@@ -1,0 +1,106 @@
+# Maxwell OS — Decision Lifecycle v1.0
+# Governs all decisions tracked in config/decisions.yaml
+#
+# ⚠️ V2 STATUS (2026-07-19): Framework is sound but NOT YET IMPLEMENTED in v2.
+# - config/decisions.yaml DOES NOT EXIST (decision registry)
+# - tools/decision_auditor.py DOES NOT EXIST
+# - tools/phantom_guard.py DOES NOT EXIST
+# - tools/implementation_guard.py DOES NOT EXIST
+# - Decision enforcement deferred to Phase 2 (lean Phase 1 approach)
+# - Cross-examinations (Kimi + Untitled 4, 2026-07-19) reaffirmed: no governance changes needed.
+#   Model decisions (no switch), sequencing (Alpha Kit first), and business model (lifetime license)
+#   are TASK decisions, not governance changes.
+
+version: "1.0"
+ratified: "2026-07-12"
+
+categories:
+  INF: 
+    name: INFRASTRUCTURE
+    desc: Pipeline, tools, scripts, paths
+    examples: [D799, D410]
+  DAT:
+    name: DATA_SAFETY
+    desc: Anytype, deletion, overwrite rules
+    examples: [D413, D824]
+  CLS:
+    name: CLASSIFICATION
+    desc: Taxonomy, domains, disciplines
+    examples: [D150, D316]
+  QLT:
+    name: QUALITY_GATES
+    desc: Validation, evaluation, smoke tests
+    examples: [G0, G6]
+  GOV:
+    name: GOVERNANCE
+    desc: Constitution, decisions, contracts
+    examples: [D852, D813]
+  PRD:
+    name: PRODUCT
+    desc: User-facing, push, Anytype objects
+    examples: [D767, D798]
+  RES:
+    name: RESEARCH
+    desc: Models, embeddings, benchmarks
+    examples: [D528, D574]
+  DEF:
+    name: DEFERRED
+    desc: Unimplemented, rejected, phantom
+    examples: [D801, D817]
+
+states:
+  PROPOSED:
+    desc: Idea logged, no sponsor
+    entry: Any agent can propose
+    exit: DRAFT or REJECTED
+  DRAFT:
+    desc: Under development
+    entry: Has champion + category + target_file
+    exit: ACTIVE or REJECTED
+  ACTIVE:
+    desc: Implemented and verified
+    entry: target_file EXISTS + passes test
+    exit: STALE or SUPERSEDED
+  STALE:
+    desc: Implementation drifted
+    entry: Hash mismatch or file deleted or test fails
+    exit: ACTIVE (after fix) or ARCHIVED
+  SUPERSEDED:
+    desc: Replaced by newer decision
+    entry: Has superseded_by field
+    exit: ARCHIVED (90 days later)
+  ARCHIVED:
+    desc: Historical record only
+    entry: 90 days inactive or G7 decision
+    exit: None
+  REJECTED:
+    desc: Will not implement
+    entry: G7 human decision
+    exit: None
+
+maintenance:
+  weekly: "python3 tools/decision_auditor.py --stale-check"
+  session_end: "python3 tools/phantom_guard.py --quick"
+  quarterly: "Full decision audit + archive STALE >90 days"
+  
+traceability:
+  required_fields: [category, state, desc, champion, target_file]
+  optional_fields: [test_command, content_hash, superseded_by, target_function, configs, gates]
+  hash_algorithm: SHA256 (first 16 chars)
+  
+expansion_policy:
+  trigger: "New decision logged in DECISION-LOG.md"
+  action: "Add to config/decisions.yaml with category + state"
+  max_active_per_category: 20
+  overflow: "Archive oldest non-critical or consolidate"
+
+# D909: Implementation-Verified state added to close LIVING≠IMPLEMENTED gap
+implementation_verification:
+  tool: "tools/implementation_guard.py"
+  cadence: "post-turn auto-audit"
+  states:
+    LIVING: "Decision agreed, implementation pending or in progress"
+    IMPLEMENTED: "All claimed files exist on filesystem"
+    VERIFIED: "IMPLEMENTED + wired to active paths + tested"
+    PHANTOM: "LIVING but claimed files missing — needs reclassification"
+  rule: "No LIVING decision with IMPL_CLAIMED may remain PHANTOM for >1 session"

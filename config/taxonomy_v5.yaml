@@ -1,0 +1,1065 @@
+version: '5.0'
+classification_version: v5.0
+groups:
+  domain:
+  - Visual Practice
+  - Digital & Interactive
+  - Illustration & Craft
+  - Business & Strategy
+  - AI & Computing
+  - Computational Art & Code
+  - Systems, Semiotics & Knowledge
+  discipline:
+  - Perception & Signal
+  - Form & Structure
+  - Design Cognition
+  - Behavioral & Cognitive
+  - Operational & Strategy
+  - Systems & Method
+  - AI & Computing
+  - Computational Craft
+  - Heterodox
+domains:
+- canonical: graphic design
+  group: Visual Practice
+  raw:
+  - Graphic Design
+  - graphic_design
+  - layout
+  - print design
+  - poster design
+  - digital art
+  - typography
+  - Typography
+  - typographic style
+  - typographic history
+  - Color Theory
+  - Color Psychology
+  - color theory
+  - color psychology
+- canonical: brand identity
+  group: Visual Practice
+  raw:
+  - Brand Identity
+  - branding
+  - brand design
+  - visual identity
+  - logo design
+  - Visual Identity Design
+  - brand strategy
+  - Brand Strategy
+  - Branding
+- canonical: editorial & advertising
+  group: Visual Practice
+  raw:
+  - editorial
+  - Editorial Design
+  - advertising
+  - Advertising
+  - copywriting
+  - presentation
+  - Presentation Design
+- canonical: motion design
+  group: Visual Practice
+  raw:
+  - motion
+  - Motion Graphics
+  - Motion Design
+  - motiongraphic
+  - animation
+  - Animation
+  - After Effects
+- canonical: environmental design
+  group: Visual Practice
+  raw:
+  - Environmental Design
+  - interior design
+  - wayfinding
+  - industrial design
+- canonical: digital product
+  group: Digital & Interactive
+  raw:
+  - Digital Product
+  - Digital Product Design
+  - UI/UX
+  - UX Design
+  - UI Design
+  - web design
+  - Web Design
+  - interaction design
+  - Interaction Design
+  - product design
+  - Product Design
+  - service design
+  - Service Design
+  - Design Research
+  - Design Research Investigation
+  - Design Operations
+  - DesignOps
+  - Design Thinking
+  - Product Development
+  - Product Management
+  - Design Systems
+  - Design System
+  - design system
+  - design systems
+- canonical: data visualization
+  group: Digital & Interactive
+  raw:
+  - Data Visualization
+  - Data Visualisation
+  - DataVis
+  - datavis
+  - information design
+  - Information Design
+  - Information Visualization
+  - Data Storytelling
+- canonical: creative technology
+  group: Digital & Interactive
+  raw:
+  - Creative Technology
+  - creative coding
+  - Creative Coding
+  - software engineering
+  - Software Engineering
+  - web development
+  - Web Development
+  - front-end
+- canonical: web & ui
+  group: Digital & Interactive
+  raw:
+  - Web Design
+  - Front-End
+  - Responsive Web Design
+  - Web Typography
+  - Web Architecture
+  - Web Navigation
+  - Web Strategy
+- canonical: user experience
+  group: Digital & Interactive
+  raw:
+  - User Experience
+  - User Experience Design
+  - UX Design
+  - UX Research
+  - UX
+  - Usability
+  - Human-Computer Interaction
+  - HCI
+  - User Interface Design
+  - UI Design
+  - UI/UX Design
+  - UI/UX
+  - Interaction Design
+  - User-Centered Design
+  - UCD
+  - User Research
+  - Service Design
+  - Accessible Design
+  - Inclusive Design
+- canonical: illustration
+  group: Illustration & Craft
+  raw:
+  - Illustration
+  - illustration
+- canonical: packaging
+  group: Illustration & Craft
+  raw:
+  - Packaging
+  - Packaging Design
+  - packaging design
+- canonical: business operations
+  group: Business & Strategy
+  raw:
+  - Business
+  - operations
+  - Business Operations
+  - Finance
+  - accounting
+  - Accounting
+  - Corporate Finance
+  - finance
+  - business
+  - business management
+  - economics
+  - Economics
+  - economic analysis
+  - economic policy
+  - Monetary Policy
+  - financial control
+  - Financial Control
+  - surveillance capitalism
+  - Surveillance Capitalism
+  - Business Model Innovation
+  - Business Model
+  - Innovation
+  - Innovation Management
+  - Corporate Strategy
+  - Business Strategy
+  - Strategic Management
+  - Product Strategy
+  - personal development
+  - Personal Development
+  - personal growth
+  - Personal Growth
+- canonical: business development
+  group: Business & Strategy
+  raw:
+  - Business Development
+  - marketing
+  - Marketing
+  - Marketing Strategy
+  - sales
+  - Sales Communication
+  - Sales Psychology
+  - Sales and Persuasion
+- canonical: entrepreneurship
+  group: Business & Strategy
+  raw:
+  - Entrepreneurship
+  - entrepreneurship
+  - startup strategy
+  - Startup Strategy
+  - startup management
+  - Startup Management
+  - indie hacking
+  - Indie Hacking
+  - bootstrapping
+  - Bootstrapping
+  - startup finance
+  - Startup Finance
+  - startup fundraising
+  - Startup Fundraising
+  - startup operations
+  - startup governance
+  - startup validation
+  - startup valuation
+  - startup formation
+  - startup leadership
+  - startup financing
+  - venture capital
+  - Venture Capital
+- canonical: organizational behavior
+  group: Business & Strategy
+  raw:
+  - Organizational Behavior
+  - organizational behavior
+  - Organizational Design
+  - Organizational Culture
+  - Organizational Psychology
+  - Organizational Management
+  - Organizational Leadership
+  - Corporate Governance
+  - Leadership
+  - management
+  - Management
+  - Human Resources Management
+- canonical: ai & agents
+  group: AI & Computing
+  raw:
+  - AI Agents
+  - AI Agents and Applications
+  - Agentic AI
+  - Agentic AI Systems
+  - Agentic Architectural Patterns
+  - Agentic Architectural Patterns for Building Multi Agent Systems
+  - Agentic Artificial Intelligence
+  - Multi-Agent Systems
+  - multi-agent systems
+  - Multi-Agent Systems Architecture
+  - AI Systems
+  - Agentic Systems
+  - AI Agent Architecture
+  - Artificial Intelligence
+  - artificial intelligence
+  - AI
+- canonical: ai systems
+  group: AI & Computing
+  raw:
+  - Machine Learning
+  - machine learning
+  - Machine Learning Engineering
+  - Machine Learning Systems
+  - Neural Networks
+  - Deep Learning
+  - Generative AI
+  - Generative AI Systems
+  - Generative AI Engineering
+  - Generative AI Infrastructure
+  - Generative AI Output Reliability
+  - Large Language Models
+  - LLM Architecture
+  - LLM Serving and Optimization
+  - LLM Application Development
+- canonical: engineering practice
+  group: AI & Computing
+  raw:
+  - Software Engineering
+  - software engineering
+  - Software Development
+  - Software Architecture
+  - Programming
+  - Object-Oriented Programming
+  - Python Programming
+  - JavaScript Programming
+  - Computer Science
+  - computer science
+- canonical: computational art
+  group: Computational Art & Code
+  raw:
+  - computational art
+  - Computational Creativity
+  - Generative Art
+  - generative art
+  - Creative Coding
+  - Creative Programming
+  - Multimedia Programming
+  - computational aesthetics
+  - computational art and design
+  - computational art and simulation
+- canonical: code & computation
+  group: Computational Art & Code
+  raw:
+  - openFrameworks
+  - Processing
+  - computational design
+  - computational graphics
+  - creative technology
+  - Data-Driven Graphic Design
+- canonical: computational science & physics
+  group: Computational Art & Code
+  raw:
+  - computational physics
+  - computational physics simulation
+  - computational simulation
+  - Computational Models of Social Life
+  - computational biology
+  - computational ecology
+  - computational neuroscience
+  - computational geometry
+  - computational systems
+  - computational evolution
+  - computational pedagogy
+  - Simulation
+  - Computer Graphics
+  - Computer Graphics / Simulation
+  - Computer Graphics / Physics Simulation
+  - Physics Simulation
+  - Cellular Automata
+  - Genetic Algorithms
+  - Neuroevolution
+- canonical: systems & frameworks
+  group: Systems, Semiotics & Knowledge
+  raw:
+  - Systems Theory
+  - Systems Thinking
+  - systems thinking
+  - Systems Science
+  - Systems Analysis
+  - systems analysis
+  - Systems Design
+  - Systems Engineering
+  - Systems Management
+  - System Dynamics
+  - System Design
+  - System Behavior
+  - System Architecture
+  - Complex Systems
+  - Complex Adaptive Systems
+  - General Systems Theory
+  - General Systems
+  - Cybernetics
+  - Systems Bible
+  - Systemantics
+  - Social Systems
+  - Family Systems
+  - Control Systems
+  - Digital Systems
+  - Communication Systems
+  - Financial Systems
+  - Social Life
+  - Social Life and Computational Models
+- canonical: semiotics & communication
+  group: Systems, Semiotics & Knowledge
+  raw:
+  - semiotics
+  - Semiotics
+  - visual semiotics
+  - Visual Semiotics
+  - Visual Rhetoric
+  - visual rhetoric
+  - Multimodal Metaphor
+  - multimodal metaphor
+  - Peircean Semiotics
+  - Peircean semiotics
+  - biosemiotics
+  - cognitive semiotics
+  - social semiotics
+  - Social Semiotics
+  - sociosemiotics
+  - media semiotics
+  - history of semiotics
+  - linguistics
+  - Linguistics
+  - Cognitive Linguistics
+  - Philosophy of Language
+  - Phenomenology
+  - phenomenology
+  - Umwelt theory
+  - Communication
+  - Communication Theory
+  - Communication Studies
+  - Communication Strategy
+  - Business Communication
+  - Interpersonal Communication
+  - Nonverbal Communication
+  - Nonverbal Communication Analysis
+  - body language
+  - Body Language Analysis
+  - Media Studies
+  - Cultural Studies
+  - Visual Communication
+  - visual communication
+  - Communication Design
+- canonical: research & methodology
+  group: Systems, Semiotics & Knowledge
+  raw:
+  - Research Methodology
+  - research methodology
+  - Research Methods
+  - Research Design
+  - Research Ethics
+  - Academic Research
+  - Academic Writing
+  - Academic Publishing
+  - Qualitative Research Methodology
+  - Qualitative Research Methods
+  - qualitative research methodology
+  - qualitative research methods
+  - quantitative research methodology
+  - Grounded Theory
+  - Ethnography
+  - ethnography
+  - ethnomethodology
+  - Ethnomethodology
+  - Phenomenology
+  - Action Research
+  - Program Evaluation
+  - Social Science Research
+  - Social Science Research Methodology
+  - social science research methodology
+  - Social Sciences
+  - social sciences
+  - Statistics
+  - statistics
+  - Data Analysis
+  - Data Science
+  - Probability Theory
+  - Information Theory
+  - Information Science
+  - Library Science
+  - Decision Science
+  - Epistemology
+  - epistemology
+  - philosophy of science
+  - Philosophy of Science
+disciplines:
+- canonical: visual perception
+  group: Perception & Signal
+  raw:
+  - Visual Perception
+  - visual perception
+  - Visual Culture
+  - Color Psychology
+  - Color Theory
+  - color theory
+- canonical: visual semiotics
+  group: Perception & Signal
+  raw:
+  - Visual Semiotics
+  - visual semiotics
+  - visual rhetoric
+  - Visual Rhetoric
+  - Visual Communication
+  - visual communication
+  - Visual Communication Design
+  - Multimodal Metaphor
+  - multimodal metaphor
+  - Multimodal Discourse Analysis
+- canonical: cultural design
+  group: Perception & Signal
+  raw:
+  - cultural design
+  - Cultural Design
+  - Design History
+  - design history
+  - Design Theory
+  - Design History and Theory
+  - Art History
+- canonical: semiotics
+  group: Perception & Signal
+  raw:
+  - semiotics
+  - Semiotics
+  - Peircean Semiotics
+  - biosemiotics
+  - cognitive semiotics
+  - social semiotics
+  - sociosemiotics
+  - media semiotics
+  - history of semiotics
+  - classical semiotic theory
+- canonical: multimodal metaphor
+  group: Perception & Signal
+  raw:
+  - Multimodal Metaphor
+  - multimodal metaphor
+  - Metaphorically Selling
+  - Metaphorical Selling
+- canonical: typography
+  group: Form & Structure
+  raw:
+  - typography
+  - Typography
+  - Web Typography
+  - web typography
+  - typographic style
+  - typographic design
+  - typographic history
+  - typographic symbols
+  - Typography History
+  - typography history
+  - history of typography
+  - history of type design
+  - typeface design
+  - Typographic Hierarchy
+- canonical: color theory
+  group: Form & Structure
+  raw:
+  - Color Theory
+  - color theory
+  - Color Psychology
+  - Color and design
+  - Color Theory & Layout
+- canonical: composition & layout
+  group: Form & Structure
+  raw:
+  - composition+layout
+  - Composition + Layout
+  - Layout
+  - Layout Essentials
+  - Layout and Composition
+  - Layout Design
+  - Layout and Typography
+  - Grid Systems
+  - Grid & Spatial Systems
+  - grid+spatial system
+  - Layout & Typography
+  - Layout and Grid Systems
+  - page layout
+  - Graphic Design Layout
+  - structural forms
+- canonical: geometry & proportion
+  group: Form & Structure
+  raw:
+  - geometry+proportion
+  - Geometry and Proportions
+  - Geometry
+  - sacred geometry
+- canonical: motion & time
+  group: Form & Structure
+  raw:
+  - motion+time
+  - Motion and Time
+  - Motion Design
+  - Motion Graphics
+  - motion graphics
+  - Motion Graphic Design
+  - Animation
+  - animation
+  - Compositing
+  - Design for Motion
+  - Motion Graphics Software Interface
+  - Film Editing
+  - Film Production
+  - Film Studies
+- canonical: iconography
+  group: Form & Structure
+  raw:
+  - visual language+iconography
+  - Iconography & Visual Language
+  - iconography
+  - Visual Language
+  - symbolism
+- canonical: design psychology
+  group: Design Cognition
+  raw:
+  - Design Psychology
+  - design psychology
+  - cognitive ergonomics
+  - Cognitive Ergonomics
+  - Emotional Design
+  - emotional design
+  - Design Psychology
+- canonical: information architecture
+  group: Design Cognition
+  raw:
+  - Information Architecture
+  - information architecture
+  - Information Architecture For the Web and Beyond
+  - Information Design
+  - Information Graphics
+  - Information Graphics and Visualization
+  - Labeling Systems
+  - Taxonomy Design
+  - Taxonomy and Classification
+  - Controlled Vocabularies
+  - Search and Navigation
+  - Navigation Design
+  - Search Interface Design
+  - Search Systems
+  - Web Navigation
+  - Web Navigation Design
+- canonical: narrative design
+  group: Design Cognition
+  raw:
+  - narrative design
+  - Narrative Design
+  - Storytelling
+  - storytelling
+  - Narrative
+  - Visual Storytelling
+  - Data Storytelling
+  - Design is storytelling
+- canonical: design systems
+  group: Design Cognition
+  raw:
+  - Design Systems
+  - design systems
+  - Design System
+  - design system
+  - Atomic Design
+  - atomic design
+  - Building Design Systems
+  - Design That Scales
+  - Design Systems Governance
+  - Design Operations
+  - Modularity
+- canonical: design strategy
+  group: Design Cognition
+  raw:
+  - practice strategy
+  - Practice Strategy
+  - Design Strategy
+  - design strategy
+  - Design Management
+  - Design Process
+  - design process
+  - Design Research
+  - Design Research Investigation
+  - Scoping
+  - scoping
+  - Product Strategy
+  - UX Strategy
+  - Design Education
+  - Strategy
+- canonical: creative process
+  group: Design Cognition
+  raw:
+  - practice execution
+  - Practice Execution
+  - creative process
+  - Creative Process
+  - Creative Process and Workflow
+  - Creative Practice
+  - Creative Problem Solving
+  - Creativity
+  - creativity
+  - Creative Psychology
+  - Psychology of Creativity
+  - Creative Resistance
+  - Creative Work
+  - Creative Direction
+  - Innovation
+  - Innovation Management
+  - innovation management
+  - Organizational Creativity
+  - execution
+- canonical: cognitive science
+  group: Behavioral & Cognitive
+  raw:
+  - Cognitive Science
+  - cognitive science
+  - Cognitive Psychology
+  - Cognitive Ergonomics
+  - Cognitive Bias
+  - Cognitive Load
+  - Cognitive Load Management
+  - Creative Psychology
+  - creative psychology
+  - cognitive psychology
+- canonical: behavioral economics
+  group: Behavioral & Cognitive
+  raw:
+  - Behavioral Economics
+  - behavioural economics+persuasion
+  - behavioral economics
+  - behavioral psychology
+  - Behavioral Analysis
+  - behavioral analysis
+  - Consumer Behavior
+  - Persuasion
+  - persuasion
+  - Rhetoric
+  - rhetoric
+- canonical: decision making
+  group: Behavioral & Cognitive
+  raw:
+  - Decision Making
+  - decision making
+  - Decision Science
+  - Decision Making and Creativity
+  - Strategic Decision Making
+  - Problem Solving
+  - Forecasting
+- canonical: psychology
+  group: Behavioral & Cognitive
+  raw:
+  - Psychology
+  - psychology
+  - Social Psychology
+  - Cognitive Psychology
+  - Organizational Psychology
+  - psychology of creativity
+- canonical: linguistics
+  group: Behavioral & Cognitive
+  raw:
+  - Cognitive Linguistics
+  - linguistics
+  - Linguistics
+  - Philosophy of Language
+  - cognitive linguistics
+- canonical: leadership
+  group: Operational & Strategy
+  raw:
+  - Leadership
+  - leadership
+  - Organizational Leadership
+  - Strategic Leadership
+  - Team Dynamics
+  - Conflict Resolution
+  - Stakeholder Engagement
+- canonical: strategic thinking
+  group: Operational & Strategy
+  raw:
+  - Strategic Thinking
+  - strategic thinking
+  - Strategic Management
+  - Strategic Planning
+  - Business Strategy
+  - business strategy
+  - Corporate Strategy
+  - Strategic Decision Making
+- canonical: project management
+  group: Operational & Strategy
+  raw:
+  - Project Management
+  - project management
+  - Product Management
+  - Product Development
+  - Product Discovery
+  - Operations Management
+  - Supply Chain Management
+  - Resource Management
+- canonical: risk management
+  group: Operational & Strategy
+  raw:
+  - Risk Management
+  - risk management
+- canonical: personal productivity
+  group: Operational & Strategy
+  raw:
+  - Personal Productivity
+  - personal productivity
+  - personal development
+  - Personal Development
+  - Personal Effectiveness
+  - Time Management
+  - Career Development
+  - Career Strategy
+  - Professional Development
+  - Professional Practice
+  - Execution
+  - Productivity
+  - productivity
+  - Remote Work and Burnout Prevention
+- canonical: marketing
+  group: Operational & Strategy
+  raw:
+  - Marketing
+  - marketing
+  - Marketing Strategy
+  - Brand Management
+  - Brand Strategy
+  - brand strategy
+  - Content Strategy
+  - advertising
+  - Advertising
+  - Sales
+  - Sales Communication
+  - Sales Psychology
+- canonical: systems thinking
+  group: Systems & Method
+  raw:
+  - Systems Thinking
+  - systems thinking
+  - Systems Theory
+  - systems theory
+  - Systems Science
+  - Systems Analysis
+  - General Systems
+  - Systems Bible
+  - Systemantics
+  - System Dynamics
+  - Systems Design
+  - Systems Management
+  - System Behavior
+  - Family Systems
+  - Social Systems
+  - Control Systems
+  - Communication Systems
+- canonical: complex adaptive systems
+  group: Systems & Method
+  raw:
+  - Complex Adaptive Systems
+  - Complex Systems
+  - complex systems
+  - Computational Models of Social Life
+  - Computational Social Science
+  - Computational Modeling
+  - emergence
+  - Emergence
+- canonical: systems engineering
+  group: Systems & Method
+  raw:
+  - Systems Engineering
+  - systems engineering
+  - System Design
+  - System Architecture
+  - Systems Design
+  - Software Architecture
+  - Frontend Architecture
+  - Cloud Application Architecture
+- canonical: research methodology
+  group: Systems & Method
+  raw:
+  - Research Methodology
+  - research methodology
+  - Research Methods
+  - Research Design
+  - Qualitative Research
+  - Quantitative Research
+  - Grounded Theory
+  - Ethnography
+  - Action Research
+  - Situational Analysis
+  - Program Evaluation
+  - Statistics
+  - Data Analysis
+  - Exploratory Data Analysis
+  - Statistical Graphics
+  - Data Science
+- canonical: operations research
+  group: Systems & Method
+  raw:
+  - Operations Research
+  - operations research
+  - Decision Science
+  - Probability Theory
+  - Information Theory
+  - Game Theory
+  - Simulation
+- canonical: prompt engineering
+  group: AI & Computing
+  raw:
+  - Prompt Engineering
+  - prompt engineering
+  - Prompt Engineering for Generative AI
+- canonical: agentic architecture
+  group: AI & Computing
+  raw:
+  - Agentic Architectural Patterns
+  - Agentic Architectural Patterns for Building Multi Agent Systems
+  - Multi-Agent Systems
+  - multi-agent systems
+  - Multi-Agent Systems Architecture
+  - AI Agent Architecture
+  - Agentic Systems
+  - Agentic AI
+  - Agentic AI Systems
+  - Agentic Artificial Intelligence
+  - Designing Multi-Agent Systems
+  - Agentic AI for Engineers
+  - AI Agents and Applications
+- canonical: machine learning
+  group: AI & Computing
+  raw:
+  - Machine Learning
+  - machine learning
+  - Machine Learning Engineering
+  - Machine Learning Systems
+  - Neural Networks
+  - Deep Learning
+  - Computer Vision
+  - Natural Language Processing
+  - Large Language Models
+  - LLM Architecture
+  - LLM Serving and Optimization
+  - LLM Application Development
+- canonical: generative ai
+  group: AI & Computing
+  raw:
+  - Generative AI
+  - generative ai
+  - Generative AI Systems
+  - Generative AI Engineering
+  - Generative AI Infrastructure
+  - Generative AI Output Reliability
+  - Generative AI Services
+  - AI Engineering
+  - AI Strategy
+- canonical: software engineering
+  group: AI & Computing
+  raw:
+  - Software Engineering
+  - software engineering
+  - Software Development
+  - Object-Oriented Programming
+  - Python Programming
+  - JavaScript Programming
+  - Web Development
+  - Front-End Development
+  - Computer Science
+  - computer science
+  - Programming
+  - Image Processing
+- canonical: creative coding
+  group: Computational Craft
+  raw:
+  - Creative Coding
+  - creative coding
+  - Creative Programming
+  - Creative Technology
+  - openFrameworks
+  - Processing
+  - Multimedia Programming
+  - computational design
+  - computational graphics
+  - Data-Driven Graphic Design
+- canonical: generative design
+  group: Computational Craft
+  raw:
+  - Generative Design
+  - generative design
+  - Generative Art
+  - generative art
+  - Computational Creativity
+  - computational creativity
+- canonical: computational physics & simulation
+  group: Computational Craft
+  raw:
+  - computational physics
+  - computational physics simulation
+  - computational simulation
+  - Physics Simulation
+  - computational biology
+  - computational ecology
+  - computational neuroscience
+  - Computational Models of Social Life
+  - Cellular Automata
+  - Genetic Algorithms
+  - Neuroevolution
+  - Simulation
+  - Computer Graphics / Simulation
+  - Computer Graphics / Physics Simulation
+  - computational evolution
+  - computational systems
+- canonical: computational geometry
+  group: Computational Craft
+  raw:
+  - computational geometry
+  - Geometry
+  - Geometry and Proportions
+  - Mathematics
+  - mathematics
+- canonical: game design
+  group: Computational Craft
+  raw:
+  - Game Design
+  - game design
+  - Game Studies
+  - Interactive Design
+- canonical: social engineering
+  group: Heterodox
+  raw:
+  - Social Engineering
+  - social engineering
+  - OSINT
+  - Intelligence Analysis
+- canonical: political economy
+  group: Heterodox
+  raw:
+  - political economy
+  - Political Economy
+  - geopolitical strategy
+  - geopolitics
+  - political science
+  - Political Science
+  - political theory
+  - economic theory
+  - macroeconomics
+  - microeconomics
+  - economics
+  - Economics
+  - economic analysis
+  - economic history
+- canonical: privacy & surveillance
+  group: Heterodox
+  raw:
+  - Privacy & Surveillance
+  - privacy
+  - surveillance
+  - OSINT
+  - counter-surveillance
+  - data privacy
+  - digital privacy
+  - surveillance capitalism
+  - surveillance studies
+  - information privacy
+  - data protection
+  - privacy engineering
+- canonical: philosophy
+  group: Heterodox
+  raw:
+  - Philosophy
+  - philosophy
+  - Epistemology
+  - epistemology
+  - Philosophy of Science
+  - philosophy of science
+  - Phenomenology
+  - phenomenology
+  - Ethics
+
+# ── D34-R7/R14: Meta labels for unclassified principles ──
+# "emerging" is NOT a 26th canonical domain or 48th discipline.
+# It is a catch-all for principles that don't fit the 25-domain/47-discipline taxonomy.
+# Valid in: domain_canonical, discipline_canonical, classify_domains.py, classify_disciplines.py.
+# NOT counted by contract_DOMAIN_COUNT or contract_DISCIPLINE_COUNT.
+meta:
+  catch_all_domain: emerging
+  catch_all_discipline: emerging
+  catch_all_description: >
+    Used when no canonical domain or discipline fits the principle ontologically
+    and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
+    for future taxonomy expansion when enough principles accumulate under a label.

@@ -1,0 +1,960 @@
+# domain_disciplines.yaml — Per-domain discipline whitelist (v2.0 — regenerated from data)
+# Generated: 2026-07-09T19:44:06 | Classification: v5.0
+# Maps each v5 canonical domain to disciplines found in classified converged data.
+# Source: 25,667 principles across 9 converged domains.
+# Includes "emerging" domain for pipeline-placeholder FBs.
+version: '2.0'
+classification_version: v5.0
+generated: '2026-07-09T19:44:06'
+source: Regenerated from 25,667 classified converged principles (S3a output)
+note: Disciplines derived from actual classification output, not pre-S3 assumptions.
+domains:
+  ai & agents:
+    group: AI & Computing
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - visual perception
+    - visual semiotics
+  ai systems:
+    group: AI & Computing
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative process
+    - design psychology
+    - design strategy
+    - design systems
+    - generative ai
+    - generative design
+    - information architecture
+    - linguistics
+    - machine learning
+    - operations research
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - systems engineering
+    - systems thinking
+    - visual perception
+  brand identity:
+    group: Visual Practice
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - composition & layout
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - political economy
+    - project management
+    - psychology
+    - research methodology
+    - semiotics
+    - social engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  business development:
+    group: Business & Strategy
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - complex adaptive systems
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - generative ai
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - political economy
+    - privacy & surveillance
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - visual perception
+    - visual semiotics
+  business operations:
+    group: Business & Strategy
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - computational geometry
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - generative ai
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - visual perception
+    - visual semiotics
+  code & computation:
+    group: Computational Art & Code
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - design strategy
+    - design systems
+    - generative ai
+    - generative design
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - political economy
+    - prompt engineering
+    - software engineering
+    - typography
+    - visual semiotics
+  computational art:
+    group: Computational Art & Code
+    disciplines:
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - information architecture
+    - machine learning
+    - motion & time
+    - multimodal metaphor
+    - philosophy
+    - prompt engineering
+    - semiotics
+    - software engineering
+    - typography
+    - visual perception
+    - visual semiotics
+  computational science & physics:
+    group: Computational Art & Code
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - cultural design
+    - design psychology
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - information architecture
+    - linguistics
+    - machine learning
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - psychology
+    - research methodology
+    - semiotics
+    - software engineering
+    - systems engineering
+    - systems thinking
+    - visual perception
+    - visual semiotics
+  creative technology:
+    group: Digital & Interactive
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - information architecture
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - semiotics
+    - social engineering
+    - software engineering
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  data visualization:
+    group: Digital & Interactive
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  digital product:
+    group: Digital & Interactive
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - color theory
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - information architecture
+    - marketing
+    - motion & time
+    - narrative design
+    - political economy
+    - project management
+    - research methodology
+    - risk management
+    - semiotics
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  editorial & advertising:
+    group: Visual Practice
+    disciplines:
+    - behavioral economics
+    - color theory
+    - composition & layout
+    - computational geometry
+    - creative coding
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - geometry & proportion
+    - information architecture
+    - leadership
+    - linguistics
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - software engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  engineering practice:
+    group: AI & Computing
+    disciplines:
+    - agentic architecture
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - information architecture
+    - machine learning
+    - marketing
+    - motion & time
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - visual semiotics
+  entrepreneurship:
+    group: Business & Strategy
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - generative ai
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems thinking
+    - visual semiotics
+  environmental design:
+    group: Visual Practice
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational physics & simulation
+    - creative coding
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - linguistics
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - political economy
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  graphic design:
+    group: Visual Practice
+    disciplines:
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational geometry
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - project management
+    - psychology
+    - research methodology
+    - semiotics
+    - software engineering
+    - typography
+    - visual perception
+    - visual semiotics
+  illustration:
+    group: Illustration & Craft
+    disciplines:
+    - color theory
+    - composition & layout
+    - creative coding
+    - creative process
+    - cultural design
+    - design strategy
+    - geometry & proportion
+    - iconography
+    - linguistics
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - political economy
+    - psychology
+    - research methodology
+    - semiotics
+    - typography
+    - visual perception
+    - visual semiotics
+  motion design:
+    group: Visual Practice
+    disciplines:
+    - color theory
+    - composition & layout
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design strategy
+    - design systems
+    - game design
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - project management
+    - psychology
+    - semiotics
+    - software engineering
+    - systems engineering
+    - typography
+    - visual perception
+    - visual semiotics
+  organizational behavior:
+    group: Business & Strategy
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - complex adaptive systems
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - information architecture
+    - leadership
+    - linguistics
+    - marketing
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - visual perception
+    - visual semiotics
+  packaging:
+    group: Illustration & Craft
+    disciplines:
+    - color theory
+    - composition & layout
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - information architecture
+    - marketing
+    - operations research
+    - political economy
+    - psychology
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  research & methodology:
+    group: Systems, Semiotics & Knowledge
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  semiotics & communication:
+    group: Systems, Semiotics & Knowledge
+    disciplines:
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational physics & simulation
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative design
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - philosophy
+    - political economy
+    - project management
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  systems & frameworks:
+    group: Systems, Semiotics & Knowledge
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational geometry
+    - computational physics & simulation
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  user experience:
+    group: Digital & Interactive
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - iconography
+    - information architecture
+    - leadership
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  web & ui:
+    group: Digital & Interactive
+    disciplines:
+    - color theory
+    - composition & layout
+    - computational geometry
+    - creative process
+    - cultural design
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - machine learning
+    - marketing
+    - motion & time
+    - narrative design
+    - philosophy
+    - project management
+    - prompt engineering
+    - research methodology
+    - semiotics
+    - software engineering
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+  emerging:
+    group: Pipeline Workflow
+    disciplines:
+    - agentic architecture
+    - behavioral economics
+    - cognitive science
+    - color theory
+    - complex adaptive systems
+    - composition & layout
+    - computational geometry
+    - computational physics & simulation
+    - creative coding
+    - creative process
+    - cultural design
+    - decision making
+    - design psychology
+    - design strategy
+    - design systems
+    - game design
+    - generative ai
+    - generative design
+    - geometry & proportion
+    - iconography
+    - information architecture
+    - leadership
+    - linguistics
+    - machine learning
+    - marketing
+    - motion & time
+    - multimodal metaphor
+    - narrative design
+    - operations research
+    - personal productivity
+    - philosophy
+    - political economy
+    - privacy & surveillance
+    - project management
+    - prompt engineering
+    - psychology
+    - research methodology
+    - risk management
+    - semiotics
+    - social engineering
+    - software engineering
+    - strategic thinking
+    - systems engineering
+    - systems thinking
+    - typography
+    - visual perception
+    - visual semiotics
+    note: D34 pipeline placeholder — FBs awaiting S3a classification. All disciplines valid.

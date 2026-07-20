@@ -1,0 +1,70 @@
+# Secrets — DO NOT COMMIT
+.env
+**/.env
+*.env
+api-keys.env
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Pipeline generated data (regenerable)
+data/checkpoints/*.jsonl
+data/checkpoints/*.jsonl.segids
+data/checkpoints/bucket_clusters/
+data/checkpoints/bucket_clusters/**/*.jsonl
+data/maxwell.db
+data/maxwell.db-shm
+data/maxwell.db-wal
+data/parquet/*.parquet
+
+# Large books directory (symlinks, not actual books)
+books/
+
+# Temp files
+temp/
+/tmp/
+
+# Editor files
+*.swp
+*.swo
+*~
+.zed/
+**/.zed/
+
+# Agent data
+.agents/
+.brv/
+.claude/
+.claudeignore
+
+# Audio/video files (large, not code)
+*.mp3
+*.mp4
+*.wav
+*.mov
+
+# Binary tools
+*.bin
+
+# Old archive directory
+archive/
+
+# Archived zips (old code dumps)
+*.zip
+# Empty books dir (symlinked content)
+books
+books/

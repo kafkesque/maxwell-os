@@ -1,0 +1,273 @@
+version: '1.0'
+generated: '2026-07-02T14:11:00Z'
+description: "Maxwell OS Pipeline \u2014 Universal Deployment Config. One file configures\
+  \ everything."
+models:
+  s1_embedder: nomic-embed-text
+  s3_converger: Qwen3.6-35B-A3B-4bit
+  s5_generator: gemma-4-26B-A4B-it-OptiQ-4bit
+  name_normalizer: Phi-4-mini-instruct-8bit
+  omlx_url: http://127.0.0.1:11435/v1/chat/completions
+  fallback_provider: deepseek
+  fallback_model: deepseek-v4
+  s6_validator: gemma-4-26B-A4B-it-OptiQ-4bit
+  t2_gate: Qwen3.6-35B-A3B-4bit
+  s3a_convergence: Qwen3.6-35B-A3B-4bit
+  s3_summarizer: Phi-4-mini-instruct-8bit
+  t3_gate: Qwen3.6-35B-A3B-4bit
+  context_class: Qwen3.6-35B-A3B-4bit
+  draft_triage: Ornith-1.0-9B-4bit
+  resident_brain: Qwen3.6-35B-A3B-4bit
+  reviewer: gemma-4-26B-A4B-it-OptiQ-4bit
+paths:
+  project_root: ${MAXWELL_ROOT}
+  heavy_data: knowledge pipeline  # D34: unified into project root (relative path)
+  anytype_url: http://127.0.0.1:31009
+  education: ~/Library/CloudStorage/Dropbox/education/books
+  temp: knowledge pipeline/.tmp/
+credentials:
+  anytype_key: f8JwVR/tR7XakA+6B7x23YBuTEiMxkem1YlLM/lXkRc=
+spaces:
+  non_private:
+    id: bafyreicnqhopbqqrpfgwpopjscm2anxitak3yeuzsn4zelftzrjiugbm5m.2vbzhnpt5cgin
+    type_key: foundational_block___l_1
+    label: Knowledge Base
+  private:
+    id: bafyreihfpapgcfri5nxt3tcnykeua5wrdegb66osewtwiqghtedh7opd3i.2vbzhnpt5cgin
+    type_key: foundation_block
+    label: deathpectation
+taxonomy:
+  file: config/taxonomy_v5.yaml
+  canonical_domains: 25
+  canonical_disciplines: 47
+  context_tags:
+  - personal
+  - design
+  - business
+  - academic
+  - system-always
+  - system-phase
+properties:
+  required:
+  - status
+  - depth
+  - evidence
+  - accessibility
+  - discipline
+  - domain
+  - citation
+  - intimacy_boundary
+  - domains_knowledge
+  - classification_version
+  - classified_at
+  - classification_method
+  - last_verified
+  auto_populated:
+    status: draft
+    domains_knowledge: 'yes'
+    classification_version: v5.0
+    classification_method: S5-generate
+routing:
+  content_based:
+    personal_disciplines:
+    - personal productivity
+    - psychology
+    - cognitive science
+    - decision making
+    - behavioral economics
+    design_business_domains:
+    - graphic design
+    - brand identity
+    - editorial & advertising
+    - motion design
+    - environmental design
+    - digital product
+    - web & ui
+    - user experience
+    - illustration
+    - packaging
+    - creative technology
+    - business operations
+    - business development
+    - entrepreneurship
+    - organizational behavior
+    rule: If discipline in personal_disciplines AND no design_business_domains ->
+      Private
+  label_based:
+    d383: PERSONAL in context (solo or mixed) -> Private
+    intimacy: private or selective -> Private
+    default: public -> Non-Private
+field_map:
+  NAME: name
+  DISCIPLINE: discipline
+  EVIDENCE: evidence
+  DEPTH: depth
+  DEFINITION: definition
+  APPLICATION: application
+  FAILURE_MODE: failure_mode
+  FAILURE MODE: failure_mode
+  ACCESSIBILITY: accessibility
+  CONTEXT: context
+  DOMAINS: domains
+  DOMAINS_KNOWLEDGE: domains_knowledge
+  SOURCE: source
+  JARGON: jargon
+  RELATED_BLOCKS: related_blocks
+  RELATED BLOCKS: related_blocks
+  CITATIONS: citations
+  CITATION: citation
+  GROUNDING_EVIDENCE: grounding_evidence
+  SOURCE_PARAGRAPH_IDS: source_paragraph_ids
+  INTIMACY_BOUNDARY: intimacy_boundary
+  EMBODIMENT_TAG: embodiment_tag
+  WHY_THIS_MATTERS_TO_ME: why_this_matters_to_me
+  CONFIDENCE: confidence
+  VERSION: version
+  SCHEMA_VERSION: schema_version
+  GEN_MODEL: gen_model
+  PIPELINE_COMMIT: pipeline_commit
+  SUPERSEDED_BY: superseded_by
+  INTENT_TAGS: intent_tags
+  PREREQUISITES: prerequisites
+  CONTRADICTIONS: contradictions
+  STATUS: status
+null_values:
+- 'NULL'
+- None
+- ''
+body_format:
+  zones:
+  - ZONE 1 - RELATIONS
+  - ZONE 2 - BODY
+  - ZONE 3 - STABLE GATE
+  sections:
+  - DEFINITION
+  - APPLICATION
+  - FAILURE MODE
+  - JARGON
+  emojis:
+    definition: "\U0001F3DB\uFE0F"
+    application: "\U0001F525"
+    failure_mode: "\u26A0\uFE0F"
+    jargon: "\U0001F913"
+status_correlation:
+  stable_requirement: deployed >= 3 times with successful outcomes
+  deprecated_requirement: not deployed for 90-180 days
+  evidence_stability_map:
+    cited: "Highest \u2014 externally validated"
+    axiomatic: "Medium \u2014 self-evident truth"
+    experiential: "Lowest \u2014 single perspective"
+gates:
+  G0:
+    description: Pre-flight liveness check
+    check: Anytype API + OMLX available
+  G1:
+    description: OID parity between SPACE_CONFIG and live Anytype API
+    check: Tag counts match live API
+  G2:
+    description: Canonical domain guard
+    check: All domains in batch are canonical taxonomy values
+  G3:
+    description: Post-push object verification
+    check: Ledger OIDs match live API OIDs via LIST pagination
+  G4:
+    description: Routing correctness
+    check: Intimacy=private/selective → Private, context=personal → Private
+  G5:
+    description: Body format verification
+    check: Pipeline FBs have ZONE 1-2 in snippet (Z3 truncated in preview)
+  G6:
+    description: Name quality
+    check: No sentence-like names (>7 words, starts with A/The/An)
+  G7:
+    description: HUMAN GATE — manual review
+    check: Maxwell reviews and approves batch
+  G8:
+    description: Idempotency
+    check: No same-space duplicates >2 copies
+  G9:
+    description: Depth-label validation
+    check: specialized=1 domain, domain=1-2, cross-domain=2+
+  G10:
+    description: Gemma-4 independent claim verification (advisory)
+    check: Name quality, claim verifiability, consistency
+  G11:
+    description: Taxonomy validation
+    check: All discipline/domain/status/accessibility are canonical
+  G12:
+    description: Live API canonical check (Phase 2)
+    check: Pull 20 live objects, verify all property values canonical
+source_of_truth:
+  S3a:
+    authoritative_for:
+    - domain_classification
+    - discipline_classification
+    - depth_classification
+    file: knowledge pipeline/input/3.converged/{domain}/converged_principles.json
+    rule: domain_canonical + discipline_canonical are authoritative. Raw fields are
+      historical.
+  S6:
+    authoritative_for:
+    - fb_content
+    - field_completeness
+    - violation_status
+    file: knowledge pipeline/output/6.validated/{batch}/_manifest.json
+    rule: Validated .md files are authoritative for FB body content. Manifest status
+      (PASS/FLAG/QUARANTINE) is authoritative.
+  S8:
+    authoritative_for:
+    - final_artifact
+    - live_state
+    file: Anytype space (live API)
+    rule: "The pushed Anytype object is the FINAL authority. Any discrepancy between\
+      \ local files and Anytype objects \u2192 Anytype wins. Re-push if needed."
+  discrepancy_resolution: "If S3a says 'specialized' but S8 object has 'cross-domain'\
+    \ \u2192 S8 wins (pipeline corrected it). If S6 says PASS but S8 object has NULL\
+    \ jargon \u2192 S8 wins (push verification caught it). If S3a says 'psychology'\
+    \ domain but S8 doesn't \u2192 S8 wins (canonical filter)."
+circuit_breakers:
+  BORP_quarantine_rate:
+    threshold: 0.3
+    action: HALT_PIPELINE
+    description: If >30% of FBs are quarantined, something is fundamentally wrong.
+      Stop and diagnose.
+  OID_mismatch:
+    threshold: 1
+    action: HALT_PIPELINE
+    description: Any OID mismatch between SPACE_CONFIG and live Anytype API halts
+      push.
+  depth_violation_rate:
+    threshold: 0.05
+    action: HALT_PIPELINE
+    description: If >5% of FBs have depth-vs-domain-count violations, S3a/S5 classification
+      is broken.
+  name_sentence_rate:
+    threshold: 0.0
+    action: HALT_PIPELINE
+    description: Any sentence-like name halts push. Run normalize_fb_names.py first.
+  canonical_domain_leak:
+    threshold: 1
+    action: HALT_PIPELINE
+    description: Any non-canonical domain in output halts. Fix S6 canonical filter.
+  push_failure_rate:
+    threshold: 0.1
+    action: WARN
+    description: If >10% of FBs fail to push, log and continue but flag for review.
+temp:
+  default: knowledge pipeline/.tmp/
+  logs: logs/
+  max_age_hours: 24
+  description: Temporary files, session outputs, scratch work. Auto-cleaned after
+    max_age.
+archive_rules:
+  _historical: Superseded content, kept for reference
+  _archive: Dead content, kept for reference only
+  _merged: Merged from duplicate directory
+  temp_path: knowledge pipeline/.tmp/
+  index_file: agent/docs-index.yaml
+agent:
+  docs_index: agent/docs-index.yaml
+  session_seed: agent/session_seed.yaml
+  compact_constitution: agent/compact-constitution.md
+  decision_log: DECISION-LOG.md
+  master_task: MASTER-TASK-REGISTER.md

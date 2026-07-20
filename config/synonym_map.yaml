@@ -1,0 +1,743 @@
+# K4: Synonym Map — Domain Label to Search Terms (L2, D29-D)
+# 2026-07-08
+#
+# Maps every S3 canonical domain label to user-searchable terms.
+# Addresses FM2 (D28 Pattern Gap): the D28 GENERAL_PATTERNS list
+# misses entire domains like information architecture, design systems,
+# branding, prototyping, agile, management, business law.
+#
+# This expands D28's hardcoded pattern matching to cover actual S3 vocabulary.
+# Generation: python3 tools/synonym_generator.py --validate
+#
+# See also: config/taxonomy_v5.yaml, config/context_definitions.yaml
+# Related FBs: C5 (Keyword Validation), K5 (FB Relations)
+
+version: "2026-07-08.K4"
+classification_version: v1.0
+
+# ── Domain → Synonym Mappings ──
+# Each domain has:
+#   - synonyms: equivalent terms used in source materials
+#   - keywords: searchable terms for user queries
+#   - patterns: regex-like patterns for D28 expansion
+synonyms:
+  graphic_design:
+    canonical: graphic design
+    synonyms:
+      - graphic design
+      - visual communication
+      - print design
+      - poster design
+    keywords:
+      - composition
+      - layout
+      - typography
+      - color theory
+      - visual hierarchy
+    patterns:
+      - "graphic"
+      - "print"
+      - "poster"
+      - "layout"
+      - "typography"
+
+  brand_identity:
+    canonical: brand identity
+    synonyms:
+      - brand identity
+      - branding
+      - brand design
+      - visual identity
+    keywords:
+      - logo
+      - brand strategy
+      - brand guidelines
+      - identity system
+      - brand positioning
+    patterns:
+      - "brand"
+      - "identity"
+      - "logo"
+
+  editorial_advertising:
+    canonical: editorial & advertising
+    synonyms:
+      - editorial design
+      - advertising
+      - publication design
+      - copywriting
+    keywords:
+      - magazine
+      - newspaper
+      - ad campaign
+      - editorial layout
+      - publication
+    patterns:
+      - "editorial"
+      - "advertis"
+      - "publication"
+      - "magazine"
+      - "copywriting"
+
+  motion_design:
+    canonical: motion design
+    synonyms:
+      - motion design
+      - motion graphics
+      - animation
+      - kinetic typography
+    keywords:
+      - animation
+      - motion
+      - kinetic
+      - video
+      - timeline
+    patterns:
+      - "motion"
+      - "animation"
+      - "kinetic"
+      - "video"
+
+  environmental_design:
+    canonical: environmental design
+    synonyms:
+      - environmental design
+      - spatial design
+      - wayfinding
+      - exhibition design
+      - signage
+    keywords:
+      - space
+      - signage
+      - wayfinding
+      - exhibition
+      - environmental
+    patterns:
+      - "environmental"
+      - "spatial"
+      - "wayfinding"
+      - "signage"
+      - "exhibition"
+
+  digital_product:
+    canonical: digital product
+    synonyms:
+      - digital product
+      - product design
+      - app design
+      - saas design
+      - interaction design
+    keywords:
+      - product
+      - app
+      - saas
+      - digital
+      - interaction
+    patterns:
+      - "digital product"
+      - "product design"
+      - "app design"
+      - "interaction"
+
+  data_visualization:
+    canonical: data visualization
+    synonyms:
+      - data visualization
+      - data viz
+      - information visualization
+      - infographics
+      - statistical graphics
+    keywords:
+      - chart
+      - graph
+      - dashboard
+      - infographic
+      - data viz
+      - visualization
+    patterns:
+      - "data vis"
+      - "data visual"
+      - "chart"
+      - "graph"
+      - "infographic"
+      - "dashboard"
+
+  creative_technology:
+    canonical: creative technology
+    synonyms:
+      - creative technology
+      - creative tech
+      - new media
+      - interactive installation
+      - digital art
+    keywords:
+      - interactive
+      - installation
+      - new media
+      - immersive
+      - generative
+    patterns:
+      - "creative tech"
+      - "new media"
+      - "interactive install"
+      - "immersive"
+
+  web_ui:
+    canonical: web & ui
+    synonyms:
+      - web design
+      - ui design
+      - interface design
+      - frontend
+      - web development
+    keywords:
+      - website
+      - interface
+      - ui
+      - frontend
+      - responsive
+      - web app
+    patterns:
+      - "web"
+      - "ui"
+      - "interface"
+      - "frontend"
+      - "responsive"
+
+  user_experience:
+    canonical: user experience
+    synonyms:
+      - user experience
+      - ux
+      - usability
+      - user research
+      - human factors
+    keywords:
+      - ux
+      - usability
+      - user research
+      - accessibility
+      - human-centered
+    patterns:
+      - "ux"
+      - "usability"
+      - "user research"
+      - "accessibility"
+      - "human factor"
+
+  illustration:
+    canonical: illustration
+    synonyms:
+      - illustration
+      - drawing
+      - concept art
+      - visual narrative
+    keywords:
+      - drawing
+      - sketch
+      - concept art
+      - narrative art
+      - vector art
+    patterns:
+      - "illustration"
+      - "drawing"
+      - "sketch"
+      - "concept art"
+
+  packaging:
+    canonical: packaging
+    synonyms:
+      - packaging design
+      - package design
+      - product packaging
+      - structural design
+    keywords:
+      - packaging
+      - package
+      - structural
+      - retail
+      - label
+    patterns:
+      - "packaging"
+      - "package"
+      - "retail"
+
+  business_operations:
+    canonical: business operations
+    synonyms:
+      - business operations
+      - operations
+      - workflow
+      - process management
+      - business process
+    keywords:
+      - operations
+      - workflow
+      - process
+      - management
+      - efficiency
+      - agile
+      - project management
+    patterns:
+      - "business operations"
+      - "workflow"
+      - "process management"
+      - "operations"
+      - "agile"
+      - "project management"
+
+  business_development:
+    canonical: business development
+    synonyms:
+      - business development
+      - biz dev
+      - sales strategy
+      - partnerships
+      - growth strategy
+    keywords:
+      - business development
+      - growth
+      - partnerships
+      - sales
+      - strategy
+    patterns:
+      - "business development"
+      - "biz dev"
+      - "growth"
+      - "partnership"
+      - "sales"
+
+  entrepreneurship:
+    canonical: entrepreneurship
+    synonyms:
+      - entrepreneurship
+      - startup
+      - venture
+      - innovation
+      - founder
+    keywords:
+      - startup
+      - venture
+      - founder
+      - innovation
+      - business model
+    patterns:
+      - "entrepreneur"
+      - "startup"
+      - "venture"
+      - "founder"
+      - "innovation"
+
+  organizational_behavior:
+    canonical: organizational behavior
+    synonyms:
+      - organizational behavior
+      - org behavior
+      - organizational psychology
+      - team dynamics
+      - leadership
+    keywords:
+      - organization
+      - team
+      - leadership
+      - culture
+      - behavior
+    patterns:
+      - "organizational"
+      - "org behavior"
+      - "team dynamics"
+      - "leadership"
+      - "culture"
+
+  ai_agents:
+    canonical: ai & agents
+    synonyms:
+      - ai
+      - artificial intelligence
+      - agents
+      - llm
+      - machine learning
+      - nlp
+    keywords:
+      - ai
+      - agent
+      - llm
+      - machine learning
+      - neural network
+      - deep learning
+      - prompt engineering
+      - rag
+      - fine-tuning
+    patterns:
+      - "ai"
+      - "agent"
+      - "llm"
+      - "machine learning"
+      - "neural"
+      - "prompt"
+      - "rag"
+      - "fine.tun"
+
+  ai_systems:
+    canonical: ai systems
+    synonyms:
+      - ai systems
+      - ai infrastructure
+      - ml systems
+      - ai platform
+    keywords:
+      - ai system
+      - ml system
+      - ai infrastructure
+      - platform
+      - deployment
+    patterns:
+      - "ai system"
+      - "ml system"
+      - "ai infrastructure"
+      - "platform"
+
+  engineering_practice:
+    canonical: engineering practice
+    synonyms:
+      - engineering practice
+      - software engineering
+      - engineering methodology
+      - dev practices
+    keywords:
+      - software
+      - engineering
+      - code
+      - programming
+      - testing
+      - deployment
+      - devops
+      - architecture
+    patterns:
+      - "software"
+      - "engineering"
+      - "programming"
+      - "testing"
+      - "devops"
+      - "architecture"
+
+  computational_art:
+    canonical: computational art
+    synonyms:
+      - computational art
+      - generative art
+      - algorithmic art
+      - digital art
+    keywords:
+      - generative
+      - algorithmic
+      - procedural
+      - creative coding
+    patterns:
+      - "generative art"
+      - "algorithmic art"
+      - "computational art"
+      - "creative coding"
+
+  code_computation:
+    canonical: code & computation
+    synonyms:
+      - code
+      - computation
+      - programming
+      - algorithms
+      - data structures
+    keywords:
+      - algorithm
+      - data structure
+      - code
+      - program
+      - function
+      - optimization
+    patterns:
+      - "algorithm"
+      - "data structure"
+      - "code"
+      - "programming"
+      - "function"
+
+  computational_science:
+    canonical: computational science & physics
+    synonyms:
+      - computational science
+      - computational physics
+      - scientific computing
+      - simulation
+    keywords:
+      - simulation
+      - physics
+      - scientific
+      - numerical
+      - modeling
+    patterns:
+      - "computational science"
+      - "computational physics"
+      - "simulation"
+      - "scientific computing"
+      - "numerical"
+
+  systems_frameworks:
+    canonical: systems & frameworks
+    synonyms:
+      - systems thinking
+      - frameworks
+      - system design
+      - methodology
+    keywords:
+      - system
+      - framework
+      - methodology
+      - paradigm
+      - model
+    patterns:
+      - "system"
+      - "framework"
+      - "methodology"
+      - "paradigm"
+      - "model"
+
+  semiotics_communication:
+    canonical: semiotics & communication
+    synonyms:
+      - semiotics
+      - communication theory
+      - signs
+      - symbols
+      - meaning
+    keywords:
+      - semiotics
+      - sign
+      - symbol
+      - meaning
+      - communication
+      - language
+    patterns:
+      - "semiotics"
+      - "semiotic"
+      - "sign"
+      - "symbol"
+      - "meaning"
+      - "communication"
+
+  research_methodology:
+    canonical: research & methodology
+    synonyms:
+      - research methodology
+      - research methods
+      - empirical research
+      - experimental design
+    keywords:
+      - research
+      - methodology
+      - empirical
+      - experiment
+      - study
+      - qualitative
+      - quantitative
+    patterns:
+      - "research"
+      - "methodology"
+      - "empirical"
+      - "experiment"
+      - "study"
+
+# ── D28 Pattern Expansion ──
+# These patterns expand the D28 GENERAL_PATTERNS list to cover actual S3 vocabulary.
+# Previously-missed domains: information architecture, design systems, branding,
+# prototyping, agile, management, business law.
+d28_expansion:
+  description: >
+    Addresses FM2: D28 uses hardcoded pattern lists that can't match
+    actual S3 domain vocabulary. This expansion maps every S3 domain label
+    to patterns that D28 can use for content-based classification.
+  original_general_patterns:
+    - css
+    - html
+    - rendering
+    - physics
+    - force
+    - vector
+    - array
+    - data structure
+    - code
+    - programming
+    - browser
+    - font
+    - typography
+    - color
+    - layout
+    - grid
+    - syntax
+  expanded_patterns:
+    - css
+    - html
+    - rendering
+    - physics
+    - force
+    - vector
+    - array
+    - data structure
+    - code
+    - programming
+    - browser
+    - font
+    - typography
+    - color
+    - layout
+    - grid
+    - syntax
+    # ── New: previously missing domains ──
+    - "information architecture"
+    - "design system"
+    - branding
+    - prototyping
+    - agile
+    - management
+    - "business law"
+    - "project management"
+    - workflow
+    - process
+    - strategy
+    - framework
+    - methodology
+    - system
+    - model
+    - pattern
+    - principle
+    - heuristic
+    - guideline
+    - best practice
+    - governance
+    - compliance
+    - risk
+    - quality
+    - metric
+    - benchmark
+    - evaluation
+    - validation
+    - verification
+
+# ── D28 Routing Patterns ──
+# These replace the hardcoded lists in tools/space_router.py and tools/eval_loop.py.
+# Single source of truth for D28 disambiguation logic (FM2 root cause).
+routing:
+  agentic_patterns:
+    description: "Agentic/Maxwell-specific patterns → system-phase is correct"
+    patterns:
+      - agentic
+      - pipeline
+      - orchestrat
+      - harness
+      - delegat
+      - sub-agent
+      - multi-agent
+      - "llm "
+      - goose
+      - maxwell
+      - telemetry
+      - toolset
+      - child agent
+      - task orchestration
+    routing: "private"
+    when: "has_system_phase"
+
+  personal_patterns:
+    description: "Personal/psychological patterns → personal is correct"
+    patterns:
+      - habit
+      - cognition
+      - bias
+      - behavior
+      - motivation
+      - identity
+      - emotion
+      - psychology
+      - self
+      - mindfulness
+      - personal
+      - individual
+      - introspection
+    routing: "private"
+    when: "has_personal"
+
+  general_patterns:
+    description: "General knowledge patterns → system-phase/personal is WRONG → overrule to Non-Private"
+    patterns:
+      - css
+      - html
+      - rendering
+      - physics
+      - force
+      - vector
+      - array
+      - data structure
+      - code
+      - programming
+      - browser
+      - font
+      - typography
+      - color
+      - layout
+      - grid
+      - syntax
+      - "information architecture"
+      - "design system"
+      - branding
+      - prototyping
+      - agile
+      - management
+      - "business law"
+      - "project management"
+      - workflow
+      - process
+      - strategy
+      - framework
+      - methodology
+      - system
+      - model
+      - pattern
+      - principle
+      - heuristic
+      - guideline
+      - "best practice"
+      - governance
+      - compliance
+      - risk
+      - quality
+      - metric
+      - benchmark
+      - evaluation
+      - validation
+      - verification
+    routing: "non_private"
+    when: "always"
+
+  # D30: Fixed — D28 now also triggers on system-phase without professional context.
+  # Previously system-phase+general knowledge fell through to "purely personal" → Private.
+  # This was the root cause of ~90% false-positive rate on Private routing.
+  d28_trigger_fix:
+    description: "D30 fix: D28 disambiguation now triggers when ANY trigger context (personal, system-phase, design, business, academic) is present with a non-empty S3 domain. Previously required professional context."
+    fixed_in: "tools/space_router.py :: route_by_fb()"
+    test_cases: 12/12 passing
+    date: "2026-07-08"
+
+  ambiguous_default:
+    description: "Safety-first: mixed context + no pattern match → Private"
+    routing: "private"
+    when: "never_matches"
+
+# ── Usage ──
+usage:
+  lookup: >
+    Given a search term, find the most likely domain(s) by matching against
+    synonyms, keywords, and patterns. Return ranked list.
+  generation: >
+    python3 tools/synonym_generator.py --validate
+  d28_integration: >
+    Replace hardcoded GENERAL_PATTERNS in D28 with expanded_patterns from
+    this file. Verify no regression on known test cases.

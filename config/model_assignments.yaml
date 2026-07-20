@@ -1,0 +1,228 @@
+roles:
+  S3A_CONVERGENCE:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # D1037/D1052: 1.5x faster, near-100% schema compliance
+    backend: omlx
+    family: qwen
+  S5_GENERATOR:
+    model: gemma-4-26B-A4B-it-OptiQ-4bit
+    backend: omlx
+    family: gemma
+  S6_VALIDATOR:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+  T2_GATE:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  T3_GATE:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  CONTEXT_CLASS:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  PLANNER:
+    model: Qwen3.6-35B-A3B-4bit
+    backend: omlx
+    family: qwen
+  PLANNER_FALLBACK:
+    model: Qwopus-GLM-18B
+    backend: omlx
+    family: qwen
+  REVIEWER:
+    model: DeepSeek-R1-0528-Qwen3-8B-MLX-4bit
+    backend: omlx
+    family: deepseek
+    notes: "D924/D925: Dedicated critic \u2014 CoT reasoning, 308K downloads, ~5GB"
+  CODING_DRAFT:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  CODING_CLEAN:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+  ORCHESTRATOR:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  HIGH_CAPABILITY:
+    model: gemma-4-26B-A4B-it-OptiQ-4bit
+    backend: omlx
+    family: gemma
+  LONG_CONTEXT:
+    model: Qwen3.6-35B-A3B-4bit
+    backend: omlx
+    family: qwen
+  MEMORY_MCP_PATH:
+    model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/memory_mcp_server.py
+    backend: path
+    family: engramory-adapted
+    version: 2.1.0
+    store: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/agent/memory/
+  HARNESS_STAGE:
+    model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/harness_stage.py
+    backend: path
+    family: path
+  EMBEDDINGS:
+    model: nomic-embed-text
+    backend: ollama
+    family: nomic
+  RESIDENT_BRAIN:
+    model: gemma-4-E2B-it-MLX-4bit
+    backend: omlx
+    family: gemma
+  L2_VALIDATOR:
+    model: gemma-4-E2B-it-MLX-4bit
+    backend: omlx
+    family: gemma
+  S3_SUMMARIZER:
+    model: Qwen3.6-35B-A3B-4bit
+    backend: omlx
+    family: qwen
+  LIGHTWEIGHT_CODER:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  DRAFT_TRIAGE:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+  BOUNDARY_VERIFIER:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+  S3A_VERIFIER:
+    model: gemma-4-E4B-it-MLX-4bit
+    backend: omlx
+    family: gemma
+  S5_FB_VERIFIER:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+verification_tolerance:
+  version: 2026-07-08.V2
+  s6_validation:
+    max_disagreement: 0.33
+    on_exceed: flag
+    min_verifiers: 3
+  t2_gate:
+    max_disagreement: 0.4
+    on_exceed: re-verify
+    min_verifiers: 2
+  t3_gate:
+    max_disagreement: 0.25
+    on_exceed: quarantine
+    min_verifiers: 2
+  s3a_verification:
+    max_disagreement: 0.5
+    on_exceed: flag
+    min_verifiers: 2
+fallbacks:
+  HIGH_CAPABILITY:
+  - Qwen3.6-35B-A3B-4bit
+  - gemma-4-26B-A4B-it-OptiQ-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  S3A_CONVERGENCE:
+  - Qwen3.6-35B-A3B-4bit
+  - gemma-4-26B-A4B-it-OptiQ-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  S5_GENERATOR:
+  - gemma-4-E4B-it-MLX-4bit
+  - Phi-4-mini-instruct-8bit
+  - Qwen3.6-35B-A3B-4bit
+  S6_VALIDATOR:
+  - Qwen3.6-35B-A3B-4bit
+  - gemma-4-E2B-it-MLX-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  RESIDENT_BRAIN:
+  - Phi-4-mini-instruct-8bit
+  - gemma-4-E2B-it-MLX-4bit
+  L2_VALIDATOR:
+  - Phi-4-mini-instruct-8bit
+  - gemma-4-E2B-it-MLX-4bit
+  S3_SUMMARIZER:
+  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  LIGHTWEIGHT_CODER:
+  - Phi-4-mini-instruct-8bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  DRAFT_TRIAGE:
+  - Phi-4-mini-instruct-8bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  BOUNDARY_VERIFIER:
+  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  S3A_VERIFIER:
+  - Qwen3.6-35B-A3B-4bit
+  - gemma-4-E4B-it-MLX-4bit
+  S5_FB_VERIFIER:
+  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  T2_GATE:
+  - gemma-4-E2B-it-MLX-4bit
+  - Phi-4-mini-instruct-8bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  T3_GATE:
+  - gemma-4-E2B-it-MLX-4bit
+  - Phi-4-mini-instruct-8bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  CONTEXT_CLASS:
+  - gemma-4-E2B-it-MLX-4bit
+  - Phi-4-mini-instruct-8bit
+  EMBEDDINGS: []
+models:
+routing:
+  daily_zed:
+    primary: qwen-plus
+    fallbacks:
+    - deepseek-v4-flash
+    notes: 'Zed editor daily coding. Cloud OK (external tool).'
+  complex_coding:
+    primary: qwen-max
+    fallbacks:
+    - deepseek-v4-flash
+    notes: 'Zed editor complex coding. Cloud OK (external tool).'
+  fb_generation:
+    primary: qwen3.6-35b-a3b-moe
+    fallbacks:
+    - gemma-4-26B-A4B-it-OptiQ-4bit
+    notes: 'D950: Local primary. DeepSeek only as last resort ($0 cost priority).'
+  tier2_validation:
+    primary: qwen3.6-35b-a3b-moe
+    fallbacks:
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    notes: 'D950: All-local validation chain.'
+  concept_summarization:
+    primary: qwen3.6-35b-a3b-moe
+    fallbacks:
+    - qwen-plus
+  depth_reasoning:
+    primary: qwen-max
+    fallbacks:
+    - opus-distilled-27b
+    - Qwen3.6-35B-A3B-4bit
+  self_critique:
+    primary: deepseek-r1-8b
+    fallbacks:
+    - gemma-4-E4B-it-MLX-4bit
+    notes: 'D924/D925: Dedicated critique routing. DeepSeek R1-8B (LOCAL) for CoT reasoning,
+      Gemma-4-E4B for cross-family verify.'
+  colibri_deploy:
+    primary: glm-5.2-colibri
+    fallbacks:
+    - qwen3.6-35b-a3b-moe
+    notes: 'D950: Local fallback only. DeepSeek removed.'
+archived:
+- gemma-4-31B-it-OptiQ-4bit
+- Ornith-1.0-9B-4bit
+constraints:
+  generator_neq_verifier: true
+  pipeline_temp: 0.0
+  max_resident_models: 4
+cloud_roles:
+- cloud_fallback
+_source: Merged from model_assignments.yaml + models.yaml + model_registry.yaml
+_merged_at: 2026-07-08 20:31 UTC

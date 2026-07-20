@@ -1,0 +1,649 @@
+# domain_anchors.yaml — Canonical book ontology for Maxwell OS
+# D408 NOW-safe. Created 2026-06-11 from FABLE-BOOK-FOLDER-ONTOLOGY v1.0
+# Updated 2026-06-13 D481 — added subfolder-level anchors (§16.2) for TIER-3 Scope 3 precision
+# Subfolder IDs use sf_D#_ prefix to distinguish from field and cross-domain anchors
+#
+# Each anchor is a descriptive paragraph defining the field's content.
+# The classifier (classify_book_domains.py) embeds these as reference vectors
+# and assigns books by cosine similarity to the nearest anchor.
+#
+# Hierarchy: FIELD → CROSS-DOMAIN → SUBFOLDER
+# Filing rule: a book lives at the shallowest level that fully contains it.
+# Subfolder anchors used exclusively by intake.py for Scope 3 routing.
+
+anchors:
+  # ── FIELD 0: Systems + Decision ──────────────────────────────────────
+  - id: field_0_systems_decision
+    name: "DOMAIN 0 Systems + Decision"
+    type: field
+    description: >
+      Systems thinking, complexity theory, cybernetics, and decision-making
+      under uncertainty. Mental models, epistemology, logic, and
+      philosophy of science. Strategy, game theory, behavioral economics,
+      and feedback systems. Execution, operations, and productivity
+      frameworks for organizations. How to model, navigate, and decide
+      within complex systems. NOT about personal productivity or
+      self-help (D5), interpersonal influence (D7), or visual design
+      practice (D2).
+    subfolders:
+      - id: sf_0_systems_thinking
+        name: "systems thinking"
+        description: >
+          Systems thinking, system dynamics, feedback loops, emergence,
+          and complexity theory. How interconnected parts create
+          behaviors that cannot be predicted from individual components.
+          Meadows, Senge,复杂性理论.
+      - id: sf_0_systems_complexity
+        name: "systems + complexity"
+        description: >
+          Complexity science, complex adaptive systems, network theory,
+          and non-linear dynamics. Emergence, self-organization, and
+          the behavior of systems with many interacting agents.
+      - id: sf_0_decision_science
+        name: "decision science"
+        description: >
+          Decision theory, judgment under uncertainty, heuristics and
+          biases, and behavioral economics. Kahneman, Tversky, and
+          the psychology of choice.
+      - id: sf_0_decision_strategy
+        name: "decision + strategy"
+        description: >
+          Strategic thinking, game theory, competitive strategy, and
+          long-range planning. How to make decisions that shape
+          future outcomes in competitive environments.
+      - id: sf_0_epistemology
+        name: "epistemology"
+        description: >
+          Epistemology, philosophy of science, logic, and the theory
+          of knowledge. How we know what we know, scientific method,
+          and critical thinking. Popper, Kuhn, Bayesian reasoning.
+      - id: sf_0_mental_models_epistemology
+        name: "mental models + epistemology"
+        description: >
+          Mental models, cognitive frameworks, and conceptual tools
+          for understanding reality. Latticework of mental models,
+          inversion thinking, and first principles reasoning.
+      - id: sf_0_strategic_reasoning
+        name: "strategic reasoning"
+        description: >
+          Strategic reasoning, long-term thinking, and scenario
+          planning. How to think several moves ahead and anticipate
+          the responses of other actors in a system.
+      - id: sf_0_execution_productivity
+        name: "execution + productivity"
+        description: >
+          Execution discipline, organizational productivity, getting
+          things done at scale. How organizations ship work, manage
+          operations, and maintain momentum.
+      - id: sf_0_execution_operations
+        name: "execution + operations"
+        description: >
+          Operations management, process optimization, and operational
+          excellence. How organizations run efficiently and deliver
+          consistently. Manufacturing, service ops, lean methods.
+      - id: sf_0_organizational_operations
+        name: "organizational operations"
+        description: >
+          Organizational design, structure, and operations at the
+          enterprise level. How companies organize people and
+          processes to execute strategy.
+    cross_domains:
+      - id: cd_0_systems_complexity
+        name: "systems + complexity"
+        description: >
+          Systems thinking, complexity science, emergence, cybernetics,
+          and feedback loops. The behavior of complex adaptive systems.
+      - id: cd_0_decision_strategy
+        name: "decision + strategy"
+        description: >
+          Decision theory, strategic thinking, game theory, behavioral
+          economics, and judgment under uncertainty.
+      - id: cd_0_mental_models
+        name: "mental models + epistemology"
+        description: >
+          Mental models, cognitive frameworks, epistemology, logic,
+          and philosophy of science. How we know what we know.
+      - id: cd_0_execution_operations
+        name: "execution + operations"
+        description: >
+          Productivity, execution discipline, operations management,
+          and getting things done. Belsky, Grove, and operational
+          excellence.
+
+  # ── FIELD 1: Substrate — Mind, Math, Meaning ─────────────────────────
+  - id: field_1_substrate
+    name: "DOMAIN 1 Substrate — Mind, Math, Meaning"
+    type: field
+    description: >
+      The foundations of human cognition and communication: cognitive
+      science, perception, neuroscience, psychology (academic), mathematics,
+      geometry, semiotics, and meaning-making. The substrate on which all
+      other disciplines build. Excludes: applied persuasion (D7), design
+      psychology (D2), and self-help psychology (D5).
+    subfolders:
+      - id: sf_1_cognition_perception
+        name: "cognition + perception"
+        description: >
+          Cognitive science, perception, attention, memory, and
+          neuroscience. How the brain processes information and
+          constructs experience. Neural mechanisms of cognition.
+      - id: sf_1_psychology
+        name: "psychology"
+        description: >
+          Academic psychology: social, cognitive, behavioral,
+          developmental, and clinical theory. Research methods,
+          experimental design, and established psychological
+          theory. NOT self-help or applied persuasion.
+      - id: sf_1_semiotics_meaning
+        name: "semiotics + meaning"
+        description: >
+          Semiotics, signs, symbols, meaning-making, and communication
+          theory at the foundational level. How meaning is created,
+          transmitted, and interpreted. Peirce, Saussure, Barthes.
+    cross_domains:
+      - id: cd_1_cognition
+        name: "cognition + perception"
+        description: >
+          Cognitive science, perception, attention, and neuroscience.
+          How the brain processes information and constructs experience.
+      - id: cd_1_psychology
+        name: "psychology"
+        description: >
+          Academic psychology: social, cognitive, behavioral. Research
+          methods and established theory. NOT self-help or persuasion.
+      - id: cd_1_mathematics
+        name: "mathematics + geometry"
+        description: >
+          Mathematics, geometry, topology, and quantitative reasoning.
+          Ghyka, Elam, Apostol. The language of pattern.
+      - id: cd_1_semiotics
+        name: "semiotics + meaning"
+        description: >
+          Semiotics, signs, symbols, and meaning-making. Communication
+          theory at the foundational level.
+
+  # ── FIELD 2: Design ──────────────────────────────────────────────────
+  - id: field_2_design
+    name: "DOMAIN 2 Design"
+    type: field
+    description: >
+      Visual design, communication design, information design, interaction
+      design, and design practice. Typography, color, composition, grids,
+      visual rhetoric, data visualization, UX/UI, design systems, design
+      thinking, creative process, and design research. The practice and
+      theory of making things visual, usable, and meaningful through
+      deliberate design choices. Absorbs D2 + D2.5. NOT about
+      persuasion (D7), personal productivity (D5), or art (D3).
+    subfolders:
+      - id: sf_2_brand_identity
+        name: "brand identity"
+        description: >
+          Brand identity, logo design, visual identity systems, and
+          brand strategy. How brands express themselves through
+          visual language and maintain consistency across touchpoints.
+      - id: sf_2_color_grid_layout
+        name: "color, grid + layout"
+        description: >
+          Color theory, color systems, grid systems, layout design,
+          and composition. The structural and chromatic foundations
+          of visual design. Itten, Albers, Müller-Brockmann.
+      - id: sf_2_communication_design
+        name: "communication design"
+        description: >
+          Graphic design, visual identity, branding, visual rhetoric,
+          semiotics, illustration, narrative, storytelling, and
+          design history. How design communicates and persuades
+          through visual means.
+      - id: sf_2_data_visualization
+        name: "data visualization"
+        description: >
+          Data visualization, information design, statistical graphics,
+          and the visual presentation of quantitative and qualitative
+          data. Tufte, Cairo, Yau, Few.
+      - id: sf_2_design_research_process
+        name: "design research + process"
+        description: >
+          Design research, user research, ethnographic methods,
+          creative process, and the design studio workflow. How
+          designers investigate problems and iterate toward solutions.
+          IDEO, d.school, design thinking.
+      - id: sf_2_design_systems
+        name: "design systems"
+        description: >
+          Design systems, pattern libraries, component libraries, and
+          systematic approaches to design at scale. Atomic design,
+          style guides, and design ops.
+      - id: sf_2_design_systems_alt
+        name: "design + systems"
+        description: >
+          The intersection of design and systems thinking. Service
+          design, systemic design, and design for complex systems.
+      - id: sf_2_motion_illustration
+        name: "motion + illustration"
+        description: >
+          Motion design, animation, illustration, and visual
+          storytelling through moving images. Kinetic typography,
+          explainer videos, narrative illustration.
+      - id: sf_2_practice_process
+        name: "practice + process"
+        description: >
+          Design practice, professional process, design management,
+          and the business of design. Studio management, client
+          relations, and design leadership.
+      - id: sf_2_typography_type
+        name: "typography + type"
+        description: >
+          Typography, type design, lettering, and the art of
+          arranging type. Type history, classification, legibility,
+          and expressive typography. Bringhurst, Spiekermann.
+      - id: sf_2_ux_interaction
+        name: "UX + interaction"
+        description: >
+          User experience design, interaction design, information
+          architecture, usability, and human-computer interaction.
+          User-centered design, wireframing, prototyping, testing.
+      - id: sf_2_visual_semiotics_rhetoric
+        name: "visual semiotics + rhetoric"
+        description: >
+          Visual semiotics, visual rhetoric, the language of images,
+          and how visual communication creates meaning. How images
+          persuade, inform, and shape understanding.
+      - id: sf_2_visual_fundamentals
+        name: "visual fundamentals"
+        description: >
+          Foundational principles of visual design: Gestalt,
+          hierarchy, balance, contrast, rhythm, proportion, and
+          unity. The building blocks that underlie all visual work.
+    cross_domains:
+      - id: cd_2_visual_fundamentals
+        name: "visual fundamentals"
+        description: >
+          Typography, color theory, composition, grids, design theory,
+          and design psychology. The building blocks of visual design.
+      - id: cd_2_communication
+        name: "communication design"
+        description: >
+          Graphic design, visual identity, branding, visual rhetoric,
+          semiotics, illustration, narrative, storytelling, and design
+          history. How design communicates.
+      - id: cd_2_data_info
+        name: "data + information design"
+        description: >
+          Data visualization, information architecture, and the
+          visual presentation of quantitative and qualitative data.
+      - id: cd_2_interaction_digital
+        name: "interaction + digital"
+        description: >
+          UX, UI, web design, motion graphics, and digital product
+          design. Human-computer interaction.
+      - id: cd_2_design_systems
+        name: "design systems"
+        description: >
+          Design systems, pattern libraries, component design, and
+          systematic approaches to design at scale.
+      - id: cd_2_practice_process
+        name: "practice + process"
+        description: >
+          Design thinking, creative process, design research, scoping,
+          and professional practice. Absorbs D2.5.
+
+  # ── FIELD 3: Art + Computational Media ───────────────────────────────
+  - id: field_3_art_media
+    name: "DOMAIN 3 Art + Computational Media"
+    type: field
+    description: >
+      Generative art, creative coding, glitch art, media art, and live
+      visuals/VJing. The intersection of art, technology, and computation.
+      Creative coding frameworks (openFrameworks, Processing, p5.js).
+    subfolders:
+      - id: sf_3_generative_creative_coding
+        name: "generative art + creative coding"
+        description: >
+          Generative art, algorithmic art, creative coding, and the
+          use of programming for artistic expression. Processing,
+          openFrameworks, p5.js, and computational creativity.
+      - id: sf_3_glitch_media_art
+        name: "glitch + media art"
+        description: >
+          Glitch art, media art, video art, net art, and experimental
+          digital art practices. Databending, circuit bending, and
+          the aesthetics of error and decay.
+      - id: sf_3_live_visuals_vjing
+        name: "live visuals + VJing"
+        description: >
+          Live visuals, VJing, real-time projection, performance
+          visuals, and audiovisual performance. Tools like Resolume,
+          TouchDesigner, and real-time rendering environments.
+    cross_domains:
+      - id: cd_3_generative
+        name: "generative art + creative coding"
+        description: >
+          Generative art, algorithmic art, creative coding, and the
+          use of programming for artistic expression.
+      - id: cd_3_glitch_media
+        name: "glitch + media art"
+        description: >
+          Glitch art, media art, video art, and experimental digital
+          art practices.
+      - id: cd_3_vjing
+        name: "live visuals + vjing"
+        description: >
+          Live visuals, VJing, real-time projection, and performance
+          visuals.
+
+  # ── FIELD 4: Business ────────────────────────────────────────────────
+  - id: field_4_business
+    name: "DOMAIN 4 Business"
+    type: field
+    description: >
+      Business strategy, branding, marketing, growth, organizations,
+      leadership, and the economics of creative practice. Pricing,
+      studio management, freelancing, starting a business. B Corp,
+      management, HBR sets. Excludes: self-help productivity (D5),
+      AI business strategy (D6).
+    subfolders:
+      - id: sf_4_brand_strategy
+        name: "brand strategy"
+        description: >
+          Brand strategy, brand positioning, brand architecture, and
+          strategic brand management. How brands create value,
+          differentiate, and build equity over time.
+      - id: sf_4_branding_marketing
+        name: "branding + marketing"
+        description: >
+          Branding and marketing practice: campaign strategy, content
+          marketing, advertising, and brand communications. The
+          execution side of building brand awareness and demand.
+      - id: sf_4_business_strategy
+        name: "business strategy"
+        description: >
+          Business strategy, competitive positioning, strategic
+          planning, and corporate strategy. How companies compete,
+          grow, and create sustainable advantage. Porter, Kim &
+          Mauborgne.
+      - id: sf_4_creative_practice
+        name: "creative practice"
+        description: >
+          The business of creative work: freelancing, pricing, client
+          management, studio operations, and the economics of art
+          and design practice. How creatives build sustainable careers.
+      - id: sf_4_entrepreneurship
+        name: "entrepreneurship"
+        description: >
+          Entrepreneurship, starting a business, venture creation,
+          and the founder journey. Lean startup, business models,
+          bootstrapping, and early-stage growth.
+      - id: sf_4_marketing
+        name: "marketing"
+        description: >
+          Marketing theory and practice: segmentation, targeting,
+          positioning, marketing mix, and marketing strategy. How
+          products and services reach their audiences.
+      - id: sf_4_marketing_growth
+        name: "marketing + growth"
+        description: >
+          Growth marketing, growth hacking, conversion optimization,
+          and data-driven marketing. Experiments, funnels, and
+          metrics-driven approaches to customer acquisition.
+      - id: sf_4_organizational_leadership
+        name: "organizational leadership"
+        description: >
+          Organizational behavior, leadership theory, management
+          practice, and how companies work. Team dynamics, corporate
+          culture, and leading organizations through change.
+      - id: sf_4_organizations_leadership
+        name: "organizations + leadership"
+        description: >
+          Organization design, structure, governance, and leadership
+          at scale. How to build, run, and evolve effective
+          organizations. B Corp, governance models.
+      - id: sf_4_practice_economics
+        name: "practice economics"
+        description: >
+          The economics of creative and professional practice:
+          pricing strategy, value-based pricing, fee negotiation,
+          and financial management for creative professionals.
+      - id: sf_4_pricing
+        name: "pricing"
+        description: >
+          Pricing strategy, value pricing, pricing psychology, and
+          monetization. How to set prices that capture value and
+          communicate worth.
+      - id: sf_4_starting_business
+        name: "starting a business"
+        description: >
+          Starting a business: practical guides on incorporation,
+          business plans, funding, legal structures, and early-stage
+          operations for new ventures.
+      - id: sf_4_strategy
+        name: "strategy"
+        description: >
+          General strategy frameworks, strategic thinking, and
+          competitive analysis. How to analyze markets, evaluate
+          options, and make strategic choices.
+      - id: sf_4_strategy_brand
+        name: "strategy + brand"
+        description: >
+          The intersection of strategy and brand: brand-led strategy,
+          strategic branding, and how brand drives competitive
+          advantage and business value.
+      - id: sf_4_studio_freelance
+        name: "studio + freelance"
+        description: >
+          Running a creative studio or freelance practice: client
+          acquisition, project management, contracts, invoicing,
+          and the day-to-day of independent creative work.
+    cross_domains:
+      - id: cd_4_strategy_brand
+        name: "strategy + brand"
+        description: >
+          Business strategy, brand strategy, and competitive positioning.
+      - id: cd_4_marketing_growth
+        name: "marketing + growth"
+        description: >
+          Marketing, growth, acquisition, and market development.
+      - id: cd_4_practice_economics
+        name: "practice economics"
+        description: >
+          Pricing, studio management, freelancing, and the business
+          of creative work. Professional practice economics.
+      - id: cd_4_organizations
+        name: "organizations + leadership"
+        description: >
+          Organizational behavior, leadership, management, B Corp,
+          and how companies work.
+
+  # ── FIELD 5: Personal Practice ───────────────────────────────────────
+  - id: field_5_personal_practice
+    name: "DOMAIN 5 Personal Practice"
+    type: field
+    description: >
+      Self-help, personal development, productivity, habits, behavior
+      change, therapy, mood, and AI-augmented work. Books about
+      improving oneself, building better habits, managing mental health,
+      and using AI tools for personal productivity. Excludes: academic
+      psychology (D1), business management (D4), AI engineering (D6).
+    subfolders:
+      - id: sf_5_ai_augmented_work
+        name: "AI-augmented work"
+        description: >
+          Using AI tools for personal productivity, AI-assisted
+          workflows, and the personal side of AI. How individuals
+          leverage AI to work better and faster. NOT AI engineering.
+      - id: sf_5_habit_formation
+        name: "habit formation"
+        description: >
+          Habit formation, behavior change, personal transformation,
+          and the science of building better routines. Atomic Habits,
+          Tiny Habits. Clear, Guise, Fogg.
+      - id: sf_5_life_philosophy
+        name: "life philosophy"
+        description: >
+          Personal philosophy, life wisdom, meaning-making, and
+          existential guidance. Stoicism, minimalism, and practical
+          philosophy for everyday life. Naval, Burkeman, Pressfield.
+      - id: sf_5_mental_wellbeing
+        name: "mental wellbeing"
+        description: >
+          Mental health, therapy, mood management, CBT, mindfulness,
+          and emotional well-being. Feeling Good, Burns, Brach.
+          Managing anxiety, depression, and emotional regulation.
+      - id: sf_5_personal_productivity
+        name: "personal productivity"
+        description: >
+          Personal productivity, time management, getting things done,
+          and individual execution systems. GTD, Pomodoro, deep work.
+          How individuals organize and execute their work.
+    cross_domains:
+      - id: cd_5_productivity
+        name: "productivity + execution"
+        description: >
+          Personal productivity, getting things done, time management,
+          and execution frameworks for individuals.
+      - id: cd_5_habits
+        name: "habits + behavior change"
+        description: >
+          Habit formation, behavior change, and personal transformation.
+          Atomic Habits, Tiny Habits, etc. Guise, Acuff.
+      - id: cd_5_therapy
+        name: "mood + therapy"
+        description: >
+          Mental health, CBT, therapy, mood management, and emotional
+          well-being. Feeling Good, therapy modalities.
+      - id: cd_5_ai_augmented
+        name: "ai-augmented work"
+        description: >
+          Using AI tools for personal productivity, AI-assisted
+          workflows, and the personal side of AI. NOT AI engineering.
+
+  # ── FIELD 6: AI + Computing ──────────────────────────────────────────
+  - id: field_6_ai_computing
+    name: "DOMAIN 6 AI + Computing"
+    type: field
+    description: >
+      Artificial intelligence, machine learning, LLM applications, AI
+      agents, programming, and the societal impact of AI. Engineering
+      AI systems, building with LLMs, ML foundations, and AI product
+      management. General programming (Python, self-taught coding).
+      Creative coding stays in D3.
+    subfolders:
+      - id: sf_6_ai_agents
+        name: "AI agents"
+        description: >
+          AI agents, autonomous systems, agentic workflows, and
+          multi-agent architectures. LangChain, LangGraph, AutoGPT,
+          and the frontier of AI autonomy and tool use.
+      - id: sf_6_ai_strategy
+        name: "AI strategy"
+        description: >
+          AI strategy, AI product management, and the business of
+          AI. How organizations adopt, deploy, and compete with AI.
+          AI value creation, governance, and responsible AI.
+      - id: sf_6_generative_ai
+        name: "generative AI"
+        description: >
+          Generative AI: LLMs, diffusion models, transformers, and
+          foundation models. How generative models work, prompting,
+          fine-tuning, and building applications on foundation models.
+      - id: sf_6_llm_applications
+        name: "LLM applications"
+        description: >
+          Building applications with LLMs: RAG, prompt engineering,
+          tool use, function calling, and LLM-powered products.
+          LangChain, vector databases, and LLM ops.
+      - id: sf_6_ml_foundations
+        name: "ML foundations"
+        description: >
+          Machine learning foundations: supervised, unsupervised,
+          reinforcement learning. Deep learning, neural networks,
+          model architecture, and training methodology.
+      - id: sf_6_programming
+        name: "programming"
+        description: >
+          General programming, software engineering, Python, and
+          coding fundamentals. Data structures, algorithms, and
+          self-taught programming skills. NOT creative coding (D3).
+    cross_domains:
+      - id: cd_6_ai_engineering
+        name: "ai engineering + agents"
+        description: >
+          LLM applications, LangChain, LangGraph, MCP, AI agents,
+          autonomy, and AI product management. Building with AI.
+      - id: cd_6_ml_foundations
+        name: "machine learning foundations"
+        description: >
+          ML theory, deep learning, statistics for ML, and the
+          mathematical foundations of artificial intelligence.
+      - id: cd_6_programming
+        name: "programming"
+        description: >
+          General programming, Python, self-taught coding, and
+          software engineering fundamentals. NOT creative coding.
+      - id: cd_6_ai_society
+        name: "ai + society + business"
+        description: >
+          AI strategy, AI value, societal impact, and business of AI.
+          About AI itself, not using AI for other domains.
+
+  # ── FIELD 7: Influence + Power ───────────────────────────────────────
+  - id: field_7_influence_power
+    name: "DOMAIN 7 Influence + Power"
+    type: field
+    description: >
+      Direct interpersonal influence: persuasion techniques, compliance
+      principles, social engineering, human profiling, deception, and
+      body language. Financial trading and market microstructure. Not
+      about systems thinking, decision theory, epistemology, strategy,
+      or mental models (those belong in D0). Not about business
+      management (D4), self-help productivity (D5), or visual design (D2).
+    subfolders:
+      - id: sf_7_institutions_intelligence
+        name: "institutions + intelligence"
+        description: >
+          Institutional analysis, intelligence studies, surveillance,
+          power structures, and shadow governance. How institutions
+          maintain and exercise power. Tavistock, deep state analysis.
+      - id: sf_7_markets_trading
+        name: "markets + trading"
+        description: >
+          Financial markets, trading, market microstructure, and the
+          behavioral dynamics of markets. Technical analysis, order
+          flow, and the psychology of trading.
+      - id: sf_7_social_engineering_profiling
+        name: "social engineering + profiling"
+        description: >
+          Social engineering, behavior profiling, body language,
+          human hacking, and the art of reading people. Hadnagy,
+          Chase Hughes, and advanced interpersonal psychology.
+    cross_domains:
+      - id: cd_7_persuasion
+        name: "persuasion + influence"
+        description: >
+          The science and practice of persuasion, influence, and
+          compliance. Cialdini, influence principles, rhetoric.
+      - id: cd_7_social_engineering
+        name: "social engineering + profiling"
+        description: >
+          Social engineering, behavior profiling, body language,
+          and human hacking. Hadnagy, Six-Minute X-Ray.
+      - id: cd_7_institutions
+        name: "institutions + intelligence"
+        description: >
+          Institutional analysis, intelligence studies, surveillance,
+          and power structures. Tavistock, shadow government.
+      - id: cd_7_markets_trading
+        name: "markets + trading"
+        description: >
+          Financial markets, trading, market microstructure, and
+          the behavioral dynamics of markets.
+
+# Routing configuration: which space each domain's FBs go to
+routing:
+  field_0_systems_decision: non_private
+  field_1_substrate: non_private
+  field_2_design: non_private
+  field_3_art_media: non_private
+  field_4_business: non_private
+  field_5_personal_practice: private
+  field_6_ai_computing: non_private
+  field_7_influence_power: private

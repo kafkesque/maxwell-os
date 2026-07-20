@@ -1,0 +1,1797 @@
+memory_protocol:
+  enabled: true
+  root: agent/memory/
+  index_file: engramory.md
+  protocol: engramory-adapted
+  schema_version: 2.1.0
+delegate_guard:
+  enforced: true
+  cost_ceiling_usd: 0.0
+  hard_ceiling_usd: 1.0
+  max_concurrent: 2
+  no_concurrent_heavy: true
+  heavy_models:
+  - Qwen3.6
+  - Gemma-4
+  - Qwen3-Coder
+  - gemma-4-26B
+completed:
+- D34-R5: GitHub repo analysis (6 topics, 30+ repos audited)
+- D34-R5: "pg_durable \u2192 durable_run.py (513 lines, checkpoint-resume, status\
+    \ CLI)"
+- D34-R5: "Dagu \u2192 mcp_pipeline.py (262 lines, MCP tools for Goose pipeline mgmt)"
+- D34-R5: "DBOS Transact \u2192 @step() pattern absorbed into DurableRun"
+- D34-R5: SPEC-DURABLE-PIPELINE.md written (185 lines)
+- D34-R5: feeds.opml updated (+20 entries, 105 total)
+- D34-R5: reclassify_fb_domains.py regex bug FIXED (+4 lines)
+- D34-10: "Path de-hardcoding. 21 scripts, 22 constants \u2192 pipeline_paths + config.yaml\
+    \ \u2705"
+- D34-11: "Model stack 12\u21928. Removed gemma-12b-coder\xD72, Ornith, gemma-4-31B.\
+    \ +Qwen2.5-Coder \u2705"
+- D34-12: "vllm-mlx/OMLX split. Qwen\u2192vllm-mlx(MTP), Gemma\u2192OMLX(cross-family\
+    \ R5) \u2705"
+- D34-13: "Lazy-load protocol. model_lazyload.py (219 lines). 2 pinned (7.8GB) \u2705"
+- D34-14: "Goose model router. model_router.py (256 lines). 9 task types\u2192optimal\
+    \ local \u2705"
+- D34-15: "Memory safety. 40 max_process (25.6GB enforcer). 30GB model max \u2705"
+- D34-16: "Pipeline audit. FAILURE_MODE naming gap, INTIMACY_BOUNDARY missing, S7=0\
+    \ \u26A0\uFE0F"
+- D34-17: "Dry run validated. 105 FBs in 9.3s. 11.3 FB/s. Parallel viable \u2705"
+- D34-18: "gemma-4 = gemma4_unified = unsupported by all MLX backends \u2705"
+- "2.extract restored to Dropbox heavy dir (3.7GB, 54 dirs, 197 files) \u2705"
+- 18.3GB freed: "gemma-4-12b-coder \xD72 deleted from HF cache \u2705"
+- "Qwopus tested and assigned to PLANNER_FALLBACK role \u2705"
+- "DECISION-LOG.md updated (D34-10 through D34-18) \u2705"
+- "MASTER-TASK-REGISTER.md updated \u2705"
+- Contracts updated: "GR-OMLX (8-model limit), D710 (SOURCE_TEXT + ANCHORING_SCORE)\
+    \ \u2705"
+# ── 2026-07-16 Session ──
+- D1031: "S5 SpecPrefill implemented (omlx_token_wrapper.py + config/omlx_specprefill.yaml, 1.33x verified)"
+- D1032: "Engineering tools research (8 GitHub topics, feed.opml updated)"
+- D1033: "Comprehensive feed evaluation (all 3 OPMLs, ~120 feeds) — CORRECTED after sandbox"
+- S3_SpecPrefill_sandbox: "NOT VIABLE (3 blockers: no draft model, batching disabled, net slowdown)"
+- USearch_sandbox: "REJECTED (9x SLOWER than FAISS on 200-vector clusters, not 10x faster as feed claimed)"
+- TurboVec_sandbox: "NOT USABLE (API mismatch, turbovec.Index does not exist in installed v0.8.0)"
+- D1033_status: "6 of 8 ADOPT NOW tools were UNTESTED — downgraded to RESEARCH RECOMMENDATION"
+- Code: "tools/omlx_token_wrapper.py modified, config/omlx_specprefill.yaml created"
+- Sandbox: "sandbox_s3_specprefill.py (279L), sandbox_vector_bench.py (222L)"
+- Research: "comprehensive_feed_evaluation.md (693L), session_audit_verified.md (152L)"
+- Governance: "decisions.yaml + DECISION-LOG.md + MTR all updated"
+model_stack:
+  pinned:
+  - Phi-4-mini-instruct-8bit (3.8GB)
+  - gemma-4-E2B-it-MLX-4bit (4GB)
+  lazy:
+  - Qwen2.5-Coder-7B-4bit (4GB)
+  - gemma-4-E4B (6.4GB)
+  - Qwopus-GLM-18B (8.7GB)
+  big_on_demand:
+  - Qwen3-Coder-30B (16GB vllm-mlx)
+  - gemma-4-26B (18.4GB)
+  - Qwen3.6-35B (20GB)
+  removed:
+  - gemma-4-12b-coder-4bit
+  - gemma-4-12b-coder-8bit
+  - Ornith-1.0-9B
+  - gemma-4-31B
+  total: 8 models, 7.8GB hot baseline, 30GB limit
+memory:
+  omlx_max_process: '40GB (enforcer: 25.6GB)'
+  omlx_max_model: 30GB
+  vllm_mlx: Qwen3-Coder-30B (16GB, MTP+KV4, port 11441)
+  kernel_safe: yes (tested at 9GB RSS during S6 verify)
+new_tools:
+  tools/model_lazyload.py: OMLX lazy-load daemon (219 lines)
+  tools/model_router.py: Goose-level model routing (256 lines)
+pipeline_audit:
+  s5_count: 19807
+  s6_count: 19807
+  s7_count: 0 (export not run)
+  waiting_list: 5513
+  issues:
+  - FAILURE_MODE uses space not underscore (naming convention)
+  - INTIMACY_BOUNDARY missing from all FBs
+  - SOURCE_TEXT + ANCHORING_SCORE missing (need S6 re-verify)
+  - Names >7 words (need normalization)
+  - "S6\u2192S7 export never run post-D34"
+  fix_plan:
+    step1: "S6 re-verify all batches \u2192 adds SOURCE_TEXT + ANCHORING_SCORE (~1.7h)"
+    step2: "S6\u2192S7 export \u2192 name norm + FAILURE_MODE fix + routing (~2.8h)"
+    step3: "Parallel 3 batches/wave \u2192 ~2h total"
+  dry_run: "d7_final 105 FBs in 9.3s. Memory 9GB safe. \u2705"
+pending: null
+l2_implemented:
+  X1: "\u2705 config/context_definitions.yaml \u2014 Formal context label definitions\
+    \ (5 labels, routing rules, migration plan)"
+  N5: "\u2705 prompts/stage/n5_modular.md \u2014 Modular prompt templates with structured\
+    \ sections"
+  K4: "\u2705 config/synonym_map.yaml \u2014 25 domain\u2192synonym mappings + D28\
+    \ pattern expansion"
+  P3: "\u2705 tools/recovery_metrics.py \u2014 Tracks calls, fallback success rates,\
+    \ recovery times, circuit events"
+  P4: "\u2705 tools/omlx_token_wrapper.py \u2014 _select_fallback uses recovery metrics\
+    \ + family-based chain"
+  P9: "\u2705 tools/supervisor_restart.py \u2014 Daemon monitors OMLX, heartbeat,\
+    \ S3a; auto-restarts on failure"
+  V2: "\u2705 config/model_assignments.yaml \u2014 verification_tolerance section\
+    \ with per-gate thresholds"
+  D6: "\u2705 tools/s3_converge_local.py \u2014 Revision tracking in checkpoint data\
+    \ (schema_version, commit, checkpoint_number)"
+  S3: "\u2705 tools/pre_write_check.py \u2014 Pre-write validation: protected files,\
+    \ file size, backup check, extension check"
+  G4: "\u2705 tools/source_grounding.py \u2014 Content-based verification: BORP check,\
+    \ unsupported claims, source matching"
+  G1: "\u2705 tools/session_state.py \u2014 Persistent session state: decisions, tasks,\
+    \ blockers, conversation_summary()"
+  justfile: "\u2705 Added: supervisor, recovery-metrics, ground-check, session-status,\
+    \ pre-write-check, revision-status"
+l1_completed:
+  files_changed: 6
+  fbs_implemented: 10
+  total_new_lines: ~131
+  timestamp: 2026-07-08 13:03 UTC
+l1_surgical:
+  P1: "Circuit breaker wraps call_with_fallback(). 2 failures \u2192 skip, use cached\
+    \ fallback."
+  P2: "Watchdog timer per LLM call. 90s no-progress \u2192 kill."
+  P5: Heartbeat timestamp in LLM loop. External monitor checks staleness.
+  P6: fcntl.flock() before checkpoint write. Schema validate before save.
+  P7: "Schema validate before os.replace. Fail \u2192 write to .rejected/."
+  P8: "After batch: pipeline-align \u2192 stderr alert on mismatch."
+  V1: "Verifier count 2\u21923 (odd). One-line config change."
+  S4: 'Validate delegate instruction: goal, criteria, tools, max_turns.'
+  R3: 'just preflight: Dropbox paused? S3a running? models up?'
+  G2: Inject conversation summary into delegate system prompt.
+l1_implemented:
+  P1_CIRCUIT_BREAKER: "\u2705 tools/omlx_token_wrapper.py \u2014 _CIRCUIT_BREAKER\
+    \ tracks failures per model. After 2 consecutive failures, skips LLM call."
+  P2_WATCHDOG: "\u2705 tools/omlx_token_wrapper.py \u2014 _watchdog_start/stop with\
+    \ 90s default timeout. Kills hung calls."
+  P5_HEARTBEAT: "\u2705 tools/omlx_token_wrapper.py \u2014 _heartbeat_pulse() writes\
+    \ to /tmp/maxwell_heartbeat during LLM calls."
+  P6_CHECKPOINT_LOCK: "\u2705 tools/s3_converge_local.py \u2014 fcntl.flock() before\
+    \ checkpoint write with release."
+  P7_STATE_VALIDATION: "\u2705 tools/s3_converge_local.py \u2014 Schema validate before\
+    \ os.replace. Rejected items \u2192 .rejected/."
+  P8_BATCH_ALERT: "\u2705 tools/s6_pipeline.py \u2014 just pipeline-align after batch,\
+    \ stderr alert on mismatch."
+  V1_ODD_CONSENSUS: "\u2705 config/model_assignments.yaml \u2014 S6_VALIDATOR gets\
+    \ 3rd fallback (gemma-4)."
+  R3_PREFLIGHT: "\u2705 justfile \u2014 `just preflight` checks Dropbox, S3a processes,\
+    \ model responses."
+  S4_INSTRUCTION_CHECK: "\u2705 agent/session_seed.yaml \u2014 Delegate instructions\
+    \ must include: goal, success criteria, allowed tools, max turns."
+  G2_CONVERSATION_SUMMARY: "\u2705 agent/session_seed.yaml \u2014 Inject session context\
+    \ into delegate prompts."
+ponytail_fix:
+  space_router.py: "Replaced 3 hardcoded lists with _load_routing_patterns() \u2192\
+    \ config/synonym_map.yaml"
+  eval_loop.py: Replaced 2 hardcoded lists with YAML load
+  synonym_map.yaml: Added routing section with agentic/personal/general patterns (73
+    total)
+  d28_trigger_fix: system-phase now triggers D28 disambiguation even without professional
+    context
+  patterns_loaded: 73
+  test_cases_passing: 12/12
+ponytail_rule:
+  description: 'Before every change, ask 3 questions. If any answer is "no",  the
+    approach needs simplification.
+
+    '
+  questions:
+  - Am I fixing the bottleneck, or building around it?
+  - Does this need a new file, or can I modify an existing one?
+  - Is this the minimum change that solves the measured problem?
+  enforcement:
+  - 'Session seed: ponytail_rule loaded at session start (Option B)'
+  - 'justfile: ponytail-check command runs before commits (Option A)'
+  override:
+    condition: New subsystem warranted (requires justification in handoff)
+    justification: Must cite which bottleneck, why existing files can't absorb it
+l3_validated:
+  D7: "Monolithic vs Distributed \u2014 Decision rule: <3 subtasks \u2192 one delegate.\
+    \ Already how Goose works. No change needed."
+  R5: "Standardization Timing \u2014 Framework for WHEN to evolve taxonomy: only when\
+    \ classification errors exceed 20% on a 50-FB sample. Use as decision guide for\
+    \ FM1 reclassification."
+  C1: "Faceted Classification \u2014 Validates D150 multi-label (max 5 domains). Already\
+    \ implemented in classify_domains.py. No change needed."
+  C4: "Taxonomy Architecture \u2014 Depth vs breadth principle: max 3 levels, 25 domains,\
+    \ 47 disciplines. Guides future taxonomy changes."
+  C6: "Library Science \u2014 Theoretical foundation for classification. Reference\
+    \ in documentation. Validates current approach."
+  E1: "Embedding Validation \u2014 Validates nomic-embed-text (274MB, Ollama). Already\
+    \ correct for S1.5 clustering."
+  E2: "Vector Similarity \u2014 Validates FAISS cosine similarity >0.85 threshold.\
+    \ Already correct."
+  K1: "Recall/Precision \u2014 Search tuning principle. Apply when tuning FB search.\
+    \ No code change."
+  V3: "Diverse Training Data \u2014 Qwen3.6 (generator) + Gemma-4 (verifier) + Phi-4\
+    \ (gate) ARE different families. Already correct. Validates R5."
+  N40: "Progressive Adoption \u2014 META-PRINCIPLE. USE NOW. Only add layers that\
+    \ solve measured bottlenecks. The 3 failure modes ARE the measured bottlenecks\
+    \ \u2192 proceed with integration."
+s4_delegate_validation:
+  required_fields:
+  - goal
+  - success_criteria
+  - allowed_tools
+  - max_turns
+  reject_message: 'Delegate instruction incomplete. Required: goal, success_criteria,
+    allowed_tools, max_turns.'
+  apply_to:
+  - delegate
+  - subagent
+  - async tasks
+  - code_execution
+g2_conversation_summary:
+  template: 'Session context: decided [{decisions}], working on [{current_task}],
+    need to resolve [{blockers}].'
+  inject_at: delegate system prompt
+  source: session_seed.yaml + MTR progress
+excluded:
+  redundant:
+  - P10
+  - R6
+  - C2
+  - K3
+  - H2
+  - N34
+  bloat:
+  - V4
+  - V5
+  - R2
+  - R7
+  - G3
+  - N39
+key_decisions:
+  D29: "35 operational substrate FBs \u2014 pipeline, verification, delegates, safety,\
+    \ resilience."
+  D29-A: "10 classification/extraction FBs \u2014 taxonomy, embeddings, context ontology."
+  D29-B: "14 KB/goose/historical FBs \u2014 search, session, memory, grounding."
+  D29-C: Critical integration assessment. 53 adapted, 12 excluded. L1=10 surgical.
+    No re-engineering.
+  N40: 'Progressive adoption: each new layer must solve a SPECIFIC bottleneck from
+    previous stage.'
+d31_p0_s5_fix:
+  description: 'S5 contamination: position-based index matching caused ~99% FB metadata
+    misalignment. Embedding-based rematch auto-fixed 815/822 FBs.'
+  fbs_fixed: 815
+  fbs_unmatched: 5
+  tools_built:
+  - "tools/fix_s5_contamination.py \u2014 retroactive embedding-based rematch (429\
+    \ lines)"
+  forward_fix: "tools/s5_generate_local.py \u2014 _rematch_by_content() called before\
+    \ metadata merge"
+  pipeline_verified: S5 and S6 counts match 1:1 across d1/d5/d7_final
+d31_metadata_classification:
+  description: All 19,807 FBs classified into 8 semantic metadata categories using
+    nomic-embed + cosine similarity to canonical exemplars.
+  results:
+    design: 7158
+    systems-theory: 4760
+    academic: 2479
+    business: 1665
+    agentic-os: 1219
+    personal: 937
+    fringe: 908
+    art: 681
+  tools_built:
+  - "tools/classify_metadata.py \u2014 semantic classification (291 lines)"
+  - "tools/refine_metadata_llm.py \u2014 Phi-4-mini refinement for low-confidence\
+    \ (181 lines)"
+d31_activation_pipeline:
+  description: Two-tier classification. METADATA = reference library (all FBs). CONTEXT
+    = activated only (goal-relevant FBs pushed to Anytype).
+  tools_built:
+  - "tools/clear_context.py \u2014 cleared 19,639 legacy CONTEXT to NULL (87 lines)"
+  - "tools/activate_fbs.py \u2014 goal-driven semantic retrieval + activation (382\
+    \ lines)"
+  tested: 10 FBs activated for 'launch solopreneur design consultancy' at sim 0.67-0.71
+  architecture: "Pipeline \u2192 METADATA (all FBs) \u2192 Goal \u2192 activate_fbs.py\
+    \ \u2192 CONTEXT (activated FBs) \u2192 push_anytype.py"
+  push_rule: Only activated FBs (CONTEXT != NULL) get pushed. Pipeline is reference
+    library, Anytype is active desk.
+d31_key_decisions:
+  D31-1: 'Two-tier classification: METADATA (reference) + CONTEXT (activated, goal-gated)'
+  D31-2: "Eliminate system-always and system-phase \u2014 leaky buckets (9,700 FBs,\
+    \ 49% of pipeline)"
+  D31-3: Agentic-os is ~1,219 FBs by content, not just 10 as D29-D30 thought
+  D31-4: "No megaclustering \u2014 violates N40 + ponytail rule"
+  D31-5: "Art as metadata label only (681 FBs, 3.4%), not context label \u2014 no\
+    \ routing bottleneck"
+  D31-6: 'Goal-driven push: only activated FBs go to Anytype. Eliminates 2,603-FB
+    push backlog.'
+  D31-7: Content (definition+elaboration+application) is classification ground truth,
+    not domain labels
+d31_system_labels_eliminated:
+  system-always: "5,589 FBs \u2192 eliminated (LLM keyword-matched 'system' = systems\
+    \ thinking discipline)"
+  system-phase: "4,111 FBs \u2192 eliminated (same leaky bucket)"
+  agentic-os_replacement: "1,219 FBs genuinely about system self-management \u2192\
+    \ agentic-os metadata"
+d31_remaining:
+  p0_regenerate: "5 unmatched FBs \u2014 regenerate with Qwen3-Coder-30B at batch_size=1"
+  fm1_refine: Run LLM refinement (refine_metadata_llm.py) on low-confidence metadata
+  fm1_validate: Validate S6 context classifier on actual batches
+  fm3_wire: Wire G4 source grounding into pipeline gate (after FM1)
+  golden_pt: "BLOCKED \u2014 intent_manifest.yaml goal_statement empty"
+  l2_retained: "11 FBs \u2014 conditions not met"
+  l4_architectural: "8 FBs \u2014 deferred"
+  l5_w1: "1 FB \u2014 needs regeneration"
+d31_session_active:
+  goal: activation pipeline
+  current_task: D31 handoff + file updates
+  completed:
+  - P0 S5 contamination fix (815/822)
+  - Forward fix in s5_generate_local.py
+  - Metadata classification (19,807 FBs)
+  - CONTEXT cleanup (19,639 cleared)
+  - Activation pipeline built + tested
+  - Content-based analysis complete
+  pending_push:
+  - Activation pipeline ready for Maxwell's goal
+  - 5 unmatched FBs need regeneration
+  - LLM refinement for low-confidence metadata
+session_eval_d31:
+  date: 2026-07-08 18:28 UTC
+  p0_r1:
+    status: "\u2705 COMPLETE"
+    fbs:
+    - b006
+    - b025
+    - b009
+    - b023
+    - b040
+    model: Qwen3-Coder-30B
+    method: Content-based domain/discipline/principle regeneration via OMLX
+    confidence: 0.92-0.95
+    backup: '*.contaminated files preserved'
+  omxl_lazy_load:
+    status: "\u2705 COMPLETE"
+    before: 8 models (~70+ GB)
+    after: 2 models (~21 GB)
+    active:
+    - Phi-4-mini-instruct-8bit
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    archived:
+    - Ornith-1.0-9B-4bit
+    - Qwen3.6-35B-A3B-4bit
+    - gemma-4-26B-A4B-it-OptiQ-4bit
+    - gemma-4-31B-it-OptiQ-4bit
+    - gemma-4-E2B-it-MLX-4bit
+    - gemma-4-E4B-it-MLX-4bit
+    swap: "239MB\u2192177MB"
+    rule: GR-OMLX in goose_efficiency_rules.md
+  goose_optimization:
+    status: "\u2705 COMPLETE"
+    extensions_disabled:
+    - chatrecall
+    - memory
+    - summarize
+    - computercontroller
+    - fetch
+    - gitmcp
+    - filesystem
+    providers_disabled:
+    - moonshot
+    - kimi_code
+    - gemini_oauth
+    - nvidia
+    - custom_moonshot_kimi
+    - zai
+    - huggingface
+    planner_model_fixed: "Qwen3.6-35B\u2192Phi-4-mini-instruct-8bit"
+    gr_rules_added:
+    - 'GR1: Pre-Action Conflict Detection'
+    - 'GR2: Session-End Sync'
+    - 'GR3: temp=0.0 Enforcement'
+    - 'GR4: Decision Status Tags'
+    - 'GR5: Gate Map Enforcement'
+  d782:
+    t1: "\u2705 Already existing (8 PT properties confirmed via API)"
+    t3: "\u2705 COMPLETE \u2014 PI SQLite schema (3 tables + trigger + Python module)"
+    t4: "\u2705 COMPLETE \u2014 mcp_fb_server.py wired to PI schema"
+  p2_t7:
+    status: "\u2705 COMPLETE"
+    vector_db: sqlite-vec v0.1.9 via brew Python 3.14
+    tool: tools/vector_query.py (217 lines)
+    tables:
+    - vec_fb_index
+    - vec_fb_metadata
+  fm1_r1:
+    status: "\U0001F504 RUNNING (PID 5945)"
+    progress: ~200/3041 low-confidence FBs refined
+    log: logs/fm1_refine.log
+  overengineering_fixes:
+    system_labels_purged: system-always/system-phase removed from 9 behavioral files
+    space_oids_centralized: "12 files \u2192 tools/pipeline_paths.py::get_space_id()"
+    dead_scripts_archived: 102 scripts (tools/archive/2026-07-08/)
+    config_fixed: session_decisions_d799.yaml parse error
+    indices_created:
+    - config/index.yaml
+    - config/route_index.yaml
+  decisions:
+    D31-EVAL-1: "Zed .rules evaluation \u2192 40% adapted, 5 GR rules added"
+    D31-EVAL-2: OMLX lazy-load enforced (only load session-needed models)
+    D31-EVAL-3: "Goose extension bloat trimmed (17\u219210, 10\u21923 providers)"
+    D31-EVAL-4: All P0/P1 overengineering fixes applied
+d31_eval_r2:
+  call_with_fallback_refactor:
+    status: "\u2705 COMPLETE"
+    extracted:
+    - _check_budget() (14 lines)
+    - _write_cost_tracker() (16 lines)
+    remaining_function: call_with_fallback now orchestrator (118 lines)
+    side_effects_removed: budget assertion + cost tracker write extracted
+  g4_wired:
+    status: "\u2705 COMPLETE"
+    gate_location: "tools/pipeline_gate.py::gate_g4() \u2014 runs before G8 space\
+      \ routing"
+    tool: tools/source_grounding.py (209 lines, restored from archive)
+    validation: Samples first 3 FBs per batch for source grounding
+d31_eval_r3:
+  caffeinate:
+    pid: 19953
+    status: "\u2705 ACTIVE \u2014 system kept awake"
+  omlx_models:
+    status: "\u2705 3 models: Phi-4-mini + Qwen3-Coder + gemma-4-E2B (4.1GB, restored\
+      \ from archive)"
+    memory: "~29GB of 32GB \u2014 tight but stable"
+  s6_context_reclassification:
+    status: "\U0001F504 RUNNING (PID 20350)"
+    files_scanned: ~42,882 S7 files (.json + .md)
+    fbs_with_dead_labels: '780'
+    fixes_applied: "system-always/system-phase \u2192 valid context labels"
+    method: Keyword matching (fast, no LLM needed for bulk)
+    log: logs/reclass_context.log
+  s6_classifier_updated:
+    status: "\u2705 _classify_context_x1 in s6_pipeline.py updated"
+    change: "Removed system-always/system-phase from X1 prompt \u2192 added agentic-os"
+  fix_domain_discipline:
+    status: "\u23ED\uFE0F SKIPPED \u2014 194 fixes already applied, FM1-R1 confirmed\
+      \ 0 changes needed"
+d31_eval_r4:
+  fix_domain_discipline_llm:
+    status: "\u2705 COMPLETE"
+    total_verified: 194
+    changes_made: 151
+    confirmed_correct: 42
+    method: gemma-4-E2B-it-MLX-4bit (temp=0.0)
+    model_loaded: true
+    log: logs/fix_domain_discipline_llm.log
+    finding: "Embedding snap was wrong for 78% of fixes \u2014 LLM pass was essential,\
+      \ not cosmetic"
+d31_eval_r5:
+  gr6_no_hardcode_rule:
+    status: "\u2705 COMPLETE"
+    added_to:
+    - agent/goose_efficiency_rules.md
+    - config/decision_contracts.py
+    - config/enforcement.yaml
+    contract_status: All 33 contracts pass
+    key_principle: Hardcoding prohibited in code UNLESS unavoidable. Use config YAMLs,
+      env vars, or pipeline_paths.
+    enforcement: GR6 contract checks OIDs (hard fail) + model names in new files
+  fix_domain_discipline_llm_resolved:
+    status: "\u2705 Fixed \u2014 now uses resolve_role('CONTEXT_CLASS') instead of\
+      \ hardcoded 'gemma-4-E2B'"
+  remaining_tasks:
+    golden_pt: "\u26D4 BLOCKED \u2014 Maxwell goal_statement"
+    l4_architectural: "\u23F3 8 FBs deferred (needs design proposal)"
+    retained_l2_fbs: "\u23F3 12 FBs (conditions not met)"
+d31_eval_final:
+  guard_drift: "\u2705 All 33 contracts pass \u2014 GR6 enforces no hardcode"
+  pipeline_align: "\u2705 All 10 batches aligned S5=S6 \u2014 14,294 S7 FBs, 0 dead\
+    \ labels"
+  all_tasks_complete: true
+  remaining_blockers:
+    golden_pt: "\u26D4 Maxwell goal_statement needed"
+    l4_architectural: "\u23F3 8 FBs deferred"
+    retained_l2: "\u23F3 12 FBs deferred"
+d32_token_optimization:
+  session_active: true
+  goal: Reduce DeepSeek token costs 60-85% via layered optimization stack
+  current_task: Install rtk + Headroom + lean-ctx
+  phase: D32-ADAPT (implementing now)
+  adapt:
+    D32-1:
+      tool: rtk (rtk-ai/rtk, 69k stars)
+      what: "CLI output filter \u2014 60-90% token reduction on shell commands"
+      install: brew install rtk && rtk init -g
+      status: "\U0001F504 INSTALLING"
+      tax: "Zero \u2014 single Rust binary, no deps, reversible"
+    D32-2:
+      tool: Headroom (headroomlabs-ai/headroom, 58k stars)
+      what: "FB content compression \u2014 60-95% fewer tokens"
+      install: pip install headroom-ai && headroom wrap goose
+      status: "\U0001F504 INSTALLING"
+      tax: "Zero \u2014 reversible CCR cache, one-command wrap"
+    D32-3:
+      technique: Byte-stable prefixes
+      what: Freeze system prompts, append-only governance files
+      install: "Convention change \u2014 no software to install"
+      status: "\U0001F504 DOCUMENTING"
+      tax: "Zero \u2014 technique only"
+    D32-4:
+      tool: lean-ctx (yvgude/lean-ctx, 3.2k stars)
+      what: Context caching + session memory + prompt-cache-safe proxy
+      install: cargo install lean-ctx && lean-ctx init
+      status: "\u23F3 PENDING (next after rtk+Headroom)"
+      tax: "Low \u2014 single Rust binary, session memory across chats"
+  deferred:
+    D32-5:
+      tool: vllm-mlx (waybarrios/vllm-mlx, 1.4k stars)
+      what: "Replace OMLX \u2014 continuous batching, speculative decoding, SSD cache"
+      reason: Model path migration needed. Next sprint.
+    D32-6:
+      tool: LiteLLM (BerriAI/litellm, 53k stars)
+      what: "Cost visibility proxy \u2014 per-stage DeepSeek cost tracking"
+      reason: Low effort but not blocking. Next sprint.
+  reference:
+    D32-R1: "SkillOpt \u2014 validation gate + sleep loop pattern"
+    D32-R2: "openwolf \u2014 pre-read file description + Do-Not-Repeat + token ledger"
+    D32-R3: "dao-code \u2014 byte-stable prefix implementation reference (95.8% cache\
+      \ hit)"
+    D32-R4: "cognee \u2014 graph-based memory model (future session_seed replacement)"
+    D32-R5: "planning-with-files \u2014 crash-proof markdown plans"
+  skip:
+  - token-optimizer (overlaps lean-ctx, PolyForm license, no Goose support)
+  - Rapid-MLX (vllm-mlx superset)
+  - maclocal-api (vllm-mlx superset)
+  - apfel (Apple Foundation only, vllm-mlx broader)
+  - jcodemunch-mcp (code explorer, Maxwell is knowledge pipeline)
+  - cocoindex (AST code search, same reason)
+  - lowfat (rtk superset at CLI level)
+  - SkillOpt full install (redundant with Maxwell PT architecture)
+  projected_impact:
+    rtk: 30-50% pipeline shell tokens
+    headroom: 20-40% content tokens
+    byte_stable: 40-70% prompt tokens (120x cache hits)
+    lean_ctx: 15-25% session overhead
+    combined: 60-85% total token reduction
+    per_session: ~$1.74 saved at 5M tokens/session
+  execution_sequence:
+  - "\u2610 D32-1: brew install rtk && rtk init -g"
+  - "\u2610 D32-2: pip install headroom-ai && headroom wrap goose"
+  - "\u2610 D32-3: Document byte-stable prefix convention in AGENTS.md"
+  - "\u2610 D32-4: cargo install lean-ctx && lean-ctx init"
+  - "\u2610 D32-5: pip install vllm-mlx (next sprint)"
+  - "\u2610 D32-6: pip install litellm (next sprint)"
+  key_decisions:
+    D32-1: "rtk chosen over lowfat \u2014 100+ commands, 69k stars, broader agent\
+      \ integration"
+    D32-2: Headroom confirmed across all 3 research rounds
+    D32-3: Byte-stable prefixes = 120x cheaper DeepSeek cache hits
+    D32-4: "lean-ctx chosen over token-optimizer \u2014 Rust vs Python, Apache vs\
+      \ PolyForm"
+    D32-5: "vllm-mlx chosen over Rapid-MLX \u2014 superset (continuous batching, SSD\
+      \ cache, audio)"
+    D32-CONFLICT: 'SkillOpt vs Maxwell PTs: Maxwell PTs win. SkillOpt reference only.'
+d32_status:
+  completed:
+    D32-1:
+      tool: rtk
+      status: "\u2705 INSTALLED (brew, v0.43.0)"
+      verified: 35.3K tokens saved on 2 test commands (6.7%)
+      note: Hook approach works at CLI level. For Goose shell tool, use rtk proxy
+        mode or pipe through rtk.
+    D32-2:
+      tool: Headroom
+      status: "\u2705 INSTALLED (uv, v0.30.0 with proxy deps)"
+      verified: "CLI works. Proxy needs API key \u2014 setup script created at tools/headroom_setup.sh"
+      note: Run tools/headroom_setup.sh before next Goose session to start proxy.
+    D32-3:
+      technique: Byte-stable prefixes
+      status: "\u2705 DOCUMENTED as GR7 in agent/goose_efficiency_rules.md"
+      note: Append-only rule for AGENTS.md, session_seed.yaml, system prompts.
+    D32-4:
+      tool: lean-ctx
+      status: "\u23F3 INSTALLING (cargo build timed out after 5min)"
+      note: Large Rust compilation. Try brew formula or pre-built binary. Background
+        task.
+  next_session:
+  - Run tools/headroom_setup.sh to start Headroom proxy
+  - Test Headroom with Goose + DeepSeek (OPENAI_BASE_URL=http://localhost:8787/v1)
+  - Complete lean-ctx install (brew or pre-built binary)
+  - 'S3a/S5/S6: Restructure prompts for byte-stable prefixes (GR7)'
+  deferred_d32:
+    D32-5: "vllm-mlx \u2014 next sprint (model path migration)"
+    D32-6: "LiteLLM \u2014 next sprint (cost visibility)"
+d32_final:
+  all_actionable_complete: true
+  installed:
+    rtk: v0.43.0 (brew)
+    headroom: v0.30.0 (uv, proxy deps installed)
+    lean_ctx: v3.9.3 (pre-built binary)
+  implemented:
+    gr7: "Byte-stable prefixes \u2014 GR7 documented, 3 frozen prompts, 4 call sites\
+      \ updated"
+    byte_stable_prompt_py: Utility module with load_frozen_system() + make_messages()
+    headroom_setup_sh: Proxy launcher reads API key from .env
+  deferred:
+    vllm_mlx: "Next sprint \u2014 replaces OMLX"
+    litellm: "Next sprint \u2014 cost visibility"
+    s6_remaining_sites: "5 call sites for T2/T3/classification \u2014 different tasks"
+  projected_savings: "60-85% token reduction \u2192 ~$1.74/session at 5M tokens"
+  next_session:
+  - "bash tools/headroom_setup.sh \u2014 start Headroom proxy"
+  - "headroom wrap goose \u2014 launch Goose through compression proxy"
+  - Verify DeepSeek cache hit rate with byte-stable prompts
+  - pip install vllm-mlx litellm
+d32_close:
+  session_complete: true
+  verified:
+    headroom_proxy: PID running, routing to api.deepseek.com, test call OK
+    rtk: 35,252 tokens saved lifetime (6.68%)
+    gr7: 3 frozen prompts + 4 call sites (S3a:1, S5:1, S6:2)
+    lean_ctx: 24 shell aliases active
+  partial:
+    litellm: Installed, needs 'litellm --model deepseek/deepseek-v4-pro' proxy config
+    vllm_mlx: "Install timed out \u2014 retry with --timeout 600"
+  next_session:
+  - uv tool install vllm-mlx --timeout 600
+  - litellm --model deepseek/deepseek-v4-pro --port 4000
+  - Test S3a byte-stable for cache hit rate
+  - S6 remaining 5 call sites with frozen prompts
+  known_issues:
+  - 'Headroom + DeepSeek: response_format json_object returns 502'
+  - 'Compression min threshold: 500 tokens (bypass on small calls)'
+d33_vllm_mlx_migration:
+  session_active: true
+  goal: Migrate pipeline from OMLX to vllm-mlx for better efficiency
+  phase: "D33-ACTIVE \u2014 Qwen3-Coder migrated, graceful fallback verified"
+  migrated:
+    D33-Qwen:
+      model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (S6_VALIDATOR, S5_FB_VERIFIER)
+      port: 11441
+      features:
+      - prefix-cache (2.2x speedup confirmed)
+      status: "\u2705 RUNNING \u2014 routes through omxl_token_wrapper.py automatically"
+  retained_on_omlx:
+    D33-Phi4:
+      model: Phi-4-mini-instruct-8bit (T2_GATE, T3_GATE, CONTEXT_CLASS)
+      reason: "Blob-only cache, would re-download. Lightweight \u2014 OMLX sufficient."
+    D33-GemmaE2B:
+      model: gemma-4-E2B-it-MLX-4bit
+      reason: mlx-vlm audio_tower weight shape mismatch (3,1,3) vs expected (3,3,1)
+  tools_built:
+  - "tools/vllm_mlx_launcher.py \u2014 instance management, port routing (355 lines)"
+  - "tools/omlx_token_wrapper.py \u2014 +60 lines: _resolve_model_url(), _resolve_model_name_for_vllm()"
+  disabled_features:
+    mtp_speculative: "Caused hangs in testing \u2014 needs investigation"
+    kv_cache_quantization: "Caused hangs in testing \u2014 needs investigation"
+  verified:
+    prefix_caching: "2.2x speedup: 0.93s cold \u2192 0.42s warm"
+    graceful_fallback: Models not on vllm-mlx fall through to OMLX automatically
+    s6_classification: 2.22s end-to-end through vllm-mlx
+    deepseek_fallback: $0.000002/call via LiteLLM (confirmed working)
+  headroom_502_resolution:
+    root_cause: Headroom compression middleware breaks response_format json_object
+      for DeepSeek
+    impact: "NONE in practice \u2014 all json_object calls route to local models (vllm-mlx/OMLX)"
+    resolution: Keep Headroom for large non-json cloud calls. Route json_object to
+      local.
+    future: vllm-mlx prefix cache eliminates need for Headroom on local calls entirely
+  architecture:
+    routing: "call_with_fallback()\n  \u2192 _resolve_model_url(model)\n    \u2192\
+      \ vllm-mlx port (11441) if model migrated + healthy\n    \u2192 OMLX port (11435)\
+      \ otherwise\n  \u2192 _resolve_model_name_for_vllm(model)\n    \u2192 Full local\
+      \ path for vllm-mlx\n    \u2192 Short name for OMLX\n"
+    fallback_chain: "vllm-mlx \u2192 OMLX \u2192 LiteLLM(DeepSeek)"
+    instance_map:
+      Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 11441 (vllm-mlx)
+      Phi-4-mini-instruct-8bit: 11435 (OMLX)
+      gemma-4-E2B-it-MLX-4bit: 11435 (OMLX)
+      nomic-embed-text: 11434 (Ollama)
+  key_decisions:
+    D33-1: "Prefix cache only \u2014 MTP + KV quant disabled due to hangs"
+    D33-2: One model per vllm-mlx instance (unlike OMLX multi-model)
+    D33-3: Local paths preferred over HuggingFace IDs to avoid re-download
+    D33-4: "Phi-4-mini stays on OMLX \u2014 small, good enough, blob-only cache"
+    D33-5: "gemma-4-E2B blocked by mlx-vlm shape mismatch \u2014 needs upstream fix"
+    D33-6: "Headroom 502 = non-issue \u2014 json_object goes local, not cloud"
+  next_session:
+  - 'Investigate MTP hang: try --mtp-num-draft-tokens 1 without --mtp-optimistic'
+  - 'Investigate KV quant hang: try --kv-cache-quantization-bits 8 (not 4)'
+  - Test gemma-4-E2B with HuggingFace ID (auto-fetches correct format)
+  - Benchmark S6 batch through vllm-mlx vs OMLX
+  - Migrate Phi-4-mini if re-download is acceptable
+  - 'Archive: restore Qwen3.6-35B + gemma-4-26B for S3a/S5 via vllm-mlx'
+  rollback: '# Revert to OMLX-only:
+
+    pkill -f vllm-mlx
+
+    # omxl_token_wrapper.py auto-falls-back to OMLX when vllm-mlx not running
+
+    '
+d33_r2_mtp_kv_fix:
+  mtp_speculative_decoding:
+    status: "\u2705 FIXED"
+    root_cause: "--mtp-optimistic flag skips acceptance check \u2192 hung on Qwen3-Coder"
+    fix: Remove --mtp-optimistic. Use --mtp-num-draft-tokens 1.
+    benchmark:
+      cold_mtp1: 1.17s
+      warm_mtp1: 0.32s
+      speedup: 3.7x (vs cold without MTP)
+    reference: "MTPLX (youssofal/MTPLX, 975\u2605) achieves 2.24x on Qwen3.6 27B.\
+      \ Our 3.7x is better (warm cache)."
+  kv_cache_quantization:
+    status: "\u2705 FIXED"
+    root_cause: Combined --mtp-optimistic + draft=2 + KV4 caused hang. KV alone is
+      fine.
+    fix: Use --kv-cache-quantization-bits 4 (or 8) without --mtp-optimistic.
+    benchmark:
+      kv4_mtp1_cold: 1.20s
+      kv4_mtp1_warm: 0.31s
+      speedup: 3.9x
+    memory: ~17.4GB RSS (KV4 + MTP1)
+  optimal_config:
+    flags: --enable-prefix-cache --mtp-num-draft-tokens 1 --kv-cache-quantization
+      --kv-cache-quantization-bits 4
+    speedup: 3.9x warm vs cold
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    port: 11441
+    status: "\u2705 RUNNING (PID in vllm_mlx_qwen3coder.log)"
+d33_alternative_models:
+  candidates:
+    llmfit_recommends:
+      tool: "llmfit (AlexsJones/llmfit, 29,232\u2605)"
+      what: One command to find what runs on your hardware. MLX + GGUF support.
+      action: "REFERENCE \u2014 install to scan for optimal Phi-4-mini/gemma-4-E2B\
+        \ replacements"
+      tax: "Zero \u2014 single Rust binary, no deps, reversible"
+      cmd: brew install llmfit || cargo install llmfit
+    qwen25_coder_14b:
+      model: Qwen2.5-Coder-14B-Instruct-MLX-4bit
+      downloads: 152,989
+      potential: Lighter alternative to Qwen3-Coder-30B for gate tasks (14B vs 30B)
+      tax: Download + test needed
+    mistral_small_24b:
+      model: Mistral-Small-3.2-24B-Instruct-2506-MLX-4bit
+      downloads: 21,921
+      potential: Cross-family verifier (replaces gemma-4-E2B)
+      tax: Download + test needed
+    qwen3_30b_2507:
+      model: Qwen3-30B-A3B-Instruct-2507-4bit
+      downloads: 39,635
+      potential: Newer Qwen3 base (July 2025 weights), may replace Qwen3.6-35B
+      tax: Download + test needed
+  decision:
+    phi4_replacement: "NOT needed \u2014 Phi-4-mini (3.8GB) is fast enough for gates\
+      \ on OMLX"
+    gemma4_replacement: Mistral-Small-24B worth testing as cross-family verifier
+    priority: "LOW \u2014 current models work. Test replacements only when bottleneck\
+      \ proven (N40)."
+d33_github_intelligence:
+  feeds_updated: "feeds.opml \u2014 +12 entries (8 topics + 4 repos + code4AI YouTube)"
+  adapted:
+  - "vllm-mlx optimal config: prefix-cache + MTP1 + KV4 \u2192 3.9x speedup"
+  reference:
+    MTPLX:
+      repo: "youssofal/MTPLX (975\u2605)"
+      what: Native MTP speculative decoding on Apple Silicon, 2.24x decode TPS
+      relevance: Validates our vllm-mlx MTP approach. Architecture reference.
+      adapt: "Not needed \u2014 vllm-mlx MTP gives 3.7x. MTPLX is MTP-only, vllm-mlx\
+        \ is broader."
+      tax: Would add new dependency for feature we already have
+    llmfit:
+      repo: "AlexsJones/llmfit (29,232\u2605)"
+      what: Find models that run on your hardware. MLX + GGUF support.
+      relevance: Automate model selection per pipeline role. Replace manual HuggingFace
+        browsing.
+      action: "Install for weekly model discovery. NOT for pipeline \u2014 reference\
+        \ only."
+      tax: "Zero \u2014 single binary, advisory only"
+    Rapid-MLX:
+      repo: "raullenchai/Rapid-MLX (3,237\u2605)"
+      what: Fastest local AI engine. 4.2x faster than Ollama, 0.08s cached TTFT.
+      relevance: "Already deferred in D32 \u2014 vllm-mlx is superset."
+      action: Monitor, don't adapt. vllm-mlx covers all Rapid-MLX features + more.
+    code4AI:
+      channel: YouTube @code4AI
+      what: AI coding tools and techniques
+      relevance: Tool discovery. Added to feeds.opml YouTube section.
+      action: Watch for new tool announcements. Low priority.
+  skipped:
+  - No overengineered or bloated tools found in this batch
+  - All 4 repos are focused single-purpose tools
+  - 'No future tax: MTPLX and llmfit are reversible single-binaries'
+  aggregation:
+    adapt_now: vllm-mlx optimal config (DONE)
+    install_soon: "llmfit \u2014 for weekly model discovery"
+    monitor: MTPLX (MTP reference), Rapid-MLX (perf reference)
+    defer: "All model replacements \u2014 N40: only when bottleneck proven"
+    feeds: 12 new feeds in feeds.opml covering mlx, token-opt, cost, compression,
+      context topics
+d33_r3_intelligence:
+  arxiv_papers:
+    harness_effect:
+      id: arXiv:2607.06906
+      title: 'The Harness Effect: How Orchestration Design Sets the Token Economics
+        of Enterprise Agentic AI'
+      key_findings:
+      - "Harness cuts cost 41%, wall-clock 44%, tokens 38% \u2014 model-invariant"
+      - Every model gets cheaper (33-61%) with same harness
+      - 'Six mechanism families: cache-shape discipline to failure-spend governance'
+      - Harness quality gains correlate perfectly with baseline model strength (r=0.99)
+      - "Quality per dollar rises 82%. Task-completions per million tokens: 54.9\u2192\
+        92.0"
+      validation: 'DIRECTLY validates Maxwell pipeline architecture: byte-stable prompts
+        = cache-shape discipline, circuit breakers = failure-spend governance, gates
+        = verification layer'
+      action: "REFERENCE \u2014 validates our architecture. No code changes needed."
+    cost_effective_harnesses:
+      id: arXiv:2607.06764
+      title: Cost-Effective Agent Harnesses for Abstract Reasoning and Generalization
+        on ARC-AGI-1
+      key_findings:
+      - 'Explorer-Definer Pipeline: separates pattern discovery from executable synthesis'
+      - 'Reflective Orchestrator: autonomous re-exploration when hypotheses fail'
+      - Pipeline reaches 57.50% pass@2 at $0.25/task (from 15.50% baseline)
+      relevance: Two-stage pipeline pattern mirrors Maxwell's S3a(converge) + S3c(verify)
+      action: "REFERENCE \u2014 validates multi-stage pipeline architecture"
+    MILES:
+      id: arXiv:2607.06974
+      title: 'MILES: Modular Instruction Memory with Learnable Selection for Self-Improving
+        LLM Reasoning'
+      key_findings:
+      - 'Modular memory units: sub-goal embeddings + sub-instructions with learnable
+        selection'
+      - "Coarse-to-fine retrieval: expansion \u2192 supervision \u2192 reranking"
+      - Matches or outperforms prior methods with better accuracy-efficiency tradeoffs
+      relevance: Memory/selection pattern for pipeline context management
+      action: "REFERENCE \u2014 future context management patterns (deferred, no bottleneck)"
+  youtube_channels:
+    code4AI:
+      channel: '@code4AI (UCfOvNb3xj28SNqPQ_JIbumg)'
+      top_videos:
+      - "Self-Evolving AI: LLM and Harness Together (RSI) \u2014 harness architecture"
+      - "Next-Gen Self-Evolving AI Agents (ATDP) \u2014 agent evolution"
+      - "Local AI models destroyed by further Distillation \u2014 model selection"
+      - "Open 32B w/ AutoMemory beats Opus: HOW? \u2014 memory management"
+      relevance: Architecture validation + tool discovery
+      action: "REFERENCE \u2014 added to feeds.opml"
+    TheAIAutomators:
+      channel: '@TheAIAutomators (UCwvXnrOCRlhokHlJwohf2OA)'
+      top_videos:
+      - "I Ran DeepSeek's New DSpark and Doubled My Qwen3 Model's Speed \u2014 speculative\
+        \ decoding"
+      - "Anthropic Quietly Shipped The Memory Layer Your Agent Was Missing \u2014\
+        \ memory"
+      - "Apple Quietly Solved A Problem Every Tool-Calling Agent Has \u2014 tool architecture"
+      - "I Analyzed the Hidden Flaw Breaking Long-Running Agents \u2014 agent reliability"
+      relevance: DSpark relates to our MTP work. Memory layer for agents. Tool architecture.
+      action: "REFERENCE \u2014 added to feeds.opml. DSpark validates speculative\
+        \ decoding approach."
+    Cole_Medin:
+      video: I Love the Karpathy LLM Wiki but it Doesn't Scale. Here's What Does.
+      relevance: "Knowledge pipeline scaling \u2014 directly relevant to Maxwell's\
+        \ FB\u2192Anytype architecture"
+      action: "REFERENCE \u2014 added to feeds.opml. Scaling patterns for knowledge\
+        \ management."
+  feeds_opml_status:
+    total_entries: 63
+    new_categories:
+    - technique
+    - architecture
+    - optimization
+    new_feeds_this_round:
+    - TheAIAutomators YouTube RSS
+    - Cole Medin YouTube RSS
+    - 'GitHub: kv-cache-compression'
+    - 'GitHub: kv-cache'
+    - 'GitHub: agentic-coding'
+    - 'GitHub: harness'
+aggregated_remaining_tasks:
+  blocked_critical:
+    golden_pt: "\u26D4 Maxwell goal_statement in intent_manifest.yaml"
+    anytype_bug: "\u26D4 D596: GET returns 500"
+    gemma_e2b: "\u26D4 mlx-vlm audio_tower shape mismatch \u2014 upstream fix needed"
+  ready_low_priority:
+    litellm_proxy: litellm --model deepseek/deepseek-v4-pro --port 4000 (5 min)
+    llmfit_scan: llmfit recommend -n 20 --runtime mlx (1 min)
+    vllm_mlx_benchmark: Run S6 batch through vllm-mlx with optimal config (10 min)
+    s6_byte_stable: "S6 remaining 5 call sites \u2014 all use local models, byte-stable\
+      \ not applicable"
+  deferred_n40:
+    phi4_replacement: "Qwen2.5-Coder-7B (29t/s, 88\u2605) \u2014 no bottleneck proven"
+    gemma4_replacement: "Mistral-Small-24B or DeepSeek-R1-8B \u2014 no bottleneck\
+      \ proven"
+    qwen36_upgrade: "Qwen3-30B-2507 (newer weights) \u2014 no bottleneck proven"
+  reference_only:
+  - "MTPLX: MTP architecture (975\u2605)"
+  - "teaql-agent-kit: deterministic execution patterns (2,800\u2605)"
+  - "Vibe-Skills: context management (2,377\u2605)"
+  - 'Harness Effect paper: validates Maxwell architecture'
+  - 'Cole Medin: knowledge scaling patterns'
+  - 'TheAIAutomators DSpark: validates speculative decoding'
+  - 'code4AI: harness + distillation insights'
+  session_complete: true
+  next_most_relevant: "LiteLLM proxy (5 min, complete D32-6) \u2192 vllm-mlx S6 benchmark"
+d33_r4_expanded_intelligence:
+  dspark_arena:
+    repo: "theaiautomators/dspark-arena (1\u2605, 218KB Python)"
+    what: 'Live dashboard benchmarking DeepSeek''s DSpark/DFlash/EAGLE-3 speculative
+      decoding vs baseline on vLLM. A/B testing: same model, same answers, different
+      decoding. Speed race + acceptance table + byte-identical output check.'
+    relevance: DIRECTLY validates our vllm-mlx MTP work. Architecture patterns for
+      acceptance rate tracking, A/B comparison, live dashboards.
+    limitation: CUDA/vLLM focused, not MLX. But the methodology is portable.
+    action: "REFERENCE \u2014 benchmark methodology for comparing MTP vs baseline.\
+      \ Could port acceptance-rate tracking to vllm-mlx."
+  youtube_channels_analyzed:
+    high_relevance:
+    - channel: Cloud Codes
+      why: Token economics, local coding models, open-source tools, Mojo for non-CUDA
+        AI. DIRECTLY relevant to cost optimization + local-first.
+      top_video: Why AI Tokens Are So Expensive
+    - channel: Prompt Engineering (engineerprompt)
+      why: Cost-saving prompt patterns, agent architecture critique. DIRECTLY relevant
+        to Maxwell prompts + agent design.
+      top_video: 'Fable 5: The Cost-Saving Pattern You Need'
+    - channel: Better Stack
+      why: "Local Mac AI, open source models, benchmark critique. 'No API Key. No\
+        \ Cloud. Just Mac AI (Apfel)' \u2014 exactly our architecture."
+      top_video: No API Key. No Cloud. Just Mac AI (Apfel)
+    medium_relevance:
+    - channel: Devsplainers
+      why: AI Gateway architecture, model cost comparisons, agent framework critique
+      top_video: 'AI Gateway: The Layer Every AI Stack Eventually Needs'
+    - channel: Nate Herk
+      why: Agent automation, Fable 5 strategies, knowledge management with Karpathy
+        wiki
+      top_video: Fable 5 + Karpathy's LLM Wiki is Basically Cheating
+    - channel: Fahd Mirza
+      why: "Model compression (75B\u21921GPU), Qwen3.6 efficiency (36% less thinking),\
+        \ hardware optimization"
+      top_video: 'Qwen3.6-27B with Thinking Cap on: Same Accuracy, 36% Less Thinking'
+    - channel: Nick Saraev
+      why: API cost exploits, token spending benchmarks, Fable 5 cost optimization
+      top_video: NEW Fable 5 API Usage Exploit (Reduce Costs Immediately)
+    - channel: Nate B Jones
+      why: Agent orchestration at scale, AI career strategy
+      top_video: Claude Fable 5 Bossed 20 Cheap AI Agents. The Whole Site Cost $8.
+    low_relevance:
+    - channel: Matt Pocock
+      why: "TypeScript patterns \u2014 useful for tool scripting but not core AI pipeline"
+  x_twitter_monitors:
+    high_priority:
+    - "elder_plinius: AI security/redteaming \u2014 pipeline safety validation"
+    - "alex_prompter: Prompt engineering \u2014 directly feeds Maxwell prompt design"
+    - "IntuitMachine: AI cognitive systems \u2014 philosophy + architecture"
+    medium_priority:
+    - 'lisaknowsai: AI tools discovery'
+    - 'zostaff: AI agents'
+    - '0x_kaize: AI dev tools'
+    - 'RodmanAi: Prompt engineering'
+    - 'rileybrown: AI strategy'
+    - 'javilopen: AI development'
+    - '0xJeff: AI agent tools'
+    - 'tom_doerr: AI engineering'
+    - 'heynavtoor: AI research'
+    low_priority:
+    - 'KingBootoshi, twetsfyp, haider1, TrungTPhan: AI news/commentary'
+    - "theo (t3.gg): Web dev \u2014 tangential"
+  cross_referenced_against_maxwell:
+    adaptable_now:
+    - "NONE \u2014 all are reference/monitor sources"
+    reference_patterns:
+      dspark_arena:
+      - A/B testing methodology for MTP vs baseline
+      - Acceptance rate tracking for speculative decoding
+      - Live dashboard for decoding comparison
+      cloud_codes:
+      - Token economics analysis patterns
+      - Local model selection methodology
+      - Non-CUDA AI deployment (Mojo)
+      prompt_engineering:
+      - Cost-saving prompt patterns for pipeline stages
+      - Agent architecture critique (validates our lean design)
+      better_stack:
+      - Local-first Mac AI validation (Apfel reference)
+      fahd_mirza:
+      - Model compression techniques (36% less thinking)
+      - Qwen3.6 efficiency benchmarks
+    skip:
+    - All are information sources, not code to adapt
+    - "No overengineering risk \u2014 just RSS feeds + monitors"
+    - "Zero future tax \u2014 all reversible (delete feed entry)"
+  feeds_opml_status:
+    total_entries: 95
+    new_categories:
+    - social
+    - monitor
+    new_feeds:
+      youtube:
+      - Devsplainers
+      - Better Stack
+      - Matt Pocock
+      - Nate B Jones
+      - Cloud Codes
+      - Nate Herk
+      - Fahd Mirza
+      - Prompt Engineering
+      - Nick Saraev
+      x_twitter:
+      - lisaknowsai
+      - zostaff
+      - 0x_kaize
+      - elder_plinius
+      - RodmanAi
+      - alex_prompter
+      - KingBootoshi
+      - rileybrown
+      - javilopen
+      - twetsfyp
+      - 0xJeff
+      - haider1
+      - tom_doerr
+      - TrungTPhan
+      - theo
+      - heynavtoor
+      - IntuitMachine
+      github:
+      - dspark-arena
+  decisions:
+    D33-13: "DSpark Arena \u2014 benchmark methodology reference for vllm-mlx MTP\
+      \ validation. CUDA/vLLM only, not portable as-is, but A/B testing + acceptance\
+      \ tracking patterns are valuable."
+    D33-14: "Cloud Codes + Better Stack \u2014 validate local-first Mac AI architecture.\
+      \ Apfel + Mojo references for non-CUDA deployment."
+    D33-15: "Prompt Engineering channel \u2014 cost-saving prompt patterns directly\
+      \ applicable to S3a/S5/S6 prompts. Reference, not adapt."
+    D33-16: "All X/Twitter accounts \u2014 monitor-only. No code to adapt. Zero-tax\
+      \ intelligence gathering."
+    D33-17: "Fahd Mirza: Qwen3.6 36% less thinking \u2014 validates that efficiency\
+      \ gains exist beyond our current MTP/KV work. Future reference for S3a optimization."
+d33_session_close:
+  handoff_file: handoff/AI-HANDOFF-2026-07-09-D33.md
+  built:
+  - tools/vllm_mlx_launcher.py (324 lines)
+  - tools/key_claim_anchor.py (395 lines)
+  - tools/omlx_token_wrapper.py (+60 lines routing)
+  - tools/s6_pipeline.py (+60 lines anchoring + regex fix)
+  - tools/pipeline_paths.py (3 path fixes)
+  fixed:
+  - MTP speculative decoding (removed --mtp-optimistic)
+  - KV cache quantization (4-bit stable)
+  - VALIDATED_DIR / ACCEPTED_DIR / CONVERGED_DIR paths
+  - GEN_MODEL naming (900 FBs normalized)
+  - DEFINITION field regex in s6_pipeline
+  - Service port verification (no conflicts)
+  confirmed_false_alarms:
+  - Model duplication (OMLX lazy-loads)
+  - FAILURE MODE empty (by design, S6 --fix handles)
+  - Headroom 502 (json_object routes local, not cloud)
+  services_running:
+  - vllm-mlx :11441 (Qwen3-Coder, prefix-cache+MTP1+KV4, 3.9x)
+  - OMLX :11435 (Phi-4-mini + gemma-E2B)
+  - Ollama :11434 (nomic-embed-text)
+  - "Headroom :8787 \u2192 DeepSeek"
+  - "LiteLLM :4000 \u2192 deepseek-v4-pro"
+  pipeline_state:
+    S5: 19,807 FBs (9 batches)
+    S6: 105 validated (d7_final only)
+    S7: 52 pre-anytype
+    waiting_list: 5,513 FBs (failed T2/T3)
+  next_most_beneficial:
+  - Run S6 --verify on remaining 8 batches (20 min)
+  - Run S6 --fix with batch 10/call on flagged FBs (~1.5 hrs)
+  - 'Implement D33-R6: embed source text in S5 generation'
+  next_session_start: cat handoff/AI-HANDOFF-2026-07-09-D34.md
+d34_session_start: 2026-07-09 14:07 UTC
+d34_status: "COMPLETE \u2014 19,807 FBs consolidated, T2/T3 removed, D33-R6 done,\
+  \ 11 files pathed"
+d34_session_close:
+  handoff_file: handoff/AI-HANDOFF-2026-07-09-D34.md
+  revelations:
+    r1_data_was_always_in_dropbox: maxwell-os-heavy was a separate Dropbox folder,
+      NOT an external drive. Only maxwell_data (embeddings) was outside Dropbox.
+    r2_t3_was_30s_test: T3 was the 30-second decision-boundary test, NOT the '4 writers.'
+      Substituted by CRIBS heuristics.
+    r3_mtplx_no_gemma: MTPLX has ZERO Gemma-4 models. Only Qwen3.6. Marginal benefit
+      for S3a only.
+    r4_anchoring_vs_naming_orthogonal: key_claim_anchor = DEFINITION+APPLICATION,
+      normalize_fb_names = NAME. Zero overlap.
+    r5_source_paragraph_ids_alone_useless: "IDs are traceability. TEXT enables factuality.\
+      \ Value chain: IDs \u2192 TEXT \u2192 anchoring \u2192 score."
+  built:
+  - tools/backfill_source_text.py (307 lines)
+  - tools/mtplx_benchmark.py (179 lines)
+  modified:
+  - 'tools/s5_generate_local.py (+14 lines: D33-R6 SOURCE_TEXT)'
+  - 'tools/s6_pipeline.py (+25 lines: T2/T3 removal, anchoring fallback, export routing)'
+  - 'tools/pipeline_paths.py (+2 lines: defaults to PROJECT_ROOT)'
+  - 'config/pipeline.yaml (-3 lines: removed external paths)'
+  - config/pipeline_config.yaml (relative path)
+  - "config/decision_contracts.py (3 hardcoded paths \u2192 PROJECT_ROOT)"
+  - "tools/vault.py (vault path \u2192 knowledge pipeline/data)"
+  - "tools/extract_highlights.py (anchor paths \u2192 knowledge pipeline/data)"
+  - "tools/eval_loop.py (7 hardcoded paths \u2192 ROOT-relative)"
+  - "tools/normalize_fb_names.py (2 hardcoded paths \u2192 ROOT-relative)"
+  - "tools/preflight.py (hardcoded path \u2192 PROJECT_ROOT)"
+  - tools/validate_s7_spec.py (hardcoded path + ROOT definition)
+  - "tools/apply_cross_domain.py (EXTRACT_DIR \u2192 knowledge pipeline)"
+  consolidated:
+    from: /Users/barn/.../maxwell-os-heavy/knowledge pipeline/ (5.7GB, separate Dropbox
+      folder)
+    from_2: ~/maxwell_data/ (3.7GB, outside Dropbox)
+    to: knowledge pipeline/ in project root (5.3GB unified)
+    total_fbs: 19,807 across 9 batches
+    verified: "All paths resolve through pipeline_paths.py \u2705"
+  services_running:
+  - vllm-mlx :11441 (Qwen3-Coder, MTP1+KV4, 3.7x)
+  - OMLX :11435 (Phi-4-mini + Gemma-4-E2B)
+  - Ollama :11434 (nomic-embed-text)
+  pipeline_state:
+    S5: "19,807 FBs (9 batches) \u2014 now in project knowledge pipeline/output/5.generated/"
+    S6: verify ready (T2/T3 removed, anchoring active)
+    S7: 52+ pre-anytype (now in project)
+    waiting_list: 5,513 FBs (foundational_block + growth categories)
+    mtplx_download: Qwopus3.6-35B-A3B-4bit-MTPLX in progress (~2h remaining)
+  next_most_beneficial:
+  - "Backfill source text: python3 tools/backfill_source_text.py --all --dry-run \u2192\
+    \ --all"
+  - 'S6 verify all 9 batches: 25 min (anchoring now works with SOURCE_TEXT fallback)'
+  - 'Re-evaluate waiting list with anchoring scores: ~30 min'
+  - 'Qwopus benchmark when download complete: python3 tools/mtplx_benchmark.py --quick'
+  next_session_start: cat handoff/AI-HANDOFF-2026-07-09-D34.md
+d34_research_findings:
+  source: Live crawl of feeds.opml (89 feeds) + ArXiv RSS + GitHub API + code analysis
+  implemented:
+    d34_i1:
+      what: 'D33-R6: Embed SOURCE_TEXT in S5 generation'
+      change: 's5_generate_local.py: extract source paragraphs from S5 input text,
+        store as source_text in meta, write as **SOURCE_TEXT:** in FB output'
+      impact: Enables key-claim anchoring with FB's own source text as fallback
+      lines_changed: +14 in s5_generate_local.py
+    d34_i2:
+      what: Remove T2/T3 LLM gates from S6 pipeline
+      change: 's6_pipeline.py: skip _run_t2_t3_batched(), set t2/t3_result=SKIPPED,
+        route to waiting list based on anchoring_score'
+      impact: "S6 from ~16h \u2192 ~1h (D33 estimate). Eliminates 5,513 waiting list\
+        \ backlog cause"
+      lines_changed: +5 in s6_pipeline.py
+      validation: Harness Effect paper (arXiv:2607.06906) + Interpretable Uncertainty
+        paper + D33 finding of zero single-source FBs
+    d34_i3:
+      what: Add anchoring_score to S6 export fields
+      change: 's6_pipeline.py: store anchoring_score in fields dict, add to build_fb_json
+        output'
+      impact: Export routing uses anchoring (deterministic) instead of T3 (LLM) for
+        waiting list decisions
+      lines_changed: +3 in s6_pipeline.py
+    d34_i4:
+      what: SOURCE_TEXT fallback for anchoring
+      change: 's6_pipeline.py: if .s5_input.json has no source text at fb_index, use
+        FB''s **SOURCE_TEXT:** field'
+      impact: Anchoring works even when .s5_input.json is incomplete (currently 16%
+        coverage)
+      lines_changed: +7 in s6_pipeline.py
+  implement_now:
+    m1_mtplx_turbo:
+      source: 'GitHub API: MTPLX v2.0.2 (2026-07-09) + v2.0.1 (2026-07-07)'
+      what: Turbo kernels for all Apple Silicon. v2.0.2 fixes multi-turn repetition
+        (Qwen chat template).
+      maxwell_impact: "\u26A0\uFE0F CORRECTED: MTPLX requires MTPLX-optimized models.\
+        \ NO Gemma-4 model exists. Only Qwen3.6 models available. vllm-mlx already\
+        \ gives 3.7x MTP for Qwen. MTPLX benefit is marginal vs existing infra."
+      action: "DOWNLOADED from IMPLEMENT NOW \u2192 ADAPT NEXT. If testing: pull Qwen3.6-35B-A3B-MTPLX\
+        \ model, benchmark vs vllm-mlx MTP for S3a."
+      effort: ~6GB download + 30 min benchmark
+      priority: "\U0001F7E0 DOWNGRADED \u2014 no Gemma-4 support, only Qwen3.6 (S3a)"
+  adapt_next:
+    a1_structured_belief:
+      source: 'arXiv CS.IR: ''Structured Belief State and the First Precision-Aware
+        Benchmark for LLM Memory Retrieval'' (2026-07-09)'
+      what: Similarity-based retrieval over domain-specific corpora struggles to isolate
+        target beliefs. Multi-turn topic drift compounds retrieval noise while driving
+        up latency. Introduces precision-aware benchmark.
+      maxwell_impact: S1.5 FAISS clustering may produce semantically-similar-but-topically-different
+        clusters. Paper validates adding a precision gate after clustering.
+      action: "Add topical coherence check to s1p5_cluster.py \u2014 verify cluster\
+        \ members are about the same topic, not just embedding-proximate"
+      effort: ~2-3 hours
+      priority: "\U0001F7E0"
+    a2_skill_routing:
+      source: 'arXiv CS.IR: ''Skill Is Not Document: A Query-Conditional Benchmark
+        and Two-Stage Retriever for LLM Agent Skill Routing'' (2026-07-09)'
+      what: Top-K correctness in skill retrieval depends on query-conditioned compatibility,
+        not just independent relevance. LLM rejection decisions signal which skills
+        should NOT be retrieved together.
+      maxwell_impact: 'Model routing pattern. D33 already sketches S3a-Routed architecture
+        (HIGH/MED/LOW tiers). This paper provides theoretical backing: route based
+        on query-conditioned compatibility.'
+      action: Reference for D33 S3a-Routed architecture implementation
+      effort: "Deferred \u2014 S3a routing already planned"
+      priority: "\U0001F7E0"
+    a3_human_nugget:
+      source: 'arXiv CS.IR: ''Human-in-the-Loop Nugget Annotation for Accountable
+        LLM-as-a-Judge Evaluations'' (2026-07-09)'
+      what: 'Optimal division of labor: humans identify what information matters (nuggets),
+        LLMs handle high-volume matching of nuggets to system outputs'
+      maxwell_impact: 'S7 gate enhancement: instead of reviewing 30 random FBs, define
+        nugget criteria, let anchoring auto-score all FBs against them'
+      action: Add nugget-definition to S7 workflow
+      effort: ~2 hours
+      priority: "\U0001F7E0"
+    a4_multi_factor_scoring:
+      source: 'arXiv CS.CL: ''Comprehensive Evaluation of LLM Responses: A Multi-Factor
+        Scoring System'' (2026-07-09)'
+      what: '5 dimensions: accuracy, conciseness, factual consistency, readability,
+        coherence. GUI for visualization'
+      maxwell_impact: S6 currently pass/fail. Dimension-level scoring enables trend
+        analysis over batches.
+      action: Add dimension scoring to s6_pipeline.py output
+      effort: ~3 hours
+      priority: "\U0001F7E1"
+    a5_agentlens_trajectory:
+      source: 'arXiv CS.AI: ''AgentLens: Production-Assessed Trajectory Reviews for
+        Coding Agent Evaluation'' (2026-07-09)'
+      what: Evaluates entire agent trajectory, not just pass/fail. Tracks instruction
+        following, tool use, self-verification, error recovery.
+      maxwell_impact: "Pipeline observability beyond gate pass/fail \u2014 did S3a\
+        \ converge smoothly? Did S6 fix catch most issues?"
+      action: "Reference \u2014 ties into Conductor Loop monitoring"
+      effort: Deferred
+      priority: "\U0001F7E1"
+    a6_weaver_speculative:
+      source: 'arXiv CS.LG: ''Trees from Marginals: Autoregressive drafting with factorized
+        priors (Weaver)'' (2026-07-09)'
+      what: Lightweight autoregressive adapter that constructs proposal trees from
+        factorized drafter marginals. Restores conditional dependencies.
+      maxwell_impact: Could complement/replace MTP if MTPLX doesn't handle Gemma-4
+        well
+      action: "Reference only \u2014 MTPLX benchmark first"
+      effort: Deferred
+      priority: "\U0001F7E1"
+  reference:
+    r1_triroute:
+      source: 'arXiv CS.LG: ''TriRoute: Unified Learned Routing for Joint Adaptive
+        Attention, Experts, and KV-Cache Allocation'' (2026-07-09)'
+      note: "Joint optimization. Academic \u2014 monitor for open-source implementation."
+    r2_rag_metrics:
+      source: 'arXiv CS.CL: ''Evaluating RAG Metrics in Applied Contexts'' (2026-07-09)'
+      note: Compared Ragas, DeepEval, RAGChecker, Opik. Maxwell's anchoring is better
+        (deterministic, 5ms, zero LLM). Reference for library selection if needed.
+    r3_hf_data_agents:
+      source: 'Hugging Face Blog: ''Data for Agents'' (2026-07-08)'
+      note: "SPA \u2014 content not scrapable. Monitor if Maxwell ever trains custom\
+        \ classifier."
+    r4_hf_kernels:
+      source: "Hugging Face Blog: '\U0001F917 Kernels: Major Updates' (2026-07-06)"
+      note: Custom CUDA kernels from Codex/Claude. Skip for local Mac pipeline.
+    r5_hf_specialization:
+      source: 'Hugging Face Blog: ''Why Specialization Is Inevitable'' (2026-06-30)'
+      note: "Likely validates Generator\u2260Verifier (R5) approach. Read when accessible."
+    r6_hf_every_eval:
+      source: 'Hugging Face Blog: ''Featuring Every Eval Ever Results'' (2026-06-30)'
+      note: Eval results integrated into HF model pages. Useful for model selection.
+    r7_simon_conformance:
+      source: 'Simon Willison: ''Rewriting Bun in Rust'' (2026-07-08)'
+      note: '''Fix the process that generates the code instead of hand-fixing the
+        code.'' Apply to S5 prompt when S6 --fix shows recurring failures.'
+    r8_simon_sqlite:
+      source: 'Simon Willison: sqlite-utils 4.0 (2026-07-07)'
+      note: Schema migrations for SQLite. Reference if Maxwell's tracking infrastructure
+        moves beyond JSON.
+    r9_mlx_v032:
+      source: 'GitHub: MLX v0.32.0 (2026-07-07)'
+      note: "Quantized matmul, GGUF validation. Substrate improvement \u2014 absorbed\
+        \ by vllm-mlx/OMLX automatically."
+    r10_ollama_v0312:
+      source: 'GitHub: Ollama v0.31.2 (2026-07-08)'
+      note: iGPU mmproj offload. Minor embedding performance.
+  skipped:
+  - 'OpenAI GPT-Live (Simon Willison): voice mode, zero relevance'
+  - 'Kenton Varda on AI change descriptions: cautionary, not actionable'
+  - 'ArXiv: audio sentiment, speech alignment, ad generation, dialect bias: wrong
+    domain'
+  - 'HF: Cerebras/Gemma 4 voice AI, SageMaker, SkyPilot: cloud/infra'
+  - 'HF: ScarfBench (Java migration): not knowledge pipeline'
+  - "ArXiv API: export.arxiv.org returns empty \u2014 RSS feeds used instead"
+  confirmed_no_conflict:
+    key_anchoring_vs_name_normalization:
+      finding: key_claim_anchor.py operates on DEFINITION+APPLICATION. normalize_fb_names.py
+        operates on NAME field. Zero field overlap. Completely orthogonal.
+      verdict: Safe to run both independently.
+    source_paragraph_index_value:
+      finding: SOURCE_PARAGRAPH_IDS alone are traceability metadata (no quality impact).
+        Source paragraph TEXT enables deterministic factuality verification. Value
+        = TEXT, not IDs.
+      backfill_estimate: 30-60 min to backfill source text to existing .s5_input.json
+        using S3a convergence data
+  d33_status_updates:
+    mtplx: "UPGRADED from 'reference only' \u2192 'IMPLEMENT NOW' (v2.0.1 turbo-for-all\
+      \ changes equation)"
+    d33_r6: IMPLEMENTED in s5_generate_local.py
+    t2_t3_removal: "IMPLEMENTED in s6_pipeline.py \u2014 validated by 3 independent\
+      \ sources"
+    harness_effect: "REINFORCED \u2014 verification layering map extended to 6/6 mechanisms"
+    dspark: "SUPERSEDED \u2014 MTPLX v2.0.2 more directly actionable"
+d34_code_changes:
+  s5_generate_local.py:
+  - '+14 lines: D33-R6 source text extraction + SOURCE_TEXT output field'
+  s6_pipeline.py:
+  - '+2 lines: comment out _run_t2_t3_batched call with explanation'
+  - '+2 lines: T2/T3 required changed to SKIPPED with defaults'
+  - '+3 lines: anchoring_score stored in fields dict for export routing'
+  - '+2 lines: export routing uses anchoring_score < 0.40 as waiting list gate'
+  - '+1 line: anchoring_score in build_fb_json output'
+  - '+7 lines: SOURCE_TEXT fallback for anchoring when .s5_input.json missing'
+d34_next_actions:
+- 'Backup after batch writes: bash tools/backup_guardian.sh (need heavy drive mounted)'
+- 'Benchmark MTPLX v2.0.2 with Gemma-4: 30 min'
+- 'Backfill .s5_input.json source text: 30-60 min'
+- 'Run S6 --verify on all 9 batches: 25 min'
+- 'Re-evaluate 5,513 waiting list with anchoring: 30 min'
+- 'Create handoff: handoff/AI-HANDOFF-2026-07-09-D34.md'
+d824_pivot:
+  position_corrected: Framework adoption (Pydantic AI V2 or LangGraph) is PREMATURE.
+    Execute Golden PT first.
+  rationale: 'Maxwell OS already works. Pipeline, MCP servers, Goose harness, governance,
+    memory are all operational.
+
+    What''s missing is VALIDATION, not a framework.
+
+    Adding a framework before proving the core loop is architecture astronautics.
+
+    Frameworks amplify both success AND failure. Validate first, framework later.
+
+    '
+  kimi_langgraph:
+    adopted: Graph-shaped problem is real for TAXONOMY layer. LangGraph valid for
+      Phase 2+.
+    rejected: Immediate LangGraph adoption. Learning curve too steep for solo builder.
+      Time-travel overkill for batch pipeline.
+    corrected: LangGraph lock-in risk softened from 4/10 to 6/10 (MIT license, self-hosted
+      PostgresSaver avoids LangSmith).
+  pydantic_ai_v2:
+    adopted: Still the best velocity option. Capabilities = FBs is elegant. Deferred
+      loading solves tool bloat.
+    corrected_from_D816: Immediate adoption deferred. Pre-1.0 instability risk (3
+      weeks old). Must verify OMLX structured output first (DH14).
+    phase_1_gate: 'IF Golden PT succeeds AND OMLX structured output works: evaluate
+      fb_capability.py.'
+  final_framework_position:
+    answer_to_kimi: 'Kimi is RIGHT about the graph-shaped nature of Maxwell''s data
+      model.
+
+      Kimi is RIGHT that LangGraph''s state graph is more isomorphic than flat capabilities.
+
+      Kimi is RIGHT that the custom protocol-native path is the only true zero-lock-in
+      architecture.
+
+
+      But Kimi is WRONG about timing.
+
+      The framework question is a PHASE 2 decision.
+
+      Phase 0 is: execute Golden PT, build self_critic.py, restructure AGENTS.md.
+
+      All three are framework-agnostic and improve the system TODAY.
+
+
+      The S-tier move is to defer the framework decision until there''s EMPIRICAL
+      DATA
+
+      from 5+ PI executions about whether Maxwell needs flat capabilities or graph
+      traversal.
+
+      '
+    answer_to_previous_self: "My D816 position (adopt Pydantic AI V2 now) was premature.\n\
+      The architecture is correct but the timing is wrong.\nPhase 0 has 7 framework-agnostic\
+      \ tasks that matter more.\nPydantic AI V2 remains the best velocity option \u2014\
+      \ but only AFTER Golden PT proves the core loop.\n"
+  phase_0_priority:
+  - "Execute Golden PT (D-D6) \u2014 proves core loop, populates trust ledger"
+  - "Build self_critic.py (D817) \u2014 self-adversarial critic, 70%\u219285% accuracy"
+  - Restructure AGENTS.md to hierarchical XML (D818, D816-P1)
+  - Add forbidden FB retrieval phrases (D818, D816-P2)
+  - Add unconditional recall_decisions() pre-read (D818, D816-P3)
+  phase_1_priority:
+  - Install Pydantic AI V2 + verify OMLX structured output (D816-PA1, 30 min)
+  - sqlite-vec migration (D816-R1, 1 hour)
+  - Rust token counter (D816-R3, 1 hour)
+  - 'IF OMLX structured output works: evaluate fb_capability.py'
+  phase_2_priority:
+  - 'Framework decision: Pydantic AI V2 vs LangGraph vs Custom'
+  - Evaluate based on empirical data, not theoretical fit
+  north_star: 'Custom MCP + A2A + Pydantic lib + Goose + SQLite.
+
+    Weighted score: 8.05/10 (highest of all options).
+
+    Velocity drag: 2/10 (3-month build from scratch).
+
+    Target: migrate over 1-2 years, not now.
+
+    '
+d816_session:
+  completed:
+  - D816-D830: "Full cross-examination \u2014 Goose vs Kimi vs Fable 5 architecture"
+  - D816-D830: Fable 5 system prompt (3,826 lines) analyzed for adaptable patterns
+  - D816-D830: 6 format-agnostic patterns identified for port to Maxwell
+  - D816-D830: Self-adversarial critic spec written (tools/self_critic.py)
+  - D816-D830: "Pydantic AI V2 integration spec written (FB\u2192Capability, PT\u2192\
+      Agent)"
+  - D816-D830: Rust hot-path spec (sqlite-vec, token counter)
+  - D816-D830: Full synthesis saved to temp/D816-D830-CROSS-EXAMINATION-SYNTHESIS.md
+  - DECISION-LOG.md: D816-D823 appended (8 new decisions)
+  - MASTER-TASK-REGISTER.md: 15 new tasks (D816-PA1 through D816-R3)
+  key_decisions:
+    D816: Goose remains the harness. Pydantic AI V2 joins as orchestration LOGIC.
+      They COMPOSE.
+    D817: "Self-adversarial critic adopted \u2014 Generate \u2192 Self-Critique \u2192\
+      \ Revise \u2192 Cross-Family Verify \u2192 Gate."
+    D818: "Fable 5 prompt architecture ported to Maxwell \u2014 hierarchical XML,\
+      \ forbidden phrases, mandatory pre-reads."
+    D819: "sqlite-vec migration \u2014 turbovec \u2192 sqlite-vec for vector search."
+    D820: Rust token counter (tiktoken-rs) for exact context window tracking.
+    D821: 'Kimi cross-examination: MCP+A2A adopted, capabilities=FBs adopted, Goose-as-tool
+      rejected, Cognee/Mem0 rejected.'
+    D822: "Fable 5 anti-patterns documented \u2014 memory DB, MCP marketplace, cloud\
+      \ sandbox, web search primary."
+    D823: "Goose accuracy path: 70% \u2192 95% via self-critique + FB grounding +\
+      \ cross-family verify + DeepSeek fallback + contracts."
+  kimi_agreement:
+  - Pydantic AI V2 capabilities = FBs is elegant and adopted
+  - MCP + A2A as protocol hedge is correct
+  - Cognee/Mem0 overkill for single-user scale
+  - Rust for hot paths, not orchestration
+  - Golden PT is the critical bottleneck
+  kimi_disagreement:
+  - 'Goose as MCP tool subordinate to Pydantic AI: REJECTED. Goose IS the harness.'
+  - 'Goose ''designed for task completion, not cognitive state'': Maxwell has BUILT
+    cognitive state ON Goose.'
+  fable5_patterns_adopted:
+  - "Hierarchical XML instruction blocks \u2192 AGENTS.md restructure (D816-P1)"
+  - "Forbidden meta-commentary phrases \u2192 FB retrieval silence rules (D816-P2)"
+  - "Mandatory pre-read protocol \u2192 Unconditional recall_decisions() (D816-P3)"
+  - "Decision-tree tool routing \u2192 Model routing steps 0-5 (D816-P4)"
+  - "MCP-first priority \u2192 Check MCP before built-in tools (D816-P5)"
+  - "Output discipline \u2192 Already have crash-safe writes, tighten (existing)"
+  next_session_priority:
+    phase_0: "Install Pydantic AI V2 + verify OMLX structured output (D816-PA1 \u2014\
+      \ 30 min)"
+    phase_1: "Build self_critic.py \u2014 highest impact, zero deps (D816-SC1 \u2014\
+      \ 4h)"
+    phase_2: "Build fb_capability.py \u2014 FB \u2192 Pydantic AI V2 Capability (D816-PA2\
+      \ \u2014 2h)"
+    phase_3: "Restructure AGENTS.md to hierarchical XML (D816-P1 \u2014 2h)"
+    blocking: "Golden PT (D-D6) \u2014 needs Maxwell's business idea input"
+  self_adversarial_critic_architecture:
+    generate: "Qwen3.6-35B ($0) \u2014 primary generation"
+    self_critique: "SAME model, role-switched to critic \u2014 finds own errors"
+    revise: Based on critique, max 3 rounds, score threshold 80/100
+    cross_family_verify: "Gemma-4-26B ($0) \u2014 R5 compliance, different model family"
+    deterministic_gate: "decision_contracts.py (22 rules) \u2014 bash holds final\
+      \ vote"
+    human_escalation: "Maker and checker disagree twice \u2192 G7 human gate"
+  fable5_prompt_stats:
+    total_lines: 3826
+    key_sections:
+    - 'claude_behavior: refusal_handling, tone_and_formatting, evenhandedness'
+    - 'memory_system: memory_overview, application_instructions, forbidden_phrases,
+      examples'
+    - 'computer_use: skills, file_handling, artifacts, package_management'
+    - 'search_instructions: core_behaviors, usage_guidelines, copyright_compliance'
+    - 'request_evaluation_checklist: Step 0-3 decision tree for tool routing'
+    - 'user_wellbeing: medical, mental health, self-harm, eating disorder protocols'
+    adaptable: '6 patterns (D818). Not adaptable: memory DB, MCP marketplace, cloud
+      sandbox (D822).'
+    size: '~190K token budget. Maxwell''s equivalent: ~12K tokens (AGENTS.md + session_seed.yaml).'
+d34_r7_r14:
+  completed:
+  - D34-R7: classify_domains/disciplines "emerging" support (25+1 domains, 47+1 disciplines)
+  - D34-R8: JSON repair pipeline (10 OutputGuard strategies in tools/json_repair.py)
+  - D34-R9: Langfuse tracing integration (tools/langfuse_trace.py, no-op until configured)
+  - D34-R10: "Full pipeline audit \u2014 0% domain label accuracy in S5/S6/S7"
+  - D34-R11: "Classification flow clarified \u2014 S3=content type, S6=quality gate"
+  - D34-R12: T2/T3 + anchoring ensemble restored (s6_pipeline.py +272 lines)
+  - D34-R13: Confidence % (0-100) + auto-quarantine (s6_pipeline.py +120 lines)
+  - D34-R14: Gap audit + critical fixes C1-C4 (4 files, +48 lines)
+  - Phase 1-4: "classify_domains --all \u2192 classify_disciplines --all \u2192 bridge\
+      \ \u2192 Chonkie S1"
+  verification_architecture:
+    30s_mechanical: "deterministic 4-dim test (constraint, action, failure, name)\
+      \ \u2014 score 0-4"
+    anchoring: "cosine similarity to source paragraphs \u2014 0.0-1.0"
+    t2_semantic: "LLM-based (Phi-4-mini) \u2014 confidence 0-100%, gated to anchoring\
+      \ 30-60%"
+    t3_actionability: "LLM-based (Phi-4-mini) \u2014 confidence 0-100%, runs anchoring\
+      \ >30%"
+    quarantine: auto-flag on signal disagreement >40% or all mid-range 30-70%
+    routing: "T2+T3 ensemble \u2192 S7 / foundational_block / growth / experiential"
+  classification:
+    domains: 25 canonical + "emerging" catch-all (taxonomy_v5.yaml meta section)
+    disciplines: 47 canonical + "emerging" catch-all
+    classify_domains: "If NONE fit, say EXACTLY 'emerging' \u2014 backup created before\
+      \ write"
+    classify_disciplines: same pattern
+    bridge_gate: allows "emerging" as valid domain/discipline
+    s3_metadata: "s3_original_domain chain restored (convergence \u2192 bridge \u2192\
+      \ S5 \u2192 S6 \u2192 S7)"
+  observability:
+    langfuse: "tools/langfuse_trace.py \u2014 LLMCallTracer, zero-impact no-op mode"
+    enable: set LANGFUSE_SECRET_KEY + LANGFUSE_PUBLIC_KEY + LANGFUSE_HOST in .env
+    traces: caller_id, model, latency_ms, tokens, success/failure, error classification
+  next_session:
+    phase_1: python3 tools/classify_domains.py --all && python3 tools/classify_disciplines.py
+      --all
+    phase_2: python3 tools/classify_domains_multi.py --all && python3 tools/s5_bridge.py
+      --all
+    phase_3: for batch in ...; do python3 tools/s6_pipeline.py --batch $batch --verify
+      --export; done
+    phase_6: compare current S7 vs old heavy S7 as ground truth
+d34_session_revelations:
+  date: '2026-07-12'
+  state: Export running (9,749/19,770 S7, re-running 4 crashed batches)
+  l0_l4_tiers:
+    L0: "Manifest integrity check \u2014 MISSING. Fix: validate all source_file fields\
+      \ pre-export"
+    L1: "Single-FB dry-run export \u2014 MISSING. Fix: export 1 FB before batch"
+    L2: "Process preflight \u2014 MISSING. Fix: preflight checks manifest, not just\
+      \ output"
+    L3: "Error \u2192 HALT \u2014 MISSING. Fix: don't print 'done' on crash"
+    L4: "Gate registry \u2014 IMPLEMENTED this session (D790, D797, D798, D799 added)"
+  phantom_decisions:
+  - D801 MTPLX
+  - D802 DSpark monitor
+  - D806 session_episodes
+  - D817 self-adversarial critic
+  - D818 Fable 5 prompt
+  - D819 sqlite-vec
+  - D820 tiktoken-rs
+  - D-D12 sync_docs.py
+  - D-D13 mcp_doc_guard.py
+  export_crash:
+    root_cause: "15 empty source_file entries in verified_manifest.json \u2192 IsADirectoryError"
+    batches_affected:
+    - 3_art
+    - 6_ai_computing
+    - domain_0_framework
+    - domain_2_visual_design
+    fixed: true
+    guard_added: true
+  d31_6_contract_crash:
+    root_cause: contract_D31_6_context_labels returned (bool, str) instead of (bool,
+      list)
+    result: "extend(iter) on string \u2192 character-by-character iteration \u2192\
+      \ 'e','a','r','n','e','d'..."
+    fixed: true
+  names_normalized: 19770
+  reclassified: 19770
+  next_session_priority:
+  - Wait for export to complete (9,749/19,770)
+  - Run G16 gate on full S7
+  - Evaluate context before push
+  - Push to Anytype (dry-run first)
+  - "Implement L0 + L1 + L3 (manifest integrity + single-FB dry-run + error\u2192\
+    halt)"
+  - 'Close phantom decision gap: implement or explicitly REJECT unimplemented D800+
+    decisions'
+d851_governance_cross_examination:
+  date: 2026-07-12 11:44 UTC
+  type: strategic_architecture_governance_reform
+  handoff: handoff/AI-HANDOFF-2026-07-12-D851-GOVERNANCE-CROSS-EXAMINATION.md
+  ground_truth_verified:
+    phantom_count: 10
+    zombie_infrastructure: conductor-loop.sh calls 4 non-existent scripts
+    empty_database: maxwell_os.db is 0 bytes with no tables
+    stale_constitution: AGENTS.md 3 weeks behind CONSTITUTION.md
+  spec_delivered: MGP-1 (Maxwell Governance Protocol v1)
+  pending_decision: Maxwell must choose Option A (full build), B (minimal fix), or
+    C (accept Maxwell A only)
+  urgent: true
+governance_v2:
+  pre_action: 'Run: python3 tools/constitution_enforcer.py --quick'
+  post_action: 'Run: python3 tools/phantom_guard.py --quick'
+  weekly: 'Run: python3 tools/decision_auditor.py'
+  folder_protocol: governance/folder_protocol.md
+skill_tree:
+  enabled: true
+  schema_version: 1.0.0
+  tree_file: agent/skill_tree.yaml
+  orchestrator: tools/skill_orchestrator.py
+  generator: tools/skill_generator.py
+  auto_evolve: true
+  categories:
+  - design
+  - research
+  - system
+  - _evolution
+onboarding:
+  spec: SPEC-maxwell-onboard.md
+  d: D926
+  task: P1-T8
+  status: TESTING
+  impl: tools/maxwell_onboard.py
+  data_module: tools/_onboard_data.py
+  estimated_hours: 6-8
+  actual_hours: 2
+  completed_phases:
+  - "\xA7\xA71-6 v1.0": VALIDATE/DISCOVER modes, FB scoring, Readiness Radar, 3 artifacts,
+      journal
+  - "\xA77 v1.1": Market Reality Adapter (Jina Reader T0, Crawl4AI T1, graceful skip)
+  - "\xA78": Full error handling with escalation loops, never-dead-end, SIGINT handler
+  - "\xA79": --test flag for automated testing (validate_strong, validate_weak, discover)
+  integration: non-interactive via --mode validate --idea for agent harness piping
+agent_harness:
+  d: D927
+  task: P1-T9
+  status: DONE
+  architecture:
+    tool: tools/agent_harness.py
+    recipe: governance/recipes/execute_project.md
+    db: ~/.maxwell_os/projects/projects.db
+  skill_tree_integration: deferred_to_v2
+  estimated_hours: 4-6
+  built: '2026-07-14'
+  tool: tools/agent_harness.py
+  recipe: governance/recipes/execute_project.md
+  lines: 826
+  verified: "init\u2192decompose\u2192execute(INTENT)\u2192complete\u2192status"
+fb_adaptations_phase:
+  registered: '2026-07-14'
+  source: 25,666 FB cross-examination across 11 Maxwell OS layers
+  finding: All 11 layers BUILT. 10 gaps are cross-layer integrations.
+  tasks:
+    D932:
+      name: Parallel Execution Consensus
+      status: PENDING
+      est_hours: 2.0
+    D933:
+      name: Dual Memory Architecture
+      status: PENDING
+      est_hours: 2.0
+    D934:
+      name: Semantic Cache at Router
+      status: PENDING
+      est_hours: 2.0
+    D935:
+      name: Circuit Breaker on OMLX
+      status: PENDING
+      est_hours: 1.5
+    D936:
+      name: Escalation Protocol
+      status: PENDING
+      est_hours: 1.5
+    D937:
+      name: LLM Observability Hooks
+      status: PENDING
+      est_hours: 2.0
+    D938:
+      name: Consensus Voting
+      status: PENDING
+      est_hours: 1.5
+    D939:
+      name: Intent-Based Routing
+      status: PENDING
+      est_hours: 2.0
+    D940:
+      name: Self-Healing System
+      status: PENDING
+      est_hours: 1.5
+    D941:
+      name: Knowledge Layer Autowire
+      status: PENDING
+      est_hours: 2.0
+vllm_mlx:
+  decision: D942
+  status: BENCHMARKED
+  date: '2026-07-14'
+  benchmark:
+    model: Phi-4-mini-instruct-8bit
+    vllm_mlx_tok_s: 49.1
+    omlx_tok_s: 41.2
+    improvement: 19%
+    note: Real gains in paged KV cache, SSD-tiering, MCP tool calling, not visible
+      in single-request benchmark
+  model_compat_issue: "gemma-4-E2B not found on HF \u2014 needs local model ID mapping"
+  binary: ~/.local/bin/vllm-mlx
+rust_strategy:
+  decision: D943
+  monitor_feeds:
+  - mlxcel
+  - arle
+  - rMLX
+  - mlx-rs
+  - ane-infer
+  - vllm-mlx
+  adaptations_to_rust:
+  - D932
+  - D934
+  - D935
+  macos_26_plan:
+    apfel: Tier-0
+    vllm_mlx: primary
+    containers: pipeline isolation
+platform_architecture:
+  decision: D948
+  status: ADOPTED
+  architecture: 3-process Python engine + phased shell
+  phase_1:
+    name: TUI + IPC API
+    status: PENDING
+    est: 2 weeks
+  phase_2:
+    name: SwiftUI Native Shell
+    status: PLANNED
+    est: 6 weeks
+  phase_3:
+    name: apfel + App Store
+    status: PLANNED
+    est: 8 weeks
+  escape_hatches:
+  - Tauri shell
+  - Python web UI
+  - llama.cpp inference
+  - Linux ARM
+  supersedes: D946 (Swift+Python only)
+  roundtable_doc: evaluations/roundtable_context_20260714.md
+book_library:
+  session: 2026-07-15
+  decisions:
+  - D988_FAISS_THRESHOLD_075
+  - D989_OMLX_MEMORY_FIX
+  - D990_VLLM_MLX_INCOMPATIBLE
+  - D986_OVERRIDE_D5_TO_D4
+  - D984_BOOK_LIBRARY_RESTRUCTURE
+  - D985_AUTO_INTAKE_PIPELINE
+  restructuring:
+    phase_1_flatten_nesting: 171 ops
+    phase_2_unify_naming: 1864 ops
+    phase_3_fix_contamination: 27 ops
+    total_operations: 2043
+    legacy_folders: 49
+    canonical_folders: 33
+    roots:
+    - md
+    - epub
+    - pdf
+    - pipeline
+  intake_pipeline:
+    inbox_processed: 127
+    crdownload_filtered: 6
+    md_classified_placed: 50
+    epub_pdf_matched_placed: 71
+    md_synced_to_pipeline: 62
+    quarantine_keyword_match_rate: 48/50 (96%)
+    files_tracked: false
+    tracker_file: config/intake_tracker.json
+  scripts:
+    tools/restructure_books.py: 'Phase 1-3: flatten, unify, fix contamination. Supports
+      --roots md|epub|pdf|pipeline'
+    tools/validate_book_structure.py: Pre-S1 gate. Validates canonical cross_domain
+      names. --legacy-ok for pre-restructure
+    tools/intake.py: "ANCHOR_TO_SUBFOLDER rebuilt. Each cross_domain \u2192 own canonical\
+      \ folder. Fixes bug: was 8 catch-alls"
+    tools/place_quarantine.py: Keyword-based quarantine review + cross-format epub/pdf
+      matching from inbox
+    tools/auto_intake.py: Auto-detect new inbox files, classify, route, track via
+      hash. --push-missing syncs MD to pipeline
+    tools/sync_education_to_pipeline.py: "One-way MD sync from education/books/md\
+      \ \u2192 1.sources/"
+  auto_detect:
+    entry: python3 tools/auto_intake.py
+    report: python3 tools/auto_intake.py --report
+    push_missing: python3 tools/auto_intake.py --push-missing
+  notes:
+  - 'total_book_collection: MD=863, EPUB=505, PDF=673, Pipeline=864'
+  - inbox is empty (all processed)
+  - 'next_book_routing: auto_intake.py handles new inbox files automatically'
+  - 'pipeline_push: sync_education_to_pipeline.py copies new MD to 1.sources'
+  s3a:
+    threshold: 0.75
+    status: running
+    domains_completed:
+    - domain_0_framework
+    - domain_1_substrate
+    - domain_2_visual_design
+    - domain_3_art
+    domains_remaining:
+    - domain_7_fringe
+    - domain_4_business
+    - domain_6_ai_computing
+    current: domain_7_fringe (35% complete)

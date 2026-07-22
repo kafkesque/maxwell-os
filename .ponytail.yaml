@@ -1,0 +1,68 @@
+# Maxwell OS — Ponytail-Lite Ruleset
+# Enforced: 2026-07-21 | Source: github.com/ilindaniel/ponytail-lite
+# These rules apply to ALL code in this repository.
+
+rules:
+  no_silent_errors:
+    description: "All except clauses must log the error and re-raise or handle explicitly"
+    severity: CRITICAL
+    check: "grep -rn 'except.*:' pipeline/*.py | grep -v 'raise\|log\|logging'"
+    
+  type_hints:
+    description: "All function signatures must have type annotations"
+    severity: HIGH
+    check: "grep -rn 'def [a-z_]*(' pipeline/*.py | grep -v '->'"
+    
+  docstrings:
+    description: "All functions over 5 lines must have docstrings"
+    severity: HIGH
+    
+  no_dead_code:
+    description: "No _OLD files, __pycache__ in working tree, no commented-out code blocks"
+    severity: MEDIUM
+    check: "find . -name '*_OLD*' -o -name '__pycache__' | head"
+    
+  no_magic_numbers:
+    description: "Numbers in code must be named constants or from YAML config"
+    severity: MEDIUM
+    exceptions:
+      - "0, 1, -1 (sentinel values)"
+      - "random_state=42 (standard seed)"
+      - "temp=0.0 (constitutional)"
+      
+  dry:
+    description: "No code duplication across pipeline stages"
+    severity: HIGH
+    check: "grep -rn 'def ' pipeline/*.py | sort | uniq -d"
+    
+  small_functions:
+    description: "Functions should be under 50 lines where possible"
+    severity: LOW
+    
+  explicit_errors:
+    description: "Error messages must describe what failed and why"
+    severity: HIGH
+    bad_example: "raise ValueError('invalid')"
+    good_example: "raise ValueError(f'Expected {expected}, got {actual}')"
+
+# ── Cursor/Goose Rules ──
+goose_rules:
+  no_hardcoded_paths:
+    description: "All paths from pipeline_config.yaml, never inline strings"
+    enforced_by: CONSTITUTION.md C12
+    
+  absolute_paths:
+    description: "Always use absolute paths resolved from PROJECT_ROOT"
+    enforced_by: pipeline_paths.py
+    
+  deterministic:
+    description: "temp=0.0, random_state=42, sorted() before iteration"
+    enforced_by: CONSTITUTION.md C9
+    
+  stamp_everything:
+    description: "Every persistent object has schema_version, gen_model, pipeline_commit"
+    enforced_by: CONSTITUTION.md C10, pipeline/stamp.py
+    
+  config_over_code:
+    description: "Settings in YAML, not in source files"
+    enforced_by: pipeline_config.yaml, pipeline_paths.py

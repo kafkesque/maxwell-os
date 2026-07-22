@@ -8,14 +8,14 @@ Input:  Principles from Stage 2 checkpoint
 Output: Clusters with cohesion metrics, checkpoint at stage3_cluster.jsonl
 
 Process:
-  1. Embed all principles via Ollama nomic-embed-text
-  2. Dimensionality reduction via PCA (50 dims)
+  1. Embed all principles via Ollama bge-m3 (1024-dim)
+  2. Dimensionality reduction via UMAP (50 dims, cosine metric)
   3. HDBSCAN density-based clustering
   4. Compute cohesion = mean pairwise cosine similarity per cluster
   5. Noise points (cluster=-1) are discarded
   6. Write checkpoint
 
-Embedding model: nomic-embed-text (Ollama)
+Embedding model: bge-m3 (Ollama, 1024-dim)
 Min cluster size: 3 (from pipeline_paths)
 
 Usage:
@@ -87,16 +87,22 @@ def compute_embeddings(principles: list[dict]) -> np.ndarray:
     return np.array(all_embeddings, dtype=np.float32)
 
 
-def reduce_dimensions(embeddings: np.ndarray, n_dims: int = PCA_DIMS) -> np.ndarray:
-    """Reduce embedding dimensions via PCA."""
-    from sklearn.decomposition import PCA
+def reduce_dimensions(embeddings: np.ndarray, n_dims: int = 50) -> np.ndarray:
+    """Reduce dimensions via UMAP. Preserves non-linear structure.
+    Deterministic with random_state=42. P0.5 FIX: was PCA (linear, caused collapse).
+    """
+    import umap
 
-    n_dims = min(n_dims, embeddings.shape[0], embeddings.shape[1])
-    pca = PCA(n_components=n_dims, random_state=42)
-    reduced = pca.fit_transform(embeddings)
-    explained = pca.explained_variance_ratio_.sum()
-    print(f"   PCA: {embeddings.shape[1]} → {n_dims} dims "
-          f"({explained:.1%} variance retained)")
+    n_dims = min(n_dims, embeddings.shape[0] - 2, embeddings.shape[1])
+    reducer = umap.UMAP(
+        n_neighbors=15,
+        n_components=n_dims,
+        metric="cosine",
+        min_dist=0.0,
+        random_state=42,       # Deterministic. Reproducible.
+    )
+    reduced = reducer.fit_transform(embeddings)
+    print(f"   UMAP: {embeddings.shape[1]} → {n_dims} dims (cosine, neighbors=15)")
     return reduced
 
 

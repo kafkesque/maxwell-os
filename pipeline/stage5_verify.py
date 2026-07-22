@@ -36,6 +36,7 @@ from pipeline.pipeline_paths import (
     STAGE5_CHECKPOINT,
     CHECKPOINT_DIR,
     VERIFY_MODEL,
+    EMBED_MODEL,
     BORP_MIN_SOURCES,
 )
 from pipeline.stamp import stamp_record, get_pipeline_commit
@@ -53,6 +54,24 @@ Check:
 
 Return ONLY a JSON object:
 {"consistent": true/false, "score": 0.0-1.0, "issues": ["issue1", "issue2"] or []}"""
+
+
+def _load_cluster_map() -> dict[str, list[str]]:
+    """P0.8 FIX: Load cluster_id → principle_ids mapping from Stage 3 checkpoint."""
+    from pipeline.pipeline_paths import STAGE3_CHECKPOINT
+    cluster_map: dict[str, list[str]] = {}
+    if not STAGE3_CHECKPOINT.exists():
+        return cluster_map
+    with open(STAGE3_CHECKPOINT) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                c = json.loads(line)
+                cid = str(c.get("cluster_id", ""))
+                pids = c.get("principle_ids", [])
+                if cid and pids:
+                    cluster_map[cid] = pids
+    return cluster_map
 
 
 def build_factual_prompt(fb: dict, source_principles: list[dict]) -> str:
@@ -150,18 +169,41 @@ def check_factual(fb: dict, principles_idx: dict, skip_factual: bool = False
     if skip_factual:
         return True, 1.0, "Skipped (no source principles available)"
 
-    # Find source principles for this FB's clusters
-    source_clusters = fb.get("source_clusters", [])
-    source_principles = []
-    for pid, p in principles_idx.items():
-        for cid in source_clusters:
-            # Principles from stage 2 don't have cluster IDs directly,
-            # so we approximate by checking if the principle was used
-            # (we match by looking at all principles and using those
-            #  whose texts appear as sources)
-            pass
-    # Fallback: use all available principles
-    source_principles = list(principles_idx.values())[:20]
+    # P0.8 FIX: Load cluster checkpoint to map cluster_id → principle_ids.
+    # Was: empty pass loop that fell back to arbitrary first 20 principles.
+    cluster_map = _load_cluster_map()
+    source_principle_ids = set()
+    source_clusters = fb.get("source_clusters", [])  # QWEN-FIX: was undefined, causing NameError
+    for cid in source_clusters:
+        pids = cluster_map.get(str(cid), [])
+        source_principle_ids.update(pids)
+
+    # Filter principles to only those from source clusters
+    source_principles = [
+        principles_idx[pid] for pid in source_principle_ids
+        if pid in principles_idx
+    ]
+
+    # Fallback: cosine top-10 by definition similarity if <5 sources
+    if len(source_principles) < 5:
+        import numpy as np
+        from pipeline.ollama_embed import batch_embed
+        fb_text = fb.get("definition", "")
+        all_texts = [p["principle_text"][:400] for p in principles_idx.values()]
+        all_ids = list(principles_idx.keys())
+        if all_texts and fb_text:
+            try:
+                fb_emb = np.array(batch_embed([fb_text], model=EMBED_MODEL)[0], dtype=np.float32)
+                all_embs = np.array(batch_embed(all_texts, model=EMBED_MODEL), dtype=np.float32)
+                sims = np.dot(all_embs, fb_emb) / (
+                    np.linalg.norm(all_embs, axis=1) * np.linalg.norm(fb_emb) + 1e-8
+                )
+                top_10 = np.argsort(sims)[-10:][::-1]
+                source_principles = [principles_idx[all_ids[i]] for i in top_10]
+            except Exception:
+                source_principles = list(principles_idx.values())[:20]
+        else:
+            source_principles = list(principles_idx.values())[:20]
 
     if not source_principles:
         return True, 0.5, "No source principles found for verification"

@@ -1,109 +1,69 @@
-# Maxwell OS v2.0 — CONSTITUTION.md
-> **Ratified:** 2026-07-18 | **Supersedes:** v1.2.1
+# Maxwell OS v2.1 — CONSTITUTION.md
+> **Ratified:** 2026-07-18 | **Last Amended:** 2026-07-21 (M1 re-sync)
 > **Authority:** Single source of truth for ALL system rules.
-> **Amendment:** Requires G7 human gate + decision log entry.
-
----
 
 ## §0 — HARD CONSTRAINTS
 
-| # | Rule | Check |
-|----|------|-------|
-| **C1** | $0 marginal cost — all generation runs on local hardware | OMLX + Ollama only |
-| **C2** | No vendor lock-in — every component has open-source replacement path | SQLite + Parquet over proprietary DBs |
-| **C3** | Sovereign — all data and compute remain local | No cloud APIs for core pipeline |
-| **C4** | Future-proof — no single-provider dependency | Open formats, multiple model families |
-| **C5** | Zero bloat — no dependency added without proven need | Test suite gate |
-| **C6** | Crash-safe writes: tempfile → fsync → os.replace | `pipeline/io_guard.py` |
-| **C7** | Checkpoint every stage — resumeable | `data/checkpoints/` per stage |
-| **C8** | Generator ≠ Verifier — different model family for each (R5) | Qwen3.6 generates, Phi-4-mini verifies |
-| **C9** | temp=0.0 on all generation scripts (R7) | Enforced in `pipeline/omlx_call.py` |
-| **C10** | Every persistent object stamped: schema_version, gen_model, pipeline_commit (R14) | `pipeline/stamp.py` decorator |
-| **C11** | All imports ⊂ requirements.txt | Pre-commit check |
-| **C12** | NEVER hardcode paths — import from `pipeline/pipeline_paths.py` | Pre-commit check |
-| **C13** | Backups after batch writes | `bash pipeline/backup_guardian.sh` |
-| **C14** | Session seed loaded at startup | `agent/session_seed.yaml` |
+| # | Rule |
+|----|------|
+| **C1** | $0 marginal cost — all generation on local hardware. NO cloud. |
+| **C2** | No vendor lock-in — every component has open-source replacement path |
+| **C3** | Sovereign — all data and compute remain local |
+| **C4** | Future-proof — no single-provider dependency |
+| **C5** | Zero bloat — no dependency without proven need |
+| **C6** | Crash-safe writes: tempfile → fsync → os.replace |
+| **C7** | Checkpoint every stage — resumable |
+| **C8** | Generator ≠ Verifier (R5) — different model families |
+| **C9** | temp=0.0 on all generation (R7) |
+| **C10** | Every persistent object stamped (R14) |
+| **C11** | All imports ⊂ requirements.txt |
+| **C12** | NEVER hardcode paths — all from config/pipeline_config.yaml |
+| **C13** | Backups after batch writes |
+| **C14** | Session seed loaded at startup |
+| **C15** | Buglog — 5+ unresolved → append to all handoffs |
+| **C16** | No silent errors — all except clauses must log and raise (ponytail: fail fast) |
+| **C17** | Type hints on all function signatures (ponytail: type safety) |
+| **C18** | Docstrings on all functions >5 lines (ponytail: documentation) |
+| **C19** | No dead code — _OLD files → archive/ or deleted (ponytail: no dead code) |
+| **C20** | No magic numbers — extract to config or named constants (Zed: explicit over implicit) |
 
 ## §1 — DATA SAFETY
-
-| # | Rule |
-|---|------|
-| **R-D413** | NEVER delete Anytype objects without Maxwell's explicit written confirmation |
-| **R-D410** | ONLY delete pipeline output via `pipeline/safe_delete.py` |
-| **R-D413b** | NEVER run `pipeline/nuke_anytype.py` without Maxwell's explicit permission |
-| **R-D824** | NEVER overwrite protected files (DECISION-LOG.md, MTR, AGENTS.md, .env, config/*.yaml) |
+- NEVER delete Anytype objects without explicit confirmation
+- ONLY delete pipeline output via safe_delete.py
+- NEVER overwrite protected files (DECISION-LOG.md, MASTER-TASK-REGISTER.md, AGENTS.md, .env, config/*.yaml)
 
 ## §2 — ARCHITECTURE
 
-### 2.1 Three-Layer Model
+3 LAYERS: Pipeline (7-stage) → Knowledge (SQLite+FTS5+sqlite-vec) → Orchestration (Phase 2)
 
-```
-3. LOOPS      — Agentic automation cycles (post-MVP)
-2. FRAMEWORK  — FBs in SQLite with hybrid retrieval (post-triad)
-1. PIPELINE   — 6-stage extraction: Convert → Chunk → Extract → Cluster → Merge → Verify → Commit
-```
+MODELS: Gen=Qwen3-Coder-30B-A3B-MLX-4bit | Verify=Phi-4-mini-8bit | Embed=bge-m3 | NLI=DeBERTa-v3-mnli
 
-### 2.2 Model Assignments
+PIPELINE (7 stages): 0-convert → 1-chunk → 1.5-intent-filter → 2-extract → 3-cluster(UMAP+HDBSCAN) → 4-merge(SALSA) → 5-verify(FActScore+DeBERTa) → 6-commit
 
-| Role | Model | Stage |
-|------|-------|-------|
-| Generator | Qwen3.6-35B-A3B-4bit (OMLX) | Stages 2, 4 |
-| Verifier | Phi-4-mini-instruct-8bit (OMLX) | Stage 5 |
-| Embeddings | nomic-embed-text (Ollama) | Stage 3 |
-| Fallback | Gemma-4-26B-A4B (OMLX) | Cross-family verify (R5) |
+STORAGE: SQLite (canonical) + sqlite-vec (vectors) + Parquet (portability) | TAXONOMY: 25 domains, 47 disciplines, max 5 per FB
 
-### 2.3 Storage
+## §3 — KEY DECISIONS (chronological)
+R5: Generator≠Verifier | R7: temp=0.0 | R14: Schema stamps | D150: Max 5 domains | D316: Multi-label (M3 under review)
+D2003: Targeted re-engineering | D2004: 14 foundation fixes | D2005: UMAP over BIRCH | D2006: No cloud | D2007: bge-m3
+D2008: 7-stage preserved | D2009: Confidence deferred | D2010: LangChain rejected | D2011: Buglog (C15)
+D2013: Intent filter+FActScore | D2014: Modular deferred to Phase 2 | D2016: Lifetime license
+D2019: UMAP confirmed | D2020: 3-layer OMLX defense + watchdog | D2023: Claim-type routing | D2024: Dichotomous SALSA
+D2026: M1 re-sync | D2027: M2 OMLX watchdog | D2028: Local LLM reliability | D2029: Source provenance gate
+D2030: Prompt version control | D2031: Drift detection
 
-| Layer | Technology | Format |
-|-------|-----------|--------|
-| Canonical | SQLite | `data/maxwell.db` |
-| Vectors | sqlite-vec | Embedded in SQLite |
-| Portability | Parquet | `data/fbs_snapshot_*.parquet` |
-| Relationships | SQLite | `relationships` table |
-| Presentation | Anytype | Post-MVP push |
+## §4 — PHASES
+Phase 0: 14 fixes (~10h) → G0: 130 books ≥5 clusters
+Phase 0.5: 4-layer cleaning (~3h)
+Phase 1: Intent filter + FActScore/DeBERTa (~1wk) → G1: ≥70% manual pass
+Phase 2: Layer 2 orchestration (100+ FBs needed)
+Phase 3: IP legal + packaging
+Phase 4: Launch
 
-## §3 — PIPELINE (6 STAGES)
+## §5 — STARTUP
+1. Read CONSTITUTION.md  2. Load agent/session_seed.yaml  3. Run OMLX stress test
+4. Verify OMLX+Ollama  5. python3 pipeline/status.py
 
-| Stage | Script | Model | Input → Output |
-|-------|--------|-------|----------------|
-| 0 | `stage0_convert.py` | Pandoc/Docling | EPUB/PDF → MD |
-| 1 | `stage1_chunk.py` | Python | MD → segments + SHA-256 dedup |
-| 2 | `stage2_extract.py` | Qwen3.6 | Segments → principles + MinHash dedup |
-| 3 | `stage3_cluster.py` | nomic-embed-text + HDBSCAN | Principles → clusters |
-| 4 | `stage4_merge.py` | Qwen3.6 + SALSA | Clusters → FBs + classify |
-| 5 | `stage5_verify.py` | Phi-4-mini + Human | FBs → verified FBs |
-| 6 | `stage6_commit.py` | Python | Verified FBs → SQLite + Parquet |
+## §6 — FOLDER STRUCTURE
+See governance/folder_protocol.md — books/ for source, stage{N}_{name}/{run_id}/ for self-contained output.
 
-## §4 — TAXONOMY
-
-- 25 domains (see `config/taxonomy_v5.yaml`)
-- 47 disciplines (see `config/taxonomy_v5.yaml`)
-- Max 5 domains per FB, unranked (D150)
-- Multi-label, content-based classification (D316)
-
-## §5 — KEY DECISIONS CARRIED FORWARD
-
-| ID | Decision |
-|----|----------|
-| **R5** | Generator ≠ Verifier |
-| **R7** | temp=0.0 on all generation |
-| **R14** | Schema stamps on all output |
-| **D150** | Max 5 domains per FB |
-| **D316** | Multi-label locked |
-| **D1057** | Lazy-load OMLX models per stage |
-| **D1058** | Jargon decontamination |
-
-## §6 — STARTUP SEQUENCE
-
-1. Read CONSTITUTION.md
-2. Load `agent/session_seed.yaml`
-3. Verify OMLX + Ollama running
-4. Run `python3 pipeline/status.py`
-
-## §7 — FOLDER STRUCTURE
-
-See `governance/folder_protocol.md`
-
----
-
-*Schema version: 2.0 | Pipeline commit: v2.0-init | Ratified: 2026-07-18*
+*Schema: 2.1 | Commit: v2.1-Phase0 | Amended: 2026-07-21 (M1)*

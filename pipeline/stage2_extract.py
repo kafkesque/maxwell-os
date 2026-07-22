@@ -79,6 +79,13 @@ ANTI-PATTERNS (do NOT extract):
 
 For each segment, extract 0-3 principles. If the segment contains no extractable principles, return an empty list.
 
+CRITICAL RULES (non-negotiable):
+- ONLY extract principles EXPLICITLY stated in the text. Never fabricate.
+- If no principles are found, return an empty list: []
+- Do NOT generalize beyond what the text explicitly says.
+- Do NOT add numbers, statistics, or data unless verbatim in source.
+- A principle must be traceable back to a specific sentence in the source.
+
 Return ONLY a JSON array of objects with this structure:
 [{"text": "The principle statement", "source_segment": "segment_id_here"}, ...]"""
 
@@ -103,10 +110,14 @@ def init_minhash_lsh():
         from datasketch import MinHash, MinHashLSH
         lsh = MinHashLSH(threshold=MINHASH_THRESHOLD, num_perm=MINHASH_NUM_PERM)
         return lsh, True
-    except ImportError:
-        print("  ⚠️  datasketch not installed. Near-dedup DISABLED.")
-        print("     Install: pip install datasketch")
-        return None, False
+    except ImportError as e:
+        # C16: No silent errors — log AND raise. Near-dedup is critical for quality.
+        import logging
+        logging.error("datasketch not installed. Near-dedup REQUIRED. Install: pip install datasketch")
+        raise ImportError(
+            "datasketch is required for MinHash near-dedup. "
+            "Install: pip install datasketch"
+        ) from e
 
 
 def make_minhash(text: str, num_perm: int = MINHASH_NUM_PERM):
@@ -190,6 +201,7 @@ def run_stage2(batch_size: int = BATCH_SIZE,
     print(f"   Model: {GEN_MODEL} | temp=0.0 | batch_size={batch_size}")
     if intent:
         print(f"   Intent: {intent}")
+        print(f"   ⚠️  Intent is prompt-level focus only. For chunk-level semantic filtering, run stage1_5_intent.py first.")
     print(f"{'='*60}")
 
     lsh, minhash_ok = init_minhash_lsh()

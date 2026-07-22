@@ -108,11 +108,27 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(db_path))
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
+
+    # P0.11 FIX: Load sqlite-vec extension BEFORE creating virtual tables.
+    # Was: missing entirely, causing "no such module: vec0" on first run.
+    try:
+        conn.enable_load_extension(True)
+        import sqlite_vec
+        sqlite_vec.load(conn)
+        conn.enable_load_extension(False)
+    except (ImportError, Exception) as e:
+        print(f"  ⚠️  sqlite-vec not available: {e}")
+        print("     Vector search will not be available. Install: pip install sqlite-vec")
+
     conn.execute(CREATE_FBS_TABLE)
     # FTS5 may not be compiled in all SQLite builds
     try:
         conn.execute(CREATE_FTS_TABLE)
-        conn.execute("DELETE FROM fbs_fts")  # Will be rebuilt
+        # BUG-025 FIX: Rebuild FTS from ALL existing fbs rows (was DELETE which lost history)
+        try:
+            conn.execute("INSERT INTO fbs_fts(fbs_fts) VALUES('rebuild')")
+        except Exception:
+            conn.execute("DELETE FROM fbs_fts")  # Fallback: clear + rebuild via triggers
         conn.executescript(CREATE_FTS_TRIGGERS)
     except sqlite3.OperationalError as e:
         print(f"  ⚠️  FTS5 not available: {e}")

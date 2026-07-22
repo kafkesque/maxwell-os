@@ -68,3 +68,6 @@ archive/
 # Empty books dir (symlinked content)
 books
 books/
+
+# Maxwell OS v2.0 pipeline data (regenerable)
+knowledge pipeline/

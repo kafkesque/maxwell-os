@@ -4,9 +4,9 @@ roles:
     backend: omlx
     family: qwen
   S5_GENERATOR:
-    model: gemma-4-26B-A4B-it-OptiQ-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # was gemma-4-26B (BROKEN — removed)
     backend: omlx
-    family: gemma
+    family: qwen
   S6_VALIDATOR:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
@@ -27,8 +27,9 @@ roles:
     model: Qwen3.6-35B-A3B-4bit
     backend: omlx
     family: qwen
+  # PLANNER_FALLBACK: PHANTOM — Qwopus-GLM-18B does not exist locally. Disabled per P0.14.
   PLANNER_FALLBACK:
-    model: Qwopus-GLM-18B
+    model: Qwen3.6-35B-A3B-4bit
     backend: omlx
     family: qwen
   REVIEWER:
@@ -49,27 +50,27 @@ roles:
     backend: omlx
     family: phi
   HIGH_CAPABILITY:
-    model: gemma-4-26B-A4B-it-OptiQ-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # was gemma-4-26B (BROKEN — removed)
     backend: omlx
-    family: gemma
+    family: qwen
   LONG_CONTEXT:
     model: Qwen3.6-35B-A3B-4bit
     backend: omlx
     family: qwen
-  MEMORY_MCP_PATH:
-    model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/memory_mcp_server.py
-    backend: path
-    family: engramory-adapted
-    version: 2.1.0
-    store: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/agent/memory/
-  HARNESS_STAGE:
-    model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/harness_stage.py
-    backend: path
-    family: path
+  # MEMORY_MCP_PATH: Disabled per P0.14 — not part of v2.0 pipeline.
+  # MEMORY_MCP_PATH:
+  #   model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/memory_mcp_server.py
+  #   backend: path
+  #   family: engramory-adapted
+  # HARNESS_STAGE: Disabled per P0.14 — not part of v2.0 pipeline.
+  # HARNESS_STAGE:
+  #   model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/harness_stage.py
+  #   backend: path
+  #   family: path
   EMBEDDINGS:
-    model: nomic-embed-text
+    model: bge-m3
     backend: ollama
-    family: nomic
+    family: bge
   RESIDENT_BRAIN:
     model: gemma-4-E2B-it-MLX-4bit
     backend: omlx
@@ -123,11 +124,11 @@ verification_tolerance:
 fallbacks:
   HIGH_CAPABILITY:
   - Qwen3.6-35B-A3B-4bit
-  - gemma-4-26B-A4B-it-OptiQ-4bit
+  # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S3A_CONVERGENCE:
   - Qwen3.6-35B-A3B-4bit
-  - gemma-4-26B-A4B-it-OptiQ-4bit
+  # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S5_GENERATOR:
   - gemma-4-E4B-it-MLX-4bit
@@ -188,7 +189,7 @@ routing:
   fb_generation:
     primary: qwen3.6-35b-a3b-moe
     fallbacks:
-    - gemma-4-26B-A4B-it-OptiQ-4bit
+    # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
     notes: 'D950: Local primary. DeepSeek only as last resort ($0 cost priority).'
   tier2_validation:
     primary: qwen3.6-35b-a3b-moe
@@ -202,7 +203,7 @@ routing:
   depth_reasoning:
     primary: qwen-max
     fallbacks:
-    - opus-distilled-27b
+    # - opus-distilled-27b  # PHANTOM per P0.14
     - Qwen3.6-35B-A3B-4bit
   self_critique:
     primary: deepseek-r1-8b
@@ -210,11 +211,12 @@ routing:
     - gemma-4-E4B-it-MLX-4bit
     notes: 'D924/D925: Dedicated critique routing. DeepSeek R1-8B (LOCAL) for CoT reasoning,
       Gemma-4-E4B for cross-family verify.'
-  colibri_deploy:
-    primary: glm-5.2-colibri
-    fallbacks:
-    - qwen3.6-35b-a3b-moe
-    notes: 'D950: Local fallback only. DeepSeek removed.'
+  # colibri_deploy: DISABLED per P0.14 — glm-5.2-colibri does not exist locally
+  # colibri_deploy:
+  #   primary: glm-5.2-colibri
+  #   fallbacks:
+  #   - qwen3.6-35b-a3b-moe
+  #   notes: 'D950: Local fallback only. DeepSeek removed.'
 archived:
 - gemma-4-31B-it-OptiQ-4bit
 - Ornith-1.0-9B-4bit

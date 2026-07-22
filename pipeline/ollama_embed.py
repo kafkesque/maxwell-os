@@ -16,6 +16,8 @@ Usage:
 
 # ── Type aliases (replaces chromadb imports) ──────────────────────────────
 from typing import List, Sequence
+from pipeline.pipeline_paths import OLLAMA_HOST, OLLAMA_PORT
+OLLAMA_URL = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}/api/embed"  # BUG-028 FIX
 
 Documents = Sequence[str]
 Embeddings = Sequence[Sequence[float]]
@@ -30,7 +32,7 @@ class EmbeddingFunction:
 
 NOMIC_MAX_CHARS = 4000  # nomic-embed-text context ~8192 tokens
 BATCH_SIZE = 100  # max texts per Ollama batch API call
-OLLAMA_URL = "http://localhost:11434/api/embed"
+# OLLAMA_URL now configured from pipeline_paths.py (was hardcoded localhost)
 
 
 def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:

@@ -38,9 +38,10 @@ from pipeline.pipeline_paths import (
     STAGE4_CHECKPOINT,
     CHECKPOINT_DIR,
     GEN_MODEL,
+    VERIFY_MODEL,  # P0.10: imported for R5-compliant SALSA classification
     MAX_DOMAINS_PER_FB,
 )
-from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit
+from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit, get_pipeline_run_id
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.io_guard import safe_write
 from pipeline.schemas import (
@@ -281,7 +282,7 @@ def run_stage4(cluster_ids: list[int] = None):
     failed = 0
     classification_errors = 0
     pipeline_commit = get_pipeline_commit()
-    pipeline_run_id = stamp_record({})["pipeline_run_id"]  # Generate once per run
+    pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
 
     for i, cluster in enumerate(clusters, 1):
         cluster_id = cluster["cluster_id"]
@@ -340,7 +341,7 @@ def run_stage4(cluster_ids: list[int] = None):
             )
             class_data = call_omlx_json(
                 prompt=class_prompt,
-                model=GEN_MODEL,
+                model=GEN_MODEL,        # P0.10 REVERTED: Phi-4-mini returns empty on short prompts (Goose stress test: 44-389ms)
                 system=CLASSIFY_SYSTEM_PROMPT,
                 max_tokens=512,
             )

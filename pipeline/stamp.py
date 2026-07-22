@@ -52,6 +52,19 @@ def get_pipeline_commit() -> str:
     return commit
 
 
+# Singleton: generated once per process, reused across all calls (P0.9 FIX)
+_PIPELINE_RUN_ID: Optional[str] = None
+
+
+def get_pipeline_run_id() -> str:
+    """Return the current pipeline run ID (created once, reused).
+    P0.9 FIX: was regenerated per call, breaking R14 lineage for 6 of 7 stages."""
+    global _PIPELINE_RUN_ID
+    if _PIPELINE_RUN_ID is None:
+        _PIPELINE_RUN_ID = uuid.uuid4().hex
+    return _PIPELINE_RUN_ID
+
+
 def stamp_record(
     record: dict,
     gen_model: Optional[str] = None,
@@ -69,7 +82,7 @@ def stamp_record(
     record["gen_model"] = gen_model
     record["pipeline_commit"] = get_pipeline_commit()
     record["taxonomy_version"] = TAXONOMY_VERSION
-    record["pipeline_run_id"] = record.get("pipeline_run_id") or uuid.uuid4().hex
+    record["pipeline_run_id"] = get_pipeline_run_id()  # P0.9 FIX: singleton
     record["created_at"] = datetime.now(timezone.utc).isoformat()
     return record
 

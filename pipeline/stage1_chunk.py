@@ -40,26 +40,26 @@ from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit
 from pipeline.io_guard import safe_write
 
 # ── Constants ──────────────────────────────────────────────────────────────
-MIN_CHUNK_WORDS = 30  # Skip chunks shorter than this
+MIN_CHUNK_WORDS = 10  # P0.4 FIX: was 30. Preserve short aphoristic principles.
 SECTION_HEADING_RE = re.compile(r"^#{1,6}\s+")
 SKIP_PATTERNS = [
     re.compile(r"^```"),           # code fence
     re.compile(r"^---"),           # horizontal rule
     re.compile(r"^!\[.*\]\(.*\)$"),  # image
-    re.compile(r"^\s*$"),          # blank line
-    re.compile(r"^\s*\d+[.\)]\s"),  # numbered list (may contain content, but skip standalone)
+    # P0.3 FIX: removed numbered-list pattern (contains real principles)
+    # P0.1 FIX: removed blank-line pattern (handled by clean_line return "")
 ]
 SKIP_WORDS = {"twitter", "x.com", "instagram", "facebook", "subscribe", "newsletter",
               "copyright", "disclaimer", "all rights reserved"}
 
 
 def clean_line(line: str) -> str | None:
-    """Clean a single line. Returns None if it should be skipped."""
+    """Clean a single line. Returns '' for blank lines (preserves paragraph boundary).
+    Returns None for lines that should be skipped entirely."""
     stripped = line.strip()
     if not stripped:
-        return None
-    if len(stripped) < 15:
-        return None
+        return ""                # P0.1 FIX: was return None. Preserves paragraph boundary.
+    # P0.4: Removed min-length filter — preserve short aphorisms like "Price is a signal."
     for pattern in SKIP_PATTERNS:
         if pattern.match(stripped):
             return None
@@ -118,35 +118,40 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE_WORDS,
 
 
 def split_on_headings(text: str) -> list[tuple[str, str, str]]:
-    """Split markdown on ## headings. Returns [(heading, section_text, section_title)].
+    """Split markdown on headings. Preserves paragraph boundaries via blank lines.
 
-    Also handles # (H1) and ### (H3+) as section boundaries.
+    P0.2 FIX: Uses list-of-lists to preserve paragraph structure.
+    Was: flat list that destroyed all paragraph boundaries before chunk_text().
     """
     lines = text.split("\n")
     sections = []
     current_heading = ""
     current_title = ""
-    current_lines: list[str] = []
+    current_paras: list[list[str]] = [[]]  # paragraphs, each a list of lines
+
+    def flush():
+        paras = [" ".join(p) for p in current_paras if p]
+        return "\n\n".join(paras)
 
     for line in lines:
         if SECTION_HEADING_RE.match(line):
-            # Save previous section
-            if current_lines:
-                body = "\n".join(current_lines)
+            body = flush()
+            if body:
                 sections.append((current_heading, body, current_title))
             current_heading = line.strip()
             current_title = line.lstrip("#").strip()
-            current_lines = []
+            current_paras = [[]]
         else:
             cleaned = clean_line(line)
-            if cleaned:
-                current_lines.append(cleaned)
+            if cleaned == "":
+                if current_paras[-1]:       # blank line = new paragraph boundary
+                    current_paras.append([])
+            elif cleaned:
+                current_paras[-1].append(cleaned)
 
-    # Last section
-    if current_lines:
-        body = "\n".join(current_lines)
+    body = flush()
+    if body:
         sections.append((current_heading, body, current_title))
-
     return sections
 
 

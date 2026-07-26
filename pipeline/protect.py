@@ -9,9 +9,7 @@ Usage:
   python3 tools/protect.py domain_6_ai_computing --rm-checkpoint  # Block if active
 """
 
-import json
 import os
-import signal
 import subprocess
 import sys
 import time
@@ -19,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 from tools.pipeline_paths import RUNTIME_RUNNING_FLAG, STAGE_PATHS
+
 RUNNING_FLAG = RUNTIME_RUNNING_FLAG
 
 

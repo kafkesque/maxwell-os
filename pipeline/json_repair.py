@@ -23,8 +23,8 @@ Strategies NOT needed for Gemma-4 (omitted to avoid bloat):
 Based on OutputGuard (MIT) by ndcorder — strategies adapted for Maxwell pipeline.
 """
 
-import re
 import json
+import re
 
 # ── Strategy 1: Strip markdown fences ──
 
@@ -314,7 +314,7 @@ def _fix_truncated(text: str) -> str:
 
 def _salvage_array_objects(text: str) -> list:
     """Split a JSON array on object boundaries when the whole array won't parse.
-    
+
     Preserves position and count by splitting on `},{` between top-level objects.
     Each piece is parsed individually; corrupted pieces become None.
     None placeholders keep index alignment for downstream s3a_meta merge.
@@ -323,7 +323,7 @@ def _salvage_array_objects(text: str) -> list:
     body = (text[l + 1: r] if (l != -1 and r != -1 and r > l) else text).strip()
     if "{" not in body:
         return []
-    
+
     pieces = re.split(r"\}\s*,\s*\{", body)
     out = []
     for piece in pieces:
@@ -343,7 +343,7 @@ def _salvage_array_objects(text: str) -> list:
 
 def repair_json(text: str) -> str:
     """Apply all JSON repair strategies to a potentially malformed JSON string.
-    
+
     Strategies are applied in order from least-destructive to most-destructive.
     Returns the repaired text (may still not parse if unfixable).
     """
@@ -370,22 +370,22 @@ def parse_json_robust(text: str) -> dict | list:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-    
+
     # Phase 2: Repair + parse
     repaired = repair_json(text)
     try:
         return json.loads(repaired)
     except json.JSONDecodeError:
         pass
-    
+
     # Phase 3: Array salvage on repaired text
     result = _salvage_array_objects(repaired)
     if result and any(isinstance(r, dict) for r in result):
         return result
-    
+
     # Phase 4: Array salvage on original (for cases where repair made things worse)
     result = _salvage_array_objects(text)
     if result and any(isinstance(r, dict) for r in result):
         return result
-    
+
     return []

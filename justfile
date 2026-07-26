@@ -11,6 +11,7 @@ preflight:
     @python3 -c "from pipeline.pipeline_paths import ensure_dirs; ensure_dirs(); print('✅ Directories OK')"
     @python3 -c "from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES; print(f'✅ Taxonomy: {len(CANONICAL_DOMAINS)} domains, {len(CANONICAL_DISCIPLINES)} disciplines')"
     @python3 -c "from pipeline.omlx_call import check_omlx_health; ok = check_omlx_health(); print('✅ OMLX UP' if ok else '❌ OMLX DOWN')"
+    @python3 tools/sync_decisions.py
     just stress
 
 # ── Stress-test OMLX chat (catches the 'health endpoint lies' bug) ──
@@ -24,10 +25,14 @@ stress:
 status:
     python3 pipeline/status.py
 
+# v3.0 cluster-before-extract pipeline (D2115: updated stage order)
 triad:
-    @echo "=== Triad Pipeline Run ==="
+    @echo "=== v3.0 Pipeline Run (cluster-before-extract) ==="
     python3 pipeline/stage0_convert.py
+    python3 pipeline/stage0_5_extract_metadata.py
     python3 pipeline/stage1_chunk.py
+    python3 pipeline/stage1_3_prefilter.py
+    python3 pipeline/stage1_5_embed_cluster.py
     python3 pipeline/stage2_extract.py
     python3 pipeline/stage3_cluster.py
     python3 pipeline/stage4_merge.py
@@ -35,11 +40,36 @@ triad:
     python3 pipeline/stage6_commit.py
     python3 pipeline/status.py
 
+# ── Delegate Safety Check (DELEGATE-001) ──────────────────────────
+delegate-check:
+    python3 tools/delegate_safe.py
+
+delegate-fix:
+    python3 tools/delegate_safe.py --fix
+
+# Smoke test: 1-book end-to-end
+smoke:
+    @echo "=== Smoke Test (1-book E2E) ==="
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage0_convert.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_chunk.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_3_prefilter.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_5_embed_cluster.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage2_extract.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage5_verify.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage6_commit.py
+    @echo "✅ Smoke test complete. Check output in stage6_commit/smoke/"
+
 # ── Individual stages ─────────────────────────────────────────
 stage0:
     python3 pipeline/stage0_convert.py
+stage0_5:
+    python3 pipeline/stage0_5_extract_metadata.py
 stage1:
     python3 pipeline/stage1_chunk.py
+stage1_3:
+    python3 pipeline/stage1_3_prefilter.py
+stage1_5:
+    python3 pipeline/stage1_5_embed_cluster.py
 stage2:
     python3 pipeline/stage2_extract.py
 stage3:
@@ -58,6 +88,21 @@ export:
 
 backup:
     bash pipeline/backup_guardian.sh
+
+# ── Vibecheck — Ruff + format on changed files (D2109) ───────
+vibecheck:
+    @echo "=== Vibecheck ==="
+    @python3 -m ruff check --fix pipeline/ 2>&1 | tail -3
+    @python3 -m ruff format --check pipeline/ 2>&1 | tail -1
+    @echo "✅ Vibecheck complete"
+
+vibecheck-full:
+    @echo "=== Full Vibecheck (all checks) ==="
+    python3 -m ruff check pipeline/
+    python3 -m ruff format --check pipeline/
+    @echo "=== Syntax check on all pipeline .py files ==="
+    @for f in pipeline/*.py; do python3 -c "compile(open('$$f').read(), '$$f', 'exec')" && echo "✅ $$f" || echo "❌ $$f"; done
+    @echo "✅ Full vibecheck complete"
 
 # ── Cleanup ───────────────────────────────────────────────────
 clean:

@@ -1,0 +1,341 @@
+# Maxwell OS — Promptfoo Eval Config (D315, Kimi-verified)
+description: D315 depth classification eval with full rule coverage and edge-case examples
+
+prompts:
+  - "You are a D315 depth classifier for the Maxwell OS knowledge pipeline. Classify the principle extracted from source texts into exactly one depth level.\n\n## D315 CLASSIFICATION RULES (apply in order)\n\n### STEP 1: Check if SPECIALIZED\nIs this principle bound to a SPECIFIC named tool, brand, protocol, function, or API?\n- Examples: p5.js, atan2(), L-Systems, Perlin noise, a specific library, a brand name\n- YES → depth = "specialized"\n- EXCEPTION: Named physical/mathematical laws (Newton's laws, vector decomposition,\n  velocity/force relationships) are DOMAIN, not specialized — they describe general\n  physics/math, not a specific tool.\n\n### STEP 2: Check if UNIVERSAL (system-independence test)\nDoes this principle apply to ALL system types equally?\n- Physical systems, biological systems, cognitive systems, social systems, engineered systems\n- Ask: "Would this be true for a galaxy, an ecosystem, a human brain, a society, AND a computer?"\n- YES → depth = "universal"\n- KEY SIGNALS: "all systems," "regardless of substrate," "any system," "ubiquitous in all"\n- FALSE SIGNALS: "the brain," "organizations," "cognition," "cultural" — bounded, not universal\n\n### STEP 3: Check if PRESCRIPTIVE (domain test)\nDoes the principle tell you what TO DO? (imperative, instruction, should, must)\n- Contains: "you should," "you must," "use X to," "encapsulate," "acknowledge," "leverage"\n- Contains actionable verbs directed at a practitioner\n- YES → depth = "domain" (practice-bound)\n\n### STEP 4: Descriptive spanning multiple domains (cross-domain)\nDoes the principle describe what IS (not what to do) across 2+ unrelated fields?\n- Descriptive mechanism that applies to multiple disciplines\n- NOT bounded to a single practice area\n- YES → depth = "cross-domain"\n\n### STEP 5: Everything else\n- Descriptive but bounded to 1-2 related fields → depth = "domain"\n\n## CRITICAL EDGE CASES\n| Text | Depth | Why |\n|------|-------|-----|\n| "Velocity updates only during force application" | domain | Physics, no tool named |\n| "Mass is a derived property" | domain | Physics principle |\n| "Vector decomposition separates direction from magnitude" | domain | Math/physics, not tool-bound |\n| "You must adapt your tone" | domain | Prescriptive instruction |\n| "Use visual examples to establish" | domain | Prescriptive "use" |\n| "Acknowledge contributors" | domain | Social norm, not tool-bound |\n| "The atan2() function provides" | specialized | Named function |\n| "Time in p5.js is measured in frames" | specialized | Brand name p5.js |\n| "All systems emerge from existing structures" | universal | ANY system type |\n| "Scale invariance of system properties" | universal | Regardless of substrate |\n| "The brain prioritizes threat detection" | cross-domain | Bounded to cognition |\n\n## OUTPUT FORMAT\nReturn ONLY valid JSON. No markdown, no explanation:\n{{"principle":"<=25 words","depth":"universal|cross-domain|domain|specialized","discipline":"...","domains":"comma, separated, list","evidence":"cited|axiomatic","route":"FB|PT|NULL"}}\n\n## INPUT TEXTS\n{{texts}}"
+
+providers:
+  - id: omlx:Qwen3.6-35B-A3B-4bit
+    config:
+      apiBaseUrl: http://localhost:11435/v1
+      temperature: 0.0
+      max_tokens: 256
+  - id: omlx:gemma-4-E2B-it-MLX-4bit
+    config:
+      apiBaseUrl: http://localhost:11435/v1
+      temperature: 0.0
+      max_tokens: 256
+  - id: omlx:Ornith-1.0-9B-4bit
+    config:
+      apiBaseUrl: http://localhost:11435/v1
+      temperature: 0.0
+      max_tokens: 256
+  - id: omlx:Phi-4-mini-instruct-8bit
+    config:
+      apiBaseUrl: http://localhost:11435/v1
+      temperature: 0.0
+      max_tokens: 256
+
+tests:
+  - vars:
+      texts: "Fragile species require artificial environments to survive habitat loss. The mechanism is the creation of highly controlled, sheltered niches to replace lost natural ecosystems. This creates a dependency on human intervention."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Designers should leverage platform-specific guidelines. They use established standards to ensure consistency. The constraint is the target operating system's design language."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Acknowledge contributors to maintain project integrity. Recognition occurs through documentation and citations. This process validates the labor of library developers and code contributors."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Visual layering uses distinct visual properties to separate data sets. Color and geometry distinguish different information types within a single graphic. The constraint is the clarity of the data."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Systems often perform worse than expected. Unpredictable failures are common. The constraint is the inherent instability of complex systems."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Authentic outreach is the use of cultural or personal markers to build rapport. The mechanism is the alignment of communication style with the recipient's background. You must adapt your tone to match the target's context."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Time in p5.js is measured in frames. The mechanism uses the refresh rate of the sketch to track progression. The constraint is the discrete nature of frame updates."
+      expected_depth: "specialized"
+    assert:
+      - type: javascript
+        value: "output.depth === 'specialized'"
+  - vars:
+      texts: "Existing references accelerate alignment. Use visual or conceptual examples to establish common understanding. This prevents the need for building everything from scratch."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Systems possess inherent directional forces. The mechanism is the vector-based movement of system components toward specific states. These forces act like gravity on the system's evolution."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Combining traditional ornaments with geometric forms creates new relationships to convey age. The mechanism is the juxtaposition of historical motifs with modern structures. This technique bridges the gap between heritage and contemporary relevance."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "No complex system is created de novo. All systems emerge from existing structures or precursors. The constraint is the necessity of prior existence."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Systems students aim to cope and prevail. The mechanism is the alignment of individual action with natural constraints. A constraint is the inherent unpredictability of life."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Domain-specific terminology prevents implementation ambiguity. The mechanism maps technical concepts to unique, non-conflicting names. The constraint is the presence of overlapping names in existing software frameworks."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Interdisciplinary integration combines disparate fields to drive innovation. This synthesis creates new ways of understanding information. The constraint is the intersection of domains."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Breaking monolithic architectures resolves tight coupling and blocking bottlenecks. It separates distinct functions into independent units. The constraint is the resource contention within a single monolith."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Environment dictates psychological states. Specific locations provide therapeutic atmospheres. The setting acts as a catalyst for mental reorganization."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Systems are inherently imperfect and never reach a state of perfection. Flaws are a constant feature of existence. Perfection is an impossible target for any system."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Equivalence relationships link preferred terms to their variants. This mechanism maps different linguistic expressions to a single concept. The constraint is the variety of human language."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Velocity updates only during force application. A non-zero net force triggers calculation. Zero net force requires no mathematical updates to velocity."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "A single gene value maps to a specific speed range. The mechanism inverts the input to transform a 0-1 value into a 15-0 speed range. This constraint ensures that higher gene values result in lower speeds."
+      expected_depth: "specialized"
+    assert:
+      - type: javascript
+        value: "output.depth === 'specialized'"
+  - vars:
+      texts: "Conceptual blending theory allows for the creation of hybrid mental spaces. A subset of attributes from source and target domains are imported into a new space. This space allows for the combination of disparate ideas."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Contextualization through publication validates design work. The mechanism is the presentation of work within a curated medium. The constraint is the need for professional visibility."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Personalized communication uses specific client data to build rapport. This mechanism bridges the gap between stranger and collaborator. You must use only verified, visible information to avoid inaccuracy."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Temporal visualization requires stacking generations to show history. The mechanism is the vertical arrangement of cell states. The constraint is the 2D representation of 1D data."
+      expected_depth: "specialized"
+    assert:
+      - type: javascript
+        value: "output.depth === 'specialized'"
+  - vars:
+      texts: "Perlin noise generates smooth pseudo-randomness. It uses input parameters to create continuous fluctuations. The constraint is the defined range of the output."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Specific technical difficulties in systems are examples of general laws applicable to any system. The mechanism is isomorphism across scales and domains. Surface differences obscure underlying universality."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Imperfection is a fundamental property. Failure is an inevitable outcome of any functioning system. The constraint is the inherent flaw in all components."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Cyclical behavior is ubiquitous in all systems. The mechanism alternates between expansion and contraction phases. This applies to economies, populations, ecosystems, and engineered systems alike."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Constraining randomness to a circular path prevents jittery movement. The mechanism is the mapping of random values to a circle. The constraint is the fixed radius of the circle."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Systemic principles are identified through the analysis of specific examples. Systematic study reveals universal truths. The constraint is the need for rigorous observation."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "No algorithmic process generates suitable new frames. Creativity lacks a repeatable formula. The constraint is the inherent unpredictability of insight."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Mass is a derived property. The engine calculates mass by multiplying body size by density. This constraint ensures physical consistency within the simulation."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Cybernetics unifies communication, control, and statistics across systems. Feedback loops regulate behavior through information exchange. The constraint is that all systems require information flow to maintain order."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Constraint behavior options define the physical properties of a connection. The developer sets parameters like stiffness or damping to tune the interaction. This constraint allows for varied mechanical behaviors."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Vector decomposition separates direction from magnitude. You split a single force into two distinct components. The constraint is the complexity of multi-dimensional math."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Universal facial expressions serve as a global communication standard. Biological hardwiring ensures observers interpret facial cues identically across cultures. This mechanism functions regardless of geographic origin."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Collaboration drives innovation. Open exchange of ideas accelerates learning. Constraint is the isolation of individual knowledge."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Limitations act as recurring boundaries in all systems. One repeatedly encounters the same constraints regardless of domain. The constraint is the reality of the environment that bounds every system."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Absolute data privacy is impossible in distributed AI systems. The mechanism involves the inherent distribution of data across networks. Constraints include the mathematical properties of data and system architecture."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Systematic mapping organizes structural and semiotic elements to ensure usability. The mechanism is the detailed documentation of relationships between components. Constraints are the complexity of the system and the clarity of the mapping language."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "The atan2() function provides a unique angle for any 2D vector. It uses the signs of both components to determine the correct quadrant. The constraint is the 2D coordinate system."
+      expected_depth: "specialized"
+    assert:
+      - type: javascript
+        value: "output.depth === 'specialized'"
+  - vars:
+      texts: "Abductive reasoning bridges analytical past-data and intuitive knowing, enabling design thinking to transcend current knowledge stages. Abduction uses incomplete observations to form the best possible explanation. This allows for creative leaps beyond existing data."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Storytelling bridges the gap between vision and reality. This mechanism makes abstract ideas tangible and memorable. The constraint is the difficulty of communicating complex visions to diverse audiences."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Negativity dominance occurs when negative stimuli outweigh positive ones. The brain prioritizes threat detection over reward acquisition. The constraint is the inherent survival bias of cognition."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "L-systems use an alphabet and an axiom to define a starting state. Recursive production rules transform the current string into a new one. The constraint is the fixed alphabet of valid characters."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Metaphors derive meaning from cultural beliefs about specific concepts. They map abstract qualities onto culturally significant objects. The constraint is the reliance on shared cultural knowledge."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Engagement requires accepting inevitable hardship. The arena demands a price in the form of emotional or physical discomfort. The constraint is the inherent pain of participation."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Encapsulate population management within a dedicated class. This structure centralizes selection and reproduction logic. The constraint is code maintainability in complex simulations."
+      expected_depth: "specialized"
+    assert:
+      - type: javascript
+        value: "output.depth === 'specialized'"
+  - vars:
+      texts: "Human systems differ only in degree from other systems. The mechanism is scale invariance of system properties. The constraint is that all systems share fundamental behavioral laws regardless of substrate."
+      expected_depth: "universal"
+    assert:
+      - type: javascript
+        value: "output.depth === 'universal'"
+  - vars:
+      texts: "Systems thinking informs the design of information architectures. It views components as parts of a larger whole. The constraint is the interconnectedness of all system elements."
+      expected_depth: "cross-domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'cross-domain'"
+  - vars:
+      texts: "Organizational ineptitude is an inherent systemic property. Hidden forces drive malfunctions regardless of individual intent. This constraint separates individual competence from systemic outcome."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"
+  - vars:
+      texts: "Misaligned objectives cause agents to compete for resources. Agents act to maximize their own utility. The constraint is the scarcity of system resources."
+      expected_depth: "domain"
+    assert:
+      - type: javascript
+        value: "output.depth === 'domain'"

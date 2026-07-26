@@ -12,6 +12,10 @@ This is a standing rule — not a one-time action.
 
 When 5+ bugs are unresolved, the full buglog MUST be appended to all LLM handoff documents so the next LLM has complete context.
 
+## Auto-Log Rule (2026-07-22)
+
+**Agent MUST log any bug immediately upon discovery.** No deferring. If a tool call fails unexpectedly, returns garbled output, or reveals a systemic issue — log it NOW. This applies to: model failures, API errors, config mismatches, pipeline crashes, data corruption, duplicate files, stale references, and any behavior that deviates from expected operation.
+
 ## Bug Entry Format
 
 Every bug entry must include:

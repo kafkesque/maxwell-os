@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Maxwell OS — Pipeline Technology Feeds</title>
+    <dateCreated>2026-07-16T07:59:00Z</dateCreated>
+    <dateModified>2026-07-26T14:50:00Z</dateModified>
+    <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation</description>
+  </head>
+  <body>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- GITHUB TOPIC FEEDS — weekly review for new tools             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="GitHub Topic Feeds" description="Weekly review feeds">
+      <outline type="rss" text="Vector Search" xmlUrl="https://github.com/topics/vector-search" 
+               description="New vector search libraries and tools"/>
+      <outline type="rss" text="FAISS" xmlUrl="https://github.com/topics/faiss" 
+               description="FAISS ecosystem: alternatives, extensions, wrappers"/>
+      <outline type="rss" text="RAG" xmlUrl="https://github.com/topics/retrieval-augmented-generation" 
+               description="RAG frameworks and techniques"/>
+      <outline type="rss" text="Vector Database" xmlUrl="https://github.com/topics/vector-database" 
+               description="Vector DBs: embedded, cloud, local"/>
+      <outline type="rss" text="Embedding" xmlUrl="https://github.com/topics/embedding" 
+               description="Embedding models and tooling"/>
+      <outline type="rss" text="Embeddings" xmlUrl="https://github.com/topics/embeddings" 
+               description="Alternative embeddings topic"/>
+      <outline type="rss" text="Clustering" xmlUrl="https://github.com/topics/clustering" 
+               description="Clustering algorithms and libraries"/>
+      <outline type="rss" text="ANN Search" xmlUrl="https://github.com/topics/approximate-nearest-neighbor-search" 
+               description="Approximate nearest neighbor search"/>
+      <outline type="rss" text="HNSW" xmlUrl="https://github.com/topics/hnsw" 
+               description="HNSW algorithm implementations"/>
+      <!-- D1031: Engineering & Agent Development feeds (2026-07-16) -->
+      <outline type="rss" text="Engineering" xmlUrl="https://github.com/topics/engineering" 
+               description="Software engineering tools and practices"/>
+      <outline type="rss" text="AI Development" xmlUrl="https://github.com/topics/ai-development" 
+               description="AI-powered development tools and frameworks"/>
+      <outline type="rss" text="Spec-Driven" xmlUrl="https://github.com/topics/spec-driven" 
+               description="Specification-driven development tools"/>
+      <outline type="rss" text="Copilot" xmlUrl="https://github.com/topics/copilot" 
+               description="AI copilot tools and extensions"/>
+      <outline type="rss" text="AI Tools" xmlUrl="https://github.com/topics/ai-tools" 
+               description="General AI developer tools"/>
+      <outline type="rss" text="Spec" xmlUrl="https://github.com/topics/spec" 
+               description="Specification languages, formats, and tools"/>
+      <outline type="rss" text="Developer Tools" xmlUrl="https://github.com/topics/developer-tools" 
+               description="General developer tooling"/>
+      <outline type="rss" text="Prompt Engineering" xmlUrl="https://github.com/topics/prompt-engineering" 
+               description="Prompt engineering frameworks and tools"/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- EVALUATED REPOS — FAISS ALTERNATIVES & ACCELERATORS           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="FAISS Alternatives &amp; Accelerators" description="Evaluated via GitHub topic search 2026-07-16">
+      
+      <!-- USearch — HIGHEST POTENTIAL -->
+      <outline type="link" text="⭐ USearch — FAISS Replacement (search + clustering)" 
+               url="https://github.com/unum-cloud/USearch"
+               description="⭐4,216 | C++/Python | Apache-2.0 | SIMD-optimized (NEON for Apple Silicon). 10x faster HNSW than FAISS. Has clustering (KNN), PCA, multi-language bindings. Single-header C++11. Used by Google, ClickHouse, DuckDB. Updated daily. TOP CANDIDATE for S1.5 replacement."/>
+
+      <!-- Turbovec — ALREADY INSTALLED -->
+      <outline type="link" text="⭐ TurboVec — Quantized search accelerator" 
+               url="https://github.com/RyanCodrai/turbovec"
+               description="⭐12,846 | Python/Rust | MIT | 2-4 bit quantized vector index. Metal SIMD on Apple Silicon. 4-8x faster search than FAISS brute-force. Already installed (v0.8.0). Use case: S1.5 k-NN search phase, FB retrieval."/>
+
+      <!-- LEANN — FB retrieval layer -->
+      <outline type="link" text="⭐ LEANN — 97% storage savings RAG" 
+               url="https://github.com/StarTrail-org/LEANN"
+               description="⭐12,688 | Python | MIT | MLsys2026 paper. 97% storage savings, fast, accurate, 100% private RAG on personal devices. Uses FAISS internally. Compelling for FB retrieval/reasoning layer."/>
+
+      <!-- zvec — lightweight embedded vector DB -->
+      <outline type="link" text="⭐ zvec — Lightweight embedded vector DB" 
+               url="https://github.com/alibaba/zvec"
+               description="⭐14,942 | C++ | Apache-2.0 | Lightweight, lightning-fast, in-process vector database by Alibaba. HNSW, embedded, no server. Could replace FAISS for persistent vector storage."/>
+
+      <!-- memvid — agent memory -->
+      <outline type="link" text="⭐ memvid — Agent memory layer" 
+               url="https://github.com/memvid/memvid"
+               description="⭐15,901 | Rust | Apache-2.0 | Memory layer for AI agents. Serverless, single-file. Replace complex RAG pipelines. Knowledge graph support. Use case: Maxwell agent memory, not pipeline."/>
+
+      <!-- sqlite-vss — SQLite vectors -->
+      <outline type="link" text="⭐ sqlite-vss — SQLite vector extension" 
+               url="https://github.com/asg017/sqlite-vss"
+               description="⭐1,997 | C++ | MIT | SQLite extension for vector search based on FAISS. Unifies vectors + metadata in SQLite (already used for session_episodes). Use case: persistent vector + metadata store."/>
+
+      <!-- LightRAG — graph-based RAG -->
+      <outline type="link" text="⭐ LightRAG — Graph-based RAG" 
+               url="https://github.com/HKUDS/LightRAG"
+               description="⭐37,713 | Python | EMNLP2025 paper. Simple and fast graph-based RAG. Entity-relation extraction + graph traversal. Use case: FB retrieval quality improvement via graph approach."/>
+
+      <!-- FAISS (baseline) -->
+      <outline type="link" text="⭐ FAISS — Current baseline" 
+               url="https://github.com/facebookresearch/FAISS"
+               description="⭐34,000+ | C++/Python | MIT | Current S1.5 clustering engine. Meta, 7+ years. IndexFlatIP (brute-force) + KMeans. Keep for clustering; consider USearch as faster alternative."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- YOUTUBE CHANNELS — weekly review for techniques & talks       -->
+    <!-- D2116: Added 2026-07-26                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="YouTube Channels" description="Weekly review for agentic/AI engineering techniques">
+      <outline type="rss" text="AI Engineer" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCkA3AB6Y4MQKu3NwAaZfB6g"
+               htmlUrl="https://www.youtube.com/@aiDotEngineer"
+               description="AI Engineering talks, agent architectures, production patterns. Source of Emil Eifrem/Neo4j talk, Daniel Chalef/Zep provenance talk."/>
+      <outline type="rss" text="IBM Technology" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCKWaEZ-_VweaEx1jVdoCCRw"
+               htmlUrl="https://www.youtube.com/@IBMTechnology"
+               description="IBM's agentic AI patterns, CoALA cognitive architecture, skill.md standard. Production-proven enterprise agent patterns."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- X.COM MONITOR — agentic/AI thought leaders                    -->
+    <!-- D2116: Added 2026-07-26                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="X.com Sources" description="Agentic AI thought leaders and tools">
+      <outline type="link" text="0xCodez" url="https://x.com/0xCodez"
+               description="AI agent architecture, tool-use patterns, agent memory design. Practical agentic engineering insights."/>
+      <outline type="rss" text="X.com — 0xCodez (via RSS Bridge)" xmlUrl="https://rsshub.app/twitter/user/0xCodez"
+               description="RSS proxy for 0xCodez tweets. Agent architecture and memory design insights."/>
+    </outline>
+  </body>
+</opml>

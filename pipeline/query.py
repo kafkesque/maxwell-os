@@ -77,20 +77,20 @@ def show_stats(conn: sqlite3.Connection):
         "ORDER BY cnt DESC LIMIT 15"
     ).fetchall()
 
-    print(f"\n╔══════════════════════════════════════╗")
-    print(f"║   Maxwell OS — FB Database Stats     ║")
-    print(f"╚══════════════════════════════════════╝")
+    print("\n╔══════════════════════════════════════╗")
+    print("║   Maxwell OS — FB Database Stats     ║")
+    print("╚══════════════════════════════════════╝")
     print(f"  Total FBs: {total}")
     print()
-    print(f"  By Status:")
+    print("  By Status:")
     for r in by_status:
         print(f"    {r['status']:15s} {r['cnt']:>6}")
     print()
-    print(f"  By Depth:")
+    print("  By Depth:")
     for r in by_depth:
         print(f"    {r['depth']:15s} {r['cnt']:>6}")
     print()
-    print(f"  Top Disciplines:")
+    print("  Top Disciplines:")
     for r in by_discipline:
         print(f"    {r['discipline']:30s} {r['cnt']:>6}")
 
@@ -112,10 +112,10 @@ def export_all(conn: sqlite3.Connection):
 
 def interactive(conn: sqlite3.Connection):
     """Simple interactive browser loop."""
-    print(f"\n╔══════════════════════════════════════════╗")
-    print(f"║   Maxwell OS v2.0 — FB Browser          ║")
-    print(f"╚══════════════════════════════════════════╝")
-    print(f"  Type 'help' for commands, 'quit' to exit.")
+    print("\n╔══════════════════════════════════════════╗")
+    print("║   Maxwell OS v2.0 — FB Browser          ║")
+    print("╚══════════════════════════════════════════╝")
+    print("  Type 'help' for commands, 'quit' to exit.")
     print()
 
     while True:
@@ -237,23 +237,23 @@ def _print_fb_full(fb: dict):
             domains = [domains]
     print(f"  Domains:     {', '.join(domains)}")
 
-    print(f"\n  ── DEFINITION ──")
+    print("\n  ── DEFINITION ──")
     print(f"  {fb.get('definition', 'N/A')}")
-    print(f"\n  ── APPLICATION ──")
+    print("\n  ── APPLICATION ──")
     print(f"  {fb.get('application', 'N/A')}")
-    print(f"\n  ── FAILURE MODE ──")
+    print("\n  ── FAILURE MODE ──")
     print(f"  {fb.get('failure_mode', 'N/A')}")
-    print(f"\n  ── ELABORATION ──")
+    print("\n  ── ELABORATION ──")
     print(f"  {fb.get('elaboration', 'N/A')}")
 
     if fb.get("keywords"):
-        print(f"\n  ── KEYWORDS ──")
+        print("\n  ── KEYWORDS ──")
         print(f"  {fb.get('keywords')}")
     if fb.get("jargon"):
-        print(f"\n  ── JARGON ──")
+        print("\n  ── JARGON ──")
         print(f"  {fb.get('jargon')}")
 
-    print(f"\n  ── STAMPS ──")
+    print("\n  ── STAMPS ──")
     print(f"  Schema: {fb.get('schema_version')} | "
           f"Model: {fb.get('gen_model')} | "
           f"Commit: {fb.get('pipeline_commit')}")

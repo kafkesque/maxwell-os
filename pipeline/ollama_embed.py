@@ -15,8 +15,10 @@ Usage:
 """
 
 # ── Type aliases (replaces chromadb imports) ──────────────────────────────
-from typing import List, Sequence
+from collections.abc import Sequence
+
 from pipeline.pipeline_paths import OLLAMA_HOST, OLLAMA_PORT
+
 OLLAMA_URL = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}/api/embed"  # BUG-028 FIX
 
 Documents = Sequence[str]
@@ -52,7 +54,6 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
     if model is None:
         from pipeline.pipeline_paths import EMBED_MODEL
         model = EMBED_MODEL
-    import time
 
     import requests
 
@@ -78,7 +79,7 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
                 missing = len(truncated) - len(batch_embs)
                 dim = len(batch_embs[0]) if batch_embs else 768
                 results.extend([[0.0] * dim] * missing)
-        except Exception as e:
+        except Exception:
             # Fall back to single-doc embedding for this batch
             import ollama
 
@@ -119,7 +120,7 @@ class OllamaEmbeddingFunction(EmbeddingFunction):
         import ollama
 
         result = []
-        for i, doc in enumerate(input):
+        for _i, doc in enumerate(input):
             if len(doc) > NOMIC_MAX_CHARS:
                 doc = doc[:NOMIC_MAX_CHARS]
             try:

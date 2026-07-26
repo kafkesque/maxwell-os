@@ -22,10 +22,9 @@ Usage:
     from pipeline.route import route_fb_folder, count_raw_labels
 """
 
-from pathlib import Path
-import json
 import csv
 from collections import Counter
+from pathlib import Path
 
 
 def route_fb_folder(fb: dict) -> str:

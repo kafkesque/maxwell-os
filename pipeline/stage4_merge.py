@@ -15,7 +15,7 @@ Process:
   5. Write checkpoint
 
 Generator: Qwen3.6-35B-A3B-4bit (OMLX)
-Classifier: Same model, SALSA probe (single-token restriction via prompt)
+Classifier: Phi-4-mini-instruct-8bit (OMLX) — R5: different family from generator (D2068: fixed on oMLX 0.5.3)
 temp: 0.0 (R7)
 
 Usage:
@@ -28,37 +28,41 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
+from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
+    CHECKPOINT_DIR,
+    GEN_MODEL,
+    MAX_DOMAINS_PER_FB,
+    S4_GE_OUTPUT,
+    S4_MAX_PRINCIPLES,
+    S4_PI_OUTPUT,
+    S4_PT_OUTPUT,
+    S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
     STAGE3_CHECKPOINT,
     STAGE4_CHECKPOINT,
-    CHECKPOINT_DIR,
-    GEN_MODEL,
     VERIFY_MODEL,  # P0.10: imported for R5-compliant SALSA classification
-    MAX_DOMAINS_PER_FB,
 )
-from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit, get_pipeline_run_id
-from pipeline.omlx_call import call_omlx_json, check_omlx_health
-from pipeline.io_guard import safe_write
 from pipeline.schemas import (
-    CANONICAL_DOMAINS,
     CANONICAL_DISCIPLINES,
-    is_valid_domain,
+    CANONICAL_DOMAINS,
     is_valid_discipline,
-    match_to_canonical,
+    is_valid_domain,
     match_domains_to_canonical,
+    match_to_canonical,
 )
+from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
-MAX_PRINCIPLES_PER_CLUSTER = 20  # Truncate large clusters for prompt
+MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
 
 # ── Prompt templates ───────────────────────────────────────────────────────
 
-FB_SYSTEM_PROMPT = """You are a Foundation Block generator. You synthesize multiple related principles 
+FB_SYSTEM_PROMPT = """You are a Foundation Block generator. You synthesize multiple related principles
 into a single, cohesive Foundation Block — a reusable concept that can be applied across contexts.
 
 A Foundation Block has these fields:
@@ -105,7 +109,7 @@ def build_fb_prompt(principles: list[dict]) -> str:
     lines = ["Synthesize these related principles into ONE Foundation Block.\n"]
     lines.append("PRINCIPLES TO MERGE:")
     for i, p in enumerate(principles, 1):
-        text = p["principle_text"][:500]
+        text = (p.get("definition") or p.get("principle_text", ""))[:500]
         lines.append(f"  {i}. {text}")
     lines.append("")
     lines.append("Return a JSON object:")
@@ -122,7 +126,7 @@ Rules:
 - Pick EXACTLY from the lists below. NO invented labels. No "emerging" unless absolutely unavoidable.
 - discipline: Pick ONE from the discipline list that best captures the FB's core domain.
 - domains: Pick 1-5 from the domain list. Only include domains the principle genuinely spans.
-- depth: "universal" (applies everywhere), "cross-domain" (2+ domains), 
+- depth: "universal" (applies everywhere), "cross-domain" (2+ domains),
          "domain" (specific to one domain), "specialized" (narrow sub-field)
 - evidence: "cited" (grounded in source text) or "axiomatic" (self-evident truth)
 
@@ -159,24 +163,48 @@ DISCIPLINES (pick ONE): {discipline_list}
 DOMAINS (pick 1-5): {domain_list}
 
 Return JSON:
-{{"discipline": "exact_discipline_label", 
-  "domains": ["domain1", "domain2"], 
-  "depth": "universal|cross-domain|domain|specialized", 
+{{"discipline": "exact_discipline_label",
+  "domains": ["domain1", "domain2"],
+  "depth": "universal|cross-domain|domain|specialized",
   "evidence": "cited|axiomatic"}}"""
 
 
 def load_stage3_clusters() -> list[dict]:
-    """Load clusters from Stage 3 checkpoint."""
+    """Load clusters from Stage 3 checkpoint, including noise-preserved singletons.
+
+    D2093/D2081 fix: Noise points written to cluster_noise.jsonl by Stage 3
+    are loaded alongside main clusters. Previously orphaned — written but never read.
+    """
+    clusters = []
+
+    # Main clusters
     if not STAGE3_CHECKPOINT.exists():
         print("❌ Stage 3 checkpoint not found. Run stage3_cluster.py first.")
         sys.exit(1)
 
-    clusters = []
     with open(STAGE3_CHECKPOINT) as f:
         for line in f:
             line = line.strip()
             if line:
                 clusters.append(json.loads(line))
+
+    # D2093/D2081: Load noise-preserved singletons
+    noise_path = STAGE3_CHECKPOINT.parent / "cluster_noise.jsonl"
+    if noise_path.exists():
+        noise_count = 0
+        with open(noise_path) as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    entry = json.loads(line)
+                    # Convert noise entry to cluster-like format for downstream processing
+                    entry["is_noise"] = True
+                    entry["is_convergent"] = False
+                    clusters.append(entry)
+                    noise_count += 1
+        if noise_count > 0:
+            print(f"   🔈 Loaded {noise_count} noise-preserved singletons from cluster_noise.jsonl")
+
     return clusters
 
 
@@ -192,7 +220,12 @@ def load_stage2_principles() -> dict[str, dict]:
             line = line.strip()
             if line:
                 p = json.loads(line)
-                principles[p["principle_id"]] = p
+                pid = p.get("principle_id", "")
+                fid = p.get("fb_id", "")
+                if pid:
+                    principles[pid] = p
+                if fid and fid != pid:
+                    principles[fid] = p
     return principles
 
 
@@ -234,7 +267,44 @@ def validate_classification(result: dict) -> tuple[bool, list[str]]:
     return len(errors) == 0, errors
 
 
-def _serialize_jargon(jargon_value) -> Optional[str]:
+def normalize_fb_name(name: str, max_words: int = 5) -> str:
+    """Normalize FB name: title case, word count enforcement, strip punctuation.
+
+    D2069: Ensures consistent, searchable, non-sentence-style names.
+    """
+    import re
+    name = name.strip().strip('"').strip("'")
+    # Remove trailing periods, colons
+    name = re.sub(r'[.:;]+$', '', name)
+    # Title case: capitalize first letter of each word, except articles/prepositions
+    minor_words = {'a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'and', 'or', 'but', 'nor', 'with', 'by'}
+    words = name.split()
+    if not words:
+        return name
+    normalized = []
+    for i, w in enumerate(words):
+        if i == 0 or i == len(words) - 1 or w.lower() not in minor_words:
+            normalized.append(w[0].upper() + w[1:].lower() if len(w) > 1 else w.upper())
+        else:
+            normalized.append(w.lower())
+    name = ' '.join(normalized)
+    # Word count enforcement: truncate if too long
+    if max_words and len(words) > max_words:
+        name = ' '.join(words[:max_words])
+        print(f"      ⚠️  Name truncated to {max_words} words: '{name}'")
+    return name
+
+
+def check_name_unique(name: str, existing_names: set[str]) -> bool:
+    """Check if FB name is unique against existing names in this batch.
+
+    D2069: Prevents cross-cluster name collisions within a single pipeline run.
+    Cross-run uniqueness is enforced at Stage 6 commit via DB unique constraint.
+    """
+    return name not in existing_names
+
+
+def _serialize_jargon(jargon_value) -> str | None:
     """Convert jargon (string or dict) to a string.
 
     LLM sometimes returns jargon as {"term": "explanation"} dict.
@@ -275,12 +345,18 @@ def run_stage4(cluster_ids: list[int] = None):
             sys.exit(1)
 
     print(f"🧩 Stage 4: Merge + Classify — {len(clusters)} clusters")
-    print(f"   Model: {GEN_MODEL} | temp=0.0 | SALSA classify")
+    print(f"   Model: {VERIFY_MODEL} | temp=0.0 | SALSA classify")
     print(f"{'='*60}")
 
     fbs = []
+    process_templates = []   # D2072: process templates (repeatable how-to methods)
+    process_instances = []   # D2072: concrete case studies
+    growth_edges = []        # D2073: speculative insights (pipeline-extracted)
+    tool_instructions = []   # D2072: tool-specific commands
     failed = 0
     classification_errors = 0
+    name_collisions = 0
+    existing_names: set[str] = set()  # D2069: batch-level uniqueness tracking
     pipeline_commit = get_pipeline_commit()
     pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
 
@@ -290,14 +366,29 @@ def run_stage4(cluster_ids: list[int] = None):
         print(f"  [{i}/{len(clusters)}] Cluster {cluster_id} "
               f"({len(principle_ids)} principles)", end=" ")
 
-        # Gather principles for this cluster
+        # Gather principles for this cluster, split by content_type (D2072)
         cluster_principles = []
         for pid in principle_ids:
             if pid in principles_idx:
-                cluster_principles.append(principles_idx[pid])
+                p = principles_idx[pid]
+                ct = p.get("content_type", "principle")
+                if ct == "process_template":
+                    process_templates.append(p)
+                elif ct == "process_instance":
+                    process_instances.append(p)
+                elif ct == "growth_edge":
+                    growth_edges.append(p)
+                elif ct == "tool_instruction":
+                    tool_instructions.append(p)
+                else:
+                    cluster_principles.append(p)
 
         if not cluster_principles:
-            print("→ ⚠️  No principles found, skipping")
+            skipped_types = []
+            if process_templates: skipped_types.append(f"{len(process_templates)} PTs")
+            if process_instances: skipped_types.append(f"{len(process_instances)} PIs")
+            if tool_instructions: skipped_types.append(f"{len(tool_instructions)} TIs")
+            print(f"→ ⏭️  Non-principle cluster ({', '.join(skipped_types) if skipped_types else 'empty'})")
             continue
 
         # Truncate if too many
@@ -321,7 +412,7 @@ def run_stage4(cluster_ids: list[int] = None):
             continue
 
         if not isinstance(fb_data, dict):
-            print(f"→ ⚠️  Non-dict response, skipping")
+            print("→ ⚠️  Non-dict response, skipping")
             failed += 1
             continue
 
@@ -341,7 +432,7 @@ def run_stage4(cluster_ids: list[int] = None):
             )
             class_data = call_omlx_json(
                 prompt=class_prompt,
-                model=GEN_MODEL,        # P0.10 REVERTED: Phi-4-mini returns empty on short prompts (Goose stress test: 44-389ms)
+                model=VERIFY_MODEL,     # D2068: Phi-4-mini fixed on oMLX 0.5.3 (R5 restore)
                 system=CLASSIFY_SYSTEM_PROMPT,
                 max_tokens=512,
             )
@@ -406,6 +497,25 @@ def run_stage4(cluster_ids: list[int] = None):
             if len(parts) >= 2:
                 s3_original_domain = parts[0]  # Top-level domain folder
 
+        # D2069: Name normalization + uniqueness
+        name = normalize_fb_name(name, max_words=5)
+        if not check_name_unique(name, existing_names):
+            name_collisions += 1
+            # Append cluster_id to disambiguate
+            name = f"{name} (Cluster {cluster_id})"
+            print(f"      ⚠️  Name collision, disambiguated: '{name}'")
+        existing_names.add(name)
+
+        # D2069: Embed source principle texts for fast Stage 5 verification.
+        # Eliminates the 3-checkpoint lookup chain (Stage5→Stage3→Stage2).
+        source_principles_embedded = []
+        for p in cluster_principles:
+            source_principles_embedded.append({
+                "principle_id": p.get("principle_id", ""),
+                "principle_text": (p.get("definition") or p.get("principle_text", ""))[:500],
+                "source_segment_id": p.get("source_segments", [""])[0] if p.get("source_segments") else "",
+            })
+
         # Build FB record
         fb = {
             "fb_id": make_hash_id(name, definition),
@@ -424,6 +534,7 @@ def run_stage4(cluster_ids: list[int] = None):
             "evidence": class_data["evidence"],
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
+            "source_principles": source_principles_embedded,
             "s3_original_domain": s3_original_domain,
             "classification_method": "SALSA",
             "classification_errors": errors,
@@ -437,25 +548,95 @@ def run_stage4(cluster_ids: list[int] = None):
         err_str = f" ({len(errors)} label errors)" if errors else ""
         print(f"→ ✅ '{name}'{err_str} ({elapsed:.1f}s)")
 
-    # Write checkpoint
+    # Write FB checkpoint
     safe_write(
         STAGE4_CHECKPOINT,
         "\n".join(json.dumps(f, ensure_ascii=False) for f in fbs) + "\n",
     )
 
+    # ── D2073: Save growth edges separately ───────────────────────────
+    ge_path = STAGE4_CHECKPOINT.parent / S4_GE_OUTPUT
+    if growth_edges:
+        seen_ge: set[str] = set()
+        deduped_ge = []
+        for ge in growth_edges:
+            if ge["principle_id"] not in seen_ge:
+                seen_ge.add(ge["principle_id"])
+                deduped_ge.append(ge)
+        safe_write(
+            ge_path,
+            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ge) + "\n",
+        )
+
+    # ── D2072: Save process templates separately ──────────────────────
+    pt_path = STAGE4_CHECKPOINT.parent / S4_PT_OUTPUT
+    if process_templates:
+        seen_pt: set[str] = set()
+        deduped_pt = []
+        for pt in process_templates:
+            if pt["principle_id"] not in seen_pt:
+                seen_pt.add(pt["principle_id"])
+                deduped_pt.append(pt)
+        safe_write(
+            pt_path,
+            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pt) + "\n",
+        )
+
+    # ── D2072: Save process instances separately ──────────────────────
+    pi_path = STAGE4_CHECKPOINT.parent / S4_PI_OUTPUT
+    if process_instances:
+        seen_pi: set[str] = set()
+        deduped_pi = []
+        for pi in process_instances:
+            if pi["principle_id"] not in seen_pi:
+                seen_pi.add(pi["principle_id"])
+                deduped_pi.append(pi)
+        safe_write(
+            pi_path,
+            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pi) + "\n",
+        )
+
+    # ── D2072: Save tool instructions separately ──────────────────────
+    ti_path = STAGE4_CHECKPOINT.parent / S4_TI_OUTPUT
+    if tool_instructions:
+        seen_ti: set[str] = set()
+        deduped_ti = []
+        for ti in tool_instructions:
+            if ti["principle_id"] not in seen_ti:
+                seen_ti.add(ti["principle_id"])
+                deduped_ti.append(ti)
+        safe_write(
+            ti_path,
+            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ti) + "\n",
+        )
+
     # Summary
     print(f"\n{'='*60}")
-    print(f"✅ FBs generated:        {len(fbs)}")
-    print(f"❌ Failed clusters:      {failed}")
-    print(f"🏷️  Classification errors: {classification_errors}")
+    print(f"✅ FBs generated:            {len(fbs)}")
+    print(f"🔧 Process templates:        {len(process_templates)} (→ {S4_PT_OUTPUT})")
+    print(f"📖 Process instances:        {len(process_instances)} (→ {S4_PI_OUTPUT})")
+    print(f"🌱 Growth edges:             {len(growth_edges)} (→ {S4_GE_OUTPUT})")
+    print(f"🛠️  Tool instructions:        {len(tool_instructions)} (→ {S4_TI_OUTPUT})")
+    print(f"❌ Failed clusters:          {failed}")
+    print(f"🏷️  Classification errors:     {classification_errors}")
+    if name_collisions:
+        print(f"🔤 Name collisions:          {name_collisions} (auto-disambiguated)")
     if fbs:
         depths = {}
         for fb in fbs:
             d = fb["depth"]
             depths[d] = depths.get(d, 0) + 1
-        print(f"📊 Depths:               {depths}")
-        print(f"📊 Avg domains/FB:       {sum(len(fb['domains']) for fb in fbs) / len(fbs):.1f}")
-    print(f"📋 Checkpoint:            {STAGE4_CHECKPOINT}")
+        print(f"📊 Depths:                   {depths}")
+        print(f"📊 Avg domains/FB:           {sum(len(fb['domains']) for fb in fbs) / len(fbs):.1f}")
+    print(f"📋 FB Checkpoint:            {STAGE4_CHECKPOINT}")
+    if process_templates:
+        print(f"📋 PT Checkpoint:            {pt_path}")
+    if process_instances:
+        print(f"📋 PI Checkpoint:            {pi_path}")
+    if growth_edges:
+        print(f"📋 GE Checkpoint:            {ge_path}")
+    if tool_instructions:
+        print(f"📋 TI Checkpoint:            {ti_path}")
 
 
 def main():

@@ -30,8 +30,8 @@ LAYER 2   ORCHESTRATION   FB → PT → PI → Recipe → Trust Ledger
 LAYER 1   KNOWLEDGE       SQLite + Parquet + FTS5 + hybrid search + fb_relationships
   (in progress)             ↑ "Queryable, classified, traced, reliability-scored."
 
-LAYER 0   PIPELINE        6-stage extraction: books → principles → FBs → SQLite
-  (built)                   ↑ "Proven. Hardened. Property logic complete."
+LAYER 0   PIPELINE        7-stage extraction: books → principles → FBs → SQLite
+  (built)                   ↑ "Phase 0 complete. Proven. Hardened. Property logic complete."
 ```
 
 ## THE ONE THING THAT MATTERS RIGHT NOW
@@ -40,6 +40,54 @@ LAYER 0   PIPELINE        6-stage extraction: books → principles → FBs → S
 > 0 lines of orchestration code turn FBs into skills.
 > The bridge from knowledge to action IS the product.
 > **Build the bridge.**
+
+
+
+---
+
+## MAXWELL OS PHILOSOPHY — Infrastructure Independence (Ratified 2026-07-22)
+
+### Core Principle: Every Component is Swappable
+
+Maxwell OS is a **sovereign knowledge operating system** designed to survive any vendor, any model deprecation, any OS change. The architecture is built on one rule: **every infrastructure component must be replaceable without touching pipeline logic.**
+
+### The Swappable Layers
+
+| Layer | Default | Swappable To | Protocol |
+|-------|---------|-------------|----------|
+| **Inference** | OMLX (local MLX) | Ollama, vLLM, llama.cpp, OpenAI API, Anthropic API | InferenceProvider |
+| **Embeddings** | Ollama bge-m3 | sentence-transformers, OpenAI embeddings | EmbeddingProvider |
+| **Storage** | SQLite + FTS5 + sqlite-vec | PostgreSQL, LanceDB, JSON files | StorageBackend |
+| **Memory** | psutil (cross-platform) | vm_stat (macOS), cgroups (Linux) | MemoryMonitor |
+| **Process** | psutil (cross-platform) | systemd, launchd | ProcessManager |
+| **Agent Interface** | MCP (stdio) | REST API, gRPC | Open protocols |
+| **Sync** | None (local-only) | Syncthing, rsync, iCloud | SyncProvider |
+| **Distribution** | pipx / pyproject.toml | Docker, Homebrew, PyInstaller | Standard packaging |
+
+### Sovereignty is Non-Negotiable
+
+Local-first, always. The user owns their data, their models, their knowledge base. Frontier API access is an **explicit opt-in** — never a default, never hidden. Verification (C8/R5) is always local.
+
+### Hybrid Option
+
+allow_api: true in config enables frontier models for non-verification roles. verify_always_local: true is constitutional (C22) and cannot be overridden.
+
+### Future-Proof by Design
+
+- **No vendor lock-in.** Every provider has a documented replacement path.
+- **No model dependency.** Swap Qwen to Llama to Mistral by changing one config line.
+- **No OS dependency.** psutil + pathlib throughout. macOS today, Linux tomorrow, Windows eventually.
+- **No silent breakage.** Dependency updates tested against golden set before adoption.
+- **No dead ends.** Every architectural decision preserves a migration path. Protocols first, implementations follow.
+
+### Lightweight is the Default
+
+Streamlined by design. Every feature starts behind a feature flag. Quality tiers (balanced | maximum | minimum) let the user choose their tradeoff. Bloat is always opt-in.
+
+### Hardware-Adaptive
+
+Minimum target: 16GB RAM, any modern CPU. Auto-detects available resources and selects appropriate model quant. Degrades gracefully — never crashes with OOM.
+
 
 ## PHASE 0: ALPHA KIT (NOW)
 

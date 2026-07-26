@@ -1,0 +1,880 @@
+# Maxwell OS — Decision Registry
+# ================================
+# Authority: governance/decision_lifecycle.yaml §expansion_policy
+# Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
+# Last manual edit: 2026-07-26
+#
+# This file tracks the STATE of each decision from DECISION-LOG.md.
+# DECISION-LOG.md is the source of truth for decision CONTENT.
+# This file is the operational registry for tooling.
+#
+version: '1.0'
+ratified: '2026-07-26'
+last_sync: '2026-07-26T13:35:44Z'
+total_decisions: 117
+decisions:
+- id: D2092
+  category: INF
+  state: ACTIVE
+  description: 'Diagnosis: pipeline has extract-before-cluster architecture (root cause of summarization)'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2093
+  category: QLT
+  state: ACTIVE
+  description: 'Fail-closed verification: any check failure → QUARANTINE, never silent PASS'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage5_verify.py
+  created: '2026-07-25'
+- id: D2094
+  category: INF
+  state: ACTIVE
+  description: 'Cluster-before-extract architecture: FAISS on raw segments → convergent LLM extraction'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  - pipeline/stage2_extract.py
+  created: '2026-07-25'
+- id: D2095
+  category: QLT
+  state: ACTIVE
+  description: 'Convergent extraction schema: name, definition, mechanism, boundary, consequence, is_summary, evidence_passages'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage2_extract.py
+  created: '2026-07-25'
+- id: D2096
+  category: INF
+  state: ACTIVE
+  description: FAISS IndexFlatIP cosine clustering (ported from old project)
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  created: '2026-07-25'
+- id: D2097
+  category: INF
+  state: ACTIVE
+  description: 'Source diversity filter: ≥2 distinct books for convergent clusters'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  created: '2026-07-25'
+- id: D2098
+  category: GOV
+  state: ACTIVE
+  description: 'Cross-examination: Claude review 85% accurate, highest-leverage bug identifications'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2099
+  category: GOV
+  state: ACTIVE
+  description: 'Cross-examination: Kimi review has 4 critical errors, 1 correct recommendation'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2100
+  category: INF
+  state: SUPERSEDED
+  description: Proposed stage2_cluster.py has min_dist=0.0 bug — rejected
+  champion: 2026-07-25 session
+  target_files: []
+  superseded_by: D2094
+  created: '2026-07-25'
+- id: D2101
+  category: RES
+  state: ACTIVE
+  description: 'Gold standard reference: old project S1.5 FAISS + S3A + S6 DeBERTa NLI'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2102
+  category: GOV
+  state: ACTIVE
+  description: '5 improvement propositions: strategic ranking by impact'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2103
+  category: QLT
+  state: ACTIVE
+  description: Golden set strength + calibration gap identified
+  champion: 2026-07-25 session
+  target_files:
+  - config/golden/stage2_fewshot.yaml
+  created: '2026-07-25'
+- id: D2104
+  category: QLT
+  state: ACTIVE
+  description: 'D2085 supersession: DeBERTa NLI restored for cluster-before-extract context'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage5_verify.py
+  supersedes: D2085
+  created: '2026-07-25'
+- id: D2105
+  category: DAT
+  state: ACTIVE
+  description: 'YAML duplicate key fix: Qwen3-Embedding dead code removed'
+  champion: 2026-07-25 session
+  target_files:
+  - config/pipeline_config.yaml
+  created: '2026-07-25'
+- id: D2106
+  category: DEF
+  state: ACTIVE
+  description: D2032 (Multi-Label vs Dichotomous) CONFIRMED UNRESOLVED — deferred
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2107
+  category: GOV
+  state: ACTIVE
+  description: 'Tier 1 session: 6/18 done, 12 deferred (BUG-040 blocked delegation)'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2108
+  category: INF
+  state: ACTIVE
+  description: 'Cluster collapse fix: UMAP n_components 50→5 + allow_single_cluster=false + min_cluster_size 8→15'
+  champion: 2026-07-25 session
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/stage3_cluster.py
+  created: '2026-07-25'
+- id: D2109
+  category: INF
+  state: ACTIVE
+  description: 'Vibecheck system: ruff + format via justfile'
+  champion: 2026-07-25 session
+  target_files:
+  - justfile
+  created: '2026-07-25'
+- id: D2110
+  category: QLT
+  state: ACTIVE
+  description: 'Convergent extraction rewrite: stage2_extract.py v3.0 (639 LOC)'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage2_extract.py
+  created: '2026-07-25'
+- id: D2111
+  category: QLT
+  state: ACTIVE
+  description: Stage 5 DeBERTa NLI port + embedding similarity removed
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage5_verify.py
+  created: '2026-07-25'
+- id: D2112
+  category: GOV
+  state: ACTIVE
+  description: 'Tier 1 completion: 15/18 done'
+  champion: 2026-07-25 session
+  target_files: []
+  created: '2026-07-25'
+- id: D2113
+  category: VAL
+  state: ACTIVE
+  description: 'E2E pipeline validation: v3.0 architecture confirmed working (3 books, 237 chunks, 7 FBs)'
+  champion: 2026-07-25 session
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  - pipeline/stage2_extract.py
+  - pipeline/stage5_verify.py
+  created: '2026-07-25'
+- id: D2114
+  category: INF
+  state: ACTIVE
+  description: 'Source book metadata extraction: LLM-based author/title from MD preambles'
+  champion: 2026-07-26 session
+  target_files:
+  - pipeline/stage0_5_extract_metadata.py
+  created: '2026-07-26'
+- id: D1051
+  category: INF
+  state: ACTIVE
+  description: '3. DB analysis: `domain_dir` values match `s3_original_domain` (formatting difference only — spaces vs underscores).
+    No cross-domain leaks.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D1057
+  category: INF
+  state: ACTIVE
+  description: '- D1058: Jargon decontamination'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D1058
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2000
+  category: INF
+  state: ARCHIVED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2001
+  category: INF
+  state: ARCHIVED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2002
+  category: INF
+  state: ARCHIVED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2003
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2004
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2005
+  category: INF
+  state: REJECTED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2006
+  category: DAT
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2007
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2008
+  category: INF
+  state: REJECTED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2009
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2010
+  category: QLT
+  state: REJECTED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2011
+  category: QLT
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2012
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2013
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2014
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2015
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2016
+  category: CLS
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2017
+  category: CLS
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2018
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2019
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2020
+  category: INF
+  state: ACTIVE
+  description: '| B | Single-domain bias (only pricing tested) | D2053-B (run brand strategy domain after Phase 0) |'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2021
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2022
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2023
+  category: INF
+  state: ACTIVE
+  description: '| F | Cross-domain validation missing | D2021 (stratified 3-domain comparison protocol) |'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2024
+  category: CLS
+  state: ACTIVE
+  description: '- **Option B:** Revert to D316 (multi-label). Replace SALSA with multi-label classifier. ~40 LOC change in
+    stage4_merge.py.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2025
+  category: INF
+  state: ACTIVE
+  description: '| E | DeBERTa weak on causal/statistical claims | D2023 (claim-type routing: FACT→DeBERTa, CAUSAL→Phi-4-mini,
+    STATISTICAL→source check) |'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2026
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2027
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2028
+  category: INF
+  state: REJECTED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2029
+  category: CLS
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2030
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2031
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2032
+  category: INF
+  state: DEFERRED
+  description: '**Category:** CLS'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2033
+  category: CLS
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2034
+  category: INF
+  state: ARCHIVED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2035
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2036
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2037
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2038
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2039
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2040
+  category: INF
+  state: ACTIVE
+  description: '- Before embedding, prepend book title + chapter context to each chunk'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2041
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2042
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2043
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2044
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2045
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2046
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2047
+  category: GOV
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2048
+  category: DAT
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2049
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2050
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2051
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2052
+  category: INF
+  state: ARCHIVED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2053
+  category: INF
+  state: ACTIVE
+  description: '| C | Author-weighted BORP | D2053-C (~30 LOC, Phase 1) |'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2054
+  category: CLS
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2055
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2056
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2057
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2058
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2059
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2060
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2061
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2062
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2063
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2064
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2065
+  category: INF
+  state: DEFERRED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2066
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2067
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2068
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2069
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2070
+  category: INF
+  state: SUPERSEDED
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2071
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2072
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2074
+  category: INF
+  state: REJECTED
+  description: '**Acceptance threshold:** ≥80% of extracted principles contain detected causal language AND pass NLI entailment.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2080
+  category: INF
+  state: SUPERSEDED
+  description: '**Context:** Cross-examination of Kimi, Qwen, and DeepSeek reviews confirmed root cause of summarizer behavior:
+    the LLM receives prose extraction criteria but no forced binary decision token.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2081
+  category: INF
+  state: ACTIVE
+  description: '**Context:** Three verified bugs: (1) UMAP min_dist=0.0 collapses clusters, (2) noise points silently discarded
+    via `continue`, (3) centroid uses raw dot product inappropriate for cosine space.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2082
+  category: INF
+  state: ACTIVE
+  description: '**Context:** S4 already routes PT/PI/GE/TI to separate files. But paths were hardcoded strings and MAX_PRINCIPLES_PER_CLUSTER
+    was hardcoded 20. Verified: process_templates ARE being written (no bug —'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2083
+  category: INF
+  state: ACTIVE
+  description: '**Context:** BORP requires distinct_sources ≥ 2 but PT/PI/GE/TI are valid as single-source content. The pipeline
+    already routes them around FB generation in S4, but if any reach S5, they should bypass'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2084
+  category: INF
+  state: DEFERRED
+  description: '**Context:** PI/TI/GE/PT are written to jsonl files in S4 but never committed to the database. Not searchable.
+    Not in sqlite-vec index.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2085
+  category: INF
+  state: SUPERSEDED
+  description: '**Context:** Both tools were proposed across multiple review rounds but consistently rejected by cross-examination.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2086
+  category: INF
+  state: ACTIVE
+  description: '**Context:** Config has BORP_MIN_SOURCES=2. User conversation summary mentioned "BORP ≥ 3". Potential discrepancy.'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2087
+  category: INF
+  state: SUPERSEDED
+  description: '**Category:** GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2088
+  category: INF
+  state: ACTIVE
+  description: '**Category:** CLS'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2089
+  category: INF
+  state: ACTIVE
+  description: '**Category:** CLS'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2090
+  category: INF
+  state: ACTIVE
+  description: '**Category:** QLT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2091
+  category: INF
+  state: SUPERSEDED
+  description: '**Category:** GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2115
+  category: INF
+  state: ACTIVE
+  description: '- CONSTITUTION §2 NLI model reference fixed'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2116
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2117
+  category: QLT
+  state: ACTIVE
+  description: '- CONSTITUTION §2 NLI model reference fixed'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2118
+  category: RES
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2119
+  category: RES
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+summary:
+  total: 117
+  proposed: 0
+  draft: 0
+  active: 88
+  stale: 0
+  superseded: 6
+  archived: 5
+  rejected: 5
+  by_category:
+    INF: 88
+    QLT: 9
+    GOV: 6
+    RES: 3
+    DAT: 3
+    DEF: 1
+    VAL: 1
+    CLS: 6

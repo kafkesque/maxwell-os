@@ -1,0 +1,18 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["knowledge pipeline/", "backup/", "agent/archive/", "external/"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+exclude = "(knowledge pipeline/|backup/|agent/archive/|external/)"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 """
-omlx_watchdog.py — OMLX SERVER memory watchdog (M2 / D2027)
-=============================================================
+omlx_watchdog.py — OMLX SERVER memory watchdog (M2 / D2027 + BUG-017 mitigation)
+=================================================================================
 The existing 3-layer defense (memory_guard.py, justfile stress test,
 --memory-guard aggressive) only protects the Python PROCESS.
 
 This watchdog monitors the OMLX SERVER process for wired memory
-growth (GitHub #2184). When RSS exceeds threshold, it restarts
-the OMLX server gracefully.
+growth (GitHub #2184, BUG-017). When RSS exceeds threshold or grows
+abnormally, it restarts the OMLX server gracefully.
+
+BUG-017 mitigation (D2115): Progressive threshold + trend detection.
+If RSS grows >2GB since last check, triggers restart even if below
+absolute threshold. Prevents unbounded wired memory leak on sustained runs.
 
 Usage:
     python3 pipeline/omlx_watchdog.py              # one-shot check
     python3 pipeline/omlx_watchdog.py --daemon 60  # poll every 60s
     python3 pipeline/omlx_watchdog.py --pre-stage  # check before pipeline stage
+    python3 pipeline/omlx_watchdog.py --reset      # reset trend tracking
 """
 
 import argparse
+import json
 import os
 import signal
 import subprocess
@@ -24,11 +30,13 @@ import time
 from pathlib import Path
 
 # ── Config (env overridable) ──────────────────────────────────────────
-OMLX_BIN = os.environ.get("OMLX_BIN", "/opt/homebrew/opt/omlx/bin/omlx")
+OMLX_BIN = os.environ.get("OMLX_BIN", "/Applications/oMLX.app/Contents/MacOS/omlx-cli")
 OMLX_PORT = int(os.environ.get("OMLX_PORT", "11435"))
-RSS_THRESHOLD_GB = float(os.environ.get("OMLX_WATCHDOG_RSS_GB", "12.0"))  # restart when RSS > 12GB
+RSS_THRESHOLD_GB = float(os.environ.get("OMLX_WATCHDOG_RSS_GB", "20.0"))  # D2115: 20GB for 35B model
+RSS_TREND_THRESHOLD_GB = float(os.environ.get("OMLX_WATCHDOG_TREND_GB", "2.0"))  # BUG-017: restart if grew >2GB
 RESTART_WAIT_SECS = int(os.environ.get("OMLX_WATCHDOG_RESTART_WAIT", "30"))
 LOG_FILE = Path(os.environ.get("OMLX_WATCHDOG_LOG", "pipeline/omlx_watchdog.log"))
+STATE_FILE = Path(os.environ.get("OMLX_WATCHDOG_STATE", "pipeline/.omlx_watchdog_state.json"))
 
 
 def get_omlx_pid() -> int | None:
@@ -109,14 +117,38 @@ def start_omlx() -> bool:
         return False
 
 
+def _load_state() -> dict:
+    """Load watchdog state (previous RSS for trend detection)."""
+    if STATE_FILE.exists():
+        try:
+            return json.loads(STATE_FILE.read_text())
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {"last_rss_gb": 0.0, "restart_count": 0, "last_restart_at": None}
+
+def _save_state(state: dict) -> None:
+    """Save watchdog state atomically."""
+    tmp = STATE_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, indent=2))
+    tmp.replace(STATE_FILE)
+
+def _reset_state() -> None:
+    """Reset trend tracking state (after manual OMLX restart)."""
+    STATE_FILE.unlink(missing_ok=True)
+    log("Watchdog state reset")
+
 def check_and_restart() -> int:
     """
-    Check OMLX server RSS. Restart if over threshold.
+    Check OMLX server RSS. Restart if over threshold or growing too fast.
+    BUG-017 mitigation: progressive trend detection catches memory leak
+    before it hits the absolute threshold.
+
     Returns: 0=OK, 1=restarted, 2=error
     """
     pid = get_omlx_pid()
     if pid is None:
         log("OMLX server not running. Attempting start...")
+        _reset_state()
         if start_omlx():
             log(f"Waiting {RESTART_WAIT_SECS}s for OMLX to initialize...")
             time.sleep(RESTART_WAIT_SECS)
@@ -128,17 +160,40 @@ def check_and_restart() -> int:
         log(f"Could not read RSS for PID {pid}")
         return 2
 
-    if rss_gb > RSS_THRESHOLD_GB:
-        log(f"WARNING: OMLX RSS {rss_gb:.1f}GB exceeds threshold {RSS_THRESHOLD_GB}GB. Restarting...")
+    state = _load_state()
+    prev_rss = state.get("last_rss_gb", 0.0)
+    rss_delta = rss_gb - prev_rss if prev_rss > 0 else 0.0
+
+    should_restart = False
+    reason = ""
+
+    # BUG-017: Trend detection — catch progressive memory leak
+    if rss_delta > RSS_TREND_THRESHOLD_GB:
+        should_restart = True
+        reason = f"RSS grew {rss_delta:.1f}GB since last check (trend threshold {RSS_TREND_THRESHOLD_GB}GB)"
+    # Absolute threshold
+    elif rss_gb > RSS_THRESHOLD_GB:
+        should_restart = True
+        reason = f"RSS {rss_gb:.1f}GB exceeds absolute threshold {RSS_THRESHOLD_GB}GB"
+
+    if should_restart:
+        log(f"WARNING: {reason}. Restarting OMLX...")
         kill_omlx(pid)
         time.sleep(3)
         if start_omlx():
+            state["restart_count"] = state.get("restart_count", 0) + 1
+            state["last_restart_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+            state["last_rss_gb"] = 0.0  # Reset trend after restart
+            _save_state(state)
             log(f"Waiting {RESTART_WAIT_SECS}s for OMLX to initialize...")
             time.sleep(RESTART_WAIT_SECS)
             return 1
         return 2
 
-    log(f"OMLX OK: RSS {rss_gb:.1f}GB (threshold {RSS_THRESHOLD_GB}GB)")
+    # Update trend tracking
+    state["last_rss_gb"] = rss_gb
+    _save_state(state)
+    log(f"OMLX OK: RSS {rss_gb:.1f}GB (delta +{rss_delta:.1f}GB, threshold {RSS_THRESHOLD_GB}GB, restarts: {state.get('restart_count', 0)})")
     return 0
 
 
@@ -167,10 +222,15 @@ def main():
                         help="Check before pipeline stage (exit 1 if restart needed)")
     parser.add_argument("--pid", type=int, default=0,
                         help="Check specific PID instead of auto-detecting")
+    parser.add_argument("--reset", action="store_true",
+                        help="Reset trend tracking state (after manual OMLX restart)")
 
     args = parser.parse_args()
 
-    if args.daemon:
+    if args.reset:
+        _reset_state()
+        sys.exit(0)
+    elif args.daemon:
         daemon_mode(args.daemon)
     elif args.pid:
         rss = get_rss_gb(args.pid)

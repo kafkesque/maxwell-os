@@ -1,0 +1,19 @@
+{
+  "scanned": 19733,
+  "specialized_fixed_during_option_c": 0,
+  "universal_checked": 590,
+  "universal_ok": 583,
+  "universal_maybe_cross": 7,
+  "cross_domain_checked": 3593,
+  "cross_domain_ok": 2964,
+  "cross_domain_maybe_domain": 629,
+  "domain_checked": 13020,
+  "domain_ok": 13020,
+  "domain_maybe_cross": 0,
+  "single_domain_identified": 8888,
+  "single_domain_fixed": 7786,
+  "single_domain_flagged": 7958,
+  "multi_domain_before": 10814,
+  "multi_domain_after": 18600,
+  "errors": []
+}

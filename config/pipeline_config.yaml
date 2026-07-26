@@ -14,13 +14,15 @@ run:
 
 # ── Stage folders (self-contained: output + ckpt + log + meta per run) ──
 stages:
-  stage0_convert:   knowledge pipeline/stage0_convert     # EPUB/PDF → MD
-  stage1_chunk:     knowledge pipeline/stage1_chunk       # MD → chunks
-  stage2_extract:   knowledge pipeline/stage2_extract     # Chunks → principles  
-  stage3_cluster:   knowledge pipeline/stage3_cluster     # Principles → clusters
-  stage4_merge:     knowledge pipeline/stage4_merge       # Clusters → FBs
-  stage5_verify:    knowledge pipeline/stage5_verify      # FBs → verified
-  stage6_commit:    knowledge pipeline/stage6_commit      # Verified → DB
+  stage0_convert:       knowledge pipeline/stage0_convert          # EPUB/PDF → MD
+  stage1_chunk:         knowledge pipeline/stage1_chunk            # MD → chunks
+  stage1_3_prefilter:   knowledge pipeline/stage1_3_prefilter      # Regex pre-filter
+  stage1_5_embed:       knowledge pipeline/stage1_5_embed_cluster  # Embed + FAISS cluster ← D2094 NEW
+  stage2_extract:       knowledge pipeline/stage2_extract          # Clusters → convergent FBs ← D2094 REWRITE
+  stage3_cluster:       knowledge pipeline/stage3_cluster          # Semantic dedup (D2094: simplified, was principle clustering)
+  stage4_merge:         knowledge pipeline/stage4_merge            # SALSA classify + dedup ← D2094: simplified from merge
+  stage5_verify:        knowledge pipeline/stage5_verify           # FBs → verified (D2093: fail-closed + DeBERTa NLI)
+  stage6_commit:        knowledge pipeline/stage6_commit           # Verified → DB
 
 # ── Output filenames within each stage/{run_id}/ ────────────────────────
 stage_files:
@@ -37,6 +39,13 @@ stage_files:
   checkpoint: checkpoint.jsonl   # Resume support (per stage, per run)
   log: pipeline.log              # Stage log (per run)
   meta: run_meta.yaml            # Config snapshot (per run)
+
+# ── Paths (D2115: de-hardcoded from pipeline_paths.py — C12 compliance) ──
+paths:
+  checkpoint_dir: knowledge pipeline/checkpoints   # flat checkpoint dir (stages 0-4)
+  db_path: knowledge pipeline/maxwell.db           # canonical DB (stage6, query, retrieve)
+  parquet_dir: knowledge pipeline/parquet           # Parquet snapshots (stage6 --export-only)
+  data_dir: knowledge pipeline                      # data directory (stage6 DB path)
 
 # ── Source books ───────────────────────────────────────────────────────
 books_dir: knowledge pipeline/books  # books/{domain}/{discipline}/book.epub
@@ -55,12 +64,12 @@ services:
     port: 11435
     api_key: sk-maxwell-local
     min_version: "0.4.0"
-    bin: /opt/homebrew/opt/omlx/bin/omlx
+    bin: /Applications/oMLX.app/Contents/MacOS/omlx-cli
 
 # ── Models ─────────────────────────────────────────────────────────────
 models:
   generator:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    model: Qwen3.6-35B-A3B-4bit
     provider: omlx
     temperature: 0.0
     max_tokens: 4096
@@ -68,21 +77,86 @@ models:
     model: Phi-4-mini-instruct-8bit
     provider: omlx
     temperature: 0.0
+  verifier_v2:
+    model: gemma-4-E4B-it-MLX-4bit
+    provider: omlx
+    temperature: 0.0
+    notes: "D2069: Cross-family verifier (Gemma ≠ Phi classifier ≠ Qwen generator). R5 fully satisfied."
   embeddings:
     model: bge-m3
     provider: ollama
+    alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ  # 0.4GB, 64.34 MTEB (D2105: was dead YAML dup key)
 
 # ── Pipeline settings ──────────────────────────────────────────────────
 pipeline:
-  schema_version: "2.1"
-  commit: v2.1-Phase0
+  schema_version: "2.2"
+  commit: v2.2-GateFix
   taxonomy_version: v5.0
   max_domains_per_fb: 5
   chunk_size_words: 300
   chunk_overlap_words: 50
-  min_cluster_size: 3
-  min_samples: 2
-  hdbscan_min_cluster_size: 8
+  hdbscan_min_cluster_size: 15    # D2108: was 8 — too permissive at 2,697 principle scale
   borp_min_sources: 2
   intent_top_k_ratio: 0.30
   intent_threshold: 0.35
+  smoke_book_limit: 3             # BUG-051: Max books when MAXWELL_RUN_ID=smoke
+
+# ── Stage 1.5: Embed + FAISS Cluster (D2094) ──────────────────────────
+stage1_5:
+  faiss_threshold: 0.75            # Cosine similarity for cluster membership
+  min_cluster_size: 2              # Minimum members per cluster
+  max_cluster_size: 500            # Max before k-means split
+  min_source_diversity: 2          # ≥2 distinct books for convergent flag
+  neighbor_k: 150                  # FAISS nearest neighbors to search
+  embed_model: bge-m3              # Embedding model (Ollama)
+
+# ── Stage 1.3: Regex Pre-Filter (D2080) ─────────────────────────────────
+stage1_3:
+  min_len: 40                      # Drop segments shorter than this
+  cite_density: 0.6                # Drop if >60% of lines are citations
+  enabled: true                    # Set false to skip pre-filter
+
+# ── Stage 2: Extraction (D2080: Gate-Fix + Evidence + Routing) ──────────
+stage2:
+  batch_size: 10                  # Segments per LLM call
+  minhash_threshold: 0.90         # Jaccard similarity for near-dedup
+  minhash_num_perm: 128           # MinHash permutations
+  golden_path: config/golden/stage2_fewshot.yaml
+  golden_positive: 6              # Positive examples per batch (parity)
+  golden_negative: 6              # Negative examples per batch (parity)
+  golden_max_examples: 12         # Max total golden examples injected
+  gate_enabled: true              # D2080: Force binary gate (YES/NO)
+  gate_strict: true               # If true, gate=NO + principles → force []
+  evidence_tracking: true         # D2080: cited vs axiomatic evidence
+  source_book_match: exact        # "exact" or "prefix" (exact = safer)
+  omlx_retry_attempts: 1          # Retry on OMLX parse failure (was: 0/silent skip)
+  batch_position_monitor: false   # D2080: Track gate=YES rate by position
+
+# ── Stage 3: Clustering (D2081: Bug fixes) ──────────────────────────────
+stage3:
+  umap_n_neighbors: 15
+  umap_n_components: 5             # D2108: Was 50 — too many dims dilute structure, cause mega-clusters
+  umap_min_dist: 0.1              # D2081: Was 0.0 (cluster collapse bug)
+  umap_metric: cosine
+  hdbscan_allow_single_cluster: false  # D2108: false = force meaningful clusters, no mega-blob
+  keep_noise: true                # D2081: Preserve noise as singletons (was: discard)
+  noise_output: cluster_noise.jsonl
+  normalize_centroid: true        # D2081: Normalize for cosine space (was: raw)
+
+# ── Stage 4: Merge (D2082: Type-aware routing) ──────────────────────────
+stage4:
+  process_template_output: process_templates.jsonl
+  process_instance_output: process_instances.jsonl
+  growth_edge_output: growth_edges.jsonl
+  tool_instruction_output: tool_instructions.jsonl
+  max_principles_per_cluster: 25
+
+# ── Stage 5: Verification (D2083: Type-aware BORP) ──────────────────────
+stage5:
+  borp_bypass_types: [process_template, process_instance, growth_edge, tool_instruction]
+  factscore_enabled: false         # P2: FActScore verification (expensive)
+  deberta_nli_enabled: false       # P3: NLI ensemble (bloat tax)
+
+# ── Stage 6: Commit ─────────────────────────────────────────────────────
+stage6:
+  commit_non_fb_types: false       # D2084: PI/TI/GE/PT → DB (deferred to v3.0)

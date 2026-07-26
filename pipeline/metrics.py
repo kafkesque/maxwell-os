@@ -7,25 +7,24 @@ No heavy framework. Just structured data for debugging and calibration.
 import json
 import time
 from pathlib import Path
-from typing import Optional
 
 METRICS_PATH = Path(__file__).resolve().parent.parent / "knowledge pipeline" / "metrics.jsonl"
 
 
 class StageTimer:
     """Context manager for timing pipeline stages. Writes to metrics.jsonl."""
-    
-    def __init__(self, stage: str, run_id: str = "latest", metadata: Optional[dict] = None):
+
+    def __init__(self, stage: str, run_id: str = "latest", metadata: dict | None = None):
         self.stage = stage
         self.run_id = run_id
         self.metadata = metadata or {}
         self.start_time: float = 0
         self.end_time: float = 0
-    
+
     def __enter__(self):
         self.start_time = time.time()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.end_time = time.time()
         elapsed = self.end_time - self.start_time

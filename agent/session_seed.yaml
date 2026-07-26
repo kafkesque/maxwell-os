@@ -1,17 +1,17 @@
-# Maxwell OS v2.1 — Session Seed
+# Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-07-21 (M1 re-sync)
+# Updated: 2026-07-26 (v3.0 cluster-before-extract architecture + model sync)
 
 session:
-    version: "2.1.0"
-    pipeline_commit: v2.1-Phase0
-    schema_version: "2.1"
+    version: "3.0.0"
+    pipeline_commit: v3.0-ClusterFirst
+    schema_version: "3.0"
     project_root: knowledge pipeline/
 
-# ── Models (from CONSTITUTION.md §2) ──
+# ── Models (synced with config/pipeline_config.yaml — D2115) ──
 models:
     generator:
-        model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+        model: Qwen3.6-35B-A3B-4bit
         provider: omlx
         temperature: 0.0
         family: qwen
@@ -20,41 +20,52 @@ models:
         provider: omlx
         temperature: 0.0
         family: phi
+    verifier_v2:
+        model: gemma-4-E4B-it-MLX-4bit
+        provider: omlx
+        temperature: 0.0
+        family: gemma
+        notes: "D2069: Cross-family verifier (Gemma ≠ Phi classifier ≠ Qwen generator). R5 satisfied."
     embeddings:
         model: bge-m3
         provider: ollama
         dims: 1024
         family: bge
     nli:
-        model: DeBERTa-v3-base-mnli
+        model: roberta-large-mnli
         provider: local
-        family: deberta
+        family: roberta
+        notes: "D2111: Ported from old project. Compares FB definition against verbatim evidence_passages."
 
-# ── Pipeline (7-stage) ──
+# ── Pipeline (9-stage v3.0 — cluster-before-extract) ──
 pipeline:
     stages:
-        stage0:  convert          # EPUB/PDF → MD (Pandoc/Docling)
-        stage1:  chunk            # MD → segments + SHA-256 dedup
-        stage1_5: intent_filter   # Semantic pre-filter (Phase 1)
-        stage2:  extract          # Segments → principles + MinHash dedup
-        stage3:  cluster          # UMAP + HDBSCAN clustering
-        stage4:  merge            # Clusters → FBs + SALSA classify
-        stage5:  verify           # FActScore + DeBERTa + BORP
-        stage6:  commit           # SQLite + Parquet export
+        stage0:    convert           # EPUB/PDF → MD (Pandoc/Docling)
+        stage0_5:  extract_metadata  # Filename → author/title/year (Phi-4-mini)
+        stage1:    chunk             # MD → segments + SHA-256 dedup
+        stage1_3:  prefilter         # Regex structural garbage filter (D2080)
+        stage1_5:  embed_cluster     # FAISS clustering on raw segments (D2094 — NEW)
+        stage2:    extract           # Clusters → convergent FBs (1 LLM call per cluster — REWRITE D2110)
+        stage3:    dedup             # Semantic dedup of extracted principles (SIMPLIFIED — D2094)
+        stage4:    classify          # Multi-label classification + formatting (D2066 multi-label, not SALSA)
+        stage5:    verify            # DeBERTa NLI + Gemma cross-family + BORP (D2111, D2093 fail-closed)
+        stage6:    commit            # SQLite + Parquet export
     clustering:
-        method: UMAP
+        method: FAISS
         metric: cosine
-        random_state: 42
-        n_dims: 50
-        hdbscan_min_cluster_size: 8
+        threshold: 0.70              # D2113: calibrated on 3 books. Re-calibrate at 20+ books.
+        embed_model: bge-m3
+        min_source_diversity: 2
     classification:
-        method: SALSA
-        model: verifier           # R5: Generator ≠ Classifier
+        method: multi_label          # D2066: raw labels dethrone canonicals. Not SALSA.
+        model: verifier              # R5: Generator ≠ Classifier
         max_domains_per_fb: 5
     verification:
         borp_min_sources: 2
-        nli_model: DeBERTa-v3-base-mnli
-        fact_score: enabled
+        nli_model: roberta-large-mnli
+        nli_entailment_threshold: 0.6
+        cross_family_verifier: gemma-4-E4B-it-MLX-4bit
+        fail_mode: fail_closed       # D2093: QUARANTINE on any check failure, never PASS
 
 # ── Services ──
 services:
@@ -64,6 +75,7 @@ services:
         api_key: sk-maxwell-local
         watchdog: pipeline/omlx_watchdog.py
         memory_guard: pipeline/memory_guard.py
+        memory_limit_gb: 24          # BUG-017 mitigation: restart OMLX if RSS exceeds
     ollama:
         host: localhost
         port: 11434
@@ -100,27 +112,26 @@ boot:
 
 # ── Phase Tracking ──
 phase:
-    current: Phase 0
-    status: 11 of 14 fixes applied
+    current: Phase 1 (v3.0 architecture validation)
+    status: Tier 1 complete (15/18). E2E validated on 3 books. Scaling to 20+ books next.
     completed:
-        - P0.1-P0.4    # Chunker fixes
-        - P0.5         # UMAP replaces PCA
-        - P0.6         # bge-m3 replaces nomic
-        - P0.7         # HDBSCAN min_cluster_size=8
-        - P0.8         # Verify cluster map
-        - P0.9         # Stamp lineage singleton
-        - P0.10        # R5: VERIFY_MODEL for SALSA
-        - P0.11        # sqlite-vec load
-        - P0.12        # OMLX watchdog (replaces guard)
-        - P0.13        # Cloud code audit (none found)
-        - P0.14        # Model audit (phantoms nuked)
+        - Phase 0: 14/14 foundation fixes ✅
+        - Phase 0.5: cleaning pipeline spec'd, partially implemented
+        - Tier 1: architecture restructure (cluster-before-extract) ✅
+        - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
+        - D2092-D2114: v3.0 architecture decisions recorded ✅
     pending:
-        - T-0.1        # OMLX memory stress test
-        - M3            # D316 vs D2024 resolution
-    next_phase: Phase 0.5 (4-layer cleaning)
+        - Q6: 5+ book E2E test with meaningful convergent extraction
+        - Tier 2: quality calibration (golden set audit, manual FB review)
+        - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
+        - C8: D2066 dynamic canonical taxonomy
+        - C9: D2067 cross-run incremental extraction
+    next_phase: Tier 2 quality calibration → Tier 3 speed → 20-book production run
 
-# ── Book Library (v1 reference, not active in v2) ──
+# ── Book Library ──
 book_library:
-    status: archived
-    total_books: 863 MD, 505 EPUB, 673 PDF
-    v2_source: knowledge pipeline/books/
+    total_books: 852 MD (8 domains)
+    test_domains:
+        - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
+        - Pricing subset (3 books, 237 segments — E2E test)
+    source: knowledge pipeline/books/

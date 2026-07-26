@@ -17,8 +17,9 @@ Inter-stage contracts (6 stages):
 All objects stamped: schema_version, gen_model, pipeline_commit (R14).
 """
 
-from typing import Optional, Literal
 from datetime import datetime
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -110,6 +111,24 @@ DEPTH_LITERAL = Literal["universal", "cross-domain", "domain", "specialized"]
 EVIDENCE_LITERAL = Literal["cited", "axiomatic"]
 VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 
+# ── D2073: Growth Edge categories ─────────────────────────────────────
+GE_CATEGORY = Literal[
+    "personal_idea",              # "I should build X" — user-originated
+    "business_idea",              # "A service/product that does X"
+    "inspiration",                # "This quote/concept resonated deeply"
+    "academic_concept",           # "Needs theoretical investigation"
+    "implementation_candidate",   # "This could become a product feature"
+    "theoretical_investigation",  # "Does X work differently in context Y?"
+    "pipeline_speculative",       # Pipeline-extracted, low-confidence insight
+]
+GE_STATUS = Literal[
+    "open",              # Just captured, not yet evaluated
+    "investigating",     # Actively researching/gathering evidence
+    "implementing",      # Being built/applied right now
+    "promoted",          # Graduated to FB, PT, or Project
+    "archived",          # Not relevant now, kept for reference
+]
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Base — every persistent object carries these stamps (R14, C10)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -117,9 +136,9 @@ VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 class StampedRecord(BaseModel):
     """Base mixin: every persistent pipeline record carries these stamps."""
     schema_version: str = Field(default="2.0")
-    gen_model: Optional[str] = Field(default=None)
+    gen_model: str | None = Field(default=None)
     pipeline_commit: str = Field(default="v2.0-init")
-    pipeline_run_id: Optional[str] = Field(
+    pipeline_run_id: str | None = Field(
         default=None,
         description="UUID identifying a single pipeline run. All records from the same run share this ID."
     )
@@ -165,13 +184,21 @@ class Principle(StampedRecord):
     """A single principle extracted by Qwen3.6 from one or more segments."""
     principle_id: str = Field(description="SHA-256 hash of principle text (dedup key)")
     principle_text: str = Field(description="The extracted principle")
+    content_type: str = Field(
+        default="principle",
+        description="Type: 'principle' (reusable concept), "
+                    "'process_template' (repeatable how-to method), "
+                    "'process_instance' (concrete case study of a template in action), "
+                    "'tool_instruction' (tool-specific command), "
+                    "'fact' (domain factoid), 'meta' (navigation text)"
+    )
     source_segments: list[str] = Field(
         description="List of segment_ids that generated this principle"
     )
     source_books: list[str] = Field(
         description="List of source book filenames"
     )
-    minhash_signature: Optional[str] = Field(
+    minhash_signature: str | None = Field(
         default=None, description="MinHash signature for near-dedup (hex)"
     )
 
@@ -198,6 +225,222 @@ class Cluster(StampedRecord):
     size: int = Field(description="Number of principles in cluster", ge=1)
     distinct_books: int = Field(
         description="Number of distinct source books", ge=1
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Stage 4a: Process Template — Repeatable how-to methods (v1 PT schema D782)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ProcessTemplate(StampedRecord):
+    """A repeatable step-by-step technique extracted from texts.
+
+    Mirrors v1's PT Anytype schema (D782): trigger, prerequisite, done_condition,
+    consulted_fbs, template_source, fb_query_domain, fb_query_intent.
+
+    Distinct from FB: PT answers "how do I?" (procedural), FB answers "why/when?" (conceptual).
+    """
+    pt_id: str = Field(description="SHA-256 hash of process name + steps summary")
+    name: str = Field(description="Concise name for this process", min_length=3)
+    steps: str = Field(
+        description="Numbered step-by-step method. 3-8 steps, each 1 sentence.",
+        min_length=20,
+    )
+    trigger: str = Field(
+        description="What situation or condition activates this process?",
+        min_length=5,
+    )
+    prerequisite: str = Field(
+        description="What must be in place before starting? (tools, data, skills, decisions)",
+        min_length=3,
+    )
+    done_condition: str = Field(
+        description="How do you know this process is complete? Observable outcome.",
+        min_length=5,
+    )
+    failure_mode: str = Field(
+        description="How this process fails or degrades in practice. 1-3 sentences.",
+        min_length=10,
+    )
+    template_source: str = Field(
+        description="Which book(s) this template was extracted from"
+    )
+    consulted_fbs: list[str] = Field(
+        default_factory=list,
+        description="FB IDs consulted during process execution (for runtime retrieval)"
+    )
+    fb_query_domain: str = Field(
+        default="",
+        description="Domain filter for runtime FB retrieval during execution"
+    )
+    fb_query_intent: str = Field(
+        default="",
+        description="Intent filter for runtime FB retrieval during execution"
+    )
+
+    # ── Classification (shared with FB) ──
+    domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
+        min_length=1, max_length=5,
+        description="1-5 canonical domains"
+    )
+    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+        description="Canonical discipline"
+    )
+    depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
+        description="universal | cross-domain | domain | specialized"
+    )
+    evidence: EVIDENCE_LITERAL = Field(  # type: ignore[valid-type]
+        description="cited (from source text) | axiomatic (self-evident)"
+    )
+
+    # ── Provenance ──
+    source_clusters: list[int] = Field(description="Cluster IDs that formed this PT")
+    source_books: list[str] = Field(description="Distinct source books")
+    source_principles: list[dict] = Field(
+        default_factory=list,
+        description="Source principles with texts embedded"
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Stage 4b: Process Instance — Concrete case study of a template in action
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ProcessInstance(StampedRecord):
+    """A concrete case study documenting a Process Template being applied.
+
+    The template says HOW; the instance proves IT WORKS. Instances are always linked
+    to a parent PT and serve as evidence that the template is effective.
+    """
+    pi_id: str = Field(description="SHA-256 hash of instance text")
+    parent_pt_id: str = Field(
+        description="ProcessTemplate ID this instance is evidence for"
+    )
+    instance_text: str = Field(
+        description="Concrete narrative: who did what, when, and what happened. 2-5 sentences.",
+        min_length=30,
+    )
+    actors: str = Field(
+        description="Who executed this process? (company, person, team)",
+        default="",
+    )
+    outcome_metric: str = Field(
+        description="Quantitative result if available: '+12% conversion', 'saved $2M'",
+        default="",
+    )
+    outcome_qualitative: str = Field(
+        description="Qualitative result: 'improved team alignment', 'faster decisions'",
+        default="",
+    )
+    domain_context: str = Field(
+        description="Industry or situation context for similarity matching",
+        default="",
+    )
+    source_book: str = Field(description="Which book this case study comes from")
+    source_segment_id: str = Field(description="Segment ID in source book")
+
+    # ── Links ──
+    source_principles: list[dict] = Field(
+        default_factory=list,
+        description="Source principles that contributed to this instance"
+    )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Stage 4c: Growth Edge — Speculative idea (pipeline OR human-created)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class GrowthEdge(StampedRecord):
+    """A speculative idea that may become an FB, PT, or Project.
+
+    Growth Edges are the ONLY object type that can be created manually by the user.
+    They serve as an idea inbox — upstream of all verified knowledge. Pipeline-
+    extracted speculative insights also land here.
+
+    D2073: GE is a full object type with its own schema, body format, and promotion
+    path. It bridges pipeline output and human judgment.
+    """
+    ge_id: str = Field(description="SHA-256 hash of title + body")
+    title: str = Field(
+        description="Short, memorable name for this idea. 2-8 words.",
+        min_length=3,
+        max_length=100,
+    )
+    body: str = Field(
+        description="The idea, insight, or speculation. Flexible format — "
+                    "can be a paragraph, a quote, a set of bullet points. "
+                    "2-30 sentences.",
+        min_length=10,
+    )
+    source: str = Field(
+        default="manual",
+        description="Origin: 'manual' (user-created), 'pipeline' (extracted from books), "
+                    "'import' (from external source)",
+    )
+    category: GE_CATEGORY = Field(  # type: ignore[valid-type]
+        default="pipeline_speculative",
+        description="What kind of idea this is. Determines how it's surfaced to the user."
+    )
+    actionable: bool = Field(
+        default=False,
+        description="Can this idea be acted on right now? If true, it appears in "
+                    "the implementation queue. If false, it's for later investigation."
+    )
+    status: GE_STATUS = Field(  # type: ignore[valid-type]
+        default="open",
+        description="open → investigating → implementing → promoted | archived"
+    )
+
+    # ── Links to pipeline objects (if derived from extraction) ──
+    parent_fb_ids: list[str] = Field(
+        default_factory=list,
+        description="FB IDs this GE relates to or was inspired by"
+    )
+    parent_pt_id: str | None = Field(
+        default=None,
+        description="PT ID this GE was derived from (if pipeline source)"
+    )
+    source_segment_id: str | None = Field(
+        default=None,
+        description="Segment ID if extracted from a book"
+    )
+    source_book: str = Field(
+        default="",
+        description="Book this insight came from (if pipeline source)"
+    )
+
+    # ── Promotion tracking ──
+    promoted_to_type: str | None = Field(
+        default=None,
+        description="If promoted: 'FB', 'PT', 'Project'. The target object type."
+    )
+    promoted_to_id: str | None = Field(
+        default=None,
+        description="ID of the FB/PT/Project this was promoted to"
+    )
+    promoted_at: str | None = Field(
+        default=None,
+        description="ISO timestamp of promotion"
+    )
+
+    # ── Metadata ──
+    tags: list[str] = Field(
+        default_factory=list,
+        description="Free-form tags for filtering and discovery"
+    )
+    domain: str = Field(
+        default="",
+        description="Domain context for routing (may be empty for personal ideas)"
+    )
+    discipline: str = Field(
+        default="",
+        description="Discipline context (may be empty)"
+    )
+    priority: int = Field(
+        default=0,
+        ge=0,
+        le=5,
+        description="User-assigned priority: 0 (uncategorized) to 5 (urgent)"
     )
 
 
@@ -230,7 +473,7 @@ class FB(StampedRecord):
         min_length=20,
     )
     keywords: str = Field(description="3-5 key terms, comma-separated")
-    jargon: Optional[str] = Field(
+    jargon: str | None = Field(
         default=None,
         description="Specialized terminology explanation. None if no jargon.",
     )
@@ -250,11 +493,11 @@ class FB(StampedRecord):
     # These are the LLM's actual labels before validation/synonym-matching.
     # When canonical ≠ raw, the raw label accumulates; when it crosses a threshold,
     # it earns a canonical slot in taxonomy_v5.yaml.
-    domains_raw: Optional[list[str]] = Field(
+    domains_raw: list[str] | None = Field(
         default=None,
         description="LLM's original domain labels before canonical validation. Preserved for taxonomy expansion."
     )
-    discipline_raw: Optional[str] = Field(
+    discipline_raw: str | None = Field(
         default=None,
         description="LLM's original discipline before canonical validation. Preserved for taxonomy expansion."
     )
@@ -269,7 +512,13 @@ class FB(StampedRecord):
     # ── Provenance ──
     source_clusters: list[int] = Field(description="Cluster IDs that formed this FB")
     source_books: list[str] = Field(description="Distinct source books")
-    s3_original_domain: Optional[str] = Field(
+    source_principles: list[dict] = Field(
+        default_factory=list,
+        description="Source principles with texts embedded for fast Stage 5 verification. "
+                    "Each: {principle_id, principle_text, source_segment_id}. "
+                    "D2069: Eliminates 3-checkpoint lookup chain per FB."
+    )
+    s3_original_domain: str | None = Field(
         default=None,
         description="Crawl provenance: which domain folder the source books came from (e.g., 'DOMAIN 4 Business'). Immutable."
     )
@@ -298,7 +547,7 @@ class VerificationResult(BaseModel):
     check_name: str = Field(description="Name of the check (e.g., 'BORP', 'factual')")
     passed: bool = Field(description="Did the check pass?")
     score: float = Field(description="Score 0.0-1.0", ge=0.0, le=1.0)
-    detail: Optional[str] = Field(default=None, description="Explanation of result")
+    detail: str | None = Field(default=None, description="Explanation of result")
 
 
 class VerifiedFB(FB):
@@ -319,7 +568,7 @@ class VerifiedFB(FB):
     needs_human_review: bool = Field(
         default=False, description="True if FLAG or QUARANTINE"
     )
-    verifier_model: Optional[str] = Field(
+    verifier_model: str | None = Field(
         default=None, description="Model that performed verification"
     )
 
@@ -330,7 +579,7 @@ class VerifiedFB(FB):
 
 class FBRecord(VerifiedFB):
     """Canonical DB record — VerifiedFB + DB-specific fields."""
-    rowid: Optional[int] = Field(default=None, description="SQLite rowid")
+    rowid: int | None = Field(default=None, description="SQLite rowid")
     committed_at: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat() + "Z"
     )
@@ -345,8 +594,9 @@ def load_taxonomy():
 
     Returns (domains: list[str], disciplines: list[str], domain_to_group: dict).
     """
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     config_path = Path(__file__).resolve().parent.parent / "config" / "taxonomy_v5.yaml"
     with open(config_path) as f:
@@ -387,8 +637,9 @@ _SYNONYM_INDEX = None  # Lazy-built cache
 
 def _build_synonym_index():
     """Build {synonym_lower: canonical} lookup from taxonomy + synonym_map."""
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     config_root = Path(__file__).resolve().parent.parent / "config"
     lookup = {}
@@ -411,7 +662,7 @@ def _build_synonym_index():
     if syn_path.exists():
         with open(syn_path) as f:
             syn_map = yaml.safe_load(f)
-        for key, entry in syn_map.get("synonyms", {}).items():
+        for _key, entry in syn_map.get("synonyms", {}).items():
             canonical = entry.get("canonical", "").strip()
             if canonical:
                 lookup[canonical.lower()] = canonical

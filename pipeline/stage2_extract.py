@@ -1,126 +1,323 @@
 #!/usr/bin/env python3
 """
-stage2_extract.py — Extract principles from segments via Qwen3.6 + MinHash dedup.
-================================================================================
-Authority: CONSTITUTION.md §3 (Pipeline Stage 2), R5, R7, C8
+stage2_extract.py — Convergent Principle Extraction from Clusters.
+==================================================================
+Authority: D2094, D2095, D2101 | CONSTITUTION.md §3
 
-Input:  Segments from Stage 1 checkpoint
-Output: Principles with MinHash near-dedup, checkpoint at stage2_extract.jsonl
+Input:  Clusters from Stage 1.5 (FAISS) + raw segments from Stage 1
+Output: Convergent Foundation Blocks with mechanism/boundary/consequence
+
+v3.0 REWRITE (D2094): Extracts ONE principle per CLUSTER (5-15 segments, ≥2 books).
+Replaces per-segment extraction which produced summaries, not principles.
 
 Process:
-  1. Batch segments into groups of ~10
-  2. Send each batch to Qwen3.6 with temp=0.0
-  3. Parse JSON response, extract principles
-  4. MinHash near-dedup: skip principles that are >90% similar to existing
-  5. Write checkpoint
+  1. Load clusters from Stage 1.5 checkpoint
+  2. For each convergent cluster (≥2 source books):
+     a. Gather 5-15 raw segment texts
+     b. Build convergent extraction prompt
+     c. Call LLM to extract ONE principle per cluster
+     d. Schema: name, definition, mechanism, boundary, consequence,
+        is_summary, evidence_passages
+     e. Merged classification: depth, discipline, domain, evidence, route
+  3. Gate enforcement, golden few-shot parity, MinHash dedup
+  4. Crash-safe incremental checkpoint
 
-Generator model: Qwen3.6-35B-A3B-4bit (OMLX)
+Generator: Qwen3.6-35B-A3B-4bit (OMLX or MLX)
 temp: 0.0 (R7)
 
 Usage:
     python3 pipeline/stage2_extract.py
-    python3 pipeline/stage2_extract.py --batch-size 15 --minhash-threshold 0.90
+    python3 pipeline/stage2_extract.py --only-convergent  # Skip single-source clusters
+    python3 pipeline/stage2_extract.py --provider mlx     # Use MLX instead of OMLX
 """
 
 import argparse
 import json
 import os
+import random
 import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
-    STAGE1_CHECKPOINT,
-    STAGE2_CHECKPOINT,
     CHECKPOINT_DIR,
     GEN_MODEL,
-    BORP_MIN_SOURCES,
+    S2_GATE_ENABLED,
+    S2_GATE_STRICT,
+    S2_GOLDEN_MAX,
+    S2_GOLDEN_NEGATIVE,
+    S2_GOLDEN_PATH,
+    S2_GOLDEN_POSITIVE,
+    S2_MINHASH_NUM_PERM,
+    S2_MINHASH_THRESHOLD,
+    S2_OMLX_RETRY,
+    S15_MIN_SOURCE_DIVERSITY,
+    STAGE1_5_CHECKPOINT,
+    STAGE1_CHECKPOINT,
+    STAGE2_CHECKPOINT,
 )
-from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit
-from pipeline.omlx_call import call_omlx_json, check_omlx_health
-from pipeline.io_guard import safe_write
+from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
-BATCH_SIZE = 10  # Segments per LLM call
-MINHASH_THRESHOLD = 0.90  # Jaccard similarity threshold for near-dedup
-MINHASH_NUM_PERM = 128  # Number of MinHash permutations
+MAX_CLUSTER_SAMPLES: int = 15  # Max segments to feed per cluster
+MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
+NON_FB_TYPES: set[str] = {"process_template", "process_instance", "growth_edge", "tool_instruction"}
 
-# ── Prompt templates ───────────────────────────────────────────────────────
+# ── Convergent extraction system prompt (v3.0: cluster-before-extract) ────
 
-SYSTEM_PROMPT = """You are a principle extraction engine. Your task is to identify reusable, 
-actionable principles from text segments. 
+SYSTEM_PROMPT = """You are a convergent principle extraction engine. You receive multiple related text
+passages from DIFFERENT books. Your task is to identify the ONE underlying principle
+that transcends any single source — the causal mechanism, concept, or method that
+these passages collectively reveal.
 
-A principle is:
-- A concise, standalone statement of a concept that can be applied across contexts
-- 1-3 sentences, specific enough to be useful, general enough to be reusable
-- NOT a summary of the text
-- NOT a fact about the specific book or author
-- NOT a tool instruction ("use the + operator in Altair", "set env vars in R")
-- NOT a syntax explanation ("functions take parameters with defaults")
-- NOT a system design document ("retail inventory event architecture")
+A convergent principle is:
+- A concise statement of WHY something works, WHEN it applies, and WHAT its limits are
+- Synthesized from patterns across ALL provided passages, not just one
+- NOT a summary of any single passage
+- NOT a list of what each passage says
+- NOT a vague generalization that ignores specifics
 
-A principle answers WHY and WHEN, not just WHAT or HOW.
+PRINCIPLE STRUCTURE (required for every extraction):
+1. name: 3-7 word concept name (title case, precise)
+2. definition: 3-4 sentences. S1: name the principle. S2: explain the causal mechanism.
+   S3-4: describe boundary conditions and consequences.
+3. mechanism: "X causes/enables/prevents Y because Z" — the causal chain
+4. boundary: "The principle applies when [condition]. It fails when [counter-condition]."
+5. consequence: "Because of this principle, [what follows]."
+6. is_summary: true ONLY if you can only restate the passages without identifying
+   a convergent mechanism. Be honest — self-flag if summarizing.
 
-EXAMPLES OF GOOD PRINCIPLES (what to extract):
-- "Descriptive references use named identifiers instead of positional indices to create robust code. Named column references survive structure changes that break positional access."
-- "AI capabilities have a jagged frontier — strong on some tasks, weak on closely related ones. Map it empirically rather than assuming uniform competence."
-- "Narrative framing structures user flows using story patterns (arcs, tension/release) to create emotional engagement beyond functional sequences."
-- "Technologies follow S-curve logistic growth — rapid exponential improvement, then gradual slowdown as limits are approached."
-- "Autoencoders learn compressed representations by forcing data through a bottleneck layer that preserves only salient features."
+EXTRACTION BOUNDARY — extract if and only if:
+1. The passages collectively reveal a CAUSAL MECHANISM (X→Y because Z), OR
+2. They converge on a CONCEPT with boundary conditions, OR
+3. They demonstrate a repeatable METHOD with failure modes
 
-ANTI-PATTERNS (do NOT extract):
-- "Altair's + operator layers independent marks" — this is a tool feature, not a principle
-- "Function parameters allow developers to customize behavior" — this is syntax, not insight
-- "RStudio's Environment tab shows loaded objects" — this is a UI description
-- "Computer vision + event bus enables real-time inventory" — this is a system design doc
+Do NOT extract if passages:
+- Share a topic but don't converge on a mechanism
+- Only come from ONE book (no cross-source synthesis possible)
+- Are about tool-specific features bound to one platform
+- State outcomes without mechanisms ("good leadership matters")
 
-For each segment, extract 0-3 principles. If the segment contains no extractable principles, return an empty list.
+EVIDENCE: For every claim in the principle, there must be a verbatim passage that
+supports it. Include up to 5 verbatim evidence passages from the source texts.
 
-CRITICAL RULES (non-negotiable):
-- ONLY extract principles EXPLICITLY stated in the text. Never fabricate.
-- If no principles are found, return an empty list: []
-- Do NOT generalize beyond what the text explicitly says.
-- Do NOT add numbers, statistics, or data unless verbatim in source.
-- A principle must be traceable back to a specific sentence in the source.
+CLASSIFICATION (merged — classify as part of extraction):
+- depth: "universal" (applies across all domains) | "cross-domain" (2+ unrelated fields) |
+         "domain" (specific to one field — DEFAULT) | "specialized" (narrow tool/method)
+- discipline: Pick from the provided discipline list
+- domain: Pick 1-3 from the provided domain list
+- evidence: "cited" (verbatim support exists) | "axiomatic" (logically follows)
+- route: "FB" (convergent principle) | "PT" (process template/steps) |
+         "GE" (growth edge/speculative) | "NULL" (no extractable principle)
 
-Return ONLY a JSON array of objects with this structure:
-[{"text": "The principle statement", "source_segment": "segment_id_here"}, ...]"""
+When in doubt, route NULL. False positives pollute; false negatives leave gaps.
+
+Return ONLY a JSON object with these EXACT keys. No markdown, no explanation.
+
+Example output:
+{
+  "name": "Value-First Demonstration",
+  "definition": "Demonstrating concrete value before requesting commitment converts prospects because direct experience of benefit bypasses skepticism toward unverified claims. The principle holds when the value is demonstrable within minutes of first exposure.",
+  "mechanism": "Direct experience of value eliminates skepticism toward unverified claims because the prospect's own senses provide the proof, making external persuasion unnecessary.",
+  "boundary": "Applies when value is demonstrable within minutes. Fails when value requires long-term usage to perceive (e.g., enterprise infrastructure, health supplements).",
+  "consequence": "Products that can demonstrate value immediately grow faster through product-led adoption than those relying on sales narratives.",
+  "is_summary": false,
+  "evidence_passages": [
+    "Dropbox used a 3-minute demo video showing file sync... beta signups jumped from 5,000 to 75,000.",
+    "The best SaaS companies demonstrate value before asking for money. Slack let users invite teammates before requiring payment."
+  ],
+  "depth": "cross-domain",
+  "discipline": "marketing",
+  "domain": ["business operations", "digital product"],
+  "evidence": "cited",
+  "route": "FB"
+}"""
 
 
-def build_extraction_prompt(segments: list[dict]) -> str:
-    """Build the extraction prompt for a batch of segments."""
-    lines = ["Extract principles from these text segments. Return ONLY a JSON array.\n"]
-    for seg in segments:
-        lines.append(f"--- SEGMENT {seg['segment_id'][:12]} ---")
-        lines.append(seg["text"][:1500])  # Truncate very long segments
-        lines.append("")
-    lines.append("---")
-    lines.append("Return JSON array of principles: [{\"text\": \"...\", \"source_segment\": \"...\"}, ...]")
-    return "\n".join(lines)
+# ── Gate enforcement (D2080, preserved from v2.2) ──────────────────────────
+
+def enforce_gate(extractions: list[dict], strict: bool = True) -> tuple[list[dict], int]:
+    """Post-extraction gate enforcement. Forces [] on gate=NO with content."""
+    cleaned: list[dict] = []
+    violations: int = 0
+    for item in extractions:
+        if not isinstance(item, dict):
+            continue
+        gate: str = item.get("gate", "").strip().upper() if "gate" in item else ""
+        route: str = item.get("route", "").strip().upper()
+        if gate == "NO" or route == "NULL":
+            has_content: bool = bool(item.get("text") or item.get("definition") or item.get("name"))
+            if has_content:
+                violations += 1
+            cleaned.append({"route": "NULL"})
+        else:
+            cleaned.append(item)
+    return cleaned, violations
 
 
-# ── MinHash near-dedup ─────────────────────────────────────────────────────
+# ── Data loading ───────────────────────────────────────────────────────────
 
-def init_minhash_lsh():
-    """Initialize MinHash LSH index for near-dedup. Falls back gracefully."""
+def load_clusters() -> list[dict]:
+    """Load clusters from Stage 1.5 checkpoint."""
+    if not STAGE1_5_CHECKPOINT.exists():
+        # Fallback: try old Stage 3 clusters
+        old_path = CHECKPOINT_DIR / "stage3_cluster.jsonl"
+        if old_path.exists():
+            print("   ⚠️  Stage 1.5 not found, falling back to Stage 3 clusters")
+            checkpoint = old_path
+        else:
+            print("❌ No clusters found. Run stage1_5_embed_cluster.py first.")
+            sys.exit(1)
+    else:
+        checkpoint = STAGE1_5_CHECKPOINT
+
+    clusters: list[dict] = []
+    with open(checkpoint) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                clusters.append(json.loads(line))
+    return clusters
+
+
+def load_segments() -> dict[str, dict]:
+    """Load segments from Stage 1, indexed by segment_id."""
+    if not STAGE1_CHECKPOINT.exists():
+        print("❌ Stage 1 checkpoint not found. Run stage1_chunk.py first.")
+        sys.exit(1)
+
+    segments: dict[str, dict] = {}
+    with open(STAGE1_CHECKPOINT) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            seg: dict = json.loads(line)
+            seg_id: str = seg.get("segment_id", "")
+            if seg_id:
+                segments[seg_id] = seg
+    return segments
+
+
+# ── Prompt building ────────────────────────────────────────────────────────
+
+def build_convergent_prompt(
+    cluster: dict,
+    segments: dict[str, dict],
+    taxonomy_disciplines: list[str],
+    taxonomy_domains: list[str],
+) -> tuple[str, list[str]]:
+    """Build convergent extraction prompt for one cluster.
+
+    Args:
+        cluster: Cluster dict with segment_ids, source_books, cohesion.
+        segments: Indexed segment dicts by segment_id.
+        taxonomy_disciplines: Canonical discipline labels.
+        taxonomy_domains: Canonical domain labels.
+
+    Returns:
+        Tuple of (prompt_text, evidence_passages_for_output).
+    """
+    seg_ids: list[str] = cluster.get("segment_ids", [])
+    cohesion: float = cluster.get("cohesion", 0.5)
+
+    # Sample segments: fewer for high-cohesion clusters
+    if cohesion >= 0.90:
+        n_samples: int = 5
+    elif cohesion >= 0.75:
+        n_samples: int = 8
+    else:
+        n_samples: int = MAX_CLUSTER_SAMPLES
+
+    sampled: list[str] = seg_ids[:n_samples]
+    books_seen: set[str] = set()
+    texts: list[str] = []
+    evidence_passages: list[str] = []
+
+    for i, sid in enumerate(sampled):
+        seg: dict | None = segments.get(sid)
+        if seg is None:
+            continue
+        text: str = seg.get("text", "")[:400]
+        book: str = seg.get("source_book", "unknown")
+        book_short: str = book.split("/")[-1].replace(".md", "")[:40] if book else "unknown"
+        books_seen.add(book_short)
+        texts.append(f"[{i+1}] ({book_short}): {text}")
+        evidence_passages.append(text)
+
+    source_summary: str = ", ".join(sorted(books_seen)[:5])
+    discipline_list: str = ", ".join(taxonomy_disciplines[:30])
+    domain_list: str = ", ".join(taxonomy_domains[:30])
+
+    prompt: str = f"""I have {len(sampled)} passages from {len(books_seen)} books: {source_summary}
+
+{"─" * 40}
+{" | ".join(texts)}
+{"─" * 40}
+
+Extract ONE convergent principle. Return JSON with:
+- name, definition, mechanism, boundary, consequence, is_summary (bool), evidence_passages (up to 5 verbatim quotes)
+- depth (universal|cross-domain|domain|specialized), discipline ({discipline_list}), domain ({domain_list}), evidence (cited|axiomatic), route (FB|PT|GE|NULL)
+
+No principle → {{"route": "NULL"}}"""
+
+    return prompt, evidence_passages
+
+
+# ── Golden few-shot (D2080, preserved from v2.2) ────────────────────────────
+
+def load_golden_parity(
+    golden_path: str | None,
+    pos_count: int,
+    neg_count: int,
+    max_total: int,
+) -> tuple[list[dict], list[dict], int]:
+    """Load golden examples and subsample to parity."""
+    if golden_path is None or not os.path.exists(str(golden_path)):
+        return [], [], 0
+
     try:
-        from datasketch import MinHash, MinHashLSH
-        lsh = MinHashLSH(threshold=MINHASH_THRESHOLD, num_perm=MINHASH_NUM_PERM)
+        import yaml
+        with open(str(golden_path)) as f:
+            golden = yaml.safe_load(f)
+    except Exception:
+        return [], [], 0
+
+    examples: list[dict] = golden.get("examples", [])
+    all_pos: list[dict] = [e for e in examples if e.get("should_extract") and e.get("id") != "GE-001"]
+    all_neg: list[dict] = [e for e in examples if not e.get("should_extract")]
+    random.shuffle(all_pos)
+    random.shuffle(all_neg)
+
+    pos: list[dict] = all_pos[:min(pos_count, len(all_pos))]
+    neg: list[dict] = all_neg[:min(neg_count, len(all_neg))]
+    while len(pos) + len(neg) > max_total:
+        if len(pos) > len(neg):
+            pos.pop()
+        elif neg:
+            neg.pop()
+        else:
+            break
+
+    return pos, neg, len(pos) + len(neg)
+
+
+# ── MinHash dedup infrastructure ────────────────────────────────────────────
+
+def init_minhash_lsh() -> tuple:
+    """Initialize MinHash LSH index for near-dedup."""
+    try:
+        from datasketch import MinHashLSH
+        lsh = MinHashLSH(threshold=S2_MINHASH_THRESHOLD, num_perm=S2_MINHASH_NUM_PERM)
         return lsh, True
     except ImportError as e:
-        # C16: No silent errors — log AND raise. Near-dedup is critical for quality.
-        import logging
-        logging.error("datasketch not installed. Near-dedup REQUIRED. Install: pip install datasketch")
-        raise ImportError(
-            "datasketch is required for MinHash near-dedup. "
-            "Install: pip install datasketch"
-        ) from e
+        raise ImportError("datasketch required for MinHash near-dedup. pip install datasketch") from e
 
 
-def make_minhash(text: str, num_perm: int = MINHASH_NUM_PERM):
+def make_minhash(text: str, num_perm: int = S2_MINHASH_NUM_PERM):
     """Create a MinHash for a text string."""
     from datasketch import MinHash
     mh = MinHash(num_perm=num_perm)
@@ -129,229 +326,312 @@ def make_minhash(text: str, num_perm: int = MINHASH_NUM_PERM):
     return mh
 
 
-def is_near_duplicate(text: str, lsh, minhash_cache: dict) -> tuple[bool, Optional[str]]:
-    """Check if a principle is a near-duplicate of any existing principle.
-
-    Returns (is_dup: bool, signature: str|None).
-    """
+def is_near_duplicate(text: str, lsh, minhash_cache: dict) -> tuple[bool, str | None]:
+    """Check if a principle is a near-duplicate of any existing principle."""
     if lsh is None:
         return False, None
-
-    from datasketch import MinHash
     mh = make_minhash(text)
-
-    # Query LSH for near-duplicates
     results = lsh.query(mh)
     if results:
         return True, None
-
-    # Store in LSH
-    sig = f"mh_{len(minhash_cache)}"
+    sig: str = f"mh_{len(minhash_cache)}"
     lsh.insert(sig, mh)
     minhash_cache[sig] = text
     return False, sig
 
 
-def load_stage1_segments() -> list[dict]:
-    """Load segments from Stage 1 checkpoint."""
-    if not STAGE1_CHECKPOINT.exists():
-        print("❌ Stage 1 checkpoint not found. Run stage1_chunk.py first.")
-        sys.exit(1)
+# ── LLM calling ─────────────────────────────────────────────────────────────
 
-    segments = []
-    with open(STAGE1_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                segments.append(json.loads(line))
-    return segments
+def call_llm(prompt: str, system: str, model: str, provider: str = "omlx") -> dict | None:
+    """Call LLM for convergent extraction. Returns parsed JSON dict or None."""
+    max_tokens: int = 2048
+
+    if provider == "mlx":
+        try:
+            from pipeline.providers.mlx_provider import get_mlx_provider
+            prov = get_mlx_provider(role="generator")
+            result = prov.generate_json(prompt=prompt, system=system, max_tokens=max_tokens)
+            return json.loads(result.text)
+        except Exception as e:
+            print(f"      ⚠️  MLX error: {e}, falling back to OMLX")
+            # Fall through to OMLX
+
+    # OMLX path
+    try:
+        from pipeline.omlx_call import call_omlx_json
+        return call_omlx_json(prompt=prompt, model=model, system=system, max_tokens=max_tokens)
+    except Exception as e:
+        print(f"      ❌ LLM error: {e}")
+        return None
 
 
-def run_stage2(batch_size: int = BATCH_SIZE,
-               minhash_threshold: float = MINHASH_THRESHOLD,
-               intent: str = None):
-    """Run Stage 2: Extract principles from segments.
+# ── Main stage ─────────────────────────────────────────────────────────────
 
-    If intent is provided, focuses extraction on that domain (e.g.
-    'pricing strategy, cost modeling, revenue, financial planning').
+def run_stage2(
+    provider: str = "omlx",
+    only_convergent: bool = False,
+    gate_enabled: bool = S2_GATE_ENABLED,
+    gate_strict: bool = S2_GATE_STRICT,
+) -> None:
+    """Run Stage 2: Convergent principle extraction from clusters.
+
+    Args:
+        provider: "omlx" or "mlx" for LLM inference.
+        only_convergent: Skip single-source clusters.
+        gate_enabled: Enable gate enforcement.
+        gate_strict: Force [] on NULL-route with content.
     """
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Health check — stress-test chat, not just ping
-    from pipeline.omlx_call import stress_test_omlx, check_omlx_health
-    if not check_omlx_health():
-        print("❌ OMLX server is not responding. Start OMLX first.")
-        sys.exit(1)
-    stress = stress_test_omlx(model=GEN_MODEL, prompt_sizes=[50, 1000, 5000], verbose=True)
-    if not stress["healthy"]:
-        print(f"❌ OMLX chat check FAILED: {stress['verdict']}")
-        print("   The server responds to health checks but chat completions are broken.")
-        print("   Restart OMLX and re-run.")
-        sys.exit(1)
+    # Load taxonomy
+    try:
+        from pipeline.schemas import CANONICAL_DISCIPLINES, CANONICAL_DOMAINS
+        disciplines: list[str] = list(CANONICAL_DISCIPLINES)
+        domains: list[str] = list(CANONICAL_DOMAINS)
+    except ImportError:
+        disciplines = ["strategic thinking", "marketing", "design strategy", "software engineering",
+                       "economics", "psychology", "business operations"]
+        domains = ["business operations", "digital product", "marketing", "strategic thinking",
+                   "engineering practice", "user experience", "creative technology"]
 
-    # Build system prompt with optional domain intent
-    system_prompt = SYSTEM_PROMPT
-    if intent:
-        system_prompt += f"\n\nFOCUS: Extract ONLY principles related to: {intent}. "
-        system_prompt += "Ignore principles unrelated to these topics. "
-        system_prompt += "If a segment contains no principles about these topics, return []."
+    # Load clusters
+    clusters: list[dict] = load_clusters()
 
-    segments = load_stage1_segments()
-    print(f"🧠 Stage 2: Extract Principles — {len(segments)} segments")
-    print(f"   Model: {GEN_MODEL} | temp=0.0 | batch_size={batch_size}")
-    if intent:
-        print(f"   Intent: {intent}")
-        print(f"   ⚠️  Intent is prompt-level focus only. For chunk-level semantic filtering, run stage1_5_intent.py first.")
+    # Filter: convergent vs single-source
+    convergent: list[dict] = [c for c in clusters if c.get("is_convergent")]
+    single_source: list[dict] = [c for c in clusters if not c.get("is_convergent") and not c.get("is_noise", False)]
+    noise: list[dict] = [c for c in clusters if c.get("is_noise", False)]
+
+    if only_convergent:
+        target_clusters: list[dict] = convergent
+    else:
+        target_clusters = convergent + single_source
+
+    # Load segments
+    segments: dict[str, dict] = load_segments()
+
+    # Golden examples
+    golden_path: str | None = S2_GOLDEN_PATH
+    if golden_path and not os.path.isabs(str(golden_path)):
+        golden_path = str(Path(__file__).resolve().parent.parent / golden_path)
+    pos_ex, neg_ex, golden_total = load_golden_parity(
+        golden_path, S2_GOLDEN_POSITIVE, S2_GOLDEN_NEGATIVE, S2_GOLDEN_MAX
+    )
+
+    # Health check
+    if provider == "omlx":
+        from pipeline.omlx_call import check_omlx_health
+        if not check_omlx_health():
+            print("❌ OMLX server is not responding.")
+            sys.exit(1)
+
+    print(f"🧠 Stage 2: Convergent Extraction — {len(target_clusters)} clusters")
+    print(f"   Convergent (≥{MIN_CONVERGENT_BOOKS} books): {len(convergent)}")
+    print(f"   Single-source: {len(single_source)} | Noise: {len(noise)}")
+    print(f"   Provider: {provider} | Model: {GEN_MODEL} | temp=0.0")
+    print(f"   Golden: {golden_total} examples | Gate: {'on' if gate_enabled else 'off'}")
     print(f"{'='*60}")
 
+    # Dedup infrastructure
     lsh, minhash_ok = init_minhash_lsh()
     minhash_cache: dict = {}
-    all_principles: list[dict] = []
-    total_extracted = 0
-    total_skipped = 0
-    pipeline_commit = get_pipeline_commit()
+    all_fbs: list[dict] = []
+    total_extracted: int = 0
+    total_skipped: int = 0
+    total_null: int = 0
+    total_gate_violations: int = 0
+    pipeline_commit: str = get_pipeline_commit()
 
-    # Process in batches
-    batches = [segments[i:i + batch_size] for i in range(0, len(segments), batch_size)]
-
-    # Load existing checkpoint for resume
-    processed_seg_ids: set[str] = set()
-    segids_file = str(STAGE2_CHECKPOINT) + ".segids"
+    # Resume support
+    processed_ids: set[str] = set()
+    segids_file: str = str(STAGE2_CHECKPOINT) + ".segids"
     if STAGE2_CHECKPOINT.exists() and os.path.exists(segids_file):
         try:
             with open(STAGE2_CHECKPOINT) as f:
                 for line in f:
                     line = line.strip()
                     if line:
-                        all_principles.append(json.loads(line))
+                        all_fbs.append(json.loads(line))
             with open(segids_file) as f:
-                processed_seg_ids = set(json.load(f))
-            print(f"   📋 Resuming: {len(processed_seg_ids)} segments processed → {len(all_principles)} principles so far")
+                processed_ids = set(json.load(f))
+            print(f"   📋 Resuming: {len(processed_ids)} clusters processed → {len(all_fbs)} FBs")
         except Exception:
-            all_principles = []
-            processed_seg_ids = set()
+            all_fbs = []
+            processed_ids = set()
 
-    # Track total so batch numbering is correct
-    initial_principle_count = len(all_principles)
-
-    for batch_idx, batch in enumerate(batches, 1):
-        # Skip batches where ALL segments are already processed
-        batch_seg_ids = {s.get("segment_id", "") for s in batch}
-        if batch_seg_ids and batch_seg_ids.issubset(processed_seg_ids):
-            continue  # Skip silently
-
-        print(f"  [{batch_idx}/{len(batches)}] Batch of {len(batch)} segments", end=" ")
-
-        start = time.time()
-        try:
-            prompt = build_extraction_prompt(batch)
-            result = call_omlx_json(
-                prompt=prompt,
-                model=GEN_MODEL,
-                system=system_prompt,
-                max_tokens=4096,
-            )
-        except Exception as e:
-            print(f"→ ❌ OMLX error: {e}")
+    # Process clusters
+    for i, cluster in enumerate(target_clusters, 1):
+        cid: str = cluster.get("cluster_id", f"cluster_{i}")
+        if cid in processed_ids:
             continue
 
-        # Parse results
-        if not isinstance(result, list):
-            print(f"→ ⚠️  Unexpected response type: {type(result).__name__}")
+        is_conv: bool = cluster.get("is_convergent", False)
+        book_count: int = cluster.get("source_diversity", len(cluster.get("source_books", [])))
+        conv_tag: str = "🌐" if is_conv else "📖"
+        print(f"  [{i}/{len(target_clusters)}] {conv_tag} {cid} "
+              f"({cluster.get('size', 0)} segments, {book_count} books)", end=" ")
+
+        start: float = time.time()
+
+        # Build prompt
+        prompt, evidence_passages = build_convergent_prompt(
+            cluster, segments, disciplines, domains
+        )
+
+        # Call LLM with retry
+        result: dict | None = None
+        for attempt in range(S2_OMLX_RETRY + 1):
+            try:
+                result = call_llm(prompt, SYSTEM_PROMPT, GEN_MODEL, provider)
+                if result is not None:
+                    break
+            except Exception as e:
+                if attempt < S2_OMLX_RETRY:
+                    time.sleep(2)
+                    continue
+                print(f"→ ❌ Failed after {S2_OMLX_RETRY + 1} attempts: {e}")
+
+        if result is None:
             continue
 
-        batch_principles = 0
-        for item in result:
-            if not isinstance(item, dict):
-                continue
-            principle_text = item.get("text", "").strip()
-            source_segment = item.get("source_segment", "")
-            if not principle_text or len(principle_text) < 20:
-                continue
+        # Check for NULL route
+        route: str = result.get("route", "FB").strip().upper()
+        if route == "NULL":
+            total_null += 1
+            print(f"→ ⏭️  NULL ({time.time() - start:.1f}s)")
+            processed_ids.add(cid)
+            continue
 
-            # MinHash near-dedup
-            is_dup, sig = is_near_duplicate(principle_text, lsh, minhash_cache)
+        # Validate required fields
+        name: str = result.get("name", "").strip()
+        definition: str = result.get("definition", "").strip()
+        mechanism: str = result.get("mechanism", "").strip()
+        boundary: str = result.get("boundary", "").strip()
+        consequence: str = result.get("consequence", "").strip()
+        is_summary: bool = result.get("is_summary", False)
+
+        if not name or not definition or len(definition) < 30:
+            print(f"→ ⚠️  Incomplete (name={bool(name)}, def_len={len(definition)})")
+            total_null += 1
+            processed_ids.add(cid)
+            continue
+
+        # Gate: reject summaries
+        if is_summary and gate_enabled:
+            total_gate_violations += 1
+            print("→ 🚫 Self-flagged as summary, skipping")
+            processed_ids.add(cid)
+            continue
+
+        # Build FB record
+        fb_id: str = make_hash_id(name, definition)
+        fb: dict = {
+            "fb_id": fb_id,
+            "name": name,
+            "definition": definition,
+            "mechanism": mechanism,
+            "boundary": boundary,
+            "consequence": consequence,
+            "is_summary": is_summary,
+            "evidence_passages": result.get("evidence_passages", evidence_passages[:5]),
+            "evidence_passages_shown": evidence_passages,  # BUG-045 fix: what LLM actually saw (5-15), not all cluster segments
+            "depth": result.get("depth", "domain"),
+            "discipline": result.get("discipline", "emerging"),
+            "domain": result.get("domain", ["emerging"]),
+            "evidence": result.get("evidence", "cited"),
+            "route": route,
+            "source_cluster": cid,
+            "source_books": cluster.get("source_books", []),
+            "source_segments": cluster.get("segment_ids", []),
+            "cluster_cohesion": cluster.get("cohesion", 0.0),
+            "cluster_size": cluster.get("size", 0),
+            "source_diversity": book_count,
+            "is_convergent": is_conv,
+        }
+        fb = stamp_record(fb, gen_model=GEN_MODEL)
+        fb["pipeline_commit"] = pipeline_commit
+
+        # MinHash near-dedup
+        if minhash_ok:
+            is_dup, sig = is_near_duplicate(definition, lsh, minhash_cache)
             if is_dup:
                 total_skipped += 1
+                print("→ 🗑️  Near-duplicate, skipping")
+                processed_ids.add(cid)
                 continue
+            fb["minhash_signature"] = sig
 
-            # Collect source books from source segment
-            source_book = ""
-            for seg in batch:
-                if seg["segment_id"].startswith(source_segment[:12]):
-                    source_book = seg.get("source_book", "")
-                    break
+        all_fbs.append(fb)
+        total_extracted += 1
+        processed_ids.add(cid)
 
-            principle = {
-                "principle_id": make_hash_id(principle_text),
-                "principle_text": principle_text,
-                "source_segments": [source_segment] if source_segment else [],
-                "source_books": [source_book] if source_book else [],
-                "batch_index": batch_idx,
-                "minhash_signature": sig,
-            }
-            principle = stamp_record(principle, gen_model=GEN_MODEL)
-            principle["pipeline_commit"] = pipeline_commit
-            all_principles.append(principle)
-            batch_principles += 1
+        elapsed: float = time.time() - start
+        depth_tag: str = result.get("depth", "?")[:1].upper()
+        sum_tag: str = "⚠️SUM" if is_summary else ""
+        print(f"→ ✅ '{name[:40]}' {depth_tag} {sum_tag} ({elapsed:.1f}s)")
 
-        elapsed = time.time() - start
-        total_extracted += batch_principles
-        print(f"→ {batch_principles} principles ({elapsed:.1f}s)")
-
-        # Incremental checkpoint — write every 5 batches to avoid data loss on crash
-        if batch_idx % 5 == 0 or batch_idx == len(batches):
-            seen_ids: set[str] = set()
-            deduped = []
-            for p in all_principles:
-                if p["principle_id"] not in seen_ids:
-                    seen_ids.add(p["principle_id"])
-                    deduped.append(p)
+        # Incremental checkpoint every 5 clusters
+        if i % 5 == 0 or i == len(target_clusters):
             safe_write(
                 STAGE2_CHECKPOINT,
-                "\n".join(json.dumps(p, ensure_ascii=False) for p in deduped) + "\n",
+                "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
             )
-            # Track processed segment IDs for resume
-            processed_ids = set()
-            for p in deduped:
-                for seg in p.get("source_segments", []):
-                    processed_ids.add(seg)
-            with open(str(STAGE2_CHECKPOINT) + ".segids", "w") as f:
-                json.dump(list(processed_ids), f)
+            # Atomic segids
+            import tempfile
+            segids_tmp = tempfile.NamedTemporaryFile(
+                mode="w", suffix=".segids", delete=False,
+                dir=str(STAGE2_CHECKPOINT.parent)
+            )
+            try:
+                json.dump(list(processed_ids), segids_tmp)
+                segids_tmp.flush()
+                os.fsync(segids_tmp.fileno())
+                segids_tmp.close()
+                os.replace(segids_tmp.name, segids_file)
+            except Exception:
+                if os.path.exists(segids_tmp.name):
+                    os.unlink(segids_tmp.name)
 
-    # Deduplicate by principle_id (exact duplicates that slipped through)
-    seen_ids: set[str] = set()
-    deduped = []
-    for p in all_principles:
-        if p["principle_id"] not in seen_ids:
-            seen_ids.add(p["principle_id"])
-            deduped.append(p)
-
-    # Write checkpoint
+    # Write final checkpoint
     safe_write(
         STAGE2_CHECKPOINT,
-        "\n".join(json.dumps(p, ensure_ascii=False) for p in deduped) + "\n",
+        "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
     )
 
     # Summary
     print(f"\n{'='*60}")
-    print(f"✅ Principles extracted:  {total_extracted}")
-    print(f"🗑️  Near-duplicates:       {total_skipped}")
-    print(f"🔑 Unique after dedup:    {len(deduped)}")
-    print(f"📋 Checkpoint:            {STAGE2_CHECKPOINT}")
+    print(f"✅ Convergent FBs:     {total_extracted}")
+    print(f"🚪 Gate violations:    {total_gate_violations} (self-flagged as summary)")
+    print(f"⏭️  NULL routes:        {total_null}")
+    print(f"🗑️  Near-duplicates:    {total_skipped}")
+    print(f"📦 Total FBs:          {len(all_fbs)}")
+    if all_fbs:
+        from collections import Counter
+        depths = Counter(fb.get("depth", "?") for fb in all_fbs)
+        print(f"📊 Depths:             {dict(depths)}")
+        routes = Counter(fb.get("route", "?") for fb in all_fbs)
+        print(f"📊 Routes:             {dict(routes)}")
+    print(f"📋 Checkpoint:         {STAGE2_CHECKPOINT}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Stage 2: Extract Principles via Qwen3.6")
-    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE,
-                        help=f"Segments per LLM call (default: {BATCH_SIZE})")
-    parser.add_argument("--minhash-threshold", type=float, default=MINHASH_THRESHOLD,
-                        help=f"MinHash Jaccard threshold (default: {MINHASH_THRESHOLD})")
-    parser.add_argument("--intent", type=str, default=None,
-                        help="Domain-specific extraction focus (e.g. 'pricing strategy, cost modeling, revenue generation, financial planning')")
-    args = parser.parse_args()
+def main() -> None:
+    """CLI entry point."""
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="Stage 2: Convergent principle extraction from clusters"
+    )
+    parser.add_argument("--only-convergent", action="store_true",
+                        help="Skip single-source clusters (extract only from ≥2 book clusters)")
+    parser.add_argument("--provider", choices=["omlx", "mlx"], default="omlx",
+                        help="LLM provider (default: omlx)")
+    parser.add_argument("--no-gate", action="store_true",
+                        help="Disable gate enforcement (debug only)")
+    args: argparse.Namespace = parser.parse_args()
 
-    run_stage2(batch_size=args.batch_size, minhash_threshold=args.minhash_threshold, intent=args.intent)
+    run_stage2(
+        provider=args.provider,
+        only_convergent=args.only_convergent,
+        gate_enabled=not args.no_gate,
+    )
 
 
 if __name__ == "__main__":

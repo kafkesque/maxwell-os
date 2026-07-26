@@ -21,17 +21,17 @@ Generator ≠ Verifier (R5): Use Qwen3.6 for generation, Phi-4-mini for verifica
 
 import json
 import time
-import requests
-from typing import Optional
 
+import requests
+
+from pipeline.json_repair import parse_json_robust, repair_json
 from pipeline.pipeline_paths import (
-    OMLX_URL,
-    OMLX_API_KEY,
-    GEN_MODEL,
     GEN_MAX_TOKENS,
+    GEN_MODEL,
+    OMLX_API_KEY,
+    OMLX_URL,
     VERIFY_MODEL,
 )
-from pipeline.json_repair import repair_json, parse_json_robust
 
 # ── Constants ──────────────────────────────────────────────────────────────
 DEFAULT_TIMEOUT = 180  # seconds
@@ -47,7 +47,7 @@ CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
 def call_omlx(
     prompt: str,
     model: str = GEN_MODEL,
-    system: Optional[str] = None,
+    system: str | None = None,
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> str:
@@ -121,7 +121,7 @@ def call_omlx(
 def call_omlx_json(
     prompt: str,
     model: str = GEN_MODEL,
-    system: Optional[str] = None,
+    system: str | None = None,
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> dict | list:
@@ -168,7 +168,7 @@ def call_omlx_json(
             f"OMLX response could not be parsed as JSON. "
             f"Raw (first 200 chars): {raw[:200]}... "
             f"Error: {e}"
-        )
+        ) from e
 
 
 def get_omlx_version() -> str | None:

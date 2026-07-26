@@ -22,15 +22,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.omlx_call import check_omlx_health
 from pipeline.pipeline_paths import (
-    CHECKPOINT_DIR,
-    STAGE_CHECKPOINTS,
+    BOOKS_DIR,
     DB_PATH,
     PARQUET_DIR,
-    BOOKS_DIR,
     SCHEMA_VERSION,
+    STAGE_CHECKPOINTS,
 )
-from pipeline.omlx_call import check_omlx_health
 
 
 def count_jsonl(path: Path) -> int:
@@ -133,9 +132,9 @@ def get_status(json_output: bool = False) -> dict:
         return status
 
     # Pretty print
-    print(f"╔══════════════════════════════════════════════╗")
-    print(f"║   Maxwell OS v2.0 — Pipeline Status         ║")
-    print(f"╚══════════════════════════════════════════════╝")
+    print("╔══════════════════════════════════════════════╗")
+    print("║   Maxwell OS v2.0 — Pipeline Status         ║")
+    print("╚══════════════════════════════════════════════╝")
     print()
 
     # Services
@@ -146,7 +145,7 @@ def get_status(json_output: bool = False) -> dict:
     print()
 
     # Pipeline stages
-    print(f"  ┌─ Pipeline Stages ──────────────────────────┐")
+    print("  ┌─ Pipeline Stages ──────────────────────────┐")
     stage_names = {
         0: "0. Convert  ",
         1: "1. Chunk    ",
@@ -161,7 +160,7 @@ def get_status(json_output: bool = False) -> dict:
         bar = _bar(count, max(max(stage_counts.values()), 1), 20)
         name = stage_names[i]
         print(f"  │ {name} │ {bar} │ {count:>6} │")
-    print(f"  └────────────────────────────────────────────┘")
+    print("  └────────────────────────────────────────────┘")
     print()
 
     # Database

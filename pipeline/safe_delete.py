@@ -21,7 +21,6 @@ Usage:
 """
 
 import argparse
-import os
 import shutil
 import sys
 from datetime import datetime
@@ -134,7 +133,7 @@ def backup_then_delete(path, reason, no_confirm=False, maxwell_confirmed=None):
             path.unlink()
         print(f"  ✅ Deleted: {path}")
         print(f"  📦 Backup preserved at: {dest}")
-        print(f"  ℹ️  Log to DECISION-LOG.md if this is a pipeline output deletion.")
+        print("  ℹ️  Log to DECISION-LOG.md if this is a pipeline output deletion.")
     except Exception as e:
         print(f"  ❌ Delete failed: {e}")
         sys.exit(1)

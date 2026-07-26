@@ -1,219 +1,186 @@
-# Maxwell OS v2.1 — CONSOLIDATED MASTER TASK REGISTER
-> **Generated:** 2026-07-21 20:00 | **Sources:** DECISION-LOG.md, agent/session_seed.yaml,  
-> ULTIMATE-CROSS-EXAMINATION-2026-07-21.md, ULTIMATE-CROSS-EXAMINATION-HANDOFF.md,  
-> temp/asad.txt, buglog.md, MASTER-TASK-REGISTER.md (git recovery)
-> **Rule:** Done tasks → move to DONE section. Only undone tasks stay on top.
+# Maxwell OS v3.0 — MASTER TASK REGISTER
+> **Updated:** 2026-07-26 15:33 | **Sources:** MTR v2.2 + COMPREHENSIVE-TASK-REGISTER + Session Research
+> **Rule:** Undone tasks at top (priority-ordered). Done tasks at bottom.
+> **Buglog:** 11 open bugs (DELEGATE-001, BUG-044–054)
 
 ---
 
-## 🔴 CRITICAL (Must do NOW)
+## ⚠️ DELEGATE WARNING — BOTH DELEGATE MODELS BROKEN
+
+| Model | Bug | Status |
+|-------|-----|--------|
+| Phi-4-mini-instruct-8bit | **BUG-053:** HALLUCINATES — fabricates repo names, star counts, URLs. Do NOT use for factual/research tasks. | 🔴 OPEN |
+| Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | **BUG-054:** OMLX JSON parse error — `Failed to parse JSON: error decoding response body`. | 🔴 OPEN |
+| DeepSeek API | **DELEGATE-001:** reasoning_content passthrough bug (thinking mode). | 🟡 WORKAROUND (don't use) |
+
+**CURRENT STATE:** Delegation is DEAD. All 3 paths blocked. Do research & code tasks directly until BUG-053/054 resolved.
+**Only safe delegate use:** Phi-4-mini for summarization WHEN source text is provided inline (no external data fetching).
+**Untested:** gemma-4-E4B-it-MLX-4bit for delegates — may work, investigate.
+
+---
+
+## 🔴 CRITICAL — BLOCKS EVERYTHING (Session 2026-07-26)
+
+| # | Task | Source | Effort | Impact | Status |
+|---|------|--------|--------|--------|--------|
+| C1 | **Delegate system fix** — Use local OMLX for ALL delegates (DeepSeek→$0) | DELEGATE-001 | 0h | Saved $$$ + attempted fix | ✅ DONE (workaround applied, but BUG-053/054 discovered) |
+| C2 | **Governance sync** — decisions.yaml auto-sync, stale refs fixed, NLI mismatch resolved | Cross-audit | 2h | 115 decisions synced, zero contradictions | ✅ DONE |
+| C3 | **Run `just smoke`** — Verify all Tier 0 fixes E2E | IMPL-PLAN | 0.5h | Blocked by BUG-051 | ⬜ BLOCKED — smoke processes 852 books (BUG-051) |
+| C4 | **CONSTITUTION NLI mismatch** — roberta-large-mnli → DeBERTa-v3-base-mnli (D2111) | Deep Audit §5.1 | 0.1h | Stage 5 verification aligned | ✅ DONE |
+| C5 | **DELEGATE-001 logged to buglog** | This session | 0.1h | Buglog current | ✅ DONE |
+| C6 | **BUG-053 logged** — Phi-4-mini hallucination | This session | 0.1h | Prevents bad decisions | ✅ DONE |
+| C7 | **BUG-054 logged** — Qwen3-Coder OMLX parse error | This session | 0.1h | Delegation status documented | ✅ DONE |
+| C8 | **BUG-051 logged** — just smoke processes all books | This session | 0.1h | Smoke test fix tracked | ✅ DONE |
+
+---
+
+## 🟠 HIGH — THIS WEEK (Unblock Pipeline Scaling)
+
+| # | Task | Source | Effort | Impact | Why High |
+|---|------|--------|--------|--------|----------|
+| H1 | **Fix BUG-051: `just smoke` limits** — Add `--limit 1` or pick first book | This session | 0.5h | Unblocks smoke testing | Can't verify any fix without working smoke test |
+| H2 | **Investigate BUG-054: Qwen3-Coder OMLX parse** — Test raw curl completions, check for non-JSON output | This session | 1h | Unblocks code-gen delegation | All delegation dead until resolved |
+| H3 | **Test gemma-4-E4B-it for delegates** — Only untested model, may be the fix for BUG-053/054 | This session | 0.5h | May restore delegation | gemma-4 is cross-family verifier, may work for delegates |
+| H4 | **20-book FAISS calibration** | IMPL-PLAN T1#1 | 2h | Unlocks production scale | Threshold calibrated on 3 books only |
+| H5 | **Stage 3: fix or remove** (BUG-048) | IMPL-PLAN T1#2 | 4h | Removes pipeline dead weight | Bypassed via bridge script |
+| H6 | **LightRAG overlay** (Layer 1c) — 38,163★, MIT, updated daily, graph on top of existing vector store | Weekly Research + Feed Research | 4h | Highest benefit/effort ratio | Every independent source validates graph > vector |
+| H7 | **20-book E2E test** | IMPL-PLAN T1#5 | 3h | Validates v3.0 at scale | Expect 50-200 FBs |
+| H8 | **Stage 4 simplification** (D2112) | IMPL-PLAN T1#3 | 3h | Prevents subtle v3.0 bugs | 650-line script for old architecture |
+| H9 | **Implement --dry-run mode** | IMPL-PLAN T3#17 + Weekly Research I4 | 4h | Noob vibecoder safety | "Preview before commit" — Beyang Liu pattern |
+| H10 | **Resolve D316 vs D2066 — SALSA multi-label cleanup in code** | Deep Audit §2.8 | 1h | Removes architectural ambiguity | CONSTITUTION updated; code still references SALSA? |
+
+---
+
+## 🟡 MEDIUM — THIS MONTH (Quality, Layer 2 Foundation)
+
+| # | Task | Source | Effort | Why |
+|---|------|--------|--------|-----|
+| M1 | **Evaluate Graphify** (96,158★) — Turn codebase+docs into queryable KG | Feed Research (NEW) | 3h | Could make Maxwell self-aware — ingest own codebase as KG |
+| M2 | **Evaluate Cognee** (29,368★) — Open-source AI memory platform | Feed Research (NEW) | 4h | Persistent agent memory across sessions, self-hosted |
+| M3 | **Evaluate Supermemory** (28,621★) — Local-first memory engine | Feed Research (NEW) | 3h | "Extremely fast, scalable, runs fully locally" — aligns with C1/C3 |
+| M4 | **IBM Course study → Layer 2 blueprint** | Weekly Research I7 | 16h | Maps 1:1 to Maxwell needs (3 modules: agentic graph, graph memory, multi-agent) |
+| M5 | **MCP server for knowledge access (C25)** | IMPL-PLAN T2#10 | 8h | Agent-agnostic FB query |
+| M6 | **Implement skill.md standard** | IMPL-PLAN T2#9 | 4h | IBM production-proven agent skill composition |
+| M7 | **Hardware probe (C24)** | IMPL-PLAN T2#11 | 3h | Auto-detect RAM, prevent OOM |
+| M8 | **Golden set audit + convergent examples** | IMPL-PLAN T2#6,#8 | 3h | v3.0 schema coverage validation |
+| M9 | **Schema migration scripts** | IMPL-PLAN T3#15 | 3h | Recover v1's 19,863 FBs |
+| M10 | **Add "Trust But Verify" citation pattern** | Weekly Research R2 | 2h | Independently validated by Brightwave |
+| M11 | **Evaluate Semantica** (1,440★) — Graph-native infrastructure for accountable AI | Feed Research (NEW) | 2h | Lightweight alternative to Neo4j for Maxwell Layer 2 |
+| M12 | **Evaluate Neo4j llm-graph-builder** (4,963★) — Graph construction from unstructured data via LLMs | Feed Research (NEW) | 2h | Could replace/supplement Stage 2 extraction for graph layer |
+| M13 | **Research: awesome-agent-skills + awesome-llm-apps** (127,802★) | Feed Research (NEW) | 2h | 100+ agent skills and RAG patterns for skill.md adoption |
+| M14 | **Benchmark Qwen3-Embedding-0.6B vs bge-m3** | IMPL-PLAN T2#2 | 1h | Speed/quality tradeoff for Stage 1.5 |
+| M15 | **Stratify golden sampling by type** | IMPL-PLAN T2#5 | 0.5h | 67/75 principle fix |
+
+---
+
+## 🟢 LATER — 6-12 Weeks (Graph Substrate, Speed, Cognitive Architecture)
 
 | # | Task | Source | Effort |
 |---|------|--------|--------|
-| C1 | pip install umap-learn | G0.6 | ✅ DONE |
-| C2 | Resolve M3: D316 (multi-label) vs D2024 (SALSA dichotomous) | D2032 | G7 DECISION |
-| C3 | OMLX memory stress test (T-0.1): 5 pipeline runs, vm_stat | Gap A, D2020 | 15 min |
-| C4 | Install pytest, run 12/12 chunker tests | G0.1 | ✅ DONE |
-| C5 | Fix BUG-015: datasketch import must raise, not print() | BUG-015, C16 | ✅ DONE |
-| C6 | Adopt C16-C20 in CONSTITUTION, AGENTS, .ponytail.yaml | Ponytail analysis | ✅ DONE |
+| L1 | Benchmark USearch vs FAISS (4,234★, C++, SIMD+NEON for Apple Silicon) | Feed Research | 2h |
+| L2 | Evaluate Zep/Graphiti for temporal provenance | IMPL-PLAN T3#13 + Weekly Research I9 | 4+8h |
+| L3 | Benchmark MLX vs OMLX | IMPL-PLAN T3#14 | 2h |
+| L4 | Integration test suite | IMPL-PLAN T3#16 | 4h |
+| L5 | GAAMA 4-node memory architecture | Weekly Research I8 | 8h |
+| L6 | Typed Graph Storage (F1) | IMPL-PLAN T4#F1 | 8h |
+| L7 | Edge Type Ontology (F2) | IMPL-PLAN T4#F2 | 8h |
+| L8 | Skill Subgraph Templates (F3) | IMPL-PLAN T4#F3 | 12h |
+| L9 | Constitutional Constraint Graph (F4) | IMPL-PLAN T4#F4 | 16h |
+| L10 | Self-Observation Protocol (F5) | IMPL-PLAN T4#F5 | 12h |
+| L11 | Evaluate zvec performance (15,277★, C++, embedded vector DB, Alibaba) | Feed Research | 2h |
+| L12 | Evaluate NornicDB (832★, Graph+Vector+Temporal MVCC, sub-ms HNSW) | Feed Research (NEW) | 2h |
+| L13 | 130-book end-to-end run | IMPL-PLAN T3#S4 | 6-12h |
+| L14 | FAISS GPU (Metal) acceleration for Stage 1.5 | IMPL-PLAN T3#S3 | 1h |
 
 ---
 
-## 🟠 HIGH — Phase 0.5 (Pre-Processing Quality)
+## 🔵 TIER 1 — ARCHITECTURE + VERIFICATION (15/18 DONE — moved to bottom)
 
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| H1 | clean_markdown() — strip formatting artifacts | 30 | asad.txt #15 | ⬜ |
-| H2 | normalize_paragraphs() — 30-250 word paragraphs | 30 | asad.txt #16 | ⬜ |
-| H3 | Integration wiring (Layer 4) | 20 | asad.txt #17 | ⬜ |
-| H4 | Post-conversion quality check (garbled PDFs) | 15 | asad.txt #18 | ⬜ |
-| H5 | Re-run 130 pricing books with fixed pipeline | — | Gap B | ⬜ |
-| H6 | Run brand strategy domain (cross-domain validation) | — | Gap B/F | ⬜ |
+### Architecture Restructure — 8/10 done
+| ID | Task | Status |
+|----|------|--------|
+| A1 | Port FAISS clustering → `stage1_5_embed_cluster.py` | ✅ 407 LOC |
+| A2 | Configure FAISS params (cos≥0.75, min_cluster=2, max=500) | ✅ Calibrated 0.70 |
+| A3 | Embed raw segments via bge-m3 | ✅ 237 segments in 21s |
+| A4 | Write stage2_cluster.py (HDBSCAN+UMAP) | ⬜ SKIPPED — redundant with FAISS |
+| A5 | Rewrite stage2 for convergent extraction | ✅ 639 LOC |
+| A6 | Add mechanism/boundary/consequence/is_summary/evidence_passages schema | ✅ |
+| A7 | Merged extraction+classification in single LLM call | ✅ |
+| A8 | Simplify stage4 → stage4_format_classify | ⬜ SKIPPED — cosmetic |
+| A9 | Update pipeline_config.yaml stage ordering | ✅ |
+| A10 | Update pipeline_paths.py with new checkpoints | ✅ |
 
----
+### Stage 5 Verification Fix — 7/8 done
+| ID | Task | Status |
+|----|------|--------|
+| V1 | Port DeBERTa NLI | ✅ |
+| V2-V5 | Flip fail-open → fail-closed (4 return statements) | ✅ |
+| V6 | Remove embedding similarity, replace with DeBERTa NLI | ✅ 83 lines removed |
+| V7 | Compare against evidence_passages (verbatim) | ✅ |
+| V8 | Wire cluster_noise.jsonl into Stage 4 read path | ✅ |
 
-## 🟢 HIGH — Phase 1 (Intent + Verification)
-
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| V1 | stage1_5_intent.py — semantic pre-filter | 80 | asad.txt #20, D2013 | ⬜ |
-| V2 | stage5_verify_v2.py — FActScore + DeBERTa NLI | 200 | asad.txt #21, D2013 | ⬜ |
-| V3 | Golden few-shot examples YAML for Stage 2/4 prompts | — | asad.txt #22, D2045 | ⬜ |
-| V4 | Source-substring gate in stage2 (~30 LOC) | 30 | asad.txt #23, D2043 | ⬜ |
-| V5 | --intent flag wires to semantic filter | 10 | asad.txt #24 | ⬜ |
-| V6 | NLI pre-merge coherence check (DeBERTa pairwise) | ~30 | asad.txt #27, D2044 | ⬜ |
-| V7 | Claim-type routing: FACT→DeBERTa, CAUSAL→Phi-4, STAT→source | ~50 | Gap E, D2023 | ⬜ |
-| V8 | Author-weighted BORP (~30 LOC) | ~30 | Gap C, D2053-C | ⬜ |
-| V9 | Golden FB calibration data injected into prompts | — | asad.txt #30, D2052 | ⬜ |
-| V10 | SALSA test on 20 hand-labeled FBs (BL5) | — | BL5, D2046 | ⬜ |
-| V11 | Source provenance verification gate (BL1) | ~30 | BL1, D2029 | ⬜ |
-| V12 | DeBERTa benchmark on M1 Max (BL3) | — | BL3 | ⬜ |
-
----
-
-## 🔷 MEDIUM — Phase 1.5 (Modularize)
-
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| M1 | Spike: Outlines/XGrammar + OMLX compatibility | — | asad.txt #25, D2041 | ⬜ |
-| M2 | DFlash speculative decoding verification | — | asad.txt #26, D2042 | ⬜ |
-| M3 | InferenceProvider Protocol + OMLX/Ollama impl | 40 | asad.txt #38, D2014 | ⬜ |
-| M4 | StagePlugin ABC + StageRegistry | 80 | asad.txt #39 | ⬜ |
-| M5 | Embedding model versioning in schema | 10 | asad.txt #40 | ⬜ |
-| M6 | Prompt versioning in output metadata | 5 | asad.txt #41 | ⬜ |
-| M7 | Config-driven model assignments (hardcoded→YAML) | 25 | asad.txt #42 | ⬜ |
+### Quick Fixes — 3/3 done
+| ID | Task | Status |
+|----|------|--------|
+| Q1 | Fix YAML duplicate key | ✅ |
+| D2108 | Fix cluster collapse | ✅ |
+| D2109 | Vibecheck system | ✅ |
 
 ---
 
-## 🔵 MEDIUM — Phase 1 Cross-Exam Gaps
+## 🔵 TIER 2 — QUALITY + CALIBRATION (2/7 done, remaining moved to MEDIUM)
 
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| G1 | Drift detection implementation (BL7, D2031) | ~50 | BL7 | ⬜ |
-| G2 | Embedding migration protocol (CT1) | ~60 | CT1 | ⬜ |
-| G3 | Prompt version control SHA-256 hashing (BL2, D2030) | ~40 | BL2 | ⬜ |
-| G4 | UMAP fallback definition (BL6) | — | BL6 | ⬜ |
-| G5 | In-memory dedup persistence (BT4) | ~10 | BT4 | ⬜ |
-| G6 | ollama.stop() after Stage 3 (BT5) | ~3 | BT5 | ⬜ |
-| G7 | Stage 5 bottleneck analysis (BT1) | — | BT1 | ⬜ |
+| ID | Task | Status |
+|----|------|--------|
+| Q1 | Fix YAML duplicate key | ✅ |
+| Q6 | 5-book E2E test (v3.0 validation) | ✅ 3 books, 237 chunks, 7 FBs |
+| Q2-Q5,Q7 | Remaining Tier 2 | ⬜ → See M14, M15, M8 above |
 
 ---
 
-## 🔵 Phase 2 — Layer 2 (The Product)
+## 🐛 OPEN BUGS (Prioritized)
 
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| L1 | Trust Ledger schema + log execution outcomes | 25 | asad.txt #43 | ⬜ |
-| L2 | fb_reliability scoring (STABLE/WATCH/UNSTABLE/GARBAGE) | 40 | asad.txt #44 | ⬜ |
-| L3 | Recipe compiler: PT + consulted FBs → Goose YAML | 80 | asad.txt #45, D2049 | ⬜ |
-| L4 | retrieve.py v2 with pre-computed embeddings (BUG-004) | 40 | asad.txt #46 | ⬜ |
-| L5 | Hybrid search: FTS5 + sqlite-vec RRF | 40 | asad.txt #47 | ⬜ |
-| L6 | 3-zone body template enforcement | 50 | asad.txt #48 | ⬜ |
-| L7 | Conductor Loop: trigger→retrieve→execute→verify | 50 | asad.txt #49 | ⬜ |
-| L8 | Parquet + LanceDB + DuckDB canonical storage (D2048) | — | asad.txt #50 | ⬜ |
-
----
-
-## 🟠 Phase 3 — Scale + Access
-
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| S1 | FastAPI REST: /query, /recommend, /explain, /feedback | 150 | asad.txt #51 | ⬜ |
-| S2 | MCP server wrapper (read-only tools for agents) | 80 | asad.txt #52 | ⬜ |
-| S3 | Web ingestion: SearXNG + Trafilatura + Crawl4AI | 100 | asad.txt #53 | ⬜ |
-| S4 | Multi-domain support (beyond pricing) | 40 | asad.txt #54 | ⬜ |
-| S5 | fb_relationships table (supports/contradicts/extends) | 30 | asad.txt #55 | ⬜ |
-| S6 | IP legal consult (Gap D, D2025) | — | Gap D | ⬜ |
+| Bug | Severity | Description | Status |
+|-----|----------|-------------|--------|
+| **DELEGATE-001** | 🔴 CRITICAL | reasoning_content passthrough — DeepSeek delegates fail | 🟡 WORKAROUND (don't use DeepSeek for delegates) |
+| **BUG-054** | 🔴 CRITICAL | Qwen3-Coder-30B OMLX JSON parse error — blocks code-gen delegation | 🔴 OPEN — see H2 |
+| **BUG-053** | 🔴 CRITICAL | Phi-4-mini HALLUCINATES on factual tasks — blocks research delegation | 🔴 OPEN — see H3 (test gemma-4) |
+| **BUG-051** | 🟠 HIGH | `just smoke` processes ALL 852 books — smoke test unusable | 🟡 OPEN — see H1 |
+| **BUG-048** | 🟡 MED | Stage 3 semantic dedup bypassed | ⬜ OPEN — see H5 |
+| **BUG-044** | 🟡 MED | Stage 3 clusters not used (bridge bypass) | ⬜ OPEN — same root as BUG-048 |
+| **BUG-046** | 🟡 MED | Stage 4 complexity for v3.0 | ⬜ OPEN — see H8 |
+| **BUG-045** | 🟡 MED | Stage 2 source_segments metadata inflated | ✅ FIXED (2026-07-26) |
+| **BUG-047** | 🟡 MED | check_factual_llm old schema | ✅ FIXED (2026-07-26) |
+| **BUG-049** | 🟡 MED | FAISS threshold monitoring with 5+ books | 🟡 Monitor — see H4 |
+| **BUG-050** | 🟡 MED | Only 3/5 books chunked in old pipeline | 🟡 Run more converts |
+| **BUG-017** | 🟢 LOW | OMLX kernel memory leak | Monitor |
+| **BUG-037** | 🟢 LOW | OMLX registry stale | Needs OMLX GUI restart |
 
 ---
 
-## 🟤 Phase 4 — Onboard + Monetize
+## ✅ DONE — Quick Reference
 
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| O1 | Onboarding CLI: VALIDATE + DISCOVER modes | 200 | asad.txt #57 | ⬜ |
-| O2 | ExtractionProfile JSON (onboarding → pipeline bridge) | 30 | asad.txt #58 | ⬜ |
-| O3 | Lifetime license billing (D2050) | 50 | asad.txt #59 | ⬜ |
-| O4 | Multi-tenancy (user_id, private FBs) | 50 | asad.txt #60 | ⬜ |
-| O5 | Web UI (minimal) | 100 | asad.txt #61 | ⬜ |
-
----
-
-## ⚫ Phase 5 — Moat
-
-| # | Task | Source | Status |
-|---|------|--------|--------|
-| Z1 | Claim graph (cross-FB consistency) | asad.txt #62 | ⬜ |
-| Z2 | Dynamic source reliability (author/book weighting) | asad.txt #63 | ⬜ |
-| Z3 | Self-healing loop (auto-flag degrading FBs) | asad.txt #64 | ⬜ |
-| Z4 | Multi-model adjudication (Critic: Qwen3-0.6B) | asad.txt #65 | ⬜ |
-| Z5 | Contextual Retrieval (Anthropic 2024, D2040) | asad.txt #66 | ⬜ |
-| Z6 | FastFit classifier on 500+ FBs (D2051) | asad.txt #67 | ⬜ |
-| Z7 | pgvector migration path | asad.txt #68 | ⬜ |
+| Decision | What | Status |
+|----------|------|--------|
+| D2092-D2097 | Architecture diagnosis + fix plan | ✅ |
+| D2098-D2106 | Cross-examination of 8 proposals | ✅ |
+| D2107 | Tier 1 session partial | ✅ |
+| D2108 | Cluster collapse fix | ✅ |
+| D2109 | Vibecheck system | ✅ |
+| D2110 | stage2_extract.py v3.0 (convergent) | ✅ |
+| D2111 | stage5 DeBERTa NLI port | ✅ |
+| D2112 | Tier 1 15/18 complete | ✅ |
+| **D2115** | C12 de-hardcode + dead code archive + model sync + constitution fix + justfile + BUG-045/047 | ✅ |
+| **D2116** | feed.opml expansion + weekly deep research + governance update + C12b-d sub-rules | ✅ |
+| **D2117** | Tier 1-4 remaining tasks logged + IBM course Layer 2 blueprint | ✅ |
+| **D2118** | Full feed.opml research + 6 NEW tool discoveries + BUG-051/053/054 logged + MTR merged | ✅ (2026-07-26) |
+| **D2119** | Delegate cascade failure documented — Phi-4-mini hallucination + Qwen3-Coder parse error + DeepSeek thinking bug | ✅ (2026-07-26) |
+| A1-A10 | Architecture restructure | 8/10 done ✅ |
+| V1-V8 | Stage 5 verification fix | 7/8 done ✅ |
+| C1-C2,C4-C8 | Session critical fixes | 7/8 done ✅ (C3 blocked) |
 
 ---
 
-## 📋 GAP REGISTER
-
-| Gap | Description | Gate | Status |
-|-----|-------------|------|--------|
-| A | OMLX kernel memory leak untested (GitHub #2184) | Stress test BEFORE Phase 0 | ⬜ |
-| B | Single-domain bias (only pricing tested) | Run brand strategy after Phase 0 | ⬜ |
-| C | No author diversity in BORP | Add in V8 (~30 LOC) | ⬜ |
-| D | IP/copyright risk unexamined | Legal consult before Phase 3 | ⬜ |
-| E | DeBERTa weak on causal/statistical claims | Claim-type routing (V7) | ⬜ |
-| F | Onboarding conceptual model unresolved | Design from scratch in Phase 4 | ⬜ |
-
----
-
-## 🐛 OPEN BUGS (from buglog.md)
-
-| Bug | Severity | Symptom | Status |
-|-----|----------|---------|--------|
-| BUG-004 | 🟠 HIGH | Vector search re-embeds entire DB every query | Phase 1 |
-| BUG-015 | 🟡 MEDIUM | Silent datasketch import failure | C5 |
-| BUG-017 | 🔴 CRITICAL | OMLX kernel memory leak untested | T-0.1 / C3 |
-
----
-
-## 🟢 NEW GOVERNANCE RULES (from ponytail-lite/cursor-rules analysis)
-
-| Rule | Description | Priority |
-|------|-------------|----------|
-| C16 | No silent errors — all except clauses must log or raise | 🔴 CRITICAL |
-| C17 | Type hints on all function signatures | 🟠 HIGH |
-| C18 | Docstrings on all functions >5 lines | 🟠 HIGH |
-| C19 | No dead code — _OLD files → archive/ | 🟡 MEDIUM |
-| C20 | Magic numbers extracted to config or named constants | 🟡 MEDIUM |
-
----
-
-## ✅ DONE
-
-| # | Task | When |
-|---|------|------|
-| P0.1 | clean_line("") returns "" not None | 2026-07-21 |
-| P0.2 | split_on_headings() paragraph-aware (list[list[str]]) | 2026-07-21 |
-| P0.3 | Remove numbered-list from SKIP_PATTERNS | 2026-07-21 |
-| P0.4 | MIN_CHUNK_WORDS 30→10 | 2026-07-21 |
-| P0.5 | PCA → UMAP(random_state=42, cosine) | 2026-07-21 |
-| P0.6 | nomic-embed-text → bge-m3 | 2026-07-21 |
-| P0.7 | HDBSCAN min_cluster_size 3→8 | 2026-07-21 |
-| P0.8 | _load_cluster_map() in stage5_verify.py | 2026-07-21 |
-| P0.9 | get_pipeline_run_id() singleton in stamp.py | 2026-07-21 |
-| P0.10 | VERIFY_MODEL for SALSA (R5 fix) | 2026-07-21 |
-| P0.11 | sqlite_vec.load(conn) before virtual table | 2026-07-21 |
-| P0.12 | omlx_watchdog.py replaces pkill guard | 2026-07-21 |
-| P0.13 | Cloud code audit — none found | 2026-07-21 |
-| P0.14 | Model audit — phantoms nuked, bge-m3 wired | 2026-07-21 |
-| M1 | CONSTITUTION.md re-synced v2.1 | 2026-07-21 |
-| M2 | OMLX server watchdog (pipeline/omlx_watchdog.py) | 2026-07-21 |
-| G1 | DECISION-LOG.md: D2026-D2054 (56 decisions) | 2026-07-21 |
-| G2 | agent/session_seed.yaml: rewritten v2.1 | 2026-07-21 |
-| G3 | AGENTS.md: updated v2.1 (models, 7-stage, boot) | 2026-07-21 |
-| G4 | LaunchAgents disabled (com.maxwell.*.plist) | 2026-07-21 |
-| G5 | Knowledge pipeline consolidated | 2026-07-21 |
-| G6 | Project folder unified (5 variants → 1) | 2026-07-21 |
-| G7 | Buglog updated (22 bugs, 19 resolved) | 2026-07-21 |
-| G8 | 29/29 pipeline .py syntax check passed | 2026-07-21 |
-| G9 | umap-learn installed (v0.5.12) | 2026-07-21 |
-| D1 | D2032: M3 conflict logged | 2026-07-21 |
-| D2 | D2033-D2038: Session decisions logged | 2026-07-21 |
-| D3 | D2039-D2053: Handoff items registered | 2026-07-21 |
-| D4 | D2054: asad.txt registered | 2026-07-21 |
-| B1 | BUG-018: stage1_chunk.py orphaned if → FIXED | 2026-07-21 |
-| B2 | BUG-019: pipeline_paths.py missing exports → FIXED | 2026-07-21 |
-| B3 | BUG-020: model_assignments.yaml phantoms → FIXED | 2026-07-21 |
-| B4 | BUG-021: LaunchAgents recreating dir → FIXED | 2026-07-21 |
-| B5 | BUG-022: Dropbox 5-folder variants → FIXED | 2026-07-21 |
-
----
-
-*Consolidated from: DECISION-LOG.md (56 decisions), MTR (git recovery), 
-ULTIMATE-CROSS-EXAMINATION-2026-07-21.md (534 lines),
-ULTIMATE-CROSS-EXAMINATION-HANDOFF.md (695 lines), temp/asad.txt (462 lines),
-buglog.md (325 lines), agent/session_seed.yaml (125 lines)*
-*Rule: When task done → move to DONE section. Undone tasks stay on top.*
-| C4 | pytest installed, 12/12 chunker tests pass | 2026-07-21 |
-| C5 | BUG-015 fixed: datasketch raises ImportError (C16) | 2026-07-21 |
-| C6 | C16-C20 adopted: CONSTITUTION, AGENTS, .ponytail.yaml | 2026-07-21 |
+*Rule: Undone tasks at top (critical→high→medium→later). Done tasks at bottom.*
+*Last action: BUG-051/053/054 logged, MTR merged with comprehensive register, 6 new tool discoveries from feed.opml research.*
+*Next: H1 (fix just smoke) → H2 (investigate BUG-054) → H3 (test gemma-4 for delegates) → H6 (LightRAG overlay)*

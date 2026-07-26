@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Maxwell OS — Rust MLX Ecosystem Feeds</title>
+    <dateCreated>2026-07-14</dateCreated>
+  </head>
+  <body>
+    <!-- Rust MLX Ecosystem — Weekly monitor feeds -->
+    <outline text="Rust MLX" title="Rust MLX Ecosystem">
+      <outline type="rss" text="MLX Rust GitHub Releases" title="mlx-rs Releases"
+               xmlUrl="https://github.com/rust-mlx/mlx-rs/releases.atom"
+               htmlUrl="https://github.com/rust-mlx/mlx-rs"/>
+      <outline type="rss" text="Candle (Rust ML framework)" title="Candle"
+               xmlUrl="https://github.com/huggingface/candle/releases.atom"
+               htmlUrl="https://github.com/huggingface/candle"/>
+      <outline type="rss" text="Burn (Rust DL framework)" title="Burn"
+               xmlUrl="https://github.com/tracel-ai/burn/releases.atom"
+               htmlUrl="https://github.com/tracel-ai/burn"/>
+      <outline type="rss" text="MLX Swift GitHub" title="mlx-swift"
+               xmlUrl="https://github.com/ml-explore/mlx-swift/releases.atom"
+               htmlUrl="https://github.com/ml-explore/mlx-swift"/>
+      <outline type="rss" text="Apple MLX Releases" title="mlx"
+               xmlUrl="https://github.com/ml-explore/mlx/releases.atom"
+               htmlUrl="https://github.com/ml-explore/mlx"/>
+      <outline type="rss" text="Rust ML Community" title="rust-ml-community"
+               xmlUrl="https://rust-ml.blogspot.com/feeds/posts/default"
+               htmlUrl="https://rust-ml.blogspot.com/"/>
+      <outline type="rss" text="HuggingFace Candle Blog" title="candle-blog"
+               xmlUrl="https://huggingface.co/blog/feed.xml"
+               htmlUrl="https://huggingface.co/blog"/>
+    </outline>
+  </body>
+</opml>

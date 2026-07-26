@@ -29,11 +29,10 @@ CLI:
 """
 import hashlib
 import json
-import os
-import sys
 import subprocess
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parent.parent
 SNAPSHOT_FILE = ROOT / "knowledge pipeline" / ".tmp" / ".doc_guard_snapshot.json"
@@ -70,26 +69,26 @@ def is_protected(filepath: str) -> dict | None:
         rel = str(p.relative_to(ROOT))
     except ValueError:
         rel = str(p)
-    
+
     # Check exact match
     if rel in PROTECTED_FILES:
         return PROTECTED_FILES[rel]
-    
+
     # Check by filename (for config/*.yaml etc.)
     fname = p.name
     if fname in PROTECTED_FILES:
         return PROTECTED_FILES[fname]
-    
+
     return None
 
 
 def snapshot() -> dict:
     """Take a snapshot of all protected files. Returns snapshot dict."""
     snap = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "files": {}
     }
-    for fname, policy in PROTECTED_FILES.items():
+    for fname, _policy in PROTECTED_FILES.items():
         fpath = ROOT / fname
         if not fpath.exists():
             snap["files"][fname] = {"exists": False}
@@ -101,7 +100,7 @@ def snapshot() -> dict:
             "size": len(content),
             "sha256": hashlib.sha256(content.encode()).hexdigest(),
         }
-    
+
     SNAPSHOT_FILE.parent.mkdir(parents=True, exist_ok=True)
     SNAPSHOT_FILE.write_text(json.dumps(snap, indent=2))
     return snap
@@ -116,24 +115,24 @@ def postflight() -> list[str]:
     """Verify protected files after operation. Returns list of violations."""
     if not SNAPSHOT_FILE.exists():
         return ["ERROR: No preflight snapshot found. Run preflight() first."]
-    
+
     before = json.loads(SNAPSHOT_FILE.read_text())
     violations = []
-    
+
     for fname, policy in PROTECTED_FILES.items():
         fpath = ROOT / fname
         before_state = before["files"].get(fname, {})
-        
+
         if not fpath.exists():
             if before_state.get("exists"):
                 violations.append(f"D824: {fname} DELETED (was {before_state.get('lines')} lines)")
             continue
-        
+
         current = fpath.read_text()
         current_lines = len(current.split('\n'))
         current_sha = hashlib.sha256(current.encode()).hexdigest()
         min_lines = policy["min_lines"]
-        
+
         # Check minimum lines
         if current_lines < min_lines:
             violations.append(
@@ -141,12 +140,12 @@ def postflight() -> list[str]:
                 f"was: {before_state.get('lines', '?')})"
             )
             continue
-        
+
         # Check overwrite vs append
         if before_state.get("exists") and current_sha != before_state.get("sha256"):
             pol = policy["policy"]
             before_lines = before_state.get("lines", 0)
-            
+
             if pol == "append_only" and current_lines < before_lines:
                 violations.append(
                     f"D824: {fname} OVERWRITTEN! {before_lines}→{current_lines} lines. "
@@ -157,7 +156,7 @@ def postflight() -> list[str]:
                     f"D824: {fname} MODIFIED! Policy: {pol}. "
                     f"Restore from vault required."
                 )
-    
+
     return violations
 
 
@@ -165,11 +164,11 @@ def auto_restore(violations: list[str]) -> bool:
     """Auto-restore protected files from vault if violations found."""
     if not violations:
         return True
-    
+
     print(f"🚨 DOC GUARD: {len(violations)} violations detected!")
     for v in violations:
         print(f"  ❌ {v}")
-    
+
     # Try restore from vault
     print("🔄 Attempting auto-restore from vault...")
     for v in violations:
@@ -182,7 +181,7 @@ def auto_restore(violations: list[str]) -> bool:
                 )
                 print(f"  {fname}: {result.stdout.strip()}")
                 break
-    
+
     return False
 
 

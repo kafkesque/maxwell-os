@@ -29,22 +29,21 @@ import argparse
 import json
 import sqlite3
 import sys
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
-    STAGE5_CHECKPOINT,
-    STAGE6_CHECKPOINT,
     CHECKPOINT_DIR,
     DB_PATH,
     PARQUET_DIR,
-    DATA_DIR,
+    STAGE5_CHECKPOINT,
+    STAGE5_HUMAN_REVIEW,
+    STAGE6_CHECKPOINT,
 )
-from pipeline.stamp import stamp_record, get_pipeline_commit
-from pipeline.io_guard import safe_write
+from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── SQLite schema ──────────────────────────────────────────────────────────
 
@@ -101,6 +100,13 @@ CREATE TRIGGER IF NOT EXISTS fbs_ai AFTER INSERT ON fbs BEGIN
 END;
 """
 
+# BUG-004 FIX: Pre-compute embeddings at commit time for O(1) vector search.
+CREATE_VEC_TABLE = """
+CREATE VIRTUAL TABLE IF NOT EXISTS vec_fbs USING vec0(
+    definition_embedding float[768]
+);
+"""
+
 
 def init_db(db_path: Path) -> sqlite3.Connection:
     """Initialize SQLite database with schema."""
@@ -121,6 +127,11 @@ def init_db(db_path: Path) -> sqlite3.Connection:
         print("     Vector search will not be available. Install: pip install sqlite-vec")
 
     conn.execute(CREATE_FBS_TABLE)
+    # BUG-004 FIX: Create vector embedding table (may fail if sqlite-vec not loaded)
+    try:
+        conn.execute(CREATE_VEC_TABLE)
+    except Exception as e:
+        print(f"  ⚠️  vec_fbs table not created (sqlite-vec unavailable): {e}")
     # FTS5 may not be compiled in all SQLite builds
     try:
         conn.execute(CREATE_FTS_TABLE)
@@ -169,6 +180,33 @@ def _safe_json(val, default=None):
     if isinstance(val, (dict, list)):
         return json.dumps(val, ensure_ascii=False)
     return val
+
+
+def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> bool:
+    """BUG-004 FIX: Pre-compute and store embedding for vector search.
+
+    Embeds the definition once at commit time and stores in vec_fbs.
+    Eliminates O(n) re-embedding on every search_vector() query.
+    """
+    try:
+        import struct
+
+        from pipeline.ollama_embed import batch_embed
+
+        embeddings = batch_embed([definition])
+        if not embeddings or not embeddings[0]:
+            return False
+
+        emb = embeddings[0]
+        # Pack float32 array into binary blob for sqlite-vec
+        blob = struct.pack(f'{len(emb)}f', *emb)
+        conn.execute(
+            "INSERT INTO vec_fbs(rowid, definition_embedding) VALUES (?, ?)",
+            (rowid, blob),
+        )
+        return True
+    except Exception:
+        return False  # Non-critical — vector search will fall back to FTS
 
 
 def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
@@ -239,7 +277,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("taxonomy_version"), "v5.0"),
             _safe_str(fb.get("pipeline_run_id")),
             _safe_str(fb.get("created_at"), ""),
-            datetime.now(timezone.utc).isoformat(),
+            datetime.now(UTC).isoformat(),
         ))
         return True
     except Exception as e:
@@ -319,6 +357,11 @@ def run_stage6(export_only: bool = False):
             name = fb.get("name", "unnamed")[:40]
             if insert_fb(conn, fb):
                 inserted += 1
+                # BUG-004 FIX: Pre-compute embedding at commit time
+                definition = fb.get("definition", "")
+                if definition:
+                    rowid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                    insert_embedding(conn, rowid, definition)
             else:
                 failed += 1
                 print(f"  [{i}] Failed: {name}")
@@ -357,6 +400,23 @@ def run_stage6(export_only: bool = False):
         STAGE6_CHECKPOINT,
         "\n".join(json.dumps(r, ensure_ascii=False) for r in commit_recs) + "\n",
     )
+
+    # ── D2066: Dynamic taxonomy post-commit ──────────────────────────
+    if not export_only:
+        try:
+            from pipeline.taxonomy_manager import run_post_commit_taxonomy
+            # Write human review files alongside Stage 5 review artifacts
+            human_review_dir = STAGE5_HUMAN_REVIEW.parent
+            taxonomy_review = run_post_commit_taxonomy(conn, human_review_dir)
+            if taxonomy_review:
+                print(f"\n⏸️  TAXONOMY REVIEW REQUIRED (C8-G1): {taxonomy_review}")
+                print("   Review the candidates, set 'approved': true/false, then run:")
+                print(f"   python3 pipeline/taxonomy_manager.py --apply {taxonomy_review}")
+                print("   C8-G2: After applying, review the generated taxonomy YAML before activating.")
+            else:
+                print("\n✅ No taxonomy replacements needed.")
+        except Exception as e:
+            print(f"\n⚠️  Taxonomy post-commit hook failed (non-fatal): {e}")
 
     # Summary
     print(f"\n{'='*60}")

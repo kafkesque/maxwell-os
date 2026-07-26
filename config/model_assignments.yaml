@@ -1,22 +1,22 @@
 roles:
   S3A_CONVERGENCE:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # D1037/D1052: 1.5x faster, near-100% schema compliance
+    model: Qwen3.6-35B-A3B-OptiQ-4bit  # OptiQ: Cap 80.03, BFCL 92.5%, HashHop +8%
     backend: omlx
     family: qwen
   S5_GENERATOR:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # was gemma-4-26B (BROKEN — removed)
+    model: Qwen3.6-35B-A3B-OptiQ-4bit  # primary generator
     backend: omlx
     family: qwen
   S6_VALIDATOR:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    model: Qwen3.6-35B-A3B-OptiQ-4bit
     backend: omlx
     family: qwen
   T2_GATE:
-    model: Phi-4-mini-instruct-8bit
+    model: Phi-4-mini-instruct-4bit  # lighter, faster verifier
     backend: omlx
     family: phi
   T3_GATE:
-    model: Phi-4-mini-instruct-8bit
+    model: Phi-4-mini-instruct-4bit
     backend: omlx
     family: phi
   CONTEXT_CLASS:
@@ -24,7 +24,7 @@ roles:
     backend: omlx
     family: phi
   PLANNER:
-    model: Qwen3.6-35B-A3B-4bit
+    model: Qwen3.6-35B-A3B-OptiQ-4bit  # was 8bit, now OptiQ
     backend: omlx
     family: qwen
   # PLANNER_FALLBACK: PHANTOM — Qwopus-GLM-18B does not exist locally. Disabled per P0.14.

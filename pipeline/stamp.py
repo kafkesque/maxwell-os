@@ -20,9 +20,8 @@ Usage:
 import hashlib
 import subprocess
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import wraps
-from typing import Optional
 
 from pipeline.pipeline_paths import SCHEMA_VERSION, TAXONOMY_VERSION
 
@@ -53,7 +52,7 @@ def get_pipeline_commit() -> str:
 
 
 # Singleton: generated once per process, reused across all calls (P0.9 FIX)
-_PIPELINE_RUN_ID: Optional[str] = None
+_PIPELINE_RUN_ID: str | None = None
 
 
 def get_pipeline_run_id() -> str:
@@ -67,7 +66,7 @@ def get_pipeline_run_id() -> str:
 
 def stamp_record(
     record: dict,
-    gen_model: Optional[str] = None,
+    gen_model: str | None = None,
 ) -> dict:
     """Add provenance stamps to a dict record.
 
@@ -83,11 +82,11 @@ def stamp_record(
     record["pipeline_commit"] = get_pipeline_commit()
     record["taxonomy_version"] = TAXONOMY_VERSION
     record["pipeline_run_id"] = get_pipeline_run_id()  # P0.9 FIX: singleton
-    record["created_at"] = datetime.now(timezone.utc).isoformat()
+    record["created_at"] = datetime.now(UTC).isoformat()
     return record
 
 
-def stamp(gen_model: Optional[str] = None):
+def stamp(gen_model: str | None = None):
     """Decorator: stamp every dict in the returned list.
 
     Usage:

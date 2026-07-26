@@ -20,7 +20,6 @@ Usage:
 """
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -29,15 +28,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
+    CHECKPOINT_DIR,
+    CHUNK_OVERLAP_WORDS,
+    CHUNK_SIZE_WORDS,
     STAGE0_CHECKPOINT,
     STAGE1_CHECKPOINT,
-    CHECKPOINT_DIR,
-    CHUNK_SIZE_WORDS,
-    CHUNK_OVERLAP_WORDS,
 )
-from pipeline.stamp import stamp_record, make_hash_id, get_pipeline_commit
-from pipeline.io_guard import safe_write
+from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
+from pipeline.text_cleaner import clean_markdown, normalize_paragraphs
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MIN_CHUNK_WORDS = 10  # P0.4 FIX: was 30. Preserve short aphoristic principles.
@@ -204,10 +204,16 @@ def run_stage1(chunk_size: int = CHUNK_SIZE_WORDS,
         start = time.time()
         try:
             with open(md_path, encoding="utf-8") as f:
-                text = f.read()
+                raw_text = f.read()
         except Exception as e:
             print(f"→ ❌ Read error: {e}")
             continue
+
+        # ── H1+H2+H3: Pre-processing quality (Phase 0.5) ──────────────
+        # clean_markdown() strips formatting artifacts (bold, links, boilerplate)
+        # normalize_paragraphs() produces 30-250 word single-topic paragraphs
+        clean_paragraphs = normalize_paragraphs(clean_markdown(raw_text))
+        text = '\n\n'.join(clean_paragraphs)
 
         # Split on headings, then chunk each section
         sections = split_on_headings(text)

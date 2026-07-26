@@ -9,7 +9,6 @@ This module adds a pre-flight memory check to the pipeline — refuse to
 run if free memory is below the safety threshold.
 """
 
-import os
 import sys
 
 
@@ -61,8 +60,8 @@ def check_memory(min_free_gb: float = 8.0, verbose: bool = True) -> bool:
     if free < min_free_gb:
         if verbose:
             print(f"  ❌ INSUFFICIENT MEMORY — {free:.1f} GB free, need ≥{min_free_gb:.0f} GB")
-            print(f"  Risk: macOS jetsam may kill OMLX → wired memory leak → reboot required")
-            print(f"  Action: Close applications or reboot before running pipeline")
+            print("  Risk: macOS jetsam may kill OMLX → wired memory leak → reboot required")
+            print("  Action: Close applications or reboot before running pipeline")
         return False
 
     if verbose:

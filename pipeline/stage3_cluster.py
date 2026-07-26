@@ -2,21 +2,22 @@
 """
 stage3_cluster.py — Embed principles + HDBSCAN semantic clustering.
 ===================================================================
-Authority: CONSTITUTION.md §3 (Pipeline Stage 3)
+Authority: CONSTITUTION.md §3 (Pipeline Stage 3), D2081
 
 Input:  Principles from Stage 2 checkpoint
-Output: Clusters with cohesion metrics, checkpoint at stage3_cluster.jsonl
+Output: Semantic clusters with centroids, noise preserved
 
 Process:
-  1. Embed all principles via Ollama bge-m3 (1024-dim)
-  2. Dimensionality reduction via UMAP (50 dims, cosine metric)
+  1. Embed principles via bge-m3 (Ollama, 1024-dim)
+  2. Dimensionality reduction via UMAP (configurable params, cosine metric)
   3. HDBSCAN density-based clustering
-  4. Compute cohesion = mean pairwise cosine similarity per cluster
-  5. Noise points (cluster=-1) are discarded
-  6. Write checkpoint
+  4. Centroid extraction (normalized for cosine space — D2081 fix)
+  5. Noise points preserved as singletons (D2081 fix — was: silently discarded)
 
-Embedding model: bge-m3 (Ollama, 1024-dim)
-Min cluster size: 3 (from pipeline_paths)
+D2081 fixes:
+  - UMAP min_dist = 0.1 (was 0.0 — collapsed clusters)
+  - Noise points preserved → cluster_noise.jsonl (was: continue/silent discard)
+  - Centroid normalized for cosine similarity (was: raw dot product)
 
 Usage:
     python3 pipeline/stage3_cluster.py
@@ -33,80 +34,88 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
+from pipeline.ollama_embed import batch_embed
 from pipeline.pipeline_paths import (
-    STAGE2_CHECKPOINT,
-    STAGE3_CHECKPOINT,
     CHECKPOINT_DIR,
     EMBED_MODEL,
     HDBSCAN_MIN_CLUSTER_SIZE,
-    CLUSTER_MIN_SIZE,
+    S3_ALLOW_SINGLE_CLUSTER,
+    S3_KEEP_NOISE,
+    S3_NOISE_OUTPUT,
+    S3_NORMALIZE_CENTROID,
+    S3_UMAP_METRIC,
+    S3_UMAP_MIN_DIST,
+    S3_UMAP_N_COMPONENTS,
+    S3_UMAP_N_NEIGHBORS,
+    STAGE2_CHECKPOINT,
+    STAGE3_CHECKPOINT,
 )
-from pipeline.stamp import stamp_record, get_pipeline_commit
-from pipeline.ollama_embed import batch_embed
-from pipeline.io_guard import safe_write
-
-# ── Constants ──────────────────────────────────────────────────────────────
-PCA_DIMS = 50  # Reduce to 50 dimensions before clustering
-EMBED_BATCH_SIZE = 100  # Texts per Ollama embed call
+from pipeline.stamp import get_pipeline_commit, stamp_record
 
 
-def load_stage2_principles() -> list[dict]:
-    """Load principles from Stage 2 checkpoint."""
+def load_principles() -> list[dict]:
+    """Load principles from Stage 2 checkpoint. Only returns 'principle' type —
+    non-FB types (PT/PI/GE/TI) are routed directly to staging by S2 type-aware router.
+
+    D2080: Non-FB types written to stage2_non_fb.jsonl, bypass S3 entirely.
+    """
     if not STAGE2_CHECKPOINT.exists():
         print("❌ Stage 2 checkpoint not found. Run stage2_extract.py first.")
         sys.exit(1)
 
     principles = []
+    skipped_types: dict[str, int] = {}
     with open(STAGE2_CHECKPOINT) as f:
         for line in f:
             line = line.strip()
             if line:
-                principles.append(json.loads(line))
+                p = json.loads(line)
+                ct = p.get("content_type") or p.get("route", "principle")
+                if ct in ("principle", "FB", "fb"):
+                    principles.append(p)
+                else:
+                    skipped_types[ct] = skipped_types.get(ct, 0) + 1
+
+    if skipped_types:
+        print(f"   ℹ️  Skipped non-FB types (routed to staging): {skipped_types}")
+
     return principles
 
 
-def compute_embeddings(principles: list[dict]) -> np.ndarray:
-    """Embed all principles via Ollama batch API.
-
-    Returns: (n_principles, 768) float32 array.
-    """
-    texts = [p["principle_text"] for p in principles]
-    print(f"   Embedding {len(texts)} texts via {EMBED_MODEL}...")
-
-    all_embeddings = []
-    for i in range(0, len(texts), EMBED_BATCH_SIZE):
-        batch_texts = texts[i:i + EMBED_BATCH_SIZE]
-        print(f"     Batch {i // EMBED_BATCH_SIZE + 1}/{(len(texts) - 1) // EMBED_BATCH_SIZE + 1} "
-              f"({len(batch_texts)} texts)", end=" ")
-        start = time.time()
-        embs = batch_embed(batch_texts, model=EMBED_MODEL)
-        elapsed = time.time() - start
-        all_embeddings.extend(embs)
-        print(f"({elapsed:.1f}s)")
-
-    return np.array(all_embeddings, dtype=np.float32)
-
-
-def reduce_dimensions(embeddings: np.ndarray, n_dims: int = 50) -> np.ndarray:
+def reduce_dimensions(
+    embeddings: np.ndarray,
+    n_dims: int = S3_UMAP_N_COMPONENTS,
+    n_neighbors: int = S3_UMAP_N_NEIGHBORS,
+    min_dist: float = S3_UMAP_MIN_DIST,
+    metric: str = S3_UMAP_METRIC,
+) -> np.ndarray:
     """Reduce dimensions via UMAP. Preserves non-linear structure.
-    Deterministic with random_state=42. P0.5 FIX: was PCA (linear, caused collapse).
+
+    D2081 fix: min_dist defaults to 0.1 (was 0.0).
     """
     import umap
 
-    n_dims = min(n_dims, embeddings.shape[0] - 2, embeddings.shape[1])
     reducer = umap.UMAP(
-        n_neighbors=15,
+        n_neighbors=min(n_neighbors, len(embeddings) - 1),
         n_components=n_dims,
-        metric="cosine",
-        min_dist=0.0,
-        random_state=42,       # Deterministic. Reproducible.
+        min_dist=min_dist,
+        metric=metric,
+        random_state=42,
     )
     reduced = reducer.fit_transform(embeddings)
-    print(f"   UMAP: {embeddings.shape[1]} → {n_dims} dims (cosine, neighbors=15)")
+    print(
+        f"   UMAP: {embeddings.shape[1]} → {reduced.shape[1]} dims "
+        f"(cosine, neighbors={n_neighbors}, min_dist={min_dist})"
+    )
     return reduced
 
 
-def cluster_hdbscan(embeddings: np.ndarray, min_cluster_size: int) -> np.ndarray:
+def cluster_embeddings(
+    embeddings: np.ndarray,
+    min_cluster_size: int = HDBSCAN_MIN_CLUSTER_SIZE,
+    allow_single_cluster: bool = S3_ALLOW_SINGLE_CLUSTER,
+) -> np.ndarray:
     """Cluster embeddings using HDBSCAN.
 
     Returns: cluster labels array (noise = -1).
@@ -115,144 +124,214 @@ def cluster_hdbscan(embeddings: np.ndarray, min_cluster_size: int) -> np.ndarray
 
     clusterer = HDBSCAN(
         min_cluster_size=min_cluster_size,
-        min_samples=2,
-        metric="euclidean",
-        cluster_selection_method="eom",
+        min_samples=1,
+        allow_single_cluster=allow_single_cluster,
+        metric="euclidean",  # UMAP output is in Euclidean space after reduction
     )
     labels = clusterer.fit_predict(embeddings)
     return labels
 
 
-def compute_cohesion(embeddings: np.ndarray, labels: np.ndarray,
-                     cluster_id: int) -> float:
-    """Compute mean pairwise cosine similarity within a cluster."""
-    from sklearn.metrics.pairwise import cosine_similarity
+def find_centroid(member_embeddings: np.ndarray, normalize: bool = S3_NORMALIZE_CENTROID) -> int:
+    """Find the centroid index — the principle closest to the cluster mean.
 
-    mask = labels == cluster_id
-    if mask.sum() < 2:
-        return 1.0
-    cluster_embs = embeddings[mask]
-    sim_matrix = cosine_similarity(cluster_embs)
-    # Mean of upper triangle (exclude diagonal)
-    n = sim_matrix.shape[0]
-    if n <= 1:
-        return 1.0
-    triu_indices = np.triu_indices(n, k=1)
-    return float(np.mean(sim_matrix[triu_indices]))
+    D2081 fix: normalize vectors before computing centroid for cosine space.
+    Previously used raw dot product which is inappropriate for cosine metric.
+    """
+    if len(member_embeddings) == 0:
+        return 0
+
+    if normalize and len(member_embeddings) > 0:
+        # Normalize to unit vectors for cosine similarity
+        norms = np.linalg.norm(member_embeddings, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0  # Avoid division by zero
+        normalized = member_embeddings / norms
+        mean_vec = np.mean(normalized, axis=0)
+        # Cosine similarity: dot product of normalized vectors
+        similarities = np.dot(normalized, mean_vec)
+        centroid_idx = int(np.argmax(similarities))
+    else:
+        # Legacy: raw dot product (euclidean centroid)
+        mean_vec = np.mean(member_embeddings, axis=0)
+        similarities = np.dot(member_embeddings, mean_vec)
+        centroid_idx = int(np.argmax(similarities))
+
+    return centroid_idx
 
 
-def run_stage3(min_cluster_size: int = HDBSCAN_MIN_CLUSTER_SIZE,
-               pca_dims: int = PCA_DIMS):
-    """Run Stage 3: Cluster principles semantically."""
+def run_stage3(min_cluster_size: int = HDBSCAN_MIN_CLUSTER_SIZE, keep_noise: bool = S3_KEEP_NOISE):
+    """Run Stage 3: Cluster principles.
+
+    Args:
+        min_cluster_size: Minimum cluster size for HDBSCAN.
+        keep_noise: If True, preserve noise points as singletons (D2081 fix).
+    """
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
-    principles = load_stage2_principles()
-    if len(principles) < CLUSTER_MIN_SIZE:
-        print(f"❌ Need at least {CLUSTER_MIN_SIZE} principles for clustering. "
-              f"Got {len(principles)}.")
+    principles = load_principles()
+    if not principles:
+        print("❌ No principles found. Run stage2_extract.py first.")
         sys.exit(1)
 
-    print(f"🔗 Stage 3: Cluster — {len(principles)} principles")
-    print(f"   Min cluster size: {min_cluster_size}")
-    print(f"{'='*60}")
+    print(f"🧩 Stage 3: Semantic Clustering — {len(principles)} principles")
+    print(f"   Embedding model: {EMBED_MODEL} | HDBSCAN min_cluster={min_cluster_size}")
+    print(f"   UMAP min_dist={S3_UMAP_MIN_DIST} | Keep noise: {keep_noise}")
+    print(f"{'=' * 60}")
 
-    start_total = time.time()
+    # Embed all principles
+    print(f"   Embedding {len(principles)} principles...", end=" ")
+    start = time.time()
+    # D2094: Support both old (principle_text) and v3.0 (definition) schemas
+    texts = [p.get("definition") or p["principle_text"] for p in principles]
+    raw_embeddings = batch_embed(texts, model=EMBED_MODEL)
 
-    # 1. Embed
-    embeddings = compute_embeddings(principles)
+    # Filter out failed embeddings
+    valid_indices = [i for i, e in enumerate(raw_embeddings) if len(e) > 0]
+    embeddings = np.array([raw_embeddings[i] for i in valid_indices])
+    valid_principles = [principles[i] for i in valid_indices]
+    elapsed = time.time() - start
+    print(f"{len(embeddings)} valid embeddings ({elapsed:.1f}s)")
+    print(f"   ⚠️  {len(principles) - len(valid_principles)} principles dropped (embedding failure)")
 
-    # 2. Reduce dimensions
-    if embeddings.shape[1] > pca_dims:
-        reduced = reduce_dimensions(embeddings, pca_dims)
+    if len(embeddings) < 5:
+        print("❌ Too few valid embeddings to cluster.")
+        sys.exit(1)
+
+    # ── BUG-048: Bypass HDBSCAN for small FB counts ─────────────────────
+    # When FB count < min_cluster_size, HDBSCAN produces 0 clusters (all noise).
+    # In v3.0 cluster-before-extract, Stage 2 already produces final FBs —
+    # Stage 3's role is semantic dedup, not primary clustering.
+    # For small runs: bypass HDBSCAN, treat each FB as its own singleton cluster.
+    bypass_hdbscan = len(embeddings) < min_cluster_size
+    if bypass_hdbscan:
+        print(f"   ⚠️  BUG-048 bypass: {len(embeddings)} FBs < min_cluster_size={min_cluster_size}")
+        print("   → Each FB treated as singleton cluster (HDBSCAN skipped)")
+        reduced = embeddings  # Skip UMAP — not needed for singleton clusters
+        # Fake labels: each embedding is its own cluster
+        labels = np.arange(len(embeddings), dtype=np.int32)
     else:
-        reduced = embeddings
-        print(f"   Skipping PCA: {embeddings.shape[1]} dims ≤ {pca_dims}")
+        # Reduce dimensions
+        reduced = reduce_dimensions(embeddings)
 
-    # 3. Cluster
-    print(f"   HDBSCAN clustering...", end=" ")
-    start_cluster = time.time()
-    labels = cluster_hdbscan(reduced, min_cluster_size)
-    elapsed = time.time() - start_cluster
-    unique_labels = set(labels)
-    n_clusters = len(unique_labels - {-1})
+        # Cluster
+        print("   HDBSCAN clustering...", end=" ")
+        start = time.time()
+        labels = cluster_embeddings(reduced, min_cluster_size=min_cluster_size)
+        elapsed = time.time() - start
+
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     n_noise = int((labels == -1).sum())
-    print(f"{n_clusters} clusters, {n_noise} noise ({elapsed:.1f}s)")
+    if not bypass_hdbscan:
+        print(f"{n_clusters} clusters, {n_noise} noise ({elapsed:.1f}s)")
+    else:
+        print(f"{n_clusters} singleton clusters ({n_noise} noise)")
 
-    # 4. Build cluster records
+    # Build cluster output
     clusters = []
+    noise_points = []
     pipeline_commit = get_pipeline_commit()
 
-    for cluster_id in sorted(unique_labels):
-        if cluster_id == -1:
-            continue  # Skip noise
+    for cluster_id in range(n_clusters):
+        member_indices = [i for i, label in enumerate(labels) if label == cluster_id]
+        if not member_indices:
+            continue
 
-        mask = labels == cluster_id
-        member_indices = np.where(mask)[0]
-        member_principles = [principles[i] for i in member_indices]
-        principle_ids = [p["principle_id"] for p in member_principles]
+        member_principles = [valid_principles[i] for i in member_indices]
+        member_embs = embeddings[member_indices]
 
-        # Find centroid (principle closest to cluster mean)
-        cluster_embs = embeddings[mask]
-        centroid_idx = np.argmax(np.mean(
-            np.dot(cluster_embs, cluster_embs.T), axis=1
-        ))
-        centroid_text = member_principles[centroid_idx]["principle_text"]
+        # Find centroid
+        centroid_idx = find_centroid(member_embs)
+        centroid_text = (
+            member_principles[centroid_idx].get("definition")
+            or member_principles[centroid_idx]["principle_text"]
+        )
 
-        # Cohesion
-        cohesion = compute_cohesion(embeddings, labels, cluster_id)
-
-        # Distinct books
-        source_books = set()
+        # Collect source data
+        source_segments: list[str] = []
+        source_books: set[str] = set()
         for p in member_principles:
-            for sb in p.get("source_books", []):
-                source_books.add(sb)
+            for seg in p.get("source_segments", []):
+                source_segments.append(seg)
+            for book in p.get("source_books", []):
+                source_books.add(book)
 
-        cluster_rec = {
-            "cluster_id": int(cluster_id),
-            "principle_ids": principle_ids,
+        cluster = {
+            "cluster_id": f"c{cluster_id:04d}",
+            "size": len(member_principles),
             "centroid_text": centroid_text,
-            "cohesion": round(cohesion, 4),
-            "size": len(member_indices),
-            "distinct_books": len(source_books),
+            "principle_ids": [p.get("fb_id") or p["principle_id"] for p in member_principles],
+            "source_segments": list(set(source_segments)),
             "source_books": sorted(source_books),
+            "cohesion": float(
+                np.mean([np.dot(reduced[i], reduced[centroid_idx]) for i in member_indices])
+            ),
         }
-        cluster_rec = stamp_record(cluster_rec, gen_model="hdbscan+nomic")
-        cluster_rec["pipeline_commit"] = pipeline_commit
-        clusters.append(cluster_rec)
+        cluster = stamp_record(cluster, gen_model=EMBED_MODEL)
+        cluster["pipeline_commit"] = pipeline_commit
+        clusters.append(cluster)
 
-    # Sort by size descending
-    clusters.sort(key=lambda c: c["size"], reverse=True)
+    # ── D2081 fix: Keep noise points ──────────────────────────────────
+    if keep_noise:
+        noise_indices = [i for i, label in enumerate(labels) if label == -1]
+        for idx in noise_indices:
+            p = valid_principles[idx]
+            noise_point = {
+                "principle_id": p.get("fb_id") or p["principle_id"],
+                "principle_text": p.get("definition") or p["principle_text"],
+                "content_type": p.get("content_type") or p.get("route", "principle"),
+                "source_segments": p.get("source_segments", []),
+                "source_books": p.get("source_books", []),
+                "evidence_type": p.get("evidence_type", "axiomatic"),
+                "cluster_label": -1,
+                "reason": "noise — did not cluster with any group",
+            }
+            noise_point = stamp_record(noise_point, gen_model=EMBED_MODEL)
+            noise_point["pipeline_commit"] = pipeline_commit
+            noise_points.append(noise_point)
 
-    # Write checkpoint
+        # Write noise to separate file
+        if noise_points:
+            noise_path = STAGE3_CHECKPOINT.parent / S3_NOISE_OUTPUT
+            safe_write(
+                noise_path,
+                "\n".join(json.dumps(n, ensure_ascii=False) for n in noise_points) + "\n",
+            )
+
+    # Write cluster checkpoint
     safe_write(
         STAGE3_CHECKPOINT,
         "\n".join(json.dumps(c, ensure_ascii=False) for c in clusters) + "\n",
     )
 
-    total_elapsed = time.time() - start_total
-
     # Summary
-    cohesion_values = [c["cohesion"] for c in clusters]
-    avg_cohesion = np.mean(cohesion_values) if cohesion_values else 0
-    print(f"\n{'='*60}")
-    print(f"✅ Clusters:            {len(clusters)}")
-    print(f"🗑️  Noise points:        {n_noise}")
-    print(f"📊 Avg cohesion:        {avg_cohesion:.3f}")
-    print(f"📊 Cohesion range:      {min(cohesion_values):.3f} - {max(cohesion_values):.3f}" if cohesion_values else "")
-    print(f"📊 Largest cluster:     {clusters[0]['size'] if clusters else 0}")
-    print(f"⏱️  Total time:          {total_elapsed:.1f}s")
-    print(f"📋 Checkpoint:           {STAGE3_CHECKPOINT}")
+    print(f"\n{'=' * 60}")
+    print(f"✅ Clusters:              {len(clusters)}")
+    print(f"🔊 Noise points preserved: {len(noise_points)}")
+    if noise_points:
+        noise_path = STAGE3_CHECKPOINT.parent / S3_NOISE_OUTPUT
+        print(f"📋 Noise checkpoint:       {noise_path}")
+    print(f"📋 Cluster checkpoint:     {STAGE3_CHECKPOINT}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Stage 3: Cluster principles via HDBSCAN")
-    parser.add_argument("--min-cluster-size", type=int, default=HDBSCAN_MIN_CLUSTER_SIZE,
-                        help=f"Minimum cluster size for HDBSCAN (default: {HDBSCAN_MIN_CLUSTER_SIZE})")
-    parser.add_argument("--pca-dims", type=int, default=PCA_DIMS,
-                        help=f"PCA dimensions (default: {PCA_DIMS})")
+    parser.add_argument(
+        "--min-cluster-size",
+        type=int,
+        default=HDBSCAN_MIN_CLUSTER_SIZE,
+        help=f"Minimum cluster size (default: {HDBSCAN_MIN_CLUSTER_SIZE})",
+    )
+    parser.add_argument(
+        "--discard-noise",
+        action="store_true",
+        help="Discard noise points instead of preserving them (legacy behavior)",
+    )
     args = parser.parse_args()
 
-    run_stage3(min_cluster_size=args.min_cluster_size, pca_dims=args.pca_dims)
+    run_stage3(
+        min_cluster_size=args.min_cluster_size,
+        keep_noise=not args.discard_noise,
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,15 @@
+{
+  "golden_sha256": "d0ccb2dbafee",
+  "trimmed_ids": [
+    "PRO-002",
+    "LEA-001",
+    "ART-006",
+    "PER-008"
+  ],
+  "borderline_kept": [
+    "MPL-002",
+    "DES-005",
+    "DES-009",
+    "ART-009"
+  ]
+}

@@ -27,13 +27,17 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import (
-    STAGE1_CHECKPOINT, STAGE1_OUTPUT, STAGE2_OUTPUT,
-    EMBED_MODEL, OLLAMA_URL, INTENT_THRESHOLD, INTENT_TOP_K_RATIO,
-)
-from pipeline.stamp import stamp_record, get_pipeline_run_id
 from pipeline.io_guard import safe_write
 from pipeline.metrics import StageTimer, log_metric
+from pipeline.pipeline_paths import (
+    EMBED_MODEL,
+    INTENT_THRESHOLD,
+    INTENT_TOP_K_RATIO,
+    OLLAMA_URL,
+    STAGE1_CHECKPOINT,
+    STAGE1_OUTPUT,
+)
+from pipeline.stamp import get_pipeline_run_id
 
 # ── Embedding helper ──────────────────────────────────────────────────
 
@@ -103,7 +107,7 @@ def filter_chunks(
 
     # Extract text from chunks
     texts = [c.get("text", c.get("body", "")) for c in chunks]
-    
+
     # Embed all chunks (batch if needed)
     chunk_embs = embed_texts(texts)
 
@@ -152,7 +156,7 @@ def main():
 
     run_id = get_pipeline_run_id()
 
-    with StageTimer("stage1_5", run_id, {"intent": args.intent}) as timer:
+    with StageTimer("stage1_5", run_id, {"intent": args.intent}):
         # Load chunks from Stage 1
         if not STAGE1_CHECKPOINT.exists():
             print(f"❌ Stage 1 checkpoint not found: {STAGE1_CHECKPOINT}")

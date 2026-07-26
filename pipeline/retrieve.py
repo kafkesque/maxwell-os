@@ -99,47 +99,51 @@ def search_vector(
     query: str,
     limit: int = 20,
 ) -> list[dict]:
-    """Vector similarity search using sqlite-vec (if available)."""
+    """Vector similarity search using pre-computed sqlite-vec embeddings.
+
+    BUG-004 FIX: Embeddings are pre-computed at Stage 6 commit time and stored
+    in vec_fbs. Only the query is embedded at search time (O(1) not O(n)).
+    Falls back to FTS if vec_fbs is not available.
+    """
     try:
-        # Try to use sqlite-vec
-        import requests
+        import struct
+
+        import numpy as np
+
         from pipeline.ollama_embed import batch_embed
 
         # Embed the query
-        embeddings = batch_embed([query], model="nomic-embed-text")
+        embeddings = batch_embed([query])
         if not embeddings or not embeddings[0]:
             print("  ⚠️  Embedding failed, falling back to FTS")
             return search_fts(conn, query, limit)
 
         query_vec = embeddings[0]
+        query_blob = struct.pack(f'{len(query_vec)}f', *query_vec)
 
-        # sqlite-vec requires the extension to be loaded
-        # For now, fall back to loading all and computing cosine similarity
-        rows = conn.execute(
-            "SELECT * FROM fbs WHERE status = 'PASS'"
-        ).fetchall()
+        # Try sqlite-vec similarity search on pre-computed embeddings
+        try:
+            rows = conn.execute("""
+                SELECT fbs.*, vec_fbs.distance
+                FROM vec_fbs
+                JOIN fbs ON fbs.rowid = vec_fbs.rowid
+                WHERE fbs.status = 'PASS'
+                    AND definition_embedding MATCH ?
+                    AND k = ?
+                ORDER BY distance
+            """, (query_blob, limit)).fetchall()
 
-        # Embed all definitions (in-memory, not ideal for large DBs)
-        definitions = [r["definition"] for r in rows]
-        def_embeddings = batch_embed(definitions, model="nomic-embed-text")
+            if rows:
+                return [_row_to_dict(r) for r in rows]
+        except Exception:
+            pass  # vec_fbs not available — fall through to FTS
 
-        # Compute cosine similarity
-        import numpy as np
-        query_vec = np.array(query_vec)
-        similarities = []
-        for i, emb in enumerate(def_embeddings):
-            if emb and len(emb) == len(query_vec):
-                sim = np.dot(query_vec, np.array(emb)) / (
-                    np.linalg.norm(query_vec) * np.linalg.norm(np.array(emb)) + 1e-8
-                )
-                similarities.append((float(sim), i))
-
-        similarities.sort(key=lambda x: x[0], reverse=True)
-        top_indices = [s[1] for s in similarities[:limit]]
-        return [_row_to_dict(rows[i]) for i in top_indices]
+        # Fallback: FTS on definition
+        print("  ⚠️  vec_fbs unavailable, falling back to FTS")
+        return search_fts(conn, query, limit)
 
     except ImportError:
-        print("  ⚠️  numpy not available, falling back to FTS")
+        print("  ⚠️  numpy/struct not available, falling back to FTS")
         return search_fts(conn, query, limit)
     except Exception as e:
         print(f"  ⚠️  Vector search error: {e}, falling back to FTS")

@@ -13,6 +13,7 @@ import sys
 from pipeline.memory_guard import check_memory
 from pipeline.omlx_call import stress_test_omlx
 
+
 def main():
     print("=== Memory Check ===")
     if not check_memory(min_free_gb=6.0):

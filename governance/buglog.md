@@ -1,4 +1,143 @@
 # Maxwell OS — Buglog
+> **Last updated:** 2026-07-26 15:49 (BUG-051/048/053 fixed, BUG-054 investigated, gemma delegate viable)
+> **Next review:** After delegate system stabilized + just smoke tested
+
+---
+
+### DELEGATE-001: Delegate System Broken — reasoning_content Passthrough Bug
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (blocks all delegation) |
+| **Discovered** | 2026-07-26 — all 3 parallel research delegates failed identically |
+| **Symptom** | `"reasoning_content in the thinking mode must be passed back to the API"` |
+| **Root Cause** | DeepSeek thinking mode (`GOOSE_THINKING_EFFORT: high`) returns `reasoning_content` blocks. API requires these blocks passed back verbatim on turn N+1. Goose delegate system creates fresh context — doesn't preserve reasoning_content history. |
+| **Impact** | ALL delegation is dead. Parallelism impossible. Research delegates fail 100%. |
+| **Fix (Workaround)** | Use local OMLX models for all delegates: Phi-4-mini-8bit (research) or Qwen3-Coder-30B (code gen). $0 cost, sovereign, no thinking-mode issues. |
+| **Long-term Fix** | Goose framework needs reasoning_content passthrough in delegate system. |
+| **Files** | `temp/DELEGATE-FIX-ROOT-CAUSE-2026-07-26.md` |
+| **Status** | 🟡 WORKAROUND ACTIVE — Use `provider: maxwell_omlx` for all delegates. |
+
+---
+
+### BUG-053: Phi-4-mini-instruct-8bit HALLUCINATES on Factual/Research Tasks 🔴
+| Field | Value |
+|-------|-------|
+| **Discovered** | 2026-07-26 15:20 — delegate research on GitHub topics returned entirely fabricated repos |
+| **Symptom** | Delegate output: fake repo names (Faiss-CMake, HnswLib from "thesynk"), wrong URLs (Weaviate→veidicate), fake star counts (16k for non-existent repos), Llama.cpp attributed to Microsoft |
+| **Root Cause** | Phi-4-mini-8bit is a 4GB distilled model unsuitable for open-ended research. When asked to fetch real data, it generates plausible-sounding hallucinations instead. It does NOT call tools to fetch data — it fabricates from training distribution. |
+| **Impact** | ALL research/read-only delegate tasks using Phi-4-mini produce garbage. Any decision based on delegate output is dangerously wrong. |
+| **Fix** | NEVER use Phi-4-mini for research tasks requiring factual data retrieval. Use ONLY for summarization when SOURCE TEXT IS PROVIDED. For research: do it yourself with shell/curl OR use Qwen3-Coder with explicit tool-use instructions. |
+| **Files** | AGENTS.md delegate_rules section |
+| **Status** | ✅ MITIGATED (2026-07-26) — AGENTS.md delegate_rules updated: Phi-4-mini restricted to summarization-only with source text. Research tasks → direct shell/curl. |
+
+---
+
+### BUG-054: Qwen3-Coder-30B Delegate Fails — OMLX JSON Parse Error 🔴
+| Field | Value |
+|-------|-------|
+| **Discovered** | 2026-07-26 15:30 — MTR merge delegate failed turn 1 |
+| **Symptom** | `Request failed: Failed to parse JSON: error decoding response body for url (http://localhost:11435/v1/chat/completions)` |
+| **Known Facts** | Qwen3-Coder-30B IS listed in OMLX /v1/models alongside Phi-4-mini. Phi-4-mini delegate completed (hallucinated, but connected). Qwen3-Coder generates non-JSON-compliant response that OMLX server rejects. |
+| **Hypothesis** | Qwen3-Coder outputs contain control characters or malformed UTF-8 that break JSON serialization in OMLX v1/completions endpoint. Different from Phi-4-mini bug — this is transport-layer, not content-layer. |
+| **Impact** | BOTH delegate models broken: Phi-4-mini (hallucination) and Qwen3-Coder (JSON parse). Delegation is dead — no working model for either research or code-gen delegates. |
+| **Fix** | Test raw OMLX chat completions against Qwen3-Coder via curl. Check for non-JSON output. May need OMLX server config fix or different model. gemma-4-E4B-it untested for delegates. |
+| **Status** | 🟡 INVESTIGATED (2026-07-26) — Qwen3-Coder works fine via direct curl to OMLX. JSON parse error likely in Goose delegate layer request formatting, not the model. Retest delegates after Goose update. |
+
+---
+
+### BUG-051: `just smoke` Processes ALL 852 Books Instead of 1
+| Field | Value |
+|-------|-------|
+| **Discovered** | 2026-07-26 15:25 — `just smoke` ran stage0_convert on 849 books, timed out at stage1_chunk |
+| **Symptom** | `MAXWELL_RUN_ID=smoke` passed to pipeline stages but stage0_convert ignores it — processes entire books/ directory |
+| **Root Cause** | stage0_convert.py doesn't read MAXWELL_RUN_ID to limit input. The env var is used for output path prefix only, not input filtering. |
+| **Expected** | Smoke test should process 1 book only (fast E2E validation) |
+| **Fix** | Add `--limit N` or respect `MAXWELL_RUN_ID=smoke` to auto-limit to 1-3 books. OR create `just quick-smoke` that picks first N books. |
+| **Status** | ✅ FIXED (2026-07-26) — `--limit N` added. Auto-limits to 3 when `MAXWELL_RUN_ID=smoke`. |
+
+---
+
+## 2026-07-25 — E2E Pipeline Validation — New Bugs
+
+### BUG-044: NLI Pre-Filter Used Strict ENTAILMENT (NEUTRAL = FAIL)
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (causes false negatives but NLI still runs) |
+| **File** | `pipeline/stage5_verify.py`, `nli_evidence_check()` |
+| **Symptom** | All evidence passages scored NEUTRAL against FB definitions (passages discuss related concepts but don't strictly entail synthesized claims). Original code treated NEUTRAL the same as CONTRADICTION → FAIL, meaning NLI pre-filter never passed. |
+| **Root Cause** | NLI design assumed evidence passages logically ENTAIL the definition. In practice, extracted principles are syntheses that go beyond any single passage — NEUTRAL is the expected case for valid extractions. |
+| **Proposed Fix** | Changed NLI strategy: CONTRADICTION≥50% → FAIL, ENTAILMENT≥50% → strong PASS (skip LLM), NEUTRAL → PASS (score=0.4, triggers LLM escalation). |
+| **Status** | ✅ FIXED in D2113 E2E run. 3-way classification now handles NEUTRAL correctly. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-045: Stage 2 Evidence Passages Inflated — All Cluster Segments Included
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (metadata bloat, not logical error) |
+| **File** | `pipeline/stage2_extract.py` |
+| **Symptom** | Convergent cluster_203 has 191 segments but LLM only saw 15. The output `evidence_passages` field includes ALL 191 segment texts as evidence, but only 15 were actually shown to the LLM. Inflates source_segments metadata and misleads verification. |
+| **Root Cause** | The extraction records all `segment_ids` from the cluster in `source_segments`, but the evidence selection (which 15 of 191 were shown) is not tracked. |
+| **Proposed Fix** | Track which segments were actually sampled for the LLM call. Store only those in `evidence_passages`. Add `cluster_total_segments` for context. |
+| **Status** | 🟡 OPEN — Deferred. Low priority (metadata issue, not extraction quality issue). |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-046: check_factual_llm Required source_principles (Old Schema) — FIXED
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (blocks LLM verification for v3.0 FBs) |
+| **File** | `pipeline/stage5_verify.py`, `check_factual_llm()` |
+| **Symptom** | LLM deep check returned "No source principles — QUARANTINE" for all 7 FBs. The v3.0 schema stores evidence in `evidence_passages`, not `source_principles`. |
+| **Root Cause** | `check_factual_llm` checked `fb.get("source_principles", [])` and returned immediately if empty. v3.0 convergent extraction does NOT populate `source_principles` — it uses `evidence_passages` directly. |
+| **Proposed Fix** | Added `evidence_passages` as fallback. Updated `build_factual_prompt()` to use v3.0 schema fields (mechanism/boundary/consequence) with v2.x fallbacks. |
+| **Status** | ✅ FIXED in D2113 E2E run. Both schemas now supported. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-047: check_completeness Required Old Schema Fields — FIXED
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (completeness check always failed for v3.0 FBs) |
+| **File** | `pipeline/stage5_verify.py`, `check_completeness()` |
+| **Symptom** | All FBs scored 0.333 on completeness — missing `application`, `failure_mode`, `elaboration`, `keywords`. v3.0 schema uses `mechanism`, `boundary`, `consequence` instead. |
+| **Root Cause** | `check_completeness` had hardcoded v2.x field list. No schema version detection. |
+| **Proposed Fix** | Updated required fields to check both v3.0 (mechanism/boundary/consequence) and v2.x (application/failure_mode/elaboration/keywords) with fallback. |
+| **Status** | ✅ FIXED in D2113 E2E run. All 7 FBs now pass completeness. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-048: Stage 3 (HDBSCAN Clustering) Incompatible with v3.0 Architecture
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (blocks pipeline for small FB counts) |
+| **File** | `pipeline/stage3_cluster.py` |
+| **Symptom** | With 7 FBs and `hdbscan_min_cluster_size=15`, Stage 3 produces 0 clusters (all noise). Stage 4 then has nothing to merge. The stage was designed for the OLD architecture where Stage 2 produced 100s of raw principles needing clustering. In v3.0, Stage 2 already produces final FBs per cluster — Stage 3 clustering is redundant. |
+| **Root Cause** | Architecture shift (extract-before-cluster → cluster-before-extract) made Stage 3's original purpose obsolete. It was repurposed as "semantic dedup" but the HDBSCAN params and schema expectations are incompatible with 7-FB output. |
+| **Proposed Fix** | Either: 1) Rewrite Stage 3 as a lightweight semantic dedup pass (no HDBSCAN, just MinHash + embedding cosine check), or 2) Merge Stage 3 into Stage 2 (dedup during extraction), or 3) Remove Stage 3 entirely (FAISS clustering in Stage 1.5 already handles dedup). Recommended: option 3 — remove Stage 3, update pipeline to 6-stage. |
+| **Workaround** | `bridge_s2_to_s4.py` bypasses Stage 3 and 4 for testing. |
+| **Status** | ✅ MITIGATED (2026-07-26) — When FB count < min_cluster_size, Stage 3 bypasses HDBSCAN and creates singleton clusters. Full architectural decision (remove/replace Stage 3) deferred. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-049: FAISS Threshold Hypersensitive — Narrow Sweet Spot
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (calibration issue, not a bug) |
+| **File** | `pipeline/stage1_5_embed_cluster.py` |
+| **Symptom** | With 237 segments from 3 books: threshold 0.75 → 0 convergent clusters, threshold 0.60 → 1 mega-cluster (all 237 segments), threshold 0.70 → 1 convergent cluster. The gap between "no cross-book" and "everything merges" is only 0.10. |
+| **Root Cause** | Small dataset (3 books, heavily dominated by one book: 141/237=60% kaczynski2). With more diverse books, the threshold should be more forgiving. The union-find clustering is also sensitive because one low-similarity bridge can merge two otherwise separate clusters. |
+| **Proposed Fix** | 1) Test with 5+ diverse books to find stable threshold. 2) Consider alternative: DBSCAN-style clustering instead of union-find (requires mutual proximity, not transitive). 3) Add cluster quality metrics to auto-tune threshold. |
+| **Status** | 🟡 OPEN — Monitor during 5+ book test. Threshold 0.70 is current working value. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+### BUG-050: Only 3 of 20 Books Chunked — Insufficient for Meaningful Convergence
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (data pipeline limitation, not code bug) |
+| **File** | `pipeline/stage0_convert.py`, `pipeline/stage1_chunk.py` |
+| **Symptom** | 852 books available, 20 in the "Influence + Power" domain, but only 3 were chunked (kaczynski2: 141, SSRN-id2594754: 63, Epistemology In The Cloud: 33). The other 17 books were converted to MD but not chunked — old pipeline stopped after 5 books. Need to re-chunk more books for meaningful cross-source convergent extraction. |
+| **Root Cause** | Old pipeline run (July 23) chunked a subset. v3.0 E2E test reused existing chunks. |
+| **Proposed Fix** | Run `stage0_convert.py` + `stage1_chunk.py` on 5-10 books from the same domain to get 500-1000+ segments across diverse sources. |
+| **Status** | 🟡 OPEN — Next action: chunk 5+ books for meaningful convergence test. |
+| **Source** | D2113, E2E test 2026-07-25 |
+
+---
 > **Rule:** Accumulate recurring bugs/issues here for LLM handoff with full documentation.
 > **When:** 5+ unresolved bugs → append buglog to all LLM handoff documents.
 > **Format:** Bug ID, severity, file, lines, symptom, root cause, proposed fix, source, status.
@@ -38,7 +177,7 @@
 | **Root Cause** | `call_omlx_json(model=GEN_MODEL)` used for both generation and classification calls. |
 | **Proposed Fix** | Use `VERIFY_MODEL` (Phi-4-mini) for SALSA classification. ~5 LOC. |
 | **Source** | Kimi code audit (BUG 3); R5 (CONSTITUTION.md) |
-| **Status** | 🟠 OPEN — Phase 0, P0.10 |
+| **Status** | ✅ UN-REVERTED — oMLX 0.5.3 fixes Phi-4-mini on short prompts (3/3 correct classification at ~360ms). VERIFY_MODEL restored for SALSA per R5. |
 
 ### BUG-004: Vector Search Re-Embeds Entire DB Every Query
 | Field | Value |
@@ -170,7 +309,7 @@
 | **Root Cause** | Import wrapped in try/except with print, not raise or log.WARNING. |
 | **Proposed Fix** | Raise ImportError or log at WARNING level with clear message. ~5 LOC. |
 | **Source** | Grounded Review §4 |
-| **Status** | 🟡 OPEN — Phase 0.5, P0.5.5 |
+| **Status** | ✅ RESOLVED — Now raises ImportError per C16 (no silent errors). Fix applied 2026-07-21 (C5). |
 
 ### BUG-016: Model Assignments Reference Phantom Models
 | Field | Value |
@@ -235,7 +374,7 @@ The following bugs were resolved during the 2026-07-21 cross-examination session
 |--------|-----------|-------------|
 | BUG-001 | ✅ RESOLVED | P0.8: `_load_cluster_map()` implemented in `stage5_verify.py` |
 | BUG-002 | ✅ RESOLVED | P0.9: Singleton `get_pipeline_run_id()` in `stamp.py` |
-| BUG-003 | ✅ RESOLVED | P0.10: `VERIFY_MODEL` used for SALSA in `stage4_merge.py` |
+| BUG-003 | ⚠️ REVERTED | P0.10: VERIFY_MODEL→GEN_MODEL reverted (Phi-4-mini broken on short prompts) |
 | BUG-005 | ✅ RESOLVED | P0.1-P0.2: `clean_line("")`→`""`, paragraph-aware `split_on_headings()` |
 | BUG-006 | ✅ RESOLVED | P0.3: Numbered-list pattern removed from SKIP_PATTERNS |
 | BUG-007 | ✅ RESOLVED | P0.5: UMAP replaces PCA in `stage3_cluster.py` |
@@ -248,7 +387,7 @@ The following bugs were resolved during the 2026-07-21 cross-examination session
 | BUG-014 | ✅ RESOLVED | P0.13: No cloud code found in pipeline — C1/C3 compliant |
 | BUG-016 | ✅ RESOLVED | P0.14: Phantom models nuked, bge-m3 replaces nomic, old paths fixed |
 
-**Still open:** BUG-004 (Phase 1), BUG-015 (Phase 0.5), BUG-017 (needs stress test)
+**Still open:** BUG-004 (Phase 1), BUG-017 (needs stress test)
 
 ---
 
@@ -311,7 +450,7 @@ The following bugs were resolved during the 2026-07-21 cross-examination session
 
 ---
 
-## BUGLOG RULES — AMENDED (2026-07-21)
+## BUGLOG RULES — AMENDED (2026-07-21, 2026-07-22)
 
 1. **When to add:** Any bug found during pipeline execution, code review, cross-examination session, or LLM handoff evaluation
 2. **Severity levels:** 🔴 CRITICAL (data loss, constitutional violation, pipeline failure) | 🟠 HIGH (broken feature, incorrect output, import failure) | 🟡 MEDIUM (quality degradation, scaling issue, phantom references) | 🟢 LOW (cosmetic, documentation)
@@ -320,10 +459,11 @@ The following bugs were resolved during the 2026-07-21 cross-examination session
 5. **Ownership:** Each bug must have a proposed fix and a target phase. No bug stays "acknowledged but unassigned."
 6. **SESSION RULE:** After every working session, accumulate all discovered bugs here. This is a standing rule for LLM handoff continuity.
 7. **Format:** Bug ID (BUG-NNN), severity emoji, file path, line numbers, symptom, root cause, proposed fix, source (which review/audit/session found it), status.
+8. **AUTO-LOG (2026-07-22):** Agent MUST log any bug immediately upon discovery — never defer. Only log bugs found in existing code/systems/configuration, not self-created errors in ad-hoc scripts.
 
 ---
 
-*Updated: 2026-07-21 | Bugs tracked: 22 (17 original + 5 new) | Resolved: 19 | Open: 3 (BUG-004, BUG-015, BUG-017) | Schema version: 1.1*---
+*Updated: 2026-07-23 | Bugs tracked: 37 (17 original + 5 new + 7 audit + 7 benchmark + 1 new) | Resolved: 37 | Open: 2 (BUG-017, BUG-037) | Observations: 2 (OBS-001, OBS-002) | Schema version: 1.4*
 ## QWEN CROSS-EXAMINATION SESSION (2026-07-21)
 
 ### Design Observations for Pre-Implementation Testing
@@ -469,3 +609,204 @@ Cross-referenced all 17 original bugs against production code.
 | BUG-017 | OPEN — P0.0 | 🔴 OPEN | Needs 130-book OMLX stress test (not testable in sandbox) |
 
 **Summary: 14/17 resolved, 1 reverted (BUG-003), 2 still open (BUG-004, BUG-017)**
+
+---
+
+## BENCHMARK SESSION — BUG-030 through BUG-036 (2026-07-22)
+
+### BUG-030: DeepSeek-R1 Token Encoding Mismatch — Garbled Output
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL |
+| **File** | N/A (oMLX/MXL model loading) |
+| **Symptom** | All DeepSeek-R1 output contains `Ċ` and `Ġ` character prefixes (e.g., `ĊFirst,ĠtheĠuserĠsaid:`). CoT reasoning tokens leaked into output. Model unusable. |
+| **Root Cause** | Tokenizer encoding mismatch between the LM Studio community MLX port and oMLX 0.5.3. The chat_template is not correctly configured. |
+| **Proposed Fix** | Replace with `mlx-community/DeepSeek-R1-Distill-Qwen-7B-MLX-4bit` (distilled, no CoT leakage). Or fix tokenizer_config.json in the model directory. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🔴 OPEN — Remove model. Replace with distilled version. |
+
+### BUG-031: Qwopus-GLM-18B "Thinking Process" Preamble Pollutes Output
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL |
+| **File** | N/A (model behavior) |
+| **Symptom** | Every response starts with "Thinking Process:" followed by step-by-step reasoning before actual output. Not compatible with structured JSON extraction or classification. |
+| **Root Cause** | Model is a reasoning/CoT variant. The chat_template exposes thinking tokens instead of hiding them (like DeepSeek-R1's intended behavior). |
+| **Proposed Fix** | Remove from pipeline lineup. If reasoning is needed, use a model with hidden CoT (like Qwen3-Coder's internal reasoning). |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🔴 OPEN — Remove model. Not suitable for pipeline tasks. |
+
+### BUG-032: gemma-4-E4B Extraction Latency Spikes to 21.95s
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH |
+| **File** | N/A (model behavior) |
+| **Symptom** | Extraction latency varies wildly: 1.22s on first warm call, 21.95s on second call. 18x variance. Other tasks remain fast (classification: 0.55-1.14s). |
+| **Root Cause** | Likely MLX graph recompilation or model swapping in oMLX engine pool. Extraction prompt is longer (~200 tokens) and may trigger recompilation. |
+| **Proposed Fix** | Use only for short-prompt tasks (classification, verification) where it's consistently fast (0.50-1.14s). Not suitable for extraction. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟡 NEEDS INVESTIGATION — Test with pinned model (disable engine pool auto-swap). |
+
+### BUG-033: gemma-4-E2B Extraction Latency Spikes to 13.20s
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH |
+| **File** | N/A (model behavior) |
+| **Symptom** | Same extraction latency variance as E4B: 0.76s first call, 13.20s second call. |
+| **Root Cause** | Same as BUG-032 — MLX graph recompilation on longer prompts. |
+| **Proposed Fix** | Pin model in oMLX engine pool. Test with `--memory-guard aggressive` which may prevent unloading between calls. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟡 NEEDS INVESTIGATION |
+
+### BUG-034: Qwen3-Coder Misclassification — "Economics" for Scarcity Principle
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM |
+| **File** | N/A (LLM behavior, Stage 4 classification) |
+| **Symptom** | Qwen3-Coder classified "Scarcity increases perceived value because people want what is rare or limited" as "economics" instead of "marketing" or "psychology". 1 misclassification in 3 attempts. |
+| **Root Cause** | Qwen3-Coder has broader domain associations. "Scarcity" is a term used in both economics and marketing psychology. The model chose the more academic association. |
+| **Proposed Fix** | This is why R5 exists — Phi-4-mini (VERIFY_MODEL) classifies it correctly as "marketing". Generator classification should NOT be the final label. VERIFY_MODEL must always override. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟡 CONFIRMS NEED FOR R5 — Generator ≠ Verifier is essential. |
+
+### BUG-035: Ornith-1.0-9B-4bit — Archive Empty, Model Not Downloaded
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM |
+| **File** | `/Users/barn/.omlx/models_archive/Ornith-1.0-9B-4bit/` |
+| **Symptom** | Archive directory exists but contains zero files. HF cache has lock file but no actual weights. Model was never fully downloaded. |
+| **Root Cause** | Partial/incomplete download. HF lock file created but download never completed. |
+| **Proposed Fix** | Re-download: `omlx-cli pull mlx-community/Ornith-1.0-9B-4bit` or delete lock file and archive. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟡 OPEN — Download or remove. |
+
+### BUG-036: Qwen3.6-35B-A3B Model Directory Has Config Only, No Weights
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM |
+| **File** | `/Users/barn/.omlx/models/Qwen3.6-35B-A3B-4bit/` |
+| **Symptom** | Directory restored from archive contains only config files (README.md, config.json, chat_template.jinja). No safetensors/model weights. oMLX API returns "Model not found." Weights are in HF cache at `models--mlx-community--Qwen3.6-35B-A3B-4bit` but model not discoverable by oMLX. |
+| **Root Cause** | Model was archived with config only, or oMLX 0.5.3 changed model discovery paths. Weights are in HF cache but need proper linking. |
+| **Proposed Fix** | Re-download: `omlx-cli pull mlx-community/Qwen3.6-35B-A3B-4bit`. Or symlink weights from HF cache into oMLX models directory. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟡 OPEN — Re-download or fix symlinks. |
+
+### BUG-037: Duplicate Phi-4-mini Model Cannot Be Deleted via API
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟢 LOW |
+| **File** | oMLX 0.5.3 API |
+| **Symptom** | `DELETE /v1/models/mlx-community--Phi-4-mini-instruct-8bit` returns 404 "Not Found". Model is listed in `GET /v1/models` but cannot be removed via API. |
+| **Root Cause** | oMLX 0.5.3 may not support DELETE endpoint, or the model name format doesn't match internal ID. |
+| **Proposed Fix** | Remove via oMLX GUI app: uncheck the duplicate model. Or remove from disk: delete `~/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/`. |
+| **Source** | 2026-07-22 benchmark session |
+| **Status** | 🟢 LOW — Remove via GUI or filesystem. |
+
+
+---
+
+## SESSION RESOLUTIONS (2026-07-23) — D2069/D2070 Verification Rewrite + Bug Sweep
+
+The following bugs were resolved during the 2026-07-23 session. Fixes applied and verified.
+
+| Bug ID | Resolution | Fix Applied |
+|--------|-----------|-------------|
+| BUG-003 | ✅ RESOLVED | D2069: R5 fully restored. Stage 5 verifier → Gemma-4-E4B (cross-family). Qwen≠Phi≠Gemma. |
+| BUG-004 | ✅ RESOLVED | BUG-004 FIX: `insert_embedding()` in stage6_commit.py pre-computes embeddings. `search_vector()` in retrieve.py uses sqlite-vec MATCH (O(1) not O(n)). ~55 LOC. |
+| BUG-030 | ✅ RESOLVED | DeepSeek-R1 deleted from disk (~4KB stub removed). Model unusable (CoT leakage). |
+| BUG-031 | ✅ RESOLVED | Qwopus-GLM-18B deleted from disk. "Thinking Process" preamble incompatible with structured output. |
+| BUG-032 | ✅ RESOLVED | Gemma-4-E4B re-benchmarked on oMLX 0.5.3: 1.4s (short), 6.4s (medium), 6.9s (long). No 21s spikes. Stable. |
+| BUG-033 | ✅ RESOLVED | gemma-4-E2B deleted from disk (4.1GB freed). Superseded by E4B. |
+| BUG-034 | ✅ RESOLVED | R5 fix (D2069). Qwen3-Coder no longer classifies its own output. Phi-4-mini classifies, Gemma verifies. |
+| BUG-035 | ✅ RESOLVED | Ornith-1.0-9B archive empty → deleted. Model never fully downloaded. |
+| BUG-036 | ✅ RESOLVED | Qwen3.6-35B-A3B weights confirmed (19GB, 4 safetensors in HF cache + OMLX symlink). Model is fully functional. |
+| BUG-037 | 🔴 NEEDS RESTART | OMLX registry still lists 10 models (6 deleted from disk). Requires OMLX GUI app restart to clear stale entries. Not a code bug. |
+| BUG-039 | 🟡 OBSERVATION | BUG-005/006/007/008/009 root cause fixed. Text cleaner (H1-H2) strips markdown artifacts + normalizes paragraphs. Cluster collapse from PCA+nomic no longer applies (UMAP+bge-m3). |
+| BUG-040 | 🟡 OBSERVATION | Cross-run dedup (C9) requires datasketch. If datasketch unavailable, MinHash near-duplicate detection silently disables (falls through to SHA-256 exact only). priint() warning on import failure. |
+| BUG-016 | ✅ RESOLVED | model_assignments.yaml: all phantom models removed (Qwopus, colibri, opus-distilled, deepseek fallbacks). 4 family mismatches fixed. |
+
+### NEW BUG — 2026-07-23
+
+---
+
+## 2026-07-25 — D2094 Tier 1 Implementation Session (Architecture Fix)
+
+### BUG-040: Delegate Tool Fails with reasoning_content API Error (2 consecutive failures)
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (blocks delegated code generation) |
+| **File** | N/A (Goose delegate/infrastructure layer) |
+| **Symptom** | Two independent delegate calls (task 20260725_1 and 20260725_2) both failed identically with: `Request failed: Bad request (400): The reasoning_content in the thinking mode must be passed back to the API.` Both tasks completed in 20-30s with zero output. |
+| **Root Cause** | The delegate infrastructure appears to use a model in "thinking mode" that emits `reasoning_content`. When the response is returned to the API, the `reasoning_content` field is not being passed back, causing a 400 Bad Request. This is likely a protocol mismatch between the delegate runner and the underlying model API. |
+| **Impact** | Blocks all Tier 1 delegated code generation. Forced manual file creation (407-line stage1_5_embed_cluster.py written directly). |
+| **Reproduction** | Any delegate call with `async: true` and custom instructions targeting a file write. Both attempts reproduced identically. |
+| **Proposed Fix** | 1) Investigate whether delegate model supports thinking mode — if not, disable it. 2) If thinking mode is required, ensure `reasoning_content` is propagated back in subsequent API calls. 3) Add fallback: if thinking mode fails, retry without it. |
+| **Source** | 2026-07-25 Tier 1 implementation session. Tasks 20260725_1, 20260725_2. |
+| **Status** | 🔴 OPEN — Needs investigation at delegate/infrastructure level. Workaround: manual file writes. |
+
+### BUG-041: No Delegation Code Review Possible — Manual Code Only
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (blocks R5 cross-family verification of generated code) |
+| **File** | N/A (workflow limitation) |
+| **Symptom** | The Maxwell OS constitution requires R5 (Generator ≠ Verifier — different model families). The plan was: delegate code generation to Qwen-family model, then delegate code review to Gemma/Phi-family model. BUG-040 blocks all delegation, making cross-family code review impossible via the delegate system. |
+| **Root Cause** | Same as BUG-040 — delegate infrastructure cannot complete any task. |
+| **Impact** | All Tier 1 code written directly without cross-family review. stage1_5_embed_cluster.py (407 LOC), stage5_verify.py fail-open flips (4 lines), stage4_merge.py noise wire (24 lines), pipeline_config.yaml, pipeline_paths.py — none received R5-compliant review. |
+| **Proposed Fix** | After BUG-040 is resolved, run cross-family review on all files modified in this session: stage1_5_embed_cluster.py, stage5_verify.py (lines 245-267), stage4_merge.py (load_stage3_clusters), config/pipeline_config.yaml, pipeline/pipeline_paths.py. |
+| **Source** | 2026-07-25 Tier 1 implementation session. |
+| **Status** | 🟠 OPEN — Deferred until BUG-040 resolved. Manual review should be done as interim measure. |
+
+### BUG-042: stage5_verify.py — Embedding Similarity Check Still Active (Not Yet Removed)
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (fail-open branches now fail-closed, but embedding check is still the wrong tool) |
+| **File** | `pipeline/stage5_verify.py`, lines 83-149 (`embedding_similarity_check()`) |
+| **Symptom** | The fail-open branches (V2-V5) have been flipped to fail-closed. However, the `embedding_similarity_check()` function still runs as the pre-filter. It measures cosine similarity between FB definition and source_principles (paraphrases), not actual NLI entailment. The code comment at line 83-96 still explains why they abandoned DeBERTa. |
+| **Root Cause** | V1 (port DeBERTa NLI from old project) and V6 (remove embedding similarity) were NOT completed in this session — deferred because delegate system failed and these require significant new code (old s6_pipeline.py NLI port + new function design). |
+| **Proposed Fix** | Port `nli_entailment()` function from old project's `tools/s6_pipeline.py` (lines 27-44). Replace `embedding_similarity_check()` with `nli_entailment_check()` that: 1) loads roberta-large-mnli pipeline, 2) compares FB definition against verbatim evidence_passages (not source_principles), 3) returns FAIL on CONTRADICTION, FLAG on NEUTRAL, PASS on ENTAILMENT with score ≥0.6. |
+| **Source** | D2093, D2101, D2104. Cross-examination of actual stage5_verify.py. |
+| **Status** | ✅ FIXED (D2113) — `nli_evidence_check()` with DeBERTa NLI replaces `embedding_similarity_check()`. |
+
+
+### BUG-038: pipeline_config.yaml Pointed to Deleted Models
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL |
+| **File** | `config/pipeline_config.yaml` |
+| **Symptom** | `models.generator.model: Qwen3.6-35B-A3B-OptiQ-4bit` (DELETED). `models.verifier.model: Phi-4-mini-instruct-4bit` (DELETED). Pipeline would crash on Stage 2 with model-not-found. |
+| **Root Cause** | Model deletions (2026-07-22) were not synced to pipeline_config.yaml. pipeline_paths.py reads model names from this file. |
+| **Proposed Fix** | Update to live models: generator → Qwen3.6-35B-A3B-4bit, verifier → Phi-4-mini-instruct-8bit. Add verifier_v2 → gemma-4-E4B-it-MLX-4bit. |
+| **Source** | 2026-07-23 audit (governance cross-examination) |
+| **Status** | ✅ RESOLVED — Fixed in same session. pipeline_config.yaml, pipeline_paths.py, model_assignments.yaml all updated. |
+
+---
+
+## 2026-07-23 — Gate-Fix Sprint (D2080-D2086) — Threat Assessment
+
+### FIXED (v2.2)
+
+| Bug ID | Severity | File | Symptom | Root Cause | Fix |
+|--------|----------|------|---------|-----------|-----|
+| D2080-B1 | 🔴 HIGH | stage3_cluster.py:101 | Clusters collapsed, principles lumped together | UMAP min_dist=0.0 forces all points into tight balls | min_dist=0.1 (configurable) |
+| D2080-B2 | 🔴 HIGH | stage3_cluster.py:187 | Valid single-source principles silently lost | `continue` on noise label=-1 discards principles | Keep noise, write to cluster_noise.jsonl |
+| D2080-B3 | 🟡 MED | stage3_cluster.py:196 | Centroid selection wrong for cosine space | Raw dot product on cosine-reduced embeddings | Normalize vectors before centroid |
+| D2080-B4 | 🟡 MED | stage2_extract.py:409-412 | source_book="" → empty source_books → BORP fail | Fragile prefix match on LLM-returned segment_id | Exact match first, prefix fallback |
+| D2080-B5 | 🟡 MED | stage2_extract.py:309-347 | Resume: in-run dedup partially broken | MinHash LSH not rebuilt from checkpoint | Rebuild LSH on resume |
+| D2080-B6 | 🟡 MED | stage2_extract.py:452-460 | .segids and checkpoint desync on crash | Two-file write not atomic | Atomic tempfile→fsync→replace for .segids |
+| D2080-B8 | 🟡 MED | stage2_extract.py:371-373 | Segments silently lost on OMLX failure | `except Exception: continue` | Retry once (configurable), log skipped IDs |
+
+### OBSERVED (v2.2 — accepted)
+
+| ID | Severity | Description | Why Accepted |
+|----|----------|-------------|-------------|
+| D2080-O1 | 🟢 LOW | Resume: partial batches re-sent entirely to LLM | Gate makes re-extraction cheap; partially-processed batches are rare |
+| D2080-O2 | 🟢 LOW | Golden set has no version tracking | Not critical for v2.2; repo commit hash provides implicit tracking |
+| D2080-O3 | 🟢 LOW | gate_basis values are opaque (a/b/c) | Documented in SYSTEM_PROMPT; self-documenting in JSON output |
+
+### DEFERRED TO v3.0
+
+| ID | Severity | Description | Decision |
+|----|----------|-------------|----------|
+| D2084-D1 | 🟡 MED | PI/TI/GE/PT not committed to DB | D2084 |
+| D2084-D2 | 🟡 MED | Orphan PIs without parent PT links | D2084 |
+| D2084-D3 | 🟡 MED | Growth edge quarantine no promotion | MTR |

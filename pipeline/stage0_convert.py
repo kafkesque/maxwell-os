@@ -19,6 +19,7 @@ Usage:
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -27,14 +28,15 @@ from pathlib import Path
 # ── Paths ──────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
-    STAGE0_CHECKPOINT,
     CHECKPOINT_DIR,
-    SCHEMA_VERSION,
+    SMOKE_BOOK_LIMIT,
+    STAGE0_CHECKPOINT,
 )
-from pipeline.stamp import stamp_record, get_pipeline_commit
-from pipeline.io_guard import safe_write
+from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.text_cleaner import check_conversion_quality
 
 # ── Constants ──────────────────────────────────────────────────────────────
 SUPPORTED_EXTENSIONS = {".epub", ".pdf", ".md"}  # .md = already converted
@@ -56,9 +58,11 @@ def convert_epub(epub_path: Path, output_path: Path) -> bool:
             [
                 "pandoc",
                 str(epub_path),
-                "-t", "markdown",
+                "-t",
+                "markdown",
                 "--wrap=none",
-                "-o", str(output_path),
+                "-o",
+                str(output_path),
             ],
             capture_output=True,
             text=True,
@@ -99,15 +103,17 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> bool:
         pass
 
     # Fallback to Pandoc
-    print(f"  ℹ️  Docling not available, trying Pandoc for PDF...")
+    print("  ℹ️  Docling not available, trying Pandoc for PDF...")
     try:
         result = subprocess.run(
             [
                 "pandoc",
                 str(pdf_path),
-                "-t", "markdown",
+                "-t",
+                "markdown",
                 "--wrap=none",
-                "-o", str(output_path),
+                "-o",
+                str(output_path),
             ],
             capture_output=True,
             text=True,
@@ -147,10 +153,24 @@ def load_existing_checkpoint() -> dict[str, dict]:
     return existing
 
 
-def run_stage0(books_dir: Path = None, force: bool = False, single_book: str = None):
-    """Run Stage 0: Convert all books to Markdown."""
+def run_stage0(
+    books_dir: Path = None, force: bool = False, single_book: str = None, limit: int = None
+):
+    """Run Stage 0: Convert all books to Markdown.
+
+    Args:
+        books_dir: Directory containing source books.
+        force: Reconvert already-converted books.
+        single_book: Convert only the named book.
+        limit: Maximum number of books to process (applied after finding all books).
+               If None and MAXWELL_RUN_ID=smoke, defaults to 3.
+    """
     if books_dir is None:
         books_dir = BOOKS_DIR
+
+    # ── Auto-limit for smoke tests ──────────────────────────────────────
+    if limit is None and os.environ.get("MAXWELL_RUN_ID") == "smoke":
+        limit = SMOKE_BOOK_LIMIT
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -169,14 +189,26 @@ def run_stage0(books_dir: Path = None, force: bool = False, single_book: str = N
     else:
         books = find_books(books_dir)
 
+    # ── Apply limit ─────────────────────────────────────────────────────
+    if limit is not None and limit > 0:
+        books = books[:limit]
+
     if not books:
         print("📭 No EPUB or PDF files found in books/")
         return
 
     print(f"📚 Stage 0: Convert — {len(books)} books found")
-    print(f"{'='*60}")
+    if limit:
+        print(f"   (limited to first {limit})")
+    print(f"{'=' * 60}")
 
-    existing = load_existing_checkpoint() if not force else {}
+    # ── Checkpoint handling ──────────────────────────────────────────────
+    # When a limit is active (e.g. smoke test), don't load accumulated
+    # checkpoints from prior full runs — they pollute the limited run.
+    if limit is not None and limit > 0 and not force:
+        existing = {}  # Fresh checkpoint for limited runs
+    else:
+        existing = load_existing_checkpoint() if not force else {}
     converted = []
     failed = []
     skipped = 0
@@ -201,15 +233,18 @@ def run_stage0(books_dir: Path = None, force: bool = False, single_book: str = N
             if book_path.stat().st_size > 100:
                 sha = compute_sha256(book_path)
                 size_kb = book_path.stat().st_size / 1024
-                rec = stamp_record({
-                    "source_file": book_path.name,
-                    "source_path": str(book_path),
-                    "output_path": str(md_path),
-                    "format": "md",
-                    "sha256": sha,
-                    "size_kb": round(size_kb, 1),
-                    "elapsed_s": 0.0,
-                }, gen_model="pandoc/docling")
+                rec = stamp_record(
+                    {
+                        "source_file": book_path.name,
+                        "source_path": str(book_path),
+                        "output_path": str(md_path),
+                        "format": "md",
+                        "sha256": sha,
+                        "size_kb": round(size_kb, 1),
+                        "elapsed_s": 0.0,
+                    },
+                    gen_model="pandoc/docling",
+                )
                 rec["pipeline_commit"] = pipeline_commit
                 converted.append(rec)
                 print(f"→ ✅ {size_kb:.0f}KB (native MD)")
@@ -231,21 +266,39 @@ def run_stage0(books_dir: Path = None, force: bool = False, single_book: str = N
         if success:
             size_kb = md_path.stat().st_size / 1024
             sha = compute_sha256(md_path)
-            rec = stamp_record({
-                "source_file": book_path.name,
-                "source_path": str(book_path),
-                "output_path": str(md_path),
-                "format": ext,
-                "sha256": sha,
-                "size_kb": round(size_kb, 1),
-                "elapsed_s": round(elapsed, 1),
-            }, gen_model="pandoc/docling")
+            # ── H4: Post-conversion quality check ─────────────────────
+            quality_warnings = []
+            try:
+                with open(md_path, encoding="utf-8") as _qf:
+                    q_result = check_conversion_quality(_qf.read(), book_path.name)
+                if not q_result["ok"]:
+                    print(f"→ ⚠️  {q_result['error']}")
+                    quality_warnings.append(q_result["error"])
+                for w in q_result.get("warnings", []):
+                    print(f"   ⚠️  {w}")
+                    quality_warnings.append(w)
+            except Exception:
+                pass  # Quality check is best-effort
+
+            rec = stamp_record(
+                {
+                    "source_file": book_path.name,
+                    "source_path": str(book_path),
+                    "output_path": str(md_path),
+                    "format": ext,
+                    "sha256": sha,
+                    "size_kb": round(size_kb, 1),
+                    "elapsed_s": round(elapsed, 1),
+                    "quality_warnings": quality_warnings,
+                },
+                gen_model="pandoc/docling",
+            )
             rec["pipeline_commit"] = pipeline_commit
             converted.append(rec)
             print(f"→ ✅ {size_kb:.0f}KB ({elapsed:.1f}s)")
         else:
             failed.append({"file": book_path.name, "format": ext})
-            print(f"→ ❌ Failed")
+            print("→ ❌ Failed")
 
     # Write checkpoint
     all_records = list(existing.values()) + converted
@@ -255,7 +308,7 @@ def run_stage0(books_dir: Path = None, force: bool = False, single_book: str = N
     )
 
     # Summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Converted: {len(converted)}")
     print(f"⏭️  Skipped:   {skipped}")
     print(f"❌ Failed:    {len(failed)}")
@@ -270,10 +323,16 @@ def main():
     parser.add_argument("--book", help="Convert a single book (filename only)")
     parser.add_argument("--force", action="store_true", help="Reconvert already-converted books")
     parser.add_argument("--books-dir", help="Override books directory")
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Max books to process (auto: 3 when MAXWELL_RUN_ID=smoke)",
+    )
     args = parser.parse_args()
 
     books_dir = Path(args.books_dir) if args.books_dir else BOOKS_DIR
-    run_stage0(books_dir=books_dir, force=args.force, single_book=args.book)
+    run_stage0(books_dir=books_dir, force=args.force, single_book=args.book, limit=args.limit)
 
 
 if __name__ == "__main__":

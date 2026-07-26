@@ -21,15 +21,21 @@ Usage:
 import argparse
 import json
 import sys
-import yaml
 from pathlib import Path
-from collections import defaultdict
+
+import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT))
 
-from pipeline_paths import EDUCATION_MD_BOOKS, EDUCATION_EPUB_BOOKS, EDUCATION_PDF_BOOKS, STAGE_PATHS, CONFIG_DIR
+from pipeline_paths import (
+    CONFIG_DIR,
+    EDUCATION_EPUB_BOOKS,
+    EDUCATION_MD_BOOKS,
+    EDUCATION_PDF_BOOKS,
+    STAGE_PATHS,
+)
 
 PIPELINE_SOURCES = STAGE_PATHS.get("sources", ROOT / "knowledge pipeline" / "input" / "1.sources")
 
@@ -120,7 +126,7 @@ def validate_root(root_path: Path, valid_cds: set, cd_to_domain: dict):
 
         # Level 1: domain folder
         if depth == 1:
-            domain_name = rel_parts[0]
+            rel_parts[0]
             findings["total_dirs"] += len(dirnames)
             # Files at domain level = unclassified
             for fn in filenames:
@@ -207,7 +213,7 @@ def print_findings(findings, json_out=False):
             print(f"     ... and {len(findings['root_books']) - 10} more")
 
     if not findings["nested"] and not findings["unknown_names"] and not findings["root_books"]:
-        print(f"\n  ✅ Structure is clean.")
+        print("\n  ✅ Structure is clean.")
 
     return findings["pass"]
 
@@ -216,7 +222,7 @@ def fix_empty_dirs(root_path: Path):
     """Remove empty directories (safe — only removes truly empty dirs)."""
     import os
     removed = 0
-    for dirpath, dirnames, filenames in os.walk(root_path, topdown=False):
+    for dirpath, _dirnames, _filenames in os.walk(root_path, topdown=False):
         if dirpath == str(root_path):
             continue
         try:
@@ -256,7 +262,7 @@ def main():
         roots.append(("Pipeline 1.sources", PIPELINE_SOURCES))
 
     all_pass = True
-    for name, root_path in roots:
+    for _name, root_path in roots:
         findings = validate_root(root_path, valid_cds, cd_to_domain)
         passed = print_findings(findings, json_out=args.json)
         all_pass = all_pass and passed

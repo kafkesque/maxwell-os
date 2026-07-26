@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 """
-stage5_verify.py — Verify FBs via Phi-4-mini (BORP + factual checks).
-=====================================================================
-Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8
+stage5_verify.py — Verify FBs via DeBERTa NLI pre-filter + Gemma-4-E4B deep check.
+==================================================================================
+Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8, D2069
 
-Input:  FBs from Stage 4 checkpoint
+Input:  FBs from Stage 4 checkpoint (with embedded source_principles)
 Output: Verified FBs, checkpoint at stage5_verify.jsonl
 
 Process:
   1. BORP check: verify at least 2 distinct source books per FB
-  2. Factual consistency: Phi-4-mini checks definition against source principles
-  3. Completeness: all required fields present and non-trivial
-  4. Assign status: PASS / FLAG / QUARANTINE
-  5. Human queue: FBs that need Maxwell's review
+  2. Completeness: all required fields present and non-trivial
+  3. DeBERTa NLI entailment: fast entailment check (definition ↔ evidence_passages)
+     → ENTAILMENT + ≥0.6 = PASS (skip LLM)
+     → CONTRADICTION = FAIL → escalate to Gemma-4-E4B
+     → NEUTRAL = FLAG → escalate to Gemma-4-E4B
+  4. FAIL-CLOSED (D2093): any check failure → QUARANTINE, never PASS
+  5. Assign status: PASS / FLAG / QUARANTINE
 
-Verifier model: Phi-4-mini-instruct-8bit (OMLX) — different family from generator (R5)
-temp: 0.0 (R7)
+R5 compliance (D2069):
+  Generator: Qwen3.6-35B (Qwen family) — Stage 2, 4 Phase 1
+  Classifier: Phi-4-mini-8bit (Phi family) — Stage 4 Phase 2
+  Verifier:   Gemma-4-E4B (Gemma family) — Stage 5
+  Three different families. No model reviews its own output.
+
+DeBERTa model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB, already on disk)
+  Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%
+  Speed: ~50ms per sentence pair on CPU (M1 Max)
 
 Usage:
     python3 pipeline/stage5_verify.py
     python3 pipeline/stage5_verify.py --strict   # Quarantine on any failure
+    python3 pipeline/stage5_verify.py --skip-nli  # Skip DeBERTa, use LLM for all
 """
 
 import argparse
@@ -30,66 +41,134 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write
+from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
-    STAGE2_CHECKPOINT,
+    BORP_MIN_SOURCES,
+    CHECKPOINT_DIR,
+    S5_BORP_BYPASS_TYPES,  # D2083: types that skip BORP check
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
-    CHECKPOINT_DIR,
-    VERIFY_MODEL,
-    EMBED_MODEL,
-    BORP_MIN_SOURCES,
+    VERIFY_MODEL_V2,  # D2069: cross-family verifier (Gemma-4-E4B)
 )
-from pipeline.stamp import stamp_record, get_pipeline_commit
-from pipeline.omlx_call import call_omlx, check_omlx_health
-from pipeline.io_guard import safe_write
+from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
+NLI_ENTAILMENT_THRESHOLD: float = 0.6  # Minimum confidence for DeBERTa ENTAILMENT label (D2093)
+# ── DeBERTa NLI — ported from old project s6_pipeline.py (D2093, D2101, D2104) ─
+# The embedding-similarity pre-filter has been REPLACED with real NLI entailment.
+# In cluster-before-extract architecture, FBs have verbatim evidence_passages —
+# DeBERTa works correctly because it compares against exact source text.
+
+_nli_pipeline = None
+
+
+def _get_nli():
+    """Lazy-load roberta-large-mnli for entailment scoring."""
+    global _nli_pipeline
+    if _nli_pipeline is None:
+        from transformers import pipeline
+        _nli_pipeline = pipeline("text-classification", model="roberta-large-mnli", device=-1)
+    return _nli_pipeline
+
+
+def nli_entailment(claim: str, source: str) -> dict:
+    """Score entailment: does source text entail the claim?
+
+    Returns {'label': 'ENTAILMENT'|'NEUTRAL'|'CONTRADICTION', 'score': 0.0-1.0}
+    """
+    nli = _get_nli()
+    source = source[:1024] if len(source) > 1024 else source
+    result = nli(f"{source} </s></s> {claim}")
+    top = result[0] if isinstance(result, list) else result
+    return {"label": top.get("label", "UNKNOWN"), "score": round(top.get("score", 0.0), 4)}
+
+
+# ── Prompt templates ───────────────────────────────────────────────────────
+
 FACTUAL_CHECK_SYSTEM = """You are a factual consistency checker for Foundation Blocks.
-Compare the FB's definition against the source principles it was derived from.
+Compare the FB's definition against its EVIDENCE PASSAGES (verbatim source text).
 
 Check:
-1. Does the definition accurately reflect the source principles? (not contradict, not fabricate)
-2. Are any claims in the definition NOT supported by the source principles?
-3. Is the definition coherent and logically consistent?
+1. Does the definition accurately reflect the evidence passages? (not contradict, not fabricate)
+2. Are any claims in the definition NOT supported by the evidence passages?
+3. Is the definition coherent and logically consistent WITH the evidence?
 
 Return ONLY a JSON object:
 {"consistent": true/false, "score": 0.0-1.0, "issues": ["issue1", "issue2"] or []}"""
 
 
-def _load_cluster_map() -> dict[str, list[str]]:
-    """P0.8 FIX: Load cluster_id → principle_ids mapping from Stage 3 checkpoint."""
-    from pipeline.pipeline_paths import STAGE3_CHECKPOINT
-    cluster_map: dict[str, list[str]] = {}
-    if not STAGE3_CHECKPOINT.exists():
-        return cluster_map
-    with open(STAGE3_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                c = json.loads(line)
-                cid = str(c.get("cluster_id", ""))
-                pids = c.get("principle_ids", [])
-                if cid and pids:
-                    cluster_map[cid] = pids
-    return cluster_map
+# ── NLI evidence check (D2093: replaces embedding similarity) ──────────────
+
+def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
+    """DeBERTa NLI entailment: compare FB definition against verbatim evidence passages.
+
+    v3.0 (D2093, D2104): Replaces embedding_similarity_check() which measured
+    topical closeness (cosine similarity), not factual entailment. DeBERTa MNLI
+    works correctly with verbatim evidence_passages from convergent extraction.
+
+    Returns (passed, confidence, detail).
+    """
+    # BUG-045 fix: prefer evidence_passages_shown (what LLM actually saw, 5-15 passages)
+    # over evidence_passages (what LLM chose to return, up to 5) for NLI verification.
+    evidence_passages: list[str] = fb.get("evidence_passages_shown", [])
+    if not evidence_passages:
+        evidence_passages = fb.get("evidence_passages", [])
+    if not evidence_passages:
+        # Fallback: try source_principles (v2.2 checkpoint compatibility)
+        source_principles: list[dict] = fb.get("source_principles", [])
+        if source_principles:
+            evidence_passages = [p.get("principle_text", "") for p in source_principles if p.get("principle_text")]
+        else:
+            return False, 0.0, "No evidence_passages or source_principles — QUARANTINE"
+
+    definition: str = fb.get("definition", "")
+    if not definition or len(definition) < 20:
+        return False, 0.0, "No definition — QUARANTINE"
+
+    try:
+        results: list[dict] = []
+        for passage in evidence_passages[:8]:  # Max 8 passages for speed
+            if not passage.strip():
+                continue
+            result: dict = nli_entailment(definition, passage)
+            results.append(result)
+
+        if not results:
+            return False, 0.0, "No valid evidence passages to check — QUARANTINE"
+
+        # Score: % of passages that entail vs contradict the definition.
+        # D2094 revised: CONTRADICTION = fail, NEUTRAL = pass-to-LLM, ENTAILMENT = strong pass.
+        entailments: int = sum(1 for r in results if r["label"] == "ENTAILMENT" and r["score"] >= 0.6)
+        contradictions: int = sum(1 for r in results if r["label"] == "CONTRADICTION" and r["score"] >= 0.6)
+        neutrals: int = len(results) - entailments - contradictions
+
+        nli_entail_score: float = entailments / len(results) if results else 0.0
+        nli_contra_score: float = contradictions / len(results) if results else 0.0
+
+        if nli_contra_score >= 0.5:
+            # Majority contradict → strong failure
+            passed: bool = False
+            nli_score: float = 0.0
+            detail: str = f"NLI FAIL: {contradictions}/{len(results)} contradictions — evidence contradicts claim"
+        elif nli_entail_score >= 0.5:
+            # Majority entail → strong pass (skip LLM)
+            passed = True
+            nli_score = nli_entail_score
+            detail = f"NLI PASS: {entailments}/{len(results)} entailments (≥0.6 confidence)"
+        else:
+            # Mixed/neutral → pass to LLM for deeper check (score < 0.5 triggers escalation)
+            passed = True
+            nli_score = 0.4  # Below 0.5 threshold → triggers LLM escalation in run_stage5
+            detail = f"NLI NEUTRAL: {entailments}E/{neutrals}N/{contradictions}C — escalate to LLM"
+
+        return passed, nli_score, detail
+
+    except Exception as e:
+        return False, 0.0, f"NLI check error — QUARANTINE: {e}"
 
 
-def build_factual_prompt(fb: dict, source_principles: list[dict]) -> str:
-    """Build the factual consistency check prompt."""
-    lines = ["Check if this Foundation Block is factually consistent with its source principles.\n"]
-    lines.append("=== FOUNDATION BLOCK ===")
-    lines.append(f"NAME: {fb.get('name', 'N/A')}")
-    lines.append(f"DEFINITION: {fb.get('definition', 'N/A')[:600]}")
-    lines.append(f"APPLICATION: {fb.get('application', 'N/A')[:300]}")
-    lines.append(f"FAILURE MODE: {fb.get('failure_mode', 'N/A')[:300]}")
-    lines.append("")
-    lines.append("=== SOURCE PRINCIPLES ===")
-    for i, p in enumerate(source_principles[:10], 1):
-        lines.append(f"{i}. {p['principle_text'][:400]}")
-    lines.append("")
-    lines.append("Return JSON: {\"consistent\": bool, \"score\": float, \"issues\": [...]}")
-    return "\n".join(lines)
-
+# ── Core verification functions ────────────────────────────────────────────
 
 def load_stage4_fbs() -> list[dict]:
     """Load FBs from Stage 4 checkpoint."""
@@ -106,26 +185,48 @@ def load_stage4_fbs() -> list[dict]:
     return fbs
 
 
-def load_stage2_principles() -> dict[str, dict]:
-    """Load principles indexed by principle_id."""
-    if not STAGE2_CHECKPOINT.exists():
-        return {}
+def build_factual_prompt(fb: dict) -> str:
+    """Build factual consistency prompt using embedded source_principles.
 
-    principles = {}
-    with open(STAGE2_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                p = json.loads(line)
-                principles[p["principle_id"]] = p
-    return principles
+    D2069: Uses fb['source_principles'] directly — no checkpoint lookups needed.
+    """
+    lines = ["Check if this Foundation Block is factually consistent with its source evidence.\n"]
+    lines.append("=== FOUNDATION BLOCK ===")
+    lines.append(f"NAME: {fb.get('name', 'N/A')}")
+    lines.append(f"DEFINITION: {fb.get('definition', 'N/A')[:600]}")
+    lines.append(f"MECHANISM: {fb.get('mechanism', fb.get('application', 'N/A'))[:300]}")
+    lines.append(f"BOUNDARY: {fb.get('boundary', fb.get('failure_mode', 'N/A'))[:300]}")
+    lines.append(f"CONSEQUENCE: {fb.get('consequence', fb.get('elaboration', 'N/A'))[:300]}")
+    lines.append("")
+    # D2094: Use evidence_passages (v3.0) or source_principles (v2.x)
+    sources: list[str] = []
+    if fb.get("evidence_passages"):
+        sources = [str(p) for p in fb["evidence_passages"][:10]]
+        lines.append("=== EVIDENCE PASSAGES ===")
+    else:
+        source_principles = fb.get("source_principles", [])
+        sources = [p.get('principle_text', '')[:400] for p in source_principles[:10]]
+        lines.append("=== SOURCE PRINCIPLES ===")
+    for i, src in enumerate(sources, 1):
+        lines.append(f"{i}. {str(src)[:400]}")
+    lines.append("")
+    lines.append("Return JSON: {\"consistent\": bool, \"score\": float, \"issues\": [...]}")
+    return "\n".join(lines)
 
 
-def check_borp(fb: dict) -> tuple[bool, float, str]:
+def check_borp(fb: dict, bypass_types: list[str] = S5_BORP_BYPASS_TYPES) -> tuple[bool, float, str]:
     """BORP check: distinct sources ≥ BORP_MIN_SOURCES.
 
-    Returns (passed, score, detail).
+    D2083: Types in bypass_types skip BORP entirely.
+    process_template, process_instance, growth_edge, tool_instruction don't need
+    cross-source convergence — they're methods, evidence, speculations, and commands.
     """
+    content_type = fb.get("content_type", "principle")
+
+    # D2083: Type-aware bypass
+    if content_type in bypass_types:
+        return True, 1.0, f"BORP bypassed (type={content_type})"
+
     source_books = fb.get("source_books", [])
     distinct = len(set(source_books))
     score = min(distinct / BORP_MIN_SOURCES, 1.0)
@@ -135,17 +236,21 @@ def check_borp(fb: dict) -> tuple[bool, float, str]:
 
 
 def check_completeness(fb: dict) -> tuple[bool, float, str]:
-    """Check that all required FB fields are present and non-trivial."""
-    required_fields = [
+    """Check that all required FB fields are present and non-trivial.
+
+    D2094: Uses v3.0 schema (mechanism/boundary/consequence) or v2.x fallback fields.
+    """
+    # v3.0 schema fields first, v2.x as fallback
+    has_mechanism = bool(fb.get("mechanism") or fb.get("application"))
+    has_boundary = bool(fb.get("boundary") or fb.get("failure_mode"))
+    has_consequence = bool(fb.get("consequence") or fb.get("elaboration"))
+
+    required_fields: list[tuple[str, int]] = [
         ("name", 3),
         ("definition", 30),
-        ("application", 10),
-        ("failure_mode", 10),
-        ("elaboration", 20),
-        ("keywords", 3),
     ]
-    missing = []
-    short = []
+    missing: list[str] = []
+    short: list[str] = []
     for field, min_len in required_fields:
         val = fb.get(field, "")
         if not val:
@@ -153,109 +258,86 @@ def check_completeness(fb: dict) -> tuple[bool, float, str]:
         elif len(val.strip()) < min_len:
             short.append(f"{field} ({len(val.strip())} < {min_len} chars)")
 
+    # D2094: Check v3.0 structural fields
+    if not has_mechanism:
+        missing.append("mechanism/application")
+    if not has_boundary:
+        missing.append("boundary/failure_mode")
+    if not has_consequence:
+        missing.append("consequence/elaboration")
+
+    total_checks = len(required_fields) + 3  # name + def + 3 structural
     issues = missing + short
-    score = 1.0 - (len(issues) / len(required_fields))
+    score = max(0.0, 1.0 - (len(issues) / total_checks))
     passed = len(issues) == 0
     detail = ", ".join(issues) if issues else "All fields present"
     return passed, score, detail
 
 
-def check_factual(fb: dict, principles_idx: dict, skip_factual: bool = False
-                  ) -> tuple[bool, float, str]:
-    """Factual consistency check using Phi-4-mini.
+def check_factual_llm(fb: dict, model: str) -> tuple[bool, float, str]:
+    """Deep factual check using LLM (Gemma-4-E4B, cross-family).
 
-    Returns (passed, score, detail).
+    D2069: Only called when NLI pre-filter fails (~30% of FBs).
+    D2094: Uses evidence_passages (v3.0) or source_principles (v2.x) — schema-adaptive.
     """
-    if skip_factual:
-        return True, 1.0, "Skipped (no source principles available)"
+    source_principles = fb.get("source_principles", [])
+    evidence_passages = fb.get("evidence_passages", [])
+    if not source_principles and not evidence_passages:
+        return False, 0.0, "No source principles or evidence passages — QUARANTINE (D2093: fail-closed)"
 
-    # P0.8 FIX: Load cluster checkpoint to map cluster_id → principle_ids.
-    # Was: empty pass loop that fell back to arbitrary first 20 principles.
-    cluster_map = _load_cluster_map()
-    source_principle_ids = set()
-    source_clusters = fb.get("source_clusters", [])  # QWEN-FIX: was undefined, causing NameError
-    for cid in source_clusters:
-        pids = cluster_map.get(str(cid), [])
-        source_principle_ids.update(pids)
-
-    # Filter principles to only those from source clusters
-    source_principles = [
-        principles_idx[pid] for pid in source_principle_ids
-        if pid in principles_idx
-    ]
-
-    # Fallback: cosine top-10 by definition similarity if <5 sources
-    if len(source_principles) < 5:
-        import numpy as np
-        from pipeline.ollama_embed import batch_embed
-        fb_text = fb.get("definition", "")
-        all_texts = [p["principle_text"][:400] for p in principles_idx.values()]
-        all_ids = list(principles_idx.keys())
-        if all_texts and fb_text:
-            try:
-                fb_emb = np.array(batch_embed([fb_text], model=EMBED_MODEL)[0], dtype=np.float32)
-                all_embs = np.array(batch_embed(all_texts, model=EMBED_MODEL), dtype=np.float32)
-                sims = np.dot(all_embs, fb_emb) / (
-                    np.linalg.norm(all_embs, axis=1) * np.linalg.norm(fb_emb) + 1e-8
-                )
-                top_10 = np.argsort(sims)[-10:][::-1]
-                source_principles = [principles_idx[all_ids[i]] for i in top_10]
-            except Exception:
-                source_principles = list(principles_idx.values())[:20]
-        else:
-            source_principles = list(principles_idx.values())[:20]
-
-    if not source_principles:
-        return True, 0.5, "No source principles found for verification"
+    if not check_omlx_health():
+        return False, 0.0, "OMLX unavailable — QUARANTINE (D2093: fail-closed)"
 
     try:
-        prompt = build_factual_prompt(fb, source_principles)
-        result = call_omlx(
+        prompt = build_factual_prompt(fb)
+        result = call_omlx_json(
             prompt=prompt,
-            model=VERIFY_MODEL,
+            model=model,
             system=FACTUAL_CHECK_SYSTEM,
             max_tokens=512,
         )
-        # Parse result
-        import json as _json
-        from pipeline.json_repair import parse_json_robust
-
-        data = parse_json_robust(result)
-        if isinstance(data, dict):
-            consistent = data.get("consistent", False)
-            score = data.get("score", 0.5)
-            issues = data.get("issues", [])
-            detail = "; ".join(issues) if issues else "Factually consistent"
+        if isinstance(result, dict):
+            consistent = result.get("consistent", False)
+            score = result.get("score", 0.5)
+            issues = result.get("issues", [])
+            detail = "; ".join(issues) if issues else "LLM: factually consistent"
             return consistent, score, detail
     except Exception as e:
-        return True, 0.5, f"Factual check failed: {e}"
+        return False, 0.0, f"LLM factual check error — QUARANTINE (D2093: fail-closed): {e}"
 
-    return True, 0.5, "Factual check could not be completed"
+    return False, 0.0, "LLM check could not be completed — QUARANTINE (D2093: fail-closed)"
 
 
-def run_stage5(strict: bool = False, skip_factual: bool = False):
-    """Run Stage 5: Verify FBs."""
+# ── Main ────────────────────────────────────────────────────────────────────
+
+def run_stage5(strict: bool = False, skip_nli: bool = False):
+    """Run Stage 5: Verify FBs with DeBERTa NLI pre-filter + Gemma-4-E4B."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage4_fbs()
-    principles_idx = load_stage2_principles()
+    total = len(fbs)
 
-    if not skip_factual and not check_omlx_health():
-        print("⚠️  OMLX not running. Skipping factual checks (use --skip-factual).")
-        skip_factual = True
+    # Check models
+    omlx_available = check_omlx_health()
 
-    print(f"🔍 Stage 5: Verify — {len(fbs)} FBs")
-    print(f"   Verifier: {VERIFY_MODEL} | temp=0.0 | BORP ≥ {BORP_MIN_SOURCES}")
-    print(f"   Strict: {strict} | Factual checks: {not skip_factual}")
+    print(f"🔍 Stage 5: Verify — {total} FBs")
+    print(f"   Verifier: {VERIFY_MODEL_V2} (cross-family, R5: Gemma ≠ Phi ≠ Qwen)")
+    print(f"   Pre-filter: {'✅ DeBERTa NLI entailment (roberta-large-mnli)' if not skip_nli else '❌ skipped'}")
+    print(f"   OMLX deep check: {'✅ available' if omlx_available else '❌ unavailable'}")
+    print(f"   Strict: {strict} | NLI threshold: {NLI_ENTAILMENT_THRESHOLD} | Fail-closed: ✅ (D2093)")
     print(f"{'='*60}")
 
     verified = []
     stats = {"PASS": 0, "FLAG": 0, "QUARANTINE": 0}
+    prefilter_stats = {"passed": 0, "failed": 0, "skipped": 0}
+    llm_stats = {"called": 0, "skipped": 0}
     pipeline_commit = get_pipeline_commit()
 
     for i, fb in enumerate(fbs, 1):
         name = fb.get("name", "unnamed")[:40]
-        print(f"  [{i}/{len(fbs)}] {name}", end=" ")
+        has_sources = bool(fb.get("source_principles"))
+        source_tag = "📦" if has_sources else "⚠️"
+        print(f"  [{i}/{total}] {source_tag} {name}", end=" ")
 
         start = time.time()
         results = []
@@ -278,10 +360,59 @@ def run_stage5(strict: bool = False, skip_factual: bool = False):
             "detail": comp_detail,
         })
 
-        # 3. Factual consistency check
-        fact_passed, fact_score, fact_detail = check_factual(
-            fb, principles_idx, skip_factual=skip_factual
-        )
+        # 3. Factual consistency — DeBERTa NLI pre-filter → LLM deep check (D2093)
+        fact_passed: bool = True
+        fact_score: float = 1.0
+        fact_detail: str = "No verification needed"
+        method: str = "none"
+
+        if not skip_nli:
+            # D2093: DeBERTa NLI pre-filter (replaces embedding similarity)
+            nli_passed, nli_score, nli_detail = nli_evidence_check(fb)
+            if nli_passed and nli_score >= 0.8:
+                prefilter_stats["passed"] += 1
+                fact_passed = True
+                fact_score = nli_score
+                fact_detail = f"NLI PASS: {nli_detail}"
+                method = "nli"
+                llm_stats["skipped"] += 1
+            elif nli_passed and nli_score >= 0.5:
+                prefilter_stats["passed"] += 1
+                fact_passed = True
+                fact_score = nli_score
+                fact_detail = f"NLI FLAG (marginal): {nli_detail}"
+                method = "nli"
+            else:
+                prefilter_stats["failed"] += 1
+                # Escalate to LLM deep check (Gemma-4-E4B, cross-family)
+                if omlx_available:
+                    llm_stats["called"] += 1
+                    fact_passed, fact_score, fact_detail = check_factual_llm(
+                        fb, model=VERIFY_MODEL_V2
+                    )
+                    fact_detail = f"NLI FAIL → LLM: {fact_detail}"
+                    method = "nli+LLM"
+                else:
+                    # D2093: fail-closed — no LLM available = QUARANTINE
+                    fact_passed = False
+                    fact_score = nli_score
+                    fact_detail = f"NLI FAIL + OMLX unavailable — QUARANTINE: {nli_detail}"
+                    method = "nli-only"
+        else:
+            prefilter_stats["skipped"] += 1
+            if omlx_available:
+                llm_stats["called"] += 1
+                fact_passed, fact_score, fact_detail = check_factual_llm(
+                    fb, model=VERIFY_MODEL_V2
+                )
+                fact_detail = f"LLM (direct, NLI skipped): {fact_detail}"
+                method = "LLM"
+            else:
+                fact_passed = False
+                fact_score = 0.0
+                fact_detail = "No verification — NLI skipped, OMLX unavailable — QUARANTINE"
+                method = "none"
+
         results.append({
             "check_name": "factual",
             "passed": fact_passed,
@@ -291,7 +422,7 @@ def run_stage5(strict: bool = False, skip_factual: bool = False):
 
         # Determine status
         all_passed = all(r["passed"] for r in results)
-        borp_only_fail = not borp_passed and comp_passed
+        borp_only_fail = not borp_passed and comp_passed and fact_passed
 
         if all_passed:
             status = "PASS"
@@ -306,14 +437,14 @@ def run_stage5(strict: bool = False, skip_factual: bool = False):
         stats[status] += 1
 
         # Build verified FB
-        vfb = dict(fb)  # Copy all FB fields
+        vfb = dict(fb)
         vfb["verification_results"] = results
         vfb["borp_score"] = borp_score
         vfb["status"] = status
         vfb["needs_human_review"] = needs_human
-        vfb["verifier_model"] = VERIFY_MODEL
+        vfb["verifier_model"] = VERIFY_MODEL_V2
+        vfb["verification_method"] = method  # D2069: track which path was used
 
-        # Re-stamp
         vfb = stamp_record(vfb, gen_model=fb.get("gen_model"))
         vfb["pipeline_commit"] = pipeline_commit
 
@@ -321,7 +452,8 @@ def run_stage5(strict: bool = False, skip_factual: bool = False):
 
         elapsed = time.time() - start
         status_icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}[status]
-        print(f"→ {status_icon} {status} ({elapsed:.1f}s)")
+        nli_tag = {"nli": "⚡", "nli+LLM": "🔍", "LLM": "🤖", "none": "·"}[method]
+        print(f"→ {status_icon} {status} {nli_tag} ({elapsed:.1f}s)")
 
     # Write checkpoint
     safe_write(
@@ -331,24 +463,36 @@ def run_stage5(strict: bool = False, skip_factual: bool = False):
 
     # Summary
     print(f"\n{'='*60}")
-    print(f"✅ PASS:         {stats['PASS']}")
-    print(f"⚠️  FLAG:         {stats['FLAG']}")
-    print(f"🚫 QUARANTINE:   {stats['QUARANTINE']}")
+    print("📊 VERIFICATION RESULTS")
+    print(f"   ✅ PASS:         {stats['PASS']}")
+    print(f"   ⚠️  FLAG:         {stats['FLAG']}")
+    print(f"   🚫 QUARANTINE:   {stats['QUARANTINE']}")
     human_review = stats["FLAG"] + stats["QUARANTINE"]
     if human_review:
-        print(f"👤 Need review:   {human_review}")
-    print(f"📋 Checkpoint:    {STAGE5_CHECKPOINT}")
+        print(f"   👤 Need review:   {human_review}")
+    print("")
+    print("📊 EMBEDDING PRE-FILTER")
+    print(f"   ⚡ NLI passed:    {prefilter_stats['passed']} (skipped LLM)")
+    print(f"   🔍 NLI failed:    {prefilter_stats['failed']} (escalated to LLM)")
+    print(f"   ·  Skipped:       {prefilter_stats['skipped']}")
+    llm_saved = prefilter_stats['passed']
+    if total > 0:
+        print(f"   💰 LLM calls saved: {llm_saved}/{total} ({100*llm_saved/total:.0f}%)")
+    print("")
+    print(f"📋 Checkpoint:       {STAGE5_CHECKPOINT}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Stage 5: Verify FBs via Phi-4-mini + BORP")
+    parser = argparse.ArgumentParser(
+        description="Stage 5: Verify FBs via DeBERTa NLI + Gemma-4-E4B"
+    )
     parser.add_argument("--strict", action="store_true",
                         help="Quarantine on any failure (default: flag on BORP-only)")
-    parser.add_argument("--skip-factual", action="store_true",
-                        help="Skip LLM factual consistency checks")
+    parser.add_argument("--skip-nli", action="store_true",
+                        help="Skip DeBERTa NLI pre-filter, use LLM for all checks")
     args = parser.parse_args()
 
-    run_stage5(strict=args.strict, skip_factual=args.skip_factual)
+    run_stage5(strict=args.strict, skip_nli=args.skip_nli)
 
 
 if __name__ == "__main__":

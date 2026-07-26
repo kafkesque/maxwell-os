@@ -1,18 +1,15 @@
-# Maxwell OS — Decision Lifecycle v1.0
-# Governs all decisions tracked in config/decisions.yaml
+# Maxwell OS — Decision Lifecycle v1.1
+# Governs all decisions tracked in DECISION-LOG.md
 #
-# ⚠️ V2 STATUS (2026-07-19): Framework is sound but NOT YET IMPLEMENTED in v2.
-# - config/decisions.yaml DOES NOT EXIST (decision registry)
-# - tools/decision_auditor.py DOES NOT EXIST
-# - tools/phantom_guard.py DOES NOT EXIST
-# - tools/implementation_guard.py DOES NOT EXIST
-# - Decision enforcement deferred to Phase 2 (lean Phase 1 approach)
-# - Cross-examinations (Kimi + Untitled 4, 2026-07-19) reaffirmed: no governance changes needed.
-#   Model decisions (no switch), sequencing (Alpha Kit first), and business model (lifetime license)
-#   are TASK decisions, not governance changes.
+# UPDATED (2026-07-23, D2069/D2070): Pipeline is now in active production with R5-compliant
+# 3-model verification chain. Decision enforcement is live through pipeline config validation,
+# model family checks, and DECISION-LOG append-only discipline. Enforcement tools (decision_auditor.py,
+# phantom_guard.py) remain deferred to Phase 1 infrastructure (II9-II12 in MASTER-TASK-REGISTER).
+# The decision LIFECYCLE framework (this file) is operational; the automated tooling is not yet.
 
-version: "1.0"
+version: "1.1"
 ratified: "2026-07-12"
+amended: "2026-07-23"
 
 categories:
   INF: 

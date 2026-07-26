@@ -1,0 +1,470 @@
+[
+  {
+    "name": "Fragile Species Require Artificial Environments To Survive Habitat",
+    "depth": "cross-domain",
+    "discipline": "psychology",
+    "domains": "systems & frameworks, environmental design",
+    "definition": "Fragile species require artificial environments to survive habitat loss. The mechanism is the creation of highly controlled, sheltered niches to replace lost natural ecosystems. This creates a dependency on human intervention.",
+    "evidence": "cited",
+    "source_file": "b133_fragile_species_require_artificial_environments_to-fbs.md"
+  },
+  {
+    "name": "Designers Should Leverage Platform-Specific Guidelines. They Use Established",
+    "depth": "domain",
+    "discipline": "design systems",
+    "domains": "creative technology, digital product",
+    "definition": "Designers should leverage platform-specific guidelines. They use established standards to ensure consistency. The constraint is the target operating system's design language.",
+    "evidence": "cited",
+    "source_file": "b373_designers_should_leverage_platform-specific_guidelines_they-fbs.md"
+  },
+  {
+    "name": "Acknowledge Contributors To Maintain Project Integrity. Recognition Occurs",
+    "depth": "domain",
+    "domains": "code & computation",
+    "discipline": "design strategy",
+    "definition": "Acknowledge contributors to maintain project integrity. Recognition occurs through documentation and citations. This process validates the labor of library developers and code contributors.",
+    "evidence": "cited",
+    "source_file": "b014_acknowledge_contributors_to_maintain_project_integrity-fbs.md"
+  },
+  {
+    "name": "Visual Layering Uses Distinct Visual Properties To Separate",
+    "depth": "cross-domain",
+    "discipline": "color theory",
+    "domains": "data visualization, digital product",
+    "definition": "Visual layering uses distinct visual properties to separate data sets. Color and geometry distinguish different information types within a single graphic. The constraint is the clarity of the data.",
+    "evidence": "cited",
+    "source_file": "b260_visual_layering_uses_distinct_visual_properties-fbs.md"
+  },
+  {
+    "name": "Systems Often Perform Worse Than Expected. Unpredictable Failures",
+    "depth": "cross-domain",
+    "domains": "systems & frameworks, engineering practice, ai systems, user experience, organizational behavior, business operations",
+    "discipline": "systems thinking",
+    "definition": "Systems often perform worse than expected. Unpredictable failures are common. The constraint is the inherent instability of complex systems.",
+    "evidence": "cited",
+    "source_file": "b136_systems_often_perform_worse_than_expected-fbs.md"
+  },
+  {
+    "name": "Authentic Outreach Is The Use Of Cultural Or",
+    "depth": "domain",
+    "discipline": "psychology",
+    "domains": "business development, user experience, organizational behavior, business operations",
+    "definition": "Authentic outreach is the use of cultural or personal markers to build rapport. The mechanism is the alignment of communication style with the recipient's background. You must adapt your tone to match the target's context.",
+    "evidence": "cited",
+    "source_file": "b471_authentic_outreach_is_the_use_of-fbs.md"
+  },
+  {
+    "name": "Time In P5.Js Is Measured In Frames. The",
+    "depth": "specialized",
+    "domains": "motion design, engineering practice",
+    "discipline": "creative coding",
+    "definition": "Time in p5.js is measured in frames. The mechanism uses the refresh rate of the sketch to track progression. The constraint is the discrete nature of frame updates.",
+    "evidence": "cited",
+    "source_file": "b046_time_in_p5js_is_measured_in-fbs.md"
+  },
+  {
+    "name": "Existing References Accelerate Alignment. Use Visual Or Conceptual",
+    "depth": "domain",
+    "discipline": "cultural design",
+    "domains": "business operations, graphic design, brand identity, user experience, web & ui, digital product",
+    "definition": "Existing references accelerate alignment. Use visual or conceptual examples to establish common understanding. This prevents the need for building everything from scratch.",
+    "evidence": "cited",
+    "source_file": "b235_existing_references_accelerate_alignment_use_visual-fbs.md"
+  },
+  {
+    "name": "Systems Possess Inherent Directional Forces. The Mechanism Is",
+    "depth": "cross-domain",
+    "domains": "systems & frameworks, engineering practice, computational science & physics, ai systems",
+    "discipline": "systems thinking",
+    "definition": "Systems possess inherent directional forces. The mechanism is the vector-based movement of system components toward specific states. These forces act like gravity on the system's evolution.",
+    "evidence": "cited",
+    "source_file": "b127_systems_possess_inherent_directional_forces_the-fbs.md"
+  },
+  {
+    "name": "Combining Traditional Ornaments With Geometric Forms Creates New",
+    "depth": "cross-domain",
+    "domains": "semiotics & communication, graphic design, brand identity",
+    "discipline": "visual semiotics",
+    "definition": "Combining traditional ornaments with geometric forms creates new relationships to convey age. The mechanism is the juxtaposition of historical motifs with modern structures. This technique bridges the gap between heritage and contemporary relevance.",
+    "evidence": "cited",
+    "source_file": "b221_combining_traditional_ornaments_with_geometric_forms-fbs.md"
+  },
+  {
+    "name": "No Complex System Is Created De Novo. All Systems Emerge From Existing Structures",
+    "depth": "universal",
+    "domains": "business operations, engineering practice, systems & frameworks, organizational behavior, ai systems, computational science & physics",
+    "discipline": "systems thinking",
+    "definition": "No complex system is created de novo. All systems emerge from existing structures or precursors. The constraint is the necessity of prior existence.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_01.md"
+  },
+  {
+    "name": "Systems Students Aim To Cope And Prevail. The",
+    "depth": "domain",
+    "domains": "systems & frameworks, environmental design, organizational behavior",
+    "discipline": "systems thinking",
+    "definition": "Systems students aim to cope and prevail. The mechanism is the alignment of individual action with natural constraints. A constraint is the inherent unpredictability of life.",
+    "evidence": "cited",
+    "source_file": "b126_systems_students_aim_to_cope_and-fbs.md"
+  },
+  {
+    "name": "Domain-Specific Terminology Prevents Implementation Ambiguity. The Mechanism Maps",
+    "depth": "domain",
+    "domains": "ai systems",
+    "discipline": "linguistics",
+    "definition": "Domain-specific terminology prevents implementation ambiguity. The mechanism maps technical concepts to unique, non-conflicting names. The constraint is the presence of overlapping names in existing software frameworks.",
+    "evidence": "cited",
+    "source_file": "b075_domain-specific_terminology_prevents_implementation_ambiguit-fbs.md"
+  },
+  {
+    "name": "Interdisciplinary Integration Combines Disparate Fields To Drive Innovation",
+    "depth": "domain",
+    "discipline": "generative design",
+    "domains": "data visualization, ai & agents",
+    "definition": "Interdisciplinary integration combines disparate fields to drive innovation. This synthesis creates new ways of understanding information. The constraint is the intersection of domains.",
+    "evidence": "cited",
+    "source_file": "b015_interdisciplinary_integration_combines_disparate_fields_to-fbs.md"
+  },
+  {
+    "name": "Breaking Monolithic Architectures Resolves Tight Coupling And Blocking",
+    "depth": "domain",
+    "discipline": "software engineering",
+    "domains": "engineering practice",
+    "definition": "Breaking monolithic architectures resolves tight coupling and blocking bottlenecks. It separates distinct functions into independent units. The constraint is the resource contention within a single monolith.",
+    "evidence": "cited",
+    "source_file": "b147_breaking_monolithic_architectures_resolves_tight_coupling-fbs.md"
+  },
+  {
+    "name": "Environment Dictates Psychological States. Specific Locations Provide Therapeutic",
+    "depth": "cross-domain",
+    "discipline": "cognitive science",
+    "domains": "organizational behavior, environmental design, user experience, business development, business operations",
+    "definition": "Environment dictates psychological states. Specific locations provide therapeutic atmospheres. The setting acts as a catalyst for mental reorganization.",
+    "evidence": "cited",
+    "source_file": "b505_environment_dictates_psychological_states_specific_locations-fbs.md"
+  },
+  {
+    "name": "Systems Are Inherently Imperfect And Never Reach A",
+    "depth": "cross-domain",
+    "domains": "systems & frameworks, engineering practice, ai systems",
+    "discipline": "systems thinking",
+    "definition": "Systems are inherently imperfect and never reach a state of perfection. Flaws are a constant feature of existence. Perfection is an impossible target for any system.",
+    "evidence": "cited",
+    "source_file": "b112_systems_are_inherently_imperfect_and_never-fbs.md"
+  },
+  {
+    "name": "Equivalence Relationships Link Preferred Terms To Their Variants",
+    "depth": "domain",
+    "discipline": "information architecture",
+    "domains": "computational science & physics, research & methodology",
+    "definition": "Equivalence relationships link preferred terms to their variants. This mechanism maps different linguistic expressions to a single concept. The constraint is the variety of human language.",
+    "evidence": "cited",
+    "source_file": "b397_equivalence_relationships_link_preferred_terms_to-fbs.md"
+  },
+  {
+    "name": "Velocity Updates Only During Force Application. A Non-Zero",
+    "depth": "domain",
+    "domains": "ai & agents",
+    "discipline": "computational physics & simulation",
+    "definition": "Velocity updates only during force application. A non-zero net force triggers calculation. Zero net force requires no mathematical updates to velocity.",
+    "evidence": "cited",
+    "source_file": "b036_velocity_updates_only_during_force_application-fbs.md"
+  },
+  {
+    "name": "A Single Gene Value Maps To A Specific",
+    "depth": "specialized",
+    "domains": "ai & agents, ai systems",
+    "discipline": "computational physics & simulation",
+    "definition": "A single gene value maps to a specific speed range. The mechanism inverts the input to transform a 0-1 value into a 15-0 speed range. This constraint ensures that higher gene values result in lower speeds.",
+    "evidence": "cited",
+    "source_file": "b096_a_single_gene_value_maps_to-fbs.md"
+  },
+  {
+    "name": "Conceptual Blending Theory Allows For The Creation Of",
+    "depth": "cross-domain",
+    "discipline": "multimodal metaphor",
+    "domains": "semiotics & communication",
+    "definition": "Conceptual blending theory allows for the creation of hybrid mental spaces. A subset of attributes from source and target domains are imported into a new space. This space allows for the combination of disparate ideas.",
+    "evidence": "cited",
+    "source_file": "b641_conceptual_blending_theory_allows_for_the-fbs.md"
+  },
+  {
+    "name": "Contextualization Through Publication Validates Design Work. The Mechanism",
+    "depth": "domain",
+    "discipline": "typography",
+    "domains": "editorial & advertising, graphic design",
+    "definition": "Contextualization through publication validates design work. The mechanism is the presentation of work within a curated medium. The constraint is the need for professional visibility.",
+    "evidence": "cited",
+    "source_file": "b014_contextualization_through_publication_validates_design_work-fbs.md"
+  },
+  {
+    "name": "Personalized Communication Uses Specific Client Data To Build",
+    "depth": "domain",
+    "domains": "business development, user experience, web & ui",
+    "discipline": "design psychology",
+    "definition": "Personalized communication uses specific client data to build rapport. This mechanism bridges the gap between stranger and collaborator. You must use only verified, visible information to avoid inaccuracy.",
+    "evidence": "cited",
+    "source_file": "b473_personalized_communication_uses_specific_client_data-fbs.md"
+  },
+  {
+    "name": "Temporal Visualization Requires Stacking Generations To Show History",
+    "depth": "specialized",
+    "domains": "computational science & physics",
+    "discipline": "computational physics & simulation",
+    "definition": "Temporal visualization requires stacking generations to show history. The mechanism is the vertical arrangement of cell states. The constraint is the 2D representation of 1D data.",
+    "evidence": "cited",
+    "source_file": "b079_temporal_visualization_requires_stacking_generations_to-fbs.md"
+  },
+  {
+    "name": "Perlin Noise Generates Smooth Pseudo-Randomness. It Uses Input",
+    "depth": "domain",
+    "discipline": "generative design",
+    "domains": "computational art",
+    "definition": "Perlin noise generates smooth pseudo-randomness. It uses input parameters to create continuous fluctuations. The constraint is the defined range of the output.",
+    "evidence": "cited",
+    "source_file": "b192_perlin_noise_generates_smooth_pseudo-randomness_it-fbs.md"
+  },
+  {
+    "name": "Specific Technical Difficulties Are Examples Of General Laws Applicable To Any System",
+    "depth": "universal",
+    "domains": "systems & frameworks, engineering practice, research & methodology, computational science & physics",
+    "discipline": "systems thinking",
+    "definition": "Specific technical difficulties in systems are examples of general laws applicable to any system. The mechanism is isomorphism across scales and domains. Surface differences obscure underlying universality.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_05.md"
+  },
+  {
+    "name": "Imperfection Is A Fundamental Property. Failure Is An",
+    "depth": "cross-domain",
+    "domains": "systems & frameworks, engineering practice, ai systems, computational science & physics",
+    "discipline": "systems thinking",
+    "definition": "Imperfection is a fundamental property. Failure is an inevitable outcome of any functioning system. The constraint is the inherent flaw in all components.",
+    "evidence": "cited",
+    "source_file": "b140_imperfection_is_a_fundamental_property_failure-fbs.md"
+  },
+  {
+    "name": "Cyclical Behavior Is Ubiquitous In All Systems. Alternation Between Expansion And Contraction",
+    "depth": "universal",
+    "domains": "systems & frameworks, computational science & physics, business operations, environmental design, organizational behavior",
+    "discipline": "systems thinking",
+    "definition": "Cyclical behavior is ubiquitous in all systems. The mechanism alternates between expansion and contraction phases. This applies to economies, populations, ecosystems, and engineered systems alike.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_03.md"
+  },
+  {
+    "name": "Constraining Randomness To A Circular Path Prevents Jittery",
+    "depth": "domain",
+    "domains": "ai & agents",
+    "discipline": "game design",
+    "definition": "Constraining randomness to a circular path prevents jittery movement. The mechanism is the mapping of random values to a circle. The constraint is the fixed radius of the circle.",
+    "evidence": "cited",
+    "source_file": "b058_constraining_randomness_to_a_circular_path-fbs.md"
+  },
+  {
+    "name": "Systemic Principles Are Identified Through The Analysis Of",
+    "depth": "cross-domain",
+    "domains": "research & methodology, systems & frameworks, engineering practice",
+    "discipline": "systems thinking",
+    "definition": "Systemic principles are identified through the analysis of specific examples. Systematic study reveals universal truths. The constraint is the need for rigorous observation.",
+    "evidence": "cited",
+    "source_file": "b135_systemic_principles_are_identified_through_the-fbs.md"
+  },
+  {
+    "name": "No Algorithmic Process Generates Suitable New Frames. Creativity",
+    "depth": "cross-domain",
+    "domains": "research & methodology, graphic design, brand identity, semiotics & communication, web & ui",
+    "discipline": "design strategy",
+    "definition": "No algorithmic process generates suitable new frames. Creativity lacks a repeatable formula. The constraint is the inherent unpredictability of insight.",
+    "evidence": "cited",
+    "source_file": "b135_no_algorithmic_process_generates_suitable_new-fbs.md"
+  },
+  {
+    "name": "Mass Is A Derived Property. The Engine Calculates",
+    "depth": "domain",
+    "domains": "engineering practice",
+    "discipline": "computational physics & simulation",
+    "definition": "Mass is a derived property. The engine calculates mass by multiplying body size by density. This constraint ensures physical consistency within the simulation.",
+    "evidence": "cited",
+    "source_file": "b071_mass_is_a_derived_property_the-fbs.md"
+  },
+  {
+    "name": "Cybernetics Unifies Communication, Control, And Statistics Across All Systems",
+    "depth": "universal",
+    "domains": "systems & frameworks, ai & agents, engineering practice, computational science & physics, organizational behavior",
+    "discipline": "systems thinking",
+    "definition": "Cybernetics unifies communication, control, and statistics across systems. Feedback loops regulate behavior through information exchange. The constraint is that all systems require information flow to maintain order.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_06.md"
+  },
+  {
+    "name": "Constraint Behavior Options Define The Physical Properties Of",
+    "depth": "domain",
+    "domains": "engineering practice",
+    "discipline": "computational physics & simulation",
+    "definition": "Constraint behavior options define the physical properties of a connection. The developer sets parameters like stiffness or damping to tune the interaction. This constraint allows for varied mechanical behaviors.",
+    "evidence": "cited",
+    "source_file": "b069_constraint_behavior_options_define_the_physical-fbs.md"
+  },
+  {
+    "name": "Vector Decomposition Separates Direction From Magnitude. You Split",
+    "depth": "domain",
+    "domains": "computational science & physics, engineering practice",
+    "discipline": "computational physics & simulation",
+    "definition": "Vector decomposition separates direction from magnitude. You split a single force into two distinct components. The constraint is the complexity of multi-dimensional math.",
+    "evidence": "cited",
+    "source_file": "b042_vector_decomposition_separates_direction_from_magnitude-fbs.md"
+  },
+  {
+    "name": "Universal Facial Expressions Serve As A Global Communication",
+    "depth": "cross-domain",
+    "domains": "research & methodology, semiotics & communication, user experience",
+    "discipline": "visual perception",
+    "definition": "Universal facial expressions serve as a global communication standard. Biological hardwiring ensures observers interpret facial cues identically across cultures. This mechanism functions regardless of geographic origin.",
+    "evidence": "cited",
+    "source_file": "b498_universal_facial_expressions_serve_as_a-fbs.md"
+  },
+  {
+    "name": "Collaboration Drives Innovation. Open Exchange Of Ideas Accelerates",
+    "depth": "domain",
+    "discipline": "systems thinking",
+    "domains": "business development, research & methodology",
+    "definition": "Collaboration drives innovation. Open exchange of ideas accelerates learning. Constraint is the isolation of individual knowledge.",
+    "evidence": "cited",
+    "source_file": "b950_collaboration_drives_innovation_open_exchange_of-fbs.md"
+  },
+  {
+    "name": "Limitations Act As Recurring Boundaries In All Systems. Every System Has Constraints",
+    "depth": "universal",
+    "domains": "research & methodology, systems & frameworks, engineering practice, business operations, computational science & physics",
+    "discipline": "systems thinking",
+    "definition": "Limitations act as recurring boundaries in all systems. One repeatedly encounters the same constraints regardless of domain. The constraint is the reality of the environment that bounds every system.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_04.md"
+  },
+  {
+    "name": "Absolute Data Privacy Is Impossible In Distributed Ai",
+    "depth": "cross-domain",
+    "domains": "ai systems, ai & agents",
+    "discipline": "privacy & surveillance",
+    "definition": "Absolute data privacy is impossible in distributed AI systems. The mechanism involves the inherent distribution of data across networks. Constraints include the mathematical properties of data and system architecture.",
+    "evidence": "cited",
+    "source_file": "b525_absolute_data_privacy_is_impossible_in-fbs.md"
+  },
+  {
+    "name": "Systematic Mapping Organizes Structural And Semiotic Elements To",
+    "depth": "cross-domain",
+    "discipline": "semiotics",
+    "domains": "systems & frameworks, digital product, web & ui, business operations, organizational behavior",
+    "definition": "Systematic mapping organizes structural and semiotic elements to ensure usability. The mechanism is the detailed documentation of relationships between components. Constraints are the complexity of the system and the clarity of the mapping language.",
+    "evidence": "cited",
+    "source_file": "b037_systematic_mapping_organizes_structural_and_semiotic-fbs.md"
+  },
+  {
+    "name": "The Atan2() Function Provides A Unique Angle For",
+    "depth": "specialized",
+    "domains": "computational art",
+    "discipline": "software engineering",
+    "definition": "The atan2() function provides a unique angle for any 2D vector. It uses the signs of both components to determine the correct quadrant. The constraint is the 2D coordinate system.",
+    "evidence": "cited",
+    "source_file": "b045_the_atan2()_function_provides_a_unique-fbs.md"
+  },
+  {
+    "name": "Abductive Reasoning Bridges Analytical Past-Data And Intuitive Knowing",
+    "depth": "cross-domain",
+    "domains": "research & methodology, systems & frameworks",
+    "discipline": "design psychology",
+    "definition": "Abductive reasoning bridges analytical past-data and intuitive knowing, enabling design thinking to transcend current knowledge stages. Abduction uses incomplete observations to form the best possible explanation. This allows for creative leaps beyond existing data.",
+    "evidence": "cited",
+    "source_file": "b021_abductive_reasoning_bridges_analytical_past-data_and-fbs.md"
+  },
+  {
+    "name": "Storytelling Bridges The Gap Between Vision And Reality",
+    "depth": "cross-domain",
+    "domains": "brand identity, digital product, web & ui",
+    "discipline": "creative process",
+    "definition": "Storytelling bridges the gap between vision and reality. This mechanism makes abstract ideas tangible and memorable. The constraint is the difficulty of communicating complex visions to diverse audiences.",
+    "evidence": "cited",
+    "source_file": "b092_storytelling_bridges_the_gap_between_vision-fbs.md"
+  },
+  {
+    "name": "Negativity Dominance Occurs When Negative Stimuli Outweigh Positive",
+    "depth": "cross-domain",
+    "domains": "research & methodology, user experience, organizational behavior",
+    "discipline": "psychology",
+    "definition": "Negativity dominance occurs when negative stimuli outweigh positive ones. The brain prioritizes threat detection over reward acquisition. The constraint is the inherent survival bias of cognition.",
+    "evidence": "cited",
+    "source_file": "b081_negativity_dominance_occurs_when_negative_stimuli-fbs.md"
+  },
+  {
+    "name": "L-Systems Use An Alphabet And An Axiom To",
+    "depth": "domain",
+    "discipline": "generative design",
+    "domains": "code & computation",
+    "definition": "L-systems use an alphabet and an axiom to define a starting state. Recursive production rules transform the current string into a new one. The constraint is the fixed alphabet of valid characters.",
+    "evidence": "cited",
+    "source_file": "b086_l-systems_use_an_alphabet_and_an-fbs.md"
+  },
+  {
+    "name": "Metaphors Derive Meaning From Cultural Beliefs About Specific",
+    "depth": "cross-domain",
+    "discipline": "linguistics",
+    "domains": "semiotics & communication",
+    "definition": "Metaphors derive meaning from cultural beliefs about specific concepts. They map abstract qualities onto culturally significant objects. The constraint is the reliance on shared cultural knowledge.",
+    "evidence": "cited",
+    "source_file": "b634_metaphors_derive_meaning_from_cultural_beliefs-fbs.md"
+  },
+  {
+    "name": "Engagement Requires Accepting Inevitable Hardship. The Arena Demands",
+    "depth": "domain",
+    "domains": "entrepreneurship, graphic design, brand identity",
+    "discipline": "creative process",
+    "definition": "Engagement requires accepting inevitable hardship. The arena demands a price in the form of emotional or physical discomfort. The constraint is the inherent pain of participation.",
+    "evidence": "cited",
+    "source_file": "b506_engagement_requires_accepting_inevitable_hardship_the-fbs.md"
+  },
+  {
+    "name": "Encapsulate Population Management Within A Dedicated Class. This",
+    "depth": "specialized",
+    "domains": "ai & agents, computational art",
+    "discipline": "machine learning",
+    "definition": "Encapsulate population management within a dedicated class. This structure centralizes selection and reproduction logic. The constraint is code maintainability in complex simulations.",
+    "evidence": "cited",
+    "source_file": "b094_encapsulate_population_management_within_a_dedicated-fbs.md"
+  },
+  {
+    "name": "Human Systems Differ Only In Degree From Other Systems. Scale Invariance Of System Properties",
+    "depth": "universal",
+    "domains": "systems & frameworks, computational science & physics, organizational behavior, ai & agents",
+    "discipline": "systems thinking",
+    "definition": "Human systems differ only in degree from other systems. The mechanism is scale invariance of system properties. The constraint is that all systems share fundamental behavioral laws regardless of substrate.",
+    "evidence": "cited",
+    "source_file": "genuine_universal_02.md"
+  },
+  {
+    "name": "Systems Thinking Informs The Design Of Information Architectures",
+    "depth": "cross-domain",
+    "discipline": "information architecture",
+    "domains": "digital product, systems & frameworks",
+    "definition": "Systems thinking informs the design of information architectures. It views components as parts of a larger whole. The constraint is the interconnectedness of all system elements.",
+    "evidence": "cited",
+    "source_file": "b447_systems_thinking_informs_the_design_of-fbs.md"
+  },
+  {
+    "name": "Organizational Ineptitude Is An Inherent Systemic Property. Hidden",
+    "depth": "domain",
+    "domains": "organizational behavior, business operations, systems & frameworks, ai systems",
+    "discipline": "systems thinking",
+    "definition": "Organizational ineptitude is an inherent systemic property. Hidden forces drive malfunctions regardless of individual intent. This constraint separates individual competence from systemic outcome.",
+    "evidence": "cited",
+    "source_file": "b110_organizational_ineptitude_is_an_inherent_systemic-fbs.md"
+  },
+  {
+    "name": "Misaligned Objectives Cause Agents To Compete For Resources",
+    "depth": "domain",
+    "discipline": "game design",
+    "domains": "ai & agents",
+    "definition": "Misaligned objectives cause agents to compete for resources. Agents act to maximize their own utility. The constraint is the scarcity of system resources.",
+    "evidence": "cited",
+    "source_file": "b077_misaligned_objectives_cause_agents_to_compete-fbs.md"
+  }
+]

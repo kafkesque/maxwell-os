@@ -1,0 +1,55 @@
+
+Step 1 Convergence extraction
+I am building a personal knowledge base — Visual Communication Framework — unit by unit. This unit focuses on [UNIT NAME e.g. Visual Semiotics / Composition / Hierarchy]. Task: Scan all sources and identify principles that appear in 3 or more books. For each principle: - State it in ONE sentence — declarative, actionable, no hedge words, no "process of" - List which authors/books confirm it (author name + book title only) - Note if any author disagrees Rules: - One sentence per principle means one claim. Not an intro. Not a chapter title. - Test: "Can a practitioner apply this tomorrow without opening another resource?" - If NO → rewrite or split - Ignore domain-specific examples at this stage. Principles only. Format (exact — no deviation): PRINCIPLE: [one sentence] CONFIRMED BY: [Author (Book), Author (Book), ...] DISSENT: [Author (Book)] or NONE Give me the top 10 most convergent principles only. Ranked by number of confirming sources, highest first. (make sure you don't overlap any of the previous
+
+STEP 2 — Practitioner Filter Take the principles from Step 1.
+
+For each principle, run this filter:
+A practitioner is in the middle of a real project. They have 30 seconds.
+Does this principle change a specific decision they are about to make?
+
+For each principle that passes:
+- Keep the one-sentence definition (unchanged from Step 1)
+- Add ONE concrete example — named, specific, not generic
+  ("A dashboard with 3 competing visual weights loses hierarchy" not "bad design loses hierarchy")
+- Add the failure mode — what goes wrong when this principle is violated
+- Flag if the principle requires domain knowledge to apply (design background needed = flag it)
+
+Format:
+PRINCIPLE: [same one-sentence definition]
+EXAMPLE: [specific, named scenario]
+FAILURE MODE: [what breaks when violated]
+DOMAIN FLAG: YES / NO
+
+Drop any principle that fails the practitioner test.
+List only the ones that pass.  STEP 3 — Unique but Applicable Now scan for single-source insights — principles that appear in only ONE book
+but are strong enough to be worth keeping even without consensus.
+
+Criteria for inclusion (all three must be true):
+1. It changes a real decision — same test as Step 2
+2. It does NOT contradict the consensus principles from Step 1
+3. It comes from an author with demonstrated domain authority
+
+For each qualifying insight:
+- State it in ONE sentence (same standard as Step 1)
+- Name the single source: Author (Book)
+- State why it has no consensus: too new / too contrarian / too domain-specific
+- State where it applies: which project type or decision point
+
+Format:
+PRINCIPLE: [one sentence]
+SOURCE: [Author (Book)] — single source
+NO CONSENSUS BECAUSE: [reason]
+APPLIES WHEN: [specific condition]
+
+Limit: top 5 only. If fewer than 5 qualify, return fewer. Do not pad. 
+Step 4 Taxonomy extraction
+now examine if there are any practically applicable [unit name]  taxonomies either generally to visual communication and or to specific design domains, such graphic design,mograph, typography design, generally typography, datavis, design system ,logo design, creative coding, mograph, etc. rank them based on applicability and practicability Format for each
+SOURCE: [Author (Book)] — single source
+NO CONSENSUS BECAUSE: 
+APPLIES WHEN: [specific condition] DOMAINS [where is it applied] (make sure you don't overlap any of the previous
+
+STEP 5 now examine if there are [unit name] with applicable practice, strategy, methodology, workflow, process template, approach,decision matrix, criteria, checklist  either generally for visual design and or domain specifically graphic design,, typography design, generally typography, color,datavis, design system ,logo design, creative coding, mograph,ui, web design, design system etc. rank them based on applicability and practicability Format for each
+SOURCE: [Author (Book)] — single source
+NO CONSENSUS BECAUSE: 
+APPLIES WHEN: [specific condition] DOMAINS [where is it applied] (make sure you don't overlap any of the previous

@@ -293,23 +293,11 @@ def dedup_fbs_by_cosine(
 
 
 def load_stage3_clusters() -> list[dict]:
-    """DEPRECATED by D2120. Use load_stage2_fbs_via_clusters() instead.
+    """D2120: Always loads from Stage 2 FBs (Stage 3 removed).
 
-    Kept as compatibility shim that falls back to the old Stage 3 checkpoint
-    if it exists, otherwise wraps Stage 2 FBs.
+    The old Stage 3 HDBSCAN checkpoint is archived — it no longer exists.
+    Stage 1.5 clustering + Stage 2 convergent extraction replaced it.
     """
-    # Try old Stage 3 checkpoint first (backward compat)
-    if STAGE3_CHECKPOINT.exists():
-        print("   📂 Loading from Stage 3 checkpoint (legacy path)")
-        clusters = []
-        with open(STAGE3_CHECKPOINT) as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    clusters.append(json.loads(line))
-        return clusters
-
-    # D2120: Wrap Stage 2 FBs as clusters
     clusters, _ = load_stage2_fbs_via_clusters()
     return clusters
 
@@ -557,7 +545,7 @@ def compute_fb_relationships(
     return fbs
 
 
-def run_stage4(cluster_ids: list[int] = None):
+def run_stage4(cluster_ids: list[int | str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -906,13 +894,18 @@ def run_stage4(cluster_ids: list[int] = None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Stage 4: Merge Clusters → FBs + SALSA Classification")
-    parser.add_argument("--cluster", help="Comma-separated cluster IDs to process")
+    parser = argparse.ArgumentParser(description="Stage 4: Merge Clusters → FBs + Multi-label Classification")
+    parser.add_argument("--cluster", help="Comma-separated cluster IDs to process (int or string)")
     args = parser.parse_args()
 
     cluster_ids = None
     if args.cluster:
-        cluster_ids = [int(c.strip()) for c in args.cluster.split(",")]
+        raw_ids = [c.strip() for c in args.cluster.split(",")]
+        # D2120: Cluster IDs can be hash strings (from Stage 2 FBs) or ints (legacy)
+        try:
+            cluster_ids = [int(c) for c in raw_ids]
+        except ValueError:
+            cluster_ids = raw_ids
 
     run_stage4(cluster_ids=cluster_ids)
 

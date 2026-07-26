@@ -175,9 +175,17 @@ def load_stage0_md_files() -> list[dict]:
 
 def run_stage1(chunk_size: int = CHUNK_SIZE_WORDS,
                overlap: int = CHUNK_OVERLAP_WORDS,
-               single_book: str = None):
+               single_book: str = None,
+               book_limit: int | None = None):
     """Run Stage 1: Chunk all .md files into segments."""
+    import os as _os
+
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Resolve book limit from env if not explicitly set
+    if book_limit is None:
+        env_limit = _os.environ.get("MAXWELL_BOOK_LIMIT", "")
+        book_limit = int(env_limit) if env_limit.isdigit() else None
 
     md_files = load_stage0_md_files()
     if single_book:
@@ -186,7 +194,11 @@ def run_stage1(chunk_size: int = CHUNK_SIZE_WORDS,
             print(f"❌ Book not found in Stage 0 output: {single_book}")
             sys.exit(1)
 
-    print(f"📝 Stage 1: Chunk — {len(md_files)} markdown files")
+    if book_limit and book_limit < len(md_files):
+        md_files = md_files[:book_limit]
+        print(f"📝 Stage 1: Chunk — {len(md_files)} markdown files (limited from {len(load_stage0_md_files())})")
+    else:
+        print(f"📝 Stage 1: Chunk — {len(md_files)} markdown files")
     print(f"{'='*60}")
 
     seen_hashes: set[str] = set()

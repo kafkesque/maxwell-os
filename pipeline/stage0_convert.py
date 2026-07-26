@@ -168,9 +168,14 @@ def run_stage0(
     if books_dir is None:
         books_dir = BOOKS_DIR
 
-    # ── Auto-limit for smoke tests ──────────────────────────────────────
-    if limit is None and os.environ.get("MAXWELL_RUN_ID") == "smoke":
-        limit = SMOKE_BOOK_LIMIT
+    # ── Auto-limit for smoke tests + runner --books flag ────────────────
+    if limit is None:
+        if os.environ.get("MAXWELL_RUN_ID") == "smoke":
+            limit = SMOKE_BOOK_LIMIT
+        else:
+            env_limit = os.environ.get("MAXWELL_BOOK_LIMIT", "")
+            if env_limit.isdigit():
+                limit = int(env_limit)
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 

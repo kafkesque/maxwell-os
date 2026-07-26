@@ -30,6 +30,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import sys
 import time
@@ -262,14 +263,29 @@ def parse_filename_heuristic(filename: str) -> dict:
     return {"author": "", "title": "", "year": None}
 
 
-def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False) -> None:
-    """Main extraction loop."""
+def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: int | None = None) -> None:
+    """Main extraction loop.
+
+    Args:
+        model: OMLX model for LLM extraction.
+        force: Re-extract even if cached.
+        book_limit: Max books to process (reads MAXWELL_BOOK_LIMIT env if None).
+    """
     cache_path: Path = CHECKPOINT_DIR / METADATA_CACHE
     cache: dict[str, dict] = load_cache(cache_path)
 
+    # Resolve book limit from env if not explicitly set
+    if book_limit is None:
+        env_limit = os.environ.get("MAXWELL_BOOK_LIMIT", "")
+        book_limit = int(env_limit) if env_limit.isdigit() else None
+
     # Find all MD files
     md_files: list[Path] = sorted(BOOKS_DIR.rglob("*.md"), key=lambda p: p.name)
-    print(f"📚 Stage 0.5: Extract Author/Title — {len(md_files)} MD files")
+    if book_limit and book_limit < len(md_files):
+        md_files = md_files[:book_limit]
+        print(f"📚 Stage 0.5: Extract Author/Title — {len(md_files)}/{len(list(BOOKS_DIR.rglob('*.md')))} MD files (limited)")
+    else:
+        print(f"📚 Stage 0.5: Extract Author/Title — {len(md_files)} MD files")
     print(f"   Model: {model} | Cache: {len(cache)} cached")
     if force:
         print("   ⚠️  --force: re-extracting all files")

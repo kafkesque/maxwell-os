@@ -745,15 +745,6 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             for sb in p.get("source_books", []):
                 source_books.add(sb)
 
-        # Derive crawl provenance from source book paths
-        # e.g., "DOMAIN 4 Business/some_book.md" → "DOMAIN 4 Business"
-        s3_original_domain = None
-        if source_books:
-            first_book = sorted(source_books)[0]
-            parts = first_book.replace("\\", "/").split("/")
-            if len(parts) >= 2:
-                s3_original_domain = parts[0]  # Top-level domain folder
-
         # D2069: Name normalization + uniqueness
         name = normalize_fb_name(name, max_words=5)
         if not check_name_unique(name, existing_names):
@@ -763,17 +754,38 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             print(f"      ⚠️  Name collision, disambiguated: '{name}'")
         existing_names.add(name)
 
-        # D2069: Embed source principle texts for fast Stage 5 verification.
-        # Eliminates the 3-checkpoint lookup chain (Stage5→Stage3→Stage2).
-        source_principles_embedded = []
-        for p in cluster_principles:
-            source_principles_embedded.append({
-                "principle_id": p.get("principle_id", ""),
-                "principle_text": (p.get("definition") or p.get("principle_text", ""))[:500],
-                "source_segment_id": p.get("source_segments", [""])[0] if p.get("source_segments") else "",
-            })
+        # ── Auto-derive agentic metadata (D2130) ──────────────────────────
+        n_disciplines = len(class_data.get("disciplines", []))
+        n_domains = len(class_data.get("domains", []))
 
-        # Build FB record
+        # difficulty_level: derived from depth + discipline complexity
+        depth_val = class_data.get("depth", "domain")
+        if depth_val == "specialized" or (depth_val == "domain" and n_disciplines == 1):
+            difficulty_level = "expert"
+        elif depth_val == "universal" or n_disciplines >= 3:
+            difficulty_level = "beginner"  # universal = accessible to all
+        else:
+            difficulty_level = "intermediate"
+
+        # temporal_scope: heuristic from keywords + definition signals
+        def_text = (definition + " " + fb_data.get("elaboration", "")).lower()
+        if any(w in def_text for w in ["always", "universal", "fundamental", "any system", "all"]):
+            temporal_scope = "timeless"
+        elif any(w in def_text for w in ["202", "current", "modern", "recent", "today", "now"]):
+            temporal_scope = "contemporary"
+        else:
+            temporal_scope = "timeless"  # default: principles are timeless unless evidence suggests otherwise
+
+        # depth consistency check (D2130: warn, don't override LLM)
+        depth_warning = None
+        if depth_val == "specialized" and n_disciplines > 1:
+            depth_warning = f"depth=specialized but {n_disciplines} disciplines"
+        elif depth_val == "universal" and n_domains < 3:
+            depth_warning = f"depth=universal but only {n_domains} domains"
+        if depth_warning:
+            print(f"      ⚠️  {depth_warning}", flush=True)
+
+        # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
         fb = {
             "fb_id": make_hash_id(name, definition),
             "name": name,
@@ -784,17 +796,26 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "keywords": fb_data.get("keywords", "").strip(),
             "jargon": _serialize_jargon(fb_data.get("jargon")),
             "domains": class_data["domains"],
-            "disciplines": class_data["disciplines"],       # D2066: multi-label (1-3)
+            "disciplines": class_data["disciplines"],
             "domains_raw": domains_raw,
-            "disciplines_raw": disciplines_raw,             # D2066: raw LLM output preserved
-            "depth": class_data["depth"],
-            "evidence": class_data["evidence"],
+            "disciplines_raw": disciplines_raw,
+            "depth": depth_val,
+            "evidence": class_data.get("evidence", "cited"),
+            # ── Agentic metadata ──
+            "difficulty_level": difficulty_level,
+            "temporal_scope": temporal_scope,
+            "prerequisite_fbs": fb_data.get("prerequisite_fbs", []),
+            "procedural_skill": fb_data.get("procedural_skill"),
+            # ── Provenance (simplified) ──
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
-            "source_principles": source_principles_embedded,
-            "s3_original_domain": s3_original_domain,
-            "classification_method": "multi-label",  # D2066: was SALSA (D2024 superseded)
-            "classification_errors": errors,
+            "source_principle_ids": [p.get("principle_id", "") for p in cluster_principles if p.get("principle_id")],
+            "classification_errors": errors if errors else None,
+            # ── Utilization tracking (initialized at zero) ──
+            "usage_count": 0,
+            "feedback_score": None,
+            "feedback_count": 0,
+            "fb_version": 1,
         }
         fb = stamp_record(fb, gen_model=GEN_MODEL)
         fb["pipeline_run_id"] = pipeline_run_id

@@ -69,27 +69,44 @@ CREATE TABLE IF NOT EXISTS fbs (
     elaboration TEXT,
     keywords TEXT,
     jargon TEXT,
-    domains TEXT NOT NULL,         -- JSON array (canonical, validated)
+    -- Classification (D2066 multi-label)
+    domains TEXT NOT NULL,         -- JSON array (canonical, 1-5)
     domains_raw TEXT,              -- JSON array (LLM original, preserved)
-    disciplines TEXT NOT NULL,     -- JSON array (D2066 multi-label, 1-3)
+    disciplines TEXT NOT NULL,     -- JSON array (multi-label, 1-3)
     disciplines_raw TEXT,          -- JSON array (LLM original, preserved)
     depth TEXT NOT NULL,
     evidence TEXT NOT NULL,
-    source_clusters TEXT,          -- JSON array
+    -- Agentic metadata (D2130)
+    difficulty_level TEXT,         -- beginner | intermediate | expert
+    temporal_scope TEXT,           -- timeless | contemporary | era-specific
+    confidence_score REAL,         -- from Stage 5 verification
+    prerequisite_fbs TEXT,         -- JSON array of FB IDs
+    procedural_skill TEXT,         -- agent tool/function name
+    contradicts_fbs TEXT,          -- JSON array of conflicting FB IDs
+    related_fbs TEXT,              -- JSON array of relationship edges (P1.4)
+    -- Utilization tracking
+    usage_count INTEGER DEFAULT 0,
+    last_retrieved_at TEXT,
+    feedback_score REAL,           -- aggregated agent feedback 0-1
+    feedback_count INTEGER DEFAULT 0,
+    fb_version INTEGER DEFAULT 1,
+    -- Provenance (simplified — bloat removed per D2130)
+    source_clusters TEXT,          -- JSON array (hash strings)
     source_books TEXT,             -- JSON array
-    s3_original_domain TEXT,       -- Crawl provenance: domain folder
-    classification_method TEXT,
-    classification_errors TEXT,    -- JSON array
+    source_principle_ids TEXT,     -- JSON array (references, not embedded)
+    classification_errors TEXT,    -- JSON array or NULL
+    -- Verification (from Stage 5)
     verification_results TEXT,     -- JSON array
     borp_score REAL,
     status TEXT NOT NULL,
     needs_human_review INTEGER,
     verifier_model TEXT,
+    -- Stamps (R14)
     schema_version TEXT,
     gen_model TEXT,
     pipeline_commit TEXT,
     taxonomy_version TEXT,
-    pipeline_run_id TEXT,          -- UUID per pipeline run (lineage)
+    pipeline_run_id TEXT,
     created_at TEXT,
     committed_at TEXT
 );
@@ -222,7 +239,7 @@ def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> b
 
 
 def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
-    """Insert or replace an FB into the database."""
+    """Insert or replace an FB into the database (D2130 schema)."""
     try:
         conn.execute("""
             INSERT OR REPLACE INTO fbs (
@@ -230,9 +247,14 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 elaboration, keywords, jargon,
                 domains, domains_raw,
                 disciplines, disciplines_raw,
-                depth, evidence, source_clusters, source_books,
-                s3_original_domain,
-                classification_method, classification_errors,
+                depth, evidence,
+                difficulty_level, temporal_scope, confidence_score,
+                prerequisite_fbs, procedural_skill,
+                contradicts_fbs, related_fbs,
+                usage_count, last_retrieved_at,
+                feedback_score, feedback_count, fb_version,
+                source_clusters, source_books, source_principle_ids,
+                classification_errors,
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
                 schema_version, gen_model, pipeline_commit,
@@ -242,9 +264,14 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?,
                 ?, ?,
-                ?, ?, ?, ?,
-                ?,
                 ?, ?,
+                ?, ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?,
+                ?, ?, ?,
+                ?, ?, ?,
+                ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
@@ -260,22 +287,34 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("elaboration"), ""),
             _safe_str(fb.get("keywords"), ""),
             _safe_str(fb.get("jargon")),
-            # domains (canonical + raw)
+            # domains + disciplines (canonical + raw)
             _safe_json(fb_domains(fb)),
             _safe_json(fb.get("domains_raw")),
-            # disciplines (canonical + raw) — D2066 multi-label
             _safe_json(fb_disciplines(fb)),
             _safe_json(fb_disciplines_raw(fb)),
-            # depth, evidence, provenance
+            # depth, evidence
             _safe_str(fb_depth(fb), "domain"),
             _safe_str(fb_evidence_type(fb), "cited"),
+            # agentic metadata (D2130)
+            _safe_str(fb.get("difficulty_level")),
+            _safe_str(fb.get("temporal_scope")),
+            fb.get("confidence_score"),
+            _safe_json(fb.get("prerequisite_fbs")),
+            _safe_str(fb.get("procedural_skill")),
+            _safe_json(fb.get("contradicts_fbs")),
+            _safe_json(fb.get("related_fbs")),
+            # utilization tracking
+            fb.get("usage_count", 0),
+            _safe_str(fb.get("last_retrieved_at")),
+            fb.get("feedback_score"),
+            fb.get("feedback_count", 0),
+            fb.get("fb_version", 1),
+            # provenance (simplified)
             _safe_json(fb.get("source_clusters", [])),
             _safe_json(fb_source_books(fb)),
-            # provenance
-            _safe_str(fb.get("s3_original_domain")),
-            # classification
-            _safe_str(fb.get("classification_method"), ""),
-            _safe_json(fb.get("classification_errors", [])),
+            _safe_json(fb.get("source_principle_ids", [])),
+            # classification errors
+            _safe_json(fb.get("classification_errors")),
             # verification
             _safe_json(fb.get("verification_results", [])),
             fb.get("borp_score", 0.0),

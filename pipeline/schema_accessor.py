@@ -209,3 +209,70 @@ def cluster_source_books(cluster: dict[str, Any]) -> list[str]:
 def cluster_is_convergent(cluster: dict[str, Any]) -> bool:
     """Whether cluster has >=2 distinct source books."""
     return bool(cluster.get("is_convergent", False))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# D2130: Agentic metadata accessors
+# ═══════════════════════════════════════════════════════════════════════════
+
+def fb_difficulty_level(fb: dict[str, Any]) -> str | None:
+    """beginner | intermediate | expert — derived from depth + discipline complexity."""
+    return fb.get("difficulty_level")
+
+
+def fb_temporal_scope(fb: dict[str, Any]) -> str | None:
+    """timeless | contemporary | era-specific."""
+    return fb.get("temporal_scope")
+
+
+def fb_confidence_score(fb: dict[str, Any]) -> float | None:
+    """Aggregated verification confidence from Stage 5."""
+    return fb.get("confidence_score")
+
+
+def fb_prerequisite_fbs(fb: dict[str, Any]) -> list[str]:
+    """FB IDs that should be understood before this one."""
+    prereqs = fb.get("prerequisite_fbs", [])
+    return prereqs if isinstance(prereqs, list) else []
+
+
+def fb_procedural_skill(fb: dict[str, Any]) -> str | None:
+    """Agent tool/function name this FB enables."""
+    return fb.get("procedural_skill")
+
+
+def fb_contradicts_fbs(fb: dict[str, Any]) -> list[str]:
+    """FB IDs known to conflict with this one."""
+    conflicts = fb.get("contradicts_fbs", [])
+    return conflicts if isinstance(conflicts, list) else []
+
+
+def fb_usage_count(fb: dict[str, Any]) -> int:
+    """Times this FB has been retrieved/used."""
+    return fb.get("usage_count", 0)
+
+
+def fb_last_retrieved(fb: dict[str, Any]) -> str | None:
+    """ISO timestamp of last retrieval."""
+    return fb.get("last_retrieved_at")
+
+
+def fb_feedback_score(fb: dict[str, Any]) -> float | None:
+    """Aggregated agent feedback score 0.0-1.0."""
+    return fb.get("feedback_score")
+
+
+def fb_feedback_count(fb: dict[str, Any]) -> int:
+    """Number of feedback ratings received."""
+    return fb.get("feedback_count", 0)
+
+
+def fb_version(fb: dict[str, Any]) -> int:
+    """FB version number (increments on significant update)."""
+    return fb.get("fb_version", 1)
+
+
+def fb_source_principle_ids(fb: dict[str, Any]) -> list[str]:
+    """Principle IDs from Stage 2 (reference, not embedded text)."""
+    ids = fb.get("source_principle_ids", [])
+    return ids if isinstance(ids, list) else []

@@ -109,6 +109,9 @@ DISCIPLINE_LITERAL = Literal[
 
 DEPTH_LITERAL = Literal["universal", "cross-domain", "domain", "specialized"]
 EVIDENCE_LITERAL = Literal["cited", "axiomatic"]
+DIFFICULTY_LITERAL = Literal["beginner", "intermediate", "expert"]
+TEMPORAL_LITERAL = Literal["timeless", "contemporary", "era-specific"]
+VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 
 # ── D2073: Growth Edge categories ─────────────────────────────────────
@@ -484,22 +487,21 @@ class FB(StampedRecord):
         min_length=1,
         max_length=5,
     )
-    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
-        description="Canonical discipline from 47-discipline taxonomy. Validated; 'emerging' if no match."
+    disciplines: list[DISCIPLINE_LITERAL] = Field(  # type: ignore[valid-type]
+        default_factory=list,
+        description="1-3 canonical disciplines (D2066 multi-label). Validated; 'emerging' if no match.",
+        min_length=1,
+        max_length=3,
     )
 
     # ── Raw classification — LLM output preserved FOREVER (never overwritten) ──
-    # Authority: governance/domain_labelling.md §1 (D1055-FIX Channel B)
-    # These are the LLM's actual labels before validation/synonym-matching.
-    # When canonical ≠ raw, the raw label accumulates; when it crosses a threshold,
-    # it earns a canonical slot in taxonomy_v5.yaml.
     domains_raw: list[str] | None = Field(
         default=None,
         description="LLM's original domain labels before canonical validation. Preserved for taxonomy expansion."
     )
-    discipline_raw: str | None = Field(
+    disciplines_raw: list[str] | None = Field(
         default=None,
-        description="LLM's original discipline before canonical validation. Preserved for taxonomy expansion."
+        description="LLM's original disciplines before canonical validation. Preserved for taxonomy expansion."
     )
 
     depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
@@ -509,21 +511,53 @@ class FB(StampedRecord):
         description="cited (from source text) | axiomatic (self-evident)"
     )
 
-    # ── Provenance ──
-    source_clusters: list[int] = Field(description="Cluster IDs that formed this FB")
-    source_books: list[str] = Field(description="Distinct source books")
-    source_principles: list[dict] = Field(
-        default_factory=list,
-        description="Source principles with texts embedded for fast Stage 5 verification. "
-                    "Each: {principle_id, principle_text, source_segment_id}. "
-                    "D2069: Eliminates 3-checkpoint lookup chain per FB."
-    )
-    s3_original_domain: str | None = Field(
+    # ── Agentic metadata (D2130) ──────────────────────────────────────────
+    difficulty_level: DIFFICULTY_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
-        description="Crawl provenance: which domain folder the source books came from (e.g., 'DOMAIN 4 Business'). Immutable."
+        description="beginner | intermediate | expert — derived from depth + discipline count"
     )
-    classification_method: str = Field(
-        default="SALSA", description="SALSA | FastFit | manual"
+    temporal_scope: TEMPORAL_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="timeless | contemporary | era-specific — is this FB likely to decay?"
+    )
+    confidence_score: float | None = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Aggregated verification confidence (BORP + NLI + consensus). Populated by Stage 5."
+    )
+    prerequisite_fbs: list[str] | None = Field(
+        default=None,
+        description="FB IDs that should be understood before this one. Dependency graph edges."
+    )
+    procedural_skill: str | None = Field(
+        default=None,
+        description="Agent tool/function name this FB enables (e.g., 'frame_price_as_loss_avoidance')."
+    )
+    contradicts_fbs: list[str] | None = Field(
+        default=None,
+        description="FB IDs known to conflict with this one. Anti-pattern pairs."
+    )
+    related_fbs: list[dict] | None = Field(
+        default=None,
+        description="Related FBs with edge type and similarity score (P1.4 relationship edges)."
+    )
+
+    # ── Utilization tracking ──────────────────────────────────────────────
+    usage_count: int = Field(default=0, ge=0, description="Times retrieved/used by agents")
+    last_retrieved_at: str | None = Field(default=None, description="ISO timestamp of last retrieval")
+    feedback_score: float | None = Field(default=None, ge=0.0, le=1.0, description="Aggregated agent feedback (0=useless, 1=essential)")
+    feedback_count: int = Field(default=0, ge=0, description="Number of feedback ratings received")
+    fb_version: int = Field(default=1, ge=1, description="FB version number (increments on significant update)")
+
+    # ── Provenance (simplified — bloat removed per D2130) ─────────────────
+    source_clusters: list[str] = Field(default_factory=list, description="Cluster IDs that formed this FB (hash strings post-D2120)")
+    source_books: list[str] = Field(description="Distinct source books")
+    source_principle_ids: list[str] = Field(
+        default_factory=list,
+        description="Principle IDs from Stage 2. Source texts retrieved on-demand, not embedded (D2130: was source_principles)."
+    )
+    classification_errors: list[str] | None = Field(
+        default=None,
+        description="Label validation errors. None if classification was clean."
     )
 
     @field_validator("domains")
@@ -536,6 +570,45 @@ class FB(StampedRecord):
                 seen.add(d)
                 unique.append(d)
         return sorted(unique)
+
+    @field_validator("depth")
+    @classmethod
+    def depth_consistent_with_labels(cls, v: str, info) -> str:
+        """D2130: Warn if depth is inconsistent with discipline/domain cardinality."""
+        data = info.data
+        n_disciplines = len(data.get("disciplines", []))
+        n_domains = len(data.get("domains", []))
+        if v == "specialized" and n_disciplines > 1:
+            import warnings
+            warnings.warn(f"FB depth='specialized' but has {n_disciplines} disciplines — consider 'domain'")
+        if v == "universal" and n_domains < 3:
+            import warnings
+            warnings.warn(f"FB depth='universal' but only {n_domains} domains — consider 'cross-domain'")
+        return v
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# FeedbackRecord — Agent utilization feedback (D2130 self-improvement loop)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class FeedbackRecord(BaseModel):
+    """Agent feedback on FB utilization quality.
+
+    After an agent retrieves and uses an FB, it (or a human) rates it.
+    These ratings accumulate into fb.feedback_score and inform:
+      - Retrieval ranking (higher-rated FBs surface first)
+      - FB retirement (persistently low-rated FBs get flagged)
+      - Pipeline improvement (low-rated FBs signal extraction quality issues)
+    """
+    fb_id: str = Field(description="FB being rated")
+    agent_id: str | None = Field(default=None, description="Agent that used the FB")
+    task_id: str | None = Field(default=None, description="Task context for the rating")
+    rating: float = Field(ge=0.0, le=1.0, description="0.0=useless, 0.5=adequate, 1.0=essential")
+    was_correct: bool | None = Field(default=None, description="Was the FB factually correct for this task?")
+    was_actionable: bool | None = Field(default=None, description="Did the FB lead to a concrete action?")
+    was_timely: bool | None = Field(default=None, description="Was the FB relevant to the current context?")
+    notes: str | None = Field(default=None, description="Free-text feedback for improvement")
+    created_at: str = Field(default_factory=lambda: __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat())
 
 
 # ═══════════════════════════════════════════════════════════════════════════

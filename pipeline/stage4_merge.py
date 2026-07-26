@@ -634,19 +634,26 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         start = time.time()
 
-        # Phase 1: Generate FB
-        try:
-            prompt = build_fb_prompt(cluster_principles)
-            fb_data = call_omlx_json(
-                prompt=prompt,
-                model=GEN_MODEL,
-                system=FB_SYSTEM_PROMPT,
-                max_tokens=2048,
-            )
-        except Exception as e:
-            print(f"→ ❌ Generation error: {e}")
-            failed += 1
-            continue
+        # Phase 1: Generate FB — skip GEN for single-FB clusters (D2120 optimization)
+        # Since Stage 3 was removed, every cluster is single-FB (S2 already produced
+        # the full FB). Re-generating via LLM is 100% redundant — saves ~20s/FB.
+        if len(cluster_principles) == 1:
+            fb_data = dict(cluster_principles[0])  # shallow copy to avoid mutation
+            fb_data["_gen_skipped"] = True  # provenance marker
+            print(f"→ ⚡ GEN skipped (single-FB cluster)", flush=True, end=" ")
+        else:
+            try:
+                prompt = build_fb_prompt(cluster_principles)
+                fb_data = call_omlx_json(
+                    prompt=prompt,
+                    model=GEN_MODEL,
+                    system=FB_SYSTEM_PROMPT,
+                    max_tokens=2048,
+                )
+            except Exception as e:
+                print(f"→ ❌ Generation error: {e}")
+                failed += 1
+                continue
 
         if not isinstance(fb_data, dict):
             print("→ ⚠️  Non-dict response, skipping")
@@ -660,7 +667,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             failed += 1
             continue
 
-        # Phase 2: SALSA classify
+        # Phase 2: Multi-label classify
         try:
             class_prompt = build_classify_prompt(
                 name, definition,

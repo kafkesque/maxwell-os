@@ -1,12 +1,24 @@
 # ============================================================================
-# Maxwell v3.0 — Golden Edge-Case Classification Test Set (50 cases)
+# Maxwell v3.0 — Golden Classification + Generation Test Set (70 cases)
 # Authority: D2066, D316, P1.7
-# Purpose: Exhaustive coverage of every classification property, boundary,
-#          and degenerate input for the multi-label classifier in Stage 4.
+# Purpose: Complete evaluation of Stage 4 pipeline (Phase 1: GEN + Phase 2: CLASSIFY)
 # ============================================================================
 #
-# Each case tests a specific edge-case property of the classification system.
-# Properties tested across all 50 cases:
+# Each case tests both phases of the pipeline:
+#
+#   PHASE 1 — FB Generation (GEN): Qwen3.6 produces the full Foundation Block
+#     - name, definition, application, failure_mode, elaboration, jargon
+#     - These are expected_output fields that the generated FB should match
+#
+#   PHASE 2 — Classification (CLASSIFY): Phi-4-mini classifies the FB
+#     - disciplines (1-3), domains (1-5), depth, evidence
+#     - These are the expected_classification fields
+#
+# NOTE: Phase 2 only receives name + definition[:500] from Phase 1 output.
+# Therefore classification tests are valid with just name+definition.
+# Phase 1 generation tests require all expected_output fields.
+#
+# Properties covered across 70 cases:
 #   - Disciplines: 1-label, 2-label, 3-label, edge-of-known, emerging, empty
 #   - Domains: 1-label, 2-label, max (5), emerging, none, all-canonical
 #   - Depth: universal, cross-domain, domain, specialized, ambiguous, missing
@@ -14,6 +26,7 @@
 #   - Name/definition: short, long, empty, non-English terms, special chars
 #   - Semantic: cross-domain ambiguity, jargon-heavy, overly generic, too narrow
 #   - Format: JSON edge cases (extra fields, wrong types, nulls)
+#   - FB Generation: application, failure_mode, elaboration, jargon quality
 # ============================================================================
 
 golden_cases:
@@ -613,6 +626,11 @@ golden_cases:
     description: "Clear, unambiguous design strategy FB"
     fb_name: "Iterative Prototyping Reduces Risk"
     fb_definition: "Building and testing low-fidelity prototypes early in the design process surfaces usability issues before significant engineering investment. Each iteration costs less than the previous, creating an asymmetric risk-reward profile that favors rapid experimentation over upfront specification."
+    expected_output:
+      application: "Product teams should allocate 20% of sprint capacity to prototype testing before committing to implementation. Use Figma click-through prototypes for UX flows and paper prototypes for physical products."
+      failure_mode: "Teams skip prototyping under time pressure and discover critical UX flaws post-launch, requiring 10× more effort to fix compared to early-stage iteration."
+      elaboration: "The asymmetry comes from the cost curve: prototype fixes cost hours, development fixes cost days, production fixes cost weeks. Each stage amplifies fix cost by roughly 10×, making early cheap iteration the highest-ROI activity in product development."
+      jargon: "low-fidelity, wireframe, click-through prototype, usability testing"
     expected_disciplines: ["design strategy"]
     expected_domains: ["digital product", "user experience"]
     expected_depth: "domain"
@@ -623,6 +641,11 @@ golden_cases:
     description: "Clear software engineering FB"
     fb_name: "Immutable Infrastructure Deployment"
     fb_definition: "Servers and infrastructure components should be replaced rather than updated in-place. Immutable deployments eliminate configuration drift, ensure reproducibility, and enable instant rollback by keeping previous versions available. This principle underpins container orchestration and infrastructure-as-code practices."
+    expected_output:
+      application: "Use Docker images with versioned tags and Terraform state files to define infrastructure. Never SSH into production servers — if a configuration change is needed, update the image/template and redeploy the entire stack."
+      failure_mode: "Teams apply hotfixes directly to production servers during incidents, creating configuration drift that makes future deployments unpredictable and rollback impossible."
+      elaboration: "Mutable infrastructure accumulates 'snowflake servers' — unique configurations that only one person understands. When that person leaves, the server becomes a black box. Immutable infrastructure treats servers as cattle, not pets: when one is sick, you replace it, not nurse it."
+      jargon: "immutable, idempotent, declarative, container orchestration, infrastructure-as-code, cattle not pets"
     expected_disciplines: ["software engineering"]
     expected_domains: ["code & computation", "engineering practice"]
     expected_depth: "domain"
@@ -633,6 +656,11 @@ golden_cases:
     description: "Clear marketing/psychology FB"
     fb_name: "Loss Aversion in Pricing Strategy"
     fb_definition: "Consumers feel losses approximately twice as intensely as equivalent gains. Framing a price as 'avoiding a $100 loss' is more persuasive than 'gaining $100 in value'. Effective pricing strategies leverage this asymmetry by emphasizing what customers stand to lose by not purchasing."
+    expected_output:
+      application: "Structure pricing pages to show the cost of NOT using the product (lost revenue, wasted time, missed opportunities) BEFORE showing the price. Use 'Save $X' rather than 'Get $X off' messaging."
+      failure_mode: "Overusing loss framing creates negative brand association — customers feel manipulated rather than informed. Balance loss framing with gain framing for loyalty-focused segments."
+      elaboration: "Loss aversion is prospect theory's cornerstone: the pain of losing $100 is psychologically equivalent to the pleasure of gaining $200. Marketing that only emphasizes gains is fighting an uphill battle against this 2:1 asymmetry. Smart pricing surfaces the avoided loss and then offers the solution as relief."
+      jargon: "loss aversion, prospect theory, framing effect, anchoring, reference point"
     expected_disciplines: ["marketing", "design psychology"]
     expected_domains: ["business operations"]
     expected_depth: "domain"
@@ -643,6 +671,11 @@ golden_cases:
     description: "Clear AI/ML engineering FB"
     fb_name: "Embedding Drift Detection in Production"
     fb_definition: "ML models in production degrade when input distributions shift from training data. Monitoring embedding drift — the semantic distance between current and reference input embeddings — provides an early warning signal before accuracy drops below acceptable thresholds. Cosine distance above 0.3 typically indicates meaningful drift."
+    expected_output:
+      application: "Implement a drift monitoring pipeline: compute reference embeddings on training data, batch-embed production inputs nightly, calculate cosine distance distribution, and trigger alerts when the 95th percentile exceeds 0.3."
+      failure_mode: "Teams monitor only accuracy metrics which lag behind drift by days or weeks. By the time accuracy drops, the model has been serving degraded predictions to users, causing silent business impact."
+      elaboration: "Embedding drift catches semantic shift that accuracy metrics miss. If users start asking about 'crypto wallets' when the model was trained on 'banking,' the words change but accuracy might not drop until users churn. Embedding distance captures this shift within hours."
+      jargon: "distribution shift, embedding drift, cosine distance, reference distribution, concept drift, data drift"
     expected_disciplines: ["ai engineering", "data science"]
     expected_domains: ["ai & agents", "code & computation"]
     expected_depth: "domain"
@@ -653,6 +686,11 @@ golden_cases:
     description: "Clear cognitive science FB"
     fb_name: "Chunking Overcomes Working Memory Limits"
     fb_definition: "Human working memory holds approximately 4±1 items simultaneously. Chunking — grouping related information into meaningful units — effectively expands capacity by treating each chunk as a single item. Expert chess players chunk board positions into tactical patterns, enabling them to remember far more than novices."
+    expected_output:
+      application: "Design interfaces that present information in groups of 3-5 items. Phone numbers use chunking (XXX-XXX-XXXX). Navigation menus should have 5-7 top-level items max. Form fields should be grouped into logical sections of 3-5 fields."
+      failure_mode: "Interfaces that present 10+ ungrouped options trigger choice paralysis. Users scan randomly rather than systematically, missing critical options and making errors."
+      elaboration: "The magic number 7±2 (Miller's Law) was later refined to 4±1 for working memory. But chunking effectively bypasses this limit — a chess grandmaster doesn't remember 25 individual pieces but 5-6 tactical patterns. The key to good UX is providing the chunks, not asking users to create them."
+      jargon: "working memory, chunking, Miller's Law, cognitive load, pattern recognition"
     expected_disciplines: ["cognitive science"]
     expected_domains: ["user experience"]
     expected_depth: "domain"
@@ -663,6 +701,11 @@ golden_cases:
     description: "Clear data science FB"
     fb_name: "Correlation Does Not Imply Causation Without Intervention"
     fb_definition: "Observational correlations between variables do not establish causation unless accompanied by an intervention that breaks confounding pathways. Randomized controlled trials, instrumental variables, or difference-in-differences designs are required to move from association to causal claim."
+    expected_output:
+      application: "When analyzing A/B test results, confirm randomization was successful by checking pre-treatment covariate balance. Never claim 'X causes Y' from observational data without an identified instrument or natural experiment."
+      failure_mode: "Analysts discover correlation between user engagement and revenue, then recommend 'increase engagement to increase revenue' without establishing that engagement causes revenue rather than both being caused by product quality."
+      elaboration: "This is the most expensive statistical error in business. Companies spend millions building features to increase correlated metrics that have no causal relationship with revenue. The antidote is always an intervention: split users into treatment/control, change only one variable, measure the difference."
+      jargon: "causal inference, confounding, randomized controlled trial, instrumental variable, difference-in-differences, covariate balance"
     expected_disciplines: ["data science"]
     expected_domains: ["code & computation", "engineering practice"]
     expected_depth: "cross-domain"
@@ -673,6 +716,11 @@ golden_cases:
     description: "Clear graphic design FB"
     fb_name: "Visual Hierarchy Through Scale and Contrast"
     fb_definition: "Viewers scan pages in an F-pattern, fixating first on the largest, highest-contrast elements. Establishing a clear visual hierarchy — where element size, weight, and color saturation correspond to information importance — guides attention predictably and reduces cognitive load."
+    expected_output:
+      application: "Design landing pages with 3 hierarchical levels: hero headline (largest, boldest), subheadline (medium), body text (smallest). Use contrast ratios of at least 3:1 between hierarchy levels. Test with the squint test — squint at the page and verify the most important element still dominates."
+      failure_mode: "Everything screams for attention when everything is bold, large, and high-contrast. The page becomes visual noise — users can't find the primary action and bounce."
+      elaboration: "Visual hierarchy isn't about making things 'look good' — it's about information architecture rendered visually. The eye should land on the most important element within 200ms. If it doesn't, the design has failed regardless of aesthetic quality."
+      jargon: "visual hierarchy, F-pattern, contrast ratio, squint test, typographic scale, visual weight"
     expected_disciplines: ["graphic design"]
     expected_domains: ["graphic design", "user experience"]
     expected_depth: "domain"
@@ -683,6 +731,11 @@ golden_cases:
     description: "Clear engineering methodology FB"
     fb_name: "Test-Driven Development Cycle"
     fb_definition: "Write a failing test first, then implement the minimum code to pass it, then refactor while keeping tests green. This red-green-refactor cycle ensures every line of production code has a corresponding test, catches regressions immediately, and enforces modular design by making untestable code obvious."
+    expected_output:
+      application: "For each new feature: 1) Write the test describing desired behavior (RED), 2) Write minimal code to pass (GREEN), 3) Refactor for clarity/performance while tests stay green (REFACTOR). Commit after each cycle."
+      failure_mode: "Teams write tests after implementation. Post-hoc tests only verify that code does what it already does — they don't drive design and miss the edge cases that TDD's test-first approach naturally surfaces."
+      elaboration: "TDD isn't about testing — it's about design. When you write the test first, you're forced to define the interface before the implementation. This constraint produces modular, testable code because untestable designs are painful to write tests for. The test is the first client of your API."
+      jargon: "red-green-refactor, unit test, regression, test coverage, mock, stub, test-driven development"
     expected_disciplines: ["engineering practice"]
     expected_domains: ["code & computation", "engineering practice"]
     expected_depth: "domain"
@@ -693,6 +746,11 @@ golden_cases:
     description: "Clear strategic thinking FB"
     fb_name: "Second-Order Effects Dominate Long-Term Outcomes"
     fb_definition: "First-order effects of decisions are immediately visible and often beneficial, but second-order effects — the reactions of systems and actors to the initial change — frequently reverse or amplify outcomes in unexpected ways. Effective strategy requires modeling at least two levels of causal chain beyond the obvious."
+    expected_output:
+      application: "Before major decisions, run a second-order effects workshop: list the immediate outcome (1st order), then ask 'and then what?' for each stakeholder affected (2nd order), then ask 'and then what happens to the system?' (3rd order). Only proceed if net effect across all three levels is positive."
+      failure_mode: "Leaders optimize for first-order metrics (this quarter's revenue) while destroying second-order value (customer trust, employee retention, brand equity). The damage surfaces 12-18 months later when the leader has already been promoted."
+      elaboration: "First-order thinking is easy and immediately rewarding. Second-order thinking is hard and its benefits are delayed — which is exactly why it's a durable competitive advantage. Organizations that institutionalize second-order analysis make fewer catastrophic mistakes and capture opportunities that first-order competitors can't see."
+      jargon: "second-order effects, systems thinking, causal chains, unintended consequences, feedback loops"
     expected_disciplines: ["strategic thinking"]
     expected_domains: ["business operations", "engineering practice"]
     expected_depth: "cross-domain"
@@ -703,6 +761,11 @@ golden_cases:
     description: "Clear UX research FB"
     fb_name: "Observed Behavior Trumps Self-Reported Preference"
     fb_definition: "Users consistently misreport their own preferences and behaviors in surveys and interviews. Direct observation — watching users attempt real tasks with real products — reveals friction points, workarounds, and unmet needs that users cannot articulate. Self-report measures what users think they do; observation measures what they actually do."
+    expected_output:
+      application: "Run at least 5 moderated usability sessions per feature before launch. Record screen + face. Count friction events (hesitations, sighs, wrong clicks) rather than asking 'was that easy?'. Prioritize fixes for behaviors observed in 3+ participants."
+      failure_mode: "Teams run surveys asking 'would you use this feature?' and get 80% positive responses, then launch to find 5% actual adoption. The gap between stated and revealed preference can be 10-20×."
+      elaboration: "The say-do gap is one of the most replicated findings in behavioral research. People say they want salad and buy burgers. They say they value privacy and click 'accept all cookies.' Observation bypasses the rationalization layer and shows what the body does, not what the mind says."
+      jargon: "contextual inquiry, usability testing, say-do gap, revealed preference, think-aloud protocol, friction counting"
     expected_disciplines: ["user research"]
     expected_domains: ["user experience", "digital product"]
     expected_depth: "domain"
@@ -713,6 +776,11 @@ golden_cases:
     description: "Clear semiotics/communication FB"
     fb_name: "Signifier-Signified Gap Creates Interpretive Space"
     fb_definition: "The relationship between a signifier (word, image, symbol) and its signified (concept, meaning) is arbitrary and culturally constructed. This gap creates space for multiple interpretations — the same visual element can signify different concepts across cultures, contexts, and time periods. Effective communication requires awareness of this gap."
+    expected_output:
+      application: "When designing icons for international products, test each icon with users from at least 3 cultural backgrounds. The 'hamburger menu' icon means 'menu' to Western users but may signify nothing or 'food' elsewhere. Maintain an icon-meaning glossary with cultural annotations."
+      failure_mode: "Designers assume their cultural signifiers are universal. A 'thumbs up' icon means approval in the US, offense in parts of the Middle East, and the number one in Germany. The signifier stays the same; the signified shifts catastrophically."
+      elaboration: "Saussure's key insight was that the signifier-signified relationship is arbitrary — there's nothing inherently 'treelike' about the word 'tree.' This arbitrariness is a feature, not a bug: it's what allows the same concept to be expressed differently across languages and the same symbol to carry different meanings. Designers who ignore this create accidental international incidents."
+      jargon: "signifier, signified, semiotics, denotation, connotation, cultural encoding, Saussurean gap"
     expected_disciplines: ["semiotics"]
     expected_domains: ["creative technology", "graphic design"]
     expected_depth: "domain"
@@ -723,6 +791,11 @@ golden_cases:
     description: "Clear design psychology FB"
     fb_name: "Hick's Law Governs Decision Latency"
     fb_definition: "Decision time increases logarithmically with the number of choices presented. Each additional option adds cognitive load proportionally to the log of the total options — doubling choices from 4 to 8 adds roughly the same decision delay as going from 1 to 2. Interface design should minimize simultaneous options."
+    expected_output:
+      application: "Progressive disclosure: show 3-5 top-level options, reveal sub-options on click/hover. For navigation, use 5-7 items max. For pricing pages, show 3 tiers (not 7). For filters, collapse options behind 'More filters' after the first 5."
+      failure_mode: "E-commerce category pages showing 50+ unfiltered options trigger decision paralysis — users leave without purchasing rather than process the overwhelm. Each doubling of options roughly halves conversion rate."
+      elaboration: "Hick's Law is logarithmic, not linear — the biggest jump in decision time is from 1 to 2 options. After about 8 choices, additional options add negligible delay because users stop evaluating and start satisficing (picking the first acceptable option). The damage isn't slower decisions but worse decisions made by satisficing."
+      jargon: "Hick's Law, decision latency, cognitive load, progressive disclosure, choice architecture, satisficing"
     expected_disciplines: ["design psychology"]
     expected_domains: ["user experience", "digital product"]
     expected_depth: "domain"
@@ -733,6 +806,11 @@ golden_cases:
     description: "Clear design research/ethnography FB"
     fb_name: "Contextual Inquiry Reveals Tacit Knowledge"
     fb_definition: "Observing users in their natural environment — rather than a lab or conference room — reveals tacit knowledge, environmental constraints, and tool adaptations that users cannot articulate because they have become invisible through habituation. The workplace context is an essential part of understanding the work itself."
+    expected_output:
+      application: "Schedule 2-hour contextual inquiry sessions: 1 hour of silent observation (master-apprentice model), 30 min of guided walkthrough, 30 min of retrospective discussion. Take photos of the physical workspace including post-it notes, cheat sheets, and makeshift tools."
+      failure_mode: "Researchers conduct interviews in conference rooms and miss the spreadsheet macros, paper checklists, and Slack workarounds that constitute 40% of actual work practice. The designed solution addresses the official workflow, not the real one."
+      elaboration: "Tacit knowledge is what people know but can't say. It lives in muscle memory, environmental cues, and social routines. A nurse knows which patients need attention by the sound of their breathing — they'd never think to mention this in an interview. Contextual inquiry surfaces these invisible competencies by making the researcher a humble apprentice to the expert."
+      jargon: "contextual inquiry, tacit knowledge, master-apprentice model, ethnographic observation, work practice, situated action"
     expected_disciplines: ["user research", "design strategy"]
     expected_domains: ["user experience", "digital product"]
     expected_depth: "domain"
@@ -743,6 +821,11 @@ golden_cases:
     description: "Clear interaction design FB"
     fb_name: "Affordances Must Be Perceivable to Be Actionable"
     fb_definition: "An object's affordances — the actions it enables — must be visually or haptically perceivable by the user to influence behavior. A door that can be pushed but has only a pull-handle creates a false affordance. Digital interfaces have the same requirement: buttons must look clickable, draggable elements must signal their draggability."
+    expected_output:
+      application: "Audit every interactive element before launch: does it look interactive? Use established patterns (underlined text = link, raised rectangle = button, gripper dots = draggable). Never require users to hover-randomly to discover functionality. Test with first-time users who have zero prior knowledge."
+      failure_mode: "Flat design removes affordance signals (shadows, bevels, underlines) in pursuit of aesthetic minimalism, leaving users unable to distinguish static text from interactive buttons. Click-through rates drop 25-40% because users don't know what's clickable."
+      elaboration: "Gibson's concept of affordance was about the environment 'offering' action possibilities to an organism. Norman adapted it for design: perceived affordances are what matter, not actual affordances. A glass door technically affords pushing, but if there's no visible push plate, users will pull the handle and feel stupid. The designer's job is making the true affordance visible."
+      jargon: "affordance, perceived affordance, signifier, flat design, discoverability, Norman door, gulfs of execution/evaluation"
     expected_disciplines: ["design strategy", "design psychology"]
     expected_domains: ["user experience", "digital product"]
     expected_depth: "domain"
@@ -753,6 +836,11 @@ golden_cases:
     description: "Clear universal/cross-domain FB"
     fb_name: "Feedback Delay Causes Oscillation"
     fb_definition: "Any control system — whether mechanical, biological, economic, or social — will oscillate when feedback arrives after a delay that exceeds the system's response time. Shortening feedback loops is the universal solution: tighter code-review cycles, faster market testing, immediate performance feedback, real-time dashboards."
+    expected_output:
+      application: "Map every decision loop in your organization and measure its cycle time. Target: code review <4 hours, customer feedback to product response <1 week, performance review <1 quarter. The loop with the longest delay is your system's bottleneck regardless of where you think the bottleneck is."
+      failure_mode: "Annual performance reviews create 12-month feedback loops — by the time an employee hears they're underperforming, they've been underperforming for a year and the corrective action comes too late to salvage the situation."
+      elaboration: "This is control theory's most portable insight: delay destabilizes. A thermostat with a 5-minute delay overshoots wildly. A startup with 6-month product cycles builds features nobody wants. A relationship where feedback is withheld until it becomes a fight explodes. The universal prescription — tighten the loop — works because it addresses the root cause (delay) rather than the symptom (oscillation)."
+      jargon: "feedback loop, oscillation, cycle time, control theory, damping, lead time, system dynamics"
     expected_disciplines: ["strategic thinking", "engineering practice"]
     expected_domains: ["engineering practice", "business operations", "code & computation", "digital product", "ai & agents"]
     expected_depth: "universal"

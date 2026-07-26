@@ -74,11 +74,21 @@ _nli_pipeline = None
 
 
 def _get_nli():
-    """Lazy-load roberta-large-mnli for entailment scoring."""
+    """Lazy-load DeBERTa-v3-base-mnli for entailment scoring.
+
+    D2105: Switched from roberta-large-mnli to DeBERTa-v3-base-mnli-fever-anli.
+    DeBERTa outperforms RoBERTa on MNLI (90.3% vs 89.4%) and the FEVER+ANLI
+    fine-tune adds fact-verification capability relevant to our use case.
+    Model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB, on disk).
+    """
     global _nli_pipeline
     if _nli_pipeline is None:
         from transformers import pipeline
-        _nli_pipeline = pipeline("text-classification", model="roberta-large-mnli", device=-1)
+        _nli_pipeline = pipeline(
+            "text-classification",
+            model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+            device=-1,
+        )
     return _nli_pipeline
 
 
@@ -332,7 +342,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
     print(f"🔍 Stage 5: Verify — {total} FBs")
     print(f"   Verifier: {VERIFY_MODEL_V2} (cross-family, R5: Gemma ≠ Phi ≠ Qwen)")
-    print(f"   Pre-filter: {'✅ DeBERTa NLI entailment (roberta-large-mnli)' if not skip_nli else '❌ skipped'}")
+    print(f"   Pre-filter: {'✅ DeBERTa-v3 NLI entailment' if not skip_nli else '❌ skipped'}")
     print(f"   OMLX deep check: {'✅ available' if omlx_available else '❌ unavailable'}")
     print(f"   Strict: {strict} | NLI threshold: {NLI_ENTAILMENT_THRESHOLD} | Fail-closed: ✅ (D2093)")
     print(f"{'='*60}")

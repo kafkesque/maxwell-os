@@ -120,8 +120,10 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
 
     got_disciplines = normalize_disciplines(result.get("disciplines", result.get("discipline", [])))
     got_domains = result.get("domains", [])
-    got_depth = result.get("depth", "")
-    got_evidence = result.get("evidence", "")
+    # H04 fix: .get() returns None when key exists with null value, not the default.
+    # Explicitly coalesce None → default for all nullable fields.
+    got_depth = result.get("depth") or ""
+    got_evidence = result.get("evidence") or ""
 
     expected_disciplines = case.get("expected_disciplines", [])
     expected_domains = case.get("expected_domains", [])
@@ -134,12 +136,21 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
     accept_any_disc = case.get("accept_any_of_disciplines")
     checks["disciplines"] = match_disciplines(got_disciplines, expected_disciplines, accept_any_disc)
 
-    # Domains check (partial: at least 50% overlap)
+    # Domains check — tiered by cardinality (Claude review fix):
+    # - 1-domain case: exact match required (no false breadth)
+    # - 2-domain case: ≥2 overlap (at least both)
+    # - 3+ domain case: ≥75% overlap (penalizes truncation for B03-style tests)
+    # - emerging: exact match or empty
     if expected_domains == ["emerging"]:
         checks["domains"] = got_domains == ["emerging"] or len(got_domains) == 0
     else:
         overlap = set(got_domains) & set(expected_domains)
-        checks["domains"] = len(overlap) >= max(1, len(expected_domains) // 2)
+        if len(expected_domains) == 1:
+            checks["domains"] = len(overlap) == 1 and len(got_domains) == 1
+        elif len(expected_domains) == 2:
+            checks["domains"] = len(overlap) >= 2
+        else:
+            checks["domains"] = len(overlap) >= max(2, int(len(expected_domains) * 0.75))
 
     # Depth check
     accept_any_depth = case.get("accept_any_of_depth")
@@ -150,6 +161,11 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
     checks["evidence"] = match_evidence(got_evidence, expected_evidence, accept_any_evidence)
 
     all_passed = all(checks.values())
+
+    # H02/H03: Production-path checks (Claude review — test real pipeline, not get() defaults)
+    raw_domains = result.get("domains", [])
+    has_duplicates = isinstance(raw_domains, list) and len(raw_domains) != len(set(str(d) for d in raw_domains))
+    extra_keys = set(result.keys()) - {"disciplines", "discipline", "domains", "depth", "evidence"}
 
     return {
         "case_id": case["id"],
@@ -164,6 +180,8 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
             "domains": got_domains,
             "depth": got_depth,
             "evidence": got_evidence,
+            "raw_has_duplicates": has_duplicates,
+            "raw_extra_keys": list(extra_keys),
         },
         "expected": {
             "disciplines": expected_disciplines,

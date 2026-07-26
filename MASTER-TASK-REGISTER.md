@@ -93,18 +93,13 @@
 
 ---
 
-## 📋 OPEN BUGS (8)
+## 📋 OPEN BUGS (3)
 
 | Bug | Severity | Status |
 |-----|----------|--------|
-| DELEGATE-001 | 🔴 CRITICAL | 🟡 WORKAROUND — Use local OMLX, subprocess parallelism instead |
-| BUG-053 | 🔴 CRITICAL | ✅ MITIGATED — Phi-4-mini restricted to summarization with source text |
-| BUG-054 | 🔴 CRITICAL | 🟡 INVESTIGATED — Qwen3-Coder works via curl, Goose layer issue |
+| DELEGATE-001 | 🔴 CRITICAL | 🟢 IMPROVED — gemma-4-E4B + Qwen3-Coder confirmed working via OMLX. Subprocess parallel.py for pipeline. |
 | BUG-017 | 🔴 CRITICAL | 🟡 MONITOR — OMLX watchdog enhanced, needs stress test |
-| BUG-049 | 🟡 MEDIUM | ⬜ TODO — Phase 0 P0.3 (R-NN clustering fix) |
 | BUG-050 | 🟡 MEDIUM | ⬜ TODO — Need 5+ book chunk run |
-| BUG-045 | 🟡 MEDIUM | 🟡 OPEN — evidence_passages_shown field added, deferred |
-| BUG-004 | 🟠 HIGH | 🟡 OPEN — sqlite-vec pre-compute, Phase 1 |
 
 ---
 

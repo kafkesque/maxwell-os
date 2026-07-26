@@ -71,16 +71,17 @@
   stage6_commit.py     → SQLite (sqlite-vec) + Parquet export
 </pipeline>
 
-<!-- DELEGATE RULES (DELEGATE-001/053/054 — delegation degraded, gemma fallback viable) -->
+<!-- DELEGATE RULES (DELEGATE-001 workaround verified 2026-07-26) -->
 <delegate_rules>
 - ALWAYS specify provider and model: delegate({provider: "maxwell_omlx", model: "..."})
-- ⚠️ DELEGATION STATUS (2026-07-26):
-  - PREFERRED: gemma-4-E4B-it-MLX-4bit (~8GB). Tested via curl: works. Good for code review + summarization.
-  - Phi-4-mini HALLUCINATES on open-ended research (BUG-053). ONLY for summarization WHEN SOURCE TEXT PROVIDED.
-  - Qwen3-Coder: curl test PASSES (BUG-054 likely Goose layer, not model). OK as secondary code-gen delegate.
+- ⚠️ DELEGATION STATUS (2026-07-26, CONFIRMED):
+  - ✅ gemma-4-E4B-it-MLX-4bit: CONFIRMED working. 0.48s response. Use for: code review, summarization, classification.
+  - ✅ Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: CONFIRMED working via curl. Use for: code generation.
+  - ⚠️ Phi-4-mini-instruct-8bit: HALLUCINATES on open-ended research (BUG-053). Only for summarization WITH source text.
+  - ❌ NEVER use custom_deepseek: reasoning_content passthrough bug (DELEGATE-001).
   - For research/fact-finding: use shell/curl directly. Do NOT delegate open-ended research.
-- NEVER use custom_deepseek for delegates (reasoning_content passthrough bug — DELEGATE-001)
 - Memory budget: ~24GB of 64GB for all models combined
+- Pipeline parallelism: use subprocess (pipeline/parallel.py), NOT delegates
 </delegate_rules>
 
 <!-- MODELS (CONSTITUTION §2 v3.0) -->

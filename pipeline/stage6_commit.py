@@ -103,7 +103,7 @@ END;
 # BUG-004 FIX: Pre-compute embeddings at commit time for O(1) vector search.
 CREATE_VEC_TABLE = """
 CREATE VIRTUAL TABLE IF NOT EXISTS vec_fbs USING vec0(
-    definition_embedding float[768]
+    definition_embedding float[1024]
 );
 """
 

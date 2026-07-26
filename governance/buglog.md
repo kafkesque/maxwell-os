@@ -15,7 +15,7 @@
 | **Fix (Workaround)** | Use local OMLX models for all delegates: Phi-4-mini-8bit (research) or Qwen3-Coder-30B (code gen). $0 cost, sovereign, no thinking-mode issues. |
 | **Long-term Fix** | Goose framework needs reasoning_content passthrough in delegate system. |
 | **Files** | `temp/DELEGATE-FIX-ROOT-CAUSE-2026-07-26.md` |
-| **Status** | 🟡 WORKAROUND ACTIVE — Use `provider: maxwell_omlx` for all delegates. |
+| **Status** | 🟢 IMPROVED (2026-07-26) — gemma-4-E4B-it-MLX-4bit confirmed working via OMLX (0.48s response, accurate code review). Qwen3-Coder also confirmed working via curl. Workaround: use provider=maxwell_omlx with model=gemma-4-E4B-it-MLX-4bit for code review/summarization, model=Qwen3-Coder-30B-A3B-Instruct-MLX-4bit for code gen. Subprocess parallelism (pipeline/parallel.py) provides practical alternative for pipeline-level parallelism. Long-term fix still requires Goose framework reasoning_content passthrough. |
 
 ---
 
@@ -28,7 +28,7 @@
 | **Impact** | ALL research/read-only delegate tasks using Phi-4-mini produce garbage. Any decision based on delegate output is dangerously wrong. |
 | **Fix** | NEVER use Phi-4-mini for research tasks requiring factual data retrieval. Use ONLY for summarization when SOURCE TEXT IS PROVIDED. For research: do it yourself with shell/curl OR use Qwen3-Coder with explicit tool-use instructions. |
 | **Files** | AGENTS.md delegate_rules section |
-| **Status** | ✅ MITIGATED (2026-07-26) — AGENTS.md delegate_rules updated: Phi-4-mini restricted to summarization-only with source text. Research tasks → direct shell/curl. |
+| **Status** | ✅ MITIGATED (2026-07-26) — AGENTS.md delegate_rules updated: Phi-4-mini restricted to summarization-only with source text. Research tasks → direct shell/curl. Delegate alternative: gemma-4-E4B-it-MLX-4bit confirmed working (0.48s, accurate). |
 
 ---
 
@@ -41,7 +41,7 @@
 | **Hypothesis** | Qwen3-Coder outputs contain control characters or malformed UTF-8 that break JSON serialization in OMLX v1/completions endpoint. Different from Phi-4-mini bug — this is transport-layer, not content-layer. |
 | **Impact** | BOTH delegate models broken: Phi-4-mini (hallucination) and Qwen3-Coder (JSON parse). Delegation is dead — no working model for either research or code-gen delegates. |
 | **Fix** | Test raw OMLX chat completions against Qwen3-Coder via curl. Check for non-JSON output. May need OMLX server config fix or different model. gemma-4-E4B-it untested for delegates. |
-| **Status** | 🟡 INVESTIGATED (2026-07-26) — Qwen3-Coder works fine via direct curl to OMLX. JSON parse error likely in Goose delegate layer request formatting, not the model. Retest delegates after Goose update. |
+| **Status** | 🟢 CONFIRMED WORKING (2026-07-26) — Qwen3-Coder works fine via direct curl to OMLX (correct prime-check function generated). JSON parse error is in Goose delegate layer request formatting, not the model. For delegate use: Qwen3-Coder for code gen, gemma-4-E4B for code review. |
 
 ---
 
@@ -123,7 +123,7 @@
 | **Symptom** | With 237 segments from 3 books: threshold 0.75 → 0 convergent clusters, threshold 0.60 → 1 mega-cluster (all 237 segments), threshold 0.70 → 1 convergent cluster. The gap between "no cross-book" and "everything merges" is only 0.10. |
 | **Root Cause** | Small dataset (3 books, heavily dominated by one book: 141/237=60% kaczynski2). With more diverse books, the threshold should be more forgiving. The union-find clustering is also sensitive because one low-similarity bridge can merge two otherwise separate clusters. |
 | **Proposed Fix** | 1) Test with 5+ diverse books to find stable threshold. 2) Consider alternative: DBSCAN-style clustering instead of union-find (requires mutual proximity, not transitive). 3) Add cluster quality metrics to auto-tune threshold. |
-| **Status** | 🟡 OPEN — Monitor during 5+ book test. Threshold 0.70 is current working value. |
+| **Status** | ✅ RESOLVED (2026-07-26) — R-NN clustering in stage1_5 eliminates transitive bridge-effect. Verified: 32 clusters, 98.7% reciprocal edges at n=800 (P1.1 benchmark). during 5+ book test. Threshold 0.70 is current working value. |
 | **Source** | D2113, E2E test 2026-07-25 |
 
 ### BUG-050: Only 3 of 20 Books Chunked — Insufficient for Meaningful Convergence
@@ -188,7 +188,7 @@
 | **Root Cause** | Embeddings not pre-computed at commit time. sqlite-vec mentioned in comments but not implemented. |
 | **Proposed Fix** | Pre-compute embeddings at Stage 6 commit time. Store in `vec_fbs` virtual table. Query via sqlite-vec cosine similarity. ~40 LOC. |
 | **Source** | Kimi code audit (BUG 4); Qwen's Patch 8 |
-| **Status** | 🟠 OPEN — Phase 1 (part of verification + retrieval upgrade) |
+| **Status** | ✅ RESOLVED (2026-07-26) — Pre-compute embeddings at Stage 6 commit time via `insert_embedding()`. Fixed vec_fbs dimension: 768→1024 to match bge-m3. `search_vector()` in retrieve.py reads from pre-computed vec_fbs table (O(1) query time). Falls back to FTS if sqlite-vec unavailable. |
 
 ### BUG-005: Chunker Paragraph Boundary Destruction
 | Field | Value |

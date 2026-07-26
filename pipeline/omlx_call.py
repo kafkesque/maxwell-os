@@ -1,14 +1,14 @@
 """
-omlx_call.py — Simplified OMLX wrapper for v2.0 pipeline.
-=============================================================
-Authority: CONSTITUTION.md C1, C8, C9
+omlx_call.py — Inference wrapper with OMLX + direct MLX backends.
+==================================================================
+Authority: CONSTITUTION.md C1, C8, C9, C21 (Swappable Infrastructure)
 
 Features:
   - temp=0.0 ENFORCED on every call (R7)
-  - Single function: call_omlx(prompt, model, system=None) → str
+  - Two backends: OMLX (HTTP) and MLX (direct, speculative decoding)
   - Auto JSON repair on output
-  - Timeout handling
-  - Retry on failure (up to 3 attempts)
+  - Timeout handling + retry (OMLX), eager loading (MLX)
+  - Dispatch controlled by MAXWELL_INFERENCE_BACKEND env var or config
 
 Usage:
     from pipeline.omlx_call import call_omlx, call_omlx_json
@@ -16,10 +16,15 @@ Usage:
     text = call_omlx("Extract principles from: ...", model="Qwen3.6-35B-A3B-4bit")
     data = call_omlx_json("Return JSON: {...}", model="Qwen3.6-35B-A3B-4bit")
 
+Backend selection:
+    MAXWELL_INFERENCE_BACKEND=mlx   → direct MLX with speculative decoding
+    MAXWELL_INFERENCE_BACKEND=omlx  → OMLX HTTP server (default)
+
 Generator ≠ Verifier (R5): Use Qwen3.6 for generation, Phi-4-mini for verification.
 """
 
 import json
+import os as _os
 import time
 
 import requests
@@ -43,6 +48,59 @@ TEMPERATURE = 0.0
 
 CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
 
+# ── Backend selection ─────────────────────────────────────────────────────
+_INFERENCE_BACKEND = _os.environ.get("MAXWELL_INFERENCE_BACKEND", "omlx")
+
+# ── MLX backend (lazy-loaded) ─────────────────────────────────────────────
+_mlx_providers: dict[str, object] = {}  # model_name → MLXInferenceProvider
+
+# Draft model pairings for speculative decoding (1.5-2× speedup)
+_MLX_DRAFT_MODELS: dict[str, str] = {
+    "Qwen3.6-35B-A3B-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+    "gemma-4-E4B-it-MLX-4bit": "mlx-community/gemma-2-2b-it-4bit",
+}
+
+# Short name → HF path mapping (add mlx-community/ prefix if not present)
+def _mlx_model_path(model_name: str) -> str:
+    """Map short OMLX model names to MLX HF paths."""
+    if model_name.startswith("mlx-community/"):
+        return model_name
+    return f"mlx-community/{model_name}"
+
+
+def _get_mlx_provider(model_name: str):
+    """Get or create MLX provider for a model (with draft model for speed)."""
+    if model_name not in _mlx_providers:
+        from pipeline.providers.mlx_provider import MLXInferenceProvider
+
+        mlx_path = _mlx_model_path(model_name)
+        draft_path = _MLX_DRAFT_MODELS.get(model_name)
+
+        _mlx_providers[model_name] = MLXInferenceProvider(
+            model_name=mlx_path,
+            draft_model_name=draft_path,
+        )
+    return _mlx_providers[model_name]
+
+
+def _call_mlx(prompt: str, model: str, system: str = "", max_tokens: int = 2048) -> str:
+    """Direct MLX inference (no HTTP, speculative decoding)."""
+    provider = _get_mlx_provider(model)
+    result = provider.generate(
+        prompt=prompt,
+        system=system,
+        max_tokens=max_tokens,
+        temperature=0.0,
+    )
+    return result.text.strip()
+
+
+def _call_mlx_json(prompt: str, model: str, system: str = "", max_tokens: int = 2048) -> dict:
+    """Direct MLX JSON inference with auto-repair."""
+    raw = _call_mlx(prompt, model, system, max_tokens)
+    return parse_json_robust(raw, repair_fn=repair_json)
+
 
 def call_omlx(
     prompt: str,
@@ -51,14 +109,18 @@ def call_omlx(
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> str:
-    """Call OMLX with a prompt and return the response text.
+    """Call inference backend (OMLX HTTP or MLX direct) and return text.
+
+    Dispatch is controlled by MAXWELL_INFERENCE_BACKEND env var:
+      - 'mlx'  → direct MLX with speculative decoding (1.5-2× faster)
+      - 'omlx' → OMLX HTTP server (default)
 
     Args:
         prompt: The user prompt.
         model: Model name (default: Qwen3.6-35B-A3B-4bit).
         system: Optional system message.
         max_tokens: Max tokens to generate.
-        timeout: Request timeout in seconds.
+        timeout: Request timeout in seconds (OMLX only).
 
     Returns:
         Generated text string.
@@ -66,6 +128,8 @@ def call_omlx(
     Raises:
         RuntimeError: After MAX_RETRIES failed attempts.
     """
+    if _INFERENCE_BACKEND == "mlx":
+        return _call_mlx(prompt, model, system or "", max_tokens)
     messages = []
     if system:
         messages.append({"role": "system", "content": system})
@@ -125,8 +189,9 @@ def call_omlx_json(
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> dict | list:
-    """Call OMLX and parse the response as JSON.
+    """Call inference backend and parse the response as JSON.
 
+    Dispatch is controlled by MAXWELL_INFERENCE_BACKEND env var.
     Uses json_repair.py to fix common LLM JSON errors before parsing.
 
     Args:
@@ -134,7 +199,7 @@ def call_omlx_json(
         model: Model name.
         system: Optional system message.
         max_tokens: Max tokens.
-        timeout: Request timeout.
+        timeout: Request timeout (OMLX only).
 
     Returns:
         Parsed JSON (dict or list).
@@ -142,6 +207,8 @@ def call_omlx_json(
     Raises:
         ValueError: If the response cannot be parsed as JSON.
     """
+    if _INFERENCE_BACKEND == "mlx":
+        return _call_mlx_json(prompt, model, system or "", max_tokens)
     # If no system message, add a JSON instruction
     if system is None:
         system = "You are a precise JSON generator. Return ONLY valid JSON. No markdown, no explanation."

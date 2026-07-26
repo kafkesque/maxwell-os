@@ -45,9 +45,11 @@ from pipeline.pipeline_paths import (
 )
 from pipeline.schema_accessor import (
     fb_definition,
+    fb_depth,
     fb_disciplines,
     fb_disciplines_raw,
     fb_domains,
+    fb_evidence_type,
     fb_id,
     fb_name,
     fb_source_books,
@@ -381,11 +383,27 @@ def run_stage6(export_only: bool = False):
         # Count
         count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
         print(f"  ✅ SQLite: {inserted} inserted, {failed} failed, {count} total rows")
+
+        # ── D2066: Dynamic taxonomy post-commit (BEFORE conn.close) ──
+        try:
+            from pipeline.taxonomy_manager import run_post_commit_taxonomy
+            human_review_dir = STAGE5_HUMAN_REVIEW.parent
+            taxonomy_review = run_post_commit_taxonomy(conn, human_review_dir)
+            if taxonomy_review:
+                print(f"\n⏸️  TAXONOMY REVIEW REQUIRED (C8-G1): {taxonomy_review}")
+                print("   Review the candidates, set 'approved': true/false, then run:")
+                print(f"   python3 pipeline/taxonomy_manager.py --apply {taxonomy_review}")
+                print("   C8-G2: After applying, review the generated taxonomy YAML before activating.")
+            else:
+                print("\n✅ No taxonomy replacements needed.")
+        except Exception as e:
+            print(f"\n⚠️  Taxonomy post-commit hook failed (non-fatal): {e}")
+
+        conn.close()
     else:
         count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
         print(f"  ℹ️  SQLite: {count} existing rows (--export-only)")
-
-    conn.close()
+        conn.close()
 
     # Parquet export
     parquet_path = export_parquet(fbs, PARQUET_DIR)
@@ -410,23 +428,6 @@ def run_stage6(export_only: bool = False):
         STAGE6_CHECKPOINT,
         "\n".join(json.dumps(r, ensure_ascii=False) for r in commit_recs) + "\n",
     )
-
-    # ── D2066: Dynamic taxonomy post-commit ──────────────────────────
-    if not export_only:
-        try:
-            from pipeline.taxonomy_manager import run_post_commit_taxonomy
-            # Write human review files alongside Stage 5 review artifacts
-            human_review_dir = STAGE5_HUMAN_REVIEW.parent
-            taxonomy_review = run_post_commit_taxonomy(conn, human_review_dir)
-            if taxonomy_review:
-                print(f"\n⏸️  TAXONOMY REVIEW REQUIRED (C8-G1): {taxonomy_review}")
-                print("   Review the candidates, set 'approved': true/false, then run:")
-                print(f"   python3 pipeline/taxonomy_manager.py --apply {taxonomy_review}")
-                print("   C8-G2: After applying, review the generated taxonomy YAML before activating.")
-            else:
-                print("\n✅ No taxonomy replacements needed.")
-        except Exception as e:
-            print(f"\n⚠️  Taxonomy post-commit hook failed (non-fatal): {e}")
 
     # Summary
     print(f"\n{'='*60}")

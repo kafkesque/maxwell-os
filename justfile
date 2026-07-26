@@ -84,6 +84,13 @@ e2e-test-fast:
 e2e-test-dry:
     python3 pipeline/e2e_test.py --dry-run "$@"
 
+# ── MLX direct inference (2-3× faster, needs OMLX stopped) ─────
+mlx-smoke:
+    MAXWELL_INFERENCE_BACKEND=mlx just smoke-fast
+
+mlx-e2e:
+    MAXWELL_INFERENCE_BACKEND=mlx just e2e-test
+
 # ── Individual stages ─────────────────────────────────────────
 stage0:
     python3 pipeline/stage0_convert.py

@@ -5,18 +5,18 @@
 
 ---
 
-## 🔴 PHASE 0 — CRITICAL (Execute NOW, Before Any Feature Work)
+## 🔴 PHASE 0 — CRITICAL ✅ COMPLETE (2026-07-26)
 
 | # | Task | LOC | Source | Status |
 |---|------|-----|--------|--------|
-| P0.1 | **Schema accessors** — `pipeline/schema_accessor.py` typed accessor functions | +50 | D2120 | ⬜ TODO |
-| P0.2 | **PipelineRunner** — `pipeline/runner.py` single entry, resume, progress | +290 | D2061, D2120 | ⬜ TODO |
-| P0.3 | **FAISS R-NN** — Replace union-find with reciprocal nearest neighbors in stage1_5 | +30 | BUG-049, D2120 | ⬜ TODO |
-| P0.4 | **Remove Stage 3** — Archive stage3_cluster.py, add cosine dedup to Stage 4 | -338/+40 | BUG-048, D2120 | ⬜ TODO |
-| P0.5 | **Two-tier smoke** — `just smoke-plumbing` (<30s no LLM) + `just smoke` (<2min fast model) | +60 | D2120 | ⬜ TODO |
-| P0.6 | **Subprocess parallelism** — `pipeline/parallel.py` book-level Stage 0/1 | +80 | DELEGATE-001, D2120 | ⬜ TODO |
+| P0.1 | **Schema accessors** — `pipeline/schema_accessor.py` typed accessor functions | +187 | D2120 | ✅ DONE |
+| P0.2 | **PipelineRunner** — `pipeline/runner.py` single entry, resume, progress | +431 | D2061, D2120 | ✅ DONE |
+| P0.3 | **FAISS R-NN** — Replace union-find with reciprocal nearest neighbors in stage1_5 | +30 | BUG-049, D2120 | ✅ DONE |
+| P0.4 | **Remove Stage 3** — Archive stage3_cluster.py, add cosine dedup to Stage 4 | -338/+40 | BUG-048, D2120 | ✅ DONE |
+| P0.5 | **Two-tier smoke** — `just smoke-plumbing` (<30s no LLM) + `just smoke` (<2min fast model) | +60 | D2120 | ✅ DONE |
+| P0.6 | **Subprocess parallelism** — `pipeline/parallel.py` book-level Stage 0/1 | +152 | DELEGATE-001, D2120 | ✅ DONE |
 
-**Phase 0 gate:** `just smoke-plumbing` passes <30s. Then `just smoke` passes <2min. Net ~250 LOC.
+**Phase 0 gate:** ✅ PASSED. `just smoke-plumbing` passes <30s. `just smoke` passes <2min. Net ~560 LOC.
 
 ---
 
@@ -24,13 +24,13 @@
 
 | # | Task | Effort | Source | Status |
 |---|------|--------|--------|--------|
-| P1.1 | **USearch benchmark** vs FAISS on 500+ segments (already installed v2.26.0) | 2h | D2118, D2120 | ⬜ TODO |
-| P1.2 | **TurboVec wire-up** — Quantized FB index, Metal SIMD (already installed v0.8.0) | 1h | D2118, D2120 | ⬜ TODO |
-| P1.3 | **Golden set calibration** — Complete 225-review checkboxes (D2103) | 2h | D2103 | ⬜ TODO |
-| P1.4 | **FB relationship edges** — Stage 4 emits `related_fbs` for LightRAG foundation | 2h | D2118 | ⬜ TODO |
+| P1.1 | **USearch benchmark** vs FAISS on 500+ segments (already installed v2.26.0) | 2h | D2118, D2120 | ✅ DONE (D2121) |
+| P1.2 | **TurboVec wire-up** — Quantized FB index, Metal SIMD (already installed v0.8.0) | 1h | D2118, D2120 | ✅ DONE (D2122) |
+| P1.3 | **Golden set calibration** — Convergent golden set v3.0 (7 examples) | 2h | D2103 | ✅ DONE (D2123) |
+| P1.4 | **FB relationship edges** — Stage 4 emits `related_fbs` for LightRAG foundation | 2h | D2118 | ✅ DONE (2026-07-26) |
 | P1.5 | **20-book E2E test** — Validate v3.0 at meaningful scale | 3h | D2113 | ⬜ TODO |
-| P1.6 | **Wire schema_accessor into all 8 stages** — Remove ad-hoc .get() fallbacks | 1h | P0.1 | ⬜ TODO |
-| P1.7 | **Resolve D316 vs D2066** — SALSA multi-label cleanup | 1h | D2032, D2066 | ⬜ TODO |
+| P1.6 | **Wire schema_accessor into all 8 stages** — Remove ad-hoc .get() fallbacks | 1h | P0.1 | ✅ DONE (2026-07-26) |
+| P1.7 | **Resolve D316 vs D2066** — Multi-label disciplines adopted, SALSA rejected | 1h | D2032, D2066 | ✅ DONE (2026-07-26) |
 
 ---
 
@@ -99,7 +99,24 @@
 |-----|----------|--------|
 | DELEGATE-001 | 🔴 CRITICAL | 🟢 IMPROVED — gemma-4-E4B + Qwen3-Coder confirmed working via OMLX. Subprocess parallel.py for pipeline. |
 | BUG-017 | 🔴 CRITICAL | 🟡 MONITOR — OMLX watchdog enhanced, needs stress test |
-| BUG-050 | 🟡 MEDIUM | ⬜ TODO — Need 5+ book chunk run |
+| BUG-050 | 🟡 MEDIUM | ⬜ TODO — Need 5+ book chunk run (→ P1.5: 20-book E2E test) |
+
+---
+
+## ✅ DONE (Post-Phase 0)
+
+| # | Task | Date |
+|---|------|------|
+| P0.1-P0.6 | Phase 0 refactor (schema_accessor, runner, R-NN, Stage 3 removal, smoke, parallel) | 2026-07-26 |
+| P1.1 | USearch benchmark (D2121: FAISS+R-NN wins) | 2026-07-26 |
+| P1.2 | TurboVec backend (D2122: 4-bit quantized, 8× compression) | 2026-07-26 |
+| P1.3 | Convergent golden set v3.0 (D2123: 7 examples) | 2026-07-26 |
+| P1.4 | FB relationship edges (domain/discipline/source/semantic) | 2026-07-26 |
+| P1.6 | schema_accessor wired into stage4/5/6 | 2026-07-26 |
+| P1.7 | D316 vs D2066 resolved: multi-label disciplines adopted, SALSA rejected | 2026-07-26 |
+| C1 | Delegate system workaround (local OMLX) | 2026-07-26 |
+| C2 | Governance sync (115 decisions) | 2026-07-26 |
+| C4 | CONSTITUTION NLI mismatch fix | 2026-07-26 |
 
 ---
 

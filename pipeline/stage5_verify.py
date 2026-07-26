@@ -43,6 +43,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
+from pipeline.schema_accessor import (
+    fb_boundary,
+    fb_consequence,
+    fb_definition,
+    fb_mechanism,
+    fb_name,
+    fb_source_books,
+    fb_source_texts,
+    fb_source_texts_shown,
+)
 from pipeline.pipeline_paths import (
     BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
@@ -111,9 +121,9 @@ def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
     """
     # BUG-045 fix: prefer evidence_passages_shown (what LLM actually saw, 5-15 passages)
     # over evidence_passages (what LLM chose to return, up to 5) for NLI verification.
-    evidence_passages: list[str] = fb.get("evidence_passages_shown", [])
+    evidence_passages: list[str] = fb_source_texts_shown(fb)
     if not evidence_passages:
-        evidence_passages = fb.get("evidence_passages", [])
+        evidence_passages = fb_source_texts(fb)
     if not evidence_passages:
         # Fallback: try source_principles (v2.2 checkpoint compatibility)
         source_principles: list[dict] = fb.get("source_principles", [])
@@ -122,7 +132,7 @@ def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
         else:
             return False, 0.0, "No evidence_passages or source_principles — QUARANTINE"
 
-    definition: str = fb.get("definition", "")
+    definition: str = fb_definition(fb)
     if not definition or len(definition) < 20:
         return False, 0.0, "No definition — QUARANTINE"
 
@@ -227,8 +237,8 @@ def check_borp(fb: dict, bypass_types: list[str] = S5_BORP_BYPASS_TYPES) -> tupl
     if content_type in bypass_types:
         return True, 1.0, f"BORP bypassed (type={content_type})"
 
-    source_books = fb.get("source_books", [])
-    distinct = len(set(source_books))
+    source_books: list[str] = fb_source_books(fb)
+    distinct: int = len(set(source_books))
     score = min(distinct / BORP_MIN_SOURCES, 1.0)
     passed = distinct >= BORP_MIN_SOURCES
     detail = f"{distinct} distinct sources (need ≥{BORP_MIN_SOURCES})"

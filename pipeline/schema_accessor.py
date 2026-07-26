@@ -107,6 +107,30 @@ def fb_domains(fb: dict[str, Any]) -> list[str]:
     return [str(domain)] if domain else []
 
 
+def fb_disciplines(fb: dict[str, Any]) -> list[str]:
+    """D2066: Multi-label disciplines list (1-3). v3.0 only."""
+    disciplines = fb.get("disciplines", [])
+    if isinstance(disciplines, list):
+        return [str(d) for d in disciplines]
+    # Backward compat: single discipline field
+    disc = fb.get("discipline", "")
+    return [str(disc)] if disc else []
+
+
+def fb_disciplines_raw(fb: dict[str, Any]) -> list[str]:
+    """Raw LLM discipline output, before canonical matching."""
+    raw = fb.get("disciplines_raw", [])
+    if isinstance(raw, list):
+        return [str(r) for r in raw]
+    disc_raw = fb.get("discipline_raw", "")
+    return [str(disc_raw)] if disc_raw else []
+
+
+def fb_related_fbs(fb: dict[str, Any]) -> list[dict]:
+    """P1.4: Related FB edges for LightRAG graph foundation."""
+    return list(fb.get("related_fbs", []))
+
+
 def fb_depth(fb: dict[str, Any]) -> str:
     """v3.0: depth | v2.x: depth (same field name, but v2 may be None)."""
     return str(fb.get("depth", "specialized"))

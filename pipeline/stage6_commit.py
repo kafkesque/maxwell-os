@@ -43,6 +43,16 @@ from pipeline.pipeline_paths import (
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
 )
+from pipeline.schema_accessor import (
+    fb_definition,
+    fb_disciplines,
+    fb_disciplines_raw,
+    fb_domains,
+    fb_id,
+    fb_name,
+    fb_source_books,
+    fb_source_texts,
+)
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── SQLite schema ──────────────────────────────────────────────────────────
@@ -59,8 +69,8 @@ CREATE TABLE IF NOT EXISTS fbs (
     jargon TEXT,
     domains TEXT NOT NULL,         -- JSON array (canonical, validated)
     domains_raw TEXT,              -- JSON array (LLM original, preserved)
-    discipline TEXT NOT NULL,
-    discipline_raw TEXT,           -- LLM original, preserved
+    disciplines TEXT NOT NULL,     -- JSON array (D2066 multi-label, 1-3)
+    disciplines_raw TEXT,          -- JSON array (LLM original, preserved)
     depth TEXT NOT NULL,
     evidence TEXT NOT NULL,
     source_clusters TEXT,          -- JSON array
@@ -146,7 +156,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
         print("     Full-text search will not be available.")
     # Add new columns if upgrading from v2.0.0 (which lacked raw fields)
     _migrate_add_column(conn, "fbs", "domains_raw", "TEXT")
-    _migrate_add_column(conn, "fbs", "discipline_raw", "TEXT")
+    _migrate_add_column(conn, "fbs", "disciplines_raw", "TEXT")   # D2066: was discipline_raw
     _migrate_add_column(conn, "fbs", "s3_original_domain", "TEXT")
     _migrate_add_column(conn, "fbs", "pipeline_run_id", "TEXT")
     return conn
@@ -217,7 +227,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 fb_id, name, definition, application, failure_mode,
                 elaboration, keywords, jargon,
                 domains, domains_raw,
-                discipline, discipline_raw,
+                disciplines, disciplines_raw,
                 depth, evidence, source_clusters, source_books,
                 s3_original_domain,
                 classification_method, classification_errors,
@@ -240,25 +250,25 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?
             )
         """, (
-            _safe_str(fb.get("fb_id")),
-            _safe_str(fb.get("name")),
-            _safe_str(fb.get("definition")),
+            _safe_str(fb_id(fb)),
+            _safe_str(fb_name(fb)),
+            _safe_str(fb_definition(fb)),
             _safe_str(fb.get("application"), ""),
             _safe_str(fb.get("failure_mode"), ""),
             _safe_str(fb.get("elaboration"), ""),
             _safe_str(fb.get("keywords"), ""),
             _safe_str(fb.get("jargon")),
             # domains (canonical + raw)
-            _safe_json(fb.get("domains", [])),
+            _safe_json(fb_domains(fb)),
             _safe_json(fb.get("domains_raw")),
-            # discipline (canonical + raw)
-            _safe_str(fb.get("discipline"), "emerging"),
-            _safe_str(fb.get("discipline_raw")),
+            # disciplines (canonical + raw) — D2066 multi-label
+            _safe_json(fb_disciplines(fb)),
+            _safe_json(fb_disciplines_raw(fb)),
             # depth, evidence, provenance
-            _safe_str(fb.get("depth"), "domain"),
-            _safe_str(fb.get("evidence"), "cited"),
+            _safe_str(fb_depth(fb), "domain"),
+            _safe_str(fb_evidence_type(fb), "cited"),
             _safe_json(fb.get("source_clusters", [])),
-            _safe_json(fb.get("source_books", [])),
+            _safe_json(fb_source_books(fb)),
             # provenance
             _safe_str(fb.get("s3_original_domain")),
             # classification
@@ -354,11 +364,11 @@ def run_stage6(export_only: bool = False):
 
     if not export_only:
         for i, fb in enumerate(fbs, 1):
-            name = fb.get("name", "unnamed")[:40]
+            name = fb_name(fb)[:40]
             if insert_fb(conn, fb):
                 inserted += 1
                 # BUG-004 FIX: Pre-compute embedding at commit time
-                definition = fb.get("definition", "")
+                definition = fb_definition(fb)
                 if definition:
                     rowid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
                     insert_embedding(conn, rowid, definition)

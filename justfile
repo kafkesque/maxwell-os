@@ -74,6 +74,16 @@ smoke-fast:
 smoke: smoke-fast
     @echo "ℹ️  For plumbing-only (<30s no LLM): just smoke-plumbing"
 
+# ── E2E test (P1.5) ───────────────────────────────────────────
+e2e-test:
+    python3 pipeline/e2e_test.py "$@"
+
+e2e-test-fast:
+    python3 pipeline/e2e_test.py --quality fast "$@"
+
+e2e-test-dry:
+    python3 pipeline/e2e_test.py --dry-run "$@"
+
 # ── Individual stages ─────────────────────────────────────────
 stage0:
     python3 pipeline/stage0_convert.py

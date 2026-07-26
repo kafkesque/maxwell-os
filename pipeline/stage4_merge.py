@@ -120,11 +120,12 @@ def build_fb_prompt(principles: list[dict]) -> str:
 
 
 CLASSIFY_SYSTEM_PROMPT = """You are a precise taxonomy classifier for Foundation Blocks.
-You must classify the given FB into EXACTLY ONE discipline and 1-5 domains from the provided lists.
+You must classify the given FB into 1-3 disciplines and 1-5 domains from the provided lists.
 
 Rules:
 - Pick EXACTLY from the lists below. NO invented labels. No "emerging" unless absolutely unavoidable.
-- discipline: Pick ONE from the discipline list that best captures the FB's core domain.
+- disciplines: Pick 1-3 from the discipline list that capture the FB's intellectual foundations.
+                Multi-disciplinary FBs are EXPECTED and valuable. Only pick ONE if truly single-discipline.
 - domains: Pick 1-5 from the domain list. Only include domains the principle genuinely spans.
 - depth: "universal" (applies everywhere), "cross-domain" (2+ domains),
          "domain" (specific to one domain), "specialized" (narrow sub-field)
@@ -133,23 +134,27 @@ Rules:
 CLASSIFICATION EXAMPLES:
 
 FB: "The Jagged Frontier of AI Competence" — about AI task performance patterns
--> discipline: "strategic thinking" | depth: "cross-domain" | domains: ["ai & agents", "engineering practice", "business operations"]
+-> disciplines: ["strategic thinking", "ai engineering"] | depth: "cross-domain" | domains: ["ai & agents", "engineering practice", "business operations"]
 
 FB: "Descriptive References Reduce Fragility" — about code maintainability via named access
--> discipline: "software engineering" | depth: "domain" | domains: ["code & computation", "engineering practice"]
+-> disciplines: ["software engineering"] | depth: "domain" | domains: ["code & computation", "engineering practice"]
 
 FB: "Design Fiction" — about speculative prototyping for strategy
--> discipline: "design strategy" | depth: "cross-domain" | domains: ["creative technology", "graphic design", "digital product"]
+-> disciplines: ["design strategy", "strategic thinking"] | depth: "cross-domain" | domains: ["creative technology", "graphic design", "digital product"]
 
 FB: "Cross-Modal Design Amplification" — about multisensory integration in experience design
--> discipline: "design psychology" | depth: "cross-domain" | domains: ["digital product", "creative technology", "user experience"]
+-> disciplines: ["design psychology", "user research"] | depth: "cross-domain" | domains: ["digital product", "creative technology", "user experience"]
 
-Return ONLY a JSON object: {"discipline": "...", "domains": ["d1", "d2"], "depth": "...", "evidence": "..."}"""
+Return ONLY a JSON object: {"disciplines": ["d1", "d2"], "domains": ["d1", "d2"], "depth": "...", "evidence": "..."}"""
 
 
 def build_classify_prompt(fb_name: str, fb_definition: str,
                           domains: list[str], disciplines: list[str]) -> str:
-    """Build the SALSA classification prompt with inline label lists."""
+    """Build the multi-label classification prompt with inline label lists.
+    
+    D2066: Open-set depth-based multi-label classification.
+    disciplines: 1-3 labels (was single-discipline SALSA, D2024 — superseded).
+    """
     domain_list = ", ".join(domains)
     discipline_list = ", ".join(disciplines)
 
@@ -158,12 +163,12 @@ def build_classify_prompt(fb_name: str, fb_definition: str,
 NAME: {fb_name}
 DEFINITION: {fb_definition[:500]}
 
-DISCIPLINES (pick ONE): {discipline_list}
+DISCIPLINES (pick 1-3): {discipline_list}
 
 DOMAINS (pick 1-5): {domain_list}
 
 Return JSON:
-{{"discipline": "exact_discipline_label",
+{{"disciplines": ["discipline1", "discipline2"],
   "domains": ["domain1", "domain2"],
   "depth": "universal|cross-domain|domain|specialized",
   "evidence": "cited|axiomatic"}}"""
@@ -331,16 +336,28 @@ def load_stage2_principles() -> dict[str, dict]:
 
 
 def validate_classification(result: dict) -> tuple[bool, list[str]]:
-    """Validate classification output against canonical taxonomy.
+    """Validate multi-label classification output against canonical taxonomy.
 
+    D2066: disciplines is now a list (1-3). D2024 SALSA single-discipline superseded.
     Returns (is_valid, errors).
     """
-    errors = []
+    errors: list[str] = []
 
-    # Validate discipline
-    discipline = result.get("discipline", "")
-    if not is_valid_discipline(discipline):
-        errors.append(f"Invalid discipline: '{discipline}'")
+    # Validate disciplines (multi-label, 1-3)
+    disciplines = result.get("disciplines", [])
+    if isinstance(disciplines, str):
+        # Backward compat: single string → wrap in list
+        disciplines = [disciplines]
+    if not isinstance(disciplines, list):
+        errors.append(f"Disciplines is not a list: {type(disciplines)}")
+    else:
+        if len(disciplines) < 1:
+            errors.append("At least 1 discipline required")
+        if len(disciplines) > 3:
+            errors.append(f"Too many disciplines: {len(disciplines)} > 3")
+        for d in disciplines:
+            if not is_valid_discipline(d):
+                errors.append(f"Invalid discipline: '{d}'")
 
     # Validate domains
     domains = result.get("domains", [])
@@ -426,6 +443,118 @@ def _serialize_jargon(jargon_value) -> str | None:
     if isinstance(jargon_value, list):
         return "; ".join(str(item) for item in jargon_value if item) or None
     return str(jargon_value) if jargon_value else None
+
+
+# ── P1.4: FB Relationship Edge Detection ──────────────────────────────────
+
+def compute_fb_relationships(
+    fbs: list[dict],
+    similarity_threshold: float = 0.80,
+) -> list[dict]:
+    """Compute FB-to-FB relationships for LightRAG graph foundation.
+
+    D2118, D2120: Relationship edges enable graph-based knowledge retrieval.
+    Four relationship types:
+      - domain_overlap: FBs sharing ≥1 domain label
+      - discipline_overlap: FBs sharing ≥1 discipline (D2066 multi-label)
+      - source_crossover: FBs derived from ≥1 shared source book
+      - semantic_near: Cosine similarity ≥ threshold on definition embeddings
+
+    Writes `related_fbs` list onto each FB dict (mutates in place).
+
+    Args:
+        fbs: List of FB dicts (with domains, disciplines, source_books, definition).
+        similarity_threshold: Cosine similarity threshold for semantic_near edges.
+
+    Returns:
+        The same fbs list, mutated with `related_fbs` fields.
+    """
+    if len(fbs) < 2:
+        for fb in fbs:
+            fb.setdefault("related_fbs", [])
+        return fbs
+
+    n: int = len(fbs)
+    print(f"\n🔗 Computing FB relationships for {n} FBs...")
+
+    # Embed definitions for semantic similarity
+    try:
+        import numpy as np
+        from pipeline.embeddings import embed_texts_bge_m3
+
+        definitions: list[str] = [fb.get("definition", "")[:500] for fb in fbs]
+        embeddings: np.ndarray = embed_texts_bge_m3(definitions)
+        # Normalize for cosine
+        norms: np.ndarray = np.linalg.norm(embeddings, axis=1, keepdims=True)
+        norms = np.where(norms == 0, 1.0, norms)  # Avoid div-by-zero
+        embeddings = embeddings / norms
+        has_embeddings: bool = True
+    except Exception as e:
+        print(f"   ⚠️  Embedding failed ({e}), skipping semantic edges")
+        has_embeddings = False
+        embeddings = None
+
+    # Pre-extract sets for fast comparison
+    fb_id_list: list[str] = [fb["fb_id"] for fb in fbs]
+    domain_sets: list[set[str]] = [set(fb.get("domains", [])) for fb in fbs]
+    discipline_sets: list[set[str]] = [set(fb.get("disciplines", [])) for fb in fbs]
+    book_sets: list[set[str]] = [set(fb.get("source_books", [])) for fb in fbs]
+
+    # Initialize related_fbs on all FBs
+    for fb in fbs:
+        fb["related_fbs"] = []
+
+    edge_counts: dict[str, int] = {"domain_overlap": 0, "discipline_overlap": 0,
+                                      "source_crossover": 0, "semantic_near": 0}
+
+    # Pairwise comparison (upper triangle)
+    for i in range(n):
+        for j in range(i + 1, n):
+            relationships: list[str] = []
+
+            # Domain overlap
+            if domain_sets[i] & domain_sets[j]:
+                relationships.append("domain_overlap")
+
+            # Discipline overlap (D2066 multi-label)
+            if discipline_sets[i] & discipline_sets[j]:
+                relationships.append("discipline_overlap")
+
+            # Source crossover
+            if book_sets[i] & book_sets[j]:
+                relationships.append("source_crossover")
+
+            # Semantic similarity
+            if has_embeddings and embeddings is not None:
+                sim: float = float(np.dot(embeddings[i], embeddings[j]))
+                if sim >= similarity_threshold:
+                    relationships.append("semantic_near")
+
+            if relationships:
+                # Bidirectional edges
+                fbs[i]["related_fbs"].append({
+                    "fb_id": fb_id_list[j],
+                    "relationships": relationships,
+                })
+                fbs[j]["related_fbs"].append({
+                    "fb_id": fb_id_list[i],
+                    "relationships": relationships,
+                })
+                for rel in relationships:
+                    edge_counts[rel] = edge_counts.get(rel, 0) + 1
+
+    # Summary
+    print(f"   Domain overlap:       {edge_counts['domain_overlap']} edges")
+    print(f"   Discipline overlap:   {edge_counts['discipline_overlap']} edges")
+    print(f"   Source crossover:     {edge_counts['source_crossover']} edges")
+    if has_embeddings:
+        print(f"   Semantic near (cos≥{similarity_threshold:.2f}): {edge_counts['semantic_near']} edges")
+
+    total_edges: int = sum(edge_counts.values())
+    isolated: int = sum(1 for fb in fbs if not fb["related_fbs"])
+    print(f"   Total edges: {total_edges} | Isolated FBs: {isolated}/{n}")
+
+    return fbs
 
 
 def run_stage4(cluster_ids: list[int] = None):
@@ -559,7 +688,7 @@ def run_stage4(cluster_ids: list[int] = None):
         except Exception as e:
             print(f"→ ⚠️  Classification error: {e}, using 'emerging'")
             class_data = {
-                "discipline": "emerging",
+                "disciplines": ["emerging"],
                 "domains": ["emerging"],
                 "depth": "domain",
                 "evidence": "cited",
@@ -570,15 +699,23 @@ def run_stage4(cluster_ids: list[int] = None):
         # Raw labels are preserved forever; canonical labels earn their place
         # through accumulation, not through being pre-approved.
         domains_raw = list(class_data.get("domains", []))
-        discipline_raw = class_data.get("discipline", "")
+        disciplines_raw_raw = class_data.get("disciplines", [])
+        if isinstance(disciplines_raw_raw, str):
+            disciplines_raw_raw = [disciplines_raw_raw]
+        disciplines_raw = list(disciplines_raw_raw)
 
         # Phase 2b: Synonym matching before validation.
         # Try to match non-canonical labels via synonym_map.yaml and taxonomy raw aliases.
         # This reduces "emerging" fallbacks without forcing labels that don't fit.
-        if not is_valid_discipline(discipline_raw):
-            matched = match_to_canonical(discipline_raw, kind="discipline")
-            if matched:
-                class_data["discipline"] = matched
+        matched_disciplines = []
+        for d in disciplines_raw:
+            if is_valid_discipline(d):
+                matched_disciplines.append(d)
+            else:
+                matched = match_to_canonical(d, kind="discipline")
+                matched_disciplines.append(matched if matched else d)
+        class_data["disciplines"] = matched_disciplines
+
         matched_domains = match_domains_to_canonical(domains_raw)
         if matched_domains:
             class_data["domains"] = matched_domains
@@ -588,8 +725,13 @@ def run_stage4(cluster_ids: list[int] = None):
         if not is_valid:
             classification_errors += 1
             # Fix invalid labels by replacing with 'emerging'
-            if not is_valid_discipline(class_data.get("discipline", "")):
-                class_data["discipline"] = "emerging"
+            fixed_disciplines = []
+            for d in class_data.get("disciplines", []):
+                if is_valid_discipline(d):
+                    fixed_disciplines.append(d)
+            if not fixed_disciplines:
+                fixed_disciplines = ["emerging"]
+            class_data["disciplines"] = fixed_disciplines
             fixed_domains = []
             for d in class_data.get("domains", []):
                 if is_valid_domain(d):
@@ -647,16 +789,16 @@ def run_stage4(cluster_ids: list[int] = None):
             "keywords": fb_data.get("keywords", "").strip(),
             "jargon": _serialize_jargon(fb_data.get("jargon")),
             "domains": class_data["domains"],
-            "discipline": class_data["discipline"],
+            "disciplines": class_data["disciplines"],       # D2066: multi-label (1-3)
             "domains_raw": domains_raw,
-            "discipline_raw": discipline_raw,
+            "disciplines_raw": disciplines_raw,             # D2066: raw LLM output preserved
             "depth": class_data["depth"],
             "evidence": class_data["evidence"],
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
             "source_principles": source_principles_embedded,
             "s3_original_domain": s3_original_domain,
-            "classification_method": "SALSA",
+            "classification_method": "multi-label",  # D2066: was SALSA (D2024 superseded)
             "classification_errors": errors,
         }
         fb = stamp_record(fb, gen_model=GEN_MODEL)
@@ -667,6 +809,10 @@ def run_stage4(cluster_ids: list[int] = None):
         elapsed = time.time() - start
         err_str = f" ({len(errors)} label errors)" if errors else ""
         print(f"→ ✅ '{name}'{err_str} ({elapsed:.1f}s)")
+
+    # ── P1.4: Compute FB relationship edges (LightRAG foundation) ────
+    if len(fbs) > 1:
+        compute_fb_relationships(fbs)
 
     # Write FB checkpoint
     safe_write(

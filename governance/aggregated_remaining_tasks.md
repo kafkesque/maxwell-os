@@ -9,10 +9,10 @@
 | # | Action | Effort | Why | Status |
 |---|--------|--------|-----|--------|
 | 1 | 20-book FAISS calibration | 2h | Calibrate threshold on meaningful scale | ⬜ TODO |
-| 2 | Stage 3: fix or remove | 4h | BUG-048: bridge script bypass. Either rewrite or remove. | ⬜ TODO |
-| 3 | Stage 4 simplification | 3h | D2112 deferred. 650-line script for old architecture. | ⬜ TODO |
-| 4 | LightRAG overlay (Layer 1c) | 4h | Weekly research: ALL sources validate graph memory > vector memory | ⬜ TODO |
-| 5 | 20-book E2E test | 3h | Validate v3.0 at scale. Expect 50-200 convergent FBs. | ⬜ TODO |
+| 2 | Stage 3: fix or remove | 4h | BUG-048: bridge script bypass. Either rewrite or remove. | ✅ DONE (P0.4: archived, cosine dedup in S4) |
+| 3 | Stage 4 simplification | 3h | D2112 deferred. Multi-label + relationship edges added. | ✅ DONE (P1.4+P1.7: +113 LOC) |
+| 4 | LightRAG overlay (Layer 1c) | 4h | Weekly research: ALL sources validate graph memory > vector memory | 🟡 P1.4 DONE (edges ready), full LightRAG → P2.1 |
+| 5 | 20-book E2E test | 3h | Validate v3.0 at scale. Expect 50-200 convergent FBs. | ⬜ TODO (→ P1.5) |
 
 ## TIER 2 — THIS MONTH (Quality + Layer 2 Foundation)
 
@@ -66,7 +66,7 @@
 | BUG-045 | 🟡 MED | evidence_passages inflates (fixed: evidence_passages_shown) | ✅ DONE (2026-07-26) |
 | BUG-046 | 🟡 MED | Stage 4 complexity for v3.0 | ⬜ OPEN |
 | BUG-047 | 🟡 MED | OMLX memory leak (watchdog enhanced) | ✅ DONE (2026-07-26) |
-| BUG-048 | 🟡 MED | Stage 3 semantic dedup not functioning | ⬜ OPEN |
+| BUG-048 | 🟡 MED | Stage 3 semantic dedup not functioning | ✅ DONE — S3 removed, cosine dedup in S4 |
 | BUG-050 | 🟡 MED | governance drift (CONSTITUTION stale refs) | ✅ DONE (2026-07-26) |
 | BUG-001 | 🔴 CRITICAL | OMLX model crashes on large context | ⬜ MITIGATED (watchdog) |
 

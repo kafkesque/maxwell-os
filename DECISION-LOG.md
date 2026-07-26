@@ -1918,3 +1918,79 @@ Then evaluate Qwen3-Embedding on real data before making it primary.
 **Category:** GOV — Governance
 **State:** ACTIVE
 **See:** D2061 (PipelineRunner spec), D2094 (cluster-before-extract), D2118 (feed research), BUG-049 (FAISS threshold)
+
+---
+
+## D2121 — P1.1: USearch vs FAISS Benchmark Results (2026-07-26)
+
+**Context:** Benchmarked USearch v2.26.0 clustering against FAISS+R-NN on real pipeline segments (800 segments, bge-m3 1024-dim embeddings).
+
+**Results (threshold=0.70, n=800):**
+
+| Metric | FAISS+R-NN | USearch |
+|--------|-----------|---------|
+| Clusters | 32 | N/A (failed) |
+| Singletons | 80 | N/A |
+| Reciprocal edges | 98.7% | N/A |
+| Clustering time | 0.019s | N/A |
+| Convergent clusters (≥2 books) | 13 | N/A |
+
+**Verdict: FAISS+R-NN WINS.** USearch's built-in `cluster()` method fails with "Index too small to cluster" at 300 and 800 vectors — it appears to require 5000+ vectors for its clustering algorithm. USearch is excellent for SEARCH (10x faster HNSW with NEON SIMD) but NOT viable for CLUSTERING at Maxwell's data scale (100-5000 segments per domain).
+
+**Decision:**
+- **Keep FAISS+R-NN** as the Stage 1.5 clustering backend
+- **Keep USearch installed** for potential future search/retrieval acceleration (Phase 2)
+- **Do NOT** attempt to replace FAISS with USearch for clustering
+
+**Category:** RES — Research
+**State:** CLOSED
+**See:** benchmarks/benchmark_faiss_vs_usearch.py
+
+---
+
+## D2122 — P1.2: TurboVec Backend Created (2026-07-26)
+
+**Context:** Created `pipeline/storage/turbovec_backend.py` (274 LOC) as a swappable vector storage backend using TurboVec's 4-bit quantized index.
+
+**Key specs:**
+- 4-bit quantization → 8x memory compression vs float32
+- Metal SIMD acceleration on Apple Silicon
+- Save/reload roundtrip verified
+- Search: returns (fb_id, similarity_score) tuples
+- Implements swappable StorageBackend protocol (D2056)
+
+**Integration plan:**
+- Stage 6 can optionally write FB embeddings to TurboVec index alongside SQLite+sqlite-vec
+- Config flag: `vector_backend: turbovec` in pipeline_config.yaml
+- TurboVec excels at: large FB collections (1000+), memory-constrained deployments, fast semantic search
+
+**Category:** INF — Infrastructure
+**State:** ACTIVE
+**See:** pipeline/storage/turbovec_backend.py
+
+---
+
+## D2123 — P1.3: Convergent Golden Set v3.0 Created (2026-07-26)
+
+**Context:** The old golden set (`stage2_fewshot.yaml`, 75 examples) was designed for the OLD per-segment extraction architecture (1 segment → 1 principle). The v3.0 cluster-before-extract architecture requires a fundamentally different golden set: N segments from ≥2 books → 1 convergent FB with mechanism/boundary/consequence.
+
+**New golden set:** `config/golden/stage2_fewshot_convergent.yaml` (443 lines)
+- 7 examples: 5 convergent positives + 2 hard negatives
+- Each example simulates what Stage 2 receives from a Stage 1.5 FAISS+R-NN cluster
+- Schema per D2095: name, definition, mechanism, boundary, consequence, evidence_passages
+- Domains covered: pricing, behavioral change, advertising, persuasion, marketing
+- Hard negatives: single-source rejection (NEG-CONV-001), platitude detection (NEG-CONV-002)
+
+**Old golden set:** Archived to `stage2_fewshot.yaml.archived-v2` — examples are valid extractions but the per-segment format is incompatible with v3.0 convergent extraction.
+
+**Calibration status:** Calibrated. All 7 examples reviewed and validated for:
+- Source fidelity (evidence_passages are verbatim from source segments)
+- Mechanism presence (every positive example has causal mechanism)
+- Boundary conditions (when mechanism applies AND fails)
+- Cross-source convergence (synthesis across ≥2 sources)
+
+**Next:** Wire into Stage 2 prompt via `--golden` flag (adds convergent examples alongside existing golden parity sampling).
+
+**Category:** QLT — Quality
+**State:** ACTIVE
+**See:** config/golden/stage2_fewshot_convergent.yaml

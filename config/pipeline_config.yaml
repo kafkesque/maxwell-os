@@ -19,8 +19,7 @@ stages:
   stage1_3_prefilter:   knowledge pipeline/stage1_3_prefilter      # Regex pre-filter
   stage1_5_embed:       knowledge pipeline/stage1_5_embed_cluster  # Embed + FAISS cluster ← D2094 NEW
   stage2_extract:       knowledge pipeline/stage2_extract          # Clusters → convergent FBs ← D2094 REWRITE
-  stage3_cluster:       knowledge pipeline/stage3_cluster          # Semantic dedup (D2094: simplified, was principle clustering)
-  stage4_merge:         knowledge pipeline/stage4_merge            # SALSA classify + dedup ← D2094: simplified from merge
+  stage4_merge:         knowledge pipeline/stage4_merge            # Classify + format + lightweight dedup (D2120: Stage 3 removed)
   stage5_verify:        knowledge pipeline/stage5_verify           # FBs → verified (D2093: fail-closed + DeBERTa NLI)
   stage6_commit:        knowledge pipeline/stage6_commit           # Verified → DB
 
@@ -100,6 +99,18 @@ pipeline:
   intent_top_k_ratio: 0.30
   intent_threshold: 0.35
   smoke_book_limit: 3             # BUG-051: Max books when MAXWELL_RUN_ID=smoke
+
+# ── Smoke Test Tiers (D2120) ────────────────────────────────────────────
+smoke:
+  plumbing:
+    skip_llm: true                  # Use cached golden output for LLM stages
+    fast_model: null                # No LLM at all
+    timeout_per_stage: 10           # Max seconds per stage
+  fast:
+    skip_llm: false                 # Run LLM stages with fast model
+    fast_model: "Phi-4-mini-instruct-8bit"  # ~10x faster than Qwen3.6
+    skip_gemma_deep_check: true     # Skip Stage 5 Gemma cross-family verify
+    max_books: 3
 
 # ── Stage 1.5: Embed + FAISS Cluster (D2094) ──────────────────────────
 stage1_5:

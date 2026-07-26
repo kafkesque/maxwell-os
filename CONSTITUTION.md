@@ -60,7 +60,7 @@ This rule applies to ALL code — human-written AND LLM/agent-generated.
 
 MODELS: Gen=Qwen3.6-35B-A3B-4bit | Verify=Phi-4-mini-8bit | VerifyV2=Gemma-4-E4B (R5 cross-family) | Embed=bge-m3 | NLI=DeBERTa-v3-base-mnli (D2111)
 
-PIPELINE (v3.0 cluster-before-extract): 0-convert → 0.5-metadata → 1-chunk → 1.3-prefilter → 1.5-FAISS-cluster → 2-convergent-extract → 3-semantic-dedup → 4-classify(multi-label, D2066) → 5-verify(DeBERTa-NLI+Gemma-cross-family+BORP, D2093 fail-closed) → 6-commit
+PIPELINE (v3.0 cluster-before-extract, D2120: 8-stage): 0-convert → 0.5-metadata → 1-chunk → 1.3-prefilter → 1.5-FAISS-RNN-cluster → 2-convergent-extract → 4-classify+dedup(D2120: Stage 3 removed) → 5-verify(DeBERTa-NLI+Gemma-cross-family+BORP, D2093 fail-closed) → 6-commit
 
 STORAGE: SQLite (canonical) + sqlite-vec (vectors) + Parquet (portability) | TAXONOMY: 25 domains, 47 disciplines, max 5 per FB (D2066: dynamic, raw labels can dethrone canonicals)
 

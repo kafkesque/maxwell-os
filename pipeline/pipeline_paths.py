@@ -21,13 +21,12 @@ def get_run_id(): return _rid()
 # ── Stage dirs ─────────────────────────────────────────────────────────
 S0=_CFG["stages"]["stage0_convert"]; S1=_CFG["stages"]["stage1_chunk"]
 S13=_CFG["stages"]["stage1_3_prefilter"]; S15=_CFG["stages"]["stage1_5_embed"]
-S2=_CFG["stages"]["stage2_extract"]; S3=_CFG["stages"]["stage3_cluster"]
-S4=_CFG["stages"]["stage4_merge"]; S5=_CFG["stages"]["stage5_verify"]
+S2=_CFG["stages"]["stage2_extract"]; S4=_CFG["stages"]["stage4_merge"]; S5=_CFG["stages"]["stage5_verify"]  # D2120: Stage 3 removed
 S6=_CFG["stages"]["stage6_commit"]
 
 def _sdir(name): return PROJECT_ROOT / name
 S0_DIR=_sdir(S0); S1_DIR=_sdir(S1); S13_DIR=_sdir(S13); S15_DIR=_sdir(S15)
-S2_DIR=_sdir(S2); S3_DIR=_sdir(S3); S4_DIR=_sdir(S4); S5_DIR=_sdir(S5); S6_DIR=_sdir(S6)
+S2_DIR=_sdir(S2); S3_DIR=_sdir(S2); S4_DIR=_sdir(S4); S5_DIR=_sdir(S5); S6_DIR=_sdir(S6)  # D2120: S3 removed, S3_DIR→S2 fallback
 
 # ── Self-contained stage paths: {stage}/{run_id}/{file} ─────────────────
 def _sp(stage_dir, file_key):
@@ -52,7 +51,8 @@ def _ckpt(stage_dir, n):
 STAGE0_CHECKPOINT=_ckpt(S0_DIR,0); STAGE1_CHECKPOINT=_ckpt(S1_DIR,1); STAGE2_CHECKPOINT=_ckpt(S2_DIR,2)
 STAGE3_CHECKPOINT=_ckpt(S3_DIR,3); STAGE4_CHECKPOINT=_ckpt(S4_DIR,4); STAGE5_CHECKPOINT=_ckpt(S5_DIR,5)
 STAGE6_CHECKPOINT=_ckpt(S6_DIR,6)
-STAGE_CHECKPOINTS={0:STAGE0_CHECKPOINT,1:STAGE1_CHECKPOINT,2:STAGE2_CHECKPOINT,3:STAGE3_CHECKPOINT,4:STAGE4_CHECKPOINT,5:STAGE5_CHECKPOINT,6:STAGE6_CHECKPOINT}
+# D2120: Stage 3 removed. 8 stages (0-2, 4-6).
+STAGE_CHECKPOINTS={0:STAGE0_CHECKPOINT,1:STAGE1_CHECKPOINT,2:STAGE2_CHECKPOINT,4:STAGE4_CHECKPOINT,5:STAGE5_CHECKPOINT,6:STAGE6_CHECKPOINT}
 
 def stage_log(stage_dir): return stage_dir / _rid() / _CFG["stage_files"]["log"]
 def stage_meta(stage_dir): return stage_dir / _rid() / _CFG["stage_files"]["meta"]
@@ -154,3 +154,9 @@ OMLX_BIN = _CFG["services"]["omlx"]["bin"]                             # omlx bi
 # ── Stage 1.5 checkpoints (D2094: defined after CHECKPOINT_DIR) ──────────
 STAGE1_5_CHECKPOINT = CHECKPOINT_DIR / "stage1_5_clusters.jsonl"
 STAGE1_5_SINGLETONS = CHECKPOINT_DIR / "stage1_5_singletons.jsonl"
+
+# ── Smoke test config (D2120) ────────────────────────────────────────────
+SMOKE_PLUMBING_SKIP_LLM = bool(_CFG.get("smoke", {}).get("plumbing", {}).get("skip_llm", True))
+SMOKE_FAST_MODEL = _CFG.get("smoke", {}).get("fast", {}).get("fast_model", "Phi-4-mini-instruct-8bit")
+SMOKE_FAST_SKIP_GEMMA = bool(_CFG.get("smoke", {}).get("fast", {}).get("skip_gemma_deep_check", True))
+SMOKE_MAX_BOOKS = int(_CFG.get("smoke", {}).get("fast", {}).get("max_books", 3))

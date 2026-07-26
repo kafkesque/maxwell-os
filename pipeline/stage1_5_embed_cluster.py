@@ -142,11 +142,16 @@ def faiss_cluster(
     max_size: int,
     neighbor_k: int,
 ) -> tuple[dict, dict, dict]:
-    """FAISS cosine clustering with union-find connected components.
+    """FAISS cosine clustering with reciprocal nearest-neighbor (R-NN) edges.
+
+    R-NN eliminates the transitive ''bridge effect'' that union-find suffers from.
+    Two points are connected ONLY if they are MUTUALLY in each other's top-k
+    neighbors above the similarity threshold. This prevents a single weak
+    bridge from merging two otherwise distinct clusters (BUG-049 root cause).
 
     Args:
         embeddings: Normalized float32 array (n, dim).
-        threshold: Cosine similarity threshold for cluster membership.
+        threshold: Cosine similarity threshold for R-NN edge.
         min_size: Minimum members per cluster (smaller → singletons).
         max_size: Maximum before k-means split.
         neighbor_k: FAISS nearest neighbors to search.
@@ -167,8 +172,8 @@ def faiss_cluster(
     print(f"   🔍 Searching {k} nearest neighbors...")
     sims, neigh = index.search(embeddings, k)
 
-    # Union-find connected components
-    print(f"   🔗 Union-find clustering (cos ≥ {threshold})...")
+    # ── Reciprocal Nearest-Neighbor clustering (fixes BUG-049) ──────────
+    print(f"   🔗 R-NN clustering (reciprocal cos ≥ {threshold})...")
     parent: list[int] = list(range(n))
 
     def find(x: int) -> int:
@@ -182,10 +187,27 @@ def faiss_cluster(
         if ra != rb:
             parent[ra] = rb
 
+    # Build neighbor sets for O(1) reciprocity check
+    neighbor_sets: list[set[int]] = []
     for i in range(n):
+        nbrs: set[int] = set()
         for j, s in zip(neigh[i], sims[i], strict=False):
             if j != i and s >= threshold:
+                nbrs.add(int(j))
+        neighbor_sets.append(nbrs)
+
+    # Only union reciprocal edges
+    reciprocal_edges: int = 0
+    total_edges: int = 0
+    for i in range(n):
+        for j in neighbor_sets[i]:
+            total_edges += 1
+            if i in neighbor_sets[j]:  # j is also neighbor of i
                 union(i, j)
+                reciprocal_edges += 1
+
+    reciprocity: float = (reciprocal_edges / total_edges * 100) if total_edges > 0 else 0.0
+    print(f"      {reciprocal_edges}/{total_edges} edges reciprocal ({reciprocity:.0f}%)")
 
     # Collect clusters
     clusters: dict[int, list[int]] = defaultdict(list)

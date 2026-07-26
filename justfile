@@ -47,17 +47,32 @@ delegate-check:
 delegate-fix:
     python3 tools/delegate_safe.py --fix
 
-# Smoke test: 1-book end-to-end
-smoke:
-    @echo "=== Smoke Test (1-book E2E) ==="
+# ── Two-tier Smoke Tests (D2120) ────────────────────────────────────────
+
+# Tier 1: Plumbing smoke — no LLM, validates pipeline plumbing (<30s)
+smoke-plumbing:
+    @echo "=== Plumbing Smoke (no LLM, <30s) ==="
+    MAXWELL_RUN_ID=smoke MAXWELL_SKIP_LLM=1 python3 pipeline/stage0_convert.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_chunk.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_3_prefilter.py
+    MAXWELL_RUN_ID=smoke python3 pipeline/stage1_5_embed_cluster.py
+    @echo "✅ Plumbing smoke complete (LLM stages skipped)."
+
+# Tier 2: Fast smoke — Phi-4-mini, skip Gemma deep check (<2min)
+smoke-fast:
+    @echo "=== Fast Smoke (Phi-4-mini, <2min) ==="
     MAXWELL_RUN_ID=smoke python3 pipeline/stage0_convert.py
     MAXWELL_RUN_ID=smoke python3 pipeline/stage1_chunk.py
     MAXWELL_RUN_ID=smoke python3 pipeline/stage1_3_prefilter.py
     MAXWELL_RUN_ID=smoke python3 pipeline/stage1_5_embed_cluster.py
-    MAXWELL_RUN_ID=smoke python3 pipeline/stage2_extract.py
-    MAXWELL_RUN_ID=smoke python3 pipeline/stage5_verify.py
+    MAXWELL_RUN_ID=smoke MAXWELL_FAST_MODEL=Phi-4-mini-instruct-8bit python3 pipeline/stage2_extract.py
+    MAXWELL_RUN_ID=smoke MAXWELL_SKIP_GEMMA=1 python3 pipeline/stage5_verify.py
     MAXWELL_RUN_ID=smoke python3 pipeline/stage6_commit.py
-    @echo "✅ Smoke test complete. Check output in stage6_commit/smoke/"
+    @echo "✅ Fast smoke complete. Check output in stage6_commit/smoke/"
+
+# Full smoke: default models (Qwen3.6 + Gemma, ~5min)
+smoke: smoke-fast
+    @echo "ℹ️  For plumbing-only (<30s no LLM): just smoke-plumbing"
 
 # ── Individual stages ─────────────────────────────────────────
 stage0:

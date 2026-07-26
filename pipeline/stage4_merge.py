@@ -169,52 +169,153 @@ Return JSON:
   "evidence": "cited|axiomatic"}}"""
 
 
-def load_stage3_clusters() -> list[dict]:
-    """Load clusters from Stage 3 checkpoint, including noise-preserved singletons.
+def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
+    """D2120: Load FBs from Stage 2, wrapping each as a single-FB cluster.
 
-    D2093/D2081 fix: Noise points written to cluster_noise.jsonl by Stage 3
-    are loaded alongside main clusters. Previously orphaned — written but never read.
+    Stage 3 (HDBSCAN dedup) has been REMOVED — architecturally redundant in
+    cluster-before-extract (D2094). Each Stage 2 FB becomes its own ''cluster''
+    for downstream Stage 4 processing (classification + formatting).
+
+    Returns:
+        Tuple of (clusters: list[dict], principles_idx: dict[str, dict]).
+        Each cluster wraps a single FB: {cluster_id, principle_ids: [fb_id], ...}
     """
-    clusters = []
-
-    # Main clusters
-    if not STAGE3_CHECKPOINT.exists():
-        print("❌ Stage 3 checkpoint not found. Run stage3_cluster.py first.")
+    if not STAGE2_CHECKPOINT.exists():
+        print("❌ Stage 2 checkpoint not found. Run stage2_extract.py first.")
         sys.exit(1)
 
-    with open(STAGE3_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                clusters.append(json.loads(line))
+    clusters: list[dict] = []
+    principles_idx: dict[str, dict] = {}
 
-    # D2093/D2081: Load noise-preserved singletons
-    noise_path = STAGE3_CHECKPOINT.parent / "cluster_noise.jsonl"
-    if noise_path.exists():
-        noise_count = 0
-        with open(noise_path) as f:
+    with open(STAGE2_CHECKPOINT) as f:
+        for i, line in enumerate(f, 1):
+            line = line.strip()
+            if not line:
+                continue
+            fb = json.loads(line)
+
+            # Index by both fb_id and principle_id (v2.x/v3.0 compat)
+            fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
+            pid_val = fb.get("principle_id", "")
+            if fb_id_val:
+                principles_idx[fb_id_val] = fb
+            if pid_val and pid_val != fb_id_val:
+                principles_idx[pid_val] = fb
+
+            # Wrap as a single-FB cluster
+            is_convergent = fb.get("is_convergent", False)
+            clusters.append({
+                "cluster_id": fb_id_val or f"fb_{i}",
+                "principle_ids": [fb_id_val] if fb_id_val else [f"fb_{i}"],
+                "source_books": fb.get("source_books", []),
+                "is_convergent": is_convergent,
+                "is_noise": not is_convergent,
+                "source": "stage2_fb",  # Mark as directly from Stage 2
+            })
+
+    print(f"   📂 Loaded {len(clusters)} FBs from Stage 2 (Stage 3 bypassed per D2120)")
+    return clusters, principles_idx
+
+
+def dedup_fbs_by_cosine(
+    fbs: list[dict],
+    threshold: float = 0.92,
+    model: str = "bge-m3",
+) -> list[dict]:
+    """D2120: Lightweight FB dedup replacing removed Stage 3 HDBSCAN.
+
+    Embeds FB definitions via bge-m3, computes pairwise cosine similarity,
+    and removes near-duplicates. Keeps the FB with higher source diversity
+    (more source_books) as the winner.
+
+    Args:
+        fbs: List of FB dicts from Stage 2.
+        threshold: Cosine similarity above which FBs are considered duplicates.
+        model: Embedding model for semantic comparison.
+
+    Returns:
+        Deduplicated list of FBs (order preserved, duplicates removed).
+    """
+    from pipeline.ollama_embed import batch_embed
+    from pipeline.schema_accessor import fb_definition, fb_source_books
+
+    if len(fbs) < 2:
+        return fbs
+
+    definitions = [fb_definition(fb) for fb in fbs]
+    raw_embs = batch_embed(definitions, model=model)
+
+    # Convert to numpy, normalize
+    import numpy as np
+    embeddings = np.array([np.array(e, dtype=np.float32) for e in raw_embs if len(e) > 0])
+    if len(embeddings) < 2:
+        return fbs
+
+    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    embeddings = embeddings / norms
+
+    # Compute pairwise cosine similarity (upper triangle only)
+    similarity = embeddings @ embeddings.T
+    n = len(fbs)
+    removed: set[int] = set()
+    dupes_found = 0
+
+    for i in range(n):
+        if i in removed:
+            continue
+        for j in range(i + 1, n):
+            if j in removed:
+                continue
+            if similarity[i, j] >= threshold:
+                # Keep FB with more source diversity
+                books_i = len(fb_source_books(fbs[i]))
+                books_j = len(fb_source_books(fbs[j]))
+                if books_i >= books_j:
+                    removed.add(j)
+                else:
+                    removed.add(i)
+                    break  # i removed, stop checking j against i
+                dupes_found += 1
+
+    if dupes_found > 0:
+        kept = [fbs[i] for i in range(n) if i not in removed]
+        print(f"   🔍 Dedup: {dupes_found} near-duplicate FBs removed "
+              f"(cos ≥ {threshold}), {len(kept)} kept")
+        return kept
+
+    return fbs
+
+
+def load_stage3_clusters() -> list[dict]:
+    """DEPRECATED by D2120. Use load_stage2_fbs_via_clusters() instead.
+
+    Kept as compatibility shim that falls back to the old Stage 3 checkpoint
+    if it exists, otherwise wraps Stage 2 FBs.
+    """
+    # Try old Stage 3 checkpoint first (backward compat)
+    if STAGE3_CHECKPOINT.exists():
+        print("   📂 Loading from Stage 3 checkpoint (legacy path)")
+        clusters = []
+        with open(STAGE3_CHECKPOINT) as f:
             for line in f:
                 line = line.strip()
                 if line:
-                    entry = json.loads(line)
-                    # Convert noise entry to cluster-like format for downstream processing
-                    entry["is_noise"] = True
-                    entry["is_convergent"] = False
-                    clusters.append(entry)
-                    noise_count += 1
-        if noise_count > 0:
-            print(f"   🔈 Loaded {noise_count} noise-preserved singletons from cluster_noise.jsonl")
+                    clusters.append(json.loads(line))
+        return clusters
 
+    # D2120: Wrap Stage 2 FBs as clusters
+    clusters, _ = load_stage2_fbs_via_clusters()
     return clusters
 
 
 def load_stage2_principles() -> dict[str, dict]:
-    """Load principles from Stage 2, indexed by principle_id."""
+    """Load principles from Stage 2, indexed by principle_id and fb_id (v2/v3 compat)."""
     if not STAGE2_CHECKPOINT.exists():
         print("❌ Stage 2 checkpoint not found.")
         sys.exit(1)
 
-    principles = {}
+    principles: dict[str, dict] = {}
     with open(STAGE2_CHECKPOINT) as f:
         for line in f:
             line = line.strip()
@@ -344,7 +445,26 @@ def run_stage4(cluster_ids: list[int] = None):
             print(f"❌ No clusters found with IDs: {cluster_ids}")
             sys.exit(1)
 
-    print(f"🧩 Stage 4: Merge + Classify — {len(clusters)} clusters")
+    # D2120: Pre-merge lightweight dedup (replaces removed Stage 3 HDBSCAN)
+    if len(clusters) > 1:
+        cluster_fbs = []
+        for c in clusters:
+            for pid in c.get("principle_ids", []):
+                if pid in principles_idx:
+                    cluster_fbs.append(principles_idx[pid])
+        if len(cluster_fbs) > 1:
+            deduped_fbs = dedup_fbs_by_cosine(cluster_fbs, threshold=0.92)
+            # Rebuild clusters from deduped list
+            valid_ids = {
+                p.get("fb_id") or p.get("principle_id", "")
+                for p in deduped_fbs
+            }
+            clusters = [
+                c for c in clusters
+                if any(pid in valid_ids for pid in c.get("principle_ids", []))
+            ]
+
+    print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters")
     print(f"   Model: {VERIFY_MODEL} | temp=0.0 | SALSA classify")
     print(f"{'='*60}")
 

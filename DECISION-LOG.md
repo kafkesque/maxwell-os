@@ -1863,3 +1863,58 @@ Then evaluate Qwen3-Embedding on real data before making it primary.
 **Category:** GOV — Governance  
 **State:** ACTIVE
 **See:** governance/buglog.md (BUG-053, BUG-054), MASTER-TASK-REGISTER.md (H2, H3)
+
+---
+
+## D2120 — Phase 0 Refactor: Ultimate Architecture Before Scale (2026-07-26)
+
+**Context:** Comprehensive cross-examination of all 211 decisions, 54 bugs, feed.opml research (D2118), and pipeline code. Senior RAG engineer assessment identified 6 critical fixes that must be implemented BEFORE any feature work or scale-up.
+
+**Decision:** Execute 6-item Phase 0 refactor (~250 net LOC):
+
+| # | Item | LOC | Rationale |
+|---|------|-----|-----------|
+| P0.1 | `pipeline/schema_accessor.py` | +50 | Typed accessor functions eliminate v2/v3 field fragmentation across all stages |
+| P0.2 | `pipeline/runner.py` (D2061) | +290 | Single entry point, resume, progress, error recovery. Highest-leverage missing infrastructure. |
+| P0.3 | FAISS R-NN clustering (stage1_5) | +30 | Replace transitive union-find with reciprocal nearest neighbors. Fixes BUG-049 root cause. |
+| P0.4 | Remove Stage 3 + Stage 4 lightweight dedup | -338/+40 | Stage 3 (HDBSCAN) is structurally redundant in cluster-before-extract. Replace with cosine+MinHash dedup in Stage 4. Pipeline: 9→8 stages. |
+| P0.5 | Two-tier smoke (`just smoke-plumbing`, `just smoke`) | +60 | Plumbing smoke <30s (no LLM), fast smoke <2min (Phi-4-mini). Catches 80% of bugs with zero LLM wait. |
+| P0.6 | `pipeline/parallel.py` | +80 | Book-level subprocess parallelism for Stage 0-1. Practical workaround for DELEGATE-001. ~4x speedup. |
+
+**Net impact:** ~550 LOC added, ~300 removed. **~250 net LOC.**
+**Pipeline stages:** 9 → 8 (Stage 3 removed)
+**Smoke test:** From ~5min → <30s plumbing / <2min fast
+
+**Architecture decisions embedded in this plan:**
+- **FAISS stays** (not USearch) — battle-tested on 19,438 FBs in old project. USearch benchmark deferred to Phase 1.
+- **Union-find replaced by R-NN** — fixes transitive merge (BUG-049) without changing FAISS backbone
+- **Schema accessors, not Pydantic migration** — lighter, preserves checkpoint compatibility
+- **Subprocess, not delegates** — works today, no Goose framework dependency
+- **PipelineRunner, not Dagster/Prefect** — <300 LOC, zero new dependencies
+- **Two-tier smoke** — plumbing (no LLM) + fast (Phi-4-mini) for developer velocity
+
+**Phase 1 (next week) after Phase 0 verified:**
+- USearch benchmark (already installed v2.26.0)
+- TurboVec wire-up (already installed v0.8.0)
+- Golden set calibration (D2103)
+- FB relationship edges in Stage 4 (foundation for LightRAG)
+
+**Phase 2 (within month):**
+- LightRAG graph overlay
+- Cognee/Supermemory eval for Layer 2 agent memory
+- IBM Agentic KG implementation
+
+**Rejected alternatives:**
+| Rejected | Why |
+|----------|-----|
+| USearch for FAISS (now) | FAISS proven on 19,438 FBs. Benchmark first, don't swap blind. |
+| Full Pydantic migration | Breaks existing checkpoints. Schema accessors are sufficient. |
+| Dagster/Prefect orchestration | Heavy. PipelineRunner <300 LOC. |
+| Fix delegate system | Goose framework issue. Can't fix from Maxwell. Use subprocess. |
+| Keep Stage 3 | HDBSCAN is overkill for second-level dedup. Lightweight dedup in Stage 4 is sufficient. |
+
+**Status:** ✅ DECISION RECORDED. Implementation begins immediately after governance update.
+
+**Category:** GOV — Governance
+**State:** ACTIVE
+**See:** D2061 (PipelineRunner spec), D2094 (cluster-before-extract), D2118 (feed research), BUG-049 (FAISS threshold)

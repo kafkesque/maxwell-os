@@ -1,9 +1,9 @@
-# Maxwell OS v2.0 — justfile
+# Maxwell OS v3.0 — justfile
 # Authority: CONSTITUTION.md §6
 
 # ── Health ───────────────────────────────────────────────────
 health:
-    @echo "=== Maxwell OS v2.0 Health Check ==="
+    @echo "=== Maxwell OS v3.0 Health Check ==="
     python3 pipeline/status.py
 
 preflight:

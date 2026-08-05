@@ -20,6 +20,9 @@ import tempfile
 import time
 from pathlib import Path
 
+# Project root — required when script is invoked directly (C12: no hardcoded paths)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import numpy as np
 
 from pipeline.memory_guard import check_memory
@@ -81,7 +84,7 @@ def _check_embedding_throughput() -> bool:
             print("   ❌ Embedding returned no vectors")
             return False
 
-        expected_dim = 384  # bge-small-en-v1.5
+        expected_dim = 512  # bge-m3 Matryoshka truncated (D2181)
         actual_dim = embeddings.shape[1] if hasattr(embeddings, 'shape') else len(embeddings[0])
         if actual_dim != expected_dim:
             print(f"   ❌ Dimension mismatch: {actual_dim} != {expected_dim}")
@@ -105,7 +108,7 @@ def _check_faiss_construction() -> bool:
     try:
         import faiss
 
-        dim = 384
+        dim = 512  # bge-m3 Matryoshka truncated (D2181, was 384 bge-small)
         n_vectors = 1000
         np.random.seed(42)
         vectors = np.random.randn(n_vectors, dim).astype(np.float32)

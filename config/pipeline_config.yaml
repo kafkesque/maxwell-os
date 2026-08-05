@@ -75,7 +75,7 @@ pipeline:
   chunk_overlap_words: 50
   min_chunk_words: 10                        # T1.1: minimum words to keep a chunk (P0.4)
   enhance_min_header_gap_chars: 3000         # T1.2: min chars between auto-inserted headers
-  hdbscan_min_cluster_size: 15
+  # hdbscan_min_cluster_size: REMOVED (D2120/D2183 — Stage 3 dead, ghost config purged)
   borp_min_sources: 2
   intent_top_k_ratio: 0.3
   intent_threshold: 0.35

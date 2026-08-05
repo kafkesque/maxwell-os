@@ -589,6 +589,10 @@ class FB(StampedRecord):
         default=None,
         description="Label validation errors. None if classification was clean."
     )
+    classification_status: str = Field(
+        default="CLEAN",
+        description="Classification outcome: CLEAN (canonical match), FALLBACK (synonym mapped), FAILED (quarantined)."
+    )
 
     @field_validator("domains")
     @classmethod

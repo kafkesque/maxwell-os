@@ -34,9 +34,8 @@ if TYPE_CHECKING:
     pass
 
 from pipeline.io_guard import safe_write
-from pipeline.pipeline_paths import PROJECT_ROOT
+from pipeline.pipeline_paths import DB_PATH, PROJECT_ROOT
 
-DB_PATH: Path = PROJECT_ROOT / "knowledge pipeline" / "maxwell.db"
 FEEDBACK_TABLE: str = "fb_feedback"
 
 # ── Thresholds (from config would be ideal per C12, but feedback is new) ──

@@ -255,11 +255,19 @@ def run_stage(
                 timeout=30,
             )
             if preflight.returncode != 0:
-                print(f"   ⚠️  OMLX watchdog warning (continuing): {preflight.stderr.decode()[-200:]}")
+                if stage.get("llm_bound"):
+                    print(f"   ❌ OMLX DOWN — LLM-bound stage {stage_id} cannot proceed")
+                    print(f"   {preflight.stderr.decode()[-200:]}")
+                    sys.exit(1)
+                else:
+                    print(f"   ⚠️  OMLX watchdog warning (continuing — non-LLM stage): {preflight.stderr.decode()[-200:]}")
             else:
                 print(f"   ✅ OMLX healthy")
         except Exception as e:
-            print(f"   ⚠️  Preflight check failed ({e}) — continuing anyway")
+            if stage.get("llm_bound"):
+                print(f"   ❌ Preflight check failed for LLM-bound stage {stage_id} ({e})")
+                sys.exit(1)
+            print(f"   ⚠️  Preflight check failed ({e}) — continuing (non-LLM stage)")
 
     # Run stage
     label = f"[Stage {stage_id}] {stage['name']}"

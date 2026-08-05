@@ -100,9 +100,9 @@ TAXONOMY_VERSION=_CFG["pipeline"]["taxonomy_version"]; MAX_DOMAINS_PER_FB=_CFG["
 CHUNK_SIZE_WORDS=_CFG["pipeline"]["chunk_size_words"]; CHUNK_OVERLAP_WORDS=_CFG["pipeline"]["chunk_overlap_words"]
 MIN_CHUNK_WORDS=int(_CFG.get("pipeline", {}).get("min_chunk_words", 10))              # T1.1: preserve short aphoristic principles
 ENHANCE_MIN_HEADER_GAP_CHARS=int(_CFG.get("pipeline", {}).get("enhance_min_header_gap_chars", 3000))  # T1.2: min chars between headers
-# D2177: HDBSCAN removed (D2120). Use safe default to prevent KeyError on clean checkout.
-_HDBSCAN_DEFAULT = 15
-HDBSCAN_MIN_CLUSTER_SIZE=_CFG.get("pipeline", {}).get("hdbscan_min_cluster_size", _HDBSCAN_DEFAULT)
+# D2183: HDBSCAN ghost config removed (D2120/D2183). Retained as 0 for backward compat only.
+# No pipeline stage imports this — safe to remove entirely in v3.2.
+HDBSCAN_MIN_CLUSTER_SIZE: int = 0  # was _CFG.get("pipeline", {}).get("hdbscan_min_cluster_size", 15)
 BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))

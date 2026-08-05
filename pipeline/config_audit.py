@@ -68,6 +68,30 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "e2e.min_pass_rate":                ("pipeline.e2e_test", "E2E_MIN_PASS_RATE", "float"),
     "e2e.min_fbs":                      ("pipeline.e2e_test", "E2E_MIN_FBS", "int"),
     "e2e.convergent_ratio":             ("pipeline.e2e_test", "E2E_CONVERGENT_RATIO", "float"),
+    # ── Pipeline tuning (T1.4: threshold/flag registration) ──
+    "pipeline.chunk_size_words":        ("pipeline.pipeline_paths", "CHUNK_SIZE_WORDS", "int"),
+    "pipeline.chunk_overlap_words":     ("pipeline.pipeline_paths", "CHUNK_OVERLAP_WORDS", "int"),
+    "pipeline.intent_threshold":        ("pipeline.pipeline_paths", "INTENT_THRESHOLD", "float"),
+    "pipeline.intent_top_k_ratio":      ("pipeline.pipeline_paths", "INTENT_TOP_K_RATIO", "float"),
+    "pipeline.borp_min_sources":        ("pipeline.pipeline_paths", "BORP_MIN_SOURCES", "int"),
+    # ── Stage 1.5 tuning ──
+    "stage1_5.min_cluster_size":        ("pipeline.pipeline_paths", "S15_MIN_CLUSTER_SIZE", "int"),
+    "stage1_5.max_cluster_size":        ("pipeline.pipeline_paths", "S15_MAX_CLUSTER_SIZE", "int"),
+    "stage1_5.neighbor_k":              ("pipeline.pipeline_paths", "S15_NEIGHBOR_K", "int"),
+    # ── Stage 2 tuning ──
+    "stage2.batch_size":                ("pipeline.pipeline_paths", "S2_BATCH_SIZE", "int"),
+    "stage2.evidence_tracking":         ("pipeline.pipeline_paths", "S2_EVIDENCE_TRACKING", "bool"),
+    # ── Stage 4 tuning ──
+    "stage4.max_principles_per_cluster": ("pipeline.pipeline_paths", "S4_MAX_PRINCIPLES", "int"),
+    # ── Stage 5 tuning ──
+    "stage5.factscore_enabled":         ("pipeline.pipeline_paths", "S5_FACTSCORE_ENABLED", "bool"),
+    # ── Stage 6 tuning ──
+    "stage6.commit_non_fb_types":       ("pipeline.pipeline_paths", "S6_COMMIT_NON_FB", "bool"),
+    "stage6.okf_export_enabled":        ("pipeline.pipeline_paths", "S6_OKF_EXPORT_ENABLED", "bool"),
+    # ── Smoke test tuning ──
+    "smoke.plumbing.skip_llm":          ("pipeline.pipeline_paths", "SMOKE_PLUMBING_SKIP_LLM", "bool"),
+    "smoke.fast.skip_gemma_deep_check": ("pipeline.pipeline_paths", "SMOKE_FAST_SKIP_GEMMA", "bool"),
+    "smoke.fast.max_books":             ("pipeline.pipeline_paths", "SMOKE_MAX_BOOKS", "int"),
 }
 
 # ── Acknowledged hardcoded values (resilient fallbacks in except blocks) ──

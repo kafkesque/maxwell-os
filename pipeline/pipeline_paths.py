@@ -149,6 +149,27 @@ S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "MoritzLa
 S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119
 S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.8))  # D2155: configurable
 S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.5))  # D2155: configurable
+
+# ── NLI threshold sanity check (D2185: T1.4 — catch misconfigured thresholds) ──
+def _validate_nli_thresholds():
+    """Warn if NLI thresholds are misordered or out of range."""
+    issues = []
+    for name, val in [("nli_marginal", S5_NLI_MARGINAL_THRESHOLD),
+                       ("nli_entailment", S5_NLI_ENTAILMENT_THRESHOLD),
+                       ("nli_pass", S5_NLI_PASS_THRESHOLD)]:
+        if not (0 <= val <= 1):
+            issues.append(f"  {name}={val} is out of range [0,1]")
+    if S5_NLI_MARGINAL_THRESHOLD >= S5_NLI_ENTAILMENT_THRESHOLD:
+        issues.append(f"  marginal ({S5_NLI_MARGINAL_THRESHOLD}) >= entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) — should be lower")
+    if S5_NLI_ENTAILMENT_THRESHOLD >= S5_NLI_PASS_THRESHOLD:
+        issues.append(f"  entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) >= pass ({S5_NLI_PASS_THRESHOLD}) — should be lower")
+    if issues:
+        import sys
+        print("⚠️  NLI threshold misconfiguration:", file=sys.stderr)
+        for issue in issues:
+            print(issue, file=sys.stderr)
+        print(f"   Expected: 0 ≤ marginal({S5_NLI_MARGINAL_THRESHOLD}) < entailment({S5_NLI_ENTAILMENT_THRESHOLD}) < pass({S5_NLI_PASS_THRESHOLD}) ≤ 1", file=sys.stderr)
+_validate_nli_thresholds()
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
 
 # ── Coverage settings (T0.3) ─────────────────────────────────────────

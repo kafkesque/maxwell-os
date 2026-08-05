@@ -228,7 +228,8 @@ def task2_llm_stubborn(dry_run: bool = True, max_books: int = 0):
     for md_path in MD_BASE.rglob("*.md"):
         try:
             text = md_path.read_text(errors='replace')
-        except:
+        except Exception as e:
+            print(f"    ⚠️  Cannot read {md_path.name}: {e}")
             continue
         stats = analyze_headers(text)
         if stats['density'] < 1.0:

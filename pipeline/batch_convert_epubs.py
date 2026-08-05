@@ -154,7 +154,8 @@ def main():
         # Read existing MD stats
         try:
             old_text = md_path.read_text(errors='replace')
-        except:
+        except Exception as e:
+            print(f"    ⚠️  Cannot read {md_path.name}: {e}")
             old_text = ""
         before = count_headers(old_text)
         

@@ -1,7 +1,81 @@
 # D2185 — Master Task Register & Cross-Review Aggregation (2026-08-05 20:42)
 
 > **Aggregated from:** 14 LLM reviews (deepseek eval7/8, qwen eval8/9/10/11, chatgpt eval8/9/10, kimi eval9/10/11, round2), D2183-D2184 audits, DECISION-LOG, buglog.
-> **Remote parity:** CONFIRMED at be89bdb. Local = remote = GitHub main.
+> **Remote parity:** CONFIRMED at be89bdb → **7ab6387** (local = remote = GitHub main).
+
+---
+
+## ⚡ STATUS UPDATE — 2026-08-05 20:50 (Post-D2185 Audit)
+
+### P0/P1 Completion Status
+
+| ID | Task | Status | Evidence |
+|----|------|--------|----------|
+| **P0-1** | BORP canonical source_id | ✅ **DONE** (D2185) | `fb_source_ids()` in schema_accessor.py; check_borp uses it |
+| **P0-2** | Run S1.3 + S1.5 with bge-m3 512d | ⏳ **PENDING — S1.5 BLOCKER** | S1.3 DONE (checkpoint: completed=true, 323,294). S1.5 latest/ EMPTY; old log = **bge-small 384d (STALE)** |
+| **P0-3** | Vector embedding completeness | ✅ **DONE** (D2185) | stage6 prints Vector: READY/DEGRADED vs fbs count |
+| **P0-4** | vec_fbs ↔ fbs rowid reconciliation | ✅ **DONE** (D2185) | Orphaned-vector detection at commit |
+| **P1-1** | related_fbs graph traversal | ❌ **NOT DONE — BLOCKED** | retrieve.py: 0 refs to related_fbs; requires S2-S6 DB |
+| **P1-2** | Feedback loop wiring | ⚠️ **PARTIAL — unblocked** | feedback.py has record_feedback + usage_count UPDATE; retrieve.py does NOT call them (wiring only) |
+| **P1-3** | OMLX circuit breaker | ⚠️ **PARTIAL — unblocked** | Retry loop exists (MAX_RETRIES, timeout); NO circuit breaker, NO provider failover |
+| **P1-4** | Golden set 7 → 200+ | ❌ **NOT DONE — unblocked** | config/golden/stage2_fewshot_convergent.yaml = 465-line few-shot prompt, NOT annotated clusters |
+| **P1-5** | NLI calibration dataset | ❌ **NOT DONE — unblocked** | Only rubric_v2_calibrated.md; no 100E/100N/100C dataset |
+
+### P1 Blocking Analysis (vs S1.3-S1.5)
+
+| Task | Blocked by S1.5? | Reason |
+|------|------------------|--------|
+| P1-1 related_fbs traversal | 🔴 **BLOCKED** | Needs FBs with related_fbs edges in DB (S2→S4→S6) |
+| P1-2 feedback loop wiring | 🟢 **NOT BLOCKED** | Plumbing exists in feedback.py; wiring retrieve.py→record usage can proceed now (validation needs data) |
+| P1-3 OMLX circuit breaker | 🟢 **NOT BLOCKED** | Pure infrastructure — zero data dependency |
+| P1-4 golden set | 🟢 **NOT BLOCKED** | Annotation task — can proceed on existing clusters |
+| P1-5 NLI calibration | 🟢 **NOT BLOCKED** | Dataset construction can use source text now; threshold validation needs FBs |
+
+**Key finding:** Only **P1-1 is hard-blocked** by S1.5. P1-2/3/4/5 are all unblocked and actionable immediately.
+
+### 🔴 NEW CRITICAL FINDING — S1.5 Old Run is STALE
+
+The `s15_run.log` proves the only S1.5 run used **bge-small-en-v1.5 (384d)**, NOT bge-m3 512d:
+
+```
+🧠 Embedding 323226 segments via BAAI/bge-small-en-v1.5 (MPS, 384d)...
+```
+
+Current config requires `embed_model_hf: BAAI/bge-m3`, `embed_dim: 512`. The `latest/` dir is **empty** (output superseded). **S1.5 MUST be re-run with bge-m3 512d before S2-S6.** Embed time ≈ 5,537s (92 min) for 323K segments on MPS.
+
+### Blindspot Fix Status (B-1 → B-13)
+
+| ID | Blindspot | Status |
+|----|-----------|--------|
+| B-1 | Remote-local drift | ✅ MITIGATED — remote=local at 7ab6387; CI badge (P3-9) still pending |
+| B-2 | DECISION-LOG rot | ✅ MITIGATED — D2183-D2185 log real fixes; pre-commit hook (P3-10) pending |
+| B-3 | Reviewers audit URLs | ✅ MITIGATED — handoffs include git rev-parse |
+| B-4 | qwen eval11 stale cache | ✅ DETECTED — verified remote=local before accepting claims |
+| B-5 | Component vs state-transition audit | ✅ FIXED — D2184 monotonic trust methodology |
+| B-6 | grep can't detect FAILED→PASS | ✅ FIXED — D2184 classification_status persistence |
+| B-7 | Code correctness ≠ agentic efficacy | ⚠️ ACKNOWLEDGED — roadmap P2-1 (agent runtime) |
+| B-8 | BORP filename identity | ✅ FIXED — P0-1 (D2185) |
+| B-9 | related_fbs unused in retrieval | ❌ **OPEN** — P1-1 (blocked by data) |
+| B-10 | Vector fail-open | ✅ FIXED — P0-3 (D2185) |
+| B-11 | OMLX single-point failure | ⚠️ PARTIAL — retry exists, no circuit breaker (P1-3) |
+| B-12 | Static KB, no feedback loop | ⚠️ PARTIAL — plumbing exists, wiring pending (P1-2) |
+| B-13 | schema_version schizophrenia | ✅ FIXED — D2184 |
+
+**Blindspot score: 9/13 fixed · 2 partial (B-11, B-12) · 1 open (B-9) · 1 acknowledged (B-7)**
+
+### Pipeline Execution Status (Post-D2185 verification)
+
+| Stage | Status | Evidence |
+|-------|--------|----------|
+| S0 | ✅ DONE | 922 MDs |
+| S1 | ✅ DONE | 323,226 segments |
+| S1.3 | ✅ DONE | checkpoint.jsonl: completed=true, total=323,294 |
+| S1.5 | ❌ **STALE** | Old run = bge-small 384d; latest/ EMPTY; needs bge-m3 512d |
+| S2-S6c | ❌ NOT RUN | Empty stage dirs |
+
+---
+
+## Original Register (Baseline)
 
 ---
 
@@ -11,12 +85,12 @@
 |-------|--------|-------|
 | S0 (convert) | ✅ DONE | 922 MDs from EPUB/PDF |
 | S1 (chunk) | ✅ DONE | 323,226 segments, SHA-256 dedup |
-| S1.3 (prefilter) | 🔴 NEEDS FIRST RUN | Regex pre-filter — fast, no embeddings |
-| S1.5 (embed+cluster) | 🔴 NEEDS FIRST RUN | bge-m3 512d Matryoshka → FAISS R-NN → Louvain |
+| S1.3 (prefilter) | ✅ **DONE** (2026-08-05 verify) | checkpoint.jsonl: completed=true, 323,294 |
+| S1.5 (embed+cluster) | ❌ **STALE — RE-RUN REQUIRED** | Only run = bge-small 384d (log evidence). latest/ EMPTY. Must run bge-m3 512d (~92 min) |
 | S2 (extract) | 🔴 NEEDS FIRST RUN | Qwen3.6 → 1:N principles (Golden set prompt) |
 | S4 (merge+classify) | 🔴 NEEDS FIRST RUN | Two-stage classification + CRIBS |
-| S5 (verify) | 🔴 NEEDS FIRST RUN | ModernBERT NLI → Gemma-4-E4B → BORP |
-| S6 (commit) | 🔴 NEEDS FIRST RUN | SQLite 49-col + FTS5 + sqlite-vec + Parquet |
+| S5 (verify) | 🔴 NEEDS FIRST RUN | ModernBERT NLI → Gemma-4-E4B → BORP (canonical source_ids) |
+| S6 (commit) | 🔴 NEEDS FIRST RUN | SQLite 49-col + FTS5 + sqlite-vec + Parquet + vector completeness |
 | S6b (anytype) | 🔴 NEEDS FIRST RUN | Anytype domain subfolders |
 | S6c (obsidian) | 🔴 NEEDS FIRST RUN | Obsidian Markdown vault |
 
@@ -27,10 +101,11 @@
 ## S0-S1.5 Re-Run Analysis
 
 **Decision: S0 and S1 do NOT need re-run.** Chunks are embedding-model agnostic.
-**S1.5 MUST be run fresh** with bge-m3 512d Matryoshka (config already aligned).
-**S1.3 is a fast regex pass** — run it fresh (~minutes).
+**S1.3 is DONE** (verified 2026-08-05: checkpoint completed=true, 323,294 segments).
+**S1.5 MUST be RE-RUN with bge-m3 512d** — the only existing run used bge-small 384d (log evidence: `Embedding 323226 segments via BAAI/bge-small-en-v1.5 (MPS, 384d)`). Config now requires `embed_model_hf: BAAI/bge-m3`, `embed_dim: 512`. The latest/ dir is empty (superseded).
 
-**Embedding time estimate:** 323K segments × bge-m3 on MPS ≈ 106 minutes (per D2131 benchmarks).
+**Embedding time estimate:** 323K segments × bge-m3 on MPS ≈ 5,537s (92 min, per D2131 benchmarks).
+**CRITICAL:** Do NOT start S2-S6 until S1.5 bge-m3 run completes — downstream FB embeddings/edges depend on this vector space.
 
 ---
 
@@ -158,22 +233,43 @@
 
 ---
 
-## The Highest Priority — What to Do Next
+## The Highest Priority — What to Do Next (UPDATED 20:50)
 
-### Immediate (Tonight)
-1. **P0-1: Fix BORP canonical source_id** (2h) — last remaining P0
-2. **P0-3: Stage 6 vector completeness monitoring** (1h)
-3. **P0-4: vec_fbs rowid reconciliation** (1h)
-
-### Tomorrow
-4. **P0-2: Run S1.3 + S1.5** with bge-m3 512d (start it, runs unattended ~2h)
-5. **P1-1: related_fbs graph traversal in retrieval** (1d)
+### Immediate (Tonight — all unblocked)
+1. **P0-2: START S1.5 bge-m3 512d run** (92 min unattended) — unblocks P1-1 and all downstream
+2. **P1-3: OMLX circuit breaker** (1d) — pure infra, unblocked
+3. **P1-2: Wire feedback loop** (retrieve.py → record usage_count) (2h) — plumbing ready in feedback.py
 
 ### This Week
-6. **P1-4: Golden set expansion** (3d) — prerequisite for ALL algorithm tuning
-7. **P1-3: OMLX circuit breaker** (1d)
+4. **P1-4: Golden set expansion** (3d) — prerequisite for ALL algorithm tuning, unblocked
+5. **P1-5: NLI calibration dataset** (1d) — build from source text, unblocked
+
+### Blocked (waiting on S1.5→S6 data)
+6. **P1-1: related_fbs graph traversal** (1d) — BLOCKED until DB has FBs with edges
+7. **P1-2 validation**: end-to-end feedback test — needs committed FBs
+
+---
+
+## ✅ DONE in D2183-D2185 (do not re-do)
+
+| ID | Task | Round |
+|----|------|-------|
+| — | feedback.py DB_PATH → pipeline_paths | D2183 |
+| — | Ghost hdbscan config removed | D2183 |
+| — | FB schema classification_status | D2183 |
+| — | Runner preflight fails hard (llm_bound) | D2183 |
+| — | classification_status persisted in SQLite | D2184 |
+| — | Stage 5 FAILED → QUARANTINE monotonic trust | D2184 |
+| — | Stage 0.5 content-hash cache scoping | D2184 |
+| — | Runner resume + stage0.5 run-scoped | D2184 |
+| — | schema defaults 2.0→3.0 | D2184 |
+| — | .env.example de-personalized | D2184 |
+| — | OMLX binary dynamic resolution | D2184 |
+| — | BORP canonical source_id (P0-1) | D2185 |
+| — | Vector completeness + reconciliation (P0-3, P0-4) | D2185 |
 
 ---
 
 *Aggregated from 14 LLM reviews, 2 forensic audits, DECISION-LOG, and buglog.*
-*Local = Remote = GitHub main at be89bdb. All claims verified against live code.*
+*Local = Remote = GitHub main at 7ab6387. All claims verified against live code.*
+*Status update: 2026-08-05 20:50 — P0/P1 statuses, blocking analysis, blindspot registry refreshed.*

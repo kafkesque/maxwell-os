@@ -103,6 +103,19 @@ def fb_source_books(fb: dict[str, Any]) -> list[str]:
     return []
 
 
+def fb_source_ids(fb: dict[str, Any]) -> list[str]:
+    """D2185: Canonical source_ids (SHA-256 author|title) for BORP/epistemic counting.
+    
+    Prefer source_ids (populated by S2 from S1.5 canonical hashes).
+    Fall back to source_books (filenames) for v2.x backward compatibility.
+    """
+    source_ids = fb.get("source_ids", [])
+    if isinstance(source_ids, list) and source_ids:
+        return [str(s) for s in source_ids]
+    # Fallback: derive from source_books (less accurate — filenames, not canonical)
+    return fb_source_books(fb)
+
+
 def fb_domains(fb: dict[str, Any]) -> list[str]:
     """v3.0: domains list | v2.x: domain string or domains list."""
     domains = fb.get("domains", [])

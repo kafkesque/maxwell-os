@@ -467,6 +467,32 @@ def run_stage6(export_only: bool = False):
         count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
         print(f"  ✅ SQLite: {inserted} inserted, {failed} failed, {count} total rows")
 
+        # ── D2185: Vector embedding completeness check (R-016) ──
+        vec_count = 0
+        try:
+            vec_count = conn.execute("SELECT COUNT(*) FROM vec_fbs").fetchone()[0]
+        except Exception:
+            pass
+        if vec_count == 0:
+            print(f"  ⚠️  Vector: DEGRADED — 0 embeddings (sqlite-vec may be unavailable)")
+        elif vec_count < count:
+            pct = round(vec_count / count * 100, 1)
+            print(f"  ⚠️  Vector: DEGRADED {vec_count}/{count} ({pct}%)")
+        else:
+            print(f"  ✅ Vector: READY {vec_count}/{count}")
+
+        # ── D2185: vec_fbs ↔ fbs rowid reconciliation (R-017) ──
+        try:
+            orphaned = conn.execute("""
+                SELECT COUNT(*) FROM vec_fbs v
+                LEFT JOIN fbs f ON v.rowid = f.rowid
+                WHERE f.rowid IS NULL
+            """).fetchone()[0]
+            if orphaned > 0:
+                print(f"  ⚠️  Orphaned vector rows: {orphaned} (run reconcile)")
+        except Exception:
+            pass
+
         # ── D2066: Dynamic taxonomy post-commit (BEFORE conn.close) ──
         try:
             from pipeline.taxonomy_manager import run_post_commit_taxonomy

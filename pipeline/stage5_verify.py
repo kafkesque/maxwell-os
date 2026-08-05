@@ -50,6 +50,7 @@ from pipeline.schema_accessor import (
     fb_mechanism,
     fb_name,
     fb_source_books,
+    fb_source_ids,  # D2185: canonical SHA-256 author|title source_ids for BORP
     fb_source_texts,
     fb_source_texts_shown,
 )
@@ -300,11 +301,13 @@ def check_borp(fb: dict, bypass_types: list[str] = S5_BORP_BYPASS_TYPES) -> tupl
     if content_type in bypass_types:
         return True, 1.0, f"BORP bypassed (type={content_type})"
 
-    source_books: list[str] = fb_source_books(fb)
+    source_books: list[str] = fb_source_ids(fb)  # D2185: canonical SHA-256 author|title (was fb_source_books)
+    if not source_books:
+        source_books = fb_source_books(fb)  # fallback: filenames (v2.x backward compat)
     distinct: int = len(set(source_books))
     score = min(distinct / BORP_MIN_SOURCES, 1.0)
     passed = distinct >= BORP_MIN_SOURCES
-    detail = f"{distinct} distinct sources (need ≥{BORP_MIN_SOURCES})"
+    detail = f"{distinct} distinct canonical sources (need ≥{BORP_MIN_SOURCES})"
     return passed, score, detail
 
 

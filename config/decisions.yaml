@@ -1290,17 +1290,37 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2190
+  category: INF
+  state: ACTIVE
+  description: "Embedding backend switched MPS→Ollama bge-m3. MPS deadlocked at batch ~19-24 on large corpus (3 runs). Ollama uses MLX (Apple native), stable, 15-18 seg/s, ~6h for 323K. bge-m3 512d Matryoshka (92% neighbor overlap) beats bge-small 384d (MTEB 58.3 vs 54.2). Unified semantic space with S4 (D2181)."
+  champion: goose
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  - pipeline/coverage_check.py
+  created: '2026-08-05'
+- id: D2190a
+  category: PERF
+  state: ACTIVE
+  description: "embed_batch_size 128→64 for Ollama parallelism (4 workers, 5051 batches). embed_chunk_size: 20000 segments per chunk (reduces memory). documented in D2190-embedding-model-selection.md"
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/stage1_5_embed_cluster.py
+  created: '2026-08-05'
 summary:
-  total: 179
+  total: 181
   proposed: 0
   draft: 0
-  active: 147
+  active: 149
   stale: 0
   superseded: 6
   archived: 5
   rejected: 5
   by_category:
-    INF: 107
+    INF: 109
     QLT: 20
     GOV: 11
     RES: 4
@@ -1309,7 +1329,7 @@ summary:
     VAL: 2
     CLS: 7
     STR: 1
-    PERF: 2
+    PERF: 3
     BUGFIX: 10
     CFG: 4
     ARCH: 4
@@ -1325,7 +1345,7 @@ by_category:
   VAL: 2
   CLS: 7
   STR: 1
-  PERF: 2
+  PERF: 3
   BUGFIX: 10
   CFG: 4
   ARCH: 4

@@ -3038,7 +3038,39 @@ See: governance/D2185-master-task-register.md
 3. Before S2: minimal golden set validation/expansion (P1-4, few hours)
 4. Then S2 → S4 → S5 (after P1-5 dataset) → S6
 
-### D2188 — P1-2 Implemented: Feedback Loop Wiring (2026-08-05 21:16)
+### D2190 — Embedding Backend: MPS → Ollama bge-m3 (2026-08-05 22:30)
+
+✅ S1.5 embed_backend switched from MPS to Ollama.
+
+ROOT CAUSE (3 failed MPS runs):
+- bge-m3 on PyTorch MPS reproducibly deadlocks at ~batch 19-24 of large-corpus encoding
+- NOT pathological text (700 stall-region segments encode fine in isolation)
+- NOT memory (stalled at 35GB free)
+- Likely MPS driver/SentenceTransformer interaction with full-corpus tokenization
+
+FIX:
+- Switched embed_backend mps → ollama (bge-m3 already loaded in Ollama, 1.2GB)
+- Ollama uses MLX (Apple native) not PyTorch MPS — different GPU stack, stable
+- Throughput: 15-18 seg/s → ~6h for 323K segments
+- RSS stable at 2.3GB, free RAM 45GB (no leaks)
+- MPS path retained as fallback (chunked + micro-batches), Ollama is default
+
+EMBEDDING QUALITY:
+- bge-m3 native 1024d → Matryoshka truncation to 512d (92% neighbor overlap per D2118)
+- MTEB Retrieval: bge-m3(512d) = 58.3 vs bge-small(384d) = 54.2
+- bge-m3 supports 8192 tokens (vs bge-small 512), 100+ languages
+- Same model as S4 relationship edges (D2181 T1.2) — unified semantic space
+
+CONFIG UPDATES (all references):
+- pipeline_paths.py: S15_EMBED_BACKEND default "mps" → "ollama"
+- pipeline_config.yaml: embed_backend: ollama, comments updated
+- stage1_5_embed_cluster.py: docstring throughput corrected
+- coverage_check.py: comment updated
+
+⚠️  S1.5 is running standalone (not via runner.py) — will NOT auto-continue to S2.
+OMLX is stopped (brew service) — restart for S2+.
+
+See: governance/D2190-embedding-model-selection.md
 
 ✅ P1-2 DONE (was PARTIAL — plumbing existed, retrieve.py didn't call it)
 

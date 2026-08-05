@@ -24,7 +24,7 @@ try:
     from pipeline.pipeline_paths import S15_EMBED_MODEL_HF as _cfg_embed_model
     MODEL_NAME: str = _cfg_embed_model
 except ImportError:
-    MODEL_NAME: str = "BAAI/bge-m3"  # D2182: unified with S1.5/S4 (was bge-small)
+    MODEL_NAME: str = "BAAI/bge-m3"  # D2182: unified — was bge-small; now bge-m3 via Ollama (D2190)
 
 
 def load_segments():

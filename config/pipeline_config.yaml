@@ -101,10 +101,10 @@ stage1_5:
   neighbor_k: 50
   embed_model: bge-m3                           # D2181: unified with S4 (T1.2 Option A)
   embed_dim: 512                                # D2181: Matryoshka truncation (E7) — 92% neighbor overlap, 2× faster FAISS
-  embed_backend: ollama                        # D2190: Ollama HTTP (bge-m3) — avoids MPS hangs, 58-66 seg/s
+  embed_backend: ollama                        # D2190: Ollama HTTP (bge-m3) — stable, 58-66 seg/s, avoids MPS hang
   embed_model_hf: BAAI/bge-m3                   # D2181: unified model — same semantic space as S4 relationship edges
-  embed_chunk_size: 20000                       # D2189: segments per chunk (prevents MPS OOM on 323K batch)
-  embed_batch_size: 64                          # D2190: MPS forward-pass batch (halves peak workspace vs 128)
+  embed_chunk_size: 20000                       # D2189: segments per chunk (prevents OOM on large corpora)
+  embed_batch_size: 64                          # D2190: texts per Ollama HTTP request (4 workers × 5051 batches)
 stage1_3:
   min_len: 40
   cite_density: 0.6

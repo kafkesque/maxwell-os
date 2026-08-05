@@ -124,8 +124,8 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
 
     D2181: Unified to bge-m3 (T1.2 Option A) — same model as S4 relationship edges.
     Native 1024d → Matryoshka truncation to S15_EMBED_DIM (512d, E7).
-    MPS path: ~20-30 seg/s (bge-m3 ≈ 2× slower than bge-small but higher quality).
-    Ollama fallback: ~15-20 seg/s via HTTP.
+    Ollama backend (D2190): ~15-18 seg/s via HTTP (4 workers, 5051 batches).
+    MPS backend (unstable): ~4-6 seg/s, reproducibly deadlocks on bge-m3 + large corpus.
 
     D2189: Chunked processing — instead of tokenizing all 323K texts in one encode() call
     (which creates massive PyTorch tensors + MPS allocations ≈ 7-10GB), process in

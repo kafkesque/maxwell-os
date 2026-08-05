@@ -25,15 +25,18 @@ import json
 import sys
 from pathlib import Path
 
-# ── Registry: config_path → (module, attr_name) ──────────────────────
-# Format: "stage.section.key": ("pipeline/module.py", "CONSTANT_NAME")
-# Add entries here whenever a new config key is added to pipeline_config.yaml
+# ── Registry: config_path → (module, attr_name, type) ───────────────
+# Format: "stage.section.key": ("pipeline/module.py", "CONSTANT_NAME", "type")
+# Add entries here whenever a new config key is added to pipeline_config.yaml.
+# This is the SINGLE ENFORCEMENT POINT — every configurable value must be registered.
 CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
-    # ── Stage 2 (extraction) ──
-    "stage2.split_probe_enabled":   ("pipeline.stage2_extract", "SPLIT_PROBE_ENABLED", "bool"),
-    "stage2.split_probe_min_size":  ("pipeline.stage2_extract", "SPLIT_PROBE_MIN_SIZE", "int"),
-    "stage2.split_probe_max_cohesion": ("pipeline.stage2_extract", "SPLIT_PROBE_MAX_COHESION", "float"),
-    "stage2.workers":               ("pipeline.stage2_extract", "S2_WORKERS", "int") if False else None,  # not yet in config
+    # ── Stage 2 (extraction, T0.1) ──
+    "stage2.split_probe_enabled":              ("pipeline.stage2_extract", "SPLIT_PROBE_ENABLED", "bool"),
+    "stage2.split_probe_min_size":             ("pipeline.stage2_extract", "SPLIT_PROBE_MIN_SIZE", "int"),
+    "stage2.split_probe_max_cohesion":         ("pipeline.stage2_extract", "SPLIT_PROBE_MAX_COHESION", "float"),
+    "stage2.max_cluster_samples":              ("pipeline.stage2_extract", "MAX_CLUSTER_SAMPLES", "int"),
+    "stage2.max_probe_samples":                ("pipeline.stage2_extract", "S2_MAX_PROBE_SAMPLES", "int"),
+    "stage2.split_probe_kmeans_random_state":  ("pipeline.stage2_extract", "SPLIT_KMEANS_RANDOM_STATE", "int"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),
@@ -42,13 +45,32 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "stage1_5.min_source_diversity": ("pipeline.pipeline_paths", "S15_MIN_SOURCE_DIVERSITY", "int"),
     "stage1_5.neighbor_k":         ("pipeline.pipeline_paths", "S15_NEIGHBOR_K", "int"),
     # ── Stage 5 (verify) ──
-    "stage5.nli_model":            ("pipeline.pipeline_paths", "S5_NLI_MODEL", "str"),
-    "stage5.nli_entailment_threshold": ("pipeline.pipeline_paths", "NLI_ENTAILMENT_THRESHOLD", "float"),
-    "stage5.nli_pass_threshold":   ("pipeline.pipeline_paths", "NLI_PASS_THRESHOLD", "float"),
-    "stage5.nli_marginal_threshold": ("pipeline.pipeline_paths", "NLI_MARGINAL_THRESHOLD", "float"),
-    "stage5.borp_min_sources":     ("pipeline.pipeline_paths", "BORP_MIN_SOURCES", "int"),
+    "stage5.nli_model":                 ("pipeline.pipeline_paths", "S5_NLI_MODEL", "str"),
+    "stage5.nli_entailment_threshold":  ("pipeline.pipeline_paths", "S5_NLI_ENTAILMENT_THRESHOLD", "float"),
+    "stage5.nli_pass_threshold":        ("pipeline.pipeline_paths", "S5_NLI_PASS_THRESHOLD", "float"),
+    "stage5.nli_marginal_threshold":    ("pipeline.pipeline_paths", "S5_NLI_MARGINAL_THRESHOLD", "float"),
     # ── Models ──
-    "models.embeddings.model":     ("pipeline.pipeline_paths", "EMBED_MODEL", "str"),
+    "models.embeddings.model":          ("pipeline.pipeline_paths", "EMBED_MODEL", "str"),
+    # ── Services (T0.2, T0.4) ──
+    "services.omlx.default_timeout":    ("pipeline.omlx_call", "DEFAULT_TIMEOUT", "int"),
+    "services.omlx.max_retries":        ("pipeline.omlx_call", "MAX_RETRIES", "int"),
+    "services.omlx.retry_delay":        ("pipeline.omlx_call", "RETRY_DELAY", "int"),
+    "services.ollama.nomic_max_chars":  ("pipeline.ollama_embed", "NOMIC_MAX_CHARS", "int"),
+    "services.ollama.batch_size":       ("pipeline.ollama_embed", "BATCH_SIZE", "int"),
+    # ── Coverage (T0.3) ──
+    "coverage.threshold":               ("pipeline.coverage_check", "COVERAGE_THRESHOLD", "float"),
+    "coverage.flag_fraction":           ("pipeline.coverage_check", "COVERAGE_FLAG_FRACTION", "float"),
+}
+
+# ── Acknowledged hardcoded values (pending migration to config, Tier 1+) ──
+# These won't appear in --check-unchecked. Add to CONFIG_TO_CODE when migrated.
+ACKNOWLEDGED_HARDCODED: set[str] = {
+    "BORP_MIN_SOURCES",      # e2e_test.py — T1 task
+    "E2E_MIN_PASS_RATE",     # e2e_test.py — T1 task
+    "E2E_MIN_FBS",           # e2e_test.py — T1 task
+    "E2E_CONVERGENT_RATIO",  # e2e_test.py — T1 task
+    "MIN_CHUNK_WORDS",       # stage1_chunk.py — T1 task
+    "MIN_HEADER_GAP_CHARS",  # enhance_md_headers.py — T1 task
 }
 
 
@@ -74,6 +96,10 @@ def get_config_value(cfg: dict, key_path: str):
 
 def get_code_value(module_name: str, attr_name: str):
     """Get module-level constant value. Returns None if not importable."""
+    # Ensure project root is in sys.path (needed when script is run directly)
+    _project_root = str(Path(__file__).resolve().parent.parent)
+    if _project_root not in sys.path:
+        sys.path.insert(0, _project_root)
     try:
         import importlib
         mod = importlib.import_module(module_name)
@@ -145,6 +171,7 @@ def check_hardcoded_elsewhere() -> list[dict]:
     py_files = sorted(Path(__file__).resolve().parent.glob("*.py"))
 
     known_attrs = {m[1] for m in CONFIG_TO_CODE.values() if m is not None}
+    known_attrs |= ACKNOWLEDGED_HARDCODED  # Tier 1+ pending migrations
 
     for fp in py_files:
         with open(fp) as f:
@@ -230,10 +257,12 @@ def main():
     parser.add_argument("--fix", action="store_true", help="Suggest config updates")
     parser.add_argument("--check-unchecked", action="store_true",
                         help="Also scan for unregistered hardcoded values")
+    parser.add_argument("--strict", action="store_true",
+                        help="Fail if ANY unregistered hardcoded values exist (enforcement mode)")
     args = parser.parse_args()
 
     drifts, mic, mico = run_audit()
-    unchecked = check_hardcoded_elsewhere() if args.check_unchecked else []
+    unchecked = check_hardcoded_elsewhere() if (args.check_unchecked or args.strict) else []
 
     fmt = "json" if args.json else "text"
     has_issues = print_report(drifts, mic, mico, unchecked, fmt)
@@ -243,7 +272,11 @@ def main():
         for m in mic:
             print(f"  {m['key']}: {repr(m['code_value'])}")
 
-    sys.exit(1 if has_issues else 0)
+    # --strict: unchecked hardcoded values also cause failure
+    exit_code = 1 if has_issues else 0
+    if args.strict and unchecked:
+        exit_code = 1
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

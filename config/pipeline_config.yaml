@@ -35,12 +35,17 @@ services:
   ollama:
     host: localhost
     port: 11434
+    nomic_max_chars: 4000                    # Max chars per doc for nomic-embed-text, T0.4
+    batch_size: 100                          # Max texts per Ollama batch API call, T0.4
   omlx:
     host: localhost
     port: 11435
     api_key: sk-maxwell-local
     min_version: 0.4.0
     bin: /Applications/oMLX.app/Contents/MacOS/omlx-cli
+    default_timeout: 180                     # seconds, T0.2
+    max_retries: 3                           # T0.2
+    retry_delay: 5                           # seconds, T0.2
 models:
   generator:
     model: Qwen3.6-35B-A3B-4bit
@@ -123,6 +128,9 @@ stage2:
   gate_strict: true
   evidence_tracking: true
   source_book_match: exact
+  max_cluster_samples: 15                  # Max segments to feed per cluster
+  max_probe_samples: 15                    # Max segments to sample during gate probe
+  split_probe_kmeans_random_state: 42      # Deterministic k-means seed for gate probes
   omlx_retry_attempts: 1
   batch_position_monitor: false
 # Stage 3: REMOVED via D2120 — cluster-before-extract replaces HDBSCAN dedup.
@@ -148,6 +156,9 @@ stage5:
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true
+coverage:                                       # T0.3: coverage gap analysis
+  threshold: 0.50                               # Cosine similarity below which a segment is "under-covered"
+  flag_fraction: 0.30                           # Fraction of under-covered segments that triggers a flag
 test:
   full_run:
     books:

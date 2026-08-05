@@ -33,18 +33,22 @@ from pipeline.json_repair import parse_json_robust, repair_json
 from pipeline.pipeline_paths import (
     GEN_MAX_TOKENS,
     GEN_MODEL,
+    GEN_TEMPERATURE,
     OMLX_API_KEY,
+    OMLX_DEFAULT_TIMEOUT,
+    OMLX_MAX_RETRIES,
+    OMLX_RETRY_DELAY,
     OMLX_URL,
     VERIFY_MODEL,
 )
 
-# ── Constants ──────────────────────────────────────────────────────────────
-DEFAULT_TIMEOUT = 180  # seconds
-MAX_RETRIES = 3
-RETRY_DELAY = 5  # seconds
+# ── Constants (T0.2: de-hardcoded — sourced from pipeline_config.yaml) ────
+DEFAULT_TIMEOUT: int = OMLX_DEFAULT_TIMEOUT     # seconds (from config)
+MAX_RETRIES: int = OMLX_MAX_RETRIES             # (from config)
+RETRY_DELAY: int = OMLX_RETRY_DELAY             # seconds (from config)
 
 # temp=0.0 — NEVER override (R7)
-TEMPERATURE = 0.0
+TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
 
 CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
 

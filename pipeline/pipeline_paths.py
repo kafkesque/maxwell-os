@@ -79,6 +79,13 @@ OMLX_HOST=_env("omlx_host",_CFG["services"]["omlx"]["host"]); OMLX_PORT=int(_env
 OLLAMA_URL=f"http://{OLLAMA_HOST}:{OLLAMA_PORT}"; OMLX_URL=f"http://{OMLX_HOST}:{OMLX_PORT}"
 OMLX_API_KEY=_env("omlx_api_key",_CFG["services"]["omlx"]["api_key"])
 
+# ── Service-level tuning (T0.2, T0.4) ────────────────────────────────
+OMLX_DEFAULT_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("default_timeout", 180))
+OMLX_MAX_RETRIES = int(_CFG.get("services", {}).get("omlx", {}).get("max_retries", 3))
+OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay", 5))
+OLLAMA_NOMIC_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("nomic_max_chars", 4000))
+OLLAMA_BATCH_SIZE = int(_CFG.get("services", {}).get("ollama", {}).get("batch_size", 100))
+
 # ── Models ─────────────────────────────────────────────────────────────
 GEN_MODEL=_env("gen_model",_CFG["models"]["generator"]["model"]); GEN_PROVIDER=_CFG["models"]["generator"]["provider"]
 GEN_TEMPERATURE=_CFG["models"]["generator"]["temperature"]; GEN_MAX_TOKENS=_CFG["models"]["generator"]["max_tokens"]
@@ -113,6 +120,12 @@ S2_EVIDENCE_TRACKING=bool(_CFG["stage2"]["evidence_tracking"])
 S2_SOURCE_BOOK_MATCH=_CFG["stage2"]["source_book_match"]
 S2_OMLX_RETRY=int(_CFG["stage2"]["omlx_retry_attempts"])
 S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
+S2_MAX_CLUSTER_SAMPLES=int(_CFG.get("stage2", {}).get("max_cluster_samples", 15))       # T0.1
+S2_MAX_PROBE_SAMPLES=int(_CFG.get("stage2", {}).get("max_probe_samples", 15))           # T0.1
+S2_SPLIT_KMEANS_RANDOM_STATE=int(_CFG.get("stage2", {}).get("split_probe_kmeans_random_state", 42))  # T0.1
+S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", True))     # D2163: gate master switch
+S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate
+S2_SPLIT_PROBE_MAX_COHESION=float(_CFG.get("stage2", {}).get("split_probe_max_cohesion", 0.85))  # D2163: max cohesion for gate
 
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])
@@ -135,6 +148,10 @@ S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_thr
 S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.8))  # D2155: configurable
 S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.5))  # D2155: configurable
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
+
+# ── Coverage settings (T0.3) ─────────────────────────────────────────
+COVERAGE_THRESHOLD = float(_CFG.get("coverage", {}).get("threshold", 0.50))
+COVERAGE_FLAG_FRACTION = float(_CFG.get("coverage", {}).get("flag_fraction", 0.30))
 
 # ── Stage 1.5 settings (D2094: FAISS cluster) ─────────────────────────
 S15_FAISS_THRESHOLD = float(_CFG.get("stage1_5", {}).get("faiss_threshold", 0.75))

@@ -7,10 +7,18 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import STAGE1_CHECKPOINT, STAGE2_CHECKPOINT
+from pipeline.pipeline_paths import (
+    COVERAGE_FLAG_FRACTION,
+    COVERAGE_THRESHOLD,
+    STAGE1_CHECKPOINT,
+    STAGE2_CHECKPOINT,
+)
 
-COVERAGE_THRESHOLD = 0.50
-FLAG_FRACTION = 0.30
+# ── Constants (T0.3: de-hardcoded — sourced from pipeline_config.yaml) ────
+# COVERAGE_THRESHOLD and FLAG_FRACTION are now imported directly from pipeline_paths.py
+# (which reads them from config/pipeline_config.yaml → coverage: section)
+_COVERAGE_FLAG_FRACTION: float = COVERAGE_FLAG_FRACTION  # re-export for backward compat
+
 # D2158: read embedding model from config, not hardcoded
 try:
     from pipeline.pipeline_paths import S15_EMBED_MODEL_HF as _cfg_embed_model
@@ -66,7 +74,7 @@ def compute_coverage(fbs, segments, model, threshold):
             "under_covered": len(under),
             "under_covered_fraction": round(frac, 4),
             "mean_similarity": round(float(np.mean(sims)) if sims else 1.0, 4),
-            "flagged": frac > FLAG_FRACTION,
+            "flagged": frac > _COVERAGE_FLAG_FRACTION,
             "under_covered_segment_ids": under[:20],
         })
     return results
@@ -74,7 +82,8 @@ def compute_coverage(fbs, segments, model, threshold):
 
 def main():
     parser = argparse.ArgumentParser(description="Coverage gap analysis (D2149)")
-    parser.add_argument("--threshold", type=float, default=COVERAGE_THRESHOLD)
+    parser.add_argument("--threshold", type=float,
+                        default=COVERAGE_THRESHOLD)          # T0.3: from config
     parser.add_argument("--output", type=str, default=None)
     args = parser.parse_args()
 

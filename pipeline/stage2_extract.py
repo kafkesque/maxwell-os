@@ -57,18 +57,24 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_PATH,
     S2_GOLDEN_POSITIVE,
     S2_GOLDEN_INJECT,
+    S2_MAX_CLUSTER_SAMPLES,
+    S2_MAX_PROBE_SAMPLES,
     S2_MINHASH_NUM_PERM,
     S2_MINHASH_THRESHOLD,
     S2_OMLX_RETRY,
+    S2_SPLIT_KMEANS_RANDOM_STATE,
     S15_MIN_SOURCE_DIVERSITY,
     STAGE1_5_CHECKPOINT,
     STAGE1_CHECKPOINT,
     STAGE2_CHECKPOINT,
+    S2_SPLIT_PROBE_ENABLED,
+    S2_SPLIT_PROBE_MIN_SIZE,
+    S2_SPLIT_PROBE_MAX_COHESION,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 
-# ── Constants ──────────────────────────────────────────────────────────────
-MAX_CLUSTER_SAMPLES: int = 15  # Max segments to feed per cluster
+# ── Constants (T0.1: de-hardcoded — sourced from pipeline_config.yaml) ────
+MAX_CLUSTER_SAMPLES: int = S2_MAX_CLUSTER_SAMPLES      # Max segments to feed per cluster (from config)
 MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
 
 # D2180: Minimum viable FB schema for LLM output validation (T2.2)
@@ -143,14 +149,14 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
 
     return len(errors) == 0, errors
 
-# D2163: Principle Discovery Gate — probe thresholds
+# D2163: Principle Discovery Gate — probe thresholds (T0.1: now from config)
 # D2176: Lowered MIN_SIZE from 50→20. A 40-segment cluster with 2 distinct
 # principles would previously escape the gate and get compressed into ONE FB.
 # The 291:1 compression death spiral was partly due to the gate being too conservative.
-SPLIT_PROBE_ENABLED: bool = True         # Master switch for the probe
-SPLIT_PROBE_MIN_SIZE: int = 20            # Only probe clusters with >N segments (D2176: was 50)
-SPLIT_PROBE_MAX_COHESION: float = 0.85    # Only probe clusters with cohesion below this
-SPLIT_KMEANS_RANDOM_STATE: int = 42       # Deterministic k-means seed
+SPLIT_PROBE_ENABLED: bool = S2_SPLIT_PROBE_ENABLED        # Master switch for the probe (from config)
+SPLIT_PROBE_MIN_SIZE: int = S2_SPLIT_PROBE_MIN_SIZE       # Only probe clusters with >N segments (from config)
+SPLIT_PROBE_MAX_COHESION: float = S2_SPLIT_PROBE_MAX_COHESION  # Only probe clusters with cohesion below this (from config)
+SPLIT_KMEANS_RANDOM_STATE: int = S2_SPLIT_KMEANS_RANDOM_STATE  # Deterministic k-means seed (from config)
 # ── Convergent extraction system prompt (v3.0: cluster-before-extract) ────
 
 SYSTEM_PROMPT = """You are a convergent principle extraction engine. You receive multiple related text
@@ -693,7 +699,7 @@ def discover_principles(
     # NEW: Round-robin across source books (matching D2161 approach). Ensures
     # every book is represented. If there are distinct principles from different
     # books, the probe sees all of them. Target 12-15 samples with max 2 per book.
-    MAX_PROBE_SAMPLES: int = 15
+    MAX_PROBE_SAMPLES: int = S2_MAX_PROBE_SAMPLES  # T0.1: from config, was 15
     MAX_PER_BOOK: int = 2
 
     # Group segment IDs by source book

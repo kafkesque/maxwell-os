@@ -3038,8 +3038,36 @@ See: governance/D2185-master-task-register.md
 3. Before S2: minimal golden set validation/expansion (P1-4, few hours)
 4. Then S2 → S4 → S5 (after P1-5 dataset) → S6
 
-### D2187 — P1-3 Implemented: OMLX Circuit Breaker (2026-08-05 21:05)
-✅ P1-3 DONE (was PARTIAL — retry existed, no breaker)
+### D2188 — P1-2 Implemented: Feedback Loop Wiring (2026-08-05 21:16)
+
+✅ P1-2 DONE (was PARTIAL — plumbing existed, retrieve.py didn't call it)
+
+Implementation:
+- pipeline/retrieve.py: imports mark_fb_retrieved from feedback.py
+- After ANY search returns results, each returned FB's usage_count +1 and last_retrieved_at stamped
+- --no-track flag for read-only queries (audit/exports)
+- retrieve conn is read-only (mode=ro); mark_fb_retrieved opens its own RW conn — no conflict
+- Only status=PASS FBs are returned by search → only usable FBs get tracked
+- Tested: compiles, no circular import, usage_count 0→1→2 across calls, timestamp set
+
+📈 PROJECTION UPDATE (vs old '800 FBs' claim):
+Old run (bge-small 384d): 1,110 clusters (720 convergent + 390 single) + 2,804 singletons
+Current pipeline (bge-m3 512d + split-probe D2163/D2176 + 1:N extraction + singleton preservation D2149/D2171):
+- 1:N: stage2 line 1043 `principles = result if isinstance(result, list) else [result]`
+- Split-probe: sub-clusters from large low-cohesion clusters (>20 segs, cohesion <0.85)
+- Singletons: process_singletons() extracts from each viable singleton
+PROJECTED OUTPUT: ~4,000-6,000 FBs (NOT ~800) — 5-7x the old estimate
+  - Convergent clusters × 2-4 principles (1:N + split) ≈ 1,500-4,000
+  - Single-source × 1-2 ≈ 400-1,200
+  - Viable singletons ≈ 1,500-2,500
+
+🚀 S1.5 RE-RUN LAUNCHED (2026-08-05 21:13, PID 93915)
+- bge-m3 512d on MPS (config verified: model=BAAI/bge-m3 dim=512 backend=mps)
+- Input: 767MB prefiltered checkpoint (S1.3 in-place, flag confirmed)
+- Log: knowledge pipeline/stage1_5_embed_cluster/s15_bge-m3_run.log
+- ETA ~92 min
+
+### D2187 — P1-3 Implemented: OMLX Circuit Breaker (2026-08-05 21:05)✅ P1-3 DONE (was PARTIAL — retry existed, no breaker)
 
 Implementation:
 - pipeline/omlx_call.py: CircuitBreaker class (CLOSED→OPEN→HALF_OPEN state machine)

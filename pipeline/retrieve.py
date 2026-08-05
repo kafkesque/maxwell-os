@@ -26,6 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import DB_PATH
+from pipeline.feedback import mark_fb_retrieved  # D2188 (P1-2): usage tracking on retrieval
 
 
 def get_conn() -> sqlite3.Connection:
@@ -320,6 +321,7 @@ def main():
     parser.add_argument("--status", default="PASS", help="Filter by status (default: PASS)")
     parser.add_argument("--limit", "-n", type=int, default=10, help="Max results")
     parser.add_argument("--json", action="store_true", help="JSON output")
+    parser.add_argument("--no-track", action="store_true", help="D2188: disable usage tracking (read-only query)")
     parser.add_argument("--list-domains", action="store_true", help="List all domains in DB")
     args = parser.parse_args()
 
@@ -363,6 +365,18 @@ def main():
         results = search_keyword(conn, status=args.status, limit=args.limit)
 
     conn.close()
+
+    # D2188 (P1-2): Feedback loop — track usage of every returned FB.
+    # Opens its own RW connection (retrieve conn is read-only). Skip with --no-track.
+    if results and not args.no_track:
+        tracked = 0
+        for fb in results:
+            fid = fb.get("fb_id")
+            if fid:
+                mark_fb_retrieved(fid)
+                tracked += 1
+        if tracked:
+            print(f"   📈 Usage tracked: {tracked} FB(s) (--no-track to disable)")
 
     if args.json:
         print(json.dumps(results, indent=2, ensure_ascii=False))

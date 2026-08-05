@@ -16,7 +16,7 @@
 | **P0-3** | Vector embedding completeness | ✅ **DONE** (D2185) | stage6 prints Vector: READY/DEGRADED vs fbs count |
 | **P0-4** | vec_fbs ↔ fbs rowid reconciliation | ✅ **DONE** (D2185) | Orphaned-vector detection at commit |
 | **P1-1** | related_fbs graph traversal | ❌ **NOT DONE — BLOCKED** | retrieve.py: 0 refs to related_fbs; requires S2-S6 DB |
-| **P1-2** | Feedback loop wiring | ⚠️ **PARTIAL — unblocked** | feedback.py has record_feedback + usage_count UPDATE; retrieve.py does NOT call them (wiring only) |
+| **P1-2** | Feedback loop wiring | ✅ **DONE** (D2188) | retrieve.py calls mark_fb_retrieved on every result; --no-track flag; tested 0→1→2 |
 | **P1-3** | OMLX circuit breaker | ✅ **DONE** (D2187) | CircuitBreaker CLOSED→OPEN→HALF_OPEN; canonical probe re-open; config-driven (5/60s); 8/8 tests pass |
 | **P1-4** | Golden set 7 → 200+ | ❌ **NOT DONE — unblocked** | config/golden/stage2_fewshot_convergent.yaml = 465-line few-shot prompt, NOT annotated clusters |
 | **P1-5** | NLI calibration dataset | ❌ **NOT DONE — unblocked** | Only rubric_v2_calibrated.md; no 100E/100N/100C dataset |
@@ -237,9 +237,10 @@ Current config requires `embed_model_hf: BAAI/bge-m3`, `embed_dim: 512`. The `la
 ## The Highest Priority — What to Do Next (UPDATED 20:50)
 
 ### Immediate (Tonight — all unblocked)
-1. **P0-2: START S1.5 bge-m3 512d run NOW** (92 min) — nothing blocks it (local MPS embeddings, no OMLX)
+1. 🚀 **P0-2: S1.5 bge-m3 512d RUNNING** (PID 93915, launched 21:13, ETA ~92 min)
 2. ✅ **P1-3: OMLX circuit breaker — DONE (D2187)**
-3. **P1-4: minimal golden validation** (few hrs) — MUST complete BEFORE S2 (injected into every prompt)
+3. ✅ **P1-2: Feedback loop wiring — DONE (D2188)**
+4. **P1-4: minimal golden validation** (few hrs) — MUST complete BEFORE S2 (injected into every prompt)
 
 ### This Week
 4. **P1-4 full: Golden set expansion** (3d) — prerequisite for ALL algorithm tuning

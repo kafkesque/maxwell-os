@@ -52,6 +52,8 @@ STAGE0_CHECKPOINT=_ckpt(S0_DIR,0); STAGE1_CHECKPOINT=_ckpt(S1_DIR,1); STAGE2_CHE
 STAGE3_CHECKPOINT=_ckpt(S3_DIR,3); STAGE4_CHECKPOINT=_ckpt(S4_DIR,4); STAGE5_CHECKPOINT=_ckpt(S5_DIR,5)
 STAGE6_CHECKPOINT=_ckpt(S6_DIR,6)
 # D2120: Stage 3 removed. 8 stages (0-2, 4-6).
+STAGE2_SINGLETON_OUTPUT = S2_DIR / "singleton_fbs.jsonl"   # D2176: singleton FB integration
+
 STAGE_CHECKPOINTS={0:STAGE0_CHECKPOINT,1:STAGE1_CHECKPOINT,2:STAGE2_CHECKPOINT,4:STAGE4_CHECKPOINT,5:STAGE5_CHECKPOINT,6:STAGE6_CHECKPOINT}
 
 def stage_log(stage_dir): return stage_dir / _rid() / _CFG["stage_files"]["log"]
@@ -59,8 +61,10 @@ def stage_meta(stage_dir): return stage_dir / _rid() / _CFG["stage_files"]["meta
 
 # ── Source books ───────────────────────────────────────────────────────
 BOOKS_DIR = PROJECT_ROOT / _CFG["books_dir"]
-SOURCE_EPUB_DIR = Path(_env("source_epub_dir", _CFG.get("source_epub_dir", str(BOOKS_DIR))))
-SOURCE_PDF_DIR = Path(_env("source_pdf_dir", _CFG.get("source_pdf_dir", str(BOOKS_DIR))))
+_epub_cfg = _CFG.get("source_epub_dir") or ""
+_pdf_cfg = _CFG.get("source_pdf_dir") or ""
+SOURCE_EPUB_DIR = Path(_env("source_epub_dir", _epub_cfg) or str(BOOKS_DIR / "epub"))
+SOURCE_PDF_DIR = Path(_env("source_pdf_dir", _pdf_cfg) or str(BOOKS_DIR / "pdf"))
 
 # ── Global ─────────────────────────────────────────────────────────────
 GLOBAL_LOG = PROJECT_ROOT / _CFG["global_log"]

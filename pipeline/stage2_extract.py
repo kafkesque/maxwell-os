@@ -69,16 +69,24 @@ MAX_CLUSTER_SAMPLES: int = 15  # Max segments to feed per cluster
 MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
 
 # D2163: Principle Discovery Gate — probe thresholds
+# D2176: Lowered MIN_SIZE from 50→20. A 40-segment cluster with 2 distinct
+# principles would previously escape the gate and get compressed into ONE FB.
+# The 291:1 compression death spiral was partly due to the gate being too conservative.
 SPLIT_PROBE_ENABLED: bool = True         # Master switch for the probe
-SPLIT_PROBE_MIN_SIZE: int = 50            # Only probe clusters with >N segments
+SPLIT_PROBE_MIN_SIZE: int = 20            # Only probe clusters with >N segments (D2176: was 50)
 SPLIT_PROBE_MAX_COHESION: float = 0.85    # Only probe clusters with cohesion below this
 SPLIT_KMEANS_RANDOM_STATE: int = 42       # Deterministic k-means seed
 # ── Convergent extraction system prompt (v3.0: cluster-before-extract) ────
 
 SYSTEM_PROMPT = """You are a convergent principle extraction engine. You receive multiple related text
-passages from DIFFERENT books. Your task is to identify the ONE underlying principle
-that transcends any single source — the causal mechanism, concept, or method that
+passages from DIFFERENT books. Your task is to identify the underlying principle(s)
+that transcend any single source — the causal mechanism(s), concept(s), or method(s) that
 these passages collectively reveal.
+
+If the passages describe genuinely distinct mechanisms (different cause→effect chains),
+extract each as a separate principle. If they describe different facets of ONE mechanism,
+merge them into a single principle. Be precise — split only when the mechanisms are
+truly independent, not just different aspects of the same concept.
 
 A convergent principle is:
 - A concise statement of WHY something works, WHEN it applies, and WHAT its limits are
@@ -295,7 +303,9 @@ def build_convergent_prompt(
 {" | ".join(texts)}
 {"─" * 40}
 
-Extract ONE convergent principle. Return JSON with:
+Extract the convergent principle(s). If genuinely distinct mechanisms exist, return a
+JSON array of principle objects. If only ONE mechanism, return a single object.
+Each principle must have:
 - name, definition, mechanism, boundary, consequence, elaboration (3-5 sentences; empty string if no added nuance), is_summary (bool), evidence_passages (up to 5 verbatim quotes)
 - route: "FB" (convergent principle -> Stage 4 classifies) | "NULL" (no principle)
 
@@ -723,19 +733,23 @@ def split_cluster_by_kmeans(
             if len(sub_ids) < 2:
                 continue  # Skip degenerate sub-clusters
 
-            # Compute source books for sub-cluster
+            # Compute source books for sub-cluster (D2176: canonical source_ids)
+            from pipeline.book_metadata import resolve_source_ids
             sub_books: set[str] = set()
             for sid in sub_ids:
                 seg = segments.get(sid)
                 if seg:
                     sub_books.add(seg.get("source_book", "unknown"))
+            sub_source_ids: set[str] = resolve_source_ids(list(sub_books))
+            sub_sid_count: int = len(sub_source_ids)
 
             sub_cluster: dict = dict(cluster)
             sub_cluster["segment_ids"] = sub_ids
             sub_cluster["size"] = len(sub_ids)
             sub_cluster["source_books"] = list(sub_books)
-            sub_cluster["source_diversity"] = len(sub_books)
-            sub_cluster["is_convergent"] = len(sub_books) >= 2
+            sub_cluster["source_ids"] = sorted(sub_source_ids)
+            sub_cluster["source_diversity"] = sub_sid_count
+            sub_cluster["is_convergent"] = sub_sid_count >= 2
             sub_cluster["parent_cluster_id"] = cluster.get("cluster_id", "?")
             sub_cluster["cluster_id"] = f"{cluster.get('cluster_id', '?')}_sub{label_idx}"
             sub_cluster["_is_sub_cluster"] = True
@@ -884,7 +898,10 @@ def run_stage2(
         """Process one cluster and return FB dict or None."""
         cid: str = cluster.get("cluster_id", "?")
         is_conv: bool = cluster.get("is_convergent", False)
-        book_count: int = cluster.get("source_diversity", len(cluster.get("source_books", [])))
+        # D2176: source_diversity from S1.5 uses canonical source_ids (not filenames).
+        # Fallback: if source_ids available, use len(source_ids); else len(source_books).
+        book_count: int = cluster.get("source_diversity",
+                          len(cluster.get("source_ids", cluster.get("source_books", []))))
 
         # Tiered prompt: convergent = full synthesis, single-source = simplified
         if is_conv or book_count >= 2:
@@ -912,88 +929,119 @@ def run_stage2(
         if result is None:
             return None
 
-        # Check for NULL route
-        route: str = result.get("route", "FB").strip().upper()
-        if route == "NULL":
-            return {"_null": True, "cluster_id": cid}
+        # D2176: Handle both single-object and array responses.
+        # If LLM returns [{...}, {...}], process each as a separate FB.
+        # If LLM returns {...}, process as single FB (backward compatible).
+        principles: list[dict] = result if isinstance(result, list) else [result]
 
-        # Validate required fields — unified reading with fallback for single-source schema
-        name: str = result.get("name", "").strip()
-        definition: str = result.get("definition", "").strip()
-        mechanism: str = result.get("mechanism", "").strip()
-        boundary: str = result.get("boundary", result.get("application", "")).strip()
-        consequence: str = result.get("consequence", result.get("failure_mode", "")).strip()
-        is_summary: bool = result.get("is_summary", False)
-        extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
-        content_type: str = result.get("content_type", "principle").strip()
+        # If multiple principles returned, yield them as a batch result.
+        # The caller (in the parallel loop) will handle multi-FB returns.
+        if len(principles) > 1:
+            # Multi-principle extraction: process each, return list
+            fbs: list[dict] = []
+            for principle in principles:
+                fb = _build_fb_from_result(principle, cluster, evidence_passages, cid)
+                if fb:
+                    fbs.append(fb)
+            return fbs if fbs else None
 
-        if not name or not definition or len(definition) < 30:
-            return {"_null": True, "cluster_id": cid}
+        # Single principle (original path)
+        return _build_fb_from_result(principles[0], cluster, evidence_passages, cid)
 
-        # Gate: reject summaries
-        if is_summary and gate_enabled:
-            return {"_gate": True, "cluster_id": cid}
 
-        # Build FB record
-        fb_id: str = make_hash_id(name, definition)
-        fb: dict = {
-            "fb_id": fb_id,
-            "name": name,
-            "definition": definition,
-            "mechanism": mechanism,
-            "boundary": boundary,
-            "consequence": consequence,
-            "is_summary": is_summary,
-            "extraction_type": extraction_type,
-            "content_type": content_type,
-            "evidence_passages": result.get("evidence_passages", evidence_passages[:5]),
-            "evidence_passages_shown": evidence_passages,
-            "route": route,
-            "source_cluster": cid,
-            "source_books": cluster.get("source_books", []),
-            "source_segments": cluster.get("segment_ids", []),
-            "cluster_cohesion": cluster.get("cohesion", 0.0),
-            "cluster_size": cluster.get("size", 0),
-            "source_diversity": book_count,
-            "is_convergent": is_conv,
-        }
+def _build_fb_from_result(
+    result: dict,
+    cluster: dict,
+    evidence_passages: list[str],
+    cid: str,
+) -> dict | None:
+    """D2176: Build an FB record from a single extraction result.
 
-        # Enrich with author/title/year (BUG-061 FIX)
-        src_books_list: list[str] = cluster.get("source_books", [])
-        if src_books_list:
-            from pipeline.book_metadata import (
-                build_citation,
-                resolve_book_metadata,
-                select_primary_source,
-            )
-            source_authors: list[dict] = []
-            for sb in src_books_list:
-                m = resolve_book_metadata(sb)
-                source_authors.append({
-                    "book": sb, "author": m.get("author", ""),
-                    "title": m.get("title", ""), "year": m.get("year", ""),
-                })
-            fb["source_authors"] = source_authors
-            fb["primary_source"] = select_primary_source(src_books_list, evidence_passages)
-            prim = fb["primary_source"].get("book", src_books_list[0])
-            prim_meta = next(
-                (sa for sa in source_authors if sa["book"] == prim),
-                {"author": "Unknown Author", "title": "Unknown Title"},
-            )
-            fb["citation"] = build_citation(
-                prim_meta.get("author", ""), prim_meta.get("title", ""), prim,
-            )
+    Extracted from _process_one to support both single and multi-principle returns.
+    """
+    # Check for NULL route
+    route: str = result.get("route", "FB").strip().upper()
+    if route == "NULL":
+        return {"_null": True, "cluster_id": cid}
 
-        fb = stamp_record(fb, gen_model=GEN_MODEL)
-        fb["pipeline_commit"] = pipeline_commit
+    # Validate required fields — unified reading with fallback for single-source schema
+    name: str = result.get("name", "").strip()
+    definition: str = result.get("definition", "").strip()
+    mechanism: str = result.get("mechanism", "").strip()
+    boundary: str = result.get("boundary", result.get("application", "")).strip()
+    consequence: str = result.get("consequence", result.get("failure_mode", "")).strip()
+    is_summary: bool = result.get("is_summary", False)
+    extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
+    content_type: str = result.get("content_type", "principle").strip()
 
-        # Attach minhash sig for dedup (processed post-collection)
-        if minhash_ok:
-            _, sig = is_near_duplicate(definition, lsh, minhash_cache)
-            if sig:
-                fb["minhash_signature"] = sig
+    if not name or not definition or len(definition) < 30:
+        return {"_null": True, "cluster_id": cid}
 
-        return fb
+    # Gate: reject summaries
+    if is_summary and gate_enabled:
+        return {"_gate": True, "cluster_id": cid}
+
+    # Build FB record
+    fb_id: str = make_hash_id(name, definition)
+    fb: dict = {
+        "fb_id": fb_id,
+        "name": name,
+        "definition": definition,
+        "mechanism": mechanism,
+        "boundary": boundary,
+        "consequence": consequence,
+        "is_summary": is_summary,
+        "extraction_type": extraction_type,
+        "content_type": content_type,
+        "evidence_passages": result.get("evidence_passages", evidence_passages[:5]),
+        "evidence_passages_shown": evidence_passages,
+        "route": route,
+        "source_cluster": cid,
+        "source_books": cluster.get("source_books", []),
+        "source_ids": cluster.get("source_ids", []),
+        "source_segments": cluster.get("segment_ids", []),
+        "cluster_cohesion": cluster.get("cohesion", 0.0),
+        "cluster_size": cluster.get("size", 0),
+        "source_diversity": book_count,
+        "is_convergent": is_conv,
+    }
+
+    # Enrich with author/title/year (BUG-061 FIX)
+    src_books_list: list[str] = cluster.get("source_books", [])
+    if src_books_list:
+        from pipeline.book_metadata import (
+            build_citation,
+            resolve_book_metadata,
+            select_primary_source,
+        )
+        source_authors: list[dict] = []
+        for sb in src_books_list:
+            m = resolve_book_metadata(sb)
+            source_authors.append({
+                "book": sb, "author": m.get("author", ""),
+                "title": m.get("title", ""), "year": m.get("year", ""),
+            })
+        fb["source_authors"] = source_authors
+        fb["primary_source"] = select_primary_source(src_books_list, evidence_passages)
+        prim = fb["primary_source"].get("book", src_books_list[0])
+        prim_meta = next(
+            (sa for sa in source_authors if sa["book"] == prim),
+            {"author": "Unknown Author", "title": "Unknown Title"},
+        )
+        fb["citation"] = build_citation(
+            prim_meta.get("author", ""), prim_meta.get("title", ""), prim,
+        )
+
+    fb = stamp_record(fb, gen_model=GEN_MODEL)
+    fb["pipeline_commit"] = pipeline_commit
+
+    # Attach minhash sig for dedup (processed post-collection)
+    if minhash_ok:
+        _, sig = is_near_duplicate(definition, lsh, minhash_cache)
+        if sig:
+            fb["minhash_signature"] = sig
+
+    return fb
 
     # ── Parallel extraction (D2148: ThreadPool, 3 workers) ────────────────
     max_workers: int = 3
@@ -1063,7 +1111,8 @@ def run_stage2(
             all_fbs.append(fb)
             total_extracted += 1
             processed_ids.add(cid)
-            book_count: int = cluster.get("source_diversity", len(cluster.get("source_books", [])))
+            book_count: int = cluster.get("source_diversity",
+                          len(cluster.get("source_ids", cluster.get("source_books", []))))
             print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid} "
                   f"({cluster.get('size', 0)} segs, {book_count} books) → {fb.get('name', '?')[:40]}")
 
@@ -1165,7 +1214,8 @@ def process_singletons(
 
     # Resume support
     processed_ids: set[str] = set()
-    singleton_segids_file = str(Path("knowledge pipeline/stage2_extract/singleton_fbs.jsonl").parent / "singleton.segids")
+    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
+    singleton_segids_file = str(STAGE2_SINGLETON_OUTPUT.parent / "singleton.segids")
     Path(singleton_segids_file).parent.mkdir(parents=True, exist_ok=True)
 
     # Filter to viable singletons (skip fragments)
@@ -1226,6 +1276,7 @@ def process_singletons(
             "route": route,
             "source_cluster": item["singleton"].get("cluster_id", f"singleton_{item['segment_id'][:8]}"),
             "source_books": item["singleton"].get("source_books", [item["source_book"]]),
+            "source_ids": item["singleton"].get("source_ids", []),
             "source_segments": [item["segment_id"]],
             "cluster_cohesion": 1.0,
             "cluster_size": 1,
@@ -1257,7 +1308,8 @@ def process_singletons(
                 print(f"  [{completed}/{len(viable)}] {total_extracted} extracted, {total_null} NULL")
 
     # Write output
-    singleton_output = Path("knowledge pipeline/stage2_extract/singleton_fbs.jsonl")
+    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
+    singleton_output = STAGE2_SINGLETON_OUTPUT
     singleton_output.parent.mkdir(parents=True, exist_ok=True)
     with open(singleton_output, "w") as f:
         for fb in all_fbs:

@@ -172,25 +172,59 @@ def search_hybrid(
     depth: str = None,
     limit: int = 20,
 ) -> list[dict]:
-    """Hybrid: FTS + keyword combined."""
-    fts_results = search_fts(conn, query, limit=limit * 2)
-    kw_results = search_keyword(
-        conn, domain=domain, discipline=discipline, depth=depth, limit=limit * 2
+    """D2176: True hybrid retrieval with Reciprocal Rank Fusion (RRF).
+
+    OLD: concatenated FTS + keyword, deduplicated by fb_id. Vector search
+    existed but was never fused — "hybrid" was lexical-only.
+    NEW: FTS + vector + keyword candidates, fused via RRF scores.
+    Score(d) = 1/(k + rank_fts) + 1/(k + rank_vector) + 1/(k + rank_metadata)
+
+    Falls back gracefully if vector search is unavailable (pre-computed
+    vec_fbs table may not exist).
+    """
+    RRF_K: int = 60  # RRF constant — higher = smoother rank blending
+    POOL_SIZE: int = min(limit * 5, 100)  # Candidate pool per method
+
+    # 1. Collect ranked candidates from all three methods
+    fts_results: list[dict] = search_fts(conn, query, limit=POOL_SIZE)
+    vector_results: list[dict] = search_vector(conn, query, limit=POOL_SIZE)
+    kw_results: list[dict] = search_keyword(
+        conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE
     )
 
-    # Merge and deduplicate by fb_id
-    seen: set[str] = set()
-    merged = []
-    for r in fts_results:
-        if r["fb_id"] not in seen:
-            seen.add(r["fb_id"])
-            merged.append(r)
-    for r in kw_results:
-        if r["fb_id"] not in seen:
-            seen.add(r["fb_id"])
-            merged.append(r)
+    # 2. Build RRF score map: fb_id → cumulative RRF score
+    rrf_scores: dict[str, float] = {}
+    fb_map: dict[str, dict] = {}  # fb_id → best row data
 
-    return merged[:limit]
+    for rank, r in enumerate(fts_results, 1):
+        fid: str = r["fb_id"]
+        rrf_scores[fid] = rrf_scores.get(fid, 0.0) + 1.0 / (RRF_K + rank)
+        if fid not in fb_map:
+            fb_map[fid] = r
+
+    for rank, r in enumerate(vector_results, 1):
+        fid = r["fb_id"]
+        rrf_scores[fid] = rrf_scores.get(fid, 0.0) + 1.0 / (RRF_K + rank)
+        if fid not in fb_map:
+            fb_map[fid] = r
+
+    for rank, r in enumerate(kw_results, 1):
+        fid = r["fb_id"]
+        rrf_scores[fid] = rrf_scores.get(fid, 0.0) + 1.0 / (RRF_K + rank)
+        if fid not in fb_map:
+            fb_map[fid] = r
+
+    # 3. Sort by fused RRF score (descending)
+    ranked_ids: list[str] = sorted(rrf_scores, key=lambda fid: rrf_scores[fid], reverse=True)
+
+    # 4. Return top-N with RRF scores attached
+    results: list[dict] = []
+    for fid in ranked_ids[:limit]:
+        fb: dict = dict(fb_map[fid])
+        fb["_rrf_score"] = round(rrf_scores[fid], 6)
+        results.append(fb)
+
+    return results
 
 
 def _row_to_dict(row: sqlite3.Row) -> dict:

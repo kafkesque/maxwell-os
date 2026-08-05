@@ -437,11 +437,24 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
                 method = "nli"
                 llm_stats["skipped"] += 1
             elif nli_passed and nli_score >= NLI_MARGINAL_THRESHOLD:  # D2155: config threshold (default 0.5)
-                prefilter_stats["passed"] += 1
-                fact_passed = True
-                fact_score = nli_score
-                fact_detail = f"NLI FLAG (marginal): {nli_detail}"
-                method = "nli"
+                # D2176: Marginal NLI (0.5–0.8) must escalate to LLM deep check.
+                # OLD: fact_passed=True on marginal — treated weak evidence as confirmed.
+                # NEW: marginal → UNKNOWN → escalate to LLM verifier (Gemma cross-family).
+                # This is epistemically correct: "maybe" is not "yes."
+                prefilter_stats["marginal"] = prefilter_stats.get("marginal", 0) + 1
+                if omlx_available:
+                    llm_stats["escalated_marginal"] = llm_stats.get("escalated_marginal", 0) + 1
+                    fact_passed, fact_score, fact_detail = check_factual_llm(
+                        fb, model=VERIFY_MODEL_V2
+                    )
+                    fact_detail = f"NLI MARGINAL → LLM: {fact_detail}"
+                    method = "nli+LLM"
+                else:
+                    # Fail-closed: no LLM available for escalation → UNKNOWN
+                    fact_passed = False
+                    fact_score = nli_score
+                    fact_detail = f"NLI MARGINAL + OMLX unavailable — UNKNOWN: {nli_detail}"
+                    method = "nli-only"
             else:
                 prefilter_stats["failed"] += 1
                 # Escalate to LLM deep check (Gemma-4-E4B, cross-family)
@@ -512,6 +525,26 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["needs_human_review"] = needs_human
         vfb["verifier_model"] = VERIFY_MODEL_V2
         vfb["verification_method"] = method  # D2069: track which path was used
+
+        # D2176: Derive epistemic_status — what kind of knowledge claim this is.
+        # BORP = corroboration (not truth), NLI = source-support (not proof).
+        # These are epistemic categories, not verification pass/fail states.
+        source_count: int = len(fb.get("source_books", []))
+        is_singleton: bool = fb.get("is_singleton_fb", False) or fb.get("is_singleton", False)
+
+        if borp_passed and fact_passed:
+            epistemic_status = "corroborated"
+        elif borp_passed and not fact_passed:
+            epistemic_status = "cross-source-unverified"
+        elif not borp_passed and fact_passed:
+            epistemic_status = "source-supported"
+        elif source_count >= 2:
+            epistemic_status = "contested"
+        elif is_singleton:
+            epistemic_status = "singleton-unverified"
+        else:
+            epistemic_status = "speculative"
+        vfb["epistemic_status"] = epistemic_status
 
         vfb = stamp_record(vfb, gen_model=fb.get("gen_model"))
         vfb["pipeline_commit"] = pipeline_commit

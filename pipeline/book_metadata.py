@@ -12,10 +12,12 @@ Authoritative order:
 
 Usage:
     from pipeline.book_metadata import resolve_book_metadata, select_primary_source
+    from pipeline.book_metadata import resolve_source_id, resolve_source_ids
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -23,7 +25,12 @@ from pathlib import Path
 # ── Cache (lazy-loaded once per process) ─────────────────────────────────────
 _metadata_cache: dict[str, dict[str, str]] | None = None
 _normalized_index: dict[str, str] | None = None  # normalized-key → cache key
-METADATA_PATH: Path = Path("knowledge pipeline/checkpoints/book_metadata.jsonl")
+# D2176: use DATA_DIR from pipeline_paths (no hardcoded paths per C12a)
+try:
+    from pipeline.pipeline_paths import DATA_DIR
+    METADATA_PATH: Path = DATA_DIR / "checkpoints" / "book_metadata.jsonl"
+except ImportError:
+    METADATA_PATH: Path = Path("knowledge pipeline/checkpoints/book_metadata.jsonl")
 
 
 def _normalize_key(name: str) -> str:
@@ -75,6 +82,83 @@ def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
     _metadata_cache = cache
     _normalized_index = norm_index
     return cache
+
+
+# ── Canonical source identity (D2176: prevents false convergence) ──────────
+
+# Cache: source_book filename → canonical source_id
+_source_id_cache: dict[str, str] = {}
+
+
+def compute_source_id(author: str, title: str, fallback_key: str = "") -> str:
+    """Generate a canonical source_id from author + title.
+
+    Stable across filename variations. Same book with different filenames
+    (editions, formats, naming conventions) resolves to the same source_id.
+
+    Priority:
+      1. SHA-256(author + "|" + title) if author and title are known
+      2. SHA-256("unknown|" + normalized_fallback) if only fallback available
+
+    Args:
+        author: Resolved author name (may be "Unknown Author").
+        title: Resolved title (may be "Unknown Title").
+        fallback_key: Normalized filename (used only if author/title unknown).
+
+    Returns:
+        16-char hex source_id (first 16 of SHA-256).
+    """
+    if author and author != "Unknown Author" and title and title != "Unknown Title":
+        canonical = f"{author}|{title}"
+    elif fallback_key:
+        canonical = f"unknown|{_normalize_key(fallback_key)}"
+    else:
+        canonical = f"unknown|{title}"
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+def resolve_source_id(source_book: str) -> str:
+    """Resolve a source_book filename → canonical source_id.
+
+    Uses metadata cache for author/title; falls back to filename heuristics.
+    Results are cached in _source_id_cache for O(1) subsequent lookups.
+
+    Args:
+        source_book: Raw source_book filename from segment/cluster metadata.
+
+    Returns:
+        16-char hex source_id.
+    """
+    fname: str = (source_book or "").strip()
+    if not fname:
+        return hashlib.sha256(b"unknown|empty").hexdigest()[:16]
+
+    if fname in _source_id_cache:
+        return _source_id_cache[fname]
+
+    meta: dict[str, str] = resolve_book_metadata(fname)
+    sid: str = compute_source_id(
+        author=meta.get("author", ""),
+        title=meta.get("title", ""),
+        fallback_key=Path(fname).name,
+    )
+    _source_id_cache[fname] = sid
+    return sid
+
+
+def resolve_source_ids(source_books: list[str]) -> set[str]:
+    """Resolve a list of source_book filenames → set of canonical source_ids.
+
+    Use this for source diversity counting. Unlike counting distinct filenames,
+    this collapses duplicates (same book, different editions/formats).
+
+    Args:
+        source_books: List of source_book filename strings.
+
+    Returns:
+        Set of unique 16-char hex source_ids.
+    """
+    return {resolve_source_id(b) for b in (source_books or []) if b}
 
 
 # ── Filename heuristic fallback (robust, handles leading parens) ────────────

@@ -302,6 +302,74 @@ def run_stage(
         return False
 
 
+def _check_version_consistency() -> None:
+    """D2176: Verify all version sources agree before pipeline execution.
+
+    version.yaml is the single source of truth for all version strings (D2169).
+    This gate prevents objects from being stamped with conflicting schema_version
+    values, which would break reproducibility and downstream schema validation.
+    """
+    import sys
+    from pathlib import Path
+
+    version_yaml_path: Path = Path("config/version.yaml")
+    pipeline_config_path: Path = Path("config/pipeline_config.yaml")
+
+    if not version_yaml_path.exists():
+        print("⚠️  config/version.yaml not found — skipping version gate")
+        return
+
+    # Read version.yaml
+    try:
+        import yaml
+        with open(version_yaml_path) as f:
+            vy = yaml.safe_load(f) or {}
+    except Exception as e:
+        print(f"⚠️  Cannot parse version.yaml ({e}) — skipping version gate")
+        return
+
+    expected_schema: str = str(vy.get("schema_version", "")).strip().strip("'\"")
+    gate_enabled: bool = vy.get("version_gate_enabled", True)
+
+    if not gate_enabled:
+        print("   ℹ️  Version gate disabled in version.yaml")
+        return
+
+    if not expected_schema:
+        print("⚠️  No schema_version in version.yaml — skipping version gate")
+        return
+
+    # Read pipeline_config.yaml
+    violations: list[str] = []
+    if pipeline_config_path.exists():
+        try:
+            with open(pipeline_config_path) as f:
+                pcy = yaml.safe_load(f) or {}
+        except Exception as e:
+            print(f"⚠️  Cannot parse pipeline_config.yaml ({e}) — skipping version gate")
+            return
+
+        cfg_schema = str(pcy.get("pipeline", {}).get("schema_version", "")).strip().strip("'\"")
+        if cfg_schema and cfg_schema != expected_schema:
+            violations.append(
+                f"pipeline_config.yaml → schema_version: '{cfg_schema}' "
+                f"(expected '{expected_schema}' from version.yaml)"
+            )
+
+    if violations:
+        print("\n" + "=" * 70)
+        print("❌ VERSION GATE FAILED — pipeline refuses to run")
+        print("=" * 70)
+        for v in violations:
+            print(f"   • {v}")
+        print(f"\n   Fix: update schema_version fields to match version.yaml")
+        print(f"   Or set version_gate_enabled: false in config/version.yaml")
+        print("=" * 70 + "\n")
+        sys.exit(1)
+
+    print(f"   ✅ Version gate passed: schema_version={expected_schema}")
+
+
 def run_pipeline(
     *,
     resume_from: str | None = None,
@@ -334,6 +402,12 @@ def run_pipeline(
     Returns:
         True if all stages completed successfully.
     """
+    # D2176: Version gate — refuse to run if version sources disagree.
+    # version.yaml is the single source of truth (D2169). If pipeline_config.yaml
+    # or any other file declares a different schema_version, the pipeline halts
+    # rather than producing objects with ambiguous version provenance.
+    _check_version_consistency()
+
     # Determine stages to run
     if stages:
         stage_ids = stages

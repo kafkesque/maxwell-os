@@ -336,17 +336,68 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
                 principles_idx[pid_val] = fb
 
             # Wrap as a single-FB cluster
-            is_convergent = fb.get("is_convergent", False)
+            # D2176: Preserve is_noise/is_singleton semantics from S1.5/S2.
+            # OLD: is_noise = not is_convergent — treated ALL single-source and
+            # singleton FBs as noise, overwriting the S1.5 fix (D2171).
+            # NEW: is_noise is an independent quality state. A single-source FB
+            # or singleton is NOT noise — it just has weaker corroboration.
+            # origin field tracks the structural provenance independently.
+            is_convergent: bool = fb.get("is_convergent", False)
+            is_singleton: bool = fb.get("is_singleton_fb", False) or fb.get("is_singleton", False)
+            is_noise: bool = fb.get("is_noise", False)  # Only True if S1.5/S2 explicitly marked noise
+
+            # Derive origin from structural properties
+            if is_singleton:
+                origin: str = "singleton"
+            elif is_convergent:
+                origin: str = "convergent"
+            else:
+                origin: str = "single_source"
+
             clusters.append({
                 "cluster_id": fb_id_val or f"fb_{i}",
                 "principle_ids": [fb_id_val] if fb_id_val else [f"fb_{i}"],
                 "source_books": fb.get("source_books", []),
                 "is_convergent": is_convergent,
-                "is_noise": not is_convergent,
+                "is_noise": is_noise,
+                "is_singleton": is_singleton,
+                "origin": origin,
                 "source": "stage2_fb",  # Mark as directly from Stage 2
             })
 
-    print(f"   📂 Loaded {len(clusters)} FBs from Stage 2 (Stage 3 bypassed per D2120)")
+    # D2176: Also load singleton FBs. Stage 2 writes convergent + single-source FBs
+    # to STAGE2_CHECKPOINT and singleton FBs to a separate file. Previously
+    # Stage 4 only read the main checkpoint — singletons were silently dropped.
+    # Now we merge both sources into a single canonical principle index.
+    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
+    singleton_count: int = 0
+    if STAGE2_SINGLETON_OUTPUT.exists():
+        with open(STAGE2_SINGLETON_OUTPUT) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                fb = json.loads(line)
+                fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
+                if fb_id_val:
+                    principles_idx[fb_id_val] = fb
+
+                # Singleton FBs are always: not convergent, not noise, is singleton
+                clusters.append({
+                    "cluster_id": fb_id_val or f"singleton_{singleton_count}",
+                    "principle_ids": [fb_id_val] if fb_id_val else [f"singleton_{singleton_count}"],
+                    "source_books": fb.get("source_books", []),
+                    "is_convergent": False,
+                    "is_noise": False,
+                    "is_singleton": True,
+                    "origin": "singleton",
+                    "source": "stage2_singleton",
+                })
+                singleton_count += 1
+        print(f"   📂 Loaded {len(clusters) - singleton_count} FBs from Stage 2 + {singleton_count} singletons (Stage 3 bypassed per D2120)")
+    else:
+        print(f"   📂 Loaded {len(clusters)} FBs from Stage 2 (Stage 3 bypassed per D2120)")
+
     return clusters, principles_idx
 
 
@@ -861,12 +912,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             )
         except Exception as e:
             import traceback
-            print(f"→ ⚠️  Classification error: {e}, using 'emerging'")
+            print(f"→ ❌ Classification FAILED: {e} — FB QUARANTINED")
             print(f"   Traceback: {traceback.format_exc()[-300:]}")
+            # D2176: Quarantine on classification failure. OLD behavior silently
+            # labeled failed classifications as "emerging", contaminating the DB.
+            # NEW: classification_status = "FAILED", discipline = "unclassified",
+            # domains = ["unclassified"]. The FB is still stored for audit but
+            # excluded from agent retrieval (filtered by status in retrieve.py).
             class_data = {
-                "discipline": "emerging",
-                "domains": ["emerging"],
+                "discipline": "unclassified",
+                "domains": ["unclassified"],
                 "is_specialized": False,
+                "classification_status": "FAILED",
+                "classification_error": str(e)[:200],
                 "evidence": "cited",
             }
             # BUG-058: Track silent classification failures

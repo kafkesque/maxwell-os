@@ -62,8 +62,8 @@ models:
     provider: ollama
     alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ
 pipeline:
-  schema_version: '2.2'
-  commit: v2.2-GateFix
+  schema_version: '3.0'
+  commit: v3.0-D2176
   taxonomy_version: v5.0
   max_domains_per_fb: 5
   chunk_size_words: 300
@@ -2145,5 +2145,5 @@ test:
     extraction_top_n: 8
     extraction_combined_chars: 600
     extraction_prompt_limit: 3000
-source_epub_dir: /Users/barn/Library/CloudStorage/Dropbox/education/books/epub
-source_pdf_dir: /Users/barn/Library/CloudStorage/Dropbox/education/books/pdf
+source_epub_dir: null   # D2176: use env var SOURCE_EPUB_DIR or falls back to books_dir
+source_pdf_dir: null   # D2176: use env var SOURCE_PDF_DIR or falls back to books_dir

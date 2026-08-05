@@ -405,17 +405,26 @@ def build_clusters(
     cluster_records: list[dict] = []
     singleton_records: list[dict] = []
 
+    # D2176: Canonical source identity for diversity counting.
+    # OLD: source_diversity = len(distinct filenames). Same book with
+    # different edition/filename would inflate diversity → false convergence.
+    # NEW: source_ids = set of canonical SHA-256(author|title) hashes.
+    # source_diversity = len(source_ids). source_books preserved for provenance.
+    from pipeline.book_metadata import resolve_source_ids
+
     for cid, idxs in multi.items():
         seg_ids: list[str] = [segments[i].get("segment_id", f"seg_{i}") for i in idxs]
-        books: set[str] = {segments[i].get("source_book", "unknown") for i in idxs}
-        book_count: int = len(books)
+        books_list: list[str] = sorted({segments[i].get("source_book", "unknown") for i in idxs})
+        source_ids: set[str] = resolve_source_ids(books_list)
+        sid_count: int = len(source_ids)
 
         cluster: dict = {
             "cluster_id": f"cluster_{cid}",
             "segment_ids": seg_ids,
-            "source_books": sorted(books),
-            "source_diversity": book_count,
-            "is_convergent": book_count >= min_diversity,
+            "source_books": books_list,
+            "source_ids": sorted(source_ids),
+            "source_diversity": sid_count,
+            "is_convergent": sid_count >= min_diversity,
             "is_noise": False,
             "cohesion": round(cohesion.get(cid, 0.0), 4),
             "size": len(idxs),
@@ -426,7 +435,8 @@ def build_clusters(
 
     for cid, idxs in singles.items():
         seg_ids = [segments[i].get("segment_id", f"seg_{i}") for i in idxs]
-        books = {segments[i].get("source_book", "unknown") for i in idxs}
+        books_list = sorted({segments[i].get("source_book", "unknown") for i in idxs})
+        source_ids = resolve_source_ids(books_list)
 
         # D2171: Singletons are NOT noise — they carry unique book-specific insights.
         # "is_noise: True" was a legacy label that would cause downstream stages
@@ -435,8 +445,9 @@ def build_clusters(
         singleton: dict = {
             "cluster_id": f"singleton_{cid}",
             "segment_ids": seg_ids,
-            "source_books": sorted(books),
-            "source_diversity": len(books),
+            "source_books": books_list,
+            "source_ids": sorted(source_ids),
+            "source_diversity": len(source_ids),
             "is_convergent": False,
             "is_noise": False,
             "is_singleton": True,

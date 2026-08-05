@@ -55,9 +55,16 @@ _INFERENCE_BACKEND = _os.environ.get("MAXWELL_INFERENCE_BACKEND", "omlx")
 _mlx_providers: dict[str, object] = {}  # model_name → MLXInferenceProvider
 
 # Draft model pairings for speculative decoding (1.5-2× speedup)
+# D2176: Qwen3.x models CANNOT use Qwen2.5 draft models — speculative decoding
+# requires byte-for-byte tokenizer parity. Qwen2.5 and Qwen3 have different
+# tokenizers. Using mismatched draft/target pairs causes 99% draft rejection
+# (destroying the speedup) and risks incoherent token generation.
+# Fix: disable speculative decoding for Qwen3.x until Qwen3 draft models exist.
+# For models where a same-family draft IS available, the mapping remains.
 _MLX_DRAFT_MODELS: dict[str, str] = {
-    "Qwen3.6-35B-A3B-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
-    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",
+    # Qwen3.x — NO compatible draft model yet (Qwen2.5 has different tokenizer)
+    # "Qwen3.6-35B-A3B-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",  # DISABLED D2176
+    # "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": "mlx-community/Qwen2.5-0.5B-Instruct-4bit",  # DISABLED D2176
     "gemma-4-E4B-it-MLX-4bit": "mlx-community/gemma-2-2b-it-4bit",
 }
 

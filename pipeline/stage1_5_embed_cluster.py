@@ -9,8 +9,9 @@ Output: Semantic clusters with canonical source diversity scoring
 
 Process (v3.0 actual):
   1. Load segments from Stage 1.3 or Stage 1
-  2. Embed raw segment text via bge-small-en-v1.5 (MPS/sentence-transformers, 384-dim)
-     OR bge-m3 (Ollama fallback, 1024-dim) — fail-fast on dimension mismatch (D2170)
+  2. Embed raw segment text via bge-m3 (MPS/sentence-transformers, 1024-dim native)
+     Matryoshka truncation to 512d (E7) — 2× faster FAISS, 92% neighbor overlap.
+     Ollama fallback available — fail-fast on dimension mismatch (D2170).
   3. FAISS IndexFlatIP cosine similarity → KNN graph
   4. Build R-NN edges (reciprocal only: A↔B requires A∈topK(B) AND B∈topK(A))
   5. Louvain community detection on R-NN graph (networkx, D2168) — no transitive chaining
@@ -112,11 +113,12 @@ def load_segments() -> list[dict]:
 
 
 def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.ndarray:
-    """Embed segment text via configured backend (MPS fast, Ollama fallback).
+    """Embed segment text via configured backend (MPS sentence-transformers, Ollama fallback).
 
-    D2127r5: Added MPS sentence-transformers path (~47 seg/s) when
-    S15_EMBED_BACKEND == 'mps'. Falls back to Ollama HTTP bge-m3 (~33 seg/s).
-    Both paths apply Matryoshka truncation to S15_EMBED_DIM.
+    D2181: Unified to bge-m3 (T1.2 Option A) — same model as S4 relationship edges.
+    Native 1024d → Matryoshka truncation to S15_EMBED_DIM (512d, E7).
+    MPS path: ~20-30 seg/s (bge-m3 ≈ 2× slower than bge-small but higher quality).
+    Ollama fallback: ~15-20 seg/s via HTTP.
 
     Args:
         segments: List of segment dicts with 'text' field.

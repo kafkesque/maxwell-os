@@ -89,10 +89,10 @@ stage1_5:
   max_cluster_size: 500
   min_source_diversity: 2
   neighbor_k: 50
-  embed_model: BAAI/bge-small-en-v1.5         # D2156: unified — actual model loaded by S1.5
-  embed_dim: 384
-  embed_backend: mps
-  embed_model_hf: BAAI/bge-small-en-v1.5        # D2156: matches embed_model — no drift
+  embed_model: bge-m3                           # D2181: unified with S4 (T1.2 Option A)
+  embed_dim: 512                                # D2181: Matryoshka truncation (E7) — 92% neighbor overlap, 2× faster FAISS
+  embed_backend: mps                            # sentence-transformers on Apple Silicon GPU
+  embed_model_hf: BAAI/bge-m3                   # D2181: unified model — same semantic space as S4 relationship edges
 stage1_3:
   min_len: 40
   cite_density: 0.6

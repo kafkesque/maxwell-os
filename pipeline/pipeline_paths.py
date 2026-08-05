@@ -140,9 +140,9 @@ S15_MAX_CLUSTER_SIZE = int(_CFG.get("stage1_5", {}).get("max_cluster_size", 500)
 S15_MIN_SOURCE_DIVERSITY = int(_CFG.get("stage1_5", {}).get("min_source_diversity", 2))
 S15_NEIGHBOR_K = int(_CFG.get("stage1_5", {}).get("neighbor_k", 150))
 S15_EMBED_MODEL = _CFG.get("stage1_5", {}).get("embed_model", "bge-m3")
-S15_EMBED_DIM = int(_CFG.get("stage1_5", {}).get("embed_dim", 512))  # E7: Matryoshka truncation
-S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "ollama")
-S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-small-en-v1.5")
+S15_EMBED_DIM = int(_CFG.get("stage1_5", {}).get("embed_dim", 512))  # D2181: Matryoshka 512d (E7)
+S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "mps")  # D2181: MPS default for bge-m3
+S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-m3")  # D2181: unified
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])

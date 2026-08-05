@@ -80,7 +80,12 @@ Return JSON: {{"author": "string", "title": "string", "year": int|null}}"""
 
 
 def load_cache(cache_path: Path) -> dict[str, dict]:
-    """Load existing metadata cache, keyed by source_book filename."""
+    """Load existing metadata cache, keyed by source_book filename.
+    
+    D2184: Cache entries now include content_hash for invalidation.
+    If a file's content changes but filename stays the same, the stale
+    cache entry is invalidated and metadata is re-extracted.
+    """
     cache: dict[str, dict] = {}
     if cache_path.exists():
         with open(cache_path) as f:
@@ -94,6 +99,12 @@ def load_cache(cache_path: Path) -> dict[str, dict]:
                     except json.JSONDecodeError:
                         continue
     return cache
+
+
+def _file_content_hash(filepath: Path) -> str:
+    """SHA-256 of file content for cache invalidation (D2184)."""
+    import hashlib
+    return hashlib.sha256(filepath.read_bytes()).hexdigest()[:16]
 
 
 def extract_from_text(text: str, filename: str, model: str) -> Optional[dict]:
@@ -299,10 +310,23 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
     for md_path in md_files:
         filename: str = md_path.name
 
-        # Skip if cached
+        # Skip if cached — with content-hash validation (D2184)
         if not force and filename in cache:
-            skipped += 1
-            continue
+            cached = cache[filename]
+            cached_hash = cached.get("content_hash", "")
+            if cached_hash:
+                current_hash = _file_content_hash(md_path)
+                if cached_hash == current_hash:
+                    skipped += 1
+                    continue
+                else:
+                    # Content changed — invalidate stale cache entry
+                    print(f"   🔄 {filename[:60]:60s} → content changed, re-extracting")
+                    del cache[filename]
+            else:
+                # Legacy cache entry (no content_hash) — accept but warn
+                skipped += 1
+                continue
 
         # Try heuristic first (fast, no LLM cost)
         h_result: dict = parse_filename_heuristic(filename)
@@ -314,6 +338,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
                 "year": h_result["year"],
                 "extraction_method": "heuristic",
                 "source_path": str(md_path),
+                "content_hash": _file_content_hash(md_path),  # D2184: cache invalidation
             }
             record = stamp_record(record, gen_model="regex")
             record["pipeline_commit"] = pipeline_commit
@@ -342,6 +367,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
                 "year": result["year"],
                 "extraction_method": f"llm:{model}",
                 "source_path": str(md_path),
+                "content_hash": _file_content_hash(md_path),  # D2184: cache invalidation
             }
             record = stamp_record(record, gen_model=model)
             record["pipeline_commit"] = pipeline_commit
@@ -358,6 +384,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
                 "year": None,
                 "extraction_method": "fallback",
                 "source_path": str(md_path),
+                "content_hash": _file_content_hash(md_path),  # D2184: cache invalidation
             }
             record = stamp_record(record, gen_model="fallback")
             record["pipeline_commit"] = pipeline_commit

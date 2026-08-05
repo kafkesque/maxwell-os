@@ -142,9 +142,9 @@ GE_STATUS = Literal[
 
 class StampedRecord(BaseModel):
     """Base mixin: every persistent pipeline record carries these stamps."""
-    schema_version: str = Field(default="2.0")
+    schema_version: str = Field(default="3.0")  # D2184: was "2.0" — stale default corrected
     gen_model: str | None = Field(default=None)
-    pipeline_commit: str = Field(default="v2.0-init")
+    pipeline_commit: str = Field(default="v3.0")  # D2184: was "v2.0-init" — stale default corrected
     pipeline_run_id: str | None = Field(
         default=None,
         description="UUID identifying a single pipeline run. All records from the same run share this ID."

@@ -42,7 +42,7 @@ services:
     port: 11435
     api_key: sk-maxwell-local
     min_version: 0.4.0
-    bin: /Applications/oMLX.app/Contents/MacOS/omlx-cli
+    bin: null  # D2184: resolved dynamically: $MAXWELL_OMLX_BIN → shutil.which("omlx-cli") → platform paths
     default_timeout: 180                     # seconds, T0.2
     max_retries: 3                           # T0.2
     retry_delay: 5                           # seconds, T0.2

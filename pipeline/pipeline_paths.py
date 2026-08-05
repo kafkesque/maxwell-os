@@ -315,7 +315,28 @@ CHECKPOINT_DIR = PROJECT_ROOT / _PATHS.get("checkpoint_dir", "knowledge pipeline
 DB_PATH = PROJECT_ROOT / _PATHS.get("db_path", "knowledge pipeline/maxwell.db")
 PARQUET_DIR = PROJECT_ROOT / _PATHS.get("parquet_dir", "knowledge pipeline/parquet")
 DATA_DIR = PROJECT_ROOT / _PATHS.get("data_dir", "knowledge pipeline")
-OMLX_BIN = _CFG["services"]["omlx"]["bin"]                             # omlx binary path
+# D2184: Dynamic OMLX binary resolution (was hardcoded /Applications/...)
+_omlx_bin_cfg = _CFG["services"]["omlx"].get("bin")
+if _omlx_bin_cfg and Path(_omlx_bin_cfg).exists():
+    OMLX_BIN: str = _omlx_bin_cfg
+else:
+    import shutil as _shutil
+    _found = _shutil.which("omlx-cli")
+    if _found:
+        OMLX_BIN = _found
+    else:
+        # Platform fallbacks
+        _candidates = [
+            "/Applications/oMLX.app/Contents/MacOS/omlx-cli",
+            "/usr/local/bin/omlx-cli",
+            str(Path.home() / ".local/bin/omlx-cli"),
+        ]
+        _found = None
+        for _c in _candidates:
+            if Path(_c).exists():
+                _found = _c
+                break
+        OMLX_BIN = _found or ""  # Empty → watchdog will fail with clear diagnostic
 
 # ── Stage 1.5 checkpoints (D2094: self-contained stage dir, D2134 fix) ──
 def _s15_path(filename: str) -> Path:

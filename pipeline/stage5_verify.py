@@ -507,19 +507,31 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             "detail": fact_detail,
         })
 
-        # Determine status
-        all_passed = all(r["passed"] for r in results)
-        borp_only_fail = not borp_passed and comp_passed and fact_passed
-
-        if all_passed:
-            status = "PASS"
-            needs_human = False
-        elif borp_only_fail and not strict:
-            status = "FLAG"
-            needs_human = True
-        else:
+        # D2184: Monotonic trust — classification FAILED cannot become PASS
+        # The FB must stay QUARANTINED until classification is re-evaluated.
+        if fb.get("classification_status") == "FAILED":
             status = "QUARANTINE"
             needs_human = True
+            results.append({
+                "check_name": "classification_status",
+                "passed": False,
+                "score": 0.0,
+                "detail": "Classification FAILED — cannot pass verification. Re-classify first."
+            })
+        else:
+            # Determine status
+            all_passed = all(r["passed"] for r in results)
+            borp_only_fail = not borp_passed and comp_passed and fact_passed
+
+            if all_passed:
+                status = "PASS"
+                needs_human = False
+            elif borp_only_fail and not strict:
+                status = "FLAG"
+                needs_human = True
+            else:
+                status = "QUARANTINE"
+                needs_human = True
 
         stats[status] += 1
 

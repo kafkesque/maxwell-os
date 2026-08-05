@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS fbs (
     source_books TEXT,             -- JSON array
     source_principle_ids TEXT,     -- JSON array (references, not embedded)
     classification_errors TEXT,    -- JSON array or NULL
+    classification_status TEXT NOT NULL DEFAULT 'CLEAN',  -- D2184: CLEAN | FALLBACK | FAILED (monotonic trust)
     -- Verification (from Stage 5)
     verification_results TEXT,     -- JSON array
     borp_score REAL,
@@ -284,7 +285,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 usage_count, last_retrieved_at,
                 feedback_score, feedback_count, fb_version,
                 source_clusters, source_books, source_principle_ids,
-                classification_errors,
+                classification_errors, classification_status,
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
                 schema_version, gen_model, pipeline_commit,
@@ -302,7 +303,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?,
                 ?, ?, ?,
                 ?, ?, ?,
-                ?,
+                ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
@@ -354,6 +355,8 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_json(fb.get("source_principle_ids", [])),
             # classification errors
             _safe_json(fb.get("classification_errors")),
+            # classification status (D2184: CLEAN | FALLBACK | FAILED)
+            _safe_str(fb.get("classification_status"), "CLEAN"),
             # verification
             _safe_json(fb.get("verification_results", [])),
             fb.get("borp_score", 0.0),

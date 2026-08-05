@@ -66,7 +66,7 @@ STAGES: dict[str, dict[str, Any]] = {
     "0.5": {
         "name": "Extract Metadata",
         "script": "pipeline/stage0_5_extract_metadata.py",
-        "checkpoint": CHECKPOINT_DIR / "stage0_5_metadata.jsonl",
+        "checkpoint": CHECKPOINT_DIR / get_run_id() / "stage0_5_metadata.jsonl",  # D2184: run-scoped
         "can_parallelize": True,
         "depends_on": "0",
     },
@@ -143,7 +143,9 @@ STAGE_ORDER: list[str] = ["0", "0.5", "1", "1.3", "1.5", "2", "4", "5", "6", "6b
 
 # ── Resume marker ──────────────────────────────────────────────────────────
 
-_RESUME_MARKER: Path = CHECKPOINT_DIR / "pipeline_resume.json"
+# D2184: Resume marker is now run-scoped (was global CHECKPOINT_DIR / "pipeline_resume.json")
+# Each run_id gets its own resume state — no cross-run contamination.
+_RESUME_MARKER: Path = CHECKPOINT_DIR / get_run_id() / "pipeline_resume.json"
 
 
 def _write_resume_marker(stage_id: str, *, paused: bool = False) -> None:

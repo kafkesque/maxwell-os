@@ -46,6 +46,9 @@ services:
     default_timeout: 180                     # seconds, T0.2
     max_retries: 3                           # T0.2
     retry_delay: 5                           # seconds, T0.2
+    circuit_breaker_enabled: true            # D2187: P1-3 — trip after consecutive failures
+    circuit_breaker_failure_threshold: 5     # D2187: consecutive call failures → OPEN
+    circuit_breaker_cooldown_seconds: 60     # D2187: OPEN duration before HALF-OPEN probe
 models:
   generator:
     model: Qwen3.6-35B-A3B-4bit

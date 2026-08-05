@@ -3038,3 +3038,27 @@ See: governance/D2185-master-task-register.md
 3. Before S2: minimal golden set validation/expansion (P1-4, few hours)
 4. Then S2 → S4 → S5 (after P1-5 dataset) → S6
 
+### D2187 — P1-3 Implemented: OMLX Circuit Breaker (2026-08-05 21:05)
+✅ P1-3 DONE (was PARTIAL — retry existed, no breaker)
+
+Implementation:
+- pipeline/omlx_call.py: CircuitBreaker class (CLOSED→OPEN→HALF_OPEN state machine)
+  - Canonical: HALF_OPEN probe failure → IMMEDIATE re-OPEN (no hammering)
+  - HALF_OPEN probe success → CLOSED, resets failure count
+  - CircuitOpenError fast-fail: raises before retry loop when OPEN
+  - Module-level singleton _breaker (process-wide state)
+  - Wired into call_omlx: entry guard + record_success on return + record_failure on exhaust
+- config/pipeline_config.yaml: circuit_breaker_enabled/failure_threshold/cooldown_seconds (C12)
+- pipeline/pipeline_paths.py: OMLX_CB_ENABLED/FAILURE_THRESHOLD/COOLDOWN_SECONDS exports
+
+Config: 5 consecutive call failures → OPEN for 60s → HALF_OPEN probe.
+Protects ~1,100-call Stage 2 runs from hammering a dead OMLX server.
+8/8 state-machine tests PASS. call_omlx signature unchanged (no regression).
+
+✅ S0.5-S1.3 RE-RUN VERIFICATION (100% confident — see D2186 + file-level diffs):
+- S0: stage0_convert.py Jul 26 (pre-checkpoint); 969 MDs; params unchanged
+- S0.5: D2184 change additive (content_hash); 969 records = 969 books; VALUES unchanged
+- S1: D2185 de-hardcoding, SAME value (10=10); zero behavioral change
+- S1.3: D2182 removed BYTE-IDENTICAL duplicate function; zero behavioral change
+- ONLY S1.5 stale (bge-small 384d) → re-run bge-m3 512d
+

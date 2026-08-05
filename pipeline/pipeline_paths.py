@@ -83,6 +83,10 @@ OMLX_API_KEY=_env("omlx_api_key",_CFG["services"]["omlx"]["api_key"])
 OMLX_DEFAULT_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("default_timeout", 180))
 OMLX_MAX_RETRIES = int(_CFG.get("services", {}).get("omlx", {}).get("max_retries", 3))
 OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay", 5))
+# D2187: OMLX circuit breaker (P1-3) — config-driven, no hardcoding
+OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
+OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))
+OMLX_CB_COOLDOWN_SECONDS = float(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_cooldown_seconds", 60))
 OLLAMA_NOMIC_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("nomic_max_chars", 4000))
 OLLAMA_BATCH_SIZE = int(_CFG.get("services", {}).get("ollama", {}).get("batch_size", 100))
 

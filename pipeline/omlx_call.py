@@ -39,6 +39,9 @@ from pipeline.pipeline_paths import (
     OMLX_MAX_RETRIES,
     OMLX_RETRY_DELAY,
     OMLX_URL,
+    OMLX_CB_ENABLED,
+    OMLX_CB_FAILURE_THRESHOLD,
+    OMLX_CB_COOLDOWN_SECONDS,
     VERIFY_MODEL,
 )
 
@@ -51,6 +54,63 @@ RETRY_DELAY: int = OMLX_RETRY_DELAY             # seconds (from config)
 TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
 
 CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
+
+
+# ── Circuit breaker (D2187, P1-3) ────────────────────────────────────────
+class CircuitBreaker:
+    """Fail-fast guard for OMLX HTTP calls.
+
+    States:
+      CLOSED    — normal operation (calls allowed, failures counted)
+      OPEN      — threshold exceeded; calls refused for cooldown window
+      HALF_OPEN — cooldown elapsed; exactly one probe call allowed
+
+    A single success resets to CLOSED. A probe failure re-opens.
+    Prevents hammering a dead OMLX server for the duration of a long
+    Stage 2 run (~1,100 extraction calls).
+    """
+
+    def __init__(self, failure_threshold: int, cooldown_seconds: float) -> None:
+        self._threshold: int = max(1, failure_threshold)
+        self._cooldown: float = max(1.0, cooldown_seconds)
+        self._consecutive_failures: int = 0
+        self._open_until: float = 0.0
+        self._state: str = "CLOSED"
+
+    @property
+    def state(self) -> str:
+        """Current breaker state: CLOSED | OPEN | HALF_OPEN."""
+        if self._state == "OPEN" and time.time() >= self._open_until:
+            self._state = "HALF_OPEN"
+        return self._state
+
+    def allow_request(self) -> bool:
+        """True if a request may proceed; False = fast-fail (breaker OPEN)."""
+        return self.state != "OPEN"
+
+    def record_success(self) -> None:
+        """Successful call — reset failure count, close breaker."""
+        self._consecutive_failures = 0
+        self._state = "CLOSED"
+
+    def record_failure(self) -> None:
+        """Failed call — count toward threshold; trip breaker when reached."""
+        self._consecutive_failures += 1
+        if self._state == "HALF_OPEN":
+            # Canonical: probe failure re-opens immediately (no repeated probes)
+            self._state = "OPEN"
+            self._open_until = time.time() + self._cooldown
+        elif self._consecutive_failures >= self._threshold:
+            self._state = "OPEN"
+            self._open_until = time.time() + self._cooldown
+
+
+# Module-level singleton (process-wide state survives across calls)
+_breaker = CircuitBreaker(OMLX_CB_FAILURE_THRESHOLD, OMLX_CB_COOLDOWN_SECONDS)
+
+
+class CircuitOpenError(RuntimeError):
+    """Raised when the OMLX circuit breaker is OPEN (fast-fail)."""
 
 # ── Backend selection ─────────────────────────────────────────────────────
 _INFERENCE_BACKEND = _os.environ.get("MAXWELL_INFERENCE_BACKEND", "omlx")
@@ -168,6 +228,14 @@ def call_omlx(
     }
 
     last_error = None
+    # D2187: Circuit breaker fast-fail (skip retry loop when OPEN)
+    if OMLX_CB_ENABLED and not _breaker.allow_request():
+        raise CircuitOpenError(
+            f"OMLX circuit breaker {_breaker.state} — "
+            f"{OMLX_CB_FAILURE_THRESHOLD} consecutive failures; "
+            f"cooldown until {_breaker._open_until:.0f} (epoch s). "
+            f"Check OMLX at {OMLX_URL}."
+        )
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             resp = requests.post(
@@ -179,6 +247,8 @@ def call_omlx(
             resp.raise_for_status()
             data = resp.json()
             content = data["choices"][0]["message"]["content"]
+            if OMLX_CB_ENABLED:
+                _breaker.record_success()
             return content.strip()
         except requests.exceptions.Timeout:
             last_error = f"Timeout after {timeout}s"
@@ -199,6 +269,8 @@ def call_omlx(
             if attempt < MAX_RETRIES:
                 time.sleep(RETRY_DELAY * attempt)
 
+    if OMLX_CB_ENABLED:
+        _breaker.record_failure()
     raise RuntimeError(f"OMLX call failed after {MAX_RETRIES} attempts: {last_error}")
 
 

@@ -585,15 +585,52 @@ def discover_principles(
     if not seg_ids:
         return 1
 
-    # Sample up to 12 segments evenly distributed across the cluster
-    n_sample: int = min(12, len(seg_ids))
-    step: int = max(1, len(seg_ids) // n_sample)
-    sampled_ids: list[str] = [seg_ids[i] for i in range(0, len(seg_ids), step)][:n_sample]
+    # D2173: Source-stratified sampling for the discovery probe.
+    #
+    # OLD: Positional sampling (seg[0], seg[step], seg[2*step]...) — blinded the
+    # probe to semantic diversity. If Principle A dominates the first half of a
+    # 200-segment cluster and Principle B the second half, the probe might only
+    # see A and return principle_count=1, failing to split the cluster.
+    #
+    # NEW: Round-robin across source books (matching D2161 approach). Ensures
+    # every book is represented. If there are distinct principles from different
+    # books, the probe sees all of them. Target 12-15 samples with max 2 per book.
+    MAX_PROBE_SAMPLES: int = 15
+    MAX_PER_BOOK: int = 2
 
+    # Group segment IDs by source book
+    book_to_segids: dict[str, list[str]] = {}
+    for sid in seg_ids:
+        seg: dict | None = segments.get(sid)
+        if seg is None:
+            continue
+        book: str = seg.get("source_book", "unknown")
+        book_short: str = book.split("/")[-1].replace(".md", "")[:50] if book else "unknown"
+        book_to_segids.setdefault(book_short, []).append(sid)
+
+    # Round-robin across books: take 1 from each book per pass, up to MAX_PER_BOOK
+    sampled_ids: list[str] = []
+    book_lists: list[tuple[str, list[str], int]] = [
+        (book, segs, 0) for book, segs in book_to_segids.items()
+    ]
+    while len(sampled_ids) < MAX_PROBE_SAMPLES:
+        added_this_pass: bool = False
+        for i, (book, segs, taken) in enumerate(book_lists):
+            if taken >= MAX_PER_BOOK or taken >= len(segs):
+                continue
+            sampled_ids.append(segs[taken])
+            book_lists[i] = (book, segs, taken + 1)
+            added_this_pass = True
+            if len(sampled_ids) >= MAX_PROBE_SAMPLES:
+                break
+        if not added_this_pass:
+            break  # All books exhausted
+
+    # Build passage texts with book labels
     books_seen: set[str] = set()
     passage_texts: list[str] = []
     for sid in sampled_ids:
-        seg: dict | None = segments.get(sid)
+        seg = segments.get(sid)
         if seg is None:
             continue
         text: str = seg.get("text", "")[:300]

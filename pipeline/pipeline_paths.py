@@ -107,15 +107,19 @@ S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])
 
-# ── Stage 3 settings (D2081: Bug fixes) ────────────────────────────────
-S3_UMAP_N_NEIGHBORS=int(_CFG["stage3"]["umap_n_neighbors"])
-S3_UMAP_N_COMPONENTS=int(_CFG["stage3"]["umap_n_components"])
-S3_UMAP_MIN_DIST=float(_CFG["stage3"]["umap_min_dist"])
-S3_UMAP_METRIC=_CFG["stage3"]["umap_metric"]
-S3_ALLOW_SINGLE_CLUSTER=bool(_CFG["stage3"]["hdbscan_allow_single_cluster"])
-S3_KEEP_NOISE=bool(_CFG["stage3"]["keep_noise"])
-S3_NOISE_OUTPUT=_CFG["stage3"]["noise_output"]
-S3_NORMALIZE_CENTROID=bool(_CFG["stage3"]["normalize_centroid"])
+# ── Stage 3: REMOVED (D2120) — Ghost config cleaned (D2174) ─────────────
+# Stage 3 (HDBSCAN semantic dedup) was removed via D2120. The redundant
+# clustering layer was replaced by S1.5 cluster-before-extract + S2
+# convergent extraction. S3_* constants below are NO-OPs retained only
+# to prevent import errors in any legacy scripts. Remove after v3.1.
+S3_UMAP_N_NEIGHBORS = 15
+S3_UMAP_N_COMPONENTS = 5
+S3_UMAP_MIN_DIST = 0.0
+S3_UMAP_METRIC = "euclidean"
+S3_ALLOW_SINGLE_CLUSTER = False
+S3_KEEP_NOISE = False
+S3_NOISE_OUTPUT = ""
+S3_NORMALIZE_CENTROID = True
 
 # ── Stage 4 settings (D2082: Type-aware routing) ───────────────────────
 S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]

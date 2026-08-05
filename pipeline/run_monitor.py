@@ -31,8 +31,10 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+# D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
+from pipeline.pipeline_paths import DATA_DIR
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-METRICS_DIR = PROJECT_ROOT / "knowledge pipeline" / "metrics"
+METRICS_DIR = DATA_DIR / "metrics"
 
 
 def detect_hardware() -> dict:
@@ -83,7 +85,8 @@ def sample_memory() -> dict:
 
 def analyze_stage_output(stage_name: str, run_id: str) -> dict:
     """Post-stage analysis of checkpoint quality."""
-    checkpoint_dir = PROJECT_ROOT / "knowledge pipeline" / "checkpoints"
+    # D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
+    checkpoint_dir = DATA_DIR / "checkpoints"
     stage_map = {
         "stage0_convert": "stage0_convert",
         "stage0_5_extract_metadata": "stage0_5_extract_metadata",

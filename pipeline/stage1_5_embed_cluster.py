@@ -136,12 +136,17 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
 
         elapsed: float = time.time() - start
         embeddings: np.ndarray = np.array(raw, dtype=np.float32)
-        # Pad or truncate to S15_EMBED_DIM
-        if embeddings.shape[1] < S15_EMBED_DIM:
-            pad = np.zeros((embeddings.shape[0], S15_EMBED_DIM - embeddings.shape[1]), dtype=np.float32)
-            embeddings = np.concatenate([embeddings, pad], axis=1)
-        elif embeddings.shape[1] > S15_EMBED_DIM:
-            embeddings = embeddings[:, :S15_EMBED_DIM]
+        # D2170: Assert dimension match — fail fast on config-code drift (C16)
+        # Zero-padding was a latent data corruption time-bomb: padding synthetic zeros
+        # corrupts FAISS cosine geometry. If config demands 1024d but model outputs
+        # 384d, this must fail with a clear message, not silently pad.
+        if embeddings.shape[1] != S15_EMBED_DIM:
+            raise ValueError(
+                f"Embedding dimension mismatch: model output {embeddings.shape[1]}d "
+                f"≠ config S15_EMBED_DIM={S15_EMBED_DIM}d. "
+                f"Check pipeline_config.yaml → stage1_5.embed_model_hf ({S15_EMBED_MODEL_HF}) "
+                f"and ensure it matches the actual model output dimension."
+            )
 
         print(f"      → {len(embeddings)} embeddings ({embeddings.shape[1]}d) in {elapsed:.1f}s ({total/elapsed:.0f}/s)")
 
@@ -182,20 +187,29 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
                 print(f"      ⚠️  Batch at idx={idx} failed: {e}")
                 results[idx] = []
 
+    # D2172: Track successful segment indices to prevent index misalignment.
+    # When a batch fails and we drop its embeddings, the segments list must be
+    # filtered in lockstep. Otherwise embedding[i] no longer corresponds to
+    # segments[i] — cluster membership becomes random (silent data corruption).
     all_embeddings: list[np.ndarray] = []
-    for i in sorted(results.keys()):
-        for emb in results[i]:
+    successful_indices: list[int] = []
+    for batch_idx in sorted(results.keys()):
+        batch_start: int = batch_idx
+        for seg_offset, emb in enumerate(results[batch_idx]):
             if len(emb) > 0:
                 arr: np.ndarray = np.array(emb, dtype=np.float32)
                 if S15_EMBED_DIM < len(arr):
                     arr = arr[:S15_EMBED_DIM]
                 all_embeddings.append(arr)
+                successful_indices.append(batch_start + seg_offset)
 
     elapsed: float = time.time() - start
+    n_dropped: int = len(segments) - len(all_embeddings)
     print(f"      → {len(all_embeddings)} embeddings ({S15_EMBED_DIM}d) in {elapsed:.1f}s")
 
-    if len(all_embeddings) < len(segments):
-        print(f"   ⚠️  {len(segments) - len(all_embeddings)} segments dropped (embedding failure)")
+    if n_dropped > 0:
+        print(f"   ⚠️  {n_dropped} segments dropped (embedding failure) — filtering segments in lockstep")
+        segments = [segments[i] for i in successful_indices]
 
     embeddings = np.array(all_embeddings, dtype=np.float32)
     norms: np.ndarray = np.linalg.norm(embeddings, axis=1, keepdims=True)
@@ -242,20 +256,28 @@ def faiss_cluster(
     print(f"   🔍 Searching {k} nearest neighbors...")
     sims, neigh = index.search(embeddings, k)
 
-    # ── Reciprocal Nearest-Neighbor clustering (fixes BUG-049) ──────────
-    print(f"   🔗 R-NN clustering (reciprocal cos ≥ {threshold})...")
-    parent: list[int] = list(range(n))
-
-    def find(x: int) -> int:
-        while parent[x] != x:
-            parent[x] = parent[parent[x]]
-            x = parent[x]
-        return x
-
-    def union(a: int, b: int) -> None:
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            parent[ra] = rb
+    # ── Reciprocal Nearest-Neighbor + Louvain Community Detection ─────
+    # D2168: Replaces Union-Find with Louvain community detection.
+    #
+    # WHY: Union-Find computes connected components on R-NN edges.
+    # If A↔B and B↔C are both reciprocal, Union-Find merges A,B,C into one
+    # component even if A and C are semantically unrelated. This is the
+    # "transitive bridge effect" — R-NN constrains edge CREATION but
+    # Union-Find still chains components transitively. BUG-049 was only
+    # partially fixed; the documentation claim "R-NN eliminates the
+    # transitive bridge effect" was mathematically false.
+    #
+    # Louvain community detection optimizes modularity (dense intra-community
+    # edges, sparse inter-community edges). It naturally splits long chains
+    # at semantic boundaries where connectivity thins out. Runs in ~100ms
+    # on a graph with 300K+ nodes and reciprocal edges.
+    #
+    # Reference: Blondel et al. 2008, "Fast unfolding of communities in
+    # large networks" (J. Stat. Mech.). Louvain is the predecessor to Leiden
+    # (Traag et al. 2019) — both avoid transitive chaining. Leiden would be
+    # preferred but requires igraph/leidenalg (C dependency). Louvain via
+    # networkx is pure Python and already in requirements.
+    print(f"   🔗 R-NN + Louvain clustering (reciprocal cos ≥ {threshold})...")
 
     # Build neighbor sets for O(1) reciprocity check
     neighbor_sets: list[set[int]] = []
@@ -266,23 +288,48 @@ def faiss_cluster(
                 nbrs.add(int(j))
         neighbor_sets.append(nbrs)
 
-    # Only union reciprocal edges
+    # Build undirected R-NN graph (only reciprocal edges)
+    import networkx as nx
+    from networkx.algorithms.community import louvain_communities
+
+    G: nx.Graph = nx.Graph()
+    G.add_nodes_from(range(n))
     reciprocal_edges: int = 0
     total_edges: int = 0
     for i in range(n):
         for j in neighbor_sets[i]:
             total_edges += 1
-            if i in neighbor_sets[j]:  # j is also neighbor of i
-                union(i, j)
+            if i in neighbor_sets[j] and i < j:  # add each edge once
+                G.add_edge(i, j)
                 reciprocal_edges += 1
 
     reciprocity: float = (reciprocal_edges / total_edges * 100) if total_edges > 0 else 0.0
-    print(f"      {reciprocal_edges}/{total_edges} edges reciprocal ({reciprocity:.0f}%)")
+    print(f"      {reciprocal_edges}/{total_edges} edges reciprocal ({reciprocity:.0f}%) "
+          f"→ Louvain on {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
 
-    # Collect clusters
+    # Louvain community detection
+    louvain_start: float = time.time()
+    communities: list[set[int]] = louvain_communities(G, seed=FAISS_SEED)
+    louvain_elapsed: float = time.time() - louvain_start
+    print(f"      Louvain: {len(communities)} communities in {louvain_elapsed*1000:.0f}ms")
+
+    # Collect clusters (plus isolated nodes as singletons)
     clusters: dict[int, list[int]] = defaultdict(list)
+    assigned_nodes: set[int] = set()
+    for comm_idx, comm in enumerate(communities):
+        for node in comm:
+            clusters[comm_idx].append(node)
+            assigned_nodes.add(node)
+
+    # Any nodes with zero edges (isolated) become individual singletons
+    n_isolated: int = 0
     for i in range(n):
-        clusters[find(i)].append(i)
+        if i not in assigned_nodes:
+            clusters[n + n_isolated] = [i]
+            n_isolated += 1
+
+    if n_isolated > 0:
+        print(f"      + {n_isolated} isolated nodes (zero reciprocal edges) → individual singletons")
 
     # Split by size
     multi: dict[str, list[int]] = {}
@@ -381,13 +428,18 @@ def build_clusters(
         seg_ids = [segments[i].get("segment_id", f"seg_{i}") for i in idxs]
         books = {segments[i].get("source_book", "unknown") for i in idxs}
 
+        # D2171: Singletons are NOT noise — they carry unique book-specific insights.
+        # "is_noise: True" was a legacy label that would cause downstream stages
+        # and retrieval filters to silently drop 2,804 unique knowledge items.
+        # "is_singleton: True" preserves the structural distinction without data loss.
         singleton: dict = {
             "cluster_id": f"singleton_{cid}",
             "segment_ids": seg_ids,
             "source_books": sorted(books),
             "source_diversity": len(books),
             "is_convergent": False,
-            "is_noise": True,
+            "is_noise": False,
+            "is_singleton": True,
             "cohesion": 1.0,
             "size": len(idxs),
         }

@@ -14,8 +14,7 @@ stage_files:
   stage0: null
   stage1: chunks.jsonl
   stage2: principles.jsonl
-  stage3: clusters.jsonl
-  stage3_quality: quality.json
+  # Stage 3: REMOVED (D2120) — cluster-before-extract replaces HDBSCAN
   stage4: fbs.jsonl
   stage5: verified.jsonl
   stage5_human_review: human_review/
@@ -126,15 +125,8 @@ stage2:
   source_book_match: exact
   omlx_retry_attempts: 1
   batch_position_monitor: false
-stage3:
-  umap_n_neighbors: 15
-  umap_n_components: 5
-  umap_min_dist: 0.1
-  umap_metric: cosine
-  hdbscan_allow_single_cluster: false
-  keep_noise: true
-  noise_output: cluster_noise.jsonl
-  normalize_centroid: true
+# Stage 3: REMOVED via D2120 — cluster-before-extract replaces HDBSCAN dedup.
+# Ghost config cleaned via D2174. See config/archive/ for historical values.
 stage4:
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl

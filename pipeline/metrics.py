@@ -8,7 +8,9 @@ import json
 import time
 from pathlib import Path
 
-METRICS_PATH = Path(__file__).resolve().parent.parent / "knowledge pipeline" / "metrics.jsonl"
+# D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
+from pipeline.pipeline_paths import DATA_DIR
+METRICS_PATH = DATA_DIR / "metrics.jsonl"
 
 
 class StageTimer:

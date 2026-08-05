@@ -943,4 +943,95 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 | **Status** | ✅ FIXED (2026-08-05) — D2155. |
 
 
-*Updated: 2026-08-05 | Bugs tracked: 42 | Resolved: 42 | Open: 0 (all Phase 0 bugs fixed) | Schema version: 1.6*
+---
+
+### BUG-065: Union-Find Transitive Chaining — Mathematical Illusion in R-NN Clustering 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (silent cluster corruption — merges distinct semantic groups) |
+| **Discovered** | 2026-08-05 — cross-examination of 7 external LLM evaluations |
+| **File** | `pipeline/stage1_5_embed_cluster.py`, lines 247-279 |
+| **Symptom** | Documentation claimed "R-NN eliminates the transitive bridge effect." Mathematically false: R-NN constrains edge creation (reciprocal only), but Union-Find computes connected components. If A↔B and B↔C are reciprocal, Union-Find merges A,B,C into one cluster — A and C may be semantically unrelated. Stress test: 2 groups of 150 nodes with 5 bridge edges → Union-Find merges all 300 into 1 component. |
+| **Root Cause** | Union-Find finds connected components on R-NN edge graph. Transitive chaining is still 100% active. |
+| **Fix** | D2168: Replace Union-Find with Louvain community detection (networkx). Louvain optimizes modularity — dense intra-community, sparse inter-community — naturally splitting chains at semantic boundaries. Same stress test: Louvain yields 4 communities with 100% purity. |
+| **Status** | ✅ FIXED (2026-08-05) — D2168. |
+
+### BUG-066: Zero-Padding Embedding Corruption — Latent Data Time-Bomb 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (silent geometry corruption if config-model mismatch) |
+| **Discovered** | 2026-08-05 — cross-examination (Qwen, ChatGPT identified) |
+| **File** | `pipeline/stage1_5_embed_cluster.py`, lines 140-142 (REMOVED) |
+| **Symptom** | If embedding model outputs 384d but config expects 1024d, code padded last 640 dims with synthetic zeros. FAISS cosine geometry corrupted. Config was unified in D2156 but the padding hack remained as a latent time-bomb. |
+| **Root Cause** | Defensive padding instead of fail-fast assertion. Violated C16. |
+| **Fix** | D2170: Replace zero-padding with `ValueError` assertion. Pipeline now fails with clear message: "dimension mismatch: model output Xd ≠ config S15_EMBED_DIM=Yd". |
+| **Status** | ✅ FIXED (2026-08-05) — D2170. |
+
+### BUG-067: Segment-Embedding Index Misalignment — Silent Data Corruption 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (cluster membership becomes random on batch failure) |
+| **Discovered** | 2026-08-05 — cross-examination (ChatGPT, Qwen, Kimi all identified) |
+| **File** | `pipeline/stage1_5_embed_cluster.py`, Ollama fallback path |
+| **Symptom** | When Ollama batch fails, `results[idx] = []` drops embeddings but does NOT filter the segments list. Subsequent clustering assumes `embedding[i] ↔ segments[i]`. After a failure, index `i` points to the wrong segment. Cluster labeled "Book A" may contain segments from "Book B." |
+| **Root Cause** | Anonymous matrix indexing with no stable segment_id mapping. |
+| **Fix** | D2172: Track `successful_indices` in lockstep with embeddings. Filter `segments = [segments[i] for i in successful_indices]` after embedding. |
+| **Status** | ✅ FIXED (2026-08-05) — D2172. |
+
+### BUG-068: Singletons Marked is_noise=True — Silent Knowledge Deletion 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (2,804 unique insights at risk of deletion) |
+| **Discovered** | 2026-08-05 — unanimous across all 7 evaluations |
+| **File** | `pipeline/stage1_5_embed_cluster.py`, line 390 (original) |
+| **Symptom** | All 2,804 singletons stamped with `is_noise: True`. Any downstream filter or retrieval query respecting this flag silently drops unique, book-specific knowledge. |
+| **Root Cause** | Legacy labeling conflated "single-source" with "noise." |
+| **Fix** | D2171: `is_noise: False, is_singleton: True`. Preserves structural distinction without data loss. |
+| **Status** | ✅ FIXED (2026-08-05) — D2171. |
+
+### BUG-069: D2163 Discovery Probe — Positional Sampling Blind Spot 🟠
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (probe misses distinct principles, fails to split mixed clusters) |
+| **Discovered** | 2026-08-05 — cross-examination (ChatGPT identified) |
+| **File** | `pipeline/stage2_extract.py`, `discover_principles()` function |
+| **Symptom** | Probe sampled 12 segments positionally (seg[0], seg[step], seg[2*step]...). If Principle A dominates first half and Principle B second half, probe may only see A, return count=1, and fail to split. |
+| **Root Cause** | No source-book stratification in probe sampling (unlike D2161 which already stratifies extraction). |
+| **Fix** | D2173: Source-stratified round-robin sampling across all books. Max 15 samples, max 2 per book. Ensures every book is represented in the probe. |
+| **Status** | ✅ FIXED (2026-08-05) — D2173. |
+
+### BUG-070: Version Schizophrenia — 5 Files, 3 Different Versions 🟠
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (non-reproducible runs) |
+| **Discovered** | 2026-08-05 — cross-examination (Kimi eval4, ChatGPT identified) |
+| **File** | CONSTITUTION.md (v3.0), requirements.txt (v3.0), stage6_commit.py (default "2.0"), query.py (banner "v2.0"), pipeline_config.yaml (schema 2.2) |
+| **Symptom** | For a system stamping every record with `schema_version`, you cannot know which version produced which run. |
+| **Root Cause** | No single source of truth for versioning. Each file independently declared its version. |
+| **Fix** | D2169: Created `config/version.yaml` as single source of truth. stage6_commit.py reads `pipeline_version` from it. query.py reads `query_banner_version`. All future version bumps happen in one file. |
+| **Status** | ✅ FIXED (2026-08-05) — D2169. |
+
+### BUG-071: Dead Stage 3 Config — Ghost Configuration Risk 🟡
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (future maintainer may edit dead config believing it's active) |
+| **Discovered** | 2026-08-05 — cross-examination (ChatGPT identified) |
+| **File** | `pipeline/pipeline_paths.py` (lines 111-118), `config/pipeline_config.yaml` (lines 17-18, 129-137) |
+| **Symptom** | Stage 3 (HDBSCAN) removed via D2120 but config still loaded S3_UMAP_*, S3_ALLOW_SINGLE_CLUSTER, etc. from pipeline_config.yaml. Ghost configuration risk. |
+| **Root Cause** | Config cleanup deferred after architectural change. |
+| **Fix** | D2174: Replaced live config reads with hardcoded NO-OP defaults (prevent import errors in legacy scripts). Removed stage3 section from pipeline_config.yaml. |
+| **Status** | ✅ FIXED (2026-08-05) — D2174. |
+
+### BUG-072: Hardcoded 'knowledge pipeline' Paths — C12a Violation 🟡
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (fragile paths with literal spaces, constitutional violation) |
+| **Discovered** | 2026-08-05 — cross-examination (Qwen eval4 identified) |
+| **File** | `pipeline/metrics.py:11`, `pipeline/reliability.py:22`, `pipeline/run_monitor.py:35,88` |
+| **Symptom** | Literal string `"knowledge pipeline"` with space hardcoded in 4 locations. Fragile for shell scripting and violates C12a. |
+| **Root Cause** | No central path constant. Each file independently constructed paths. |
+| **Fix** | D2175: All 4 locations now use `DATA_DIR` from `pipeline_paths.py`. Centralized path resolution. |
+| **Status** | ✅ FIXED (2026-08-05) — D2175. |
+
+
+*Updated: 2026-08-05 | Bugs tracked: 50 | Resolved: 50 | Open: 0 | Schema version: 1.7*

@@ -1155,15 +1155,55 @@ decisions:
   category: ARCH
   state: PLANNED
   summary: "Semantic chunking \u2014 rolling-window coherence detection (S1.1)"
+- id: D2168
+  category: BUGFIX
+  state: ACTIVE
+  summary: "Louvain community detection replaces Union-Find \u2014 fixes transitive chaining\
+    \ math illusion (stress-test verified: 100% purity vs 0%)"
+- id: D2169
+  category: GOV
+  state: ACTIVE
+  summary: "config/version.yaml \u2014 single source of truth for all version strings;\
+    \ resolves 5-file version schizophrenia"
+- id: D2170
+  category: BUGFIX
+  state: ACTIVE
+  summary: "Kill zero-padding hack \u2014 replaced with ValueError dim assertion (C16\
+    \ fail-closed)"
+- id: D2171
+  category: BUGFIX
+  state: ACTIVE
+  summary: "Singletons: is_noise=False + is_singleton=True \u2014 prevents silent deletion\
+    \ of 2,804 unique insights"
+- id: D2172
+  category: BUGFIX
+  state: ACTIVE
+  summary: "Index alignment fix \u2014 track successful_indices, filter segments in\
+    \ lockstep with embeddings"
+- id: D2173
+  category: BUGFIX
+  state: ACTIVE
+  summary: "D2163 discovery probe \u2014 source-stratified sampling replaces positional\
+    \ stepping"
+- id: D2174
+  category: CFG
+  state: ACTIVE
+  summary: "Dead Stage 3 config removed from pipeline_config.yaml + NO-OP defaults\
+    \ in pipeline_paths.py"
+- id: D2175
+  category: CFG
+  state: ACTIVE
+  summary: "C12a fix \u2014 hardcoded 'knowledge pipeline' paths replaced with DATA_DIR\
+    \ from pipeline_paths.py"
 summary:
-  total: 152
-  active: 120
+  total: 160
+  active: 128
   last_updated: '2026-08-05'
-  audit_session: cross-examination-2026-08-05
+  audit_session: cross-examination-phase0-2026-08-05
 by_category:
   INF: 93
   QLT: 19
-  GOV: 8
+  GOV: 9
   RES: 4
   DAT: 4
   DEF: 1
@@ -1171,6 +1211,6 @@ by_category:
   CLS: 7
   STR: 1
   PERF: 2
-  BUGFIX: 5
-  CFG: 2
+  BUGFIX: 10
+  CFG: 4
   ARCH: 4

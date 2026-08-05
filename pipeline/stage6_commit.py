@@ -206,6 +206,16 @@ def _migrate_add_column(conn, table, column, col_type):
         pass  # Column already exists
 
 
+def _get_pipeline_version() -> str:
+    """Read pipeline version from config/version.yaml (D2169: single source of truth)."""
+    try:
+        import yaml
+        vcfg = yaml.safe_load(Path("config/version.yaml").read_text())
+        return str(vcfg.get("pipeline_version", "3.0"))
+    except Exception:
+        return "3.0"
+
+
 def _safe_str(val, default=""):
     """Convert a value to string. Handles dicts, lists, None."""
     if val is None:
@@ -351,7 +361,8 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             1 if fb.get("needs_human_review") else 0,
             _safe_str(fb.get("verifier_model")),
             # stamps
-            _safe_str(fb.get("schema_version"), "2.0"),
+            # D2169: Read schema version from config/version.yaml (single source of truth)
+            _safe_str(fb.get("schema_version"), _get_pipeline_version()),
             _safe_str(fb.get("gen_model")),
             _safe_str(fb.get("pipeline_commit"), "unknown"),
             _safe_str(fb.get("taxonomy_version"), "v5.0"),

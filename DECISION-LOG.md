@@ -2762,6 +2762,38 @@ which was previously inert because S2 didn't set content_type.
 
 ### Remaining Pre-S2
 - OMLX restart (only blocker)
-- D2162 (R-NN diameter constraint): Phase 1 — post-S1.5, not blocking
 - Golden set expansion (7→30+): Phase 1 — baseline works with 7
+
+
+## PHASE 0 — Cross-Examination Bug Fixes (2026-08-05 Session 2)
+
+Cross-examination of 7 external LLM evaluations (ChatGPT, Kimi×2, Qwen×2, DeepSeek×2)
+against live main branch code. 5 Phase 0 bugs (D2151-D2155) were already patched.
+4 additional critical bugs + 4 medium-severity issues identified and fixed:
+
+### Critical Fixes (Verified in Live Code)
+
+| Decision | Bug | Status |
+|----------|-----|--------|
+| D2168 | Union-Find + R-NN transitive chaining — mathematical illusion | ✅ Replaced with Louvain community detection (networkx). Stress test: 2 groups of 150 nodes with 5 bridges → Union-Find merges all (1 comp), Louvain yields 4 communities at 100% purity. |
+| D2170 | Zero-padding embedding corruption — latent time-bomb | ✅ Replaced with ValueError dimension assertion (fail-fast, C16) |
+| D2171 | Singletons is_noise=True — 2,804 items at risk | ✅ Changed to is_noise=False, is_singleton=True |
+| D2172 | Segment-embedding index misalignment — silent corruption | ✅ Track successful_indices, filter segments in lockstep |
+
+### Medium-Severity Fixes
+
+| Decision | Bug | Status |
+|----------|-----|--------|
+| D2173 | D2163 discovery probe positional sampling blind spot | ✅ Source-stratified round-robin sampling across all books |
+| D2169 | Version schizophrenia (5 files, 3 different versions) | ✅ config/version.yaml as single source of truth |
+| D2174 | Dead Stage 3 config — ghost configuration risk | ✅ Removed from pipeline_config.yaml, NO-OP defaults in pipeline_paths.py |
+| D2175 | Hardcoded "knowledge pipeline" paths — C12a violation | ✅ All use DATA_DIR from pipeline_paths.py |
+
+### Governance Sync
+- DECISION-LOG.md: 79 decisions (D2000-D2175)
+- config/decisions.yaml: 160 total, 128 ACTIVE
+- Buglog: 50 bugs (BUG-060 through BUG-072), all resolved
+- config/version.yaml: NEW — single source of truth for versioning
+- All 55 pipeline .py files compile clean
+- Louvain stress test: 100% community purity vs Union-Find's 0%
 

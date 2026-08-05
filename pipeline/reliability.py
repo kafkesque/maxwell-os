@@ -17,9 +17,9 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-from pipeline.pipeline_paths import PROJECT_ROOT
-
-DB_PATH: Path = PROJECT_ROOT / "knowledge pipeline" / "maxwell.db"
+# D2175: Use DB_PATH from pipeline_paths — no hardcoded paths (C12a)
+from pipeline.pipeline_paths import DB_PATH as _DB_PATH
+DB_PATH: Path = _DB_PATH
 
 # ── Thresholds (from spec §2.3) ─────────────────────────────────────────
 STABLE_THRESHOLD: float = 0.85

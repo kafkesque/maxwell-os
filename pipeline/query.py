@@ -110,10 +110,21 @@ def export_all(conn: sqlite3.Connection):
         print(json.dumps(d, ensure_ascii=False))
 
 
+def _get_query_version() -> str:
+    """Read banner version from config/version.yaml (D2169: single source of truth)."""
+    try:
+        import yaml
+        vcfg = yaml.safe_load(Path("config/version.yaml").read_text())
+        return str(vcfg.get("query_banner_version", "3.0"))
+    except Exception:
+        return "3.0"
+
+
 def interactive(conn: sqlite3.Connection):
     """Simple interactive browser loop."""
+    banner_v: str = _get_query_version()
     print("\n╔══════════════════════════════════════════╗")
-    print("║   Maxwell OS v2.0 — FB Browser          ║")
+    print(f"║   Maxwell OS v{banner_v} — FB Browser          ║")
     print("╚══════════════════════════════════════════╝")
     print("  Type 'help' for commands, 'quit' to exit.")
     print()

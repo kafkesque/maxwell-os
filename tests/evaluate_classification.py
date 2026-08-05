@@ -58,25 +58,24 @@ def classify_fb(fb_name: str, fb_definition: str, model: str) -> dict:
     )
 
 
-def normalize_disciplines(raw) -> list[str]:
-    """Normalize discipline output: string → [string], ensure list."""
+def normalize_discipline(raw) -> str:
+    """D316: Normalize discipline output to a single string.
+
+    Handles backward compat: old list format → takes first element.
+    """
     if isinstance(raw, str):
-        return [raw]
-    if isinstance(raw, list):
-        return [str(d) for d in raw]
-    return []
+        return raw
+    if isinstance(raw, list) and raw:
+        return str(raw[0])
+    return ""
 
 
-def match_disciplines(got: list[str], expected: list[str], accept_any: list[list[str]] | None) -> bool:
-    """Check if got matches expected disciplines, with optional alternatives."""
-    got_set = set(got)
-    expected_set = set(expected)
-    if got_set == expected_set:
+def match_discipline(got: str, expected: str, accept_any: list[str] | None) -> bool:
+    """D316: Check if got matches expected discipline (singular), with optional alternatives."""
+    if got == expected:
         return True
-    if accept_any:
-        for alt in accept_any:
-            if got_set == set(alt):
-                return True
+    if accept_any and got in accept_any:
+        return True
     return False
 
 
@@ -118,23 +117,35 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
 
     latency = round(time.time() - start, 2)
 
-    got_disciplines = normalize_disciplines(result.get("disciplines", result.get("discipline", [])))
+    # Guard: LLM may return list instead of dict for edge cases (J04 empty definition)
+    if not isinstance(result, dict):
+        return {
+            "case_id": case["id"],
+            "case_idx": case_idx,
+            "fb_name": fb_name,
+            "passed": False,
+            "error": f"LLM returned non-dict: {type(result).__name__}",
+            "latency_s": latency,
+        }
+
+    # D316: discipline is singular — normalize to string
+    got_discipline = normalize_discipline(result.get("discipline", result.get("disciplines", "")))
     got_domains = result.get("domains", [])
     # H04 fix: .get() returns None when key exists with null value, not the default.
     # Explicitly coalesce None → default for all nullable fields.
     got_depth = result.get("depth") or ""
     got_evidence = result.get("evidence") or ""
 
-    expected_disciplines = case.get("expected_disciplines", [])
+    expected_discipline = case.get("expected_discipline", "")
     expected_domains = case.get("expected_domains", [])
     expected_depth = case.get("expected_depth", "")
     expected_evidence = case.get("expected_evidence", "")
 
     checks = {}
 
-    # Disciplines check
-    accept_any_disc = case.get("accept_any_of_disciplines")
-    checks["disciplines"] = match_disciplines(got_disciplines, expected_disciplines, accept_any_disc)
+    # Discipline check (D316: singular)
+    accept_any_disc = case.get("accept_any_of_discipline")
+    checks["discipline"] = match_discipline(got_discipline, expected_discipline, accept_any_disc)
 
     # Domains check — tiered by cardinality (Claude review fix):
     # - 1-domain case: exact match required (no false breadth)
@@ -165,7 +176,7 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
     # H02/H03: Production-path checks (Claude review — test real pipeline, not get() defaults)
     raw_domains = result.get("domains", [])
     has_duplicates = isinstance(raw_domains, list) and len(raw_domains) != len(set(str(d) for d in raw_domains))
-    extra_keys = set(result.keys()) - {"disciplines", "discipline", "domains", "depth", "evidence"}
+    extra_keys = set(result.keys()) - {"discipline", "disciplines", "domains", "depth", "evidence"}
 
     return {
         "case_id": case["id"],
@@ -176,7 +187,7 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
         "passed": all_passed,
         "checks": checks,
         "got": {
-            "disciplines": got_disciplines,
+            "discipline": got_discipline,
             "domains": got_domains,
             "depth": got_depth,
             "evidence": got_evidence,
@@ -184,7 +195,7 @@ def evaluate_case(case: dict, model: str, case_idx: int) -> dict:
             "raw_extra_keys": list(extra_keys),
         },
         "expected": {
-            "disciplines": expected_disciplines,
+            "discipline": expected_discipline,
             "domains": expected_domains,
             "depth": expected_depth,
             "evidence": expected_evidence,
@@ -277,7 +288,7 @@ def main():
             print(f"   {prop}: {count} failures")
 
     # Check-level breakdown
-    check_failures = {"disciplines": 0, "domains": 0, "depth": 0, "evidence": 0}
+    check_failures = {"discipline": 0, "domains": 0, "depth": 0, "evidence": 0}
     for r in results:
         if "checks" in r:
             for check_name, ok in r["checks"].items():

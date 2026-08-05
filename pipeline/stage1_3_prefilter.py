@@ -59,6 +59,24 @@ DROP_PATTERNS = [
     (r'^[=\-—–\*]{10,}\s*$', re.I),
 ]
 
+# D2137: config-driven boilerplate patterns (C12). Cached at module level so
+# BOTH the __main__ script instance and the imported module instance get
+# identical patterns (script-vs-import double-loading otherwise desyncs them).
+def _load_extra_drop_patterns():
+    from pathlib import Path
+    import yaml as _yaml
+    _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+    try:
+        with open(_cfg_path) as _f:
+            _cfg = _yaml.safe_load(_f)
+        pats = (_cfg.get("stage1_3", {}) or {}).get("drop_patterns_extra", []) or []
+        # ".*" prefix gives search semantics (re.match is anchored at pos 0)
+        return [(r".*" + re.escape(p), re.I) for p in pats if p and p.strip()]
+    except Exception:
+        return []
+
+_EXTRA_DROP_PATTERNS = _load_extra_drop_patterns()
+
 # Causal/definitional/procedural markers — if NONE are present, likely not a principle.
 # These are HEURISTIC — they don't guarantee a principle, just indicate possibility.
 CAUSAL_MARKERS = {
@@ -100,6 +118,9 @@ def should_drop_heuristic(text: str, min_len: int = None,
         return True, f"too_short ({len(text)} chars < {min_len})"
 
     # Match against structural patterns
+    for pattern, flags in _EXTRA_DROP_PATTERNS:  # D2137 boilerplate (search semantics)
+        if re.match(pattern, text, flags):
+            return True, f"structural_match: {pattern[:40]}"
     for pattern, flags in DROP_PATTERNS:
         if isinstance(flags, int):
             if re.match(pattern, text, flags):
@@ -198,7 +219,19 @@ def run_prefilter(in_place: bool = False, min_len: int = None,
             "\n".join(json.dumps(s, ensure_ascii=False) for s in kept) + "\n",
         )
         print(f"   ✅ Filtered checkpoint written: {STAGE1_CHECKPOINT}")
-    elif not in_place:
+
+    # ── D2136: Write stage completion flag for runner resume ────────────
+    from pipeline.pipeline_paths import S13_DIR, get_run_id
+    flag_path = S13_DIR / get_run_id() / "checkpoint.jsonl"
+    flag_path.parent.mkdir(parents=True, exist_ok=True)
+    flag_path.write_text(json.dumps({
+        "completed": True,
+        "total": len(segments),
+        "kept": len(kept),
+        "dropped": len(dropped),
+    }) + "\n")
+
+    if not in_place:
         print("\n   ℹ️  Dry run. Use --in-place to actually filter.")
         print(f"   ℹ️  This would save ~{drop_pct:.0f}% of S2 LLM calls.")
 
@@ -232,3 +265,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ── D2137: config-driven boilerplate drop patterns (C12) ────────────────────
+# Publisher boilerplate was measured poisoning S1.5 clustering (391 segs/181 books,
+# one false-convergent cluster held 78% of a 30-book sample). Patterns live in
+# config/pipeline_config.yaml → stage1_3.drop_patterns_extra.
+def _load_extra_drop_patterns():
+    from pathlib import Path
+    import yaml as _yaml
+    _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+    try:
+        with open(_cfg_path) as _f:
+            _cfg = _yaml.safe_load(_f)
+        pats = (_cfg.get("stage1_3", {}) or {}).get("drop_patterns_extra", []) or []
+        # ".*" prefix gives search semantics (re.match is anchored at pos 0)
+        return [(r".*" + re.escape(p), re.I) for p in pats if p and p.strip()]
+    except Exception:
+        return []
+

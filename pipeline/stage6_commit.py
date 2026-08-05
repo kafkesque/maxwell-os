@@ -44,14 +44,18 @@ from pipeline.pipeline_paths import (
     STAGE6_CHECKPOINT,
 )
 from pipeline.schema_accessor import (
+    fb_accessibility,
+    fb_context,
     fb_definition,
     fb_depth,
-    fb_disciplines,
-    fb_disciplines_raw,
+    fb_discipline,
+    fb_discipline_raw,
     fb_domains,
     fb_evidence_type,
     fb_id,
+    fb_intimacy_boundary,
     fb_name,
+    fb_provenance,
     fb_source_books,
     fb_source_texts,
 )
@@ -69,13 +73,20 @@ CREATE TABLE IF NOT EXISTS fbs (
     elaboration TEXT,
     keywords TEXT,
     jargon TEXT,
-    -- Classification (D2066 multi-label)
+    -- Classification (D316: discipline singular, D150: domains multi-label)
     domains TEXT NOT NULL,         -- JSON array (canonical, 1-5)
     domains_raw TEXT,              -- JSON array (LLM original, preserved)
-    disciplines TEXT NOT NULL,     -- JSON array (multi-label, 1-3)
-    disciplines_raw TEXT,          -- JSON array (LLM original, preserved)
+    discipline TEXT NOT NULL,      -- SINGULAR canonical discipline (D316)
+    discipline_raw TEXT,           -- LLM original, preserved (singular)
     depth TEXT NOT NULL,
     evidence TEXT NOT NULL,
+    -- v1 Anytype properties (parity)
+    context TEXT,                  -- comma-separated: business,design,system,academic,personal
+    accessibility TEXT,            -- self-evident | prerequisite
+    intimacy_boundary TEXT,        -- public | selective | private (space routing)
+    provenance TEXT NOT NULL DEFAULT 'llm_extracted_from_source',  -- C29: provenance tier
+    source_text TEXT,              -- concatenated source paragraph text for verification (D2131)
+    is_summary INTEGER DEFAULT 0,  -- D2089: 1=summary (not actionable), 0=principle
     -- Agentic metadata (D2130)
     difficulty_level TEXT,         -- beginner | intermediate | expert
     temporal_scope TEXT,           -- timeless | contemporary | era-specific
@@ -173,11 +184,17 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     except sqlite3.OperationalError as e:
         print(f"  ⚠️  FTS5 not available: {e}")
         print("     Full-text search will not be available.")
-    # Add new columns if upgrading from v2.0.0 (which lacked raw fields)
+    # Add new columns if upgrading from older schema versions
     _migrate_add_column(conn, "fbs", "domains_raw", "TEXT")
-    _migrate_add_column(conn, "fbs", "disciplines_raw", "TEXT")   # D2066: was discipline_raw
+    _migrate_add_column(conn, "fbs", "discipline_raw", "TEXT")  # D316: singular
     _migrate_add_column(conn, "fbs", "s3_original_domain", "TEXT")
     _migrate_add_column(conn, "fbs", "pipeline_run_id", "TEXT")
+    # v1 parity columns
+    _migrate_add_column(conn, "fbs", "context", "TEXT")
+    _migrate_add_column(conn, "fbs", "accessibility", "TEXT")
+    _migrate_add_column(conn, "fbs", "intimacy_boundary", "TEXT")
+    _migrate_add_column(conn, "fbs", "provenance", "TEXT")
+    _migrate_add_column(conn, "fbs", "source_text", "TEXT")  # D2131
     return conn
 
 
@@ -246,8 +263,11 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 fb_id, name, definition, application, failure_mode,
                 elaboration, keywords, jargon,
                 domains, domains_raw,
-                disciplines, disciplines_raw,
+                discipline, discipline_raw,
                 depth, evidence,
+                context, accessibility, intimacy_boundary, provenance,
+                source_text,
+                is_summary,
                 difficulty_level, temporal_scope, confidence_score,
                 prerequisite_fbs, procedural_skill,
                 contradicts_fbs, related_fbs,
@@ -265,6 +285,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?,
                 ?, ?,
                 ?, ?,
+                ?, ?, ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?,
@@ -287,14 +308,22 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("elaboration"), ""),
             _safe_str(fb.get("keywords"), ""),
             _safe_str(fb.get("jargon")),
-            # domains + disciplines (canonical + raw)
+            # domains + discipline (canonical + raw) — D316: discipline singular
             _safe_json(fb_domains(fb)),
             _safe_json(fb.get("domains_raw")),
-            _safe_json(fb_disciplines(fb)),
-            _safe_json(fb_disciplines_raw(fb)),
+            _safe_str(fb_discipline(fb), "emerging"),
+            _safe_str(fb_discipline_raw(fb)),
             # depth, evidence
             _safe_str(fb_depth(fb), "domain"),
             _safe_str(fb_evidence_type(fb), "cited"),
+            # v1 Anytype properties
+            _safe_str(fb_context(fb)),
+            _safe_str(fb_accessibility(fb)),
+            _safe_str(fb_intimacy_boundary(fb)),
+            _safe_str(fb_provenance(fb), "llm_extracted_from_source"),
+            # source text for verification (D2131)
+            _safe_str(fb.get("source_text")),
+            fb.get("is_summary", 0),
             # agentic metadata (D2130)
             _safe_str(fb.get("difficulty_level")),
             _safe_str(fb.get("temporal_scope")),
@@ -351,7 +380,8 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
         jsonlike_fields = {
             "domains", "domains_raw", "source_clusters", "source_books",
             "verification_results", "classification_errors",
-            "jargon",
+            "jargon", "source_principle_ids",
+            "prerequisite_fbs", "contradicts_fbs", "related_fbs",
         }
         for fb in fbs:
             row = dict(fb)

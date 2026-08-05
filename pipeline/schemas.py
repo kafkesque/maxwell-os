@@ -111,7 +111,10 @@ DEPTH_LITERAL = Literal["universal", "cross-domain", "domain", "specialized"]
 EVIDENCE_LITERAL = Literal["cited", "axiomatic"]
 DIFFICULTY_LITERAL = Literal["beginner", "intermediate", "expert"]
 TEMPORAL_LITERAL = Literal["timeless", "contemporary", "era-specific"]
-VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
+ACCESSIBILITY_LITERAL = Literal["self-evident", "prerequisite"]
+INTIMACY_LITERAL = Literal["public", "selective", "private"]
+CONTEXT_LITERAL = Literal["business", "design", "system", "academic", "personal"]
+PROVENANCE_LITERAL = Literal["human_verbatim", "llm_extracted_from_source", "llm_hypothesis"]
 VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 
 # ── D2073: Growth Edge categories ─────────────────────────────────────
@@ -482,26 +485,26 @@ class FB(StampedRecord):
     )
 
     # ── Classification (Literal types enforce validity at construction) ──
+    # D316: Multi-label applies to DOMAINS only (max 5). Discipline is ALWAYS singular.
+    # D2066 amendment: discipline was incorrectly made multi-label; reverted per D316 original.
     domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
         description="1-5 canonical domains (D150: max 5). Validated via synonym matching; 'emerging' if no match.",
         min_length=1,
         max_length=5,
     )
-    disciplines: list[DISCIPLINE_LITERAL] = Field(  # type: ignore[valid-type]
-        default_factory=list,
-        description="1-3 canonical disciplines (D2066 multi-label). Validated; 'emerging' if no match.",
-        min_length=1,
-        max_length=3,
+    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+        description="Single canonical discipline from 48-discipline taxonomy. Validated; 'emerging' if no match."
     )
 
     # ── Raw classification — LLM output preserved FOREVER (never overwritten) ──
+    # Authority: governance/domain_labelling.md §1 (D1055-FIX Channel B)
     domains_raw: list[str] | None = Field(
         default=None,
         description="LLM's original domain labels before canonical validation. Preserved for taxonomy expansion."
     )
-    disciplines_raw: list[str] | None = Field(
+    discipline_raw: str | None = Field(
         default=None,
-        description="LLM's original disciplines before canonical validation. Preserved for taxonomy expansion."
+        description="LLM's original discipline before canonical validation. Preserved for taxonomy expansion."
     )
 
     depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
@@ -509,6 +512,31 @@ class FB(StampedRecord):
     )
     evidence: EVIDENCE_LITERAL = Field(  # type: ignore[valid-type]
         description="cited (from source text) | axiomatic (self-evident)"
+    )
+
+    # ── Anytype properties (v1 schema parity) ─────────────────────────────
+    context: str | None = Field(
+        default=None,
+        description="Comma-separated multi-select: business, design, system, academic, personal. Never free text."
+    )
+    accessibility: ACCESSIBILITY_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="self-evident: immediately graspable. prerequisite: requires prior concept."
+    )
+    intimacy_boundary: INTIMACY_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="Space routing: public (Knowledge base), selective, private (deathpectation)."
+    )
+    provenance: PROVENANCE_LITERAL = Field(  # type: ignore[valid-type]
+        default="llm_extracted_from_source",
+        description="Provenance tier (C29): human_verbatim | llm_extracted_from_source | llm_hypothesis."
+    )
+
+    # ── Source text for verification ──────────────────────────────────────
+    source_text: str | None = Field(
+        default=None,
+        description="Concatenated source paragraph text(s) this FB was extracted from. "
+                    "Preserved for verification without re-reading source books."
     )
 
     # ── Agentic metadata (D2130) ──────────────────────────────────────────
@@ -574,16 +602,22 @@ class FB(StampedRecord):
     @field_validator("depth")
     @classmethod
     def depth_consistent_with_labels(cls, v: str, info) -> str:
-        """D2130: Warn if depth is inconsistent with discipline/domain cardinality."""
+        """D2130: Warn if depth is inconsistent with domain cardinality.
+
+        Depth hierarchy: universal (≥3 domains) > cross-domain (≥2) > domain (1) > specialized (1+ narrow).
+        Discipline is singular so no cardinality check needed there.
+        """
         data = info.data
-        n_disciplines = len(data.get("disciplines", []))
         n_domains = len(data.get("domains", []))
-        if v == "specialized" and n_disciplines > 1:
+        if v == "specialized" and n_domains > 1:
             import warnings
-            warnings.warn(f"FB depth='specialized' but has {n_disciplines} disciplines — consider 'domain'")
+            warnings.warn(f"FB depth='specialized' but has {n_domains} domains — consider 'domain'")
         if v == "universal" and n_domains < 3:
             import warnings
             warnings.warn(f"FB depth='universal' but only {n_domains} domains — consider 'cross-domain'")
+        if v == "cross-domain" and n_domains < 2:
+            import warnings
+            warnings.warn(f"FB depth='cross-domain' but only {n_domains} domain(s) — consider 'domain'")
         return v
 
 
@@ -705,17 +739,40 @@ def is_valid_discipline(discipline: str) -> bool:
 # to "emerging". Reduces data loss and provides richer raw label accumulation.
 # ═══════════════════════════════════════════════════════════════════════════
 
-_SYNONYM_INDEX = None  # Lazy-built cache
+_SYNONYM_INDEX = None  # Lazy-built cache (flat, backward compat)
+_SYNONYM_INDEX_BY_KIND: dict[str, dict[str, str]] = {}
 
 
-def _build_synonym_index():
-    """Build {synonym_lower: canonical} lookup from taxonomy + synonym_map."""
+def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
+    """Build {synonym_lower: canonical} lookup from taxonomy + synonym_map.
+
+    Args:
+        kind: "domain", "discipline", or None for the flat combined index.
+            When kind is given, only entries whose canonical belongs to that
+            kind's canonical list are included — this resolves collisions where
+            the same raw label (e.g. "robotics", "cloud computing") exists in
+            both disciplines and domains and the flat index would resolve to
+            the wrong kind (D2133).
+
+    Returns:
+        dict[str, str]: lowercase raw label → canonical label.
+    """
     from pathlib import Path
 
     import yaml
 
     config_root = Path(__file__).resolve().parent.parent / "config"
     lookup = {}
+
+    # Constrain canonicals to the requested kind when provided
+    valid_canonicals: set[str] | None = None
+    if kind == "domain":
+        valid_canonicals = {c.lower() for c in CANONICAL_DOMAINS}
+    elif kind == "discipline":
+        valid_canonicals = {c.lower() for c in CANONICAL_DISCIPLINES}
+
+    def _accept(canonical: str) -> bool:
+        return valid_canonicals is None or canonical.lower() in valid_canonicals
 
     # 1. Taxonomy raw aliases (both domains and disciplines)
     tax_path = config_root / "taxonomy_v5.yaml"
@@ -724,6 +781,8 @@ def _build_synonym_index():
             taxa = yaml.safe_load(f)
         for entry in taxa.get("domains", []) + taxa.get("disciplines", []):
             canonical = entry["canonical"].strip()
+            if not _accept(canonical):
+                continue
             lookup[canonical.lower()] = canonical
             for raw in entry.get("raw", []):
                 raw_clean = raw.strip()
@@ -752,11 +811,24 @@ def _build_synonym_index():
     return lookup
 
 
-def get_synonym_index():
-    """Return the cached synonym → canonical lookup dict."""
+def get_synonym_index(kind: str | None = None) -> dict[str, str]:
+    """Return the cached synonym → canonical lookup dict.
+
+    Args:
+        kind: "domain" or "discipline" for a kind-constrained index
+            (D2133: resolves cross-kind collisions), or None for the flat
+            combined index (backward compatible).
+
+    Returns:
+        dict[str, str]: lowercase raw label → canonical label.
+    """
     global _SYNONYM_INDEX
+    if kind is not None:
+        if kind not in _SYNONYM_INDEX_BY_KIND:
+            _SYNONYM_INDEX_BY_KIND[kind] = _build_synonym_index(kind)
+        return _SYNONYM_INDEX_BY_KIND[kind]
     if _SYNONYM_INDEX is None:
-        _SYNONYM_INDEX = _build_synonym_index()
+        _SYNONYM_INDEX = _build_synonym_index(None)
     return _SYNONYM_INDEX
 
 
@@ -781,9 +853,16 @@ def match_to_canonical(label: str, kind: str = "domain") -> str | None:
         if label_lower == c.lower():
             return c
 
-    # 2. Synonym index lookup
-    synonym_index = get_synonym_index()
+    # 2. Synonym index lookup — kind-aware first (D2133: resolves cross-kind
+    #    collisions like "robotics" → discipline vs domain), flat as fallback.
+    synonym_index = get_synonym_index(kind)
     matched = synonym_index.get(label_lower)
+    if matched:
+        # Kind-constrained index guarantees the canonical belongs to this kind
+        return matched
+
+    synonym_index_flat = get_synonym_index(None)
+    matched = synonym_index_flat.get(label_lower)
     if matched:
         # Verify matched canonical is in the right list
         matched_lower = matched.lower()

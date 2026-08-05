@@ -45,8 +45,9 @@ def search_keyword(
     depth: str = None,
     status: str = "PASS",
     limit: int = 20,
+    exclude_summaries: bool = True,
 ) -> list[dict]:
-    """Keyword-based SQL search."""
+    """Keyword-based SQL search. Excludes summary FBs by default."""
     conditions = []
     params = []
 
@@ -62,6 +63,8 @@ def search_keyword(
     if depth:
         conditions.append("depth = ?")
         params.append(depth)
+    if exclude_summaries:
+        conditions.append("(is_summary = 0 OR is_summary IS NULL)")
 
     where = " AND ".join(conditions) if conditions else "1=1"
     query = f"SELECT * FROM fbs WHERE {where} ORDER BY borp_score DESC LIMIT ?"
@@ -71,13 +74,15 @@ def search_keyword(
     return [_row_to_dict(r) for r in rows]
 
 
-def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20) -> list[dict]:
-    """Full-text search on name, definition, keywords."""
+def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
+             exclude_summaries: bool = True) -> list[dict]:
+    """Full-text search on name, definition, keywords. Excludes summaries by default."""
     try:
         rows = conn.execute("""
             SELECT f.* FROM fbs f
             JOIN fbs_fts ft ON f.rowid = ft.rowid
             WHERE fbs_fts MATCH ?
+              AND (f.is_summary = 0 OR f.is_summary IS NULL)
             ORDER BY rank
             LIMIT ?
         """, (query, limit)).fetchall()
@@ -85,12 +90,21 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20) -> list[di
     except sqlite3.OperationalError:
         # FTS5 may not be available — fall back to LIKE
         like_query = f"%{query}%"
-        rows = conn.execute("""
-            SELECT * FROM fbs
-            WHERE name LIKE ? OR definition LIKE ? OR keywords LIKE ?
-            ORDER BY borp_score DESC
-            LIMIT ?
-        """, (like_query, like_query, like_query, limit)).fetchall()
+        if exclude_summaries:
+            rows = conn.execute("""
+                SELECT * FROM fbs
+                WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
+                  AND (is_summary = 0 OR is_summary IS NULL)
+                ORDER BY borp_score DESC
+                LIMIT ?
+            """, (like_query, like_query, like_query, limit)).fetchall()
+        else:
+            rows = conn.execute("""
+                SELECT * FROM fbs
+                WHERE name LIKE ? OR definition LIKE ? OR keywords LIKE ?
+                ORDER BY borp_score DESC
+                LIMIT ?
+            """, (like_query, like_query, like_query, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
 
 
@@ -192,19 +206,54 @@ def _row_to_dict(row: sqlite3.Row) -> dict:
     return d
 
 
-def format_fb(fb: dict, index: int = None) -> str:
-    """Format an FB for display."""
+def format_fb(fb: dict, index: int = None, compact: bool = False) -> str:
+    """Format an FB for display (Tier-1 agent card).
+
+    Args:
+        fb: FB dict from DB row.
+        index: Optional display index.
+        compact: If True, only show Tier-1 core fields (def+mech+app+fail+boundary).
+    """
     lines = []
     if index is not None:
         lines.append(f"─── #{index} ───────────────────────────────────────")
-    lines.append(f"📌 {fb.get('name', 'unnamed')}")
+
+    # Summary flag (D2089: is_summary = not actionable)
+    if fb.get("is_summary"):
+        lines.append(f"⚠️ SUMMARY FB — not actionable | {fb.get('name', 'unnamed')}")
+    else:
+        lines.append(f"📌 {fb.get('name', 'unnamed')}")
+
     lines.append(f"   Discipline: {fb.get('discipline', 'N/A')} | "
                   f"Depth: {fb.get('depth', 'N/A')} | "
                   f"Status: {fb.get('status', 'N/A')}")
     lines.append(f"   Domains: {', '.join(fb.get('domains', []))}")
-    lines.append(f"   Definition: {fb.get('definition', 'N/A')[:200]}...")
-    if fb.get("keywords"):
+    definition = fb.get("definition", "")
+    if definition:
+        lines.append(f"   Definition: {definition[:200]}{'...' if len(definition) > 200 else ''}")
+    mechanism = fb.get("mechanism", "")
+    if mechanism:
+        lines.append(f"   Mechanism: {mechanism[:200]}{'...' if len(mechanism) > 200 else ''}")
+    application = fb.get("application", "")
+    if application:
+        lines.append(f"   Application: {application[:150]}{'...' if len(application) > 150 else ''}")
+    failure_mode = fb.get("failure_mode", "")
+    if failure_mode:
+        lines.append(f"   Failure Mode: {failure_mode[:150]}{'...' if len(failure_mode) > 150 else ''}")
+    boundary = fb.get("boundary", "")
+    if boundary:
+        lines.append(f"   Boundary: {boundary[:150]}{'...' if len(boundary) > 150 else ''}")
+    # Reliability stats
+    fb_score = fb.get("feedback_score")
+    usage = fb.get("usage_count", 0)
+    if fb_score is not None:
+        lines.append(f"   Reliability: {fb_score:.2f} ({usage} uses)")
+    elif usage > 0:
+        lines.append(f"   Retrieved: {usage}×")
+    if fb.get("keywords") and not compact:
         lines.append(f"   Keywords: {fb.get('keywords')}")
+    if fb.get("citation") and not compact:
+        lines.append(f"   Source: {fb.get('citation')}")
     lines.append("")
     return "\n".join(lines)
 

@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-stage4_merge.py — Merge clusters → Foundation Blocks + SALSA classification.
-=============================================================================
-Authority: CONSTITUTION.md §3 (Pipeline Stage 4), D1058, D150
+stage4_merge.py — Merge clusters → Foundation Blocks + multi-label classification.
+===================================================================================
+Authority: CONSTITUTION.md §3 (Pipeline Stage 4), D1058, D150, D316
 
-Input:  Clusters from Stage 3 + Principles from Stage 2
-Output: Foundation Blocks with SALSA-classified labels, checkpoint at stage4_merge.jsonl
+Input:  Clusters from Stage 2 + Principles from Stage 2
+Output: Foundation Blocks with classified labels, checkpoint at stage4_merge.jsonl
 
 Process:
   1. For each cluster, gather all member principles
   2. Send to Qwen3.6: merge principles → single FB (name + 6 body fields)
-  3. SALSA classification: single-pass prompt lists all valid labels inline
+  3. Classification: single-pass prompt lists all valid labels inline (D316: discipline singular, domains multi-label)
   4. Pydantic Literal validation catches hallucinated labels at write boundary
-  5. Write checkpoint
+  5. Auto-derive context, accessibility, intimacy_boundary, provenance (v1 parity)
+  6. Write checkpoint
 
 Generator: Qwen3.6-35B-A3B-4bit (OMLX)
 Classifier: Phi-4-mini-instruct-8bit (OMLX) — R5: different family from generator (D2068: fixed on oMLX 0.5.3)
@@ -25,6 +26,7 @@ Usage:
 
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -43,17 +45,15 @@ from pipeline.pipeline_paths import (
     S4_PT_OUTPUT,
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
-    STAGE3_CHECKPOINT,
     STAGE4_CHECKPOINT,
     VERIFY_MODEL,  # P0.10: imported for R5-compliant SALSA classification
 )
 from pipeline.schemas import (
     CANONICAL_DISCIPLINES,
     CANONICAL_DOMAINS,
+    get_synonym_index,
     is_valid_discipline,
     is_valid_domain,
-    match_domains_to_canonical,
-    match_to_canonical,
 )
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
@@ -71,8 +71,14 @@ A Foundation Block has these fields:
 - application: "When [situation] -> do [action]." One concrete, actionable example.
 - failure_mode: "The principle fails when [specific scenario]." How it breaks in practice.
 - elaboration: 3-5 sentences. Deeper nuance, edge cases, unexpected implications.
-- keywords: 3-5 key terms, comma-separated.
-- jargon: Explain any specialized terms in 1-2 plain-language sentences each. Use null if none needed.
+- keywords: 3-5 key search TERMS, comma-separated. These are LABELS for retrieval, NOT explanations.
+  Example: "loss aversion, prospect theory, framing effect, anchoring"
+- jargon: ONLY include if the FB uses specialized terms a non-expert wouldn't know.
+  OMIT this field entirely when all terms are self-evident — do NOT include empty {}.
+  When present: JSON dict mapping each specialized term → 1-2 sentence plain-English explanation.
+  Example: {"prospect theory": "A behavioral economics model showing that people value gains and losses differently, making decisions based on perceived gains rather than objective outcomes.", "anchoring": "The cognitive bias where an initial piece of information serves as a reference point that distorts subsequent judgments."}
+  ⚠️ NEVER copy keywords into jargon. Keywords are for search; jargon is for pedagogy.
+  ⚠️ NEVER put comma-separated terms in jargon. Jargon ALWAYS has term:explanation pairs.
 
 CRITICAL RULES:
 - Produce a genuine PRINCIPLE, not tool documentation, not syntax lessons, not system design docs
@@ -86,11 +92,13 @@ EXAMPLE 1 (cross-domain): "The Jagged Frontier of AI Competence"
 Definition: "AI capabilities are not uniformly distributed across tasks — they exhibit a jagged frontier where some tasks are performed exceptionally well while closely related tasks fail unexpectedly. Effective human-AI collaboration requires mapping this frontier empirically rather than assuming uniform capability."
 Application: "When introducing AI into a workflow -> run a systematic calibration: give the AI 10 representative tasks from your domain, evaluate each output, identify the pattern of successes and failures."
 Keywords: "AI collaboration, jagged frontier, task decomposition, empirical calibration"
+Jargon: {"jagged frontier": "The irregular boundary between tasks AI can do well and tasks it fails at — neighboring tasks can have opposite performance levels.", "empirical calibration": "Testing AI performance on real tasks instead of assuming capabilities based on benchmarks or intuition."}
 
 EXAMPLE 2 (domain-specific): "Descriptive References Reduce Fragility"
 Definition: "Descriptive references use named identifiers instead of positional indices to create more robust and maintainable code. This approach leverages human-readable labels to access data elements, making code less susceptible to breaking when underlying data structures change."
 Application: "When writing data processing code that accesses structured information -> use named column references or descriptive variable names instead of positional indices."
 Keywords: "named references, positional indices, code maintainability, magic numbers"
+Jargon: {"positional indices": "Accessing data by its numeric position in a sequence (e.g., column 3, row 7) rather than by a meaningful label.", "magic numbers": "Hardcoded numeric values in code that lack explanation, making the code fragile and hard to maintain."}
 
 ANTI-PATTERNS — never produce these:
 - "Altair Annotation and Emphasis Techniques" — this is tool documentation renamed
@@ -99,9 +107,66 @@ ANTI-PATTERNS — never produce these:
 - "Event-Driven Retail Inventory Architecture" — this is a system design document
 - Definitions stuffed with unrelated jargon from multiple domains
 - Names that sound profound but mean nothing specific
+- `"jargon": "feedback loop, oscillation, cycle time"` — this copies keywords into jargon field. Jargon must be dict of term→explanation, not a comma-separated list.
+- `"jargon": {}` or `"jargon": ""` — shipping empty jargon. OMIT the field entirely when no specialized terms need explanation.
+- `"jargon": "loss aversion, prospect theory"` — same error as above. Use proper dict format or omit.
 
 Synthesize the principles into one block. Don't just pick one — merge the insights.
-Return ONLY a JSON object with these exact keys."""
+Return ONLY a JSON object. Include jargon ONLY when specialized terms need explanation — omit the key entirely otherwise."""
+
+
+# ── CRIBS enrichment (D2137: fills missing fields for single-FB clusters) ──
+
+CRIBS_ENRICHMENT_SYSTEM = """You enrich Foundation Blocks with CRIBS-quality fields. You receive an FB with
+name + definition already written. Your job is to ADD the missing fields.
+
+CRIBS editing rules:
+- Confusing → clarify with analogy
+- Repetitive → cut redundancy
+- Interesting → extend ONLY if retention requires it
+- Boring → add a concrete stake (what happens if you ignore this?)
+- Surprising → ship as-is
+
+CRITICAL RULES:
+- application: "When [concrete situation] -> do [specific action]." Must name a real scenario.
+- failure_mode: "The principle fails when [specific condition]." How it breaks — be specific.
+- elaboration: 3-5 sentences. Edge cases, non-obvious implications, second-order effects.
+- keywords: 3-5 search terms, comma-separated. These are RETRIEVAL labels, not explanations.
+- jargon: OMIT this key entirely if no specialized terms exist. Only include when
+  a non-expert would not understand specific terms used in the FB.
+  ⚠️ NEVER copy keywords into jargon. Jargon is for pedagogy, keywords for search.
+
+Return ONLY a JSON object:
+{"application": "...", "failure_mode": "...", "elaboration": "...", "keywords": "...", "jargon": {...} or omit}"""
+
+
+def _build_cribs_enrichment_prompt(fb_data: dict) -> str:
+    """Build a lightweight CRIBS enrichment prompt for a single-FB cluster.
+
+    Only asks for the fields stage2 doesn't produce: application, failure_mode,
+    elaboration, keywords, jargon. The name + definition are already set.
+    """
+    name: str = fb_data.get("name", "")
+    definition: str = fb_data.get("definition", "")
+    mechanism: str = fb_data.get("mechanism", "")
+    boundary: str = fb_data.get("boundary", "")
+    consequence: str = fb_data.get("consequence", "")
+
+    lines: list[str] = [
+        "Add CRIBS-quality enrichment fields to this Foundation Block.",
+        "",
+        f"NAME: {name}",
+        f"DEFINITION: {definition}",
+    ]
+    if mechanism:
+        lines.append(f"MECHANISM: {mechanism}")
+    if boundary:
+        lines.append(f"BOUNDARY: {boundary}")
+    if consequence:
+        lines.append(f"CONSEQUENCE: {consequence}")
+    lines.append("")
+    lines.append("Return ONLY a JSON object with: application, failure_mode, elaboration, keywords, jargon")
+    return "\n".join(lines)
 
 
 def build_fb_prompt(principles: list[dict]) -> str:
@@ -115,63 +180,126 @@ def build_fb_prompt(principles: list[dict]) -> str:
     lines.append("Return a JSON object:")
     lines.append('{"name": "...", "definition": "...", "application": "...", ')
     lines.append(' "failure_mode": "...", "elaboration": "...", ')
-    lines.append(' "keywords": "...", "jargon": "..." or null}')
+    lines.append(' "keywords": "...", "jargon": {...} or omit if no specialized terms}')
     return "\n".join(lines)
 
 
-CLASSIFY_SYSTEM_PROMPT = """You are a precise taxonomy classifier for Foundation Blocks.
-You must classify the given FB into 1-3 disciplines and 1-5 domains from the provided lists.
+CLASSIFY_SYSTEM_PROMPT = """You are a scientific taxonomy classifier. Your job is to identify
+what discipline and domains a Foundation Block genuinely belongs to, using your full knowledge
+of academic fields and applied domains.
+
+CRITICAL: Classify based on what the principle IS, not what label fits best from a predefined list.
+Use precise, scientifically accurate names. If the principle is about "neuroaesthetics", say
+"neuroaesthetics" — do not round it off to "design psychology" or "cognitive science".
+If it's about "thermo-economics", say "thermo-economics" — not "economics".
 
 Rules:
-- Pick EXACTLY from the lists below. NO invented labels. No "emerging" unless absolutely unavoidable.
-- disciplines: Pick 1-3 from the discipline list that capture the FB's intellectual foundations.
-                Multi-disciplinary FBs are EXPECTED and valuable. Only pick ONE if truly single-discipline.
-- domains: Pick 1-5 from the domain list. Only include domains the principle genuinely spans.
-- depth: "universal" (applies everywhere), "cross-domain" (2+ domains),
-         "domain" (specific to one domain), "specialized" (narrow sub-field)
+- discipline: The SINGLE academic/intellectual discipline this FB belongs to.
+  Be specific. "computational neuroscience" > "neuroscience" > "cognitive science".
+  D316: discipline is ALWAYS singular — pick the ONE discipline the FB fundamentally
+  belongs to, even if it spans multiple domains.
+- domains: 1-5 applied domains/fields/industries where this principle is relevant.
+  Think: where would a practitioner USE this knowledge? What fields does it span?
+- is_specialized: true ONLY if this is a narrow sub-technique within a sub-field.
+  "Kerning Pair Adjustment" → true. "Design Strategy" → false. "Color harmony in brand" → true.
+  "Strategic positioning" → false. Most FBs are NOT specialized. Default to false unless
+  the principle is clearly a narrow technique, tool-specific skill, or sub-field detail.
 - evidence: "cited" (grounded in source text) or "axiomatic" (self-evident truth)
 
-CLASSIFICATION EXAMPLES:
+DO NOT:
+- Force-fit into generic categories
+- Simplify complex disciplines into broad buckets
+- Use "emerging" as a label — the pipeline decides that, not you
+- Use placeholder labels like "other", "miscellaneous", "general"
+- Use vague labels like "design" when "interaction design" or "speculative design" is more precise
 
-FB: "The Jagged Frontier of AI Competence" — about AI task performance patterns
--> disciplines: ["strategic thinking", "ai engineering"] | depth: "cross-domain" | domains: ["ai & agents", "engineering practice", "business operations"]
-
-FB: "Descriptive References Reduce Fragility" — about code maintainability via named access
--> disciplines: ["software engineering"] | depth: "domain" | domains: ["code & computation", "engineering practice"]
-
-FB: "Design Fiction" — about speculative prototyping for strategy
--> disciplines: ["design strategy", "strategic thinking"] | depth: "cross-domain" | domains: ["creative technology", "graphic design", "digital product"]
-
-FB: "Cross-Modal Design Amplification" — about multisensory integration in experience design
--> disciplines: ["design psychology", "user research"] | depth: "cross-domain" | domains: ["digital product", "creative technology", "user experience"]
-
-Return ONLY a JSON object: {"disciplines": ["d1", "d2"], "domains": ["d1", "d2"], "depth": "...", "evidence": "..."}"""
+Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "is_specialized": true/false, "evidence": "..."}"""
 
 
-def build_classify_prompt(fb_name: str, fb_definition: str,
-                          domains: list[str], disciplines: list[str]) -> str:
-    """Build the multi-label classification prompt with inline label lists.
-    
-    D2066: Open-set depth-based multi-label classification.
-    disciplines: 1-3 labels (was single-discipline SALSA, D2024 — superseded).
+def build_classify_prompt(fb_name: str, fb_definition: str) -> str:
+    """Build a FREE scientific classification prompt — no canonical lists.
+
+    D2138: Two-stage classification. Stage 1: LLM classifies freely using its
+    full scientific knowledge (produces raw labels). Stage 2: pipeline maps
+    raw labels to canonical taxonomy, using 'emerging' as fallback.
+
+    This preserves ontological accuracy — raw labels capture what the principle
+    genuinely IS, while canonical labels organize it within our taxonomy.
     """
-    domain_list = ", ".join(domains)
-    discipline_list = ", ".join(disciplines)
-
-    return f"""Classify this Foundation Block:
+    return f"""Classify this Foundation Block scientifically.
 
 NAME: {fb_name}
-DEFINITION: {fb_definition[:500]}
+DEFINITION: {fb_definition[:800]}
 
-DISCIPLINES (pick 1-3): {discipline_list}
-
-DOMAINS (pick 1-5): {domain_list}
+Identify:
+1. What academic/intellectual discipline does this principle fundamentally belong to?
+   (Use the most precise discipline name you know — not generic buckets)
+2. What applied domains/fields/industries does this principle span?
+   (1-5 domains where a practitioner would apply this knowledge)
+3. Is this a NARROW sub-technique or sub-field detail? (is_specialized: true/false)
+   - true = narrow technique, tool-specific skill, sub-field detail (e.g., "Kerning Pair Adjustment")
+   - false = broad principle applicable across the domain (e.g., "Design Strategy")
+   - Default to false unless clearly narrow.
 
 Return JSON:
-{{"disciplines": ["discipline1", "discipline2"],
+{{"discipline": "precise_discipline_name",
   "domains": ["domain1", "domain2"],
-  "depth": "universal|cross-domain|domain|specialized",
+  "is_specialized": true_or_false,
   "evidence": "cited|axiomatic"}}"""
+
+
+def map_to_canonical_with_fallback(raw_label: str, kind: str,
+                                     synonym_index: dict[str, str],
+                                     canonical_list: list[str]) -> str:
+    """Map a raw scientific label to canonical taxonomy. Returns 'emerging' if no match.
+
+    D2138: Two-stage classification. The raw label is the LLM's free scientific
+    classification — it captures what the principle genuinely IS. The canonical
+    label maps it into our taxonomy for organization.
+
+    When raw == canonical (exact match), the principle pragmatically and ontologically
+    falls under that canonical label 100%. When no match exists, canonical = 'emerging'
+    and the raw label is preserved forever — enabling future taxonomy expansion via
+    re-mapping without re-running the pipeline.
+
+    Args:
+        raw_label: The LLM's free classification (e.g., "neuroaesthetics")
+        kind: "discipline" or "domain" (constrains canonical list)
+        synonym_index: Pre-built synonym map (lowercase raw → canonical)
+        canonical_list: The full canonical list for this kind
+
+    Returns:
+        Canonical label string, or "emerging" if nothing matches.
+    """
+    if not raw_label or not raw_label.strip():
+        return "emerging"
+
+    raw_lower = raw_label.strip().lower()
+
+    # 1. Exact canonical match (case-insensitive) — principle fits 100%
+    for c in canonical_list:
+        if c.lower() == raw_lower:
+            return c  # Return canonical casing
+
+    # 2. Synonym index match (e.g., "visual communication" → "graphic design")
+    matched = synonym_index.get(raw_lower)
+    if matched:
+        matched_lower = matched.lower()
+        for c in canonical_list:
+            if matched_lower == c.lower():
+                return c
+        # Flat index may have resolved to the wrong KIND (D2133: e.g. raw
+        # "cloud computing" → discipline "software engineering" when we need a
+        # domain). Retry with the kind-constrained index before giving up.
+        from pipeline.schemas import get_synonym_index as _get_kind_syn
+        kind_matched = _get_kind_syn(kind).get(raw_lower)
+        if kind_matched:
+            for c in canonical_list:
+                if kind_matched.lower() == c.lower():
+                    return c
+
+    # 3. No match — genuinely novel. Raw label preserved; canonical = "emerging"
+    return "emerging"
 
 
 def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
@@ -331,21 +459,18 @@ def validate_classification(result: dict) -> tuple[bool, list[str]]:
     """
     errors: list[str] = []
 
-    # Validate disciplines (multi-label, 1-3)
-    disciplines = result.get("disciplines", [])
-    if isinstance(disciplines, str):
-        # Backward compat: single string → wrap in list
-        disciplines = [disciplines]
-    if not isinstance(disciplines, list):
-        errors.append(f"Disciplines is not a list: {type(disciplines)}")
-    else:
-        if len(disciplines) < 1:
-            errors.append("At least 1 discipline required")
-        if len(disciplines) > 3:
-            errors.append(f"Too many disciplines: {len(disciplines)} > 3")
-        for d in disciplines:
-            if not is_valid_discipline(d):
-                errors.append(f"Invalid discipline: '{d}'")
+    # D316: discipline is SINGULAR — validate as string
+    discipline = result.get("discipline", "")
+    if isinstance(discipline, list):
+        # Backward compat: if LLM returns old list format, take first element
+        discipline = discipline[0] if discipline else ""
+        result["discipline"] = discipline
+    if not discipline:
+        errors.append("Discipline is required (D316: singular)")
+    elif not isinstance(discipline, str):
+        errors.append(f"Discipline is not a string: {type(discipline)}")
+    elif not is_valid_discipline(discipline):
+        errors.append(f"Invalid discipline: '{discipline}'")
 
     # Validate domains
     domains = result.get("domains", [])
@@ -410,17 +535,38 @@ def check_name_unique(name: str, existing_names: set[str]) -> bool:
     return name not in existing_names
 
 
+def _collect_source_text(principles: list[dict]) -> str | None:
+    """Collect source text from cluster principles for verification.
+
+    Concatenates principle_text fields with source attribution.
+    Returns None if no text available.
+    """
+    texts: list[str] = []
+    for p in principles:
+        pt = (p.get("definition") or p.get("principle_text", "")).strip()
+        if pt:
+            source = p.get("source", p.get("source_books", ["unknown"])[0] if p.get("source_books") else "unknown")
+            texts.append(f"[{source}] {pt}")
+    return "\n\n".join(texts) if texts else None
+
+
 def _serialize_jargon(jargon_value) -> str | None:
-    """Convert jargon (string or dict) to a string.
+    """Convert jargon (dict or string) to flat string. Returns None if empty/absent.
 
     LLM sometimes returns jargon as {"term": "explanation"} dict.
-    Flatten to "term: explanation" format per jargon key.
+    When no specialized terms exist, jargon should be absent — return None
+    so the FB record omits the field entirely.
     """
     if jargon_value is None:
         return None
     if isinstance(jargon_value, str):
-        return jargon_value.strip() or None
+        stripped = jargon_value.strip()
+        if not stripped or stripped in ("{}", "null", "None", ""):
+            return None
+        return stripped
     if isinstance(jargon_value, dict):
+        if not jargon_value:
+            return None
         parts = []
         for term, explanation in jargon_value.items():
             if explanation:
@@ -429,8 +575,9 @@ def _serialize_jargon(jargon_value) -> str | None:
                 parts.append(term)
         return "; ".join(parts) if parts else None
     if isinstance(jargon_value, list):
-        return "; ".join(str(item) for item in jargon_value if item) or None
-    return str(jargon_value) if jargon_value else None
+        result = "; ".join(str(item) for item in jargon_value if item)
+        return result if result else None
+    return None
 
 
 # ── P1.4: FB Relationship Edge Detection ──────────────────────────────────
@@ -485,7 +632,8 @@ def compute_fb_relationships(
     # Pre-extract sets for fast comparison
     fb_id_list: list[str] = [fb["fb_id"] for fb in fbs]
     domain_sets: list[set[str]] = [set(fb.get("domains", [])) for fb in fbs]
-    discipline_sets: list[set[str]] = [set(fb.get("disciplines", [])) for fb in fbs]
+    # D316: discipline is singular — wrap in set for comparison
+    discipline_sets: list[set[str]] = [{fb.get("discipline", "")} if fb.get("discipline") else set() for fb in fbs]
     book_sets: list[set[str]] = [set(fb.get("source_books", [])) for fb in fbs]
 
     # Initialize related_fbs on all FBs
@@ -634,13 +782,37 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         start = time.time()
 
-        # Phase 1: Generate FB — skip GEN for single-FB clusters (D2120 optimization)
-        # Since Stage 3 was removed, every cluster is single-FB (S2 already produced
-        # the full FB). Re-generating via LLM is 100% redundant — saves ~20s/FB.
+        # Phase 1: Generate FB — D2120 optimization: skip full GEN for single-FB
+        # clusters but STILL run a CRIBS enrichment pass to fill application,
+        # failure_mode, elaboration, jargon, keywords (D2137 fix).
         if len(cluster_principles) == 1:
-            fb_data = dict(cluster_principles[0])  # shallow copy to avoid mutation
-            fb_data["_gen_skipped"] = True  # provenance marker
-            print(f"→ ⚡ GEN skipped (single-FB cluster)", flush=True, end=" ")
+            fb_data = dict(cluster_principles[0])  # shallow copy
+            fb_data["_gen_skipped"] = True
+            print(f"→ ⚡ GEN skipped (single-FB)", flush=True, end=" ")
+            # ── D2137: CRIBS enrichment for single-FB clusters ──────────
+            # Stage2 produces name+definition+mechanism+boundary but NOT
+            # application, failure_mode, elaboration, jargon, keywords.
+            # Always run a lightweight enrichment to add these fields.
+            _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
+            if _skip_llm:
+                print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
+            else:
+                try:
+                    cribs_prompt = _build_cribs_enrichment_prompt(fb_data)
+                    cribs_result = call_omlx_json(
+                        prompt=cribs_prompt,
+                        model=GEN_MODEL,
+                        system=CRIBS_ENRICHMENT_SYSTEM,
+                        max_tokens=1024,
+                    )
+                    if isinstance(cribs_result, dict):
+                        for field in ("application", "failure_mode", "elaboration",
+                                      "keywords", "jargon"):
+                            if cribs_result.get(field):
+                                fb_data[field] = cribs_result[field]
+                        print("+CRIBS", flush=True, end=" ")
+                except Exception:
+                    pass  # enrichment is best-effort; don't fail the FB
         else:
             try:
                 prompt = build_fb_prompt(cluster_principles)
@@ -667,66 +839,109 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             failed += 1
             continue
 
-        # Phase 2: Multi-label classify
+        # Phase 2: TWO-STAGE classification (D2138) + derived depth (Kim's logic)
+        # Stage 1: FREE scientific classification — LLM uses full knowledge,
+        # unrestricted by canonical lists. Produces ontologically accurate raw labels
+        # and an is_specialized flag for narrow sub-field detection.
+        # Stage 2: CANONICAL MAPPING — pipeline maps raw labels to taxonomy.
+        # Stage 3: DEPTH DERIVATION — depth = f(n_canonical_domains, is_specialized).
+        # Depth is a structural property (domain count), not a semantic guess.
+        synonym_index = get_synonym_index()
+
         try:
-            class_prompt = build_classify_prompt(
-                name, definition,
-                domains=CANONICAL_DOMAINS,
-                disciplines=CANONICAL_DISCIPLINES,
-            )
+            class_prompt = build_classify_prompt(name, definition)
             class_data = call_omlx_json(
                 prompt=class_prompt,
-                model=VERIFY_MODEL,     # D2068: Phi-4-mini fixed on oMLX 0.5.3 (R5 restore)
+                model=VERIFY_MODEL,
                 system=CLASSIFY_SYSTEM_PROMPT,
                 max_tokens=512,
             )
         except Exception as e:
+            import traceback
             print(f"→ ⚠️  Classification error: {e}, using 'emerging'")
+            print(f"   Traceback: {traceback.format_exc()[-300:]}")
             class_data = {
-                "disciplines": ["emerging"],
+                "discipline": "emerging",
                 "domains": ["emerging"],
-                "depth": "domain",
+                "is_specialized": False,
                 "evidence": "cited",
             }
+            # BUG-058: Track silent classification failures
+            if "classification_errors" not in dir():
+                classification_errors = 0
+            classification_errors += 1
 
-        # Capture raw LLM output BEFORE any validation/replacement.
-        # Authority: governance/domain_labelling.md §1 (D1055-FIX Channel B)
-        # Raw labels are preserved forever; canonical labels earn their place
-        # through accumulation, not through being pre-approved.
+        # ── Stage 1: Capture raw LLM output (D2138: preserved forever) ──
         domains_raw = list(class_data.get("domains", []))
-        disciplines_raw_raw = class_data.get("disciplines", [])
-        if isinstance(disciplines_raw_raw, str):
-            disciplines_raw_raw = [disciplines_raw_raw]
-        disciplines_raw = list(disciplines_raw_raw)
+        discipline_raw_raw = class_data.get("discipline", "")
+        if isinstance(discipline_raw_raw, list):
+            discipline_raw_raw = discipline_raw_raw[0] if discipline_raw_raw else ""
+        discipline_raw = str(discipline_raw_raw) if discipline_raw_raw else ""
+        is_specialized = class_data.get("is_specialized", False)
+        if not isinstance(is_specialized, bool):
+            is_specialized = str(is_specialized).lower() in ("true", "1", "yes")
 
-        # Phase 2b: Synonym matching before validation.
-        # Try to match non-canonical labels via synonym_map.yaml and taxonomy raw aliases.
-        # This reduces "emerging" fallbacks without forcing labels that don't fit.
-        matched_disciplines = []
-        for d in disciplines_raw:
-            if is_valid_discipline(d):
-                matched_disciplines.append(d)
+        # Validate evidence (still LLM-classified)
+        if class_data.get("evidence") not in ("cited", "axiomatic"):
+            class_data["evidence"] = "cited"
+
+        # ── Stage 2: Map raw → canonical (D2138) ──
+        canonical_discipline = map_to_canonical_with_fallback(
+            discipline_raw, "discipline", synonym_index, CANONICAL_DISCIPLINES
+        )
+        canonical_domains: list[str] = []
+        seen_canonical: set[str] = set()
+        for d in domains_raw:
+            mapped = map_to_canonical_with_fallback(
+                d, "domain", synonym_index, CANONICAL_DOMAINS
+            )
+            if mapped not in seen_canonical:
+                seen_canonical.add(mapped)
+                canonical_domains.append(mapped)
+        if not canonical_domains:
+            canonical_domains = ["emerging"]
+
+        # ── Stage 3: DERIVE depth from canonical domain count (Kimi's logic) ──
+        # Depth is a structural property: n_domains → depth tier.
+        # "emerging" counts as 1 domain for broad principles (conservative).
+        # For specialized principles, use canonical-only count — "emerging" isn't
+        # a genuine second domain for a narrow technique.
+        n_canonical = len([d for d in canonical_domains if d != "emerging"])
+        has_emerging = "emerging" in canonical_domains
+
+        if is_specialized:
+            # D2139: Specialized principles use canonical-only domain count.
+            # A narrow technique with 1 real domain + emerging = specialized, not domain.
+            # A narrow technique spanning 2+ real domains = domain (capped, can't be higher).
+            # A narrow technique with 0 real domains (all emerging) = domain (conservative).
+            if n_canonical >= 2:
+                depth_val = "domain"
+            elif n_canonical == 1:
+                depth_val = "specialized"
             else:
-                matched = match_to_canonical(d, kind="discipline")
-                matched_disciplines.append(matched if matched else d)
-        class_data["disciplines"] = matched_disciplines
+                depth_val = "domain"
+        else:
+            effective_n = n_canonical + (1 if has_emerging else 0)
+            if effective_n >= 3:
+                depth_val = "universal"
+            elif effective_n == 2:
+                depth_val = "cross-domain"
+            elif effective_n == 1:
+                depth_val = "domain"
+            else:
+                depth_val = "domain"
 
-        matched_domains = match_domains_to_canonical(domains_raw)
-        if matched_domains:
-            class_data["domains"] = matched_domains
+        # ── Assemble class_data with CANONICAL labels + derived depth ──
+        class_data["discipline"] = canonical_discipline
+        class_data["domains"] = canonical_domains
+        class_data["depth"] = depth_val
 
-        # Validate classification
+        # Validate canonical labels (safety net — mapper should only return valid labels)
         is_valid, errors = validate_classification(class_data)
         if not is_valid:
             classification_errors += 1
-            # Fix invalid labels by replacing with 'emerging'
-            fixed_disciplines = []
-            for d in class_data.get("disciplines", []):
-                if is_valid_discipline(d):
-                    fixed_disciplines.append(d)
-            if not fixed_disciplines:
-                fixed_disciplines = ["emerging"]
-            class_data["disciplines"] = fixed_disciplines
+            if not class_data.get("discipline") or not is_valid_discipline(class_data["discipline"]):
+                class_data["discipline"] = "emerging"
             fixed_domains = []
             for d in class_data.get("domains", []):
                 if is_valid_domain(d):
@@ -734,10 +949,6 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             if not fixed_domains:
                 fixed_domains = ["emerging"]
             class_data["domains"] = fixed_domains
-            if class_data.get("depth") not in ("universal", "cross-domain", "domain", "specialized"):
-                class_data["depth"] = "domain"
-            if class_data.get("evidence") not in ("cited", "axiomatic"):
-                class_data["evidence"] = "cited"
 
         # Collect source books
         source_books = set()
@@ -755,15 +966,16 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         existing_names.add(name)
 
         # ── Auto-derive agentic metadata (D2130) ──────────────────────────
-        n_disciplines = len(class_data.get("disciplines", []))
         n_domains = len(class_data.get("domains", []))
 
-        # difficulty_level: derived from depth + discipline complexity
+        # difficulty_level: derived from depth (discipline is singular, no cardinality check)
         depth_val = class_data.get("depth", "domain")
-        if depth_val == "specialized" or (depth_val == "domain" and n_disciplines == 1):
+        if depth_val == "specialized":
             difficulty_level = "expert"
-        elif depth_val == "universal" or n_disciplines >= 3:
+        elif depth_val == "universal":
             difficulty_level = "beginner"  # universal = accessible to all
+        elif depth_val == "domain":
+            difficulty_level = "expert" if n_domains == 1 else "intermediate"
         else:
             difficulty_level = "intermediate"
 
@@ -776,14 +988,51 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         else:
             temporal_scope = "timeless"  # default: principles are timeless unless evidence suggests otherwise
 
-        # depth consistency check (D2130: warn, don't override LLM)
-        depth_warning = None
-        if depth_val == "specialized" and n_disciplines > 1:
-            depth_warning = f"depth=specialized but {n_disciplines} disciplines"
-        elif depth_val == "universal" and n_domains < 3:
-            depth_warning = f"depth=universal but only {n_domains} domains"
-        if depth_warning:
-            print(f"      ⚠️  {depth_warning}", flush=True)
+        # ── Auto-derive v1 Anytype properties (context, accessibility, intimacy_boundary) ─
+        # context: comma-separated routing hints derived from domain signals
+        context_parts: list[str] = []
+        business_signals = {"business operations", "business development", "entrepreneurship",
+                            "organizational behavior", "marketing"}
+        design_signals = {"graphic design", "brand identity", "editorial & advertising",
+                          "motion design", "environmental design", "digital product",
+                          "illustration", "packaging", "web & ui", "user experience",
+                          "creative technology", "data visualization"}
+        system_signals = {"systems & frameworks", "code & computation", "engineering practice",
+                          "ai & agents", "ai systems", "computational science & physics",
+                          "software engineering"}
+        academic_signals = {"research & methodology", "semiotics & communication",
+                            "computational art", "philosophy"}
+        domain_set = set(class_data.get("domains", []))
+        if domain_set & business_signals:
+            context_parts.append("business")
+        if domain_set & design_signals:
+            context_parts.append("design")
+        if domain_set & system_signals:
+            context_parts.append("system")
+        if domain_set & academic_signals:
+            context_parts.append("academic")
+        if not context_parts:
+            context_parts.append("personal")
+        context_val = ", ".join(sorted(context_parts))
+
+        # accessibility: derived from prerequisite_fbs and difficulty
+        # D2132: expert→prerequisite is a default, not a law.
+        # The golden set shows many expert FBs (L06, F02, K02, C02) are self-evident
+        # when the core claim is intuitive even if application details require expertise.
+        # Override: no prereqs AND definition < 200 chars → self-evident regardless of difficulty.
+        prereqs = fb_data.get("prerequisite_fbs", [])
+        if prereqs and isinstance(prereqs, list) and len(prereqs) > 0:
+            accessibility_val = "prerequisite"
+        elif difficulty_level == "expert" and len(definition) > 200:
+            accessibility_val = "prerequisite"
+        else:
+            accessibility_val = "self-evident"
+
+        # intimacy_boundary: default public for pipeline FBs (user can override)
+        intimacy_val = "public"
+
+        # provenance: pipeline FBs are always llm_extracted_from_source (C29)
+        provenance_val = "llm_extracted_from_source"
 
         # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
         fb = {
@@ -794,13 +1043,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "failure_mode": fb_data.get("failure_mode", "").strip(),
             "elaboration": fb_data.get("elaboration", "").strip(),
             "keywords": fb_data.get("keywords", "").strip(),
-            "jargon": _serialize_jargon(fb_data.get("jargon")),
             "domains": class_data["domains"],
-            "disciplines": class_data["disciplines"],
+            "discipline": class_data.get("discipline", "emerging"),
             "domains_raw": domains_raw,
-            "disciplines_raw": disciplines_raw,
+            "discipline_raw": discipline_raw if discipline_raw else None,
             "depth": depth_val,
             "evidence": class_data.get("evidence", "cited"),
+            # ── v1 Anytype properties ──
+            "context": context_val,
+            "accessibility": accessibility_val,
+            "intimacy_boundary": intimacy_val,
+            "provenance": provenance_val,
             # ── Agentic metadata ──
             "difficulty_level": difficulty_level,
             "temporal_scope": temporal_scope,
@@ -810,6 +1063,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
             "source_principle_ids": [p.get("principle_id", "") for p in cluster_principles if p.get("principle_id")],
+            "source_text": _collect_source_text(cluster_principles),
             "classification_errors": errors if errors else None,
             # ── Utilization tracking (initialized at zero) ──
             "usage_count": 0,
@@ -817,6 +1071,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "feedback_count": 0,
             "fb_version": 1,
         }
+        # Only include jargon when specialized terms need explanation
+        jargon_val = _serialize_jargon(fb_data.get("jargon"))
+        if jargon_val:
+            fb["jargon"] = jargon_val
         fb = stamp_record(fb, gen_model=GEN_MODEL)
         fb["pipeline_run_id"] = pipeline_run_id
         fb["pipeline_commit"] = pipeline_commit

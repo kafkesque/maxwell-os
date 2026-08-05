@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-stage5_verify.py — Verify FBs via DeBERTa NLI pre-filter + Gemma-4-E4B deep check.
+stage5_verify.py — Verify FBs via ModernBERT NLI pre-filter + Gemma-4-E4B deep check.
 ==================================================================================
 Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8, D2069
 
@@ -57,6 +57,9 @@ from pipeline.pipeline_paths import (
     BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
     S5_BORP_BYPASS_TYPES,  # D2083: types that skip BORP check
+    S5_NLI_ENTAILMENT_THRESHOLD,  # D2119: configurable NLI threshold
+    S5_NLI_MODEL,  # D2119: primary NLI model (ModernBERT)
+    S5_NLI_MODEL_FALLBACK,  # D2119: fallback NLI model (DeBERTa)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
     VERIFY_MODEL_V2,  # D2069: cross-family verifier (Gemma-4-E4B)
@@ -64,32 +67,63 @@ from pipeline.pipeline_paths import (
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
-NLI_ENTAILMENT_THRESHOLD: float = 0.6  # Minimum confidence for DeBERTa ENTAILMENT label (D2093)
-# ── DeBERTa NLI — ported from old project s6_pipeline.py (D2093, D2101, D2104) ─
-# The embedding-similarity pre-filter has been REPLACED with real NLI entailment.
-# In cluster-before-extract architecture, FBs have verbatim evidence_passages —
-# DeBERTa works correctly because it compares against exact source text.
+NLI_ENTAILMENT_THRESHOLD: float = S5_NLI_ENTAILMENT_THRESHOLD  # D2119: from config (default 0.6)
+# ── NLI Model — config-driven with automatic fallback (D2119) ────────────
+# Primary: ModernBERT-base-nli (~64ms, 8192 ctx, 90% MNLI accuracy)
+# Fallback: DeBERTa-v3-base-mnli-fever-anli (~129ms, 512 ctx, 90% MNLI + FEVER)
+# If primary model fails to load (missing, OOM, etc.), falls back automatically.
 
 _nli_pipeline = None
+_nli_model_loaded: str = ""
 
 
 def _get_nli():
-    """Lazy-load DeBERTa-v3-base-mnli for entailment scoring.
+    """Lazy-load NLI model for entailment scoring.
 
-    D2105: Switched from roberta-large-mnli to DeBERTa-v3-base-mnli-fever-anli.
-    DeBERTa outperforms RoBERTa on MNLI (90.3% vs 89.4%) and the FEVER+ANLI
-    fine-tune adds fact-verification capability relevant to our use case.
-    Model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB, on disk).
+    D2119: Switched primary from DeBERTa-v3 to ModernBERT-base-nli.
+    ModernBERT is 2× faster (64ms vs 129ms), has 16× larger context (8192 vs 512),
+    and achieves equal accuracy (90% on 20-pair manual test).
+    DeBERTa kept as automatic fallback if ModernBERT can't load.
+    Model configured in pipeline_config.yaml → stage5.nli_model.
     """
-    global _nli_pipeline
-    if _nli_pipeline is None:
-        from transformers import pipeline
+    global _nli_pipeline, _nli_model_loaded
+    if _nli_pipeline is not None:
+        return _nli_pipeline
+
+    from transformers import pipeline
+
+    # Try primary model first
+    primary = S5_NLI_MODEL
+    fallback = S5_NLI_MODEL_FALLBACK
+
+    try:
+        print(f"   🧠 Loading NLI model: {primary}...")
         _nli_pipeline = pipeline(
             "text-classification",
-            model="MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+            model=primary,
             device=-1,
         )
-    return _nli_pipeline
+        _nli_model_loaded = primary
+        print(f"   ✅ NLI: {primary}")
+        return _nli_pipeline
+    except Exception as e:
+        print(f"   ⚠️  Primary NLI model failed: {e}")
+        print(f"   🔄 Falling back to: {fallback}...")
+        try:
+            _nli_pipeline = pipeline(
+                "text-classification",
+                model=fallback,
+                device=-1,
+            )
+            _nli_model_loaded = fallback
+            print(f"   ✅ NLI (fallback): {fallback}")
+            return _nli_pipeline
+        except Exception as e2:
+            raise RuntimeError(
+                f"Both NLI models failed to load.\n"
+                f"  Primary: {primary} → {e}\n"
+                f"  Fallback: {fallback} → {e2}"
+            )
 
 
 def nli_entailment(claim: str, source: str) -> dict:
@@ -342,7 +376,8 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
     print(f"🔍 Stage 5: Verify — {total} FBs")
     print(f"   Verifier: {VERIFY_MODEL_V2} (cross-family, R5: Gemma ≠ Phi ≠ Qwen)")
-    print(f"   Pre-filter: {'✅ DeBERTa-v3 NLI entailment' if not skip_nli else '❌ skipped'}")
+    print(f"   Pre-filter: {'✅ ModernBERT NLI entailment' if not skip_nli else '❌ skipped'} (D2119)")
+    print(f"   NLI model: {S5_NLI_MODEL} | Fallback: {S5_NLI_MODEL_FALLBACK}")
     print(f"   OMLX deep check: {'✅ available' if omlx_available else '❌ unavailable'}")
     print(f"   Strict: {strict} | NLI threshold: {NLI_ENTAILMENT_THRESHOLD} | Fail-closed: ✅ (D2093)")
     print(f"{'='*60}")
@@ -456,10 +491,18 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
         stats[status] += 1
 
+        # ── Compute confidence_score (D2130 fix: was always None) ──────────
+        # Weighted average of BORP (20%) + Completeness (10%) + Factual (70%)
+        # Factual score carries more weight because it's the hardest check.
+        confidence_score = round(
+            0.20 * borp_score + 0.10 * comp_score + 0.70 * fact_score, 4
+        )
+
         # Build verified FB
         vfb = dict(fb)
         vfb["verification_results"] = results
         vfb["borp_score"] = borp_score
+        vfb["confidence_score"] = confidence_score
         vfb["status"] = status
         vfb["needs_human_review"] = needs_human
         vfb["verifier_model"] = VERIFY_MODEL_V2

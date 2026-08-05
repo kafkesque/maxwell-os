@@ -1,6 +1,20 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-07-26 15:49 (BUG-051/048/053 fixed, BUG-054 investigated, gemma delegate viable)
-> **Next review:** After delegate system stabilized + just smoke tested
+> **Last updated:** 2026-07-28 15:30 (D2121-D2126 implemented, BUG-055 found+fixed)
+> **Next review:** After domain-by-domain extraction run (D2124)
+
+---
+
+### BUG-055: `related_fbs` vs `related_blocks` Field Name Mismatch Across Pipeline
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (silent data loss — relationships computed but never surfaced) |
+| **Discovered** | 2026-07-28 — vibecheck after D2121-D2126 implementation |
+| **Symptom** | `compute_fb_relationships()` in `stage4_merge.py` writes to dict key `related_fbs`, but `tests/full_run.py` initialized `related_blocks: None` and `stage6b_anytype_push.py` read from `related_blocks`. After calling compute, the `related_blocks` key remained `None` and `related_fbs` was populated but never displayed/serialized. |
+| **Root Cause** | v1 schema used `related_blocks`. D2118/P1.4 introduced `related_fbs`. Schema migration was incomplete — test file and push script retained old field name. |
+| **Impact** | Full run test: `related_blocks` always `None`, Obsidian markdown never rendered related blocks. Anytype push: `related_fbs` field missing from payload. |
+| **Fix** | Standardized on `related_fbs` across all files: `tests/full_run.py` (field init + summary messages), `pipeline/stage6b_anytype_push.py` (ALL_FIELDS list, markdown render, payload function). `schema_accessor.py` already used `related_fbs`. |
+| **Files** | tests/full_run.py, pipeline/stage6b_anytype_push.py |
+| **Status** | ✅ FIXED (2026-07-28) |
 
 ---
 
@@ -810,3 +824,64 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 | D2084-D1 | 🟡 MED | PI/TI/GE/PT not committed to DB | D2084 |
 | D2084-D2 | 🟡 MED | Orphan PIs without parent PT links | D2084 |
 | D2084-D3 | 🟡 MED | Growth edge quarantine no promotion | MTR |
+
+---
+
+## BUG-056: False Embedding-Speed Claim in stage1_5_fastembed.py
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 MEDIUM (misleads future runs; could waste 9h on wrong route) |
+| **Discovered** | 2026-08-03 — measured benchmark (2,000-seg sample, M1 Max) |
+| **Symptom** | Docstring claims "~5 min" for 289K embeddings (D2127r4). Measured reality: **564 min** (9.4h) with default CPU ONNX. CoreML provider gives no speedup (9 seg/s). |
+| **Root Cause** | Claim never benchmarked on this hardware before logging. |
+| **Impact** | Any session trusting D2127r4 loses ~9h. |
+| **Fix** | D2131 — update docstring with measured numbers; verified fastest route is sentence-transformers bge-small on MPS (45 seg/s, 106 min). |
+| **Status** | 🟡 OPEN → tracked as D2131 |
+
+## BUG-057: 16 Books Missing from Chunked Corpus (906/922)
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (silent corpus gap: 98.3% coverage, 1.7% missing with no error) |
+| **Discovered** | 2026-08-03 — cross-check config books vs stage1_chunk/latest |
+| **Symptom** | 16 MD files exist in `knowledge pipeline/books/` but produce zero segments. 12 have valid content (165KB–1MB); 4 are 0KB corrupt (`Mueller-Brockmann_Grid_Systems`, `Build a Multi-Agent System (MEAP)`, `Domain-Specific SLMs (MEAP)`, `Prompt Engineering for AI Systems (MEAP)`). |
+| **Root Cause** | Stage 1 chunking run interrupted (memory hang) or per-file errors silently skipped. |
+| **Impact** | Books like *Blink*, *Thinking with Type*, *Grid Systems* absent from knowledge base. |
+| **Fix** | D2130 — re-chunk the 12 valid books; quarantine the 4 zero-byte files (source EPUBs/PDFs no longer on disk — 0 found — unrecoverable without re-acquisition). |
+| **Status** | 🟡 OPEN → tracked as D2130 |
+
+## BUG-058: Silent Classification Fallback to "emerging" on LLM Error
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (silent corruption of classification metrics — C16 violation) |
+| **Discovered** | 2026-08-03 — code inspection stage4_merge.py L845-857 |
+| **Symptom** | Any OMLX/classify exception in Stage 4 silently produces `{"discipline": "emerging", "domains": ["emerging"], ...}` with no log. 45% of 77-FB run mapped to `emerging` (35/77) — part genuine taxonomy gaps, part potentially silent LLM errors, indistinguishable today. |
+| **Root Cause** | `except Exception: class_data = {...emerging...}` without logging (L851). |
+| **Impact** | Misclassification is invisible; quality gates can't distinguish taxonomy-gap from classifier-failure. |
+| **Fix** | D2134 — log warning + set `classification_errors` field, count failures in summary. |
+| **Status** | 🟡 OPEN → tracked as D2134 |
+
+---
+
+## BUG-059: pipeline/embeddings.py Missing — Semantic Relationship Edges Silent
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟠 HIGH (silent data loss — semantic_near edges never computed) |
+| **Discovered** | 2026-08-04 — Q3 audit of full_run_streaming.py |
+| **Symptom** | `stage4_merge.py:618` imports `embed_texts_bge_m3` from `pipeline.embeddings` which did NOT exist anywhere in the repo. The try/except silently degraded `compute_fb_relationships()` to domain/discipline/source edges only. The 77-FB run's `related_fbs` had NO semantic similarity edges, and no error was ever surfaced (C16 violation). |
+| **Root Cause** | Embeddings module deleted/lost before D2118; import wrapped in try/except so the absence was invisible. |
+| **Impact** | Graph foundation (LightRAG) missing semantic edges; near-duplicate FBs across books never linked. |
+| **Fix** | D2136 — created `pipeline/embeddings.py` with `embed_texts_bge_m3()` (Ollama bge-m3, config-driven, normalized output). Verified: semantic_near edges now emitted (test: 3 FBs → 1 semantic edge). |
+| **Status** | ✅ FIXED (2026-08-04, D2136) |
+
+---
+
+## BUG-060: mlx_provider.py Unusable - 501s Load + 556s Unconstrained Generation
+| Field | Value |
+|-------|-------|
+| **Severity** | ORANGE HIGH (D2055 dead code - direct-MLX path broken) |
+| **Discovered** | 2026-08-04 - measured benchmark (M1 Max, mlx-community/Phi-4-mini-instruct-8bit) |
+| **Symptom** | MLXInferenceProvider.generate_json() -> first-use load 501s (re-downloads 12 files from HF despite cache) + single classify call 556s producing an open-ended essay, NOT the requested JSON (outlines constraint not applied). vs OMLX same model: 1.6s for identical call. |
+| **Root Cause** | 1) Model cache miss (weights not in the HF cache the provider reads) -> 8+ min download on first use. 2) Outlines/JSON-schema path not constraining output - model rambles. 3) Generation defaults unverified. |
+| **Impact** | Direct-MLX (D2055 speculative decoding / KV cache / outlines) is 0% used AND currently unusable. Pipeline is 100% OMLX HTTP. Any plan relying on mlx_provider would take ~9 min per call today. |
+| **Fix plan** | Debug separately: verify HF cache path, cap max_tokens, unit-test outlines constraint, then benchmark speculative decoding (draft Qwen2.5-0.5B IS cached - confirmed). Deferred - OMLX is the proven path for the hybrid run. |
+| **Status** | YELLOW OPEN - deferred (OMLX stays primary) |

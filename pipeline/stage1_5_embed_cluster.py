@@ -44,7 +44,11 @@ from pipeline.io_guard import safe_write
 from pipeline.ollama_embed import batch_embed
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
+    S13_DIR,
+    S15_EMBED_BACKEND,
+    S15_EMBED_DIM,
     S15_EMBED_MODEL,
+    S15_EMBED_MODEL_HF,
     S15_FAISS_THRESHOLD,
     S15_MAX_CLUSTER_SIZE,
     S15_MIN_CLUSTER_SIZE,
@@ -53,6 +57,7 @@ from pipeline.pipeline_paths import (
     STAGE1_5_CHECKPOINT,
     STAGE1_5_SINGLETONS,
     STAGE1_CHECKPOINT,
+    get_run_id,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
@@ -67,12 +72,21 @@ def load_segments() -> list[dict]:
     Returns:
         List of segment dicts with at minimum: segment_id, text, source_book.
     """
-    # Try Stage 1.3 prefilter first
-    prefilter_path = CHECKPOINT_DIR / "stage1_3_filtered.jsonl"
-    if prefilter_path.exists():
-        print(f"   📂 Loading from Stage 1.3 prefilter: {prefilter_path}")
-        checkpoint = prefilter_path
-    elif STAGE1_CHECKPOINT.exists():
+    # Stage 1.3 prefilter writes in-place to STAGE1_CHECKPOINT, but also
+    # writes a flag at S13_DIR/{run_id}/checkpoint.jsonl. If the flag exists,
+    # we know STAGE1_CHECKPOINT has been filtered — use it directly.
+    prefilter_flag = S13_DIR / get_run_id() / "checkpoint.jsonl"
+    if prefilter_flag.exists():
+        # Verify it's a flag, not segments (flag has "completed" key)
+        try:
+            flag_data = json.loads(prefilter_flag.read_text().strip())
+            if flag_data.get("completed"):
+                print(f"   ✅ Stage 1.3 prefilter completed ({flag_data.get('kept', '?')}/{flag_data.get('total', '?')} kept)")
+        except (json.JSONDecodeError, KeyError):
+            pass
+        # Fall through to load from STAGE1_CHECKPOINT (which IS the filtered output)
+
+    if STAGE1_CHECKPOINT.exists():
         print(f"   📂 Loading from Stage 1: {STAGE1_CHECKPOINT}")
         checkpoint = STAGE1_CHECKPOINT
     else:
@@ -95,39 +109,95 @@ def load_segments() -> list[dict]:
 
 
 def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.ndarray:
-    """Embed segment text via bge-m3 (Ollama).
+    """Embed segment text via configured backend (MPS fast, Ollama fallback).
+
+    D2127r5: Added MPS sentence-transformers path (~47 seg/s) when
+    S15_EMBED_BACKEND == 'mps'. Falls back to Ollama HTTP bge-m3 (~33 seg/s).
+    Both paths apply Matryoshka truncation to S15_EMBED_DIM.
 
     Args:
         segments: List of segment dicts with 'text' field.
-        model: Ollama embedding model name.
+        model: Ollama embedding model name (ignored when backend=mps).
 
     Returns:
-        Float32 array of shape (n_segments, 1024), normalized to unit vectors.
+        Float32 array of shape (n_segments, S15_EMBED_DIM), normalized to unit vectors.
     """
     texts: list[str] = [seg["text"][:1500] for seg in segments]
     total: int = len(texts)
 
-    print(f"   🧠 Embedding {total} segments via {model}...")
+    # ── D2127r5: MPS fast path via sentence-transformers ───────────────
+    if S15_EMBED_BACKEND == "mps":
+        print(f"   🧠 Embedding {total} segments via {S15_EMBED_MODEL_HF} (MPS, {S15_EMBED_DIM}d)...")
+        start: float = time.time()
+
+        from sentence_transformers import SentenceTransformer
+        st_model = SentenceTransformer(S15_EMBED_MODEL_HF, device="mps")
+        raw = st_model.encode(texts, batch_size=128, show_progress_bar=True, device="mps")
+
+        elapsed: float = time.time() - start
+        embeddings: np.ndarray = np.array(raw, dtype=np.float32)
+        # Pad or truncate to S15_EMBED_DIM
+        if embeddings.shape[1] < S15_EMBED_DIM:
+            pad = np.zeros((embeddings.shape[0], S15_EMBED_DIM - embeddings.shape[1]), dtype=np.float32)
+            embeddings = np.concatenate([embeddings, pad], axis=1)
+        elif embeddings.shape[1] > S15_EMBED_DIM:
+            embeddings = embeddings[:, :S15_EMBED_DIM]
+
+        print(f"      → {len(embeddings)} embeddings ({embeddings.shape[1]}d) in {elapsed:.1f}s ({total/elapsed:.0f}/s)")
+
+        # Normalize
+        norms: np.ndarray = np.linalg.norm(embeddings, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        return embeddings / norms
+
+    # ── Ollama HTTP fallback ────────────────────────────────────────────
+    print(f"   🧠 Embedding {total} segments via {model} (Ollama, truncating to {S15_EMBED_DIM}d)...")
     start: float = time.time()
 
-    all_embeddings: list[np.ndarray] = []
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    batches: dict[int, list[str]] = {}
     for i in range(0, total, BATCH_SIZE):
-        batch: list[str] = texts[i : i + BATCH_SIZE]
-        raw: list[list[float]] = batch_embed(batch, model=model)
-        for emb in raw:
+        batches[i] = texts[i : i + BATCH_SIZE]
+
+    print(f"      Sending {len(batches)} batches to {model} (parallel workers=4)...")
+    results: dict[int, list[list[float]]] = {}
+    completed_count: int = 0
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_to_idx = {
+            executor.submit(batch_embed, batch_texts, model): idx
+            for idx, batch_texts in batches.items()
+        }
+        for future in as_completed(future_to_idx):
+            idx = future_to_idx[future]
+            try:
+                raw = future.result()
+                results[idx] = raw
+                completed_count += 1
+                if completed_count % 10 == 0 or completed_count == len(batches):
+                    segments_done = min(completed_count * BATCH_SIZE, total)
+                    print(f"      ... {segments_done}/{total}")
+            except Exception as e:
+                print(f"      ⚠️  Batch at idx={idx} failed: {e}")
+                results[idx] = []
+
+    all_embeddings: list[np.ndarray] = []
+    for i in sorted(results.keys()):
+        for emb in results[i]:
             if len(emb) > 0:
-                all_embeddings.append(np.array(emb, dtype=np.float32))
-        if (i // BATCH_SIZE) % 10 == 0:
-            print(f"      ... {min(i + BATCH_SIZE, total)}/{total}")
+                arr: np.ndarray = np.array(emb, dtype=np.float32)
+                if S15_EMBED_DIM < len(arr):
+                    arr = arr[:S15_EMBED_DIM]
+                all_embeddings.append(arr)
 
     elapsed: float = time.time() - start
-    print(f"      → {len(all_embeddings)} embeddings in {elapsed:.1f}s")
+    print(f"      → {len(all_embeddings)} embeddings ({S15_EMBED_DIM}d) in {elapsed:.1f}s")
 
     if len(all_embeddings) < len(segments):
         print(f"   ⚠️  {len(segments) - len(all_embeddings)} segments dropped (embedding failure)")
 
-    embeddings: np.ndarray = np.array(all_embeddings, dtype=np.float32)
-    # Normalize to unit vectors for cosine similarity via inner product
+    embeddings = np.array(all_embeddings, dtype=np.float32)
     norms: np.ndarray = np.linalg.norm(embeddings, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
     embeddings = embeddings / norms

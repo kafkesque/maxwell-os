@@ -1,7 +1,7 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-07-26 16:45 | **Decision:** D2120 (Phase 0 Refactor)
+> **Updated:** 2026-08-03 22:00 | **Decisions:** D2129–D2135 (7 new, verified fixes)
 > **Rule:** Undone tasks at top (priority-ordered). Done tasks at bottom.
-> **Buglog:** 8 open bugs | **Decision log:** 212 decisions (D2000-D2120)
+> **Buglog:** 8 open + BUG-056/057/058 (3 new) | **Decision log:** 132 decisions (D2000-D2135)
 
 ---
 
@@ -17,6 +17,19 @@
 | P0.6 | **Subprocess parallelism** — `pipeline/parallel.py` book-level Stage 0/1 | +152 | DELEGATE-001, D2120 | ✅ DONE |
 
 **Phase 0 gate:** ✅ PASSED. `just smoke-plumbing` passes <30s. `just smoke` passes <2min. Net ~560 LOC.
+
+## 🔴 PHASE 0.5 — VERIFIED BOTTLENECK FIXES (2026-08-03, D2129-D2134)
+
+| # | Task | Effort | Source | Status |
+|---|------|--------|--------|--------|
+| V1 | **Streaming per-book production run** — `tests/full_run_streaming.py`; chunk→extract→classify→persist→free per book; resume checkpoint; smoke-tested (3 books → 9 FBs) | 2h | D2129, BUG-02 (hang) | ✅ DONE (2026-08-03) |
+| V2 | **Re-chunk 12 missing books** + quarantine 4 zero-byte corrupt files — resolved by V1 design (iterates all 922 config books; auto-quarantine) | 30m | D2130, BUG-057 | ✅ DONE (via V1) |
+| V3 | **Correct embedding speed claim** in stage1_5_fastembed.py (measured 564 min ≠ "~5 min") | 15m | D2131, BUG-056 | ⬜ TODO |
+| V4 | **Repoint/remove dead `books` symlink** + smoke assertion ≥900 MD | 15m | D2132 | ⬜ TODO |
+| V5 | **Expand canonical taxonomy** — +26 disciplines/+10 domains; kind-aware synonym index; measured 35/77→0/77 discipline collapse | 3h | D2133 | ✅ DONE (2026-08-03) |
+| V6 | **Fail-visible classification fallback** — log + `classification_errors` field, count failures | 30m | D2134, BUG-058 | ⬜ TODO |
+
+
 
 ---
 
@@ -117,7 +130,73 @@
 | C1 | Delegate system workaround (local OMLX) | 2026-07-26 |
 | C2 | Governance sync (115 decisions) | 2026-07-26 |
 | C4 | CONSTITUTION NLI mismatch fix | 2026-07-26 |
+| **D2121** | **C12 De-Hardcoding:** 19 values from tests/full_run.py → config/pipeline_config.yaml | 2026-07-28 |
+| **D2122** | **Anytype Push Complete Payload:** 42-field payloads, 3-zone body, PT/PI/GE/TI export | 2026-07-28 |
+| **D2123** | **Session Agreements Formalized:** Citation format, jargon body-only, body-only fields, related_blocks mandatory | 2026-07-28 |
+| **D2124** | **Extraction Strategy:** Domain-by-domain sequential (Design→AI→Systems→Substrate→Art→Business→Personal→Influence) | 2026-07-28 |
+| **D2125** | **Pipeline Throughput Estimate:** 5-10s per FB (~6.0s weighted avg), well under 30s threshold | 2026-07-28 |
+| **D2126** | **ModernBERT NLI Confirmed Active:** Live in stage5_verify, DeBERTa fallback | 2026-07-28 |
 
 ---
 
-*Register synchronized with D2120. Phase 0 begins immediately.*
+## 🟢 EXTRACTION STRATEGY (D2124) — 2026-07-28
+
+**Domain-by-Domain Sequential Extraction** is the recommended production start.
+
+### Extraction Order:
+| # | Domain | Rationale | Est. FBs |
+|---|--------|-----------|----------|
+| 1 | **Design** (DOMAIN 2) | Largest, most diverse: comm design, UX, brand, typography | 200-400 |
+| 2 | **AI + Computing** (DOMAIN 6) | PT-rich: engineering patterns, agent architecture, ML ops | 150-300 |
+| 3 | **Systems + Decision** (DOMAIN 0) | Universal principles: systems thinking, decision theory | 100-200 |
+| 4 | **Substrate** (DOMAIN 1) | Mind, math, meaning: semiotics, cognition, philosophy | 100-200 |
+| 5 | **Art + Comp. Media** (DOMAIN 3) | Specialized: glitch, computational art, media theory | 100-150 |
+| 6 | **Business** (DOMAIN 4) | Strategy, entrepreneurship, marketing | 100-200 |
+| 7 | **Personal Practice** (DOMAIN 5) | Productivity, creativity, learning | 80-150 |
+| 8 | **Influence + Power** (DOMAIN 7) | Negotiation, persuasion, politics | 80-150 |
+
+### After All Domains:
+- Cross-domain re-classification pass (many domain FBs will become cross-domain/universal)
+- Full PT/PI/GE/TI commitment to database
+- LightRAG graph construction from `compute_fb_relationships()` edges
+
+### Expected Throughput (D2125):
+- ~5-10s per FB end-to-end
+- Domain 2 (~300 FBs): ~25-50 minutes
+- Full corpus (~1400 FBs): ~2-4 hours
+
+---
+
+*Register synchronized with D2121-D2126. Session agreements enforced.*
+
+---
+
+## 🟢 PHASE 1.5 — ENHANCEMENTS (2026-07-27)
+
+| # | Task | Effort | Source | Status |
+|---|------|--------|--------|--------|
+| **E7** | **Matryoshka 512-dim** — Truncate bge-m3 embeddings, 2× faster FAISS, 92% neighbor overlap | 0.5h | D2118 | ✅ DONE |
+| **E6a** | **ModernBERT NLI** — Replace DeBERTa-v3 in stage5_verify, 2× faster with 8192 ctx | 1h | D2119 | ⏳ TESTED |
+| **E6b** | **ModernBERT threshold calibration** — Recalibrate NLI_ENTAILMENT_THRESHOLD for ModernBERT scores | 0.5h | D2119 | 📋 TODO |
+| **E6c** | **ModernBERT fallback config** — Add NLI model toggle in pipeline_config.yaml | 0.3h | D2119, C12 | 📋 TODO |
+| **OKF1** | **Stage 6b OKF export** — `pipeline/stage6_okf_export.py` FBs → .okf/ bundle | 2h | D2120 | 📋 PLANNED |
+| **OKF2** | **OKF index.md generator** — Domain-driven hierarchy, progressive disclosure map | 1h | D2120 | 📋 PLANNED |
+| **OKF3** | **OKF CI gate** — Add `okf validate .okf/ && okf lint .okf/` to justfile | 0.5h | D2120 | 📋 PLANNED |
+
+### Enhancement Summary (2026-07-27)
+
+| Improvement | Speed Gain | Quality Impact | Risk | Status |
+|------------|:----------:|:--------------:|:----:|:------:|
+| bge-m3 512-dim Matryoshka | 2.0× search | Neutral (92% overlap) | LOW | ✅ DONE |
+| ModernBERT-base-nli | 2.0× NLI | Neutral (90% = 90%) | LOW | ⏳ TESTED |
+| OKF export (stage 6b) | N/A | Better agent consumption | NONE | 📋 PLANNED |
+
+### Model Inventory Update
+
+| Model | Role | Size | Speed | Context | Status |
+|-------|------|------|:-----:|:-------:|:------:|
+| Qwen3.6-35B-A3B-4bit | Generator | ~18GB | 30 tok/s | 262K | ✅ Active |
+| Phi-4-mini-instruct-8bit | Verifier | ~8GB | 32 tok/s | 128K | ✅ Active |
+| gemma-4-E4B-it-MLX-4bit | VerifierV2 | ~6GB | 27 tok/s | 128K | ✅ Active |
+| bge-m3 → 512-dim | Embeddings | ~2GB | 2s/embed | N/A | ✅ Upgraded |
+| DeBERTa-v3 → ModernBERT | NLI | 571MB | 64ms/check | 512→8192 | ⏳ Switching |

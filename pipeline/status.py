@@ -101,7 +101,7 @@ def count_books() -> int:
 
 def get_status(json_output: bool = False) -> dict:
     """Gather full pipeline status."""
-    stage_counts = {i: count_jsonl(STAGE_CHECKPOINTS[i]) for i in range(7)}
+    stage_counts = {i: count_jsonl(STAGE_CHECKPOINTS[i]) for i in range(7) if i in STAGE_CHECKPOINTS}
     db_stats = get_db_stats(DB_PATH)
     parquet_count = count_parquet_snapshots()
     book_count = count_books()
@@ -115,7 +115,7 @@ def get_status(json_output: bool = False) -> dict:
             "0_convert": stage_counts[0],
             "1_chunk": stage_counts[1],
             "2_extract": stage_counts[2],
-            "3_cluster": stage_counts[3],
+            "3_cluster": stage_counts.get(3, "removed"),  # D2120: Stage 3 removed
             "4_merge": stage_counts[4],
             "5_verify": stage_counts[5],
             "6_commit": stage_counts[6],

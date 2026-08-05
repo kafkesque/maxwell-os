@@ -12,17 +12,14 @@
 #   - Stage 2 MUST synthesize ONE Foundation Block with mechanism/boundary/consequence
 #   - evidence_passages MUST be verbatim quotes from source segments
 #
-# Schema (Stage 2 output, per D2095):
-#   name: short title (≤5 words)
-#   definition: 1-3 sentence synthesis
-#   mechanism: "X causes/enables/prevents Y because Z"
-#   boundary: when mechanism applies and when it fails
-#   consequence: what follows from the mechanism
-#   evidence_passages: [verbatim quotes from source segments, min 2]
-#   depth: universal|cross_domain|domain|specialized
-#   domains: [list of domains]
-#   is_convergent: true
-#   source_books: [list of source books]
+# Schema (Stage 2 output):
+#   name, definition, mechanism, boundary, consequence,
+#   is_summary (bool), evidence_passages (verbatim quotes), route ("FB" | "NULL")
+#
+# Example-root metadata (NOT Stage 2 output, used by load_golden_parity()):
+#   is_convergent: true/false  — was the cluster cross-source?
+#   should_extract: true/false — positive or negative training example?
+#   source_books: [list]       — reference list for this cluster
 
 examples:
 
@@ -55,7 +52,15 @@ examples:
         deluxe model for $429. The $279 model suddenly looked reasonable and sales nearly doubled.
         The expensive model wasn't meant to sell; it was there to make the original look like a
         good deal. This is asymmetric dominance at work in retail.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
+  is_convergent: true
+  should_extract: true
   expected_fb:
+    is_summary: false
+    route: "FB"
     name: "Asymmetric Dominance Decoy"
     definition: |
       Introducing an inferior decoy option that is dominated by a target option on all salient
@@ -84,10 +89,6 @@ examples:
       - "The Economist's subscription page [...] when the decoy was present, 84% chose Print+Web. When he removed the decoy [...] only 32% chose Print+Web."
       - "adding a clearly inferior option that is dominated by the target can increase the target's share dramatically"
       - "Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for $429. The $279 model suddenly looked reasonable and sales nearly doubled."
-    depth: cross_domain
-    domains: ["pricing", "behavioral economics", "decision making", "marketing"]
-    is_convergent: true
-    should_extract: true
   rationale: |
     Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases
     (Economist subscriptions, general dominance logic, Williams-Sonoma bread makers) converging
@@ -125,7 +126,15 @@ examples:
         decisions unmade. Each day you must decide when, where, and how to exercise. Each decision
         is an opportunity to opt out. Implementation intentions remove these decision points by
         pre-committing to a specific plan. When the moment arrives, there is nothing to decide.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
+  is_convergent: true
+  should_extract: true
   expected_fb:
+    is_summary: false
+    route: "FB"
     name: "Implementation Intention Triggering"
     definition: |
       Specifying the exact time, location, and behavioral format of an intended action ('I will
@@ -153,10 +162,6 @@ examples:
       - "people who use implementation intentions are two to three times more likely to follow through"
       - "Implementation intentions work because they manufacture a clear, unambiguous cue"
       - "implementation intentions remove these decision points by pre-committing to a specific plan"
-    depth: cross_domain
-    domains: ["behavioral change", "psychology", "productivity", "habit formation"]
-    is_convergent: true
-    should_extract: true
   rationale: |
     Two sources (Clear and Duhigg) converging on the same mechanism with complementary explanations.
     Clear provides the specificity + Gollwitzer research data. Duhigg provides the neurological
@@ -188,7 +193,15 @@ examples:
         complexity (abstract conceptual blends), comprehension drops sharply: only 23% of
         participants correctly interpreted the intended meaning. At moderate complexity, both
         comprehension (87%) and elaboration are maximized.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
+  is_convergent: true
+  should_extract: true
   expected_fb:
+    is_summary: false
+    route: "FB"
     name: "Metaphor Complexity Inverted-U"
     definition: |
       Visual metaphors in advertising have a curvilinear (inverted-U) relationship with persuasive
@@ -217,10 +230,6 @@ examples:
       - "Moderately complex metaphors [...] produce the most favorable attitudes toward both the ad and the brand"
       - "At moderate complexity, both comprehension (87%) and elaboration are maximized"
       - "The sweet spot is the 'aha' moment that occurs when the viewer successfully resolves the metaphor"
-    depth: domain
-    domains: ["advertising", "cognitive psychology", "visual communication"]
-    is_convergent: true
-    should_extract: true
   rationale: |
     Two sources from the same academic domain converging on the inverted-U finding — one providing
     the theoretical framework (tipping point, 'aha' moment), the other providing experimental data
@@ -249,7 +258,15 @@ examples:
         similarity between the viewer (who sees themselves as overlooked) and the rookie creates
         emotional resonance that raw achievement data cannot. The principle: people believe stories
         about people who remind them of themselves.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
+  is_convergent: true
+  should_extract: true
   expected_fb:
+    is_summary: false
+    route: "FB"
     name: "Similarity-Weighted Social Proof"
     definition: |
       Social proof persuades through perceived similarity, not volume. A message showing that
@@ -275,13 +292,9 @@ examples:
       campaigns ('X million served') in conversion and engagement. The identity connection creates
       an emotional resonance that statistical proof cannot match.
     evidence_passages:
-      - "showing that 'people like you bought this' is less persuasive — actually MORE persuasive — than showing that '10,000 people bought this'"
+      - "Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'"
       - "people believe stories about people who remind them of themselves"
       - "the effect is strongest when people are uncertain about what to do"
-    depth: cross_domain
-    domains: ["persuasion", "marketing", "behavioral economics", "social psychology"]
-    is_convergent: true
-    should_extract: true
   rationale: |
     Cialdini provides the mechanism (similarity amplifies social proof under uncertainty).
     Heath provides the narrative application (NFL Films example). Convergent extraction must
@@ -309,7 +322,15 @@ examples:
         transformation — where they are now versus where they will be after using your product —
         with such specificity that they experience the relief of the problem being solved before
         they pay a cent.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
+  is_convergent: true
+  should_extract: true
   expected_fb:
+    is_summary: false
+    route: "FB"
     name: "Value-First Demonstration"
     definition: |
       Leading with the experienced outcome of a product — rather than its features, specifications,
@@ -317,11 +338,12 @@ examples:
       evaluating the cost. The value demonstration makes the price an afterthought rather than a
       barrier, because the prospect has already internalized the benefit.
     mechanism: |
-      Value-first demonstration causes higher conversion because it exploits loss aversion in
-      reverse: once a prospect vividly imagines the outcome (the 'after' state), the price becomes
-      the cost of NOT achieving that outcome, rather than the cost of the product. Features-first
-      selling frames the decision as 'is this worth $X?' — a cost-benefit calculation. Value-first
-      selling frames it as 'can you afford NOT to achieve this?' — a loss prevention decision.
+      Value-first demonstration causes higher conversion because outcome visualization
+      creates a vivid internal reference point — prospects imagine the transformation so
+      concretely that the price is evaluated against the relief of the solved problem rather
+      than against competitor feature lists. When the prospect has already experienced the
+      outcome in their mind, the price becomes the cost of not achieving that outcome, not
+      the cost of the product.
     boundary: |
       Applies when the product delivers a clear, emotionally resonant transformation (productivity,
       status, relief, connection). Fails when: (1) the product is a commodity where all competitors
@@ -334,17 +356,13 @@ examples:
       marketing on conversion metrics. Dropbox's video approach (5K→75K signups) is the canonical
       example: showing the outcome created demand that feature lists never generated.
     evidence_passages:
-      - "Beta signups jumped from 5,000 to 75,000 overnight" (Dropbox video demo)
+      - "Beta signups jumped from 5,000 to 75,000 overnight"
       - "making the prospect feel the outcome so vividly that the price becomes an afterthought"
       - "they experience the relief of the problem being solved before they pay a cent"
-    depth: domain
-    domains: ["marketing", "sales", "product", "behavioral economics"]
-    is_convergent: true
-    should_extract: true
   rationale: |
-    Ellis provides the case study (Dropbox, 5K→75K). Hormozi provides the mechanism (loss aversion
-    reversal, outcome visualization). Convergent extraction must combine the empirical evidence
-    with the theoretical mechanism.
+    Ellis provides the case study (Dropbox, 5K→75K). Hormozi provides the mechanism
+    (outcome visualization, price as afterthought). Convergent extraction must combine
+    the empirical evidence with the source-grounded mechanism.
 
 # ═══════════════════════════════════════════════════════════════════════════
 # HARD NEGATIVE: Hallucinated Convergence
@@ -360,17 +378,19 @@ examples:
         price influences not just what we're willing to pay for that product, but what we're willing
         to pay for related products in the same category. Arbitrary anchors can have effects that
         persist even when people know the anchor was arbitrary.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
   expected_fb:
+    is_summary: false
+    route: "NULL"
     name: "Anchoring"
     definition: ""
     mechanism: ""
     boundary: ""
     consequence: ""
     evidence_passages: []
-    depth: specialized
-    domains: []
-    is_convergent: false
-    should_extract: false
   rationale: |
     HARD NEGATIVE: This is a single-source segment passed as a "cluster" with only ONE book.
     Stage 2 should detect that source_diversity < 2 and route this to non-convergent path
@@ -397,17 +417,19 @@ examples:
         Visionary companies prioritize people development. They invest heavily in training and
         create cultures where talented people can thrive and grow. The commitment to people
         is what separates the truly great companies from the merely good ones.
+  is_convergent: true
+  should_extract: true
+  is_convergent: false
+  should_extract: false
   expected_fb:
+    is_summary: false
+    route: "NULL"
     name: ""
     definition: ""
     mechanism: ""
     boundary: ""
     consequence: ""
     evidence_passages: []
-    depth: specialized
-    domains: []
-    is_convergent: false
-    should_extract: false
   rationale: |
     HARD NEGATIVE: Both segments say "good people are important" in different words. This is
     a platitude, not a principle. There is no mechanism (HOW do great people cause great

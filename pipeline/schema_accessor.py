@@ -82,6 +82,11 @@ def fb_source_texts_shown(fb: dict[str, Any]) -> list[str]:
     return fb_source_texts(fb)
 
 
+def fb_source_text_concat(fb: dict[str, Any]) -> str | None:
+    """D2131: Concatenated source paragraph text for fast verification. Single string."""
+    return fb.get("source_text")
+
+
 def fb_source_books(fb: dict[str, Any]) -> list[str]:
     """v2.x/v3.0: source_books or source_clusters[].source_book."""
     books = fb.get("source_books", [])
@@ -107,23 +112,51 @@ def fb_domains(fb: dict[str, Any]) -> list[str]:
     return [str(domain)] if domain else []
 
 
-def fb_disciplines(fb: dict[str, Any]) -> list[str]:
-    """D2066: Multi-label disciplines list (1-3). v3.0 only."""
-    disciplines = fb.get("disciplines", [])
-    if isinstance(disciplines, list):
-        return [str(d) for d in disciplines]
-    # Backward compat: single discipline field
+def fb_discipline(fb: dict[str, Any]) -> str:
+    """D316: SINGULAR discipline — always exactly one canonical discipline.
+
+    v3.0 (D2066-amended): discipline is singular. Multi-label applies to domains only.
+    Backward compat: if old 'disciplines' list is present, takes first element.
+    """
     disc = fb.get("discipline", "")
-    return [str(disc)] if disc else []
+    if disc:
+        return str(disc)
+    # Backward compat: old multi-label 'disciplines' list
+    disciplines = fb.get("disciplines", [])
+    if isinstance(disciplines, list) and disciplines:
+        return str(disciplines[0])
+    return "emerging"
+
+
+def fb_disciplines(fb: dict[str, Any]) -> list[str]:
+    """Backward compat wrapper: returns single discipline as a 1-element list.
+
+    DEPRECATED: Use fb_discipline() for new code. This exists for callers
+    that haven't been updated from the multi-label era.
+    """
+    disc = fb_discipline(fb)
+    return [disc] if disc else []
+
+
+def fb_discipline_raw(fb: dict[str, Any]) -> str | None:
+    """Raw LLM discipline output, before canonical matching. Singular."""
+    raw = fb.get("discipline_raw")
+    if raw and isinstance(raw, str):
+        return raw
+    # Backward compat: old list format
+    raw_list = fb.get("disciplines_raw", [])
+    if isinstance(raw_list, list) and raw_list:
+        return str(raw_list[0])
+    return None
 
 
 def fb_disciplines_raw(fb: dict[str, Any]) -> list[str]:
-    """Raw LLM discipline output, before canonical matching."""
-    raw = fb.get("disciplines_raw", [])
-    if isinstance(raw, list):
-        return [str(r) for r in raw]
-    disc_raw = fb.get("discipline_raw", "")
-    return [str(disc_raw)] if disc_raw else []
+    """Backward compat wrapper: returns raw discipline as 1-element list.
+
+    DEPRECATED: Use fb_discipline_raw() for new code.
+    """
+    raw = fb_discipline_raw(fb)
+    return [raw] if raw else []
 
 
 def fb_related_fbs(fb: dict[str, Any]) -> list[dict]:
@@ -139,6 +172,26 @@ def fb_depth(fb: dict[str, Any]) -> str:
 def fb_evidence_type(fb: dict[str, Any]) -> str:
     """v3.0: evidence | v2.x: evidence (cited/axiomatic)."""
     return str(fb.get("evidence", "cited"))
+
+
+def fb_context(fb: dict[str, Any]) -> str | None:
+    """v1 parity: comma-separated multi-select — business, design, system, academic, personal."""
+    return fb.get("context")
+
+
+def fb_accessibility(fb: dict[str, Any]) -> str | None:
+    """v1 parity: self-evident (immediately graspable) | prerequisite (requires prior concept)."""
+    return fb.get("accessibility")
+
+
+def fb_intimacy_boundary(fb: dict[str, Any]) -> str | None:
+    """v1 parity: Space routing — public (Knowledge base), selective, private (deathpectation)."""
+    return fb.get("intimacy_boundary")
+
+
+def fb_provenance(fb: dict[str, Any]) -> str:
+    """C29: Provenance tier — human_verbatim | llm_extracted_from_source | llm_hypothesis."""
+    return str(fb.get("provenance", "llm_extracted_from_source"))
 
 
 def fb_route(fb: dict[str, Any]) -> str:

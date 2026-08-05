@@ -3,8 +3,8 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-07-26T14:50:00Z</dateModified>
-    <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation</description>
+    <dateModified>2026-07-27T14:24:00Z</dateModified>
+    <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
   </head>
   <body>
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -46,10 +46,62 @@
                description="General developer tooling"/>
       <outline type="rss" text="Prompt Engineering" xmlUrl="https://github.com/topics/prompt-engineering" 
                description="Prompt engineering frameworks and tools"/>
+      <!-- E8: MLX + Apple Silicon ecosystem feeds (2026-07-27) -->
+      <outline type="rss" text="MLX" xmlUrl="https://github.com/topics/mlx"
+               description="Apple MLX framework ecosystem: inference engines, servers, tools, models"/>
+      <outline type="rss" text="Apple Silicon" xmlUrl="https://github.com/topics/apple-silicon"
+               description="Apple Silicon native tools: LLM inference, optimization, monitoring"/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <!-- EVALUATED REPOS — FAISS ALTERNATIVES & ACCELERATORS           -->
+    <!-- MLX INFERENCE ENGINES — evaluated 2026-07-27                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="MLX Inference Engines" description="Apple Silicon LLM servers — alternatives to OMLX">
+
+      <!-- Rapid-MLX / vLLM-MLX — HIGHEST POTENTIAL but cache issue -->
+      <outline type="link" text="⭐ Rapid-MLX (vLLM-MLX) — 2-4x faster than Ollama" 
+               url="https://github.com/raullenchai/Rapid-MLX"
+               description="⭐3,423 | Python | Apache-2.0 | Pure MLX kernels. Continuous batching, prompt cache (radix+DeltaNet RNN), KV cache quantization (int4/int8), 0.08s cached TTFT. Drop-in OpenAI/Anthropic API on port 8000. 165+ text model aliases. ISSUE: v0.11.0 pulls models from HF network instead of using ~/.cache/huggingface/ — violates C1/C3. Monitor for cache-respecting release."/>
+
+      <!-- MTPLX — Native MTP speculative decoding -->
+      <outline type="link" text="⭐ MTPLX — Native MTP speculative decoding" 
+               url="https://github.com/youssofal/MTPLX"
+               description="⭐1,102 | Python | Apache-2.0 | Uses model's built-in MTP heads (no external drafter). Claims 1.6-2.24x decode on M4/M5. ISSUE: M5 TensorOps required for hardware acceleration. M1 Max flagged as 'hardware acceleration confirmed: false'. Benefit at temp=0.0 likely minimal. Monitor for M1-optimized release."/>
+
+      <!-- CIDER — INT8 TensorOps -->
+      <outline type="link" text="CIDER — W8A8/W4A8 INT8 TensorOps" 
+               url="https://github.com/Mininglamp-AI/cider"
+               description="⭐332 | Python | MIT | Unlocks unused INT8 TensorOps on Apple Silicon. SDPA decode kernel 1.2-1.9x. ISSUE: INT8 TensorOps only compile on M5+. M1 Max gets SDPA decode kernel only (~1.0-1.1x). Revisit on M5+ hardware."/>
+
+      <!-- OMLX — Current baseline -->
+      <outline type="link" text="✅ OMLX — Current Maxwell baseline" 
+               url="https://github.com/nlpxio/omlx"
+               description="⭐18,215 | Python | Apache-2.0 | LLM inference server with continuous batching & SSD caching. Already deployed on port 11435. 30 tok/s on Qwen3.6-35B-A3B. Works with HF cache. PROVEN, STABLE."/>
+
+      <!-- mlx-serve — No-Python server -->
+      <outline type="link" text="mlx-serve — No-Python MLX server" 
+               url="https://github.com/ddalcu/mlx-serve"
+               description="⭐374 | Swift | No Python runtime. Smaller footprint. Same MLX backend — no performance advantage over OMLX. Monitor for maturity."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODEL EVALUATION TOOLS — evaluated 2026-07-27                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="Model Evaluation Tools" description="Hardware fit and model selection">
+
+      <!-- llmfit — ADOPTED -->
+      <outline type="link" text="✅ llmfit — Hardware-model fit checker (ADOPTED)" 
+               url="https://github.com/AlexsJones/llmfit"
+               description="⭐30,752 | Rust/Python | MIT | Detects hardware, scores models across fit/speed/quality/context. v1.1.6 installed via pip. Integration script at scripts/llmfit_check.sh. USE FOR ALL NEW MODEL EVALUATION."/>
+
+      <!-- whichllm — Alternative -->
+      <outline type="link" text="whichllm — Community benchmark rankings" 
+               url="https://github.com/maziyarpanahi/whichllm"
+               description="⭐6,019 | Real community-tested tok/s rankings. Different approach: measures, doesn't estimate. Good cross-reference for llmfit estimates."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- FAISS ALTERNATIVES & ACCELERATORS                             -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <outline text="FAISS Alternatives &amp; Accelerators" description="Evaluated via GitHub topic search 2026-07-16">
       
@@ -105,6 +157,9 @@
       <outline type="rss" text="IBM Technology" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCKWaEZ-_VweaEx1jVdoCCRw"
                htmlUrl="https://www.youtube.com/@IBMTechnology"
                description="IBM's agentic AI patterns, CoALA cognitive architecture, skill.md standard. Production-proven enterprise agent patterns."/>
+      <outline type="rss" text="Blaizzy (mlx-vlm/Nativ)" xmlUrl="https://www.youtube.com/feeds/videos.xml?channel_id=UCWg7K2a6BwCk1jNj9R2EeRg"
+               htmlUrl="https://www.youtube.com/@Blaizzy"
+               description="mlx-vlm author, Nativ app developer. MLX inference, local AI on Mac."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -116,6 +171,15 @@
                description="AI agent architecture, tool-use patterns, agent memory design. Practical agentic engineering insights."/>
       <outline type="rss" text="X.com — 0xCodez (via RSS Bridge)" xmlUrl="https://rsshub.app/twitter/user/0xCodez"
                description="RSS proxy for 0xCodez tweets. Agent architecture and memory design insights."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SYSTEM MONITORING & DIAGNOSTICS — evaluated 2026-07-27        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="System Monitoring" description="Apple Silicon diagnostics and optimization">
+      <outline type="link" text="SiliconScope — Sudoless Apple Silicon monitor" 
+               url="https://github.com/kennss/SiliconScope"
+               description="⭐802 | SwiftUI | Native Apple Silicon system monitor with ANE/Media Engine/memory-bandwidth tracking. Diagnostic tool for OOM/thermal debugging."/>
     </outline>
   </body>
 </opml>

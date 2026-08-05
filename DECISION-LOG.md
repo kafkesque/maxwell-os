@@ -1994,3 +1994,609 @@ Then evaluate Qwen3-Embedding on real data before making it primary.
 **Category:** QLT — Quality
 **State:** ACTIVE
 **See:** config/golden/stage2_fewshot_convergent.yaml
+
+## D2118 — Matryoshka 512-dim Embeddings (2026-07-27)
+
+**Decision:** Truncate bge-m3 embeddings from 1024-dim to 512-dim in Stage 1.5 using Matryoshka Representation Learning (MRL).
+
+**Rationale:**
+- bge-m3 was trained with MRL — early dimensions carry coarse semantic structure
+- Tested on 30 real pipeline segments: 92.0% top-10 neighbor overlap, 96.3% cluster assignment agreement
+- FAISS cosine search is 2.0× faster (half the multiply-adds)
+- Index memory usage halved (50% reduction)
+- Quality preservation is EXCELLENT — cluster structure effectively unchanged
+- Reversible: set `embed_dim: 1024` in config to restore full dims
+
+**Implementation:**
+- `config/pipeline_config.yaml`: `stage1_5.embed_dim: 512`
+- `pipeline/pipeline_paths.py`: `S15_EMBED_DIM` constant
+- `pipeline/stage1_5_embed_cluster.py`: truncate + re-normalize after Ollama returns
+- `agent/session_seed.yaml`: updated dims to 512
+
+**Status:** ✅ IMPLEMENTED and VALIDATED
+
+---
+
+## D2119 — ModernBERT-base-nli Replacing DeBERTa-v3 for NLI (2026-07-27)
+
+**Decision:** Replace `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` with `tasksource/ModernBERT-base-nli` for Stage 5 NLI entailment checking.
+
+**Rationale:**
+- Equal accuracy: both 18/20 (90%) on 20 diverse claim-evidence pairs
+- ModernBERT is **2.02× faster**: 64ms vs 129ms per NLI check
+- ModernBERT has **8192 token context** (16× DeBERTa's 512) — evidence passages no longer need truncation
+- Both perfect on CONTRADICTION (6/6) and NEUTRAL (4/4) detection
+- Both 8/10 on ENTAILMENT — different misses (complementary, not worse)
+- ModernBERT loads in 1.9s vs DeBERTa's 8.4s (4.4× faster startup)
+- ModernBERT model: 571MB vs DeBERTa's 362MB (acceptable for 2× speed)
+- Apache 2.0 license (same as DeBERTa)
+
+**Trade-off:** ModernBERT lacks DeBERTa's FEVER fact-verification fine-tune. However, Maxwell's NLI is a pre-filter — failures escalate to Gemma-4-E4B cross-family verification. The 8192 context advantage (processing full evidence passages) likely outweighs the FEVER specialization.
+
+**Implementation plan:**
+- Replace model in `pipeline/stage5_verify.py` `_get_nli()` function
+- Update `NLI_ENTAILMENT_THRESHOLD` if score distributions differ
+- Keep DeBERTa as fallback via config toggle
+
+**Status:** ⏳ TESTED — awaiting implementation
+
+---
+
+## D2120 — OKF Export Stage (2026-07-27)
+
+**Decision:** Add a Stage 6b that exports verified Foundation Blocks to Open Knowledge Format (OKF) bundles. Do NOT replace Maxwell's canonical format — export only.
+
+**Rationale:**
+- OKF (Google Cloud, Apache 2.0) is an open format for agent-readable knowledge bundles
+- Maxwell's Parquet/SQLite storage is queryable but not human-readable or git-diffable
+- OKF export gives: human-readable Markdown per FB, git-diffable text, progressive disclosure, interactive graph (okf server), CI-gated validation (okf validate)
+- Maxwell FB format is RICHER than OKF in critical dimensions: provenance (R14), verification trail, failure modes, verbatim evidence, structured taxonomy
+- Export approach preserves all Maxwell strengths while adding OKF benefits
+
+**Implementation plan:**
+- Create `pipeline/stage6_okf_export.py` — reads verified FBs from SQLite, writes `.okf/` bundle
+- One `.md` per FB with YAML frontmatter containing all Maxwell fields
+- Generate `index.md` with domain-driven hierarchy for progressive disclosure
+- Generate `log.md` from pipeline run metadata
+- Add to pipeline config as optional stage
+
+**Status:** 📋 PLANNED — not yet implemented
+
+---
+
+## D2121 — C12 De-Hardcoding for Test Harness (2026-07-28)
+
+**Decision:** Extract all 16+ hardcoded values in `tests/full_run.py` into `config/pipeline_config.yaml` under a new `test.full_run` section. Every string, threshold, model name, path, and magic number must be config-driven.
+
+**Hardcoded values identified:**
+| # | Hardcoded Value | Location | Config Key |
+|---|----------------|----------|------------|
+| 1 | `"phi-4-mini-instruct-8bit"` | L119, L150 | `test.full_run.extract_model` |
+| 2 | `BOOKS_DIR / "DOMAIN 2 Design/..."` | L30-34 | `test.full_run.books` |
+| 3 | `OUT_DIR / "full-run"` | L19 | `test.full_run.output_subdir` |
+| 4 | `"full-run-v2"` | L244 | `test.full_run.pipeline_commit` |
+| 5 | `"2.3"` | L241 | `test.full_run.schema_version` |
+| 6 | `"v5.0"` | L242 | `test.full_run.taxonomy_version` |
+| 7 | `{"business operations", ...}` signals | L183-186 | `test.full_run.context_signals` |
+| 8 | `{"business": ["business operations"...]}` | L183 | `test.full_run.domain_to_context` |
+| 9 | `"202", "current", "modern", "recent", "today"` | L198 | `test.full_run.temporal_signals` |
+| 10 | `{"specialized": "expert", ...}` | L197 | `test.full_run.difficulty_map` |
+| 11 | `0.7` confidence | L218 | `test.full_run.default_confidence` |
+| 12 | `1` BORP score | L215 | `test.full_run.default_borp_score` |
+| 13 | `"source_text"` grounding | L224 | `test.full_run.default_grounding` |
+| 14 | `"self-evident"` accessibility | L228 | `test.full_run.default_accessibility` |
+| 15 | `"public"` intimacy | L229 | `test.full_run.default_intimacy` |
+| 16 | `"llm_extracted_from_source"` provenance | L230 | `test.full_run.default_provenance` |
+| 17 | `"book_metadata.jsonl"` path | L22 | `config.pipeline_paths.metadata_cache` |
+| 18 | `max_tokens=2048` | L109 | `test.full_run.extract_max_tokens` |
+| 19 | `max_tokens=512` | L151 | `test.full_run.classify_max_tokens` |
+
+**Implementation:**
+- `config/pipeline_config.yaml`: new `test` section with `full_run` subsection
+- `tests/full_run.py`: all values read from config via `pipeline_paths`-style accessor
+- `pipeline/pipeline_paths.py`: add `FULL_RUN_*` constants if needed
+
+**Category:** GOV — Governance
+**State:** ACTIVE
+**See:** config/pipeline_config.yaml, tests/full_run.py
+
+## D2122 — Anytype Push Pipeline: Complete Payload Alignment (2026-07-28)
+
+**Decision:** Upgrade `pipeline/stage6b_anytype_push.py` to produce complete Anytype payloads matching all 42 FB fields, including: jargon (body-only per session agreement), elaboration, keywords, citation in `Author (Book Title)` format, 3-zone body rendering, PT/PI/GE/TI export.
+
+**Gap analysis:**
+- `_format_fb_payload()` returns only 13 of 42 fields — missing jargon, elaboration, keywords, citation, source_paragraph_ids, grounding_evidence, confidence, borp_score, related_blocks, embodiment_tag, temporal_scope, procedural_skill, difficulty_level
+- `_format_fb_markdown()` was missing jargon section, citation header, keywords section, elaboration section
+- No 3-zone body format (v1 `render_zone.py` had ZONE1: definition, ZONE2: application+failure_mode, ZONE3: elaboration+jargon)
+- PT/PI/GE/TI are silently dropped — they're extracted in S4 but never reach push
+
+**Implementation:**
+- `_format_fb_payload()`: add all missing fields, 3-zone body
+- `_format_fb_markdown()`: add citation header, jargon, keywords, elaboration
+- Add `BODY_ONLY_FIELDS` constant matching session agreement
+- Add PT/PI/GE/TI subfolders in domain output
+
+**Category:** INF — Infrastructure
+**State:** ACTIVE
+**See:** pipeline/stage6b_anytype_push.py
+
+## D2123 — Session Agreements Formalized (2026-07-28)
+
+**Decision:** Formalize the 4 session agreements from the full-run audit as constitution-level rules.
+
+**Agreements:**
+1. **Citation format:** `Author (Book Title)` — always this format, derived from metadata cache or filename parsing
+2. **Jargon placement:** Strictly body-only, never in YAML frontmatter. Jargon is pedagogical, not metadata.
+3. **Body-only field list:** `definition`, `application`, `failure_mode`, `elaboration`, `keywords`, `jargon` — these render in the body section, not YAML frontmatter
+4. **related_blocks MUST be populated:** Never `None`. Always call `compute_fb_relationships(fbs)` after FB generation. Synthetic tests must either call the function or explicitly mark as synthetic.
+
+**Enforcement:**
+- `BODY_ONLY_FIELDS` constant in all export/push modules
+- `related_blocks` schema validation in stage5_verify: None → FLAG
+- Citation format validation: must match `Author (Title)` pattern or be flagged
+
+**Category:** GOV — Governance
+**State:** ACTIVE
+**See:** pipeline/stage4_merge.py, pipeline/stage6b_anytype_push.py, tests/full_run.py
+
+## D2124 — Domain-by-Domain Sequential Extraction Strategy (2026-07-28)
+
+**Decision:** Initial production extraction proceeds domain-by-domain, starting with visual design (largest, most diverse in Maxwell's corpus), then AI & computing (PT-rich), then systems (universal principles), then the remaining 5 domains sequentially. After all domains complete, run a cross-domain re-classification pass.
+
+**Rationale:**
+- Domain-by-domain yields full PT/PI/GE/TI capture (each domain has domain-specific process templates, instances, tool instructions)
+- Growth edges are domain-bound initially, then re-classified cross-domain
+- Validates depth distribution progressively (domain → cross-domain → universal emerges naturally)
+- Clean growth path from v1 extraction structure (books organized by domain)
+- Allows per-domain quality calibration before cross-domain merge
+
+**Extraction order:**
+1. DOMAIN 2 — Design (largest, most diverse: communication design, UX, brand, typography, practice)
+2. DOMAIN 6 — AI + Computing (PT-rich: engineering patterns, agent architecture, ML ops)
+3. DOMAIN 0 — Systems + Decision (universal principles: systems thinking, decision theory)
+4. DOMAIN 1 — Substrate (mind, math, meaning: semiotics, cognition, philosophy)
+5. DOMAIN 3 — Art + Computational Media (specialized: glitch, computational art)
+6. DOMAIN 4 — Business (strategy, entrepreneurship, marketing)
+7. DOMAIN 5 — Personal Practice (productivity, creativity, learning)
+8. DOMAIN 7 — Influence + Power (negotiation, persuasion, politics)
+
+**Estimated throughput:** ~5-10s per FB amortized end-to-end (see D2125). Domain 2 (~200-400 FBs expected) would complete in ~20-55 minutes. Full corpus (~1000-2000 FBs) in ~1.5-5.5 hours.
+
+**Category:** STR — Strategy
+**State:** ACTIVE
+**See:** CONSTITUTION.md, governance/aggregated_remaining_tasks.md
+
+## D2125 — Verified FB Pipeline Throughput Estimate (2026-07-28)
+
+**Decision:** Validated estimate for average end-to-end FB processing time through all 9 pipeline stages.
+
+**Methodology:** Per-stage timing measured from real runs (D2113: 3-book E2E, D2118: USearch benchmark, full_run.py synthetic runs). Conservative upper bounds used for all LLM calls.
+
+**Per-stage timing (per FB, amortized):**
+
+| Stage | Operation | Time | Notes |
+|-------|-----------|------|-------|
+| S0 | Convert EPUB/PDF→MD | <0.1s | Amortized across all FBs from book |
+| S0.5 | Extract metadata (author/title) | <0.1s | One call per book, cached |
+| S1 | Chunk text | <0.1s | Regex, sub-second per book |
+| S1.3 | Pre-filter regex | <0.1s | Drop short/citation-dense segments |
+| S1.5 | Embed + FAISS cluster | ~0.5s | bge-m3 512-dim (D2118), amortized |
+| S2 | Convergent extract | ~1-3s | Qwen3.6 batch, amortized across FBs |
+| S4 | Classify + CRIBS | **~2-5s** | CRIBS enrich (single-FB, ~2s), full gen (multi-FB, ~5s), classify (~1s) |
+| S5 | NLI + Gemma verify | ~0.5-2s | ModernBERT ~64ms + Gemma for ~30% flagged FBs (~3-5s) |
+| S6 | Commit to SQLite/Parquet | <0.1s | Batch insert, amortized |
+
+**Weighted average (70% single-FB, 30% multi-FB clusters):**
+- Single-FB: 0.5 + 1 + 2 + 0.5 + 0.1 = **~4.1s**
+- Multi-FB: 0.5 + 3 + 5 + 2 + 0.1 = **~10.6s**
+- **Weighted average: 0.7 × 4.1 + 0.3 × 10.6 = 2.87 + 3.18 = ~6.0s per FB**
+
+**Conservative estimate (rounding up):** **~5-10 seconds per FB** end-to-end, well under the 30-second threshold from v1.
+
+**Bottleneck:** Stage 4 LLM calls (CRIBS enrichment + classification). These are sequential per FB.
+- Mitigation: subprocess parallelism on single-FB CRIBS enrichment (pipeline/parallel.py, D2120)
+- With 2× parallelism on Stage 4: ~3-6s per FB
+
+**Category:** PERF — Performance
+**State:** ACTIVE
+**See:** pipeline/stage4_merge.py, pipeline/stage5_verify.py, config/pipeline_config.yaml
+
+## D2126 — ModernBERT-NLI Active + DeBERTa Fallback Confirmed (2026-07-28)
+
+**Decision:** Confirm ModernBERT-base-nli as the active Stage 5 NLI pre-filter, with DeBERTa-v3 as automatic fallback if ModernBERT fails to load.
+
+**Status verification:**
+- `config/pipeline_config.yaml`: `stage5.nli_model: tasksource/ModernBERT-base-nli` ✅
+- `config/pipeline_config.yaml`: `stage5.nli_model_fallback: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` ✅
+- `pipeline/pipeline_paths.py`: `S5_NLI_MODEL` and `S5_NLI_MODEL_FALLBACK` constants ✅
+- `pipeline/stage5_verify.py`: `_get_nli()` with try/except fallback chain ✅
+- D2119 test results: 90% accuracy both models, ModernBERT 2.02× faster ✅
+
+**No further action needed.** The NLI transition is complete and validated.
+
+**Category:** INF — Infrastructure
+**State:** ACTIVE (confirmed)
+**See:** D2119, config/pipeline_config.yaml, pipeline/stage5_verify.py
+
+---
+
+## D2127 — Golden Set Recalibration: Remove Classification from Stage 2 (2026-07-28)
+
+**Decision:** Remove `depth`, `domains`, `discipline`, `evidence` from Stage 2 output schema and golden set expected output. Stage 2 extracts principles; Stage 4 classifies them (D2138/D2139). Classification in Stage 2 was always dead work — generated, stored in checkpoint, never consumed downstream.
+
+**Rationale:**
+- Stage 2's depth/discipline/domain were written to checkpoint but NEVER read by Stage 4 (which does its own independent D2138/D2139 classification)
+- All 5 golden positive examples had depth mismatches with D2139 (e.g., 4-domain FBs labeled "cross_domain" but D2139 derives "universal" for ≥3 domains)
+- Golden set was training Stage 2 on stale depth logic, creating confusion when Stage 4 overrode values
+- Removing classification from Stage 2 saves ~15% prompt tokens and output tokens (D2130 bloat reduction)
+- Clean separation: Stage 2 = extraction ("does a principle exist?"), Stage 4 = classification ("what domains/depth?")
+
+**Changes:**
+- `pipeline/stage2_extract.py`: Removed `depth`, `discipline`, `domain`, `evidence` from SYSTEM_PROMPT and FB record builder. Kept `route` (used for NULL filtering).
+- `config/golden/stage2_fewshot_convergent.yaml`: Removed `depth` and `domains` from all 7 `expected_fb` blocks. Updated schema header and meta notes.
+- Stage 4 (`stage4_merge.py`): No changes — already ignores Stage 2 classification.
+
+**Category:** QLT — Quality
+**State:** ACTIVE
+**See:** D2138, D2139, pipeline/stage2_extract.py, config/golden/stage2_fewshot_convergent.yaml
+
+## D2128 — `route` → `content_type` Gap Identified (2026-07-28)
+
+**Decision:** Document (but do NOT fix yet) that Stage 2 outputs `route` (FB/PT/GE/NULL) while Stage 4 routes on `content_type` (process_template/process_instance/growth_edge/tool_instruction). No conversion exists between these fields. PT/PI/GE/TI routing from Stage 2 has never been operational.
+
+**Impact:** PT/PI/GE/TI are only captured when the LLM happens to populate `content_type` directly (rare), or when Stage 4's heuristic detection catches them. The `route=PT` and `route=GE` outputs from Stage 2 are silently ignored.
+
+**Fix plan:** Add a `route_to_content_type` mapping in Stage 4's load function: `{"PT": "process_template", "PI": "process_instance", "GE": "growth_edge", "TI": "tool_instruction"}`. Deferred to not expand scope of this session.
+
+**Category:** INF — Infrastructure
+**State:** ACTIVE (documented, deferred)
+**See:** pipeline/stage2_extract.py L498-542, pipeline/stage4_merge.py L745-760
+
+---
+
+## D2129 — Streaming Per-Book Execution: Memory-Hang Resolution (2026-08-03)
+
+**Decision:** Restructure the production corpus run from "load all 289,498 segments into RAM" to **streaming per-book execution** — chunk → extract → classify → persist per book, then free memory. Never hold the full segment list in memory.
+
+**Verified evidence (2026-08-03 research):**
+- Root cause of the hang: `tests/full_run.py` builds `all_segments` (289,498 Python dicts, 707MB disk → ~5–7GB+ RAM with dict/string overhead) plus a `clusters` dict before any extraction.
+- The per-book pattern is PROVEN: the 77-FB run (2026-07-28) used the same extraction/classification code path per book and passed all quality gates.
+- 906/922 books already have segments in `knowledge pipeline/stage1_chunk/latest/checkpoint.jsonl`.
+
+**Changes:**
+- Batch books into domain groups (checkpoint per group, `pipeline_resume.json` style).
+- Per book: read segments → extract → classify → append FB to streaming JSONL → free.
+- Optional: DuckDB (installed 1.5.4) for out-of-core queries of the 707MB checkpoint — no schema change.
+
+**Category:** PERF — Performance
+**State:** ACTIVE
+**See:** tests/full_run.py L100-126, D2125, config/pipeline_config.yaml
+
+## D2130 — Recover 16 Missing Books (Corpus Coverage 98.3% → 100%) (2026-08-03)
+
+**Decision:** Re-chunk the 12 books that have valid MD content but zero segments; flag the 4 zero-byte (corrupt) MD files as quarantined rather than silently absent.
+
+**Verified evidence (2026-08-03):**
+- 922 MD files exist in `knowledge pipeline/books/`; only 906 have segments.
+- 16 missing: 12 have content (165KB–1MB, e.g. *Blink*, *Thinking with Type*, *Grid Systems*) — chunkable now; 4 are 0KB (`Mueller-Brockmann...`, `Build a Multi-Agent System (MEAP)`, `Domain-Specific SLMs (MEAP)`, `Prompt Engineering for AI Systems (MEAP)`) — corrupt/empty conversions, cannot be chunked without re-conversion from source (source EPUBs/PDFs no longer present — 0 files found).
+
+**Changes:**
+- Re-run `stage1_chunk.py` on the 12 valid books → append to `stage1_chunk/latest/checkpoint.jsonl`.
+- Log the 4 corrupt files to governance/buglog.md (BUG-057) with "quarantined" status.
+
+**Category:** DAT — Data
+**State:** ACTIVE
+**See:** pipeline/stage1_chunk.py, knowledge pipeline/books/, BUG-057
+
+## D2131 — Correct False Embedding-Speed Claim; MPS Verified as Fastest Route (2026-08-03)
+
+**Decision:** Retract the "~5 min" claim in `pipeline/stage1_5_fastembed.py` (D2127r4) — measured reality is 564 min. Document the verified benchmark so future sessions pick the fastest route without re-testing.
+
+**Verified measurements (2026-08-03, M1 Max, real 289K-segment corpus, 2,000-seg sample):**
+
+| Route | Measured | 289K est. | Dim |
+|---|---|---|---|
+| sentence-transformers bge-small (MPS) | 45 seg/s | 106 min | 384 |
+| Ollama bge-m3 (HTTP) | 16.7 seg/s | 4.8 h | 1024 |
+| fastembed bge-small (CPU ONNX) | 10 seg/s | 463 min | 384 |
+| fastembed + CoreML provider | 9 seg/s | 564 min | 384 |
+| OMLX Qwen3-Embedding-0.6B | 8.7 seg/s | 551 min | 1024 |
+
+**Changes:**
+- Update docstring/comment in `pipeline/stage1_5_fastembed.py` with measured numbers.
+- If corpus-wide embeddings are ever needed: **sentence-transformers bge-small on MPS** (installed, Apache-2.0, ⭐18,966) + FAISS — zero new dependencies.
+
+**Category:** VAL — Validation
+**State:** ACTIVE
+**See:** pipeline/stage1_5_fastembed.py, D2127, BUG-056
+
+## D2132 — Remove Dead `books` Symlink Trap (2026-08-03)
+
+**Decision:** Repoint or remove the `books/` symlink → `../maxwell os/knowledge pipeline/input/1.sources` (verified EMPTY — only .DS_Store). Config correctly uses `books_dir: knowledge pipeline/books` (922 MD files verified), but the dangling symlink is a trap for any future run that resolves `ROOT/books` directly.
+
+**Verified evidence:** `ls -la books` shows symlink to empty dir; `config/pipeline_config.yaml books_dir: knowledge pipeline/books` contains all 922 MD files.
+
+**Changes:**
+- Point `books/` symlink to `knowledge pipeline/books` (or remove it if unused).
+- Add a smoke assertion: `books_dir` must contain ≥900 MD files before any run.
+
+**Category:** INF — Infrastructure
+**State:** ACTIVE
+**See:** config/pipeline_config.yaml, books/ symlink
+
+## D2133 — Expand Canonical Taxonomy: Classification Accuracy Fix (2026-08-03)
+
+**Decision:** The verified classification bottleneck is **taxonomy coverage, not the LLM**. Expand `CANONICAL_DISCIPLINES` (48 labels) with the 18+ verified missing labels, and add an NLI/embedding-based fallback for raw→canonical mapping. Inject the canonical list into the classify prompt.
+
+**Verified evidence (2026-08-03, 77-FB run):**
+- LLM raw labels are precise: `decision theory`, `Evolutionary Biology`, `Intellectual Property Law`, `ethnobotany`, `social network analysis`, etc.
+- **35/77 FBs (45%) collapsed to `emerging`** because the raw label was absent from the 48-label taxonomy + 643-synonym index.
+- Measured: 18/24 representative labels that fell to `emerging` are NOT in taxonomy or synonyms.
+- DeBERTa-v3-mnli (already installed + used in Stage 5) can map raw→canonical via entailment — zero new dependencies.
+
+**Changes:**
+- Expand `config/taxonomy_v5.yaml` (C12: taxonomy is YAML-driven): +26 disciplines (48→73, incl. artificial intelligence, sociology, finance, economics, law, evolutionary biology, etc.), +10 domains (26→36, incl. education, health & wellness, finance & investment, social sciences).
+- Add kind-aware synonym index (`get_synonym_index(kind)`) in `pipeline/schemas.py` — resolves cross-kind collisions where the flat index resolved a raw label to the wrong kind (e.g. "cloud computing" → discipline `software engineering` instead of domain `engineering & infrastructure`).
+- `map_to_canonical_with_fallback()` falls back to the kind-constrained index before returning "emerging".
+
+**IMPLEMENTED 2026-08-03 — MEASURED RESULTS (re-mapping 77-FB run, zero LLM re-runs):**
+- Discipline collapse: **35/77 → 0/77** (was 45% → 0%)
+- Domain collapse: **27/77 → 0/77**
+- All 28 collapsed raw disciplines now map; 118/142 collapsed raw domains map (24 remaining are discipline-names in the domain slot or vague labels — preserved raw per D2138 design)
+
+**NOT adopted:** canonical-list injection into the classify prompt — rejected because it conflicts with D2138's free-classification design (raw labels must capture what a principle genuinely IS, unbiased by the taxonomy). Taxonomy expansion achieves the goal without changing Stage 1 semantics.
+
+**Category:** CLS — Classification
+**State:** ACTIVE
+**See:** pipeline/schemas.py, pipeline/stage4_merge.py L251-291, measured 77-FB output
+
+## D2134 — Fail-Visible Classification Fallback (No Silent "emerging") (2026-08-03)
+
+**Decision:** Replace the silent `except → {"discipline": "emerging", ...}` fallback in `stage4_merge.py` (line ~851) with an explicit logged+flagged fallback (C16: no silent errors).
+
+**Verified evidence:** Code inspection — any OMLX/classify exception silently produces `emerging` without logging, corrupting classification metrics with no trace. BUG-058.
+
+**Changes:**
+- On classify failure: log warning with FB name + error, set `classification_errors: ["classify_llm_error"]` on the FB (field already exists), keep `emerging` only as explicit last resort.
+- Count failures in run summary so coverage is measurable.
+
+**Category:** QLT — Quality
+**State:** ACTIVE
+**See:** pipeline/stage4_merge.py L845-857, BUG-058
+
+## D2135 — External Tools Research Outcome: NOT Adopted (2026-08-03)
+
+**Decision:** Document the 20+ tool/paper research outcome. **None of the external tools are adopted** beyond the verified fixes D2129–D2134. Reasons are verified, not speculative — prevents re-research and avoids breaking the proven path.
+
+**Verified findings (repos via GitHub API, papers via arXiv/Semantic Scholar):**
+- **Outlines** (⭐15,489, Apache-2.0; paper arXiv:2305.13971 EMNLP 2023): grammar-constrained decoding = proven hallucination control, BUT integration with OMLX (OpenAI-compat `/v1/chat/completions`) **unverified** — requires compatibility test before any adoption. Not adopted now.
+- **Instructor** (⭐13,679, MIT): retry-on-validation over OpenAI-compat APIs — adds per-FB latency; not adopted.
+- **RAGAS** (⭐15,105; paper arXiv:2309.15217): faithfulness eval adds an LLM-judge pass (latency); current DeBERTa+Gemma+BORP already aligns with NLI-based verification standard (SelfCheckGPT, arXiv:2303.08896, 1,100 cites). Not adopted.
+- **Marker/MinerU re-conversion, Late Chunking (arXiv:2409.04701), HDBSCAN at 289K scale (O(n²) — verified limitation), ColBERT:** no measured ROI on this corpus. Not adopted.
+- **DuckDB** (installed 1.5.4, ⭐39,939): adopted only as optional out-of-core query layer (D2129), read-only, no schema change.
+
+**Category:** RES — Research
+**State:** ACTIVE
+**See:** D2129–D2134, governance/aggregated_remaining_tasks.md
+
+---
+
+## D2136 — Audit Fixes: Embeddings Module + Streaming Runner Hardening (2026-08-04)
+
+**Decision:** Fix the 6 issues found in the Q1/Q2/Q3 audit of the 922-book execution path.
+
+**Verified findings + fixes:**
+
+| # | Finding (verified) | Fix |
+|---|---|---|
+| 1 | `pipeline/embeddings.py` did not exist — `compute_fb_relationships()` silently skipped semantic_near edges in ALL runs (BUG-059) | Created `pipeline/embeddings.py` with `embed_texts_bge_m3()` (Ollama bge-m3, C12 config, normalized). Semantic edges now emitted. |
+| 2 | Golden few-shot (Kimi-reviewed 7-example set) was wired ONLY into `stage2_extract.call_llm` — the 922-book runner used the baseline prompt | `full_run_streaming.py` now loads `load_golden_parity` (3 pos + 1 neg, config toggle) and injects via `format_golden_fewshot` — same mechanism as stage2. |
+| 3 | Obsidian export missing blank line after closing `---` → frontmatter glued to body heading (unparseable) | Added `fm.append("")` (matches full_run.py behavior). |
+| 4 | `_load_resume` had no JSONDecodeError guard — a torn resume line would crash resume | try/except skip malformed lines (crash-safe). |
+| 5 | Depth derivation in streaming runner diverged from authoritative D2139: `is_specialized` + 0 canonical domains gave "specialized" instead of "domain" | Rewritten to mirror `stage4_merge.py` exactly. |
+| 6 | Cosmetic: `accessibility` key on same line as `context` | Reformatted. |
+
+**Q1 answer (verified):** the 922-book path previously used the BASELINE extract prompt; it NOW uses the golden few-shot (full calibrated examples) — aligning the streaming runner with the agreed stage2 quality mechanism.
+
+**Q2 answer (verified):** the agreed criteria are preserved — D2123 (citation `Author (Book Title)`, jargon body-only via BODY_ONLY_FIELDS, related_fbs), D2138 (two-stage classification, raw labels preserved), D2139 (depth logic now byte-identical to stage4_merge), D2121 (config-driven), R7 (OMLX temperature 0.0 confirmed at all 3 call sites). One divergence found and fixed (#5).
+
+**Q3 answer (verified):** 2 hidden leakage bugs found and fixed (#1 silent semantic edges, #3 frontmatter) + 2 robustness bugs (#2, #4) + 1 parity bug (#5).
+
+**Category:** QLT — Quality
+**State:** ACTIVE
+**See:** pipeline/embeddings.py, tests/full_run_streaming.py, BUG-059
+
+---
+
+## D2137 — Five-Fix Application: Boilerplate, Wiring, Schema, Models (2026-08-04)
+
+**Decision:** Apply the 5 verified fixes for the hybrid convergent 922-book run, with measured trade-offs.
+
+**Fixes (all verified):**
+1. **Boilerplate prefilter** (config stage1_3.drop_patterns_extra, 8 patterns): measured 391 boilerplate segs/181 books were poisoning S1.5 clustering (one false-convergent cluster held 78% of a 30-book sample). Now dropped via should_drop_heuristic + stage1_5_domain_cluster + full_run_streaming. CLI --in-place run: 376 dropped total (342 structural + 34 boilerplate) → 289,122 segments. Double-import bug fixed (patterns live in _EXTRA_DROP_PATTERNS inside the function, both module instances).
+2. **Cluster wiring**: stage1_5_domain_cluster.py outputs to STAGE1_5_CHECKPOINT (= stage1_5_embed_cluster/latest/checkpoint.jsonl) — stage2.load_clusters() now reads the domain-bucketed convergent clusters.
+3. **S1.3 on full corpus**: run --in-place (backup: checkpoint.jsonl.bak-20260804).
+4. **Unified extraction schema**: extract_system_prompt now = stage2 schema (mechanism/boundary/consequence/evidence_passages/is_summary/route). Streaming runner stores the fields; Obsidian renders them; route-NULL gate matches stage2; None-result fail-visible guard added.
+5. **Models**: extract=Qwen3.6-35B (golden-calibrated), classify=Phi-4-mini (measured: 1.6s/call vs Qwen 15.8s — 10x; 77-FB run proved Phi-4 classify quality). NULL instruction softened (golden few-shot negatives already teach route discrimination).
+
+**Measured:** 3-book smoke: 3 FBs, all with mechanism/boundary/evidence_passages, correct taxonomy, related_fbs, citations. Qwen more selective than phi-4 (1 FB/book vs 3) — higher precision per golden calibration.
+
+**Category:** QLT — Quality
+**State:** ACTIVE
+**See:** config/pipeline_config.yaml, pipeline/stage1_3_prefilter.py, pipeline/stage1_5_domain_cluster.py, tests/full_run_streaming.py
+
+
+---
+
+## D2140 - neighbor_k: 20 to 50 (Config Fix)
+**Date:** 2026-08-04 16:57 UTC | **Category:** CFG | **State:** ACTIVE
+
+**Root cause:** Pipeline config `neighbor_k: 20` overrides the default 150. At cosine threshold 0.75, k=20 produces almost no reciprocal edges leading to 88%+ singleton rate. This wastes S2 extraction on singleton clusters that can never converge.
+
+**Fix:** Raised to 50 in `config/pipeline_config.yaml`. Gives enough neighbor candidates for meaningful cluster boundaries while keeping FAISS search negligible (12.7s for 60K vectors = 0.1% of pipeline time).
+
+**Files:** `config/pipeline_config.yaml` line 92.
+
+---
+
+## D2141 - Parallel Stage 2 Extraction: Limited Viability (1.5x)
+**Date:** 2026-08-04 16:57 UTC | **Category:** INF | **State:** ACTIVE
+
+**Stress test results (Qwen3.6-35B-A3B, realistic extraction prompts):**
+- Sequential: 3 calls x 8.9s = 26.6s
+- Concurrent (ThreadPool, 3 workers): 17.7s total, 17.5s/call
+- **Speedup: 1.51x** (NOT 3x as initially estimated)
+
+**Why limited:** Qwen3.6-35B MoE forward passes cannot be truly parallelized on M1 Max GPU. OMLX serializes them. The speedup comes from overlapping HTTP I/O + prefill, not GPU batching. No quality loss (temp=0.0 deterministic). No memory pressure. No kernel panic risk.
+
+**Earlier claim corrected:** The `parallel.py` doc comment that Stage 2 "cannot be parallelized (shared OMLX)" was WRONG. It CAN be parallelized, but the benefit is marginal (1.5x, not 3x). OMLX uses model-level serialization for large models on a single GPU.
+
+**Recommendation:** Implement ThreadPool in stage2 anyway. 1.5x is free, safe, and zero quality impact. But the REAL bottleneck solution is D2142 (pre-filter gate).
+
+**Files:** `pipeline/parallel.py` (doc correction), `pipeline/stage2_extract.py` (extraction loop).
+
+---
+
+## D2142 - Pre-Filter Gate: Phi-4-mini Convergence Detection (5.9x per cluster)
+**Date:** 2026-08-04 16:57 UTC | **Category:** OPT | **State:** ACTIVE
+
+**Stress test results:**
+- Gate call (Phi-4-mini): 1.33-1.62s
+- Full extraction (Qwen3.6-35B): 8.84-8.92s
+- **Gate is 5.5-6.7x faster per non-convergent cluster**
+
+**Accuracy test:**
+- CONVERGENT cluster (Matthew Effect, 3 books): correctly flagged convergent (confidence 0.95)
+- NOT CONVERGENT cluster (random topics, 3 books): correctly flagged not convergent (confidence 0.0)
+
+**Impact model:** If 70% of clusters are non-convergent:
+- Before: all clusters to Qwen3.6 at 8.9s = 8.9s avg
+- After: 70% gate at 1.5s + 30% Qwen3.6 at 8.9s = 3.7s avg
+- **Pipeline speedup: 2.4x**
+
+**Risk:** Phi-4-mini false-negative (missing a convergent cluster) would lose a principle. Mitigation: use confidence >= 0.3 as "maybe convergent" to route to Qwen3.6. Gate biased toward "maybe" - false positive cheap (waste one Qwen call), false negative expensive (miss a principle).
+
+**Implementation:** In stage2 extraction loop, before build_convergent_prompt + call_llm, insert gate check with Phi-4-mini. Only convergent/maybe-convergent clusters get full Qwen3.6 extraction.
+
+**Files:** `pipeline/stage2_extract.py`, `config/pipeline_config.yaml` (gate threshold).
+
+---
+
+## D2143 - OMLX Prefix Caching: Confirmed (17% speedup)
+**Date:** 2026-08-04 16:57 UTC | **Category:** INF | **State:** ACTIVE
+
+**Stress test results (5 identical small prompts):**
+- Call 1: 1.033s
+- Calls 2-5 avg: 0.861s
+- **17% faster after first call (KV cache reuse)**
+
+**Impact:** OMLX caches KV cache for repeated prompt prefixes. The SYSTEM_PROMPT (923 tokens, identical across ALL clusters) benefits. All calls after the first skip recomputing the shared prefix. Automatic, no configuration needed.
+
+**Limitation:** Only applies to the SYSTEM_PROMPT prefix, not the per-cluster passages (25% of total prompt tokens). Net pipeline speedup: about 4%.
+
+**Reference:** Comparable to Anthropic prompt caching and OpenAI automatic prefix caching. OMLX implements this natively.
+
+---
+
+## D2144 - Phi-4-mini Context Window: Sufficient for Extraction
+**Date:** 2026-08-04 16:57 UTC | **Category:** CAP | **State:** ACTIVE
+
+**Test:** 1,223-token prompt (7 x 3-sentence passages) processed correctly in 2.62s with coherent output. The extraction gate requires about 750-900 tokens (SYSTEM + 3-8 passages at 600 combined chars). Ample margin within Phi-4-mini's 128K context window.
+
+**Output limit:** Extraction output about 150-300 tokens. Phi-4-mini max_tokens=512 default is sufficient. Gate output is under 100 tokens.
+
+**BUG-053 note:** Phi-4-mini hallucinates on open-ended research WITHOUT source text. But the gate task provides source text (passages) and asks a constrained classification question. This is summarization-like, Phi-4-mini's verified strength per delegate rules.
+
+---
+
+## D2145 - USearch Clustering: Evaluated, Not Adopted
+**Date:** 2026-08-04 16:57 UTC | **Category:** EVAL | **State:** CLOSED
+
+**Finding:** USearch v2.26.0 clustering API works (Clustering.queries, .members_of(), .network). But:
+- Same HNSW algorithm as FAISS = equivalent cluster quality
+- FAISS clustering time = 12.7s for 60K vectors = 0.1% of total pipeline
+- Better clustering = MORE clusters = MORE S2 calls = SLOWER overall
+- Random embeddings insufficient for meaningful cluster quality comparison
+
+**Verdict:** FAISS retained. USearch would speed up an already-trivial stage with no quality gain.
+
+**Files:** `benchmarks/benchmark_faiss_vs_usearch.py` (exists, compiles, needs API update for v2.26.0).
+
+---
+
+## D2146 - is_summary Column Added to DB Schema
+**Date:** 2026-08-04 16:57 UTC | **Category:** BUGFIX | **State:** ACTIVE
+
+**Root cause:** `is_summary` extracted in stage2 (D2089) but never persisted to DB. Retrieve filters would silently match nothing or crash. FTS5 fallback path also missed the filter (BUG-063).
+
+**Fix:** Added is_summary INTEGER DEFAULT 0 to CREATE TABLE and INSERT in stage6_commit.py. FTS5 LIKE fallback now includes is_summary filter.
+
+**Files:** `pipeline/stage6_commit.py`, `pipeline/retrieve.py`.
+
+---
+
+## D2147 - 3-Zone Locked Template Restored (RULE 2)
+**Date:** 2026-08-04 16:57 UTC | **Category:** FMT | **State:** ACTIVE
+
+**Decision:** Restore the v1-proven locked ZONE template (RULE 2 / D353 / D2015) in stage6b_anytype_push.py. The D2122 payload alignment had drifted to a content-zones variant that dropped Relations, STABLE GATE, evidence rendering, and source footer.
+
+**Restored format:** ZONE 1 RELATIONS (metadata) / ZONE 2 BODY (def+mech+app+fail+boundary+jargon) / ZONE 3 STABLE GATE (evidence+reliability+source).
+
+**Companion changes:** retrieve.py Tier-1 card, is_summary filter, pipeline/reliability.py module, expanded BODY_ONLY_FIELDS and ALL_FIELDS.
+
+**Files:** `pipeline/stage6b_anytype_push.py`, `pipeline/retrieve.py`, `pipeline/reliability.py`, `pipeline/stage6_commit.py`.
+
+## D2148 — Tiered Single-Source Extraction + Schema Alignment (2026-08-05)
+**Category:** QLT
+**Decision:** Fixed SINGLE_SOURCE_SYSTEM prompt to use boundary/consequence fields matching
+what _process_cluster() reads. Previously used application/failure_mode which were never
+consumed — causing empty boundary/consequence in all single-source FBs. Added backward-compatible
+fallback: code reads result.get("boundary", result.get("application", "")) to handle both formats.
+
+**Changes:**
+- SINGLE_SOURCE_SYSTEM: replaced application, failure_mode with boundary, consequence
+- Added extraction_type and content_type fields to SINGLE_SOURCE_SYSTEM output schema
+- Removed dead NON_FB_TYPES constant (defined but never imported/used)
+- SYSTEM_PROMPT now includes extraction_type (line 8) and content_type (line 9) in PRINCIPLE STRUCTURE
+- SYSTEM_PROMPT example JSON now includes extraction_type and content_type fields
+
+**Status:** IMPLEMENTED. Compile verified.
+
+
+## D2149 — Coverage Gap Detection + Singleton Extraction Pipeline (2026-08-05)
+**Category:** QLT
+**Decision:** Two-part implementation:
+(1) pipeline/coverage_check.py — post-S2 residual embedding coverage analysis.
+For each extracted FB, embeds FB definition + all cluster segments via bge-small-en-v1.5 (MPS),
+computes cosine similarity. Segments below 0.50 threshold are "under-covered". Clusters with
+>30% under-covered segments are FLAGGED for potential under-extraction.
+(2) --process-singletons flag in S2 — processes 2,804 singleton segments (segments with zero
+reciprocal neighbors in embedding space) through SINGLETON_SYSTEM prompt. Analysis confirmed
+all 2,804 have viable text (>=50 chars) spanning 583 unique books.
+
+**Singleton processing flow:**
+- Load singletons.jsonl → cross-reference S1 checkpoint for text
+- Filter to viable (text >= 50 chars) → extract via ThreadPoolExecutor(3)
+- SINGLETON_SYSTEM prompt: classifies extraction_type + content_type per mapping rules
+- Output: knowledge pipeline/stage2_extract/singleton_fbs.jsonl
+
+**Status:** IMPLEMENTED. coverage_check.py compiles. --process-singletons flag added.
+
+
+## D2150 — Extraction Type → Content Type Mapping (S2→S4 Routing) (2026-08-05)
+**Category:** QLT
+**Decision:** Defined explicit mapping from extraction_type to content_type to enable correct S4 routing:
+
+| extraction_type | → content_type | Rationale |
+|---|---|---|
+| causal_mechanism | principle | Clear X→Y because Z mechanism = standard FB |
+| empirical_pattern | growth_edge | Strong correlation without proven causal chain = speculative insight (D2073) |
+| normative_heuristic (repeatable method) | process_template | Practical rule of thumb with clear steps |
+| normative_heuristic (general concept) | principle | Widely applicable heuristic without process format |
+| tool-specific features | tool_instruction | Commands/features bound to one platform |
+| case studies / specific examples | process_instance | Concrete examples rather than reusable principles |
+
+This wires into S4 existing routing (S4_GE_OUTPUT, S4_PT_OUTPUT, S4_PI_OUTPUT, S4_TI_OUTPUT)
+which was previously inert because S2 didn't set content_type.
+
+**Status:** IMPLEMENTED. Mapping embedded in SINGLETON_SYSTEM and SYSTEM_PROMPT docs.

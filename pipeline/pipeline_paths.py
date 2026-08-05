@@ -59,6 +59,8 @@ def stage_meta(stage_dir): return stage_dir / _rid() / _CFG["stage_files"]["meta
 
 # ── Source books ───────────────────────────────────────────────────────
 BOOKS_DIR = PROJECT_ROOT / _CFG["books_dir"]
+SOURCE_EPUB_DIR = Path(_env("source_epub_dir", _CFG.get("source_epub_dir", str(BOOKS_DIR))))
+SOURCE_PDF_DIR = Path(_env("source_pdf_dir", _CFG.get("source_pdf_dir", str(BOOKS_DIR))))
 
 # ── Global ─────────────────────────────────────────────────────────────
 GLOBAL_LOG = PROJECT_ROOT / _CFG["global_log"]
@@ -82,7 +84,7 @@ EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PRO
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]
 TAXONOMY_VERSION=_CFG["pipeline"]["taxonomy_version"]; MAX_DOMAINS_PER_FB=_CFG["pipeline"]["max_domains_per_fb"]
 CHUNK_SIZE_WORDS=_CFG["pipeline"]["chunk_size_words"]; CHUNK_OVERLAP_WORDS=_CFG["pipeline"]["chunk_overlap_words"]
-HDBSCAN_MIN_CLUSTER_SIZE=_CFG["pipeline"]["hdbscan_min_cluster_size"]; BORP_MIN_SOURCES=_CFG["pipeline"]["borp_min_sources"]; SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
+HDBSCAN_MIN_CLUSTER_SIZE=_CFG["pipeline"]["hdbscan_min_cluster_size"]; BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))
 
@@ -94,6 +96,7 @@ S2_GOLDEN_PATH=_CFG["stage2"]["golden_path"]
 S2_GOLDEN_POSITIVE=int(_CFG["stage2"]["golden_positive"])
 S2_GOLDEN_NEGATIVE=int(_CFG["stage2"]["golden_negative"])
 S2_GOLDEN_MAX=int(_CFG["stage2"]["golden_max_examples"])
+S2_GOLDEN_INJECT=_CFG["stage2"].get("golden_inject_enabled", False)
 S2_GATE_ENABLED=bool(_CFG["stage2"]["gate_enabled"])
 S2_GATE_STRICT=bool(_CFG["stage2"]["gate_strict"])
 S2_EVIDENCE_TRACKING=bool(_CFG["stage2"]["evidence_tracking"])
@@ -124,7 +127,10 @@ S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])
 S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
-S5_DEBERTA_NLI_ENABLED=bool(_CFG["stage5"]["deberta_nli_enabled"])
+S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "tasksource/ModernBERT-base-nli")  # D2119
+S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2119
+S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119: configurable
+S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
 
 # ── Stage 1.5 settings (D2094: FAISS cluster) ─────────────────────────
 S15_FAISS_THRESHOLD = float(_CFG.get("stage1_5", {}).get("faiss_threshold", 0.75))
@@ -133,6 +139,9 @@ S15_MAX_CLUSTER_SIZE = int(_CFG.get("stage1_5", {}).get("max_cluster_size", 500)
 S15_MIN_SOURCE_DIVERSITY = int(_CFG.get("stage1_5", {}).get("min_source_diversity", 2))
 S15_NEIGHBOR_K = int(_CFG.get("stage1_5", {}).get("neighbor_k", 150))
 S15_EMBED_MODEL = _CFG.get("stage1_5", {}).get("embed_model", "bge-m3")
+S15_EMBED_DIM = int(_CFG.get("stage1_5", {}).get("embed_dim", 512))  # E7: Matryoshka truncation
+S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "ollama")
+S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-small-en-v1.5")
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])
@@ -151,9 +160,15 @@ PARQUET_DIR = PROJECT_ROOT / _PATHS.get("parquet_dir", "knowledge pipeline/parqu
 DATA_DIR = PROJECT_ROOT / _PATHS.get("data_dir", "knowledge pipeline")
 OMLX_BIN = _CFG["services"]["omlx"]["bin"]                             # omlx binary path
 
-# ── Stage 1.5 checkpoints (D2094: defined after CHECKPOINT_DIR) ──────────
-STAGE1_5_CHECKPOINT = CHECKPOINT_DIR / "stage1_5_clusters.jsonl"
-STAGE1_5_SINGLETONS = CHECKPOINT_DIR / "stage1_5_singletons.jsonl"
+# ── Stage 1.5 checkpoints (D2094: self-contained stage dir, D2134 fix) ──
+def _s15_path(filename: str) -> Path:
+    """Create a path within S15_DIR/{run_id}/ — self-contained like all other stages."""
+    p = S15_DIR / _rid() / filename
+    p.parent.mkdir(parents=True, exist_ok=True)
+    return p
+
+STAGE1_5_CHECKPOINT = _s15_path("checkpoint.jsonl")
+STAGE1_5_SINGLETONS = _s15_path("singletons.jsonl")
 
 # ── Smoke test config (D2120) ────────────────────────────────────────────
 SMOKE_PLUMBING_SKIP_LLM = bool(_CFG.get("smoke", {}).get("plumbing", {}).get("skip_llm", True))

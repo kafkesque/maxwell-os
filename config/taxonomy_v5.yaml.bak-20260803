@@ -1,5 +1,5 @@
-version: v5.1
-classification_version: v5.0.1
+version: '5.0'
+classification_version: v5.0
 groups:
   domain:
   - Visual Practice
@@ -103,8 +103,6 @@ domains:
   - Design System
   - design system
   - design systems
-  - product management
-  - SaaS
 - canonical: data visualization
   group: Digital & Interactive
   raw:
@@ -116,7 +114,6 @@ domains:
   - Information Design
   - Information Visualization
   - Data Storytelling
-  - infographics
 - canonical: creative technology
   group: Digital & Interactive
   raw:
@@ -128,8 +125,6 @@ domains:
   - web development
   - Web Development
   - front-end
-  - interactive installations
-  - new media art
 - canonical: web & ui
   group: Digital & Interactive
   raw:
@@ -162,9 +157,6 @@ domains:
   - Service Design
   - Accessible Design
   - Inclusive Design
-  - User Experience (UX) Design
-  - usability
-  - accessibility
 - canonical: illustration
   group: Illustration & Craft
   raw:
@@ -210,13 +202,6 @@ domains:
   - Personal Development
   - personal growth
   - Personal Growth
-  - Professional Services
-  - Customer Service
-  - Customer Experience
-  - human resources
-  - Knowledge Management
-  - business analytics
-  - operations management
 - canonical: business development
   group: Business & Strategy
   raw:
@@ -254,9 +239,6 @@ domains:
   - startup financing
   - venture capital
   - Venture Capital
-  - startup
-  - startups
-  - founders
 - canonical: organizational behavior
   group: Business & Strategy
   raw:
@@ -272,9 +254,6 @@ domains:
   - management
   - Management
   - Human Resources Management
-  - organizational culture
-  - team dynamics
-  - workplace psychology
 - canonical: ai & agents
   group: AI & Computing
   raw:
@@ -294,9 +273,6 @@ domains:
   - Artificial Intelligence
   - artificial intelligence
   - AI
-  - AI agents
-  - agentic workflows
-  - agent frameworks
 - canonical: ai systems
   group: AI & Computing
   raw:
@@ -315,9 +291,6 @@ domains:
   - LLM Architecture
   - LLM Serving and Optimization
   - LLM Application Development
-  - AI systems
-  - model deployment
-  - MLOps
 - canonical: engineering practice
   group: AI & Computing
   raw:
@@ -331,10 +304,6 @@ domains:
   - JavaScript Programming
   - Computer Science
   - computer science
-  - Control Systems Engineering
-  - Network Engineering
-  - cloud infrastructure
-  - site reliability
 - canonical: computational art
   group: Computational Art & Code
   raw:
@@ -357,9 +326,6 @@ domains:
   - computational graphics
   - creative technology
   - Data-Driven Graphic Design
-  - programming
-  - computer programming
-  - software development
 - canonical: computational science & physics
   group: Computational Art & Code
   raw:
@@ -382,8 +348,6 @@ domains:
   - Cellular Automata
   - Genetic Algorithms
   - Neuroevolution
-  - scientific computing
-  - numerical methods
 - canonical: systems & frameworks
   group: Systems, Semiotics & Knowledge
   raw:
@@ -415,9 +379,6 @@ domains:
   - Financial Systems
   - Social Life
   - Social Life and Computational Models
-  - frameworks
-  - models
-  - conceptual frameworks
 - canonical: semiotics & communication
   group: Systems, Semiotics & Knowledge
   raw:
@@ -460,7 +421,6 @@ domains:
   - Visual Communication
   - visual communication
   - Communication Design
-  - sign systems
 - canonical: research & methodology
   group: Systems, Semiotics & Knowledge
   raw:
@@ -503,179 +463,6 @@ domains:
   - epistemology
   - philosophy of science
   - Philosophy of Science
-  - Market Research
-  - evaluation research
-  - survey research
-  - experimental design
-- canonical: education
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - education
-  - Education
-  - Education Policy
-  - Academia
-  - instructional design
-  - art education
-  - academic curriculum development
-  - e-learning
-  - training
-- canonical: health & wellness
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - healthcare
-  - Healthcare
-  - Health and Wellness
-  - Health Promotion
-  - mental health
-  - therapy
-  - counseling
-  - psychopharmacology
-  - Kinesiology
-  - medicine
-  - public health
-  - wellness
-  - clinical psychology
-  - spirituality
-  - psychedelic studies
-  - wellbeing
-- canonical: finance & investment
-  group: Business & Strategy
-  raw:
-  - Investment Management
-  - Portfolio Theory
-  - Financial Planning
-  - financial analysis
-  - asset management
-  - wealth management
-  - e-commerce
-  - fintech
-- canonical: marketing & communications
-  group: Business & Strategy
-  raw:
-  - Marketing Communications
-  - Digital Marketing
-  - Strategic Marketing
-  - public relations
-  - sensory marketing
-  - pricing strategy
-  - Market Research
-  - Social Media Marketing
-  - Influencer Marketing
-  - Consumer Psychology
-  - Customer Psychology
-  - Crowdsourcing
-  - Social Media
-  - Collaborative Platforms
-  - brand marketing
-  - advertising
-- canonical: legal & public policy
-  group: Business & Strategy
-  raw:
-  - law
-  - Law
-  - legal studies
-  - public policy
-  - Public Administration
-  - public administration
-  - nonprofit management
-  - non-profit management
-  - social entrepreneurship
-  - community development
-  - governance
-  - regulation
-  - policy analysis
-- canonical: science & research
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - neuroscience
-  - Neuroscience
-  - genetics
-  - Genetics
-  - Bioinformatics
-  - bioinformatics
-  - biostatistics
-  - pharmacology
-  - Developmental Biology
-  - Conservation Biology
-  - Comparative Genomics
-  - Ethnobotany
-  - Biological Systems
-  - food science
-  - psychometrics
-  - laboratory research
-- canonical: arts & culture
-  group: Visual Practice
-  raw:
-  - art
-  - Art
-  - Visual Arts
-  - Art Theory
-  - Performance Art
-  - theatre
-  - music
-  - literature
-  - criticism
-  - art criticism
-  - literary theory
-  - art education
-  - museum studies
-  - cultural heritage
-- canonical: engineering & infrastructure
-  group: AI & Computing
-  raw:
-  - robotics
-  - Robotics
-  - Mechanical Engineering
-  - Aerospace Engineering
-  - Cloud Computing
-  - cloud computing
-  - distributed systems
-  - internet technologies
-  - real-time systems
-  - Network Engineering
-  - Control Systems Engineering
-  - autonomous systems
-  - Quality Assurance
-  - Information Technology
-  - infrastructure
-  - Data Governance
-  - Data Management
-  - Cybersecurity
-  - cybersecurity
-  - data engineering
-  - IT operations
-- canonical: media & entertainment
-  group: Digital & Interactive
-  raw:
-  - game development
-  - video game development
-  - video games
-  - Media Technology
-  - Publishing
-  - Media Production
-  - Interactive Media
-  - virtual reality
-  - Virtual Reality
-  - visual effects
-  - streaming
-  - entertainment
-  - Digital Media
-  - digital media
-  - Digital Media Studies
-  - film studies
-- canonical: social sciences
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - sociology
-  - Sociology
-  - anthropology
-  - Anthropology
-  - Social Work
-  - social science
-  - criminology
-  - social research
-  - demography
-  - Anthropological Linguistics
 disciplines:
 - canonical: visual perception
   group: Perception & Signal
@@ -686,7 +473,6 @@ disciplines:
   - Color Psychology
   - Color Theory
   - color theory
-  - computer vision
 - canonical: visual semiotics
   group: Perception & Signal
   raw:
@@ -899,9 +685,6 @@ disciplines:
   - innovation management
   - Organizational Creativity
   - execution
-  - creativity research
-  - creative thinking
-  - ideation
 - canonical: cognitive science
   group: Behavioral & Cognitive
   raw:
@@ -915,10 +698,6 @@ disciplines:
   - Creative Psychology
   - creative psychology
   - cognitive psychology
-  - problem-solving
-  - problem solving
-  - cognition
-  - Cognitive Studies
 - canonical: behavioral economics
   group: Behavioral & Cognitive
   raw:
@@ -943,12 +722,6 @@ disciplines:
   - Strategic Decision Making
   - Problem Solving
   - Forecasting
-  - decision theory
-  - Decision Sciences
-  - business decision-making
-  - psychology of judgment and decision making
-  - Decisions
-  - choice theory
 - canonical: psychology
   group: Behavioral & Cognitive
   raw:
@@ -958,9 +731,6 @@ disciplines:
   - Cognitive Psychology
   - Organizational Psychology
   - psychology of creativity
-  - clinical psychology
-  - behavioral psychology
-  - cognitive psychology
 - canonical: linguistics
   group: Behavioral & Cognitive
   raw:
@@ -979,9 +749,6 @@ disciplines:
   - Team Dynamics
   - Conflict Resolution
   - Stakeholder Engagement
-  - human resources
-  - people management
-  - organizational leadership
 - canonical: strategic thinking
   group: Operational & Strategy
   raw:
@@ -993,8 +760,6 @@ disciplines:
   - business strategy
   - Corporate Strategy
   - Strategic Decision Making
-  - strategy formulation
-  - competitive strategy
 - canonical: project management
   group: Operational & Strategy
   raw:
@@ -1011,9 +776,6 @@ disciplines:
   raw:
   - Risk Management
   - risk management
-  - Quality Assurance
-  - compliance
-  - safety engineering
 - canonical: personal productivity
   group: Operational & Strategy
   raw:
@@ -1046,23 +808,6 @@ disciplines:
   - Sales
   - Sales Communication
   - Sales Psychology
-  - Marketing Communications
-  - Digital Marketing
-  - Strategic Marketing
-  - public relations
-  - sensory marketing
-  - pricing strategy
-  - Market Research
-  - Social Media Marketing
-  - Influencer Marketing
-  - Consumer Psychology
-  - Customer Psychology
-  - e-commerce
-  - Crowdsourcing
-  - Social Media
-  - Collaborative Platforms
-  - growth marketing
-  - brand marketing
 - canonical: systems thinking
   group: Systems & Method
   raw:
@@ -1083,9 +828,6 @@ disciplines:
   - Social Systems
   - Control Systems
   - Communication Systems
-  - Biological Systems
-  - system dynamics
-  - cybernetics
 - canonical: complex adaptive systems
   group: Systems & Method
   raw:
@@ -1108,9 +850,6 @@ disciplines:
   - Software Architecture
   - Frontend Architecture
   - Cloud Application Architecture
-  - Control Systems Engineering
-  - systems architecture
-  - requirements engineering
 - canonical: research methodology
   group: Systems & Method
   raw:
@@ -1130,11 +869,6 @@ disciplines:
   - Exploratory Data Analysis
   - Statistical Graphics
   - Data Science
-  - biostatistics
-  - psychometrics
-  - business analytics
-  - statistical methods
-  - evaluation research
 - canonical: operations research
   group: Systems & Method
   raw:
@@ -1151,8 +885,6 @@ disciplines:
   - Prompt Engineering
   - prompt engineering
   - Prompt Engineering for Generative AI
-  - prompt design
-  - few-shot prompting
 - canonical: agentic architecture
   group: AI & Computing
   raw:
@@ -1169,7 +901,6 @@ disciplines:
   - Designing Multi-Agent Systems
   - Agentic AI for Engineers
   - AI Agents and Applications
-  - autonomous agents
 - canonical: machine learning
   group: AI & Computing
   raw:
@@ -1185,9 +916,6 @@ disciplines:
   - LLM Architecture
   - LLM Serving and Optimization
   - LLM Application Development
-  - pattern recognition
-  - supervised learning
-  - deep learning
 - canonical: generative ai
   group: AI & Computing
   raw:
@@ -1200,10 +928,6 @@ disciplines:
   - Generative AI Services
   - AI Engineering
   - AI Strategy
-  - GenAI
-  - foundation models
-  - large language models
-  - LLMs
 - canonical: software engineering
   group: AI & Computing
   raw:
@@ -1219,15 +943,6 @@ disciplines:
   - computer science
   - Programming
   - Image Processing
-  - distributed systems
-  - real-time systems
-  - internet technologies
-  - cloud computing
-  - Cloud Computing
-  - Network Engineering
-  - systems programming
-  - software architecture
-  - DevOps
 - canonical: creative coding
   group: Computational Craft
   raw:
@@ -1308,15 +1023,6 @@ disciplines:
   - Economics
   - economic analysis
   - economic history
-  - public policy
-  - Public Administration
-  - public administration
-  - nonprofit management
-  - non-profit management
-  - social entrepreneurship
-  - community development
-  - governance
-  - public policy analysis
 - canonical: privacy & surveillance
   group: Heterodox
   raw:
@@ -1344,264 +1050,16 @@ disciplines:
   - Phenomenology
   - phenomenology
   - Ethics
-  - philosophy of mind
-  - philosophy of technology
-  - business ethics
-  - ethics
-  - moral philosophy
-- canonical: artificial intelligence
-  group: AI & Computing
-  raw:
-  - Artificial Intelligence
-  - artificial intelligence
-  - AI
-  - AGI
-  - general intelligence
-- canonical: communication theory
-  group: Perception & Signal
-  raw:
-  - communication theory
-  - Communication Theory
-  - Multimodal Communication
-  - communications
-  - Communication Studies
-- canonical: human-computer interaction
-  group: Design Cognition
-  raw:
-  - Human-Computer Interaction
-  - HCI
-  - User Experience (UX) Design
-  - virtual reality
-  - Virtual Reality
-  - VR
-  - interactive systems
-  - interaction design
-- canonical: interdisciplinary studies
-  group: Heterodox
-  raw:
-  - interdisciplinary studies
-  - Interdisciplinary
-  - cross-disciplinary studies
-  - transdisciplinary
-  - multidisciplinary
-- canonical: information science
-  group: Systems & Method
-  raw:
-  - Information Science
-  - information science
-  - Knowledge Management
-  - Data Governance
-  - Data Management
-  - bioinformatics
-  - information studies
-  - library science
-- canonical: finance
-  group: Operational & Strategy
-  raw:
-  - Finance
-  - finance
-  - Investment Management
-  - Portfolio Theory
-  - Financial Planning
-  - financial analysis
-  - corporate finance
-- canonical: economics
-  group: Operational & Strategy
-  raw:
-  - Economics
-  - economics
-  - Educational Economics
-  - Human Capital Economics
-  - Labor Economics
-  - Educational Finance
-  - economic theory
-  - microeconomics
-- canonical: sociology
-  group: Heterodox
-  raw:
-  - Sociology
-  - sociology
-  - Sociology of Professions
-  - social science
-  - Social Work
-  - social theory
-  - sociological theory
-  - Sociology of Work and Organizations
-  - sociology of work
-- canonical: anthropology
-  group: Heterodox
-  raw:
-  - anthropology
-  - Anthropology
-  - ethnobotany
-  - Ethnobotany
-  - Anthropology of Religion
-  - Anthropological Linguistics
-  - cultural anthropology
-- canonical: cultural studies
-  group: Heterodox
-  raw:
-  - cultural studies
-  - Cultural Studies
-  - culture studies
-  - cultural theory
-- canonical: theoretical physics
-  group: Systems & Method
-  raw:
-  - Theoretical Physics
-  - theoretical physics
-  - Quantum Mechanics
-  - quantum mechanics
-  - particle physics
-  - physics
-- canonical: aesthetics
-  group: Design Cognition
-  raw:
-  - Aesthetics
-  - aesthetics
-  - art theory
-  - Art Theory
-  - neuroaesthetics
-  - philosophy of art
-- canonical: media studies
-  group: Perception & Signal
-  raw:
-  - Media Studies
-  - media studies
-  - Digital Media Studies
-  - Media Technology
-  - Digital Media
-  - Interactive Media
-  - Publishing
-  - Media Production
-  - media theory
-- canonical: computer graphics
-  group: Computational Craft
-  raw:
-  - computer graphics
-  - Computer Graphics
-  - visual effects
-  - rendering
-  - image synthesis
-  - CGI
-- canonical: law
-  group: Heterodox
-  raw:
-  - law
-  - Law
-  - Intellectual Property Law
-  - legal studies
-  - Privacy Law
-  - jurisprudence
-  - legal theory
-- canonical: information security
-  group: Heterodox
-  raw:
-  - Information Security
-  - information security
-  - Cybersecurity
-  - cybersecurity
-  - network security
-  - infosec
-- canonical: evolutionary biology
-  group: Systems & Method
-  raw:
-  - Evolutionary Biology
-  - evolutionary biology
-  - genetics
-  - Genetics
-  - Comparative Genomics
-  - Developmental Biology
-  - Conservation Biology
-  - population genetics
-  - biology
-- canonical: social network analysis
-  group: Systems & Method
-  raw:
-  - social network analysis
-  - Social Network Analysis
-  - network theory
-  - network science
-  - graph theory applications
-- canonical: neuroscience
-  group: Behavioral & Cognitive
-  raw:
-  - neuroscience
-  - Neuroscience
-  - neurology
-  - Neurology
-  - cognitive neuroscience
-  - neurobiology
-- canonical: robotics
-  group: AI & Computing
-  raw:
-  - robotics
-  - Robotics
-  - autonomous systems
-  - mechatronics
-  - robot control
-- canonical: education
-  group: Operational & Strategy
-  raw:
-  - education
-  - Education
-  - Education Policy
-  - instructional design
-  - art education
-  - academic curriculum development
-  - pedagogy
-  - Academia
-  - learning science
-- canonical: health & medicine
-  group: Heterodox
-  raw:
-  - healthcare
-  - Healthcare
-  - Health and Wellness
-  - Health Promotion
-  - mental health
-  - therapy
-  - counseling
-  - psychopharmacology
-  - medicine
-  - Kinesiology
-  - clinical psychology
-  - pharmacology
-  - public health
-- canonical: performing arts
-  group: Heterodox
-  raw:
-  - music
-  - Music
-  - theatre
-  - theater
-  - performance art
-  - Performance Art
-  - drama
-  - musical composition
-- canonical: literary theory
-  group: Perception & Signal
-  raw:
-  - literature
-  - Literature
-  - literary theory
-  - criticism
-  - literary criticism
-  - poetics
-- canonical: engineering
-  group: Systems & Method
-  raw:
-  - Mechanical Engineering
-  - Aerospace Engineering
-  - civil engineering
-  - electrical engineering
-  - chemical engineering
-  - materials engineering
+
+# ── D34-R7/R14: Meta labels for unclassified principles ──
+# "emerging" is NOT a 26th canonical domain or 48th discipline.
+# It is a catch-all for principles that don't fit the 25-domain/47-discipline taxonomy.
+# Valid in: domain_canonical, discipline_canonical, classify_domains.py, classify_disciplines.py.
+# NOT counted by contract_DOMAIN_COUNT or contract_DISCIPLINE_COUNT.
 meta:
   catch_all_domain: emerging
   catch_all_discipline: emerging
-  catch_all_description: 'Used when no canonical domain or discipline fits the principle
-    ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
+  catch_all_description: >
+    Used when no canonical domain or discipline fits the principle ontologically
+    and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
     for future taxonomy expansion when enough principles accumulate under a label.
-
-    '

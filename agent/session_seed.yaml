@@ -29,7 +29,7 @@ models:
     embeddings:
         model: bge-m3
         provider: ollama
-        dims: 1024
+        dims: 512                       # E7: Matryoshka truncated from 1024 (95.3% neighbor overlap, 2× speed)
         family: bge
     nli:
         model: roberta-large-mnli

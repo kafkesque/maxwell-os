@@ -42,8 +42,14 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
 
 from pipeline.pipeline_paths import (  # noqa: E402
+    BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
+    OMLX_BIN,
+    S6_DIR,
+    S13_DIR,
+    S15_DIR,
     STAGE_CHECKPOINTS,
+    STAGE1_5_CHECKPOINT,
     get_run_id,
 )
 
@@ -74,14 +80,14 @@ STAGES: dict[str, dict[str, Any]] = {
     "1.3": {
         "name": "Regex Pre-filter",
         "script": "pipeline/stage1_3_prefilter.py",
-        "checkpoint": CHECKPOINT_DIR / "stage1_3_filtered.jsonl",
+        "checkpoint": S13_DIR / get_run_id() / "checkpoint.jsonl",  # D2134: self-contained
         "can_parallelize": False,
         "depends_on": "1",
     },
     "1.5": {
         "name": "FAISS Cluster (R-NN)",
         "script": "pipeline/stage1_5_embed_cluster.py",
-        "checkpoint": CHECKPOINT_DIR / "stage1_5_clusters.jsonl",
+        "checkpoint": STAGE1_5_CHECKPOINT,  # D2134: self-contained
         "can_parallelize": False,
         "depends_on": "1.3",
     },
@@ -116,9 +122,51 @@ STAGES: dict[str, dict[str, Any]] = {
         "can_parallelize": False,
         "depends_on": "5",
     },
+    "6b": {
+        "name": "Anytype Push Prep (Domain Subfolders)",
+        "script": "pipeline/stage6b_anytype_push.py",
+        "checkpoint": S6_DIR / get_run_id() / "anytype_push" / "push_stats.json",
+        "can_parallelize": False,
+        "depends_on": "6",
+    },
+    "6c": {
+        "name": "Obsidian Export (Markdown Vault)",
+        "script": "pipeline/stage6c_obsidian_export.py",
+        "checkpoint": S6_DIR / get_run_id() / "obsidian_vault" / ".obsidian_export.json",
+        "can_parallelize": False,
+        "depends_on": "6",
+    },
 }
 
-STAGE_ORDER: list[str] = ["0", "0.5", "1", "1.3", "1.5", "2", "4", "5", "6"]
+STAGE_ORDER: list[str] = ["0", "0.5", "1", "1.3", "1.5", "2", "4", "5", "6", "6b", "6c"]
+
+
+# ── Resume marker ──────────────────────────────────────────────────────────
+
+_RESUME_MARKER: Path = CHECKPOINT_DIR / "pipeline_resume.json"
+
+
+def _write_resume_marker(stage_id: str, *, paused: bool = False) -> None:
+    """Write pipeline resume state for crash recovery.
+
+    Called after each successful stage and on SIGINT (paused=True).
+    The runner reads this on startup to auto-resume from the last completed stage.
+    """
+    _RESUME_MARKER.parent.mkdir(parents=True, exist_ok=True)
+    import json as _json
+    state: dict[str, Any] = {
+        "last_stage": stage_id,
+        "paused": paused,
+        "run_id": get_run_id(),
+        "timestamp": time.time(),
+    }
+    _RESUME_MARKER.write_text(_json.dumps(state))
+
+
+def _clear_resume_marker() -> None:
+    """Clear resume marker after successful full run."""
+    if _RESUME_MARKER.exists():
+        _RESUME_MARKER.unlink()
 
 
 # ── Runner ────────────────────────────────────────────────────────────────
@@ -195,6 +243,24 @@ def run_stage(
         print(f"   [DRY RUN] {env_str} {script.name}")
         return True
 
+    # ── D2136: Preflight health check before LLM-bound stages ──────────
+    if stage.get("llm_bound") and not skip_llm:
+        print(f"   🔍 Preflight: checking OMLX health...")
+        try:
+            watchdog = _PROJECT_ROOT / "pipeline" / "omlx_watchdog.py"
+            preflight = subprocess.run(
+                ["python3", str(watchdog), "--pre-stage"],
+                cwd=str(_PROJECT_ROOT),
+                capture_output=True,
+                timeout=30,
+            )
+            if preflight.returncode != 0:
+                print(f"   ⚠️  OMLX watchdog warning (continuing): {preflight.stderr.decode()[-200:]}")
+            else:
+                print(f"   ✅ OMLX healthy")
+        except Exception as e:
+            print(f"   ⚠️  Preflight check failed ({e}) — continuing anyway")
+
     # Run stage
     label = f"[Stage {stage_id}] {stage['name']}"
     print(f"\n{'─'*60}")
@@ -208,12 +274,14 @@ def run_stage(
             cwd=str(_PROJECT_ROOT),
             env={**__import__("os").environ, **env},
             capture_output=False,
-            timeout=600,  # 10 min max per stage
+            timeout=3600,  # 60 min max per stage (was 600s)
         )
         elapsed = time.time() - start
 
         if result.returncode == 0:
             print(f"✅ {label} — {elapsed:.1f}s")
+            # ── D2136: Write resume marker after successful stage ──────
+            _write_resume_marker(stage_id)
             return True
         else:
             print(f"❌ {label} — FAILED (exit code {result.returncode}) — {elapsed:.1f}s")
@@ -223,7 +291,10 @@ def run_stage(
         print(f"⏰ {label} — TIMEOUT ({elapsed:.1f}s)")
         return False
     except KeyboardInterrupt:
-        print(f"\n⏸️  Pipeline interrupted at Stage {stage_id}")
+        elapsed = time.time() - start
+        print(f"\n⏸️  Pipeline paused at Stage {stage_id} ({elapsed:.1f}s)")
+        _write_resume_marker(stage_id, paused=True)
+        print(f"   Resume with: python -m pipeline.run --resume-from {stage_id}")
         raise
     except Exception as e:
         elapsed = time.time() - start
@@ -335,6 +406,9 @@ def run_pipeline(
           f"({total_elapsed:.1f}s)")
     print(f"{'═'*60}")
 
+    if not dry_run and failed == 0:
+        _clear_resume_marker()
+
     return failed == 0
 
 
@@ -388,6 +462,8 @@ Examples:
                         help="Model for fast mode (default: Phi-4-mini)")
     parser.add_argument("--skip-gemma", action="store_true",
                         help="Skip Gemma deep check in Stage 5")
+    parser.add_argument("--no-borp", action="store_true",
+                        help="Disable BORP multi-source check (allow single-source FBs)")
     parser.add_argument("--run-id", type=str,
                         help="Override run_id (default: from config/env)")
 
@@ -397,6 +473,22 @@ Examples:
     if args.run_id:
         import os
         os.environ["MAXWELL_RUN_ID"] = args.run_id
+
+    # ── D2136: Auto-resume from marker if no explicit resume-from ──────
+    if not args.resume_from and _RESUME_MARKER.exists():
+        import json as _json
+        state = _json.loads(_RESUME_MARKER.read_text())
+        if state.get("paused"):
+            resume_stage = state.get("last_stage", "")
+            if resume_stage in STAGES:
+                print(f"⏸️  Found paused pipeline at Stage {resume_stage}")
+                print(f"   Auto-resuming... (use --resume-from to override)")
+                args.resume_from = resume_stage
+
+    # Override BORP for single-domain test runs
+    if args.no_borp:
+        import os
+        os.environ["MAXWELL_BORP_MIN_SOURCES"] = "1"
 
     # Mode resolution
     is_plumbing = args.smoke_plumbing

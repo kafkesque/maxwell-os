@@ -126,22 +126,25 @@ class MLXInferenceProvider:
             print(f"[MLX] Loaded draft model {self.draft_model_name} in {load_time:.1f}s")
 
     def _ensure_outlines(self) -> bool:
-        """Lazy-check if outlines structured generation is available."""
+        """Lazy-check if outlines structured generation is available.
+
+        outlines 1.3.2 API: outlines.models.MLXLM(model, tokenizer)
+        (NOT the old outlines.models.mlxlm() module-call pattern).
+        """
         if self._outlines_available is not None:
             return self._outlines_available
 
         try:
             import outlines
-            self._outlines_model = outlines.models.mlxlm(
-                self.model_name,
-                model=self._model,
-                tokenizer=self._tokenizer,
+            self._outlines_model = outlines.models.MLXLM(
+                self._model,
+                self._tokenizer,
             )
             self._outlines_available = True
-            print("[MLX] Outlines structured generation enabled")
+            print("[MLX] Outlines structured generation enabled (v1.3.2 API)")
         except Exception as e:
             self._outlines_available = False
-            print(f"[MLX] Outlines not available ({e}), falling back to regex extraction")
+            print(f"[MLX] Outlines not available ({e}), falling back to unconstrained generation")
 
         return self._outlines_available
 
@@ -222,38 +225,49 @@ class MLXInferenceProvider:
         draft_model = self._draft_model if (use_speculative and self._draft_model) else None
 
         # Generate
-        # NOTE: mlx_lm 0.31.3 uses sampler for temperature, not a 'temp' kwarg.
-        # Default (no sampler) = greedy (equivalent to temp=0.0).
+        # BUG-060 RC3: mlx_lm 0.31.3 generate() returns plain `str`, NOT an
+        # object with .text/.token_count/.draft_tokens. Use stream_generate()
+        # internally to capture metadata, falling back to direct generate()
+        # for simpler use cases.
         kwargs: dict[str, Any] = {
             "max_tokens": max_tokens,
         }
         if draft_model:
             kwargs["draft_model"] = draft_model
 
-        response = mlx_lm.generate(
-            self._model,
-            self._tokenizer,
-            full_prompt,
-            **kwargs,
-        )
+        # Use stream_generate for metadata-rich responses (token counts, etc.)
+        draft_accepted = 0
+        draft_total = 0
+        try:
+            text = ""
+            for response in mlx_lm.stream_generate(
+                self._model,
+                self._tokenizer,
+                full_prompt,
+                **kwargs,
+            ):
+                text += response.text
+                # Capture metadata from last response
+                if hasattr(response, 'generation_tokens'):
+                    tokens_used = response.generation_tokens
+                if hasattr(response, 'draft_tokens'):
+                    draft_accepted = response.draft_tokens
+                    draft_total = draft_accepted
+            # If we got no metadata from stream, encode to count
+            if 'tokens_used' not in dir():
+                tokens_used = len(self._tokenizer.encode(text))
+        except Exception:
+            # Fallback: direct generate for compatibility
+            text = mlx_lm.generate(
+                self._model,
+                self._tokenizer,
+                full_prompt,
+                **kwargs,
+            )
+            # mlx_lm 0.31.3 returns plain str — encode to count tokens
+            tokens_used = len(self._tokenizer.encode(text))
 
         elapsed = (time.time() - t0) * 1000
-
-        # Count tokens in output
-        if hasattr(response, 'token_count'):
-            tokens_used = response.token_count
-        elif hasattr(response, 'generation_tokens'):
-            tokens_used = response.generation_tokens
-        else:
-            tokens_used = len(self._tokenizer.encode(response.text if hasattr(response, 'text') else str(response)))
-
-        text = response.text if hasattr(response, 'text') else str(response)
-        if hasattr(response, 'draft_tokens'):
-            draft_accepted = response.draft_tokens
-            draft_total = draft_accepted  # approximate
-        else:
-            draft_accepted = 0
-            draft_total = 0
 
         # If system was provided and cache missed, cache it now
         if system and not cache_hit:
@@ -324,10 +338,13 @@ class MLXInferenceProvider:
         Uses outlines for guaranteed-valid JSON when a schema is provided.
         Falls back to generate() + json extraction when outlines is unavailable.
 
+        BUG-060 fix: max_tokens capped at 512 for JSON calls (was 2048 — caused
+        556s generation of essays instead of JSON payloads).
+
         Args:
             prompt: The user prompt (should instruct JSON output).
             system: Optional system message.
-            max_tokens: Max tokens.
+            max_tokens: Max tokens (capped at 512 for JSON — BUG-060 RC2).
             temperature: Sampling temperature.
             json_schema: Optional JSON schema to constrain output.
                          If None, uses regex-based JSON extraction.
@@ -336,7 +353,16 @@ class MLXInferenceProvider:
             MLXGenerationResult with text containing valid JSON.
         """
         self._ensure_loaded()
-        max_tokens = max_tokens if max_tokens is not None else self.max_tokens_default
+
+        # BUG-060 RC2: Cap max_tokens for JSON to prevent unbounded generation.
+        # JSON classification/extraction responses are typically 50-200 tokens.
+        # 2048-token default causes 500s+ generation times (essays, not JSON).
+        _JSON_MAX_TOKENS = 512
+        if max_tokens is None:
+            max_tokens = min(self.max_tokens_default, _JSON_MAX_TOKENS)
+        else:
+            max_tokens = min(max_tokens, _JSON_MAX_TOKENS)
+
         temperature = temperature if temperature is not None else self.temperature
         temperature = max(temperature, 0.0)
 
@@ -351,14 +377,21 @@ class MLXInferenceProvider:
                 if system:
                     full_prompt = f"{system}\n\n{prompt}"
 
-                generator = outlines.generate.json(
-                    self._outlines_model,
-                    json_schema,
-                )
-                result_text = generator(full_prompt, max_tokens=max_tokens)
+                # outlines 1.3.2 API: Generator(model, output_type=schema)
+                # NOTE: JSON schema via output_type may not be supported for MLX
+                # in outlines 1.3.2. Falls through to unconstrained if it fails.
+                try:
+                    generator = outlines.Generator(
+                        self._outlines_model,
+                        output_type=json_schema,
+                    )
+                    result_text = generator(full_prompt, max_tokens=max_tokens)
+                except (TypeError, NotImplementedError):
+                    # outlines 1.3.2 fallback: Generator without schema + regex post-extraction
+                    generator = outlines.Generator(self._outlines_model)
+                    result_text = generator(full_prompt, max_tokens=max_tokens)
 
                 elapsed = (time.time() - t0) * 1000
-                # Approximate token count (outlines doesn't expose exact count)
                 tokens_used = len(self._tokenizer.encode(result_text))
 
                 return MLXGenerationResult(

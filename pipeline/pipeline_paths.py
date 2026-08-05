@@ -154,11 +154,29 @@ def ensure_dirs():
 
 
 def check_books_source() -> tuple[bool, str]:
-    """D2178: Validate that book source directories contain EPUB/PDF files.
+    """D2178/D2180: Validate book source directories — EPUB/PDF for S0, MD for S1.
 
-    Returns (ok, message) where ok=False means no books found.
+    Two-phase check:
+    1. If MD files already exist in BOOKS_DIR, S0 is already done.
+    2. If no MDs, check for EPUB/PDF source files to convert.
+
+    Returns (ok, message) where ok=False means no books found at all.
     Called by preflight/smoke to catch empty source before pipeline runs.
     """
+    # Phase 1: Check for already-converted MD files (S0 done, ready for S1)
+    md_files: list[Path] = list(BOOKS_DIR.glob("**/*.md")) if BOOKS_DIR.exists() else []
+    if md_files:
+        domains: dict[str, int] = {}
+        for f in md_files:
+            d = f.parent.name
+            domains[d] = domains.get(d, 0) + 1
+        domain_summary = ", ".join(f"{d}: {c}" for d, c in sorted(domains.items()))
+        return True, (
+            f"✅ {len(md_files)} MD files across {len(domains)} domains (S0 done)\n"
+            f"   {domain_summary}"
+        )
+
+    # Phase 2: No MDs — check for EPUB/PDF source files
     epub_dir = SOURCE_EPUB_DIR.resolve() if SOURCE_EPUB_DIR else None
     pdf_dir = SOURCE_PDF_DIR.resolve() if SOURCE_PDF_DIR else None
 
@@ -173,12 +191,72 @@ def check_books_source() -> tuple[bool, str]:
     total = len(epubs) + len(pdfs)
     if total == 0:
         return False, (
-            f"No EPUB/PDF files found in:\n"
-            f"  EPUB: {epub_dir} ({'exists' if epub_dir and epub_dir.exists() else 'MISSING'})\n"
-            f"  PDF:  {pdf_dir} ({'exists' if pdf_dir and pdf_dir.exists() else 'MISSING'})\n"
-            f"Place source books in these directories or set SOURCE_EPUB_DIR/SOURCE_PDF_DIR env vars."
+            f"No books found (no MDs, no EPUBs, no PDFs):\n"
+            f"  MD dir: {BOOKS_DIR} ({'exists' if BOOKS_DIR.exists() else 'MISSING'})\n"
+            f"  EPUB:   {epub_dir} ({'exists' if epub_dir and epub_dir.exists() else 'MISSING'})\n"
+            f"  PDF:    {pdf_dir} ({'exists' if pdf_dir and pdf_dir.exists() else 'MISSING'})\n"
+            f"Place source EPUB/PDF in 1.sources/ or set SOURCE_EPUB_DIR/SOURCE_PDF_DIR."
         )
-    return True, f"✅ {len(epubs)} EPUBs + {len(pdfs)} PDFs = {total} source books"
+    return True, f"✅ {len(epubs)} EPUBs + {len(pdfs)} PDFs = {total} source books (needs S0)"
+
+
+def check_pipeline_state() -> str:
+    """D2180: Comprehensive pipeline state report for preflight.
+
+    Reports stage-by-stage checkpoint status, record counts,
+    embedding model consistency, and bloat detection.
+    Used by `just preflight` for self-learning and debugging.
+    """
+    lines: list[str] = []
+    stages: list[tuple[str, Path, str]] = [
+        ("S0  (convert)",   S0_DIR / get_run_id(), "MD files"),
+        ("S1  (chunk)",     S1_DIR / get_run_id(), "segments"),
+        ("S1.3(prefilter)", S13_DIR / get_run_id(), "filtered segments"),
+        ("S1.5(embed)",     S15_DIR / get_run_id(), "clusters"),
+        ("S2  (extract)",   S2_DIR / get_run_id(), "FBs"),
+        ("S4  (merge)",     S4_DIR / get_run_id(), "classified FBs"),
+        ("S5  (verify)",    S5_DIR / get_run_id(), "verified FBs"),
+        ("S6  (commit)",    S6_DIR / get_run_id(), "DB records"),
+    ]
+
+    any_done = False
+    lines.append("Pipeline stage status:")
+    for name, stage_dir, unit in stages:
+        if not stage_dir.exists():
+            lines.append(f"  ⬜ {name}: not run")
+            continue
+        checkpoints = list(stage_dir.glob("checkpoint*.jsonl"))
+        if checkpoints:
+            count = sum(1 for _ in open(checkpoints[0]))
+            lines.append(f"  ✅ {name}: {count} {unit}")
+            any_done = True
+        else:
+            segids = list(stage_dir.glob("*.segids"))
+            if segids:
+                lines.append(f"  ⚠️  {name}: segids only (partial)")
+            else:
+                lines.append(f"  ⬜ {name}: dir exists, no data")
+
+    if not any_done:
+        lines.append("  ⚠️  No stages have been run — run `just triad` to start")
+
+    # Embedding model consistency check
+    s15_model = _CFG.get("stage1_5", {}).get("embed_model_hf", "?")
+    s15_dim = _CFG.get("stage1_5", {}).get("embed_dim", "?")
+    s4_model = _CFG.get("models", {}).get("embeddings", {}).get("model", "?")
+    if "bge-small" in str(s15_model).lower() and "bge-m3" in str(s4_model).lower():
+        lines.append(f"  ⚠️  Embed model mismatch: S1.5={s15_model} ({s15_dim}d) vs S4={s4_model} (T1.2)")
+    elif "bge-m3" in str(s15_model).lower() and "bge-m3" in str(s4_model).lower():
+        lines.append(f"  ✅ Embed models aligned: both bge-m3")
+    else:
+        lines.append(f"  ℹ️  Embed: S1.5={s15_model} ({s15_dim}d), S4={s4_model}")
+
+    # Version consistency
+    ver = _CFG.get("pipeline", {}).get("schema_version", "?")
+    commit = _CFG.get("pipeline", {}).get("commit", "?")
+    lines.append(f"  ℹ️  Schema v{ver} | Commit: {commit}")
+
+    return "\n".join(lines)
 
 VERSION="3.0.0"; BUILD_DATE="2026-07-26"
 

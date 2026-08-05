@@ -68,6 +68,78 @@ from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 MAX_CLUSTER_SAMPLES: int = 15  # Max segments to feed per cluster
 MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
 
+# D2180: Minimum viable FB schema for LLM output validation (T2.2)
+# Checks structural integrity of LLM JSON output before it enters the pipeline.
+# Prevents malformed/missing-field outputs from corrupting downstream stages.
+_FB_REQUIRED_FIELDS: dict[str, tuple[type, int]] = {
+    "name": (str, 3),                # Must be string, ≥3 chars
+    "definition": (str, 30),         # Must be string, ≥30 chars
+    "mechanism": (str, 0),           # Must be string (can be empty for non-causal)
+    "boundary": (str, 0),            # Must be string
+    "consequence": (str, 0),         # Must be string
+    "is_summary": (bool, 0),         # Must be boolean
+    "extraction_type": (str, 0),     # Must be string
+    "content_type": (str, 0),        # Must be string
+    "route": (str, 0),               # Must be string
+}
+_VALID_ROUTES: frozenset[str] = frozenset({"FB", "NULL"})
+_VALID_CONTENT_TYPES: frozenset[str] = frozenset({
+    "principle", "process_template", "process_instance",
+    "growth_edge", "tool_instruction",
+})
+
+
+def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
+    """D2180: Validate LLM JSON output against minimum FB schema (T2.2).
+
+    Performs structural validation only — does not check classification
+    fields (added in Stage 4). Catches missing fields, wrong types,
+    and invalid enum values before data enters the pipeline.
+
+    Args:
+        result: Dict from LLM JSON output (single principle).
+
+    Returns:
+        (is_valid, error_messages) — is_valid=False means reject this FB.
+    """
+    errors: list[str] = []
+
+    if not isinstance(result, dict):
+        return False, [f"Expected dict, got {type(result).__name__}"]
+
+    # Check required fields
+    for field, (expected_type, min_len) in _FB_REQUIRED_FIELDS.items():
+        if field not in result:
+            if field in ("mechanism", "boundary", "consequence"):
+                continue  # Optional structural fields — Stage 4 enriches
+            errors.append(f"Missing required field: '{field}'")
+            continue
+
+        val = result[field]
+        if not isinstance(val, expected_type):
+            errors.append(
+                f"Field '{field}' type mismatch: expected {expected_type.__name__}, "
+                f"got {type(val).__name__}"
+            )
+            continue
+
+        if expected_type is str and min_len > 0 and len(str(val).strip()) < min_len:
+            errors.append(
+                f"Field '{field}' too short: {len(str(val).strip())} chars "
+                f"(need ≥{min_len})"
+            )
+
+    # Validate enum fields if present
+    route = str(result.get("route", "")).strip().upper()
+    if route and route not in _VALID_ROUTES:
+        errors.append(f"Invalid route '{route}': must be FB or NULL")
+
+    ctype = str(result.get("content_type", "")).strip()
+    if ctype and ctype not in _VALID_CONTENT_TYPES:
+        errors.append(f"Invalid content_type '{ctype}'")
+
+    return len(errors) == 0, errors
+
 # D2163: Principle Discovery Gate — probe thresholds
 # D2176: Lowered MIN_SIZE from 50→20. A 40-segment cluster with 2 distinct
 # principles would previously escape the gate and get compressed into ONE FB.
@@ -980,6 +1052,15 @@ def _build_fb_from_result(
     if route == "NULL":
         return {"_null": True, "cluster_id": cid}
 
+    # D2180: Schema validation (T2.2) — catch malformed LLM output before it enters pipeline
+    is_valid, schema_errors = validate_fb_output(result)
+    if not is_valid:
+        # Log schema violations for debugging but don't crash — treat as NULL
+        import sys as _sys
+        print(f"   ⚠️  Schema validation failed for {cid}: {'; '.join(schema_errors[:3])}",
+              file=_sys.stderr)
+        return {"_null": True, "cluster_id": cid, "_schema_errors": schema_errors}
+
     # Validate required fields — unified reading with fallback for single-source schema
     name: str = result.get("name", "").strip()
     definition: str = result.get("definition", "").strip()
@@ -990,6 +1071,7 @@ def _build_fb_from_result(
     extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
     content_type: str = result.get("content_type", "principle").strip()
 
+    # Redundant check kept as defense-in-depth (validator already checks these)
     if not name or not definition or len(definition) < 30:
         return {"_null": True, "cluster_id": cid}
 

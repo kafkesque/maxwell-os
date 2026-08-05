@@ -103,6 +103,7 @@ stage1_5:
   embed_dim: 512                                # D2181: Matryoshka truncation (E7) — 92% neighbor overlap, 2× faster FAISS
   embed_backend: mps                            # sentence-transformers on Apple Silicon GPU
   embed_model_hf: BAAI/bge-m3                   # D2181: unified model — same semantic space as S4 relationship edges
+  embed_chunk_size: 20000                       # D2189: segments per chunk (prevents MPS OOM on 323K batch)
 stage1_3:
   min_len: 40
   cite_density: 0.6

@@ -196,6 +196,7 @@ S15_EMBED_MODEL = _CFG.get("stage1_5", {}).get("embed_model", "bge-m3")
 S15_EMBED_DIM = int(_CFG.get("stage1_5", {}).get("embed_dim", 512))  # D2181: Matryoshka 512d (E7)
 S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "mps")  # D2181: MPS default for bge-m3
 S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-m3")  # D2181: unified
+S15_EMBED_CHUNK_SIZE = int(_CFG.get("stage1_5", {}).get("embed_chunk_size", 20000))  # D2189: chunked embedding
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])

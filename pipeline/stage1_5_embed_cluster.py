@@ -120,6 +120,11 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
     MPS path: ~20-30 seg/s (bge-m3 ≈ 2× slower than bge-small but higher quality).
     Ollama fallback: ~15-20 seg/s via HTTP.
 
+    D2189: Chunked processing — instead of tokenizing all 323K texts in one encode() call
+    (which creates massive PyTorch tensors + MPS allocations ≈ 7-10GB), process in
+    configurable chunks of ~20K segments at a time, writing embeddings to a memory-mapped
+    numpy file on disk. GC + MPS cache flush between chunks prevents memory bloat.
+
     Args:
         segments: List of segment dicts with 'text' field.
         model: Ollama embedding model name (ignored when backend=mps).
@@ -130,35 +135,88 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
     texts: list[str] = [seg["text"][:1500] for seg in segments]
     total: int = len(texts)
 
-    # ── D2127r5: MPS fast path via sentence-transformers ───────────────
+    # ── D2127r5/D2189: MPS chunked processing ───────────────────────────
     if S15_EMBED_BACKEND == "mps":
-        print(f"   🧠 Embedding {total} segments via {S15_EMBED_MODEL_HF} (MPS, {S15_EMBED_DIM}d)...")
-        start: float = time.time()
+        import gc
+        import tempfile
+        import atexit
+
+        try:
+            import torch
+            _has_torch = True
+        except ImportError:
+            torch = None  # type: ignore
+            _has_torch = False
+
+        chunk_size: int = S15_EMBED_CHUNK_SIZE
+        n_chunks: int = (total + chunk_size - 1) // chunk_size
+
+        print(f"   🧠 Embedding {total} segments via {S15_EMBED_MODEL_HF} "
+              f"(MPS, {S15_EMBED_DIM}d, {n_chunks} chunks × ~{chunk_size})...")
+        start_total: float = time.time()
+
+        # Memory-mapped output file — avoids holding 660MB numpy array in RAM.
+        # np.memmap lets us write directly to disk, OS pages only what we touch.
+        tmp_fd, tmp_path = tempfile.mkstemp(suffix=".npy", prefix="s15_embeds_")
+        os.close(tmp_fd)
+        atexit.register(lambda p=tmp_path: os.unlink(p) if os.path.exists(p) else None)
+
+        embeddings_mmap: np.ndarray = np.memmap(
+            tmp_path, dtype=np.float32, mode="w+",
+            shape=(total, S15_EMBED_DIM),
+        )
 
         from sentence_transformers import SentenceTransformer
         st_model = SentenceTransformer(S15_EMBED_MODEL_HF, device="mps")
-        raw = st_model.encode(texts, batch_size=128, show_progress_bar=True, device="mps")
 
-        elapsed: float = time.time() - start
-        embeddings: np.ndarray = np.array(raw, dtype=np.float32)
-        # D2170: Assert dimension match — fail fast on config-code drift (C16)
-        # Zero-padding was a latent data corruption time-bomb: padding synthetic zeros
-        # corrupts FAISS cosine geometry. If config demands 1024d but model outputs
-        # 384d, this must fail with a clear message, not silently pad.
-        if embeddings.shape[1] != S15_EMBED_DIM:
+        for chunk_idx in range(n_chunks):
+            start_idx: int = chunk_idx * chunk_size
+            end_idx: int = min(start_idx + chunk_size, total)
+            chunk_texts: list[str] = texts[start_idx:end_idx]
+            chunk_n: int = len(chunk_texts)
+
+            # Encode one chunk at a time — limits tokenization tensors + MPS allocs
+            raw = st_model.encode(
+                chunk_texts,
+                batch_size=128,
+                show_progress_bar=True,
+                device="mps",
+                normalize_embeddings=True,  # D2189: normalize in-model (faster than post-hoc)
+            )
+
+            chunk_embeddings: np.ndarray = np.array(raw, dtype=np.float32)
+            embeddings_mmap[start_idx:end_idx, :] = chunk_embeddings
+
+            # Free chunk tensors, flush MPS cache (prevents 2,526-batch leak)
+            del raw, chunk_embeddings, chunk_texts
+            if _has_torch and torch is not None:
+                try:
+                    torch.mps.empty_cache()
+                except Exception:
+                    pass
+            gc.collect()
+
+            chunk_elapsed = time.time() - start_total
+            overall_rate = (end_idx) / chunk_elapsed if chunk_elapsed > 0 else 0
+            print(f"      chunk {chunk_idx+1}/{n_chunks} | {end_idx}/{total} ({100*end_idx/total:.1f}%) "
+                  f"| {chunk_elapsed:.0f}s | {overall_rate:.0f} seg/s")
+
+        # Verify dimension
+        if embeddings_mmap.shape[1] != S15_EMBED_DIM:
             raise ValueError(
-                f"Embedding dimension mismatch: model output {embeddings.shape[1]}d "
+                f"Embedding dimension mismatch: model output {embeddings_mmap.shape[1]}d "
                 f"≠ config S15_EMBED_DIM={S15_EMBED_DIM}d. "
                 f"Check pipeline_config.yaml → stage1_5.embed_model_hf ({S15_EMBED_MODEL_HF}) "
                 f"and ensure it matches the actual model output dimension."
             )
 
-        print(f"      → {len(embeddings)} embeddings ({embeddings.shape[1]}d) in {elapsed:.1f}s ({total/elapsed:.0f}/s)")
+        elapsed_total: float = time.time() - start_total
+        print(f"      → {total} embeddings ({S15_EMBED_DIM}d) in {elapsed_total:.1f}s "
+              f"({total/elapsed_total:.0f} seg/s, {n_chunks} chunks)")
 
-        # Normalize
-        norms: np.ndarray = np.linalg.norm(embeddings, axis=1, keepdims=True)
-        norms[norms == 0] = 1.0
-        return embeddings / norms
+        # Flush and return the memmap (caller can read or copy)
+        embeddings_mmap.flush()
+        return np.array(embeddings_mmap)  # Materialize once (FAISS needs contiguous)
 
     # ── Ollama HTTP fallback ────────────────────────────────────────────
     print(f"   🧠 Embedding {total} segments via {model} (Ollama, truncating to {S15_EMBED_DIM}d)...")

@@ -6,7 +6,7 @@ D2074: Golden set v2.0 — rebalanced domains, real book passages, hard negative
 import yaml, textwrap, sys
 from pathlib import Path
 
-ROOT = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0")
+ROOT = Path(__file__).resolve().parent.parent.parent  # D2190: relative — no hardcoded dev path
 
 # ── All examples as Python data (single source of truth) ──────────────
 EXAMPLES = [

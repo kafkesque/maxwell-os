@@ -55,6 +55,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     S13_DIR,
     S15_EMBED_BACKEND,
+    S15_EMBED_BATCH_SIZE,  # D2190: MPS forward batch size
     S15_EMBED_CHUNK_SIZE,  # D2189: chunked embedding
     S15_EMBED_DIM,
     S15_EMBED_MODEL,
@@ -181,16 +182,31 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
             chunk_texts: list[str] = texts[start_idx:end_idx]
             chunk_n: int = len(chunk_texts)
 
-            # Encode one chunk at a time — limits tokenization tensors + MPS allocs
-            raw = st_model.encode(
-                chunk_texts,
-                batch_size=128,
-                show_progress_bar=True,
-                device="mps",
-                normalize_embeddings=True,  # D2189: normalize in-model (faster than post-hoc)
-            )
+            # D2190: Manual micro-batch loop — lets us flush MPS allocator periodically.
+            # encode() on the whole chunk lets the MPS caching allocator retain
+            # workspace across 157 batches → ~5GB/min invisible RAM growth.
+            micro_batches: list[np.ndarray] = []
+            for mb_start in range(0, chunk_n, S15_EMBED_BATCH_SIZE):
+                mb_texts: list[str] = chunk_texts[mb_start:mb_start + S15_EMBED_BATCH_SIZE]
+                mb_raw = st_model.encode(
+                    mb_texts,
+                    batch_size=S15_EMBED_BATCH_SIZE,
+                    show_progress_bar=True,
+                    device="mps",
+                    normalize_embeddings=True,
+                )
+                micro_batches.append(np.array(mb_raw, dtype=np.float32))
 
-            chunk_embeddings: np.ndarray = np.array(raw, dtype=np.float32)
+                # D2190: periodic MPS allocator flush — every 20 micro-batches (~1280 segs)
+                if (mb_start // S15_EMBED_BATCH_SIZE) % 20 == 19:
+                    if _has_torch and torch is not None:
+                        try:
+                            torch.mps.empty_cache()
+                        except Exception:
+                            pass
+
+            chunk_embeddings: np.ndarray = np.concatenate(micro_batches, axis=0)
+            del micro_batches
             # D2189: Matryoshka truncation — bge-m3 outputs 1024d natively, truncate to 512d
             # per config. MRL training guarantees cosine ranking preserved (92% overlap per D2118).
             chunk_embeddings = chunk_embeddings[:, :S15_EMBED_DIM]

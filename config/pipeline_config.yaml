@@ -104,6 +104,7 @@ stage1_5:
   embed_backend: mps                            # sentence-transformers on Apple Silicon GPU
   embed_model_hf: BAAI/bge-m3                   # D2181: unified model — same semantic space as S4 relationship edges
   embed_chunk_size: 20000                       # D2189: segments per chunk (prevents MPS OOM on 323K batch)
+  embed_batch_size: 64                          # D2190: MPS forward-pass batch (halves peak workspace vs 128)
 stage1_3:
   min_len: 40
   cite_density: 0.6

@@ -2969,3 +2969,34 @@ Of 22 critical claims, only 5 were valid — all fixed:
 **Mitigation:** Push after significant fixes, CI parity badge, pre-push decision-log verification.
 See: governance/D2183-cross-review-forensic-audit.md
 
+### D2184 — System Integrity Hardening (2026-08-05 20:30)
+Second-pass cross-review audit against kimi eval10, qwen eval10, chatgpt eval10.
+**Methodology:** Each claim verified against live local code (not documentation, not remote).
+**Key finding:** Reviews correctly identified 9 integrity gaps D2183 missed.
+
+🔴 P0 FIXES:
+- classification_status persisted in SQLite (49 cols, col 36)
+- Stage 5 FAILED → QUARANTINE enforced (monotonic trust invariant)
+- Stage 0.5 metadata cache content-hash scoped (prevents stale metadata on file replace)
+
+🟠 P1 FIXES:
+- Runner resume marker run-scoped (was global CHECKPOINT_DIR/pipeline_resume.json)
+- Stage 0.5 checkpoint run-scoped (was global)
+- schemas.py version defaults: "2.0"→"3.0", "v2.0-init"→"v3.0"
+- .env.example de-personalized (removed /Users/barn/ paths)
+- OMLX binary dynamic resolution: config → $PATH → platform paths
+- STAGE_ORDER verified includes 6b/6c (kimi eval10 claim was wrong)
+
+⚠️  VERIFIED INVALID:
+- kimi eval10: STAGE_ORDER missing 6b/6c → WRONG (line 141 has them)
+- kimi eval10: "remote stale" → moot after D2183 push
+
+📋 DEFERRED RISKS:
+- R-009: BORP uses filename identity vs canonical source_id (data model change)
+- R-012: NLI evidence aggregation coarse (passage-majority, not support/contradiction)
+- R-013: Source independence needs work-level/edition-level distinction
+- R-014: related_fbs unused in retrieval
+- R-015: Context-conditioned reliability missing
+
+See: governance/D2184-system-integrity-audit.md
+

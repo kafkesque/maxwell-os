@@ -2956,3 +2956,16 @@ Set to `null`, never referenced. Harmless placeholder. Removed from ACKNOWLEDGED
 - S1.3–S6 need FIRST RUN (not re-run) with bge-m3 512-dim embeddings
 - Embed models aligned: both bge-m3 ✅
 
+### D2183 — Cross-Review Forensic Audit (2026-08-05)
+8 LLM reviews (deepseek, qwen, chatgpt, kimi) cross-examined against live code.
+**Key finding:** Reviews audited stale GitHub remote (~60 commits behind local).
+Of 22 critical claims, only 5 were valid — all fixed:
+- feedback.py: hardcoded DB_PATH → imported from pipeline_paths
+- pipeline_config.yaml: ghost hdbscan_min_cluster_size removed
+- pipeline_paths.py: HDBSCAN_MIN_CLUSTER_SIZE zeroed
+- schemas.py: classification_status field added to FB schema
+- runner.py: preflight fails hard for llm_bound stages (sys.exit(1))
+**Blindspot root cause:** Push frequency gap. Remote-Local drift created massive false-positive rate.
+**Mitigation:** Push after significant fixes, CI parity badge, pre-push decision-log verification.
+See: governance/D2183-cross-review-forensic-audit.md
+

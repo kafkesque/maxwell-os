@@ -200,3 +200,17 @@
 | gemma-4-E4B-it-MLX-4bit | VerifierV2 | ~6GB | 27 tok/s | 128K | ✅ Active |
 | bge-m3 → 512-dim | Embeddings | ~2GB | 2s/embed | N/A | ✅ Upgraded |
 | DeBERTa-v3 → ModernBERT | NLI | 571MB | 64ms/check | 512→8192 | ⏳ Switching |
+
+## 🟡 PHASE 1.5 — ACTIVE (2026-08-05, D2148-D2150)
+
+| # | Task | Effort | Source | Status |
+|---|------|--------|--------|--------|
+| S1 | **Singleton extraction pass** — `python3 pipeline/stage2_extract.py --process-singletons` | ~30 min (2,804 calls × 3 workers) | D2149 | ⬜ TODO |
+| S2 | **Coverage gap analysis** — `python3 pipeline/coverage_check.py` after S2 | ~10 min | D2149 | ⬜ TODO |
+| S3 | **Golden set expansion** — Sample 30-40 diverse clusters, manual review, add to YAML | ~2h human review | D2127 | ⬜ TODO |
+| S4 | **Re-run S2 with expanded golden + dynamic selection** | ~60-90 min | D2127 | ⬜ TODO |
+| S5 | **S5 NLI threshold tuning** — Lower 0.6→0.55 for aggressive contradiction detection | 1-line config | D2149 | ⬜ TODO |
+| S6 | **Evidence book coverage check** — Flag FBs citing <25% of cluster books | ~30 LOC | D2149 | ⬜ TODO |
+| S7 | **Resolve BUG-056** — Fix embedding speed claim docstring | 15 min | D2131 | ⬜ TODO |
+| S8 | **Resolve BUG-057** — Re-chunk 12 valid missing books | 30 min | D2130 | ⬜ TODO |
+| S9 | **Resolve BUG-058** — Fail-visible classification fallback | 30 min | D2134 | ⬜ TODO |

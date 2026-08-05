@@ -2797,3 +2797,48 @@ against live main branch code. 5 Phase 0 bugs (D2151-D2155) were already patched
 - All 55 pipeline .py files compile clean
 - Louvain stress test: 100% community purity vs Union-Find's 0%
 
+---
+
+## D2177: P0 Cleanup from Round 2 Cross-Examination (2026-08-05)
+
+**External evaluators:** Kimi eval6, DeepSeek eval5, Qwen eval6, ChatGPT eval6
+
+**Cross-examination finding:** Kimi claimed 10 P0 bugs — only 2 were actually live (20%
+accuracy). The other 8 were already fixed in D2168–D2176. Kimi reviewed stale code again.
+ChatGPT was most accurate (8/8 novel P0 claims verified against live code). Qwen found
+3 novel fatal flaws that no one else spotted (fsync, LIMIT 5000, ghost deps).
+
+### P0 FIXES (D2177)
+
+| # | Bug | Found By | Location | Fix |
+|---|-----|----------|----------|-----|
+| 1 | **fsync omission** (C6: crash-safe writes broken) | Qwen | `io_guard.py:79` | `os.fsync(fd)` before `os.close(fd)` |
+| 2 | **LIMIT 5000** caps dedup to 5K entries | Qwen, Kimi | `principle_index.py:167` | Removed LIMIT — all entries checked |
+| 3 | **pipeline_paths.py KeyError on clean checkout** | ChatGPT | `pipeline_paths.py:91` | `.get()` with safe default (15) |
+| 4 | **Dead Stage 3 symbols** (S3_DIR, STAGE3_CHECKPOINT, S3_UMAP_*) | ChatGPT, Qwen | `pipeline_paths.py:29,38-39,51,115-127` | All purged |
+| 5 | **justfile dead stage3_cluster.py** | ChatGPT, DeepSeek | `justfile:37,107-108` | Removed |
+| 6 | **networkx not in requirements.txt** (C11) | ChatGPT | `requirements.txt` | Added `networkx>=3.2` |
+| 7 | **Dead deps umap-learn + hdbscan** (C5) | ChatGPT, Qwen | `requirements.txt` | Removed — no code imports them |
+| 8 | **S1.5 docstring stale** (bge-m3/union-find) | ChatGPT | `stage1_5_embed_cluster.py` | Rewritten: bge-small/384-dim/Louvain |
+| 9 | **schemas.py stale** (Stage 3/HDBSCAN) | ChatGPT | `schemas.py:9-12,220-224` | Updated: S1.5 Louvain language |
+| 10 | **Silent except:pass in S2** (C16) | ChatGPT | `stage2_extract.py` | Added structured logging to 3 critical paths |
+
+### STRESS TEST RESULTS
+- fsync: 1052 bytes written + fsync'd + read back ✅
+- Clean-checkout import: No KeyError, HDBSCAN_MIN_CLUSTER_SIZE = 15 ✅
+- Dead symbols: STAGE3_CHECKPOINT, S3_UMAP_N_NEIGHBORS, S3_DIR, STAGE3_OUTPUT, STAGE3_QUALITY all removed ✅
+- Requirements: networkx added, umap-learn + hdbscan removed ✅
+- justfile: 0 active stage3 references ✅
+- 69/69 .py files compile clean ✅
+
+### BLINDNESS ANALYSIS (why were these missed in previous rounds?)
+- **fsync:** I verified the `os.replace()` atomic swap pattern but didn't check
+  the missing `os.fsync()` between write and close. The CI pattern was "tempfile →
+  os.replace" but the fsync step between them was invisible to grep-only audits.
+- **LIMIT 5000:** The comment said "limit to recent runs for performance" which
+  sounded reasonable. I didn't calculate the actual memory cost (20MB for 20K entries).
+- **pipeline_paths.py KeyError:** My dev environment has all config keys populated.
+  A clean checkout would fail but my machine wouldn't show it.
+- **Remediation:** Future audits must include a clean-venv import test and a
+  memory-budget calculation for every LIMIT clause.
+

@@ -101,7 +101,7 @@ stage1_5:
   neighbor_k: 50
   embed_model: bge-m3                           # D2181: unified with S4 (T1.2 Option A)
   embed_dim: 512                                # D2181: Matryoshka truncation (E7) — 92% neighbor overlap, 2× faster FAISS
-  embed_backend: mps                            # sentence-transformers on Apple Silicon GPU
+  embed_backend: ollama                        # D2190: Ollama HTTP (bge-m3) — avoids MPS hangs, 58-66 seg/s
   embed_model_hf: BAAI/bge-m3                   # D2181: unified model — same semantic space as S4 relationship edges
   embed_chunk_size: 20000                       # D2189: segments per chunk (prevents MPS OOM on 323K batch)
   embed_batch_size: 64                          # D2190: MPS forward-pass batch (halves peak workspace vs 128)

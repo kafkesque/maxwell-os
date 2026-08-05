@@ -213,7 +213,7 @@
 | **Root Cause** | `clean_line()` destroys the only paragraph boundary signal in Markdown (blank lines) before any join or split can use them. Three prior "final" fixes targeted the join call — all missed this. |
 | **Proposed Fix** | `clean_line("")` returns `""` (not `None`). `split_on_headings()` uses `list[list[str]]` for paragraphs. `flush()` joins lines within paragraphs with space, paragraphs with `\n\n`. ~15 LOC. |
 | **Source** | Grounded Review §1; Qwen's exact diff (30/30 tests pass) |
-| **Status** | 🟡 OPEN — Phase 0, P0.1 + P0.2 |
+| **Status** | ✅ RESOLVED (P0.1) — `clean_line("")` now returns `""` (not `None`), preserving paragraph boundaries. Line 61: `return ""  # P0.1 FIX: was return None. Preserves paragraph boundary.` Verified 2026-08-05. |
 
 ### BUG-006: Numbered List Items Silently Dropped
 | Field | Value |
@@ -224,7 +224,7 @@
 | **Root Cause** | Pattern was added to filter table-of-contents numbering but also catches real content. |
 | **Proposed Fix** | Remove the pattern from SKIP_PATTERNS. ~2 LOC. |
 | **Source** | Qwen; confirmed in test suite |
-| **Status** | 🟡 OPEN — Phase 0, P0.3 |
+| **Status** | ✅ RESOLVED (P0.3) — Numbered-list SKIP_PATTERN removed. Line 49: `# P0.3 FIX: removed numbered-list pattern (contains real principles)`. Verified 2026-08-05. |
 
 ### BUG-007: PCA Collapses Non-Linear Semantic Structure
 | Field | Value |
@@ -235,7 +235,7 @@
 | **Root Cause** | PCA is a linear algorithm. Semantic relationships in embedding space are non-linear. |
 | **Proposed Fix** | Replace PCA with UMAP (n_neighbors=15, min_dist=0.0, metric="cosine", random_state=42). ~10 LOC. |
 | **Source** | Grounded Review §3; Qwen's Patch 5 |
-| **Status** | 🔴 OPEN — Phase 0, P0.5 |
+| **Status** | ❌ CLOSED (MOOT) — Stage 3 (PCA+HDBSCAN) removed per D2120. Current S1.5 uses FAISS cosine + Louvain, not PCA. No linear dimensionality reduction in pipeline. Verified 2026-08-05. |
 
 ### BUG-008: nomic-embed-text Poor Discrimination on Pricing
 | Field | Value |
@@ -246,7 +246,7 @@
 | **Root Cause** | Model trained on general text, not domain-specific business principles. |
 | **Proposed Fix** | Switch to bge-m3 (1024-dim, 8192 token context, higher MTEB retrieval). ~1 LOC. |
 | **Source** | ALL 7 documents |
-| **Status** | 🟠 OPEN — Phase 0, P0.6 |
+| **Status** | ❌ CLOSED (MOOT) — nomic-embed-text replaced by bge-m3 (Ollama, 1024-dim) and bge-small-en-v1.5 (MPS, 384-dim) per D2156/D2111. Verified 2026-08-05. |
 
 ### BUG-009: HDBSCAN min_cluster_size=3 Too Permissive
 | Field | Value |
@@ -257,7 +257,7 @@
 | **Root Cause** | Parameter chosen for small test runs. Not tuned for 2,697 principles. |
 | **Proposed Fix** | Raise to 8 as starting point. Tune after re-run with UMAP + bge-m3. ~1 LOC. |
 | **Source** | Grounded Review; Qwen's Patch 7 |
-| **Status** | 🟡 OPEN — Phase 0, P0.7 |
+| **Status** | ❌ CLOSED (MOOT) — HDBSCAN removed per D2120. Current clustering uses Louvain community detection (S1.5), not HDBSCAN. Verified 2026-08-05. |
 
 ### BUG-010: Dead pipeline_config.yaml
 | Field | Value |
@@ -268,7 +268,7 @@
 | **Root Cause** | Config loader was never wired. |
 | **Proposed Fix** | Wire `load_config()` in pipeline runner OR delete the file. ~15 LOC if wiring. |
 | **Source** | Kimi code audit (BUG 6) |
-| **Status** | 🟡 OPEN — Phase 0.5 (de-prioritized — env vars + pipeline_paths.py work) |
+| **Status** | ✅ RESOLVED — `pipeline_config.yaml` is actively loaded by `pipeline_paths.py` (_CFG). All stages read config via `pipeline_paths.py` imports. Verified 2026-08-05. |
 
 ### BUG-011: Zero Tests
 | Field | Value |
@@ -1034,4 +1034,5 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 | **Status** | ✅ FIXED (2026-08-05) — D2175. |
 
 
-*Updated: 2026-08-05 | Bugs tracked: 50 | Resolved: 50 | Open: 0 | Schema version: 1.7*
+*Updated: 2026-08-05 (D2176 audit) | Bugs tracked: 50 | Resolved: 45 | Closed (moot): 5 | Open: 0 | Schema version: 1.8*
+<!-- BUG-005/006 resolved (P0.1/P0.3 fixes already in code), BUG-007/008/009 closed (Stage 3/HDBSCAN/PCA/nomic all removed), BUG-010 resolved (config actively used) -->

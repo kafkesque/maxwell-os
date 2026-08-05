@@ -117,7 +117,7 @@ stage2:
   golden_inject_enabled: true
   golden_seed: 42                            # D2159: deterministic few-shot selection
   split_probe_enabled: true                  # D2163: principle discovery gate master switch
-  split_probe_min_size: 50                   # D2163: only probe clusters with >N segments
+  split_probe_min_size: 20                   # D2182: lowered from 50 → 20 (D2176, fight compression death)
   split_probe_max_cohesion: 0.85             # D2163: only probe clusters with cohesion below this
   gate_enabled: true
   gate_strict: true

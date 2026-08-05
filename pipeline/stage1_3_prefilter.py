@@ -269,18 +269,7 @@ if __name__ == "__main__":
 
 # ── D2137: config-driven boilerplate drop patterns (C12) ────────────────────
 # Publisher boilerplate was measured poisoning S1.5 clustering (391 segs/181 books,
-# one false-convergent cluster held 78% of a 30-book sample). Patterns live in
+# D2182: REMOVED duplicate _load_extra_drop_patterns (line 65 is authoritative).
+# Maxwell R2 finding — second definition at line 274 shadowed the first.
 # config/pipeline_config.yaml → stage1_3.drop_patterns_extra.
-def _load_extra_drop_patterns():
-    from pathlib import Path
-    import yaml as _yaml
-    _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
-    try:
-        with open(_cfg_path) as _f:
-            _cfg = _yaml.safe_load(_f)
-        pats = (_cfg.get("stage1_3", {}) or {}).get("drop_patterns_extra", []) or []
-        # ".*" prefix gives search semantics (re.match is anchored at pos 0)
-        return [(r".*" + re.escape(p), re.I) for p in pats if p and p.strip()]
-    except Exception:
-        return []
 

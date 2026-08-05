@@ -7,17 +7,20 @@ Authority: D2094, D2095, D2101 | CONSTITUTION.md §3
 Input:  Clusters from Stage 1.5 (FAISS) + raw segments from Stage 1
 Output: Convergent Foundation Blocks with mechanism/boundary/consequence
 
-v3.0 REWRITE (D2094): Extracts ONE principle per CLUSTER (5-15 segments, ≥2 books).
-Replaces per-segment extraction which produced summaries, not principles.
+v3.1 UPDATE (D2182): Extracts 1:N principles per cluster — 1:1 extraction was
+causing 291:1 compression death spiral. LLM returns JSON array of distinct
+atomic causal mechanisms. Principle Discovery Gate (D2163) splits large
+low-cohesion clusters via k-means before extraction.
 
 Process:
   1. Load clusters from Stage 1.5 checkpoint
   2. For each convergent cluster (≥2 source books):
      a. Gather 5-15 raw segment texts
      b. Build convergent extraction prompt
-     c. Call LLM to extract ONE principle per cluster
+     c. Call LLM to extract ALL distinct mechanisms (1:N, array response)
      d. Schema: name, definition, mechanism, boundary, consequence,
         is_summary, evidence_passages
+     e. Post-extraction: MinHash 3-gram dedup, gate enforcement
      e. Merged classification: depth, discipline, domain, evidence, route
   3. Gate enforcement, golden few-shot parity, MinHash dedup
   4. Crash-safe incremental checkpoint
@@ -155,10 +158,15 @@ passages from DIFFERENT books. Your task is to identify the underlying principle
 that transcend any single source — the causal mechanism(s), concept(s), or method(s) that
 these passages collectively reveal.
 
+D2182: Changed extraction bias from conservative-merge to aggressive-split.
+The 291:1 compression death spiral (323K segments → ~800 FBs) was caused by
+forcing one principle per cluster. False splits are recoverable (S4 MinHash dedup).
+False merges permanently lose information.
+
 If the passages describe genuinely distinct mechanisms (different cause→effect chains),
 extract each as a separate principle. If they describe different facets of ONE mechanism,
-merge them into a single principle. Be precise — split only when the mechanisms are
-truly independent, not just different aspects of the same concept.
+merge them into a single principle. When in doubt, SPLIT — it's better to have
+two related FBs that Stage 4 can deduplicate than one bloated summary.
 
 A convergent principle is:
 - A concise statement of WHY something works, WHEN it applies, and WHAT its limits are

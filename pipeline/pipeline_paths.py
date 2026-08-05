@@ -8,7 +8,10 @@ from pathlib import Path
 
 import yaml
 
-_CFG = yaml.safe_load(open(Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"))
+# D2182: Use with-statement to close file handle (was unclosed — Maxwell R2 finding)
+_CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+with open(_CFG_PATH) as _f:
+    _CFG = yaml.safe_load(_f)
 def _env(k, d): return _os.environ.get(f"MAXWELL_{k.upper()}", str(d))
 
 PROJECT_ROOT = Path(_os.environ.get("MAXWELL_PIPELINE_ROOT", str(Path(__file__).resolve().parent.parent)))

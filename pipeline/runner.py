@@ -312,8 +312,9 @@ def _check_version_consistency() -> None:
     import sys
     from pathlib import Path
 
-    version_yaml_path: Path = Path("config/version.yaml")
-    pipeline_config_path: Path = Path("config/pipeline_config.yaml")
+    # D2182: Use _PROJECT_ROOT (not cwd) for version gate paths
+    version_yaml_path: Path = _PROJECT_ROOT / "config" / "version.yaml"
+    pipeline_config_path: Path = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
 
     if not version_yaml_path.exists():
         print("⚠️  config/version.yaml not found — skipping version gate")

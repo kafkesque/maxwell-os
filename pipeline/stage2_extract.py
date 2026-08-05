@@ -671,8 +671,12 @@ def discover_principles(
             count: int = result.get("principle_count", 1)
             if isinstance(count, int) and 0 <= count <= 4:
                 return count
-    except Exception:
-        pass  # Fail-safe: return 1 (don't split on probe error)
+    except Exception as e:
+        # D2177 (C16): Log probe failures — don't silently swallow.
+        # Fail-safe: return 1 (don't split), but operator must know.
+        import sys
+        print(f"   ⚠️  Discovery probe failed for {cluster.get('cluster_id', '?')}: {type(e).__name__}: {e}",
+              file=sys.stderr)
 
     return 1
 
@@ -889,7 +893,13 @@ def run_stage2(
             with open(segids_file) as f:
                 processed_ids = set(json.load(f))
             print(f"   📋 Resuming: {len(processed_ids)} clusters processed → {len(all_fbs)} FBs")
-        except Exception:
+        except Exception as e:
+            # D2177 (C16): Don't silently discard all prior work on resume failure.
+            # Log the error and start fresh — but the operator must know.
+            import traceback
+            print(f"   ⚠️  Resume checkpoint corrupted ({type(e).__name__}: {e})")
+            print(f"   ⚠️  Starting fresh — prior progress discarded")
+            print(f"   ⚠️  Traceback: {traceback.format_exc()[-300:]}")
             all_fbs = []
             processed_ids = set()
 
@@ -1293,7 +1303,9 @@ def process_singletons(
             completed += 1
             try:
                 fb = future.result()
-            except Exception:
+            except Exception as e:
+                # D2177 (C16): Log singleton extraction failures
+                print(f"  [{completed}/{len(viable)}] ⚠️  singleton worker error: {type(e).__name__}: {e}")
                 continue
             if fb is None:
                 continue

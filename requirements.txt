@@ -18,13 +18,15 @@ requests>=2.28         # OMLX/Ollama HTTP calls
 # ── Embeddings & clustering ─────────────────────────
 numpy>=1.24
 scikit-learn>=1.3      # Cosine similarity utilities
-umap-learn>=0.5        # P0.5: Non-linear dim reduction (replaces PCA)
-hdbscan>=0.8           # Density-based clustering
+# D2177: umap-learn + hdbscan removed (Stage 3 dead, D2120). C5 + C19 compliance.
 faiss-cpu>=1.7         # FAISS cosine nearest-neighbor search (S1.5)
 sentence-transformers>=2.2  # MPS embedding via bge-small (S1.5, coverage_check)
 
 # ── NLI verification (S5) ────────────────────────────
 transformers>=4.40     # ModernBERT/DeBERTa NLI pipeline
+
+# ── Clustering ────────────────────────────────────────
+networkx>=3.2          # D2177: Louvain community detection (S1.5, C11)
 
 # ── Deduplication ────────────────────────────────────
 datasketch>=1.6        # MinHash near-dedup

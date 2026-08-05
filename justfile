@@ -34,7 +34,6 @@ triad:
     python3 pipeline/stage1_3_prefilter.py
     python3 pipeline/stage1_5_embed_cluster.py
     python3 pipeline/stage2_extract.py
-    python3 pipeline/stage3_cluster.py
     python3 pipeline/stage4_merge.py
     python3 pipeline/stage5_verify.py
     python3 pipeline/stage6_commit.py
@@ -104,8 +103,7 @@ stage1_5:
     python3 pipeline/stage1_5_embed_cluster.py
 stage2:
     python3 pipeline/stage2_extract.py
-stage3:
-    python3 pipeline/stage3_cluster.py
+# D2177: stage3 removed (D2120) — redirects to runner
 stage4:
     python3 pipeline/stage4_merge.py
 stage5:

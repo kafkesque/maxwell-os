@@ -159,12 +159,17 @@ def check_duplicate(
         minhash_sig = _compute_minhash(principle_text)
 
     if minhash_sig is not None:
-        # Load existing signatures for comparison (limit to recent runs for performance)
+        # D2177: Load ALL existing signatures for cross-run dedup.
+        # OLD: LIMIT 5000 — capped at 5K entries. For a 20K FB corpus,
+        # 75% of existing principles were never checked for duplicates,
+        # silently accumulating semantic bloat across runs.
+        # A 128-perm MinHash sig = 1024 bytes. 20K entries = ~20MB —
+        # trivial for M1 Max 64GB. No excuse for the cap.
         existing_sigs = conn.execute(
             """SELECT principle_hash, minhash_blob, principle_text
                FROM principles_index
                WHERE minhash_blob IS NOT NULL
-               ORDER BY extracted_at DESC LIMIT 5000"""
+               ORDER BY extracted_at DESC"""
         ).fetchall()
 
         for _ex_hash, ex_blob, _ex_text in existing_sigs:

@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """
-stage1_5_embed_cluster.py — FAISS Cosine Clustering on Raw Segments.
-=====================================================================
-Authority: D2094, D2101 | CONSTITUTION.md §3 (Pipeline Stage 1.5 — NEW)
+stage1_5_embed_cluster.py — FAISS R-NN + Louvain Clustering on Raw Segments.
+=============================================================================
+Authority: D2094, D2101, D2168, D2170, D2172, D2176 | CONSTITUTION.md §3
 
 Input:  Prefiltered segments from Stage 1.3 checkpoint (or Stage 1 fallback)
-Output: Semantic clusters with source diversity scoring
+Output: Semantic clusters with canonical source diversity scoring
 
-Process:
+Process (v3.0 actual):
   1. Load segments from Stage 1.3 or Stage 1
-  2. Embed raw segment text via bge-m3 (Ollama, 1024-dim)
-  3. FAISS IndexFlatIP cosine clustering (threshold=0.75)
-  4. Union-find connected components
-  5. Split large clusters via faiss.Kmeans
-  6. Source diversity: flag clusters with ≥2 distinct books as "convergent"
+  2. Embed raw segment text via bge-small-en-v1.5 (MPS/sentence-transformers, 384-dim)
+     OR bge-m3 (Ollama fallback, 1024-dim) — fail-fast on dimension mismatch (D2170)
+  3. FAISS IndexFlatIP cosine similarity → KNN graph
+  4. Build R-NN edges (reciprocal only: A↔B requires A∈topK(B) AND B∈topK(A))
+  5. Louvain community detection on R-NN graph (networkx, D2168) — no transitive chaining
+  6. Source diversity: count canonical source_ids (SHA-256 author|title, D2176)
+     → is_convergent: ≥2 distinct canonical sources
+     → is_singleton: exactly 1 segment, is_noise=False, is_singleton=True (D2171)
   7. Write clusters + singletons to checkpoint JSONL
 
 Why this stage is critical (D2094):

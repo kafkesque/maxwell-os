@@ -72,10 +72,14 @@ def safe_write(path, content, shrink_guard=True, force_shrink=False):
                 f"Use force_shrink=True to override."
             )
 
-    # Atomic write: temp file + os.replace()
+    # Atomic write: tempfile → fsync → os.replace (C6)
+    # D2177: os.fsync(fd) is MANDATORY before os.close(). Without it,
+    # data sits in the OS buffer — a kernel panic or power loss between
+    # os.write() and the OS flush cycle corrupts the checkpoint.
     fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
         os.write(fd, content_bytes)
+        os.fsync(fd)  # D2177: flush to physical media before close
         os.close(fd)
         os.replace(tmp_path, path)
     except Exception:

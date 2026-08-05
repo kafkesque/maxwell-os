@@ -6,13 +6,14 @@ Authority: CONSTITUTION.md §3, §4
 Every pipeline stage reads/writes typed objects.
 Pydantic Literal types make invalid labels structurally impossible (C10, D1058).
 
-Inter-stage contracts (6 stages):
-    Segment   — Stage 1 output: text chunk + provenance
-    Principle — Stage 2 output: Qwen3.6-extracted principle
-    Cluster   — Stage 3 output: HDBSCAN cluster of principles
-    FB        — Stage 4 output: Merged Foundation Block
-    VerifiedFB— Stage 5 output: FB + verification result
-    FBRecord  — Stage 6 output: Canonical DB row
+Inter-stage contracts (8 stages — Stage 3 removed per D2120):
+    Segment     — Stage 1 output: text chunk + provenance
+    SegmentMeta — Stage 0.5 output: author/title/year
+    Cluster     — Stage 1.5 output: Louvain community (D2168) + source_ids (D2176)
+    Principle   — Stage 2 output: Qwen3.6-extracted principle (1:N, D2176)
+    FB          — Stage 4 output: Merged Foundation Block + classification
+    VerifiedFB  — Stage 5 output: FB + BORP/NLI/LLM verification + epistemic_status (D2176)
+    FBRecord    — Stage 6 output: Canonical DB row
 
 All objects stamped: schema_version, gen_model, pipeline_commit (R14).
 """
@@ -217,11 +218,12 @@ class Principle(StampedRecord):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Stage 3: Cluster — Principles → Clusters (HDBSCAN)
+# Stage 1.5: Cluster — Segments → Clusters (FAISS R-NN + Louvain)
+# (Stage 3/HDBSCAN removed per D2120. Cluster model now describes S1.5 output.)
 # ═══════════════════════════════════════════════════════════════════════════
 
 class Cluster(StampedRecord):
-    """A semantic cluster of related principles (HDBSCAN output)."""
+    """A semantic cluster of related segments (Louvain community detection on R-NN graph)."""
     cluster_id: int = Field(description="Sequential cluster ID")
     principle_ids: list[str] = Field(description="Principle IDs in this cluster")
     centroid_text: str = Field(description="Most central principle text")

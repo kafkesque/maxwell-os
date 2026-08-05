@@ -26,7 +26,7 @@ S6=_CFG["stages"]["stage6_commit"]
 
 def _sdir(name): return PROJECT_ROOT / name
 S0_DIR=_sdir(S0); S1_DIR=_sdir(S1); S13_DIR=_sdir(S13); S15_DIR=_sdir(S15)
-S2_DIR=_sdir(S2); S3_DIR=_sdir(S2); S4_DIR=_sdir(S4); S5_DIR=_sdir(S5); S6_DIR=_sdir(S6)  # D2120: S3 removed, S3_DIR→S2 fallback
+S2_DIR=_sdir(S2); S4_DIR=_sdir(S4); S5_DIR=_sdir(S5); S6_DIR=_sdir(S6)  # D2177: S3_DIR removed (dead, D2120)
 
 # ── Self-contained stage paths: {stage}/{run_id}/{file} ─────────────────
 def _sp(stage_dir, file_key):
@@ -35,8 +35,7 @@ def _sp(stage_dir, file_key):
 
 STAGE1_OUTPUT       = _sp(S1_DIR, "stage1")
 STAGE2_OUTPUT       = _sp(S2_DIR, "stage2")
-STAGE3_OUTPUT       = _sp(S3_DIR, "stage3")
-STAGE3_QUALITY      = _sp(S3_DIR, "stage3_quality")
+# D2177: STAGE3_OUTPUT/STAGE3_QUALITY removed (Stage 3 dead, D2120)
 STAGE4_OUTPUT       = _sp(S4_DIR, "stage4")
 STAGE5_OUTPUT       = _sp(S5_DIR, "stage5")
 STAGE5_HUMAN_REVIEW = _sp(S5_DIR, "stage5_human_review")
@@ -49,7 +48,8 @@ def _ckpt(stage_dir, n):
     p.parent.mkdir(parents=True, exist_ok=True); return p
 
 STAGE0_CHECKPOINT=_ckpt(S0_DIR,0); STAGE1_CHECKPOINT=_ckpt(S1_DIR,1); STAGE2_CHECKPOINT=_ckpt(S2_DIR,2)
-STAGE3_CHECKPOINT=_ckpt(S3_DIR,3); STAGE4_CHECKPOINT=_ckpt(S4_DIR,4); STAGE5_CHECKPOINT=_ckpt(S5_DIR,5)
+# D2177: STAGE3_CHECKPOINT removed (Stage 3 dead, D2120)
+STAGE4_CHECKPOINT=_ckpt(S4_DIR,4); STAGE5_CHECKPOINT=_ckpt(S5_DIR,5)
 STAGE6_CHECKPOINT=_ckpt(S6_DIR,6)
 # D2120: Stage 3 removed. 8 stages (0-2, 4-6).
 STAGE2_SINGLETON_OUTPUT = S2_DIR / "singleton_fbs.jsonl"   # D2176: singleton FB integration
@@ -88,7 +88,10 @@ EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PRO
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]
 TAXONOMY_VERSION=_CFG["pipeline"]["taxonomy_version"]; MAX_DOMAINS_PER_FB=_CFG["pipeline"]["max_domains_per_fb"]
 CHUNK_SIZE_WORDS=_CFG["pipeline"]["chunk_size_words"]; CHUNK_OVERLAP_WORDS=_CFG["pipeline"]["chunk_overlap_words"]
-HDBSCAN_MIN_CLUSTER_SIZE=_CFG["pipeline"]["hdbscan_min_cluster_size"]; BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
+# D2177: HDBSCAN removed (D2120). Use safe default to prevent KeyError on clean checkout.
+_HDBSCAN_DEFAULT = 15
+HDBSCAN_MIN_CLUSTER_SIZE=_CFG.get("pipeline", {}).get("hdbscan_min_cluster_size", _HDBSCAN_DEFAULT)
+BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))
 
@@ -111,18 +114,7 @@ S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])
 
-# ── Stage 3: REMOVED (D2120) — Ghost config cleaned (D2174) ─────────────
-# Stage 3 (HDBSCAN semantic dedup) was removed via D2120. The redundant
-# clustering layer was replaced by S1.5 cluster-before-extract + S2
-# convergent extraction. S3_* constants below are NO-OPs retained only
-# to prevent import errors in any legacy scripts. Remove after v3.1.
-S3_UMAP_N_NEIGHBORS = 15
-S3_UMAP_N_COMPONENTS = 5
-S3_UMAP_MIN_DIST = 0.0
-S3_UMAP_METRIC = "euclidean"
-S3_ALLOW_SINGLE_CLUSTER = False
-S3_KEEP_NOISE = False
-S3_NOISE_OUTPUT = ""
+# ── Stage 3: REMOVED (D2120) — D2177: purged dead constants ─────────────
 S3_NORMALIZE_CENTROID = True
 
 # ── Stage 4 settings (D2082: Type-aware routing) ───────────────────────

@@ -71,3 +71,7 @@ books/
 
 # Maxwell OS v2.0 pipeline data (regenerable)
 knowledge pipeline/
+
+# Runtime state (regenerable)
+pipeline/.omlx_watchdog_state.json
+pipeline/omlx_watchdog.log

@@ -811,8 +811,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                             if cribs_result.get(field):
                                 fb_data[field] = cribs_result[field]
                         print("+CRIBS", flush=True, end=" ")
-                except Exception:
-                    pass  # enrichment is best-effort; don't fail the FB
+                except Exception as e:
+                    # D2160: enrichment is best-effort but must be observable (C16)
+                    fb_data["enrichment_status"] = "FAILED"
+                    fb_data["enrichment_error"] = str(e)[:200]
+                    print(f"⚠️CRIBS", flush=True, end=" ")
         else:
             try:
                 prompt = build_fb_prompt(cluster_principles)

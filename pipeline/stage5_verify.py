@@ -60,6 +60,8 @@ from pipeline.pipeline_paths import (
     S5_NLI_ENTAILMENT_THRESHOLD,  # D2119: configurable NLI threshold
     S5_NLI_MODEL,  # D2119: primary NLI model (ModernBERT)
     S5_NLI_MODEL_FALLBACK,  # D2119: fallback NLI model (DeBERTa)
+    S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (skip LLM)
+    S5_NLI_MARGINAL_THRESHOLD,  # D2155: NLI score threshold for FLAG (escalate)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
     VERIFY_MODEL_V2,  # D2069: cross-family verifier (Gemma-4-E4B)
@@ -68,6 +70,8 @@ from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
 NLI_ENTAILMENT_THRESHOLD: float = S5_NLI_ENTAILMENT_THRESHOLD  # D2119: from config (default 0.6)
+NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2155: from config (default 0.8)
+NLI_MARGINAL_THRESHOLD: float = S5_NLI_MARGINAL_THRESHOLD  # D2155: from config (default 0.5)
 # ── NLI Model — config-driven with automatic fallback (D2119) ────────────
 # Primary: ModernBERT-base-nli (~64ms, 8192 ctx, 90% MNLI accuracy)
 # Fallback: DeBERTa-v3-base-mnli-fever-anli (~129ms, 512 ctx, 90% MNLI + FEVER)
@@ -133,9 +137,10 @@ def nli_entailment(claim: str, source: str) -> dict:
     """
     nli = _get_nli()
     source = source[:1024] if len(source) > 1024 else source
-    result = nli(f"{source} </s></s> {claim}")
+    # D2151: NLI models require premise/hypothesis PAIR format, not single concatenated string
+    result = nli({"text": source, "text_pair": claim})
     top = result[0] if isinstance(result, list) else result
-    return {"label": top.get("label", "UNKNOWN"), "score": round(top.get("score", 0.0), 4)}
+    return {"label": top.get("label", "UNKNOWN").upper(), "score": round(top.get("score", 0.0), 4)}
 
 
 # ── Prompt templates ───────────────────────────────────────────────────────
@@ -424,14 +429,14 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         if not skip_nli:
             # D2093: DeBERTa NLI pre-filter (replaces embedding similarity)
             nli_passed, nli_score, nli_detail = nli_evidence_check(fb)
-            if nli_passed and nli_score >= 0.8:
+            if nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2155: config threshold (default 0.8)
                 prefilter_stats["passed"] += 1
                 fact_passed = True
                 fact_score = nli_score
                 fact_detail = f"NLI PASS: {nli_detail}"
                 method = "nli"
                 llm_stats["skipped"] += 1
-            elif nli_passed and nli_score >= 0.5:
+            elif nli_passed and nli_score >= NLI_MARGINAL_THRESHOLD:  # D2155: config threshold (default 0.5)
                 prefilter_stats["passed"] += 1
                 fact_passed = True
                 fact_score = nli_score

@@ -2600,3 +2600,168 @@ This wires into S4 existing routing (S4_GE_OUTPUT, S4_PT_OUTPUT, S4_PI_OUTPUT, S
 which was previously inert because S2 didn't set content_type.
 
 **Status:** IMPLEMENTED. Mapping embedded in SINGLETON_SYSTEM and SYSTEM_PROMPT docs.
+
+
+## D2151 — NLI Input Format Fix: Stage 5 Verification Was Broken (2026-08-05)
+**Category:** BUGFIX
+**Decision:** stage5_verify.py line 136 calls `nli(f"{source} </s></s> {claim}")` — a single concatenated string. The transformers text-classification pipeline tokenizes this as ONE sequence (all token_type_ids=0). NLI models are trained on premise/hypothesis PAIRS with different token_type_ids. The `</s></s>` separator is not auto-parsed by the pipeline. The model receives a single sequence and cannot distinguish premise from hypothesis. Stage 5 verification has been producing effectively random results.
+
+**Fix:** Change to `nli({"text": source, "text_pair": claim})`. Also normalize label casing: `r["label"].upper() == "ENTAILMENT"`.
+
+**Status:** ACTIVE — Must fix before any production S2 run.
+
+## D2152 — MinHash Dedup Fix: Near-Duplicate Detection Was Disabled (2026-08-05)
+**Category:** BUGFIX
+**Decision:** stage2_extract.py line 765: `minhash_cache.get("_jaccard", lambda a, b: 0)(sig, prev_sig) > 0.9`. The `_jaccard` key is NEVER populated in minhash_cache (which only stores `sig → text` mappings at line 406). The fallback lambda returns 0, and `0 > 0.9` is never true. Near-duplicate detection is completely disabled.
+
+**Fix:** Use actual datasketch.MinHash objects with .jaccard() comparison method.
+
+**Status:** ACTIVE — Must fix before any production S2 run.
+
+## D2153 — Fix Dead Code in run_stage2(): NameError on start/result/is_summary (2026-08-05)
+**Category:** BUGFIX
+**Decision:** Lines 781-786 of stage2_extract.py are dedented to run_stage2() scope (OUTSIDE the for future loop) but reference variables only defined inside _process_cluster(): `start`, `result`, `is_summary`, `name`. These 5 lines are copy-paste residue from _process_cluster() and would crash with NameError.
+
+**Fix:** Remove lines 781-786 entirely. Logging is already handled inside the loop at lines 770-778.
+
+**Status:** ACTIVE
+
+## D2154 — Fix Incremental Checkpoint Index: Writes Once at End, Not Every 5 (2026-08-05)
+**Category:** BUGFIX
+**Decision:** Line 787: `if i % 5 == 0 or i == len(target_clusters)` is OUTSIDE the for future loop. `i` comes from enumerate at line 721 but the checkpoint writes only once after all clusters complete. The intended "every 5 clusters" incremental save never triggers.
+
+**Fix:** Move checkpoint write logic INSIDE the for future loop, using `completed` counter. Write when `completed % 5 == 0`.
+
+**Status:** ACTIVE
+
+## D2155 — Unify NLI Threshold Configuration: Three Thresholds, Config Says One (2026-08-05)
+**Category:** BUGFIX
+**Decision:** Config says `nli_entailment_threshold: 0.6`. Runtime uses three: >=0.8 = PASS, >=0.5 = FLAG marginal, <0.5 = FAIL. Three thresholds with different semantics, none matching config. Violates C12/C20.
+
+**Fix:** Add all thresholds to config: nli_pass_threshold, nli_marginal_threshold, nli_entailment_threshold. Runtime reads from config.
+
+**Status:** ACTIVE
+
+## D2156 — Fix Config Embedding Model Drift: bge-m3 Stamped, bge-small Used (2026-08-05)
+**Category:** CFG
+**Decision:** pipeline_config.yaml has two conflicting embed specs: `embed_model: bge-m3` AND `embed_model_hf: BAAI/bge-small-en-v1.5`. S1.5 loads bge-small (384d) via SentenceTransformer but stamps records with bge-m3 (1024d). Every cluster record carries a lie about its embedding model. Invalidates reproducibility and threshold interpretation.
+
+**Fix:** Unify both to `BAAI/bge-small-en-v1.5`. Add runtime mismatch check.
+
+**Status:** ACTIVE
+
+## D2157 — Fix requirements.txt Gaps: Missing faiss, sentence-transformers, transformers (2026-08-05)
+**Category:** INF
+**Decision:** requirements.txt does not list faiss-cpu, sentence-transformers, or transformers. All three are imported by pipeline stages. Violates C5.
+
+**Fix:** Add faiss-cpu>=1.7, sentence-transformers>=2.2, transformers>=4.40.
+
+**Status:** ACTIVE
+
+## D2158 — Fix coverage_check.py Hardcoded Model: C12 Violation (2026-08-05)
+**Category:** CFG
+**Decision:** coverage_check.py line 14 hardcodes `MODEL_NAME = "BAAI/bge-small-en-v1.5"` instead of reading from config. If S1.5 switches models, coverage operates in wrong vector space.
+
+**Fix:** Read S15_EMBED_MODEL_HF and S15_EMBED_DIM from pipeline_paths.py config.
+
+**Status:** ACTIVE
+
+## D2159 — Fix Non-Deterministic Golden Selection: random.shuffle Without Seed (2026-08-05)
+**Category:** QLT
+**Decision:** stage2_extract.py lines 359-360 call random.shuffle(all_pos) and random.shuffle(all_neg) with no explicit seed. Prompt composition can differ between runs, making pipeline non-deterministic despite temp=0.
+
+**Fix:** Add golden_seed to config. Call random.seed(golden_seed) before shuffle. Persist selected example IDs.
+
+**Status:** ACTIVE
+
+## D2160 — Fix CRIBS Silent Error Swallowing: except: pass Violates C16 (2026-08-05)
+**Category:** QLT
+**Decision:** stage4_merge.py line 814: `except Exception: pass` — enrichment failure silently swallowed. Violates C16.
+
+**Fix:** Log enrichment failure with FB name + error. Set enrichment_status: FAILED on FB record.
+
+**Status:** ACTIVE
+
+## D2161 — Fix Cluster Sampling Bias: seg_ids[:n_samples] Not Stratified (2026-08-05)
+**Category:** QLT
+**Decision:** stage2_extract.py samples only first N segments from a cluster. A 40-book cluster may show the LLM passages from only 2-3 books. The book count reported to the LLM is from the sample, not the cluster.
+
+**Fix:** Stratified sampling by source book + centroid proximity + semantic diversity.
+
+**Status:** ACTIVE
+
+## D2162 — R-NN Transitive Chaining Mitigation: Diameter Constraint Post-Processing (2026-08-05)
+**Category:** ARCH
+**Decision:** R-NN reciprocity eliminates one-hop non-reciprocal edges but union-find still creates transitive chains (A↔B, B↔C but not A↔C → A and C in same component). Add post-processing diameter check.
+
+**Fix:** After union-find, compute max pairwise cosine distance (diameter) per component. If diameter > 0.65, split via k-means or complete-link.
+
+**Status:** ACTIVE
+
+## D2163 — Principle Discovery Gate: 1:N Extraction from Clusters (2026-08-05)
+**Category:** ARCH
+**Decision:** Current 1-FB-per-cluster constraint forces Frankenstein syntheses. Add lightweight Phi-4-mini probe: "How many distinct principles (0-4) in this cluster?" → split by k-means if N>1 → extract each.
+
+**Trigger:** Cluster size >30 AND cohesion <0.85. Estimated yield increase: 800→1,200-1,800 FBs.
+
+**Status:** ACTIVE
+
+## D2164 — Claim-Level Verification Architecture: FActScore-Style Atomic Decomposition (2026-08-05)
+**Category:** ARCH
+**Decision:** Replace FB-level NLI with: FB → atomic claims (2-8) → evidence retrieval per claim → NLI per claim → coverage score. FB-level NLI is too coarse — vague definitions can pass while individual claims are unsupported.
+
+**Effort:** ~200 LOC. Phase 2.
+
+**Status:** PLANNED
+
+## D2165 — Principle-Recall Benchmark: Mandatory Evaluation Harness (2026-08-05)
+**Category:** QLT
+**Decision:** Create gold benchmark: annotate 500 principles from 20 books. Measure: principle recall, precision, mutation rate, evidence coverage. Without this, the 19,438→800 compression story is uninterpretable.
+
+**Status:** PLANNED
+
+## D2166 — Semantic Chunking: Rolling-Window Coherence Detection (S1.1) (2026-08-05)
+**Category:** ARCH
+**Decision:** Before fixed-size chunking, run rolling-window semantic coherence detector. Embed 3-sentence windows. If cosine <0.65 between adjacent windows → chunk boundary. Prevents slicing principles in half.
+
+**Effort:** ~60 LOC. Phase 1+.
+
+**Status:** PLANNED
+
+
+## IMPLEMENTATION SUMMARY — 2026-08-05 Session (Phase 0 Complete)
+
+### Phase 0 — 10 Critical Bug Fixes (D2151-D2160): ALL IMPLEMENTED
+
+| Decision | Bug | Status |
+|----------|-----|--------|
+| D2151 | NLI input format — single string → pair dict + `.upper()` | ✅ stage5_verify.py:140-143 |
+| D2152 | MinHash dedup disabled — `_jaccard` never populated | ✅ stage2_extract.py:408,763-770 |
+| D2153 | Dead code — `start`/`result`/`is_summary` undefined | ✅ Removed lines 781-786 |
+| D2154 | Checkpoint index out of scope | ✅ `completed % 5` inside for loop |
+| D2155 | Three NLI thresholds hardcoded | ✅ Config-driven S5_NLI_PASS/MARGINAL_THRESHOLD |
+| D2156 | Config embed drift — bge-m3 stamped, bge-small used | ✅ Unified both to bge-small-en-v1.5 |
+| D2157 | requirements.txt missing 3 packages | ✅ Added faiss, sentence-transformers, transformers |
+| D2158 | coverage_check hardcoded model | ✅ Reads S15_EMBED_MODEL_HF from config |
+| D2159 | Non-deterministic golden selection | ✅ `random.seed(42)` |
+| D2160 | CRIBS `except: pass` silent error | ✅ Logs enrichment_status: FAILED |
+
+### Phase 1 — Architectural Enhancements: IMPLEMENTED
+
+| Decision | Enhancement | Status |
+|----------|-------------|--------|
+| D2161 | Stratified sampling by source book | ✅ Round-robin across books in build_convergent_prompt |
+| D2163 | Principle Discovery Gate (1:N extraction) | ✅ discover_principles() + split_cluster_by_kmeans() wired into run_stage2 |
+
+### Governance Sync
+- DECISION-LOG.md: 71 decisions (D2000-D2166)
+- config/decisions.yaml: 152 total, 120 ACTIVE
+- Buglog: 42 bugs, BUG-060 through BUG-064 tracked, pending FIXED status
+- requirements.txt: v3.0, complete dependencies
+- Cross-examination audit: governance/cross-examination-audit-2026-08-05.md
+
+### Remaining Pre-S2
+- OMLX restart (only blocker)
+- D2162 (R-NN diameter constraint): Phase 1 — post-S1.5, not blocking
+- Golden set expansion (7→30+): Phase 1 — baseline works with 7
+

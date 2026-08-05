@@ -11,7 +11,12 @@ from pipeline.pipeline_paths import STAGE1_CHECKPOINT, STAGE2_CHECKPOINT
 
 COVERAGE_THRESHOLD = 0.50
 FLAG_FRACTION = 0.30
-MODEL_NAME = "BAAI/bge-small-en-v1.5"
+# D2158: read embedding model from config, not hardcoded
+try:
+    from pipeline.pipeline_paths import S15_EMBED_MODEL_HF as _cfg_embed_model
+    MODEL_NAME: str = _cfg_embed_model
+except ImportError:
+    MODEL_NAME: str = "BAAI/bge-small-en-v1.5"  # fallback if config unavailable
 
 
 def load_segments():

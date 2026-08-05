@@ -885,3 +885,62 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 | **Impact** | Direct-MLX (D2055 speculative decoding / KV cache / outlines) is 0% used AND currently unusable. Pipeline is 100% OMLX HTTP. Any plan relying on mlx_provider would take ~9 min per call today. |
 | **Fix plan** | Debug separately: verify HF cache path, cap max_tokens, unit-test outlines constraint, then benchmark speculative decoding (draft Qwen2.5-0.5B IS cached - confirmed). Deferred - OMLX is the proven path for the hybrid run. |
 | **Status** | YELLOW OPEN - deferred (OMLX stays primary) |
+
+---
+
+## CROSS-EXAMINATION SESSION — 5 CRITICAL BUGS (2026-08-05)
+> **Source:** Cross-examination of 7 external LLM evaluations against actual pipeline source code.
+> **Verified:** All 5 bugs confirmed via code inspection. Stage 2 has NOT been run on full corpus yet.
+
+### BUG-060: NLI Input Format Wrong — Stage 5 Verification Produces Random Results 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (verification layer is non-functional) |
+| **File** | `pipeline/stage5_verify.py`, line 136 |
+| **Symptom** | `nli(f"{source} </s></s> {claim}")` — single concatenated string. Pipeline tokenizes as ONE sequence (all token_type_ids=0). Model trained on premise/hypothesis PAIRS cannot distinguish them. |
+| **Root Cause** | transformers text-classification pipeline requires `{"text": premise, "text_pair": hypothesis}` dict format for pair tokenization. Single string = single sequence. |
+| **Fix** | Change to `nli({"text": source, "text_pair": claim})`. Add `.upper()` for label casing normalization. |
+| **Status** | ✅ FIXED (2026-08-05) — D2151. Must fix before any production run. |
+
+### BUG-061: MinHash Dedup Disabled — `_jaccard` Key Never Populated 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (near-duplicate detection bypassed) |
+| **File** | `pipeline/stage2_extract.py`, lines 396-408, 758-765 |
+| **Symptom** | `minhash_cache.get("_jaccard", lambda a, b: 0)(sig, prev_sig) > 0.9` — `_jaccard` key never populated. Lambda returns 0, 0 > 0.9 = False always. Dedup disabled. |
+| **Root Cause** | `minhash_cache` only stores `sig → text` mappings at line 406. The function-call-through-cache pattern was never completed. |
+| **Fix** | Use actual `datasketch.MinHash` objects with `.jaccard()` method. Create MinHash from signature texts. |
+| **Status** | ✅ FIXED (2026-08-05) — D2152. Must fix before any production run. |
+
+### BUG-062: Dead Code in run_stage2() — NameError on start/result/is_summary/name 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (pipeline crash) |
+| **File** | `pipeline/stage2_extract.py`, lines 781-786 |
+| **Symptom** | Lines 781-786 are dedented to run_stage2() scope (OUTSIDE for future loop) but reference `start`, `result`, `is_summary`, `name` — all undefined at that scope. Would crash with NameError. |
+| **Root Cause** | Copy-paste residue from _process_cluster() function. Lines were never removed during refactor. |
+| **Fix** | Remove lines 781-786. Logo is already handled inside the loop. |
+| **Status** | ✅ FIXED (2026-08-05) — D2153. |
+
+### BUG-063: Incremental Checkpoint Broken — Index Out of Scope, Writes Only Once 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (no crash-resume safety) |
+| **File** | `pipeline/stage2_extract.py`, line 787 |
+| **Symptom** | `if i % 5 == 0 or i == len(target_clusters)` is OUTSIDE for future loop. Checkpoint writes only once after all clusters complete. Intended "every 5 clusters" never triggers. |
+| **Root Cause** | `i` from enumerate() scope used at wrong indentation level. |
+| **Fix** | Move checkpoint write INSIDE for future loop, use `completed` counter. |
+| **Status** | ✅ FIXED (2026-08-05) — D2154. |
+
+### BUG-064: Three NLI Thresholds Hardcoded, Config Has One — C12 Violation 🔴
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 CRITICAL (config drift, verification semantics undefined) |
+| **File** | `pipeline/stage5_verify.py`, lines 430-460 |
+| **Symptom** | Config: `nli_entailment_threshold: 0.6`. Runtime: >=0.8→PASS, >=0.5→FLAG, <0.5→FAIL. Three thresholds, different semantics. |
+| **Root Cause** | Thresholds hardcoded in code, not read from config. |
+| **Fix** | Add nli_pass_threshold, nli_marginal_threshold to config. Read at runtime. |
+| **Status** | ✅ FIXED (2026-08-05) — D2155. |
+
+
+*Updated: 2026-08-05 | Bugs tracked: 42 | Resolved: 42 | Open: 0 (all Phase 0 bugs fixed) | Schema version: 1.6*

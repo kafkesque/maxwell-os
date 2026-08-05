@@ -129,7 +129,9 @@ S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])
 S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
 S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "tasksource/ModernBERT-base-nli")  # D2119
 S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2119
-S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119: configurable
+S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119
+S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.8))  # D2155: configurable
+S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.5))  # D2155: configurable
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
 
 # ── Stage 1.5 settings (D2094: FAISS cluster) ─────────────────────────

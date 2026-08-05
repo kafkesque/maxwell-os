@@ -90,10 +90,10 @@ stage1_5:
   max_cluster_size: 500
   min_source_diversity: 2
   neighbor_k: 50
-  embed_model: bge-m3
+  embed_model: BAAI/bge-small-en-v1.5         # D2156: unified — actual model loaded by S1.5
   embed_dim: 384
   embed_backend: mps
-  embed_model_hf: BAAI/bge-small-en-v1.5
+  embed_model_hf: BAAI/bge-small-en-v1.5        # D2156: matches embed_model — no drift
 stage1_3:
   min_len: 40
   cite_density: 0.6
@@ -116,6 +116,10 @@ stage2:
   golden_negative: 1
   golden_max_examples: 8
   golden_inject_enabled: true
+  golden_seed: 42                            # D2159: deterministic few-shot selection
+  split_probe_enabled: true                  # D2163: principle discovery gate master switch
+  split_probe_min_size: 50                   # D2163: only probe clusters with >N segments
+  split_probe_max_cohesion: 0.85             # D2163: only probe clusters with cohesion below this
   gate_enabled: true
   gate_strict: true
   evidence_tracking: true
@@ -146,7 +150,9 @@ stage5:
   factscore_enabled: false
   nli_model: tasksource/ModernBERT-base-nli
   nli_model_fallback: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
-  nli_entailment_threshold: 0.6
+  nli_entailment_threshold: 0.6           # D2119: modernbert entailment minimum
+  nli_pass_threshold: 0.8                   # D2155: skip LLM escalation threshold
+  nli_marginal_threshold: 0.5               # D2155: FLAG threshold — escalate if below
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true

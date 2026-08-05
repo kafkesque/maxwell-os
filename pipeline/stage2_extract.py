@@ -67,6 +67,12 @@ from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_CLUSTER_SAMPLES: int = 15  # Max segments to feed per cluster
 MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
+
+# D2163: Principle Discovery Gate — probe thresholds
+SPLIT_PROBE_ENABLED: bool = True         # Master switch for the probe
+SPLIT_PROBE_MIN_SIZE: int = 50            # Only probe clusters with >N segments
+SPLIT_PROBE_MAX_COHESION: float = 0.85    # Only probe clusters with cohesion below this
+SPLIT_KMEANS_RANDOM_STATE: int = 42       # Deterministic k-means seed
 # ── Convergent extraction system prompt (v3.0: cluster-before-extract) ────
 
 SYSTEM_PROMPT = """You are a convergent principle extraction engine. You receive multiple related text
@@ -232,7 +238,39 @@ def build_convergent_prompt(
     else:
         n_samples: int = MAX_CLUSTER_SAMPLES
 
-    sampled: list[str] = seg_ids[:n_samples]
+    # D2161: Stratified sampling by source book — ensures all books represented
+    # Group segments by source book
+    book_segments: dict[str, list[str]] = {}
+    for sid in seg_ids:
+        seg: dict | None = segments.get(sid)
+        if seg is None:
+            continue
+        book: str = seg.get("source_book", "unknown")
+        book_short: str = book.split("/")[-1].replace(".md", "")[:40] if book else "unknown"
+        book_segments.setdefault(book_short, []).append(sid)
+
+    # Sample proportionally: at least 1 from each book, then fill remaining slots
+    sampled: list[str] = []
+    n_books: int = len(book_segments)
+    if n_books == 0:
+        sampled = seg_ids[:n_samples]
+    else:
+        # First pass: take 1 from each book (round-robin through books)
+        book_list: list[str] = list(book_segments.keys())
+        book_idx: int = 0
+        book_consumed: dict[str, int] = {b: 0 for b in book_list}
+        while len(sampled) < n_samples:
+            book: str = book_list[book_idx % n_books]
+            segs: list[str] = book_segments[book]
+            pos: int = book_consumed[book]
+            if pos < len(segs):
+                sampled.append(segs[pos])
+                book_consumed[book] = pos + 1
+            book_idx += 1
+            # Break if all books exhausted
+            if all(book_consumed[b] >= len(book_segments[b]) for b in book_list):
+                break
+
     books_seen: set[str] = set()
     texts: list[str] = []
     evidence_passages: list[str] = []
@@ -356,6 +394,8 @@ def load_golden_parity(
     examples: list[dict] = golden.get("examples", [])
     all_pos: list[dict] = [e for e in examples if e.get("should_extract") and e.get("id") != "GE-001"]
     all_neg: list[dict] = [e for e in examples if not e.get("should_extract")]
+    # D2159: deterministic golden selection (seed 42; TODO: move to config pipeline_config.yaml → stage2.golden_seed)
+    random.seed(42)
     random.shuffle(all_pos)
     random.shuffle(all_neg)
 
@@ -403,7 +443,7 @@ def is_near_duplicate(text: str, lsh, minhash_cache: dict) -> tuple[bool, str | 
         return True, None
     sig: str = f"mh_{len(minhash_cache)}"
     lsh.insert(sig, mh)
-    minhash_cache[sig] = text
+    minhash_cache[sig] = (text, mh)  # D2152: store MinHash object for jaccard comparison
     return False, sig
 
 
@@ -506,6 +546,172 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
 
 # ── Main stage ─────────────────────────────────────────────────────────────
 
+# ═══════════════════════════════════════════════════════════════════════════
+# D2163: Principle Discovery Gate — 1:N extraction from clusters
+# ═══════════════════════════════════════════════════════════════════════════
+
+PRINCIPLE_DISCOVERY_SYSTEM: str = (
+    "You are a principle-counting engine. Given passages from a semantic cluster, "
+    "determine how many DISTINCT, non-overlapping causal mechanisms or heuristics are present. "
+    "Two passages discuss the SAME principle if they describe the same cause→effect chain "
+    "or the same decision rule. They are DIFFERENT if they describe different mechanisms "
+    "even if the topic is similar. Return ONLY a JSON object."
+)
+
+PRINCIPLE_DISCOVERY_PROMPT: str = (
+    "Analyze these {n_passages} passages from {n_books} books.\n\n"
+    "{passages_text}\n\n"
+    "How many DISTINCT, non-overlapping causal mechanisms or heuristics are present here? "
+    "Return ONLY: {{\"principle_count\": N}} where N is 0-4.\n"
+    "- N=0: no extractable principle (pure description, table of contents, etc.)\n"
+    "- N=1: all passages discuss the same underlying mechanism\n"
+    "- N=2-4: multiple distinct mechanisms present\n\n"
+    "Be CONSERVATIVE — only split when the mechanisms are genuinely distinct, "
+    "not just different aspects of the same principle."
+)
+
+
+def discover_principles(
+    cluster: dict,
+    segments: dict[str, dict],
+    provider: str = "maxwell_omlx",
+) -> int:
+    """Probe a cluster to count distinct principles via Phi-4-mini.
+
+    Only called for convergent clusters above size/cohesion thresholds.
+    Returns principle_count (0-4). Returns 1 on any error (fail-safe: don't split).
+    """
+    seg_ids: list[str] = cluster.get("segment_ids", [])
+    if not seg_ids:
+        return 1
+
+    # Sample up to 12 segments evenly distributed across the cluster
+    n_sample: int = min(12, len(seg_ids))
+    step: int = max(1, len(seg_ids) // n_sample)
+    sampled_ids: list[str] = [seg_ids[i] for i in range(0, len(seg_ids), step)][:n_sample]
+
+    books_seen: set[str] = set()
+    passage_texts: list[str] = []
+    for sid in sampled_ids:
+        seg: dict | None = segments.get(sid)
+        if seg is None:
+            continue
+        text: str = seg.get("text", "")[:300]
+        book: str = seg.get("source_book", "unknown")
+        book_short: str = book.split("/")[-1].replace(".md", "")[:30] if book else "unknown"
+        books_seen.add(book_short)
+        passage_texts.append(f"[{book_short}]: {text}")
+
+    passages_blob: str = "\n\n".join(passage_texts)
+    prompt: str = PRINCIPLE_DISCOVERY_PROMPT.format(
+        n_passages=len(passage_texts),
+        n_books=len(books_seen),
+        passages_text=passages_blob,
+    )
+
+    # Phi-4-mini probe (fast, ~1.5s) — use VERIFY_MODEL for speed
+    try:
+        from pipeline.omlx_call import call_omlx_json
+        from pipeline.pipeline_paths import VERIFY_MODEL
+        result: dict = call_omlx_json(
+            prompt=prompt,
+            model=VERIFY_MODEL,
+            system=PRINCIPLE_DISCOVERY_SYSTEM,
+            max_tokens=128,
+            temperature=0.0,
+        )
+        if isinstance(result, dict):
+            count: int = result.get("principle_count", 1)
+            if isinstance(count, int) and 0 <= count <= 4:
+                return count
+    except Exception:
+        pass  # Fail-safe: return 1 (don't split on probe error)
+
+    return 1
+
+
+def split_cluster_by_kmeans(
+    cluster: dict,
+    segments: dict[str, dict],
+    n_principles: int,
+) -> list[dict]:
+    """Split a cluster into N sub-clusters via k-means on segment embeddings.
+
+    Uses bge-small-en-v1.5 on MPS (same model as S1.5) for consistency.
+    Each sub-cluster inherits metadata from the parent cluster.
+    """
+    seg_ids: list[str] = cluster.get("segment_ids", [])
+    if len(seg_ids) < n_principles * 2:
+        # Too few segments to split meaningfully
+        return [cluster]
+
+    # Load segment texts
+    texts: list[str] = []
+    valid_ids: list[str] = []
+    for sid in seg_ids:
+        seg: dict | None = segments.get(sid)
+        if seg is None:
+            continue
+        text: str = seg.get("text", "")
+        if len(text) >= 30:
+            texts.append(text[:1000])
+            valid_ids.append(sid)
+
+    if len(texts) < n_principles * 2:
+        return [cluster]
+
+    # Embed segments (same model as S1.5 for consistency)
+    try:
+        from sentence_transformers import SentenceTransformer
+        from pipeline.pipeline_paths import S15_EMBED_MODEL_HF
+        import numpy as np
+        from sklearn.cluster import KMeans
+
+        model = SentenceTransformer(S15_EMBED_MODEL_HF, device="mps")
+        embeddings: np.ndarray = model.encode(texts, normalize_embeddings=True,
+                                                show_progress_bar=False)
+
+        # K-means clustering
+        kmeans = KMeans(n_clusters=n_principles, random_state=SPLIT_KMEANS_RANDOM_STATE,
+                        n_init=10)
+        labels: np.ndarray = kmeans.fit_predict(embeddings)
+
+        # Build sub-clusters
+        sub_clusters: list[dict] = []
+        for label_idx in range(n_principles):
+            sub_ids: list[str] = [
+                valid_ids[i] for i in range(len(valid_ids))
+                if labels[i] == label_idx
+            ]
+            if len(sub_ids) < 2:
+                continue  # Skip degenerate sub-clusters
+
+            # Compute source books for sub-cluster
+            sub_books: set[str] = set()
+            for sid in sub_ids:
+                seg = segments.get(sid)
+                if seg:
+                    sub_books.add(seg.get("source_book", "unknown"))
+
+            sub_cluster: dict = dict(cluster)
+            sub_cluster["segment_ids"] = sub_ids
+            sub_cluster["size"] = len(sub_ids)
+            sub_cluster["source_books"] = list(sub_books)
+            sub_cluster["source_diversity"] = len(sub_books)
+            sub_cluster["is_convergent"] = len(sub_books) >= 2
+            sub_cluster["parent_cluster_id"] = cluster.get("cluster_id", "?")
+            sub_cluster["cluster_id"] = f"{cluster.get('cluster_id', '?')}_sub{label_idx}"
+            sub_cluster["_is_sub_cluster"] = True
+            sub_clusters.append(sub_cluster)
+
+        if len(sub_clusters) >= 2:
+            return sub_clusters
+    except Exception:
+        pass  # Fail-safe: return original cluster if k-means fails
+
+    return [cluster]
+
+
 def run_stage2(
     provider: str = "omlx",
     only_convergent: bool = False,
@@ -564,7 +770,50 @@ def run_stage2(
     print(f"   Single-source: {len(single_source)} | Noise: {len(noise)}")
     print(f"   Provider: {provider} | Model: {GEN_MODEL} | temp=0.0")
     print(f"   Golden: {golden_total} examples | Gate: {'on' if gate_enabled else 'off'}")
+    print(f"   Split Probe: {'on' if SPLIT_PROBE_ENABLED else 'off'} (size>{SPLIT_PROBE_MIN_SIZE}, coh<{SPLIT_PROBE_MAX_COHESION})")
     print(f"{'='*60}")
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # D2163: Principle Discovery Gate — probe convergent clusters for N>1
+    # ═══════════════════════════════════════════════════════════════════════
+    split_count: int = 0
+    extra_fbs_estimate: int = 0
+    if SPLIT_PROBE_ENABLED and convergent:
+        print(f"\n🔍 Principle Discovery Gate: probing {len(convergent)} convergent clusters...")
+        expanded_targets: list[dict] = []
+        probes_run: int = 0
+        probe_total: float = 0.0
+
+        for cluster in convergent:
+            size: int = cluster.get("size", 0)
+            cohesion: float = cluster.get("cohesion", 1.0)
+
+            # Trigger: large AND lower-cohesion clusters most likely multi-principle
+            if size > SPLIT_PROBE_MIN_SIZE and cohesion < SPLIT_PROBE_MAX_COHESION:
+                probes_run += 1
+                t0: float = time.time()
+                n_principles: int = discover_principles(cluster, segments, provider)
+                probe_total += time.time() - t0
+
+                if n_principles > 1:
+                    sub_clusters: list[dict] = split_cluster_by_kmeans(cluster, segments, n_principles)
+                    if len(sub_clusters) > 1:
+                        expanded_targets.extend(sub_clusters)
+                        split_count += 1
+                        extra_fbs_estimate += len(sub_clusters) - 1
+                        cid: str = cluster.get("cluster_id", "?")[:30]
+                        print(f"   ✂️  {cid}: {size}s/{cohesion:.3f}coh → {n_principles} principles, {len(sub_clusters)} sub-clusters")
+                        continue
+            # Default: keep cluster as-is
+            expanded_targets.append(cluster)
+
+        # Add single-source clusters unchanged
+        expanded_targets.extend(single_source)
+        target_clusters = expanded_targets
+        print(f"   ✅ Probe: {probes_run} clusters checked in {probe_total:.1f}s")
+        print(f"   ✂️  Split: {split_count} clusters → +{extra_fbs_estimate} expected FBs")
+        print(f"   📊 Total extraction targets: {len(target_clusters)} (was {len(convergent) + len(single_source)})")
+        print(f"{'='*60}")
 
     # Dedup infrastructure
     lsh, minhash_ok = init_minhash_lsh()
@@ -755,16 +1004,19 @@ def run_stage2(
                 processed_ids.add(cid)
                 continue
 
-            # MinHash near-dedup (post-collection)
+            # MinHash near-dedup (post-collection) — D2152: fixed jaccard comparison
             if minhash_ok and fb.get("minhash_signature"):
                 sig: str = fb["minhash_signature"]
-                # Check against already-accepted FBs
+                # Recreate MinHash for current FB definition
+                cur_mh = make_minhash(definition)
                 is_dup: bool = False
                 for prev_fb in all_fbs:
                     prev_sig: str = prev_fb.get("minhash_signature", "")
-                    if prev_sig and minhash_cache.get("_jaccard", lambda a, b: 0)(sig, prev_sig) > 0.9:
-                        is_dup = True
-                        break
+                    if prev_sig and prev_sig in minhash_cache:
+                        _, prev_mh = minhash_cache[prev_sig]
+                        if cur_mh.jaccard(prev_mh) > S2_MINHASH_THRESHOLD:
+                            is_dup = True
+                            break
                 if is_dup:
                     total_skipped += 1
                     print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: near-duplicate")
@@ -778,32 +1030,27 @@ def run_stage2(
             print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid} "
                   f"({cluster.get('size', 0)} segs, {book_count} books) → {fb.get('name', '?')[:40]}")
 
-        elapsed: float = time.time() - start
-        depth_tag: str = result.get("depth", "?")[:1].upper()
-        sum_tag: str = "⚠️SUM" if is_summary else ""
-        print(f"→ ✅ '{name[:40]}' {depth_tag} {sum_tag} ({elapsed:.1f}s)")
-
-        # Incremental checkpoint every 5 clusters
-        if i % 5 == 0 or i == len(target_clusters):
-            safe_write(
-                STAGE2_CHECKPOINT,
-                "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
-            )
-            # Atomic segids
-            import tempfile
-            segids_tmp = tempfile.NamedTemporaryFile(
-                mode="w", suffix=".segids", delete=False,
-                dir=str(STAGE2_CHECKPOINT.parent)
-            )
-            try:
-                json.dump(list(processed_ids), segids_tmp)
-                segids_tmp.flush()
-                os.fsync(segids_tmp.fileno())
-                segids_tmp.close()
-                os.replace(segids_tmp.name, segids_file)
-            except Exception:
-                if os.path.exists(segids_tmp.name):
-                    os.unlink(segids_tmp.name)
+            # D2154: Incremental checkpoint every 5 clusters (inside for future loop)
+            if completed % 5 == 0:
+                safe_write(
+                    STAGE2_CHECKPOINT,
+                    "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
+                )
+                # Atomic segids
+                import tempfile
+                segids_tmp = tempfile.NamedTemporaryFile(
+                    mode="w", suffix=".segids", delete=False,
+                    dir=str(STAGE2_CHECKPOINT.parent)
+                )
+                try:
+                    json.dump(list(processed_ids), segids_tmp)
+                    segids_tmp.flush()
+                    os.fsync(segids_tmp.fileno())
+                    segids_tmp.close()
+                    os.replace(segids_tmp.name, segids_file)
+                except Exception:
+                    if os.path.exists(segids_tmp.name):
+                        os.unlink(segids_tmp.name)
 
     # Write final checkpoint
     safe_write(

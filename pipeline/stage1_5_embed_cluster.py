@@ -33,8 +33,13 @@ Usage:
 """
 
 import argparse
+import atexit
+import gc
 import json
+import logging
+import os
 import sys
+import tempfile
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -50,6 +55,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     S13_DIR,
     S15_EMBED_BACKEND,
+    S15_EMBED_CHUNK_SIZE,  # D2189: chunked embedding
     S15_EMBED_DIM,
     S15_EMBED_MODEL,
     S15_EMBED_MODEL_HF,
@@ -185,6 +191,9 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
             )
 
             chunk_embeddings: np.ndarray = np.array(raw, dtype=np.float32)
+            # D2189: Matryoshka truncation — bge-m3 outputs 1024d natively, truncate to 512d
+            # per config. MRL training guarantees cosine ranking preserved (92% overlap per D2118).
+            chunk_embeddings = chunk_embeddings[:, :S15_EMBED_DIM]
             embeddings_mmap[start_idx:end_idx, :] = chunk_embeddings
 
             # Free chunk tensors, flush MPS cache (prevents 2,526-batch leak)

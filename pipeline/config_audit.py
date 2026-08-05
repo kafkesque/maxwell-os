@@ -60,17 +60,24 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     # ── Coverage (T0.3) ──
     "coverage.threshold":               ("pipeline.coverage_check", "COVERAGE_THRESHOLD", "float"),
     "coverage.flag_fraction":           ("pipeline.coverage_check", "COVERAGE_FLAG_FRACTION", "float"),
+    # ── Pipeline tuning (T1.1, T1.2) ──
+    "pipeline.min_chunk_words":             ("pipeline.stage1_chunk", "MIN_CHUNK_WORDS", "int"),
+    "pipeline.enhance_min_header_gap_chars": ("pipeline.enhance_md_headers", "MIN_HEADER_GAP_CHARS", "int"),
+    # ── E2E validation (T1.3) ──
+    "e2e.borp_min_sources":             ("pipeline.e2e_test", "BORP_MIN_SOURCES", "int"),
+    "e2e.min_pass_rate":                ("pipeline.e2e_test", "E2E_MIN_PASS_RATE", "float"),
+    "e2e.min_fbs":                      ("pipeline.e2e_test", "E2E_MIN_FBS", "int"),
+    "e2e.convergent_ratio":             ("pipeline.e2e_test", "E2E_CONVERGENT_RATIO", "float"),
 }
 
-# ── Acknowledged hardcoded values (pending migration to config, Tier 1+) ──
-# These won't appear in --check-unchecked. Add to CONFIG_TO_CODE when migrated.
+# ── Acknowledged hardcoded values (resilient fallbacks in except blocks) ──
+# These are inside try/except blocks as graceful degradation when config is unavailable.
+# They mirror the config defaults in pipeline_paths.py — NOT drift risks.
 ACKNOWLEDGED_HARDCODED: set[str] = {
-    "BORP_MIN_SOURCES",      # e2e_test.py — T1 task
-    "E2E_MIN_PASS_RATE",     # e2e_test.py — T1 task
-    "E2E_MIN_FBS",           # e2e_test.py — T1 task
-    "E2E_CONVERGENT_RATIO",  # e2e_test.py — T1 task
-    "MIN_CHUNK_WORDS",       # stage1_chunk.py — T1 task
-    "MIN_HEADER_GAP_CHARS",  # enhance_md_headers.py — T1 task
+    "BORP_MIN_SOURCES",      # e2e_test.py — except fallback (mirrors config default=2)
+    "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)
+    "E2E_MIN_FBS",           # e2e_test.py — except fallback (mirrors config default=30)
+    "E2E_CONVERGENT_RATIO",  # e2e_test.py — except fallback (mirrors config default=0.25)
 }
 
 

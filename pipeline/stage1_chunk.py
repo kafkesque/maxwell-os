@@ -33,14 +33,15 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     CHUNK_OVERLAP_WORDS,
     CHUNK_SIZE_WORDS,
+    MIN_CHUNK_WORDS,
     STAGE0_CHECKPOINT,
     STAGE1_CHECKPOINT,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 from pipeline.text_cleaner import clean_markdown, normalize_paragraphs
 
-# ── Constants ──────────────────────────────────────────────────────────────
-MIN_CHUNK_WORDS = 10  # P0.4 FIX: was 30. Preserve short aphoristic principles.
+# ── Constants (T1.1: de-hardcoded — sourced from pipeline_config.yaml) ────
+# MIN_CHUNK_WORDS imported from pipeline_paths (config → pipeline.min_chunk_words)
 SECTION_HEADING_RE = re.compile(r"^#{1,6}\s+")
 SKIP_PATTERNS = [
     re.compile(r"^```"),           # code fence

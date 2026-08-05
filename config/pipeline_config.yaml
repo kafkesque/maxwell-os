@@ -73,6 +73,8 @@ pipeline:
   max_domains_per_fb: 5
   chunk_size_words: 300
   chunk_overlap_words: 50
+  min_chunk_words: 10                        # T1.1: minimum words to keep a chunk (P0.4)
+  enhance_min_header_gap_chars: 3000         # T1.2: min chars between auto-inserted headers
   hdbscan_min_cluster_size: 15
   borp_min_sources: 2
   intent_top_k_ratio: 0.3
@@ -159,6 +161,11 @@ stage6:
 coverage:                                       # T0.3: coverage gap analysis
   threshold: 0.50                               # Cosine similarity below which a segment is "under-covered"
   flag_fraction: 0.30                           # Fraction of under-covered segments that triggers a flag
+e2e:                                            # T1.3: end-to-end test validation thresholds
+  borp_min_sources: 2                           # Minimum source books for convergent cluster
+  min_pass_rate: 0.80                           # Minimum Stage 5 PASS rate (80%)
+  min_fbs: 30                                   # Minimum expected FBs from 20-book smoke test
+  convergent_ratio: 0.25                        # Minimum fraction of clusters that must be convergent (≥2 books)
 test:
   full_run:
     books:

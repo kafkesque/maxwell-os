@@ -24,7 +24,12 @@ from pathlib import Path
 from collections import Counter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from pipeline.pipeline_paths import SOURCE_EPUB_DIR, SOURCE_PDF_DIR, BOOKS_DIR
+from pipeline.pipeline_paths import (
+    BOOKS_DIR,
+    ENHANCE_MIN_HEADER_GAP_CHARS,
+    SOURCE_EPUB_DIR,
+    SOURCE_PDF_DIR,
+)
 
 # ── Regex heuristic patterns ──
 # Each pattern: (regex, header_prefix) — if line matches, prefix it with ##
@@ -95,8 +100,8 @@ NOT_HEADER_PATTERNS = [
     r'^Table\s+\d',                  # Table captions
 ]
 
-# Minimum chars between headers (avoid clustering)
-MIN_HEADER_GAP_CHARS = 3000  # avoid clustering tutorial steps too tightly
+# Minimum chars between headers (avoid clustering) — T1.2: from config
+MIN_HEADER_GAP_CHARS: int = ENHANCE_MIN_HEADER_GAP_CHARS  # avoid clustering tutorial steps too tightly
 
 
 def should_be_header(line: str) -> bool:

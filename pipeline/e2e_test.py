@@ -45,16 +45,22 @@ from pipeline.pipeline_paths import (
     STAGE6_CHECKPOINT,
 )
 
-# ── Thresholds (from config, per CONSTITUTION C12 — no hardcoded values) ───
+# ── Thresholds (T1.3: de-hardcoded — sourced from pipeline_config.yaml) ────
+# Graceful fallback: if pipeline_paths can't provide e2e config, use defaults.
+# This preserves the resilience of the original try/except pattern while
+# centralizing config in pipeline_paths for the normal path.
 try:
-    import yaml
-    with open(PROJECT_ROOT / "config" / "pipeline_config.yaml") as f:
-        _cfg = yaml.safe_load(f)
-    BORP_MIN_SOURCES = _cfg.get("verification", {}).get("borp_min_sources", 2)
-    E2E_MIN_PASS_RATE = _cfg.get("stage5", {}).get("e2e_min_pass_rate", 0.80)
-    E2E_MIN_FBS = _cfg.get("stage4", {}).get("e2e_min_fbs", 30)
-    E2E_CONVERGENT_RATIO = _cfg.get("stage1_5", {}).get("e2e_convergent_ratio", 0.25)
-except Exception:
+    from pipeline.pipeline_paths import (
+        E2E_BORP_MIN_SOURCES,
+        E2E_CONVERGENT_RATIO as _E2E_CONVERGENT_RATIO_CFG,
+        E2E_MIN_FBS as _E2E_MIN_FBS_CFG,
+        E2E_MIN_PASS_RATE as _E2E_MIN_PASS_RATE_CFG,
+    )
+    BORP_MIN_SOURCES: int = E2E_BORP_MIN_SOURCES
+    E2E_MIN_PASS_RATE: float = _E2E_MIN_PASS_RATE_CFG
+    E2E_MIN_FBS: int = _E2E_MIN_FBS_CFG
+    E2E_CONVERGENT_RATIO: float = _E2E_CONVERGENT_RATIO_CFG
+except (ImportError, AttributeError):
     BORP_MIN_SOURCES = 2
     E2E_MIN_PASS_RATE = 0.80
     E2E_MIN_FBS = 30

@@ -98,6 +98,8 @@ EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PRO
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]
 TAXONOMY_VERSION=_CFG["pipeline"]["taxonomy_version"]; MAX_DOMAINS_PER_FB=_CFG["pipeline"]["max_domains_per_fb"]
 CHUNK_SIZE_WORDS=_CFG["pipeline"]["chunk_size_words"]; CHUNK_OVERLAP_WORDS=_CFG["pipeline"]["chunk_overlap_words"]
+MIN_CHUNK_WORDS=int(_CFG.get("pipeline", {}).get("min_chunk_words", 10))              # T1.1: preserve short aphoristic principles
+ENHANCE_MIN_HEADER_GAP_CHARS=int(_CFG.get("pipeline", {}).get("enhance_min_header_gap_chars", 3000))  # T1.2: min chars between headers
 # D2177: HDBSCAN removed (D2120). Use safe default to prevent KeyError on clean checkout.
 _HDBSCAN_DEFAULT = 15
 HDBSCAN_MIN_CLUSTER_SIZE=_CFG.get("pipeline", {}).get("hdbscan_min_cluster_size", _HDBSCAN_DEFAULT)
@@ -152,6 +154,12 @@ S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True
 # ── Coverage settings (T0.3) ─────────────────────────────────────────
 COVERAGE_THRESHOLD = float(_CFG.get("coverage", {}).get("threshold", 0.50))
 COVERAGE_FLAG_FRACTION = float(_CFG.get("coverage", {}).get("flag_fraction", 0.30))
+
+# ── E2E validation thresholds (T1.3) ─────────────────────────────────
+E2E_BORP_MIN_SOURCES = int(_CFG.get("e2e", {}).get("borp_min_sources", 2))
+E2E_MIN_PASS_RATE = float(_CFG.get("e2e", {}).get("min_pass_rate", 0.80))
+E2E_MIN_FBS = int(_CFG.get("e2e", {}).get("min_fbs", 30))
+E2E_CONVERGENT_RATIO = float(_CFG.get("e2e", {}).get("convergent_ratio", 0.25))
 
 # ── Stage 1.5 settings (D2094: FAISS cluster) ─────────────────────────
 S15_FAISS_THRESHOLD = float(_CFG.get("stage1_5", {}).get("faiss_threshold", 0.75))

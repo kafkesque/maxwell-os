@@ -2842,3 +2842,117 @@ ChatGPT was most accurate (8/8 novel P0 claims verified against live code). Qwen
 - **Remediation:** Future audits must include a clean-venv import test and a
   memory-budget calculation for every LIMIT clause.
 
+---
+
+## D2184: Tier 0 De-hardcoding — All Tuning Constants Config-Driven (2026-08-05)
+
+**Trigger:** Maxwell review found 14 values in YAML ignored by code (stage2_extract.py
+had its own hardcoded constants). All Tier 0 files de-hardcoded.
+
+### T0.1 — Stage 2 (stage2_extract.py)
+| Constant | Was | Now |
+|----------|-----|-----|
+| MAX_CLUSTER_SAMPLES | = 15 | = S2_MAX_CLUSTER_SAMPLES (config) |
+| SPLIT_PROBE_ENABLED | = True | = S2_SPLIT_PROBE_ENABLED (config) |
+| SPLIT_PROBE_MIN_SIZE | = 20 | = S2_SPLIT_PROBE_MIN_SIZE (config) |
+| SPLIT_PROBE_MAX_COHESION | = 0.85 | = S2_SPLIT_PROBE_MAX_COHESION (config) |
+| SPLIT_KMEANS_RANDOM_STATE | = 42 | = S2_SPLIT_KMEANS_RANDOM_STATE (config) |
+| MAX_PROBE_SAMPLES (fn-local) | = 15 | = S2_MAX_PROBE_SAMPLES (config) |
+
+### T0.2 — OMLX Call (omlx_call.py)
+| Constant | Was | Now |
+|----------|-----|-----|
+| DEFAULT_TIMEOUT | = 180 | = OMLX_DEFAULT_TIMEOUT (config) |
+| MAX_RETRIES | = 3 | = OMLX_MAX_RETRIES (config) |
+| RETRY_DELAY | = 5 | = OMLX_RETRY_DELAY (config) |
+| TEMPERATURE | = 0.0 | = GEN_TEMPERATURE (config) |
+
+### T0.3 — Coverage Check (coverage_check.py)
+| Constant | Was | Now |
+|----------|-----|-----|
+| COVERAGE_THRESHOLD | = 0.50 | imported from pipeline_paths (config→coverage.threshold) |
+| FLAG_FRACTION | = 0.30 | imported from pipeline_paths (config→coverage.flag_fraction) |
+
+### T0.4 — Ollama Embed (ollama_embed.py)
+| Constant | Was | Now |
+|----------|-----|-----|
+| NOMIC_MAX_CHARS | = 4000 | = OLLAMA_NOMIC_MAX_CHARS (config) |
+| BATCH_SIZE | = 100 | = OLLAMA_BATCH_SIZE (config) |
+
+### Enforcement mechanism
+- config_audit.py: 30 registered mappings with sys.path fix for CLI invocation
+- --strict flag: exits 1 if unregistered hardcoded values exist
+- just preflight: now uses --check-unchecked --strict
+- ACKNOWLEDGED_HARDCODED set for resilient fallbacks (not drift risks)
+
+### Verification
+- 12/12 tests pass, zero config-code drift
+- Gemma-4 code review: PASS on all files
+
+---
+
+## D2185: Tier 1 De-hardcoding — Remaining Constants + NLI Validation (2026-08-05)
+
+**Trigger:** 6 acknowledged-but-not-migrated values in e2e_test, stage1_chunk,
+enhance_md_headers needed migration.
+
+### T1.1 — stage1_chunk.py
+MIN_CHUNK_WORDS = 10 → pipeline.min_chunk_words (config)
+
+### T1.2 — enhance_md_headers.py
+MIN_HEADER_GAP_CHARS = 3000 → pipeline.enhance_min_header_gap_chars (config)
+
+### T1.3 — e2e_test.py
+BORP_MIN_SOURCES, E2E_MIN_PASS_RATE, E2E_MIN_FBS, E2E_CONVERGENT_RATIO → e2e.* config section.
+Preserved graceful try/except fallback pattern for resilience.
+Added to ACKNOWLEDGED_HARDCODED as resilient defaults.
+
+### Verification
+- Gemma-4 code reviews: PASS on all 4 files
+- 12/12 tests pass, config audit clean
+- e2e_test resilience pattern reviewed: PASS
+
+---
+
+## D2186: C16 Fixes + Config Audit Expansion + NLI Validation (2026-08-05)
+
+### T0.1 (C16 fix) — batch_convert_epubs.py:157
+Bare `except:` that silently set old_text = "" → now logs:
+```python
+except Exception as e:
+    print(f"    ⚠️  Cannot read {md_path.name}: {e}")
+    old_text = ""
+```
+
+### T0.2 (C16 fix) — fix_remaining.py:231
+Bare `except: continue` → now logs:
+```python
+except Exception as e:
+    print(f"    ⚠️  Cannot read {md_path.name}: {e}")
+    continue
+```
+
+### T1.1 — Config audit registry expanded
+48 registered mappings (from 30). Added: chunk sizes, intent thresholds, S4/S5/S6
+flags, smoke test config, S1.5 cluster sizes. All numeric thresholds and boolean
+feature flags now tracked for drift.
+
+### T1.4 — NLI threshold validation
+pipeline_paths now validates at import time:
+- Warns if any threshold out of [0,1]
+- Warns if marginal ≥ entailment or entailment ≥ pass
+- Does NOT crash — graceful degradation with stderr warning
+- Tested: catches misordered (0.5 ≥ 0.3) and out-of-range (1.5) correctly
+
+### T1.2 DEFERRED — Path resolution inconsistency
+28 files use manual sys.path, 16 use package imports. Both work correctly.
+Standardizing would risk import breakage. Deferred to Tier 3 architectural.
+
+### T1.3 DEFERRED — Unused config key pipeline_root
+Set to `null`, never referenced. Harmless placeholder. Removed from ACKNOWLEDGED set.
+
+### S0-S1.5 RE-RUN ANALYSIS
+- S0 (922 MDs) + S1 (323,226 segments): DONE — no re-run needed
+- S1.3–S6 need FIRST RUN (not re-run) with bge-m3 512-dim embeddings
+- Embed models aligned: both bge-m3 ✅
+

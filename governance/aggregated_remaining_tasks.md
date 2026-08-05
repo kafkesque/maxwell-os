@@ -1,6 +1,8 @@
-# Maxwell OS — Aggregated Remaining Tasks (Post-Audit v3.0)
-> **Updated:** 2026-07-26 | **Source:** IMPLEMENTATION-PLAN-2026-07-26.md + WEEKLY-RESEARCH-2026-07-26.md
-> **Total remaining:** 17 tasks across 4 tiers + 5 urgent actions from weekly research
+# Maxwell OS — Aggregated Remaining Tasks (Post T0/T1 De-hardcoding)
+> **Updated:** 2026-08-05 19:45 | **Source:** D2184–D2186 comprehensive audit
+> **Total remaining:** 14 tasks across 4 tiers
+> **Completed:** All Tier 0 and Tier 1 de-hardcoding. All C16 silent excepts fixed.
+> **Config drift protection:** 48 registered mappings, --strict enforcement, zero drift.
 
 ---
 
@@ -8,11 +10,11 @@
 
 | # | Action | Effort | Why | Status |
 |---|--------|--------|-----|--------|
-| 1 | 20-book FAISS calibration | 2h | Calibrate threshold on meaningful scale | ⬜ TODO |
-| 2 | Stage 3: fix or remove | 4h | BUG-048: bridge script bypass. Either rewrite or remove. | ✅ DONE (P0.4: archived, cosine dedup in S4) |
-| 3 | Stage 4 simplification | 3h | D2112 deferred. Multi-label + relationship edges added. | ✅ DONE (P1.4+P1.7: +113 LOC) |
-| 4 | LightRAG overlay (Layer 1c) | 4h | Weekly research: ALL sources validate graph memory > vector memory | 🟡 P1.4 DONE (edges ready), full LightRAG → P2.1 |
-| 5 | 20-book E2E test | 3h | Validate v3.0 at scale. Expect 50-200 convergent FBs. | ⬜ TODO (→ P1.5) |
+| 1 | **Run S1.3→S6 pipeline** | 4h | S0 (922 MDs) + S1 (323K segments) done. S1.3–S6 need first run with bge-m3 512d. Embed models aligned. | 🔴 HIGHEST PRIORITY |
+| 2 | NLI calibration on real data | 2h | Thresholds (0.5/0.6/0.8) unvalidated on bge-m3 embeddings. nli_calibrate.py exists. | ⬜ TODO |
+| 3 | 20-book E2E test | 3h | Validate v3.0 at scale. Thresholds now configurable via e2e.* config. | ⬜ TODO |
+| 4 | LightRAG overlay (Layer 1c) | 4h | Graph memory > vector memory (validated). Stage 4 edges ready. | ⬜ TODO |
+| 5 | Stage 3: REMOVED | — | D2120: archived, cosine dedup in S4 | ✅ DONE |
 
 ## TIER 2 — THIS MONTH (Quality + Layer 2 Foundation)
 
@@ -62,27 +64,35 @@
 
 | Bug ID | Severity | Description | Status |
 |--------|----------|-------------|--------|
-| BUG-044 | 🟡 MED | Stage 3 bypassed (bridge script) → clusters not used | ⬜ OPEN |
+| BUG-044 | 🟡 MED | Stage 3 bypassed (bridge script) → clusters not used | ✅ DONE — S3 removed (D2120) |
 | BUG-045 | 🟡 MED | evidence_passages inflates (fixed: evidence_passages_shown) | ✅ DONE (2026-07-26) |
 | BUG-046 | 🟡 MED | Stage 4 complexity for v3.0 | ⬜ OPEN |
 | BUG-047 | 🟡 MED | OMLX memory leak (watchdog enhanced) | ✅ DONE (2026-07-26) |
 | BUG-048 | 🟡 MED | Stage 3 semantic dedup not functioning | ✅ DONE — S3 removed, cosine dedup in S4 |
 | BUG-050 | 🟡 MED | governance drift (CONSTITUTION stale refs) | ✅ DONE (2026-07-26) |
 | BUG-001 | 🔴 CRITICAL | OMLX model crashes on large context | ⬜ MITIGATED (watchdog) |
+| — | ✅ FIXED | C16: batch_convert_epubs.py bare except | ✅ DONE (D2186) |
+| — | ✅ FIXED | C16: fix_remaining.py bare except | ✅ DONE (D2186) |
 
 ---
 
 ## IMMEDIATE NEXT ACTION
 
 ```bash
-# Verify all changes from today's session
-python3 -c "from pipeline.pipeline_paths import CHECKPOINT_DIR, DB_PATH, VERSION; print(f'v{VERSION} — C12 compliant ✅')"
+# Run preflight (now enforces config-code parity)
+just preflight
 
-# Test OMLX watchdog with new trend detection
-python3 pipeline/omlx_watchdog.py --pre-stage
+# Run the pipeline from S1.3 through S6
+python3 pipeline/stage1_3_prefilter.py
+python3 pipeline/stage1_5_embed_cluster.py
+python3 pipeline/stage2_extract.py --process-singletons
+python3 pipeline/stage4_merge.py
+python3 pipeline/stage5_verify.py
+python3 pipeline/stage6_commit.py
 
-# Run smoke test
-just smoke
+# Or use the unified runner
+python3 pipeline/runner.py --from-stage 1_3
 ```
 
-Then begin Tier 1: 20-book FAISS calibration → Stage 3 decision → LightRAG overlay.
+**Current state:** S0 (922 MDs) ✅ S1 (323K segments) ✅ → S1.3–S6 need first run.
+Embed models aligned (bge-m3/512d). All tuning constants in config. Zero drift.

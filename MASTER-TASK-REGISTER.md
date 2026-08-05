@@ -1,7 +1,7 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-03 22:00 | **Decisions:** D2129–D2135 (7 new, verified fixes)
+> **Updated:** 2026-08-05 19:45 | **Decisions:** D2184–D2186 (3 new, T0/T1 de-hardcoding)
 > **Rule:** Undone tasks at top (priority-ordered). Done tasks at bottom.
-> **Buglog:** 8 open + BUG-056/057/058 (3 new) | **Decision log:** 132 decisions (D2000-D2135)
+> **Buglog:** 8 open | **Decision log:** 135 decisions (D2000-D2186)
 
 ---
 
@@ -17,6 +17,41 @@
 | P0.6 | **Subprocess parallelism** — `pipeline/parallel.py` book-level Stage 0/1 | +152 | DELEGATE-001, D2120 | ✅ DONE |
 
 **Phase 0 gate:** ✅ PASSED. `just smoke-plumbing` passes <30s. `just smoke` passes <2min. Net ~560 LOC.
+
+---
+
+## 🔴 TIER 0 — DE-HARDCODING COMPLETE (2026-08-05, D2184/D2186)
+
+| # | Task | Status |
+|---|------|--------|
+| T0.1 | **Stage 2 de-hardcode** — MAX_CLUSTER_SAMPLES, SPLIT_PROBE_*, SPLIT_KMEANS_RANDOM_STATE, MAX_PROBE_SAMPLES → config | ✅ DONE (D2184) |
+| T0.2 | **OMLX call de-hardcode** — DEFAULT_TIMEOUT, MAX_RETRIES, RETRY_DELAY, TEMPERATURE → config | ✅ DONE (D2184) |
+| T0.3 | **Coverage check de-hardcode** — COVERAGE_THRESHOLD, FLAG_FRACTION → config | ✅ DONE (D2184) |
+| T0.4 | **Ollama embed de-hardcode** — NOMIC_MAX_CHARS, BATCH_SIZE → config | ✅ DONE (D2184) |
+| T0.5 | **C16: batch_convert_epubs.py:157** bare except → log error | ✅ DONE (D2186) |
+| T0.6 | **C16: fix_remaining.py:231** bare except → log error | ✅ DONE (D2186) |
+| T0.7 | **Config audit enforcement** — 48 mappings, --strict flag, just preflight integration | ✅ DONE (D2184/D2186) |
+
+**Tier 0 gate:** ✅ PASSED. All 14 hardcoded tuning values migrated. 2 silent excepts fixed.
+48 registered config→code mappings. Zero drift. `just preflight` enforces on every run.
+
+---
+
+## 🟠 TIER 1 — DE-HARDCODING COMPLETE (2026-08-05, D2185/D2186)
+
+| # | Task | Status |
+|---|------|--------|
+| T1.1 | **stage1_chunk** — MIN_CHUNK_WORDS → config | ✅ DONE (D2185) |
+| T1.2 | **enhance_md_headers** — MIN_HEADER_GAP_CHARS → config | ✅ DONE (D2185) |
+| T1.3 | **e2e_test** — BORP/E2E thresholds → config (try/except fallback) | ✅ DONE (D2185) |
+| T1.4 | **NLI threshold validation** — import-time sanity check (stderr warning) | ✅ DONE (D2186) |
+| T1.5 | **Config audit expansion** — 30→48 mappings (chunk, intent, S4/S5/S6 flags, smoke) | ✅ DONE (D2186) |
+
+**Tier 1 deferred:**
+| T1.6 | **Path resolution standardization** (28 sys.path vs 16 pkg imports) → Tier 3 | ⏸️ DEFERRED |
+| T1.7 | **pipeline_root unused config key** (null, harmless placeholder) → Tier 3 | ⏸️ DEFERRED |
+
+---
 
 ## 🔴 PHASE 0.5 — VERIFIED BOTTLENECK FIXES (2026-08-03, D2129-D2134)
 

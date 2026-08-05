@@ -152,6 +152,34 @@ def ensure_dirs():
     for d in [S0_DIR,S1_DIR,S13_DIR,S15_DIR,S2_DIR,S4_DIR,S5_DIR,S6_DIR,ARCHIVE_DIR,BOOKS_DIR]:
         d.mkdir(parents=True,exist_ok=True)
 
+
+def check_books_source() -> tuple[bool, str]:
+    """D2178: Validate that book source directories contain EPUB/PDF files.
+
+    Returns (ok, message) where ok=False means no books found.
+    Called by preflight/smoke to catch empty source before pipeline runs.
+    """
+    epub_dir = SOURCE_EPUB_DIR.resolve() if SOURCE_EPUB_DIR else None
+    pdf_dir = SOURCE_PDF_DIR.resolve() if SOURCE_PDF_DIR else None
+
+    epubs: list[Path] = []
+    pdfs: list[Path] = []
+
+    if epub_dir and epub_dir.exists():
+        epubs = list(epub_dir.glob("**/*.epub"))
+    if pdf_dir and pdf_dir.exists():
+        pdfs = list(pdf_dir.glob("**/*.pdf"))
+
+    total = len(epubs) + len(pdfs)
+    if total == 0:
+        return False, (
+            f"No EPUB/PDF files found in:\n"
+            f"  EPUB: {epub_dir} ({'exists' if epub_dir and epub_dir.exists() else 'MISSING'})\n"
+            f"  PDF:  {pdf_dir} ({'exists' if pdf_dir and pdf_dir.exists() else 'MISSING'})\n"
+            f"Place source books in these directories or set SOURCE_EPUB_DIR/SOURCE_PDF_DIR env vars."
+        )
+    return True, f"✅ {len(epubs)} EPUBs + {len(pdfs)} PDFs = {total} source books"
+
 VERSION="3.0.0"; BUILD_DATE="2026-07-26"
 
 # ── Paths (D2115: C12 compliant — from config, not hardcoded) ──────────

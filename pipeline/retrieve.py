@@ -47,13 +47,21 @@ def search_keyword(
     limit: int = 20,
     exclude_summaries: bool = True,
 ) -> list[dict]:
-    """Keyword-based SQL search. Excludes summary FBs by default."""
+    """Keyword-based SQL search. Excludes summary FBs and failed classifications by default.
+
+    D2178: Added classification_status filter — FBs with failed classifications
+    (classification_status='FAILED') are excluded from all search paths. Previously
+    only 'status' was checked, so a FB with status='PASS' but classification_status='FAILED'
+    would silently appear in results with unclassified/emerging labels.
+    """
     conditions = []
     params = []
 
     if status:
         conditions.append("status = ?")
         params.append(status)
+    # D2178: Exclude failed classifications from all search paths
+    conditions.append("(classification_status IS NULL OR classification_status != 'FAILED')")
     if domain:
         conditions.append("domains LIKE ?")
         params.append(f"%{domain}%")
@@ -76,25 +84,31 @@ def search_keyword(
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
              exclude_summaries: bool = True) -> list[dict]:
-    """Full-text search on name, definition, keywords. Excludes summaries by default."""
+    """Full-text search on name, definition, keywords.
+
+    D2178: Added classification_status filter — failed classifications excluded.
+    """
     try:
         rows = conn.execute("""
             SELECT f.* FROM fbs f
             JOIN fbs_fts ft ON f.rowid = ft.rowid
             WHERE fbs_fts MATCH ?
               AND (f.is_summary = 0 OR f.is_summary IS NULL)
+              AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')
             ORDER BY rank
             LIMIT ?
         """, (query, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
     except sqlite3.OperationalError:
         # FTS5 may not be available — fall back to LIKE
+        # D2178: classification_status filter applied to fallback path
         like_query = f"%{query}%"
         if exclude_summaries:
             rows = conn.execute("""
                 SELECT * FROM fbs
                 WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
                   AND (is_summary = 0 OR is_summary IS NULL)
+                  AND (classification_status IS NULL OR classification_status != 'FAILED')
                 ORDER BY borp_score DESC
                 LIMIT ?
             """, (like_query, like_query, like_query, limit)).fetchall()
@@ -102,6 +116,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
             rows = conn.execute("""
                 SELECT * FROM fbs
                 WHERE name LIKE ? OR definition LIKE ? OR keywords LIKE ?
+                  AND (classification_status IS NULL OR classification_status != 'FAILED')
                 ORDER BY borp_score DESC
                 LIMIT ?
             """, (like_query, like_query, like_query, limit)).fetchall()

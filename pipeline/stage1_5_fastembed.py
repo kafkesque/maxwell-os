@@ -2,8 +2,14 @@
 """
 stage1_5_fastembed.py — FAISS Clustering via fastembed (MLX-speed).
 ====================================================================
-D2127r4: Replaces Ollama HTTP embedding (12.4h) with fastembed (~5 min).
+D2127r4: Replaces Ollama HTTP embedding with fastembed (ONNX-optimized).
+D2178: Corrected speed estimate — measured ~47 seg/s on MPS, ~33 seg/s on Ollama.
+       For 323K segments: ~115 min (MPS) or ~163 min (Ollama), not ~5 min.
 Uses ONNX-optimized bge-small-en-v1.5 via fastembed library.
+
+NOTE: The primary embedding path is now in stage1_5_embed_cluster.py which
+uses sentence-transformers on MPS (~47 seg/s) as the default backend.
+This file serves as the ONNX fastembed alternative path.
 """
 import argparse
 import json

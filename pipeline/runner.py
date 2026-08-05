@@ -66,7 +66,7 @@ STAGES: dict[str, dict[str, Any]] = {
     "0.5": {
         "name": "Extract Metadata",
         "script": "pipeline/stage0_5_extract_metadata.py",
-        "checkpoint": CHECKPOINT_DIR / get_run_id() / "stage0_5_metadata.jsonl",  # D2184: run-scoped
+        "checkpoint": CHECKPOINT_DIR / "book_metadata.jsonl",  # D2186: matches script's actual cache path (global, content-hash keyed)
         "can_parallelize": True,
         "depends_on": "0",
     },

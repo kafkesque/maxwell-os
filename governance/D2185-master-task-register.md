@@ -67,11 +67,12 @@ Current config requires `embed_model_hf: BAAI/bge-m3`, `embed_dim: 512`. The `la
 
 | Stage | Status | Evidence |
 |-------|--------|----------|
-| S0 | ✅ DONE | 922 MDs |
+| S0 | ✅ DONE (no re-run) | checkpoint.jsonl: 969 MDs converted; chunk params unchanged |
+| S0.5 | ✅ DONE (no re-run) | book_metadata.jsonl: 969 records; D2186 fixed runner checkpoint path mismatch |
 | S1 | ✅ DONE | 323,226 segments |
 | S1.3 | ✅ DONE | checkpoint.jsonl: completed=true, total=323,294 |
-| S1.5 | ❌ **STALE** | Old run = bge-small 384d; latest/ EMPTY; needs bge-m3 512d |
-| S2-S6c | ❌ NOT RUN | Empty stage dirs |
+| S1.5 | ❌ **STALE — RE-RUN NOW** | Old run = bge-small 384d; latest/ EMPTY; bge-m3 512d needed (92 min, no OMLX dep) |
+| S2-S6c | ❌ NOT RUN | Empty stage dirs; S2 needs P1-3 + P1-4 first |
 
 ---
 
@@ -236,17 +237,18 @@ Current config requires `embed_model_hf: BAAI/bge-m3`, `embed_dim: 512`. The `la
 ## The Highest Priority — What to Do Next (UPDATED 20:50)
 
 ### Immediate (Tonight — all unblocked)
-1. **P0-2: START S1.5 bge-m3 512d run** (92 min unattended) — unblocks P1-1 and all downstream
-2. **P1-3: OMLX circuit breaker** (1d) — pure infra, unblocked
-3. **P1-2: Wire feedback loop** (retrieve.py → record usage_count) (2h) — plumbing ready in feedback.py
+1. **P0-2: START S1.5 bge-m3 512d run NOW** (92 min) — nothing blocks it (local MPS embeddings, no OMLX)
+2. **P1-3: OMLX circuit breaker** (1d) — MUST complete BEFORE S2 (S2 = ~1,100 OMLX calls)
+3. **P1-4: minimal golden validation** (few hrs) — MUST complete BEFORE S2 (injected into every prompt)
 
 ### This Week
-4. **P1-4: Golden set expansion** (3d) — prerequisite for ALL algorithm tuning, unblocked
-5. **P1-5: NLI calibration dataset** (1d) — build from source text, unblocked
+4. **P1-4 full: Golden set expansion** (3d) — prerequisite for ALL algorithm tuning
+5. **P1-5: NLI calibration dataset** (1d) — build from source text; complete BEFORE S5
+6. **P1-2: Wire feedback loop** (2h) — retrieval-side, any time before agent consumption
 
 ### Blocked (waiting on S1.5→S6 data)
-6. **P1-1: related_fbs graph traversal** (1d) — BLOCKED until DB has FBs with edges
-7. **P1-2 validation**: end-to-end feedback test — needs committed FBs
+7. **P1-1: related_fbs graph traversal** (1d) — BLOCKED until DB has FBs with edges
+8. **P1-2 validation**: end-to-end feedback test — needs committed FBs
 
 ---
 

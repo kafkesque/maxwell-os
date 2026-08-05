@@ -3014,3 +3014,27 @@ Cross-review audit against kimi eval11 + qwen eval11. Remote parity CONFIRMED at
 
 See: governance/D2185-master-task-register.md
 
+### D2186 — S0/S0.5 Re-Run Analysis + P1-Before-S2 Priority (2026-08-05 20:55)
+
+**Q1: Do S0 (convert) or S0.5 (metadata) need re-run? → NO**
+- S0: checkpoint.jsonl confirms 969 MDs converted. Chunk params (300/50/10/3000) unchanged in config.
+- S0.5: book_metadata.jsonl = 969 records (covers all books). D2184 content-hash change accepts legacy entries (warn-only).
+- 🐛 FIXED: D2184 run-scoped stage0_5 checkpoint created path mismatch (runner: checkpoints/latest/stage0_5_metadata.jsonl vs script: checkpoints/book_metadata.jsonl). Metadata cache is a GLOBAL artifact (keyed by filename+content_hash) — run-scoping was wrong. Runner now points at actual cache path.
+
+**Q2: Which P1 BEFORE S1.5 (P0-2)? → NONE — S1.5 is unblocked**
+- S1.5 uses SentenceTransformer(bge-m3, device="mps") — LOCAL embeddings, zero OMLX/LLM calls.
+- Start S1.5 bge-m3 512d NOW (~92 min unattended).
+
+**Q3: Which P1 BEFORE S2? → P1-3 + P1-4 (minimal)**
+- P1-3 (OMLX circuit breaker): S2 makes ~1,100 cluster extraction calls via OMLX — resilience critical for multi-hour run.
+- P1-4 (golden set): golden few-shot injected into EVERY S2 prompt (load_golden_parity). Run S2 with 7 examples now = bake in suboptimal extraction; re-run costs hours of LLM time. At minimum validate/expand minimally before S2; full 200+ deferred.
+- P1-2 (feedback): retrieval-side — NOT needed before S1.5/S2.
+- P1-5 (NLI calibration): needed before S5, not S2.
+- P1-1: blocked (needs S2-S6 data).
+
+**Execution order recommendation:**
+1. START S1.5 (bge-m3 512d) NOW — nothing blocks it
+2. While S1.5 runs: implement P1-3 (OMLX circuit breaker)
+3. Before S2: minimal golden set validation/expansion (P1-4, few hours)
+4. Then S2 → S4 → S5 (after P1-5 dataset) → S6
+

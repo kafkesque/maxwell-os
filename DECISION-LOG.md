@@ -3000,3 +3000,17 @@ Second-pass cross-review audit against kimi eval10, qwen eval10, chatgpt eval10.
 
 See: governance/D2184-system-integrity-audit.md
 
+### D2185 — P0 Fixes + Master Task Register (2026-08-05 20:44)
+Cross-review audit against kimi eval11 + qwen eval11. Remote parity CONFIRMED at be89bdb.
+
+🔴 P0 FIXES:
+- P0-1: BORP canonical source_id (fb_source_ids → SHA-256 author|title, not filenames)
+- P0-3: Stage 6 vector embedding completeness monitoring (vec_fbs count vs fbs count)
+- P0-4: vec_fbs ↔ fbs rowid reconciliation (orphaned vector detection)
+
+📋 MASTER TASK REGISTER: 30 tasks across P0-P3, 13 blindspots categorized.
+📋 S0-S1.5: S0+S1 DONE, S1.3-S6 need FIRST RUN with bge-m3 512d.
+📋 qwen eval11 claims about missing Louvain/classification_status = FALSE (scraped stale cache).
+
+See: governance/D2185-master-task-register.md
+

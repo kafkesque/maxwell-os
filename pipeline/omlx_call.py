@@ -104,9 +104,18 @@ def _call_mlx(prompt: str, model: str, system: str = "", max_tokens: int = 2048)
 
 
 def _call_mlx_json(prompt: str, model: str, system: str = "", max_tokens: int = 2048) -> dict:
-    """Direct MLX JSON inference with auto-repair."""
+    """Direct MLX JSON inference with auto-repair.
+
+    D2178: Removed repair_fn= kwarg — parse_json_robust does not accept it.
+    Instead, call repair_json as a pre-processing step before parsing.
+    """
     raw = _call_mlx(prompt, model, system, max_tokens)
-    return parse_json_robust(raw, repair_fn=repair_json)
+    try:
+        return parse_json_robust(raw)
+    except (json.JSONDecodeError, ValueError):
+        # Fallback: repair then parse
+        repaired = repair_json(raw)
+        return json.loads(repaired)
 
 
 def call_omlx(

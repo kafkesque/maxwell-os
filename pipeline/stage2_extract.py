@@ -435,11 +435,19 @@ def init_minhash_lsh() -> tuple:
 
 
 def make_minhash(text: str, num_perm: int = S2_MINHASH_NUM_PERM):
-    """Create a MinHash for a text string."""
+    """Create a MinHash signature using 3-gram character shingles.
+
+    D2178: Changed from word-level to 3-gram character shingles.
+    Word-level MinHash fails on semantically identical principles with different
+    wording (e.g., "Value-First Demonstration" vs "Demonstrate Value Before Asking").
+    3-gram character shingles capture sub-word structure and are more robust to
+    paraphrasing while still being fast.
+    """
     from datasketch import MinHash
     mh = MinHash(num_perm=num_perm)
-    for word in text.lower().split():
-        mh.update(word.encode("utf-8"))
+    text_lower: str = text.lower()
+    for i in range(len(text_lower) - 2):
+        mh.update(text_lower[i:i + 3].encode("utf-8"))
     return mh
 
 
@@ -904,8 +912,12 @@ def run_stage2(
             processed_ids = set()
 
     # ── Worker: process one cluster (D2148: tiered + parallel) ──────────
-    def _process_cluster(cluster: dict) -> dict | None:
-        """Process one cluster and return FB dict or None."""
+    def _process_cluster(cluster: dict) -> list[dict]:
+        """Process one cluster and return list of FB dicts (empty list if nothing extracted).
+
+        D2178: Return type unified to list[dict] — no more dict|list ambiguity.
+        Multi-principle extraction now handled uniformly by the caller loop.
+        """
         cid: str = cluster.get("cluster_id", "?")
         is_conv: bool = cluster.get("is_convergent", False)
         # D2176: source_diversity from S1.5 uses canonical source_ids (not filenames).
@@ -922,7 +934,7 @@ def run_stage2(
             system = SINGLE_SOURCE_SYSTEM
 
         # Call LLM with retry
-        result: dict | None = None
+        result: dict | list | None = None
         for attempt in range(S2_OMLX_RETRY + 1):
             try:
                 result = call_llm(
@@ -937,26 +949,20 @@ def run_stage2(
                     continue
 
         if result is None:
-            return None
+            return []
 
         # D2176: Handle both single-object and array responses.
         # If LLM returns [{...}, {...}], process each as a separate FB.
         # If LLM returns {...}, process as single FB (backward compatible).
         principles: list[dict] = result if isinstance(result, list) else [result]
 
-        # If multiple principles returned, yield them as a batch result.
-        # The caller (in the parallel loop) will handle multi-FB returns.
-        if len(principles) > 1:
-            # Multi-principle extraction: process each, return list
-            fbs: list[dict] = []
-            for principle in principles:
-                fb = _build_fb_from_result(principle, cluster, evidence_passages, cid)
-                if fb:
-                    fbs.append(fb)
-            return fbs if fbs else None
-
-        # Single principle (original path)
-        return _build_fb_from_result(principles[0], cluster, evidence_passages, cid)
+        # D2178: Always return list — caller loop handles uniform iteration
+        fbs: list[dict] = []
+        for principle in principles:
+            fb = _build_fb_from_result(principle, cluster, evidence_passages, cid)
+            if fb:
+                fbs.append(fb)
+        return fbs
 
 
 def _build_fb_from_result(
@@ -1075,7 +1081,7 @@ def _build_fb_from_result(
 
             completed += 1
             try:
-                fb = future.result()
+                fb_results = future.result()
             except Exception as e:
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {cid}: {e}")
                 continue
@@ -1083,48 +1089,51 @@ def _build_fb_from_result(
             is_conv: bool = cluster.get("is_convergent", False)
             conv_tag: str = "🌐" if is_conv else "📖"
 
-            if fb is None:
+            # D2178: _process_cluster now always returns list[dict]
+            if not fb_results:
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {conv_tag} {cid}: LLM failed")
                 continue
 
-            if fb.get("_null"):
-                total_null += 1
-                print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: NULL/skip")
-                processed_ids.add(cid)
-                continue
-
-            if fb.get("_gate"):
-                total_gate_violations += 1
-                print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: summary gated")
-                processed_ids.add(cid)
-                continue
-
-            # MinHash near-dedup (post-collection) — D2152: fixed jaccard comparison
-            if minhash_ok and fb.get("minhash_signature"):
-                sig: str = fb["minhash_signature"]
-                # Recreate MinHash for current FB definition
-                cur_mh = make_minhash(definition)
-                is_dup: bool = False
-                for prev_fb in all_fbs:
-                    prev_sig: str = prev_fb.get("minhash_signature", "")
-                    if prev_sig and prev_sig in minhash_cache:
-                        _, prev_mh = minhash_cache[prev_sig]
-                        if cur_mh.jaccard(prev_mh) > S2_MINHASH_THRESHOLD:
-                            is_dup = True
-                            break
-                if is_dup:
-                    total_skipped += 1
-                    print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: near-duplicate")
-                    processed_ids.add(cid)
+            for fb in fb_results:
+                if fb.get("_null"):
+                    total_null += 1
+                    print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: NULL/skip")
                     continue
 
-            all_fbs.append(fb)
-            total_extracted += 1
+                if fb.get("_gate"):
+                    total_gate_violations += 1
+                    print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: summary gated")
+                    continue
+
+                # MinHash near-dedup (post-collection) — D2152: fixed jaccard comparison
+                definition: str = fb.get("definition", fb.get("name", ""))
+                if minhash_ok and fb.get("minhash_signature"):
+                    sig: str = fb["minhash_signature"]
+                    # Recreate MinHash for current FB definition
+                    cur_mh = make_minhash(definition)
+                    is_dup: bool = False
+                    for prev_fb in all_fbs:
+                        prev_sig: str = prev_fb.get("minhash_signature", "")
+                        if prev_sig and prev_sig in minhash_cache:
+                            _, prev_mh = minhash_cache[prev_sig]
+                            if cur_mh.jaccard(prev_mh) > S2_MINHASH_THRESHOLD:
+                                is_dup = True
+                                break
+                    if is_dup:
+                        total_skipped += 1
+                        print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: near-duplicate")
+                        continue
+
+                all_fbs.append(fb)
+                total_extracted += 1
             processed_ids.add(cid)
             book_count: int = cluster.get("source_diversity",
                           len(cluster.get("source_ids", cluster.get("source_books", []))))
+            fb_names: str = ", ".join(f.get('name', '?')[:30] for f in fb_results[:3])
+            if len(fb_results) > 3:
+                fb_names += f" +{len(fb_results) - 3} more"
             print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid} "
-                  f"({cluster.get('size', 0)} segs, {book_count} books) → {fb.get('name', '?')[:40]}")
+                  f"({cluster.get('size', 0)} segs, {book_count} books) → {fb_names}")
 
             # D2154: Incremental checkpoint every 5 clusters (inside for future loop)
             if completed % 5 == 0:

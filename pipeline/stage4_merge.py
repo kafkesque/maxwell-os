@@ -927,9 +927,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                 "classification_error": str(e)[:200],
                 "evidence": "cited",
             }
-            # BUG-058: Track silent classification failures
-            if "classification_errors" not in dir():
-                classification_errors = 0
+            # D2178: Track classification failures (variable in same scope — no shadowing)
+            # OLD: fragile dir() check removed — classification_errors is in run_stage4 scope
             classification_errors += 1
 
         # ── Stage 1: Capture raw LLM output (D2138: preserved forever) ──

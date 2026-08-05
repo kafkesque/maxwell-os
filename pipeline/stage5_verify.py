@@ -95,20 +95,34 @@ def _get_nli():
         return _nli_pipeline
 
     from transformers import pipeline
+    import torch
+
+    # D2178: Auto-detect device — MPS (Apple Silicon), CUDA, or CPU fallback.
+    # Previously hardcoded device=-1 (CPU only). MPS provides 5-10× speedup
+    # for NLI inference on Apple Silicon (C24: Hardware-Adaptive).
+    if torch.backends.mps.is_available():
+        nli_device: int | str = "mps"
+        device_label: str = "MPS (Apple Silicon GPU)"
+    elif torch.cuda.is_available():
+        nli_device = 0
+        device_label = "CUDA GPU"
+    else:
+        nli_device = -1
+        device_label = "CPU"
 
     # Try primary model first
     primary = S5_NLI_MODEL
     fallback = S5_NLI_MODEL_FALLBACK
 
     try:
-        print(f"   🧠 Loading NLI model: {primary}...")
+        print(f"   🧠 Loading NLI model: {primary} on {device_label}...")
         _nli_pipeline = pipeline(
             "text-classification",
             model=primary,
-            device=-1,
+            device=nli_device,
         )
         _nli_model_loaded = primary
-        print(f"   ✅ NLI: {primary}")
+        print(f"   ✅ NLI: {primary} ({device_label})")
         return _nli_pipeline
     except Exception as e:
         print(f"   ⚠️  Primary NLI model failed: {e}")
@@ -117,10 +131,10 @@ def _get_nli():
             _nli_pipeline = pipeline(
                 "text-classification",
                 model=fallback,
-                device=-1,
+                device=nli_device,
             )
             _nli_model_loaded = fallback
-            print(f"   ✅ NLI (fallback): {fallback}")
+            print(f"   ✅ NLI (fallback): {fallback} ({device_label})")
             return _nli_pipeline
         except Exception as e2:
             raise RuntimeError(

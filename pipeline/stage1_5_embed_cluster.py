@@ -306,7 +306,9 @@ def faiss_cluster(
                 G.add_edge(i, j)
                 reciprocal_edges += 1
 
-    reciprocity: float = (reciprocal_edges / total_edges * 100) if total_edges > 0 else 0.0
+    # D2178: total_edges counts directed edges; reciprocal_edges counts each pair once.
+    # True reciprocity = (2 * reciprocal_edges) / total_edges (each reciprocal pair = 2 directed edges)
+    reciprocity: float = ((2 * reciprocal_edges) / total_edges * 100) if total_edges > 0 else 0.0
     print(f"      {reciprocal_edges}/{total_edges} edges reciprocal ({reciprocity:.0f}%) "
           f"→ Louvain on {G.number_of_nodes()} nodes, {G.number_of_edges()} edges")
 

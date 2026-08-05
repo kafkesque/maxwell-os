@@ -114,8 +114,7 @@ S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])
 
-# ── Stage 3: REMOVED (D2120) — D2177: purged dead constants ─────────────
-S3_NORMALIZE_CENTROID = True
+# ── Stage 3: REMOVED (D2120) — D2178: dead constant purged ─────────────
 
 # ── Stage 4 settings (D2082: Type-aware routing) ───────────────────────
 S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]
@@ -149,7 +148,8 @@ S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-sm
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])
 
 def ensure_dirs():
-    for d in [S0_DIR,S1_DIR,S13_DIR,S15_DIR,S2_DIR,S3_DIR,S4_DIR,S5_DIR,S6_DIR,ARCHIVE_DIR,BOOKS_DIR]:
+    # D2178: S3_DIR removed (D2120/D2177) — no longer referenced
+    for d in [S0_DIR,S1_DIR,S13_DIR,S15_DIR,S2_DIR,S4_DIR,S5_DIR,S6_DIR,ARCHIVE_DIR,BOOKS_DIR]:
         d.mkdir(parents=True,exist_ok=True)
 
 VERSION="3.0.0"; BUILD_DATE="2026-07-26"

@@ -1,0 +1,445 @@
+# Master Prompt — Golden Set Cross-Evaluation
+
+> **Purpose:** Evaluate 7 golden few-shot examples for a convergent principle extraction pipeline.
+> **For:** Kimi, ChatGPT, or any capable reasoning LLM.
+> **Instructions:** Copy this entire prompt (including the golden examples) into the target LLM.
+> **Output format:** Structured evaluation per the rubric below.
+
+---
+
+## YOUR TASK
+
+You are evaluating a golden set of few-shot examples used to train an LLM to extract "convergent principles" (Foundation Blocks) from clusters of text segments sourced from 2+ different books.
+
+Each golden example simulates what the extraction pipeline receives:
+- A cluster of 2-6 related text segments from different source books
+- The expected output: a JSON object with fields: name, definition, mechanism, boundary, consequence, is_summary (bool), evidence_passages (verbatim quotes), route ("FB" for extractable, "NULL" for reject)
+
+Your job is to critically evaluate EACH of the 7 examples against the rubric below. Be specific. Flag problems. Suggest fixes.
+
+---
+
+## EVALUATION RUBRIC
+
+For each example, score on these dimensions (A=Excellent, B=Good, C=Adequate, D=Problem, F=Fatal):
+
+### For POSITIVE examples (route="FB"):
+
+1. **Cross-Source Synthesis (A-F)** — Does the expected FB genuinely synthesize across ALL provided segments, or does it primarily paraphrase one source? An "A" means every segment contributed something unique to the final FB. A "D" means one source provides all the content and others are window dressing.
+
+2. **Mechanism Quality (A-F)** — Does the mechanism explain HOW/WHY the principle works, or is it just a restatement of the observation? "Increasing conversion rates by demonstrating value" is not a mechanism. "Demonstrating value first increases conversion because the prospect internalizes the outcome before evaluating cost, anchoring the purchase decision against relief rather than price" is a mechanism.
+
+3. **Boundary Testability (A-F)** — Could someone use the boundary conditions to predict where this principle would FAIL? Vague boundaries like "depends on context" get an F. Specific boundaries with testable conditions ("fails when the audience lacks prerequisite knowledge to resolve the metaphor") get an A.
+
+4. **Consequence Specificity (A-F)** — Does the consequence describe a specific, observable outcome, or is it a vague directional statement? "It works better" is an F. "People who use implementation intentions are 2-3x more likely to follow through" is an A.
+
+5. **Evidence Fidelity (A-F)** — Are ALL evidence_passages VERBATIM from the provided segments? Check each one. If any evidence passage is a paraphrase rather than a direct quote from the source segments, flag it.
+
+6. **Name Precision (Pass/Fail)** — Is the FB name specific and descriptive, or is it a generic category label? "Marketing" is Fail. "Asymmetric Dominance Decoy" is Pass.
+
+### For NEGATIVE examples (route="NULL"):
+
+7. **Rejection Correctness (A-F)** — Is the decision to route=NULL CORRECT given the cluster? Could a reasonable person argue the cluster DOES contain a convergent principle? If the rejection is clearly correct, A. If borderline, C or D.
+
+8. **Training Signal Clarity (A-F)** — Would this example effectively teach an LLM WHEN to reject? Does it illustrate a clear rejection pattern (single-source, platitude, no mechanism)?
+
+### Cross-cutting concerns (applies to all):
+
+9. **Schema Compliance (Pass/Fail)** — Does the expected_fb contain all required fields? Missing mechanism, boundary, or consequence = Fail.
+10. **Domain Diversity (Note only)** — What domain(s) does this cover? Is the overall set balanced?
+
+---
+
+## BONUS: GLOBAL ISSUES
+
+After evaluating all 7 individual examples, answer:
+
+1. What is the SINGLE BIGGEST PROBLEM with this golden set? (One sentence)
+2. What is MISSING that would most improve the LLM's extraction quality? (One sentence)
+3. Which example is the STRONGEST? Which is the WEAKEST? (One sentence each with reason)
+4. If you could ADD one example from any domain, what would it be and why?
+5. Any examples where the mechanism, boundary, or consequence are actually WRONG (factually incorrect, not just poorly written)?
+
+---
+
+## GOLDEN EXAMPLES
+
+```yaml
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 1: CONV-001
+# ═══════════════════════════════════════════════════════════════
+- id: CONV-001
+  domain: pricing
+  source_books:
+    - "Predictably Irrational — Dan Ariely"
+    - "Thinking, Fast and Slow — Daniel Kahneman"
+    - "Priceless — William Poundstone"
+  cluster_segments:
+    - source_book: "Predictably Irrational — Dan Ariely"
+      text: |
+        The Economist's subscription page became a famous case study. They offered three options:
+        Web-only for $59, Print-only for $125, and Print+Web for $125. The Print-only option was
+        the decoy — nobody chose it, but its presence made Print+Web look like a bargain. Dan Ariely
+        tested this with his students: when the decoy was present, 84% chose Print+Web. When he
+        removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web.
+    - source_book: "Thinking, Fast and Slow — Daniel Kahneman"
+      text: |
+        The dominance relationship makes choices easier. When A dominates B in all respects, people
+        choose A without hesitation. But when A is better than B on some dimensions and worse on
+        others, choice becomes difficult and people often defer. This is why adding a clearly inferior
+        option that is dominated by the target can increase the target's share dramatically.
+    - source_book: "Priceless — William Poundstone"
+      text: |
+        Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger,
+        deluxe model for $429. The $279 model suddenly looked reasonable and sales nearly doubled.
+        The expensive model wasn't meant to sell; it was there to make the original look like a
+        good deal. This is asymmetric dominance at work in retail.
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Asymmetric Dominance Decoy"
+    definition: |
+      Introducing an inferior decoy option that is dominated by a target option on all salient
+      dimensions shifts choice toward the target by making its relative value obvious. The decoy
+      is not meant to be chosen — it exists solely to make the target appear superior through
+      contrast, exploiting the human preference for easy dominance comparisons over difficult
+      trade-off evaluations.
+    mechanism: |
+      Decoys cause preference shifts because System 1 (intuitive) reasoning resolves dominance
+      comparisons effortlessly, while trade-off comparisons between non-dominated options trigger
+      System 2 (deliberative) reasoning that often results in choice deferral. The decoy
+      eliminates the need for difficult trade-off analysis by providing an obvious loser.
+    boundary: |
+      Applies when the decoy is clearly inferior to the target on all relevant dimensions AND
+      the target and competitor are difficult to compare directly (each has advantages). Fails
+      when: (1) the decoy is not clearly dominated — if it has ANY advantage over the target,
+      it becomes a legitimate option; (2) the target and competitor are already easily comparable
+      — no need for a decoy; (3) consumers have strong pre-existing preferences that overwhelm
+      contextual cues.
+    consequence: |
+      Markets structured with decoy options produce systematically different choices than markets
+      with only genuinely competitive options. This means the same consumer with the same true
+      preferences will make different choices depending on whether a decoy is present — the
+      preference is constructed at the moment of choice, not revealed by it.
+    evidence_passages:
+      - "The Economist's subscription page [...] when the decoy was present, 84% chose Print+Web. When he removed the decoy [...] only 32% chose Print+Web."
+      - "adding a clearly inferior option that is dominated by the target can increase the target's share dramatically"
+      - "Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for $429. The $279 model suddenly looked reasonable and sales nearly doubled."
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 2: CONV-002
+# ═══════════════════════════════════════════════════════════════
+- id: CONV-002
+  domain: behavioral_change
+  source_books:
+    - "Atomic Habits — James Clear"
+    - "The Power of Habit — Charles Duhigg"
+  cluster_segments:
+    - source_book: "Atomic Habits — James Clear"
+      text: |
+        Implementation intentions leverage the two most common cues: time and location. The format
+        is 'I will [BEHAVIOR] at [TIME] in [LOCATION].' For example: 'I will meditate for one minute
+        at 7 a.m. in my kitchen.' Research by Peter Gollwitzer has shown that people who use
+        implementation intentions are two to three times more likely to follow through. The specificity
+        of the plan creates an automatic trigger — when the time and place arrive, the behavior
+        is initiated without conscious deliberation.
+    - source_book: "The Power of Habit — Charles Duhigg"
+      text: |
+        The cue-routine-reward loop explains why some behaviors become automatic while others require
+        constant effort. The cue is the trigger that tells your brain to go into automatic mode.
+        Implementation intentions work because they manufacture a clear, unambiguous cue. When you say
+        'I will exercise at 6 p.m. in the park,' the clock striking six becomes a cue that initiates
+        the routine without requiring a decision.
+    - source_book: "Atomic Habits — James Clear"
+      text: |
+        The problem with vague goals like 'I want to exercise more' is that they leave too many
+        decisions unmade. Each day you must decide when, where, and how to exercise. Each decision
+        is an opportunity to opt out. Implementation intentions remove these decision points by
+        pre-committing to a specific plan. When the moment arrives, there is nothing to decide.
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Implementation Intention Triggering"
+    definition: |
+      Specifying the exact time, location, and behavioral format of an intended action ('I will
+      [BEHAVIOR] at [TIME] in [LOCATION]') increases follow-through 2-3x by converting vague
+      intentions into automatic cue-response triggers. The specificity eliminates the decision
+      points where willpower typically fails.
+    mechanism: |
+      Implementation intentions cause behavior follow-through because they manufacture a clear,
+      unambiguous situational cue (time + location) that triggers automatic initiation of the
+      planned behavior without requiring conscious deliberation. This bypasses the decision-fatigue
+      bottleneck where vague intentions break down — when the specified time and place arrive,
+      the pre-committed plan executes as if on autopilot.
+    boundary: |
+      Applies when the target behavior is simple, specific, and the cue is unambiguous (e.g.,
+      'meditate at 7am in the kitchen'). Fails when: (1) the behavior is complex and cannot be
+      reduced to a simple trigger (e.g., 'write a novel at 9am' — the behavior itself requires
+      ongoing decisions); (2) the cue is frequently unpredictable (e.g., 'exercise when I feel
+      energized'); (3) the person has no genuine motivation — implementation intentions amplify
+      existing motivation, they do not create it.
+    consequence: |
+      People who use implementation intentions are 2-3x more likely to follow through compared to
+      those with equivalent motivation but vague plans. The effect compounds: each successful
+      automatic execution reinforces the cue-response link, making future execution even more likely.
+    evidence_passages:
+      - "people who use implementation intentions are two to three times more likely to follow through"
+      - "Implementation intentions work because they manufacture a clear, unambiguous cue"
+      - "implementation intentions remove these decision points by pre-committing to a specific plan"
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 3: CONV-003
+# ═══════════════════════════════════════════════════════════════
+- id: CONV-003
+  domain: advertising
+  source_books:
+    - "Finding the Tipping Point — Visual Metaphor in Advertising"
+    - "The Cognitive Effect of Visual Metaphor in Advertising — Mostafa"
+  cluster_segments:
+    - source_book: "Finding the Tipping Point — Visual Metaphor in Advertising"
+      text: |
+        Visual metaphors in advertising follow an inverted-U relationship with conceptual complexity.
+        Moderately complex metaphors — those requiring some cognitive effort to resolve but not so
+        much that they frustrate — produce the most favorable attitudes toward both the ad and the
+        brand. When a metaphor is too obvious, viewers dismiss it as trivial. When it is too obscure,
+        they disengage. The sweet spot is the 'aha' moment that occurs when the viewer successfully
+        resolves the metaphor.
+    - source_book: "The Cognitive Effect of Visual Metaphor in Advertising — Mostafa"
+      text: |
+        Our experimental results confirm a curvilinear relationship between metaphor complexity
+        and comprehension. At low complexity (literal juxtapositions), processing fluency is high
+        but elaboration is low — viewers 'get it' immediately but don't think about it. At high
+        complexity (abstract conceptual blends), comprehension drops sharply: only 23% of
+        participants correctly interpreted the intended meaning. At moderate complexity, both
+        comprehension (87%) and elaboration are maximized.
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Metaphor Complexity Inverted-U"
+    definition: |
+      Visual metaphors in advertising have a curvilinear (inverted-U) relationship with persuasive
+      impact: moderate conceptual complexity produces the strongest brand attitudes and message
+      elaboration, while too-simple metaphors are dismissed as trivial and too-complex metaphors
+      cause disengagement or misinterpretation. The optimal level triggers an 'aha' resolution
+      moment that rewards the viewer's cognitive effort.
+    mechanism: |
+      Moderate metaphor complexity causes stronger persuasion because it triggers elaborative
+      processing — the viewer invests cognitive effort to resolve the metaphor and is rewarded
+      with an 'aha' insight. This self-generated insight is more memorable and persuasive than
+      a message that is simply received passively. Too little complexity provides no reward;
+      too much complexity prevents resolution entirely.
+    boundary: |
+      Applies when the audience has sufficient domain knowledge to resolve the metaphor (cultural
+      references, category familiarity). Fails when: (1) the audience lacks prerequisite knowledge
+      — a moderately complex metaphor becomes too complex; (2) the medium limits processing time
+      (e.g., billboards vs. magazine ads); (3) the product category is high-involvement where
+      literal information is preferred over metaphorical.
+    consequence: |
+      Ads with moderately complex metaphors generate higher recall, more favorable brand attitudes,
+      and greater message elaboration than either literal or highly abstract ads. The processing
+      effort itself becomes a persuasive force — we value insights we work for more than those
+      we receive passively.
+    evidence_passages:
+      - "Moderately complex metaphors [...] produce the most favorable attitudes toward both the ad and the brand"
+      - "At moderate complexity, both comprehension (87%) and elaboration are maximized"
+      - "The sweet spot is the 'aha' moment that occurs when the viewer successfully resolves the metaphor"
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 4: CONV-004
+# ═══════════════════════════════════════════════════════════════
+- id: CONV-004
+  domain: persuasion
+  source_books:
+    - "Influence — Robert Cialdini"
+    - "Made to Stick — Chip & Dan Heath"
+  cluster_segments:
+    - source_book: "Influence — Robert Cialdini"
+      text: |
+        Social proof is most effective when the proof comes from similar others. Showing that '10,000
+        people bought this' is less persuasive than showing that 'people like you bought this.' The
+        effect is strongest when people are uncertain about what to do — in ambiguous situations, we
+        look to others' behavior as a heuristic for correct action.
+    - source_book: "Made to Stick — Chip & Dan Heath"
+      text: |
+        NFL Films tells the story of an undrafted rookie who made the team. Rather than listing
+        statistics, they show veterans talking about 'that kid who reminds me of myself.' The
+        similarity between the viewer (who sees themselves as overlooked) and the rookie creates
+        emotional resonance that raw achievement data cannot. The principle: people believe stories
+        about people who remind them of themselves.
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Similarity-Weighted Social Proof"
+    definition: |
+      Social proof persuades through perceived similarity, not volume. A message showing that
+      'people like you' took an action is more influential than showing that '10,000 people' took
+      it, because relevance amplifies the heuristic. The effect is strongest under uncertainty —
+      when people don't know what to do, they look to similar others as a decision shortcut.
+    mechanism: |
+      Similarity-weighted social proof causes persuasion because it activates self-relevant
+      processing — the viewer sees the referenced group as a proxy for themselves ('if they did
+      it, I should too'). Volume-based proof (10,000 people) activates statistical reasoning,
+      which is weaker than identity-based reasoning. The mechanism is amplified by uncertainty:
+      the less someone knows what to do, the more they rely on similar-other behavior as a
+      decision heuristic.
+    boundary: |
+      Applies when the reference group shares a relevant, visible identity characteristic with
+      the target audience. Fails when: (1) the similarity is on irrelevant dimensions — 'people
+      who drink coffee bought this' doesn't persuade if the decision has nothing to do with
+      coffee drinking; (2) the reference group's behavior is undesirable — similarity backfires
+      if the referenced behavior is stigmatized; (3) the audience has strong independent
+      preferences that override social cues.
+    consequence: |
+      Social proof campaigns that emphasize 'people like you' consistently outperform volume-based
+      campaigns ('X million served') in conversion and engagement. The identity connection creates
+      an emotional resonance that statistical proof cannot match.
+    evidence_passages:
+      - "Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'"
+      - "people believe stories about people who remind them of themselves"
+      - "the effect is strongest when people are uncertain about what to do"
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 5: CONV-005
+# ═══════════════════════════════════════════════════════════════
+- id: CONV-005
+  domain: marketing
+  source_books:
+    - "Hacking Growth — Sean Ellis"
+    - "$100M Offers — Alex Hormozi"
+  cluster_segments:
+    - source_book: "Hacking Growth — Sean Ellis"
+      text: |
+        When Dropbox launched, Drew Houston created a 3-minute demo video showing the product in
+        action — syncing files across devices, recovering deleted files, sharing folders. The video
+        demonstrated the outcome before mentioning price or features. Beta signups jumped from
+        5,000 to 75,000 overnight.
+    - source_book: "$100M Offers — Alex Hormozi"
+      text: |
+        The grand slam offer is not about listing features. It is about making the prospect feel
+        the outcome so vividly that the price becomes an afterthought. You must articulate the
+        transformation — where they are now versus where they will be after using your product —
+        with such specificity that they experience the relief of the problem being solved before
+        they pay a cent.
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Value-First Demonstration"
+    definition: |
+      Leading with the experienced outcome of a product — rather than its features, specifications,
+      or price — increases conversion by allowing prospects to feel the transformation before
+      evaluating the cost. The value demonstration makes the price an afterthought rather than a
+      barrier, because the prospect has already internalized the benefit.
+    mechanism: |
+      Value-first demonstration causes higher conversion because outcome visualization
+      creates a vivid internal reference point — prospects imagine the transformation so
+      concretely that the price is evaluated against the relief of the solved problem rather
+      than against competitor feature lists. When the prospect has already experienced the
+      outcome in their mind, the price becomes the cost of not achieving that outcome, not
+      the cost of the product.
+    boundary: |
+      Applies when the product delivers a clear, emotionally resonant transformation (productivity,
+      status, relief, connection). Fails when: (1) the product is a commodity where all competitors
+      deliver equivalent outcomes — value demonstration can't differentiate; (2) the audience
+      already understands the outcome and is evaluating features/price — value-first becomes
+      redundant; (3) the product requires explanation of how it works before prospects trust the
+      outcome claim.
+    consequence: |
+      Products marketed with value-first demonstration consistently outperform feature-first
+      marketing on conversion metrics. Dropbox's video approach (5K→75K signups) is the canonical
+      example: showing the outcome created demand that feature lists never generated.
+    evidence_passages:
+      - "Beta signups jumped from 5,000 to 75,000 overnight"
+      - "making the prospect feel the outcome so vividly that the price becomes an afterthought"
+      - "they experience the relief of the problem being solved before they pay a cent"
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 6: NEG-CONV-001 (HARD NEGATIVE)
+# ═══════════════════════════════════════════════════════════════
+- id: NEG-CONV-001
+  domain: pricing
+  source_books:
+    - "Predictably Irrational — Dan Ariely"
+  cluster_segments:
+    - source_book: "Predictably Irrational — Dan Ariely"
+      text: |
+        When we encounter a new product, the first price we see becomes an anchor. This initial
+        price influences not just what we're willing to pay for that product, but what we're willing
+        to pay for related products in the same category. Arbitrary anchors can have effects that
+        persist even when people know the anchor was arbitrary.
+  expected_fb:
+    is_summary: false
+    route: "NULL"
+    name: "Anchoring"
+    definition: ""
+    mechanism: ""
+    boundary: ""
+    consequence: ""
+    evidence_passages: []
+
+# ═══════════════════════════════════════════════════════════════
+# EXAMPLE 7: NEG-CONV-002 (HARD NEGATIVE)
+# ═══════════════════════════════════════════════════════════════
+- id: NEG-CONV-002
+  domain: business
+  source_books:
+    - "Good to Great — Jim Collins"
+    - "Built to Last — Jim Collins"
+  cluster_segments:
+    - source_book: "Good to Great — Jim Collins"
+      text: |
+        Great companies have great people. The right people are the most important asset of any
+        organization. Getting the right people on the bus and in the right seats is the first
+        step to building a great company.
+    - source_book: "Built to Last — Jim Collins"
+      text: |
+        Visionary companies prioritize people development. They invest heavily in training and
+        create cultures where talented people can thrive and grow. The commitment to people
+        is what separates the truly great companies from the merely good ones.
+  expected_fb:
+    is_summary: false
+    route: "NULL"
+    name: ""
+    definition: ""
+    mechanism: ""
+    boundary: ""
+    consequence: ""
+    evidence_passages: []
+```
+
+---
+
+## YOUR EVALUATION
+
+For EACH of the 7 examples, provide:
+
+**Example ID: [CONV-001 / CONV-002 / ... / NEG-CONV-002]**
+
+| Dimension | Score | Evidence/Reasoning |
+|-----------|-------|-------------------|
+| Cross-Source Synthesis | | |
+| Mechanism Quality | | |
+| Boundary Testability | | |
+| Consequence Specificity | | |
+| Evidence Fidelity | | |
+| Name Precision | | |
+| (or) Rejection Correctness | | |
+| (or) Training Signal Clarity | | |
+| Schema Compliance | | |
+
+**Any factual errors?** [Yes/No — if yes, specify exactly what is wrong]
+
+**Suggested improvement:** [One sentence]
+
+---
+
+Then answer the 5 GLOBAL ISSUES questions.
+
+---
+
+## BACKGROUND (for context, not part of your evaluation)
+
+This golden set is for a knowledge extraction pipeline called Maxwell OS v3.0. It uses a "cluster-before-extract" architecture: text segments from 2+ books are clustered by semantic similarity (FAISS + Louvain), then an LLM extracts convergent principles that synthesize across all sources. The current run has 323,226 segments forming 12,964 clusters (2,634 convergent, 10,330 single-source, 35,239 singletons). The golden set of 7 examples is injected as few-shot training into every extraction prompt. Your evaluation will determine whether this golden set is adequate to run the full pipeline (2,634 convergent clusters) or needs expansion first.
+
+---
+
+*End of evaluation prompt. Please provide your structured evaluation for all 7 examples plus global issues.*

@@ -54,10 +54,6 @@ examples:
         good deal. This is asymmetric dominance at work in retail.
   is_convergent: true
   should_extract: true
-  is_convergent: false
-  should_extract: false
-  is_convergent: true
-  should_extract: true
   expected_fb:
     is_summary: false
     route: "FB"
@@ -128,10 +124,6 @@ examples:
         pre-committing to a specific plan. When the moment arrives, there is nothing to decide.
   is_convergent: true
   should_extract: true
-  is_convergent: false
-  should_extract: false
-  is_convergent: true
-  should_extract: true
   expected_fb:
     is_summary: false
     route: "FB"
@@ -195,10 +187,6 @@ examples:
         comprehension (87%) and elaboration are maximized.
   is_convergent: true
   should_extract: true
-  is_convergent: false
-  should_extract: false
-  is_convergent: true
-  should_extract: true
   expected_fb:
     is_summary: false
     route: "FB"
@@ -258,10 +246,6 @@ examples:
         similarity between the viewer (who sees themselves as overlooked) and the rookie creates
         emotional resonance that raw achievement data cannot. The principle: people believe stories
         about people who remind them of themselves.
-  is_convergent: true
-  should_extract: true
-  is_convergent: false
-  should_extract: false
   is_convergent: true
   should_extract: true
   expected_fb:
@@ -324,10 +308,6 @@ examples:
         they pay a cent.
   is_convergent: true
   should_extract: true
-  is_convergent: false
-  should_extract: false
-  is_convergent: true
-  should_extract: true
   expected_fb:
     is_summary: false
     route: "FB"
@@ -378,8 +358,6 @@ examples:
         price influences not just what we're willing to pay for that product, but what we're willing
         to pay for related products in the same category. Arbitrary anchors can have effects that
         persist even when people know the anchor was arbitrary.
-  is_convergent: true
-  should_extract: true
   is_convergent: false
   should_extract: false
   expected_fb:
@@ -418,8 +396,6 @@ examples:
         create cultures where talented people can thrive and grow. The commitment to people
         is what separates the truly great companies from the merely good ones.
   is_convergent: true
-  should_extract: true
-  is_convergent: false
   should_extract: false
   expected_fb:
     is_summary: false
@@ -437,6 +413,203 @@ examples:
     segments agree, but they agree on a truism. Stage 2 should detect the absence of causal
     mechanism and reject this cluster. Even though there are 2 sources, having multiple sources
     echoing the same platitude does not create a convergent principle.
+    
+    NOTE: Collins' "First Who, Then What" IS a defended principle with a mechanism in Good to
+    Great (Chapter 3: rigorous people decisions → right people self-motivate → no need for
+    heavy management). However, the EXCERPTS selected for this cluster deliberately omit that
+    mechanism. This teaches the LLM to evaluate the cluster it RECEIVES — not the books it
+    recognizes — and reject when the provided segments lack causal depth, even if the source
+    material contains it elsewhere.
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONVERGENT EXAMPLE 6: 1:N Extraction — Two Distinct Principles from One Cluster
+# ──────────────────────────────────────────────────────────────────────────
+- id: CONV-006
+  domain: economics
+  source_books:
+    - "Algorithms to Live By — Brian Christian & Tom Griffiths"
+    - "Thinking, Fast and Slow — Daniel Kahneman"
+    - "Misbehaving — Richard Thaler"
+  cluster_segments:
+    - source_book: "Algorithms to Live By — Brian Christian & Tom Griffiths"
+      text: |
+        The multi-armed bandit problem captures the fundamental tension between exploration and
+        exploitation. You face a row of slot machines, each with an unknown payout rate. You
+        must decide: pull the arm you know is decent (exploit), or try a new arm that might be
+        better (explore)? The mathematically optimal strategy — the Gittins index — assigns a
+        dynamic value to each option based on both its estimated return and the uncertainty
+        around that estimate. Options with high uncertainty get exploration bonuses.
+    - source_book: "Thinking, Fast and Slow — Daniel Kahneman"
+      text: |
+        Loss aversion refers to the asymmetry between the psychological weight of gains and losses:
+        losses hurt roughly twice as much as equivalent gains feel good. This is not a cognitive
+        error but a deeply wired feature of human decision-making, observable across cultures and
+        even in other primates. In negotiation, the endowment effect — valuing what you already
+        have more than what you could acquire — is a direct consequence of loss aversion.
+    - source_book: "Misbehaving — Richard Thaler"
+      text: |
+        The endowment effect is one of the most robust findings in behavioral economics. In a
+        classic experiment, students given a coffee mug demanded roughly twice as much to sell
+        it as students without mugs were willing to pay. This violates standard microeconomic
+        theory, which predicts willingness-to-pay and willingness-to-accept should be nearly
+        identical for small stakes. The effect is driven by loss aversion: giving up the mug
+        feels like a loss, while buying it feels like a gain, and losses loom larger.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    - is_summary: false
+      route: "FB"
+      name: "Explore-Exploit Exploration Bonus"
+      definition: |
+        In sequential decision problems with uncertain options, the optimal strategy assigns an
+        "exploration bonus" to uncertain options — their value includes not just estimated mean
+        return but also a premium proportional to information gain. This causes decision-makers
+        to sample apparently suboptimal options because the knowledge acquired has intrinsic worth.
+      mechanism: |
+        The exploration bonus works because uncertainty represents option value above expected
+        return. The Gittins index formalizes this: each arm's value = estimated mean + uncertainty
+        premium. As an arm is pulled more, uncertainty decreases, the bonus shrinks, and the index
+        converges to the true mean. Early exploration of high-uncertainty options minimizes
+        cumulative regret by avoiding indefinite commitment to a potentially suboptimal choice.
+      boundary: |
+        Applies when outcomes are stochastic with unknown distributions and repeated trials are
+        possible. Fails when: (1) trials are severely limited (near-zero horizon) — the optimal
+        strategy is to maximize expected immediate return; (2) the cost of a bad outcome is
+        ruinous — uncertainty bonuses don't account for catastrophic risk; (3) arms are
+        non-stationary — changing payout distributions break the Gittins assumption.
+      consequence: |
+        Systems using exploration bonuses systematically outperform pure-exploitation strategies
+        in domains from clinical trials (adaptive allocation) to A/B testing (bandit algorithms).
+        The cost of initial exploration is repaid many times over by avoiding indefinite
+        commitment to a suboptimal option discovered too late.
+      evidence_passages:
+        - "Options with high uncertainty get exploration bonuses"
+        - "you must decide: pull the arm you know is decent (exploit), or try a new arm"
+    - is_summary: false
+      route: "FB"
+      name: "Loss-Aversion Endowment Gap"
+      definition: |
+        Ownership creates a psychological valuation asymmetry: owners demand roughly 2x more to
+        give up an item than non-owners would pay to acquire it. This "endowment effect" is driven
+        by loss aversion — giving up the item is coded as a loss (weighted ~2x), while acquiring
+        it is coded as a gain (weighted ~1x). The gap is not irrational valuation but asymmetric
+        reference-point weighting.
+      mechanism: |
+        The endowment gap arises because transactions are evaluated relative to a reference point
+        set by current ownership. Selling = losing the item (a loss); buying = gaining the item
+        (a gain). Since losses are approximately twice as psychologically impactful as gains, the
+        minimum acceptable selling price is ~2x the maximum buying price. This is consistent with
+        prospect theory's value function, which is steeper in the loss domain than the gain domain.
+      boundary: |
+        Applies when the item is held for personal use and the owner has formed subjective
+        attachment. Fails when: (1) the holder is a professional trader — experience resets the
+        reference point to market value; (2) the item is purely fungible (cash, tokens) — no
+        attachment forms; (3) the transaction is framed as an exchange rather than a sale — trading
+        mugs for pens eliminates the loss frame and the effect disappears.
+      consequence: |
+        The endowment effect creates systematic market friction: goods are held by owners who value
+        them less than potential buyers, but transactions fail because the ask-bid spread exceeds
+        the true value gap. This explains housing lock-in, low trading volume in collectibles
+        markets, and the difficulty of negotiated buyouts where the seller's reference point is
+        anchored to past acquisition cost rather than current market value.
+      evidence_passages:
+        - "students given a coffee mug demanded roughly twice as much to sell it as students without mugs were willing to pay"
+        - "Losses hurt roughly twice as much as equivalent gains feel good"
+        - "the endowment effect — valuing what you already have more than what you could acquire"
+  rationale: |
+    1:N extraction example. This cluster contains TWO distinct convergent principles: (1)
+    Explore-Exploit Exploration Bonus, synthesized from the Christian/Griffiths segment on
+    the multi-armed bandit and Gittins index; (2) Loss-Aversion Endowment Gap, synthesized
+    from the Kahneman and Thaler segments on loss aversion and the endowment effect. The LLM
+    returns a JSON array of 2 principle objects. This example teaches that clusters may
+    contain multiple separate mechanisms; the LLM should enumerate all distinct convergent
+    principles rather than forcing them into a single synthesis. This is essential training
+    for the split-probe gate (discover_principles) which asks "how many distinct principles?"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONVERGENT EXAMPLE 7: Keynesian Beauty Contest — Economics/Finance (STEM)
+# ──────────────────────────────────────────────────────────────────────────
+- id: CONV-007
+  domain: economics
+  source_books:
+    - "Algorithms to Live By — Brian Christian & Tom Griffiths"
+    - "The Art of Strategy — Avinash Dixit & Barry Nalebuff"
+    - "The Great Mental Models, Volume 4: Economics and Art — Shane Parrish"
+  cluster_segments:
+    - source_book: "The Art of Strategy — Avinash Dixit & Barry Nalebuff"
+      text: |
+        Keynes used the beauty contest as a metaphor for the stock market, where each investor
+        wants to buy the stocks that will rise in price, which means the stocks that investors,
+        in general, think will appreciate. The value of a stock is not what YOU think it's worth,
+        but what you think OTHERS think it's worth — and what they think others think, in an
+        infinite recursion of mutual expectation.
+    - source_book: "Algorithms to Live By — Brian Christian & Tom Griffiths"
+      text: |
+        As Keynes put it, making a crucial distinction between beauty and popularity: professional
+        investment may be likened to those newspaper competitions in which the competitors have
+        to pick out the six prettiest faces from a hundred photographs, the prize being awarded
+        to the competitor whose choice most nearly corresponds to the average preferences of the
+        competitors as a whole. Each competitor has to pick, not those faces which he himself
+        finds prettiest, but those which he thinks likeliest to catch the fancy of the other
+        competitors. We have reached the third degree where we devote our intelligences to
+        anticipating what average opinion expects the average opinion to be.
+    - source_book: "The Great Mental Models, Volume 4: Economics and Art — Shane Parrish"
+      text: |
+        Economist John Maynard Keynes used the metaphor of a beauty contest to explain how stock
+        prices are set. He asked readers to imagine a contest where entrants must choose six faces
+        out of a hundred; those who pick the faces chosen by the most other people win. Keynes
+        believed stocks are priced not according to their intrinsic value but according to
+        investors' perceptions of other investors' perceptions — a recursive prediction problem
+        where the fundamental value becomes almost irrelevant to short-term price movements.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: "FB"
+    name: "Keynesian Recursive Expectation"
+    definition: |
+      In markets where asset prices depend on collective belief rather than intrinsic value,
+      successful prediction requires reasoning about what others believe others believe — a
+      recursive chain of mutual expectation. The asset's fundamental value decouples from its
+      market price with each recursion step, as each participant optimizes for the anticipated
+      average opinion rather than underlying reality.
+    mechanism: |
+      Recursive expectation drives price formation through higher-order belief coordination.
+      Level-1 investors value assets on fundamentals. Level-2 investors value based on predicted
+      level-1 beliefs. Level-k investors value based on predicted level-(k-1) beliefs. The
+      mechanism amplifies small errors: misperceptions about others' beliefs compound with each
+      recursion level, producing price cascades where individually rational decisions generate
+      collectively destabilizing speculation. The recursion has no natural termination — at
+      sufficiently high k, the fundamental value becomes negligible relative to the recursive
+      belief component.
+    boundary: |
+      Applies when future prices depend primarily on other investors' behavior rather than
+      measurable cash flows. Fails when: (1) the asset has a contractually guaranteed terminal
+      value (zero-coupon bond) — the recursion collapses to a known endpoint; (2) participants
+      have identical information and reasoning — recursion converges to fundamentals; (3)
+      transaction costs exceed speculative margin — the game is not worth playing; (4) a
+      dominant player can unilaterally set the price — no need to predict others.
+    consequence: |
+      Markets governed by recursive expectations exhibit excess volatility relative to
+      fundamentals, spontaneous coordination on arbitrary focal points (round-number prices),
+      and vulnerability to self-fulfilling prophecies where collective belief in a price
+      movement causes that movement. This explains why assets with zero cash flows
+      (cryptocurrencies, collectibles, meme stocks) can sustain high valuations indefinitely
+      as long as participants believe others will continue to believe.
+    evidence_passages:
+      - "Keynes used the beauty contest as a metaphor for the stock market, where each investor wants to buy the stocks that will rise in price, which means the stocks that investors, in general, think will appreciate"
+      - "We have reached the third degree where we devote our intelligences to anticipating what average opinion expects the average opinion to be"
+      - "stocks are priced not according to their intrinsic value but according to investors' perceptions of other investors' perceptions"
+  rationale: |
+    STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5
+    bge-m3 run (3 books, cohesion=0.865). Three independent sources (Dixit/Nalebuff,
+    Christian/Griffiths, Parrish) converging on Keynes' beauty contest mechanism. The
+    mechanism explicitly traces recursion levels (1→2→k) and identifies the compounding-error
+    dynamic that produces speculative instability — going beyond "prices reflect beliefs" to
+    explain WHY recursive belief coordination creates excess volatility. The boundary
+    distinguishes speculative from contractual assets as a testable condition. This expands
+    golden set domain coverage from psychology/marketing into economics and game theory,
+    demonstrating convergent extraction on academic/theoretical source material.
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Metadata
@@ -444,22 +617,23 @@ examples:
 meta:
   version: "3.0"
   architecture: "cluster-before-extract"
-  total_examples: 7
-  convergent_positives: 5
+  total_examples: 9
+  convergent_positives: 7
   hard_negatives: 2
   expected_coverage:
     - convergent_multi_source_synthesis
     - single_source_rejection
     - platitude_detection
     - mechanism_boundary_consequence_structure
+    - one_to_n_extraction  # CONV-006: 2 distinct FBs from one cluster
+    - stem_domain_economics  # CONV-007: Keynesian recursive expectation
   calibration_status: "calibrated"
-  calibrated_date: "2026-07-26"
+  calibrated_date: "2026-08-06"
   notes: |
-    This golden set replaces config/golden/stage2_fewshot.yaml (v2.0, 75 single-segment examples)
-    which was designed for the OLD per-segment extraction architecture. v3.0 uses cluster-before-extract
-    (D2094): Stage 2 receives clusters of 5-15 related segments from ≥2 books and must synthesize ONE
-    convergent FB. These 7 examples (5 positive, 2 negative) demonstrate the convergent synthesis pattern.
-    
-    The old golden set is preserved at config/golden/stage2_fewshot.yaml.archived-v2 for reference
-    only — its examples are valid extractions but the per-segment format is incompatible with the
-    v3.0 convergent extraction prompt.
+    D2191: Golden set expanded from 7 to 9 examples. Fixes applied:
+    - YAML duplicate keys removed (is_convergent/should_extract per example)
+    - CONV-006: 1:N extraction example (Explore-Exploit + Endowment Gap from 3 books)
+    - CONV-007: STEM domain example (Keynesian Recursive Expectation, economics/game theory)
+    - NEG-CONV-002 rationale updated to address Collins "First Who" controversy
+    Domain coverage: pricing, behavioral_change, advertising, persuasion, marketing,
+    economics (2 examples), business. Source books: 13 unique across 9 examples.

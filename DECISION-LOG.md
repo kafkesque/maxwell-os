@@ -3122,3 +3122,17 @@ Protects ~1,100-call Stage 2 runs from hammering a dead OMLX server.
 - S1.3: D2182 removed BYTE-IDENTICAL duplicate function; zero behavioral change
 - ONLY S1.5 stale (bge-small 384d) → re-run bge-m3 512d
 
+
+### D2191a — Golden Set: 4 Fixes Applied (2026-08-06 10:20)
+
+✅ All 4 fixes from D2191 validation applied:
+1. YAML duplicate keys removed (3 pairs → 1 pair per example, 9 total)
+2. CONV-006: 1:N extraction example added (Explore-Exploit + Endowment Gap, 3 books)
+3. CONV-007: STEM domain example added (Keynesian Recursive Expectation, economics/game theory, real cluster_90 data, 3 books)
+4. NEG-CONV-002: Rationale updated to address Collins "First Who" controversy
+
+Post-fix: 9 examples (7 positive, 2 negative), 7 domains, 17 unique sources.
+All mechanism/boundary/consequence/evidence fields present. YAML parses cleanly.
+Golden loader verification: `load_golden_parity()` correctly samples 3 pos + 1 neg.
+
+**GATE: ✅ Golden set ready for S2 full run (2,634 convergent clusters).**

@@ -132,6 +132,41 @@ integrity:
 integrity-quick:
     python3 pipeline/integrity_check.py --quick
 
+# ── D2205 Retrieval Tools ─────────────────────────────────────
+# Graph-aware retrieval (FTS + vector + keyword + graph expansion)
+retrieve-graph query:
+    python3 pipeline/retrieve.py --graph-aware "{{query}}" --limit 15
+
+# Agentic retrieval (iterative with critique loop)
+retrieve-agentic query:
+    python3 pipeline/retrieve.py --agentic "{{query}}" --limit 15
+
+# Retrieval evaluator — test critique on current DB
+retrieve-eval query fb_ids:
+    python3 pipeline/retrieval_evaluator.py --critique-only --fb-ids "{{fb_ids}}"
+
+# D2205 Migration — two-axis epistemic model
+migrate-epistemic:
+    python3 pipeline/migrate_D2205_epistemic.py
+
+migrate-epistemic-dry:
+    python3 pipeline/migrate_D2205_epistemic.py --dry-run
+
+migrate-epistemic-verify:
+    python3 pipeline/migrate_D2205_epistemic.py --verify
+
+# MCP Server — start Maxwell knowledge server for agents
+mcp-server:
+    @echo "=== Maxwell MCP Knowledge Server ==="
+    @echo "Starting... Register with Claude Desktop or Goose."
+    @echo "Config: { 'mcpServers': { 'maxwell': {"
+    @echo "  'command': 'python3',"
+    @echo "  'args': ['maxwell_mcp_server.py'] } } }"
+    python3 maxwell_mcp_server.py
+
+mcp-test:
+    python3 maxwell_mcp_server.py --test
+
 # ── Vibecheck — Ruff + format on changed files (D2109) ───────
 vibecheck:
     @echo "=== Vibecheck ==="

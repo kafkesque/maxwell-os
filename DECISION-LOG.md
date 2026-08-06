@@ -3,6 +3,58 @@
 
 ---
 
+## D2205 — RAG Architecture Roadmap: 4-Model Synthesis & Adaptation (2026-08-06)
+
+**Summary:** Four independent model families (Kimi/Moonshot, DeepSeek, Qwen, ChatGPT/OpenAI) converged on the same architectural verdict. Maxwell's ingestion pipeline (Stages 0-6) is best-in-class for sovereign knowledge extraction. The retrieval layer runs 2023-vintage architecture. This decision documents the verified, grounded, Maxwell-adapted implementation plan.
+
+**Key findings:**
+- Graph fields (`related_fbs`, `contradicts_fbs`, `prerequisite_fbs`) exist in schema but 0 references in `retrieve.py`
+- No MCP server — 0 references to "MCP" or "mcp" in all 59 pipeline `.py` files
+- No retrieval evaluator — no CRAG-style Correct/Incorrect/Ambiguous classification
+- No iterative retrieval loop — single-shot `search_hybrid()` only
+- `faiss_threshold` mismatch: pipeline_config.yaml 0.75 vs session_seed.yaml 0.70
+- AGENTS.md still says "9-stage" despite Stage 3 removal (D2120)
+
+**Implementation plan (4 phases, 7 days total):**
+
+**P0 — Agentic Retrieval Loop (1.5 days):**
+- `pipeline/retrieval_evaluator.py` — CRAG-style critique with Phi-4-mini. Structured JSON: CORRECT/PARTIAL/INCORRECT/CONTRADICTORY + answered_aspects, missing_aspects, proposed_next_query
+- `retrieve.py:agentic_search()` — iteration budget (3 rounds), stop conditions, EvidencePack output
+- Adapted for Maxwell: no web search fallback (C3), no tree-decoding (R7 temp=0.0), no training (C1)
+- Gate: ≥15% recall improvement on multi-aspect queries
+
+**P1 — Graph Traversal Layer (1.5 days):**
+- `retrieve.py:graph_expand()` — BFS over SQLite adjacency list for related_fbs/contradicts_fbs/prerequisite_fbs. Zero new deps
+- `retrieve.py:graph_aware_search()` — hybrid search + graph expansion + rerank by borp×feedback×graph_centrality
+- Gate: ≥3 additional relevant FBs via graph expansion per complex query
+
+**P2 — MCP Server (1 day):**
+- `maxwell_mcp_server.py` — 3 tools: query_knowledge (hybrid+graph), get_fb_detail (evidence+graph), get_fb_reliability (execution history)
+- Read-only v1. Stateless. Stdio transport. C25 compliance.
+- Gate: Goose/Claude Desktop can call all 3 tools successfully
+
+**P3 — Evidence Pack & Two-Axis Epistemic Model (2 days):**
+- Schema migration: evidence_support, evidence_independence, evidence_contradiction, evidence_coverage, execution_trials, execution_successes, epistemic_state
+- EvidencePack dataclass: wire through retrieve→critique→format
+- Backfill from existing borp_score and feedback_score
+- Gate: Migration verified, EvidencePack round-trips
+
+**Integration testing: 1 day. Total: 7 days.**
+
+**Rejected proposals (with constraint-violation reasons):**
+- Self-RAG reflection token training → C1 (cost) + R7 (temp=0.0)
+- CRAG web search fallback → C3 (sovereignty)
+- ColBERT late interaction → M1 Max memory
+- Full RAPTOR hierarchy → 564 min already for flat embedding
+- vllm-mlx migration → estimate unrealistic for production
+- Multi-agent swarm → coordination tax 39-70% (Google Research)
+- Neo4j → external service (C3)
+
+**Files:** `governance/D2205-rag-architecture-roadmap-2026-08-06.md` (1,091 lines, full implementation specs with code)
+**Cross-references:** D2195 (cross-examination verdict), D2196-D2204 (immediate fixes), D2120 (cluster-before-extract), D2130 (feedback system), D2176 (RRF hybrid search)
+
+---
+
 ## D2000 — v2.0 Architecture (2026-07-18)
 
 **Summary:** Maxwell OS restarts with a clean v2.0 codebase. v1 archived in `archive/maxwell_os_v1/`. Architecture v3.0 adopted for pipeline.
@@ -3166,3 +3218,21 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
        config/golden/stage2_fewshot_convergent.yaml,
        config/golden/GOLDEN-EVALUATION-PROMPT.md (master LLM eval prompt v2.0).
        Status: needs_review — requires LLM cross-eval before calibration.
+
+## D2205 — Golden-Eval Cross-Examination & Pre-Calibration Fix Pass (2026-08-06)
+
+**Context:** Three LLM evaluations of the D2204-expanded golden set (Kimi, Qwen, DeepSeek) returned BROKEN / NEEDS-FIXES / NEEDS-FIXES. All claims independently re-verified against `config/golden/stage2_fewshot_convergent.yaml` ground truth.
+
+**Verified findings (17 TRUE / 3 FALSE / 2 re-graded):**
+- TRUE: NEG-001..004 `route: FB` contradiction (4 examples); meta counts wrong (20/5 vs actual 18/7); jargon-echo + boundary-violation negatives missing; CONV-006 schema deviation (list vs dict); CONV-006/020 default-effect near-duplicate; 4 verbatim violations (CONV-003/012/013/017 — CONV-013 missed by all three evals); bimodal property distribution (CONV-001..007 = 0 props, CONV-011..021 = 10-11); domain skew (~52% business); CONV-003 source "Finding the Tipping Point" fabricated (a POSITIVE — worst contamination); NEG-001 Graham quote misattributed; NEG-002 Duhigg paraphrase; CONV-012 Russell pseudo-independence (2 of 3 sources); CONV-020 Lewis secondary source; CONV-007 Parrish synthesis source; stray fields/typos (consequence_2, source_book_2, opptimization, afntifragility); ID gaps CONV-008..010.
+- FALSE (all Qwen): CONV-006 "invalid YAML duplicate keys" (file is valid YAML list); "ra tionale" typos (absent); "mor e"/"T his" typos (absent).
+- RE-GRADED: NEG-001/NEG-002 fabrication CRITICAL→HIGH (negative-set contamination ≠ positive poisoning); DeepSeek's hallucination PASS overruled (fabricated positive source present).
+
+**Decision:**
+1. Golden set verdict: **NEEDS-FIXES** (not BROKEN — positive corpus S-tier, defects all mechanical).
+2. Calibration REMAINS GATED: `calibration_status: needs_review` stays until P0 fix pass lands.
+3. Evaluator meta-verdict: Qwen strongest overall, Kimi strongest on structure, DeepSeek too lenient. Tri-party eval is now the permanent golden-set lifecycle (mirrors R5/BORP).
+4. Fix pass defined: P0 (NEG routes, CONV-006 schema, CONV-003 source, meta header, NEG-005/006) → P1 (verbatim repairs + generator assertion, CONV-006/020 dedupe, CONV-012 source, property backfill, domain rebalance, typos, verified segments) → P2 (eval prompt v2.1 with programmatic verbatim + source-existence checks, author-overlap detector, integrity check #18).
+5. Record: `governance/golden-eval-cross-examination-2026-08-06.md`.
+
+**Files:** governance/golden-eval-cross-examination-2026-08-06.md, DECISION-LOG.md, governance/task_register_2026-08-06.md

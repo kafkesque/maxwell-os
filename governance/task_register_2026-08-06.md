@@ -88,3 +88,42 @@
 | 476 Ruff errors in pipeline (was lint-blind for months) | 🟡 MED | P1 #6 |
 | Anytype cloud-sync sovereignty leak | 🟡 MED | Deferred |
 | BORP ≠ Truth (two books can agree on a myth) | 🟡 MED | Epistemic, deferred |
+
+---
+
+## D2205 — Golden-Eval Fix Pass (from 3-LLM cross-examination, pre-calibration gate)
+
+Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative block + metadata F-tier; 17 verified findings).
+
+### P0 — blocks calibration
+| # | Task | Source |
+|---|------|--------|
+| G-01 | NEG-001..004 → `route: NULL` + empty FB fields (NEG-CONV pattern) | Kimi/Qwen/DeepSeek consensus |
+| G-02 | CONV-006 1:N schema: formalize `expected_fb: FB \| List[FB]` in schemas.py | Kimi (accurate framing) |
+| G-03 | Replace fabricated CONV-003 source "Finding the Tipping Point" (verified real alt: McQuarrie & Mick 1999; Phillips & McQuarrie 2004); verify Mostafa | Qwen (only catcher) |
+| G-04 | Meta header: `convergent_positives: 18`, `hard_negatives: 7`, fix notes | Kimi/Qwen |
+| G-05 | Add NEG-005 jargon-echo + NEG-006 boundary-violation negatives | All three consensus |
+
+### P1 — quality
+| # | Task | Source |
+|---|------|--------|
+| G-06 | Repair 4 verbatim violations (CONV-003/012/013/017); add substring assertion to expand_golden_v2.py | This audit (CONV-013 found only here) |
+| G-07 | Dedupe CONV-006 FB1 vs CONV-020 → keep canonical, replace CONV-020 with distinct BE principle (framing effects) | Kimi/Qwen |
+| G-08 | CONV-012: replace one Russell source with independent AI-safety text | Qwen |
+| G-09 | Property backfill into CONV-001..007 (depth/evidence/jargon/keywords) | Qwen/DeepSeek |
+| G-10 | Domain rebalance: 2 business → AI/Visual/Interactive (also fixes ratio 20:8) | Kimi/Qwen |
+| G-11 | Fix stray fields (consequence_2, source_book_2) + typos (opptimization, afntifragility); renumber/document ID gaps | Kimi/Qwen/DeepSeek |
+| G-12 | Replace NEG-001 Graham + NEG-002 Duhigg segments with verified excerpts | Kimi/Qwen |
+
+### P2 — process hardening
+| # | Task | Source |
+|---|------|--------|
+| G-13 | GOLDEN-EVALUATION-PROMPT.md v2.1: mandate programmatic verbatim check + external source-existence check in Dimension 9 | This audit (gap: all 3 evals missed ≥1 violation) |
+| G-14 | Author-overlap + secondary-source detector in golden validation (would've caught CONV-012/020) | Qwen/DeepSeek |
+| G-15 | integrity_check.py check #18: route-vs-should_extract consistency | This audit |
+
+### Evaluator meta-record (for future eval selection)
+- Qwen: strongest overall (best fact-check; 3 false micro-claims)
+- Kimi: strongest structure (missed positive-source fabrication)
+- DeepSeek: most lenient (would've let contaminated set calibrate — hallucination PASS overruled)
+- **Rule: never calibrate on single-evaluator verdict; tri-party eval = golden-set lifecycle (R5/BORP applied to the eval loop itself)**

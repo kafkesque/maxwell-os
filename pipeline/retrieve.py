@@ -1,26 +1,33 @@
 #!/usr/bin/env python3
 """
-retrieve.py — Hybrid search: SQL + FTS5 + sqlite-vec.
-========================================================
-Authority: CONSTITUTION.md §2.3
+retrieve.py — Hybrid search: SQL + FTS5 + sqlite-vec + Graph + Agentic.
+========================================================================
+Authority: CONSTITUTION.md §2.3, D2205 (RAG Architecture Roadmap)
 
-Three retrieval modes:
+Retrieval modes:
   1. Keyword: SQL query on domains, discipline, depth, status
   2. Full-text: FTS5 search on name, definition, keywords
   3. Vector: sqlite-vec cosine similarity (if available)
+  4. Hybrid: FTS + vector + keyword fused via RRF (D2176)
+  5. Graph-aware: Hybrid + BFS graph expansion (D2205 P1)
+  6. Agentic: Iterative retrieval with critique loop (D2205 P0)
 
 Usage:
     python3 pipeline/retrieve.py --keyword "systems thinking"
     python3 pipeline/retrieve.py --domain "ai & agents" --depth universal
     python3 pipeline/retrieve.py --fts "feedback loops"
     python3 pipeline/retrieve.py --vector "how to build resilient systems"
-    python3 pipeline/retrieve.py --hybrid "decision making"  # FTS + keyword
+    python3 pipeline/retrieve.py --hybrid "decision making"  # FTS + vector + keyword
+    python3 pipeline/retrieve.py --agentic "pricing strategy"  # Iterative with critique
+    python3 pipeline/retrieve.py --graph-aware "systems thinking"  # Graph expansion
 """
 
 import argparse
 import json
 import sqlite3
 import sys
+from collections import deque
+from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -39,6 +46,7 @@ def get_conn() -> sqlite3.Connection:
     return conn
 
 
+
 def search_keyword(
     conn: sqlite3.Connection,
     domain: str = None,
@@ -48,21 +56,24 @@ def search_keyword(
     limit: int = 20,
     exclude_summaries: bool = True,
 ) -> list[dict]:
-    """Keyword-based SQL search. Excludes summary FBs and failed classifications by default.
+    """Keyword-based SQL search. Gracefully handles missing optional columns.
 
-    D2178: Added classification_status filter — FBs with failed classifications
-    (classification_status='FAILED') are excluded from all search paths. Previously
-    only 'status' was checked, so a FB with status='PASS' but classification_status='FAILED'
-    would silently appear in results with unclassified/emerging labels.
+    Columns is_summary and classification_status may not exist in older DBs.
+    Filters for them are applied only when the columns are present.
     """
-    conditions = []
-    params = []
+    # Check which optional columns exist in this DB
+    db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    has_class_status: bool = "classification_status" in db_cols
+    has_is_summary: bool = "is_summary" in db_cols
+
+    conditions: list[str] = []
+    params: list = []
 
     if status:
         conditions.append("status = ?")
         params.append(status)
-    # D2178: Exclude failed classifications from all search paths
-    conditions.append("(classification_status IS NULL OR classification_status != 'FAILED')")
+    if has_class_status:
+        conditions.append("(classification_status IS NULL OR classification_status != 'FAILED')")
     if domain:
         conditions.append("domains LIKE ?")
         params.append(f"%{domain}%")
@@ -72,11 +83,11 @@ def search_keyword(
     if depth:
         conditions.append("depth = ?")
         params.append(depth)
-    if exclude_summaries:
+    if exclude_summaries and has_is_summary:
         conditions.append("(is_summary = 0 OR is_summary IS NULL)")
 
-    where = " AND ".join(conditions) if conditions else "1=1"
-    query = f"SELECT * FROM fbs WHERE {where} ORDER BY borp_score DESC LIMIT ?"
+    where: str = " AND ".join(conditions) if conditions else "1=1"
+    query: str = f"SELECT * FROM fbs WHERE {where} ORDER BY borp_score DESC LIMIT ?"
     params.append(limit)
 
     rows = conn.execute(query, params).fetchall()
@@ -85,42 +96,42 @@ def search_keyword(
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
              exclude_summaries: bool = True) -> list[dict]:
-    """Full-text search on name, definition, keywords.
+    """Full-text search on name, definition, keywords. Column-aware.
 
-    D2178: Added classification_status filter — failed classifications excluded.
+    Gracefully handles missing is_summary and classification_status columns
+    which may not exist in older DB schemas.
     """
+    db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    has_class_status: bool = "classification_status" in db_cols
+    has_is_summary: bool = "is_summary" in db_cols
+
+    summary_f: str = "AND (f.is_summary = 0 OR f.is_summary IS NULL)" if has_is_summary else ""
+    class_f: str = "AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')" if has_class_status else ""
+
     try:
-        rows = conn.execute("""
+        rows = conn.execute(f"""
             SELECT f.* FROM fbs f
             JOIN fbs_fts ft ON f.rowid = ft.rowid
             WHERE fbs_fts MATCH ?
-              AND (f.is_summary = 0 OR f.is_summary IS NULL)
-              AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')
+              {summary_f}
+              {class_f}
             ORDER BY rank
             LIMIT ?
         """, (query, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
     except sqlite3.OperationalError:
         # FTS5 may not be available — fall back to LIKE
-        # D2178: classification_status filter applied to fallback path
-        like_query = f"%{query}%"
-        if exclude_summaries:
-            rows = conn.execute("""
-                SELECT * FROM fbs
-                WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
-                  AND (is_summary = 0 OR is_summary IS NULL)
-                  AND (classification_status IS NULL OR classification_status != 'FAILED')
-                ORDER BY borp_score DESC
-                LIMIT ?
-            """, (like_query, like_query, like_query, limit)).fetchall()
-        else:
-            rows = conn.execute("""
-                SELECT * FROM fbs
-                WHERE name LIKE ? OR definition LIKE ? OR keywords LIKE ?
-                  AND (classification_status IS NULL OR classification_status != 'FAILED')
-                ORDER BY borp_score DESC
-                LIMIT ?
-            """, (like_query, like_query, like_query, limit)).fetchall()
+        like_query: str = f"%{query}%"
+        like_summary: str = "AND (is_summary = 0 OR is_summary IS NULL)" if (has_is_summary and exclude_summaries) else ""
+        like_class: str = "AND (classification_status IS NULL OR classification_status != 'FAILED')" if has_class_status else ""
+        rows = conn.execute(f"""
+            SELECT * FROM fbs
+            WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
+              {like_summary}
+              {like_class}
+            ORDER BY borp_score DESC
+            LIMIT ?
+        """, (like_query, like_query, like_query, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
 
 
@@ -308,35 +319,528 @@ def format_fb(fb: dict, index: int = None, compact: bool = False) -> str:
     return "\n".join(lines)
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# D2205 P1 — Graph Expansion Layer
+# ═══════════════════════════════════════════════════════════════════════
+
+def graph_expand(
+    conn: sqlite3.Connection,
+    fb_ids: list[str],
+    hops: int = 2,
+    include_contradictions: bool = True,
+    include_prerequisites: bool = True,
+) -> dict[str, dict]:
+    """D2205 P1: BFS graph expansion over SQLite adjacency list.
+
+    Traverses related_fbs (undirected semantic edges), contradicts_fbs
+    (bidirectional warning edges), and prerequisite_fbs (directed dependency
+    edges) stored in the fbs table.
+
+    No external graph DB. No Cypher. No Neo4j. Pure SQLite + in-memory BFS.
+    No new dependencies. Uses fields already populated by Stage 4 merge.
+
+    Memory: O(V+E) for BFS frontier. Typical: 20 seed FBs × 2 hops
+            ≈ 100-200 FBs in memory. Negligible on 64GB (M1 Max).
+
+    Args:
+        conn: Read-only SQLite connection
+        fb_ids: Seed FB IDs to expand from
+        hops: Maximum BFS depth (1 = direct neighbors, 2 = neighbors of neighbors)
+        include_contradictions: Whether to traverse contradicts_fbs edges
+        include_prerequisites: Whether to traverse prerequisite_fbs edges (upstream)
+
+    Returns:
+        Dict keyed by fb_id, each value:
+        {fb_id: {"related": [...], "contradicts": [...], "prerequisites": [...]}}
+
+        Related entries include full FB dicts from DB.
+        Contradicts/prerequisites are fb_id strings (fetch detail separately).
+    """
+    visited: set[str] = set(fb_ids)
+    frontier: deque[str] = deque(fb_ids)
+    result: dict[str, dict] = {
+        fid: {"related": [], "contradicts": [], "prerequisites": []}
+        for fid in fb_ids
+    }
+    current_hop: int = 0
+
+    while frontier and current_hop < hops:
+        level_size: int = len(frontier)
+        for _ in range(level_size):
+            current_id: str = frontier.popleft()
+
+            # Fetch edges from DB
+            row = conn.execute(
+                """SELECT fb_id, related_fbs, contradicts_fbs, prerequisite_fbs
+                   FROM fbs WHERE fb_id = ?""",
+                (current_id,),
+            ).fetchone()
+
+            if not row:
+                continue
+
+            # ── Expand related_fbs (undirected semantic edges) ──────────
+            if row["related_fbs"]:
+                try:
+                    related_raw = row["related_fbs"]
+                    related: list = (
+                        json.loads(related_raw)
+                        if isinstance(related_raw, str)
+                        else related_raw
+                    )
+                except (json.JSONDecodeError, TypeError):
+                    related = []
+
+                for rel in related:
+                    rel_id: str | None = None
+                    if isinstance(rel, dict):
+                        rel_id = rel.get("fb_id")
+                    elif isinstance(rel, str):
+                        rel_id = rel
+                    if rel_id and rel_id not in visited:
+                        visited.add(rel_id)
+                        frontier.append(rel_id)
+                        # Fetch FB details for the related entry
+                        rrow = conn.execute(
+                            "SELECT fb_id, name, definition, domains, borp_score "
+                            "FROM fbs WHERE fb_id = ?",
+                            (rel_id,),
+                        ).fetchone()
+                        if current_id not in result:
+                            result[current_id] = {"related": [], "contradicts": [], "prerequisites": []}
+                        result[current_id]["related"].append(
+                            dict(rrow) if rrow else {"fb_id": rel_id}
+                        )
+
+            # ── Expand contradicts_fbs (bidirectional warning) ─────────
+            if include_contradictions and row["contradicts_fbs"]:
+                try:
+                    contradicts_raw = row["contradicts_fbs"]
+                    contradicts: list = (
+                        json.loads(contradicts_raw)
+                        if isinstance(contradicts_raw, str)
+                        else contradicts_raw
+                    )
+                except (json.JSONDecodeError, TypeError):
+                    contradicts = []
+
+                for cid in contradicts:
+                    cid_str: str = str(cid) if not isinstance(cid, dict) else str(cid.get("fb_id", cid))
+                    if cid_str and cid_str not in visited:
+                        visited.add(cid_str)
+                        frontier.append(cid_str)
+                        if current_id not in result:
+                            result[current_id] = {"related": [], "contradicts": [], "prerequisites": []}
+                        result[current_id]["contradicts"].append(cid_str)
+                        # Record reciprocal contradiction
+                        if cid_str not in result:
+                            result[cid_str] = {"related": [], "contradicts": [current_id], "prerequisites": []}
+                        elif current_id not in result[cid_str]["contradicts"]:
+                            result[cid_str]["contradicts"].append(current_id)
+
+            # ── Expand prerequisite_fbs (directed — upstream only) ──────
+            if include_prerequisites and row["prerequisite_fbs"]:
+                try:
+                    prereqs_raw = row["prerequisite_fbs"]
+                    prereqs: list = (
+                        json.loads(prereqs_raw)
+                        if isinstance(prereqs_raw, str)
+                        else prereqs_raw
+                    )
+                except (json.JSONDecodeError, TypeError):
+                    prereqs = []
+
+                for pid in prereqs:
+                    pid_str: str = str(pid) if not isinstance(pid, dict) else str(pid.get("fb_id", pid))
+                    if pid_str and pid_str not in visited:
+                        visited.add(pid_str)
+                        frontier.append(pid_str)
+                        if current_id not in result:
+                            result[current_id] = {"related": [], "contradicts": [], "prerequisites": []}
+                        result[current_id]["prerequisites"].append(pid_str)
+
+        current_hop += 1
+
+    return result
+
+
+def graph_aware_search(
+    conn: sqlite3.Connection,
+    query: str,
+    limit: int = 20,
+    graph_hops: int = 2,
+    domain: str | None = None,
+    discipline: str | None = None,
+    depth: str | None = None,
+) -> list[dict]:
+    """D2205 P1: Hybrid search + graph expansion pipeline.
+
+    Pipeline:
+      1. search_hybrid → top-N seed FBs (RRF fusion of FTS + vector + keyword)
+      2. graph_expand → 1-2 hop graph traversal over related/contradicts/prerequisite edges
+      3. Deduplicate by fb_id
+      4. Rerank by: borp_score × (1.0 + feedback_score) × graph_closeness
+         (seed FBs weighted higher than 2-hop neighbors)
+      5. Return top-k with _graph metadata attached
+
+    Result: Retrieves FBs that are semantically close AND structurally
+    connected, not just semantically similar. Surfaces contradictions
+    alongside supporting evidence.
+
+    Args:
+        conn: Read-only SQLite connection
+        query: Natural language search query
+        limit: Max seed FBs from hybrid search
+        graph_hops: BFS depth for graph expansion (1-2 recommended)
+        domain: Optional domain filter
+        discipline: Optional discipline filter
+        depth: Optional depth filter
+
+    Returns:
+        List of FB dicts with _graph and _is_seed metadata attached
+    """
+    # 1. Seed retrieval via hybrid search
+    seeds: list[dict] = search_hybrid(
+        conn, query,
+        limit=limit,
+        domain=domain,
+        discipline=discipline,
+        depth=depth,
+    )
+
+    if not seeds:
+        return []
+
+    seed_ids: list[str] = [
+        str(s.get("fb_id", s.get("id", "")))
+        for s in seeds
+        if s.get("fb_id") or s.get("id")
+    ]
+
+    # 2. Graph expansion
+    graph: dict[str, dict] = graph_expand(
+        conn, seed_ids,
+        hops=graph_hops,
+        include_contradictions=True,
+        include_prerequisites=True,
+    )
+
+    # 3. Collect all unique FB IDs (seeds + expanded)
+    all_fb_ids: set[str] = set(seed_ids)
+    for fid, edges in graph.items():
+        all_fb_ids.add(fid)
+        for rel in edges.get("related", []):
+            rid: str | None = None
+            if isinstance(rel, dict):
+                rid = rel.get("fb_id")
+            elif isinstance(rel, str):
+                rid = rel
+            if rid:
+                all_fb_ids.add(rid)
+        for cid in edges.get("contradicts", []):
+            all_fb_ids.add(str(cid))
+        for pid in edges.get("prerequisites", []):
+            all_fb_ids.add(str(pid))
+
+    # 4. Fetch all FBs with scores (column-aware — classification_status may not exist)
+    db_cols_gas: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    class_filter_gas: str = (
+        "AND (classification_status IS NULL OR classification_status != 'FAILED')"
+        if "classification_status" in db_cols_gas else ""
+    )
+    placeholders: str = ",".join("?" * len(all_fb_ids))
+    rows = conn.execute(
+        f"""SELECT *,
+            COALESCE(borp_score, 0.5) AS _borp,
+            COALESCE(feedback_score, 0.5) AS _feedback
+            FROM fbs
+            WHERE fb_id IN ({placeholders})
+            {class_filter_gas}
+            ORDER BY _borp DESC, _feedback DESC""",
+        list(all_fb_ids),
+    ).fetchall()
+
+    results: list[dict] = [dict(r) for r in rows]
+
+    # 5. Attach graph metadata and compute graph-aware score
+    for fb in results:
+        fid: str = str(fb.get("fb_id", ""))
+        is_seed: bool = fid in seed_ids
+        fb["_graph"] = graph.get(fid, {"related": [], "contradicts": [], "prerequisites": []})
+        fb["_is_seed"] = is_seed
+
+        # Graph-aware score: boost seed FBs, penalize distant ones
+        borp: float = float(fb.get("borp_score", 0.5) or 0.5)
+        feedback: float = float(fb.get("feedback_score", 0.5) or 0.5)
+        graph_boost: float = 1.2 if is_seed else 0.9  # D2205: seed bias
+        fb["_graph_score"] = borp * (1.0 + feedback) * graph_boost
+
+    # Re-sort by graph-aware score
+    results.sort(key=lambda fb: fb.get("_graph_score", 0.0), reverse=True)
+
+    return results[:limit]
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# D2205 P0 — Agentic Retrieval Loop
+# ═══════════════════════════════════════════════════════════════════════
+
+@dataclass
+class EvidencePack:
+    """D2205 P3: Typed evidence package for agentic retrieval.
+
+    Every Maxwell component consumes/produces this object instead of
+    passing arbitrary dicts around — reduces agentic hallucination.
+
+    Attributes:
+        query: Original user query
+        fbs: Retrieved Foundation Blocks (deduplicated across iterations)
+        critique: Retrieval quality assessment (from retrieval_evaluator)
+        iterations: Number of retrieval rounds executed
+        exhausted: True if iteration budget was exhausted without CORRECT
+        contradictions_surfaced: Contradicting FB pairs found during graph expansion
+        total_fbs_found: Unique FBs across all iterations
+    """
+    query: str
+    fbs: list[dict] = field(default_factory=list)
+    critique: object | None = None  # CritiqueResult (lazy import to avoid circular)
+    iterations: int = 1
+    exhausted: bool = False
+    contradictions_surfaced: list[dict] = field(default_factory=list)
+    total_fbs_found: int = 0
+
+
+def agentic_search(
+    conn: sqlite3.Connection,
+    query: str,
+    max_iterations: int = 3,
+    confidence_threshold: float = 0.85,
+    limit: int = 20,
+    domain: str | None = None,
+    discipline: str | None = None,
+    depth: str | None = None,
+    graph_aware: bool = True,
+) -> EvidencePack:
+    """D2205 P0: Agentic retrieval with structured critique and iteration budget.
+
+    Implements the iterative retrieval loop with:
+      1. Retrieve → Critique → Decide (continue/stop)
+      2. Hard iteration cap with explicit exhaustion flag
+      3. Structured critique JSON from retrieval_evaluator
+
+    Stop conditions (evaluated in order):
+      1. critique.confidence >= confidence_threshold → return
+      2. critique.retrieval_quality == "CORRECT" → return
+      3. iteration == max_iterations → return with exhausted=True
+      4. critique.retrieval_quality == "INCORRECT" → broaden search, then return
+
+    Adapted from Self-RAG + CRAG for Maxwell constraints:
+      - No web search fallback (C3: sovereign) → broader local retrieval
+      - No tree-decoding / beam search (R7: temp=0.0) → deterministic scoring
+      - No training required (C1: $0 marginal cost) → Phi-4-mini evaluator
+
+    Iteration budget: 3 rounds maximum (Agentic RAG 2026 best practice).
+    Token overhead: ~3× single-shot cost on PARTIAL queries, ~1× on CORRECT.
+
+    Args:
+        conn: Read-only SQLite connection
+        query: Natural language search query
+        max_iterations: Maximum retrieval rounds (default 3 from config)
+        confidence_threshold: Stop if critique confidence exceeds this
+        limit: Max FBs per retrieval pass
+        exclude_summaries: (REMOVED — search_hybrid doesn't support this param)
+        domain: Optional domain filter
+        discipline: Optional discipline filter
+        depth: Optional depth filter
+        graph_aware: Whether to use graph-aware search (default True)
+
+    Returns:
+        EvidencePack with all FBs, critique, iteration metadata
+    """
+    # Lazy import to avoid circular dependency at module level
+    from pipeline.retrieval_evaluator import evaluate_retrieval
+
+    current_query: str = query
+    all_fbs: dict[str, dict] = {}  # Deduplicate across iterations by fb_id
+    final_critique = None
+    contradictions: list[dict] = []
+
+    for i in range(max_iterations):
+        # 1. Retrieve
+        if graph_aware:
+            results: list[dict] = graph_aware_search(
+                conn, current_query,
+                limit=limit,
+                domain=domain,
+                discipline=discipline,
+                depth=depth,
+            )
+        else:
+            results = search_hybrid(
+                conn, current_query,
+                limit=limit,
+                domain=domain,
+                discipline=discipline,
+                depth=depth,
+            )
+
+        # Track FBs across iterations (dedup by fb_id)
+        for fb in results:
+            fid: str = str(fb.get("fb_id", fb.get("id", "")))
+            if fid and fid not in all_fbs:
+                all_fbs[fid] = fb
+
+        # Collect contradictions from graph metadata
+        for fb in results:
+            g = fb.get("_graph", {})
+            for cid in g.get("contradicts", []):
+                contradictions.append({
+                    "fb_a": fb.get("fb_id", ""),
+                    "fb_b": cid,
+                    "iteration": i + 1,
+                })
+
+        # 2. Critique
+        fbs_list: list[dict] = list(all_fbs.values())
+        critique = evaluate_retrieval(query, fbs_list)
+        final_critique = critique
+
+        # 3. Decide: stop conditions
+        if critique.confidence >= confidence_threshold:
+            return EvidencePack(
+                query=query,
+                fbs=fbs_list,
+                critique=critique,
+                iterations=i + 1,
+                contradictions_surfaced=contradictions,
+                total_fbs_found=len(all_fbs),
+            )
+
+        if critique.retrieval_quality == "CORRECT":
+            return EvidencePack(
+                query=query,
+                fbs=fbs_list,
+                critique=critique,
+                iterations=i + 1,
+                contradictions_surfaced=contradictions,
+                total_fbs_found=len(all_fbs),
+            )
+
+        if critique.retrieval_quality == "INCORRECT":
+            # Broaden search: drop domain/discipline/depth filters
+            broader = search_hybrid(
+                conn, query,
+                limit=limit * 2,
+            )
+            for fb in broader:
+                fid = str(fb.get("fb_id", fb.get("id", "")))
+                if fid and fid not in all_fbs:
+                    all_fbs[fid] = fb
+            return EvidencePack(
+                query=query,
+                fbs=list(all_fbs.values()),
+                critique=critique,
+                iterations=i + 1,
+                exhausted=True,
+                contradictions_surfaced=contradictions,
+                total_fbs_found=len(all_fbs),
+            )
+
+        # 4. Continue: refine query for next iteration
+        if critique.proposed_next_query and i < max_iterations - 1:
+            current_query = critique.proposed_next_query
+        # else: loop exits naturally
+
+    # Exhausted iteration budget
+    return EvidencePack(
+        query=query,
+        fbs=list(all_fbs.values()),
+        critique=final_critique,
+        iterations=max_iterations,
+        exhausted=True,
+        contradictions_surfaced=contradictions,
+        total_fbs_found=len(all_fbs),
+    )
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Hybrid FB retrieval")
+    parser = argparse.ArgumentParser(description="D2205: Hybrid + Graph + Agentic FB retrieval")
     parser.add_argument("query", nargs="?", help="Search query")
     parser.add_argument("--keyword", "-k", help="Keyword search")
     parser.add_argument("--fts", "-f", help="Full-text search")
     parser.add_argument("--vector", "-v", help="Vector similarity search")
-    parser.add_argument("--hybrid", help="Hybrid (FTS + keyword) search")
+    parser.add_argument("--hybrid", help="Hybrid (FTS + vector + keyword) search")
+    parser.add_argument("--agentic", action="store_true",
+                        help="D2205 P0: Iterative retrieval with critique loop")
+    parser.add_argument("--graph-aware", action="store_true",
+                        help="D2205 P1: Hybrid search + graph expansion")
+    parser.add_argument("--graph-hops", type=int, default=2,
+                        help="Graph expansion depth (default: 2, only with --graph-aware)")
+    parser.add_argument("--max-iterations", type=int, default=3,
+                        help="Max retrieval rounds for --agentic (default: 3)")
+    parser.add_argument("--confidence", type=float, default=0.85,
+                        help="Confidence threshold for --agentic (default: 0.85)")
     parser.add_argument("--domain", "-d", help="Filter by domain")
     parser.add_argument("--discipline", help="Filter by discipline")
     parser.add_argument("--depth", help="Filter by depth")
     parser.add_argument("--status", default="PASS", help="Filter by status (default: PASS)")
     parser.add_argument("--limit", "-n", type=int, default=10, help="Max results")
     parser.add_argument("--json", action="store_true", help="JSON output")
-    parser.add_argument("--no-track", action="store_true", help="D2188: disable usage tracking (read-only query)")
-    parser.add_argument("--list-domains", action="store_true", help="List all domains in DB")
+    parser.add_argument("--no-track", action="store_true",
+                        help="D2188: disable usage tracking (read-only query)")
+    parser.add_argument("--list-domains", action="store_true",
+                        help="List all domains in DB")
     args = parser.parse_args()
 
     conn = get_conn()
 
     if args.list_domains:
-        rows = conn.execute("SELECT DISTINCT discipline, depth, status FROM fbs").fetchall()
+        rows = conn.execute(
+            "SELECT DISTINCT discipline, depth, status FROM fbs"
+        ).fetchall()
         for r in rows:
             print(f"  {r['discipline']:30s} | {r['depth']:15s} | {r['status']}")
         conn.close()
         return
 
-    # Determine search mode
-    results = []
-    if args.keyword or (args.domain or args.discipline or args.depth):
+    # ── Determine search mode ──────────────────────────────────────
+    results: list[dict] = []
+    evidence_pack: EvidencePack | None = None
+
+    if args.agentic:
+        # D2205 P0: Agentic retrieval with critique loop
+        query_text: str = args.query or args.hybrid or ""
+        if not query_text:
+            print("❌ --agentic requires a query", file=sys.stderr)
+            conn.close()
+            sys.exit(1)
+        evidence_pack = agentic_search(
+            conn, query_text,
+            max_iterations=args.max_iterations,
+            confidence_threshold=args.confidence,
+            limit=args.limit,
+            domain=args.domain,
+            discipline=args.discipline,
+            depth=args.depth,
+            graph_aware=True,
+        )
+        results = evidence_pack.fbs
+    elif args.graph_aware:
+        # D2205 P1: Graph-aware search
+        query_text = args.query or args.hybrid or ""
+        if not query_text:
+            print("❌ --graph-aware requires a query", file=sys.stderr)
+            conn.close()
+            sys.exit(1)
+        results = graph_aware_search(
+            conn, query_text,
+            limit=args.limit,
+            graph_hops=args.graph_hops,
+            domain=args.domain,
+            discipline=args.discipline,
+            depth=args.depth,
+        )
+    elif args.keyword or (args.domain or args.discipline or args.depth):
         results = search_keyword(
             conn,
             domain=args.domain,
@@ -358,7 +862,7 @@ def main():
             limit=args.limit,
         )
     elif args.query:
-        # Default: try hybrid
+        # Default: hybrid search
         results = search_hybrid(conn, args.query, limit=args.limit)
     else:
         # No query: show recent
@@ -366,24 +870,64 @@ def main():
 
     conn.close()
 
-    # D2188 (P1-2): Feedback loop — track usage of every returned FB.
-    # Opens its own RW connection (retrieve conn is read-only). Skip with --no-track.
+    # D2188 (P1-2): Usage tracking
     if results and not args.no_track:
-        tracked = 0
+        tracked: int = 0
         for fb in results:
             fid = fb.get("fb_id")
             if fid:
                 mark_fb_retrieved(fid)
                 tracked += 1
-        if tracked:
+        if tracked and not args.json:
             print(f"   📈 Usage tracked: {tracked} FB(s) (--no-track to disable)")
 
+    # ── Output ─────────────────────────────────────────────────────
     if args.json:
-        print(json.dumps(results, indent=2, ensure_ascii=False))
+        output: dict = {"results": results}
+        if evidence_pack:
+            output["agentic"] = {
+                "iterations": evidence_pack.iterations,
+                "exhausted": evidence_pack.exhausted,
+                "total_fbs_found": evidence_pack.total_fbs_found,
+            }
+            if evidence_pack.critique:
+                c = evidence_pack.critique
+                output["critique"] = {
+                    "retrieval_quality": getattr(c, "retrieval_quality", "?"),
+                    "confidence": getattr(c, "confidence", 0.0),
+                    "answered_aspects": getattr(c, "answered_aspects", []),
+                    "missing_aspects": getattr(c, "missing_aspects", []),
+                    "rationale": getattr(c, "rationale", ""),
+                }
+            if evidence_pack.contradictions_surfaced:
+                output["contradictions"] = evidence_pack.contradictions_surfaced
+        print(json.dumps(output, indent=2, ensure_ascii=False))
     else:
+        if evidence_pack:
+            c = evidence_pack.critique
+            quality: str = getattr(c, "retrieval_quality", "?") if c else "?"
+            conf: float = getattr(c, "confidence", 0.0) if c else 0.0
+            rationale: str = getattr(c, "rationale", "") if c else ""
+            print(f"\n🤖 Agentic Search: {evidence_pack.iterations} iteration(s)")
+            print(f"   Quality: {quality} | Confidence: {conf:.0%}")
+            if rationale:
+                print(f"   Rationale: {rationale}")
+            if evidence_pack.exhausted:
+                print(f"   ⚠️  Iteration budget exhausted — results may be incomplete")
+            if evidence_pack.contradictions_surfaced:
+                print(f"   ⚡ {len(evidence_pack.contradictions_surfaced)} contradiction(s) surfaced")
         print(f"\n🔍 Found {len(results)} results\n")
         for i, fb in enumerate(results, 1):
-            print(format_fb(fb, i))
+            # D2205: Show graph metadata in compact mode
+            if fb.get("_graph"):
+                g = fb["_graph"]
+                fb["_graph_summary"] = (
+                    f"🔗 {len(g.get('related', []))} related"
+                    + (f" ⚡ {len(g.get('contradicts', []))} contradicts" if g.get("contradicts") else "")
+                    + (f" 📋 {len(g.get('prerequisites', []))} prereqs" if g.get("prerequisites") else "")
+                )
+            prefix = "⭐ " if fb.get("_is_seed") else "   "
+            print(prefix + format_fb(fb, i))
 
     if not results:
         print("  (no results found)")

@@ -166,6 +166,15 @@ stage6:
 coverage:                                       # T0.3: coverage gap analysis
   threshold: 0.50                               # Cosine similarity below which a segment is "under-covered"
   flag_fraction: 0.30                           # Fraction of under-covered segments that triggers a flag
+retrieval_eval:                                 # D2205 P0: retrieval evaluator configuration
+  model: Phi-4-mini-instruct-8bit               # Evaluation model (NOT the Verifier — R5 satisfied)
+  provider: omlx                                # Provider for evaluation LLM calls
+  max_tokens: 1024                              # Max tokens for critique JSON response
+  confidence_threshold: 0.85                    # Stop agentic search when confidence ≥ this
+  max_iterations: 3                             # Hard cap on retrieval rounds
+  max_fbs_to_evaluate: 15                       # Evaluate up to this many FBs per critique pass
+  fb_definition_max_chars: 300                  # Truncate FB definitions in critique prompt
+  fb_name_max_chars: 200                        # Truncate FB names in critique prompt
 e2e:                                            # T1.3: end-to-end test validation thresholds
   borp_min_sources: 2                           # Minimum source books for convergent cluster
   min_pass_rate: 0.80                           # Minimum Stage 5 PASS rate (80%)

@@ -1,110 +1,207 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-05 19:45 | **Decisions:** D2184–D2186 (3 new, T0/T1 de-hardcoding)
-> **Rule:** Undone tasks at top (priority-ordered). Done tasks at bottom.
-> **Buglog:** 8 open | **Decision log:** 135 decisions (D2000-D2186)
+> **Updated:** 2026-08-06 17:20 | **Decisions:** D2000-D2205 (205 decisions)
+> **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (37 tasks, 4 tiers)
+> **Buglog:** `governance/buglog.md` (8 open | 1,077 lines)
 
 ---
 
-## 🔴 PHASE 0 — CRITICAL ✅ COMPLETE (2026-07-26)
+## 🔥 ACTIVE — D2205 RAG ARCHITECTURE ROADMAP (2026-08-06)
 
-| # | Task | LOC | Source | Status |
-|---|------|-----|--------|--------|
-| P0.1 | **Schema accessors** — `pipeline/schema_accessor.py` typed accessor functions | +187 | D2120 | ✅ DONE |
-| P0.2 | **PipelineRunner** — `pipeline/runner.py` single entry, resume, progress | +431 | D2061, D2120 | ✅ DONE |
-| P0.3 | **FAISS R-NN** — Replace union-find with reciprocal nearest neighbors in stage1_5 | +30 | BUG-049, D2120 | ✅ DONE |
-| P0.4 | **Remove Stage 3** — Archive stage3_cluster.py, add cosine dedup to Stage 4 | -338/+40 | BUG-048, D2120 | ✅ DONE |
-| P0.5 | **Two-tier smoke** — `just smoke-plumbing` (<30s no LLM) + `just smoke` (<2min fast model) | +60 | D2120 | ✅ DONE |
-| P0.6 | **Subprocess parallelism** — `pipeline/parallel.py` book-level Stage 0/1 | +152 | DELEGATE-001, D2120 | ✅ DONE |
+> **Full spec:** `governance/D2205-rag-architecture-roadmap-2026-08-06.md` (1,091 lines)
+> **Source:** Cross-examination of Kimi, DeepSeek, Qwen, ChatGPT eval13 + codebase verification
+> **Verdict:** Ingestion pipeline = 8/10, Retrieval layer = 5/10 → build 4-phase bridge
 
-**Phase 0 gate:** ✅ PASSED. `just smoke-plumbing` passes <30s. `just smoke` passes <2min. Net ~560 LOC.
+### P0 — Agentic Retrieval Loop (Week 1)
 
----
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **D2205-P0.1** | **Retrieval evaluator** — `pipeline/retrieval_evaluator.py`. CRAG-style critique: CORRECT/PARTIAL/INCORRECT/CONTRADICTORY. Uses Phi-4-mini (local). Structured JSON output. | 0.5d | ⬜ TODO |
+| **D2205-P0.2** | **Agentic retrieval loop** — `retrieve.py:agentic_search()`. Iteration budget (3 rounds). Stop conditions: confidence≥0.85, CORRECT, or exhausted. EvidencePack output. | 0.5d | ⬜ TODO |
 
-## 🔴 TIER 0 — DE-HARDCODING COMPLETE (2026-08-05, D2184/D2186)
+### P1 — Graph Traversal Layer (Week 1-2)
 
-| # | Task | Status |
-|---|------|--------|
-| T0.1 | **Stage 2 de-hardcode** — MAX_CLUSTER_SAMPLES, SPLIT_PROBE_*, SPLIT_KMEANS_RANDOM_STATE, MAX_PROBE_SAMPLES → config | ✅ DONE (D2184) |
-| T0.2 | **OMLX call de-hardcode** — DEFAULT_TIMEOUT, MAX_RETRIES, RETRY_DELAY, TEMPERATURE → config | ✅ DONE (D2184) |
-| T0.3 | **Coverage check de-hardcode** — COVERAGE_THRESHOLD, FLAG_FRACTION → config | ✅ DONE (D2184) |
-| T0.4 | **Ollama embed de-hardcode** — NOMIC_MAX_CHARS, BATCH_SIZE → config | ✅ DONE (D2184) |
-| T0.5 | **C16: batch_convert_epubs.py:157** bare except → log error | ✅ DONE (D2186) |
-| T0.6 | **C16: fix_remaining.py:231** bare except → log error | ✅ DONE (D2186) |
-| T0.7 | **Config audit enforcement** — 48 mappings, --strict flag, just preflight integration | ✅ DONE (D2184/D2186) |
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **D2205-P1.1** | **Graph expansion** — `retrieve.py:graph_expand()`. BFS over SQLite adjacency list. Traverses `related_fbs`, `contradicts_fbs`, `prerequisite_fbs`. Zero new deps. | 1.0d | ⬜ TODO |
+| **D2205-P1.2** | **Graph-aware search** — `retrieve.py:graph_aware_search()`. Hybrid search + graph expansion + rerank by borp×feedback×graph_centrality. | 0.5d | ⬜ TODO |
 
-**Tier 0 gate:** ✅ PASSED. All 14 hardcoded tuning values migrated. 2 silent excepts fixed.
-48 registered config→code mappings. Zero drift. `just preflight` enforces on every run.
+### P2 — MCP Server (Week 2)
 
----
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **D2205-P2.1** | **MCP knowledge server** — `maxwell_mcp_server.py`. 3 tools: query_knowledge, get_fb_detail, get_fb_reliability. Read-only. Stateless. Stdio transport. | 1.0d | ⬜ TODO |
 
-## 🟠 TIER 1 — DE-HARDCODING COMPLETE (2026-08-05, D2185/D2186)
+### P3 — Evidence Pack & Two-Axis Epistemic Model (Week 2-3)
 
-| # | Task | Status |
-|---|------|--------|
-| T1.1 | **stage1_chunk** — MIN_CHUNK_WORDS → config | ✅ DONE (D2185) |
-| T1.2 | **enhance_md_headers** — MIN_HEADER_GAP_CHARS → config | ✅ DONE (D2185) |
-| T1.3 | **e2e_test** — BORP/E2E thresholds → config (try/except fallback) | ✅ DONE (D2185) |
-| T1.4 | **NLI threshold validation** — import-time sanity check (stderr warning) | ✅ DONE (D2186) |
-| T1.5 | **Config audit expansion** — 30→48 mappings (chunk, intent, S4/S5/S6 flags, smoke) | ✅ DONE (D2186) |
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **D2205-P3.1** | **Two-axis epistemic migration** — Schema: evidence_support, evidence_independence, evidence_contradiction, evidence_coverage, execution_trials, execution_successes, epistemic_state. Backfill from existing data. | 1.0d | ⬜ TODO |
+| **D2205-P3.2** | **EvidencePack dataclass** — Wire through retrieve→critique→format pipeline. Every component consumes/produces same typed object. | 0.5d | ⬜ TODO |
+| **D2205-P3.3** | **Migration script** — `pipeline/migrate_D2205_epistemic.py`. Crash-safe (C6). Idempotent. | 0.5d | ⬜ TODO |
 
-**Tier 1 deferred:**
-| T1.6 | **Path resolution standardization** (28 sys.path vs 16 pkg imports) → Tier 3 | ⏸️ DEFERRED |
-| T1.7 | **pipeline_root unused config key** (null, harmless placeholder) → Tier 3 | ⏸️ DEFERRED |
+### D2205 Gates
 
----
+| Gate | Test | Target |
+|------|------|--------|
+| P0 gate | Agentic search on 10 golden queries | ≥15% recall improvement on multi-aspect queries |
+| P1 gate | Graph-aware vs flat search on 10 complex queries | ≥3 additional relevant FBs via graph expansion |
+| P2 gate | Goose/Claude Desktop query "what does maxwell know about X?" | All 3 tools return valid results |
+| P3 gate | `PRAGMA table_info(fbs)` shows new columns | Migration verified + EvidencePack round-trip |
 
-## 🔴 PHASE 0.5 — VERIFIED BOTTLENECK FIXES (2026-08-03, D2129-D2134)
+### D2205 Rejected Proposals (with reasons)
 
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| V1 | **Streaming per-book production run** — `tests/full_run_streaming.py`; chunk→extract→classify→persist→free per book; resume checkpoint; smoke-tested (3 books → 9 FBs) | 2h | D2129, BUG-02 (hang) | ✅ DONE (2026-08-03) |
-| V2 | **Re-chunk 12 missing books** + quarantine 4 zero-byte corrupt files — resolved by V1 design (iterates all 922 config books; auto-quarantine) | 30m | D2130, BUG-057 | ✅ DONE (via V1) |
-| V3 | **Correct embedding speed claim** in stage1_5_fastembed.py (measured 564 min ≠ "~5 min") | 15m | D2131, BUG-056 | ⬜ TODO |
-| V4 | **Repoint/remove dead `books` symlink** + smoke assertion ≥900 MD | 15m | D2132 | ⬜ TODO |
-| V5 | **Expand canonical taxonomy** — +26 disciplines/+10 domains; kind-aware synonym index; measured 35/77→0/77 discipline collapse | 3h | D2133 | ✅ DONE (2026-08-03) |
-| V6 | **Fail-visible classification fallback** — log + `classification_errors` field, count failures | 30m | D2134, BUG-058 | ⬜ TODO |
-
-
+| Proposal | Why Rejected |
+|:---------|:-------------|
+| Full Self-RAG with reflection tokens | Requires training (C1). temp=0.0 blocks beam search (R7). |
+| CRAG web search fallback | Data leaves machine (C3). Replaced with broader local retrieval. |
+| ColBERT late interaction | Memory-prohibitive on M1 Max with other models loaded. |
+| Full RAPTOR hierarchy on all chunks | 564 min for flat embedding already. Recursive = weeks. |
+| vllm-mlx migration | "1 day" estimate unrealistic. Deferred to P4 backlog. |
+| Multi-agent swarm | Coordination tax 39-70%. M1 Max can't run 5+ agents × models. |
+| Neo4j graph database | External service (C3). SQLite adequate for 4K-6K FBs. |
+| LangChain/LlamaIndex | Vendor lock-in (C2). Maxwell's pipeline is cleaner. |
 
 ---
 
-## 🟠 PHASE 1 — HIGH (Next Week, After Phase 0 Verified)
+## 🟠 TIER 1 — HIGH (This Sprint, Non-D2205)
 
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| P1.1 | **USearch benchmark** vs FAISS on 500+ segments (already installed v2.26.0) | 2h | D2118, D2120 | ✅ DONE (D2121) |
-| P1.2 | **TurboVec wire-up** — Quantized FB index, Metal SIMD (already installed v0.8.0) | 1h | D2118, D2120 | ✅ DONE (D2122) |
-| P1.3 | **Golden set calibration** — Convergent golden set v3.0 (7 examples) | 2h | D2103 | ✅ DONE (D2123) |
-| P1.4 | **FB relationship edges** — Stage 4 emits `related_fbs` for LightRAG foundation | 2h | D2118 | ✅ DONE (2026-07-26) |
-| P1.5 | **20-book E2E test** — Validate v3.0 at meaningful scale | 3h | D2113 | ⬜ TODO |
-| P1.6 | **Wire schema_accessor into all 8 stages** — Remove ad-hoc .get() fallbacks | 1h | P0.1 | ✅ DONE (2026-07-26) |
-| P1.7 | **Resolve D316 vs D2066** — Multi-label disciplines adopted, SALSA rejected | 1h | D2032, D2066 | ✅ DONE (2026-07-26) |
+### Pipeline Critical Path
+
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **T1.1** | **Run S1.3→S6 pipeline** — first full run with bge-m3 512d. S0 (922 MDs) + S1 (323K segments) done. | 4h | ⬜ TODO |
+| **T1.2** | **Yield crisis diagnostic** — manual extract 10 principles from 1 book vs pipeline. 14 FBs from 852 books = 0.004% yield. | 1d | ⬜ TODO |
+| **T1.3** | **NLI calibration on real data** — validate thresholds (0.5/0.6/0.8) against bge-m3. `nli_calibrate.py` exists. | 2h | ⬜ TODO |
+
+### Fixes
+
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **T1.4** | **Fix faiss_threshold mismatch** — pipeline_config.yaml:0.75 vs session_seed.yaml:0.70. Make session_seed reference config, not copy. | 0.5h | ⬜ TODO |
+| **T1.5** | **Fix AGENTS.md stage count** — still says "9-stage" despite Stage 3 removal. Generate from canonical pipeline_config. | 0.5h | ⬜ TODO |
+| **T1.6** | **Auto-fix Ruff lint errors** — 322 auto-fixable in pipeline/. | 1h | ⬜ TODO |
+| **T1.7** | **Run LLM evaluation on golden set (25 examples)** — use 2+ LLMs. Golden set is `needs_review`. | 2h | ⬜ TODO |
+
+### Quality
+
+| # | Task | Effort | Status |
+|---|------|--------|--------|
+| **T1.8** | **Cross-encoder reranker gate** — `bge-reranker-v2-m3` ONNX between S2 and S5. Rescues yield crisis. Trade-off: 1.2GB VRAM. | 1d | ⬜ TODO |
+| **T1.9** | **Source-independence graph** — model citation chains. effective_source_count for BORP. | 1d | ⬜ TODO |
 
 ---
 
-## 🟡 PHASE 2 — MEDIUM (Within Month)
+## 🟡 TIER 2 — MEDIUM (Next Sprint)
 
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| P2.1 | **LightRAG graph overlay** on FAISS+SQLite | 8h | D2118 | ⬜ TODO |
-| P2.2 | **Cognee vs Supermemory eval** — Layer 2 agent memory | 7h | D2118 | ⬜ TODO |
-| P2.3 | **IBM Agentic KG implementation** — Layer 2 orchestration blueprint | 16h | D2116 | ⬜ TODO |
-| P2.4 | **MCP interface** — 8 tools, stdio transport (D2058) | ~200 LOC | D2058 | ⬜ TODO |
-| P2.5 | **Config validation** — Pydantic schema (D2059) | ~80 LOC | D2059 | ⬜ TODO |
-| P2.6 | **Feature flag system** (D2060) | ~40 LOC | D2060 | ⬜ TODO |
-| P2.7 | **Distribution packaging** — pyproject.toml, install.sh (D2062) | ~80 LOC | D2062 | ⬜ TODO |
+| # | Task | Effort | Source |
+|---|------|--------|--------|
+| T2.1 | Execute ONE business PI with existing FBs — existential test | 2h | Qwen, Kimi |
+| T2.2 | Atomic evidence schema — per-passage NLI, not majority vote | 2d | ChatGPT C9 |
+| T2.3 | Monotonic trust state machine — DB-level transition constraints | 2d | ChatGPT C7 |
+| T2.4 | Surface reliability scores in Zone 3 — context-conditioned | 1d | DeepSeek, Kimi |
+| T2.5 | skill.md standard (Layer 2 MVP) — IBM progressive disclosure | 4h | aggregated |
+| T2.6 | Hardware probe (C24) — auto-detect RAM, select model quant | 3h | aggregated |
+| T2.7 | 20-book E2E test — validate v3.0 at scale | 3h | aggregated |
+| T2.8 | Integration test suite — `just test` golden-file regression | 4h | aggregated |
+| T2.9 | Adversarial golden set — contradiction, false convergence tests | 2d | ChatGPT §41 |
+| T2.10 | RAGTruth hallucination suite — 10 adversarial test types | 1d | ChatGPT §14 |
+| T2.11 | ARES component evaluation — per-component metrics | 1d | ChatGPT §40 |
+| T2.12 | One pipeline authority — canonical DAG → generated docs | 1d | ChatGPT §3 |
+| T2.13 | Split config into active/archived/experiments | 1d | ChatGPT C13 |
+| T2.14 | Collapse config authority — one canonical YAML per domain | 1d | ChatGPT C15 |
+| T2.15 | Prompt lineage stamping — prompt_id, prompt_hash, prompt_version | 1d | ChatGPT C16 |
+| T2.16 | Move taxonomy from hardcoded Literal to YAML-driven | 2d | DeepSeek D5 |
 
 ---
 
-## 🟢 PHASE 3 — LATER (Evaluate When Needed)
+## ⚪ TIER 3 — LOW (Backlog, 6-8 Weeks)
 
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| P3.1 | **Cross-platform memory/process** — psutil for Linux/Windows (D2057) | ~110 LOC | D2057 | ⬜ TODO |
-| P3.2 | **Hybrid sync protocol** — Multi-machine KB sharing stub (D2063) | ~30 LOC | D2063 | ⬜ TODO |
-| P3.3 | **Semantica eval** — Graph-native infrastructure (1,440★) | 2h | D2118 | ⬜ TODO |
-| P3.4 | **Neo4j llm-graph-builder eval** — Graph construction from unstructured data | 2h | D2118 | ⬜ TODO |
-| P3.5 | **LEANN eval** — 97% storage savings RAG (12,732★) | 2h | D2118 | ⬜ TODO |
+| # | Task | Effort | Source |
+|---|------|--------|--------|
+| T3.1 | USearch vs FAISS benchmark | 2h | aggregated |
+| T3.2 | MeshRAG hash-driven clustering eval | 1d | DeepSeek |
+| T3.3 | Leiden clustering via python-igraph | 2h | Qwen |
+| T3.4 | Schema migration scripts — v2.x → v3.0, recover v1 FBs | 3h | aggregated |
+| T3.5 | HyDE for abstract queries | 1d | ChatGPT §20 |
+| T3.6 | Multi-perspective retrieval (STORM-inspired) | 1d | ChatGPT §32 |
+| T3.7 | ColBERT benchmark on Maxwell corpus | 1d | ChatGPT §22 |
+| T3.8 | Pydantic AI harness for agent orchestration | 1w | Kimi |
+| T3.9 | Agent execution safety boundary — Plan→Policy→Auth→Execute→Rollback | 3d | ChatGPT C14 |
+| T3.10 | Dry-run mode on all stages | 4h | aggregated |
+| T3.11 | Modularize stage2_extract (1,480 lines) + stage4_merge (1,260 lines) | 3d | Kimi |
+
+---
+
+## 🔵 TIER 4 — RESEARCH (Ongoing, from D2116 feed.opml)
+
+| # | Foundation | Status |
+|---|-----------|--------|
+| R1 | Typed Graph Storage — Zep/Graphiti eval | ⬜ DEFERRED |
+| R2 | Edge Type Ontology — 10-15 types, machine-checkable | ⬜ DEFERRED |
+| R3 | Skill Subgraph Templates — graduate when 50+ skills | ⬜ DEFERRED |
+| R4 | Constitutional Constraint Graph — C1-C28 as graph invariants | ⬜ DEFERRED |
+| R5 | Self-Observation Protocol — agent queries own graph | ⬜ DEFERRED |
+| R6 | IBM course transcript for Layer 2 | ⬜ DEFERRED |
+| R7 | GAAMA 4-node memory — episodes+facts+reflections+concepts | ⬜ DEFERRED |
+| R8 | awesome-agent-skills repo eval | ⬜ DEFERRED |
+| R9 | caveman prompt framework — local-first S2 prompts | ⬜ DEFERRED |
+| R10 | vLLM-mlx for multi-agent — deferred, OMLX adequate | ⬜ DEFERRED |
+| R11 | LanceDB unified store — only if sqlite-vec hits limits | ⬜ DEFERRED |
+| R12 | ONNX runtime for NLI — only if ModernBERT too heavy | ⬜ DEFERRED |
+
+---
+
+## 🔴 OPEN BUGS (from buglog.md)
+
+| Bug ID | Severity | Description | Status |
+|--------|----------|-------------|--------|
+| BUG-001 | 🔴 CRITICAL | Empty pass loop — verification checks random principles | 🔴 OPEN |
+| BUG-053 | 🔴 CRITICAL | Phi-4-mini HALLUCINATES on open-ended research | 🔴 OPEN — Mitigated in D2205 P0 (classification only) |
+| BUG-054 | 🔴 CRITICAL | Qwen3-Coder delegate fails — OMLX JSON parse error | 🔴 OPEN |
+| BUG-055 | 🔴 CRITICAL | `related_fbs` vs `related_blocks` field name mismatch | 🔴 OPEN — Blocks delegation |
+| BUG-051 | 🟡 MED | `just smoke` processes ALL 852 books instead of 1 | 🟡 OPEN |
+| BUG-045 | 🟡 MED | Stage 2 evidence passages inflated | 🟡 OPEN — Deferred |
+| BUG-046 | 🟡 MED | Stage 4 merge complexity for v3.0 | 🟡 OPEN |
+| BUG-050 | 🟡 MED | Only 3 of 20 books chunked — insufficient convergence | 🟡 OPEN |
+
+---
+
+## ✅ COMPLETED — D2195-D2204 (2026-08-05/06 Immediate Fixes)
+
+| # | Task | Decision |
+|---|------|----------|
+| ✅ | Zero-vector fallback → EmbeddingQuarantineError | D2196 |
+| ✅ | LICENSE (MIT) | D2200 |
+| ✅ | session_seed.yaml sync (NLI, stage3, 8-stage) | D2197 |
+| ✅ | model_assignments.yaml sync (REVIEWER, S5_FB_VERIFIER) | D2199 |
+| ✅ | stage6_commit INSERT 49→48 column fix | D2203 |
+| ✅ | AGENTS.md + architecture docs stage3 purge | D2198 |
+| ✅ | Ruff/mypy pipeline exclusion removed | D2201 |
+| ✅ | ollama import removed → batch_embed delegation | D2202 |
+| ✅ | just preflight exit bug fixed | D2203 |
+| ✅ | integrity_check.py 17 checks (17/17 pass) | D2203 |
+| ✅ | requirements.lock deterministic | D2203 |
+| ✅ | Golden set 10→25 (full properties, 21 domains, 5 negatives) | D2204 |
+| ✅ | Master LLM eval prompt v2.0 | D2204 |
+
+## ✅ COMPLETED — D2184-D2186 (2026-08-05 De-hardcoding)
+
+| # | Task | Decision |
+|---|------|----------|
+| ✅ | T0.1-T0.7: All 14 hardcoded tuning values → config | D2184 |
+| ✅ | C16: batch_convert_epubs.py + fix_remaining.py bare excepts | D2186 |
+| ✅ | Config audit: 48 mappings, --strict flag, preflight integration | D2184/D2186 |
+| ✅ | T1.1-T1.5: chunk, headers, e2e, NLI, config audit expansion | D2185/D2186 |
+
+## ✅ COMPLETED — Phase 0-1.5 (2026-07-26/28)
+
+| # | Task | Date |
+|---|------|------|
+| ✅ | P0.1-P0.6: schema_accessor, runner, R-NN, Stage 3 removal, smoke, parallel | 2026-07-26 |
+| ✅ | P1.1-P1.7: USearch, TurboVec, golden set, relationship edges, schema wiring | 2026-07-26 |
+| ✅ | D2121-D2126: De-hardcoding, Anytype, session agreements, extraction strategy | 2026-07-28 |
+| ✅ | Matryoshka 512-dim, ModernBERT NLI tested, OKF export planned | 2026-07-27 |
 
 ---
 
@@ -112,140 +209,16 @@
 
 | # | Task | Why Rejected | Source |
 |---|------|-------------|--------|
-| R1 | Cloud burst (GPT-4o-mini) | Violates C1/C3 | Kimi review |
-| R2 | LangChain dependency | 50MB for problem we don't have (C5) | D2010 |
-| R3 | GraphRAG (Microsoft) | Heavy, cloud-native | D2118 |
-| R4 | LanceDB/DuckDB storage | SQLite works, no proven need (C5) | D2048 |
-| R5 | Dagster/Prefect orchestration | Heavy, PipelineRunner <300 LOC | D2061 |
-| R6 | Full Pydantic migration | Breaks checkpoints, schema accessors sufficient | D2120 |
-| R7 | Leiden algorithm | Premature optimization | Kimi review |
-| R8 | OpenFActScore | Overengineered | Kimi review |
-
----
-
-## ✅ DONE (Pre-Phase 0)
-
-| # | Task | Date |
-|---|------|------|
-| C1 | Delegate system workaround (local OMLX) | 2026-07-26 |
-| C2 | Governance sync (115 decisions) | 2026-07-26 |
-| C4 | CONSTITUTION NLI mismatch fix | 2026-07-26 |
-| C5 | DELEGATE-001 logged to buglog | 2026-07-26 |
-| C6 | BUG-053 logged (Phi-4-mini hallucination) | 2026-07-26 |
-| C7 | BUG-054 logged (Qwen3-Coder parse error) | 2026-07-26 |
-| H1 | BUG-051 fix (smoke limit) | 2026-07-26 |
-| H4 | BUG-048 fix (HDBSCAN bypass) | 2026-07-26 |
-| — | v3.0 architecture (D2094-D2113) | 2026-07-25 |
-| — | 14 foundation fixes (Phase 0 original) | 2026-07-21 |
-| — | GitHub backup (v3.0 checkpoint, commit 245d737) | 2026-07-26 |
-
----
-
-## 📋 OPEN BUGS (3)
-
-| Bug | Severity | Status |
-|-----|----------|--------|
-| DELEGATE-001 | 🔴 CRITICAL | 🟢 IMPROVED — gemma-4-E4B + Qwen3-Coder confirmed working via OMLX. Subprocess parallel.py for pipeline. |
-| BUG-017 | 🔴 CRITICAL | 🟡 MONITOR — OMLX watchdog enhanced, needs stress test |
-| BUG-050 | 🟡 MEDIUM | ⬜ TODO — Need 5+ book chunk run (→ P1.5: 20-book E2E test) |
-
----
-
-## ✅ DONE (Post-Phase 0)
-
-| # | Task | Date |
-|---|------|------|
-| P0.1-P0.6 | Phase 0 refactor (schema_accessor, runner, R-NN, Stage 3 removal, smoke, parallel) | 2026-07-26 |
-| P1.1 | USearch benchmark (D2121: FAISS+R-NN wins) | 2026-07-26 |
-| P1.2 | TurboVec backend (D2122: 4-bit quantized, 8× compression) | 2026-07-26 |
-| P1.3 | Convergent golden set v3.0 (D2123: 7 examples) | 2026-07-26 |
-| P1.4 | FB relationship edges (domain/discipline/source/semantic) | 2026-07-26 |
-| P1.6 | schema_accessor wired into stage4/5/6 | 2026-07-26 |
-| P1.7 | D316 vs D2066 resolved: multi-label disciplines adopted, SALSA rejected | 2026-07-26 |
-| C1 | Delegate system workaround (local OMLX) | 2026-07-26 |
-| C2 | Governance sync (115 decisions) | 2026-07-26 |
-| C4 | CONSTITUTION NLI mismatch fix | 2026-07-26 |
-| **D2121** | **C12 De-Hardcoding:** 19 values from tests/full_run.py → config/pipeline_config.yaml | 2026-07-28 |
-| **D2122** | **Anytype Push Complete Payload:** 42-field payloads, 3-zone body, PT/PI/GE/TI export | 2026-07-28 |
-| **D2123** | **Session Agreements Formalized:** Citation format, jargon body-only, body-only fields, related_blocks mandatory | 2026-07-28 |
-| **D2124** | **Extraction Strategy:** Domain-by-domain sequential (Design→AI→Systems→Substrate→Art→Business→Personal→Influence) | 2026-07-28 |
-| **D2125** | **Pipeline Throughput Estimate:** 5-10s per FB (~6.0s weighted avg), well under 30s threshold | 2026-07-28 |
-| **D2126** | **ModernBERT NLI Confirmed Active:** Live in stage5_verify, DeBERTa fallback | 2026-07-28 |
-
----
-
-## 🟢 EXTRACTION STRATEGY (D2124) — 2026-07-28
-
-**Domain-by-Domain Sequential Extraction** is the recommended production start.
-
-### Extraction Order:
-| # | Domain | Rationale | Est. FBs |
-|---|--------|-----------|----------|
-| 1 | **Design** (DOMAIN 2) | Largest, most diverse: comm design, UX, brand, typography | 200-400 |
-| 2 | **AI + Computing** (DOMAIN 6) | PT-rich: engineering patterns, agent architecture, ML ops | 150-300 |
-| 3 | **Systems + Decision** (DOMAIN 0) | Universal principles: systems thinking, decision theory | 100-200 |
-| 4 | **Substrate** (DOMAIN 1) | Mind, math, meaning: semiotics, cognition, philosophy | 100-200 |
-| 5 | **Art + Comp. Media** (DOMAIN 3) | Specialized: glitch, computational art, media theory | 100-150 |
-| 6 | **Business** (DOMAIN 4) | Strategy, entrepreneurship, marketing | 100-200 |
-| 7 | **Personal Practice** (DOMAIN 5) | Productivity, creativity, learning | 80-150 |
-| 8 | **Influence + Power** (DOMAIN 7) | Negotiation, persuasion, politics | 80-150 |
-
-### After All Domains:
-- Cross-domain re-classification pass (many domain FBs will become cross-domain/universal)
-- Full PT/PI/GE/TI commitment to database
-- LightRAG graph construction from `compute_fb_relationships()` edges
-
-### Expected Throughput (D2125):
-- ~5-10s per FB end-to-end
-- Domain 2 (~300 FBs): ~25-50 minutes
-- Full corpus (~1400 FBs): ~2-4 hours
-
----
-
-*Register synchronized with D2121-D2126. Session agreements enforced.*
-
----
-
-## 🟢 PHASE 1.5 — ENHANCEMENTS (2026-07-27)
-
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| **E7** | **Matryoshka 512-dim** — Truncate bge-m3 embeddings, 2× faster FAISS, 92% neighbor overlap | 0.5h | D2118 | ✅ DONE |
-| **E6a** | **ModernBERT NLI** — Replace DeBERTa-v3 in stage5_verify, 2× faster with 8192 ctx | 1h | D2119 | ⏳ TESTED |
-| **E6b** | **ModernBERT threshold calibration** — Recalibrate NLI_ENTAILMENT_THRESHOLD for ModernBERT scores | 0.5h | D2119 | 📋 TODO |
-| **E6c** | **ModernBERT fallback config** — Add NLI model toggle in pipeline_config.yaml | 0.3h | D2119, C12 | 📋 TODO |
-| **OKF1** | **Stage 6b OKF export** — `pipeline/stage6_okf_export.py` FBs → .okf/ bundle | 2h | D2120 | 📋 PLANNED |
-| **OKF2** | **OKF index.md generator** — Domain-driven hierarchy, progressive disclosure map | 1h | D2120 | 📋 PLANNED |
-| **OKF3** | **OKF CI gate** — Add `okf validate .okf/ && okf lint .okf/` to justfile | 0.5h | D2120 | 📋 PLANNED |
-
-### Enhancement Summary (2026-07-27)
-
-| Improvement | Speed Gain | Quality Impact | Risk | Status |
-|------------|:----------:|:--------------:|:----:|:------:|
-| bge-m3 512-dim Matryoshka | 2.0× search | Neutral (92% overlap) | LOW | ✅ DONE |
-| ModernBERT-base-nli | 2.0× NLI | Neutral (90% = 90%) | LOW | ⏳ TESTED |
-| OKF export (stage 6b) | N/A | Better agent consumption | NONE | 📋 PLANNED |
-
-### Model Inventory Update
-
-| Model | Role | Size | Speed | Context | Status |
-|-------|------|------|:-----:|:-------:|:------:|
-| Qwen3.6-35B-A3B-4bit | Generator | ~18GB | 30 tok/s | 262K | ✅ Active |
-| Phi-4-mini-instruct-8bit | Verifier | ~8GB | 32 tok/s | 128K | ✅ Active |
-| gemma-4-E4B-it-MLX-4bit | VerifierV2 | ~6GB | 27 tok/s | 128K | ✅ Active |
-| bge-m3 → 512-dim | Embeddings | ~2GB | 2s/embed | N/A | ✅ Upgraded |
-| DeBERTa-v3 → ModernBERT | NLI | 571MB | 64ms/check | 512→8192 | ⏳ Switching |
-
-## 🟡 PHASE 1.5 — ACTIVE (2026-08-05, D2148-D2150)
-
-| # | Task | Effort | Source | Status |
-|---|------|--------|--------|--------|
-| S1 | **Singleton extraction pass** — `python3 pipeline/stage2_extract.py --process-singletons` | ~30 min (2,804 calls × 3 workers) | D2149 | ⬜ TODO |
-| S2 | **Coverage gap analysis** — `python3 pipeline/coverage_check.py` after S2 | ~10 min | D2149 | ⬜ TODO |
-| S3 | **Golden set expansion** — Sample 30-40 diverse clusters, manual review, add to YAML | ~2h human review | D2127 | ⬜ TODO |
-| S4 | **Re-run S2 with expanded golden + dynamic selection** | ~60-90 min | D2127 | ⬜ TODO |
-| S5 | **S5 NLI threshold tuning** — Lower 0.6→0.55 for aggressive contradiction detection | 1-line config | D2149 | ⬜ TODO |
-| S6 | **Evidence book coverage check** — Flag FBs citing <25% of cluster books | ~30 LOC | D2149 | ⬜ TODO |
-| S7 | **Resolve BUG-056** — Fix embedding speed claim docstring | 15 min | D2131 | ⬜ TODO |
-| S8 | **Resolve BUG-057** — Re-chunk 12 valid missing books | 30 min | D2130 | ⬜ TODO |
-| S9 | **Resolve BUG-058** — Fail-visible classification fallback | 30 min | D2134 | ⬜ TODO |
+| R1 | Cloud burst (GPT-4o-mini) | Violates C1/C3 | Kimi |
+| R2 | LangChain dependency | Vendor lock-in (C2) | D2010 |
+| R3 | Microsoft GraphRAG | Heavy, cloud-native | D2118 |
+| R4 | LanceDB/DuckDB storage | SQLite adequate (C5) | D2048 |
+| R5 | Dagster/Prefect orchestration | PipelineRunner <300 LOC | D2061 |
+| R6 | Full Pydantic migration | Schema accessors sufficient | D2120 |
+| R7 | Leiden algorithm (for now) | Louvain adequate. Revisit at scale. | Kimi |
+| R8 | OpenFActScore | Overengineered | Kimi |
+| — | Self-RAG reflection token training | C1 (cost) + R7 (temp=0.0) | D2205 |
+| — | CRAG web search fallback | C3 (sovereignty) | D2205 |
+| — | ColBERT late interaction | M1 Max memory | D2205 |
+| — | Multi-agent swarm | Coordination tax 39-70% | D2205 |
+| — | Neo4j graph database | External service (C3) | D2205 |

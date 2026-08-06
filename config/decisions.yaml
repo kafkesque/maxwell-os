@@ -1337,6 +1337,15 @@ summary:
     governance: 1
 by_category:
   INF: 93
+- id: D2205
+  date: 2026-08-06
+  status: ACTIVE
+  category: ARCH
+  summary: "RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d), integration (1d). Full specs with Maxwell-adapted code in governance/D2205-rag-architecture-roadmap-2026-08-06.md (1,091 lines). 13 proposals rejected with constraint-violation reasons."
+  link: "governance/D2205-rag-architecture-roadmap-2026-08-06.md"
+  predecessor: D2195
+  successor: null
+
   QLT: 19
   GOV: 9
   RES: 4
@@ -1348,4 +1357,4 @@ by_category:
   PERF: 3
   BUGFIX: 10
   CFG: 4
-  ARCH: 4
+  ARCH: 5

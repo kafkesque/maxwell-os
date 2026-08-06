@@ -70,19 +70,26 @@ BOOKS/                          852 books across 8 domain folders
   │
   ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ STAGE 3: CLUSTER                  Principles → Clusters      │
-│ Embed: nomic-embed-text (Ollama)  253 lines                  │
-│ Reduce: PCA (50 dims)             7 functions                │
-│ Cluster: HDBSCAN (density-based)                            │
-│ Output: stage3_cluster.jsonl      (clusters + cohesion)      │
+│ STAGE 1.5: EMBED + CLUSTER        Segments → Clusters        │
+│ Embed: bge-m3 (Ollama, 512-dim)   cluster-before-extract     │
+│ Cluster: FAISS R-NN + Louvain     D2120: replaces old Stage 3│
+│ Output: bucket_clusters/          (cross-source clusters)    │
 └──────────────────────────────────────────────────────────────┘
   │
   ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ STAGE 4: MERGE + CLASSIFY         Clusters → FBs             │
-│ Generator: Qwen3-Coder-30B (OMLX) 473 lines                  │
-│ Method: Merge principles → FB     8 functions                │
-│ Classify: SALSA single-pass       temp=0.0 (R7)              │
+│ STAGE 2: CONVERGENT EXTRACT      Clusters → FBs              │
+│ Generator: Qwen3.6-35B-A3B (OMLX) 1,480 lines                │
+│ Method: 1 LLM call per cluster    temp=0.0 (R7)              │
+│ Output: principles.jsonl          (convergent FBs per cluster)│
+└──────────────────────────────────────────────────────────────┘
+  │
+  ▼
+┌──────────────────────────────────────────────────────────────┐
+│ STAGE 4: MERGE + CLASSIFY         FBs → classified FBs       │
+│ Generator: Phi-4-mini (OMLX)      1,260 lines                 │
+│ Method: Merge + BORP + classify   8 functions                │
+│ Classify: multi-label (D2066)     temp=0.0 (R7)              │
 │ SYNONYM MATCH: 643-entry index    (P1.5-B: new in v2.0.1)   │
 │ RAW PRESERVE: domains_raw,        (P1.5-A: Channel B fix)    │
 │              discipline_raw                                  │
@@ -265,7 +272,7 @@ JSONL checkpoint files — each stage reads previous, writes its own:
 stage0_convert.jsonl:  [{path, book_path, format, word_count}, ...]
 stage1_chunk.jsonl:    [{segment_id, text, source_book, char_start, char_end, word_count}, ...]
 stage2_extract.jsonl:  [{principle_id, principle_text, source_segments, source_books}, ...]
-stage3_cluster.jsonl:  [{cluster_id, principle_ids, centroid_text, cohesion, size}, ...]
+# stage3_cluster.jsonl: REMOVED (D2120) — cluster-before-extract replaces HDBSCAN. Clustering now in Stage 1.5.
 stage4_merge.jsonl:    [{fb_id, name, definition, ..., domains, discipline, domains_raw, ...}, ...]
 stage5_verify.jsonl:   [{...all FB fields..., verification_results, status, borp_score}, ...]
 stage6_commit.jsonl:   [{fb_id, name, status, committed_to_sqlite, parquet_snapshot}, ...]
@@ -276,8 +283,8 @@ stage6_commit.jsonl:   [{fb_id, name, status, committed_to_sqlite, parquet_snaps
 | Stage | Method | What It Prevents |
 |-------|--------|-----------------|
 | Stage 1 | SHA-256 hash of text | Exact duplicate segments |
+| Stage 1.5 | FAISS R-NN + Louvain | Cross-source convergence clustering (replaces old Stage 3 HDBSCAN) |
 | Stage 2 | MinHash LSH | Near-duplicate principles |
-| Stage 3 | HDBSCAN + PCA | Semantic duplicates via clustering |
 | Stage 4 | SHA-256 of name+definition | Duplicate FBs across runs |
 
 ---
@@ -349,10 +356,11 @@ Compression: Snappy. Compatible with DuckDB, Pandas, any data tool.
 
 | Role | Model | Provider | Port | Cost |
 |------|-------|----------|------|------|
-| **Generator** (Stages 2, 4) | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | OMLX | 11435 | $0 |
-| **Verifier** (Stage 5) | Phi-4-mini-instruct-8bit | OMLX | 11435 | $0 |
-| **Embedder** (Stage 3) | nomic-embed-text | Ollama | 11434 | $0 |
-| **Planned: Cross-family verifier** | Gemma-4-26B-A4B-it-OptiQ-4bit | OMLX | 11435 | $0 |
+| **Generator** (Stage 2) | Qwen3.6-35B-A3B-4bit | OMLX | 11435 | $0 |
+| **Classifier** (Stage 4) | Phi-4-mini-instruct-8bit | OMLX | 11435 | $0 |
+| **Verifier** (Stage 5) | ModernBERT-large + gemma-4-E4B-it-MLX-4bit | local + OMLX | 11435 | $0 |
+| **Embedder** (Stage 1.5) | bge-m3 (512-dim Matryoshka) | Ollama | 11434 | $0 |
+| **Cross-family verifier** (Stage 5) | gemma-4-E4B-it-MLX-4bit | OMLX | 11435 | $0 |
 
 ### API Wrappers
 
@@ -588,7 +596,7 @@ trust_tier: "watch"
 | `stage0_convert.py` | 280 | EPUB/PDF → Markdown |
 | `stage1_chunk.py` | 268 | MD → Segments + SHA-256 dedup |
 | `stage2_extract.py` | 277 | Principles + MinHash dedup |
-| `stage3_cluster.py` | 253 | Embed + PCA + HDBSCAN |
+| `stage3_cluster.py` | ❌ REMOVED (D2120) | Replaced by Stage 1.5 FAISS + Louvain cluster-before-extract |
 | `stage4_merge.py` | 473 | Clusters → FBs + SALSA + synonym match |
 | `stage5_verify.py` | 313 | BORP + completeness + factual check |
 | `stage6_commit.py` | 364 | SQLite + Parquet + FTS5 |

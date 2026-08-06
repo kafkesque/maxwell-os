@@ -17,6 +17,17 @@ Usage:
 # ── Type aliases (replaces chromadb imports) ──────────────────────────────
 from collections.abc import Sequence
 
+
+class EmbeddingQuarantineError(Exception):
+    """Raised when embedding fails and document must be quarantined.
+
+    D2196: Zero-vector fallback DELIBERATELY REMOVED.
+    Never insert [0.0]*dim into FAISS — it creates false convergence clusters
+    that satisfy BORP (multiple sources!) from network errors alone.
+    """
+    pass
+
+
 from pipeline.pipeline_paths import (
     OLLAMA_BATCH_SIZE,
     OLLAMA_HOST,
@@ -84,23 +95,24 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
                 results.extend(batch_embs)
                 missing = len(truncated) - len(batch_embs)
                 dim = len(batch_embs[0]) if batch_embs else 768
-                results.extend([[0.0] * dim] * missing)
-        except Exception:
-            # Fall back to single-doc embedding for this batch
-            import ollama
-
-            for doc in truncated:
-                try:
-                    resp = ollama.embeddings(model=model, prompt=doc)
-                    results.append(resp["embedding"])
-                except Exception:
-                    # Zero vector fallback
-                    try:
-                        resp = ollama.embeddings(model=model, prompt="x")
-                        dim = len(resp["embedding"])
-                    except Exception:
-                        dim = 768
-                    results.append([0.0] * dim)
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Embedding batch partial response: {missing}/{len(truncated)} missing. Quarantining batch.")
+                raise EmbeddingQuarantineError(
+                    f"Batch embedding returned {len(batch_embs)}/{len(truncated)} vectors. "
+                    f"{missing} documents failed. Full batch quarantined to prevent FAISS contamination."
+                )
+        except EmbeddingQuarantineError:
+            raise
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Embedding batch failed: {e}. Quarantining batch to prevent zero-vector contamination.")
+            raise EmbeddingQuarantineError(
+                f"Batch embedding completely failed ({e}). "
+                f"Batch of {len(truncated)} documents quarantined. "
+                f"Zero-vector fallback DELIBERATELY REMOVED (D2196) — never insert synthetic vectors into FAISS."
+            ) from e
     return results
 
 
@@ -122,24 +134,8 @@ class OllamaEmbeddingFunction(EmbeddingFunction):
         if len(input) > 1:
             return batch_embed(list(input))
 
-        # Single document fallback
-        import ollama
-
-        result = []
-        for _i, doc in enumerate(input):
-            if len(doc) > NOMIC_MAX_CHARS:
-                doc = doc[:NOMIC_MAX_CHARS]
-            try:
-                resp = ollama.embeddings(model=self._model, prompt=doc)
-                result.append(resp["embedding"])
-            except Exception:
-                try:
-                    resp = ollama.embeddings(
-                        model=self._model, prompt=doc[:2000]
-                    )
-                    result.append(resp["embedding"])
-                except Exception:
-                    fallback = ollama.embeddings(model=self._model, prompt="x")
-                    dim = len(fallback["embedding"])
-                    result.append([0.0] * dim)
-        return result
+        # Single document — delegate to batch_embed (single code path).
+        # D2202: Replaced `import ollama` (undeclared dependency) with delegation
+        # to batch_embed which uses requests directly. The ollama Python package
+        # is intentionally NOT in requirements.txt — all embedding uses HTTP API.
+        return batch_embed(list(input))

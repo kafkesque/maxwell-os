@@ -1,7 +1,10 @@
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-extend-exclude = ["knowledge pipeline/", "backup/", "agent/archive/", "external/"]
+# D2201: Removed "knowledge pipeline/" from exclusions — pipeline code is NOT optional.
+# The most critical code (stage2_extract, stage4_merge, stage5_verify) must pass lint.
+# Previous exclusion was a deliberate blindspot where bugs lived.
+extend-exclude = ["backup/", "agent/archive/", "external/"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "UP", "B"]
@@ -11,7 +14,7 @@ ignore = ["E501", "B008"]
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
-exclude = "(knowledge pipeline/|backup/|agent/archive/|external/)"
+exclude = "(backup/|agent/archive/|external/)"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

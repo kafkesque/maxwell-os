@@ -1,6 +1,45 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-07-28 15:30 (D2121-D2126 implemented, BUG-055 found+fixed)
+> **Last updated:** 2026-08-06 16:00 (D2195-D2201 cross-examination + surgical fixes)
 > **Next review:** After domain-by-domain extraction run (D2124)
+
+---
+
+### D2195-D2201: Cross-Examination Ultimate Verdict — Bugs Found & Fixed (2026-08-06)
+
+Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) + direct codebase verification. Full report: `governance/cross-examination-ultimate-verdict-2026-08-06.md`.
+
+**P0 Fixes Applied:**
+- ZERO-VECTOR-001: `ollama_embed.py` — removed all zero-vector fallbacks (2 paths). Replaced with `EmbeddingQuarantineError`. D2196.
+- LICENSE-MISSING: Added MIT LICENSE. D2200.
+- SESSION-NLI-STALE: `session_seed.yaml` NLI model corrected from `roberta-large-mnli` → `ModernBERT-large`. D2197.
+- SESSION-STAGE3-GHOST: `session_seed.yaml` stage3 removed, corrected to 8-stage. D2197.
+- MODEL-VARIANT-MISMATCH: `model_assignments.yaml` — documented OptiQ/non-OptiQ split, fixed REVIEWER (broken DeepSeek → gemma), fixed S5_FB_VERIFIER (Qwen→Gemma for R5 cross-family). D2199.
+
+**P1 Fixes Applied:**
+- AGENTS-STAGE3-GHOST: `AGENTS.md` stage3_cluster.py reference commented out with removal note. D2198.
+- RUFF-EXCLUDES-PIPELINE: `pyproject.toml` — removed `knowledge pipeline/` from both Ruff and mypy exclusions. D2201.
+- STAGE4-FUNCTION-MISNAMED: `stage4_merge.py` `load_stage3_clusters()` → `load_stage2_clusters()`. D2198.
+- KNOWLEDGE-ARCHITECTURE-STALE: `KNOWLEDGE-PIPELINE-ARCHITECTURE.md` — updated to 8-stage pipeline, removed all stage3 references. D2198.
+- WATCHDOG-LOG-COMMITTED: Removed `omlx_watchdog.log` and `.omlx_watchdog_state.json` from repo.
+
+**P2 Fixes Applied (2026-08-06):**
+- O1: `ollama_embed.py` — removed undeclared `import ollama`. Single-doc path now delegates to batch_embed (requests-based). D2202.
+- O2: `.DS_Store` files cleaned from repository.
+- D2203: `pipeline/integrity_check.py` — 17 automated checks. `just integrity` + `just integrity-quick` commands. Added to health+preflight.
+- D2203: Deterministic lockfile — `requirements.lock` generated via `uv pip compile`.
+- D2203: `just preflight` exit bug fixed — `exit(0 if ok else 0)` → `exit(0 if ok else 1)`.
+- D2203: `stage6_commit.py` — INSERT column/placeholder mismatch fixed (49→48, added s3_original_domain, removed is_summary + classification_status).
+- D2203: `.ponytail.yaml` — YAML escape character fixed (`\|` → `\\|`).
+
+**Deferred to Future Phases:**
+- Atomic evidence schema (per-passage NLI scores)
+- Monotonic trust state machine
+- bge-m3 to MLX-native (investigate MPS deadlock first)
+- Context-conditioned reliability in Zone 3
+- Graph-aware retrieval
+- Agent execution safety boundary (MCP server + Pydantic AI harness)
+- Modularize stage2/stage4 god modules
+- Run auto-fix on 476 Ruff lint errors (322 auto-fixable)
 
 ---
 

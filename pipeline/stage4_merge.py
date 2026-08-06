@@ -471,11 +471,12 @@ def dedup_fbs_by_cosine(
     return fbs
 
 
-def load_stage3_clusters() -> list[dict]:
-    """D2120: Always loads from Stage 2 FBs (Stage 3 removed).
+def load_stage2_clusters() -> list[dict]:
+    """D2198: Renamed from load_stage3_clusters (Stage 3 removed per D2120).
 
-    The old Stage 3 HDBSCAN checkpoint is archived — it no longer exists.
-    Stage 1.5 clustering + Stage 2 convergent extraction replaced it.
+    Always loads from Stage 2 FBs — Stage 1.5 clustering + Stage 2 convergent
+    extraction replaced the old HDBSCAN pipeline. The old function name was
+    misleading (it never loaded Stage 3 data, always loaded Stage 2).
     """
     clusters, _ = load_stage2_fbs_via_clusters()
     return clusters
@@ -752,7 +753,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         print("❌ OMLX is not running.")
         sys.exit(1)
 
-    clusters = load_stage3_clusters()
+    clusters = load_stage2_clusters()
     principles_idx = load_stage2_principles()
 
     if cluster_ids:

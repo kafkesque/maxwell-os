@@ -13,7 +13,10 @@ pyarrow>=14.0          # Parquet export
 
 # ── LLM inference (local, C1) ───────────────────────
 requests>=2.28         # OMLX/Ollama HTTP calls
-# ollama>=0.4           # Optional: Ollama Python client (fallback)
+# ollama>=0.4           # D2202: INTENTIONALLY NOT INSTALLED. All Ollama calls use requests HTTP API directly.
+#                       # The ollama Python package would add a daemon-management dependency.
+#                       # If added in future, also update ollama_embed.py which currently delegates
+#                       # single-doc path to batch_embed (requests-based).
 
 # ── Embeddings & clustering ─────────────────────────
 numpy>=1.24

@@ -1,6 +1,0 @@
-[2026-07-23 17:01:16] WARNING: OMLX RSS 26.4GB exceeds threshold 12.0GB. Restarting...
-[2026-07-23 17:01:16] Sent SIGTERM to OMLX (PID 88658)
-[2026-07-23 17:01:18] OMLX (PID 88658) terminated gracefully
-[2026-07-23 17:01:21] Started OMLX on port 11435 with --memory-guard aggressive
-[2026-07-23 17:01:21] Waiting 30s for OMLX to initialize...
-[2026-08-05 14:25:47] OMLX OK: RSS 4.3GB (delta +0.0GB, threshold 20.0GB, restarts: 0)

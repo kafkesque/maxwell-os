@@ -36,8 +36,10 @@ LAYER 0   PIPELINE        7-stage extraction: books → principles → FBs → S
 
 ## THE ONE THING THAT MATTERS RIGHT NOW
 
-> **Layer 2 is the product.** 7,299 lines of pipeline code produce FBs.
-> 0 lines of orchestration code turn FBs into skills.
+> **Layer 2 is the product.** ~7,300 lines of pipeline code (runner.py, stages 0-6) produce FBs.
+> 0 lines of agentic orchestration code turn FBs into executable skills.
+> Pipeline orchestration exists (runner.py 608 lines, route.py, run_monitor.py).
+> Agentic orchestration (FB → skill → execute → reliability feedback) does not.
 > The bridge from knowledge to action IS the product.
 > **Build the bridge.**
 

@@ -5,16 +5,18 @@
 health:
     @echo "=== Maxwell OS v3.0 Health Check ==="
     python3 pipeline/status.py
+    python3 pipeline/integrity_check.py --quick
 
 preflight:
     @echo "=== Maxwell OS Preflight ==="
     @python3 -c "from pipeline.pipeline_paths import ensure_dirs; ensure_dirs(); print('✅ Directories OK')"
-    @python3 -c "from pipeline.pipeline_paths import check_books_source; ok, msg = check_books_source(); print(msg); exit(0 if ok else 0)"
+    @python3 -c "from pipeline.pipeline_paths import check_books_source; ok, msg = check_books_source(); print(msg); exit(0 if ok else 1)"
     @python3 -c "from pipeline.pipeline_paths import check_pipeline_state; print(check_pipeline_state())"
     @python3 pipeline/config_audit.py --check-unchecked --strict || { echo "  ❌ Config drift or unchecked hardcoded values — fix before continuing"; exit 1; }
     @python3 -c "from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES; print(f'✅ Taxonomy: {len(CANONICAL_DOMAINS)} domains, {len(CANONICAL_DISCIPLINES)} disciplines')"
     @python3 -c "from pipeline.omlx_call import check_omlx_health; ok = check_omlx_health(); print('✅ OMLX UP' if ok else '❌ OMLX DOWN')"
     @python3 tools/sync_decisions.py
+    just integrity-quick
     just stress
 
 # ── Stress-test OMLX chat (catches the 'health endpoint lies' bug) ──
@@ -121,6 +123,14 @@ export:
 
 backup:
     bash pipeline/backup_guardian.sh
+
+# ── Integrity — 17 automated checks (D2203) ──────────────────
+integrity:
+    @echo "=== Maxwell OS Integrity Check (D2203) ==="
+    python3 pipeline/integrity_check.py
+
+integrity-quick:
+    python3 pipeline/integrity_check.py --quick
 
 # ── Vibecheck — Ruff + format on changed files (D2109) ───────
 vibecheck:

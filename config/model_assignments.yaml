@@ -1,3 +1,9 @@
+# ── D2199: model_assignments.yaml — Agent role model registry ──
+# CANONICAL SOURCE for pipeline models: config/pipeline_config.yaml
+# This file defines agent roles BEYOND the core pipeline.
+# If a model appears in BOTH files, pipeline_config.yaml takes precedence.
+# OptiQ variant: experimental — not yet adopted in main pipeline.
+# Updated: 2026-08-06 — D2199: fixed REVIEWER, documented OptiQ/non-OptiQ split.
 roles:
   S3A_CONVERGENCE:
     model: Qwen3.6-35B-A3B-OptiQ-4bit  # OptiQ: Cap 80.03, BFCL 92.5%, HashHop +8%
@@ -32,11 +38,14 @@ roles:
     model: Qwen3.6-35B-A3B-4bit
     backend: omlx
     family: qwen
+  # REVIEWER: DeepSeek-R1-0528-Qwen3-8B-MLX-4bit REMOVED (D2199)
+  # DeepSeek thinking mode is BROKEN per DELEGATE-001 — reasoning_content passthrough bug.
+  # Replaced with gemma-4-E4B (confirmed working, 0.675 weighted accuracy for verification).
   REVIEWER:
-    model: DeepSeek-R1-0528-Qwen3-8B-MLX-4bit
+    model: gemma-4-E4B-it-MLX-4bit
     backend: omlx
-    family: deepseek
-    notes: "D924/D925: Dedicated critic \u2014 CoT reasoning, 308K downloads, ~5GB"
+    family: gemma
+    notes: "D2199: Replaced broken DeepSeek-R1 (DELEGATE-001). Gemma: 0.675 weighted accuracy, confirmed working."
   CODING_DRAFT:
     model: Phi-4-mini-instruct-8bit
     backend: omlx
@@ -100,9 +109,10 @@ roles:
     backend: omlx
     family: gemma
   S5_FB_VERIFIER:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    model: gemma-4-E4B-it-MLX-4bit     # D2199: synced with pipeline_config.yaml verifier_v2 (was Qwen3-Coder — wrong family for R5)
     backend: omlx
-    family: qwen
+    family: gemma
+    notes: "D2199: Must be cross-family from generator (Qwen) per R5. Pipeline config uses Gemma."
 verification_tolerance:
   version: 2026-07-08.V2
   s6_validation:

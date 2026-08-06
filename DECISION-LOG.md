@@ -3149,3 +3149,12 @@ Cross-evaluation by Qwen and Kimi identified 3 actionable defects. All fixed:
 
 Post-fix: 10 examples (7 positive, 3 negative), 7 domains, 18 unique sources.
 All P0/P1 gate blockers resolved. Golden set ready for S2 full run.
+D2195: Cross-Examination Ultimate Verdict — governance/cross-examination-ultimate-verdict-2026-08-06.md
+D2196: Zero-vector fallback → EmbeddingQuarantineError — ollama_embed.py
+D2197: session_seed.yaml sync — NLI model, stage3 removal, 8-stage pipeline
+D2198: AGENTS.md + KNOWLEDGE-PIPELINE-ARCHITECTURE.md stage3 ghost removal + load_stage3_clusters→load_stage2_clusters
+D2199: model_assignments.yaml sync — REVIEWER fixed (DeepSeek→gemma), S5_FB_VERIFIER fixed (Qwen→Gemma), OptiQ documented
+D2200: LICENSE added — MIT
+D2201: pyproject.toml — removed pipeline/ from Ruff+mypy exclusions
+D2202: ollama_embed.py — removed undeclared ollama import, delegated single-doc to batch_embed (requests-based)
+D2203: integrity_check.py — 17 automated checks, just integrity command, added to health+preflight

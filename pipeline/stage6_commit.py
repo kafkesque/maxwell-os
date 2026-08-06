@@ -278,36 +278,37 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 depth, evidence,
                 context, accessibility, intimacy_boundary, provenance,
                 source_text,
-                is_summary,
                 difficulty_level, temporal_scope, confidence_score,
                 prerequisite_fbs, procedural_skill,
                 contradicts_fbs, related_fbs,
                 usage_count, last_retrieved_at,
                 feedback_score, feedback_count, fb_version,
                 source_clusters, source_books, source_principle_ids,
-                classification_errors, classification_status,
+                classification_errors,
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
+                s3_original_domain,
                 created_at, committed_at
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
-                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?, ?,
-                ?, ?, ?,
+                ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?,
+                ?,
                 ?, ?
             )
         """, (
@@ -334,7 +335,6 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb_provenance(fb), "llm_extracted_from_source"),
             # source text for verification (D2131)
             _safe_str(fb.get("source_text")),
-            fb.get("is_summary", 0),
             # agentic metadata (D2130)
             _safe_str(fb.get("difficulty_level")),
             _safe_str(fb.get("temporal_scope")),
@@ -355,8 +355,6 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_json(fb.get("source_principle_ids", [])),
             # classification errors
             _safe_json(fb.get("classification_errors")),
-            # classification status (D2184: CLEAN | FALLBACK | FAILED)
-            _safe_str(fb.get("classification_status"), "CLEAN"),
             # verification
             _safe_json(fb.get("verification_results", [])),
             fb.get("borp_score", 0.0),
@@ -370,6 +368,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("pipeline_commit"), "unknown"),
             _safe_str(fb.get("taxonomy_version"), "v5.0"),
             _safe_str(fb.get("pipeline_run_id")),
+            _safe_str(fb.get("s3_original_domain"), ""),
             _safe_str(fb.get("created_at"), ""),
             datetime.now(UTC).isoformat(),
         ))

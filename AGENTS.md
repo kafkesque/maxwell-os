@@ -65,7 +65,7 @@
   stage1_3_prefilter.py → regex pre-filter (D2080)
   stage1_5_embed_cluster.py → FAISS cosine + source diversity (cluster-before-extract)
   stage2_extract.py    → Clusters → convergent FBs (Qwen3-Coder, R5)
-  stage3_cluster.py    → Semantic dedup (UMAP+HDBSCAN)
+  # stage3_cluster.py  → REMOVED (D2120/D2198) — HDBSCAN dedup replaced by cluster-before-extract
   stage4_merge.py      → FBs → classified + formatted
   stage5_verify.py     → DeBERTa NLI + Gemma cross-family + BORP (fail-closed, D2093)
   stage6_commit.py     → SQLite (sqlite-vec) + Parquet export

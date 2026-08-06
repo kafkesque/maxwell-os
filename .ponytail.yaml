@@ -6,7 +6,7 @@ rules:
   no_silent_errors:
     description: "All except clauses must log the error and re-raise or handle explicitly"
     severity: CRITICAL
-    check: "grep -rn 'except.*:' pipeline/*.py | grep -v 'raise\|log\|logging'"
+    check: "grep -rn 'except.*:' pipeline/*.py | grep -v 'raise\\|log\\|logging'"
     
   type_hints:
     description: "All function signatures must have type annotations"

@@ -3136,3 +3136,16 @@ All mechanism/boundary/consequence/evidence fields present. YAML parses cleanly.
 Golden loader verification: `load_golden_parity()` correctly samples 3 pos + 1 neg.
 
 **GATE: ✅ Golden set ready for S2 full run (2,634 convergent clusters).**
+
+### D2191b — Golden Set: P0 + P1 Fixes Applied (2026-08-06 14:45)
+
+Cross-evaluation by Qwen and Kimi identified 3 actionable defects. All fixed:
+
+1. **CONV-006 restructured (P0):** Replaced single-source FB1 ("Explore-Exploit Exploration Bonus" from Algorithms to Live By only) with "Default Inertia Effect" (Kahneman + Thaler, 2 sources). Both FBs now genuinely cross-source. CONV-006 now: FB1 = Default Inertia Effect (Kahneman + Thaler), FB2 = Choice Overload Paralysis (Ariely + Kahneman). Each FB draws from 2 distinct books.
+
+2. **CONV-001 evidence de-condensed (P1):** Replaced `[...]` stitched pseudo-verbatim passage with 4 contiguous verbatim quotes from original segments. No ellipsis condensation. All passages verified verbatim with whitespace-normalized matching.
+
+3. **NEG-CONV-003 added (P1):** Hard false-convergence negative — 2 independent sources (Stone & Heen + Laloux) both discussing "feedback" but at different analytical levels (interpersonal psychology vs organizational systems). Topical overlap without shared causal mechanism. Teaches rejection of source-diverse but mechanistically disjoint clusters — the most common real-world false-convergence pattern.
+
+Post-fix: 10 examples (7 positive, 3 negative), 7 domains, 18 unique sources.
+All P0/P1 gate blockers resolved. Golden set ready for S2 full run.

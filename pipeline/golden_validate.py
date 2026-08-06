@@ -26,7 +26,7 @@ def norm(text: str) -> str:
         (" ", " "),
     ]:
         text = text.replace(a, b)
-    return re.sub(r"s+", " ", text).strip()
+    return re.sub(r"\s+", " ", text).strip()
 
 
 class DuplicateKeyLoader(yaml.SafeLoader):

@@ -16,13 +16,17 @@ Usage:
     python3 pipeline/batch_convert_epubs.py                # Convert all 505
 """
 
-import argparse, os, re, sys, tempfile, time
+import argparse
+import os
+import re
+import sys
+import tempfile
 from pathlib import Path
 
 import pypandoc
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from pipeline.pipeline_paths import SOURCE_EPUB_DIR, SOURCE_PDF_DIR, BOOKS_DIR
+from pipeline.pipeline_paths import SOURCE_EPUB_DIR
 
 EPUB_BASE = SOURCE_EPUB_DIR
 MD_BASE = Path("knowledge pipeline/books")
@@ -68,7 +72,7 @@ def clean_pandoc_output(text: str) -> str:
     skip_svg = False
     for line in lines:
         stripped = line.strip()
-        
+
         # Skip SVG blocks
         if '<svg' in stripped.lower() or 'viewbox=' in stripped.lower():
             skip_svg = True
@@ -77,23 +81,23 @@ def clean_pandoc_output(text: str) -> str:
             if '</svg>' in stripped.lower() or stripped == '```':
                 skip_svg = False
             continue
-        
+
         # Skip cover image references
         if re.match(r'^!\[\]\(cover', stripped):
             continue
-        
+
         # Skip empty anchor tags
         if re.match(r'^\[\]{#', stripped):
             continue
-        
+
         # Skip raw HTML div wrappers
         if re.match(r'^:::\s*\{', stripped):
             continue
         if stripped == ':::':
             continue
-        
+
         cleaned.append(line)
-    
+
     return '\n'.join(cleaned)
 
 
@@ -116,11 +120,11 @@ def main():
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--max', type=int, default=0, help='Max books to convert')
     args = parser.parse_args()
-    
+
     # Find all EPUBs
     epubs = list(EPUB_BASE.rglob("*.epub"))
     print(f"📚 Found {len(epubs)} EPUBs")
-    
+
     # Find matching MDs
     matched = []
     unmatched = []
@@ -130,27 +134,27 @@ def main():
             matched.append((ep, md))
         else:
             unmatched.append(ep)
-    
+
     print(f"   With matching MD: {len(matched)}")
     print(f"   No matching MD:   {len(unmatched)}")
-    
+
     if args.max > 0:
         matched = matched[:args.max]
-    
+
     mode = "DRY RUN" if args.dry_run else "CONVERTING"
     print(f"\n🔄 {mode}: {len(matched)} books")
     print(f"{'='*70}")
-    
+
     converted = 0
     skipped = 0
     failed = 0
     total_headers_before = 0
     total_headers_after = 0
-    
+
     for i, (epub_path, md_path) in enumerate(matched):
         epub_size = epub_path.stat().st_size
         name = epub_path.name[:70]
-        
+
         # Read existing MD stats
         try:
             old_text = md_path.read_text(errors='replace')
@@ -158,53 +162,53 @@ def main():
             print(f"    ⚠️  Cannot read {md_path.name}: {e}")
             old_text = ""
         before = count_headers(old_text)
-        
+
         # Convert
         pandoc_text = convert_epub(epub_path)
         if pandoc_text is None:
             failed += 1
             print(f"  ❌ [{i+1}/{len(matched)}] FAILED: {name}")
             continue
-        
+
         # Clean
         cleaned = clean_pandoc_output(pandoc_text)
         after = count_headers(cleaned)
-        
+
         # Quality check: did we get meaningful headers?
         total_h_before = before['h1'] + before['h2'] + before['h3']
         total_h_after = after['h1'] + after['h2'] + after['h3']
-        
+
         # Reject if Pandoc output is clearly worse (much smaller, fewer headers)
         if after['chars'] < before['chars'] * 0.3 and total_h_after <= total_h_before:
             print(f"  ⚠️  [{i+1}/{len(matched)}] DEGRADED: {name} ({before['chars']:,}→{after['chars']:,}c, h#{total_h_before}→{total_h_after})")
             skipped += 1
             continue
-        
+
         if not args.dry_run:
             crash_safe_write(md_path, cleaned)
-        
+
         h_delta = total_h_after - total_h_before
         flag = "✅" if h_delta > 5 else "📈" if h_delta > 0 else "➡️"
         print(f"  {flag} [{i+1}/{len(matched)}] {epub_size/1e6:.1f}MB | "
               f"h#{total_h_before}→{total_h_after} (+{h_delta}) | "
               f"{before['chars']:,}→{after['chars']:,}c | {name[:45]}")
-        
+
         converted += 1
         total_headers_before += total_h_before
         total_headers_after += total_h_after
-    
+
     # Summary
     print(f"\n{'='*70}")
-    print(f"📊 SUMMARY")
+    print("📊 SUMMARY")
     print(f"   Converted: {converted}")
     print(f"   Skipped (degraded): {skipped}")
     print(f"   Failed: {failed}")
     if converted > 0:
         print(f"   Total headers: {total_headers_before} → {total_headers_after} (+{total_headers_after - total_headers_before})")
         print(f"   Avg headers/book: {total_headers_before/converted:.0f} → {total_headers_after/converted:.0f}")
-    
+
     if args.dry_run:
-        print(f"\n   Run without --dry-run to apply changes.")
+        print("\n   Run without --dry-run to apply changes.")
 
 
 if __name__ == "__main__":

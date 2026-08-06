@@ -43,29 +43,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
-from pipeline.schema_accessor import (
-    fb_boundary,
-    fb_consequence,
-    fb_definition,
-    fb_mechanism,
-    fb_name,
-    fb_source_books,
-    fb_source_ids,  # D2185: canonical SHA-256 author|title source_ids for BORP
-    fb_source_texts,
-    fb_source_texts_shown,
-)
 from pipeline.pipeline_paths import (
     BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
     S5_BORP_BYPASS_TYPES,  # D2083: types that skip BORP check
     S5_NLI_ENTAILMENT_THRESHOLD,  # D2119: configurable NLI threshold
+    S5_NLI_MARGINAL_THRESHOLD,  # D2155: NLI score threshold for FLAG (escalate)
     S5_NLI_MODEL,  # D2119: primary NLI model (ModernBERT)
     S5_NLI_MODEL_FALLBACK,  # D2119: fallback NLI model (DeBERTa)
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (skip LLM)
-    S5_NLI_MARGINAL_THRESHOLD,  # D2155: NLI score threshold for FLAG (escalate)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
     VERIFY_MODEL_V2,  # D2069: cross-family verifier (Gemma-4-E4B)
+)
+from pipeline.schema_accessor import (
+    fb_definition,
+    fb_source_books,
+    fb_source_ids,  # D2185: canonical SHA-256 author|title source_ids for BORP
+    fb_source_texts,
+    fb_source_texts_shown,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
@@ -95,8 +91,8 @@ def _get_nli():
     if _nli_pipeline is not None:
         return _nli_pipeline
 
-    from transformers import pipeline
     import torch
+    from transformers import pipeline
 
     # D2178: Auto-detect device — MPS (Apple Silicon), CUDA, or CPU fallback.
     # Previously hardcoded device=-1 (CPU only). MPS provides 5-10× speedup

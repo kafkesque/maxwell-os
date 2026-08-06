@@ -19,6 +19,7 @@ from pathlib import Path
 
 # D2175: Use DB_PATH from pipeline_paths — no hardcoded paths (C12a)
 from pipeline.pipeline_paths import DB_PATH as _DB_PATH
+
 DB_PATH: Path = _DB_PATH
 
 # ── Thresholds (from spec §2.3) ─────────────────────────────────────────
@@ -120,7 +121,7 @@ def render_stable_gate(fb_id: str, evidence_type: str = "cited",
         return line
 
     elif tier == "WATCH":
-        line = f"⚠️ Watch"
+        line = "⚠️ Watch"
         if rel["reliability_score"] is not None:
             line += f": reliability {rel['reliability_score']:.2f} ({rel['feedback_count']} ratings)"
         return line

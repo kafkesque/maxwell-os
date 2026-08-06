@@ -36,7 +36,6 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from pipeline.pipeline_paths import (
-    CHECKPOINT_DIR,
     DB_PATH,
     STAGE1_5_CHECKPOINT,
     STAGE2_CHECKPOINT,
@@ -52,8 +51,14 @@ from pipeline.pipeline_paths import (
 try:
     from pipeline.pipeline_paths import (
         E2E_BORP_MIN_SOURCES,
+    )
+    from pipeline.pipeline_paths import (
         E2E_CONVERGENT_RATIO as _E2E_CONVERGENT_RATIO_CFG,
+    )
+    from pipeline.pipeline_paths import (
         E2E_MIN_FBS as _E2E_MIN_FBS_CFG,
+    )
+    from pipeline.pipeline_paths import (
         E2E_MIN_PASS_RATE as _E2E_MIN_PASS_RATE_CFG,
     )
     BORP_MIN_SOURCES: int = E2E_BORP_MIN_SOURCES
@@ -240,13 +245,13 @@ def main():
         "stage6_commit.py",
     ]
 
-    print(f"╔══════════════════════════════════════════════════════════╗")
+    print("╔══════════════════════════════════════════════════════════╗")
     print(f"║     Maxwell v3.0 — P1.5: {args.books}-Book E2E Test              ║")
-    print(f"╠══════════════════════════════════════════════════════════╣")
+    print("╠══════════════════════════════════════════════════════════╣")
     print(f"║  Books:     {args.books:<43}║")
     print(f"║  Quality:   {args.quality:<43}║")
-    print(f"║  Stages:    9 (0→0.5→1→1.3→1.5→2→4→5→6)              ║")
-    print(f"╚══════════════════════════════════════════════════════════╝")
+    print("║  Stages:    9 (0→0.5→1→1.3→1.5→2→4→5→6)              ║")
+    print("╚══════════════════════════════════════════════════════════╝")
     print()
 
     if args.dry_run:
@@ -274,7 +279,7 @@ def main():
         return 1
 
     # ── Validate results ───────────────────────────────────────────────
-    print(f"\n🔍 Validating output quality...")
+    print("\n🔍 Validating output quality...")
     results = validate_results()
 
     print(f"\n{'─'*60}")
@@ -289,7 +294,7 @@ def main():
         print(f"\n✅ E2E TEST PASSED — all {len(results['checks'])} checks green")
         return 0
     else:
-        print(f"\n❌ E2E TEST FAILED — quality thresholds not met")
+        print("\n❌ E2E TEST FAILED — quality thresholds not met")
         return 2
 
 

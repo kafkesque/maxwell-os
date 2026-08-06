@@ -27,9 +27,9 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # ── Config (C12: no hardcoded values) ──────────────────────────────────────
-from pipeline.pipeline_paths import OLLAMA_URL
-
 import yaml
+
+from pipeline.pipeline_paths import OLLAMA_URL
 
 _CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
 with open(_CFG_PATH) as f:

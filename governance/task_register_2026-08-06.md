@@ -211,3 +211,40 @@ Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative bl
 - decisions.yaml: now valid (198 decisions) — re-sync via `tools/sync_decisions.py` after every DECISION-LOG append
 
 ---
+
+
+---
+
+# MASTER PRIORITY QUEUE (2026-08-06 23:30 — POST-CALIBRATION)
+> Golden set: CALIBRATED | S2 pipeline: 5 bugs fixed | OMLX: 100GB guard | Yield: 1/10 confirmed
+
+## NEXT IMMEDIATE
+| # | Task | Why | Effort |
+|---|------|-----|--------|
+| N1 | Full yield diagnostic: S2 on all 58 TFS multi-source clusters | Only 1/10 principles confirmed | 5-15 min |
+| N2 | S2 on full corpus (13K clusters) | Calibrated, working, unblocked | 2-6 hours |
+| N3 | Execute one business PI with existing FBs | Product test | 1h |
+| N4 | Persist OMLX config (safe guard + 100GB ceiling) | Survive reboots | 5 min |
+
+## P1 (golden quality + pipeline hardening)
+G-07: Replace CONV-020 (dup) with framing effects | G-08: CONV-012 Russell source | G-09: Property backfill CONV-001..007 | G-10: Domain rebalance | G-13: Eval prompt v2.1 | G-15: integrity check #18 | Ruff: 155 manual fixes | Atomic evidence | Monotonic trust | bge-m3 MLX-native | Reliability surfaces | G-14: Author-overlap detector
+
+## P2
+MCP server | Graph-aware retrieval | Context-conditioned reliability | Agent harness+safety | Modularize S2/S4 | Config split | Prompt lineage | Taxonomy YAML-driven | CI
+
+## P3
+vLLM-mlx | LanceDB | Config authority | Leiden | ONNX
+
+## Watchlist
+Anytype sync leak | BORP != Truth | G-11 stray fields | D-number governance
+
+## SESSION SCORECARD
+- Golden set: needs_review -> CALIBRATED (17 defects fixed, S2 pilot verified)
+- S2 bugs: 5 discovered, 5 fixed (temp-arg, indent-deadcode, book_count, is_conv, OMLX prefill)
+- decisions.yaml: corrupted -> valid 198 decisions (17 missing synced)
+- status.py: KeyError:3 -> clean 6-stage display
+- pipeline_resume.json: last_stage 0.5 -> 1.5
+- Ruff: 483 -> 155 remaining (328 auto-fixed)
+- S2 extraction: 0 -> 2/2 FBs (100% pilot yield, Regression to the Mean confirmed)
+- Golden eval: 3 LLM cross-examination (D2206) -> calibrated without re-eval
+- Integrity: 17/17, Tests: 12/12

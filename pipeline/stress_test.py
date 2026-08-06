@@ -12,7 +12,6 @@ Called by `just stress`. Tests (sequentially, fail-fast):
 
 Exit 0 = ready, Exit 1 = not ready.
 """
-import json
 import os
 import sqlite3
 import sys
@@ -57,7 +56,7 @@ def _check_config_integrity() -> bool:
             if "/Users/" in line and not line.strip().startswith("#"):
                 print(f"   ⚠️  Hardcoded path at line {i}: {line.strip()[:80]}")
                 # Warning only — not fatal
-    print(f"   ✅ No fatal config issues")
+    print("   ✅ No fatal config issues")
     return ok
 
 

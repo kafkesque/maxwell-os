@@ -6,10 +6,10 @@ No heavy framework. Just structured data for debugging and calibration.
 """
 import json
 import time
-from pathlib import Path
 
 # D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
 from pipeline.pipeline_paths import DATA_DIR
+
 METRICS_PATH = DATA_DIR / "metrics.jsonl"
 
 

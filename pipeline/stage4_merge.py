@@ -667,6 +667,7 @@ def compute_fb_relationships(
     # Embed definitions for semantic similarity
     try:
         import numpy as np
+
         from pipeline.embeddings import embed_texts_bge_m3
 
         definitions: list[str] = [fb.get("definition", "")[:500] for fb in fbs]
@@ -840,7 +841,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         if len(cluster_principles) == 1:
             fb_data = dict(cluster_principles[0])  # shallow copy
             fb_data["_gen_skipped"] = True
-            print(f"→ ⚡ GEN skipped (single-FB)", flush=True, end=" ")
+            print("→ ⚡ GEN skipped (single-FB)", flush=True, end=" ")
             # ── D2137: CRIBS enrichment for single-FB clusters ──────────
             # Stage2 produces name+definition+mechanism+boundary but NOT
             # application, failure_mode, elaboration, jargon, keywords.
@@ -867,7 +868,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     # D2160: enrichment is best-effort but must be observable (C16)
                     fb_data["enrichment_status"] = "FAILED"
                     fb_data["enrichment_error"] = str(e)[:200]
-                    print(f"⚠️CRIBS", flush=True, end=" ")
+                    print("⚠️CRIBS", flush=True, end=" ")
         else:
             try:
                 prompt = build_fb_prompt(cluster_principles)

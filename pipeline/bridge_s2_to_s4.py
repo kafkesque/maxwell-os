@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT, STAGE4_CHECKPOINT
 
+
 def convert() -> None:
     if not STAGE2_CHECKPOINT.exists():
         print("❌ Stage 2 checkpoint not found.")

@@ -3236,3 +3236,18 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 5. Record: `governance/golden-eval-cross-examination-2026-08-06.md`.
 
 **Files:** governance/golden-eval-cross-examination-2026-08-06.md, DECISION-LOG.md, governance/task_register_2026-08-06.md
+
+## D2207 — S2 Pilot Bug Discovery + Golden Calibration (2026-08-06)
+
+**Bugs found & fixed:**
+1. Stage2 temperature arg crash (line 765): call_omlx_json doesn't accept temperature; removed.
+2. Stage2 indent bug: _build_fb_from_result at module level, ~110 lines dead code. Re-indented +4.
+3. book_count closure: free var from _process_cluster; now derived from cluster arg.
+4. is_conv closure: same pattern; cluster.get("is_convergent").
+5. OMLX prefill guard: per-request guard rejects 2.8K-3.3K kv_len at ~4GB peak. Fixed: --memory-guard-gb 100.
+
+**S2 pilot results (2 TFS clusters, small):**
+- 2 FBs: both "Regression to the Mean..." (Kahneman principle #7 confirmed)
+- Evidence passages verbatim. Routes: FB(2), NULL(0).
+
+**Golden set: CALIBRATED.** Evidence: 3-LLM eval x 17 defects → D2206 fix pass → working S2 pilot.

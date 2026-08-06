@@ -338,17 +338,17 @@ def main() -> None:
         actions = migrate_safe(DB_PATH, dry_run=True)
         for action in actions:
             print(action)
-        print(f"\n  Run without --dry-run to apply.")
+        print("\n  Run without --dry-run to apply.")
         return
 
     # Confirm
     if not args.force:
-        print(f"=== D2205 Epistemic Model Migration ===\n")
+        print("=== D2205 Epistemic Model Migration ===\n")
         print(f"  DB: {DB_PATH}")
         print(f"  Columns to add: {', '.join(EPISTEMIC_COLUMNS)}")
-        print(f"  Backfill: borp_score → evidence_support, feedback → execution_*")
-        print(f"\n  This is a safe migration (C6: tempfile → fsync → os.replace).")
-        print(f"  No data will be lost.\n")
+        print("  Backfill: borp_score → evidence_support, feedback → execution_*")
+        print("\n  This is a safe migration (C6: tempfile → fsync → os.replace).")
+        print("  No data will be lost.\n")
         resp = input("  Continue? [y/N] ").strip().lower()
         if resp not in ("y", "yes"):
             print("  Aborted.")
@@ -359,7 +359,7 @@ def main() -> None:
         print(f"  DB: {DB_PATH}")
         for action in actions:
             print(action)
-        print(f"\n✅ D2205 migration complete.")
+        print("\n✅ D2205 migration complete.")
     except FileNotFoundError as exc:
         print(f"❌ {exc}", file=sys.stderr)
         sys.exit(1)

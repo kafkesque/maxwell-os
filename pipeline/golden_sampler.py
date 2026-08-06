@@ -216,19 +216,19 @@ def export_annotation_batch(
     batch: list[dict] = []
     md_lines: list[str] = [
         "# Golden Set Annotation Batch",
-        f"",
+        "",
         f"**{len(sampled)} clusters** sampled for cross-family annotation.",
-        f"Send each prompt to Kimi, ChatGPT, AND Claude. Compare results.",
-        f"",
-        f"## Methodology",
-        f"- Cross-Family Ensemble Labeling (Gilardi et al. 2023)",
-        f"- 3+ models annotate each cluster independently",
-        f"- 2/3 agreement → gold principle (auto-accept)",
-        f"- 1/3 or 0/3 → flag for manual review",
-        f"- Cuts manual work from 200 clusters to ~20 disputed ones",
-        f"",
-        f"---",
-        f"",
+        "Send each prompt to Kimi, ChatGPT, AND Claude. Compare results.",
+        "",
+        "## Methodology",
+        "- Cross-Family Ensemble Labeling (Gilardi et al. 2023)",
+        "- 3+ models annotate each cluster independently",
+        "- 2/3 agreement → gold principle (auto-accept)",
+        "- 1/3 or 0/3 → flag for manual review",
+        "- Cuts manual work from 200 clusters to ~20 disputed ones",
+        "",
+        "---",
+        "",
     ]
 
     for i, cluster in enumerate(sampled):
@@ -246,7 +246,7 @@ def export_annotation_batch(
 
         md_lines.append(f"## Cluster {i+1}: {cid}")
         md_lines.append(f"- Size: {cluster.get('size', 0)} | Books: {cluster.get('source_diversity', 0)} | Cohesion: {cluster.get('cohesion', 0.0):.3f}")
-        md_lines.append(f"")
+        md_lines.append("")
         md_lines.append("```")
         md_lines.append(prompt)
         md_lines.append("```")
@@ -303,11 +303,11 @@ def main() -> None:
         print(f"❌ Stage 1 checkpoint not found: {s1_checkpoint}")
         sys.exit(1)
 
-    print(f"📂 Loading clusters from S1.5...")
+    print("📂 Loading clusters from S1.5...")
     clusters = load_clusters(s15_checkpoint)
     print(f"   {len(clusters)} clusters loaded")
 
-    print(f"📂 Loading segment texts from Stage 1...")
+    print("📂 Loading segment texts from Stage 1...")
     segments = load_segments(s1_checkpoint)
     print(f"   {len(segments)} segments indexed")
 
@@ -332,15 +332,15 @@ def main() -> None:
     # Export
     jsonl_path = export_annotation_batch(sampled, segments, output_dir, args.max_segs)
 
-    print(f"\n📋 Exported to:")
+    print("\n📋 Exported to:")
     print(f"   {jsonl_path}")
     print(f"   {output_dir / 'annotation_batch.md'}")
-    print(f"\n✅ Ready for cross-family annotation.")
-    print(f"   Send each prompt in annotation_batch.jsonl to:")
-    print(f"   1. Kimi (kimi.moonshot.cn or API)")
-    print(f"   2. ChatGPT (chat.openai.com or API)")
-    print(f"   3. Claude (claude.ai or API)")
-    print(f"\n   Then run: python3 pipeline/golden_merge.py to merge results.")
+    print("\n✅ Ready for cross-family annotation.")
+    print("   Send each prompt in annotation_batch.jsonl to:")
+    print("   1. Kimi (kimi.moonshot.cn or API)")
+    print("   2. ChatGPT (chat.openai.com or API)")
+    print("   3. Claude (claude.ai or API)")
+    print("\n   Then run: python3 pipeline/golden_merge.py to merge results.")
 
 
 if __name__ == "__main__":

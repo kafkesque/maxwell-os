@@ -48,6 +48,7 @@ SEGS_PATH = Path(_segs_cfg) if _segs_cfg else (
     ROOT / "knowledge pipeline" / "stage1_chunk" / "latest" / "checkpoint.jsonl")
 # D2137: output to the path stage2.load_clusters() reads (STAGE1_5_CHECKPOINT)
 from pipeline.pipeline_paths import STAGE1_5_CHECKPOINT as _S15_CP
+
 OUT_DIR = Path(_S15_CP).parent
 
 # D2137: boilerplate patterns from config (stage1_3.drop_patterns_extra)

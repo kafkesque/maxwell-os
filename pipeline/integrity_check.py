@@ -31,14 +31,10 @@ Usage:
 """
 
 import ast
-import json
-import os
 import re
 import sqlite3
-import subprocess
 import sys
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -177,7 +173,7 @@ STDLIB_MODULES = {
     "struct", "pickle", "shelve", "marshal", "queue", "threading",
     "multiprocessing", "asyncio", "concurrent", "socket", "ssl",
     "signal", "mmap", "gc", "atexit", "pdb", "pprint", "platform",
-    "getpass", "getopt", "configparser", "logging", "secrets",
+    "getpass", "getopt", "configparser", "secrets",
     "tomllib", "tomli", "zipfile", "tarfile", "gzip", "bz2", "lzma",
     "__future__",  # stdlib: used for annotations
 }
@@ -642,7 +638,7 @@ def check_model_registry_runtime() -> tuple[bool, str]:
     if gen_family == ver_family and gen_family != "unknown":
         return False, f"R5 violation: Generator ({gen_family}) = Verifier ({ver_family}) — must be different families"
 
-    return True, f"R5 compliant: Generator=Qwen, Verifier=Gemma (cross-family)"
+    return True, "R5 compliant: Generator=Qwen, Verifier=Gemma (cross-family)"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

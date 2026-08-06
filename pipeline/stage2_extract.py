@@ -35,7 +35,6 @@ Usage:
 """
 
 import argparse
-
 import ast
 import json
 import os
@@ -52,24 +51,24 @@ from pipeline.pipeline_paths import (
     GEN_MODEL,
     S2_GATE_ENABLED,
     S2_GATE_STRICT,
+    S2_GOLDEN_INJECT,
     S2_GOLDEN_MAX,
     S2_GOLDEN_NEGATIVE,
     S2_GOLDEN_PATH,
     S2_GOLDEN_POSITIVE,
-    S2_GOLDEN_INJECT,
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_PROBE_SAMPLES,
     S2_MINHASH_NUM_PERM,
     S2_MINHASH_THRESHOLD,
     S2_OMLX_RETRY,
     S2_SPLIT_KMEANS_RANDOM_STATE,
+    S2_SPLIT_PROBE_ENABLED,
+    S2_SPLIT_PROBE_MAX_COHESION,
+    S2_SPLIT_PROBE_MIN_SIZE,
     S15_MIN_SOURCE_DIVERSITY,
     STAGE1_5_CHECKPOINT,
     STAGE1_CHECKPOINT,
     STAGE2_CHECKPOINT,
-    S2_SPLIT_PROBE_ENABLED,
-    S2_SPLIT_PROBE_MIN_SIZE,
-    S2_SPLIT_PROBE_MAX_COHESION,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 
@@ -763,7 +762,6 @@ def discover_principles(
             model=VERIFY_MODEL,
             system=PRINCIPLE_DISCOVERY_SYSTEM,
             max_tokens=128,
-            temperature=0.0,
         )
         if isinstance(result, dict):
             count: int = result.get("principle_count", 1)
@@ -811,10 +809,11 @@ def split_cluster_by_kmeans(
 
     # Embed segments (same model as S1.5 for consistency)
     try:
-        from sentence_transformers import SentenceTransformer
-        from pipeline.pipeline_paths import S15_EMBED_MODEL_HF
         import numpy as np
+        from sentence_transformers import SentenceTransformer
         from sklearn.cluster import KMeans
+
+        from pipeline.pipeline_paths import S15_EMBED_MODEL_HF
 
         model = SentenceTransformer(S15_EMBED_MODEL_HF, device="mps")
         embeddings: np.ndarray = model.encode(texts, normalize_embeddings=True,
@@ -996,7 +995,7 @@ def run_stage2(
             # Log the error and start fresh — but the operator must know.
             import traceback
             print(f"   ⚠️  Resume checkpoint corrupted ({type(e).__name__}: {e})")
-            print(f"   ⚠️  Starting fresh — prior progress discarded")
+            print("   ⚠️  Starting fresh — prior progress discarded")
             print(f"   ⚠️  Traceback: {traceback.format_exc()[-300:]}")
             all_fbs = []
             processed_ids = set()
@@ -1033,7 +1032,7 @@ def run_stage2(
                 )
                 if result is not None:
                     break
-            except Exception as e:
+            except Exception:
                 if attempt < S2_OMLX_RETRY:
                     time.sleep(2)
                     continue
@@ -1055,109 +1054,110 @@ def run_stage2(
         return fbs
 
 
-def _build_fb_from_result(
-    result: dict,
-    cluster: dict,
-    evidence_passages: list[str],
-    cid: str,
-) -> dict | None:
-    """D2176: Build an FB record from a single extraction result.
+    def _build_fb_from_result(
+        result: dict,
+        cluster: dict,
+        evidence_passages: list[str],
+        cid: str,
+    ) -> dict | None:
+        """D2176: Build an FB record from a single extraction result.
 
-    Extracted from _process_one to support both single and multi-principle returns.
-    """
-    # Check for NULL route
-    route: str = result.get("route", "FB").strip().upper()
-    if route == "NULL":
-        return {"_null": True, "cluster_id": cid}
+        Extracted from _process_one to support both single and multi-principle returns.
+        """
+        # Check for NULL route
+        route: str = result.get("route", "FB").strip().upper()
+        if route == "NULL":
+            return {"_null": True, "cluster_id": cid}
 
-    # D2180: Schema validation (T2.2) — catch malformed LLM output before it enters pipeline
-    is_valid, schema_errors = validate_fb_output(result)
-    if not is_valid:
-        # Log schema violations for debugging but don't crash — treat as NULL
-        import sys as _sys
-        print(f"   ⚠️  Schema validation failed for {cid}: {'; '.join(schema_errors[:3])}",
-              file=_sys.stderr)
-        return {"_null": True, "cluster_id": cid, "_schema_errors": schema_errors}
+        # D2180: Schema validation (T2.2) — catch malformed LLM output before it enters pipeline
+        is_valid, schema_errors = validate_fb_output(result)
+        if not is_valid:
+            # Log schema violations for debugging but don't crash — treat as NULL
+            import sys as _sys
+            print(f"   ⚠️  Schema validation failed for {cid}: {'; '.join(schema_errors[:3])}",
+                  file=_sys.stderr)
+            return {"_null": True, "cluster_id": cid, "_schema_errors": schema_errors}
 
-    # Validate required fields — unified reading with fallback for single-source schema
-    name: str = result.get("name", "").strip()
-    definition: str = result.get("definition", "").strip()
-    mechanism: str = result.get("mechanism", "").strip()
-    boundary: str = result.get("boundary", result.get("application", "")).strip()
-    consequence: str = result.get("consequence", result.get("failure_mode", "")).strip()
-    is_summary: bool = result.get("is_summary", False)
-    extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
-    content_type: str = result.get("content_type", "principle").strip()
+        # Validate required fields — unified reading with fallback for single-source schema
+        name: str = result.get("name", "").strip()
+        definition: str = result.get("definition", "").strip()
+        mechanism: str = result.get("mechanism", "").strip()
+        boundary: str = result.get("boundary", result.get("application", "")).strip()
+        consequence: str = result.get("consequence", result.get("failure_mode", "")).strip()
+        is_summary: bool = result.get("is_summary", False)
+        extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
+        content_type: str = result.get("content_type", "principle").strip()
 
-    # Redundant check kept as defense-in-depth (validator already checks these)
-    if not name or not definition or len(definition) < 30:
-        return {"_null": True, "cluster_id": cid}
+        # Redundant check kept as defense-in-depth (validator already checks these)
+        if not name or not definition or len(definition) < 30:
+            return {"_null": True, "cluster_id": cid}
 
-    # Gate: reject summaries
-    if is_summary and gate_enabled:
-        return {"_gate": True, "cluster_id": cid}
+        # Gate: reject summaries
+        if is_summary and gate_enabled:
+            return {"_gate": True, "cluster_id": cid}
 
-    # Build FB record
-    fb_id: str = make_hash_id(name, definition)
-    fb: dict = {
-        "fb_id": fb_id,
-        "name": name,
-        "definition": definition,
-        "mechanism": mechanism,
-        "boundary": boundary,
-        "consequence": consequence,
-        "is_summary": is_summary,
-        "extraction_type": extraction_type,
-        "content_type": content_type,
-        "evidence_passages": result.get("evidence_passages", evidence_passages[:5]),
-        "evidence_passages_shown": evidence_passages,
-        "route": route,
-        "source_cluster": cid,
-        "source_books": cluster.get("source_books", []),
-        "source_ids": cluster.get("source_ids", []),
-        "source_segments": cluster.get("segment_ids", []),
-        "cluster_cohesion": cluster.get("cohesion", 0.0),
-        "cluster_size": cluster.get("size", 0),
-        "source_diversity": book_count,
-        "is_convergent": is_conv,
-    }
+        # Build FB record
+        fb_id: str = make_hash_id(name, definition)
+        fb: dict = {
+            "fb_id": fb_id,
+            "name": name,
+            "definition": definition,
+            "mechanism": mechanism,
+            "boundary": boundary,
+            "consequence": consequence,
+            "is_summary": is_summary,
+            "extraction_type": extraction_type,
+            "content_type": content_type,
+            "evidence_passages": result.get("evidence_passages", evidence_passages[:5]),
+            "evidence_passages_shown": evidence_passages,
+            "route": route,
+            "source_cluster": cid,
+            "source_books": cluster.get("source_books", []),
+            "source_ids": cluster.get("source_ids", []),
+            "source_segments": cluster.get("segment_ids", []),
+            "cluster_cohesion": cluster.get("cohesion", 0.0),
+            "cluster_size": cluster.get("size", 0),
+            "source_diversity": cluster.get("source_diversity",
+                          len(cluster.get("source_ids", cluster.get("source_books", [])))),
+            "is_convergent": cluster.get("is_convergent", True),
+        }
 
-    # Enrich with author/title/year (BUG-061 FIX)
-    src_books_list: list[str] = cluster.get("source_books", [])
-    if src_books_list:
-        from pipeline.book_metadata import (
-            build_citation,
-            resolve_book_metadata,
-            select_primary_source,
-        )
-        source_authors: list[dict] = []
-        for sb in src_books_list:
-            m = resolve_book_metadata(sb)
-            source_authors.append({
-                "book": sb, "author": m.get("author", ""),
-                "title": m.get("title", ""), "year": m.get("year", ""),
-            })
-        fb["source_authors"] = source_authors
-        fb["primary_source"] = select_primary_source(src_books_list, evidence_passages)
-        prim = fb["primary_source"].get("book", src_books_list[0])
-        prim_meta = next(
-            (sa for sa in source_authors if sa["book"] == prim),
-            {"author": "Unknown Author", "title": "Unknown Title"},
-        )
-        fb["citation"] = build_citation(
-            prim_meta.get("author", ""), prim_meta.get("title", ""), prim,
-        )
+        # Enrich with author/title/year (BUG-061 FIX)
+        src_books_list: list[str] = cluster.get("source_books", [])
+        if src_books_list:
+            from pipeline.book_metadata import (
+                build_citation,
+                resolve_book_metadata,
+                select_primary_source,
+            )
+            source_authors: list[dict] = []
+            for sb in src_books_list:
+                m = resolve_book_metadata(sb)
+                source_authors.append({
+                    "book": sb, "author": m.get("author", ""),
+                    "title": m.get("title", ""), "year": m.get("year", ""),
+                })
+            fb["source_authors"] = source_authors
+            fb["primary_source"] = select_primary_source(src_books_list, evidence_passages)
+            prim = fb["primary_source"].get("book", src_books_list[0])
+            prim_meta = next(
+                (sa for sa in source_authors if sa["book"] == prim),
+                {"author": "Unknown Author", "title": "Unknown Title"},
+            )
+            fb["citation"] = build_citation(
+                prim_meta.get("author", ""), prim_meta.get("title", ""), prim,
+            )
 
-    fb = stamp_record(fb, gen_model=GEN_MODEL)
-    fb["pipeline_commit"] = pipeline_commit
+        fb = stamp_record(fb, gen_model=GEN_MODEL)
+        fb["pipeline_commit"] = pipeline_commit
 
-    # Attach minhash sig for dedup (processed post-collection)
-    if minhash_ok:
-        _, sig = is_near_duplicate(definition, lsh, minhash_cache)
-        if sig:
-            fb["minhash_signature"] = sig
+        # Attach minhash sig for dedup (processed post-collection)
+        if minhash_ok:
+            _, sig = is_near_duplicate(definition, lsh, minhash_cache)
+            if sig:
+                fb["minhash_signature"] = sig
 
-    return fb
+        return fb
 
     # ── Parallel extraction (D2148: ThreadPool, 3 workers) ────────────────
     max_workers: int = 3
@@ -1436,7 +1436,7 @@ def process_singletons(
         for fb in all_fbs:
             f.write(json.dumps(fb) + "\n")
 
-    print(f"\n✅ Singleton extraction complete:")
+    print("\n✅ Singleton extraction complete:")
     print(f"   Extracted FBs: {total_extracted}")
     print(f"   NULL routes:   {total_null}")
     print(f"   Output:        {singleton_output}")

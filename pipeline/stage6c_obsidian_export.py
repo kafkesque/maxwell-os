@@ -44,7 +44,6 @@ from pipeline.pipeline_paths import (
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
-
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 def _slugify(name: str) -> str:
@@ -104,7 +103,7 @@ def _format_frontmatter(fb: dict) -> str:
 
     lines = ["---"]
     lines.append(f"fb_id: \"{fb_id}\"")
-    lines.append(f"type: foundation_block")
+    lines.append("type: foundation_block")
     lines.append(f"status: {status}")
     lines.append(f"discipline: {discipline}")
     lines.append(f"domains: {json.dumps(domains)}")
@@ -238,7 +237,7 @@ def _generate_source_book_page(book_name: str, fbs: list[dict]) -> str:
     """Generate a source book hub page with backlinks."""
     lines = [
         "---",
-        f"type: source_book",
+        "type: source_book",
         f"title: \"{book_name}\"",
         f"fb_count: {len(fbs)}",
         "---",
@@ -396,7 +395,7 @@ def main() -> None:
         skipped = len(fbs) - len(pass_fbs)
         if skipped:
             print(f"   PASS: {len(pass_fbs)} | Skipped (non-PASS): {skipped}")
-            print(f"   Use --all-statuses to include all")
+            print("   Use --all-statuses to include all")
         fbs = pass_fbs
 
     if not fbs:

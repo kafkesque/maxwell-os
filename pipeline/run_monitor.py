@@ -33,6 +33,7 @@ from pathlib import Path
 
 # D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
 from pipeline.pipeline_paths import DATA_DIR
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 METRICS_DIR = DATA_DIR / "metrics"
 
@@ -307,7 +308,7 @@ def monitor_run(cmd: list[str], run_id: str | None = None) -> dict:
     print(f"  📊 RUN SUMMARY — {run_id}")
     print(f"  Exit: {proc.returncode} | Time: {total_elapsed:.1f}s | LLM calls: ~{llm_calls} | Errors: {errors_seen}")
     print(f"  Memory: {memory_after['ram_used_percent']}% | Process RSS: {memory_after['process_rss_gb']}GB" if memory_after else "")
-    print(f"  Stage times:")
+    print("  Stage times:")
     for stage, elapsed in stage_times.items():
         analysis = stage_analyses.get(stage, {})
         extras = ""

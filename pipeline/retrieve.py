@@ -32,8 +32,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import DB_PATH
 from pipeline.feedback import mark_fb_retrieved  # D2188 (P1-2): usage tracking on retrieval
+from pipeline.pipeline_paths import DB_PATH
 
 
 def get_conn() -> sqlite3.Connection:
@@ -913,7 +913,7 @@ def main():
             if rationale:
                 print(f"   Rationale: {rationale}")
             if evidence_pack.exhausted:
-                print(f"   ⚠️  Iteration budget exhausted — results may be incomplete")
+                print("   ⚠️  Iteration budget exhausted — results may be incomplete")
             if evidence_pack.contradictions_surfaced:
                 print(f"   ⚡ {len(evidence_pack.contradictions_surfaced)} contradiction(s) surfaced")
         print(f"\n🔍 Found {len(results)} results\n")

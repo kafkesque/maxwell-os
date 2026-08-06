@@ -64,6 +64,7 @@ DROP_PATTERNS = [
 # identical patterns (script-vs-import double-loading otherwise desyncs them).
 def _load_extra_drop_patterns():
     from pathlib import Path
+
     import yaml as _yaml
     _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
     try:

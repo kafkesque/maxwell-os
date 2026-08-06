@@ -33,13 +33,9 @@ Usage:
 """
 
 import argparse
-import atexit
-import gc
 import json
-import logging
 import os
 import sys
-import tempfile
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -144,9 +140,9 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
 
     # ── D2127r5/D2189: MPS chunked processing ───────────────────────────
     if S15_EMBED_BACKEND == "mps":
+        import atexit
         import gc
         import tempfile
-        import atexit
 
         try:
             import torch

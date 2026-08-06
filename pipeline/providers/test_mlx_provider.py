@@ -184,8 +184,8 @@ def test_06_json_generation():
     except json.JSONDecodeError:
         # Fallback mode might not produce valid JSON with potion (embedding model)
         print(f"     Raw output (not valid JSON — expected with embedding model): '{result.text[:80]}...'")
-        print(f"     NOTE: potion-base-32M is an embedding model, not a chat model.")
-        print(f"     For real JSON tests, use a chat model like gemma-4-E4B.")
+        print("     NOTE: potion-base-32M is an embedding model, not a chat model.")
+        print("     For real JSON tests, use a chat model like gemma-4-E4B.")
 
 
 def test_07_batch_generate():
@@ -207,7 +207,7 @@ def test_07_batch_generate():
 
 def test_08_get_mlx_provider_factory():
     """Test: Factory function returns providers."""
-    from pipeline.providers.mlx_provider import get_mlx_provider, clear_providers
+    from pipeline.providers.mlx_provider import clear_providers, get_mlx_provider
 
     clear_providers()
 
@@ -276,7 +276,7 @@ def test_10_omlx_comparison():
     from pipeline.pipeline_paths import GEN_MODEL
 
     print(f"     Comparing MLX direct vs OMLX HTTP for model: {GEN_MODEL}")
-    print(f"     NOTE: This loads the full model. May take significant RAM.")
+    print("     NOTE: This loads the full model. May take significant RAM.")
 
     # MLX direct
     mlx_provider = MLXInferenceProvider(GEN_MODEL, max_tokens_default=100)
@@ -335,8 +335,8 @@ def test_11_delegate_compatibility():
         "latency_ms": result.latency_ms,
     }
     json.dumps(as_dict)  # Should not raise
-    print(f"     Result serializable: ✅")
-    print(f"     Interface: provider.generate(prompt, system=..., max_tokens=...)")
+    print("     Result serializable: ✅")
+    print("     Interface: provider.generate(prompt, system=..., max_tokens=...)")
 
     # Test 2: Drop-in compatibility signature
     def call_omlx_compat(prompt: str, model: str = "", system: str = "", max_tokens: int = 2048) -> str:
@@ -350,7 +350,7 @@ def test_11_delegate_compatibility():
     params = list(sig.parameters.keys())
     assert "prompt" in params, "Must have prompt parameter"
     assert "system" in params, "Must have system parameter"
-    print(f"     Compatible with call_omlx() signature: ✅")
+    print("     Compatible with call_omlx() signature: ✅")
 
     # Test 3: Delegate instructions can use it
     delegate_instructions = """
@@ -362,7 +362,7 @@ def test_11_delegate_compatibility():
     print(result.text)
     """
     print(f"     Delegate instructions template: {len(delegate_instructions)} chars")
-    print(f"     Delegate-compatible: ✅")
+    print("     Delegate-compatible: ✅")
 
 
 def test_12_temperature_enforcement():
@@ -378,7 +378,7 @@ def test_12_temperature_enforcement():
     # generate() clamps to >= 0.0
     result = provider.generate("Hello", temperature=-1.0)
     assert result.latency_ms > 0, "Should still generate"
-    print(f"     R7 enforced: temperature clamped to >= 0.0 ✅")
+    print("     R7 enforced: temperature clamped to >= 0.0 ✅")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

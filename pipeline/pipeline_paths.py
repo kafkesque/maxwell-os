@@ -302,7 +302,7 @@ def check_pipeline_state() -> str:
     if "bge-small" in str(s15_model).lower() and "bge-m3" in str(s4_model).lower():
         lines.append(f"  ⚠️  Embed model mismatch: S1.5={s15_model} ({s15_dim}d) vs S4={s4_model} (T1.2)")
     elif "bge-m3" in str(s15_model).lower() and "bge-m3" in str(s4_model).lower():
-        lines.append(f"  ✅ Embed models aligned: both bge-m3")
+        lines.append("  ✅ Embed models aligned: both bge-m3")
     else:
         lines.append(f"  ℹ️  Embed: S1.5={s15_model} ({s15_dim}d), S4={s4_model}")
 

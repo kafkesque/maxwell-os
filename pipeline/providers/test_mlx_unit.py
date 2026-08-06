@@ -44,8 +44,6 @@ def test_01_provider_imports():
     from pipeline.providers.mlx_provider import (
         MLXGenerationResult,
         MLXInferenceProvider,
-        clear_providers,
-        get_mlx_provider,
     )
     assert MLXInferenceProvider is not None
     assert MLXGenerationResult is not None
@@ -208,7 +206,7 @@ def test_08_temperature_enforcement():
 
 def test_09_factory_singleton():
     """get_mlx_provider() returns same instance for same model."""
-    from pipeline.providers.mlx_provider import get_mlx_provider, clear_providers
+    from pipeline.providers.mlx_provider import clear_providers, get_mlx_provider
 
     clear_providers()
     p1 = get_mlx_provider("test/model-a")

@@ -42,14 +42,11 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
 
 from pipeline.pipeline_paths import (  # noqa: E402
-    BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
-    OMLX_BIN,
     S6_DIR,
     S13_DIR,
-    S15_DIR,
-    STAGE_CHECKPOINTS,
     STAGE1_5_CHECKPOINT,
+    STAGE_CHECKPOINTS,
     get_run_id,
 )
 
@@ -247,7 +244,7 @@ def run_stage(
 
     # ── D2136: Preflight health check before LLM-bound stages ──────────
     if stage.get("llm_bound") and not skip_llm:
-        print(f"   🔍 Preflight: checking OMLX health...")
+        print("   🔍 Preflight: checking OMLX health...")
         try:
             watchdog = _PROJECT_ROOT / "pipeline" / "omlx_watchdog.py"
             preflight = subprocess.run(
@@ -264,7 +261,7 @@ def run_stage(
                 else:
                     print(f"   ⚠️  OMLX watchdog warning (continuing — non-LLM stage): {preflight.stderr.decode()[-200:]}")
             else:
-                print(f"   ✅ OMLX healthy")
+                print("   ✅ OMLX healthy")
         except Exception as e:
             if stage.get("llm_bound"):
                 print(f"   ❌ Preflight check failed for LLM-bound stage {stage_id} ({e})")
@@ -320,7 +317,6 @@ def _check_version_consistency() -> None:
     values, which would break reproducibility and downstream schema validation.
     """
     import sys
-    from pathlib import Path
 
     # D2182: Use _PROJECT_ROOT (not cwd) for version gate paths
     version_yaml_path: Path = _PROJECT_ROOT / "config" / "version.yaml"
@@ -373,8 +369,8 @@ def _check_version_consistency() -> None:
         print("=" * 70)
         for v in violations:
             print(f"   • {v}")
-        print(f"\n   Fix: update schema_version fields to match version.yaml")
-        print(f"   Or set version_gate_enabled: false in config/version.yaml")
+        print("\n   Fix: update schema_version fields to match version.yaml")
+        print("   Or set version_gate_enabled: false in config/version.yaml")
         print("=" * 70 + "\n")
         sys.exit(1)
 
@@ -567,7 +563,7 @@ Examples:
             resume_stage = state.get("last_stage", "")
             if resume_stage in STAGES:
                 print(f"⏸️  Found paused pipeline at Stage {resume_stage}")
-                print(f"   Auto-resuming... (use --resume-from to override)")
+                print("   Auto-resuming... (use --resume-from to override)")
                 args.resume_from = resume_stage
 
     # Override BORP for single-domain test runs

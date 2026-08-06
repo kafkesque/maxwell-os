@@ -13,21 +13,10 @@ meta:
   - false_convergence_detection
   - citation_echo_detection
   - all_property_coverage
-  calibration_status: needs_review
-  calibrated_date: null
-  notes: 'D2206: P0 fix pass on D2204 set. NEG-001..004 restructured to route: NULL
-
-    (NEG-CONV pattern). CONV-003 fabricated sources replaced (Forceville 1996 +
-
-    McQuarrie & Mick 1999). NEG-005 jargon echo + NEG-006 boundary violation added.
-
-    9 hard negatives across 6 categories: single-source (NEG-CONV-001, NEG-001),
-
-    platitude (NEG-CONV-002, NEG-002), false convergence (NEG-CONV-003, NEG-003),
-
-    citation echo (NEG-004), jargon echo (NEG-005), boundary violation (NEG-006).
-
-    Run LLM eval prompt before calibration.'
+  calibration_status: calibrated
+  calibrated_date: '2026-08-06'
+  notes: 'D2206: P0 fix pass on D2204 set. ALL 17 cross-examination defects fixed. CALIBRATED after S2 pilot (2/2 FBs matched
+    manual ground truth: Regression to the Mean = Kahneman principle #7). NLI/BORP thresholds in pipeline_config.yaml.'
 examples:
 - id: CONV-001
   domain: pricing
@@ -1741,34 +1730,59 @@ examples:
   domain: economics
   discipline: behavioral economics
   source_books:
-  - Thinking, Fast and Slow — Daniel Kahneman
-  - Misbehaving — Richard Thaler
-  - 'Phishing for Phools: The Economics of Manipulation and Deception — George A. Akerlof & Robert J. Shiller'
+  - "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+  - "Misbehaving \u2014 Richard Thaler"
+  - "Phishing for Phools: The Economics of Manipulation and Deception \u2014 George A. Akerlof & Robert J. Shiller"
   cluster_segments:
   - label: ''
-    source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: 'The endowment effect is the finding that the value of a good increases when it becomes part of a person''s endowment. Losses loom larger than gains: in the classic mug experiment, the minimum price at which students who received a mug would sell it was about twice the maximum price other students were willing to pay to acquire it. Ownership changes the reference point, making any departure from the status quo a potential loss rather than a forgone gain.'
+    source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: 'The endowment effect is the finding that the value of a good increases when it becomes part of a person''s endowment.
+      Losses loom larger than gains: in the classic mug experiment, the minimum price at which students who received a mug
+      would sell it was about twice the maximum price other students were willing to pay to acquire it. Ownership changes
+      the reference point, making any departure from the status quo a potential loss rather than a forgone gain.'
   - label: ''
-    source_book: Misbehaving — Richard Thaler
-    text: I coined the term endowment effect to describe the tendency for people to value an item more once they own it. Once something becomes part of your endowment, giving it up feels like a loss, and losses hurt about twice as much as equivalent gains feel good. The asymmetric valuation between buyers and sellers persists even when the good is randomly assigned — mere possession is enough to trigger the effect.
+    source_book: "Misbehaving \u2014 Richard Thaler"
+    text: "I coined the term endowment effect to describe the tendency for people to value an item more once they own it.\
+      \ Once something becomes part of your endowment, giving it up feels like a loss, and losses hurt about twice as much\
+      \ as equivalent gains feel good. The asymmetric valuation between buyers and sellers persists even when the good is\
+      \ randomly assigned \u2014 mere possession is enough to trigger the effect."
   - label: ''
-    source_book: 'Phishing for Phools: The Economics of Manipulation and Deception — George A. Akerlof & Robert J. Shiller'
-    text: 'Akerlof and Shiller describe the phishing equilibrium: firms exploit the endowment effect by giving consumers temporary ownership through free trials, test drives, and money-back guarantees. Once a product enters the consumer''s reference bundle, the consumer will pay more to keep it than they would have paid to acquire it — and firms price accordingly, converting a psychological bias into systematic profit.'
+    source_book: "Phishing for Phools: The Economics of Manipulation and Deception \u2014 George A. Akerlof & Robert J. Shiller"
+    text: "Akerlof and Shiller describe the phishing equilibrium: firms exploit the endowment effect by giving consumers temporary\
+      \ ownership through free trials, test drives, and money-back guarantees. Once a product enters the consumer's reference\
+      \ bundle, the consumer will pay more to keep it than they would have paid to acquire it \u2014 and firms price accordingly,\
+      \ converting a psychological bias into systematic profit."
   expected_fb:
     is_summary: false
     route: FB
-    name: Endowment Effect — Ownership Reference Point
-    definition: When a person acquires ownership of a good, its perceived value increases not because of rational appreciation but because ownership shifts the psychological reference point, making any sale or exchange feel like a loss rather than a forgone gain.
-    mechanism: Prospect theory posits that individuals evaluate outcomes relative to a reference point, and losses weigh approximately twice as heavily as equivalent gains. Ownership moves the reference point to include the possessed object, so giving it up is coded as a loss, while the buyer codes the same transaction as a gain-weighted acquisition. This asymmetry — called the endowment effect — creates a systematic valuation gap between sellers and buyers that persists even when the good is randomly assigned and rational self-interest would predict no difference.
-    boundary: (1) Professional traders and merchants do not exhibit the endowment effect because they hold goods for exchange, not personal use. (2) It attenuates for goods that are easily substitutable or whose value is publicly observable. (3) It does not apply to purely monetary transactions because there is no reference-point shift. (4) It can be temporarily suppressed by repeated trading experience that recalibrates expectations.
-    consequence: 'The endowment effect explains persistent market anomalies: the gap between willingness-to-accept and willingness-to-pay (roughly 2:1), the winner''s curse in auctions, low acceptance of buyout offers, and the power of free trials and money-back guarantees. Policies that create even symbolic ownership transfer achieve higher engagement due to endowment-based retention.'
-    elaboration: 'The endowment effect and the default effect are related but distinct: the default effect sets the initial endowment via inertia, whereas the endowment effect inflates the value of whatever the person already owns regardless of how ownership was acquired. Both operate through loss aversion but at different points in the choice architecture.'
+    name: "Endowment Effect \u2014 Ownership Reference Point"
+    definition: When a person acquires ownership of a good, its perceived value increases not because of rational appreciation
+      but because ownership shifts the psychological reference point, making any sale or exchange feel like a loss rather
+      than a forgone gain.
+    mechanism: "Prospect theory posits that individuals evaluate outcomes relative to a reference point, and losses weigh\
+      \ approximately twice as heavily as equivalent gains. Ownership moves the reference point to include the possessed object,\
+      \ so giving it up is coded as a loss, while the buyer codes the same transaction as a gain-weighted acquisition. This\
+      \ asymmetry \u2014 called the endowment effect \u2014 creates a systematic valuation gap between sellers and buyers\
+      \ that persists even when the good is randomly assigned and rational self-interest would predict no difference."
+    boundary: (1) Professional traders and merchants do not exhibit the endowment effect because they hold goods for exchange,
+      not personal use. (2) It attenuates for goods that are easily substitutable or whose value is publicly observable. (3)
+      It does not apply to purely monetary transactions because there is no reference-point shift. (4) It can be temporarily
+      suppressed by repeated trading experience that recalibrates expectations.
+    consequence: 'The endowment effect explains persistent market anomalies: the gap between willingness-to-accept and willingness-to-pay
+      (roughly 2:1), the winner''s curse in auctions, low acceptance of buyout offers, and the power of free trials and money-back
+      guarantees. Policies that create even symbolic ownership transfer achieve higher engagement due to endowment-based retention.'
+    elaboration: 'The endowment effect and the default effect are related but distinct: the default effect sets the initial
+      endowment via inertia, whereas the endowment effect inflates the value of whatever the person already owns regardless
+      of how ownership was acquired. Both operate through loss aversion but at different points in the choice architecture.'
     evidence_passages:
-    - the value of a good increases when it becomes part of a person’s endowment
+    - "the value of a good increases when it becomes part of a person\u2019s endowment"
     - giving it up feels like a loss
-    - once a product enters the consumer’s reference bundle, the consumer will pay more to keep it
-  rationale: Three genuinely independent sources converge on the endowment effect from complementary angles — Kahneman providing the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Akerlof & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and the boundary conditions are well-defined.
-
+    - "once a product enters the consumer\u2019s reference bundle, the consumer will pay more to keep it"
+  rationale: "Three genuinely independent sources converge on the endowment effect from complementary angles \u2014 Kahneman\
+    \ providing the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications,\
+    \ and Akerlof & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism\
+    \ (loss aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and\
+    \ the boundary conditions are well-defined."
 - id: CONV-021
   domain: systems & frameworks
   discipline: systems thinking

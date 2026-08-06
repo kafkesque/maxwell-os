@@ -13,7 +13,10 @@ Usage: python3 pipeline/golden_validate.py [path]
 Exit 0 on pass, 1 on failure. Prints failures to stderr.
 """
 
-import sys, re, yaml
+import re
+import sys
+
+import yaml
 
 
 def norm(text: str) -> str:

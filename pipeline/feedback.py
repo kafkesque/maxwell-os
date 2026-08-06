@@ -33,8 +33,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     pass
 
-from pipeline.io_guard import safe_write
-from pipeline.pipeline_paths import DB_PATH, PROJECT_ROOT
+from pipeline.pipeline_paths import DB_PATH
 
 FEEDBACK_TABLE: str = "fb_feedback"
 
@@ -213,7 +212,7 @@ def get_retirement_candidates(db_path: Path | None = None) -> list[dict]:
         _ensure_feedback_table(conn)
 
         rows = conn.execute(
-            f"""SELECT fb_id, feedback_score, feedback_count, name
+            """SELECT fb_id, feedback_score, feedback_count, name
                 FROM fbs
                 WHERE feedback_count >= ?
                   AND feedback_score < ?

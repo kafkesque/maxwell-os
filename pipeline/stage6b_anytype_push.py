@@ -34,11 +34,9 @@ Usage:
 """
 
 import argparse
-import hashlib
 import json
 import os
 import sys
-import time
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -49,7 +47,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
-    CHECKPOINT_DIR,
     S4_GE_OUTPUT,
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
@@ -819,15 +816,15 @@ def main() -> None:
         print(f"   PT/PI/GE/TI:    {stats['pt']} PT, {stats['pi']} PI, "
               f"{stats['ge']} GE, {stats['ti']} TI")
     print(f"   Output:         {PUSH_DIR}")
-    print(f"\n   Domain folders:")
+    print("\n   Domain folders:")
     for domain in sorted(by_domain.keys()):
         count = len(by_domain[domain])
         print(f"     {domain}/  ({count} FBs)")
     print(f"\n📋 Domain index:   {PUSH_DIR / 'domain_index.json'}")
     print(f"📋 Push stats:     {PUSH_DIR / 'push_stats.json'}")
     print(f"\n💡 Next: Use the JSON payloads in {PUSH_DIR}/{{domain}}/{{fb_slug}}.json")
-    print(f"   to push to Anytype via the Local API or anytype-mcp server.")
-    print(f"   All 42+ fields included per D2122. 3-zone body per D2123.")
+    print("   to push to Anytype via the Local API or anytype-mcp server.")
+    print("   All 42+ fields included per D2122. 3-zone body per D2123.")
 
 
 if __name__ == "__main__":

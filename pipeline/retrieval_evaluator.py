@@ -204,6 +204,7 @@ def evaluate_fb_set_quick(
         FileNotFoundError: If Maxwell DB not found
     """
     import sqlite3
+
     from pipeline.pipeline_paths import DB_PATH
 
     if not DB_PATH.exists():

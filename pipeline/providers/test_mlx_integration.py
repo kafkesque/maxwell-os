@@ -28,8 +28,9 @@ DEFAULT_MODEL = "mlx-community/Qwen2.5-0.5B-Instruct-4bit"
 
 def download_model(model_name: str) -> bool:
     """Download model if not cached. Returns True if ready."""
-    from huggingface_hub import snapshot_download
     import os
+
+    from huggingface_hub import snapshot_download
 
     cache_dir = os.path.expanduser("~/.cache/huggingface/hub")
     model_dir = model_name.replace("/", "--")
@@ -168,7 +169,6 @@ def test_delegate_compatibility(provider) -> dict:
     # 3. Call generate with various parameters
     # 4. Return results
 
-    from pipeline.providers.mlx_provider import MLXInferenceProvider
 
     # Test 1: Standard generate
     r1 = provider.generate("What is 2+2?", max_tokens=30)
@@ -275,7 +275,7 @@ def main():
             print(f"  ✅ {name}")
 
     # Speed recommendations
-    print(f"\n--- Speed Analysis ---")
+    print("\n--- Speed Analysis ---")
     if "Basic Generation" in results and "error" not in results["Basic Generation"]:
         gen = results["Basic Generation"]
         tps = gen["tokens"] / (gen["latency_ms"] / 1000) if gen["latency_ms"] > 0 else 0
@@ -293,11 +293,11 @@ def main():
     if "Delegate Compatibility" in results and "error" not in results["Delegate Compatibility"]:
         dc = results["Delegate Compatibility"]
         if dc.get("all_successful"):
-            print(f"\n  ✅ Delegate-compatible: all generation patterns work")
+            print("\n  ✅ Delegate-compatible: all generation patterns work")
         else:
-            print(f"\n  ⚠️  Delegate compatibility: partial")
+            print("\n  ⚠️  Delegate compatibility: partial")
 
-    print(f"\n  Note: For speculative decoding (1.5-2x faster), add --draft-model")
+    print("\n  Note: For speculative decoding (1.5-2x faster), add --draft-model")
     print(f"  Example: get_mlx_provider('{model_name}', draft_model_name='mlx-community/Qwen2.5-0.5B-Instruct-4bit')")
 
     return 0 if all_passed else 1

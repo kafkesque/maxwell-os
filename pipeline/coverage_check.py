@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Coverage gap analysis for Stage 2 FBs — residual embedding check (D2149)."""
 
-import argparse, json, statistics, sys
+import argparse
+import json
+import statistics
+import sys
 from pathlib import Path
+
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -88,7 +92,7 @@ def main():
     args = parser.parse_args()
 
     if not STAGE2_CHECKPOINT.exists():
-        print(f"No S2 checkpoint. Run stage2_extract.py first.")
+        print("No S2 checkpoint. Run stage2_extract.py first.")
         sys.exit(1)
 
     fbs = [json.loads(line) for line in open(STAGE2_CHECKPOINT) if line.strip()]
@@ -118,7 +122,7 @@ def main():
         print(f"  Mean under-covered:   {statistics.mean(all_under)*100:.1f}%")
 
     if flagged:
-        print(f"\nFLAGGED CLUSTERS (potential under-extraction):")
+        print("\nFLAGGED CLUSTERS (potential under-extraction):")
         for r in sorted(flagged, key=lambda x: -x["under_covered_fraction"])[:10]:
             print(f"  [{r['under_covered_fraction']*100:.0f}%] {r['name'][:55]} ({r['under_covered']}/{r['total_segments']} segs)")
         if args.output:

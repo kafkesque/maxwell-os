@@ -38,12 +38,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
-    S5_DIR,
     S6_DIR,
     S6_OKF_EXPORT_ENABLED,
     STAGE5_CHECKPOINT,
 )
-from pipeline.stamp import get_pipeline_commit
 
 # ── Constants ──────────────────────────────────────────────────────────────
 OKF_DIR_NAME: str = ".okf"
@@ -64,7 +62,7 @@ def _slugify(name: str) -> str:
 def _format_frontmatter(fb: dict) -> str:
     """Generate YAML frontmatter from an FB dict."""
     lines = ["---"]
-    lines.append(f"type: FoundationBlock")
+    lines.append("type: FoundationBlock")
     lines.append(f"title: {fb.get('name', 'Untitled')}")
     desc = fb.get("definition", "")
     if len(desc) > 160:
@@ -385,7 +383,7 @@ def main() -> None:
         ckpt_path = STAGE5_CHECKPOINT
         if not ckpt_path.exists():
             print(f"  ❌ Stage 5 checkpoint not found: {ckpt_path}")
-            print(f"  💡 Run Stage 5 first, or use --source sqlite")
+            print("  💡 Run Stage 5 first, or use --source sqlite")
             sys.exit(1)
 
         print(f"  📖 Loading FBs from: {ckpt_path}")
@@ -404,7 +402,7 @@ def main() -> None:
         db_path = S6_DIR / "fbs.db"
         if not db_path.exists():
             print(f"  ❌ SQLite DB not found: {db_path}")
-            print(f"  💡 Run Stage 6 first, or use --source checkpoint")
+            print("  💡 Run Stage 6 first, or use --source checkpoint")
             sys.exit(1)
 
         print(f"  📖 Loading FBs from: {db_path}")
@@ -434,13 +432,13 @@ def main() -> None:
     elapsed = time.time() - start
 
     print(f"\n  ✅ OKF export complete in {elapsed:.1f}s")
-    print(f"  ┌─────────────────────────────────────────────┐")
+    print("  ┌─────────────────────────────────────────────┐")
     print(f"  │ FBs written:  {stats['fbs_written']:>4}                          │")
     print(f"  │ FBs skipped:  {stats['fbs_skipped']:>4}                          │")
     print(f"  │ Domains:      {stats['domains']:>4}                          │")
     print(f"  │ Bundle:       {stats['okf_dir']}")
-    print(f"  └─────────────────────────────────────────────┘")
-    print(f"\n  Next steps:")
+    print("  └─────────────────────────────────────────────┘")
+    print("\n  Next steps:")
     print(f"    okf validate {stats['okf_dir']}    # Validate OKF conformance")
     print(f"    okf lint {stats['okf_dir']}        # Check curation quality")
     print(f"    okf server {stats['okf_dir']}      # Browse interactive graph")

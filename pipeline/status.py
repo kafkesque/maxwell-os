@@ -150,13 +150,12 @@ def get_status(json_output: bool = False) -> dict:
         0: "0. Convert  ",
         1: "1. Chunk    ",
         2: "2. Extract  ",
-        3: "3. Cluster  ",
         4: "4. Merge    ",
         5: "5. Verify   ",
         6: "6. Commit   ",
     }
-    for i in range(7):
-        count = stage_counts[i]
+    for i in sorted(stage_names):
+        count = stage_counts.get(i, 0)
         bar = _bar(count, max(max(stage_counts.values()), 1), 20)
         name = stage_names[i]
         print(f"  │ {name} │ {bar} │ {count:>6} │")

@@ -35,13 +35,11 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.io_guard import safe_write
 from pipeline.omlx_call import call_omlx_json
-from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR, OMLX_URL
+from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -107,7 +105,7 @@ def _file_content_hash(filepath: Path) -> str:
     return hashlib.sha256(filepath.read_bytes()).hexdigest()[:16]
 
 
-def extract_from_text(text: str, filename: str, model: str) -> Optional[dict]:
+def extract_from_text(text: str, filename: str, model: str) -> dict | None:
     """Extract author/title/year from MD preamble text via LLM.
 
     Args:
@@ -357,7 +355,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
             continue
 
         print(f"   🤖 {filename[:60]:60s} → ", end="", flush=True)
-        result: Optional[dict] = extract_from_text(text, filename, model)
+        result: dict | None = extract_from_text(text, filename, model)
 
         if result and (result["author"] or result["title"]):
             record = {

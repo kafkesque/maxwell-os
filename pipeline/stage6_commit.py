@@ -57,7 +57,6 @@ from pipeline.schema_accessor import (
     fb_name,
     fb_provenance,
     fb_source_books,
-    fb_source_texts,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
@@ -473,7 +472,7 @@ def run_stage6(export_only: bool = False):
         except Exception:
             pass
         if vec_count == 0:
-            print(f"  ⚠️  Vector: DEGRADED — 0 embeddings (sqlite-vec may be unavailable)")
+            print("  ⚠️  Vector: DEGRADED — 0 embeddings (sqlite-vec may be unavailable)")
         elif vec_count < count:
             pct = round(vec_count / count * 100, 1)
             print(f"  ⚠️  Vector: DEGRADED {vec_count}/{count} ({pct}%)")

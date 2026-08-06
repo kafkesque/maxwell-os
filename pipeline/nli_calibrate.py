@@ -35,7 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 
-from pipeline.pipeline_paths import S5_NLI_MODEL, S5_NLI_MODEL_FALLBACK
+from pipeline.pipeline_paths import S5_NLI_MODEL
 from pipeline.stage5_verify import _get_nli, nli_entailment
 
 
@@ -242,7 +242,7 @@ def print_report(calibration: dict) -> None:
         print(f"{r['threshold']:>10.2f} {r['precision']:>7.3f} {r['recall']:>7.3f} "
               f"{r['f1']:>7.3f} {r['tp']:>5} {r['fp']:>5} {r['tn']:>5} {r['fn']:>5}{marker}")
 
-    print(f"\n📊 RECOMMENDED THRESHOLDS:")
+    print("\n📊 RECOMMENDED THRESHOLDS:")
     best_f1 = calibration["best_f1_threshold"]
     best_prec = calibration["best_precision_threshold"]
     print(f"   NLI_ENTAILMENT_THRESHOLD = {best_f1['threshold']:.2f}  (F1={best_f1['f1']:.3f})")
@@ -250,10 +250,10 @@ def print_report(calibration: dict) -> None:
     print(f"   NLI_MARGINAL_THRESHOLD  = {max(0.40, best_f1['threshold'] - 0.10):.2f}  (lower bound)")
 
     # Compare with current defaults
-    print(f"\n📋 CURRENT DEFAULTS (pipeline_config.yaml):")
-    print(f"   NLI_ENTAILMENT_THRESHOLD = 0.60")
-    print(f"   NLI_PASS_THRESHOLD      = 0.80")
-    print(f"   NLI_MARGINAL_THRESHOLD  = 0.50")
+    print("\n📋 CURRENT DEFAULTS (pipeline_config.yaml):")
+    print("   NLI_ENTAILMENT_THRESHOLD = 0.60")
+    print("   NLI_PASS_THRESHOLD      = 0.80")
+    print("   NLI_MARGINAL_THRESHOLD  = 0.50")
 
     drift = abs(best_f1["threshold"] - 0.60)
     if drift > 0.10:

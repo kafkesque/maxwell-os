@@ -1743,7 +1743,7 @@ examples:
   source_books:
   - Thinking, Fast and Slow — Daniel Kahneman
   - Misbehaving — Richard Thaler
-  - Predictably Irrational — Dan Ariely
+  - 'Phishing for Phools: The Economics of Manipulation and Deception — George A. Akerlof & Robert J. Shiller'
   cluster_segments:
   - label: ''
     source_book: Thinking, Fast and Slow — Daniel Kahneman
@@ -1752,8 +1752,8 @@ examples:
     source_book: Misbehaving — Richard Thaler
     text: I coined the term endowment effect to describe the tendency for people to value an item more once they own it. Once something becomes part of your endowment, giving it up feels like a loss, and losses hurt about twice as much as equivalent gains feel good. The asymmetric valuation between buyers and sellers persists even when the good is randomly assigned — mere possession is enough to trigger the effect.
   - label: ''
-    source_book: Predictably Irrational — Dan Ariely
-    text: 'Ariely demonstrates that ownership changes our valuation: we overvalue what we already have. In his experiments, students who won basketball ticket lotteries valued their tickets far higher than the students who did not win. No rational calculation explains the gap — the mere fact of ownership triggers a psychological attachment that inflates perceived value.'
+    source_book: 'Phishing for Phools: The Economics of Manipulation and Deception — George A. Akerlof & Robert J. Shiller'
+    text: 'Akerlof and Shiller describe the phishing equilibrium: firms exploit the endowment effect by giving consumers temporary ownership through free trials, test drives, and money-back guarantees. Once a product enters the consumer''s reference bundle, the consumer will pay more to keep it than they would have paid to acquire it — and firms price accordingly, converting a psychological bias into systematic profit.'
   expected_fb:
     is_summary: false
     route: FB
@@ -1766,8 +1766,8 @@ examples:
     evidence_passages:
     - the value of a good increases when it becomes part of a person’s endowment
     - giving it up feels like a loss
-    - the mere fact of ownership triggers a psychological attachment
-  rationale: Three genuinely independent behavioral economists converge on the endowment effect from complementary angles — Kahneman providing the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Ariely replicating with field experiments and extending to psychological attachment. The mechanism (loss aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and the boundary conditions are well-defined.
+    - once a product enters the consumer’s reference bundle, the consumer will pay more to keep it
+  rationale: Three genuinely independent sources converge on the endowment effect from complementary angles — Kahneman providing the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Akerlof & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and the boundary conditions are well-defined.
 
 - id: CONV-021
   domain: systems & frameworks

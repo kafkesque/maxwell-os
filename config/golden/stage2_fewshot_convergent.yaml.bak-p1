@@ -702,6 +702,7 @@ examples:
       that override spatial grouping.
 
       '
+    consequence_2: ''
     evidence_passages:
     - elements placed close together are perceived as more related than elements placed far apart
     - When related controls are physically grouped together, users infer a mapping between them
@@ -747,7 +748,7 @@ examples:
   domain: ai & agents
   discipline: machine learning
   source_books:
-  - "Superintelligence: Paths, Dangers, Strategies \u2014 Nick Bostrom"
+  - "Artificial Intelligence: A Modern Approach \u2014 Russell & Norvig"
   - "Human Compatible \u2014 Stuart Russell"
   - "The Alignment Problem \u2014 Brian Christian"
   cluster_segments:
@@ -768,14 +769,14 @@ examples:
       \ first train the base model, then collect human preference\ncomparisons between model outputs, then train a reward\
       \ model that predicts human\npreferences, and finally optimize the policy against that reward model. Each step\nintroduces\
       \ its own failure modes \u2014 reward hacking, distribution shift, and overfitting\nto the preference dataset.\n"
-  - source_book: "Superintelligence: Paths, Dangers, Strategies \u2014 Nick Bostrom"
-    text: 'The orthogonality thesis holds that intelligence and final goals are orthogonal:
+  - source_book: "Artificial Intelligence: A Modern Approach \u2014 Russell & Norvig"
+    text: 'The specification problem is fundamental: any formally specified utility function
 
-      more or less any level of intelligence could in principle be combined with more or less
+      will fail to capture the full richness of what we want. This is why agents must be
 
-      any final goal. This means a superintelligent agent with a misspecified objective
+      designed with uncertainty about the true objective and a mechanism for learning it
 
-      will pursue the letter of that objective in ways its designers never intended.
+      from human behavior, rather than assuming the specification is complete.
 
       '
   is_convergent: true
@@ -800,7 +801,7 @@ examples:
       corrects for specification errors.
 
       '
-    consequence: "Systems that assume complete specifications (command-and-control) produce\noptimization failures; systems\
+    consequence: "Systems that assume complete specifications (command-and-control) produce\nopptimization failures; systems\
       \ that model uncertainty (assistance game) remain\nreversible and corrigible. This is a necessary \u2014 not sufficient\
       \ \u2014 condition for safe AI.\n"
     boundary: 'Applies to AI systems that can act autonomously in high-stakes domains. Fails when:
@@ -815,7 +816,7 @@ examples:
     evidence_passages:
     - specifying the objective precisely is impossible for complex real-world values
     - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
-    - intelligence and final goals are orthogonal
+    - any formally specified utility function will fail to capture the full richness of what we want
     depth: universal
     evidence: cited
     jargon:
@@ -1052,7 +1053,7 @@ examples:
 
       (highest). Senge''s ''small changes, big results'' formulation and Taleb''s
 
-      antifragility both independently arrive at the same structural-vs-parametric
+      afntifragility both independently arrive at the same structural-vs-parametric
 
       distinction.'
     prerequisite_fbs:
@@ -1097,6 +1098,7 @@ examples:
     text: "Generative design is not about coding a specific image but about coding a system\nthat produces images. The designer's\
       \ role shifts from drawing the artifact to\ndesigning the rules and parameters that generate the artifact. Small rule\
       \ changes\nproduce vastly different outputs \u2014 the design space is explored computationally.\n"
+    source_book_2: ''
   - source_book: "A New Kind of Science \u2014 Stephen Wolfram"
     text: 'Simple programs can produce behavior of great complexity. Wolfram''s cellular
 
@@ -1736,39 +1738,114 @@ examples:
 
     '
 - id: CONV-020
+  domain: legal & public policy
+  discipline: political economy
+  source_books:
+  - "Nudge \u2014 Richard Thaler & Cass Sunstein"
+  - "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+  - "The Undoing Project \u2014 Michael Lewis"
+  cluster_segments:
+  - source_book: "Nudge \u2014 Richard Thaler & Cass Sunstein"
+    text: "Defaults are incredibly powerful. When a choice is framed with a default, most\npeople do not change it \u2014\
+      \ they accept the option they are given. In retirement\nsavings, automatic enrollment (opt-out) produces participation\
+      \ rates above 90%,\nwhile voluntary enrollment (opt-in) produces rates below 50%. Changing the\ndefault changes behavior\
+      \ without restricting choice.\n"
+  - source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: 'Status quo bias is a manifestation of loss aversion and inertia. People
+
+      overweight the losses associated with changing from the current state. This is
+
+      why defaults matter: the default defines the status quo, and changing it
+
+      requires overcoming loss aversion.
+
+      '
+  - source_book: "The Undoing Project \u2014 Michael Lewis"
+    text: "Kahneman and Tversky's prospect theory showed that people evaluate outcomes\nrelative to a reference point, not\
+      \ absolutely. The default sets the reference\npoint \u2014 any change is perceived as a loss or gain relative to it.\
+      \ This is the\npsychological foundation of why default options stick.\n"
   is_convergent: true
   should_extract: true
-  domain: economics
-  discipline: behavioral economics
-  source_books:
-  - Thinking, Fast and Slow — Daniel Kahneman
-  - Misbehaving — Richard Thaler
-  - Predictably Irrational — Dan Ariely
-  cluster_segments:
-  - label: ''
-    source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: 'The endowment effect is the finding that the value of a good increases when it becomes part of a person''s endowment. Losses loom larger than gains: in the classic mug experiment, the minimum price at which students who received a mug would sell it was about twice the maximum price other students were willing to pay to acquire it. Ownership changes the reference point, making any departure from the status quo a potential loss rather than a forgone gain.'
-  - label: ''
-    source_book: Misbehaving — Richard Thaler
-    text: I coined the term endowment effect to describe the tendency for people to value an item more once they own it. Once something becomes part of your endowment, giving it up feels like a loss, and losses hurt about twice as much as equivalent gains feel good. The asymmetric valuation between buyers and sellers persists even when the good is randomly assigned — mere possession is enough to trigger the effect.
-  - label: ''
-    source_book: Predictably Irrational — Dan Ariely
-    text: 'Ariely demonstrates that ownership changes our valuation: we overvalue what we already have. In his experiments, students who won basketball ticket lotteries valued their tickets far higher than the students who did not win. No rational calculation explains the gap — the mere fact of ownership triggers a psychological attachment that inflates perceived value.'
   expected_fb:
     is_summary: false
     route: FB
-    name: Endowment Effect — Ownership Reference Point
-    definition: When a person acquires ownership of a good, its perceived value increases not because of rational appreciation but because ownership shifts the psychological reference point, making any sale or exchange feel like a loss rather than a forgone gain.
-    mechanism: Prospect theory posits that individuals evaluate outcomes relative to a reference point, and losses weigh approximately twice as heavily as equivalent gains. Ownership moves the reference point to include the possessed object, so giving it up is coded as a loss, while the buyer codes the same transaction as a gain-weighted acquisition. This asymmetry — called the endowment effect — creates a systematic valuation gap between sellers and buyers that persists even when the good is randomly assigned and rational self-interest would predict no difference.
-    boundary: (1) Professional traders and merchants do not exhibit the endowment effect because they hold goods for exchange, not personal use. (2) It attenuates for goods that are easily substitutable or whose value is publicly observable. (3) It does not apply to purely monetary transactions because there is no reference-point shift. (4) It can be temporarily suppressed by repeated trading experience that recalibrates expectations.
-    consequence: 'The endowment effect explains persistent market anomalies: the gap between willingness-to-accept and willingness-to-pay (roughly 2:1), the winner''s curse in auctions, low acceptance of buyout offers, and the power of free trials and money-back guarantees. Policies that create even symbolic ownership transfer achieve higher engagement due to endowment-based retention.'
-    elaboration: 'The endowment effect and the default effect are related but distinct: the default effect sets the initial endowment via inertia, whereas the endowment effect inflates the value of whatever the person already owns regardless of how ownership was acquired. Both operate through loss aversion but at different points in the choice architecture.'
-    evidence_passages:
-    - the value of a good increases when it becomes part of a person’s endowment
-    - giving it up feels like a loss
-    - the mere fact of ownership triggers a psychological attachment
-  rationale: Three genuinely independent behavioral economists converge on the endowment effect from complementary angles — Kahneman providing the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Ariely replicating with field experiments and extending to psychological attachment. The mechanism (loss aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and the boundary conditions are well-defined.
+    name: Default Option Stickiness
+    definition: "When a choice architecture includes a default option, the majority of people\nwill accept the default rather\
+      \ than actively choose an alternative. Changing\nthe default reliably changes aggregate behavior without prohibiting\
+      \ any option\n\u2014 a form of libertarian paternalism.\n"
+    mechanism: 'Defaults leverage status quo bias and loss aversion: the default becomes the
 
+      reference point, and any deviation is evaluated as a potential loss. Combined
+
+      with inertia and the effort cost of opting out, this produces high default
+
+      acceptance rates.
+
+      '
+    consequence: 'Policies and products that set defaults deliberately (automatic enrollment,
+
+      pre-checked options, standard configurations) achieve dramatically higher
+
+      adoption than equivalent opt-in designs, at zero cost to choice freedom.
+
+      '
+    boundary: "Applies when the choice is one people are reluctant to deliberate on (complex,\nlow-stakes, or emotionally\
+      \ neutral). Fails when: (1) the choice is highly\nconsequential (medical decisions) \u2014 people override defaults;\
+      \ (2) the default\nis obviously harmful \u2014 backlash and opt-out increase; (3) the population has\nstrong pre-existing\
+      \ preferences.\n"
+    evidence_passages:
+    - automatic enrollment (opt-out) produces participation rates above 90%
+    - Status quo bias is a manifestation of loss aversion and inertia
+    - people evaluate outcomes relative to a reference point, not absolutely
+    depth: universal
+    evidence: cited
+    jargon:
+    - choice architecture
+    - default
+    - status quo bias
+    - nudge
+    keywords:
+    - default
+    - nudge
+    - behavioral economics
+    - choice architecture
+    application: Retirement policy, organ donation, insurance, software settings, consent forms
+    elaboration: 'The default effect is one of the most replicated findings in behavioral
+
+      economics, with field evidence from retirement savings (401k), organ donation
+
+      (opt-out countries), and privacy settings.'
+    prerequisite_fbs:
+    - 'LOSS-AV-001: Loss Aversion Basics'
+    contradicts_fbs:
+    - 'RATIONAL-ACTOR-001: Rational Actor Model'
+    related_fbs:
+    - 'FRAMING-001: Choice Framing Effects'
+    procedural_skill: 'When designing any choice architecture: (1) identify the desired social or
+
+      individual outcome; (2) set the default to the option that produces it; (3)
+
+      keep the alternative one step away (not hidden); (4) disclose the default and
+
+      its rationale; (5) measure opt-out rate; (6) revisit if opt-out exceeds a
+
+      threshold indicating coercion.
+
+      '
+    failure_mode: 'Setting defaults for consequential personal choices (medical, financial)
+
+      without transparency backfires: perceived manipulation triggers reactance and
+
+      erodes trust in the institution, causing long-term opt-out and reputation
+
+      damage.
+
+      '
+  rationale: 'Thaler/Sunstein, Kahneman, and Lewis converge on default stickiness via status quo
+
+    bias and reference points. Demonstrates legal & public policy domain, contradicts_fbs.
+
+    '
 - id: CONV-021
   domain: systems & frameworks
   discipline: systems thinking

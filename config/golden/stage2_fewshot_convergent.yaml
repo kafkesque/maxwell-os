@@ -857,7 +857,7 @@ examples:
       on edge cases. Fix: diversify preference data and add adversarial evaluation.
 
       '
-  rationale: 'Three AI references (Russell, Christian, Russell & Norvig) converge on objective
+  rationale: 'Three AI references (Bostrom, Russell, and Christian) converge on objective
 
     uncertainty as the foundational alignment principle. Demonstrates AI & Computing group,
 

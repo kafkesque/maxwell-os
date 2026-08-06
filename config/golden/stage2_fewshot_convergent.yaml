@@ -1,506 +1,2027 @@
-examples:
-  - id: CONV-001
-    domain: pricing
-    source_books:
-      - Predictably Irrational — Dan Ariely
-      - Thinking, Fast and Slow — Daniel Kahneman
-      - Priceless — William Poundstone
-    cluster_segments:
-      - source_book: Predictably Irrational — Dan Ariely
-        text: "The Economist's subscription page became a famous case study. They offered three options:\nWeb-only for $59,
-          Print-only for $125, and Print+Web for $125. The Print-only option was\nthe decoy — nobody chose it, but its presence
-          made Print+Web look like a bargain. Dan Ariely\ntested this with his students: when the decoy was present, 84% chose
-          Print+Web. When he\nremoved the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web.\n"
-      - source_book: Thinking, Fast and Slow — Daniel Kahneman
-        text: "The dominance relationship makes choices easier. When A dominates B in all respects, people\nchoose A without
-          hesitation. But when A is better than B on some dimensions and worse on\nothers, choice becomes difficult and people
-          often defer. This is why adding a clearly inferior\noption that is dominated by the target can increase the target's
-          share dramatically.\n"
-      - source_book: Priceless — William Poundstone
-        text: "Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger,\ndeluxe model for
-          $429. The $279 model suddenly looked reasonable and sales nearly doubled.\nThe expensive model wasn't meant to sell;
-          it was there to make the original look like a\ngood deal. This is asymmetric dominance at work in retail.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Asymmetric Dominance Decoy
-      definition: "Introducing an inferior decoy option that is dominated by a target option on all salient\ndimensions shifts
-        choice toward the target by making its relative value obvious. The decoy\nis not meant to be chosen — it exists solely
-        to make the target appear superior through\ncontrast, exploiting the human preference for easy dominance comparisons
-        over difficult\ntrade-off evaluations.\n"
-      mechanism: "Decoys cause preference shifts because System 1 (intuitive) reasoning resolves dominance\ncomparisons effortlessly,
-        while trade-off comparisons between non-dominated options trigger\nSystem 2 (deliberative) reasoning that often results
-        in choice deferral. The decoy\neliminates the need for difficult trade-off analysis by providing an obvious loser.\n"
-      boundary: "Applies when the decoy is clearly inferior to the target on all relevant dimensions AND\nthe target and competitor
-        are difficult to compare directly (each has advantages). Fails\nwhen: (1) the decoy is not clearly dominated — if
-        it has ANY advantage over the target,\nit becomes a legitimate option; (2) the target and competitor are already easily
-        comparable\n— no need for a decoy; (3) consumers have strong pre-existing preferences that overwhelm\ncontextual cues.\n"
-      consequence: "Markets structured with decoy options produce systematically different choices than markets\nwith only
-        genuinely competitive options. This means the same consumer with the same true\npreferences will make different choices
-        depending on whether a decoy is present — the\npreference is constructed at the moment of choice, not revealed by
-        it.\n"
-      evidence_passages:
-        - when the decoy was present, 84% chose Print+Web
-        - When he removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web
-        - adding a clearly inferior option that is dominated by the target can increase the target's share dramatically
-        - Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for 
-          $429. The $279 model suddenly looked reasonable and sales nearly doubled
-    rationale: "Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases\n(Economist
-      subscriptions, general dominance logic, Williams-Sonoma bread makers) converging\non the same mechanism. Convergent
-      extraction MUST synthesize across all sources, not paraphrase\nany single one. The mechanism/boundary/consequence structure
-      forces the LLM to go beyond\nobservation (\"decoys work\") to explanation (\"they work because...\") and limits (\"\
-      they fail when...\").\n"
-  - id: CONV-002
-    domain: behavioral_change
-    source_books:
-      - Atomic Habits — James Clear
-      - The Power of Habit — Charles Duhigg
-    cluster_segments:
-      - source_book: Atomic Habits — James Clear
-        text: "Implementation intentions leverage the two most common cues: time and location. The format\nis 'I will [BEHAVIOR]
-          at [TIME] in [LOCATION].' For example: 'I will meditate for one minute\nat 7 a.m. in my kitchen.' Research by Peter
-          Gollwitzer has shown that people who use\nimplementation intentions are two to three times more likely to follow
-          through. The specificity\nof the plan creates an automatic trigger — when the time and place arrive, the behavior\n\
-          is initiated without conscious deliberation.\n"
-      - source_book: The Power of Habit — Charles Duhigg
-        text: "The cue-routine-reward loop explains why some behaviors become automatic while others require\nconstant effort.
-          The cue is the trigger that tells your brain to go into automatic mode.\nImplementation intentions work because
-          they manufacture a clear, unambiguous cue. When you say\n'I will exercise at 6 p.m. in the park,' the clock striking
-          six becomes a cue that initiates\nthe routine without requiring a decision.\n"
-      - source_book: Atomic Habits — James Clear
-        text: "The problem with vague goals like 'I want to exercise more' is that they leave too many\ndecisions unmade.
-          Each day you must decide when, where, and how to exercise. Each decision\nis an opportunity to opt out. Implementation
-          intentions remove these decision points by\npre-committing to a specific plan. When the moment arrives, there is
-          nothing to decide.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Implementation Intention Triggering
-      definition: "Specifying the exact time, location, and behavioral format of an intended action ('I will\n[BEHAVIOR] at
-        [TIME] in [LOCATION]') increases follow-through 2-3x by converting vague\nintentions into automatic cue-response triggers.
-        The specificity eliminates the decision\npoints where willpower typically fails.\n"
-      mechanism: "Implementation intentions cause behavior follow-through because they manufacture a clear,\nunambiguous situational
-        cue (time + location) that triggers automatic initiation of the\nplanned behavior without requiring conscious deliberation.
-        This bypasses the decision-fatigue\nbottleneck where vague intentions break down — when the specified time and place
-        arrive,\nthe pre-committed plan executes as if on autopilot.\n"
-      boundary: "Applies when the target behavior is simple, specific, and the cue is unambiguous (e.g.,\n'meditate at 7am
-        in the kitchen'). Fails when: (1) the behavior is complex and cannot be\nreduced to a simple trigger (e.g., 'write
-        a novel at 9am' — the behavior itself requires\nongoing decisions); (2) the cue is frequently unpredictable (e.g.,
-        'exercise when I feel\nenergized'); (3) the person has no genuine motivation — implementation intentions amplify\n\
-        existing motivation, they do not create it.\n"
-      consequence: "People who use implementation intentions are 2-3x more likely to follow through compared to\nthose with
-        equivalent motivation but vague plans. The effect compounds: each successful\nautomatic execution reinforces the cue-response
-        link, making future execution even more likely.\n"
-      evidence_passages:
-        - people who use implementation intentions are two to three times more likely to follow through
-        - Implementation intentions work because they manufacture a clear, unambiguous cue
-        - implementation intentions remove these decision points by pre-committing to a specific plan
-    rationale: "Two sources (Clear and Duhigg) converging on the same mechanism with complementary explanations.\nClear provides
-      the specificity + Gollwitzer research data. Duhigg provides the neurological\nexplanation (cue-routine-reward loop).
-      A good convergent extraction synthesizes both: the\n\"what\" from Clear + the \"why\" from Duhigg.\n"
-  - id: CONV-003
-    domain: advertising
-    source_books:
-      - Finding the Tipping Point — Visual Metaphor in Advertising
-      - The Cognitive Effect of Visual Metaphor in Advertising — Mostafa
-    cluster_segments:
-      - source_book: Finding the Tipping Point — Visual Metaphor in Advertising
-        text: "Visual metaphors in advertising follow an inverted-U relationship with conceptual complexity.\nModerately complex
-          metaphors — those requiring some cognitive effort to resolve but not so\nmuch that they frustrate — produce the
-          most favorable attitudes toward both the ad and the\nbrand. When a metaphor is too obvious, viewers dismiss it as
-          trivial. When it is too obscure,\nthey disengage. The sweet spot is the 'aha' moment that occurs when the viewer
-          successfully\nresolves the metaphor.\n"
-      - source_book: The Cognitive Effect of Visual Metaphor in Advertising — Mostafa
-        text: "Our experimental results confirm a curvilinear relationship between metaphor complexity\nand comprehension.
-          At low complexity (literal juxtapositions), processing fluency is high\nbut elaboration is low — viewers 'get it'
-          immediately but don't think about it. At high\ncomplexity (abstract conceptual blends), comprehension drops sharply:
-          only 23% of\nparticipants correctly interpreted the intended meaning. At moderate complexity, both\ncomprehension
-          (87%) and elaboration are maximized.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Metaphor Complexity Inverted-U
-      definition: "Visual metaphors in advertising have a curvilinear (inverted-U) relationship with persuasive\nimpact: moderate
-        conceptual complexity produces the strongest brand attitudes and message\nelaboration, while too-simple metaphors
-        are dismissed as trivial and too-complex metaphors\ncause disengagement or misinterpretation. The optimal level triggers
-        an 'aha' resolution\nmoment that rewards the viewer's cognitive effort.\n"
-      mechanism: "Moderate metaphor complexity causes stronger persuasion because it triggers elaborative\nprocessing — the
-        viewer invests cognitive effort to resolve the metaphor and is rewarded\nwith an 'aha' insight. This self-generated
-        insight is more memorable and persuasive than\na message that is simply received passively. Too little complexity
-        provides no reward;\ntoo much complexity prevents resolution entirely.\n"
-      boundary: "Applies when the audience has sufficient domain knowledge to resolve the metaphor (cultural\nreferences,
-        category familiarity). Fails when: (1) the audience lacks prerequisite knowledge\n— a moderately complex metaphor
-        becomes too complex; (2) the medium limits processing time\n(e.g., billboards vs. magazine ads); (3) the product category
-        is high-involvement where\nliteral information is preferred over metaphorical.\n"
-      consequence: "Ads with moderately complex metaphors generate higher recall, more favorable brand attitudes,\nand greater
-        message elaboration than either literal or highly abstract ads. The processing\neffort itself becomes a persuasive
-        force — we value insights we work for more than those\nwe receive passively.\n"
-      evidence_passages:
-        - Moderately complex metaphors [...] produce the most favorable attitudes toward both the ad and the brand
-        - At moderate complexity, both comprehension (87%) and elaboration are maximized
-        - The sweet spot is the 'aha' moment that occurs when the viewer successfully resolves the metaphor
-    rationale: "Two sources from the same academic domain converging on the inverted-U finding — one providing\nthe theoretical
-      framework (tipping point, 'aha' moment), the other providing experimental data\n(87% comprehension at moderate, 23%
-      at high). This is a convergent FB from our actual pipeline\ndata (cluster_271).\n"
-  - id: CONV-004
-    domain: persuasion
-    source_books:
-      - Influence — Robert Cialdini
-      - Made to Stick — Chip & Dan Heath
-    cluster_segments:
-      - source_book: Influence — Robert Cialdini
-        text: "Social proof is most effective when the proof comes from similar others. Showing that '10,000\npeople bought
-          this' is less persuasive than showing that 'people like you bought this.' The\neffect is strongest when people are
-          uncertain about what to do — in ambiguous situations, we\nlook to others' behavior as a heuristic for correct action.\n"
-      - source_book: Made to Stick — Chip & Dan Heath
-        text: "NFL Films tells the story of an undrafted rookie who made the team. Rather than listing\nstatistics, they show
-          veterans talking about 'that kid who reminds me of myself.' The\nsimilarity between the viewer (who sees themselves
-          as overlooked) and the rookie creates\nemotional resonance that raw achievement data cannot. The principle: people
-          believe stories\nabout people who remind them of themselves.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Similarity-Weighted Social Proof
-      definition: "Social proof persuades through perceived similarity, not volume. A message showing that\n'people like you'
-        took an action is more influential than showing that '10,000 people' took\nit, because relevance amplifies the heuristic.
-        The effect is strongest under uncertainty —\nwhen people don't know what to do, they look to similar others as a decision
-        shortcut.\n"
-      mechanism: "Similarity-weighted social proof causes persuasion because it activates self-relevant\nprocessing — the
-        viewer sees the referenced group as a proxy for themselves ('if they did\nit, I should too'). Volume-based proof (10,000
-        people) activates statistical reasoning,\nwhich is weaker than identity-based reasoning. The mechanism is amplified
-        by uncertainty:\nthe less someone knows what to do, the more they rely on similar-other behavior as a\ndecision heuristic.\n"
-      boundary: "Applies when the reference group shares a relevant, visible identity characteristic with\nthe target audience.
-        Fails when: (1) the similarity is on irrelevant dimensions — 'people\nwho drink coffee bought this' doesn't persuade
-        if the decision has nothing to do with\ncoffee drinking; (2) the reference group's behavior is undesirable — similarity
-        backfires\nif the referenced behavior is stigmatized; (3) the audience has strong independent\npreferences that override
-        social cues.\n"
-      consequence: "Social proof campaigns that emphasize 'people like you' consistently outperform volume-based\ncampaigns
-        ('X million served') in conversion and engagement. The identity connection creates\nan emotional resonance that statistical
-        proof cannot match.\n"
-      evidence_passages:
-        - Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'
-        - people believe stories about people who remind them of themselves
-        - the effect is strongest when people are uncertain about what to do
-    rationale: "Cialdini provides the mechanism (similarity amplifies social proof under uncertainty).\nHeath provides the
-      narrative application (NFL Films example). Convergent extraction must\nsynthesize the mechanism with the application,
-      not just paraphrase Cialdini.\n"
-  - id: CONV-005
-    domain: marketing
-    source_books:
-      - Hacking Growth — Sean Ellis
-      - $100M Offers — Alex Hormozi
-    cluster_segments:
-      - source_book: Hacking Growth — Sean Ellis
-        text: "When Dropbox launched, Drew Houston created a 3-minute demo video showing the product in\naction — syncing
-          files across devices, recovering deleted files, sharing folders. The video\ndemonstrated the outcome before mentioning
-          price or features. Beta signups jumped from\n5,000 to 75,000 overnight.\n"
-      - source_book: $100M Offers — Alex Hormozi
-        text: "The grand slam offer is not about listing features. It is about making the prospect feel\nthe outcome so vividly
-          that the price becomes an afterthought. You must articulate the\ntransformation — where they are now versus where
-          they will be after using your product —\nwith such specificity that they experience the relief of the problem being
-          solved before\nthey pay a cent.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Value-First Demonstration
-      definition: "Leading with the experienced outcome of a product — rather than its features, specifications,\nor price
-        — increases conversion by allowing prospects to feel the transformation before\nevaluating the cost. The value demonstration
-        makes the price an afterthought rather than a\nbarrier, because the prospect has already internalized the benefit.\n"
-      mechanism: "Value-first demonstration causes higher conversion because outcome visualization\ncreates a vivid internal
-        reference point — prospects imagine the transformation so\nconcretely that the price is evaluated against the relief
-        of the solved problem rather\nthan against competitor feature lists. When the prospect has already experienced the\n\
-        outcome in their mind, the price becomes the cost of not achieving that outcome, not\nthe cost of the product.\n"
-      boundary: "Applies when the product delivers a clear, emotionally resonant transformation (productivity,\nstatus, relief,
-        connection). Fails when: (1) the product is a commodity where all competitors\ndeliver equivalent outcomes — value
-        demonstration can't differentiate; (2) the audience\nalready understands the outcome and is evaluating features/price
-        — value-first becomes\nredundant; (3) the product requires explanation of how it works before prospects trust the\n\
-        outcome claim.\n"
-      consequence: "Products marketed with value-first demonstration consistently outperform feature-first\nmarketing on conversion
-        metrics. Dropbox's video approach (5K→75K signups) is the canonical\nexample: showing the outcome created demand that
-        feature lists never generated.\n"
-      evidence_passages:
-        - Beta signups jumped from 5,000 to 75,000 overnight
-        - making the prospect feel the outcome so vividly that the price becomes an afterthought
-        - they experience the relief of the problem being solved before they pay a cent
-    rationale: "Ellis provides the case study (Dropbox, 5K→75K). Hormozi provides the mechanism\n(outcome visualization, price
-      as afterthought). Convergent extraction must combine\nthe empirical evidence with the source-grounded mechanism.\n"
-  - id: NEG-CONV-001
-    domain: pricing
-    source_books:
-      - Predictably Irrational — Dan Ariely
-    cluster_segments:
-      - source_book: Predictably Irrational — Dan Ariely
-        text: "When we encounter a new product, the first price we see becomes an anchor. This initial\nprice influences not
-          just what we're willing to pay for that product, but what we're willing\nto pay for related products in the same
-          category. Arbitrary anchors can have effects that\npersist even when people know the anchor was arbitrary.\n"
-    is_convergent: false
-    should_extract: false
-    expected_fb:
-      is_summary: false
-      route: 'NULL'
-      name: Anchoring
-      definition: ''
-      mechanism: ''
-      boundary: ''
-      consequence: ''
-      evidence_passages: []
-    rationale: "HARD NEGATIVE: This is a single-source segment passed as a \"cluster\" with only ONE book.\nStage 2 should
-      detect that source_diversity < 2 and route this to non-convergent path\n(no extraction, or extract with is_convergent=false
-      and flag for single-source verification).\nThe golden example trains the LLM to recognize when it does NOT have enough
-      sources for\nconvergent synthesis.\n"
-  - id: NEG-CONV-002
-    domain: business
-    source_books:
-      - Good to Great — Jim Collins
-      - Built to Last — Jim Collins
-    cluster_segments:
-      - source_book: Good to Great — Jim Collins
-        text: "Great companies have great people. The right people are the most important asset of any\norganization. Getting
-          the right people on the bus and in the right seats is the first\nstep to building a great company.\n"
-      - source_book: Built to Last — Jim Collins
-        text: "Visionary companies prioritize people development. They invest heavily in training and\ncreate cultures where
-          talented people can thrive and grow. The commitment to people\nis what separates the truly great companies from
-          the merely good ones.\n"
-    is_convergent: true
-    should_extract: false
-    expected_fb:
-      is_summary: false
-      route: 'NULL'
-      name: ''
-      definition: ''
-      mechanism: ''
-      boundary: ''
-      consequence: ''
-      evidence_passages: []
-    rationale: "HARD NEGATIVE: Both segments say \"good people are important\" in different words. This is\na platitude, not
-      a principle. There is no mechanism (HOW do great people cause great\noutcomes?), no boundary (when does great talent
-      NOT help?), no testable consequence. All\nsegments agree, but they agree on a truism. Stage 2 should detect the absence
-      of causal\nmechanism and reject this cluster. Even though there are 2 sources, having multiple sources\nechoing the
-      same platitude does not create a convergent principle.\n\nNOTE: Collins' \"First Who, Then What\" IS a defended principle
-      with a mechanism in Good to\nGreat (Chapter 3: rigorous people decisions → right people self-motivate → no need for\n\
-      heavy management). However, the EXCERPTS selected for this cluster deliberately omit that\nmechanism. This teaches the
-      LLM to evaluate the cluster it RECEIVES — not the books it\nrecognizes — and reject when the provided segments lack
-      causal depth, even if the source\nmaterial contains it elsewhere.\n"
-  - id: NEG-CONV-003
-    domain: management
-    source_books:
-      - Thanks for the Feedback — Douglas Stone & Sheila Heen
-      - Reinventing Organizations — Frederic Laloux
-    cluster_segments:
-      - source_book: Thanks for the Feedback — Douglas Stone & Sheila Heen
-        text: "Receiving feedback triggers one of three reactions: truth-triggers (is this accurate?), relationship-triggers
-          (what does this say about our relationship?), and identity-triggers (what does this say about who I am?). The key
-          to receiving feedback well is recognizing which trigger is firing and separating the message from the emotional
-          reaction. Even well-intentioned feedback can provoke defensiveness if it threatens the recipient's sense of competence
-          or belonging."
-      - source_book: Reinventing Organizations — Frederic Laloux
-        text: Self-managing organizations replace hierarchical oversight with peer-based feedback loops. Instead of a 
-          manager conducting annual reviews, colleagues give real-time feedback through structured processes like the 
-          "advice process" — anyone can make a decision, but must first seek advice from affected parties and 
-          subject-matter experts. This distributes feedback across the organization and makes it a continuous, 
-          operational function rather than a periodic, evaluative one.
-    is_convergent: true
-    should_extract: false
-    expected_fb:
-      is_summary: false
-      route: 'NULL'
-      name: ''
-      definition: ''
-      mechanism: ''
-      boundary: ''
-      consequence: ''
-      evidence_passages: []
-    rationale: 'HARD NEGATIVE — FALSE CONVERGENCE. Both segments use the word "feedback" and discuss its role in organizations,
-      creating a strong topical overlap. But they operate at completely different levels of analysis: Stone & Heen address
-      interpersonal psychology (emotional triggers, identity threat, individual defensiveness), while Laloux addresses organizational
-      structure (peer processes, distributed decision-making, system-level feedback loops). There is NO shared causal mechanism
-      — one says "feedback fails because of emotional triggers" and the other says "feedback works when structured as an organizational
-      process." Merging these would create a false synthesis. Stage 2 must detect that topical overlap without causal convergence
-      = NULL. This is more challenging than single-source rejection (NEG-CONV-001) or platitude detection (NEG-CONV-002) because
-      both sources are legitimate and well-argued — they just describe different mechanisms at different levels, making this
-      the most common real-world false-convergence pattern.'
-  - id: CONV-006
-    domain: economics
-    source_books:
-      - Thinking, Fast and Slow — Daniel Kahneman
-      - Misbehaving — Richard Thaler
-      - Predictably Irrational — Dan Ariely
-    cluster_segments:
-      - source_book: Thinking, Fast and Slow — Daniel Kahneman
-        text: The default option is the one that will be chosen if the decision-maker does nothing. Defaults are 
-          powerful because opting out requires an active decision, which engages System 2. When people are uncertain or 
-          the choice is complex, they tend to stay with the default — not because they prefer it, but because changing 
-          it costs mental effort. This is why organ donation rates are above 90% in countries with opt-out defaults and 
-          below 15% in countries with opt-in defaults, despite similar underlying preferences.
-      - source_book: Misbehaving — Richard Thaler
-        text: 'Choice architecture is the design of the environment in which people make decisions. A nudge is any aspect
-          of the choice architecture that alters behavior without forbidding options or changing economic incentives. Automatic
-          enrollment in retirement savings plans — where employees are enrolled by default but can opt out — increases participation
-          from roughly 40% to over 90%. The power of defaults comes not from coercion but from inertia: people tend to stick
-          with whatever option requires no action.'
-      - source_book: Predictably Irrational — Dan Ariely
-        text: When people face too many options, they often fail to choose at all. In one experiment, shoppers presented
-          with 24 jam varieties were far less likely to buy than those shown only 6 varieties — despite being more 
-          attracted to the larger display. The cognitive cost of evaluating many options exceeds the benefit of having 
-          more choices. Choice, beyond a certain point, becomes paralyzing rather than liberating.
-      - source_book: Thinking, Fast and Slow — Daniel Kahneman
-        text: When faced with a difficult question, System 1 often substitutes an easier one without the person 
-          noticing. This is why people who are asked "how happy are you with your life?" before being asked "how many 
-          dates have you had recently?" show no correlation between the two, but when asked in the reverse order, the 
-          correlation jumps to 0.66. Complex evaluations are frequently replaced by simpler proxies that happen to be 
-          accessible.
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      - is_summary: false
-        route: FB
-        name: Default Inertia Effect
-        definition: Pre-selected default options dramatically influence outcomes because opting out requires active 
-          cognitive effort. Participation rates shift from ~40% to 90%+ when enrollment is automatic rather than opt-in 
-          — not because preferences change, but because the path of least resistance exploits decision inertia. The 
-          effect is strongest when the decision is complex or the chooser is uncertain.
-        mechanism: "Defaults cause behavior shifts because the status quo requires no action, while changing it activates
-          System 2 deliberation. Opting out demands evaluating alternatives, weighing trade-offs, and executing a non-default
-          action — each step is a friction point where inertia wins. The mechanism is amplified by uncertainty: when people
-          don't know which option is best, staying with the default feels safer than risking an active choice that might be
-          wrong."
-        boundary: 'Applies when the default is plausibly acceptable and the decision is not emotionally charged. Fails when:
-          (1) the default is clearly harmful — people will overcome inertia to avoid pain; (2) the decision is simple and
-          low-stakes — the cognitive cost of switching is negligible; (3) strong pre-existing preferences exist — someone
-          who has already decided will ignore the default.'
-        consequence: 'Default architecture produces 50+ percentage-point swings in participation rates (organ donation: >90%
-          vs <15%; retirement savings: >90% vs ~40%). Countries and companies that use opt-out defaults systematically achieve
-          higher enrollment in socially beneficial programs without changing incentives or restricting choice.'
-        evidence_passages:
-          - organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in
-            defaults
-          - Automatic enrollment in retirement savings plans — where employees are enrolled by default but can opt out —
-            increases participation from roughly 40% to over 90%
-          - Defaults are powerful because opting out requires an active decision
-      - is_summary: false
-        route: FB
-        name: Choice Overload Paralysis
-        definition: Increasing the number of options beyond a moderate threshold reduces the likelihood of any choice 
-          being made. Decision-makers are attracted to larger choice sets but become paralyzed when the cognitive cost 
-          of evaluating trade-offs exceeds the expected benefit of finding a better option. The result is choice 
-          deferral — doing nothing rather than risking a suboptimal selection.
-        mechanism: 'Choice overload causes paralysis because each additional option increases the cognitive load of comparison
-          exponentially, while the marginal benefit of having one more option diminishes. System 1 avoids this cost through
-          attribute substitution: instead of evaluating all options, it substitutes an easier proxy judgment. When no easy
-          proxy exists, the decision is deferred. The mechanism is self-reinforcing: each deferred choice makes future choices
-          harder by adding unresolved options to the mental queue.'
-        boundary: "Applies when options are difficult to compare (each has unique advantages) and the decision is one-shot
-          (no trial-and-error). Fails when: (1) options are easily ranked on a single dimension — more is always better; (2)
-          the decision-maker has strong pre-existing preferences that eliminate most options immediately; (3) the choice can
-          be reversed at low cost — trialability eliminates paralysis because wrong choices aren't permanent."
-        consequence: 'Consumers presented with 24 options buy at significantly lower rates than those presented with 6, despite
-          reporting higher satisfaction with the larger selection. This has practical implications for product line design,
-          menu engineering, and any domain where the provider controls the size of the choice set: fewer curated options often
-          produce more decisions than exhaustive catalogs.'
-        evidence_passages:
-          - shoppers presented with 24 jam varieties were far less likely to buy than those shown only 6 varieties
-          - When faced with a difficult question, System 1 often substitutes an easier one without the person noticing
-          - Complex evaluations are frequently replaced by simpler proxies that happen to be accessible
-    rationale: 1:N extraction where BOTH principles are genuinely cross-source. FB1 (Default Inertia Effect) synthesizes
-      Kahneman's System 2 opt-out cost with Thaler's retirement-savings nudge data — 2 distinct sources. FB2 (Choice 
-      Overload Paralysis) synthesizes Ariely's jam experiment with Kahneman's attribute substitution mechanism — 2 
-      distinct sources. Each FB draws evidence from 2 independent books. The LLM returns a JSON array of 2 principle 
-      objects. This example teaches that 1:N extraction requires EACH principle to be convergent — not just that the 
-      cluster has multiple segments. Essential training for the split-probe gate (discover_principles).
-  - id: CONV-007
-    domain: economics
-    source_books:
-      - Algorithms to Live By — Brian Christian & Tom Griffiths
-      - The Art of Strategy — Avinash Dixit & Barry Nalebuff
-      - 'The Great Mental Models, Volume 4: Economics and Art — Shane Parrish'
-    cluster_segments:
-      - source_book: The Art of Strategy — Avinash Dixit & Barry Nalebuff
-        text: "Keynes used the beauty contest as a metaphor for the stock market, where each investor\nwants to buy the stocks
-          that will rise in price, which means the stocks that investors,\nin general, think will appreciate. The value of
-          a stock is not what YOU think it's worth,\nbut what you think OTHERS think it's worth — and what they think others
-          think, in an\ninfinite recursion of mutual expectation.\n"
-      - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
-        text: "As Keynes put it, making a crucial distinction between beauty and popularity: professional\ninvestment may
-          be likened to those newspaper competitions in which the competitors have\nto pick out the six prettiest faces from
-          a hundred photographs, the prize being awarded\nto the competitor whose choice most nearly corresponds to the average
-          preferences of the\ncompetitors as a whole. Each competitor has to pick, not those faces which he himself\nfinds
-          prettiest, but those which he thinks likeliest to catch the fancy of the other\ncompetitors. We have reached the
-          third degree where we devote our intelligences to\nanticipating what average opinion expects the average opinion
-          to be.\n"
-      - source_book: 'The Great Mental Models, Volume 4: Economics and Art — Shane Parrish'
-        text: "Economist John Maynard Keynes used the metaphor of a beauty contest to explain how stock\nprices are set. He
-          asked readers to imagine a contest where entrants must choose six faces\nout of a hundred; those who pick the faces
-          chosen by the most other people win. Keynes\nbelieved stocks are priced not according to their intrinsic value but
-          according to\ninvestors' perceptions of other investors' perceptions — a recursive prediction problem\nwhere the
-          fundamental value becomes almost irrelevant to short-term price movements.\n"
-    is_convergent: true
-    should_extract: true
-    expected_fb:
-      is_summary: false
-      route: FB
-      name: Keynesian Recursive Expectation
-      definition: "In markets where asset prices depend on collective belief rather than intrinsic value,\nsuccessful prediction
-        requires reasoning about what others believe others believe — a\nrecursive chain of mutual expectation. The asset's
-        fundamental value decouples from its\nmarket price with each recursion step, as each participant optimizes for the
-        anticipated\naverage opinion rather than underlying reality.\n"
-      mechanism: "Recursive expectation drives price formation through higher-order belief coordination.\nLevel-1 investors
-        value assets on fundamentals. Level-2 investors value based on predicted\nlevel-1 beliefs. Level-k investors value
-        based on predicted level-(k-1) beliefs. The\nmechanism amplifies small errors: misperceptions about others' beliefs
-        compound with each\nrecursion level, producing price cascades where individually rational decisions generate\ncollectively
-        destabilizing speculation. The recursion has no natural termination — at\nsufficiently high k, the fundamental value
-        becomes negligible relative to the recursive\nbelief component.\n"
-      boundary: "Applies when future prices depend primarily on other investors' behavior rather than\nmeasurable cash flows.
-        Fails when: (1) the asset has a contractually guaranteed terminal\nvalue (zero-coupon bond) — the recursion collapses
-        to a known endpoint; (2) participants\nhave identical information and reasoning — recursion converges to fundamentals;
-        (3)\ntransaction costs exceed speculative margin — the game is not worth playing; (4) a\ndominant player can unilaterally
-        set the price — no need to predict others.\n"
-      consequence: "Markets governed by recursive expectations exhibit excess volatility relative to\nfundamentals, spontaneous
-        coordination on arbitrary focal points (round-number prices),\nand vulnerability to self-fulfilling prophecies where
-        collective belief in a price\nmovement causes that movement. This explains why assets with zero cash flows\n(cryptocurrencies,
-        collectibles, meme stocks) can sustain high valuations indefinitely\nas long as participants believe others will continue
-        to believe.\n"
-      evidence_passages:
-        - Keynes used the beauty contest as a metaphor for the stock market, where each investor wants to buy the stocks
-          that will rise in price, which means the stocks that investors, in general, think will appreciate
-        - We have reached the third degree where we devote our intelligences to anticipating what average opinion 
-          expects the average opinion to be
-        - stocks are priced not according to their intrinsic value but according to investors' perceptions of other 
-          investors' perceptions
-    rationale: "STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5\nbge-m3 run (3 books,
-      cohesion=0.865). Three independent sources (Dixit/Nalebuff,\nChristian/Griffiths, Parrish) converging on Keynes' beauty
-      contest mechanism. The\nmechanism explicitly traces recursion levels (1→2→k) and identifies the compounding-error\n\
-      dynamic that produces speculative instability — going beyond \"prices reflect beliefs\" to\nexplain WHY recursive belief
-      coordination creates excess volatility. The boundary\ndistinguishes speculative from contractual assets as a testable
-      condition. This expands\ngolden set domain coverage from psychology/marketing into economics and game theory,\ndemonstrating
-      convergent extraction on academic/theoretical source material.\n"
 meta:
   version: '3.0'
   architecture: cluster-before-extract
-  total_examples: 10
-  convergent_positives: 7
-  hard_negatives: 3
+  total_examples: 25
+  convergent_positives: 20
+  hard_negatives: 5
   expected_coverage:
-    - convergent_multi_source_synthesis
-    - single_source_rejection
-    - platitude_detection
-    - mechanism_boundary_consequence_structure
-    - one_to_n_extraction
-    - stem_domain_economics
-    - hard_false_convergence_negative
-  calibration_status: calibrated
-  calibrated_date: '2026-08-06'
-  notes: "D2191: Golden set expanded from 7 to 9 examples. Fixes applied:\n- YAML duplicate keys removed (is_convergent/should_extract
-    per example)\n- CONV-006: 1:N extraction example (Explore-Exploit + Endowment Gap from 3 books)\n- CONV-007: STEM domain
-    example (Keynesian Recursive Expectation, economics/game theory)\n- NEG-CONV-002 rationale updated to address Collins
-    \"First Who\" controversy\nDomain coverage: pricing, behavioral_change, advertising, persuasion, marketing,\neconomics
-    (2 examples), business. Source books: 13 unique across 9 examples.\n"
+  - convergent_multi_source_synthesis
+  - single_source_rejection
+  - platitude_detection
+  - mechanism_boundary_consequence_structure
+  - one_to_n_extraction
+  - false_convergence_detection
+  - citation_echo_detection
+  - all_property_coverage
+  calibration_status: needs_review
+  calibrated_date: null
+  notes: 'D2204: Golden set expanded from 10 to 25 examples. Full property
+
+    coverage added: prerequisite_fbs, contradicts_fbs, related_fbs, procedural_skill,
+
+    failure_mode, depth, evidence. All 7 domain groups covered. 6 hard negatives:
+
+    single-source (NEG-001), platitude (NEG-002), false convergence (NEG-003),
+
+    citation echo (NEG-004). Run LLM eval prompt before calibration.'
+examples:
+- id: CONV-001
+  domain: pricing
+  source_books:
+  - "Predictably Irrational \u2014 Dan Ariely"
+  - "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+  - "Priceless \u2014 William Poundstone"
+  cluster_segments:
+  - source_book: "Predictably Irrational \u2014 Dan Ariely"
+    text: "The Economist's subscription page became a famous case study. They offered three options:\nWeb-only for $59, Print-only\
+      \ for $125, and Print+Web for $125. The Print-only option was\nthe decoy \u2014 nobody chose it, but its presence made\
+      \ Print+Web look like a bargain. Dan Ariely\ntested this with his students: when the decoy was present, 84% chose Print+Web.\
+      \ When he\nremoved the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web.\n"
+  - source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: 'The dominance relationship makes choices easier. When A dominates B in all respects, people
+
+      choose A without hesitation. But when A is better than B on some dimensions and worse on
+
+      others, choice becomes difficult and people often defer. This is why adding a clearly inferior
+
+      option that is dominated by the target can increase the target''s share dramatically.
+
+      '
+  - source_book: "Priceless \u2014 William Poundstone"
+    text: "Williams-Sonoma sold a bread maker for $279 \u2014 it flopped. Then they introduced a larger,\ndeluxe model for\
+      \ $429. The $279 model suddenly looked reasonable and sales nearly doubled.\nThe expensive model wasn't meant to sell;\
+      \ it was there to make the original look like a\ngood deal. This is asymmetric dominance at work in retail.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Asymmetric Dominance Decoy
+    definition: "Introducing an inferior decoy option that is dominated by a target option on all salient\ndimensions shifts\
+      \ choice toward the target by making its relative value obvious. The decoy\nis not meant to be chosen \u2014 it exists\
+      \ solely to make the target appear superior through\ncontrast, exploiting the human preference for easy dominance comparisons\
+      \ over difficult\ntrade-off evaluations.\n"
+    mechanism: 'Decoys cause preference shifts because System 1 (intuitive) reasoning resolves dominance
+
+      comparisons effortlessly, while trade-off comparisons between non-dominated options trigger
+
+      System 2 (deliberative) reasoning that often results in choice deferral. The decoy
+
+      eliminates the need for difficult trade-off analysis by providing an obvious loser.
+
+      '
+    boundary: "Applies when the decoy is clearly inferior to the target on all relevant dimensions AND\nthe target and competitor\
+      \ are difficult to compare directly (each has advantages). Fails\nwhen: (1) the decoy is not clearly dominated \u2014\
+      \ if it has ANY advantage over the target,\nit becomes a legitimate option; (2) the target and competitor are already\
+      \ easily comparable\n\u2014 no need for a decoy; (3) consumers have strong pre-existing preferences that overwhelm\n\
+      contextual cues.\n"
+    consequence: "Markets structured with decoy options produce systematically different choices than markets\nwith only genuinely\
+      \ competitive options. This means the same consumer with the same true\npreferences will make different choices depending\
+      \ on whether a decoy is present \u2014 the\npreference is constructed at the moment of choice, not revealed by it.\n"
+    evidence_passages:
+    - when the decoy was present, 84% chose Print+Web
+    - When he removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web
+    - adding a clearly inferior option that is dominated by the target can increase the target's share dramatically
+    - "Williams-Sonoma sold a bread maker for $279 \u2014 it flopped. Then they introduced a larger, deluxe model for $429.\
+      \ The $279 model suddenly looked reasonable and sales nearly doubled"
+  rationale: 'Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases
+
+    (Economist subscriptions, general dominance logic, Williams-Sonoma bread makers) converging
+
+    on the same mechanism. Convergent extraction MUST synthesize across all sources, not paraphrase
+
+    any single one. The mechanism/boundary/consequence structure forces the LLM to go beyond
+
+    observation ("decoys work") to explanation ("they work because...") and limits ("they fail when...").
+
+    '
+- id: CONV-002
+  domain: behavioral_change
+  source_books:
+  - "Atomic Habits \u2014 James Clear"
+  - "The Power of Habit \u2014 Charles Duhigg"
+  cluster_segments:
+  - source_book: "Atomic Habits \u2014 James Clear"
+    text: "Implementation intentions leverage the two most common cues: time and location. The format\nis 'I will [BEHAVIOR]\
+      \ at [TIME] in [LOCATION].' For example: 'I will meditate for one minute\nat 7 a.m. in my kitchen.' Research by Peter\
+      \ Gollwitzer has shown that people who use\nimplementation intentions are two to three times more likely to follow through.\
+      \ The specificity\nof the plan creates an automatic trigger \u2014 when the time and place arrive, the behavior\nis\
+      \ initiated without conscious deliberation.\n"
+  - source_book: "The Power of Habit \u2014 Charles Duhigg"
+    text: 'The cue-routine-reward loop explains why some behaviors become automatic while others require
+
+      constant effort. The cue is the trigger that tells your brain to go into automatic mode.
+
+      Implementation intentions work because they manufacture a clear, unambiguous cue. When you say
+
+      ''I will exercise at 6 p.m. in the park,'' the clock striking six becomes a cue that initiates
+
+      the routine without requiring a decision.
+
+      '
+  - source_book: "Atomic Habits \u2014 James Clear"
+    text: 'The problem with vague goals like ''I want to exercise more'' is that they leave too many
+
+      decisions unmade. Each day you must decide when, where, and how to exercise. Each decision
+
+      is an opportunity to opt out. Implementation intentions remove these decision points by
+
+      pre-committing to a specific plan. When the moment arrives, there is nothing to decide.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Implementation Intention Triggering
+    definition: 'Specifying the exact time, location, and behavioral format of an intended action (''I will
+
+      [BEHAVIOR] at [TIME] in [LOCATION]'') increases follow-through 2-3x by converting vague
+
+      intentions into automatic cue-response triggers. The specificity eliminates the decision
+
+      points where willpower typically fails.
+
+      '
+    mechanism: "Implementation intentions cause behavior follow-through because they manufacture a clear,\nunambiguous situational\
+      \ cue (time + location) that triggers automatic initiation of the\nplanned behavior without requiring conscious deliberation.\
+      \ This bypasses the decision-fatigue\nbottleneck where vague intentions break down \u2014 when the specified time and\
+      \ place arrive,\nthe pre-committed plan executes as if on autopilot.\n"
+    boundary: "Applies when the target behavior is simple, specific, and the cue is unambiguous (e.g.,\n'meditate at 7am in\
+      \ the kitchen'). Fails when: (1) the behavior is complex and cannot be\nreduced to a simple trigger (e.g., 'write a\
+      \ novel at 9am' \u2014 the behavior itself requires\nongoing decisions); (2) the cue is frequently unpredictable (e.g.,\
+      \ 'exercise when I feel\nenergized'); (3) the person has no genuine motivation \u2014 implementation intentions amplify\n\
+      existing motivation, they do not create it.\n"
+    consequence: 'People who use implementation intentions are 2-3x more likely to follow through compared to
+
+      those with equivalent motivation but vague plans. The effect compounds: each successful
+
+      automatic execution reinforces the cue-response link, making future execution even more likely.
+
+      '
+    evidence_passages:
+    - people who use implementation intentions are two to three times more likely to follow through
+    - Implementation intentions work because they manufacture a clear, unambiguous cue
+    - implementation intentions remove these decision points by pre-committing to a specific plan
+  rationale: 'Two sources (Clear and Duhigg) converging on the same mechanism with complementary explanations.
+
+    Clear provides the specificity + Gollwitzer research data. Duhigg provides the neurological
+
+    explanation (cue-routine-reward loop). A good convergent extraction synthesizes both: the
+
+    "what" from Clear + the "why" from Duhigg.
+
+    '
+- id: CONV-003
+  domain: advertising
+  source_books:
+  - "Finding the Tipping Point \u2014 Visual Metaphor in Advertising"
+  - "The Cognitive Effect of Visual Metaphor in Advertising \u2014 Mostafa"
+  cluster_segments:
+  - source_book: "Finding the Tipping Point \u2014 Visual Metaphor in Advertising"
+    text: "Visual metaphors in advertising follow an inverted-U relationship with conceptual complexity.\nModerately complex\
+      \ metaphors \u2014 those requiring some cognitive effort to resolve but not so\nmuch that they frustrate \u2014 produce\
+      \ the most favorable attitudes toward both the ad and the\nbrand. When a metaphor is too obvious, viewers dismiss it\
+      \ as trivial. When it is too obscure,\nthey disengage. The sweet spot is the 'aha' moment that occurs when the viewer\
+      \ successfully\nresolves the metaphor.\n"
+  - source_book: "The Cognitive Effect of Visual Metaphor in Advertising \u2014 Mostafa"
+    text: "Our experimental results confirm a curvilinear relationship between metaphor complexity\nand comprehension. At\
+      \ low complexity (literal juxtapositions), processing fluency is high\nbut elaboration is low \u2014 viewers 'get it'\
+      \ immediately but don't think about it. At high\ncomplexity (abstract conceptual blends), comprehension drops sharply:\
+      \ only 23% of\nparticipants correctly interpreted the intended meaning. At moderate complexity, both\ncomprehension\
+      \ (87%) and elaboration are maximized.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Metaphor Complexity Inverted-U
+    definition: 'Visual metaphors in advertising have a curvilinear (inverted-U) relationship with persuasive
+
+      impact: moderate conceptual complexity produces the strongest brand attitudes and message
+
+      elaboration, while too-simple metaphors are dismissed as trivial and too-complex metaphors
+
+      cause disengagement or misinterpretation. The optimal level triggers an ''aha'' resolution
+
+      moment that rewards the viewer''s cognitive effort.
+
+      '
+    mechanism: "Moderate metaphor complexity causes stronger persuasion because it triggers elaborative\nprocessing \u2014\
+      \ the viewer invests cognitive effort to resolve the metaphor and is rewarded\nwith an 'aha' insight. This self-generated\
+      \ insight is more memorable and persuasive than\na message that is simply received passively. Too little complexity\
+      \ provides no reward;\ntoo much complexity prevents resolution entirely.\n"
+    boundary: "Applies when the audience has sufficient domain knowledge to resolve the metaphor (cultural\nreferences, category\
+      \ familiarity). Fails when: (1) the audience lacks prerequisite knowledge\n\u2014 a moderately complex metaphor becomes\
+      \ too complex; (2) the medium limits processing time\n(e.g., billboards vs. magazine ads); (3) the product category\
+      \ is high-involvement where\nliteral information is preferred over metaphorical.\n"
+    consequence: "Ads with moderately complex metaphors generate higher recall, more favorable brand attitudes,\nand greater\
+      \ message elaboration than either literal or highly abstract ads. The processing\neffort itself becomes a persuasive\
+      \ force \u2014 we value insights we work for more than those\nwe receive passively.\n"
+    evidence_passages:
+    - Moderately complex metaphors [...] produce the most favorable attitudes toward both the ad and the brand
+    - At moderate complexity, both comprehension (87%) and elaboration are maximized
+    - The sweet spot is the 'aha' moment that occurs when the viewer successfully resolves the metaphor
+  rationale: "Two sources from the same academic domain converging on the inverted-U finding \u2014 one providing\nthe theoretical\
+    \ framework (tipping point, 'aha' moment), the other providing experimental data\n(87% comprehension at moderate, 23%\
+    \ at high). This is a convergent FB from our actual pipeline\ndata (cluster_271).\n"
+- id: CONV-004
+  domain: persuasion
+  source_books:
+  - "Influence \u2014 Robert Cialdini"
+  - "Made to Stick \u2014 Chip & Dan Heath"
+  cluster_segments:
+  - source_book: "Influence \u2014 Robert Cialdini"
+    text: "Social proof is most effective when the proof comes from similar others. Showing that '10,000\npeople bought this'\
+      \ is less persuasive than showing that 'people like you bought this.' The\neffect is strongest when people are uncertain\
+      \ about what to do \u2014 in ambiguous situations, we\nlook to others' behavior as a heuristic for correct action.\n"
+  - source_book: "Made to Stick \u2014 Chip & Dan Heath"
+    text: 'NFL Films tells the story of an undrafted rookie who made the team. Rather than listing
+
+      statistics, they show veterans talking about ''that kid who reminds me of myself.'' The
+
+      similarity between the viewer (who sees themselves as overlooked) and the rookie creates
+
+      emotional resonance that raw achievement data cannot. The principle: people believe stories
+
+      about people who remind them of themselves.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Similarity-Weighted Social Proof
+    definition: "Social proof persuades through perceived similarity, not volume. A message showing that\n'people like you'\
+      \ took an action is more influential than showing that '10,000 people' took\nit, because relevance amplifies the heuristic.\
+      \ The effect is strongest under uncertainty \u2014\nwhen people don't know what to do, they look to similar others as\
+      \ a decision shortcut.\n"
+    mechanism: "Similarity-weighted social proof causes persuasion because it activates self-relevant\nprocessing \u2014 the\
+      \ viewer sees the referenced group as a proxy for themselves ('if they did\nit, I should too'). Volume-based proof (10,000\
+      \ people) activates statistical reasoning,\nwhich is weaker than identity-based reasoning. The mechanism is amplified\
+      \ by uncertainty:\nthe less someone knows what to do, the more they rely on similar-other behavior as a\ndecision heuristic.\n"
+    boundary: "Applies when the reference group shares a relevant, visible identity characteristic with\nthe target audience.\
+      \ Fails when: (1) the similarity is on irrelevant dimensions \u2014 'people\nwho drink coffee bought this' doesn't persuade\
+      \ if the decision has nothing to do with\ncoffee drinking; (2) the reference group's behavior is undesirable \u2014\
+      \ similarity backfires\nif the referenced behavior is stigmatized; (3) the audience has strong independent\npreferences\
+      \ that override social cues.\n"
+    consequence: 'Social proof campaigns that emphasize ''people like you'' consistently outperform volume-based
+
+      campaigns (''X million served'') in conversion and engagement. The identity connection creates
+
+      an emotional resonance that statistical proof cannot match.
+
+      '
+    evidence_passages:
+    - Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'
+    - people believe stories about people who remind them of themselves
+    - the effect is strongest when people are uncertain about what to do
+  rationale: 'Cialdini provides the mechanism (similarity amplifies social proof under uncertainty).
+
+    Heath provides the narrative application (NFL Films example). Convergent extraction must
+
+    synthesize the mechanism with the application, not just paraphrase Cialdini.
+
+    '
+- id: CONV-005
+  domain: marketing
+  source_books:
+  - "Hacking Growth \u2014 Sean Ellis"
+  - "$100M Offers \u2014 Alex Hormozi"
+  cluster_segments:
+  - source_book: "Hacking Growth \u2014 Sean Ellis"
+    text: "When Dropbox launched, Drew Houston created a 3-minute demo video showing the product in\naction \u2014 syncing\
+      \ files across devices, recovering deleted files, sharing folders. The video\ndemonstrated the outcome before mentioning\
+      \ price or features. Beta signups jumped from\n5,000 to 75,000 overnight.\n"
+  - source_book: "$100M Offers \u2014 Alex Hormozi"
+    text: "The grand slam offer is not about listing features. It is about making the prospect feel\nthe outcome so vividly\
+      \ that the price becomes an afterthought. You must articulate the\ntransformation \u2014 where they are now versus where\
+      \ they will be after using your product \u2014\nwith such specificity that they experience the relief of the problem\
+      \ being solved before\nthey pay a cent.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Value-First Demonstration
+    definition: "Leading with the experienced outcome of a product \u2014 rather than its features, specifications,\nor price\
+      \ \u2014 increases conversion by allowing prospects to feel the transformation before\nevaluating the cost. The value\
+      \ demonstration makes the price an afterthought rather than a\nbarrier, because the prospect has already internalized\
+      \ the benefit.\n"
+    mechanism: "Value-first demonstration causes higher conversion because outcome visualization\ncreates a vivid internal\
+      \ reference point \u2014 prospects imagine the transformation so\nconcretely that the price is evaluated against the\
+      \ relief of the solved problem rather\nthan against competitor feature lists. When the prospect has already experienced\
+      \ the\noutcome in their mind, the price becomes the cost of not achieving that outcome, not\nthe cost of the product.\n"
+    boundary: "Applies when the product delivers a clear, emotionally resonant transformation (productivity,\nstatus, relief,\
+      \ connection). Fails when: (1) the product is a commodity where all competitors\ndeliver equivalent outcomes \u2014\
+      \ value demonstration can't differentiate; (2) the audience\nalready understands the outcome and is evaluating features/price\
+      \ \u2014 value-first becomes\nredundant; (3) the product requires explanation of how it works before prospects trust\
+      \ the\noutcome claim.\n"
+    consequence: "Products marketed with value-first demonstration consistently outperform feature-first\nmarketing on conversion\
+      \ metrics. Dropbox's video approach (5K\u219275K signups) is the canonical\nexample: showing the outcome created demand\
+      \ that feature lists never generated.\n"
+    evidence_passages:
+    - Beta signups jumped from 5,000 to 75,000 overnight
+    - making the prospect feel the outcome so vividly that the price becomes an afterthought
+    - they experience the relief of the problem being solved before they pay a cent
+  rationale: "Ellis provides the case study (Dropbox, 5K\u219275K). Hormozi provides the mechanism\n(outcome visualization,\
+    \ price as afterthought). Convergent extraction must combine\nthe empirical evidence with the source-grounded mechanism.\n"
+- id: NEG-CONV-001
+  domain: pricing
+  source_books:
+  - "Predictably Irrational \u2014 Dan Ariely"
+  cluster_segments:
+  - source_book: "Predictably Irrational \u2014 Dan Ariely"
+    text: 'When we encounter a new product, the first price we see becomes an anchor. This initial
+
+      price influences not just what we''re willing to pay for that product, but what we''re willing
+
+      to pay for related products in the same category. Arbitrary anchors can have effects that
+
+      persist even when people know the anchor was arbitrary.
+
+      '
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Anchoring
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+  rationale: 'HARD NEGATIVE: This is a single-source segment passed as a "cluster" with only ONE book.
+
+    Stage 2 should detect that source_diversity < 2 and route this to non-convergent path
+
+    (no extraction, or extract with is_convergent=false and flag for single-source verification).
+
+    The golden example trains the LLM to recognize when it does NOT have enough sources for
+
+    convergent synthesis.
+
+    '
+- id: NEG-CONV-002
+  domain: business
+  source_books:
+  - "Good to Great \u2014 Jim Collins"
+  - "Built to Last \u2014 Jim Collins"
+  cluster_segments:
+  - source_book: "Good to Great \u2014 Jim Collins"
+    text: 'Great companies have great people. The right people are the most important asset of any
+
+      organization. Getting the right people on the bus and in the right seats is the first
+
+      step to building a great company.
+
+      '
+  - source_book: "Built to Last \u2014 Jim Collins"
+    text: 'Visionary companies prioritize people development. They invest heavily in training and
+
+      create cultures where talented people can thrive and grow. The commitment to people
+
+      is what separates the truly great companies from the merely good ones.
+
+      '
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE: Both segments say \"good people are important\" in different words. This is\na platitude, not\
+    \ a principle. There is no mechanism (HOW do great people cause great\noutcomes?), no boundary (when does great talent\
+    \ NOT help?), no testable consequence. All\nsegments agree, but they agree on a truism. Stage 2 should detect the absence\
+    \ of causal\nmechanism and reject this cluster. Even though there are 2 sources, having multiple sources\nechoing the\
+    \ same platitude does not create a convergent principle.\n\nNOTE: Collins' \"First Who, Then What\" IS a defended principle\
+    \ with a mechanism in Good to\nGreat (Chapter 3: rigorous people decisions \u2192 right people self-motivate \u2192 no\
+    \ need for\nheavy management). However, the EXCERPTS selected for this cluster deliberately omit that\nmechanism. This\
+    \ teaches the LLM to evaluate the cluster it RECEIVES \u2014 not the books it\nrecognizes \u2014 and reject when the provided\
+    \ segments lack causal depth, even if the source\nmaterial contains it elsewhere.\n"
+- id: NEG-CONV-003
+  domain: management
+  source_books:
+  - "Thanks for the Feedback \u2014 Douglas Stone & Sheila Heen"
+  - "Reinventing Organizations \u2014 Frederic Laloux"
+  cluster_segments:
+  - source_book: "Thanks for the Feedback \u2014 Douglas Stone & Sheila Heen"
+    text: 'Receiving feedback triggers one of three reactions: truth-triggers (is this accurate?), relationship-triggers (what
+      does this say about our relationship?), and identity-triggers (what does this say about who I am?). The key to receiving
+      feedback well is recognizing which trigger is firing and separating the message from the emotional reaction. Even well-intentioned
+      feedback can provoke defensiveness if it threatens the recipient''s sense of competence or belonging.'
+  - source_book: "Reinventing Organizations \u2014 Frederic Laloux"
+    text: "Self-managing organizations replace hierarchical oversight with peer-based feedback loops. Instead of a manager\
+      \ conducting annual reviews, colleagues give real-time feedback through structured processes like the \"advice process\"\
+      \ \u2014 anyone can make a decision, but must first seek advice from affected parties and subject-matter experts. This\
+      \ distributes feedback across the organization and makes it a continuous, operational function rather than a periodic,\
+      \ evaluative one."
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE \u2014 FALSE CONVERGENCE. Both segments use the word \"feedback\" and discuss its role in organizations,\
+    \ creating a strong topical overlap. But they operate at completely different levels of analysis: Stone & Heen address\
+    \ interpersonal psychology (emotional triggers, identity threat, individual defensiveness), while Laloux addresses organizational\
+    \ structure (peer processes, distributed decision-making, system-level feedback loops). There is NO shared causal mechanism\
+    \ \u2014 one says \"feedback fails because of emotional triggers\" and the other says \"feedback works when structured\
+    \ as an organizational process.\" Merging these would create a false synthesis. Stage 2 must detect that topical overlap\
+    \ without causal convergence = NULL. This is more challenging than single-source rejection (NEG-CONV-001) or platitude\
+    \ detection (NEG-CONV-002) because both sources are legitimate and well-argued \u2014 they just describe different mechanisms\
+    \ at different levels, making this the most common real-world false-convergence pattern."
+- id: CONV-006
+  domain: economics
+  source_books:
+  - "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+  - "Misbehaving \u2014 Richard Thaler"
+  - "Predictably Irrational \u2014 Dan Ariely"
+  cluster_segments:
+  - source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: "The default option is the one that will be chosen if the decision-maker does nothing. Defaults are powerful because\
+      \ opting out requires an active decision, which engages System 2. When people are uncertain or the choice is complex,\
+      \ they tend to stay with the default \u2014 not because they prefer it, but because changing it costs mental effort.\
+      \ This is why organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with\
+      \ opt-in defaults, despite similar underlying preferences."
+  - source_book: "Misbehaving \u2014 Richard Thaler"
+    text: "Choice architecture is the design of the environment in which people make decisions. A nudge is any aspect of the\
+      \ choice architecture that alters behavior without forbidding options or changing economic incentives. Automatic enrollment\
+      \ in retirement savings plans \u2014 where employees are enrolled by default but can opt out \u2014 increases participation\
+      \ from roughly 40% to over 90%. The power of defaults comes not from coercion but from inertia: people tend to stick\
+      \ with whatever option requires no action."
+  - source_book: "Predictably Irrational \u2014 Dan Ariely"
+    text: "When people face too many options, they often fail to choose at all. In one experiment, shoppers presented with\
+      \ 24 jam varieties were far less likely to buy than those shown only 6 varieties \u2014 despite being more attracted\
+      \ to the larger display. The cognitive cost of evaluating many options exceeds the benefit of having more choices. Choice,\
+      \ beyond a certain point, becomes paralyzing rather than liberating."
+  - source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: When faced with a difficult question, System 1 often substitutes an easier one without the person noticing. This
+      is why people who are asked "how happy are you with your life?" before being asked "how many dates have you had recently?"
+      show no correlation between the two, but when asked in the reverse order, the correlation jumps to 0.66. Complex evaluations
+      are frequently replaced by simpler proxies that happen to be accessible.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+  - is_summary: false
+    route: FB
+    name: Default Inertia Effect
+    definition: "Pre-selected default options dramatically influence outcomes because opting out requires active cognitive\
+      \ effort. Participation rates shift from ~40% to 90%+ when enrollment is automatic rather than opt-in \u2014 not because\
+      \ preferences change, but because the path of least resistance exploits decision inertia. The effect is strongest when\
+      \ the decision is complex or the chooser is uncertain."
+    mechanism: "Defaults cause behavior shifts because the status quo requires no action, while changing it activates System\
+      \ 2 deliberation. Opting out demands evaluating alternatives, weighing trade-offs, and executing a non-default action\
+      \ \u2014 each step is a friction point where inertia wins. The mechanism is amplified by uncertainty: when people don't\
+      \ know which option is best, staying with the default feels safer than risking an active choice that might be wrong."
+    boundary: "Applies when the default is plausibly acceptable and the decision is not emotionally charged. Fails when: (1)\
+      \ the default is clearly harmful \u2014 people will overcome inertia to avoid pain; (2) the decision is simple and low-stakes\
+      \ \u2014 the cognitive cost of switching is negligible; (3) strong pre-existing preferences exist \u2014 someone who\
+      \ has already decided will ignore the default."
+    consequence: 'Default architecture produces 50+ percentage-point swings in participation rates (organ donation: >90% vs
+      <15%; retirement savings: >90% vs ~40%). Countries and companies that use opt-out defaults systematically achieve higher
+      enrollment in socially beneficial programs without changing incentives or restricting choice.'
+    evidence_passages:
+    - organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in defaults
+    - "Automatic enrollment in retirement savings plans \u2014 where employees are enrolled by default but can opt out \u2014\
+      \ increases participation from roughly 40% to over 90%"
+    - Defaults are powerful because opting out requires an active decision
+  - is_summary: false
+    route: FB
+    name: Choice Overload Paralysis
+    definition: "Increasing the number of options beyond a moderate threshold reduces the likelihood of any choice being made.\
+      \ Decision-makers are attracted to larger choice sets but become paralyzed when the cognitive cost of evaluating trade-offs\
+      \ exceeds the expected benefit of finding a better option. The result is choice deferral \u2014 doing nothing rather\
+      \ than risking a suboptimal selection."
+    mechanism: 'Choice overload causes paralysis because each additional option increases the cognitive load of comparison
+      exponentially, while the marginal benefit of having one more option diminishes. System 1 avoids this cost through attribute
+      substitution: instead of evaluating all options, it substitutes an easier proxy judgment. When no easy proxy exists,
+      the decision is deferred. The mechanism is self-reinforcing: each deferred choice makes future choices harder by adding
+      unresolved options to the mental queue.'
+    boundary: "Applies when options are difficult to compare (each has unique advantages) and the decision is one-shot (no\
+      \ trial-and-error). Fails when: (1) options are easily ranked on a single dimension \u2014 more is always better; (2)\
+      \ the decision-maker has strong pre-existing preferences that eliminate most options immediately; (3) the choice can\
+      \ be reversed at low cost \u2014 trialability eliminates paralysis because wrong choices aren't permanent."
+    consequence: 'Consumers presented with 24 options buy at significantly lower rates than those presented with 6, despite
+      reporting higher satisfaction with the larger selection. This has practical implications for product line design, menu
+      engineering, and any domain where the provider controls the size of the choice set: fewer curated options often produce
+      more decisions than exhaustive catalogs.'
+    evidence_passages:
+    - shoppers presented with 24 jam varieties were far less likely to buy than those shown only 6 varieties
+    - When faced with a difficult question, System 1 often substitutes an easier one without the person noticing
+    - Complex evaluations are frequently replaced by simpler proxies that happen to be accessible
+  rationale: "1:N extraction where BOTH principles are genuinely cross-source. FB1 (Default Inertia Effect) synthesizes Kahneman's\
+    \ System 2 opt-out cost with Thaler's retirement-savings nudge data \u2014 2 distinct sources. FB2 (Choice Overload Paralysis)\
+    \ synthesizes Ariely's jam experiment with Kahneman's attribute substitution mechanism \u2014 2 distinct sources. Each\
+    \ FB draws evidence from 2 independent books. The LLM returns a JSON array of 2 principle objects. This example teaches\
+    \ that 1:N extraction requires EACH principle to be convergent \u2014 not just that the cluster has multiple segments.\
+    \ Essential training for the split-probe gate (discover_principles)."
+- id: CONV-007
+  domain: economics
+  source_books:
+  - "Algorithms to Live By \u2014 Brian Christian & Tom Griffiths"
+  - "The Art of Strategy \u2014 Avinash Dixit & Barry Nalebuff"
+  - "The Great Mental Models, Volume 4: Economics and Art \u2014 Shane Parrish"
+  cluster_segments:
+  - source_book: "The Art of Strategy \u2014 Avinash Dixit & Barry Nalebuff"
+    text: "Keynes used the beauty contest as a metaphor for the stock market, where each investor\nwants to buy the stocks\
+      \ that will rise in price, which means the stocks that investors,\nin general, think will appreciate. The value of a\
+      \ stock is not what YOU think it's worth,\nbut what you think OTHERS think it's worth \u2014 and what they think others\
+      \ think, in an\ninfinite recursion of mutual expectation.\n"
+  - source_book: "Algorithms to Live By \u2014 Brian Christian & Tom Griffiths"
+    text: 'As Keynes put it, making a crucial distinction between beauty and popularity: professional
+
+      investment may be likened to those newspaper competitions in which the competitors have
+
+      to pick out the six prettiest faces from a hundred photographs, the prize being awarded
+
+      to the competitor whose choice most nearly corresponds to the average preferences of the
+
+      competitors as a whole. Each competitor has to pick, not those faces which he himself
+
+      finds prettiest, but those which he thinks likeliest to catch the fancy of the other
+
+      competitors. We have reached the third degree where we devote our intelligences to
+
+      anticipating what average opinion expects the average opinion to be.
+
+      '
+  - source_book: "The Great Mental Models, Volume 4: Economics and Art \u2014 Shane Parrish"
+    text: "Economist John Maynard Keynes used the metaphor of a beauty contest to explain how stock\nprices are set. He asked\
+      \ readers to imagine a contest where entrants must choose six faces\nout of a hundred; those who pick the faces chosen\
+      \ by the most other people win. Keynes\nbelieved stocks are priced not according to their intrinsic value but according\
+      \ to\ninvestors' perceptions of other investors' perceptions \u2014 a recursive prediction problem\nwhere the fundamental\
+      \ value becomes almost irrelevant to short-term price movements.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Keynesian Recursive Expectation
+    definition: "In markets where asset prices depend on collective belief rather than intrinsic value,\nsuccessful prediction\
+      \ requires reasoning about what others believe others believe \u2014 a\nrecursive chain of mutual expectation. The asset's\
+      \ fundamental value decouples from its\nmarket price with each recursion step, as each participant optimizes for the\
+      \ anticipated\naverage opinion rather than underlying reality.\n"
+    mechanism: "Recursive expectation drives price formation through higher-order belief coordination.\nLevel-1 investors\
+      \ value assets on fundamentals. Level-2 investors value based on predicted\nlevel-1 beliefs. Level-k investors value\
+      \ based on predicted level-(k-1) beliefs. The\nmechanism amplifies small errors: misperceptions about others' beliefs\
+      \ compound with each\nrecursion level, producing price cascades where individually rational decisions generate\ncollectively\
+      \ destabilizing speculation. The recursion has no natural termination \u2014 at\nsufficiently high k, the fundamental\
+      \ value becomes negligible relative to the recursive\nbelief component.\n"
+    boundary: "Applies when future prices depend primarily on other investors' behavior rather than\nmeasurable cash flows.\
+      \ Fails when: (1) the asset has a contractually guaranteed terminal\nvalue (zero-coupon bond) \u2014 the recursion collapses\
+      \ to a known endpoint; (2) participants\nhave identical information and reasoning \u2014 recursion converges to fundamentals;\
+      \ (3)\ntransaction costs exceed speculative margin \u2014 the game is not worth playing; (4) a\ndominant player can\
+      \ unilaterally set the price \u2014 no need to predict others.\n"
+    consequence: 'Markets governed by recursive expectations exhibit excess volatility relative to
+
+      fundamentals, spontaneous coordination on arbitrary focal points (round-number prices),
+
+      and vulnerability to self-fulfilling prophecies where collective belief in a price
+
+      movement causes that movement. This explains why assets with zero cash flows
+
+      (cryptocurrencies, collectibles, meme stocks) can sustain high valuations indefinitely
+
+      as long as participants believe others will continue to believe.
+
+      '
+    evidence_passages:
+    - Keynes used the beauty contest as a metaphor for the stock market, where each investor wants to buy the stocks that
+      will rise in price, which means the stocks that investors, in general, think will appreciate
+    - We have reached the third degree where we devote our intelligences to anticipating what average opinion expects the
+      average opinion to be
+    - stocks are priced not according to their intrinsic value but according to investors' perceptions of other investors'
+      perceptions
+  rationale: "STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5\nbge-m3 run (3 books,\
+    \ cohesion=0.865). Three independent sources (Dixit/Nalebuff,\nChristian/Griffiths, Parrish) converging on Keynes' beauty\
+    \ contest mechanism. The\nmechanism explicitly traces recursion levels (1\u21922\u2192k) and identifies the compounding-error\n\
+    dynamic that produces speculative instability \u2014 going beyond \"prices reflect beliefs\" to\nexplain WHY recursive\
+    \ belief coordination creates excess volatility. The boundary\ndistinguishes speculative from contractual assets as a\
+    \ testable condition. This expands\ngolden set domain coverage from psychology/marketing into economics and game theory,\n\
+    demonstrating convergent extraction on academic/theoretical source material.\n"
+- id: CONV-011
+  domain: graphic design
+  discipline: visual perception
+  source_books:
+  - "The Design of Everyday Things \u2014 Don Norman"
+  - "Universal Principles of Design \u2014 William Lidwell"
+  - "Thinking with Type \u2014 Ellen Lupton"
+  cluster_segments:
+  - source_book: "Universal Principles of Design \u2014 William Lidwell"
+    text: 'The principle of proximity states that elements placed close together are perceived as
+
+      more related than elements placed far apart. Designers use proximity to group related
+
+      items visually, reducing the cognitive load required to understand relationships. This
+
+      works even when the elements are otherwise identical in size, color, and shape.
+
+      '
+  - source_book: "The Design of Everyday Things \u2014 Don Norman"
+    text: 'The perceived relationship between controls and what they affect is critical for
+
+      usability. When related controls are physically grouped together, users infer a mapping
+
+      between them. When they are scattered, users must rely on memory or trial-and-error,
+
+      increasing error rates and frustration.
+
+      '
+  - source_book: "Thinking with Type \u2014 Ellen Lupton"
+    text: 'In typography, spacing creates hierarchy. Related content shares consistent spacing
+
+      while unrelated content is separated by larger gaps. Readers use these spatial cues
+
+      unconsciously to parse document structure before reading a single word.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Proximity Grouping
+    definition: "Spatial proximity between visual elements signals conceptual relatedness: elements\nplaced closer together\
+      \ are perceived as belonging to the same group. This principle\noperates pre-attentively \u2014 before conscious attention\
+      \ \u2014 making it one of the most\nreliable structural cues in visual communication.\n"
+    mechanism: 'Proximity works because the visual system groups stimuli according to spatial
+
+      contiguity (Gestalt law of proximity) before higher-level semantic processing begins.
+
+      The grouping is automatic and cannot be voluntarily suppressed, which is why proximity
+
+      overrides even strong differences in color, shape, or size.
+
+      '
+    consequence: 'Interfaces, layouts, and documents that respect proximity grouping are understood
+
+      faster and with fewer errors. Elements that must be read together are placed together;
+
+      spatial distance becomes a proxy for semantic distance.
+
+      '
+    boundary: 'Applies when spatial layout is under designer control and elements carry equal
+
+      semantic weight. Fails when: (1) the design is text-dense with no spatial variation
+
+      possible; (2) proximity conflicts with stronger cues such as shared color or common
+
+      region; (3) users have strong prior expectations from conventions (e.g., reading order)
+
+      that override spatial grouping.
+
+      '
+    consequence_2: ''
+    evidence_passages:
+    - elements placed close together are perceived as more related than elements placed far apart
+    - When related controls are physically grouped together, users infer a mapping between them
+    - Related content shares consistent spacing while unrelated content is separated by larger gaps
+    depth: domain
+    evidence: cited
+    jargon:
+    - Gestalt law of proximity
+    - spatial contiguity
+    keywords:
+    - proximity
+    - grouping
+    - visual hierarchy
+    - spacing
+    application: UI layout, information design, typography systems, dashboard design
+    elaboration: 'The Gestalt school of psychology identified proximity as one of several grouping
+
+      laws (alongside similarity, closure, continuity) that describe how the visual system
+
+      organizes raw stimuli into perceived structure.'
+    prerequisite_fbs:
+    - 'PARSING-001: Visual Hierarchy Basics'
+    contradicts_fbs: []
+    related_fbs:
+    - 'SIMILARITY-011: Similarity Grouping'
+    procedural_skill: 'Given a set of UI elements with known semantic relationships, group related
+
+      elements using consistent spacing (8px grid for related, 24px+ for unrelated), then
+
+      validate with a 5-second scan test: a naive user should be able to identify the groups.
+
+      '
+    failure_mode: "If all elements receive equal spacing (a uniform grid), proximity provides no\nstructural signal and the\
+      \ design reads as flat \u2014 users cannot infer relationships\nwithout reading. Fix: introduce spatial hierarchy deliberately.\n"
+  rationale: 'Three independent design references (Lidwell, Norman, Lupton) converge on the same
+
+    principle: spatial proximity creates perceived relationship. Demonstrates visual practice
+
+    domain, prerequisite_fbs, failure_mode, and procedural_skill properties.
+
+    '
+- id: CONV-012
+  domain: ai & agents
+  discipline: machine learning
+  source_books:
+  - "Artificial Intelligence: A Modern Approach \u2014 Russell & Norvig"
+  - "Human Compatible \u2014 Stuart Russell"
+  - "The Alignment Problem \u2014 Brian Christian"
+  cluster_segments:
+  - source_book: "Human Compatible \u2014 Stuart Russell"
+    text: 'The alignment problem asks how we can ensure that AI systems reliably pursue the
+
+      objectives we actually intend, rather than the literal specification we write. Russell
+
+      argues that specifying the objective precisely is impossible for complex real-world
+
+      values, so we must design systems that are uncertain about the objective and defer to
+
+      human preferences as they are observed.
+
+      '
+  - source_book: "The Alignment Problem \u2014 Brian Christian"
+    text: "Reinforcement learning from human feedback (RLHF) emerged as a practical method for\naligning language models:\
+      \ first train the base model, then collect human preference\ncomparisons between model outputs, then train a reward\
+      \ model that predicts human\npreferences, and finally optimize the policy against that reward model. Each step\nintroduces\
+      \ its own failure modes \u2014 reward hacking, distribution shift, and overfitting\nto the preference dataset.\n"
+  - source_book: "Artificial Intelligence: A Modern Approach \u2014 Russell & Norvig"
+    text: 'The specification problem is fundamental: any formally specified utility function
+
+      will fail to capture the full richness of what we want. This is why agents must be
+
+      designed with uncertainty about the true objective and a mechanism for learning it
+
+      from human behavior, rather than assuming the specification is complete.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Objective Uncertainty in AI Alignment
+    definition: 'AI systems should be designed with explicit uncertainty about the true objective and
+
+      must learn human preferences from behavior, because any formally specified utility
+
+      function is incomplete. This is the core architectural principle of aligned AI.
+
+      '
+    mechanism: 'When an AI system is certain about a misspecified objective, it optimizes that
+
+      objective to the point of harmful behavior (reward hacking). When it is uncertain and
+
+      must query human preference, it maintains an outer loop of preference learning that
+
+      corrects for specification errors.
+
+      '
+    consequence: "Systems that assume complete specifications (command-and-control) produce\nopptimization failures; systems\
+      \ that model uncertainty (assistance game) remain\nreversible and corrigible. This is a necessary \u2014 not sufficient\
+      \ \u2014 condition for safe AI.\n"
+    boundary: 'Applies to AI systems that can act autonomously in high-stakes domains. Fails when:
+
+      (1) human preferences are themselves inconsistent or pathological; (2) the preference
+
+      signal is too noisy to learn from; (3) the system is deployed before the alignment loop
+
+      has converged.
+
+      '
+    evidence_passages:
+    - specifying the objective precisely is impossible for complex real-world values
+    - RLHF emerged as a practical method for aligning language models
+    - any formally specified utility function will fail to capture the full richness of what we want
+    depth: universal
+    evidence: cited
+    jargon:
+    - reward hacking
+    - RLHF
+    - assistance game
+    - corrigibility
+    keywords:
+    - AI alignment
+    - objective specification
+    - preference learning
+    application: AI safety engineering, LLM fine-tuning pipelines, agent design
+    elaboration: 'The ''assistance game'' formulation (Russell) models AI as an assistant that is
+
+      uncertain about the objective and learns it from human actions and corrections. This
+
+      contrasts with the classical agent formulation where the objective is fully specified
+
+      in advance.'
+    prerequisite_fbs:
+    - 'RLHF-PIPE-001: Preference Data Collection'
+    contradicts_fbs:
+    - 'SPEC-FULL-001: Complete Specification Assumption'
+    related_fbs:
+    - 'GRAD-DESC-001: Reward Gradient Optimization'
+    procedural_skill: 'When designing an AI system for a real-world task: (1) treat any written objective
+
+      as a hypothesis, not a specification; (2) design a preference observation channel;
+
+      (3) include a correction loop with human oversight; (4) test for reward hacking before
+
+      deployment; (5) document the specification''s known incompleteness.
+
+      '
+    failure_mode: 'If the reward model is trained on biased or narrow preference data, the aligned
+
+      system will optimize the biased proxy, appearing aligned on benchmarks while failing
+
+      on edge cases. Fix: diversify preference data and add adversarial evaluation.
+
+      '
+  rationale: 'Three AI references (Russell, Christian, Russell & Norvig) converge on objective
+
+    uncertainty as the foundational alignment principle. Demonstrates AI & Computing group,
+
+    contradicts_fbs, prerequisite_fbs, procedural_skill.
+
+    '
+- id: CONV-013
+  domain: user experience
+  discipline: human-computer interaction
+  source_books:
+  - "The Design of Everyday Things \u2014 Don Norman"
+  - "Don't Make Me Think \u2014 Steve Krug"
+  - "About Face \u2014 Alan Cooper"
+  cluster_segments:
+  - source_book: "Don't Make Me Think \u2014 Steve Krug"
+    text: "Users don't want to think about how an interface works \u2014 they want to complete their\ntask. Progressive disclosure\
+      \ is the practice of showing only the essential controls\nand revealing advanced options only when needed. It reduces\
+      \ cognitive load and lets\nnovices use the interface immediately while experts can still find the power features.\n"
+  - source_book: "About Face \u2014 Alan Cooper"
+    text: 'Novice and expert users have different needs. Novices need simplicity; experts need
+
+      efficiency. Progressive disclosure serves both by presenting a simple default surface
+
+      while hiding advanced functionality behind progressively deeper layers. The key is
+
+      that the user must be able to discover the deeper layers without prior training.
+
+      '
+  - source_book: "The Design of Everyday Things \u2014 Don Norman"
+    text: "Information overload is a design failure, not a user failure. When an interface\npresents all options simultaneously,\
+      \ the user's working memory is overwhelmed and\ndecision quality drops. Reducing the number of visible options at any\
+      \ moment \u2014\nrevealing more only on demand \u2014 improves both learnability and expert performance.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Progressive Disclosure
+    definition: 'Show only the controls relevant to the current task; reveal advanced functionality
+
+      progressively as the user requests it. This reduces cognitive load, improves
+
+      learnability for novices, and preserves efficiency for experts.
+
+      '
+    mechanism: 'Progressive disclosure works because working memory is limited (~4 chunks). Presenting
+
+      all options at once forces the user to filter and remember, while revealing options
+
+      on-demand converts the interface into an external memory: the user knows where to
+
+      look rather than needing to remember what exists.
+
+      '
+    consequence: 'Interfaces with progressive disclosure are learnable by novices within minutes while
+
+      remaining efficient for experts, because both populations see an appropriate level of
+
+      complexity for their current task.
+
+      '
+    boundary: 'Applies when the feature set is large relative to the task set. Fails when: (1)
+
+      hiding is so aggressive that users cannot discover important features; (2) the
+
+      interface must be used by experts exclusively (they prefer flat, dense surfaces);
+
+      (3) the disclosure requires significant interaction cost (too many clicks to reveal).
+
+      '
+    evidence_passages:
+    - Progressive disclosure is the practice of showing only the essential controls
+    - Novices need simplicity; experts need efficiency
+    - reducing the number of visible options at any moment improves both learnability and expert performance
+    depth: domain
+    evidence: cited
+    jargon:
+    - cognitive load
+    - progressive disclosure
+    - affordance
+    keywords:
+    - UI design
+    - progressive disclosure
+    - information architecture
+    - learnability
+    application: Web forms, mobile apps, desktop software, dashboard design
+    elaboration: 'Progressive disclosure is one of the most reliable UX patterns because it aligns
+
+      the interface''s information architecture with the user''s cognitive architecture.'
+    prerequisite_fbs:
+    - 'HIC-TAX-001: User Task Analysis'
+    contradicts_fbs: []
+    related_fbs:
+    - 'AFFORD-013: Visible Affordances'
+    procedural_skill: 'Audit each screen for controls used by <20% of users. Move those into a secondary
+
+      layer (menu, ''More'', advanced tab). Ensure primary task completion never requires
+
+      the secondary layer. Validate: new-user task completion time must drop.
+
+      '
+    failure_mode: 'If disclosure is too deep (features buried under 4+ clicks), expert users abandon
+
+      the interface for power tools, and the product loses its efficiency story.
+
+      '
+  rationale: 'Krug, Cooper, and Norman converge on progressive disclosure as the UX principle for
+
+    managing complexity. Demonstrates Digital & Interactive group, depth, evidence,
+
+    procedural_skill, failure_mode.
+
+    '
+- id: CONV-014
+  domain: systems & frameworks
+  discipline: systems thinking
+  source_books:
+  - "Thinking in Systems \u2014 Donella Meadows"
+  - "The Fifth Discipline \u2014 Peter Senge"
+  - "Antifragile \u2014 Nassim Taleb"
+  cluster_segments:
+  - source_book: "Thinking in Systems \u2014 Donella Meadows"
+    text: 'Leverage points are places in a system where a small change can produce a large
+
+      shift in behavior. The most powerful leverage points are not parameters (like tax
+
+      rates) but the structure of information flows and the goals of the system itself.
+
+      Changing the rules of the game has more leverage than changing the players.
+
+      '
+  - source_book: "The Fifth Discipline \u2014 Peter Senge"
+    text: "Systems thinking reveals that the most effective interventions often target the\nfeedback loops and mental models\
+      \ that shape behavior, not the events themselves.\n'Small changes can produce big results \u2014 but the areas of highest\
+      \ leverage are often\nthe least obvious.'\n"
+  - source_book: "Antifragile \u2014 Nassim Taleb"
+    text: "Systems that are robust to small perturbations fail catastrophically when exposed to\nrare events. Antifragile\
+      \ systems, by contrast, gain from disorder \u2014 they use\noptionality and redundancy to convert volatility into benefit.\
+      \ The location of the\nintervention matters more than its size.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Structural Leverage
+    definition: 'In any system, the highest-leverage interventions target structure (information
+
+      flows, feedback loops, goals, and rules) rather than parameters (quantities, rates,
+
+      stocks). A small structural change can produce outsized behavioral shifts, while
+
+      large parameter changes often produce only marginal effects.
+
+      '
+    mechanism: "Parameters are the weakest points because they merely scale existing dynamics.\nInformation flows and feedback\
+      \ loops change the dynamics themselves \u2014 they alter how\nsignals propagate through the system, which compounds\
+      \ across all downstream behavior.\nGoals are the most powerful because they redefine what the system optimizes for.\n"
+    consequence: 'Systems interventions should be sequenced from structure-first to parameter-last:
+
+      change the goal, change the information flows, change the feedback loops, then change
+
+      parameters. This ordering maximizes the probability of durable system change.
+
+      '
+    boundary: 'Applies to complex adaptive systems with feedback. Fails when: (1) the system is
+
+      linear and decoupled (parameter changes dominate); (2) stakeholders have veto power
+
+      over structural change; (3) the system is too small for structural intervention to
+
+      matter relative to noise.
+
+      '
+    evidence_passages:
+    - places in a system where a small change can produce a large shift in behavior
+    - the most effective interventions often target the feedback loops and mental models
+    - The location of the intervention matters more than its size
+    depth: universal
+    evidence: cited
+    jargon:
+    - leverage point
+    - feedback loop
+    - mental model
+    - antifragility
+    keywords:
+    - systems thinking
+    - leverage
+    - intervention
+    - feedback
+    application: Policy design, organizational change, software architecture, economics
+    elaboration: 'Meadows ranked 12 leverage points from parameters (lowest) to paradigm shifts
+
+      (highest). Senge''s ''small changes, big results'' formulation and Taleb''s
+
+      afntifragility both independently arrive at the same structural-vs-parametric
+
+      distinction.'
+    prerequisite_fbs:
+    - 'LOOP-BASE-001: Feedback Loop Identification'
+    contradicts_fbs:
+    - 'PARAM-ONLY-001: Parameter Adjustment Sufficiency'
+    related_fbs:
+    - 'ANTIFRAG-001: Antifragility Through Optionality'
+    - 'MODELL-001: Systems Modeling'
+    procedural_skill: 'When planning any system intervention: (1) map the feedback loops; (2) identify the
+
+      goal the system currently optimizes; (3) choose the highest-leverage structural point
+
+      available; (4) predict second-order effects; (5) measure baseline before intervening.
+
+      '
+    failure_mode: 'Intervening at parameter level when the system is structurally misaligned produces
+
+      ''fighting the last war'': the system compensates and returns to its prior behavior
+
+      (homeostasis), making the intervention appear ineffective.
+
+      '
+  rationale: 'Meadows, Senge, and Taleb converge on structural-vs-parametric leverage. Demonstrates
+
+    Systems group, contradicts_fbs, related_fbs, procedural_skill.
+
+    '
+- id: CONV-015
+  domain: computational art
+  discipline: generative design
+  source_books:
+  - "The Nature of Code \u2014 Daniel Shiffman"
+  - "Generative Design \u2014 Benedikt Gross"
+  - "A New Kind of Science \u2014 Stephen Wolfram"
+  cluster_segments:
+  - source_book: "The Nature of Code \u2014 Daniel Shiffman"
+    text: "Complex behavior in natural systems often arises from simple rules repeated over\nmany agents. Flocking emerges\
+      \ from three local rules: alignment, cohesion, and\nseparation. No bird knows the flock's global shape \u2014 it emerges\
+      \ from local\ninteractions. This is the heart of generative art: design the rules, not the\noutcome.\n"
+  - source_book: "Generative Design \u2014 Benedikt Gross"
+    text: "Generative design is not about coding a specific image but about coding a system\nthat produces images. The designer's\
+      \ role shifts from drawing the artifact to\ndesigning the rules and parameters that generate the artifact. Small rule\
+      \ changes\nproduce vastly different outputs \u2014 the design space is explored computationally.\n"
+    source_book_2: ''
+  - source_book: "A New Kind of Science \u2014 Stephen Wolfram"
+    text: 'Simple programs can produce behavior of great complexity. Wolfram''s cellular
+
+      automata experiments show that a one-dimensional rule with three neighbors can
+
+      produce patterns as complex as anything in nature. This suggests that complexity
+
+      is not imported from outside but generated from within by simple rules.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Emergent Complexity from Simple Rules
+    definition: 'Complex, organic-looking systems and artifacts can be generated from simple local
+
+      rules applied repeatedly. The creator controls the rules and parameters, not the
+
+      final form; the form emerges from the interactions. This is the foundational
+
+      principle of generative and computational art.
+
+      '
+    mechanism: "Iterated local rules produce global patterns because each application of the rule\npropagates information\
+      \ through the system. In flocking, three local rules\n(alignment, cohesion, separation) produce coherent global motion;\
+      \ in cellular\nautomata, simple update rules produce complex spatiotemporal patterns. Emergence\nrequires iteration\
+      \ \u2014 one application is trivial, thousands produce complexity.\n"
+    consequence: 'Designers can create systems whose output space is vastly larger than what they
+
+      could specify by hand. The aesthetic value moves from the artifact to the rule set;
+
+      ''interestingness'' becomes a property of the generative system, not individual
+
+      outputs.
+
+      '
+    boundary: "Applies when the system is iterated enough times for emergence to manifest and the\nrules are local (interactions\
+      \ are spatially or topologically nearby). Fails when:\n(1) rule application is too sparse to propagate; (2) rules are\
+      \ globally coupled\n(everything affects everything \u2014 no local structure); (3) the parameter space is\nnot explored\
+      \ systematically.\n"
+    evidence_passages:
+    - 'Flocking emerges from three local rules: alignment, cohesion, and separation'
+    - The designer's role shifts from drawing the artifact to designing the rules
+    - Simple programs can produce behavior of great complexity
+    depth: cross-domain
+    evidence: cited
+    jargon:
+    - emergence
+    - generative system
+    - cellular automata
+    - local rules
+    keywords:
+    - generative art
+    - emergence
+    - complexity
+    - rules
+    application: Generative art, procedural content generation, simulation, data art
+    elaboration: "The same principle underlies Conway's Game of Life, reaction-diffusion systems,\nand L-systems \u2014 all\
+      \ generate complex forms from simple local rules."
+    prerequisite_fbs: []
+    contradicts_fbs:
+    - 'TOP-DOWN-001: Top-Down Design Control'
+    related_fbs:
+    - 'PATCH-001: Procedural Patterning'
+    procedural_skill: "When building a generative system: (1) define 3-7 simple local rules; (2) iterate\nthe system many\
+      \ times; (3) map the parameter space; (4) curate outputs \u2014 not all\nemergent forms are interesting; (5) treat the\
+      \ rule set as the primary artifact.\n"
+    failure_mode: "If rules are too complex (many global conditions), emergence collapses into\nscripted behavior and the\
+      \ output space shrinks to the designer's imagination \u2014\nthe generative advantage is lost.\n"
+  rationale: 'Shiffman, Gross, and Wolfram converge on emergence from simple rules. Demonstrates
+
+    Computational Art group, contradicts_fbs, depth, procedural_skill.
+
+    '
+- id: CONV-016
+  domain: illustration
+  discipline: color theory
+  source_books:
+  - "Interaction of Color \u2014 Josef Albers"
+  - "Color and Light \u2014 James Gurney"
+  - "The Elements of Color \u2014 Johannes Itten"
+  cluster_segments:
+  - source_book: "Interaction of Color \u2014 Josef Albers"
+    text: "Colors are the most relative medium in art. A color's appearance changes completely\nbased on its neighbors. Restricting\
+      \ the palette to a few colors forces the artist to\nunderstand these relationships deeply \u2014 with fewer colors,\
+      \ each one must work harder\nand its interaction with others becomes the entire composition.\n"
+  - source_book: "Color and Light \u2014 James Gurney"
+    text: "Professional illustrators often restrict their palette deliberately. A limited\npalette creates harmony because\
+      \ all colors share common pigment characteristics. The\nbeginner's urge to use every color available usually produces\
+      \ mud \u2014 too many hues\ncompeting creates visual noise rather than richness.\n"
+  - source_book: "The Elements of Color \u2014 Johannes Itten"
+    text: "Color harmony is a matter of proportion and relationship, not the number of colors.\nItten's seven color contrasts\
+      \ show that even two colors can produce powerful effects\nwhen their relationship is understood \u2014 complementary\
+      \ contrast, simultaneous\ncontrast, and warm-cool contrast all emerge from pairings, not palettes.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Limited Palette Discipline
+    definition: 'Restricting the color palette to a small set of deliberate colors (typically 2-5)
+
+      produces more harmonious and powerful visual work than using a wide palette,
+
+      because color harmony is a function of relationships and proportion, not quantity.
+
+      '
+    mechanism: "With few colors, each color's appearance is determined by its interaction with the\nothers, forcing the artist\
+      \ to understand simultaneous contrast and relative\nappearance. Wide palettes dilute this understanding \u2014 every\
+      \ color is diluted by\ncompeting relationships, producing visual noise (mud).\n"
+    consequence: 'Artists working within constraints produce more coherent work: the palette becomes
+
+      a unifying element, and the limited vocabulary forces compositional clarity. This
+
+      applies to illustration, UI design, branding, and data visualization.
+
+      '
+    boundary: 'Applies when the goal is harmony and coherence. Fails when: (1) the subject
+
+      requires naturalistic color (photorealism) where wide gamut is necessary;
+
+      (2) the palette is so limited it cannot represent required distinctions
+
+      (colorblind-safe data viz needs distinguishable hues); (3) the artist lacks
+
+      understanding of the colors chosen (limited palette without mastery = flat work).
+
+      '
+    evidence_passages:
+    - Restricting the palette to a few colors forces the artist to understand these relationships deeply
+    - The beginner's urge to use every color available usually produces mud
+    - even two colors can produce powerful effects when their relationship is understood
+    depth: domain
+    evidence: cited
+    jargon:
+    - simultaneous contrast
+    - palette
+    - mud
+    - color harmony
+    keywords:
+    - color
+    - palette
+    - illustration
+    - harmony
+    application: Illustration, branding, UI design, data visualization, photography
+    elaboration: 'The principle generalizes beyond color: constraints in general (limited typefaces,
+
+      limited materials, limited tools) often produce more creative work because they
+
+      force deeper engagement with the material at hand.'
+    prerequisite_fbs:
+    - 'COLOR-REL-001: Color Relationship Basics'
+    contradicts_fbs: []
+    related_fbs:
+    - 'COMP-CONTRAST-001: Complementary Contrast'
+    procedural_skill: 'When starting a visual piece: (1) choose 2-5 colors from a single hue family or a
+
+      complementary pair; (2) define proportions (dominant, secondary, accent); (3) test
+
+      all pairings for simultaneous contrast; (4) adjust values (lightness) before
+
+      saturating; (5) add one ''escape'' color only if the composition demands it.
+
+      '
+    failure_mode: "A palette chosen without understanding of value contrast (all colors same\nlightness) produces flat, unreadable\
+      \ work even with few colors \u2014 the constraint\nmust be paired with value discipline.\n"
+  rationale: 'Albers, Gurney, and Itten converge on limited-palette harmony. Demonstrates
+
+    Illustration & Craft group, application, elaboration, procedural_skill.
+
+    '
+- id: NEG-001
+  domain: finance & investment
+  discipline: finance
+  source_books:
+  - "The Intelligent Investor \u2014 Benjamin Graham"
+  cluster_segments:
+  - source_book: "The Intelligent Investor \u2014 Benjamin Graham"
+    text: 'The intelligent investor is never wrong for long. Even a very bad investment will
+
+      eventually recover in value if the underlying business is sound. Time is on the
+
+      side of the patient investor.
+
+      '
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Patient Investment Recovery
+    definition: 'Bad investments always recover if held long enough, because sound businesses
+
+      appreciate over time regardless of purchase price.
+
+      '
+    mechanism: "None provided \u2014 single source, no independent verification."
+    consequence: Hold losers indefinitely; time heals all investment wounds.
+    boundary: "UNVERIFIED \u2014 contradicts empirical evidence that some businesses permanently\ndecline (Enron, Kodak, Blockbuster)."
+    evidence_passages:
+    - The intelligent investor is never wrong for long
+    depth: ''
+    evidence: ''
+    jargon: []
+    keywords: []
+    application: ''
+    elaboration: ''
+    prerequisite_fbs: []
+    contradicts_fbs: []
+    related_fbs: []
+    procedural_skill: ''
+    failure_mode: ''
+  rationale: "SINGLE SOURCE \u2014 only Graham. Cannot satisfy BORP (min 2 independent sources).\nAdditionally, the claim\
+    \ itself is a platitude that contradicts empirical evidence\n(permanent business decline). REJECT: not convergent, not\
+    \ verified.\n"
+- id: NEG-002
+  domain: behavioral_change
+  discipline: psychology
+  source_books:
+  - "Atomic Habits \u2014 James Clear"
+  - "The Power of Habit \u2014 Charles Duhigg"
+  cluster_segments:
+  - source_book: "Atomic Habits \u2014 James Clear"
+    text: 'You do not rise to the level of your goals. You fall to the level of your systems.
+
+      Small habits compound into extraordinary results over time.
+
+      '
+  - source_book: "The Power of Habit \u2014 Charles Duhigg"
+    text: 'Habits are powerful forces that shape our lives. Understanding how they work is
+
+      important for personal change.
+
+      '
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Systems Beat Goals
+    definition: Systems and habits are more effective than goal-setting for achieving results.
+    mechanism: "None \u2014 motivational claim without mechanism."
+    consequence: Focus on systems rather than goals.
+    boundary: Too vague to bound.
+    evidence_passages:
+    - You do not rise to the level of your goals. You fall to the level of your systems
+    - Habits are powerful forces that shape our lives
+    depth: ''
+    evidence: ''
+    jargon: []
+    keywords: []
+    application: ''
+    elaboration: ''
+    prerequisite_fbs: []
+    contradicts_fbs: []
+    related_fbs: []
+    procedural_skill: ''
+    failure_mode: ''
+  rationale: "PLATITUDE \u2014 the claim 'systems beat goals' is motivational rhetoric without a\nspecific mechanism, boundary,\
+    \ or falsifiable consequence. Second source (Duhigg) adds\nno specific convergent content. REJECT: platitude detection.\n"
+- id: NEG-003
+  domain: marketing & communications
+  discipline: marketing
+  source_books:
+  - "Crossing the Chasm \u2014 Geoffrey Moore"
+  - "Purple Cow \u2014 Seth Godin"
+  cluster_segments:
+  - source_book: "Crossing the Chasm \u2014 Geoffrey Moore"
+    text: 'The early market is driven by technology enthusiasts who buy products for the
+
+      product''s own sake. The mainstream market is driven by pragmatists who buy
+
+      products for the business problem they solve. Crossing the chasm requires
+
+      focusing on a single beachhead segment.
+
+      '
+  - source_book: "Purple Cow \u2014 Seth Godin"
+    text: "Marketing has changed. The old rules of advertising no longer work. You need a\nproduct or service that is remarkable\
+      \ enough to be worth talking about \u2014 a purple\ncow. Be remarkable, and the market will come to you.\n"
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Market Disruption Through Remarkability
+    definition: "Markets are won by being remarkable \u2014 creating a product so distinctive it\ndisrupts existing market\
+      \ dynamics."
+    mechanism: "None \u2014 the two sources discuss different phenomena (technology adoption curve\nvs. word-of-mouth marketing)\
+      \ using different terminology."
+    consequence: Be remarkable to win markets.
+    boundary: None provided.
+    evidence_passages:
+    - Crossing the chasm requires focusing on a single beachhead segment
+    - You need a product or service that is remarkable enough to be worth talking about
+    depth: ''
+    evidence: ''
+    jargon: []
+    keywords: []
+    application: ''
+    elaboration: ''
+    prerequisite_fbs: []
+    contradicts_fbs: []
+    related_fbs: []
+    procedural_skill: ''
+    failure_mode: ''
+  rationale: "FALSE CONVERGENCE \u2014 Moore discusses the technology adoption lifecycle (a\nmarket-segmentation model); Godin\
+    \ discusses word-of-mouth virality (a\nremarkability model). They share the word 'market' but describe different\nphenomena.\
+    \ BORP would be falsely satisfied by surface-level keyword overlap.\nREJECT.\n"
+- id: NEG-004
+  domain: entrepreneurship
+  discipline: strategic thinking
+  source_books:
+  - "The Lean Startup \u2014 Eric Ries"
+  - "The Startup Way \u2014 Eric Ries"
+  cluster_segments:
+  - source_book: "The Lean Startup \u2014 Eric Ries"
+    text: 'Build-Measure-Learn is the fundamental unit of startup progress. Every startup
+
+      should iterate through this loop as quickly as possible to maximize learning
+
+      per unit of effort.
+
+      '
+  - source_book: "The Startup Way \u2014 Eric Ries"
+    text: 'The Build-Measure-Learn feedback loop, introduced in The Lean Startup, applies
+
+      not just to startups but to any organization seeking innovation. The loop is the
+
+      core engine of entrepreneurial management.
+
+      '
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Build-Measure-Learn Loop
+    definition: 'Rapid iteration through the Build-Measure-Learn loop maximizes startup learning
+
+      and progress.'
+    mechanism: 'The loop converts assumptions into validated learning through minimum viable
+
+      products and metric-driven pivots.'
+    consequence: Faster iteration leads to faster learning and better product-market fit.
+    boundary: Requires the organization to tolerate ambiguity and act on metrics.
+    evidence_passages:
+    - Build-Measure-Learn is the fundamental unit of startup progress
+    - The Build-Measure-Learn feedback loop, introduced in The Lean Startup
+    depth: ''
+    evidence: ''
+    jargon:
+    - Build-Measure-Learn
+    - MVP
+    keywords:
+    - startup
+    - lean
+    - iteration
+    application: ''
+    elaboration: ''
+    prerequisite_fbs: []
+    contradicts_fbs: []
+    related_fbs: []
+    procedural_skill: ''
+    failure_mode: ''
+  rationale: "CITATION ECHO \u2014 both books are by the same author (Eric Ries). The second book\ncites the first. These\
+    \ are NOT independent sources \u2014 BORP requires \u22652 independent\nsources, and this fails the independence test.\
+    \ REJECT: pseudo-independence.\n"
+- id: CONV-017
+  domain: education
+  discipline: cognitive science
+  source_books:
+  - "Make It Stick \u2014 Peter Brown"
+  - "Moonwalking with Einstein \u2014 Joshua Foer"
+  - "Why We Sleep \u2014 Matthew Walker"
+  cluster_segments:
+  - source_book: "Make It Stick \u2014 Peter Brown"
+    text: 'Spaced practice is far more effective than massed practice. Retrieving a memory
+
+      at increasing intervals strengthens it because each retrieval is harder and
+
+      requires deeper reconstruction. Cramming produces short-term gains that fade
+
+      quickly, while spaced retrieval produces durable long-term learning.
+
+      '
+  - source_book: "Moonwalking with Einstein \u2014 Joshua Foer"
+    text: "Memory athletes do not have exceptional brains \u2014 they use systematic techniques.\nThe spacing effect is the\
+      \ single most powerful memory technique: reviewing\nmaterial at expanding intervals produces dramatically better retention\
+      \ than\nequal-interval or massed review.\n"
+  - source_book: "Why We Sleep \u2014 Matthew Walker"
+    text: "Sleep consolidates memory. Memories are transferred from the hippocampus to the\nneocortex during sleep, making\
+      \ them stable and integrated. This is why spaced\npractice with sleep between sessions works better than cramming \u2014\
+      \ each sleep\nperiod consolidates what was practiced that day.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Spaced Retrieval Practice
+    definition: 'Retrieving information at expanding intervals produces dramatically more durable
+
+      learning than massed practice (cramming). Each spaced retrieval forces deeper
+
+      reconstruction of the memory, and intervening sleep consolidates it into
+
+      long-term storage.
+
+      '
+    mechanism: 'Spaced retrieval works through the testing effect (retrieval strengthens memory
+
+      more than re-study) amplified by the spacing effect (intervals allow partial
+
+      forgetting that makes retrieval effortful) and sleep consolidation (hippocampal-
+
+      neocortical transfer during sleep stabilizes memories).
+
+      '
+    consequence: 'Learners using spaced retrieval retain substantially more after weeks and months
+
+      than learners who crammed the same total time. The effect is robust across
+
+      subjects, ages, and materials.
+
+      '
+    boundary: "Applies to declarative knowledge and procedural skills. Fails when: (1) the\nmaterial must be recalled within\
+      \ hours (urgent exam) \u2014 spacing still helps but\nmassed practice is faster for same-day recall; (2) the learner\
+      \ does not actually\nretrieve (re-reading is not retrieval practice); (3) intervals are too long,\ncausing complete\
+      \ forgetting before the next review.\n"
+    evidence_passages:
+    - Spaced practice is far more effective than massed practice
+    - The spacing effect is the single most powerful memory technique
+    - Sleep consolidates memory... each sleep period consolidates what was practiced
+    depth: universal
+    evidence: cited
+    jargon:
+    - testing effect
+    - spacing effect
+    - hippocampal-neocortical transfer
+    keywords:
+    - spaced repetition
+    - memory
+    - retrieval
+    - learning
+    application: Study systems, corporate training, language learning (Anki, SuperMemo)
+    elaboration: 'The spacing effect is one of the most replicated findings in cognitive psychology
+
+      (first demonstrated by Ebbinghaus in 1885) and is the theoretical basis of
+
+      spaced repetition software (SRS).'
+    prerequisite_fbs:
+    - 'RETRIEVAL-BASE-001: Retrieval Practice Basics'
+    contradicts_fbs:
+    - 'CRAMMING-001: Massed Practice Efficacy'
+    related_fbs:
+    - 'SLEEP-CONSOL-001: Sleep Consolidation'
+    procedural_skill: "Design a spaced repetition schedule: Day 0 (learn), Day 1 (first recall), Day 3,\nDay 7, Day 14, Day\
+      \ 30. Each review must be active retrieval (cover the answer,\nrecall it, then check) \u2014 never passive re-reading.\
+      \ Adjust intervals when recall\nfails (shorten) or succeeds easily (lengthen).\n"
+    failure_mode: 'SRS systems fail when users treat reviews as re-reading sessions: without active
+
+      retrieval, the spacing effect collapses and retention matches massed practice.
+
+      '
+  rationale: 'Brown, Foer, and Walker converge on spaced retrieval with distinct mechanisms
+
+    (testing effect, spacing effect, sleep consolidation). Demonstrates education domain,
+
+    procedural_skill, contradicts_fbs.
+
+    '
+- id: CONV-018
+  domain: business operations
+  discipline: decision making
+  source_books:
+  - "Certain to Win \u2014 Chet Richards"
+  - "The Art of Action \u2014 Stephen Bungay"
+  - "Blink \u2014 Malcolm Gladwell"
+  cluster_segments:
+  - source_book: "Certain to Win \u2014 Chet Richards"
+    text: 'The OODA loop (Observe, Orient, Decide, Act) is John Boyd''s model of decision
+
+      superiority. The key insight is that speed of iteration matters more than
+
+      optimization of any single step. Whoever cycles through the loop faster than
+
+      their opponent forces the opponent into a reactive posture.
+
+      '
+  - source_book: "The Art of Action \u2014 Stephen Bungay"
+    text: "In military command, the key is not to make the perfect plan but to create\nshared intent (the commander's intent)\
+      \ and then let subordinates act decisively\nwithin it. Over-control slows the decision cycle and hands initiative to\
+      \ the\nenemy. The objective is tempo \u2014 operating faster than the opponent's decision\ncycle.\n"
+  - source_book: "Blink \u2014 Malcolm Gladwell"
+    text: "Rapid cognition \u2014 'thin-slicing' \u2014 can outperform extensive deliberation in\ncertain domains. Experts\
+      \ who have compressed years of experience into\npattern-recognition can make better decisions in seconds than novices\
+      \ make in\nhours. Speed is not the enemy of accuracy; it is often its ally.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Decision Tempo Superiority
+    definition: 'In competitive situations, the agent that cycles through its decision loop
+
+      (observe-orient-decide-act) faster than the opponent gains decisive advantage,
+
+      because the opponent is forced into a reactive posture and loses the initiative.
+
+      Operational tempo beats perfect optimization.
+
+      '
+    mechanism: "Faster cycling means each of the opponent's moves is anticipated or answered\nbefore it can be completed \u2014\
+      \ the slower agent is always one step behind and\ncannot set the terms of engagement. Shared intent allows subordinate\n\
+      decision-making without centralized delay, preserving tempo at scale.\n"
+    consequence: 'Organizations that compress their decision cycles (empower local actors, clarify
+
+      intent, reduce approval layers) consistently outmaneuver slower organizations
+
+      even with inferior resources.
+
+      '
+    boundary: 'Applies to adversarial or competitive environments with time pressure and
+
+      uncertainty. Fails when: (1) the domain requires deep analysis where speed
+
+      sacrifices correctness (nuclear safety, medical diagnosis); (2) the team lacks
+
+      competence to act on shared intent; (3) decisions have irreversible
+
+      consequences that favor deliberation.
+
+      '
+    evidence_passages:
+    - Whoever cycles through the loop faster than their opponent forces the opponent into a reactive posture
+    - "The objective is tempo \u2014 operating faster than the opponent's decision cycle"
+    - Experts who have compressed years of experience into pattern-recognition can make better decisions in seconds
+    depth: cross-domain
+    evidence: cited
+    jargon:
+    - OODA loop
+    - commander's intent
+    - tempo
+    - thin-slicing
+    keywords:
+    - decision making
+    - tempo
+    - OODA
+    - competition
+    application: Competitive strategy, product development, military command, sports, sales
+    elaboration: 'Boyd''s OODA loop originated in air combat but has been applied broadly. The
+
+      mechanism is information-cycle asymmetry: each agent''s observation cycle is
+
+      coupled to the other''s actions, so the faster agent controls the tempo.
+
+      '
+    prerequisite_fbs:
+    - 'INTENT-001: Commander''s Intent'
+    contradicts_fbs:
+    - 'PERF-PLAN-001: Perfect Plan Preparation'
+    related_fbs:
+    - 'DECISION-COMP-001: Decision Compression'
+    - 'EMPOWER-001: Subordinate Empowerment'
+    procedural_skill: 'To implement tempo superiority: (1) define the commander''s intent in one
+
+      paragraph (what and why, not how); (2) push decision authority to the lowest
+
+      competent level; (3) eliminate approval layers that add latency; (4) set a
+
+      bounded decision cadence (e.g., weekly sprints); (5) measure decision-cycle time
+
+      and reduce it iteratively.
+
+      '
+    failure_mode: "Tempo without competence is chaos: if actors lack the skill to act on shared\nintent, faster cycling produces\
+      \ faster mistakes. Tempo superiority requires\ncompetence floors \u2014 it is a force multiplier, not a substitute for\
+      \ ability.\n"
+  rationale: 'Richards, Bungay, and Gladwell converge on decision tempo as competitive advantage.
+
+    Demonstrates procedural_skill, failure_mode, contradicts_fbs. Expands Business group.
+
+    '
+- id: CONV-019
+  domain: health & wellness
+  discipline: behavioral economics
+  source_books:
+  - "Atomic Habits \u2014 James Clear"
+  - "The Power of Habit \u2014 Charles Duhigg"
+  - "Tiny Habits \u2014 BJ Fogg"
+  cluster_segments:
+  - source_book: "Atomic Habits \u2014 James Clear"
+    text: 'Habit stacking is a strategy for pairing a new habit with an existing one: ''After
+
+      I [CURRENT HABIT], I will [NEW HABIT].'' The existing habit serves as a stable
+
+      anchor and trigger for the new behavior. This works because the current habit
+
+      already has a well-worn neural pathway that the new habit can attach to.
+
+      '
+  - source_book: "The Power of Habit \u2014 Charles Duhigg"
+    text: 'The habit loop consists of cue, routine, and reward. New habits are easier to
+
+      form when they are attached to an existing cue. Duhigg calls this ''the golden
+
+      rule of habit change'': you cannot extinguish a bad habit, but you can change the
+
+      routine while keeping the cue and reward.
+
+      '
+  - source_book: "Tiny Habits \u2014 BJ Fogg"
+    text: 'Fogg''s formula is: after a reliable existing behavior (anchor), do a tiny new
+
+      behavior, then celebrate immediately. The tiny size lowers friction to near
+
+      zero, and the celebration attaches positive emotion, which wires the habit
+
+      faster. Anchoring is the most reliable way to install a new habit.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Habit Anchoring
+    definition: 'Attaching a new behavior to an existing, reliable habit (as its immediate
+
+      successor) dramatically increases the probability the new habit forms. The
+
+      existing habit provides the cue; the new habit rides the established neural
+
+      pathway.
+
+      '
+    mechanism: "Existing habits have strong, automatic cue-response wiring. By placing the new\nbehavior immediately after\
+      \ a reliable anchor, the new behavior inherits the\nanchor's cue strength. Celebration after the tiny behavior attaches\
+      \ positive\nreward, completing the loop (cue-anchor \u2192 new routine \u2192 celebration).\n"
+    consequence: 'Habit anchoring converts the hardest part of habit formation (remembering to
+
+      do the behavior) from a conscious decision into an automatic sequence.
+
+      Formation rates are substantially higher than standalone habit attempts.
+
+      '
+    boundary: 'Applies when the anchor is genuinely reliable (performed daily without
+
+      exception) and the new habit is small enough to complete in seconds. Fails
+
+      when: (1) the anchor is aspirational, not actual; (2) the new habit is large
+
+      (enough friction to interrupt the chain); (3) the environment changes
+
+      (vacation, travel) breaking the anchor''s reliability.
+
+      '
+    evidence_passages:
+    - Habit stacking is a strategy for pairing a new habit with an existing one
+    - New habits are easier to form when they are attached to an existing cue
+    - Anchoring is the most reliable way to install a new habit
+    depth: domain
+    evidence: cited
+    jargon:
+    - habit stacking
+    - anchor
+    - cue-routine-reward
+    - tiny habits
+    keywords:
+    - habits
+    - behavior change
+    - anchoring
+    application: Personal productivity, fitness, health interventions, therapy
+    elaboration: 'Clear, Duhigg, and Fogg are the three leading popular-science authors on habit
+
+      formation; all converge on the cue-anchor mechanism with minor terminology
+
+      variations (stacking, golden rule, anchoring).'
+    prerequisite_fbs:
+    - 'LOOP-BASE-002: Habit Loop Structure'
+    contradicts_fbs:
+    - 'MOTIVATION-001: Motivation-Driven Change'
+    related_fbs:
+    - 'TINY-FIRST-001: Tiny Habit Scaling'
+    - 'CELEBRATION-001: Reward Attachment'
+    procedural_skill: 'Install a habit: (1) choose a daily anchor (''After I brush my teeth''); (2) make
+
+      the new behavior tiny (2 minutes or less); (3) state the plan explicitly
+
+      (''After I ___, I will ___''); (4) celebrate immediately after; (5) log
+
+      completion; (6) scale up only after 2 weeks of consistency.
+
+      '
+    failure_mode: "If the anchor habit is itself unreliable, the chain breaks and the new habit\nfails silently \u2014 the\
+      \ user thinks they lack willpower when the actual failure is\nanchor selection.\n"
+  rationale: 'Clear, Duhigg, and Fogg converge on anchoring new habits to existing cues.
+
+    Demonstrates health & wellness domain, prerequisite_fbs, related_fbs,
+
+    procedural_skill.
+
+    '
+- id: CONV-020
+  domain: legal & public policy
+  discipline: political economy
+  source_books:
+  - "Nudge \u2014 Richard Thaler & Cass Sunstein"
+  - "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+  - "The Undoing Project \u2014 Michael Lewis"
+  cluster_segments:
+  - source_book: "Nudge \u2014 Richard Thaler & Cass Sunstein"
+    text: "Defaults are incredibly powerful. When a choice is framed with a default, most\npeople do not change it \u2014\
+      \ they accept the option they are given. In retirement\nsavings, automatic enrollment (opt-out) produces participation\
+      \ rates above 90%,\nwhile voluntary enrollment (opt-in) produces rates below 50%. Changing the\ndefault changes behavior\
+      \ without restricting choice.\n"
+  - source_book: "Thinking, Fast and Slow \u2014 Daniel Kahneman"
+    text: 'Status quo bias is a manifestation of loss aversion and inertia. People
+
+      overweight the losses associated with changing from the current state. This is
+
+      why defaults matter: the default defines the status quo, and changing it
+
+      requires overcoming loss aversion.
+
+      '
+  - source_book: "The Undoing Project \u2014 Michael Lewis"
+    text: "Kahneman and Tversky's prospect theory showed that people evaluate outcomes\nrelative to a reference point, not\
+      \ absolutely. The default sets the reference\npoint \u2014 any change is perceived as a loss or gain relative to it.\
+      \ This is the\npsychological foundation of why default options stick.\n"
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Default Option Stickiness
+    definition: "When a choice architecture includes a default option, the majority of people\nwill accept the default rather\
+      \ than actively choose an alternative. Changing\nthe default reliably changes aggregate behavior without prohibiting\
+      \ any option\n\u2014 a form of libertarian paternalism.\n"
+    mechanism: 'Defaults leverage status quo bias and loss aversion: the default becomes the
+
+      reference point, and any deviation is evaluated as a potential loss. Combined
+
+      with inertia and the effort cost of opting out, this produces high default
+
+      acceptance rates.
+
+      '
+    consequence: 'Policies and products that set defaults deliberately (automatic enrollment,
+
+      pre-checked options, standard configurations) achieve dramatically higher
+
+      adoption than equivalent opt-in designs, at zero cost to choice freedom.
+
+      '
+    boundary: "Applies when the choice is one people are reluctant to deliberate on (complex,\nlow-stakes, or emotionally\
+      \ neutral). Fails when: (1) the choice is highly\nconsequential (medical decisions) \u2014 people override defaults;\
+      \ (2) the default\nis obviously harmful \u2014 backlash and opt-out increase; (3) the population has\nstrong pre-existing\
+      \ preferences.\n"
+    evidence_passages:
+    - automatic enrollment (opt-out) produces participation rates above 90%
+    - Status quo bias is a manifestation of loss aversion and inertia
+    - people evaluate outcomes relative to a reference point, not absolutely
+    depth: universal
+    evidence: cited
+    jargon:
+    - choice architecture
+    - default
+    - status quo bias
+    - nudge
+    keywords:
+    - default
+    - nudge
+    - behavioral economics
+    - choice architecture
+    application: Retirement policy, organ donation, insurance, software settings, consent forms
+    elaboration: 'The default effect is one of the most replicated findings in behavioral
+
+      economics, with field evidence from retirement savings (401k), organ donation
+
+      (opt-out countries), and privacy settings.'
+    prerequisite_fbs:
+    - 'LOSS-AV-001: Loss Aversion Basics'
+    contradicts_fbs:
+    - 'RATIONAL-ACTOR-001: Rational Actor Model'
+    related_fbs:
+    - 'FRAMING-001: Choice Framing Effects'
+    procedural_skill: 'When designing any choice architecture: (1) identify the desired social or
+
+      individual outcome; (2) set the default to the option that produces it; (3)
+
+      keep the alternative one step away (not hidden); (4) disclose the default and
+
+      its rationale; (5) measure opt-out rate; (6) revisit if opt-out exceeds a
+
+      threshold indicating coercion.
+
+      '
+    failure_mode: 'Setting defaults for consequential personal choices (medical, financial)
+
+      without transparency backfires: perceived manipulation triggers reactance and
+
+      erodes trust in the institution, causing long-term opt-out and reputation
+
+      damage.
+
+      '
+  rationale: 'Thaler/Sunstein, Kahneman, and Lewis converge on default stickiness via status quo
+
+    bias and reference points. Demonstrates legal & public policy domain, contradicts_fbs.
+
+    '
+- id: CONV-021
+  domain: systems & frameworks
+  discipline: systems thinking
+  source_books:
+  - "Thinking in Systems \u2014 Donella Meadows"
+  - "Freakonomics \u2014 Steven Levitt & Stephen Dubner"
+  - "The Logic of Life \u2014 Tim Harford"
+  cluster_segments:
+  - source_book: "Thinking in Systems \u2014 Donella Meadows"
+    text: "Every action in a system has second-order effects \u2014 effects that were not\nintended and often not predicted.\
+      \ Policy resistance occurs when the system\ncompensates for an intervention, producing the opposite of the intended\
+      \ effect.\nThe cure for policy resistance is to find the source of the resistance and\nchange the rules that create\
+      \ it.\n"
+  - source_book: "Freakonomics \u2014 Steven Levitt & Stephen Dubner"
+    text: 'Incentives are the cornerstone of modern life. When the incentive structure is
+
+      misaligned, behavior follows the incentive, not the stated goal. The authors
+
+      document how well-intentioned policies (e.g., Chicago school reform) created
+
+      unintended behaviors (teaching to the test, cheating) when the incentive
+
+      metric was gameable.
+
+      '
+  - source_book: "The Logic of Life \u2014 Tim Harford"
+    text: 'The law of unintended consequences: interventions that ignore the rational
+
+      responses of the people they target will be evaded or exploited. Rational
+
+      economic agents respond to incentives in ways that the policy designer often
+
+      fails to anticipate.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Incentive-Driven Unintended Consequences
+    definition: 'Any intervention that changes the incentive structure of a system will produce
+
+      responses that the designer did not intend, because the agents in the system
+
+      optimize against the new incentives rather than the stated goal. This is the
+
+      fundamental source of policy resistance and gaming behavior.
+
+      '
+    mechanism: 'Agents in any system respond to incentives, not intentions. When an
+
+      intervention alters the payoff structure, agents re-optimize their behavior;
+
+      this re-optimization often exploits gaps in the intervention''s design,
+
+      producing behaviors that counteract the stated goal (Goodhart''s law: when a
+
+      measure becomes a target, it ceases to be a good measure).
+
+      '
+    consequence: 'Policies and incentives must be designed with the expectation of gaming and
+
+      adaptation. The metric used to measure success will be gamed if it is visible;
+
+      the intervention will be evaded if it is costly; second-order effects will
+
+      emerge from the interaction of rational agents.
+
+      '
+    boundary: 'Applies when the intervention changes observable incentives AND agents have
+
+      freedom to respond. Fails when: (1) agents lack the information to perceive
+
+      incentive changes; (2) the system is closed with no adaptive freedom; (3) the
+
+      intervention is invisible to agents (they cannot react to what they cannot see).
+
+      '
+    evidence_passages:
+    - Every action in a system has second-order effects
+    - When the incentive structure is misaligned, behavior follows the incentive, not the stated goal
+    - Interventions that ignore the rational responses of the people they target will be evaded or exploited
+    depth: universal
+    evidence: cited
+    jargon:
+    - second-order effects
+    - policy resistance
+    - Goodhart's law
+    - incentive gaming
+    keywords:
+    - incentives
+    - unintended consequences
+    - systems
+    - policy
+    application: Public policy, management, product design, economics, regulation
+    elaboration: 'This is the systems-theoretic restatement of Goodhart''s law and the cobra
+
+      effect (the classic example of a bounty program that backfired).'
+    prerequisite_fbs:
+    - 'INCENT-BASE-001: Incentive Structure Analysis'
+    contradicts_fbs:
+    - 'STATIC-POLICY-001: Static Policy Sufficiency'
+    related_fbs:
+    - 'GOODHART-001: Metric Gaming'
+    - 'POLICY-RESIST-001: Policy Resistance'
+    procedural_skill: 'Before implementing any policy or metric: (1) model the incentive change;
+
+      (2) ask who can game the new metric and how; (3) predict second-order effects
+
+      (what will the system do to compensate?); (4) design countermeasures;
+
+      (5) pilot on a small scale and watch for gaming; (6) review the metric itself
+
+      periodically.
+
+      '
+    failure_mode: 'Using a metric as a target without monitoring gaming leads to Goodhart collapse:
+
+      the metric rises while the underlying goal deteriorates (e.g., call-center
+
+      handle-time targets reducing service quality).
+
+      '
+  rationale: 'Meadows, Levitt/Dubner, and Harford converge on incentive-driven unintended
+
+    consequences. Demonstrates contradiction, related_fbs, procedural_skill.
+
+    '

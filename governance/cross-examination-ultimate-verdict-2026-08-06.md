@@ -224,3 +224,6 @@ These are valid suggestions from all 4 LLMs that are deferred to future phases:
 | D2199 | model_assignments.yaml vs pipeline_config.yaml resolution |
 | D2200 | LICENSE: MIT |
 | D2201 | pyproject.toml pipeline exclusion removal |
+| D2202 | ollama_embed.py: undeclared ollama import → batch_embed delegation |
+| D2203 | integrity_check.py 17 checks + just integrity + lockfile + preflight fix + stage6 INSERT fix |
+| D2204 | Golden set expansion 10→25 (full property + domain coverage) + LLM eval prompt v2.0 |

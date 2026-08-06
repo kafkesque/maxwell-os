@@ -3158,3 +3158,11 @@ D2200: LICENSE added — MIT
 D2201: pyproject.toml — removed pipeline/ from Ruff+mypy exclusions
 D2202: ollama_embed.py — removed undeclared ollama import, delegated single-doc to batch_embed (requests-based)
 D2203: integrity_check.py — 17 automated checks, just integrity command, added to health+preflight
+D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisite_fbs 0→10,
+       contradicts_fbs 0→8, related_fbs 0→11, procedural_skill 0→11, failure_mode 0→11,
+       depth 0→11, evidence 0→11). Domains 8→21 (all 7 domain groups). 4 new hard negatives:
+       NEG-001 single-source(finance), NEG-002 platitude, NEG-003 false convergence,
+       NEG-004 citation echo. Files: config/golden/expand_golden_v2.py,
+       config/golden/stage2_fewshot_convergent.yaml,
+       config/golden/GOLDEN-EVALUATION-PROMPT.md (master LLM eval prompt v2.0).
+       Status: needs_review — requires LLM cross-eval before calibration.

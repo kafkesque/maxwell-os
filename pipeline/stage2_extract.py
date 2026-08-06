@@ -607,26 +607,30 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
 
     for i, ex in enumerate(pos_examples[:5], 1):
         fb = ex.get("expected_fb", {})
+        # D2206: expected_fb may be a single dict OR a list of dicts (1:N extraction)
+        fbs = fb if isinstance(fb, list) else [fb]
         source_books = ex.get("source_books", [])
         rationale = ex.get("rationale", "")
 
-        parts.append(f"## Example {i}: {fb.get('name', 'Untitled')}")
+        parts.append(f"## Example {i}: {fbs[0].get('name', 'Untitled')}")
         parts.append(f"Sources: {', '.join(source_books[:3])}")
-        parts.append(f"Extracted principle:")
-        parts.append("```json")
-        # Build a clean JSON showing only the output fields
-        output = {
-            "name": fb.get("name", ""),
-            "definition": fb.get("definition", ""),
-            "mechanism": fb.get("mechanism", ""),
-            "boundary": fb.get("boundary", ""),
-            "consequence": fb.get("consequence", ""),
-            "is_summary": fb.get("is_summary", False),
-            "evidence_passages": fb.get("evidence_passages", [])[:2],
-            "route": fb.get("route", "FB"),
-        }
-        parts.append(json.dumps(output, indent=2, ensure_ascii=False))
-        parts.append("```")
+        for j, fb_item in enumerate(fbs, 1):
+            label = "Extracted principle:" if len(fbs) == 1 else f"Extracted principle {j} of {len(fbs)}:"
+            parts.append(label)
+            parts.append("```json")
+            # Build a clean JSON showing only the output fields
+            output = {
+                "name": fb_item.get("name", ""),
+                "definition": fb_item.get("definition", ""),
+                "mechanism": fb_item.get("mechanism", ""),
+                "boundary": fb_item.get("boundary", ""),
+                "consequence": fb_item.get("consequence", ""),
+                "is_summary": fb_item.get("is_summary", False),
+                "evidence_passages": fb_item.get("evidence_passages", [])[:2],
+                "route": fb_item.get("route", "FB"),
+            }
+            parts.append(json.dumps(output, indent=2, ensure_ascii=False))
+            parts.append("```")
         if rationale:
             # Truncate rationale to 1-2 key sentences
             first_sentence = rationale.strip().split(".")[0] + "."

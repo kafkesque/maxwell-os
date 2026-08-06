@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-05
+# Last manual edit: 2026-08-06
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-05T17:41:43Z'
-total_decisions: 179
+last_sync: '2026-08-06T16:01:40Z'
+total_decisions: 198
 decisions:
 - id: D2092
   category: INF
@@ -1293,7 +1293,9 @@ decisions:
 - id: D2190
   category: INF
   state: ACTIVE
-  description: "Embedding backend switched MPS→Ollama bge-m3. MPS deadlocked at batch ~19-24 on large corpus (3 runs). Ollama uses MLX (Apple native), stable, 15-18 seg/s, ~6h for 323K. bge-m3 512d Matryoshka (92% neighbor overlap) beats bge-small 384d (MTEB 58.3 vs 54.2). Unified semantic space with S4 (D2181)."
+  description: Embedding backend switched MPS→Ollama bge-m3. MPS deadlocked at batch ~19-24 on large corpus (3 runs). Ollama
+    uses MLX (Apple native), stable, 15-18 seg/s, ~6h for 323K. bge-m3 512d Matryoshka (92% neighbor overlap) beats bge-small
+    384d (MTEB 58.3 vs 54.2). Unified semantic space with S4 (D2181).
   champion: goose
   target_files:
   - pipeline/stage1_5_embed_cluster.py
@@ -1304,23 +1306,145 @@ decisions:
 - id: D2190a
   category: PERF
   state: ACTIVE
-  description: "embed_batch_size 128→64 for Ollama parallelism (4 workers, 5051 batches). embed_chunk_size: 20000 segments per chunk (reduces memory). documented in D2190-embedding-model-selection.md"
+  description: 'embed_batch_size 128→64 for Ollama parallelism (4 workers, 5051 batches). embed_chunk_size: 20000 segments
+    per chunk (reduces memory). documented in D2190-embedding-model-selection.md'
   champion: goose
   target_files:
   - config/pipeline_config.yaml
   - pipeline/stage1_5_embed_cluster.py
   created: '2026-08-05'
+- id: D2181
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2182
+  category: INF
+  state: ACTIVE
+  description: '- ONLY S1.5 stale (bge-small 384d) → re-run bge-m3 512d'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2183
+  category: INF
+  state: ACTIVE
+  description: 8 LLM reviews (deepseek, qwen, chatgpt, kimi) cross-examined against live code.
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2187
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2191
+  category: INF
+  state: ACTIVE
+  description: 1. YAML duplicate keys removed (3 pairs → 1 pair per example, 9 total)
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2195
+  category: INF
+  state: ARCHIVED
+  description: 'D2196: Zero-vector fallback → EmbeddingQuarantineError — ollama_embed.py'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2196
+  category: INF
+  state: ARCHIVED
+  description: 'D2197: session_seed.yaml sync — NLI model, stage3 removal, 8-stage pipeline'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2197
+  category: INF
+  state: ACTIVE
+  description: 'D2198: AGENTS.md + KNOWLEDGE-PIPELINE-ARCHITECTURE.md stage3 ghost removal + load_stage3_clusters→load_stage2_clusters'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2198
+  category: INF
+  state: ACTIVE
+  description: 'D2199: model_assignments.yaml sync — REVIEWER fixed (DeepSeek→gemma), S5_FB_VERIFIER fixed (Qwen→Gemma), OptiQ
+    documented'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2199
+  category: INF
+  state: ACTIVE
+  description: 'D2200: LICENSE added — MIT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2200
+  category: INF
+  state: ACTIVE
+  description: 'D2201: pyproject.toml — removed pipeline/ from Ruff+mypy exclusions'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2201
+  category: INF
+  state: ACTIVE
+  description: 'D2202: ollama_embed.py — removed undeclared ollama import, delegated single-doc to batch_embed (requests-based)'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2202
+  category: INF
+  state: ACTIVE
+  description: 'D2203: integrity_check.py — 17 automated checks, just integrity command, added to health+preflight'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2203
+  category: INF
+  state: ACTIVE
+  description: 'D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisite_fbs 0→10,'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2204
+  category: INF
+  state: ARCHIVED
+  description: contradicts_fbs 0→8, related_fbs 0→11, procedural_skill 0→11, failure_mode 0→11,
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2205
+  category: ARCH
+  state: ACTIVE
+  description: "RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d), integration (1d). Full specs in governance/D2205-rag-architecture-roadmap-2026-08-06.md (1,091 lines). 13 proposals rejected with constraint-violation reasons."
+  champion: goose
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2206
+  category: QLT
+  state: ACTIVE
+  description: "Golden-Eval Cross-Examination (D2206): three LLM evals of the D2204 golden set verified claim-by-claim against ground truth (17 TRUE / 3 FALSE / 2 re-graded). Verdict NEEDS-FIXES. P0 fix pass: NEG-001..004 route NULL, CONV-003 fabricated sources replaced (Forceville 1996 + McQuarrie & Mick 1999), NEG-005 jargon echo + NEG-006 boundary violation added, meta corrected to 18/9, verbatim evidence repaired (4), 1:N schema formalized (GoldenFB/GoldenExample + validate_golden_set), generator made rerunnable. Calibration still gated on LLM re-eval."
+  champion: goose
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 181
+  total: 198
   proposed: 0
   draft: 0
-  active: 149
+  active: 163
   stale: 0
   superseded: 6
-  archived: 5
+  archived: 8
   rejected: 5
   by_category:
-    INF: 109
+    INF: 125
     QLT: 20
     GOV: 11
     RES: 4
@@ -1335,26 +1459,3 @@ summary:
     ARCH: 4
     pipeline-fix: 1
     governance: 1
-by_category:
-  INF: 93
-- id: D2205
-  date: 2026-08-06
-  status: ACTIVE
-  category: ARCH
-  summary: "RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d), integration (1d). Full specs with Maxwell-adapted code in governance/D2205-rag-architecture-roadmap-2026-08-06.md (1,091 lines). 13 proposals rejected with constraint-violation reasons."
-  link: "governance/D2205-rag-architecture-roadmap-2026-08-06.md"
-  predecessor: D2195
-  successor: null
-
-  QLT: 19
-  GOV: 9
-  RES: 4
-  DAT: 4
-  DEF: 1
-  VAL: 2
-  CLS: 7
-  STR: 1
-  PERF: 3
-  BUGFIX: 10
-  CFG: 4
-  ARCH: 5

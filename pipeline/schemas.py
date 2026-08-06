@@ -900,3 +900,130 @@ def match_domains_to_canonical(labels: list[str]) -> list[str]:
             seen.add(r)
             unique.append(r)
     return unique
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Golden set schema + validator (D2206)
+# ────────────────────────────────────────────────────────────────────────────
+# Formalizes config/golden/stage2_fewshot_convergent.yaml. D2206: expected_fb
+# is FB | list[FB] — 1:N extraction is a documented pipeline capability
+# (meta.expected_coverage: one_to_n_extraction). validate_golden_set() turns
+# the golden-set invariants from the D2206 cross-examination into executable
+# spec: meta counts, route/should_extract consistency, verbatim evidence.
+# ═══════════════════════════════════════════════════════════════════════════
+
+class GoldenFB(BaseModel):
+    """One Foundation Block as represented in a golden few-shot example.
+
+    Lenient by design: negatives use route NULL with empty fields, and early
+    positives (CONV-001..007) omit optional properties. Literal route makes
+    route/should_extract contradictions structurally catchable.
+    """
+    is_summary: bool = False
+    route: Literal["FB", "NULL"] = "FB"
+    name: str = ""
+    definition: str = ""
+    mechanism: str = ""
+    boundary: str = ""
+    consequence: str = ""
+    evidence_passages: list[str] = Field(default_factory=list)
+    depth: str = ""
+    evidence: str = ""
+    jargon: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
+    application: str = ""
+    elaboration: str = ""
+    prerequisite_fbs: list[str] = Field(default_factory=list)
+    contradicts_fbs: list[str] = Field(default_factory=list)
+    related_fbs: list[str] = Field(default_factory=list)
+    procedural_skill: str = ""
+    failure_mode: str = ""
+
+
+class GoldenExample(BaseModel):
+    """One golden few-shot example (D2206: 1:N via list expected_fb)."""
+    id: str
+    domain: str
+    discipline: str | None = None
+    source_books: list[str] = Field(default_factory=list)
+    cluster_segments: list[dict] = Field(default_factory=list)
+    is_convergent: bool = False
+    should_extract: bool = False
+    expected_fb: GoldenFB | list[GoldenFB]
+    rationale: str = ""
+
+
+def validate_golden_set(path: str) -> list[str]:
+    """Validate a golden-set YAML against semantic invariants (D2206).
+
+    Checks:
+      1. meta counts match actual should_extract/negative counts
+      2. route/should_extract consistency (route FB ⇔ should_extract true)
+      3. evidence_passages are whitespace-normalized verbatim substrings of
+         some cluster segment (no elision, no abbreviation, no fabrication)
+      4. 1:N expected_fb lists must all be route FB
+
+    Args:
+        path: Path to golden set YAML.
+
+    Returns:
+        List of violation strings. Empty list == valid.
+    """
+    import re
+
+    import yaml
+
+    with open(path) as f:
+        doc = yaml.safe_load(f)
+
+    violations: list[str] = []
+    meta = doc.get("meta", {})
+    examples = doc.get("examples", [])
+
+    def norm(s: str) -> str:
+        return re.sub(r"[\s\-–—]+", " ", str(s)).lower().strip()
+
+    # 1. Meta counts
+    actual_pos = sum(1 for e in examples if e.get("should_extract"))
+    actual_neg = len(examples) - actual_pos
+    if meta.get("convergent_positives") != actual_pos:
+        violations.append(
+            f"meta.convergent_positives={meta.get('convergent_positives')} != actual {actual_pos}"
+        )
+    if meta.get("hard_negatives") != actual_neg:
+        violations.append(
+            f"meta.hard_negatives={meta.get('hard_negatives')} != actual {actual_neg}"
+        )
+    if meta.get("total_examples") != len(examples):
+        violations.append(
+            f"meta.total_examples={meta.get('total_examples')} != actual {len(examples)}"
+        )
+
+    # 2-4. Per-example invariants
+    for ex in examples:
+        eid = ex.get("id", "?")
+        should = bool(ex.get("should_extract"))
+        fb = ex.get("expected_fb", {})
+        fbs: list[dict] = fb if isinstance(fb, list) else [fb]
+        for fb_item in fbs:
+            route = str(fb_item.get("route", "")).strip().upper()
+            if should and route != "FB":
+                violations.append(f"{eid}: should_extract=true but route={route!r}")
+            if not should and route != "NULL":
+                violations.append(f"{eid}: should_extract=false but route={route!r}")
+        if isinstance(fb, list) and len(fbs) > 1:
+            for fb_item in fbs:
+                if str(fb_item.get("route", "")).strip().upper() != "FB":
+                    violations.append(f"{eid}: 1:N expected_fb item route != FB")
+
+        # 3. Verbatim evidence (only meaningful for positives with segments)
+        if not should:
+            continue
+        segment_texts = [norm(c.get("text", "")) for c in ex.get("cluster_segments", [])]
+        for fb_item in fbs:
+            for p in fb_item.get("evidence_passages", []) or []:
+                np_ = norm(p)
+                if np_ and not any(np_ in st for st in segment_texts):
+                    violations.append(f"{eid}: evidence_passage not verbatim: {p[:70]!r}")
+
+    return violations

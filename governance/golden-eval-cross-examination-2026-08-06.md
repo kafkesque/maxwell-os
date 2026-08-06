@@ -1,4 +1,4 @@
-# Golden Set Evaluation — Cross-Examination & Pragmatic Verdict (D2205)
+# Golden Set Evaluation — Cross-Examination & Pragmatic Verdict (D2206)
 
 **Date:** 2026-08-06
 **Subject:** Three LLM evaluations of `config/golden/stage2_fewshot_convergent.yaml` (v3.0, 25 examples)

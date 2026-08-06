@@ -91,18 +91,19 @@
 
 ---
 
-## D2205 — Golden-Eval Fix Pass (from 3-LLM cross-examination, pre-calibration gate)
+## D2206 — Golden-Eval Fix Pass (from 3-LLM cross-examination, pre-calibration gate)
 
 Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative block + metadata F-tier; 17 verified findings).
 
 ### P0 — blocks calibration
-| # | Task | Source |
-|---|------|--------|
-| G-01 | NEG-001..004 → `route: NULL` + empty FB fields (NEG-CONV pattern) | Kimi/Qwen/DeepSeek consensus |
-| G-02 | CONV-006 1:N schema: formalize `expected_fb: FB \| List[FB]` in schemas.py | Kimi (accurate framing) |
-| G-03 | Replace fabricated CONV-003 source "Finding the Tipping Point" (verified real alt: McQuarrie & Mick 1999; Phillips & McQuarrie 2004); verify Mostafa | Qwen (only catcher) |
-| G-04 | Meta header: `convergent_positives: 18`, `hard_negatives: 7`, fix notes | Kimi/Qwen |
-| G-05 | Add NEG-005 jargon-echo + NEG-006 boundary-violation negatives | All three consensus |
+| # | Task | Source | Status |
+|---|------|--------|--------|
+| G-01 | NEG-001..004 → `route: NULL` + empty FB fields (NEG-CONV pattern) | Kimi/Qwen/DeepSeek consensus | ✅ D2206 |
+| G-02 | CONV-006 1:N schema: formalize `expected_fb: FB \| List[FB]` (GoldenFB/GoldenExample + validate_golden_set in schemas.py; format_golden_fewshot 1:N-safe) | Kimi (accurate framing) | ✅ D2206 |
+| G-03 | Replace fabricated CONV-003 source "Finding the Tipping Point" → Forceville 1996 + McQuarrie & Mick 1999 (both real, independent traditions) | Qwen (only catcher) | ✅ D2206 |
+| G-04 | Meta header: `convergent_positives: 18`, `hard_negatives: 9`, notes fixed | Kimi/Qwen | ✅ D2206 |
+| G-05 | Add NEG-005 jargon-echo + NEG-006 boundary-violation negatives | All three consensus | ✅ D2206 |
+| G-06 | Repair 4 verbatim violations (CONV-003/012/013/017) + substring assertion in validator + generator hooks it | This audit (CONV-013 found only here) | ✅ D2206 |
 
 ### P1 — quality
 | # | Task | Source |
@@ -113,7 +114,7 @@ Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative bl
 | G-09 | Property backfill into CONV-001..007 (depth/evidence/jargon/keywords) | Qwen/DeepSeek |
 | G-10 | Domain rebalance: 2 business → AI/Visual/Interactive (also fixes ratio 20:8) | Kimi/Qwen |
 | G-11 | Fix stray fields (consequence_2, source_book_2) + typos (opptimization, afntifragility); renumber/document ID gaps | Kimi/Qwen/DeepSeek |
-| G-12 | Replace NEG-001 Graham + NEG-002 Duhigg segments with verified excerpts | Kimi/Qwen |
+| G-12 | Replace NEG-001 Graham + NEG-002 Duhigg segments with verified excerpts | Kimi/Qwen | ✅ D2206 (folded into G-01) |
 
 ### P2 — process hardening
 | # | Task | Source |
@@ -127,3 +128,24 @@ Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative bl
 - Kimi: strongest structure (missed positive-source fabrication)
 - DeepSeek: most lenient (would've let contaminated set calibrate — hallucination PASS overruled)
 - **Rule: never calibrate on single-evaluator verdict; tri-party eval = golden-set lifecycle (R5/BORP applied to the eval loop itself)**
+
+---
+
+## D2206 — P0 FIX PASS COMPLETE (2026-08-06)
+
+**Golden set v3.0 now passes all semantic invariants: `validate_golden_set` = 0 violations; integrity 17/17; tests 12/12.**
+- Negatives: 9 (6 categories), all `route: NULL` with empty FB fields.
+- CONV-003: fabricated sources replaced with Forceville (1996) + McQuarrie & Mick (1999).
+- Evidence: all passages programmatically verified verbatim substrings.
+- CONV-006 1:N: schema formalized (`GoldenFB | list[GoldenFB]`), stage2 few-shot 1:N-safe.
+- Generator `expand_golden_v2.py`: rerunnable (ID-overlap → replace), correct meta stats, validation gate before write.
+
+**Bonus fixes discovered during the pass:**
+1. 🔴 **Decision ID collision**: my initial D2205 collided with existing D2205 (RAG Architecture Roadmap, same day). Renumbered to **D2206**. Lesson: check `DECISION-LOG.md` tail before issuing D-numbers.
+2. 🟡 **decisions.yaml corrupt tail**: malformed append (RAG D2205 wedged inside `by_category`) — file failed YAML parse (integrity check #1 was failing at HEAD). Repaired: truncated, re-synced (17 missing decisions D2181-D2206 added), enriched D2205/D2206 entries. Integrity now 10/10 quick, 17/17 full.
+3. 🟡 **Generator was unrunnable** (ID-collision abort once ids committed). Now replace-on-overlap.
+4. 🟡 **Generator meta stats were wrong** (counted is_convergent instead of should_extract). Fixed to 18/9 semantics.
+
+**Remaining golden-set work (P1, not in this pass):** G-07 (CONV-006/020 dedupe — replace CONV-020 with framing-effects), G-08 (CONV-012 Russell source), G-09 (property backfill into CONV-001..007), G-10 (domain rebalance), G-11 (typos/stray fields — partially done in D2204 era; re-verify), G-13 (eval prompt v2.1: programmatic verbatim + source-existence checks), G-14 (author-overlap detector), G-15 (integrity check #18: route-vs-should_extract — partially covered by validate_golden_set, wire into integrity_check.py).
+
+**Next gate:** re-run GOLDEN-EVALUATION-PROMPT.md with 3 LLMs on the fixed set → then calibrate (`calibration_status: calibrated`).

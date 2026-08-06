@@ -3219,7 +3219,7 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
        config/golden/GOLDEN-EVALUATION-PROMPT.md (master LLM eval prompt v2.0).
        Status: needs_review — requires LLM cross-eval before calibration.
 
-## D2205 — Golden-Eval Cross-Examination & Pre-Calibration Fix Pass (2026-08-06)
+## D2206 — Golden-Eval Cross-Examination & Pre-Calibration Fix Pass (2026-08-06)
 
 **Context:** Three LLM evaluations of the D2204-expanded golden set (Kimi, Qwen, DeepSeek) returned BROKEN / NEEDS-FIXES / NEEDS-FIXES. All claims independently re-verified against `config/golden/stage2_fewshot_convergent.yaml` ground truth.
 

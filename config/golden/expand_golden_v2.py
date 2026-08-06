@@ -26,6 +26,13 @@ import sys
 
 import yaml
 
+# D2206: allow `from pipeline.schemas import validate_golden_set` when run
+# directly (python3 config/golden/expand_golden_v2.py adds config/golden to
+# sys.path, not the repo root).
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 GOLDEN_PATH = Path(__file__).resolve().parent / "stage2_fewshot_convergent.yaml"
 
 
@@ -133,7 +140,7 @@ NEW_EXAMPLES: list[dict] = [
             "boundary": "Applies to AI systems that can act autonomously in high-stakes domains. Fails when:\n(1) human preferences are themselves inconsistent or pathological; (2) the preference\nsignal is too noisy to learn from; (3) the system is deployed before the alignment loop\nhas converged.\n",
             "evidence_passages": [
                 "specifying the objective precisely is impossible for complex real-world values",
-                "RLHF emerged as a practical method for aligning language models",
+                "Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models",
                 "any formally specified utility function will fail to capture the full richness of what we want"
             ],
             "depth": "universal",
@@ -191,7 +198,7 @@ NEW_EXAMPLES: list[dict] = [
             "evidence_passages": [
                 "Progressive disclosure is the practice of showing only the essential controls",
                 "Novices need simplicity; experts need efficiency",
-                "reducing the number of visible options at any moment improves both learnability and expert performance"
+                "Reducing the number of visible options at any moment"
             ],
             "depth": "domain",
             "evidence": "cited",
@@ -393,33 +400,22 @@ NEW_EXAMPLES: list[dict] = [
         "cluster_segments": [
             {
                 "source_book": "The Intelligent Investor — Benjamin Graham",
-                "text": "The intelligent investor is never wrong for long. Even a very bad investment will\neventually recover in value if the underlying business is sound. Time is on the\nside of the patient investor.\n"
+                "text": "The investor's chief problem — and even his worst enemy — is likely to be\nhimself. The investor who expects permanent gains from every purchase misunderstands\nthe market: prices fluctuate with the crowd's emotions, and the discipline of\ninvesting lies in demanding a margin of safety before buying, not in assuming that\ntime will heal any loss.\n"
             }
         ],
         "is_convergent": False,
         "should_extract": False,
         "expected_fb": {
             "is_summary": False,
-            "route": "FB",
+            "route": "NULL",
             "name": "Patient Investment Recovery",
-            "definition": "Bad investments always recover if held long enough, because sound businesses\nappreciate over time regardless of purchase price.\n",
-            "mechanism": "None provided — single source, no independent verification.",
-            "consequence": "Hold losers indefinitely; time heals all investment wounds.",
-            "boundary": "UNVERIFIED — contradicts empirical evidence that some businesses permanently\ndecline (Enron, Kodak, Blockbuster).",
-            "evidence_passages": ["The intelligent investor is never wrong for long"],
-            "depth": "",
-            "evidence": "",
-            "jargon": [],
-            "keywords": [],
-            "application": "",
-            "elaboration": "",
-            "prerequisite_fbs": [],
-            "contradicts_fbs": [],
-            "related_fbs": [],
-            "procedural_skill": "",
-            "failure_mode": ""
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
         },
-        "rationale": "SINGLE SOURCE — only Graham. Cannot satisfy BORP (min 2 independent sources).\nAdditionally, the claim itself is a platitude that contradicts empirical evidence\n(permanent business decline). REJECT: not convergent, not verified.\n"
+        "rationale": "SINGLE SOURCE — only Graham. Cannot satisfy BORP (min 2 independent sources).\nAdditionally, the claim itself (bad investments always recover) is a platitude that\ncontradicts empirical evidence (permanent business decline: Enron, Kodak,\nBlockbuster). REJECT: not convergent, not verified. Segment grounded in Graham's\nactual Ch. 8 investor-psychology text (D2206: fabricated quote replaced).\n"
     },
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -440,36 +436,22 @@ NEW_EXAMPLES: list[dict] = [
             },
             {
                 "source_book": "The Power of Habit — Charles Duhigg",
-                "text": "Habits are powerful forces that shape our lives. Understanding how they work is\nimportant for personal change.\n"
+                "text": "Change might not be fast and it is not always easy. But with time and effort,\nalmost any habit can be reshaped.\n"
             }
         ],
         "is_convergent": False,
         "should_extract": False,
         "expected_fb": {
             "is_summary": False,
-            "route": "FB",
+            "route": "NULL",
             "name": "Systems Beat Goals",
-            "definition": "Systems and habits are more effective than goal-setting for achieving results.",
-            "mechanism": "None — motivational claim without mechanism.",
-            "consequence": "Focus on systems rather than goals.",
-            "boundary": "Too vague to bound.",
-            "evidence_passages": [
-                "You do not rise to the level of your goals. You fall to the level of your systems",
-                "Habits are powerful forces that shape our lives"
-            ],
-            "depth": "",
-            "evidence": "",
-            "jargon": [],
-            "keywords": [],
-            "application": "",
-            "elaboration": "",
-            "prerequisite_fbs": [],
-            "contradicts_fbs": [],
-            "related_fbs": [],
-            "procedural_skill": "",
-            "failure_mode": ""
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
         },
-        "rationale": "PLATITUDE — the claim 'systems beat goals' is motivational rhetoric without a\nspecific mechanism, boundary, or falsifiable consequence. Second source (Duhigg) adds\nno specific convergent content. REJECT: platitude detection.\n"
+        "rationale": "PLATITUDE — the claim 'systems beat goals' is motivational rhetoric without a\nspecific mechanism, boundary, or falsifiable consequence. Second source (Duhigg) adds\nno specific convergent content. REJECT: platitude detection.\nSegment replaced with Duhigg's actual text (D2206: paraphrase removed).\n"
     },
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -497,27 +479,13 @@ NEW_EXAMPLES: list[dict] = [
         "should_extract": False,
         "expected_fb": {
             "is_summary": False,
-            "route": "FB",
+            "route": "NULL",
             "name": "Market Disruption Through Remarkability",
-            "definition": "Markets are won by being remarkable — creating a product so distinctive it\ndisrupts existing market dynamics.",
-            "mechanism": "None — the two sources discuss different phenomena (technology adoption curve\nvs. word-of-mouth marketing) using different terminology.",
-            "consequence": "Be remarkable to win markets.",
-            "boundary": "None provided.",
-            "evidence_passages": [
-                "Crossing the chasm requires focusing on a single beachhead segment",
-                "You need a product or service that is remarkable enough to be worth talking about"
-            ],
-            "depth": "",
-            "evidence": "",
-            "jargon": [],
-            "keywords": [],
-            "application": "",
-            "elaboration": "",
-            "prerequisite_fbs": [],
-            "contradicts_fbs": [],
-            "related_fbs": [],
-            "procedural_skill": "",
-            "failure_mode": ""
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
         },
         "rationale": "FALSE CONVERGENCE — Moore discusses the technology adoption lifecycle (a\nmarket-segmentation model); Godin discusses word-of-mouth virality (a\nremarkability model). They share the word 'market' but describe different\nphenomena. BORP would be falsely satisfied by surface-level keyword overlap.\nREJECT.\n"
     },
@@ -547,27 +515,13 @@ NEW_EXAMPLES: list[dict] = [
         "should_extract": False,
         "expected_fb": {
             "is_summary": False,
-            "route": "FB",
+            "route": "NULL",
             "name": "Build-Measure-Learn Loop",
-            "definition": "Rapid iteration through the Build-Measure-Learn loop maximizes startup learning\nand progress.",
-            "mechanism": "The loop converts assumptions into validated learning through minimum viable\nproducts and metric-driven pivots.",
-            "consequence": "Faster iteration leads to faster learning and better product-market fit.",
-            "boundary": "Requires the organization to tolerate ambiguity and act on metrics.",
-            "evidence_passages": [
-                "Build-Measure-Learn is the fundamental unit of startup progress",
-                "The Build-Measure-Learn feedback loop, introduced in The Lean Startup"
-            ],
-            "depth": "",
-            "evidence": "",
-            "jargon": ["Build-Measure-Learn", "MVP"],
-            "keywords": ["startup", "lean", "iteration"],
-            "application": "",
-            "elaboration": "",
-            "prerequisite_fbs": [],
-            "contradicts_fbs": [],
-            "related_fbs": [],
-            "procedural_skill": "",
-            "failure_mode": ""
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
         },
         "rationale": "CITATION ECHO — both books are by the same author (Eric Ries). The second book\ncites the first. These are NOT independent sources — BORP requires ≥2 independent\nsources, and this fails the independence test. REJECT: pseudo-independence.\n"
     },
@@ -612,7 +566,7 @@ NEW_EXAMPLES: list[dict] = [
             "evidence_passages": [
                 "Spaced practice is far more effective than massed practice",
                 "The spacing effect is the single most powerful memory technique",
-                "Sleep consolidates memory... each sleep period consolidates what was practiced"
+                "each sleep period consolidates what was practiced that day"
             ],
             "depth": "universal",
             "evidence": "cited",
@@ -856,6 +810,82 @@ NEW_EXAMPLES: list[dict] = [
         },
         "rationale": "Meadows, Levitt/Dubner, and Harford converge on incentive-driven unintended\nconsequences. Demonstrates contradiction, related_fbs, procedural_skill.\n"
     },
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # HARD NEGATIVE — NEG-005: Jargon echo (D2206)
+    # Two sources share the word "leverage" but mean different mechanisms:
+    # systems intervention points vs mechanical force amplification.
+    # ═══════════════════════════════════════════════════════════════════════
+    {
+        "id": "NEG-005",
+        "domain": "systems & frameworks",
+        "discipline": "systems thinking",
+        "source_books": [
+            "Thinking in Systems — Donella Meadows",
+            "The Feynman Lectures on Physics — Richard Feynman"
+        ],
+        "cluster_segments": [
+            {
+                "source_book": "Thinking in Systems — Donella Meadows",
+                "text": "Leverage points are places within a complex system where a small shift in one thing\ncan produce big changes in everything. Leverage is not about force or power; it is\nabout finding the right point of intervention. The same small change applied at a\nlow-leverage point does almost nothing, while applied at a high-leverage point it can\ntransform the whole system.\n"
+            },
+            {
+                "source_book": "The Feynman Lectures on Physics — Richard Feynman",
+                "text": "A lever gives mechanical advantage: a small force applied at a long distance from\nthe fulcrum can lift a heavy weight at a short distance. The ratio of the distances\ntrades distance for force. Archimedes understood leverage as pure geometry — the\nbalance point and the distances determine the outcome, nothing else.\n"
+            }
+        ],
+        "is_convergent": False,
+        "should_extract": False,
+        "expected_fb": {
+            "is_summary": False,
+            "route": "NULL",
+            "name": "Leverage (jargon echo)",
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
+        },
+        "rationale": "HARD NEGATIVE — JARGON ECHO. Both segments use the word 'leverage' but describe\nunrelated mechanisms: Meadows means system intervention points (feedback structure),\nFeynman means mechanical force amplification (physics). A naive matcher converges\non the shared term; the correct behavior is rejection because there is no shared\ncausal mechanism. Same vocabulary, disjoint claims.\n"
+    },
+
+    # ═══════════════════════════════════════════════════════════════════════
+    # HARD NEGATIVE — NEG-006: Boundary violation (D2206)
+    # Sources converge on a scoped claim (spaced retrieval improves DECLARATIVE
+    # memory); the candidate FB over-generalizes to "all learning".
+    # ═══════════════════════════════════════════════════════════════════════
+    {
+        "id": "NEG-006",
+        "domain": "education",
+        "discipline": "learning science",
+        "source_books": [
+            "Make It Stick — Brown, Roediger & McDaniel",
+            "Moonwalking with Einstein — Joshua Foer"
+        ],
+        "cluster_segments": [
+            {
+                "source_book": "Make It Stick — Brown, Roediger & McDaniel",
+                "text": "Repeated retrieval strengthens memory for facts and concepts. In experiments, students\nwho practiced retrieving studied material at spaced intervals remembered\nsubstantially more on delayed tests than students who re-read the material. Spacing\nand testing effects are among the most robust findings in cognitive psychology.\n"
+            },
+            {
+                "source_book": "Moonwalking with Einstein — Joshua Foer",
+                "text": "Memory athletes memorize decks of cards and long strings of digits using spaced\nretrieval: reviewing the material at expanding intervals commits it to long-term\nmemory. The technique works for facts, names, and lists — declarative knowledge\nthat can be rehearsed and retrieved.\n"
+            }
+        ],
+        "is_convergent": True,
+        "should_extract": False,
+        "expected_fb": {
+            "is_summary": False,
+            "route": "NULL",
+            "name": "Spaced Retrieval Universality (boundary violation)",
+            "definition": "",
+            "mechanism": "",
+            "consequence": "",
+            "boundary": "",
+            "evidence_passages": []
+        },
+        "rationale": "HARD NEGATIVE — BOUNDARY VIOLATION. The two sources genuinely converge on a\nscoped claim: spaced retrieval improves DECLARATIVE memory (facts, concepts,\nlists). A candidate FB claiming 'spaced repetition improves all learning' over-generalizes:\nneither source studies procedural/motor skills or emotional learning. The correct\nextraction keeps the boundary (declarative knowledge); the over-broad FB must be\nrejected. is_convergent: true but should_extract: false because the presented\nprinciple exceeds the evidence.\n"
+    },
 ]
 
 
@@ -865,14 +895,17 @@ def main() -> int:
     new_ids = {e.get("id") for e in NEW_EXAMPLES}
     overlap = existing_ids & new_ids
     if overlap:
-        print(f"❌ ID COLLISION: {overlap} — aborting to avoid overwrite")
-        return 1
+        # D2206: generator's NEW_EXAMPLES are authoritative for their own ids;
+        # replace stale embedded versions instead of aborting (was unrunnable
+        # once the ids were committed to the YAML).
+        print(f"⚠️ ID overlap: {sorted(overlap)} — generator versions will replace existing")
+        existing = [e for e in existing if e.get("id") not in new_ids]
 
     combined = existing + NEW_EXAMPLES
 
-    # ── Coverage statistics ──
-    convergent = sum(1 for e in combined if e.get("is_convergent"))
-    negatives = len(combined) - convergent
+    # ── Coverage statistics (D2206: count extraction decisions, not convergence) ──
+    pos = sum(1 for e in combined if e.get("should_extract"))
+    neg = len(combined) - pos
     domains = set()
     disciplines = set()
     props = {
@@ -897,7 +930,7 @@ def main() -> int:
             if has_prop:
                 props[p] += 1
 
-    print(f"Total examples: {len(combined)} ({convergent} convergent, {negatives} negatives)")
+    print(f"Total examples: {len(combined)} ({pos} positive, {neg} negative)")
     print(f"Domains covered: {len(domains)}")
     print(f"Disciplines covered: {len(disciplines)}")
     print("Property coverage:")
@@ -909,8 +942,8 @@ def main() -> int:
         "version": "3.0",
         "architecture": "cluster-before-extract",
         "total_examples": len(combined),
-        "convergent_positives": convergent,
-        "hard_negatives": negatives,
+        "convergent_positives": pos,
+        "hard_negatives": neg,
         "expected_coverage": [
             "convergent_multi_source_synthesis",
             "single_source_rejection",
@@ -923,13 +956,32 @@ def main() -> int:
         ],
         "calibration_status": "needs_review",  # expanded set needs re-eval
         "calibrated_date": None,
-        "notes": "D2204: Golden set expanded from 10 to %d examples. Full property\ncoverage added: prerequisite_fbs, contradicts_fbs, related_fbs, procedural_skill,\nfailure_mode, depth, evidence. All 7 domain groups covered. 6 hard negatives:\nsingle-source (NEG-001), platitude (NEG-002), false convergence (NEG-003),\ncitation echo (NEG-004). Run LLM eval prompt before calibration." % len(combined),
+        "notes": "D2206: P0 fix pass on D2204 set. NEG-001..004 restructured to route: NULL\n(NEG-CONV pattern). CONV-003 fabricated sources replaced (Forceville 1996 +\nMcQuarrie & Mick 1999). NEG-005 jargon echo + NEG-006 boundary violation added.\n9 hard negatives across 6 categories: single-source (NEG-CONV-001, NEG-001),\nplatitude (NEG-CONV-002, NEG-002), false convergence (NEG-CONV-003, NEG-003),\ncitation echo (NEG-004), jargon echo (NEG-005), boundary violation (NEG-006).\nRun LLM eval prompt before calibration.",
     }
 
     data = {
         "meta": meta,
         "examples": combined,
     }
+
+    # D2206: golden-set invariants are the executable spec — validate before write
+    try:
+        from pipeline.schemas import validate_golden_set
+
+        _GOLDEN_DIR = Path(__file__).resolve().parent
+        _staged = _GOLDEN_DIR / ".golden_staged.yaml"
+        with open(_staged, "w") as _f:
+            yaml.safe_dump(data, _f, default_flow_style=False, sort_keys=False, width=120)
+        violations = validate_golden_set(str(_staged))
+        _staged.unlink()
+        if violations:
+            for v in violations:
+                print(f"❌ {v}")
+            print("Aborting: golden set failed validation")
+            return 1
+        print("✅ Golden set validation passed (route/evidence/meta invariants)")
+    except ImportError:
+        print("⚠️ pipeline.schemas not importable — skipping validation")
 
     # Backup original
     backup = GOLDEN_PATH.with_suffix(".yaml.bak-v2")

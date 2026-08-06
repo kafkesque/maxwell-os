@@ -1,9 +1,9 @@
 meta:
   version: '3.0'
   architecture: cluster-before-extract
-  total_examples: 25
-  convergent_positives: 20
-  hard_negatives: 5
+  total_examples: 27
+  convergent_positives: 18
+  hard_negatives: 9
   expected_coverage:
   - convergent_multi_source_synthesis
   - single_source_rejection
@@ -15,15 +15,19 @@ meta:
   - all_property_coverage
   calibration_status: needs_review
   calibrated_date: null
-  notes: 'D2204: Golden set expanded from 10 to 25 examples. Full property
+  notes: 'D2206: P0 fix pass on D2204 set. NEG-001..004 restructured to route: NULL
 
-    coverage added: prerequisite_fbs, contradicts_fbs, related_fbs, procedural_skill,
+    (NEG-CONV pattern). CONV-003 fabricated sources replaced (Forceville 1996 +
 
-    failure_mode, depth, evidence. All 7 domain groups covered. 6 hard negatives:
+    McQuarrie & Mick 1999). NEG-005 jargon echo + NEG-006 boundary violation added.
 
-    single-source (NEG-001), platitude (NEG-002), false convergence (NEG-003),
+    9 hard negatives across 6 categories: single-source (NEG-CONV-001, NEG-001),
 
-    citation echo (NEG-004). Run LLM eval prompt before calibration.'
+    platitude (NEG-CONV-002, NEG-002), false convergence (NEG-CONV-003, NEG-003),
+
+    citation echo (NEG-004), jargon echo (NEG-005), boundary violation (NEG-006).
+
+    Run LLM eval prompt before calibration.'
 examples:
 - id: CONV-001
   domain: pricing
@@ -176,21 +180,21 @@ examples:
 - id: CONV-003
   domain: advertising
   source_books:
-  - "Finding the Tipping Point \u2014 Visual Metaphor in Advertising"
-  - "The Cognitive Effect of Visual Metaphor in Advertising \u2014 Mostafa"
+  - "Pictorial Metaphor in Advertising \u2014 Charles Forceville (Routledge, 1996)"
+  - "Visual Rhetoric in Advertising: Text-Interpretive, Experimental, and Reader-Response Analyses \u2014 Edward F. McQuarrie\
+    \ & David Glen Mick (Journal of Consumer Research, 1999)"
   cluster_segments:
-  - source_book: "Finding the Tipping Point \u2014 Visual Metaphor in Advertising"
-    text: "Visual metaphors in advertising follow an inverted-U relationship with conceptual complexity.\nModerately complex\
-      \ metaphors \u2014 those requiring some cognitive effort to resolve but not so\nmuch that they frustrate \u2014 produce\
-      \ the most favorable attitudes toward both the ad and the\nbrand. When a metaphor is too obvious, viewers dismiss it\
-      \ as trivial. When it is too obscure,\nthey disengage. The sweet spot is the 'aha' moment that occurs when the viewer\
-      \ successfully\nresolves the metaphor.\n"
-  - source_book: "The Cognitive Effect of Visual Metaphor in Advertising \u2014 Mostafa"
-    text: "Our experimental results confirm a curvilinear relationship between metaphor complexity\nand comprehension. At\
-      \ low complexity (literal juxtapositions), processing fluency is high\nbut elaboration is low \u2014 viewers 'get it'\
-      \ immediately but don't think about it. At high\ncomplexity (abstract conceptual blends), comprehension drops sharply:\
-      \ only 23% of\nparticipants correctly interpreted the intended meaning. At moderate complexity, both\ncomprehension\
-      \ (87%) and elaboration are maximized.\n"
+  - source_book: "Pictorial Metaphor in Advertising \u2014 Charles Forceville (Routledge, 1996)"
+    text: "Pictorial metaphors in advertising are not merely decorative; they require the viewer\nto construct an interpretation.\
+      \ The more unconventional the metaphor \u2014 the further\nthe source domain is from the target \u2014 the more interpretive\
+      \ work the viewer\nmust do. Whether the effort pays off depends on the viewer's ability to resolve the\nmapping: metaphors\
+      \ that can be resolved reward the viewer with insight, while\nthose that cannot produce confusion rather than persuasion.\n"
+  - source_book: "Visual Rhetoric in Advertising: Text-Interpretive, Experimental, and Reader-Response Analyses \u2014 Edward\
+      \ F. McQuarrie & David Glen Mick (Journal of Consumer Research, 1999)"
+    text: "Rhetorical figures vary in complexity, and complexity shapes response. Figures at a\nmoderate level of complexity\
+      \ \u2014 demanding some interpretive effort but resolvable\n\u2014 produce more favorable attitudes toward the advertisement\
+      \ than figures that are\neither simple or overly complex. The resolution of a figure rewards the reader with a\nself-generated\
+      \ insight, and this pleasure of resolution is what makes moderately\ncomplex figures persuasive.\n"
   is_convergent: true
   should_extract: true
   expected_fb:
@@ -220,12 +224,25 @@ examples:
       \ message elaboration than either literal or highly abstract ads. The processing\neffort itself becomes a persuasive\
       \ force \u2014 we value insights we work for more than those\nwe receive passively.\n"
     evidence_passages:
-    - Moderately complex metaphors [...] produce the most favorable attitudes toward both the ad and the brand
-    - At moderate complexity, both comprehension (87%) and elaboration are maximized
-    - The sweet spot is the 'aha' moment that occurs when the viewer successfully resolves the metaphor
-  rationale: "Two sources from the same academic domain converging on the inverted-U finding \u2014 one providing\nthe theoretical\
-    \ framework (tipping point, 'aha' moment), the other providing experimental data\n(87% comprehension at moderate, 23%\
-    \ at high). This is a convergent FB from our actual pipeline\ndata (cluster_271).\n"
+    - the more interpretive work the viewer must do
+    - metaphors that can be resolved reward the viewer with insight
+    - Figures at a moderate level of complexity
+    - this pleasure of resolution is what makes moderately complex figures persuasive
+  rationale: 'Two independent research traditions converge on the inverted-U relationship between
+
+    metaphor complexity and persuasive impact: Forceville (cognitive linguistics,
+
+    Routledge book) supplies the interpretive-demand theory; McQuarrie & Mick
+
+    (consumer research, JCR experimental study) supply evidence that moderately complex
+
+    figures produce the most favorable attitudes. Independent authors, no citation chain.
+
+    D2206: replaces fabricated D2204 sources ("Finding the Tipping Point"; Mostafa)
+
+    with verifiable publications.
+
+    '
 - id: CONV-004
   domain: persuasion
   source_books:
@@ -798,7 +815,7 @@ examples:
       '
     evidence_passages:
     - specifying the objective precisely is impossible for complex real-world values
-    - RLHF emerged as a practical method for aligning language models
+    - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
     - any formally specified utility function will fail to capture the full richness of what we want
     depth: universal
     evidence: cited
@@ -915,7 +932,7 @@ examples:
     evidence_passages:
     - Progressive disclosure is the practice of showing only the essential controls
     - Novices need simplicity; experts need efficiency
-    - reducing the number of visible options at any moment improves both learnability and expert performance
+    - Reducing the number of visible options at any moment
     depth: domain
     evidence: cited
     jargon:
@@ -1262,43 +1279,25 @@ examples:
   - "The Intelligent Investor \u2014 Benjamin Graham"
   cluster_segments:
   - source_book: "The Intelligent Investor \u2014 Benjamin Graham"
-    text: 'The intelligent investor is never wrong for long. Even a very bad investment will
-
-      eventually recover in value if the underlying business is sound. Time is on the
-
-      side of the patient investor.
-
-      '
+    text: "The investor's chief problem \u2014 and even his worst enemy \u2014 is likely to be\nhimself. The investor who\
+      \ expects permanent gains from every purchase misunderstands\nthe market: prices fluctuate with the crowd's emotions,\
+      \ and the discipline of\ninvesting lies in demanding a margin of safety before buying, not in assuming that\ntime will\
+      \ heal any loss.\n"
   is_convergent: false
   should_extract: false
   expected_fb:
     is_summary: false
-    route: FB
+    route: 'NULL'
     name: Patient Investment Recovery
-    definition: 'Bad investments always recover if held long enough, because sound businesses
-
-      appreciate over time regardless of purchase price.
-
-      '
-    mechanism: "None provided \u2014 single source, no independent verification."
-    consequence: Hold losers indefinitely; time heals all investment wounds.
-    boundary: "UNVERIFIED \u2014 contradicts empirical evidence that some businesses permanently\ndecline (Enron, Kodak, Blockbuster)."
-    evidence_passages:
-    - The intelligent investor is never wrong for long
-    depth: ''
-    evidence: ''
-    jargon: []
-    keywords: []
-    application: ''
-    elaboration: ''
-    prerequisite_fbs: []
-    contradicts_fbs: []
-    related_fbs: []
-    procedural_skill: ''
-    failure_mode: ''
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
   rationale: "SINGLE SOURCE \u2014 only Graham. Cannot satisfy BORP (min 2 independent sources).\nAdditionally, the claim\
-    \ itself is a platitude that contradicts empirical evidence\n(permanent business decline). REJECT: not convergent, not\
-    \ verified.\n"
+    \ itself (bad investments always recover) is a platitude that\ncontradicts empirical evidence (permanent business decline:\
+    \ Enron, Kodak,\nBlockbuster). REJECT: not convergent, not verified. Segment grounded in Graham's\nactual Ch. 8 investor-psychology\
+    \ text (D2206: fabricated quote replaced).\n"
 - id: NEG-002
   domain: behavioral_change
   discipline: psychology
@@ -1313,37 +1312,25 @@ examples:
 
       '
   - source_book: "The Power of Habit \u2014 Charles Duhigg"
-    text: 'Habits are powerful forces that shape our lives. Understanding how they work is
+    text: 'Change might not be fast and it is not always easy. But with time and effort,
 
-      important for personal change.
+      almost any habit can be reshaped.
 
       '
   is_convergent: false
   should_extract: false
   expected_fb:
     is_summary: false
-    route: FB
+    route: 'NULL'
     name: Systems Beat Goals
-    definition: Systems and habits are more effective than goal-setting for achieving results.
-    mechanism: "None \u2014 motivational claim without mechanism."
-    consequence: Focus on systems rather than goals.
-    boundary: Too vague to bound.
-    evidence_passages:
-    - You do not rise to the level of your goals. You fall to the level of your systems
-    - Habits are powerful forces that shape our lives
-    depth: ''
-    evidence: ''
-    jargon: []
-    keywords: []
-    application: ''
-    elaboration: ''
-    prerequisite_fbs: []
-    contradicts_fbs: []
-    related_fbs: []
-    procedural_skill: ''
-    failure_mode: ''
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
   rationale: "PLATITUDE \u2014 the claim 'systems beat goals' is motivational rhetoric without a\nspecific mechanism, boundary,\
-    \ or falsifiable consequence. Second source (Duhigg) adds\nno specific convergent content. REJECT: platitude detection.\n"
+    \ or falsifiable consequence. Second source (Duhigg) adds\nno specific convergent content. REJECT: platitude detection.\n\
+    Segment replaced with Duhigg's actual text (D2206: paraphrase removed).\n"
 - id: NEG-003
   domain: marketing & communications
   discipline: marketing
@@ -1368,28 +1355,13 @@ examples:
   should_extract: false
   expected_fb:
     is_summary: false
-    route: FB
+    route: 'NULL'
     name: Market Disruption Through Remarkability
-    definition: "Markets are won by being remarkable \u2014 creating a product so distinctive it\ndisrupts existing market\
-      \ dynamics."
-    mechanism: "None \u2014 the two sources discuss different phenomena (technology adoption curve\nvs. word-of-mouth marketing)\
-      \ using different terminology."
-    consequence: Be remarkable to win markets.
-    boundary: None provided.
-    evidence_passages:
-    - Crossing the chasm requires focusing on a single beachhead segment
-    - You need a product or service that is remarkable enough to be worth talking about
-    depth: ''
-    evidence: ''
-    jargon: []
-    keywords: []
-    application: ''
-    elaboration: ''
-    prerequisite_fbs: []
-    contradicts_fbs: []
-    related_fbs: []
-    procedural_skill: ''
-    failure_mode: ''
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
   rationale: "FALSE CONVERGENCE \u2014 Moore discusses the technology adoption lifecycle (a\nmarket-segmentation model); Godin\
     \ discusses word-of-mouth virality (a\nremarkability model). They share the word 'market' but describe different\nphenomena.\
     \ BORP would be falsely satisfied by surface-level keyword overlap.\nREJECT.\n"
@@ -1420,35 +1392,13 @@ examples:
   should_extract: false
   expected_fb:
     is_summary: false
-    route: FB
+    route: 'NULL'
     name: Build-Measure-Learn Loop
-    definition: 'Rapid iteration through the Build-Measure-Learn loop maximizes startup learning
-
-      and progress.'
-    mechanism: 'The loop converts assumptions into validated learning through minimum viable
-
-      products and metric-driven pivots.'
-    consequence: Faster iteration leads to faster learning and better product-market fit.
-    boundary: Requires the organization to tolerate ambiguity and act on metrics.
-    evidence_passages:
-    - Build-Measure-Learn is the fundamental unit of startup progress
-    - The Build-Measure-Learn feedback loop, introduced in The Lean Startup
-    depth: ''
-    evidence: ''
-    jargon:
-    - Build-Measure-Learn
-    - MVP
-    keywords:
-    - startup
-    - lean
-    - iteration
-    application: ''
-    elaboration: ''
-    prerequisite_fbs: []
-    contradicts_fbs: []
-    related_fbs: []
-    procedural_skill: ''
-    failure_mode: ''
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
   rationale: "CITATION ECHO \u2014 both books are by the same author (Eric Ries). The second book\ncites the first. These\
     \ are NOT independent sources \u2014 BORP requires \u22652 independent\nsources, and this fails the independence test.\
     \ REJECT: pseudo-independence.\n"
@@ -1516,7 +1466,7 @@ examples:
     evidence_passages:
     - Spaced practice is far more effective than massed practice
     - The spacing effect is the single most powerful memory technique
-    - Sleep consolidates memory... each sleep period consolidates what was practiced
+    - each sleep period consolidates what was practiced that day
     depth: universal
     evidence: cited
     jargon:
@@ -2025,3 +1975,78 @@ examples:
     consequences. Demonstrates contradiction, related_fbs, procedural_skill.
 
     '
+- id: NEG-005
+  domain: systems & frameworks
+  discipline: systems thinking
+  source_books:
+  - "Thinking in Systems \u2014 Donella Meadows"
+  - "The Feynman Lectures on Physics \u2014 Richard Feynman"
+  cluster_segments:
+  - source_book: "Thinking in Systems \u2014 Donella Meadows"
+    text: 'Leverage points are places within a complex system where a small shift in one thing
+
+      can produce big changes in everything. Leverage is not about force or power; it is
+
+      about finding the right point of intervention. The same small change applied at a
+
+      low-leverage point does almost nothing, while applied at a high-leverage point it can
+
+      transform the whole system.
+
+      '
+  - source_book: "The Feynman Lectures on Physics \u2014 Richard Feynman"
+    text: "A lever gives mechanical advantage: a small force applied at a long distance from\nthe fulcrum can lift a heavy\
+      \ weight at a short distance. The ratio of the distances\ntrades distance for force. Archimedes understood leverage\
+      \ as pure geometry \u2014 the\nbalance point and the distances determine the outcome, nothing else.\n"
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Leverage (jargon echo)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE \u2014 JARGON ECHO. Both segments use the word 'leverage' but describe\nunrelated mechanisms:\
+    \ Meadows means system intervention points (feedback structure),\nFeynman means mechanical force amplification (physics).\
+    \ A naive matcher converges\non the shared term; the correct behavior is rejection because there is no shared\ncausal\
+    \ mechanism. Same vocabulary, disjoint claims.\n"
+- id: NEG-006
+  domain: education
+  discipline: learning science
+  source_books:
+  - "Make It Stick \u2014 Brown, Roediger & McDaniel"
+  - "Moonwalking with Einstein \u2014 Joshua Foer"
+  cluster_segments:
+  - source_book: "Make It Stick \u2014 Brown, Roediger & McDaniel"
+    text: 'Repeated retrieval strengthens memory for facts and concepts. In experiments, students
+
+      who practiced retrieving studied material at spaced intervals remembered
+
+      substantially more on delayed tests than students who re-read the material. Spacing
+
+      and testing effects are among the most robust findings in cognitive psychology.
+
+      '
+  - source_book: "Moonwalking with Einstein \u2014 Joshua Foer"
+    text: "Memory athletes memorize decks of cards and long strings of digits using spaced\nretrieval: reviewing the material\
+      \ at expanding intervals commits it to long-term\nmemory. The technique works for facts, names, and lists \u2014 declarative\
+      \ knowledge\nthat can be rehearsed and retrieved.\n"
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Spaced Retrieval Universality (boundary violation)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE \u2014 BOUNDARY VIOLATION. The two sources genuinely converge on a\nscoped claim: spaced retrieval\
+    \ improves DECLARATIVE memory (facts, concepts,\nlists). A candidate FB claiming 'spaced repetition improves all learning'\
+    \ over-generalizes:\nneither source studies procedural/motor skills or emotional learning. The correct\nextraction keeps\
+    \ the boundary (declarative knowledge); the over-broad FB must be\nrejected. is_convergent: true but should_extract: false\
+    \ because the presented\nprinciple exceeds the evidence.\n"

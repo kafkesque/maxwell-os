@@ -149,3 +149,65 @@ Verdict on golden set v3.0: **NEEDS-FIXES** (positive corpus S-tier; negative bl
 **Remaining golden-set work (P1, not in this pass):** G-07 (CONV-006/020 dedupe — replace CONV-020 with framing-effects), G-08 (CONV-012 Russell source), G-09 (property backfill into CONV-001..007), G-10 (domain rebalance), G-11 (typos/stray fields — partially done in D2204 era; re-verify), G-13 (eval prompt v2.1: programmatic verbatim + source-existence checks), G-14 (author-overlap detector), G-15 (integrity check #18: route-vs-should_extract — partially covered by validate_golden_set, wire into integrity_check.py).
 
 **Next gate:** re-run GOLDEN-EVALUATION-PROMPT.md with 3 LLMs on the fixed set → then calibrate (`calibration_status: calibrated`).
+---
+
+# 🎯 MASTER PRIORITY QUEUE (2026-08-06, post-D2206) — AUTHORITATIVE VIEW
+> Consolidated from: D2195-D2204 critical path + P1/P2/P3 backlog + D2205/2206 golden fix pass + D2206 bonus findings.
+> Legend: 🔴 existential · 🟠 sprint · 🟡 next sprint · ⚪ backlog · ✅ done this round
+
+## 🔴 TIER 0 — EXISTENTIAL (this week, parallelizable)
+| # | Task | Why | Blocked By |
+|---|------|-----|-----------|
+| T0-1 | **Yield crisis diagnostic**: manually extract 10 principles from 1 book, diff vs pipeline output (14 FBs / 852 books = 1.6% yield) | Pipeline's core promise is broken at 1.6% yield; must know WHERE the loss happens (S1 chunking? S1.5 clustering? S2 extraction? S5 verification fail-closed?) before anything else | NOT blocked — manual diagnostic runs on current data; no calibration needed |
+| T0-2 | **Execute ONE business PI with existing 14 FBs** (e.g., a pricing decision using CONV-001 decoy) | Existential product test: can FBs produce a useful action today? Validates Layer 2 thesis | Needs only existing FBs |
+| T0-3 | **Re-run GOLDEN-EVALUATION-PROMPT.md with 3 LLMs on FIXED 27-example set** | Previous 3-LLM eval (Kimi/Qwen/DeepSeek) ran on the BROKEN set; the D2206 P0 fix pass addressed all 17 verified findings — must re-verify before calibration | ✅ golden set fixed (validate_golden_set: 0 violations) |
+| T0-4 | **Calibrate golden set** (NLI entailment threshold, BORP min-sources, platitude rejection heuristics) → `calibration_status: calibrated` | Gates S2 quality at scale | T0-3 |
+
+## 🟠 TIER 1 — HIGH (this sprint)
+| # | Task | Source |
+|---|------|--------|
+| T1-1 | G-07: Replace CONV-020 (dup of CONV-006 FB1) with framing-effects principle, independent sources | D2205 (Kimi/Qwen) |
+| T1-2 | G-08: CONV-012 — replace one Russell source with independent AI-safety text (Bostrom / Gabriel et al.) | D2205 (Qwen) |
+| T1-3 | G-09: backfill depth/evidence/jargon/keywords into CONV-001..007 (kill bimodal property distribution) | D2205 (Qwen/DeepSeek) |
+| T1-4 | G-10: convert 2 business examples → AI/Visual/Interactive (fixes 52% domain skew + ratio 18:9→20:9) | D2205 (Kimi/Qwen) |
+| T1-5 | G-13: GOLDEN-EVALUATION-PROMPT.md v2.1 — mandate programmatic verbatim check + external source-existence check in Dimension 9 | D2205 (this audit: all 3 evals missed ≥1 violation) |
+| T1-6 | G-15: integrity_check.py check #18 — route-vs-should_extract (reuse validate_golden_set) | D2205 |
+| T1-7 | Ruff: auto-fix 322 lint errors in pipeline/ (154 manual after) — lint-exposed since D2201, 476 total | D2201 |
+| T1-8 | Atomic evidence schema — per-passage NLI scores, not majority vote | ChatGPT C9 |
+| T1-9 | Monotonic trust state machine — DB-level transition constraints | ChatGPT C7 |
+| T1-10 | bge-m3 → MLX-native (investigate D2190 MPS deadlock root cause first) | Kimi K12 |
+| T1-11 | Surface reliability scores in Zone 3 | Kimi K3 |
+| T1-12 | G-14: author-overlap + secondary-source detector in golden validation (would've caught CONV-012/020 automatically) | D2205 (Qwen/DeepSeek) |
+
+## 🟡 TIER 2 — MEDIUM (next sprint)
+| # | Task | Source |
+|---|------|--------|
+| T2-1 | MCP server exposing FBs (Layer 2 product start) | Kimi K14 |
+| T2-2 | Graph-aware retrieval (contradictions + prerequisites traversal) | ChatGPT C10 |
+| T2-3 | Context-conditioned reliability (domain-scoped scores) | ChatGPT C11 |
+| T2-4 | Pydantic AI harness for agent orchestration | Kimi K14 |
+| T2-5 | Agent execution safety boundary (Plan→Policy→Auth→Execute→Rollback) | ChatGPT C14 |
+| T2-6 | Modularize stage2_extract (1,480) + stage4_merge (1,260) | Kimi K5 |
+| T2-7 | Split config into active/archived/experiments | ChatGPT C13 |
+| T2-8 | Prompt lineage stamping (prompt_id, prompt_hash) | ChatGPT C16 |
+| T2-9 | Taxonomy from hardcoded Literal → YAML-driven | DeepSeek D5 |
+| T2-10 | `just integrity` in CI (when CI exists) | ChatGPT C12 |
+
+## ⚪ TIER 3 — BACKLOG
+| # | Task | Source |
+|---|------|--------|
+| T3-1 | vLLM-mlx for concurrent multi-agent execution | Kimi |
+| T3-2 | LanceDB as unified vector+metadata store | Kimi |
+| T3-3 | Collapse config authority to one canonical YAML per domain | ChatGPT C15 |
+| T3-4 | Leiden via python-igraph (defer — Louvain adequate) | Qwen Q5 |
+| T3-5 | ONNX runtime for NLI (only if ModernBERT too heavy) | DeepSeek D4 |
+
+## 🔭 WATCHLIST (deferred/risk)
+- Anytype cloud-sync sovereignty leak (stage6b_anytype_push.py)
+- BORP ≠ Truth (two books can agree on a myth) — epistemological
+- G-11: re-verify stray fields/typos in generator + YAML (partially addressed D2204/D2206)
+- G-02b: confirm stage2 golden injection honors `golden_max_examples: 8` with the 1:N list
+- Governance lesson (D2206): check DECISION-LOG.md tail BEFORE issuing D-numbers (D2205 collision)
+- decisions.yaml: now valid (198 decisions) — re-sync via `tools/sync_decisions.py` after every DECISION-LOG append
+
+---

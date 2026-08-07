@@ -13,7 +13,21 @@ import sys
 
 
 def _free_memory_gb() -> float:
-    """Get free memory in GB from vm_stat."""
+    """Get available memory in GB (reclaimable, not just 'free' pages).
+
+    D2208: Use psutil.virtual_memory().available instead of vm_stat Pages free.
+    macOS keeps substantial memory in 'inactive' and 'purgeable' states that
+    are instantly reclaimable. vm_stat Pages free alone (often <1 GB) causes
+    false alarms when 15-20 GB is actually available. psutil.available includes
+    inactive + purgeable — the correct measure for 'can OMLX allocate more?'.
+    """
+    try:
+        import psutil
+        mem = psutil.virtual_memory()
+        return mem.available / (1024 ** 3)
+    except ImportError:
+        pass
+    # Fallback: vm_stat (sum free + inactive + purgeable for macOS)
     try:
         import subprocess
         result = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=5)
@@ -29,7 +43,10 @@ def _free_memory_gb() -> float:
                     pass
         page_size = stats.get("page size of", 16384)
         free_pages = stats.get("Pages free", 0)
-        return (free_pages * page_size) / (1024 ** 3)
+        inactive_pages = stats.get("Pages inactive", 0)
+        purgeable_pages = stats.get("Pages purgeable", 0)
+        total_reclaimable = free_pages + inactive_pages + purgeable_pages
+        return (total_reclaimable * page_size) / (1024 ** 3)
     except Exception:
         return -1.0
 

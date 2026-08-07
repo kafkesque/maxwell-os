@@ -546,6 +546,10 @@ def is_near_duplicate(text: str, lsh, minhash_cache: dict) -> tuple[bool, str | 
         return True, None
     sig: str = f"mh_{len(minhash_cache)}"
     lsh.insert(sig, mh)
+    # D2208: LRU eviction — prevent unbounded cache growth
+    if len(minhash_cache) >= 10000:
+        oldest_key = next(iter(minhash_cache))
+        del minhash_cache[oldest_key]
     minhash_cache[sig] = (text, mh)  # D2152: store MinHash object for jaccard comparison
     return False, sig
 
@@ -754,14 +758,14 @@ def discover_principles(
     )
 
     # Phi-4-mini probe (fast, ~1.5s) — use VERIFY_MODEL for speed
+    # D2209: Route through call_llm to respect --provider flag (was hardcoded OMLX).
     try:
-        from pipeline.omlx_call import call_omlx_json
         from pipeline.pipeline_paths import VERIFY_MODEL
-        result: dict = call_omlx_json(
+        result: dict = call_llm(
             prompt=prompt,
             model=VERIFY_MODEL,
             system=PRINCIPLE_DISCOVERY_SYSTEM,
-            max_tokens=128,
+            provider=provider,
         )
         if isinstance(result, dict):
             count: int = result.get("principle_count", 1)
@@ -1159,8 +1163,8 @@ def run_stage2(
 
         return fb
 
-    # ── Parallel extraction (D2148: ThreadPool, 3 workers) ────────────────
-    max_workers: int = 3
+    # ── Parallel extraction (D2148: ThreadPool, config-driven) ────────────────
+    max_workers: int = S2_MAX_WORKERS
     print(f"⚡ Processing {len(target_clusters)} clusters with {max_workers} parallel workers...")
 
     import concurrent.futures
@@ -1240,6 +1244,7 @@ def run_stage2(
                 safe_write(
                     STAGE2_CHECKPOINT,
                     "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
+                    force_shrink=True,
                 )
                 # Atomic segids
                 import tempfile
@@ -1359,7 +1364,7 @@ def process_singletons(
 
     # Process with ThreadPoolExecutor
     import concurrent.futures
-    max_workers: int = 3
+    max_workers: int = S2_MAX_WORKERS
 
     def _process_one(item: dict) -> dict | None:
         prompt = f"Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}"

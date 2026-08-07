@@ -128,6 +128,7 @@ S2_OMLX_RETRY=int(_CFG["stage2"]["omlx_retry_attempts"])
 S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
 S2_MAX_CLUSTER_SAMPLES=int(_CFG.get("stage2", {}).get("max_cluster_samples", 15))       # T0.1
 S2_MAX_PROBE_SAMPLES=int(_CFG.get("stage2", {}).get("max_probe_samples", 15))           # T0.1
+S2_MAX_WORKERS=int(_CFG.get("stage2", {}).get("max_workers", 3))                     # T0.2 (C12)
 S2_SPLIT_KMEANS_RANDOM_STATE=int(_CFG.get("stage2", {}).get("split_probe_kmeans_random_state", 42))  # T0.1
 S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", True))     # D2163: gate master switch
 S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate

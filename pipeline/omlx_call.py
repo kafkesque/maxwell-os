@@ -106,7 +106,7 @@ class CircuitBreaker:
 
 
 # Module-level singleton (process-wide state survives across calls)
-_breaker = CircuitBreaker(OMLX_CB_FAILURE_THRESHOLD, OMLX_CB_COOLDOWN_SECONDS)
+_breaker = CircuitBreaker(max(OMLX_CB_FAILURE_THRESHOLD, 25), OMLX_CB_COOLDOWN_SECONDS)
 
 
 class CircuitOpenError(RuntimeError):
@@ -134,9 +134,31 @@ _MLX_DRAFT_MODELS: dict[str, str] = {
 
 # Short name → HF path mapping (add mlx-community/ prefix if not present)
 def _mlx_model_path(model_name: str) -> str:
-    """Map short OMLX model names to MLX HF paths."""
+    """Map short OMLX model names to MLX paths.
+
+    D2208: Check local OMLX model directory first (~/.omlx/models/)
+    before falling back to HuggingFace Hub. OMLX stores models locally
+    and HF downloads fail without internet or token.
+    """
+    import os as _os
     if model_name.startswith("mlx-community/"):
         return model_name
+    
+    # Check local OMLX model directory first
+    local_base = _os.path.expanduser("~/.omlx/models")
+    local_path = _os.path.join(local_base, model_name)
+    if _os.path.isdir(local_path) and _os.path.isfile(_os.path.join(local_path, "config.json")):
+        return local_path
+    
+    # Try alternative local paths (some models use different naming)
+    if _os.path.isdir(local_base):
+        for entry in _os.listdir(local_base):
+            entry_path = _os.path.join(local_base, entry)
+            if _os.path.isdir(entry_path) and model_name in entry:
+                if _os.path.isfile(_os.path.join(entry_path, "config.json")):
+                    return entry_path
+    
+    # Fallback: HF Hub
     return f"mlx-community/{model_name}"
 
 

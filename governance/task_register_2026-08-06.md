@@ -248,3 +248,30 @@ Anytype sync leak | BORP != Truth | G-11 stray fields | D-number governance
 - S2 extraction: 0 -> 2/2 FBs (100% pilot yield, Regression to the Mean confirmed)
 - Golden eval: 3 LLM cross-examination (D2206) -> calibrated without re-eval
 - Integrity: 17/17, Tests: 12/12
+
+## Session 2026-08-07 — N0/P1/P2 Fix Pass + N1 Complete
+
+### Completed
+- [x] **N1 Yield Diagnostic** — 55 FBs from 58 TFS clusters, 7/10 Kahneman principles confirmed
+- [x] **OMLX plist fix** — removed invalid `--max-process-memory`, added `--memory-guard-gb 55`
+- [x] **Circuit breaker fix** — threshold 5→25, prevents death spiral with concurrent workers
+- [x] **Memory guard fix** — `vm_stat`→`psutil.available`, now reports 32 GB instead of 0.1 GB
+- [x] **Discovery probe routing** — now uses `call_llm()`, respects `--provider` flag
+- [x] **max_workers to config** — C12 compliance, `S2_MAX_WORKERS` in pipeline_paths.py
+- [x] **MLX local model path** — checks `~/.omlx/models/` before HF download
+- [x] **minhash_cache LRU** — FIFO eviction at 10K entries
+- [x] **source_diversity verified** — matches source_ids, no anomaly
+- [x] **OMLX stress test** — ALL_PASS up to 5000 chars
+
+### Deferred
+- [ ] Batch mode (port BATCH_SIZE=8 from old S3A) — significant feature, post-N2
+- [ ] 119 Ruff lint errors — non-blocking style issues
+- [ ] Embedding dimension warning (1024→512 Matryoshka) — stress test artifact, not a bug
+
+### Ready for N2
+- ✅ 12,964 clusters at S1.5
+- ✅ OMLX stable, ceiling 48 GB, memory 31 GB available
+- ✅ Config: max_cluster_samples=8, golden_inject=true, split_probe=true
+- ✅ Circuit breaker lenient (threshold=25)
+- ✅ All integrity checks pass (10/10)
+- ✅ Estimated N2 duration: 3-5 hours

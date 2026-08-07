@@ -3251,3 +3251,34 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 - Evidence passages verbatim. Routes: FB(2), NULL(0).
 
 **Golden set: CALIBRATED.** Evidence: 3-LLM eval x 17 defects → D2206 fix pass → working S2 pilot.
+
+## D2208 — N1 Yield Diagnostic Pass + P0/P1/P2 Fix Pass (2026-08-07)
+**Category:** INF / QLT
+**Decision:** N1 yield diagnostic completed successfully: 55 FBs extracted from 58 TFS clusters (95% yield), ~7/10 Kahneman manual principles confirmed. Six bugs fixed:
+
+1. **OMLX memory guard ceiling (48 GB hard cap):** OMLX 0.5.1 has a hard ceiling derived from system RAM minus reserve. `--memory-guard-gb` cannot increase it beyond 48 GB. Both Phi-4-mini + Qwen3.6 loaded simultaneously consumed 45.57 GB, leaving only 0.03 GB for prompt KV cache — any extraction call was rejected. Mitigation: reduced `max_cluster_samples` 15→8, disabled golden injection during N1, set `max-concurrent-requests` to 2 to minimize concurrent KV allocation.
+
+2. **Circuit breaker death spiral (A1):** Module-level singleton with threshold=5. When 3 concurrent workers hit OMLX rejections simultaneously, breaker tripped permanently. Fix: increased threshold to `max(config_value, 25)` in source. Also added `force_shrink=True` to checkpoint writes for TFS-only runs.
+
+3. **Memory guard false alarm (A2, D2208):** `memory_guard.py` used `vm_stat Pages free` (0.1-0.2 GB) which ignores macOS inactive/purgeable pages (15-20 GB reclaimable). Fix: switched to `psutil.virtual_memory().available` with vm_stat fallback (sum free+inactive+purgeable). Now correctly reports ~32 GB available.
+
+4. **Discovery probe hardcoded to OMLX (A3, D2209):** `discover_principles()` called `call_omlx_json` directly, bypassing `--provider` flag. Fix: routed through `call_llm()` which respects provider routing.
+
+5. **Hardcoded `max_workers=3` (A4, C12):** Two occurrences in stage2_extract.py. Moved to `config/pipeline_config.yaml` as `stage2.max_workers` and imported via `S2_MAX_WORKERS` in pipeline_paths.py.
+
+6. **MLX provider local model path (A6, D2208):** `_mlx_model_path()` forced `mlx-community/` prefix → HF download → 404. Fix: checks `~/.omlx/models/{name}/config.json` first, falls back to HF.
+
+**Additionally:**
+- `minhash_cache` LRU eviction at 10K entries (prevents unbounded growth in multi-day runs)
+- OMLX plist fixed: removed invalid `--max-process-memory 70`, replaced with `--memory-guard-gb 55 --max-concurrent-requests 3`
+- `source_diversity` verified correct (matches `len(source_ids)`, values of 40-140 legitimate for mega-clusters)
+- N1 yield confirmed: Regression to Mean, Anchoring, Loss Aversion, Outside View, Remembering Self, Hot Hand, Present Bias all matched
+
+**Status:** ✅ DECISION RECORDED. N1 passed. Pipeline ready for full S2 corpus run (N2).
+
+## D2209 — Discovery Probe Provider Routing (2026-08-07)
+**Category:** INF
+**Decision:** `discover_principles()` now routes through `call_llm()` instead of calling `call_omlx_json()` directly. This ensures the `--provider` CLI flag is respected for discovery probes. Previously, even with `--provider mlx`, discovery probes would unconditionally use OMLX.
+
+**Files:** `pipeline/stage2_extract.py` (discover_principles function)
+**Status:** ✅ IMPLEMENTED and compile-verified.

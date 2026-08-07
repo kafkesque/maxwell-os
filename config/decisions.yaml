@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-06T16:01:40Z'
-total_decisions: 198
+last_sync: '2026-08-06T21:27:09Z'
+total_decisions: 199
 decisions:
 - id: D2092
   category: INF
@@ -1422,30 +1422,43 @@ decisions:
 - id: D2205
   category: ARCH
   state: ACTIVE
-  description: "RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d), integration (1d). Full specs in governance/D2205-rag-architecture-roadmap-2026-08-06.md (1,091 lines). 13 proposals rejected with constraint-violation reasons."
-  champion: goose
+  description: 'RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day implementation plan: P0 agentic retrieval
+    loop (1.5d), P1 graph traversal layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d), integration
+    (1d). Full specs in governance/D2205-rag-architecture-roadmap-2026-08-06.md (1,091 lines). 13 proposals rejected with
+    constraint-violation reasons.'
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2206
   category: QLT
   state: ACTIVE
-  description: "Golden-Eval Cross-Examination (D2206): three LLM evals of the D2204 golden set verified claim-by-claim against ground truth (17 TRUE / 3 FALSE / 2 re-graded). Verdict NEEDS-FIXES. P0 fix pass: NEG-001..004 route NULL, CONV-003 fabricated sources replaced (Forceville 1996 + McQuarrie & Mick 1999), NEG-005 jargon echo + NEG-006 boundary violation added, meta corrected to 18/9, verbatim evidence repaired (4), 1:N schema formalized (GoldenFB/GoldenExample + validate_golden_set), generator made rerunnable. Calibration still gated on LLM re-eval."
+  description: 'Golden-Eval Cross-Examination (D2206): three LLM evals of the D2204 golden set verified claim-by-claim against
+    ground truth (17 TRUE / 3 FALSE / 2 re-graded). Verdict NEEDS-FIXES. P0 fix pass: NEG-001..004 route NULL, CONV-003 fabricated
+    sources replaced (Forceville 1996 + McQuarrie & Mick 1999), NEG-005 jargon echo + NEG-006 boundary violation added, meta
+    corrected to 18/9, verbatim evidence repaired (4), 1:N schema formalized (GoldenFB/GoldenExample + validate_golden_set),
+    generator made rerunnable. Calibration still gated on LLM re-eval.'
   champion: goose
   target_files: []
   created: '2026-07-26'
+- id: D2207
+  category: INF
+  state: ACTIVE
+  description: No description extracted
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 198
+  total: 199
   proposed: 0
   draft: 0
-  active: 163
+  active: 164
   stale: 0
   superseded: 6
   archived: 8
   rejected: 5
   by_category:
-    INF: 125
-    QLT: 20
+    INF: 124
+    QLT: 21
     GOV: 11
     RES: 4
     DAT: 4
@@ -1456,6 +1469,6 @@ summary:
     PERF: 3
     BUGFIX: 10
     CFG: 4
-    ARCH: 4
+    ARCH: 5
     pipeline-fix: 1
     governance: 1

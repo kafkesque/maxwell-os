@@ -1073,5 +1073,19 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 | **Status** | ✅ FIXED (2026-08-05) — D2175. |
 
 
-*Updated: 2026-08-05 (D2176 audit) | Bugs tracked: 50 | Resolved: 45 | Closed (moot): 5 | Open: 0 | Schema version: 1.8*
+## BUG-059 — 2026-08-07 20:27 — N2 crash: NameError S2_MAX_WORKERS at extraction start
+- **Symptom:** Probe completed (99.7%, 565 splits, +1,209 expected FBs) then `NameError: name 'S2_MAX_WORKERS' is not defined` at stage2_extract L1167 → N2 died; 2h39m probe results lost (in-memory only).
+- **Root cause:** S2_MAX_WORKERS defined in pipeline_paths.py L131 and used at stage2_extract L1167, but never added to the `from pipeline.pipeline_paths import (...)` list (commit 107b1c3).
+- **Impact:** Probe results lost; full restart required.
+- **Status:** ✅ FIXED (import added). End-to-end preflight (real corpus, mocked LLM) proves L1167 executes.
+- **Prevention:** Probe phase now persisted to probe_targets.jsonl (STAGE2_PROBE_CACHE) — crash-resumable.
+
+## BUG-060 — 2026-08-07 20:45 — `--only-convergent` silently defeated by probe block
+- **Symptom:** Run log showed `Total extraction targets: 14173 (was 12964)` under `--only-convergent` — all 10,330 single-source clusters were being added to extraction.
+- **Root cause:** Probe block ran `expanded_targets.extend(single_source)` unconditionally (stage2_extract L967), overriding the only_convergent filter.
+- **Impact:** N2 would have processed 14,173 targets (~23h+) instead of convergent-only (~3,200).
+- **Status:** ✅ FIXED (`if not only_convergent:` guard). Preflight proves targets=2,634, not 14,173.
+- **Prevention:** end-to-end preflight (real corpus + mocked LLM) is now the launch gate.
+
+*Updated: 2026-08-07 (N2 crash audit) | Bugs tracked: 52 | Resolved: 45 | Closed (moot): 5 | Open: 2 | Schema version: 1.8*
 <!-- BUG-005/006 resolved (P0.1/P0.3 fixes already in code), BUG-007/008/009 closed (Stage 3/HDBSCAN/PCA/nomic all removed), BUG-010 resolved (config actively used) -->

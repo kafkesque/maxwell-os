@@ -58,6 +58,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_POSITIVE,
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_PROBE_SAMPLES,
+    S2_MAX_WORKERS,
     S2_MINHASH_NUM_PERM,
     S2_MINHASH_THRESHOLD,
     S2_OMLX_RETRY,
@@ -69,6 +70,7 @@ from pipeline.pipeline_paths import (
     STAGE1_5_CHECKPOINT,
     STAGE1_CHECKPOINT,
     STAGE2_CHECKPOINT,
+    STAGE2_PROBE_CACHE,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
 
@@ -868,6 +870,54 @@ def split_cluster_by_kmeans(
     return [cluster]
 
 
+def _load_probe_cache(
+    convergent: list[dict],
+    single_source: list[dict],
+    only_convergent: bool,
+) -> list[dict] | None:
+    """Load cached probe targets when valid; None if absent, stale, or corrupt.
+
+    Crash-resume for the split-probe phase — the one pipeline phase with no
+    checkpoint. A crash after 2+ hours of probing previously lost everything.
+    Cache key = corpus shape (convergent/single-source counts + mode flag) so a
+    stale cache from a different corpus or run mode is ignored.
+    """
+    if not STAGE2_PROBE_CACHE.exists():
+        return None
+    try:
+        with open(STAGE2_PROBE_CACHE) as f:
+            pc: dict = json.load(f)
+        if (
+            pc.get("convergent_count") == len(convergent)
+            and pc.get("single_source_count") == len(single_source)
+            and pc.get("only_convergent") == only_convergent
+        ):
+            targets: list[dict] = pc.get("targets", [])
+            return targets if targets else None
+    except Exception as e:
+        print(f"   ⚠️  Probe cache unreadable ({type(e).__name__}: {e}) — re-probing")
+    return None
+
+
+def _write_probe_cache(
+    targets: list[dict],
+    convergent: list[dict],
+    single_source: list[dict],
+    only_convergent: bool,
+) -> None:
+    """Persist probe-expanded targets for crash-resume. Crash-safe via safe_write."""
+    try:
+        payload: dict = {
+            "convergent_count": len(convergent),
+            "single_source_count": len(single_source),
+            "only_convergent": only_convergent,
+            "targets": targets,
+        }
+        safe_write(str(STAGE2_PROBE_CACHE), json.dumps(payload, ensure_ascii=False))
+    except Exception as e:
+        print(f"   ⚠️  Probe cache write failed ({type(e).__name__}: {e})")
+
+
 def run_stage2(
     provider: str = "omlx",
     only_convergent: bool = False,
@@ -934,38 +984,70 @@ def run_stage2(
     # ═══════════════════════════════════════════════════════════════════════
     split_count: int = 0
     extra_fbs_estimate: int = 0
-    if SPLIT_PROBE_ENABLED and convergent:
+    cached_targets: list[dict] | None = _load_probe_cache(convergent, single_source, only_convergent)
+    if cached_targets is not None:
+        target_clusters = cached_targets
+        print(f"   📂 Probe cache loaded: {len(target_clusters)} extraction targets — re-probe skipped")
+    elif SPLIT_PROBE_ENABLED and convergent:
         print(f"\n🔍 Principle Discovery Gate: probing {len(convergent)} convergent clusters...")
         expanded_targets: list[dict] = []
         probes_run: int = 0
         probe_total: float = 0.0
 
-        for cluster in convergent:
-            size: int = cluster.get("size", 0)
-            cohesion: float = cluster.get("cohesion", 1.0)
+        # Parallel probe (D2xxx): Phi-4 GPU calls + k-means CPU overlap via ThreadPool.
+        # Same per-cluster decisions as sequential (kmeans random_state=42, per-cluster
+        # independence); results rebuilt in original order for a deterministic cache.
+        import concurrent.futures
+        _qualifying: list[tuple[int, dict]] = [
+            (i, c) for i, c in enumerate(convergent)
+            if c.get("size", 0) > SPLIT_PROBE_MIN_SIZE
+            and c.get("cohesion", 1.0) < SPLIT_PROBE_MAX_COHESION
+        ]
 
-            # Trigger: large AND lower-cohesion clusters most likely multi-principle
-            if size > SPLIT_PROBE_MIN_SIZE and cohesion < SPLIT_PROBE_MAX_COHESION:
+        def _probe_split(item: tuple[int, dict]) -> tuple[int, list[dict]]:
+            """Probe one cluster; return (index, sub_clusters); [] if not split."""
+            _i, _c = item
+            try:
+                _n: int = discover_principles(_c, segments, provider)
+                if _n > 1:
+                    _sub: list[dict] = split_cluster_by_kmeans(_c, segments, _n)
+                    if len(_sub) > 1:
+                        return _i, _sub
+            except Exception as _e:
+                print(f"   ⚠️  probe worker error ({_c.get('cluster_id', '?')}): {type(_e).__name__}: {_e}")
+            return _i, []
+
+        _t0_all: float = time.time()
+        with concurrent.futures.ThreadPoolExecutor(max_workers=S2_MAX_WORKERS) as _ex:
+            _futures = [_ex.submit(_probe_split, item) for item in _qualifying]
+            for _f in concurrent.futures.as_completed(_futures):
+                _idx, _subs = _f.result()
                 probes_run += 1
-                t0: float = time.time()
-                n_principles: int = discover_principles(cluster, segments, provider)
-                probe_total += time.time() - t0
+                if _subs:
+                    _c = convergent[_idx]
+                    split_count += 1
+                    extra_fbs_estimate += len(_subs) - 1
+                    print(f"   ✂️  {_c.get('cluster_id', '?')[:30]}: {_c.get('size', 0)}s/{_c.get('cohesion', 1.0):.3f}coh → {len(_subs)} principles, {len(_subs)} sub-clusters")
+        probe_total = time.time() - _t0_all
+        # Rebuild in original order (deterministic, cache-friendly)
+        _split_map: dict[int, list[dict]] = {}
+        for _f in _futures:
+            _idx, _subs = _f.result()
+            if _subs:
+                _split_map[_idx] = _subs
+        for _i, _c in enumerate(convergent):
+            if _i in _split_map:
+                expanded_targets.extend(_split_map[_i])
+            else:
+                expanded_targets.append(_c)
 
-                if n_principles > 1:
-                    sub_clusters: list[dict] = split_cluster_by_kmeans(cluster, segments, n_principles)
-                    if len(sub_clusters) > 1:
-                        expanded_targets.extend(sub_clusters)
-                        split_count += 1
-                        extra_fbs_estimate += len(sub_clusters) - 1
-                        cid: str = cluster.get("cluster_id", "?")[:30]
-                        print(f"   ✂️  {cid}: {size}s/{cohesion:.3f}coh → {n_principles} principles, {len(sub_clusters)} sub-clusters")
-                        continue
-            # Default: keep cluster as-is
-            expanded_targets.append(cluster)
-
-        # Add single-source clusters unchanged
-        expanded_targets.extend(single_source)
+        # Add single-source clusters unchanged — but ONLY outside --only-convergent
+        # (BUG-0XX: this extend previously ran unconditionally, silently defeating
+        #  the --only-convergent flag and sending all single-source clusters to extraction)
+        if not only_convergent:
+            expanded_targets.extend(single_source)
         target_clusters = expanded_targets
+        _write_probe_cache(expanded_targets, convergent, single_source, only_convergent)
         print(f"   ✅ Probe: {probes_run} clusters checked in {probe_total:.1f}s")
         print(f"   ✂️  Split: {split_count} clusters → +{extra_fbs_estimate} expected FBs")
         print(f"   📊 Total extraction targets: {len(target_clusters)} (was {len(convergent) + len(single_source)})")

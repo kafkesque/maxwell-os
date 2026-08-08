@@ -3282,3 +3282,42 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 
 **Files:** `pipeline/stage2_extract.py` (discover_principles function)
 **Status:** ✅ IMPLEMENTED and compile-verified.
+
+## D2211 — P0 Circuit Breaker & Error Propagation Fixes (2026-08-08)
+**Category:** BUGFIX / INF
+**Source:** Cross-examination of 4 LLM audits + Kimi peer review → Ultimate Final Verdict arbitration
+**Decision:** 13 surgical P0 fixes applied across 3 files (~106 lines) to break the failure chain that caused the 12-hour Run 5 waste:
+
+**Root Cause Chain (Run 5):**
+1. Shallow health check (`/v1/models`) missed OMLX degradation
+2. 4xx prefill guard rejections counted as breaker failures
+3. `call_llm` converted `CircuitOpenError` to `None` (silent)
+4. `discover_principles` couldn't signal `None` as infrastructure failure
+5. `future.result()` caught generic `Exception` → swallowed abort signal
+
+**13 Fixes Applied (in logical order):**
+
+| # | Fix | File |
+|---|------|------|
+| P0-1 | CB log: `OMLX_CB_FAILURE_THRESHOLD` → `_breaker._threshold` | `omlx_call.py` |
+| P0-2 | Import `CircuitOpenError` in stage2_extract.py (3 sites) | `stage2_extract.py` |
+| P0-3 | `stress_test_omlx`: `all_ok=False` on non-200 HTTP | `omlx_call.py` |
+| P0-4 | `discover_principles`: detect `call_llm` returning `None`, `error_counter` param | `stage2_extract.py` |
+| P0-5 | Probe fail-closed: mutable error counter + 10% abort threshold | `stage2_extract.py` |
+| P0-6 | `call_llm`: `except CircuitOpenError: raise` before generic catch | `stage2_extract.py` |
+| P0-7 | `_process_cluster`: same `CircuitOpenError` re-raise | `stage2_extract.py` |
+| P0-8 | `future.result()` boundary: catch `CircuitOpenError`, cancel futures, preserve checkpoint, abort | `stage2_extract.py` |
+| P0-9 | `process_singletons` future boundary: same pattern | `stage2_extract.py` |
+| P0-10 | Health check: `check_omlx_health()` → `stress_test_omlx()` (real chat requests) | `stage2_extract.py` |
+| P0-11 | Probe cache + singleton output scoped by `_rid()` | `pipeline_paths.py` |
+| P0-12 | `CircuitBreaker` thread safety: `threading.Lock` on all state mutations | `omlx_call.py` |
+| P0-13 | 4xx HTTP errors excluded from breaker failure count | `omlx_call.py` |
+
+**Result type refactor deferred to v3.1** (Kimi's architectural critique accepted in principle but ~200+ lines of churn for P0 emergency fix).
+
+**Verification:** All 3 files pass Python syntax check. `stress_test_omlx` live-tested against running OMLX. Circuit breaker lock + state transitions unit-verified. Full failure chain traced end-to-end.
+
+**Pipeline impact:** S0-S1.5 outputs unaffected (no data format changes). S2 can run directly against existing S1.5 clusters. Old unscoped probe cache ignored → fresh probes with fixed error handling.
+
+**Files:** `pipeline/omlx_call.py`, `pipeline/stage2_extract.py`, `pipeline/pipeline_paths.py`
+**Status:** ✅ IMPLEMENTED and verified.

@@ -1,8 +1,10 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-06 17:20 | **Decisions:** D2000-D2205 (205 decisions)
+> **Updated:** 2026-08-08 08:51 | **Decisions:** D2000-D2211 (211 decisions)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (37 tasks, 4 tiers)
-> **Buglog:** `governance/buglog.md` (8 open | 1,077 lines)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T0.1-T0.4 DONE, T0.5 READY, 28 outstanding IMPLEMENTATION_SPEC findings)
+> **Buglog:** `governance/buglog.md` (D2211 13 P0 fixes applied)
+> **Audit:** IMPLEMENTATION_SPEC cross-referenced against live HEAD — 28/33 findings still valid (10 HIGH, 9 MEDIUM, 9 LOW)
+> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ | S2 ready (D2211 fixes applied, stress_test ALL_PASS)
 
 ---
 
@@ -16,15 +18,15 @@
 
 | # | Task | Effort | Status |
 |---|------|--------|--------|
-| **D2205-P0.1** | **Retrieval evaluator** — `pipeline/retrieval_evaluator.py`. CRAG-style critique: CORRECT/PARTIAL/INCORRECT/CONTRADICTORY. Uses Phi-4-mini (local). Structured JSON output. | 0.5d | ⬜ TODO |
-| **D2205-P0.2** | **Agentic retrieval loop** — `retrieve.py:agentic_search()`. Iteration budget (3 rounds). Stop conditions: confidence≥0.85, CORRECT, or exhausted. EvidencePack output. | 0.5d | ⬜ TODO |
+| **D2205-P0.1** | **Retrieval evaluator** — `pipeline/retrieval_evaluator.py`. CRAG-style critique: CORRECT/PARTIAL/INCORRECT/CONTRADICTORY. Uses Phi-4-mini (local). Structured JSON output. | 0.5d | ✅ DONE (511 lines) |
+| **D2205-P0.2** | **Agentic retrieval loop** — `retrieve.py:agentic_search()`. Iteration budget (3 rounds). Stop conditions: confidence≥0.85, CORRECT, or exhausted. EvidencePack output. | 0.5d | ✅ DONE (retrieve.py:613) |
 
 ### P1 — Graph Traversal Layer (Week 1-2)
 
 | # | Task | Effort | Status |
 |---|------|--------|--------|
-| **D2205-P1.1** | **Graph expansion** — `retrieve.py:graph_expand()`. BFS over SQLite adjacency list. Traverses `related_fbs`, `contradicts_fbs`, `prerequisite_fbs`. Zero new deps. | 1.0d | ⬜ TODO |
-| **D2205-P1.2** | **Graph-aware search** — `retrieve.py:graph_aware_search()`. Hybrid search + graph expansion + rerank by borp×feedback×graph_centrality. | 0.5d | ⬜ TODO |
+| **D2205-P1.1** | **Graph expansion** — `retrieve.py:graph_expand()`. BFS over SQLite adjacency list. Traverses `related_fbs`, `contradicts_fbs`, `prerequisite_fbs`. Zero new deps. | 1.0d | ✅ DONE (retrieve.py:326) |
+| **D2205-P1.2** | **Graph-aware search** — `retrieve.py:graph_aware_search()`. Hybrid search + graph expansion + rerank by borp×feedback×graph_centrality. | 0.5d | ✅ DONE (retrieve.py:467) |
 
 ### P2 — MCP Server (Week 2)
 
@@ -166,6 +168,28 @@
 | BUG-050 | 🟡 MED | Only 3 of 20 books chunked — insufficient convergence | 🟡 OPEN |
 
 ---
+
+## ✅ COMPLETED — D2211 (2026-08-08 P0 Circuit Breaker & Error Propagation Fixes)
+
+| # | Task | Decision |
+|---|------|----------|
+| ✅ | 13 P0 fixes: health check, 4xx exclusion, CircuitOpenError propagation, probe fail-closed, future boundary abort, thread safety, run scoping | D2211 |
+| ✅ | `stress_test_omlx` non-200 set `all_ok=False` | D2211 |
+| ✅ | `CircuitBreaker` thread safety (`threading.Lock`) | D2211 |
+| ✅ | Probe cache + singleton output scoped by `_rid()` | D2211 |
+| ✅ | Full failure chain verified end-to-end (syntax + live stress_test + breaker unit test) | D2211 |
+| ✅ | **MinHash race condition** — `threading.Lock` protecting datasketch LSH + minhash_cache across ThreadPoolExecutor workers (the ONLY S2-blocking fix from IMPLEMENTATION_SPEC audit) | D2212 |
+| ✅ | **SentenceTransformer cache** — module-level `_st_model_cache` prevents 500MB model reload per `split_cluster_by_kmeans` call (~611 calls, ~25 min saved) | D2212 |
+
+### 🔜 DEFERRED to MTR (beneficial for S2 quality but not crash-blocking)
+
+| # | Task | When | Why Deferred |
+|---|------|------|-------------|
+| **F-H10** | Evidence truncation 300→600 chars | After OMLX memory guard test | Could trigger prefill guard. Needs testing. |
+| **F-H1** | Singleton resume logic | After first successful S2 | Nothing to resume on first run. |
+| **F-H2** | Singleton `safe_write` final output | P2 | CircuitOpenError path already safe. |
+| **F-M5** | Enforce non-empty mechanism/boundary | After yield impact test | Would increase rejections — needs data. |
+| **F-H12** | MinHash LRU evict from LSH | P3 | Negligible at single-run scale (~1.2MB). |
 
 ## ✅ COMPLETED — D2195-D2204 (2026-08-05/06 Immediate Fixes)
 

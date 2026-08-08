@@ -1447,8 +1447,29 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2208
+  category: BUGFIX
+  state: ACTIVE
+  description: 'N1 Yield Diagnostic Pass (D2208): 6 bugs fixed — OMLX memory guard ceiling, circuit breaker death spiral, memory guard false alarm, discovery probe hardcoded to OMLX, hardcoded max_workers, MLX provider local model path. 55 FBs from 58 TFS clusters (95% yield).'
+  champion: auto-sync
+  target_files: ['pipeline/omlx_call.py', 'pipeline/stage2_extract.py', 'pipeline/memory_guard.py', 'pipeline/providers/mlx_provider.py']
+  created: '2026-08-07'
+- id: D2209
+  category: INF
+  state: ACTIVE
+  description: 'Discovery Probe Provider Routing (D2209): discover_principles() now routes through call_llm() instead of calling call_omlx_json() directly, respecting --provider CLI flag.'
+  champion: auto-sync
+  target_files: ['pipeline/stage2_extract.py']
+  created: '2026-08-07'
+- id: D2211
+  category: BUGFIX
+  state: ACTIVE
+  description: 'P0 Circuit Breaker & Error Propagation Fixes (D2211): 13 surgical fixes across 3 files breaking the 12-hour Run 5 failure chain. Health check now uses stress_test_omlx (real chat requests). CircuitOpenError propagates through call_llm→discover_principles→_process_cluster→future.result(). Probe fail-closed with 10% abort threshold. 4xx excluded from breaker. Thread safety lock added. Run-scoped paths for probe cache + singletons.'
+  champion: Goose (S-tier Senior RAG Engineer)
+  target_files: ['pipeline/omlx_call.py', 'pipeline/stage2_extract.py', 'pipeline/pipeline_paths.py']
+  created: '2026-08-08'
 summary:
-  total: 199
+  total: 202
   proposed: 0
   draft: 0
   active: 164
@@ -1457,7 +1478,7 @@ summary:
   archived: 8
   rejected: 5
   by_category:
-    INF: 124
+    INF: 125
     QLT: 21
     GOV: 11
     RES: 4
@@ -1467,7 +1488,7 @@ summary:
     CLS: 7
     STR: 1
     PERF: 3
-    BUGFIX: 10
+    BUGFIX: 12
     CFG: 4
     ARCH: 5
     pipeline-fix: 1

@@ -1,8 +1,23 @@
-# Maxwell OS — Aggregated Remaining Tasks (Post D2205 RAG Architecture Roadmap)
-> **Updated:** 2026-08-06 17:20 | **Source:** D2195-D2205 + 4-model cross-examination + all prior sessions
-> **Total remaining:** 37 tasks across 4 tiers
-> **Recently completed:** D2195-D2204 (12 immediate fixes), D2205 roadmap published
-> **Next decision range:** D2206+
+# Maxwell OS — Aggregated Remaining Tasks (Post D2211 P0 Fixes + Full Audit)
+> **Updated:** 2026-08-08 08:51 | **Source:** D2195-D2211 + Goose Ultimate Final Verdict + IMPLEMENTATION_SPEC cross-reference
+> **Total outstanding findings:** 33 items (12 HIGH + 10 MEDIUM + 10 LOW), 2 fixed by D2211, 2 partially mitigated
+> **Recently completed:** D2195-D2204 (12 immediate fixes), D2205 roadmap, D2205-P0.1-P1.2 (retrieval eval + agentic + graph), D2208 (N1 yield), D2209 (probe routing), **D2211 (13 P0 circuit breaker fixes)**
+> **Pipeline state:** S0 (922 MDs) ✅ | S1 (323K segments) ✅ | S1.5 (12,964 clusters + 35,239 singletons) ✅ | **S2 ready to run**
+> **OMLX state:** All models loaded. stress_test: ALL_PASS.
+> **Loose end:** Old 21MB probe cache ✅ cleaned up via safe_delete (backed up to backup/deletions/)
+
+### Pre-S2 Readiness Checklist (2026-08-08 08:51)
+| Check | Status |
+|-------|--------|
+| Syntax (3 files) | ✅ |
+| OMLX /v1/models | ✅ HTTP 200 |
+| OMLX stress_test (chat) | ✅ ALL_PASS |
+| Models loaded | ✅ All 5 |
+| S1.5 clusters + singletons | ✅ 12,964 + 35,239 |
+| S2 checkpoint (resume) | ✅ 9 FBs |
+| Probe cache (scoped) | ❌ Fresh → probe WILL run |
+| CircuitBreaker | ✅ CLOSED, thread-safe |
+| Old probe cache (flat) | ✅ Cleaned (safe_delete → backup) |
 
 ---
 
@@ -12,12 +27,91 @@ These tasks directly implement the D2205 RAG Architecture Roadmap. They are the 
 
 | # | Task | Phase | Effort | Why | Status |
 |---|------|-------|--------|-----|--------|
-| **T0.1** | **Build retrieval evaluator** (`pipeline/retrieval_evaluator.py`) — CRAG-style critique with structured JSON output (CORRECT/PARTIAL/INCORRECT/CONTRADICTORY) | P0 | 0.5d | Single highest-impact change. Reuses Phi-4-mini. No new deps. | ⬜ TODO |
-| **T0.2** | **Build agentic retrieval loop** (`retrieve.py:agentic_search()`) — iteration budget (3 rounds), stop conditions, EvidencePack output | P0 | 0.5d | Makes every query better without pipeline changes. Reuses existing retrieve.py. | ⬜ TODO |
-| **T0.3** | **Build graph traversal layer** (`retrieve.py:graph_expand()`) — BFS over SQLite adjacency list for `related_fbs`, `contradicts_fbs`, `prerequisite_fbs` | P1 | 1.0d | Activates data already stored but never queried. Zero new deps. | ⬜ TODO |
-| **T0.4** | **Build graph-aware search** (`retrieve.py:graph_aware_search()`) — hybrid search + graph expansion + reranking | P1 | 0.5d | Combines T0.1+T0.3. Surfaces contradictions alongside support. | ⬜ TODO |
-| **T0.5** | **Run S1.3→S6 pipeline** — first full pipeline run with bge-m3 512d embeddings | — | 4h | S0 (922 MDs) + S1 (323K segments) done. S1.3–S6 need first run. | ⬜ TODO |
-| **T0.6** | **Yield crisis diagnostic** — manual extract 10 principles from 1 book, compare vs pipeline output (14 FBs from 852 books = 0.004% yield) | — | 1d | Pipeline emergency. Cross-encoder reranker gate may rescue yield (Qwen proposal). | ⬜ TODO |
+| **T0.1** | **Build retrieval evaluator** (`pipeline/retrieval_evaluator.py`) — CRAG-style critique with structured JSON output (CORRECT/PARTIAL/INCORRECT/CONTRADICTORY) | P0 | 0.5d | Single highest-impact change. Reuses Phi-4-mini. No new deps. | ✅ **DONE** (511 lines) |
+| **T0.2** | **Build agentic retrieval loop** (`retrieve.py:agentic_search()`) — iteration budget (3 rounds), stop conditions, EvidencePack output | P0 | 0.5d | Makes every query better without pipeline changes. Reuses existing retrieve.py. | ✅ **DONE** (retrieve.py:613) |
+| **T0.3** | **Build graph traversal layer** (`retrieve.py:graph_expand()`) — BFS over SQLite adjacency list for `related_fbs`, `contradicts_fbs`, `prerequisite_fbs` | P1 | 1.0d | Activates data already stored but never queried. Zero new deps. | ✅ **DONE** (retrieve.py:326) |
+| **T0.4** | **Build graph-aware search** (`retrieve.py:graph_aware_search()`) — hybrid search + graph expansion + reranking | P1 | 0.5d | Combines T0.1+T0.3. Surfaces contradictions alongside support. | ✅ **DONE** (retrieve.py:467) |
+| **T0.5** | **Run S2→S6 pipeline** — `python3 pipeline/stage2_extract.py --process-singletons`. S2: 2,634 convergent → probe (Phi-4-mini, ~5min) → split → ~12,964 targets extraction (Qwen3.6, est. 3h). Then 35,239 singletons (est. 16h). Checkpoint/resume safe. Then S4→S5→S6. | P0 | 4-20h | Pipeline emergency — only 9 FBs from failed Run 5. S2 ready NOW (all pre-flight checks passed). | ⬜ **READY** |
+| **T0.6** | **Yield crisis diagnostic** — manual extract 10 principles from 1 book, compare vs pipeline output (14 FBs from 852 books = 0.004% yield) | P1 | 1d | BLOCKED on S2 completion. Cross-encoder reranker gate may rescue yield. | 🔒 BLOCKED |
+
+---
+
+---
+
+## 🔴 CROSS-REFERENCE: IMPLEMENTATION_SPEC Findings vs D2211 Fixes (2026-08-08 Audit)
+
+D2211 addressed 2 of 33 findings. Below is the complete re-audit against live repository HEAD.
+
+### 0.2 HIGH — Prevent Data Loss / Quality Degradation (12 findings)
+
+| ID | Finding | D2211 Fix? | Status | Recommendation |
+|----|---------|-----------|--------|----------------|
+| **F-H1** | `process_singletons` no resume — 35,239 items × ~4s = ~39h at risk | ❌ | 🔴 **STILL BROKEN** | Implement singleton resume with deterministic cluster IDs. 35K items without resume = massive vulnerability. |
+| **F-H2** | `process_singletons` plain `open(..., "w")` — crash corrupts output (line 1592) | ⚠️ Partial | 🟠 **STILL VALID** | D2211 added safe_write in CircuitOpenError boundary, but final write still uses plain open(). |
+| **F-H3** | `process_singletons` shallow health check | ✅ **YES** | ✅ FIXED | D2211 P0-10: replaced with stress_test_omlx() |
+| **F-H4** | MPS `NameError`: `del raw` when variable is `mb_raw` (`stage1_5_embed_cluster.py:212`) | ❌ | 🔴 **STILL BROKEN** | Will crash on M1/M2/M3 Macs. 1-line fix: `del raw` → `del mb_raw`. Must fix before S1.5 rerun. |
+| **F-H5** | `split_cluster_by_kmeans` loads SentenceTransformer on EVERY call | ✅ | ✅ **FIXED (D2212)** — module-level `_st_model_cache` dict + `_get_st_model()`. 500MB model loaded once, reused across all ~611 probe calls. Saves ~25 min S2 runtime. | |
+| **F-H6** | MLX `generate_json()` caps ALL JSON output at 512 tokens — silent truncation | ❌ | 🟠 **MLX-ONLY** — no impact on default OMLX path. Fix if MLX provider is ever used for extraction. |
+| **F-H7** | MLX path silently falls back to OMLX on error — user's provider choice overridden | ❌ | 🟠 **STILL VALID** | Line 583-588: `except Exception` → `# Fall through to OMLX`. Violates user intent. |
+| **F-H8** | Watchdog hardcoded paths + PID 13137 default (`n2_watchdog.py:23-26`) | ❌ | 🟠 **STILL VALID** | Hardcoded `"knowledge pipeline/stage2_extract/latest/..."` paths. |
+| **F-H9** | Watchdog reads S1.5 from hardcoded `latest/` (`n2_watchdog.py:50`) | ❌ | 🟠 **STILL VALID** | Ignores `get_run_id()`. Same file. |
+| **F-H10** | Evidence passages truncated at 300-400 chars before LLM sees them (lines 377, 464, 758) | ❌ | 🟠 **STILL VALID** | Hardcoded `[:300]` and `[:400]` truncation. LLM sees truncated evidence. |
+| **F-H11** | MinHash race condition — `is_near_duplicate` called from ThreadPoolExecutor, mutates datasketch state | ✅ | ✅ **FIXED (D2212)** — `threading.Lock` wraps all `lsh.insert()` and `minhash_cache` access in `_build_fb_from_result` + post-collection dedup. | |
+| **F-H12** | MinHash LRU evicts cache but not LSH index — inconsistency | ❌ | 🟠 **STILL VALID** | LRU eviction of `minhash_cache` doesn't remove from LSH index. Negligible for single run (~1.2MB at 10K entries). |
+
+### 0.3 MEDIUM — Operational / Performance (11 findings)
+
+| ID | Finding | D2211 Fix? | Status |
+|----|---------|-----------|--------|
+| **F-M1** | `enforce_gate` defined (line 247) but NEVER called — dead code | ❌ | 🟡 Remove or wire in |
+| **F-M2** | 6 dead/ghost config items in pipeline_paths.py | ❌ | 🟡 Clean up |
+| **F-M3** | Probe burst-submits 611 calls simultaneously | ⚠️ | 🟢 MITIGATED (ThreadPoolExecutor with max_workers=S2_MAX_WORKERS limits concurrency to 3-5) |
+| **F-M4** | Stress test prompt sizes [50, 1000, 5000] don't match actual workload (6000+ chars) | ❌ | 🟡 Add 6000-char test |
+| **F-M5** | `validate_fb_output` allows empty mechanism/boundary/consequence (min_len check skipped at line 123-124) | ❌ | 🟡 Enforce min_len for structural fields |
+| **F-M6** | Probe cache no content hash → stale cache risk | ⚠️ | 🟢 PARTIALLY FIXED (D2211 P0-11: run_id scoping prevents cross-run contamination. Corpus-change detection still missing.) |
+| **F-M7** | `_build_fb_from_result` imports inside hot loop (line 1214 area) | ❌ | 🟡 Hoist to module level |
+| **F-M8** | Watchdog phase detection ambiguous (PROBE vs EXTRACTION) | ❌ | 🟡 Parse log for phase transitions |
+| **F-M9** | Watchdog stall detection ignores checkpoint growth | ❌ | 🟡 Monitor checkpoint size |
+| **F-M10** | `call_omlx` breaker check at entry only — not re-checked inside retry loop | ❌ | 🟡 Re-check breaker between retries (breaks are sub-second now with lock, low priority) |
+| **F-M11** | `run_monitor.py:68` — `except Exception: pass` (silent swallow) | ❌ | 🟡 Log the error |
+
+### 0.4 LOW — Hygiene / Future Tax (10 findings)
+
+| ID | Finding | Status |
+|----|---------|--------|
+| **F-L1** | `random.seed(42)` hardcoded despite `golden_seed: 42` in config | 🟡 Use config value |
+| **F-L2** | D2xxx placeholder decision numbers in comments | ⚠️ Some fixed by D2211 |
+| **F-L3** | BUG-061 ID collision (3 issues share same ID) | 🟡 Re-number |
+| **F-L4** | Session seed 19+ days stale (2026-07-26) | 🟡 Update |
+| **F-L5** | 105 bare `except Exception` blocks across pipeline/*.py | 🟡 Gradual C16 compliance |
+| **F-L6** | Constitution says both "9-stage" (line 59) and "8-stage" (line 63) | 🟡 Fix line 59 |
+| **F-L7** | JSON repair `_salvage_array_objects` returns None placeholders | 🟡 Filter None |
+| **F-L8** | D2177 citation mismatch in comment | 🟡 Fix comment |
+| **F-L9** | `stage0_convert.py:285` — `except Exception: pass` | 🟡 Log the error |
+| **F-L10** | `stage1_3_prefilter.py:76-77` — `except Exception: return []` | 🟡 Log the error |
+
+### 📊 Summary
+
+| Category | Total | Fixed (D2211+D2212) | Mitigated | Still Outstanding |
+|----------|-------|---------------------|-----------|-------------------|
+| 0.2 HIGH | 12 | 3 (F-H3, F-H5, F-H11) | 1 (F-H2 partial) | **8** |
+| 0.3 MEDIUM | 11 | 0 | 2 (F-M3, F-M6) | **9** |
+| 0.4 LOW | 10 | 0 | 1 (F-L2) | **9** |
+| **TOTAL** | **33** | **3** | **4** | **26** |
+
+**D2212 (2026-08-08):** Two pre-S2 fixes applied:
+1. **F-H11** MinHash race condition — `threading.Lock` protecting datasketch LSH + minhash_cache. Was the ONLY finding that could crash/corrupt S2.
+2. **F-H5** SentenceTransformer cache — module-level singleton saves ~25 min of S2 probe runtime (500MB model loaded once instead of ~611 times).
+
+### 🟢 Beneficial-but-Deferred to MTR (won't crash S2, but would improve quality/perf)
+
+| ID | What | Why Deferred | Priority for MTR |
+|----|------|-------------|------------------|
+| **F-H10** | Evidence truncated 300-400 chars before LLM | Could cause OMLX prefill guard rejections if increased. Needs memory guard testing first. | P1 — test after S2 run |
+| **F-H1** | Singleton resume logic | First run has nothing to resume. Only matters if S2 crashes mid-singletons. | P1 — implement after first successful S2 |
+| **F-H2** | Singleton `safe_write` for final output | CircuitOpenError path already safe. Marginal for first run. | P2 |
+| **F-M5** | `validate_fb_output` allows empty mechanism | Would reject more FBs → lower yield. Needs yield impact testing first. | P2 |
+| **F-H12** | MinHash LRU doesn't evict from LSH | LSH grows ~1.2MB at 10K entries. Negligible for single run. | P3 |
 
 ---
 

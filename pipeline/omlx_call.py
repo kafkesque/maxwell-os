@@ -25,6 +25,7 @@ Generator ≠ Verifier (R5): Use Qwen3.6 for generation, Phi-4-mini for verifica
 
 import json
 import os as _os
+import threading
 import time
 
 import requests
@@ -76,6 +77,7 @@ class CircuitBreaker:
         self._consecutive_failures: int = 0
         self._open_until: float = 0.0
         self._state: str = "CLOSED"
+        self._lock: threading.Lock = threading.Lock()  # D2211: thread safety for ThreadPoolExecutor
 
     @property
     def state(self) -> str:
@@ -86,23 +88,26 @@ class CircuitBreaker:
 
     def allow_request(self) -> bool:
         """True if a request may proceed; False = fast-fail (breaker OPEN)."""
-        return self.state != "OPEN"
+        with self._lock:
+            return self.state != "OPEN"
 
     def record_success(self) -> None:
         """Successful call — reset failure count, close breaker."""
-        self._consecutive_failures = 0
-        self._state = "CLOSED"
+        with self._lock:
+            self._consecutive_failures = 0
+            self._state = "CLOSED"
 
     def record_failure(self) -> None:
         """Failed call — count toward threshold; trip breaker when reached."""
-        self._consecutive_failures += 1
-        if self._state == "HALF_OPEN":
-            # Canonical: probe failure re-opens immediately (no repeated probes)
-            self._state = "OPEN"
-            self._open_until = time.time() + self._cooldown
-        elif self._consecutive_failures >= self._threshold:
-            self._state = "OPEN"
-            self._open_until = time.time() + self._cooldown
+        with self._lock:
+            self._consecutive_failures += 1
+            if self._state == "HALF_OPEN":
+                # Canonical: probe failure re-opens immediately (no repeated probes)
+                self._state = "OPEN"
+                self._open_until = time.time() + self._cooldown
+            elif self._consecutive_failures >= self._threshold:
+                self._state = "OPEN"
+                self._open_until = time.time() + self._cooldown
 
 
 # Module-level singleton (process-wide state survives across calls)
@@ -254,7 +259,7 @@ def call_omlx(
     if OMLX_CB_ENABLED and not _breaker.allow_request():
         raise CircuitOpenError(
             f"OMLX circuit breaker {_breaker.state} — "
-            f"{OMLX_CB_FAILURE_THRESHOLD} consecutive failures; "
+            f"{_breaker._threshold} consecutive failures; "
             f"cooldown until {_breaker._open_until:.0f} (epoch s). "
             f"Check OMLX at {OMLX_URL}."
         )
@@ -292,7 +297,10 @@ def call_omlx(
                 time.sleep(RETRY_DELAY * attempt)
 
     if OMLX_CB_ENABLED:
-        _breaker.record_failure()
+        # D2211: 4xx = client error (OMLX healthy, request rejected). Don't trip breaker.
+        # TODO(v3.1): Replace with FailureKind enum from pipeline/result_types.py
+        if last_error and not str(last_error).startswith("HTTP 4"):
+            _breaker.record_failure()
     raise RuntimeError(f"OMLX call failed after {MAX_RETRIES} attempts: {last_error}")
 
 
@@ -468,6 +476,7 @@ def stress_test_omlx(model: str = None, prompt_sizes: list[int] = None,
             else:
                 error = f"HTTP {resp.status_code}: {resp.text[:150]}"
                 elapsed = time.time() - start
+                all_ok = False  # D2211: non-200 response = not healthy
         except requests.Timeout:
             elapsed = time.time() - start
             error = f"TIMEOUT after {elapsed:.0f}s"

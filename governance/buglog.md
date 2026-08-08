@@ -1,6 +1,44 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-06 16:00 (D2195-D2201 cross-examination + surgical fixes)
-> **Next review:** After domain-by-domain extraction run (D2124)
+> **Last updated:** 2026-08-08 08:37 (D2211 — 13 P0 circuit breaker + error propagation fixes)
+> **Next review:** After full S2 extraction run
+
+---
+
+### D2211: P0 Circuit Breaker & Error Propagation Fixes (2026-08-08)
+
+**13 surgical fixes applied** across 3 files (~106 lines). Source: Goose Ultimate Final Verdict arbitration of spec vs Kimi peer review, all verified against live repository HEAD.
+
+**Root Cause of Run 5 (12-hour waste):**
+1. Shallow health check (`/v1/models`) missed OMLX prefill guard → all prompts rejected with HTTP 400
+2. 4xx counted as breaker failures → breaker tripped prematurely
+3. `call_llm` caught `CircuitOpenError` → returned `None` (silent)
+4. `discover_principles`: `None` is not dict → returned 1 (no split detected)
+5. `future.result()` caught generic `Exception` → continued loop (never aborted)
+6. Result: 611 clusters probed → 0 splits → 2,577 clusters extracted → breaker blocks all → 9 FBs in 12 hours
+
+**Fixes Applied:**
+
+| # | Fix | File | Lines |
+|---|------|------|-------|
+| P0-1 | CB log: `OMLX_CB_FAILURE_THRESHOLD` → `_breaker._threshold` (showed 5, actual 25) | `omlx_call.py` | 1 |
+| P0-2 | Import `CircuitOpenError` in stage2_extract.py (3 sites) | `stage2_extract.py` | 3 |
+| P0-3 | `stress_test_omlx`: `all_ok=False` on non-200 HTTP | `omlx_call.py` | 1 |
+| P0-4 | `discover_principles`: detect `call_llm` returning `None`, `error_counter` param | `stage2_extract.py` | ~12 |
+| P0-5 | Probe fail-closed: mutable counter + 10% abort threshold | `stage2_extract.py` | ~10 |
+| P0-6 | `call_llm`: `except CircuitOpenError: raise` before generic catch | `stage2_extract.py` | 3 |
+| P0-7 | `_process_cluster`: same `CircuitOpenError` re-raise | `stage2_extract.py` | 2 |
+| P0-8 | `future.result()` boundary: catch `CircuitOpenError`, cancel futures, preserve checkpoint, abort | `stage2_extract.py` | ~12 |
+| P0-9 | `process_singletons` future boundary: same pattern | `stage2_extract.py` | ~11 |
+| P0-10 | Health check: `check_omlx_health()` → `stress_test_omlx()` (real chat requests) | `stage2_extract.py` | ~10 |
+| P0-11 | Probe cache + singleton output scoped by `_rid()` | `pipeline_paths.py` | 2 |
+| P0-12 | `CircuitBreaker` thread safety: `threading.Lock` on state mutations | `omlx_call.py` | ~8 |
+| P0-13 | 4xx HTTP errors excluded from breaker failure count | `omlx_call.py` | 3 |
+
+**Verification:** Syntax check passed (3/3 files). Live stress_test against running OMLX. CircuitBreaker lock + state transitions unit-verified. Full failure chain traced: health→ST→call_llm→discover→process→future boundary.
+
+**Deferred:** Result[T] type system → v3.1 (Kimi's architectural critique correct but ~200+ lines for P0 emergency).
+
+**Status:** ✅ ALL FIXED (2026-08-08)
 
 ---
 

@@ -40,6 +40,7 @@ import json
 import os
 import random
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -88,8 +89,8 @@ _FB_REQUIRED_FIELDS: dict[str, tuple[type, int]] = {
     "boundary": (str, 0),            # Must be string
     "consequence": (str, 0),         # Must be string
     "is_summary": (bool, 0),         # Must be boolean
-    "extraction_type": (str, 0),     # Must be string
-    "content_type": (str, 0),        # Must be string
+    "extraction_type": (str, -1),     # D2214: optional — Qwen3-Coder doesn't include it; default inserted
+    "content_type": (str, -1),       # D2214: optional — classification, not content
     "route": (str, 0),               # Must be string
 }
 _VALID_ROUTES: frozenset[str] = frozenset({"FB", "NULL"})
@@ -120,8 +121,8 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
     # Check required fields
     for field, (expected_type, min_len) in _FB_REQUIRED_FIELDS.items():
         if field not in result:
-            if field in ("mechanism", "boundary", "consequence"):
-                continue  # Optional structural fields — Stage 4 enriches
+            if field in ("mechanism", "boundary", "consequence", "extraction_type", "content_type", "route"):
+                continue  # D2214: Optional fields — Qwen3-Coder doesn't include classification metadata
             errors.append(f"Missing required field: '{field}'")
             continue
 
@@ -587,8 +588,11 @@ def call_llm(prompt: str, system: str, model: str, provider: str = "omlx",
 
     # OMLX path
     try:
-        from pipeline.omlx_call import call_omlx_json
+        from pipeline.omlx_call import CircuitOpenError, call_omlx_json
         return call_omlx_json(prompt=prompt, model=model, system=system, max_tokens=max_tokens)
+    except CircuitOpenError:
+        # D2211: Circuit breaker open — abort, don't return None
+        raise
     except Exception as e:
         print(f"      ❌ LLM error: {e}")
         return None
@@ -688,11 +692,17 @@ def discover_principles(
     cluster: dict,
     segments: dict[str, dict],
     provider: str = "maxwell_omlx",
+    error_counter: list[int] | None = None,  # D2211: mutable container for nonlocal probe error count
 ) -> int:
     """Probe a cluster to count distinct principles via Phi-4-mini.
 
     Only called for convergent clusters above size/cohesion thresholds.
     Returns principle_count (0-4). Returns 1 on any error (fail-safe: don't split).
+
+    Args:
+        error_counter: Optional mutable list[int] for tracking probe failures
+                       across calls without shared global state. If provided,
+                       error_counter[0] is incremented on LLM failures.
     """
     seg_ids: list[str] = cluster.get("segment_ids", [])
     if not seg_ids:
@@ -763,16 +773,30 @@ def discover_principles(
     # D2209: Route through call_llm to respect --provider flag (was hardcoded OMLX).
     try:
         from pipeline.pipeline_paths import VERIFY_MODEL
-        result: dict = call_llm(
+        result: dict | None = call_llm(
             prompt=prompt,
             model=VERIFY_MODEL,
             system=PRINCIPLE_DISCOVERY_SYSTEM,
             provider=provider,
         )
+        if result is None:
+            # D2211: call_llm returned None → LLM infrastructure failure
+            if error_counter is not None:
+                error_counter[0] += 1
+            import sys
+            print(f"   ⚠️  Discovery probe: LLM returned None for {cluster.get('cluster_id', '?')}",
+                  file=sys.stderr)
+            return 1
         if isinstance(result, dict):
             count: int = result.get("principle_count", 1)
             if isinstance(count, int) and 0 <= count <= 4:
                 return count
+            # D2211: dict returned but count invalid → also a failure
+            if error_counter is not None:
+                error_counter[0] += 1
+    except CircuitOpenError:
+        # D2211: Breaker open — abort probe phase entirely
+        raise
     except Exception as e:
         # D2177 (C16): Log probe failures — don't silently swallow.
         # Fail-safe: return 1 (don't split), but operator must know.
@@ -781,6 +805,25 @@ def discover_principles(
               file=sys.stderr)
 
     return 1
+
+
+# D2212: Module-level SentenceTransformer cache (F-H5 fix).
+# split_cluster_by_kmeans loads the model on every call (~611 times in probe phase,
+# 500MB model × 2-3s per load = ~25 min wasted). Caching eliminates this.
+_st_model_cache: dict[str, object] = {}
+_st_model_lock: threading.Lock = threading.Lock()  # D2212: atomic first-load (threads can race)
+_st_encode_lock: threading.Lock = threading.Lock()  # D2213: MPS not thread-safe — serialize encode()
+
+
+def _get_st_model(model_name: str, device: str = "mps") -> object:
+    """Return cached SentenceTransformer, loading on first call (thread-safe)."""
+    if model_name not in _st_model_cache:
+        with _st_model_lock:
+            # Double-checked: another thread may have loaded it while we waited
+            if model_name not in _st_model_cache:
+                from sentence_transformers import SentenceTransformer
+                _st_model_cache[model_name] = SentenceTransformer(model_name, device=device)
+    return _st_model_cache[model_name]
 
 
 def split_cluster_by_kmeans(
@@ -816,14 +859,16 @@ def split_cluster_by_kmeans(
     # Embed segments (same model as S1.5 for consistency)
     try:
         import numpy as np
-        from sentence_transformers import SentenceTransformer
         from sklearn.cluster import KMeans
 
         from pipeline.pipeline_paths import S15_EMBED_MODEL_HF
 
-        model = SentenceTransformer(S15_EMBED_MODEL_HF, device="mps")
-        embeddings: np.ndarray = model.encode(texts, normalize_embeddings=True,
-                                                show_progress_bar=False)
+        # D2212: Cached model load (F-H5 fix — was loading 500MB model per call)
+        model = _get_st_model(S15_EMBED_MODEL_HF)
+        # D2213: MPS not thread-safe — serialize encode() across threads
+        with _st_encode_lock:
+            embeddings: np.ndarray = model.encode(texts, normalize_embeddings=True,
+                                                    show_progress_bar=False)
 
         # K-means clustering
         kmeans = KMeans(n_clusters=n_principles, random_state=SPLIT_KMEANS_RANDOM_STATE,
@@ -932,6 +977,11 @@ def run_stage2(
         gate_enabled: Enable gate enforcement.
         gate_strict: Force [] on NULL-route with content.
     """
+    # D2214: Force line-buffered logging to file (tee/hohup corrupts unbuffered)
+    import sys as _sys
+    _sys.stdout.reconfigure(line_buffering=True) if hasattr(_sys.stdout, "reconfigure") else None
+    _sys.stderr.reconfigure(line_buffering=True) if hasattr(_sys.stderr, "reconfigure") else None
+
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Load clusters
@@ -964,11 +1014,15 @@ def run_stage2(
         few_shot_text = format_golden_fewshot(pos_ex, neg_ex)
         print(f"   🎯 Golden few-shot: {len(pos_ex)} pos + {len(neg_ex)} neg examples ({len(few_shot_text)} chars)")
 
-    # Health check
+    # D2211: Health check — use stress_test (real chat requests, not just /v1/models)
     if provider == "omlx":
-        from pipeline.omlx_call import check_omlx_health
-        if not check_omlx_health():
-            print("❌ OMLX server is not responding.")
+        from pipeline.omlx_call import CircuitOpenError, stress_test_omlx
+        health = stress_test_omlx(verbose=False)
+        if not health["healthy"]:
+            print(f"❌ OMLX stress test FAILED: {health['verdict']}")
+            for r in health["results"]:
+                if r.get("error"):
+                    print(f"   [{r['size']} chars]: {r['error']}")
             sys.exit(1)
 
     print(f"🧠 Stage 2: Convergent Extraction — {len(target_clusters)} clusters")
@@ -1004,16 +1058,23 @@ def run_stage2(
             and c.get("cohesion", 1.0) < SPLIT_PROBE_MAX_COHESION
         ]
 
+        # D2211: Mutable error counter for nonlocal probe failure tracking
+        probe_errors: list[int] = [0]
+
         def _probe_split(item: tuple[int, dict]) -> tuple[int, list[dict]]:
             """Probe one cluster; return (index, sub_clusters); [] if not split."""
             _i, _c = item
             try:
-                _n: int = discover_principles(_c, segments, provider)
+                _n: int = discover_principles(_c, segments, provider, error_counter=probe_errors)
                 if _n > 1:
                     _sub: list[dict] = split_cluster_by_kmeans(_c, segments, _n)
                     if len(_sub) > 1:
                         return _i, _sub
+            except CircuitOpenError:
+                # D2211: Breaker open during probe — let it propagate
+                raise
             except Exception as _e:
+                probe_errors[0] += 1
                 print(f"   ⚠️  probe worker error ({_c.get('cluster_id', '?')}): {type(_e).__name__}: {_e}")
             return _i, []
 
@@ -1051,11 +1112,19 @@ def run_stage2(
         print(f"   ✅ Probe: {probes_run} clusters checked in {probe_total:.1f}s")
         print(f"   ✂️  Split: {split_count} clusters → +{extra_fbs_estimate} expected FBs")
         print(f"   📊 Total extraction targets: {len(target_clusters)} (was {len(convergent) + len(single_source)})")
+
+        # D2211: Fail-closed — abort if probe error rate exceeds threshold
+        if probes_run > 0 and probe_errors[0] / probes_run > 0.10:
+            raise RuntimeError(
+                f"❌ PROBE ABORT: {probe_errors[0]}/{probes_run} clusters failed "
+                f"({probe_errors[0]/probes_run:.1%}). Aborting before extraction."
+            )
         print(f"{'='*60}")
 
     # Dedup infrastructure
     lsh, minhash_ok = init_minhash_lsh()
     minhash_cache: dict = {}
+    dedup_lock: threading.Lock = threading.Lock()  # D2212: thread safety for MinHash (F-H11 fix)
     all_fbs: list[dict] = []
     total_extracted: int = 0
     total_skipped: int = 0
@@ -1118,6 +1187,9 @@ def run_stage2(
                 )
                 if result is not None:
                     break
+            except CircuitOpenError:
+                # D2211: Breaker open — abort extraction, preserve checkpoint
+                raise
             except Exception:
                 if attempt < S2_OMLX_RETRY:
                     time.sleep(2)
@@ -1174,8 +1246,9 @@ def run_stage2(
         extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
         content_type: str = result.get("content_type", "principle").strip()
 
-        # Redundant check kept as defense-in-depth (validator already checks these)
-        if not name or not definition or len(definition) < 30:
+        # D2214: Removed redundant check — validate_fb_output already enforces definition ≥30 chars.
+        # Qwen3-Coder produces concise definitions that pass validation but were caught here.
+        if not name or not definition:
             return {"_null": True, "cluster_id": cid}
 
         # Gate: reject summaries
@@ -1238,10 +1311,12 @@ def run_stage2(
         fb["pipeline_commit"] = pipeline_commit
 
         # Attach minhash sig for dedup (processed post-collection)
+        # D2212: Thread-safe — MinHashLSH is NOT thread-safe (F-H11 fix)
         if minhash_ok:
-            _, sig = is_near_duplicate(definition, lsh, minhash_cache)
-            if sig:
-                fb["minhash_signature"] = sig
+            with dedup_lock:
+                _, sig = is_near_duplicate(definition, lsh, minhash_cache)
+                if sig:
+                    fb["minhash_signature"] = sig
 
         return fb
 
@@ -1268,6 +1343,17 @@ def run_stage2(
             completed += 1
             try:
                 fb_results = future.result()
+            except CircuitOpenError:
+                # D2211: Breaker open — cancel all futures, preserve checkpoint, abort
+                print(f"\n❌ CIRCUIT BREAKER OPEN — aborting run")
+                print(f"   Preserving {len(all_fbs)} FBs from {len(processed_ids)} clusters")
+                for f in futures:
+                    f.cancel()
+                # Write checkpoint with current progress before aborting
+                safe_write(STAGE2_CHECKPOINT,
+                           "\n".join(json.dumps(fb, ensure_ascii=False) for fb in all_fbs) + "\n",
+                           force_shrink=True)
+                raise  # Abort the run
             except Exception as e:
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {cid}: {e}")
                 continue
@@ -1292,19 +1378,20 @@ def run_stage2(
                     continue
 
                 # MinHash near-dedup (post-collection) — D2152: fixed jaccard comparison
+                # D2212: Thread-safe — minhash_cache shared with worker threads (F-H11 fix)
                 definition: str = fb.get("definition", fb.get("name", ""))
                 if minhash_ok and fb.get("minhash_signature"):
                     sig: str = fb["minhash_signature"]
-                    # Recreate MinHash for current FB definition
                     cur_mh = make_minhash(definition)
                     is_dup: bool = False
-                    for prev_fb in all_fbs:
-                        prev_sig: str = prev_fb.get("minhash_signature", "")
-                        if prev_sig and prev_sig in minhash_cache:
-                            _, prev_mh = minhash_cache[prev_sig]
-                            if cur_mh.jaccard(prev_mh) > S2_MINHASH_THRESHOLD:
-                                is_dup = True
-                                break
+                    with dedup_lock:
+                        for prev_fb in all_fbs:
+                            prev_sig: str = prev_fb.get("minhash_signature", "")
+                            if prev_sig and prev_sig in minhash_cache:
+                                _, prev_mh = minhash_cache[prev_sig]
+                                if cur_mh.jaccard(prev_mh) > S2_MINHASH_THRESHOLD:
+                                    is_dup = True
+                                    break
                     if is_dup:
                         total_skipped += 1
                         print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: near-duplicate")
@@ -1403,16 +1490,21 @@ def process_singletons(
     # Load segments for text lookup
     segments = load_segments()
 
-    # OMLX health check
+    # D2211: Health check — use stress_test (real chat requests, not just /v1/models)
     if provider == "omlx":
-        from pipeline.omlx_call import check_omlx_health
-        if not check_omlx_health():
-            print("❌ OMLX server not responding")
+        from pipeline.omlx_call import CircuitOpenError, stress_test_omlx
+        health = stress_test_omlx(verbose=False)
+        if not health["healthy"]:
+            print(f"❌ OMLX stress test FAILED: {health['verdict']}")
+            for r in health["results"]:
+                if r.get("error"):
+                    print(f"   [{r['size']} chars]: {r['error']}")
             sys.exit(1)
 
     # Init dedup
     lsh, minhash_ok = init_minhash_lsh()
     minhash_cache: dict = {}
+    dedup_lock: threading.Lock = threading.Lock()  # D2212: thread safety for MinHash (F-H11 fix)
     all_fbs: list[dict] = []
     total_extracted: int = 0
     total_null: int = 0
@@ -1499,6 +1591,17 @@ def process_singletons(
             completed += 1
             try:
                 fb = future.result()
+            except CircuitOpenError:
+                # D2211: Breaker open — cancel all futures, preserve checkpoint, abort
+                print(f"\n❌ CIRCUIT BREAKER OPEN during singleton extraction — aborting")
+                print(f"   Preserving {len(all_fbs)} singleton FBs")
+                for f in futures:
+                    f.cancel()
+                STAGE2_SINGLETON_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+                safe_write(STAGE2_SINGLETON_OUTPUT,
+                           "\n".join(json.dumps(fb, ensure_ascii=False) for fb in all_fbs) + "\n",
+                           force_shrink=True)
+                raise
             except Exception as e:
                 # D2177 (C16): Log singleton extraction failures
                 print(f"  [{completed}/{len(viable)}] ⚠️  singleton worker error: {type(e).__name__}: {e}")

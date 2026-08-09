@@ -103,3 +103,28 @@ Aggregate fine-tuning candidates to cover: 5 disciplines × 3 depths × 3 extrac
 ## CURRENT GEMSA GATE ISSUE (context for evaluation)
 
 Gemma-4-E4B currently rejects 73% of convergent FBs because it demands verbatim evidence for synthesized principles. When evaluating gate_recommendation, consider: is this principle LOGICALLY supported by evidence (even if not explicitly stated), or is it fabricating claims?
+
+## S5 VERIFICATION BENCHMARK (2026-08-09)
+
+Tested 15 convergent FBs through full S4→S5 pipeline:
+
+| Gate | Result |
+|------|--------|
+| S4 Classification | 15/15 valid (100%) — canonical mapping correct |
+| S5 BORP (source diversity) | 15/15 PASS |
+| S5 NLI (ModernBERT entailment) | 15/15 NEUTRAL 0.400 — expected for synthesis |
+| S5 Gemma-4-E4B (cross-family) | 4/15 PASS (27%) — 73% false negative |
+
+**Gemma rejection pattern**: Every rejection says "The Foundation Block introduces concepts... that are not verified in the evidence passages." Gemma demands verbatim evidence for synthesized abstractions — it rejects the convergent synthesis methodology itself.
+
+**PASS FBs (deemed factually consistent by Gemma):**
+1. Patch Cord Routing and Object Connection (software engineering, 600c elaboration)
+2. Value-First Demonstration variant (psychology, 537c)
+3. Intuitive Decision Making (psychology, 1143c)
+4. Translation as Pathway to Insight (emerging, 941c)
+
+**Verification model alternatives analyzed:**
+- No dedicated verification model exists in MLX 4-bit ecosystem
+- Candidates: gemma-2-9b-it-4bit (untested), Qwen2.5-7B-Instruct-4bit (untested), Mistral-Nemo-12B-4bit (untested)
+- Only proven model: Qwen3-Coder-30B (understands FB synthesis but breaks R5 cross-family)
+- Recommendation: use Q3C as verifier OR lower Gemma threshold to 0.3

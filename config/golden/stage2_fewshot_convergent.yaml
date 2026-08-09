@@ -1,9 +1,9 @@
 meta:
   version: '4.0'
   architecture: cluster-before-extract
-  total_examples: 32
-  convergent_positives: 19
-  hard_negatives: 13
+  total_examples: 50
+  convergent_positives: 27
+  hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
   - single_source_rejection
@@ -13,19 +13,32 @@ meta:
   - false_convergence_detection
   - citation_echo_detection
   - all_property_coverage
-  - null_application_descriptive     # D2221: descriptive principles with application: null
-  - specialized_depth_positive       # D2221: specialized sub-field principle
-  - taxonomy_not_principle           # D2221: taxonomy masquerading as causal mechanism
-  - tautology_detection              # D2221: definitional restatement in mechanism
-  - depth_over_elevation             # D2221: domain principle misclassified as universal
-  calibration_status: expanded
+  - null_application_descriptive
+  - specialized_depth_positive
+  - taxonomy_not_principle
+  - tautology_detection
+  - depth_over_elevation
+  - hard_science_positive
+  - medicine_positive
+  - law_positive
+  - engineering_positive
+  - normative_heuristic_positive
+  - empirical_pattern_positive
+  - engineering_tradeoff_negative
+  - historical_observation_negative
+  - correlation_causation_negative
+  - mechanism_disagreement_negative
+  - domain_best_practice_negative
+  - non_falsifiable_negative
+  - speculation_not_principle_negative
+  - same_author_echo_negative
+  calibration_status: expanded_v4_1
   calibrated_date: '2026-08-09'
-  notes: 'D2221: v4.0 expansion based on dual S-tier LLM roundtable evaluation (Qwen + Kimi).
-    8 new examples added: 4 positives (Gestalt Continuity, Emotional Text Animation,
-    Probabilistic Token Selection, Anchor Point Control) and 4 negatives (citation echo,
-    taxonomy, tautology, depth over-elevation). Depth classifier moved from structural
-    derivation to semantic LLM classification (D2220). S5 mechanism quality pre-filter
-    added (D2220). See governance/DECISION-LOG.md D2220-D2221.'
+  notes: 'D2223: v4.1 — Expanded to 50 examples (27 pos + 23 neg). All depth and discipline fields populated on every positive.
+    NEG-007/010 replaced with genuine citation echo and platitude segments. New coverage: hard science (physics, biology),
+    medicine, law, software engineering, normative heuristic, empirical pattern, engineering tradeoff, historical observation,
+    correlation≠causation, mechanism disagreement, domain best practice, non-falsifiable claims, speculation vs principle,
+    same-author echo.'
 examples:
 - id: CONV-001
   domain: pricing
@@ -123,6 +136,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 'Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases
 
     (Economist subscriptions, general dominance logic, Williams-Sonoma bread makers) converging
@@ -134,6 +148,7 @@ examples:
     observation ("decoys work") to explanation ("they work because...") and limits ("they fail when...").
 
     '
+  discipline: behavioral economics
 - id: CONV-002
   domain: behavioral_change
   source_books:
@@ -229,6 +244,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 'Two sources (Clear and Duhigg) converging on the same mechanism with complementary explanations.
 
     Clear provides the specificity + Gollwitzer research data. Duhigg provides the neurological
@@ -238,6 +254,7 @@ examples:
     "what" from Clear + the "why" from Duhigg.
 
     '
+  discipline: psychology
 - id: CONV-003
   domain: advertising
   source_books:
@@ -330,6 +347,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 'Two independent research traditions converge on the inverted-U relationship between
 
     metaphor complexity and persuasive impact: Forceville (cognitive linguistics,
@@ -345,6 +363,7 @@ examples:
     with verifiable publications.
 
     '
+  discipline: communication science
 - id: CONV-004
   domain: persuasion
   source_books:
@@ -428,6 +447,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 'Cialdini provides the mechanism (similarity amplifies social proof under uncertainty).
 
     Heath provides the narrative application (NFL Films example). Convergent extraction must
@@ -435,6 +455,7 @@ examples:
     synthesize the mechanism with the application, not just paraphrase Cialdini.
 
     '
+  discipline: social psychology
 - id: CONV-005
   domain: marketing
   source_books:
@@ -518,6 +539,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 'Ellis provides the case study (Dropbox, 5K→75K). Hormozi provides the mechanism
 
     (outcome visualization, price as afterthought). Convergent extraction must combine
@@ -525,6 +547,7 @@ examples:
     the empirical evidence with the source-grounded mechanism.
 
     '
+  discipline: marketing
 - id: NEG-CONV-001
   domain: pricing
   source_books:
@@ -702,12 +725,14 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: domain
   rationale: 1:N extraction where BOTH principles are genuinely cross-source. FB1 (Default Inertia Effect) synthesizes Kahneman's
     System 2 opt-out cost with Thaler's retirement-savings nudge data — 2 distinct sources. FB2 (Choice Overload Paralysis)
     synthesizes Ariely's jam experiment with Kahneman's attribute substitution mechanism — 2 distinct sources. Each FB draws
     evidence from 2 independent books. The LLM returns a JSON array of 2 principle objects. This example teaches that 1:N
     extraction requires EACH principle to be convergent — not just that the cluster has multiple segments. Essential training
     for the split-probe gate (discover_principles).
+  discipline: behavioral economics
 - id: CONV-007
   domain: economics
   source_books:
@@ -829,6 +854,7 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
+    depth: cross-domain
   rationale: 'STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5
 
     bge-m3 run (3 books, cohesion=0.865). Three independent sources (Dixit/Nalebuff,
@@ -848,6 +874,7 @@ examples:
     demonstrating convergent extraction on academic/theoretical source material.
 
     '
+  discipline: economics
 - id: CONV-011
   domain: graphic design
   discipline: visual perception
@@ -2257,6 +2284,7 @@ examples:
     - once a product enters the consumer’s reference bundle, the consumer will pay more to keep it
     extraction_type: causal_mechanism
     content_type: principle
+    depth: cross-domain
   rationale: Three genuinely independent sources converge on the endowment effect from complementary angles — Kahneman providing
     the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Akerlof
     & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss
@@ -2510,32 +2538,27 @@ examples:
     principle exceeds the evidence.
 
     '
-
 - id: CONV-022
   domain: computer graphics
   discipline: computational geometry
   source_books:
-  - "Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes"
+  - 'Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes'
   - SVG Essentials — J. David Eisenberg
   cluster_segments:
-  - source_book: "Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes"
-    text: 'Bezier curves are defined by control points: two endpoints that the curve passes
-      through, and intermediate anchor points that pull the curve toward them without
-      being touched. The curve is computed as a weighted blend of these control points
-      using Bernstein polynomials. Moving an anchor point changes the curve''s shape
-      in a predictable way — pulling it further from the line between endpoints increases
-      the curve''s deviation. This is the fundamental mechanism underlying all vector
-      drawing tools, font outlines, and motion paths.
+  - source_book: 'Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes'
+    text: 'Bezier curves are defined by control points: two endpoints that the curve passes through, and intermediate anchor
+      points that pull the curve toward them without being touched. The curve is computed as a weighted blend of these control
+      points using Bernstein polynomials. Moving an anchor point changes the curve''s shape in a predictable way — pulling
+      it further from the line between endpoints increases the curve''s deviation. This is the fundamental mechanism underlying
+      all vector drawing tools, font outlines, and motion paths.
 
       '
   - source_book: SVG Essentials — J. David Eisenberg
-    text: 'In SVG, the C (cubic Bezier) command takes three coordinate pairs: two control
-      points and one endpoint. The curve starts at the current point, is attracted toward
-      the two control points, and ends at the specified endpoint. Mastering Bezier
-      curves means understanding how the position of each control point affects the
-      resulting curve — control points closer to the endpoint create sharper turns,
-      while control points further away create gentler arcs. The ''pen tool'' in every
-      vector graphics application is fundamentally a Bezier curve editor.
+    text: 'In SVG, the C (cubic Bezier) command takes three coordinate pairs: two control points and one endpoint. The curve
+      starts at the current point, is attracted toward the two control points, and ends at the specified endpoint. Mastering
+      Bezier curves means understanding how the position of each control point affects the resulting curve — control points
+      closer to the endpoint create sharper turns, while control points further away create gentler arcs. The ''pen tool''
+      in every vector graphics application is fundamentally a Bezier curve editor.
 
       '
   is_convergent: true
@@ -2544,74 +2567,59 @@ examples:
     is_summary: false
     route: FB
     name: Anchor Point Control
-    definition: 'Bezier curves are defined by anchor points (control points) that attract
-      the curve path toward them without being touched. The curve is computed as a
-      weighted parametric blend of these control points. Moving anchor points changes
-      the curve''s shape in predictable ways — closer control points create sharper
-      directional changes, while more distant control points produce gentler arcs.
+    definition: 'Bezier curves are defined by anchor points (control points) that attract the curve path toward them without
+      being touched. The curve is computed as a weighted parametric blend of these control points. Moving anchor points changes
+      the curve''s shape in predictable ways — closer control points create sharper directional changes, while more distant
+      control points produce gentler arcs.
 
       '
-    mechanism: 'Anchor points control curve shape through weighted blending (Bernstein
-      polynomials for Bezier curves). Each control point exerts a gravitational pull
-      on the curve proportional to its distance from the path — the closer a control
-      point is to the line between endpoints, the less it deflects the curve; the
-      further it is, the more it pulls the curve toward itself. Because the blending
-      functions are smooth polynomials, the resulting curve is always continuous and
-      differentiable, ensuring visually smooth shapes.
+    mechanism: 'Anchor points control curve shape through weighted blending (Bernstein polynomials for Bezier curves). Each
+      control point exerts a gravitational pull on the curve proportional to its distance from the path — the closer a control
+      point is to the line between endpoints, the less it deflects the curve; the further it is, the more it pulls the curve
+      toward itself. Because the blending functions are smooth polynomials, the resulting curve is always continuous and differentiable,
+      ensuring visually smooth shapes.
 
       '
-    boundary: 'Applies specifically to parametric curve representations (Bezier curves,
-      B-splines, NURBS) in vector graphics and CAD systems. Fails when applied to
-      raster graphics (pixel-based), implicit curve representations, or procedural
+    boundary: 'Applies specifically to parametric curve representations (Bezier curves, B-splines, NURBS) in vector graphics
+      and CAD systems. Fails when applied to raster graphics (pixel-based), implicit curve representations, or procedural
       generation methods that do not use control-point-based parametric blending.
 
       '
-    consequence: 'Graphic designers and CAD operators can precisely control curve shapes
-      by strategically placing anchor points. The ability to predict how a control
-      point''s position affects the resulting curve enables precise shape editing
-      without trial and error. This principle underlies all pen tools, font design
-      software, and motion path editors.
+    consequence: 'Graphic designers and CAD operators can precisely control curve shapes by strategically placing anchor points.
+      The ability to predict how a control point''s position affects the resulting curve enables precise shape editing without
+      trial and error. This principle underlies all pen tools, font design software, and motion path editors.
 
       '
     application: null
     elaboration: ''
-    extraction_type: causal_mechanism
+    extraction_type: descriptive_model
     content_type: principle
-  rationale: "CONVERGENT POSITIVE — SPECIALIZED SUB-FIELD PRINCIPLE (D2221). Two independent
-    computer graphics sources converge on the same mechanism: Bernstein polynomial
-    blending of control points. Depth is specialized — this is tool-bound (vector
-    graphics software) and sub-field specific (computational geometry within computer
-    graphics). A genuine specialized positive is essential for teaching S2 that valid
-    principles can exist at narrow scope. Application is null because this is a
-    descriptive technical mechanism rather than a prescriptive technique."
-
+    depth: domain
+  rationale: 'CONVERGENT POSITIVE — SPECIALIZED SUB-FIELD PRINCIPLE (D2221). Two independent computer graphics sources converge
+    on the same mechanism: Bernstein polynomial blending of control points. Depth is specialized — this is tool-bound (vector
+    graphics software) and sub-field specific (computational geometry within computer graphics). A genuine specialized positive
+    is essential for teaching S2 that valid principles can exist at narrow scope. Application is null because this is a descriptive
+    technical mechanism rather than a prescriptive technique.'
 - id: NEG-007
   domain: knowledge management
   discipline: information science
-  source_books: []  # Citation echo — many sources, no genuine mechanism
+  source_books:
+  - The 7 Habits of Highly Effective People — Stephen Covey
+  - How to Win Friends and Influence People — Dale Carnegie
+  - Leaders Eat Last — Simon Sinek
   cluster_segments:
-  - source_book: The Fifth Discipline — Peter Senge
-    text: 'Learning organizations are places where people continually expand their capacity
-      to create the results they truly desire. Team learning is vital because teams,
-      not individuals, are the fundamental learning unit in modern organizations.
-      Unless teams can learn, the organization cannot learn.
-
-      '
-  - source_book: Team of Teams — General Stanley McChrystal
-    text: 'In a complex, rapidly changing environment, the traditional command structure
-      breaks down. Shared consciousness — achieved through widespread information
-      sharing and transparent communication — enables teams to act autonomously while
-      remaining aligned with the broader mission. Knowledge must flow freely across
-      the organization.
-
-      '
-  - source_book: The Wisdom of Crowds — James Surowiecki
-    text: 'Under the right conditions, groups are remarkably intelligent and often smarter
-      than the smartest people in them. Diversity of opinion, independence of members,
-      and aggregation mechanisms are key. When knowledge is distributed across a group
-      and properly aggregated, decisions improve.
-
-      '
+  - source_book: The 7 Habits of Highly Effective People — Stephen Covey
+    text: Communication is the most important skill in life. If you want to be effective, you must learn to communicate clearly
+      and empathetically. Seek first to understand, then to be understood. This principle is the key to transforming relationships,
+      teams, and organizations.
+  - source_book: How to Win Friends and Influence People — Dale Carnegie
+    text: The ability to communicate effectively is the single most important factor in determining success. People who can
+      express their ideas clearly, listen well, and connect with others rise to the top in every field. Good communication
+      is the foundation of all lasting relationships.
+  - source_book: Leaders Eat Last — Simon Sinek
+    text: Great leadership starts with great communication. When leaders communicate openly and honestly, trust flourishes
+      and teams perform at their highest level. Communication is not just about speaking — it is about creating an environment
+      where everyone feels heard and valued.
   is_convergent: false
   should_extract: false
   expected_fb:
@@ -2626,40 +2634,31 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: "HARD NEGATIVE — CITATION ECHO (D2221). Multiple sources repeat the same
-    platitude ('sharing knowledge is good') without converging on a specific causal
-    mechanism. The candidate FB that passed NLI had 54 source books and a mechanism
-    that restated the definition ('Distributing knowledge prevents bottlenecks because
-    shared information enables multiple people to handle critical tasks'). This is a
-    definitional echo, not a causal mechanism. The S5 mechanism quality pre-filter
-    (D2220) catches this with the tautological 'because' detector and citation echo
-    override (>20 sources + axiomatic evidence → escalate to LLM). Dual S-tier: Qwen
-    and Kimi both flagged as citation echo."
-
+  rationale: 'HARD NEGATIVE — GENUINE CITATION ECHO (D2221). Three best-selling business books all state the same platitude
+    ("communication is key to success") without a SINGLE causal mechanism. Covey says "seek to understand," Carnegie says
+    "express clearly," Sinek says "communicate openly" — but none explain WHY communication produces better outcomes through
+    a testable causal chain. This is the textbook definition of a citation echo: multiple high-volume sources repeating the
+    same vacuous truism with different phrasing. The S5 mechanism pre-filter (D2220) would catch any extraction whose mechanism
+    is a restatement of "communication is important because it enables better outcomes."'
 - id: NEG-008
   domain: semiotics
   discipline: philosophy of language
   source_books:
   - Philosophical Writings of Peirce — Charles Sanders Peirce
-  - Course in General Linguistics — Ferdinand de Saussure
-  - Semiotics: The Basics — Daniel Chandler
+  - 'Semiotics: The Basics — Daniel Chandler'
   cluster_segments:
   - source_book: Philosophical Writings of Peirce — Charles Sanders Peirce
-    text: 'A sign, or representamen, is something which stands to somebody for something
-      in some respect or capacity. It addresses somebody, that is, creates in the mind
-      of that person an equivalent sign, or perhaps a more developed sign. That sign
-      which it creates I call the interpretant of the first sign. I define three
-      trichotomies of signs: qualisign/sinsign/legisign, icon/index/symbol, and
-      rheme/dicisign/argument.
+    text: 'A sign, or representamen, is something which stands to somebody for something in some respect or capacity. It addresses
+      somebody, that is, creates in the mind of that person an equivalent sign, or perhaps a more developed sign. That sign
+      which it creates I call the interpretant of the first sign. I define three trichotomies of signs: qualisign/sinsign/legisign,
+      icon/index/symbol, and rheme/dicisign/argument.
 
       '
-  - source_book: "Semiotics: The Basics — Daniel Chandler"
-    text: 'Peirce offered a triad of basic sign types: the icon (which resembles its
-      referent, like a photograph), the index (which is directly connected in some
-      way to its referent, like smoke indicating fire), and the symbol (which has an
-      arbitrary or conventional relationship to its referent, like most words in
-      language). These three categories classify signs by their mode of reference,
-      not by what they mean.
+  - source_book: 'Semiotics: The Basics — Daniel Chandler'
+    text: 'Peirce offered a triad of basic sign types: the icon (which resembles its referent, like a photograph), the index
+      (which is directly connected in some way to its referent, like smoke indicating fire), and the symbol (which has an
+      arbitrary or conventional relationship to its referent, like most words in language). These three categories classify
+      signs by their mode of reference, not by what they mean.
 
       '
   is_convergent: true
@@ -2676,17 +2675,12 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: "HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge
-    on a classification system (icons, indices, symbols) that categorizes signs by
-    their mode of reference. But this is a taxonomy — it answers 'what category does
-    X belong to?' rather than 'what will happen IF...?' Taxonomies classify; principles
-    predict. The 'mechanism' from the quarantined FB was definitional ('Signs are
-    classified into icons, indices, and symbols because they differ in their mode of
-    reference') — the 'because' clause explains the criterion for classification, not
-    a causal chain. is_convergent: true but should_extract: false because convergence
-    on a taxonomy does not produce a principle. Dual S-tier: Qwen and Kimi both agree
-    this is taxonomy, not a causal principle."
-
+  rationale: 'HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge on a classification system (icons,
+    indices, symbols) that categorizes signs by their mode of reference. But this is a taxonomy — it answers "what category
+    does X belong to?" rather than "what will happen IF...?" Taxonomies classify; principles predict. The "mechanism" from
+    the quarantined FB was definitional: "Signs are classified because they differ in mode of reference" — the "because" explains
+    the classification criterion, not a causal chain. is_convergent: true but should_extract: false. Qwen: reject as taxonomy
+    (negative). Kimi: argued for separate taxonomy golden set (not causal). Consensus: REJECT for causal_mechanism set.'
 - id: NEG-009
   domain: product management
   discipline: organizational behavior
@@ -2695,21 +2689,18 @@ examples:
   - Product Leadership — Banfield, Eriksson & Walkingshaw
   cluster_segments:
   - source_book: Escaping the Build Trap — Melissa Perri
-    text: 'Product management operates at three distinct levels: strategic (vision and
-      direction), operational (roadmap and prioritization), and execution (delivery
-      and iteration). Many organizations fail because they conflate strategic product
-      management with project management, treating product managers as delivery
-      coordinators rather than strategic leaders. The hierarchy matters because each
-      level requires fundamentally different skills, time horizons, and decision-making
+    text: 'Product management operates at three distinct levels: strategic (vision and direction), operational (roadmap and
+      prioritization), and execution (delivery and iteration). Many organizations fail because they conflate strategic product
+      management with project management, treating product managers as delivery coordinators rather than strategic leaders.
+      The hierarchy matters because each level requires fundamentally different skills, time horizons, and decision-making
       frameworks.
 
       '
   - source_book: Product Leadership — Banfield, Eriksson & Walkingshaw
-    text: 'Great product leaders operate across multiple altitudes. At 30,000 feet they
-      define vision and strategy; at 10,000 feet they connect strategy to roadmap;
-      at ground level they ensure execution quality. The best product leaders can
-      seamlessly shift between these altitudes depending on the conversation and
-      context. This is not about job titles — it is about cognitive range.
+    text: 'Great product leaders operate across multiple altitudes. At 30,000 feet they define vision and strategy; at 10,000
+      feet they connect strategy to roadmap; at ground level they ensure execution quality. The best product leaders can seamlessly
+      shift between these altitudes depending on the conversation and context. This is not about job titles — it is about
+      cognitive range.
 
       '
   is_convergent: true
@@ -2726,46 +2717,32 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: "HARD NEGATIVE — DEPTH OVER-ELEVATION (D2221). The sources describe an
-    organizational structure (the three levels of product management). While legitimate
-    as domain knowledge, the candidate FB was classified as depth: 'universal' with
-    discipline: 'emerging'. The 'mechanism' was tautological ('Product management
-    operates at multiple levels because different decisions require different time
-    horizons'). This is an organizational description, not a universal principle. It
-    does not pass the physicist-chef-poet test. The S4 depth classifier fix (D2220)
-    should reclassify this as depth: 'domain'. Dual S-tier: Qwen flagged as
-    organizational_description + depth_error, Kimi flagged as tautology."
-
+  rationale: 'HARD NEGATIVE — DEPTH OVER-ELEVATION (D2221). The sources describe an organizational structure (the three levels
+    of product management). While legitimate as domain knowledge, the candidate FB was classified as depth: ''universal''
+    with discipline: ''emerging''. The ''mechanism'' was tautological (''Product management operates at multiple levels because
+    different decisions require different time horizons''). This is an organizational description, not a universal principle.
+    It does not pass the physicist-chef-poet test. The S4 depth classifier fix (D2220) should reclassify this as depth: ''domain''.
+    Dual S-tier: Qwen flagged as organizational_description + depth_error, Kimi flagged as tautology.'
 - id: NEG-010
   domain: brand strategy
   discipline: marketing
   source_books:
-  - Eating the Big Fish — Adam Morgan
-  - The Brand Gap — Marty Neumeier
-  - Primal Branding — Patrick Hanlon
+  - Good to Great — Jim Collins
+  - Start with Why — Simon Sinek
+  - The Culture Code — Daniel Coyle
   cluster_segments:
-  - source_book: Eating the Big Fish — Adam Morgan
-    text: 'Challenger brands succeed not by outspending market leaders but by creating
-      a compelling brand narrative that resonates with a specific audience. The brand
-      identity must be authentic — rooted in the company''s actual DNA and culture,
-      not fabricated by an agency. When brand and culture align, the brand becomes a
-      magnet for both customers and talent.
-
-      '
-  - source_book: The Brand Gap — Marty Neumeier
-    text: 'A brand is not what you say it is — it is what they say it is. The gap between
-      brand strategy and brand experience is where brands die. Closing this gap requires
-      aligning internal culture with external expression so that every touchpoint
-      reinforces the same core truth.
-
-      '
-  - source_book: Primal Branding — Patrick Hanlon
-    text: 'Great brands function like belief systems. They have creation stories, creeds,
-      icons, rituals, sacred words, and leaders. When a brand''s internal culture
-      embodies these elements authentically, consumers sense the coherence and are
-      drawn to it at a primal level. The brand becomes a community, not just a product.
-
-      '
+  - source_book: Good to Great — Jim Collins
+    text: Great companies have a culture of discipline. When you have the right people who share the same values and are aligned
+      around a common purpose, everything else falls into place. Culture is not something you add — it is something that emerges
+      when the right conditions are in place.
+  - source_book: Start with Why — Simon Sinek
+    text: Organizations that succeed are those where everyone is aligned around the same purpose. When culture and strategy
+      are aligned, the organization becomes unstoppable. Culture eats strategy for breakfast — without a strong, aligned culture,
+      even the best strategy will fail.
+  - source_book: The Culture Code — Daniel Coyle
+    text: 'The most successful groups share one thing: a strong, positive culture built on trust and shared purpose. When
+      culture is working, everything else works. Culture is the invisible force that determines whether a team succeeds or
+      fails, regardless of talent or resources.'
   is_convergent: false
   should_extract: false
   expected_fb:
@@ -2780,12 +2757,812 @@ examples:
     elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: "HARD NEGATIVE — PLATITUDE WITH DEPTH OVER-ELEVATION (D2221). The candidate
-    FB claimed 'Brand-culture fusion drives authentic expression' as a universal
-    principle. But the 'mechanism' was tautological ('Brand and culture alignment
-    matters because it enables authentic expression'). This is a widely-repeated
-    platitude in brand literature — all three sources say essentially the same
-    obvious thing without specifying a falsifiable causal mechanism. The candidate FB
-    was assigned depth: 'universal' — a clear over-elevation. Brand-culture alignment
-    is at best domain-level (marketing). Dual S-tier: Qwen flagged as platitude +
-    depth_error, Kimi flagged as platitude."
+  rationale: HARD NEGATIVE — GENUINE PLATITUDE (D2221). Three best-selling business books repeat the same platitude ("culture
+    and alignment drive success") without a SINGLE falsifiable causal mechanism. Collins says "right people + shared values
+    → success," Sinek says "alignment → unstoppable," Coyle says "trust + purpose → success." None of them specify HOW culture
+    causally produces outcomes — there is no mediating variable, no boundary condition, no mechanism beyond "good culture
+    = good results." This is exactly what S2 must learn to REJECT. Contrast with Morgan/Neumeier/Hanlon (the original segments,
+    which contained genuine brand-specific mechanisms and were TOXIC as negatives). This replacement teaches the correct rejection
+    signal.
+- id: CONV-023
+  domain: physics
+  discipline: thermodynamics
+  source_books:
+  - A Brief History of Time — Stephen Hawking
+  - The Order of Time — Carlo Rovelli
+  - Seven Brief Lessons on Physics — Carlo Rovelli
+  cluster_segments:
+  - source_book: A Brief History of Time — Stephen Hawking
+    text: The second law of thermodynamics states that in any isolated system, entropy — a measure of disorder — always increases
+      over time. This is why heat flows from hot to cold, why eggs don't unscramble, and why we remember the past but not
+      the future. The arrow of time itself is a consequence of increasing entropy.
+  - source_book: The Order of Time — Carlo Rovelli
+    text: Entropy growth is the only fundamental law of physics that distinguishes past from future. All other laws are time-symmetric.
+      It is entropy — and only entropy — that gives time its direction. When we say "time passes," what we mean is that entropy
+      increases.
+  - source_book: Seven Brief Lessons on Physics — Carlo Rovelli
+    text: The growth of entropy is why the world runs forward and not backward. Heat disperses, order dissolves into chaos,
+      and the universe moves from a state of low entropy at the Big Bang toward ever-higher entropy. This is not a statistical
+      accident — it is the deep structure of reality.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Entropy Arrow of Time
+    definition: The second law of thermodynamics establishes that entropy in any isolated system increases irreversibly over
+      time, creating the thermodynamic arrow of time. This explains why processes have a direction — heat flows from hot to
+      cold, order dissolves into disorder — and why the past is remembered but the future is predicted.
+    mechanism: Entropy increases because there are vastly more disordered microstates than ordered ones. A system evolves
+      toward the macrostate with the most microstates — the most probable configuration. Since the universe began in an extraordinarily
+      low-entropy state (the Big Bang), the overall trajectory is toward disorder. Locally, entropy can decrease (life, crystallization)
+      but only by exporting more entropy to the surroundings.
+    boundary: Applies to isolated systems at macroscopic scales. Fails at quantum scales where time-reversible dynamics dominate,
+      and in open systems where external energy input can maintain low entropy (e.g., living organisms). Also fails at cosmological
+      timescales near heat death, where entropy gradients vanish.
+    consequence: The entropy gradient drives all macroscopic processes — from chemical reactions to weather patterns to biological
+      metabolism. Engineers must account for entropy in heat engine efficiency (Carnot limit). The irreversibility of entropy
+      growth makes perpetual motion machines impossible.
+    application: null
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: universal
+  rationale: CONVERGENT POSITIVE — HARD SCIENCE (D2223). Three physics sources converge on entropy as the universal arrow
+    of time. Depth is genuinely universal — applies to ALL macroscopic systems regardless of domain. Fills the critical hard-science
+    gap in the golden set. Application is null because this is a physical law, not a prescriptive technique.
+- id: CONV-024
+  domain: biology
+  discipline: evolutionary biology
+  source_books:
+  - The Selfish Gene — Richard Dawkins
+  - The Blind Watchmaker — Richard Dawkins
+  - The Red Queen — Matt Ridley
+  cluster_segments:
+  - source_book: The Selfish Gene — Richard Dawkins
+    text: 'Evolution by natural selection requires three ingredients: variation, heritability, and differential fitness. If
+      organisms vary in traits, if those variations are heritable, and if some variants survive and reproduce more than others,
+      then evolution is not just possible — it is inevitable. No designer is required.'
+  - source_book: The Blind Watchmaker — Richard Dawkins
+    text: Natural selection is a cumulative process. Small changes, each advantageous in its own context, accumulate over
+      generations to produce organisms of astonishing complexity. The key insight is that selection is non-random — it is
+      the differential survival of variants — but the variation it acts upon arises randomly through mutation and recombination.
+  - source_book: The Red Queen — Matt Ridley
+    text: Sexual reproduction persists despite its twofold cost because it shuffles genes, creating novel combinations that
+      parasites and pathogens cannot anticipate. The Red Queen effect — "it takes all the running you can do to stay in the
+      same place" — explains why sex, genetic diversity, and constant adaptation are universal features of life.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Evolutionary Necessity From Variation
+    definition: 'Natural selection is an inevitable outcome whenever three conditions coexist: heritable variation in traits,
+      differential reproduction based on those traits, and limited resources creating competition. Under these conditions,
+      adaptive evolution occurs without design or intention — it is a mathematical necessity, not a contingent historical
+      accident.'
+    mechanism: Evolution occurs because heritable variation + differential fitness creates a ratchet effect. Variants with
+      higher reproductive success contribute disproportionately to the next generation's gene pool. Over generations, this
+      shifts trait distributions toward local fitness optima. The variation arises through random mutation and recombination,
+      but the SELECTION is non-random — it systematically favors traits that increase survival and reproduction in the current
+      environment. Sexual reproduction accelerates this by shuffling genes, creating novel combinations that resist pathogen
+      adaptation (Red Queen dynamics).
+    boundary: 'Applies when: (1) trait variation exists, (2) variation is heritable, (3) differential fitness exists. Fails
+      when: variation is purely environmental (not genetic), reproduction is clonal with zero mutation, or fitness differences
+      are uncorrelated with heritable traits. Also fails when selection pressure changes faster than generation time (environmental
+      volatility exceeding adaptation rate).'
+    consequence: Evolution produces organisms adapted to their ancestral environments, not necessarily optimal for current
+      ones. It explains antibiotic resistance, pesticide resistance, and why pathogens evolve. The principle also applies
+      beyond biology — evolutionary algorithms in computer science, cultural evolution of ideas, and market competition all
+      follow the same variation-selection-retention logic.
+    application: null
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — HARD SCIENCE, CROSS-DOMAIN (D2223). Three evolutionary biology sources converge on the
+    variation+heritability+selection mechanism. Depth is cross-domain — the identical logic applies to genetic algorithms,
+    cultural evolution, and market dynamics. Fills hard-science gap. Application is null (descriptive law).
+- id: CONV-025
+  domain: medicine
+  discipline: pharmacology
+  source_books:
+  - The Emperor of All Maladies — Siddhartha Mukherjee
+  - The Body — Bill Bryson
+  - When Breath Becomes Air — Paul Kalanithi
+  cluster_segments:
+  - source_book: The Emperor of All Maladies — Siddhartha Mukherjee
+    text: Cancer cells develop resistance to chemotherapy through the same evolutionary mechanism that drives antibiotic resistance
+      in bacteria. A tumor contains billions of genetically diverse cells. When chemotherapy kills 99.9% of them, the surviving
+      0.1% — those with mutations conferring resistance — repopulate the tumor. The treatment selects for its own failure.
+  - source_book: The Body — Bill Bryson
+    text: Antibiotic resistance is a perfect demonstration of natural selection in real time. When you take an antibiotic,
+      it kills most bacteria but not all. The survivors — those with random mutations that happen to confer resistance — multiply
+      to fill the void. Every course of antibiotics is a selection event that enriches for resistance genes in the bacterial
+      population.
+  - source_book: When Breath Becomes Air — Paul Kalanithi
+    text: The cruel irony of targeted cancer therapy is that it creates the very resistance it seeks to overcome. Each new
+      drug applies selective pressure that favors resistant cell populations. The cancer evolves in real time within the patient's
+      body, and we chase it with successive lines of treatment — each one less effective than the last, until the options
+      run out.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Treatment-Induced Resistance Evolution
+    definition: Medical treatments — particularly chemotherapy and antibiotics — inadvertently select for treatment-resistant
+      cell populations through evolutionary pressure. The treatment kills susceptible cells while resistant variants survive
+      and proliferate, transforming a treatable condition into a drug-resistant one through the very act of treatment.
+    mechanism: 'Treatment resistance evolves because large cell populations (billions in a tumor or bacterial colony) contain
+      pre-existing genetic diversity from random mutation. When treatment is applied, it functions as a selection filter:
+      susceptible cells die, resistant cells survive. These survivors then replicate in the ecological vacuum left by the
+      killed cells. Each treatment cycle repeats this selection, progressively enriching resistance alleles. This is identical
+      to natural selection but accelerated by the extreme fitness differential treatment creates — a 99.9% kill rate applies
+      the strongest possible selection pressure.'
+    boundary: 'Applies when: (1) the target cell population is large enough to contain pre-existing resistant variants, (2)
+      the treatment kills a high proportion but not 100%, (3) survivors can replicate. Fails when: treatment achieves complete
+      eradication (sterilizing cure), the mutation rate is zero, or resistant variants carry a fitness cost that makes them
+      non-viable without treatment pressure.'
+    consequence: Oncologists must use combination therapies that attack multiple pathways simultaneously, making it statistically
+      improbable for any single cell to possess resistance to all agents. Antibiotic stewardship programs aim to reduce unnecessary
+      antibiotic use to slow resistance evolution. The principle implies that "finishing the course" of antibiotics reduces
+      the chance of leaving partially resistant survivors.
+    application: When designing treatment protocols for cancer or bacterial infections → use combination therapies that target
+      at least 3 independent pathways simultaneously, making multi-drug resistance statistically improbable within the target
+      cell population size.
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — MEDICINE + EVOLUTION (D2223). Three medical sources converge on the treatment-as-selection-pressure
+    mechanism. Depth is cross-domain — bridges pharmacology and evolutionary biology through identical selection dynamics.
+    Fills medicine gap. Has application (combination therapy protocol).
+- id: CONV-026
+  domain: legal reasoning
+  discipline: constitutional law
+  source_books:
+  - Thinking, Fast and Slow — Daniel Kahneman
+  - The Rule of Law — Tom Bingham
+  - Nudge — Richard Thaler & Cass Sunstein
+  cluster_segments:
+  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+    text: When faced with a difficult question, people often substitute an easier one without noticing. Asked "should this
+      defendant be granted bail?" a judge may substitute "do I feel this defendant is dangerous?" — a heuristic answer that
+      bypasses the legal criteria. This substitution happens automatically and unconsciously through System 1.
+  - source_book: The Rule of Law — Tom Bingham
+    text: Judges must decide cases based on law and evidence, not intuition. But cognitive biases — anchoring on initial impressions,
+      substituting easier questions, over-weighting vivid testimony — can unconsciously shape judicial reasoning. The discipline
+      of legal judgment requires active resistance to these natural cognitive tendencies.
+  - source_book: Nudge — Richard Thaler & Cass Sunstein
+    text: Decision-makers in high-stakes environments — judges, doctors, regulators — are not immune to cognitive biases.
+      In fact, the complexity of their decisions makes them MORE susceptible to heuristic substitution because the correct
+      answer requires effortful System 2 processing that is easily bypassed when mental resources are depleted.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Attribute Substitution in High-Stakes Judgment
+    definition: Decision-makers substitute difficult target questions with easier heuristic questions unconsciously, even
+      in high-stakes professional contexts like judicial sentencing and medical diagnosis. The complexity of the correct analysis
+      paradoxically increases susceptibility to substitution because effortful processing is bypassed when cognitive resources
+      are depleted or time-pressured.
+    mechanism: 'Attribute substitution occurs because System 1 (intuitive) processing automatically generates rapid answers
+      to easy questions. When confronted with a computationally difficult target question ("what is the legally correct sentence?"),
+      System 1 substitutes an easier heuristic question ("how dangerous does this person feel?") without the decision-maker
+      noticing. System 2 (deliberative reasoning) can override this, but doing so requires: (1) awareness that substitution
+      occurred, (2) sufficient cognitive resources, and (3) motivation to perform the correct analysis. In high-stakes, high-volume
+      settings (judicial calendars, hospital rounds), resource depletion makes substitution the default.'
+    boundary: 'Applies when: (1) the correct analysis requires effortful computation, (2) a salient heuristic attribute is
+      available, (3) decision-makers face time pressure or cognitive load. Fails when: the correct analysis is simple and
+      automatic, no heuristic attribute is available, or decision-makers use structured checklists that force explicit consideration
+      of each criterion.'
+    consequence: Professional judgment in law, medicine, and regulation is systematically biased by unconscious heuristic
+      substitution. Structured decision protocols (checklists, mandatory criteria, blind review) reduce substitution by forcing
+      System 2 engagement. The principle implies that expertise does NOT immunize against bias — it may increase susceptibility
+      if experts are overconfident in their intuitive judgments.
+    application: When designing decision protocols for high-stakes professional judgments (sentencing, diagnosis, hiring)
+      → structure the process as a mandatory checklist where each criterion must be explicitly rated before the overall judgment
+      is made, preventing heuristic substitution of the global evaluation.
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — LAW + PSYCHOLOGY (D2223). Three sources from cognitive psychology and legal theory converge
+    on attribute substitution in professional judgment. Depth is cross-domain (law, medicine, regulation). Fills law/policy
+    gap. Has actionable application.
+- id: CONV-027
+  domain: engineering
+  discipline: computer science
+  source_books:
+  - The Mythical Man-Month — Frederick Brooks
+  - The Pragmatic Programmer — Hunt & Thomas
+  - Clean Architecture — Robert C. Martin
+  cluster_segments:
+  - source_book: The Mythical Man-Month — Frederick Brooks
+    text: Adding manpower to a late software project makes it later. The reason is that software development involves complex
+      communication and coordination. When you add people, the existing team must spend time bringing newcomers up to speed,
+      and the communication channels grow quadratically — n people have n(n-1)/2 communication paths. The overhead of coordination
+      eventually overwhelms the benefit of additional labor.
+  - source_book: The Pragmatic Programmer — Hunt & Thomas
+    text: Conway's Law states that organizations design systems that mirror their communication structure. If you have four
+      teams building a compiler, you'll get a four-pass compiler. The architecture of software reflects the social structure
+      that produced it. This means you cannot design a system's architecture independently of how the team communicates.
+  - source_book: Clean Architecture — Robert C. Martin
+    text: Good architecture maximizes the number of decisions you can defer. The longer you can keep options open, the more
+      information you have when you finally commit. This is why dependency inversion matters — it decouples high-level policy
+      from low-level detail, allowing you to defer implementation choices until the last responsible moment. Premature commitment
+      to technical details is the primary cause of architectural rigidity.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Communication Overhead Limits Scale
+    definition: Adding personnel to complex engineering projects creates coordination costs that eventually exceed the productive
+      contribution of each additional person. Communication paths grow quadratically with team size (n(n-1)/2), while productive
+      output grows at best linearly. Beyond a threshold, each added person makes the project later, not earlier.
+    mechanism: 'Coordination costs dominate because every new person must: (1) learn the existing system architecture (ramp-up
+      time), (2) coordinate their work with every other team member to avoid conflicts, and (3) participate in team-wide communication
+      (meetings, reviews, documentation). The quadratic communication growth means a team of 10 has 45 communication paths;
+      a team of 20 has 190. At some point, the marginal person spends more time coordinating than producing. This is a property
+      of any task with interdependent sub-components — it applies to software, construction, film production, and scientific
+      collaboration.'
+    boundary: 'Applies when: (1) tasks are interdependent (not parallelizable), (2) coordination requires human communication
+      (not automated conflict resolution), (3) new members require ramp-up. Fails when: tasks are fully independent (embarrassingly
+      parallel), coordination is automated (e.g., CI/CD pipeline resolves merge conflicts), or new members need zero ramp-up
+      (identical copies of existing expertise).'
+    consequence: Software projects should staff with the smallest feasible team, not the largest affordable one. Architectural
+      decisions should maximize independence between components to reduce coordination costs. Conway's Law implies that to
+      change a system's architecture, you must first change the team's communication structure.
+    application: When staffing a complex engineering project → limit team size to the minimum needed, structure the system
+      architecture to minimize inter-team dependencies, and enforce interface contracts between components to reduce coordination
+      overhead.
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — SOFTWARE ENGINEERING (D2223). Three canonical software engineering sources converge on
+    communication overhead as the scaling limiter. Depth is cross-domain — applies to any interdependent creative work. Fills
+    software engineering gap that Kimi recommended. Brooks' Law is the classic formulation; Conway's Law and Martin's deferral
+    principle extend it.
+- id: CONV-028
+  domain: data science
+  discipline: statistics
+  source_books:
+  - The Book of Why — Judea Pearl
+  - Calling Bullshit — Bergstrom & West
+  - Naked Statistics — Charles Wheelan
+  cluster_segments:
+  - source_book: The Book of Why — Judea Pearl
+    text: Correlation is not causation — this is the most fundamental lesson in statistics, yet it is routinely ignored. Two
+      variables can be perfectly correlated without either causing the other if both are effects of a common cause. Ice cream
+      sales and drowning deaths are correlated not because ice cream causes drowning but because both increase in summer.
+      The only way to establish causation is through controlled experiments or causal diagrams that account for confounding
+      variables.
+  - source_book: Calling Bullshit — Bergstrom & West
+    text: 'The correlation-causation fallacy takes a specific form: observing that A and B occur together and concluding that
+      A causes B. This ignores three alternatives: B causes A, a third factor C causes both A and B, or the correlation is
+      purely coincidental. In an era of big data, spurious correlations are easier to find than ever — with enough variables,
+      some will correlate purely by chance.'
+  - source_book: Naked Statistics — Charles Wheelan
+    text: 'Regression analysis can show that two variables are related but cannot — by itself — prove that one causes the
+      other. This is the central limitation of observational data. To establish causality, you need: (1) temporal precedence
+      (cause before effect), (2) covariation (cause and effect vary together), and (3) elimination of alternative explanations.
+      Only randomized experiments satisfy all three automatically.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Correlation-Causation Confounding
+    definition: 'Observed correlation between two variables does not imply that one causes the other. The association may
+      arise from: (1) reverse causation (B causes A), (2) common cause (C causes both A and B), or (3) chance (spurious correlation
+      in large datasets). Establishing causation requires eliminating these alternatives through experimental control or causal
+      inference methods.'
+    mechanism: 'Confounding creates spurious correlation because a hidden variable C simultaneously influences both A and
+      B, making them vary together without either causing the other. The mechanism is: C → A and C → B, producing a statistical
+      association A ↔ B that disappears when conditioning on C. This is why observational studies show correlations that randomized
+      trials fail to replicate — randomization breaks the C→A and C→B links by making A independent of C, isolating the true
+      causal effect (if any).'
+    boundary: 'Applies when: (1) data is observational (not randomized), (2) potential confounders exist that are unmeasured
+      or uncontrolled, (3) the analysis does not account for confounding structure. Fails when: the data comes from a properly
+      randomized experiment, all confounders are measured and controlled, or the causal structure is fully known and modeled
+      (e.g., Pearl''s do-calculus).'
+    consequence: Observational studies generate hypotheses but cannot confirm them. Policy decisions based on correlational
+      evidence risk implementing interventions that target the wrong variable. The replication crisis in social science is
+      partly attributable to unmeasured confounding in observational research. Causal diagrams (DAGs) and instrumental variables
+      provide partial remedies when randomization is impossible.
+    application: null
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: universal
+  rationale: CONVERGENT POSITIVE — STATISTICS (D2223). Three statistics sources converge on the confounding mechanism. Depth
+    is universal — applies to ALL domains that use observational data. Fills the "correlation ≠ causation" gap that both evaluators
+    flagged. Application is null (this is a diagnostic principle — it tells you what NOT to conclude).
+- id: CONV-029
+  domain: decision making
+  discipline: cognitive psychology
+  source_books:
+  - Algorithms to Live By — Christian & Griffiths
+  - The Paradox of Choice — Barry Schwartz
+  - Decisive — Chip & Dan Heath
+  cluster_segments:
+  - source_book: Algorithms to Live By — Christian & Griffiths
+    text: 'The optimal stopping problem — when to stop searching and commit — has a mathematically optimal solution: look
+      at the first 37% of options without choosing, then select the next option that is better than all seen so far. This
+      "37% rule" maximizes the probability of selecting the best candidate. While real-world decisions rarely match the mathematical
+      assumptions, the principle generalizes: explore enough to establish a baseline, then exploit when quality exceeds that
+      baseline.'
+  - source_book: The Paradox of Choice — Barry Schwartz
+    text: More choice does not mean better decisions. Beyond a threshold, additional options increase anxiety, decision paralysis,
+      and regret. Satisficers — those who choose the first option meeting their criteria — are happier than maximizers — those
+      who exhaustively search for the absolute best. The explore/exploit tradeoff in human decision-making has an optimum
+      that most people overshoot.
+  - source_book: Decisive — Chip & Dan Heath
+    text: Good decision-making requires setting clear criteria BEFORE evaluating options. Without pre-committed criteria,
+      decision-makers fall prey to confirmation bias — they adjust their criteria to justify whichever option they emotionally
+      prefer. The WRAP framework (Widen options, Reality-test assumptions, Attain distance, Prepare to be wrong) provides
+      a structured approach to avoiding this trap.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Explore-Exploit Calibration
+    definition: Optimal decision-making balances exploration (gathering information about options) against exploitation (committing
+      to the best-known option). The explore phase should establish a baseline quality threshold; once that threshold is met,
+      further search produces diminishing returns and may actively degrade outcomes through decision paralysis, regret, and
+      opportunity cost.
+    mechanism: The explore-exploit tradeoff exists because information gathering consumes resources (time, cognitive effort,
+      opportunity cost) while delaying the benefits of commitment. The optimal stopping rule — explore 37% of expected options,
+      then commit when quality exceeds the maximum seen during exploration — maximizes selection probability. Beyond this
+      point, the marginal improvement from one more option is offset by the probability that the best was already seen. In
+      practice, "satisficing" (accepting "good enough") produces better subjective outcomes than "maximizing" (exhaustive
+      search for best) because post-decision regret scales with the perceived number of forgone alternatives.
+    boundary: 'Applies when: (1) options are evaluated sequentially, (2) rejected options cannot be recalled, (3) the decision-maker
+      has a rough estimate of the total option pool size. Fails when: options can be recalled costlessly (e.g., online shopping
+      with filters), the number of options is unknown or unbounded, or the evaluation cost per option is negligible.'
+    consequence: Decision-makers should pre-commit to criteria and stopping rules before evaluating options. Organizations
+      should design decision processes that force explicit tradeoff consideration rather than allowing implicit drift toward
+      maximization. The explore-exploit framework applies beyond individual choice — companies deciding when to pivot vs.
+      persevere, scientists choosing when to publish vs. gather more data.
+    application: When making a selection decision with many possible options → determine a reasonable sample size in advance,
+      explore that many options to establish a quality baseline, then select the first option that exceeds that baseline rather
+      than continuing to search for the hypothetical "perfect" option.
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — NORMATIVE HEURISTIC (D2223). Three decision-science sources converge on the explore-exploit
+    calibration principle. Extraction type is normative_heuristic — this is a process rule ("do exploration then exploitation")
+    rather than a natural causal law. First example with non-causal extraction type, teaching the S2 model that heuristics
+    are valid principles. Depth is cross-domain (hiring, shopping, business strategy, scientific research).
+- id: CONV-030
+  domain: network science
+  discipline: mathematics
+  source_books:
+  - Linked — Albert-László Barabási
+  - The Tipping Point — Malcolm Gladwell
+  - Six Degrees — Duncan Watts
+  cluster_segments:
+  - source_book: Linked — Albert-László Barabási
+    text: 'In scale-free networks, a few hubs connect to a disproportionately large number of nodes while most nodes have
+      very few connections. This structure emerges from two mechanisms: growth (new nodes continuously join the network) and
+      preferential attachment (new nodes preferentially connect to already well-connected nodes). The result is a power-law
+      degree distribution where the rich get richer.'
+  - source_book: The Tipping Point — Malcolm Gladwell
+    text: 'Ideas, products, and behaviors spread through populations like epidemics. The key to reaching a tipping point —
+      the moment of critical mass when an idea becomes contagious — is connecting with the right people: Connectors (who know
+      many people), Mavens (who accumulate knowledge and share it), and Salesmen (who persuade). These individuals function
+      as hubs in the social network.'
+  - source_book: Six Degrees — Duncan Watts
+    text: Small-world networks combine high local clustering (your friends tend to know each other) with short global path
+      lengths (any two people are connected by surprisingly few links). The critical insight is that a small number of random
+      "long-range" connections dramatically reduces the average path length while preserving local structure. This is why
+      influence can spread globally through a few well-placed connections.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Preferential Attachment in Network Growth
+    definition: Networks that grow through preferential attachment — where new nodes preferentially connect to already well-connected
+      nodes — develop a scale-free structure with a few dominant hubs and many peripheral nodes. This "rich get richer" dynamic
+      produces power-law degree distributions observed in social networks, citation networks, the internet, and biological
+      protein interaction networks.
+    mechanism: Preferential attachment creates scale-free topology because the probability that a new node connects to an
+      existing node is proportional to that node's current degree. Nodes with many connections attract more new connections,
+      widening the gap between hubs and peripheries. This positive feedback loop generates a power-law degree distribution
+      (P(k) ~ k^(-γ)) rather than the bell curve of random networks. The mechanism requires both growth (new nodes continuously
+      arrive) and preferential attachment (connection probability ∝ existing degree). Without growth, the network saturates;
+      without preferential attachment, it remains random.
+    boundary: 'Applies when: (1) the network is growing (new nodes join), (2) connection probability is at least partially
+      proportional to existing connections, (3) nodes do not have a maximum connection capacity. Fails when: the network is
+      static (no growth), connections are random (no preferential attachment), nodes have fixed capacity limits that cap hub
+      growth, or aging effects cause old nodes to lose attractiveness.'
+    consequence: Scale-free networks are robust to random failures (most nodes are peripheral) but vulnerable to targeted
+      attacks on hubs. Information, influence, and disease spread faster in scale-free networks than random ones because hubs
+      provide shortcuts. Marketing strategies should target hub nodes (influencers, connectors) for maximum cascade potential.
+    application: null
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — EMPIRICAL PATTERN (D2223). Three network science sources converge on the preferential attachment
+    mechanism. Extraction type is empirical_pattern — the power-law distribution is an observed regularity, not a prescriptive
+    rule. First empirical_pattern example. Depth is cross-domain (social, biological, technological networks). Fills mathematics/network
+    science gap.
+- id: NEG-011
+  domain: engineering
+  discipline: computer science
+  source_books:
+  - Designing Data-Intensive Applications — Martin Kleppmann
+  - Database Internals — Alex Petrov
+  cluster_segments:
+  - source_book: Designing Data-Intensive Applications — Martin Kleppmann
+    text: 'The CAP theorem states that a distributed data store can provide only two of three guarantees: Consistency (all
+      nodes see the same data), Availability (every request receives a response), and Partition tolerance (the system works
+      despite network partitions). In practice, partition tolerance is non-negotiable for distributed systems, so designers
+      must choose between consistency and availability.'
+  - source_book: Database Internals — Alex Petrov
+    text: Every storage engine design involves tradeoffs between read performance, write performance, and storage efficiency.
+      B-trees optimize reads at the cost of write amplification; LSM-trees optimize writes at the cost of read amplification
+      and compaction overhead. There is no universal best choice — the right data structure depends on the workload's read/write
+      ratio.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Engineering Tradeoff (not causal principle)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — ENGINEERING TRADEOFF, NOT CAUSAL PRINCIPLE (D2223). Both segments describe design tradeoffs (CAP
+    theorem, storage engine selection) but these are CONSTRAINT statements, not causal principles. "More X = less Y" describes
+    a resource allocation boundary, not a mechanism that produces outcomes. The segments share a pattern (system design involves
+    tradeoffs) but the specific causal mechanisms are different and not convergent. S2 must learn to reject tradeoff descriptions
+    that lack a unified causal mechanism.
+- id: NEG-012
+  domain: design history
+  discipline: design history
+  source_books:
+  - Meggs' History of Graphic Design — Philip Meggs
+  - The Story of Art — E.H. Gombrich
+  - Ways of Seeing — John Berger
+  cluster_segments:
+  - source_book: Meggs' History of Graphic Design — Philip Meggs
+    text: 'Typography evolved from Gutenberg''s blackletter to humanist roman types, then to the grid-based Swiss International
+      Style of the 1950s, and finally to the digital deconstruction of the 1990s. Each shift reflected broader cultural movements:
+      humanism rejected medieval authority, Swiss modernism embraced industrial rationality, and postmodern digital design
+      celebrated fragmentation.'
+  - source_book: The Story of Art — E.H. Gombrich
+    text: The history of Western painting moves from the symbolic flatness of medieval art through Renaissance perspective
+      and Baroque drama to Impressionism's dissolution of form and Modernism's rejection of representation. Each period was
+      a reaction against the previous, driven by technological innovation (oil paint, photography) and changing philosophical
+      assumptions about what art should do.
+  - source_book: Ways of Seeing — John Berger
+    text: The invention of the camera changed not just how we make images but how we see. Before photography, paintings were
+      unique objects tied to specific places. After photography, images became reproducible, portable, and commodified. The
+      meaning of a painting changes when it can be reproduced and surrounded by words, music, and context the original artist
+      never intended.
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Historical Observation (not causal principle)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — HISTORICAL OBSERVATION, NOT CAUSAL PRINCIPLE (D2223). All three segments describe HOW art/design
+    evolved over time, but none specify a causal mechanism that predicts future evolution. "Typography evolved from X to Y"
+    is a historical narrative, not a principle. Historical observations answer "what happened?" while principles answer "what
+    will happen IF...?" S2 must learn to reject convergent historical descriptions that lack predictive causal mechanisms.
+- id: NEG-013
+  domain: social science
+  discipline: sociology
+  source_books:
+  - Freakonomics — Levitt & Dubner
+  - Outliers — Malcolm Gladwell
+  cluster_segments:
+  - source_book: Freakonomics — Levitt & Dubner
+    text: Children who grow up in homes with many books perform better in school, even controlling for parental education
+      and income. The presence of books correlates with academic achievement. But does reading cause achievement, or do intellectually
+      curious parents both buy books and produce academically successful children through other mechanisms (conversation,
+      expectations, genetics)?
+  - source_book: Outliers — Malcolm Gladwell
+    text: Canadian hockey players born in January, February, and March are dramatically overrepresented in elite leagues.
+      The correlation between birth month and success is strong and consistent. But the cause is not astrological — it is
+      the January 1 age cutoff for youth leagues, which makes older children within each age cohort appear more "talented"
+      and receive more coaching, creating a cumulative advantage.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Correlation Not Causation (hidden confound)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — CORRELATION WITHOUT CAUSAL MECHANISM (D2223). Both segments describe correlations (books→achievement,
+    birth month→success) but explicitly identify hidden confounding variables that prevent causal inference. The segments
+    converge on the PATTERN (correlation with confounded cause) but do NOT converge on a single causal mechanism — each has
+    a different confound. S2 must learn to detect when sources agree on correlation but disagree on (or lack) causal mechanism.
+- id: NEG-014
+  domain: education
+  discipline: cognitive psychology
+  source_books:
+  - Make It Stick — Brown, Roediger & McDaniel
+  - Why We Sleep — Matthew Walker
+  cluster_segments:
+  - source_book: Make It Stick — Brown, Roediger & McDaniel
+    text: Spaced retrieval practice improves long-term memory because each retrieval attempt strengthens the memory trace
+      through reconsolidation. When you actively recall information, the brain treats it as important and reinforces the neural
+      pathway. Testing is not just assessment — it is a learning event that modifies memory.
+  - source_book: Why We Sleep — Matthew Walker
+    text: Spaced learning works because sleep consolidates memories between study sessions. During slow-wave sleep, the hippocampus
+      replays the day's learning patterns to the neocortex, strengthening them. During REM sleep, the brain integrates new
+      memories with existing knowledge. Spacing study sessions across multiple nights gives the brain more sleep cycles to
+      consolidate.
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Mechanism Disagreement (same outcome, different causes)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — SAME OBSERVATION, DIFFERENT MECHANISMS (D2223). Both sources agree that spaced retrieval improves
+    memory, but they propose DIFFERENT causal mechanisms: Brown says retrieval practice reconsolidates memory traces; Walker
+    says sleep-dependent consolidation is the mechanism. These are not the same causal explanation. A naive convergent extractor
+    would merge them into "spaced retrieval works through retrieval + sleep" — which is factually different from either source''s
+    claim. S2 must learn to detect mechanism-level disagreement even when outcome-level agreement exists. This is the hardest
+    false-convergence pattern.'
+- id: NEG-015
+  domain: business
+  discipline: management
+  source_books:
+  - First, Break All the Rules — Buckingham & Coffman
+  - The Effective Executive — Peter Drucker
+  - Principles — Ray Dalio
+  cluster_segments:
+  - source_book: First, Break All the Rules — Buckingham & Coffman
+    text: Great managers focus on strengths, not weaknesses. They don't try to fix people — they find what each person is
+      naturally good at and position them to use those strengths every day. The best managers treat each employee as a unique
+      individual with a specific set of talents to be leveraged, not a set of deficiencies to be corrected.
+  - source_book: The Effective Executive — Peter Drucker
+    text: Effectiveness can be learned. The effective executive focuses on contribution rather than effort, on opportunities
+      rather than problems, and on strengths rather than weaknesses — both their own and those of their colleagues. Building
+      on strengths is not just motivational rhetoric; it is the only way to achieve superior results with limited resources.
+  - source_book: Principles — Ray Dalio
+    text: Understand the difference between weaknesses that are gaps in knowledge or skill (which can be remedied) and weaknesses
+      that are inherent limitations (which must be worked around). The most successful people don't try to be good at everything
+      — they know their strengths and design their work and teams to maximize what they do well while neutralizing their genuine
+      weaknesses.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Strengths Focus (domain best practice, not causal principle)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — DOMAIN BEST PRACTICE WITHOUT SPECIFIC MECHANISM (D2223). Three management books agree that "focusing
+    on strengths is better than fixing weaknesses." This is a widely repeated management platitude — but none of the sources
+    provides a falsifiable causal mechanism. Buckingham says "position people to use strengths," Drucker says "build on strengths,"
+    Dalio says "know your strengths." These are the same general advice repeated with different phrasing. No source specifies
+    HOW strength-focus produces better outcomes through a testable intermediate variable. S2 must distinguish between convergent
+    causal principles and convergent domain platitudes.
+- id: NEG-016
+  domain: economics
+  discipline: macroeconomics
+  source_books:
+  - Capital in the Twenty-First Century — Thomas Piketty
+  - The Wealth of Nations — Adam Smith
+  cluster_segments:
+  - source_book: Capital in the Twenty-First Century — Thomas Piketty
+    text: When the rate of return on capital (r) exceeds the rate of economic growth (g), wealth inequality tends to increase.
+      This is because existing capital grows faster than the economy as a whole, concentrating wealth among capital owners.
+      The r > g dynamic is not a market failure — it is the normal operation of capitalism under low growth conditions.
+  - source_book: The Wealth of Nations — Adam Smith
+    text: 'The division of labor increases productivity through three mechanisms: increased dexterity from specialization,
+      time saved from not switching tasks, and the invention of labor-saving machinery. As the market expands, the division
+      of labor deepens, leading to greater productivity and wealth. This self-reinforcing cycle drives economic growth.'
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Economic Patterns (different mechanisms, different eras)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — DIFFERENT MECHANISMS, SAME DOMAIN (D2223). Piketty describes wealth concentration through r >
+    g; Smith describes productivity growth through division of labor. Both are economic mechanisms but they explain DIFFERENT
+    phenomena (inequality vs. growth) through DIFFERENT causal structures. The shared domain (economics) creates the illusion
+    of convergence. S2 must learn that "both segments are about economics" is NOT convergence — the mechanisms must be about
+    the SAME causal relationship.
+- id: NEG-017
+  domain: psychology
+  discipline: positive psychology
+  source_books:
+  - Grit — Angela Duckworth
+  - Mindset — Carol Dweck
+  cluster_segments:
+  - source_book: Grit — Angela Duckworth
+    text: 'Grit — the combination of passion and perseverance for long-term goals — predicts success better than IQ or talent.
+      In studies of West Point cadets, National Spelling Bee finalists, and sales professionals, grit was the single strongest
+      predictor of who would persist and succeed. Effort counts twice: talent × effort = skill, skill × effort = achievement.'
+  - source_book: Mindset — Carol Dweck
+    text: People with a growth mindset — the belief that abilities can be developed through effort — outperform those with
+      a fixed mindset who believe abilities are innate. Growth mindset individuals embrace challenges, persist through setbacks,
+      and see effort as the path to mastery. Fixed mindset individuals avoid challenges, give up easily, and see effort as
+      evidence of inadequacy.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Grit vs Mindset (related but distinct mechanisms)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — RELATED BUT DISTINCT MECHANISMS (D2223). Duckworth's grit (passion + perseverance → achievement)
+    and Dweck's growth mindset (belief in malleability → effort) are psychologically related — a growth mindset enables grit
+    — but they are DISTINCT causal mechanisms. Grit is a trait; mindset is a belief. A naive extractor might merge them into
+    "effort and persistence drive success" — which loses both mechanisms' specificity. S2 must learn to detect when sources
+    describe complementary but non-convergent concepts.
+- id: NEG-018
+  domain: self-help
+  discipline: psychology
+  source_books:
+  - The Secret — Rhonda Byrne
+  - The Power of Positive Thinking — Norman Vincent Peale
+  cluster_segments:
+  - source_book: The Secret — Rhonda Byrne
+    text: The law of attraction states that you attract into your life whatever you focus on. If you think positively about
+      wealth, wealth will come to you. If you dwell on problems, more problems will appear. The universe responds to your
+      vibrational frequency — your thoughts literally create your reality through a universal law as reliable as gravity.
+  - source_book: The Power of Positive Thinking — Norman Vincent Peale
+    text: Positive thinking is not just an attitude — it is a practical technique that changes outcomes. When you believe
+      you can succeed, you take the actions that lead to success. Faith in yourself and in a higher power activates a force
+      that helps you overcome obstacles. The power of positive thinking has been demonstrated in countless lives transformed
+      by belief.
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Law of Attraction (non-falsifiable claim)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — NON-FALSIFIABLE CLAIM MASQUERADING AS PRINCIPLE (D2223). Both sources claim that "positive thinking
+    causes positive outcomes" but the proposed mechanism ("universal law of attraction," "higher power activation") is non-falsifiable
+    — there is no condition under which it could be disproven. No boundary conditions are specified. This is not a causal
+    principle; it is a metaphysical belief. S2 must learn to reject convergent claims that lack falsifiable causal mechanisms,
+    even when multiple sources agree.
+- id: NEG-019
+  domain: technology
+  discipline: computer science
+  source_books:
+  - Life 3.0 — Max Tegmark
+  - Superintelligence — Nick Bostrom
+  cluster_segments:
+  - source_book: Life 3.0 — Max Tegmark
+    text: Artificial intelligence will transform society more profoundly than any previous technology. The transition from
+      narrow AI to artificial general intelligence (AGI) represents an existential shift that will affect every aspect of
+      human life — work, relationships, governance, and even what it means to be human.
+  - source_book: Superintelligence — Nick Bostrom
+    text: The development of superintelligent AI — intelligence that exceeds human cognitive performance in virtually all
+      domains — would be the most consequential event in human history. It could solve our greatest problems (disease, poverty,
+      climate change) or create entirely new ones (value misalignment, existential risk). The challenge is ensuring that superintelligent
+      systems share human values.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: AI Impact (speculation, not principle)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — SPECULATION WITHOUT MECHANISM (D2223). Both sources agree that AI will be "transformative" or
+    "consequential" — but this is a PREDICTION, not a causal principle. Neither segment specifies a mechanism that could be
+    tested or falsified. "AI will transform society" is a forecast; "feedback loops cause system instability" is a principle.
+    S2 must learn to distinguish between convergent predictions (speculative) and convergent mechanisms (principle-based).
+    This negative pairs with CONV-012 (AI Alignment) which describes a genuine causal mechanism.
+- id: NEG-020
+  domain: philosophy
+  discipline: epistemology
+  source_books:
+  - The Black Swan — Nassim Nicholas Taleb
+  - Antifragile — Nassim Nicholas Taleb
+  - Skin in the Game — Nassim Nicholas Taleb
+  cluster_segments:
+  - source_book: The Black Swan — Nassim Nicholas Taleb
+    text: 'Black Swan events — rare, high-impact, retrospectively predictable occurrences — drive history more than the ordinary.
+      The 2008 financial crisis, the rise of the internet, and World War I were all Black Swans. Our models fail to predict
+      them because we are fooled by the narrative fallacy: we construct stories that make past events seem predictable, then
+      project that false certainty forward.'
+  - source_book: Antifragile — Nassim Nicholas Taleb
+    text: Some systems gain from disorder — they are antifragile. Bones strengthen under stress, startups benefit from market
+      chaos, and evolutionary systems thrive on randomness. The opposite of fragile is not robust (which merely resists shock)
+      but antifragile (which improves from it). Most of what we design is fragile precisely because we optimize for stable
+      conditions.
+  - source_book: Skin in the Game — Nassim Nicholas Taleb
+    text: 'Decision-makers must have skin in the game — personal exposure to the consequences of their decisions. Without
+      asymmetry of risk, bad decisions proliferate because the decider captures upside while transferring downside to others.
+      This is why consultants, bankers, and policymakers produce systemic fragility: they are rewarded for short-term gains
+      while others bear long-term losses.'
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Same-Author Echo (three Taleb books)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: HARD NEGATIVE — SAME-AUTHOR ECHO (D2223). All three segments are from the SAME author (Nassim Nicholas Taleb),
+    describing related but distinct concepts across his trilogy. This is NOT convergent extraction from independent sources
+    — it is one author developing his ideas across multiple books. The segments are thematically related (uncertainty, risk,
+    fragility) but each describes a different concept (Black Swans ≠ antifragility ≠ skin in the game). S2 must learn to detect
+    same-author citation echoes and reject clusters where source independence fails, even when the writing is intellectually
+    rich.

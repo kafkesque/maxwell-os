@@ -1,0 +1,835 @@
+meta:
+  version: 4.1-trimmed
+  architecture: cluster-before-extract
+  total_examples: 12
+  convergent_positives: 6
+  hard_negatives: 6
+  trimmed_from: 50
+  selection_criterion: Maximum information density — one example per failure mode and extraction type
+  calibrated_date: '2026-08-09'
+  notes: 'D2224: Trimmed few-shot for efficient S2 extraction. 12 examples selected from 50-example full set. Preserves coverage
+    of all extraction types, depths, and failure modes while reducing prompt tokens by ~76%.'
+examples:
+- id: CONV-001
+  domain: pricing
+  source_books:
+  - Predictably Irrational — Dan Ariely
+  - Thinking, Fast and Slow — Daniel Kahneman
+  - Priceless — William Poundstone
+  cluster_segments:
+  - source_book: Predictably Irrational — Dan Ariely
+    text: 'The Economist''s subscription page became a famous case study. They offered three options:
+
+      Web-only for $59, Print-only for $125, and Print+Web for $125. The Print-only option was
+
+      the decoy — nobody chose it, but its presence made Print+Web look like a bargain. Dan Ariely
+
+      tested this with his students: when the decoy was present, 84% chose Print+Web. When he
+
+      removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web.
+
+      '
+  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+    text: 'The dominance relationship makes choices easier. When A dominates B in all respects, people
+
+      choose A without hesitation. But when A is better than B on some dimensions and worse on
+
+      others, choice becomes difficult and people often defer. This is why adding a clearly inferior
+
+      option that is dominated by the target can increase the target''s share dramatically.
+
+      '
+  - source_book: Priceless — William Poundstone
+    text: 'Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger,
+
+      deluxe model for $429. The $279 model suddenly looked reasonable and sales nearly doubled.
+
+      The expensive model wasn''t meant to sell; it was there to make the original look like a
+
+      good deal. This is asymmetric dominance at work in retail.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Asymmetric Dominance Decoy
+    definition: 'Introducing an inferior decoy option that is dominated by a target option on all salient
+
+      dimensions shifts choice toward the target by making its relative value obvious. The decoy
+
+      is not meant to be chosen — it exists solely to make the target appear superior through
+
+      contrast, exploiting the human preference for easy dominance comparisons over difficult
+
+      trade-off evaluations.
+
+      '
+    mechanism: 'Decoys cause preference shifts because System 1 (intuitive) reasoning resolves dominance
+
+      comparisons effortlessly, while trade-off comparisons between non-dominated options trigger
+
+      System 2 (deliberative) reasoning that often results in choice deferral. The decoy
+
+      eliminates the need for difficult trade-off analysis by providing an obvious loser.
+
+      '
+    boundary: 'Applies when the decoy is clearly inferior to the target on all relevant dimensions AND
+
+      the target and competitor are difficult to compare directly (each has advantages). Fails
+
+      when: (1) the decoy is not clearly dominated — if it has ANY advantage over the target,
+
+      it becomes a legitimate option; (2) the target and competitor are already easily comparable
+
+      — no need for a decoy; (3) consumers have strong pre-existing preferences that overwhelm
+
+      contextual cues.
+
+      '
+    consequence: 'Markets structured with decoy options produce systematically different choices than markets
+
+      with only genuinely competitive options. This means the same consumer with the same true
+
+      preferences will make different choices depending on whether a decoy is present — the
+
+      preference is constructed at the moment of choice, not revealed by it.
+
+      '
+    evidence_passages:
+    - when the decoy was present, 84% chose Print+Web
+    - When he removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web
+    - adding a clearly inferior option that is dominated by the target can increase the target's share dramatically
+    - Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for $429. The
+      $279 model suddenly looked reasonable and sales nearly doubled
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: domain
+  rationale: 'Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases
+
+    (Economist subscriptions, general dominance logic, Williams-Sonoma bread makers) converging
+
+    on the same mechanism. Convergent extraction MUST synthesize across all sources, not paraphrase
+
+    any single one. The mechanism/boundary/consequence structure forces the LLM to go beyond
+
+    observation ("decoys work") to explanation ("they work because...") and limits ("they fail when...").
+
+    '
+  discipline: behavioral economics
+- id: CONV-012
+  domain: ai & agents
+  discipline: machine learning
+  source_books:
+  - 'Superintelligence: Paths, Dangers, Strategies — Nick Bostrom'
+  - Human Compatible — Stuart Russell
+  - The Alignment Problem — Brian Christian
+  cluster_segments:
+  - source_book: Human Compatible — Stuart Russell
+    text: 'The alignment problem asks how we can ensure that AI systems reliably pursue the
+
+      objectives we actually intend, rather than the literal specification we write. Russell
+
+      argues that specifying the objective precisely is impossible for complex real-world
+
+      values, so we must design systems that are uncertain about the objective and defer to
+
+      human preferences as they are observed.
+
+      '
+  - source_book: The Alignment Problem — Brian Christian
+    text: 'Reinforcement learning from human feedback (RLHF) emerged as a practical method for
+
+      aligning language models: first train the base model, then collect human preference
+
+      comparisons between model outputs, then train a reward model that predicts human
+
+      preferences, and finally optimize the policy against that reward model. Each step
+
+      introduces its own failure modes — reward hacking, distribution shift, and overfitting
+
+      to the preference dataset.
+
+      '
+  - source_book: 'Superintelligence: Paths, Dangers, Strategies — Nick Bostrom'
+    text: 'The orthogonality thesis holds that intelligence and final goals are orthogonal:
+
+      more or less any level of intelligence could in principle be combined with more or less
+
+      any final goal. This means a superintelligent agent with a misspecified objective
+
+      will pursue the letter of that objective in ways its designers never intended.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Objective Uncertainty in AI Alignment
+    definition: 'AI systems should be designed with explicit uncertainty about the true objective and
+
+      must learn human preferences from behavior, because any formally specified utility
+
+      function is incomplete. This is the core architectural principle of aligned AI.
+
+      '
+    mechanism: 'When an AI system is certain about a misspecified objective, it optimizes that
+
+      objective to the point of harmful behavior (reward hacking). When it is uncertain and
+
+      must query human preference, it maintains an outer loop of preference learning that
+
+      corrects for specification errors.
+
+      '
+    consequence: 'Systems that assume complete specifications (command-and-control) produce
+
+      optimization failures; systems that model uncertainty (assistance game) remain
+
+      reversible and corrigible. This is a necessary — not sufficient — condition for safe AI.
+
+      '
+    boundary: 'Applies to AI systems that can act autonomously in high-stakes domains. Fails when:
+
+      (1) human preferences are themselves inconsistent or pathological; (2) the preference
+
+      signal is too noisy to learn from; (3) the system is deployed before the alignment loop
+
+      has converged.
+
+      '
+    evidence_passages:
+    - specifying the objective precisely is impossible for complex real-world values
+    - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
+    - intelligence and final goals are orthogonal
+    depth: universal
+    evidence: cited
+    jargon:
+    - reward hacking
+    - RLHF
+    - assistance game
+    - corrigibility
+    keywords:
+    - AI alignment
+    - objective specification
+    - preference learning
+    application: AI safety engineering, LLM fine-tuning pipelines, agent design
+    elaboration: 'The ''assistance game'' formulation (Russell) models AI as an assistant that is
+
+      uncertain about the objective and learns it from human actions and corrections. This
+
+      contrasts with the classical agent formulation where the objective is fully specified
+
+      in advance.'
+    prerequisite_fbs:
+    - 'RLHF-PIPE-001: Preference Data Collection'
+    contradicts_fbs:
+    - 'SPEC-FULL-001: Complete Specification Assumption'
+    related_fbs:
+    - 'GRAD-DESC-001: Reward Gradient Optimization'
+    procedural_skill: 'When designing an AI system for a real-world task: (1) treat any written objective
+
+      as a hypothesis, not a specification; (2) design a preference observation channel;
+
+      (3) include a correction loop with human oversight; (4) test for reward hacking before
+
+      deployment; (5) document the specification''s known incompleteness.
+
+      '
+    failure_mode: 'If the reward model is trained on biased or narrow preference data, the aligned
+
+      system will optimize the biased proxy, appearing aligned on benchmarks while failing
+
+      on edge cases. Fix: diversify preference data and add adversarial evaluation.
+
+      '
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'Three AI references (Bostrom, Russell, and Christian) converge on objective
+
+    uncertainty as the foundational alignment principle. Demonstrates AI & Computing group,
+
+    contradicts_fbs, prerequisite_fbs, procedural_skill.
+
+    '
+- id: CONV-017
+  domain: education
+  discipline: cognitive science
+  source_books:
+  - Make It Stick — Peter Brown
+  - Moonwalking with Einstein — Joshua Foer
+  - Why We Sleep — Matthew Walker
+  cluster_segments:
+  - source_book: Make It Stick — Peter Brown
+    text: 'Spaced practice is far more effective than massed practice. Retrieving a memory
+
+      at increasing intervals strengthens it because each retrieval is harder and
+
+      requires deeper reconstruction. Cramming produces short-term gains that fade
+
+      quickly, while spaced retrieval produces durable long-term learning.
+
+      '
+  - source_book: Moonwalking with Einstein — Joshua Foer
+    text: 'Memory athletes do not have exceptional brains — they use systematic techniques.
+
+      The spacing effect is the single most powerful memory technique: reviewing
+
+      material at expanding intervals produces dramatically better retention than
+
+      equal-interval or massed review.
+
+      '
+  - source_book: Why We Sleep — Matthew Walker
+    text: 'Sleep consolidates memory. Memories are transferred from the hippocampus to the
+
+      neocortex during sleep, making them stable and integrated. This is why spaced
+
+      practice with sleep between sessions works better than cramming — each sleep
+
+      period consolidates what was practiced that day.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Spaced Retrieval Practice
+    definition: 'Retrieving information at expanding intervals produces dramatically more durable
+
+      learning than massed practice (cramming). Each spaced retrieval forces deeper
+
+      reconstruction of the memory, and intervening sleep consolidates it into
+
+      long-term storage.
+
+      '
+    mechanism: 'Spaced retrieval works through the testing effect (retrieval strengthens memory
+
+      more than re-study) amplified by the spacing effect (intervals allow partial
+
+      forgetting that makes retrieval effortful) and sleep consolidation (hippocampal-
+
+      neocortical transfer during sleep stabilizes memories).
+
+      '
+    consequence: 'Learners using spaced retrieval retain substantially more after weeks and months
+
+      than learners who crammed the same total time. The effect is robust across
+
+      subjects, ages, and materials.
+
+      '
+    boundary: 'Applies to declarative knowledge and procedural skills. Fails when: (1) the
+
+      material must be recalled within hours (urgent exam) — spacing still helps but
+
+      massed practice is faster for same-day recall; (2) the learner does not actually
+
+      retrieve (re-reading is not retrieval practice); (3) intervals are too long,
+
+      causing complete forgetting before the next review.
+
+      '
+    evidence_passages:
+    - Spaced practice is far more effective than massed practice
+    - The spacing effect is the single most powerful memory technique
+    - each sleep period consolidates what was practiced that day
+    depth: universal
+    evidence: cited
+    jargon:
+    - testing effect
+    - spacing effect
+    - hippocampal-neocortical transfer
+    keywords:
+    - spaced repetition
+    - memory
+    - retrieval
+    - learning
+    application: Study systems, corporate training, language learning (Anki, SuperMemo)
+    elaboration: 'The spacing effect is one of the most replicated findings in cognitive psychology
+
+      (first demonstrated by Ebbinghaus in 1885) and is the theoretical basis of
+
+      spaced repetition software (SRS).'
+    prerequisite_fbs:
+    - 'RETRIEVAL-BASE-001: Retrieval Practice Basics'
+    contradicts_fbs:
+    - 'CRAMMING-001: Massed Practice Efficacy'
+    related_fbs:
+    - 'SLEEP-CONSOL-001: Sleep Consolidation'
+    procedural_skill: 'Design a spaced repetition schedule: Day 0 (learn), Day 1 (first recall), Day 3,
+
+      Day 7, Day 14, Day 30. Each review must be active retrieval (cover the answer,
+
+      recall it, then check) — never passive re-reading. Adjust intervals when recall
+
+      fails (shorten) or succeeds easily (lengthen).
+
+      '
+    failure_mode: 'SRS systems fail when users treat reviews as re-reading sessions: without active
+
+      retrieval, the spacing effect collapses and retention matches massed practice.
+
+      '
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'Brown, Foer, and Walker converge on spaced retrieval with distinct mechanisms
+
+    (testing effect, spacing effect, sleep consolidation). Demonstrates education domain,
+
+    procedural_skill, contradicts_fbs.
+
+    '
+- id: CONV-022
+  domain: computer graphics
+  discipline: computational geometry
+  source_books:
+  - 'Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes'
+  - SVG Essentials — J. David Eisenberg
+  cluster_segments:
+  - source_book: 'Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes'
+    text: 'Bezier curves are defined by control points: two endpoints that the curve passes through, and intermediate anchor
+      points that pull the curve toward them without being touched. The curve is computed as a weighted blend of these control
+      points using Bernstein polynomials. Moving an anchor point changes the curve''s shape in a predictable way — pulling
+      it further from the line between endpoints increases the curve''s deviation. This is the fundamental mechanism underlying
+      all vector drawing tools, font outlines, and motion paths.
+
+      '
+  - source_book: SVG Essentials — J. David Eisenberg
+    text: 'In SVG, the C (cubic Bezier) command takes three coordinate pairs: two control points and one endpoint. The curve
+      starts at the current point, is attracted toward the two control points, and ends at the specified endpoint. Mastering
+      Bezier curves means understanding how the position of each control point affects the resulting curve — control points
+      closer to the endpoint create sharper turns, while control points further away create gentler arcs. The ''pen tool''
+      in every vector graphics application is fundamentally a Bezier curve editor.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Anchor Point Control
+    definition: 'Bezier curves are defined by anchor points (control points) that attract the curve path toward them without
+      being touched. The curve is computed as a weighted parametric blend of these control points. Moving anchor points changes
+      the curve''s shape in predictable ways — closer control points create sharper directional changes, while more distant
+      control points produce gentler arcs.
+
+      '
+    mechanism: 'Anchor points control curve shape through weighted blending (Bernstein polynomials for Bezier curves). Each
+      control point exerts a gravitational pull on the curve proportional to its distance from the path — the closer a control
+      point is to the line between endpoints, the less it deflects the curve; the further it is, the more it pulls the curve
+      toward itself. Because the blending functions are smooth polynomials, the resulting curve is always continuous and differentiable,
+      ensuring visually smooth shapes.
+
+      '
+    boundary: 'Applies specifically to parametric curve representations (Bezier curves, B-splines, NURBS) in vector graphics
+      and CAD systems. Fails when applied to raster graphics (pixel-based), implicit curve representations, or procedural
+      generation methods that do not use control-point-based parametric blending.
+
+      '
+    consequence: 'Graphic designers and CAD operators can precisely control curve shapes by strategically placing anchor points.
+      The ability to predict how a control point''s position affects the resulting curve enables precise shape editing without
+      trial and error. This principle underlies all pen tools, font design software, and motion path editors.
+
+      '
+    application: null
+    elaboration: ''
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: domain
+  rationale: 'CONVERGENT POSITIVE — SPECIALIZED SUB-FIELD PRINCIPLE (D2221). Two independent computer graphics sources converge
+    on the same mechanism: Bernstein polynomial blending of control points. Depth is specialized — this is tool-bound (vector
+    graphics software) and sub-field specific (computational geometry within computer graphics). A genuine specialized positive
+    is essential for teaching S2 that valid principles can exist at narrow scope. Application is null because this is a descriptive
+    technical mechanism rather than a prescriptive technique.'
+- id: CONV-029
+  domain: decision making
+  discipline: cognitive psychology
+  source_books:
+  - Algorithms to Live By — Christian & Griffiths
+  - The Paradox of Choice — Barry Schwartz
+  - Decisive — Chip & Dan Heath
+  cluster_segments:
+  - source_book: Algorithms to Live By — Christian & Griffiths
+    text: 'The optimal stopping problem — when to stop searching and commit — has a mathematically optimal solution: look
+      at the first 37% of options without choosing, then select the next option that is better than all seen so far. This
+      "37% rule" maximizes the probability of selecting the best candidate. While real-world decisions rarely match the mathematical
+      assumptions, the principle generalizes: explore enough to establish a baseline, then exploit when quality exceeds that
+      baseline.'
+  - source_book: The Paradox of Choice — Barry Schwartz
+    text: More choice does not mean better decisions. Beyond a threshold, additional options increase anxiety, decision paralysis,
+      and regret. Satisficers — those who choose the first option meeting their criteria — are happier than maximizers — those
+      who exhaustively search for the absolute best. The explore/exploit tradeoff in human decision-making has an optimum
+      that most people overshoot.
+  - source_book: Decisive — Chip & Dan Heath
+    text: Good decision-making requires setting clear criteria BEFORE evaluating options. Without pre-committed criteria,
+      decision-makers fall prey to confirmation bias — they adjust their criteria to justify whichever option they emotionally
+      prefer. The WRAP framework (Widen options, Reality-test assumptions, Attain distance, Prepare to be wrong) provides
+      a structured approach to avoiding this trap.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Explore-Exploit Calibration
+    definition: Optimal decision-making balances exploration (gathering information about options) against exploitation (committing
+      to the best-known option). The explore phase should establish a baseline quality threshold; once that threshold is met,
+      further search produces diminishing returns and may actively degrade outcomes through decision paralysis, regret, and
+      opportunity cost.
+    mechanism: The explore-exploit tradeoff exists because information gathering consumes resources (time, cognitive effort,
+      opportunity cost) while delaying the benefits of commitment. The optimal stopping rule — explore 37% of expected options,
+      then commit when quality exceeds the maximum seen during exploration — maximizes selection probability. Beyond this
+      point, the marginal improvement from one more option is offset by the probability that the best was already seen. In
+      practice, "satisficing" (accepting "good enough") produces better subjective outcomes than "maximizing" (exhaustive
+      search for best) because post-decision regret scales with the perceived number of forgone alternatives.
+    boundary: 'Applies when: (1) options are evaluated sequentially, (2) rejected options cannot be recalled, (3) the decision-maker
+      has a rough estimate of the total option pool size. Fails when: options can be recalled costlessly (e.g., online shopping
+      with filters), the number of options is unknown or unbounded, or the evaluation cost per option is negligible.'
+    consequence: Decision-makers should pre-commit to criteria and stopping rules before evaluating options. Organizations
+      should design decision processes that force explicit tradeoff consideration rather than allowing implicit drift toward
+      maximization. The explore-exploit framework applies beyond individual choice — companies deciding when to pivot vs.
+      persevere, scientists choosing when to publish vs. gather more data.
+    application: When making a selection decision with many possible options → determine a reasonable sample size in advance,
+      explore that many options to establish a quality baseline, then select the first option that exceeds that baseline rather
+      than continuing to search for the hypothetical "perfect" option.
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — NORMATIVE HEURISTIC (D2223). Three decision-science sources converge on the explore-exploit
+    calibration principle. Extraction type is normative_heuristic — this is a process rule ("do exploration then exploitation")
+    rather than a natural causal law. First example with non-causal extraction type, teaching the S2 model that heuristics
+    are valid principles. Depth is cross-domain (hiring, shopping, business strategy, scientific research).
+- id: CONV-030
+  domain: network science
+  discipline: mathematics
+  source_books:
+  - Linked — Albert-László Barabási
+  - The Tipping Point — Malcolm Gladwell
+  - Six Degrees — Duncan Watts
+  cluster_segments:
+  - source_book: Linked — Albert-László Barabási
+    text: 'In scale-free networks, a few hubs connect to a disproportionately large number of nodes while most nodes have
+      very few connections. This structure emerges from two mechanisms: growth (new nodes continuously join the network) and
+      preferential attachment (new nodes preferentially connect to already well-connected nodes). The result is a power-law
+      degree distribution where the rich get richer.'
+  - source_book: The Tipping Point — Malcolm Gladwell
+    text: 'Ideas, products, and behaviors spread through populations like epidemics. The key to reaching a tipping point —
+      the moment of critical mass when an idea becomes contagious — is connecting with the right people: Connectors (who know
+      many people), Mavens (who accumulate knowledge and share it), and Salesmen (who persuade). These individuals function
+      as hubs in the social network.'
+  - source_book: Six Degrees — Duncan Watts
+    text: Small-world networks combine high local clustering (your friends tend to know each other) with short global path
+      lengths (any two people are connected by surprisingly few links). The critical insight is that a small number of random
+      "long-range" connections dramatically reduces the average path length while preserving local structure. This is why
+      influence can spread globally through a few well-placed connections.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Preferential Attachment in Network Growth
+    definition: Networks that grow through preferential attachment — where new nodes preferentially connect to already well-connected
+      nodes — develop a scale-free structure with a few dominant hubs and many peripheral nodes. This "rich get richer" dynamic
+      produces power-law degree distributions observed in social networks, citation networks, the internet, and biological
+      protein interaction networks.
+    mechanism: Preferential attachment creates scale-free topology because the probability that a new node connects to an
+      existing node is proportional to that node's current degree. Nodes with many connections attract more new connections,
+      widening the gap between hubs and peripheries. This positive feedback loop generates a power-law degree distribution
+      (P(k) ~ k^(-γ)) rather than the bell curve of random networks. The mechanism requires both growth (new nodes continuously
+      arrive) and preferential attachment (connection probability ∝ existing degree). Without growth, the network saturates;
+      without preferential attachment, it remains random.
+    boundary: 'Applies when: (1) the network is growing (new nodes join), (2) connection probability is at least partially
+      proportional to existing connections, (3) nodes do not have a maximum connection capacity. Fails when: the network is
+      static (no growth), connections are random (no preferential attachment), nodes have fixed capacity limits that cap hub
+      growth, or aging effects cause old nodes to lose attractiveness.'
+    consequence: Scale-free networks are robust to random failures (most nodes are peripheral) but vulnerable to targeted
+      attacks on hubs. Information, influence, and disease spread faster in scale-free networks than random ones because hubs
+      provide shortcuts. Marketing strategies should target hub nodes (influencers, connectors) for maximum cascade potential.
+    application: null
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — EMPIRICAL PATTERN (D2223). Three network science sources converge on the preferential attachment
+    mechanism. Extraction type is empirical_pattern — the power-law distribution is an observed regularity, not a prescriptive
+    rule. First empirical_pattern example. Depth is cross-domain (social, biological, technological networks). Fills mathematics/network
+    science gap.
+- id: NEG-CONV-002
+  domain: business
+  source_books:
+  - Good to Great — Jim Collins
+  - Built to Last — Jim Collins
+  cluster_segments:
+  - source_book: Good to Great — Jim Collins
+    text: 'Great companies have great people. The right people are the most important asset of any
+
+      organization. Getting the right people on the bus and in the right seats is the first
+
+      step to building a great company.
+
+      '
+  - source_book: Built to Last — Jim Collins
+    text: 'Visionary companies prioritize people development. They invest heavily in training and
+
+      create cultures where talented people can thrive and grow. The commitment to people
+
+      is what separates the truly great companies from the merely good ones.
+
+      '
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE: Both segments say "good people are important" in different words. This is
+
+    a platitude, not a principle. There is no mechanism (HOW do great people cause great
+
+    outcomes?), no boundary (when does great talent NOT help?), no testable consequence. All
+
+    segments agree, but they agree on a truism. Stage 2 should detect the absence of causal
+
+    mechanism and reject this cluster. Even though there are 2 sources, having multiple sources
+
+    echoing the same platitude does not create a convergent principle.
+
+
+    NOTE: Collins'' "First Who, Then What" IS a defended principle with a mechanism in Good to
+
+    Great (Chapter 3: rigorous people decisions → right people self-motivate → no need for
+
+    heavy management). However, the EXCERPTS selected for this cluster deliberately omit that
+
+    mechanism. This teaches the LLM to evaluate the cluster it RECEIVES — not the books it
+
+    recognizes — and reject when the provided segments lack causal depth, even if the source
+
+    material contains it elsewhere.
+
+    '
+- id: NEG-CONV-003
+  domain: management
+  source_books:
+  - Thanks for the Feedback — Douglas Stone & Sheila Heen
+  - Reinventing Organizations — Frederic Laloux
+  cluster_segments:
+  - source_book: Thanks for the Feedback — Douglas Stone & Sheila Heen
+    text: 'Receiving feedback triggers one of three reactions: truth-triggers (is this accurate?), relationship-triggers (what
+      does this say about our relationship?), and identity-triggers (what does this say about who I am?). The key to receiving
+      feedback well is recognizing which trigger is firing and separating the message from the emotional reaction. Even well-intentioned
+      feedback can provoke defensiveness if it threatens the recipient''s sense of competence or belonging.'
+  - source_book: Reinventing Organizations — Frederic Laloux
+    text: Self-managing organizations replace hierarchical oversight with peer-based feedback loops. Instead of a manager
+      conducting annual reviews, colleagues give real-time feedback through structured processes like the "advice process"
+      — anyone can make a decision, but must first seek advice from affected parties and subject-matter experts. This distributes
+      feedback across the organization and makes it a continuous, operational function rather than a periodic, evaluative
+      one.
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — FALSE CONVERGENCE. Both segments use the word "feedback" and discuss its role in organizations,
+    creating a strong topical overlap. But they operate at completely different levels of analysis: Stone & Heen address interpersonal
+    psychology (emotional triggers, identity threat, individual defensiveness), while Laloux addresses organizational structure
+    (peer processes, distributed decision-making, system-level feedback loops). There is NO shared causal mechanism — one
+    says "feedback fails because of emotional triggers" and the other says "feedback works when structured as an organizational
+    process." Merging these would create a false synthesis. Stage 2 must detect that topical overlap without causal convergence
+    = NULL. This is more challenging than single-source rejection (NEG-CONV-001) or platitude detection (NEG-CONV-002) because
+    both sources are legitimate and well-argued — they just describe different mechanisms at different levels, making this
+    the most common real-world false-convergence pattern.'
+- id: NEG-005
+  domain: systems & frameworks
+  discipline: systems thinking
+  source_books:
+  - Thinking in Systems — Donella Meadows
+  - The Feynman Lectures on Physics — Richard Feynman
+  cluster_segments:
+  - source_book: Thinking in Systems — Donella Meadows
+    text: 'Leverage points are places within a complex system where a small shift in one thing
+
+      can produce big changes in everything. Leverage is not about force or power; it is
+
+      about finding the right point of intervention. The same small change applied at a
+
+      low-leverage point does almost nothing, while applied at a high-leverage point it can
+
+      transform the whole system.
+
+      '
+  - source_book: The Feynman Lectures on Physics — Richard Feynman
+    text: 'A lever gives mechanical advantage: a small force applied at a long distance from
+
+      the fulcrum can lift a heavy weight at a short distance. The ratio of the distances
+
+      trades distance for force. Archimedes understood leverage as pure geometry — the
+
+      balance point and the distances determine the outcome, nothing else.
+
+      '
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Leverage (jargon echo)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — JARGON ECHO. Both segments use the word ''leverage'' but describe
+
+    unrelated mechanisms: Meadows means system intervention points (feedback structure),
+
+    Feynman means mechanical force amplification (physics). A naive matcher converges
+
+    on the shared term; the correct behavior is rejection because there is no shared
+
+    causal mechanism. Same vocabulary, disjoint claims.
+
+    '
+- id: NEG-007
+  domain: knowledge management
+  discipline: information science
+  source_books:
+  - The 7 Habits of Highly Effective People — Stephen Covey
+  - How to Win Friends and Influence People — Dale Carnegie
+  - Leaders Eat Last — Simon Sinek
+  cluster_segments:
+  - source_book: The 7 Habits of Highly Effective People — Stephen Covey
+    text: Communication is the most important skill in life. If you want to be effective, you must learn to communicate clearly
+      and empathetically. Seek first to understand, then to be understood. This principle is the key to transforming relationships,
+      teams, and organizations.
+  - source_book: How to Win Friends and Influence People — Dale Carnegie
+    text: The ability to communicate effectively is the single most important factor in determining success. People who can
+      express their ideas clearly, listen well, and connect with others rise to the top in every field. Good communication
+      is the foundation of all lasting relationships.
+  - source_book: Leaders Eat Last — Simon Sinek
+    text: Great leadership starts with great communication. When leaders communicate openly and honestly, trust flourishes
+      and teams perform at their highest level. Communication is not just about speaking — it is about creating an environment
+      where everyone feels heard and valued.
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Distributed Knowledge Architecture (citation echo)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — GENUINE CITATION ECHO (D2221). Three best-selling business books all state the same platitude
+    ("communication is key to success") without a SINGLE causal mechanism. Covey says "seek to understand," Carnegie says
+    "express clearly," Sinek says "communicate openly" — but none explain WHY communication produces better outcomes through
+    a testable causal chain. This is the textbook definition of a citation echo: multiple high-volume sources repeating the
+    same vacuous truism with different phrasing. The S5 mechanism pre-filter (D2220) would catch any extraction whose mechanism
+    is a restatement of "communication is important because it enables better outcomes."'
+- id: NEG-008
+  domain: semiotics
+  discipline: philosophy of language
+  source_books:
+  - Philosophical Writings of Peirce — Charles Sanders Peirce
+  - 'Semiotics: The Basics — Daniel Chandler'
+  cluster_segments:
+  - source_book: Philosophical Writings of Peirce — Charles Sanders Peirce
+    text: 'A sign, or representamen, is something which stands to somebody for something in some respect or capacity. It addresses
+      somebody, that is, creates in the mind of that person an equivalent sign, or perhaps a more developed sign. That sign
+      which it creates I call the interpretant of the first sign. I define three trichotomies of signs: qualisign/sinsign/legisign,
+      icon/index/symbol, and rheme/dicisign/argument.
+
+      '
+  - source_book: 'Semiotics: The Basics — Daniel Chandler'
+    text: 'Peirce offered a triad of basic sign types: the icon (which resembles its referent, like a photograph), the index
+      (which is directly connected in some way to its referent, like smoke indicating fire), and the symbol (which has an
+      arbitrary or conventional relationship to its referent, like most words in language). These three categories classify
+      signs by their mode of reference, not by what they mean.
+
+      '
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Peircean Sign Classification (taxonomy, not principle)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge on a classification system (icons,
+    indices, symbols) that categorizes signs by their mode of reference. But this is a taxonomy — it answers "what category
+    does X belong to?" rather than "what will happen IF...?" Taxonomies classify; principles predict. The "mechanism" from
+    the quarantined FB was definitional: "Signs are classified because they differ in mode of reference" — the "because" explains
+    the classification criterion, not a causal chain. is_convergent: true but should_extract: false. Qwen: reject as taxonomy
+    (negative). Kimi: argued for separate taxonomy golden set (not causal). Consensus: REJECT for causal_mechanism set.'
+- id: NEG-014
+  domain: education
+  discipline: cognitive psychology
+  source_books:
+  - Make It Stick — Brown, Roediger & McDaniel
+  - Why We Sleep — Matthew Walker
+  cluster_segments:
+  - source_book: Make It Stick — Brown, Roediger & McDaniel
+    text: Spaced retrieval practice improves long-term memory because each retrieval attempt strengthens the memory trace
+      through reconsolidation. When you actively recall information, the brain treats it as important and reinforces the neural
+      pathway. Testing is not just assessment — it is a learning event that modifies memory.
+  - source_book: Why We Sleep — Matthew Walker
+    text: Spaced learning works because sleep consolidates memories between study sessions. During slow-wave sleep, the hippocampus
+      replays the day's learning patterns to the neocortex, strengthening them. During REM sleep, the brain integrates new
+      memories with existing knowledge. Spacing study sessions across multiple nights gives the brain more sleep cycles to
+      consolidate.
+  is_convergent: true
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Mechanism Disagreement (same outcome, different causes)
+    definition: ''
+    mechanism: ''
+    consequence: ''
+    boundary: ''
+    evidence_passages: []
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE — SAME OBSERVATION, DIFFERENT MECHANISMS (D2223). Both sources agree that spaced retrieval improves
+    memory, but they propose DIFFERENT causal mechanisms: Brown says retrieval practice reconsolidates memory traces; Walker
+    says sleep-dependent consolidation is the mechanism. These are not the same causal explanation. A naive convergent extractor
+    would merge them into "spaced retrieval works through retrieval + sleep" — which is factually different from either source''s
+    claim. S2 must learn to detect mechanism-level disagreement even when outcome-level agreement exists. This is the hardest
+    false-convergence pattern.'

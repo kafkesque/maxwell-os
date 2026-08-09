@@ -91,6 +91,7 @@ _FB_REQUIRED_FIELDS: dict[str, tuple[type, int]] = {
     "is_summary": (bool, 0),         # Must be boolean
     "extraction_type": (str, -1),     # D2214: optional — Qwen3-Coder doesn't include it; default inserted
     "content_type": (str, -1),       # D2214: optional — classification, not content
+    "elaboration": (str, -1),        # D2215: optional — Qwen3-Coder omits entirely; empty string is valid
     "route": (str, 0),               # Must be string
 }
 _VALID_ROUTES: frozenset[str] = frozenset({"FB", "NULL"})
@@ -119,10 +120,11 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
         return False, [f"Expected dict, got {type(result).__name__}"]
 
     # Check required fields
+    # D2215: min_len < 0 means optional (field may be absent). min_len >= 0 means required.
     for field, (expected_type, min_len) in _FB_REQUIRED_FIELDS.items():
         if field not in result:
-            if field in ("mechanism", "boundary", "consequence", "extraction_type", "content_type", "route"):
-                continue  # D2214: Optional fields — Qwen3-Coder doesn't include classification metadata
+            if min_len < 0:
+                continue  # Optional field — absent is fine
             errors.append(f"Missing required field: '{field}'")
             continue
 
@@ -327,10 +329,11 @@ def build_convergent_prompt(
     cohesion: float = cluster.get("cohesion", 0.5)
 
     # Sample segments: fewer for high-cohesion clusters
+    # D2215: capped at MAX_CLUSTER_SAMPLES to avoid OMLX memory guard (Qwen3.6 KV cache)
     if cohesion >= 0.90:
-        n_samples: int = 5
+        n_samples: int = min(3, MAX_CLUSTER_SAMPLES)
     elif cohesion >= 0.75:
-        n_samples: int = 8
+        n_samples: int = min(5, MAX_CLUSTER_SAMPLES)
     else:
         n_samples: int = MAX_CLUSTER_SAMPLES
 
@@ -932,10 +935,12 @@ def _load_probe_cache(
     try:
         with open(STAGE2_PROBE_CACHE) as f:
             pc: dict = json.load(f)
+        # D2215: Always accept cache when corpus counts match, even if mode flag differs.
+        # If cache was built without --only-convergent but we're now running with it,
+        # load all targets — the caller filters to convergent-only after loading.
         if (
             pc.get("convergent_count") == len(convergent)
             and pc.get("single_source_count") == len(single_source)
-            and pc.get("only_convergent") == only_convergent
         ):
             targets: list[dict] = pc.get("targets", [])
             return targets if targets else None
@@ -977,10 +982,15 @@ def run_stage2(
         gate_enabled: Enable gate enforcement.
         gate_strict: Force [] on NULL-route with content.
     """
-    # D2214: Force line-buffered logging to file (tee/hohup corrupts unbuffered)
-    import sys as _sys
-    _sys.stdout.reconfigure(line_buffering=True) if hasattr(_sys.stdout, "reconfigure") else None
-    _sys.stderr.reconfigure(line_buffering=True) if hasattr(_sys.stderr, "reconfigure") else None
+    # D2215: Force write-through logging (tee/nohup/pipe corrupt buffered output on macOS)
+    # python3 -u should be enough, but TextIOWrapper on macOS still buffers on
+    # non-TTY fds. write_through=True forces every write() to flush immediately.
+    import sys as _sys, io as _io
+    try:
+        _sys.stdout = _io.TextIOWrapper(_sys.stdout.buffer, write_through=True, line_buffering=True)
+        _sys.stderr = _io.TextIOWrapper(_sys.stderr.buffer, write_through=True, line_buffering=True)
+    except (AttributeError, ValueError):
+        pass  # already unbuffered or fd redirected
 
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1041,7 +1051,15 @@ def run_stage2(
     cached_targets: list[dict] | None = _load_probe_cache(convergent, single_source, only_convergent)
     if cached_targets is not None:
         target_clusters = cached_targets
-        print(f"   📂 Probe cache loaded: {len(target_clusters)} extraction targets — re-probe skipped")
+        # D2215: If running --only-convergent but cache includes single-source,
+        # filter to convergent-only targets. Cache built with full corpus can
+        # serve both modes.
+        if only_convergent:
+            n_before: int = len(target_clusters)
+            target_clusters = [t for t in target_clusters if t.get("is_convergent")]
+            print(f"   📂 Probe cache loaded: {n_before} targets → {len(target_clusters)} convergent (--only-convergent filter)")
+        else:
+            print(f"   📂 Probe cache loaded: {len(target_clusters)} extraction targets — re-probe skipped")
     elif SPLIT_PROBE_ENABLED and convergent:
         print(f"\n🔍 Principle Discovery Gate: probing {len(convergent)} convergent clusters...")
         expanded_targets: list[dict] = []
@@ -1144,7 +1162,24 @@ def run_stage2(
                         all_fbs.append(json.loads(line))
             with open(segids_file) as f:
                 processed_ids = set(json.load(f))
-            print(f"   📋 Resuming: {len(processed_ids)} clusters processed → {len(all_fbs)} FBs")
+            # D2215: Detect cluster-ID format mismatch between old segids and current probe cache.
+            # Old probe used "cluster_N_subN", new probe uses "cluster_N_sN_subN". Zero overlap
+            # means the segids are from a different probe format — discard them to avoid silent reprocessing.
+            target_cids: set[str] = {c.get("cluster_id", "") for c in target_clusters}
+            if processed_ids and not (processed_ids & target_cids):
+                print(f"   ⚠️  Resume segids format mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(target_cids)} targets")
+                print("   ⚠️  Starting fresh — all clusters will be processed")
+                processed_ids = set()
+            else:
+                print(f"   📋 Resuming: {len(processed_ids)} clusters processed → {len(all_fbs)} FBs")
+                # D2215: CRITICAL — filter targets BEFORE submitting to executor.
+                # Without this, workers re-process already-done clusters (~15h wasted)
+                # and the main loop silently skips their output via `continue`.
+                n_before_resume: int = len(target_clusters)
+                target_clusters = [c for c in target_clusters
+                                   if c.get("cluster_id") not in processed_ids]
+                print(f"   📋 Remaining after resume filter: {len(target_clusters)} clusters "
+                      f"(skipped {n_before_resume - len(target_clusters)} already-processed)")
         except Exception as e:
             # D2177 (C16): Don't silently discard all prior work on resume failure.
             # Log the error and start fresh — but the operator must know.
@@ -1264,6 +1299,7 @@ def run_stage2(
             "mechanism": mechanism,
             "boundary": boundary,
             "consequence": consequence,
+            "elaboration": result.get("elaboration", ""),  # D2215: was silently dropped — LLM produces it, builder discarded it
             "is_summary": is_summary,
             "extraction_type": extraction_type,
             "content_type": content_type,

@@ -75,3 +75,4 @@ knowledge pipeline/
 # Runtime state (regenerable)
 pipeline/.omlx_watchdog_state.json
 pipeline/omlx_watchdog.log
+backup/

@@ -151,8 +151,12 @@ S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])
 S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
-S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "tasksource/ModernBERT-base-nli")  # D2119
-S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2119
+# D2216 (2026-08-09): DeBERTa FEVER primary. ModernBERT is fallback.
+# DeBERTa FEVER: 5.8× more discriminative than ModernBERT on convergent FBs.
+# FEVER + ANLI training = purpose-built for claim-evidence verification.
+# See governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
+S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2216
+S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "tasksource/ModernBERT-base-nli")  # D2216
 S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119
 S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.8))  # D2155: configurable
 S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.5))  # D2155: configurable

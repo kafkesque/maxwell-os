@@ -42,7 +42,7 @@ services:
     api_key: sk-maxwell-local
     min_version: 0.4.0
     bin: null
-    default_timeout: 300  # D2215: was 45 — Qwen3.6 at 5 tok/s × 2048 max_tok = 410s; Q3C at 14 tok/s = 146s. 45s caused "Response ended prematurely".
+    default_timeout: 300
     max_retries: 2
     retry_delay: 3
     circuit_breaker_enabled: true
@@ -50,10 +50,10 @@ services:
     circuit_breaker_cooldown_seconds: 60
 models:
   generator:
-    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit   # D2215: Qwen3.6 hits 45.6GB memory guard at 3.1K tok + timeout at 5 tok/s. Q3C: fits memory, 14 tok/s.
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     provider: omlx
     temperature: 0.0
-    max_tokens: 1024   # D2215: FBs avg 500-900 tok JSON. 1024 ample, keeps generation under 73s at 14 tok/s.
+    max_tokens: 1024
   verifier:
     model: Phi-4-mini-instruct-8bit
     provider: omlx
@@ -121,9 +121,9 @@ stage2:
   minhash_threshold: 0.9
   minhash_num_perm: 128
   golden_path: config/golden/stage2_fewshot_convergent.yaml
-  golden_positive: 1              # D2215: reduced from 3 — slim prompt for Qwen3.6 memory budget
+  golden_positive: 1
   golden_negative: 1
-  golden_max_examples: 4          # D2215: reduced from 8
+  golden_max_examples: 4
   golden_inject_enabled: true
   golden_seed: 42
   split_probe_enabled: true
@@ -133,10 +133,10 @@ stage2:
   gate_strict: true
   evidence_tracking: true
   source_book_match: exact
-  max_cluster_samples: 5   # D2215: reduced from 8 — Qwen3.6 KV cache hits 45.6GB memory guard at 3.6K tokens
+  max_cluster_samples: 5
   max_probe_samples: 8
   split_probe_kmeans_random_state: 42
-  omlx_retry_attempts: 2   # D2213: was 1. 2 retries gives 3 total call_llm attempts — handles OMLX restart (30-60s).
+  omlx_retry_attempts: 2
   batch_position_monitor: false
   max_workers: 3
 stage4:
@@ -152,11 +152,11 @@ stage5:
   - growth_edge
   - tool_instruction
   factscore_enabled: false
-  nli_model: tasksource/ModernBERT-base-nli
-  nli_model_fallback: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
-  nli_entailment_threshold: 0.6
-  nli_pass_threshold: 0.8
-  nli_marginal_threshold: 0.5
+  nli_model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
+  nli_model_fallback: tasksource/ModernBERT-base-nli
+  nli_entailment_threshold: 0.5
+  nli_pass_threshold: 0.6
+  nli_marginal_threshold: 0.3
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true

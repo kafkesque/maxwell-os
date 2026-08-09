@@ -56,7 +56,7 @@ This rule applies to ALL code — human-written AND LLM/agent-generated.
 
 ## §2 — ARCHITECTURE
 
-3 LAYERS: Pipeline (9-stage) → Knowledge (SQLite+FTS5+sqlite-vec+LightRAG) → Orchestration (Phase 2, skill.md standard)
+3 LAYERS: Pipeline (8-stage) → Knowledge (SQLite+FTS5+sqlite-vec+LightRAG) → Orchestration (Phase 2, skill.md standard)
 
 MODELS: Gen=Qwen3.6-35B-A3B-4bit | Verify=Phi-4-mini-8bit | VerifyV2=Gemma-4-E4B (R5 cross-family) | Embed=bge-m3 | NLI=DeBERTa-v3-base-mnli (D2111)
 

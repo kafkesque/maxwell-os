@@ -148,13 +148,13 @@ def _mlx_model_path(model_name: str) -> str:
     import os as _os
     if model_name.startswith("mlx-community/"):
         return model_name
-    
+
     # Check local OMLX model directory first
     local_base = _os.path.expanduser("~/.omlx/models")
     local_path = _os.path.join(local_base, model_name)
     if _os.path.isdir(local_path) and _os.path.isfile(_os.path.join(local_path, "config.json")):
         return local_path
-    
+
     # Try alternative local paths (some models use different naming)
     if _os.path.isdir(local_base):
         for entry in _os.listdir(local_base):
@@ -162,7 +162,7 @@ def _mlx_model_path(model_name: str) -> str:
             if _os.path.isdir(entry_path) and model_name in entry:
                 if _os.path.isfile(_os.path.join(entry_path, "config.json")):
                     return entry_path
-    
+
     # Fallback: HF Hub
     return f"mlx-community/{model_name}"
 
@@ -215,6 +215,7 @@ def call_omlx(
     system: str | None = None,
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
+    response_format: dict | None = None,
 ) -> str:
     """Call inference backend (OMLX HTTP or MLX direct) and return text.
 
@@ -253,6 +254,8 @@ def call_omlx(
         "temperature": TEMPERATURE,
         "max_tokens": max_tokens,
     }
+    if response_format is not None:
+        payload["response_format"] = response_format
 
     last_error = None
     # D2187: Circuit breaker fast-fail (skip retry loop when OPEN)
@@ -341,6 +344,7 @@ def call_omlx_json(
         system=system,
         max_tokens=max_tokens,
         timeout=timeout,
+        response_format={"type": "json_object"},  # D2219: A/B tested — valid JSON, no fence, 7% faster
     )
 
     result = parse_json_robust(raw)

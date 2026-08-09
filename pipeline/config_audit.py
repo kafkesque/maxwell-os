@@ -102,6 +102,7 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
     "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)
     "E2E_MIN_FBS",           # e2e_test.py — except fallback (mirrors config default=30)
     "E2E_CONVERGENT_RATIO",  # e2e_test.py — except fallback (mirrors config default=0.25)
+    "INTERVAL",              # n2_watchdog.py — 300s polling loop (P3: migrate to config.stage2.watchdog_interval)
 }
 
 

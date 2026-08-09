@@ -1,10 +1,12 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-08 08:51 | **Decisions:** D2000-D2211 (211 decisions)
+> **Updated:** 2026-08-09 20:17 | **Decisions:** D2000-D2218 (218 decisions)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T0.1-T0.4 DONE, T0.5 READY, 28 outstanding IMPLEMENTATION_SPEC findings)
+> **Latest session:** `governance/SESSION-HANDOFF-2026-08-09.md` (comprehensive audit: actionability, Pydantic, bottlenecks, factuality)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T0.1-T0.4 DONE, T0.5 READY, 26 outstanding IMPLEMENTATION_SPEC findings)
 > **Buglog:** `governance/buglog.md` (D2211 13 P0 fixes applied)
-> **Audit:** IMPLEMENTATION_SPEC cross-referenced against live HEAD — 28/33 findings still valid (10 HIGH, 9 MEDIUM, 9 LOW)
+> **Audit:** IMPLEMENTATION_SPEC cross-referenced against live HEAD — 26/33 findings still valid (8 HIGH, 9 MEDIUM, 9 LOW)
 > **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ | S2 ready (D2211 fixes applied, stress_test ALL_PASS)
+> **Tier 0 fixes:** 4 emergency fixes specified (Fix 0.1-0.4) — NOT YET APPLIED
 
 ---
 
@@ -63,6 +65,38 @@
 | Multi-agent swarm | Coordination tax 39-70%. M1 Max can't run 5+ agents × models. |
 | Neo4j graph database | External service (C3). SQLite adequate for 4K-6K FBs. |
 | LangChain/LlamaIndex | Vendor lock-in (C2). Maxwell's pipeline is cleaner. |
+
+---
+
+## 🔥 TIER 0 — EMERGENCY FIXES (Session 2026-08-09)
+
+> **Source:** 5-review cross-examination + comprehensive pipeline audit
+> **Spec:** `governance/SESSION-HANDOFF-2026-08-09.md` §10
+> **Decisions:** D2213-D2218
+
+| # | Fix | File | Effort | Status |
+|---|-----|------|--------|--------|
+| **Fix 0.1** | Conditionalize application prompt — allow null for descriptive FBs | `stage4_merge.py` L71, L131 | 5min | ⬜ TODO |
+| **Fix 0.2** | Forward mechanism/boundary/consequence to S4 output dict | `stage4_merge.py` L1093+ | 5min | ⬜ TODO |
+| **Fix 0.3** | Delete dead multi-FB merge path + add assert (backup: `.backup-20260809`) | `stage4_merge.py` L65-116,172-184,872-884 | 10min | ⬜ TODO |
+| **Fix 0.4** | Align NLI scoring to MAX-entailment (match governance benchmark) | `stage5_verify.py` L217-229 | 10min | ⬜ TODO |
+
+### Post-Fix Execution
+```bash
+just health
+python3 pipeline/stage2_extract.py --only-convergent  # ~19h async
+# After S2: python3 pipeline/stage4_merge.py && python3 pipeline/stage5_verify.py
+```
+
+### New Tasks from Audit (D2213-D2218)
+| # | Task | Priority |
+|---|------|----------|
+| N2 | Add mechanism/boundary/consequence to Pydantic FB model | 🟠 P1 |
+| N3 | Add actionability field (descriptive/prescriptive/diagnostic) | 🟠 P1 |
+| N6 | Swap DeBERTa FEVER to primary NLI | 🟠 P1 |
+| N9 | Two-stage S4: separate classification from CRIBS | 🔵 v3.1 |
+| N10 | Kimi depth confidence signal | 🔵 v3.1 |
+| N14 | Profile max_workers=5 memory impact for S2 | 🟡 P2 |
 
 ---
 

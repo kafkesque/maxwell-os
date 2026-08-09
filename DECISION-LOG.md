@@ -3321,3 +3321,42 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 
 **Files:** `pipeline/omlx_call.py`, `pipeline/stage2_extract.py`, `pipeline/pipeline_paths.py`
 **Status:** ✅ IMPLEMENTED and verified.
+
+---
+
+## Session 2026-08-09 — Comprehensive Pipeline Audit + Actionability Recovery
+
+### D2213 — Old 30-sec Actionability Rule Recovered from v1 (2026-08-09)
+**Category:** ARC / GOV
+**Decision:** The v1 Maxwell OS T3 gate (`config/session_decisions_d799.yaml` D12_T3_DECISION_BOUNDARY) defined actionability as a binary test: (1) 30s actionability — can a practitioner read it and know what to do? (2) Constraint clarity — does it define when NOT to apply? T3=PASS → S7 JSON, T3=FAIL → 5.5 waiting list. The v3.0 proposed 3-class taxonomy (descriptive/prescriptive/diagnostic) is a new innovation built on this foundation: prescriptive = T3=PASS, descriptive = T3=FAIL, diagnostic = T3=PARTIAL (identifies problem, action implied but not specified). v1 had NO typology of actionability types — purely binary.
+**Files:** v1 `config/session_decisions_d799.yaml`, v3 `pipeline/stage4_merge.py`
+**Status:** ✅ RECOVERED AND DOCUMENTED — Handoff: `governance/SESSION-HANDOFF-2026-08-09.md`
+
+### D2214 — Pydantic FB Class Confirmed Dead Code (2026-08-09)
+**Category:** INF / QLT
+**Decision:** The Pydantic `FB(StampedRecord)` class at `schemas.py:459` is never instantiated anywhere in the pipeline (`grep -rn 'FB(' pipeline/ --include='*.py'` returns 0 calls). All `min_length` constraints, `Literal` validators, and field validators are dead code. Actual FB records are raw dicts built in `stage4_merge.py:L1093-1137`. The `min_length=10` on `application`/`failure_mode` that external reviewers attributed to hallucination-forcing is non-functional. Real enforcement is in prompt strings (FB_SYSTEM_PROMPT, CRIBS_ENRICHMENT_SYSTEM). Pydantic model retained as interface documentation.
+**Files:** `pipeline/schemas.py`, `pipeline/stage4_merge.py`
+**Status:** ✅ DOCUMENTED
+
+### D2215 — S5 Verification Blindspot: mechanism/boundary/consequence Fallback (2026-08-09)
+**Category:** BUGFIX / QLT
+**Decision:** S5 `nli_evidence_check()` at `stage5_verify.py:L267-269` attempts to verify mechanism, boundary, and consequence against source evidence. However, S4 drops these fields from the final FB dict. S5's fallback chain substitutes `application` for `mechanism`, `failure_mode` for `boundary`, and `elaboration` for `consequence`. NLI scores for "mechanism" actually reflect how well CRIBS-enriched `application` matches source text — not the original S2 mechanism extraction. Fix 0.2 (forwarding mechanism/boundary/consequence in S4 dict assembly) resolves the blindspot. Also affects `check_fb_completeness()` L334-339 which passes as long as fallback fields exist.
+**Files:** `pipeline/stage5_verify.py:L267-269,L334-339`, `pipeline/stage4_merge.py:L1093-1137`
+**Status:** ✅ DOCUMENTED — Resolution: Fix 0.2 in Tier 0 emergency fixes
+
+### D2216 — DeBERTa FEVER Confirmed as Correct Factuality Model (2026-08-09)
+**Category:** ARC / MOD
+**Decision:** Maxwell already uses a factuality-trained model: `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` (362MB, FEVER 89.1%, MNLI 90.3%, ANLI 62.4%). This is purpose-built for claim-evidence verification and optimal for Maxwell's constraints: runs locally (C3), $0 marginal cost (C1). MiniCheck (7B, used in v1) exceeds current memory budget (~24GB for all models). AlignScore (330M) could complement as additional signal but adds complexity. No model swap needed — the S5 verification issue is architectural (wrong fields being verified), not model capability.
+**Files:** `config/pipeline_config.yaml:155`, `pipeline/stage5_verify.py`
+**Status:** ✅ DOCUMENTED
+
+### D2217 — S2 Rerun Preferred Over Elaboration Repair (2026-08-09)
+**Category:** ARC / QLT
+**Decision:** Rerunning S2 extraction is preferred over running the elaboration repair script. Rationale: (1) avoids two-model contamination — Phi-4-mini elaboration mixed with pre-fix Qwen extraction, (2) benefits from calibrated golden few-shot (D2206 fix pass confirmed working), (3) produces consistent mechanism/boundary/consequence/elaboration from single model (Qwen3-Coder-30B, temp=0.0), (4) maintains provenance integrity — single gen_model stamp. The ~19h runtime (2,655 convergent + 35,239 singletons) is acceptable for provenance quality. Elaboration repair would compound the D2215 verification blindspot.
+**Status:** ✅ DECIDED — Execute after Tier 0 fixes applied
+
+### D2218 — Dead Multi-FB Merge Path Deleted (Option A) (2026-08-09)
+**Category:** ARC / QLT
+**Decision:** The multi-FB merge path (`build_fb_prompt`, L65-116, 172-184, 872-884 in stage4_merge.py) is unreachable under cluster-before-extract (D2120) where every cluster has exactly 1 principle ID. A/B test conducted: Option A (delete path + add assert) chosen over Option B (guard with synthesis fallback). Guard would require untestable synthesis functions — the path was never adapted to v3.0 mechanism/boundary/consequence schema. Backup created: `stage4_merge.py.backup-20260809`. Part of Tier 0 Fix 0.3.
+**Files:** `pipeline/stage4_merge.py`, backup: `pipeline/stage4_merge.py.backup-20260809`
+**Status:** ✅ DECIDED — Part of Fix 0.3 (not yet applied)

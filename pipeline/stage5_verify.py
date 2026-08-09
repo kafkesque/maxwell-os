@@ -207,30 +207,27 @@ def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
         if not results:
             return False, 0.0, "No valid evidence passages to check — QUARANTINE"
 
-        # Score: % of passages that entail vs contradict the definition.
-        # D2094 revised: CONTRADICTION = fail, NEUTRAL = pass-to-LLM, ENTAILMENT = strong pass.
-        entailments: int = sum(1 for r in results if r["label"] == "ENTAILMENT" and r["score"] >= 0.6)
-        contradictions: int = sum(1 for r in results if r["label"] == "CONTRADICTION" and r["score"] >= 0.6)
-        neutrals: int = len(results) - entailments - contradictions
+        # Score: MAX-entailment — strongest signal wins (D2215: DeBERTa FEVER factuality).
+        # A single strong contradiction (≥0.8) fails regardless of other passages.
+        # A single strong entailment (≥0.8) passes without escalation.
+        max_entail: float = max((r["score"] for r in results if r["label"] == "ENTAILMENT"), default=0.0)
+        max_contra: float = max((r["score"] for r in results if r["label"] == "CONTRADICTION"), default=0.0)
 
-        nli_entail_score: float = entailments / len(results) if results else 0.0
-        nli_contra_score: float = contradictions / len(results) if results else 0.0
-
-        if nli_contra_score >= 0.5:
-            # Majority contradict → strong failure
+        if max_contra >= 0.8:
+            # Strong contradiction → fail-closed (D2093)
             passed: bool = False
             nli_score: float = 0.0
-            detail: str = f"NLI FAIL: {contradictions}/{len(results)} contradictions — evidence contradicts claim"
-        elif nli_entail_score >= 0.5:
-            # Majority entail → strong pass (skip LLM)
+            detail: str = f"NLI FAIL: max contradiction {max_contra:.2f} — evidence contradicts claim"
+        elif max_entail >= 0.8:
+            # Strong entailment → strong pass (skip LLM)
             passed = True
-            nli_score = nli_entail_score
-            detail = f"NLI PASS: {entailments}/{len(results)} entailments (≥0.6 confidence)"
+            nli_score = max_entail
+            detail = f"NLI PASS: max entailment {max_entail:.2f} (strong signal)"
         else:
-            # Mixed/neutral → pass to LLM for deeper check (score < 0.5 triggers escalation)
+            # Weak/mixed signals → escalate to LLM
             passed = True
             nli_score = 0.4  # Below 0.5 threshold → triggers LLM escalation in run_stage5
-            detail = f"NLI NEUTRAL: {entailments}E/{neutrals}N/{contradictions}C — escalate to LLM"
+            detail = f"NLI NEUTRAL: max_entail={max_entail:.2f} max_contra={max_contra:.2f} — escalate to LLM"
 
         return passed, nli_score, detail
 
@@ -380,6 +377,73 @@ def check_factual_llm(fb: dict, model: str) -> tuple[bool, float, str]:
     return False, 0.0, "LLM check could not be completed — QUARANTINE (D2093: fail-closed)"
 
 
+# ── Mechanism quality pre-filter (D2220: guards against citation echo gaming NLI) ──
+
+# D2220: Citation echo detection thresholds — configurable via pipeline_config.yaml
+# fallback defaults if config keys not present
+MECHANISM_MIN_LENGTH: int = 150  # Minimum mechanism character length
+CITATION_ECHO_SOURCE_THRESHOLD: int = 20  # Source count triggering citation echo check
+BANNED_MECHANISM_PREFIXES: tuple[str, ...] = (
+    "because it enables",
+    "because it allows",
+    "because it helps",
+    "because it provides",
+    "because it makes",
+    "because it can",
+)
+
+
+def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
+    """Pre-filter: check mechanism quality before NLI to prevent citation echo gaming.
+
+    D2220: When source count is high, MAX-entailment NLI is vulnerable to
+    "at least one passage matches" — any vague mechanism with 20+ sources has
+    a high probability of at least one passage having high entailment, creating
+    false positives. This pre-filter catches low-quality mechanisms before they
+    reach NLI.
+
+    Checks:
+      1. Mechanism minimum length (prevents vacuous one-liners)
+      2. Non-tautological "because" clause (prevents definitional restatements)
+      3. Citation echo override: high source count + axiomatic evidence = escalate
+
+    Returns:
+        (passed, score, detail). score=0.0 means auto-quarantine. score=0.5 means
+        escalate to LLM regardless of NLI outcome.
+    """
+    mechanism = fb.get("mechanism", "").strip()
+    source_books = fb.get("source_books", [])
+    n_sources = len(source_books) if isinstance(source_books, list) else 0
+    evidence = fb.get("evidence", "cited")
+
+    # 1. Minimum mechanism length
+    if len(mechanism) < MECHANISM_MIN_LENGTH:
+        return False, 0.0, (
+            f"Mechanism too short ({len(mechanism)} chars < {MECHANISM_MIN_LENGTH}) — "
+            "likely vacuous. QUARANTINE."
+        )
+
+    # 2. Tautological "because" detection
+    mech_lower = mechanism.lower()
+    for banned_prefix in BANNED_MECHANISM_PREFIXES:
+        if mech_lower.startswith(banned_prefix) or banned_prefix in mech_lower:
+            # Check if the because-clause is the ONLY content
+            # "X works because it enables X" is tautological
+            return False, 0.0, (
+                f"Mechanism contains tautological pattern '{banned_prefix}' — "
+                "restates definition rather than explaining causal chain. QUARANTINE."
+            )
+
+    # 3. Citation echo override: high source count + axiomatic evidence
+    if n_sources > CITATION_ECHO_SOURCE_THRESHOLD and evidence == "axiomatic":
+        return True, 0.5, (
+            f"Citation echo risk: {n_sources} sources + axiomatic evidence. "
+            "Escalate to LLM deep check regardless of NLI outcome."
+        )
+
+    return True, 1.0, "Mechanism quality OK"
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 
 def run_stage5(strict: bool = False, skip_nli: bool = False):
@@ -433,16 +497,54 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             "detail": comp_detail,
         })
 
+        # 2.5 Mechanism quality pre-filter (D2220: guards citation echo gaming NLI)
+        mech_passed, mech_score, mech_detail = check_mechanism_quality(fb)
+        results.append({
+            "check_name": "mechanism_quality",
+            "passed": mech_passed,
+            "score": mech_score,
+            "detail": mech_detail,
+        })
+
         # 3. Factual consistency — DeBERTa NLI pre-filter → LLM deep check (D2093)
         fact_passed: bool = True
         fact_score: float = 1.0
         fact_detail: str = "No verification needed"
         method: str = "none"
 
-        if not skip_nli:
+        # D2220: Mechanism quality pre-filter gates NLI shortcuts.
+        # If mechanism_quality score = 0.0: auto-quarantine, skip NLI + LLM entirely
+        # If mechanism_quality score = 0.5: citation echo risk → always escalate to LLM
+        if not mech_passed:
+            # Mechanism quality failed → auto-quarantine, no NLI needed
+            fact_passed = False
+            fact_score = 0.0
+            fact_detail = f"MECH FAIL: {mech_detail}"
+            method = "mech_quality"
+            prefilter_stats["mech_fail"] = prefilter_stats.get("mech_fail", 0) + 1
+        elif not skip_nli:
             # D2093: DeBERTa NLI pre-filter (replaces embedding similarity)
             nli_passed, nli_score, nli_detail = nli_evidence_check(fb)
-            if nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2155: config threshold (default 0.8)
+
+            # D2220: Citation echo override — if mechanism is flagged, NLI pass is unreliable
+            force_llm = (mech_score <= 0.5)
+
+            if force_llm:
+                # D2220: Citation echo risk — NLI alone is unreliable. Always escalate to LLM.
+                prefilter_stats["echo_escalated"] = prefilter_stats.get("echo_escalated", 0) + 1
+                if omlx_available:
+                    llm_stats["echo_llm"] = llm_stats.get("echo_llm", 0) + 1
+                    fact_passed, fact_score, fact_detail = check_factual_llm(
+                        fb, model=VERIFY_MODEL_V2
+                    )
+                    fact_detail = f"NLI {nli_score:.2f} + CITATION-ECHO → LLM: {fact_detail}"
+                    method = "nli+LLM-echo"
+                else:
+                    fact_passed = False
+                    fact_score = nli_score
+                    fact_detail = f"NLI {nli_score:.2f} + CITATION-ECHO + OMLX unavailable — QUARANTINE: {mech_detail}"
+                    method = "nli-echo"
+            elif nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2155: config threshold (default 0.8)
                 prefilter_stats["passed"] += 1
                 fact_passed = True
                 fact_score = nli_score

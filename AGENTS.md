@@ -57,7 +57,7 @@
 - feed.opml (technology feed sources for weekly research)
 </knowledge_sources>
 
-<!-- PIPELINE — 9-stage v3.0 (CONSTITUTION §2) -->
+<!-- PIPELINE — 8-stage v3.0 (CONSTITUTION §2) -->
 <pipeline>
   stage0_convert.py    → EPUB/PDF → MD (Pandoc/Docling)
   stage0_5_extract_metadata.py → MD → author/title (LLM)

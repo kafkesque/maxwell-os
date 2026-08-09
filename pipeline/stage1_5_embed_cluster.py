@@ -209,7 +209,7 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
             embeddings_mmap[start_idx:end_idx, :] = chunk_embeddings
 
             # Free chunk tensors, flush MPS cache (prevents 2,526-batch leak)
-            del raw, chunk_embeddings, chunk_texts
+            del mb_raw, chunk_embeddings, chunk_texts
             if _has_torch and torch is not None:
                 try:
                     torch.mps.empty_cache()

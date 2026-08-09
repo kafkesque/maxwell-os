@@ -16,6 +16,12 @@ preflight:
     @python3 -c "from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES; print(f'✅ Taxonomy: {len(CANONICAL_DOMAINS)} domains, {len(CANONICAL_DISCIPLINES)} disciplines')"
     @python3 -c "from pipeline.omlx_call import check_omlx_health; ok = check_omlx_health(); print('✅ OMLX UP' if ok else '❌ OMLX DOWN')"
     @python3 tools/sync_decisions.py
+    @echo "  🔍 Dependency check..."
+    @pip3 check 2>&1 || echo "    ⚠️  Dependency conflicts found (non-blocking — see above)"
+    @echo "    📦 Outdated packages:"
+    @pip3 list --outdated --format=columns 2>/dev/null | wc -l | xargs -I{} echo "      {} total (run 'pip3 list --outdated' for details)"
+    @echo "  🖥️  Hardware-model fit..."
+    @llmfit 2>&1 | head -5 || echo "    ⚠️  llmfit unavailable"
     just integrity-quick
     just stress
 

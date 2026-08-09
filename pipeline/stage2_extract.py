@@ -985,7 +985,8 @@ def run_stage2(
     # D2215: Force write-through logging (tee/nohup/pipe corrupt buffered output on macOS)
     # python3 -u should be enough, but TextIOWrapper on macOS still buffers on
     # non-TTY fds. write_through=True forces every write() to flush immediately.
-    import sys as _sys, io as _io
+    import io as _io
+    import sys as _sys
     try:
         _sys.stdout = _io.TextIOWrapper(_sys.stdout.buffer, write_through=True, line_buffering=True)
         _sys.stderr = _io.TextIOWrapper(_sys.stderr.buffer, write_through=True, line_buffering=True)
@@ -1381,7 +1382,7 @@ def run_stage2(
                 fb_results = future.result()
             except CircuitOpenError:
                 # D2211: Breaker open — cancel all futures, preserve checkpoint, abort
-                print(f"\n❌ CIRCUIT BREAKER OPEN — aborting run")
+                print("\n❌ CIRCUIT BREAKER OPEN — aborting run")
                 print(f"   Preserving {len(all_fbs)} FBs from {len(processed_ids)} clusters")
                 for f in futures:
                     f.cancel()
@@ -1629,7 +1630,7 @@ def process_singletons(
                 fb = future.result()
             except CircuitOpenError:
                 # D2211: Breaker open — cancel all futures, preserve checkpoint, abort
-                print(f"\n❌ CIRCUIT BREAKER OPEN during singleton extraction — aborting")
+                print("\n❌ CIRCUIT BREAKER OPEN during singleton extraction — aborting")
                 print(f"   Preserving {len(all_fbs)} singleton FBs")
                 for f in futures:
                     f.cancel()

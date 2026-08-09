@@ -62,73 +62,13 @@ MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardco
 
 # ── Prompt templates ───────────────────────────────────────────────────────
 
-FB_SYSTEM_PROMPT = """You are a Foundation Block generator. You synthesize multiple related principles
-into a single, cohesive Foundation Block — a reusable concept that can be applied across contexts.
-
-A Foundation Block has these fields:
-- name: 3-7 word concept name (title case, precise — not vague like "Strategic AI Collaboration")
-- definition: 3-4 sentences. S1: name it. S2: explain mechanism. S3-4: constraints/consequences.
-- application: "When [situation] -> do [action]." One concrete, actionable example.
-- failure_mode: "The principle fails when [specific scenario]." How it breaks in practice.
-- elaboration: 3-5 sentences. Deeper nuance, edge cases, unexpected implications.
-- keywords: 3-5 key search TERMS, comma-separated. These are LABELS for retrieval, NOT explanations.
-  Example: "loss aversion, prospect theory, framing effect, anchoring"
-- jargon: ONLY include if the FB uses specialized terms a non-expert wouldn't know.
-  OMIT this field entirely when all terms are self-evident — do NOT include empty {}.
-  When present: JSON dict mapping each specialized term → 1-2 sentence plain-English explanation.
-  Example: {"prospect theory": "A behavioral economics model showing that people value gains and losses differently, making decisions based on perceived gains rather than objective outcomes.", "anchoring": "The cognitive bias where an initial piece of information serves as a reference point that distorts subsequent judgments."}
-  ⚠️ NEVER copy keywords into jargon. Keywords are for search; jargon is for pedagogy.
-  ⚠️ NEVER put comma-separated terms in jargon. Jargon ALWAYS has term:explanation pairs.
-
-CRITICAL RULES:
-- Produce a genuine PRINCIPLE, not tool documentation, not syntax lessons, not system design docs
-- If the principles are about a specific tool (Altair, Figma, R, etc.), the FB must name the tool explicitly in its title
-- A principle answers WHY and WHEN, not just HOW
-- Names must be precise: "Narrative Framing in UX" not "Narrative Design Creates Meaning"
-
-GOLDEN EXAMPLES — model your output on these:
-
-EXAMPLE 1 (cross-domain): "The Jagged Frontier of AI Competence"
-Definition: "AI capabilities are not uniformly distributed across tasks — they exhibit a jagged frontier where some tasks are performed exceptionally well while closely related tasks fail unexpectedly. Effective human-AI collaboration requires mapping this frontier empirically rather than assuming uniform capability."
-Application: "When introducing AI into a workflow -> run a systematic calibration: give the AI 10 representative tasks from your domain, evaluate each output, identify the pattern of successes and failures."
-Keywords: "AI collaboration, jagged frontier, task decomposition, empirical calibration"
-Jargon: {"jagged frontier": "The irregular boundary between tasks AI can do well and tasks it fails at — neighboring tasks can have opposite performance levels.", "empirical calibration": "Testing AI performance on real tasks instead of assuming capabilities based on benchmarks or intuition."}
-
-EXAMPLE 2 (domain-specific): "Descriptive References Reduce Fragility"
-Definition: "Descriptive references use named identifiers instead of positional indices to create more robust and maintainable code. This approach leverages human-readable labels to access data elements, making code less susceptible to breaking when underlying data structures change."
-Application: "When writing data processing code that accesses structured information -> use named column references or descriptive variable names instead of positional indices."
-Keywords: "named references, positional indices, code maintainability, magic numbers"
-Jargon: {"positional indices": "Accessing data by its numeric position in a sequence (e.g., column 3, row 7) rather than by a meaningful label.", "magic numbers": "Hardcoded numeric values in code that lack explanation, making the code fragile and hard to maintain."}
-
-ANTI-PATTERNS — never produce these:
-- "Altair Annotation and Emphasis Techniques" — this is tool documentation renamed
-- "Function Parameters Control Behavior" — this is syntax, not a principle
-- "R Workspace Hygiene" — this is a language-specific workflow guide
-- "Event-Driven Retail Inventory Architecture" — this is a system design document
-- Definitions stuffed with unrelated jargon from multiple domains
-- Names that sound profound but mean nothing specific
-- `"jargon": "feedback loop, oscillation, cycle time"` — this copies keywords into jargon field. Jargon must be dict of term→explanation, not a comma-separated list.
-- `"jargon": {}` or `"jargon": ""` — shipping empty jargon. OMIT the field entirely when no specialized terms need explanation.
-- `"jargon": "loss aversion, prospect theory"` — same error as above. Use proper dict format or omit.
-
-Synthesize the principles into one block. Don't just pick one — merge the insights.
-Return ONLY a JSON object. Include jargon ONLY when specialized terms need explanation — omit the key entirely otherwise."""
-
-
 # ── CRIBS enrichment (D2137: fills missing fields for single-FB clusters) ──
 
 CRIBS_ENRICHMENT_SYSTEM = """You enrich Foundation Blocks with CRIBS-quality fields. You receive an FB with
 name + definition already written. Your job is to ADD the missing fields.
 
-CRIBS editing rules:
-- Confusing → clarify with analogy
-- Repetitive → cut redundancy
-- Interesting → extend ONLY if retention requires it
-- Boring → add a concrete stake (what happens if you ignore this?)
-- Surprising → ship as-is
-
 CRITICAL RULES:
-- application: "When [concrete situation] -> do [specific action]." Must name a real scenario.
+- application: Generate ONLY if this principle is prescriptive (actionable technique/method). If descriptive/theoretical, set to null. Format when present: "When [concrete situation] → do [specific action]."
 - failure_mode: "The principle fails when [specific condition]." How it breaks — be specific.
 - elaboration: 3-5 sentences. Edge cases, non-obvious implications, second-order effects.
 - keywords: 3-5 search terms, comma-separated. These are RETRIEVAL labels, not explanations.
@@ -169,24 +109,9 @@ def _build_cribs_enrichment_prompt(fb_data: dict) -> str:
     return "\n".join(lines)
 
 
-def build_fb_prompt(principles: list[dict]) -> str:
-    """Build the FB generation prompt from cluster principles."""
-    lines = ["Synthesize these related principles into ONE Foundation Block.\n"]
-    lines.append("PRINCIPLES TO MERGE:")
-    for i, p in enumerate(principles, 1):
-        text = (p.get("definition") or p.get("principle_text", ""))[:500]
-        lines.append(f"  {i}. {text}")
-    lines.append("")
-    lines.append("Return a JSON object:")
-    lines.append('{"name": "...", "definition": "...", "application": "...", ')
-    lines.append(' "failure_mode": "...", "elaboration": "...", ')
-    lines.append(' "keywords": "...", "jargon": {...} or omit if no specialized terms}')
-    return "\n".join(lines)
-
-
 CLASSIFY_SYSTEM_PROMPT = """You are a scientific taxonomy classifier. Your job is to identify
-what discipline and domains a Foundation Block genuinely belongs to, using your full knowledge
-of academic fields and applied domains.
+what discipline, domains, and ontological depth a Foundation Block genuinely belongs to,
+using your full knowledge of academic fields and applied domains.
 
 CRITICAL: Classify based on what the principle IS, not what label fits best from a predefined list.
 Use precise, scientifically accurate names. If the principle is about "neuroaesthetics", say
@@ -206,14 +131,52 @@ Rules:
   the principle is clearly a narrow technique, tool-specific skill, or sub-field detail.
 - evidence: "cited" (grounded in source text) or "axiomatic" (self-evident truth)
 
+DEPTH CLASSIFICATION — ONTOLOGICAL, NOT STRUCTURAL:
+Depth describes how BROADLY the principle's CAUSAL MECHANISM applies across reality.
+This is a SEMANTIC judgment about the mechanism's scope, NOT about how many domains
+are listed. Use the PHYSICIST-CHEF-POET TEST:
+
+  universal:     The mechanism applies to ALL systems — physical, biological, social, cognitive.
+                 Test: Would a physicist, a chef, AND a poet each encounter this mechanism
+                 in their own domain, WITHOUT borrowing domain-specific vocabulary?
+                 Examples: "Iterative refinement improves outcomes" (feedback→correction
+                 applies to physics experiments, recipes, AND poem revisions).
+                 "Irrevocable choices foreclose alternatives" (true in thermodynamics,
+                 cooking substitutions, AND narrative structure).
+
+  cross-domain:  The mechanism CONNECTS two or more DISTINCT disciplines via a shared
+                 causal structure. Must explicitly bridge domains that are normally separate.
+                 Test: Does this reveal a structural isomorphism between Domain A and Domain B?
+                 Examples: "Path dependency in technology adoption mirrors developmental
+                 canalization in biology" (economics ↔ biology via irreversibility).
+
+  domain:        The mechanism applies within ONE professional field or cluster of related
+                 fields. Requires domain-specific vocabulary or context to understand.
+                 Test: If you strip ALL domain jargon, does the mechanism become meaningless?
+                 Examples: "Color contrast creates visual hierarchy" (requires understanding
+                 of graphic design, visual perception in that context).
+                 "Strategic positioning requires customer insight" (requires markets, brands).
+
+  specialized:   The mechanism applies to a narrow sub-technique, tool-specific skill,
+                 or niche methodology within a single sub-field.
+                 Test: Would most practitioners IN the parent domain understand this?
+                 Examples: "Kerning pair adjustment improves readability" (typography sub-field).
+                 "Anchor point control in vector graphics" (graphics software feature).
+
+CRITICAL: depth is NOT domain count. A design principle that spans 5 design-adjacent
+domains (graphic design, UX, branding, editorial, packaging) is STILL domain, NOT universal.
+The test is: can this mechanism be stated WITHOUT any domain-specific concepts?
+
 DO NOT:
 - Force-fit into generic categories
 - Simplify complex disciplines into broad buckets
 - Use "emerging" as a label — the pipeline decides that, not you
 - Use placeholder labels like "other", "miscellaneous", "general"
 - Use vague labels like "design" when "interaction design" or "speculative design" is more precise
+- Over-assign "universal" — most principles are domain-bound. Default to "domain" unless
+  the mechanism demonstrably crosses into physics, biology, or pure mathematics.
 
-Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "is_specialized": true/false, "evidence": "..."}"""
+Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "depth": "universal|cross-domain|domain|specialized", "is_specialized": true/false, "evidence": "..."}"""
 
 
 def build_classify_prompt(fb_name: str, fb_definition: str) -> str:
@@ -222,6 +185,10 @@ def build_classify_prompt(fb_name: str, fb_definition: str) -> str:
     D2138: Two-stage classification. Stage 1: LLM classifies freely using its
     full scientific knowledge (produces raw labels). Stage 2: pipeline maps
     raw labels to canonical taxonomy, using 'emerging' as fallback.
+
+    D2220: DEPTH is now LLM-classified semantically (not derived from domain count).
+    The LLM applies the physicist-chef-poet test to determine ontological scope.
+    This replaces the structural derivation that caused 55% depth error rate.
 
     This preserves ontological accuracy — raw labels capture what the principle
     genuinely IS, while canonical labels organize it within our taxonomy.
@@ -236,7 +203,12 @@ Identify:
    (Use the most precise discipline name you know — not generic buckets)
 2. What applied domains/fields/industries does this principle span?
    (1-5 domains where a practitioner would apply this knowledge)
-3. Is this a NARROW sub-technique or sub-field detail? (is_specialized: true/false)
+3. DEPTH (ontological scope): universal, cross-domain, domain, or specialized?
+   Apply the physicist-chef-poet test. Does the mechanism apply across ALL reality
+   (universal), bridge two distinct disciplines via shared structure (cross-domain),
+   operate within one field (domain), or describe a narrow sub-technique (specialized)?
+   DEFAULT to "domain" unless the mechanism clearly transcends it.
+4. Is this a NARROW sub-technique or sub-field detail? (is_specialized: true/false)
    - true = narrow technique, tool-specific skill, sub-field detail (e.g., "Kerning Pair Adjustment")
    - false = broad principle applicable across the domain (e.g., "Design Strategy")
    - Default to false unless clearly narrow.
@@ -244,6 +216,7 @@ Identify:
 Return JSON:
 {{"discipline": "precise_discipline_name",
   "domains": ["domain1", "domain2"],
+  "depth": "universal|cross-domain|domain|specialized",
   "is_specialized": true_or_false,
   "evidence": "cited|axiomatic"}}"""
 
@@ -835,53 +808,40 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         start = time.time()
 
-        # Phase 1: Generate FB — D2120 optimization: skip full GEN for single-FB
-        # clusters but STILL run a CRIBS enrichment pass to fill application,
-        # failure_mode, elaboration, jargon, keywords (D2137 fix).
-        if len(cluster_principles) == 1:
-            fb_data = dict(cluster_principles[0])  # shallow copy
-            fb_data["_gen_skipped"] = True
-            print("→ ⚡ GEN skipped (single-FB)", flush=True, end=" ")
-            # ── D2137: CRIBS enrichment for single-FB clusters ──────────
-            # Stage2 produces name+definition+mechanism+boundary but NOT
-            # application, failure_mode, elaboration, jargon, keywords.
-            # Always run a lightweight enrichment to add these fields.
-            _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
-            if _skip_llm:
-                print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
-            else:
-                try:
-                    cribs_prompt = _build_cribs_enrichment_prompt(fb_data)
-                    cribs_result = call_omlx_json(
-                        prompt=cribs_prompt,
-                        model=GEN_MODEL,
-                        system=CRIBS_ENRICHMENT_SYSTEM,
-                        max_tokens=1024,
-                    )
-                    if isinstance(cribs_result, dict):
-                        for field in ("application", "failure_mode", "elaboration",
-                                      "keywords", "jargon"):
-                            if cribs_result.get(field):
-                                fb_data[field] = cribs_result[field]
-                        print("+CRIBS", flush=True, end=" ")
-                except Exception as e:
-                    # D2160: enrichment is best-effort but must be observable (C16)
-                    fb_data["enrichment_status"] = "FAILED"
-                    fb_data["enrichment_error"] = str(e)[:200]
-                    print("⚠️CRIBS", flush=True, end=" ")
+        # Phase 1: Generate FB — D2120: cluster-before-extract guarantees 1 principle per cluster.
+        # All generation happens via CRIBS enrichment on the single principle.
+        assert len(cluster_principles) == 1, \
+            f"UNREACHABLE: cluster {cluster_id} has {len(cluster_principles)} principles (cluster-before-extract invariant violated)"
+        fb_data = dict(cluster_principles[0])  # shallow copy
+        fb_data["_gen_skipped"] = True
+        print("→ ⚡ GEN skipped (single-FB)", flush=True, end=" ")
+        # ── D2137: CRIBS enrichment for single-FB clusters ──────────
+        # Stage2 produces name+definition+mechanism+boundary but NOT
+        # application, failure_mode, elaboration, jargon, keywords.
+        # Always run a lightweight enrichment to add these fields.
+        _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
+        if _skip_llm:
+            print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
         else:
             try:
-                prompt = build_fb_prompt(cluster_principles)
-                fb_data = call_omlx_json(
-                    prompt=prompt,
+                cribs_prompt = _build_cribs_enrichment_prompt(fb_data)
+                cribs_result = call_omlx_json(
+                    prompt=cribs_prompt,
                     model=GEN_MODEL,
-                    system=FB_SYSTEM_PROMPT,
-                    max_tokens=2048,
+                    system=CRIBS_ENRICHMENT_SYSTEM,
+                    max_tokens=1024,
                 )
+                if isinstance(cribs_result, dict):
+                    for field in ("application", "failure_mode", "elaboration",
+                                  "keywords", "jargon"):
+                        if cribs_result.get(field):
+                            fb_data[field] = cribs_result[field]
+                    print("+CRIBS", flush=True, end=" ")
             except Exception as e:
-                print(f"→ ❌ Generation error: {e}")
-                failed += 1
-                continue
+                # D2160: enrichment is best-effort but must be observable (C16)
+                fb_data["enrichment_status"] = "FAILED"
+                fb_data["enrichment_error"] = str(e)[:200]
+                print("⚠️CRIBS", flush=True, end=" ")
 
         if not isinstance(fb_data, dict):
             print("→ ⚠️  Non-dict response, skipping")
@@ -895,13 +855,12 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             failed += 1
             continue
 
-        # Phase 2: TWO-STAGE classification (D2138) + derived depth (Kim's logic)
+        # Phase 2: TWO-STAGE classification (D2138) + semantic depth (D2220)
         # Stage 1: FREE scientific classification — LLM uses full knowledge,
-        # unrestricted by canonical lists. Produces ontologically accurate raw labels
-        # and an is_specialized flag for narrow sub-field detection.
+        # unrestricted by canonical lists. Produces ontologically accurate raw labels,
+        # is_specialized flag, AND semantic depth via physicist-chef-poet test.
         # Stage 2: CANONICAL MAPPING — pipeline maps raw labels to taxonomy.
-        # Stage 3: DEPTH DERIVATION — depth = f(n_canonical_domains, is_specialized).
-        # Depth is a structural property (domain count), not a semantic guess.
+        # Stage 3: DEPTH — LLM-classified semantically (D2220), not derived from domain count.
         synonym_index = get_synonym_index()
 
         try:
@@ -963,37 +922,22 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         if not canonical_domains:
             canonical_domains = ["emerging"]
 
-        # ── Stage 3: DERIVE depth from canonical domain count (Kimi's logic) ──
-        # Depth is a structural property: n_domains → depth tier.
-        # "emerging" counts as 1 domain for broad principles (conservative).
-        # For specialized principles, use canonical-only count — "emerging" isn't
-        # a genuine second domain for a narrow technique.
-        n_canonical = len([d for d in canonical_domains if d != "emerging"])
-        has_emerging = "emerging" in canonical_domains
-
-        if is_specialized:
-            # D2139: Specialized principles use canonical-only domain count.
-            # A narrow technique with 1 real domain + emerging = specialized, not domain.
-            # A narrow technique spanning 2+ real domains = domain (capped, can't be higher).
-            # A narrow technique with 0 real domains (all emerging) = domain (conservative).
-            if n_canonical >= 2:
-                depth_val = "domain"
-            elif n_canonical == 1:
-                depth_val = "specialized"
-            else:
-                depth_val = "domain"
+        # ── Stage 3: USE LLM-CLASSIFIED DEPTH (D2220: semantic, not structural) ──
+        # D2220: Depth is now classified by the LLM using the physicist-chef-poet
+        # test (see CLASSIFY_SYSTEM_PROMPT). This replaces the structural derivation
+        # from domain count, which had a ~55% error rate (over-assigned "universal").
+        # The LLM judges ontological scope — whether the mechanism applies across all
+        # reality (universal), bridges two disciplines (cross-domain), operates within
+        # one field (domain), or is a narrow sub-technique (specialized).
+        raw_depth = class_data.get("depth", "")
+        VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
+        if raw_depth in VALID_DEPTHS:
+            depth_val = raw_depth
         else:
-            effective_n = n_canonical + (1 if has_emerging else 0)
-            if effective_n >= 3:
-                depth_val = "universal"
-            elif effective_n == 2:
-                depth_val = "cross-domain"
-            elif effective_n == 1:
-                depth_val = "domain"
-            else:
-                depth_val = "domain"
+            # Fallback: conservative default. If LLM hallucinates depth, assume domain.
+            depth_val = "domain"
 
-        # ── Assemble class_data with CANONICAL labels + derived depth ──
+        # ── Assemble class_data with CANONICAL labels + semantic depth ──
         class_data["discipline"] = canonical_discipline
         class_data["domains"] = canonical_domains
         class_data["depth"] = depth_val
@@ -1101,6 +1045,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "fb_id": make_hash_id(name, definition),
             "name": name,
             "definition": definition,
+            "mechanism": fb_data.get("mechanism", "").strip(),
+            "boundary": fb_data.get("boundary", "").strip(),
+            "consequence": fb_data.get("consequence", "").strip(),
             "application": fb_data.get("application", "").strip(),
             "failure_mode": fb_data.get("failure_mode", "").strip(),
             "elaboration": fb_data.get("elaboration", "").strip(),
@@ -1125,6 +1072,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
             "source_principle_ids": [p.get("principle_id", "") for p in cluster_principles if p.get("principle_id")],
+            "evidence_passages": cluster_principles[0].get("evidence_passages", []) if cluster_principles else [],
+            "evidence_passages_shown": cluster_principles[0].get("evidence_passages_shown", []) if cluster_principles else [],
             "source_text": _collect_source_text(cluster_principles),
             "classification_errors": errors if errors else None,
             # ── Utilization tracking (initialized at zero) ──
@@ -1132,6 +1081,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "feedback_score": None,
             "feedback_count": 0,
             "fb_version": 1,
+            "classification_status": "CLEAN",  # D2214/F-H16: Pydantic default never applied to dict
         }
         # Only include jargon when specialized terms need explanation
         jargon_val = _serialize_jargon(fb_data.get("jargon"))

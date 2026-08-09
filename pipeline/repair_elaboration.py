@@ -12,13 +12,9 @@ from __future__ import annotations
 import concurrent.futures
 import io
 import json
-import os
 import sys
-import tempfile
-import threading
 import time
 from pathlib import Path
-from typing import Any
 
 # Add project root to path
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -28,10 +24,10 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 _sys = sys
 _sys.stdout = io.TextIOWrapper(_sys.stdout.buffer, write_through=True, line_buffering=True)
 
-from pipeline.omlx_call import call_omlx, CircuitOpenError
-from pipeline.json_repair import parse_json_robust
-from pipeline.pipeline_paths import STAGE2_CHECKPOINT
 from pipeline.io_guard import safe_write
+from pipeline.json_repair import parse_json_robust
+from pipeline.omlx_call import CircuitOpenError, call_omlx
+from pipeline.pipeline_paths import STAGE2_CHECKPOINT
 
 # Config
 BATCH_SIZE: int = 5

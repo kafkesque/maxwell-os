@@ -1,8 +1,10 @@
-# Maxwell OS — Aggregated Remaining Tasks (Post D2211 P0 Fixes + Full Audit)
-> **Updated:** 2026-08-08 08:51 | **Source:** D2195-D2211 + Goose Ultimate Final Verdict + IMPLEMENTATION_SPEC cross-reference
-> **Total outstanding findings:** 33 items (12 HIGH + 10 MEDIUM + 10 LOW), 2 fixed by D2211, 2 partially mitigated
-> **Recently completed:** D2195-D2204 (12 immediate fixes), D2205 roadmap, D2205-P0.1-P1.2 (retrieval eval + agentic + graph), D2208 (N1 yield), D2209 (probe routing), **D2211 (13 P0 circuit breaker fixes)**
+# Maxwell OS — Aggregated Remaining Tasks (Post D2211 P0 Fixes + 2026-08-09 Audit)
+> **Updated:** 2026-08-09 20:17 | **Source:** D2195-D2218 + Goose Ultimate Final Verdict + 2026-08-09 comprehensive audit
+> **Total outstanding findings:** 38 items (16 HIGH + 11 MEDIUM + 11 LOW), 4 fixed by D2211+D2212, 2 partially mitigated
+> **New from 2026-08-09 audit:** 5 HIGH findings (F-H13 through F-H17), 2 MEDIUM (F-M12, F-M13), 1 LOW (F-L11)
+> **Recently completed:** D2195-D2204 (12 immediate fixes), D2205 roadmap, D2205-P0.1-P1.2 (retrieval eval + agentic + graph), D2208 (N1 yield), D2209 (probe routing), **D2211 (13 P0 circuit breaker fixes)**, D2212 (MinHash lock + ST cache), **D2213-D2218 (2026-08-09 audit decisions)**
 > **Pipeline state:** S0 (922 MDs) ✅ | S1 (323K segments) ✅ | S1.5 (12,964 clusters + 35,239 singletons) ✅ | **S2 ready to run**
+> **Tier 0 fixes:** Fix 0.1-0.4 specified (NOT YET APPLIED) — see `SESSION-HANDOFF-2026-08-09.md` §10
 > **OMLX state:** All models loaded. stress_test: ALL_PASS.
 > **Loose end:** Old 21MB probe cache ✅ cleaned up via safe_delete (backed up to backup/deletions/)
 
@@ -59,7 +61,17 @@ D2211 addressed 2 of 33 findings. Below is the complete re-audit against live re
 | **F-H11** | MinHash race condition — `is_near_duplicate` called from ThreadPoolExecutor, mutates datasketch state | ✅ | ✅ **FIXED (D2212)** — `threading.Lock` wraps all `lsh.insert()` and `minhash_cache` access in `_build_fb_from_result` + post-collection dedup. | |
 | **F-H12** | MinHash LRU evicts cache but not LSH index — inconsistency | ❌ | 🟠 **STILL VALID** | LRU eviction of `minhash_cache` doesn't remove from LSH index. Negligible for single run (~1.2MB at 10K entries). |
 
-### 0.3 MEDIUM — Operational / Performance (11 findings)
+### 🆕 2026-08-09 Audit Findings — HIGH (5 new)
+
+| ID | Finding | Status | Recommendation |
+|----|---------|--------|----------------|
+| **F-H13** | **S5 verification blindspot** — mechanism/boundary/consequence dropped in S4, S5 falls back to application/failure_mode/elaboration. NLI scores labeled "mechanism" actually reflect CRIBS-enriched application match. `check_fb_completeness()` passes as long as fallback fields exist. **D2215.** | 🔴 **CRITICAL** | Fix 0.2: forward mechanism/boundary/consequence in S4 dict. Then Fix 0.4: align NLI to MAX-entailment. |
+| **F-H14** | **Pydantic FB class dead code** — `FB(StampedRecord)` at schemas.py:459 never instantiated. All validators (min_length, Literal, field_validator) are non-functional. `grep -rn 'FB(' pipeline/` returns 0 calls. **D2214.** | 🟠 **GOVERNANCE GAP** | Either wire Pydantic validation at S4 output boundary OR remove dead class. Prompt-based enforcement currently stricter. |
+| **F-H15** | **No actionability field** — FB dict and Pydantic model lack actionability classification. v3 proposal (descriptive/prescriptive/diagnostic) not implemented. v1 had binary T3 gate (30s test). **D2213.** | 🟠 **MISSING FEATURE** | Add actionability to FB model + dict. Implement in classification prompt. Enables conditional CRIBS generation (descriptive FBs skip expensive CRIBS call). |
+| **F-H16** | **classification_status not in FB dict** — Pydantic model has `classification_status: str = "CLEAN"` but dict assembly only sets it in D2176 failure path. Default "CLEAN" never written to checkpoint. | 🟡 **DATA GAP** | Add `"classification_status": "CLEAN"` to default dict assembly. |
+| **F-H17** | **confidence_score not populated** — Pydantic model expects `confidence_score` (populated by S5) but dict never includes it. | 🟡 **DATA GAP** | Add confidence_score after S5 verification pass. |
+
+### 0.3 MEDIUM — Operational / Performance (11 findings → 13 with new)
 
 | ID | Finding | D2211 Fix? | Status |
 |----|---------|-----------|--------|
@@ -75,7 +87,14 @@ D2211 addressed 2 of 33 findings. Below is the complete re-audit against live re
 | **F-M10** | `call_omlx` breaker check at entry only — not re-checked inside retry loop | ❌ | 🟡 Re-check breaker between retries (breaks are sub-second now with lock, low priority) |
 | **F-M11** | `run_monitor.py:68` — `except Exception: pass` (silent swallow) | ❌ | 🟡 Log the error |
 
-### 0.4 LOW — Hygiene / Future Tax (10 findings)
+### 🆕 2026-08-09 Audit Findings — MEDIUM (2 new)
+
+| ID | Finding | Status | Recommendation |
+|----|---------|--------|----------------|
+| **F-M12** | **S2 singleton bottleneck** — 35,239 items × ~4s with max_workers=3 = ~39h runtime. Increasing to max_workers=5 → ~24h. Need memory profiling first. | 🟡 **PERF** | Profile memory at max_workers=5. OMLX currently at ~45GB with 3 workers; 5 workers may hit memory guard ceiling. |
+| **F-M13** | **Evidence truncated at 300-400 chars** (F-H10 related) — LLM sees truncated evidence in both S2 extraction and S5 verification. Could miss critical context. | 🟡 **QUALITY** | Test with increased truncation limit after verifying OMLX prefill guard doesn't reject. |
+
+### 0.4 LOW — Hygiene / Future Tax (10 findings → 11 with new)
 
 | ID | Finding | Status |
 |----|---------|--------|
@@ -90,14 +109,22 @@ D2211 addressed 2 of 33 findings. Below is the complete re-audit against live re
 | **F-L9** | `stage0_convert.py:285` — `except Exception: pass` | 🟡 Log the error |
 | **F-L10** | `stage1_3_prefilter.py:76-77` — `except Exception: return []` | 🟡 Log the error |
 
+### 🆕 2026-08-09 Audit Findings — LOW (1 new)
+
+| ID | Finding | Status | Recommendation |
+|----|---------|--------|----------------|
+| **F-L11** | **CONSTITUTION.md says both "9-stage" and "8-stage"** — line 59 says "9-stage v3.0" but line 63 says "8-stage pipeline". Stage 3 removed per D2120/D2198. | 🟢 **DOC** | Fix line 59: "9-stage" → "8-stage". |
+
 ### 📊 Summary
 
 | Category | Total | Fixed (D2211+D2212) | Mitigated | Still Outstanding |
 |----------|-------|---------------------|-----------|-------------------|
-| 0.2 HIGH | 12 | 3 (F-H3, F-H5, F-H11) | 1 (F-H2 partial) | **8** |
-| 0.3 MEDIUM | 11 | 0 | 2 (F-M3, F-M6) | **9** |
-| 0.4 LOW | 10 | 0 | 1 (F-L2) | **9** |
-| **TOTAL** | **33** | **3** | **4** | **26** |
+| 0.2 HIGH | 17 | 3 (F-H3, F-H5, F-H11) | 1 (F-H2 partial) | **13** |
+| 0.3 MEDIUM | 13 | 0 | 2 (F-M3, F-M6) | **11** |
+| 0.4 LOW | 11 | 0 | 1 (F-L2) | **10** |
+| **TOTAL** | **41** | **3** | **4** | **34** |
+
+⬆️ +8 findings from 2026-08-09 comprehensive audit (actionability, Pydantic, S5 blindspot, bottleneck, evidence truncation).
 
 **D2212 (2026-08-08):** Two pre-S2 fixes applied:
 1. **F-H11** MinHash race condition — `threading.Lock` protecting datasketch LSH + minhash_cache. Was the ONLY finding that could crash/corrupt S2.

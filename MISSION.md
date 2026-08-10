@@ -1,4 +1,4 @@
-# Maxwell OS v2.0 — MISSION.md
+# Maxwell OS v3.0 — MISSION.md
 
 ## WHY MAXWELL OS EXISTS
 
@@ -194,5 +194,5 @@ Minimum target: 16GB RAM, any modern CPU. Auto-detects available resources and s
 
 ---
 
-*Maxwell OS v2.0 — Build the bridge. Test everything. Own your AI.*
+*Maxwell OS v3.0 — Build the bridge. Test everything. Own your AI.*
 *Cross-examined: Kimi (2026-07-19), Goose (2026-07-19)*

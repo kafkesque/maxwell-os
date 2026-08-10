@@ -393,8 +393,7 @@ def check_version_consistency() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 # CHECK 13: No deprecated config is reachable
 # ═══════════════════════════════════════════════════════════════════════════
-DEPRECATED_KEYS = [
-    "hdbscan_min_cluster_size",
+DEPRECATED_KEYS = [,
     "umap_n_neighbors",
     "umap_min_dist",
     "stage3_cluster",

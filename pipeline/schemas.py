@@ -1,5 +1,5 @@
 """
-schemas.py — Pydantic v2 boundary contracts for Maxwell OS v2.0 pipeline.
+schemas.py — Pydantic v2 boundary contracts for Maxwell OS v3.0 pipeline.
 =========================================================================
 Authority: CONSTITUTION.md §3, §4
 

@@ -89,7 +89,7 @@ OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay
 OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
 OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))
 OMLX_CB_COOLDOWN_SECONDS = float(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_cooldown_seconds", 60))
-OLLAMA_NOMIC_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("nomic_max_chars", 4000))
+OLLAMA_EMBED_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("embed_max_chars", 4000))
 OLLAMA_BATCH_SIZE = int(_CFG.get("services", {}).get("ollama", {}).get("batch_size", 100))
 
 # ── Models ─────────────────────────────────────────────────────────────
@@ -108,7 +108,6 @@ MIN_CHUNK_WORDS=int(_CFG.get("pipeline", {}).get("min_chunk_words", 10))        
 ENHANCE_MIN_HEADER_GAP_CHARS=int(_CFG.get("pipeline", {}).get("enhance_min_header_gap_chars", 3000))  # T1.2: min chars between headers
 # D2183: HDBSCAN ghost config removed (D2120/D2183). Retained as 0 for backward compat only.
 # No pipeline stage imports this — safe to remove entirely in v3.2.
-HDBSCAN_MIN_CLUSTER_SIZE: int = 0  # was _CFG.get("pipeline", {}).get("hdbscan_min_cluster_size", 15)
 BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))

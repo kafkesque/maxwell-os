@@ -55,7 +55,7 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "services.omlx.default_timeout":    ("pipeline.omlx_call", "DEFAULT_TIMEOUT", "int"),
     "services.omlx.max_retries":        ("pipeline.omlx_call", "MAX_RETRIES", "int"),
     "services.omlx.retry_delay":        ("pipeline.omlx_call", "RETRY_DELAY", "int"),
-    "services.ollama.nomic_max_chars":  ("pipeline.ollama_embed", "NOMIC_MAX_CHARS", "int"),
+    "services.ollama.embed_max_chars":  ("pipeline.ollama_embed", "EMBED_MAX_CHARS", "int"),
     "services.ollama.batch_size":       ("pipeline.ollama_embed", "BATCH_SIZE", "int"),
     # ── Coverage (T0.3) ──
     "coverage.threshold":               ("pipeline.coverage_check", "COVERAGE_THRESHOLD", "float"),

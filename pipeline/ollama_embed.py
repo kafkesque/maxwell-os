@@ -31,7 +31,7 @@ class EmbeddingQuarantineError(Exception):
 from pipeline.pipeline_paths import (
     OLLAMA_BATCH_SIZE,
     OLLAMA_HOST,
-    OLLAMA_NOMIC_MAX_CHARS,
+    OLLAMA_EMBED_MAX_CHARS,
     OLLAMA_PORT,
 )
 
@@ -49,7 +49,7 @@ class EmbeddingFunction:
 
 
 # ── Constants (T0.4: de-hardcoded — sourced from pipeline_config.yaml) ────
-NOMIC_MAX_CHARS: int = OLLAMA_NOMIC_MAX_CHARS  # nomic-embed-text context (from config)
+EMBED_MAX_CHARS: int = OLLAMA_EMBED_MAX_CHARS  # bge-m3 embed context (from config)
 BATCH_SIZE: int = OLLAMA_BATCH_SIZE            # max texts per batch (from config)
 # OLLAMA_URL now configured from pipeline_paths.py (was hardcoded localhost)
 
@@ -78,7 +78,7 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
     for i in range(0, len(texts), BATCH_SIZE):
         batch = texts[i : i + BATCH_SIZE]
         # Truncate long texts
-        truncated = [t[:NOMIC_MAX_CHARS] for t in batch]
+        truncated = [t[:EMBED_MAX_CHARS] for t in batch]
         try:
             resp = requests.post(
                 OLLAMA_URL,

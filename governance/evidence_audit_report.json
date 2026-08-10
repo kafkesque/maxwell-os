@@ -1,7 +1,7 @@
 {
   "stats": {
-    "total_passages": 178,
-    "verbatim": 178,
+    "total_passages": 190,
+    "verbatim": 190,
     "fuzzy": 0,
     "missing": 0
   },
@@ -2673,6 +2673,186 @@
         "source_book": "Crucial Conversations — Kerry Patterson et al.",
         "char_start": 54,
         "char_end": 165,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-051",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Personality traits can be organized along five broad dimensions — Openness to experience, Conscientiousness, Extraversio",
+      "passage_sha": "892a9796022329cf",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Quiet — Susan Cain",
+        "char_start": 0,
+        "char_end": 153,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-051",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The model is descriptive: it classifies the landscape of human personality into five empirically-derived factors",
+      "passage_sha": "debcc78150424e67",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Quiet — Susan Cain",
+        "char_start": 268,
+        "char_end": 380,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-051",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "conscientiousness as the trait most consistently associated with achievement across domains",
+      "passage_sha": "ba45f84cae1095c1",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Grit — Angela Duckworth",
+        "char_start": 42,
+        "char_end": 133,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-051",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The model provides the vocabulary for distinguishing between different flavors of achievement-oriented personality",
+      "passage_sha": "7aed9d1d0cf1058c",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Grit — Angela Duckworth",
+        "char_start": 402,
+        "char_end": 516,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-052",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "five forces framework classifies the competitive pressures that shape every industry",
+      "passage_sha": "62598bed2c1354b5",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Understanding Michael Porter — Joan Magretta",
+        "char_start": 9,
+        "char_end": 93,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-052",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "This is a descriptive model: it categorizes the structural forces that determine industry profitability",
+      "passage_sha": "6aa50034daa1755e",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Understanding Michael Porter — Joan Magretta",
+        "char_start": 471,
+        "char_end": 574,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-052",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The framework does not tell you what to do — it tells you which competitive pressures exist",
+      "passage_sha": "6178ad2ff33b9af4",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Lean Startup — Eric Ries",
+        "char_start": 341,
+        "char_end": 432,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-052",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The categories themselves are descriptive, not prescriptive",
+      "passage_sha": "a34708b3e2cabae3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Lean Startup — Eric Ries",
+        "char_start": 468,
+        "char_end": 527,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-053",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Basic features (must-haves) cause dissatisfaction when absent but do not increase satisfaction when present",
+      "passage_sha": "4080fad311b75f51",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Inspired — Marty Cagan",
+        "char_start": 113,
+        "char_end": 220,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-053",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Delighters (excitement features) cause disproportionate satisfaction when present but no dissatisfaction when absent",
+      "passage_sha": "b6c63b182ab05662",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Inspired — Marty Cagan",
+        "char_start": 333,
+        "char_end": 449,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-053",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "the same feature migrates from delighter to performance to basic over time as competitors adopt it",
+      "passage_sha": "d06b0e8e8381e812",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Hooked — Nir Eyal",
+        "char_start": 378,
+        "char_end": 476,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-053",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The skill is not in building all three types equally but in recognizing that the same feature migrates",
+      "passage_sha": "6e87695b55091976",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Hooked — Nir Eyal",
+        "char_start": 301,
+        "char_end": 403,
         "match_mode": "raw"
       }
     }

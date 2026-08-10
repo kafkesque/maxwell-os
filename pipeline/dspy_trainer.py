@@ -4,7 +4,7 @@ DSPy Fine-Tuning Harness for Maxwell OS S2 Extraction Stage (T-007).
 
 Trains the S2 extractor (Qwen3-Coder) to produce convergent Foundation Blocks
 from multi-source book segment clusters using the v4.4 golden set (73 examples,
-75 FBs). Uses dspy.LM with openai/ prefix for OMLX OpenAI-compatible API.
+75 FBs). Uses DirectOMLXLM (custom dspy.LM subclass) that bypasses litellm for all optimizers.
 
 Architecture:
   1. ConvergentExtraction Signature → defines DSPy task I/O
@@ -427,31 +427,74 @@ def extraction_metric(
 
 
 # ──────────────────────────────────────────────────────────────────────
-# 5. DSPy Configuration (OMLX via OpenAI-compatible API)
+# 5. Direct OMLX LM Backend (bypasses litellm)
 # ──────────────────────────────────────────────────────────────────────
-# OMLX exposes an OpenAI-compatible API at http://localhost:11435/v1.
-# dspy.LM with the "openai/" model prefix handles this natively — no
-# custom LM subclass needed.
+# dspy's built-in litellm integration has issues with custom OpenAI-
+# compatible endpoints (MIPROv2 passes kwargs dict as model name).
+# DirectOMLXLM makes raw HTTP calls to OMLX's /v1/chat/completions,
+# bypassing litellm entirely. This works for ALL dspy optimizers.
+
+class DirectOMLXLM(dspy.LM):
+    """DSPy LM backend that calls OMLX directly, bypassing litellm.
+
+    Avoids the litellm custom-endpoint bug where MIPROv2's instruction
+    proposer passes the entire kwargs dict as the model parameter.
+    """
+
+    def __init__(
+        self,
+        model: str = DSPY_MODEL,
+        api_base: str = f"http://localhost:{OMLX_PORT}/v1",
+        api_key: str = "not-needed",
+        temperature: float = DSPY_TEMPERATURE,
+        max_tokens: int = DSPY_MAX_TOKENS,
+        **kwargs,
+    ):
+        super().__init__(model=model, temperature=temperature, max_tokens=max_tokens, **kwargs)
+        self.omlx_model = model
+        self.omlx_url = f"{api_base}/chat/completions"
+        self.omlx_key = api_key
+        self.omlx_temperature = temperature
+        self.omlx_max_tokens = max_tokens
+        self.provider = "omlx"
+
+    def __call__(self, prompt=None, messages=None, **kwargs):
+        """Make direct HTTP POST to OMLX."""
+        if messages:
+            msgs = messages
+        elif prompt:
+            msgs = [{"role": "user", "content": prompt}]
+        else:
+            return [""]
+
+        payload = {
+            "model": self.omlx_model,
+            "messages": msgs,
+            "temperature": self.omlx_temperature,
+            "max_tokens": self.omlx_max_tokens,
+        }
+
+        try:
+            import requests
+            resp = requests.post(
+                self.omlx_url,
+                json=payload,
+                headers={"Authorization": f"Bearer {self.omlx_key}"},
+                timeout=180,
+            )
+            resp.raise_for_status()
+            return [resp.json()["choices"][0]["message"]["content"]]
+        except Exception as e:
+            print(f"[DirectOMLXLM] Error: {e}")
+            return [""]
+
 
 def configure_dspy(model: str = DSPY_MODEL, verbose: bool = True) -> dspy.LM:
-    """Configure DSPy with OMLX via OpenAI-compatible API.
-
-    Uses openai/ prefix so dspy routes through OpenAIProvider.
-    BootstrapFewShot and ChainOfThought work correctly with this prefix.
-    MIPROv2 has a known litellm integration issue with custom endpoints
-    (tracked as DSPY-OMLX-001); use BootstrapFewShot until resolved.
-    """
-    omlx_model = f"openai/{model}"
-    lm = dspy.LM(
-        model=omlx_model,
-        api_base=f"http://localhost:{OMLX_PORT}/v1",
-        api_key="not-needed",
-        temperature=DSPY_TEMPERATURE,
-        max_tokens=DSPY_MAX_TOKENS,
-    )
+    """Configure DSPy with DirectOMLXLM for all optimizers."""
+    lm = DirectOMLXLM(model=model)
     dspy.configure(lm=lm)
     if verbose:
-        print(f"DSPy configured: model={omlx_model}, api_base=http://localhost:{OMLX_PORT}/v1")
+        print(f"DSPy configured: model={model}, backend=DirectOMLXLM (litellm bypassed)")
     return lm
 
 

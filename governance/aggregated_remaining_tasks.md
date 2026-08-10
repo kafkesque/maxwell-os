@@ -2,7 +2,7 @@
 > **Updated:** 2026-08-10 15:05 | **Source:** D2227-D2236 (cross-examination + quality blockers + DSPy harness)
 > **P0:** 7/7 DONE ✅ | **P1:** 8/8 DONE ✅ | **P2:** 4/4 DONE ✅ | **Blindspots:** 6/6 addressed
 > **Golden set:** v4.4 (73 examples, 75 FBs, EP:12, NH:12, DM:12, CM:39)
-> **DSPy harness:** Built (720 lines), OMLX backend verified, pilot pending
+> **DSPy harness:** Built (720 lines), DirectOMLXLM backend (no litellm), BootstrapFewShot verified (~48s/ex)
 > **Model:** gemma-4-31B-it-MLX-8bit downloading
 
 ---
@@ -168,3 +168,14 @@ T-016..T-019 + B-002 + B-003
 | 5 | Evaluate optimized S2 against held-out test set | P1 | After full training |
 | 6 | Triage 32 open buglog items | P2 | Deferred |
 | 7 | S4 classifier model replacement (Phi-4→Gemma) | P2 | After Gemma download |
+
+
+### 🟢 D2237 Update (2026-08-10 15:53)
+
+| Item | Status |
+|------|--------|
+| DirectOMLXLM backend | ✅ Working (bypasses litellm, all optimizers) |
+| BootstrapFewShot | ✅ Verified (~48s/example on M1 Max) |
+| MIPROv2 | Should work (same __call__ path) |
+| DSPy pilot runtime | ~10 min for 8-example pilot, ~1-2h for full 51-example training |
+| Gemma-4-31B-8bit | 1/7 shards downloaded (968MB), rest pending |

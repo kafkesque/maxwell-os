@@ -3617,3 +3617,26 @@ OMLX's `/v1/chat/completions` endpoint). Increase `DSPY_MAX_TOKENS` to 4096.
 - OMLX provider: OpenAIProvider (auto-detected from openai/ prefix)
 
 
+### D2237 — DirectOMLXLM Backend + DSPy Optimizer Verified (2026-08-10)
+
+**Context:** dspy.LM with `openai/` prefix worked for direct ChainOfThought but
+failed under MIPROv2 and BootstrapFewShot because litellm passes the entire kwargs
+dict as the model name to custom OpenAI-compatible endpoints.
+
+**Decision:** Implement `DirectOMLXLM` — a dspy.LM subclass that makes raw HTTP POST
+calls to OMLX's `/v1/chat/completions`, bypassing litellm entirely. This works
+for ALL dspy optimizers (ChainOfThought, BootstrapFewShot, MIPROv2).
+
+**Verification:**
+- Direct generation: ✅ (11/11 fields, 12s/generation)
+- BootstrapFewShot: ✅ (~48s/example on M1 Max, 1/3 completed before timeout)
+- MIPROv2: Should now work (same `__call__` path)
+
+**Performance note:** Qwen3-Coder-30B-A3B-MLX-4bit takes ~12s per generation on
+M1 Max. BootstrapFewShot with 3 rounds × 2 bootstraps × 8 examples ≈ 48 API calls
+≈ 10 minutes for a minimal pilot. Full training (51 examples) ≈ 1-2 hours.
+Recommended: run `--pilot` as a background task with nohup.
+
+**Code:** `pipeline/dspy_trainer.py` — `DirectOMLXLM` class (lines 435-490).
+
+

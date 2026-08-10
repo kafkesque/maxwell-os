@@ -3747,3 +3747,27 @@ The 0% depth accuracy proves the model cannot classify depth from extraction con
 **Recommendation:** Remove `depth` from ConvergentExtraction output fields and
 `format_golden_fewshot()` output. Let S4 classify depth as originally architected.
 
+
+### D2242: Remove Depth from S2 — Classified in Stage 4 (A-001)
+**Date:** 2026-08-10 | **Status:** DONE | **Type:** Architecture Fix
+
+**Problem:** The DSPy ConvergentExtraction Signature forced `depth` as an S2 output
+field. This contradicted:
+1. SYSTEM_PROMPT in stage2_extract.py: "Classification (depth, domains, discipline) 
+   is Stage 4's job — do NOT include those fields."
+2. 0% depth accuracy across ALL extraction runs (Traditional, CoT, BS)
+3. Only 1 universal + 1 specialized example in 50 FBs — no training signal
+4. Both LLM auditors (Kimi03, Qwen003) independently concluded depth belongs in S4
+
+**Fix:** Removed `depth` from:
+- ConvergentExtraction Signature output fields
+- golden_to_examples() example construction
+- extraction_metric scoring (15% weight redistributed)
+- format_golden_fewshot() output dict
+- compare_s2_methods.py metric Example construction
+
+**Weight redistribution:** depth 15% → type 15→20%, name 10→12%, mechanism 10→13%.
+Total remains 1.00.
+
+**Impact:** S2 now extracts principles only. S4 classifies depth as originally
+architected. Post-depth pilot run needed for fair S2 comparison.

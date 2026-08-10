@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-10T17:52:00'
-total_decisions: 224
+total_decisions: 225
 decisions:
 - id: D2092
   category: INF
@@ -1716,11 +1716,19 @@ decisions:
     claim was wrong. Qwen03 scored higher (8.5 vs 7 of 10).
   impact: Confirmed depth should move to S4. Traditional S2 scores inflated. No verified
     DSPy advantage in repo.
+- id: D2242
+  category: ARCH
+  state: ACTIVE
+  description: Remove depth from S2 — classified in Stage 4. Depth was erroneously
+    forced in DSPy ConvergentExtraction Signature despite SYSTEM_PROMPT explicitly
+    stating it is Stage 4 job. 0% accuracy confirmed architectural misfit.
+  impact: 'S2 extracts principles; S4 classifies depth. Metric redistributed: type
+    20%, name 12%, mechanism 13%.'
 summary:
-  total: 224
+  total: 225
   proposed: 0
   draft: 0
-  active: 185
+  active: 186
   stale: 0
   superseded: 8
   archived: 8

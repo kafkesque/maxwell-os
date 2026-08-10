@@ -124,6 +124,56 @@ def dspy_s2_extract(
 # Comparison Runner
 # ──────────────────────────────────────────────────────────────────────
 
+def _example_authors(example: dspy.Example) -> set[str]:
+    """Extract author surnames from a dspy.Example (A-002)."""
+    authors = getattr(example, "authors", None)
+    if isinstance(authors, (set, frozenset)):
+        return set(authors)
+    # Fallback: parse source_books if present
+    sb = getattr(example, "source_books", None)
+    if sb:
+        from pipeline.dspy_trainer import _extract_authors
+        return _extract_authors({"source_books": sb}) if not isinstance(sb, (set, frozenset)) else set()
+    return set()
+
+
+def _author_disjoint_fewshot(
+    golden: dict,
+    test_examples: list[dspy.Example],
+    n_pos: int,
+    n_neg: int,
+) -> tuple[list[dict], list[dict]]:
+    """
+    Select few-shot examples whose authors do NOT overlap the test set (A-002).
+
+    Data-leakage fix: previously the first N golden examples were used as
+    few-shot, so few-shot and test could share authors AND exact cluster
+    content, inflating Traditional S2 scores. This selects candidates
+    author-disjoint from test. Falls back to minimal-overlap if strict
+    exclusion is infeasible (small golden set).
+    """
+    test_authors: set[str] = set()
+    for ex in test_examples:
+        test_authors |= _example_authors(ex)
+
+    def _authors_of(entry: dict) -> set[str]:
+        from pipeline.dspy_trainer import _extract_authors
+        return _extract_authors(entry)
+
+    pos_candidates = [e for e in golden["examples"] if e.get("should_extract")]
+    neg_candidates = [e for e in golden["examples"] if not e.get("should_extract")]
+
+    def _select(candidates: list[dict], n: int) -> list[dict]:
+        strict = [c for c in candidates if not (_authors_of(c) & test_authors)]
+        if len(strict) >= n:
+            return strict[:n]
+        # Fallback: sort by overlap count ascending, take n
+        scored = sorted(candidates, key=lambda c: len(_authors_of(c) & test_authors))
+        return scored[:n]
+
+    return _select(pos_candidates, n_pos), _select(neg_candidates, n_neg)
+
+
 def run_comparison(
     test_examples: list[dspy.Example],
     optimized_program: dspy.Module | None = None,
@@ -140,8 +190,8 @@ def run_comparison(
     with open(GOLDEN_PATH) as f:
         golden = yaml.safe_load(f)
 
-    gold_pos = [e for e in golden["examples"] if e.get("should_extract")][:n_pos_fewshot]
-    gold_neg = [e for e in golden["examples"] if not e.get("should_extract")][:n_neg_fewshot]
+    # A-002: author-disjoint few-shot (no author overlap with test set)
+    gold_pos, gold_neg = _author_disjoint_fewshot(golden, test_examples, n_pos_fewshot, n_neg_fewshot)
 
     results = {
         "traditional": {"scores": [], "times": [], "predictions": []},
@@ -303,6 +353,20 @@ if __name__ == "__main__":
 
     # Truncate to n_examples
     test = test[:args.n_examples]
+
+    # A-002: report author overlap between test and few-shot pool
+    with open(GOLDEN_PATH) as f:
+        _golden = yaml.safe_load(f)
+    _test_auth: set[str] = set()
+    for _ex in test:
+        _test_auth |= _example_authors(_ex)
+    _gold_auth: set[str] = set()
+    for _g in _golden["examples"]:
+        from pipeline.dspy_trainer import _extract_authors
+        _gold_auth |= _extract_authors(_g)
+    _overlap = _test_auth & _gold_auth
+    print(f"\n  A-002 author check: test has {len(_test_auth)} authors, "
+          f"{len(_overlap)} also appear in golden pool ({len(_overlap)/max(1,len(_test_auth)):.0%})")
 
     # Load or skip DSPy program
     optimized = None

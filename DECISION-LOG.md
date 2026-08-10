@@ -3833,3 +3833,27 @@ from golden v4.4. Both models served via OMLX API (safe — D2243 prevention).
 - **Cross-domain** needs prompt few-shot examples — neither model can learn
   the distinction from the ontology description alone.
 - Do NOT use Gemma-8bit for latency-critical S2/S4 at scale on this hardware.
+
+### D2245: GPT-OSS-20B-MXFP4-Q8 — S4 Depth Classifier (llmfit-driven model research)
+
+**Context:** Gemma-4-31B-8bit (50% depth acc, 143.8s/call) is too slow for S4. User requested in-depth research for a smaller, more capable, optimized model, 100% compatible with the stack (MLX/OMLX, M1 Max 64GB, memory guard 55GB), using `llmfit`.
+
+**Research (llmfit + HF API):**
+- llmfit recommended DeepSeek-R1-0528-Qwen3-8B (score 95.3) and gpt-oss-20b-MXFP4-Q8 (82.0, 49 tok/s est)
+- Qwen3.5-9B-MLX-4bit REJECTED: it is a VLM (image-text-to-text), not a text classifier
+- gpt-oss-20b-MXFP4-Q8: 12.08GB disk, OpenAI GPT-OSS-20B (MoE, 3.6B active), Apache-2.0, text-generation, 4M context, converted with mlx-lm 0.27
+- Verified gpt_oss.py + MXFP4 both present in OMLX bundled mlx_lm (0.31.3/0.32.0) → load-compatible
+- Downloaded 12.08GB (159s), symlinked into ~/.omlx/models/, registered via `omlx restart`
+
+**Benchmark (seed-42 stratified 8 FBs, same as D2244):**
+
+| Model | Accuracy | avg/call | Notes |
+|-------|----------|----------|-------|
+| GPT-OSS-20B-MXFP4-Q8 | **62.5%** (5/8) | **5.8s** | 100% universal/domain/specialized |
+| Gemma-4-31B-8bit | 50% (4/8) | 143.8s | D2244 baseline |
+| Phi-4-mini-8bit | 37.5% (3/8) | 0.5s | D2244 baseline |
+
+- **24.9× faster than Gemma, +12.5pp accuracy, 1/3 the memory (12.1 vs 31GB)**
+- Cross-domain: still 0/3 — all three models fail; few-shot examples required (D2244 finding stands)
+
+**Impact:** GPT-OSS-20B becomes the S4 depth classifier. Frees ~19GB RAM for pipeline. Cross-family with Qwen3-Coder generator (R5 satisfied: OpenAI ≠ Qwen). Reasoning content available via `reasoning_content` field; parse `content` for final answer.

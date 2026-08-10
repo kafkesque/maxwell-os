@@ -110,7 +110,7 @@ def dspy_s2_extract(
             "boundary": getattr(result, "boundary", ""),
             "consequence": getattr(result, "consequence", ""),
             "extraction_type": getattr(result, "extraction_type", "causal_mechanism"),
-            "depth": getattr(result, "depth", "domain"),
+            # Depth no longer in S2 (A-001/D2241)
             "is_summary": getattr(result, "is_summary", False),
             "evidence_passages": getattr(result, "evidence_passages", "[]"),
             "route": getattr(result, "route", "NULL"),
@@ -178,7 +178,7 @@ def run_comparison(
                 route=trad_result.get("route", "NULL"),
                 name=trad_result.get("name", ""),
                 extraction_type=trad_result.get("extraction_type", "causal_mechanism"),
-                depth=trad_result.get("depth", "domain"),
+                # Depth no longer in S2 (A-001/D2241)
                 mechanism=trad_result.get("mechanism", ""),
                 boundary=trad_result.get("boundary", ""),
                 consequence=trad_result.get("consequence", ""),
@@ -207,7 +207,7 @@ def run_comparison(
                     route=dspy_result.get("route", "NULL"),
                     name=dspy_result.get("name", ""),
                     extraction_type=dspy_result.get("extraction_type", "causal_mechanism"),
-                    depth=dspy_result.get("depth", "domain"),
+                    # Depth no longer in S2 (A-001/D2241)
                     mechanism=dspy_result.get("mechanism", ""),
                     boundary=dspy_result.get("boundary", ""),
                     consequence=dspy_result.get("consequence", ""),

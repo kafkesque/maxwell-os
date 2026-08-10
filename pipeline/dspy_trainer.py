@@ -51,9 +51,10 @@ DSPY_MAX_TOKENS = 4096  # Override config's 1024: ConvergentExtraction needs 4K 
 OMLX_PORT = int(_cfg.get("omlx", {}).get("port", 11435))
 RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 
-# Extraction types and depths for validation
+# Extraction types for validation
+# NOTE: Depth is now classified in Stage 4, not S2 (A-001/D2241).
+# DEPTHS removed from S2 metric — see CONSTITUTION §2, D2241.
 EXTRACTION_TYPES = {"causal_mechanism", "empirical_pattern", "normative_heuristic", "descriptive_model"}
-DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -74,7 +75,7 @@ class ConvergentExtraction(dspy.Signature):
 
     Input: cluster_segments (list of source texts with authors)
     Output: is_convergent (bool), name, definition, mechanism, boundary,
-            consequence, extraction_type, depth, evidence_passages, route
+            consequence, extraction_type, evidence_passages, route
     """
 
     cluster_segments: str = dspy.InputField(
@@ -101,9 +102,8 @@ class ConvergentExtraction(dspy.Signature):
     extraction_type: str = dspy.OutputField(
         desc="causal_mechanism | empirical_pattern | normative_heuristic | descriptive_model"
     )
-    depth: str = dspy.OutputField(
-        desc="universal | cross-domain | domain | specialized"
-    )
+    # NOTE: Depth classification moved to Stage 4 (A-001/D2241).
+    # S2 extracts principles; S4 classifies depth. See CONSTITUTION §2.
     evidence_passages: str = dspy.OutputField(
         desc="JSON array of verbatim passages from cluster_segments that support this FB (2-4 passages)"
     )
@@ -206,7 +206,7 @@ def golden_to_examples(
                 boundary=fb.get("boundary", ""),
                 consequence=fb.get("consequence", ""),
                 extraction_type=fb.get("extraction_type", "causal_mechanism"),
-                depth=fb.get("depth", "domain"),
+                # Depth no longer in S2 (A-001/D2241) — classified in Stage 4
                 evidence_passages=evidence_json,
                 route="FB" if should_extract and fb.get("route", "NULL") != "NULL" else "NULL",
             )
@@ -320,16 +320,15 @@ def extraction_metric(
 
     Scoring dimensions (0.0–1.0):
     - convergence_correct: ±0.30  (heavily penalize FP/FN)
-    - name_similarity: ±0.10
-    - type_correct: ±0.15
-    - depth_correct: ±0.10
-    - mechanism_nonempty: ±0.10
+    - type_correct: ±0.20
+    - name_similarity: ±0.12
+    - mechanism_nonempty: ±0.13
     - evidence_present: ±0.10
     - boundary_present: ±0.05
     - consequence_present: ±0.05
     - route_correct: ±0.05
 
-    Total: 1.0 for perfect match.
+    Total: 1.0 for perfect match. Depth moved to Stage 4 (A-001/D2241).
 
     False positives (pred says extract, gold says don't) are heavily penalized:
     max score for FP = 0.20 (only partial credit for correct rejection fields).
@@ -356,35 +355,18 @@ def extraction_metric(
             # FALSE NEGATIVE — missed extraction
             return max(0.0, score + 0.10)  # partial credit for no hallucination
 
-    # ── Extraction type (P1: 15%) ──
+    # ── Extraction type (P1: 20%) ──
     gold_type = gold.extraction_type
     pred_type = getattr(pred, "extraction_type", "causal_mechanism")
     if gold_type == pred_type:
-        score += 0.15
+        score += 0.20
     elif gold_type in EXTRACTION_TYPES and pred_type in EXTRACTION_TYPES:
         score += 0.05  # wrong type but valid
 
-    # ── Depth (P1: 15%) — heavily penalize universal default bias ──
-    gold_depth = gold.depth
-    pred_depth = getattr(pred, "depth", "domain")
-    if gold_depth == pred_depth:
-        score += 0.15
-    elif gold_depth in DEPTHS and pred_depth in DEPTHS:
-        # Partial credit for adjacent depths
-        depth_order = ["specialized", "domain", "cross-domain", "universal"]
-        try:
-            g_idx = depth_order.index(gold_depth)
-            p_idx = depth_order.index(pred_depth)
-            if abs(g_idx - p_idx) == 1:
-                score += 0.07
-            # Bonus penalty: if gold is domain/cross-domain but pred is universal
-            # (the most common DSPy error — universal default bias)
-            if pred_depth == "universal" and gold_depth in ("domain", "specialized"):
-                score += 0.0  # No credit for universal when gold is domain/specialized
-        except ValueError:
-            pass
+    # NOTE: Depth classification moved to Stage 4 (A-001/D2241).
+    # The 15% depth weight is redistributed: type 15→20%, name 10→12%, mechanism 10→13%.
 
-    # ── Name similarity (10%) ──
+    # ── Name similarity (12%) ──
     gold_name = (gold.name or "").lower().strip()
     pred_name = getattr(pred, "name", "").lower().strip()
     if gold_name and pred_name:
@@ -393,14 +375,14 @@ def extraction_metric(
         pred_tokens = set(pred_name.split())
         if gold_tokens and pred_tokens:
             overlap = len(gold_tokens & pred_tokens) / max(len(gold_tokens), len(pred_tokens))
-            score += overlap * 0.10
+            score += overlap * 0.12
 
-    # ── Mechanism quality (10%) ──
+    # ── Mechanism quality (13%) ──
     pred_mech = getattr(pred, "mechanism", "")
     if pred_mech and len(pred_mech.strip()) > 30:
-        score += 0.10
+        score += 0.13
     elif pred_mech and len(pred_mech.strip()) > 10:
-        score += 0.05
+        score += 0.06
 
     # ── Evidence passages (10%) ──
     pred_evidence = getattr(pred, "evidence_passages", "[]")
@@ -653,14 +635,6 @@ def cmd_dry_run(verbose: bool = True) -> None:
     print(f"\n── Extraction Types ──")
     for t in ["causal_mechanism", "empirical_pattern", "normative_heuristic", "descriptive_model"]:
         print(f"  {t}: {type_counts.get(t, 0)}")
-
-    # Depth stats
-    depth_counts = defaultdict(int)
-    for ex in pos:
-        depth_counts[ex.depth] += 1
-    print(f"\n── Depths ──")
-    for d in ["universal", "cross-domain", "domain", "specialized"]:
-        print(f"  {d}: {depth_counts.get(d, 0)}")
 
     print(f"\n✅ Dry run complete. {len(examples)} examples ready for DSPy training.")
     print(f"   Train: {len(train)} | Dev: {len(dev)} | Test: {len(test)}")

@@ -364,11 +364,11 @@ def extraction_metric(
     elif gold_type in EXTRACTION_TYPES and pred_type in EXTRACTION_TYPES:
         score += 0.05  # wrong type but valid
 
-    # ── Depth (P1: 10%) ──
+    # ── Depth (P1: 15%) — heavily penalize universal default bias ──
     gold_depth = gold.depth
     pred_depth = getattr(pred, "depth", "domain")
     if gold_depth == pred_depth:
-        score += 0.10
+        score += 0.15
     elif gold_depth in DEPTHS and pred_depth in DEPTHS:
         # Partial credit for adjacent depths
         depth_order = ["specialized", "domain", "cross-domain", "universal"]
@@ -376,7 +376,11 @@ def extraction_metric(
             g_idx = depth_order.index(gold_depth)
             p_idx = depth_order.index(pred_depth)
             if abs(g_idx - p_idx) == 1:
-                score += 0.05
+                score += 0.07
+            # Bonus penalty: if gold is domain/cross-domain but pred is universal
+            # (the most common DSPy error — universal default bias)
+            if pred_depth == "universal" and gold_depth in ("domain", "specialized"):
+                score += 0.0  # No credit for universal when gold is domain/specialized
         except ValueError:
             pass
 
@@ -528,23 +532,25 @@ def run_dspy_pilot(
 
     program = ExtractFB()
 
-    # Configure optimizer — use BootstrapFewShot for pilot (MIPROv2 has
-    # litellm integration issues with custom OMLX endpoints). MIPROv2 is
-    # available for full training once the litellm path is resolved.
-    optimizer = dspy.BootstrapFewShot(
+    # D2239: MIPROv2 confirmed working with DirectOMLXLM.
+    # The litellm bug only affects stock dspy.LM; DirectOMLXLM bypasses it.
+    optimizer = dspy.MIPROv2(
         metric=extraction_metric,
-        max_bootstrapped_demos=1,
-        max_labeled_demos=1,
-        max_rounds=1,  # Single round for pilot validation
+        num_threads=1,  # Single thread for local MLX
+        auto="light",   # 10 trials, light hyperparameter search
     )
 
     if verbose:
-        print(f"Optimizer: BootstrapFewShot (3 rounds, {len(train_examples)} trainset)")
+        print(f"Optimizer: MIPROv2 (auto=light, {len(train_examples)} train, {len(dev_examples)} val)")
         print("Starting optimization...")
 
     optimized = optimizer.compile(
         program,
         trainset=train_examples,
+        valset=dev_examples,
+        max_bootstrapped_demos=2,
+        max_labeled_demos=2,
+        requires_permission_to_run=False,
     )
 
     if verbose:

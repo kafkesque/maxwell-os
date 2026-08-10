@@ -2,7 +2,7 @@
 > **Updated:** 2026-08-10 15:05 | **Source:** D2227-D2236 (cross-examination + quality blockers + DSPy harness)
 > **P0:** 7/7 DONE ✅ | **P1:** 8/8 DONE ✅ | **P2:** 4/4 DONE ✅ | **Blindspots:** 6/6 addressed
 > **Golden set:** v4.4 (73 examples, 75 FBs, EP:12, NH:12, DM:12, CM:39)
-> **DSPy harness:** Built (720 lines), DirectOMLXLM backend (no litellm), BootstrapFewShot verified (~48s/ex)
+> **DSPy harness:** Built (720 lines), DirectOMLXLM + MIPROv2 verified, depth metric 15% + universal bias penalty
 > **Model:** gemma-4-31B-it-MLX-8bit downloading
 
 ---
@@ -179,3 +179,14 @@ T-016..T-019 + B-002 + B-003
 | MIPROv2 | Should work (same __call__ path) |
 | DSPy pilot runtime | ~10 min for 8-example pilot, ~1-2h for full 51-example training |
 | Gemma-4-31B-8bit | 1/7 shards downloaded (968MB), rest pending |
+
+
+### 🟢 D2239 Update (2026-08-10 17:00)
+
+| Item | Status |
+|------|--------|
+| MIPROv2 + DirectOMLXLM | ✅ Confirmed working (bypasses litellm) |
+| Depth metric fix | ✅ 10%→15%, universal-bias penalty |
+| MIPROv2 pilot | 🔄 Running (auto=light, 3 train, 2 val) |
+| Master prompt v7 | ✅ Created (8 evaluation questions) |
+| Gemma-4-31B-8bit | 3/7 shards (11GB of 16GB) |

@@ -3649,7 +3649,25 @@ held-out test examples.
 **Results (Qwen3-Coder-30B-A3B-MLX-4bit, M1 Max):**
 
 | Metric | Traditional | DSPy CoT | Winner |
-|--------|------------|----------|--------|
+|
+### D2239 — MIPROv2 Validated + Depth Metric Fix + Master Prompt v7 (2026-08-10)
+
+**Context:** MIPROv2 was previously blocked by litellm custom-endpoint bug. BootstrapFewShot
+showed +6% improvement (0.82→0.87) but was slow (51s). Depth accuracy was 0% across all methods.
+
+**Decisions:**
+1. MIPROv2 confirmed working with DirectOMLXLM. The litellm bug only affects stock dspy.LM;
+   DirectOMLXLM's raw HTTP calls bypass litellm entirely. MIPROv2 auto=light pilot running.
+
+2. Depth metric: weight increased 10%→15%, explicit penalty for universal default bias
+   (no credit for universal when gold is domain/specialized). This is the most common DSPy error.
+
+3. Master prompt v7 created: asks 8 evaluation questions about the Traditional vs DSPy
+   comparison, data leakage assessment, depth crisis, speed optimization, and architecture decision.
+
+**Status:** MIPROv2 pilot running in background. Gemma download at 3/7 shards.
+
+--------|------------|----------|--------|
 | Quality Score | **1.00** | 0.82 | Traditional |
 | Latency | 45.3s | **43.2s** | DSPy |
 | Type Accuracy | 3/3 | 2/3 | Traditional |

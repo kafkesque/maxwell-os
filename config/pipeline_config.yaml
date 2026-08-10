@@ -156,9 +156,12 @@ stage4:
   depth_fallback_depth: domain
 s2:
   # T-007b/D2250: DSPy MIPROv2 demo count — D2248 showed 2 demos = design-only
-  # (Cooper/Krug/Norman) while golden pool spans 38 domains. 4 demos → better coverage.
-  dspy_max_labeled_demos: 4
-  dspy_max_bootstrapped_demos: 4
+  # (Cooper/Krug/Norman) while golden pool spans 38 domains.
+  # D2251 finding: 4 demos × 51 examples × 6 bootstrap sets ≈ 20h — infeasible for
+  # interactive re-opt. HYBRID architecture (DSPy gate + Trad extract, 0.736) is the
+  # production fix and needs NO demo increase. 3 demos = scheduled overnight opt only.
+  dspy_max_labeled_demos: 3
+  dspy_max_bootstrapped_demos: 3
 stage5:
   borp_bypass_types:
   - process_template

@@ -3981,3 +3981,21 @@ Re-optimized gate (demos 4) expected to close the remaining FN gap.
 rejected (Traditional alone: 0/6 → all 0.0). (3) MIPROv2 re-optimization with
 4 demos running (D2250 config). (4) Implementation: `hybrid_s2_extract()` in
 tools/compare_s2_methods.py.
+
+### D2252: T-007b resolution — hybrid is production; demo re-opt scheduled not interactive
+
+**Finding:** MIPROv2 with max_labeled_demos=4 × 51 train × 6 bootstrap sets ≈ 20h
+(188s/example with 4 demos). Infeasible for interactive sessions.
+
+**Decision:** The HYBRID architecture (D2251, 0.736 avg) is the production S2
+implementation and needs NO demo increase — it uses the DSPy gate (negative
+rejection, its proven strength) + Traditional extraction (positive fidelity,
+its proven strength). The demo-count re-optimization (2→3, moderate cost) is a
+scheduled overnight task, not a blocking prerequisite.
+
+**Config:** `s2.dspy_max_labeled_demos: 3`, `dspy_max_bootstrapped_demos: 3`
+(D2251 attempted 4 — reverted to 3 as cost-balanced).
+
+**Impact:** (1) Production S2 = hybrid (D2251). (2) T-007b CLOSED as resolved
+via hybrid. (3) Overnight re-opt (3 demos) is optional polish, tracked in
+aggregated_remaining_tasks.md as T-007b-v2.

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-10'
-total_decisions: 234
+total_decisions: 235
 decisions:
 - id: D2092
   category: INF
@@ -1831,11 +1831,23 @@ decisions:
   files:
   - tools/compare_s2_methods.py
   - governance/s2_comparison_results.json
+- id: D2252
+  date: '2026-08-10'
+  category: CLS
+  status: active
+  title: 'T-007b resolution: hybrid is production; demo re-opt scheduled not interactive'
+  summary: 'MIPROv2 with 4 demos ~20h (188s/example) — infeasible interactive. Hybrid
+    (D2251, 0.736) needs no demo increase: DSPy gate + Trad extract. Config demos
+    2->3 (cost-balanced) for overnight opt only.'
+  impact: Production S2 = hybrid. T-007b CLOSED. Overnight re-opt optional polish.
+  files:
+  - config/pipeline_config.yaml
+  - pipeline/dspy_trainer.py
 summary:
-  total: 234
+  total: 235
   proposed: 0
   draft: 0
-  active: 190
+  active: 191
   stale: 0
   superseded: 8
   archived: 8
@@ -1848,7 +1860,7 @@ summary:
     DAT: 4
     DEF: 1
     VAL: 2
-    CLS: 9
+    CLS: 10
     STR: 1
     PERF: 3
     BUGFIX: 13

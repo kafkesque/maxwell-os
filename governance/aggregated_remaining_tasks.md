@@ -30,6 +30,8 @@
 | **BUG-053** | **Phi retired from S4** | ✅ Resolved for S4 (GPT-OSS replaces). Phi retained for S5 verify + fast gates |
 | **T-007b** | **S2 positive-fidelity gap** | ✅ **Hybrid (DSPy gate + Trad extract) WINS: 0.736** vs DSPy 0.672 vs Trad 0.591 (D2251). Root cause: MIPROv2 2 demos design-only. Fix: demos 2→4 config + hybrid architecture |
 | **T-009-followup** | **Author cap Christian 4→3** | ✅ CONV-012 Christian→The Age of AI (Kissinger/Schmidt/Huttenlocher). Evidence 194/194 verbatim, golden_validate PASS |
+| **S4 Chain E2E** | **GPT-OSS + focused depth on real S2 FBs** | ✅ Validated live: Patch Cord→specialized, Value-First→cross-domain (~7-26s/call) |
+| **D2252** | **T-007b pragmatic resolution** | ✅ Hybrid = production (0.736). Demo re-opt 4→3 (20h infeasible interactive); scheduled overnight |
 | **Audit** | **Golden pool + DSPy calibration** | ✅ Quality 0 gaps, 73/73 rationale, 194/194 evidence verbatim, metric weights sum 1.0. ⚠️ Depth class imbalance: universal=1, specialized=1 (4%) |
 
 ---

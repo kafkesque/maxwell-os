@@ -1,0 +1,135 @@
+{
+  "traditional": {
+    "scores": [
+      0.9666666666666667,
+      0.8666666666666667,
+      0.0,
+      0.0,
+      0.8500000000000001,
+      0.7500000000000001
+    ],
+    "times": [
+      75.05702614784241,
+      65.73491883277893,
+      36.25774383544922,
+      34.18505501747131,
+      46.21934700012207,
+      51.13486909866333
+    ],
+    "predictions": [
+      {
+        "name": "Habit Loop Anchoring",
+        "definition": "Attaching new behaviors to existing habit loops increases formation success by leveraging pre-existing neural pathways and cue-reward structures. The principle works because established habits already contain the essential components (cue, routine, reward) that can be repurposed to support new behaviors.\n\nThe mechanism operates through three key elements: (1) the existing habit provides a stable trigger (cue) that reliably initiates the behavior sequence, (2) the established routine structure allows new behaviors to be seamlessly integrated into the existing neural pathway, and (3) the reward system reinforces both the original and new behaviors through shared emotional associations.\n\nThis approach is particularly effective for forming new habits because it reduces cognitive load and decision fatigue while maintaining the psychological satisfaction that drives habit formation. The principle applies when the anchor habit is well-established and consistently performed, and fails when the anchor is too weak or inconsistent to serve as a reliable trigger.",
+        "mechanism": "Existing habit loops cause new behavior formation because they provide a stable cue-reward structure that can be repurposed to support new routines. The established neural pathways for the anchor habit create automatic triggers that initiate the new behavior sequence without requiring conscious effort or decision-making.\n\nThe new habit becomes embedded in the existing loop because the same cue that triggers the original routine now also triggers the new routine, while the same reward that reinforces the original behavior also reinforces the new behavior, creating dual reinforcement that strengthens both habits.",
+        "boundary": "Applies when the anchor habit is well-established, consistently performed, and has a clear cue-reward structure that can be repurposed. Fails when: (1) the anchor habit is too weak or inconsistent to serve as a reliable trigger; (2) the new behavior cannot be integrated into the existing routine structure; (3) the cue and reward systems of the anchor habit are incompatible with the desired new behavior.",
+        "consequence": "Because of this principle, new habits form more quickly and reliably when attached to existing routines, reducing the cognitive effort required for habit formation and increasing the likelihood of long-term retention. The approach creates dual reinforcement systems that strengthen both the anchor and new habits simultaneously.",
+        "elaboration": "The principle works best when the anchor habit is a simple, automatic behavior that occurs regularly in daily life, such as brushing teeth, drinking coffee, or checking email. The new behavior should be compatible with the timing and context of the anchor habit to maximize the likelihood of successful integration. When the anchor habit is too complex or variable, it may not provide a stable enough trigger for consistent new habit formation. Additionally, the reward system must be compatible between the anchor and new habits, as mismatched rewards can create confusion and weaken the reinforcement. The principle also works best when the new behavior is small and easily executable, as this reduces friction and makes consistent performance more likely.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "Habit stacking is a strategy for pairing a new habit with an existing one: 'After I [CURRENT HABIT], I will [NEW HABIT].' The existing habit serves as a stable anchor and trigger for the new behavior.",
+          "The habit loop consists of cue, routine, and reward. New habits are easier to form when they are attached to an existing cue.",
+          "Fogg's formula is: after a reliable existing behavior (anchor), do a tiny new behavior, then celebrate immediately."
+        ],
+        "route": "FB"
+      },
+      {
+        "name": "Spatial Proximity Grouping",
+        "definition": "Spatial proximity creates perceived relationships between elements, enabling users to group related items and understand organizational structure without explicit labeling. The principle operates through visual and cognitive mechanisms that treat physically close elements as part of the same conceptual unit. This grouping reduces cognitive load by leveraging innate spatial reasoning patterns. When elements are positioned near each other, users automatically infer functional or semantic connections between them.",
+        "mechanism": "Spatial proximity causes perceived grouping because the human visual system and cognitive processing automatically associate elements that are physically near each other, treating them as a single conceptual unit. This occurs through both visual perception (where spatial arrangement triggers grouping) and cognitive inference (where users assume functional relationships based on spatial arrangement).",
+        "boundary": "Applies when elements are visually or conceptually similar enough to be meaningfully grouped, and when the spatial relationship is clear and unambiguous. Fails when: (1) elements are too dissimilar in form or function to be meaningfully grouped; (2) spatial arrangement is inconsistent or unclear; (3) users have no prior knowledge or expectations about the grouping structure.",
+        "consequence": "Designs that leverage spatial proximity for grouping reduce cognitive processing demands and improve user comprehension by allowing users to intuitively understand organizational relationships. This leads to more efficient information processing and reduced error rates in task completion.",
+        "elaboration": "The principle works across multiple domains (design, typography, usability) because it taps into fundamental human cognitive patterns. In typography, spacing creates visual hierarchy that guides reading flow. In usability, physical grouping of controls reduces mental mapping effort. The strength of the grouping effect depends on the degree of spatial separation and the semantic similarity of the grouped elements. When proximity is used consistently, it creates predictable user expectations that enhance usability. However, when proximity is used inconsistently or with elements that shouldn't be grouped, it can create confusion and counterintuitive user experiences.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "The principle of proximity states that elements placed close together are perceived as more related than elements placed far apart",
+          "When related controls are physically grouped together, users infer a mapping between them",
+          "In typography, spacing creates hierarchy. Related content shares consistent spacing while unrelated content is separated by larger gaps"
+        ],
+        "route": "FB"
+      },
+      {
+        "name": "Tradeoff-Driven Design Selection",
+        "definition": "System design decisions are fundamentally constrained by tradeoffs between competing performance dimensions, where optimizing one aspect necessarily degrades others. The optimal solution depends on the specific workload characteristics and performance priorities of the system. Designers must make conscious choices about which dimensions to prioritize based on their operational requirements.",
+        "mechanism": "Design selections cause optimal system performance because system components are inherently constrained by physical and architectural limitations that force tradeoffs between competing objectives. When one performance dimension is optimized, others must suffer to maintain system viability, creating a bounded decision space where no universal solution exists.",
+        "boundary": "Applies when system components have inherent constraints that force tradeoffs between measurable performance dimensions (e.g., read/write efficiency, storage overhead). Fails when: (1) systems can be designed without fundamental constraints (e.g., single-node systems with unlimited resources); (2) all performance dimensions can be optimized simultaneously through architectural innovation; (3) workload characteristics remain constant and predictable.",
+        "consequence": "Designers must make explicit tradeoff decisions rather than assuming universal optimal solutions, leading to system architectures that reflect specific operational priorities rather than abstract perfection.",
+        "elaboration": "The principle reveals that design decisions are not about finding the single 'best' solution but about selecting the most appropriate compromise for a given context. In distributed systems, partition tolerance is often a given constraint that forces choices between consistency and availability. Similarly, storage engines must balance read performance against write performance and storage efficiency. These tradeoffs are not just technical limitations but fundamental properties of how systems scale and function under real-world constraints. The principle also implies that design decisions are context-dependent - what works for a write-heavy workload will fail for a read-heavy one, and vice versa.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "The CAP theorem states that a distributed data store can provide only two of three guarantees: Consistency, Availability, and Partition tolerance",
+          "Every storage engine design involves tradeoffs between read performance, write performance, and storage efficiency",
+          "B-trees optimize reads at the cost of write amplification; LSM-trees optimize writes at the cost of read amplification and compaction overhead"
+        ],
+        "route": "FB"
+      },
+      {
+        "name": "Feedback Loop Iteration Engine",
+        "definition": "The Build-Measure-Learn feedback loop enables rapid organizational learning by creating iterative cycles of experimentation and adaptation. The mechanism operates through systematic testing of assumptions, measuring outcomes, and adjusting direction based on data. This approach maximizes learning efficiency while minimizing waste from premature commitment to untested ideas.",
+        "mechanism": "Iterative feedback loops cause rapid learning because they systematically test assumptions through controlled experiments, measure actual outcomes against predictions, and enable immediate course correction based on empirical evidence rather than speculation.",
+        "boundary": "Applies when organizations have the capacity to rapidly iterate through cycles of experimentation and when outcomes can be measured objectively. Fails when: (1) organizational culture resists experimentation or learning from failure; (2) measurement systems are inadequate or too slow to provide actionable feedback; (3) the environment changes too rapidly for stable iterations to be meaningful.",
+        "consequence": "Organizations that consistently iterate through Build-Measure-Learn cycles develop adaptive capacity that allows them to pivot quickly when assumptions prove wrong, reducing the risk of costly dead ends and increasing the probability of discovering viable solutions.",
+        "elaboration": "The effectiveness of this mechanism depends on the organization's ability to distinguish between learning cycles that generate actionable insights versus those that merely confirm existing biases. Successful implementation requires psychological safety for failure, robust measurement systems, and leadership commitment to using data to drive decision-making rather than intuition. The feedback loop becomes particularly powerful in environments where rapid iteration is possible and where the cost of failure is low enough to support experimentation.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "Build-Measure-Learn is the fundamental unit of startup progress. Every startup should iterate through this loop as quickly as possible to maximize learning per unit of effort.",
+          "The Build-Measure-Learn feedback loop, introduced in The Lean Startup, applies not just to startups but to any organization seeking innovation. The loop is the core engine of entrepreneurial management."
+        ],
+        "route": "FB"
+      },
+      {
+        "name": "OODA Loop Speed Advantage",
+        "definition": "Operating at faster OODA loop cycles (Observe, Orient, Decide, Act) creates decision superiority by forcing opponents into reactive postures and enabling rapid adaptation to changing conditions. The principle leverages the temporal advantage of faster iteration over individual decision optimization. Speed of execution becomes the decisive factor in competitive environments.",
+        "mechanism": "Faster OODA loop cycles cause decision superiority because rapid iteration through observation, orientation, decision-making, and action creates temporal pressure that forces opponents into reactive responses rather than proactive ones. The faster cycle enables continuous adaptation while opponents remain locked in previous decision states.",
+        "boundary": "Applies when the competitive environment allows for rapid feedback loops and when the decision context permits quick execution cycles. Fails when: (1) the environment requires extensive deliberation or approval processes that cannot be accelerated; (2) the opponent has superior resources to match or exceed the faster cycle; (3) the situation demands perfect information before any action can be taken.",
+        "consequence": "Organizations or individuals that maintain faster OODA loop cycles will consistently outperform those with more optimized but slower decision processes, as they can adapt to changing conditions faster than their opponents can react.",
+        "elaboration": "The principle operates on the fundamental insight that in dynamic competitive environments, the ability to iterate quickly creates a form of strategic immunity. When one side can cycle through OODA loops faster, they effectively 'time travel' ahead of their opponent, making the opponent's previous decisions obsolete. This creates a cascading advantage where each faster iteration builds upon the last, while slower opponents become increasingly out of sync with reality. The principle also explains why over-planning and excessive analysis can be counterproductive in fast-moving environments - they create bottlenecks that eliminate the very advantage that makes rapid decision-making possible.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "The OODA loop (Observe, Orient, Decide, Act) is John Boyd's model of decision superiority",
+          "The key insight is that speed of iteration matters more than optimization of any single step",
+          "Whoever cycles through the loop faster than their opponent forces the opponent into a reactive posture",
+          "In military command, the key is not to make the perfect plan but to create shared intent and then let subordinates act decisively within it",
+          "Over-control slows the decision cycle and hands initiative to the enemy",
+          "The objective is tempo \u2014 operating faster than the opponent's decision cycle",
+          "Rapid cognition \u2014 'thin-slicing' \u2014 can outperform extensive deliberation in certain domains",
+          "Experts who have compressed years of experience into pattern-recognition can make better decisions in seconds than novices make in hours"
+        ],
+        "route": "FB"
+      },
+      {
+        "name": "Time-Constrained Output Optimization",
+        "definition": "Constraining available time for task completion forces higher output quality and quantity by increasing focus intensity and eliminating scope creep. The mechanism operates because time pressure eliminates non-essential work and forces ruthless prioritization. This principle applies when the task can be meaningfully bounded and the time constraint is treated as non-negotiable.",
+        "mechanism": "Time constraints cause improved output quality and quantity because they increase focus intensity and eliminate scope creep, forcing ruthless prioritization of essential elements. The pressure prevents the addition of complexity and polish that would otherwise consume available time.",
+        "boundary": "Applies when the task has bounded scope and the time constraint is treated as non-negotiable. Fails when: (1) the task is inherently unbounded or requires extensive iteration; (2) the time constraint is perceived as flexible or negotiable; (3) the task requires extensive collaboration or external input that cannot be compressed into a fixed time window.",
+        "consequence": "Because of this principle, projects completed under strict time constraints produce higher quality outputs with better focus than those with unlimited time, as the pressure eliminates scope creep and forces essential work to the forefront.",
+        "elaboration": "The principle operates through multiple layers of behavioral change: first, time pressure forces attention to the most critical elements, second, it eliminates the tendency to add unnecessary complexity or polish, and third, it creates a psychological commitment to finish within the constraint. This creates a feedback loop where the pressure to complete within time creates more efficient work patterns. The effect is particularly strong for creative or analytical tasks where scope creep is common. However, the principle has diminishing returns for tasks requiring extensive iteration or where the optimal solution requires more time than available.",
+        "is_summary": false,
+        "extraction_type": "causal_mechanism",
+        "content_type": "principle",
+        "evidence_passages": [
+          "Parkinson's Law states that work expands to fill the time available for its completion",
+          "Give yourself a week to write a report and it will take a week; give yourself 90 minutes and it will take 90 minutes",
+          "Counterintuitively, shorter deadlines produce equivalent or BETTER quality because they force ruthless prioritization",
+          "High-quality work produced = time spent \u00d7 intensity of focus",
+          "Fixed-schedule productivity \u2014 committing to finish work by a specific time and treating that deadline as non-negotiable \u2014 forces the intensity that produces both quantity and quality"
+        ],
+        "route": "FB"
+      }
+    ]
+  },
+  "dspy": {
+    "scores": [],
+    "times": [],
+    "predictions": []
+  }
+}

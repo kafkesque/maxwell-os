@@ -1621,7 +1621,7 @@ test:
     output_subdir: full-run
     pipeline_commit: full-run-v3
     schema_version: '2.3'
-    taxonomy_version: v5.0
+    taxonomy_version: v5.1
     extract_model: Qwen3.6-35B-A3B-4bit
     classify_model: Phi-4-mini-instruct-8bit
     extract_max_tokens: 2048

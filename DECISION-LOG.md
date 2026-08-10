@@ -3691,3 +3691,59 @@ an optimized prompt that's faster and matches traditional quality without data l
 **Next:** Compare BootstrapFewShot-optimized DSPy vs Traditional on fresh test set.
 
 
+
+---
+
+### D2240: Rename pipeline/json_repair.py → json_fixer.py (Name Collision Fix)
+**Date:** 2026-08-10 | **Status:** DONE | **Type:** P0 Bug Fix
+
+**Problem:** Maxwell's local `pipeline/json_repair.py` (custom JSON repair strategies from
+OutputGuard) shadowed the pip `json_repair` package. When dspy's MIPROv2 parallelizer
+spawned subprocesses, `import json_repair` resolved to the local module which has no
+`loads()` function, causing all MIPROv2 trials to crash with score 0.0.
+
+**Root Cause:** Name collision. The local module was named `json_repair.py` — identical to
+the pip package `json_repair` that dspy depends on for `json_repair.loads()`.
+
+**Fix:** Renamed `pipeline/json_repair.py` → `pipeline/json_fixer.py`. Updated imports in
+`omlx_call.py` and `repair_elaboration.py`. Verified `from json_repair import loads` now
+resolves correctly to the pip package in subprocesses.
+
+**Impact:** Unblocks all DSPy training. MIPROv2 pilot re-run successfully bootstrapping
+demos without crashes.
+
+### D2241: Cross-Examination Audit — Kimi03 vs Qwen003 vs Repo Ground Truth
+**Date:** 2026-08-10 | **Status:** DONE | **Type:** Quality Assurance
+
+**Method:** Compared both auditor reports against actual repo files:
+- `governance/s2_comparison_results.json` — actual data
+- `pipeline/dspy_trainer.py` — extraction_metric logic
+- `pipeline/stage2_extract.py` — SYSTEM_PROMPT depth instruction
+- `tools/compare_s2_methods.py` — few-shot sampling logic
+
+**Key Findings:**
+1. **Both auditors CORRECT on:**
+   - Data leakage in Traditional S2 (few-shot + test from same YAML)
+   - Depth architecture conflict (SYSTEM_PROMPT says S4's job, DSPy Signature forces it)
+   - Gemma-4-31B will be slower on M1 Max (dense 31B vs MoE 3B active)
+   - Stay traditional for now; no verified DSPy improvement exists in repo
+
+2. **Kimi03 ERROR:** Claimed extraction_metric has a "P1 bug" where 0.07 is awarded
+   then nullified by 0.0. Reality: the 0.07 adjacent check only fires when 
+   |g_idx - p_idx| == 1. For the penalized case (domain→universal), distance=2,
+   so 0.07 is NEVER awarded. The `score += 0.0` is dead code, not buggy. Code is correct.
+
+3. **Qwen003 more accurate** (8.5/10 vs 7/10): correctly identified metric isn't buggy,
+   correctly recommended moving depth to S4. Minor error: claimed N=3 when actual N=6.
+
+4. **Both missed:** MIPROv2 pilot crashing on every trial (json_repair.loads error).
+
+**Architectural Finding — Depth in S2 is a design error, not a decision:**
+The golden set was built end-to-end with all FB fields. The DSPy ConvergentExtraction
+Signature mirrored the full golden FB schema without pruning S4-only fields (depth,
+domains, discipline). The SYSTEM_PROMPT explicitly disallows depth classification in S2.
+The 0% depth accuracy proves the model cannot classify depth from extraction context alone.
+
+**Recommendation:** Remove `depth` from ConvergentExtraction output fields and
+`format_golden_fewshot()` output. Let S4 classify depth as originally architected.
+

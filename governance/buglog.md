@@ -1251,3 +1251,12 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Files:** `config/golden/stage2_fewshot_convergent.yaml`
 
 *Updated: 2026-08-10 (D2227 cross-examination) | Bugs tracked: 63 | Resolved: 46 | Closed (moot): 5 | Open: 12 | Schema version: 1.11*
+
+### BUG-058: IOGPUMemory Kernel Panic — Dual GPU Clients (2026-08-10) 🔴 MITIGATED
+**Symptom:** `panic: "completeMemory() prepare count underflow" @IOGPUMemory.cpp:492`
+**Trigger:** mlx_lm direct-load of Gemma-4-31B-8bit (31GB) while OMLX served
+Qwen3-Coder-30B + Phi-4-mini (~50GB combined GPU commit on 64GB unified memory).
+**Root cause:** Two concurrent Metal GPU allocators (mlx_lm + OMLX) under memory
+pressure → Apple IOGPUFamily memory prepare count underflow.
+**Fix:** OMLX-only serving. Never direct-load via mlx_lm while OMLX runs.
+**Status:** ✅ MITIGATED (D2243). Verified OMLX loads Gemma-31B safely with eviction.

@@ -3771,3 +3771,30 @@ Total remains 1.00.
 
 **Impact:** S2 now extracts principles only. S4 classifies depth as originally
 architected. Post-depth pilot run needed for fair S2 comparison.
+
+### D2243: Kernel Panic Investigation — IOGPUMemory Underflow (completeMemory prepare count)
+**Date:** 2026-08-10 | **Status:** MITIGATED | **Type:** P0 Infrastructure
+
+**Panic:** `panic(cpu 6): "completeMemory() prepare count underflow" @IOGPUMemory.cpp:492`
+OS: macOS 24F74 (Darwin 24.5.0), Apple M1 Max 64GB. Panicked task: Python (pid 31888).
+
+**Root cause chain:**
+1. Gemma-4-31B-it-MLX-8bit (31GB) loaded via mlx_lm as DIRECT Metal/GPU client
+2. OMLX server concurrently serving Qwen3-Coder-30B-4bit (~15GB) + Phi-4-mini (~4GB)
+   — a SECOND independent Metal client
+3. Unified memory 64GB: two GPU allocators committed ~50GB+ simultaneously
+4. Apple IOGPUFamily memory prepare count underflowed → kernel panic
+
+**Prevention (MANDATORY):**
+- Single GPU client rule: serve ALL models via OMLX API only
+- NEVER load large models with mlx_lm while OMLX is running
+- OMLX memory guard active: --memory-guard-gb 55 + auto-eviction
+- Check vm_stat headroom before any load: available > model_size + 10GB
+
+**Verified recovery:** OMLX successfully loaded Gemma-4-31B-8bit (30.73GB actual,
+38.09GB total) and completed reasoning-mode classification (108s/call at 2.9 tok/s).
+Gemma-4-31B is a REASONING model — emits reasoning_content then content; needs
+max_tokens≥1024 and content-field parsing for API consumers.
+
+**Impact:** S4/S5 benchmark now uses OMLX for both models. tools/benchmark_s4_depth.py
+documents the safety constraints. Buglog entry logged.

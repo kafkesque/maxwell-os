@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-10T17:52:00'
-total_decisions: 225
+total_decisions: 226
 decisions:
 - id: D2092
   category: INF
@@ -1724,11 +1724,20 @@ decisions:
     stating it is Stage 4 job. 0% accuracy confirmed architectural misfit.
   impact: 'S2 extracts principles; S4 classifies depth. Metric redistributed: type
     20%, name 12%, mechanism 13%.'
+- id: D2243
+  category: OPS
+  state: ACTIVE
+  description: 'Kernel panic: IOGPUMemory completeMemory prepare count underflow.
+    Caused by dual GPU clients (mlx_lm direct load of Gemma-4-31B while OMLX serving
+    Qwen3-Coder+Phi). Prevention: OMLX-only serving, memory guard 55GB, vm_stat headroom
+    check.'
+  impact: All model inference must go through OMLX. No direct mlx_lm for models >10GB
+    while OMLX runs.
 summary:
-  total: 225
+  total: 226
   proposed: 0
   draft: 0
-  active: 186
+  active: 187
   stale: 0
   superseded: 8
   archived: 8

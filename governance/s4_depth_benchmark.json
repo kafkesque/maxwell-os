@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-08-10T18:14:40",
+  "test_fbs": 50,
+  "phi4_mini": {
+    "accuracy": 0.22,
+    "avg_time": 1.317000584602356,
+    "n": 50
+  },
+  "gemma_4_31b": {
+    "accuracy": 0.0,
+    "avg_time": 0.25095778465270996,
+    "n": 50
+  },
+  "winner": "Phi-4-mini"
+}

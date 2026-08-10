@@ -1,24 +1,24 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 17:50 | **Source:** D2240-D2241 (json_repair fix + cross-examination audit)
-> **P0:** 8/8 DONE ✅ | **P1:** 7/8 (1 pending) | **P2:** 4/4 DONE ✅
-> **Golden set:** v4.4 (73 examples, 75 FBs, 52 pos / 21 neg)
-> **DSPy:** MIPROv2 pilot RE-RUNNING (json_repair fix applied, D2240)
-> **Model:** gemma-4-31B-it-MLX-8bit — 7/7 shards linked (25GB), ready for OMLX config
+> **Updated:** 2026-08-10 18:45 | **Source:** D2240-D2243 (panic investigation + depth removal + S4 benchmark)
+> **P0:** 8/8 DONE ✅ | **P1:** 7/8 (T-009 partial) | **P2:** 4/4 DONE ✅
+> **Golden set:** v4.4 (73 examples, 50 FBs, 52 pos / 21 neg)
+> **Models:** Qwen3-Coder-30B (S2 gen), Phi-4-mini-8bit (S4 cls), Gemma-4-31B-8bit (NEW, S5/R5 verifier)
+> **Panic:** D2243 — IOGPUMemory underflow from dual GPU clients. Prevention in place.
 
 ---
 
-## 🔴 P0 — BLOCKING (All complete)
+## 🔴 P0 — COMPLETE (8/8)
 
 | ID | Task | Status |
 |----|------|--------|
-| T-001 | Strip S4 CRIBS fields (169 instances) | ✅ DONE |
-| T-002 | Fix sqlite-vec 1024→512 | ✅ DONE |
-| T-003 | Evidence passages 190/190 verbatim | ✅ DONE |
-| T-004 | extraction_type in GoldenFB schema | ✅ DONE |
-| T-005 | Fix convergence routing | ✅ DONE |
-| T-006 | 6 C12 thresholds → config | ✅ DONE |
-| **T-007** | **DSPy harness (720 lines) + MIPROv2 pilot** | ✅ CODE DONE — pilot **RE-RUNNING** with json_repair fix |
-| T-007b | json_repair name collision (D2240) | ✅ DONE — renamed → json_fixer.py |
+| T-001 | Strip S4 CRIBS fields (169 instances) | ✅ |
+| T-002 | sqlite-vec 1024→512 | ✅ |
+| T-003 | Evidence 190/190 verbatim | ✅ |
+| T-004 | extraction_type in GoldenFB | ✅ |
+| T-005 | Convergence routing fix | ✅ |
+| T-006 | 6 C12 thresholds → config | ✅ |
+| T-007 | DSPy harness + MIPROv2 pilot | ✅ Pilot: best 44.75% (2 eval FBs) |
+| T-007b | json_repair name collision (D2240) | ✅ → json_fixer.py |
 
 ---
 
@@ -26,70 +26,77 @@
 
 | ID | Task | Status |
 |----|------|--------|
-| T-008 | Fix 3 depth misclassifications | ✅ DONE |
-| T-009 | Cap author concentration at 3 max | ⚠️ Griffiths (5), Meadows (4) still >3. Kahneman/Clear/Heath/Sunstein/Taleb/Gladwell all at ≤3. 2 offenders remain. |
-| T-010 | Fix NLI model inversion (ModernBERT primary) | ✅ DONE |
-| T-011 | Fix NLI fallback defaults | ✅ DONE (bundled T-006) |
-| T-012 | Align taxonomy v5.1 | ✅ DONE |
-| T-013 | Golden set version v4.2 | ✅ DONE |
-| T-014 | Fix CONV-035/037 false convergence | ✅ DONE |
-| T-015 | Extraction type expansion (CM/NH/DM/EP) | ✅ DONE — all 4 types populated |
+| T-008 | Depth misclassifications ×3 | ✅ |
+| **T-009** | **Author cap ≤3** — Griffiths (5), Meadows (4) exceed. 89 unique authors. Swap 3 books w/o breaking evidence verbatim. | ⚠️ 2 offenders remain |
+| T-010 | NLI inversion (ModernBERT primary) | ✅ |
+| T-011 | NLI fallback defaults | ✅ |
+| T-012 | Taxonomy v5.1 aligned | ✅ |
+| T-013 | Golden version 4.2→4.4 | ✅ |
+| T-014 | CONV-035/037 false convergence | ✅ |
+| T-015 | Type expansion (CM/NH/DM/EP) | ✅ |
 
 ---
 
-## 🟢 P2 — TECHNICAL DEBT (All complete)
+## 🟢 P2 — COMPLETE (4/4)
 
-| ID | Task | Status |
-|----|------|--------|
-| T-016 | NOMIC_MAX_CHARS → EMBED_MAX_CHARS | ✅ DONE |
-| T-017 | Remove HDBSCAN dead code | ✅ DONE |
-| T-018 | Update schemas.py v2.0→v3.0 | ✅ DONE |
-| T-019 | Update MISSION.md v2.0→v3.0 | ✅ DONE |
+T-016 EMBED_MAX_CHARS ✅ | T-017 HDBSCAN removal ✅ | T-018 schemas v3.0 ✅ | T-019 MISSION v3.0 ✅
 
 ---
 
-## 🔵 NEW — POST-AUDIT FINDINGS (D2241)
+## 🔵 POST-AUDIT FINDINGS (D2241-D2243)
 
-| ID | Finding | Priority | Action |
+| ID | Finding | Priority | Status |
 |----|---------|----------|--------|
-| **A-001** | **Remove depth from S2 DSPy Signature** — SYSTEM_PROMPT says S4's job. 0% accuracy proves model can't do it. DSPy ConvergentExtraction forces it. | P0 | Strip `depth` from Signature output fields + `format_golden_fewshot()`. Let S4 classify depth. |
-| **A-002** | **Traditional S2 data leakage** — `compare_s2_methods.py` draws few-shot + test from same YAML. Scores inflated. | P1 | Disjoint author split for few-shot vs test. |
-| **A-003** | **MIPROv2 pilot re-run** — Was crashing on json_repair.loads. Fixed via D2240. Now running. | P0 | Monitor pilot. Run 4-way comparison when done. |
-| **A-004** | **N=6 comparison insufficient** — Statistical significance requires N≥30. | P1 | Expand test set to 20+ held-out examples. |
-| **A-005** | **Gemma-4-31B downloaded** — 7/7 shards, 25GB. Ready for OMLX config. | P1 | Configure OMLX, test extraction quality vs Qwen3-Coder. Use for S5 verification (R5), not S2. |
-| **A-006** | **Dead code in extraction_metric** — `score += 0.0` at line 383 is a no-op. Not buggy (code works correctly), just dead. | P2 | Remove or comment as intentional. |
+| A-001 | **Remove depth from S2** (D2242) | P0 | ✅ DONE — Signature, metric, few-shot all cleaned. Metric rebalanced to 1.00. |
+| A-002 | Traditional S2 data leakage (few-shot = test dist) | P1 | ⏳ TODO — author-disjoint split needed |
+| A-003 | MIPROv2 pilot — crashed on json_repair.loads | P0 | ✅ FIXED (D2240) — best score 44.75% |
+| A-004 | N=6 comparison insufficient (need ≥20-30) | P1 | ⏳ TODO |
+| A-005 | **Gemma-4-31B S4/S5 benchmark** | P1 | ⏳ RUNNING — Phi vs Gemma depth classification |
+| A-006 | Dead `score += 0.0` in metric | P2 | ✅ REMOVED with A-001 |
+| A-007 | **Kernel panic D2243** — dual GPU clients (mlx_lm + OMLX) | P0 | ✅ MITIGATED — OMLX-only for all models, memory guard 55GB |
 
 ---
 
-## 📋 EXECUTION SEQUENCE
+## ⚠️ D2243 — KERNEL PANIC ROOT CAUSE & PREVENTION
 
-### NOW: MIPROv2 pilot running (~15-20 min remaining)
-```bash
-# Monitor: tail -f /tmp/dspy_mipro_pilot2.log
-# Expected: 10 MIPROv2 trials, scores should be >0.0 (previously all 0.0)
+**Symptom:** `panic: "completeMemory() prepare count underflow" @IOGPUMemory.cpp:492` — Apple M1 Max GPU driver
+
+**Root cause chain:**
+1. Loaded Gemma-4-31B-it-MLX-8bit (31GB) via `mlx_lm` (direct Metal client)
+2. OMLX server already serving Qwen3-Coder-30B-4bit (~15GB) + Phi-4-mini (~4GB) as a **second Metal client**
+3. Unified memory: 64GB total, ~50GB+ committed across both clients + macOS
+4. Two concurrent Metal GPU memory allocators under pressure → IOGPUFamily memory prepare count underflow → kernel panic (pid 31888: Python)
+
+**Why it happened now (not before):** Gemma-8bit is 31GB — 2× the size of any previously loaded model. Crossing ~50GB of concurrent GPU-committed memory triggered the driver bug.
+
+**Prevention (mandatory):**
+- 🚫 NEVER load models via mlx_lm directly while OMLX is serving (one GPU client at a time)
+- ✅ Serve ALL models through OMLX API (port 11435) — memory guard `--memory-guard-gb 55` + eviction
+- ✅ Check memory headroom before any large model load: `vm_stat` → available > model_size + 10GB
+- ✅ Gemma-4-31B registered in OMLX via symlink (not HF cache direct)
+
+**Verified post-panic:** OMLX loaded Gemma-4-31B safely (30.73GB, total 38.09GB), completed classification calls (108s/call, 2.9-3.9 tok/s reasoning model).
+
+---
+
+## 📋 REMAINING EXECUTION ORDER
+
 ```
-
-### AFTER PILOT:
-1. **A-001**: Remove depth from DSPy Signature (5 min) — unblocks fair S2 comparison
-2. **Run 4-way comparison**: Traditional, DSPy CoT, BS, MIPROv2 on held-out test set
-3. **A-005**: Configure Gemma-4-31B in OMLX, test extraction quality
-4. **T-009**: Replace 2 Griffiths + 1 Meadows examples with diverse authors
-5. **A-002**: Fix few-shot sampling to be author-disjoint
-6. **A-004**: Expand test set to 20+ examples
-
-### PUSH CYCLE:
-- Current: `f59de87` (D2240: json_repair fix) — pushed
-- Next: D2241 governance + pilot results + comparison data
-
----
+NOW    → A-005 S4 benchmark (running ~20 min) → compare Phi vs Gemma depth accuracy
+NEXT   → Post-A001 S2 comparison rerun (Traditional vs DSPy — no depth now)
+NEXT   → A-002 author-disjoint few-shot split for fair comparison
+P1     → T-009 replace Griffiths×2 + Meadows×1 (careful, evidence-safe)
+P1     → A-004 expand test set to 20+ examples
+P2     → Configure Gemma as S5 verifier (R5) once S4 role decided
+```
 
 ## STATUS SUMMARY
 
 ```
-P0: ████████████████████ 8/8 (100%)
-P1: ████████████████░░░░ 7/8 (87%) — T-009: 2 author offenders
-P2: ████████████████████ 4/4 (100%)
-NEW: ░░░░░░░░░░░░░░░░░░░░ 0/6 (0%)  — Post-audit findings
-──────────────────────────────────
-TOTAL: ████████████████░░░░ 19/25 (76%)
+P0: ████████████████████ 8/8  (100%)
+P1: ████████████████░░░░ 7/8  (87%) — T-009: 2 author offenders
+P2: ████████████████████ 4/4  (100%)
+NEW: ████████████░░░░░░░░ 4/7  (57%) — A-001/003/006/007 done, A-005 running
+────────────────────────────────────
+TOTAL: ██████████████████░░ 23/27 (85%)
 ```

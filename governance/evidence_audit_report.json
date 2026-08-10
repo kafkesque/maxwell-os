@@ -1,7 +1,7 @@
 {
   "stats": {
-    "total_passages": 190,
-    "verbatim": 190,
+    "total_passages": 194,
+    "verbatim": 194,
     "fuzzy": 0,
     "missing": 0
   },
@@ -340,21 +340,51 @@
       "example_id": "CONV-007",
       "fb_index": 0,
       "passage_index": 1,
-      "passage_preview": "We have reached the third degree where we devote our intelligences to anticipating what average opinion expects the aver",
-      "passage_sha": "e9aa5957e1c1aca6",
+      "passage_preview": "Mr. Market quotes a price at which he will either buy your stake or sell you his",
+      "passage_sha": "71fa84612ac631b0",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
-        "char_start": 540,
-        "char_end": 677,
-        "match_mode": "whitespace-normalized"
+        "source_book": "The Intelligent Investor — Benjamin Graham",
+        "char_start": 161,
+        "char_end": 241,
+        "match_mode": "raw"
       }
     },
     {
       "example_id": "CONV-007",
       "fb_index": 0,
       "passage_index": 2,
+      "passage_preview": "His quote is driven by emotion — optimism one day, pessimism the next",
+      "passage_sha": "3f548126b746d0d0",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Intelligent Investor — Benjamin Graham",
+        "char_start": 243,
+        "char_end": 312,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-007",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The intelligent investor treats Mr. Market's price as a quote to be exploited, not as a verdict on value",
+      "passage_sha": "8230325652a8d6a7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Intelligent Investor — Benjamin Graham",
+        "char_start": 360,
+        "char_end": 464,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-007",
+      "fb_index": 0,
+      "passage_index": 4,
       "passage_preview": "stocks are priced not according to their intrinsic value but according to investors' perceptions of other investors' per",
       "passage_sha": "d8a251b0af574874",
       "status": "verbatim",
@@ -505,15 +535,15 @@
       "example_id": "CONV-014",
       "fb_index": 0,
       "passage_index": 0,
-      "passage_preview": "places in a system where a small change can produce a large shift in behavior",
-      "passage_sha": "d6d748257f560599",
+      "passage_preview": "a few long-range shortcuts collapse the average path length between any two nodes",
+      "passage_sha": "478243bad89c1d47",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking in Systems — Donella Meadows",
-        "char_start": 20,
-        "char_end": 97,
-        "match_mode": "whitespace-normalized"
+        "source_book": "Six Degrees — Duncan Watts",
+        "char_start": 260,
+        "char_end": 341,
+        "match_mode": "raw"
       }
     },
     {
@@ -535,6 +565,21 @@
       "example_id": "CONV-014",
       "fb_index": 0,
       "passage_index": 2,
+      "passage_preview": "rewiring a handful of connections can change the behavior of the entire network more dramatically than strengthening any",
+      "passage_sha": "ddd1d0728bee062f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Six Degrees — Duncan Watts",
+        "char_start": 372,
+        "char_end": 509,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-014",
+      "fb_index": 0,
+      "passage_index": 3,
       "passage_preview": "The location of the intervention matters more than its size",
       "passage_sha": "04d73d3a3fa9ed09",
       "status": "verbatim",
@@ -2170,14 +2215,14 @@
       "example_id": "CONV-042",
       "fb_index": 0,
       "passage_index": 2,
-      "passage_preview": "This distributional fact — not any clever algorithm — is what makes caching work.",
-      "passage_sha": "863a332b63871219",
+      "passage_preview": "a small number of hubs accumulate a disproportionately large share of links",
+      "passage_sha": "70f621fe5ebe020a",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
-        "char_start": 481,
-        "char_end": 562,
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 97,
+        "char_end": 172,
         "match_mode": "raw"
       }
     },
@@ -2185,14 +2230,29 @@
       "example_id": "CONV-042",
       "fb_index": 0,
       "passage_index": 3,
-      "passage_preview": "A tiny fraction of items accounts for the vast majority of requests.",
-      "passage_sha": "22ae3534b367ff01",
+      "passage_preview": "the same rank-frequency regularity that Zipf documented in language appears in the network topology of the web",
+      "passage_sha": "17223f82a9c60dc9",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
-        "char_start": 337,
-        "char_end": 405,
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 220,
+        "char_end": 330,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "CONV-042",
+      "fb_index": 0,
+      "passage_index": 4,
+      "passage_preview": "Preferential attachment — the tendency of new nodes to connect to already well-connected nodes — generates this distribu",
+      "passage_sha": "82c71e5d7859120d",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 379,
+        "char_end": 503,
         "match_mode": "raw"
       }
     },

@@ -1,8 +1,9 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 10:31 | **Source:** D2227 Cross-Examination (Kimi + Qwen + ChatGPT vs repo ground truth)
-> **Previous:** D2195-D2226 (all 32 prior decisions applied)
-> **New from cross-examination:** 7 P0, 8 P1, 4 P2, 6 blindspots
-> **Total outstanding:** 25 items
+> **Updated:** 2026-08-10 15:05 | **Source:** D2227-D2236 (cross-examination + quality blockers + DSPy harness)
+> **P0:** 7/7 DONE ✅ | **P1:** 8/8 DONE ✅ | **P2:** 4/4 DONE ✅ | **Blindspots:** 6/6 addressed
+> **Golden set:** v4.4 (73 examples, 75 FBs, EP:12, NH:12, DM:12, CM:39)
+> **DSPy harness:** Built (720 lines), OMLX backend verified, pilot pending
+> **Model:** gemma-4-31B-it-MLX-8bit downloading
 
 ---
 
@@ -16,7 +17,7 @@
 | **T-004** | **Add `extraction_type` to GoldenFB schema** — `schemas.py:915`: add `extraction_type: str = ""` field. Without this, DSPy drops extraction type from training signal. | D2231 | 5m | ✅ **DONE** — `extraction_type` field added, compiles clean. |
 | **T-005** | **Fix Stage 2 convergence routing** — `stage2_extract.py:1209`: remove `or book_count >= 2` clause. Source count alone must NOT trigger convergent extraction. Require explicit `is_conv` gate from S1.5 clustering. | D2231 | 1-2h | ✅ **DONE** — Redundant `or book_count >= 2` removed. `is_convergent` from S1.5 already encodes source diversity. |
 | **T-006** | **Fix 6 C12 hardcoded threshold violations** — Move all to `pipeline_config.yaml` + read via `pipeline_paths.py`: `reliability.py` (0.85/0.50/0.20), `stage4_merge.py` (0.92/0.80), `principle_index.py` (0.90), `taxonomy_manager.py` (0.20/1.1/10), `retrieve.py` (0.85). | D2231 | 2-3h | ✅ **DONE** — 6 files fixed, 8 config keys added, 4 new pipeline_paths imports. Also bundled T-011 (NLI fallback defaults). |
-| **T-007** | **Implement DSPy harness** — System is currently few-shot injection only (zero dspy references). Build: compile → evaluate → held-out test → optimization loop. | D2235 | ✅ **DONE** | `pipeline/dspy_trainer.py` (707 lines). Signature + converter + split + metric + OMLXLM backend + MIPROv2 optimizer. Dry-run passes (72 dspy.Examples). Pilot pending OMLX server. |
+| **T-007** | **Implement DSPy harness** | D2235/D2236 | ✅ **DONE** | `pipeline/dspy_trainer.py` (720 lines). ConvergentExtraction Signature, golden→dspy.Example converter (75 examples), stratified split (51/11/13), 10-dim metric, MIPROv2 optimizer. OMLX backend verified (openai/ prefix, 4096 max_tokens). Live generation test: PASS. Pilot pending. |
 
 **P0 subtotal: 13 tasks | 12 DONE, 1 PENDING (T-007)**
 
@@ -33,7 +34,7 @@
 | **T-012** | **Align taxonomy versions** — `config/version.yaml` says v5.0, `taxonomy_v5.yaml` says v5.1. Pick one (recommend: update version.yaml to v5.1) and align. | D2232 | 5m | ✅ **DONE** — version.yaml→v5.1 AND pipeline_config.yaml pipeline.taxonomy_version→v5.1 (the runtime source). All 3 aligned. |
 | **T-013** | **Fix golden set version to v4.2** — `meta.version: '4.0'` → `'4.2'`. Remove `calibration_status: expanded_v4.2`. Single canonical version. | D2232 | 2m | ✅ **DONE** — meta.version='4.2', calibration_status removed. |
 | **T-014** | **Audit CONV-035/037 for false convergence** — CONV-035 (habit stacking + commitment): two different mechanisms, not shared causal structure. CONV-037 (Dunbar + availability): distinct cognitive phenomena. Reclassify `is_convergent: false` or strengthen evidence. | D2232 | 1h | ✅ **DONE** — CONV-035: is_convergent=false, rationale teaches complementary≠convergent. CONV-037: SPLIT into 2 FBs (Dunbar's Number + Availability Heuristic, 1:N), is_convergent=false. meta.convergent_positives 37→35. Both validators PASS. |
-| **T-015** | **Add 8-11 examples per non-causal extraction type** — Target: 12-15 descriptive_model, 12-15 normative_heuristic, 12-15 empirical_pattern. Current: 4 each. Add from missing domains (chemistry, neuroscience, ethics). | D2232 | 4-6h | T-001, T-009 |
+| **T-015** | **Extraction type expansion** — All 4 types at target: EP:12, NH:12, DM:12, CM:39 | D2234 | ✅ **DONE** | 7 reclassifications + 13 new examples (CONV-041–CONV-053). |
 
 **P1 subtotal: 8 tasks, ~10-12 hours effort**
 
@@ -43,12 +44,12 @@
 
 | ID | Task | Decision | Effort |
 |----|------|----------|--------|
-| **T-016** | **Rename NOMIC_MAX_CHARS → EMBED_MAX_CHARS** — `ollama_embed.py:52`. Model is now bge-m3, not nomic. | — | 2m |
-| **T-017** | **Remove HDBSCAN_MIN_CLUSTER_SIZE=0 dead code** — `pipeline_paths.py:111`. Stage 3 removed per D2120. | — | 1m |
-| **T-018** | **Update schemas.py docstring v2.0→v3.0** — Header still says "Maxwell OS v2.0 pipeline." | — | 1m |
-| **T-019** | **Update MISSION.md v2.0→v3.0** — Still references v2.0 and pre-cluster-before-extract architecture. | — | 15m |
+| **T-016** | **Rename NOMIC_MAX_CHARS → EMBED_MAX_CHARS** | D2234 | ✅ **DONE** | 3 files updated. |
+| **T-017** | **Remove HDBSCAN dead code** | D2234 | ✅ **DONE** | pipeline_paths.py + integrity_check.py cleaned. |
+| **T-018** | **Update schemas.py v2.0→v3.0** | D2234 | ✅ **DONE** | |
+| **T-019** | **Update MISSION.md v2.0→v3.0** | D2234 | ✅ **DONE** | |
 
-**P2 subtotal: 4 tasks, ~20 minutes effort**
+**P2 subtotal: 4/4 DONE ✅**
 
 ---
 
@@ -141,3 +142,29 @@ T-016..T-019 + B-002 + B-003
 
 *Register maintained per C15. Append new findings; never delete resolved items (mark ✅).*
 *Cross-reference: DECISION-LOG.md (D2227-D2232), governance/buglog.md (BUG-064–BUG-073), CONSTITUTION.md §3*
+
+
+---
+
+## 🟢 CURRENT STATE (2026-08-10 15:05)
+
+### ✅ All Blockers Cleared
+| Category | Status |
+|----------|--------|
+| Golden set | v4.4, 73 examples, 75 FBs, 190/190 verbatim |
+| Extraction types | EP:12, NH:12, DM:12, CM:39 |
+| Author concentration | All ≤3 |
+| DSPy harness | Built (720 lines), OMLX backend verified |
+| P2 tech debt | T-016–T-019 cleared |
+
+### 🔴 Remaining (Ordered by Priority)
+
+| # | Task | Priority | Status |
+|---|------|----------|--------|
+| 1 | Run DSPy pilot (`--pilot`) against Qwen3-Coder OMLX | P0 | Harness ready, needs execution |
+| 2 | gemma-4-31B-it-MLX-8bit download | P1 | Downloading (16 blobs so far) |
+| 3 | Configure OMLX to serve gemma-4-31B-8bit | P1 | After download completes |
+| 4 | Run full DSPy training (`--full`) | P1 | After pilot validates pipeline |
+| 5 | Evaluate optimized S2 against held-out test set | P1 | After full training |
+| 6 | Triage 32 open buglog items | P2 | Deferred |
+| 7 | S4 classifier model replacement (Phi-4→Gemma) | P2 | After Gemma download |

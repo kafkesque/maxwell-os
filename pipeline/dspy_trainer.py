@@ -3,8 +3,8 @@
 DSPy Fine-Tuning Harness for Maxwell OS S2 Extraction Stage (T-007).
 
 Trains the S2 extractor (Qwen3-Coder) to produce convergent Foundation Blocks
-from multi-source book segment clusters using the v4.3 golden set (70 examples,
-72 FBs).
+from multi-source book segment clusters using the v4.4 golden set (73 examples,
+75 FBs). Uses dspy.LM with openai/ prefix for OMLX OpenAI-compatible API.
 
 Architecture:
   1. ConvergentExtraction Signature → defines DSPy task I/O
@@ -46,7 +46,7 @@ with open(CONFIG_PATH) as f:
 DSPY_MODEL = _cfg.get("models", {}).get("generator", "lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
 DSPY_PROVIDER = _cfg.get("models", {}).get("generator_provider", "omlx")
 DSPY_TEMPERATURE = 0.0
-DSPY_MAX_TOKENS = _cfg.get("stage2", {}).get("max_tokens", 2048)
+DSPY_MAX_TOKENS = int(_cfg.get("stage2", {}).get("extract", {}).get("max_tokens", 4096)) if isinstance(_cfg.get("stage2", {}).get("extract", {}), dict) else _cfg.get("stage2", {}).get("extract_max_tokens", 4096)
 OMLX_PORT = int(_cfg.get("omlx", {}).get("port", 11435))
 RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 
@@ -423,59 +423,29 @@ def extraction_metric(
 
 
 # ──────────────────────────────────────────────────────────────────────
-# 5. OMLX LM Backend for DSPy
+# 5. DSPy Configuration (OMLX via OpenAI-compatible API)
 # ──────────────────────────────────────────────────────────────────────
-
-class OMLXLM(dspy.LM):
-    """DSPy LM backend for OMLX OpenAI-compatible API."""
-
-    def __init__(
-        self,
-        model: str = DSPY_MODEL,
-        base_url: str = f"http://localhost:{OMLX_PORT}/v1",
-        temperature: float = DSPY_TEMPERATURE,
-        max_tokens: int = DSPY_MAX_TOKENS,
-    ):
-        super().__init__(
-            model=model,
-            api_base=base_url,
-            api_key="not-needed",  # OMLX doesn't require auth
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
-
-    def __call__(self, prompt: str, **kwargs) -> list[str]:
-        """Generate from OMLX. Returns list of completions."""
-        import requests
-        url = f"{self.api_base}/chat/completions"
-        payload = {
-            "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": self.temperature,
-            "max_tokens": self.max_tokens,
-        }
-        payload.update(kwargs)
-        try:
-            resp = requests.post(url, json=payload, timeout=120)
-            resp.raise_for_status()
-            data = resp.json()
-            content = data["choices"][0]["message"]["content"]
-            return [content]
-        except Exception as e:
-            print(f"[OMLXLM] Error: {e}")
-            return [""]
-
-
-# ──────────────────────────────────────────────────────────────────────
-# 6. DSPy Pilot Training
-# ──────────────────────────────────────────────────────────────────────
+# OMLX exposes an OpenAI-compatible API at http://localhost:11435/v1.
+# dspy.LM with the "openai/" model prefix handles this natively — no
+# custom LM subclass needed.
 
 def configure_dspy(model: str = DSPY_MODEL, verbose: bool = True) -> dspy.LM:
-    """Configure DSPy with OMLX backend."""
-    lm = OMLXLM(model=model)
+    """Configure DSPy with OMLX via OpenAI-compatible API.
+
+    Uses the openai/ prefix so dspy routes through OpenAIProvider,
+    which is fully compatible with OMLX's /v1/chat/completions endpoint.
+    """
+    omlx_model = f"openai/{model}"
+    lm = dspy.LM(
+        model=omlx_model,
+        api_base=f"http://localhost:{OMLX_PORT}/v1",
+        api_key="not-needed",
+        temperature=DSPY_TEMPERATURE,
+        max_tokens=DSPY_MAX_TOKENS,
+    )
     dspy.configure(lm=lm)
     if verbose:
-        print(f"DSPy configured: model={model}, provider=OMLX, port={OMLX_PORT}")
+        print(f"DSPy configured: model=openai/{model}, api_base=http://localhost:{OMLX_PORT}/v1")
     return lm
 
 

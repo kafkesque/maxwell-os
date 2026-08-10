@@ -3599,3 +3599,21 @@ OMLX server with Qwen3-Coder loaded).
 DSPy Pilot: 8 train, 4 dev
 ============================================================ for 8-train/4-dev pilot.
 
+### D2236 — DSPy OMLX Backend Fix + DSPY_MAX_TOKENS (2026-08-10)
+
+**Context:** The custom OMLXLM class had a bug (`self.api_base` not found — dspy.LM
+stores it in `self.kwargs`). Additionally, `DSPY_MAX_TOKENS=2048` was too low for
+the ConvergentExtraction signature which outputs 11 fields.
+
+**Decision:** Remove custom OMLXLM class. Use `dspy.LM` directly with `model="openai/..."`
+prefix, which routes through dspy's built-in OpenAIProvider (fully compatible with
+OMLX's `/v1/chat/completions` endpoint). Increase `DSPY_MAX_TOKENS` to 4096.
+
+**Verification:** Live generation test succeeded:
+- Input: 2-segment cluster (Kahneman + Thaler on default effects)
+- Output: is_convergent=True, name="Default Bias", extraction_type=causal_mechanism,
+  all 11 output fields populated correctly
+- Latency: ~12s per CoT generation (Qwen3-Coder-30B-A3B-MLX-4bit)
+- OMLX provider: OpenAIProvider (auto-detected from openai/ prefix)
+
+

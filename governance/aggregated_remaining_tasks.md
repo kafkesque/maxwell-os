@@ -1,102 +1,109 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 18:45 | **Source:** D2240-D2243 (panic investigation + depth removal + S4 benchmark)
-> **P0:** 8/8 DONE ✅ | **P1:** 7/8 (T-009 partial) | **P2:** 4/4 DONE ✅
-> **Golden set:** v4.4 (73 examples, 50 FBs, 52 pos / 21 neg)
-> **Models:** Qwen3-Coder-30B (S2 gen), Phi-4-mini-8bit (S4 cls), Gemma-4-31B-8bit (NEW, S5/R5 verifier)
-> **Panic:** D2243 — IOGPUMemory underflow from dual GPU clients. Prevention in place.
+> **Updated:** 2026-08-10 21:15 | **Session:** D2245-D2249 (model research, T-009, A-002/A-004, T-007 comparison)
+> **Golden set:** v4.4 (73 examples, 50 FBs, 194 evidence passages — 100% verbatim)
+> **Models:** Qwen3-Coder-30B (S2 gen) · Phi-4-mini-8bit (S4 cls) · **GPT-OSS-20B-MXFP4-Q8 (NEW, S4 depth — D2245)** · Gemma-4-31B-8bit (S5/R5 verifier)
+> **S2 Comparison:** DSPy-MIPROv2 **0.672** vs Traditional **0.592** on 20 examples (D2248)
 
 ---
 
-## 🔴 P0 — COMPLETE (8/8)
+## ✅ COMPLETED THIS SESSION (D2245-D2249)
 
-| ID | Task | Status |
+| ID | Task | Result |
 |----|------|--------|
-| T-001 | Strip S4 CRIBS fields (169 instances) | ✅ |
-| T-002 | sqlite-vec 1024→512 | ✅ |
-| T-003 | Evidence 190/190 verbatim | ✅ |
-| T-004 | extraction_type in GoldenFB | ✅ |
-| T-005 | Convergence routing fix | ✅ |
-| T-006 | 6 C12 thresholds → config | ✅ |
-| T-007 | DSPy harness + MIPROv2 pilot | ✅ Pilot: best 44.75% (2 eval FBs) |
-| T-007b | json_repair name collision (D2240) | ✅ → json_fixer.py |
+| **D2245** | **Model research via llmfit** → GPT-OSS-20B-MXFP4-Q8 | 12.1GB, OpenAI MoE 3.6B active, registered in OMLX. **62.5% depth acc vs Gemma 50% / Phi 37.5%**; **24.9× faster than Gemma** (5.8s vs 143.8s/call) |
+| **T-009** | Author cap ≤3 — Griffiths 5→3, Meadows 4→3 | ✅ Swap 3 books (D2234 precedent): CONV-007→Graham, CONV-042→Barabási, CONV-014→Watts. Evidence audit 194/194 verbatim, golden_validate PASS |
+| **A-002** | Author-disjoint few-shot split | ✅ `_author_disjoint_fewshot()` in compare_s2_methods.py — verified 0 overlap |
+| **A-004** | Expand test set 8→20 | ✅ train_frac 0.60 → 20 test examples; max_test param |
+| **T-007** | DSPy harness + pilot rerun (post-A001) | ✅ **Best 96.4%** (was 44.75% pre-A001). Test eval 93.8%. Program persisted /tmp/dspy_mipro_optimized.json |
+| **D2246** | 4-way S2 comparison (20-example) | ✅ **DSPy 0.672 vs Traditional 0.592** — DSPy: 5/5 negative rejection, 26.4s avg. Traditional: 0.845 positive-fidelity |
+| **D2247** | S4 cross-domain A/B | ✅ Finding: `Reasoning: none` is the reliable GPT-OSS fix (60-182s → 25-40s). Few-shot anchors = weak signal |
+| **D2243** | Kernel panic prevention | ✅ OMLX-only serving held (GPT-OSS loaded 12.1GB safely alongside Qwen+Phi+Gemma) |
 
 ---
 
-## 🟡 P1 — QUALITY BLOCKERS
+## 🔴 OPEN — CRITICAL (next execution order)
 
-| ID | Task | Status |
-|----|------|--------|
-| T-008 | Depth misclassifications ×3 | ✅ |
-| **T-009** | **Author cap ≤3** — Griffiths (5), Meadows (4) exceed. 89 unique authors. Swap 3 books w/o breaking evidence verbatim. | ⚠️ 2 offenders remain |
-| T-010 | NLI inversion (ModernBERT primary) | ✅ |
-| T-011 | NLI fallback defaults | ✅ |
-| T-012 | Taxonomy v5.1 aligned | ✅ |
-| T-013 | Golden version 4.2→4.4 | ✅ |
-| T-014 | CONV-035/037 false convergence | ✅ |
-| T-015 | Type expansion (CM/NH/DM/EP) | ✅ |
+| # | Task | Priority | Effort | Notes |
+|---|------|----------|--------|-------|
+| **BUG-075** | **Cross-domain depth 0% across all models** | 🔴 P0 | 4h | Dominant class (26/50 = 52%). Root cause = long combined classify prompt. Fix: split depth into short focused call (proven 62.5%) + Reasoning:none + max_tokens≥1024 |
+| **D2249** | **S4 classifier swap Phi→GPT-OSS** | 🔴 P0 | 2h | Blocked by BUG-075. Flip VERIFY_MODEL + prompt changes in stage4_merge.py (classify call: max_tokens 512→1024, Reasoning:none prefix). Frees ~19GB RAM |
+| **BUG-053** | **Phi-4-mini hallucination on research** | 🔴 P0 | 1h | Resolution path: GPT-OSS replaces Phi for S4 depth (D2245); Phi retained only for S5 verify + fast gates |
 
 ---
 
-## 🟢 P2 — COMPLETE (4/4)
+## 🟠 OPEN — HIGH
 
-T-016 EMBED_MAX_CHARS ✅ | T-017 HDBSCAN removal ✅ | T-018 schemas v3.0 ✅ | T-019 MISSION v3.0 ✅
-
----
-
-## 🔵 POST-AUDIT FINDINGS (D2241-D2243)
-
-| ID | Finding | Priority | Status |
-|----|---------|----------|--------|
-| A-001 | **Remove depth from S2** (D2242) | P0 | ✅ DONE — Signature, metric, few-shot all cleaned. Metric rebalanced to 1.00. |
-| A-002 | Traditional S2 data leakage (few-shot = test dist) | P1 | ⏳ TODO — author-disjoint split needed |
-| A-003 | MIPROv2 pilot — crashed on json_repair.loads | P0 | ✅ FIXED (D2240) — best score 44.75% |
-| A-004 | N=6 comparison insufficient (need ≥20-30) | P1 | ⏳ TODO |
-| A-005 | **Gemma-4-31B S4/S5 benchmark** | P1 | ✅ DONE (D2244) — Gemma 50% vs Phi 37.5%. Both fail cross-domain. |
-| A-006 | Dead `score += 0.0` in metric | P2 | ✅ REMOVED with A-001 |
-| A-007 | **Kernel panic D2243** — dual GPU clients (mlx_lm + OMLX) | P0 | ✅ MITIGATED — OMLX-only for all models, memory guard 55GB |
-
----
-
-## ⚠️ D2243 — KERNEL PANIC ROOT CAUSE & PREVENTION
-
-**Symptom:** `panic: "completeMemory() prepare count underflow" @IOGPUMemory.cpp:492` — Apple M1 Max GPU driver
-
-**Root cause chain:**
-1. Loaded Gemma-4-31B-it-MLX-8bit (31GB) via `mlx_lm` (direct Metal client)
-2. OMLX server already serving Qwen3-Coder-30B-4bit (~15GB) + Phi-4-mini (~4GB) as a **second Metal client**
-3. Unified memory: 64GB total, ~50GB+ committed across both clients + macOS
-4. Two concurrent Metal GPU memory allocators under pressure → IOGPUFamily memory prepare count underflow → kernel panic (pid 31888: Python)
-
-**Why it happened now (not before):** Gemma-8bit is 31GB — 2× the size of any previously loaded model. Crossing ~50GB of concurrent GPU-committed memory triggered the driver bug.
-
-**Prevention (mandatory):**
-- 🚫 NEVER load models via mlx_lm directly while OMLX is serving (one GPU client at a time)
-- ✅ Serve ALL models through OMLX API (port 11435) — memory guard `--memory-guard-gb 55` + eviction
-- ✅ Check memory headroom before any large model load: `vm_stat` → available > model_size + 10GB
-- ✅ Gemma-4-31B registered in OMLX via symlink (not HF cache direct)
-
-**Verified post-panic:** OMLX loaded Gemma-4-31B safely (30.73GB, total 38.09GB), completed classification calls (108s/call, 2.9-3.9 tok/s reasoning model).
+| # | Task | Priority | Source |
+|---|------|----------|--------|
+| T-007b | S2 positive-fidelity gap: DSPy 0.60 vs Traditional 0.845 on both-scored positives. Options: max_labeled_demos 2→4, mechanism-weighted metric, hybrid DSPy-gate + Traditional-extract | 🟠 P1 | D2248 |
+| T1.1 | Run S1.3→S6 pipeline — first full run with bge-m3 512d | 🟠 P1 | MTR |
+| T1.2 | Yield crisis diagnostic — 14 FBs from 852 books = 0.004% | 🟠 P1 | MTR |
+| T1.3 | NLI calibration on real data (0.5/0.6/0.8 vs bge-m3) | 🟠 P1 | MTR |
+| T1.4 | Fix faiss_threshold mismatch (0.75 vs 0.70) | 🟠 P1 | MTR |
+| T1.5 | Fix AGENTS.md stage count (9-stage → canonical) | 🟠 P1 | MTR |
+| T1.6 | Auto-fix Ruff lint (322 auto-fixable) | 🟠 P1 | MTR |
+| T1.7 | LLM evaluation on golden set (25 ex, 2+ LLMs) | 🟠 P1 | MTR |
+| T1.8 | Cross-encoder reranker gate (bge-reranker-v2-m3 ONNX) | 🟠 P1 | MTR |
+| T1.9 | Source-independence graph (effective_source_count for BORP) | 🟠 P1 | MTR |
+| Fix 0.1-0.4 | Tier-0 emergency fixes (null application, S4 forward, dead path, NLI MAX-entail) | 🟠 P1 | MTR D2213-18 |
+| N2/N3/N6 | mechanism/boundary in Pydantic FB, actionability field, ModernBERT NLI | 🟠 P1 | MTR audit |
 
 ---
 
-## 📋 REMAINING EXECUTION ORDER
+## 🟡 OPEN — MEDIUM (TIER 2)
+
+| # | Task | Effort |
+|---|------|--------|
+| T2.1 | Execute ONE business PI with existing FBs — existential test | 2h |
+| T2.2 | Atomic evidence schema — per-passage NLI | 2d |
+| T2.3 | Monotonic trust state machine | 2d |
+| T2.4 | Surface reliability scores in Zone 3 | 1d |
+| T2.5 | skill.md standard (Layer 2 MVP) | 4h |
+| T2.6 | Hardware probe (C24) — auto RAM detect | 3h |
+| T2.7 | 20-book E2E test | 3h |
+| T2.8 | Integration test suite — `just test` | 4h |
+| T2.9 | Adversarial golden set | 2d |
+| T2.10 | RAGTruth hallucination suite | 1d |
+| T2.11 | ARES component evaluation | 1d |
+| T2.12 | One pipeline authority (canonical DAG) | 1d |
+| T2.13 | Split config active/archived/experiments | 1d |
+| T2.14 | Collapse config authority | 1d |
+| T2.15 | Prompt lineage stamping | 1d |
+| T2.16 | Taxonomy YAML-driven (not hardcoded Literal) | 2d |
+
+---
+
+## ⚪ OPEN — LOW (TIER 3) + BUGLOG
+
+| # | Task | Effort |
+|---|------|--------|
+| T3.1 | USearch vs FAISS benchmark | 2h |
+| T3.2 | MeshRAG hash-driven clustering eval | 1d |
+| T3.3 | Leiden clustering via python-igraph | 2h |
+| T3.4 | Kimi depth confidence signal (v3.1) | — |
+| T3.5 | Two-stage S4: separate classification from CRIBS (v3.1) | — |
+| BUG-073 | CONV-035/037 false convergence (D2232 pending) | — |
+
+---
+
+## 📊 STATUS SUMMARY
 
 ```
-DONE   → A-005 benchmark: Gemma 50% vs Phi 37.5% (D2244). Cross-domain 0% both.
-NEXT   → Post-A001 S2 comparison rerun (Traditional vs DSPy — no depth now)
-NEXT   → A-002 author-disjoint few-shot split for fair comparison
-P1     → T-009 replace Griffiths×2 + Meadows×1 (careful, evidence-safe)
-P1     → A-004 expand test set to 20+ examples
-P2     → Configure Gemma as S5 verifier (R5) once S4 role decided
-```
-
-## STATUS SUMMARY
-
-```
-P0: ████████████████████ 8/8  (100%)
-P1: ████████████████░░░░ 7/8  (87%) — T-009: 2 author offenders
-P2: ████████████████████ 4/4  (100%)
-NEW: ████████████░░░░░░░░ 4/7  (57%) — A-001/003/006/007 done, A-005 running
+CRITICAL: ████░░░░░░ 3 OPEN (BUG-075, D2249, BUG-053)  ← S4 classifier chain
+HIGH:     ██████████ 16 items (T1.x + T-007b + audit)
+MEDIUM:   ██████████ 16 items (T2.x)
+LOW:      ███░░░░░░░ 5 items
 ────────────────────────────────────
-TOTAL: ██████████████████░░ 23/27 (85%)
+Session progress: P0 6/6 → 9/9 DONE tasks, 3 critical items identified with clear paths
+```
+
+## 🔗 NEXT EXECUTION ORDER
+
+```
+1. BUG-075  → Split S4 depth into short focused prompt (Reasoning:none, max_tokens 1024)
+2. D2249    → Flip VERIFY_MODEL to gpt-oss-20b-MXFP4-Q8 + prompt changes
+3. BUG-053  → Confirm Phi retired from S4; keep for S5 verify
+4. T-007b   → Close positive-fidelity gap (more demos / metric reweight / hybrid)
+5. T1.1     → First full S1.3→S6 pipeline run (with GPT-OSS in S4)
+6. T1.2     → Yield crisis diagnostic
 ```

@@ -1,12 +1,13 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-09 20:17 | **Decisions:** D2000-D2218 (218 decisions)
+> **Updated:** 2026-08-10 21:15 | **Decisions:** D2000-D2249 (230 decisions)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Latest session:** `governance/SESSION-HANDOFF-2026-08-09.md` (comprehensive audit: actionability, Pydantic, bottlenecks, factuality)
-> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T0.1-T0.4 DONE, T0.5 READY, 26 outstanding IMPLEMENTATION_SPEC findings)
-> **Buglog:** `governance/buglog.md` (D2211 13 P0 fixes applied)
-> **Audit:** IMPLEMENTATION_SPEC cross-referenced against live HEAD — 26/33 findings still valid (8 HIGH, 9 MEDIUM, 9 LOW)
-> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ | S2 ready (D2211 fixes applied, stress_test ALL_PASS)
-> **Tier 0 fixes:** 4 emergency fixes specified (Fix 0.1-0.4) — NOT YET APPLIED
+> **Latest session:** D2245-D2249 (GPT-OSS model research, T-009 author cap, A-002/A-004, 4-way S2 comparison)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (session-complete register: 3 critical, 16 high, 16 medium, 5 low)
+> **Buglog:** `governance/buglog.md` (BUG-058 panic MITIGATED, BUG-074 MITIGATED, BUG-075 OPEN — cross-domain depth)
+> **S2 Comparison (D2248):** DSPy-MIPROv2 **0.672** vs Traditional **0.592** on 20 examples (5/5 negatives vs 0/5)
+> **S4 Depth (D2245):** GPT-OSS-20B **62.5%** @ 5.8s/call (24.9× faster than Gemma-4-31B 50%) — registered in OMLX
+> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ | S2 ✅ (DSPy harness T-007 DONE, 96.4% pilot) | S4 ready (GPT-OSS pending BUG-075)
+> **Tier 0 fixes:** Fix 0.1-0.4 still pending (see aggregated_remaining_tasks.md T1.x)
 
 ---
 

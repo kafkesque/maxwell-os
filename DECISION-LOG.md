@@ -3798,3 +3798,38 @@ max_tokens≥1024 and content-field parsing for API consumers.
 
 **Impact:** S4/S5 benchmark now uses OMLX for both models. tools/benchmark_s4_depth.py
 documents the safety constraints. Buglog entry logged.
+
+### D2244: S4 Depth Classification Benchmark — Phi-4-mini vs Gemma-4-31B
+**Date:** 2026-08-10 | **Status:** DONE | **Type:** Benchmark
+
+**Setup:** 8 stratified FBs (1 universal, 3 domain, 3 cross-domain, 1 specialized)
+from golden v4.4. Both models served via OMLX API (safe — D2243 prevention).
+
+**Results:**
+| Metric | Phi-4-mini-8bit | Gemma-4-31B-8bit |
+|--------|----------------|-------------------|
+| Depth accuracy | 37.5% (3/8) | 50.0% (4/8) |
+| Avg latency | 0.5s/call | 143.8s/call |
+| Total time | 3.6s | 1150.8s |
+| specialized | 0% (0/1) | 100% (1/1) |
+| domain | 100% (3/3) | 66.7% (2/3) |
+| cross-domain | 0% (0/3) | 0% (0/3) |
+| universal | 0% (0/1) | 100% (1/1) |
+
+**Findings:**
+1. Gemma-4-31B beats Phi-4-mini on depth accuracy (+12.5pp, +33% relative)
+   but is 288× slower (143.8s vs 0.5s/call).
+2. **BOTH models fail at cross-domain (0/3)** — the most common class in the
+   golden set (26/50 = 52%). This is the real S4 depth bottleneck.
+3. Phi-4-mini defaults everything to "domain" (majority-class bias).
+4. Gemma-4-31B is a reasoning model: needs max_tokens=1024+, parses content
+   after reasoning_content. One call overflowed (finish_reason=length,
+   pred="described" — garbage fallback).
+5. Gemma-4-31B at 8-bit is 30.73GB — fits in OMLX memory guard (38GB total).
+
+**Recommendation (S4 depth classifier):**
+- **Gemma-4-31B** for correctness-critical classification (few FBs, offline)
+- **Phi-4-mini** for high-volume classification (0.5s/call, 37.5% acc)
+- **Cross-domain** needs prompt few-shot examples — neither model can learn
+  the distinction from the ontology description alone.
+- Do NOT use Gemma-8bit for latency-critical S2/S4 at scale on this hardware.

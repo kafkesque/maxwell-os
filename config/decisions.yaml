@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-10T17:52:00'
-total_decisions: 226
+total_decisions: 227
 decisions:
 - id: D2092
   category: INF
@@ -1733,11 +1733,19 @@ decisions:
     check.'
   impact: All model inference must go through OMLX. No direct mlx_lm for models >10GB
     while OMLX runs.
+- id: D2244
+  category: QA
+  state: ACTIVE
+  description: 'S4 depth benchmark: Gemma-4-31B-8bit 50% vs Phi-4-mini-8bit 37.5%
+    accuracy. Gemma 288x slower (144s vs 0.5s/call). Both fail cross-domain (0/3).
+    Gemma wins quality, Phi wins speed.'
+  impact: Gemma for correctness-critical S4 classification; Phi for volume. Cross-domain
+    needs few-shot examples in prompt.
 summary:
-  total: 226
+  total: 227
   proposed: 0
   draft: 0
-  active: 187
+  active: 188
   stale: 0
   superseded: 8
   archived: 8

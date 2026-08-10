@@ -51,7 +51,7 @@ T-016 EMBED_MAX_CHARS ✅ | T-017 HDBSCAN removal ✅ | T-018 schemas v3.0 ✅ |
 | A-002 | Traditional S2 data leakage (few-shot = test dist) | P1 | ⏳ TODO — author-disjoint split needed |
 | A-003 | MIPROv2 pilot — crashed on json_repair.loads | P0 | ✅ FIXED (D2240) — best score 44.75% |
 | A-004 | N=6 comparison insufficient (need ≥20-30) | P1 | ⏳ TODO |
-| A-005 | **Gemma-4-31B S4/S5 benchmark** | P1 | ⏳ RUNNING — Phi vs Gemma depth classification |
+| A-005 | **Gemma-4-31B S4/S5 benchmark** | P1 | ✅ DONE (D2244) — Gemma 50% vs Phi 37.5%. Both fail cross-domain. |
 | A-006 | Dead `score += 0.0` in metric | P2 | ✅ REMOVED with A-001 |
 | A-007 | **Kernel panic D2243** — dual GPU clients (mlx_lm + OMLX) | P0 | ✅ MITIGATED — OMLX-only for all models, memory guard 55GB |
 
@@ -82,7 +82,7 @@ T-016 EMBED_MAX_CHARS ✅ | T-017 HDBSCAN removal ✅ | T-018 schemas v3.0 ✅ |
 ## 📋 REMAINING EXECUTION ORDER
 
 ```
-NOW    → A-005 S4 benchmark (running ~20 min) → compare Phi vs Gemma depth accuracy
+DONE   → A-005 benchmark: Gemma 50% vs Phi 37.5% (D2244). Cross-domain 0% both.
 NEXT   → Post-A001 S2 comparison rerun (Traditional vs DSPy — no depth now)
 NEXT   → A-002 author-disjoint few-shot split for fair comparison
 P1     → T-009 replace Griffiths×2 + Meadows×1 (careful, evidence-safe)

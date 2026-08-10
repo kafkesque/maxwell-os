@@ -1,15 +1,128 @@
 {
-  "timestamp": "2026-08-10T18:14:40",
-  "test_fbs": 50,
+  "timestamp": "2026-08-10T18:55:48",
+  "n": 8,
   "phi4_mini": {
-    "accuracy": 0.22,
-    "avg_time": 1.317000584602356,
-    "n": 50
+    "accuracy": 0.375,
+    "results": [
+      {
+        "fb": "CONV-023",
+        "gold": "universal",
+        "pred": "domain",
+        "correct": false,
+        "t": 0.43749308586120605
+      },
+      {
+        "fb": "CONV-012",
+        "gold": "domain",
+        "pred": "domain",
+        "correct": true,
+        "t": 0.7211720943450928
+      },
+      {
+        "fb": "CONV-021",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 0.3178718090057373
+      },
+      {
+        "fb": "CONV-049",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 0.39593505859375
+      },
+      {
+        "fb": "CONV-040",
+        "gold": "specialized",
+        "pred": "domain",
+        "correct": false,
+        "t": 0.3820629119873047
+      },
+      {
+        "fb": "CONV-011",
+        "gold": "domain",
+        "pred": "domain",
+        "correct": true,
+        "t": 0.34060192108154297
+      },
+      {
+        "fb": "CONV-026",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 0.45147013664245605
+      },
+      {
+        "fb": "CONV-001",
+        "gold": "domain",
+        "pred": "domain",
+        "correct": true,
+        "t": 0.5540719032287598
+      }
+    ]
   },
   "gemma_4_31b": {
-    "accuracy": 0.0,
-    "avg_time": 0.25095778465270996,
-    "n": 50
+    "accuracy": 0.5,
+    "results": [
+      {
+        "fb": "CONV-023",
+        "gold": "universal",
+        "pred": "universal",
+        "correct": true,
+        "t": 108.17531394958496
+      },
+      {
+        "fb": "CONV-012",
+        "gold": "domain",
+        "pred": "domain",
+        "correct": true,
+        "t": 219.48653602600098
+      },
+      {
+        "fb": "CONV-021",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 92.88503503799438
+      },
+      {
+        "fb": "CONV-049",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 127.94741010665894
+      },
+      {
+        "fb": "CONV-040",
+        "gold": "specialized",
+        "pred": "specialized",
+        "correct": true,
+        "t": 72.40045094490051
+      },
+      {
+        "fb": "CONV-011",
+        "gold": "domain",
+        "pred": "described",
+        "correct": false,
+        "t": 292.9992792606354
+      },
+      {
+        "fb": "CONV-026",
+        "gold": "cross-domain",
+        "pred": "domain",
+        "correct": false,
+        "t": 87.87565493583679
+      },
+      {
+        "fb": "CONV-001",
+        "gold": "domain",
+        "pred": "domain",
+        "correct": true,
+        "t": 149.02681708335876
+      }
+    ]
   },
-  "winner": "Phi-4-mini"
+  "winner": "gemma",
+  "safety": "OMLX-served both models; no mlx_lm direct load (D2243 panic prevention)"
 }

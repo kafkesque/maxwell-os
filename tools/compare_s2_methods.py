@@ -179,6 +179,7 @@ def run_comparison(
     optimized_program: dspy.Module | None = None,
     n_pos_fewshot: int = 3,
     n_neg_fewshot: int = 1,
+    max_test: int | None = None,
 ) -> dict[str, Any]:
     """
     Compare traditional S2 vs DSPy S2 on the same test set.
@@ -207,9 +208,11 @@ def run_comparison(
         "temperature": 0.0,
     }, timeout=30)
 
-    for i, ex in enumerate(test_examples[:8], 1):  # Limit to 8 for speed
+    # A-004: test set size parameterized (was hardcoded 8). Default = all provided.
+    eval_pool = test_examples if max_test is None else test_examples[:max_test]
+    for i, ex in enumerate(eval_pool, 1):
         print(f"\n{'='*60}")
-        print(f"Example {i}/{min(8, len(test_examples))}: {ex.golden_id} ({ex.fb_name})")
+        print(f"Example {i}/{len(eval_pool)}: {ex.golden_id} ({ex.fb_name})")
         print(f"{'='*60}")
 
         # ── Traditional S2 ──
@@ -341,15 +344,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compare Traditional vs DSPy S2 extraction")
     parser.add_argument("--dspy-program", type=str, default=None,
                         help="Path to pickled DSPy program (from --pilot output)")
-    parser.add_argument("--n-examples", type=int, default=8,
-                        help="Number of test examples to evaluate")
+    parser.add_argument("--n-examples", type=int, default=20,
+                        help="Number of test examples to evaluate (A-004: 20+ for significance)")
     parser.add_argument("--traditional-only", action="store_true",
                         help="Run only traditional S2 (DSPy program not available yet)")
     args = parser.parse_args()
 
     # Load test examples
     examples = golden_to_examples(verbose=False)
-    _, _, test = stratified_random_split(examples, verbose=True)
+    # A-004: train_frac 0.60 keeps dev=0.15, yields ~20 test examples (of 75)
+    _, _, test = stratified_random_split(examples, train_frac=0.60, verbose=True)
 
     # Truncate to n_examples
     test = test[:args.n_examples]
@@ -372,7 +376,20 @@ if __name__ == "__main__":
     optimized = None
     if not args.traditional_only and args.dspy_program:
         print(f"Loading DSPy program from {args.dspy_program}...")
-        optimized = dspy.Module.load(args.dspy_program)
+        # dspy 3.x: BaseModule.load is an instance method — must match pilot's
+        # ExtractFB wrapper structure (saved state keyed 'extract.predict')
+        from pipeline.dspy_trainer import ConvergentExtraction
+
+        class _ExtractFB(dspy.Module):
+            def __init__(self):
+                super().__init__()
+                self.extract = dspy.ChainOfThought(ConvergentExtraction)
+
+            def forward(self, cluster_segments: str):
+                return self.extract(cluster_segments=cluster_segments)
+
+        _prog = _ExtractFB()
+        optimized = _prog.load(args.dspy_program)
     elif args.traditional_only:
         print("Running TRADITIONAL-ONLY comparison (DSPy pilot not yet complete)")
     else:
@@ -380,7 +397,7 @@ if __name__ == "__main__":
         print("Run --pilot first, then pass --dspy-program /tmp/dspy_optimized.json")
 
     # Run comparison
-    results = run_comparison(test, optimized_program=optimized)
+    results = run_comparison(test, optimized_program=optimized, max_test=args.n_examples)
     print_comparison(results)
 
     # Save results

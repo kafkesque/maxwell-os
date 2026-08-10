@@ -1765,6 +1765,25 @@ decisions:
   impact: 'GPT-OSS-20B replaces Gemma-4-31B as S4 depth classifier: better accuracy
     at 1/3 the memory and 25x speed. Frees ~19GB RAM. Cross-domain still needs few-shot
     examples. Registered in OMLX via symlink.'
+- id: D2246
+  category: QA
+  state: ACTIVE
+  description: 'Post-A001 DSPy pilot rerun: MIPROv2 best 96.4% (was 44.75% pre-A001).
+    Held-out test eval 93.8% (3.75/4). Depth removal rebalanced metric and eliminated
+    unlearnable 15% + 0.0 universal penalty. Program persisted to /tmp/dspy_mipro_optimized.json
+    (keyed extract.predict).'
+  impact: 'Optimized S2 program viable for 4-way comparison. A-004: test set 20 examples
+    (train_frac 0.60).'
+- id: D2247
+  category: QA
+  state: ACTIVE
+  description: "S4 cross-domain few-shot A/B: 4 few-shot anchors added to CLASSIFY_SYSTEM_PROMPT\
+    \ but mixed results (CONV-026 regressed). RELIABLE FIX: Reasoning:none prefix\
+    \ for GPT-OSS (60-182s high-reasoning \u2192 25-40s direct JSON). Short focused\
+    \ depth prompt (62.5%) beats long combined classify prompt (38%) for all models.\
+    \ max_tokens 512\u21921024+ needed."
+  impact: 'S4 classify: prepend Reasoning:none, raise max_tokens. Cross-domain is
+    prompt-structure issue, not model.'
 summary:
   total: 227
   proposed: 0

@@ -3857,3 +3857,29 @@ from golden v4.4. Both models served via OMLX API (safe — D2243 prevention).
 - Cross-domain: still 0/3 — all three models fail; few-shot examples required (D2244 finding stands)
 
 **Impact:** GPT-OSS-20B becomes the S4 depth classifier. Frees ~19GB RAM for pipeline. Cross-family with Qwen3-Coder generator (R5 satisfied: OpenAI ≠ Qwen). Reasoning content available via `reasoning_content` field; parse `content` for final answer.
+
+### D2246: Post-A001 DSPy Pilot Rerun — 96.4% (depth removal was the fix)
+
+**Context:** First pilot (pre-A001, depth in Signature) scored 44.75% and was lost to the kernel panic. Rerun post-A001 with depth removed from ConvergentExtraction Signature, metric, and few-shot.
+
+**Results (MIPROv2, auto=light, 3 train / 2 dev):**
+- Best score: **96.4%** (was 44.75% pre-A001)
+- Held-out test eval: **93.8%** (3.75/4)
+- Program persisted: /tmp/dspy_mipro_optimized.json (12KB, keyed `extract.predict`)
+
+**Root cause of the 2× jump:** depth (15% of metric) was unlearnable in S2 (0% accuracy, no training signal — 1 universal + 1 specialized in 50 FBs). Removing it rebalanced the metric (type 20%, name 12%, mechanism 13%) and eliminated the 0.0 universal penalty that forced degenerate programs.
+
+**Impact:** MIPROv2-optimized S2 program now viable for the 4-way comparison (Traditional vs CoT vs BS vs MIPROv2). A-004 test set expanded to 20 examples (train_frac 0.60).
+
+### D2247: S4 Cross-Domain Few-Shot + Reasoning Control (honest A/B)
+
+**Context (D2244 finding):** All three models (Phi, Gemma, GPT-OSS) scored 0% on cross-domain depth (the dominant class, 26/50 = 52%).
+
+**Attempted fix:** Added 4 few-shot anchors (feedback loops, default option, hierarchy taxonomy, attribute substitution) to CLASSIFY_SYSTEM_PROMPT in stage4_merge.py.
+
+**Honest A/B result (GPT-OSS, Reasoning:none):**
+- Few-shot vs no-few-shot on 5 FBs: mixed — CONV-026 regressed (cross-domain→domain), CONV-021 →EMPTY
+- **Reliable fix found: `Reasoning: none` system-prefix** — GPT-OSS switches from high-reasoning mode (60-182s/call, empty content) to direct classification (25-40s, JSON output)
+- The SHORT focused depth prompt (benchmark style) remains superior to the LONG combined classify prompt: 62.5% vs 38%
+
+**Impact:** (1) S4 classify calls for GPT-OSS need `Reasoning: none` prefix + max_tokens ≥1024 (was 512 — too low, burns tokens on reasoning). (2) Cross-domain classification is a prompt-structure issue, not a model issue — long combined prompts hurt all models. (3) Few-shot anchors retained but flagged as weak signal; the structural fix (short prompt + Reasoning:none) is the primary lever.

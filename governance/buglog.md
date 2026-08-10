@@ -1260,3 +1260,33 @@ Qwen3-Coder-30B + Phi-4-mini (~50GB combined GPU commit on 64GB unified memory).
 pressure → Apple IOGPUFamily memory prepare count underflow.
 **Fix:** OMLX-only serving. Never direct-load via mlx_lm while OMLX runs.
 **Status:** ✅ MITIGATED (D2243). Verified OMLX loads Gemma-31B safely with eviction.
+
+### BUG-074 — 2026-08-10 — GPT-OSS-20B Reasoning Mode Burns Tokens at max_tokens=512 (P1) ✅ MITIGATED
+- **Symptom:** S4 classify calls with GPT-OSS-20B returned EMPTY content — all 512
+  max_tokens consumed by `reasoning_content` (high-reasoning default mode).
+- **Root cause:** GPT-OSS is a reasoning model (OpenAI GPT-OSS series). Default
+  reasoning effort is HIGH; the long CLASSIFY_SYSTEM_PROMPT triggers extended
+  chain-of-thought, exhausting the token budget before `content` starts.
+- **Fix (D2247):** Prepend `Reasoning: none` to the system prompt → GPT-OSS
+  classifies directly (25-40s/call vs 60-182s high-reasoning) and emits JSON in
+  `content`. Also raise max_tokens 512 → ≥1024 for safety.
+- **Impact:** S4 classify now reliable with GPT-OSS. Also improves latency 4-6×.
+- **Status:** ✅ MITIGATED (D2247) — pipeline prompt change pending.
+- **Files:** `pipeline/stage4_merge.py` (CLASSIFY_SYSTEM_PROMPT + call sites)
+
+### BUG-075 — 2026-08-10 — Cross-Domain Depth 0% Across All S4 Models (P1) 🔴 OPEN
+- **Symptom:** Phi-4-mini, Gemma-4-31B, AND GPT-OSS-20B all score 0% (0/3) on
+  cross-domain depth classification (the dominant class: 26/50 FBs = 52%).
+- **Root cause:** Not model capability — prompt structure. The LONG combined
+  classify prompt (discipline+domains+depth in one call) degrades all models
+  (GPT-OSS: 62.5% short-prompt → 38% long-prompt). Few-shot anchors gave mixed
+  A/B results (CONV-026 regressed).
+- **Impact:** The most common depth class is systematically misclassified as
+  "domain" — S4 depth accuracy is capped ~50-60% until resolved.
+- **Fix candidates:** (1) Split depth into its own focused short-prompt call
+  (proven 62.5%); (2) dedicated few-shot with structurally-matched anchors;
+  (3) Reasoning:none prefix for reasoning models.
+- **Status:** 🔴 OPEN — D2247 identified; structural fix pending.
+- **Files:** `pipeline/stage4_merge.py`, `tools/benchmark_s4_depth_gptoss.py`
+
+*Updated: 2026-08-10 (D2245-D2247 session) | Open: 14*

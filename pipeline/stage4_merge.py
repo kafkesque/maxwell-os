@@ -181,6 +181,42 @@ DO NOT:
 - Over-assign "universal" — most principles are domain-bound. Default to "domain" unless
   the mechanism demonstrably crosses into physics, biology, or pure mathematics.
 
+FEW-SHOT EXAMPLES (D2245 — cross-domain anchors):
+1) FB "Feedback Loops Stabilize or Destabilize Systems":
+   mechanism: "A feedback loop occurs when the output of a process feeds back as input,
+   either dampening (negative feedback: thermostat, homeostasis, market correction) or
+   amplifying (positive feedback: population growth, viral spread, bank runs). The same
+   causal structure operates in biology (homeostasis), engineering (control systems),
+   economics (speculative bubbles), and social systems (polarization)."
+   → depth: "cross-domain" (mechanism bridges biology, engineering, economics via a
+   shared causal structure — the feedback topology itself).
+
+2) FB "The default option disproportionately persists":
+   mechanism: "When a pre-selected option exists, decision-makers stick with it because
+   opting out requires active effort and the default becomes the loss-reference point."
+   → depth: "domain" (behavioral economics/decision science — requires that field's
+   vocabulary; does not structurally connect distinct disciplines).
+
+3) FB "Hierarchical taxonomy of human needs":
+   mechanism: "Human needs are organized into ranked tiers (survival, safety, social,
+   esteem, self-actualization); lower tiers dominate until satisfied, then higher tiers
+   emerge. This descriptive structure is applied identically in consumer marketing
+   (segmenting by need state), management (motivating teams), and clinical psychology
+   (understanding deprivation), because it classifies a universal psychological
+   structure that each field then operationalizes."
+   → depth: "cross-domain" (a descriptive taxonomy whose classificatory structure is
+   shared across psychology, management, and marketing — the same hierarchy is applied
+   in each field without field-specific vocabulary).
+
+4) FB "Attribute substitution under pressure":
+   mechanism: "When the target question is hard, intuitive judgment substitutes an
+   easier question ('how dangerous does this person seem?' for 'what sentence is
+   legally correct?'). This substitution operates identically in judicial sentencing,
+   medical diagnosis, and financial risk assessment — professionals in each field
+   answer a proxy question under cognitive load."
+   → depth: "cross-domain" (the same cognitive mechanism structurally bridges law,
+   medicine, and finance via shared substitutability).
+
 Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "depth": "universal|cross-domain|domain|specialized", "is_specialized": true/false, "evidence": "..."}"""
 
 

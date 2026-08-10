@@ -3999,3 +3999,39 @@ scheduled overnight task, not a blocking prerequisite.
 **Impact:** (1) Production S2 = hybrid (D2251). (2) T-007b CLOSED as resolved
 via hybrid. (3) Overnight re-opt (3 demos) is optional polish, tracked in
 aggregated_remaining_tasks.md as T-007b-v2.
+
+### D2253: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
+
+**Context:** The prior 100h estimate for the 12,964-cluster full run was naive:
+12,964 × 28s ÷ 1 worker. It ignored the tiered+parallel architecture.
+
+**Corrected model (verified against S1.5 cluster distribution):**
+- 79.7% of clusters (10,330) are SINGLE-SOURCE → simplified prompt (~12s, no few-shot)
+- 20.3% (2,634) convergent → full synthesis + few-shot (~28s, A/B-measured)
+- 5.3% (683) large (≥20 segs) → split-probe overhead (+6s, Phi-4 k-means)
+- 3 parallel workers (`stage2.max_workers: 3`, ThreadPool, config-driven)
+- S4 merged call (D2224) ~45% faster; S5 Gemma+DeBERTa ~3s/FB
+
+**Result:** S2 ≈ 18.7h + S4 ≈ 3.9h + S5 ≈ 0.7h = **~21-26h wall-clock** (4-5× faster than naive).
+
+**Decision:** T1.1 is a feasible scheduled production job (~1 day), NOT a 4-day marathon.
+Launch with batch-resume; monitor first hour for throughput (expect ≥2× single-threaded).
+
+**Impact:** (1) T1.1 demoted from "weeks" to "next-day" execution. (2) Full-run
+validation of hybrid S2 + GPT-OSS S4 can complete within one working session +
+overnight. (3) Documented in ROUNDTABLE_MASTER_PROMPT.md §G.
+
+### D2254: Session handoff + governance sync (D2250-D2253)
+
+**What changed this session (D2250-D2254):**
+- BUG-075 FIXED (87.5%, cross-domain 3/3) — focused depth prompt (D2249/D2250)
+- D2249: GPT-OSS live in S4 (VERIFY_MODEL swap, Reasoning:none, max_tokens 1024)
+- BUG-053: Phi retired from S4 (kept for S5 + gates)
+- T-007b: hybrid S2 = 0.736 (DSPy gate + Trad extract) — production architecture
+- T-009-followup: Christian 4→3 (CONV-012 → Age of AI)
+- Golden audit: clean + depth imbalance documented (T-015)
+- Master prompt v8 + DSPY_VALIDATION_REPORT.md + SESSION_AUDIT_D2250.md
+- D2253: cost model corrected → T1.1 = ~26h (next action)
+
+**Handoff file:** `governance/HANDOFF_D2254.md` — next session start point.
+**Commits:** af09de9, 88fd43f, fcf23a9 (+ pending governance sync commit).

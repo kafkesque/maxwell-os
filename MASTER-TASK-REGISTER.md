@@ -1,12 +1,14 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-10 23:45 | **Decisions:** D2000-D2251 (234 decisions)
+> **Updated:** 2026-08-10 23:58 | **Decisions:** D2000-D2254 (237 decisions)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Latest session:** D2250-D2251 (BUG-075 FIXED, GPT-OSS live in S4, T-007b hybrid, golden audit)
-> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (register: T-007b v2, T1.1 full run, 16 high, 16 medium, 5 low)
+> **Latest session:** D2250-D2254 (BUG-075 FIXED, GPT-OSS live, T-007b hybrid, golden audit, cost model, handoff)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T1.1 full run ~26h, T-007b-v2, T1.2-T1.9, T-015)
+> **Handoff:** `governance/HANDOFF_D2254.md` (next session starts here)
 > **Buglog:** `governance/buglog.md` (BUG-074 RESOLVED, BUG-075 FIXED 87.5%, BUG-053 retired for S4)
-> **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 **0.672** > Traditional **0.591** on 20 examples (hybrid = DSPy gate + Trad extract)
-> **S4 Depth (D2249/D2250):** GPT-OSS-20B focused prompt **87.5%** (cross-domain 3/3, was 0/3) @ ~8s/call — live in S4
-> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS) | S5/S6 need full run (T1.1)
+> **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 **0.672** > Traditional **0.591** (hybrid = DSPy gate + Trad extract)
+> **S4 Depth (D2249/D2250):** GPT-OSS-20B focused prompt **87.5%** (cross-domain 3/3, was 0/3) — live in S4
+> **Full-run cost (D2253):** ~21-26h wall-clock (NOT 100h — tiered + 3 workers + merged S4)
+> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS) | **T1.1 full run = NEXT ACTION**
 > **Tier 0 fixes:** Fix 0.1-0.4 still pending (see aggregated_remaining_tasks.md T1.x)
 
 ---

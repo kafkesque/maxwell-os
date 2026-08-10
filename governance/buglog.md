@@ -1,5 +1,5 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-08 08:37 (D2211 — 13 P0 circuit breaker + error propagation fixes)
+> **Last updated:** 2026-08-10 (D2254 — session handoff; BUG-074 RESOLVED, BUG-075 FIXED, BUG-053 retired for S4)
 > **Next review:** After full S2 extraction run
 
 ---

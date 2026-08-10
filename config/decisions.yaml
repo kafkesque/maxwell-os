@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-10'
-total_decisions: 235
+total_decisions: 237
 decisions:
 - id: D2092
   category: INF
@@ -1843,11 +1843,36 @@ decisions:
   files:
   - config/pipeline_config.yaml
   - pipeline/dspy_trainer.py
+- id: D2253
+  date: '2026-08-10'
+  category: PERF
+  status: active
+  title: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
+  summary: 'Naive 100h estimate (12964x28s/1 worker) ignored tiered+parallel arch.
+    Real: 79.7% single-source (12s simplified prompt), 20.3% convergent (28s few-shot),
+    3 workers, merged S4 (45% faster), S5 ~3s/FB. Result: S2~18.7h + S4~3.9h + S5~0.7h
+    = ~21-26h wall-clock.'
+  impact: T1.1 demoted from weeks to next-day production job (~1 day).
+  files:
+  - governance/ROUNDTABLE_MASTER_PROMPT.md
+- id: D2254
+  date: '2026-08-10'
+  category: GOV
+  status: active
+  title: Session handoff + governance sync (D2250-D2253)
+  summary: 'Handoff file governance/HANDOFF_D2254.md created. Master prompt v8, DSPY_VALIDATION_REPORT,
+    SESSION_AUDIT_D2250, task register aggregated. Next: T1.1 full run (~26h) + T-007b-v2
+    overnight.'
+  impact: Clean session boundary; next session starts at T1.1 launch.
+  files:
+  - governance/HANDOFF_D2254.md
+  - governance/aggregated_remaining_tasks.md
+  - governance/ROUNDTABLE_MASTER_PROMPT.md
 summary:
-  total: 235
+  total: 237
   proposed: 0
   draft: 0
-  active: 191
+  active: 193
   stale: 0
   superseded: 8
   archived: 8
@@ -1855,14 +1880,14 @@ summary:
   by_category:
     INF: 140
     QLT: 21
-    GOV: 11
+    GOV: 12
     RES: 4
     DAT: 4
     DEF: 1
     VAL: 2
     CLS: 10
     STR: 1
-    PERF: 3
+    PERF: 4
     BUGFIX: 13
     CFG: 4
     ARCH: 9

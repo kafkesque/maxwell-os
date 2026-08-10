@@ -1,7 +1,14 @@
 # LLM Roundtable — Master Prompt
 > Evaluate Maxwell OS v3.0 convergent Foundation Blocks for golden few-shot examples and fine-tuning candidates.
+> **v8 (D2250-D2252, 2026-08-10):** Updated with hybrid S2 result (0.736), S4 GPT-OSS depth fix (87.5%), golden audit findings, full-run cost model.
 > Delegated to: Qwen3-Coder-30B (primary), Gemma-4-E4B (cross-family validation), Phi-4-mini (summarization)
 > Run: delegate each model independently, compare outputs, rank by consensus.
+>
+> **Latest session results to validate (D2250-D2252):**
+> - S4 depth: GPT-OSS-20B + focused short prompt = **87.5% (7/8)**, cross-domain **3/3** (was 0/3 all models). Benchmark: `governance/s4_depth_benchmark_focused_prompt.json`
+> - S2: **Hybrid (DSPy gate + Traditional extract) = 0.736** > DSPy 0.672 > Traditional 0.591 (20 examples, 3-arm A/B)
+> - Golden pool audit: 0 quality gaps, 73/73 rationale, 194/194 evidence verbatim, author cap ≤3 (Christian 4→3 fixed)
+> - Known gap: depth class imbalance — universal=1, specialized=1 (4% of 54 positives) → T-015 expansion
 
 ---
 
@@ -173,3 +180,48 @@ additionally assess:
   `governance/s4_depth_benchmark_focused_prompt.json`
 - **Validation check:** depth accuracy ≥ 80% on the 8-FB stratified benchmark;
   cross-domain ≥ 2/3. Regression → re-check prompt structure (BUG-075).
+
+---
+
+## HYBRID S2 ARCHITECTURE VALIDATION (D2251/D2252 — production architecture)
+
+### F. Three-Arm A/B (20 examples, Qwen3-Coder temp 0.0)
+| Metric | Traditional | DSPy-MIPROv2 | **Hybrid** |
+|--------|-------------|--------------|-----------|
+| Avg Quality | 0.591 | 0.672 | **0.736** |
+| Avg Latency | 29.7s | 27.0s | 45.8s |
+| Negatives rejected (n=6) | 0/6 | 5/6 | 5/6 |
+| Positive fidelity (n=14) | 0.845 | 0.602 | 0.845 |
+
+- **Hybrid = DSPy route gate (negative rejection) + Traditional extraction (positive fidelity).**
+- DSPy alone: perfect gate, weak extractor (2 demos design-only — Cooper/Krug/Norman).
+- Traditional alone: strong extractor, no gate (0/6 negatives rejected).
+- **Validation check:** hybrid must match Traditional on positives AND DSPy on negatives.
+  Regression → gate FN (CONV-036/043/040 pattern) or extraction fidelity loss.
+- **Latency note:** hybrid 45.8s = gate (~13s) + extract (~30s); gate short-circuits
+  negatives at ~13s. Full report: `governance/DSPY_VALIDATION_REPORT.md`
+
+### G. Full-Run Cost Model (T1.1 — 12,964 clusters, ~26h not 100h)
+Naive estimate (12,964 × 28s ÷ 1 worker = 100h) is WRONG. Real model:
+
+| Segment | Clusters | Cost/cluster | Subtotal |
+|---------|----------|-------------|----------|
+| Single-source (79.7%) | 10,330 | 12s (simplified prompt) | 124,000s |
+| Convergent (20.3%) | 2,634 | 28s (full synthesis + few-shot) | 73,750s |
+| Split-probe (5.3%) | 683 | +6s (Phi probe + k-means) | 4,100s |
+| **S2 total ÷ 3 workers** | | | **~18.7h** |
+| S4 merged (D2224, ~45% faster) | ~2,634 FBs | ~16s ÷ 3 workers | ~3.9h |
+| S5 verify (Gemma + DeBERTa) | ~2,634 FBs | ~3s ÷ 3 workers | ~0.7h |
+
+**Wall-clock ≈ 21-26h** (4-5× faster than naive). Parallelism: `stage2.max_workers: 3`
+(ThreadPool, config-driven). **Validation check:** S2 throughput should approach
+3× single-threaded; if < 2×, workers are contending (OMLX queue) — raise OMLX
+`default_timeout` or reduce `max_workers` to 2.
+
+### H. Golden Pool Audit Results (D2250 — user-requested)
+- **Quality:** 0 field gaps; **Accuracy:** 73/73 rationale; **Verbatim:** 194/194 evidence
+- **Author cap:** ≤3 by FB-mention (T-009 + D2250 Christian 4→3 via CONV-012→Age of AI)
+- **Leakage:** author-disjoint few-shot (A-002) verified 0 overlap
+- **Metric calibration:** weights sum 1.00; FP ≤0.20; FN = 0.10; perfects = 1.0
+- **⚠️ Depth imbalance:** universal=1, specialized=1 (4%) — under-represented; benchmark
+  confidence on these classes is low → T-015 expansion tracked

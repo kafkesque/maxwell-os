@@ -1,38 +1,26 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 23:45 | **Session:** D2250-D2251 (BUG-075 FIXED 87.5%, GPT-OSS live in S4, T-007b hybrid 0.736, golden audit)
+> **Updated:** 2026-08-10 23:55 | **Session:** D2250-D2252 (BUG-075 FIXED, GPT-OSS live in S4, T-007b hybrid, golden audit, cost model)
 > **Golden set:** v4.4 (73 examples, 75 FBs, 194 evidence passages — 100% verbatim, author cap ≤3)
 > **Models:** Qwen3-Coder-30B (S2 gen) · **GPT-OSS-20B-MXFP4-Q8 (S4 classifier — D2249, 87.5% depth)** · Phi-4-mini-8bit (S5 verify + gates only) · Gemma-4-E4B (S5 cross-family)
-> **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 0.672 > Traditional 0.591 on 20 examples
+> **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 0.672 > Traditional 0.591 (20 examples, 3-arm)
+> **Full-run cost (T1.1):** ~21-26h wall-clock (NOT 100h — tiered prompts + 3 workers, see §F)
 
 ---
 
-## ✅ COMPLETED THIS SESSION (D2245-D2249)
+## ✅ COMPLETED THIS SESSION (D2250-D2252)
 
 | ID | Task | Result |
 |----|------|--------|
-| **D2245** | **Model research via llmfit** → GPT-OSS-20B-MXFP4-Q8 | 12.1GB, OpenAI MoE 3.6B active, registered in OMLX. **62.5% depth acc vs Gemma 50% / Phi 37.5%**; **24.9× faster than Gemma** (5.8s vs 143.8s/call) |
-| **T-009** | Author cap ≤3 — Griffiths 5→3, Meadows 4→3 | ✅ Swap 3 books (D2234 precedent): CONV-007→Graham, CONV-042→Barabási, CONV-014→Watts. Evidence audit 194/194 verbatim, golden_validate PASS |
-| **A-002** | Author-disjoint few-shot split | ✅ `_author_disjoint_fewshot()` in compare_s2_methods.py — verified 0 overlap |
-| **A-004** | Expand test set 8→20 | ✅ train_frac 0.60 → 20 test examples; max_test param |
-| **T-007** | DSPy harness + pilot rerun (post-A001) | ✅ **Best 96.4%** (was 44.75% pre-A001). Test eval 93.8%. Program persisted /tmp/dspy_mipro_optimized.json |
-| **D2246** | 4-way S2 comparison (20-example) | ✅ **DSPy 0.672 vs Traditional 0.592** — DSPy: 5/5 negative rejection, 26.4s avg. Traditional: 0.845 positive-fidelity |
-| **D2247** | S4 cross-domain A/B | ✅ Finding: `Reasoning: none` is the reliable GPT-OSS fix (60-182s → 25-40s). Few-shot anchors = weak signal |
-| **D2243** | Kernel panic prevention | ✅ OMLX-only serving held (GPT-OSS loaded 12.1GB safely alongside Qwen+Phi+Gemma) |
-
----
-
-## ✅ COMPLETED THIS SESSION (D2250-D2251)
-
-| ID | Task | Result |
-|----|------|--------|
-| **BUG-075** | **Cross-domain depth 0% — FIXED** | ✅ **87.5% (7/8)**, cross-domain **3/3** (was 0/3 all models). Root cause CONFIRMED: long combined prompt. Fix: `classify_depth_focused()` short prompt (D2249). Benchmark: `governance/s4_depth_benchmark_focused_prompt.json` |
-| **D2249** | **S4 classifier swap Phi→GPT-OSS** | ✅ VERIFY_MODEL → gpt-oss-20b-MXFP4-Q8. `Reasoning: none` prefix + max_tokens 1024 (config-driven, C12). Verified live. ~19GB RAM freed vs Gemma-31B |
-| **BUG-053** | **Phi retired from S4** | ✅ Resolved for S4 (GPT-OSS replaces). Phi retained for S5 verify + fast gates |
-| **T-007b** | **S2 positive-fidelity gap** | ✅ **Hybrid (DSPy gate + Trad extract) WINS: 0.736** vs DSPy 0.672 vs Trad 0.591 (D2251). Root cause: MIPROv2 2 demos design-only. Fix: demos 2→4 config + hybrid architecture |
-| **T-009-followup** | **Author cap Christian 4→3** | ✅ CONV-012 Christian→The Age of AI (Kissinger/Schmidt/Huttenlocher). Evidence 194/194 verbatim, golden_validate PASS |
-| **S4 Chain E2E** | **GPT-OSS + focused depth on real S2 FBs** | ✅ Validated live: Patch Cord→specialized, Value-First→cross-domain (~7-26s/call) |
-| **D2252** | **T-007b pragmatic resolution** | ✅ Hybrid = production (0.736). Demo re-opt 4→3 (20h infeasible interactive); scheduled overnight |
-| **Audit** | **Golden pool + DSPy calibration** | ✅ Quality 0 gaps, 73/73 rationale, 194/194 evidence verbatim, metric weights sum 1.0. ⚠️ Depth class imbalance: universal=1, specialized=1 (4%) |
+| **BUG-075** | **Cross-domain depth 0% — FIXED** | ✅ **87.5% (7/8)**, cross-domain **3/3** (was 0/3 all models). Root cause: long combined prompt. Fix: `classify_depth_focused()` short prompt. Benchmark: `governance/s4_depth_benchmark_focused_prompt.json` |
+| **D2249** | **S4 classifier swap Phi→GPT-OSS** | ✅ VERIFY_MODEL → gpt-oss-20b-MXFP4-Q8. `Reasoning: none` prefix + max_tokens 1024 (config-driven C12). ~19GB RAM freed vs Gemma-31B |
+| **BUG-053** | **Phi retired from S4** | ✅ GPT-OSS replaces Phi for S4 classification; Phi kept for S5 verify + fast gates only |
+| **T-007b** | **S2 positive-fidelity gap** | ✅ **Hybrid (DSPy gate + Trad extract) = 0.736** > DSPy 0.672 > Trad 0.591. Root cause: MIPROv2 2 demos design-only. Production arch = hybrid (D2251) |
+| **T-009-followup** | **Author cap Christian 4→3** | ✅ CONV-012 Christian→*The Age of AI* (Kissinger/Schmidt/Huttenlocher). 194/194 verbatim, golden_validate PASS |
+| **Golden audit** | **User-requested full audit** | ✅ 0 quality gaps, 73/73 rationale, 194/194 verbatim, metric calibrated, depth imbalance documented. Report: `governance/SESSION_AUDIT_D2250.md` |
+| **DSPy validation** | **LLM-approvable artifact** | ✅ `governance/DSPY_VALIDATION_REPORT.md` — hybrid APPROVED for production |
+| **S4 chain E2E** | **GPT-OSS + focused depth on real S2 FBs** | ✅ Validated live (Patch Cord→specialized, Value-First→cross-domain) |
+| **D2252** | **T-007b pragmatic resolution** | ✅ Demo re-opt 4→3 (20h infeasible interactive); overnight scheduled only |
+| **Cost model** | **T1.1 realistic estimate** | ✅ 12,964 clusters → ~21-26h (tiered 79.7% single-source + 3 workers + merged S4) |
 
 ---
 
@@ -40,8 +28,9 @@
 
 | # | Task | Priority | Effort | Notes |
 |---|------|----------|--------|-------|
-| **T-007b v2** | Re-optimize MIPROv2 with demos 2→4 — close DSPy gate FN gap (CONV-036/043/040) | 🟠 P1 | 1h | D2250 config `s2.dspy_max_labeled_demos: 4`; re-run + hybrid A/B to verify gate FN fixed |
-| **T1.1** | Full S1.3→S6 run — NEEDS RERUN (existing S2 checkpoint is old v2.3 schema, 0 overlap with current 12,964 clusters) | 🟠 P1 | ~100h runtime | Production job: `stage2_extract.py` resume-aware; schedule in batches |
+| **T-007b-v2** | Re-optimize MIPROv2 with demos 2→3 (overnight) — close DSPy gate FN gap (CONV-036/043/040) | 🟠 P1 | 1h setup + overnight | Config `s2.dspy_max_labeled_demos: 3` already set. Optional polish — hybrid works without it |
+| **T1.1** | **Full S1.3→S6 run on 12,964 clusters** | 🔴 P0 | **~21-26h wall-clock** | Tiered+parallel: ~19h S2 + ~4h S4 + ~1h S5. Batch-resume capable. Schedule as production job with monitor |
+| **T1.2** | Yield crisis diagnostic — 14 FBs / 852 books = 0.004% | 🟠 P1 | 2h | Re-measure on the real full run; investigate why convergent yield is so low |
 
 ---
 
@@ -49,18 +38,17 @@
 
 | # | Task | Priority | Source |
 |---|------|----------|--------|
-| T-007b | ✅ RESOLVED via hybrid (D2251) — see completed table | — | D2248 |
-| T1.1 | Run S1.3→S6 pipeline — first full run with bge-m3 512d | 🟠 P1 | MTR |
-| T1.2 | Yield crisis diagnostic — 14 FBs from 852 books = 0.004% | 🟠 P1 | MTR |
 | T1.3 | NLI calibration on real data (0.5/0.6/0.8 vs bge-m3) | 🟠 P1 | MTR |
 | T1.4 | Fix faiss_threshold mismatch (0.75 vs 0.70) | 🟠 P1 | MTR |
-| T1.5 | Fix AGENTS.md stage count (9-stage → canonical) | 🟠 P1 | MTR |
-| T1.6 | Auto-fix Ruff lint (322 auto-fixable) | 🟠 P1 | MTR |
-| T1.7 | LLM evaluation on golden set (25 ex, 2+ LLMs) | 🟠 P1 | MTR |
-| T1.8 | Cross-encoder reranker gate (bge-reranker-v2-m3 ONNX) | 🟠 P1 | MTR |
-| T1.9 | Source-independence graph (effective_source_count for BORP) | 🟠 P1 | MTR |
-| Fix 0.1-0.4 | Tier-0 emergency fixes (null application, S4 forward, dead path, NLI MAX-entail) | 🟠 P1 | MTR D2213-18 |
-| N2/N3/N6 | mechanism/boundary in Pydantic FB, actionability field, ModernBERT NLI | 🟠 P1 | MTR audit |
+| T1.5 | AGENTS.md stage count (9-stage → canonical) | 🟠 P1 | MTR |
+| T1.6 | Ruff lint auto-fix (322 warnings) | 🟠 P1 | MTR |
+| T1.7 | LLM eval on golden set (25 ex, 2+ LLMs) | 🟠 P1 | MTR |
+| T1.8 | Cross-encoder reranker gate | 🟠 P1 | MTR |
+| T1.9 | Source-independence graph | 🟠 P1 | MTR |
+| T-015 | Extraction type expansion (4→12-15 per type) + depth class balance (universal/specialized) | 🟠 P1 | 2d | Fixes golden pool imbalance found in D2250 audit |
+| Fix 0.1-0.4 | null application prompt, S4 forward dict, dead multi-FB path, NLI MAX-entailment | 🟠 P1 | MTR |
+| N2/N3/N6 | Pydantic FB fields, actionability, ModernBERT NLI | 🟠 P1 | MTR |
+| Gov-sync | decisions.yaml missing D2210/D2212/D2233-D2239 (present in DECISION-LOG) | 🟠 P2 | 1h | Historical sync gap found in D2250 audit |
 
 ---
 
@@ -103,31 +91,33 @@
 ## 📊 STATUS SUMMARY
 
 ```
-CRITICAL: ░░░░░░░░░░ 0 OPEN — S4 chain FIXED (BUG-075 87.5%, D2249 done, BUG-053 retired for S4)
-HIGH:     ██████████ T-007b v2 (gate FN) + T1.1 (full run ~100h) + T1.2-T1.9
+CRITICAL: ██░░░░░░░░ T1.1 full run (~26h) ← the only blocker to production
+HIGH:     ██████████ T-007b-v2 (optional) + T1.2-T1.9 + T-015 + Fix 0.1-0.4
 MEDIUM:   ██████████ 16 items (T2.x)
-LOW:      ███░░░░░░░ 5 items
+LOW:      ███░░░░░░░ 5 items + BUG-073
 ────────────────────────────────────
-Session progress: D2250-D2251 — 6 tasks DONE (BUG-075, D2249, BUG-053, T-007b, T-009-fup, audit)
+Session progress: D2250-D2252 — S4 chain FIXED, T-007b resolved, golden audited, cost model corrected
+Decisions: 235 (D2250, D2251, D2252 added)
 ```
 
 ## 🔗 NEXT EXECUTION ORDER
 
 ```
-1. T-007b v2  → Wait for MIPROv2 re-opt (demos 4) → hybrid A/B verify gate FN closed
-2. T1.1       → Full S1.3→S6 run (100h, schedule in batches — S2 resume-aware)
-3. T1.2       → Yield crisis diagnostic (14 FBs / 852 books = 0.004%)
-4. T1.3       → NLI calibration on real data
-5. T1.4       → faiss_threshold mismatch (0.75 vs 0.70)
+1. T1.1       → Launch full S1.3→S6 run (~26h wall-clock, batch-resume). Monitor first
+                hour for throughput (expect ≥2× single-thread: 3 workers + tiered prompts).
+2. T-007b-v2  → Overnight MIPROv2 re-opt (3 demos) in parallel with T1.1 if GPU allows.
+3. T1.2       → Yield diagnostic on the full run output (re-measure 0.004%).
+4. T1.3/T1.4  → NLI calibration + faiss threshold (pre-S5 quality gates).
+5. T-015      → Golden pool expansion (extraction types + depth balance).
 ```
 
-## 🔗 NEXT EXECUTION ORDER
+## 🧭 SESSION HANDOFF POINTER (next session start here)
 
 ```
-1. BUG-075  → Split S4 depth into short focused prompt (Reasoning:none, max_tokens 1024)
-2. D2249    → Flip VERIFY_MODEL to gpt-oss-20b-MXFP4-Q8 + prompt changes
-3. BUG-053  → Confirm Phi retired from S4; keep for S5 verify
-4. T-007b   → Close positive-fidelity gap (more demos / metric reweight / hybrid)
-5. T1.1     → First full S1.3→S6 pipeline run (with GPT-OSS in S4)
-6. T1.2     → Yield crisis diagnostic
+1. Verify OMLX health: curl -s localhost:11435/health
+2. Check T1.1 run progress: tail "knowledge pipeline/stage2_extract/latest/checkpoint.jsonl"
+3. Config: verifier=gpt-oss-20b-MXFP4-Q8, s2.max_workers=3, s2.dspy_max_labeled_demos=3
+4. Master prompt v8: governance/ROUNDTABLE_MASTER_PROMPT.md (updated with D2250-D2252)
+5. Validation report: governance/DSPY_VALIDATION_REPORT.md (hybrid approved)
+6. Session audit: governance/SESSION_AUDIT_D2250.md (clean + documented gaps)
 ```

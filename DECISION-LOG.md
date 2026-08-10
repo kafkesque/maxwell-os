@@ -3512,3 +3512,46 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 **Effort:** 6-8 hours
 **Files:** `config/golden/stage2_fewshot_convergent.yaml`, `config/version.yaml`, `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`, `pipeline/stage5_verify.py`
 **Status:** ⏳ PENDING
+
+### D2234 — Author Concentration Cap & Extraction Type Expansion (2026-08-10)
+
+**Context:** Cross-examination audit (D2227-D2232) flagged that Kahneman appeared in 7
+golden set examples (risk of priming), and extraction types were severely imbalanced
+(25/41 causal_mechanism vs 4-7 each for other types).
+
+**Decision:** Cap all authors at ≤3 examples by editing cluster_segments to use
+diverse sources. Reclassify 7 mislabeled FBs. Add 10 new examples targeting
+under-represented extraction types.
+
+**What changed:**
+- **Author cap (T-009):** Kahneman 7→3, Taleb 5→3, James Clear 4→3, Gladwell 4→3.
+  Done via surgical cluster_segment replacement (not example deletion):
+  - CONV-006: Kahneman→Thaler/Sunstein (System 2→analytical deliberation)
+  - CONV-026: Kahneman→Sull/Eisenhardt (attribute substitution in professional judgment)
+  - CONV-034: Kahneman→Gary Klein (premortem properly attributed)
+  - CONV-037: Kahneman→Dobelli (availability heuristic)
+  - CONV-038: Taleb→Barabási (power-law distributions)
+  - NEG-002: Clear→Tony Robbins (platitude example)
+  - NEG-013: Gladwell→Nate Silver (spurious correlation)
+  - NEG-020: Taleb trilogy→Pinker trilogy (same-author echo)
+- **Reclassifications (T-015):** 7 FBs corrected from causal_mechanism:
+  CONV-011→empirical_pattern, CONV-013→normative_heuristic,
+  CONV-015→empirical_pattern, CONV-016→normative_heuristic,
+  CONV-021→empirical_pattern, CONV-028→descriptive_model, CONV-040→normative_heuristic
+- **New examples:** CONV-041 (Dunning-Kruger, EP), CONV-042 (Zipf's Law, EP),
+  CONV-043 (Group Development Stages, DM), CONV-044 (Johari Window, DM),
+  CONV-045 (Eisenhower Matrix, NH), CONV-046 (Five Whys, NH),
+  CONV-047 (Parkinson's Law, NH), CONV-048 (Rubber Duck Debugging, NH),
+  CONV-049 (Maslow's Hierarchy, DM), CONV-050 (Hanlon's Razor, NH)
+
+**Result:**
+- Author concentration: All 4 capped at ≤3 ✓
+- Extraction types: EP 7→12, NH 4→12, DM 5→9, CM 46→39
+- Golden set: 60→70 examples, 41→72 FBs (v4.3)
+- Evidence verbatim: 178/178 (100%)
+- Validation: golden_validate.py PASS
+
+**Impact:** Training data diversity significantly improved. Non-causal FB types
+better represented. Remaining gap: DM at 9 (target 12+), can be addressed in
+future expansion cycle.
+

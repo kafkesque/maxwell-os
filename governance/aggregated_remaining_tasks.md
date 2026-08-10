@@ -18,7 +18,7 @@
 | **T-006** | **Fix 6 C12 hardcoded threshold violations** — Move all to `pipeline_config.yaml` + read via `pipeline_paths.py`: `reliability.py` (0.85/0.50/0.20), `stage4_merge.py` (0.92/0.80), `principle_index.py` (0.90), `taxonomy_manager.py` (0.20/1.1/10), `retrieve.py` (0.85). | D2231 | 2-3h | ✅ **DONE** — 6 files fixed, 8 config keys added, 4 new pipeline_paths imports. Also bundled T-011 (NLI fallback defaults). |
 | **T-007** | **Implement DSPy harness** — System is currently few-shot injection only (zero dspy references). Build: compile → evaluate → held-out test → optimization loop. | D2227 | 1-2d | T-001..T-006 |
 
-**P0 subtotal: 7 tasks, ~2.5 days effort | 6 DONE, 1 PENDING (T-007)**
+**P0 subtotal: 13 tasks | 12 DONE, 1 PENDING (T-007)**
 
 ---
 

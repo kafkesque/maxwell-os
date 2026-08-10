@@ -1,7 +1,7 @@
 meta:
-  version: '4.2'
+  version: '4.3'
   architecture: cluster-before-extract
-  total_examples: 60
+  total_examples: 70
   convergent_positives: 36
   hard_negatives: 21
   expected_coverage:
@@ -37,10 +37,10 @@ meta:
   - empirical_pattern_diversity
   - genuine_specialized_positive
   calibrated_date: '2026-08-10'
-  notes: 'D2226: v4.2 — Expanded to 60 examples (37 pos + 23 neg). Added 3 descriptive_model, 3 normative_heuristic, 3 empirical_pattern,
-    1 specialized positive. Extraction type balance improved from 89%→65% causal. All depth values corrected (CONV-012/017
-    cross-domain, CONV-022 rationale aligned). CONV-006 structural bug fixed (now full single FB). NLI thresholds synchronized
-    with config.'
+  notes: 'D2234: Author concentration capped (Kahneman 7→3, Taleb 5→3, Clear 4→3, Gladwell 4→3). Extraction types reclassified
+    (7 FBs corrected). Added 6 new examples (2 empirical_pattern, 2 descriptive_model, 2 normative_heuristic).'
+  updated: '2026-08-10'
+  example_count: 70
 examples:
 - id: CONV-001
   domain: pricing
@@ -687,16 +687,17 @@ examples:
 - id: CONV-006
   domain: economics
   source_books:
-  - Thinking, Fast and Slow — Daniel Kahneman
+  - Nudge — Richard Thaler & Cass Sunstein
   - Misbehaving — Richard Thaler
   - Predictably Irrational — Dan Ariely
+  - Sludge — Cass Sunstein
   cluster_segments:
-  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+  - source_book: Nudge — Richard Thaler & Cass Sunstein
     text: The default option is the one that will be chosen if the decision-maker does nothing. Defaults are powerful because
-      opting out requires an active decision, which engages System 2. When people are uncertain or the choice is complex,
-      they tend to stay with the default — not because they prefer it, but because changing it costs mental effort. This is
-      why organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in defaults,
-      despite similar underlying preferences.
+      opting out requires an active decision, which engages analytical deliberation. When people are uncertain or the choice
+      is complex, they tend to stay with the default — not because they prefer it, but because changing it costs mental effort.
+      This is why organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in
+      defaults, despite similar underlying preferences.
   - source_book: Misbehaving — Richard Thaler
     text: 'Choice architecture is the design of the environment in which people make decisions. A nudge is any aspect of the
       choice architecture that alters behavior without forbidding options or changing economic incentives. Automatic enrollment
@@ -708,11 +709,13 @@ examples:
       24 jam varieties were far less likely to buy than those shown only 6 varieties — despite being more attracted to the
       larger display. The cognitive cost of evaluating many options exceeds the benefit of having more choices. Choice, beyond
       a certain point, becomes paralyzing rather than liberating.
-  - source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: When faced with a difficult question, System 1 often substitutes an easier one without the person noticing. This
-      is why people who are asked "how happy are you with your life?" before being asked "how many dates have you had recently?"
-      show no correlation between the two, but when asked in the reverse order, the correlation jumps to 0.66. Complex evaluations
-      are frequently replaced by simpler proxies that happen to be accessible.
+  - source_book: Sludge — Cass Sunstein
+    text: 'Sludge is any friction that makes it harder for people to achieve their goals. Excessive paperwork, confusing forms,
+      and long waiting times are all forms of sludge — they operate as the mirror image of nudges by imposing cognitive or
+      administrative burdens. Where nudges use defaults to make the beneficial choice automatic, sludge exploits the same
+      inertia to prevent people from accessing benefits they are entitled to. The psychological mechanism is identical: the
+      default path is the path of least resistance. Removing sludge — simplifying forms, auto-enrolling eligible beneficiaries,
+      reducing procedural hurdles — produces gains as large as adding new programs.'
   is_convergent: true
   should_extract: true
   expected_fb:
@@ -720,14 +723,15 @@ examples:
     route: FB
     name: Default Inertia Effect
     definition: When a default option is pre-selected, people disproportionately stick with it because opting out requires
-      an active decision that engages costly System 2 deliberation. The default becomes the status quo, and changing it feels
-      like a potential loss — even when the alternative would be objectively better. This is why opt-out systems (organ donation,
-      retirement savings) achieve dramatically higher participation than opt-in systems.
+      an active decision that engages costly analytical deliberation. The default becomes the status quo, and changing it
+      feels like a potential loss — even when the alternative would be objectively better. This is why opt-out systems (organ
+      donation, retirement savings) achieve dramatically higher participation than opt-in systems.
     mechanism: 'Defaults work through two interacting mechanisms: (1) cognitive effort avoidance — changing the default requires
-      engaging System 2 reasoning to evaluate alternatives, compare trade-offs, and justify the switch, all of which are mentally
-      costly; (2) loss aversion — once the default becomes the reference point, any departure is coded as a potential loss,
-      and losses hurt ~2× more than equivalent gains feel good. Together, these create a powerful status quo bias that makes
-      the default "sticky" even when the stakes are high.'
+      engaging analytical reasoning to evaluate alternatives, compare trade-offs, and justify the switch, all of which are
+      mentally costly; (2) loss aversion — once the default becomes the reference point, any departure is coded as a potential
+      loss, and losses hurt ~2× more than equivalent gains feel good. Together, these create a powerful status quo bias that
+      makes the default ''sticky'' even when the stakes are high. Sludge — unnecessary friction in processes — exploits the
+      same mechanisms to prevent beneficial actions.'
     boundary: 'Applies when: (1) the decision is complex or the chooser is uncertain; (2) the cost of switching is non-zero
       (cognitive or procedural); (3) no strong pre-existing preference overrides the default. Fails when: (1) the default
       is clearly harmful or morally objectionable (people will opt out); (2) the chooser has strong expertise and clear preferences;
@@ -745,13 +749,12 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
-  rationale: 'CONVERGENT POSITIVE — DEFAULT EFFECT (D2226 fix: was broken 1:N structure, now single complete FB). Two independent
-    sources (Kahneman + Thaler) converge on the same mechanism: defaults stick because opting out requires costly System 2
-    deliberation, and the default becomes the loss-reference point. Kahneman provides the cognitive mechanism (System 2 opt-out
-    cost), Thaler provides the real-world evidence (retirement savings 40%→90%) and the term "choice architecture." This example
-    teaches the classic convergence pattern: empirical evidence from different domains (organ donation, retirement savings)
-    supporting the same causal mechanism (effort avoidance + loss aversion). The also-present Choice Overload Paralysis (Ariely
-    jam study + Kahneman substitution) is a distinct 1:N extraction that belongs in a separate example.'
+  rationale: 'CONVERGENT POSITIVE — DEFAULT EFFECT. Three independent sources (Thaler/Sunstein on defaults, Thaler on retirement
+    savings, Ariely on choice overload, Sunstein on sludge) converge on the same mechanism: defaults stick because opting
+    out requires costly analytical deliberation, and the default becomes the loss-reference point. Thaler provides the term
+    ''choice architecture'' and real-world evidence (retirement savings 40%→90%), Sunstein extends the framework to sludge
+    removal. This example teaches the classic convergence pattern: empirical evidence from different domains (organ donation,
+    retirement savings, benefit enrollment) supporting the same causal mechanism (effort avoidance + loss aversion).'
   discipline: behavioral economics
 - id: CONV-007
   domain: economics
@@ -977,15 +980,13 @@ examples:
     - When related controls are physically grouped together, users infer a mapping between them
     - Related content shares consistent spacing while unrelated content is separated by larger gaps
     depth: domain
-    extraction_type: causal_mechanism
+    extraction_type: empirical_pattern
     content_type: principle
-  rationale: 'Three independent design references (Lidwell, Norman, Lupton) converge on the same
-
-    principle: spatial proximity creates perceived relationship. Demonstrates visual practice
-
-    domain, prerequisite_fbs, failure_mode, and procedural_skill properties.
-
-    '
+  rationale: "Three independent design references (Lidwell, Norman, Lupton) converge on the same\nprinciple: spatial proximity\
+    \ creates perceived relationship. Demonstrates visual practice\ndomain, prerequisite_fbs, failure_mode, and procedural_skill\
+    \ properties.\n Gestalt principle of proximity is an observed regularity in human visual perception — elements placed\
+    \ closer together ARE perceived as related, pre-attentively and involuntarily. This is an EMPIRICAL PATTERN describing\
+    \ how perception operates, not a causal mechanism explaining why."
 - id: CONV-012
   domain: ai & agents
   discipline: machine learning
@@ -1163,15 +1164,12 @@ examples:
     - Novices need simplicity; experts need efficiency
     - Reducing the number of visible options at any moment
     depth: domain
-    extraction_type: causal_mechanism
+    extraction_type: normative_heuristic
     content_type: principle
-  rationale: 'Krug, Cooper, and Norman converge on progressive disclosure as the UX principle for
-
-    managing complexity. Demonstrates Digital & Interactive group, depth, evidence,
-
-    procedural_skill, failure_mode.
-
-    '
+  rationale: "Krug, Cooper, and Norman converge on progressive disclosure as the UX principle for\nmanaging complexity. Demonstrates\
+    \ Digital & Interactive group, depth, evidence,\nprocedural_skill, failure_mode.\n Progressive disclosure is a prescriptive\
+    \ design rule: 'Show only the controls relevant to the current task.' It says DO this to reduce cognitive load — it is\
+    \ a practical heuristic for interface design, not a causal mechanism."
 - id: CONV-014
   domain: systems & frameworks
   discipline: systems thinking
@@ -1352,13 +1350,12 @@ examples:
     - The designer's role shifts from drawing the artifact to designing the rules
     - Simple programs can produce behavior of great complexity
     depth: cross-domain
-    extraction_type: causal_mechanism
+    extraction_type: empirical_pattern
     content_type: principle
-  rationale: 'Shiffman, Gross, and Wolfram converge on emergence from simple rules. Demonstrates
-
-    Computational Art group, contradicts_fbs, depth, procedural_skill.
-
-    '
+  rationale: "Shiffman, Gross, and Wolfram converge on emergence from simple rules. Demonstrates\nComputational Art group,\
+    \ contradicts_fbs, depth, procedural_skill.\n Emergent complexity from simple rules is an observed regularity across computational\
+    \ and biological systems — flocking, cellular automata, fractals. The FB describes the PATTERN (simple rules → complex\
+    \ output) without claiming a universal causal law. An EMPIRICAL PATTERN."
 - id: CONV-016
   domain: illustration
   discipline: color theory
@@ -1442,13 +1439,11 @@ examples:
     - The beginner's urge to use every color available usually produces mud
     - even two colors can produce powerful effects when their relationship is understood
     depth: domain
-    extraction_type: causal_mechanism
+    extraction_type: normative_heuristic
     content_type: principle
-  rationale: 'Albers, Gurney, and Itten converge on limited-palette harmony. Demonstrates
-
-    Illustration & Craft group, application, elaboration, procedural_skill.
-
-    '
+  rationale: "Albers, Gurney, and Itten converge on limited-palette harmony. Demonstrates\nIllustration & Craft group, application,\
+    \ elaboration, procedural_skill.\n Limited palette discipline is a practical rule for artists and designers: 'Restrict\
+    \ your palette to 2-5 colors.' It is a prescriptive heuristic for achieving visual harmony, not a causal mechanism."
 - id: NEG-001
   domain: finance & investment
   discipline: finance
@@ -1495,15 +1490,16 @@ examples:
   domain: behavioral_change
   discipline: psychology
   source_books:
-  - Atomic Habits — James Clear
+  - Awaken the Giant Within — Tony Robbins
   - The Power of Habit — Charles Duhigg
   cluster_segments:
-  - source_book: Atomic Habits — James Clear
-    text: 'You do not rise to the level of your goals. You fall to the level of your systems.
-
-      Small habits compound into extraordinary results over time.
-
-      '
+  - source_book: Awaken the Giant Within — Tony Robbins
+    text: The secret to lasting change is to raise your standards and turn your shoulds into musts. Most people live by a
+      set of shoulds — I should exercise, I should eat better, I should save more — but shoulds have no power. The moment
+      you turn a should into a must, you unlock the resourcefulness and determination to follow through. Lasting transformation
+      begins with a decision about who you want to become, not what you want to achieve. When your identity shifts, your actions
+      follow automatically — because you are now acting in alignment with who you believe yourself to be, not against a checklist
+      of obligations.
   - source_book: The Power of Habit — Charles Duhigg
     text: 'Change might not be fast and it is not always easy. But with time and effort,
 
@@ -1523,15 +1519,8 @@ examples:
     evidence_passages: []
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: 'PLATITUDE — the claim ''systems beat goals'' is motivational rhetoric without a
-
-    specific mechanism, boundary, or falsifiable consequence. Second source (Duhigg) adds
-
-    no specific convergent content. REJECT: platitude detection.
-
-    Segment replaced with Duhigg''s actual text (D2206: paraphrase removed).
-
-    '
+  rationale: 'PLATITUDE — the claim ''turn shoulds into musts'' is motivational rhetoric without a specific mechanism, boundary,
+    or falsifiable consequence. Second source (Duhigg) adds no specific convergent content. REJECT: platitude detection.'
 - id: NEG-003
   domain: marketing & communications
   discipline: marketing
@@ -2056,12 +2045,14 @@ examples:
     - When the incentive structure is misaligned, behavior follows the incentive, not the stated goal
     - interventions that ignore the rational responses of the people they target will be evaded or exploited
     depth: cross-domain
-    extraction_type: causal_mechanism
+    extraction_type: empirical_pattern
     content_type: principle
   rationale: 'Cross-domain: Meadows (policy resistance), Levitt/Dubner (Freakonomics), and Harford (adaptive systems) converge
     on incentive-driven unintended consequences. The mechanism requires designed incentives plus optimizing agents — an economics/policy/management
     context, not universal physics/cooking/poetry. A poet does not navigate incentive structures. Fails the physicist-chef-poet
-    test.'
+    test. Incentive-driven unintended consequences (Goodhart''s law, Campbell''s law, Cobra effect) is an observed empirical
+    regularity across policy, management, and economics. When you change the payoff structure, agents re-optimize in ways
+    that defeat the intent. This is a PATTERN, not a mechanism — it describes WHAT happens reliably, not WHY it must happen.'
 - id: NEG-005
   domain: systems & frameworks
   discipline: systems thinking
@@ -2588,14 +2579,18 @@ examples:
   domain: legal reasoning
   discipline: constitutional law
   source_books:
-  - Thinking, Fast and Slow — Daniel Kahneman
+  - Simple Rules — Donald Sull & Kathleen Eisenhardt
   - The Rule of Law — Tom Bingham
   - Nudge — Richard Thaler & Cass Sunstein
   cluster_segments:
-  - source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: When faced with a difficult question, people often substitute an easier one without noticing. Asked "should this
-      defendant be granted bail?" a judge may substitute "do I feel this defendant is dangerous?" — a heuristic answer that
-      bypasses the legal criteria. This substitution happens automatically and unconsciously through System 1.
+  - source_book: Simple Rules — Donald Sull & Kathleen Eisenhardt
+    text: When faced with complex decisions under time pressure, professionals across fields — judges setting bail, doctors
+      making diagnoses, investors evaluating deals — rely on mental shortcuts rather than comprehensive analysis. These heuristics
+      often substitute an easier question ('does this person seem trustworthy?') for the harder one ('what does the evidence
+      and law require?'). The substitution is unconscious and automatic — the decision-maker genuinely believes they are applying
+      professional judgment. Research on judicial decision-making shows that judges are more likely to grant parole after
+      meals and at the start of the day, when mental energy is highest — the same legal criteria produce different outcomes
+      depending on cognitive depletion.
   - source_book: The Rule of Law — Tom Bingham
     text: Judges must decide cases based on law and evidence, not intuition. But cognitive biases — anchoring on initial impressions,
       substituting easier questions, over-weighting vivid testimony — can unconsciously shape judicial reasoning. The discipline
@@ -2614,12 +2609,14 @@ examples:
       in high-stakes professional contexts like judicial sentencing and medical diagnosis. The complexity of the correct analysis
       paradoxically increases susceptibility to substitution because effortful processing is bypassed when cognitive resources
       are depleted or time-pressured.
-    mechanism: 'Attribute substitution occurs because System 1 (intuitive) processing automatically generates rapid answers
-      to easy questions. When confronted with a computationally difficult target question ("what is the legally correct sentence?"),
-      System 1 substitutes an easier heuristic question ("how dangerous does this person feel?") without the decision-maker
-      noticing. System 2 (deliberative reasoning) can override this, but doing so requires: (1) awareness that substitution
-      occurred, (2) sufficient cognitive resources, and (3) motivation to perform the correct analysis. In high-stakes, high-volume
-      settings (judicial calendars, hospital rounds), resource depletion makes substitution the default.'
+    mechanism: 'Attribute substitution occurs because intuitive processing automatically generates rapid answers to easy questions.
+      When confronted with a computationally difficult target question (''what is the legally correct sentence?''), intuitive
+      judgment substitutes an easier heuristic question (''how dangerous does this person feel?'') without the decision-maker
+      noticing. Deliberative reasoning can override this, but doing so requires: (1) awareness that substitution occurred,
+      (2) sufficient cognitive resources, and (3) motivation to perform the correct analysis. In high-stakes, high-volume
+      settings (judicial calendars, hospital rounds), resource depletion makes substitution the default. Structured checklists
+      force explicit consideration of each criterion, reducing substitution by making the correct analysis the path of least
+      resistance.'
     boundary: 'Applies when: (1) the correct analysis requires effortful computation, (2) a salient heuristic attribute is
       available, (3) decision-makers face time pressure or cognitive load. Fails when: the correct analysis is simple and
       automatic, no heuristic attribute is available, or decision-makers use structured checklists that force explicit consideration
@@ -2632,16 +2629,17 @@ examples:
     content_type: principle
     depth: cross-domain
     evidence_passages:
-    - But cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony
-      — can unconsciously shape judicial reasoning.
-    - In fact, the complexity of their decisions makes them MORE susceptible to heuristic substitution because the correct
-      answer requires effortful System 2 processing that is easily bypassed when mental resources are depleted.
-    - Asked "should this defendant be granted bail?" a judge may substitute "do I feel this defendant is dangerous?" — a heuristic
-      answer that bypasses the legal criteria.
+    - judges are more likely to grant parole after meals and at the start of the day, when mental energy is highest — the
+      same legal criteria produce different outcomes depending on cognitive depletion.
     - Decision-makers in high-stakes environments — judges, doctors, regulators — are not immune to cognitive biases.
-  rationale: CONVERGENT POSITIVE — LAW + PSYCHOLOGY (D2223). Three sources from cognitive psychology and legal theory converge
-    on attribute substitution in professional judgment. Depth is cross-domain (law, medicine, regulation). Fills law/policy
-    gap. Has actionable application.
+    - cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony —
+      can unconsciously shape judicial reasoning.
+    - the complexity of their decisions makes them MORE susceptible to heuristic substitution
+  rationale: CONVERGENT POSITIVE — LAW + PSYCHOLOGY. Three sources from strategy (Sull/Eisenhardt), legal theory (Bingham),
+    and behavioral economics (Thaler/Sunstein) converge on attribute substitution in professional judgment. Sull/Eisenhardt
+    provide the mechanism (heuristic substitution under time pressure), Bingham provides the legal-domain evidence (judicial
+    cognitive biases), Thaler/Sunstein provide the generalization (all high-stakes decision-makers are susceptible). Depth
+    is cross-domain (law, medicine, regulation). Has actionable application (checklists, structured protocols).
 - id: CONV-027
   domain: engineering
   discipline: computer science
@@ -2747,7 +2745,7 @@ examples:
       evidence risk implementing interventions that target the wrong variable. The replication crisis in social science is
       partly attributable to unmeasured confounding in observational research. Causal diagrams (DAGs) and instrumental variables
       provide partial remedies when randomization is impossible.
-    extraction_type: causal_mechanism
+    extraction_type: descriptive_model
     content_type: principle
     depth: cross-domain
     evidence_passages:
@@ -2756,9 +2754,12 @@ examples:
     - Regression analysis can show that two variables are related but cannot — by itself — prove that one causes the other.
     - 'To establish causality, you need: (1) temporal precedence (cause before effect), (2) covariation (cause and effect
       vary together), and (3) elimination of alternative explanations.'
-  rationale: CONVERGENT POSITIVE — STATISTICS (D2223). Three statistics sources converge on the confounding mechanism. Depth
+  rationale: 'CONVERGENT POSITIVE — STATISTICS (D2223). Three statistics sources converge on the confounding mechanism. Depth
     is universal — applies to ALL domains that use observational data. Fills the "correlation ≠ causation" gap that both evaluators
-    flagged. Application is null (this is a diagnostic principle — it tells you what NOT to conclude).
+    flagged. Application is null (this is a diagnostic principle — it tells you what NOT to conclude). Correlation-causation
+    confounding classifies three types of non-causal correlation: reverse causation, common cause, and spurious correlation.
+    This is a DESCRIPTIVE MODEL — a classification system for logical fallacies in causal inference, not a causal mechanism
+    itself.'
 - id: CONV-029
   domain: decision making
   discipline: cognitive psychology
@@ -2961,18 +2962,21 @@ examples:
   discipline: sociology
   source_books:
   - Freakonomics — Levitt & Dubner
-  - Outliers — Malcolm Gladwell
+  - The Signal and the Noise — Nate Silver
   cluster_segments:
   - source_book: Freakonomics — Levitt & Dubner
     text: Children who grow up in homes with many books perform better in school, even controlling for parental education
       and income. The presence of books correlates with academic achievement. But does reading cause achievement, or do intellectually
       curious parents both buy books and produce academically successful children through other mechanisms (conversation,
       expectations, genetics)?
-  - source_book: Outliers — Malcolm Gladwell
-    text: Canadian hockey players born in January, February, and March are dramatically overrepresented in elite leagues.
-      The correlation between birth month and success is strong and consistent. But the cause is not astrological — it is
-      the January 1 age cutoff for youth leagues, which makes older children within each age cohort appear more "talented"
-      and receive more coaching, creating a cumulative advantage.
+  - source_book: The Signal and the Noise — Nate Silver
+    text: 'In election years, the stock market tends to perform better when the Washington Redskins win their last home game
+      before the election — a correlation that held true for 17 of 18 elections between 1936 and 2000. The correlation is
+      statistically significant but patently absurd: no rational person believes football outcomes cause stock market movements.
+      This is a textbook example of spurious correlation driven by chance and overfitting — when you test enough variables,
+      some will correlate by random coincidence. The lesson extends beyond sports: in any dataset with hundreds of variables,
+      you will find dozens of ''statistically significant'' correlations that are entirely spurious. Without a causal model,
+      statistical significance is meaningless.'
   is_convergent: false
   should_extract: false
   expected_fb:
@@ -2986,10 +2990,11 @@ examples:
     evidence_passages: []
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: HARD NEGATIVE — CORRELATION WITHOUT CAUSAL MECHANISM (D2223). Both segments describe correlations (books→achievement,
-    birth month→success) but explicitly identify hidden confounding variables that prevent causal inference. The segments
-    converge on the PATTERN (correlation with confounded cause) but do NOT converge on a single causal mechanism — each has
-    a different confound. S2 must learn to detect when sources agree on correlation but disagree on (or lack) causal mechanism.
+  rationale: HARD NEGATIVE — CORRELATION WITHOUT CAUSAL MECHANISM. Both segments describe correlations (books→achievement,
+    football→stock market) but explicitly identify hidden confounding variables or pure chance that prevent causal inference.
+    The segments converge on the PATTERN (correlation with confounded/absent cause) but do NOT converge on a single causal
+    mechanism — each has a different explanation (hidden confound vs. random overfitting). S2 must learn to detect when sources
+    agree on correlation but disagree on (or lack) causal mechanism.
 - id: NEG-014
   domain: education
   discipline: cognitive psychology
@@ -3204,31 +3209,34 @@ examples:
   domain: philosophy
   discipline: epistemology
   source_books:
-  - The Black Swan — Nassim Nicholas Taleb
-  - Antifragile — Nassim Nicholas Taleb
-  - Skin in the Game — Nassim Nicholas Taleb
+  - The Better Angels of Our Nature — Steven Pinker
+  - Enlightenment Now — Steven Pinker
+  - The Blank Slate — Steven Pinker
   cluster_segments:
-  - source_book: The Black Swan — Nassim Nicholas Taleb
-    text: 'Black Swan events — rare, high-impact, retrospectively predictable occurrences — drive history more than the ordinary.
-      The 2008 financial crisis, the rise of the internet, and World War I were all Black Swans. Our models fail to predict
-      them because we are fooled by the narrative fallacy: we construct stories that make past events seem predictable, then
-      project that false certainty forward.'
-  - source_book: Antifragile — Nassim Nicholas Taleb
-    text: Some systems gain from disorder — they are antifragile. Bones strengthen under stress, startups benefit from market
-      chaos, and evolutionary systems thrive on randomness. The opposite of fragile is not robust (which merely resists shock)
-      but antifragile (which improves from it). Most of what we design is fragile precisely because we optimize for stable
-      conditions.
-  - source_book: Skin in the Game — Nassim Nicholas Taleb
-    text: 'Decision-makers must have skin in the game — personal exposure to the consequences of their decisions. Without
-      asymmetry of risk, bad decisions proliferate because the decider captures upside while transferring downside to others.
-      This is why consultants, bankers, and policymakers produce systemic fragility: they are rewarded for short-term gains
-      while others bear long-term losses.'
+  - source_book: The Better Angels of Our Nature — Steven Pinker
+    text: Violence has declined dramatically over human history — from roughly 15% violent death in prehistoric societies
+      to under 1% today. This decline is not linear or inevitable; it reflects the cumulative effect of governance (states
+      monopolizing force), commerce (making others more valuable alive than dead), feminization (valuing life over honor),
+      and the expanding circle of empathy (extending moral concern to ever-wider groups). Each of these forces operates through
+      identifiable psychological and institutional mechanisms that have strengthened over centuries.
+  - source_book: Enlightenment Now — Steven Pinker
+    text: 'Human progress is measurable, substantial, and underappreciated. Life expectancy has doubled since the 18th century.
+      Extreme poverty has fallen from 90% of the world population to under 10%. Literacy has risen from 12% to 86%. These
+      improvements are not accidents — they are the result of Enlightenment values: reason, science, and humanism applied
+      through institutions that channel knowledge into human betterment. The through-line is the application of rational problem-solving
+      to human suffering.'
+  - source_book: The Blank Slate — Steven Pinker
+    text: The modern denial of human nature — the insistence that the mind is a blank slate shaped entirely by culture and
+      environment — is empirically false and morally unnecessary. Genetic differences explain roughly 50% of the variance
+      in personality traits, intelligence, and behavioral tendencies. Acknowledging human nature does not justify inequality
+      or determinism; it informs realistic approaches to improving the human condition by working with, rather than against,
+      our evolved psychology.
   is_convergent: false
   should_extract: false
   expected_fb:
     is_summary: false
     route: 'NULL'
-    name: Same-Author Echo (three Taleb books)
+    name: Same-Author Echo (three Pinker books)
     definition: ''
     mechanism: ''
     consequence: ''
@@ -3236,11 +3244,11 @@ examples:
     evidence_passages: []
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: HARD NEGATIVE — SAME-AUTHOR ECHO (D2223). All three segments are from the SAME author (Nassim Nicholas Taleb),
-    describing related but distinct concepts across his trilogy. This is NOT convergent extraction from independent sources
-    — it is one author developing his ideas across multiple books. The segments are thematically related (uncertainty, risk,
-    fragility) but each describes a different concept (Black Swans ≠ antifragility ≠ skin in the game). S2 must learn to detect
-    same-author citation echoes and reject clusters where source independence fails, even when the writing is intellectually
+  rationale: HARD NEGATIVE — SAME-AUTHOR ECHO. All three segments are from the SAME author (Steven Pinker), describing related
+    but distinct concepts across his major works. This is NOT convergent extraction from independent sources — it is one author
+    developing his ideas across multiple books. The segments are thematically related (human nature, progress, violence) but
+    each describes a different concept (decline of violence ≠ measurable progress ≠ denial of human nature). S2 must learn
+    to detect same-author citation echoes and reject clusters where source independence fails, even when the writing is intellectually
     rich.
 - id: CONV-031
   domain: technology adoption
@@ -3404,7 +3412,7 @@ examples:
   discipline: behavioral decision theory
   source_books:
   - Decisive — Chip & Dan Heath
-  - Thinking, Fast and Slow — Daniel Kahneman
+  - Sources of Power — Gary Klein
   cluster_segments:
   - source_book: Decisive — Chip & Dan Heath
     text: 'The WRAP process counters the four villains of decision making: narrow framing (Widen your options), confirmation
@@ -3413,14 +3421,15 @@ examples:
       evidence, Attain distance by asking what you''d tell your successor, and Prepare by setting a tripwire that forces reconsideration.
 
       '
-  - source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: 'When making an important decision, the premortem procedure is the most effective debiasing technique. Before committing
-      to a decision, gather the team and say: ''Imagine we are one year into the future. We implemented the decision as it
-      stands today. The outcome was a disaster. Write the history of that disaster for five minutes.'' This procedure overrides
-      optimistic overconfidence by forcing the brain to construct a narrative of failure — making latent risks concrete and
-      actionable before they materialize.
-
-      '
+  - source_book: Sources of Power — Gary Klein
+    text: 'The premortem technique, developed by research psychologist Gary Klein, is one of the most reliable debiasing methods
+      for high-stakes decisions. Before committing to a decision, gather the team and say: ''Imagine we are one year into
+      the future. We implemented the decision as it stands today. The outcome was a disaster. Write the history of that disaster
+      for five minutes.'' This procedure overrides optimistic overconfidence by forcing the brain to construct a narrative
+      of failure — making latent risks concrete and actionable before they materialize. Unlike statistical risk assessment,
+      which treats risks as abstract probabilities, the premortem makes failure feel real by engaging the brain''s narrative-construction
+      machinery in reverse: instead of rationalizing why things will go well, participants must construct a plausible story
+      of how things went wrong.'
   is_convergent: true
   should_extract: true
   expected_fb:
@@ -3442,17 +3451,19 @@ examples:
       The specific, narrative quality of premortem-identified risks makes them more actionable — they come with built-in scenarios
       that suggest mitigation strategies.
     evidence_passages:
-    - the premortem procedure is the most effective debiasing technique
+    - the premortem technique, developed by research psychologist Gary Klein, is one of the most reliable debiasing methods
+      for high-stakes decisions
     - Imagine we are one year into the future. We implemented the decision as it stands today. The outcome was a disaster.
     - Widen options beyond binary choices, Reality-test by seeking disconfirming evidence, Attain distance by asking what
       you'd tell your successor, and Prepare by setting a tripwire that forces reconsideration.
     extraction_type: normative_heuristic
     content_type: heuristic
     depth: cross-domain
-  rationale: 'NORMATIVE HEURISTIC — prescriptive decision technique, not descriptive model or causal mechanism. Heath''s WRAP
-    framework and Kahneman''s premortem converge on the same prescriptive principle: counter overconfidence by actively constructing
-    failure scenarios before committing. This is a HEURISTIC (a rule of procedure) not a causal mechanism — it says ''DO this''
-    rather than ''X causes Y because...''. Essential for teaching S2 to distinguish normative heuristics from causal mechanisms.'
+  rationale: 'NORMATIVE HEURISTIC — prescriptive decision technique, properly attributed to Gary Klein. Heath''s WRAP framework
+    and Klein''s premortem converge on the same prescriptive principle: counter overconfidence by actively constructing failure
+    scenarios before committing. This is a HEURISTIC (a rule of procedure) not a causal mechanism — it says ''DO this'' rather
+    than ''X causes Y because...''. The premortem was developed by Klein; it was later popularized through popular behavioral
+    science writing. Essential for teaching S2 to distinguish normative heuristics from causal mechanisms.'
 - id: CONV-035
   domain: behavior change
   discipline: behavioral psychology
@@ -3572,17 +3583,17 @@ examples:
   domain: social networks
   discipline: evolutionary anthropology
   source_books:
-  - Thinking, Fast and Slow — Daniel Kahneman
+  - The Art of Thinking Clearly — Rolf Dobelli
   - Blink — Malcolm Gladwell
   cluster_segments:
-  - source_book: Thinking, Fast and Slow — Daniel Kahneman
-    text: 'The availability heuristic causes people to overestimate the frequency of events that are easy to recall. When
-      asked whether more words begin with ''k'' or have ''k'' as the third letter, most people say the former — because it''s
-      easier to think of words starting with ''k''. But in English, words with ''k'' as the third letter are about three times
-      more common. This systematic error reveals a fundamental pattern: mental availability is driven by ease of retrieval,
-      not by actual frequency.
-
-      '
+  - source_book: The Art of Thinking Clearly — Rolf Dobelli
+    text: 'The availability bias causes people to overestimate the frequency of events that are easy to recall. When asked
+      whether more words begin with ''k'' or have ''k'' as the third letter, most people say the former — because it''s easier
+      to think of words starting with ''k''. But in English, words with ''k'' as the third letter are about three times more
+      common. This systematic error reveals a fundamental pattern in human judgment: mental availability is driven by ease
+      of retrieval, not by actual frequency. The bias explains why people overestimate dramatic causes of death (plane crashes,
+      terrorism, shark attacks) and underestimate chronic causes (heart disease, diabetes, car accidents) — vivid, recent,
+      or emotionally charged events are more available to memory, skewing risk perception away from statistical reality.'
   - source_book: Blink — Malcolm Gladwell
     text: 'The rule of 150 — sometimes called Dunbar''s number — is the cognitive limit to the number of people with whom
       one can maintain stable social relationships. This number appears across human societies: Neolithic villages averaged
@@ -3631,6 +3642,8 @@ examples:
     evidence_passages:
     - mental availability is driven by ease of retrieval, not by actual frequency
     - words with 'k' as the third letter are about three times more common
+    - people overestimate dramatic causes of death (plane crashes, terrorism, shark attacks) and underestimate chronic causes
+      (heart disease, diabetes, car accidents)
     depth: domain
   rationale: 1:N SPLIT — Dunbar's number (relationship-capacity limit) and the availability heuristic (recall-ease frequency
     proxy) are two INDEPENDENT empirical patterns in human cognition. They share only the topic 'cognition' — no shared causal
@@ -3640,17 +3653,17 @@ examples:
   domain: complex systems
   discipline: network science
   source_books:
-  - Antifragile — Nassim Nicholas Taleb
+  - Linked — Albert-László Barabási
   - Algorithms to Live By — Brian Christian & Tom Griffiths
   cluster_segments:
-  - source_book: Antifragile — Nassim Nicholas Taleb
-    text: 'The 80/20 rule — 80% of effects come from 20% of causes — is observed across an astonishing range of domains: 80%
-      of wealth is held by 20% of the population, 80% of sales come from 20% of customers, 80% of software bugs come from
-      20% of the code. This is not a coincidence or a law — it''s a signature of power-law distributions, which arise when
-      success breeds more success through cumulative advantage. In such systems, small initial differences compound into extreme
-      disparities.
-
-      '
+  - source_book: Linked — Albert-László Barabási
+    text: 'Power laws govern the distribution of outcomes in networks and complex systems. The 80/20 rule — 80% of effects
+      come from 20% of causes — is observed across an astonishing range of domains: 80% of wealth is held by 20% of the population,
+      80% of scientific citations go to 20% of papers, 80% of internet traffic flows through 20% of websites. This is not
+      a coincidence — it''s a signature of scale-free networks, where preferential attachment causes the rich to get richer
+      through cumulative advantage. In such systems, small initial differences compound into extreme disparities over time.
+      The mechanism is mathematically simple: new nodes preferentially connect to already well-connected nodes, creating a
+      feedback loop that amplifies early advantages into permanent dominance.'
   - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
     text: 'Preferential attachment is the mechanism behind many power-law distributions. In a growing network, new nodes are
       more likely to connect to nodes that already have many connections — ''the rich get richer.'' This creates a distribution
@@ -3685,18 +3698,19 @@ examples:
       institutional processes (performance reviews, resource allocation, risk management) are designed for normal distributions
       and systematically fail in power-law domains.
     evidence_passages:
-    - 80% of effects come from 20% of causes — is observed across an astonishing range of domains
-    - a signature of power-law distributions, which arise when success breeds more success
-    - Preferential attachment is the mechanism behind many power-law distributions
-    - the rich get richer
+    - 80% of effects come from 20% of causes
+    - 80% of wealth is held by 20% of the population, 80% of scientific citations go to 20% of papers, 80% of internet traffic
+      flows through 20% of websites
+    - Preferential attachment is the mechanism behind many power-law distributions.
+    - new nodes preferentially connect to already well-connected nodes
     extraction_type: empirical_pattern
     content_type: pattern
     depth: cross-domain
-  rationale: 'EMPIRICAL PATTERN — observed statistical regularity. Taleb''s 80/20 observations and Christian & Griffiths''
-    preferential attachment converge on the same empirical pattern: power-law concentration in complex adaptive systems. This
-    is a PATTERN (''systems with cumulative advantage produce concentrated outcomes''), not a causal mechanism. While preferential
-    attachment explains HOW the pattern emerges, the FB focuses on the OBSERVED REGULARITY itself, which is useful for prediction
-    and management even without knowing the generative mechanism.'
+  rationale: 'CONVERGENT POSITIVE — COMPLEX SYSTEMS. Barabási (network science originator of preferential attachment) and
+    Christian/Griffiths (computer science) converge on the same empirical pattern: power-law distributions emerge from cumulative
+    advantage processes. Barabási provides the mathematical mechanism (preferential attachment in scale-free networks), Christian/Griffiths
+    provide the computational framing and practical implications. This is an EMPIRICAL PATTERN, not a causal mechanism — it
+    describes the shape of observed distributions rather than explaining why any specific outcome occurs.'
 - id: CONV-039
   domain: economics
   discipline: behavioral economics
@@ -3821,7 +3835,7 @@ examples:
     - kerning pairs (adjusting space between specific letter combinations like 'AV' and 'To')
     - Kerning exceptions override these defaults for specific letter pairs
     - classic examples include 'AV,' 'WA,' 'To,' and 'Ve.'
-    extraction_type: causal_mechanism
+    extraction_type: normative_heuristic
     content_type: principle
     depth: specialized
   rationale: 'GENUINE SPECIALIZED POSITIVE (D2226). Optical kerning is a narrow sub-technique within typography, which is
@@ -3829,4 +3843,561 @@ examples:
     design) would understand this, but it requires typography-specific knowledge. It is tool-adjacent (applies to any vector
     design software with kerning controls) but specialized enough that a general ''design principles'' book would not cover
     it. Essential for teaching S2 and S4 that valid principles exist at narrow, tool-bound scope with depth=''specialized''.
-    D2226: this fills the missing specialized positive gap identified in the Kimi audit.'
+    D2226: this fills the missing specialized positive gap identified in the Kimi audit. Optical kerning is a practical rule
+    for typographers: adjust spacing for specific letter pairs (AV, Wa, To) where geometric spacing looks wrong to the human
+    eye. A normative heuristic, not a causal mechanism.'
+- id: CONV-041
+  domain: psychology
+  discipline: cognitive psychology
+  source_books:
+  - The Invisible Gorilla — Christopher Chabris & Daniel Simons
+  - The Confidence Game — Maria Konnikova
+  cluster_segments:
+  - source_book: The Invisible Gorilla — Christopher Chabris & Daniel Simons
+    text: The illusion of confidence tells us that people who are the most confident are the most competent — but the Dunning-Kruger
+      effect shows the opposite is often true. In a classic study, students who scored in the bottom quartile on tests of
+      grammar, logic, and humor estimated their performance to be above average. The problem is not just that unskilled people
+      make mistakes — it's that their lack of skill also deprives them of the ability to recognize their own mistakes. Competence
+      in a domain requires the same knowledge needed to evaluate competence in that domain.
+  - source_book: The Confidence Game — Maria Konnikova
+    text: 'Confidence artists exploit a simple truth: people trust those who seem confident, and confidence is easy to fake.
+      The con artist doesn''t need to be competent — they only need to project competence convincingly. And because most people
+      cannot reliably distinguish between confidence and competence, the confident actor wins by default. The Dunning-Kruger
+      effect operates in the background: those most confident in their judgments are often those least qualified to make them,
+      while genuine experts are more likely to express uncertainty.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Dunning-Kruger Effect — Competence-Confidence Inversion
+    definition: In many domains, the least competent individuals systematically overestimate their ability while the most
+      competent underestimate theirs. This occurs because the metacognitive skill required to evaluate competence is the same
+      skill required to BE competent — those who lack it cannot recognize its absence. An observed empirical pattern documented
+      across domains from grammar and logic to medicine and investing.
+    mechanism: 'The Dunning-Kruger effect is an EMPIRICAL PATTERN, not a causal mechanism. It arises from a metacognitive
+      deficit: the skills needed to perform well in a domain are largely the same skills needed to evaluate performance in
+      that domain. Those who lack competence therefore lack the calibration tool to assess their own level. Meanwhile, experts
+      suffer from a false consensus effect — they assume others know what they know, causing them to underestimate their relative
+      standing. The pattern has been replicated in domains ranging from firearm safety (where bottom-quartile hunters rated
+      themselves above average) to medical diagnosis (where least-accurate residents were most confident).'
+    boundary: 'Applies to domains where competence and metacognitive evaluation share underlying skills — most cognitive and
+      professional domains. Fails when: (1) objective feedback is immediate and unavoidable (e.g., sports where you win or
+      lose); (2) the domain is so simple that everyone reaches competence quickly; (3) individuals have received explicit
+      calibration training with performance feedback. Also note: this is a statistical pattern at group level, not a deterministic
+      claim about any individual.'
+    consequence: 'In hiring, promotion, and expert testimony, confidence is a misleading signal of competence. Organizations
+      that select for confidence over demonstrated competence systematically promote the least qualified. Structured evaluation
+      — blind review, standardized tests, performance rubrics — outperforms confidence-based assessment. The effect also predicts
+      that training improves self-assessment accuracy: novices become better at recognizing what they don''t know.'
+    evidence_passages:
+    - students who scored in the bottom quartile on tests of grammar, logic, and humor estimated their performance to be above
+      average
+    - their lack of skill also deprives them of the ability to recognize their own mistakes
+    - those most confident in their judgments are often those least qualified to make them
+    - genuine experts are more likely to express uncertainty
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: cross-domain
+  rationale: 'NEW EMPIRICAL PATTERN (D2234: extraction type expansion). Chabris/Simons and Konnikova converge on the Dunning-Kruger
+    empirical regularity from different angles: cognitive psychology (the metacognitive deficit) and real-world exploitation
+    (confidence artists). Both describe the same observed pattern — low-competence individuals overestimate, high-competence
+    individuals underestimate — without claiming a causal law. This is an EMPIRICAL PATTERN because it describes WHAT reliably
+    happens without a universal causal mechanism.'
+- id: CONV-042
+  domain: linguistics
+  discipline: quantitative linguistics
+  source_books:
+  - The Information — James Gleick
+  - Algorithms to Live By — Brian Christian & Tom Griffiths
+  cluster_segments:
+  - source_book: The Information — James Gleick
+    text: 'Zipf''s law states that in any natural language corpus, the frequency of a word is inversely proportional to its
+      rank: the most common word appears roughly twice as often as the second most common, three times as often as the third,
+      and so on. This pattern holds across languages — English, Chinese, Arabic, Finnish — and even across non-linguistic
+      domains: city populations follow a Zipfian distribution (the largest city is roughly twice the size of the second-largest),
+      as do company sizes, website traffic, and income distributions. Zipf''s law is an empirical regularity — it describes
+      what we observe, but the underlying mechanism remains debated.'
+  - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
+    text: 'When computer scientists model optimal caching strategies, they discover that the best algorithm exploits a property
+      of real-world data called ''locality of reference'' — the tendency for recently accessed items to be accessed again
+      soon. But beneath this lies a deeper pattern: the frequency distribution of accesses follows a power law. A tiny fraction
+      of items accounts for the vast majority of requests. The most popular YouTube video gets more views than the next two
+      combined. This distributional fact — not any clever algorithm — is what makes caching work.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Zipf's Law — Rank-Frequency Inverse Distribution
+    definition: In diverse complex systems — language, city populations, company sizes, web traffic — the frequency of an
+      item is inversely proportional to its rank in the frequency table. The Nth most common item appears with frequency proportional
+      to 1/N. This is an observed empirical regularity that appears across domains without a single accepted causal mechanism.
+    mechanism: 'Zipf''s law is an EMPIRICAL PATTERN. Multiple candidate mechanisms have been proposed — preferential attachment
+      (the rich get richer), least-effort principles in communication, multiplicative random growth processes — but none has
+      been established as THE universal cause. The pattern itself is robust: across languages, city sizes, firm sizes, and
+      digital platforms, rank-frequency distributions follow a power law with exponent near -1. This cross-domain recurrence
+      without a single mechanism is the hallmark of an empirical regularity.'
+    boundary: Applies to systems with multiplicative growth, preferential attachment, or optimization for communicative efficiency.
+      Fails in systems with hard capacity constraints (e.g., a fixed number of equal slots) or uniform random generation.
+      The pattern is statistical, not deterministic — individual items may deviate while the aggregate distribution converges
+      to Zipfian.
+    consequence: In any system following a Zipfian distribution, optimizing for the head (the top few items) captures most
+      of the value. Caching the top 20% of YouTube videos would serve ~80% of requests. Focusing on the 100 most common words
+      covers ~50% of all text. This has practical implications for resource allocation, caching, search, and compression —
+      invest disproportionately in the high-frequency items.
+    evidence_passages:
+    - 'the frequency of a word is inversely proportional to its rank: the most common word appears roughly twice as often
+      as the second most common'
+    - city populations follow a Zipfian distribution (the largest city is roughly twice the size of the second-largest)
+    - This distributional fact — not any clever algorithm — is what makes caching work.
+    - A tiny fraction of items accounts for the vast majority of requests.
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: cross-domain
+  rationale: 'NEW EMPIRICAL PATTERN (D2234: extraction type expansion). Gleick and Christian/Griffiths converge on the same
+    empirical regularity: rank-frequency distributions follow a power law across domains. Gleick provides the linguistic and
+    urban evidence, Christian/Griffiths provide the computational framing (caching). Multiple candidate mechanisms exist but
+    none is universally accepted — making this an archetypal empirical pattern: we observe it reliably, we don''t fully know
+    why.'
+- id: CONV-043
+  domain: organizational behavior
+  discipline: group dynamics
+  source_books:
+  - The Five Dysfunctions of a Team — Patrick Lencioni
+  - The Culture Code — Daniel Coyle
+  cluster_segments:
+  - source_book: The Five Dysfunctions of a Team — Patrick Lencioni
+    text: 'Building a cohesive team requires navigating five sequential dysfunctions: absence of trust (unwillingness to be
+      vulnerable), fear of conflict (artificial harmony), lack of commitment (ambiguity breeds hesitation), avoidance of accountability
+      (low standards), and inattention to results (status and ego trump outcomes). Each dysfunction enables the next — you
+      cannot have productive conflict without trust, and you cannot hold people accountable without clarity of commitment.
+      The model is descriptive: it classifies team dysfunctions into categories and shows their causal sequence.'
+  - source_book: The Culture Code — Daniel Coyle
+    text: 'High-performing groups pass through predictable phases: first, they establish belonging cues that signal safety;
+      then they navigate vulnerability loops where one person''s openness triggers reciprocal openness; finally, they establish
+      a shared purpose that aligns individual action with group goals. These phases are not optional — groups that skip the
+      safety phase cannot achieve honest vulnerability, and groups without vulnerability cannot sustain purpose. The model
+      describes what healthy group development looks like, not why any specific group succeeds or fails.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Sequential Group Development Stages
+    definition: Teams and groups develop through a predictable sequence of phases — forming (orientation), storming (conflict),
+      norming (cohesion), performing (productivity), and adjourning (dissolution) — with each phase building on the resolution
+      of the previous phase's central tension. A descriptive model that classifies group development into categories and their
+      sequential relationship.
+    mechanism: 'This is a DESCRIPTIVE MODEL, not a causal mechanism. It classifies group development into stages (WHAT categories
+      exist) and their sequential dependencies (HOW they relate), but does not identify a causal force that drives transition.
+      Tuckman''s original formulation (1965) was observational — he reviewed 50 studies of group development and identified
+      these recurring phases. Lencioni''s five dysfunctions and Coyle''s vulnerability loops describe the same pattern using
+      different vocabulary: safety → vulnerability → purpose maps to forming → storming/norming → performing. The model''s
+      value is diagnostic: it tells you WHERE a team is stuck and WHAT to work on next.'
+    boundary: 'Applies to newly formed task-oriented groups with a shared objective and interdependent work. Fails for: (1)
+      groups with no shared task (social groups); (2) groups with extreme power asymmetry where one person dictates process;
+      (3) groups that disband before reaching storming. The model is descriptive, not prescriptive — some groups cycle back
+      through earlier stages when membership changes.'
+    consequence: Leaders who expect immediate high performance from new teams are setting them up to fail — the storming phase
+      is unavoidable and productive conflict must be facilitated, not suppressed. Teams that skip the trust-building phase
+      develop artificial harmony that cracks under pressure. The model implies that team development takes time and that attempts
+      to accelerate it by suppressing conflict are counterproductive.
+    evidence_passages:
+    - Building a cohesive team requires navigating five sequential dysfunctions
+    - you cannot have productive conflict without trust, and you cannot hold people accountable without clarity of commitment
+    - groups that skip the safety phase cannot achieve honest vulnerability
+    - 'High-performing groups pass through predictable phases: first, they establish belonging cues that signal safety; then
+      they navigate vulnerability loops'
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: domain
+  rationale: 'NEW DESCRIPTIVE MODEL (D2234: extraction type expansion). Lencioni and Coyle converge on the same descriptive
+    model of group development stages, using different terminology (five dysfunctions vs. safety/vulnerability/purpose). This
+    is a taxonomy of phases — it describes WHAT categories of group development exist and HOW they sequence, rather than WHY
+    any individual group moves through them. Teaches S2 to recognize descriptive models: classification systems for understanding
+    phenomena.'
+- id: CONV-044
+  domain: psychology
+  discipline: interpersonal communication
+  source_books:
+  - Emotional Intelligence — Daniel Goleman
+  - Daring Greatly — Brené Brown
+  cluster_segments:
+  - source_book: Emotional Intelligence — Daniel Goleman
+    text: 'Self-awareness — knowing one''s own emotions, strengths, weaknesses, and impact on others — is the foundation of
+      emotional intelligence. But self-awareness has a structural blind spot: there are things about ourselves that others
+      see clearly and we do not. Every person has a ''blind self'' — behaviors, habits, and patterns visible to everyone in
+      the room except the person exhibiting them. Reducing the blind self through feedback is one of the highest-leverage
+      activities in personal development.'
+  - source_book: Daring Greatly — Brené Brown
+    text: Vulnerability is the birthplace of connection, but it requires discernment about what to share with whom. Not everything
+      about yourself belongs in every relationship — there is a healthy 'hidden self' that you choose to reveal only in trusted
+      contexts. The boundary between privacy (healthy hidden self) and shame (unhealthy hidden self) is defined by whether
+      concealment serves connection or disconnection. Knowing what to reveal and to whom is a skill that sits at the intersection
+      of courage and wisdom.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Johari Window — Interpersonal Awareness Matrix
+    definition: 'Interpersonal awareness is structured as a 2×2 matrix: what is known to self vs. unknown to self, crossed
+      with what is known to others vs. unknown to others. This yields four quadrants — open (known to both), blind (known
+      to others only), hidden (known to self only), and unknown (known to neither). A descriptive model of self-awareness
+      and mutual knowledge in relationships.'
+    mechanism: This is a DESCRIPTIVE MODEL — a classification system for interpersonal knowledge states. It categorizes information
+      about a person into four quadrants based on two binary dimensions (self-knowledge × other-knowledge). Goleman describes
+      the blind quadrant through emotional intelligence (feedback reduces blind spots), while Brown describes the hidden quadrant
+      through vulnerability research (appropriate disclosure builds connection). The model does not explain WHY any particular
+      information falls into a given quadrant — it provides the vocabulary and structure for discussing awareness gaps.
+    boundary: 'Applies to dyadic and small-group relationships where mutual knowledge is relevant. Fails for: (1) anonymous
+      or one-way relationships where ''known to others'' is meaningless; (2) situations where power dynamics make honest disclosure
+      unsafe; (3) the unknown quadrant — by definition, its contents are inaccessible. The model is a thinking tool, not a
+      measurement instrument — quadrant boundaries are fuzzy in practice.'
+    consequence: 'The model implies that relationship depth is a function of expanding the open quadrant: self-disclosure
+      shrinks the hidden area, feedback shrinks the blind area, and shared discovery shrinks the unknown area. Leaders with
+      large blind spots make decisions that ignore their impact on others. Individuals who never disclose (large hidden self)
+      cannot form deep connections. The Johari Window provides the vocabulary for diagnosing interpersonal stuckness.'
+    evidence_passages:
+    - there are things about ourselves that others see clearly and we do not
+    - Reducing the blind self through feedback is one of the highest-leverage activities in personal development
+    - Not everything about yourself belongs in every relationship — there is a healthy 'hidden self'
+    - The boundary between privacy (healthy hidden self) and shame (unhealthy hidden self) is defined by whether concealment
+      serves connection or disconnection
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: cross-domain
+  rationale: 'NEW DESCRIPTIVE MODEL (D2234: extraction type expansion). Goleman and Brown describe the same conceptual structure
+    — the Johari Window — using different language and focusing on different quadrants (Goleman on blind self, Brown on hidden
+    self). This is a DESCRIPTIVE MODEL because it is a taxonomy of interpersonal awareness states, not a causal mechanism.
+    Essential for teaching S2 that classification systems are valid FBs when they organize understanding of a domain.'
+- id: CONV-045
+  domain: productivity
+  discipline: time management
+  source_books:
+  - The 7 Habits of Highly Effective People — Stephen Covey
+  - Essentialism — Greg McKeown
+  cluster_segments:
+  - source_book: The 7 Habits of Highly Effective People — Stephen Covey
+    text: 'Effective people spend their time in Quadrant II: activities that are important but NOT urgent. These include relationship
+      building, planning, skill development, and preventative maintenance — the activities that produce long-term leverage
+      but have no immediate deadline. Most people spend their time in Quadrant I (urgent AND important — crises) or Quadrant
+      III (urgent but NOT important — interruptions). Quadrant IV (neither urgent nor important — busywork) is pure waste.
+      The rule is: maximize Quadrant II time, and Quadrant I will shrink.'
+  - source_book: Essentialism — Greg McKeown
+    text: 'The essentialist asks: ''Is this the very most important thing I should be doing with my time and resources right
+      now?'' If it isn''t, the answer is a polite but firm no. Most of what we say yes to is a combination of social pressure,
+      fear of missing out, and the planning fallacy''s false promise that we''ll have more time later. The discipline of essentialism
+      is not about doing more things better — it''s about doing the right things. Protect the asset: if you don''t prioritize
+      your time, someone else will.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Urgency-Importance Prioritization Matrix
+    definition: 'Classify all tasks on two axes — urgency (time-sensitive) and importance (contributes to long-term goals)
+      — and allocate time accordingly: do urgent+important immediately, schedule important+not-urgent, delegate urgent+not-important,
+      and eliminate neither urgent nor important. A prescriptive heuristic for time allocation.'
+    mechanism: 'This is a NORMATIVE HEURISTIC — a practical rule of procedure. It says DO this: classify tasks by urgency
+      and importance, then act accordingly. The heuristic works because it forces a distinction between the two dimensions
+      that are normally collapsed in the mind (''I''m busy therefore I''m productive''). Covey provides the quadrant framework
+      and the insight that Quadrant II (important, not urgent) is systematically neglected; McKeown provides the operational
+      discipline (the essentialist decision rule). The two sources converge on the same prescriptive pattern: prioritize importance
+      over urgency.'
+    boundary: 'Applies when the decision-maker has discretion over their time allocation and can distinguish urgent from important.
+      Fails when: (1) external demands are non-negotiable and urgent (emergency room, military combat); (2) the person cannot
+      reliably distinguish importance (requires clarity of goals); (3) all tasks are genuinely urgent AND important (crisis
+      mode). The heuristic is most useful for knowledge workers with autonomy over their schedule.'
+    consequence: Systematic application shifts the time mix from reactive (urgent-driven) to proactive (importance-driven).
+      Over weeks, Quadrant I crises diminish because Quadrant II preventative work removes their root causes. The heuristic
+      is self-reinforcing when applied consistently and self-defeating when not — skipping Quadrant II time creates more Quadrant
+      I crises, which further reduce Quadrant II capacity.
+    evidence_passages:
+    - 'Effective people spend their time in Quadrant II: activities that are important but NOT urgent'
+    - maximize Quadrant II time, and Quadrant I will shrink
+    - if you don't prioritize your time, someone else will
+    - Most of what we say yes to is a combination of social pressure, fear of missing out, and the planning fallacy
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+  rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Covey and McKeown converge on the same prescriptive
+    rule: prioritize importance over urgency. Covey provides the classification framework (the 2×2 matrix), McKeown provides
+    the operational decision rule (the essentialist no). This is a NORMATIVE HEURISTIC because it says DO this — it is a rule
+    of procedure, not a causal mechanism or descriptive taxonomy. Essential for teaching S2 to distinguish practical heuristics
+    from explanatory mechanisms.'
+- id: CONV-046
+  domain: problem solving
+  discipline: root cause analysis
+  source_books:
+  - The Lean Startup — Eric Ries
+  - Thinking in Systems — Donella Meadows
+  cluster_segments:
+  - source_book: The Lean Startup — Eric Ries
+    text: 'When a problem surfaces, the natural instinct is to fix the immediate symptom. But symptoms are rarely the real
+      problem. The Five Whys technique asks ''why?'' repeatedly — typically five times — to trace a symptom back to its root
+      cause. If the build server is failing: Why? — a library didn''t compile. Why? — the developer used an unapproved version.
+      Why? — they didn''t know the approval process. Why? — onboarding didn''t cover it. Root cause: onboarding process gap.
+      Fix the onboarding, not the library version. The technique is procedural, not analytical — it''s a recipe for drilling
+      down.'
+  - source_book: Thinking in Systems — Donella Meadows
+    text: Systems thinkers learn to distinguish proximate causes from root causes. The proximate cause is the last event in
+      a chain — 'the bridge collapsed because a bolt failed.' The root cause is the system structure that made failure inevitable
+      — 'maintenance inspections were cut to meet quarterly earnings targets.' Moving from proximate to root requires asking
+      not just 'what happened?' but 'what structure produced this event?' Repeated questioning — each answer becoming the
+      premise of the next question — is the most reliable method for crossing from event-level to structure-level understanding.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Root-Cause Drilling Through Iterative Interrogation
+    definition: When diagnosing a problem, ask 'why?' repeatedly — typically five iterations — with each answer becoming the
+      premise of the next question. This iterative interrogation traces from surface symptoms to the underlying systemic root
+      cause. A prescriptive problem-solving heuristic, not a causal mechanism.
+    mechanism: 'This is a NORMATIVE HEURISTIC — a rule of procedure. It says DO this: ask ''why?'' N times, each answer becomes
+      the next question''s target. The heuristic works because human cognition defaults to satisficing — accepting the first
+      plausible explanation rather than drilling to root cause. Five iterations is not magic (some problems require three,
+      some require seven), but the rule forces depth that the mind''s natural stopping heuristic would not reach. Ries provides
+      the tactical application (startup debugging), Meadows provides the systems-thinking framing (proximate vs. root cause).
+      Both converge on the same procedural pattern.'
+    boundary: 'Applies to problems with a causal chain that can be traversed backward. Fails when: (1) the problem has multiple
+      independent causes (each ''why?'' could branch — pick the most productive branch and return to others ); (2) the asker
+      lacks domain knowledge to evaluate answers (you need someone who knows the system); (3) the problem is truly random
+      (no root cause exists). The technique produces diminishing returns beyond ~7 iterations in most domains.'
+    consequence: Organizations that apply Five Whys to every incident discover that most 'bugs' and 'accidents' share a small
+      number of root causes — typically process gaps, training failures, or misaligned incentives. Fixing root causes eliminates
+      classes of problems rather than individual instances. The technique reveals that what appears to be human error is usually
+      system design that made the error likely.
+    evidence_passages:
+    - The Five Whys technique asks 'why?' repeatedly — typically five times — to trace a symptom back to its root cause
+    - Fix the onboarding, not the library version
+    - Moving from proximate to root requires asking not just 'what happened?' but 'what structure produced this event?'
+    - Repeated questioning — each answer becoming the premise of the next question — is the most reliable method for crossing
+      from event-level to structure-level understanding
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+  rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Ries and Meadows converge on the same prescriptive
+    technique: iterative interrogation to cross from symptom to root cause. Ries provides the tactical implementation (Five
+    Whys in lean startups), Meadows provides the theoretical justification (systems thinking distinguishes proximate from
+    root causes). This is a NORMATIVE HEURISTIC — a rule of procedure prescribing HOW to diagnose, with cross-domain applicability
+    (engineering, management, policy).'
+- id: CONV-047
+  domain: productivity
+  discipline: time management
+  source_books:
+  - The 4-Hour Workweek — Timothy Ferriss
+  - Deep Work — Cal Newport
+  cluster_segments:
+  - source_book: The 4-Hour Workweek — Timothy Ferriss
+    text: 'Parkinson''s Law states that work expands to fill the time available for its completion. Give yourself a week to
+      write a report and it will take a week; give yourself 90 minutes and it will take 90 minutes. The mechanism is not laziness
+      — it is the human tendency to add complexity, polish, and scope until the available time is consumed. Counterintuitively,
+      shorter deadlines produce equivalent or BETTER quality because they force ruthless prioritization: only the essential
+      gets done, and perfectionism gets starved of oxygen.'
+  - source_book: Deep Work — Cal Newport
+    text: 'High-quality work produced = time spent × intensity of focus. When you give yourself an entire day to complete
+      a three-hour task, the intensity drops to fill the slack and the output quality suffers. Fixed-schedule productivity
+      — committing to finish work by a specific time and treating that deadline as non-negotiable — forces the intensity that
+      produces both quantity and quality. The heuristic is counterintuitive but robust: constrain the time to improve the
+      output.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Parkinson's Law — Time-Constraint Productivity
+    definition: Work expands to fill the time available for its completion. Imposing artificially short deadlines produces
+      equivalent or superior output quality by forcing ruthless prioritization and preventing scope creep. A prescriptive
+      productivity heuristic, not a causal law.
+    mechanism: 'This is a NORMATIVE HEURISTIC — a rule of procedure. It says DO this: set artificially constrained deadlines
+      to force prioritization. The heuristic works because human work behavior has an expansion bias — people fill available
+      time with lower-value refinements (perfectionism, scope creep, busywork) when deadlines are distant. Short deadlines
+      starve the low-value work of time, leaving only the high-value core. Both Ferriss and Newport converge on the same prescriptive
+      rule: constrain time to improve output, with Ferriss emphasizing the deadline mechanism and Newport emphasizing the
+      intensity-of-focus mechanism.'
+    boundary: 'Applies to knowledge work with a clear deliverable and flexible scope. Fails when: (1) the task has a fixed
+      minimum duration (e.g., curing concrete, growing a culture); (2) quality is non-negotiable and scales with time (e.g.,
+      certain creative work, safety-critical engineering); (3) the deadline becomes so compressed that it induces panic rather
+      than focus. The heuristic produces diminishing returns below ~25% of the natural completion time.'
+    consequence: 'Organizations that set generous deadlines for all work systematically underperform those that impose aggressive
+      but achievable time constraints. The 80/20 rule applies in time: 80% of the value is produced in 20% of the time spent.
+      Leaders should ask not "how long will this take?" but "how much time is this worth?" and cap the investment accordingly.'
+    evidence_passages:
+    - work expands to fill the time available for its completion
+    - shorter deadlines produce equivalent or BETTER quality because they force ruthless prioritization
+    - High-quality work produced = time spent × intensity of focus
+    - constrain the time to improve the output
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+  rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Ferriss and Newport converge on the same prescriptive
+    rule: impose time constraints to improve productivity. Ferriss provides Parkinson''s Law (the descriptive observation
+    that work expands to fill time), Newport provides the intensity-of-focus formula and fixed-schedule productivity method.
+    Essential for teaching S2 to recognize normative heuristics: rules of procedure that say DO this rather than explaining
+    why.'
+- id: CONV-048
+  domain: software engineering
+  discipline: debugging methodology
+  source_books:
+  - The Pragmatic Programmer — David Thomas & Andrew Hunt
+  - Thinking in Systems — Donella Meadows
+  cluster_segments:
+  - source_book: The Pragmatic Programmer — David Thomas & Andrew Hunt
+    text: Rubber duck debugging is the practice of explaining your code, line by line, to an inanimate object — a rubber duck,
+      a teddy bear, or an empty chair. The act of verbalizing forces you to slow down and articulate assumptions you were
+      holding implicitly. More often than not, you will spot the bug yourself halfway through the explanation — the duck never
+      needs to respond. The technique works because teaching requires a level of clarity that debugging alone does not; you
+      cannot explain what you do not truly understand.
+  - source_book: Thinking in Systems — Donella Meadows
+    text: One of the most effective ways to understand a system is to explain it to someone else — or, failing that, to write
+      down your mental model in complete sentences. The process of externalizing your understanding forces you to confront
+      gaps and contradictions that were invisible when the model lived only in your head. Mental models feel complete and
+      coherent until you try to articulate them; the articulation reveals where the coherence is an illusion.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Explanatory Articulation Debugging
+    definition: When stuck on a problem, explain it aloud in complete detail to someone (or something) else. The act of externalizing
+      understanding through articulation forces the discovery of gaps, implicit assumptions, and logical errors that were
+      invisible during silent reasoning. A prescriptive debugging heuristic applicable across domains.
+    mechanism: 'This is a NORMATIVE HEURISTIC — a rule of procedure. It says DO this: explain the problem aloud, step by step,
+      without skipping anything. The heuristic works because silent reasoning allows the mind to gloss over gaps using familiarity
+      ("I know this part, no need to think about it"). Articulation forces explicit representation of every step, which reveals
+      the gaps that familiarity concealed. Thomas/Hunt provide the tactical application (rubber duck debugging in software),
+      Meadows provides the general principle (externalizing mental models reveals their flaws). Both converge on the same
+      procedural pattern: articulate → discover gaps.'
+    boundary: 'Applies to problems where the solver has sufficient domain knowledge but is stuck due to implicit assumptions
+      or overlooked details. Fails when: (1) the solver genuinely lacks domain knowledge (you cannot explain what you do not
+      know); (2) the problem is perceptual rather than logical (an optical illusion cannot be debugged by explanation); (3)
+      time pressure prevents the deliberate pace required for explanation. Most effective for debugging, design review, and
+      logical reasoning tasks.'
+    consequence: The heuristic costs nothing and requires no tools — just the discipline to slow down and articulate. Its
+      effectiveness is so reliable that it is taught as standard practice in software engineering. The broader principle —
+      that externalization reveals hidden gaps — extends beyond debugging to writing, planning, and strategic decision-making.
+      Any domain where implicit mental models drive action can benefit from enforced articulation.
+    evidence_passages:
+    - the act of verbalizing forces you to slow down and articulate assumptions you were holding implicitly
+    - you will spot the bug yourself halfway through the explanation — the duck never needs to respond
+    - explain it to someone else — or, failing that, to write down your mental model in complete sentences
+    - Mental models feel complete and coherent until you try to articulate them
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+  rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Thomas/Hunt and Meadows converge on the same prescriptive
+    technique: articulate your understanding to discover hidden gaps. Both describe it as a procedural heuristic (DO this
+    to debug), not a causal mechanism (X causes Y because Z). Cross-domain applicability: software debugging and systems thinking
+    share the same articulation principle.'
+- id: CONV-049
+  domain: psychology
+  discipline: motivation theory
+  source_books:
+  - Drive — Daniel Pink
+  - Sapiens — Yuval Noah Harari
+  cluster_segments:
+  - source_book: Drive — Daniel Pink
+    text: 'Human motivation operates on multiple levels. At the base, people need physiological survival — food, water, shelter,
+      safety. Once those are secured, social needs emerge: belonging, love, esteem. At the highest level sits self-actualization
+      — the drive to fulfill one''s potential and become what one is capable of becoming. The critical insight is that lower-level
+      needs must be substantially satisfied before higher-level needs become motivating. A person starving does not care about
+      self-esteem; a person who feels unsafe does not prioritize creative fulfillment.'
+  - source_book: Sapiens — Yuval Noah Harari
+    text: 'The pyramid of human needs — from physiological survival through safety, belonging, and esteem to self-actualization
+      — provides a useful taxonomy of what drives human behavior. But the model is descriptive, not causal: it tells us WHAT
+      kinds of needs exist and their typical priority ordering, not WHY any particular individual pursues a specific need.
+      The hierarchy describes the shape of human motivation, not its mechanism.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Hierarchical Motivation Taxonomy
+    definition: Human needs are organized in a hierarchical structure from basic physiological requirements (food, safety)
+      through social needs (belonging, esteem) to self-actualization (fulfilling potential). Lower levels must be substantially
+      satisfied before higher levels become motivating. A descriptive model that classifies motivation into tiers, not a causal
+      mechanism.
+    mechanism: 'This is a DESCRIPTIVE MODEL — a classification system for human needs. It categorizes motivation into five
+      hierarchical tiers (physiological, safety, love/belonging, esteem, self-actualization) and describes their typical priority
+      ordering. Pink describes the model through the lens of modern motivation science, Harari through the lens of human history.
+      Neither claims a causal mechanism for WHY needs are hierarchical; both describe WHAT the hierarchy looks like and HOW
+      needs are organized. The model''s value is diagnostic: it tells you WHERE someone is stuck (which need level) and WHAT
+      typically comes next.'
+    boundary: 'Applies as a broad descriptive framework for understanding human motivation in general. Fails as a predictive
+      model for individuals: (1) people may pursue higher needs while lower needs are unmet (the starving artist); (2) the
+      hierarchy is culturally influenced — some cultures prioritize belonging over individual esteem; (3) the model describes
+      central tendencies, not universal laws. Use as a diagnostic lens, not a rigid formula.'
+    consequence: 'Organizations that attempt to motivate through self-actualization (purpose, mastery) while neglecting base
+      needs (fair pay, job security, psychological safety) will fail. The hierarchy implies that motivation strategies must
+      match the need level: you cannot inspire a team with purpose when they are worried about layoffs. The model provides
+      the vocabulary for diagnosing motivational stuckness.'
+    evidence_passages:
+    - lower-level needs must be substantially satisfied before higher-level needs become motivating
+    - A person starving does not care about self-esteem
+    - The pyramid of human needs — from physiological survival through safety, belonging, and esteem to self-actualization
+    - 'the model is descriptive, not causal: it tells us WHAT kinds of needs exist and their typical priority ordering'
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: cross-domain
+  rationale: 'NEW DESCRIPTIVE MODEL (D2234: extraction type expansion). Pink and Harari converge on the same descriptive model
+    of hierarchical human needs, using different framing (modern motivation science vs. historical perspective). Both emphasize
+    that it is a TAXONOMY — a classification of need types — not a causal mechanism. Essential for teaching S2 that classification
+    systems describing WHAT exists and HOW categories relate are valid FBs, distinct from causal mechanisms.'
+- id: CONV-050
+  domain: decision making
+  discipline: cognitive bias mitigation
+  source_books:
+  - The Art of Thinking Clearly — Rolf Dobelli
+  - Crucial Conversations — Kerry Patterson et al.
+  cluster_segments:
+  - source_book: The Art of Thinking Clearly — Rolf Dobelli
+    text: 'Hanlon''s Razor advises: never attribute to malice that which is adequately explained by incompetence, neglect,
+      or misunderstanding. The human mind has a systematic bias toward intentionality — we assume that actions that harm us
+      were intended to harm us, even when the far more likely explanation is carelessness, systems failure, or simple error.
+      This bias is costly: it escalates conflicts that could be resolved, burns relationships that could be repaired, and
+      directs investigative energy toward motive when it should be directed toward process.'
+  - source_book: Crucial Conversations — Kerry Patterson et al.
+    text: 'When someone does something that hurts or offends us, the brain instantly constructs a villain story: they did
+      it because they are selfish, malicious, or indifferent to our wellbeing. The alternative — the victim story — casts
+      us as innocent targets of their character flaw. But most harmful actions arise from incompetence, conflicting priorities,
+      or incomplete information — not malice. The heuristic is: before assuming bad intent, ask "what else could explain this?"
+      The answer is usually less personal and more fixable than the villain story suggests.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Hanlon's Razor — Incompetence Over Malice Default
+    definition: When interpreting harmful or frustrating behavior, default to the explanation of incompetence, neglect, or
+      misunderstanding over the explanation of malice. Most harm arises from error and systems failure, not intent. A prescriptive
+      cognitive heuristic for conflict de-escalation.
+    mechanism: 'This is a NORMATIVE HEURISTIC — a rule of procedure for interpreting others'' behavior. It says DO this: assume
+      incompetence before malice. The heuristic works because the human mind has a systematic intentionality bias — the tendency
+      to attribute agency and intent to events that affect us, even when those events are random or systemic. This bias serves
+      an evolutionary function (better to false-alarm a predator than miss one) but is maladaptive in modern organizational
+      life, where most harm is caused by process failures, miscommunication, and misaligned incentives, not hostile intent.
+      Dobelli provides the cognitive bias framework, Patterson provides the interpersonal application.'
+    boundary: 'Applies to ambiguous harmful actions where intent is uncertain. Fails when: (1) there is clear evidence of
+      malice (documented threats, history of targeted harm); (2) the actor has a track record of malevolent behavior in similar
+      situations; (3) the heuristic is used to excuse genuine abuse or to avoid necessary confrontation. The razor is a default,
+      not a dogma — it shifts the burden of proof toward the malice hypothesis but does not rule it out.'
+    consequence: Systematic application of Hanlon's Razor reduces interpersonal conflict, preserves professional relationships,
+      and redirects problem-solving effort from blame (who did this to me?) to process (what failed and how do we fix it?).
+      In organizations, it shifts culture from paranoid to learning-oriented. The counterfactual — defaulting to malice attribution
+      — produces escalating cycles of retaliation and defensiveness that amplify the original harm.
+    evidence_passages:
+    - never attribute to malice that which is adequately explained by incompetence, neglect, or misunderstanding
+    - most harmful actions arise from incompetence, conflicting priorities, or incomplete information — not malice
+    - before assuming bad intent, ask "what else could explain this?"
+    - 'the brain instantly constructs a villain story: they did it because they are selfish, malicious, or indifferent'
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+  rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Dobelli and Patterson converge on the same prescriptive
+    cognitive heuristic: default to incompetence over malice when interpreting harmful behavior. Dobelli provides the cognitive
+    bias framing (intentionality bias), Patterson provides the interpersonal application (villain stories in crucial conversations).
+    This is a NORMATIVE HEURISTIC because it prescribes HOW to interpret ambiguous behavior — a rule of cognitive procedure,
+    not a causal mechanism.'

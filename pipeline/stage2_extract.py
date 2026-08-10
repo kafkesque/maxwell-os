@@ -199,6 +199,9 @@ PRINCIPLE STRUCTURE (required for every extraction):
    a convergent mechanism. Be honest — self-flag if summarizing.
 8. extraction_type: "causal_mechanism" if X→Y because Z. "empirical_pattern" if strong
    correlation without proven causal chain. "normative_heuristic" if practical rule of thumb.
+   "descriptive_model" if classification system or taxonomy describing WHAT
+   categories exist and how they relate — patterns of identity/organization
+   rather than causal mechanisms (what type? how organized?).
 9. content_type: "principle" (reusable concept), "process_template" (repeatable how-to),
    "process_instance" (case study), "growth_edge" (speculative insight),
    "tool_instruction" (tool-specific command).

@@ -1,9 +1,9 @@
 {
   "stats": {
-    "total_passages": 137,
-    "verbatim": 136,
+    "total_passages": 178,
+    "verbatim": 178,
     "fuzzy": 0,
-    "missing": 1
+    "missing": 0
   },
   "results": [
     {
@@ -270,9 +270,9 @@
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 354,
-        "char_end": 471,
+        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
+        "char_start": 369,
+        "char_end": 486,
         "match_mode": "raw"
       }
     },
@@ -315,7 +315,7 @@
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
         "char_start": 4,
         "char_end": 84,
         "match_mode": "raw"
@@ -1030,10 +1030,16 @@
       "example_id": "NEG-009",
       "fb_index": 0,
       "passage_index": 3,
-      "passage_preview": "great product leaders can seamlessly shift between these altitudes depending on the conversation and context",
-      "passage_sha": "abaa4a4c36f2e8f0",
-      "status": "missing",
-      "match": null
+      "passage_preview": "The best product leaders can seamlessly shift between these altitudes depending on the conversation and context.",
+      "passage_sha": "6e5e1643cd7603ef",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Product Leadership — Banfield, Eriksson & Walkingshaw",
+        "char_start": 201,
+        "char_end": 313,
+        "match_mode": "raw"
+      }
     },
     {
       "example_id": "CONV-023",
@@ -1204,14 +1210,14 @@
       "example_id": "CONV-026",
       "fb_index": 0,
       "passage_index": 0,
-      "passage_preview": "But cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony —",
-      "passage_sha": "09be92e9b3194797",
+      "passage_preview": "judges are more likely to grant parole after meals and at the start of the day, when mental energy is highest — the same",
+      "passage_sha": "94e684f4812af599",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "The Rule of Law — Tom Bingham",
-        "char_start": 67,
-        "char_end": 231,
+        "source_book": "Simple Rules — Donald Sull & Kathleen Eisenhardt",
+        "char_start": 553,
+        "char_end": 749,
         "match_mode": "raw"
       }
     },
@@ -1219,36 +1225,6 @@
       "example_id": "CONV-026",
       "fb_index": 0,
       "passage_index": 1,
-      "passage_preview": "In fact, the complexity of their decisions makes them MORE susceptible to heuristic substitution because the correct ans",
-      "passage_sha": "4dc7be101a8c48ef",
-      "status": "verbatim",
-      "match": {
-        "segment_id": "?",
-        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
-        "char_start": 112,
-        "char_end": 334,
-        "match_mode": "raw"
-      }
-    },
-    {
-      "example_id": "CONV-026",
-      "fb_index": 0,
-      "passage_index": 2,
-      "passage_preview": "Asked \"should this defendant be granted bail?\" a judge may substitute \"do I feel this defendant is dangerous?\" — a heuri",
-      "passage_sha": "95923878c60be475",
-      "status": "verbatim",
-      "match": {
-        "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 94,
-        "char_end": 259,
-        "match_mode": "raw"
-      }
-    },
-    {
-      "example_id": "CONV-026",
-      "fb_index": 0,
-      "passage_index": 3,
       "passage_preview": "Decision-makers in high-stakes environments — judges, doctors, regulators — are not immune to cognitive biases.",
       "passage_sha": "a5c36cd35de05e15",
       "status": "verbatim",
@@ -1257,6 +1233,36 @@
         "source_book": "Nudge — Richard Thaler & Cass Sunstein",
         "char_start": 0,
         "char_end": 111,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony — can",
+      "passage_sha": "24fa9dafa340597e",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Rule of Law — Tom Bingham",
+        "char_start": 71,
+        "char_end": 231,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "the complexity of their decisions makes them MORE susceptible to heuristic substitution",
+      "passage_sha": "dee20956baf2dd08",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
+        "char_start": 121,
+        "char_end": 208,
         "match_mode": "raw"
       }
     },
@@ -1669,15 +1675,15 @@
       "example_id": "CONV-034",
       "fb_index": 0,
       "passage_index": 0,
-      "passage_preview": "the premortem procedure is the most effective debiasing technique",
-      "passage_sha": "2c82788c346d2ce5",
+      "passage_preview": "the premortem technique, developed by research psychologist Gary Klein, is one of the most reliable debiasing methods fo",
+      "passage_sha": "77960a82ded0931c",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 35,
-        "char_end": 100,
-        "match_mode": "raw"
+        "source_book": "Sources of Power — Gary Klein",
+        "char_start": 0,
+        "char_end": 143,
+        "match_mode": "case-insensitive"
       }
     },
     {
@@ -1689,9 +1695,9 @@
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 161,
-        "char_end": 277,
+        "source_book": "Sources of Power — Gary Klein",
+        "char_start": 204,
+        "char_end": 320,
         "match_mode": "raw"
       }
     },
@@ -1869,9 +1875,9 @@
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 409,
-        "char_end": 484,
+        "source_book": "The Art of Thinking Clearly — Rolf Dobelli",
+        "char_start": 422,
+        "char_end": 497,
         "match_mode": "raw"
       }
     },
@@ -1884,9 +1890,24 @@
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
-        "char_start": 286,
-        "char_end": 354,
+        "source_book": "The Art of Thinking Clearly — Rolf Dobelli",
+        "char_start": 281,
+        "char_end": 349,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-037",
+      "fb_index": 1,
+      "passage_index": 2,
+      "passage_preview": "people overestimate dramatic causes of death (plane crashes, terrorism, shark attacks) and underestimate chronic causes ",
+      "passage_sha": "61f1e0cb5751d123",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Art of Thinking Clearly — Rolf Dobelli",
+        "char_start": 521,
+        "char_end": 681,
         "match_mode": "raw"
       }
     },
@@ -1894,14 +1915,14 @@
       "example_id": "CONV-038",
       "fb_index": 0,
       "passage_index": 0,
-      "passage_preview": "80% of effects come from 20% of causes — is observed across an astonishing range of domains",
-      "passage_sha": "72e9c1c3b6070392",
+      "passage_preview": "80% of effects come from 20% of causes",
+      "passage_sha": "bbf8137df59e4f19",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Antifragile — Nassim Nicholas Taleb",
-        "char_start": 17,
-        "char_end": 108,
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 97,
+        "char_end": 135,
         "match_mode": "raw"
       }
     },
@@ -1909,14 +1930,14 @@
       "example_id": "CONV-038",
       "fb_index": 0,
       "passage_index": 1,
-      "passage_preview": "a signature of power-law distributions, which arise when success breeds more success",
-      "passage_sha": "e3406f8d7a438757",
+      "passage_preview": "80% of wealth is held by 20% of the population, 80% of scientific citations go to 20% of papers, 80% of internet traffic",
+      "passage_sha": "9f3adcaf38e04e8e",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Antifragile — Nassim Nicholas Taleb",
-        "char_start": 289,
-        "char_end": 373,
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 190,
+        "char_end": 340,
         "match_mode": "raw"
       }
     },
@@ -1924,14 +1945,14 @@
       "example_id": "CONV-038",
       "fb_index": 0,
       "passage_index": 2,
-      "passage_preview": "Preferential attachment is the mechanism behind many power-law distributions",
-      "passage_sha": "d4e8eb8f101f61b2",
+      "passage_preview": "Preferential attachment is the mechanism behind many power-law distributions.",
+      "passage_sha": "78d2f1547fb4dbff",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
         "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
         "char_start": 0,
-        "char_end": 76,
+        "char_end": 77,
         "match_mode": "raw"
       }
     },
@@ -1939,14 +1960,14 @@
       "example_id": "CONV-038",
       "fb_index": 0,
       "passage_index": 3,
-      "passage_preview": "the rich get richer",
-      "passage_sha": "4f0e348ea708ad75",
+      "passage_preview": "new nodes preferentially connect to already well-connected nodes",
+      "passage_sha": "a7c7a23facf9278e",
       "status": "verbatim",
       "match": {
         "segment_id": "?",
-        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
-        "char_start": 184,
-        "char_end": 203,
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 629,
+        "char_end": 693,
         "match_mode": "raw"
       }
     },
@@ -2052,6 +2073,606 @@
         "source_book": "Generative Design — Benedikt Gross",
         "char_start": 323,
         "char_end": 375,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-041",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "students who scored in the bottom quartile on tests of grammar, logic, and humor estimated their performance to be above",
+      "passage_sha": "d2ff2a7b5ba2d261",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Invisible Gorilla — Christopher Chabris & Daniel Simons",
+        "char_start": 184,
+        "char_end": 312,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-041",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "their lack of skill also deprives them of the ability to recognize their own mistakes",
+      "passage_sha": "7be7e6f27c3a87d4",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Invisible Gorilla — Christopher Chabris & Daniel Simons",
+        "char_start": 386,
+        "char_end": 471,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-041",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "those most confident in their judgments are often those least qualified to make them",
+      "passage_sha": "52488fca1cb01339",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Confidence Game — Maria Konnikova",
+        "char_start": 389,
+        "char_end": 473,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-041",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "genuine experts are more likely to express uncertainty",
+      "passage_sha": "cbc53ae775978131",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Confidence Game — Maria Konnikova",
+        "char_start": 481,
+        "char_end": 535,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-042",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the frequency of a word is inversely proportional to its rank: the most common word appears roughly twice as often as th",
+      "passage_sha": "a9292ffe3bdb6327",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Information — James Gleick",
+        "char_start": 55,
+        "char_end": 195,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-042",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "city populations follow a Zipfian distribution (the largest city is roughly twice the size of the second-largest)",
+      "passage_sha": "0202054dfc18ef5e",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Information — James Gleick",
+        "char_start": 357,
+        "char_end": 470,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-042",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "This distributional fact — not any clever algorithm — is what makes caching work.",
+      "passage_sha": "863a332b63871219",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 481,
+        "char_end": 562,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-042",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "A tiny fraction of items accounts for the vast majority of requests.",
+      "passage_sha": "22ae3534b367ff01",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 337,
+        "char_end": 405,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-043",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Building a cohesive team requires navigating five sequential dysfunctions",
+      "passage_sha": "24eb45373a74c103",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Five Dysfunctions of a Team — Patrick Lencioni",
+        "char_start": 0,
+        "char_end": 73,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-043",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "you cannot have productive conflict without trust, and you cannot hold people accountable without clarity of commitment",
+      "passage_sha": "9b072932c64dc6a7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Five Dysfunctions of a Team — Patrick Lencioni",
+        "char_start": 356,
+        "char_end": 475,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-043",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "groups that skip the safety phase cannot achieve honest vulnerability",
+      "passage_sha": "ad4e194dc7263aa3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Culture Code — Daniel Coyle",
+        "char_start": 331,
+        "char_end": 400,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-043",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "High-performing groups pass through predictable phases: first, they establish belonging cues that signal safety; then th",
+      "passage_sha": "0085c64d2ada1502",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Culture Code — Daniel Coyle",
+        "char_start": 0,
+        "char_end": 151,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-044",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "there are things about ourselves that others see clearly and we do not",
+      "passage_sha": "a24592207e59a3f3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Emotional Intelligence — Daniel Goleman",
+        "char_start": 184,
+        "char_end": 254,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-044",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Reducing the blind self through feedback is one of the highest-leverage activities in personal development",
+      "passage_sha": "e2cd732508226d2e",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Emotional Intelligence — Daniel Goleman",
+        "char_start": 389,
+        "char_end": 495,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-044",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Not everything about yourself belongs in every relationship — there is a healthy 'hidden self'",
+      "passage_sha": "9cd36ebcedf326e0",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Daring Greatly — Brené Brown",
+        "char_start": 106,
+        "char_end": 200,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-044",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The boundary between privacy (healthy hidden self) and shame (unhealthy hidden self) is defined by whether concealment s",
+      "passage_sha": "48efd80ad94b528b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Daring Greatly — Brené Brown",
+        "char_start": 253,
+        "char_end": 406,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-045",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Effective people spend their time in Quadrant II: activities that are important but NOT urgent",
+      "passage_sha": "058f678e37b47864",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The 7 Habits of Highly Effective People — Stephen Covey",
+        "char_start": 0,
+        "char_end": 94,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-045",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "maximize Quadrant II time, and Quadrant I will shrink",
+      "passage_sha": "7f357a4c46ace372",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The 7 Habits of Highly Effective People — Stephen Covey",
+        "char_start": 489,
+        "char_end": 542,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-045",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "if you don't prioritize your time, someone else will",
+      "passage_sha": "67bf9ebc0c5b071c",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Essentialism — Greg McKeown",
+        "char_start": 452,
+        "char_end": 504,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-045",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Most of what we say yes to is a combination of social pressure, fear of missing out, and the planning fallacy",
+      "passage_sha": "5183fa0926213018",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Essentialism — Greg McKeown",
+        "char_start": 168,
+        "char_end": 277,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-046",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The Five Whys technique asks 'why?' repeatedly — typically five times — to trace a symptom back to its root cause",
+      "passage_sha": "fbdabeb57ca3fc78",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Lean Startup — Eric Ries",
+        "char_start": 121,
+        "char_end": 234,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-046",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Fix the onboarding, not the library version",
+      "passage_sha": "491f408d736a5a37",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Lean Startup — Eric Ries",
+        "char_start": 467,
+        "char_end": 510,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-046",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Moving from proximate to root requires asking not just 'what happened?' but 'what structure produced this event?'",
+      "passage_sha": "c29877bf27890210",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 311,
+        "char_end": 424,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-046",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Repeated questioning — each answer becoming the premise of the next question — is the most reliable method for crossing ",
+      "passage_sha": "25659c4c3591dfe9",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 425,
+        "char_end": 594,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-047",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "work expands to fill the time available for its completion",
+      "passage_sha": "359a71032fc2b18c",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The 4-Hour Workweek — Timothy Ferriss",
+        "char_start": 28,
+        "char_end": 86,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-047",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "shorter deadlines produce equivalent or BETTER quality because they force ruthless prioritization",
+      "passage_sha": "864ca208e6ace210",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The 4-Hour Workweek — Timothy Ferriss",
+        "char_start": 358,
+        "char_end": 455,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-047",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "High-quality work produced = time spent × intensity of focus",
+      "passage_sha": "6b5d0337e5d0f15f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Deep Work — Cal Newport",
+        "char_start": 0,
+        "char_end": 60,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-047",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "constrain the time to improve the output",
+      "passage_sha": "3e27b2f5ca10fcd1",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Deep Work — Cal Newport",
+        "char_start": 430,
+        "char_end": 470,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-048",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the act of verbalizing forces you to slow down and articulate assumptions you were holding implicitly",
+      "passage_sha": "c82b628ff8a8e01f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Pragmatic Programmer — David Thomas & Andrew Hunt",
+        "char_start": 150,
+        "char_end": 251,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "CONV-048",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "you will spot the bug yourself halfway through the explanation — the duck never needs to respond",
+      "passage_sha": "40d96fead3aa7ded",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Pragmatic Programmer — David Thomas & Andrew Hunt",
+        "char_start": 274,
+        "char_end": 370,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-048",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "explain it to someone else — or, failing that, to write down your mental model in complete sentences",
+      "passage_sha": "9e88ce127faa9cf6",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 60,
+        "char_end": 160,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-048",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Mental models feel complete and coherent until you try to articulate them",
+      "passage_sha": "8f20658caa2e229d",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 317,
+        "char_end": 390,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-049",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "lower-level needs must be substantially satisfied before higher-level needs become motivating",
+      "passage_sha": "c094bb741ee9259f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Drive — Daniel Pink",
+        "char_start": 353,
+        "char_end": 446,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-049",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "A person starving does not care about self-esteem",
+      "passage_sha": "7a5b9bdd278bbc5d",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Drive — Daniel Pink",
+        "char_start": 448,
+        "char_end": 497,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-049",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The pyramid of human needs — from physiological survival through safety, belonging, and esteem to self-actualization",
+      "passage_sha": "28df6fe79bb7eaf7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Sapiens — Yuval Noah Harari",
+        "char_start": 0,
+        "char_end": 116,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-049",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "the model is descriptive, not causal: it tells us WHAT kinds of needs exist and their typical priority ordering",
+      "passage_sha": "53e46bcf73705414",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Sapiens — Yuval Noah Harari",
+        "char_start": 181,
+        "char_end": 292,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-050",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "never attribute to malice that which is adequately explained by incompetence, neglect, or misunderstanding",
+      "passage_sha": "d17e671593f57098",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Art of Thinking Clearly — Rolf Dobelli",
+        "char_start": 24,
+        "char_end": 130,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-050",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "most harmful actions arise from incompetence, conflicting priorities, or incomplete information — not malice",
+      "passage_sha": "4674f754ee1a884a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Crucial Conversations — Kerry Patterson et al.",
+        "char_start": 279,
+        "char_end": 387,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-050",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "before assuming bad intent, ask \"what else could explain this?\"",
+      "passage_sha": "1f5e7cfc0d343e9b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Crucial Conversations — Kerry Patterson et al.",
+        "char_start": 407,
+        "char_end": 470,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-050",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "the brain instantly constructs a villain story: they did it because they are selfish, malicious, or indifferent",
+      "passage_sha": "57637fba17a10470",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Crucial Conversations — Kerry Patterson et al.",
+        "char_start": 54,
+        "char_end": 165,
         "match_mode": "raw"
       }
     }

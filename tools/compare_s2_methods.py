@@ -280,7 +280,7 @@ def run_comparison(
     return results
 
 
-def print_comparison(results: dict[str, Any]) -> None:
+def print_comparison(results: dict[str, Any], eval_pool: list | None = None) -> None:
     """Print formatted comparison table."""
     trad = results["traditional"]
     dspy = results["dspy"]
@@ -316,17 +316,13 @@ def print_comparison(results: dict[str, Any]) -> None:
         # Compare type accuracy
         trad_type_correct = 0
         dspy_type_correct = 0
-        for i, ex in enumerate(test_examples[:n_dspy]):
-            if i >= n_trad:
-                break
-
         print(f"\n  {'─'*70}")
         print(f"  Per-example breakdown:")
         print(f"  {'Example':<30} {'Trad Score':>10} {'DSPy Score':>10} {'Δ':>8}")
         print(f"  {'-'*30} {'-'*10} {'-'*10} {'-'*8}")
         for i in range(min(n_trad, n_dspy)):
             delta = dspy["scores"][i] - trad["scores"][i]
-            name = test_examples[i].golden_id if i < len(test_examples) else f"ex{i}"
+            name = eval_pool[i].golden_id if eval_pool and i < len(eval_pool) else f"ex{i}"
             marker = " ✅" if delta > 0 else (" ❌" if delta < 0 else " =")
             print(f"  {name:<30} {trad['scores'][i]:>9.3f}  {dspy['scores'][i]:>9.3f}  {delta:>+.3f}{marker}")
 
@@ -389,7 +385,12 @@ if __name__ == "__main__":
                 return self.extract(cluster_segments=cluster_segments)
 
         _prog = _ExtractFB()
-        optimized = _prog.load(args.dspy_program)
+        # dspy 3.x: load() mutates self in place and returns None
+        _prog.load(args.dspy_program)
+        # D2246: program needs the LM configured at call time (pilot configured it;
+        # comparison must too — otherwise ValueError: No LM is loaded)
+        configure_dspy(model=MODEL_NAME, verbose=True)
+        optimized = _prog
     elif args.traditional_only:
         print("Running TRADITIONAL-ONLY comparison (DSPy pilot not yet complete)")
     else:
@@ -398,11 +399,14 @@ if __name__ == "__main__":
 
     # Run comparison
     results = run_comparison(test, optimized_program=optimized, max_test=args.n_examples)
-    print_comparison(results)
 
-    # Save results
+    # Save results BEFORE printing (crash-safe: print bugs must never lose data — C6)
     out_path = PROJECT_ROOT / "governance" / "s2_comparison_results.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
+    tmp_path = out_path.with_suffix(".json.tmp")
+    with open(tmp_path, "w") as f:
         json.dump(results, f, indent=2, default=str)
+    tmp_path.replace(out_path)
     print(f"\nResults saved to {out_path}")
+
+    print_comparison(results, eval_pool=test[:args.n_examples])

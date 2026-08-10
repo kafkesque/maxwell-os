@@ -3883,3 +3883,28 @@ from golden v4.4. Both models served via OMLX API (safe — D2243 prevention).
 - The SHORT focused depth prompt (benchmark style) remains superior to the LONG combined classify prompt: 62.5% vs 38%
 
 **Impact:** (1) S4 classify calls for GPT-OSS need `Reasoning: none` prefix + max_tokens ≥1024 (was 512 — too low, burns tokens on reasoning). (2) Cross-domain classification is a prompt-structure issue, not a model issue — long combined prompts hurt all models. (3) Few-shot anchors retained but flagged as weak signal; the structural fix (short prompt + Reasoning:none) is the primary lever.
+
+### D2248: 4-Way S2 Comparison (20-example) — DSPy wins avg, Traditional wins positive fidelity
+
+**Context (T-007 completion):** Post-A001 comparison with the MIPROv2-optimized program (96.4% pilot) on the A-004-expanded test set (20 examples, train_frac 0.60). Author-disjoint few-shot (A-002) active.
+
+**Results (Qwen3-Coder-30B via OMLX, temp=0.0):**
+
+| Metric | Traditional | DSPy (MIPROv2) |
+|--------|-------------|----------------|
+| Avg quality | 0.592 | **0.672** |
+| Avg latency | 28.8s | **26.4s** |
+| Parse-fail zeros | 6 | 1 |
+| Negatives rejected | 0/5 | **5/5** |
+
+- DSPy wins on average: perfect negative rejection (all 5 NEGs → route=NULL, score 1.0)
+- Traditional wins on positive-fidelity: 0.845 vs 0.60 on the 14 both-scored positives
+- DSPy strictly better 5, worse 14 — but the 5 wins are +1.0 each (negatives) vs small -0.06..-0.84 losses on positives
+
+**Interpretation:** MIPROv2 optimization learned the routing gate (negative rejection) — the single highest-value behavior — at the cost of positive extraction precision. With balanced pos/neg weighting, DSPy wins. The positive-fidelity gap (CONV-043 -0.84, CONV-036 -0.63) indicates the few-shot demos selected by MIPROv2 under-weight mechanism/boundary fidelity.
+
+**Impact:** DSPy-optimized S2 is production-viable for convergence routing; positive fidelity needs either (a) more labeled demos (max_labeled_demos 2→4), (b) a mechanism-weighted metric, or (c) hybrid: DSPy gate + Traditional extraction. Options recorded for T-007b.
+
+### D2249: Benchmark-validated S4 classifier model chain (Phi → GPT-OSS)
+
+**Decision:** GPT-OSS-20B-MXFP4-Q8 is the S4 depth classifier (D2245, 62.5% acc, 24.9× faster than Gemma, 12.1GB vs 31GB). Full swap deferred pending BUG-075 (long-prompt restructure) — flipping VERIFY_MODEL now would not help (long-prompt GPT-OSS 38% ≈ Phi 37.5%). Requires: (1) Reasoning:none prefix, (2) max_tokens ≥1024, (3) short focused depth prompt (proven 62.5%).

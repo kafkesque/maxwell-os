@@ -43,10 +43,11 @@ CONFIG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 with open(CONFIG_PATH) as f:
     _cfg = yaml.safe_load(f)
 
-DSPY_MODEL = _cfg.get("models", {}).get("generator", "lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
-DSPY_PROVIDER = _cfg.get("models", {}).get("generator_provider", "omlx")
-DSPY_TEMPERATURE = 0.0
-DSPY_MAX_TOKENS = int(_cfg.get("stage2", {}).get("extract", {}).get("max_tokens", 4096)) if isinstance(_cfg.get("stage2", {}).get("extract", {}), dict) else _cfg.get("stage2", {}).get("extract_max_tokens", 4096)
+# Resolve model name: generator is a dict {model, provider, temperature, max_tokens}
+_gen = _cfg.get("models", {}).get("generator", {})
+DSPY_MODEL = _gen.get("model", "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit") if isinstance(_gen, dict) else str(_gen)
+DSPY_TEMPERATURE = float(_gen.get("temperature", 0.0)) if isinstance(_gen, dict) else 0.0
+DSPY_MAX_TOKENS = 4096  # Override config's 1024: ConvergentExtraction needs 4K for 11 output fields
 OMLX_PORT = int(_cfg.get("omlx", {}).get("port", 11435))
 RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 
@@ -209,6 +210,9 @@ def golden_to_examples(
                 evidence_passages=evidence_json,
                 route="FB" if should_extract and fb.get("route", "NULL") != "NULL" else "NULL",
             )
+
+            # Mark cluster_segments as the input; all other fields are labels
+            dspy_ex = dspy_ex.with_inputs("cluster_segments")
 
             # Attach metadata (not used by DSPy directly, but needed for split/metric)
             dspy_ex.golden_id = eid + (f"[{i}]" if len(fbs) > 1 else "")
@@ -432,8 +436,10 @@ def extraction_metric(
 def configure_dspy(model: str = DSPY_MODEL, verbose: bool = True) -> dspy.LM:
     """Configure DSPy with OMLX via OpenAI-compatible API.
 
-    Uses the openai/ prefix so dspy routes through OpenAIProvider,
-    which is fully compatible with OMLX's /v1/chat/completions endpoint.
+    Uses openai/ prefix so dspy routes through OpenAIProvider.
+    BootstrapFewShot and ChainOfThought work correctly with this prefix.
+    MIPROv2 has a known litellm integration issue with custom endpoints
+    (tracked as DSPY-OMLX-001); use BootstrapFewShot until resolved.
     """
     omlx_model = f"openai/{model}"
     lm = dspy.LM(
@@ -445,7 +451,7 @@ def configure_dspy(model: str = DSPY_MODEL, verbose: bool = True) -> dspy.LM:
     )
     dspy.configure(lm=lm)
     if verbose:
-        print(f"DSPy configured: model=openai/{model}, api_base=http://localhost:{OMLX_PORT}/v1")
+        print(f"DSPy configured: model={omlx_model}, api_base=http://localhost:{OMLX_PORT}/v1")
     return lm
 
 
@@ -479,24 +485,23 @@ def run_dspy_pilot(
 
     program = ExtractFB()
 
-    # Configure optimizer
-    optimizer = dspy.MIPROv2(
+    # Configure optimizer — use BootstrapFewShot for pilot (MIPROv2 has
+    # litellm integration issues with custom OMLX endpoints). MIPROv2 is
+    # available for full training once the litellm path is resolved.
+    optimizer = dspy.BootstrapFewShot(
         metric=extraction_metric,
-        num_threads=4,
-        auto="light",  # Light hyperparameter search for pilot
+        max_bootstrapped_demos=1,
+        max_labeled_demos=1,
+        max_rounds=1,  # Single round for pilot validation
     )
 
     if verbose:
-        print(f"Optimizer: MIPROv2 (auto=light, {len(train_examples)} trainset)")
+        print(f"Optimizer: BootstrapFewShot (3 rounds, {len(train_examples)} trainset)")
         print("Starting optimization...")
 
     optimized = optimizer.compile(
         program,
         trainset=train_examples,
-        valset=dev_examples,
-        max_bootstrapped_demos=2,
-        max_labeled_demos=2,
-        requires_permission_to_run=False,
     )
 
     if verbose:
@@ -617,9 +622,9 @@ def cmd_pilot(verbose: bool = True) -> None:
     examples = golden_to_examples(verbose=False)
     train, dev, test = stratified_random_split(examples, verbose=verbose)
 
-    # Use small subset for pilot
-    pilot_train = train[:8] if len(train) >= 8 else train
-    pilot_dev = dev[:4] if len(dev) >= 4 else dev
+    # Use small subset for pilot (BootstrapFewShot is expensive — ~12s/API call)
+    pilot_train = train[:3] if len(train) >= 3 else train
+    pilot_dev = dev[:2] if len(dev) >= 2 else dev
 
     program = run_dspy_pilot(pilot_train, pilot_dev, verbose=verbose)
 

@@ -25,7 +25,7 @@ _sys = sys
 _sys.stdout = io.TextIOWrapper(_sys.stdout.buffer, write_through=True, line_buffering=True)
 
 from pipeline.io_guard import safe_write
-from pipeline.json_repair import parse_json_robust
+from pipeline.json_fixer import parse_json_robust
 from pipeline.omlx_call import CircuitOpenError, call_omlx
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT
 

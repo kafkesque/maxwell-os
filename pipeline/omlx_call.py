@@ -30,7 +30,7 @@ import time
 
 import requests
 
-from pipeline.json_repair import parse_json_robust, repair_json
+from pipeline.json_fixer import parse_json_robust, repair_json
 from pipeline.pipeline_paths import (
     GEN_MAX_TOKENS,
     GEN_MODEL,

@@ -276,7 +276,13 @@ def call_omlx(
             )
             resp.raise_for_status()
             data = resp.json()
-            content = data["choices"][0]["message"]["content"]
+            msg = data["choices"][0]["message"]
+            content = msg.get("content")
+            # C23/Reilience: reasoning models (GPT-OSS) occasionally return only
+            # reasoning_content during cold reload despite "Reasoning: none".
+            # Treat as retryable (KeyError-style) instead of crashing.
+            if content is None:
+                raise KeyError("content missing from message (reasoning-model cold reload?)")
             if OMLX_CB_ENABLED:
                 _breaker.record_success()
             return content.strip()

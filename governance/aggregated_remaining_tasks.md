@@ -1,8 +1,8 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 21:15 | **Session:** D2245-D2249 (model research, T-009, A-002/A-004, T-007 comparison)
-> **Golden set:** v4.4 (73 examples, 50 FBs, 194 evidence passages — 100% verbatim)
-> **Models:** Qwen3-Coder-30B (S2 gen) · Phi-4-mini-8bit (S4 cls) · **GPT-OSS-20B-MXFP4-Q8 (NEW, S4 depth — D2245)** · Gemma-4-31B-8bit (S5/R5 verifier)
-> **S2 Comparison:** DSPy-MIPROv2 **0.672** vs Traditional **0.592** on 20 examples (D2248)
+> **Updated:** 2026-08-10 23:45 | **Session:** D2250-D2251 (BUG-075 FIXED 87.5%, GPT-OSS live in S4, T-007b hybrid 0.736, golden audit)
+> **Golden set:** v4.4 (73 examples, 75 FBs, 194 evidence passages — 100% verbatim, author cap ≤3)
+> **Models:** Qwen3-Coder-30B (S2 gen) · **GPT-OSS-20B-MXFP4-Q8 (S4 classifier — D2249, 87.5% depth)** · Phi-4-mini-8bit (S5 verify + gates only) · Gemma-4-E4B (S5 cross-family)
+> **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 0.672 > Traditional 0.591 on 20 examples
 
 ---
 
@@ -21,13 +21,25 @@
 
 ---
 
+## ✅ COMPLETED THIS SESSION (D2250-D2251)
+
+| ID | Task | Result |
+|----|------|--------|
+| **BUG-075** | **Cross-domain depth 0% — FIXED** | ✅ **87.5% (7/8)**, cross-domain **3/3** (was 0/3 all models). Root cause CONFIRMED: long combined prompt. Fix: `classify_depth_focused()` short prompt (D2249). Benchmark: `governance/s4_depth_benchmark_focused_prompt.json` |
+| **D2249** | **S4 classifier swap Phi→GPT-OSS** | ✅ VERIFY_MODEL → gpt-oss-20b-MXFP4-Q8. `Reasoning: none` prefix + max_tokens 1024 (config-driven, C12). Verified live. ~19GB RAM freed vs Gemma-31B |
+| **BUG-053** | **Phi retired from S4** | ✅ Resolved for S4 (GPT-OSS replaces). Phi retained for S5 verify + fast gates |
+| **T-007b** | **S2 positive-fidelity gap** | ✅ **Hybrid (DSPy gate + Trad extract) WINS: 0.736** vs DSPy 0.672 vs Trad 0.591 (D2251). Root cause: MIPROv2 2 demos design-only. Fix: demos 2→4 config + hybrid architecture |
+| **T-009-followup** | **Author cap Christian 4→3** | ✅ CONV-012 Christian→The Age of AI (Kissinger/Schmidt/Huttenlocher). Evidence 194/194 verbatim, golden_validate PASS |
+| **Audit** | **Golden pool + DSPy calibration** | ✅ Quality 0 gaps, 73/73 rationale, 194/194 evidence verbatim, metric weights sum 1.0. ⚠️ Depth class imbalance: universal=1, specialized=1 (4%) |
+
+---
+
 ## 🔴 OPEN — CRITICAL (next execution order)
 
 | # | Task | Priority | Effort | Notes |
 |---|------|----------|--------|-------|
-| **BUG-075** | **Cross-domain depth 0% across all models** | 🔴 P0 | 4h | Dominant class (26/50 = 52%). Root cause = long combined classify prompt. Fix: split depth into short focused call (proven 62.5%) + Reasoning:none + max_tokens≥1024 |
-| **D2249** | **S4 classifier swap Phi→GPT-OSS** | 🔴 P0 | 2h | Blocked by BUG-075. Flip VERIFY_MODEL + prompt changes in stage4_merge.py (classify call: max_tokens 512→1024, Reasoning:none prefix). Frees ~19GB RAM |
-| **BUG-053** | **Phi-4-mini hallucination on research** | 🔴 P0 | 1h | Resolution path: GPT-OSS replaces Phi for S4 depth (D2245); Phi retained only for S5 verify + fast gates |
+| **T-007b v2** | Re-optimize MIPROv2 with demos 2→4 — close DSPy gate FN gap (CONV-036/043/040) | 🟠 P1 | 1h | D2250 config `s2.dspy_max_labeled_demos: 4`; re-run + hybrid A/B to verify gate FN fixed |
+| **T1.1** | Full S1.3→S6 run — NEEDS RERUN (existing S2 checkpoint is old v2.3 schema, 0 overlap with current 12,964 clusters) | 🟠 P1 | ~100h runtime | Production job: `stage2_extract.py` resume-aware; schedule in batches |
 
 ---
 
@@ -35,7 +47,7 @@
 
 | # | Task | Priority | Source |
 |---|------|----------|--------|
-| T-007b | S2 positive-fidelity gap: DSPy 0.60 vs Traditional 0.845 on both-scored positives. Options: max_labeled_demos 2→4, mechanism-weighted metric, hybrid DSPy-gate + Traditional-extract | 🟠 P1 | D2248 |
+| T-007b | ✅ RESOLVED via hybrid (D2251) — see completed table | — | D2248 |
 | T1.1 | Run S1.3→S6 pipeline — first full run with bge-m3 512d | 🟠 P1 | MTR |
 | T1.2 | Yield crisis diagnostic — 14 FBs from 852 books = 0.004% | 🟠 P1 | MTR |
 | T1.3 | NLI calibration on real data (0.5/0.6/0.8 vs bge-m3) | 🟠 P1 | MTR |
@@ -89,12 +101,22 @@
 ## 📊 STATUS SUMMARY
 
 ```
-CRITICAL: ████░░░░░░ 3 OPEN (BUG-075, D2249, BUG-053)  ← S4 classifier chain
-HIGH:     ██████████ 16 items (T1.x + T-007b + audit)
+CRITICAL: ░░░░░░░░░░ 0 OPEN — S4 chain FIXED (BUG-075 87.5%, D2249 done, BUG-053 retired for S4)
+HIGH:     ██████████ T-007b v2 (gate FN) + T1.1 (full run ~100h) + T1.2-T1.9
 MEDIUM:   ██████████ 16 items (T2.x)
 LOW:      ███░░░░░░░ 5 items
 ────────────────────────────────────
-Session progress: P0 6/6 → 9/9 DONE tasks, 3 critical items identified with clear paths
+Session progress: D2250-D2251 — 6 tasks DONE (BUG-075, D2249, BUG-053, T-007b, T-009-fup, audit)
+```
+
+## 🔗 NEXT EXECUTION ORDER
+
+```
+1. T-007b v2  → Wait for MIPROv2 re-opt (demos 4) → hybrid A/B verify gate FN closed
+2. T1.1       → Full S1.3→S6 run (100h, schedule in batches — S2 resume-aware)
+3. T1.2       → Yield crisis diagnostic (14 FBs / 852 books = 0.004%)
+4. T1.3       → NLI calibration on real data
+5. T1.4       → faiss_threshold mismatch (0.75 vs 0.70)
 ```
 
 ## 🔗 NEXT EXECUTION ORDER

@@ -55,9 +55,12 @@ models:
     temperature: 0.0
     max_tokens: 1024
   verifier:
-    model: Phi-4-mini-instruct-8bit
+    model: gpt-oss-20b-MXFP4-Q8
     provider: omlx
     temperature: 0.0
+    reasoning_off_prefix: 'Reasoning: none'  # D2249/BUG-074: prepended to disable CoT token burn
+    reasoning_off_models: [gpt-oss-20b-MXFP4-Q8]  # D2249/C12: models needing prefix (no hardcoding)
+    max_tokens: 1024                         # D2249: 512 insufficient for GPT-OSS reasoning model
   verifier_v2:
     model: gemma-4-E4B-it-MLX-4bit
     provider: omlx
@@ -146,6 +149,16 @@ stage4:
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
   semantic_near_threshold: 0.8
+  # BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long).
+  # Long combined classify prompt degrades ALL models on cross-domain (0/3).
+  depth_focused_classification: true
+  depth_max_tokens: 512
+  depth_fallback_depth: domain
+s2:
+  # T-007b/D2250: DSPy MIPROv2 demo count — D2248 showed 2 demos = design-only
+  # (Cooper/Krug/Norman) while golden pool spans 38 domains. 4 demos → better coverage.
+  dspy_max_labeled_demos: 4
+  dspy_max_bootstrapped_demos: 4
 stage5:
   borp_bypass_types:
   - process_template

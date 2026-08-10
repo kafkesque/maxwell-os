@@ -97,6 +97,10 @@ GEN_MODEL=_env("gen_model",_CFG["models"]["generator"]["model"]); GEN_PROVIDER=_
 GEN_TEMPERATURE=_CFG["models"]["generator"]["temperature"]; GEN_MAX_TOKENS=_CFG["models"]["generator"]["max_tokens"]
 VERIFY_MODEL=_env("verify_model",_CFG["models"]["verifier"]["model"]); VERIFY_PROVIDER=_CFG["models"]["verifier"]["provider"]
 VERIFY_TEMPERATURE=_CFG["models"]["verifier"]["temperature"]
+# D2249/BUG-074: GPT-OSS reasoning models burn max_tokens on CoT. Config-driven prefix + token budget.
+VERIFY_REASONING_OFF_PREFIX=_CFG["models"]["verifier"].get("reasoning_off_prefix", "")
+VERIFY_REASONING_OFF_MODELS=set(_CFG["models"]["verifier"].get("reasoning_off_models", []))  # D2249/C12: no hardcoded names
+VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
 VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2069: cross-family (Gemma)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]
 
@@ -148,6 +152,10 @@ S4_PI_OUTPUT=_CFG["stage4"]["process_instance_output"]
 S4_GE_OUTPUT=_CFG["stage4"]["growth_edge_output"]
 S4_TI_OUTPUT=_CFG["stage4"]["tool_instruction_output"]
 S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
+# BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long combined).
+S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))
+S4_DEPTH_MAX_TOKENS=int(_CFG.get("stage4", {}).get("depth_max_tokens", 512))
+S4_DEPTH_FALLBACK_DEPTH=str(_CFG.get("stage4", {}).get("depth_fallback_depth", "domain"))
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])

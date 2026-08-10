@@ -99,15 +99,15 @@ def build_merged_prompt(fb_data: dict) -> str:
 
 def merged_cribs_classify(
     fb_data: dict,
-    model: str = "Phi-4-mini-instruct-8bit",
+    model: str = "gpt-oss-20b-MXFP4-Q8",
     max_tokens: int = 1024,
-    timeout: int = 60,
+    timeout: int = 120,
 ) -> dict:
     """Single-call CRIBS enrichment + classification (D2224).
 
     Args:
         fb_data: FB dict with name, definition, mechanism, boundary, consequence.
-        model: Model to use. Default Phi-4-mini-8bit (R5: Microsoft ≠ Qwen ≠ Gemma).
+        model: Model to use. Default GPT-OSS-20B (D2249 — R5: OpenAI ≠ Qwen ≠ Gemma).
         max_tokens: Max output tokens.
         timeout: Request timeout in seconds.
 
@@ -116,10 +116,18 @@ def merged_cribs_classify(
     """
     prompt = build_merged_prompt(fb_data)
 
+    # D2249/BUG-074: reasoning models (e.g. GPT-OSS) — prepend Reasoning:none
+    # so they don't burn max_tokens on chain-of-thought before producing JSON.
+    system = MERGED_CRIBS_CLASSIFY_SYSTEM
+    if model:
+        from pipeline.pipeline_paths import VERIFY_REASONING_OFF_MODELS, VERIFY_REASONING_OFF_PREFIX
+        if model in VERIFY_REASONING_OFF_MODELS and VERIFY_REASONING_OFF_PREFIX:
+            system = f"{VERIFY_REASONING_OFF_PREFIX}\n\n{system}"
+
     result = call_omlx_json(
         prompt=prompt,
         model=model,
-        system=MERGED_CRIBS_CLASSIFY_SYSTEM,
+        system=system,
         max_tokens=max_tokens,
         timeout=timeout,
     )
@@ -229,3 +237,82 @@ def _likely_universal(fb_data: dict) -> bool:
         "symmetry", "optimization", "gradient",
     ]
     return any(s in name or s in mechanism for s in universal_signals)
+
+
+# ── BUG-075: Focused S4 Depth Classification ────────────────────────────────
+# D2247 finding: LONG combined classify prompt degrades ALL models on depth
+# (GPT-OSS 62.5% short → 38% long; cross-domain 0/3 for every model).
+# Fix: split depth into its own SHORT focused prompt call (proven 62.5%).
+# Prompt structure mirrors tools/benchmark_s4_depth_gptoss.py DEPTH_PROMPT.
+
+DEPTH_FOCUSED_PROMPT = """Classify the DEPTH of this Foundation Block (a convergent principle from multiple books).
+
+ONTOLOGY:
+- specialized: Requires technical expertise in one narrow field. (e.g., optical kerning in typography)
+- domain: Applies broadly within one discipline only. (e.g., price anchoring in behavioral economics)
+- cross-domain: Same principle applies across multiple disciplines. (e.g., feedback loops in biology AND orgs)
+- universal: A law of nature or mathematics — applies everywhere. (e.g., entropy, power laws)
+
+FB:
+Name: {name}
+Definition: {definition}
+Mechanism: {mechanism}
+Type: {extraction_type}
+
+Answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning."""
+
+VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
+
+
+def classify_depth_focused(
+    fb_data: dict,
+    model: str = "gpt-oss-20b-MXFP4-Q8",
+    max_tokens: int = 512,
+    timeout: int = 120,
+) -> str:
+    """Classify ONLY the depth of an FB with a short focused prompt (BUG-075).
+
+    D2247: The long combined classify prompt degrades depth accuracy for all
+    models (GPT-OSS: 62.5% short → 38% long; cross-domain 0/3 for every model).
+    This separate call uses the PROVEN short prompt format from
+    tools/benchmark_s4_depth_gptoss.py (62.5% accuracy).
+
+    Args:
+        fb_data: FB dict with name, definition, mechanism, extraction_type.
+        model: Model to use. Default GPT-OSS-20B (D2249 classifier).
+        max_tokens: Max output tokens (512 is plenty — one word answer).
+        timeout: Request timeout in seconds.
+
+    Returns:
+        One of: "universal", "cross-domain", "domain", "specialized".
+        Falls back to "domain" on any error (conservative default, C20).
+    """
+    from pipeline.omlx_call import call_omlx
+
+    name = fb_data.get("name", "")
+    definition = fb_data.get("definition", "")
+    mechanism = fb_data.get("mechanism", "")
+    extraction_type = fb_data.get("extraction_type", "causal_mechanism")
+
+    prompt = DEPTH_FOCUSED_PROMPT.format(
+        name=name,
+        definition=definition,
+        mechanism=mechanism,
+        extraction_type=extraction_type,
+    )
+
+    try:
+        raw = call_omlx(
+            prompt=prompt,
+            model=model,
+            max_tokens=max_tokens,
+            timeout=timeout,
+        )
+        text = (raw or "").strip().lower()
+        # Parse the single-word answer (first depth word found)
+        for d in ("cross-domain", "universal", "specialized", "domain"):
+            if d in text:
+                return d
+        return "domain"
+    except Exception:
+        return "domain"

@@ -120,6 +120,7 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 | **Fix** | NEVER use Phi-4-mini for research tasks requiring factual data retrieval. Use ONLY for summarization when SOURCE TEXT IS PROVIDED. For research: do it yourself with shell/curl OR use Qwen3-Coder with explicit tool-use instructions. |
 | **Files** | AGENTS.md delegate_rules section |
 | **Status** | ✅ MITIGATED (2026-07-26) — AGENTS.md delegate_rules updated: Phi-4-mini restricted to summarization-only with source text. Research tasks → direct shell/curl. Delegate alternative: gemma-4-E4B-it-MLX-4bit confirmed working (0.48s, accurate). |
+| **D2250 update** | ✅ RESOLVED FOR S4 (2026-08-10) — Phi-4-mini RETIRED as S4 classifier (D2249/D2250: VERIFY_MODEL → gpt-oss-20b-MXFP4-Q8, 87.5% depth acc vs Phi 37.5%). Phi retained ONLY for S5 verify + fast gates (T2/T3 gate probes) where source text is provided and summarization is the task. S4 research/classification now GPT-OSS (OpenAI family, R5-compliant). |
 
 ---
 
@@ -1261,7 +1262,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
 **Fix:** OMLX-only serving. Never direct-load via mlx_lm while OMLX runs.
 **Status:** ✅ MITIGATED (D2243). Verified OMLX loads Gemma-31B safely with eviction.
 
-### BUG-074 — 2026-08-10 — GPT-OSS-20B Reasoning Mode Burns Tokens at max_tokens=512 (P1) ✅ MITIGATED
+### BUG-074 — 2026-08-10 — GPT-OSS-20B Reasoning Mode Burns Tokens at max_tokens=512 (P1) ✅ RESOLVED
 - **Symptom:** S4 classify calls with GPT-OSS-20B returned EMPTY content — all 512
   max_tokens consumed by `reasoning_content` (high-reasoning default mode).
 - **Root cause:** GPT-OSS is a reasoning model (OpenAI GPT-OSS series). Default
@@ -1271,10 +1272,15 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   classifies directly (25-40s/call vs 60-182s high-reasoning) and emits JSON in
   `content`. Also raise max_tokens 512 → ≥1024 for safety.
 - **Impact:** S4 classify now reliable with GPT-OSS. Also improves latency 4-6×.
-- **Status:** ✅ MITIGATED (D2247) — pipeline prompt change pending.
-- **Files:** `pipeline/stage4_merge.py` (CLASSIFY_SYSTEM_PROMPT + call sites)
+- **Status:** ✅ RESOLVED (D2249, 2026-08-10) — pipeline wired: `Reasoning: none` prefix
+  prepended config-driven (`models.verifier.reasoning_off_prefix` + `reasoning_off_models`),
+  max_tokens 512→1024 (`models.verifier.max_tokens`). Verified live: GPT-OSS returns
+  content JSON in all warm calls; hardened `omlx_call.py` to retry missing-content
+  (cold-reload race, C23).
+- **Files:** `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`,
+  `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`, `pipeline/omlx_call.py`
 
-### BUG-075 — 2026-08-10 — Cross-Domain Depth 0% Across All S4 Models (P1) 🔴 OPEN
+### BUG-075 — 2026-08-10 — Cross-Domain Depth 0% Across All S4 Models (P1) ✅ FIXED
 - **Symptom:** Phi-4-mini, Gemma-4-31B, AND GPT-OSS-20B all score 0% (0/3) on
   cross-domain depth classification (the dominant class: 26/50 FBs = 52%).
 - **Root cause:** Not model capability — prompt structure. The LONG combined
@@ -1286,7 +1292,12 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
 - **Fix candidates:** (1) Split depth into its own focused short-prompt call
   (proven 62.5%); (2) dedicated few-shot with structurally-matched anchors;
   (3) Reasoning:none prefix for reasoning models.
-- **Status:** 🔴 OPEN — D2247 identified; structural fix pending.
-- **Files:** `pipeline/stage4_merge.py`, `tools/benchmark_s4_depth_gptoss.py`
+- **Status:** ✅ FIXED (D2249, 2026-08-10) — ROOT CAUSE CONFIRMED: prompt structure, not
+  model. SHORT focused depth prompt (`classify_depth_focused` in stage4_merged_call.py)
+  scores **87.5% (7/8)** vs 38-62.5% long combined prompt; **cross-domain 0/3 → 3/3**.
+  Wired into stage4_merge.py Stage 3 (config-gated `stage4.depth_focused_classification`),
+  overrides long-prompt depth with focused-call depth (+1 fast call/FB).
+- **Files:** `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`,
+  `config/pipeline_config.yaml`, `governance/s4_depth_benchmark_focused_prompt.json`
 
 *Updated: 2026-08-10 (D2245-D2247 session) | Open: 14*

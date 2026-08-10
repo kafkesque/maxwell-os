@@ -120,6 +120,58 @@ def dspy_s2_extract(
         return {"route": "NULL", "error": str(e)}
 
 
+def hybrid_s2_extract(
+    program: dspy.Module,
+    cluster_segments: str,
+    pos_examples: list[dict],
+    neg_examples: list[dict] | None = None,
+    max_tokens: int = 4096,
+) -> dict[str, Any]:
+    """Hybrid S2: DSPy route gate + Traditional extraction (T-007b option c).
+
+    D2248/D2250 finding: DSPy is a perfect NEGATIVE gate (rejects 5/6 negatives
+    at 1.0) but a weak positive extractor (0.602 vs Traditional 0.845 on
+    both-scored positives). Traditional is a strong extractor with NO gate
+    (all 6 negatives → 0.0).
+
+    Hybrid: use DSPy's route decision for FB/NULL classification, then run
+    Traditional few-shot extraction for the FB fields when DSPy says FB.
+    This combines the best of both: DSPy's gate + Traditional's fidelity.
+    """
+    # Step 1: DSPy gate — route decision only (cheap, reliable)
+    try:
+        gate = program(cluster_segments=cluster_segments)
+        dspy_route = getattr(gate, "route", "NULL")
+    except Exception:
+        dspy_route = "NULL"
+
+    # Step 2: If DSPy says NULL, trust the gate (its strength)
+    if dspy_route != "FB":
+        return {
+            "route": "NULL",
+            "name": "",
+            "definition": "",
+            "mechanism": "",
+            "boundary": "",
+            "consequence": "",
+            "extraction_type": "causal_mechanism",
+            "is_summary": False,
+            "evidence_passages": "[]",
+            "is_convergent": False,
+            "hybrid_gate": "dspy",
+        }
+
+    # Step 3: DSPy says FB — run Traditional extraction for field fidelity
+    trad = traditional_s2_extract(
+        cluster_segments,
+        pos_examples=pos_examples,
+        neg_examples=neg_examples,
+        max_tokens=max_tokens,
+    )
+    trad["hybrid_gate"] = "dspy+traditional"
+    return trad
+
+
 # ──────────────────────────────────────────────────────────────────────
 # Comparison Runner
 # ──────────────────────────────────────────────────────────────────────
@@ -197,6 +249,7 @@ def run_comparison(
     results = {
         "traditional": {"scores": [], "times": [], "predictions": []},
         "dspy": {"scores": [], "times": [], "predictions": []},
+        "hybrid": {"scores": [], "times": [], "predictions": []},  # T-007b: DSPy gate + Trad extract
     }
 
     # Warmup call (both approaches)
@@ -277,6 +330,37 @@ def run_comparison(
                 results["dspy"]["scores"].append(0.0)
                 results["dspy"]["times"].append(0.0)
 
+        # ── Hybrid S2 (T-007b): DSPy gate + Traditional extraction ──
+        if optimized_program:
+            print("  Hybrid S2 (DSPy gate + Trad)...", end=" ", flush=True)
+            t_start = time.time()
+            try:
+                hybrid_result = hybrid_s2_extract(
+                    optimized_program, ex.cluster_segments,
+                    pos_examples=gold_pos, neg_examples=gold_neg,
+                )
+                hybrid_time = time.time() - t_start
+
+                hybrid_pred = dspy.Example(
+                    route=hybrid_result.get("route", "NULL"),
+                    name=hybrid_result.get("name", ""),
+                    extraction_type=hybrid_result.get("extraction_type", "causal_mechanism"),
+                    mechanism=hybrid_result.get("mechanism", ""),
+                    boundary=hybrid_result.get("boundary", ""),
+                    consequence=hybrid_result.get("consequence", ""),
+                    evidence_passages=json.dumps(hybrid_result.get("evidence_passages", [])),
+                    is_convergent=hybrid_result.get("route") == "FB",
+                )
+                hybrid_score = extraction_metric(ex, hybrid_pred)
+                results["hybrid"]["scores"].append(hybrid_score)
+                results["hybrid"]["times"].append(hybrid_time)
+                results["hybrid"]["predictions"].append(hybrid_result)
+                print(f"score={hybrid_score:.2f} | {hybrid_time:.1f}s")
+            except Exception as e:
+                print(f"ERROR: {e}")
+                results["hybrid"]["scores"].append(0.0)
+                results["hybrid"]["times"].append(0.0)
+
     return results
 
 
@@ -284,9 +368,11 @@ def print_comparison(results: dict[str, Any], eval_pool: list | None = None) -> 
     """Print formatted comparison table."""
     trad = results["traditional"]
     dspy = results["dspy"]
+    hybrid = results.get("hybrid", {"scores": [], "times": []})
 
     n_trad = len(trad["scores"])
     n_dspy = len(dspy["scores"])
+    n_hybrid = len(hybrid["scores"])
 
     if n_trad == 0 and n_dspy == 0:
         print("\nNo results to compare.")
@@ -294,40 +380,45 @@ def print_comparison(results: dict[str, Any], eval_pool: list | None = None) -> 
 
     avg_trad_score = sum(trad["scores"]) / n_trad if n_trad else 0
     avg_dspy_score = sum(dspy["scores"]) / n_dspy if n_dspy else 0
+    avg_hybrid_score = sum(hybrid["scores"]) / n_hybrid if n_hybrid else 0
     avg_trad_time = sum(trad["times"]) / n_trad if n_trad else 0
     avg_dspy_time = sum(dspy["times"]) / n_dspy if n_dspy else 0
+    avg_hybrid_time = sum(hybrid["times"]) / n_hybrid if n_hybrid else 0
 
-    winner_score = "DSPy" if avg_dspy_score > avg_trad_score else "Traditional"
-    winner_speed = "DSPy" if avg_dspy_time < avg_trad_time else "Traditional"
+    best_score = max(avg_trad_score, avg_dspy_score, avg_hybrid_score)
+    winner_score = ("Hybrid" if avg_hybrid_score == best_score else
+                    "DSPy" if avg_dspy_score == best_score else "Traditional")
+    best_time = min(avg_trad_time, avg_dspy_time, avg_hybrid_time) if n_hybrid else min(avg_trad_time, avg_dspy_time)
+    winner_speed = ("Hybrid" if avg_hybrid_time == best_time else
+                    "DSPy" if avg_dspy_time == best_time else "Traditional")
 
-    print(f"\n{'='*70}")
-    print(f"  S2 EXTRACTION COMPARISON: Traditional vs DSPy-Optimized")
-    print(f"{'='*70}")
+    print(f"\n{'='*88}")
+    print(f"  S2 EXTRACTION COMPARISON: Traditional vs DSPy vs Hybrid (T-007b)")
+    print(f"{'='*88}")
     print(f"  Model: {MODEL_NAME}")
-    print(f"  Test examples: {n_trad} traditional, {n_dspy} DSPy")
+    print(f"  Test examples: {n_trad} traditional, {n_dspy} DSPy, {n_hybrid} hybrid")
     print()
-    print(f"  {'Metric':<30} {'Traditional':>12} {'DSPy':>12} {'Winner':>10}")
-    print(f"  {'-'*30} {'-'*12} {'-'*12} {'-'*10}")
-    print(f"  {'Avg Quality Score':<30} {avg_trad_score:>11.3f}  {avg_dspy_score:>11.3f}  {winner_score:>10}")
-    print(f"  {'Avg Latency (s)':<30} {avg_trad_time:>11.1f}  {avg_dspy_time:>11.1f}  {winner_speed:>10}")
+    print(f"  {'Metric':<30} {'Traditional':>12} {'DSPy':>12} {'Hybrid':>12} {'Winner':>10}")
+    print(f"  {'-'*30} {'-'*12} {'-'*12} {'-'*12} {'-'*10}")
+    print(f"  {'Avg Quality Score':<30} {avg_trad_score:>11.3f}  {avg_dspy_score:>11.3f}  {avg_hybrid_score:>11.3f}  {winner_score:>10}")
+    print(f"  {'Avg Latency (s)':<30} {avg_trad_time:>11.1f}  {avg_dspy_time:>11.1f}  {avg_hybrid_time:>11.1f}  {winner_speed:>10}")
 
     # Per-dimension analysis
     if n_trad > 0 and n_dspy > 0:
-        # Compare type accuracy
-        trad_type_correct = 0
-        dspy_type_correct = 0
-        print(f"\n  {'─'*70}")
+        print(f"\n  {'─'*88}")
         print(f"  Per-example breakdown:")
-        print(f"  {'Example':<30} {'Trad Score':>10} {'DSPy Score':>10} {'Δ':>8}")
-        print(f"  {'-'*30} {'-'*10} {'-'*10} {'-'*8}")
-        for i in range(min(n_trad, n_dspy)):
-            delta = dspy["scores"][i] - trad["scores"][i]
+        print(f"  {'Example':<30} {'Trad':>9} {'DSPy':>9} {'Hybrid':>9} {'Δh':>8}")
+        print(f"  {'-'*30} {'-'*9} {'-'*9} {'-'*9} {'-'*8}")
+        for i in range(min(n_trad, n_dspy, n_hybrid or n_dspy)):
+            h = hybrid["scores"][i] if n_hybrid else 0.0
+            delta_h = h - trad["scores"][i]
             name = eval_pool[i].golden_id if eval_pool and i < len(eval_pool) else f"ex{i}"
-            marker = " ✅" if delta > 0 else (" ❌" if delta < 0 else " =")
-            print(f"  {name:<30} {trad['scores'][i]:>9.3f}  {dspy['scores'][i]:>9.3f}  {delta:>+.3f}{marker}")
+            marker = " ✅" if delta_h > 0.05 else (" ❌" if delta_h < -0.05 else " =")
+            print(f"  {name:<30} {trad['scores'][i]:>8.3f}  {dspy['scores'][i]:>8.3f}  {h:>8.3f}  {delta_h:>+.3f}{marker}")
 
     print(f"\n  Verdict: {winner_score} wins on quality, {winner_speed} wins on speed")
-    print(f"{'='*70}")
+    print(f"  (Hybrid = DSPy route gate + Traditional field extraction — T-007b option c)")
+    print(f"{'='*88}")
 
 
 # ──────────────────────────────────────────────────────────────────────

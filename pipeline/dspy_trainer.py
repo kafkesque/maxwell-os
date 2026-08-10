@@ -48,6 +48,11 @@ _gen = _cfg.get("models", {}).get("generator", {})
 DSPY_MODEL = _gen.get("model", "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit") if isinstance(_gen, dict) else str(_gen)
 DSPY_TEMPERATURE = float(_gen.get("temperature", 0.0)) if isinstance(_gen, dict) else 0.0
 DSPY_MAX_TOKENS = 4096  # Override config's 1024: ConvergentExtraction needs 4K for 11 output fields
+# T-007b/D2250: MIPROv2 demo counts — config-driven (C12). D2248 showed 2 demos =
+# design-only (Cooper/Krug/Norman) while the golden pool spans 38 domains; 4 demos
+# give the optimizer enough labeled coverage for positive-fidelity extraction.
+DSPY_MAX_LABELED_DEMOS = int(_cfg.get("s2", {}).get("dspy_max_labeled_demos", 4))
+DSPY_MAX_BOOTSTRAPPED_DEMOS = int(_cfg.get("s2", {}).get("dspy_max_bootstrapped_demos", 4))
 OMLX_PORT = int(_cfg.get("omlx", {}).get("port", 11435))
 RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 
@@ -530,8 +535,9 @@ def run_dspy_pilot(
         program,
         trainset=train_examples,
         valset=dev_examples,
-        max_bootstrapped_demos=2,
-        max_labeled_demos=2,
+        max_bootstrapped_demos=DSPY_MAX_BOOTSTRAPPED_DEMOS,  # T-007b/D2250: 2→4 (config-driven)
+        max_labeled_demos=DSPY_MAX_LABELED_DEMOS,  # T-007b: D2248 showed 2 demos = design-only;
+                                    # golden pool spans 38 domains — more demos → better coverage
         requires_permission_to_run=False,
     )
 

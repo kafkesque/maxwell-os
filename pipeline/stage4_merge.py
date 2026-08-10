@@ -40,6 +40,9 @@ from pipeline.pipeline_paths import (
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
     S4_DEDUP_COSINE_THRESHOLD,   # D2231: C12 compliance
+    S4_DEPTH_FALLBACK_DEPTH,     # BUG-075: conservative default when depth call fails
+    S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
+    S4_DEPTH_MAX_TOKENS,         # BUG-075: depth-only call token budget
     S4_GE_OUTPUT,
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
@@ -48,7 +51,10 @@ from pipeline.pipeline_paths import (
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
     STAGE4_CHECKPOINT,
+    VERIFY_MAX_TOKENS,           # D2249: GPT-OSS needs ≥1024 (BUG-074)
     VERIFY_MODEL,  # P0.10: imported for R5-compliant SALSA classification
+    VERIFY_REASONING_OFF_MODELS,  # D2249: models needing Reasoning:none prefix
+    VERIFY_REASONING_OFF_PREFIX,  # D2249: GPT-OSS CoT suppression
 )
 from pipeline.schemas import (
     CANONICAL_DISCIPLINES,
@@ -60,7 +66,8 @@ from pipeline.schemas import (
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
-from pipeline.stage4_merged_call import merged_cribs_classify
+# BUG-075: classify_depth_focused — split depth into SHORT prompt (D2247)
+from pipeline.stage4_merged_call import classify_depth_focused, merged_cribs_classify
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
@@ -950,11 +957,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                 mechanism = fb_data.get("mechanism", "")
                 boundary = fb_data.get("boundary", "")
                 class_prompt = build_classify_prompt(name, definition, mechanism, boundary)
+                # D2249/BUG-074: reasoning models (e.g. GPT-OSS) need Reasoning:none
+                # prefix (otherwise they burn max_tokens on CoT → empty content)
+                _classify_system = CLASSIFY_SYSTEM_PROMPT
+                if (VERIFY_REASONING_OFF_PREFIX
+                        and VERIFY_MODEL in VERIFY_REASONING_OFF_MODELS):
+                    _classify_system = f"{VERIFY_REASONING_OFF_PREFIX}\n\n{_classify_system}"
                 class_data = call_omlx_json(
                     prompt=class_prompt,
                     model=VERIFY_MODEL,
-                    system=CLASSIFY_SYSTEM_PROMPT,
-                    max_tokens=512,
+                    system=_classify_system,
+                    max_tokens=VERIFY_MAX_TOKENS,
                 )
             except Exception as e:
                 import traceback
@@ -1009,11 +1022,23 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # one field (domain), or is a narrow sub-technique (specialized).
         raw_depth = class_data.get("depth", "")
         VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
-        if raw_depth in VALID_DEPTHS:
+        # ── BUG-075: Focused depth call (D2247) ──
+        # The LONG combined classify prompt degrades depth accuracy for ALL models
+        # (GPT-OSS: 62.5% short → 38% long; cross-domain 0/3 everywhere).
+        # When enabled (default), run a SEPARATE short focused depth prompt and
+        # OVERRIDE the depth from the long classify call. Cost: +1 fast call/FB.
+        if S4_DEPTH_FOCUSED_CLASSIFICATION:
+            depth_val = classify_depth_focused(
+                fb_data,
+                model=VERIFY_MODEL,
+                max_tokens=S4_DEPTH_MAX_TOKENS,
+            )
+            print(f"(depth:{depth_val})", flush=True, end=" ")
+        elif raw_depth in VALID_DEPTHS:
             depth_val = raw_depth
         else:
             # Fallback: conservative default. If LLM hallucinates depth, assume domain.
-            depth_val = "domain"
+            depth_val = S4_DEPTH_FALLBACK_DEPTH
 
         # ── Assemble class_data with CANONICAL labels + semantic depth ──
         class_data["discipline"] = canonical_discipline

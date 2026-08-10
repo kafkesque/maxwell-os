@@ -128,3 +128,48 @@ Tested 15 convergent FBs through full S4→S5 pipeline:
 - Candidates: gemma-2-9b-it-4bit (untested), Qwen2.5-7B-Instruct-4bit (untested), Mistral-Nemo-12B-4bit (untested)
 - Only proven model: Qwen3-Coder-30B (understands FB synthesis but breaks R5 cross-family)
 - Recommendation: use Q3C as verifier OR lower Gemma threshold to 0.3
+
+---
+
+## DSPy S2 OPTIMIZER VALIDATION (T-007/D2248/D2250)
+
+When evaluating the DSPy-optimized S2 extractor (`/tmp/dspy_mipro_optimized.json`),
+additionally assess:
+
+### A. Demo Diversity (T-007b)
+- MIPROv2 selects few-shot demos from the golden pool. D2248 found the 2-demo
+  program selected DESIGN-ONLY books (Cooper/Krug/Norman) while the golden pool
+  spans 38 domains → positive-fidelity losses on non-design examples.
+- **Validation check:** list the source books of the selected demos. If any domain
+  cluster (>25% of golden pool) is unrepresented, flag for T-007b (demos 2→4).
+
+### B. Calibration (D2250 audit)
+- Metric weights: convergence 0.30, type 0.20, name 0.12, mechanism 0.13,
+  evidence 0.10, boundary 0.05, consequence 0.05, route 0.05 = 1.00.
+- False positives capped at 0.20; false negatives partial credit 0.10.
+- **Validation check:** verify perfect positive = 1.0, perfect negative = 1.0,
+  FP ≤ 0.20 (run `extraction_metric` unit checks).
+
+### C. Leakage & Contamination (A-002/A-004)
+- Test set: 20 examples (train_frac 0.60), author-disjoint few-shot selection
+  (`_author_disjoint_fewshot`). Golden pool: 73 entries, 194 evidence passages,
+  **100% verbatim** in cluster segments (T-003 audit).
+- **Validation check:** no test-example author appears in its few-shot pool
+  (verify `_example_authors` disjointness).
+
+### D. Golden Pool Requirements (user audit, D2250)
+- **Quality:** 0 field gaps (name/definition/mechanism/boundary/consequence ≥ min len)
+- **Accuracy:** 73/73 rationale present; 194/194 evidence verbatim
+- **Author cap:** ≤3 per author by FB-mention (T-009 + D2250: Christian 4→3 fix)
+- **Future/agentic-proof:** depth classes universal=1, specialized=1 — UNDER-REPRESENTED
+  (4% of positives). Flag: DSPy cannot learn these classes; benchmark confidence
+  on them is low. Expansion tracked as T-015.
+- **Ontological accuracy:** depth distribution domain=26, cross-domain=26 (96% of
+  positives). Cross-domain is the dominant real-world class — correctly captured.
+
+### E. S4 Depth Classifier (D2245/D2250)
+- GPT-OSS-20B-MXFP4-Q8 with SHORT focused prompt: **87.5% (7/8)**, cross-domain 3/3
+  (was 0/3 for all models with long prompt). Benchmark:
+  `governance/s4_depth_benchmark_focused_prompt.json`
+- **Validation check:** depth accuracy ≥ 80% on the 8-FB stratified benchmark;
+  cross-domain ≥ 2/3. Regression → re-check prompt structure (BUG-075).

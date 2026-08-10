@@ -1,9 +1,9 @@
 {
   "stats": {
-    "total_passages": 95,
-    "verbatim": 95,
+    "total_passages": 137,
+    "verbatim": 136,
     "fuzzy": 0,
-    "missing": 0
+    "missing": 1
   },
   "results": [
     {
@@ -862,6 +862,630 @@
       }
     },
     {
+      "example_id": "NEG-006",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "repeated retrieval strengthens memory for facts and concepts",
+      "passage_sha": "017b7228f334cc5a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Make It Stick — Brown, Roediger & McDaniel",
+        "char_start": 0,
+        "char_end": 60,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "NEG-006",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "spacing and testing effects are among the most robust findings in cognitive psychology",
+      "passage_sha": "0df97a0a6f85f142",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Make It Stick — Brown, Roediger & McDaniel",
+        "char_start": 236,
+        "char_end": 322,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "NEG-006",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "reviewing the material at expanding intervals commits it to long-term memory",
+      "passage_sha": "e5cf9f5749866f18",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Moonwalking with Einstein — Joshua Foer",
+        "char_start": 91,
+        "char_end": 167,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "NEG-006",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "memory athletes memorize decks of cards and long strings of digits using spaced retrieval",
+      "passage_sha": "9dca9151512debfe",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Moonwalking with Einstein — Joshua Foer",
+        "char_start": 0,
+        "char_end": 89,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "CONV-022",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Mastering Bezier curves means understanding how the position of each control point affects the resulting curve — control",
+      "passage_sha": "6c5970c015d91eb1",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "SVG Essentials — J. David Eisenberg",
+        "char_start": 223,
+        "char_end": 450,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-022",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Bezier curves are defined by control points: two endpoints that the curve passes through, and intermediate anchor points",
+      "passage_sha": "9a2854bbe887f617",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes",
+        "char_start": 0,
+        "char_end": 175,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-022",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The curve is computed as a weighted blend of these control points using Bernstein polynomials.",
+      "passage_sha": "340550f70f804b12",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes",
+        "char_start": 176,
+        "char_end": 270,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-022",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Moving an anchor point changes the curve's shape in a predictable way — pulling it further from the line between endpoin",
+      "passage_sha": "76bde6dd50e8005a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Computer Graphics: Principles and Practice — Foley, van Dam, Feiner & Hughes",
+        "char_start": 271,
+        "char_end": 426,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "NEG-009",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Product management operates at three distinct levels: strategic (vision and direction), operational (roadmap and priorit",
+      "passage_sha": "13de26e10998c9d7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Escaping the Build Trap — Melissa Perri",
+        "char_start": 0,
+        "char_end": 168,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "NEG-009",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "each level requires fundamentally different skills, time horizons, and decision-making frameworks",
+      "passage_sha": "b214c0efae551603",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Escaping the Build Trap — Melissa Perri",
+        "char_start": 382,
+        "char_end": 479,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "NEG-009",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "at 30,000 feet they define vision and strategy; at 10,000 feet they connect strategy to roadmap; at ground level they en",
+      "passage_sha": "4ed72901e020eb6d",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Product Leadership — Banfield, Eriksson & Walkingshaw",
+        "char_start": 57,
+        "char_end": 199,
+        "match_mode": "case-insensitive"
+      }
+    },
+    {
+      "example_id": "NEG-009",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "great product leaders can seamlessly shift between these altitudes depending on the conversation and context",
+      "passage_sha": "abaa4a4c36f2e8f0",
+      "status": "missing",
+      "match": null
+    },
+    {
+      "example_id": "CONV-023",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Heat disperses, order dissolves into chaos, and the universe moves from a state of low entropy at the Big Bang toward ev",
+      "passage_sha": "3c643d7f06efb160",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Seven Brief Lessons on Physics — Carlo Rovelli",
+        "char_start": 70,
+        "char_end": 208,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-023",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The second law of thermodynamics states that in any isolated system, entropy — a measure of disorder — always increases ",
+      "passage_sha": "c6c5437320f814ce",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "A Brief History of Time — Stephen Hawking",
+        "char_start": 0,
+        "char_end": 130,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-023",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "This is why heat flows from hot to cold, why eggs don't unscramble, and why we remember the past but not the future.",
+      "passage_sha": "57b58c3314f6f73a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "A Brief History of Time — Stephen Hawking",
+        "char_start": 131,
+        "char_end": 247,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-023",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Entropy growth is the only fundamental law of physics that distinguishes past from future.",
+      "passage_sha": "25aa7a35eb8a5787",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Order of Time — Carlo Rovelli",
+        "char_start": 0,
+        "char_end": 90,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-024",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The key insight is that selection is non-random — it is the differential survival of variants — but the variation it act",
+      "passage_sha": "a45cbba5412858c4",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Blind Watchmaker — Richard Dawkins",
+        "char_start": 172,
+        "char_end": 350,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-024",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "If organisms vary in traits, if those variations are heritable, and if some variants survive and reproduce more than oth",
+      "passage_sha": "86d949c8dfbb5648",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Selfish Gene — Richard Dawkins",
+        "char_start": 110,
+        "char_end": 290,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-024",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The Red Queen effect — \"it takes all the running you can do to stay in the same place\" — explains why sex, genetic diver",
+      "passage_sha": "c4dec5bb78520627",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Red Queen — Matt Ridley",
+        "char_start": 157,
+        "char_end": 338,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-025",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The survivors — those with random mutations that happen to confer resistance — multiply to fill the void.",
+      "passage_sha": "05ccd4c53942e681",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Body — Bill Bryson",
+        "char_start": 149,
+        "char_end": 254,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-025",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The cancer evolves in real time within the patient's body, and we chase it with successive lines of treatment — each one",
+      "passage_sha": "63fee790ba574fcd",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "When Breath Becomes Air — Paul Kalanithi",
+        "char_start": 185,
+        "char_end": 362,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-025",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Cancer cells develop resistance to chemotherapy through the same evolutionary mechanism that drives antibiotic resistanc",
+      "passage_sha": "3f4a2a22420ca35e",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Emperor of All Maladies — Siddhartha Mukherjee",
+        "char_start": 0,
+        "char_end": 134,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-025",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "When chemotherapy kills 99.9% of them, the surviving 0.1% — those with mutations conferring resistance — repopulate the ",
+      "passage_sha": "684bbf6da31aad07",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Emperor of All Maladies — Siddhartha Mukherjee",
+        "char_start": 191,
+        "char_end": 317,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "But cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony —",
+      "passage_sha": "09be92e9b3194797",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Rule of Law — Tom Bingham",
+        "char_start": 67,
+        "char_end": 231,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "In fact, the complexity of their decisions makes them MORE susceptible to heuristic substitution because the correct ans",
+      "passage_sha": "4dc7be101a8c48ef",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
+        "char_start": 112,
+        "char_end": 334,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Asked \"should this defendant be granted bail?\" a judge may substitute \"do I feel this defendant is dangerous?\" — a heuri",
+      "passage_sha": "95923878c60be475",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 94,
+        "char_end": 259,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-026",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Decision-makers in high-stakes environments — judges, doctors, regulators — are not immune to cognitive biases.",
+      "passage_sha": "a5c36cd35de05e15",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Nudge — Richard Thaler & Cass Sunstein",
+        "char_start": 0,
+        "char_end": 111,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-027",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "When you add people, the existing team must spend time bringing newcomers up to speed, and the communication channels gr",
+      "passage_sha": "1d2b195d66c28446",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Mythical Man-Month — Frederick Brooks",
+        "char_start": 148,
+        "char_end": 330,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-027",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "This is why dependency inversion matters — it decouples high-level policy from low-level detail, allowing you to defer i",
+      "passage_sha": "35737aabc5297b54",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Clean Architecture — Robert C. Martin",
+        "char_start": 160,
+        "char_end": 336,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-027",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Conway's Law states that organizations design systems that mirror their communication structure.",
+      "passage_sha": "415f05f38a29c2a1",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Pragmatic Programmer — Hunt & Thomas",
+        "char_start": 0,
+        "char_end": 96,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-027",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "This means you cannot design a system's architecture independently of how the team communicates.",
+      "passage_sha": "e7f0ff0ee7644fb2",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Pragmatic Programmer — Hunt & Thomas",
+        "char_start": 251,
+        "char_end": 347,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-028",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Two variables can be perfectly correlated without either causing the other if both are effects of a common cause.",
+      "passage_sha": "3efa41e34aa5c563",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Book of Why — Judea Pearl",
+        "char_start": 111,
+        "char_end": 224,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-028",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "This ignores three alternatives: B causes A, a third factor C causes both A and B, or the correlation is purely coincide",
+      "passage_sha": "06cea8f8db31ac21",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Calling Bullshit — Bergstrom & West",
+        "char_start": 127,
+        "char_end": 252,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-028",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Regression analysis can show that two variables are related but cannot — by itself — prove that one causes the other.",
+      "passage_sha": "23fd7a4a6ac3fc6f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Naked Statistics — Charles Wheelan",
+        "char_start": 0,
+        "char_end": 117,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-028",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "To establish causality, you need: (1) temporal precedence (cause before effect), (2) covariation (cause and effect vary ",
+      "passage_sha": "394c43944721d23f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Naked Statistics — Charles Wheelan",
+        "char_start": 172,
+        "char_end": 351,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-029",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The optimal stopping problem — when to stop searching and commit — has a mathematically optimal solution: look at the fi",
+      "passage_sha": "8626161dac988fce",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Christian & Griffiths",
+        "char_start": 0,
+        "char_end": 221,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-029",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "While real-world decisions rarely match the mathematical assumptions, the principle generalizes: explore enough to estab",
+      "passage_sha": "b24bcc74b558f221",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Christian & Griffiths",
+        "char_start": 297,
+        "char_end": 482,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-029",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Without pre-committed criteria, decision-makers fall prey to confirmation bias — they adjust their criteria to justify w",
+      "passage_sha": "ac54928432b7b44b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Decisive — Chip & Dan Heath",
+        "char_start": 80,
+        "char_end": 240,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-029",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Satisficers — those who choose the first option meeting their criteria — are happier than maximizers — those who exhaust",
+      "passage_sha": "f7d33386a674d3ee",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Paradox of Choice — Barry Schwartz",
+        "char_start": 133,
+        "char_end": 288,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-030",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The result is a power-law degree distribution where the rich get richer.",
+      "passage_sha": "e5890cae3aeaaf37",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 322,
+        "char_end": 394,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-030",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "This structure emerges from two mechanisms: growth (new nodes continuously join the network) and preferential attachment",
+      "passage_sha": "489ef0fd669d7c9a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 133,
+        "char_end": 321,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-030",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "In scale-free networks, a few hubs connect to a disproportionately large number of nodes while most nodes have very few ",
+      "passage_sha": "01ed75d082532df4",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Linked — Albert-László Barabási",
+        "char_start": 0,
+        "char_end": 132,
+        "match_mode": "raw"
+      }
+    },
+    {
       "example_id": "CONV-031",
       "fb_index": 0,
       "passage_index": 0,
@@ -1358,8 +1982,8 @@
     },
     {
       "example_id": "CONV-039",
-      "fb_index": 0,
-      "passage_index": 2,
+      "fb_index": 1,
+      "passage_index": 0,
       "passage_preview": "The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks",
       "passage_sha": "19aa748779eee011",
       "status": "verbatim",
@@ -1373,8 +1997,8 @@
     },
     {
       "example_id": "CONV-039",
-      "fb_index": 0,
-      "passage_index": 3,
+      "fb_index": 1,
+      "passage_index": 1,
       "passage_preview": "The inside view (focusing on the specific case) consistently beats the outside view (looking at base rates of similar ca",
       "passage_sha": "08616f8033603989",
       "status": "verbatim",

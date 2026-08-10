@@ -631,12 +631,15 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
             parts.append(label)
             parts.append("```json")
             # Build a clean JSON showing only the output fields
+            # D2233: extraction_type + depth injected for S2 DSPy training signal
             output = {
                 "name": fb_item.get("name", ""),
                 "definition": fb_item.get("definition", ""),
                 "mechanism": fb_item.get("mechanism", ""),
                 "boundary": fb_item.get("boundary", ""),
                 "consequence": fb_item.get("consequence", ""),
+                "extraction_type": fb_item.get("extraction_type", "causal_mechanism"),
+                "depth": fb_item.get("depth", "domain"),
                 "is_summary": fb_item.get("is_summary", False),
                 "evidence_passages": fb_item.get("evidence_passages", [])[:2],
                 "route": fb_item.get("route", "FB"),

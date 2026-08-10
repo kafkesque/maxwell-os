@@ -99,6 +99,20 @@ def validate(path: str) -> int:
         if not should_extract and "FB" in routes:
             failures.append(f"ROUTE_MISMATCH: {eid} should_extract=false but route=FB")
 
+    # 3b. Evidence passage existence (D2233: every positive must have evidence)
+    for ex in examples:
+        eid = ex.get("id", "?")
+        if not ex.get("should_extract", False):
+            continue
+        ef = ex.get("expected_fb", {})
+        fbs: list[dict] = ef if isinstance(ef, list) else [ef]
+        for fb in fbs:
+            if not isinstance(fb, dict):
+                continue
+            eps = fb.get("evidence_passages")
+            if not eps or len(eps) == 0:
+                failures.append(f"MISSING_EVIDENCE: {eid} [{fb.get('name','?')}] has no evidence_passages")
+
     # 4. Verbatim evidence (case-insensitive)
     for ex in examples:
         eid = ex.get("id", "?")

@@ -2,8 +2,8 @@ meta:
   version: '4.2'
   architecture: cluster-before-extract
   total_examples: 60
-  convergent_positives: 35
-  hard_negatives: 23
+  convergent_positives: 36
+  hard_negatives: 21
   expected_coverage:
   - convergent_multi_source_synthesis
   - single_source_rejection
@@ -744,7 +744,7 @@ examples:
     - default option is the one that will be chosen if the decision-maker does nothing
     extraction_type: causal_mechanism
     content_type: principle
-    depth: cross-domain
+    depth: domain
   rationale: 'CONVERGENT POSITIVE — DEFAULT EFFECT (D2226 fix: was broken 1:N structure, now single complete FB). Two independent
     sources (Kahneman + Thaler) converge on the same mechanism: defaults stick because opting out requires costly System 2
     deliberation, and the default becomes the loss-reference point. Kahneman provides the cognitive mechanism (System 2 opt-out
@@ -873,7 +873,7 @@ examples:
       perceptions
     extraction_type: causal_mechanism
     content_type: principle
-    depth: cross-domain
+    depth: domain
   rationale: 'STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5
 
     bge-m3 run (3 books, cohesion=0.865). Three independent sources (Dixit/Nalebuff,
@@ -1072,7 +1072,7 @@ examples:
     - specifying the objective precisely is impossible for complex real-world values
     - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
     - intelligence and final goals are orthogonal
-    depth: cross-domain
+    depth: domain
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Three AI references (Bostrom, Russell, and Christian) converge on objective
@@ -1959,7 +1959,7 @@ examples:
     - Once a product enters the consumer's reference bundle, the consumer will pay more to keep it
     extraction_type: causal_mechanism
     content_type: principle
-    depth: cross-domain
+    depth: domain
   rationale: Three genuinely independent sources converge on the endowment effect from complementary angles — Kahneman providing
     the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Akerlof
     & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss
@@ -2143,33 +2143,34 @@ examples:
 
       '
   is_convergent: true
-  should_extract: false
+  should_extract: true
   expected_fb:
     is_summary: false
-    route: 'NULL'
-    name: Spaced Retrieval Universality (boundary violation)
-    definition: ''
-    mechanism: ''
-    consequence: ''
-    boundary: ''
-    evidence_passages: []
-    extraction_type: causal_mechanism
+    route: FB
+    name: Spaced Retrieval Effect — Declarative Memory Strengthening
+    definition: Repeated retrieval of facts and concepts at spaced intervals substantially strengthens declarative memory
+      compared to massed study or re-reading. The spacing effect is among the most robust findings in cognitive psychology.
+    mechanism: Retrieving a memory at expanding intervals requires active reconstruction, which strengthens the neural pathways
+      and increases resistance to forgetting. Each successful retrieval effort makes the next retrieval easier, creating a
+      compounding effect on retention. The difficulty of delayed recall — when it is successful — produces stronger encoding
+      than immediate, effortless recall.
+    boundary: 'Applies to declarative knowledge: facts, concepts, names, lists — content that can be explicitly rehearsed
+      and retrieved. Fails for: (1) procedural/motor skills that require physical practice, not retrieval; (2) emotional learning
+      that is not consciously accessible; (3) skills requiring automaticity rather than declarative recall.'
+    consequence: Students who use spaced retrieval for studying outperform those who re-read or cram by 20-40% on delayed
+      tests. Memory athletes reliably memorize decks of cards and digit strings using spaced retrieval schedules.
+    extraction_type: empirical_pattern
     content_type: principle
-  rationale: 'HARD NEGATIVE — BOUNDARY VIOLATION. The two sources genuinely converge on a
-
-    scoped claim: spaced retrieval improves DECLARATIVE memory (facts, concepts,
-
-    lists). A candidate FB claiming ''spaced repetition improves all learning'' over-generalizes:
-
-    neither source studies procedural/motor skills or emotional learning. The correct
-
-    extraction keeps the boundary (declarative knowledge); the over-broad FB must be
-
-    rejected. is_convergent: true but should_extract: false because the presented
-
-    principle exceeds the evidence.
-
-    '
+    depth: domain
+    evidence_passages:
+    - repeated retrieval strengthens memory for facts and concepts
+    - spacing and testing effects are among the most robust findings in cognitive psychology
+    - reviewing the material at expanding intervals commits it to long-term memory
+    - memory athletes memorize decks of cards and long strings of digits using spaced retrieval
+  rationale: 'BOUNDED POSITIVE — converted from NEG-006 (D2233). Make It Stick and Moonwalking with Einstein converge on a
+    well-scoped claim: spaced retrieval improves declarative memory for facts, concepts, and lists. The FB explicitly bounds
+    to declarative knowledge, teaching S2 to extract WITH boundary rather than reject a legitimate convergence because a candidate
+    over-generalized.'
 - id: CONV-022
   domain: computer graphics
   discipline: computational geometry
@@ -2225,6 +2226,14 @@ examples:
     extraction_type: descriptive_model
     content_type: principle
     depth: domain
+    evidence_passages:
+    - Mastering Bezier curves means understanding how the position of each control point affects the resulting curve — control
+      points closer to the endpoint create sharper turns, while control points further away create gentler arcs.
+    - 'Bezier curves are defined by control points: two endpoints that the curve passes through, and intermediate anchor points
+      that pull the curve toward them without being touched.'
+    - The curve is computed as a weighted blend of these control points using Bernstein polynomials.
+    - Moving an anchor point changes the curve's shape in a predictable way — pulling it further from the line between endpoints
+      increases the curve's deviation.
   rationale: 'CONVERGENT POSITIVE — DOMAIN-BOUND TECHNICAL PRINCIPLE (D2221, D2226). Two independent computer graphics sources
     converge on the same mechanism: Bernstein polynomial blending of control points. Depth is domain — this is field-bound
     (computational geometry within computer graphics) but TOOL-AGNOSTIC: it applies to SVG, Illustrator, CAD, font design,
@@ -2305,12 +2314,13 @@ examples:
     evidence_passages: []
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: 'HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge on a classification system (icons,
-    indices, symbols) that categorizes signs by their mode of reference. But this is a taxonomy — it answers "what category
-    does X belong to?" rather than "what will happen IF...?" Taxonomies classify; principles predict. The "mechanism" from
-    the quarantined FB was definitional: "Signs are classified because they differ in mode of reference" — the "because" explains
-    the classification criterion, not a causal chain. is_convergent: true but should_extract: false. Qwen: reject as taxonomy
-    (negative). Kimi: argued for separate taxonomy golden set (not causal). Consensus: REJECT for causal_mechanism set.'
+  rationale: 'HARD NEGATIVE — PURE TAXONOMY, NOT DESCRIPTIVE MODEL (D2233 update). Peirce''s icon/index/symbol trichotomy
+    is a classification system that categorizes signs by mode of reference — it answers ''what category does X belong to?''
+    without describing behavioral patterns. CONTRAST with CONV-032: System Fragility Taxonomy is a valid descriptive_model
+    because it categorizes system BEHAVIOR (fragile=breaks/robust=resists/antifragile=improves under stress), describing HOW
+    systems respond, not merely WHAT they are. A pure taxonomy that only classifies identity without behavioral patterns is
+    NOT a valid FB. The distinction: descriptive_model answers ''how does this system BEHAVE?'' while pure taxonomy answers
+    ''what TYPE is this?'''
 - id: NEG-009
   domain: product management
   discipline: organizational behavior
@@ -2334,24 +2344,38 @@ examples:
 
       '
   is_convergent: true
-  should_extract: false
+  should_extract: true
   expected_fb:
     is_summary: false
-    route: 'NULL'
-    name: Product Management Hierarchy (organizational description)
-    definition: ''
-    mechanism: ''
-    consequence: ''
-    boundary: ''
-    evidence_passages: []
-    extraction_type: causal_mechanism
+    route: FB
+    name: Three-Level Product Management Hierarchy
+    definition: 'Product management operates at three distinct levels: strategic (vision and direction), operational (roadmap
+      and prioritization), and execution (delivery and iteration). Each level requires fundamentally different skills, time
+      horizons, and decision-making frameworks — conflating them causes organizational dysfunction.'
+    mechanism: 'Strategic decisions set the long-term direction and define what problems to solve. Operational decisions translate
+      strategy into sequenced roadmaps and resource allocation. Execution decisions manage delivery, iteration, and quality.
+      The levels interact: strategy without execution is fantasy; execution without strategy is busywork. The best product
+      leaders shift between altitudes based on context — a cognitive range skill, not a title.'
+    boundary: 'Applies to organizations building software products with dedicated product management functions. Fails for:
+      (1) very early startups where one person does everything; (2) highly regulated industries where strategy is externally
+      determined; (3) organizations where product management is synonymous with project management (delivery coordinators).'
+    consequence: Organizations that conflate strategic product management with project management ship features without solving
+      user problems — the "build trap." Those that lack operational discipline have vision but never ship.
+    extraction_type: descriptive_model
     content_type: principle
-  rationale: 'HARD NEGATIVE — DEPTH OVER-ELEVATION (D2221). The sources describe an organizational structure (the three levels
-    of product management). While legitimate as domain knowledge, the candidate FB was classified as depth: ''universal''
-    with discipline: ''emerging''. The ''mechanism'' was tautological (''Product management operates at multiple levels because
-    different decisions require different time horizons''). This is an organizational description, not a universal principle.
-    It does not pass the physicist-chef-poet test. The S4 depth classifier fix (D2220) should reclassify this as depth: ''domain''.
-    Dual S-tier: Qwen flagged as organizational_description + depth_error, Kimi flagged as tautology.'
+    depth: domain
+    evidence_passages:
+    - 'Product management operates at three distinct levels: strategic (vision and direction), operational (roadmap and prioritization),
+      and execution (delivery and iteration)'
+    - each level requires fundamentally different skills, time horizons, and decision-making frameworks
+    - at 30,000 feet they define vision and strategy; at 10,000 feet they connect strategy to roadmap; at ground level they
+      ensure execution quality
+    - great product leaders can seamlessly shift between these altitudes depending on the conversation and context
+  rationale: 'DOMAIN POSITIVE — converted from NEG-009 (D2233). Escaping the Build Trap and Product Leadership converge on
+    a valid organizational structure: three levels of product management. Previously rejected for depth over-elevation (universal);
+    correctly labeled domain (product management/org design). The original NULL rejection confused S4 depth classification
+    with S2 extraction validity. The correct behavior: extract the FB with domain depth; let S4 classify. Teaches S2 to extract
+    valid domain FBs rather than reject for classification errors.'
 - id: NEG-010
   domain: brand strategy
   discipline: marketing
@@ -2434,6 +2458,13 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     depth: universal
+    evidence_passages:
+    - Heat disperses, order dissolves into chaos, and the universe moves from a state of low entropy at the Big Bang toward
+      ever-higher entropy.
+    - The second law of thermodynamics states that in any isolated system, entropy — a measure of disorder — always increases
+      over time.
+    - This is why heat flows from hot to cold, why eggs don't unscramble, and why we remember the past but not the future.
+    - Entropy growth is the only fundamental law of physics that distinguishes past from future.
   rationale: CONVERGENT POSITIVE — HARD SCIENCE (D2223). Three physics sources converge on entropy as the universal arrow
     of time. Depth is genuinely universal — applies to ALL macroscopic systems regardless of domain. Fills the critical hard-science
     gap in the golden set. Application is null because this is a physical law, not a prescriptive technique.
@@ -2484,6 +2515,13 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
+    evidence_passages:
+    - The key insight is that selection is non-random — it is the differential survival of variants — but the variation it
+      acts upon arises randomly through mutation and recombination.
+    - If organisms vary in traits, if those variations are heritable, and if some variants survive and reproduce more than
+      others, then evolution is not just possible — it is inevitable.
+    - The Red Queen effect — "it takes all the running you can do to stay in the same place" — explains why sex, genetic diversity,
+      and constant adaptation are universal features of life.
   rationale: CONVERGENT POSITIVE — HARD SCIENCE, CROSS-DOMAIN (D2223). Three evolutionary biology sources converge on the
     variation+heritability+selection mechanism. Depth is cross-domain — the identical logic applies to genetic algorithms,
     cultural evolution, and market dynamics. Fills hard-science gap. Application is null (descriptive law).
@@ -2535,6 +2573,14 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
+    evidence_passages:
+    - The survivors — those with random mutations that happen to confer resistance — multiply to fill the void.
+    - The cancer evolves in real time within the patient's body, and we chase it with successive lines of treatment — each
+      one less effective than the last, until the options run out.
+    - Cancer cells develop resistance to chemotherapy through the same evolutionary mechanism that drives antibiotic resistance
+      in bacteria.
+    - When chemotherapy kills 99.9% of them, the surviving 0.1% — those with mutations conferring resistance — repopulate
+      the tumor.
   rationale: CONVERGENT POSITIVE — MEDICINE + EVOLUTION (D2223). Three medical sources converge on the treatment-as-selection-pressure
     mechanism. Depth is cross-domain — bridges pharmacology and evolutionary biology through identical selection dynamics.
     Fills medicine gap. Has application (combination therapy protocol).
@@ -2585,6 +2631,14 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
+    evidence_passages:
+    - But cognitive biases — anchoring on initial impressions, substituting easier questions, over-weighting vivid testimony
+      — can unconsciously shape judicial reasoning.
+    - In fact, the complexity of their decisions makes them MORE susceptible to heuristic substitution because the correct
+      answer requires effortful System 2 processing that is easily bypassed when mental resources are depleted.
+    - Asked "should this defendant be granted bail?" a judge may substitute "do I feel this defendant is dangerous?" — a heuristic
+      answer that bypasses the legal criteria.
+    - Decision-makers in high-stakes environments — judges, doctors, regulators — are not immune to cognitive biases.
   rationale: CONVERGENT POSITIVE — LAW + PSYCHOLOGY (D2223). Three sources from cognitive psychology and legal theory converge
     on attribute substitution in professional judgment. Depth is cross-domain (law, medicine, regulation). Fills law/policy
     gap. Has actionable application.
@@ -2634,7 +2688,14 @@ examples:
       change a system's architecture, you must first change the team's communication structure.
     extraction_type: causal_mechanism
     content_type: principle
-    depth: cross-domain
+    depth: domain
+    evidence_passages:
+    - When you add people, the existing team must spend time bringing newcomers up to speed, and the communication channels
+      grow quadratically — n people have n(n-1)/2 communication paths.
+    - This is why dependency inversion matters — it decouples high-level policy from low-level detail, allowing you to defer
+      implementation choices until the last responsible moment.
+    - Conway's Law states that organizations design systems that mirror their communication structure.
+    - This means you cannot design a system's architecture independently of how the team communicates.
   rationale: CONVERGENT POSITIVE — SOFTWARE ENGINEERING (D2223). Three canonical software engineering sources converge on
     communication overhead as the scaling limiter. Depth is cross-domain — applies to any interdependent creative work. Fills
     software engineering gap that Kimi recommended. Brooks' Law is the classic formulation; Conway's Law and Martin's deferral
@@ -2688,7 +2749,13 @@ examples:
       provide partial remedies when randomization is impossible.
     extraction_type: causal_mechanism
     content_type: principle
-    depth: universal
+    depth: cross-domain
+    evidence_passages:
+    - Two variables can be perfectly correlated without either causing the other if both are effects of a common cause.
+    - 'This ignores three alternatives: B causes A, a third factor C causes both A and B, or the correlation is purely coincidental.'
+    - Regression analysis can show that two variables are related but cannot — by itself — prove that one causes the other.
+    - 'To establish causality, you need: (1) temporal precedence (cause before effect), (2) covariation (cause and effect
+      vary together), and (3) elimination of alternative explanations.'
   rationale: CONVERGENT POSITIVE — STATISTICS (D2223). Three statistics sources converge on the confounding mechanism. Depth
     is universal — applies to ALL domains that use observational data. Fills the "correlation ≠ causation" gap that both evaluators
     flagged. Application is null (this is a diagnostic principle — it tells you what NOT to conclude).
@@ -2742,6 +2809,15 @@ examples:
     extraction_type: normative_heuristic
     content_type: principle
     depth: cross-domain
+    evidence_passages:
+    - 'The optimal stopping problem — when to stop searching and commit — has a mathematically optimal solution: look at the
+      first 37% of options without choosing, then select the next option that is better than all seen so far.'
+    - 'While real-world decisions rarely match the mathematical assumptions, the principle generalizes: explore enough to
+      establish a baseline, then exploit when quality exceeds that baseline.'
+    - Without pre-committed criteria, decision-makers fall prey to confirmation bias — they adjust their criteria to justify
+      whichever option they emotionally prefer.
+    - Satisficers — those who choose the first option meeting their criteria — are happier than maximizers — those who exhaustively
+      search for the absolute best.
   rationale: CONVERGENT POSITIVE — NORMATIVE HEURISTIC (D2223). Three decision-science sources converge on the explore-exploit
     calibration principle. Extraction type is normative_heuristic — this is a process rule ("do exploration then exploitation")
     rather than a natural causal law. First example with non-causal extraction type, teaching the S2 model that heuristics
@@ -2795,6 +2871,12 @@ examples:
     extraction_type: empirical_pattern
     content_type: principle
     depth: cross-domain
+    evidence_passages:
+    - The result is a power-law degree distribution where the rich get richer.
+    - 'This structure emerges from two mechanisms: growth (new nodes continuously join the network) and preferential attachment
+      (new nodes preferentially connect to already well-connected nodes).'
+    - In scale-free networks, a few hubs connect to a disproportionately large number of nodes while most nodes have very
+      few connections.
   rationale: CONVERGENT POSITIVE — EMPIRICAL PATTERN (D2223). Three network science sources converge on the preferential attachment
     mechanism. Extraction type is empirical_pattern — the power-law distribution is an observed regularity, not a prescriptive
     rule. First empirical_pattern example. Depth is cross-domain (social, biological, technological networks). Fills mathematics/network
@@ -3423,7 +3505,7 @@ examples:
       the consistency drive.
     extraction_type: normative_heuristic
     content_type: heuristic
-    depth: cross-domain
+    depth: domain
   rationale: NORMATIVE HEURISTIC — complementary mechanisms, NOT convergent. Clear's habit stacking (cue automation) and Cialdini's
     commitment-consistency (self-image drive) are two DISTINCT behavioral mechanisms that address the same problem (behavior
     change). They do not share a causal structure — they are complementary tools. Teaches S2 to distinguish 'complementary
@@ -3638,46 +3720,57 @@ examples:
       at base rates of similar cases) in people''s intuitive forecasts.
 
       '
-  is_convergent: true
+  is_convergent: false
   should_extract: true
   expected_fb:
-    is_summary: false
+  - is_summary: false
     route: FB
-    name: Incentive Frame Reversal
+    name: Incentive Frame Displacement — When Fines Backfire
     definition: Introducing an extrinsic incentive (money, penalty, reward) can backfire when it reframes an intrinsically
       motivated behavior as a market transaction. The new frame displaces the original motivation — guilt becomes price, passion
-      becomes paid labor, civic duty becomes cost-benefit calculus — and the behavior shifts in the opposite direction from
-      what the incentive intended.
-    mechanism: 'The observed pattern is that extrinsic incentives interact with intrinsic motivation through frame displacement.
-      When a behavior is governed by social/moral norms (guilt, duty, passion), adding a monetary incentive reframes it as
-      a market exchange. People then optimize the market exchange — they pay the fine and arrive late, they work for the money
-      and stop when it stops, they calculate costs instead of honoring obligations. The PATTERN is: incentive introduction
-      → frame shift → behavior inversion. This is an empirical regularity, not a causal law — it depends on the strength of
-      the original intrinsic motivation and the salience of the new frame.'
+      becomes paid labor — and behavior shifts opposite to what the incentive intended.
+    mechanism: 'When a behavior is governed by social/moral norms (guilt, duty, passion), adding a monetary incentive reframes
+      it as a market exchange. People then optimize the market exchange — they pay the fine and arrive late, they work for
+      the money and stop when it stops, they calculate costs instead of honoring obligations. The pattern is: incentive introduction
+      → frame shift → behavior inversion.'
     boundary: 'Applies when: (1) the original behavior is intrinsically or socially motivated; (2) the extrinsic incentive
-      is small enough to reframe but not large enough to dominate (a $1000 fine would have worked). Fails when: (1) no intrinsic
-      motivation exists — incentives work as intended; (2) the incentive is so large it overwhelms the frame shift; (3) the
-      behavior is already framed as a market transaction (salary, price).'
-    consequence: Policy designers cannot assume that incentives and intrinsic motivation are additive. Adding a small fine
-      to a guilt-driven behavior can reduce compliance; adding a small bonus to a passion-driven activity can reduce engagement
-      once the bonus is removed. The empirical pattern warns against naive incentive engineering — test for frame displacement
-      before scaling.
+      is small enough to reframe but not large enough to dominate. Fails when: (1) no intrinsic motivation exists; (2) the
+      incentive is so large it overwhelms the frame shift; (3) the behavior is already framed as a market transaction.'
+    consequence: Well-intentioned incentive programs — fines, bonuses, pay-for-performance — can destroy the very motivation
+      they aim to strengthen, producing worse outcomes than doing nothing.
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: domain
     evidence_passages:
     - When a day-care center in Israel started fining parents who arrived late to pick up their children, late arrivals INCREASED
       rather than decreased.
     - The fine replaced a moral obligation (guilt about keeping teachers waiting) with a market transaction (paying for extended
       care).
+  - is_summary: false
+    route: FB
+    name: Planning Fallacy — Systematic Optimism Bias
+    definition: The planning fallacy is the systematic tendency to underestimate the time, costs, and risks of future actions
+      while overestimating their benefits. This error is not random — it is consistently optimistic across domains from construction
+      to software to personal tasks.
+    mechanism: People adopt an inside view — focusing on the specific case, constructing a narrative of success — rather than
+      the outside view that uses base rates of similar prior cases. The inside view consistently beats the outside view in
+      intuitive forecasts, producing optimistic predictions that ignore distributional information from comparable projects.
+    boundary: 'Applies when people estimate complex future tasks under uncertainty. Fails when: (1) the task is a routine,
+      well-calibrated activity; (2) explicit base-rate data is salient and forced into consideration; (3) accountability mechanisms
+      require outside-view referencing.'
+    consequence: Large infrastructure projects, software development, and personal task planning systematically overrun budgets
+      and timelines by 50-100% or more, despite repeated past experience.
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: domain
+    evidence_passages:
     - The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks
     - The inside view (focusing on the specific case) consistently beats the outside view (looking at base rates of similar
       cases) in people's intuitive forecasts.
-    extraction_type: empirical_pattern
-    content_type: pattern
-    depth: cross-domain
-  rationale: 'EMPIRICAL PATTERN — observed behavioral regularity. The day-care fine backfire (Levitt/Dubner) and the planning
-    fallacy (Kahneman) converge on the same empirical pattern: extrinsic incentives can produce the opposite of their intended
-    effect through frame displacement. This is an OBSERVED REGULARITY — ''incentives sometimes backfire when they reframe
-    intrinsically motivated behavior'' — not a causal mechanism. The FB describes WHAT happens and WHEN, without claiming
-    a universal causal law.'
+  rationale: '1:N SPLIT — Incentive frame displacement (Freakonomics: day-care fines backfire) and the planning fallacy (Kahneman:
+    systematic optimism bias) are two INDEPENDENT empirical patterns. They share only the topic ''when predictions fail''
+    — no shared causal structure. Like CONV-037, teaches S2 to split multi-source clusters when mechanisms differ. is_convergent=false
+    despite 2 books.'
 - id: CONV-040
   domain: typography
   discipline: graphic design

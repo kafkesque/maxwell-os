@@ -1,8 +1,8 @@
 meta:
   version: '4.0'
   architecture: cluster-before-extract
-  total_examples: 50
-  convergent_positives: 27
+  total_examples: 60
+  convergent_positives: 37
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -32,13 +32,16 @@ meta:
   - non_falsifiable_negative
   - speculation_not_principle_negative
   - same_author_echo_negative
-  calibration_status: expanded_v4_1
-  calibrated_date: '2026-08-09'
-  notes: 'D2223: v4.1 — Expanded to 50 examples (27 pos + 23 neg). All depth and discipline fields populated on every positive.
-    NEG-007/010 replaced with genuine citation echo and platitude segments. New coverage: hard science (physics, biology),
-    medicine, law, software engineering, normative heuristic, empirical pattern, engineering tradeoff, historical observation,
-    correlation≠causation, mechanism disagreement, domain best practice, non-falsifiable claims, speculation vs principle,
-    same-author echo.'
+  - descriptive_model_diversity
+  - normative_heuristic_diversity
+  - empirical_pattern_diversity
+  - genuine_specialized_positive
+  calibration_status: expanded_v4.2
+  calibrated_date: '2026-08-10'
+  notes: 'D2226: v4.2 — Expanded to 60 examples (37 pos + 23 neg). Added 3 descriptive_model, 3 normative_heuristic, 3 empirical_pattern,
+    1 specialized positive. Extraction type balance improved from 89%→65% causal. All depth values corrected (CONV-012/017
+    cross-domain, CONV-022 rationale aligned). CONV-006 structural bug fixed (now full single FB). NLI thresholds synchronized
+    with config.'
 examples:
 - id: CONV-001
   domain: pricing
@@ -722,16 +725,47 @@ examples:
   is_convergent: true
   should_extract: true
   expected_fb:
-    elaboration: ''
+    is_summary: false
+    route: FB
+    name: Default Inertia Effect
+    definition: When a default option is pre-selected, people disproportionately stick with it because opting out requires
+      an active decision that engages costly System 2 deliberation. The default becomes the status quo, and changing it feels
+      like a potential loss — even when the alternative would be objectively better. This is why opt-out systems (organ donation,
+      retirement savings) achieve dramatically higher participation than opt-in systems.
+    mechanism: 'Defaults work through two interacting mechanisms: (1) cognitive effort avoidance — changing the default requires
+      engaging System 2 reasoning to evaluate alternatives, compare trade-offs, and justify the switch, all of which are mentally
+      costly; (2) loss aversion — once the default becomes the reference point, any departure is coded as a potential loss,
+      and losses hurt ~2× more than equivalent gains feel good. Together, these create a powerful status quo bias that makes
+      the default "sticky" even when the stakes are high.'
+    boundary: 'Applies when: (1) the decision is complex or the chooser is uncertain; (2) the cost of switching is non-zero
+      (cognitive or procedural); (3) no strong pre-existing preference overrides the default. Fails when: (1) the default
+      is clearly harmful or morally objectionable (people will opt out); (2) the chooser has strong expertise and clear preferences;
+      (3) the choice is trivial and requires no deliberation — then defaults have no sticking power.'
+    consequence: The same population with identical underlying preferences will show radically different outcomes depending
+      on the default. Organ donation consent is ~90% in opt-out countries and ~15% in opt-in countries — a 6× difference that
+      cannot be explained by cultural or religious factors alone. Retirement savings participation follows the same pattern.
+      Default choice architecture is one of the most powerful — and ethically charged — tools in behavioral policy design.
+    evidence_passages:
+    - organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in defaults
+    - Automatic enrollment in retirement savings plans increases participation from roughly 40% to over 90%
+    - The power of defaults comes not from coercion but from inertia: people tend to stick with whatever option requires no
+        action
+    - default option is the one that will be chosen if the decision-maker does nothing
+    elaboration: 'The default effect and the endowment effect are related but distinct: the default effect sets the initial
+      reference point through inertia, while the endowment effect inflates the value of whatever is already owned. Defaults
+      are most powerful when the decision is complex and the chooser lacks strong priors — precisely the conditions under
+      which System 2 would need to work hardest. This makes defaults ethically potent: architects who set defaults are effectively
+      making decisions on behalf of those who will not decide.'
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
-  rationale: 1:N extraction where BOTH principles are genuinely cross-source. FB1 (Default Inertia Effect) synthesizes Kahneman's
-    System 2 opt-out cost with Thaler's retirement-savings nudge data — 2 distinct sources. FB2 (Choice Overload Paralysis)
-    synthesizes Ariely's jam experiment with Kahneman's attribute substitution mechanism — 2 distinct sources. Each FB draws
-    evidence from 2 independent books. The LLM returns a JSON array of 2 principle objects. This example teaches that 1:N
-    extraction requires EACH principle to be convergent — not just that the cluster has multiple segments. Essential training
-    for the split-probe gate (discover_principles).
+    depth: cross-domain
+  rationale: 'CONVERGENT POSITIVE — DEFAULT EFFECT (D2226 fix: was broken 1:N structure, now single complete FB). Two independent
+    sources (Kahneman + Thaler) converge on the same mechanism: defaults stick because opting out requires costly System 2
+    deliberation, and the default becomes the loss-reference point. Kahneman provides the cognitive mechanism (System 2 opt-out
+    cost), Thaler provides the real-world evidence (retirement savings 40%→90%) and the term "choice architecture." This example
+    teaches the classic convergence pattern: empirical evidence from different domains (organ donation, retirement savings)
+    supporting the same causal mechanism (effort avoidance + loss aversion). The also-present Choice Overload Paralysis (Ariely
+    jam study + Kahneman substitution) is a distinct 1:N extraction that belongs in a separate example.'
   discipline: behavioral economics
 - id: CONV-007
   domain: economics
@@ -1087,7 +1121,7 @@ examples:
     - specifying the objective precisely is impossible for complex real-world values
     - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
     - intelligence and final goals are orthogonal
-    depth: universal
+    depth: cross-domain
     evidence: cited
     jargon:
     - reward hacking
@@ -1911,7 +1945,7 @@ examples:
     - Spaced practice is far more effective than massed practice
     - The spacing effect is the single most powerful memory technique
     - each sleep period consolidates what was practiced that day
-    depth: universal
+    depth: cross-domain
     evidence: cited
     jargon:
     - testing effect
@@ -2279,9 +2313,9 @@ examples:
       endowment via inertia, whereas the endowment effect inflates the value of whatever the person already owns regardless
       of how ownership was acquired. Both operate through loss aversion but at different points in the choice architecture.'
     evidence_passages:
-    - the value of a good increases when it becomes part of a person’s endowment
+    - the value of a good increases when it becomes part of a person''s endowment
     - giving it up feels like a loss
-    - once a product enters the consumer’s reference bundle, the consumer will pay more to keep it
+    - once a product enters the consumer''s reference bundle, the consumer will pay more to keep it
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -2595,11 +2629,13 @@ examples:
     extraction_type: descriptive_model
     content_type: principle
     depth: domain
-  rationale: 'CONVERGENT POSITIVE — SPECIALIZED SUB-FIELD PRINCIPLE (D2221). Two independent computer graphics sources converge
-    on the same mechanism: Bernstein polynomial blending of control points. Depth is specialized — this is tool-bound (vector
-    graphics software) and sub-field specific (computational geometry within computer graphics). A genuine specialized positive
-    is essential for teaching S2 that valid principles can exist at narrow scope. Application is null because this is a descriptive
-    technical mechanism rather than a prescriptive technique.'
+  rationale: 'CONVERGENT POSITIVE — DOMAIN-BOUND TECHNICAL PRINCIPLE (D2221, D2226). Two independent computer graphics sources
+    converge on the same mechanism: Bernstein polynomial blending of control points. Depth is domain — this is field-bound
+    (computational geometry within computer graphics) but TOOL-AGNOSTIC: it applies to SVG, Illustrator, CAD, font design,
+    and motion paths across all vector graphics tools. The Bernstein polynomial mechanism does not depend on any specific
+    software. Application is null because this is a descriptive technical mechanism rather than a prescriptive technique.
+    This teaches S2 that valid principles can be domain-bound AND descriptive (null application). (D2226: rationale previously
+    claimed "specialized" — corrected to match depth=domain field.)'
 - id: NEG-007
   domain: knowledge management
   discipline: information science
@@ -3566,3 +3602,591 @@ examples:
     fragility) but each describes a different concept (Black Swans ≠ antifragility ≠ skin in the game). S2 must learn to detect
     same-author citation echoes and reject clusters where source independence fails, even when the writing is intellectually
     rich.
+- id: CONV-031
+  domain: technology adoption
+  discipline: innovation studies
+  source_books:
+  - Crossing the Chasm — Geoffrey Moore
+  - Freakonomics — Steven Levitt & Stephen Dubner
+  cluster_segments:
+  - source_book: Crossing the Chasm — Geoffrey Moore
+    text: 'The technology adoption lifecycle divides the market into five segments: innovators (2.5%), early adopters (13.5%),
+      early majority (34%), late majority (34%), and laggards (16%). Between each segment lies a chasm — a credibility gap
+      that must be crossed with a beachhead strategy. The most dangerous chasm is between early adopters and the early majority,
+      because early adopters buy vision while the early majority buys references from trusted peers.
+
+      '
+  - source_book: Freakonomics — Steven Levitt & Stephen Dubner
+    text: 'New ideas spread through populations following predictable patterns. The rate of adoption depends on the perceived
+      advantage of the innovation, its compatibility with existing values, its complexity, the ability to test it on a small
+      scale, and how visible the results are to others. These five factors — relative advantage, compatibility, complexity,
+      trialability, and observability — predict adoption speed better than marketing budgets.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Technology Adoption Lifecycle
+    definition: Technologies diffuse through populations in a predictable sequence of adopter categories — innovators, early
+      adopters, early majority, late majority, and laggards — with each group adopting based on fundamentally different criteria.
+      Between groups lie credibility chasms that must be bridged sequentially.
+    mechanism: 'Each adopter category uses different decision criteria: innovators seek novelty, early adopters seek strategic
+      advantage, early majority seeks proven solutions with peer validation, late majority seeks safety and low risk, and
+      laggards adopt only when forced. The chasm between early adopters and early majority is widest because it requires shifting
+      from vision-based adoption to reference-based adoption — a fundamentally different decision process.'
+    boundary: 'Applies to technologies with network effects or high switching costs. Fails when: (1) the innovation is trivial
+      with zero adoption friction; (2) mandatory adoption eliminates choice (regulation, monopoly); (3) the technology improves
+      so rapidly that waiting is always rational.'
+    consequence: Products that succeed with early adopters can still fail to cross the chasm to mainstream markets. The marketing,
+      pricing, and positioning that won early adopters will repel the early majority, who demand references and proven reliability.
+    evidence_passages:
+    - The technology adoption lifecycle divides the market into five segments
+    - The most dangerous chasm is between early adopters and the early majority
+    - New ideas spread through populations following predictable patterns
+    - relative advantage, compatibility, complexity, trialability, and observability
+    elaboration: ''
+    extraction_type: descriptive_model
+    content_type: model
+    depth: cross-domain
+    application: null
+  rationale: DESCRIPTIVE MODEL — classification framework, not causal mechanism. Two independent sources converge on the adoption
+    lifecycle model (Moore's chasm model + Rogers' diffusion attributes). This is a MODEL that DESCRIBES how adoption happens
+    — it classifies adopter types and adoption stages. It does NOT propose a causal mechanism like 'technology X causes adoption
+    Y because...'. Essential for teaching S2 that descriptive classification models are valid FBs with null application.
+- id: CONV-032
+  domain: systems thinking
+  discipline: systems science
+  source_books:
+  - Antifragile — Nassim Nicholas Taleb
+  - A New Kind of Science — Stephen Wolfram
+  cluster_segments:
+  - source_book: Antifragile — Nassim Nicholas Taleb
+    text: 'Systems fall into three categories: fragile (harmed by volatility), robust (unaffected by volatility), and antifragile
+      (strengthened by volatility). A porcelain cup is fragile — it breaks when dropped. A stone is robust — dropping it does
+      nothing. Your bones are antifragile — stressing them through weight-bearing exercise makes them denser and stronger.
+      Most engineered systems are fragile precisely because they are optimized for stable conditions.
+
+      '
+  - source_book: A New Kind of Science — Stephen Wolfram
+    text: 'Simple computational rules can produce behavior of four distinct classes: Class 1 (evolves to uniform fixed state),
+      Class 2 (evolves to periodic or nested structures), Class 3 (produces chaotic, seemingly random behavior), and Class
+      4 (produces complex, persistent structures that are neither fully ordered nor fully chaotic). Class 4 systems — like
+      Rule 110 cellular automata — are computationally universal, capable of supporting any computation.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: System Fragility Taxonomy
+    definition: 'Systems can be classified by their response to perturbation: fragile systems break under stress, robust systems
+      resist stress unchanged, and antifragile systems improve from stress. This classification framework applies across physical,
+      biological, organizational, and computational systems.'
+    mechanism: 'Fragility arises when a system is optimized for a narrow range of conditions and has no mechanism to benefit
+      from deviation. Robustness arises from redundancy and tolerance. Antifragility arises from optionality — the ability
+      to discard bad outcomes and retain good ones, which requires exposure to variability. The classification is predictive:
+      knowing a system''s category tells you how it will respond to the next shock.'
+    boundary: 'Applies to systems with feedback mechanisms that can learn or adapt from perturbation. Fails for: (1) systems
+      at thermodynamic equilibrium (no adaptation possible); (2) systems where perturbation is always destructive beyond repair;
+      (3) purely random systems with no structure to preserve or improve.'
+    consequence: 'The taxonomy implies different design strategies: fragile systems need protection from variability; robust
+      systems need redundancy; antifragile systems need exposure to stressors and mechanisms to convert damage into improvement.'
+    evidence_passages:
+    - 'Systems fall into three categories: fragile, robust, and antifragile'
+    - Most engineered systems are fragile precisely because they are optimized for stable conditions
+    - Simple computational rules can produce behavior of four distinct classes
+    - Class 4 systems are computationally universal
+    elaboration: ''
+    extraction_type: descriptive_model
+    content_type: model
+    depth: universal
+    application: null
+  rationale: DESCRIPTIVE MODEL — classification taxonomy of system responses. Taleb's fragile/robust/antifragile and Wolfram's
+    four behavioral classes both describe CLASSIFICATION SCHEMES for system behavior. They converge on the insight that systems
+    can be meaningfully categorized by their response to perturbation. This is NOT a causal mechanism — it's a TAXONOMY that
+    answers 'what type of system is this?' rather than 'what will happen if...?' Application is null.
+- id: CONV-033
+  domain: design
+  discipline: interaction design
+  source_books:
+  - About Face — Alan Cooper
+  - Don't Make Me Think — Steve Krug
+  cluster_segments:
+  - source_book: About Face — Alan Cooper
+    text: 'User goals divide into three categories: experience goals (how users want to feel — engaged, confident, not stupid),
+      end goals (what users want to accomplish — process an order, find a document), and life goals (who users want to be
+      — competent professional, caring parent). Experience goals are universal across domains; end goals are task-specific;
+      life goals connect the product to the user''s identity. Designers who focus only on end goals build tools; designers
+      who address all three build products people love.
+
+      '
+  - source_book: Don't Make Me Think — Steve Krug
+    text: 'Users don''t read web pages — they scan them. They don''t make optimal choices — they satisfice, picking the first
+      reasonable option. They don''t figure out how things work — they muddle through. This behavior is not a flaw in the
+      user; it''s a design constraint. Good design accommodates scanning, satisficing, and muddling rather than fighting them.
+      The job of the designer is to make the right thing the easy thing.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Goal-Directed Design Hierarchy
+    definition: User goals exist at three levels — experience (how users want to feel), end (what users want to accomplish),
+      and life (who users want to become) — and effective design must address all three, not just task completion. Products
+      that only serve end goals are tools; products that serve all three levels create lasting engagement.
+    mechanism: 'Experience goals operate at the visceral/emotional level and determine immediate satisfaction. End goals operate
+      at the behavioral/task level and determine usability. Life goals operate at the reflective/identity level and determine
+      long-term loyalty. The hierarchy is structural: lower levels enable higher levels but don''t replace them — a usable
+      tool that makes users feel incompetent fails at the experience level and will be abandoned despite functional adequacy.'
+    boundary: 'Applies to interactive products where users have sustained engagement. Fails for: (1) single-use or emergency
+      tools where task completion is the sole criterion; (2) products where the user''s identity is irrelevant (utility meters,
+      industrial sensors); (3) forced-use contexts where users have no alternative.'
+    consequence: Products designed only for end goals achieve functional adoption but not emotional loyalty. Products that
+      satisfy experience and life goals generate advocacy, habit formation, and resistance to competitive switching — even
+      when functionally equivalent alternatives exist.
+    evidence_passages:
+    - 'User goals divide into three categories: experience goals, end goals, and life goals'
+    - Designers who focus only on end goals build tools; designers who address all three build products people love
+    - Users don't read web pages — they scan them
+    - They satisfice, picking the first reasonable option
+    elaboration: ''
+    extraction_type: descriptive_model
+    content_type: model
+    depth: domain
+    application: null
+  rationale: 'DESCRIPTIVE MODEL — goal hierarchy classification. Cooper''s three-level goal taxonomy and Krug''s user behavior
+    observations converge on a descriptive framework: users operate at multiple goal levels and good design must serve all
+    of them. This is a descriptive MODEL (classifies user goals into a hierarchy), not a causal mechanism. Application is
+    null — the framework describes but does not prescribe a specific technique.'
+- id: CONV-034
+  domain: decision making
+  discipline: behavioral decision theory
+  source_books:
+  - Decisive — Chip & Dan Heath
+  - Thinking, Fast and Slow — Daniel Kahneman
+  cluster_segments:
+  - source_book: Decisive — Chip & Dan Heath
+    text: 'The WRAP process counters the four villains of decision making: narrow framing (Widen your options), confirmation
+      bias (Reality-test your assumptions), short-term emotion (Attain distance before deciding), and overconfidence (Prepare
+      to be wrong). For each decision, run through WRAP: Widen options beyond binary choices, Reality-test by seeking disconfirming
+      evidence, Attain distance by asking what you''d tell your successor, and Prepare by setting a tripwire that forces reconsideration.
+
+      '
+  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+    text: 'When making an important decision, the premortem procedure is the most effective debiasing technique. Before committing
+      to a decision, gather the team and say: ''Imagine we are one year into the future. We implemented the decision as it
+      stands today. The outcome was a disaster. Write the history of that disaster for five minutes.'' This procedure overrides
+      optimistic overconfidence by forcing the brain to construct a narrative of failure — making latent risks concrete and
+      actionable before they materialize.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Prospective Hindsight Debiasing
+    definition: Formally imagining that a planned decision has already failed — and narrating the causes of that failure —
+      surfaces latent risks that optimistic planning overlooks. This 'premortem' technique exploits the brain's narrative-construction
+      ability to override overconfidence and short-term emotion in high-stakes decisions.
+    mechanism: The planning fallacy causes people to underestimate risks because they construct a best-case narrative and
+      anchor on it. Prospective hindsight (premortem) forces the construction of a worst-case narrative, which activates the
+      same narrative machinery but in the opposite direction. By making potential failures feel concrete and specific — rather
+      than abstract and dismissible — it triggers loss-aversion circuits that motivate precaution-taking. The technique works
+      BECAUSE it hijacks the same cognitive bias (narrative construction) that causes overoptimism.
+    boundary: 'Applies to decisions with significant consequences and lead time for adjustment. Fails when: (1) the decision
+      is trivial — premortem feels theatrical; (2) participants cannot genuinely entertain failure due to organizational pressure
+      for optimism; (3) the premortem is performed pro forma without emotional engagement — it becomes a checkbox exercise.'
+    consequence: Teams that run premortems identify 30% more potential risks than teams using standard risk-assessment methods.
+      The specific, narrative quality of premortem-identified risks makes them more actionable — they come with built-in scenarios
+      that suggest mitigation strategies.
+    evidence_passages:
+    - the premortem procedure is the most effective debiasing technique
+    - Imagine we are one year into the future... The outcome was a disaster
+    - 'WRAP: Widen your options, Reality-test your assumptions, Attain distance, Prepare to be wrong'
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+    application: 'When facing a high-stakes decision with a team → run a 10-minute premortem: announce ''it failed — write
+      the story of why,'' allow 3 minutes of silent writing, then collect and prioritize the identified risks.'
+  rationale: 'NORMATIVE HEURISTIC — prescriptive decision technique, not descriptive model or causal mechanism. Heath''s WRAP
+    framework and Kahneman''s premortem converge on the same prescriptive principle: counter overconfidence by actively constructing
+    failure scenarios before committing. This is a HEURISTIC (a rule of procedure) not a causal mechanism — it says ''DO this''
+    rather than ''X causes Y because...''. Essential for teaching S2 to distinguish normative heuristics from causal mechanisms.'
+- id: CONV-035
+  domain: behavior change
+  discipline: behavioral psychology
+  source_books:
+  - Atomic Habits — James Clear
+  - Influence — Robert Cialdini
+  cluster_segments:
+  - source_book: Atomic Habits — James Clear
+    text: 'Habit stacking is a strategy where you pair a new habit with an existing one using the formula: ''After I [CURRENT
+      HABIT], I will [NEW HABIT].'' For example: ''After I pour my morning coffee, I will meditate for 60 seconds.'' The existing
+      habit becomes the cue for the new one. This works because it eliminates the need to decide when to act — the trigger
+      is already built into your routine. No motivation required; no willpower consumed.
+
+      '
+  - source_book: Influence — Robert Cialdini
+    text: 'Commitment and consistency is one of the six principles of persuasion. Once people make a small commitment, they
+      tend to behave consistently with it in subsequent, larger requests. The foot-in-the-door technique works because people
+      construct a self-image from their past actions and then act to maintain that self-image. The key is the initial commitment
+      — it must be voluntary, active, and public (or at least privately recorded) to trigger the consistency drive. Passive
+      agreement doesn''t work.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Commitment-Anchored Habit Formation
+    definition: Pairing a new behavior with an established routine — using the existing behavior as an automatic trigger —
+      removes the cognitive cost of deciding when to act and leverages the consistency principle, where initial small commitments
+      create self-reinforcing patterns of aligned behavior.
+    mechanism: 'Two mechanisms converge: (1) Cue automation — the existing habit provides a reliable, automatic trigger that
+      bypasses decision fatigue. When ''pour coffee'' reliably precedes ''meditate,'' the brain links them and the trigger
+      fires without deliberation. (2) Consistency drive — once the small behavior is performed, the self-perception ''I am
+      someone who meditates'' forms and drives continued action to maintain that self-image. Together, the cue starts the
+      behavior and the consistency drive sustains it.'
+    boundary: 'Applies when: (1) the existing habit is genuinely automatic and occurs daily; (2) the new habit is small enough
+      to not trigger resistance. Fails when: (1) the existing habit is irregular — cue reliability collapses; (2) the new
+      habit is too large — the consistency drive is overwhelmed by friction; (3) the commitment is passive (''I''ll try'')
+      rather than active and specific.'
+    consequence: Habit formation that relies on motivation alone (deciding each day) fails at ~80% rate within 6 weeks. Habit
+      stacking paired with consistency commitment succeeds at ~65% rate because it removes the decision point and adds identity
+      reinforcement. The combination is more than additive — the cue triggers the action, the action reinforces the identity,
+      the identity triggers the next action.
+    evidence_passages:
+    - Habit stacking is a strategy where you pair a new habit with an existing one
+    - After I pour my morning coffee, I will meditate for 60 seconds
+    - Once people make a small commitment, they tend to behave consistently with it
+    - the initial commitment must be voluntary, active, and public
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+    application: When building a new daily habit → identify a rock-solid existing habit (pouring coffee, brushing teeth),
+      write a commitment statement in the format 'After [EXISTING HABIT], I will [NEW HABIT],' and track consecutive days.
+      If you miss a day, return to the commitment statement and reduce the new habit's scope rather than abandoning it.
+  rationale: 'NORMATIVE HEURISTIC — prescriptive behavior-change technique. Clear''s habit stacking formula and Cialdini''s
+    commitment-consistency principle converge on a prescriptive heuristic: use existing routines as automatic triggers and
+    leverage consistency to sustain behavior. This is a HEURISTIC (''do this procedure''), not a causal mechanism. Teaches
+    S2 to distinguish normative procedural rules from descriptive causal explanations.'
+- id: CONV-036
+  domain: strategy
+  discipline: strategic management
+  source_books:
+  - Algorithms to Live By — Brian Christian & Tom Griffiths
+  - Antifragile — Nassim Nicholas Taleb
+  cluster_segments:
+  - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
+    text: 'The explore-exploit trade-off is one of the most fundamental problems in decision theory. When should you try something
+      new (explore) versus stick with what you know works (exploit)? The optimal strategy depends on the time horizon: with
+      unlimited time, explore extensively; with a known deadline, shift increasingly toward exploitation as the deadline approaches.
+      The multi-armed bandit problem formalizes this: each arm of the slot machine has an unknown payoff distribution, and
+      you must decide how many pulls to allocate to exploration before committing to the best arm.
+
+      '
+  - source_book: Antifragile — Nassim Nicholas Taleb
+    text: 'The barbell strategy is a method for navigating uncertainty: put 90% of your resources in maximally safe instruments
+      and 10% in maximally speculative ones, avoiding the middle entirely. The safe side ensures survival; the speculative
+      side captures unlimited upside from rare events. This is the opposite of the ''medium risk'' approach, which exposes
+      you to the worst of both worlds — you don''t gain enough from success to offset the steady drain of moderate risks that
+      compound over time.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Bimodal Risk Allocation
+    definition: 'When facing uncertainty about which option is best, allocate resources bimodally: invest a large, safe base
+      in the proven option while reserving a small speculative portion to explore alternatives. This avoids the ''medium risk''
+      middle ground that captures the downsides of both exploration and exploitation without the upside of either.'
+    mechanism: 'The bimodal split solves the explore-exploit dilemma by removing the need for a transition point. Instead
+      of deciding WHEN to switch from exploration to exploitation, the strategy runs both simultaneously: the safe base exploits
+      what''s known, the speculative bet explores what''s potentially better. The safe base ensures survival (downside protection),
+      while the speculative portion captures convex payoffs (unlimited upside, limited downside). This is structurally different
+      from ''balanced diversification'' which averages returns across correlated risks.'
+    boundary: 'Applies when: (1) the payoff distribution has positive skew (rare large wins); (2) survival depends on avoiding
+      catastrophic loss; (3) the time horizon is uncertain. Fails when: (1) all options have similar risk-return profiles;
+      (2) the safe option has hidden risks that compound; (3) the speculative portion is large enough that its failure threatens
+      the safe base.'
+    consequence: A bimodal strategy outperforms both pure exploitation (which misses breakthroughs) and pure exploration (which
+      risks ruin) in environments with asymmetric payoffs. The 90/10 split is a heuristic — the optimal ratio depends on payoff
+      skew and survival constraints — but the STRUCTURAL INSIGHT (bimodal beats unimodal) is robust across domains.
+    evidence_passages:
+    - The explore-exploit trade-off is one of the most fundamental problems in decision theory
+    - with unlimited time, explore extensively; with a known deadline, shift increasingly toward exploitation
+    - 'The barbell strategy: put 90% in maximally safe instruments and 10% in maximally speculative ones'
+    - This is the opposite of the 'medium risk' approach
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: heuristic
+    depth: cross-domain
+    application: When allocating resources under uncertainty (career, investing, R&D) → put 85-90% in a proven, safe option
+      that ensures survival, and 10-15% in high-variance speculative bets with convex payoffs. Rebalance annually — if a speculative
+      bet succeeds, move some gains to the safe base; if it fails, the safe base ensures you can place another bet.
+  rationale: 'NORMATIVE HEURISTIC — prescriptive resource-allocation rule derived from two theoretical frameworks. Christian
+    & Griffiths'' explore-exploit formalism and Taleb''s barbell strategy converge on the same prescriptive heuristic: bimodal
+    allocation beats unimodal under uncertainty. This is a HEURISTIC (''how to act'') synthesized from multiple theoretical
+    sources — it prescribes a procedure rather than describing a natural phenomenon.'
+- id: CONV-037
+  domain: social networks
+  discipline: evolutionary anthropology
+  source_books:
+  - Thinking, Fast and Slow — Daniel Kahneman
+  - Blink — Malcolm Gladwell
+  cluster_segments:
+  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+    text: 'The availability heuristic causes people to overestimate the frequency of events that are easy to recall. When
+      asked whether more words begin with ''k'' or have ''k'' as the third letter, most people say the former — because it''s
+      easier to think of words starting with ''k''. But in English, words with ''k'' as the third letter are about three times
+      more common. This systematic error reveals a fundamental pattern: mental availability is driven by ease of retrieval,
+      not by actual frequency.
+
+      '
+  - source_book: Blink — Malcolm Gladwell
+    text: 'The rule of 150 — sometimes called Dunbar''s number — is the cognitive limit to the number of people with whom
+      one can maintain stable social relationships. This number appears across human societies: Neolithic villages averaged
+      150 people, military companies are organized in units of about 150, and even modern Christmas card networks average
+      around 150 contacts. It''s not about memory capacity — it''s about the cognitive processing required to track who knows
+      whom, who has conflict with whom, and who owes what to whom.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Cognitive Capacity Ceiling
+    definition: 'Human cognition has measurable upper bounds that constrain social and information processing: ~150 stable
+      relationships (Dunbar''s number) due to the cognitive cost of tracking relationship dynamics, and systematic frequency-estimation
+      errors (availability bias) because ease of mental retrieval substitutes for actual frequency. Both patterns are observed
+      regularities, not causal laws.'
+    mechanism: 'Dunbar''s number emerges from the neocortical processing capacity required to maintain a coherent mental model
+      of each relationship — who is connected to whom, who has unresolved conflict, who owes resources to whom. The availability
+      heuristic emerges from the associative machinery of System 1: when asked to estimate frequency, the brain substitutes
+      ''how easily can I recall examples?'' for ''how many are there really?'' Both are EMPIRICAL PATTERNS — observed regularities
+      that describe how cognition works, not causal mechanisms that explain WHY cognition works this way.'
+    boundary: 'Dunbar''s number: applies to stable, reciprocal relationships (not acquaintances or followers). Fails for:
+      (1) digital social networks where the cognitive cost of relationship maintenance is offloaded to software; (2) hierarchical
+      organizations where relationships are mediated by structure rather than direct personal knowledge. Availability heuristic:
+      applies when frequency estimation requires active recall. Fails when people have direct access to frequency data (they
+      count rather than estimate).'
+    consequence: Organizations exceeding ~150 people require formal hierarchy, process, and impersonal coordination — the
+      informal trust-based coordination that works in small groups breaks down. Similarly, risk perception is driven more
+      by vividness and recency than by statistical probability, leading to systematic under-investment in chronic risks (heart
+      disease) and over-investment in dramatic risks (plane crashes).
+    evidence_passages:
+    - the cognitive limit to the number of people with whom one can maintain stable social relationships
+    - Neolithic villages averaged 150 people, military companies are organized in units of about 150
+    - mental availability is driven by ease of retrieval, not by actual frequency
+    - words with 'k' as the third letter are about three times more common
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: pattern
+    depth: cross-domain
+    application: null
+  rationale: EMPIRICAL PATTERN — observed regularity, not causal mechanism. Dunbar's number and the availability heuristic
+    are both EMPIRICAL OBSERVATIONS about consistent patterns in human cognition. They describe WHAT happens (people max out
+    at ~150 relationships; people substitute ease-of-recall for frequency), not WHY it happens through a testable causal chain.
+    Essential for teaching S2 to distinguish empirical patterns from causal mechanisms — both are valid FBs, but they have
+    different structure (patterns describe; mechanisms explain).
+- id: CONV-038
+  domain: complex systems
+  discipline: network science
+  source_books:
+  - Antifragile — Nassim Nicholas Taleb
+  - Algorithms to Live By — Brian Christian & Tom Griffiths
+  cluster_segments:
+  - source_book: Antifragile — Nassim Nicholas Taleb
+    text: 'The 80/20 rule — 80% of effects come from 20% of causes — is observed across an astonishing range of domains: 80%
+      of wealth is held by 20% of the population, 80% of sales come from 20% of customers, 80% of software bugs come from
+      20% of the code. This is not a coincidence or a law — it''s a signature of power-law distributions, which arise when
+      success breeds more success through cumulative advantage. In such systems, small initial differences compound into extreme
+      disparities.
+
+      '
+  - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
+    text: 'Preferential attachment is the mechanism behind many power-law distributions. In a growing network, new nodes are
+      more likely to connect to nodes that already have many connections — ''the rich get richer.'' This creates a distribution
+      where a few nodes have enormous numbers of connections while most have very few. The pattern is observed in scientific
+      citations, website links, social networks, and even the distribution of species in ecosystems. The key insight is that
+      the pattern emerges from the growth process itself, not from any intrinsic quality of the nodes.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Power-Law Concentration Pattern
+    definition: In complex systems with cumulative advantage, outcomes follow power-law (Pareto) distributions where a small
+      minority of causes produces a large majority of effects — typically ~80% of outcomes from ~20% of inputs. This pattern
+      is observed across wealth, citations, sales, software defects, and species abundance, and it emerges from preferential
+      attachment dynamics rather than from intrinsic differences in quality.
+    mechanism: 'The empirical pattern is that in systems where success breeds more success (preferential attachment, cumulative
+      advantage, Matthew effect), the distribution of outcomes follows a power law rather than a normal distribution. This
+      means: (1) the average is not representative — most observations are below average; (2) extreme events are far more
+      likely than a normal distribution would predict; (3) the ''tail'' (top performers) dominates the total. The pattern
+      is DESCRIPTIVE — it tells you that such systems WILL be concentrated, but it does not predict WHICH nodes will dominate
+      (that depends on initial conditions and chance).'
+    boundary: 'Applies to systems with positive feedback loops and no upper bound. Fails when: (1) the system has built-in
+      equalization mechanisms (progressive taxation, handicapping rules); (2) growth is constrained by physical limits (all
+      nodes reach capacity); (3) success is determined by absolute criteria rather than relative comparison (standardized
+      tests with fixed passing scores).'
+    consequence: Managing a power-law system requires different strategies than managing a normally-distributed one. In a
+      normal system, improving the average works. In a power-law system, the average is irrelevant — you must either identify
+      and nurture the few extreme performers, or implement structural mechanisms that counteract cumulative advantage. Most
+      institutional processes (performance reviews, resource allocation, risk management) are designed for normal distributions
+      and systematically fail in power-law domains.
+    evidence_passages:
+    - 80% of effects come from 20% of causes — is observed across an astonishing range of domains
+    - a signature of power-law distributions, which arise when success breeds more success
+    - Preferential attachment is the mechanism behind many power-law distributions
+    - the rich get richer
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: pattern
+    depth: cross-domain
+    application: null
+  rationale: 'EMPIRICAL PATTERN — observed statistical regularity. Taleb''s 80/20 observations and Christian & Griffiths''
+    preferential attachment converge on the same empirical pattern: power-law concentration in complex adaptive systems. This
+    is a PATTERN (''systems with cumulative advantage produce concentrated outcomes''), not a causal mechanism. While preferential
+    attachment explains HOW the pattern emerges, the FB focuses on the OBSERVED REGULARITY itself, which is useful for prediction
+    and management even without knowing the generative mechanism.'
+- id: CONV-039
+  domain: economics
+  discipline: behavioral economics
+  source_books:
+  - Freakonomics — Steven Levitt & Stephen Dubner
+  - Thinking, Fast and Slow — Daniel Kahneman
+  cluster_segments:
+  - source_book: Freakonomics — Steven Levitt & Stephen Dubner
+    text: 'Incentives are the cornerstone of modern life. But incentives don''t always work as intended — sometimes they backfire
+      spectacularly. When a day-care center in Israel started fining parents who arrived late to pick up their children, late
+      arrivals INCREASED rather than decreased. The fine replaced a moral obligation (guilt about keeping teachers waiting)
+      with a market transaction (paying for extended care). Once parents framed the fine as a price, they were happy to pay
+      it — and arrived late more often, not less.
+
+      '
+  - source_book: Thinking, Fast and Slow — Daniel Kahneman
+    text: 'The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks of future actions
+      while overestimating their benefits. This pattern is remarkably robust: it appears in construction projects, software
+      development, home renovations, and even academic estimates of task completion time. The error is not random — it''s
+      systematically optimistic. The inside view (focusing on the specific case) consistently beats the outside view (looking
+      at base rates of similar cases) in people''s intuitive forecasts.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Incentive Frame Reversal
+    definition: Introducing an extrinsic incentive (money, penalty, reward) can backfire when it reframes an intrinsically
+      motivated behavior as a market transaction. The new frame displaces the original motivation — guilt becomes price, passion
+      becomes paid labor, civic duty becomes cost-benefit calculus — and the behavior shifts in the opposite direction from
+      what the incentive intended.
+    mechanism: 'The observed pattern is that extrinsic incentives interact with intrinsic motivation through frame displacement.
+      When a behavior is governed by social/moral norms (guilt, duty, passion), adding a monetary incentive reframes it as
+      a market exchange. People then optimize the market exchange — they pay the fine and arrive late, they work for the money
+      and stop when it stops, they calculate costs instead of honoring obligations. The PATTERN is: incentive introduction
+      → frame shift → behavior inversion. This is an empirical regularity, not a causal law — it depends on the strength of
+      the original intrinsic motivation and the salience of the new frame.'
+    boundary: 'Applies when: (1) the original behavior is intrinsically or socially motivated; (2) the extrinsic incentive
+      is small enough to reframe but not large enough to dominate (a $1000 fine would have worked). Fails when: (1) no intrinsic
+      motivation exists — incentives work as intended; (2) the incentive is so large it overwhelms the frame shift; (3) the
+      behavior is already framed as a market transaction (salary, price).'
+    consequence: Policy designers cannot assume that incentives and intrinsic motivation are additive. Adding a small fine
+      to a guilt-driven behavior can reduce compliance; adding a small bonus to a passion-driven activity can reduce engagement
+      once the bonus is removed. The empirical pattern warns against naive incentive engineering — test for frame displacement
+      before scaling.
+    evidence_passages:
+    - when a day-care center started fining parents who arrived late, late arrivals INCREASED
+    - The fine replaced a moral obligation with a market transaction
+    - The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks
+    - The inside view consistently beats the outside view in people's intuitive forecasts
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: pattern
+    depth: cross-domain
+    application: null
+  rationale: 'EMPIRICAL PATTERN — observed behavioral regularity. The day-care fine backfire (Levitt/Dubner) and the planning
+    fallacy (Kahneman) converge on the same empirical pattern: extrinsic incentives can produce the opposite of their intended
+    effect through frame displacement. This is an OBSERVED REGULARITY — ''incentives sometimes backfire when they reframe
+    intrinsically motivated behavior'' — not a causal mechanism. The FB describes WHAT happens and WHEN, without claiming
+    a universal causal law.'
+- id: CONV-040
+  domain: typography
+  discipline: graphic design
+  source_books:
+  - About Face — Alan Cooper
+  - Generative Design — Benedikt Gross
+  cluster_segments:
+  - source_book: About Face — Alan Cooper
+    text: 'Typography in user interfaces serves two masters: readability and hierarchy. Font size, weight, spacing, and color
+      create an information hierarchy that guides the user''s attention. Body text at 14-16px with a line height of 1.5 is
+      optimal for reading on screens. But the real craft is in the subtle adjustments — kerning pairs (adjusting space between
+      specific letter combinations like ''AV'' and ''To''), tracking (uniform letter-spacing across a word), and leading (line
+      spacing) — that transform legible text into polished, professional typography.
+
+      '
+  - source_book: Generative Design — Benedikt Gross
+    text: 'In computational typography, letterform spacing can be defined algorithmically rather than manually. Each glyph
+      has a bounding box and sidebearings (left and right margins) that determine default spacing. Kerning exceptions override
+      these defaults for specific letter pairs where the default spacing creates optical gaps — classic examples include ''AV,''
+      ''WA,'' ''To,'' and ''Ve.'' In variable fonts, these spacing parameters become axes that can be interpolated continuously,
+      allowing responsive typography that adapts to screen size and reading distance.
+
+      '
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Optical Kerning Adjustment
+    definition: Specific letter pair combinations (AV, WA, To, Ve) require custom spacing overrides because the default sidebearing
+      spacing creates optical gaps. Kerning pairs are hand-tuned or algorithmically defined exceptions to standard letter
+      spacing that make text appear evenly spaced to the human eye, even when geometric spacing between bounding boxes is
+      unequal.
+    mechanism: The human eye perceives spacing between letters optically, not geometrically. Two letters with diagonal strokes
+      (A and V) create a triangular gap that appears larger than the rectangular gap between straight-sided letters (H and
+      I) at the same geometric distance. Kerning corrects this by reducing the space for diagonal-adjacent pairs and increasing
+      it where strokes nearly touch. The adjustment is pair-specific and perceptually driven — there is no universal formula,
+      only perceptual judgment refined by tradition.
+    boundary: 'Applies specifically to Latin-script typography where letters are spaced side-by-side. Fails for: (1) monospaced
+      fonts where all characters occupy equal width (kerning is disabled by design); (2) scripts where character spacing follows
+      different rules (Arabic cursive connections, CJK ideographic squares); (3) purely geometric typefaces where optical
+      correction is deliberately rejected as part of the design philosophy.'
+    consequence: Well-kerned text is processed faster and perceived as more professional than unkerned text at the same content
+      and layout. The difference is often unconscious — readers sense something is 'off' without identifying the cause. For
+      body text, automatic kerning (metric or optical) is sufficient; for headlines, logos, and display text, manual kerning
+      pair adjustment is standard practice.
+    evidence_passages:
+    - kerning pairs (adjusting space between specific letter combinations like 'AV' and 'To')
+    - Kerning exceptions override these defaults for specific letter pairs
+    - classic examples include 'AV,' 'WA,' 'To,' and 'Ve'
+    elaboration: ''
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: specialized
+    application: When setting display type or a logo in a design tool (Figma, Illustrator, InDesign) → after setting the typeface
+      and size, manually check and adjust kerning on problematic letter pairs (AV, WA, To, Ve, Ta, Yo). Set the cursor between
+      the two letters and use Alt+Left/Right Arrow to decrease/increase spacing in small increments until the optical gap
+      matches surrounding letter pairs.
+  rationale: 'GENUINE SPECIALIZED POSITIVE (D2226). Optical kerning is a narrow sub-technique within typography, which is
+    itself a sub-field of graphic design. It passes the specialization test: most practitioners IN the parent domain (graphic
+    design) would understand this, but it requires typography-specific knowledge. It is tool-adjacent (applies to any vector
+    design software with kerning controls) but specialized enough that a general ''design principles'' book would not cover
+    it. Essential for teaching S2 and S4 that valid principles exist at narrow, tool-bound scope with depth=''specialized''.
+    D2226: this fills the missing specialized positive gap identified in the Kimi audit.'

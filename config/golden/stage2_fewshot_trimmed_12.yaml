@@ -205,7 +205,7 @@ examples:
     - specifying the objective precisely is impossible for complex real-world values
     - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
     - intelligence and final goals are orthogonal
-    depth: universal
+    depth: cross-domain
     evidence: cited
     jargon:
     - reward hacking
@@ -339,7 +339,7 @@ examples:
     - Spaced practice is far more effective than massed practice
     - The spacing effect is the single most powerful memory technique
     - each sleep period consolidates what was practiced that day
-    depth: universal
+    depth: cross-domain
     evidence: cited
     jargon:
     - testing effect
@@ -442,11 +442,9 @@ examples:
     extraction_type: descriptive_model
     content_type: principle
     depth: domain
-  rationale: 'CONVERGENT POSITIVE — SPECIALIZED SUB-FIELD PRINCIPLE (D2221). Two independent computer graphics sources converge
-    on the same mechanism: Bernstein polynomial blending of control points. Depth is specialized — this is tool-bound (vector
-    graphics software) and sub-field specific (computational geometry within computer graphics). A genuine specialized positive
-    is essential for teaching S2 that valid principles can exist at narrow scope. Application is null because this is a descriptive
-    technical mechanism rather than a prescriptive technique.'
+  rationale: 'CONVERGENT POSITIVE — DOMAIN-BOUND TECHNICAL PRINCIPLE (D2221, D2226). Two independent computer graphics
+    sources converge on the same mechanism: Bernstein polynomial blending of control points. Depth is domain — field-bound,
+    tool-agnostic (applies to all vector graphics software).'
 - id: CONV-029
   domain: decision making
   discipline: cognitive psychology

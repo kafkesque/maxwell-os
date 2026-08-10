@@ -82,8 +82,11 @@ def main() -> None:
                 try:
                     with open(CHECKPOINT) as f:
                         cp_lines = sum(1 for line in f if line.strip())
-                except Exception:
-                    pass
+                except Exception as e:
+                    # D2226: C16 compliance — log, don't silently swallow.
+                    # Don't raise: watchdog is monitoring, not critical path.
+                    # A corrupted checkpoint file shouldn't crash the watchdog.
+                    print(f"   ⚠️  Watchdog: cannot read checkpoint line count: {e}", file=sys.stderr)
 
             # OMLX + memory
             omlx = run(["curl", "-s", "--max-time", "3", "http://localhost:11435/health"])

@@ -66,9 +66,12 @@ from pipeline.schema_accessor import (
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
-NLI_ENTAILMENT_THRESHOLD: float = S5_NLI_ENTAILMENT_THRESHOLD  # D2119: from config (default 0.6)
-NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2155: from config (default 0.8)
-NLI_MARGINAL_THRESHOLD: float = S5_NLI_MARGINAL_THRESHOLD  # D2155: from config (default 0.5)
+NLI_ENTAILMENT_THRESHOLD: float = S5_NLI_ENTAILMENT_THRESHOLD  # D2119: from config (default 0.5)
+NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2155: from config (default 0.6)
+# D2226 (Kimi audit fix): Was hardcoded 0.8 in nli_evidence_check, now reads from config.
+# Config declares 0.6 pass / 0.5 entailment / 0.3 marginal. Hardcoded 0.8 overrode
+# the more permissive config, forcing unnecessary LLM escalation.
+NLI_MARGINAL_THRESHOLD: float = S5_NLI_MARGINAL_THRESHOLD  # D2155: from config (default 0.3)
 # ── NLI Model — config-driven with automatic fallback (D2119) ────────────
 # Primary: ModernBERT-base-nli (~64ms, 8192 ctx, 90% MNLI accuracy)
 # Fallback: DeBERTa-v3-base-mnli-fever-anli (~129ms, 512 ctx, 90% MNLI + FEVER)
@@ -208,17 +211,18 @@ def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
             return False, 0.0, "No valid evidence passages to check — QUARANTINE"
 
         # Score: MAX-entailment — strongest signal wins (D2215: DeBERTa FEVER factuality).
-        # A single strong contradiction (≥0.8) fails regardless of other passages.
-        # A single strong entailment (≥0.8) passes without escalation.
+        # D2226 (Kimi audit fix): Thresholds now config-driven, not hardcoded 0.8.
+        # A single strong contradiction (≥NLI_PASS_THRESHOLD) fails regardless of other passages.
+        # A single strong entailment (≥NLI_PASS_THRESHOLD) passes without escalation.
         max_entail: float = max((r["score"] for r in results if r["label"] == "ENTAILMENT"), default=0.0)
         max_contra: float = max((r["score"] for r in results if r["label"] == "CONTRADICTION"), default=0.0)
 
-        if max_contra >= 0.8:
+        if max_contra >= NLI_PASS_THRESHOLD:
             # Strong contradiction → fail-closed (D2093)
             passed: bool = False
             nli_score: float = 0.0
             detail: str = f"NLI FAIL: max contradiction {max_contra:.2f} — evidence contradicts claim"
-        elif max_entail >= 0.8:
+        elif max_entail >= NLI_PASS_THRESHOLD:
             # Strong entailment → strong pass (skip LLM)
             passed = True
             nli_score = max_entail
@@ -544,7 +548,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
                     fact_score = nli_score
                     fact_detail = f"NLI {nli_score:.2f} + CITATION-ECHO + OMLX unavailable — QUARANTINE: {mech_detail}"
                     method = "nli-echo"
-            elif nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2155: config threshold (default 0.8)
+            elif nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2226: config threshold (default 0.6)
                 prefilter_stats["passed"] += 1
                 fact_passed = True
                 fact_score = nli_score
@@ -552,7 +556,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
                 method = "nli"
                 llm_stats["skipped"] += 1
             elif nli_passed and nli_score >= NLI_MARGINAL_THRESHOLD:  # D2155: config threshold (default 0.5)
-                # D2176: Marginal NLI (0.5–0.8) must escalate to LLM deep check.
+                # D2176: Marginal NLI (0.3–0.6) must escalate to LLM deep check.
                 # OLD: fact_passed=True on marginal — treated weak evidence as confirmed.
                 # NEW: marginal → UNKNOWN → escalate to LLM verifier (Gemma cross-family).
                 # This is epistemically correct: "maybe" is not "yes."

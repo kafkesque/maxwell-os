@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-06
+# Last manual edit: 2026-08-09
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-06T21:27:09Z'
-total_decisions: 199
+last_sync: '2026-08-09T22:42:42Z'
+total_decisions: 216
 decisions:
 - id: D2092
   category: INF
@@ -1450,77 +1450,165 @@ decisions:
 - id: D2208
   category: BUGFIX
   state: ACTIVE
-  description: 'N1 Yield Diagnostic Pass (D2208): 6 bugs fixed — OMLX memory guard ceiling, circuit breaker death spiral, memory guard false alarm, discovery probe hardcoded to OMLX, hardcoded max_workers, MLX provider local model path. 55 FBs from 58 TFS clusters (95% yield).'
+  description: 'N1 Yield Diagnostic Pass (D2208): 6 bugs fixed — OMLX memory guard ceiling, circuit breaker death spiral,
+    memory guard false alarm, discovery probe hardcoded to OMLX, hardcoded max_workers, MLX provider local model path. 55
+    FBs from 58 TFS clusters (95% yield).'
   champion: auto-sync
-  target_files: ['pipeline/omlx_call.py', 'pipeline/stage2_extract.py', 'pipeline/memory_guard.py', 'pipeline/providers/mlx_provider.py']
+  target_files:
+  - pipeline/omlx_call.py
+  - pipeline/stage2_extract.py
+  - pipeline/memory_guard.py
+  - pipeline/providers/mlx_provider.py
   created: '2026-08-07'
 - id: D2209
   category: INF
   state: ACTIVE
-  description: 'Discovery Probe Provider Routing (D2209): discover_principles() now routes through call_llm() instead of calling call_omlx_json() directly, respecting --provider CLI flag.'
+  description: 'Discovery Probe Provider Routing (D2209): discover_principles() now routes through call_llm() instead of calling
+    call_omlx_json() directly, respecting --provider CLI flag.'
   champion: auto-sync
-  target_files: ['pipeline/stage2_extract.py']
+  target_files:
+  - pipeline/stage2_extract.py
   created: '2026-08-07'
 - id: D2211
   category: BUGFIX
   state: ACTIVE
-  description: 'P0 Circuit Breaker & Error Propagation Fixes (D2211): 13 surgical fixes across 3 files breaking the 12-hour Run 5 failure chain. Health check now uses stress_test_omlx (real chat requests). CircuitOpenError propagates through call_llm→discover_principles→_process_cluster→future.result(). Probe fail-closed with 10% abort threshold. 4xx excluded from breaker. Thread safety lock added. Run-scoped paths for probe cache + singletons.'
+  description: 'P0 Circuit Breaker & Error Propagation Fixes (D2211): 13 surgical fixes across 3 files breaking the 12-hour
+    Run 5 failure chain. Health check now uses stress_test_omlx (real chat requests). CircuitOpenError propagates through
+    call_llm→discover_principles→_process_cluster→future.result(). Probe fail-closed with 10% abort threshold. 4xx excluded
+    from breaker. Thread safety lock added. Run-scoped paths for probe cache + singletons.'
   champion: Goose (S-tier Senior RAG Engineer)
-  target_files: ['pipeline/omlx_call.py', 'pipeline/stage2_extract.py', 'pipeline/pipeline_paths.py']
+  target_files:
+  - pipeline/omlx_call.py
+  - pipeline/stage2_extract.py
+  - pipeline/pipeline_paths.py
   created: '2026-08-08'
 - id: D2213
   category: ARCH
   state: ACTIVE
-  description: 'Old 30-sec T3 actionability rule recovered from v1 Maxwell OS (session_decisions_d799.yaml D12_T3_DECISION_BOUNDARY). Binary test: (1) Can practitioner apply within 30s? (2) Does it define when NOT to apply? v3 3-class taxonomy (descriptive/prescriptive/diagnostic) built on this foundation.'
+  description: 'Old 30-sec T3 actionability rule recovered from v1 Maxwell OS (session_decisions_d799.yaml D12_T3_DECISION_BOUNDARY).
+    Binary test: (1) Can practitioner apply within 30s? (2) Does it define when NOT to apply? v3 3-class taxonomy (descriptive/prescriptive/diagnostic)
+    built on this foundation.'
   champion: Goose (2026-08-09 audit)
   target_files: []
   created: '2026-08-09'
 - id: D2214
   category: INF
   state: ACTIVE
-  description: 'Pydantic FB(StampedRecord) class at schemas.py:459 confirmed dead code — never instantiated anywhere. All min_length, Literal, field_validator constraints non-functional. Actual enforcement via prompt strings. Pydantic model retained as interface documentation.'
+  description: Pydantic FB(StampedRecord) class at schemas.py:459 confirmed dead code — never instantiated anywhere. All min_length,
+    Literal, field_validator constraints non-functional. Actual enforcement via prompt strings. Pydantic model retained as
+    interface documentation.
   champion: Goose (2026-08-09 audit)
-  target_files: ['pipeline/schemas.py']
+  target_files:
+  - pipeline/schemas.py
   created: '2026-08-09'
 - id: D2215
   category: BUGFIX
   state: ACTIVE
-  description: 'S5 verification blindspot: mechanism/boundary/consequence dropped in S4 dict assembly, S5 falls back to application/failure_mode/elaboration. NLI scores for "mechanism" actually measure CRIBS-enriched application match. Fix 0.2 (forward fields) + Fix 0.4 (MAX-entailment scoring) resolves.'
+  description: 'S5 verification blindspot: mechanism/boundary/consequence dropped in S4 dict assembly, S5 falls back to application/failure_mode/elaboration.
+    NLI scores for "mechanism" actually measure CRIBS-enriched application match. Fix 0.2 (forward fields) + Fix 0.4 (MAX-entailment
+    scoring) resolves.'
   champion: Goose (2026-08-09 audit)
-  target_files: ['pipeline/stage5_verify.py', 'pipeline/stage4_merge.py']
+  target_files:
+  - pipeline/stage5_verify.py
+  - pipeline/stage4_merge.py
   created: '2026-08-09'
 - id: D2216
   category: ARCH
   state: ACTIVE
-  description: 'DeBERTa-v3-base-mnli-fever-anli confirmed as correct factuality model for sovereign pipeline. 362MB, FEVER 89.1%, runs locally (C3), $0 cost (C1). Purpose-built for claim-evidence verification. No model swap needed — S5 issue is architectural (fields), not model capability.'
+  description: DeBERTa-v3-base-mnli-fever-anli confirmed as correct factuality model for sovereign pipeline. 362MB, FEVER
+    89.1%, runs locally (C3), $0 cost (C1). Purpose-built for claim-evidence verification. No model swap needed — S5 issue
+    is architectural (fields), not model capability.
   champion: Goose (2026-08-09 audit)
-  target_files: ['config/pipeline_config.yaml', 'pipeline/stage5_verify.py']
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/stage5_verify.py
   created: '2026-08-09'
 - id: D2217
   category: ARCH
   state: ACTIVE
-  description: 'S2 rerun preferred over elaboration repair script. Avoids two-model contamination, benefits from calibrated golden few-shot (D2206), produces consistent fields from single model (Qwen3-Coder), maintains provenance integrity. ~19h runtime acceptable for quality.'
+  description: S2 rerun preferred over elaboration repair script. Avoids two-model contamination, benefits from calibrated
+    golden few-shot (D2206), produces consistent fields from single model (Qwen3-Coder), maintains provenance integrity. ~19h
+    runtime acceptable for quality.
   champion: Goose (2026-08-09 audit)
-  target_files: ['pipeline/stage2_extract.py']
+  target_files:
+  - pipeline/stage2_extract.py
   created: '2026-08-09'
 - id: D2218
   category: ARCH
   state: ACTIVE
-  description: 'Dead multi-FB merge path deleted (Option A). A/B test: delete chosen over guard. Path unreachable under cluster-before-extract (D2120). Backup: stage4_merge.py.backup-20260809. Part of Tier 0 Fix 0.3.'
+  description: 'Dead multi-FB merge path deleted (Option A). A/B test: delete chosen over guard. Path unreachable under cluster-before-extract
+    (D2120). Backup: stage4_merge.py.backup-20260809. Part of Tier 0 Fix 0.3.'
   champion: Goose (2026-08-09 audit)
-  target_files: ['pipeline/stage4_merge.py']
+  target_files:
+  - pipeline/stage4_merge.py
   created: '2026-08-09'
+- id: D2219
+  category: INF
+  state: ACTIVE
+  description: '**Category:** INF / QLT / DATA'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2220
+  category: INF
+  state: ACTIVE
+  description: '**Category:** QLT / BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2221
+  category: INF
+  state: REJECTED
+  description: '**Category:** DATA / QLT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2222
+  category: INF
+  state: ACTIVE
+  description: '**Category:** DATA'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2223
+  category: INF
+  state: SUPERSEDED
+  description: '**Category:** DATA'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2224
+  category: INF
+  state: SUPERSEDED
+  description: '**Category:** INF / OPT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2225
+  category: INF
+  state: ACTIVE
+  description: '**Category:** INF / QLT / DATA'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2226
+  category: INF
+  state: REJECTED
+  description: '**Category:** BUGFIX / QLT / DATA'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 208
+  total: 216
   proposed: 0
   draft: 0
-  active: 164
+  active: 177
   stale: 0
-  superseded: 6
+  superseded: 8
   archived: 8
-  rejected: 5
+  rejected: 7
   by_category:
-    INF: 126
+    INF: 134
     QLT: 21
     GOV: 11
     RES: 4

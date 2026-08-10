@@ -1127,3 +1127,20 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 
 *Updated: 2026-08-07 (N2 crash audit) | Bugs tracked: 52 | Resolved: 45 | Closed (moot): 5 | Open: 2 | Schema version: 1.8*
 <!-- BUG-005/006 resolved (P0.1/P0.3 fixes already in code), BUG-007/008/009 closed (Stage 3/HDBSCAN/PCA/nomic all removed), BUG-010 resolved (config actively used) -->
+
+## BUG-061 — 2026-08-10 — C16 Violation: n2_watchdog.py Silent Exception Swallowing
+- **Symptom:** `integrity_check.py` check #15 flagged `n2_watchdog.py:85: except Exception: pass` — bare except silently swallowing all errors (C16 violation).
+- **Root cause:** Checkpoint line-count read wrapped in `except Exception: pass` — if the checkpoint file was corrupted or inaccessible, the watchdog would silently report 0 lines without logging the error.
+- **Impact:** Watchdog could report misleading checkpoint state during N2 runs. Non-critical (watchdog is monitoring, not pipeline logic).
+- **Fix:** D2226 — Log error to stderr with descriptive message. Don't raise (watchdog is monitoring — a checkpoint read failure shouldn't crash the watchdog). 
+- **Status:** ✅ FIXED (2026-08-10) — D2226.
+- **Files:** `pipeline/n2_watchdog.py:85`
+
+## BUG-062 — 2026-08-10 — Merged S4 Phi-4-mini Depth Over-Assignment (95% cross-domain)
+- **Symptom:** 20-FB live test with `MAXWELL_MERGED_S4=1` classified 19/20 FBs as `cross-domain`, 1 as `domain`, 0 as `universal`, 0 as `specialized`. Disciplines show inconsistent casing (`Cognitive Psychology` vs `Cognitive psychology`).
+- **Root cause:** Phi-4-mini-3.8B is underpowered for 10-field JSON output including semantic depth classification (Kimi audit prediction confirmed). The model defaults to `cross-domain` as a safe middle-ground when it cannot discriminate depth levels reliably.
+- **Impact:** If merged call becomes default, all FBs will be shallowly classified as `cross-domain` — depth signal lost. Pipeline S5 verification would proceed on misclassified FBs.
+- **Mitigation (D2226):** Merged call kept as opt-in (`MAXWELL_MERGED_S4=1`). Default remains two-call path (CRIBS from Qwen3-35B + Classify from Phi-4-mini, now with mechanism fed to classifier). Recommendation: upgrade S4 classifier to Qwen3-8B or stronger model before making merged call the default.
+- **Status:** 🔴 OPEN — Model upgrade needed. Phi-4-mini adequate for CRIBS enrichment only, not for depth classification.
+
+*Updated: 2026-08-10 (D2226 audit) | Bugs tracked: 54 | Resolved: 46 | Closed (moot): 5 | Open: 3 | Schema version: 1.9*

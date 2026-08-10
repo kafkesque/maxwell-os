@@ -57,6 +57,9 @@ from pipeline.schemas import (
 )
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
+# D2226: Merged S4 CRIBS+Classification single-call (D2224)
+from pipeline.stage4_merged_call import merged_cribs_classify
+
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
 
@@ -179,7 +182,12 @@ DO NOT:
 Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "depth": "universal|cross-domain|domain|specialized", "is_specialized": true/false, "evidence": "..."}"""
 
 
-def build_classify_prompt(fb_name: str, fb_definition: str) -> str:
+def build_classify_prompt(
+    fb_name: str,
+    fb_definition: str,
+    mechanism: str = "",
+    boundary: str = "",
+) -> str:
     """Build a FREE scientific classification prompt — no canonical lists.
 
     D2138: Two-stage classification. Stage 1: LLM classifies freely using its
@@ -190,35 +198,42 @@ def build_classify_prompt(fb_name: str, fb_definition: str) -> str:
     The LLM applies the physicist-chef-poet test to determine ontological scope.
     This replaces the structural derivation that caused 55% depth error rate.
 
+    D2226 (Kimi audit fix): Now receives mechanism + boundary alongside name + definition.
+    The physicist-chef-poet test REQUIRES the mechanism to assess ontological scope —
+    classification without mechanism produces depth errors. Previously only name +
+    definition were passed, causing input-starvation and misclassification.
+
     This preserves ontological accuracy — raw labels capture what the principle
     genuinely IS, while canonical labels organize it within our taxonomy.
     """
-    return f"""Classify this Foundation Block scientifically.
-
-NAME: {fb_name}
-DEFINITION: {fb_definition[:800]}
-
-Identify:
-1. What academic/intellectual discipline does this principle fundamentally belong to?
-   (Use the most precise discipline name you know — not generic buckets)
-2. What applied domains/fields/industries does this principle span?
-   (1-5 domains where a practitioner would apply this knowledge)
-3. DEPTH (ontological scope): universal, cross-domain, domain, or specialized?
-   Apply the physicist-chef-poet test. Does the mechanism apply across ALL reality
-   (universal), bridge two distinct disciplines via shared structure (cross-domain),
-   operate within one field (domain), or describe a narrow sub-technique (specialized)?
-   DEFAULT to "domain" unless the mechanism clearly transcends it.
-4. Is this a NARROW sub-technique or sub-field detail? (is_specialized: true/false)
-   - true = narrow technique, tool-specific skill, sub-field detail (e.g., "Kerning Pair Adjustment")
-   - false = broad principle applicable across the domain (e.g., "Design Strategy")
-   - Default to false unless clearly narrow.
-
-Return JSON:
-{{"discipline": "precise_discipline_name",
-  "domains": ["domain1", "domain2"],
-  "depth": "universal|cross-domain|domain|specialized",
-  "is_specialized": true_or_false,
-  "evidence": "cited|axiomatic"}}"""
+    lines: list[str] = [
+        "Classify this Foundation Block scientifically.",
+        "",
+        f"NAME: {fb_name}",
+        f"DEFINITION: {fb_definition[:800]}",
+    ]
+    if mechanism:
+        lines.append(f"MECHANISM: {mechanism[:600]}")
+    if boundary:
+        lines.append(f"BOUNDARY: {boundary[:300]}")
+    lines.extend([
+        "",
+        "Identify:",
+        "1. What academic/intellectual discipline does this principle fundamentally belong to?",
+        "   (Use the most precise discipline name you know — not generic buckets)",
+        "2. What applied domains/fields/industries does this principle span?",
+        "   (1-5 domains where a practitioner would apply this knowledge)",
+        "3. DEPTH (ontological scope): universal, cross-domain, domain, or specialized?",
+        "   Apply the physicist-chef-poet test. Does the mechanism apply across ALL reality",
+        "   (universal), bridge two distinct disciplines via shared structure (cross-domain),",
+        "   operate within one field (domain), or describe a narrow sub-technique (specialized)?",
+        "   DEFAULT to \"domain\" unless the mechanism clearly transcends it.",
+        "4. Is this a NARROW sub-technique or sub-field detail? (is_specialized: true/false)",
+        "   - true = narrow technique, tool-specific skill, sub-field detail (e.g., \"Kerning Pair Adjustment\")",
+        "   - false = broad principle applicable across the domain (e.g., \"Design Strategy\")",
+        "   - Default to false unless clearly narrow.",
+    ])
+    return "\n".join(lines)
 
 
 def map_to_canonical_with_fallback(raw_label: str, kind: str,
@@ -818,11 +833,33 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # ── D2137: CRIBS enrichment for single-FB clusters ──────────
         # Stage2 produces name+definition+mechanism+boundary but NOT
         # application, failure_mode, elaboration, jargon, keywords.
-        # Always run a lightweight enrichment to add these fields.
+        #
+        # D2226: MERGED S4 CALL (D2224) — When MAXWELL_MERGED_S4=1, use single
+        # Phi-4-mini call for BOTH CRIBS enrichment + classification (~61% faster).
+        # Otherwise use two-call pattern: CRIBS (Qwen) + Classify (Phi-4-mini).
         _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
+        _use_merged: bool = os.environ.get("MAXWELL_MERGED_S4", "") == "1"
+
         if _skip_llm:
             print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
+        elif _use_merged:
+            # D2226: Single-call CRIBS + Classification (D2224)
+            try:
+                merged_result = merged_cribs_classify(fb_data, model=VERIFY_MODEL)
+                # Extract CRIBS fields
+                for field in ("application", "failure_mode", "elaboration",
+                              "keywords", "jargon"):
+                    if merged_result.get(field):
+                        fb_data[field] = merged_result[field]
+                # Stash classification for Phase 2
+                fb_data["_merged_classification"] = merged_result
+                print("⚡merged", flush=True, end=" ")
+            except Exception as e:
+                fb_data["enrichment_status"] = "FAILED"
+                fb_data["enrichment_error"] = f"merged_call: {e}"[:200]
+                print("⚠️merged", flush=True, end=" ")
         else:
+            # Original two-call path: CRIBS enrichment (Qwen) + separate classify
             try:
                 cribs_prompt = _build_cribs_enrichment_prompt(fb_data)
                 cribs_result = call_omlx_json(
@@ -856,41 +893,44 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             continue
 
         # Phase 2: TWO-STAGE classification (D2138) + semantic depth (D2220)
+        # D2226: When merged S4 call produced classification, use it directly.
+        # Otherwise fall back to separate classify call (original two-call path).
         # Stage 1: FREE scientific classification — LLM uses full knowledge,
         # unrestricted by canonical lists. Produces ontologically accurate raw labels,
         # is_specialized flag, AND semantic depth via physicist-chef-poet test.
         # Stage 2: CANONICAL MAPPING — pipeline maps raw labels to taxonomy.
         # Stage 3: DEPTH — LLM-classified semantically (D2220), not derived from domain count.
         synonym_index = get_synonym_index()
+        merged_classification = fb_data.pop("_merged_classification", None)
 
-        try:
-            class_prompt = build_classify_prompt(name, definition)
-            class_data = call_omlx_json(
-                prompt=class_prompt,
-                model=VERIFY_MODEL,
-                system=CLASSIFY_SYSTEM_PROMPT,
-                max_tokens=512,
-            )
-        except Exception as e:
-            import traceback
-            print(f"→ ❌ Classification FAILED: {e} — FB QUARANTINED")
-            print(f"   Traceback: {traceback.format_exc()[-300:]}")
-            # D2176: Quarantine on classification failure. OLD behavior silently
-            # labeled failed classifications as "emerging", contaminating the DB.
-            # NEW: classification_status = "FAILED", discipline = "unclassified",
-            # domains = ["unclassified"]. The FB is still stored for audit but
-            # excluded from agent retrieval (filtered by status in retrieve.py).
-            class_data = {
-                "discipline": "unclassified",
-                "domains": ["unclassified"],
-                "is_specialized": False,
-                "classification_status": "FAILED",
-                "classification_error": str(e)[:200],
-                "evidence": "cited",
-            }
-            # D2178: Track classification failures (variable in same scope — no shadowing)
-            # OLD: fragile dir() check removed — classification_errors is in run_stage4 scope
-            classification_errors += 1
+        if merged_classification is not None:
+            # D2226: Classification already done by merged S4 call — skip second LLM call
+            class_data = merged_classification
+            print("(classify:merged)", flush=True, end=" ")
+        else:
+            try:
+                mechanism = fb_data.get("mechanism", "")
+                boundary = fb_data.get("boundary", "")
+                class_prompt = build_classify_prompt(name, definition, mechanism, boundary)
+                class_data = call_omlx_json(
+                    prompt=class_prompt,
+                    model=VERIFY_MODEL,
+                    system=CLASSIFY_SYSTEM_PROMPT,
+                    max_tokens=512,
+                )
+            except Exception as e:
+                import traceback
+                print(f"→ ❌ Classification FAILED: {e} — FB QUARANTINED")
+                print(f"   Traceback: {traceback.format_exc()[-300:]}")
+                class_data = {
+                    "discipline": "unclassified",
+                    "domains": ["unclassified"],
+                    "is_specialized": False,
+                    "classification_status": "FAILED",
+                    "classification_error": str(e)[:200],
+                    "evidence": "cited",
+                }
+                classification_errors += 1
 
         # ── Stage 1: Capture raw LLM output (D2138: preserved forever) ──
         domains_raw = list(class_data.get("domains", []))

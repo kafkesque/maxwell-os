@@ -3360,3 +3360,69 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 **Decision:** The multi-FB merge path (`build_fb_prompt`, L65-116, 172-184, 872-884 in stage4_merge.py) is unreachable under cluster-before-extract (D2120) where every cluster has exactly 1 principle ID. A/B test conducted: Option A (delete path + add assert) chosen over Option B (guard with synthesis fallback). Guard would require untestable synthesis functions — the path was never adapted to v3.0 mechanism/boundary/consequence schema. Backup created: `stage4_merge.py.backup-20260809`. Part of Tier 0 Fix 0.3.
 **Files:** `pipeline/stage4_merge.py`, backup: `pipeline/stage4_merge.py.backup-20260809`
 **Status:** ✅ DECIDED — Part of Fix 0.3 (not yet applied)
+
+### D2219-D2225 — Session 2026-08-09 Pipeline Improvements (Logged retroactively 2026-08-10)
+**Category:** INF / QLT / DATA
+**Decision:** Multiple pipeline improvements designed and partially implemented across sessions.
+
+### D2220 — Semantic Depth Classification (Replaces Structural Derivation)
+**Category:** QLT / BUGFIX
+**Decision:** Depth (universal/cross-domain/domain/specialized) is now classified semantically by the LLM using the physicist-chef-poet test, replacing the structural derivation from `n_canonical_domains` which had ~55% error rate. The LLM judges ontological scope based on the mechanism's applicability across reality. CLASSIFY_SYSTEM_PROMPT updated with thorough ontological definitions. Default: "domain" unless mechanism clearly transcends.
+**Files:** `pipeline/stage4_merge.py` (CLASSIFY_SYSTEM_PROMPT, build_classify_prompt, run_stage4)
+**Status:** ✅ IMPLEMENTED — D2226 audit found input-starvation (mechanism not fed to classifier). FIXED.
+
+### D2221 — Golden Set v4.0: NEG-007/010 Replacement + 18 New Examples
+**Category:** DATA / QLT
+**Decision:** Replaced contaminated negatives (NEG-007 taught rejection of legitimate convergence, NEG-010 taught rejection of legitimate brand mechanisms) with genuine citation echo (Covey/Carnegie/Sinek) and genuine platitude (Collins/Sinek/Coyle). Added 18 new examples covering hard science, medicine, law, software engineering, and diverse negative failure modes (engineering tradeoff, historical observation, correlation≠causation, mechanism disagreement, domain best practice, non-falsifiable, speculation, same-author echo).
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`
+**Status:** ✅ DONE — Expanded to v4.1 (50 examples).
+
+### D2222 — Golden Set: Missing depth/discipline Fields Fixed
+**Category:** DATA
+**Decision:** All 27 positive examples now have `depth` and `discipline` populated. Previously CONV-001-007, CONV-020, CONV-022 had missing fields.
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`
+**Status:** ✅ DONE
+
+### D2223 — Golden Set v4.1: 50 Examples Finalized
+**Category:** DATA
+**Decision:** Golden set expanded to 50 examples (27 pos + 23 neg). All required fields populated. Calibrated.
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`
+**Status:** ✅ DONE — Superseded by D2226 v4.2 (60 examples).
+
+### D2224 — Merged S4 CRIBS+Classification Single Call
+**Category:** INF / OPT
+**Decision:** Built `stage4_merged_call.py` — single Phi-4-mini call producing all 10 CRIBS+Classify fields. Verified live at 7.71s (61% faster than two-call pattern). Feature flag: `MAXWELL_MERGED_S4=1`. Not initially wired into run_stage4().
+**Files:** `pipeline/stage4_merged_call.py`
+**Status:** ✅ IMPLEMENTED — D2226: wired into run_stage4() as opt-in feature flag.
+
+### D2225 — Parallel OMLX (Continuous Batching)
+**Category:** INF / OPT
+**Decision:** Built `omlx_parallel.py` — ThreadPoolExecutor-based parallel OMLX calls using `call_omlx_batch()` and `call_omlx_json_batch()`. Includes `estimate_optimal_workers()` and `benchmark_parallel()`. Exploits OMLX continuous batching for throughput. Not wired into production pipeline.
+**Files:** `pipeline/omlx_parallel.py`
+**Status:** ✅ IMPLEMENTED — Not yet integrated into production pipeline stages.
+
+### D2226 — Kimi Audit: Depth, NLI, Golden Set, and Merged S4 Fixes (2026-08-10)
+**Category:** BUGFIX / QLT / DATA
+**Source:** Kimi eval05 + Qwen eval05 + Claude eval05 cross-examination audit
+**Decision:** 6 P0/P1 fixes applied surgically across pipeline code and golden set:
+
+**Fix 1 — `build_classify_prompt` input-starvation (P0):** The live classification path only passed `name` + `definition[:800]` to the LLM, but the CLASSIFY_SYSTEM_PROMPT's physicist-chef-poet test REQUIRES the mechanism. Added `mechanism` and `boundary` params to `build_classify_prompt()`. Root cause of depth inaccuracy — classification was blind to the causal structure it was supposed to evaluate.
+
+**Fix 2 — NLI hardcoded thresholds (P0):** `nli_evidence_check()` hardcoded `max_contra >= 0.8` and `max_entail >= 0.8`, overriding config values (`nli_pass_threshold: 0.6`, `nli_entailment_threshold: 0.5`, `nli_marginal_threshold: 0.3`). Replaced hardcoded 0.8 with `NLI_PASS_THRESHOLD` (config-driven from `pipeline_config.yaml`). Updated outdated comments (default 0.8→0.6, 0.5→0.3).
+
+**Fix 3 — Merged S4 call wired (P1):** `stage4_merged_call.py` was standalone; now wired into `run_stage4()` via `MAXWELL_MERGED_S4=1` feature flag. When enabled, replaces two-call pattern (CRIBS via Qwen + Classify via Phi-4-mini) with single Phi-4-mini merged call. Original two-call path preserved as default.
+
+**Fix 4 — Golden set CONV-006 structural bug (P0):** `expected_fb` was incomplete dict (4 metadata fields only) despite rationale describing 2 full FBs. Now expanded to complete single FB (Default Inertia Effect) with all required fields. The 1:N extraction example was lost but can be restored in a future pass.
+
+**Fix 5 — Depth misclassifications (P1):** CONV-012 (AI Alignment): universal→cross-domain — fails physicist/chef/poet test (AI-specific). CONV-017 (Spaced Retrieval): universal→cross-domain — learning-context-specific, not universal. CONV-022: rationale said "specialized" but field said "domain" — rationale corrected to match field (domain = field-bound, tool-agnostic).
+
+**Fix 6 — Extraction-type diversity (P1):** Added 10 new examples: 3 descriptive_model (CONV-031-033: Technology Adoption Lifecycle, System Fragility Taxonomy, Goal-Directed Design Hierarchy), 3 normative_heuristic (CONV-034-036: Prospective Hindsight Debiasing, Commitment-Anchored Habit Formation, Bimodal Risk Allocation), 3 empirical_pattern (CONV-037-039: Cognitive Capacity Ceiling, Power-Law Concentration Pattern, Incentive Frame Reversal), 1 specialized positive (CONV-040: Optical Kerning Adjustment). Extraction type balance improved from 89%→68% causal.
+
+**Also fixed:** CONV-020 evidence passage curly apostrophe normalization. Trimmed 12-example set depth values synchronized.
+
+**Golden set post-fix:** 60 examples (37 pos + 23 neg), 25 causal/4 descriptive/4 normative/4 empirical/1 specialized. YAML parses clean. All required fields present.
+
+**Verdict on DSPy readiness:** IMPROVED but still BORDERLINE. Causal skew reduced from 89% to 68% — much better but still dominant. The golden set is now FUNCTIONALLY READY for a pilot fine-tuning run with monitoring on non-causal type accuracy. Full readiness (75+ examples with balanced types) would require another 15 examples.
+
+**Files:** `pipeline/stage4_merge.py`, `pipeline/stage5_verify.py`, `config/golden/stage2_fewshot_convergent.yaml`, `config/golden/stage2_fewshot_trimmed_12.yaml`, `config/pipeline_config.yaml`
+**Status:** ✅ ALL 6 FIXES APPLIED AND SYNTAX-VERIFIED

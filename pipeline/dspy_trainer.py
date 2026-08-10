@@ -535,6 +535,17 @@ def run_dspy_pilot(
         requires_permission_to_run=False,
     )
 
+    # D2243: Persist the optimized program so it survives crashes/reboots.
+    # Lost the first pilot to kernel panic + /tmp cleanup — never again.
+    save_path = Path("/tmp/dspy_mipro_optimized.json")
+    try:
+        optimized.save(str(save_path))
+        if verbose:
+            print(f"💾 Optimized program saved: {save_path}")
+    except Exception as e:
+        if verbose:
+            print(f"⚠️  Could not save optimized program: {e}")
+
     if verbose:
         print(f"✅ Pilot complete. Optimized program ready.")
 

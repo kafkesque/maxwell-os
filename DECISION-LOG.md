@@ -3640,3 +3640,36 @@ Recommended: run `--pilot` as a background task with nohup.
 **Code:** `pipeline/dspy_trainer.py` — `DirectOMLXLM` class (lines 435-490).
 
 
+### D2238 — Traditional vs DSPy S2 Comparison (2026-08-10)
+
+**Context:** Ran head-to-head comparison of Traditional S2 (few-shot injection from
+stage2_extract.py) vs DSPy ChainOfThought (ConvergentExtraction Signature) on 3
+held-out test examples.
+
+**Results (Qwen3-Coder-30B-A3B-MLX-4bit, M1 Max):**
+
+| Metric | Traditional | DSPy CoT | Winner |
+|--------|------------|----------|--------|
+| Quality Score | **1.00** | 0.82 | Traditional |
+| Latency | 45.3s | **43.2s** | DSPy |
+| Type Accuracy | 3/3 | 2/3 | Traditional |
+| Depth Accuracy | 0/3 | 0/3 | Neither |
+
+**Analysis:**
+- Traditional scores 1.00 due to **data leakage** — the few-shot examples come from
+  the same golden set distribution as the test examples. This is not a fair test of
+  generalization; it's memorization via prompt priming.
+- Traditional doesn't output depth (SYSTEM_PROMPT says "Stage 4's job"), so depth
+  accuracy is 0/3 by design.
+- DSPy CoT scores 0.82 with no few-shot examples — this is a true test of the model's
+  extraction capability. Type accuracy 2/3, depth defaults to "universal" (known bias).
+- DSPy is slightly faster (43s vs 45s) due to shorter prompt.
+- The traditional prompt is ~3K tokens (SYSTEM_PROMPT) + ~3K tokens (few-shot examples)
+  = 6K tokens total, causing slower inference.
+
+**BootstrapFewShot pilot:** Running now with fixed json_repair. Expected to produce
+an optimized prompt that's faster and matches traditional quality without data leakage.
+
+**Next:** Compare BootstrapFewShot-optimized DSPy vs Traditional on fresh test set.
+
+

@@ -556,9 +556,17 @@ def evaluate_on_test(
 
     results = evaluator(program)
 
+    # dspy 3.x Evaluate() returns an EvaluationResult object (not float)
+    if hasattr(results, "score"):
+        results_score = float(results.score)
+    elif isinstance(results, dict):
+        results_score = float(results.get("score", 0.0))
+    else:
+        results_score = float(results) if results else 0.0
+
     if verbose:
         print(f"\n── Test Set Results ──")
-        print(f"  Score: {results:.3f}")
+        print(f"  Score: {results_score:.3f}")
         print(f"  Examples: {len(test_examples)}")
 
     # Per-type breakdown
@@ -590,7 +598,7 @@ def evaluate_on_test(
         print(f"  False Negatives: {fn_count}")
 
     return {
-        "overall_score": float(results) if results else 0.0,
+        "overall_score": results_score,
         "fp_count": fp_count,
         "fn_count": fn_count,
         "type_scores": {t: sum(s) / len(s) if s else 0.0 for t, s in type_scores.items()},

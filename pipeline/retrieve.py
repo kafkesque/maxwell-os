@@ -28,6 +28,8 @@ import sqlite3
 import sys
 from collections import deque
 from dataclasses import dataclass, field
+
+from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -614,7 +616,7 @@ def agentic_search(
     conn: sqlite3.Connection,
     query: str,
     max_iterations: int = 3,
-    confidence_threshold: float = 0.85,
+    confidence_threshold: float = RETRIEVE_CONFIDENCE_THRESHOLD,  # D2231: from config (was hardcoded 0.85)
     limit: int = 20,
     domain: str | None = None,
     discipline: str | None = None,
@@ -778,8 +780,8 @@ def main():
                         help="Graph expansion depth (default: 2, only with --graph-aware)")
     parser.add_argument("--max-iterations", type=int, default=3,
                         help="Max retrieval rounds for --agentic (default: 3)")
-    parser.add_argument("--confidence", type=float, default=0.85,
-                        help="Confidence threshold for --agentic (default: 0.85)")
+    parser.add_argument("--confidence", type=float, default=RETRIEVE_CONFIDENCE_THRESHOLD,
+                        help=f"Confidence threshold for --agentic (default: {RETRIEVE_CONFIDENCE_THRESHOLD})")
     parser.add_argument("--domain", "-d", help="Filter by domain")
     parser.add_argument("--discipline", help="Filter by discipline")
     parser.add_argument("--depth", help="Filter by depth")

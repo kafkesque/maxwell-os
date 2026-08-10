@@ -39,10 +39,12 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
+    S4_DEDUP_COSINE_THRESHOLD,   # D2231: C12 compliance
     S4_GE_OUTPUT,
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
+    S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: C12 compliance
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
     STAGE4_CHECKPOINT,
@@ -391,7 +393,7 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
 
 def dedup_fbs_by_cosine(
     fbs: list[dict],
-    threshold: float = 0.92,
+    threshold: float = S4_DEDUP_COSINE_THRESHOLD,  # D2231: from config (was hardcoded 0.92)
     model: str = "bge-m3",
 ) -> list[dict]:
     """D2120: Lightweight FB dedup replacing removed Stage 3 HDBSCAN.
@@ -624,7 +626,7 @@ def _serialize_jargon(jargon_value) -> str | None:
 
 def compute_fb_relationships(
     fbs: list[dict],
-    similarity_threshold: float = 0.80,
+    similarity_threshold: float = S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: from config (was hardcoded 0.80)
 ) -> list[dict]:
     """Compute FB-to-FB relationships for LightRAG graph foundation.
 
@@ -759,7 +761,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                 if pid in principles_idx:
                     cluster_fbs.append(principles_idx[pid])
         if len(cluster_fbs) > 1:
-            deduped_fbs = dedup_fbs_by_cosine(cluster_fbs, threshold=0.92)
+            deduped_fbs = dedup_fbs_by_cosine(cluster_fbs)  # D2231: uses config default S4_DEDUP_COSINE_THRESHOLD
             # Rebuild clusters from deduped list
             valid_ids = {
                 p.get("fb_id") or p.get("principle_id", "")

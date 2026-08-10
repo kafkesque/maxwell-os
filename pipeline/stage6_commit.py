@@ -39,6 +39,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     DB_PATH,
     PARQUET_DIR,
+    S15_EMBED_DIM,
     STAGE5_CHECKPOINT,
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
@@ -140,10 +141,11 @@ CREATE TRIGGER IF NOT EXISTS fbs_ai AFTER INSERT ON fbs BEGIN
 END;
 """
 
-# BUG-004 FIX: Pre-compute embeddings at commit time for O(1) vector search.
-CREATE_VEC_TABLE = """
+# D2229: Embedding dimension read from config (D2181 Matryoshka 512d bge-m3).
+# Previously hardcoded float[1024] — runtime failure when embed_dim=512.
+CREATE_VEC_TABLE = f"""
 CREATE VIRTUAL TABLE IF NOT EXISTS vec_fbs USING vec0(
-    definition_embedding float[1024]
+    definition_embedding float[{S15_EMBED_DIM}]
 );
 """
 

@@ -1,20 +1,8 @@
-# Maxwell OS — Single Source of Truth for Versioning
-# ============================================================
-# D2169: All version strings MUST be read from here.
-# No file may independently declare a version header.
-# The startup gate in runner.py refuses to run on mismatch.
-#
-# Update this file when bumping any version component.
-# Then run: python3 pipeline/runner.py --version-check
-# ============================================================
-
-constitution_version: "3.0"
-schema_version: "3.0"
-taxonomy_version: "v5.0"
-requirements_version: "3.0"
-query_banner_version: "3.0"
-config_schema_version: "3.0"
-pipeline_version: "3.0"
-
-# Version gate: pipeline refuses to run if any source file disagrees
+constitution_version: '3.0'
+schema_version: '3.0'
+taxonomy_version: v5.1
+requirements_version: '3.0'
+query_banner_version: '3.0'
+config_schema_version: '3.0'
+pipeline_version: '3.0'
 version_gate_enabled: true

@@ -1162,3 +1162,92 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Priority:** P1 — blocks all local-LLM-driven code analysis workflows.
 
 *Updated: 2026-08-10 (D2226 cleanup) | Bugs tracked: 55 | Resolved: 46 | Closed (moot): 5 | Open: 4 | Schema version: 1.10*
+
+## BUG-064 — 2026-08-10 — S4 Field Pollution in All 37 Golden Positives (P0) 🔴
+- **Symptom:** Every positive example (CONV-001 through CONV-040) contains S4 CRIBS enrichment fields inside `expected_fb`: `application`, `elaboration`, `procedural_skill`, `failure_mode`, `jargon`, `keywords`, `prerequisite_fbs`, `contradicts_fbs`, `related_fbs`, `evidence`.
+- **Root cause:** Golden set was built by extracting the full FB record post-S4 enrichment instead of the S2-only output. No stage-boundary discipline was enforced during curation.
+- **Impact:** DSPy fine-tuning would teach S2 to generate S4 enrichment fields — breaking the pipeline stage contract. S2 would hallucinate CRIBS enrichment, wasting tokens and creating expectation mismatch with S4.
+- **Fix:** D2228 — Strip all S4 fields from expected_fb. Keep only S2 core fields. Create separate stage4_fewshot_enrichment.yaml for CRIBS training.
+- **Status:** 🔴 OPEN — D2228 pending.
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`
+
+## BUG-065 — 2026-08-10 — sqlite-vec Dimension Mismatch: 1024 vs 512 (P0) 🔴
+- **Symptom:** `stage6_commit.py:146` creates vector table as `float[1024]`. `pipeline_paths.py:203` reads `embed_dim: 512` from config (bge-m3 Matryoshka, D2181).
+- **Root cause:** Schema was written when embeddings were 1024-dim. D2181 reduced to 512-dim Matryoshka but the CREATE TABLE statement was never updated.
+- **Impact:** `insert_embedding()` packs a 512-float blob into a 1024-float column. sqlite-vec will reject or silently corrupt. Vector search is broken at commit time.
+- **Fix:** D2229 — Change `float[1024]` to `float[512]`, read `S15_EMBED_DIM` from config at schema creation.
+- **Status:** 🔴 OPEN — D2229 pending.
+- **Files:** `pipeline/stage6_commit.py:146`
+
+## BUG-066 — 2026-08-10 — Golden Evidence Passages Are Paraphrases, Not Exact Source Spans (P0) 🔴
+- **Symptom:** 19+ sampled evidence passages do NOT match any `cluster_segment.text` exactly. Example: CONV-001 passages are short excerpts like "when the decoy was present, 84% chose Print+Web" rather than the original Ariely segment text.
+- **Root cause:** Evidence was manually curated from memory/paraphrase of source segments rather than copy-pasted from the canonical segment text.
+- **Impact:** S2 learns "semantically relevant excerpts" rather than "exact source-grounded evidence." Creates evidence hallucination/paraphrase acceptance leak: S2 synthesizes claim → short fragment appears supportive → S5 NLI passes on fragment → FB accepted even though full segment doesn't establish the claim.
+- **Fix:** D2230 — Verify all 60 examples against cluster_segments. Add source_book, segment_id, char_start, char_end, sha256 to each passage.
+- **Status:** 🔴 OPEN — D2230 pending.
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`
+
+## BUG-067 — 2026-08-10 — Stage 2 Convergence Routing via Source Count Alone (P0) 🔴
+- **Symptom:** `stage2_extract.py:1209`: `if is_conv or book_count >= 2:` triggers convergent extraction on ANY cluster with 2+ books, regardless of mechanism convergence.
+- **Root cause:** The `book_count >= 2` clause was a heuristic shortcut. It bypasses the convergence gate (which should verify that different sources describe the SAME mechanism, not just the same topic).
+- **Impact:** False convergence — two books discussing similar topics with different mechanisms get merged into a single FB. The golden negatives explicitly teach that source diversity ≠ convergence, but the code doesn't enforce this.
+- **Fix:** D2231-P0-5 — Require explicit `is_conv` gate or mechanism-similarity check. Source count alone must not trigger convergent extraction.
+- **Status:** 🔴 OPEN — D2231 pending.
+- **Files:** `pipeline/stage2_extract.py:1209`
+
+## BUG-068 — 2026-08-10 — 6 Locations Hardcode Thresholds Bypassing Config (P0 C12 Violation) 🔴
+- **Symptom:** Thresholds hardcoded at module level in 6 files, bypassing `config/pipeline_config.yaml`:
+  - `reliability.py`: `STABLE_THRESHOLD=0.85`, `WATCH_THRESHOLD=0.50`, `GARBAGE_THRESHOLD=0.20`
+  - `stage4_merge.py`: `threshold=0.92` (dedup), `similarity_threshold=0.80` (semantic near)
+  - `principle_index.py`: `MINHASH_THRESHOLD=0.90`
+  - `taxonomy_manager.py`: `FLOOD_THRESHOLD_RATIO=0.20`, `REPLACEMENT_THRESHOLD_RATIO=1.1`, `EMERGING_FREQ_THRESHOLD=10`
+  - `retrieve.py`: argparse default `0.85` for confidence threshold
+- **Root cause:** C12 governance not enforced at code review. Thresholds were added inline without config entries.
+- **Impact:** Any attempt to tune these thresholds via `pipeline_config.yaml` is silently ignored. System is not config-driven as Constitution requires.
+- **Fix:** D2231-P0-6 — Move all to `pipeline_config.yaml`, read via `pipeline_paths.py`.
+- **Status:** 🔴 OPEN — D2231 pending.
+- **Files:** `pipeline/reliability.py`, `pipeline/stage4_merge.py`, `pipeline/principle_index.py`, `pipeline/taxonomy_manager.py`, `pipeline/retrieve.py`, `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`
+
+## BUG-069 — 2026-08-10 — GoldenFB Schema Missing extraction_type Field (P0) 🔴
+- **Symptom:** `GoldenFB` Pydantic model at `schemas.py:915` has no `extraction_type` field. The golden set YAML includes `extraction_type` in `expected_fb`, but DSPy compilation via Pydantic validation would drop this field.
+- **Root cause:** `GoldenFB` was designed post-S4 (including CRIBS fields like application, jargon, etc.) but never updated when `extraction_type` was added to the golden set for S2 training.
+- **Impact:** DSPy loses the extraction_type training signal. Model cannot learn to distinguish causal_mechanism from descriptive_model from normative_heuristic from empirical_pattern.
+- **Fix:** D2231-P0-4 — Add `extraction_type: str = ""` to `GoldenFB`.
+- **Status:** 🔴 OPEN — D2231 pending.
+- **Files:** `pipeline/schemas.py:915`
+
+## BUG-070 — 2026-08-10 — NLI Config-Code Docstring Inversion (P1) 🔴
+- **Symptom:** `config/pipeline_config.yaml` has DeBERTa as `nli_model` (primary) and ModernBERT as `nli_model_fallback`. But `stage5_verify.py:76-77` docstring claims "Primary: ModernBERT-base-nli ... Fallback: DeBERTa-v3-base-mnli-fever-anli." The CODE follows config order (DeBERTa primary at runtime), but the DOCSTRING says the opposite.
+- **Root cause:** D2119 decision switched primary to ModernBERT for speed. Config was supposed to be updated but wasn't (still has DeBERTa first). Code docstring was updated to reflect D2119 intent but config wasn't aligned.
+- **Impact:** Runtime uses DeBERTa (slower, 512 ctx) when D2119 intended ModernBERT (faster, 8192 ctx). Documentation ≠ behavior.
+- **Fix:** D2232-P1-3 — Either update config to make ModernBERT primary OR update docstring to match config. Align all three sources.
+- **Status:** 🔴 OPEN — D2232 pending.
+- **Files:** `config/pipeline_config.yaml`, `pipeline/stage5_verify.py`
+
+## BUG-071 — 2026-08-10 — NLI Fallback Defaults Landmine (P1) 🔴
+- **Symptom:** `pipeline_paths.py:160-162` has fallback defaults of `nli_entailment_threshold: 0.6`, `nli_pass_threshold: 0.8`, `nli_marginal_threshold: 0.5`. Config has `0.5, 0.6, 0.3`. If `_CFG` loading silently fails or key is renamed, thresholds revert to pre-D2226 broken values.
+- **Root cause:** D2226 fixed the hardcoded thresholds in `stage5_verify.py` but didn't update the fallback defaults in `pipeline_paths.py`. The defaults are the OLD values, not the config values.
+- **Impact:** Silent regression — if config key disappears, NLI reverts to 0.8 pass threshold, dramatically increasing false escalation rate.
+- **Fix:** D2232-P1-4 — Set fallback defaults to match config values (0.6/0.5/0.3). Add runtime assertion that loaded values match config.
+- **Status:** 🔴 OPEN — D2232 pending.
+- **Files:** `pipeline/pipeline_paths.py:160-162`
+
+## BUG-072 — 2026-08-10 — Taxonomy Version Triple Drift (P1) 🔴
+- **Symptom:** `config/version.yaml` (SSoT per D2169): `taxonomy_version: "v5.0"`. `config/taxonomy_v5.yaml`: `version: v5.1`, `classification_version: v5.0.1`. Three different version strings for the same artifact.
+- **Root cause:** Taxonomy was independently versioned (bumped to v5.1 during edits) but version.yaml (single source of truth) was never updated.
+- **Impact:** Version gate in runner.py would fail. Provenance stamps lie. Human reviewers can't tell which taxonomy is canonical.
+- **Fix:** D2232-P1-5 — Align all to single version. Update version.yaml to v5.1 or roll taxonomy back.
+- **Status:** 🔴 OPEN — D2232 pending.
+- **Files:** `config/version.yaml`, `config/taxonomy_v5.yaml`
+
+## BUG-073 — 2026-08-10 — CONV-035 and CONV-037 Likely False Convergence (P1) 🔴
+- **Symptom:** 
+  - CONV-035 combines Clear's habit stacking + Cialdini's commitment/consistency → "cue automation + consistency drive." These are two different behavioral mechanisms that can coexist, not a single shared causal structure.
+  - CONV-037 combines Dunbar's ~150 relationship limit + availability heuristic → "Cognitive Capacity Ceiling." These are distinct cognitive phenomena (social network constraint vs judgment bias), not a shared mechanism.
+- **Root cause:** Attractive synthesis was mistaken for genuine mechanism convergence. The examples were curated to fill extraction-type diversity targets without rigorous convergence validation.
+- **Impact:** Golden set teaches S2 that topical/conceptual similarity is sufficient for convergence — exactly what the negative set says to reject.
+- **Fix:** D2232-P1-7 — Reclassify as `is_convergent: false` or strengthen mechanism evidence with explicit shared causal structure. If neither source describes the other's mechanism, they don't converge.
+- **Status:** 🔴 OPEN — D2232 pending.
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`
+
+*Updated: 2026-08-10 (D2227 cross-examination) | Bugs tracked: 63 | Resolved: 46 | Closed (moot): 5 | Open: 12 | Schema version: 1.11*

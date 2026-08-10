@@ -1,10 +1,39 @@
 # Master Roundtable Evaluation Prompt — v5.0
 ## Golden Set DSPy Fine-Tuning Readiness Audit
 
-**Authority:** D2226 — Post-fix golden set v4.2 (60 examples, 37 pos + 23 neg)
+**Authority:** D2232 — Post cross-examination audit golden set v4.2 (60 examples, 37 pos + 23 neg, 35 convergent)
 **Audience:** S-tier senior RAG engineers (LLM evaluators)
 **Purpose:** Evaluate whether this golden set is ready for DSPy fine-tuning before committing to the Maxwell OS S2 extraction pipeline.
 **Date:** 2026-08-10
+
+---
+
+## ⚠️ D2232 CHANGELOG (2026-08-10) — What changed since v5.0
+
+This prompt was written for the pre-audit golden set. The following P0/P1 fixes have been applied:
+
+| Fix | Detail |
+|-----|--------|
+| S4 field strip | All 37 positives: `application`, `elaboration`, `procedural_skill`, etc. removed from `expected_fb`. Golden set is now **S2-only schema**. |
+| Evidence verbatim | All 95 evidence passages now match `cluster_segments` exactly (100%, 0 missing). Audit tool at `tools/audit_evidence_passages.py`. |
+| CONV-037 split | "Cognitive Capacity Ceiling" split into **2 FBs**: Dunbar's Number + Availability Heuristic (1:N example, `is_convergent=false`). Total FBs: 37→38. |
+| CONV-035 reclassified | `is_convergent=false` — complementary mechanisms (cue automation + consistency drive), NOT convergent. |
+| Depth corrections | CONV-014, CONV-021, CONV-032: `universal→cross-domain`. Corrupted rationales (S4 field leak) repaired. |
+| C12 thresholds | 6 hardcoded thresholds moved to `pipeline_config.yaml` (reliability, stage4, minhash, taxonomy, retrieve). |
+| sqlite-vec | `float[1024]→float[{S15_EMBED_DIM}]` — reads 512 from config at runtime. |
+| GoldenFB schema | `extraction_type: str` field added to Pydantic model. |
+| NLI config | ModernBERT primary / DeBERTa fallback (aligned with D2119). Fallback defaults fixed. |
+| Versions aligned | `taxonomy_version: v5.1` across all 3 files; golden set `meta.version: 4.2`. |
+| Validators | `golden_validate.py`: **PASS** (60 examples). `audit_evidence_passages.py`: **PASS** (95/95). |
+
+**Updated metrics (post-D2232):**
+- Convergent positives: 35 (was 37)
+- Total FBs: 38 (CONV-037 split into 2)
+- Extraction types: causal_mechanism=25, descriptive_model=4, normative_heuristic=4, empirical_pattern=5
+- Depths: domain=13, cross-domain=22, universal=2, specialized=1
+- Evidence: 100% verbatim (95/95 passages)
+
+**Evaluator note:** The two `is_convergent=false` examples (CONV-035, CONV-037) are INTENTIONAL — they teach S2 that multi-source clusters may require splitting (different mechanisms → multiple FBs) or recognition of complementary-but-distinct mechanisms (one FB, but not convergent). Evaluate whether this training signal is sufficient.
 
 ---
 

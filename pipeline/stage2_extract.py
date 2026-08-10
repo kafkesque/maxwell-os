@@ -1206,7 +1206,10 @@ def run_stage2(
                           len(cluster.get("source_ids", cluster.get("source_books", []))))
 
         # Tiered prompt: convergent = full synthesis, single-source = simplified
-        if is_conv or book_count >= 2:
+        # D2231: Removed "or book_count >= 2" — convergence gate is is_convergent
+        # flag from S1.5 clustering (which already encodes source diversity).
+        # Source count alone must not trigger convergent extraction.
+        if is_conv:
             prompt, evidence_passages = build_convergent_prompt(cluster, segments)
             system = SYSTEM_PROMPT
         else:

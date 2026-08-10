@@ -926,6 +926,7 @@ class GoldenFB(BaseModel):
     mechanism: str = ""
     boundary: str = ""
     consequence: str = ""
+    extraction_type: str = ""  # D2231: causal_mechanism, descriptive_model, normative_heuristic, empirical_pattern
     evidence_passages: list[str] = Field(default_factory=list)
     depth: str = ""
     evidence: str = ""

@@ -1,0 +1,1435 @@
+{
+  "stats": {
+    "total_passages": 95,
+    "verbatim": 95,
+    "fuzzy": 0,
+    "missing": 0
+  },
+  "results": [
+    {
+      "example_id": "CONV-001",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "when the decoy was present, 84% chose Print+Web",
+      "passage_sha": "81eb7cb24e594484",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Predictably Irrational — Dan Ariely",
+        "char_start": 303,
+        "char_end": 350,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-001",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "When he removed the decoy and offered only Web ($59) and Print+Web ($125), only 32% chose Print+Web",
+      "passage_sha": "9eda781b2c7abab8",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Predictably Irrational — Dan Ariely",
+        "char_start": 352,
+        "char_end": 451,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-001",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "adding a clearly inferior option that is dominated by the target can increase the target's share dramatically",
+      "passage_sha": "a4ef0f784973cfe4",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 250,
+        "char_end": 359,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-001",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for $429. The $279",
+      "passage_sha": "5c26fddb84106c13",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Priceless — William Poundstone",
+        "char_start": 0,
+        "char_end": 178,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-002",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "people who use implementation intentions are two to three times more likely to follow through",
+      "passage_sha": "5dd987b6b592fe84",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Atomic Habits — James Clear",
+        "char_start": 254,
+        "char_end": 347,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-002",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Implementation intentions work because they manufacture a clear, unambiguous cue",
+      "passage_sha": "72e4b38008af21b1",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Power of Habit — Charles Duhigg",
+        "char_start": 183,
+        "char_end": 263,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-002",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Implementation intentions remove these decision points by pre-committing to a specific plan",
+      "passage_sha": "363915105e48f383",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Atomic Habits — James Clear",
+        "char_start": 209,
+        "char_end": 300,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-003",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the more interpretive work the viewer must do",
+      "passage_sha": "d4ef6a1eeb9d6f8a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Pictorial Metaphor in Advertising — Charles Forceville (Routledge, 1996)",
+        "char_start": 208,
+        "char_end": 253,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-003",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "metaphors that can be resolved reward the viewer with insight",
+      "passage_sha": "c800b7ccb63b3e06",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Pictorial Metaphor in Advertising — Charles Forceville (Routledge, 1996)",
+        "char_start": 339,
+        "char_end": 400,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-003",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Figures at a moderate level of complexity",
+      "passage_sha": "a747ad48167fa8c6",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Visual Rhetoric in Advertising: Text-Interpretive, Experimental, and Reader-Response Analyses — Edward F. McQuarrie & David Glen Mick (Journal of Consumer Research, 1999)",
+        "char_start": 71,
+        "char_end": 112,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-003",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "this pleasure of resolution is what makes moderately complex figures persuasive",
+      "passage_sha": "16b0857445571601",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Visual Rhetoric in Advertising: Text-Interpretive, Experimental, and Reader-Response Analyses — Edward F. McQuarrie & David Glen Mick (Journal of Consumer Research, 1999)",
+        "char_start": 361,
+        "char_end": 440,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-004",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'",
+      "passage_sha": "81b0e0bed346e672",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Influence — Robert Cialdini",
+        "char_start": 73,
+        "char_end": 181,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-004",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "people believe stories about people who remind them of themselves",
+      "passage_sha": "28441e2a0c31cd68",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Made to Stick — Chip & Dan Heath",
+        "char_start": 332,
+        "char_end": 397,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-004",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The effect is strongest when people are uncertain about what to do",
+      "passage_sha": "12fc4f007d3e3d61",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Influence — Robert Cialdini",
+        "char_start": 182,
+        "char_end": 248,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-005",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Beta signups jumped from 5,000 to 75,000 overnight",
+      "passage_sha": "13b2120bbcf60f69",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Hacking Growth — Sean Ellis",
+        "char_start": 243,
+        "char_end": 293,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-005",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "making the prospect feel the outcome so vividly that the price becomes an afterthought",
+      "passage_sha": "14d4257a7e2948b7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "$100M Offers — Alex Hormozi",
+        "char_start": 64,
+        "char_end": 150,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-005",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "they experience the relief of the problem being solved before they pay a cent",
+      "passage_sha": "7e4bd98ab6cf2bca",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "$100M Offers — Alex Hormozi",
+        "char_start": 292,
+        "char_end": 369,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-006",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in defaults",
+      "passage_sha": "5151aec4a8d2cbb3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 354,
+        "char_end": 471,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-006",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Automatic enrollment in retirement savings plans — where employees are enrolled by default but can opt out — increases p",
+      "passage_sha": "593c01572f501d66",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Misbehaving — Richard Thaler",
+        "char_start": 215,
+        "char_end": 377,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-006",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "people tend to stick with whatever option requires no action",
+      "passage_sha": "ae5388aba9e8080f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Misbehaving — Richard Thaler",
+        "char_start": 442,
+        "char_end": 502,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-006",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "default option is the one that will be chosen if the decision-maker does nothing",
+      "passage_sha": "92b39940d7046a1f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 4,
+        "char_end": 84,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-007",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Keynes used the beauty contest as a metaphor for the stock market, where each investor wants to buy the stocks that will",
+      "passage_sha": "41ea28795fd7364b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Art of Strategy — Avinash Dixit & Barry Nalebuff",
+        "char_start": 0,
+        "char_end": 208,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-007",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "We have reached the third degree where we devote our intelligences to anticipating what average opinion expects the aver",
+      "passage_sha": "e9aa5957e1c1aca6",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 540,
+        "char_end": 677,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-007",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "stocks are priced not according to their intrinsic value but according to investors' perceptions of other investors' per",
+      "passage_sha": "d8a251b0af574874",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Great Mental Models, Volume 4: Economics and Art — Shane Parrish",
+        "char_start": 276,
+        "char_end": 404,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-011",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "elements placed close together are perceived as more related than elements placed far apart",
+      "passage_sha": "221f9ac81e2c8e7b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Universal Principles of Design — William Lidwell",
+        "char_start": 39,
+        "char_end": 130,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-011",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "When related controls are physically grouped together, users infer a mapping between them",
+      "passage_sha": "d97269fa1ee3b0d3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Design of Everyday Things — Don Norman",
+        "char_start": 92,
+        "char_end": 181,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-011",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Related content shares consistent spacing while unrelated content is separated by larger gaps",
+      "passage_sha": "e2cfad47a3a221df",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking with Type — Ellen Lupton",
+        "char_start": 42,
+        "char_end": 135,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-012",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "specifying the objective precisely is impossible for complex real-world values",
+      "passage_sha": "7e5ca32513946229",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Human Compatible — Stuart Russell",
+        "char_start": 180,
+        "char_end": 258,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-012",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models",
+      "passage_sha": "414c64b63ad2f9d7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Alignment Problem — Brian Christian",
+        "char_start": 0,
+        "char_end": 108,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-012",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "intelligence and final goals are orthogonal",
+      "passage_sha": "80d3e44279a9498f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Superintelligence: Paths, Dangers, Strategies — Nick Bostrom",
+        "char_start": 36,
+        "char_end": 79,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-013",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Progressive disclosure is the practice of showing only the essential controls",
+      "passage_sha": "5b56a345348e9131",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Don't Make Me Think — Steve Krug",
+        "char_start": 91,
+        "char_end": 168,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-013",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Novices need simplicity; experts need efficiency",
+      "passage_sha": "5dd7994980d82d1d",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "About Face — Alan Cooper",
+        "char_start": 46,
+        "char_end": 94,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-013",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Reducing the number of visible options at any moment",
+      "passage_sha": "843b6ef41ffa08b6",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Design of Everyday Things — Don Norman",
+        "char_start": 186,
+        "char_end": 238,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-014",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "places in a system where a small change can produce a large shift in behavior",
+      "passage_sha": "d6d748257f560599",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 20,
+        "char_end": 97,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-014",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "the most effective interventions often target the feedback loops and mental models",
+      "passage_sha": "326468fef1804ffa",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Fifth Discipline — Peter Senge",
+        "char_start": 30,
+        "char_end": 112,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-014",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The location of the intervention matters more than its size",
+      "passage_sha": "04d73d3a3fa9ed09",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Taleb",
+        "char_start": 225,
+        "char_end": 284,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-015",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Flocking emerges from three local rules: alignment, cohesion, and separation",
+      "passage_sha": "4868c6162acafb80",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Nature of Code — Daniel Shiffman",
+        "char_start": 94,
+        "char_end": 170,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-015",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The designer's role shifts from drawing the artifact to designing the rules",
+      "passage_sha": "571abbf77591bc23",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Generative Design — Benedikt Gross",
+        "char_start": 103,
+        "char_end": 178,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-015",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Simple programs can produce behavior of great complexity",
+      "passage_sha": "28b9a53297c3bc51",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "A New Kind of Science — Stephen Wolfram",
+        "char_start": 0,
+        "char_end": 56,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-016",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Restricting the palette to a few colors forces the artist to understand these relationships deeply",
+      "passage_sha": "9ab797dc5b2d8172",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Interaction of Color — Josef Albers",
+        "char_start": 108,
+        "char_end": 206,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-016",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The beginner's urge to use every color available usually produces mud",
+      "passage_sha": "f2b019a7d9da8972",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Color and Light — James Gurney",
+        "char_start": 160,
+        "char_end": 229,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-016",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "even two colors can produce powerful effects when their relationship is understood",
+      "passage_sha": "2436470f43c0068f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Elements of Color — Johannes Itten",
+        "char_start": 124,
+        "char_end": 206,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-017",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Spaced practice is far more effective than massed practice",
+      "passage_sha": "b8d3019ab4bc2cb6",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Make It Stick — Peter Brown",
+        "char_start": 0,
+        "char_end": 58,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-017",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The spacing effect is the single most powerful memory technique",
+      "passage_sha": "d4358b614e44be0f",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Moonwalking with Einstein — Joshua Foer",
+        "char_start": 81,
+        "char_end": 144,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-017",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "each sleep period consolidates what was practiced that day",
+      "passage_sha": "b69b52219b992202",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Why We Sleep — Matthew Walker",
+        "char_start": 224,
+        "char_end": 282,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-018",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Whoever cycles through the loop faster than their opponent forces the opponent into a reactive posture",
+      "passage_sha": "69d4fc2952e678c9",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Certain to Win — Chet Richards",
+        "char_start": 185,
+        "char_end": 287,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-018",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The objective is tempo — operating faster than the opponent's decision cycle",
+      "passage_sha": "40b36a30c0c5e063",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Art of Action — Stephen Bungay",
+        "char_start": 239,
+        "char_end": 315,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-018",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Experts who have compressed years of experience into pattern-recognition can make better decisions in seconds",
+      "passage_sha": "83a0dde7e565d7d5",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Blink — Malcolm Gladwell",
+        "char_start": 93,
+        "char_end": 202,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-019",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Habit stacking is a strategy for pairing a new habit with an existing one",
+      "passage_sha": "174357171416290b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Atomic Habits — James Clear",
+        "char_start": 0,
+        "char_end": 73,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-019",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "New habits are easier to form when they are attached to an existing cue",
+      "passage_sha": "4d03cfa4f63cabd3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Power of Habit — Charles Duhigg",
+        "char_start": 53,
+        "char_end": 124,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-019",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Anchoring is the most reliable way to install a new habit",
+      "passage_sha": "094dee4207c6a290",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Tiny Habits — BJ Fogg",
+        "char_start": 237,
+        "char_end": 294,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-020",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the value of a good increases when it becomes part of a person's endowment",
+      "passage_sha": "2470ace485e74fe0",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 41,
+        "char_end": 115,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-020",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "giving it up feels like a loss",
+      "passage_sha": "c0a9c74dd15daed8",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Misbehaving — Richard Thaler",
+        "char_start": 158,
+        "char_end": 188,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-020",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Once a product enters the consumer's reference bundle, the consumer will pay more to keep it",
+      "passage_sha": "cc91c2be7b7d50a2",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Phishing for Phools: The Economics of Manipulation and Deception — George A. Akerlof & Robert J. Shiller",
+        "char_start": 191,
+        "char_end": 283,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-021",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Every action in a system has second-order effects",
+      "passage_sha": "e6ef60d10c97f401",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking in Systems — Donella Meadows",
+        "char_start": 0,
+        "char_end": 49,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-021",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "When the incentive structure is misaligned, behavior follows the incentive, not the stated goal",
+      "passage_sha": "9f10d11b0fce6957",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Freakonomics — Steven Levitt & Stephen Dubner",
+        "char_start": 47,
+        "char_end": 142,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-021",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "interventions that ignore the rational responses of the people they target will be evaded or exploited",
+      "passage_sha": "c2143c11cf7c54e7",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "The Logic of Life — Tim Harford",
+        "char_start": 36,
+        "char_end": 138,
+        "match_mode": "whitespace-normalized"
+      }
+    },
+    {
+      "example_id": "CONV-031",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The technology adoption lifecycle divides the market into five segments",
+      "passage_sha": "97e4d5c68c6442c3",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Crossing the Chasm — Geoffrey Moore",
+        "char_start": 0,
+        "char_end": 71,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-031",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The most dangerous chasm is between early adopters and the early majority",
+      "passage_sha": "0ed3bba37f76a4fc",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Crossing the Chasm — Geoffrey Moore",
+        "char_start": 281,
+        "char_end": 354,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-031",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "New ideas spread through populations following predictable patterns",
+      "passage_sha": "cded89c026df93d8",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Freakonomics — Steven Levitt & Stephen Dubner",
+        "char_start": 0,
+        "char_end": 67,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-031",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "relative advantage, compatibility, complexity, trialability, and observability",
+      "passage_sha": "84382014e5501447",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Freakonomics — Steven Levitt & Stephen Dubner",
+        "char_start": 305,
+        "char_end": 383,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-032",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Systems fall into three categories: fragile (harmed by volatility)",
+      "passage_sha": "269b95941f495544",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 0,
+        "char_end": 66,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-032",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Most engineered systems are fragile precisely because they are optimized for stable conditions",
+      "passage_sha": "17094cac77400cec",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 356,
+        "char_end": 450,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-032",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Simple computational rules can produce behavior of four distinct classes",
+      "passage_sha": "beaa39117b0e6aa9",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "A New Kind of Science — Stephen Wolfram",
+        "char_start": 0,
+        "char_end": 72,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-032",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "Class 4 systems — like Rule 110 cellular automata — are computationally universal, capable of supporting any computation",
+      "passage_sha": "b6ae28561032ec9c",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "A New Kind of Science — Stephen Wolfram",
+        "char_start": 327,
+        "char_end": 448,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-033",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "User goals divide into three categories: experience goals (how users want to feel — engaged, confident, not stupid), end",
+      "passage_sha": "f090c2e160bed120",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "About Face — Alan Cooper",
+        "char_start": 0,
+        "char_end": 273,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-033",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Designers who focus only on end goals build tools; designers who address all three build products people love",
+      "passage_sha": "24c6ace4f49c6eda",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "About Face — Alan Cooper",
+        "char_start": 406,
+        "char_end": 515,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-033",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Users don't read web pages — they scan them",
+      "passage_sha": "9798917bb3b6b482",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Don't Make Me Think — Steve Krug",
+        "char_start": 0,
+        "char_end": 43,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-033",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "they satisfice, picking the first reasonable option",
+      "passage_sha": "79cde6ffe4d74f48",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Don't Make Me Think — Steve Krug",
+        "char_start": 79,
+        "char_end": 130,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-034",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the premortem procedure is the most effective debiasing technique",
+      "passage_sha": "2c82788c346d2ce5",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 35,
+        "char_end": 100,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-034",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Imagine we are one year into the future. We implemented the decision as it stands today. The outcome was a disaster.",
+      "passage_sha": "2ec4f38e31a6e03a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 161,
+        "char_end": 277,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-034",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Widen options beyond binary choices, Reality-test by seeking disconfirming evidence, Attain distance by asking what you'",
+      "passage_sha": "6329bafed05daf3b",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Decisive — Chip & Dan Heath",
+        "char_start": 285,
+        "char_end": 490,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-035",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "Habit stacking is a strategy where you pair a new habit with an existing one",
+      "passage_sha": "de613e8a43268f31",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Atomic Habits — James Clear",
+        "char_start": 0,
+        "char_end": 76,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-035",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "After I pour my morning coffee, I will meditate for 60 seconds",
+      "passage_sha": "9ee418105a099dcc",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Atomic Habits — James Clear",
+        "char_start": 157,
+        "char_end": 219,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-035",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Once people make a small commitment, they tend to behave consistently with it",
+      "passage_sha": "7126a8579cfbce32",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Influence — Robert Cialdini",
+        "char_start": 71,
+        "char_end": 148,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-035",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The key is the initial commitment — it must be voluntary, active, and public (or at least privately recorded) to trigger",
+      "passage_sha": "08daf5fbd56059ff",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Influence — Robert Cialdini",
+        "char_start": 322,
+        "char_end": 465,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-036",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "The explore-exploit trade-off is one of the most fundamental problems in decision theory",
+      "passage_sha": "b4ceefff590a9836",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 0,
+        "char_end": 88,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-036",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "with unlimited time, explore extensively; with a known deadline, shift increasingly toward exploitation",
+      "passage_sha": "de92c84d334fad06",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 233,
+        "char_end": 336,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-036",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The barbell strategy is a method for navigating uncertainty: put 90% of your resources in maximally safe instruments and",
+      "passage_sha": "ce0de071141980e5",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 0,
+        "char_end": 185,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-036",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "This is the opposite of the 'medium risk' approach",
+      "passage_sha": "90abe9648c5b0254",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 283,
+        "char_end": 333,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-037",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "the cognitive limit to the number of people with whom one can maintain stable social relationships",
+      "passage_sha": "1d0ca55e7a42e003",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Blink — Malcolm Gladwell",
+        "char_start": 56,
+        "char_end": 154,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-037",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Neolithic villages averaged 150 people, military companies are organized in units of about 150",
+      "passage_sha": "0d30bca55a22a2b0",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Blink — Malcolm Gladwell",
+        "char_start": 200,
+        "char_end": 294,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-037",
+      "fb_index": 1,
+      "passage_index": 0,
+      "passage_preview": "mental availability is driven by ease of retrieval, not by actual frequency",
+      "passage_sha": "038db8999c1549e9",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 409,
+        "char_end": 484,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-037",
+      "fb_index": 1,
+      "passage_index": 1,
+      "passage_preview": "words with 'k' as the third letter are about three times more common",
+      "passage_sha": "0041198ac6edad00",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 286,
+        "char_end": 354,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-038",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "80% of effects come from 20% of causes — is observed across an astonishing range of domains",
+      "passage_sha": "72e9c1c3b6070392",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 17,
+        "char_end": 108,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-038",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "a signature of power-law distributions, which arise when success breeds more success",
+      "passage_sha": "e3406f8d7a438757",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Antifragile — Nassim Nicholas Taleb",
+        "char_start": 289,
+        "char_end": 373,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-038",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "Preferential attachment is the mechanism behind many power-law distributions",
+      "passage_sha": "d4e8eb8f101f61b2",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 0,
+        "char_end": 76,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-038",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "the rich get richer",
+      "passage_sha": "4f0e348ea708ad75",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Algorithms to Live By — Brian Christian & Tom Griffiths",
+        "char_start": 184,
+        "char_end": 203,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-039",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "When a day-care center in Israel started fining parents who arrived late to pick up their children, late arrivals INCREA",
+      "passage_sha": "54a8dde1c44b4e33",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Freakonomics — Steven Levitt & Stephen Dubner",
+        "char_start": 133,
+        "char_end": 279,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-039",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "The fine replaced a moral obligation (guilt about keeping teachers waiting) with a market transaction (paying for extend",
+      "passage_sha": "3aa8a7e0d7a6381c",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Freakonomics — Steven Levitt & Stephen Dubner",
+        "char_start": 280,
+        "char_end": 409,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-039",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks",
+      "passage_sha": "19aa748779eee011",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 0,
+        "char_end": 98,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-039",
+      "fb_index": 0,
+      "passage_index": 3,
+      "passage_preview": "The inside view (focusing on the specific case) consistently beats the outside view (looking at base rates of similar ca",
+      "passage_sha": "08616f8033603989",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Thinking, Fast and Slow — Daniel Kahneman",
+        "char_start": 377,
+        "char_end": 534,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-040",
+      "fb_index": 0,
+      "passage_index": 0,
+      "passage_preview": "kerning pairs (adjusting space between specific letter combinations like 'AV' and 'To')",
+      "passage_sha": "3f1d18c68c60d864",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "About Face — Alan Cooper",
+        "char_start": 313,
+        "char_end": 400,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-040",
+      "fb_index": 0,
+      "passage_index": 1,
+      "passage_preview": "Kerning exceptions override these defaults for specific letter pairs",
+      "passage_sha": "32ca8ecce4065e0a",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Generative Design — Benedikt Gross",
+        "char_start": 205,
+        "char_end": 273,
+        "match_mode": "raw"
+      }
+    },
+    {
+      "example_id": "CONV-040",
+      "fb_index": 0,
+      "passage_index": 2,
+      "passage_preview": "classic examples include 'AV,' 'WA,' 'To,' and 'Ve.'",
+      "passage_sha": "32ccf9b14c8cd9f0",
+      "status": "verbatim",
+      "match": {
+        "segment_id": "?",
+        "source_book": "Generative Design — Benedikt Gross",
+        "char_start": 323,
+        "char_end": 375,
+        "match_mode": "raw"
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-09
+# Last manual edit: 2026-08-10
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-09T22:42:42Z'
-total_decisions: 216
+last_sync: '2026-08-10T08:32:36Z'
+total_decisions: 222
 decisions:
 - id: D2092
   category: INF
@@ -1598,17 +1598,59 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2227
+  category: INF
+  state: ACTIVE
+  description: '**Category:** AUDIT / QLT / GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2228
+  category: INF
+  state: ACTIVE
+  description: '**Category:** DATA / BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2229
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2230
+  category: INF
+  state: ACTIVE
+  description: '**Category:** DATA / QLT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2231
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX / GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2232
+  category: INF
+  state: ACTIVE
+  description: '**Category:** DATA / QLT / GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 216
+  total: 222
   proposed: 0
   draft: 0
-  active: 177
+  active: 183
   stale: 0
   superseded: 8
   archived: 8
   rejected: 7
   by_category:
-    INF: 134
+    INF: 140
     QLT: 21
     GOV: 11
     RES: 4

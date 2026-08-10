@@ -25,16 +25,24 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import DB_PATH, PROJECT_ROOT, SCHEMA_VERSION, TAXONOMY_VERSION
+from pipeline.pipeline_paths import (
+    DB_PATH,
+    PROJECT_ROOT,
+    SCHEMA_VERSION,
+    TAXONOMY_FLOOD_THRESHOLD,
+    TAXONOMY_REPLACEMENT_THRESHOLD,
+    TAXONOMY_EMERGING_FREQ,
+    TAXONOMY_VERSION,
+)
 from pipeline.stamp import get_pipeline_commit
 
-# ── Constants ────────────────────────────────────────────────────────────
+# ── Constants (D2231: C12 — read from config via pipeline_paths) ─────────
 
 MAX_DOMAINS: int = 25       # D272
 MAX_DISCIPLINES: int = 47   # D272
-REPLACEMENT_THRESHOLD_RATIO: float = 1.1  # emerging must exceed canonical by 10%
-EMERGING_FREQ_THRESHOLD: int = 10         # raw→emerging promotion threshold
-FLOOD_THRESHOLD_RATIO: float = 0.20       # >20% unmatched = flood warning (C8-G3)
+REPLACEMENT_THRESHOLD_RATIO: float = TAXONOMY_REPLACEMENT_THRESHOLD  # emerging must exceed canonical by 10%
+EMERGING_FREQ_THRESHOLD: int = TAXONOMY_EMERGING_FREQ              # raw→emerging promotion threshold
+FLOOD_THRESHOLD_RATIO: float = TAXONOMY_FLOOD_THRESHOLD            # >20% unmatched = flood warning (C8-G3)
 
 
 # ── Path helpers ─────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 meta:
-  version: '4.0'
+  version: '4.2'
   architecture: cluster-before-extract
   total_examples: 60
-  convergent_positives: 37
+  convergent_positives: 35
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -36,7 +36,6 @@ meta:
   - normative_heuristic_diversity
   - empirical_pattern_diversity
   - genuine_specialized_positive
-  calibration_status: expanded_v4.2
   calibrated_date: '2026-08-10'
   notes: 'D2226: v4.2 — Expanded to 60 examples (37 pos + 23 neg). Added 3 descriptive_model, 3 normative_heuristic, 3 empirical_pattern,
     1 specialized positive. Extraction type balance improved from 89%→65% causal. All depth values corrected (CONV-012/017
@@ -136,7 +135,6 @@ examples:
     - adding a clearly inferior option that is dominated by the target can increase the target's share dramatically
     - Williams-Sonoma sold a bread maker for $279 — it flopped. Then they introduced a larger, deluxe model for $429. The
       $279 model suddenly looked reasonable and sales nearly doubled
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
@@ -243,8 +241,7 @@ examples:
     evidence_passages:
     - people who use implementation intentions are two to three times more likely to follow through
     - Implementation intentions work because they manufacture a clear, unambiguous cue
-    - implementation intentions remove these decision points by pre-committing to a specific plan
-    elaboration: ''
+    - Implementation intentions remove these decision points by pre-committing to a specific plan
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
@@ -347,7 +344,6 @@ examples:
     - metaphors that can be resolved reward the viewer with insight
     - Figures at a moderate level of complexity
     - this pleasure of resolution is what makes moderately complex figures persuasive
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
@@ -446,8 +442,7 @@ examples:
     evidence_passages:
     - Showing that '10,000 people bought this' is less persuasive than showing that 'people like you bought this.'
     - people believe stories about people who remind them of themselves
-    - the effect is strongest when people are uncertain about what to do
-    elaboration: ''
+    - The effect is strongest when people are uncertain about what to do
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
@@ -539,7 +534,6 @@ examples:
     - Beta signups jumped from 5,000 to 75,000 overnight
     - making the prospect feel the outcome so vividly that the price becomes an afterthought
     - they experience the relief of the problem being solved before they pay a cent
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: domain
@@ -577,7 +571,6 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE: This is a single-source segment passed as a "cluster" with only ONE book.
@@ -624,7 +617,6 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE: Both segments say "good people are important" in different words. This is
@@ -681,7 +673,6 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — FALSE CONVERGENCE. Both segments use the word "feedback" and discuss its role in organizations,
@@ -747,15 +738,10 @@ examples:
       Default choice architecture is one of the most powerful — and ethically charged — tools in behavioral policy design.
     evidence_passages:
     - organ donation rates are above 90% in countries with opt-out defaults and below 15% in countries with opt-in defaults
-    - Automatic enrollment in retirement savings plans increases participation from roughly 40% to over 90%
-    - The power of defaults comes not from coercion but from inertia: people tend to stick with whatever option requires no
-        action
+    - Automatic enrollment in retirement savings plans — where employees are enrolled by default but can opt out — increases
+      participation from roughly 40% to over 90%.
+    - people tend to stick with whatever option requires no action
     - default option is the one that will be chosen if the decision-maker does nothing
-    elaboration: 'The default effect and the endowment effect are related but distinct: the default effect sets the initial
-      reference point through inertia, while the endowment effect inflates the value of whatever is already owned. Defaults
-      are most powerful when the decision is complex and the chooser lacks strong priors — precisely the conditions under
-      which System 2 would need to work hardest. This makes defaults ethically potent: architects who set defaults are effectively
-      making decisions on behalf of those who will not decide.'
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -885,7 +871,6 @@ examples:
       average opinion to be
     - stocks are priced not according to their intrinsic value but according to investors' perceptions of other investors'
       perceptions
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -992,40 +977,6 @@ examples:
     - When related controls are physically grouped together, users infer a mapping between them
     - Related content shares consistent spacing while unrelated content is separated by larger gaps
     depth: domain
-    evidence: cited
-    jargon:
-    - Gestalt law of proximity
-    - spatial contiguity
-    keywords:
-    - proximity
-    - grouping
-    - visual hierarchy
-    - spacing
-    application: UI layout, information design, typography systems, dashboard design
-    elaboration: 'The Gestalt school of psychology identified proximity as one of several grouping
-
-      laws (alongside similarity, closure, continuity) that describe how the visual system
-
-      organizes raw stimuli into perceived structure.'
-    prerequisite_fbs:
-    - 'PARSING-001: Visual Hierarchy Basics'
-    contradicts_fbs: []
-    related_fbs:
-    - 'SIMILARITY-011: Similarity Grouping'
-    procedural_skill: 'Given a set of UI elements with known semantic relationships, group related
-
-      elements using consistent spacing (8px grid for related, 24px+ for unrelated), then
-
-      validate with a 5-second scan test: a naive user should be able to identify the groups.
-
-      '
-    failure_mode: 'If all elements receive equal spacing (a uniform grid), proximity provides no
-
-      structural signal and the design reads as flat — users cannot infer relationships
-
-      without reading. Fix: introduce spatial hierarchy deliberately.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Three independent design references (Lidwell, Norman, Lupton) converge on the same
@@ -1122,46 +1073,6 @@ examples:
     - Reinforcement learning from human feedback (RLHF) emerged as a practical method for aligning language models
     - intelligence and final goals are orthogonal
     depth: cross-domain
-    evidence: cited
-    jargon:
-    - reward hacking
-    - RLHF
-    - assistance game
-    - corrigibility
-    keywords:
-    - AI alignment
-    - objective specification
-    - preference learning
-    application: AI safety engineering, LLM fine-tuning pipelines, agent design
-    elaboration: 'The ''assistance game'' formulation (Russell) models AI as an assistant that is
-
-      uncertain about the objective and learns it from human actions and corrections. This
-
-      contrasts with the classical agent formulation where the objective is fully specified
-
-      in advance.'
-    prerequisite_fbs:
-    - 'RLHF-PIPE-001: Preference Data Collection'
-    contradicts_fbs:
-    - 'SPEC-FULL-001: Complete Specification Assumption'
-    related_fbs:
-    - 'GRAD-DESC-001: Reward Gradient Optimization'
-    procedural_skill: 'When designing an AI system for a real-world task: (1) treat any written objective
-
-      as a hypothesis, not a specification; (2) design a preference observation channel;
-
-      (3) include a correction loop with human oversight; (4) test for reward hacking before
-
-      deployment; (5) document the specification''s known incompleteness.
-
-      '
-    failure_mode: 'If the reward model is trained on biased or narrow preference data, the aligned
-
-      system will optimize the biased proxy, appearing aligned on benchmarks while failing
-
-      on edge cases. Fix: diversify preference data and add adversarial evaluation.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Three AI references (Bostrom, Russell, and Christian) converge on objective
@@ -1252,37 +1163,6 @@ examples:
     - Novices need simplicity; experts need efficiency
     - Reducing the number of visible options at any moment
     depth: domain
-    evidence: cited
-    jargon:
-    - cognitive load
-    - progressive disclosure
-    - affordance
-    keywords:
-    - UI design
-    - progressive disclosure
-    - information architecture
-    - learnability
-    application: Web forms, mobile apps, desktop software, dashboard design
-    elaboration: 'Progressive disclosure is one of the most reliable UX patterns because it aligns
-
-      the interface''s information architecture with the user''s cognitive architecture.'
-    prerequisite_fbs:
-    - 'HIC-TAX-001: User Task Analysis'
-    contradicts_fbs: []
-    related_fbs:
-    - 'AFFORD-013: Visible Affordances'
-    procedural_skill: 'Audit each screen for controls used by <20% of users. Move those into a secondary
-
-      layer (menu, ''More'', advanced tab). Ensure primary task completion never requires
-
-      the secondary layer. Validate: new-user task completion time must drop.
-
-      '
-    failure_mode: 'If disclosure is too deep (features buried under 4+ clicks), expert users abandon
-
-      the interface for power tools, and the product loses its efficiency story.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Krug, Cooper, and Norman converge on progressive disclosure as the UX principle for
@@ -1374,54 +1254,13 @@ examples:
     - places in a system where a small change can produce a large shift in behavior
     - the most effective interventions often target the feedback loops and mental models
     - The location of the intervention matters more than its size
-    depth: universal
-    evidence: cited
-    jargon:
-    - leverage point
-    - feedback loop
-    - mental model
-    - antifragility
-    keywords:
-    - systems thinking
-    - leverage
-    - intervention
-    - feedback
-    application: Policy design, organizational change, software architecture, economics
-    elaboration: 'Meadows ranked 12 leverage points from parameters (lowest) to paradigm shifts
-
-      (highest). Senge''s ''small changes, big results'' formulation and Taleb''s
-
-      antifragility both independently arrive at the same structural-vs-parametric
-
-      distinction.'
-    prerequisite_fbs:
-    - 'LOOP-BASE-001: Feedback Loop Identification'
-    contradicts_fbs:
-    - 'PARAM-ONLY-001: Parameter Adjustment Sufficiency'
-    related_fbs:
-    - 'ANTIFRAG-001: Antifragility Through Optionality'
-    - 'MODELL-001: Systems Modeling'
-    procedural_skill: 'When planning any system intervention: (1) map the feedback loops; (2) identify the
-
-      goal the system currently optimizes; (3) choose the highest-leverage structural point
-
-      available; (4) predict second-order effects; (5) measure baseline before intervening.
-
-      '
-    failure_mode: 'Intervening at parameter level when the system is structurally misaligned produces
-
-      ''fighting the last war'': the system compensates and returns to its prior behavior
-
-      (homeostasis), making the intervention appear ineffective.
-
-      '
+    depth: cross-domain
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: 'Meadows, Senge, and Taleb converge on structural-vs-parametric leverage. Demonstrates
-
-    Systems group, contradicts_fbs, related_fbs, procedural_skill.
-
-    '
+  rationale: 'Cross-domain: Meadows (systems dynamics), Senge (organizational learning), and Taleb (complexity) converge on
+    structural-vs-parametric leverage. The mechanism presupposes systems framing (feedback loops, information flows, goals,
+    rules) — a systems-thinking lens, not a universal law. A poet manipulating language is not operating on the same feedback-loop
+    mechanics. Fails the physicist-chef-poet test.'
 - id: CONV-015
   domain: computational art
   discipline: generative design
@@ -1513,40 +1352,6 @@ examples:
     - The designer's role shifts from drawing the artifact to designing the rules
     - Simple programs can produce behavior of great complexity
     depth: cross-domain
-    evidence: cited
-    jargon:
-    - emergence
-    - generative system
-    - cellular automata
-    - local rules
-    keywords:
-    - generative art
-    - emergence
-    - complexity
-    - rules
-    application: Generative art, procedural content generation, simulation, data art
-    elaboration: 'The same principle underlies Conway''s Game of Life, reaction-diffusion systems,
-
-      and L-systems — all generate complex forms from simple local rules.'
-    prerequisite_fbs: []
-    contradicts_fbs:
-    - 'TOP-DOWN-001: Top-Down Design Control'
-    related_fbs:
-    - 'PATCH-001: Procedural Patterning'
-    procedural_skill: 'When building a generative system: (1) define 3-7 simple local rules; (2) iterate
-
-      the system many times; (3) map the parameter space; (4) curate outputs — not all
-
-      emergent forms are interesting; (5) treat the rule set as the primary artifact.
-
-      '
-    failure_mode: 'If rules are too complex (many global conditions), emergence collapses into
-
-      scripted behavior and the output space shrinks to the designer''s imagination —
-
-      the generative advantage is lost.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Shiffman, Gross, and Wolfram converge on emergence from simple rules. Demonstrates
@@ -1637,44 +1442,6 @@ examples:
     - The beginner's urge to use every color available usually produces mud
     - even two colors can produce powerful effects when their relationship is understood
     depth: domain
-    evidence: cited
-    jargon:
-    - simultaneous contrast
-    - palette
-    - mud
-    - color harmony
-    keywords:
-    - color
-    - palette
-    - illustration
-    - harmony
-    application: Illustration, branding, UI design, data visualization, photography
-    elaboration: 'The principle generalizes beyond color: constraints in general (limited typefaces,
-
-      limited materials, limited tools) often produce more creative work because they
-
-      force deeper engagement with the material at hand.'
-    prerequisite_fbs:
-    - 'COLOR-REL-001: Color Relationship Basics'
-    contradicts_fbs: []
-    related_fbs:
-    - 'COMP-CONTRAST-001: Complementary Contrast'
-    procedural_skill: 'When starting a visual piece: (1) choose 2-5 colors from a single hue family or a
-
-      complementary pair; (2) define proportions (dominant, secondary, accent); (3) test
-
-      all pairings for simultaneous contrast; (4) adjust values (lightness) before
-
-      saturating; (5) add one ''escape'' color only if the composition demands it.
-
-      '
-    failure_mode: 'A palette chosen without understanding of value contrast (all colors same
-
-      lightness) produces flat, unreadable work even with few colors — the constraint
-
-      must be paired with value discipline.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Albers, Gurney, and Itten converge on limited-palette harmony. Demonstrates
@@ -1711,7 +1478,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'SINGLE SOURCE — only Graham. Cannot satisfy BORP (min 2 independent sources).
@@ -1755,7 +1521,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'PLATITUDE — the claim ''systems beat goals'' is motivational rhetoric without a
@@ -1803,7 +1568,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'FALSE CONVERGENCE — Moore discusses the technology adoption lifecycle (a
@@ -1851,7 +1615,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'CITATION ECHO — both books are by the same author (Eric Ries). The second book
@@ -1946,42 +1709,6 @@ examples:
     - The spacing effect is the single most powerful memory technique
     - each sleep period consolidates what was practiced that day
     depth: cross-domain
-    evidence: cited
-    jargon:
-    - testing effect
-    - spacing effect
-    - hippocampal-neocortical transfer
-    keywords:
-    - spaced repetition
-    - memory
-    - retrieval
-    - learning
-    application: Study systems, corporate training, language learning (Anki, SuperMemo)
-    elaboration: 'The spacing effect is one of the most replicated findings in cognitive psychology
-
-      (first demonstrated by Ebbinghaus in 1885) and is the theoretical basis of
-
-      spaced repetition software (SRS).'
-    prerequisite_fbs:
-    - 'RETRIEVAL-BASE-001: Retrieval Practice Basics'
-    contradicts_fbs:
-    - 'CRAMMING-001: Massed Practice Efficacy'
-    related_fbs:
-    - 'SLEEP-CONSOL-001: Sleep Consolidation'
-    procedural_skill: 'Design a spaced repetition schedule: Day 0 (learn), Day 1 (first recall), Day 3,
-
-      Day 7, Day 14, Day 30. Each review must be active retrieval (cover the answer,
-
-      recall it, then check) — never passive re-reading. Adjust intervals when recall
-
-      fails (shorten) or succeeds easily (lengthen).
-
-      '
-    failure_mode: 'SRS systems fail when users treat reviews as re-reading sessions: without active
-
-      retrieval, the spacing effect collapses and retention matches massed practice.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Brown, Foer, and Walker converge on spaced retrieval with distinct mechanisms
@@ -2078,50 +1805,6 @@ examples:
     - The objective is tempo — operating faster than the opponent's decision cycle
     - Experts who have compressed years of experience into pattern-recognition can make better decisions in seconds
     depth: cross-domain
-    evidence: cited
-    jargon:
-    - OODA loop
-    - commander's intent
-    - tempo
-    - thin-slicing
-    keywords:
-    - decision making
-    - tempo
-    - OODA
-    - competition
-    application: Competitive strategy, product development, military command, sports, sales
-    elaboration: 'Boyd''s OODA loop originated in air combat but has been applied broadly. The
-
-      mechanism is information-cycle asymmetry: each agent''s observation cycle is
-
-      coupled to the other''s actions, so the faster agent controls the tempo.
-
-      '
-    prerequisite_fbs:
-    - 'INTENT-001: Commander''s Intent'
-    contradicts_fbs:
-    - 'PERF-PLAN-001: Perfect Plan Preparation'
-    related_fbs:
-    - 'DECISION-COMP-001: Decision Compression'
-    - 'EMPOWER-001: Subordinate Empowerment'
-    procedural_skill: 'To implement tempo superiority: (1) define the commander''s intent in one
-
-      paragraph (what and why, not how); (2) push decision authority to the lowest
-
-      competent level; (3) eliminate approval layers that add latency; (4) set a
-
-      bounded decision cadence (e.g., weekly sprints); (5) measure decision-cycle time
-
-      and reduce it iteratively.
-
-      '
-    failure_mode: 'Tempo without competence is chaos: if actors lack the skill to act on shared
-
-      intent, faster cycling produces faster mistakes. Tempo superiority requires
-
-      competence floors — it is a force multiplier, not a substitute for ability.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Richards, Bungay, and Gladwell converge on decision tempo as competitive advantage.
@@ -2214,45 +1897,6 @@ examples:
     - New habits are easier to form when they are attached to an existing cue
     - Anchoring is the most reliable way to install a new habit
     depth: domain
-    evidence: cited
-    jargon:
-    - habit stacking
-    - anchor
-    - cue-routine-reward
-    - tiny habits
-    keywords:
-    - habits
-    - behavior change
-    - anchoring
-    application: Personal productivity, fitness, health interventions, therapy
-    elaboration: 'Clear, Duhigg, and Fogg are the three leading popular-science authors on habit
-
-      formation; all converge on the cue-anchor mechanism with minor terminology
-
-      variations (stacking, golden rule, anchoring).'
-    prerequisite_fbs:
-    - 'LOOP-BASE-002: Habit Loop Structure'
-    contradicts_fbs:
-    - 'MOTIVATION-001: Motivation-Driven Change'
-    related_fbs:
-    - 'TINY-FIRST-001: Tiny Habit Scaling'
-    - 'CELEBRATION-001: Reward Attachment'
-    procedural_skill: 'Install a habit: (1) choose a daily anchor (''After I brush my teeth''); (2) make
-
-      the new behavior tiny (2 minutes or less); (3) state the plan explicitly
-
-      (''After I ___, I will ___''); (4) celebrate immediately after; (5) log
-
-      completion; (6) scale up only after 2 weeks of consistency.
-
-      '
-    failure_mode: 'If the anchor habit is itself unreliable, the chain breaks and the new habit
-
-      fails silently — the user thinks they lack willpower when the actual failure is
-
-      anchor selection.
-
-      '
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Clear, Duhigg, and Fogg converge on anchoring new habits to existing cues.
@@ -2309,13 +1953,10 @@ examples:
     consequence: 'The endowment effect explains persistent market anomalies: the gap between willingness-to-accept and willingness-to-pay
       (roughly 2:1), the winner''s curse in auctions, low acceptance of buyout offers, and the power of free trials and money-back
       guarantees. Policies that create even symbolic ownership transfer achieve higher engagement due to endowment-based retention.'
-    elaboration: 'The endowment effect and the default effect are related but distinct: the default effect sets the initial
-      endowment via inertia, whereas the endowment effect inflates the value of whatever the person already owns regardless
-      of how ownership was acquired. Both operate through loss aversion but at different points in the choice architecture.'
     evidence_passages:
-    - the value of a good increases when it becomes part of a person''s endowment
+    - the value of a good increases when it becomes part of a person's endowment
     - giving it up feels like a loss
-    - once a product enters the consumer''s reference bundle, the consumer will pay more to keep it
+    - Once a product enters the consumer's reference bundle, the consumer will pay more to keep it
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -2413,55 +2054,14 @@ examples:
     evidence_passages:
     - Every action in a system has second-order effects
     - When the incentive structure is misaligned, behavior follows the incentive, not the stated goal
-    - Interventions that ignore the rational responses of the people they target will be evaded or exploited
-    depth: universal
-    evidence: cited
-    jargon:
-    - second-order effects
-    - policy resistance
-    - Goodhart's law
-    - incentive gaming
-    keywords:
-    - incentives
-    - unintended consequences
-    - systems
-    - policy
-    application: Public policy, management, product design, economics, regulation
-    elaboration: 'This is the systems-theoretic restatement of Goodhart''s law and the cobra
-
-      effect (the classic example of a bounty program that backfired).'
-    prerequisite_fbs:
-    - 'INCENT-BASE-001: Incentive Structure Analysis'
-    contradicts_fbs:
-    - 'STATIC-POLICY-001: Static Policy Sufficiency'
-    related_fbs:
-    - 'GOODHART-001: Metric Gaming'
-    - 'POLICY-RESIST-001: Policy Resistance'
-    procedural_skill: 'Before implementing any policy or metric: (1) model the incentive change;
-
-      (2) ask who can game the new metric and how; (3) predict second-order effects
-
-      (what will the system do to compensate?); (4) design countermeasures;
-
-      (5) pilot on a small scale and watch for gaming; (6) review the metric itself
-
-      periodically.
-
-      '
-    failure_mode: 'Using a metric as a target without monitoring gaming leads to Goodhart collapse:
-
-      the metric rises while the underlying goal deteriorates (e.g., call-center
-
-      handle-time targets reducing service quality).
-
-      '
+    - interventions that ignore the rational responses of the people they target will be evaded or exploited
+    depth: cross-domain
     extraction_type: causal_mechanism
     content_type: principle
-  rationale: 'Meadows, Levitt/Dubner, and Harford converge on incentive-driven unintended
-
-    consequences. Demonstrates contradiction, related_fbs, procedural_skill.
-
-    '
+  rationale: 'Cross-domain: Meadows (policy resistance), Levitt/Dubner (Freakonomics), and Harford (adaptive systems) converge
+    on incentive-driven unintended consequences. The mechanism requires designed incentives plus optimizing agents — an economics/policy/management
+    context, not universal physics/cooking/poetry. A poet does not navigate incentive structures. Fails the physicist-chef-poet
+    test.'
 - id: NEG-005
   domain: systems & frameworks
   discipline: systems thinking
@@ -2502,7 +2102,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — JARGON ECHO. Both segments use the word ''leverage'' but describe
@@ -2554,7 +2153,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — BOUNDARY VIOLATION. The two sources genuinely converge on a
@@ -2624,8 +2222,6 @@ examples:
       trial and error. This principle underlies all pen tools, font design software, and motion path editors.
 
       '
-    application: null
-    elaboration: ''
     extraction_type: descriptive_model
     content_type: principle
     depth: domain
@@ -2667,7 +2263,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — GENUINE CITATION ECHO (D2221). Three best-selling business books all state the same platitude
@@ -2708,7 +2303,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge on a classification system (icons,
@@ -2750,7 +2344,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — DEPTH OVER-ELEVATION (D2221). The sources describe an organizational structure (the three levels
@@ -2790,7 +2383,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — GENUINE PLATITUDE (D2221). Three best-selling business books repeat the same platitude ("culture
@@ -2839,8 +2431,6 @@ examples:
     consequence: The entropy gradient drives all macroscopic processes — from chemical reactions to weather patterns to biological
       metabolism. Engineers must account for entropy in heat engine efficiency (Carnot limit). The irreversibility of entropy
       growth makes perpetual motion machines impossible.
-    application: null
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: universal
@@ -2891,8 +2481,6 @@ examples:
       ones. It explains antibiotic resistance, pesticide resistance, and why pathogens evolve. The principle also applies
       beyond biology — evolutionary algorithms in computer science, cultural evolution of ideas, and market competition all
       follow the same variation-selection-retention logic.
-    application: null
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -2944,10 +2532,6 @@ examples:
       improbable for any single cell to possess resistance to all agents. Antibiotic stewardship programs aim to reduce unnecessary
       antibiotic use to slow resistance evolution. The principle implies that "finishing the course" of antibiotics reduces
       the chance of leaving partially resistant survivors.
-    application: When designing treatment protocols for cancer or bacterial infections → use combination therapies that target
-      at least 3 independent pathways simultaneously, making multi-drug resistance statistically improbable within the target
-      cell population size.
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -2998,10 +2582,6 @@ examples:
       substitution. Structured decision protocols (checklists, mandatory criteria, blind review) reduce substitution by forcing
       System 2 engagement. The principle implies that expertise does NOT immunize against bias — it may increase susceptibility
       if experts are overconfident in their intuitive judgments.
-    application: When designing decision protocols for high-stakes professional judgments (sentencing, diagnosis, hiring)
-      → structure the process as a mandatory checklist where each criterion must be explicitly rated before the overall judgment
-      is made, preventing heuristic substitution of the global evaluation.
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -3052,10 +2632,6 @@ examples:
     consequence: Software projects should staff with the smallest feasible team, not the largest affordable one. Architectural
       decisions should maximize independence between components to reduce coordination costs. Conway's Law implies that to
       change a system's architecture, you must first change the team's communication structure.
-    application: When staffing a complex engineering project → limit team size to the minimum needed, structure the system
-      architecture to minimize inter-team dependencies, and enforce interface contracts between components to reduce coordination
-      overhead.
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: cross-domain
@@ -3110,8 +2686,6 @@ examples:
       evidence risk implementing interventions that target the wrong variable. The replication crisis in social science is
       partly attributable to unmeasured confounding in observational research. Causal diagrams (DAGs) and instrumental variables
       provide partial remedies when randomization is impossible.
-    application: null
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
     depth: universal
@@ -3165,10 +2739,6 @@ examples:
       should design decision processes that force explicit tradeoff consideration rather than allowing implicit drift toward
       maximization. The explore-exploit framework applies beyond individual choice — companies deciding when to pivot vs.
       persevere, scientists choosing when to publish vs. gather more data.
-    application: When making a selection decision with many possible options → determine a reasonable sample size in advance,
-      explore that many options to establish a quality baseline, then select the first option that exceeds that baseline rather
-      than continuing to search for the hypothetical "perfect" option.
-    elaboration: ''
     extraction_type: normative_heuristic
     content_type: principle
     depth: cross-domain
@@ -3222,8 +2792,6 @@ examples:
     consequence: Scale-free networks are robust to random failures (most nodes are peripheral) but vulnerable to targeted
       attacks on hubs. Information, influence, and disease spread faster in scale-free networks than random ones because hubs
       provide shortcuts. Marketing strategies should target hub nodes (influencers, connectors) for maximum cascade potential.
-    application: null
-    elaboration: ''
     extraction_type: empirical_pattern
     content_type: principle
     depth: cross-domain
@@ -3259,7 +2827,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — ENGINEERING TRADEOFF, NOT CAUSAL PRINCIPLE (D2223). Both segments describe design tradeoffs (CAP
@@ -3301,7 +2868,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — HISTORICAL OBSERVATION, NOT CAUSAL PRINCIPLE (D2223). All three segments describe HOW art/design
@@ -3336,7 +2902,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — CORRELATION WITHOUT CAUSAL MECHANISM (D2223). Both segments describe correlations (books→achievement,
@@ -3370,7 +2935,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'HARD NEGATIVE — SAME OBSERVATION, DIFFERENT MECHANISMS (D2223). Both sources agree that spaced retrieval improves
@@ -3411,7 +2975,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — DOMAIN BEST PRACTICE WITHOUT SPECIFIC MECHANISM (D2223). Three management books agree that "focusing
@@ -3446,7 +3009,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — DIFFERENT MECHANISMS, SAME DOMAIN (D2223). Piketty describes wealth concentration through r >
@@ -3481,7 +3043,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — RELATED BUT DISTINCT MECHANISMS (D2223). Duckworth's grit (passion + perseverance → achievement)
@@ -3516,7 +3077,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — NON-FALSIFIABLE CLAIM MASQUERADING AS PRINCIPLE (D2223). Both sources claim that "positive thinking
@@ -3551,7 +3111,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — SPECULATION WITHOUT MECHANISM (D2223). Both sources agree that AI will be "transformative" or
@@ -3593,7 +3152,6 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    elaboration: ''
     extraction_type: causal_mechanism
     content_type: principle
   rationale: HARD NEGATIVE — SAME-AUTHOR ECHO (D2223). All three segments are from the SAME author (Nassim Nicholas Taleb),
@@ -3646,11 +3204,9 @@ examples:
     - The most dangerous chasm is between early adopters and the early majority
     - New ideas spread through populations following predictable patterns
     - relative advantage, compatibility, complexity, trialability, and observability
-    elaboration: ''
     extraction_type: descriptive_model
     content_type: model
     depth: cross-domain
-    application: null
   rationale: DESCRIPTIVE MODEL — classification framework, not causal mechanism. Two independent sources converge on the adoption
     lifecycle model (Moore's chasm model + Rogers' diffusion attributes). This is a MODEL that DESCRIBES how adoption happens
     — it classifies adopter types and adoption stages. It does NOT propose a causal mechanism like 'technology X causes adoption
@@ -3695,15 +3251,13 @@ examples:
     consequence: 'The taxonomy implies different design strategies: fragile systems need protection from variability; robust
       systems need redundancy; antifragile systems need exposure to stressors and mechanisms to convert damage into improvement.'
     evidence_passages:
-    - 'Systems fall into three categories: fragile, robust, and antifragile'
+    - 'Systems fall into three categories: fragile (harmed by volatility)'
     - Most engineered systems are fragile precisely because they are optimized for stable conditions
     - Simple computational rules can produce behavior of four distinct classes
-    - Class 4 systems are computationally universal
-    elaboration: ''
+    - Class 4 systems — like Rule 110 cellular automata — are computationally universal, capable of supporting any computation.
     extraction_type: descriptive_model
     content_type: model
-    depth: universal
-    application: null
+    depth: cross-domain
   rationale: DESCRIPTIVE MODEL — classification taxonomy of system responses. Taleb's fragile/robust/antifragile and Wolfram's
     four behavioral classes both describe CLASSIFICATION SCHEMES for system behavior. They converge on the insight that systems
     can be meaningfully categorized by their response to perturbation. This is NOT a causal mechanism — it's a TAXONOMY that
@@ -3750,15 +3304,15 @@ examples:
       satisfy experience and life goals generate advocacy, habit formation, and resistance to competitive switching — even
       when functionally equivalent alternatives exist.
     evidence_passages:
-    - 'User goals divide into three categories: experience goals, end goals, and life goals'
+    - 'User goals divide into three categories: experience goals (how users want to feel — engaged, confident, not stupid),
+      end goals (what users want to accomplish — process an order, find a document), and life goals (who users want to be
+      — competent professional, caring parent)'
     - Designers who focus only on end goals build tools; designers who address all three build products people love
     - Users don't read web pages — they scan them
-    - They satisfice, picking the first reasonable option
-    elaboration: ''
+    - they satisfice, picking the first reasonable option
     extraction_type: descriptive_model
     content_type: model
     depth: domain
-    application: null
   rationale: 'DESCRIPTIVE MODEL — goal hierarchy classification. Cooper''s three-level goal taxonomy and Krug''s user behavior
     observations converge on a descriptive framework: users operate at multiple goal levels and good design must serve all
     of them. This is a descriptive MODEL (classifies user goals into a hierarchy), not a causal mechanism. Application is
@@ -3807,14 +3361,12 @@ examples:
       that suggest mitigation strategies.
     evidence_passages:
     - the premortem procedure is the most effective debiasing technique
-    - Imagine we are one year into the future... The outcome was a disaster
-    - 'WRAP: Widen your options, Reality-test your assumptions, Attain distance, Prepare to be wrong'
-    elaboration: ''
+    - Imagine we are one year into the future. We implemented the decision as it stands today. The outcome was a disaster.
+    - Widen options beyond binary choices, Reality-test by seeking disconfirming evidence, Attain distance by asking what
+      you'd tell your successor, and Prepare by setting a tripwire that forces reconsideration.
     extraction_type: normative_heuristic
     content_type: heuristic
     depth: cross-domain
-    application: 'When facing a high-stakes decision with a team → run a 10-minute premortem: announce ''it failed — write
-      the story of why,'' allow 3 minutes of silent writing, then collect and prioritize the identified risks.'
   rationale: 'NORMATIVE HEURISTIC — prescriptive decision technique, not descriptive model or causal mechanism. Heath''s WRAP
     framework and Kahneman''s premortem converge on the same prescriptive principle: counter overconfidence by actively constructing
     failure scenarios before committing. This is a HEURISTIC (a rule of procedure) not a causal mechanism — it says ''DO this''
@@ -3841,7 +3393,7 @@ examples:
       agreement doesn''t work.
 
       '
-  is_convergent: true
+  is_convergent: false
   should_extract: true
   expected_fb:
     is_summary: false
@@ -3867,18 +3419,16 @@ examples:
     - Habit stacking is a strategy where you pair a new habit with an existing one
     - After I pour my morning coffee, I will meditate for 60 seconds
     - Once people make a small commitment, they tend to behave consistently with it
-    - the initial commitment must be voluntary, active, and public
-    elaboration: ''
+    - The key is the initial commitment — it must be voluntary, active, and public (or at least privately recorded) to trigger
+      the consistency drive.
     extraction_type: normative_heuristic
     content_type: heuristic
     depth: cross-domain
-    application: When building a new daily habit → identify a rock-solid existing habit (pouring coffee, brushing teeth),
-      write a commitment statement in the format 'After [EXISTING HABIT], I will [NEW HABIT],' and track consecutive days.
-      If you miss a day, return to the commitment statement and reduce the new habit's scope rather than abandoning it.
-  rationale: 'NORMATIVE HEURISTIC — prescriptive behavior-change technique. Clear''s habit stacking formula and Cialdini''s
-    commitment-consistency principle converge on a prescriptive heuristic: use existing routines as automatic triggers and
-    leverage consistency to sustain behavior. This is a HEURISTIC (''do this procedure''), not a causal mechanism. Teaches
-    S2 to distinguish normative procedural rules from descriptive causal explanations.'
+  rationale: NORMATIVE HEURISTIC — complementary mechanisms, NOT convergent. Clear's habit stacking (cue automation) and Cialdini's
+    commitment-consistency (self-image drive) are two DISTINCT behavioral mechanisms that address the same problem (behavior
+    change). They do not share a causal structure — they are complementary tools. Teaches S2 to distinguish 'complementary
+    mechanisms in the same domain' (one FB, is_convergent=false) from genuine convergence (independent sources implying the
+    same causal structure).
 - id: CONV-036
   domain: strategy
   discipline: strategic management
@@ -3926,15 +3476,12 @@ examples:
     evidence_passages:
     - The explore-exploit trade-off is one of the most fundamental problems in decision theory
     - with unlimited time, explore extensively; with a known deadline, shift increasingly toward exploitation
-    - 'The barbell strategy: put 90% in maximally safe instruments and 10% in maximally speculative ones'
+    - 'The barbell strategy is a method for navigating uncertainty: put 90% of your resources in maximally safe instruments
+      and 10% in maximally speculative ones, avoiding the middle entirely.'
     - This is the opposite of the 'medium risk' approach
-    elaboration: ''
     extraction_type: normative_heuristic
     content_type: heuristic
     depth: cross-domain
-    application: When allocating resources under uncertainty (career, investing, R&D) → put 85-90% in a proven, safe option
-      that ensures survival, and 10-15% in high-variance speculative bets with convex payoffs. Rebalance annually — if a speculative
-      bet succeeds, move some gains to the safe base; if it fails, the safe base ensures you can place another bet.
   rationale: 'NORMATIVE HEURISTIC — prescriptive resource-allocation rule derived from two theoretical frameworks. Christian
     & Griffiths'' explore-exploit formalism and Taleb''s barbell strategy converge on the same prescriptive heuristic: bimodal
     allocation beats unimodal under uncertainty. This is a HEURISTIC (''how to act'') synthesized from multiple theoretical
@@ -3962,45 +3509,51 @@ examples:
       whom, who has conflict with whom, and who owes what to whom.
 
       '
-  is_convergent: true
+  is_convergent: false
   should_extract: true
   expected_fb:
-    is_summary: false
+  - is_summary: false
     route: FB
-    name: Cognitive Capacity Ceiling
-    definition: 'Human cognition has measurable upper bounds that constrain social and information processing: ~150 stable
-      relationships (Dunbar''s number) due to the cognitive cost of tracking relationship dynamics, and systematic frequency-estimation
-      errors (availability bias) because ease of mental retrieval substitutes for actual frequency. Both patterns are observed
-      regularities, not causal laws.'
-    mechanism: 'Dunbar''s number emerges from the neocortical processing capacity required to maintain a coherent mental model
-      of each relationship — who is connected to whom, who has unresolved conflict, who owes resources to whom. The availability
-      heuristic emerges from the associative machinery of System 1: when asked to estimate frequency, the brain substitutes
-      ''how easily can I recall examples?'' for ''how many are there really?'' Both are EMPIRICAL PATTERNS — observed regularities
-      that describe how cognition works, not causal mechanisms that explain WHY cognition works this way.'
-    boundary: 'Dunbar''s number: applies to stable, reciprocal relationships (not acquaintances or followers). Fails for:
-      (1) digital social networks where the cognitive cost of relationship maintenance is offloaded to software; (2) hierarchical
-      organizations where relationships are mediated by structure rather than direct personal knowledge. Availability heuristic:
-      applies when frequency estimation requires active recall. Fails when people have direct access to frequency data (they
-      count rather than estimate).'
+    name: Dunbar's Number — Social Relationship Capacity Limit
+    definition: 'Human cognition has a measurable upper bound on stable social relationships: ~150 (Dunbar''s number) due
+      to the cognitive cost of tracking relationship dynamics. An observed regularity, not a causal law.'
+    mechanism: Dunbar's number emerges from the neocortical processing capacity required to maintain a coherent mental model
+      of each relationship — who is connected to whom, who has unresolved conflict, who owes resources to whom. An EMPIRICAL
+      PATTERN — an observed regularity describing how social cognition scales, not a causal mechanism.
+    boundary: 'Applies to stable, reciprocal relationships (not acquaintances or followers). Fails for: (1) digital social
+      networks where the cognitive cost of relationship maintenance is offloaded to software; (2) hierarchical organizations
+      where relationships are mediated by structure rather than direct personal knowledge.'
     consequence: Organizations exceeding ~150 people require formal hierarchy, process, and impersonal coordination — the
-      informal trust-based coordination that works in small groups breaks down. Similarly, risk perception is driven more
-      by vividness and recency than by statistical probability, leading to systematic under-investment in chronic risks (heart
-      disease) and over-investment in dramatic risks (plane crashes).
+      informal trust-based coordination that works in small groups breaks down.
+    extraction_type: empirical_pattern
+    content_type: principle
     evidence_passages:
     - the cognitive limit to the number of people with whom one can maintain stable social relationships
     - Neolithic villages averaged 150 people, military companies are organized in units of about 150
+    depth: domain
+  - is_summary: false
+    route: FB
+    name: Availability Heuristic — Recall Ease as Frequency Proxy
+    definition: 'Human cognition has measurable upper bounds on information processing: systematic frequency-estimation errors
+      (availability bias) occur because ease of mental retrieval substitutes for actual frequency. An observed regularity,
+      not a causal law.'
+    mechanism: 'The availability heuristic emerges from the associative machinery of System 1: when asked to estimate frequency,
+      the brain substitutes ''how easily can I recall examples?'' for ''how many are there really?'' An EMPIRICAL PATTERN
+      — an observed regularity describing how judgment works, not a causal mechanism.'
+    boundary: Applies when frequency estimation requires active recall. Fails when people have direct access to frequency
+      data (they count rather than estimate).
+    consequence: Risk perception is driven more by vividness and recency than by statistical probability, leading to systematic
+      under-investment in chronic risks (heart disease) and over-investment in dramatic risks (plane crashes).
+    extraction_type: empirical_pattern
+    content_type: principle
+    evidence_passages:
     - mental availability is driven by ease of retrieval, not by actual frequency
     - words with 'k' as the third letter are about three times more common
-    elaboration: ''
-    extraction_type: empirical_pattern
-    content_type: pattern
-    depth: cross-domain
-    application: null
-  rationale: EMPIRICAL PATTERN — observed regularity, not causal mechanism. Dunbar's number and the availability heuristic
-    are both EMPIRICAL OBSERVATIONS about consistent patterns in human cognition. They describe WHAT happens (people max out
-    at ~150 relationships; people substitute ease-of-recall for frequency), not WHY it happens through a testable causal chain.
-    Essential for teaching S2 to distinguish empirical patterns from causal mechanisms — both are valid FBs, but they have
-    different structure (patterns describe; mechanisms explain).
+    depth: domain
+  rationale: 1:N SPLIT — Dunbar's number (relationship-capacity limit) and the availability heuristic (recall-ease frequency
+    proxy) are two INDEPENDENT empirical patterns in human cognition. They share only the topic 'cognition' — no shared causal
+    structure. Multi-source clusters on the same topic must NOT be merged into one FB when mechanisms differ. Teaches S2 to
+    split, not merge, when sources describe different phenomena. is_convergent=false despite 2 books.
 - id: CONV-038
   domain: complex systems
   discipline: network science
@@ -4054,11 +3607,9 @@ examples:
     - a signature of power-law distributions, which arise when success breeds more success
     - Preferential attachment is the mechanism behind many power-law distributions
     - the rich get richer
-    elaboration: ''
     extraction_type: empirical_pattern
     content_type: pattern
     depth: cross-domain
-    application: null
   rationale: 'EMPIRICAL PATTERN — observed statistical regularity. Taleb''s 80/20 observations and Christian & Griffiths''
     preferential attachment converge on the same empirical pattern: power-law concentration in complex adaptive systems. This
     is a PATTERN (''systems with cumulative advantage produce concentrated outcomes''), not a causal mechanism. While preferential
@@ -4112,15 +3663,16 @@ examples:
       once the bonus is removed. The empirical pattern warns against naive incentive engineering — test for frame displacement
       before scaling.
     evidence_passages:
-    - when a day-care center started fining parents who arrived late, late arrivals INCREASED
-    - The fine replaced a moral obligation with a market transaction
+    - When a day-care center in Israel started fining parents who arrived late to pick up their children, late arrivals INCREASED
+      rather than decreased.
+    - The fine replaced a moral obligation (guilt about keeping teachers waiting) with a market transaction (paying for extended
+      care).
     - The planning fallacy describes the systematic tendency to underestimate the time, costs, and risks
-    - The inside view consistently beats the outside view in people's intuitive forecasts
-    elaboration: ''
+    - The inside view (focusing on the specific case) consistently beats the outside view (looking at base rates of similar
+      cases) in people's intuitive forecasts.
     extraction_type: empirical_pattern
     content_type: pattern
     depth: cross-domain
-    application: null
   rationale: 'EMPIRICAL PATTERN — observed behavioral regularity. The day-care fine backfire (Levitt/Dubner) and the planning
     fallacy (Kahneman) converge on the same empirical pattern: extrinsic incentives can produce the opposite of their intended
     effect through frame displacement. This is an OBSERVED REGULARITY — ''incentives sometimes backfire when they reframe
@@ -4175,15 +3727,10 @@ examples:
     evidence_passages:
     - kerning pairs (adjusting space between specific letter combinations like 'AV' and 'To')
     - Kerning exceptions override these defaults for specific letter pairs
-    - classic examples include 'AV,' 'WA,' 'To,' and 'Ve'
-    elaboration: ''
+    - classic examples include 'AV,' 'WA,' 'To,' and 'Ve.'
     extraction_type: causal_mechanism
     content_type: principle
     depth: specialized
-    application: When setting display type or a logo in a design tool (Figma, Illustrator, InDesign) → after setting the typeface
-      and size, manually check and adjust kerning on problematic letter pairs (AV, WA, To, Ve, Ta, Yo). Set the cursor between
-      the two letters and use Alt+Left/Right Arrow to decrease/increase spacing in small increments until the optical gap
-      matches surrounding letter pairs.
   rationale: 'GENUINE SPECIALIZED POSITIVE (D2226). Optical kerning is a narrow sub-technique within typography, which is
     itself a sub-field of graphic design. It passes the specialization test: most practitioners IN the parent domain (graphic
     design) would understand this, but it requires typography-specific knowledge. It is tool-adjacent (applies to any vector

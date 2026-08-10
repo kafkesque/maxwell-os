@@ -142,6 +142,8 @@ S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage
 # ── Stage 3: REMOVED (D2120) — D2178: dead constant purged ─────────────
 
 # ── Stage 4 settings (D2082: Type-aware routing) ───────────────────────
+S4_DEDUP_COSINE_THRESHOLD = float(_CFG.get("stage4", {}).get("dedup_cosine_threshold", 0.92))       # D2231: C12 (was hardcoded)
+S4_SEMANTIC_NEAR_THRESHOLD = float(_CFG.get("stage4", {}).get("semantic_near_threshold", 0.80))     # D2231: C12 (was hardcoded)
 S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]
 S4_PI_OUTPUT=_CFG["stage4"]["process_instance_output"]
 S4_GE_OUTPUT=_CFG["stage4"]["growth_edge_output"]
@@ -157,9 +159,9 @@ S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
 # See governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
 S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2216
 S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "tasksource/ModernBERT-base-nli")  # D2216
-S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.6))  # D2119
-S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.8))  # D2155: configurable
-S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.5))  # D2155: configurable
+S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.5))  # D2231: fallback matches config
+S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.6))  # D2231: fallback matches config
+S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.3))  # D2231: fallback matches config
 
 # ── NLI threshold sanity check (D2185: T1.4 — catch misconfigured thresholds) ──
 def _validate_nli_thresholds():
@@ -182,6 +184,19 @@ def _validate_nli_thresholds():
         print(f"   Expected: 0 ≤ marginal({S5_NLI_MARGINAL_THRESHOLD}) < entailment({S5_NLI_ENTAILMENT_THRESHOLD}) < pass({S5_NLI_PASS_THRESHOLD}) ≤ 1", file=sys.stderr)
 _validate_nli_thresholds()
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
+
+# ── Reliability settings (D2231: C12 compliance) ──────────────────────
+RELIABILITY_STABLE_THRESHOLD = float(_CFG.get("reliability", {}).get("stable_threshold", 0.85))
+RELIABILITY_WATCH_THRESHOLD = float(_CFG.get("reliability", {}).get("watch_threshold", 0.50))
+RELIABILITY_GARBAGE_THRESHOLD = float(_CFG.get("reliability", {}).get("garbage_threshold", 0.20))
+
+# ── Taxonomy thresholds (D2231: C12 compliance) ───────────────────────
+TAXONOMY_FLOOD_THRESHOLD = float(_CFG.get("taxonomy", {}).get("flood_threshold_ratio", 0.20))
+TAXONOMY_REPLACEMENT_THRESHOLD = float(_CFG.get("taxonomy", {}).get("replacement_threshold_ratio", 1.1))
+TAXONOMY_EMERGING_FREQ = int(_CFG.get("taxonomy", {}).get("emerging_freq_threshold", 10))
+
+# ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
+RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
 
 # ── Coverage settings (T0.3) ─────────────────────────────────────────
 COVERAGE_THRESHOLD = float(_CFG.get("coverage", {}).get("threshold", 0.50))

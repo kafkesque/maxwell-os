@@ -3426,3 +3426,89 @@ D2204: Golden set expansion 10→25 examples. Full property coverage (prerequisi
 
 **Files:** `pipeline/stage4_merge.py`, `pipeline/stage5_verify.py`, `config/golden/stage2_fewshot_convergent.yaml`, `config/golden/stage2_fewshot_trimmed_12.yaml`, `config/pipeline_config.yaml`
 **Status:** ✅ ALL 6 FIXES APPLIED AND SYNTAX-VERIFIED
+
+### D2227 — Cross-Examination Audit: 7 P0 Blockers Confirmed (2026-08-10)
+**Category:** AUDIT / QLT / GOV
+**Source:** Kimi + Qwen + ChatGPT cross-examination vs repository ground truth
+**Decision:** 3-auditor cross-examination confirmed 22 bugs, identified 6 blindspots missed by all auditors, and falsified 4 claims. The golden set is NOT READY for DSPy fine-tuning.
+
+**P0 Blockers confirmed:**
+1. **S4 field pollution** — All 37 golden positives contain CRIBS fields (application, elaboration, procedural_skill, etc.) in `expected_fb`. DSPy would teach S2 to generate S4 fields.
+2. **sqlite-vec dimension mismatch** — `stage6_commit.py:146` hardcodes `float[1024]`, config says `embed_dim: 512`. Runtime failure at commit.
+3. **Evidence passages are paraphrases** — 19+ sampled mismatches. Not exact source spans. Violates source-grounding requirement.
+4. **GoldenFB schema lacks `extraction_type`** — Pydantic drops the field during DSPy compilation.
+5. **Stage 2 convergence routing** — `if is_conv or book_count >= 2` allows source-count alone to trigger convergent extraction without mechanism gate.
+6. **C12 violation: 6 hardcoded thresholds** — `reliability.py` (0.85/0.50/0.20), `stage4_merge.py` (0.92/0.80), `principle_index.py` (0.90), `taxonomy_manager.py` (0.20), `retrieve.py` (0.85).
+7. **DSPy not implemented** — Zero dspy references in codebase. System is few-shot injection only.
+
+**P1 Blockers confirmed:**
+- 3 depth misclassifications (CONV-014, 021, 032: universal→cross-domain)
+- Author concentration: Kahneman 22, Taleb 21, Clear 15 mentions (extreme overfitting risk)
+- NLI config-code docstring inversion (ModernBERT primary in docs, DeBERTa primary at runtime per config)
+- NLI fallback defaults landmine (0.8/0.6/0.5 silently revert if config load fails)
+- Taxonomy version triple drift (version.yaml v5.0 vs taxonomy_v5.yaml v5.1)
+- Golden set version says 4.0 but D2226 claims v4.2
+- CONV-035/037 likely false convergence (synthesis, not shared mechanism)
+
+**Auditor accuracy:** Kimi 8.5/10 (most thorough), ChatGPT 7.0/10 (deepest epistemic analysis, 3 factual errors), Qwen 6.5/10 (best on C12/governance, narrowest scope).
+
+**Blindspots missed by all three:** NLI config-code docstring inversion, orphan `is_summary` field in GoldenFB, zero test infrastructure, D2119 migration incomplete (config not updated to match decision intent).
+
+**Files:** `DECISION-LOG.md`, `governance/buglog.md`, `governance/aggregated_remaining_tasks.md`
+**Status:** ✅ LOGGED — Implementation pending D2228-D2232
+
+### D2228 — Fix P0-1: Strip S4 Fields from Golden Set (2026-08-10)
+**Category:** DATA / BUGFIX
+**Source:** D2227 cross-examination (Kimi A2, confirmed by all 3 auditors)
+**Decision:** Strip ALL S4 CRIBS fields from `expected_fb` in `stage2_fewshot_convergent.yaml`. Fields to remove: `application`, `elaboration`, `procedural_skill`, `failure_mode`, `jargon`, `keywords`, `prerequisite_fbs`, `contradicts_fbs`, `related_fbs`, `evidence`. Keep only S2 fields: `name`, `definition`, `mechanism`, `boundary`, `consequence`, `evidence_passages`, `extraction_type`, `depth`, `content_type`. Create separate `stage4_fewshot_enrichment.yaml` with 20 examples for CRIBS training.
+**Priority:** P0 — Blocking DSPy
+**Effort:** 2-3 hours
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`
+**Status:** ⏳ PENDING
+
+### D2229 — Fix P0-2: sqlite-vec 1024→512 Dimension (2026-08-10)
+**Category:** BUGFIX
+**Source:** D2227 cross-examination (Kimi A1)
+**Decision:** Change `float[1024]` to `float[512]` at `stage6_commit.py:146`. Read `S15_EMBED_DIM` from `pipeline_paths.py` at schema creation time rather than hardcoding.
+**Priority:** P0 — Runtime failure on commit
+**Effort:** 15 minutes
+**Files:** `pipeline/stage6_commit.py`
+**Status:** ⏳ PENDING
+
+### D2230 — Fix P0-3: Evidence Verbatim + Exact Source Spans (2026-08-10)
+**Category:** DATA / QLT
+**Source:** D2227 cross-examination (ChatGPT #2.3)
+**Decision:** For all 60 golden examples: verify each `evidence_passage` text matches a `cluster_segment.text` exactly. Add provenance fields to each passage: `source_book`, `segment_id`, `char_start`, `char_end`, `sha256`. If exact match not possible, either find the correct segment or flag as approximate (with downgraded training weight).
+**Priority:** P0 — Epistemic integrity
+**Effort:** 4-6 hours
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`
+**Status:** ⏳ PENDING
+
+### D2231 — Fix P0-4/5/6: Schema, Routing, C12 Thresholds (2026-08-10)
+**Category:** BUGFIX / GOV
+**Source:** D2227 cross-examination
+**Decision:** Three surgical fixes:
+- **P0-4:** Add `extraction_type: str = ""` to `GoldenFB` model in `schemas.py:915`. This prevents DSPy from dropping the extraction type signal.
+- **P0-5:** Fix `stage2_extract.py:1209` convergence routing. Change from `if is_conv or book_count >= 2` to require explicit `is_conv` gate or mechanism-similarity check. Source count alone must not trigger convergent extraction.
+- **P0-6:** Move 6 hardcoded thresholds to `pipeline_config.yaml` and read via `pipeline_paths.py`. Affected: `reliability.py` (0.85/0.50/0.20→`reliability.stable_threshold` etc.), `stage4_merge.py` (0.92→`stage4.dedup_cosine_threshold`, 0.80→`stage4.semantic_near_threshold`), `principle_index.py` (0.90→`stage2.minhash_threshold`), `taxonomy_manager.py` (0.20→`taxonomy.flood_threshold_ratio`), `retrieve.py` (0.85 argparse→read from config).
+**Priority:** P0 — Schema + routing + governance
+**Effort:** 3-4 hours
+**Files:** `pipeline/schemas.py`, `pipeline/stage2_extract.py`, `pipeline/reliability.py`, `pipeline/stage4_merge.py`, `pipeline/principle_index.py`, `pipeline/taxonomy_manager.py`, `pipeline/retrieve.py`, `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`
+**Status:** ⏳ PENDING
+
+### D2232 — Fix P1 Blockers: Depths, Authors, NLI, Versions, False Convergence (2026-08-10)
+**Category:** DATA / QLT / GOV
+**Source:** D2227 cross-examination (all 3 auditors)
+**Decision:** Eight P1 fixes:
+- **P1-1:** Fix 3 depth misclassifications: CONV-014 universal→cross-domain, CONV-021 universal→cross-domain, CONV-032 universal→cross-domain.
+- **P1-2:** Cap any single author at 3 appearances maximum in golden set. Replace excess Kahneman/Taleb/Clear examples with diverse authors from missing domains (chemistry, neuroscience, ethics, cybersecurity).
+- **P1-3:** Fix NLI config-code inversion. Either update config to make ModernBERT primary (matching D2119 intent and code docstring) OR update docstring to match config (DeBERTa primary). Choose one and align all three sources.
+- **P1-4:** Fix NLI fallback defaults in `pipeline_paths.py` to match config values: 0.6/0.5/0.3 (not 0.8/0.6/0.5). Add runtime assertion that loaded values match config.
+- **P1-5:** Align taxonomy versions: update `config/version.yaml` taxonomy_version to v5.1 (matching `taxonomy_v5.yaml`), or roll taxonomy back to v5.0.
+- **P1-6:** Set golden set `meta.version` to `"4.2"` (matching D2226 claim), remove `calibration_status`.
+- **P1-7:** Audit CONV-035 (habit stacking + commitment = "cue automation") and CONV-037 (Dunbar + availability = "Cognitive Capacity Ceiling") for false convergence. Reclassify as `is_convergent: false` or strengthen mechanism evidence.
+- **P1-8:** Add 8-11 examples per non-causal extraction type (target: 12-15 descriptive_model, 12-15 normative_heuristic, 12-15 empirical_pattern).
+**Priority:** P1 — Block production but not pilot
+**Effort:** 6-8 hours
+**Files:** `config/golden/stage2_fewshot_convergent.yaml`, `config/version.yaml`, `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`, `pipeline/stage5_verify.py`
+**Status:** ⏳ PENDING

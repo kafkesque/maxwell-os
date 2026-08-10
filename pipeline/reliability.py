@@ -18,14 +18,19 @@ import sqlite3
 from pathlib import Path
 
 # D2175: Use DB_PATH from pipeline_paths — no hardcoded paths (C12a)
-from pipeline.pipeline_paths import DB_PATH as _DB_PATH
+from pipeline.pipeline_paths import (
+    DB_PATH as _DB_PATH,
+    RELIABILITY_STABLE_THRESHOLD,
+    RELIABILITY_WATCH_THRESHOLD,
+    RELIABILITY_GARBAGE_THRESHOLD,
+)
 
 DB_PATH: Path = _DB_PATH
 
-# ── Thresholds (from spec §2.3) ─────────────────────────────────────────
-STABLE_THRESHOLD: float = 0.85
-WATCH_THRESHOLD: float = 0.50
-GARBAGE_THRESHOLD: float = 0.20
+# ── Thresholds (D2231: C12 — read from config/pipeline_paths) ──────────
+STABLE_THRESHOLD: float = RELIABILITY_STABLE_THRESHOLD
+WATCH_THRESHOLD: float = RELIABILITY_WATCH_THRESHOLD
+GARBAGE_THRESHOLD: float = RELIABILITY_GARBAGE_THRESHOLD
 MIN_EXECUTIONS_FOR_GARBAGE: int = 10
 MIN_RATINGS_FOR_TIER: int = 3
 

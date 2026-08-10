@@ -24,13 +24,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
-from pipeline.pipeline_paths import DB_PATH
+from pipeline.pipeline_paths import DB_PATH, S2_MINHASH_THRESHOLD, S2_MINHASH_NUM_PERM
 from pipeline.stamp import get_pipeline_run_id
 
-# ── Constants ────────────────────────────────────────────────────────────
+# ── Constants (D2231: C12 — read from config via pipeline_paths) ─────────
 
-MINHASH_NUM_PERM: int = 128
-MINHASH_THRESHOLD: float = 0.90  # Jaccard similarity for near-duplicate
+MINHASH_NUM_PERM: int = S2_MINHASH_NUM_PERM
+MINHASH_THRESHOLD: float = S2_MINHASH_THRESHOLD  # Jaccard similarity for near-duplicate
 MAX_DEDUP_LOG_SAMPLES: int = 5   # C9-G1: log first N skips per run
 
 

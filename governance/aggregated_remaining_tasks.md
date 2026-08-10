@@ -16,7 +16,7 @@
 | **T-004** | **Add `extraction_type` to GoldenFB schema** — `schemas.py:915`: add `extraction_type: str = ""` field. Without this, DSPy drops extraction type from training signal. | D2231 | 5m | ✅ **DONE** — `extraction_type` field added, compiles clean. |
 | **T-005** | **Fix Stage 2 convergence routing** — `stage2_extract.py:1209`: remove `or book_count >= 2` clause. Source count alone must NOT trigger convergent extraction. Require explicit `is_conv` gate from S1.5 clustering. | D2231 | 1-2h | ✅ **DONE** — Redundant `or book_count >= 2` removed. `is_convergent` from S1.5 already encodes source diversity. |
 | **T-006** | **Fix 6 C12 hardcoded threshold violations** — Move all to `pipeline_config.yaml` + read via `pipeline_paths.py`: `reliability.py` (0.85/0.50/0.20), `stage4_merge.py` (0.92/0.80), `principle_index.py` (0.90), `taxonomy_manager.py` (0.20/1.1/10), `retrieve.py` (0.85). | D2231 | 2-3h | ✅ **DONE** — 6 files fixed, 8 config keys added, 4 new pipeline_paths imports. Also bundled T-011 (NLI fallback defaults). |
-| **T-007** | **Implement DSPy harness** — System is currently few-shot injection only (zero dspy references). Build: compile → evaluate → held-out test → optimization loop. | D2227 | 1-2d | T-001..T-006 |
+| **T-007** | **Implement DSPy harness** — System is currently few-shot injection only (zero dspy references). Build: compile → evaluate → held-out test → optimization loop. | D2235 | ✅ **DONE** | `pipeline/dspy_trainer.py` (707 lines). Signature + converter + split + metric + OMLXLM backend + MIPROv2 optimizer. Dry-run passes (72 dspy.Examples). Pilot pending OMLX server. |
 
 **P0 subtotal: 13 tasks | 12 DONE, 1 PENDING (T-007)**
 

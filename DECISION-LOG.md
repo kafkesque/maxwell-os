@@ -3555,3 +3555,47 @@ under-represented extraction types.
 better represented. Remaining gap: DM at 9 (target 12+), can be addressed in
 future expansion cycle.
 
+
+### D2235 — DSPy Fine-Tuning Harness Built (2026-08-10)
+
+**Context:** T-007 was the last remaining P0 blocker from the D2227-D2232 cross-examination
+audit. The golden set (v4.3, 70 examples, 72 FBs) was ready after quality blockers
+(D2234), but no DSPy training infrastructure existed.
+
+**Decision:** Build a complete DSPy harness with OMLX backend integration, stratified
+split (author-grouped infeasible at 72 examples), penalizing metric, and MIPROv2 optimizer.
+
+**What was built ():**
+1. **ConvergentExtraction Signature** — DSPy task I/O defining the S2 extraction task
+2. **golden_to_examples()** — Converts golden YAML → 72 dspy.Examples (51 pos, 21 neg)
+3. **stratified_random_split()** — 70/15/15 split preserving pos/neg ratio across splits
+4. **extraction_metric()** — 10-dimension scoring (0.0–1.0): convergence (30%), type (15%),
+   depth (10%), name (10%), mechanism (10%), evidence (10%), boundary (5%), consequence (5%),
+   route (5%). False positives capped at 0.20 max.
+5. **OMLXLM** — DSPy LM backend for OMLX OpenAI-compatible API
+6. **run_dspy_pilot()** — MIPROv2 optimizer with auto=light for initial validation
+7. **evaluate_on_test()** — Held-out evaluation with per-type score breakdown
+
+**Split strategy:** Author-grouped split is ideal but mathematically infeasible at
+72 examples with many multi-author pairings (causes 92%→test imbalance or 10% leakage).
+Using stratified random split for pilot; author-grouped can be enabled when golden set
+reaches 200+ examples with cleaner author separation.
+
+**Model:** Qwen3-Coder-30B-A3B-MLX-4bit via OMLX (port 11435), temp=0.0.
+
+**Master prompt:** v6.0 created () reflecting
+D2234 state (70 examples, 72 FBs, EP:12, NH:12, DM:9, authors ≤3).
+
+**Status:** Harness built, dry-run passes. Pilot training not yet executed (requires
+OMLX server with Qwen3-Coder loaded).
+
+**Next:** Run Stratified random split: train=49 (68%), dev=11 (15%), test=12 (17%)
+  Train: 35 pos, 14 neg
+  Dev:   8 pos, 3 neg
+  Test:  8 pos, 4 neg
+  Author leakage: 11/111 (10%) — acceptable for pilot
+
+============================================================
+DSPy Pilot: 8 train, 4 dev
+============================================================ for 8-train/4-dev pilot.
+

@@ -1144,3 +1144,21 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Status:** 🔴 OPEN — Model upgrade needed. Phi-4-mini adequate for CRIBS enrichment only, not for depth classification.
 
 *Updated: 2026-08-10 (D2226 audit) | Bugs tracked: 54 | Resolved: 46 | Closed (moot): 5 | Open: 3 | Schema version: 1.9*
+
+## BUG-063 — 2026-08-10 — delegate() Cannot Execute File System Tasks (Root Cause) 🔴
+- **Symptom:** `delegate({provider: "maxwell_omlx", model: "..."})` fails for any task requiring project file access. Attempt 1: gemma-4-E4B returned 404 (model not loaded). Attempt 2: Qwen3-Coder-30B-A3B executed TypeScript code in Deno sandbox that couldn't access project files. Regular occurrence across sessions — "local LLMs useless for delegated tasks."
+- **Root cause:** The `delegate()` function routes ALL providers through `execute_typescript` (Deno/TypeScript sandbox). The `provider` parameter changes which LLM generates the TypeScript code, but the code always executes in the sandbox. The sandbox has NO filesystem access to the project directory — it can only use registered SDK functions. For file analysis, code modifications, or any task requiring `fs` or `Deno.readTextFile`, the sandbox fails silently.
+- **Impact:** Delegate is unusable for: (1) file analysis of project code, (2) YAML validation against project files, (3) pipeline code modifications, (4) any task requiring project context beyond the delegate's instructions text. Effectively reduces delegate to a chat interface with no tool access — equivalent to a simple LLM call with no grounding in project state.
+- **Workaround:** Use `shell()` + `curl` to OMLX API for file analysis tasks. Pattern:
+  ```bash
+  curl -s http://localhost:11435/v1/chat/completions -d '{
+    "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "messages": [{"role": "user", "content": "...analyze these files..."}],
+    "temperature": 0.0
+  }'
+  ```
+- **Fix needed:** `delegate()` should detect when `provider` is `maxwell_omlx` and route directly through OMLX API with a shell execution backplane (access to `shell()` tool), not through the TypeScript sandbox. Or provide a separate `delegate_omlx()` function that calls the local API directly.
+- **Status:** 🔴 OPEN — Architectural limitation. delegate() and maxwell_omlx provider are incompatible for tool-use tasks.
+- **Priority:** P1 — blocks all local-LLM-driven code analysis workflows.
+
+*Updated: 2026-08-10 (D2226 cleanup) | Bugs tracked: 55 | Resolved: 46 | Closed (moot): 5 | Open: 4 | Schema version: 1.10*

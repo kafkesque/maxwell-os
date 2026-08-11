@@ -3,6 +3,13 @@
 
 ---
 
+
+### D2264 — S5 Deep Check: Gemma-4-E4B to Phi-4-mini (2026-08-11)
+**Category:** QLT / PERF
+**Decision:** Swapped S5 deep check from Gemma-4-E4B (33% factual accuracy) to Phi-4-mini-instruct-8bit (67% accuracy, 1.6s/call). Benchmark: 3 golden FBs tested — Phi caught the asymmetric dominance case Gemma missed. R5 satisfied: DeBERTa FEVER (encoder NLI) vs Phi-4-mini (decoder LLM) — different architectures. BUG-053 does not apply: S5 deep check is structured PASS/FLAG binary task with source text.
+**Files:** config/pipeline_config.yaml, pipeline/stage5_verify.py, governance/buglog.md, config/model_assignments.yaml
+**Status:** DONE (2026-08-11)
+
 ## D2205 — RAG Architecture Roadmap: 4-Model Synthesis & Adaptation (2026-08-06)
 
 **Summary:** Four independent model families (Kimi/Moonshot, DeepSeek, Qwen, ChatGPT/OpenAI) converged on the same architectural verdict. Maxwell's ingestion pipeline (Stages 0-6) is best-in-class for sovereign knowledge extraction. The retrieval layer runs 2023-vintage architecture. This decision documents the verified, grounded, Maxwell-adapted implementation plan.
@@ -4035,3 +4042,170 @@ overnight. (3) Documented in ROUNDTABLE_MASTER_PROMPT.md §G.
 
 **Handoff file:** `governance/HANDOFF_D2254.md` — next session start point.
 **Commits:** af09de9, 88fd43f, fcf23a9 (+ pending governance sync commit).
+
+---
+
+## SESSION: 2026-08-11 — COMPREHENSIVE AUDIT + P0 FIXES (D2255-D2262)
+
+> **Trigger:** D2254 cross-examinations (8 LLM responses, 2 rounds) + user-requested comprehensive audit.
+> **Artifact:** `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` — 8-part audit of models, golden set, config/code drift, verification gaps, dependency risks.
+
+### D2255 — S5 NLI: DeBERTa FEVER Activated as Primary (Config Fix) (2026-08-11)
+
+**Context:** D2216 (2026-08-09) promoted DeBERTa FEVER from fallback to primary in pipeline_paths.py code default, citing "5.8× more discriminative than ModernBERT on convergent FBs." But `config/pipeline_config.yaml` L172 hardcoded `nli_model: tasksource/ModernBERT-base-nli`. Because config-driven architecture (C12) means config overrides code defaults, DeBERTa FEVER promotion was dead code — ModernBERT was running at runtime.
+
+**Evidence:** `governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md` benchmarked both on 5 convergent FBs. DeBERTa FEVER: clear binary signal (0.88-0.98 PASS vs 0.001 FAIL). ModernBERT standard MNLI: everything NEUTRAL 0.18-0.32 — "CANNOT verify synthesized principles."
+
+**Fix applied (2026-08-11):**
+- `config/pipeline_config.yaml` L172: `nli_model` swapped `tasksource/ModernBERT-base-nli` → `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli`
+- `config/pipeline_config.yaml` L173: `nli_model_fallback` swapped to `tasksource/ModernBERT-base-nli`
+- Annotated with D2255 reference explaining the swap
+
+**Impact:** S5 NLI pre-filter now uses a FEVER-trained claim-evidence model (89.1% FEVER) instead of standard MNLI model (ModernBERT) that returned NEUTRAL for all synthesized FBs. This should restore S5 pass rates — previously nearly all FBs escalated to Gemma (73% FN) → QUARANTINE.
+
+**R5 impact:** DeBERTa FEVER (Microsoft/FAIR) is a 4th distinct family: ≠ Qwen/Alibaba (S2 gen) ≠ OpenAI (S4 classifier) ≠ Google/Gemma (S5 verifier).
+
+**Files:** `config/pipeline_config.yaml` L172-173
+
+### D2256 — stage5_verify.py Docstring Updated (2026-08-11)
+
+**Context:** BUG-077 — The stage5_verify.py docstring was triple-stale: (1) title claimed "ModernBERT NLI" (was running ModernBERT but D2255 just activated DeBERTa), (2) R5 section claimed "Classifier: Phi-4-mini-8bit" (retired from S4, D2249/D2250), (3) process description referenced "DeBERTa NLI" which was actually running ModernBERT due to config override.
+
+**Fix applied:**
+- Title: "DeBERTa FEVER NLI pre-filter" (not ModernBERT)
+- R5 section: Now shows 4 model families — Qwen3-Coder-30B (S2 gen), GPT-OSS-20B (S4 classifier), Gemma-4-E4B (S5 verifier), DeBERTa FEVER (S5 NLI)
+- Process step 3: Annotated with D2255 reference explaining the swap from ModernBERT
+- Removed all Phi-4-mini references from the docstring
+
+**Files:** `pipeline/stage5_verify.py` docstring
+
+### D2257 — Golden Set YAML Meta Count Corrected (2026-08-11)
+
+**Context:** The golden set YAML meta claimed `convergent_positives: 36` but actual `is_convergent: True` field count is 55 (verified via `grep -c`). The stale count was likely from a pre-expansion version (v3.x before D2221/D2223 expansions).
+
+**Fix applied:** Updated `convergent_positives: 36` → `55` with annotation referencing D2257.
+
+**Files:** `config/golden/stage2_fewshot_convergent.yaml` meta
+
+### D2258 — Stale classify_model Removed from v2.3 Checkpoint Block (2026-08-11)
+
+**Context:** BUG-078 — `config/pipeline_config.yaml` L1642 contained `classify_model: Phi-4-mini-instruct-8bit` embedded in a v2.3 schema checkpoint block. This is a historical artifact from a pre-D2249 full-run configuration — Phi-4-mini has been retired from pipeline classification.
+
+**Fix applied:** Removed the stale `classify_model` line. Added annotation explaining it's a v2.3 checkpoint artifact and Phi-4-mini was retired per D2249/D2250. The surrounding checkpoint block (file lists, schema_version: '2.3', taxonomy_version: v5.1) is preserved as historical reference.
+
+**Files:** `config/pipeline_config.yaml` ~L1642
+
+### D2259 — GOLDEN-REVIEW.md v2.0 Archived (2026-08-11)
+
+**Context:** The presence of `config/golden/GOLDEN-REVIEW.md` (v2.0, 75 examples, 0/225 review checks completed) alongside the active `stage2_fewshot_convergent.yaml` (v4.4, 73 examples) caused confusion in every cross-examination round. The two files use different ID schemes (LEA/STR/DES/PER/MGT vs CONV/NEG), different author pools, and different calibration status. Multiple LLM reviewers made material errors by conflating data from GOLDEN-REVIEW.md with the active YAML (e.g., claiming NEG-HARD-012 in active set, wrong author counts).
+
+**Fix applied:** Moved `config/golden/GOLDEN-REVIEW.md` → `archive/GOLDEN-REVIEW-v2.0-ARCHIVED-2026-08-11.md`. The file is preserved for historical reference but removed from the active config directory.
+
+**Files:** `archive/GOLDEN-REVIEW-v2.0-ARCHIVED-2026-08-11.md` (was `config/golden/GOLDEN-REVIEW.md`)
+
+### D2260 — HANDOFF_D2254 Model Registry Corrected (2026-08-11)
+
+**Context:** BUG-079 — HANDOFF_D2254 model registry listed `Phi-4-mini-instruct-8bit` with role "S5 verify/gates" but Phi-4-mini has NO pipeline config role in `config/pipeline_config.yaml`. It also incorrectly listed the retired `gemma-4-31B-it-MLX-8bit` instead of the active `gemma-4-E4B-it-MLX-4bit`, and omitted the NLI model (DeBERTa FEVER) and embeddings model (bge-m3).
+
+**Fix applied:** Rewrote §4 Model Registry to include:
+- 4 OMLX pipeline models verified against actual config (Qwen3, GPT-OSS, Gemma-4-E4B, bge-m3)
+- 1 HuggingFace model (DeBERTa FEVER for S5 NLI)
+- Retired/non-pipeline section clarifying Phi-4-mini (smoke test + agent assignments only) and gemma-4-31B (retired)
+
+**Files:** `governance/HANDOFF_D2254.md` §4
+
+### D2261 — E2E Diagnostic Gate Authorized (2026-08-11)
+
+**Context:** The "yield crisis" number (0.004% = 14 FBs / 852 books) cited in prior governance originated from a v2.0 pipeline run. The v3.0 pipeline (cluster-before-extract, hybrid S2, GPT-OSS S4, DeBERTa FEVER S5) has never been measured end-to-end. Per the comprehensive audit: "The pipeline is not broken — it's undocumented."
+
+**Decision:** Before committing the ~26h full production run (T1.1 on 12,964 clusters), execute a smaller E2E diagnostic on 50-100 books through the full S1.5→S6 pipeline to:
+1. Measure real v3.0 yield (not phantom v2.0 yield)
+2. Validate DeBERTa FEVER S5 pass rates
+3. Verify S4 enrichment field generation
+4. Establish actual cluster quality
+
+**Gate criteria:**
+- Yield >1% AND S5 pass rate >40% → APPROVE T1.1 full run
+- Yield <0.5% OR S5 <20% → HALT, diagnose before scaling
+- Between → judgment call with data
+
+**Command:** `python3 pipeline/run_diagnostic.py --books 100 --output governance/e2e_diagnostic_2026-08-11.json` (script created as part of this task)
+
+**Files:** `pipeline/run_diagnostic.py` (to be created), `governance/e2e_diagnostic_2026-08-11.json` (output)
+
+### D2262 — Goose MacWebContentsOcclusion Documented (2026-08-11)
+
+**Context:** The comprehensive audit identified that Goose (Electron app) disables rendering when its window is occluded (hidden behind other windows), causing the UI renderer to use ~25% CPU unnecessarily during long pipeline runs. This steals 2-3 M1 Max cores from OMLX.
+
+**Fix:** Documented as a runtime instruction in HANDOFF_D2254.md §0 (Pre-flight):
+- Keep Goose window visible (not minimized, not behind other windows)
+- Or use macOS defaults: `defaults write com.block.goose NSWindowOcclusionDetectionEnabled -bool false` (requires app restart)
+- The `MacWebContentsOcclusion` feature in Electron is governed by `NSWindowOcclusionDetectionEnabled`
+
+**Files:** `governance/HANDOFF_D2254.md` §0
+
+### D2263 — Merged S4 Call Config-Driven (2026-08-11)
+
+**Context:** The merged S4 call was previously activated via `MAXWELL_MERGED_S4=1` env var (monkey-patched). D2263 made it fully config-driven via `config/pipeline_config.yaml` → `stage4.merged_call_enabled: true`. The env var `MAXWELL_MERGED_S4` is now set automatically by `run_diagnostic.py` when config enables it.
+
+**Fix applied:** `run_diagnostic.py` reads `_PIPELINE_CFG["stage4"]["merged_call_enabled"]` and sets `MAXWELL_MERGED_S4=1` before calling `run_stage4`. Removed the monkey-patched env override from `stage4_merge.py` (now reads config directly). `merged_call_max_tokens` defaulted to 512 (was hardcoded 1024).
+
+**Files:** `pipeline/run_diagnostic.py`, `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`, `config/pipeline_config.yaml`
+
+### D2264 — Phi-4-mini Swapped into S5 Verifier Role (2026-08-11)
+
+**Context:** Benchmarked Phi-4-mini-instruct-8bit vs Gemma-4-E4B-it-MLX-4bit for S5 deep-check verifier role on factual PASS/FLAG verification. Phi-4-mini scored 67% accuracy on 3 golden FBs (later 100% on refined short prompt), while Gemma-4-E4B scored 33-67%. Phi-4-mini is smaller (3.8GB vs 6.4GB), faster, and more accurate for this specific task.
+
+**Decision:** Swap S5 deep-check verifier from Gemma-4-E4B to Phi-4-mini-instruct-8bit, updating all governance files, configuration, and code docstrings. BUG-053 (Phi hallucinations on open-ended research) is mitigated by strict source-text guard in S5 — Phi-4-mini always receives evidence_passages in S5 usage.
+
+**Files:** `config/pipeline_config.yaml` (verifier_v2.model), `pipeline/stage5_verify.py` (docstring), `pipeline/run_diagnostic.py` (S5 header, model unload comment), `governance/HANDOFF_D2254.md`, `governance/buglog.md` (BUG-053 updated)
+
+### D2265 — Batch Classification for S4 (2026-08-11)
+
+**Context:** S4 bottleneck: GPT-OSS-20B burns ~15-20s on reasoning_content before producing the JSON output. Each FB pays the full reasoning cost. Batch classification amortizes this cost: send 3-5 FBs in one call, pay the reasoning cost once, get all classifications back. Expected ~60% throughput improvement (from ~26s/FB → ~10s/FB amortized).
+
+**Decision:** Implement batch CRIBS + classification in `stage4_merged_call.py` as `batch_cribs_classify()`. Config-driven via `config/pipeline_config.yaml` → `stage4.batch_enabled: true` and `stage4.batch_size: 4`. Per-FB `merged_cribs_classify()` preserved as fallback.
+
+**Architecture:** The batch prompt sends multiple FBs (NAME, DEFINITION, MECHANISM, BOUNDARY, CONSEQUENCE) with fb_index tags. The model returns a JSON array with one object per FB. Results are matched by fb_index for order safety. Conservative defaults: batch_size=4, max_tokens=2048.
+
+**Files:** `pipeline/stage4_merged_call.py` (batch_cribs_classify, BATCH_SIZE_DEFAULT), `config/pipeline_config.yaml` (batch_enabled, batch_size, batch_call_max_tokens)
+
+### D2266 — Process Guard: PID File Locking (2026-08-11)
+
+**Context:** The 2026-08-11 diagnostic run was wasted (~84 min) because 5+ diagnostic processes ran simultaneously from previous launches, congesting GPT-OSS and corrupting checkpoints. No mechanism existed to prevent multiple instances.
+
+**Decision:** Implement PID file locking in `pipeline/run_diagnostic.py`:
+1. On startup, check `.diagnostic_pid` — if exists and PID is alive, refuse to start
+2. If PID is dead (stale lock), clean up and proceed
+3. Write current PID to lock file
+4. Register SIGINT/SIGTERM handlers to clean up on interrupt
+5. Release lock on normal exit
+6. `_kill_stale_diagnostics()` kills any other run_diagnostic processes (belt + suspenders)
+
+**Files:** `pipeline/run_diagnostic.py` (_acquire_process_lock, _release_process_lock, _kill_stale_diagnostics, _register_signal_handlers)
+
+### D2267 — Laptop Sleep Prevention via caffeinate (2026-08-11)
+
+**Context:** Long pipeline runs (~3.7h for 200-cluster diagnostic, ~26h for T1.1) can be interrupted by macOS sleep/screensaver. This wastes compute hours and leaves checkpoint state uncertain.
+
+**Decision:** Integrate `caffeinate -i -d -s` into `run_diagnostic.py`:
+- `-i`: prevent idle sleep
+- `-d`: prevent display sleep  
+- `-s`: prevent system sleep
+- Store caffeinate PID for cleanup on exit
+- Auto-stop on normal exit and signal interrupt
+
+**Files:** `pipeline/run_diagnostic.py` (_start_caffeinate, _stop_caffeinate, signal handlers)
+
+### D2268 — BUG-053 Mitigation: S5 Source Text Guard (2026-08-11)
+
+**Context:** BUG-053 (2026-07-26): Phi-4-mini-instruct-8bit hallucinates on open-ended research. After D2264 swapped Phi-4-mini into S5 deep-check verifier role, a strict guard was needed to ensure it's never called without source text. Phi-4-mini is safe in S5 because it ALWAYS receives evidence_passages (verbatim source text from S2 extraction). But a code-level guard prevents future regressions.
+
+**Decision:** Add STRICT guard in `stage5_verify.py` → `check_factual_llm()`:
+1. If no source_principles AND no evidence_passages → auto-QUARANTINE (fail-closed)
+2. If combined source text < 50 chars → auto-QUARANTINE (insufficient grounding)
+3. Error message explicitly references BUG-053 for traceability
+
+**Status:** BUG-053 changed from 🔴 OPEN to 🟡 MITIGATED — model still hallucinates without source, but pipeline guard prevents unsafe invocation.
+
+**Files:** `pipeline/stage5_verify.py` (check_factual_llm BUG-053 guard), `governance/buglog.md` (BUG-053 status update)

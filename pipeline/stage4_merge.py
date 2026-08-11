@@ -33,6 +33,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# C12: Load pipeline config (needed for batch settings)
+import yaml as _yaml
+_CFG_PATH_S4 = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+with open(_CFG_PATH_S4) as _f:
+    _PIPELINE_CFG = _yaml.safe_load(_f)
+
 from pipeline.io_guard import safe_write
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
@@ -66,8 +72,14 @@ from pipeline.schemas import (
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
+# D2265: Batch CRIBS+Classification — amortizes GPT-OSS reasoning cost
 # BUG-075: classify_depth_focused — split depth into SHORT prompt (D2247)
-from pipeline.stage4_merged_call import classify_depth_focused, merged_cribs_classify
+from pipeline.stage4_merged_call import (
+    BATCH_SIZE_DEFAULT,
+    batch_cribs_classify,
+    classify_depth_focused,
+    merged_cribs_classify,
+)
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
@@ -831,6 +843,56 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     pipeline_commit = get_pipeline_commit()
     pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
 
+    # ── D2265: Batch pre-classification ─────────────────────────────────
+    # Collect all FB data from clusters, batch classify with GPT-OSS-20B,
+    # then use pre-classified results in the main loop. Amortizes reasoning cost.
+    _BATCH_ENABLED = bool(_PIPELINE_CFG.get("stage4", {}).get("batch_enabled", False))
+    _BATCH_SIZE = int(_PIPELINE_CFG.get("stage4", {}).get("batch_size", BATCH_SIZE_DEFAULT))
+    _pre_classified: dict[int | str, dict] = {}  # cluster_id → merged classification
+    _batch_used: bool = False
+
+    if _BATCH_ENABLED and not os.environ.get("MAXWELL_SKIP_LLM"):
+        # Collect all fb_data without making LLM calls
+        _pending: list[tuple[int | str, list[dict], dict]] = []  # (cluster_id, cluster_principles, fb_data)
+        for cluster in clusters:
+            cid = cluster["cluster_id"]
+            pids = cluster.get("principle_ids", [])
+            cluster_principles = []
+            for pid in pids:
+                if pid in principles_idx:
+                    p = principles_idx[pid]
+                    ct = p.get("content_type", "principle")
+                    if ct == "principle":
+                        cluster_principles.append(p)
+            if len(cluster_principles) != 1:
+                continue  # skip non-principle clusters in batch pre-pass
+            fb_data = dict(cluster_principles[0])
+            fb_data["_gen_skipped"] = True
+            _pending.append((cid, cluster_principles, fb_data))
+
+        if _pending:
+            print(f"   ⚡ D2265: Batch pre-classifying {len(_pending)} FBs (batch_size={_BATCH_SIZE})...")
+            _batch_start_time = time.time()
+            _batch_total = 0
+            for _batch_start in range(0, len(_pending), _BATCH_SIZE):
+                _batch = _pending[_batch_start:_batch_start + _BATCH_SIZE]
+                _batch_fbs = [fb for _, _, fb in _batch]
+                try:
+                    _results = batch_cribs_classify(_batch_fbs, model=VERIFY_MODEL)
+                    for (cid, _, _), result in zip(_batch, _results):
+                        _pre_classified[cid] = result
+                    _batch_total += len(_batch)
+                    print(f"      Batch {_batch_start // _BATCH_SIZE + 1}: "
+                          f"{len(_batch)} FBs classified (total: {_batch_total}/{len(_pending)})")
+                except Exception as e:
+                    print(f"      ⚠️ Batch {_batch_start // _BATCH_SIZE + 1} FAILED: {e}")
+                    # Fall back: let main loop handle these individually
+            _batch_elapsed = time.time() - _batch_start_time
+            _per_fb = _batch_elapsed / max(_batch_total, 1)
+            print(f"   ✅ Batch pre-classification: {_batch_total} FBs in {_batch_elapsed:.1f}s "
+                  f"({_per_fb:.1f}s/FB amortized — vs ~26s/FB unbatched)")
+            _batch_used = True
+
     for i, cluster in enumerate(clusters, 1):
         cluster_id = cluster["cluster_id"]
         principle_ids = cluster["principle_ids"]
@@ -883,14 +945,32 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # Phi-4-mini call for BOTH CRIBS enrichment + classification (~61% faster).
         # Otherwise use two-call pattern: CRIBS (Qwen) + Classify (Phi-4-mini).
         _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
+        # D2263: merged S4 call — env var or config (config sets env before stage starts)
         _use_merged: bool = os.environ.get("MAXWELL_MERGED_S4", "") == "1"
 
         if _skip_llm:
             print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
+        elif _use_merged and cluster_id in _pre_classified:
+            # D2265: Use batch pre-classified result (no LLM call needed)
+            merged_result = _pre_classified[cluster_id]
+            if isinstance(merged_result, list):
+                merged_result = merged_result[0] if merged_result else {}
+            if isinstance(merged_result, dict):
+                for field in ("application", "failure_mode", "elaboration",
+                              "keywords", "jargon"):
+                    if merged_result.get(field):
+                        fb_data[field] = merged_result[field]
+                fb_data["_merged_classification"] = merged_result
+                print("⚡batch", flush=True, end=" ")
+            else:
+                print("⚠️batch-bad", flush=True, end=" ")
         elif _use_merged:
-            # D2226: Single-call CRIBS + Classification (D2224)
+            # D2226: Single-call CRIBS + Classification (D2224) — fallback when no pre-classified
             try:
                 merged_result = merged_cribs_classify(fb_data, model=VERIFY_MODEL)
+                # BUG-080: guard against list return from call_omlx_json
+                if isinstance(merged_result, list):
+                    merged_result = merged_result[0] if merged_result else {}
                 # Extract CRIBS fields
                 for field in ("application", "failure_mode", "elaboration",
                               "keywords", "jargon"):
@@ -913,6 +993,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     system=CRIBS_ENRICHMENT_SYSTEM,
                     max_tokens=1024,
                 )
+                # BUG-080: call_omlx_json can return list or str — unwrap/guard
+                if isinstance(cribs_result, list):
+                    cribs_result = cribs_result[0] if cribs_result else {}
                 if isinstance(cribs_result, dict):
                     for field in ("application", "failure_mode", "elaboration",
                                   "keywords", "jargon"):
@@ -969,6 +1052,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     system=_classify_system,
                     max_tokens=VERIFY_MAX_TOKENS,
                 )
+                # BUG-080: call_omlx_json can return list or str (GPT-OSS
+                # occasionally wraps response in array or returns raw text).
+                # Guard: unwrap list, reject non-dict types.
+                if isinstance(class_data, list):
+                    class_data = class_data[0] if class_data else {}
+                if not isinstance(class_data, dict):
+                    class_data = {}
             except Exception as e:
                 import traceback
                 print(f"→ ❌ Classification FAILED: {e} — FB QUARANTINED")
@@ -1273,6 +1363,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     print(f"🌱 Growth edges:             {len(growth_edges)} (→ {S4_GE_OUTPUT})")
     print(f"🛠️  Tool instructions:        {len(tool_instructions)} (→ {S4_TI_OUTPUT})")
     print(f"❌ Failed clusters:          {failed}")
+    if _batch_used:
+        print(f"⚡ Batch classified:          {len(_pre_classified)} FBs (D2265)")
     print(f"🏷️  Classification errors:     {classification_errors}")
     if name_collisions:
         print(f"🔤 Name collisions:          {name_collisions} (auto-disambiguated)")

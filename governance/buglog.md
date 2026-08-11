@@ -110,16 +110,20 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 
 ---
 
-### BUG-053: Phi-4-mini-instruct-8bit HALLUCINATES on Factual/Research Tasks 🔴
+### BUG-053: Phi-4-mini-instruct-8bit HALLUCINATES on Factual/Research Tasks 🟡 MITIGATED
 | Field | Value |
 |-------|-------|
 | **Discovered** | 2026-07-26 15:20 — delegate research on GitHub topics returned entirely fabricated repos |
 | **Symptom** | Delegate output: fake repo names (Faiss-CMake, HnswLib from "thesynk"), wrong URLs (Weaviate→veidicate), fake star counts (16k for non-existent repos), Llama.cpp attributed to Microsoft |
 | **Root Cause** | Phi-4-mini-8bit is a 4GB distilled model unsuitable for open-ended research. When asked to fetch real data, it generates plausible-sounding hallucinations instead. It does NOT call tools to fetch data — it fabricates from training distribution. |
 | **Impact** | ALL research/read-only delegate tasks using Phi-4-mini produce garbage. Any decision based on delegate output is dangerously wrong. |
-| **Fix** | NEVER use Phi-4-mini for research tasks requiring factual data retrieval. Use ONLY for summarization when SOURCE TEXT IS PROVIDED. For research: do it yourself with shell/curl OR use Qwen3-Coder with explicit tool-use instructions. |
+| **Mitigation** | NEVER use Phi-4-mini for research tasks requiring factual data retrieval. Use ONLY for summarization when SOURCE TEXT IS PROVIDED. For research: do it yourself with shell/curl OR use Qwen3-Coder with explicit tool-use instructions. |
+| **D2268 (2026-08-11):** | Added STRICT guard in `stage5_verify.py` → `check_factual_llm()`: Phi-4-mini now auto-QUARANTINEs if source text is missing or <50 chars. This prevents hallucination in S5 deep-check verifier role. Phi-4-mini's S5 usage is safe because it always receives evidence_passages (verbatim source text). |
+| **Status** | 🟡 MITIGATED (not "fixed" — model still hallucinates without source, but pipeline guard prevents unsafe invocation) |
+| **Files** | `pipeline/stage5_verify.py` (check_factual_llm guard), `governance/buglog.md` |
 | **Files** | AGENTS.md delegate_rules section |
 | **Status** | ✅ MITIGATED (2026-07-26) — AGENTS.md delegate_rules updated: Phi-4-mini restricted to summarization-only with source text. Research tasks → direct shell/curl. Delegate alternative: gemma-4-E4B-it-MLX-4bit confirmed working (0.48s, accurate). |
+| **D2264 update** | S5 VERIFIER (2026-08-11) — Phi-4-mini replaces Gemma-4-E4B as S5 deep check verifier. 67% vs 33% accuracy. Structured PASS/FLAG binary task — no open-ended research risk. |
 | **D2250 update** | ✅ RESOLVED FOR S4 (2026-08-10) — Phi-4-mini RETIRED as S4 classifier (D2249/D2250: VERIFY_MODEL → gpt-oss-20b-MXFP4-Q8, 87.5% depth acc vs Phi 37.5%). Phi retained ONLY for S5 verify + fast gates (T2/T3 gate probes) where source text is provided and summarization is the task. S4 research/classification now GPT-OSS (OpenAI family, R5-compliant). |
 
 ---
@@ -1301,3 +1305,74 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   `config/pipeline_config.yaml`, `governance/s4_depth_benchmark_focused_prompt.json`
 
 *Updated: 2026-08-10 (D2245-D2247 session) | Open: 14*
+
+### BUG-076 — 2026-08-11 — S5 NLI Config Overrides D2216 DeBERTa FEVER Promotion (P1) 🔴 OPEN
+- **Symptom:** D2216 (2026-08-09) promoted DeBERTa FEVER as primary S5 NLI in
+  `pipeline/pipeline_paths.py`, citing "5.8× more discriminative than ModernBERT
+  on convergent FBs." But `config/pipeline_config.yaml` line 172 hardcodes
+  `nli_model: tasksource/ModernBERT-base-nli`. The pipeline_paths.py code reads
+  config first: `_CFG.get("stage5", {}).get("nli_model", "DeBERTa...")` — config
+  wins. DeBERTa FEVER promotion is dead code.
+- **Root cause:** Config-driven architecture (C12) means code defaults only
+  activate when config key is absent. D2216 changed the code default but didn't
+  update the config YAML. Config override = ModernBERT runs at runtime.
+- **Evidence:** `governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md` benchmarked
+  DeBERTa FEVER on 5 convergent FBs: clear binary signal (0.88-0.98 PASS vs
+  0.001 FAIL). ModernBERT/RoBERTa standard MNLI: everything NEUTRAL 0.18-0.32
+  — cannot verify synthesized FBs. But test was only 5 FBs — not production
+  calibration.
+- **Impact:** S5 NLI pre-filter is running ModernBERT, which the project's own
+  test doc says "CANNOT verify synthesized principles." This means every FB
+  falls through NLI as NEUTRAL → escalates to Gemma-4-E4B deep check (which
+  has 73% false-negative rate). Effectively: NLI is non-functional, Gemma is
+  broken → S5 produces almost all QUARANTINE.
+- **Fix candidates:** (1) Swap config `nli_model` to DeBERTa FEVER. (2) Run
+  larger calibration (50-100 real FBs) before adopting. (3) If DeBERTa FEVER
+  was intentionally demoted after the 5-FB test, document why.
+- **Status:** ✅ FIXED (D2255, 2026-08-11) — Config swapped: DeBERTa FEVER primary, ModernBERT fallback.
+- **Files:** `config/pipeline_config.yaml` L172, `pipeline/pipeline_paths.py` L163-168,
+  `governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md`
+
+### BUG-077 — 2026-08-11 — stage5_verify.py Docstring Triple-Stale (P2) 🟡 FIXED
+- **Symptom:** stage5_verify.py docstring claimed: (1) "DeBERTa NLI entailment" — but
+  config was running ModernBERT. (2) "Classifier: Phi-4-mini-8bit — Stage 4 Phase 2" —
+  Phi retired from S4 (D2249/D2250). (3) "ModernBERT NLI pre-filter" in title — stale.
+- **Root cause:** Docstring not updated when D2216 promoted DeBERTa FEVER, D2249
+  swapped S4 classifier to GPT-OSS, and D2255 finally activated DeBERTa FEVER.
+- **Fix:** D2256 (2026-08-11) — Docstring rewritten: title says DeBERTa FEVER, R5
+  section shows all 4 active families, removed Phi-4-mini references.
+- **Status:** ✅ FIXED
+- **Files:** `pipeline/stage5_verify.py` docstring
+
+### BUG-078 — 2026-08-11 — Stale classify_model in v2.3 Checkpoint Block (P3) 🟡 FIXED
+- **Symptom:** `config/pipeline_config.yaml` L1642 contained `classify_model: Phi-4-mini-instruct-8bit`
+  embedded in a v2.3 schema checkpoint configuration block.
+- **Root cause:** Historical artifact — v2.3 full-run config checkpoint was preserved
+  as reference but the classify_model line was never updated/annotated.
+- **Fix:** D2258 (2026-08-11) — Removed stale line, added annotation explaining v2.3
+  artifact status and that Phi-4-mini was retired (D2249/D2250).
+- **Status:** ✅ FIXED
+- **Files:** `config/pipeline_config.yaml` L1642
+
+### BUG-079 — 2026-08-11 — HANDOFF_D2254 Claims Phi-4-mini for S5 verify/gates (P3) 🟡 FIXED
+- **Symptom:** HANDOFF_D2254 model registry listed `Phi-4-mini-instruct-8bit` with role
+  "S5 verify/gates" — but Phi-4-mini has NO pipeline config role in `config/pipeline_config.yaml`.
+  Phi only appears in: `smoke.fast.fast_model` (test mode), `config/model_assignments.yaml`
+  (agent roles, not pipeline).
+- **Root cause:** Handoff propagated stale claim about Phi's role. Prior to D2249/D2250,
+  Phi may have been planned for S5 but was never actually given a pipeline config role.
+- **Fix:** D2260 (2026-08-11) — HANDOFF_D2254 model registry corrected. Phi-4-mini
+  listed as non-pipeline (smoke test + agent assignments only). Active pipeline models
+  verified against actual config.
+- **Status:** ✅ FIXED
+- **Files:** `governance/HANDOFF_D2254.md` §4
+
+### BUG-080: call_omlx_json returns list/str — S4 classification crashes 🔴
+| Field | Value |
+|-------|-------|
+| **Discovered** | 2026-08-11 — Diagnostic S4 crash on FB #8 |
+| **Symptom** | `'list' object has no attribute 'get'` then `'str' object has no attribute 'get'` at `class_data.get("domains")` |
+| **Root Cause** | `call_omlx_json` returns `dict | list | str` but S4 classification path assumes dict. GPT-OSS occasionally wraps response in array or returns raw text. |
+| **Fix** | BUG-080 guards: unwrap lists, reject non-dict types at all 5 `call_omlx_json` call sites in `stage4_merge.py` and `stage4_merged_call.py`. |
+| **Status** | ✅ FIXED — Guards applied at L894, L913, L969 (stage4_merge.py), L127 (stage4_merged_call.py). S5 (L370) already guarded. |
+| **Files** | `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py` |

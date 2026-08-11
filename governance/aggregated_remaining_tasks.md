@@ -1,9 +1,35 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-10 23:55 | **Session:** D2250-D2252 (BUG-075 FIXED, GPT-OSS live in S4, T-007b hybrid, golden audit, cost model)
-> **Golden set:** v4.4 (73 examples, 75 FBs, 194 evidence passages — 100% verbatim, author cap ≤3)
-> **Models:** Qwen3-Coder-30B (S2 gen) · **GPT-OSS-20B-MXFP4-Q8 (S4 classifier — D2249, 87.5% depth)** · Phi-4-mini-8bit (S5 verify + gates only) · Gemma-4-E4B (S5 cross-family)
+> **Updated:** 2026-08-11 12:00 | **Session:** D2255-D2262 — COMPREHENSIVE AUDIT + 8 P0 FIXES APPLIED
+> **Golden set:** v4.4 (73 examples, 55 convergent / 18 non-convergent — metafixed D2257)
+> **Models:** Qwen3-Coder-30B (S2 gen) · GPT-OSS-20B-MXFP4-Q8 (S4 classifier, 87.5% depth) · DeBERTa FEVER (S5 NLI primary, D2255) · Gemma-4-E4B (S5 cross-family verifier) · bge-m3 (embeddings)
+> **Phi-4-mini status:** Smoke test + agent assignments only. NO pipeline config role (BUG-079 fixed, D2260).
 > **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 0.672 > Traditional 0.591 (20 examples, 3-arm)
-> **Full-run cost (T1.1):** ~21-26h wall-clock (NOT 100h — tiered prompts + 3 workers, see §F)
+> **Full-run cost (T1.1):** ~21-26h wall-clock (NOT 100h — tiered + 3 workers + merged S4)
+
+---
+
+## 🔴 P0 COMPLETED — D2255-D2262 (2026-08-11)
+
+> **Source:** `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` — cross-examination of 11 LLM responses, every claim verified against source files.
+
+| ID | Task | Decision | Status |
+|----|------|----------|--------|
+| P0.1 | S5 NLI config → DeBERTa FEVER primary | D2255 | ✅ FIXED |
+| P0.2 | E2E diagnostic gate (50-100 books) | D2261 | ⬜ READY — see §E2E GATE below |
+| P0.3 | Archive GOLDEN-REVIEW.md v2.0 | D2259 | ✅ ARCHIVED |
+| P0.4 | Golden YAML meta count 36→55 | D2257 | ✅ FIXED |
+| P0.5 | Fix stage5_verify.py docstring | D2256 | ✅ FIXED |
+| P0.6 | Remove stale classify_model L1642 | D2258 | ✅ FIXED |
+| P0.7 | Goose MacWebContentsOcclusion | D2262 | ✅ DOCUMENTED (HANDOFF §0) |
+| P0.8 | Fix HANDOFF model registry | D2260 | ✅ FIXED |
+
+### E2E DIAGNOSTIC GATE (D2261) — NEXT ACTION
+
+**Command:** `python3 pipeline/run_diagnostic.py --books 100`
+**Gate criteria:**
+- Yield >1% AND S5 pass rate >40% → APPROVE T1.1 full run
+- Yield <0.5% OR S5 pass rate <20% → HALT, diagnose
+- Between → judgment call with data
 
 ---
 
@@ -103,12 +129,21 @@ Decisions: 235 (D2250, D2251, D2252 added)
 ## 🔗 NEXT EXECUTION ORDER
 
 ```
+P0 GATE:    E2E diagnostic on 50-100 books (~3-6h) → THIS IS THE NEXT ACTION.
+            Yield >1% + S5 >40% → proceed. Otherwise halt and diagnose.
+
+P1 (post-gate):
 1. T1.1       → Launch full S1.3→S6 run (~26h wall-clock, batch-resume). Monitor first
                 hour for throughput (expect ≥2× single-thread: 3 workers + tiered prompts).
 2. T-007b-v2  → Overnight MIPROv2 re-opt (3 demos) in parallel with T1.1 if GPU allows.
 3. T1.2       → Yield diagnostic on the full run output (re-measure 0.004%).
-4. T1.3/T1.4  → NLI calibration + faiss threshold (pre-S5 quality gates).
-5. T-015      → Golden pool expansion (extraction types + depth balance).
+4. T1.3       → NLI calibration on real data (DeBERTa FEVER thresholds on 50-100 FBs).
+5. T1.4       → Fix faiss_threshold mismatch (0.75 vs 0.70).
+6. T-015      → Golden pool expansion (extraction types + depth balance).
+7. P1.3       → Deploy DSPy hybrid gate in production stage2_extract.py.
+8. P1.4       → Fix S4→S5 verification gap (application/failure_mode/elaboration content).
+9. P1.5       → S1.5 cluster-quality diagnostic (sample 100-300 clusters).
+10. P1.7      → Fix generator model name drift (Qwen3.6-35B vs Qwen3-Coder-30B).
 ```
 
 ## 🧭 SESSION HANDOFF POINTER (next session start here)

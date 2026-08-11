@@ -13,6 +13,11 @@ roles:
     model: Qwen3.6-35B-A3B-OptiQ-4bit  # primary generator
     backend: omlx
     family: qwen
+  S5_VERIFIER:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+    notes: D2264 S5 deep check (67% acc, 2x Gemma). Structured PASS/FLAG.
   S6_VALIDATOR:
     model: Qwen3.6-35B-A3B-OptiQ-4bit
     backend: omlx

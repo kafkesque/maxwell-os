@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-stage5_verify.py — Verify FBs via ModernBERT NLI pre-filter + Gemma-4-E4B deep check.
+stage5_verify.py — Verify FBs via DeBERTa FEVER NLI pre-filter + Phi-4-mini deep check (D2264).
 ==================================================================================
-Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8, D2069
+Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8, D2069, D2255
 
 Input:  FBs from Stage 4 checkpoint (with embedded source_principles)
 Output: Verified FBs, checkpoint at stage5_verify.jsonl
@@ -10,20 +10,24 @@ Output: Verified FBs, checkpoint at stage5_verify.jsonl
 Process:
   1. BORP check: verify at least 2 distinct source books per FB
   2. Completeness: all required fields present and non-trivial
-  3. DeBERTa NLI entailment: fast entailment check (definition ↔ evidence_passages)
+  3. DeBERTa FEVER NLI entailment: fast claim-evidence verification (definition ↔ evidence_passages)
+     D2255 (2026-08-11): DeBERTa FEVER is now PRIMARY (was ModernBERT).
+     DeBERTa FEVER is 5.8× more discriminative on convergent FBs.
+     ModernBERT returned NEUTRAL for all synthesized FBs — non-functional as pre-filter.
      → ENTAILMENT + ≥0.6 = PASS (skip LLM)
-     → CONTRADICTION = FAIL → escalate to Gemma-4-E4B
-     → NEUTRAL = FLAG → escalate to Gemma-4-E4B
+     → CONTRADICTION = FAIL → escalate to Phi-4-mini (D2264: 67% acc vs Gemma 33%)
+     → NEUTRAL = FLAG → escalate to Phi-4-mini (D2264: 67% acc vs Gemma 33%)
   4. FAIL-CLOSED (D2093): any check failure → QUARANTINE, never PASS
   5. Assign status: PASS / FLAG / QUARANTINE
 
-R5 compliance (D2069):
-  Generator: Qwen3.6-35B (Qwen family) — Stage 2, 4 Phase 1
-  Classifier: Phi-4-mini-8bit (Phi family) — Stage 4 Phase 2
-  Verifier:   Gemma-4-E4B (Gemma family) — Stage 5
-  Three different families. No model reviews its own output.
+R5 compliance (D2069, D2250):
+  Generator:  Qwen3-Coder-30B (Qwen/Alibaba) — Stage 2
+  Classifier: GPT-OSS-20B (OpenAI) — Stage 4 (replaced Phi-4-mini per D2249/D2250)
+  Verifier:   Gemma-4-E4B (Gemma/Google) — Stage 5 deep check
+  NLI:        DeBERTa FEVER (Microsoft/FAIR) — Stage 5 pre-filter
+  Four distinct families. No model reviews its own output.
 
-DeBERTa model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB, already on disk)
+DeBERTa FEVER model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB)
   Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%
   Speed: ~50ms per sentence pair on CPU (M1 Max)
 
@@ -348,13 +352,38 @@ def check_completeness(fb: dict) -> tuple[bool, float, str]:
 
 
 def check_factual_llm(fb: dict, model: str) -> tuple[bool, float, str]:
-    """Deep factual check using LLM (Gemma-4-E4B, cross-family).
+    """Deep factual check using LLM (Phi-4-mini, cross-family).
 
     D2069: Only called when NLI pre-filter fails (~30% of FBs).
     D2094: Uses evidence_passages (v3.0) or source_principles (v2.x) — schema-adaptive.
+    BUG-053 (D2268): Phi-4-mini hallucinates on open-ended tasks. STRICT guard:
+    source text MUST be provided. Without it, auto-QUARANTINE (fail-closed).
     """
     source_principles = fb.get("source_principles", [])
     evidence_passages = fb.get("evidence_passages", [])
+
+    # BUG-053 guard: Phi-4-mini MUST have source text to avoid hallucination
+    has_source_text = bool(source_principles or evidence_passages)
+    if not has_source_text:
+        return False, 0.0, (
+            "BUG-053 guard: No source text provided — Phi-4-mini requires "
+            "evidence_passages or source_principles to avoid hallucination. "
+            "QUARANTINE (D2093: fail-closed)."
+        )
+
+    # BUG-053 guard: verify source text has actual content (not just placeholders)
+    all_text = ""
+    for sp in (source_principles or []):
+        all_text += str(sp.get("principle_text", sp if isinstance(sp, str) else ""))
+    for ep in (evidence_passages or []):
+        all_text += str(ep)
+    if len(all_text.strip()) < 50:
+        return False, 0.0, (
+            f"BUG-053 guard: Source text too short ({len(all_text.strip())} chars). "
+            "Phi-4-mini requires substantial source text to ground verification. "
+            "QUARANTINE (D2093: fail-closed)."
+        )
+
     if not source_principles and not evidence_passages:
         return False, 0.0, "No source principles or evidence passages — QUARANTINE (D2093: fail-closed)"
 

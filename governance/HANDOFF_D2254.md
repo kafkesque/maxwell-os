@@ -1,10 +1,29 @@
 # Maxwell OS — Session Handoff (D2254)
-> **Created:** 2026-08-10 23:58 | **From:** D2250-D2253 session | **Repo:** main @ fcf23a9 (+ sync commit)
+> **Created:** 2026-08-10 23:58 | **Updated:** 2026-08-11 12:00 (D2255-D2262 P0 audit fixes applied)
+> **From:** D2250-D2253 + D2255-D2262 sessions | **Repo:** main (uncommitted)
 > **Next session starts HERE.** Read this first, then the pointer chain below.
 
 ---
 
-## 1. WHAT WAS DONE (this session, D2250-D2253)
+## 0. PRE-FLIGHT (before any pipeline run)
+
+### 0A. CPU — Goose MacWebContentsOcclusion (D2262)
+Goose (Electron) disables rendering when its window is occluded → UI renderer ~25% CPU → steals 2-3 M1 Max cores from OMLX.
+**Fix options:**
+- Keep Goose window fully visible during long pipeline runs (not minimized, not behind other windows)
+- Or: `defaults write com.block.goose NSWindowOcclusionDetectionEnabled -bool false` (restart Goose after)
+
+### 0B. E2E DIAGNOSTIC GATE (D2261) — RUN BEFORE T1.1
+The "yield crisis" (0.004%) is from v2.0 pipeline. v3.0 yield has never been measured.
+**Command:** `python3 pipeline/run_diagnostic.py --books 100`
+**Gate criteria:**
+- Yield >1% AND S5 pass rate >40% → APPROVE T1.1 full run
+- Yield <0.5% OR S5 pass rate <20% → HALT, diagnose before scaling
+- Between → judgment call with real data
+
+---
+
+## 1. WHAT WAS DONE (this session, D2250-D2253 + D2255-D2262)
 
 | Area | Result | Evidence |
 |------|--------|----------|
@@ -15,12 +34,21 @@
 | **Author cap** | Christian 4→3 (CONV-012 → *The Age of AI*) | `config/golden/stage2_fewshot_convergent.yaml` |
 | **Cost model (D2253)** | Full run = **~21-26h** (not 100h) | `ROUNDTABLE_MASTER_PROMPT.md` §G |
 | **Master prompt** | v8 with hybrid + cost model + audit sections | `governance/ROUNDTABLE_MASTER_PROMPT.md` |
+| **P0 audit (D2255-D2262)** | DeBERTa FEVER live, golden meta fixed, docstrings fixed, GOLDEN-REVIEW archived, model registry corrected | `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` |
 
-**Commits:** `af09de9` (BUG-075/GPT-OSS/hybrid/audit) → `88fd43f` (T-007b resolution) → `fcf23a9` (validation report) → pending: governance sync (this handoff + master prompt v8 + task register).
+**Commits:** `af09de9` (BUG-075/GPT-OSS/hybrid/audit) → `88fd43f` (T-007b resolution) → `fcf23a9` (validation report) → pending: P0 fixes + governance sync (D2255-D2262).
 
 ---
 
 ## 2. NEXT ACTIONS (in order)
+
+### 🔴 Action 0: E2E Diagnostic Gate (D2261) — RUN BEFORE T1.1
+```
+cd "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0"
+python3 pipeline/run_diagnostic.py --books 100
+# Wait ~3-6h. Check output: governance/e2e_diagnostic_2026-08-11.json
+# Gate: yield >1% + S5 pass >40% → proceed to T1.1
+```
 
 ### 🔴 Action 1: Launch T1.1 full run (~26h, batch-resume)
 ```
@@ -72,9 +100,21 @@ s2.max_workers: 3                              # T1.1 parallelism
 s2.dspy_max_labeled_demos: 3                   # T-007b-v2 (overnight only)
 ```
 
-## 4. MODEL REGISTRY (OMLX, 4 models)
+## 4. MODEL REGISTRY
 
-`Phi-4-mini-instruct-8bit` (S5 verify/gates) · `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` (S2 gen) · `gemma-4-31B-it-MLX-8bit` (retired S4 — unload if memory pressure) · `gpt-oss-20b-MXFP4-Q8` (S4 classifier)
+### OMLX models (active pipeline)
+- `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` — S2 generator
+- `gpt-oss-20b-MXFP4-Q8` — S4 classifier/verifier (replaced Phi-4-mini, D2249/D2250)
+- `gemma-4-E4B-it-MLX-4bit` — S5 cross-family deep verifier
+- `bge-m3` (Ollama) — embeddings (1024-dim)
+
+### Local HuggingFace models (active pipeline)
+- `MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli` — S5 NLI pre-filter (D2255, FEVER-trained)
+
+### Retired / non-pipeline
+- `gemma-4-31B-it-MLX-8bit` — retired from S4 (D2249). Not the same as active gemma-4-E4B.
+- `Phi-4-mini-instruct-8bit` — smoke test fast_model only + agent assignments. NO pipeline config role.
+  ⚠️ BUG-079: Was claimed as "S5 verify/gates" in prior handoff — incorrect. Config has no S5 role for Phi.
 
 ## 5. KNOWN GAPS / BLINDSPOTS (honest)
 

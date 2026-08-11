@@ -1,0 +1,149 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+╔══════════════════════════════════════════════════════════════╗
+║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║
+║  Run ID: diagnostic_20260811_130316                        ║
+║  Books: 100                                                   ║
+║  Seed: 42                                                     ║
+╚══════════════════════════════════════════════════════════════╝
+📚 Total unique books in clusters: 949
+🎲 Sampled 100 books (seed=42)
+📊 Clusters touching sampled books: 1126 convergent + 1047 single-source (0 noise skipped)
+   These clusters span 933 unique books (convergent clusters are multi-book by definition)
+💾 Wrote 2173 clusters to /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/stage1_5_embed_cluster/diagnostic_20260811_130316/checkpoint.jsonl
+
+🔍 Checking OMLX health (localhost:11435)...
+   OMLX: {"status":"healthy","default_model":"Phi-4-mini-instruct-8bit","engine_pool":{"model_count":5,"loaded_count":2,"final_ceiling":51539607552,"current_model_memory":11450578197},"mcp":null}
+
+============================================================
+🔬 STAGE 2: Convergent Extraction
+============================================================
+❌ Stage 1 checkpoint not found. Run stage1_chunk.py first.
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+╔══════════════════════════════════════════════════════════════╗
+║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║
+║  Run ID: diagnostic_20260811_130316                        ║
+║  Books: 100                                                   ║
+║  Seed: 42                                                     ║
+╚══════════════════════════════════════════════════════════════╝
+📚 Total unique books in clusters: 949
+🎲 Sampled 100 books (seed=42)
+📊 Clusters touching sampled books: 1126 convergent + 1047 single-source (0 noise skipped)
+   These clusters span 933 unique books (convergent clusters are multi-book by definition)
+💾 Wrote 2173 clusters to /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/stage1_5_embed_cluster/diagnostic_20260811_130316/checkpoint.jsonl
+
+🔍 Checking OMLX health (localhost:11435)...
+   OMLX: {"status":"healthy","default_model":"Phi-4-mini-instruct-8bit","engine_pool":{"model_count":5,"loaded_count":2,"final_ceiling":51539607552,"current_model_memory":11450578197},"mcp":null}
+
+============================================================
+🔬 STAGE 2: Convergent Extraction
+============================================================
+   🎯 Golden few-shot: 1 pos + 1 neg examples (2202 chars)
+🧠 Stage 2: Convergent Extraction — 2173 clusters
+   Convergent (≥2 books): 1126
+   Single-source: 1047 | Noise: 0
+   Provider: omlx | Model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | temp=0.0
+   Golden: 2 examples | Gate: on
+   Split Probe: on (size>20, coh<0.85)
+============================================================
+
+🔍 Principle Discovery Gate: probing 1126 convergent clusters...
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+╔══════════════════════════════════════════════════════════════╗
+║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║
+║  Run ID: diagnostic_20260811_130316                        ║
+║  Books: 100                                                   ║
+║  Seed: 42                                                     ║
+╚══════════════════════════════════════════════════════════════╝
+📚 Total unique books in clusters: 949
+🎲 Sampled 100 books (seed=42)
+📊 Clusters touching sampled books: 1126 convergent + 1047 single-source (0 noise skipped)
+   These clusters span 933 unique books (convergent clusters are multi-book by definition)
+💾 Wrote 2173 clusters to /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/stage1_5_embed_cluster/diagnostic_20260811_130316/checkpoint.jsonl
+
+🔍 Checking OMLX health (localhost:11435)...
+   OMLX: {"status":"healthy","default_model":"Phi-4-mini-instruct-8bit","engine_pool":{"model_count":5,"loaded_count":4,"final_ceiling":51539607552,"current_model_memory":42164115844},"mcp":null}
+
+============================================================
+🔬 STAGE 2: Convergent Extraction
+============================================================
+   🎯 Golden few-shot: 1 pos + 1 neg examples (2202 chars)
+🧠 Stage 2: Convergent Extraction — 2173 clusters
+   Convergent (≥2 books): 1126
+   Single-source: 1047 | Noise: 0
+   Provider: omlx | Model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | temp=0.0
+   Golden: 2 examples | Gate: on
+   Split Probe: on (size>20, coh<0.85)
+============================================================
+
+🔍 Principle Discovery Gate: probing 1126 convergent clusters...
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]Loading weights: 100%|██████████| 391/391 [00:00<00:00, 29086.30it/s]
+   ✂️  cluster_890: 25s/0.818coh → 3 principles, 3 sub-clusters
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+╔══════════════════════════════════════════════════════════════╗
+║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║
+║  Run ID: diagnostic_20260811_130316                        ║
+║  Books: 100                                                   ║
+║  Seed: 42                                                     ║
+║  Max clusters: 300                                           ║
+╚══════════════════════════════════════════════════════════════╝
+📚 Total unique books in clusters: 949
+🎲 Sampled 100 books (seed=42)
+📊 Clusters touching sampled books: 1126 convergent + 1047 single-source (0 noise skipped)
+   These clusters span 933 unique books (convergent clusters are multi-book by definition)
+🔢 Capped at 300 clusters: 300 convergent + 0 single-source
+💾 Wrote 300 clusters to /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/stage1_5_embed_cluster/diagnostic_20260811_130316/checkpoint.jsonl
+
+🔍 Checking OMLX health (localhost:11435)...
+   OMLX: {"status":"healthy","default_model":"Phi-4-mini-instruct-8bit","engine_pool":{"model_count":5,"loaded_count":4,"final_ceiling":51539607552,"current_model_memory":42164115844},"mcp":null}
+
+============================================================
+🔬 STAGE 2: Convergent Extraction
+============================================================
+   🎯 Golden few-shot: 1 pos + 1 neg examples (2202 chars)
+🧠 Stage 2: Convergent Extraction — 300 clusters
+   Convergent (≥2 books): 300
+   Single-source: 0 | Noise: 0
+   Provider: omlx | Model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | temp=0.0
+   Golden: 2 examples | Gate: on
+   Split Probe: on (size>20, coh<0.85)
+============================================================
+
+🔍 Principle Discovery Gate: probing 300 convergent clusters...
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]Loading weights: 100%|██████████| 391/391 [00:00<00:00, 48180.65it/s]
+   ✂️  cluster_890: 25s/0.818coh → 3 principles, 3 sub-clusters
+   ✂️  cluster_1802: 262s/0.734coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_571_s0: 442s/0.773coh → 4 principles, 4 sub-clusters
+Loading weights:   0%|          | 0/391 [00:00<?, ?it/s]Loading weights: 100%|██████████| 391/391 [00:00<00:00, 50754.30it/s]
+   ✂️  cluster_890: 25s/0.818coh → 3 principles, 3 sub-clusters
+      ❌ LLM error: OMLX call failed after 2 attempts: 'content missing from message (reasoning-model cold reload?)'
+   ⚠️  Discovery probe: LLM returned None for cluster_571_s0
+      ❌ LLM error: OMLX call failed after 2 attempts: 'content missing from message (reasoning-model cold reload?)'
+   ⚠️  Discovery probe: LLM returned None for cluster_571_s1
+   ✂️  cluster_2541_s0: 717s/0.772coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s0: 717s/0.772coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_1802: 262s/0.734coh → 4 principles, 4 sub-clusters
+      ❌ LLM error: OMLX call failed after 2 attempts: 'content missing from message (reasoning-model cold reload?)'
+   ⚠️  Discovery probe: LLM returned None for cluster_571_s1
+   ✂️  cluster_571_s0: 442s/0.773coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_1802: 262s/0.734coh → 4 principles, 4 sub-clusters
+      ❌ LLM error: OMLX call failed after 2 attempts: 'content missing from message (reasoning-model cold reload?)'
+   ⚠️  Discovery probe: LLM returned None for cluster_571_s1
+   ✂️  cluster_2541_s2: 386s/0.779coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s4: 268s/0.715coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s1: 316s/0.802coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s4: 268s/0.715coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s2: 386s/0.779coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_3130: 213s/0.797coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s1: 316s/0.802coh → 4 principles, 4 sub-clusters
+      ❌ LLM error: OMLX call failed after 2 attempts: 'content missing from message (reasoning-model cold reload?)'
+   ⚠️  Discovery probe: LLM returned None for cluster_2541_s1
+   ✂️  cluster_2541_s0: 717s/0.772coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_3130: 213s/0.797coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_2541_s2: 386s/0.779coh → 4 principles, 4 sub-clusters
+   ✂️  cluster_3130: 213s/0.797coh → 4 principles, 4 sub-clusters
+      ❌ LLM error: OMLX call failed after 2 attempts: Response ended prematurely
+      ❌ LLM error: OMLX call failed after 2 attempts: Response ended prematurely      ❌ LLM error: OMLX call failed after 2 attempts: Connection refused at http://localhost:11435

@@ -14,8 +14,8 @@ decisions:
 - id: D2093
   category: QLT
   state: ACTIVE
-  description: 'Fail-closed verification: any check failure → QUARANTINE, never silent
-    PASS'
+  description: "Fail-closed verification: any check failure \u2192 QUARANTINE, never\
+    \ silent PASS"
   champion: 2026-07-25 session
   target_files:
   - pipeline/stage5_verify.py
@@ -23,8 +23,8 @@ decisions:
 - id: D2094
   category: INF
   state: ACTIVE
-  description: 'Cluster-before-extract architecture: FAISS on raw segments → convergent
-    LLM extraction'
+  description: "Cluster-before-extract architecture: FAISS on raw segments \u2192\
+    \ convergent LLM extraction"
   champion: 2026-07-25 session
   target_files:
   - pipeline/stage1_5_embed_cluster.py
@@ -50,7 +50,7 @@ decisions:
 - id: D2097
   category: INF
   state: ACTIVE
-  description: 'Source diversity filter: ≥2 distinct books for convergent clusters'
+  description: "Source diversity filter: \u22652 distinct books for convergent clusters"
   champion: 2026-07-25 session
   target_files:
   - pipeline/stage1_5_embed_cluster.py
@@ -73,7 +73,7 @@ decisions:
 - id: D2100
   category: INF
   state: SUPERSEDED
-  description: Proposed stage2_cluster.py has min_dist=0.0 bug — rejected
+  description: "Proposed stage2_cluster.py has min_dist=0.0 bug \u2014 rejected"
   champion: 2026-07-25 session
   target_files: []
   superseded_by: D2094
@@ -122,7 +122,7 @@ decisions:
 - id: D2106
   category: DEF
   state: ACTIVE
-  description: D2032 (Multi-Label vs Dichotomous) CONFIRMED UNRESOLVED — deferred
+  description: "D2032 (Multi-Label vs Dichotomous) CONFIRMED UNRESOLVED \u2014 deferred"
   champion: 2026-07-25 session
   target_files: []
   created: '2026-07-25'
@@ -136,8 +136,8 @@ decisions:
 - id: D2108
   category: INF
   state: ACTIVE
-  description: 'Cluster collapse fix: UMAP n_components 50→5 + allow_single_cluster=false
-    + min_cluster_size 8→15'
+  description: "Cluster collapse fix: UMAP n_components 50\u21925 + allow_single_cluster=false\
+    \ + min_cluster_size 8\u219215"
   champion: 2026-07-25 session
   target_files:
   - config/pipeline_config.yaml
@@ -196,8 +196,8 @@ decisions:
 - id: D1051
   category: INF
   state: ACTIVE
-  description: '3. DB analysis: `domain_dir` values match `s3_original_domain` (formatting
-    difference only — spaces vs underscores). No cross-domain leaks.'
+  description: "3. DB analysis: `domain_dir` values match `s3_original_domain` (formatting\
+    \ difference only \u2014 spaces vs underscores). No cross-domain leaks."
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -396,8 +396,9 @@ decisions:
 - id: D2025
   category: INF
   state: ACTIVE
-  description: '| E | DeBERTa weak on causal/statistical claims | D2023 (claim-type
-    routing: FACT→DeBERTa, CAUSAL→Phi-4-mini, STATISTICAL→source check) |'
+  description: "| E | DeBERTa weak on causal/statistical claims | D2023 (claim-type\
+    \ routing: FACT\u2192DeBERTa, CAUSAL\u2192Phi-4-mini, STATISTICAL\u2192source\
+    \ check) |"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -734,8 +735,8 @@ decisions:
 - id: D2074
   category: INF
   state: REJECTED
-  description: '**Acceptance threshold:** ≥80% of extracted principles contain detected
-    causal language AND pass NLI entailment.'
+  description: "**Acceptance threshold:** \u226580% of extracted principles contain\
+    \ detected causal language AND pass NLI entailment."
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -760,18 +761,18 @@ decisions:
 - id: D2082
   category: INF
   state: ACTIVE
-  description: '**Context:** S4 already routes PT/PI/GE/TI to separate files. But
-    paths were hardcoded strings and MAX_PRINCIPLES_PER_CLUSTER was hardcoded 20.
-    Verified: process_templates ARE being written (no bug —'
+  description: "**Context:** S4 already routes PT/PI/GE/TI to separate files. But\
+    \ paths were hardcoded strings and MAX_PRINCIPLES_PER_CLUSTER was hardcoded 20.\
+    \ Verified: process_templates ARE being written (no bug \u2014"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2083
   category: INF
   state: ACTIVE
-  description: '**Context:** BORP requires distinct_sources ≥ 2 but PT/PI/GE/TI are
-    valid as single-source content. The pipeline already routes them around FB generation
-    in S4, but if any reach S5, they should bypass'
+  description: "**Context:** BORP requires distinct_sources \u2265 2 but PT/PI/GE/TI\
+    \ are valid as single-source content. The pipeline already routes them around\
+    \ FB generation in S4, but if any reach S5, they should bypass"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -794,8 +795,8 @@ decisions:
 - id: D2086
   category: INF
   state: ACTIVE
-  description: '**Context:** Config has BORP_MIN_SOURCES=2. User conversation summary
-    mentioned "BORP ≥ 3". Potential discrepancy.'
+  description: "**Context:** Config has BORP_MIN_SOURCES=2. User conversation summary\
+    \ mentioned \"BORP \u2265 3\". Potential discrepancy."
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -837,7 +838,7 @@ decisions:
 - id: D2115
   category: INF
   state: ACTIVE
-  description: '- CONSTITUTION §2 NLI model reference fixed'
+  description: "- CONSTITUTION \xA72 NLI model reference fixed"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -851,7 +852,7 @@ decisions:
 - id: D2117
   category: QLT
   state: ACTIVE
-  description: '- CONSTITUTION §2 NLI model reference fixed'
+  description: "- CONSTITUTION \xA72 NLI model reference fixed"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -872,9 +873,9 @@ decisions:
 - id: D2121
   category: GOV
   state: ACTIVE
-  description: 'C12 De-Hardcoding for Test Harness: 19 hardcoded values extracted
-    to config/pipeline_config.yaml → test.full_run. All paths, model names, thresholds,
-    magic numbers now config-driven.'
+  description: "C12 De-Hardcoding for Test Harness: 19 hardcoded values extracted\
+    \ to config/pipeline_config.yaml \u2192 test.full_run. All paths, model names,\
+    \ thresholds, magic numbers now config-driven."
   champion: 2026-07-28 session
   target_files:
   - tests/full_run.py
@@ -905,9 +906,9 @@ decisions:
 - id: D2124
   category: STR
   state: ACTIVE
-  description: 'Domain-by-Domain Sequential Extraction: 8-domain ordered strategy
-    starting with Design→AI→Systems→Substrate→Art→Business→Personal→Influence. Cross-domain
-    re-classification after all domains.'
+  description: "Domain-by-Domain Sequential Extraction: 8-domain ordered strategy\
+    \ starting with Design\u2192AI\u2192Systems\u2192Substrate\u2192Art\u2192Business\u2192\
+    Personal\u2192Influence. Cross-domain re-classification after all domains."
   champion: 2026-07-28 session
   target_files:
   - governance/aggregated_remaining_tasks.md
@@ -924,9 +925,9 @@ decisions:
 - id: D2126
   category: INF
   state: ACTIVE
-  description: 'ModernBERT NLI Active Confirmed: tasksource/ModernBERT-base-nli is
-    live in stage5_verify._get_nli(). DeBERTa-v3 as automatic fallback. 2.02× faster,
-    equal accuracy. No further action needed.'
+  description: "ModernBERT NLI Active Confirmed: tasksource/ModernBERT-base-nli is\
+    \ live in stage5_verify._get_nli(). DeBERTa-v3 as automatic fallback. 2.02\xD7\
+    \ faster, equal accuracy. No further action needed."
   champion: 2026-07-28 session
   target_files:
   - pipeline/stage5_verify.py
@@ -946,9 +947,9 @@ decisions:
 - id: D2128
   category: INF
   state: ACTIVE
-  description: 'route→content_type gap documented: Stage 2 outputs `route` (FB/PT/GE/NULL)
-    but Stage 4 checks `content_type` (process_template/...). PT/PI/GE/TI routing
-    never worked. Fix deferred.'
+  description: "route\u2192content_type gap documented: Stage 2 outputs `route` (FB/PT/GE/NULL)\
+    \ but Stage 4 checks `content_type` (process_template/...). PT/PI/GE/TI routing\
+    \ never worked. Fix deferred."
   champion: 2026-07-28 session
   target_files:
   - pipeline/stage2_extract.py
@@ -957,10 +958,10 @@ decisions:
 - id: D2129
   category: PERF
   state: ACTIVE
-  description: 'IMPLEMENTED 2026-08-03: tests/full_run_streaming.py — per-book chunk→extract→classify→persist→free,
-    resume checkpoint (streaming_resume.jsonl), zero-byte quarantine, fail-visible
-    classification (D2134). Smoke test: 3 books → 9 FBs, all related_fbs+citation.
-    Memory: never holds >1 book segments.'
+  description: "IMPLEMENTED 2026-08-03: tests/full_run_streaming.py \u2014 per-book\
+    \ chunk\u2192extract\u2192classify\u2192persist\u2192free, resume checkpoint (streaming_resume.jsonl),\
+    \ zero-byte quarantine, fail-visible classification (D2134). Smoke test: 3 books\
+    \ \u2192 9 FBs, all related_fbs+citation. Memory: never holds >1 book segments."
   champion: 2026-08-03 research session
   target_files:
   - tests/full_run_streaming.py
@@ -989,8 +990,9 @@ decisions:
 - id: D2132
   category: INF
   state: ACTIVE
-  description: 'Remove dead books/ symlink (points to EMPTY 1.sources/). Config books_dir=knowledge
-    pipeline/books is correct (922 MD). Add smoke assertion: books_dir ≥900 MD files.'
+  description: "Remove dead books/ symlink (points to EMPTY 1.sources/). Config books_dir=knowledge\
+    \ pipeline/books is correct (922 MD). Add smoke assertion: books_dir \u2265900\
+    \ MD files."
   champion: 2026-08-03 research session
   target_files:
   - books/
@@ -999,10 +1001,10 @@ decisions:
 - id: D2133
   category: CLS
   state: ACTIVE
-  description: 'IMPLEMENTED 2026-08-03: taxonomy_v5.yaml +26 disciplines (73) +10
-    domains (36); kind-aware synonym index in schemas.py; map fallback. Measured:
-    discipline collapse 35/77→0/77, domain collapse 27/77→0/77, zero LLM re-runs.
-    Prompt injection REJECTED (D2138 conflict).'
+  description: "IMPLEMENTED 2026-08-03: taxonomy_v5.yaml +26 disciplines (73) +10\
+    \ domains (36); kind-aware synonym index in schemas.py; map fallback. Measured:\
+    \ discipline collapse 35/77\u21920/77, domain collapse 27/77\u21920/77, zero LLM\
+    \ re-runs. Prompt injection REJECTED (D2138 conflict)."
   champion: 2026-08-03 research session
   target_files:
   - config/taxonomy_v5.yaml
@@ -1013,9 +1015,9 @@ decisions:
 - id: D2134
   category: QLT
   state: ACTIVE
-  description: 'Fail-visible classification fallback: silent except→''emerging'' at
-    stage4_merge.py L851 replaced with logged+flagged error (C16). classification_errors
-    field already exists.'
+  description: "Fail-visible classification fallback: silent except\u2192'emerging'\
+    \ at stage4_merge.py L851 replaced with logged+flagged error (C16). classification_errors\
+    \ field already exists."
   champion: 2026-08-03 research session
   target_files:
   - pipeline/stage4_merge.py
@@ -1033,10 +1035,10 @@ decisions:
 - id: D2136
   category: QLT
   state: ACTIVE
-  description: 'Audit fixes: created pipeline/embeddings.py (semantic_near edges were
-    silently never computed — BUG-059); wired golden few-shot into full_run_streaming.py
-    (was baseline only); fixed Obsidian frontmatter blank line, resume torn-line crash,
-    D2139 depth parity, formatting.'
+  description: "Audit fixes: created pipeline/embeddings.py (semantic_near edges were\
+    \ silently never computed \u2014 BUG-059); wired golden few-shot into full_run_streaming.py\
+    \ (was baseline only); fixed Obsidian frontmatter blank line, resume torn-line\
+    \ crash, D2139 depth parity, formatting."
   champion: 2026-08-04 audit
   target_files:
   - pipeline/embeddings.py
@@ -1073,9 +1075,10 @@ decisions:
   category: QLT
   state: ACTIVE
   date: '2026-08-05'
-  description: 'Defined mapping: empirical_pattern→growth_edge, normative_heuristic→process_template/principle,
-    causal_mechanism→principle, tool-specific→tool_instruction, case studies→process_instance.
-    Wires S2 output into S4 routing (GE/PT/PI/TI outputs).'
+  description: "Defined mapping: empirical_pattern\u2192growth_edge, normative_heuristic\u2192\
+    process_template/principle, causal_mechanism\u2192principle, tool-specific\u2192\
+    tool_instruction, case studies\u2192process_instance. Wires S2 output into S4\
+    \ routing (GE/PT/PI/TI outputs)."
   champion: 2026-08-05 session
   target_files:
   - pipeline/stage2_extract.py
@@ -1084,99 +1087,104 @@ decisions:
 - id: D2151
   category: BUGFIX
   state: ACTIVE
-  summary: NLI input format fix — single string instead of pair dict makes S5 verification
-    random
+  summary: "NLI input format fix \u2014 single string instead of pair dict makes S5\
+    \ verification random"
 - id: D2152
   category: BUGFIX
   state: ACTIVE
-  summary: MinHash dedup disabled — _jaccard key never populated, lambda returns 0
+  summary: "MinHash dedup disabled \u2014 _jaccard key never populated, lambda returns\
+    \ 0"
 - id: D2153
   category: BUGFIX
   state: ACTIVE
-  summary: Dead code in run_stage2 — start/result/is_summary/name undefined
+  summary: "Dead code in run_stage2 \u2014 start/result/is_summary/name undefined"
 - id: D2154
   category: BUGFIX
   state: ACTIVE
-  summary: Incremental checkpoint broken — i out of scope, writes only once at end
+  summary: "Incremental checkpoint broken \u2014 i out of scope, writes only once\
+    \ at end"
 - id: D2155
   category: BUGFIX
   state: ACTIVE
-  summary: Three NLI thresholds hardcoded vs config single value — C12 violation
+  summary: "Three NLI thresholds hardcoded vs config single value \u2014 C12 violation"
 - id: D2156
   category: CFG
   state: ACTIVE
-  summary: Config embed mismatch — bge-m3 stamped, bge-small used. Reproducibility
-    invalidated
+  summary: "Config embed mismatch \u2014 bge-m3 stamped, bge-small used. Reproducibility\
+    \ invalidated"
 - id: D2157
   category: INF
   state: ACTIVE
-  summary: requirements.txt missing faiss, sentence-transformers, transformers — C5
-    violation
+  summary: "requirements.txt missing faiss, sentence-transformers, transformers \u2014\
+    \ C5 violation"
 - id: D2158
   category: CFG
   state: ACTIVE
-  summary: coverage_check.py hardcodes model name — C12 violation
+  summary: "coverage_check.py hardcodes model name \u2014 C12 violation"
 - id: D2159
   category: QLT
   state: ACTIVE
-  summary: Non-deterministic golden selection — random.shuffle without seed
+  summary: "Non-deterministic golden selection \u2014 random.shuffle without seed"
 - id: D2160
   category: QLT
   state: ACTIVE
-  summary: 'CRIBS except: pass — silent enrichment failure swallows errors. C16 violation'
+  summary: "CRIBS except: pass \u2014 silent enrichment failure swallows errors. C16\
+    \ violation"
 - id: D2161
   category: QLT
   state: ACTIVE
-  summary: Cluster sampling bias — seg_ids[:n_samples] not stratified by book
+  summary: "Cluster sampling bias \u2014 seg_ids[:n_samples] not stratified by book"
 - id: D2162
   category: ARCH
   state: ACTIVE
-  summary: R-NN transitive chaining — diameter constraint post-processing
+  summary: "R-NN transitive chaining \u2014 diameter constraint post-processing"
 - id: D2163
   category: ARCH
   state: ACTIVE
-  summary: Principle discovery gate — 1:N extraction from clusters to fix 291:1 bottleneck
+  summary: "Principle discovery gate \u2014 1:N extraction from clusters to fix 291:1\
+    \ bottleneck"
 - id: D2164
   category: ARCH
   state: PLANNED
-  summary: Claim-level verification — FActScore-style atomic claim decomposition
+  summary: "Claim-level verification \u2014 FActScore-style atomic claim decomposition"
 - id: D2165
   category: QLT
   state: PLANNED
-  summary: Principle-recall benchmark — mandatory evaluation harness
+  summary: "Principle-recall benchmark \u2014 mandatory evaluation harness"
 - id: D2166
   category: ARCH
   state: PLANNED
-  summary: Semantic chunking — rolling-window coherence detection (S1.1)
+  summary: "Semantic chunking \u2014 rolling-window coherence detection (S1.1)"
 - id: D2168
   category: BUGFIX
   state: ACTIVE
-  summary: 'Louvain community detection replaces Union-Find — fixes transitive chaining
-    math illusion (stress-test verified: 100% purity vs 0%)'
+  summary: "Louvain community detection replaces Union-Find \u2014 fixes transitive\
+    \ chaining math illusion (stress-test verified: 100% purity vs 0%)"
 - id: D2169
   category: GOV
   state: ACTIVE
-  summary: config/version.yaml — single source of truth for all version strings; resolves
-    5-file version schizophrenia
+  summary: "config/version.yaml \u2014 single source of truth for all version strings;\
+    \ resolves 5-file version schizophrenia"
 - id: D2170
   category: BUGFIX
   state: ACTIVE
-  summary: Kill zero-padding hack — replaced with ValueError dim assertion (C16 fail-closed)
+  summary: "Kill zero-padding hack \u2014 replaced with ValueError dim assertion (C16\
+    \ fail-closed)"
 - id: D2171
   category: BUGFIX
   state: ACTIVE
-  summary: 'Singletons: is_noise=False + is_singleton=True — prevents silent deletion
-    of 2,804 unique insights'
+  summary: "Singletons: is_noise=False + is_singleton=True \u2014 prevents silent\
+    \ deletion of 2,804 unique insights"
 - id: D2172
   category: BUGFIX
   state: ACTIVE
-  summary: Index alignment fix — track successful_indices, filter segments in lockstep
-    with embeddings
+  summary: "Index alignment fix \u2014 track successful_indices, filter segments in\
+    \ lockstep with embeddings"
 - id: D2173
   category: BUGFIX
   state: ACTIVE
-  summary: D2163 discovery probe — source-stratified sampling replaces positional
-    stepping
+  summary: "D2163 discovery probe \u2014 source-stratified sampling replaces positional\
+    \ stepping"
 - id: D2174
   category: CFG
   state: ACTIVE
@@ -1185,8 +1193,8 @@ decisions:
 - id: D2175
   category: CFG
   state: ACTIVE
-  summary: C12a fix — hardcoded 'knowledge pipeline' paths replaced with DATA_DIR
-    from pipeline_paths.py
+  summary: "C12a fix \u2014 hardcoded 'knowledge pipeline' paths replaced with DATA_DIR\
+    \ from pipeline_paths.py"
 - id: D2177
   date: '2026-08-05'
   status: ACTIVE
@@ -1217,7 +1225,7 @@ decisions:
 - id: D2120
   category: INF
   state: ACTIVE
-  description: '- With 2× parallelism on Stage 4: ~3-6s per FB'
+  description: "- With 2\xD7 parallelism on Stage 4: ~3-6s per FB"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -1231,16 +1239,18 @@ decisions:
 - id: D2138
   category: INF
   state: ACTIVE
-  description: '- All 5 golden positive examples had depth mismatches with D2139 (e.g.,
-    4-domain FBs labeled "cross_domain" but D2139 derives "universal" for ≥3 domains)'
+  description: "- All 5 golden positive examples had depth mismatches with D2139 (e.g.,\
+    \ 4-domain FBs labeled \"cross_domain\" but D2139 derives \"universal\" for \u2265\
+    3 domains)"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2139
   category: INF
   state: ACTIVE
-  description: '- All 5 golden positive examples had depth mismatches with D2139 (e.g.,
-    4-domain FBs labeled "cross_domain" but D2139 derives "universal" for ≥3 domains)'
+  description: "- All 5 golden positive examples had depth mismatches with D2139 (e.g.,\
+    \ 4-domain FBs labeled \"cross_domain\" but D2139 derives \"universal\" for \u2265\
+    3 domains)"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -1333,10 +1343,10 @@ decisions:
 - id: D2190
   category: INF
   state: ACTIVE
-  description: Embedding backend switched MPS→Ollama bge-m3. MPS deadlocked at batch
-    ~19-24 on large corpus (3 runs). Ollama uses MLX (Apple native), stable, 15-18
-    seg/s, ~6h for 323K. bge-m3 512d Matryoshka (92% neighbor overlap) beats bge-small
-    384d (MTEB 58.3 vs 54.2). Unified semantic space with S4 (D2181).
+  description: "Embedding backend switched MPS\u2192Ollama bge-m3. MPS deadlocked\
+    \ at batch ~19-24 on large corpus (3 runs). Ollama uses MLX (Apple native), stable,\
+    \ 15-18 seg/s, ~6h for 323K. bge-m3 512d Matryoshka (92% neighbor overlap) beats\
+    \ bge-small 384d (MTEB 58.3 vs 54.2). Unified semantic space with S4 (D2181)."
   champion: goose
   target_files:
   - pipeline/stage1_5_embed_cluster.py
@@ -1347,8 +1357,9 @@ decisions:
 - id: D2190a
   category: PERF
   state: ACTIVE
-  description: 'embed_batch_size 128→64 for Ollama parallelism (4 workers, 5051 batches).
-    embed_chunk_size: 20000 segments per chunk (reduces memory). documented in D2190-embedding-model-selection.md'
+  description: "embed_batch_size 128\u219264 for Ollama parallelism (4 workers, 5051\
+    \ batches). embed_chunk_size: 20000 segments per chunk (reduces memory). documented\
+    \ in D2190-embedding-model-selection.md"
   champion: goose
   target_files:
   - config/pipeline_config.yaml
@@ -1364,7 +1375,7 @@ decisions:
 - id: D2182
   category: INF
   state: ACTIVE
-  description: '- ONLY S1.5 stale (bge-small 384d) → re-run bge-m3 512d'
+  description: "- ONLY S1.5 stale (bge-small 384d) \u2192 re-run bge-m3 512d"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -1386,95 +1397,97 @@ decisions:
 - id: D2191
   category: INF
   state: ACTIVE
-  description: 1. YAML duplicate keys removed (3 pairs → 1 pair per example, 9 total)
+  description: "1. YAML duplicate keys removed (3 pairs \u2192 1 pair per example,\
+    \ 9 total)"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2195
   category: INF
   state: ARCHIVED
-  description: 'D2196: Zero-vector fallback → EmbeddingQuarantineError — ollama_embed.py'
+  description: "D2196: Zero-vector fallback \u2192 EmbeddingQuarantineError \u2014\
+    \ ollama_embed.py"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2196
   category: INF
   state: ARCHIVED
-  description: 'D2197: session_seed.yaml sync — NLI model, stage3 removal, 8-stage
-    pipeline'
+  description: "D2197: session_seed.yaml sync \u2014 NLI model, stage3 removal, 8-stage\
+    \ pipeline"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2197
   category: INF
   state: ACTIVE
-  description: 'D2198: AGENTS.md + KNOWLEDGE-PIPELINE-ARCHITECTURE.md stage3 ghost
-    removal + load_stage3_clusters→load_stage2_clusters'
+  description: "D2198: AGENTS.md + KNOWLEDGE-PIPELINE-ARCHITECTURE.md stage3 ghost\
+    \ removal + load_stage3_clusters\u2192load_stage2_clusters"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2198
   category: INF
   state: ACTIVE
-  description: 'D2199: model_assignments.yaml sync — REVIEWER fixed (DeepSeek→gemma),
-    S5_FB_VERIFIER fixed (Qwen→Gemma), OptiQ documented'
+  description: "D2199: model_assignments.yaml sync \u2014 REVIEWER fixed (DeepSeek\u2192\
+    gemma), S5_FB_VERIFIER fixed (Qwen\u2192Gemma), OptiQ documented"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2199
   category: INF
   state: ACTIVE
-  description: 'D2200: LICENSE added — MIT'
+  description: "D2200: LICENSE added \u2014 MIT"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2200
   category: INF
   state: ACTIVE
-  description: 'D2201: pyproject.toml — removed pipeline/ from Ruff+mypy exclusions'
+  description: "D2201: pyproject.toml \u2014 removed pipeline/ from Ruff+mypy exclusions"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2201
   category: INF
   state: ACTIVE
-  description: 'D2202: ollama_embed.py — removed undeclared ollama import, delegated
-    single-doc to batch_embed (requests-based)'
+  description: "D2202: ollama_embed.py \u2014 removed undeclared ollama import, delegated\
+    \ single-doc to batch_embed (requests-based)"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2202
   category: INF
   state: ACTIVE
-  description: 'D2203: integrity_check.py — 17 automated checks, just integrity command,
-    added to health+preflight'
+  description: "D2203: integrity_check.py \u2014 17 automated checks, just integrity\
+    \ command, added to health+preflight"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2203
   category: INF
   state: ACTIVE
-  description: 'D2204: Golden set expansion 10→25 examples. Full property coverage
-    (prerequisite_fbs 0→10,'
+  description: "D2204: Golden set expansion 10\u219225 examples. Full property coverage\
+    \ (prerequisite_fbs 0\u219210,"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2204
   category: INF
   state: ARCHIVED
-  description: contradicts_fbs 0→8, related_fbs 0→11, procedural_skill 0→11, failure_mode
-    0→11,
+  description: "contradicts_fbs 0\u21928, related_fbs 0\u219211, procedural_skill\
+    \ 0\u219211, failure_mode 0\u219211,"
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
 - id: D2205
   category: ARCH
   state: ACTIVE
-  description: 'RAG Architecture Roadmap — 4-model cross-examination synthesis. 7-day
-    implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal layer
-    (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model (2d),
-    integration (1d). Full specs in governance/D2205-rag-architecture-roadmap-2026-08-06.md
-    (1,091 lines). 13 proposals rejected with constraint-violation reasons.'
+  description: "RAG Architecture Roadmap \u2014 4-model cross-examination synthesis.\
+    \ 7-day implementation plan: P0 agentic retrieval loop (1.5d), P1 graph traversal\
+    \ layer (1.5d), P2 MCP server (1d), P3 Evidence Pack + two-axis epistemic model\
+    \ (2d), integration (1d). Full specs in governance/D2205-rag-architecture-roadmap-2026-08-06.md\
+    \ (1,091 lines). 13 proposals rejected with constraint-violation reasons."
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
@@ -1501,10 +1514,10 @@ decisions:
 - id: D2208
   category: BUGFIX
   state: ACTIVE
-  description: 'N1 Yield Diagnostic Pass (D2208): 6 bugs fixed — OMLX memory guard
-    ceiling, circuit breaker death spiral, memory guard false alarm, discovery probe
-    hardcoded to OMLX, hardcoded max_workers, MLX provider local model path. 55 FBs
-    from 58 TFS clusters (95% yield).'
+  description: "N1 Yield Diagnostic Pass (D2208): 6 bugs fixed \u2014 OMLX memory\
+    \ guard ceiling, circuit breaker death spiral, memory guard false alarm, discovery\
+    \ probe hardcoded to OMLX, hardcoded max_workers, MLX provider local model path.\
+    \ 55 FBs from 58 TFS clusters (95% yield)."
   champion: auto-sync
   target_files:
   - pipeline/omlx_call.py
@@ -1525,12 +1538,12 @@ decisions:
 - id: D2211
   category: BUGFIX
   state: ACTIVE
-  description: 'P0 Circuit Breaker & Error Propagation Fixes (D2211): 13 surgical
-    fixes across 3 files breaking the 12-hour Run 5 failure chain. Health check now
-    uses stress_test_omlx (real chat requests). CircuitOpenError propagates through
-    call_llm→discover_principles→_process_cluster→future.result(). Probe fail-closed
-    with 10% abort threshold. 4xx excluded from breaker. Thread safety lock added.
-    Run-scoped paths for probe cache + singletons.'
+  description: "P0 Circuit Breaker & Error Propagation Fixes (D2211): 13 surgical\
+    \ fixes across 3 files breaking the 12-hour Run 5 failure chain. Health check\
+    \ now uses stress_test_omlx (real chat requests). CircuitOpenError propagates\
+    \ through call_llm\u2192discover_principles\u2192_process_cluster\u2192future.result().\
+    \ Probe fail-closed with 10% abort threshold. 4xx excluded from breaker. Thread\
+    \ safety lock added. Run-scoped paths for probe cache + singletons."
   champion: Goose (S-tier Senior RAG Engineer)
   target_files:
   - pipeline/omlx_call.py
@@ -1550,10 +1563,10 @@ decisions:
 - id: D2214
   category: INF
   state: ACTIVE
-  description: Pydantic FB(StampedRecord) class at schemas.py:459 confirmed dead code
-    — never instantiated anywhere. All min_length, Literal, field_validator constraints
-    non-functional. Actual enforcement via prompt strings. Pydantic model retained
-    as interface documentation.
+  description: "Pydantic FB(StampedRecord) class at schemas.py:459 confirmed dead\
+    \ code \u2014 never instantiated anywhere. All min_length, Literal, field_validator\
+    \ constraints non-functional. Actual enforcement via prompt strings. Pydantic\
+    \ model retained as interface documentation."
   champion: Goose (2026-08-09 audit)
   target_files:
   - pipeline/schemas.py
@@ -1573,10 +1586,10 @@ decisions:
 - id: D2216
   category: ARCH
   state: ACTIVE
-  description: DeBERTa-v3-base-mnli-fever-anli confirmed as correct factuality model
-    for sovereign pipeline. 362MB, FEVER 89.1%, runs locally (C3), $0 cost (C1). Purpose-built
-    for claim-evidence verification. No model swap needed — S5 issue is architectural
-    (fields), not model capability.
+  description: "DeBERTa-v3-base-mnli-fever-anli confirmed as correct factuality model\
+    \ for sovereign pipeline. 362MB, FEVER 89.1%, runs locally (C3), $0 cost (C1).\
+    \ Purpose-built for claim-evidence verification. No model swap needed \u2014 S5\
+    \ issue is architectural (fields), not model capability."
   champion: Goose (2026-08-09 audit)
   target_files:
   - config/pipeline_config.yaml
@@ -1704,9 +1717,9 @@ decisions:
 - id: D2240
   category: INF
   state: ACTIVE
-  description: Rename pipeline/json_repair.py → json_fixer.py. Local module shadowed
-    pip json_repair package, causing dspy MIPROv2 parallelizer crashes (no loads()
-    function). Renamed to avoid collision.
+  description: "Rename pipeline/json_repair.py \u2192 json_fixer.py. Local module\
+    \ shadowed pip json_repair package, causing dspy MIPROv2 parallelizer crashes\
+    \ (no loads() function). Renamed to avoid collision."
   impact: Unblocks all DSPy training. MIPROv2 pilot re-running successfully.
 - id: D2241
   category: QA
@@ -1719,9 +1732,9 @@ decisions:
 - id: D2242
   category: ARCH
   state: ACTIVE
-  description: Remove depth from S2 — classified in Stage 4. Depth was erroneously
-    forced in DSPy ConvergentExtraction Signature despite SYSTEM_PROMPT explicitly
-    stating it is Stage 4 job. 0% accuracy confirmed architectural misfit.
+  description: "Remove depth from S2 \u2014 classified in Stage 4. Depth was erroneously\
+    \ forced in DSPy ConvergentExtraction Signature despite SYSTEM_PROMPT explicitly\
+    \ stating it is Stage 4 job. 0% accuracy confirmed architectural misfit."
   impact: 'S2 extracts principles; S4 classifies depth. Metric redistributed: type
     20%, name 12%, mechanism 13%.'
 - id: D2243
@@ -1764,19 +1777,19 @@ decisions:
 - id: D2247
   category: QA
   state: ACTIVE
-  description: 'S4 cross-domain few-shot A/B: 4 few-shot anchors added to CLASSIFY_SYSTEM_PROMPT
-    but mixed results (CONV-026 regressed). RELIABLE FIX: Reasoning:none prefix for
-    GPT-OSS (60-182s high-reasoning → 25-40s direct JSON). Short focused depth prompt
-    (62.5%) beats long combined classify prompt (38%) for all models. max_tokens 512→1024+
-    needed.'
+  description: "S4 cross-domain few-shot A/B: 4 few-shot anchors added to CLASSIFY_SYSTEM_PROMPT\
+    \ but mixed results (CONV-026 regressed). RELIABLE FIX: Reasoning:none prefix\
+    \ for GPT-OSS (60-182s high-reasoning \u2192 25-40s direct JSON). Short focused\
+    \ depth prompt (62.5%) beats long combined classify prompt (38%) for all models.\
+    \ max_tokens 512\u21921024+ needed."
   impact: 'S4 classify: prepend Reasoning:none, raise max_tokens. Cross-domain is
     prompt-structure issue, not model.'
 - id: D2248
   date: '2026-08-10'
   category: CLS
   status: active
-  title: 4-Way S2 Comparison (20-example) — DSPy wins avg, Traditional wins positive
-    fidelity
+  title: "4-Way S2 Comparison (20-example) \u2014 DSPy wins avg, Traditional wins\
+    \ positive fidelity"
   summary: 'DSPy 0.672 vs Traditional 0.592 avg quality on 20 examples (Qwen3-Coder,
     temp 0.0). DSPy: 5/5 negative rejection, 1 parse-fail; Traditional: 0/5 negatives,
     6 parse-fails, but 0.845 vs 0.60 on both-scored positives. Positive-fidelity gap
@@ -1836,9 +1849,9 @@ decisions:
   category: CLS
   status: active
   title: 'T-007b resolution: hybrid is production; demo re-opt scheduled not interactive'
-  summary: 'MIPROv2 with 4 demos ~20h (188s/example) — infeasible interactive. Hybrid
-    (D2251, 0.736) needs no demo increase: DSPy gate + Trad extract. Config demos
-    2->3 (cost-balanced) for overnight opt only.'
+  summary: "MIPROv2 with 4 demos ~20h (188s/example) \u2014 infeasible interactive.\
+    \ Hybrid (D2251, 0.736) needs no demo increase: DSPy gate + Trad extract. Config\
+    \ demos 2->3 (cost-balanced) for overnight opt only."
   impact: Production S2 = hybrid. T-007b CLOSED. Overnight re-opt optional polish.
   files:
   - config/pipeline_config.yaml
@@ -1847,7 +1860,7 @@ decisions:
   date: '2026-08-10'
   category: PERF
   status: active
-  title: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
+  title: "Full-run cost model corrected \u2014 ~26h not 100h; T1.1 unblocked"
   summary: 'Naive 100h estimate (12964x28s/1 worker) ignored tiered+parallel arch.
     Real: 79.7% single-source (12s simplified prompt), 20.3% convergent (28s few-shot),
     3 workers, merged S4 (45% faster), S5 ~3s/FB. Result: S2~18.7h + S4~3.9h + S5~0.7h
@@ -1868,11 +1881,134 @@ decisions:
   - governance/HANDOFF_D2254.md
   - governance/aggregated_remaining_tasks.md
   - governance/ROUNDTABLE_MASTER_PROMPT.md
+- id: D2255
+  date: '2026-08-11'
+  category: BUGFIX
+  status: active
+  title: 'S5 NLI: DeBERTa FEVER activated as primary (config fix for D2216 dead code)'
+  summary: "D2216 promoted DeBERTa FEVER in code default but config/pipeline_config.yaml\
+    \ L172 hardcoded ModernBERT. Config wins per C12 \u2192 D2216 was dead code. Swapped\
+    \ nli_model to DeBERTa FEVER primary, ModernBERT fallback. DeBERTa FEVER is 5.8\xD7\
+    \ more discriminative on convergent FBs."
+  impact: "S5 NLI pre-filter now functional. Previously ModernBERT returned NEUTRAL\
+    \ for all synthesized FBs \u2192 everything escalated to Gemma (73% FN) \u2192\
+    \ QUARANTINE."
+  files:
+  - config/pipeline_config.yaml
+- id: D2256
+  date: '2026-08-11'
+  category: GOV
+  status: active
+  title: stage5_verify.py docstring updated (remove stale Phi-4-mini, update NLI)
+  summary: 'Docstring was triple-stale: claimed ModernBERT NLI (was DeBERTa code default,
+    ModernBERT config runtime), claimed Phi-4-mini classifier (retired D2249/D2250),
+    process described DeBERTa NLI (was actually ModernBERT). Now shows 4 active families:
+    Qwen3/S2, GPT-OSS/S4, Gemma-4-E4B/S5, DeBERTa FEVER/S5-NLI.'
+  impact: Documentation matches runtime behavior for the first time since D2216.
+  files:
+  - pipeline/stage5_verify.py
+- id: D2257
+  date: '2026-08-11'
+  category: DATA
+  status: active
+  title: "Golden set YAML meta count corrected (36\u219255 convergent positives)"
+  summary: 'Meta claimed convergent_positives: 36 but actual is_convergent=True field
+    count is 55 (verified via grep -c). Stale count likely from pre-expansion v3.x.
+    Updated with annotation.'
+  impact: Meta now matches data. Cross-examination confusion resolved.
+  files:
+  - config/golden/stage2_fewshot_convergent.yaml
+- id: D2258
+  date: '2026-08-11'
+  category: CFG
+  status: active
+  title: Stale classify_model removed from v2.3 checkpoint block
+  summary: 'BUG-078: pipeline_config.yaml L1642 contained classify_model: Phi-4-mini-instruct-8bit
+    in a v2.3 schema checkpoint block. Removed with annotation. Phi-4-mini retired
+    from pipeline classification per D2249/D2250.'
+  impact: "Config hygiene \u2014 no more stale Phi-4-mini references in active config."
+  files:
+  - config/pipeline_config.yaml
+- id: D2259
+  date: '2026-08-11'
+  category: DATA
+  status: active
+  title: GOLDEN-REVIEW.md v2.0 archived (0/225 checks, different ID scheme)
+  summary: "Moved config/golden/GOLDEN-REVIEW.md \u2192 archive/. v2.0 file with 75\
+    \ examples, different ID scheme (LEA/STR/DES/PER/MGT), 0/225 review checks completed.\
+    \ Its presence alongside active v4.4 YAML confused every cross-examination round."
+  impact: Single source of truth for golden set. No more v2.0/v4.4 confusion.
+  files:
+  - archive/GOLDEN-REVIEW-v2.0-ARCHIVED-2026-08-11.md
+- id: D2260
+  date: '2026-08-11'
+  category: GOV
+  status: active
+  title: HANDOFF_D2254 model registry corrected
+  summary: "BUG-079: Registry listed Phi-4-mini for S5 verify/gates (no pipeline config\
+    \ role). Listed retired gemma-4-31B instead of active gemma-4-E4B. Omitted DeBERTa\
+    \ FEVER and bge-m3. Rewrote\xA74 with verified config models."
+  impact: Governance doc matches actual pipeline configuration.
+  files:
+  - governance/HANDOFF_D2254.md
+- id: D2261
+  date: '2026-08-11'
+  category: VAL
+  status: active
+  title: E2E diagnostic gate authorized (50-100 book run before T1.1 full run)
+  summary: "Before committing the ~26h T1.1 full run on 12,964 clusters, run a smaller\
+    \ E2E diagnostic on 50-100 books. Gate: yield >1% AND S5 pass >40% \u2192 approve\
+    \ T1.1. Yield <0.5% OR S5 <20% \u2192 halt. Between \u2192 judgment call."
+  impact: Converts phantom yield crisis (v2.0 0.004%) into real v3.0 data.
+  files:
+  - pipeline/run_diagnostic.py
+- id: D2262
+  date: '2026-08-11'
+  category: PERF
+  status: active
+  title: Goose MacWebContentsOcclusion fix documented
+  summary: "Goose (Electron) disables rendering when window is occluded \u2192 UI\
+    \ renderer uses ~25% CPU \u2192 steals 2-3 M1 Max cores from OMLX during long\
+    \ runs. Fix: keep window visible, or defaults write com.block.goose NSWindowOcclusionDetectionEnabled\
+    \ -bool false. Added to HANDOFF_D2254.md\xA70 pre-flight."
+  impact: ~20% CPU reclaimed for OMLX during T1.1 full run.
+  files:
+  - governance/HANDOFF_D2254.md
+- id: D2264
+  date: '2026-08-11'
+  title: 'S5 Deep Check: Gemma-4-E4B to Phi-4-mini swap (D2264)'
+  category: validation
+  status: active
+  files: config/pipeline_config.yaml, pipeline/stage5_verify.py, config/model_assignments.yaml
+- id: D2265
+  date: '2026-08-11'
+  title: 'Batch Classification for S4 — GPT-OSS reasoning amortization (D2265)'
+  category: pipeline-fix
+  status: active
+  files: pipeline/stage4_merged_call.py, config/pipeline_config.yaml
+- id: D2266
+  date: '2026-08-11'
+  title: 'Process Guard: PID File Locking prevents multi-diagnostic (D2266)'
+  category: BUGFIX
+  status: active
+  files: pipeline/run_diagnostic.py
+- id: D2267
+  date: '2026-08-11'
+  title: 'Laptop Sleep Prevention via caffeinate (D2267)'
+  category: BUGFIX
+  status: active
+  files: pipeline/run_diagnostic.py
+- id: D2268
+  date: '2026-08-11'
+  title: 'BUG-053 Mitigation: S5 Source Text Guard (D2268)'
+  category: BUGFIX
+  status: active
+  files: pipeline/stage5_verify.py, governance/buglog.md
 summary:
-  total: 237
+  total: 250
   proposed: 0
   draft: 0
-  active: 193
+  active: 206
   stale: 0
   superseded: 8
   archived: 8
@@ -1880,16 +2016,16 @@ summary:
   by_category:
     INF: 140
     QLT: 21
-    GOV: 12
+    GOV: 14
     RES: 4
-    DAT: 4
+    DAT: 6
     DEF: 1
-    VAL: 2
+    VAL: 3
     CLS: 10
     STR: 1
-    PERF: 4
-    BUGFIX: 13
-    CFG: 4
+    PERF: 5
+    BUGFIX: 17
+    CFG: 5
     ARCH: 9
-    pipeline-fix: 1
+    pipeline-fix: 2
     governance: 1

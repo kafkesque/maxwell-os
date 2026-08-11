@@ -1,15 +1,55 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-10 23:58 | **Decisions:** D2000-D2254 (237 decisions)
+> **Updated:** 2026-08-11 12:00 | **Decisions:** D2000-D2262 (245 decisions)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Latest session:** D2250-D2254 (BUG-075 FIXED, GPT-OSS live, T-007b hybrid, golden audit, cost model, handoff)
-> **Detailed tasks:** `governance/aggregated_remaining_tasks.md` (T1.1 full run ~26h, T-007b-v2, T1.2-T1.9, T-015)
-> **Handoff:** `governance/HANDOFF_D2254.md` (next session starts here)
-> **Buglog:** `governance/buglog.md` (BUG-074 RESOLVED, BUG-075 FIXED 87.5%, BUG-053 retired for S4)
+> **Latest session:** D2255-D2262 — COMPREHENSIVE AUDIT + 8 P0 FIXES APPLIED (DeBERTa FEVER live, golden meta corrected, docstrings fixed, GOLDEN-REVIEW archived, HANDOFF registry corrected)
+> **Detailed tasks:** `governance/aggregated_remaining_tasks.md`
+> **Handoff:** `governance/HANDOFF_D2254.md` (updated with corrected model registry)
+> **Buglog:** `governance/buglog.md` (BUG-076 FIXED, BUG-077/078/079 FIXED)
+> **Audit:** `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` (8-part audit: models, golden, config drift, verification gaps, dependency risks)
+> **P0 E2E Gate:** D2261 — 50-100 book diagnostic RUN BEFORE T1.1 full run
 > **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 **0.672** > Traditional **0.591** (hybrid = DSPy gate + Trad extract)
 > **S4 Depth (D2249/D2250):** GPT-OSS-20B focused prompt **87.5%** (cross-domain 3/3, was 0/3) — live in S4
+> **S5 NLI (D2255):** DeBERTa FEVER now primary (was ModernBERT — non-functional). FEVER-trained, 5.8× more discriminative.
 > **Full-run cost (D2253):** ~21-26h wall-clock (NOT 100h — tiered + 3 workers + merged S4)
-> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS) | **T1.1 full run = NEXT ACTION**
-> **Tier 0 fixes:** Fix 0.1-0.4 still pending (see aggregated_remaining_tasks.md T1.x)
+> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS) | S5 ✅ (DeBERTa FEVER + Gemma-4-E4B) | **E2E diagnostic = NEXT ACTION**
+> **Tier 0 fixes:** Fix 0.1-0.4 still pending (see aggregated_remaining_tasks.md)
+
+---
+
+## ✅ COMPLETED — D2255-D2262 P0 AUDIT FIXES (2026-08-11)
+
+> **Source:** `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` — cross-examination of 11 LLM responses across 2 rounds
+> **Method:** Every claim verified against actual config files, source code, and golden YAML
+> **Surgical precision:** 8 P0 fixes applied in <1h cumulative
+
+| # | Task | Decision | Status |
+|---|------|----------|--------|
+| **P0.1** | Swap S5 NLI to DeBERTa FEVER | D2255 | ✅ FIXED — `config/pipeline_config.yaml` L172-173 swapped |
+| **P0.3** | Archive GOLDEN-REVIEW.md v2.0 | D2259 | ✅ DONE — moved to `archive/` |
+| **P0.4** | Fix golden YAML meta count (36→55) | D2257 | ✅ FIXED — `convergent_positives: 55` |
+| **P0.5** | Fix stage5_verify.py docstring | D2256 | ✅ FIXED — triple-stale references removed |
+| **P0.6** | Remove stale classify_model from config | D2258 | ✅ FIXED — v2.3 artifact annotated |
+| **P0.7** | Goose MacWebContentsOcclusion | D2262 | ✅ DOCUMENTED — HANDOFF §0 pre-flight |
+| **P0.8** | Fix HANDOFF model registry | D2260 | ✅ FIXED — corrected model names + roles |
+
+### BUGS RESOLVED
+
+| Bug | Description | Status |
+|-----|-------------|--------|
+| BUG-076 | S5 NLI config overrides D2216 DeBERTa FEVER (dead code) | ✅ FIXED (D2255) |
+| BUG-077 | stage5_verify.py docstring triple-stale | ✅ FIXED (D2256) |
+| BUG-078 | Stale classify_model in v2.3 checkpoint | ✅ FIXED (D2258) |
+| BUG-079 | HANDOFF claims Phi-4-mini for S5 verify/gates | ✅ FIXED (D2260) |
+
+### Models Now Active (verified against config)
+
+| Role | Model | Family |
+|------|-------|--------|
+| S2 Generator | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | Qwen/Alibaba |
+| S4 Classifier | gpt-oss-20b-MXFP4-Q8 | OpenAI |
+| S5 NLI | DeBERTa-v3-base-mnli-fever-anli | Microsoft/FAIR |
+| S5 Verifier | gemma-4-E4B-it-MLX-4bit | Google/Gemma |
+| Embeddings | bge-m3 (Ollama) | BAAI |
 
 ---
 
@@ -203,6 +243,15 @@ python3 pipeline/stage2_extract.py --only-convergent  # ~19h async
 | BUG-045 | 🟡 MED | Stage 2 evidence passages inflated | 🟡 OPEN — Deferred |
 | BUG-046 | 🟡 MED | Stage 4 merge complexity for v3.0 | 🟡 OPEN |
 | BUG-050 | 🟡 MED | Only 3 of 20 books chunked — insufficient convergence | 🟡 OPEN |
+
+### ✅ RESOLVED THIS SESSION (2026-08-11)
+
+| Bug ID | Description | Resolution |
+|--------|-------------|------------|
+| BUG-076 | S5 NLI config overrides D2216 DeBERTa FEVER | ✅ FIXED (D2255) |
+| BUG-077 | stage5_verify.py docstring triple-stale | ✅ FIXED (D2256) |
+| BUG-078 | Stale classify_model in v2.3 checkpoint | ✅ FIXED (D2258) |
+| BUG-079 | HANDOFF claims Phi-4-mini for S5 verify/gates | ✅ FIXED (D2260) |
 
 ---
 

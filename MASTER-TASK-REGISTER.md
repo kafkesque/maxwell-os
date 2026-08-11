@@ -1,17 +1,20 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-11 12:00 | **Decisions:** D2000-D2262 (245 decisions)
+> **Updated:** 2026-08-11 23:15 | **Decisions:** D2000-D2268 (250 decisions, 206 active)
 > **Active roadmap:** D2205 — RAG Architecture Roadmap (4-model cross-examination synthesis)
-> **Latest session:** D2255-D2262 — COMPREHENSIVE AUDIT + 8 P0 FIXES APPLIED (DeBERTa FEVER live, golden meta corrected, docstrings fixed, GOLDEN-REVIEW archived, HANDOFF registry corrected)
+> **Latest session:** D2265-D2268 — BATCH S4, PROCESS GUARD, SLEEP PREVENTION, BUG-053 MITIGATED
 > **Detailed tasks:** `governance/aggregated_remaining_tasks.md`
 > **Handoff:** `governance/HANDOFF_D2254.md` (updated with corrected model registry)
-> **Buglog:** `governance/buglog.md` (BUG-076 FIXED, BUG-077/078/079 FIXED)
+> **Buglog:** `governance/buglog.md` (BUG-053 🟡 MITIGATED, BUG-076/077/078/079/080 FIXED)
+> **Roundtable prompt:** `governance/ROUNDTABLE_MASTER_PROMPT_v3.0.md` (4-reviewer evaluation protocol)
 > **Audit:** `governance/COMPREHENSIVE_AUDIT_2026-08-11.md` (8-part audit: models, golden, config drift, verification gaps, dependency risks)
-> **P0 E2E Gate:** D2261 — 50-100 book diagnostic RUN BEFORE T1.1 full run
+> **P0 E2E Gate:** D2261 — 200-cluster diagnostic (~3.7h) run BEFORE T1.1 full run
 > **S2 Comparison (D2251):** **Hybrid 0.736** > DSPy-MIPROv2 **0.672** > Traditional **0.591** (hybrid = DSPy gate + Trad extract)
-> **S4 Depth (D2249/D2250):** GPT-OSS-20B focused prompt **87.5%** (cross-domain 3/3, was 0/3) — live in S4
-> **S5 NLI (D2255):** DeBERTa FEVER now primary (was ModernBERT — non-functional). FEVER-trained, 5.8× more discriminative.
+> **S4 Depth (D2249/D2250):** GPT-OSS-20B focused prompt **87.5%** (cross-domain 3/3, was 0/3)
+> **S4 Batch (D2265):** Batch classification amortizes GPT-OSS reasoning (~10s/FB vs ~26s/FB)
+> **S5 Verifier (D2264):** Phi-4-mini (67% acc) swapped in for Gemma-4-E4B (33% acc)
+> **S5 NLI (D2255):** DeBERTa FEVER primary. FEVER-trained, 5.8× more discriminative.
 > **Full-run cost (D2253):** ~21-26h wall-clock (NOT 100h — tiered + 3 workers + merged S4)
-> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS) | S5 ✅ (DeBERTa FEVER + Gemma-4-E4B) | **E2E diagnostic = NEXT ACTION**
+> **Pipeline:** S0 ✅ | S1 ✅ | S1.5 ✅ (12,964 clusters) | S2 ✅ (hybrid arch) | S4 ✅ (GPT-OSS, batch) | S5 ✅ (DeBERTa FEVER + Phi-4-mini) | **E2E diagnostic = NEXT ACTION**
 > **Tier 0 fixes:** Fix 0.1-0.4 still pending (see aggregated_remaining_tasks.md)
 
 ---
@@ -32,11 +35,27 @@
 | **P0.7** | Goose MacWebContentsOcclusion | D2262 | ✅ DOCUMENTED — HANDOFF §0 pre-flight |
 | **P0.8** | Fix HANDOFF model registry | D2260 | ✅ FIXED — corrected model names + roles |
 
+---
+
+## ✅ COMPLETED — D2265-D2268 BOTTLENECK + GUARD FIXES (2026-08-11)
+
+| # | Task | Decision | Status |
+|---|------|----------|--------|
+| **P1.1** | Batch classification for S4 | D2265 | ✅ DONE — `batch_cribs_classify()` in `stage4_merged_call.py`. Config: `batch_enabled: true`, `batch_size: 4`. ~60% throughput improvement. |
+| **P1.2** | Process guard (PID file) | D2266 | ✅ DONE — `.diagnostic_pid` lock prevents multi-diagnostic. Kills stale processes. SIGINT/SIGTERM cleanup. |
+| **P1.3** | Laptop sleep prevention | D2267 | ✅ DONE — `caffeinate -i -d -s` integration. Auto-cleanup on exit. |
+| **P1.4** | BUG-053 mitigation | D2268 | ✅ DONE — S5 `check_factual_llm()` strict source text guard. Auto-QUARANTINE if <50 chars. |
+| **P1.5** | Disk + memory pre-flight checks | — | ✅ DONE — `run_diagnostic.py` checks ≥5GB disk + ≥8GB RAM before starting. |
+| **P1.6** | Roundtable eval prompt v3.0 | — | ✅ DONE — `governance/ROUNDTABLE_MASTER_PROMPT_v3.0.md` (4-reviewer protocol, golden selection, DSPy candidates). |
+| **P1.7** | Stale Gemma references purged | — | ✅ DONE — All `run_diagnostic.py` references updated from Gemma-4-E4B → Phi-4-mini (D2264). |
+| **P1.8** | S5 model pre-warming | — | ✅ DONE — Phi-4-mini pre-warmed before S5 to avoid cold-load timeout. |
+
 ### BUGS RESOLVED
 
 | Bug | Description | Status |
 |-----|-------------|--------|
-| BUG-076 | S5 NLI config overrides D2216 DeBERTa FEVER (dead code) | ✅ FIXED (D2255) |
+| BUG-053 | Phi-4-mini hallucinates on open-ended research | 🟡 MITIGATED (D2268) |
+| BUG-076 | S5 NLI config overrides DeBERTa FEVER (dead code) | ✅ FIXED (D2255) |
 | BUG-077 | stage5_verify.py docstring triple-stale | ✅ FIXED (D2256) |
 | BUG-078 | Stale classify_model in v2.3 checkpoint | ✅ FIXED (D2258) |
 | BUG-079 | HANDOFF claims Phi-4-mini for S5 verify/gates | ✅ FIXED (D2260) |

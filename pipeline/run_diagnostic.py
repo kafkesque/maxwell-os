@@ -86,6 +86,10 @@ from pipeline.pipeline_paths import (
 _DEFAULT_RUN_ID = _PIPELINE_CFG.get("run", {}).get("default_id", "latest")
 _DIAG_STATE_FILE = PROJECT_ROOT / "governance" / "diagnostic_state.json"
 
+def _get_diag_state_path() -> Path:
+    """Get run-specific diagnostic state file path."""
+    return PROJECT_ROOT / "governance" / f"diagnostic_state_{RUN_ID}.json"
+
 # ── Process Guard (D2266): PID file locking prevents multiple diagnostics ──
 _PID_FILE = PROJECT_ROOT / ".diagnostic_pid"
 _CAFFEINATE_PID_FILE = PROJECT_ROOT / ".caffeinate_pid"
@@ -200,35 +204,47 @@ def _stop_caffeinate() -> None:
 def _register_signal_handlers() -> None:
     """Register cleanup handlers for SIGINT (Ctrl+C) and SIGTERM.
 
-    Ensures PID file and caffeinate are cleaned up on interrupt,
-    preventing stale locks that block future diagnostic runs.
+    On Ctrl+C: saves diagnostic state as 'paused', cleans up PID/caffeinate.
+    On restart with same --run-id: resumes from last completed stage.
     """
     import signal as _sig
     def _cleanup_handler(signum, frame):
-        print(f"\n⚠️ Received signal {signum} — cleaning up...")
+        print(f"\n{'='*60}")
+        print(f"⏸️  PAUSED — received signal {signum}")
+        # Save pause state for resume awareness
+        _ds = _load_diag_state()
+        _ds["paused"] = True
+        _ds["paused_at"] = datetime.now().isoformat()
+        _save_diag_state(_ds)
+        print(f"   State saved to governance/diagnostic_state.json")
+        print(f"   Resume with: python3 pipeline/run_diagnostic.py --run-id {RUN_ID} --only-convergent --max-clusters {args.max_clusters or 'N'} --no-probe")
+        print(f"   Already completed stages will be skipped automatically.")
+        print(f"{'='*60}")
         _stop_caffeinate()
         _release_process_lock()
-        sys.exit(1)
+        sys.exit(0)
     _sig.signal(_sig.SIGINT, _cleanup_handler)
     _sig.signal(_sig.SIGTERM, _cleanup_handler)
 
 def _load_diag_state() -> dict:
-    """Load diagnostic checkpoint state. Returns empty dict if no state exists."""
+    """Load diagnostic checkpoint state for current run_id. Returns empty dict if no state exists."""
     import json as _json
-    if _DIAG_STATE_FILE.exists():
-        with open(_DIAG_STATE_FILE) as f:
+    _path = _get_diag_state_path()
+    if _path.exists():
+        with open(_path) as f:
             return _json.load(f)
     return {}
 
 def _save_diag_state(state: dict) -> None:
-    """Atomically save diagnostic checkpoint state (C6: crash-safe write)."""
+    """Atomically save diagnostic checkpoint state for current run_id (C6: crash-safe write)."""
     import json as _json, os as _os2
-    tmp = str(_DIAG_STATE_FILE) + ".tmp"
+    _path = _get_diag_state_path()
+    tmp = str(_path) + ".tmp"
     with open(tmp, "w") as f:
         _json.dump(state, f, indent=2, default=str)
     f.flush()
     _os2.fsync(f.fileno())
-    _os2.replace(tmp, _DIAG_STATE_FILE)
+    _os2.replace(tmp, str(_path))
 
 # Resolve the REAL S1.5 and S1 checkpoint paths using the default run_id
 _REAL_S15_CHECKPOINT = S15_DIR / _DEFAULT_RUN_ID / "checkpoint.jsonl"
@@ -400,6 +416,11 @@ def run_diagnostic() -> dict:
                             s2_fbs.append(json.loads(line))
             results["s2_fb_count"] = len(s2_fbs)
             print(f"✅ S2 complete: {len(s2_fbs)} FBs in {s2_elapsed:.1f}s")
+            # Persist state for crash recovery
+            _ds = _load_diag_state()
+            _ds["s2_completed"] = True
+            _ds["s2_fb_count"] = len(s2_fbs)
+            _save_diag_state(_ds)
             # D2263: merged call uses GPT-OSS only — unload Qwen3-Coder
             _unload_omlx_model("Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
         except Exception as e:
@@ -408,11 +429,16 @@ def run_diagnostic() -> dict:
             return results
 
     # ═══ S4: Merge + Classify + Depth ════════════════════════════════════
-    if _s4_ckpt.exists() and results.get("s4_fb_count", 0) > 0:
-        print(f"\n{'='*60}\n🧩 STAGE 4: RESUMED — checkpoint exists\n{'='*60}")
+    if _s4_ckpt.exists():
         s4_fbs = [json.loads(l) for l in open(_s4_ckpt) if l.strip()]
+        print(f"\n{'='*60}\n🧩 STAGE 4: RESUMED — {len(s4_fbs)} FBs from checkpoint\n{'='*60}")
         results["s4_fb_count"] = len(s4_fbs)
         results["s4_elapsed_s"] = 0
+        # Persist resume state for cross-process crash recovery
+        _diag_state = _load_diag_state()
+        _diag_state["s4_completed"] = True
+        _diag_state["s4_fb_count"] = len(s4_fbs)
+        _save_diag_state(_diag_state)
     else:
         print(f"\n{'='*60}\n🧩 STAGE 4: Merge + Classify + Depth\n{'='*60}")
         t0 = time.time()
@@ -447,6 +473,11 @@ def run_diagnostic() -> dict:
                             s4_fbs.append(json.loads(line))
             results["s4_fb_count"] = len(s4_fbs)
             print(f"✅ S4 complete: {len(s4_fbs)} FBs in {s4_elapsed:.1f}s")
+            # Persist state for crash recovery
+            _ds = _load_diag_state()
+            _ds["s4_completed"] = True
+            _ds["s4_fb_count"] = len(s4_fbs)
+            _save_diag_state(_ds)
             # Unload GPT-OSS — S5 uses Phi-4-mini (D2264), free S4 model memory
             _unload_omlx_model("gpt-oss-20b-MXFP4-Q8")
         except Exception as e:
@@ -455,7 +486,7 @@ def run_diagnostic() -> dict:
             return results
 
     # ═══ S5: Verify ══════════════════════════════════════════════════════
-    if _s5_ckpt.exists() and results.get("s5_fb_count", 0) > 0:
+    if _s5_ckpt.exists():
         s5_fbs = [json.loads(l) for l in open(_s5_ckpt) if l.strip()]
         s5_pass = sum(1 for fb in s5_fbs if fb.get("verification_status") == "PASS")
         s5_quarantine = sum(1 for fb in s5_fbs if fb.get("verification_status") == "QUARANTINE")
@@ -464,7 +495,12 @@ def run_diagnostic() -> dict:
                         "s5_quarantine": s5_quarantine, "s5_fail": s5_fail,
                         "s5_pass_rate": round(s5_pass / max(len(s5_fbs), 1), 3),
                         "s5_elapsed_s": 0})
-        print(f"\n{'='*60}\n🔍 STAGE 5: RESUMED — {len(s5_fbs)} FBs\n{'='*60}")
+        print(f"\n{'='*60}\n🔍 STAGE 5: RESUMED — {len(s5_fbs)} FBs (PASS={s5_pass}, Q={s5_quarantine})\n{'='*60}")
+        # Persist resume state
+        _diag_state = _load_diag_state()
+        _diag_state["s5_completed"] = True
+        _diag_state["s5_fb_count"] = len(s5_fbs)
+        _save_diag_state(_diag_state)
     else:
         print(f"\n{'='*60}\n🔍 STAGE 5: Verify (DeBERTa FEVER + Phi-4-mini + BORP)\n{'='*60}")
         # Pre-warm Phi-4-mini for S5 (D2264 verifier) — avoids cold-load timeout on first call
@@ -495,6 +531,12 @@ def run_diagnostic() -> dict:
                             "s5_quarantine": s5_quarantine, "s5_fail": s5_fail,
                             "s5_pass_rate": round(s5_pass / max(len(s5_fbs), 1), 3)})
             print(f"✅ S5 complete: {len(s5_fbs)} FBs (PASS={s5_pass}, Q={s5_quarantine}) in {s5_elapsed:.1f}s")
+            # Persist state for crash recovery
+            _ds = _load_diag_state()
+            _ds["s5_completed"] = True
+            _ds["s5_fb_count"] = len(s5_fbs)
+            _ds["s5_pass"] = s5_pass
+            _save_diag_state(_ds)
         except Exception as e:
             results["s5_error"] = str(e)
             print(f"❌ S5 FAILED: {e}")
@@ -721,6 +763,23 @@ def main() -> None:
 
     # ── D2267: Prevent laptop sleep during diagnostic ───────────────────
     _caffeinate_started = _start_caffeinate()
+
+    # ── Resume status: show what's already been done ────────────────────
+    _prev_state = _load_diag_state()
+    _resumed = False
+    if _prev_state:
+        _paused = _prev_state.get("paused", False)
+        _done = []
+        for _stg in ("s2", "s4", "s5"):
+            if _prev_state.get(f"{_stg}_completed"):
+                _done.append(f"{_stg.upper()}({_prev_state.get(f'{_stg}_fb_count', '?')} FBs)")
+        if _done:
+            _resumed = True
+            _status = "PAUSED — resuming" if _paused else "CRASHED — recovering"
+            print(f"\n🔄 {_status}: {' → '.join(_done)} already completed")
+            print(f"   Will skip completed stages and continue from last checkpoint.")
+        elif _paused:
+            print(f"\n⏸️  Previous run was paused but no stages completed. Starting fresh.")
 
     print(f"╔══════════════════════════════════════════════════════════════╗")
     print(f"║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║")

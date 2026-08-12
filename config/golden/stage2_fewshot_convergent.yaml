@@ -1,9 +1,7 @@
 meta:
-  version: '4.4'
+  version: '5.0'
   architecture: cluster-before-extract
   total_examples: 73
-  # D2257 (2026-08-11): Meta corrected — actual is_convergent=True count is 55, not 36.
-  # The stale 36 count was likely from a pre-expansion version (v3.x).
   convergent_positives: 55
   hard_negatives: 21
   expected_coverage:
@@ -39,9 +37,18 @@ meta:
   - empirical_pattern_diversity
   - genuine_specialized_positive
   calibrated_date: '2026-08-10'
-  notes: 'D2234 completion: 3 descriptive_model examples added (DM 9→12)'
-  updated: '2026-08-10'
+  notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 73 examples total.'
+  updated: '2026-08-12'
   example_count: 73
+  tier_definitions:
+    description: 'D2286: Golden tiered classification for DSPy training safety'
+    GOLD-A: Human-adjudicated, multi-source convergent, clear mechanism/boundary/consequence. Train DSPy.
+    GOLD-B: Strong positives with minor ambiguity. Evaluate DSPy. Never train.
+    CHALLENGE: Hard negatives, edge cases, adversarial. Test DSPy robustness. NEVER train.
+  tier_counts:
+    GOLD-A: 49
+    CHALLENGE: 21
+    GOLD-B: 3
 examples:
 - id: CONV-001
   domain: pricing
@@ -151,6 +158,7 @@ examples:
 
     '
   discipline: behavioral economics
+  tier: GOLD-A
 - id: CONV-002
   domain: behavioral_change
   source_books:
@@ -256,6 +264,7 @@ examples:
 
     '
   discipline: psychology
+  tier: GOLD-A
 - id: CONV-003
   domain: advertising
   source_books:
@@ -364,6 +373,7 @@ examples:
 
     '
   discipline: communication science
+  tier: GOLD-A
 - id: CONV-004
   domain: persuasion
   source_books:
@@ -455,6 +465,7 @@ examples:
 
     '
   discipline: social psychology
+  tier: GOLD-A
 - id: CONV-005
   domain: marketing
   source_books:
@@ -546,6 +557,7 @@ examples:
 
     '
   discipline: marketing
+  tier: GOLD-A
 - id: NEG-CONV-001
   domain: pricing
   source_books:
@@ -585,6 +597,7 @@ examples:
     convergent synthesis.
 
     '
+  tier: CHALLENGE
 - id: NEG-CONV-002
   domain: business
   source_books:
@@ -646,6 +659,7 @@ examples:
     material contains it elsewhere.
 
     '
+  tier: CHALLENGE
 - id: NEG-CONV-003
   domain: management
   source_books:
@@ -685,6 +699,7 @@ examples:
     = NULL. This is more challenging than single-source rejection (NEG-CONV-001) or platitude detection (NEG-CONV-002) because
     both sources are legitimate and well-argued — they just describe different mechanisms at different levels, making this
     the most common real-world false-convergence pattern.'
+  tier: CHALLENGE
 - id: CONV-006
   domain: economics
   source_books:
@@ -757,6 +772,7 @@ examples:
     removal. This example teaches the classic convergence pattern: empirical evidence from different domains (organ donation,
     retirement savings, benefit enrollment) supporting the same causal mechanism (effort avoidance + loss aversion).'
   discipline: behavioral economics
+  tier: GOLD-A
 - id: CONV-007
   domain: economics
   source_books:
@@ -877,6 +893,7 @@ examples:
     condition. This expands golden set domain coverage from psychology/marketing into economics and game theory, demonstrating
     convergent extraction on academic/theoretical source material.'
   discipline: economics
+  tier: GOLD-A
 - id: CONV-011
   domain: graphic design
   discipline: visual perception
@@ -967,6 +984,7 @@ examples:
     \ properties.\n Gestalt principle of proximity is an observed regularity in human visual perception — elements placed\
     \ closer together ARE perceived as related, pre-attentively and involuntarily. This is an EMPIRICAL PATTERN describing\
     \ how perception operates, not a causal mechanism explaining why."
+  tier: GOLD-A
 - id: CONV-012
   domain: ai & agents
   discipline: machine learning
@@ -1052,6 +1070,7 @@ examples:
   rationale: 'Three AI references (Bostrom, Russell, and Kissinger/Schmidt/Huttenlocher) converge on objective uncertainty
     as the foundational alignment principle. Demonstrates AI & Computing group, contradicts_fbs, prerequisite_fbs, procedural_skill.
     (T-009-followup: swapped Christian→Age of AI to cap author concentration at 3.)'
+  tier: GOLD-A
 - id: CONV-013
   domain: user experience
   discipline: human-computer interaction
@@ -1139,6 +1158,7 @@ examples:
     \ Digital & Interactive group, depth, evidence,\nprocedural_skill, failure_mode.\n Progressive disclosure is a prescriptive\
     \ design rule: 'Show only the controls relevant to the current task.' It says DO this to reduce cognitive load — it is\
     \ a practical heuristic for interface design, not a causal mechanism."
+  tier: GOLD-A
 - id: CONV-014
   domain: systems & frameworks
   discipline: systems thinking
@@ -1226,6 +1246,7 @@ examples:
     leverage. The mechanism presupposes systems framing (feedback loops, information flows, goals, rules) — a systems-thinking
     lens, not a universal law. A poet manipulating language is not operating on the same feedback-loop mechanics. Fails the
     physicist-chef-poet test.'
+  tier: GOLD-A
 - id: CONV-015
   domain: computational art
   discipline: generative design
@@ -1323,6 +1344,7 @@ examples:
     \ contradicts_fbs, depth, procedural_skill.\n Emergent complexity from simple rules is an observed regularity across computational\
     \ and biological systems — flocking, cellular automata, fractals. The FB describes the PATTERN (simple rules → complex\
     \ output) without claiming a universal causal law. An EMPIRICAL PATTERN."
+  tier: GOLD-A
 - id: CONV-016
   domain: illustration
   discipline: color theory
@@ -1411,6 +1433,7 @@ examples:
   rationale: "Albers, Gurney, and Itten converge on limited-palette harmony. Demonstrates\nIllustration & Craft group, application,\
     \ elaboration, procedural_skill.\n Limited palette discipline is a practical rule for artists and designers: 'Restrict\
     \ your palette to 2-5 colors.' It is a prescriptive heuristic for achieving visual harmony, not a causal mechanism."
+  tier: GOLD-A
 - id: NEG-001
   domain: finance & investment
   discipline: finance
@@ -1453,6 +1476,7 @@ examples:
     actual Ch. 8 investor-psychology text (D2206: fabricated quote replaced).
 
     '
+  tier: CHALLENGE
 - id: NEG-002
   domain: behavioral_change
   discipline: psychology
@@ -1488,6 +1512,7 @@ examples:
     content_type: principle
   rationale: 'PLATITUDE — the claim ''turn shoulds into musts'' is motivational rhetoric without a specific mechanism, boundary,
     or falsifiable consequence. Second source (Duhigg) adds no specific convergent content. REJECT: platitude detection.'
+  tier: CHALLENGE
 - id: NEG-003
   domain: marketing & communications
   discipline: marketing
@@ -1537,6 +1562,7 @@ examples:
     REJECT.
 
     '
+  tier: CHALLENGE
 - id: NEG-004
   domain: entrepreneurship
   discipline: strategic thinking
@@ -1580,6 +1606,7 @@ examples:
     sources, and this fails the independence test. REJECT: pseudo-independence.
 
     '
+  tier: CHALLENGE
 - id: CONV-017
   domain: education
   discipline: cognitive science
@@ -1674,6 +1701,7 @@ examples:
     procedural_skill, contradicts_fbs.
 
     '
+  tier: GOLD-A
 - id: CONV-018
   domain: business operations
   discipline: decision making
@@ -1768,6 +1796,7 @@ examples:
     Demonstrates procedural_skill, failure_mode, contradicts_fbs. Expands Business group.
 
     '
+  tier: GOLD-A
 - id: CONV-019
   domain: health & wellness
   discipline: behavioral economics
@@ -1862,6 +1891,7 @@ examples:
     procedural_skill.
 
     '
+  tier: GOLD-A
 - id: CONV-020
   is_convergent: true
   should_extract: true
@@ -1921,6 +1951,7 @@ examples:
     & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss
     aversion + reference-point shift) is shared across all three works, the evidence is independently sourced, and the boundary
     conditions are well-defined.
+  tier: GOLD-A
 - id: CONV-021
   domain: systems & frameworks
   discipline: systems thinking
@@ -2020,6 +2051,7 @@ examples:
     test. Incentive-driven unintended consequences (Goodhart''s law, Campbell''s law, Cobra effect) is an observed empirical
     regularity across policy, management, and economics. When you change the payoff structure, agents re-optimize in ways
     that defeat the intent. This is a PATTERN, not a mechanism — it describes WHAT happens reliably, not WHY it must happen.'
+  tier: GOLD-A
 - id: NEG-005
   domain: systems & frameworks
   discipline: systems thinking
@@ -2073,6 +2105,7 @@ examples:
     causal mechanism. Same vocabulary, disjoint claims.
 
     '
+  tier: CHALLENGE
 - id: NEG-006
   domain: education
   discipline: learning science
@@ -2129,6 +2162,7 @@ examples:
     well-scoped claim: spaced retrieval improves declarative memory for facts, concepts, and lists. The FB explicitly bounds
     to declarative knowledge, teaching S2 to extract WITH boundary rather than reject a legitimate convergence because a candidate
     over-generalized.'
+  tier: GOLD-A
 - id: CONV-022
   domain: computer graphics
   discipline: computational geometry
@@ -2199,6 +2233,7 @@ examples:
     software. Application is null because this is a descriptive technical mechanism rather than a prescriptive technique.
     This teaches S2 that valid principles can be domain-bound AND descriptive (null application). (D2226: rationale previously
     claimed "specialized" — corrected to match depth=domain field.)'
+  tier: GOLD-A
 - id: NEG-007
   domain: knowledge management
   discipline: information science
@@ -2238,6 +2273,7 @@ examples:
     a testable causal chain. This is the textbook definition of a citation echo: multiple high-volume sources repeating the
     same vacuous truism with different phrasing. The S5 mechanism pre-filter (D2220) would catch any extraction whose mechanism
     is a restatement of "communication is important because it enables better outcomes."'
+  tier: CHALLENGE
 - id: NEG-008
   domain: semiotics
   discipline: philosophy of language
@@ -2279,6 +2315,7 @@ examples:
     systems respond, not merely WHAT they are. A pure taxonomy that only classifies identity without behavioral patterns is
     NOT a valid FB. The distinction: descriptive_model answers ''how does this system BEHAVE?'' while pure taxonomy answers
     ''what TYPE is this?'''
+  tier: CHALLENGE
 - id: NEG-009
   domain: product management
   discipline: organizational behavior
@@ -2334,6 +2371,7 @@ examples:
     correctly labeled domain (product management/org design). The original NULL rejection confused S4 depth classification
     with S2 extraction validity. The correct behavior: extract the FB with domain depth; let S4 classify. Teaches S2 to extract
     valid domain FBs rather than reject for classification errors.'
+  tier: GOLD-A
 - id: NEG-010
   domain: brand strategy
   discipline: marketing
@@ -2374,6 +2412,7 @@ examples:
     = good results." This is exactly what S2 must learn to REJECT. Contrast with Morgan/Neumeier/Hanlon (the original segments,
     which contained genuine brand-specific mechanisms and were TOXIC as negatives). This replacement teaches the correct rejection
     signal.
+  tier: CHALLENGE
 - id: CONV-023
   domain: physics
   discipline: thermodynamics
@@ -2426,6 +2465,7 @@ examples:
   rationale: CONVERGENT POSITIVE — HARD SCIENCE (D2223). Three physics sources converge on entropy as the universal arrow
     of time. Depth is genuinely universal — applies to ALL macroscopic systems regardless of domain. Fills the critical hard-science
     gap in the golden set. Application is null because this is a physical law, not a prescriptive technique.
+  tier: GOLD-A
 - id: CONV-024
   domain: biology
   discipline: evolutionary biology
@@ -2483,6 +2523,7 @@ examples:
   rationale: CONVERGENT POSITIVE — HARD SCIENCE, CROSS-DOMAIN (D2223). Three evolutionary biology sources converge on the
     variation+heritability+selection mechanism. Depth is cross-domain — the identical logic applies to genetic algorithms,
     cultural evolution, and market dynamics. Fills hard-science gap. Application is null (descriptive law).
+  tier: GOLD-A
 - id: CONV-025
   domain: medicine
   discipline: pharmacology
@@ -2542,6 +2583,7 @@ examples:
   rationale: CONVERGENT POSITIVE — MEDICINE + EVOLUTION (D2223). Three medical sources converge on the treatment-as-selection-pressure
     mechanism. Depth is cross-domain — bridges pharmacology and evolutionary biology through identical selection dynamics.
     Fills medicine gap. Has application (combination therapy protocol).
+  tier: GOLD-A
 - id: CONV-026
   domain: legal reasoning
   discipline: constitutional law
@@ -2607,6 +2649,7 @@ examples:
     provide the mechanism (heuristic substitution under time pressure), Bingham provides the legal-domain evidence (judicial
     cognitive biases), Thaler/Sunstein provide the generalization (all high-stakes decision-makers are susceptible). Depth
     is cross-domain (law, medicine, regulation). Has actionable application (checklists, structured protocols).
+  tier: GOLD-A
 - id: CONV-027
   domain: engineering
   discipline: computer science
@@ -2665,6 +2708,7 @@ examples:
     communication overhead as the scaling limiter. Depth is cross-domain — applies to any interdependent creative work. Fills
     software engineering gap that Kimi recommended. Brooks' Law is the classic formulation; Conway's Law and Martin's deferral
     principle extend it.
+  tier: GOLD-A
 - id: CONV-028
   domain: data science
   discipline: statistics
@@ -2727,6 +2771,7 @@ examples:
     confounding classifies three types of non-causal correlation: reverse causation, common cause, and spurious correlation.
     This is a DESCRIPTIVE MODEL — a classification system for logical fallacies in causal inference, not a causal mechanism
     itself.'
+  tier: GOLD-A
 - id: CONV-029
   domain: decision making
   discipline: cognitive psychology
@@ -2790,6 +2835,7 @@ examples:
     calibration principle. Extraction type is normative_heuristic — this is a process rule ("do exploration then exploitation")
     rather than a natural causal law. First example with non-causal extraction type, teaching the S2 model that heuristics
     are valid principles. Depth is cross-domain (hiring, shopping, business strategy, scientific research).
+  tier: GOLD-A
 - id: CONV-030
   domain: network science
   discipline: mathematics
@@ -2849,6 +2895,7 @@ examples:
     mechanism. Extraction type is empirical_pattern — the power-law distribution is an observed regularity, not a prescriptive
     rule. First empirical_pattern example. Depth is cross-domain (social, biological, technological networks). Fills mathematics/network
     science gap.
+  tier: GOLD-A
 - id: NEG-011
   domain: engineering
   discipline: computer science
@@ -2884,6 +2931,7 @@ examples:
     a resource allocation boundary, not a mechanism that produces outcomes. The segments share a pattern (system design involves
     tradeoffs) but the specific causal mechanisms are different and not convergent. S2 must learn to reject tradeoff descriptions
     that lack a unified causal mechanism.
+  tier: CHALLENGE
 - id: NEG-012
   domain: design history
   discipline: design history
@@ -2924,6 +2972,7 @@ examples:
     evolved over time, but none specify a causal mechanism that predicts future evolution. "Typography evolved from X to Y"
     is a historical narrative, not a principle. Historical observations answer "what happened?" while principles answer "what
     will happen IF...?" S2 must learn to reject convergent historical descriptions that lack predictive causal mechanisms.
+  tier: CHALLENGE
 - id: NEG-013
   domain: social science
   discipline: sociology
@@ -2962,6 +3011,7 @@ examples:
     The segments converge on the PATTERN (correlation with confounded/absent cause) but do NOT converge on a single causal
     mechanism — each has a different explanation (hidden confound vs. random overfitting). S2 must learn to detect when sources
     agree on correlation but disagree on (or lack) causal mechanism.
+  tier: CHALLENGE
 - id: NEG-014
   domain: education
   discipline: cognitive psychology
@@ -2997,6 +3047,7 @@ examples:
     would merge them into "spaced retrieval works through retrieval + sleep" — which is factually different from either source''s
     claim. S2 must learn to detect mechanism-level disagreement even when outcome-level agreement exists. This is the hardest
     false-convergence pattern.'
+  tier: CHALLENGE
 - id: NEG-015
   domain: business
   discipline: management
@@ -3037,6 +3088,7 @@ examples:
     Dalio says "know your strengths." These are the same general advice repeated with different phrasing. No source specifies
     HOW strength-focus produces better outcomes through a testable intermediate variable. S2 must distinguish between convergent
     causal principles and convergent domain platitudes.
+  tier: CHALLENGE
 - id: NEG-016
   domain: economics
   discipline: macroeconomics
@@ -3070,6 +3122,7 @@ examples:
     phenomena (inequality vs. growth) through DIFFERENT causal structures. The shared domain (economics) creates the illusion
     of convergence. S2 must learn that "both segments are about economics" is NOT convergence — the mechanisms must be about
     the SAME causal relationship.
+  tier: CHALLENGE
 - id: NEG-017
   domain: psychology
   discipline: positive psychology
@@ -3104,6 +3157,7 @@ examples:
     — but they are DISTINCT causal mechanisms. Grit is a trait; mindset is a belief. A naive extractor might merge them into
     "effort and persistence drive success" — which loses both mechanisms' specificity. S2 must learn to detect when sources
     describe complementary but non-convergent concepts.
+  tier: CHALLENGE
 - id: NEG-018
   domain: self-help
   discipline: psychology
@@ -3138,6 +3192,7 @@ examples:
     — there is no condition under which it could be disproven. No boundary conditions are specified. This is not a causal
     principle; it is a metaphysical belief. S2 must learn to reject convergent claims that lack falsifiable causal mechanisms,
     even when multiple sources agree.
+  tier: CHALLENGE
 - id: NEG-019
   domain: technology
   discipline: computer science
@@ -3172,6 +3227,7 @@ examples:
     tested or falsified. "AI will transform society" is a forecast; "feedback loops cause system instability" is a principle.
     S2 must learn to distinguish between convergent predictions (speculative) and convergent mechanisms (principle-based).
     This negative pairs with CONV-012 (AI Alignment) which describes a genuine causal mechanism.
+  tier: CHALLENGE
 - id: NEG-020
   domain: philosophy
   discipline: epistemology
@@ -3217,6 +3273,7 @@ examples:
     each describes a different concept (decline of violence ≠ measurable progress ≠ denial of human nature). S2 must learn
     to detect same-author citation echoes and reject clusters where source independence fails, even when the writing is intellectually
     rich.
+  tier: CHALLENGE
 - id: CONV-031
   domain: technology adoption
   discipline: innovation studies
@@ -3268,6 +3325,7 @@ examples:
     lifecycle model (Moore's chasm model + Rogers' diffusion attributes). This is a MODEL that DESCRIBES how adoption happens
     — it classifies adopter types and adoption stages. It does NOT propose a causal mechanism like 'technology X causes adoption
     Y because...'. Essential for teaching S2 that descriptive classification models are valid FBs with null application.
+  tier: GOLD-A
 - id: CONV-032
   domain: systems thinking
   discipline: systems science
@@ -3319,6 +3377,7 @@ examples:
     four behavioral classes both describe CLASSIFICATION SCHEMES for system behavior. They converge on the insight that systems
     can be meaningfully categorized by their response to perturbation. This is NOT a causal mechanism — it's a TAXONOMY that
     answers 'what type of system is this?' rather than 'what will happen if...?' Application is null.
+  tier: GOLD-A
 - id: CONV-033
   domain: design
   discipline: interaction design
@@ -3374,6 +3433,7 @@ examples:
     observations converge on a descriptive framework: users operate at multiple goal levels and good design must serve all
     of them. This is a descriptive MODEL (classifies user goals into a hierarchy), not a causal mechanism. Application is
     null — the framework describes but does not prescribe a specific technique.'
+  tier: GOLD-A
 - id: CONV-034
   domain: decision making
   discipline: behavioral decision theory
@@ -3431,6 +3491,7 @@ examples:
     scenarios before committing. This is a HEURISTIC (a rule of procedure) not a causal mechanism — it says ''DO this'' rather
     than ''X causes Y because...''. The premortem was developed by Klein; it was later popularized through popular behavioral
     science writing. Essential for teaching S2 to distinguish normative heuristics from causal mechanisms.'
+  tier: GOLD-A
 - id: CONV-035
   domain: behavior change
   discipline: behavioral psychology
@@ -3489,6 +3550,7 @@ examples:
     change). They do not share a causal structure — they are complementary tools. Teaches S2 to distinguish 'complementary
     mechanisms in the same domain' (one FB, is_convergent=false) from genuine convergence (independent sources implying the
     same causal structure).
+  tier: GOLD-B
 - id: CONV-036
   domain: strategy
   discipline: strategic management
@@ -3546,6 +3608,7 @@ examples:
     & Griffiths'' explore-exploit formalism and Taleb''s barbell strategy converge on the same prescriptive heuristic: bimodal
     allocation beats unimodal under uncertainty. This is a HEURISTIC (''how to act'') synthesized from multiple theoretical
     sources — it prescribes a procedure rather than describing a natural phenomenon.'
+  tier: GOLD-A
 - id: CONV-037
   domain: social networks
   discipline: evolutionary anthropology
@@ -3616,6 +3679,7 @@ examples:
     proxy) are two INDEPENDENT empirical patterns in human cognition. They share only the topic 'cognition' — no shared causal
     structure. Multi-source clusters on the same topic must NOT be merged into one FB when mechanisms differ. Teaches S2 to
     split, not merge, when sources describe different phenomena. is_convergent=false despite 2 books.
+  tier: GOLD-B
 - id: CONV-038
   domain: complex systems
   discipline: network science
@@ -3678,6 +3742,7 @@ examples:
     advantage processes. Barabási provides the mathematical mechanism (preferential attachment in scale-free networks), Christian/Griffiths
     provide the computational framing and practical implications. This is an EMPIRICAL PATTERN, not a causal mechanism — it
     describes the shape of observed distributions rather than explaining why any specific outcome occurs.'
+  tier: GOLD-A
 - id: CONV-039
   domain: economics
   discipline: behavioral economics
@@ -3752,6 +3817,7 @@ examples:
     systematic optimism bias) are two INDEPENDENT empirical patterns. They share only the topic ''when predictions fail''
     — no shared causal structure. Like CONV-037, teaches S2 to split multi-source clusters when mechanisms differ. is_convergent=false
     despite 2 books.'
+  tier: GOLD-B
 - id: CONV-040
   domain: typography
   discipline: graphic design
@@ -3813,6 +3879,7 @@ examples:
     D2226: this fills the missing specialized positive gap identified in the Kimi audit. Optical kerning is a practical rule
     for typographers: adjust spacing for specific letter pairs (AV, Wa, To) where geometric spacing looks wrong to the human
     eye. A normative heuristic, not a causal mechanism.'
+  tier: GOLD-A
 - id: CONV-041
   domain: psychology
   discipline: cognitive psychology
@@ -3871,6 +3938,7 @@ examples:
     (confidence artists). Both describe the same observed pattern — low-competence individuals overestimate, high-competence
     individuals underestimate — without claiming a causal law. This is an EMPIRICAL PATTERN because it describes WHAT reliably
     happens without a universal causal mechanism.'
+  tier: GOLD-A
 - id: CONV-042
   domain: linguistics
   discipline: quantitative linguistics
@@ -3929,6 +3997,7 @@ examples:
     Barabási provides the network-topology evidence and a candidate mechanism (preferential attachment in scale-free networks).
     Multiple candidate mechanisms exist but none is universally accepted — making this an archetypal empirical pattern: we
     observe it reliably, we don''t fully know why.'
+  tier: GOLD-A
 - id: CONV-043
   domain: organizational behavior
   discipline: group dynamics
@@ -3986,6 +4055,7 @@ examples:
     is a taxonomy of phases — it describes WHAT categories of group development exist and HOW they sequence, rather than WHY
     any individual group moves through them. Teaches S2 to recognize descriptive models: classification systems for understanding
     phenomena.'
+  tier: GOLD-A
 - id: CONV-044
   domain: psychology
   discipline: interpersonal communication
@@ -4041,6 +4111,7 @@ examples:
     — the Johari Window — using different language and focusing on different quadrants (Goleman on blind self, Brown on hidden
     self). This is a DESCRIPTIVE MODEL because it is a taxonomy of interpersonal awareness states, not a causal mechanism.
     Essential for teaching S2 that classification systems are valid FBs when they organize understanding of a domain.'
+  tier: GOLD-A
 - id: CONV-045
   domain: productivity
   discipline: time management
@@ -4096,6 +4167,7 @@ examples:
     the operational decision rule (the essentialist no). This is a NORMATIVE HEURISTIC because it says DO this — it is a rule
     of procedure, not a causal mechanism or descriptive taxonomy. Essential for teaching S2 to distinguish practical heuristics
     from explanatory mechanisms.'
+  tier: GOLD-A
 - id: CONV-046
   domain: problem solving
   discipline: root cause analysis
@@ -4153,6 +4225,7 @@ examples:
     Whys in lean startups), Meadows provides the theoretical justification (systems thinking distinguishes proximate from
     root causes). This is a NORMATIVE HEURISTIC — a rule of procedure prescribing HOW to diagnose, with cross-domain applicability
     (engineering, management, policy).'
+  tier: GOLD-A
 - id: CONV-047
   domain: productivity
   discipline: time management
@@ -4207,6 +4280,7 @@ examples:
     that work expands to fill time), Newport provides the intensity-of-focus formula and fixed-schedule productivity method.
     Essential for teaching S2 to recognize normative heuristics: rules of procedure that say DO this rather than explaining
     why.'
+  tier: GOLD-A
 - id: CONV-048
   domain: software engineering
   discipline: debugging methodology
@@ -4261,6 +4335,7 @@ examples:
     technique: articulate your understanding to discover hidden gaps. Both describe it as a procedural heuristic (DO this
     to debug), not a causal mechanism (X causes Y because Z). Cross-domain applicability: software debugging and systems thinking
     share the same articulation principle.'
+  tier: GOLD-A
 - id: CONV-049
   domain: psychology
   discipline: motivation theory
@@ -4315,6 +4390,7 @@ examples:
     of hierarchical human needs, using different framing (modern motivation science vs. historical perspective). Both emphasize
     that it is a TAXONOMY — a classification of need types — not a causal mechanism. Essential for teaching S2 that classification
     systems describing WHAT exists and HOW categories relate are valid FBs, distinct from causal mechanisms.'
+  tier: GOLD-A
 - id: CONV-050
   domain: decision making
   discipline: cognitive bias mitigation
@@ -4370,6 +4446,7 @@ examples:
     bias framing (intentionality bias), Patterson provides the interpersonal application (villain stories in crucial conversations).
     This is a NORMATIVE HEURISTIC because it prescribes HOW to interpret ambiguous behavior — a rule of cognitive procedure,
     not a causal mechanism.'
+  tier: GOLD-A
 - id: CONV-051
   domain: psychology
   discipline: personality psychology
@@ -4428,6 +4505,7 @@ examples:
     spectrum, Duckworth to decompose conscientiousness into achievement-relevant sub-facets. This is a DESCRIPTIVE MODEL because
     it is a classification system for personality traits — it tells us WHAT the major dimensions are and HOW they''re organized,
     not WHY individuals differ.'
+  tier: GOLD-A
 - id: CONV-052
   domain: strategy
   discipline: competitive strategy
@@ -4485,6 +4563,7 @@ examples:
     structure analysis), Ries acknowledges its diagnostic value even in uncertain startup contexts. Both emphasize that it
     is a taxonomy of competitive forces — it categorizes WHAT pressures exist, not WHY specific outcomes occur. Essential
     for teaching S2 that strategic frameworks are often descriptive models, not causal mechanisms.'
+  tier: GOLD-A
 - id: CONV-053
   domain: product management
   discipline: customer experience design
@@ -4544,3 +4623,4 @@ examples:
     a classification framework — it tells you WHAT types of features exist and HOW their satisfaction impact differs, not
     WHY any specific feature produces satisfaction. Essential for teaching S2 that product/design taxonomies are valid descriptive
     models.'
+  tier: GOLD-A

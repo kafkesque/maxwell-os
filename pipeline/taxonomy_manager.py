@@ -29,9 +29,9 @@ from pipeline.pipeline_paths import (
     DB_PATH,
     PROJECT_ROOT,
     SCHEMA_VERSION,
+    TAXONOMY_EMERGING_FREQ,
     TAXONOMY_FLOOD_THRESHOLD,
     TAXONOMY_REPLACEMENT_THRESHOLD,
-    TAXONOMY_EMERGING_FREQ,
     TAXONOMY_VERSION,
 )
 from pipeline.stamp import get_pipeline_commit

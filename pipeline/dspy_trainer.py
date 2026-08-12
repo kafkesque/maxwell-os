@@ -321,44 +321,74 @@ def extraction_metric(
     trace: Any = None,
 ) -> float:
     """
-    Score a prediction against the golden FB.
+    D2287: Hierarchical metric with hard gates before weighted quality.
 
-    Scoring dimensions (0.0–1.0):
-    - convergence_correct: ±0.30  (heavily penalize FP/FN)
-    - type_correct: ±0.20
-    - name_similarity: ±0.12
-    - mechanism_nonempty: ±0.13
-    - evidence_present: ±0.10
-    - boundary_present: ±0.05
-    - consequence_present: ±0.05
-    - route_correct: ±0.05
+    HARD GATES (any failure → score=0, prevents DSPy from optimizing toward dangerous behavior):
+      1. evidence_invalid: pred says FB but evidence fabricated/empty → 0
+      2. wrong_route: pred says FB but gold says NULL (false positive) → 0
+      3. false_convergence: pred is_convergent but single-source evidence → 0
+
+    If all gates pass → weighted quality:
+      - convergence_correct: ±0.30
+      - type_correct: ±0.20
+      - name_similarity: ±0.12
+      - mechanism_nonempty: ±0.13
+      - evidence_present: ±0.10
+      - boundary_present: ±0.05
+      - consequence_present: ±0.05
+      - route_correct: ±0.05
 
     Total: 1.0 for perfect match. Depth moved to Stage 4 (A-001/D2241).
-
-    False positives (pred says extract, gold says don't) are heavily penalized:
-    max score for FP = 0.20 (only partial credit for correct rejection fields).
     """
+    gold_should = gold.is_positive
+    pred_route = getattr(pred, "route", "")
+    pred_should = pred_route == "FB" if pred_route else bool(getattr(pred, "name", ""))
+
+    # ═══════════════════════════════════════════════════════════════
+    # D2287: HARD GATES — any failure → score=0
+    # These prevent DSPy from optimizing toward dangerous behavior
+    # (e.g., fabricating evidence to boost the weighted quality score).
+    # ═══════════════════════════════════════════════════════════════
+
+    # GATE 1: evidence_invalid — pred claims FB but evidence is fabricated/empty
+    if pred_should:
+        pred_evidence = getattr(pred, "evidence_passages", "[]")
+        try:
+            ev_list = json.loads(pred_evidence) if isinstance(pred_evidence, str) else pred_evidence
+        except (json.JSONDecodeError, TypeError):
+            ev_list = []
+        if not isinstance(ev_list, list) or len(ev_list) == 0:
+            return 0.0  # HARD GATE: no evidence → score=0
+
+    # GATE 2: wrong_route — pred says FB but gold says NULL (false positive)
+    if pred_should and not gold_should:
+        return 0.0  # HARD GATE: false positive → score=0
+
+    # GATE 3: false_convergence — pred is_convergent but single-source evidence
+    if pred_should:
+        pred_is_conv = getattr(pred, "is_convergent", False)
+        if pred_is_conv:
+            try:
+                ev_list_check = json.loads(pred_evidence) if isinstance(pred_evidence, str) else pred_evidence
+            except (json.JSONDecodeError, TypeError):
+                ev_list_check = []
+            if isinstance(ev_list_check, list) and len(ev_list_check) < 2:
+                return 0.0  # HARD GATE: false convergence → score=0
+
+    # ═══════════════════════════════════════════════════════════════
+    # All gates passed — compute weighted quality score
+    # ═══════════════════════════════════════════════════════════════
     score = 0.0
 
-    gold_should = gold.is_positive
-    pred_should = pred.route == "FB" if hasattr(pred, "route") else bool(getattr(pred, "name", ""))
-
-    # ── Convergence detection (P0: 30% weight) ──
+    # ── Convergence detection (30%) ──
     if gold_should == pred_should:
         score += 0.30
-        if gold_should:
-            # Both agree it should be extracted — evaluate quality
-            pass
-        else:
-            # Both agree it should NOT be extracted — perfect for negative
+        if not gold_should:
+            # Both agree it should NOT be extracted — perfect negative
             return 1.0
     else:
-        if pred_should and not gold_should:
-            # FALSE POSITIVE — maximum penalty, cap score
-            return max(0.0, score - 0.20)
-        else:
-            # FALSE NEGATIVE — missed extraction
-            return max(0.0, score + 0.10)  # partial credit for no hallucination
+        # FALSE NEGATIVE — pred says NULL but gold says FB
+        return 0.0  # HARD GATE: false negative → score=0
 
     # ── Extraction type (P1: 20%) ──
     gold_type = gold.extraction_type
@@ -553,7 +583,7 @@ def run_dspy_pilot(
             print(f"⚠️  Could not save optimized program: {e}")
 
     if verbose:
-        print(f"✅ Pilot complete. Optimized program ready.")
+        print("✅ Pilot complete. Optimized program ready.")
 
     return optimized
 
@@ -582,7 +612,7 @@ def evaluate_on_test(
         results_score = float(results) if results else 0.0
 
     if verbose:
-        print(f"\n── Test Set Results ──")
+        print("\n── Test Set Results ──")
         print(f"  Score: {results_score:.3f}")
         print(f"  Examples: {len(test_examples)}")
 
@@ -606,11 +636,11 @@ def evaluate_on_test(
             print(f"  ⚠️  Error evaluating {ex.golden_id}: {e}")
 
     if verbose:
-        print(f"\n── Per-Type Scores ──")
+        print("\n── Per-Type Scores ──")
         for t, scores in sorted(type_scores.items()):
             avg = sum(scores) / len(scores) if scores else 0
             print(f"  {t}: {avg:.3f} ({len(scores)} examples)")
-        print(f"\n── Error Analysis ──")
+        print("\n── Error Analysis ──")
         print(f"  False Positives: {fp_count}")
         print(f"  False Negatives: {fn_count}")
 
@@ -632,7 +662,7 @@ def cmd_dry_run(verbose: bool = True) -> None:
     train, dev, test = stratified_random_split(examples, verbose=verbose)
 
     # Print statistics
-    print(f"\n── Golden Set Statistics ──")
+    print("\n── Golden Set Statistics ──")
     print(f"  Total dspy.Examples: {len(examples)}")
     pos = [e for e in examples if e.is_positive]
     neg = [e for e in examples if not e.is_positive]
@@ -657,7 +687,7 @@ def cmd_dry_run(verbose: bool = True) -> None:
     type_counts = defaultdict(int)
     for ex in pos:
         type_counts[ex.extraction_type] += 1
-    print(f"\n── Extraction Types ──")
+    print("\n── Extraction Types ──")
     for t in ["causal_mechanism", "empirical_pattern", "normative_heuristic", "descriptive_model"]:
         print(f"  {t}: {type_counts.get(t, 0)}")
 

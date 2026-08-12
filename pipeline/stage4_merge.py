@@ -15,8 +15,8 @@ Process:
   5. Auto-derive context, accessibility, intimacy_boundary, provenance (v1 parity)
   6. Write checkpoint
 
-Generator: Qwen3.6-35B-A3B-4bit (OMLX)
-Classifier: Phi-4-mini-instruct-8bit (OMLX) — R5: different family from generator (D2068: fixed on oMLX 0.5.3)
+Generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (OMLX)
+Classifier: gpt-oss-20b-MXFP4-Q8 (OMLX) — R5: different family from generator (D2249)
 temp: 0.0 (R7)
 
 Usage:
@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # C12: Load pipeline config (needed for batch settings)
 import yaml as _yaml
+
 _CFG_PATH_S4 = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
 with open(_CFG_PATH_S4) as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
@@ -45,10 +46,10 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
-    S4_DEDUP_COSINE_THRESHOLD,   # D2231: C12 compliance
-    S4_DEPTH_FALLBACK_DEPTH,     # BUG-075: conservative default when depth call fails
+    S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
+    S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
-    S4_DEPTH_MAX_TOKENS,         # BUG-075: depth-only call token budget
+    S4_DEPTH_MAX_TOKENS,  # BUG-075: depth-only call token budget
     S4_GE_OUTPUT,
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
@@ -57,8 +58,8 @@ from pipeline.pipeline_paths import (
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
     STAGE4_CHECKPOINT,
-    VERIFY_MAX_TOKENS,           # D2249: GPT-OSS needs ≥1024 (BUG-074)
-    VERIFY_MODEL,  # P0.10: imported for R5-compliant SALSA classification
+    VERIFY_MAX_TOKENS,  # D2249: GPT-OSS needs ≥1024 (BUG-074)
+    VERIFY_MODEL,  # P0.10: imported for R5-compliant CRIBS classification (D2249: GPT-OSS-20B)
     VERIFY_REASONING_OFF_MODELS,  # D2249: models needing Reasoning:none prefix
     VERIFY_REASONING_OFF_PREFIX,  # D2249: GPT-OSS CoT suppression
 )
@@ -69,7 +70,6 @@ from pipeline.schemas import (
     is_valid_discipline,
     is_valid_domain,
 )
-from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
 # D2265: Batch CRIBS+Classification — amortizes GPT-OSS reasoning cost
@@ -80,6 +80,7 @@ from pipeline.stage4_merged_call import (
     classify_depth_focused,
     merged_cribs_classify,
 )
+from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
@@ -92,10 +93,32 @@ CRIBS_ENRICHMENT_SYSTEM = """You enrich Foundation Blocks with CRIBS-quality fie
 name + definition already written. Your job is to ADD the missing fields.
 
 CRITICAL RULES:
-- application: Generate ONLY if this principle is prescriptive (actionable technique/method). If descriptive/theoretical, set to null. Format when present: "When [concrete situation] → do [specific action]."
-- failure_mode: "The principle fails when [specific condition]." How it breaks — be specific.
-- elaboration: 3-5 sentences. Edge cases, non-obvious implications, second-order effects.
-- keywords: 3-5 search terms, comma-separated. These are RETRIEVAL labels, not explanations.
+- application: Generate ONLY if this principle is prescriptive (actionable technique/method).
+  If descriptive/theoretical, set to null.
+  REQUIRED FORMAT: "When [concrete situation], [specific action] because [reason]."
+  Example: "When launching a product in a crowded market, identify an underserved niche
+  and dominate it before expanding, because concentrated resources create defensible momentum."
+  ❌ ANTI-PATTERNS (DO NOT OUTPUT):
+    - Domain names: "Marketing and negotiation tactics" ❌
+    - Noun phrases: "Strategic decision making" ❌
+    - Vague categories: "time resource management" ❌
+    - Single-word: "Leadership" ❌
+
+- failure_mode: REQUIRED FORMAT: "The principle fails when [specific condition]. [Why it breaks].
+  [What happens instead]."
+  Example: "The principle fails when the niche is too small to sustain a business. The
+  concentration of resources creates overhead that can't be recovered, and competitors
+  ignore the market entirely because there's nothing worth competing for."
+  ❌ ANTI-PATTERNS:
+    - Noun phrases: "Confirmation bias" ❌
+    - Generic: "when conditions change" ❌
+    - Circular: "when the principle doesn't apply" ❌
+
+- elaboration: 3-5 substantive sentences. Include edge cases, non-obvious implications,
+  second-order effects, and counterarguments. DO NOT restate the definition.
+  ❌ ANTI-PATTERN: "This principle is important because it helps organizations..." ❌
+
+- keywords: 3-5 specific search terms, comma-separated. RETRIEVAL labels, not explanations.
 - jargon: OMIT this key entirely if no specialized terms exist. Only include when
   a non-expert would not understand specific terms used in the FB.
   ⚠️ NEVER copy keywords into jargon. Jargon is for pedagogy, keywords for search.
@@ -551,7 +574,7 @@ def load_stage2_principles() -> dict[str, dict]:
 def validate_classification(result: dict) -> tuple[bool, list[str]]:
     """Validate multi-label classification output against canonical taxonomy.
 
-    D2066: disciplines is now a list (1-3). D2024 SALSA single-discipline superseded.
+    D2066: disciplines is now a list (1-3). D2024 single-discipline approach superseded.
     Returns (is_valid, errors).
     """
     errors: list[str] = []
@@ -791,6 +814,50 @@ def compute_fb_relationships(
     return fbs
 
 
+
+
+# ── CRIBS Quality Guard (D2293) ──────────────────────────────────────────
+
+def _validate_cribs_quality(fb_data: dict) -> dict:
+    """D2293: Post-generation CRIBS quality check. Flags short/vague enrichment fields.
+
+    Returns dict with 'cribs_warnings': list[str] for logging.
+    Does NOT block FB creation — enrichment is best-effort. Warnings are informational.
+    """
+    warnings = []
+    app = str(fb_data.get("application", "")).strip()
+    fm = str(fb_data.get("failure_mode", "")).strip()
+    elab = str(fb_data.get("elaboration", "")).strip()
+
+    # Application: must be full sentence with situation→action, or null
+    if app and len(app) < 50:
+        warnings.append(f"CRIBS-SHORT-APP ({len(app)}c): '{app[:80]}'")
+    if app and not any(kw in app.lower() for kw in ("when ", "→", "because")):
+        warnings.append(f"CRIBS-FORMAT-APP: missing 'When X → do Y' pattern: '{app[:80]}'")
+
+    # Failure mode: must describe specific failure condition
+    if fm and len(fm) < 60:
+        warnings.append(f"CRIBS-SHORT-FM ({len(fm)}c): '{fm[:80]}'")
+    if fm and "fails when" not in fm.lower() and "principle fails" not in fm.lower():
+        warnings.append(f"CRIBS-FORMAT-FM: missing 'fails when' pattern: '{fm[:80]}'")
+
+    # Elaboration: should be multiple sentences
+    if elab and len(elab) < 80:
+        warnings.append(f"CRIBS-SHORT-ELAB ({len(elab)}c)")
+
+    return {"cribs_warnings": warnings}
+
+
+def _log_cribs_warnings(fb_data: dict) -> None:
+    """D2293: Log CRIBS quality warnings. Prints summary, stashes detail in fb_data."""
+    quality = _validate_cribs_quality(fb_data)
+    warnings = quality.get("cribs_warnings", [])
+    if warnings:
+        fb_data["cribs_warnings"] = warnings
+        # Print abbreviated warning
+        fb_name = str(fb_data.get("name", "?"))[:40]
+        print(f"⚠️CRIBS({len(warnings)})", flush=True, end=" ")
+
 def run_stage4(cluster_ids: list[int | str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
@@ -828,7 +895,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             ]
 
     print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters")
-    print(f"   Model: {VERIFY_MODEL} | temp=0.0 | SALSA classify")
+    print(f"   Model: {VERIFY_MODEL} | temp=0.0 | CRIBS classify")
     print(f"{'='*60}")
 
     fbs = []
@@ -945,13 +1012,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # Phi-4-mini call for BOTH CRIBS enrichment + classification (~61% faster).
         # Otherwise use two-call pattern: CRIBS (Qwen) + Classify (Phi-4-mini).
         _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
-        # D2263: merged S4 call — env var or config (config sets env before stage starts)
-        _use_merged: bool = os.environ.get("MAXWELL_MERGED_S4", "") == "1"
+        # D2263/D2301: merged S4 call — env var overrides config (C12).
+        # BUG-FIX: config merged_call_enabled was orphaned (never read).
+        _use_merged: bool = (
+            os.environ.get("MAXWELL_MERGED_S4", "") == "1"
+            or bool(_PIPELINE_CFG.get("stage4", {}).get("merged_call_enabled", False))
+        )
 
         if _skip_llm:
             print("(LLM off — CRIBS enrichment skipped)", flush=True, end=" ")
-        elif _use_merged and cluster_id in _pre_classified:
-            # D2265: Use batch pre-classified result (no LLM call needed)
+        elif cluster_id in _pre_classified:
+            # D2265: Use batch pre-classified result (no LLM call needed).
+            # BUG-FIX: previously gated on _use_merged, so batch results were
+            # silently ignored and the slow 2-call path ran (~61s/FB).
             merged_result = _pre_classified[cluster_id]
             if isinstance(merged_result, list):
                 merged_result = merged_result[0] if merged_result else {}
@@ -961,6 +1034,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     if merged_result.get(field):
                         fb_data[field] = merged_result[field]
                 fb_data["_merged_classification"] = merged_result
+                _log_cribs_warnings(fb_data)
                 print("⚡batch", flush=True, end=" ")
             else:
                 print("⚠️batch-bad", flush=True, end=" ")
@@ -978,6 +1052,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                         fb_data[field] = merged_result[field]
                 # Stash classification for Phase 2
                 fb_data["_merged_classification"] = merged_result
+                _log_cribs_warnings(fb_data)
                 print("⚡merged", flush=True, end=" ")
             except Exception as e:
                 fb_data["enrichment_status"] = "FAILED"
@@ -1001,6 +1076,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                                   "keywords", "jargon"):
                         if cribs_result.get(field):
                             fb_data[field] = cribs_result[field]
+                    _log_cribs_warnings(fb_data)
                     print("+CRIBS", flush=True, end=" ")
             except Exception as e:
                 # D2160: enrichment is best-effort but must be observable (C16)

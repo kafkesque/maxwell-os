@@ -39,6 +39,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # ── Load pipeline config for defaults (before Maxwell imports) ─────────
 import yaml as _yaml
+
 _CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
 with open(_CFG_PATH) as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
@@ -74,10 +75,9 @@ os.environ["MAXWELL_RUN_ID"] = RUN_ID
 
 # Now safe to import Maxwell modules
 from pipeline.pipeline_paths import (
-    S15_DIR,
     CHECKPOINT_DIR,
     DATA_DIR,
-    PROJECT_ROOT as _PR,
+    S15_DIR,
 )
 
 # ── Checkpoint/Resume Infrastructure ─────────────────────────────────────
@@ -141,7 +141,8 @@ def _kill_stale_diagnostics() -> int:
     D2266: Safety net — if PID file is missing but diagnostic processes exist,
     kill them to prevent OMLX congestion.
     """
-    import os as _ospid3, subprocess as _sp2
+    import os as _ospid3
+    import subprocess as _sp2
     killed = 0
     my_pid = _ospid3.getpid()
     try:
@@ -174,7 +175,8 @@ def _start_caffeinate() -> bool:
     Stores PID for cleanup on exit.
     Returns True if caffeinate started successfully.
     """
-    import subprocess as _sp3, os as _ospid4
+    import os as _ospid4
+    import subprocess as _sp3
     if _ospid4.name != "posix" or not _ospid4.path.exists("/usr/bin/caffeinate"):
         return False
     try:
@@ -216,9 +218,9 @@ def _register_signal_handlers() -> None:
         _ds["paused"] = True
         _ds["paused_at"] = datetime.now().isoformat()
         _save_diag_state(_ds)
-        print(f"   State saved to governance/diagnostic_state.json")
+        print("   State saved to governance/diagnostic_state.json")
         print(f"   Resume with: python3 pipeline/run_diagnostic.py --run-id {RUN_ID} --only-convergent --max-clusters {args.max_clusters or 'N'} --no-probe")
-        print(f"   Already completed stages will be skipped automatically.")
+        print("   Already completed stages will be skipped automatically.")
         print(f"{'='*60}")
         _stop_caffeinate()
         _release_process_lock()
@@ -236,14 +238,19 @@ def _load_diag_state() -> dict:
     return {}
 
 def _save_diag_state(state: dict) -> None:
-    """Atomically save diagnostic checkpoint state for current run_id (C6: crash-safe write)."""
-    import json as _json, os as _os2
+    """Atomically save diagnostic checkpoint state for current run_id (C6: crash-safe write).
+
+    BUG-080: flush/fsync were OUTSIDE the with block — file was already closed,
+    causing 'I/O operation on closed file' at every state save. Fixed 2026-08-12.
+    """
+    import json as _json
+    import os as _os2
     _path = _get_diag_state_path()
     tmp = str(_path) + ".tmp"
     with open(tmp, "w") as f:
         _json.dump(state, f, indent=2, default=str)
-    f.flush()
-    _os2.fsync(f.fileno())
+        f.flush()
+        _os2.fsync(f.fileno())
     _os2.replace(tmp, str(_path))
 
 # Resolve the REAL S1.5 and S1 checkpoint paths using the default run_id
@@ -256,15 +263,6 @@ _GATE_YIELD_PASS = _DIAG_CFG.get("yield_pct_pass", 1.0)
 _GATE_YIELD_FAIL = _DIAG_CFG.get("yield_pct_fail", 0.5)
 _GATE_S5_PASS = _DIAG_CFG.get("s5_pass_rate_pass", 0.40)
 _GATE_S5_FAIL = _DIAG_CFG.get("s5_pass_rate_fail", 0.20)
-from pipeline.stage2_extract import (
-    load_golden_parity,
-    format_golden_fewshot,
-    S2_GOLDEN_PATH,
-    S2_GOLDEN_POSITIVE,
-    S2_GOLDEN_NEGATIVE,
-    S2_GOLDEN_MAX,
-    S2_GOLDEN_INJECT,
-)
 import pipeline.stage2_extract as s2
 import pipeline.stage4_merge as s4
 import pipeline.stage5_verify as s5
@@ -378,7 +376,7 @@ def run_diagnostic() -> dict:
         "seed": args.seed,
         "only_convergent": args.only_convergent,
     }
-    
+
     _s2_ckpt = CHECKPOINT_DIR / "stage2_extract" / RUN_ID / "checkpoint.jsonl"
     _s4_ckpt = CHECKPOINT_DIR / "stage4_merge" / RUN_ID / "checkpoint.jsonl"
     _s5_ckpt = CHECKPOINT_DIR / "stage5_verify" / RUN_ID / "checkpoint.jsonl"
@@ -421,12 +419,15 @@ def run_diagnostic() -> dict:
             _ds["s2_completed"] = True
             _ds["s2_fb_count"] = len(s2_fbs)
             _save_diag_state(_ds)
-            # D2263: merged call uses GPT-OSS only — unload Qwen3-Coder
-            _unload_omlx_model("Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
         except Exception as e:
             results["s2_error"] = str(e)
             print(f"❌ S2 FAILED: {e}")
             return results
+        finally:
+            # D2263: unload Qwen3-Coder regardless of success/failure
+            # BUG-080-FIX: moved to finally block — model unload failure must not
+            # prevent S4/S5 from running when FBs are already checkpointed.
+            _unload_omlx_model("Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
 
     # ═══ S4: Merge + Classify + Depth ════════════════════════════════════
     if _s4_ckpt.exists():
@@ -523,7 +524,7 @@ def run_diagnostic() -> dict:
                         if line.strip():
                             fb = json.loads(line)
                             s5_fbs.append(fb)
-                            s = fb.get("verification_status", "UNKNOWN")
+                            s = fb.get("status", fb.get("verification_status", "UNKNOWN"))
                             if s == "PASS": s5_pass += 1
                             elif s == "QUARANTINE": s5_quarantine += 1
                             else: s5_fail += 1
@@ -554,7 +555,7 @@ def run_diagnostic() -> dict:
         s6.PARQUET_DIR = DATA_DIR / "parquet" / RUN_ID
         _prod_db = DATA_DIR / "maxwell.db"
         if s6.DB_PATH.resolve() == _prod_db.resolve():
-            raise RuntimeError(f"REFUSING: DB_PATH still points to production DB")
+            raise RuntimeError("REFUSING: DB_PATH still points to production DB")
         print(f"   💾 Diagnostic DB: {s6.DB_PATH}")
         s6.run_stage6(export_only=False)
         s6_elapsed = time.time() - t0
@@ -573,12 +574,12 @@ def generate_report(summary: dict, s5_fbs: list[dict]) -> str:
     date_str = datetime.now().strftime("%Y-%m-%d")
     lines: list[str] = []
 
-    lines.append(f"# Maxwell OS v3.0 — E2E Diagnostic Report")
+    lines.append("# Maxwell OS v3.0 — E2E Diagnostic Report")
     lines.append(f"> **Run ID:** `{summary.get('run_id', '?')}`")
     lines.append(f"> **Date:** {date_str}")
     lines.append(f"> **Books sampled:** {summary.get('books_sampled', '?')}")
     lines.append(f"> **Seed:** {summary.get('seed', '?')}")
-    lines.append(f"> **Gate criteria (D2261):** Yield >1% + S5 pass >40% → approve T1.1")
+    lines.append("> **Gate criteria (D2261):** Yield >1% + S5 pass >40% → approve T1.1")
     lines.append("")
 
     # ── Pipeline summary ────────────────────────────────────────────────
@@ -635,8 +636,8 @@ def generate_report(summary: dict, s5_fbs: list[dict]) -> str:
     # ── S5 verification detail ──────────────────────────────────────────
     lines.append("## 3. S5 Verification Detail")
     lines.append("")
-    lines.append(f"| Status | Count | % |")
-    lines.append(f"|--------|-------|---|")
+    lines.append("| Status | Count | % |")
+    lines.append("|--------|-------|---|")
     total = max(summary.get("s5_fb_count", 0), 1)
     lines.append(f"| PASS | {summary.get('s5_pass', 0)} | {summary.get('s5_pass', 0)/total:.1%} |")
     lines.append(f"| QUARANTINE | {summary.get('s5_quarantine', 0)} | {summary.get('s5_quarantine', 0)/total:.1%} |")
@@ -777,12 +778,12 @@ def main() -> None:
             _resumed = True
             _status = "PAUSED — resuming" if _paused else "CRASHED — recovering"
             print(f"\n🔄 {_status}: {' → '.join(_done)} already completed")
-            print(f"   Will skip completed stages and continue from last checkpoint.")
+            print("   Will skip completed stages and continue from last checkpoint.")
         elif _paused:
-            print(f"\n⏸️  Previous run was paused but no stages completed. Starting fresh.")
+            print("\n⏸️  Previous run was paused but no stages completed. Starting fresh.")
 
-    print(f"╔══════════════════════════════════════════════════════════════╗")
-    print(f"║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║")
+    print("╔══════════════════════════════════════════════════════════════╗")
+    print("║  Maxwell OS v3.0 — E2E Diagnostic Gate (D2261)              ║")
     print(f"║  Run ID: {RUN_ID:<50}║")
     print(f"║  Books: {args.books:<54}║")
     print(f"║  Seed: {args.seed:<55}║")
@@ -792,7 +793,7 @@ def main() -> None:
         print(f"║  Max clusters: {args.max_clusters:<46}║")
     if _caffeinate_started:
         print(f"║  ☕ Laptop sleep: DISABLED (caffeinate active){' ' * 21}║")
-    print(f"╚══════════════════════════════════════════════════════════════╝")
+    print("╚══════════════════════════════════════════════════════════════╝")
 
     # ── Step 1: Sample books and filter clusters ─────────────────────────
     if args.quick:
@@ -859,7 +860,7 @@ def main() -> None:
         print(f"🧠 RAM free: {_free_gb_mem:.1f} GB (min: {_min_free_gb_mem} GB)")
         if _free_gb_mem < _min_free_gb_mem:
             print(f"⚠️  WARNING: Only {_free_gb_mem:.1f} GB RAM free. Models may OOM.")
-            print(f"   Consider closing other applications before proceeding.")
+            print("   Consider closing other applications before proceeding.")
     except ImportError:
         print("⚠️  psutil not installed — skipping memory check")
 
@@ -871,7 +872,7 @@ def main() -> None:
     print(f"💾 Disk free: {_free_gb:.1f} GB (min: {_min_free_gb} GB)")
     if _free_gb < _min_free_gb:
         print(f"🛑 INSUFFICIENT DISK SPACE: {_free_gb:.1f} GB < {_min_free_gb} GB minimum.")
-        print(f"   Free up space before running diagnostic to avoid mid-run crash.")
+        print("   Free up space before running diagnostic to avoid mid-run crash.")
         _release_process_lock()
         sys.exit(1)
 
@@ -937,7 +938,7 @@ def main() -> None:
 
     # ── Step 7: Print summary ───────────────────────────────────────────
     print(f"\n{'='*60}")
-    print(f"📊 DIAGNOSTIC SUMMARY")
+    print("📊 DIAGNOSTIC SUMMARY")
     print(f"{'='*60}")
     print(f"   Books sampled: {args.books}")
     print(f"   Clusters: {total_clusters} ({len(convergent)} convergent + {len(single_source)} single)")
@@ -954,11 +955,11 @@ def main() -> None:
     print(f"   🔍 S5 Pass Rate: {s5_pr:.1%}")
 
     if yield_pct > _GATE_YIELD_PASS and s5_pr > _GATE_S5_PASS:
-        print(f"\n   ✅ GATE PASSED — T1.1 full run APPROVED")
+        print("\n   ✅ GATE PASSED — T1.1 full run APPROVED")
     elif yield_pct < _GATE_YIELD_FAIL or s5_pr < _GATE_S5_FAIL:
-        print(f"\n   🛑 GATE FAILED — Do NOT run T1.1")
+        print("\n   🛑 GATE FAILED — Do NOT run T1.1")
     else:
-        print(f"\n   ⚠️  MARGINAL — Review report before deciding")
+        print("\n   ⚠️  MARGINAL — Review report before deciding")
 
     print(f"\n   📄 Full report: {report_path}")
     print(f"   📊 Summary JSON: {summary_path}")

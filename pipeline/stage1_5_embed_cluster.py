@@ -58,6 +58,7 @@ from pipeline.pipeline_paths import (
     S15_EMBED_MODEL_HF,
     S15_FAISS_THRESHOLD,
     S15_MAX_CLUSTER_SIZE,
+    S15_MAX_EMBED_DROP_RATE,  # D2275: embedding quality gate threshold
     S15_MIN_CLUSTER_SIZE,
     S15_MIN_SOURCE_DIVERSITY,
     S15_NEIGHBOR_K,
@@ -289,10 +290,33 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
 
     elapsed: float = time.time() - start
     n_dropped: int = len(segments) - len(all_embeddings)
-    print(f"      → {len(all_embeddings)} embeddings ({S15_EMBED_DIM}d) in {elapsed:.1f}s")
+
+    # D2274: Ollama embedding dimension assertion — MPS path has this, Ollama path didn't.
+    # Catches silent dimension mismatch (e.g., model changed from 768d to 1024d).
+    if all_embeddings and len(all_embeddings[0]) != S15_EMBED_DIM:
+        raise ValueError(
+            f"FATAL: Ollama embedding dimension mismatch: model output {len(all_embeddings[0])}d "
+            f"≠ config S15_EMBED_DIM={S15_EMBED_DIM}d. "
+            f"Fix: update config/pipeline_config.yaml stage1_5.embed_dim to match the model, "
+            f"or change the embedding model."
+        )
+
+    # D2275: Embedding drop-rate quality gate — fail if >0.5% of segments dropped.
+    # Dropped embeddings cause silent epistemic gaps (convergences involving those
+    # segments are never discovered). Config-driven threshold (C12).
+    _drop_rate = n_dropped / max(len(segments), 1)
+    _max_drop_rate = S15_MAX_EMBED_DROP_RATE  # D2275: from config (C12), default 0.005
+    if _drop_rate > _max_drop_rate:
+        raise RuntimeError(
+            f"FATAL: Embedding drop rate {_drop_rate:.1%} exceeds max {_max_drop_rate:.1%}. "
+            f"{n_dropped}/{len(segments)} segments dropped. "
+            f"Fix: check embedding model health, reduce batch_size, or increase max_embed_drop_rate in config."
+        )
+
+    print(f"      → {len(all_embeddings)} embeddings ({S15_EMBED_DIM}d) in {elapsed:.1f}s "
+          f"(dropped: {n_dropped}, rate: {_drop_rate:.2%})")
 
     if n_dropped > 0:
-        print(f"   ⚠️  {n_dropped} segments dropped (embedding failure) — filtering segments in lockstep")
         segments = [segments[i] for i in successful_indices]
 
     embeddings = np.array(all_embeddings, dtype=np.float32)

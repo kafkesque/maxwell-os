@@ -251,7 +251,7 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 | **Root Cause** | The cluster checkpoint mapping was never implemented. Comment says "we approximate" but the approximation is random. |
 | **Proposed Fix** | Load cluster checkpoint JSONL, map `cluster_id → principle_ids`, filter `principles_idx` to only those IDs. Fallback: global cosine top-10 if <5 sources found. ~25 LOC. |
 | **Source** | Kimi code audit (BUG 1); confirmed in Qwen's `stage5_verify_v2.py` |
-| **Status** | 🔴 OPEN — Phase 0, P0.8 |
+| **Status** | ✅ RESOLVED (2026-08-12) — Code path removed in DeBERTa-only S5 rewrite (D2298). Old source_clusters→principle_ids mapping no longer exists. |
 
 ### BUG-002: Lineage Broken — pipeline_run_id Regenerated Per Call
 | Field | Value |
@@ -394,7 +394,7 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 | **Root Cause** | Extraction speed concern led to cloud fallback proposal. No constitutional exception clause exists for "extraction only." |
 | **Proposed Fix** | Delete all cloud code. Fix extraction speed via semantic pre-filter + DFlash + better chunking. ~-30 LOC. |
 | **Source** | Grounded Review; Qwen; CONSTITUTION.md C1/C3 |
-| **Status** | 🔴 OPEN — Phase 0, P0.13 |
+| **Status** | ✅ RESOLVED (2026-08-12) — No cloud burst code exists anywhere in repo. Only `cloud_fallback` role in model_assignments.yaml (archived). |
 
 ### BUG-015: Silent datasketch Import Failure
 | Field | Value |
@@ -1366,6 +1366,181 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   verified against actual config.
 - **Status:** ✅ FIXED
 - **Files:** `governance/HANDOFF_D2254.md` §4
+
+### BUG-080.1 — 2026-08-12 — _save_diag_state flush/fsync outside with block (C6 violation) 🔴 FIXED
+- **Symptom:** `❌ S2 FAILED: I/O operation on closed file.` at diagnostic state save after S2 completed.
+  State file left as `.tmp` (never atomically renamed). S4/S5 never ran — pipeline returned early.
+- **Root cause:** `_save_diag_state()` in `pipeline/run_diagnostic.py` had `f.flush()` and
+  `f.fsync()` OUTSIDE the `with open()` block. File already closed → ValueError. The C6
+  crash-safety function was itself not crash-safe.
+- **Fix:** Moved flush/fsync inside with block. Also moved `_unload_omlx_model` to finally
+  block — model unload failure must not prevent S4/S5 from running when FBs are already
+  checkpointed.
+- **Impact:** 2026-08-11 diagnostic: S2 produced 188 FBs (51 min) but S4/S5 never ran.
+  Diagnostic restarted with fix, resuming from S4 checkpoint.
+- **Status:** ✅ FIXED (2026-08-12)
+- **Files:** `pipeline/run_diagnostic.py` (`_save_diag_state`, S2 finally block)
+
+### BUG-080.2 — 2026-08-12 — model_assignments.yaml S5_FB_VERIFIER still claims Gemma (D2264 desync) 🟡
+- **Symptom:** `config/model_assignments.yaml` line ~114: `S5_FB_VERIFIER: gemma-4-E4B-it-MLX-4bit`
+  but `config/pipeline_config.yaml` verifier_v2 correctly shows `Phi-4-mini-instruct-8bit`
+- **Root cause:** D2264 fixed pipeline_config.yaml but model_assignments.yaml was not synced.
+  Precedence rule (pipeline_config.yaml wins) prevents runtime issue but the desync IS a
+  documentation/configuration bug class.
+- **Fix:** Update model_assignments.yaml S5_FB_VERIFIER to Phi-4-mini-instruct-8bit.
+- **Status:** 🟡 OPEN
+- **Files:** `config/model_assignments.yaml`
+- **Source:** Cross-examination: ChatGPT F2, Claude External §6.1
+
+### BUG-080.3 — 2026-08-12 — Runner docstring says `python -m pipeline.run` but file is runner.py 🔴
+- **Symptom:** `pipeline/runner.py` line 11: `Usage: python -m pipeline.run` — would import
+  `pipeline/run.py` which does not exist. Correct: `python pipeline/runner.py` or
+  `python -m pipeline.runner`
+- **Root cause:** Renamed file at some point (or never named `run.py`); docstring not updated.
+- **Fix:** Change docstring to `python pipeline/runner.py`
+- **Status:** 🟡 OPEN
+- **Files:** `pipeline/runner.py`
+- **Source:** Cross-examination: ChatGPT F1
+
+### BUG-080.4 — 2026-08-12 — Runner 60-min timeout kills S2 on full-scale runs 🔴
+- **Symptom:** `pipeline/runner.py` line 284: `timeout=3600` — subprocess killed at 60 min.
+  S2 takes 25-40h on full corpus → runner kills it mid-extraction.
+- **Root cause:** Fixed timeout not configurable per stage. S2 runs as single subprocess.
+  (Current diagnostic bypasses runner — uses run_diagnostic.py directly — so not affected.)
+- **Fix:** Make timeout configurable per stage in pipeline_config.yaml; S2 = null (unlimited).
+- **Status:** 🔴 OPEN — blocks T1.1 if launched via runner.py
+- **Files:** `pipeline/runner.py`, `config/pipeline_config.yaml`
+- **Source:** Cross-examination: ChatGPT F13
+
+### BUG-080.5 — 2026-08-12 — S5 completeness substitutes application for mechanism 🔴
+- **Symptom:** `stage5_verify.py` lines 321-323: `has_mechanism = bool(fb.get("mechanism") or fb.get("application"))`
+  A generated `application` field (S4 enrichment) satisfies "has mechanism" even when no
+  causal mechanism was extracted → completeness scores overly optimistic.
+- **Root cause:** Legacy schema compatibility — v2 allowed field substitution; v3 has
+  distinct semantics for mechanism vs application.
+- **Fix:** Schema-version-specific validation: v3 requires strict mechanism/boundary/consequence
+  fields; v2 allows legacy substitution.
+- **Status:** 🔴 OPEN
+- **Files:** `pipeline/stage5_verify.py`
+- **Source:** Cross-examination: ChatGPT F8
+
+### BUG-080.6 — 2026-08-12 — NLI threshold validation only warns (should be fatal) 🔴
+- **Symptom:** Invalid NLI threshold configuration (e.g., entailment > pass or out of 0-1 range)
+  prints warning but pipeline continues. Verification thresholds are security-critical.
+- **Root cause:** Validation code uses `print("⚠️ ...")` instead of raising error.
+- **Fix:** Change to `sys.exit(1)` or `raise ValueError` — invalid verification config
+  is not recoverable.
+- **Status:** 🔴 OPEN
+- **Files:** `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`
+- **Source:** Cross-examination: ChatGPT F11
+
+### BUG-080.7 — 2026-08-12 — S1.5 Ollama path missing dimension assertion (MPS path has it) 🟠
+- **Symptom:** `stage1_5_embed_cluster.py` MPS path has `if embeddings_mmap.shape[1] != S15_EMBED_DIM: raise ValueError`.
+  Ollama path at line 287 only does `arr[:S15_EMBED_DIM]` (silent truncation, no assertion).
+- **Root cause:** D2170 only implemented fail-fast for MPS, not Ollama.
+- **Fix:** Add `assert len(emb) >= S15_EMBED_DIM, f"expected ≥{S15_EMBED_DIM}d, got {len(emb)}d"` before truncation.
+- **Status:** 🟠 OPEN (theoretical — bge-m3 is stable at 1024d)
+- **Files:** `pipeline/stage1_5_embed_cluster.py`
+- **Source:** Cross-examination: Audit1 P0.1 (corrected finding)
+
+### BUG-080.8 — 2026-08-12 — S1.5 dropped embeddings not gated (epistemic recall risk) 🟠
+- **Symptom:** Dropped segments are printed (`n_dropped`) but pipeline happily continues.
+  5% embedding failure → 95% corpus → missing convergences silently.
+- **Root cause:** No hard quality gate for embedding drop rate.
+- **Fix:** Add gate: if drop_rate > 0.5%, fail stage with diagnostic message.
+- **Status:** 🟠 OPEN
+- **Files:** `pipeline/stage1_5_embed_cluster.py`
+- **Source:** Cross-examination: ChatGPT F4
+
+### BUG-080.9 — 2026-08-12 — S5 method tag dict missing "nli+LLM-echo" → KeyError 🔴 FIXED
+- **Symptom:** `❌ S5 FAILED: 'nli+LLM-echo'` at FB #10. S5 processed 9 FBs then crashed.
+- **Root cause:** D2220 added citation-echo escalation path setting `method = "nli+LLM-echo"` but
+  the method→icon dict at line 716 only had `{"nli","nli+LLM","LLM","none"}`. KeyError.
+- **Fix:** Added `"nli+LLM-echo": "🔍"` and `"nli-echo": "⚠️"` to the dict (D2282).
+- **Status:** ✅ FIXED
+- **Files:** `pipeline/stage5_verify.py:716`
+
+### BUG-080.10 — 2026-08-12 — S5 method tag dict missing "mech_quality" → KeyError 🔴 FIXED
+- **Symptom:** `❌ S5 FAILED: 'mech_quality'` at FB #13 "Leading Through Intent". Same class as BUG-080.9.
+- **Root cause:** Mechanism quality auto-quarantine path sets `method = "mech_quality"` but
+  the method→icon dict didn't include this key.
+- **Fix:** Added `"mech_quality": "🚫"` and `"nli-only": "⚡"` to the dict (D2282).
+- **Status:** ✅ FIXED
+- **Files:** `pipeline/stage5_verify.py:716`
+
+### BUG-080.11 — 2026-08-12 — Diagnostic runner reads "verification_status" but S5 writes "status" 🟡
+- **Symptom:** Diagnostic report shows S5 PASS=0, Q=0 despite S5 actually running 134 PASS + 51 QUARANTINE.
+  Gate incorrectly shows FAILED.
+- **Root cause:** `pipeline/run_diagnostic.py:534` does `fb.get("verification_status", ...)` but
+  `stage5_verify.py:684` writes `vfb["status"]`. Field name mismatch → count always 0.
+- **Fix:** Changed diagnostic reader to `fb.get("status", fb.get("verification_status", "UNKNOWN"))`.
+- **Status:** 🟡 FIXED (backward-compatible read)
+- **Files:** `pipeline/run_diagnostic.py`
+
+### BUG-081 — 2026-08-12 — evals/golden_cases.json is v2 format, not v3 compatible 🟡
+- **Symptom:** 52 examples in old format: domains as comma-strings (not lists), no route/mechanism/
+  boundary/consequence fields, 0 evidence_passages, source_file instead of source_books.
+  Present in repo but not used by DSPy (dspy_trainer.py uses stage2_fewshot_convergent.yaml).
+- **Root cause:** Legacy artifact from Maxwell OS v2.0. Never migrated to v3 schema.
+- **Fix:** Either migrate to v3 format with manual adjudication, or archive with annotation.
+- **Status:** 🟡 Migrate or archive
+- **Files:** `evals/golden_cases.json`
+- **Source:** Round 2 cross-examination: golden set audit
+
+### BUG-082 — 2026-08-12 — S5 FLAG path practically unreachable (0/185 FLAGs) 🟡 CONFIRMED
+- **Symptom:** Diagnostic: 134 PASS, 51 QUARANTINE, 0 FLAG. 3-outcome design with one
+  branch producing zero results across 185 FBs.
+- **Root cause (D2291 audit 2026-08-12):** FLAG fires on `borp_only_fail and not strict`
+  (line 663-664). But S1.5 `min_source_diversity: 2` guarantees every convergent
+  cluster has ≥2 canonical sources → BORP always passes for convergent FBs.
+  Architecture: S1.5 filter (≥2 sources) → S2 convergent extract → S5 BORP check (≥2 sources).
+  The FLAG condition (BORP fail + everything else pass) is logically reachable but
+  practically impossible given upstream guarantees.
+- **Options:**
+  A) Document FLAG=0 as expected behavior, close as NOTABUG.
+  B) Redefine FLAG to fire on marginal NLI scores (0.5-0.6) or low-confidence factual.
+  C) Remove FLAG, simplify to PASS/QUARANTINE binary.
+- **Recommendation:** Option B — NLI marginal scores provide a natural middle tier between
+  confident PASS and confident QUARANTINE. Same architecture as the existing NLI threshold
+  tiers (entailment→PASS, neutral→escalate, contradiction→QUARANTINE).
+- **Status:** 🟡 CONFIRMED — design decision needed (see D2291)
+- **Files:** `pipeline/stage5_verify.py` (lines 660-668), `pipeline/stage1_5_embed_cluster.py` (line 513)
+- **Source:** Round 2 cross-examination: Claude External §2; D2291 audit 2026-08-12
+
+### BUG-083 — 2026-08-12 — domain_anchors.yaml predates current corpus (80.5% "emerging") 🟠
+- **Symptom:** Diagnostic: 149/185 FBs (80.5%) classified as domain="emerging" (catch-all).
+  domain_anchors.yaml was built 2026-06-11 for business/design-agency focus. Diagnostic's
+  #2 explicit domain is "ai & agents" (22 FBs) — taxonomy lacks anchors to discriminate it.
+- **Root cause:** Corpus evolved (AI/agents books added) but taxonomy anchors were not updated.
+- **Fix:** Add 3-5 AI/agent-specific anchors. Re-classify 149 "emerging" FBs to verify
+  improved discrimination. Fix before T1.1 — re-anchoring after 750 books is expensive.
+- **Status:** 🟠 Fix before T1.1 (D2290)
+- **Files:** `config/domain_anchors.yaml`, `config/taxonomy_v5.yaml`
+- **Source:** Round 2 cross-examination: Claude External §1
+
+### BUG-084 — 2026-08-12 — Golden depth calibration: universal=1, specialized=1 🟠
+- **Symptom:** stage2_fewshot_convergent.yaml: 73 examples with depth universal=1, specialized=1.
+  S4 depth classifier validated at 87.5% (7/8) but 8 examples insufficient to lock ontology.
+  Depth classification is uncalibratable from current goldens.
+- **Root cause:** Depth was moved to S4 (D2241) and never received dedicated golden expansion.
+  The existing goldens were built for S2 extraction evaluation, not depth classification.
+- **Fix:** Build dedicated depth benchmark: 30 universal + 40 cross-domain + 40 domain +
+  30 specialized + 30 hard negatives. Minimum 170 examples (D2292).
+- **Status:** 🟠 Expand (D2292, P1)
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`
+- **Source:** Round 2 cross-examination: ChatGPT §10, Claude External §3
+
+### BUG-085 — 2026-08-12 — hybrid_s2_extract() not wired to stage2_extract.py 🔴
+- **Symptom:** D2251 declared hybrid S2 production architecture (0.736 avg, 5/6 negative rejection).
+  But `hybrid_s2_extract()` exists ONLY in `tools/compare_s2_methods.py` (benchmark harness).
+  Zero references in `pipeline/stage2_extract.py`. Running S2 today uses traditional-only (0.591).
+- **Root cause:** D2252 deferred wiring. Hybrid was validated and decided but never integrated
+  into the production extraction path.
+- **Fix:** Wire hybrid_s2_extract() into stage2_extract.py with DSPy gate → traditional extraction
+  path. T-007b-v2 scheduled for demo re-optimization but wiring itself is independent.
+- **Status:** 🔴 Wire before T1.1 (D2276)
+- **Files:** `pipeline/stage2_extract.py`, `tools/compare_s2_methods.py`
+- **Source:** Round 2 cross-examination: Claude External, ChatGPT
 
 ### BUG-080: call_omlx_json returns list/str — S4 classification crashes 🔴
 | Field | Value |

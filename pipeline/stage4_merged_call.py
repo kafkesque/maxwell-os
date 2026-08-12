@@ -12,14 +12,13 @@ With a single call (~15-18s) producing ALL fields. The prompt includes both
 CRIBS enrichment instructions AND the physicist-chef-poet depth ontology.
 
 R5 compliance: Uses Phi-4-mini-8bit (Microsoft family), distinct from S2 generator
-(Qwen/Alibaba) and S5 verifier (Gemma/Google). Three different families.
+(Qwen/Alibaba) and S4 classifier (GPT-OSS/OpenAI). Different families per R5.
 
 Usage:
     from pipeline.stage4_merged_call import merged_cribs_classify
     result = merged_cribs_classify(fb_data)
 """
 
-import json
 from pipeline.omlx_call import call_omlx_json
 
 MERGED_CRIBS_CLASSIFY_SYSTEM = """You enrich and classify a Foundation Block in a single response. You receive an FB
@@ -99,7 +98,7 @@ def build_merged_prompt(fb_data: dict) -> str:
 
 def merged_cribs_classify(
     fb_data: dict,
-    model: str = "gpt-oss-20b-MXFP4-Q8",
+    model: str | None = None,
     max_tokens: int | None = None,
     timeout: int = 120,
 ) -> dict:
@@ -107,14 +106,20 @@ def merged_cribs_classify(
 
     Args:
         fb_data: FB dict with name, definition, mechanism, boundary, consequence.
-        model: Model to use. Default GPT-OSS-20B (D2249 — R5: OpenAI ≠ Qwen ≠ Gemma).
+        model: Model to use. Default GPT-OSS-20B (D2249 — R5: different family from S2 Qwen).
         max_tokens: Max output tokens. None → read from pipeline_config.yaml (C12).
         timeout: Request timeout in seconds.
 
     Returns:
         Dict with all CRIBS fields + discipline, domains, depth, is_specialized, evidence.
     """
-    # C12: read max_tokens from config, 512 is safe default (D2263)
+    # C12: read model and max_tokens from config if not explicitly provided
+    if model is None:
+        try:
+            from pipeline.pipeline_paths import VERIFY_MODEL
+            model = VERIFY_MODEL
+        except Exception:
+            model = "gpt-oss-20b-MXFP4-Q8"
     if max_tokens is None:
         try:
             from pipeline.pipeline_paths import _CFG
@@ -339,7 +344,7 @@ def build_batch_prompt(fbs_data: list[dict]) -> str:
 
 def batch_cribs_classify(
     fbs_data: list[dict],
-    model: str = "gpt-oss-20b-MXFP4-Q8",
+    model: str | None = None,
     max_tokens: int | None = None,
     timeout: int = 180,
 ) -> list[dict]:
@@ -350,13 +355,20 @@ def batch_cribs_classify(
 
     Args:
         fbs_data: List of FB dicts (3-5 recommended for optimal amortization).
-        model: Model to use. Default GPT-OSS-20B.
+        model: Model to use. None → reads from config (C12).
         max_tokens: Max output tokens. None → reads config (default 2048 for batch).
         timeout: Request timeout in seconds.
 
     Returns:
         List of result dicts in same order as input, each with all CRIBS + classify fields.
     """
+    # C12: read model from config if not explicitly provided
+    if model is None:
+        try:
+            from pipeline.pipeline_paths import VERIFY_MODEL
+            model = VERIFY_MODEL
+        except Exception:
+            model = "gpt-oss-20b-MXFP4-Q8"
     if not fbs_data:
         return []
 

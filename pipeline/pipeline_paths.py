@@ -85,6 +85,7 @@ OMLX_API_KEY=_env("omlx_api_key",_CFG["services"]["omlx"]["api_key"])
 OMLX_DEFAULT_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("default_timeout", 180))
 OMLX_MAX_RETRIES = int(_CFG.get("services", {}).get("omlx", {}).get("max_retries", 3))
 OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay", 5))
+OMLX_COLD_RELOAD_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("cold_reload_delay", 45))  # D2301: reasoning-model cold reload wait
 # D2187: OMLX circuit breaker (P1-3) — config-driven, no hardcoding
 OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
 OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))
@@ -101,7 +102,7 @@ VERIFY_TEMPERATURE=_CFG["models"]["verifier"]["temperature"]
 VERIFY_REASONING_OFF_PREFIX=_CFG["models"]["verifier"].get("reasoning_off_prefix", "")
 VERIFY_REASONING_OFF_MODELS=set(_CFG["models"]["verifier"].get("reasoning_off_models", []))  # D2249/C12: no hardcoded names
 VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
-VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2069: cross-family (Gemma)
+VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2264: cross-family verifier (Phi-4-mini)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]
 
 # ── Settings ───────────────────────────────────────────────────────────
@@ -128,6 +129,8 @@ S2_GOLDEN_INJECT=_CFG["stage2"].get("golden_inject_enabled", False)
 S2_GATE_ENABLED=bool(_CFG["stage2"]["gate_enabled"])
 S2_GATE_STRICT=bool(_CFG["stage2"]["gate_strict"])
 S2_EVIDENCE_TRACKING=bool(_CFG["stage2"]["evidence_tracking"])
+S2_HIGH_COHESION_THRESHOLD=float(_CFG.get("stage2", {}).get("high_cohesion_threshold", 0.90))  # C12
+S2_MED_COHESION_THRESHOLD=float(_CFG.get("stage2", {}).get("med_cohesion_threshold", 0.75))    # C12
 S2_SOURCE_BOOK_MATCH=_CFG["stage2"]["source_book_match"]
 S2_OMLX_RETRY=int(_CFG["stage2"]["omlx_retry_attempts"])
 S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
@@ -166,6 +169,8 @@ S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
 # See governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
 S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2216
 S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "tasksource/ModernBERT-base-nli")  # D2216
+S5_NLI_MODEL_LARGE=_CFG["models"]["nli_large"]  # D2293: DeBERTa-v3-large (435M) for dual-encoder primary
+S5_NLI_MODEL_CROSS=_CFG["models"]["nli_cross"]  # D2293: RoBERTa-large (355M) for cross-architecture verification
 S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.5))  # D2231: fallback matches config
 S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.6))  # D2231: fallback matches config
 S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.3))  # D2231: fallback matches config
@@ -179,16 +184,17 @@ def _validate_nli_thresholds():
                        ("nli_pass", S5_NLI_PASS_THRESHOLD)]:
         if not (0 <= val <= 1):
             issues.append(f"  {name}={val} is out of range [0,1]")
-    if S5_NLI_MARGINAL_THRESHOLD >= S5_NLI_ENTAILMENT_THRESHOLD:
-        issues.append(f"  marginal ({S5_NLI_MARGINAL_THRESHOLD}) >= entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) — should be lower")
-    if S5_NLI_ENTAILMENT_THRESHOLD >= S5_NLI_PASS_THRESHOLD:
-        issues.append(f"  entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) >= pass ({S5_NLI_PASS_THRESHOLD}) — should be lower")
+    # D2293: Single-threshold mode — all thresholds equal is valid for DeBERTa-only architecture
+    _single_threshold = (S5_NLI_MARGINAL_THRESHOLD == S5_NLI_ENTAILMENT_THRESHOLD == S5_NLI_PASS_THRESHOLD)
+    if not _single_threshold:
+        if S5_NLI_MARGINAL_THRESHOLD >= S5_NLI_ENTAILMENT_THRESHOLD:
+            issues.append(f"  marginal ({S5_NLI_MARGINAL_THRESHOLD}) >= entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) — should be lower")
+        if S5_NLI_ENTAILMENT_THRESHOLD >= S5_NLI_PASS_THRESHOLD:
+            issues.append(f"  entailment ({S5_NLI_ENTAILMENT_THRESHOLD}) >= pass ({S5_NLI_PASS_THRESHOLD}) — should be lower")
     if issues:
-        import sys
-        print("⚠️  NLI threshold misconfiguration:", file=sys.stderr)
-        for issue in issues:
-            print(issue, file=sys.stderr)
-        print(f"   Expected: 0 ≤ marginal({S5_NLI_MARGINAL_THRESHOLD}) < entailment({S5_NLI_ENTAILMENT_THRESHOLD}) < pass({S5_NLI_PASS_THRESHOLD}) ≤ 1", file=sys.stderr)
+        msg = "NLI threshold misconfiguration:\n" + "\n".join(issues)
+        msg += f"\n   Expected: 0 ≤ marginal({S5_NLI_MARGINAL_THRESHOLD}) < entailment({S5_NLI_ENTAILMENT_THRESHOLD}) < pass({S5_NLI_PASS_THRESHOLD}) ≤ 1"
+        raise ValueError(f"FATAL: {msg}")
 _validate_nli_thresholds()
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
 
@@ -227,6 +233,7 @@ S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "ollama")  # D
 S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-m3")  # D2181: unified
 S15_EMBED_CHUNK_SIZE = int(_CFG.get("stage1_5", {}).get("embed_chunk_size", 20000))  # D2189: chunked embedding
 S15_EMBED_BATCH_SIZE = int(_CFG.get("stage1_5", {}).get("embed_batch_size", 64))  # D2190: MPS forward batch
+S15_MAX_EMBED_DROP_RATE = float(_CFG.get("stage1_5", {}).get("max_embed_drop_rate", 0.005))  # D2275: embed quality gate
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])

@@ -1,0 +1,210 @@
+[
+  {
+    "fb_name": "Chemical Labeling As Biological Signal",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_ENTAIL",
+    "d_entail": 0.7877,
+    "r_entail": 0.9389,
+    "category": "SPOT-CHECK: Dual says PASS (verify auto-decision)",
+    "definition": "Chemical modification of DNA through methylation serves as a biological signal that distinguishes self from non-self, enabling cellular recognition mechanisms. The process allows for the labeling of DNA without altering its functional properties, maintaining transcription and protein synthesis capabilities. This labeling system enables hosts to differentiate between their own DNA and foreign invaders like phages. The mechanism operates by leveraging existing cellular processes to create distinguishable markers.",
+    "mechanism": "Methylation of DNA enables cellular recognition systems to distinguish between self and non-self DNA because the methyl tags create a detectable difference in molecular structure that host cells can recognize through specialized mechanisms.",
+    "evidence_passages": [
+      "be chemically labeled by tacking on a small molecule-methyl-to various nucleotides",
+      "The labeling technique described in the Dialogue is in fact one of E. colt's tricks for outwitting its phage invaders",
+      "The idea is that strands of DNA can be chemically labeled by tacking on a small molecule-methyl-to various nucleotides",
+      "methylated (labeled) DNA can be transcribed just as well as unmethylated (unlabeled) DNA",
+      "But if the host cell has some special mechanisms for examining whether DNA"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Overconfidence Bias in Decision Making",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_ENTAIL",
+    "d_entail": 0.8595,
+    "r_entail": 0.9008,
+    "category": "SPOT-CHECK: Dual says PASS (verify auto-decision)",
+    "definition": "People tend to overestimate their knowledge and confidence in predictions, leading to overconfidence bias. This occurs because individuals prefer definitive answers over uncertainty, which provides psychological comfort despite impairing foresight. The preference for certainty can be exploited for career advancement but reduces accuracy in forecasting.",
+    "mechanism": "Overconfidence bias occurs because humans find uncertainty distressing and prefer simple, confident answers over nuanced probabilistic reasoning. This preference causes people to overestimate their predictive abilities, leading to hedgehog-like thinking that appears confident but lacks accuracy.",
+    "evidence_passages": [
+      "are likelier to say something definitely will or won't happen. For many audiences, that's satisfying. People tend to find uncertainty disturbing and \"maybe\" underscores uncertainty with a bright red crayon.",
+      "The simplicity and confidence of the hedgehog impairs foresight, but it calms nerves---which is good for the careers of hedgehogs. Foxes don't fare so well in the media. They're less confident",
+      "Thus, Kahneman and Tversky showed that students would, with vivid enough wording, assume it more likely that a liberal-leaning woman was both a feminist and a bank teller rather than simply a bank teller. They called it the \"conjunction fallacy.\"",
+      "The fact that we don't think we're very good at it and have pretty well stayed out of it doesn't mean that it's irrational for you to do it."
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Recursive Self-reference",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "SPOT-CHECK: Dual says QUARANTINE (verify auto-decision)",
+    "definition": "Recursive self-reference occurs when a system refers to itself in a way that creates a loop or infinite regress, often leading to paradoxes or emergent properties. This mechanism enables systems to generate complexity from simple rules through self-replication and self-modification. The principle applies when a system's structure contains references to its own structure or behavior.",
+    "mechanism": "Recursive self-reference enables emergent complexity because a system's internal structure contains references to itself, creating feedback loops that can generate new patterns or behaviors without external input.",
+    "evidence_passages": [
+      "Tortoise: Thank you very much indeed, Achilles. Hmm ... Why are all these mathematicians' names engraved on the top? What a curious list: De Morgan Abel Boole Br o u w e r Sierpinski Weierstrass Achilles: I believe it is supposed to be a Complete List of All Great Mathematicians.",
+      "Tortoise: No, thanks. I'm too tired. I'm just going to head home. (Casually, he opens the box.) Say, wait a moment, Achilles-there are one hundred Louis d'or in here! Achilles: I would be most pleased if you would accept them, Mr. T. Tortoise: But-but Achilles: No objections, now. The box, the gold-they're yours.",
+      "Tortoise: Well, I am afraid that I myself am growing a little groggy, Achilles. It would be well for me to take my leave, while I am still capable of navigating my way home. Achilles: I am most flattered' that you have stayed up for so long, and at such an odd hour of the night, just for my benefit. I am most flattered.",
+      "Oh, sirs, am I ever glad you arrived! All evening long, I have been being terrorized by Mr. Tortoise and his very Asian gold box. Now at last you have come to liberate me! Please, sirs, just take a look behind that dresser, and there you will find the culprit!"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Self-referential Barrier Crossing",
+    "s5_status": "QUARANTINE",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "SPOT-CHECK: Dual says QUARANTINE (verify auto-decision)",
+    "definition": "A self-referential system must transcend its own structural limitations to achieve higher-order understanding. The mechanism involves recognizing and dissolving the boundaries that define the system's identity, requiring complete internal transformation. This principle applies when a system's coherence depends on maintaining distinct boundaries, but higher understanding requires breaking those boundaries.",
+    "mechanism": "Self-referential systems achieve transcendence because they must first fully embody and experience their own constraints before they can step outside them. The process requires complete internal engagement with the system's rules and limitations, making the barrier a necessary prerequisite for under",
+    "evidence_passages": [
+      "To realize Zen one has to pass through the barrier of the patriarchs",
+      "This one word, 'MU', is it. This is the barrier of Zen",
+      "If you pass through it, you will see Joshu face t face",
+      "If you want to pass this barrier, you must work through every bone in you body, through every pore of your skin"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Fundamental Uncertainty",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "S5 FALSE POSITIVE? S5=PASS, Dual=CONTRA",
+    "definition": "Fundamental uncertainty represents the inherent unpredictability of rare, high-impact events that cannot be forecasted even with advanced models or intelligence. This principle recognizes that randomness and black swan events dominate complex systems like markets, politics, and nature. The core insight is that while we can identify known unknowns and unknown knowns, truly rare events remain fundamentally unpredictable. Because of this, preparing for volatility through antifragile systems is more effective than attempting prediction.",
+    "mechanism": "Fundamental uncertainty exists because complex systems are driven by rare, high-impact events that cannot be modeled or predicted, even with superior intelligence or tools. These events are not random in the sense of being meaningless, but rather random in their timing and impact, making forecasting",
+    "evidence_passages": [
+      "an elite university who know their intelligence is being tested with an activity that is the very symbol of randomness",
+      "as the stock market, geopolitics, and global finance have shown again and again that, for the rare and impactful events in our world, predicting is impossible! It's more efficient to prepare",
+      "All the tests of probability I discussed in the previous chapters show that randomness and black swan events dominate complex systems",
+      "systems, your body, your nutrition (diabetes and many similar modern ailments seem to be associated with a lack of randomness in feeding and the absence of the stressor of occasional starvation), your psyche",
+      "For example, we know that the stock market crashes occasionally, but nobody can precisely predict when or how far it will crash"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Adaptive System Resilience",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "S5 FALSE POSITIVE? S5=PASS, Dual=CONTRA",
+    "definition": "Systems must incorporate dynamic safeguards that detect and respond to failures or threats in real-time, preventing cascading damage while maintaining operational integrity. This principle enables systems to self-regulate under stress or attack conditions by implementing layered controls that adapt to changing contexts.\n\nThe mechanism operates through continuous monitoring and automated intervention when thresholds are crossed, allowing systems to isolate faults or malicious behavior before they propagate. These safeguards act as a form of systemic immunity, protecting against both internal de",
+    "mechanism": "Adaptive system resilience works because continuous monitoring detects anomalies or threats, and automated circuit breakers or controls intervene to isolate or stop harmful processes before they cause widespread damage, thereby preserving system integrity and preventing cascading failures.",
+    "evidence_passages": [
+      "Circuit Breakers: Preventing System-Wide Failures If the errors persist, circuit breakers act as an AI's immune system, stopping faulty processes before they cause widespread damage.",
+      "Instead, use environment variables or secure configuration files that are not committed to version control.",
+      "The implementation of anti-manipulation controls requires both technical and organizational measures.",
+      "Modes are not going away. In spite of their challenges or the thought-leaders who complain about",
+      "Just as systems like AlphaGo learn unexpected strategies from millions of self-played games, so too will AI-enabled cyberattacks."
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Genetic Information Implantation",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "S5 FALSE POSITIVE? S5=PASS, Dual=CONTRA",
+    "definition": "The genetic code of an organism contains all the information necessary to produce its phenotype, yet the relationship between genotype and phenotype is not deterministic or immediately apparent. This principle highlights the complex, indirect nature of information transfer from DNA to observable traits, which creates philosophical and practical ambiguities in understanding biological development and inheritance.",
+    "mechanism": "Genetic information is embedded within DNA sequences and becomes manifest through complex biological processes, but the mapping from genetic code to observable characteristics is not direct or fully predictable because intermediate steps involve numerous regulatory mechanisms, environmental interact",
+    "evidence_passages": [
+      "when phenotype can be said to be \"available\", or \"implied\", by genotype, is a highly charged issue in our day: it is the issue of abortion.",
+      "the set of symbols would have no intrinsic meaning",
+      "FIGURE 41. This Giant Aperiodic Crystal is the base sequence for the chromosome of bacteriophage OX174. It"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Creative Connection Through Shared Purpose",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "S5 FALSE POSITIVE? S5=PASS, Dual=CONTRA",
+    "definition": "Creative individuals thrive when they connect with others who share a similar commitment to bringing new, meaningful ideas into the world. This alignment of purpose creates a supportive environment where innovation can flourish. The principle operates through mutual recognition of effort and shared vision.",
+    "mechanism": "Creative collaboration strengthens because individuals who value the same kind of expressive endeavor form emotional bonds that support risk-taking and idea generation. These connections provide validation and motivation that fuel continued creative work.",
+    "evidence_passages": [
+      "He suspected it had to do with the creative spirit, that connection you feel with another person you know is trying their best to bring new, beautiful things into the world",
+      "Try your best to seek out the like-hearted people with whom you feel this connection",
+      "Every age has its own outlook. It is specially good at seeing certain truths and specially liable to make cert",
+      "You hold in your hand a book. But what is a book? Is it something you buy or something you become? To many authors and publishers, a book is 75,000 words on 300 pages held between two rigid covers that measure 6 by 9 inches. Or, it's 75,000 electronic words that can be resized, customized, read, and annotated by the user",
+      "There is, however, a growing number of artist- and activist-designed games that aim to challenge assumptions about game design, their social and cultural uses, 7 and encourage social change"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Reference-dependent Preferences",
+    "s5_status": "PASS",
+    "dual_verdict": "BOTH_CONTRA",
+    "d_entail": 0.0,
+    "r_entail": 0.0,
+    "category": "S5 FALSE POSITIVE? S5=PASS, Dual=CONTRA",
+    "definition": "People's preferences and judgments are heavily influenced by the reference points or comparison sets they encounter. This leads to irrational decision-making when choices are framed relative to other options rather than in absolute terms. The principle operates because human evaluation is context-sensitive, with relative comparisons triggering emotional responses that override logical reasoning.",
+    "mechanism": "Reference-dependent preferences cause irrational choices because people evaluate options relative to nearby alternatives rather than their intrinsic value. When a worse option is presented first, the subsequent choice appears more attractive due to contrast effects, while the same choice might be re",
+    "evidence_passages": [
+      "The salesman deliberately shows the customer three awful houses at ridiculously high prices. Then he shows him a merely bad house at a price only moderately too high. And boom, the broker often makes an easy sale.",
+      "The same thing may appear attractive when compared to less attractive things and unattractive when compared to more attractive things.",
+      "Studies show that a person of average attractiveness is seen as less attractive when compared to highly attractive others.",
+      "Deprival-superreaction tendency has ghastly effects in labor relations.",
+      "I was a well-to-do man with no debt; there was no risk of loss, and similar no-risk opportunities"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Self-improving Agent Loop",
+    "s5_status": "QUARANTINE",
+    "dual_verdict": "BOTH_ENTAIL",
+    "d_entail": 0.9989,
+    "r_entail": 0.9511,
+    "category": "S5 FALSE NEGATIVE? S5=QUARANTINE, Dual=ENTAIL",
+    "definition": "Agents that can reflect on their own actions and adjust their behavior through feedback loops enable autonomous decision-making and continuous improvement. This mechanism allows systems to adapt to changing conditions and correct errors without external intervention. The principle applies when agents operate in dynamic environments where static rules are insufficient.",
+    "mechanism": "Self-improving agents function because they incorporate reflective processes that evaluate outcomes and update strategies accordingly, enabling them to learn from experience and refine their decision-making over time.",
+    "evidence_passages": [
+      "Reflective or self-improving agents don't just act---they reflect on the",
+      "If a step fails, the pipeline stops (or retries according to rules you wrote). The system do",
+      "A Q-learning agent that learns optimal pricing policies through exploration",
+      "The analysis will generate a report. If the report indicates that the task output satisfies your requirements, then you're done. But, here'",
+      "This mirrors the creation process for many human-created artifacts, such as this chapter you're reading now, which is the result of a back and forth between the authors, reviewers, and editor until all are happy with the final product."
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Model Context Protocol",
+    "s5_status": "QUARANTINE",
+    "dual_verdict": "BOTH_ENTAIL",
+    "d_entail": 0.9739,
+    "r_entail": 0.6773,
+    "category": "S5 FALSE NEGATIVE? S5=QUARANTINE, Dual=ENTAIL",
+    "definition": "The Model Context Protocol (MCP) enables LLM-based applications to integrate external tools and systems by defining standardized interfaces for tool execution and context management. This protocol facilitates agentic behavior by allowing models to reason about and invoke external operations like web searches, API queries, and database commands. MCP serves as a bridge between language models and real-world system interactions, enabling more capable and context-aware AI applications.",
+    "mechanism": "MCP enables LLMs to execute external operations because it provides standardized protocols for tool invocation and context management, allowing models to reason about and trigger system operations like web searches, API calls, and database queries.",
+    "evidence_passages": [
+      "Tool calls : Running a web search, querying an API, or executing a database command",
+      "Model Context Protocol (MCP) One popular approach to",
+      "MCP Model Context Protocol (MCP) from Anthropic \"is an open-source",
+      "To browse the web, the code uses the Playwright MCP server to control a web browser",
+      "Several platforms demonstrate different approaches to building organizational memory"
+    ],
+    "your_verdict": ""
+  },
+  {
+    "fb_name": "Explicit Signal Protocol",
+    "s5_status": "QUARANTINE",
+    "dual_verdict": "BOTH_ENTAIL",
+    "d_entail": 0.8777,
+    "r_entail": 0.9895,
+    "category": "S5 FALSE NEGATIVE? S5=QUARANTINE, Dual=ENTAIL",
+    "definition": "A structured communication protocol that permits non-essential information to be included in a message when it is explicitly signaled and delimited. The principle enables controlled flexibility in communication by providing clear markers for optional content. This approach prevents ambiguity while maintaining the ability to inject contextual or supplementary information.",
+    "mechanism": "Explicit signaling works because it allows the receiver to distinguish between essential and non-essential content through predefined markers, enabling the system to process the message with flexibility while maintaining clarity. The signaling mechanism creates a parsing rule that the receiver can a",
+    "evidence_passages": [
+      "Interestingly, the printed equivalent of coughing (i.e., a nonessential or irrelevant comment) is allowed, but only provided it is signaled in advance by a key word (e.g., [COMMENT]{.bold}), and then terminated by another key word (e.g., a semicolon).",
+      "This small gesture towards flexibility has its own little pitfall, ironically:"
+    ],
+    "your_verdict": ""
+  }
+]

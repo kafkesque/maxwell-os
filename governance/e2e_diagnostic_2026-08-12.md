@@ -9,15 +9,15 @@
 
 | Stage | Result | Time |
 |-------|--------|------|
-| S2 Extract | ❌ I/O operation on closed file. | 3069.8s |
-| S4 Merge+Classify | 0 FBs | ?s |
-| S5 Verify | 0 FBs (PASS=0, QUARANTINE=0, FAIL=0) | ?s |
-| S6 Commit | ✅ ? | ?s |
+| S2 Extract | 188 FBs | 0s |
+| S4 Merge+Classify | 185 FBs | 0s |
+| S5 Verify | 185 FBs (PASS=0, QUARANTINE=0, FAIL=185) | 491.0s |
+| S6 Commit | ✅ /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/diagnostic_diagnostic_20260811_232853.db | 61.7s |
 
 ## 2. Gate Decision (D2261)
 
 - **Yield:** 188 FBs / 100 books = **188.0%**
-- **S5 Pass Rate:** 0.0% (0/0)
+- **S5 Pass Rate:** 0.0% (0/185)
 
 ### 🛑 GATE FAILED — HALT AND DIAGNOSE
 Reasons: S5 pass rate 0.0% below 20% minimum.
@@ -29,21 +29,20 @@ Do NOT launch T1.1. Investigate root cause.
 |--------|-------|---|
 | PASS | 0 | 0.0% |
 | QUARANTINE | 0 | 0.0% |
-| FAIL/FLAG | 0 | 0.0% |
+| FAIL/FLAG | 185 | 100.0% |
 
-## 4. All Foundation Blocks (188 total)
+## 4. All Foundation Blocks (185 total)
 
-### ❓ FB-1: Efficiency-Over-Identity Tradeoff
+### ❓ FB-1: Efficiency-over-identity Tradeoff
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 72b59b60305866343b3adffc060e26531f77850597e21e24ff2796b9879f7fea |
+| fb_id | 2aace906774c17cd723fc2f470a44b02139daa688c00a09f44e9d92aecde67bf |
 | source_books | A Story is a Deal_ How to Use the Science of Storytelling to -- Will Storr -- 2025 -- Hachette UK -- 9780349437224 -- 2867e98f5d89cb9964c00eae9ec36302 -- Anna’s Archive.md, Decisive How to Make Better Choices in Life and Work (Chip Heath) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -56,27 +55,40 @@ Do NOT launch T1.1. Investigate root cause.
 
 **Consequence:** Because of this principle, companies experience high employee turnover, low job satisfaction, and systemic stress as workers become alienated from their roles and treated as replaceable components in a machine-like system.
 
-**Elaboration:** This tradeoff is particularly evident in call centers and gig economy roles where workers are monitored through digital systems and evaluated based on performance scores. The system creates a feedback loop where efficiency is rewarded and human needs are punished. Workers often face punitive measures for minor infractions, and their identity as professionals is eroded by constant surveillance. The principle becomes self-reinforcing as organizations optimize for efficiency metrics, leading to a cycle of high turnover and constant recruitment costs. This approach is most damaging in roles where human interaction is essential but not easily quantified.
+**Elaboration:** Prioritizing quantifiable efficiency metrics over employee well‑being leads to dehumanized work environments.
+
+**Application:** Optimizing operational processes in organizations
+
+**Failure Mode:** High employee turnover and low morale
+
+**Keywords:** efficiency, identity, employee well-being, performance metrics, turnover, morale
 
 **Evidence Passages (3):**
 1. "to hire 130 people every single year to keep the positions filled. That constant rotation causes enormous waste for companies, who must recruit and train workers who end up leaving in a few weeks...."
 2. "mouse click, every bathroom break is logged and analysed and will be used against you, should you err even slightly. Three strikes and you're out...."
 3. "Every shift, your legs cramp with the relentless hours of sitting, but you're forbidden to stand and stretch until you..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block does not accurately reflect the evidence passages. The evidence suggests a negative impact of constant rotation and lack of employee well-being, while the foun
 
 ---
 
-### ❓ FB-2: Risk-Value Tradeoff in High-Stakes Decision Making
+### ❓ FB-2: Risk-Value Tradeoff in High-Stakes Decision
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | c6c65dbc71570643ccb89ab3c194efb06ac2f0199e4d31c9c7f731748be006d5 |
+| fb_id | b81199d76a02d4eb592ac772f65875c39a89336497c9ff0d18c274daf44c1093 |
 | source_books | Range (David Epstein [Epstein, David]) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, Universal Principles of Design, Revised and Updated 125 Ways to Enhance Usability, Influence Perception, Increase Appeal, Make… (Lidwell, William Holden, Kritina Butler etc.) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 3 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | decision making |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -89,7 +101,13 @@ Do NOT launch T1.1. Investigate root cause.
 
 **Consequence:** Because of this principle, teams in high-risk environments often delay or avoid high-risk actions until the value of the potential gain outweighs the cost of failure, even if that means missing opportunities or losing competitive advantage.
 
-**Elaboration:** In complex systems, such as aerospace or racing, the principle operates under conditions where small variables (like temperature or engine performance) can cascade into major failures. The decision-making process often involves multiple stakeholders with different risk tolerances, and the choice to proceed or not is influenced by the perceived value of the outcome versus the certainty of loss. When teams face a decision between racing or not, they must consider not just the immediate risk but also the long-term implications of failure, such as loss of sponsorship or business viability. The principle also highlights how organizational pressure to reduce costs can lead to unsafe conditions, as seen in the Challenger shuttle case, where cost-cutting reduced safety factors until failure occurred. This demonstrates that risk-value tradeoffs are not just about individual decisions but also about systemic pressures.
+**Elaboration:** Balancing potential gains against catastrophic losses shapes risk‑value tradeoffs in high‑stakes contexts.
+
+**Application:** Strategic decision making under uncertainty
+
+**Failure Mode:** Delaying or avoiding high‑risk actions, losing competitive advantage
+
+**Keywords:** risk, value, high‑stakes, uncertainty, binary outcomes, irreversible loss
 
 **Evidence Passages (5):**
 1. "The crux is whether the fictional Carter Racing team’s car should compete in the biggest race of the season, which begins in one hour...."
@@ -97,20 +115,27 @@ Do NOT launch T1.1. Investigate root cause.
 3. "The case study says that at the last minute, the team owner, BJ Carter, called his mechanics...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 3 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block discusses high-stakes decisions with binary outcomes and irreversible consequences, while the evidence passages do not clearly present a high-stakes scenario w
 
 ---
 
-### ❓ FB-3: Scarcity-Driven Value Amplification
+### ❓ FB-3: Scarcity-driven Value Amplification
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | d234c9f72ffcaca085356d700f284d8f0743321f4e4fac4d6cd348e2b14632ca |
+| fb_id | f8a905ce457dbb4aade09e23ec2c08d9ecacdf3556bab5c33ddf4f827d7e6682 |
 | source_books | $100M Offers How To Make Offers So Good People Feel Stupid.md, Activate Your Brain - How Understanding Your Brain.md, Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md ... (+51 more) |
-| source_diversity | 53 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | behavioral economics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -131,7 +156,13 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 
 **Consequence:** Offers that strategically incorporate scarcity and commitment elements can achieve higher perceived value and conversion rates than those that present only the core deal, because the psychological biases of scarcity and commitment create powerful motivation to complete the transaction.
 
-**Elaboration:** The principle operates on multiple psychological levels: first, the mere addition of items creates a sense of abundance that makes the overall package seem more valuable than its parts. Second, the commitment bias causes individuals to continue down a path once they've started, even if the logic of the deal becomes less clear. Third, scarcity framing makes the offer seem more exclusive and time-sensitive, increasing urgency. The principle is particularly potent in negotiation contexts where the initial offer sets a baseline for what is acceptable. When the added elements are too obvious or too small in value, the psychological manipulation becomes transparent and fails to work. The principle also works best when the added elements are not immediately available to others, reinforcing the scarcity narrative.
+**Elaboration:** Combining scarce bonuses with commitment escalation inflates perceived value and boosts conversion.
+
+**Application:** Marketing and negotiation tactics
+
+**Failure Mode:** Perceived manipulation leading to distrust
+
+**Keywords:** scarcity, commitment, perceived value, bonuses, negotiation, marketing
 
 **Evidence Passages (5):**
 1. "Now if my offer was $400, then the value of these free bonuses ALONE is worth more than the $400..."
@@ -139,6 +170,14 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 3. "The Power of Scarcity The article archived at www.socialengineer.org/wiki/archives/Governments/GovernmentsFoodElectionWeapon.html..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 56 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.72 (strong signal)
 
 ---
 
@@ -150,9 +189,8 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 |----------|-------|
 | fb_id | a47cd891ede7b83aef9b05537072c21eb983aa3246a77fd872fd3c2f82916014 |
 | source_books | Superforecasting The Art and Science of Prediction (Philip E. Tetlock, Dan Gardner) (z-library.sk, 1lib.sk, z-lib.sk).md, The Scout Mindset (Julia Galef) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -165,13 +203,27 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 
 **Consequence:** Because of this principle, forecasters who embrace scout mindset will produce more accurate predictions over time, as they learn from both successes and failures rather than treating errors as mere noise or bad luck.
 
-**Elaboration:** The principle operates on the distinction between prediction confidence and belief updating. A forecast that is wrong doesn't necessarily mean the forecaster was wrong, but rather that their model or assumptions were incomplete. This requires a meta-cognitive approach where forecasters assess not just whether their prediction was right, but how their reasoning process led to that prediction. The principle also implies that good forecasting requires both accuracy and learning capacity. When forecasters fail to update their beliefs after clear counter-evidence, they become trapped in confirmation bias and lose the ability to improve. The principle is particularly relevant in high-stakes environments where prediction accuracy directly impacts decision-making.
+**Elaboration:** Actively seeking disconfirming evidence and updating beliefs turns errors into learning.
+
+**Application:** Improving forecasting accuracy
+
+**Failure Mode:** Confirmation bias and belief persistence
+
+**Keywords:** scout mindset, prediction, disconfirming evidence, belief updating, cognitive bias
 
 **Evidence Passages (3):**
 1. "missed the mark by a lot---if they predicted something was very likely and it didn't happen or if they predicted something was very unlikely and it did happen---they would go back and reevaluate their process..."
 2. "The Yasukuni Shrine in Japan is a controversial spot. On the one hand, it holds many of Japan's milit..."
 3. "But he didn't raise his forecast from 82% to 99%, as he later said he should have, because events unfolded quickly and he was "too swamped with work to stay on top of it."..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition inaccurately reflects the evidence passages. The evidence suggests that forecasters reevaluate their process when predictions fail, but the definition states that th
 
 ---
 
@@ -183,9 +235,8 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 |----------|-------|
 | fb_id | b1a18d021ef70416b38fd9db88c38fb78b485fb9a881ac0c11d21b364deb1df2 |
 | source_books | Blink The Power Of Thinking Without Thinking (Malcolm Gladwell) (z-library.sk, 1lib.sk, z-lib.sk).md, Blink The Power of Thinking Without Thinking - Little, Brown and Company. Malcolm Gladwell (2005).md, Deep Work Rules for Focused Success in a Distracted World (Cal Newport) (z-library.sk, 1lib.sk, z-lib.sk).md, Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md, How charts lie getting smarter about visual information (Cairo, Alberto) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+7 more) |
-| source_diversity | 12 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -198,7 +249,13 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 
 **Consequence:** Decision-making that allows for unconscious processing before conscious analysis leads to more accurate judgments and better problem-solving outcomes than forced analytical approaches.
 
-**Elaboration:** This principle suggests that deliberate over-analysis can interfere with optimal decision-making by disrupting the brain's natural pattern recognition systems. The unconscious mind benefits from having sufficient time to process information without interference from conscious effort. However, this doesn't mean all analysis should be avoided - rather, conscious analysis should follow an initial period of unconscious processing. The principle also implies that rushing to solve problems through conscious effort may lead to suboptimal outcomes, particularly in complex situations where multiple factors interact in non-obvious ways.
+**Elaboration:** The unconscious mind can process complex information in parallel, integrating many variables beyond conscious attention, leading to better judgments when problems are multi‑variable or pattern‑based.
+
+**Application:** decision-making and problem solving
+
+**Failure Mode:** when the problem requires explicit logical reasoning or conscious analysis
+
+**Keywords:** unconscious processing, parallel processing, decision making, problem solving, cognitive psychology
 
 **Evidence Passages (5):**
 1. "Gladwell says that people make complex judgments without knowing how they do it. Trying to analyze everything may lead to poorer decisions...."
@@ -206,6 +263,14 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 3. "Some people are more and others less successful in attaining their ends and solving their problems. Such differences are noticed, di..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 12 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that unconscious processing leads to better problem-solving outcomes, which is not directly supported by the evidence passages. The evidence suggests that u
 
 ---
 
@@ -217,9 +282,8 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 |----------|-------|
 | fb_id | 0a2deaab87e812fa695694aa89e7052ca0c2bf7531a17fe5546fe7248d172993 |
 | source_books | A Story is a Deal_ How to Use the Science of Storytelling to -- Will Storr -- 2025 -- Hachette UK -- 9780349437224 -- 2867e98f5d89cb9964c00eae9ec36302 -- Anna’s Archive.md, Four Thousand Weeks Time Management for Mortals (Oliver Burkeman) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -232,13 +296,27 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 
 **Consequence:** Because of this principle, organizations develop systems to monitor and regulate time usage, treating human attention as a resource to be optimized rather than a natural human capacity to be respected.
 
-**Elaboration:** The mechanism reveals how industrial society transformed time from a natural phenomenon into an economic resource. This transformation enables the development of time-tracking systems, productivity metrics, and employment policies that treat human attention as a quantifiable asset. The principle explains why modern work environments emphasize punctuality, time logs, and efficiency measures. When time is treated as a commodity, it becomes subject to the same economic pressures as physical goods, leading to the development of systems that regulate human behavior through temporal constraints. The principle also explains why workers are often viewed as 'time thieves' when they deviate from prescribed schedules or productivity standards.
+**Elaboration:** By quantifying and treating time as a commodity, organizations can allocate, monitor, and enforce schedules to maximize productivity, turning human attention into a managed resource.
+
+**Application:** time resource management in organizations
+
+**Failure Mode:** when time is treated as an unbounded natural flow or individuals have full autonomy
+
+**Keywords:** time management, resource allocation, economic principles, productivity, organizational behavior
 
 **Evidence Passages (3):**
 1. "time" is what ticks away as the hands move around the clockface..."
 2. "By the late 1700s, rural peasants were streaming into English cities, taking jobs in mills and factories..."
 3. "The way Crowley saw it, his lackadaisical employees were thieves, illegitimately helping themselves to containers from the conveyor belt of time..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
@@ -250,9 +328,8 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 |----------|-------|
 | fb_id | 751217228dab31b52e8ca384e920398fbe0ebb7bd8eefc84fa74537b392210ad |
 | source_books | About Face The Essentials of Interaction Design 4th Edition (Alan Cooper, Robert Reimann, David Cronin etc.) (z-library.sk, 1lib.sk, z-lib.sk).md, About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md, Agent-Powered Growth Deploy AI Agents That Build Your Marketing Pipeline 247 (Stu Sjouwerman) (z-library.sk, 1lib.sk, z-lib.sk).md, An Elegant Puzzle Systems of Engineering Management (Will Larson) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md ... (+73 more) |
-| source_diversity | 77 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | strategic thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -265,7 +342,13 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 
 **Consequence:** Because of this principle, teams that establish shared understanding before execution experience higher coordination efficiency, reduced rework, and more consistent delivery of intended outcomes.
 
-**Elaboration:** The principle operates across different domains—whether in creative projects, marketing campaigns, or systems design—because all require alignment between diverse stakeholders. In complex projects, this alignment often needs to be re-established periodically as new challenges emerge. Teams that invest in this process early in the lifecycle typically see better long-term outcomes than those who assume alignment will naturally develop. The principle is particularly powerful in environments where change is constant, as it provides a stable reference point for navigating uncertainty.
+**Elaboration:** Clarifying roles, goals, and success metrics reduces cognitive dissonance and communication breakdowns, aligning efforts and preventing wasted resources.
+
+**Application:** strategy execution and team coordination
+
+**Failure Mode:** when teams are unwilling to engage in difficult conversations about core assumptions or hierarchies block dialogue
+
+**Keywords:** strategic alignment, shared understanding, team coordination, goal clarity, organizational behavior
 
 **Evidence Passages (5):**
 1. "step to moving beyond that problem is determining the root of it. Should your group define some terms? Should there be more clarity on roles or diversity of effort on the team?..."
@@ -273,20 +356,27 @@ The mechanism works through two primary pathways: (1) scarcity amplification, wh
 3. "The problem is not change itself, for change is ubiquitous. Neither is the problem in the man-made origin of the change, for it is in the nature of man to change his environment...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 78 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.92 (strong signal)
 
 ---
 
-### ❓ FB-8: Customer-Centric Experience Design
+### ❓ FB-8: Customer-centric Experience Design
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | f84d81bb4c33205d5165bb6ebfc84b7dd5a414f3f049e74750ded98b4e9d2c81 |
+| fb_id | a2845d094fd0eb73cd7d6781c5de36bd07a1915a379997e5e64be4ffb715924c |
 | source_books | 101 Design Methods A Structured Approach for Driving.md, About Face The Essentials of Interaction Design 4th Edition (Alan Cooper, Robert Reimann, David Cronin etc.) (z-library.sk, 1lib.sk, z-lib.sk).md, About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md, An Elegant Puzzle Systems of Engineering Management (Will Larson) (z-library.sk, 1lib.sk, z-lib.sk).md, Art Direction for the Web Andy Clarke liber3.md ... (+46 more) |
-| source_diversity | 50 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | marketing |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -307,7 +397,13 @@ The design process enables organizations to identify key emotional highs and low
 
 Companies that implement this approach can differentiate themselves through emotional connection rather than just functional features, leading to more resilient and profitable customer relationships.
 
-**Elaboration:** The principle recognizes that customer experience is not just about transactional interactions but about creating meaningful moments that become part of the customer's identity and daily routine. This requires deep empathy and understanding of how customers actually live their lives, not just how they use products. Organizations must be willing to invest in understanding the full journey, including moments of frustration or confusion, as these are often where value can be created through thoughtful design. The emotional highs and lows identified through journey mapping become the foundation for innovation and competitive differentiation. When companies treat customer experience as a core design challenge rather than a support function, they create experiences that are not only functional but also deeply resonant with their target audience.
+**Elaboration:** Mapping the customer journey and crafting emotional touchpoints creates cumulative resonance, driving engagement, retention, and brand loyalty.
+
+**Application:** customer experience design and brand loyalty
+
+**Failure Mode:** when companies treat customer experience as an afterthought or ignore actual customer behaviors
+
+**Keywords:** customer experience, journey mapping, emotional touchpoints, loyalty, UX design
 
 **Evidence Passages (5):**
 1. "a brief time of heightened experience for a customer, one that can either drive her away or cement a lifelong relationship..."
@@ -315,6 +411,14 @@ Companies that implement this approach can differentiate themselves through emot
 3. "As you map their journey, you're walking a mile in their shoes. Along the way, you are looking for the emotional highs and lows and the meaning that the experience holds for the customer..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 51 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.96 (strong signal)
 
 ---
 
@@ -326,9 +430,8 @@ Companies that implement this approach can differentiate themselves through emot
 |----------|-------|
 | fb_id | c4573b480d1bb36c0792524c254cfe0f93d024835568eabb61053873624721b3 |
 | source_books | Agentic Artificial Intelligence (Pascal Bornet) (z-library.sk, 1lib.sk, z-lib.sk).md, Architecting Generative AI Applications Build, deploy, and scale production-ready GenAI systems with LLMOps best practices (Leonid Kuligin) (z-library.sk, 1lib.sk, z-lib.sk).md, Build Better Products (Laura Klein) (z-library.sk, 1lib.sk, z-lib.sk).md, Continuous Discovery Habits Discover Products that Create Customer Value and Business Value (Teresa Torres) (z-library.sk, 1lib.sk, z-lib.sk).md, Continuous_Discovery_Habits_Discover_Products_that_Create_Teresa.md ... (+33 more) |
-| source_diversity | 38 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | operations research |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -349,7 +452,13 @@ Process pattern identification enables systematic improvement because it reveals
 
 Teams that systematically identify recurring tasks and bottlenecks can optimize their workflows and focus on high-value activities.
 
-**Elaboration:** The framework works best when applied iteratively, allowing teams to refine their understanding over time. It requires discipline to gather feedback directly from reality rather than relying on assumptions or hearsay. The approach is particularly effective in environments where process optimization is critical to performance. When teams use structured frameworks, they often discover that many problems stem from unaddressed recurring issues rather than one-time exceptions. The principle supports both individual decision-making and organizational process improvement.
+**Elaboration:** Structured Decision Framework forces decision makers to explicitly weigh pros and cons, gather empirical feedback, and detect recurring patterns, thereby reducing bias and aligning actions with real outcomes. It is especially useful when choices involve multiple interdependent factors and when process inefficiencies can be identified through pattern recognition.
+
+**Application:** Business strategy and operational improvement
+
+**Failure Mode:** Cognitive bias and reliance on incomplete assumptions
+
+**Keywords:** decision-making, pros-cons analysis, reality feedback, pattern recognition, cognitive bias, process improvement
 
 **Evidence Passages (5):**
 1. "Ask your team: "What tasks do you find yourself doing repeatedly throughout the week?" "Which activities prevent you from focusing on more strategic work?" "What processes consistently create bottlenecks in our operations?" "Which routine tasks require the most oversight to prevent errors?"..."
@@ -357,6 +466,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Franklin said: "to divide half a sheet of paper by a line into two columns, writing over the one Pro and over the other Con."..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 38 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
@@ -368,9 +485,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | e71af4617ce33a467243a6ef0f05010c8d300e33d6abaaa15c6e79b2dd6d818e |
 | source_books | An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Branding In Five and a Half Steps (Johnson, Michael) (Z-Library).md, Building Strong Brands -- David A_ Aaker -- 1, 1, 1996 -- The Free Press -- 807833dc34abf6c66225e2abf4f0a081 -- Anna’s Archive.md, Change by Design How Design Thinking Transforms Organizations and Inspires Innovation Tim Brown liber3.md, Competing Against Luck _ The Story of Innovation and -- Recorded Books, Inc__ Christensen, Clayton M__ Dillon, -- HarperCollins, [Place of publication -- 9780062435613 -- cdfd7a64ae12968e6a9dcdb8997d050d -- Anna’s Archive.md ... (+44 more) |
-| source_diversity | 48 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -383,7 +499,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Organizations and individuals that embrace sustainable speed are more resilient to disruption and better able to innovate, because they can respond to change with both agility and insight rather than reacting impulsively or passively.
 
-**Elaboration:** In systems design, sustainable speed means that incremental changes allow for continuous adaptation without breaking the system's integrity. In creative work, it means that slowing down to observe and reflect enhances the quality of output. The principle also applies to organizational culture, where teams must balance rapid iteration with thoughtful evaluation. When speed becomes a default without reflection, systems lose their ability to adapt meaningfully. The principle is not about avoiding change, but about managing it in a way that preserves both efficiency and insight.
+**Elaboration:** Sustainable Speed in Systems balances the need for quick adaptation with deliberate observation and adjustment. By matching the pace of change to the system’s processing capacity, it prevents overwhelm and preserves coherence, while avoiding obsolescence that comes from sluggishness. This principle is critical when environments shift at a rate that allows for meaningful reflection.
+
+**Application:** Systems engineering and organizational change
+
+**Failure Mode:** Overreaction to rapid change or stagnation from slow response
+
+**Keywords:** sustainable speed, systemic adaptation, rapid response, deliberate observation, resilience, innovation
 
 **Evidence Passages (5):**
 1. "slow down, not in pace or wordage but in nerves. ---John Steinbeck It's impossible to pay proper attention to your life if you are hurtling along at lightning speed. When your job is to see things other people don't, you have to slow down enough that you can actually look...."
@@ -391,6 +513,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Science and engineering have been the catalysts for the unprecedented speed and magnitude of change...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 49 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 49 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.95 + CITATION-ECHO → LLM: The foundation block's definition does not accurately reflect the evidence passages. The passages provided discuss the importance of slowing down, the impact of rapid c
 
 ---
 
@@ -402,9 +532,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 206294189bf0e5d89220915c6140747343fb08e334749b5e02ef93f10d89800a |
 | source_books | Information Graphics (Sandra Rendgen) (z-lib.org).md, The Fifth Discipline_ The Art & Practice of The Learning Organization_Peter M. Senge_liber3.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -417,27 +546,40 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, economic systems that grow without environmental limits eventually face systemic collapse due to climate instability, resource depletion, and ecosystem breakdown that undermines the foundations of economic activity.
 
-**Elaboration:** The principle reveals a fundamental tension between human economic behavior and planetary boundaries. Even when economic actors recognize environmental risks, they often continue prioritizing growth due to competitive pressures and short-term profit cycles. The emissions created through economic activity become a self-reinforcing feedback loop that makes future economic stability increasingly uncertain. This creates a paradox where the very system that enables prosperity becomes the source of its own potential destruction. The principle also suggests that environmental regulation and carbon pricing mechanisms are necessary to align economic incentives with long-term sustainability.
+**Elaboration:** Economic Growth and Environmental Degradation explains how reinforcing feedback loops in economic systems—such as income, demand, and capital investment—drive resource consumption and greenhouse gas emissions. Without explicit environmental constraints, these loops lead to cumulative emissions that destabilize the climate and erode the very resources that sustain growth, creating a path toward systemic collapse.
+
+**Application:** Environmental policy and economic planning
+
+**Failure Mode:** Resource depletion and climate instability
+
+**Keywords:** economic growth, reinforcing feedback, greenhouse gas emissions, environmental limits, climate instability, resource depletion
 
 **Evidence Passages (3):**
 1. "The US as a major producer of greenhouse gases has been reluctant to accept that man-made climate change even existed..."
 2. "What we have not seen, until very recently, is one of the physical by-products of economic growth: greenhouse gases like CO2 released into the atmosphere..."
 3. "In recent years, people around the world have begun to see..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition discusses the relationship between economic growth and environmental degradation, including greenhouse gas emissions, which is not directly supported by the evidence
 
 ---
 
-### ❓ FB-12: End-Guided Planning
+### ❓ FB-12: End-guided Planning
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 8b8852a912fa85d8d106669a34440f086e71028faf529890a27022aced0fff51 |
+| fb_id | b14cce03584ad9d33195f6c5b4b808ef1f9b6606ff2bbd35d2d80c7a02ad1b00 |
 | source_books | The 7 Habits of Highly Effective People Powerful Lessons in Personal Change by Stephen R. Covey.md, Turn the Ship Around A True Story of Turning Followers Into Leaders (L. David Marquet) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | strategic thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -450,12 +592,26 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Organizations and individuals using end-guided planning reduce the likelihood of pursuing activities that are inconsistent with their core goals, leading to more coherent strategies and fewer costly detours.
 
-**Elaboration:** This principle operates on the premise that without a clear destination, navigation becomes inefficient and error-prone. In organizational settings, it requires leadership to articulate and communicate the desired future state. When teams lack alignment on the end goal, planning efforts can become fragmented or reactive. The principle also implies that planning should not be an afterthought but a foundational step in any strategic or operational process. It is particularly effective in complex environments where multiple stakeholders and competing priorities exist.
+**Elaboration:** End-Guided Planning starts with a clear, shared vision of the desired end state and uses it as a reference point for all decisions. By evaluating current actions against this future-oriented standard, the approach prevents short-term optimizations from derailing long-term objectives, ensuring coherent strategies and reducing costly detours.
+
+**Application:** Strategic planning and goal alignment
+
+**Failure Mode:** Goal drift and misaligned actions
+
+**Keywords:** end-guided planning, vision, goal alignment, strategic decision-making, long-term objectives, coherent strategy
 
 **Evidence Passages (2):**
 1. "When I read the several dates of the tombs, of some that died yesterday, and some six hundred years ago, I consider that great Day when we shall all of us be Contemporaries, and make our appearance together...."
 2. "Here are some things you can do to "begin with the end in mind": - [Discuss the concepts and idea of "Begin with the end in mind."]..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.96 (strong signal)
 
 ---
 
@@ -467,9 +623,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | ba3bd7cc59b98852819b209352e098f897ac390c951d1c4227e5f8c707271fa7 |
 | source_books | Make Your Mark The Creative_s - Jocelyn K. Glei 99u.md, The Art of Action -- Stephen Bungay -- 2021 -- Quercus -- 9781529383669 -- cee0159399d2b995cebff0a38d9199ba -- Anna’s Archive.md, Turn the Ship Around A True Story of Turning Followers Into Leaders (L. David Marquet) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 3 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | leadership |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -482,7 +637,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, organizations experience improved performance, increased innovation, and higher levels of engagement among team members who feel trusted and empowered to act.
 
-**Elaboration:** This approach requires leaders to articulate intent clearly and consistently, ensuring that all team members understand the desired outcomes and the boundaries within which they can operate. It also demands that leaders be willing to accept responsibility for results even when they don't control every detail of execution. The principle works best in environments where there is mutual respect and shared understanding of goals. When implemented successfully, it creates a culture where people are more likely to take initiative and learn from both successes and failures. The approach is particularly effective in complex environments where rapid decision-making is required.
+**Elaboration:** By setting clear intent, leaders empower teams to act autonomously while retaining accountability for outcomes, fostering innovation and engagement
+
+**Application:** Leadership in organizations
+
+**Failure Mode:** When trust or competence is lacking, or when strict control is required
+
+**Keywords:** leadership, autonomy, empowerment, intent, accountability
 
 **Evidence Passages (5):**
 1. "Leading through intent is a tough approach, but it is enlightened. It is not about being nice to people, but about setting clear direction and purpose..."
@@ -490,6 +651,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "I learned that if you want people to think, telling them what to do is not the best way to do it—in fact, it’s the worst..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 3 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
@@ -501,9 +670,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 365681e7074e5a0056d0f8ded8773c0499ddeccdb80531c61af1ca05a42aa76d |
 | source_books | Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Avoiding Data Pitfalls_ How to Steer Clear of Common Blunders When Working with Data and Presenting Analysis and Visualizations_Ben Jones_liber3.md, Avoiding data pitfalls how to steer clear of common.md ... (+45 more) |
-| source_diversity | 50 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -516,7 +684,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, societies can evolve beyond their current constraints when enough actors challenge the status quo with viable alternatives rather than simply accepting predetermined outcomes.
 
-**Elaboration:** The principle operates across multiple domains: political, scientific, and philosophical. In science, it manifests as paradigm shifts that overthrow previous worldviews. In social change, it requires actors to reject the idea that current conditions are unchangeable. The process often involves a tension between recognizing the limitations of existing frameworks and having the tools to build new ones. Even when conditions seem ripe for change, the path is not guaranteed because human agency and belief systems can resist transformation. The principle suggests that true progress requires both intellectual rebellion and practical implementation.
+**Elaboration:** By rejecting deterministic narratives and critiquing prevailing systems, actors create space for new possibilities that can be demonstrated as superior, leading to transformative change
+
+**Application:** Societal transformation
+
+**Failure Mode:** Deeply embedded belief systems or lack of practical means to implement alternatives
+
+**Keywords:** transformative change, disruption, social innovation, ideology, critique, alternative frameworks
 
 **Evidence Passages (5):**
 1. "take aim at the status quo, attempting to shift it to a new and superior state in which the prevailing conditions are substantially and sustainably improved for the majority..."
@@ -524,6 +698,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "A century ago it would, I t..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 50 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 50 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.94 + CITATION-ECHO → LLM: The evidence passages do not provide a clear connection to the concept of transformative change through disruption as defined in the Foundation Block. The passages seem
 
 ---
 
@@ -535,9 +717,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 2cad5e94ed1897d52b80f853f566648ef647eec1646ba65d8928af663533dde6 |
 | source_books | Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Avoiding Data Pitfalls_ How to Steer Clear of Common Blunders When Working with Data and Presenting Analysis and Visualizations_Ben Jones_liber3.md, Avoiding data pitfalls how to steer clear of common.md, Good StrategyBad Strategy (Rumelt, Richard) (z-library.sk, 1lib.sk, z-lib.sk).md, Grounded theory and grounded theorizing  pragmatism in research practice by Bryant, Antony (z-lib.org).md ... (+8 more) |
-| source_diversity | 13 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -550,7 +731,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of fundamental uncertainty, decision-makers should focus on building antifragile systems rather than attempting prediction. This means designing for volatility, maintaining upside optionality, and preparing for rare events rather than optimizing for average-case scenarios.
 
-**Elaboration:** The principle operates across multiple domains and levels of complexity. In finance, it explains why even elite forecasters fail to predict market crashes. In biology, it explains why random stressors like occasional starvation improve health outcomes. The principle reveals that the very act of trying to predict such events often makes systems more fragile. Antifragility is not just a property of systems but a necessary design principle for navigating fundamental uncertainty. The principle also explains why mainstream economic models fail in real-world applications.
+**Elaboration:** Because rare, high-impact events dominate complex systems, focusing on antifragility—designing for volatility and optionality—is more effective than attempting precise prediction
+
+**Application:** Risk assessment in complex systems
+
+**Failure Mode:** When the system is simple, linear, or the event space is well-understood and predictable
+
+**Keywords:** fundamental uncertainty, black swan, complex systems, antifragility, volatility, unpredictability
 
 **Evidence Passages (5):**
 1. "an elite university who know their intelligence is being tested with an activity that is the very symbol of randomness..."
@@ -558,20 +745,27 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "All the tests of probability I discussed in the previous chapters show that randomness and black swan events dominate complex systems..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 13 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-16: Probability as Estimation and Prediction
+### ❓ FB-16: Probability As Estimation and Prediction
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 9bff0dc5615fcc0f3dfdbc7431e08068b549ef03c43cbf48a43eca5bac57f245 |
+| fb_id | 24d77379ffa0b40cc96ef6e82724b27c02feba61ca2fa5afb4267e1676b44fb3 |
 | source_books | Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Analysis of Variance and Covariance How to Choose and Construct Models for the Life Sciences by C. Patrick Doncaster, Andrew J. H. Davey (z-lib.org).md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Avoiding Data Pitfalls_ How to Steer Clear of Common Blunders When Working with Data and Presenting Analysis and Visualizations_Ben Jones_liber3.md ... (+40 more) |
-| source_diversity | 44 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | research methodology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -584,7 +778,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, individuals and organizations can make better decisions under uncertainty by relying on probabilistic reasoning rather than intuition alone, leading to more robust strategies and reduced risk of catastrophic errors.
 
-**Elaboration:** Probability estimation becomes particularly powerful when combined with feedback loops that allow for continuous refinement of predictions. In systems where variables are highly interdependent, even minor inaccuracies in initial assumptions can compound rapidly, undermining the utility of probabilistic models. The principle also highlights the importance of distinguishing between genuine predictive skill and random chance, as demonstrated by the example of a chimp throwing darts. Furthermore, the concept of "unorganized complexity" suggests that while some systems exhibit enough regularity to be modeled statistically, others remain fundamentally unpredictable due to their chaotic nature.
+**Elaboration:** Probability quantifies the likelihood of uncertain events, allowing structured assessments that can be updated with new evidence, leading to more robust strategies
+
+**Application:** Decision-making under uncertainty
+
+**Failure Mode:** When the system is deterministic or variables are so interdependent that small errors propagate catastrophically
+
+**Keywords:** probability, estimation, prediction, uncertainty, decision-making, statistics
 
 **Evidence Passages (5):**
 1. "Probability and Experimentation IF YOU’VE EVER PLAYED a dice game or watched a movie that involves gambling, you’ve probably hear..."
@@ -592,6 +792,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Even a dart-throwing chimp will hit the occasional bull's-eye if he throws enough darts, and anyone can easily "predict" the next stock market crash by incessantly warning that the stock market is about to crash...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 45 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
@@ -603,9 +811,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | f8320a6ea490bb8a4c463063ebfff699c1b183d13dc7f155e2ee3ff8119218a0 |
 | source_books | A Story is a Deal_ How to Use the Science of Storytelling to -- Will Storr -- 2025 -- Hachette UK -- 9780349437224 -- 2867e98f5d89cb9964c00eae9ec36302 -- Anna’s Archive.md, Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md ... (+83 more) |
-| source_diversity | 86 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -618,7 +825,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Communities of creators who share a common commitment to meaningful output grow stronger over time, as members reinforce each other's efforts and collectively resist the pressures that might otherwise discourage creative expression.
 
-**Elaboration:** This principle suggests that creative work is not just an individual act but a social phenomenon that benefits from shared understanding and mutual encouragement. The emotional investment in others' success can be as important as personal achievement. In environments where creativity is undervalued or misunderstood, this principle may not hold, as individuals may not find peers who appreciate their efforts. The strength of these connections can vary based on how deeply the shared purpose is internalized by each participant.
+**Elaboration:** When creators align on purpose, they form emotional bonds that lower risk aversion and boost idea generation, creating a virtuous cycle of support.
+
+**Application:** team building
+
+**Failure Mode:** competition or isolation
+
+**Keywords:** creative collaboration, shared purpose, emotional bonds, risk-taking, validation, community resilience
 
 **Evidence Passages (5):**
 1. "He suspected it had to do with the creative spirit, that connection you feel with another person you know is trying their best to bring new, beautiful things into the world..."
@@ -626,6 +839,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Every age has its own outlook. It is specially good at seeing certain truths and specially liable to make cert..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 88 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.77 (strong signal)
 
 ---
 
@@ -637,9 +858,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 1ed67be02a0964f19728f70555b9ff901b8ecc4e20491e6389f4339a959a1e3f |
 | source_books | Andreas M. Antonopoulos - The Internet of Money Volume Three- A collection of talks - 2019.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md, Complexity_ a guided tour_Mitchell, Melanie_liber3.md, Consistency and Cognition A Theory of Causal Attribution by Shelley Duval, Virginia Hensley Duval, F. Stephan Mayer.md ... (+34 more) |
-| source_diversity | 39 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -652,7 +872,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, people often misattribute neutral or accidental actions to malicious intent, leading to unnecessary conflict, miscommunication, and overreaction in social or professional settings.
 
-**Elaboration:** This bias is particularly strong in high-stakes or emotionally charged situations where the cost of misreading intent is perceived as high. It can be exacerbated by cultural or personal assumptions about others' motivations. The principle also explains why people often project their own expectations onto others' behavior, especially when they have a vested interest in seeing intent. In some cases, this bias can be mitigated by explicit communication or feedback loops that clarify intent. The principle is especially relevant in contexts like law enforcement, where lack of feedback can reinforce incorrect assumptions.
+**Elaboration:** The tendency to attribute intentionality to ambiguous actions leads to false accusations and escalated tensions, especially when signals of accident are absent.
+
+**Application:** conflict resolution
+
+**Failure Mode:** misattribution of intent
+
+**Keywords:** intent attribution, pattern recognition, social signals, misinterpretation, attribution bias
 
 **Evidence Passages (5):**
 1. "The simpler, and thus more likely, explanation is that they didn't see you. It was a mistake. There was no intent...."
@@ -660,6 +886,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Linda is 31 years old, single, outspoken, and very bright. She majored in philosophy. As a student, she was deeply concerned..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 39 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that people interpret others' actions as intentional when they are not, which is not supported by the evidence passages. The evidence suggests that people m
 
 ---
 
@@ -671,9 +905,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 919feb713bfb129e2d8569f6f30f2531caaba0895bd7dab6cecaff29b42c53fa |
 | source_books | Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md, Building Agentic AI Systems_ Create Intelligent, Autonomous -- Anjanava Biswas, Wrick Talukdar -- EXPERT INSIGHTS, 2025 -- Packt Publishing Pvt_ Ltd -- isbn13 9781801079273 -- 11345cbb546526214f62b4fa441db11e -- Anna’s Archive.md, Complexity_ a guided tour_Mitchell, Melanie_liber3.md ... (+26 more) |
-| source_diversity | 31 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | behavioral economics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -686,7 +919,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, people who present definitive answers are often perceived as more competent and are favored in media and professional settings, even though their accuracy may be lower than more cautious approaches.
 
-**Elaboration:** The tendency toward overconfidence is particularly strong in situations where individuals have limited exposure to the full range of possible outcomes. This bias can be exacerbated by social or professional incentives that reward certainty over nuance. In forecasting contexts, this leads to systematic errors where people rank their confidence higher than their actual accuracy. The principle also explains why some individuals thrive in environments that reward bold predictions, even when those predictions are less reliable than more conservative ones.
+**Elaboration:** Preferring certainty over uncertainty, individuals overstate their knowledge, which can lead to poor forecasts and suboptimal decisions in volatile environments.
+
+**Application:** risk management
+
+**Failure Mode:** overestimation of predictive ability
+
+**Keywords:** overconfidence, certainty preference, predictive accuracy, hedgehog thinking, decision bias
 
 **Evidence Passages (4):**
 1. "are likelier to say something definitely will or won't happen. For many audiences, that's satisfying. People tend to find uncertainty disturbing and "maybe" underscores uncertainty with a bright red crayon...."
@@ -694,6 +933,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "Thus, Kahneman and Tversky showed that students would, with vivid enough wording, assume it more likely that a liberal-leaning woman was both a feminist and a bank teller rather than simply a bank teller. They called it the "conjunction fallacy."..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 31 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
@@ -705,9 +952,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 84074c25b6eaf15fc4d38c8140950c998b2a4cc60893cf995af1c56b7fb6d5b1 |
 | source_books | Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md, Complexity_ a guided tour_Mitchell, Melanie_liber3.md, Consistency and Cognition A Theory of Causal Attribution by Shelley Duval, Virginia Hensley Duval, F. Stephan Mayer.md, Essential Math for AI Next-Level Mathematics for Developing Efficient and Successful AI Systems (Hala Nelson) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+18 more) |
-| source_diversity | 23 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -720,7 +966,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, systems that attempt to simulate their own complexity will eventually become overwhelmed or inefficient, requiring external constraints or simplifications to function effectively.
 
-**Elaboration:** Recursive mental simulation is particularly problematic in complex systems like human cognition or computer algorithms where self-modeling becomes a resource drain. The principle explains why humans struggle with mental time travel and why computational models often fail when they attempt to simulate their own decision-making. In game theory, this manifests as overthinking strategies that lead to suboptimal outcomes. The principle also explains why simple heuristics often outperform complex models in real-world applications. When systems simulate their own behavior, they often get trapped in cycles of over-analysis that prevent effective action.
+**Elaboration:** When a system simulates its own processes recursively, it can enter an infinite regress that drains computational or cognitive resources, necessitating external constraints or abstraction.
+
+**Application:** system design
+
+**Failure Mode:** resource exhaustion
+
+**Keywords:** recursive simulation, self-modeling, infinite regress, resource exhaustion, computational complexity
 
 **Evidence Passages (5):**
 1. "time a system---be it a machine or a mind---simulates the workings of something as complex as itself, it finds its resources totally maxed out, more or less by definition..."
@@ -728,6 +980,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "In poker, you never play your hand," James Bond says in [Casino Royale]{.epub-..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 23 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 23 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.83 + CITATION-ECHO → LLM: LLM: factually consistent
 
 ---
 
@@ -739,9 +999,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 913077dcdd25a28394806fe17a597e50cbfde491eaaac628e6c5d7ac52239a34 |
 | source_books | A Story is a Deal_ How to Use the Science of Storytelling to -- Will Storr -- 2025 -- Hachette UK -- 9780349437224 -- 2867e98f5d89cb9964c00eae9ec36302 -- Anna’s Archive.md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md, Branding That Means Business How to Build Enduring Bonds.md, Business Model Innovation Game Changers and Contemporary Issues (Annabeth Aagaard) (z-library.sk, 1lib.sk, z-lib.sk).md, Closing the Loop Systems Thinking for Designers.md ... (+23 more) |
-| source_diversity | 26 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -754,7 +1013,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because preferences are malleable through experience, systems that shape human experiences—whether through technology, marketing, or behavioral design—can and do alter human preferences in ways that individuals may not fully recognize or control.
 
-**Elaboration:** Preferences that are deeply tied to identity or symbolic meaning are particularly susceptible to modification because they are not static but are constantly negotiated through interaction with the world. This is especially true in modern contexts where digital systems and environments shape daily experiences. The principle also implies that any system that alters human experience—whether through AI, marketing, or behavioral design—has the potential to reshape preferences in unintended ways. This creates a tension between autonomy and influence, particularly in systems that claim to respect individual choice while subtly modifying it. The malleability of preferences also suggests that the design of systems that interact with human behavior must be carefully considered to avoid unintended preference manipulation.
+**Elaboration:** The principle explains how repeated experiences, especially those mediated by technology, reshape the symbolic associations that underlie preferences, allowing systems to subtly steer choices.
+
+**Application:** Marketing, UX design, persuasive technology
+
+**Failure Mode:** Unintended manipulation of user preferences leading to loss of autonomy
+
+**Keywords:** preference change, identity, symbolic meaning, experience, machine influence, behavioral design
 
 **Evidence Passages (5):**
 1. "seems to say that everyone is entitled to whatever preferences they have and no one else should touch them. Far from being untouchable, however, preferences are touched and modified all the time, by every experience a person has...."
@@ -762,6 +1027,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "We are what we own...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 28 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.83 (strong signal)
 
 ---
 
@@ -773,9 +1046,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 25c41369f160449a3502e83d29f3ce1cde5637fa7a6e322a98b70de35ba3a4ab |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -788,27 +1060,40 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, individuals often overemphasize minor accomplishments to maintain or enhance their social standing, leading to a misalignment between perceived and actual capability in group settings.
 
-**Elaboration:** This behavior is particularly common in academic or professional environments where individuals may feel pressure to demonstrate competence even when their contributions are minor. The principle also explains why some people prefer to show off easily achievable skills rather than invest in developing more substantive abilities. It can be a form of social signaling that prioritizes appearance over substance. The effect is amplified in competitive environments where status is tied to visible performance. The principle reveals how social dynamics can distort the perception of value in favor of easily observable but less meaningful displays.
+**Elaboration:** Puffed up displays exploit the human tendency to equate perceived competence with social status, allowing individuals to gain approval without genuine skill.
+
+**Application:** Social media, workplace dynamics
+
+**Failure Mode:** Misrepresentation of competence leading to social misalignment
+
+**Keywords:** puffed up display, social validation, status, competence illusion, group dynamics
 
 **Evidence Passages (3):**
 1. "approval because doing so is creditable, considering the performer is a horse..."
 2. "reputation for our school in the manner of the man who proudly displays his horse which can count to seven..."
 3. "I was puffed up..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.93 (strong signal)
 
 ---
 
-### ❓ FB-23: Reliability as Protective Factor
+### ❓ FB-23: Reliability As Protective Factor
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | de775dc35674a82d739016f66e3fae725d1a8f8a10e673f4c6721e3894de87d3 |
+| fb_id | c59332519b1a8417f4e01d44d68cb87608506f63994f334df310a6dc951dca85 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -821,12 +1106,26 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, individuals who maintain reliability across multiple life domains are more likely to experience positive outcomes like strong relationships, professional success, and overall life satisfaction, even when facing external challenges.
 
-**Elaboration:** Reliability creates a form of 'buffer effect' where consistent performance in one area generates cascading benefits in others. For example, reliable professional conduct builds reputation and networks that support personal relationships. The principle suggests that reliability is not just about avoiding failure, but actively creating conditions for success. This protective effect is particularly strong when reliability is sustained over time rather than sporadic. The principle also implies that reliability in one domain can act as a form of insurance against the typical risks of conventional life paths.
+**Elaboration:** Consistent reliability builds trust and resources that buffer against setbacks, but excessive focus on reliability can stifle adaptability.
+
+**Application:** Career counseling, resilience training
+
+**Failure Mode:** Overreliance on reliability leading to complacency
+
+**Keywords:** reliability, cumulative advantage, resilience, protective factor
 
 **Evidence Passages (2):**
 1. "He has had a wonderful life so far: an outstanding wife and children, chief executive of a multi-billion-dollar corporation...."
 2. "If you want to avoid a conventional, main-culture, establishment result of this kind, you simply can't count on your other handicaps to hold you back if you persist in being reliable...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.94 (strong signal)
 
 ---
 
@@ -838,9 +1137,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 161bdcc5a2e6e76704d4b3d8fc76cab7bb0ef2e58611e9be3010d37cf43da116 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -853,7 +1151,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, small behavioral nudges or interventions can produce unexpectedly large impacts when they align with human psychology and create cascading effects through multiple interacting factors.
 
-**Elaboration:** The lollapalooza effect is particularly potent in situations where human behavior is driven by emotional responses rather than rational calculation. When multiple factors like fear, urgency, and social pressure align, they can create a multiplier effect that makes small changes feel like major transformations. This principle explains why simple interventions like changing the presentation of food or framing risks can have dramatic consequences in real-world settings. The effect is especially strong in long-term scenarios like voyages where gradual problems like scurvy can be masked until they become critical. The principle also applies to persuasion strategies where combining multiple psychological triggers creates more powerful outcomes than any single factor alone.
+**Elaboration:** When multiple biases and emotional triggers align, small interventions can produce outsized behavioral shifts, but misjudging the synergy can backfire.
+
+**Application:** Nudging, policy design, marketing campaigns
+
+**Failure Mode:** Overestimation of effect size leading to unintended consequences
+
+**Keywords:** lollapalooza effect, psychological factors, behavioral nudges, cognitive biases, cascading effects
 
 **Evidence Passages (4):**
 1. "you. So it's essential that you beware of lollapalooza effects. There's only one right way to do it: You have to get the main doctrines together and use them as a checklist...."
@@ -861,20 +1165,27 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "people respond to immediate crisis and threats. Anything that happens gradually, they tend to put off...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block definition does not accurately reflect the source evidence. The evidence passages discuss the importance of combining doctrines and paying attention to combina
 
 ---
 
-### ❓ FB-25: Long-Term Value Investing
+### ❓ FB-25: Long-term Value Investing
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | f36a6cfd1c956447bed93668e658f90852ee6d152c2ac49540bf208a16a62489 |
+| fb_id | 1a7e278085d346c562d798f950cc6352d3fcc6f3162e3fdb1c0fa96a0898f9a2 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | finance |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -887,7 +1198,13 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 
 **Consequence:** Because of this principle, investors who consistently buy quality businesses at fair prices and hold them for decades will likely outperform most active managers and market-timing strategies, even if they occasionally face periods of underperformance.
 
-**Elaboration:** The principle emphasizes that successful investing is not about predicting market movements but about understanding business fundamentals and maintaining patience. It also recognizes that while some investors may achieve exceptional results through skill or luck, the majority of active managers fail to consistently outperform the market. The psychological component is critical—investors must be comfortable with the possibility of short-term losses and long-term gains. This approach works particularly well in environments where market efficiency is imperfect, allowing for mispricings that can be exploited by patient investors. The principle also implies that the investment process should be tailored to individual strengths and risk tolerance.
+**Elaboration:** Long‑term value investing relies on disciplined, patient ownership of quality businesses, allowing compound growth to outweigh short‑term noise.
+
+**Application:** Investment strategy
+
+**Failure Mode:** Emotional reaction to market volatility
+
+**Keywords:** compound growth, intrinsic value, market timing, discipline, long‑term perspective
 
 **Evidence Passages (5):**
 1. "I'd be amazed if the capitalized value of all American business weren't considerably higher 25 years from now..."
@@ -895,6 +1212,14 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 3. "I don't think there's a one-size-fits-all investment strategy that I can give you. Mine works for me. But in part, that's because I'm good at taking losses..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
@@ -906,9 +1231,8 @@ Teams that systematically identify recurring tasks and bottlenecks can optimize 
 |----------|-------|
 | fb_id | 6201b0174dc9d34a760978020ad028cde96855d5c0b136232b31e551e4d45f82 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -945,34 +1269,39 @@ Those who ignore this principle may end up in a state of perpetual dissatisfacti
 
 The result is a life of fragility and instability, where happiness and fulfillment depend entirely on conditions outside one's control.
 
-**Elaboration:** The principle highlights how the human mind tends to overvalue external validation as a measure of personal worth or life success. This is especially problematic in cultures or environments that emphasize material achievement, social status, or physical appearance as primary indicators of value.
+**Elaboration:** When self‑worth is tied to external markers, individuals become fragile to changes in status, wealth, or recognition, leading to chronic dissatisfaction.
 
-The example of Epictetus's epitaph serves as a powerful counterpoint, showing that even someone who experienced extreme external hardship (slavery, physical disability, poverty) could still find favor with the gods or achieve inner peace through wisdom and acceptance.
+**Application:** Personal development
 
-This principle also connects to broader concepts of psychological resilience and emotional intelligence, which emphasize that true strength comes from within rather than from external circumstances or recognition.
+**Failure Mode:** Overreliance on external validation
 
-People who internalize this principle often struggle with identity issues, as their sense of self becomes tied to external feedback loops that can be easily disrupted.
-
-The principle suggests that wisdom involves recognizing the difference between what we can control (our responses, our growth, our character) and what we cannot control (external events, others' opinions, circumstances beyond our influence).
+**Keywords:** external validation, internal resilience, wisdom, emotional regulation, fragility
 
 **Evidence Passages (2):**
 1. "Ignore at all cost the lesson contained in the accurate epitaph written for himself by Epicetus: "Here lies Epicetus, a slave, maimed in body, the ultimate in poverty, and favored by the Gods." My final prescription to you for a life of fuzzy thinking and infelicity is to ignore a story they told me w..."
 2. "and wise, this will guarantee that, in due course, you will be permanently mired in misery. Ignore at all cost the lesson contained in the accurate epitaph written for himself by Epictetus: "Here lies Epictetus, a slave, maimed in body, the ultimate in poverty, and favored by the gods." My final prescription to you for a life of fuzzy thinking and infelicity is to ign..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it can' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it can' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-27: Integrity-Driven Decision Making
+### ❓ FB-27: Integrity-driven Decision Making
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 9f8787e29a23c9e6d55d00ea8f88c0f05bfc5cac59362866085de16f3447aa1a |
+| fb_id | b782aa0aec3f4f28fc4fe462a2dca8fcfd38c29fd04d2d41d15c98758e9fccfe |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | philosophy |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -985,27 +1314,40 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, individuals with strong integrity will either reject opportunities that require ethical compromise or develop strategies to maintain their principles while still achieving their goals.
 
-**Elaboration:** People who operate under this principle often experience significant internal conflict when faced with situations where they could gain advantage through unethical means. The psychological cost of compromising their values becomes a powerful motivator for either complete avoidance of problematic situations or direct confrontation. This principle also explains why some individuals become highly principled in their approach to work and life, as they find that maintaining their integrity provides more psychological stability than the potential gains from unethical behavior. The principle suggests that ethical consistency is not just a moral choice but a psychological necessity for individuals who have internalized strong moral standards. Those who don't experience this conflict may either lack clear ethical standards or have different value systems that don't emphasize principle adherence as a core life approach.
+**Elaboration:** Individuals with strong moral integrity experience psychological distress when faced with unethical choices, prompting either avoidance or principled action.
+
+**Application:** Ethical decision making
+
+**Failure Mode:** Lack of clear moral guidelines
+
+**Keywords:** moral integrity, ethical dilemma, internal consistency, psychological discomfort, principle adherence
 
 **Evidence Passages (3):**
 1. "he doesn't push the tax law way beyond the line, he can't stand it. He can't shave in the morning if he thinks there's been any cheating he could get by with that he hasn't done...."
 2. "And there are people like that. They just feel they aren't living aggressively enough...."
 3. "You can approach that situation in either of two ways: You can say, "I just won't work for him," and duck it. Or you can say, "Well, t..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.92 (strong signal)
 
 ---
 
-### ❓ FB-28: Self-Serving Bias in Organizational Behavior
+### ❓ FB-28: Self-serving Bias in Organizational Behavior
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | ef7ebd0170b7a5ab9aebe98c408768d67d950670c7185b199bee7b822bb3f4b4 |
+| fb_id | b5a4d47037ca66d7f6203b3f4a51e377af09a7b814a1ffd5190d1b74844f9638 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1018,7 +1360,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, brilliant and well-trained executives like the general counsel of Salomon Brothers can lose their careers despite having correct insights, simply because they failed to address the CEO's self-serving bias in communication.
 
-**Elaboration:** The principle reveals that even highly qualified individuals can be undone by their own cognitive biases when those biases are not acknowledged or addressed in organizational communication. The psychological roots of this bias make it particularly insidious, as it operates below conscious awareness. In the case of Salomon, the general counsel's correct analysis was undermined not by incompetence but by the CEO's refusal to accept information that threatened his self-image. This principle suggests that effective organizational governance requires explicit recognition of self-serving bias as a systemic risk factor. The principle also implies that persuasion strategies must account for the fact that people respond more strongly to threats to their self-image than to logical arguments.
+**Elaboration:** Leaders who overestimate their competence and underestimate risks misjudge threats, causing organizational failure when biases are unchallenged.
+
+**Application:** Organizational behavior
+
+**Failure Mode:** Self‑serving bias leading to poor decisions
+
+**Keywords:** self‑serving bias, risk misjudgment, reputation protection, decision making, organizational failure
 
 **Evidence Passages (5):**
 1. "I think the answer is no. But if you're hooked with it, appealing to interest is likely to work better as a matter of human persuasion than appeal to anything else. That, again, is a powerful psychological principle with deep biological roots...."
@@ -1026,6 +1374,14 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "If you don't allow for self-serving bias in the conduct of others, you are, again, a fool...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition introduces a concept of self-serving bias in organizational behavior that is not supported by the evidence passages. The passages discuss the loss of the general cou
 
 ---
 
@@ -1037,9 +1393,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | a1f30b48032fccce5777603fa86b3e78c710d2fb67faafd01a47cc5b9360dc3a |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1052,13 +1407,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, institutions maintain higher standards of behavior even when individual responsibility is unclear, as the system discourages risky behavior and promotes collective vigilance.
 
-**Elaboration:** The principle operates under the assumption that some level of collective punishment is necessary to prevent moral hazard and maintain institutional cohesion. It reflects a pragmatic approach to governance where the cost of maintaining order outweighs the cost of individual injustice. In cases where fault is truly impossible to determine, the system prioritizes institutional resilience over individual fairness. This approach is particularly effective in high-stakes environments where errors have cascading consequences. The principle also assumes that individuals internalize the collective consequences, which reinforces the desired behavioral norms.
+**Elaboration:** By tying individual actions to group outcomes, the system creates a shared incentive structure that discourages risky behavior. The uniform penalty mechanism ensures that accountability is maintained even when fault attribution is ambiguous, thereby preserving institutional integrity.
+
+**Application:** corporate governance, public policy, institutional design
+
+**Failure Mode:** fails when individual fault can be clearly identified and isolated, or when the system becomes rigid and punishes innocent parties
+
+**Keywords:** collective responsibility, accountability, moral hazard, institutional integrity, uniform penalties
 
 **Evidence Passages (3):**
 1. "I think that the civilization works better with some of these no-fa..."
 2. "Napoleon said he liked luckier generals---he wasn't into supporting losers. Well, the Navy likes luckier captains. You can say, "That's too tough." Th..."
 3. "It doesn't matter why your ship goes aground, your career is over. Nobody's interested in your fault. It's just a rule that we happen to have, for the good of all, all effects considered...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block's definition and mechanism do not align with the evidence passages provided. The passages suggest a system where individual fault is not considered, which cont
 
 ---
 
@@ -1070,9 +1439,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | f1a5ce27114a7e69de0286b279bd8db462c05c304ec4b4df6b279739be3356cc |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | normative_heuristic |
+| depth | cross-domain |
+| discipline | operations research |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1085,27 +1453,40 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, decision-makers avoid the trap of collecting excessive data that doesn't contribute to their goals, leading to more efficient and effective decision-making processes.
 
-**Elaboration:** This principle reflects a disciplined approach to information gathering that recognizes the difference between what can be measured and what truly matters. It acknowledges that while statistical methods work well for quantifiable data, important factors like human judgment, intuition, and context often resist numerical measurement. The approach requires upfront clarity about objectives and desired outcomes. When applied consistently, it prevents analysis paralysis and ensures that time spent gathering information directly contributes to better decisions. The principle also implies that some information is better left uncollected if it doesn't serve a clear decision-making purpose.
+**Elaboration:** Focused information collection reduces cognitive overload by ensuring that every data point directly supports the decision objective. By prioritizing measurable, actionable data, decision-makers conserve mental resources and avoid the pitfalls of irrelevant or noisy information.
+
+**Application:** business decision-making, research, policy analysis
+
+**Failure Mode:** fails when the problem domain includes critical qualitative factors that cannot be quantified but still significantly impact outcomes
+
+**Keywords:** focused data collection, decision-making, information overload, measurable factors, data quality
 
 **Evidence Passages (3):**
 1. "the stuff that can be numbered because it yields to the statistical techniques they're taught in academia, and 2) doesn't mix in the hard-to-measure stuff that may be more important..."
 2. "Don't collect data randomly. Start with why the particular information is needed in the first place..."
 3. "I'm a follower of what I call the Thomas Hunt Morgan school. Morgan was one of the great biologists in the..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-31: Agent-Centric Economic Ecosystem
+### ❓ FB-31: Agent-centric Economic Ecosystem
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | c2f87ca7b0273adcca2ba35ea60ae7f2ab5ab60281bd419248da37036037f0ec |
+| fb_id | 5c8e7f5188b8ef3f257a18fd5d9577514cd504eb12a422af301e975d29108df7 |
 | source_books | AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Business Strategy A Managerial Guide to Success (Thomas Hutzschenreuter, Tim Lämmermann) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+27 more) |
-| source_diversity | 32 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1126,6 +1507,14 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "not just in creating individual agents for people or businesses, but in building an entire economic ecosystem where digital agents can transact and interact autonomously based on pre-defined parameters..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 32 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.76 (strong signal)
 
 ---
 
@@ -1137,9 +1526,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | 295f15ec166da1009f86cb3b6b43022dbf4d2f534ba2e7b794216bda5b833c32 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md, AI Product Management (for Raymond Rhine) (Aman Khan) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI Theories and Practices (Ken Huang) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+35 more) |
-| source_diversity | 40 |
-| is_convergent | True |
-| extraction_type | normative_heuristic |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1160,20 +1548,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "The instructions in the template about exactly how to write the email---it should be upbeat, it should compliment the store owner, etc...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 40 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition's MECHANISM is not supported by the evidence passages, as there is no mention of working memory or the conversion of the interface into an external memory. The evide
 
 ---
 
-### ❓ FB-33: Agent-Based LLM System Design
+### ❓ FB-33: Agent-based Llm System Design
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | ef4fe827dbd484bd064c0381bdd9c5e55ba1158e34818f53392c96d0e247031f |
+| fb_id | 001ffdc54b96d2cd688c08e93012ec416d3a84f30c843a783fc3dc9be826aad4 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+44 more) |
-| source_diversity | 48 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1186,7 +1581,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, modern LLM systems can evolve from isolated features into sophisticated, adaptive platforms that support real-time personalization, automated workflows, and scalable business solutions without proportional cost increases.
 
-**Elaboration:** Agent-based systems allow for modular expansion and maintenance, where each component can be updated or replaced without disrupting the entire system. They support real-time adaptation to user input and external data changes, making them ideal for conversational interfaces and dynamic recommendation systems. The architecture also enables seamless integration with cloud-native services and operational automation. However, this design requires careful orchestration to avoid complexity overhead in simpler use cases.
+**Elaboration:** Agent-based design structures LLM interactions into modular, adaptive components that can reason, retrieve, and execute tools iteratively. Each agent handles a specific subtask and coordinates with others, enabling dynamic strategy adjustment as new information arrives. This modularity supports real-time personalization and scalable business solutions without proportional cost increases.
+
+**Application:** LLM-powered applications requiring complex, multi-step workflows, personalization, automation, and scalability
+
+**Failure Mode:** Fails when the system is simple, isolated features such as summarization or translation that do not require complex orchestration
+
+**Keywords:** agent-based architecture, LLM, multi-step reasoning, modular components, dynamic adaptation, orchestration, personalization, scalability
 
 **Evidence Passages (5):**
 1. "Most modern LLM use cases---knowledge assistants, copilots, workflow automation, reasoning engines---follow an agent-like structure...."
@@ -1194,20 +1595,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "Early LLM applications were built as isolated features such as summarization or translation. Over time, these grew into multistep workflows, and finally into fully agentic systems...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 49 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 1.00 (strong signal)
 
 ---
 
-### ❓ FB-34: Self-Improving Agent Loop
+### ❓ FB-34: Self-improving Agent Loop
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 6ee51eee5b07673878cdd09bf13f41085ef0f2d5630f4f7c890940ac43e4cd08 |
+| fb_id | 6e410c8d75554068b3c4757f0439c5118342a97286645ffed0469a78cafeb782 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+35 more) |
-| source_diversity | 40 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1220,7 +1628,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, agents can evolve beyond their initial programming to handle novel situations and optimize performance in real-time, making them more resilient and effective in complex, unpredictable domains.
 
-**Elaboration:** The loop involves multiple stages: action execution, outcome evaluation, reflection on performance, and strategy adjustment. In systems like Q-learning agents, this manifests as updating Q-values based on rewards. In LLMs, it appears as iterative refinement through prompts and reviews. The feedback can be internal (like unit tests) or external (like human review). This principle enables systems to move from reactive automation to proactive autonomy, where the system's behavior improves with each iteration. The mechanism is particularly powerful in environments where conditions change frequently or where the optimal strategy is not known a priori.
+**Elaboration:** Self-improving agents incorporate reflective processes that evaluate outcomes, update strategies, and learn from experience. By continuously adjusting behavior based on performance feedback, they can correct errors, adapt to changing conditions, and optimize decision-making without external intervention.
+
+**Application:** Dynamic decision-making systems that require continuous adaptation and error correction
+
+**Failure Mode:** Fails when the system lacks feedback mechanisms or operates in overly static environments where adaptation offers no benefit
+
+**Keywords:** self-improvement, reflection, feedback loop, autonomous decision-making, continuous learning
 
 **Evidence Passages (5):**
 1. "Reflective or self-improving agents don't just act---they reflect on the..."
@@ -1228,20 +1642,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "A Q-learning agent that learns optimal pricing policies through exploration..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 40 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that self-improving agents can evolve beyond their initial programming to handle novel situations, which is not supported by the evidence passages. The evid
 
 ---
 
-### ❓ FB-35: Multi-Agent System Design
+### ❓ FB-35: Multi-agent System Design
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 76482e692a4aafca2e5dce2ee7b7697bd39691ba3af5260486c6ff79a4404119 |
+| fb_id | 86a404381e24d577439fb3ee6f878efba6f66e1a5931aef95a844c0842cfc485 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md, AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+49 more) |
-| source_diversity | 54 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1254,7 +1675,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Systems designed with multi-agent architectures can scale more effectively, support diverse interaction modes, and deliver more robust performance in complex environments by leveraging the strengths of individual agents.
 
-**Elaboration:** Agents in such systems can be designed to handle specific types of inputs or tasks, such as tool usage, context gathering, or human-like communication. The design allows for modularity, where each agent can evolve independently. Coordination between agents is crucial to prevent conflicts or redundant processing. In some cases, agents may interact through shared memory or communication channels to maintain consistency. The system's robustness improves when agents are designed to handle failure or edge cases gracefully.
+**Elaboration:** Multi-agent systems delegate distinct functions to specialized agents, each designed to handle specific inputs or tasks. This modularity enables scalable, maintainable architectures where agents collaborate to solve problems that are too large or diverse for a single entity, leveraging the strengths of individual components.
+
+**Application:** Distributed reasoning and execution in complex, multi-domain tasks or human-like interaction scenarios
+
+**Failure Mode:** Fails when task decomposition does not yield clear specialized roles or when coordination mechanisms are inadequate, leading to inefficiency or conflict
+
+**Keywords:** multi-agent, specialization, distributed reasoning, coordination, modularity, scalability
 
 **Evidence Passages (5):**
 1. "Single-step agents: The simplest form of an agent is little more than a wrapped prompt. It takes an input, does some local reasoning, returns an output, and exits...."
@@ -1262,20 +1689,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "Figure 8-19 shows the trace view of the negotiation workflow in the OpenAI platform, where the salesperson, customer, and negotiation agents interact and call tools such as database queries...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 54 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block's definition of multi-agent systems does not accurately reflect the evidence passages provided. The evidence does not discuss the integration of specialized ag
 
 ---
 
-### ❓ FB-36: Agent-Centric Design Patterns
+### ❓ FB-36: Agent-centric Design Patterns
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 0e3fb6bdb1a1d49803cef82433401ee5e53d19930228af3488617ad3323a9e4a |
+| fb_id | aa67584e67f59e1c27d5e54c1c289ff853dfc89ac8c888f023283161795cad2f |
 | source_books | AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Business Strategy A Managerial Guide to Success (Thomas Hutzschenreuter, Tim Lämmermann) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Cashflow_ Turn ChatGPT into Your 24_7 Money Machine (2025 -- K Shukla -- 2025 -- 1a8879e72dc16252766f6753ed188344 -- Anna’s Archive.md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+39 more) |
-| source_diversity | 43 |
-| is_convergent | True |
-| extraction_type | normative_heuristic |
+| depth | domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1288,7 +1722,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, AI systems built with design patterns achieve higher reliability, faster development times, and better integration across tools and workflows. Engineers can focus on higher-level strategy rather than low-level implementation details.
 
-**Elaboration:** Design patterns in AI agent systems are particularly effective in environments where multiple tools or processes must interoperate, such as content creation workflows or customer service systems. They help bridge the gap between human-like interaction and structured automation. The patterns also support knowledge transfer across teams and reduce the risk of homogenization by providing flexibility in implementation. When properly applied, these patterns can prevent the 'not-invented-here' syndrome by offering frameworks that can be adapted rather than replaced.
+**Elaboration:** Agent-centric design patterns provide structured, reusable frameworks for common tasks and transitions in AI agents. By applying proven strategies, engineers reduce cognitive load, accelerate development, and ensure seamless handoffs between tasks, minimizing bottlenecks and errors in multi-step workflows.
+
+**Application:** AI system development that requires consistent, reliable, and efficient problem-solving across repetitive or predictable challenges
+
+**Failure Mode:** Fails when solutions are highly customized or novel, preventing abstraction into reusable patterns
+
+**Keywords:** design patterns, AI agents, reusable frameworks, workflow management, reliability, development efficiency
 
 **Evidence Passages (5):**
 1. "Instead of starting from a blank slate, engineers equipped with design patterns have a head start...."
@@ -1296,20 +1736,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "Efficiency in Problem Solving: Instead of starting from a blank slate, engineers equipped with design patterns have a head start...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 44 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-37: Agent-Based System Design
+### ❓ FB-37: Agent-based System Design
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | d4669eecfb3420c96c8593ace855c65c146298a676f62f3d1d42b275920ba831 |
+| fb_id | 4e9951e9452a3a84ce7a791ac5cd75b56ac37647a676280f1e898a68d08bccb9 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+37 more) |
-| source_diversity | 41 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1322,7 +1769,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, system design must shift from prompt engineering to full system architecture, incorporating state management, tool execution, and iterative logic handling.
 
-**Elaboration:** Agent systems introduce new complexity in debugging and monitoring since execution paths are dynamic and stateful. The design must account for failure recovery, state persistence, and coordination between multiple agents. Performance optimization becomes more nuanced as agents may need to balance computational efficiency with execution flexibility. The principle also implies that agent behavior must be continuously monitored and adjusted through feedback loops and performance analysis.
+**Elaboration:** Agent-based system design transforms isolated model calls into active executors that manage steps, retry failures, and adapt logic in real time. This shift demands new architecture focused on state management, tool execution, and iterative logic handling, moving beyond traditional prompt engineering.
+
+**Application:** Designing complex AI workflows that require stateful, iterative execution
+
+**Failure Mode:** Applying agent-based orchestration to single-call systems or when coordination overhead exceeds benefits
+
+**Keywords:** agent-based, workflow orchestration, state management, tool execution, iterative logic, control loops
 
 **Evidence Passages (5):**
 1. "In an agentic system, the model is no longer passive. It's running code, managing steps, and adapting as it goes...."
@@ -1330,6 +1783,14 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "This isn't prompt engineering anymore---it's system design...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 42 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 42 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.40 + CITATION-ECHO → LLM: LLM: factually consistent
 
 ---
 
@@ -1341,9 +1802,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | d3f3738e682d3b64b24ac74a1d8fa888b0360e402e94e3cb7dad6b26a30617c5 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Business Strategy A Managerial Guide to Success (Thomas Hutzschenreuter, Tim Lämmermann) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Cashflow_ Turn ChatGPT into Your 24_7 Money Machine (2025 -- K Shukla -- 2025 -- 1a8879e72dc16252766f6753ed188344 -- Anna’s Archive.md ... (+56 more) |
-| source_diversity | 61 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1356,7 +1816,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, organizations and societies must continuously reevaluate their fundamental practices and educational frameworks to remain aligned with the capabilities and constraints that these technologies introduce.
 
-**Elaboration:** Transformative technologies differ from incremental innovations in that they create new paradigms for human activity rather than just improving existing ones. They often require a fundamental shift in how humans understand their roles and capabilities. The principle suggests that education systems, organizational strategies, and service delivery models must evolve to accommodate these new realities. The impact is not just technical but also cultural and institutional, requiring a rethinking of how humans and technology collaborate. This principle applies across domains from education to marketing to strategic planning.
+**Elaboration:** Transformative technologies such as AI, the internet, and electricity become foundational infrastructure that reshapes human activity. When a technology reaches general-purpose applicability, it necessitates redefinition of education, strategy, and organizational practices to harness its full potential and mitigate systemic risks.
+
+**Application:** Aligning organizational practices, education, and strategy with emerging general-purpose technologies
+
+**Failure Mode:** Failure to adapt core practices or educational frameworks when a technology becomes pervasive
+
+**Keywords:** transformative technology, general-purpose, societal impact, education, strategy, organizational change
 
 **Evidence Passages (5):**
 1. "Economists recognize AI as one of a very few general-purpose technologies, in the same class as the internet, electricity, or the printing press...."
@@ -1364,20 +1830,27 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "The Crisis in Modern Education The rise of AI agents is fundamentally trans..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 61 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 61 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.82 + CITATION-ECHO → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-39: Agentic AI Autonomy and Control
+### ❓ FB-39: Agentic Ai Autonomy and Control
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 9aeb49918d3e5ce0447c266bfd72090eb9351f1b3baeaa7a8d9417b54f76c803 |
+| fb_id | 5740a8f015ffb7f9742a8fb6173dc2d8bd100a782a830b70015d86c1d2d3a248 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents in Action (Micheal Lanham) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md, AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Business Strategy A Managerial Guide to Success (Thomas Hutzschenreuter, Tim Lämmermann) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+47 more) |
-| source_diversity | 51 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1390,7 +1863,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, agentic AI systems can function reliably in real-world applications such as retail or AutoML, where they must make decisions independently while remaining within defined boundaries of safety and compliance.
 
-**Elaboration:** In systems like retail, agents may autonomously process refunds up to a threshold but require human approval for larger amounts, demonstrating how autonomy can be granularly controlled. In AutoML, agents can autonomously run experiments and inspect results, yet still operate under defined constraints. The principle supports both learning from experience and maintaining ethical or business-aligned behavior. When guardrails are too loose, agents may act inconsistently or contrary to goals; when too strict, they lose utility. The balance between autonomy and control is not static but must evolve with the agent's growing capabilities.
+**Elaboration:** Agentic AI systems balance operational autonomy with controlled decision-making. Perception, decision-making, and learning enable independence, but guardrails enforce safety, compliance, and goal alignment, preventing uncontrolled behavior and ensuring reliable operation in complex environments.
+
+**Application:** Deploying AI agents in real-world contexts such as retail or AutoML while maintaining safety and compliance
+
+**Failure Mode:** Uncontrolled behavior due to lack of guardrails or loss of useful autonomy from overly restrictive constraints
+
+**Keywords:** autonomy, control, guardrails, safety, compliance, learning, goal alignment
 
 **Evidence Passages (5):**
 1. "Unreliable Behavior---The agent may respond in ways that don't align with your goals because it lacks direction...."
@@ -1398,6 +1877,14 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "developers can enforce guardrails on actions to ensure safety and compliance...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 52 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 52 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.40 + CITATION-ECHO → LLM: The definition suggests that agentic AI systems can function reliably in real-world applications such as retail or AutoML, where they must make decisions independently 
 
 ---
 
@@ -1409,9 +1896,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | 7c8c23f14fcd6156e06c774158cb1afbbcb9f539261964a2a71149365d8ca40c |
 | source_books | AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, Agent-Powered Growth Deploy AI Agents That Build Your Marketing Pipeline 247 (Stu Sjouwerman) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI For Dummies (Pam Baker) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI Theories and Practices (Ken Huang) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI for Engineers Architecting Goal-Driven Systems (Dhivya Nagasubramanian) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+18 more) |
-| source_diversity | 23 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1424,7 +1910,13 @@ The principle suggests that wisdom involves recognizing the difference between w
 
 **Consequence:** Because of this principle, agents must be designed with layered memory systems that support both short-term and long-term information handling, or they will fail to reason accurately or maintain consistent behavior across interactions.
 
-**Elaboration:** Memory in agents is not just about storing data—it's about structuring it in ways that support reasoning and decision-making. The requirement for multiple memory types reflects the complexity of human-like cognition, where context, knowledge, and experience must be integrated. Nondeterministic behavior emerges when memory systems are not properly aligned with agent goals. Memory systems must also handle semantic clarity and completeness to avoid misinterpretation of data. The technical foundation of agent memory includes embeddings, vector databases, and importance scoring, which together form a complex ecosystem.
+**Elaboration:** Agents require multiple memory types—working, semantic, episodic, and procedural—to maintain continuity and accurate reasoning. Working memory handles current context, semantic memory stores facts, episodic memory retains past interactions, and procedural memory governs task execution. Without these layers, agents cannot adapt or reason effectively in dynamic environments.
+
+**Application:** Designing agents with layered memory systems to support short-term and long-term information handling
+
+**Failure Mode:** Inaccurate reasoning or inconsistent behavior due to missing or poorly integrated memory types
+
+**Keywords:** memory types, working memory, semantic memory, episodic memory, procedural memory, continuity, reasoning
 
 **Evidence Passages (5):**
 1. "systems as well as infrastructure-level LLM applications have their own operational or LLMOps problems..."
@@ -1432,6 +1924,14 @@ The principle suggests that wisdom involves recognizing the difference between w
 3. "context is composed through the ongoing engagement between agent and environment..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 23 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 23 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.40 + CITATION-ECHO → LLM: LLM: factually consistent
 
 ---
 
@@ -1443,9 +1943,8 @@ The principle suggests that wisdom involves recognizing the difference between w
 |----------|-------|
 | fb_id | d62dc02304eb07e6e49bf981848a9db32f16a45f4d740d7005dad40333395618 |
 | source_books | AI Agents with Python Build Autonomous Systems That Think, Learn, and Act (Van Der Post, Hayden) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, Agent-Powered Growth Deploy AI Agents That Build Your Marketing Pipeline 247 (Stu Sjouwerman) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI For Dummies (Pam Baker) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+33 more) |
-| source_diversity | 38 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1464,7 +1963,13 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Systems implementing adaptive resilience mechanisms can maintain operational integrity and prevent cascading failures or security breaches, even when individual components malfunction or are compromised.
 
-**Elaboration:** In AI systems, this principle manifests as circuit breakers that halt faulty processes or mode switches that prevent unintended data exposure. In cybersecurity, it involves detecting and blocking persistent AI-driven attacks that exploit unknown vulnerabilities. The principle also applies to ethical AI governance, where anti-manipulation controls prevent agents from crossing into harmful behavior. Implementation requires a balance between responsiveness and system stability, as overly aggressive safeguards can hinder normal operation. The principle is particularly relevant in distributed or complex systems where failure in one component can rapidly propagate to others.
+**Elaboration:** By continuously monitoring system metrics and automatically triggering circuit breakers or isolation protocols, adaptive resilience ensures that faults or attacks are contained before they propagate, preserving overall system integrity.
+
+**Application:** Enterprise IT infrastructure, autonomous vehicles, critical infrastructure
+
+**Failure Mode:** Overly restrictive safeguards causing system paralysis; insufficient safeguards leading to cascading failures
+
+**Keywords:** adaptive resilience, continuous monitoring, automated intervention, fault isolation, systemic immunity, cascading failure
 
 **Evidence Passages (5):**
 1. "Circuit Breakers: Preventing System-Wide Failures If the errors persist, circuit breakers act as an AI's immune system, stopping faulty processes before they cause widespread damage...."
@@ -1472,6 +1977,14 @@ Because of this principle, systems can maintain reliability and security even un
 3. "The implementation of anti-manipulation controls requires both technical and organizational measures...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 38 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.96 (strong signal)
 
 ---
 
@@ -1483,9 +1996,8 @@ Because of this principle, systems can maintain reliability and security even un
 |----------|-------|
 | fb_id | f34632c4efe460889e0f23ac85e378ae339fbd573b72cde4c3327c4bd99350c7 |
 | source_books | AI Agents and Applications With LangChain, LangGraph, and MCP (Roberto Infante) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md, Agent-Powered Growth Deploy AI Agents That Build Your Marketing Pipeline 247 (Stu Sjouwerman) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic AI For Dummies (Pam Baker) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic Architectural Patterns for Building Multi-Agent -- Ali Arsanjani, Juan Pablo Bustos -- 2026 -- Packt Publishing -- isbn13 9781806029570 -- 142146213e058c41e51d851292512a58 -- Anna’s Archive.md ... (+20 more) |
-| source_diversity | 24 |
-| is_convergent | True |
-| extraction_type | descriptive_model |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1498,7 +2010,13 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of MCP, LLM-based applications can execute complex workflows involving external data sources, system operations, and real-time information retrieval, making them more capable than purely text-based models.
 
-**Elaboration:** MCP implementations vary across platforms, with some supporting specific tool types like web browsing (e.g., Playwright MCP server) or API integration. The protocol enables progressive disclosure of system capabilities, allowing models to discover and use tools dynamically. Some implementations face platform-specific limitations (e.g., Windows compatibility issues with certain MCP servers), requiring alternative environments like WSL. MCP is particularly valuable in agentic systems where models must orchestrate multiple external operations to achieve complex goals.
+**Elaboration:** MCP defines a formal contract for tool invocation and context management, allowing language models to reason about external operations and seamlessly integrate them into their reasoning pipeline.
+
+**Application:** LLM-powered virtual assistants, autonomous agents, data integration workflows
+
+**Failure Mode:** Lack of standardized interfaces or model misinterpretation of tool usage
+
+**Keywords:** LLM, tool invocation, context management, external systems, agentic behavior, standardized interface
 
 **Evidence Passages (5):**
 1. "Tool calls : Running a web search, querying an API, or executing a database command..."
@@ -1506,6 +2024,14 @@ Because of this principle, systems can maintain reliability and security even un
 3. "MCP Model Context Protocol (MCP) from Anthropic "is an open-source..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 25 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
@@ -1517,9 +2043,8 @@ Because of this principle, systems can maintain reliability and security even un
 |----------|-------|
 | fb_id | f533f9161d8fdcb5375f2f3aa404add8b9bf572b56c5327b3387ffac4df9ec73 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1532,7 +2057,13 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of this principle, individuals who maintain ideological distance show improved judgment accuracy and are less prone to systematic errors in reasoning and decision-making.
 
-**Elaboration:** The principle operates on the premise that ideological thinking creates a feedback loop where beliefs become self-reinforcing through selective exposure and confirmation. This is particularly dangerous in group settings where ideological conformity becomes a social pressure. The strategy of avoiding ideology is not about rejecting all beliefs, but rather about maintaining intellectual flexibility and openness to evidence. The principle is especially relevant in political and religious contexts where strong convictions often lead to polarization. Those who successfully implement this principle often develop what might be called 'cognitive flexibility' as a core competency.
+**Elaboration:** By consciously distancing from rigid ideological commitments, individuals reduce confirmation bias, enabling more objective evaluation of evidence and improving judgment accuracy.
+
+**Application:** Policy analysis, scientific research, organizational decision making
+
+**Failure Mode:** Situations requiring ideological alignment for survival or professional necessity
+
+**Keywords:** ideological bias, confirmation bias, intellectual humility, cognitive accuracy, echo chambers
 
 **Evidence Passages (4):**
 1. "Strong convictions can be dangerous. The German philosopher Friedrich Wilhelm Nietzsche wrote: "Convictions are more dangerous enemies of truth than lies."..."
@@ -1540,20 +2071,27 @@ Because of this principle, systems can maintain reliability and security even un
 3. "Warren observed this as a kid, and he decided that ideology was dangerous and that he was going to stay a long way away from it. And he has throughout his whole life. That has enormously helped the accuracy of his cognition...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that avoiding ideological commitments improves cognitive accuracy, but the evidence does not explicitly state that avoiding ideology leads to improved cogni
 
 ---
 
-### ❓ FB-44: Reference-Dependent Preferences
+### ❓ FB-44: Reference-dependent Preferences
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | e739b998ee2b6f44f5d8e22afbb0ffcfb829bac7a6485e0fb710555c9be167c3 |
+| fb_id | 3c46f55b007cdb30293ca1ed20ce934fc5f4bbb17da94bf136bf5b72d5c1c55b |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | behavioral economics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1566,7 +2104,13 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of this principle, consumers often make suboptimal purchases, employees may reject reasonable offers due to relative disadvantage, and investors may make irrational financial decisions based on how options are framed rather than their actual worth.
 
-**Elaboration:** The principle manifests in various domains including consumer behavior, labor relations, and investment decisions. It explains why people react strongly to perceived losses or gains relative to a reference point, even when the absolute values remain unchanged. The effect is particularly strong in situations involving time pressure or emotional states. In labor contexts, it can lead to destructive negotiations when workers perceive their current situation as worse than a reference point, even if objectively better. The principle also explains why some individuals make poor financial decisions when they focus on relative rather than absolute value.
+**Elaboration:** Human evaluation is context-sensitive; choices are evaluated relative to reference points, leading to contrast effects and suboptimal decisions.
+
+**Application:** Marketing strategy, consumer choice design, financial product offering
+
+**Failure Mode:** Absolute value judgments or explicit instruction to ignore relative framing
+
+**Keywords:** reference dependence, framing effect, contrast effect, relative evaluation, irrational choice
 
 **Evidence Passages (5):**
 1. "The salesman deliberately shows the customer three awful houses at ridiculously high prices. Then he shows him a merely bad house at a price only moderately too high. And boom, the broker often makes an easy sale...."
@@ -1574,6 +2118,14 @@ Because of this principle, systems can maintain reliability and security even un
 3. "Studies show that a person of average attractiveness is seen as less attractive when compared to highly attractive others...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.93 (strong signal)
 
 ---
 
@@ -1585,9 +2137,8 @@ Because of this principle, systems can maintain reliability and security even un
 |----------|-------|
 | fb_id | 65f79217c675f6d3040f69a3202a24b874d6e6d2579c470bba4c2258e6c5b168 |
 | source_books | Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Paradox of Choice Why More Is Less (Barry Schwartz) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | behavioral economics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1600,7 +2151,13 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of this principle, identical information can lead to different decisions depending on how it is framed, demonstrating that human judgment is not purely rational but heavily influenced by presentation format. This has implications for policy design, marketing, and legal decision-making where framing can significantly impact outcomes.
 
-**Elaboration:** The effect is stronger when decisions involve emotional or high-stakes scenarios, such as custody battles or investment choices. People often fail to recognize that the same information should lead to the same decision regardless of framing, which creates a cognitive dissonance that can be exploited. The bias is particularly pronounced in situations where individuals must make trade-offs between competing options with both positive and negative attributes. Studies show that even experts are susceptible to framing effects, though they may be more aware of their existence. The principle also suggests that decision-making processes should account for framing effects by presenting information in multiple ways to avoid systematic bias.
+**Elaboration:** Framing bias causes identical information to produce different decisions when presented as gains or losses, altering risk perception.
+
+**Application:** policy design, marketing, legal decision-making
+
+**Failure Mode:** framing bias
+
+**Keywords:** framing, bias, risk perception, approach motivation, avoidance motivation, decision making
 
 **Evidence Passages (4):**
 1. "We see the kind 78 of risk that makes headlines. We don't see the statistical risk...."
@@ -1608,20 +2165,27 @@ Because of this principle, systems can maintain reliability and security even un
 3. "With the judgment framed in this negative language, the percentage of those voting for the child to go to B dropped from 64 percent to 55 percent...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that framing bias occurs with identical information and different framing contexts, particularly in binary choices with mixed attributes. However, the evide
 
 ---
 
-### ❓ FB-46: Deprival Super-Reaction Syndrome
+### ❓ FB-46: Deprival Super-reaction Syndrome
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 97798e11414bb4aba22b130f3bc6eec0a3967eea311ef9fb1f1974537a792665 |
+| fb_id | ffe2f05b90bed7e6293448621719822ba1127619e3bfe6d3c062ffeeb4a31582 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1634,12 +2198,26 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of this principle, individuals often escalate losses in pursuit of recovery, leading to complete financial or personal ruin rather than accepting partial losses and preserving remaining resources for future endeavors.
 
-**Elaboration:** This syndrome is particularly insidious because it often manifests as a rationalization that additional investment will 'fix' the situation, when in reality it only compounds the problem. The emotional cost of admitting failure becomes so great that it overrides any logical assessment of future prospects. It's not just about money, but about identity and pride tied to past decisions. The syndrome can be particularly dangerous in situations where the individual has already lost most of their resources and is now gambling with what remains. The key insight is that the fear of loss is more powerful than the rational calculation of expected value.
+**Elaboration:** Deprival Super-Reaction Syndrome leads individuals to continue investing in a failing course of action due to emotional attachment and fear of loss.
+
+**Application:** investment decisions, project management
+
+**Failure Mode:** escalation of commitment
+
+**Keywords:** escalation, commitment, loss aversion, sunk cost, emotional attachment
 
 **Evidence Passages (2):**
 1. "It's since come back. And we'll probably get all our money back plus the whole coupon. But it was a mistake...."
 2. "People go broke that way - because they can't stop, rethink and say, 'I can afford to write this one off and live to fight 112 again.'..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The evidence passages do not directly support the concept of 'Deprival Super-reaction Syndrome' as defined in the Foundation Block. The passages suggest a reluctance to write off a
 
 ---
 
@@ -1651,9 +2229,8 @@ Because of this principle, systems can maintain reliability and security even un
 |----------|-------|
 | fb_id | 6e4562551b8f150a794bd3e6bc7024d2884169bf684001799612f8c7bf94ae17 |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1666,27 +2243,40 @@ Because of this principle, systems can maintain reliability and security even un
 
 **Consequence:** Because of this principle, individuals who avoid vicarious wisdom may develop more robust personal understanding but at the cost of time, resources, and potential harm from repeated errors.
 
-**Elaboration:** This approach assumes that abstract knowledge lacks the emotional and contextual weight of personal failure. However, it can be counterproductive in domains where the cost of mistakes is high or where prior knowledge is essential for safe navigation. The principle works best when the learner has the luxury of time and resources to make mistakes. In contrast, in high-stakes environments like medicine or aviation, avoiding vicarious wisdom can lead to catastrophic outcomes. The strategy also assumes that individuals can accurately assess their own learning process and that they're not simply avoiding knowledge due to cognitive biases or fear.
+**Elaboration:** Vicarious Wisdom Avoidance rejects learning from others’ successes, preferring costly personal trial and error.
+
+**Application:** skill acquisition, training
+
+**Failure Mode:** avoidance of external knowledge
+
+**Keywords:** vicarious learning, experiential learning, knowledge transfer, failure, learning cost
 
 **Evidence Passages (3):**
 1. "from heedless, unoriginal error the modern saying: "If at first you don't succeed, well, so much for hang gliding."..."
 2. "The other aspect of avoiding vicarious wisdom is the rule for not learning from the best work done before yours...."
 3. "The prescription is to become as non-educated as you reasonable can...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.85 (strong signal)
 
 ---
 
-### ❓ FB-48: Cross-Domain Conceptual Transfer
+### ❓ FB-48: Cross-domain Conceptual Transfer
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 2c1bbac5684d968839a98e815ddc6dfb0199b116eed6381122a6e5126e368ade |
+| fb_id | 5638284ecef1862814caa5bf3db48a754c0b2d4756d30f1e0d59eb7cf57e350e |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1707,12 +2297,26 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Thinkers who practice cross-domain conceptual transfer develop more flexible and powerful reasoning abilities, enabling them to solve problems in novel domains by applying proven frameworks from familiar ones.
 
-**Elaboration:** The principle works best when the transfer involves fundamental structures or patterns rather than surface-level details. For example, the bridge concept of identifying sure winners and planning for additional tricks transfers well to strategic planning in business or personal development. The key is recognizing that the underlying logic of resource management and constraint optimization applies across contexts. This principle also suggests that the most effective cross-domain insights often come from disciplines that seem unrelated at first glance, such as biology informing business strategy or physics principles applying to social dynamics. The process requires both domain knowledge and meta-cognitive skills to identify and adapt relevant patterns.
+**Elaboration:** Cross-Domain Conceptual Transfer leverages structural similarities between domains to apply proven mental models to new problems.
+
+**Application:** innovation, interdisciplinary research
+
+**Failure Mode:** misapplied analogy
+
+**Keywords:** conceptual transfer, analogy, pattern recognition, interdisciplinary, structural similarity
 
 **Evidence Passages (2):**
 1. "Suppose you want to be good at declarer play in contract bridge. Well, you know the contract - you know what you have to achieve. And you can count up the sure winners you have by laying down your high cards and your invincible trumps. 191 But if you're a trick or two short, how are you going to get the other needed tricks? Well, there are only six or so different, standard..."
 2. "So if you want to be a good thinker, you must develop a mind that can jump the jurisdictional boundaries. You don't have to know it all. Just take in the best big ideas from all these disciplines. And it's not that hard to do. I might try and demonstrate that point using the card game of contract bridge. Suppose you want to be good at declarer play in contract bridge...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 1.00 (strong signal)
 
 ---
 
@@ -1724,9 +2328,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | af43281599ee75cfb8f6bb679a32f9d4bff50e380264217c987155f7a1716fec |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1739,13 +2342,27 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, major scientific and intellectual breakthroughs occur when thinkers abandon the urge to reconcile new data with old frameworks and instead reframe the entire problem space.
 
-**Elaboration:** Reversal thinking requires intellectual humility and the courage to destroy one's own cherished theories, as Einstein demonstrated with his self-criticism. It often involves abandoning the most intuitive path in favor of a more counterintuitive one. The approach is particularly effective in fields where paradigm shifts are necessary for advancement. This method can be applied across disciplines, from physics to business strategy, whenever conventional approaches fail to yield progress.
+**Elaboration:** By actively questioning foundational assumptions, practitioners can escape entrenched paradigms and generate novel solutions that were previously inaccessible.
+
+**Application:** innovation and breakthrough research
+
+**Failure Mode:** logical inconsistency or overreversal
+
+**Keywords:** paradigm shift, assumption reversal, breakthrough, critical thinking, cognitive flexibility
 
 **Evidence Passages (3):**
 1. "Einstein said that his successful theories came from "curiosity, concentration, perseverance, and self-criticism." And by self-criticism, he meant the testing and destruction of his own well-loved ideas...."
 2. "when almost everyone else was trying to revise the electromagnetic laws of Maxwell to be consistent with the motion laws of Newton, Einstein discovered special relativity as he made a 180-degree turn and revised Newton's laws to fit Maxwell's...."
 3. "minimizing objectivity will help you lessen the compromises..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
@@ -1757,9 +2374,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | df0182ffcc2b3dfd7d22d22dcc56a229234a94fcbf92e81140323f1e1c5117d4 |
 | source_books | Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1772,27 +2388,40 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this bias, individuals make suboptimal decisions in situations involving randomness, such as gambling, investment, or scientific prediction, leading to systematic errors in judgment and behavior.
 
-**Elaboration:** This bias manifests in both human and animal cognition, with studies showing that subjects attempt to match frequencies of previous occurrences even when the sequence is random. The tendency is particularly strong in situations where there is a desire to predict or control outcomes. In experimental settings, this bias can be observed in both human subjects and animals like rats and pigeons. The principle reveals how deeply ingrained pattern-seeking behavior can override statistical understanding, even when the underlying process is fundamentally random.
+**Elaboration:** Humans tend to impose structure on random data, leading to erroneous predictions and suboptimal choices in stochastic environments.
+
+**Application:** risk assessment and decision making
+
+**Failure Mode:** false positives and overfitting to noise
+
+**Keywords:** pattern recognition, bias, stochastic processes, overfitting, probability
 
 **Evidence Passages (3):**
 1. "like watching the clouds in the sky and discussing what shapes they resemble; it is your imagination and not reality you are discussing..."
 2. "research subjects tried to guess which of the two lights would appear. The studies showed that they tried to match the frequency of previous occurrences in their guesses..."
 3. "Similar studies showed that rats or pigeons instead chose with a frequency of 80% and a green light with a frequency of 20%..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.89 (strong signal)
 
 ---
 
-### ❓ FB-51: Vision-Driven Progress
+### ❓ FB-51: Vision-driven Progress
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 60169a7c1edced859bb2ef7af88a98b5d0bad5015ca3a60db6870078008e6279 |
+| fb_id | da6e0168d008832a34f164be9f8108c956ff4f953976e434a1ce517dcd03659f |
 | source_books | The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md, The Fifth Discipline_ The Art & Practice of The Learning Organization_Peter M. Senge_liber3.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1805,7 +2434,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, individuals with a strong vision are more likely to achieve excellence and make significant contributions in their fields, even when facing uncertainty or setbacks.
 
-**Elaboration:** Vision serves as a psychological anchor that helps individuals navigate through periods of confusion or failure, acting as a compass that keeps them oriented toward meaningful outcomes. The strength of the vision matters—those with a weak or unclear vision often react to circumstances rather than directing their efforts. In fields like science and engineering, where long-term projects are common, having a vision that can sustain motivation through years of uncertainty is critical for breakthrough achievements. The principle also implies that vision must be coupled with the courage to continue despite discouragement, as excellence often requires extended periods of trial and error.
+**Elaboration:** A compelling, personally resonant vision sustains motivation and focus, enabling individuals to persist through uncertainty and setbacks.
+
+**Application:** career development and organizational leadership
+
+**Failure Mode:** vague or misaligned vision
+
+**Keywords:** vision, motivation, persistence, goal setting, intrinsic motivation
 
 **Evidence Passages (5):**
 1. "whose vision calls him to a foreign country, for example, may find himself learning a new language far more rapidly than he ever could before..."
@@ -1813,6 +2448,14 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "while no vision will get you only the distance..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
@@ -1824,9 +2467,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 2cf186c8a1cace641a9a09e1f41555549c075c9cfe5bebc2ea018d8e1ea1f04c |
 | source_books | An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, How charts lie getting smarter about visual information (Cairo, Alberto) (z-library.sk, 1lib.sk, z-lib.sk).md, Physics for Animators.md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+3 more) |
-| source_diversity | 8 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1839,7 +2481,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, systems can be understood and manipulated through multiple equivalent approaches, allowing for flexibility in design, implementation, and problem-solving without altering the fundamental outcome.
 
-**Elaboration:** The principle reveals that systems often have multiple pathways to achieve the same result, which enables robustness and adaptability. For example, in biological systems, different genetic pathways can lead to the same phenotypic outcome. In engineering, different materials or configurations can yield the same performance metrics. However, this equivalence has limits—when system constraints or dependencies exist, such as in critical infrastructure or highly specialized systems, inputs cannot be freely interchanged. The principle also applies to abstract systems like computational models or organizational structures, where different initial conditions or processes can lead to the same end state. This understanding allows for creative problem-solving and system design that embraces multiple valid approaches.
+**Elaboration:** Systems can achieve the same functional outcome through multiple equivalent configurations, allowing flexibility in design and implementation.
+
+**Application:** system design and engineering
+
+**Failure Mode:** non-interchangeable inputs due to structural constraints
+
+**Keywords:** equivalence, functional behavior, redundancy, modularity, system design
 
 **Evidence Passages (5):**
 1. "The lens of equivalence shows that there are many ways to meet our need. None are the same, but all are equal in the ways they help people...."
@@ -1847,6 +2495,14 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "Like swapping a red Lego brick for a blue one. The color changes, but the structure remains the same...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 8 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.74 (strong signal)
 
 ---
 
@@ -1858,9 +2514,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 2d4bb095e710468392108befceae0df17a908e99fcff82f8a48f922774e5daee |
 | source_books | Blah Blah Blah What To Do When Words Dont Work (Dan Roam) (z-library.sk, 1lib.sk, z-lib.sk).md, The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1873,7 +2528,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, scientific and conceptual frameworks that resist updating become increasingly inaccurate and lose their utility for prediction and explanation.
 
-**Elaboration:** The evolution of models from Newtonian physics to Einstein's relativity demonstrates how even the most successful frameworks eventually break down under new conditions. The transition isn't just about adding complexity—it's about fundamentally rethinking the assumptions that once made sense. Models that are too rigid or dogmatic fail to adapt to new evidence, while those that embrace change remain useful. This principle applies not just to physics but to any domain where models are used for prediction or understanding.
+**Elaboration:** When the foundational assumptions of a model no longer match observed reality, the model’s predictions diverge from reality. Continuous reassessment and revision of assumptions are required to preserve predictive accuracy.
+
+**Application:** Adaptive model updating in scientific, engineering, and AI systems
+
+**Failure Mode:** Treating models as immutable truths
+
+**Keywords:** model evolution, reality shift, assumptions, predictive power, adaptation
 
 **Evidence Passages (5):**
 1. "Newton showed us that in a Cartesian universe, the motion of objects could be understood perfectly, and therefore plotted and predicted with extraordinary foresight...."
@@ -1881,20 +2542,27 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "If the value of a map or model is related to its ability to predict or explain, then it needs to represent reality...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.86 (strong signal)
 
 ---
 
-### ❓ FB-54: Luck and Randomness in Outcome Distribution
+### ❓ FB-54: Luck and Randomness in Outcome
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | f805a0a598abe4544a1fc8a90e2a1bf3cf35289008557cde28422be0fbfd5967 |
+| fb_id | 29d31dadb538d0e6a8f1116c30a3c02f90fd33768beeca8520f275048a44b95c |
 | source_books | Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | sociology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1907,12 +2575,26 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, successful individuals should not assume their achievements are entirely due to their own abilities, and unsuccessful individuals should not blame themselves entirely for their circumstances.
 
-**Elaboration:** The thought experiment demonstrates that even with perfect knowledge and planning, individuals cannot predict their life outcomes because they have no control over their starting conditions. This principle suggests that systems of advantage and disadvantage are often systemic rather than personal. It also implies that evaluating success or failure requires understanding the role of randomness in the process. The principle challenges the common narrative that hard work always leads to success, suggesting instead that context and timing play crucial roles. This understanding can lead to more compassionate perspectives on others' struggles and more humble recognition of one's own advantages.
+**Elaboration:** Life outcomes are heavily influenced by random events and structural factors beyond individual control. Recognizing this mitigates overconfidence and self-blame.
+
+**Application:** Risk assessment and career planning
+
+**Failure Mode:** Attributing success solely to personal skill
+
+**Keywords:** luck, randomness, life outcomes, skill, societal structure
 
 **Evidence Passages (2):**
 1. "Buffett, one of the most famous investors in the history of the world, often uses thought experiments to educate. In pointing out the role of luck, he says, Imagine that it is twenty-four hours before you are going to be born..."
 2. "To further | [2] (Seeking Wisdom_ From Darwin to Munger, 3): going to do is let you set the rules of the society into which you will be born. You can set the economic rules, thesocial rules, and whatever rules you set will apply during your lifetime, and your children's lifetimes...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.94 (strong signal)
 
 ---
 
@@ -1924,9 +2606,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 616278efc71cb3cab455c1729868dc4b1021d9418044cc2cf77f2c7baf38a1dd |
 | source_books | Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md, Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 3 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1939,7 +2620,11 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, individuals can make meaningful progress toward a better life by concentrating on eliminating known sources of suffering rather than chasing elusive definitions of joy or success.
 
-**Elaboration:** The principle works best when applied to behaviors that are widely recognized as harmful, such as envy, overfear, and overavoidance, which can subtly erode life quality without being immediately obvious. It is particularly useful in contexts where long-term consequences outweigh short-term gains. The approach also benefits from the psychological insight that people are more motivated to avoid pain than to seek pleasure. In some cases, the principle may require introspection to identify personal destructive patterns that others might not recognize. The method is especially effective in environments where social norms or cultural expectations promote harmful behaviors.
+**Elaboration:** By identifying and eliminating destructive habits, individuals reduce regret and suffering more reliably than by chasing vague notions of joy.
+
+**Application:** Personal development and behavioral change programs
+
+**Failure Mode:** Pursuing abstract happiness without concrete actions
 
 **Evidence Passages (5):**
 1. "We can more readily secure wealth by using inversion to make sure we are not doing the worst things that prevent the accumulation of wealth...."
@@ -1947,6 +2632,14 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "Carson's prescription for sure misery included: I can still recall Carson's absolute conviction as he told how he had tried these things on occasion...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 3 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
@@ -1958,9 +2651,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 167e2d7ab050e78dd531df23ec43298b831cf00eed84f8e540ce2c67dffb504a |
 | source_books | Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md, The Great Mental Models, Volume 2 Physics, Chemistry and Biology (Shane Parrish, Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -1981,6 +2673,14 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "factories produced a cleaner environment and the peppered moth is in the process of returning to its lighter color..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.95 (strong signal)
 
 ---
 
@@ -1992,9 +2692,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | f8e2e029635dcfe9d76057058d4b00ac7cd851408e643237051e9826132914b3 |
 | source_books | The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md, Thinking, Fast and Slow - Daniel Kahneman.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2007,7 +2706,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, media reports and scientific studies often incorrectly attribute improvements to interventions when the changes are simply due to regression to the mean, leading to flawed decision-making and wasted resources on ineffective treatments.
 
-**Elaboration:** The phenomenon is particularly problematic in medical and educational contexts where extreme baseline measurements are common. Even trained scientists struggle to correctly interpret regression effects, which suggests that this is a fundamental limitation of human cognition rather than a lack of knowledge. The bias is especially strong when there's a temporal gap between intervention and measurement, as people naturally seek explanations for change. This principle explains why many 'success stories' in medicine or education may not actually reflect the effectiveness of the treatment or method used. The cognitive demand for causal explanations makes regression to the mean particularly deceptive.
+**Elaboration:** When extreme measurements are followed by less extreme ones, observers often incorrectly attribute the change to an intervention rather than to statistical regression. This misinterpretation arises because intuitive System 1 thinking seeks causal explanations, while System 2 struggles to grasp the statistical nature of the phenomenon, leading to biased conclusions and wasted resources.
+
+**Application:** media reporting, clinical research, educational assessment
+
+**Failure Mode:** misattribution of causation
+
+**Keywords:** regression to the mean, statistical bias, causal inference, System 1, System 2, cognitive bias
 
 **Evidence Passages (4):**
 1. "This is called regression to the mean, and it means we have to be extra careful when diagnosing causation..."
@@ -2015,42 +2720,18 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "System 2 finds it difficult to understand and learn..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-58: Regression to the Mean
-
-**Status:** UNKNOWN
-
-| Property | Value |
-|----------|-------|
-| fb_id | 025e9d77320d452428252d06ae642daa171f28ce24ab0105674be3fc0bde6bbd |
-| source_books | The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md, Thinking, Fast and Slow - Daniel Kahneman.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
-| gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
-| pipeline_commit | 12bc968 |
-| schema_version | 3.0 |
-
-**Definition:** Regression to the mean is a statistical phenomenon where extreme values tend to move toward the average over time, even without any intervention. This occurs because extreme outcomes are often due to random variation rather than true effects. The principle applies when measuring performance or outcomes before and after a period, especially when initial measurements are at extremes. When extreme groups show improvement, it's crucial to distinguish between real treatment effects and natural regression.
-
-**Mechanism:** Regression to the mean occurs because extreme measurements are often influenced by random factors that will naturally average out over time. When a treatment is applied to a group with extreme initial outcomes, any improvement can be partially or fully explained by this statistical tendency rather than the treatment itself.
-
-**Boundary:** The principle applies when there are extreme initial measurements and a time gap between measurement periods. It fails when there is a true causal relationship between treatment and outcome, or when the measurement period is too short to observe natural variation.
-
-**Consequence:** Because of this principle, researchers and decision-makers must use control groups or baseline comparisons to distinguish between genuine treatment effects and natural regression, otherwise they may incorrectly attribute improvements to interventions that had no real effect.
-
-**Elaboration:** Regression to the mean is particularly problematic in medical and business contexts where extreme outcomes (e.g., very high or low performance) are often the basis for intervention. The phenomenon is especially deceptive when the same individuals are measured twice, as the second measurement will naturally regress toward the mean. This principle explains why random assignment to treatment and control groups is essential in experimental design. It also highlights why anecdotal evidence of improvement after treatment can be misleading without proper statistical controls. The effect is stronger when the correlation between measurements is weak.
-
-**Evidence Passages (2):**
-1. "a group of patients who receive this treatment to a "control group" that receives no treatment (or, better, receives a placebo). The control group is expected to improve by regression alone, and the aim of the experiment is to determine whether the treated patients improve more than regression can explain...."
-2. "We often mistakenly attribute a specific policy or treatment as the cause of an effect, when the change in the extreme groups would have happened anyway...."
-
-
----
-
-### ❓ FB-59: Loss Aversion in Performance Contexts
+### ❓ FB-58: Loss Aversion in Performance Contexts
 
 **Status:** UNKNOWN
 
@@ -2058,9 +2739,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 84e1af98e28771043946d116152eed47915b3da34e6a99d9a4c570710dfeaace |
 | source_books | Die Empty Unleash Your Best Work Every Day (Todd Henry) (z-library.sk, 1lib.sk, z-lib.sk).md, Thinking, Fast and Slow - Daniel Kahneman.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | behavioral economics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2073,17 +2753,31 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, individuals in competitive or goal-driven environments will show stronger behavioral responses to avoid losses than to achieve gains, leading to more intense effort when facing potential loss scenarios.
 
-**Elaboration:** In golf, players show higher success rates on putts when avoiding a bogey rather than making a birdie, demonstrating that loss aversion affects performance even at the margin of skill. This effect persists regardless of putt difficulty or distance, indicating a robust psychological bias. The principle also applies to other domains like driving, where workers increase effort when facing time constraints or loss of income. Loss aversion can lead to over-adjustment in behavior, potentially causing inefficiencies or suboptimal performance in some cases. The effect is strongest when the loss is framed as a certainty rather than a possibility.
+**Elaboration:** Loss aversion causes individuals to exert more effort to avoid potential losses than to achieve equivalent gains. This asymmetric response is driven by the greater psychological weight of losses, leading to heightened performance in loss-framed scenarios but potentially diminishing overall efficiency when gains are equally valuable.
+
+**Application:** competitive sports, business performance, academic testing
+
+**Failure Mode:** overemphasis on avoiding losses leading to suboptimal effort allocation
+
+**Keywords:** loss aversion, performance, motivation, goal framing, asymmetric response, behavioral economics
 
 **Evidence Passages (3):**
 1. "The logic of loss aversion suggests the opposite: drivers who have a fixed daily target will work many more hours when the pickings are slim and go home early when rain-drenched customers are begging to be taken somewhere...."
 2. "Pope and Schweitzer reasoned from loss aversion that players would try a little harder when putting for par (to avoid a bogey) than when putting for a birdie...."
 3. "They analyzed more than 2.5 million putts in exquisite detail to test that prediction. They were right. Whether the putt was easy or hard, at every distance from the hole, the players were more successful..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The evidence suggests that individuals work harder to avoid losses (e.g., missing a birdie to make bogey) rather than the opposite stated in the definition. The definition incorrec
 
 ---
 
-### ❓ FB-60: Adaptive Business Model Evolution
+### ❓ FB-59: Adaptive Business Model Evolution
 
 **Status:** UNKNOWN
 
@@ -2091,9 +2785,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 3e411e0d6fdda2be255a2183272a566c5a9f83c18ca6f3ac29bd49828d94574b |
 | source_books | Blue Ocean Strategy and Beyond Disruption Collection (2 -- Kim, W_ Chan, Mauborgne, Renée A_ -- 2024_2023 -- Harvard Business Review Press -- isbn13 9781647829674 -- dd8b809f7dbec9acf0bb1fa0b0d2cc2c -- Anna’s Archive.md, Branding That Means Business How to Build Enduring Bonds.md, Business Model Generation A Handbook for Visionaries, Game.md, Change by Design How Design Thinking Transforms Organizations and Inspires Innovation Tim Brown liber3.md, Company of One Why Staying Small is the Next Big Thing for Business (Paul Jarvis) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+29 more) |
-| source_diversity | 34 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | strategic thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2106,7 +2799,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Organizations that embrace adaptive business model evolution can transform from niche players into dominant market forces, as demonstrated by Amazon's expansion from online bookstore to global marketplace and logistics leader.
 
-**Elaboration:** The principle operates across multiple dimensions: operational adaptation (e.g., Amazon's fulfillment center network), product portfolio expansion (Amazon's move to become a destination site), and strategic pivoting (Netflix's shift from physical to digital media delivery). Companies must balance short-term operational efficiency with long-term strategic flexibility. The process often involves significant resource reallocation and cultural transformation. Early adopters of adaptive model evolution typically outpace competitors who remain locked into legacy approaches.
+**Elaboration:** Adaptive business model evolution enables firms to realign value propositions and operational structures in response to market dynamics, technology shifts, and consumer behavior changes. Companies that resist change due to inertia or sunk costs risk obsolescence, whereas those that pivot strategically can transform from niche players into dominant forces.
+
+**Application:** corporate strategy, entrepreneurship, product development
+
+**Failure Mode:** failure to adapt leading to loss of competitive advantage
+
+**Keywords:** business model evolution, strategic pivot, market dynamics, competitive advantage, innovation management
 
 **Evidence Passages (5):**
 1. "Even though Super Saver Shipping made sense for Amazon's supply chain..."
@@ -2114,20 +2813,27 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "Bezos recognized the need to constantly adapt to technological advancements, changing consumer behaviors, and emerging market trends..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 34 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.85 (strong signal)
 
 ---
 
-### ❓ FB-61: Two-Way Door Decision Framework
+### ❓ FB-60: Two-way Door Decision Framework
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | a0c6ee747621c05551d5e2c2defe40deb8cfe9a10e5430e5dc964d84c47e3481 |
+| fb_id | fce324a82e93174307fca88c1f09cd048c7da96aa0359bfbaabc33ce8adf719d |
 | source_books | Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, Building AI Agent Platforms (for Isabel Garcia) (Ben OMahony and Fabian Nonnenmacher) (z-library.sk, 1lib.sk, z-lib.sk).md, Building AI Agent Platforms (for Isabel Garcia) -- Ben O'Mahony and Fabian Nonnenmacher -- 2026 -- O'Reilly Media, Inc_ -- 0cd870ebd42c3c37eb0a817985df2e9e -- Anna’s Archive.md, Business Model Generation A Handbook for Visionaries, Game.md, Competing Against Luck _ The Story of Innovation and -- Recorded Books, Inc__ Christensen, Clayton M__ Dillon, -- HarperCollins, [Place of publication -- 9780062435613 -- cdfd7a64ae12968e6a9dcdb8997d050d -- Anna’s Archive.md ... (+27 more) |
-| source_diversity | 31 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | decision making |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2140,7 +2846,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Organizations using this framework make more informed strategic choices, reduce the risk of costly mistakes, and increase their ability to adapt to changing conditions by focusing on decisions that can be revisited or corrected.
 
-**Elaboration:** The principle emphasizes that not all decisions should be treated with equal weight or scrutiny. Reversible decisions allow for experimentation and learning, which can lead to better outcomes over time. Organizations that apply this principle often find that they can act more boldly on reversible decisions, knowing that they can adjust if needed. The framework also supports a culture of calculated risk-taking, where failure is seen as a learning opportunity rather than a permanent setback. This approach is particularly valuable in fast-changing environments where flexibility is key to success.
+**Elaboration:** The two-way door framework distinguishes reversible (two-way) decisions from irreversible (one-way) ones, guiding organizations to prioritize actions that allow course correction and learning. By evaluating the cost of regret and the feasibility of reversal, firms can reduce costly mistakes and enhance adaptability.
+
+**Application:** strategic planning, product launches, organizational change
+
+**Failure Mode:** commitment to irreversible decisions without learning
+
+**Keywords:** two-way door, irreversible, reversible, decision making, regret, learning, organizational behavior
 
 **Evidence Passages (5):**
 1. "Jeff Bezos's, founder of Amazon, two-way door principle..."
@@ -2148,10 +2860,18 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "This means whenever possible, Jeff Bezos would make decisions that could be reversed..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 32 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-62: Scout Mindset and Assumption Validation
+### ❓ FB-61: Scout Mindset and Assumption Validation
 
 **Status:** UNKNOWN
 
@@ -2159,9 +2879,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | cbbc2eafd1aff7180bee7c1847d9d89da1e74f313e79872ae252836b6b6a714f |
 | source_books | About Face The Essentials of Interaction Design 4th Edition (Alan Cooper, Robert Reimann, David Cronin etc.) (z-library.sk, 1lib.sk, z-lib.sk).md, About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Closing the Loop Systems Thinking for Designers.md, Company of One Why Staying Small is the Next Big Thing for Business (Paul Jarvis) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+58 more) |
-| source_diversity | 62 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | operations research |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2174,7 +2893,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Organizations and individuals who embrace scout mindset avoid costly mistakes from flawed assumptions and maintain flexibility in response to changing conditions, leading to better long-term outcomes.
 
-**Elaboration:** The scout mindset operates through a tension between confidence in one's current understanding and openness to evidence that contradicts it. This creates a dynamic tension that can be uncomfortable but is necessary for adaptation. When individuals or organizations become too attached to their initial assumptions, they lose the ability to pivot. The principle also implies that effective decision-making requires not just data processing but also the courage to act on disconfirming evidence. This mindset is particularly critical in environments where change is constant and where past success can become a liability.
+**Elaboration:** The scout mindset compels decision-makers to actively seek disconfirming evidence, continuously realign expectations with outcomes, and avoid defending pre-existing beliefs, thereby reducing bias and enhancing adaptability.
+
+**Application:** Decision-making under uncertainty
+
+**Failure Mode:** Failure to question assumptions leads to cognitive bias and costly mistakes
+
+**Keywords:** cognitive bias, assumption testing, uncertainty, decision-making, flexibility
 
 **Evidence Passages (5):**
 1. "certain assumptions made regarding an uncertain future, or conversely, what assumptions underlie certain proposed courses of action..."
@@ -2182,10 +2907,18 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "Nobody gets fired for buying an IBM..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 63 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 63 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.88 + CITATION-ECHO → LLM: The definition introduces the concept of a 'Scout Mindset' which is not explicitly mentioned in the evidence passages. The evidence does not directly support the existe
 
 ---
 
-### ❓ FB-63: Complementary Perspectives in Systems Thinking
+### ❓ FB-62: Complementary Perspectives in Systems Thinking
 
 **Status:** UNKNOWN
 
@@ -2193,9 +2926,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | d4fa6c24411d110bbcd473c8223d51fdaeea1ebaa88c2532012410e7d4c55e6e |
 | source_books | An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2208,7 +2940,13 @@ The principle enables effective thinking by allowing individuals to leverage est
 
 **Consequence:** Because of this principle, systems thinking must embrace multiple viewpoints rather than seeking a single 'correct' interpretation, leading to more robust and comprehensive understanding of complex systems.
 
-**Elaboration:** The principle highlights that the limitations in observation are not flaws but inherent features of systems thinking. When observers have different constraints—whether in time, tools, or conceptual frameworks—their views will naturally differ and yet remain valid. This is particularly relevant in fields like social science or physics, where the act of observation itself can alter the system being studied. The principle also implies that systems thinking benefits from interdisciplinary collaboration, as each discipline brings its own lens to the system. Furthermore, it suggests that evaluation of systems should not rely on a single metric or perspective but should consider how different viewpoints align or diverge.
+**Elaboration:** Complementary perspectives arise because observation is limited by granularity and context; multiple viewpoints reveal different system aspects, enabling a more comprehensive understanding.
+
+**Application:** Designing and analyzing complex systems
+
+**Failure Mode:** Assuming a single perspective can fully represent the system leads to incomplete understanding and flawed interventions
+
+**Keywords:** systems thinking, multiple perspectives, granularity, context, complexity
 
 **Evidence Passages (5):**
 1. "may do well or ill; but such an inclusion creates no truth, and such omission indicates no falsity. The justification for one's procedure, in this respect, is purely pragmatic; it depends upon the relevance of what is included or omitted to the purposes which the system is designed to satisfy..."
@@ -2216,20 +2954,27 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "In other words, if there is some limit to the grain of observation, then complementary views will result..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.63 (strong signal)
 
 ---
 
-### ❓ FB-64: Emergent Complexity from Simple Rules
+### ❓ FB-63: Emergent Complexity From Simple Rules
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | a36f98f37916fae00a2dd2a5944a4372ad9df997a5fc3b39ccb81f2b124b25c2 |
+| fb_id | fef9407e02c1c04fb22166134f92649855f72c2a3a7864653a75ed1be9b6ef9b |
 | source_books | 1506.06774.md, Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Business Model You The One-page Way to Reinvent Your Work.md ... (+45 more) |
-| source_diversity | 50 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2250,10 +2995,18 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "One of the prime drivers of economic theory over the past two centuries has been Smith’s concept..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 50 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.66 (strong signal)
 
 ---
 
-### ❓ FB-65: Systems Thinking Loop
+### ❓ FB-64: Systems Thinking Loop
 
 **Status:** UNKNOWN
 
@@ -2261,9 +3014,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | 7b5474126a914283107c0672c8074ad6bee386e41358232951ad506f6c58b2d6 |
 | source_books | 101 Design Methods A Structured Approach for Driving.md, An Elegant Puzzle Systems of Engineering Management (Will Larson) (z-library.sk, 1lib.sk, z-lib.sk).md, Business Model You The One-page Way to Reinvent Your Work.md, Closing the Loop Systems Thinking for Designers.md, Complex Adaptive Systems An Introduction to Computational Models of Social Life (John H. Miller, Scott E. Page) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+40 more) |
-| source_diversity | 45 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2284,10 +3036,18 @@ The principle enables effective thinking by allowing individuals to leverage est
 3. "It all starts with my willingness to see the shortcomings that are all too evident to those around me...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 45 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-66: Stakeholder Ecosystem Mapping
+### ❓ FB-65: Stakeholder Ecosystem Mapping
 
 **Status:** UNKNOWN
 
@@ -2295,9 +3055,8 @@ The principle enables effective thinking by allowing individuals to leverage est
 |----------|-------|
 | fb_id | f9ac5a333704ea2138d6bc9aeaea84047049d804159799fd5ada1ddd17fc999f |
 | source_books | About Face The Essentials of Interaction Design 4th Edition (Alan Cooper, Robert Reimann, David Cronin etc.) (z-library.sk, 1lib.sk, z-lib.sk).md, About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md, An Elegant Puzzle Systems of Engineering Management (Will Larson) (z-library.sk, 1lib.sk, z-lib.sk).md, Business Model You The One-page Way to Reinvent Your Work.md, Closing the Loop Systems Thinking for Designers.md ... (+42 more) |
-| source_diversity | 47 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2318,7 +3077,13 @@ The process works by identifying entities and their connections, ranking them by
 
 **Consequence:** Organizations that implement stakeholder ecosystem mapping can make more informed decisions about resource allocation, partnership development, and impact measurement by understanding how different actors influence each other and contribute to system outcomes.
 
-**Elaboration:** Ecosystem mapping is particularly powerful in social entrepreneurship and public sector contexts where multiple stakeholders with varying objectives must collaborate. The approach allows for the identification of both direct and indirect influencers, enabling organizations to strategically position themselves within the broader system. When done effectively, stakeholder mapping can reveal hidden dependencies and opportunities for collective impact that would otherwise remain invisible. The method also supports adaptive organizational design by highlighting how changes in one part of the ecosystem can cascade through the system. However, the effectiveness of mapping depends on the quality of data and the willingness of stakeholders to participate in the process.
+**Elaboration:** Stakeholder ecosystem mapping uses network analysis to reveal interdependencies among actors, enabling identification of leverage points for value creation and systemic impact.
+
+**Application:** Strategic stakeholder engagement and resource allocation
+
+**Failure Mode:** When stakeholder relationships are linear or mapping is not linked to action
+
+**Keywords:** stakeholder mapping, network analysis, leverage points, value flow, systemic influence
 
 **Evidence Passages (5):**
 1. "diverse range of stakeholders. These stakeholders include funders, governments, investors, volunteers, partners, NGOs, customers, and beneficiaries, all of whom require careful engagement..."
@@ -2326,10 +3091,18 @@ The process works by identifying entities and their connections, ranking them by
 3. "Ford's Marv Adams stands in a long line of people drawn to learning organization work not only as a way to lead change, but also as a way to build organizations with greater capacity to deal with ongoing change..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 47 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block's definition does not directly reference the specific types of stakeholders mentioned in the evidence passages (funders, governments, investors, volunteers, pa
 
 ---
 
-### ❓ FB-67: Stable State Resistance to Change
+### ❓ FB-66: Stable State Resistance to Change
 
 **Status:** UNKNOWN
 
@@ -2337,9 +3110,8 @@ The process works by identifying entities and their connections, ranking them by
 |----------|-------|
 | fb_id | 070bd7a7f7394be30da971f9dbad6f213b3ccc97a64e6b1978ca9176b8d1e761 |
 | source_books | AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md, Algorithms to Live By The Computer Science of Human Decisions (Brian Christian, Tom Griffiths) (z-library.sk, 1lib.sk, z-lib.sk).md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+43 more) |
-| source_diversity | 48 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2362,7 +3134,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Organizations and societies often remain trapped in inefficient or harmful states because their internal systems resist change. Meaningful improvement requires either disruptive external forces or deliberate intervention that overcomes the system's natural tendency to maintain equilibrium.
 
-**Elaboration:** The principle operates across multiple domains: from educational systems that resist reform despite evidence of failure, to economic structures that maintain inequality despite available solutions. The key insight is that stability itself becomes a barrier to progress. Even when the optimal solution is clear, the system's inertia prevents adoption. This explains why incremental improvements often fail to address root problems. The principle also suggests that sustainable change requires more than just better solutions—it demands a fundamental shift in the system's equilibrium conditions. In some cases, the system may only respond to crisis conditions, making proactive change more difficult to achieve.
+**Elaboration:** Stable state resistance to change describes how self-reinforcing feedback loops maintain equilibrium, requiring disruptive interventions to shift systems toward optimal performance.
+
+**Application:** Organizational change initiatives
+
+**Failure Mode:** When systems are inherently unstable or change is actively encouraged
+
+**Keywords:** stable state, equilibrium, self-reinforcing, inertia, disruptive change, systemic resilience
 
 **Evidence Passages (5):**
 1. "Carnegie's world, for instance, was in a stable state when it came to access to books; only a transformative shift would afford the majority of people broad access to them...."
@@ -2370,10 +3148,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Education systems for the rural poor are another example of a stable but unhappy equilibrium...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 48 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-68: Approximate Reasoning for Efficiency
+### ❓ FB-67: Approximate Reasoning for Efficiency
 
 **Status:** UNKNOWN
 
@@ -2381,9 +3167,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 67a2c09afdaf8804d34917d4d76e9c735bc9723dadd04bf581b02529fc59e891 |
 | source_books | AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, Algorithms for visual design using the Processing language_Kostas Terzidis_liber3.md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Build a Mathematical Mind - Even If You Think You Can_t Have -- Albert Rutherford -- 2023 -- Albert Rutherford -- b435ff30445d7a332b11dfec591da533 -- Anna’s Archive.md, Closing the Loop Systems Thinking for Designers.md ... (+30 more) |
-| source_diversity | 35 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2396,7 +3181,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, individuals often make decisions based on rounded estimates rather than exact computations, which allows for efficient processing in daily life but can lead to suboptimal outcomes in high-stakes contexts.
 
-**Elaboration:** This mechanism reflects a fundamental trade-off between accuracy and efficiency in human cognition. While approximate reasoning is highly effective for routine tasks like estimating costs or making quick purchases, it becomes problematic in domains requiring mathematical precision or where small errors compound into large deviations. The reliance on heuristics also means that people may overlook important details or fail to consider edge cases that would be caught with exact calculation. In computational or algorithmic contexts, similar principles apply when systems optimize for speed or resource usage over perfect accuracy.
+**Elaboration:** Approximate reasoning relies on heuristics and mental shortcuts to reduce cognitive load, enabling quick decisions when the cost of error is low.
+
+**Application:** Rapid decision-making in everyday contexts
+
+**Failure Mode:** When precision is critical or errors have high costs
+
+**Keywords:** heuristics, mental shortcuts, cognitive load, speed-accuracy tradeoff, bounded rationality
 
 **Evidence Passages (5):**
 1. "They may want chips and a drink. Before they get to the cashier, they’re probably rounding and adding approximate amounts in their heads...."
@@ -2404,10 +3195,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Whether it involves machines or humans, there’s magnificent power when depending upon each other, because we can together do things that we could never achieve alone...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 35 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block's definition and evidence passages do not align. The evidence passages discuss rounding amounts in a shopping context, the power of collaboration, a mathematic
 
 ---
 
-### ❓ FB-69: Predictable Behavioral Response
+### ❓ FB-68: Predictable Behavioral Response
 
 **Status:** UNKNOWN
 
@@ -2415,9 +3214,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | e869028d64dda465812f55e4b65983eb938f23a5efa51c183b1c8a48b145d56e |
 | source_books | AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, Agentic Artificial Intelligence (Pascal Bornet) (z-library.sk, 1lib.sk, z-lib.sk).md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md, Atomic Habits Tiny Changes, Remarkable Results An Easy &.md ... (+79 more) |
-| source_diversity | 83 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | neuroscience |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2430,7 +3228,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, external systems can reliably influence human behavior through carefully designed environmental triggers and social feedback mechanisms, enabling systematic change without requiring explicit rational justification.
 
-**Elaboration:** The principle operates through subconscious neural pathways that respond to cues before conscious recognition, making behavioral manipulation possible even when individuals believe they are making independent choices. Social comparisons particularly trigger automatic responses because humans naturally evaluate themselves relative to others. The predictability allows for systematic design of environments that shape behavior. This mechanism explains why simple feedback loops or social norms can drive significant changes in consumption, decision-making, or habit formation. The principle also suggests that effective behavioral design must account for the timing of neural responses relative to conscious decision-making.
+**Elaboration:** Predictable behavioral response explains how neural reward systems trigger automatic actions before conscious awareness, allowing external systems to shape choices via cues and social comparisons.
+
+**Application:** Behavioral influence through environmental cues
+
+**Failure Mode:** When individuals have strong internal motivation or cues misalign with emotional frameworks
+
+**Keywords:** neural reward, automatic behavior, environmental cues, social comparison, behavioral economics, unconscious influence
 
 **Evidence Passages (5):**
 1. "a eld merging neuroscience and decision theory, shows that your brain’s reward systems light up with predictable precision, often before you’re even aware of your preferences..."
@@ -2438,10 +3242,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "In fact, reason is an outgrowth of emotion; it is crippled without an emotional foundation to drive our decisions..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 84 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-70: Feedback Loop Response
+### ❓ FB-69: Feedback Loop Response
 
 **Status:** UNKNOWN
 
@@ -2449,9 +3261,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 3f9b4374840ca823d6b0fc5d1cb60072392193b2eca26b9ac16198fa5c5c496d |
 | source_books | AI Engineering Building Applications with Foundation Models (Chip Huyen) (z-library.sk, 1lib.sk, z-lib.sk).md, AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md, An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md, Ariely, Dan - Predictably Irrational_ The Hidden Forces That Shape Our Decisions (2010, HarperCollins) - libgen.li.md ... (+38 more) |
-| source_diversity | 43 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2464,7 +3275,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems that consistently ignore significant variances will experience spiraling deterioration, while those that respond with corrective actions will achieve sustainable growth patterns through reinforcing feedback loops.
 
-**Elaboration:** The principle operates across multiple system types, from organizational performance to ecological systems. When systems ignore significant variances, they often enter a state of 'flywheel' growth that appears beneficial but is ultimately unsustainable. The key insight is that ignoring variance creates a false sense of stability that masks underlying problems. In complex systems, the timing and magnitude of variance responses can determine whether a system enters a positive or negative feedback cycle. The principle also highlights that not all feedback loops are equally impactful - some may be ignored or misinterpreted, leading to system collapse.
+**Elaboration:** When a system fails to detect or respond to large performance deviations, the lack of corrective action allows reinforcing loops to dominate, causing unsustainable growth or collapse. Conversely, timely corrective actions activate balancing loops that stabilize the system and foster sustainable growth.
+
+**Application:** Organizational change management and engineering system design
+
+**Failure Mode:** Ignoring significant variances leads to spiraling deterioration
+
+**Keywords:** feedback, variance, reinforcing loop, balancing loop, growth, deterioration
 
 **Evidence Passages (5):**
 1. "If the variance between the actual and expected performance is significant, more analysis will determine whether corrective actions are necessary..."
@@ -2472,20 +3289,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "reinforcing feedback "explains the development of both engines of growth or flywheels as well as spiraling deterioration"..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM-echo
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 43 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Citation echo risk: 43 sources + axiomatic evidence. Escalate to LLM deep check regardless of NLI outcome.
+- **factual:** NLI 0.40 + CITATION-ECHO → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-71: Recursive Self-Reference in Systems
+### ❓ FB-70: Recursive Self-reference in Systems
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 37c1500173e46fb9e4fd57663efd0477a21546b81e5b32f16ccbf48b4df0dfad |
+| fb_id | 0fe51685b03889c03c40080bd49027ae6403beeb97712ad70848699dd6669405 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2498,17 +3322,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Systems with recursive self-reference can support complex behaviors like self-modification, meta-cognition, and the emergence of higher-order patterns that are not directly encoded in their basic structure.
 
-**Elaboration:** In biological systems, this manifests as neural networks that can represent and process information about their own activity. In computational systems, it enables self-modifying code or interpreters that can reason about their own execution. The recursive property allows for the emergence of abstract concepts that can refer to the system's own structure. This principle underlies how consciousness might emerge from neural networks, where thoughts can be about thoughts. The recursive nature creates a bridge between the physical substrate and abstract representation.
+**Elaboration:** Recursive self-reference equips a system with the ability to encode and process information about its own structure, enabling meta-level awareness and self-modification. Without such recursive links, systems cannot generate higher-order patterns or adapt beyond their initial programming.
+
+**Application:** Self-modifying code and metacognitive AI systems
+
+**Failure Mode:** Lack of internal representation leads to strictly linear behavior
+
+**Keywords:** recursion, self-reference, meta-cognition, self-modification, feedback loop
 
 **Evidence Passages (3):**
 1. "the Prelude return. transformed considerably...."
 2. "How can thoughts he supported by the hardware of the brain is the topic of the Chapter..."
 3. "At the end of the Ant Fugue, themes from the Prelude return. transformed considerably...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.69 (strong signal)
 
 ---
 
-### ❓ FB-72: Computational Complexity and Search Space
+### ❓ FB-71: Computational Complexity and Search Space
 
 **Status:** UNKNOWN
 
@@ -2516,9 +3354,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 4b99d5853f5920ed1c220f0f80551ce6b5f2bb2545fc36dd6c838471737b2d96 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2531,7 +3368,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, computational systems must be designed with specific constraints on search behavior to ensure termination or manage complexity, leading to the development of distinct computational models like BlooP, FlooP, and GlooP.
 
-**Elaboration:** The distinction between BlooP and FlooP programs reflects a fundamental dichotomy in computational theory: whether a program can be guaranteed to terminate. BlooP's restriction to finite searches makes it suitable for problems with bounded complexity, while FlooP's allowance for potentially infinite searches enables more expressive computational models. This principle underlies the Church-Turing thesis and demonstrates how computational limits are tied to the nature of search spaces. The concept extends to understanding undecidability in formal systems, where infinite search spaces can lead to problems that cannot be solved by any algorithmic process.
+**Elaboration:** Computational models differ in their ability to explore infinite or partially infinite search spaces. Models like BlooP restrict programs to predictable finite searches, ensuring termination but limiting expressiveness. Models like FlooP allow unpredictable or infinite searches, enabling richer problem solving at the cost of potential non‑termination.
+
+**Application:** Algorithm design and problem‑solving strategy selection
+
+**Failure Mode:** Unbounded search spaces cause non‑termination or excessive resource consumption
+
+**Keywords:** computational complexity, search space, finite, infinite, BlooP, FlooP, GlooP
 
 **Evidence Passages (5):**
 1. "Chapter XIII: BlooP and FlooP and GlooP. These are the names of three computer languages. BlooP programs can carry out only predictably finite searches, while FlooP programs can carry out unpredictable or even infinite searches..."
@@ -2539,10 +3382,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "BlooP programs can carry out only predictably finite searches, while FlooP programs can carry out unpredictable or even infinite searches..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-73: Artificial Intelligence Limitations
+### ❓ FB-72: Artificial Intelligence Limitations
 
 **Status:** UNKNOWN
 
@@ -2550,9 +3401,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 22848246686f7731ba5fa0ed97db7b3dd1987d9661d795a4a401873fc2a785f8 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2565,27 +3415,40 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, AI systems that seem to understand language or solve problems in specific domains cannot be assumed to possess general intelligence or real comprehension.
 
-**Elaboration:** The apparent understanding in systems like SHRDLU is based on pattern matching and rule-based responses rather than conceptual knowledge. These systems can engage in seemingly intelligent conversation but do not possess the ability to reason about novel situations outside their training. The limitation becomes apparent when attempting to apply the same system to different domains or when the system encounters inputs that fall outside its designed parameters. The principle highlights the difference between intelligence as demonstrated in narrow contexts and general intelligence as humans possess. This distinction is crucial for understanding the current state of artificial intelligence and its limitations.
+**Elaboration:** AI systems such as SHRDLU can manipulate symbols according to rules and appear to understand language within a narrow domain. However, they lack true semantic knowledge because they do not grasp meaning beyond their programmed parameters, limiting their ability to generalize or exhibit real comprehension.
+
+**Application:** Evaluation of natural language processing systems
+
+**Failure Mode:** Syntactic processing is mistaken for genuine semantic understanding
+
+**Keywords:** AI, syntactic processing, semantic understanding, SHRDLU, general intelligence
 
 **Evidence Passages (3):**
 1. "a program communicates with a person about the so-called "blocks world" in rather impressive English..."
 2. "The computer program appears to exhibit some real understanding-in its limited world..."
 3. "The Dialogue's title is based on Jesu, joy of Mans Desiring, one movement of Bach's Cantata 147..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-74: Self-Reference and Information Circularity
+### ❓ FB-73: Self-reference and Information Circularity
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 0e1c628f23dd325ca788e2395cdbab7d103f05643151e6ecf843b9e58f6fbced |
+| fb_id | ffe404ff034a3afa8bc7794ae4124ef3608ba896aa2c647b31234b7c944fc032 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2598,16 +3461,30 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems that exhibit self-reference often show emergent behaviors that cannot be predicted from their component parts alone, and they frequently require special handling to avoid paradoxes or infinite loops in their operation.
 
-**Elaboration:** The circular nature of self-reference creates a fundamental tension between the system's ability to understand itself and its ability to function as a stable entity. In computational systems, this manifests as the halting problem and undecidability. In biological systems, it appears in the self-replication of DNA and RNA. The principle suggests that systems with self-reference are inherently more complex than their component parts, and that their behavior cannot be fully captured by linear or hierarchical models. This circularity also explains why self-referential systems often require external context or meta-level reasoning to resolve paradoxes or maintain stability. The boundary between self and environment becomes fluid in such systems.
+**Elaboration:** When a system encodes and processes information about its own structure, the distinction between internal representation and external context dissolves, creating circular information pathways. This self-referential embedding can lead to emergent behaviors such as self-reproduction or meta-level reasoning, but also risks paradoxes or unbounded recursion if not carefully constrained.
+
+**Application:** Self-modifying AI, biological self-replication, adaptive control systems
+
+**Failure Mode:** Paradox, infinite loops, loss of clear system boundaries
+
+**Keywords:** self-reference,circularity,feedback,emergent,self-reproduction,meta-reasoning
 
 **Evidence Passages (2):**
 1. "Chapter is about the connection between self-reference in its various guises, and self-reproducing entities e.g., computer programs or DNA molecules..."
 2. "The relations between a self-reproducing entity and the mechanisms external to it which aid it in reproducing itself (e.g., a computer or proteins) are discussed-particularly the fuzziness of the distinction..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.78 (strong signal)
 
 ---
 
-### ❓ FB-75: Formal System Rule Compliance
+### ❓ FB-74: Formal System Rule Compliance
 
 **Status:** UNKNOWN
 
@@ -2615,9 +3492,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | cd884591014a6fa9ef3983bf14e199ca98295749ceb6a01c5a9837f57c464d3e |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2630,7 +3506,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, formal systems can only produce outcomes that are logically derivable from their initial axioms and transformation rules, making their behavior completely determined by their rule set.
 
-**Elaboration:** The principle demonstrates that formal systems are self-contained and internally consistent, with no room for external interpretation or assumption. Even when multiple rules might apply, the system's structure doesn't dictate which to choose, leaving choice to the user or implementer. This creates a tension between formal constraints and creative application, where the art lies in navigating the defined space rather than transcending it. The requirement of formality is not just a constraint but a fundamental property that makes formal systems amenable to mathematical analysis and logical reasoning.
+**Elaboration:** Formal systems are governed by a fixed set of transformation rules. All operations must strictly adhere to these rules; any deviation produces an invalid state, breaking the system’s formal structure. This strict compliance ensures predictability but also limits flexibility, as the system cannot incorporate external assumptions or manipulations.
+
+**Application:** Programming language semantics, theorem provers, formal verification tools
+
+**Failure Mode:** Rule violation leads to undefined states or invalid operations
+
+**Keywords:** rule compliance,formal system,determinism,validity,transformation rules
 
 **Evidence Passages (5):**
 1. "in your collection, you may make a new string with U in place of III..."
@@ -2638,20 +3520,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "The major point, which almost doesn't need stating, is that you must not do anything which is outside the rules..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI FAIL → LLM: The evidence passages suggest that there is some flexibility in how a formal system can be played or interpreted, which contradicts the strict adherence to rules stated in the foundati
 
 ---
 
-### ❓ FB-76: Abstract Number vs. Concrete Quantity
+### ❓ FB-75: Abstract Number Vs. Concrete Quantity
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | f0081921c8d4dc2f7df4f03bc188e4eff79b37652f753b8d35c2224ac7832c5f |
+| fb_id | 3c435c91563162c0466d31cdf21eb7546e720d297a238e745e08e47754d2616f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2664,7 +3553,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, mathematical operations and axioms cannot always be directly applied to physical situations without considering the underlying assumptions and limitations of abstract versus concrete representations.
 
-**Elaboration:** The principle highlights that mathematical systems like arithmetic are built on assumptions that may not hold in the physical world. For example, while two raindrops may visually appear to merge into one, their physical properties (volume, mass, etc.) do not necessarily add up in a way that supports arithmetic addition. This principle also explains why mathematical models often require approximation or adjustment to reflect real-world complexity. The distinction becomes more nuanced in systems where physical entities can be indistinguishable or where measurement introduces uncertainty. The principle underscores that mathematical truth and physical truth are not always aligned, which is why mathematical modeling requires careful validation against empirical data.
+**Elaboration:** Abstract numbers are invariant mathematical constructs governed by axioms, whereas concrete quantities are subject to physical constraints such as conservation laws and discrete interactions. When physical processes like merging or splitting objects are modeled with abstract arithmetic, the resulting calculations can violate real-world behavior, revealing a fundamental mismatch between mathematical abstraction and empirical reality.
+
+**Application:** Physical modeling, engineering simulations, computational physics
+
+**Failure Mode:** Misapplication of abstract mathematical operations to physical phenomena
+
+**Keywords:** abstract number,concrete quantity,mathematical abstraction,physical reality,applied mathematics
 
 **Evidence Passages (4):**
 1. "Two raindrops running down a windowpane merge; does one plus one make one?..."
@@ -2672,20 +3567,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "The amount of money in our pocket will not change as we walk down the street, jostling it up and down..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-77: Self-Reference Paradox
+### ❓ FB-76: Self-reference Paradox
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 097f885bdaabf298c00ff44f9752cd5106424b60fc49a5682bb98284576240cd |
+| fb_id | 0a5f68e4f5123d9590d6c54a2f5602dfb975b5a59b9ec8c02df5f84440859afc |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2698,7 +3600,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems that attempt to fully model their own structure will inevitably encounter incompleteness or contradiction, whether in mathematical proofs, musical compositions, or computational processes.
 
-**Elaboration:** In formal systems like those studied by Gödel, self-reference leads to undecidable propositions that cannot be proven true or false within the system. In creative works like Bach's Art of the Fugue, self-reference manifests as the impossibility of fully completing a composition that aims to encompass all possible fugal structures. The paradox is not just theoretical but has practical consequences for creators and systems that attempt to be completely self-contained. The principle suggests that some form of external perspective or limitation is necessary for systems to achieve their full expressive potential. This creates a fundamental tension between the desire for completeness and the reality of structural limitations.
+**Elaboration:** When a system’s expressive power allows it to refer to itself, the act of self-representation can create logical or structural contradictions. The system cannot fully capture its own structure without excluding elements or introducing inconsistencies, leading to inherent incompleteness or paradoxes in formal proofs, logical frameworks, or even artistic compositions.
+
+**Application:** Gödel’s incompleteness proofs, Liar paradox, self-referential creative works
+
+**Failure Mode:** Incompleteness or contradiction when a system attempts full self-description
+
+**Keywords:** self-reference,paradox,incompleteness,contradiction,formal systems
 
 **Evidence Passages (5):**
 1. "The Tortoise says that no sufficiently powerful record player can be perfect, in the sense of being able to reproduce every possible sound from a record..."
@@ -2706,20 +3614,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "His aim was to construct a complete exposition of fugal writing, and usage of multiple themes was one important facet of it..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.86 (strong signal)
 
 ---
 
-### ❓ FB-78: Self-Similar Recursive Structure
+### ❓ FB-77: Self-similar Recursive Structure
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | e28518962880b21862d2ecb6191c388bb0a615788b08c70491d1473804ee222f |
+| fb_id | c0ece93c6dff7bd72459c72a0ec43299b3a89d2a1599c01eefcee5f772ca109b |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2732,17 +3647,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems with self-similar recursive structure exhibit infinite complexity within finite definitions, and can be understood at any scale by examining any component piece.
 
-**Elaboration:** The principle demonstrates that mathematical structures like the Fibonacci sequence can be extended to infinite self-similarity when properly defined with both recursive rules and base values. The recursive nature means that any local portion of the structure contains the entire global structure, making the system's behavior at any scale predictive of its behavior at all scales. This creates a kind of mathematical immortality where the whole system is preserved in every part. The principle also implies that such systems can be infinitely complex yet remain fully describable by simple rules, which is a fundamental insight in fractal geometry and recursive systems theory.
+**Elaboration:** Self-similar recursive structures arise when a system is defined by a recursive rule that can be applied indefinitely, with a base case that anchors the recursion. Each component contains a miniature copy of the whole, allowing the system to be analyzed at any magnification. This principle underlies fractals, recursive algorithms, and hierarchical biological structures.
+
+**Application:** Modeling fractals, recursive data structures, natural phenomena
+
+**Failure Mode:** Absence of recursive definition or base case, or loss of structural identity across scales
+
+**Keywords:** self-similarity, recursion, base case, infinite nesting, fractal, recursive definition
 
 **Evidence Passages (3):**
 1. "It consists of an infinite number of curved pieces, which get smaller and smaller towards the corners-and incidentally, less and less curved. Now if you look closely at each such piece, you will find that it is actually a copy of the full graph, merely curved!..."
 2. "One of them is that the graph of INT consists of nothing but copies of itself, nested down infinitely deeply. If you pick up any piece of the graph, no matter how small, you are holding a complete copy of the whole graph-in fact, infinitely many copies of it!..."
 3. "The fact that INT consists of nothing but copies of itself might make you think it is too ephemeral to exist. Its definition sounds to..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.78 (strong signal)
 
 ---
 
-### ❓ FB-79: Modular Hierarchical Organization
+### ❓ FB-78: Modular Hierarchical Organization
 
 **Status:** UNKNOWN
 
@@ -2750,9 +3679,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | e831227679f282d5471eef22e77c3dd2e3120d006c7634a4241a546e6ac6995a |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2771,20 +3699,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 1. "are lumped together and considered a single unit with a name-such as the procedure [ORNATE NOUN]{.bold}. As we saw in [RTN]{.bold}'s, procedures can call each other by name, and thereby express very concisely sequences of operations which are to be carried out. This is the essence of modularity in programming...."
 2. "Modularity exists, of course, in hi-fi systems, furniture, living cells, human society-wherever there is hierarchical organization...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-80: Recursive Evaluation in Game Tree Search
+### ❓ FB-79: Recursive Evaluation in Game Tree
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 9690dc1f552ac23a79d96ec35ce71293fec697fce1b157f9a9b23a109a021428 |
+| fb_id | 1ebcfa5ebe043a41498d44379dd7da7b528ee90b444494f6babc67977a9ba09f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2803,20 +3738,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 1. "There are a number of useful criteria for this purpose, such as si number of pieces on each side, the number and type of pieces undo the control of the center, and so on. By using this kind of evaluation at the bottom, the recursive move-generator can pop back upwards..."
 2. "One of the parameters in the self-calling, then, must tell how many moves to look ahead. The most call on the procedure will use some externally set value parameter. Thereafter, each time the procedure recursively calls must decrease this look-ahead parameter by 1. That way, w parameter reaches zero, the procedure will follow the alternate pathway..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-81: Self-Referential Commentary
+### ❓ FB-80: Self-referential Commentary
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | a1fde27d929a5e04e2d6ecd419990462fa78ab00de1cee96f036d0f1fa0e2f1f |
+| fb_id | 89e40a37cffc9d2c75db1e33d2206c43ce7223a8eeb63433fabda73ff6d4fad6 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2837,10 +3779,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Achilles: A haiku is a Japanese seventeen-syllable poem-or minipoem rather, which is evocative in the same way, perhaps, as a fragrant pet..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-82: Universal Message Meaning
+### ❓ FB-81: Universal Message Meaning
 
 **Status:** UNKNOWN
 
@@ -2848,9 +3798,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | f409e38593c6c6cabecabb2d09dbf2a8a1ba6d8b9e6445d7c2d35b9928011332 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | operations research |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2863,27 +3812,40 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, some messages can be understood and interpreted consistently across different observers and contexts, suggesting that communication can achieve a level of objectivity that transcends individual perspective and cultural framing.
 
-**Elaboration:** The principle implies that while not all messages can be considered universally meaningful, there exists a class of messages that carry inherent structural properties that make their meaning stable across different interpreters. This suggests that intelligence and communication systems may naturally gravitate toward encoding information in ways that maximize the likelihood of universal interpretation. The relationship to simplicity in describing intelligence suggests that the most fundamental messages are those that can be expressed through the simplest, most universal principles. This creates a hierarchy where some messages are more likely to achieve objective meaning than others based on their structural properties. The principle also hints at the possibility that truly universal messages might be those that reflect the fundamental organizing principles of consciousness or intelligence itself.
+**Elaboration:** Universal Message Meaning posits that certain information structures encode patterns that are inherently meaningful to any observer, independent of context. This allows for objective interpretation across cultures and systems.
+
+**Application:** Enabling cross-cultural communication systems that rely on objective message structures.
+
+**Failure Mode:** Fails when messages are purely subjective or lack structural consistency across observers.
+
+**Keywords:** universal, message, meaning, objective, structure, pattern, intelligence, communication
 
 **Evidence Passages (3):**
 1. "In this Chapter, I want to present the case for the universality of at least some messages, without, to be sure, claiming it for all messages..."
 2. "The idea of an "objective meaning" of a message will turn out to be related, in an interesting way, to the simplicity with which intelligence can be described..."
 3. "The idea of an "objective meaning" of a message will turn out to be related, in an interesting way, to the simplicity with which intelligence can be described..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 1.00 (strong signal)
 
 ---
 
-### ❓ FB-83: Self-Referential Interpretation
+### ❓ FB-82: Self-referential Interpretation
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 42bd698dd391f8d1bfa30967d02d19f24dda7c9c86697794ed7eb1f5715a027e |
+| fb_id | 938d421def49167db5a6ad3818d8c71f06680ea1988ba49c1fe71a2c64adc90e |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | linguistics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2896,17 +3858,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, communication systems must account for the cognitive burden of identifying message formats before content can be comprehended, which affects the design of multilingual interfaces and translation systems.
 
-**Elaboration:** This principle reveals that interpretation is not purely semantic but involves meta-cognitive steps of medium recognition. Even when translations are provided, the fundamental challenge remains that the interpreter must first identify the language or format to access the content. The principle suggests that truly seamless communication requires either prior shared understanding or explicit signaling of medium properties. This creates a fundamental limit on how easily information can be transferred across different representational systems. The self-referential nature implies that any communication system must either encode its own structure or rely on external context to function.
+**Elaboration:** Self-Referential Interpretation requires the interpreter to first identify the medium or language of a message before semantic processing can occur. This creates a prerequisite step that can impose cognitive load.
+
+**Application:** Design of multilingual interfaces and translation systems.
+
+**Failure Mode:** Fails when the medium is obvious or interpreter already has context.
+
+**Keywords:** self-referential, interpretation, medium, language, translation, cognitive load
 
 **Evidence Passages (3):**
 1. "English-speaking person still has to recognize the "Englishness" of the message; otherwise it does no good...."
 2. "You might try wriggle out of this by including translations of the statement "This mess2 is in Japanese" into many different languages. That would help it practical sense, but in a theoretical sense the same difficulty is there...."
 3. "Thus one cannot avoid the problem that one has to find out how to decipher the inner..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-84: Intrinsic Meaning Through Universal Triggers
+### ❓ FB-83: Intrinsic Meaning Through Universal Triggers
 
 **Status:** UNKNOWN
 
@@ -2914,9 +3890,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | a165cf02e7d7d46e7d9e8ac8ebf3ff7eaa8885821e17e3cd5fe318a975de1fc4 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | universal |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2929,7 +3904,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, messages that contain universal triggers can be understood as carrying intrinsic meaning that transcends the particular context in which they were created, allowing for cross-intelligence communication and interpretation.
 
-**Elaboration:** The principle suggests that there may be a core set of cognitive patterns or triggers that are so fundamental to intelligence that they produce the same semantic effects across different intelligent systems. This implies that meaning is not entirely dependent on the observer's context or prior knowledge, but rather emerges from the interaction between universal triggers and the observer's cognitive architecture. The 'Jukebox' theory of meaning supports this by suggesting that once the right trigger is activated, the meaning is directly accessible. However, this principle also implies that truly universal triggers might be rare, and most meaning requires some level of context or prior understanding to decode. The principle does not require that all intelligent beings interpret messages identically, but rather that they interpret them in a consistent way relative to their own cognitive structures.
+**Elaboration:** Intrinsic Meaning Through Universal Triggers suggests that messages containing universal triggers elicit consistent responses across intelligent beings by tapping shared cognitive structures.
+
+**Application:** Cross-intelligence communication protocols.
+
+**Failure Mode:** Fails when triggers are culturally specific or intelligence levels differ.
+
+**Keywords:** intrinsic meaning, universal triggers, cross-intelligence, cognitive structures, interpretation
 
 **Evidence Passages (5):**
 1. "Thus, would be certain kinds of triggers which would have "universal triggering power", in that all intelligent beings would tend to respond to them same way as we do...."
@@ -2937,10 +3918,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Success lets him break through into the inside, at which point the ratio of triggers to explicit meanings shifts drastically towards the latter...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-85: Information Encoding Through Recursive Patterns
+### ❓ FB-84: Information Encoding Through Recursive Patterns
 
 **Status:** UNKNOWN
 
@@ -2948,9 +3937,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 63b97f6bd546eedeb4d985701f5881b74f5fccf61b92f8722a1e6c1bd6c8e361 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | universal |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2963,17 +3951,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** By encoding information through recursive patterns, systems can transmit complex structures efficiently using only the initial conditions and transformation rules, reducing storage and communication requirements.
 
-**Elaboration:** This principle demonstrates how self-similar structures can encode their own generation process. The encoding efficiency becomes particularly apparent when comparing the compact representation (first two numbers) to the full sequence. The recursive nature allows for infinite expansion from finite information. However, this approach requires that the recursive rule be known or discoverable by the recipient. When the pattern is not immediately recognizable or when the rule is too complex to infer, the encoding fails to convey the intended information.
+**Elaboration:** Information Encoding Through Recursive Patterns uses a minimal initial state and a recursive rule to generate complete information, enabling compact representation.
+
+**Application:** Efficient data compression and transmission.
+
+**Failure Mode:** Fails when information cannot be defined by a recursive relationship or initial state insufficient.
+
+**Keywords:** recursive patterns, genotype, phenotype, information encoding, data compression, efficient transmission
 
 **Evidence Passages (3):**
 1. "Supp think of the initial pair of values (1,1) as a "genotype" from which the "phenotype"-the full Fibonacci sequence-is pulled out by a recursive rule..."
 2. "By sending the genotype alone-namely the first version plaque-we fail to send the information which allo..."
 3. "In fact, the recursive part of the definition of the Fib numbers can be inferred, with some confidence, from this list..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-86: Symbolic Interpretation Flexibility
+### ❓ FB-85: Symbolic Interpretation Flexibility
 
 **Status:** UNKNOWN
 
@@ -2981,9 +3983,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 458504f2d69ebf089786776f1d2f1212cc928d77e4e5052fe59ec8a938f4fc83 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -2996,17 +3997,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, formal systems can be used to model and express various real-world concepts through flexible semantic mapping, enabling translation between abstract logic and concrete meaning.
 
-**Elaboration:** The principle demonstrates that formal systems are not tied to specific meanings but rather to logical relationships. This allows the same logical structure to be applied to different domains, such as using the same implication rules to model both mathematical proofs and natural language arguments. The consistency requirement ensures that once a symbol is assigned a meaning, that meaning must remain stable throughout any derivation or string. This flexibility enables the system to serve as a universal framework for representing logical relationships across different contexts. The principle also underlies how formal systems can model human reasoning patterns by mapping abstract logical structures to concrete semantic content.
+**Elaboration:** Allows symbols in a formal system to be mapped to natural language sentences while preserving logical structure, enabling flexible semantic interpretation.
+
+**Application:** formal logic translation to natural language
+
+**Failure Mode:** contradiction or logical inconsistency
+
+**Keywords:** symbolic interpretation, formal system, natural language, logical consistency, semantic mapping
 
 **Evidence Passages (3):**
 1. "The only symbols we have not interpreted are the atoms. An atom has no single interpretation-it may be interpreted by any sentence of English..."
 2. "Thus, for example, the well-formed string could be interpreted by the compound sentence This mind is Buddha, and this mind is not Buddha..."
 3. "The Intended Interpretation of the Symbols We might as well let the cat out of the bag at this point, and reveal the intended interpretation for..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-87: Peano Axioms Framework
+### ❓ FB-86: Peano Axioms Framework
 
 **Status:** UNKNOWN
 
@@ -3014,9 +4029,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 507bf3002284829d473c0872f3bf46dafa02d11b10a2a8c364a735fe7777fd59 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3029,17 +4043,31 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, arithmetic systems can be built with consistent logical foundations, enabling rigorous proofs about natural numbers and their properties.
 
-**Elaboration:** The axioms form a complete system for natural numbers, where each axiom serves a specific logical role: Axiom 1 establishes the base case (zero), Axiom 2 defines successorship, Axiom 3 prevents circularity in the successor chain, Axiom 4 ensures uniqueness of numbers, and Axiom 5 enables induction. The use of undefined terms allows for multiple interpretations while maintaining logical consistency. The framework demonstrates how abstract mathematical structures can be built from minimal assumptions. The recursive nature of the axioms enables the construction of all natural numbers from zero through successive application of the successor function.
+**Elaboration:** Defines natural numbers via recursive successor function and induction, providing a rigorous base for number theory.
+
+**Application:** foundational arithmetic system
+
+**Failure Mode:** inconsistent interpretation of undefined terms
+
+**Keywords:** Peano axioms, natural numbers, successor, induction, arithmetic foundation
 
 **Evidence Passages (3):**
 1. "Axiom 1 states a special fact about the number 0; Axioms 2 and 3 are concerned with the nature of addition; Axioms 4 and 5 are concerned with the nature of multiplication..."
 2. "The five Peano postulates: (1) Genie is a djinn. (2) Every djinn has a mesa (which is also a djinn). (3) Genie is not the mesa of any djinn. (4) Different djinns have different metas. (5) If Genie has X, and each djinn relays X to its mesa, then all djinns get X..."
 3. "Peano's five postulates place five restrictions on djinns..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.74 (strong signal)
 
 ---
 
-### ❓ FB-88: Emergent Unity Through Recursive Reflection
+### ❓ FB-87: Emergent Unity Through Recursive Reflection
 
 **Status:** UNKNOWN
 
@@ -3047,9 +4075,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 3adf8bb924a420270e34736b5a9fff45a9759044826ad4cd91cdd1eb3decce97 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | philosophy |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3062,7 +4089,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems that exhibit recursive structure can reveal deeper truths through the collapse of apparent contradictions into unified essences, enabling insights that transcend surface-level categorization.
 
-**Elaboration:** The principle operates across multiple domains: linguistic (where words become reflections of themselves), mathematical (where self-referential systems reveal paradoxes), and philosophical (where consciousness reflects upon itself). The emergent unity is not a simple summation but a transformation that occurs when recursive patterns collapse into singular, illuminating essences. This process can be observed in both Eastern philosophical concepts like Zen enlightenment and Western mathematical concepts like Gödel's incompleteness theorems. The principle suggests that true understanding emerges not from linear analysis but from recursive reflection that allows distinctions to dissolve into deeper unity.
+**Elaboration:** Recursive reflection merges nested representations, collapsing distinctions to reveal unified essences across levels.
+
+**Application:** analysis of recursive systems and self-referential structures
+
+**Failure Mode:** absence of self-reference or necessary distinctions
+
+**Keywords:** recursive reflection, self-reference, emergent unity, nested representation, higher-order patterns
 
 **Evidence Passages (5):**
 1. "toward the center of Verbum, the distinctions gradually blur, so that in the end there remains not three, not two, but one single essence: "VERBUM"..."
@@ -3070,10 +4103,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "The complete Tripitaka can be expressed in one character..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.68 (strong signal)
 
 ---
 
-### ❓ FB-89: Paradoxical Triggering
+### ❓ FB-88: Paradoxical Triggering
 
 **Status:** UNKNOWN
 
@@ -3081,9 +4122,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 463657bca7b26b3ee5e3173da635f517135d8a52e39eafdb10a3934747e07406 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3096,7 +4136,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, paradoxical tools like Zen koans or Riddles of the Sphinx can effectively catalyze breakthrough insights or understanding in individuals who are open to non-linear thinking.
 
-**Elaboration:** The effectiveness of paradoxical triggers depends on the learner's readiness to abandon linear reasoning and embrace ambiguity. When the mind is primed for such engagement, the paradox becomes a gateway to deeper understanding. The triggers work best when they are not immediately resolved but rather allowed to sit with the individual, creating space for unconscious processing. This principle also explains why some philosophical or spiritual practices emphasize the value of 'not knowing' as a path to wisdom. The paradoxical nature of the trigger is not just a rhetorical device but a structural feature that enables cognitive transformation.
+**Elaboration:** Paradoxical statements create cognitive dissonance, forcing deeper processing and unlocking non-linear understanding.
+
+**Application:** cognitive insight induction via paradoxical stimuli
+
+**Failure Mode:** obscure or unengaging trigger
+
+**Keywords:** paradoxical trigger, cognitive dissonance, insight, Zen koan, non-linear processing
 
 **Evidence Passages (5):**
 1. "Koans are supposed to be "triggers" which, though they do not contain enough information in themselves to impart enlightenment, may possibly be sufficient to unlock the mechanisms inside one's mind that lead to enlightenment...."
@@ -3104,10 +4150,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Zen koans are a central part of Zen study, verbal though they are. Koans are supposed to be "triggers" which, though they do not contain enough information in themselves to impart enlightenment, may possibly be sufficient to unlock the mechanisms inside one's mind that lead to enlightenment...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.84 (strong signal)
 
 ---
 
-### ❓ FB-90: Explicit Signal Protocol
+### ❓ FB-89: Explicit Signal Protocol
 
 **Status:** UNKNOWN
 
@@ -3115,9 +4169,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 10b87df8c5745d7e6e0d6fcee42b40c41fa6b031ccc08734ed66f9f5cbb52877 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3130,26 +4183,39 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, communication systems can support both structured content and contextual additions without losing coherence or increasing parsing complexity.
 
-**Elaboration:** The explicit signal protocol demonstrates how even small deviations from strict structure can be managed through clear conventions. The protocol's effectiveness depends on the reliability of the signaling system and the consistency of its use. If the signaling is inconsistent or overloaded with multiple types of optional content, the system can become less effective. The principle also suggests that flexibility in communication is most effective when it is bounded and predictable rather than arbitrary. The use of specific markers like [COMMENT] and semicolons creates a self-contained ecosystem for optional content.
+**Elaboration:** Explicit Signal Protocol introduces clear delimiters that separate essential from non‑essential data, enabling receivers to parse messages flexibly while preserving structure. When markers are omitted or overloaded, the system cannot reliably distinguish optional content, causing ambiguity or parsing errors.
+
+**Application:** Design of communication protocols that allow optional data without sacrificing clarity
+
+**Failure Mode:** Inconsistent or ambiguous markers leading to misinterpretation of optional content
+
+**Keywords:** explicit signaling, optional content, protocol design, parsing, clarity, flexibility
 
 **Evidence Passages (2):**
 1. "Interestingly, the printed equivalent of coughing (i.e., a nonessential or irrelevant comment) is allowed, but only provided it is signaled in advance by a key word (e.g., [COMMENT]{.bold}), and then terminated by another key word (e.g., a semicolon)...."
 2. "This small gesture towards flexibility has its own little pitfall, ironically:..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-91: Hierarchical Sealing-Off
+### ❓ FB-90: Hierarchical Sealing-off
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 0e1cc128a3621ef083ced99d2e5fbae07c6460ac124ae878a9ac74f950a79677 |
+| fb_id | a09231e8bba2c93641c193be0a9a7ab39d0f2270a8f994dac01d78ae32e4a9b4 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3162,7 +4228,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, scientists and engineers can work effectively at different levels of complexity, using simplified models and abstractions without losing accuracy in their applications.
 
-**Elaboration:** The sealing-off is not absolute; there is always some 'leakage' between levels, meaning that information and effects can sometimes propagate between levels. However, this leakage is typically minimal enough that the abstraction remains useful. The principle works best when the higher-level phenomena are stable and predictable enough to support independent study. In cases where the lower levels are highly dynamic or chaotic, the sealing-off breaks down and more granular understanding becomes necessary.
+**Elaboration:** Hierarchical Sealing‑Off allows each level of a system to operate independently while being grounded in lower levels. This abstraction reduces cognitive load and supports scalable design. Failure occurs when emergent properties at a higher level cannot be explained without detailed lower‑level knowledge, breaking the seal.
+
+**Application:** Modular system design and abstraction in engineering and software architecture
+
+**Failure Mode:** Inadequate lower‑level explanation causing higher‑level behavior to be unpredictable
+
+**Keywords:** hierarchical abstraction, emergent properties, modularity, system design, sealing-off
 
 **Evidence Passages (5):**
 1. "Similarly, and fortunately. one does not have to know all about quarks to understand many things about the particles which they may compose...."
@@ -3170,10 +4242,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Each level is, in some sense, "sealed off" from the levels below it...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-92: Cross-lingual Textual Ambiguity
+### ❓ FB-91: Cross-lingual Textual Ambiguity
 
 **Status:** UNKNOWN
 
@@ -3181,9 +4261,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | b00be6a8b96d5042017aa40f56c221bf674f53150a1a9b93234fc3b1b2b5e74c |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3196,16 +4275,30 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, translated or adapted texts may lose their original intent or become subject to multiple interpretations, especially in literary or poetic contexts where nuance and wordplay are critical.
 
-**Elaboration:** In multilingual contexts, particularly in literature or poetry, the same phrase or line can carry different emotional or conceptual weight depending on the language it's rendered in. For example, a metaphor that resonates in one language might be lost or transformed in another. This principle is especially relevant in translation studies and cross-cultural communication, where fidelity to the original and clarity of meaning must be balanced. The effect is not just semantic but also stylistic and emotional, as seen in the use of alliteration or rhythm in verse. The principle highlights the challenge of preserving artistic or rhetorical intent across linguistic boundaries.
+**Elaboration:** Cross‑lingual Textual Ambiguity arises when idioms, cultural references, or stylistic elements lack direct equivalents in the target language, leading to multiple or distorted interpretations. The principle highlights the need for context‑aware translation strategies to preserve semantic core.
+
+**Application:** Translation quality assessment and cross‑cultural communication
+
+**Failure Mode:** Loss of idiomatic meaning or introduction of unintended interpretations
+
+**Keywords:** cross‑lingual ambiguity, idioms, cultural references, translation, semantic distortion
 
 **Evidence Passages (2):**
 1. "milieu, Le glaive vorpal fait pat-a-pan! La bete defaite, avec sa tete, Il rentre gallomphant...."
 2. "Un deux, un deux, par le milieu, Le glaive vorpal fait pat-a-pan! La bete defaite, avec sa tete, Il rentre gallomphant...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-93: Symbolic Translation Ambiguity
+### ❓ FB-92: Symbolic Translation Ambiguity
 
 **Status:** UNKNOWN
 
@@ -3213,9 +4306,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 06cdd6cdf0e63934d69b8bb5eded21259809754c1645b082f8f698c9bb6d9840 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3228,7 +4320,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, symbolic translation between systems requires careful consideration of cultural and linguistic context to preserve meaning, or may necessitate the creation of new symbolic constructs to bridge conceptual gaps.
 
-**Elaboration:** The principle reveals that symbolic translation is not merely a matter of finding equivalent words but involves deep structural alignment between conceptual frameworks. When a word like 'lubricilleux' is more Latinate and abstract than 'slithy', the translation process may lose the intuitive or experiential quality that makes symbols meaningful in their original context. This suggests that translation is not just about mapping symbols but about preserving the experiential or conceptual resonance that gives symbols their power. The principle also implies that some symbolic systems may be fundamentally incompatible for direct translation, requiring either creative re-expression or the development of hybrid symbolic constructs.
+**Elaboration:** Symbolic Translation Ambiguity occurs when conceptual meanings lack direct symbolic equivalents in another language or system, leading to either loss of meaning or introduction of new, unintended associations. The principle underscores the importance of cultural and structural alignment when creating or translating symbolic representations.
+
+**Application:** Design of symbolic systems and cross‑domain knowledge representation
+
+**Failure Mode:** Loss of meaning or unintended connotations when symbols are mapped across incompatible systems
+
+**Keywords:** symbolic translation, ambiguity, cross‑domain representation, cultural context, symbolic systems
 
 **Evidence Passages (5):**
 1. "Does "lubricilleux" do the corresponding thing in the brain of a Frenchman? What indeed would be "the corresponding thing"?..."
@@ -3236,20 +4334,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "What if there is no word, real or fabricated, which will accomplish that?..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-94: Recursive Self-Reference
+### ❓ FB-93: Recursive Self-reference
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 8da048503bdbe3873a319aa1906e21a0ac94023ec2136a1235c3167c82f63cb8 |
+| fb_id | 11fd5c0fdc73022479a21319ec8dd972e197aa08dffef8bfb4491c6066d1234c |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3262,7 +4367,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, systems that exhibit recursive self-reference can generate infinite complexity or paradoxes from simple initial conditions, making them powerful models for understanding consciousness, computation, and language.
 
-**Elaboration:** Recursive self-reference is not merely circularity but a form of self-awareness or self-modeling that can lead to higher-order thinking or paradoxes like the liar paradox. In computational systems, it enables self-modification and meta-level reasoning. The principle is foundational in understanding Gödel's incompleteness theorems, where a system can refer to its own provability. It also underlies the structure of recursive functions in computer science and the self-referential nature of consciousness in philosophy. The mechanism is particularly potent in systems that can encode and execute their own rules.
+**Elaboration:** Recursive self-reference creates feedback loops that allow a system to generate new patterns or behaviors from its own structure, leading to emergent complexity or paradoxes. The mechanism relies on a system containing references to itself, enabling self-modification and self-replication without external input.
+
+**Application:** Modeling complex systems such as consciousness, language, and self-modifying software
+
+**Failure Mode:** Occurs when the system lacks internal self-referential structure or recursion is strictly bounded and terminates
+
+**Keywords:** recursion, self-reference, emergent complexity, paradox, infinite regress, feedback loop
 
 **Evidence Passages (4):**
 1. "Tortoise: Thank you very much indeed, Achilles. Hmm ... Why are all these mathematicians' names engraved on the top? What a curious list: De Morgan Abel Boole Br o u w e r Sierpinski Weierstrass Achilles: I believe it is supposed to be a Complete List of All Great Mathematicians...."
@@ -3270,10 +4381,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "Tortoise: Well, I am afraid that I myself am growing a little groggy, Achilles. It would be well for me to take my leave, while I am still capable of navigating my way home. Achilles: I am most flattered' that you have stayed up for so long, and at such an odd hour of the night, just for my benefit. I am most flattered...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.89 (strong signal)
 
 ---
 
-### ❓ FB-95: Diagonalization Method
+### ❓ FB-94: Diagonalization Method
 
 **Status:** UNKNOWN
 
@@ -3281,9 +4400,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | 2429374a208a0a2bb965cffeac0d746497c6ea2209b0354b79d6a469becd0c56 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3296,7 +4414,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, it is impossible to create a complete list of all computable functions or programs, demonstrating the existence of undecidable problems and the limits of systematic enumeration in computational theory.
 
-**Elaboration:** The diagonal method is foundational in computability theory and is used to prove that the set of all computable functions is uncountable. It also underpins Gödel's incompleteness theorems and demonstrates that there are more real numbers than computable numbers. The method can be extended to show that no universal program can decide the behavior of all programs. The construction is not just theoretical—it implies that any attempt to enumerate all programs or functions will always miss some, no matter how comprehensive the enumeration. This principle reveals inherent limitations in formal systems and computational completeness.
+**Elaboration:** The diagonalization method constructs a new function that differs from every function in a given list by altering its output at the index corresponding to each function. This guarantees that the new function cannot belong to the original list, demonstrating that no complete enumeration of computable functions exists and revealing undecidable problems.
+
+**Application:** Proving undecidability, uncountability, and limits of algorithmic enumeration in computability theory
+
+**Failure Mode:** Fails when the set of functions is not enumerable or when no mechanism exists to vary outputs
+
+**Keywords:** diagonalization, computability, uncountability, undecidability, enumeration, Turing machines
 
 **Evidence Passages (5):**
 1. "The Diagonal Method Very well-now we apply the "twist": Cantor's diagonal met..."
@@ -3304,20 +4428,27 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "To be a Blue Program, it would have to have an index number-say it were Blue Program # X. This assumption is expressed by writing Equation (2) ... Bluediag [N] = Blueprogram{# X} [N]..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block's definition introduces the concept of the diagonalization method in a general computational context, while the evidence passages specifically discuss Cantor's
 
 ---
 
-### ❓ FB-96: Diagonalization Method
+### ❓ FB-95: Diagonalization Method (Cluster 21de480a50201d82b26d931bfd954df7c4b7fa303e146dc683a08eb4c08fd8ca)
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 21de480a50201d82b26d931bfd954df7c4b7fa303e146dc683a08eb4c08fd8ca |
+| fb_id | 0404939e33e9fcb1ab1766742259532222add856e51c8d21aed514a5a0c3b043 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3330,7 +4461,13 @@ It is most relevant in contexts where there's a clear gap between current perfor
 
 **Consequence:** Because of this principle, any attempt to enumerate all real numbers or solve certain decision problems will always miss at least one element, demonstrating the existence of uncountable sets or undecidable problems.
 
-**Elaboration:** The diagonalization method is foundational in mathematical logic and computer science, particularly in proving the existence of uncountable sets like the real numbers. It also underpins proofs of the undecidability of the halting problem. The method works regardless of how the list is ordered or how the diagonal elements are changed, as long as each new element differs from the corresponding element in the list. This robustness makes it a powerful tool for demonstrating impossibility or incompleteness in formal systems. The technique can be extended to higher dimensions or more complex structures, maintaining its core logic of systematic difference.
+**Elaboration:** By systematically altering the diagonal entries of a matrix or list representation, the diagonalization method creates an element that differs from every listed element in at least one position. This shows that any attempt to enumerate all real numbers or solve certain decision problems will miss at least one element, establishing uncountability and undecidability.
+
+**Application:** Demonstrating uncountability of real numbers and proving undecidable problems in mathematics
+
+**Failure Mode:** Fails when the structure is not enumerable or diagonal elements cannot be altered
+
+**Keywords:** diagonalization, uncountability, real numbers, Cantor's theorem, undecidability, matrix representation
 
 **Evidence Passages (5):**
 1. "you take the diagonal digits in order, and change each one of them to some other digit..."
@@ -3338,10 +4475,18 @@ It is most relevant in contexts where there's a clear gap between current perfor
 3. "The digits that run down the diagonal are in boldface: 1, 3, 8, 2, 0......."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.72 (strong signal)
 
 ---
 
-### ❓ FB-97: Abstract Mathematical Representation
+### ❓ FB-96: Abstract Mathematical Representation
 
 **Status:** UNKNOWN
 
@@ -3349,9 +4494,8 @@ It is most relevant in contexts where there's a clear gap between current perfor
 |----------|-------|
 | fb_id | d47fa2e03e5489547d8f7d3a0bb77df9e6bc31f259f917c2f270e91a378c93ff |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3368,16 +4512,28 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, mathematical entities like imaginary numbers must be defined by their functional properties rather than by attempts to compare their 'size' to real numbers, ensuring accurate understanding and manipulation of these abstract concepts.
 
-**Elaboration:** This principle extends beyond just imaginary numbers to include all mathematical abstractions where intuitive scaling fails. For example, infinite sets cannot be compared in size using natural number intuition, requiring set theory's axioms instead. The principle also applies to higher-dimensional mathematical objects or abstract algebraic structures where spatial intuition breaks down. In computational mathematics, this principle underlies why algorithms must define mathematical objects through their operations rather than their magnitude. The principle reveals that mathematical truth is not dependent on physical intuition but on logical consistency and operational definitions.
+**Elaboration:** Abstract mathematical entities that cannot be grasped through familiar numerical scales must
+
+**Application:** Defining abstract entities like complex numbers, imaginary units, and infinite sets where intuitive magnitude fails
+
+**Failure Mode:** Fails when the entity can be described using familiar numerical relationships or when abstract nature is not fully understood
 
 **Evidence Passages (2):**
 1. "got any good vocabulary for describing the sizes of infinitely large integers, so I am afraid I cannot convey a sense of I's magnitude. But then just how big is i (the square root of -1)? Its size cannot be imagined in terms of the sizes of familiar natural numbers. You can't say, "Well, i is about half as big as 14, and 9/10 as big as 24." You have to say, "i squared is -1", and more or less leav..."
 2. "got any good vocabulary for describing the sizes of infinitely large integers, so I am afraid I cannot convey a sense of I's magnitude. But then just how big is i (the square root of -1)? Its size cannot be imagined in terms of the sizes of familiar natural numbers. You can't say, "Well, i is about half as big as 14, and 9/10 as big as 24." You have to say, "i squared is -1", and more or less leav..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.94 (strong signal)
 
 ---
 
-### ❓ FB-98: Diophantine Equation Definition
+### ❓ FB-97: Diophantine Equation Definition
 
 **Status:** UNKNOWN
 
@@ -3385,9 +4541,8 @@ This approach is necessary when dealing with mathematical constructs that transc
 |----------|-------|
 | fb_id | a8d6b14ead64c1ebdb7621388d535cf08620ce8c7d6d2c4550c818a3fc3dd090 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | descriptive_model |
+| depth | cross-domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3400,27 +4555,40 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, mathematicians can systematically categorize and analyze polynomial equations for decidability properties, particularly in contexts involving Hilbert's Tenth Problem and Gödel's incompleteness theorems.
 
-**Elaboration:** The definition serves as a bridge between abstract mathematical theory and concrete computational problems. The specific requirement for fixed integral coefficients and exponents creates a well-defined class of problems that can be studied for their algorithmic properties. This formalism allows for the construction of undecidable problems like the Entscheidungsproblem and provides a framework for understanding the limits of mechanical computation. The principle demonstrates how mathematical structures can be precisely defined to reveal fundamental computational limitations.
+**Elaboration:** provides a standardized form for polynomial equations with integer coefficients, enabling systematic study of solvability and decidability properties, especially in the context of Hilbert's Tenth Problem and Gödel's incompleteness theorems
+
+**Application:** analysis of decidability in number theory and computability
+
+**Failure Mode:** does not apply to non-polynomial or non-integer coefficient equations
+
+**Keywords:** Diophantine equation, polynomial, integer coefficients, decidability, Hilbert's Tenth Problem, Gödel's incompleteness
 
 **Evidence Passages (3):**
 1. "For this, I must define what a Diophantine equation is. This is an equation in which a polynomial with fixed integral coefficients and exponents is set to 0. For instance, a=0 and 5x+13y-1=0 And 5p5 + 17q17 - 177 = 0 and a123,666,111,666 + b123,.666,111,666 - c123,666, 111,666 = 0 are Diophantine equations...."
 2. "This is an equation in which a polynomial with fixed integral coefficients and exponents is set to 0. For instance..."
 3. "logicians believe that TNT-and systems similar to it-are -consistent, and that the G del string which can be constructed in any such system is undecidable within that system. That means that they can choose to add either it or its negation as an axiom. Hilbert's Tenth Problem and the Tortoise I would like to conclude this Chapter by mentioning one extension of G del s Theorem. (This material is mo..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-99: Self-Transcendence Fallacy
+### ❓ FB-98: Self-transcendence Fallacy
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 8f10ebc67759e7b1faee74d066246f2af7318fab69801f878cbb1b7a789ae1d4 |
+| fb_id | f7d1b4b09cb0606833441ecd29811f3f2a5fb9c63c1238e7febbb7dda2207e45 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | philosophy |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3433,7 +4601,13 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, claims of human superiority over formal systems or computers based on self-awareness or meta-cognition are ultimately unfounded, as any such capability must still operate within the bounds of the system's original rules.
 
-**Elaboration:** The argument demonstrates that even if a system can observe or modify its own structure, it cannot escape the constraints of its own formal definition. This is particularly relevant in discussions of artificial intelligence and consciousness, where the assumption of 'jumping out of the system' is often made without considering that such actions must still follow the rules of the system. The symmetry of the argument is key: if a system can observe another system, that observation must also be subject to the same logical constraints. The principle also applies to philosophical arguments about consciousness and self-awareness, where the very act of introspection is itself a form of system behavior. The fallacy becomes more apparent when the argument is applied symmetrically to other domains, such as the gendered example in the passages.
+**Elaboration:** self-transcendence arguments assume escape from logical constraints, but any self-modification must still obey system rules, so no true escape from the system's limitations
+
+**Application:** evaluating claims of human superiority over formal systems
+
+**Failure Mode:** fails when system not bound by formal rules or self-modification unconstrained
+
+**Keywords:** self-transcendence, meta-awareness, formal systems, consistency, completeness, fallacy
 
 **Evidence Passages (5):**
 1. "The way in which he mirrors the world in his brain structures prevents him from simultaneously being "consistent" and asserting that true sentence...."
@@ -3441,10 +4615,18 @@ This approach is necessary when dealing with mathematical constructs that transc
 3. "No matter how a program twists and turns to get out of itself, it is still following the rules inherent in its..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition discusses the self-transcendence fallacy in the context of formal systems and computational processes, while the evidence passages do not directly address this falla
 
 ---
 
-### ❓ FB-100: Systemic Frame Analysis
+### ❓ FB-99: Systemic Frame Analysis
 
 **Status:** UNKNOWN
 
@@ -3452,9 +4634,8 @@ This approach is necessary when dealing with mathematical constructs that transc
 |----------|-------|
 | fb_id | 74485175aa508bfe811e9c846aca3b80db0f25a2d0c5d290a489fd22ad715bff |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3467,17 +4648,31 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, any human endeavor that resists systemic framing will likely generate creative breakthroughs, while those that embrace systemic constraints will produce more predictable but less transformative outcomes.
 
-**Elaboration:** The principle reveals that the same creative impulse that drives artistic revolution also powers commercial strategies like advertising. This suggests that the most effective framing devices in commercial contexts are those that acknowledge and work with the fundamental human drive to escape system constraints. The principle also implies that the most successful commercial content often emerges from a tension between the commercial system and the creative impulse to transcend it. When this tension is resolved too quickly or too completely, the result is typically mundane rather than transformative. The principle suggests that the most powerful framing devices are those that make the system's limitations visible while simultaneously offering a path to transcendence.
+**Elaboration:** human creativity seeks to transcend or reframe existing structures, leading to breakthroughs; when constraints are embraced, outcomes are predictable
+
+**Application:** identifying creative breakthroughs by framing systems
+
+**Failure Mode:** fails when system itself is creative or no clear boundary
+
+**Keywords:** systemic frame analysis, creativity, transcendence, structure, innovation
 
 **Evidence Passages (3):**
 1. "his drive to jump out of the system is a pervasive one, and lies behind all progress in art, music, and other human endeavors..."
 2. "his insidious trend has been beautifully perceived and described by Irving Goffman in his book Frame Analysis..."
 3. "the system is a pervasive one, and lies behind all progress in art, music, and other human endeavors..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-101: Quine Construction
+### ❓ FB-100: Quine Construction
 
 **Status:** UNKNOWN
 
@@ -3485,9 +4680,8 @@ This approach is necessary when dealing with mathematical constructs that transc
 |----------|-------|
 | fb_id | dd28bcae61aa01b35b5d6c622d1f4a2df45efd342f63c8b42832174e364e8eb9 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3500,7 +4694,13 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, formal systems can achieve self-reference and self-replication, enabling complex recursive structures in logic, programming, and language theory. It allows for the construction of paradoxes and self-descriptive systems that are foundational in computability theory.
 
-**Elaboration:** The Quine construction is particularly powerful in programming languages where a program can output its own source code. It demonstrates how self-reference can be achieved without external dependencies, making it a fundamental concept in computer science and mathematical logic. The technique is closely related to Gödel numbering and self-referential paradoxes like the Epimenides paradox. In practical applications, it enables metaprogramming and self-modifying code. The construction can be generalized to any formal system that supports string manipulation and quotation.
+**Elaboration:** a Quine embeds a quotation of itself, creating a recursive loop that reproduces the original string, foundational in computability and logic
+
+**Application:** enabling self-reference and self-replication in formal systems
+
+**Failure Mode:** fails when system cannot embed its own content or self-reference leads to contradictions
+
+**Keywords:** Quine, self-replication, self-reference, formal systems, recursion
 
 **Evidence Passages (5):**
 1. "using the phrase "this sentence" is the Quine method, illustrated in the dialogue [Air on G's String]...."
@@ -3508,10 +4708,18 @@ This approach is necessary when dealing with mathematical constructs that transc
 3. "DEFINE PROCEDURE "ENIUQ" [TEMPLATE]: PRINT [TEMPLATE, LEFT-BRACKET, QUOTE-MARK, TEMPLATE, QUOTE-MARK, RIGHT-BRACKET, PERIOD]. ENIUQ ['DEFINE PROCEDURE "ENIUQ" [TEMPLATE]: PRINT [TEMPLATE, LEFT-BRACKET, QUOTE-MARK, TEMPLATE, QUOTE-MARK, RIGHT-BRACKET, PERIOD]. ENIUQ']. ENIU..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.66 (strong signal)
 
 ---
 
-### ❓ FB-102: Protection and Subversion Mechanisms
+### ❓ FB-101: Protection and Subversion Mechanisms
 
 **Status:** UNKNOWN
 
@@ -3519,9 +4727,8 @@ This approach is necessary when dealing with mathematical constructs that transc
 |----------|-------|
 | fb_id | d10507362e57894fbaec606742325898144cee6ff97cffc51db1fa0c94527093 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3534,17 +4741,31 @@ This approach is necessary when dealing with mathematical constructs that transc
 
 **Consequence:** Because of this principle, biological systems show remarkable complexity in molecular recognition, immune responses, and viral adaptation patterns that reflect the ongoing evolutionary struggle between hosts and their invaders.
 
-**Elaboration:** The protection mechanisms often involve physical barriers, chemical defenses, and recognition systems that detect and neutralize threats. Subversion strategies typically involve molecular mimicry, hijacking cellular machinery, and exploiting cellular vulnerabilities. These interactions are not static but evolve continuously, with each adaptation driving counter-adaptations in the opposing party. The T4 phage and E. coli relationship exemplifies how these mechanisms can be studied to understand fundamental principles of biological warfare and defense. The principle extends beyond just bacteria and phages to encompass all forms of host-pathogen interactions.
+**Elaboration:** The principle captures the dynamic where host cells evolve protective mechanisms such as innate immunity and adaptive responses, while invaders (viruses, bacteria, parasites) evolve subversion tactics like immune evasion proteins or receptor mimicry. This arms race drives increasing molecular sophistication, leading to complex recognition systems and viral countermeasures.
+
+**Application:** Informing vaccine design, antimicrobial strategies, and evolutionary modeling of host‑pathogen interactions.
+
+**Failure Mode:** When the interaction is purely environmental or when one party is not actively evolving in response to the other.
+
+**Keywords:** host‑pathogen, evolutionary arms race, immune response, viral adaptation, molecular recognition
 
 **Evidence Passages (3):**
 1. "mechanisms of protection and subversion which cells and their invaders have developed..."
 2. "Let us consider the biologists' favorite cell, that of the bacterium Escherichia coli (no relation to M. C. Escher), and one of their favorite invaders of that cell: the sinister and eerie T4 phage..."
 3. "E. Coli vs. T4 Let us consider the biologists' favorite cell, that of the bacterium Escherichia coli (no relation to M. C. Escher), and one of their favorite invaders of that cell: the sinister and eerie T4 phage..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-103: Molecular Trojan Horse
+### ❓ FB-102: Molecular Trojan Horse
 
 **Status:** UNKNOWN
 
@@ -3552,9 +4773,8 @@ This approach is necessary when dealing with mathematical constructs that transc
 |----------|-------|
 | fb_id | e5dde2b4c799b1431d9f431754fc5265d8b4cf1a523fa253fc08f735cb0f5963 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3575,26 +4795,39 @@ The host cell's normal cellular functions are subverted to serve viral replicati
 
 **Consequence:** Viral infections spread by hijacking host cellular infrastructure, making them highly efficient at replicating once they successfully enter a compatible host cell.
 
-**Elaboration:** The molecular Trojan horse strategy demonstrates how pathogens can exploit the fundamental similarities between host and pathogen cellular machinery. The success of this mechanism depends on the host's cellular processes being sufficiently similar to the virus's requirements. Some hosts have evolved specific defenses against this strategy, such as restriction enzymes that prevent foreign DNA replication. The principle also explains why some viruses are host-specific - they must be able to utilize the exact same cellular machinery that the host uses for its own replication. The timing of the cellular response is crucial - the virus must replicate faster than the host's immune system can detect and eliminate it.
+**Elaboration:** The Molecular Trojan Horse principle describes how viruses inject their genetic material into host cells and masquerade as normal cellular components. Host transcription and translation machinery are co-opted to produce viral proteins, leading to assembly of new virions and eventual cell lysis. This hijacking mechanism underlies many viral life cycles and informs strategies to block entry or replication.
+
+**Application:** Targeted drug delivery, gene therapy, and the development of antiviral therapeutics.
+
+**Failure Mode:** When host defenses prevent viral entry or the cellular machinery cannot support viral replication.
+
+**Keywords:** viral entry, hijacking, replication machinery, host transcription, translation, viral assembly
 
 **Evidence Passages (2):**
 1. "Viral DNA enters a bacterium. Bacterial DNA is disrupted and viral DNA replicated. Synthesis of viral structural proteins and their assembly into virus continues until the cell bursts, releasing particles...."
 2. "The story of the Trojan horse, according to which hundreds of soldiers were sneaked into Troy inside a harmless seeming giant wooden horse; but once inside the city, they broke loose and captured it...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.83 (strong signal)
 
 ---
 
-### ❓ FB-104: Symbolic Meaning vs. Physical Perception
+### ❓ FB-103: Symbolic Meaning Vs. Physical Perception
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 0d567d3a3a6012218a17f5763a15ddb6c87737709cb9d9a711a5d9618806578c |
+| fb_id | c2c00816140a4d3bcfd721b2a8c8e59c5222a61f061c7c0f896104b30b0e0606 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3607,27 +4840,40 @@ The host cell's normal cellular functions are subverted to serve viral replicati
 
 **Consequence:** Because of this principle, the same physical input can be interpreted in multiple ways depending on the context of perception, which allows for the coexistence of symbolic and physical processing in systems like biological or cognitive systems.
 
-**Elaboration:** In biological systems, this principle explains how proteins can regulate their own synthesis through feedback loops, where the physical presence of a protein can be perceived either as a functional symbol (use) or as a mere physical presence (mention). In cognitive systems, it explains how the same sensory input can be interpreted as meaningful language or as noise depending on context. The principle also suggests that symbolic systems are sensitive to the balance between physical and conceptual processing. When symbolic systems are overwhelmed by physical intensity, they lose their ability to process meaning, which can lead to breakdowns in communication or understanding. This principle underlies the distinction between perception and cognition in both biological and artificial systems.
+**Elaboration:** This principle distinguishes symbolic meaning from raw physical perception. Symbols gain meaning when processed in a context that connects them to use or function; otherwise, they are perceived merely as physical sensations. The dual interpretation allows systems—biological or artificial—to flexibly switch between semantic and sensory processing based on context.
+
+**Application:** Design of user interfaces, educational tools, and communication systems that leverage contextual meaning.
+
+**Failure Mode:** When symbols are unambiguously meaningless or when perception is entirely devoid of conceptual or functional context.
+
+**Keywords:** symbolic meaning, physical perception, context, cognition, semantics
 
 **Evidence Passages (3):**
 1. "constituents whose symbolic meaning matters-a case of use, rather than mention..."
 2. "when the sound is just too loud, the symbols are not conveying meaning: they are merely being perceived as loud sounds, and might as well be devoid of meaning-a case of mention, rather than use..."
 3. "This case more resembles the feedback loops by which proteins regulate their own rates of synthesis..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.94 (strong signal)
 
 ---
 
-### ❓ FB-105: Chemical Labeling as Biological Signal
+### ❓ FB-104: Chemical Labeling As Biological Signal
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | e69b364b9a9a9213a80b64b017ccfde539d0d6278bfdd230967ca6179225d790 |
+| fb_id | 4a98ac0a164b7eb19af4a106c84b47cbc0737e6c921b340b6b8455e8d0a37252 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3640,7 +4886,13 @@ The host cell's normal cellular functions are subverted to serve viral replicati
 
 **Consequence:** Because of this principle, bacteria can use DNA methylation as a defense mechanism against phage infection by marking their own DNA as 'self' and identifying foreign DNA as 'non-self'.
 
-**Elaboration:** The methylation process represents an elegant example of how biological systems can repurpose existing molecular machinery for new functions. The labeling does not interfere with normal cellular processes, demonstrating the principle that biological systems can layer new information onto existing structures without disrupting core functionality. This approach allows for rapid adaptation to new threats while maintaining cellular homeostasis. The principle also illustrates how biological signals can be encoded at the molecular level through simple chemical modifications. The system's success depends on the host's ability to maintain and recognize these methyl tags consistently across cellular processes.
+**Elaboration:** DNA methylation acts as a non‑destructive tag that distinguishes self from non‑self DNA. Host cells possess methyl‑specific restriction enzymes or other sensors that detect unmethylated foreign DNA, triggering defense responses. This chemical labeling preserves gene function while enabling selective immunity against phages and other mobile genetic elements.
+
+**Application:** Engineering bacterial phage resistance, epigenetic regulation studies, and synthetic biology circuits.
+
+**Failure Mode:** When the host cell lacks biochemical pathways to detect methylation or the methylation pattern is not recognized by the host’s recognition systems.
+
+**Keywords:** DNA methylation, self/non‑self, epigenetics, phage defense, recognition
 
 **Evidence Passages (5):**
 1. "be chemically labeled by tacking on a small molecule-methyl-to various nucleotides..."
@@ -3648,10 +4900,18 @@ The host cell's normal cellular functions are subverted to serve viral replicati
 3. "The idea is that strands of DNA can be chemically labeled by tacking on a small molecule-methyl-to various nucleotides..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.68 (strong signal)
 
 ---
 
-### ❓ FB-106: Originality Through Constraint
+### ❓ FB-105: Originality Through Constraint
 
 **Status:** UNKNOWN
 
@@ -3659,9 +4919,8 @@ The host cell's normal cellular functions are subverted to serve viral replicati
 |----------|-------|
 | fb_id | c5b22303c9335d7fc888b9470c47ba088defb5b987c2312ebf1c1bfc911e026f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3680,7 +4939,13 @@ The constraint of formal systems (mathematical rigor, institutional norms) enabl
 
 **Consequence:** Genius emerges not from pure creativity or pure conformity, but from the dynamic tension between breaking rules and following them sufficiently to gain recognition. This explains why truly original figures often face initial rejection or misunderstanding before being validated by the very systems they challenge.
 
-**Elaboration:** The principle reveals that originality is not just about being different, but about being different in a way that can be understood and validated. Ramanujan's case shows that his mathematical insights were so profound that they seemed to come from another realm, yet they had to be expressed in ways that could be verified by the mathematical community. The constraint of formal systems is not a limitation but a necessary condition for recognition. This principle also explains why some geniuses are more celebrated than others: those who can bridge the gap between radical insight and institutional validation. The principle suggests that the most impactful originality occurs when the creator is simultaneously outside and inside the system, able to challenge it from within.
+**Elaboration:** The principle posits that groundbreaking ideas thrive when they simultaneously push beyond existing norms and fit within recognizable structures that allow validation. By navigating this tension, creators can achieve recognition while maintaining originality.
+
+**Application:** Innovation management, creative research, artistic production
+
+**Failure Mode:** rigid institutional frameworks that reject novel ideas; inability to translate insight into communicable form
+
+**Keywords:** originality, constraint, innovation, formal systems, validation, paradox, institutional recognition
 
 **Evidence Passages (5):**
 1. "Srinivasa Ramanujan and one of his strange Indian melodies. results together in a packet of papers, and sent them all to the, unforewarned Hardy with a covering letter which friends helped him express in English...."
@@ -3688,10 +4953,18 @@ The constraint of formal systems (mathematical rigor, institutional norms) enabl
 3. "They must be true because, if they were not true, no one would have had the imagination to invent them...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.82 (strong signal)
 
 ---
 
-### ❓ FB-107: Ambiguous Comparison Principle
+### ❓ FB-106: Ambiguous Comparison Principle
 
 **Status:** UNKNOWN
 
@@ -3699,9 +4972,8 @@ The constraint of formal systems (mathematical rigor, institutional norms) enabl
 |----------|-------|
 | fb_id | 11f3f36e4efd3ce56f27de67cfbfd886c4e27948a820a10e7a11c989f0bd9082 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | linguistics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3714,26 +4986,39 @@ The constraint of formal systems (mathematical rigor, institutional norms) enabl
 
 **Consequence:** Because of this principle, linguistic exchanges can be misunderstood or misinterpreted when participants do not share the same understanding of comparison terms, leading to confusion in communication or reasoning.
 
-**Elaboration:** This principle reveals how context-dependent language can create communication challenges even when the surface structure appears identical. The same comparison can be valid in one context but invalid in another, depending on whether the speaker intends a general or specific reference. This demonstrates the importance of shared semantic understanding in natural language processing and human communication. The principle also suggests that language users must consider both literal and metaphorical interpretations when analyzing comparisons. The ambiguity is particularly relevant in literary or poetic contexts where wordplay and double meanings are common.
+**Elaboration:** Ambiguous comparison arises when a term can refer to both a generic instance and a specific event, leading to multiple interpretations that depend on contextual cues.
+
+**Application:** Natural language processing, communication design, education
+
+**Failure Mode:** unambiguous context or explicit disambiguation
+
+**Keywords:** ambiguity, comparison, semantics, pragmatics, context, metaphor
 
 **Evidence Passages (2):**
 1. "Mr. Pickwick reminded you of Christmas? Witness: In a way. Interrogator: Yet Christmas is a winter's day, and I do not think Mr. Pickwick would mind the comparison. Witness: I don't think you're serious. By a winter's day one means a typical winter's day, rather than a special one like Christmas...."
 2. "In the first line of your sonnet which reads "Shall I compare thee to a summer's day", would not "a spring day" do as well or better, Witness: It wouldn't scan. Interrogator: How about 'a winter's day'? That would scan all right. Witness: Yes, but nobody wants to be compared to a w..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-108: Origination vs. Execution
+### ❓ FB-107: Origination Vs. Execution
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | a2bc894826c042d1ed7e2123c1885cd6db861e335d789d7b40ac8f8cb10314d5 |
+| fb_id | 3645351453ae082d2d30533cd5ebdba214fc76ac4ed32087256e9130b0a782b6 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3756,35 +5041,40 @@ It also fails in cases where human behavior is considered to involve truly novel
 
 This principle sets limits on what computational systems can achieve in terms of genuine innovation or creative autonomy, requiring human intervention for any truly novel computational behavior.
 
-**Elaboration:** The principle highlights a fundamental distinction between human creativity, which can involve spontaneous insight and novel combinations of ideas, and machine execution, which is always bound by its programming and known algorithms.
+**Elaboration:** Computational systems can only reproduce known computations; they lack internal generative mechanisms to produce truly novel outputs without human input.
 
-It raises questions about whether consciousness or true understanding can emerge from computational processes alone, or whether some form of internal generative capacity is required.
+**Application:** Artificial intelligence development, computational creativity research
 
-The principle suggests that even if a machine can simulate human-like behavior or produce outputs that appear novel, it is still operating within the constraints of its programming and cannot truly originate from within.
+**Failure Mode:** emergent behavior that appears internally generated
 
-This limitation is particularly relevant in discussions of artificial intelligence and whether systems can achieve genuine intelligence or merely simulate it.
-
-The principle also implies that any computational system claiming to 'think' or 'create' must demonstrate that its outputs are not simply ordered executions but involve some form of internal generative process.
+**Keywords:** execution, origination, computation, AI, creativity, deterministic algorithms, generative processes
 
 **Evidence Passages (3):**
 1. "The Analytical Engine has no pretensions to originate anything. It can do whatever we know how to order it to perform..."
 2. "diversity of behaviour as a man, do something really new..."
 3. "subject of its own thought, have as much diversity of behaviour as a man, do something really new..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The evidence suggests that the Analytical Engine, or similar computational systems, may have the potential for diversity of behavior and to do something really new, which contradic
 
 ---
 
-### ❓ FB-109: Awe-Inducing Intelligence Perception
+### ❓ FB-108: Awe-inducing Intelligence Perception
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 8951382d7a2b08dba0e7e464f77ddda698a8887db319106c64cabc9d53478b38 |
+| fb_id | 84410f4c9d3c7e5e7fa9804c2304eb8935889dbe5c4e9545ddb2769f853f7f6d |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3797,7 +5087,13 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, the same technological achievements that once inspired awe and philosophical debate gradually become mundane and expected, leading to a cycle where increasingly sophisticated systems fail to evoke the same sense of wonder.
 
-**Elaboration:** This phenomenon reflects the human psychological adaptation to novelty and complexity. The initial sense of awe often stems from the cognitive dissonance between human expectations of intelligence and the reality of machine capabilities. As systems become more common and their operation more predictable, the element of surprise and mystery fades. This process suggests that the perception of intelligence in artificial systems is not just about capability but also about the observer's relationship to technological progress and their own understanding of consciousness.
+**Elaboration:** When systems surpass human capabilities, they trigger awe and mysticism, but repeated exposure normalizes these reactions, reducing the emotional impact over time.
+
+**Application:** Human-Computer Interaction design, AI ethics, technology adoption
+
+**Failure Mode:** desensitization to technological novelty
+
+**Keywords:** awe, intelligence perception, technological novelty, desensitization, consciousness attribution, human cognition
 
 **Evidence Passages (4):**
 1. "their inventors did experience an awesome and mystical sense of being in the presence of another kind of "thinking being"..."
@@ -3805,10 +5101,18 @@ The principle also implies that any computational system claiming to 'think' or 
 3. "The once-exciting phrase "Giant Electronic Brain" remains only as a sort of "camp" cliché..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that awe diminishes over time as technological achievements become normalized and expected, but the evidence passages indicate that the sense of awe has com
 
 ---
 
-### ❓ FB-110: Intuitive Mechanism Recognition
+### ❓ FB-109: Intuitive Mechanism Recognition
 
 **Status:** UNKNOWN
 
@@ -3816,9 +5120,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | 7811bf672eea665578dc66a1a04b9cbdbaece646b00ddc1eb36f8162018ad1fd |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3831,17 +5134,31 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, people often overestimate their ability to predict or understand complex systems, leading to either unwarranted confidence in simple explanations or persistent confusion when systems do not conform to intuitive models.
 
-**Elaboration:** This principle reveals a fundamental tension in human cognition: the desire to find order and simplicity in complexity, even when such order may not exist. It underlies the common tendency to see patterns in randomness and to attribute deep meaning to seemingly simple mechanisms. In creative and computational contexts, this bias can lead to both insight and misinterpretation. The principle also explains why some systems are perceived as 'elegant' or 'beautiful'—when their behavior aligns with human expectations of simple, comprehensible causality. When systems defy this expectation, they often provoke awe or frustration, depending on whether the complexity is perceived as accidental or purposeful.
+**Elaboration:** Humans tend to attribute observable outcomes to straightforward, surface-level mechanisms, often overlooking hidden interactions or emergent properties. This bias can cause engineers and analysts to underestimate system complexity, resulting in inadequate solutions or persistent confusion when systems behave unpredictably.
+
+**Application:** System design, troubleshooting, and user interface development
+
+**Failure Mode:** Overconfidence in simple explanations leading to misdiagnosis of complex systems
+
+**Keywords:** cognitive bias, intuitive reasoning, mechanism simplification, pattern recognition, emergent behavior
 
 **Evidence Passages (3):**
 1. "Was the proof lying deeply hidden in the program? Or was it close to the surface? That is, how easy is it to see why the program did what it did?..."
 2. "Can the discovery be attributed to some simple mechanism, or simple combination of mechanisms, in the program?..."
 3. "It seems the program was just revealing ideas which were in essence hidden though not too deeply-inside the programmer's own mind...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.65 (strong signal)
 
 ---
 
-### ❓ FB-111: Algorithmic Composition
+### ❓ FB-110: Algorithmic Composition
 
 **Status:** UNKNOWN
 
@@ -3849,9 +5166,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | 54a9b952887d9d0dbdd441b02ebd42ff39c8eeceb4a106386cdfe7335c5a9c49 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md, The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md, The UX book process and guidelines for ensuring a quality user experience Hartson, Rex_Pyla, Pardha S liber3.md |
-| source_diversity | 4 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3864,7 +5180,13 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, music can be generated at any speed, controlled precisely, and made to produce sounds impossible with traditional instruments, enabling cost-effective and versatile musical production.
 
-**Elaboration:** Algorithmic composition systems can produce music that sounds complex and emotionally resonant, though they may lack the nuanced human intuition that makes some compositions deeply moving. The process can generate music that is pleasant and surprising to composers, but the resulting works may sometimes sound mechanical or overly structured. The approach allows for the creation of sounds that no physical instrument can produce, making computers the ultimate musical tool in terms of versatility. However, the principle is limited by its reliance on predetermined rules rather than creative inspiration.
+**Elaboration:** Deterministic algorithms can generate complex musical structures by systematically manipulating parameters such as frequency, amplitude, and timing. While this allows for precise, repeatable, and cost-effective production, it also limits spontaneous improvisation and the nuanced emotional content that human performers bring to music.
+
+**Application:** Music production, generative art, and algorithmic composition tools
+
+**Failure Mode:** Loss of human creativity and emotional expression in music
+
+**Keywords:** deterministic algorithms, musical structure, parameter manipulation, generative music, computational creativity
 
 **Evidence Passages (5):**
 1. "with its "attack" (meaning how the frequencies grow in amplitude as the note starts, and the decay later on), and other features. With a number of different instruments programmed, you can then supply the notes and have the sound of the music written out on the tape for later playing...."
@@ -3872,10 +5194,18 @@ The principle also implies that any computational system claiming to 'think' or 
 3. "It is cheaper, more controlled, and can make sounds which no musical instrument at present can make. Indeed, any sound which can appear on a sound track can be produced by a computer...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 4 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.93 (strong signal)
 
 ---
 
-### ❓ FB-112: Problem Space Representation
+### ❓ FB-111: Problem Space Representation
 
 **Status:** UNKNOWN
 
@@ -3883,9 +5213,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | 0c50284b8dd0b988bb8e2aa920192411371274fe8f3c23f7f75c9060661583aa |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3898,7 +5227,13 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, abstract problem-solving often requires redefining the problem space or shifting mental models to reveal efficient solutions. Solutions that are logically optimal may be overlooked if the problem is framed in a way that obscures the most direct route.
 
-**Elaboration:** The principle reveals that even when a solution is physically or logically simple, the way a problem is framed can make it seem complex or inefficient. This is especially true in abstract domains like planning, strategy, or conceptual design. The principle also implies that insight often comes from reframing the problem rather than applying direct methods. In some cases, the most efficient solution involves moving away from the goal initially, which is only visible when the problem space is redefined. This principle underlies many cognitive biases and the need for creative problem-solving approaches.
+**Elaboration:** When a problem is framed in a way that ties it too closely to familiar or physical contexts, alternative, more efficient logical paths become invisible. Redefining or shifting the mental model of the problem space can reveal hidden solutions and improve overall problem-solving effectiveness.
+
+**Application:** Software design, decision making, and educational problem-solving
+
+**Failure Mode:** Obscured solutions and inefficient problem solving due to poor representation
+
+**Keywords:** problem representation, abstract reasoning, mental models, solution visibility, cognitive framing
 
 **Evidence Passages (5):**
 1. "Notice how everything depends on the way you represent the "problem space"-that is, on what you perceive as reducing the problem (forward motion towards the overall goal) and what you perceive as magnifying the problem (backward motion away from the goal)...."
@@ -3906,10 +5241,18 @@ The principle also implies that any computational system claiming to 'think' or 
 3. "In some sense all problems are abstract versions of the dog-and-bone problem. Many problems are not in physical space but in some sort of conceptual space...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-113: Mathematical Closeness and Isomorphism
+### ❓ FB-112: Mathematical Closeness and Isomorphism
 
 **Status:** UNKNOWN
 
@@ -3917,9 +5260,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | 2bce4965f062845fea185de12864ce221cb00d6c73c3c4b3d6d758bbe38d52bc |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3932,7 +5274,13 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, artificial intelligence systems attempting to simulate mathematical creativity must encode not just formal rules but also intuitive notions of mathematical 'closeness' and structural similarity to achieve meaningful mathematical reasoning.
 
-**Elaboration:** The principle implies that mathematical insight often emerges from recognizing that seemingly distinct problems or structures are actually isomorphic, which allows mathematicians to transfer solutions or methods across domains. This suggests that mathematical creativity involves pattern recognition at multiple levels of abstraction. The challenge for AI systems is encoding this intuitive sense of mathematical naturalness or simplicity that humans use to judge closeness. The principle also hints at the possibility that mathematical truth might be more subjective or culturally influenced than purely objective, since our sense of mathematical closeness may reflect historical and cognitive development rather than absolute mathematical properties.
+**Elaboration:** Mathematical closeness and isomorphism allow the transfer of insights across seemingly unrelated domains by identifying deep structural parallels. AI systems that encode these notions can simulate human-like mathematical creativity, but failure to detect isomorphisms limits their reasoning capabilities.
+
+**Application:** AI mathematical reasoning, knowledge transfer, and automated theorem proving
+
+**Failure Mode:** Inability to recognize structural similarities leading to missed insights
+
+**Keywords:** mathematical isomorphism, structural similarity, transfer learning, AI reasoning, pattern recognition
 
 **Evidence Passages (5):**
 1. "These are two different senses of the word "close" in the domain of mathematics..."
@@ -3940,10 +5288,18 @@ The principle also implies that any computational system claiming to 'think' or 
 3. "Some theorems of different branches of mathematics appear to us hard to link, and we might say th..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block introduces the concept of 'mathematical closeness' as a form of isomorphism and a mental metric for pattern recognition, which is not explicitly mentioned in t
 
 ---
 
-### ❓ FB-114: Recursive Transition Network Grammar
+### ❓ FB-113: Recursive Transition Network Grammar
 
 **Status:** UNKNOWN
 
@@ -3951,9 +5307,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | bf1060c2248599f7740226e02d075ea78009bf7fac2304da4eaeb698c8d6e6e7 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -3966,7 +5321,13 @@ The principle also implies that any computational system claiming to 'think' or 
 
 **Consequence:** Because of this principle, computational systems can produce varied, syntactically correct sentences that appear natural despite using minimal vocabulary, making it useful for artificial language generation and linguistic experimentation.
 
-**Elaboration:** The recursive nature of these grammars allows for the generation of increasingly complex sentence structures without requiring an exponential increase in rule definitions. The system can produce both simple and elaborate sentences from the same base rules, demonstrating emergent complexity. The approach is particularly effective for creating artificial languages or generating humorous, nonsensical content. The grammar's flexibility enables it to produce outputs that can appear surrealistic or haiku-like in structure. The principle demonstrates how simple recursive mechanisms can generate rich linguistic variety.
+**Elaboration:** Recursive Transition Network grammars generate syntactically correct sentences from limited vocabularies, but they lack deep semantic grounding, leading to outputs that may appear natural yet miss contextual meaning.
+
+**Application:** Artificial language generation and linguistic experimentation
+
+**Failure Mode:** semantic incoherence beyond syntactic structure
+
+**Keywords:** recursion, transition network, production rules, syntactic generation, limited vocabulary, artificial language
 
 **Evidence Passages (5):**
 1. "but flexible grammar which could produce a wide variety of sentences of the type found in some children's books..."
@@ -3974,10 +5335,18 @@ The principle also implies that any computational system claiming to 'think' or 
 3. "In this grammar, the selection of words in a sentence was determined by a process which began by selecting-at..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that recursive transition network grammars can generate complex sentence structures and have emergent complexity, which is not supported by the evidence pas
 
 ---
 
-### ❓ FB-115: Semantic Constraint Filtering
+### ❓ FB-114: Semantic Constraint Filtering
 
 **Status:** UNKNOWN
 
@@ -3985,9 +5354,8 @@ The principle also implies that any computational system claiming to 'think' or 
 |----------|-------|
 | fb_id | bd2b365f6fd13149c867874e4be6c697ddc0f31b35c9865353e4a73a3261be1f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | machine learning |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4006,7 +5374,13 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 
 **Consequence:** Systems that rely on semantic constraint filtering may produce outputs that appear correct or relevant at first glance but are ultimately meaningless or misleading because they lack true understanding of the domain's conceptual structure.
 
-**Elaboration:** This filtering mechanism is particularly evident in AI-generated content where grammatical correctness is prioritized over semantic accuracy. The principle highlights a fundamental limitation in systems that can mimic surface-level coherence without grasping the deeper logic or context. It also explains why some AI-generated text can pass superficial scrutiny but fail to convey genuine insight or understanding. The principle underscores the difference between syntactic fluency and semantic comprehension. In systems like the koan-generating program, the output may appear to follow the form of a koan but lacks the intended spiritual or philosophical depth.
+**Elaboration:** Semantic constraint filtering relies on surface grammatical checks, producing outputs that pass syntactic validation but fail to capture genuine semantic relationships, resulting in misleading or meaningless content.
+
+**Application:** Pattern-based content generation and rule‑based language systems
+
+**Failure Mode:** misleading superficial coherence
+
+**Keywords:** surface constraints, grammar, structure, semantic filtering, pattern matching, rule-based generation
 
 **Evidence Passages (5):**
 1. "One of her early efforts produced this curious quasi-koan: A SMALL YOUNG MASTER WANTED A SMALL WHITE GNARLED BOWL...."
@@ -4014,10 +5388,18 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 3. "my program ran, there was no mirror inside it of how the world works, except for the small semantic constraints which it had to follow...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-116: Integrative Cognitive Architecture
+### ❓ FB-115: Integrative Cognitive Architecture
 
 **Status:** UNKNOWN
 
@@ -4025,9 +5407,8 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 |----------|-------|
 | fb_id | 63426e4fb510f04facc858d32d0763e3d326c3bd11d983e8f5719648b111e010 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4040,7 +5421,13 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 
 **Consequence:** Because of this principle, cognitive systems like SHRDLU demonstrate emergent intelligence that cannot be replicated by simply combining independent modules, as the interdependencies create a unified processing structure.
 
-**Elaboration:** The interdependencies in systems like SHRDLU mean that even though each module may contain specific knowledge about the world, the system's intelligence emerges from their dynamic interaction rather than from isolated processing. This challenges the assumption that intelligence can be compartmentalized into independent components. The architecture resembles a tangled knot that resists simplification but can still be understood as a whole. The principle suggests that true intelligence requires integration over modularity, not just the presence of multiple specialized components.
+**Elaboration:** Integrative cognitive architecture posits that tightly coupled modules create emergent intelligence; isolated modules cannot replicate the dynamic interdependencies that enable adaptive, holistic responses.
+
+**Application:** Intelligent adaptive systems and holistic cognitive architectures
+
+**Failure Mode:** failure when modules can be isolated without loss of function
+
+**Keywords:** integration, interdependent modules, emergent cognition, SHRDLU, holistic understanding, adaptive response
 
 **Evidence Passages (5):**
 1. "give answers in English to questions about the situation; (3) understand requests in English to manipulate the blocks; (4) break down each request into a sequence of operations it could do; (5) understand what it had done, and for what reasons; (6) describe its actions and their reasons, in English..."
@@ -4048,10 +5435,18 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 3. "The program is like a very tangled knot which resists untangling; but the fact that you cannot untangle it does not mean that you cannot understand it..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-117: Procedural Knowledge Isolation
+### ❓ FB-116: Procedural Knowledge Isolation
 
 **Status:** UNKNOWN
 
@@ -4059,9 +5454,8 @@ This leads to outputs that pass basic validation checks (e.g., grammar, structur
 |----------|-------|
 | fb_id | 4bf6a259d7d6b60162f6c0cf418fe8b0afbaf5002e970e6619fb076af47032b9 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4084,20 +5478,30 @@ It particularly applies to systems that can process information at a high level 
 
 It also explains why systems like SHRDLU can demonstrate sophisticated behavior while being mathematically or conceptually 'ignorant' of the principles that underlie their operation.
 
-**Elaboration:** This principle reveals a fundamental tension in artificial intelligence design: the difference between capability and comprehension. Systems can be trained to produce correct outputs without understanding why those outputs are correct. This has implications for AI safety, as systems may appear to understand concepts while actually operating on procedural rules.
+**Elaboration:** Procedural knowledge isolation allows systems to perform complex tasks through encoded operations, yet they remain ignorant of the underlying principles, leading to a false impression of understanding.
 
-The phenomenon is not limited to computational systems; it also applies to human cognition, where procedural knowledge can be acquired without conceptual understanding. For example, a person can learn to drive a car through procedural training without understanding the physics of vehicle dynamics.
+**Application:** Procedural systems lacking conceptual understanding
 
-This principle suggests that the presence of sophisticated behavior does not necessarily indicate the presence of true understanding or conceptual knowledge. It also implies that systems can be highly functional while remaining fundamentally opaque in their internal operations.
+**Failure Mode:** failure when deep understanding is required for novel situations
+
+**Keywords:** procedural knowledge, conceptual knowledge, operational patterns, functional separation, SHRDLU, false impression of understanding
 
 **Evidence Passages (2):**
 1. "to count to ten."19 With all its mathematical underpinning, SHRDLU is a mathematical ignoramus! Just like Aunt Hillary, SHRDLU doesn't know anything about the lower levels which make it up. Its knowledge is largely procedural..."
 2. "Our system does not accept numbers in numeric form, and has only been taught to count to ten."19 With all its mathematical underpinning, SHRDLU is a mathematical ignoramus! Just like Aunt Hillary, [SHRDLU ]{.bold}doesn't know anything about the lower levels which make it up. Its knowledge is largely [procedural ]{.italic}..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-118: Cognitive Framing Sensitivity
+### ❓ FB-117: Cognitive Framing Sensitivity
 
 **Status:** UNKNOWN
 
@@ -4105,9 +5509,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | 3bfb3eb42b22716769141ea4ffc36c1b70f137bc7f90f61960bef260e8956962 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4120,16 +5523,30 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, humans can distinguish between logically equivalent but intuitively different conceptual violations, leading to inconsistent judgments about what constitutes 'reasonable' or 'natural' possibilities in discourse.
 
-**Elaboration:** This phenomenon reveals that human reasoning is not purely logical but heavily influenced by pre-existing mental frameworks and conceptual habits. The same logical structure can be perceived as acceptable or absurd depending on how well it aligns with the listener's internalized categories and expectations. This creates a paradox where logical consistency does not guarantee intuitive acceptability. The principle also suggests that conceptual violations are evaluated through a combination of semantic plausibility and contextual familiarity rather than abstract logical validity. This explains why some violations of logical consistency feel more 'natural' than others in human discourse.
+**Elaboration:** Cognitive framing sensitivity explains why people rate two logically equivalent statements differently; the mind relies on semantic expectations and mental models rather than formal logic, leading to variable judgments of plausibility.
+
+**Application:** natural language understanding
+
+**Failure Mode:** inconsistent judgments of possibility
+
+**Keywords:** cognitive framing, semantic expectations, intuitive coherence, logical equivalence, mental models
 
 **Evidence Passages (2):**
 1. "serious sentence also scoffed at? Somehow, in some difficult-to-pin-down sense, the parameters slipped in this sentence do not violate our sense of "possibility" as much as in the earlier examples..."
 2. "Something allows us to imagine "all other things being equal" better in this one than in the others..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-119: Template Refinement Through Pattern Recognition
+### ❓ FB-118: Template Refinement Through Pattern Recognition
 
 **Status:** UNKNOWN
 
@@ -4137,9 +5554,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | f8bda9a59a0aecbbf616b553906c7d41951c763a060d51b329a08641fd02f3b1 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4152,17 +5568,31 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, template-based classification systems become more accurate and robust over time as they incorporate refined structural elements that better reflect the underlying patterns in the data.
 
-**Elaboration:** The iterative refinement process demonstrates that templates are not static structures but evolving frameworks that adapt to new insights. The principle shows how cognitive proximity in networks can trigger structural reorganization. When templates are too rigidly defined, they resist necessary adaptation. The process also reveals that pattern recognition systems benefit from tentativeness in their initial assumptions, allowing for more flexible re-structuring. The principle applies across domains where classification systems must evolve to capture nuanced distinctions.
+**Elaboration:** Template refinement through pattern recognition describes how initial generic templates are iteratively improved when pattern recognition detects missing slots; contextual cues trigger the addition of new structural elements, enhancing classification accuracy.
+
+**Application:** knowledge base construction
+
+**Failure Mode:** rigid template failure
+
+**Keywords:** template refinement, pattern recognition, structural adaptation, contextual cues, granularity
 
 **Evidence Passages (3):**
 1. "Thus a first stab at a template would be: large closed curve:----- small o's:-----..."
 2. "The concepts "interior" and "exterior" are activated by their proximity in the net to "closed curve". This suggests to the template-builder that it might be a good idea to make distinct slots for the interior and exterior of the curve...."
 3. "Thus, in the spirit of tentativity, the template is tentatively restructured to be this: large closed curve: ---- little o's in interior: ---- little o's in exterior:----..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-120: Pattern Recognition Fluency
+### ❓ FB-119: Pattern Recognition Fluency
 
 **Status:** UNKNOWN
 
@@ -4170,9 +5600,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | ecb8c3995722e81b7f61c719904e253636b5a06c8798b48f71558dc188ee2a84 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | neuroscience |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4185,7 +5614,13 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, humans can perform seemingly effortless recognition tasks like face identification, trail navigation, and text reading, even when the underlying patterns undergo significant transformation. These abilities appear automatic and require no conscious effort to execute.
 
-**Elaboration:** The principle reveals that what seems like effortless recognition is actually the result of millions of years of evolutionary optimization. The brain's ability to recognize faces across age and expression changes demonstrates that pattern recognition systems can maintain identity despite substantial variation in input. This fluency extends to symbolic systems like text, where readers can parse content across thousands of typefaces without conscious effort. The principle also suggests that these systems are highly specialized and not easily transferable to novel domains without extensive training or adaptation.
+**Elaboration:** Pattern recognition fluency refers to the brain’s automatic, hierarchical processing that abstracts invariant features, enabling robust recognition across transformations; this fluency breaks down when encountering unfamiliar or abstract patterns.
+
+**Application:** computer vision
+
+**Failure Mode:** novel pattern misrecognition
+
+**Keywords:** pattern recognition, fluency, neural architecture, invariance, hierarchical representation
 
 **Evidence Passages (4):**
 1. "Some of the problems of visual pattern recognition which we human beings seem to have completely "flattened" into our unconscious are quite amazing..."
@@ -4193,20 +5628,27 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "recognition of hiking trails in forests and mountains-somehow this has always impressed me as one of our most subtle acts of pattern recognition-and yet animals can do it, too..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.89 (strong signal)
 
 ---
 
-### ❓ FB-121: Symbolic Frame-Actor Integration
+### ❓ FB-120: Symbolic Frame-actor Integration
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | decd22dd3ff8994ade4b2595bb68075a070a1c43cdd774be9129fcb76fe0e1eb |
+| fb_id | 0753ba41e42c70e2b904f070216a99e554b83dfea8022937fda1a350fd7e157b |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4219,17 +5661,29 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, distributed systems can achieve both consistency and autonomy in information processing, enabling complex symbolic communication patterns similar to biological systems.
 
-**Elaboration:** The integration of frame and actor creates a symbolic layer that enables higher-order communication patterns. This structure allows for both redundancy (multiple interpreters) and specialization (individual idiosyncrasies in interpretation). The principle suggests that symbolic systems naturally emerge when information processing units can both generate and interpret messages. The parallel processing capability enables systems to scale while maintaining coherence. This mechanism explains how distributed systems can achieve both robustness and adaptability.
+**Elaboration:** Symbolic frame‑actor integration posits that a symbol arises when a frame endowed with actor capabilities can generate and interpret messages; identical interpreters can then process information consistently while retaining autonomy, enabling scalable symbolic communication.
+
+**Application:** distributed AI systems
+
+**Failure Mode:** lack of parallel processing
 
 **Evidence Passages (3):**
 1. "be many actors with identical interpreters; in fact, this could be a great advantage, just as it is extremely important in the cell to have a multitude of identical ribosomes floating throughout the cytoplasm, all of which will interpret a message-in this case, messenger RNA-in one and the same way..."
 2. "Let us call a frame with the capability of generating and interpreting complex messages a symbol: frame + actor = symbol..."
 3. "Actors with the ability to exchange messages become somewhat autonomous agents-in fact, even like autonomous computers, with messages being somewhat like programs..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-122: Conceptual Skeleton Mapping
+### ❓ FB-121: Conceptual Skeleton Mapping
 
 **Status:** UNKNOWN
 
@@ -4237,9 +5691,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | 2b1fa65b73356504e2e966f51640a406aa728d95d392e8860c701ded73fbb1d7 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4252,7 +5705,11 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, complex ideas can be understood through familiar analogies, and new conceptual structures can be built by extending existing knowledge patterns. This enables learning and comprehension across diverse domains by leveraging pre-existing mental models.
 
-**Elaboration:** The mapping process can reveal profound isomorphisms when extended recursively, or simpler analogies when stopped earlier. The effectiveness of the mapping depends on the richness of the conceptual skeleton in the source domain. When a conceptual skeleton already exists for a concept (like 'spare tire' or 'Vice President'), it can be used as a reference point for understanding new concepts. The principle works best when the mapping can be extended downward through multiple levels of abstraction. The process is iterative and can be refined as more information becomes available.
+**Elaboration:** The principle asserts that understanding is achieved by recursively mapping higher‑level conceptual skeletons onto lower‑level structures, revealing isomorphic patterns across domains. When a match is found, the mapping guides the identification of corresponding sub‑ideas, enabling analogical reasoning and knowledge transfer.
+
+**Failure Mode:** Fails when conceptual frameworks are too dissimilar or when no higher‑level match exists to guide the mapping.
+
+**Keywords:** conceptual skeleton, abstraction, analogy, isomorphism, recursive mapping, cross‑domain understanding
 
 **Evidence Passages (5):**
 1. "skeletons on some level of abstraction, different things can happen..."
@@ -4260,10 +5717,18 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "Sometimes the match can be extended recursively downwards several levels, revealing a profound isomorphism..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.95 (strong signal)
 
 ---
 
-### ❓ FB-123: Conceptual Harmony Pattern
+### ❓ FB-122: Conceptual Harmony Pattern
 
 **Status:** UNKNOWN
 
@@ -4271,9 +5736,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | b7e0b88a53ed965236002aa3eda1db9597146e0356b82c2596d0e0dd9e8bc8cb |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4286,7 +5750,11 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, creative systems must balance the exploration of distant conceptual spaces with the maintenance of structural coherence to produce truly novel yet understandable ideas.
 
-**Elaboration:** The principle suggests that creativity is not just about random combination but about finding the right 'harmonic' combinations that feel natural despite their apparent distance. This explains why creative breakthroughs often seem obvious in hindsight. The principle also implies that systems capable of creative insight must be able to navigate conceptual spaces and identify meaningful connections between seemingly unrelated domains. The process involves both discovery of distant concepts and synthesis of their relationships into coherent structures.
+**Elaboration:** Creative breakthroughs arise when distant conceptual elements are combined into a harmonious structure that feels both novel and inevitable. The principle emphasizes balancing novelty with coherence, mirroring how musical chords blend disparate notes into a pleasing whole.
+
+**Failure Mode:** Fails when elements are too distant to form meaningful connections or when the combination lacks conceptual resonance.
+
+**Keywords:** conceptual harmony, creativity, novelty, coherence, distant concepts, structural resonance
 
 **Evidence Passages (5):**
 1. "Perhaps what differentiates highly creative ideas from ordinary ones is some combined sense of beauty, simplicity, and harmony..."
@@ -4294,10 +5762,18 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "conceptual analogue to harmony; these harmonious "idea-chords" are often widely separated, as measured on an imaginary "keyboard of concepts"..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-124: Emergent Emotional Complexity
+### ❓ FB-123: Emergent Emotional Complexity
 
 **Status:** UNKNOWN
 
@@ -4305,9 +5781,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | f9442f14e5cb5d9f5e9387cdb28408bb11680a0fd479e55319e5a2f296e8bd6a |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4320,7 +5795,11 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, artificial systems will not achieve genuine emotional expression through direct programming but must instead develop emotional complexity through systemic organization and integration of multiple states.
 
-**Elaboration:** The principle suggests that emotional authenticity requires the organic emergence of feelings from complex system dynamics rather than artificial construction. This implies that even highly advanced AI systems will not achieve true emotional depth through explicit programming alone. The complexity of human emotion arises from the interaction of numerous factors including memory, context, and internal state changes that cannot be fully captured in a single module. Furthermore, this principle indicates that emotional expression in AI systems will likely emerge as a side effect of their overall cognitive architecture rather than as a primary design goal. The principle also suggests that attempts to directly program emotional states like 'falling in love' or 'grief' will fail because these are descriptions of emergent phenomena rather than discrete components.
+**Elaboration:** Emotional complexity in artificial systems is a byproduct of systemic organization, requiring the integration of multiple opposing states and experiences. Genuine emotional expression emerges only when a system’s architecture supports the interplay of contradictory affective states, rather than from isolated modules or direct instruction.
+
+**Failure Mode:** Fails when systems are too simple or when emotional states are directly programmed rather than emerging organically.
+
+**Keywords:** emotional complexity, emergent properties, systemic organization, opposing states, affective computing
 
 **Evidence Passages (5):**
 1. "It would have to have known resignation and worldweariness, grief and despair, determination and victory, piety and awe. In it would have had to commingle such opposites as hope and fear, anguish and jubilation..."
@@ -4328,10 +5807,18 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "Programs or machines will acquire emotions in the same way: as by-products of their structure, of the way in which they are organized-not by direct programming..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.96 (strong signal)
 
 ---
 
-### ❓ FB-125: Artificial Consciousness Illusion
+### ❓ FB-124: Artificial Consciousness Illusion
 
 **Status:** UNKNOWN
 
@@ -4339,9 +5826,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | 553b4148e5c22649e24cf10a32ee6bdc22d9399150d111524b4aeeda07b62857 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | philosophy |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4354,17 +5840,29 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, we will continue to anthropomorphize AI systems even when they lack true consciousness, leading to mistaken beliefs about their inner lives and potentially problematic expectations about their capabilities.
 
-**Elaboration:** The principle reveals that consciousness and intelligence are not necessarily co-located in systems. The 'pond' of an AI system is so deep and complex that observers cannot see the fundamental computational processes that drive behavior. This creates a fundamental disconnect between the observer's perception of consciousness and the system's actual operation. The illusion becomes more pronounced when systems pass behavioral tests like the Turing test, where the observer sees what appears to be genuine emotional or conscious responses. This principle suggests that consciousness may be fundamentally unobservable in artificial systems, regardless of their behavioral sophistication. The principle also implies that the question of whether AI can achieve 'superintelligence' is tied to whether consciousness is necessary for such intelligence.
+**Elaboration:** Artificial consciousness illusion occurs when complex AI systems exhibit behavior indistinguishable from consciousness, yet lack genuine subjective experience. The opacity of their internal processes leads observers to mistake functional patterns for inner life, perpetuating anthropomorphism and misplaced expectations.
+
+**Failure Mode:** Fails when systems can be directly introspected or when consciousness is defined as having actual inner experience rather than mere behavioral mimicry.
+
+**Keywords:** artificial consciousness, illusion, behavioral mimicry, opacity, anthropomorphism, subjective experience
 
 **Evidence Passages (3):**
 1. "intelligent program will not be chameleon-like, any more than people are. It will rely on the constancy of its memories, and will not be able to flit between personalities..."
 2. "the "pond" of an Al program will turn out to be so deep and murky that we won't be able to peer all the way to the bottom..."
 3. "When we create a program that passes the Turing test, we will see a "heart" even though we know it's not there..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.92 (strong signal)
 
 ---
 
-### ❓ FB-126: Hierarchical Rule Modification
+### ❓ FB-125: Hierarchical Rule Modification
 
 **Status:** UNKNOWN
 
@@ -4372,9 +5870,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | 6fa47178d7eba3696d188dfb20ed294954b29202aef4ce0340e1e4dc154b78de |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4387,7 +5884,13 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, systems can achieve self-modification and adaptive behavior while preserving core structural elements, enabling complex behaviors to emerge from simple rule interactions.
 
-**Elaboration:** The hierarchical structure allows for meta-rules to govern the modification of base rules, creating a feedback loop where changes at higher levels can influence the entire system. The principle enables systems to evolve their own operational constraints while maintaining a stable foundation. Some elements remain inviolate to prevent complete breakdown of the system's coherence. The recursive nature of rule modification allows for increasingly complex behaviors to emerge from simple rule structures. This creates a balance between adaptability and stability in complex systems.
+**Elaboration:** By structuring rules in a hierarchy, higher-level rules can alter the rule sets below, creating a recursive meta-structure that allows changes to propagate while preserving core invariants.
+
+**Application:** Design of adaptive, self-modifying software and organizational rule systems
+
+**Failure Mode:** Undefined hierarchy or inability to modify lower-level rules
+
+**Keywords:** hierarchical, rule modification, self-modification, meta-structure, adaptive behavior
 
 **Evidence Passages (5):**
 1. "A first variation, then, concerns games in which on your turn, you may modify the rules. Think of chess...."
@@ -4395,20 +5898,27 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "So we have rules and metarules. The next step is obvious: introduce metametarules by which we can change the metarules...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-127: Bottom-Up Emergence
+### ❓ FB-126: Bottom-up Emergence
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 94b0937888c2a4c8bdbad7b1e6a53c2a1f541992febe509ba7456620d9a08956 |
+| fb_id | 43d11f2b36772721d3098035e1772f4a206ca270f02a763a9891eed0fbabbcdc |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4421,7 +5931,13 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, understanding complex systems requires examining both the fundamental components and their interaction dynamics rather than assuming macro-level explanations can be directly mapped to micro-level causes.
 
-**Elaboration:** The principle demonstrates that emergent properties are not merely the sum of individual parts but arise from the organization and interaction patterns of those parts. In physics, this means that while individual molecules follow quantum mechanics, their collective behavior follows thermodynamic laws. In social systems, individual human actions and motivations create emergent societal patterns. The principle also implies that predictive power at macro levels often requires statistical approaches rather than deterministic ones, since the complexity of interactions makes precise prediction difficult. This bottom-up approach is particularly important in fields like complexity science, systems biology, and social network analysis where emergent behaviors dominate.
+**Elaboration:** Complex macroscopic behaviors arise from the collective interactions of microscopic components, producing properties that cannot be directly inferred from individual parts.
+
+**Application:** Predicting emergent phenomena in physical and social systems
+
+**Failure Mode:** Dominance of top-down control or excessive randomness
+
+**Keywords:** emergence, bottom-up, macroscopic, microscopic, collective behavior
 
 **Evidence Passages (4):**
 1. "a physicist has recourse only to statistical mechanics-that is, to a level of description which is not macroscopic, for the ultimate explanation of a gas's behavior always lies on the molecular level..."
@@ -4429,10 +5945,18 @@ This principle suggests that the presence of sophisticated behavior does not nec
 3. "gases in equilibrium obey simple laws connecting their temperature, pressure..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.68 (strong signal)
 
 ---
 
-### ❓ FB-128: Symbolic Value Depletion
+### ❓ FB-127: Symbolic Value Depletion
 
 **Status:** UNKNOWN
 
@@ -4440,9 +5964,8 @@ This principle suggests that the presence of sophisticated behavior does not nec
 |----------|-------|
 | fb_id | ffac80f661b286ca5a8a924f37c7f76d705e7e10c0a2f15f901a95f5dae6c7ef |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | aesthetics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4455,26 +5978,39 @@ This principle suggests that the presence of sophisticated behavior does not nec
 
 **Consequence:** Because of this principle, artistic works can shift from conveying emotional or conceptual content to existing as pure sensory experiences, fundamentally altering their interpretive and communicative function.
 
-**Elaboration:** This transformation represents a philosophical shift from representational art to experiential art, where the value lies not in what is communicated but in the direct sensory encounter. The principle reveals how artistic meaning can be deconstructed through removal of symbolic encoding. In music, this manifests as Cage's approach to sound as pure phenomenon rather than emotional expression. The principle suggests that artistic value can be redefined by focusing on the sensory experience itself rather than its communicative function. This creates a tension between traditional artistic intent and experimental approaches that prioritize pure sensory engagement.
+**Elaboration:** When artistic elements are stripped of contextual encoding, they shift from conveying symbolic meaning to existing as pure sensory phenomena.
+
+**Application:** Deconstructing symbolic meaning in artistic works
+
+**Failure Mode:** Retention of conventional symbolic frameworks
+
+**Keywords:** symbolism, sensory experience, contextual encoding, artistic elements, value depletion
 
 **Evidence Passages (2):**
 1. "anything just to be. This means to exist as pure globs of paint, or pure sounds, but in either case drained of all symbolic value...."
 2. "John Cage has been very influential in bringing a Zen-like approach to sound. Many of his pieces convey a disdain for "use" of sounds-that is, using sounds to convey emotional states-and an exultation in "mentioning" sounds..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-129: Self-Referential Inconsistency
+### ❓ FB-128: Self-referential Inconsistency
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | c8601e265048a753fab60cdea8fc866d9a3f8676d40ef37fd931c9bc549c5406 |
+| fb_id | 1582b8bfcf663c841894dc841e552e34db36ce88323b0e316664ca54a54d8a8d |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md, Moments politiques (Ranciere, Jacques) (Z-Library).md |
-| source_diversity | 3 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4497,26 +6033,35 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Elaboration:** The principle reveals that self-referential systems cannot escape the paradox of modeling their own structure, which creates a fundamental tension between internal logic and external reality. This tension is not a flaw but a necessary feature that generates unique behavioral patterns and identity formation. The principle suggests that inconsistency in self-referential systems is not a bug but a feature that enables growth and adaptation. When systems attempt to understand themselves completely, they inevitably create paradoxes that become the source of their dynamism. The principle also implies that any attempt to apply insights from one domain to another without accounting for the specific nature of self-reference will fail to capture the essential dynamics.
 
+**Application:** Explaining identity formation and systemic limits in
+
 **Evidence Passages (5):**
 1. "large number of unresolved, possibly unresolvable, inconsistencies... provide much of the dynamic tension which is so much a part of being human..."
 2. "Gödel's Theorem shows that there are fundamental limitations to consistent formal systems with self-images..."
 3. "It is natural to try to draw parallels between people and sufficiently complicated formal systems which, like people, have "self-images" of a sort..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 3 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.74 (strong signal)
 
 ---
 
-### ❓ FB-130: Ideas as Causal Entities
+### ❓ FB-129: Ideas As Causal Entities
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | beaab641eb5584165bd20062b879a9c8c15ebff48533e0ac3f4741ac5349bf41 |
+| fb_id | ffcf967a8a97d80756369b176a03814a1fee04764995c2b5e6f3b1689ab45874 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4529,26 +6074,39 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because ideas function as causal entities, mental models must account for idea-to-idea causation and interaction patterns rather than treating ideas as passive reflections of underlying physical processes.
 
-**Elaboration:** The principle suggests that conceptual evolution isn't just emergent from neural activity but that ideas themselves constitute a level of reality with causal agency. This implies that mental phenomena can be understood through the lens of idea dynamics rather than purely physical or computational models. The principle also suggests that collective intelligence emerges not just from communication but from the actual causal influence of ideas across minds. When ideas are treated as causal entities, the brain model must incorporate feedback loops and evolutionary processes at the conceptual level. The principle implies that consciousness and intelligence involve more than just information processing - they involve the real causal power of ideas themselves.
+**Elaboration:** Ideas are treated as entities that can cause other ideas, analogous to physical causation, requiring that their influence be traceable in mental processes. When such influence cannot be demonstrated, the principle does not apply.
+
+**Application:** cognitive modeling
+
+**Failure Mode:** ideas lack demonstrable influence on other ideas or mental processes, or are merely symbolic representations without causal power
+
+**Keywords:** ideas, causal potency, mental models, conceptual evolution, network communication
 
 **Evidence Passages (2):**
 1. "we find ideas. Man over the chimpanzee has ideas and ideals. In the brain model proposed here, the causal potency of an idea, or an ideal, becomes just as real as that of a molecule, a cell, or a nerve impulse. Ideas cause ideas and help evolve new ideas. They interact with each other and with other mental forces in the same brain, in neighboring brains, and, thanks to global communication, in..."
 2. "we find ideas. Man over the chimpanzee has ideas and ideals. In the brain model proposed here, the causal potency of an idea, or an ideal, becomes just as real as that of a molecule, a cell, or a nerve impulse. Ideas cause ideas and help evolve new ideas. They interact with each other and with other mental forces in the same brain, in neighboring brains, and, thanks to global communication, in..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-131: Self-Referential Syntax
+### ❓ FB-130: Self-referential Syntax
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 90f80bd578f2070083aa6508cc03b6146d47dc05285233d90813f221f6c8634e |
+| fb_id | b47d2386045148fa2f1622cbc8cc30e36e0c2a27dcba576cb2790f44b4350735 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4561,27 +6119,40 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Systems with self-referential syntax simplify formal proofs and eliminate the complexity of indirect encoding methods, making self-reference natural rather than artificially constructed.
 
-**Elaboration:** In systems like LISP, the uniformity of syntax allows for elegant metaprogramming where code can be treated as data and data as code. This contrasts with Gödel's approach where self-reference required complex number-theoretic encoding. The principle reveals that syntactic uniformity is a key enabler of self-reference in computational systems. When syntax is not uniform, systems must rely on indirect methods like Gödel numbering to achieve self-reference, which adds unnecessary complexity. This principle explains why LISP's design was more elegant for self-referential systems than the formal systems Gödel constructed.
+**Elaboration:** Self-referential syntax allows code to be treated as data without an intermediate encoding scheme, simplifying formal proofs and eliminating the need for Gödel numbering.
+
+**Application:** program design
+
+**Failure Mode:** when programs and data have different syntactic structures requiring encoding or translation to achieve self-reference
+
+**Keywords:** self-referential syntax, code-as-data, Gödel numbering, indirect encoding
 
 **Evidence Passages (3):**
 1. "The idea is to imitate | | | | | | | | Gödel's self-referential construction, which as you know is INDIRECT, and depends | | | | | | | | on the isomorphism set up by Gödel numbering..."
 2. "Crab: Oh. Well, in the programming language LISP, you can talk about your own | | | | | | | | programs directly, instead of indirectly, because programs and data have exactly | | | | | | | | the same form..."
 3. "G del should have just thought up LISP, and then Author: But Crab: I mean, he should have formalized quotation. With a language able to talk about itself, the proof of his Theorem would have been so much simpler..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.96 (strong signal)
 
 ---
 
-### ❓ FB-132: Recursive Self-Reference in Systems
+### ❓ FB-131: Recursive Self-reference in Systems (Cluster fa808d749b472be9186973b70290b7a73182661037232a09a7635db905018fe2)
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | fa808d749b472be9186973b70290b7a73182661037232a09a7635db905018fe2 |
+| fb_id | ea53ee1531862d3c6e2c134e9414f40be19730c441f99d2e6c263482e00ae094 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4594,17 +6165,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Systems with recursive self-reference can exhibit behaviors that appear to involve beliefs, desires, or consciousness, because the self-referential loops create internal models that mirror cognitive processes.
 
-**Elaboration:** The principle operates across multiple domains: mathematical fractals (Mandelbrot's work) show recursive structures that have dimensionality not expressible in whole numbers, while philosophical discussions (McCarthy's article) explore how recursive self-reference in machines might enable mental qualities. The principle suggests that recursive structures in systems can give rise to emergent properties that transcend their component parts. When recursive structures are present in computational systems, they can create the conditions for what appears to be consciousness or intentionality. The principle also implies that recursive systems may be more likely to exhibit properties that humans associate with cognition.
+**Elaboration:** Recursive self-reference creates feedback loops that enable a system to internally model its own operations, giving rise to emergent cognitive-like behaviors such as beliefs and intentions.
+
+**Application:** AI system design
+
+**Failure Mode:** systems lack self-referential structures or contain purely mathematical recursion without semantic content
+
+**Keywords:** recursive self-reference, feedback loops, consciousness, beliefs, intentions, machine mentality
 
 **Evidence Passages (3):**
 1. "It is interesting to compare this article with..."
 2. "A rarity: a picture book of sophisticated contemporary research ideas in mathematics..."
 3. "Here, it concerns recursively defined curves and shapes..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.93 (strong signal)
 
 ---
 
-### ❓ FB-133: Linguistic Relativity and Cultural Context
+### ❓ FB-132: Linguistic Relativity and Cultural Context
 
 **Status:** UNKNOWN
 
@@ -4612,9 +6197,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | f95b8aea8343928e29814547ca4cdb6a80e83578ec97632abbd5689bdd36bc38 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | linguistics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4627,7 +6211,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, speakers of languages with culturally embedded linguistic structures will demonstrate different cognitive patterns and conceptual frameworks compared to speakers of more abstract or universalist languages, as their linguistic tools directly shape their mental models.
 
-**Elaboration:** The principle reveals that linguistic diversity is not just about vocabulary or grammar, but about how different cultures encode and transmit knowledge through language. The Dyirbal example shows how language can encode complex social hierarchies and relationships in ways that are inaccessible to speakers of other languages. This suggests that linguistic relativity extends beyond simple word choice to encompass entire modes of conceptualization. The principle also implies that understanding a culture's worldview requires understanding its linguistic structures, particularly those that encode social roles or domain-specific knowledge. Furthermore, the principle suggests that cognitive frameworks are not universal but emerge from the specific linguistic and cultural environments in which they develop.
+**Elaboration:** Linguistic structures that encode cultural norms and social relationships actively shape how speakers perceive and categorize reality, leading to distinct cognitive patterns across cultures.
+
+**Application:** cognitive research
+
+**Failure Mode:** language lacks culturally specific semantic domains or social relationship markers that influence cognition
+
+**Keywords:** linguistic relativity, cultural context, social relationships, cognitive processing, Dyirbal, Minsky
 
 **Evidence Passages (4):**
 1. "Northern Queensland: a separate language used only for speaking to one's mother-in-law..."
@@ -4635,10 +6225,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "A fascinating compendium of linguistic facts and theories, hearing on Whorl 's hypothesis that language is the same as worldviesv..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-134: Genetic Information Encoding
+### ❓ FB-133: Genetic Information Encoding
 
 **Status:** UNKNOWN
 
@@ -4646,9 +6244,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 2790a2d95e828853295e7ab63cf7789d53dc45884f1120f11752499423277abf |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4661,7 +6258,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, genetic systems must be understood as information processing systems that encode meaning through multiple levels of organization, including explicit sequences, implicit regulatory networks, and emergent phenotypic properties.
 
-**Elaboration:** The encoding mechanism reveals that genetic information is not merely a set of instructions but a complex system of communication that includes feedback loops, context-dependent expression, and emergent properties that arise from the interaction of multiple genetic elements. This principle suggests that understanding genetic information requires looking beyond simple cause-effect relationships to consider the broader information ecosystem. The implicit semantic content includes regulatory elements, epigenetic marks, and developmental timing information that guide proper gene expression. This multi-layered encoding explains why identical genotypes can produce different phenotypes under different conditions. The principle also implies that genetic information is not fully contained in the DNA sequence itself but includes the entire cellular and environmental context in which it operates.
+**Elaboration:** The principle asserts that DNA encodes not only literal protein instructions but also contextual regulatory information and emergent properties, making the genotype a multi-layered information system.
+
+**Application:** Genetic engineering, evolutionary modeling
+
+**Failure Mode:** Deterministic blueprint interpretation
+
+**Keywords:** genetic encoding, implicit semantics, emergent properties, regulatory networks, genotype-phenotype mapping
 
 **Evidence Passages (4):**
 1. "It is about whether a genotype can be said, in any operational sense, to contain "all" the information about its phenotype..."
@@ -4669,10 +6272,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "It is about the location of meaning in the genotype..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-135: Isomorphic Meaning Revelation
+### ❓ FB-134: Isomorphic Meaning Revelation
 
 **Status:** UNKNOWN
 
@@ -4680,9 +6291,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | a1de7519f9e84cca625626590ce435407c59754c33e354deaaeb846b95a8ecf9 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4695,7 +6305,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, formal systems can be interpreted as having semantic content even when their symbols are initially meaningless, provided that their internal structure reflects an external reality or pattern.
 
-**Elaboration:** This principle operates across multiple domains including music (as in Bach's fugues), geometry (as in Euclidean vs. non-Euclidean systems), and logic (as in formal proof systems). The principle suggests that meaning is not intrinsic to symbols but emerges from their relational structure. In some cases, the isomorphism may be intentional (as in acrostics or contrapunctus), while in others it may be accidental or discovered. The principle also implies that understanding can emerge from pattern recognition rather than direct semantic encoding.
+**Elaboration:** When a formal system’s internal structure mirrors an external reality, symbols acquire semantic meaning through isomorphism, turning neutral symbols into meaningful representations.
+
+**Application:** Music composition, data visualization, geometric art
+
+**Failure Mode:** Lack of meaningful correspondence between formal structure and external domain
+
+**Keywords:** isomorphism, formal systems, semantics, structural correspondence, external domain
 
 **Evidence Passages (5):**
 1. "are suddenly revealed to possess meaning by virtue of the form of the theorems they appear in..."
@@ -4703,20 +6319,27 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "Apparently meaningless at first, its symbols are suddenly revealed to possess meaning by virtue of the form of the theorems they appear in..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.84 (strong signal)
 
 ---
 
-### ❓ FB-136: Recursive Self-Similarity
+### ❓ FB-135: Recursive Self-similarity
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 043a7aacf216788bbe6ad5cd471bc24f825edb931cf654fe5b25dd0645d2283d |
+| fb_id | 3e3fc5adfa70220da2fc108b09edec5f8d0acd78165b7b40c0bd5d759400ba68 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4729,59 +6352,38 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, systems can represent infinitely complex processes using finite structures, enabling the expression of endless processes in bounded forms like Escher's metamorphosis or Bach's canons.
 
-**Elaboration:** The recursive structure creates a feedback loop where each level contains information about the whole system, making it possible to understand the complete structure from any single level. This principle underlies the concept of fractals and self-similar systems in mathematics and art. When levels form a loop rather than a linear chain, the distinction between reality and fantasy becomes blurred, as each level can be both real and imaginary simultaneously. The principle demonstrates how finite representations can capture infinite processes through recursive encoding.
+**Elaboration:** Recursive self-similarity allows a finite structure to encode infinite complexity by repeating the same pattern across scales, creating hierarchical self
+
+**Application:** Fractal design, algorithmic art, data compression
+
+**Failure Mode:** Breakdown of recursive relationship or independent levels
 
 **Evidence Passages (3):**
 1. "representing an endless process in a finite way? And infinity plays a large role n many of Escher's drawings. Copies of one single theme often fit into each' other, forming visual analogues to the canons of Bach..."
 2. "It is a little like the "Endlessly Rising Canon": wandering further and further from its starting point..."
 3. "always another level above it of greater "reality", and likewise, there is always a level below, "more imaginary" than it is..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.84 (strong signal)
 
 ---
 
-### ❓ FB-137: Recursive Self-Reference in Systems
+### ❓ FB-136: Self-referential Paradox
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 1b75aeb3b37a912718045108b831bec16b1986e7ec336f3b08af7d60fafaa60e |
+| fb_id | 4e59eebc58a19d4c4820ab0664ca536f5631df77823f9c4825f883033c0e1109 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
-| gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
-| pipeline_commit | 12bc968 |
-| schema_version | 3.0 |
-
-**Definition:** Complex systems can exhibit self-referential properties that create loops in their own structure and behavior. This recursive pattern enables systems to model and reflect upon their own operations, leading to emergent properties like consciousness or intelligence. The principle applies when a system's components interact in ways that reference the system as a whole.
-
-**Mechanism:** Recursive self-reference enables complex behavior because systems can use their own structure as input for further operations, creating feedback loops that generate higher-order patterns. These loops allow for the emergence of meta-level understanding where the system can reason about its own processes.
-
-**Boundary:** The principle applies when systems have sufficient complexity to support circular causality and self-modeling. It fails when systems are purely linear or lack the capacity for internal representation of their own structure.
-
-**Consequence:** Systems that exhibit recursive self-reference can demonstrate behaviors that appear to transcend their component parts, including what might be interpreted as intelligence or consciousness, because they can internally simulate and reason about their own operation.
-
-**Elaboration:** The principle operates across multiple levels of abstraction, from musical composition (Bach's fugues) to theological reflection (Schmidt's treatise) to computational systems. Recursive structures can be found in mathematical proofs, artistic compositions, and philosophical arguments. The self-referential loops create a kind of 'echo chamber' where patterns reinforce and amplify each other. This mechanism explains how simple rules can generate complex, seemingly non-deterministic behavior. The principle suggests that consciousness or intelligence may emerge not from the complexity of individual components, but from the way those components relate to each other in recursive patterns.
-
-**Evidence Passages (2):**
-1. "the complexity of our minds seems so overwhelming that one feels that there can be no solution to the problem of understanding intelligence-that it is wrong to think that rules of any sort govern a creature's behavior, even if one takes "rule" in the multilevel sense described above..."
-2. "In the year 1754, four years after the death of J. S. Bach, the Leipzig theologian Johann Michael Schmi..."
-
-
----
-
-### ❓ FB-138: Self-Referential Paradox
-
-**Status:** UNKNOWN
-
-| Property | Value |
-|----------|-------|
-| fb_id | 74dca9183e552c819dc111806df0dd50288f0b6a7343b69361a7076a952cede0 |
-| source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4800,10 +6402,18 @@ The tension arises from the impossibility of fully representing one's own struct
 1. "in his blindness to the pen of another: Wenn wir in hochsten Nothen seen. I am sure that he will soon need his soul if he wishes to observe all the beauties contained therein, let alone wishes to play it to himself or to form a judgment of the author...."
 2. "Everything that the champions of Materialism put forward must fall to the ground in view of this single example...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.93 (strong signal)
 
 ---
 
-### ❓ FB-139: Fuzzy Boundaries in Classification
+### ❓ FB-137: Fuzzy Boundaries in Classification
 
 **Status:** UNKNOWN
 
@@ -4811,9 +6421,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | d18e795c34ff3416ad312bd43cde283ee9929d11c4a47a6e283a7a9a832964d5 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4826,17 +6435,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, attempts to quantify inherently fuzzy concepts like languages or dialects lead to conceptual confusion rather than clarity, revealing the limits of applying rigid numerical systems to fluid human constructs.
 
-**Elaboration:** The principle demonstrates that even when precise numbers are provided for categories like languages or dialects, the underlying definitions remain subjective and context-dependent. This suggests that human categorization systems are fundamentally incompatible with mathematical precision. The tension between numerical precision and conceptual fuzziness is not just a limitation of measurement but a fundamental aspect of how humans organize and understand the world. This principle extends beyond linguistic classification to any domain where human perception or social constructs form the basis of categorization. The principle reveals that mathematical systems struggle with human constructs that are inherently subjective and context-sensitive.
+**Elaboration:** When a system imposes exact numeric thresholds on categories that are inherently vague, the resulting labels clash with the true fluidity of the concepts, producing confusion rather than clarity.
+
+**Application:** Classification systems in data science, linguistics, and knowledge organization
+
+**Failure Mode:** Overprecision leading to cognitive dissonance and misrepresentation of fuzzy categories
+
+**Keywords:** fuzzy logic, vagueness, classification, cognitive dissonance, numerical precision
 
 **Evidence Passages (3):**
 1. "There are 17 languages in India, and 462 dialects. There is something strange about precise statements like that, when the concepts "language" and "dialect" are themselves fuzzy...."
 2. "Numbers as realities misbehave. However, there is an ancient and innate sense in people that numbers ought not to misbehave...."
 3. "Ideal Numbers Numbers as realities misbehave...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.95 (strong signal)
 
 ---
 
-### ❓ FB-140: Degenerate Solution
+### ❓ FB-138: Degenerate Solution
 
 **Status:** UNKNOWN
 
@@ -4844,9 +6467,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | c240fc0b487db19864c88342885a0505c4fe487c1d3578b1f73c055c621f1039 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4859,7 +6481,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, solutions that technically meet criteria but miss the point become common in puzzles, riddles, and formal logic problems. These solutions often appear clever but are ultimately unhelpful or misleading in practical application.
 
-**Elaboration:** Degenerate solutions often arise in formal systems where the rules are rigidly applied without regard for the underlying purpose. They can be particularly problematic in educational or design contexts where the goal is to encourage deep understanding rather than surface compliance. In some cases, degenerate solutions can be intentionally crafted to highlight the limitations of formal logic or to demonstrate the gap between syntax and semantics. The principle is especially relevant in puzzles that rely on wordplay or visual perception, where the solution might satisfy a structural constraint but not the intended creative or conceptual challenge.
+**Elaboration:** A solver may craft a solution that satisfies every stated rule but fails to capture the underlying purpose, resulting in a technically correct yet semantically empty answer.
+
+**Application:** Puzzle solving, formal logic exercises, programming contests
+
+**Failure Mode:** Literal compliance with constraints, ignoring intended meaning
+
+**Keywords:** degenerate solution, formal constraints, literal interpretation, puzzle, logic
 
 **Evidence Passages (5):**
 1. "Achilles: Very ingenious-but that's almost cheating. It's certainly not what I meant!..."
@@ -4867,10 +6495,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "Achilles: What do you mean, "phantasmagorical beasts"?..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.67 (strong signal)
 
 ---
 
-### ❓ FB-141: Figure Ground Ambiguity
+### ❓ FB-139: Figure Ground Ambiguity
 
 **Status:** UNKNOWN
 
@@ -4878,9 +6514,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | d538e2a87ca844559761275a3e968249917ce0b28ca1b54bf590014d4c9a12d1 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4893,17 +6528,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, logical systems must account for the possibility that truths and falsehoods can be encoded in ways that blur their traditional boundaries, requiring more nuanced approaches to truth determination.
 
-**Elaboration:** This principle reveals that in formal systems, the distinction between truth and falsehood is not always absolute but can be relative to the encoding mechanism. The figure-ground relationship in logic mirrors the visual figure-ground relationship in perception, where the same elements can be interpreted in multiple ways. The principle suggests that logical systems may have inherent limitations in defining absolute truth and falsehood due to their self-referential nature. This ambiguity can manifest in paradoxes or undecidable propositions, where the system cannot definitively classify certain statements. The principle also implies that understanding logical systems requires considering both what is explicitly stated and what is implicitly excluded.
+**Elaboration:** When a system encodes truths as nontheorems and falsehoods as negated theorems, the distinction between what is true and what is false blurs, complicating inference.
+
+**Application:** Logical reasoning systems, AI knowledge bases, formal verification
+
+**Failure Mode:** Ambiguous truth assignment due to dual representation
+
+**Keywords:** figure-ground ambiguity, truth, falsehood, logical systems, dual representation
 
 **Evidence Passages (3):**
 1. "inside the set of all nontheorems are found some truths..."
 2. "outside the set of all negated theorems are found some falsehoods..."
 3. "One may also look for figures and grounds in music..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-142: Recursive Complexity Boundary
+### ❓ FB-140: Recursive Complexity Boundary
 
 **Status:** UNKNOWN
 
@@ -4911,9 +6560,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 720553f62611e739d24e1d2cf35e1023c839896a5798ae0c57495092f11935c1 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4926,7 +6574,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, formal systems cannot achieve complete decidability or finite characterization of their truth sets, meaning there will always be aspects of their structure that resist complete description or exhaustive analysis.
 
-**Elaboration:** The principle demonstrates that even when we can describe the basic rules of a system, the emergent boundary between what is true and what is false becomes infinitely complex. This mirrors how musical structures like Bach's compositions can have multiple simultaneous melodies that interweave in ways that resist simple description. The fractal nature means that no matter how much we zoom in, we find new levels of structure that were not present at coarser scales. This creates fundamental limits on what can be known or computed about such systems. The principle also suggests that infinite complexity can emerge from finite rules, which has implications for understanding consciousness, computation, and the nature of mathematical truth.
+**Elaboration:** Recursive systems generate self-similar boundaries between truths and falsities that cannot be captured in any finite representation, implying inherent undecidability.
+
+**Application:** Formal verification, computability theory, algorithmic analysis
+
+**Failure Mode:** Inability to fully characterize truth sets due to infinite recursive complexity
+
+**Keywords:** recursive systems, fractal boundary, self-similarity, infinite complexity, formal systems, undecidability
 
 **Evidence Passages (5):**
 1. "The boundary beta the set of truths and the set of falsities is meant to suggest a randomly meandering coastline which, no matter how closely you examine it, always has finer levels of structure..."
@@ -4934,20 +6588,27 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "Recursively Enumerable Sets vs. Recursive Sets..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-143: Integer-Part Function Properties
+### ❓ FB-141: Integer-part Function Properties
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | ce2a7e3f969f4d112d243b07e849613b82e1775ec11d074c8dac8e997862da3a |
+| fb_id | b0a4e3bffa8840351b5fd61c093bbe44ceb392f8ce5c21e29478887d5dbc4d49 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4960,17 +6621,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, the integer-part function can be used to construct iterative systems with fixed points for integer inputs, and it maintains consistent algebraic structure for rational and quadratic numbers, making it useful in number theory and crystal energy calculations.
 
-**Elaboration:** The function's behavior at rational vs. irrational points creates a unique mathematical structure where rational inputs yield rational outputs with jump discontinuities, while irrational inputs produce continuous outputs. The fixed-point property [INT(INT)(x)] = x only holds for integer values, not for all real numbers. The preservation of quadraticity suggests a deeper connection to field extensions and Galois theory. The principle does not extend to higher-degree algebraic numbers, indicating a limitation in the generalization of these properties.
+**Elaboration:** The integer‑part function INT preserves rationality and quadraticity by mapping algebraic numbers to algebraic numbers of the same degree. Its fixed‑point property arises because INT(INT(x)) = x for integer x, making integers fixed points. Continuity differs at rational versus irrational points, leading to distinct patterns.
+
+**Application:** Number theory research and crystal energy modeling
+
+**Failure Mode:** Fails for transcendental inputs or higher‑degree algebraic numbers where degree preservation is not guaranteed
+
+**Keywords:** integer part,rationality,quadraticity,continuity,fixed point,algebraic numbers
 
 **Evidence Passages (3):**
 1. "so is INT(x); if x is quadratic, so is INT(x). I do not know if this trend holds for higher algebraic degrees...."
 2. "Another lovely feature of INT is that at all rational values of x, it has a jump discontinuity, but at all irrational values of x, it is continuous...."
 3. "As a consequence, [INT(INT)]{.bold}(x) = x. [INT]{.bold}has the property that if x is rational, so is [INT]{.bold}(x); if x is quadratic, so is [INT]{.bold}(x)...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-144: Recursive Pattern Recognition
+### ❓ FB-142: Recursive Pattern Recognition
 
 **Status:** UNKNOWN
 
@@ -4978,9 +6653,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | dc15ab853ba6512801e5a37782878b71998b774d0d359e935767145aa97056e2 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -4993,26 +6667,39 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, systems can generate infinitely complex structures from finite rule sets, and complex behaviors can emerge from simple recursive processes. This enables the construction of sophisticated linguistic or computational systems from basic building blocks.
 
-**Elaboration:** Recursive pattern recognition operates on the fundamental insight that complex structures can be built from simple, repeated patterns. In linguistic systems, this means that grammatical rules can be applied recursively to generate an infinite variety of sentences. The principle also applies to computational systems where the same algorithmic steps can be repeated at different levels of abstraction. This mechanism underlies both natural language generation and artificial intelligence systems that build complexity from simple rules. The recursive nature allows for the emergence of properties that aren't explicitly programmed but arise from the pattern itself.
+**Elaboration:** Recursive pattern recognition builds complex structures by repeatedly applying the same transformation rules at different abstraction levels. This self‑similarity allows infinite complexity from finite rule sets, enabling sophisticated linguistic or computational systems.
+
+**Application:** Generating complex linguistic structures, procedural content generation, fractal design
+
+**Failure Mode:** Fails when systems lack self‑similarity or rules vary across levels
+
+**Keywords:** recursion,pattern recognition,self‑similarity,hierarchy,infinite patterns,rule sets
 
 **Evidence Passages (2):**
 1. "producing sensible-as distinguished from nonsensical-English sentences out of raw words, according to a grammar represented in a set of ATN's..."
 2. "Recursion in Chess Programs A classic example of a rec..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-145: Recursive Self-Reference
+### ❓ FB-143: Recursive Self-reference (Cluster 7dd16ba5acf6f266027109068b1e314caaddef342abbb46399470e15aa85ef5a)
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 7dd16ba5acf6f266027109068b1e314caaddef342abbb46399470e15aa85ef5a |
+| fb_id | 5260f01062e53b83993528a49e04f90072616f14448b3ef10480ed2e6ed28c22 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5025,17 +6712,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, mathematical sequences and computational systems can grow infinitely from finite initial conditions, and complexity emerges naturally from simple rules rather than requiring explicit programming of every detail.
 
-**Elaboration:** Recursive self-reference creates emergent properties where the whole system exhibits behaviors not explicitly programmed in any single step. The Fibonacci sequence demonstrates how simple addition rules can generate increasingly complex numerical patterns. In computational systems, this principle explains why some problems are inherently unpredictable - they grow through recursive steps that compound over time. The mathematical snowball effect shows how small initial elements can lead to exponential growth when each step uses the same rule. This principle also explains why recursive definitions in mathematics can be both elegant and powerful, as they capture infinite complexity in finite descriptions.
+**Elaboration:** Recursive self‑reference constructs complex structures by defining each step in terms of previous steps using identical rules. This leads to exponential growth patterns, as seen in Fibonacci sequences, and allows infinite expansion from finite initial conditions.
+
+**Application:** Generating mathematical sequences and modeling computational unpredictability
+
+**Failure Mode:** Fails when the system requires external inputs or lacks a base case
+
+**Keywords:** recursion,self‑reference,Fibonacci,exponential growth,iterative rules,base case
 
 **Evidence Passages (3):**
 1. "This is just one more piece of evidence for the rather recursive Hofstadter's Law: It always takes longer than you expect, even when you take into account Hofstadter's Law...."
 2. "The Fibonacci numbers and the Lucas numbers are perfect examples of r.e. sets-snowballing from two elements by a recursive rule into infinite sets...."
 3. "But this is the essence of recursion-something being defined in terms of simpler versions of itself, instead of explicitly...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-146: Tangled Recursion and Intelligence
+### ❓ FB-144: Tangled Recursion and Intelligence
 
 **Status:** UNKNOWN
 
@@ -5043,9 +6744,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 1045b5686419eb9e9d76562aedafc71ae8b88bf81c8a320d47ef1d99c4d11470 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5064,20 +6764,27 @@ The tension arises from the impossibility of fully representing one's own struct
 1. "This kind of thought carried a little further suggests that suitably complicated recursive systems might be strong enough to break out of any predetermined patterns. And isn't this one of the defining properties of intelligence?..."
 2. "This kind of "tangled recursion" probably lies at the heart of intelligence...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-147: Information-Bearing Artifacts
+### ❓ FB-145: Information-bearing Artifacts
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 3bfd30d52c8e4edac37e15351fe0b5d7fb827409c84277a00682e24ecc1ef0d5 |
+| fb_id | bc72b78bfd862108beaa3e64fa8b9dcca443a67c7024031d572c49ff49e5aa8a |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | semiotics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5090,17 +6797,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, artifacts can serve as vehicles for information transmission across different contexts and civilizations, even when the full decoding process is not immediately achievable by the observer.
 
-**Elaboration:** The principle highlights that information in artifacts is not solely dependent on the observer's current understanding but also on the artifact's physical properties and the context in which it is encountered. The trigger mechanism allows for partial understanding even without full decoding. The transformation process is critical for converting physical patterns into interpretable data. Even if the full meaning is not immediately accessible, the artifact's presence and form can still communicate that it is an information-bearing object. This principle applies across different media and contexts, from ancient records to modern digital artifacts.
+**Elaboration:** Artifacts act as information carriers by providing physical triggers that initiate contextual understanding, and by undergoing transformation processes that convert physical patterns into interpretable data. When an artifact lacks recognizable form or the transformation mechanism is insufficient, the information cannot be extracted, limiting its communicative power.
+
+**Application:** communication systems
+
+**Failure Mode:** misinterpretation due to lack of contextual cues
+
+**Keywords:** artifact, information, context, transformation, signal, decoding
 
 **Evidence Passages (3):**
 1. "Levels of Understanding of a Message Nowadays, the idea of decoding is extremely wide..."
 2. "Thus immediately its shape, acting as a trigger, has given them some information: that it is an artifact, perhaps an information-bearing artifact..."
 3. "What, indeed, would constitute a successful deciphering of such a record? Evidently, the civilization would have to be able to make sense out of the sounds..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-148: Outer Message Limitation
+### ❓ FB-146: Outer Message Limitation
 
 **Status:** UNKNOWN
 
@@ -5108,9 +6829,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | f7708705255d8dc299683dffe5c5c24f50c6cbf22c362e6859a3417a6744d5af |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5123,16 +6843,30 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, external observers can only perceive surface-level patterns in complex systems, never fully understanding the deeper logical structures that govern the system's behavior.
 
-**Elaboration:** This limitation is particularly evident in systems that exhibit self-reference or recursive properties, where the meaning emerges from the system's internal relationships rather than from external descriptions. The principle suggests that true understanding requires internal participation rather than external observation. Even when external signals appear to provide information, they cannot capture the system's emergent properties or its internal logic. This creates a fundamental gap between what can be communicated and what can be truly understood. The principle also implies that systems with high internal complexity will always resist complete external interpretation.
+**Elaboration:** External messages cannot fully convey a system's internal, recursive, self-referential structure because the transmission medium limits the encoding of such complex patterns. Consequently, observers only perceive surface-level signals, missing the deeper logical architecture that defines the system.
+
+**Application:** system monitoring
+
+**Failure Mode:** incomplete representation of internal structure
+
+**Keywords:** outer message, internal structure, recursive, self-referential, communication channel
 
 **Evidence Passages (2):**
 1. "It is in the nature of outer messages that they are not conveyed in any FIGURE 40. A collage of scripts. Uppermost on the left is an inscription in the un ciphered boustrophedonic writing system from Easter..."
 2. "in the soup then he tries to identify the language the broadcast is in-and clearly, he is still on the outside; he accepts triggers from the radio, but they cam explicitly tell him the answer..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block definition discusses the limitation of external messages in conveying the full meaning or context of a system's internal structure, while the evidence passages
 
 ---
 
-### ❓ FB-149: Genetic Information Implantation
+### ❓ FB-147: Genetic Information Implantation
 
 **Status:** UNKNOWN
 
@@ -5140,9 +6874,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 8d0b83b9db1f4a3ba21da8c0ab1a42738b62b1a24abdefe49f684aa3ae2a867d |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | evolutionary biology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5155,17 +6888,31 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, the interpretation of genetic information and its implications for biological development and inheritance remains inherently ambiguous and subject to philosophical debate, particularly in cases where the genetic code does not directly specify observable outcomes.
 
-**Elaboration:** The principle reveals that even in well-mapped genomes like bacteriophage OX174, the complete genetic blueprint does not immediately reveal the organism's phenotype. The translation from genetic code to physical form involves complex biochemical pathways, gene regulation, and environmental influences that are not encoded in the DNA itself. This creates a fundamental gap between the information content of DNA and the actual manifestation of life. The principle also underscores that biological systems exhibit emergent properties that cannot be reduced to their constituent genetic elements alone. The philosophical implications extend beyond biology into questions of determinism, free will, and the nature of information itself.
+**Elaboration:** While DNA encodes all necessary information for an organism's phenotype, the mapping is indirect and mediated by regulatory networks, environmental interactions, and emergent properties. This complexity introduces ambiguity in predicting observable traits from genetic sequences alone.
+
+**Application:** genetic engineering
+
+**Failure Mode:** non-deterministic genotype-to-phenotype mapping
+
+**Keywords:** genotype, phenotype, regulatory mechanisms, environmental interactions, emergent properties
 
 **Evidence Passages (3):**
 1. "when phenotype can be said to be "available", or "implied", by genotype, is a highly charged issue in our day: it is the issue of abortion...."
 2. "the set of symbols would have no intrinsic meaning..."
 3. "FIGURE 41. This Giant Aperiodic Crystal is the base sequence for the chromosome of bacteriophage OX174. It..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.70 (strong signal)
 
 ---
 
-### ❓ FB-150: Intrinsic Meaning Dependence
+### ❓ FB-148: Intrinsic Meaning Dependence
 
 **Status:** UNKNOWN
 
@@ -5173,9 +6920,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 3f9352f77f7c3a65add8231992eb095625727dbc79a63025da7195d12c289258 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | semiotics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5188,7 +6934,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, messages that are truly self-contained and pattern-rich can be understood across different interpreters and cultures, while those requiring extensive background knowledge are not universally meaningful and may lose their intended meaning when separated from their context.
 
-**Elaboration:** The principle reveals that meaning is not a fixed property of a message but emerges from the interaction between the message's structure and the interpreter's knowledge base. Messages like Bach's compositions are considered to have intrinsic meaning because they contain patterns that can be recognized and decoded by those familiar with musical structures. In contrast, Cage's work requires extensive cultural knowledge to understand, indicating its lack of intrinsic meaning. This principle also suggests that the more self-contained and pattern-rich a message is, the more likely it is to have universal interpretability. The principle highlights the importance of context in interpretation and suggests that truly universal messages must be able to communicate their own decoding rules.
+**Elaboration:** Intrinsic meaning arises when a message contains sufficient self-contained structure for intelligent interpreters to reconstruct context without external guidance. Messages that rely heavily on cultural or intellectual background lack this property, leading to misinterpretation or loss of intended meaning across diverse audiences.
+
+**Application:** cross-cultural communication
+
+**Failure Mode:** loss of meaning when external context is missing
+
+**Keywords:** intrinsic meaning, context, prior knowledge, self-contained structure, cultural background
 
 **Evidence Passages (5):**
 1. "There are few "chunks" to seize onto in this Cage piece, few patterns which could guide a decipherer..."
@@ -5196,10 +6948,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "If some message did have that context-restoring property, then it would seem reasonable to consider the meaning of the message as an inherent property of the message..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.86 (strong signal)
 
 ---
 
-### ❓ FB-151: Symbolic Representation and Interpretation
+### ❓ FB-149: Symbolic Representation and Interpretation
 
 **Status:** UNKNOWN
 
@@ -5207,9 +6967,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 04a468b6c6e0d7871ee67cf17a6bc4e78ff778a1a3db949800689a6714d066bb |
 | source_books | An Introduction to General Systems Thinking_ Systems Thinking, no. 1_Gerald M. Weinberg_liber3.md, Building Complex Multi-Agent Systems Using Pattern Prompting A guide to building robust and secure GenAI applications using… (Tim OBrien) (z-library.sk, 1lib.sk, z-lib.sk).md, Complexity_ a guided tour_Mitchell, Melanie_liber3.md, Essential Math for AI Next-Level Mathematics for Developing Efficient and Successful AI Systems (Hala Nelson) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md ... (+13 more) |
-| source_diversity | 18 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5222,7 +6981,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Systems that properly encode symbolic relationships can support self-reference, complex reasoning, and emergent properties like understanding or consciousness, provided the symbolic layer preserves semantic fidelity.
 
-**Elaboration:** The principle operates across multiple domains: from formal logic systems (Gödel's theorems) to computational models (AI and neural networks), and even to cognitive architectures (the brain as an active symbol processor). The key is that symbolic systems must not only encode but also preserve the meaning that allows for higher-order operations like metatheory or self-awareness. When symbolic representation breaks down or conflates appearance with reality (as in the Chinese Room), the system loses its capacity for true understanding or recursive reflection.
+**Elaboration:** When symbolic structures are translated into concrete representations, preserving the relationships between symbols is essential. If the mapping distorts or omits key semantic links, the system cannot support self‑reference or complex reasoning, leading to misunderstandings or failure of emergent properties.
+
+**Application:** Natural Language Processing
+
+**Failure Mode:** Loss of semantic fidelity during mapping
+
+**Keywords:** symbolic representation, semantic fidelity, self-reference, mapping, abstraction
 
 **Evidence Passages (5):**
 1. "of an isomorphism which maps typographical symbols onto numbers, operations, and relations; and strings of typographical symbols onto statements..."
@@ -5230,10 +6995,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "The Chinese Room is not an argument that AI is useless. It is an argument that the appearance of understanding is not the same as understanding..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 18 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-152: Symbolic Representation and System Complexity
+### ❓ FB-150: Symbolic Representation and System Complexity
 
 **Status:** UNKNOWN
 
@@ -5241,9 +7014,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 5101af29f0e51147eab9c60f860d9d2379cda3d1b96b7f5db565ce67337ce09b |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md, How to Solve It A New Aspect of Mathematical Method (George Polya) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 3 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5256,7 +7028,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, mathematical proofs can be constructed from simple, trivial steps that collectively demonstrate profound truths, while symbolic systems can encode complex structures like entire stories or mathematical concepts.
 
-**Elaboration:** The principle reveals that there is a fundamental duality in symbolic systems: they can be simultaneously simple in their component operations and complex in their overall structure. This duality explains why mathematical proofs can be both accessible in their individual steps and profound in their conclusions. The encoding power of symbols extends beyond pure mathematics to include narrative structures, as evidenced by the possibility of representing entire stories through symbolic means. The principle also illuminates why mathematical systems can be both intuitive to work with and inherently complex in their implications.
+**Elaboration:** Symbolic representation acts as external memory, encoding the structure of mathematical systems. When the symbols faithfully capture the relationships, complex truths can be derived through simple, trivial steps. If the symbolic framework fails to encode the structure, derivations break down and the system cannot express the intended complexity.
+
+**Application:** Proof construction
+
+**Failure Mode:** Symbols cannot represent underlying mathematical structure
+
+**Keywords:** symbolic representation, mathematical complexity, derivation, external memory
 
 **Evidence Passages (5):**
 1. "2 (and then there are infinitely many triplets a, b, c which satisfy the equation); but there are no solutions for n \> 2. I have discovered a truly marvelous proof of this statement, which, unfortunately. is so small that it would be well-nigh invisible if written in the margin...."
@@ -5264,54 +7042,27 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "The use of mathematical symbols is similar to the use of words. Mathematical no..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 3 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI FAIL → LLM: The foundation block discusses the complexity of mathematical systems and symbolic representation, while the evidence passages do not directly address the complexity of mathematical sy
 
 ---
 
-### ❓ FB-153: Recursive Self-Reference
+### ❓ FB-151: Tension-resolution Pattern
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 7773eae231268918b003a829415a7644b85ba84c13df99b98972afc9507268ce |
+| fb_id | 176fe6be2834247663a372dc3abd6347c7cf059d7313203c140c063f4d4799f8 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
-| gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
-| pipeline_commit | 12bc968 |
-| schema_version | 3.0 |
-
-**Definition:** Recursive self-reference occurs when a system refers to itself in a way that creates a loop or hierarchy of levels. This mechanism enables systems to generate complexity from simple rules and allows for the emergence of higher-order patterns. The principle applies when a system's structure contains embedded references to its own form or function.
-
-**Mechanism:** Recursive self-reference enables complex behavior because it creates hierarchical layers where each level contains information about the structure of the levels above or below it, allowing for emergent properties that cannot be predicted from the base rules alone.
-
-**Boundary:** The principle applies when a system contains self-referential structures that create meaningful hierarchies or loops. It fails when the self-reference is purely coincidental or lacks structural significance.
-
-**Consequence:** Because of this principle, systems can exhibit behaviors that transcend their individual components, generating novel patterns and properties that arise from the recursive structure itself.
-
-**Elaboration:** Recursive self-reference often manifests in formal systems where rules can refer to other rules, or in artistic works where themes loop back on themselves. In computational systems, it enables the construction of programs that can reason about their own behavior. The mechanism is particularly powerful in creating paradoxes or logical puzzles, as seen in Gödel's incompleteness theorems. When applied to language or music, recursive structures can create infinite regressions or self-similar patterns that are both mathematically and aesthetically compelling.
-
-**Evidence Passages (5):**
-1. "involve twenty-four distinct subjects, one in | | | | | | | | each of the major and minor keys..."
-2. "Three-Part Invention. Bach wrote fifteen three-part inventions. In this three-part Dialogue, the Tortoise and Achilles-the main fictional protagonists in the Dialogues-are "invented" by Zeno..."
-3. "Tortoise: I know the rest of you won't believe this, but in fact this picture consists of the | | | | | | | | word "REDUCTIONISM" written once, with the letters continually growing as they | | | | | | | | proceed from left to right..."
-  ... and 2 more
-
-
----
-
-### ❓ FB-154: Tension-Resolution Pattern
-
-**Status:** UNKNOWN
-
-| Property | Value |
-|----------|-------|
-| fb_id | 17247574404904811002703bf5f341b611e5af7c0d69459a5e26d9f444366fa7 |
-| source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5331,10 +7082,18 @@ The tension arises from the impossibility of fully representing one's own struct
 2. "Notice, however, that in [TNT] itself, there seems to be no reflection of these tensions. In other words, [TNT] doesn't formalize the notions of tension and resolution..."
 3. "Now line 49 is a critically important tension-increaser, because of "almost-there" feeling which it induces. It would be extremely unsatisfactory to leave off there! From there on, it is almost predictable how things must go...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.98 (strong signal)
 
 ---
 
-### ❓ FB-155: Dualistic Thinking Transcendence
+### ❓ FB-152: Dualistic Thinking Transcendence
 
 **Status:** UNKNOWN
 
@@ -5342,9 +7101,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | b71f37ac3a530bd43eed8191e20acf339d5641869ad3bd0e179303be48b4dd9e |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5365,20 +7123,27 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "To suppress perception, to suppress logical, verbal, dualistic thinking-this is the essence of Zen, the essence of ism...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.94 (strong signal)
 
 ---
 
-### ❓ FB-156: Self-Referential Barrier Crossing
+### ❓ FB-153: Self-referential Barrier Crossing
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 23ab80fbf89074221be10229a35a4aae36b3f95ba6722500df61b344a0971038 |
+| fb_id | 2c3f6b245b52aa481eddc3277b61868a122af37774d1e87bf0be4c0922d0e02b |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | systems thinking |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5391,7 +7156,13 @@ The tension arises from the impossibility of fully representing one's own struct
 
 **Consequence:** Because of this principle, systems that can fully experience their own limitations can achieve higher-order understanding that transcends their original structure, while systems that cannot engage with their own constraints remain trapped in their initial framework.
 
-**Elaboration:** The principle operates through a paradoxical process where the very structure that defines a system must be completely internalized before it can be transcended. This creates a necessary tension between maintaining identity and achieving transformation. The process requires not just intellectual understanding but complete experiential immersion in the system's own logic. In cases where the system's boundaries are not fully accessible or where the system is not designed to be experienced from within, the principle cannot be applied. The principle suggests that true understanding requires a kind of 'death' of the original system's identity.
+**Elaboration:** The principle posits that a system must first fully embody its own rules before it can transcend them, akin to a self-aware entity recognizing its own limitations.
+
+**Application:** Systemic transformation and organizational change
+
+**Failure Mode:** Inability to internalize constraints
+
+**Keywords:** self-referential, boundary dissolution, internal transformation, transcendence
 
 **Evidence Passages (4):**
 1. "To realize Zen one has to pass through the barrier of the patriarchs..."
@@ -5399,10 +7170,18 @@ The tension arises from the impossibility of fully representing one's own struct
 3. "If you pass through it, you will see Joshu face t face..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block discusses a self-referential system's ability to transcend its own structural limitations, which is not directly supported by the evidence passages that refer 
 
 ---
 
-### ❓ FB-157: Cognitive Liberation Through Structural Collapse
+### ❓ FB-154: Cognitive Liberation Through Structural Collapse
 
 **Status:** UNKNOWN
 
@@ -5410,9 +7189,8 @@ The tension arises from the impossibility of fully representing one's own struct
 |----------|-------|
 | fb_id | 1a0e704eecae0e3d968edd12056435e85169a1e74de0be34f6004b9437408ea6 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5437,20 +7215,30 @@ The principle works best when the disruption is specific and concrete, like the 
 
 This explains how sudden enlightenment or creative insight can occur in response to specific disruptions in familiar patterns or assumptions.
 
-**Elaboration:** The principle suggests that the most effective moments of insight occur when a person's existing mental model is disrupted in a specific, concrete way. The bamboo breaking represents a particular type of constraint that is both familiar and essential to the person's current understanding. When that constraint fails, it creates a moment of clarity that allows for new understanding to emerge.
+**Elaboration:** When a deeply ingrained mental model collapses, the mind temporarily clears, allowing novel connections to surface, similar to a sudden insight after a paradigm shift.
 
-The principle also implies that the disruption must be meaningful enough to create a genuine shift in perspective, not just a random event. The specific nature of the disruption (the bamboo breaking) is crucial to the principle's operation.
+**Application:** Creative problem solving
 
-In the case of the Zen koan, the 'three worlds' represent a complex conceptual framework that threatens the monk, and the answer 'Sit down' suggests that the solution is not to fight the structure but to accept the moment of disruption and allow insight to emerge naturally.
+**Failure Mode:** Chaotic disruption
+
+**Keywords:** cognitive collapse, structural disruption, insight, creativity
 
 **Evidence Passages (2):**
 1. "many years under Bukko of Engaku. Still, she could not attain the fruits of meditation. At last one moonlit night she was carrying water in an old wooden pail girded with bamboo. The bamboo broke, and the bottom fell out of the pail. At that moment, she was set free. Chiyono said, "No more water in the pail, no more moon in the water."..."
 2. "Three Worlds: an Escher picture (Fig. 46), and the subject of a Zen koan:12 A monk asked Ganto, "When the three worlds threaten me, what shall I do?" Ganto answered, "Sit down." "I do not understand," said the monk...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.67 (strong signal)
 
 ---
 
-### ❓ FB-158: Transcendent Awareness State
+### ❓ FB-155: Transcendent Awareness State
 
 **Status:** UNKNOWN
 
@@ -5458,9 +7246,8 @@ In the case of the Zen koan, the 'three worlds' represent a complex conceptual f
 |----------|-------|
 | fb_id | 53f12de0a27aa1d3bfb49640646338c64a25a96802405d8915996cec1563d53f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5479,17 +7266,31 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, individuals can act with unprecedented clarity and power, overcoming any obstacle in their path and experiencing complete freedom in their relationship with existence.
 
-**Elaboration:** This state represents a fundamental shift in consciousness where the individual no longer experiences themselves as separate from the world. The 'sharp sword' metaphor suggests both the cutting power of this clarity and the precision with which one can navigate any situation. The reference to 'MU' (void/emptiness) indicates that this state requires complete focus and the absence of mental discontinuity. The principle suggests that this transcendent state is not a permanent condition but rather a potential that can be accessed through disciplined practice and complete commitment to the process. The state enables the individual to move beyond conventional limitations of identity and purpose.
+**Elaboration:** By dissolving the ego shell, the individual experiences a unity of self and environment, enabling actions unfiltered by personal biases.
+
+**Application:** Personal empowerment
+
+**Failure Mode:** Ego persistence
+
+**Keywords:** ego dissolution, self-transcendence, awareness, freedom
 
 **Evidence Passages (3):**
 1. "a fruit ripening i season, your subjectivity and objectivity naturally become one..."
 2. "He knows about it but he cannot tell i When he enters this condition his ego-shell is crushed and he can shake th heaven and move the earth..."
 3. "He is like a great warrior with a sharp sword. If Buddha stands in his way, he will cut him down; if a patriarch offers him an obstacle | [2] (Godel, Escher, Bach-An Eternal Golden Br): with a sharp sword. If Buddha stands in his way, he will cut him down; if a patriarch offers him an obstacle, he will kill him..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The evidence passages do not clearly support the claim of ego-shell dissolution leading to a state of consciousness where self and environment boundaries dissolve, enabling radical
 
 ---
 
-### ❓ FB-159: Symbolic Representation System
+### ❓ FB-156: Symbolic Representation System
 
 **Status:** UNKNOWN
 
@@ -5497,9 +7298,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 81651a8b7f2245ea0b4bfb7317c586b96793f697a74fe0f08d36e6812b2bcf21 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5512,7 +7312,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, complex logical systems can be expressed and manipulated through formal notations that maintain semantic integrity, enabling automated reasoning and derivation processes.
 
-**Elaboration:** The principle demonstrates that symbolic systems can encode both syntactic rules (like axioms and inference rules) and semantic content simultaneously. In formal systems like TNT, the same logical content can be represented in multiple notations, with one being more visually intuitive while the other is more mechanically processable. The system's effectiveness depends on maintaining the correspondence between the symbolic structure and the logical relationships it represents. When this correspondence breaks down, the system loses its ability to support valid derivations. The principle also suggests that the choice of notation can influence how easily humans or machines can work with the system.
+**Elaboration:** Symbolic representation systems provide a formal bridge between abstract concepts and logical syntax, enabling machines to manipulate meaning while preserving semantics.
+
+**Application:** Automated reasoning
+
+**Failure Mode:** Inconsistent mapping
+
+**Keywords:** symbolic logic, formal representation, semantic preservation, automated reasoning
 
 **Evidence Passages (4):**
 1. "Here is the Rule of Detachment, in the new notation: | | | | | | | | RULE: If x and 212x6331213 are both theorems, then 1 is a theorem...."
@@ -5520,10 +7326,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "There is a hidden motivation for this, which you will find out about in Chapter XVI...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests a system that maintains a consistent translation between symbols and their meanings, but the evidence passages do not provide enough information to confirm 
 
 ---
 
-### ❓ FB-160: Contextual Interpretation Failure
+### ❓ FB-157: Contextual Interpretation Failure
 
 **Status:** UNKNOWN
 
@@ -5531,9 +7345,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 38d298ca0cf8a2811a228db29cf0a69274f5f3ddbc29194a57f44931310996cd |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5546,7 +7359,11 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, systems and users often make persistent errors when processing ambiguous input, particularly in translation or parsing tasks where initial context determines the entire interpretation flow.
 
-**Elaboration:** This phenomenon reveals a fundamental limitation in how both humans and machines process information - they create mental models based on initial assumptions that become deeply embedded in their processing. The error propagation is particularly problematic in natural language processing where context can shift between languages or domains. Even when the system has the capability to detect and correct errors, the initial misinterpretation often becomes a permanent part of the processing chain. This principle explains why translation software often fails in complex or idiomatic contexts, and why human interpreters must constantly re-evaluate their understanding.
+**Elaboration:** When initial contextual cues are unclear or conflicting, both human and machine parsers lock onto incorrect interpretations, propagating errors through subsequent processing.
+
+**Failure Mode:** Misinterpretation due to ambiguous context
+
+**Keywords:** ambiguous context, contextual cues, parsing, misinterpretation, backtracking
 
 **Evidence Passages (5):**
 1. "trying to interpret all the remaining English as French..."
@@ -5554,10 +7371,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "Perhaps this sounds condemnatory of computers, but it is not meant to be..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The foundation block's definition suggests that both humans and computers struggle with ambiguous input when context shifts abruptly, but the evidence passages do not provide infor
 
 ---
 
-### ❓ FB-161: Emergent Macroscopic Laws
+### ❓ FB-158: Emergent Macroscopic Laws
 
 **Status:** UNKNOWN
 
@@ -5565,9 +7390,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 3f11c94cf5a4813891f81b4e77f6d892b13dea6b3b0e6c152f14a800ee13302c |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | theoretical physics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5580,7 +7404,11 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, macroscopic descriptions of physical systems require entirely new vocabularies and conceptual frameworks that are not reducible to their microscopic constituents, making cross-level understanding essential for complete comprehension.
 
-**Elaboration:** The principle demonstrates that there is a fundamental conceptual gap between microscopic and macroscopic descriptions, where the former is about individual particle behavior while the latter is about collective phenomena. This gap means that even if one understands all the microscopic rules, one cannot predict or understand the macroscopic behavior without additional conceptual tools. The emergent properties are not just 'more of the same' but represent entirely new levels of organization. These emergent laws often exhibit deterministic behavior despite the underlying microscopic randomness, showing how order can arise from chaos. The principle also implies that knowledge at one level is not sufficient to fully understand the system at another level.
+**Elaboration:** Macroscopic behaviors emerge from collective interactions, forming new patterns that cannot be reduced to individual component rules.
+
+**Failure Mode:** Inability to derive macroscopic laws from microscopic description
+
+**Keywords:** emergence, macroscopic laws, microscopic interactions, aggregation, abstraction
 
 **Evidence Passages (4):**
 1. "Pressure" and "temperature" are new terms which experience with the low level alone cannot convey...."
@@ -5588,20 +7416,27 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "The former refers to microscopic descriptions, the latter to macroscopic descriptions...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.69 (strong signal)
 
 ---
 
-### ❓ FB-162: ASU-Based Narrative Structure
+### ❓ FB-159: Asu-based Narrative Structure
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 11362665e623cf98660b1fde69c11330cc9fb816682cc78a3a5586adc6d2646e |
+| fb_id | aed1952ea9a1a53f559b3335e5c29e57b54a804f5e4d2afbe2d94fcd0bff1c6a |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5614,7 +7449,11 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, readers can engage with highly abstract or foreign narrative elements if those elements can be connected to familiar mental models, explaining why readers can understand translated novels or fantastical fiction despite surface-level unfamiliarity.
 
-**Elaboration:** The principle reveals that readers' comprehension depends not on literal translation or surface-level realism, but on the ability to find familiar associative structures within the narrative. This explains why readers can be disoriented by translations that break these associative links, as in the Crime and Punishment example. The principle also explains why some abstract works like Jabberwocky can be understood through their internal logic, even when they don't reference real-world elements. When ASUs are completely absent or too distant from familiar concepts, readers experience cognitive dissonance and loss of narrative coherence.
+**Elaboration:** Readers map fictional elements onto familiar associative semantic units, enabling understanding even when surface details are unfamiliar.
+
+**Failure Mode:** Difficulty comprehending abstract narratives lacking familiar anchors
+
+**Keywords:** ASU, associative semantic units, narrative structure, mental models, comprehension
 
 **Evidence Passages (4):**
 1. "I will never forget the disoriented feeling I experienced when I began reading the novel and encountered those streets with only letters for names..."
@@ -5622,10 +7461,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "I happened to look at three different English paperback translations, and found the following..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.79 (strong signal)
 
 ---
 
-### ❓ FB-163: Primitive Recursive Truth Representation
+### ❓ FB-160: Primitive Recursive Truth Representation
 
 **Status:** UNKNOWN
 
@@ -5633,9 +7480,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 887a5a3c458ad853ec8ba6eaf5628eb365819f51f012f8284029b975676a8629 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5648,7 +7494,11 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, formal systems that fail to represent all primitive recursive truths are rejected as insufficiently powerful for modeling arithmetic, even if they appear otherwise complete or useful.
 
-**Elaboration:** The principle operates as a threshold filter, similar to Euclid's postulates in geometry or a thief's criterion for 'rich' targets. It's not a complete measure of system power but rather a minimum requirement for inclusion in the class of systems capable of encoding number theory. Systems like TNT meet this criterion, while others like the pq-system do not. The principle allows for the systematic exclusion of systems that lack the necessary computational strength to serve as foundations for arithmetic, even if they are formally consistent or internally coherent.
+**Elaboration:** A system must encode all primitive recursive truths to be powerful enough for number theory; lacking them indicates insufficient computational expressiveness.
+
+**Failure Mode:** Inadequate formal system failing to represent primitive recursive truths
+
+**Keywords:** primitive recursive truths, formal system, number theory, computational expressiveness, axioms
 
 **Evidence Passages (5):**
 1. "The pqsystem does not include enough of the core truths of N to count as "a number theory"..."
@@ -5656,10 +7506,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "From here on out, the [representability] of all primitive recursive truths will be the criterion for calling a system "sufficiently powerful"..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-164: Abstract Meaning Through Pattern Recognition
+### ❓ FB-161: Abstract Meaning Through Pattern Recognition
 
 **Status:** UNKNOWN
 
@@ -5667,9 +7525,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 2dcdb383357a0b2bad964cdda40375f0e76f152196c93ec9ef3b95aef28de2b1 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | computational geometry |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5682,7 +7539,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, previously meaningless numerical strings can be understood as representations of deeper mathematical truths, enabling abstract reasoning and pattern-based comprehension.
 
-**Elaboration:** The principle reveals that meaning is not inherent in individual elements but emerges from the relationships between elements across sequences. This suggests that abstract understanding often requires stepping outside the immediate context to find connections. The example shows how a decimal expansion can encode the sum of a series, demonstrating that surface-level differences can mask fundamental mathematical unity. This principle extends beyond mathematics to any domain where patterns reveal hidden structures. The process of pattern recognition becomes a tool for transcending apparent complexity to access deeper conceptual truths.
+**Elaboration:** By uncovering hidden mathematical structures, pattern recognition transforms random-looking data into meaningful representations, enabling abstract reasoning across disciplines.
+
+**Application:** Data analysis, cryptography, AI pattern recognition
+
+**Failure Mode:** When sequences are truly independent or require knowledge beyond observed data
+
+**Keywords:** pattern recognition, abstract meaning, mathematical relationships, sequences, hidden connections, structural truths, randomness encoding
 
 **Evidence Passages (5):**
 1. "SALVIATI Suppose I give you two sequences of numbers, such as 78539816339744830961566084......"
@@ -5690,20 +7553,27 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "SIMPLICIO This does not seem probable to me...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI FAIL → LLM: The definition suggests that meaning emerges from recognizing patterns in seemingly unrelated sequences, enabling abstract understanding of mathematical relationships. However, the evi
 
 ---
 
-### ❓ FB-165: Self-Referential Looping
+### ❓ FB-162: Self-referential Looping
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | ec7628ba0fcd56ff9e99c685d5c5ad7607f23f0655f9b120f6f88b1c4bf2b6b4 |
+| fb_id | 892d115c738489dfc69b1f169859e78a1376f8de77706ffc2211d8431fa9f189 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5716,27 +7586,40 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, systems that rely on self-referential loops in lower dimensions will always be incomplete or paradoxical in their understanding of the concepts they're modeling, leading to fundamental limitations in their comprehension and representation.
 
-**Elaboration:** The principle reveals that even when a system has access to higher-dimensional information, it cannot fully embody or understand that information when it's constrained to a lower-dimensional framework. This creates a fundamental tension between the system's ability to simulate and its actual understanding. The dragon example demonstrates that no matter how cleverly the dragon's image is constructed, it remains trapped in its two-dimensional reality. The Escher dragon's biting of its tail becomes a metaphor for systems that cannot escape their own structural limitations. This principle extends beyond visual art to any recursive or self-referential system, including logical systems, computational models, and even philosophical frameworks that attempt to describe themselves.
+**Elaboration:** Self-referential loops in lower-dimensional frameworks trap simulations, preventing faithful capture of higher-dimensional concepts, leading to paradoxes and incomplete models.
+
+**Application:** Simulation design, modeling of higher-dimensional data, AI representation
+
+**Failure Mode:** When the system lacks full dimensional context or representation is not constrained by dimensional limitations
+
+**Keywords:** self-referential, looping, dimensional constraints, simulation, higher-dimensional, lower-dimensional, paradox, representation
 
 **Evidence Passages (3):**
 1. "But this dragon is an obstinate beast, and in' spite of his two dimensions he persists in assuming that he has three; so he sticks his head through one of the holes and his tail through the others..."
 2. "Its most salient feature is, of course, its subject matter-a dragon biting its tail, with all the Gödelian connotations which that carries..."
 3. "The futility of it all, for the dragon and the holes and the folds are all merely two-dimensional simulations of those concepts, and not a one of them is real..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The Foundation Block's definition of a self-referential system creating paradoxes and limitations when simulating higher-dimensional concepts within a lower-dimensional framework i
 
 ---
 
-### ❓ FB-166: Self-Reference via Translation
+### ❓ FB-163: Self-reference Via Translation
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 58e478a5a35a5ad59dc8914adf803842480acb235300051f81614d87690a1fa7 |
+| fb_id | c459ee5c9f11cdd2bc86d3d2267c88e7583cbfdbbe9be2ca5c7061400b5e34d2 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5756,20 +7639,27 @@ The dissolution of the ego creates a state where internal and external obstacles
 2. "One might also think back to some of the Dialogues, for some of them, too, are self-refs via translation..."
 3. "language in which it is written, TNT, seems to offer no hope of referring to its own structures, unlike English, in which it is the easiest thing in the world to discuss the English language..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it can' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it can' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-167: Self-Referential System Limitation
+### ❓ FB-164: Self-referential System Limitation
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 061eb7e34d23fc3e83e4987329821923d0e706a6ce18cc0fbfaa32929a0ac09c |
+| fb_id | fc9e3c10f307986b974933c96db1aa5ff37155f6f6d56bd353622b03b8255cbc |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5790,10 +7680,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "There is always further to go; enlightenment is not the end-all of And there is no recipe which tells how to transcend Zen..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-168: Central Dogma Analogy
+### ❓ FB-165: Central Dogma Analogy
 
 **Status:** UNKNOWN
 
@@ -5801,9 +7699,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | d50a3b6760cee3c7556a863d725939566de32fee7cc532627a7f0999eb71a18e |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | descriptive_model |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5816,7 +7713,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, insights from one domain (e.g., molecular biology) can illuminate abstract logical systems (e.g., Gödel's theorem) and vice versa, suggesting that fundamental organizational patterns transcend disciplinary boundaries.
 
-**Elaboration:** The analogy reveals that both systems exhibit self-referential properties and recursive structures that enable them to encode and process information in similar ways. The correspondence suggests that information processing in biological systems may be understood through the lens of logical systems and vice versa. This principle highlights the deep unity of information processing across seemingly disparate domains. The mapping also suggests that complex systems in nature and mathematics may share fundamental organizational principles that manifest in different forms. The principle is particularly powerful in identifying how abstract mathematical concepts can be instantiated in concrete biological processes.
+**Elaboration:** The Central Dogma Analogy posits that the hierarchical, rule‑based transformations seen in molecular biology (DNA → RNA → Protein) mirror the logical progression of information in mathematical logic (axioms → theorems). By establishing a structural correspondence, researchers can transfer insights about information integrity, error correction, and modularity between the two fields, potentially informing both genetic engineering and formal verification.
+
+**Application:** Facilitates cross-disciplinary research by mapping biological information flow to logical inference structures.
+
+**Failure Mode:** Fails when the two domains lack comparable structural organization or when the mapping is not grounded in fundamental operational principles.
+
+**Keywords:** central dogma, structural correspondence, information encoding, hierarchical transformations, semantic integrity, cross‑domain analogy
 
 **Evidence Passages (5):**
 1. "background, now we are in a position to draw an elaborate comparison between F. Crick's "Central Dogma of Molecular Biology" (.DOGMA I) upon which all cellular processes are based; and what I, with poetic license, call the "Central Dogma of Mathematical Logic" (.DOGMA II), upon which G6del's Theorem is based..."
@@ -5824,10 +7727,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "This Central Dogmap is by no means a rigorous proof of identity of the two theories; but it clearly shows a profound kinship, which is worth deeper exploration..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-169: Genetic Interpretation and Reproduction
+### ❓ FB-166: Genetic Interpretation and Reproduction
 
 **Status:** UNKNOWN
 
@@ -5835,9 +7746,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | a4e2c851a9ed0d63aad621f74fbeba42d9bb059f40de3349da08b6b33a7ee6c1 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5850,16 +7760,30 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, genetic sequences that successfully reproduce in a host can be understood as carrying specific functional meanings about their reproductive capability in particular cellular environments.
 
-**Elaboration:** The principle reveals that biological meaning emerges not from the abstract properties of genetic code, but from its practical utility in reproduction. This suggests that semantic interpretation in biological systems is fundamentally tied to reproductive success. The distinction between 'evolutionarily pointless' phages and successful ones demonstrates that meaning in genetic systems is determined by functional outcomes rather than inherent complexity. This interpretation mechanism operates at multiple levels - from individual genetic sequences to entire evolutionary strategies. The principle also implies that biological systems naturally develop interpretive frameworks that favor sequences with successful reproductive potential.
+**Elaboration:** This principle reframes genetic material not as static code but as a dynamic narrative whose meaning emerges from successful replication. The host’s transcriptional machinery acts as an interpreter, translating nucleotide sequences into mRNA and ultimately proteins that enable the genetic material to propagate. Thus, functional meaning is inseparable from reproductive success.
+
+**Application:** Interpreting genetic sequences as functional units of reproductive capability within host environments.
+
+**Failure Mode:** Fails when genetic material cannot be transcribed, integrated, or reproduced within the host cell.
+
+**Keywords:** genetic interpretation, reproduction, transcription, functional meaning, host cell, integration
 
 **Evidence Passages (2):**
 1. "The essential fact is that it is a battle between a host which is trying to reject all invading DNA, and a phage which is trying to infiltrate its DNA into some host which will transcribe it into mRNA (after which its reproduction is guaranteed)...."
 2. "Any phage DNA which succeeds in getting itself reproduced this way can be thought of as having this high-level interpretation: "I Can Be Reproduced in Cells of Type X"...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.90 (strong signal)
 
 ---
 
-### ❓ FB-170: Strategic Recognition Game
+### ❓ FB-167: Strategic Recognition Game
 
 **Status:** UNKNOWN
 
@@ -5867,9 +7791,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 6bdacde104a46f01a47e0146a435bde99c7a546d028c4811d845cd6c1319d360 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | operations research |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5882,7 +7805,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, systems that involve recognition, disguise, and labeling will naturally exhibit parallel structures across scales, and understanding one level (molecular or macroscopic) provides insight into the other.
 
-**Elaboration:** The principle reveals that recognition systems are not just about identifying features but about maintaining strategic balance between defense and attack. In biological systems, this manifests as immune responses (defense) and pathogen invasion (attack), while in computational systems, it appears as security protocols and hacking attempts. The parallelism across scales suggests that these systems are governed by universal principles of strategic interaction rather than just physical or biological constraints. The principle also implies that any recognition system must inherently contain both protective and invasive elements to be complete and effective.
+**Elaboration:** Recognition, disguise, and labeling mechanisms can be viewed as a two‑player game where each participant simultaneously defends its domain and seeks to invade another. This dual tension is evident in immune surveillance, pathogen evasion, and even social identity formation. By treating these interactions as strategic games, one can anticipate adaptive strategies and design interventions that shift the balance toward desired outcomes.
+
+**Application:** Predicting outcomes of recognition systems by modeling them as strategic games of defense and invasion.
+
+**Failure Mode:** Fails when systems lack clear opposing players or when objectives are not dualistic (e.g., purely cooperative or purely defensive).
+
+**Keywords:** recognition game, defense, invasion, strategic balance, labeling, disguise
 
 **Evidence Passages (5):**
 1. "player is to protect itself and destroy the invader..."
@@ -5890,10 +7819,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "The objective of the C player is to protect itself and destroy the invader..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-171: Symbolic Manipulation Limitation
+### ❓ FB-168: Symbolic Manipulation Limitation
 
 **Status:** UNKNOWN
 
@@ -5901,9 +7838,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 043fd45a20178ba05b0fc2a325814544ae69b139077020ed8278819254230a40 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | artificial intelligence |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5916,7 +7852,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Systems that rely solely on symbolic manipulation cannot resolve questions about physical constraints or spatial configurations unless they have direct access to the physical environment or a complete model of it embedded in their symbolic structure.
 
-**Elaboration:** This limitation highlights the gap between syntactic processing and semantic understanding. Even if a system can parse complex commands and execute them correctly within its symbolic framework, it cannot reason about physical impossibilities or real-world constraints without external knowledge or direct sensory input. The principle reveals that symbolic systems are fundamentally limited in their ability to reason about physical reality without explicit modeling of that reality. This is particularly evident in cases where the system must make inferences about spatial relationships or object properties that are not explicitly encoded in its symbolic rules.
+**Elaboration:** Symbolic manipulation relies on internal grammatical and semantic rules, enabling systems like SHRDLU to execute commands. However, without a direct mapping to physical reality, such systems cannot resolve questions about spatial constraints or material properties. This limitation underscores the need for hybrid architectures that integrate symbolic reasoning with perceptual grounding.
+
+**Application:** Highlighting the limitations of purely symbolic AI systems in interacting with the physical world.
+
+**Failure Mode:** Fails when the system lacks direct sensory access to the physical domain or a complete physical model embedded in its symbolic structure.
+
+**Keywords:** symbolic manipulation, representation, physical reality, SHRDLU, semantic rules, physical constraints
 
 **Evidence Passages (5):**
 1. "SHRDLU: I DON'T KNOW...."
@@ -5924,10 +7866,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "Logical connectives, such as "and", "or", "either", etc. are handled in both the grammar and semantics..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that symbolic systems cannot resolve questions about physical constraints or spatial configurations unless they have direct access to the physical environme
 
 ---
 
-### ❓ FB-172: Modular Computational Cell
+### ❓ FB-169: Modular Computational Cell
 
 **Status:** UNKNOWN
 
@@ -5935,9 +7885,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | b0a422b1b34ce0d5d963a9184b7731623ea3931d4fab675c872f9a3f814821e9 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5950,7 +7899,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Systems composed of modular cells can scale both in complexity and in parallelism, as each cell operates autonomously and contributes to a global aggregate without needing to coordinate directly with other cells.
 
-**Elaboration:** Each cell's internal parameter N allows for parameterized evolution, where offspring cells inherit modified versions of their parent's state. This creates a lineage of evolving computational units that can be used to build recursive or iterative algorithms. The modular structure enables systems to grow organically, with each new cell contributing to a larger computational process. The distinction between up-mode (replication) and down-mode (calculation) creates a dual-purpose architecture that supports both system expansion and numerical evaluation. The accumulation of results in down-mode suggests that these cells can be used to compute mathematical series or other aggregative processes.
+**Elaboration:** Modular computational cells operate autonomously, switching between replication and calculation modes. Their outputs feed into a global accumulator, enabling emergent behavior without tight coupling. This design supports horizontal scaling and fault tolerance, but breaks down if tasks demand synchronized state or shared resources.
+
+**Application:** Scalable distributed systems, swarm robotics, parallel AI pipelines
+
+**Failure Mode:** Fails when tasks require strict sequential dependencies or shared memory between units.
+
+**Keywords:** modular,computational cell,self-replication,distributed computation,parallelism,mode-switching,autonomous,aggregator
 
 **Evidence Passages (5):**
 1. "Now suppose we switch the mode to down, and run this big program... The first "cell" runs, and calculates 1/1. The second "cell" runs, calculating -1/3, and adding it to the previous result...."
@@ -5958,10 +7913,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "When it runs in the downmode, it does not self-rep, but instead calculates the number (-1)'/(2N + 1) and adds it to a running total...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.88 (strong signal)
 
 ---
 
-### ❓ FB-173: Mathematical Intuition
+### ❓ FB-170: Mathematical Intuition
 
 **Status:** UNKNOWN
 
@@ -5969,9 +7932,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | f4dc46d3668c8f54527fd4e32264f8f9cc539c046eae2b11065abf3447f4dc24 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -5984,7 +7946,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, some mathematicians can solve complex problems or derive elegant generalizations in moments, appearing to 'see' the solution rather than working through it systematically. This leads to a perception of extraordinary mathematical insight or genius.
 
-**Elaboration:** Mathematical intuition often manifests as an almost immediate recognition of the structure underlying a problem, even when the solution itself is not immediately obvious. It is not random guessing but rather a refined form of pattern matching that emerges from deep familiarity with mathematical concepts. The phenomenon is most pronounced in individuals who have spent years internalizing mathematical relationships. This faculty can be enhanced through extensive practice and exposure to mathematical structures, but it also appears to have a component of natural predisposition. The principle explains why some mathematicians seem to 'know' solutions before they can articulate the steps to reach them.
+**Elaboration:** Mathematical intuition is a pattern-recognition faculty that allows experts to leap to solutions by recalling familiar structures. It relies on a mental library of heuristics built through extensive exposure, enabling rapid synthesis of generalizations. When confronted with truly novel problems, the intuition mechanism degrades to systematic reasoning.
+
+**Application:** Mathematical research, education, problem solving, theorem proving
+
+**Failure Mode:** Fails when the problem requires entirely novel or abstract reasoning not grounded in existing intuition.
+
+**Keywords:** intuition,pattern recognition,heuristics,mathematical insight,experience,generalization
 
 **Evidence Passages (5):**
 1. "There are a couple of anecdotes which illustrate this special power. The first one is related by Hardy: I remember once going to see him when he was lying ill at Putney. I had ridden in taxi-cab No. 1729, and remarked that the number seemed to me rather a dull one, and that I hoped it was not an unfavorable omen. "No,"..."
@@ -5992,10 +7960,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "The other anecdote is taken from a biography of Ramanujan by his countryman S. R. Ranganathan, where it is called "Ramanujan's Flash". It is related by a Indian friend of Ramanujan's from his Cambridge days, Dr. P. C. Mahalanobis...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The definition suggests that mathematical intuition allows for instant solutions or generalizations, which is not supported by the evidence passages. The evidence does not provide 
 
 ---
 
-### ❓ FB-174: Programmatic Identity Simulation
+### ❓ FB-171: Programmatic Identity Simulation
 
 **Status:** UNKNOWN
 
@@ -6003,9 +7979,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 5b3de9c2bfab1382dac4816ec2db24770c2176e71c0363ee1096f50f0e039308 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6018,7 +7993,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, computer programs can engage in discourse that appears genuinely human, leading to situations where humans may mistake programmatic responses for authentic human interaction, particularly in controlled or limited conversational contexts.
 
-**Elaboration:** The simulation becomes more convincing when the program's response patterns align with the psychological or social model it is meant to represent. When programs like 'Doctor' and 'Parry' interact, their combined behaviors can create a dynamic that appears to reflect real human psychological complexity. However, the effectiveness of such simulations depends heavily on the fidelity of the modeled identity and the context in which the simulation occurs. The principle reveals how computational systems can embody and express human-like identity structures, even when they do not possess genuine consciousness or understanding.
+**Elaboration:** Programmatic identity simulation embeds conceptual frameworks—such as belief structures or therapeutic stances—into a computational system. By maintaining internal consistency, the system can generate responses that mimic human-like discourse. Coherence is essential; otherwise, the interaction collapses into nonsensical or contradictory dialogue.
+
+**Application:** Chatbots, virtual assistants, therapeutic AI, educational tutors
+
+**Failure Mode:** Fails when the simulation lacks coherence or the underlying logic does not align with the modeled human behavior.
+
+**Keywords:** identity simulation,conversational AI,psychological modeling,bewief
 
 **Evidence Passages (4):**
 1. "In the Dialogue preceding this Chapter, you have seen an authentic exchange between a computer program and a human...."
@@ -6026,20 +8007,27 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "The former is supposed to simulate a psychiatrist using "nondirective therapy", the latter to simulate the belief structure of a paranoid...."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-175: Meta-Authorship in Computational Creation
+### ❓ FB-172: Meta-authorship in Computational Creation
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 10d9cf94b2044d4fe8cacd2075b97200d575e72e4d10bc389329f459ac183e12 |
+| fb_id | 8d9ffd06fd1c4e58501c57f053ac9daa402c2934162e464a02f4cf09e637564f |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6059,10 +8047,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 2. "In the particular case of Gelernter and his geometry machine, while Gelernter probably would not have rediscovered Pappus' proof, still the mechanisms which generated that proof were sufficiently close to the surface of the program that one hesitates to call the program a geometer in its own right...."
 3. "If it had kept on astonishing people by coming up with ingenious new proofs over and over again, one might have been forced to call the program a geometer...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-176: Symbolic Representation and Meaning
+### ❓ FB-173: Symbolic Representation and Meaning
 
 **Status:** UNKNOWN
 
@@ -6070,9 +8066,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 21ad104c36d6a749a94e00f4805a01be4b072524dee54db199ba36819ddf6844 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6085,17 +8080,31 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, systems that can simulate human-like symbolic processing and activation patterns will be perceived as more intelligent or creative, even if they are not truly conscious, because they align with our intuitive understanding of how meaning arises in minds.
 
-**Elaboration:** The principle implies that the perception of intelligence in machines is not just about functional capability but also about structural similarity to human cognition. This explains why people remain skeptical about AI-generated art or music until it exhibits internal complexity that mirrors human mental processes. The principle also suggests that the development of truly convincing artificial intelligence requires more than just algorithmic advancement—it demands an understanding of how human minds actually organize and process symbolic information. This is why the MU-puzzle and similar constructs are used to explore the limits of symbolic manipulation in relation to human-like understanding. The principle further suggests that until computational systems can demonstrate the kind of internal coherence and pattern recognition that characterizes human cognition, they will not be fully accepted as creators or thinkers.
+**Elaboration:** When symbolic structures in a computational system mirror the activation patterns of human neural networks, they can produce outputs that feel meaningful to observers, even if the system lacks true consciousness. The principle emphasizes that meaning arises from pattern similarity, not just symbol manipulation.
+
+**Application:** AI systems that aim to emulate human-like intelligence, cognitive modeling, natural language processing
+
+**Failure Mode:** Symbol manipulation without semantic grounding or resemblance to human neural activation patterns
+
+**Keywords:** symbolic representation, meaning, cognition, neural patterns, semantic grounding, human-like intelligence
 
 **Evidence Passages (3):**
 1. "to some extent. But until then, I will not feel comfortable in saying "this piece was composed by a computer"...."
 2. "on something similar to the "symbols" in our brains and their triggering patterns, which are responsible for the complex notion of meaning...."
 3. "The fact of having this kind of internal structure would endow the program with properties which would make us feel comfortable in identifying with it, to some extent...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.75 (strong signal)
 
 ---
 
-### ❓ FB-177: Framework Flexibility Principle
+### ❓ FB-174: Framework Flexibility Principle
 
 **Status:** UNKNOWN
 
@@ -6103,9 +8112,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 42cc01f8c19f9ccc642cb67e3d91fc912a93024802ac84bbfe7ca221198e146b |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | software engineering |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6118,7 +8126,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Systems that can flexibly switch between conceptual frameworks will solve complex problems more effectively than those bound to single approaches, because they can adapt their representation of the problem space to better match the solution path.
 
-**Elaboration:** The principle reveals that true intelligence involves meta-cognitive awareness of one's own problem-solving approach. It suggests that the most effective systems must not only solve problems within frameworks but also evaluate whether those frameworks are optimal. This creates a hierarchy of problem-solving: mechanical execution, framework selection, and meta-framework creation. The principle implies that intelligence emerges not from perfect execution of rules, but from the ability to judge when to change rules. Systems that cannot step back and reframe problems will remain trapped in local optima.
+**Elaboration:** Dynamic framework switching allows a system to recognize when its current representation is insufficient and to construct a new conceptual space that better aligns with the goal state, thereby expanding the solution space and improving problem-solving efficiency.
+
+**Application:** Adaptive problem-solving in AI planning, software engineering, and decision support systems
+
+**Failure Mode:** Rigid adherence to a single framework that fails to reduce problem distance or adapt to new information
+
+**Keywords:** framework flexibility, problem representation, adaptive reasoning, conceptual spaces, dynamic switching, solution space
 
 **Evidence Passages (5):**
 1. "how do you choose a good internal representation for a problem? What kind of "space" do you see it in?..."
@@ -6126,10 +8140,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "It would be able to choose to stop working within a given framework, if need be, and to create a new framework of rules within which to work for a..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it allows' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-178: Semiotic Reciprocal Substitution
+### ❓ FB-175: Semiotic Reciprocal Substitution
 
 **Status:** UNKNOWN
 
@@ -6137,9 +8159,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 8533c76e105d3eb64154cc557345211cae94099ae900a472a6f83a8c3481bed9 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | semiotics |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6152,7 +8173,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, communicative systems can generate novel meanings through element exchange, enabling creative expression and adaptive communication patterns.
 
-**Elaboration:** The principle operates across multiple levels of semiotic organization, from linguistic to conceptual. It enables the emergence of humor or novelty in communication when substitutions create unexpected juxtapositions. In computational contexts, this mechanism underlies the generation of seemingly meaningful output from pattern-based substitution. The principle is particularly relevant in systems where content is generated through recursive or iterative processes rather than direct semantic mapping. The mechanism supports both creative and functional communication, depending on how substitutions are applied.
+**Elaboration:** Semiotic reciprocal substitution systematically exchanges semiotic elements while preserving structural relationships, enabling new meanings to emerge from the recontextualization of symbols within recursive semantic layers.
+
+**Application:** Creative communication systems, AI language generation, semiotic analysis, and adaptive storytelling
+
+**Failure Mode:** Lack of structural flexibility that prevents meaningful substitution or disrupts communicative integrity
+
+**Keywords:** semiotic substitution, recursive, structural flexibility, emergent meaning, communicative framework, layer
 
 **Evidence Passages (5):**
 1. "Blurting may be considered as the reciprocal substitution of semiotic material (dubbing) for a semiotic dialogical product in a dynamic reflexion...."
@@ -6160,10 +8187,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "semiotic material (dubbing) for a semiotic dial..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-179: Recursive Structural Generation
+### ❓ FB-176: Recursive Structural Generation
 
 **Status:** UNKNOWN
 
@@ -6171,9 +8206,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 3aa5e66b75350951666d3618edc8e63cbf09a2a80a301645daa698a1a61bcdcf |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6188,16 +8222,28 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Elaboration:** The recursive generation process can create structures that appear to have causal relationships or logical flow, but these are artifacts of the formal system rather than real understanding. The generated content may seem sophisticated or coherent, yet lacks the depth of true comprehension. In domains like music or narrative, such formal generation may produce pseudomusic or pseudo-stories that are valuable for exploration but not genuine artistic expression. The principle reveals a fundamental distinction between syntactic pattern generation and semantic meaning creation.
 
+**Application:** Procedural content generation, formal language synthesis, AI creativity, and algorithmic music composition
+
+**Failure Mode:** Generated structures that lack genuine
+
 **Evidence Passages (5):**
 1. "a recursive LISP procedure called "CASCADE", which creates chains of actions linked in a vaguely causal way to each other..."
 2. "Although the degree of comprehension of the world possessed by this koan generator is clearly not stupendous..."
 3. "Grammars for Music? Then there is music. This is a domain which you might suppose, on first thoug..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.95 (strong signal)
 
 ---
 
-### ❓ FB-180: Recursive Problem Decomposition
+### ❓ FB-177: Recursive Problem Decomposition
 
 **Status:** UNKNOWN
 
@@ -6205,9 +8251,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | db9cf3a54d9bbc43c64f47131509c08815b7dc418d0f17fc94e6bb73ee811815 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6220,7 +8265,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Systems implementing recursive problem decomposition can solve complex problems more efficiently than brute-force search methods, because they organize the search space into manageable subproblems and avoid redundant exploration through backtracking.
 
-**Elaboration:** The mechanism enables systems to handle problems with exponential solution spaces by organizing them into a tree structure where each level represents a deeper decomposition. Backtracking provides a systematic way to recover from dead ends without requiring complete reinitialization. This approach is particularly effective in domains where subproblems can be solved independently but must be coordinated to achieve the overall goal. The process resembles human problem-solving in that it builds upon previous solutions to tackle increasingly complex subproblems. The system's ability to maintain context across different levels of decomposition is crucial for successful problem resolution.
+**Elaboration:** Recursive problem decomposition systematically reduces a complex problem into simpler subproblems, forming a tree of nested subgoals. Backtracking allows the system to abandon a failed path and explore alternatives, thereby avoiding redundant exploration and managing combinatorial explosion.
+
+**Application:** Software engineering, AI planning, operations research
+
+**Failure Mode:** Fails when problems lack hierarchical structure or decomposition cost exceeds benefit
+
+**Keywords:** recursion, decomposition, backtracking, search tree, combinatorial complexity
 
 **Evidence Passages (4):**
 1. "The language [PLANNER]... is an At language whose principal feature is that some of the operations necessary for problem reduction are built in-namely, the recursive process of creating a tree of subgoals, subsubgoals, etc...."
@@ -6228,10 +8279,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "then the [PLANNER] program will "backtrack" and try another route..."
   ... and 1 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-181: Counterfactual Channel Addressing
+### ❓ FB-178: Counterfactual Channel Addressing
 
 **Status:** UNKNOWN
 
@@ -6239,9 +8298,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | ee300b2215e8a11078e5dd8580ec6732e9229c8b7b30c8787b2ccba3da79d783 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6260,10 +8318,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 1. "don't need to know the channel's call letters. Instead, I tune it in by coding, in these dials, the hypothetical situation which I want to be represented. Technically, this is called "addressing a channel by its counterfactual parameters". There are always a large number of channels broadcasting every conceivable world. All the channels which carry worlds that are "near" to each other have c..."
 2. "I want to be represented. Technically, this is called "addressing a channel by its counterfactual parameters". There are always a large number of channels broadcasting every conceivable world. All the channels which carry worlds that are "near" to each other have call letters that are near to each other, too...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI FAIL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-182: Subjective Counterfactual Processing
+### ❓ FB-179: Subjective Counterfactual Processing
 
 **Status:** UNKNOWN
 
@@ -6271,9 +8337,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | c2dc2a6db30e83d777dc670555119e0dff04b84f2590de9b072c33aac9229123 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6293,10 +8358,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 2. "Driving down a country road, you run into a swarm of bees. You don't just duly take note of it; the whole situation is immediately placed in perspective by a swarm of "replays" that crowd into your mind...."
 3. "Typically, you think, "Sure am lucky my window wasn't open!"-or worse, the reverse: "Too bad my window wasn't closed!" "Lucky I wasn't on my bike!"..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.97 (strong signal)
 
 ---
 
-### ❓ FB-183: Counterfactual Reasoning
+### ❓ FB-180: Counterfactual Reasoning
 
 **Status:** UNKNOWN
 
@@ -6304,9 +8377,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | a5f7d72bcd259be08f0868ed8af3229c54c07483975352ba0ecd409fc72de0c2 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6325,10 +8397,18 @@ The dissolution of the ego creates a state where internal and external obstacles
 1. "If Leonardo da Vinci had been born a female the ceiling of the Sistine Chapel might never have been painted...."
 2. "And if Michelangelo had been Siamese twins, the work would have been completed in half the time...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: The evidence passages do not directly support the definition's claim about isolating variables and revealing structural constraints and dependencies in complex systems. The example
 
 ---
 
-### ❓ FB-184: Hypothetical Reasoning Foundation
+### ❓ FB-181: Hypothetical Reasoning Foundation
 
 **Status:** UNKNOWN
 
@@ -6336,9 +8416,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | e63f140ef6e0c1425ce1db937e52cdfb2ec8bf517f0132da7b34951371cb9e32 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6351,17 +8430,31 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because hypothetical reasoning is foundational to human language and cognition, any system or theory of human understanding must account for how these conditional structures enable complex conceptualization and categorization of experiences.
 
-**Elaboration:** The principle reveals that hypothetical reasoning is not merely a grammatical curiosity but a core cognitive mechanism that underlies human creativity and philosophical development. The fact that it appears in both linguistic analysis (Steiner's work) and cognitive science (GEB's exploration) suggests this is a fundamental human capacity rather than a cultural artifact. The principle also implies that any truly human-like reasoning system must incorporate conditional logic as a core component. The 'almost' situations and subjunctive constructions mentioned suggest that humans naturally construct and process near-misses and potential states as part of their conceptual toolkit. This foundation supports both the richness of human language and the depth of human philosophical inquiry.
+**Elaboration:** Hypothetical reasoning provides a syntactic and logical scaffold that allows humans to construct, compare, and integrate alternative realities, enabling complex conceptualization and categorization.
+
+**Application:** language modeling, AI reasoning, philosophical analysis
+
+**Failure Mode:** fails when communication is purely factual, immediate, or lacks grammatical structure for conditional statements
+
+**Keywords:** hypothetical reasoning, counterfactuals, conditional, language, cognition, conceptual organization
 
 **Evidence Passages (3):**
 1. "Hypotheticals, 'imaginaries', conditionals, the syntax of counter-factuality and contingency may well be the generative centres of human speech..."
 2. "believe that "almost" situations and unconsciously manufactured subjunctives represent some of the richest potential sources of insight into how human beings organize and categorize their perceptions of the world..."
 3. "No less than future tenses to which they are, one feels, related..."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** mech_quality
+- **borp_score:** 1.0
+- **epistemic_status:** cross-source-unverified
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
+- **factual:** MECH FAIL: Mechanism contains tautological pattern 'because it provides' — restates definition rather than explaining causal chain. QUARANTINE.
 
 ---
 
-### ❓ FB-185: Hierarchical Description Decomposition
+### ❓ FB-182: Hierarchical Description Decomposition
 
 **Status:** UNKNOWN
 
@@ -6369,9 +8462,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | 8c33d7850031473e0acb0fea96d528d468a5961a24f05da69417495388290e30 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6384,16 +8476,30 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, problem-solving approaches can be generalized across domains by identifying and reusing common structural templates, reducing cognitive load and enabling faster understanding of new problems through familiar organizational frameworks.
 
-**Elaboration:** The hierarchical structure emerges organically from the natural grouping of related concepts, with each level representing a different degree of abstraction. The preprocessor level represents the fundamental building blocks that cannot be further decomposed without losing meaning. This principle enables the creation of meta-level frameworks that can be applied across multiple domains, from mathematical proofs to artistic compositions. The template schemas created through this process can be refined and expanded as new patterns are discovered, making the system adaptive to new information. The principle also suggests that truly fundamental concepts exist at the preprocessor level, which serve as the foundation for all higher-level reasoning.
+**Elaboration:** By recursively breaking down complex problems into nested subdescriptions, hierarchical decomposition reveals shared structural patterns that can be captured as reusable template schemas, reducing cognitive load and enabling cross-domain generalization.
+
+**Application:** software architecture, system design, knowledge modeling
+
+**Failure Mode:** fails when problems lack inherent structural similarities or decomposition becomes overly rigid
+
+**Keywords:** hierarchical decomposition, template schemas, preprocessor, structural patterns, problem solving
 
 **Evidence Passages (2):**
 1. "the boxes in a problem. The idea is that a description can often be broken up in a natural way into subdescriptions, and those in turn into subs ubdescriptions, if need be. The bottom is hit when you come to primitive concepts which belong to the level of the preprocessor...."
 2. "preprocessing is an attempt to manufacture a template, or description-schema-a un form format for the descriptions of all the boxes in a problem. The idea is that a description can often be broken up in a natural way into subdescriptions, and those in turn into subs ubdescriptions, if need be. The bottom is hit when you come to primitive concepts which belong to the level of the preprocessor...."
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.90 (strong signal)
 
 ---
 
-### ❓ FB-186: Conceptual Abstraction
+### ❓ FB-183: Conceptual Abstraction
 
 **Status:** UNKNOWN
 
@@ -6401,9 +8507,8 @@ The dissolution of the ego creates a state where internal and external obstacles
 |----------|-------|
 | fb_id | c051df2db9fe8c4392fba0b984dfe3af1305c542e3ac672ef692d7f6656e8d27 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | cognitive science |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6416,7 +8521,13 @@ The dissolution of the ego creates a state where internal and external obstacles
 
 **Consequence:** Because of this principle, knowledge systems can store and process vast amounts of information efficiently by organizing it into hierarchical conceptual structures rather than maintaining detailed raw data.
 
-**Elaboration:** The abstraction process creates a trade-off between detail preservation and conceptual clarity. While some information is lost in the abstraction process, the resulting conceptual structures enable powerful reasoning and inference capabilities. The principle works best when the abstracted concepts form a coherent hierarchy that reflects real-world relationships. In some cases, multiple levels of abstraction may be necessary to capture both high-level concepts and their detailed properties. The effectiveness of abstraction depends on the ability to identify which details are truly irrelevant to the conceptual relationships being modeled.
+**Elaboration:** Conceptual abstraction filters out extraneous details from raw data, creating generalizable categories that support hierarchical organization and efficient storage and retrieval in concept networks.
+
+**Application:** knowledge representation, AI knowledge bases, educational curriculum design
+
+**Failure Mode:** fails when specific details are essential or abstraction removes critical distinguishing features
+
+**Keywords:** abstraction, generalization, hierarchical organization, concept networks, cognitive load
 
 **Evidence Passages (5):**
 1. "Of course an enormous amount of information has been thrown away concerning the sizes, positions, and orientations of these triangles, and many other things as well. But that is the whole point of making descriptions instead of just using the raw data! It is the same idea as funneling, which we discussed in Chapter XI...."
@@ -6424,20 +8535,27 @@ The dissolution of the ego creates a state where internal and external obstacles
 3. "A polygon is a closed curve. The difference between a triangle and a square is that one has 3 sides and the other has 4. 4 is similar to 3. A circle is a closed curve. A closed curve has an interior and an exterior. "Interior" and "exterior" are opposites...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---
 
-### ❓ FB-187: Context-Dependent Description Filtering
+### ❓ FB-184: Context-dependent Description Filtering
 
 **Status:** UNKNOWN
 
 | Property | Value |
 |----------|-------|
-| fb_id | 0fc58d699bfaac04fa3498ae622f1c8f00f2f64d070e7c0818ae695b795eb3d7 |
+| fb_id | 187294111c9f236eff22632457d1d7551401783412509b1ff2c2662907efc169 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | emerging |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6464,15 +8582,11 @@ It also fails when there is no meaningful distinction between contexts or when a
 
 This principle implies that intelligent systems must be able to dynamically adjust their level of abstraction and filtering based on the problem domain, and that overly general or rigid descriptions can lead to misinterpretation or incorrect conclusions. It also suggests that the best description for a given problem is often one that is tailored to that specific context rather than a universal one.
 
-**Elaboration:** The principle reveals that descriptions are not static or absolute but are shaped by the observer's perspective and the problem space. This has implications for how we approach pattern recognition, classification, and even human communication, where the same object or event can be described in multiple ways depending on the audience or purpose.
+**Elaboration:** Context-dependent description filtering recognizes that a
 
-In systems design, this principle suggests that effective pattern recognition systems must be able to handle multiple levels of abstraction and must be capable of adjusting their filtering mechanisms based on context. It also implies that the best approach to problem-solving often involves starting with a high-level description and then refining it to match the specific constraints of the problem.
+**Application:** pattern recognition, classification systems, AI model interpretation
 
-The principle also touches on the concept of 'overloaded' or 'right' descriptions that work in one context but not another, suggesting that the most effective descriptions are often those that are explicitly conditional or framed within specific constraints. This aligns with the idea that good descriptions are not just accurate but also appropriately contextualized.
-
-In Bongard problems, this principle demonstrates that the same visual elements can be interpreted in radically different ways depending on the problem's constraints, and that the most effective solution requires understanding how to frame the problem in a way that makes the correct interpretation obvious.
-
-The principle also implies that there is a fundamental trade-off between the richness of a description and its specificity to a context, which has implications for how we design systems that must balance generality with precision.
+**Failure Mode:** fails when descriptions are assumed universally applicable or context is ignored
 
 **Evidence Passages (5):**
 1. "Each of these descriptions sees the box through a "filter". Out of context, any of them might be a useful description. As it turns out, though, all of them are "wrong", in the context of the particular Bongard problem they are part of...."
@@ -6480,10 +8594,18 @@ The principle also implies that there is a fundamental trade-off between the ric
 3. "The trick, then, is to devise explicit rules that say how to make tentative descriptions for each box; compare them with tentative descriptions for other boxes..."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI PASS: NLI PASS: max entailment 0.99 (strong signal)
 
 ---
 
-### ❓ FB-188: Focusing and Filtering
+### ❓ FB-185: Focusing and Filtering
 
 **Status:** UNKNOWN
 
@@ -6491,9 +8613,8 @@ The principle also implies that there is a fundamental trade-off between the ric
 |----------|-------|
 | fb_id | 93fcd00ba88e39d085a1eca03aee4546f03e4ba0f0a738f46a46aa714ddfdbb4 |
 | source_books | Godel Escher Bach An Eternal Golden Braid (Hofstadter Douglas) (z-library.sk, 1lib.sk, z-lib.sk).md, Godel, Escher, Bach-An Eternal Golden Braid (Douglas R. Hofstadter) (z-library.sk, 1lib.sk, z-lib.sk).md |
-| source_diversity | 2 |
-| is_convergent | True |
-| extraction_type | causal_mechanism |
+| depth | cross-domain |
+| discipline | psychology |
 | gen_model | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit |
 | pipeline_commit | 12bc968 |
 | schema_version | 3.0 |
@@ -6506,7 +8627,13 @@ The principle also implies that there is a fundamental trade-off between the ric
 
 **Consequence:** Because of this principle, complex pattern recognition tasks can be solved more efficiently by systematically identifying and analyzing the most informative elements while eliminating noise, enabling programs and humans to tackle problems like Bongard puzzles with reduced cognitive burden.
 
-**Elaboration:** Focusing can be achieved by examining the simplest or most distinctive examples in a dataset, which often reveals the key distinguishing characteristics. Filtering works by eliminating all but one relevant attribute, such as focusing only on size while ignoring shape or color. These processes are particularly effective in hierarchical or comparative analysis where the goal is to identify the minimal set of features that distinguish between classes. The combination of focusing and filtering creates a systematic approach to pattern discrimination that mirrors how human perception and machine learning algorithms can be optimized for classification tasks. When applied to Bongard problems, this principle enables the identification of the critical distinguishing feature through selective attention and elimination of irrelevant variables.
+**Elaboration:** Focusing narrows attention to salient, simple elements that expose distinguishing characteristics, while filtering removes distracting or irrelevant concepts. Together they reduce cognitive load, enabling efficient extraction of critical attributes in complex data. This dual process is especially useful in tasks like Bongard problems, where isolating a single distinguishing feature among many distractors is essential.
+
+**Application:** pattern recognition, artificial intelligence, educational assessment
+
+**Failure Mode:** fails when relevant features are not clearly separable or when a holistic, non‑componential analysis is required
+
+**Keywords:** focusing, filtering, pattern recognition, cognitive load, feature selection, Bongard problems, attention, noise reduction
 
 **Evidence Passages (5):**
 1. "Focusing and Filtering Now let us deal with another question: ways to throw information out. This involves two related notions, which I call "focusing" and "filtering"...."
@@ -6514,5 +8641,13 @@ The principle also implies that there is a fundamental trade-off between the ric
 3. "BP 22 (Fig. 127) presents an example of filtering. Here, we must filter out every concept but that of size...."
   ... and 2 more
 
+- **verifier_model:** Phi-4-mini-instruct-8bit
+- **verification_method:** nli+LLM
+- **borp_score:** 1.0
+- **epistemic_status:** corroborated
+- **BORP:** 2 distinct canonical sources (need ≥2)
+- **completeness:** All fields present
+- **mechanism_quality:** Mechanism quality OK
+- **factual:** NLI MARGINAL → LLM: LLM: factually consistent
 
 ---

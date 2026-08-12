@@ -342,3 +342,167 @@ def fb_source_principle_ids(fb: dict[str, Any]) -> list[str]:
     """Principle IDs from Stage 2 (reference, not embedded text)."""
     ids = fb.get("source_principle_ids", [])
     return ids if isinstance(ids, list) else []
+
+
+# ── D2283: FB Schema Split — Core vs Enrichment Contract ─────────────────
+
+# Core fields: output by S2 extraction, verified by S5 NLI.
+# These are factual claims about the source text — must be evidence-grounded.
+FB_CORE_FIELDS: tuple[str, ...] = (
+    "name",
+    "definition",
+    "mechanism",
+    "boundary",
+    "consequence",
+    "evidence_passages",
+    "evidence_passages_shown",
+    "source_books",
+    "source_principles",
+    "is_summary",
+    "is_convergent",
+)
+
+# Enrichment fields: output by S4 classification, NOT verified by S5.
+# These are metadata, interpretation aids, and downstream consumption labels.
+# S5 must NOT use enrichment fields for verification (D2283: no field substitution).
+FB_ENRICHMENT_FIELDS: tuple[str, ...] = (
+    "application",
+    "failure_mode",
+    "elaboration",
+    "jargon",
+    "domains",
+    "depth",
+    "discipline",
+    "extraction_type",
+    "route",
+    "confidence",
+    "cribs_warnings",
+)
+
+
+def fb_is_core_field(field_name: str) -> bool:
+    """D2283: Returns True if field is a core (verified) field."""
+    return field_name in FB_CORE_FIELDS
+
+
+def fb_is_enrichment_field(field_name: str) -> bool:
+    """D2283: Returns True if field is an enrichment (unverified) field."""
+    return field_name in FB_ENRICHMENT_FIELDS
+
+
+def fb_core_fields_present(fb: dict[str, Any]) -> dict[str, bool]:
+    """D2283: Check which core fields are present and non-empty in an FB.
+
+    Returns a dict of field_name → bool. Used by verification stages
+    to ensure core fields exist before NLI checks.
+    """
+    result: dict[str, bool] = {}
+    for field in FB_CORE_FIELDS:
+        val = fb.get(field)
+        if val is None:
+            result[field] = False
+        elif isinstance(val, str):
+            result[field] = len(val.strip()) > 0
+        elif isinstance(val, (list, tuple)):
+            result[field] = len(val) > 0
+        elif isinstance(val, bool):
+            result[field] = True  # booleans are always "present" regardless of value
+        else:
+            result[field] = val is not None
+    return result
+
+
+# ── D2284: ISOR — Independent Source Support Ratio ───────────────────────
+
+def _extract_author_surname(source_book: str) -> str:
+    """Extract author surname from a 'Title — Author Name' source book string.
+
+    Handles: 'Predictably Irrational — Dan Ariely' → 'Ariely'
+             'Thinking, Fast and Slow — Daniel Kahneman' → 'Kahneman'
+             'Priceless — William Poundstone' → 'Poundstone'
+    """
+    if " — " in source_book:
+        author_part = source_book.split(" — ", 1)[1].strip()
+        # Take last word as surname
+        parts = author_part.split()
+        if parts:
+            return parts[-1].lower()
+    return source_book.lower()
+
+
+def isor_score(fb: dict[str, Any]) -> dict[str, Any]:
+    """D2284: Compute ISOR (Independent Source Support Ratio) for an FB.
+
+    Beyond simple BORP≥2 count. Evaluates three dimensions:
+      1. Author independence: distinct authors / total sources
+      2. Domain diversity: distinct domains across sources (proxy for evidence tradition)
+      3. Source count: raw distinct source book count
+
+    Returns dict with scores and a composite independence rating.
+
+    Rating scale:
+      - "strong": ≥2 authors, ≥2 domains, ≥3 sources
+      - "medium": ≥2 authors OR ≥2 domains, ≥2 sources
+      - "weak": single author/source
+    """
+    source_books = fb.get("source_books", [])
+    if not isinstance(source_books, list) or len(source_books) == 0:
+        return {
+            "score": 0.0,
+            "rating": "weak",
+            "n_sources": 0,
+            "n_authors": 0,
+            "n_domains": 0,
+            "detail": "No source books",
+        }
+
+    # 1. Author independence
+    authors: set[str] = set()
+    for sb in source_books:
+        surname = _extract_author_surname(str(sb))
+        if surname:
+            authors.add(surname)
+    n_authors = len(authors)
+    author_score = min(n_authors / max(len(source_books), 1), 1.0)
+
+    # 2. Domain diversity (from FB domains field)
+    domains = fb.get("domains", [])
+    if not isinstance(domains, list):
+        domains = [domains] if domains else []
+    n_domains = len(set(domains))
+    domain_score = min(n_domains / 3.0, 1.0)  # 3+ domains = full score
+
+    # 3. Raw source count
+    n_sources = len(set(source_books))
+    count_score = min(n_sources / 3.0, 1.0)  # 3+ sources = full score
+
+    # Composite score: weighted average
+    composite = round(0.50 * author_score + 0.25 * domain_score + 0.25 * count_score, 3)
+
+    # Rating
+    if n_authors >= 2 and n_domains >= 2 and n_sources >= 3:
+        rating = "strong"
+    elif n_authors >= 2 or n_domains >= 2 and n_sources >= 2:
+        rating = "medium"
+    else:
+        rating = "weak"
+
+    return {
+        "score": composite,
+        "rating": rating,
+        "n_sources": n_sources,
+        "n_authors": n_authors,
+        "n_domains": n_domains,
+        "author_score": round(author_score, 3),
+        "domain_score": round(domain_score, 3),
+        "count_score": round(count_score, 3),
+        "detail": (
+            f"ISOR {rating}: {n_authors} authors, {n_domains} domains, "
+            f"{n_sources} sources → composite {composite}"
+        ),
+    }
+
+
+def isor_rating(fb: dict[str, Any]) -> str:
+    """D2284: Shortcut — return just the ISOR rating string (strong/medium/weak)."""
+    return str(isor_score(fb).get("rating", "weak"))

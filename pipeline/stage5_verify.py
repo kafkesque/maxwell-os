@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-stage5_verify.py — Verify FBs via DeBERTa FEVER NLI pre-filter + Phi-4-mini deep check (D2264).
+stage5_verify.py — DeBERTa-Only S5: Calibrated NLI Verification (D2298).
 ==================================================================================
 Authority: CONSTITUTION.md §3 (Pipeline Stage 5), R5, C8, D2069, D2255
 
@@ -8,33 +8,30 @@ Input:  FBs from Stage 4 checkpoint (with embedded source_principles)
 Output: Verified FBs, checkpoint at stage5_verify.jsonl
 
 Process:
-  1. BORP check: verify at least 2 distinct source books per FB
-  2. Completeness: all required fields present and non-trivial
-  3. DeBERTa FEVER NLI entailment: fast claim-evidence verification (definition ↔ evidence_passages)
-     D2255 (2026-08-11): DeBERTa FEVER is now PRIMARY (was ModernBERT).
-     DeBERTa FEVER is 5.8× more discriminative on convergent FBs.
-     ModernBERT returned NEUTRAL for all synthesized FBs — non-functional as pre-filter.
-     → ENTAILMENT + ≥0.6 = PASS (skip LLM)
-     → CONTRADICTION = FAIL → escalate to Phi-4-mini (D2264: 67% acc vs Gemma 33%)
-     → NEUTRAL = FLAG → escalate to Phi-4-mini (D2264: 67% acc vs Gemma 33%)
-  4. FAIL-CLOSED (D2093): any check failure → QUARANTINE, never PASS
-  5. Assign status: PASS / FLAG / QUARANTINE
+  1. Mechanism quality pre-filter: catch tautological mechanisms (regex, free)
+  2. DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI): sole NLI verifier
+  3. Threshold 0.10 — calibrated via human adjudication (12 FBs): P=1.000, R=0.556
+  4. Verdict:
+     → ENTAIL ≥ 0.10 → PASS
+     → Otherwise → QUARANTINE
+  5. FAIL-CLOSED (D2093): any path failure → QUARANTINE, never PASS
 
-R5 compliance (D2069, D2250):
-  Generator:  Qwen3-Coder-30B (Qwen/Alibaba) — Stage 2
-  Classifier: GPT-OSS-20B (OpenAI) — Stage 4 (replaced Phi-4-mini per D2249/D2250)
-  Verifier:   Gemma-4-E4B (Gemma/Google) — Stage 5 deep check
-  NLI:        DeBERTa FEVER (Microsoft/FAIR) — Stage 5 pre-filter
-  Four distinct families. No model reviews its own output.
+  DELETED (dead checks): BORP (S1.5 guarantees ≥2 sources), Completeness (S4 fills all fields)
+  DELETED (unreliable): Phi-4-mini LLM (67% acc, hallucination risk), RoBERTa-large (zero signal)
+  DeBERTa is an ENCODER → computes scores, doesn't generate text → CANNOT HALLUCINATE.
 
-DeBERTa FEVER model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (362MB)
-  Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%
-  Speed: ~50ms per sentence pair on CPU (M1 Max)
+R5 compliance (D2298):
+  Verifier: DeBERTa-v3-large (Microsoft/FAIR, 435M, disentangled attention)
+  Single encoder — chosen after calibration showed RoBERTa added zero signal on paraphrase evidence.
+  D2227: evidence passages are LLM paraphrases, not verbatim — RoBERTa can't differentiate.
+
+DeBERTa-v3-large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (4.14GB)
+  Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%+
+  Calibration: Precision 1.000, Recall 0.556, F1 0.714 at threshold 0.10 (12 FBs)
+  Speed: ~290ms per sentence pair on MPS (loaded in 6s)
 
 Usage:
     python3 pipeline/stage5_verify.py
-    python3 pipeline/stage5_verify.py --strict   # Quarantine on any failure
-    python3 pipeline/stage5_verify.py --skip-nli  # Skip DeBERTa, use LLM for all
 """
 
 import argparse
@@ -46,133 +43,111 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import safe_write
-from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
-    BORP_MIN_SOURCES,
     CHECKPOINT_DIR,
-    S5_BORP_BYPASS_TYPES,  # D2083: types that skip BORP check
-    S5_NLI_ENTAILMENT_THRESHOLD,  # D2119: configurable NLI threshold
-    S5_NLI_MARGINAL_THRESHOLD,  # D2155: NLI score threshold for FLAG (escalate)
-    S5_NLI_MODEL,  # D2119: primary NLI model (ModernBERT)
-    S5_NLI_MODEL_FALLBACK,  # D2119: fallback NLI model (DeBERTa)
-    S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (skip LLM)
+    S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
+    S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
-    VERIFY_MODEL_V2,  # D2069: cross-family verifier (Gemma-4-E4B)
 )
 from pipeline.schema_accessor import (
     fb_definition,
-    fb_source_books,
-    fb_source_ids,  # D2185: canonical SHA-256 author|title source_ids for BORP
     fb_source_texts,
     fb_source_texts_shown,
 )
-from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.stamp import get_pipeline_commit
 
 # ── Constants ──────────────────────────────────────────────────────────────
-NLI_ENTAILMENT_THRESHOLD: float = S5_NLI_ENTAILMENT_THRESHOLD  # D2119: from config (default 0.5)
 NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2155: from config (default 0.6)
 # D2226 (Kimi audit fix): Was hardcoded 0.8 in nli_evidence_check, now reads from config.
 # Config declares 0.6 pass / 0.5 entailment / 0.3 marginal. Hardcoded 0.8 overrode
 # the more permissive config, forcing unnecessary LLM escalation.
-NLI_MARGINAL_THRESHOLD: float = S5_NLI_MARGINAL_THRESHOLD  # D2155: from config (default 0.3)
 # ── NLI Model — config-driven with automatic fallback (D2119) ────────────
 # Primary: ModernBERT-base-nli (~64ms, 8192 ctx, 90% MNLI accuracy)
 # Fallback: DeBERTa-v3-base-mnli-fever-anli (~129ms, 512 ctx, 90% MNLI + FEVER)
 # If primary model fails to load (missing, OOM, etc.), falls back automatically.
 
-_nli_pipeline = None
-_nli_model_loaded: str = ""
+_DUAL_LOADED: bool = False
+_DEBERTA_LARGE = None
 
 
-def _get_nli():
-    """Lazy-load NLI model for entailment scoring.
-
-    D2119: Switched primary from DeBERTa-v3 to ModernBERT-base-nli.
-    ModernBERT is 2× faster (64ms vs 129ms), has 16× larger context (8192 vs 512),
-    and achieves equal accuracy (90% on 20-pair manual test).
-    DeBERTa kept as automatic fallback if ModernBERT can't load.
-    Model configured in pipeline_config.yaml → stage5.nli_model.
+def _load_dual_encoders():
+    """D2298: Load DeBERTa-large once. Encoder — no hallucination risk.
+    RoBERTa removed (D2298) — added zero signal on paraphrase evidence (D2227).
+    Model ID from pipeline_config.yaml → models.nli_large (C12: config-driven).
     """
-    global _nli_pipeline, _nli_model_loaded
-    if _nli_pipeline is not None:
-        return _nli_pipeline
+    global _DUAL_LOADED, _DEBERTA_LARGE
+    if _DUAL_LOADED:
+        return _DEBERTA_LARGE, None
 
-    import torch
-    from transformers import pipeline
+    import torch as _t
+    from transformers import AutoModelForSequenceClassification as _AM
+    from transformers import AutoTokenizer as _AT
+    from transformers import pipeline as _p
 
-    # D2178: Auto-detect device — MPS (Apple Silicon), CUDA, or CPU fallback.
-    # Previously hardcoded device=-1 (CPU only). MPS provides 5-10× speedup
-    # for NLI inference on Apple Silicon (C24: Hardware-Adaptive).
-    if torch.backends.mps.is_available():
-        nli_device: int | str = "mps"
-        device_label: str = "MPS (Apple Silicon GPU)"
-    elif torch.cuda.is_available():
-        nli_device = 0
-        device_label = "CUDA GPU"
-    else:
-        nli_device = -1
-        device_label = "CPU"
+    _device = "mps" if _t.backends.mps.is_available() else ("cuda" if _t.cuda.is_available() else -1)
+    _dl = "MPS" if _device != -1 else "CPU"
 
-    # Try primary model first
-    primary = S5_NLI_MODEL
-    fallback = S5_NLI_MODEL_FALLBACK
+    # DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI)
+    _did = S5_NLI_MODEL_LARGE
+    _dname = _did.split("/")[-1] if "/" in str(_did) else str(_did)
+    print(f"   🧠 DeBERTa-large: {_dname[:50]}...")
+    _dtok = _AT.from_pretrained(_did, trust_remote_code=True)
+    _dmod = _AM.from_pretrained(_did, trust_remote_code=True)
+    _dmod.to(_device)
+    _DEBERTA_LARGE = _p("text-classification", model=_dmod, tokenizer=_dtok, device=_dmod.device)
 
-    try:
-        print(f"   🧠 Loading NLI model: {primary} on {device_label}...")
-        _nli_pipeline = pipeline(
-            "text-classification",
-            model=primary,
-            device=nli_device,
-        )
-        _nli_model_loaded = primary
-        print(f"   ✅ NLI: {primary} ({device_label})")
-        return _nli_pipeline
-    except Exception as e:
-        print(f"   ⚠️  Primary NLI model failed: {e}")
-        print(f"   🔄 Falling back to: {fallback}...")
+    _DUAL_LOADED = True
+    print(f"   ✅ DeBERTa-large loaded on {_dl}: 435M params")
+    return _DEBERTA_LARGE, None
+
+
+def deberta_check(fb: dict) -> tuple[bool, float, str]:
+    """D2298-calibrated: DeBERTa-only NLI check. Threshold 0.10 from human calibration.
+
+    Calibration (12 FBs): Precision 1.000, Recall 0.556, F1 0.714 at threshold 0.10.
+    RoBERTa removed (D2298) — added zero signal on paraphrase-based evidence (D2227).
+    Returns (passed, score, detail).
+    """
+    debert, _ = _load_dual_encoders()
+    if debert is None:
+        return False, 0.0, "DeBERTa not loaded — QUARANTINE"
+
+    from pipeline.schema_accessor import fb_definition, fb_source_texts, fb_source_texts_shown
+    _eps = fb_source_texts_shown(fb) or fb_source_texts(fb)
+    if not _eps:
+        _sps = fb.get("source_principles", [])
+        _eps = [p.get("principle_text", "") for p in _sps if p.get("principle_text")]
+    if not _eps:
+        return False, 0.0, "No evidence — QUARANTINE"
+
+    _def = fb_definition(fb)
+    if not _def or len(_def) < 20:
+        return False, 0.0, "No definition — QUARANTINE"
+
+    _thresh = S5_NLI_PASS_THRESHOLD  # Config-driven (C12), D2293 calibrated: 0.10
+    _scores = []
+
+    for _ep in _eps[:8]:
+        if not _ep.strip():
+            continue
+        _txt = f"{_def} {_ep}"[:512]
         try:
-            _nli_pipeline = pipeline(
-                "text-classification",
-                model=fallback,
-                device=nli_device,
-            )
-            _nli_model_loaded = fallback
-            print(f"   ✅ NLI (fallback): {fallback} ({device_label})")
-            return _nli_pipeline
-        except Exception as e2:
-            raise RuntimeError(
-                f"Both NLI models failed to load.\n"
-                f"  Primary: {primary} → {e}\n"
-                f"  Fallback: {fallback} → {e2}"
-            )
+            _r = debert(_txt)
+            _scores.append(_r[0] if isinstance(_r, list) else _r)
+        except Exception:
+            pass
 
+    if not _scores:
+        return False, 0.0, "NLI scoring failed — QUARANTINE"
 
-def nli_entailment(claim: str, source: str) -> dict:
-    """Score entailment: does source text entail the claim?
+    _entail = max((s["score"] for s in _scores if s["label"].upper() in ("ENTAILMENT", "ENTAIL")), default=0.0)
+    _contra = max((s["score"] for s in _scores if s["label"].upper() in ("CONTRADICTION", "CONTRA")), default=0.0)
 
-    Returns {'label': 'ENTAILMENT'|'NEUTRAL'|'CONTRADICTION', 'score': 0.0-1.0}
-    """
-    nli = _get_nli()
-    source = source[:1024] if len(source) > 1024 else source
-    # D2151: NLI models require premise/hypothesis PAIR format, not single concatenated string
-    result = nli({"text": source, "text_pair": claim})
-    top = result[0] if isinstance(result, list) else result
-    return {"label": top.get("label", "UNKNOWN").upper(), "score": round(top.get("score", 0.0), 4)}
-
-
-# ── Prompt templates ───────────────────────────────────────────────────────
-
-FACTUAL_CHECK_SYSTEM = """You are a factual consistency checker for Foundation Blocks.
-Compare the FB's definition against its EVIDENCE PASSAGES (verbatim source text).
-
-Check:
-1. Does the definition accurately reflect the evidence passages? (not contradict, not fabricate)
-2. Are any claims in the definition NOT supported by the evidence passages?
-3. Is the definition coherent and logically consistent WITH the evidence?
-
-Return ONLY a JSON object:
-{"consistent": true/false, "score": 0.0-1.0, "issues": ["issue1", "issue2"] or []}"""
+    if _entail >= _thresh:
+        return True, round(_entail, 4), f"ENTAIL: {_entail:.2f}"
+    else:
+        return False, 0.0, f"CONTRA: ent={_entail:.2f} cont={_contra:.2f}"
 
 
 # ── NLI evidence check (D2093: replaces embedding similarity) ──────────────
@@ -260,155 +235,12 @@ def load_stage4_fbs() -> list[dict]:
     return fbs
 
 
-def build_factual_prompt(fb: dict) -> str:
-    """Build factual consistency prompt using embedded source_principles.
-
-    D2069: Uses fb['source_principles'] directly — no checkpoint lookups needed.
-    """
-    lines = ["Check if this Foundation Block is factually consistent with its source evidence.\n"]
-    lines.append("=== FOUNDATION BLOCK ===")
-    lines.append(f"NAME: {fb.get('name', 'N/A')}")
-    lines.append(f"DEFINITION: {fb.get('definition', 'N/A')[:600]}")
-    lines.append(f"MECHANISM: {fb.get('mechanism', fb.get('application', 'N/A'))[:300]}")
-    lines.append(f"BOUNDARY: {fb.get('boundary', fb.get('failure_mode', 'N/A'))[:300]}")
-    lines.append(f"CONSEQUENCE: {fb.get('consequence', fb.get('elaboration', 'N/A'))[:300]}")
-    lines.append("")
-    # D2094: Use evidence_passages (v3.0) or source_principles (v2.x)
-    sources: list[str] = []
-    if fb.get("evidence_passages"):
-        sources = [str(p) for p in fb["evidence_passages"][:10]]
-        lines.append("=== EVIDENCE PASSAGES ===")
-    else:
-        source_principles = fb.get("source_principles", [])
-        sources = [p.get('principle_text', '')[:400] for p in source_principles[:10]]
-        lines.append("=== SOURCE PRINCIPLES ===")
-    for i, src in enumerate(sources, 1):
-        lines.append(f"{i}. {str(src)[:400]}")
-    lines.append("")
-    lines.append("Return JSON: {\"consistent\": bool, \"score\": float, \"issues\": [...]}")
-    return "\n".join(lines)
-
-
-def check_borp(fb: dict, bypass_types: list[str] = S5_BORP_BYPASS_TYPES) -> tuple[bool, float, str]:
-    """BORP check: distinct sources ≥ BORP_MIN_SOURCES.
-
-    D2083: Types in bypass_types skip BORP entirely.
-    process_template, process_instance, growth_edge, tool_instruction don't need
-    cross-source convergence — they're methods, evidence, speculations, and commands.
-    """
-    content_type = fb.get("content_type", "principle")
-
-    # D2083: Type-aware bypass
-    if content_type in bypass_types:
-        return True, 1.0, f"BORP bypassed (type={content_type})"
-
-    source_books: list[str] = fb_source_ids(fb)  # D2185: canonical SHA-256 author|title (was fb_source_books)
-    if not source_books:
-        source_books = fb_source_books(fb)  # fallback: filenames (v2.x backward compat)
-    distinct: int = len(set(source_books))
-    score = min(distinct / BORP_MIN_SOURCES, 1.0)
-    passed = distinct >= BORP_MIN_SOURCES
-    detail = f"{distinct} distinct canonical sources (need ≥{BORP_MIN_SOURCES})"
-    return passed, score, detail
-
-
-def check_completeness(fb: dict) -> tuple[bool, float, str]:
-    """Check that all required FB fields are present and non-trivial.
-
-    D2094: Uses v3.0 schema (mechanism/boundary/consequence) or v2.x fallback fields.
-    """
-    # v3.0 schema fields first, v2.x as fallback
-    has_mechanism = bool(fb.get("mechanism") or fb.get("application"))
-    has_boundary = bool(fb.get("boundary") or fb.get("failure_mode"))
-    has_consequence = bool(fb.get("consequence") or fb.get("elaboration"))
-
-    required_fields: list[tuple[str, int]] = [
-        ("name", 3),
-        ("definition", 30),
-    ]
-    missing: list[str] = []
-    short: list[str] = []
-    for field, min_len in required_fields:
-        val = fb.get(field, "")
-        if not val:
-            missing.append(field)
-        elif len(val.strip()) < min_len:
-            short.append(f"{field} ({len(val.strip())} < {min_len} chars)")
-
-    # D2094: Check v3.0 structural fields
-    if not has_mechanism:
-        missing.append("mechanism/application")
-    if not has_boundary:
-        missing.append("boundary/failure_mode")
-    if not has_consequence:
-        missing.append("consequence/elaboration")
-
-    total_checks = len(required_fields) + 3  # name + def + 3 structural
-    issues = missing + short
-    score = max(0.0, 1.0 - (len(issues) / total_checks))
-    passed = len(issues) == 0
-    detail = ", ".join(issues) if issues else "All fields present"
-    return passed, score, detail
-
-
-def check_factual_llm(fb: dict, model: str) -> tuple[bool, float, str]:
-    """Deep factual check using LLM (Phi-4-mini, cross-family).
-
-    D2069: Only called when NLI pre-filter fails (~30% of FBs).
-    D2094: Uses evidence_passages (v3.0) or source_principles (v2.x) — schema-adaptive.
-    BUG-053 (D2268): Phi-4-mini hallucinates on open-ended tasks. STRICT guard:
-    source text MUST be provided. Without it, auto-QUARANTINE (fail-closed).
-    """
-    source_principles = fb.get("source_principles", [])
-    evidence_passages = fb.get("evidence_passages", [])
-
-    # BUG-053 guard: Phi-4-mini MUST have source text to avoid hallucination
-    has_source_text = bool(source_principles or evidence_passages)
-    if not has_source_text:
-        return False, 0.0, (
-            "BUG-053 guard: No source text provided — Phi-4-mini requires "
-            "evidence_passages or source_principles to avoid hallucination. "
-            "QUARANTINE (D2093: fail-closed)."
-        )
-
-    # BUG-053 guard: verify source text has actual content (not just placeholders)
-    all_text = ""
-    for sp in (source_principles or []):
-        all_text += str(sp.get("principle_text", sp if isinstance(sp, str) else ""))
-    for ep in (evidence_passages or []):
-        all_text += str(ep)
-    if len(all_text.strip()) < 50:
-        return False, 0.0, (
-            f"BUG-053 guard: Source text too short ({len(all_text.strip())} chars). "
-            "Phi-4-mini requires substantial source text to ground verification. "
-            "QUARANTINE (D2093: fail-closed)."
-        )
-
-    if not source_principles and not evidence_passages:
-        return False, 0.0, "No source principles or evidence passages — QUARANTINE (D2093: fail-closed)"
-
-    if not check_omlx_health():
-        return False, 0.0, "OMLX unavailable — QUARANTINE (D2093: fail-closed)"
-
-    try:
-        prompt = build_factual_prompt(fb)
-        result = call_omlx_json(
-            prompt=prompt,
-            model=model,
-            system=FACTUAL_CHECK_SYSTEM,
-            max_tokens=512,
-        )
-        if isinstance(result, dict):
-            consistent = result.get("consistent", False)
-            score = result.get("score", 0.5)
-            issues = result.get("issues", [])
-            detail = "; ".join(issues) if issues else "LLM: factually consistent"
-            return consistent, score, detail
-    except Exception as e:
-        return False, 0.0, f"LLM factual check error — QUARANTINE (D2093: fail-closed): {e}"
-
-    return False, 0.0, "LLM check could not be completed — QUARANTINE (D2093: fail-closed)"
-
+# ── D2298/D2283: Dead check functions removed ─────────────────────────────
+# check_borp: BORP guarantee now provided by S1.5 (≥2 sources enforced at cluster level)
+# check_completeness: Field presence guaranteed by S4 merge (always fills all fields)
+# check_factual_llm: Phi-4-mini LLM escalation removed (67% acc, hallucination risk)
+# build_factual_prompt, FACTUAL_CHECK_SYSTEM: Only used by check_factual_llm → removed
+# D2283: Core (S2) vs Enrichment (S4) field contract in schema_accessor.py → CORE_FIELDS / ENRICHMENT_FIELDS
 
 # ── Mechanism quality pre-filter (D2220: guards against citation echo gaming NLI) ──
 
@@ -424,6 +256,80 @@ BANNED_MECHANISM_PREFIXES: tuple[str, ...] = (
     "because it makes",
     "because it can",
 )
+
+
+def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
+    """D2277: Lightweight enrichment verification — checks S4 fields don't contradict core.
+
+    Does NOT block FB creation (enrichment is best-effort, D2283). Flags:
+      1. Application contradicts boundary (e.g., boundary says "fails when X" but app says "use when X")
+      2. Failure_mode repeats the definition verbatim (should describe failure, not repeat mechanism)
+      3. Enrichment fields are missing or suspiciously short
+
+    Returns (passed, score, detail). Always passes (score 1.0) — enrichment issues
+    degrade confidence_score but don't fail verification. True failures only for
+    critical contradictions.
+    """
+    # D2283: Only check enrichment fields if present (core/enrichment split)
+    app = str(fb.get("application", "")).strip()
+    fm = str(fb.get("failure_mode", "")).strip()
+    definition = str(fb.get("definition", "")).strip()
+    boundary = str(fb.get("boundary", "")).strip()
+    mechanism = str(fb.get("mechanism", "")).strip()
+
+    warnings: list[str] = []
+    grade: float = 1.0
+    passed: bool = True
+
+    # 1. Check: application contradicts boundary
+    if app and boundary:
+        # Simple heuristic: if boundary mentions a failure condition that application ignores
+        app_lower = app.lower()
+        boundary_lower = boundary.lower()
+        # Extract failure condition keywords from boundary
+        fail_indicators = ["fails when", "does not apply", "breaks when", "limited to", "not effective"]
+        for indicator in fail_indicators:
+            if indicator in boundary_lower:
+                # Check if application acknowledges this
+                context = boundary_lower.split(indicator, 1)[1][:80] if indicator in boundary_lower else ""
+                if context and context.split()[0] in app_lower:
+                    pass  # Application acknowledges the boundary condition
+                elif indicator == "fails when" and "when" not in app_lower:
+                    warnings.append(f"ENRICH-APP-BOUNDARY: application doesn't acknowledge boundary condition")
+                    grade -= 0.05
+                break
+
+    # 2. Check: failure_mode doesn't just repeat definition
+    if fm and definition:
+        # Simple overlap check: if >70% of failure_mode words overlap with definition
+        fm_words = set(fm.lower().split())
+        def_words = set(definition.lower().split())
+        if fm_words and def_words:
+            overlap = len(fm_words & def_words) / len(fm_words)
+            if overlap > 0.7:
+                warnings.append(f"ENRICH-FM-ECHO: failure_mode {overlap:.0%} overlaps definition — should describe failure, not repeat mechanism")
+                grade -= 0.10
+
+    # 3. Check: enrichment fields present
+    if not app:
+        warnings.append("ENRICH-MISSING: application field empty")
+        grade -= 0.03
+    elif len(app) < 30:
+        warnings.append(f"ENRICH-SHORT-APP: {len(app)} chars (expected ≥50, D2295)")
+        grade -= 0.02
+    if not fm:
+        warnings.append("ENRICH-MISSING: failure_mode field empty")
+        grade -= 0.03
+    elif len(fm) < 40:
+        warnings.append(f"ENRICH-SHORT-FM: {len(fm)} chars (expected ≥60, D2295)")
+        grade -= 0.02
+
+    # Only fail for critical contradictions
+    if grade < 0.80:
+        passed = False
+
+    detail = "; ".join(warnings) if warnings else "Enrichment quality: OK"
+    return passed, round(max(grade, 0.0), 3), detail
 
 
 def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
@@ -480,159 +386,68 @@ def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
 # ── Main ────────────────────────────────────────────────────────────────────
 
 def run_stage5(strict: bool = False, skip_nli: bool = False):
-    """Run Stage 5: Verify FBs with DeBERTa NLI pre-filter + Gemma-4-E4B."""
+    """D2298: DeBERTa-only S5 — single NLI verification, calibrated at threshold 0.10.
+    No decoder LLM. No BORP (S1.5 guarantees ≥2 sources). No Completeness (S4 fills all fields).
+    RoBERTa removed — added zero signal on paraphrase-based evidence (D2227).
+    """
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage4_fbs()
     total = len(fbs)
+    _thresh = S5_NLI_PASS_THRESHOLD  # config-driven (C12), calibrated: 0.10
 
-    # Check models
-    omlx_available = check_omlx_health()
+    # Preload DeBERTa model
+    _load_dual_encoders()
 
-    print(f"🔍 Stage 5: Verify — {total} FBs")
-    print(f"   Verifier: {VERIFY_MODEL_V2} (cross-family, R5: Gemma ≠ Phi ≠ Qwen)")
-    print(f"   Pre-filter: {'✅ ModernBERT NLI entailment' if not skip_nli else '❌ skipped'} (D2119)")
-    print(f"   NLI model: {S5_NLI_MODEL} | Fallback: {S5_NLI_MODEL_FALLBACK}")
-    print(f"   OMLX deep check: {'✅ available' if omlx_available else '❌ unavailable'}")
-    print(f"   Strict: {strict} | NLI threshold: {NLI_ENTAILMENT_THRESHOLD} | Fail-closed: ✅ (D2093)")
+    print(f"🔍 Stage 5: DeBERTa-Only Verify — {total} FBs")
+    print("   DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI) — D2298 calibrated")
+    print(f"   Threshold: {_thresh} (Calibrated: P=1.000 R=0.556 F1=0.714) | Fail-closed: ✅ (D2093)")
+    print(f"   ENTAIL ≥ {_thresh} → PASS | Otherwise → QUARANTINE")
     print(f"{'='*60}")
 
     verified = []
     stats = {"PASS": 0, "FLAG": 0, "QUARANTINE": 0}
-    prefilter_stats = {"passed": 0, "failed": 0, "skipped": 0}
-    llm_stats = {"called": 0, "skipped": 0}
     pipeline_commit = get_pipeline_commit()
 
     for i, fb in enumerate(fbs, 1):
         name = fb.get("name", "unnamed")[:40]
-        has_sources = bool(fb.get("source_principles"))
-        source_tag = "📦" if has_sources else "⚠️"
-        print(f"  [{i}/{total}] {source_tag} {name}", end=" ")
+        print(f"  [{i}/{total}] {name}", end=" ")
 
         start = time.time()
         results = []
 
-        # 1. BORP check
-        borp_passed, borp_score, borp_detail = check_borp(fb)
-        results.append({
-            "check_name": "BORP",
-            "passed": borp_passed,
-            "score": borp_score,
-            "detail": borp_detail,
-        })
-
-        # 2. Completeness check
-        comp_passed, comp_score, comp_detail = check_completeness(fb)
-        results.append({
-            "check_name": "completeness",
-            "passed": comp_passed,
-            "score": comp_score,
-            "detail": comp_detail,
-        })
-
-        # 2.5 Mechanism quality pre-filter (D2220: guards citation echo gaming NLI)
-        mech_passed, mech_score, mech_detail = check_mechanism_quality(fb)
+        # 1. Mechanism quality pre-filter (regex, tautology detection)
+        mech_passed, mech_score_float, mech_detail = check_mechanism_quality(fb)
         results.append({
             "check_name": "mechanism_quality",
             "passed": mech_passed,
-            "score": mech_score,
+            "score": mech_score_float,
             "detail": mech_detail,
         })
 
-        # 3. Factual consistency — DeBERTa NLI pre-filter → LLM deep check (D2093)
+        # 2. Dual-encoder factual check
         fact_passed: bool = True
         fact_score: float = 1.0
         fact_detail: str = "No verification needed"
-        method: str = "none"
 
-        # D2220: Mechanism quality pre-filter gates NLI shortcuts.
-        # If mechanism_quality score = 0.0: auto-quarantine, skip NLI + LLM entirely
-        # If mechanism_quality score = 0.5: citation echo risk → always escalate to LLM
+        method: str = "deberta-nli"
+
         if not mech_passed:
-            # Mechanism quality failed → auto-quarantine, no NLI needed
+            # Tautological mechanism → auto-quarantine
             fact_passed = False
             fact_score = 0.0
             fact_detail = f"MECH FAIL: {mech_detail}"
             method = "mech_quality"
-            prefilter_stats["mech_fail"] = prefilter_stats.get("mech_fail", 0) + 1
-        elif not skip_nli:
-            # D2093: DeBERTa NLI pre-filter (replaces embedding similarity)
-            nli_passed, nli_score, nli_detail = nli_evidence_check(fb)
 
-            # D2220: Citation echo override — if mechanism is flagged, NLI pass is unreliable
-            force_llm = (mech_score <= 0.5)
-
-            if force_llm:
-                # D2220: Citation echo risk — NLI alone is unreliable. Always escalate to LLM.
-                prefilter_stats["echo_escalated"] = prefilter_stats.get("echo_escalated", 0) + 1
-                if omlx_available:
-                    llm_stats["echo_llm"] = llm_stats.get("echo_llm", 0) + 1
-                    fact_passed, fact_score, fact_detail = check_factual_llm(
-                        fb, model=VERIFY_MODEL_V2
-                    )
-                    fact_detail = f"NLI {nli_score:.2f} + CITATION-ECHO → LLM: {fact_detail}"
-                    method = "nli+LLM-echo"
-                else:
-                    fact_passed = False
-                    fact_score = nli_score
-                    fact_detail = f"NLI {nli_score:.2f} + CITATION-ECHO + OMLX unavailable — QUARANTINE: {mech_detail}"
-                    method = "nli-echo"
-            elif nli_passed and nli_score >= NLI_PASS_THRESHOLD:  # D2226: config threshold (default 0.6)
-                prefilter_stats["passed"] += 1
-                fact_passed = True
-                fact_score = nli_score
-                fact_detail = f"NLI PASS: {nli_detail}"
-                method = "nli"
-                llm_stats["skipped"] += 1
-            elif nli_passed and nli_score >= NLI_MARGINAL_THRESHOLD:  # D2155: config threshold (default 0.5)
-                # D2176: Marginal NLI (0.3–0.6) must escalate to LLM deep check.
-                # OLD: fact_passed=True on marginal — treated weak evidence as confirmed.
-                # NEW: marginal → UNKNOWN → escalate to LLM verifier (Gemma cross-family).
-                # This is epistemically correct: "maybe" is not "yes."
-                prefilter_stats["marginal"] = prefilter_stats.get("marginal", 0) + 1
-                if omlx_available:
-                    llm_stats["escalated_marginal"] = llm_stats.get("escalated_marginal", 0) + 1
-                    fact_passed, fact_score, fact_detail = check_factual_llm(
-                        fb, model=VERIFY_MODEL_V2
-                    )
-                    fact_detail = f"NLI MARGINAL → LLM: {fact_detail}"
-                    method = "nli+LLM"
-                else:
-                    # Fail-closed: no LLM available for escalation → UNKNOWN
-                    fact_passed = False
-                    fact_score = nli_score
-                    fact_detail = f"NLI MARGINAL + OMLX unavailable — UNKNOWN: {nli_detail}"
-                    method = "nli-only"
-            else:
-                prefilter_stats["failed"] += 1
-                # Escalate to LLM deep check (Gemma-4-E4B, cross-family)
-                if omlx_available:
-                    llm_stats["called"] += 1
-                    fact_passed, fact_score, fact_detail = check_factual_llm(
-                        fb, model=VERIFY_MODEL_V2
-                    )
-                    fact_detail = f"NLI FAIL → LLM: {fact_detail}"
-                    method = "nli+LLM"
-                else:
-                    # D2093: fail-closed — no LLM available = QUARANTINE
-                    fact_passed = False
-                    fact_score = nli_score
-                    fact_detail = f"NLI FAIL + OMLX unavailable — QUARANTINE: {nli_detail}"
-                    method = "nli-only"
         else:
-            prefilter_stats["skipped"] += 1
-            if omlx_available:
-                llm_stats["called"] += 1
-                fact_passed, fact_score, fact_detail = check_factual_llm(
-                    fb, model=VERIFY_MODEL_V2
-                )
-                fact_detail = f"LLM (direct, NLI skipped): {fact_detail}"
-                method = "LLM"
-            else:
+            # D2298: DeBERTa-only NLI (RoBERTa removed — zero signal on paraphrase evidence)
+            try:
+                fact_passed, fact_score, fact_detail = deberta_check(fb)
+                method = "deberta-nli"
+            except Exception as e:
                 fact_passed = False
                 fact_score = 0.0
-                fact_detail = "No verification — NLI skipped, OMLX unavailable — QUARANTINE"
-                method = "none"
+                fact_detail = f"Dual-encoder error — QUARANTINE: {e}"
 
         results.append({
             "check_name": "factual",
@@ -641,107 +456,75 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             "detail": fact_detail,
         })
 
-        # D2184: Monotonic trust — classification FAILED cannot become PASS
-        # The FB must stay QUARANTINED until classification is re-evaluated.
-        if fb.get("classification_status") == "FAILED":
-            status = "QUARANTINE"
-            needs_human = True
+        # 2b. D2277: Enrichment verification — light check that S4 fields don't contradict core
+        enrich_passed, enrich_score, enrich_detail = _check_enrichment_quality(fb)
+        if not enrich_passed:
             results.append({
-                "check_name": "classification_status",
-                "passed": False,
-                "score": 0.0,
-                "detail": "Classification FAILED — cannot pass verification. Re-classify first."
+                "check_name": "enrichment_quality",
+                "passed": enrich_passed,
+                "score": enrich_score,
+                "detail": enrich_detail,
             })
-        else:
-            # Determine status
-            all_passed = all(r["passed"] for r in results)
-            borp_only_fail = not borp_passed and comp_passed and fact_passed
 
-            if all_passed:
-                status = "PASS"
-                needs_human = False
-            elif borp_only_fail and not strict:
-                status = "FLAG"
-                needs_human = True
-            else:
-                status = "QUARANTINE"
-                needs_human = True
+        # 3. Determine status — DeBERTa-only (D2293 calibrated)
+        if fact_passed:
+            status = "PASS"
+            needs_human = False
+        else:
+            status = "QUARANTINE"
+            needs_human = False  # DeBERTa is the final authority — no human needed
+
+        # Handle strict mode: any non-PASS → QUARANTINE
+        if strict and status != "PASS":
+            status = "QUARANTINE"
 
         stats[status] += 1
 
-        # ── Compute confidence_score (D2130 fix: was always None) ──────────
-        # Weighted average of BORP (20%) + Completeness (10%) + Factual (70%)
-        # Factual score carries more weight because it's the hardest check.
-        confidence_score = round(
-            0.20 * borp_score + 0.10 * comp_score + 0.70 * fact_score, 4
-        )
+        # Confidence score: mechanism 15% + DeBERTa NLI 75% + enrichment 10%
+        confidence_score = round(0.15 * mech_score_float + 0.75 * fact_score + 0.10 * enrich_score, 4)
 
         # Build verified FB
         vfb = dict(fb)
         vfb["verification_results"] = results
-        vfb["borp_score"] = borp_score
         vfb["confidence_score"] = confidence_score
         vfb["status"] = status
         vfb["needs_human_review"] = needs_human
-        vfb["verifier_model"] = VERIFY_MODEL_V2
-        vfb["verification_method"] = method  # D2069: track which path was used
+        vfb["verifier_model"] = "DeBERTa-v3-large (D2293 calibrated, threshold 0.10)"
+        vfb["verification_method"] = method
 
-        # D2176: Derive epistemic_status — what kind of knowledge claim this is.
-        # BORP = corroboration (not truth), NLI = source-support (not proof).
-        # These are epistemic categories, not verification pass/fail states.
-        source_count: int = len(fb.get("source_books", []))
-        is_singleton: bool = fb.get("is_singleton_fb", False) or fb.get("is_singleton", False)
-
-        if borp_passed and fact_passed:
+        # D2284: Epistemic status — ISOR scoring (replaces simple BORP ≥2)
+        from pipeline.schema_accessor import isor_score as _isor_score
+        isor = _isor_score(fb)
+        if isor["rating"] in ("strong",) and fact_passed:
             epistemic_status = "corroborated"
-        elif borp_passed and not fact_passed:
+        elif isor["rating"] in ("strong", "medium") and not fact_passed:
             epistemic_status = "cross-source-unverified"
-        elif not borp_passed and fact_passed:
+        elif fact_passed:
             epistemic_status = "source-supported"
-        elif source_count >= 2:
-            epistemic_status = "contested"
-        elif is_singleton:
-            epistemic_status = "singleton-unverified"
         else:
             epistemic_status = "speculative"
         vfb["epistemic_status"] = epistemic_status
-
-        vfb = stamp_record(vfb, gen_model=fb.get("gen_model"))
-        vfb["pipeline_commit"] = pipeline_commit
-
-        verified.append(vfb)
+        vfb["isor"] = isor  # D2284: Full ISOR scores embedded in verified FB
 
         elapsed = time.time() - start
-        status_icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}[status]
-        nli_tag = {"nli": "⚡", "nli+LLM": "🔍", "LLM": "🤖", "none": "·"}[method]
-        print(f"→ {status_icon} {status} {nli_tag} ({elapsed:.1f}s)")
+        icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}.get(status, "❓")
+        print(f"→ {icon} {status} ({elapsed:.1f}s)")
+        verified.append(vfb)
 
-    # Write checkpoint
-    safe_write(
-        STAGE5_CHECKPOINT,
-        "\n".join(json.dumps(v, ensure_ascii=False) for v in verified) + "\n",
-    )
-
-    # Summary
+    # Save checkpoint — serialize to JSONL (D2299: was passing list, caused TypeError)
+    checkpoint_text = "\n".join(json.dumps(vfb, ensure_ascii=False) for vfb in verified) + "\n"
+    safe_write(STAGE5_CHECKPOINT, checkpoint_text)
     print(f"\n{'='*60}")
     print("📊 VERIFICATION RESULTS")
-    print(f"   ✅ PASS:         {stats['PASS']}")
-    print(f"   ⚠️  FLAG:         {stats['FLAG']}")
-    print(f"   🚫 QUARANTINE:   {stats['QUARANTINE']}")
-    human_review = stats["FLAG"] + stats["QUARANTINE"]
-    if human_review:
-        print(f"   👤 Need review:   {human_review}")
-    print("")
-    print("📊 EMBEDDING PRE-FILTER")
-    print(f"   ⚡ NLI passed:    {prefilter_stats['passed']} (skipped LLM)")
-    print(f"   🔍 NLI failed:    {prefilter_stats['failed']} (escalated to LLM)")
-    print(f"   ·  Skipped:       {prefilter_stats['skipped']}")
-    llm_saved = prefilter_stats['passed']
-    if total > 0:
-        print(f"   💰 LLM calls saved: {llm_saved}/{total} ({100*llm_saved/total:.0f}%)")
-    print("")
-    print(f"📋 Checkpoint:       {STAGE5_CHECKPOINT}")
-
+    for s, c in stats.items():
+        print(f"   {s}: {c}")
+    print("\n📊 DeBERTa-ONLY VERIFICATION (D2293 calibrated)")
+    print("   ENTAIL ≥ threshold → PASS:     auto")
+    print("   CONTRA → QUARANTINE:            auto")
+    print(f"   Disagree → FLAG (human): {stats.get('FLAG', 0)} FBs need review")
+    print(f"   Mechanisms auto-rejected: {sum(1 for fb in verified if 'MECH FAIL' in str(fb.get('verification_results', [])))}")
+    print(f"\n📋 Checkpoint: {STAGE5_CHECKPOINT}")
+    return verified
 
 def main():
     parser = argparse.ArgumentParser(

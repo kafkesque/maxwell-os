@@ -20,9 +20,11 @@ from pathlib import Path
 # D2175: Use DB_PATH from pipeline_paths — no hardcoded paths (C12a)
 from pipeline.pipeline_paths import (
     DB_PATH as _DB_PATH,
+)
+from pipeline.pipeline_paths import (
+    RELIABILITY_GARBAGE_THRESHOLD,
     RELIABILITY_STABLE_THRESHOLD,
     RELIABILITY_WATCH_THRESHOLD,
-    RELIABILITY_GARBAGE_THRESHOLD,
 )
 
 DB_PATH: Path = _DB_PATH

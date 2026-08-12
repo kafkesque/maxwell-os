@@ -7,14 +7,14 @@ Single entry point for the entire Maxwell OS knowledge extraction pipeline.
 Handles: stage ordering, resume, progress, error recovery, configuration.
 
 Usage:
-    python -m pipeline.run                          # Full pipeline, latest run_id
-    python -m pipeline.run --domain pricing         # Single domain
-    python -m pipeline.run --smoke                  # Fast smoke test
-    python -m pipeline.run --resume-from stage2     # Resume after crash
-    python -m pipeline.run --stages 0,1,1.5         # Specific stages only
-    python -m pipeline.run --quality fast           # Quality tier (C28)
-    python -m pipeline.run --books 10               # Limit books
-    python -m pipeline.run --dry-run                # Show what would run
+    python pipeline/runner.py                       # Full pipeline, latest run_id
+    python pipeline/runner.py --domain pricing      # Single domain
+    python pipeline/runner.py --smoke               # Fast smoke test
+    python pipeline/runner.py --resume-from stage2  # Resume after crash
+    python pipeline/runner.py --stages 0,1,1.5      # Specific stages only
+    python pipeline/runner.py --quality fast        # Quality tier (C28)
+    python pipeline/runner.py --books 10            # Limit books
+    python pipeline/runner.py --dry-run             # Show what would run
 
 Architecture: 8 stages (Stage 3 REMOVED per D2120)
     Stage 0:    Convert EPUB/PDF → MD
@@ -22,9 +22,9 @@ Architecture: 8 stages (Stage 3 REMOVED per D2120)
     Stage 1:    Chunk MD → segments
     Stage 1.3:  Regex pre-filter segments
     Stage 1.5:  FAISS cosine cluster (R-NN, D2120)
-    Stage 2:    Convergent extract (Qwen3.6 per cluster)
-    Stage 4:    Classify + format + lightweight dedup (Phi-4-mini)
-    Stage 5:    Verify (DeBERTa NLI + Gemma cross-family)
+    Stage 2:    Convergent extract (Qwen3-Coder-30B)
+    Stage 4:    Classify + format + lightweight dedup (GPT-OSS-20B)
+    Stage 5:    Verify (DeBERTa FEVER NLI + Phi-4-mini cross-family)
     Stage 6:    Commit (SQLite + Parquet)
 """
 
@@ -89,7 +89,7 @@ STAGES: dict[str, dict[str, Any]] = {
         "depends_on": "1.3",
     },
     "2": {
-        "name": "Convergent Extract (Qwen3.6)",
+        "name": "Convergent Extract (Qwen3-Coder-30B)",
         "script": "pipeline/stage2_extract.py",
         "checkpoint": STAGE_CHECKPOINTS.get(2),
         "can_parallelize": False,
@@ -97,7 +97,7 @@ STAGES: dict[str, dict[str, Any]] = {
         "llm_bound": True,
     },
     "4": {
-        "name": "Classify + Format (Phi-4-mini)",
+        "name": "Classify + Format (GPT-OSS-20B)",
         "script": "pipeline/stage4_merge.py",
         "checkpoint": STAGE_CHECKPOINTS.get(4),
         "can_parallelize": False,
@@ -105,7 +105,7 @@ STAGES: dict[str, dict[str, Any]] = {
         "llm_bound": True,
     },
     "5": {
-        "name": "Verify (DeBERTa + Gemma)",
+        "name": "Verify (DeBERTa FEVER + Phi-4-mini)",
         "script": "pipeline/stage5_verify.py",
         "checkpoint": STAGE_CHECKPOINTS.get(5),
         "can_parallelize": False,
@@ -194,13 +194,34 @@ def find_resume_point(resume_from: str | None = None) -> str | None:
     return STAGE_ORDER[-1]
 
 
+def _get_stage_timeout(stage_id: str) -> float | None:
+    """D2269: Get per-stage timeout from pipeline_config.yaml.
+
+    Timeout keys in config match runner's STAGES dict keys (e.g., "2", "4").
+    S2 extraction timeout = null (unlimited) for long full-corpus runs.
+    All other stages default to 3600s (60 min) if not configured.
+
+    Returns:
+        Timeout in seconds (float), or None for unlimited.
+    """
+    import yaml as _yaml_timeout
+    _config_path = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
+    try:
+        with open(_config_path) as _f:
+            _cfg = _yaml_timeout.safe_load(_f) or {}
+        _timeouts = _cfg.get("stages", {}).get("timeouts", {})
+        # Direct key lookup — config keys match STAGES dict keys (C12: no hardcoded mapping)
+        return _timeouts.get(stage_id, 3600.0)
+    except Exception:
+        return 3600.0  # fallback default
+
+
 def run_stage(
     stage_id: str,
     *,
     smoke: bool = False,
     skip_llm: bool = False,
     fast_model: str | None = None,
-    skip_gemma: bool = False,
     domain: str | None = None,
     books: int | None = None,
     quality: str = "balanced",
@@ -228,8 +249,6 @@ def run_stage(
         env["MAXWELL_SKIP_LLM"] = "1"
     if fast_model and stage.get("llm_bound") and stage_id == "2":
         env["MAXWELL_FAST_MODEL"] = fast_model
-    if skip_gemma and stage_id == "5":
-        env["MAXWELL_SKIP_GEMMA"] = "1"
     if domain:
         env["MAXWELL_DOMAIN"] = domain
     if books:
@@ -274,6 +293,11 @@ def run_stage(
     print(f"▶ {label}")
     print(f"{'─'*60}")
 
+    # D2269: Per-stage configurable timeout from pipeline_config.yaml
+    # S2 (extraction) defaults to null (unlimited) for long full-corpus runs.
+    # Other stages default to 3600s (60 min).
+    stage_timeout = _get_stage_timeout(stage_id)
+
     start = time.time()
     try:
         result = subprocess.run(
@@ -281,7 +305,7 @@ def run_stage(
             cwd=str(_PROJECT_ROOT),
             env={**__import__("os").environ, **env},
             capture_output=False,
-            timeout=3600,  # 60 min max per stage (was 600s)
+            timeout=stage_timeout,
         )
         elapsed = time.time() - start
 
@@ -301,7 +325,7 @@ def run_stage(
         elapsed = time.time() - start
         print(f"\n⏸️  Pipeline paused at Stage {stage_id} ({elapsed:.1f}s)")
         _write_resume_marker(stage_id, paused=True)
-        print(f"   Resume with: python -m pipeline.run --resume-from {stage_id}")
+        print(f"   Resume with: python pipeline/runner.py --resume-from {stage_id}")
         raise
     except Exception as e:
         elapsed = time.time() - start
@@ -384,7 +408,6 @@ def run_pipeline(
     smoke: bool = False,
     skip_llm: bool = False,
     fast_model: str | None = None,
-    skip_gemma: bool = False,
     domain: str | None = None,
     books: int | None = None,
     quality: str = "balanced",
@@ -399,7 +422,6 @@ def run_pipeline(
         smoke: Use smoke test config (fast model, limited books).
         skip_llm: Skip LLM-bound stages (plumbing smoke).
         fast_model: Override model for LLM stages.
-        skip_gemma: Skip Gemma deep check in Stage 5.
         domain: Filter books by domain directory.
         books: Limit number of books to process.
         quality: Quality tier (fast/balanced/maximum).
@@ -458,7 +480,6 @@ def run_pipeline(
             smoke=smoke,
             skip_llm=skip_llm,
             fast_model=fast_model,
-            skip_gemma=skip_gemma,
             domain=domain,
             books=books,
             quality=quality,
@@ -472,7 +493,7 @@ def run_pipeline(
         else:
             failed += 1
             print(f"\n⚠️  Stage {stage_id} FAILED. Pipeline stopped.")
-            print(f"   Resume with: python -m pipeline.run --resume-from {stage_id}")
+            print(f"   Resume with: python pipeline/runner.py --resume-from {stage_id}")
             break
 
         if stop_after and stage_id == stop_after:
@@ -502,15 +523,15 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python -m pipeline.run                           # Full pipeline, auto-resume
-  python -m pipeline.run --smoke                   # Fast smoke test (<2min)
-  python -m pipeline.run --smoke-plumbing          # Plumbing smoke (<30s, no LLM)
-  python -m pipeline.run --resume-from stage2      # Resume after crash
-  python -m pipeline.run --domain pricing          # Pricing domain only
-  python -m pipeline.run --books 10                # Limit to 10 books
-  python -m pipeline.run --dry-run                 # Show what would run
-  python -m pipeline.run --quality fast            # Fast quality tier
-  python -m pipeline.run --stages 1.5,2,4          # Specific stages only
+  python pipeline/runner.py                         # Full pipeline, auto-resume
+  python pipeline/runner.py --smoke                 # Fast smoke test (<2min)
+  python pipeline/runner.py --smoke-plumbing        # Plumbing smoke (<30s, no LLM)
+  python pipeline/runner.py --resume-from stage2    # Resume after crash
+  python pipeline/runner.py --domain pricing        # Pricing domain only
+  python pipeline/runner.py --books 10              # Limit to 10 books
+  python pipeline/runner.py --dry-run               # Show what would run
+  python pipeline/runner.py --quality fast          # Fast quality tier
+  python pipeline/runner.py --stages 1.5,2,4        # Specific stages only
         """,
     )
 
@@ -541,8 +562,6 @@ Examples:
     parser.add_argument("--fast-model", type=str,
                         default="Phi-4-mini-instruct-8bit",
                         help="Model for fast mode (default: Phi-4-mini)")
-    parser.add_argument("--skip-gemma", action="store_true",
-                        help="Skip Gemma deep check in Stage 5")
     parser.add_argument("--no-borp", action="store_true",
                         help="Disable BORP multi-source check (allow single-source FBs)")
     parser.add_argument("--run-id", type=str,
@@ -576,8 +595,6 @@ Examples:
     is_smoke = args.smoke or is_plumbing
     skip_llm = is_plumbing
     fast_model = args.fast_model if is_smoke else None
-    skip_gemma = args.skip_gemma or is_smoke
-
     # Stage list
     stages_list = None
     if args.stages:
@@ -589,7 +606,6 @@ Examples:
         smoke=is_smoke,
         skip_llm=skip_llm,
         fast_model=fast_model,
-        skip_gemma=skip_gemma,
         domain=args.domain,
         books=args.books,
         quality=args.quality,

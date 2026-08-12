@@ -30,8 +30,8 @@ class EmbeddingQuarantineError(Exception):
 
 from pipeline.pipeline_paths import (
     OLLAMA_BATCH_SIZE,
-    OLLAMA_HOST,
     OLLAMA_EMBED_MAX_CHARS,
+    OLLAMA_HOST,
     OLLAMA_PORT,
 )
 

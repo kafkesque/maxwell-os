@@ -22,6 +22,7 @@ Usage:
 """
 
 import concurrent.futures
+
 from pipeline.omlx_call import call_omlx
 
 

@@ -114,10 +114,10 @@ roles:
     backend: omlx
     family: gemma
   S5_FB_VERIFIER:
-    model: gemma-4-E4B-it-MLX-4bit     # D2199: synced with pipeline_config.yaml verifier_v2 (was Qwen3-Coder — wrong family for R5)
+    model: Phi-4-mini-instruct-8bit     # D2273: synced with pipeline_config.yaml verifier_v2 (D2264: Phi-4-mini, 67% acc)
     backend: omlx
-    family: gemma
-    notes: "D2199: Must be cross-family from generator (Qwen) per R5. Pipeline config uses Gemma."
+    family: phi
+    notes: "D2273/D2264: S5 deep check uses Phi-4-mini (67% acc vs Gemma 33%). R5: DeBERTa FEVER (encoder) ≠ Phi-4-mini (decoder)."
 verification_tolerance:
   version: 2026-07-08.V2
   s6_validation:

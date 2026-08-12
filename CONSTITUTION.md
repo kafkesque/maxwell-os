@@ -58,9 +58,9 @@ This rule applies to ALL code — human-written AND LLM/agent-generated.
 
 3 LAYERS: Pipeline (8-stage) → Knowledge (SQLite+FTS5+sqlite-vec+LightRAG) → Orchestration (Phase 2, skill.md standard)
 
-MODELS: Gen=Qwen3.6-35B-A3B-4bit | Verify=Phi-4-mini-8bit | VerifyV2=Gemma-4-E4B (R5 cross-family) | Embed=bge-m3 | NLI=DeBERTa-v3-base-mnli (D2111)
+MODELS: Gen=Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | Classify=gpt-oss-20b-MXFP4-Q8 | Embed=bge-m3 | NLI=MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (D2298)
 
-PIPELINE (v3.0 cluster-before-extract, D2120: 8-stage): 0-convert → 0.5-metadata → 1-chunk → 1.3-prefilter → 1.5-FAISS-RNN-cluster → 2-convergent-extract → 4-classify+dedup(D2120: Stage 3 removed) → 5-verify(DeBERTa-NLI+Gemma-cross-family+BORP, D2093 fail-closed) → 6-commit
+PIPELINE (v3.0 cluster-before-extract, D2120: 8-stage): 0-convert → 0.5-metadata → 1-chunk → 1.3-prefilter → 1.5-FAISS-RNN-cluster → 2-convergent-extract(+hybrid-gate D2276) → 4-classify+dedup(D2120: Stage 3 removed) → 5-verify(DeBERTa-v3-large-NLI-only D2298, threshold 0.10 calibrated, fail-closed D2093) → 6-commit
 
 STORAGE: SQLite (canonical) + sqlite-vec (vectors) + Parquet (portability) | TAXONOMY: 25 domains, 47 disciplines, max 5 per FB (D2066: dynamic, raw labels can dethrone canonicals)
 
@@ -86,6 +86,16 @@ D2072: Content type ontology — principle, process_template, process_instance, 
 D2073: Growth Edge as first-class object type — 7 categories (personal_idea→theoretical_investigation), 5 statuses (open→archived), promotion path to FB/PT/Project, human-created + pipeline-extracted
 D2074: Golden few-shot v2.0 — 23 examples (18% pricing, 82% non-pricing), 11 types, real book passages, 3 hard negatives, 2 multi-principle segments, --golden flag wired into stage2_extract.py
 C21-C28: Infrastructure independence rules (§0: swappable, hybrid sovereignty, resilient, adaptive, agent-agnostic, cross-platform, zero future tax, quality-tiered)
+
+### Known Modularity Gaps (D2300 — 2026-08-12 Audit)
+| Level | Gap | Status | Fix |
+|-------|-----|--------|-----|
+| **Component (C21 violation)** | `omlx_call.py` called directly from stage2/4/5 | 🔴 No InferenceProvider protocol (D2055 unimplemented) | ~160 LOC abstraction |
+| **Component (C21 violation)** | `ollama_embed.py` called directly from stage1_5 | 🔴 No EmbeddingProvider protocol | ~80 LOC abstraction |
+| **Component (C21 violation)** | SQLite hardcoded in stage6_commit.py | 🔴 No StorageBackend protocol (D2056 unimplemented) | ~100 LOC abstraction |
+| **JSONL (strong)** | Stage checkpoints are self-contained JSONL | ✅ Each stage reads/writes independently — fully swappable internals | — |
+| **Schema (partial)** | Pydantic FB model exists (schemas.py) but never instantiated | 🟡 Dead code — actual contract is implicit dict shapes | Remove or enforce |
+| **Config (strong)** | pipeline_paths.py loads all values from pipeline_config.yaml | ✅ C12 enforced | — |
 
 ## §4 — PHASES
 Phase 0: 14 fixes (~10h) → ✅ DONE (14/14 — T-0.1 verified, oMLX 0.5.3 stress test passed)

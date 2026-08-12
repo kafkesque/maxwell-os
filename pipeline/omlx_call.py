@@ -39,6 +39,7 @@ from pipeline.pipeline_paths import (
     OMLX_CB_COOLDOWN_SECONDS,
     OMLX_CB_ENABLED,
     OMLX_CB_FAILURE_THRESHOLD,
+    OMLX_COLD_RELOAD_DELAY,
     OMLX_DEFAULT_TIMEOUT,
     OMLX_MAX_RETRIES,
     OMLX_RETRY_DELAY,
@@ -50,6 +51,7 @@ from pipeline.pipeline_paths import (
 DEFAULT_TIMEOUT: int = OMLX_DEFAULT_TIMEOUT     # seconds (from config)
 MAX_RETRIES: int = OMLX_MAX_RETRIES             # (from config)
 RETRY_DELAY: int = OMLX_RETRY_DELAY             # seconds (from config)
+COLD_RELOAD_DELAY: int = OMLX_COLD_RELOAD_DELAY  # D2301: reasoning-model cold reload wait (from config)
 
 # temp=0.0 — NEVER override (R7)
 TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
@@ -303,7 +305,13 @@ def call_omlx(
         except Exception as e:
             last_error = str(e)
             if attempt < MAX_RETRIES:
-                time.sleep(RETRY_DELAY * attempt)
+                # D2301: reasoning-model cold reload needs 30-60s (not 3-6s).
+                # Detect the cold-reload signal and wait accordingly, else normal backoff.
+                if "cold reload" in str(e) or "content missing" in str(e):
+                    print(f"      ❄️  cold reload detected — waiting {COLD_RELOAD_DELAY}s for model re-warm", flush=True)
+                    time.sleep(COLD_RELOAD_DELAY)
+                else:
+                    time.sleep(RETRY_DELAY * attempt)
 
     if OMLX_CB_ENABLED:
         # D2211: 4xx = client error (OMLX healthy, request rejected). Don't trip breaker.

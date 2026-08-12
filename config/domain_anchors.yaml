@@ -521,24 +521,35 @@ anchors:
     name: "DOMAIN 6 AI + Computing"
     type: field
     description: >
-      Artificial intelligence, machine learning, LLM applications, AI
-      agents, programming, and the societal impact of AI. Engineering
-      AI systems, building with LLMs, ML foundations, and AI product
-      management. General programming (Python, self-taught coding).
-      Creative coding stays in D3.
+      Artificial intelligence, machine learning, large language models,
+      AI agents and autonomous systems, agentic workflows, multi-agent
+      architectures, and the societal impact of AI. Engineering AI systems,
+      building applications with LLMs, RAG pipelines, prompt engineering,
+      tool use and function calling, model evaluation and benchmarking.
+      ML foundations including supervised/unsupervised/reinforcement
+      learning, deep learning, neural network architecture, transformers,
+      diffusion models, and foundation model training methodology.
+      AI product management, AI strategy, responsible AI governance,
+      and the business of artificial intelligence. General programming
+      (Python, self-taught coding, data structures, algorithms).
+      Creative coding stays in D3. NOT about personal productivity (D5)
+      or business strategy that happens to mention AI (D4).
     subfolders:
       - id: sf_6_ai_agents
         name: "AI agents"
         description: >
           AI agents, autonomous systems, agentic workflows, and
           multi-agent architectures. LangChain, LangGraph, AutoGPT,
-          and the frontier of AI autonomy and tool use.
+          MCP servers, tool-augmented LLMs, and the frontier of AI
+          autonomy, delegation, and agent coordination. Agent memory,
+          planning, reasoning loops, and self-improving agents.
       - id: sf_6_ai_strategy
         name: "AI strategy"
         description: >
           AI strategy, AI product management, and the business of
           AI. How organizations adopt, deploy, and compete with AI.
-          AI value creation, governance, and responsible AI.
+          AI value creation, governance, responsible AI, and
+          AI-driven business transformation.
       - id: sf_6_generative_ai
         name: "generative AI"
         description: >
@@ -549,8 +560,9 @@ anchors:
         name: "LLM applications"
         description: >
           Building applications with LLMs: RAG, prompt engineering,
-          tool use, function calling, and LLM-powered products.
-          LangChain, vector databases, and LLM ops.
+          tool use, function calling, LLM-powered products, AI
+          engineering practices, and LLM ops. Vector databases,
+          embedding models, semantic search, and retrieval systems.
       - id: sf_6_ml_foundations
         name: "ML foundations"
         description: >
@@ -563,6 +575,20 @@ anchors:
           General programming, software engineering, Python, and
           coding fundamentals. Data structures, algorithms, and
           self-taught programming skills. NOT creative coding (D3).
+      - id: sf_6_ai_knowledge_systems
+        name: "AI knowledge systems"
+        description: >
+          AI-powered knowledge management, RAG architectures,
+          knowledge graphs, semantic search, retrieval-augmented
+          generation, vector databases, embedding-based search,
+          and AI-assisted research and synthesis pipelines.
+      - id: sf_6_prompt_engineering
+        name: "prompt engineering"
+        description: >
+          Prompt engineering, few-shot prompting, chain-of-thought,
+          prompt optimization, system prompt design, and structured
+          LLM output formatting. Techniques for reliable, reproducible
+          LLM behavior in production systems.
     cross_domains:
       - id: cd_6_ai_engineering
         name: "ai engineering + agents"
@@ -584,6 +610,20 @@ anchors:
         description: >
           AI strategy, AI value, societal impact, and business of AI.
           About AI itself, not using AI for other domains.
+      - id: cd_6_ai_decision
+        name: "ai + decision systems"
+        description: >
+          AI-augmented decision making, algorithmic reasoning,
+          computational epistemology, and the intersection of AI
+          with systems thinking, complexity science, and strategic
+          reasoning. How AI changes how we model, decide, and act.
+      - id: cd_6_ai_knowledge
+        name: "ai + knowledge + research"
+        description: >
+          AI for knowledge extraction, automated research pipelines,
+          RAG-based knowledge synthesis, LLM evaluation methodology,
+          and AI-assisted scholarship. Building systems that read,
+          understand, and synthesize large document corpora.
 
   # ── FIELD 7: Influence + Power ───────────────────────────────────────
   - id: field_7_influence_power

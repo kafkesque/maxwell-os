@@ -76,3 +76,12 @@ knowledge pipeline/
 pipeline/.omlx_watchdog_state.json
 pipeline/omlx_watchdog.log
 backup/
+
+# Probe output — transient artifacts (keep only stage{2,4,5}_fbs.jsonl + _visual.md + README)
+probe_output/stage2_checkpoint.jsonl
+probe_output/probe_clusters*.jsonl
+probe_output/*.log
+probe_output/s5_run_retry.log
+
+# Diagnostic runtime logs (transient)
+governance/diagnostic_live_*.log

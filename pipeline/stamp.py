@@ -1,7 +1,7 @@
 """
 stamp.py — R14 provenance stamp decorator for pipeline objects.
 =================================================================
-Authority: CONSTITUTION.md R14, C10
+Authority: CONSTITUTION.md R14, C10, D2282
 
 Usage:
     from pipeline.stamp import stamp, get_git_commit
@@ -11,17 +11,20 @@ Usage:
         ...
 
     # Every dict output automatically gets:
-    #   schema_version, gen_model, pipeline_commit, taxonomy_version, created_at
+    #   schema_version, gen_model, pipeline_commit, taxonomy_version,
+    #   manifest_hash (D2282), pipeline_run_id, created_at
 
     # Manual stamp:
     stamped = stamp_record({"principle_text": "..."}, gen_model="Qwen3.6")
 """
 
 import hashlib
+import json
 import subprocess
 import uuid
 from datetime import UTC, datetime
 from functools import wraps
+from pathlib import Path
 
 from pipeline.pipeline_paths import SCHEMA_VERSION, TAXONOMY_VERSION
 
@@ -64,6 +67,41 @@ def get_pipeline_run_id() -> str:
     return _PIPELINE_RUN_ID
 
 
+# D2282: Manifest hash — frozen config fingerprint embedded in every checkpoint.
+# Computed once per process from pipeline_manifest section + runtime git_commit.
+_MANIFEST_HASH: str | None = None
+
+
+def _load_manifest() -> dict:
+    """D2282: Load pipeline_manifest from config/pipeline_config.yaml."""
+    import yaml as _yaml
+    _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+    try:
+        with open(_cfg_path) as _f:
+            _cfg = _yaml.safe_load(_f) or {}
+        return _cfg.get("pipeline_manifest", {})
+    except Exception:
+        return {}
+
+
+def get_manifest_hash() -> str:
+    """D2282: Compute frozen config manifest hash.
+
+    Combines pipeline_manifest from config with runtime git_commit.
+    Returns the same hash for all records in a single pipeline run.
+    Any config change → different hash → FB provenance is auditable.
+    """
+    global _MANIFEST_HASH
+    if _MANIFEST_HASH is None:
+        manifest = _load_manifest()
+        # Add runtime git commit (not in static config)
+        manifest["_git_commit"] = get_git_commit()
+        # Canonical JSON serialization for deterministic hashing
+        manifest_json = json.dumps(manifest, sort_keys=True, default=str)
+        _MANIFEST_HASH = hashlib.sha256(manifest_json.encode()).hexdigest()[:16]
+    return _MANIFEST_HASH
+
+
 def stamp_record(
     record: dict,
     gen_model: str | None = None,
@@ -75,12 +113,13 @@ def stamp_record(
         gen_model: Model that generated this record.
 
     Returns:
-        Same dict with added stamp fields.
+        Same dict with added stamp fields including manifest_hash (D2282).
     """
     record["schema_version"] = SCHEMA_VERSION
     record["gen_model"] = gen_model
     record["pipeline_commit"] = get_pipeline_commit()
     record["taxonomy_version"] = TAXONOMY_VERSION
+    record["manifest_hash"] = get_manifest_hash()  # D2282: config fingerprint
     record["pipeline_run_id"] = get_pipeline_run_id()  # P0.9 FIX: singleton
     record["created_at"] = datetime.now(UTC).isoformat()
     return record

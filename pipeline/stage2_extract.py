@@ -25,7 +25,7 @@ Process:
   3. Gate enforcement, golden few-shot parity, MinHash dedup
   4. Crash-safe incremental checkpoint
 
-Generator: Qwen3.6-35B-A3B-4bit (OMLX or MLX)
+Generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (OMLX)
 temp: 0.0 (R7)
 
 Usage:
@@ -52,6 +52,8 @@ from pipeline.pipeline_paths import (
     GEN_MODEL,
     S2_GATE_ENABLED,
     S2_GATE_STRICT,
+    S2_HIGH_COHESION_THRESHOLD,  # C12: config-driven cohesion tiers
+    S2_MED_COHESION_THRESHOLD,   # C12: config-driven cohesion tiers
     S2_GOLDEN_INJECT,
     S2_GOLDEN_MAX,
     S2_GOLDEN_NEGATIVE,
@@ -74,6 +76,16 @@ from pipeline.pipeline_paths import (
     STAGE2_PROBE_CACHE,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
+
+# D2276: Hybrid gate — DSPy-inspired pre-extraction filter (BUG-085 fix)
+try:
+    from pipeline.hybrid_gate import HybridGate
+    from pipeline.hybrid_gate import format_segments_for_gate as _fmt_segs_gate
+    _HYBRID_GATE_AVAILABLE: bool = True
+except ImportError:
+    _HYBRID_GATE_AVAILABLE = False
+    HybridGate = None  # type: ignore[assignment]
+    _fmt_segs_gate = None  # type: ignore[assignment]
 
 # ── Constants (T0.1: de-hardcoded — sourced from pipeline_config.yaml) ────
 MAX_CLUSTER_SAMPLES: int = S2_MAX_CLUSTER_SAMPLES      # Max segments to feed per cluster (from config)
@@ -187,9 +199,12 @@ A convergent principle is:
 
 PRINCIPLE STRUCTURE (required for every extraction):
 1. name: 3-7 word concept name (title case, precise)
-2. definition: 3-4 sentences. S1: name the principle. S2: explain the causal mechanism.
-   S3-4: describe boundary conditions and consequences.
-3. mechanism: "X causes/enables/prevents Y because Z" — the causal chain
+2. definition: 2-3 CONCISE sentences stating WHAT the principle IS. Be specific, not generic.
+   ❌ Do NOT explain HOW it works (that's mechanism).
+   ❌ Do NOT describe WHEN it applies/fails (that's boundary).
+   ❌ Do NOT state WHAT happens as a result (that's consequence).
+   ✅ Just name the phenomenon, pattern, or insight — crisp and scannable.
+3. mechanism: "X causes/enables/prevents Y because Z" — the causal chain. HOW it works.
 4. boundary: "The principle applies when [condition]. It fails when [counter-condition]."
 5. consequence: "Because of this principle, [what follows]."
 6. elaboration: 3-5 sentences of deeper nuance — edge cases, exceptions,
@@ -233,7 +248,7 @@ Return ONLY a JSON object with these EXACT keys. No markdown, no explanation.
 Example output:
 {
   "name": "Value-First Demonstration",
-  "definition": "Demonstrating concrete value before requesting commitment converts prospects because direct experience of benefit bypasses skepticism toward unverified claims. The principle holds when the value is demonstrable within minutes of first exposure.",
+  "definition": "Demonstrating concrete value before requesting commitment converts prospects at higher rates than persuasion-first approaches. The principle describes a product-led growth pattern where immediate tangible benefit replaces sales narrative as the primary conversion driver.",
   "mechanism": "Direct experience of value eliminates skepticism toward unverified claims because the prospect's own senses provide the proof, making external persuasion unnecessary.",
   "boundary": "Applies when value is demonstrable within minutes. Fails when value requires long-term usage to perceive (e.g., enterprise infrastructure, health supplements).",
   "consequence": "Products that can demonstrate value immediately grow faster through product-led adoption than those relying on sales narratives.",
@@ -333,9 +348,9 @@ def build_convergent_prompt(
 
     # Sample segments: fewer for high-cohesion clusters
     # D2215: capped at MAX_CLUSTER_SAMPLES to avoid OMLX memory guard (Qwen3.6 KV cache)
-    if cohesion >= 0.90:
+    if cohesion >= S2_HIGH_COHESION_THRESHOLD:
         n_samples: int = min(3, MAX_CLUSTER_SAMPLES)
-    elif cohesion >= 0.75:
+    elif cohesion >= S2_MED_COHESION_THRESHOLD:
         n_samples: int = min(5, MAX_CLUSTER_SAMPLES)
     else:
         n_samples: int = MAX_CLUSTER_SAMPLES
@@ -979,6 +994,7 @@ def run_stage2(
     only_convergent: bool = False,
     gate_enabled: bool = S2_GATE_ENABLED,
     gate_strict: bool = S2_GATE_STRICT,
+    hybrid_gate: bool = False,
 ) -> None:
     """Run Stage 2: Convergent principle extraction from clusters.
 
@@ -987,6 +1003,7 @@ def run_stage2(
         only_convergent: Skip single-source clusters.
         gate_enabled: Enable gate enforcement.
         gate_strict: Force [] on NULL-route with content.
+        hybrid_gate: D2276 — Use DSPy-inspired pre-extraction gate to skip non-principle clusters.
     """
     # D2215: Force write-through logging (tee/nohup/pipe corrupt buffered output on macOS)
     # python3 -u should be enough, but TextIOWrapper on macOS still buffers on
@@ -1047,8 +1064,30 @@ def run_stage2(
     print(f"   Single-source: {len(single_source)} | Noise: {len(noise)}")
     print(f"   Provider: {provider} | Model: {GEN_MODEL} | temp=0.0")
     print(f"   Golden: {golden_total} examples | Gate: {'on' if gate_enabled else 'off'}")
-    print(f"   Split Probe: {'on' if SPLIT_PROBE_ENABLED else 'off'} (size>{SPLIT_PROBE_MIN_SIZE}, coh<{SPLIT_PROBE_MAX_COHESION})")
+    print(f"   Hybrid Gate (D2276): {'✅ enabled' if hybrid_gate else 'off'} | Split Probe: {'on' if SPLIT_PROBE_ENABLED else 'off'}")
     print(f"{'='*60}")
+
+    # D2276: Initialize hybrid gate if enabled — pre-filters clusters before extraction
+    _hybrid_gate = None
+    if hybrid_gate:
+        if _HYBRID_GATE_AVAILABLE and HybridGate is not None:
+            _hybrid_gate = HybridGate(provider=provider)
+            print(f"   🚪 Hybrid gate initialized (model={_hybrid_gate._model})")
+        else:
+            print("   ⚠️  Hybrid gate requested but hybrid_gate.py not available — proceeding without gate")
+            hybrid_gate = False
+
+    # Helper: gather cluster segment texts for gate evaluation (D2276)
+    def _gather_cluster_segments(cluster: dict, segs: dict) -> list[dict]:
+        """Collect segment dicts for a cluster from the segments lookup."""
+        member_ids = cluster.get("member_segment_ids", [])
+        result = []
+        for sid in member_ids:
+            if sid in segs:
+                result.append(segs[sid])
+            if len(result) >= 8:  # Max 8 segments for gate efficiency
+                break
+        return result
 
     # ═══════════════════════════════════════════════════════════════════════
     # D2163: Principle Discovery Gate — probe convergent clusters for N>1
@@ -1210,6 +1249,23 @@ def run_stage2(
         # Fallback: if source_ids available, use len(source_ids); else len(source_books).
         book_count: int = cluster.get("source_diversity",
                           len(cluster.get("source_ids", cluster.get("source_books", []))))
+
+        # D2276: Hybrid gate — pre-filter before expensive extraction.
+        # The gate is a cheap LLM call (~50 tokens, ~1s) vs full extraction (~28s).
+        # From D2250 benchmark: gate is a perfect NEGATIVE filter (rejects 5/6 negatives).
+        # Fail-open: gate error → proceed with extraction (prefer false positive to data loss).
+        if hybrid_gate and is_conv and _hybrid_gate is not None:
+            try:
+                # Build compact segment text for gate decision
+                raw_segs = _gather_cluster_segments(cluster, segments)
+                seg_text = _fmt_segs_gate(raw_segs) if _fmt_segs_gate else "\n".join(
+                    s.get("text", "")[:350] for s in raw_segs[:8]
+                )
+                gate_route = _hybrid_gate.decide(seg_text, cluster.get("source_books", []))
+                if gate_route == "NULL":
+                    return [{"_null": True, "cluster_id": cid, "_gate_reason": "hybrid-gate-NULL"}]
+            except Exception:
+                pass  # Gate failure → proceed with extraction (fail-open)
 
         # Tiered prompt: convergent = full synthesis, single-source = simplified
         # D2231: Removed "or book_count >= 2" — convergence gate is is_convergent
@@ -1699,12 +1755,15 @@ def main() -> None:
                         help="LLM provider (default: omlx)")
     parser.add_argument("--no-gate", action="store_true",
                         help="Disable gate enforcement (debug only)")
+    parser.add_argument("--hybrid", action="store_true",
+                        help="D2276: Enable DSPy-inspired hybrid gate — pre-filter clusters before extraction")
     args: argparse.Namespace = parser.parse_args()
 
     run_stage2(
         provider=args.provider,
         only_convergent=args.only_convergent,
         gate_enabled=not args.no_gate,
+        hybrid_gate=args.hybrid,
     )
 
     if args.process_singletons:

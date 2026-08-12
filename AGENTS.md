@@ -86,11 +86,11 @@
 
 <!-- MODELS (CONSTITUTION §2 v3.0) -->
 <models>
-  Generator:    Qwen3.6-35B-A3B-4bit (OMLX)
-  Verifier:     Phi-4-mini-instruct-8bit (OMLX)
-  VerifierV2:   gemma-4-E4B-it-MLX-4bit (OMLX, R5 cross-family)
+  Generator:    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (OMLX)
+  Verifier:     gpt-oss-20b-MXFP4-Q8 (OMLX)
+  VerifierV2:   Phi-4-mini-instruct-8bit (OMLX, R5 cross-family, D2264)
   Embeddings:   bge-m3 (Ollama, 1024-dim)
-  NLI:          DeBERTa-v3-base-mnli (local, D2111)
+  NLI:          MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (local, D2255)
 </models>
 
 <!-- PROTECTED FILES — never overwrite -->

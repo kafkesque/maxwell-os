@@ -3,8 +3,8 @@
 DSPy Fine-Tuning Harness for Maxwell OS S2 Extraction Stage (T-007).
 
 Trains the S2 extractor (Qwen3-Coder) to produce convergent Foundation Blocks
-from multi-source book segment clusters using the v4.4 golden set (73 examples,
-75 FBs). Uses DirectOMLXLM (custom dspy.LM subclass) that bypasses litellm for all optimizers.
+from multi-source book segment clusters using the v4.4 golden set (75 examples,
+77 FBs). Uses DirectOMLXLM (custom dspy.LM subclass) that bypasses litellm for all optimizers.
 
 Architecture:
   1. ConvergentExtraction Signature → defines DSPy task I/O
@@ -47,7 +47,7 @@ with open(CONFIG_PATH) as f:
 _gen = _cfg.get("models", {}).get("generator", {})
 DSPY_MODEL = _gen.get("model", "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit") if isinstance(_gen, dict) else str(_gen)
 DSPY_TEMPERATURE = float(_gen.get("temperature", 0.0)) if isinstance(_gen, dict) else 0.0
-DSPY_MAX_TOKENS = 4096  # Override config's 1024: ConvergentExtraction needs 4K for 11 output fields
+DSPY_MAX_TOKENS = int(_cfg.get("s2", {}).get("dspy_max_tokens", 4096))  # D2304/C12: config-driven (was hardcoded 4096)
 # T-007b/D2250: MIPROv2 demo counts — config-driven (C12). D2248 showed 2 demos =
 # design-only (Cooper/Krug/Norman) while the golden pool spans 38 domains; 4 demos
 # give the optimizer enough labeled coverage for positive-fidelity extraction.
@@ -224,6 +224,10 @@ def golden_to_examples(
             dspy_ex.authors = frozenset(authors)
             dspy_ex.is_positive = should_extract
             dspy_ex.fb_name = fb.get("name", "")
+            # D2304: D2286 tier-aware split — GOLD-A (train) / GOLD-B (dev) / CHALLENGE (test).
+            # The golden YAML carries `tier` at the example level. Default to GOLD-A
+            # (never treat an unlabeled example as adversarial; GOLD-A is the safe train bucket).
+            dspy_ex.tier = ex.get("tier", "GOLD-A")
 
             examples.append(dspy_ex)
 
@@ -251,11 +255,11 @@ def stratified_random_split(
 
     Used as the default split strategy. Author-grouped split is ideal but
     requires a larger golden set (>200 examples) with cleaner author separation.
-    At 72 examples with many multi-author pairings, clean author separation
+    At 75 examples with many multi-author pairings, clean author separation
     is mathematically infeasible.
 
     For the DSPy pilot, we accept some author leakage and rely on the diverse
-    source material (40+ distinct authors across 70 examples) to provide
+    source material (40+ distinct authors across 75 examples) to provide
     sufficient generalization signal.
 
     Returns:
@@ -309,6 +313,101 @@ def stratified_random_split(
             print(f"  Author leakage: {len(leakage)}/{len(unique_authors)} ({leak_pct:.0f}%) — acceptable for pilot")
 
     return train, dev, test
+
+
+def tier_aware_split(
+    examples: list[dspy.Example],
+    verbose: bool = False,
+) -> tuple[list[dspy.Example], list[dspy.Example], list[dspy.Example]]:
+    """D2304/D2286: Tier-aware split — GOLD-A → train, GOLD-B → dev, CHALLENGE → test.
+
+    The golden YAML carries `tier` per example (GOLD-A: 49, GOLD-B: 3, CHALLENGE: 23).
+    D2286 defines the safety contract:
+      - GOLD-A  = human-adjudicated, multi-source convergent → TRAIN DSPy
+      - GOLD-B  = strong positives with minor ambiguity → DEV (evaluate), never train
+      - CHALLENGE = hard negatives / edge cases / adversarial → TEST, NEVER train
+
+    This split is the ONLY correct one for DSPy training: random split (stratified_random_split)
+    leaks CHALLENGE hard negatives into train, which optimizes the prompt toward
+    rejecting the very edge cases we need it to catch, and leaks GOLD-B into train
+    (which D2286 explicitly forbids).
+
+    Fallback: if no example carries a tier (should not happen — golden YAML v5.0 has
+    full tier coverage), every example is treated as GOLD-A (train). This preserves
+    the old behavior rather than silently dropping data.
+
+    Returns:
+        (train, dev, test) lists of dspy.Example, grouped by tier.
+    """
+    train: list[dspy.Example] = []
+    dev: list[dspy.Example] = []
+    test: list[dspy.Example] = []
+
+    for ex in examples:
+        tier = getattr(ex, "tier", "GOLD-A")
+        if tier == "GOLD-B":
+            dev.append(ex)
+        elif tier == "CHALLENGE":
+            test.append(ex)
+        else:  # GOLD-A or unlabeled → train (safe default)
+            train.append(ex)
+
+    if verbose:
+        total = max(len(examples), 1)
+        print(f"Tier-aware split (D2286): train(GOLD-A)={len(train)} ({len(train)/total:.0%}), "
+              f"dev(GOLD-B)={len(dev)} ({len(dev)/total:.0%}), "
+              f"test(CHALLENGE)={len(test)} ({len(test)/total:.0%})")
+        # Report tier counts for transparency
+        from collections import Counter
+        tiers = Counter(getattr(e, "tier", "GOLD-A") for e in examples)
+        print(f"  Tier distribution: {dict(tiers)}")
+        # Report author leakage for transparency (train vs test)
+        train_authors: set[str] = set()
+        test_authors: set[str] = set()
+        for ex in train:
+            train_authors.update(ex.authors)
+        for ex in test:
+            test_authors.update(ex.authors)
+        leakage = train_authors & test_authors
+        unique = train_authors | test_authors
+        if unique:
+            print(f"  Author leakage (train∩test): {len(leakage)}/{len(unique)} ({len(leakage)/len(unique)*100:.0f}%)")
+
+    return train, dev, test
+
+
+def load_optimized_program(path: Path | str | None = None) -> dspy.Module | None:
+    """D2304: Load a previously serialized DSPy program (D2243 persistence).
+
+    Args:
+        path: Path to the serialized program JSON. Defaults to the config-driven
+              D2243 save path. Returns None if the file does not exist.
+
+    Returns:
+        Loaded dspy.Module, or None if load fails.
+    """
+    from pipeline.pipeline_paths import DSPY_PROGRAM_PATH
+
+    p = Path(path) if path is not None else DSPY_PROGRAM_PATH
+    if not p.exists():
+        return None
+
+    try:
+        # Define the program class (must match the one used at train time)
+        class ExtractFB(dspy.Module):
+            def __init__(self):
+                super().__init__()
+                self.extract = dspy.ChainOfThought(ConvergentExtraction)
+
+            def forward(self, cluster_segments: str):
+                return self.extract(cluster_segments=cluster_segments)
+
+        program = ExtractFB()
+        program.load(str(p))
+        return program
+    except Exception as e:
+        print(f"⚠️  Could not load optimized program from {p}: {e}")
+        return None
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -573,7 +672,9 @@ def run_dspy_pilot(
 
     # D2243: Persist the optimized program so it survives crashes/reboots.
     # Lost the first pilot to kernel panic + /tmp cleanup — never again.
-    save_path = Path("/tmp/dspy_mipro_optimized.json")
+    # D2304: config-driven path (C12) — was hardcoded /tmp/dspy_mipro_optimized.json.
+    from pipeline.pipeline_paths import DSPY_PROGRAM_PATH
+    save_path = DSPY_PROGRAM_PATH
     try:
         optimized.save(str(save_path))
         if verbose:
@@ -656,10 +757,18 @@ def evaluate_on_test(
 # 7. Main Entry Points
 # ──────────────────────────────────────────────────────────────────────
 
-def cmd_dry_run(verbose: bool = True) -> None:
+def _split(examples: list[dspy.Example], strategy: str, verbose: bool):
+    """D2304: dispatch split strategy — 'tier' (default, D2286) or 'random' (legacy)."""
+    if strategy == "random":
+        return stratified_random_split(examples, verbose=verbose)
+    return tier_aware_split(examples, verbose=verbose)
+
+
+def cmd_dry_run(verbose: bool = True, split: str = "tier") -> None:
     """Validate golden set conversion and split without training."""
     examples = golden_to_examples(verbose=verbose)
-    train, dev, test = stratified_random_split(examples, verbose=verbose)
+    # D2304: tier-aware split is the default (D2286). Random split leaks CHALLENGE→train.
+    train, dev, test = _split(examples, split, verbose=verbose)
 
     # Print statistics
     print("\n── Golden Set Statistics ──")
@@ -695,14 +804,16 @@ def cmd_dry_run(verbose: bool = True) -> None:
     print(f"   Train: {len(train)} | Dev: {len(dev)} | Test: {len(test)}")
 
 
-def cmd_pilot(verbose: bool = True) -> None:
+def cmd_pilot(verbose: bool = True, split: str = "tier") -> None:
     """Run a 10-example pilot to validate the pipeline end-to-end."""
     examples = golden_to_examples(verbose=False)
-    train, dev, test = stratified_random_split(examples, verbose=verbose)
+    # D2304: tier-aware split (D2286). GOLD-A=train, GOLD-B=dev, CHALLENGE=test.
+    train, dev, test = _split(examples, split, verbose=verbose)
 
     # Use small subset for pilot (BootstrapFewShot is expensive — ~12s/API call)
+    # GOLD-B dev is small (3); pad pilot_dev from train if needed for a usable eval set.
     pilot_train = train[:3] if len(train) >= 3 else train
-    pilot_dev = dev[:2] if len(dev) >= 2 else dev
+    pilot_dev = dev[:2] if len(dev) >= 2 else train[:2]
 
     program = run_dspy_pilot(pilot_train, pilot_dev, verbose=verbose)
 
@@ -710,10 +821,11 @@ def cmd_pilot(verbose: bool = True) -> None:
         evaluate_on_test(program, test[:4], verbose=verbose)
 
 
-def cmd_full(verbose: bool = True) -> None:
+def cmd_full(verbose: bool = True, split: str = "tier") -> None:
     """Run full DSPy training on all examples."""
     examples = golden_to_examples(verbose=False)
-    train, dev, test = stratified_random_split(examples, verbose=verbose)
+    # D2304: tier-aware split (D2286). GOLD-A=train, GOLD-B=dev, CHALLENGE=test.
+    train, dev, test = _split(examples, split, verbose=verbose)
 
     program = run_dspy_pilot(train, dev, verbose=verbose)
 
@@ -755,17 +867,38 @@ def main() -> None:
         action="store_true",
         help="Suppress verbose output",
     )
+    parser.add_argument(
+        "--split",
+        type=str,
+        default="tier",
+        choices=["tier", "random"],
+        help="Split strategy: 'tier' (D2286 GOLD-A/B/CHALLENGE, default) or 'random' (legacy stratified)",
+    )
+    parser.add_argument(
+        "--load",
+        type=str,
+        default=None,
+        help="Load a previously serialized DSPy program and evaluate on the test split",
+    )
 
     args = parser.parse_args()
     verbose = not args.quiet
 
-    if args.pilot:
-        cmd_pilot(verbose=verbose)
+    # D2304: --load evaluates a persisted program against the held-out tier.
+    if args.load:
+        program = load_optimized_program(args.load)
+        if program is None:
+            sys.exit(1)
+        examples = golden_to_examples(verbose=False)
+        _, _, test = _split(examples, args.split, verbose=verbose)
+        evaluate_on_test(program, test, verbose=verbose)
+    elif args.pilot:
+        cmd_pilot(verbose=verbose, split=args.split)
     elif args.full:
-        cmd_full(verbose=verbose)
+        cmd_full(verbose=verbose, split=args.split)
     else:
-        # Default: dry run
-        cmd_dry_run(verbose=verbose)
+        # Default: dry run (tier-aware split by default, D2304)
+        cmd_dry_run(verbose=verbose, split=args.split)
 
 
 if __name__ == "__main__":

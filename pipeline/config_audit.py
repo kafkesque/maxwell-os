@@ -57,6 +57,9 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "services.omlx.retry_delay":        ("pipeline.omlx_call", "RETRY_DELAY", "int"),
     "services.ollama.embed_max_chars":  ("pipeline.ollama_embed", "EMBED_MAX_CHARS", "int"),
     "services.ollama.batch_size":       ("pipeline.ollama_embed", "BATCH_SIZE", "int"),
+    # ── D2304/D2307: DSPy + recall thresholds (C12) ──
+    "s2.dspy_max_tokens":               ("pipeline.dspy_trainer", "DSPY_MAX_TOKENS", "int"),
+    "recall.match_threshold":           ("pipeline.recall_measure", "DEFAULT_MATCH_THRESHOLD", "float"),
     # ── Coverage (T0.3) ──
     "coverage.threshold":               ("pipeline.coverage_check", "COVERAGE_THRESHOLD", "float"),
     "coverage.flag_fraction":           ("pipeline.coverage_check", "COVERAGE_FLAG_FRACTION", "float"),
@@ -77,7 +80,6 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     # ── Stage 1.5 tuning ──
     "stage1_5.min_cluster_size":        ("pipeline.pipeline_paths", "S15_MIN_CLUSTER_SIZE", "int"),
     "stage1_5.max_cluster_size":        ("pipeline.pipeline_paths", "S15_MAX_CLUSTER_SIZE", "int"),
-    "stage1_5.neighbor_k":              ("pipeline.pipeline_paths", "S15_NEIGHBOR_K", "int"),
     # ── Stage 2 tuning ──
     "stage2.batch_size":                ("pipeline.pipeline_paths", "S2_BATCH_SIZE", "int"),
     "stage2.evidence_tracking":         ("pipeline.pipeline_paths", "S2_EVIDENCE_TRACKING", "bool"),
@@ -103,6 +105,7 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
     "E2E_MIN_FBS",           # e2e_test.py — except fallback (mirrors config default=30)
     "E2E_CONVERGENT_RATIO",  # e2e_test.py — except fallback (mirrors config default=0.25)
     "INTERVAL",              # n2_watchdog.py — 300s polling loop (P3: migrate to config.stage2.watchdog_interval)
+    "TRADITIONAL_EXTRACT_SECONDS",  # hybrid_gate_ab.py — documented benchmark estimate, not a runtime threshold
 }
 
 

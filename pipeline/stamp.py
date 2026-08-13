@@ -6,7 +6,7 @@ Authority: CONSTITUTION.md R14, C10, D2282
 Usage:
     from pipeline.stamp import stamp, get_git_commit
 
-    @stamp(gen_model="Qwen3.6-35B-A3B-4bit")
+    @stamp(gen_model="Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
     def stage2_extract(segments):
         ...
 
@@ -15,7 +15,7 @@ Usage:
     #   manifest_hash (D2282), pipeline_run_id, created_at
 
     # Manual stamp:
-    stamped = stamp_record({"principle_text": "..."}, gen_model="Qwen3.6")
+    stamped = stamp_record({"principle_text": "..."}, gen_model="Qwen3-Coder-30B-A3B")
 """
 
 import hashlib
@@ -129,7 +129,7 @@ def stamp(gen_model: str | None = None):
     """Decorator: stamp every dict in the returned list.
 
     Usage:
-        @stamp(gen_model="Qwen3.6-35B-A3B-4bit")
+        @stamp(gen_model="Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
         def extract_principles(segments: list[dict]) -> list[dict]:
             ...
 

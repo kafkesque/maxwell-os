@@ -13,14 +13,14 @@ Features:
 Usage:
     from pipeline.omlx_call import call_omlx, call_omlx_json
 
-    text = call_omlx("Extract principles from: ...", model="Qwen3.6-35B-A3B-4bit")
-    data = call_omlx_json("Return JSON: {...}", model="Qwen3.6-35B-A3B-4bit")
+    text = call_omlx("Extract principles from: ...", model="Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
+    data = call_omlx_json("Return JSON: {...}", model="Qwen3-Coder-30B-A3B-Instruct-MLX-4bit")
 
 Backend selection:
     MAXWELL_INFERENCE_BACKEND=mlx   → direct MLX with speculative decoding
     MAXWELL_INFERENCE_BACKEND=omlx  → OMLX HTTP server (default)
 
-Generator ≠ Verifier (R5): Use Qwen3.6 for generation, Phi-4-mini for verification.
+Generator ≠ Verifier (R5): Use Qwen3-Coder-30B for generation, gpt-oss-20b for classification/verification.
 """
 
 import json
@@ -227,7 +227,7 @@ def call_omlx(
 
     Args:
         prompt: The user prompt.
-        model: Model name (default: Qwen3.6-35B-A3B-4bit).
+        model: Model name (default: GEN_MODEL from pipeline_config.yaml).
         system: Optional system message.
         max_tokens: Max tokens to generate.
         timeout: Request timeout in seconds (OMLX only).

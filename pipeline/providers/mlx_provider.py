@@ -12,14 +12,14 @@ Features:
   - Implements InferenceProvider protocol (C21)
 
 Model vs draft_model pairings:
-  - Qwen3.6-35B-A3B → Qwen2.5-0.5B-Instruct (same tokenizer family)
+  - Qwen3-Coder-30B-A3B → Qwen2.5-0.5B-Instruct (same tokenizer family)
   - Gemma-4-E4B → Gemma-2-2B-it (same tokenizer family)
   - Qwen3-Coder-30B → Qwen2.5-0.5B-Instruct (same tokenizer family)
 
 Usage:
     from pipeline.providers.mlx_provider import MLXInferenceProvider
 
-    provider = MLXInferenceProvider("mlx-community/Qwen3.6-35B-A3B-4bit")
+    provider = MLXInferenceProvider("mlx-community/Qwen3-Coder-30B-A3B-4bit")
     result = provider.generate("Explain pricing psychology.", system="Be concise.")
     json_result = provider.generate_json("Return: {\"name\": \"...\"}", system="JSON only.")
 """
@@ -83,7 +83,7 @@ class MLXInferenceProvider:
         """Initialize MLX inference provider.
 
         Args:
-            model_name: HuggingFace model ID (e.g. 'mlx-community/Qwen3.6-35B-A3B-4bit').
+            model_name: HuggingFace model ID (e.g. 'mlx-community/Qwen3-Coder-30B-A3B-4bit').
             draft_model_name: Optional draft model for speculative decoding.
                               Must share same tokenizer as main model.
             max_tokens_default: Default max_tokens for generate() calls.
@@ -164,7 +164,7 @@ class MLXInferenceProvider:
     def _strip_thinking(text: str) -> str:
         """Strip thinking/CoT tokens from model output.
 
-        Qwen3.6-35B emits answer first, then <think>...</think> reasoning.
+        Qwen3-Coder-30B emits answer first, then <think>...</think> reasoning.
         We keep text before <think> and discard everything after.
         Also handles models that put everything inside <think> tags.
         """

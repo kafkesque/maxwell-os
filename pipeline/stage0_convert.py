@@ -43,11 +43,21 @@ SUPPORTED_EXTENSIONS = {".epub", ".pdf", ".md"}  # .md = already converted
 MD_EXTENSION = ".md"
 
 
-def find_books(books_dir: Path) -> list[Path]:
-    """Find all EPUB and PDF files recursively in the books directory."""
+def find_books(books_dir: Path, subdir: str | None = None) -> list[Path]:
+    """Find all supported files recursively in the books directory.
+
+    Args:
+        books_dir: Root books directory.
+        subdir: Optional relative subdirectory to restrict the search (D2316:
+            domain-coherent e2e sampling — avoids the alphabetical grab-bag that
+            produced 3% convergence).
+    """
+    search_root = books_dir / subdir if subdir else books_dir
+    if subdir and not search_root.is_dir():
+        return []
     books = []
     for ext in SUPPORTED_EXTENSIONS:
-        books.extend(books_dir.rglob(f"*{ext}"))
+        books.extend(search_root.rglob(f"*{ext}"))
     return sorted(books, key=lambda p: p.name)
 
 
@@ -192,7 +202,10 @@ def run_stage0(
                 sys.exit(1)
         books = [book_path]
     else:
-        books = find_books(books_dir)
+        # D2316: domain-coherent sampling — restrict to a subdirectory when
+        # MAXWELL_BOOK_SUBDIR is set (e.g. e2e test).
+        subdir = os.environ.get("MAXWELL_BOOK_SUBDIR", "").strip() or None
+        books = find_books(books_dir, subdir=subdir)
 
     # ── Apply limit ─────────────────────────────────────────────────────
     if limit is not None and limit > 0:

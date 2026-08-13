@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-12 14:52 | **Decisions:** D2000-D2299 (274 decisions)
+> **Updated:** 2026-08-13 10:14 | **Decisions:** D2000-D2321 (310 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4), DeBERTa-v3-large (S5), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -307,3 +307,27 @@
 4. S2 hybrid NOT wired (BUG-085) — highest priority
 5. D2298 marks S5 architecture final — no ongoing human adjudication
 ```
+
+---
+
+## ✅ DONE — D2300-D2307 SENIOR RAG AUDIT (2026-08-12)
+
+| Decision | Description | Status |
+|----------|-------------|--------|
+| D2300 | Modularity gaps documented (InferenceProvider/EmbeddingProvider/StorageBackend unimplemented) | ✅ LOGGED |
+| D2301 | Cold-reload recovery — `cold_reload_delay` 45s (content=None) | ✅ DONE |
+| D2302 | DSPy 3 gaps logged (not-wired / stale Stage 3a / random split) | ✅ LOGGED |
+| D2303 | CRIBS bottleneck — batch CRIBS selected + wiring fixed | ✅ DONE |
+| D2304 | DSPy tier-aware split (GOLD-A→train/B→dev/CHALLENGE→test) + `load_optimized_program()` | ✅ DONE |
+| D2305 | Pipeline audit revelation — recall + latency SLA blindspots | ✅ LOGGED |
+| D2306 | InferenceProvider + EmbeddingProvider protocol implemented (OMLX + Ollama) | ✅ DONE |
+| D2307 | Recall measurement — `pipeline/recall_measure.py` | ✅ DONE |
+
+### ⏳ DEFERRED — POST-T1.1 (from D2300-D2307)
+
+| # | Task | Source |
+|---|------|--------|
+| GAP-1 | Wire DSPy trained program into stage2_extract.py | D2302 |
+| GAP-2 | Remove stale Stage 3a artifacts (prompts/s3a_*.txt) | D2302 |
+| SLA | End-to-end latency SLA | D2305 |
+| SB | StorageBackend protocol (stage6 SQLite) | D2300 |

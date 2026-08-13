@@ -7,6 +7,8 @@ health:
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
 
+healthcheck: health
+
 preflight:
     @echo "=== Maxwell OS Preflight ==="
     @python3 -c "from pipeline.pipeline_paths import ensure_dirs; ensure_dirs(); print('✅ Directories OK')"
@@ -31,6 +33,10 @@ stress:
     PYTHONPATH=. python3 pipeline/memory_guard.py --min-gb 6 || exit 1
     @echo "=== OMLX Chat Stress Test ==="
     PYTHONPATH=. python3 pipeline/stress_test.py
+
+# ── G10: OMLX wired-memory leak stress test (D2020 Layer 1, pre-26h-run gate) ──
+wired-stress:
+    PYTHONPATH=. python3 pipeline/omlx_wired_stress.py
 
 # ── Pipeline ──────────────────────────────────────────────────
 status:
@@ -80,7 +86,7 @@ smoke-fast:
     MAXWELL_RUN_ID=smoke python3 pipeline/stage6_commit.py
     @echo "✅ Fast smoke complete. Check output in stage6_commit/smoke/"
 
-# Full smoke: default models (Qwen3.6 + Gemma, ~5min)
+# Full smoke: default models (Qwen3-Coder-30B + gpt-oss-20b, ~5min)
 smoke: smoke-fast
     @echo "ℹ️  For plumbing-only (<30s no LLM): just smoke-plumbing"
 
@@ -93,6 +99,9 @@ e2e-test-fast:
 
 e2e-test-dry:
     python3 pipeline/e2e_test.py --dry-run "$@"
+
+# Alias: full pipeline evaluation (end-to-end validation)
+eval: e2e-test
 
 # ── MLX direct inference (2-3× faster, needs OMLX stopped) ─────
 mlx-smoke:
@@ -137,6 +146,15 @@ integrity:
 
 integrity-quick:
     python3 pipeline/integrity_check.py --quick
+
+# ── Full audit: config drift + integrity + lint + delegate safety ──
+audit:
+    @echo "=== Maxwell OS Full Audit ==="
+    python3 pipeline/config_audit.py --check-unchecked --strict || { echo "  ❌ Config drift or hardcoded values — fix before continuing"; exit 1; }
+    python3 pipeline/integrity_check.py --quick
+    @python3 -m ruff check pipeline/ 2>&1 | tail -5
+    python3 tools/delegate_safe.py
+    @echo "✅ Audit complete"
 
 # ── D2205 Retrieval Tools ─────────────────────────────────────
 # Graph-aware retrieval (FTS + vector + keyword + graph expansion)

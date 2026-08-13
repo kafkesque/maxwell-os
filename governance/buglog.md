@@ -1,8 +1,152 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-10 (D2254 — session handoff; BUG-074 RESOLVED, BUG-075 FIXED, BUG-053 retired for S4)
-> **Next review:** After full S2 extraction run
+> **Last updated:** 2026-08-13 (D2321 S5 NLI premise/hypothesis pairing fix — pass rate 36%→84%)
+> **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+### BUG-087 — 2026-08-12 — Duplicate-edition false convergence (source identity broken, 3 layers) 🔴
+- **Symptom:** `Safe Withdrawal Rate`, `Transgenic Artistic Agency`, `Black Swan` all `source_diversity:2, is_convergent:true` from two filenames of the SAME work (z-library vs liber3/1lib.sk). The central `is_convergent` claim is false for these FBs.
+- **Root cause (3 stacked layers):**
+  1. `book_metadata.compute_source_id` = SHA-256(author|title), but stage0_5 metadata is inconsistent (subtitle presence, co-author lists, title+subtitle concatenation) → same work resolves to 2 canonical IDs.
+  2. `schema_accessor.isor_score` counts RAW FILENAMES (`len(set(source_books))`), not canonical IDs → duplicate editions inflate source count.
+  3. `schema_accessor._extract_author_surname` splits on `" — "` (em-dash) but corpus uses `"Title (Author) (source).md"` (parenthesis) → returns full filename → `n_authors == n_sources`.
+- **Fix:** D2308 (metadata normalization + canonical work count) + D2309 (ISOR metadata-author + canonical source count).
+- **Status:** ✅ FIXED (D2308+D2309, 2026-08-12) — duplicate editions collapse to one canonical work
+- **Files:** `pipeline/book_metadata.py`, `pipeline/schema_accessor.py`, `pipeline/stage1_5_embed_cluster.py`
+- **Source:** Roundtable adjudication 2026-08-12 — ChatGPT C1/E1, verified against probe data
+
+### BUG-088 — 2026-08-12 — ISOR author extraction heuristic + rating precedence bug 🟠
+- **Symptom:** 0/40 probe FBs rated "weak"; `n_authors == n_sources` always; `author_score` pinned at 1.0. `Data-driven Pipeline Processing` reports `n_authors=23` from 23 filenames.
+- **Root cause:** `_extract_author_surname` expects `"Title — Author"` (0/268 source_books use this; 268 use parenthesis) → returns full filename as "surname". Rating condition `n_authors>=2 or n_domains>=2 and n_sources>=2` binds `and` tighter than `or` → `n_authors>=2 or (n_domains>=2 and n_sources>=2)`.
+- **Fix:** D2309.
+- **Status:** ✅ FIXED (D2309, 2026-08-12) — metadata author + canonical source count; "weak" reachable (5 FBs)
+- **Files:** `pipeline/schema_accessor.py`
+- **Source:** Roundtable adjudication 2026-08-12 — Qwen C2 / Kimi C2, root-caused
+
+### GOLDEN-AUDIT — 2026-08-12 — Golden set validity verified after pipeline changes 🟢 (3 minor findings)
+- **Verification:** `pipeline/golden_validate.py` PASSES (75 examples, all 5 checks: no dup keys, verbatim evidence, route/should_extract consistency, author diversity, meta count). All `is_convergent=True` positives have genuinely distinct sources (no post-D2308 duplicate-edition false positives). `dspy_trainer.golden_to_examples()` parses all 75 entries → 77 FB objects. Golden set is **STILL VALID and USABLE** after D2298/D2308/D2309/D2310/D2241.
+- **Finding 1 — 3 examples missing `discipline`:** NEG-CONV-001/002/003 have no `discipline` field (predate the field's addition). Low risk — all are CHALLENGE negatives where discipline is irrelevant. Should backfill for schema uniformity before D2292 depth expansion.
+- **Finding 2 — NEG-DUP-001/002 use `discipline: emerging`:** Both new hard negatives label discipline as `emerging` (catch-all) despite having concrete domains (finance, art). Harmless for route=NULL negatives, but lazy labeling — backfill real disciplines (finance→finance/behavioral-finance, art→art/design).
+- **Finding 3 — dead `depth` field in 54 positive FBs:** D2241 moved depth classification to S4, but `expected_fb.depth` remains populated in 54 positives (0 consumers — `golden_to_examples()` ignores it). Dead data per C19; strip during D2292 golden depth expansion (BUG-084), which will reintroduce depth as a dedicated S4 benchmark.
+- **Note (GAP-1, post-T1.1):** `golden_to_examples()` maps `is_convergent = should_extract AND is_convergent`, collapsing the golden set's 4 quadrants (convergent-pos / false-convergence / single-source-pos / plain-neg) onto a single bool. The `route` field preserves the distinction, so DSPy can still learn correctly, but the `is_convergent` OutputField alone is ambiguous for GOLD-B single-source positives (CONV-035/037/039 → `is_convergent=False` + `route=FB`). Reconcile semantics when wiring DSPy (GAP-1).
+- **Drift fixed (this session):** `dspy_trainer.py` docstrings corrected 73→75 examples / 77 FBs, CHALLENGE 21→23, "72 examples"/"70 examples"→75.
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`, `pipeline/dspy_trainer.py`
+
+### BUG-089 — 2026-08-12 — `just eval` S2 hardcoded 600s timeout kills extraction 🔴
+- **Symptom:** `just eval` (e2e_test.py) ran S0→S1.5 clean (191 clusters, 5 convergent) then `stage2_extract.py` raised `subprocess.TimeoutExpired` after exactly 600s with only 3 FBs written. Full eval could never complete.
+- **Root cause:** `pipeline/e2e_test.py::run_stage()` hardcoded `timeout=600` (10min) for every stage — a C12 violation. The 30B generator (Qwen3-Coder-30B) needs far longer for S2 on 20 books (599 cluster+singleton targets). Config already had `stages.timeouts['2']=null` (D2269) for `runner.py`, but e2e_test.py ignored it.
+- **Fix (D2311):** Added `_get_stage_timeout()` + `_STAGE_ID_BY_SCRIPT` to e2e_test.py, reading per-stage timeout from `config/pipeline_config.yaml` (`stages.timeouts`), mirroring `runner.py::_get_stage_timeout`. S2 now `null` (unlimited) instead of 600s.
+- **Status:** ✅ FIXED (D2311, 2026-08-12) — `_get_stage_timeout('stage2_extract.py')` → None; other stages → 3600s.
+- **Files:** `pipeline/e2e_test.py`
+- **Source:** `just eval` run 2026-08-12 (this session)
+
+### BUG-090 — 2026-08-12 — e2e `validate_results()` reads stale "latest" checkpoint, not the e2e run 🔴
+- **Symptom:** `just eval` ran all 9 stages clean (703s, 9/9 passed) then crashed in `validate_results()` with `JSONDecodeError: line 1 column 78` loading `STAGE2_CHECKPOINT`. Validation never ran.
+- **Root cause (2 layers):**
+  1. `pipeline_paths` caches `run_id` at import time from `MAXWELL_RUN_ID` (default `latest`). `e2e_test.py` imports it at module top *before* `run_stage()` sets `MAXWELL_RUN_ID=e2e` for the subprocesses — so the module-level `STAGE2_CHECKPOINT` resolves to `latest/checkpoint.jsonl`.
+  2. `latest/checkpoint.jsonl` is a STALE file (Aug 12 18:01 diagnostic run) containing pretty-printed JSON (not JSONL) → `_load_jsonl` raises `JSONDecodeError`.
+- **Fix (D2312):** Set `os.environ.setdefault("MAXWELL_RUN_ID", "e2e")` at the top of `e2e_test.py`, BEFORE importing `pipeline_paths`. Checkpoints now resolve to `{stage}/e2e/checkpoint.jsonl` (the run that was just executed).
+- **Status:** ✅ FIXED (D2312, 2026-08-12) — `STAGE2_CHECKPOINT` → `stage2_extract/e2e/checkpoint.jsonl`.
+- **Files:** `pipeline/e2e_test.py`
+- **Source:** `just eval` run 2026-08-12 (this session)
+
+### BUG-091 — 2026-08-12 — e2e validation report: `db_commit` KeyError + `disciplines` field drift 🟡
+- **Symptom 1:** `validate_results()` crashed with `KeyError: 'threshold'` after printing `verify_pass_rate` — the `db_commit` check dict (Check 5) lacked a `threshold` key, and the print loop did `check['threshold']`.
+- **Symptom 2:** `multi_label: 0/3` always — the check read `fb.get("disciplines")` (plural list) but S4 writes `domains` (plural list) + `discipline` (singular string). Field-name drift made the check measure a nonexistent key.
+- **Fix (D2313/D2314):** Added `threshold: "written"` to the `db_commit` check; made the print loop defensive via `check.get('threshold', '—')`; changed `multi_label` to read `domains` (the actual multi-label field).
+- **Status:** ✅ FIXED (2026-08-12)
+- **Files:** `pipeline/e2e_test.py`
+- **Source:** `just eval` run 2026-08-12 (this session)
+
+### D2315 — 2026-08-12 — Black Swan title-concat case: 3rd duplicate-edition now collapses ✅
+- **Residual from G1 (BUG-087):** `The Black Swan (Taleb)` and `The Black SwanThe Impact of the Highly Improbable (Taleb)` are the same work but the camelCase-concatenated subtitle made `normalize_title` yield two different canonical titles → false divergence (source_diversity 2).
+- **Root cause:** `_SUBTITLE_SPLIT` only handles explicit separators (`:—–-`); the concat case ("SwanThe") was camelCase-split but the subtitle phrase was retained.
+- **Fix:** `_CONCAT_SUBTITLE_SPLIT` regex splits at the camelCase boundary preceding a subtitle-opener (`The|A|An|How|Why|What`) and drops the remainder. "The Black SwanThe Impact…" → "the black swan". Verified all 3 dup-edition cases now collapse (`resolve_source_id` equal); regression-safe on Make Bootstrapper + Speculative Everything.
+- **Status:** ✅ FIXED (2026-08-12)
+- **Files:** `pipeline/book_metadata.py`
+
+### D2316 — 2026-08-12 — Domain-coherent e2e book sampling ✅
+- **Symptom:** `just eval` selected the first 20 books alphabetically (a domain-diverse grab-bag) → 3% convergent clusters, 3 FBs — useless for convergence validation.
+- **Fix:** `stage0_convert.find_books()` accepts a `subdir` filter via `MAXWELL_BOOK_SUBDIR`; `e2e_test.py` gained `--subdir` (default `DOMAIN 6 AI + Computing/ai+engineering+agents`, 55 coherent AI-agents books).
+- **Status:** ✅ FIXED (2026-08-12)
+- **Files:** `pipeline/stage0_convert.py`, `pipeline/e2e_test.py`
+
+### G10 — 2026-08-12 — OMLX wired-memory leak stress test ✅ PASS
+- **Result:** 5 rounds × 20 reqs (Qwen3-Coder-30B), wired flat 34.07→34.07 GB, cumulative growth 0.0%, 0 errors. No GitHub #2184 leak. `just wired-stress`.
+- **Status:** ✅ PASS (2026-08-12)
+- **Files:** `pipeline/omlx_wired_stress.py`
+
+### D2317 — 2026-08-12 — stage2 stale-FB contamination on segids mismatch 🟡
+- **Symptom:** When a new e2e run uses a different book sample, `stage2_extract.py`'s resume logic detects a segids mismatch (old cluster IDs have 0 overlap with new probe targets) and clears `processed_ids` — but `all_fbs` (already loaded from the old checkpoint) was NOT cleared. Stale FBs from the prior run would be appended to the new run's checkpoint.
+- **Fix:** Added `all_fbs = []` alongside `processed_ids = set()` in the mismatch branch.
+- **Status:** ✅ FIXED (2026-08-12). Note: the running coherent eval was launched before this fix, so its checkpoint may retain 3 stale diverse-run FBs (~10% of expected output) — minor, flag-only.
+- **Files:** `pipeline/stage2_extract.py`
+
+### D2319 — 2026-08-13 — S2 discovery probe used GPT-OSS (reasoning model) → PROBE ABORT (2×) 🔴
+- **Symptom:** Domain-coherent `just eval` (39 convergent clusters) failed at `stage2_extract.py` rc=1 with `PROBE ABORT` — `discover_principles()` returned None for >10% of clusters (cluster_109, cluster_212, …). Diverse run (5 clusters) never crossed the threshold, masking the bug.
+- **Root cause:** `discover_principles()` called `call_llm(model=VERIFY_MODEL=gpt-oss-20b)`. VERIFY_MODEL was repointed to GPT-OSS (D2249/D2250, S4 classifier) but the probe was *designed* for Phi-4-mini (fast, ~1.5s, non-reasoning). GPT-OSS is a reasoning model: during cold reload it emits only `reasoning_content` (no JSON `content`) → `call_omlx` raises "content missing" → `call_llm` returns None. A "Reasoning: none" prefix (D2318 attempt) reduced but did NOT eliminate failures — the cold-reload reasoning_content emission persists.
+- **Fix:** Repoint the probe to `VERIFY_MODEL_V2` (Phi-4-mini-instruct-8bit) — the original fast probe model. Phi-4-mini is non-reasoning, JSON-mode-safe (`response_format: json_object`), and returns `{"principle_count": N}` with `finish: stop` (no `reasoning_content`). Verified via direct call.
+- **Status:** ✅ FIXED (2026-08-13)
+- **Files:** `pipeline/stage2_extract.py`
+- **Supersedes:** D2318 (Reasoning:none prefix — necessary for stage4, insufficient for the probe)
+
+### D2320 — 2026-08-13 — Stage4 D2072 dedup KeyError on v3.0 `fb_id` records 🔴
+- **Symptom:** `stage4_merge.py` crashed `KeyError: 'principle_id'` at line 1408 after writing the 88-FB checkpoint. Triggered by the domain-coherent run producing `content_type: process_template` (3) + `tool_instruction` (1) FBs — the diverse run had none, masking the bug.
+- **Root cause:** The D2072/D2073 separate-output dedup blocks (`growth_edges`, `process_templates`, `process_instances`, `tool_instructions`) read `rec["principle_id"]`, but v3.0 stage2 records use `fb_id` (no `principle_id` field).
+- **Fix:** All four dedup blocks now use `rec.get("fb_id") or rec.get("principle_id", "")`.
+- **Status:** ✅ FIXED (2026-08-13)
+- **Files:** `pipeline/stage4_merge.py`
+
+### BUG-092 — 2026-08-13 — S5 DeBERTa NLI fed single concatenated string (no premise/hypothesis) → 36% false pass rate 🔴
+- **Symptom:** Domain-coherent eval showed `verify_pass_rate: 32/88 (36%)` — 56 FBs QUARANTINE. Manual classification of all 56 revealed ~50 are factually correct ("Sigmoid maps to (0,1)", "Transformer dim scaling", "Data Leakage Prevention", "Graceful Degradation") — a ~90% false-negative rate, the opposite of a healthy fail-closed gate.
+- **Root cause (2 stacked bugs in `deberta_check()`):**
+  1. **BUG-A (pairing):** `_txt = f"{_def} {_ep}"[:512]` concatenated definition+evidence into ONE string and fed it to DeBERTa as a single sequence. NLI models require `(premise=evidence, hypothesis=definition)` as two sequences; a single blob produces meaningless logits biased to NEUTRAL.
+  2. **BUG-B (top-1 collapse):** `debert(_txt)` used the `text-classification` pipeline default (top-1 only). When the argmax was NEUTRAL, both `ent` and `cont` defaulted to 0.0 and the detail string mislabeled it `CONTRA` (`34x "CONTRA: ent=0.00 cont=0.00"` were actually NEUTRAL verdicts).
+- **Fix (D2321):** Pass proper pair `debert({"text": premise, "text_pair": hypothesis}, top_k=3)`; read all three labels and distinguish ENTAIL / NEUTRAL / CONTRA; add config-driven truncation `nli_max_premise_chars`/`nli_max_hypothesis_chars` (256) honoring C12.
+- **Impact:** Re-run of S5 on the same 88 FBs: **32/88 (36%) → 74/88 (84%)**. Remaining 14 QUARANTINE = 3 genuinely vacuous MECH-FAIL + 11 NEUTRAL cross-source syntheses (legitimate fail-closed cost; D2285 claim-decomposition is the future recovery path).
+- **Note:** D2293 "calibration" (P=1.000/R=0.556/F1=0.714 on 12 FBs) was measured on this SAME broken call → calibration numbers are suspect and should be re-derived post-fix.
+- **Status:** ✅ FIXED (2026-08-13)
+- **Files:** `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+
+### D2321 — 2026-08-13 — S5 NLI premise/hypothesis pairing + all-3-label scoring ✅
+- **Fix for BUG-092:** `deberta_check()` now passes `(premise=evidence, hypothesis=definition)` as a proper two-sequence pair via `{"text": ..., "text_pair": ...}`, reads all three NLI labels (`top_k=3`), and distinguishes ENTAIL/NEUTRAL/CONTRA in both the detail string and fail-closed logic. Truncation limits moved to config (`stage5.nli_max_premise_chars`/`nli_max_hypothesis_chars`, default 256).
+- **Config keys added:** `stage5.nli_max_premise_chars`, `stage5.nli_max_hypothesis_chars`; exported as `S5_NLI_MAX_PREMISE_CHARS`/`S5_NLI_MAX_HYPOTHESIS_CHARS`.
+- **Status:** ✅ FIXED (2026-08-13)
+- **Files:** `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+
+### D2322 — 2026-08-13 — nli_calibrate.py re-derivation: 3 bugs + non-reproducible D2293 calibration 🔴
+- **Task:** Re-derive the S5 NLI threshold post-BUG-092 (the D2293 "P=1.000/R=0.556/F1=0.714 at 0.10" was measured on the broken single-sequence call).
+- **Found 3 bugs in `nli_calibrate.py` (same family as BUG-092):**
+  1. `load_fbs_from_stage4()` read `STAGE4_OUTPUT` (`stage4_merge/e2e/fbs.jsonl`, does NOT exist) instead of `STAGE4_CHECKPOINT` (`checkpoint.jsonl`).
+  2. `calibrate()` used `deberta_check()` which returned `0.0` entailment on every non-pass verdict → the threshold sweep collapsed to a binary pass/fail.
+  3. Sweep range `np.arange(0.50, 0.96, 0.05)` was a stale ModernBERT-era guess that never covered the D2298 operating threshold 0.10 (DeBERTa entailment scores on paraphrase evidence cluster LOW).
+- **Fix:** Repointed to `STAGE4_CHECKPOINT`; extracted `_nli_pair_scores()` (D2322) in `stage5_verify.py` returning continuous `(entail, neutral, contra)` and used it directly in `calibrate()`; extended sweep to `0.05–0.95`. `deberta_check()` now returns the continuous entailment score on non-pass (was `0.0`).
+- **Honest auto-calibration result (466 pairs, 88 FBs):** at 0.10 → **P=0.647 / R=0.386 / F1=0.484**; best F1 at 0.05 (P=0.619/R=0.468/F1=0.533); best precision at 0.50 (P=0.667/R=0.180). **D2293's P=1.000 is NOT reproducible.**
+- **Interpretation (IMPORTANT):** the auto-pair methodology (definition ↔ single evidence passage) measures *strict single-passage entailment*, NOT the S5 gate's real question (*is the cross-source synthesis supported by its corpus evidence?*). It is therefore a PESSIMISTIC lower bound — cross-source syntheses don't strictly entail from any single passage (D2227 paraphrase evidence). The most reliable current signal is the empirical S5 run (84% pass, ~90% manual correctness, 14 quarantine = 3 vacuous + 11 NEUTRAL).
+- **Decision:** KEEP threshold 0.10 (fail-closed, empirically sound). A proper human-labeled FB-level re-calibration (D2293 methodology) is deferred — fold into D2292 golden-depth expansion or a dedicated adjudication pass post-T1.1.
+- **Status:** ✅ FIXED (2026-08-13). Threshold unchanged (0.10). Docs/code now carry the honest auto-calibration numbers instead of the unreproducible D2293 P=1.0.
+- **Files:** `pipeline/nli_calibrate.py`, `pipeline/stage5_verify.py`
+
+### STALE BUGS CLOSED — 2026-08-12 (validated already-fixed; were marked OPEN in error)
+- **BUG-080.4** (runner 60-min timeout) → **already fixed by D2269** (config `stages.timeouts` `'2': null`).
+- **BUG-080.5** (S5 completeness substitutes application for mechanism) → **already fixed by D2298** (`check_completeness` deleted).
+- **BUG-080.6** (NLI threshold validation warns only) → **already fixed by D2272** (`_validate_nli_thresholds()` raises ValueError).
+- **BUG-080.7** (Ollama path missing dim assertion) → **already fixed by D2274** (ValueError on mismatch, line 296-299).
+- **BUG-080.8** (dropped embeddings not gated) → **already fixed by D2275** (RuntimeError >0.5% drop rate).
+
+### BUG-086 — 2026-08-12 — S4 batch CRIBS results silently ignored (orphaned config) 🟠
+- **Symptom:** S4 CRIBS enrichment ran ~61s/FB despite `batch_enabled: true`. Batch pre-classification
+  collected `_pre_classified` results but the main loop never consumed them.
+- **Root cause:** `merged_call_enabled` config flag was orphaned — `_use_merged` was set from
+  `os.environ.get("MAXWELL_MERGED_S4")` only, so config `true` was ignored. The
+  `elif cluster_id in _pre_classified` branch was gated behind `_use_merged`, which was
+  always False → batch results discarded → slow two-call path ran for every FB.
+- **Fix (D2303):** Read `merged_call_enabled` from config (`_PIPELINE_CFG.get("stage4", {}).get("merged_call_enabled")`)
+  in `_use_merged`; added a standalone `elif cluster_id in _pre_classified` branch so batch
+  results are consumed regardless of `_use_merged`. Expected ~3× speedup (~19.4s/FB vs ~61s/FB).
+- **Status:** ✅ FIXED (2026-08-12, D2303)
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** Senior RAG audit — CRIBS bottleneck investigation
 
 ### D2211: P0 Circuit Breaker & Error Propagation Fixes (2026-08-08)
 
@@ -427,7 +571,7 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 | **Root Cause** | OMLX server bug. Not a Maxwell OS code bug. |
 | **Proposed Fix** | Stress test: 5 consecutive pipeline runs, monitor `vm_stat` for wired memory accumulation. If growth >10%, add explicit `sudo purge` between stages or reduce batch sizes. |
 | **Source** | ROUNDTABLE-HANDOFF; Gap A from ULTIMATE-CROSS-EXAMINATION-HANDOFF.md |
-| **Status** | 🔴 OPEN — Phase 0, P0.0 (must run BEFORE any pipeline fixes) |
+| **Status** | ✅ RESOLVED (2026-08-12, G10) — `pipeline/omlx_wired_stress.py` (D2020 Layer 1): 5 rounds × 20 reqs, wired flat 34.26→34.22 GB (-0.11% cumulative), 0 errors. No GitHub #2184 leak detected. Run `just wired-stress` as the pre-26h-run gate. |
 
 ---
 
@@ -702,7 +846,7 @@ Cross-referenced all 17 original bugs against production code.
 | BUG-014 | OPEN — P0.13 | ✅ RESOLVED | No cloud code found in pipeline |
 | BUG-015 | OPEN — P0.5.5 | ✅ RESOLVED | datasketch import now raises ImportError |
 | BUG-016 | OPEN — P0.14 | ✅ RESOLVED | Phantom models removed/commented in model_assignments.yaml |
-| BUG-017 | OPEN — P0.0 | 🔴 OPEN | Needs 130-book OMLX stress test (not testable in sandbox) |
+| BUG-017 | OPEN — P0.0 | ✅ RESOLVED (G10) | Wired-memory stress test PASS — flat (-0.11%), no leak |
 
 **Summary: 14/17 resolved, 1 reverted (BUG-003), 2 still open (BUG-004, BUG-017)**
 
@@ -1146,7 +1290,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Phi-4-mini-3.8B is underpowered for 10-field JSON output including semantic depth classification (Kimi audit prediction confirmed). The model defaults to `cross-domain` as a safe middle-ground when it cannot discriminate depth levels reliably.
 - **Impact:** If merged call becomes default, all FBs will be shallowly classified as `cross-domain` — depth signal lost. Pipeline S5 verification would proceed on misclassified FBs.
 - **Mitigation (D2226):** Merged call kept as opt-in (`MAXWELL_MERGED_S4=1`). Default remains two-call path (CRIBS from Qwen3-35B + Classify from Phi-4-mini, now with mechanism fed to classifier). Recommendation: upgrade S4 classifier to Qwen3-8B or stronger model before making merged call the default.
-- **Status:** 🔴 OPEN — Model upgrade needed. Phi-4-mini adequate for CRIBS enrichment only, not for depth classification.
+- **Status:** ✅ RESOLVED (2026-08-12) — S4 classify model is `gpt-oss-20b-MXFP4-Q8` (config `models.verifier.model` → `VERIFY_MODEL`), NOT Phi-4-mini. Depth is LLM-classified semantically (D2220) via focused depth prompt (D2247). Merged call remains opt-in (D2226). BUG-062 root cause (Phi-4-mini depth over-assignment) no longer applies.
 
 *Updated: 2026-08-10 (D2226 audit) | Bugs tracked: 54 | Resolved: 46 | Closed (moot): 5 | Open: 3 | Schema version: 1.9*
 
@@ -1538,9 +1682,9 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   into the production extraction path.
 - **Fix:** Wire hybrid_s2_extract() into stage2_extract.py with DSPy gate → traditional extraction
   path. T-007b-v2 scheduled for demo re-optimization but wiring itself is independent.
-- **Status:** 🔴 Wire before T1.1 (D2276)
-- **Files:** `pipeline/stage2_extract.py`, `tools/compare_s2_methods.py`
-- **Source:** Round 2 cross-examination: Claude External, ChatGPT
+- **Status:** ✅ RESOLVED (2026-08-12) — A/B tested. HybridGate was wired (D2276, `--hybrid` flag) but was **broken at runtime** (`call_omlx()` has no `temperature` kwarg → 100% ERROR → fail-open FB). Fixed the kwarg. A/B test on 75 golden examples (`pipeline/hybrid_gate_ab.py`): positive recall 100% (0 FNs), but **negative rejection only 4.3%** (1/23 negatives) → net **-5.3% time** (gate costs more than it saves). Verdict: **do NOT enable `--hybrid` for T1.1 — run traditional-only.** The D2250 "perfect negative filter (5/6)" was the *DSPy* gate, NOT this heuristic HybridGate. Revisit hybrid only after GAP-1 (real DSPy fine-tuning).
+- **Files:** `pipeline/stage2_extract.py`, `pipeline/hybrid_gate.py`, `pipeline/hybrid_gate_ab.py`, `tools/compare_s2_methods.py`
+- **Source:** A/B test 2026-08-12 (this session)
 
 ### BUG-080: call_omlx_json returns list/str — S4 classification crashes 🔴
 | Field | Value |

@@ -1,8 +1,63 @@
-# Maxwell OS v2.0 — Decision Log
+# Maxwell OS v3.0 — Decision Log
 > **Append-only.** Newest first. Hash-chained.
 
 ---
 
+
+### D2310 — ISOR/Discipline/Confidence Fixes (2026-08-12)
+**Category:** QLT
+**Decision:** Roundtable adjudication fixes. G2: ISOR now uses metadata author + canonical source count with correct precedence — "weak" bucket reachable (5 FBs). G4: S5 confidence decoupled from NLI (NLI is a binary gate, not 75% weight); weights mechanism 0.35 / enrichment 0.25 / ISOR 0.40 with quarantine cap 0.25. G9: discipline "emerging" over-firing fixed — preserve `discipline_raw` + `taxonomy_match_method`.
+**Files:** `pipeline/schema_accessor.py`, `pipeline/stage5_verify.py`, `config/pipeline_config.yaml`
+
+### D2309 — ISOR Author Extraction + Precedence Fix (2026-08-12)
+**Category:** QLT
+**Decision:** Fix `_extract_author_surname` (parenthesis format, not em-dash) and rating precedence (`n_authors>=2 or (n_domains>=2 and n_sources>=2)`). Closes BUG-088.
+**Files:** `pipeline/schema_accessor.py`
+
+### D2308 — Source Identity: Metadata Normalization + Work-Level Convergence (2026-08-12)
+**Category:** DAT
+**Decision:** `compute_source_id` uses normalized author/title; `is_convergent` redefined on distinct canonical works ≥2 (not raw filenames). Duplicate editions collapse to one canonical work. Closes BUG-087 (false convergence from z-library vs liber3/1lib.sk).
+**Files:** `pipeline/book_metadata.py`, `pipeline/stage1_5_embed_cluster.py`, `pipeline/schema_accessor.py`
+
+### D2307 — Recall Measurement (2026-08-12)
+**Category:** VAL
+**Decision:** Created `pipeline/recall_measure.py` to close the recall blindspot (D2305). Measures golden-set recall via normalized name token-overlap (Jaccard) matching — deterministic (R7), zero LLM cost. Reports recall/precision/F1 + per-tier breakdown (D2286). Name-based matching chosen over evidence matching because S2 paraphrases evidence (D2227) — evidence matching would under-count for a non-miss reason. Smoke-tested on 40-FB probe: recall 0.019 (expected — probe did not sample golden principles).
+**Files:** `pipeline/recall_measure.py`
+
+### D2306 — InferenceProvider + EmbeddingProvider Protocol Implemented (2026-08-12)
+**Category:** ARCH
+**Decision:** Implemented `OMLXInferenceProvider` and `OllamaEmbeddingProvider`, both implementing the D2055 protocols from `providers/base.py`. They delegate to `omlx_call`/`ollama_embed` (single HTTP code path — no drift). Exported from `providers/__init__.py`. Closes the D2300 component-level gap for inference + embedding; StorageBackend (stage6 SQLite) remains open.
+**Files:** `pipeline/providers/omlx_provider.py`, `pipeline/providers/ollama_provider.py`, `pipeline/providers/__init__.py`
+
+### D2305 — Pipeline Audit Revelation: Recall + Latency SLA Blindspots (2026-08-12)
+**Category:** ARCH
+**Decision:** Senior RAG audit identified remaining blindspots: (1) no end-to-end recall measurement against golden set (yield never measured vs ground truth), (2) no end-to-end latency SLA. Also documented: modularity gaps (D2300), DSPy gaps (D2302), CRIBS bottleneck (D2303). Recall blindspot closed via D2307.
+**Files:** `governance/aggregated_remaining_tasks.md`, `pipeline/recall_measure.py`
+
+### D2304 — DSPy Tier-Aware Split + Program Load (2026-08-12)
+**Category:** ARCH
+**Decision:** Implemented `tier_aware_split()`: GOLD-A (49) → train, GOLD-B (3) → dev, CHALLENGE (21) → test, per D2286. Default split is now "tier" (was random, which leaked CHALLENGE hard negatives into train). Added `load_optimized_program()` (D2243 persistence), config-driven `DSPY_PROGRAM_PATH` (was hardcoded `/tmp`). CLI `--split {tier,random}` + `--load`. `golden_to_examples()` attaches `ex.tier`.
+**Files:** `pipeline/dspy_trainer.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+
+### D2303 — CRIBS Bottleneck Mitigation: Batch CRIBS Selected (2026-08-12)
+**Category:** PERF
+**Decision:** S4 CRIBS was ~61s/FB. Root cause: `batch_cribs_classify` results silently ignored (`merged_call_enabled` config orphaned; `_use_merged` never set) → slow two-call path. Peer-reviewed alternatives evaluated (vLLM continuous batching, speculative decoding, prompt compression/LLMLingua, distillation, constrained decoding). Verdict: batch CRIBS (D2265) is the reliable/viable/feasible choice — amortizes GPT-OSS reasoning across 4 FBs (~19.4s/FB vs ~61s/FB, ~3×). Fixed wiring so `_pre_classified` batch results are consumed.
+**Files:** `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`
+
+### D2302 — DSPy Three Gaps Logged (2026-08-12)
+**Category:** ARCH
+**Decision:** Three DSPy gaps identified. GAP-1: `dspy_trainer.py` (MIPROv2 + DirectOMLXLM + hard-gate metric, ~80% infra) NOT wired into `stage2_extract.py` — hybrid gate is hand-written stopgap. GAP-2: stale Stage 3a artifacts `prompts/s3a_optimized.txt` + `prompts/frozen/s3a_system_v1.txt` survive despite Stage 3a removal (D2120). GAP-3: trainer uses random split, ignoring tier field — violates D2286. Fixed GAP-3 via D2304; GAP-1/GAP-2 deferred to T1.2.
+**Files:** `pipeline/dspy_trainer.py`, `prompts/s3a_optimized.txt`, `prompts/frozen/s3a_system_v1.txt`
+
+### D2301 — Cold-Reload Recovery (2026-08-12)
+**Category:** BUGFIX
+**Decision:** GPT-OSS reasoning model returns `content=None` during cold eviction/reload → `KeyError`. 3-6s backoff insufficient (model needs 30-60s). Added config-driven `cold_reload_delay` (45s). Detects "cold reload"/"content missing" and waits `OMLX_COLD_RELOAD_DELAY` instead of `RETRY_DELAY*attempt`.
+**Files:** `pipeline/omlx_call.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+
+### D2300 — Pipeline Modularity Gaps (2026-08-12)
+**Category:** ARCH
+**Decision:** Audit found component-level C21 violations: `omlx_call.py` imported directly from stage2/4/5 (no InferenceProvider), `ollama_embed.py` imported directly from stage1_5 (no EmbeddingProvider), SQLite hardcoded in stage6 (no StorageBackend). JSONL checkpoints strong; config strong (C12); `schemas.py` Pydantic FB model is dead code (0 callers). Recorded in CONSTITUTION Known Modularity Gaps table.
+**Files:** `CONSTITUTION.md`
 
 ### D2264 — S5 Deep Check: Gemma-4-E4B to Phi-4-mini (2026-08-11)
 **Category:** QLT / PERF

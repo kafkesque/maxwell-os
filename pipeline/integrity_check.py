@@ -94,7 +94,10 @@ def check_referenced_files() -> tuple[bool, str]:
 
     stages = config.get("stages", {})
     for stage_name, stage_path in stages.items():
-        # Stage config points to output directories (e.g., "knowledge pipeline/stage1_5_embed_cluster")
+        # Config points to output directories; scripts live in pipeline/.
+        # Skip non-string entries (e.g., 'timeouts' is a dict, not a stage script).
+        if not isinstance(stage_path, str):
+            continue
         # The scripts live in pipeline/. Config may use shorthand key (e.g., "stage1_5_embed").
         script_name = STAGE_CONFIG_TO_SCRIPT.get(stage_name, stage_name)
         script_name = script_name + ".py" if not script_name.endswith(".py") else script_name
@@ -188,6 +191,7 @@ KNOWN_PACKAGES = {
     "outlines",        # mlx_provider: structured generation (optional)
     "huggingface_hub", # test_mlx_integration: test-only dependency
     "fastembed",       # stage1_5_fastembed: alternative embedding backend
+    "dspy",            # dspy_trainer: MIPROv2 optimization harness (optional, post-T1.1)
 }
 LOCAL_MODULES = {"pipeline", "config", "tools", "tests", "providers", "storage", "sync", "memory", "pipeline_paths"}
 
@@ -393,7 +397,7 @@ def check_version_consistency() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 # CHECK 13: No deprecated config is reachable
 # ═══════════════════════════════════════════════════════════════════════════
-DEPRECATED_KEYS = [,
+DEPRECATED_KEYS = [
     "umap_n_neighbors",
     "umap_min_dist",
     "stage3_cluster",
@@ -632,12 +636,16 @@ def check_model_registry_runtime() -> tuple[bool, str]:
 
     # R5: Generator ≠ Verifier (different model families)
     gen_family = "qwen" if "qwen" in generator.lower() else "unknown"
-    ver_family = "gemma" if "gemma" in verifier_v2.lower() else "phi" if "phi" in verifier.lower() else "unknown"
+    ver_family = "unknown"
+    for fam in ("gpt-oss", "gemma", "phi", "qwen", "deepseek", "llama"):
+        if fam in verifier.lower() or fam in verifier_v2.lower():
+            ver_family = fam
+            break
 
     if gen_family == ver_family and gen_family != "unknown":
         return False, f"R5 violation: Generator ({gen_family}) = Verifier ({ver_family}) — must be different families"
 
-    return True, "R5 compliant: Generator=Qwen, Verifier=Gemma (cross-family)"
+    return True, f"R5 compliant: Generator={gen_family}, Verifier={ver_family} (cross-family)"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

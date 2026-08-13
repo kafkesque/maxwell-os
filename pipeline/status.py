@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-status.py — Pipeline status dashboard for Maxwell OS v2.0.
+status.py — Pipeline status dashboard for Maxwell OS v3.0.
 ============================================================
 Authority: CONSTITUTION.md §6 (Startup Sequence)
 
@@ -133,7 +133,7 @@ def get_status(json_output: bool = False) -> dict:
 
     # Pretty print
     print("╔══════════════════════════════════════════════╗")
-    print("║   Maxwell OS v2.0 — Pipeline Status         ║")
+    print("║   Maxwell OS v3.0 — Pipeline Status         ║")
     print("╚══════════════════════════════════════════════╝")
     print()
 

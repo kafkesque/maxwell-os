@@ -26,6 +26,7 @@ Usage:
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -34,6 +35,13 @@ from pathlib import Path
 # ── Project root ───────────────────────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+
+# D2312: pipeline_paths caches run_id at import time (default "latest").
+# The e2e stages write to {stage}/e2e/ (MAXWELL_RUN_ID=e2e in run_stage), but
+# validate_results() reads the module-level checkpoints — which would point at
+# the stale "latest" dir. Set the run_id BEFORE importing pipeline_paths so the
+# checkpoints resolve to the e2e run that was just executed.
+os.environ.setdefault("MAXWELL_RUN_ID", "e2e")
 
 from pipeline.pipeline_paths import (
     DB_PATH,
@@ -72,20 +80,66 @@ except (ImportError, AttributeError):
     E2E_CONVERGENT_RATIO = 0.25
 
 
-def run_stage(stage_script: str, quality: str = "balanced", books: int = 20) -> bool:
-    """Run a single pipeline stage via subprocess."""
+# D2311/C12: per-stage timeout from pipeline_config.yaml (no hardcoded 600s).
+# Mirror runner.py's _get_stage_timeout (D2269). S2 extraction = null (unlimited)
+# because the 30B generator needs far more than 10min on 20 books.
+_STAGE_ID_BY_SCRIPT = {
+    "stage0_convert.py": "0",
+    "stage0_5_extract_metadata.py": "0.5",
+    "stage1_chunk.py": "1",
+    "stage1_3_prefilter.py": "1.3",
+    "stage1_5_embed_cluster.py": "1.5",
+    "stage2_extract.py": "2",
+    "stage4_merge.py": "4",
+    "stage5_verify.py": "5",
+    "stage6_commit.py": "6",
+}
+
+
+def _get_stage_timeout(stage_script: str) -> float | None:
+    """D2311: Read per-stage timeout from config; fall back to 3600s.
+
+    Returns None for unlimited (S2 `null`), matching runner.py semantics.
+    """
+    stage_id = _STAGE_ID_BY_SCRIPT.get(stage_script, "0")
+    try:
+        import yaml as _yaml_timeout
+        _cfg_path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
+        with open(_cfg_path) as _f:
+            _cfg = _yaml_timeout.safe_load(_f) or {}
+        _timeouts = _cfg.get("stages", {}).get("timeouts", {})
+        return _timeouts.get(stage_id, 3600.0)
+    except Exception:
+        return 3600.0
+
+
+def run_stage(stage_script: str, quality: str = "balanced", books: int = 20, subdir: str | None = None) -> bool:
+    """Run a single pipeline stage via subprocess.
+
+    Stages are configured via MAXWELL_* env vars, NOT CLI flags (matches the
+    smoke-fast justfile target). The stage scripts do NOT accept --quality/--books;
+    those map to MAXWELL_RUN_ID / MAXWELL_BOOK_LIMIT / MAXWELL_FAST_MODEL.
+    """
     start = time.time()
+    env = dict(os.environ)
+    env["MAXWELL_RUN_ID"] = "e2e"
+    env["MAXWELL_BOOK_LIMIT"] = str(books)  # read by stage0 / stage0_5 / stage1_chunk
+    if subdir:
+        env["MAXWELL_BOOK_SUBDIR"] = subdir  # D2316: domain-coherent book sampling
+    if quality == "fast":
+        # D2120 smoke-fast pattern. NOTE: MAXWELL_FAST_MODEL is currently
+        # set-but-not-consumed (fast-model wiring gap, see BUG-085 audit) — harmless
+        # here, retained for forward-compat with runner.py's smoke path.
+        env["MAXWELL_FAST_MODEL"] = "Phi-4-mini-instruct-8bit"
+        env["MAXWELL_SKIP_GEMMA"] = "1"
+    stage_timeout = _get_stage_timeout(stage_script)
     result = subprocess.run(
-        [
-            sys.executable,
-            str(PROJECT_ROOT / "pipeline" / stage_script),
-            "--quality", quality,
-            "--books", str(books),
-        ],
+        [sys.executable, str(PROJECT_ROOT / "pipeline" / stage_script)],
         capture_output=True,
         text=True,
-        timeout=600,  # 10min per stage
+        timeout=stage_timeout,  # D2311: config-driven (S2=null/unlimited)
         cwd=str(PROJECT_ROOT),
+        env=env,
     )
     elapsed = time.time() - start
     status = "✅" if result.returncode == 0 else "❌"
@@ -108,7 +162,7 @@ def validate_results() -> dict:
         ok = ratio >= E2E_CONVERGENT_RATIO
         results["checks"].append({
             "check": "convergent_clusters",
-            "value": f"{convergent}/{total} ({ratio:.0%})",
+            "value": f"{convergent}/{total} ({ratio:.1%})",
             "threshold": f"≥{E2E_CONVERGENT_RATIO:.0%}",
             "passed": ok,
         })
@@ -149,11 +203,11 @@ def validate_results() -> dict:
     if STAGE4_CHECKPOINT.exists():
         fbs = _load_jsonl(STAGE4_CHECKPOINT)
         count = len(fbs)
-        with_multi = sum(1 for fb in fbs if isinstance(fb.get("disciplines"), list) and len(fb["disciplines"]) > 0)
+        with_multi = sum(1 for fb in fbs if isinstance(fb.get("domains"), list) and len(fb["domains"]) > 0)
         with_edges = sum(1 for fb in fbs if fb.get("related_fbs"))
         results["checks"].append({
             "check": "multi_label",
-            "value": f"{with_multi}/{count} have disciplines list",
+            "value": f"{with_multi}/{count} have domains list",
             "threshold": "≥90%",
             "passed": with_multi / count >= 0.9 if count else False,
         })
@@ -176,7 +230,7 @@ def validate_results() -> dict:
         ok = rate >= E2E_MIN_PASS_RATE
         results["checks"].append({
             "check": "verify_pass_rate",
-            "value": f"{passed}/{count} ({rate:.0%})",
+            "value": f"{passed}/{count} ({rate:.1%})",
             "threshold": f"≥{E2E_MIN_PASS_RATE:.0%}",
             "passed": ok,
         })
@@ -188,9 +242,9 @@ def validate_results() -> dict:
 
     # Check 5: Stage 6 commit
     if STAGE6_CHECKPOINT.exists():
-        results["checks"].append({"check": "db_commit", "value": "checkpoint written", "passed": True})
+        results["checks"].append({"check": "db_commit", "value": "checkpoint written", "threshold": "written", "passed": True})
     else:
-        results["checks"].append({"check": "db_commit", "value": "no checkpoint", "passed": False})
+        results["checks"].append({"check": "db_commit", "value": "no checkpoint", "threshold": "written", "passed": False})
         results["passed"] = False
 
     # Check 6: SQLite DB has rows
@@ -230,6 +284,12 @@ def main():
     parser = argparse.ArgumentParser(description="P1.5: 20-book E2E pipeline test")
     parser.add_argument("--books", type=int, default=20, help="Number of books (default: 20)")
     parser.add_argument("--quality", default="balanced", choices=["fast", "balanced", "maximum"])
+    parser.add_argument(
+        "--subdir",
+        default="DOMAIN 6 AI + Computing/ai+engineering+agents",
+        help="Domain-coherent book subdirectory under books/ (D2316). "
+             "Restricts the sample to one topic so cross-book convergence is meaningful.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print stages without running")
     args = parser.parse_args()
 
@@ -250,6 +310,7 @@ def main():
     print("╠══════════════════════════════════════════════════════════╣")
     print(f"║  Books:     {args.books:<43}║")
     print(f"║  Quality:   {args.quality:<43}║")
+    print(f"║  Subdir:    {args.subdir:<43}║")
     print("║  Stages:    9 (0→0.5→1→1.3→1.5→2→4→5→6)              ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
@@ -265,7 +326,7 @@ def main():
     failed_stages = []
 
     for stage in stages:
-        if not run_stage(stage, quality=args.quality, books=args.books):
+        if not run_stage(stage, quality=args.quality, books=args.books, subdir=args.subdir):
             failed_stages.append(stage)
             print(f"\n   ⛔ Pipeline halted at {stage}")
             break
@@ -286,7 +347,7 @@ def main():
     all_ok = True
     for check in results["checks"]:
         icon = "✅" if check["passed"] else "❌"
-        print(f"  {icon} {check['check']}: {check['value']} (need {check['threshold']})")
+        print(f"  {icon} {check['check']}: {check['value']} (need {check.get('threshold', '—')})")
         if not check["passed"]:
             all_ok = False
 

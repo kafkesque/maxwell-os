@@ -47,9 +47,9 @@
 <!-- KNOWLEDGE SOURCES -->
 <knowledge_sources>
 - CONSTITUTION.md (single source of truth, v3.0)
-- DECISION-LOG.md (all architectural decisions D2000-D2117)
+- DECISION-LOG.md (all architectural decisions D2000-D2310)
 - MASTER-TASK-REGISTER.md (task tracker)
-- config/decisions.yaml (auto-synced decision registry — 115 decisions)
+- config/decisions.yaml (auto-synced decision registry — 299 decisions)
 - governance/buglog.md (8 open items including DELEGATE-001)
 - governance/aggregated_remaining_tasks.md (prioritized task register)
 - governance/folder_protocol.md (file creation rules)
@@ -67,7 +67,7 @@
   stage2_extract.py    → Clusters → convergent FBs (Qwen3-Coder, R5)
   # stage3_cluster.py  → REMOVED (D2120/D2198) — HDBSCAN dedup replaced by cluster-before-extract
   stage4_merge.py      → FBs → classified + formatted
-  stage5_verify.py     → DeBERTa NLI + Gemma cross-family + BORP (fail-closed, D2093)
+  stage5_verify.py     → DeBERTa-v3-large NLI only (fail-closed, D2298)
   stage6_commit.py     → SQLite (sqlite-vec) + Parquet export
 </pipeline>
 
@@ -90,7 +90,7 @@
   Verifier:     gpt-oss-20b-MXFP4-Q8 (OMLX)
   VerifierV2:   Phi-4-mini-instruct-8bit (OMLX, R5 cross-family, D2264)
   Embeddings:   bge-m3 (Ollama, 1024-dim)
-  NLI:          MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli (local, D2255)
+  NLI:          MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (local, D2298)
 </models>
 
 <!-- PROTECTED FILES — never overwrite -->

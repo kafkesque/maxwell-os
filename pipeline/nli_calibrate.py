@@ -36,22 +36,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import numpy as np
 
 from pipeline.pipeline_paths import S5_NLI_MODEL
-from pipeline.stage5_verify import _get_nli, nli_entailment
+from pipeline.stage5_verify import _load_dual_encoders, _nli_pair_scores
 
 
 def load_fbs_from_stage4() -> list[dict]:
     """Load FBs from Stage 4 checkpoint."""
-    from pipeline.pipeline_paths import STAGE4_OUTPUT
-    if not STAGE4_OUTPUT.exists():
-        print(f"❌ Stage 4 output not found at {STAGE4_OUTPUT}")
+    from pipeline.pipeline_paths import STAGE4_CHECKPOINT
+    if not STAGE4_CHECKPOINT.exists():
+        print(f"❌ Stage 4 checkpoint not found at {STAGE4_CHECKPOINT}")
         sys.exit(1)
     fbs = []
-    with open(STAGE4_OUTPUT) as f:
+    with open(STAGE4_CHECKPOINT) as f:
         for line in f:
             line = line.strip()
             if line:
                 fbs.append(json.loads(line))
-    print(f"📂 Loaded {len(fbs)} FBs from Stage 4")
+    print(f"📂 Loaded {len(fbs)} FBs from Stage 4 checkpoint")
     return fbs
 
 
@@ -144,7 +144,7 @@ def calibrate(pairs: list[tuple[str, str, str]], dry_run: bool = False) -> dict:
 
     # Load NLI pipeline (lazy, cached)
     print(f"🧠 Loading NLI model: {S5_NLI_MODEL}...")
-    _ = _get_nli()  # Pre-load
+    _ = _load_dual_encoders()  # Pre-load (D2298: DeBERTa-v3-large sole verifier)
     print(f"   Running {len(pairs)} NLI inferences...")
 
     scores: list[dict] = []
@@ -156,23 +156,30 @@ def calibrate(pairs: list[tuple[str, str, str]], dry_run: bool = False) -> dict:
             eta = (len(pairs) - i) / rate
             print(f"   [{i}/{len(pairs)}] {rate:.1f}/s, ETA {eta:.0f}s")
 
-        result = nli_entailment(definition, evidence)
+        # D2322: use the raw-score primitive directly so the threshold sweep sees
+        # honest continuous entailment/neutral/contradiction probabilities (the
+        # old deberta_check returned 0.0 entailment on every non-pass verdict,
+        # which made the sweep collapse to a binary pass/fail — BUG-092 family).
+        _ent, _neu, _con = _nli_pair_scores(premise=evidence, hypothesis=definition)
+        _passed = _ent >= 0.10
         scores.append({
             "definition": definition[:100],
             "evidence": evidence[:100],
             "expected_label": label,
-            "nli_label": result.get("label", "NEUTRAL"),
-            "nli_score": result.get("score", 0.0),
-            "entailment_score": result.get("entailment_score", 0.0),
-            "neutral_score": result.get("neutral_score", 0.0),
-            "contradiction_score": result.get("contradiction_score", 0.0),
+            "nli_label": "ENTAILMENT" if _passed else "NEUTRAL",
+            "nli_score": _ent,
+            "entailment_score": _ent,
+            "neutral_score": _neu,
+            "contradiction_score": _con,
         })
 
     elapsed = time.time() - start
     print(f"   ✅ {len(pairs)} pairs in {elapsed:.0f}s ({len(pairs)/elapsed:.1f}/s)")
 
-    # Analyze threshold candidates
-    thresholds = np.arange(0.50, 0.96, 0.05)
+    # Analyze threshold candidates. D2322: start at 0.05 (DeBERTa entailment scores
+    # on paraphrase evidence cluster LOW — the old 0.50-0.95 range was a stale
+    # ModernBERT-era guess that never covered the D2298 operating threshold 0.10).
+    thresholds = np.arange(0.05, 0.96, 0.05)
     results = []
 
     for t in thresholds:
@@ -249,13 +256,13 @@ def print_report(calibration: dict) -> None:
     print(f"   NLI_PASS_THRESHOLD      = {best_prec['threshold']:.2f}  (precision={best_prec['precision']:.3f})")
     print(f"   NLI_MARGINAL_THRESHOLD  = {max(0.40, best_f1['threshold'] - 0.10):.2f}  (lower bound)")
 
-    # Compare with current defaults
+    # Compare with current defaults (D2298: DeBERTa-only single threshold 0.10)
     print("\n📋 CURRENT DEFAULTS (pipeline_config.yaml):")
-    print("   NLI_ENTAILMENT_THRESHOLD = 0.60")
-    print("   NLI_PASS_THRESHOLD      = 0.80")
-    print("   NLI_MARGINAL_THRESHOLD  = 0.50")
+    print("   NLI_ENTAILMENT_THRESHOLD = 0.10")
+    print("   NLI_PASS_THRESHOLD      = 0.10")
+    print("   NLI_MARGINAL_THRESHOLD  = 0.10")
 
-    drift = abs(best_f1["threshold"] - 0.60)
+    drift = abs(best_f1["threshold"] - 0.10)
     if drift > 0.10:
         print(f"\n⚠️  THRESHOLD DRIFT: recommended NLI_ENTAILMENT_THRESHOLD "
               f"differs from default by {drift:.2f}. Update pipeline_config.yaml.")

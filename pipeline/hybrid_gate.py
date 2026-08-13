@@ -145,8 +145,7 @@ class HybridGate:
             model=self._model,
             system=GATE_SYSTEM_PROMPT,
             max_tokens=GATE_MAX_TOKENS,
-            temperature=GATE_TEMPERATURE,
-        )
+        )  # note: call_omlx enforces temp=0.0 internally (R7) — no temperature kwarg
         # call_omlx returns the text directly for non-JSON calls
         if isinstance(result, dict):
             return result.get("content", str(result))

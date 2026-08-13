@@ -58,6 +58,7 @@ services:
     host: localhost
     port: 11434
     nomic_max_chars: 4000
+    embed_max_chars: 4000
     batch_size: 100
   omlx:
     host: localhost
@@ -97,10 +98,10 @@ models:
     provider: ollama
     alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ
   nli_large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
-  nli_cross: ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli
+  # nli_cross: REMOVED (D2298) — RoBERTa-large added zero signal on paraphrase evidence (D2227).
 pipeline:
   schema_version: '3.0'
-  commit: v3.0-D2176
+  commit: v3.0-D2298
   taxonomy_version: v5.1
   max_domains_per_fb: 5
   chunk_size_words: 300
@@ -191,6 +192,8 @@ stage4:
 s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3
+  dspy_max_tokens: 4096  # D2304/C12: ConvergentExtraction needs 4K for 11 output fields (was hardcoded in dspy_trainer.py)
+  dspy_program_path: data/dspy_mipro_optimized.json  # D2304: C12 config-driven (was hardcoded /tmp)
   gate:
     enabled: false
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -217,11 +220,19 @@ stage5:
   - growth_edge
   - tool_instruction
   factscore_enabled: false
-  nli_model: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
-  nli_model_fallback: tasksource/ModernBERT-base-nli
+  nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+  # nli_model_fallback: REMOVED (D2298) — ModernBERT fallback deleted with RoBERTa.
   nli_entailment_threshold: 0.1
   nli_pass_threshold: 0.1
   nli_marginal_threshold: 0.1
+  nli_max_premise_chars: 256
+  nli_max_hypothesis_chars: 256
+  confidence:
+    mechanism_weight: 0.35
+    enrichment_weight: 0.25
+    isor_weight: 0.40
+    quarantine_cap: 0.25
+    human_review_isor_rating: strong
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true
@@ -1693,7 +1704,7 @@ test:
     pipeline_commit: full-run-v3
     schema_version: '2.3'
     taxonomy_version: v5.1
-    extract_model: Qwen3.6-35B-A3B-4bit
+    extract_model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     extract_max_tokens: 2048
     classify_max_tokens: 512
     extract_system_prompt: "You extract reusable principles from text.\nReturn a JSON array of principle objects:\n[{\"name\"\
@@ -1779,3 +1790,21 @@ test:
     extraction_prompt_limit: 3000
 source_epub_dir: null
 source_pdf_dir: null
+
+# ── G10 / P0.0 / D2020 Layer 1: OMLX wired-memory leak stress test ──
+# Detects GitHub #2184-style kernel wired-memory leaks before a 26h run.
+# Kill criteria: cumulative wired growth > growth_threshold_pct → FAIL (leak).
+# round_trend_gb matches BUG-017 watchdog trend threshold (2GB → restart).
+omlx_wired_stress:
+  rounds: 5
+  prompts_per_round: 20
+  prompt_size_chars: 1000
+  max_tokens: 128
+  growth_threshold_pct: 10.0
+  round_trend_gb: 2.0
+  per_request_timeout: 30
+  model: null
+
+# ── D2307: Recall measurement (golden-set yield) — config-driven threshold (C12) ──
+recall:
+  match_threshold: 0.55

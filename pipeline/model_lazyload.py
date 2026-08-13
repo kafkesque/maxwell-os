@@ -6,7 +6,7 @@ Manages OMLX model lifecycle: load on demand, auto-unload when idle.
 
 Usage:
   # Pre-warm a model (loads and keeps warm for N seconds)
-  python3 tools/model_lazyload.py --load Qwen3.6-35B-A3B-4bit --warm 120
+  python3 tools/model_lazyload.py --load Qwen3-Coder-30B-A3B-Instruct-MLX-4bit --warm 120
 
   # Unload specific model immediately
   python3 tools/model_lazyload.py --unload gemma-4-26B-A4B-it-OptiQ-4bit
@@ -18,8 +18,8 @@ Usage:
   python3 tools/model_lazyload.py --daemon --idle-timeout 300
 
 Architecture:
-  - Pinned models (Phi-4-mini, gemma-4-E2B): always hot (~8GB)
-  - Big models (Qwen3.6, gemma-4-26B): loaded on first request, unloaded after idle timeout
+  - Pinned models (Phi-4-mini, gemma-4-E4B): always hot (~8GB)
+  - Big models (Qwen3-Coder-30B, gemma-4-26B): loaded on first request, unloaded after idle timeout
   - Unload by calling OMLX /v1/models/{model}/unload endpoint
 """
 
@@ -49,7 +49,7 @@ MODEL_SIZES = {
     "Ornith-1.0-9B-4bit": 4.69,
     "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 16.00,
     "gemma-4-26B-A4B-it-OptiQ-4bit": 18.36,
-    "Qwen3.6-35B-A3B-4bit": 19.95,
+    # "Qwen3.6-35B-A3B-4bit": 19.95,  # PHANTOM (BUG-036: config only, no weights)
     "gemma-4-31B-it-OptiQ-4bit": 22.43,
     "gemma-4-12b-coder-fable5-composer2.5-4bit": 6.30,
     "gemma-4-12b-coder-fable5-composer2.5-8bit": 12.00,

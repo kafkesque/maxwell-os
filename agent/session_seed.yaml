@@ -4,52 +4,52 @@
 
 session:
     version: "3.0.0"
-    pipeline_commit: v3.0-ClusterFirst
+    pipeline_commit: v3.0-D2298
     schema_version: "3.0"
     project_root: knowledge pipeline/
 
-# ── Models (synced with config/pipeline_config.yaml — D2115) ──
+# ── Models (synced with config/pipeline_config.yaml — D2115/D2298) ──
 models:
     generator:
-        model: Qwen3.6-35B-A3B-4bit
+        model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
         provider: omlx
         temperature: 0.0
         family: qwen
     verifier:
+        model: gpt-oss-20b-MXFP4-Q8
+        provider: omlx
+        temperature: 0.0
+        family: gpt-oss
+    verifier_v2:
         model: Phi-4-mini-instruct-8bit
         provider: omlx
         temperature: 0.0
         family: phi
-    verifier_v2:
-        model: gemma-4-E4B-it-MLX-4bit
-        provider: omlx
-        temperature: 0.0
-        family: gemma
-        notes: "D2069: Cross-family verifier (Gemma ≠ Phi classifier ≠ Qwen generator). R5 satisfied."
+        notes: "D2264: S5 deep check (67% acc). R5: DeBERTa FEVER (encoder) ≠ Phi-4-mini (decoder)."
     embeddings:
         model: bge-m3
         provider: ollama
         dims: 512                       # E7: Matryoshka truncated from 1024 (95.3% neighbor overlap, 2× speed)
         family: bge
     nli:
-        model: ModernBERT-large
+        model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
         provider: local
-        family: modernbert
-        notes: "D2111/D2197: Uses ModernBERT-large with 8K context window for NLI. 2× faster than DeBERTa-v3, 0.57 F1. roberta-large-mnli was stale config — purged D2197."
+        family: deberta
+        notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10 (P=1.000, R=0.556, F1=0.714). RoBERTa/ModernBERT removed (zero signal / superseded)."
 
 # ── Pipeline (8-stage v3.0 — cluster-before-extract) ──
 # D2197: stage3 removed (D2120). Pipeline is 8-stage, not 9.
 pipeline:
     stages:
         stage0:    convert           # EPUB/PDF → MD (Pandoc/Docling)
-        stage0_5:  extract_metadata  # Filename → author/title/year (Phi-4-mini)
+        stage0_5:  extract_metadata  # Filename → author/title/year (LLM)
         stage1:    chunk             # MD → segments + SHA-256 dedup
         stage1_3:  prefilter         # Regex structural garbage filter (D2080)
         stage1_5:  embed_cluster     # FAISS clustering on raw segments (D2094)
         stage2:    extract           # Clusters → convergent FBs (1 LLM call per cluster — REWRITE D2110)
         # stage3: REMOVED (D2120) — HDBSCAN semantic dedup replaced by cluster-before-extract
         stage4:    classify          # Multi-label classification + formatting (D2066 multi-label, not SALSA)
-        stage5:    verify            # ModernBERT NLI + Gemma cross-family + BORP (D2111, D2093 fail-closed)
+        stage5:    verify            # DeBERTa-v3-large NLI only (D2298, D2093 fail-closed)
         stage6:    commit            # SQLite + Parquet export
     clustering:
         method: FAISS
@@ -63,9 +63,9 @@ pipeline:
         max_domains_per_fb: 5
     verification:
         borp_min_sources: 2
-        nli_model: ModernBERT-large          # D2197: was roberta-large-mnli (stale). ModernBERT: 8K context, 2× faster.
-        nli_entailment_threshold: 0.6
-        cross_family_verifier: gemma-4-E4B-it-MLX-4bit
+        nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli   # D2298: DeBERTa-only
+        nli_entailment_threshold: 0.10
+        cross_family_verifier: null   # D2298: removed (RoBERTa/Phi-4-mini/Gemma deleted)
         fail_mode: fail_closed       # D2093: QUARANTINE on any check failure, never PASS
 
 # ── Services ──

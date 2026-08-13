@@ -10,7 +10,7 @@ Inter-stage contracts (8 stages — Stage 3 removed per D2120):
     Segment     — Stage 1 output: text chunk + provenance
     SegmentMeta — Stage 0.5 output: author/title/year
     Cluster     — Stage 1.5 output: Louvain community (D2168) + source_ids (D2176)
-    Principle   — Stage 2 output: Qwen3.6-extracted principle (1:N, D2176)
+    Principle   — Stage 2 output: Qwen3-Coder-extracted principle (1:N, D2176)
     FB          — Stage 4 output: Merged Foundation Block + classification
     VerifiedFB  — Stage 5 output: FB + BORP/NLI/LLM verification + epistemic_status (D2176)
     FBRecord    — Stage 6 output: Canonical DB row
@@ -184,11 +184,11 @@ class Segment(StampedRecord):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Stage 2: Extract — Segments → Principles (Qwen3.6)
+# Stage 2: Extract — Segments → Principles (Qwen3-Coder-30B)
 # ═══════════════════════════════════════════════════════════════════════════
 
 class Principle(StampedRecord):
-    """A single principle extracted by Qwen3.6 from one or more segments."""
+    """A single principle extracted by Qwen3-Coder-30B from one or more segments."""
     principle_id: str = Field(description="SHA-256 hash of principle text (dedup key)")
     principle_text: str = Field(description="The extracted principle")
     content_type: str = Field(
@@ -453,7 +453,7 @@ class GrowthEdge(StampedRecord):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Stage 4: Merge + Classify — Clusters → FBs (Qwen3.6 + SALSA)
+# Stage 4: Merge + Classify — Clusters → FBs (Qwen3-Coder + GPT-OSS)
 # ═══════════════════════════════════════════════════════════════════════════
 
 class FB(StampedRecord):

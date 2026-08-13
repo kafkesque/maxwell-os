@@ -347,7 +347,7 @@ def build_convergent_prompt(
     cohesion: float = cluster.get("cohesion", 0.5)
 
     # Sample segments: fewer for high-cohesion clusters
-    # D2215: capped at MAX_CLUSTER_SAMPLES to avoid OMLX memory guard (Qwen3.6 KV cache)
+    # D2215: capped at MAX_CLUSTER_SAMPLES to avoid OMLX memory guard (Qwen3-Coder KV cache)
     if cohesion >= S2_HIGH_COHESION_THRESHOLD:
         n_samples: int = min(3, MAX_CLUSTER_SAMPLES)
     elif cohesion >= S2_MED_COHESION_THRESHOLD:
@@ -793,13 +793,17 @@ def discover_principles(
         passages_text=passages_blob,
     )
 
-    # Phi-4-mini probe (fast, ~1.5s) — use VERIFY_MODEL for speed
+    # Phi-4-mini probe (fast, ~1.5s) — D2319: use VERIFY_MODEL_V2 (Phi-4-mini),
+    # NOT VERIFY_MODEL (GPT-OSS). GPT-OSS is a reasoning model: during cold
+    # reload it emits only reasoning_content → "content missing" → call_llm
+    # returns None → probe failure >10% → PROBE ABORT. Phi-4-mini is
+    # non-reasoning and JSON-mode safe for principle counting (with source text).
     # D2209: Route through call_llm to respect --provider flag (was hardcoded OMLX).
     try:
-        from pipeline.pipeline_paths import VERIFY_MODEL
+        from pipeline.pipeline_paths import VERIFY_MODEL_V2
         result: dict | None = call_llm(
             prompt=prompt,
-            model=VERIFY_MODEL,
+            model=VERIFY_MODEL_V2,
             system=PRINCIPLE_DISCOVERY_SYSTEM,
             provider=provider,
         )
@@ -1216,6 +1220,7 @@ def run_stage2(
                 print(f"   ⚠️  Resume segids format mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(target_cids)} targets")
                 print("   ⚠️  Starting fresh — all clusters will be processed")
                 processed_ids = set()
+                all_fbs = []  # D2317: discard stale FBs from a different run's checkpoint
             else:
                 print(f"   📋 Resuming: {len(processed_ids)} clusters processed → {len(all_fbs)} FBs")
                 # D2215: CRITICAL — filter targets BEFORE submitting to executor.

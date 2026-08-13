@@ -6,11 +6,11 @@
 # Updated: 2026-08-06 — D2199: fixed REVIEWER, documented OptiQ/non-OptiQ split.
 roles:
   S3A_CONVERGENCE:
-    model: Qwen3.6-35B-A3B-OptiQ-4bit  # OptiQ: Cap 80.03, BFCL 92.5%, HashHop +8%
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   S5_GENERATOR:
-    model: Qwen3.6-35B-A3B-OptiQ-4bit  # primary generator
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # primary generator
     backend: omlx
     family: qwen
   S5_VERIFIER:
@@ -19,7 +19,7 @@ roles:
     family: phi
     notes: D2264 S5 deep check (67% acc, 2x Gemma). Structured PASS/FLAG.
   S6_VALIDATOR:
-    model: Qwen3.6-35B-A3B-OptiQ-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   T2_GATE:
@@ -35,12 +35,12 @@ roles:
     backend: omlx
     family: phi
   PLANNER:
-    model: Qwen3.6-35B-A3B-OptiQ-4bit  # was 8bit, now OptiQ
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   # PLANNER_FALLBACK: PHANTOM — Qwopus-GLM-18B does not exist locally. Disabled per P0.14.
   PLANNER_FALLBACK:
-    model: Qwen3.6-35B-A3B-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   # REVIEWER: DeepSeek-R1-0528-Qwen3-8B-MLX-4bit REMOVED (D2199)
@@ -68,7 +68,7 @@ roles:
     backend: omlx
     family: qwen
   LONG_CONTEXT:
-    model: Qwen3.6-35B-A3B-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   # MEMORY_MCP_PATH: Disabled per P0.14 — not part of v2.0 pipeline.
@@ -86,15 +86,15 @@ roles:
     backend: ollama
     family: bge
   RESIDENT_BRAIN:
-    model: gemma-4-E2B-it-MLX-4bit
+    model: gemma-4-E4B-it-MLX-4bit
     backend: omlx
     family: gemma
   L2_VALIDATOR:
-    model: gemma-4-E2B-it-MLX-4bit
+    model: gemma-4-E4B-it-MLX-4bit
     backend: omlx
     family: gemma
   S3_SUMMARIZER:
-    model: Qwen3.6-35B-A3B-4bit
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
     family: qwen
   LIGHTWEIGHT_CODER:
@@ -138,29 +138,29 @@ verification_tolerance:
     min_verifiers: 2
 fallbacks:
   HIGH_CAPABILITY:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S3A_CONVERGENCE:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S5_GENERATOR:
   - gemma-4-E4B-it-MLX-4bit
   - Phi-4-mini-instruct-8bit
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S6_VALIDATOR:
-  - Qwen3.6-35B-A3B-4bit
-  - gemma-4-E2B-it-MLX-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   RESIDENT_BRAIN:
   - Phi-4-mini-instruct-8bit
-  - gemma-4-E2B-it-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   L2_VALIDATOR:
   - Phi-4-mini-instruct-8bit
-  - gemma-4-E2B-it-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   S3_SUMMARIZER:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   LIGHTWEIGHT_CODER:
   - Phi-4-mini-instruct-8bit
@@ -169,24 +169,24 @@ fallbacks:
   - Phi-4-mini-instruct-8bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   BOUNDARY_VERIFIER:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   S3A_VERIFIER:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   - gemma-4-E4B-it-MLX-4bit
   S5_FB_VERIFIER:
-  - Qwen3.6-35B-A3B-4bit
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   T2_GATE:
-  - gemma-4-E2B-it-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   - Phi-4-mini-instruct-8bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   T3_GATE:
-  - gemma-4-E2B-it-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   - Phi-4-mini-instruct-8bit
   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   CONTEXT_CLASS:
-  - gemma-4-E2B-it-MLX-4bit
+  - gemma-4-E4B-it-MLX-4bit
   - Phi-4-mini-instruct-8bit
   EMBEDDINGS: []
 models:
@@ -202,24 +202,24 @@ routing:
     - deepseek-v4-flash
     notes: 'Zed editor complex coding. Cloud OK (external tool).'
   fb_generation:
-    primary: qwen3.6-35b-a3b-moe
+    primary: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     fallbacks:
     # - gemma-4-26B-A4B-it-OptiQ-4bit  # DISABLED: broken model (Goose stress test: 5/5 calls fail)
     notes: 'D950: Local primary. DeepSeek only as last resort ($0 cost priority).'
   tier2_validation:
-    primary: qwen3.6-35b-a3b-moe
+    primary: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     fallbacks:
     - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     notes: 'D950: All-local validation chain.'
   concept_summarization:
-    primary: qwen3.6-35b-a3b-moe
+    primary: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     fallbacks:
     - qwen-plus
   depth_reasoning:
     primary: qwen-max
     fallbacks:
     # - opus-distilled-27b  # PHANTOM per P0.14
-    - Qwen3.6-35B-A3B-4bit
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   self_critique:
     primary: deepseek-r1-8b
     fallbacks:
@@ -230,7 +230,7 @@ routing:
   # colibri_deploy:
   #   primary: glm-5.2-colibri
   #   fallbacks:
-  #   - qwen3.6-35b-a3b-moe
+  #   - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   #   notes: 'D950: Local fallback only. DeepSeek removed.'
 archived:
 - gemma-4-31B-it-OptiQ-4bit

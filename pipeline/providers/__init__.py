@@ -14,10 +14,21 @@ from pipeline.providers.mlx_provider import (
     clear_providers,
     get_mlx_provider,
 )
+# D2306: OMLX + Ollama providers implement the InferenceProvider/EmbeddingProvider
+# protocols (D2055). Closes the D2300 modularity gap where stages imported
+# omlx_call/ollama_embed directly.
+from pipeline.providers.omlx_provider import (
+    OMLXGenerationResult,
+    OMLXInferenceProvider,
+)
+from pipeline.providers.ollama_provider import OllamaEmbeddingProvider
 
 __all__ = [
     "MLXGenerationResult",
     "MLXInferenceProvider",
     "clear_providers",
     "get_mlx_provider",
+    "OMLXGenerationResult",
+    "OMLXInferenceProvider",
+    "OllamaEmbeddingProvider",
 ]

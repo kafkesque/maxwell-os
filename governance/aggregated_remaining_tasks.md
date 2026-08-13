@@ -1,10 +1,106 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-12 15:24 | **Decisions:** D2000-D2299 (274) | **P0 complete, P1 complete, T1.1 ready**
-> **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing adjudication.
+> **Updated:** 2026-08-13 10:14 | **Decisions:** D2000-D2321 (310) | **T1.1 unblocked — eval 7/8 green**
+> **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4) | DeBERTa-v3-large (S5) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276). Enable via `--hybrid` flag in stage2_extract.py.
 > **ISOR Scoring:** Active (P0.4, D2284). 3-dimension independence rating in verified FB output.
 > **Audit completed:** Runner.py Gemma dead code purged. Stale comments fixed. No silent crash risks found.
+> **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
+
+---
+
+## ✅ ROUNDTABLE ADJUDICATION — IMPLEMENTED (2026-08-12)
+
+> **🔴 S5 NLI BUG FIXED (2026-08-13, this session — BUG-092/D2321):** `deberta_check()` was feeding DeBERTa a single concatenated `"definition evidence"` string (no premise/hypothesis separation) and reading only the top-1 label → NEUTRAL verdicts collapsed to `"CONTRA: ent=0.00 cont=0.00"` and were quarantined. Result: **verify_pass_rate 36% (32/88)** — a ~90% false-negative rate on factually-correct cross-source FBs. Fix: proper `(premise=evidence, hypothesis=definition)` pair + `top_k=3` all-label scoring. **Post-fix: 74/88 (84.1%) PASS.** Remaining 14 QUARANTINE = 3 genuinely-vacuous MECH-FAIL + 11 NEUTRAL cross-source syntheses (legitimate fail-closed cost; D2285 claim-decomposition is the recovery path). ⚠️ D2293 calibration (P=1.0/R=0.556) was measured on the broken call — re-derive post-fix.
+> **Eval status (2026-08-13):** 7/8 green — `fb_count` 92 ✅, `fb_fields` ✅, `multi_label` ✅, `relationship_edges` ✅, `verify_pass_rate` 84.1% ✅, `db_commit` ✅, `db_rows` 119 ✅. **1 red: `convergent_clusters` 24.5% (39/159) vs ≥25%** — borderline (−0.5%), sampling artifact on 20 books; a 25-book sample or accept-as-noise.
+
+**Pre-T1.1 gate: 12/12 DONE — 9 implemented, 3 already-fixed (stale buglog), V1 verified (BUG-062 moot), G10 stress test PASS (no wired-memory leak).**
+
+| # | Task | Status |
+|---|------|--------|
+| G1 | Source identity — metadata normalization + work-level convergence (D2308) | ✅ normalize_author/normalize_title in book_metadata.py |
+| G2 | ISOR — metadata author + canonical count + precedence (D2309) | ✅ "weak" bucket reachable (5 FBs) |
+| G3 | Runner timeout (BUG-080.4) | ✅ already D2269 (config '2': null) |
+| G4 | S5 confidence — NLI gate + ISOR/mech/enrich + cap + human-review (D2310) | ✅ config-driven weights |
+| G5 | S5 completeness substitution (BUG-080.5) | ✅ already D2298 (check_completeness deleted) |
+| G6 | S5 threshold validation fatal (BUG-080.6) | ✅ already D2272 (raises ValueError) |
+| G7 | S1.5 dropped-embed gate (BUG-080.8) | ✅ already D2275 (RuntimeError >0.5%) |
+| G8 | S1.5 Ollama dim assert (BUG-080.7) | ✅ already D2274 |
+| G9 | discipline "emerging" (D2310) | ✅ preserve discipline_raw + taxonomy_match_method |
+| G10 | OMLX wired-memory stress test (P0.0) | ✅ PASS — 5×20 reqs, wired flat 34.26→34.22 GB (-0.11%), no leak |
+| G11 | delete stale Stage 3a artifacts | ✅ safe_delete (backed up) |
+| G12 | golden duplicate-edition negatives | ✅ NEG-DUP-001/002 (75 total) |
+
+### 🔴 REMAINING (most critical first)
+
+1. **V1** — ✅ VERIFIED (2026-08-12): BUG-062 is moot. S4 classify = `gpt-oss-20b-MXFP4-Q8` (config `models.verifier.model` → `VERIFY_MODEL`), NOT Phi-4-mini. Depth semantic (D2220) + focused (D2247). No live blocker.
+2. **G10** — ✅ PASS (2026-08-12): OMLX wired-memory leak stress test — 5 rounds × 20 reqs, wired flat 34.26→34.22 GB (-0.11% cumulative), 0 errors. No GitHub #2184 leak. Script: `pipeline/omlx_wired_stress.py` (`just wired-stress`).
+3. **T1.1** — full S1.5→S6 run (NOW UNBLOCKED: convergence + verification + classification fixes landed). S1.3 and earlier are still valid (see rerun note).
+4. **content_hash tiebreaker** — ✅ FIXED (D2315, 2026-08-12): Black Swan title-concat now collapses via `_CONCAT_SUBTITLE_SPLIT`. All 3 duplicate-edition cases collapse.
+5. **GAP-1** — wire DSPy program into S2 (post-T1.1).
+6. **D2285** claim decomposition · **D2292** golden depth · **D2289/D2288** splits/κ · **D2300** StorageBackend · **D2305** latency SLA (post-T1.1).
+
+> **Golden set audit (2026-08-12, this session):** ✅ VALID post-pipeline-change — `golden_validate.py` 5/5 checks pass; 75 examples → 77 FBs; no duplicate-edition false positives among convergents. 3 minor findings logged (`GOLDEN-AUDIT` in buglog.md): NEG-CONV-001/002/003 missing `discipline`; NEG-DUP-001/002 lazy `discipline: emerging`; dead `depth` field in 54 positives (D2241). Backfill all three during D2292 (BUG-084) golden depth expansion — non-blocking.
+
+> **`just eval` (2026-08-12, this session):** 9/9 stages PASSED (703s). Fixed 4 blocking bugs first: BUG-089 (hardcoded 600s S2 timeout, D2311), BUG-090 (stale `latest` checkpoint, D2312), BUG-091 (`db_commit` KeyError + `disciplines`→`domains` field drift, D2313/D2314). Quality report: 5/8 green — `fb_fields` ✅, `multi_label` ✅, `relationship_edges` ✅, `db_commit` ✅, `db_rows` ✅; **3 red**: `convergent_clusters` 3% (5/191, need 25%), `fb_count` 3 (need 30), `verify_pass_rate` 67% (2/3, need 80%). ⚠️ **Root cause of reds = e2e selects first 20 books (alphabetical, domain-diverse) → almost no cross-book convergence (3%)**. Not a pipeline bug — full corpus is domain-organized. ⚠️ `verify_pass_rate` 67% = DeBERTa-only NLI (D2298) fail-closed at Recall 0.556 (1/3 FB quarantined on NEUTRAL evidence — expected false-negative per calibration). For T1.1: 3 FBs is too thin for LLM evaluation — use a domain-coherent sample or accept S5 quarantine ~33-44%.
+
+---
+
+## 🔴 ROUNDTABLE ADJUDICATION — 2026-08-12 (NEW CRITICAL, blocks convergence trust)
+
+| # | Task | Decision | Severity | Effort |
+|---|------|----------|:--------:|:------:|
+| RA-1 | Fix source identity: metadata normalization + canonical work count (redefine `is_convergent` on distinct works ≥2) | D2308 | 🔴 | 4-6h |
+| RA-2 | Fix ISOR: metadata-author + canonical source count + precedence parens | D2309 | 🔴 | 2-3h |
+| RA-3 | Decouple NLI from confidence (gate not 75% weight) + per-passage aggregation + human adjudication | D2310 | 🟠 | 4-8h |
+| RA-4 | Fix `discipline:"emerging"` over-firing (taxonomy match confidence + rationale; split EMERGING_TRUE/UNCERTAIN) | BUG-083→discipline | 🟠 | 4-6h |
+| RA-5 | Add 2 duplicate-edition hard negatives to golden set (Safe Withdrawal Rate, Transgenic) | — | 🟠 | 1h |
+| RA-6 | Purge stale model/threshold comments (0.6/0.8/0.5/0.3; Phi-4/Gemma/ModernBERT) | — | 🟡 | 1h |
+| RA-7 | Freeze per-run manifest (config/model/prompt/taxonomy/threshold hashes) | — | 🟡 | 3-4h |
+
+> **Bugs:** BUG-087 (duplicate-edition false convergence) + BUG-088 (ISOR author parse/precedence).
+> **Full detail:** `governance/ROUNDTABLE_ADJUDICATION_2026-08-12.md`.
+
+---
+
+## 🚦 PRE-T1.1 GATE — CONSOLIDATED (2026-08-12, do NOT launch T1.1 before these)
+
+> T1.1 = full S1.3→S6 run on 12,964 clusters (~21-26h). Launching with known bugs either
+> **corrupts the output** (false convergence) or **wastes the run** (77.5% quarantine).
+
+### 🔴 BLOCKING (corrupts output — fix first)
+
+| # | Task | Decision/Bug | Why blocking |
+|---|------|-------------|--------------|
+| G1 | Source identity: metadata normalization + work-level `is_convergent` | D2308 / BUG-087 | 12,964 clusters would produce false-convergent FBs; entire KB epistemically invalid |
+| G2 | ISOR: metadata-author + canonical source count + precedence | D2309 / BUG-088 | "Independence" currently = file count; downstream golden/ISOR contaminated |
+| G3 | Runner 60-min timeout → configurable per-stage | BUG-080.4 | **Hard blocker** — runner kills S2 at 60min; S2 needs 25-40h |
+| G4 | S5 NLI as gate (not 75% weight) + per-passage aggregation | D2310 | Else 77.5% of T1.1 output quarantined (recall collapse) |
+| G5 | S5 completeness: stop substituting application for mechanism | BUG-080.5 | Completeness scores overly optimistic → false PASS risk |
+| G6 | S5 threshold validation: warn→fatal | BUG-080.6 | Bad verification config must not run silently |
+
+### 🟠 HIGH (data quality — fix before or immediately after)
+
+| # | Task | Decision/Bug | Note |
+|---|------|-------------|------|
+| G7 | S1.5 dropped-embedding gate (epistemic recall) | BUG-080.8 | Silent drop = silent recall loss |
+| G8 | S1.5 Ollama dim assertion (parity with MPS) | BUG-080.7 | Theoretical (bge-m3 stable 1024d) |
+| G9 | `discipline:"emerging"` over-firing (65%) | BUG-083→discipline | Classifier mass-produces "emerging" |
+| G10 | OMLX wired-memory leak stress test (P0.0) | P0.0 | ✅ PASS — wired flat (-0.11%), 0 errors, no leak |
+| G11 | Delete stale Stage 3a artifacts | D2302-GAP2 | 5-min cleanup; verify no refs |
+| G12 | Add duplicate-edition hard negatives to golden | RA-5 | 1h; closes golden blindspot |
+
+### 🟡 VERIFY (drift/conflict — resolve before assuming)
+
+| # | Question |
+|---|----------|
+| V1 | ✅ VERIFIED (2026-08-12): BUG-062 moot — S4 classify = `gpt-oss-20b-MXFP4-Q8` (config `models.verifier.model`), NOT Phi-4-mini. Depth semantic (D2220) + focused (D2247). Not blocking. |
+| V2 | BUG-080.4 — is T1.1 launched via `runner.py` or `run_diagnostic.py`? (diagnostic bypasses runner, so timeout may not block in practice) |
+
+### ✅ POST-T1.1 (safe to defer)
+
+GAP-1 (DSPy wiring), D2285 (claim decomposition), D2292 (golden depth), D2289 (author-disjoint splits),
+D2288 (Fleiss kappa), D2300 (StorageBackend), D2305 (latency SLA), T1.2 (yield diagnostic).
 
 ---
 
@@ -72,11 +168,25 @@
 ### FUTURE TAX (identified in audit)
 | # | Issue | Severity |
 |---|-------|----------|
-| F1 | InferenceProvider protocol not implemented (D2055) | 🟡 — omxl_call/ollama_embed called directly |
+| F1 | InferenceProvider protocol not implemented (D2055) | ✅ DONE (D2306 — OMLX + Ollama providers) |
 | F2 | Pydantic FB schema dead code (schemas.py, never instantiated) | 🟡 — 0 callers |
 | F3 | Hardcoded model name in stage4_merged_call.py:101 | 🟡 — should be config-driven |
-| F4 | Hardcoded cohesion threshold 0.75 in stage2_extract.py:351 | 🟡 — should be config |
-| F5 | stage4_merged_call.py — hardcoded defaults for model params | 🟡 — config values exist but kwargs override |
+| F4 | Hardcoded cohesion threshold 0.75 in stage2_extract.py:351 | ✅ DONE (config S2_HIGH/MED_COHESION_THRESHOLD) |
+| F5 | stage4_merged_call.py — hardcoded defaults for model params | ✅ DONE (model=None reads config VERIFY_MODEL) |
+| F6 | StorageBackend protocol not implemented (stage6 SQLite) | 🟡 — remaining modularity gap (D2300) |
+
+### 🔴 NEW TASKS — 2026-08-12 AUDIT (D2300-D2307)
+
+| # | Decision | Task | Status |
+|---|----------|------|--------|
+| N1 | D2302-GAP1 | Wire DSPy trained program into stage2_extract.py (replace/augment hybrid gate) | ⏳ T1.2 |
+| N2 | D2302-GAP2 | Remove stale Stage 3a artifacts (prompts/s3a_optimized.txt, s3a_system_v1.txt) | ⏳ T1.2 |
+| N3 | D2302-GAP3 | DSPy tier-aware split | ✅ DONE (D2304) |
+| N4 | D2303 | CRIBS batch mitigation — wire batch_cribs_classify | ✅ DONE (FIX-1) |
+| N5 | D2305 | Recall measurement | ✅ DONE (D2307 recall_measure.py) |
+| N6 | D2305 | End-to-end latency SLA | ⏳ Post-T1.1 |
+| N7 | D2306 | InferenceProvider + EmbeddingProvider protocol | ✅ DONE |
+| N8 | D2306 | StorageBackend protocol (stage6 SQLite) | ⏳ Post-T1.1 |
 
 ## 📊 STATUS SUMMARY
 

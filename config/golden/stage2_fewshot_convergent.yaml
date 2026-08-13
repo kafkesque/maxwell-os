@@ -1,9 +1,9 @@
 meta:
   version: '5.0'
   architecture: cluster-before-extract
-  total_examples: 73
+  total_examples: 75
   convergent_positives: 55
-  hard_negatives: 21
+  hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
   - single_source_rejection
@@ -37,9 +37,9 @@ meta:
   - empirical_pattern_diversity
   - genuine_specialized_positive
   calibrated_date: '2026-08-10'
-  notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 73 examples total.'
+  notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 75 examples total.'
   updated: '2026-08-12'
-  example_count: 73
+  example_count: 75
   tier_definitions:
     description: 'D2286: Golden tiered classification for DSPy training safety'
     GOLD-A: Human-adjudicated, multi-source convergent, clear mechanism/boundary/consequence. Train DSPy.
@@ -47,7 +47,7 @@ meta:
     CHALLENGE: Hard negatives, edge cases, adversarial. Test DSPy robustness. NEVER train.
   tier_counts:
     GOLD-A: 49
-    CHALLENGE: 21
+    CHALLENGE: 23
     GOLD-B: 3
 examples:
 - id: CONV-001
@@ -4624,3 +4624,55 @@ examples:
     WHY any specific feature produces satisfaction. Essential for teaching S2 that product/design taxonomies are valid descriptive
     models.'
   tier: GOLD-A
+- id: NEG-DUP-001
+  domain: finance
+  discipline: emerging
+  source_books:
+  - MAKE Bootstrappers Handbook. Learn to build profitable startups the indie way (Pieter Levels) @.md
+  - Make_Bootstrappers_Handbook_-_Pieter_Levels.md
+  cluster_segments:
+  - source_book: MAKE Bootstrappers Handbook. Learn to build profitable startups the indie way (Pieter Levels) @.md
+    text: It is one of a category of studies that attempt to determine "safe withdrawal rates" from retirement portfolios that contain stocks and thus grow (or shrink) irregularly over time.
+  - source_book: Make_Bootstrappers_Handbook_-_Pieter_Levels.md
+    text: In short this means that if you invest your money in a diversified portfolio, you can
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Safe Withdrawal Rate
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two source files are the SAME work (Pieter Levels, MAKE Bootstrapper''s Handbook) from different mirrors. Canonical source-id resolution collapses them to ONE distinct work: source_diversity must be 1 (not 2) and is_convergent must be false.'
+  tier: CHALLENGE
+- id: NEG-DUP-002
+  domain: art
+  discipline: emerging
+  source_books:
+  - Speculative Everything Design, Fiction, and Social Dreaming (Anthony Dunne) (z-library.sk, 1lib.sk, z-lib.sk).md
+  - Speculative Everything Design, Fiction, and Social Dreaming Anthony Dunne, Fiona Raby liber3.md
+  cluster_segments:
+  - source_book: Speculative Everything Design, Fiction, and Social Dreaming (Anthony Dunne) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: artist is free to set his or her own agenda and take on a more critical role
+  - source_book: Speculative Everything Design, Fiction, and Social Dreaming Anthony Dunne, Fiona Raby liber3.md
+    text: Eduardo Kac is known for working with living materials, or transgenic art, as he terms it
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: false
+    route: 'NULL'
+    name: Transgenic Artistic Agency
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    evidence_passages: []
+    extraction_type: causal_mechanism
+    content_type: principle
+  rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two files are the SAME work (Speculative Everything, Dunne & Raby); co-author list present in only one filename. Canonical author normalization collapses ''Anthony Dunne'' + ''Anthony Dunne, Fiona Raby'' to ONE primary author: source_diversity must be 1 and is_convergent false.'
+  tier: CHALLENGE

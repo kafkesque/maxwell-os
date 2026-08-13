@@ -85,6 +85,11 @@ def embed_texts_bge_m3(texts: list[str], batch_size: int = BATCH_SIZE) -> np.nda
         embeddings.extend(batch_embs)
 
     arr = np.asarray(embeddings, dtype=np.float32)
+    # D2181/E7: Matryoshka truncation — bge-m3 outputs 1024d natively, truncate to
+    # EMBED_DIM (512d) to match stage1_5 (2× faster FAISS, 92% neighbor overlap).
+    # Truncate BEFORE normalize (normalizing the truncated subspace is correct).
+    if arr.shape[1] > EMBED_DIM:
+        arr = arr[:, :EMBED_DIM]
     # Normalize rows for cosine similarity (matches stage4 usage of dot product)
     norms = np.linalg.norm(arr, axis=1, keepdims=True)
     norms = np.where(norms == 0, 1.0, norms)

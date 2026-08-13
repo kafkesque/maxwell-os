@@ -90,6 +90,50 @@ def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
 _source_id_cache: dict[str, str] = {}
 
 
+# ── D2308: Canonicalization (prevent duplicate-edition false convergence) ──
+_SUBTITLE_SPLIT = re.compile(r"[:—–-]")
+_COAUTHOR_SPLIT = re.compile(r",|\band\b|&", re.IGNORECASE)
+_CAMEL_CONCAT = re.compile(r"([a-z0-9])([A-Z])")
+# D2315: camelCase-concatenated subtitle opener (no separator). "The Black
+# SwanThe Impact of the Highly Improbable" -> split at "The" boundary, drop
+# the subtitle so it collapses with "The Black Swan" (same work, different
+# edition). Lookahead requires a lowercase/digit before + word boundary after.
+_CONCAT_SUBTITLE_SPLIT = re.compile(r"(?<=[a-z0-9])(?=(?:The|A|An|How|Why|What)\b)")
+
+
+def normalize_author(author: str) -> str:
+    """D2308: Canonicalize an author string to primary-author form.
+
+    'Anthony Dunne, Fiona Raby' -> 'anthony dunne'
+    Collapses co-author lists (','/'and'/'&'), case, and punctuation drift so
+    that edition variants of the same work resolve to the same author key.
+    """
+    a = (author or "").strip().lower()
+    a = _COAUTHOR_SPLIT.split(a, maxsplit=1)[0].strip()
+    a = re.sub(r"[^a-z ]", "", a)
+    return re.sub(r"\s+", " ", a).strip()
+
+
+def normalize_title(title: str) -> str:
+    """D2308/D2315: Canonicalize a title string (strip subtitle, fix concatenation).
+
+    'Make Bootstrappers Handbook: Learn to build...' -> 'make bootstrappers handbook'
+    'The Black SwanThe Impact of...' -> 'the black swan' (D2315: split at concat
+    subtitle-opener and drop the subtitle, so edition variants collapse).
+    """
+    raw = (title or "").strip()
+    # D2315: camelCase-concatenated subtitle — split at the concat boundary
+    # before a subtitle-opener word and drop the remainder.
+    m = _CONCAT_SUBTITLE_SPLIT.search(raw)
+    if m:
+        raw = raw[:m.start()].rstrip()
+    t = raw.lower()
+    t = _CAMEL_CONCAT.sub(r"\1 \2", t)
+    t = _SUBTITLE_SPLIT.split(t, maxsplit=1)[0]
+    t = re.sub(r"[^a-z0-9]+", " ", t)
+    return t.strip()
+
+
 def compute_source_id(author: str, title: str, fallback_key: str = "") -> str:
     """Generate a canonical source_id from author + title.
 
@@ -109,11 +153,11 @@ def compute_source_id(author: str, title: str, fallback_key: str = "") -> str:
         16-char hex source_id (first 16 of SHA-256).
     """
     if author and author != "Unknown Author" and title and title != "Unknown Title":
-        canonical = f"{author}|{title}"
+        canonical = f"{normalize_author(author)}|{normalize_title(title)}"
     elif fallback_key:
         canonical = f"unknown|{_normalize_key(fallback_key)}"
     else:
-        canonical = f"unknown|{title}"
+        canonical = f"unknown|{normalize_title(title)}"
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 

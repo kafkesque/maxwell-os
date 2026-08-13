@@ -36,3 +36,6 @@ datasketch>=1.6        # MinHash near-dedup
 
 # ── Vector search ────────────────────────────────────
 sqlite-vec>=0.1        # P0.11: Vector search in SQLite
+
+# ── DSPy optimization (post-T1.1, GAP-1) ────────────
+dspy-ai>=3.3.0         # D2243/D2304: MIPROv2 optimizer + DirectOMLXLM (dspy_trainer.py)

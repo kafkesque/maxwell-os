@@ -414,20 +414,18 @@ def fb_core_fields_present(fb: dict[str, Any]) -> dict[str, bool]:
 
 # ── D2284: ISOR — Independent Source Support Ratio ───────────────────────
 
-def _extract_author_surname(source_book: str) -> str:
-    """Extract author surname from a 'Title — Author Name' source book string.
+def _author_identity(source_book: str) -> str:
+    """D2309: Resolve canonical author identity from metadata (not filename parsing).
 
-    Handles: 'Predictably Irrational — Dan Ariely' → 'Ariely'
-             'Thinking, Fast and Slow — Daniel Kahneman' → 'Kahneman'
-             'Priceless — William Poundstone' → 'Poundstone'
+    The old heuristic split on 'Title — Author' (em-dash), but the corpus uses
+    'Title (Author) (source).md' (parenthesis) — so it returned the whole filename
+    as the "surname", making n_authors == n_sources always. Now resolves author
+    from the metadata cache and normalizes to primary-author form (D2308).
     """
-    if " — " in source_book:
-        author_part = source_book.split(" — ", 1)[1].strip()
-        # Take last word as surname
-        parts = author_part.split()
-        if parts:
-            return parts[-1].lower()
-    return source_book.lower()
+    from pipeline.book_metadata import normalize_author, resolve_book_metadata
+
+    meta = resolve_book_metadata(str(source_book))
+    return normalize_author(meta.get("author", ""))
 
 
 def isor_score(fb: dict[str, Any]) -> dict[str, Any]:
@@ -456,14 +454,19 @@ def isor_score(fb: dict[str, Any]) -> dict[str, Any]:
             "detail": "No source books",
         }
 
-    # 1. Author independence
+    # D2309: canonical source count — distinct WORKS, not distinct filenames.
+    from pipeline.book_metadata import resolve_source_ids
+
+    n_sources = len(resolve_source_ids(source_books))
+
+    # 1. Author independence — canonical author from metadata (D2309).
     authors: set[str] = set()
     for sb in source_books:
-        surname = _extract_author_surname(str(sb))
-        if surname:
-            authors.add(surname)
+        ident = _author_identity(str(sb))
+        if ident:
+            authors.add(ident)
     n_authors = len(authors)
-    author_score = min(n_authors / max(len(source_books), 1), 1.0)
+    author_score = min(n_authors / max(n_sources, 1), 1.0)
 
     # 2. Domain diversity (from FB domains field)
     domains = fb.get("domains", [])
@@ -472,17 +475,16 @@ def isor_score(fb: dict[str, Any]) -> dict[str, Any]:
     n_domains = len(set(domains))
     domain_score = min(n_domains / 3.0, 1.0)  # 3+ domains = full score
 
-    # 3. Raw source count
-    n_sources = len(set(source_books))
-    count_score = min(n_sources / 3.0, 1.0)  # 3+ sources = full score
+    # 3. Raw source count score (canonical works)
+    count_score = min(n_sources / 3.0, 1.0)  # 3+ works = full score
 
     # Composite score: weighted average
     composite = round(0.50 * author_score + 0.25 * domain_score + 0.25 * count_score, 3)
 
-    # Rating
+    # Rating — D2309: parenthesized to fix and-binds-tighter-than-or precedence.
     if n_authors >= 2 and n_domains >= 2 and n_sources >= 3:
         rating = "strong"
-    elif n_authors >= 2 or n_domains >= 2 and n_sources >= 2:
+    elif (n_authors >= 2 or n_domains >= 2) and n_sources >= 2:
         rating = "medium"
     else:
         rating = "weak"

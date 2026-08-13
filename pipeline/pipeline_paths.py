@@ -141,6 +141,11 @@ S2_SPLIT_KMEANS_RANDOM_STATE=int(_CFG.get("stage2", {}).get("split_probe_kmeans_
 S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", True))     # D2163: gate master switch
 S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate
 S2_SPLIT_PROBE_MAX_COHESION=float(_CFG.get("stage2", {}).get("split_probe_max_cohesion", 0.85))  # D2163: max cohesion for gate
+# D2304: DSPy optimized-program persistence path (C12). Was hardcoded /tmp/dspy_mipro_optimized.json.
+# NOTE: the `s2` key (lowercase) holds DSPy training settings; `stage2` holds pipeline extraction settings.
+_dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")
+_dspy_program_p = Path(str(_dspy_program_raw))
+DSPY_PROGRAM_PATH = _dspy_program_p if _dspy_program_p.is_absolute() else PROJECT_ROOT / _dspy_program_p
 
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])
@@ -167,13 +172,21 @@ S5_FACTSCORE_ENABLED=bool(_CFG["stage5"]["factscore_enabled"])
 # DeBERTa FEVER: 5.8× more discriminative than ModernBERT on convergent FBs.
 # FEVER + ANLI training = purpose-built for claim-evidence verification.
 # See governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
-S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli")  # D2216
-S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "tasksource/ModernBERT-base-nli")  # D2216
-S5_NLI_MODEL_LARGE=_CFG["models"]["nli_large"]  # D2293: DeBERTa-v3-large (435M) for dual-encoder primary
-S5_NLI_MODEL_CROSS=_CFG["models"]["nli_cross"]  # D2293: RoBERTa-large (355M) for cross-architecture verification
+S5_NLI_MODEL=_CFG.get("stage5", {}).get("nli_model", "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")  # D2298: DeBERTa-v3-large sole verifier
+S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "")  # D2298: fallback removed (was ModernBERT-base-nli)
+S5_NLI_MODEL_LARGE=_CFG["models"]["nli_large"]  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
+# S5_NLI_MODEL_CROSS removed (D2298): RoBERTa-large added zero signal on paraphrase evidence (D2227).
 S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.5))  # D2231: fallback matches config
 S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.6))  # D2231: fallback matches config
 S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.3))  # D2231: fallback matches config
+S5_NLI_MAX_PREMISE_CHARS=int(_CFG.get("stage5", {}).get("nli_max_premise_chars", 256))  # D2321: premise(evidence) truncation for NLI pairing
+S5_NLI_MAX_HYPOTHESIS_CHARS=int(_CFG.get("stage5", {}).get("nli_max_hypothesis_chars", 256))  # D2321: hypothesis(definition) truncation
+# D2310: Confidence weights — NLI is a binary gate, not a score component (C12 config-driven).
+S5_CONF_MECH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("mechanism_weight", 0.35))
+S5_CONF_ENRICH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("enrichment_weight", 0.25))
+S5_CONF_ISOR_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("isor_weight", 0.40))
+S5_QUARANTINE_CONF_CAP=float(_CFG.get("stage5", {}).get("confidence", {}).get("quarantine_cap", 0.25))
+S5_HUMAN_REVIEW_ISOR=str(_CFG.get("stage5", {}).get("confidence", {}).get("human_review_isor_rating", "strong"))
 
 # ── NLI threshold sanity check (D2185: T1.4 — catch misconfigured thresholds) ──
 def _validate_nli_thresholds():

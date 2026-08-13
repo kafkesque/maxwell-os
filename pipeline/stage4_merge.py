@@ -9,7 +9,7 @@ Output: Foundation Blocks with classified labels, checkpoint at stage4_merge.jso
 
 Process:
   1. For each cluster, gather all member principles
-  2. Send to Qwen3.6: merge principles → single FB (name + 6 body fields)
+  2. Send to Qwen3-Coder-30B: merge principles → single FB (name + 6 body fields)
   3. Classification: single-pass prompt lists all valid labels inline (D316: discipline singular, domains multi-label)
   4. Pydantic Literal validation catches hallucinated labels at write boundary
   5. Auto-derive context, accessibility, intimacy_boundary, provenance (v1 parity)
@@ -1010,7 +1010,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         #
         # D2226: MERGED S4 CALL (D2224) — When MAXWELL_MERGED_S4=1, use single
         # Phi-4-mini call for BOTH CRIBS enrichment + classification (~61% faster).
-        # Otherwise use two-call pattern: CRIBS (Qwen) + Classify (Phi-4-mini).
+        # Otherwise use two-call pattern: CRIBS (Qwen) + Classify (GPT-OSS).
         _skip_llm: bool = os.environ.get("MAXWELL_SKIP_LLM", "") == "1"
         # D2263/D2301: merged S4 call — env var overrides config (C12).
         # BUG-FIX: config merged_call_enabled was orphaned (never read).
@@ -1167,6 +1167,16 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         canonical_discipline = map_to_canonical_with_fallback(
             discipline_raw, "discipline", synonym_index, CANONICAL_DISCIPLINES
         )
+        # D2310: Preserve raw label + record match method (diagnose "emerging" over-firing, BUG-083).
+        # The raw label was previously discarded after mapping — losing the signal needed to
+        # expand the taxonomy. match_method: "exact" | "synonym" | "emerging".
+        class_data["discipline_raw"] = discipline_raw
+        if canonical_discipline == "emerging":
+            class_data["taxonomy_match_method"] = "emerging"
+        elif canonical_discipline.lower() == discipline_raw.lower():
+            class_data["taxonomy_match_method"] = "exact"
+        else:
+            class_data["taxonomy_match_method"] = "synonym"
         canonical_domains: list[str] = []
         seen_canonical: set[str] = set()
         for d in domains_raw:
@@ -1381,8 +1391,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         seen_ge: set[str] = set()
         deduped_ge = []
         for ge in growth_edges:
-            if ge["principle_id"] not in seen_ge:
-                seen_ge.add(ge["principle_id"])
+            _k = ge.get("fb_id") or ge.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
+            if _k and _k not in seen_ge:
+                seen_ge.add(_k)
                 deduped_ge.append(ge)
         safe_write(
             ge_path,
@@ -1395,8 +1406,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         seen_pt: set[str] = set()
         deduped_pt = []
         for pt in process_templates:
-            if pt["principle_id"] not in seen_pt:
-                seen_pt.add(pt["principle_id"])
+            _k = pt.get("fb_id") or pt.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
+            if _k and _k not in seen_pt:
+                seen_pt.add(_k)
                 deduped_pt.append(pt)
         safe_write(
             pt_path,
@@ -1409,8 +1421,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         seen_pi: set[str] = set()
         deduped_pi = []
         for pi in process_instances:
-            if pi["principle_id"] not in seen_pi:
-                seen_pi.add(pi["principle_id"])
+            _k = pi.get("fb_id") or pi.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
+            if _k and _k not in seen_pi:
+                seen_pi.add(_k)
                 deduped_pi.append(pi)
         safe_write(
             pi_path,
@@ -1423,8 +1436,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         seen_ti: set[str] = set()
         deduped_ti = []
         for ti in tool_instructions:
-            if ti["principle_id"] not in seen_ti:
-                seen_ti.add(ti["principle_id"])
+            _k = ti.get("fb_id") or ti.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
+            if _k and _k not in seen_ti:
+                seen_ti.add(_k)
                 deduped_ti.append(ti)
         safe_write(
             ti_path,

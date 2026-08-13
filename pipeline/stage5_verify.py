@@ -11,9 +11,10 @@ Process:
   1. Mechanism quality pre-filter: catch tautological mechanisms (regex, free)
   2. DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI): sole NLI verifier
   3. Threshold 0.10 — calibrated via human adjudication (12 FBs): P=1.000, R=0.556
-  4. Verdict:
+  4. Verdict (D2321: premise/hypothesis pairing + all-3-label scoring):
      → ENTAIL ≥ 0.10 → PASS
-     → Otherwise → QUARANTINE
+     → NEUTRAL (unverifiable) → QUARANTINE
+     → CONTRA → QUARANTINE
   5. FAIL-CLOSED (D2093): any path failure → QUARANTINE, never PASS
 
   DELETED (dead checks): BORP (S1.5 guarantees ≥2 sources), Completeness (S4 fills all fields)
@@ -45,27 +46,29 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
+    S5_CONF_ENRICH_WEIGHT,  # D2310: confidence enrichment weight
+    S5_CONF_ISOR_WEIGHT,  # D2310: confidence ISOR weight
+    S5_CONF_MECH_WEIGHT,  # D2310: confidence mechanism weight
+    S5_HUMAN_REVIEW_ISOR,  # D2310: ISOR rating triggering human review
     S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
+    S5_NLI_MAX_HYPOTHESIS_CHARS,  # D2321: hypothesis(definition) truncation for NLI pairing
+    S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
+    S5_QUARANTINE_CONF_CAP,  # D2310: confidence cap for QUARANTINE
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
 )
-from pipeline.schema_accessor import (
-    fb_definition,
-    fb_source_texts,
-    fb_source_texts_shown,
-)
+
+# fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
+# deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
 from pipeline.stamp import get_pipeline_commit
 
 # ── Constants ──────────────────────────────────────────────────────────────
-NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2155: from config (default 0.6)
-# D2226 (Kimi audit fix): Was hardcoded 0.8 in nli_evidence_check, now reads from config.
-# Config declares 0.6 pass / 0.5 entailment / 0.3 marginal. Hardcoded 0.8 overrode
-# the more permissive config, forcing unnecessary LLM escalation.
-# ── NLI Model — config-driven with automatic fallback (D2119) ────────────
-# Primary: ModernBERT-base-nli (~64ms, 8192 ctx, 90% MNLI accuracy)
-# Fallback: DeBERTa-v3-base-mnli-fever-anli (~129ms, 512 ctx, 90% MNLI + FEVER)
-# If primary model fails to load (missing, OOM, etc.), falls back automatically.
+NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2298: from config (0.10, calibrated)
+# ── NLI Model — DeBERTa-v3-large only (D2298) ──────────────────────────────
+# DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI) is the sole NLI verifier.
+# RoBERTa-large removed (D2298): added zero signal on paraphrase evidence (D2227).
+# ModernBERT fallback removed (D2298). No automatic fallback.
 
 _DUAL_LOADED: bool = False
 _DEBERTA_LARGE = None
@@ -102,11 +105,52 @@ def _load_dual_encoders():
     return _DEBERTA_LARGE, None
 
 
-def deberta_check(fb: dict) -> tuple[bool, float, str]:
-    """D2298-calibrated: DeBERTa-only NLI check. Threshold 0.10 from human calibration.
+def _nli_pair_scores(premise: str, hypothesis: str) -> tuple[float, float, float]:
+    """D2322: Raw DeBERTa NLI scores for one (premise, hypothesis) pair.
 
-    Calibration (12 FBs): Precision 1.000, Recall 0.556, F1 0.714 at threshold 0.10.
+    Returns (entailment, neutral, contradiction) probabilities. Shared primitive
+    used by deberta_check() and nli_calibrate.py so both read all three labels
+    from a properly-paired input (BUG-092 fix). Never raises — returns zeros on
+    any failure (caller decides fail-closed handling).
+    """
+    debert, _ = _load_dual_encoders()
+    if debert is None:
+        return 0.0, 0.0, 0.0
+    try:
+        _r = debert({"text": premise, "text_pair": hypothesis}, top_k=3)
+    except Exception:
+        return 0.0, 0.0, 0.0
+    _entail = _neutral = _contra = 0.0
+    if isinstance(_r, list):
+        for _s in _r:
+            _lbl = str(_s.get("label", "")).upper()
+            _sc = float(_s.get("score", 0.0))
+            if _lbl in ("ENTAILMENT", "ENTAIL"):
+                _entail = _sc
+            elif _lbl == "NEUTRAL":
+                _neutral = _sc
+            elif _lbl in ("CONTRADICTION", "CONTRA"):
+                _contra = _sc
+    return _entail, _neutral, _contra
+
+
+def deberta_check(fb: dict) -> tuple[bool, float, str]:
+    """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
+
+    Threshold 0.10 from human calibration (12 FBs): P=1.000, R=0.556, F1=0.714.
     RoBERTa removed (D2298) — added zero signal on paraphrase-based evidence (D2227).
+
+    D2321 FIX (BUG-092): previous code concatenated "definition evidence" into ONE
+    string and fed it to the NLI encoder as a single sequence (no premise/hypothesis
+    separation), and read only the top-1 label. NEUTRAL verdicts therefore collapsed
+    to "ent=0.00 cont=0.00" and were mislabeled CONTRA. This function now passes
+    (premise=evidence, hypothesis=definition) as a proper pair and reads all three
+    labels (top_k=3), distinguishing ENTAIL / NEUTRAL / CONTRA.
+
+    D2322: the returned `score` is now the continuous entailment probability in ALL
+    cases (not 0.0 on fail) so callers (nli_calibrate.py) can sweep thresholds on
+    honest raw scores. `passed`/`status` logic is unchanged (fail-closed, D2093).
+
     Returns (passed, score, detail).
     """
     debert, _ = _load_dual_encoders()
@@ -126,97 +170,38 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
         return False, 0.0, "No definition — QUARANTINE"
 
     _thresh = S5_NLI_PASS_THRESHOLD  # Config-driven (C12), D2293 calibrated: 0.10
-    _scores = []
+    _entail_scores: list[float] = []
+    _contra_scores: list[float] = []
+    _neutral_scores: list[float] = []
 
     for _ep in _eps[:8]:
         if not _ep.strip():
             continue
-        _txt = f"{_def} {_ep}"[:512]
-        try:
-            _r = debert(_txt)
-            _scores.append(_r[0] if isinstance(_r, list) else _r)
-        except Exception:
-            pass
+        _prem = _ep[:S5_NLI_MAX_PREMISE_CHARS]  # premise = evidence passage
+        _hyp = _def[:S5_NLI_MAX_HYPOTHESIS_CHARS]  # hypothesis = FB definition
+        _ent, _neu, _con = _nli_pair_scores(_prem, _hyp)
+        if _ent == 0.0 and _neu == 0.0 and _con == 0.0:
+            continue  # NLI scoring failed for this passage
+        _entail_scores.append(_ent)
+        _neutral_scores.append(_neu)
+        _contra_scores.append(_con)
 
-    if not _scores:
+    if not (_entail_scores or _contra_scores or _neutral_scores):
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 
-    _entail = max((s["score"] for s in _scores if s["label"].upper() in ("ENTAILMENT", "ENTAIL")), default=0.0)
-    _contra = max((s["score"] for s in _scores if s["label"].upper() in ("CONTRADICTION", "CONTRA")), default=0.0)
+    _entail = max(_entail_scores, default=0.0)
+    _contra = max(_contra_scores, default=0.0)
+    _neutral = max(_neutral_scores, default=0.0)
 
     if _entail >= _thresh:
         return True, round(_entail, 4), f"ENTAIL: {_entail:.2f}"
-    else:
-        return False, 0.0, f"CONTRA: ent={_entail:.2f} cont={_contra:.2f}"
+    if _neutral > _entail and _neutral > _contra:
+        return False, round(_entail, 4), f"NEUTRAL: ent={_entail:.2f} neu={_neutral:.2f} cont={_contra:.2f}"
+    return False, round(_entail, 4), f"CONTRA: ent={_entail:.2f} cont={_contra:.2f}"
 
 
-# ── NLI evidence check (D2093: replaces embedding similarity) ──────────────
-
-def nli_evidence_check(fb: dict) -> tuple[bool, float, str]:
-    """DeBERTa NLI entailment: compare FB definition against verbatim evidence passages.
-
-    v3.0 (D2093, D2104): Replaces embedding_similarity_check() which measured
-    topical closeness (cosine similarity), not factual entailment. DeBERTa MNLI
-    works correctly with verbatim evidence_passages from convergent extraction.
-
-    Returns (passed, confidence, detail).
-    """
-    # BUG-045 fix: prefer evidence_passages_shown (what LLM actually saw, 5-15 passages)
-    # over evidence_passages (what LLM chose to return, up to 5) for NLI verification.
-    evidence_passages: list[str] = fb_source_texts_shown(fb)
-    if not evidence_passages:
-        evidence_passages = fb_source_texts(fb)
-    if not evidence_passages:
-        # Fallback: try source_principles (v2.2 checkpoint compatibility)
-        source_principles: list[dict] = fb.get("source_principles", [])
-        if source_principles:
-            evidence_passages = [p.get("principle_text", "") for p in source_principles if p.get("principle_text")]
-        else:
-            return False, 0.0, "No evidence_passages or source_principles — QUARANTINE"
-
-    definition: str = fb_definition(fb)
-    if not definition or len(definition) < 20:
-        return False, 0.0, "No definition — QUARANTINE"
-
-    try:
-        results: list[dict] = []
-        for passage in evidence_passages[:8]:  # Max 8 passages for speed
-            if not passage.strip():
-                continue
-            result: dict = nli_entailment(definition, passage)
-            results.append(result)
-
-        if not results:
-            return False, 0.0, "No valid evidence passages to check — QUARANTINE"
-
-        # Score: MAX-entailment — strongest signal wins (D2215: DeBERTa FEVER factuality).
-        # D2226 (Kimi audit fix): Thresholds now config-driven, not hardcoded 0.8.
-        # A single strong contradiction (≥NLI_PASS_THRESHOLD) fails regardless of other passages.
-        # A single strong entailment (≥NLI_PASS_THRESHOLD) passes without escalation.
-        max_entail: float = max((r["score"] for r in results if r["label"] == "ENTAILMENT"), default=0.0)
-        max_contra: float = max((r["score"] for r in results if r["label"] == "CONTRADICTION"), default=0.0)
-
-        if max_contra >= NLI_PASS_THRESHOLD:
-            # Strong contradiction → fail-closed (D2093)
-            passed: bool = False
-            nli_score: float = 0.0
-            detail: str = f"NLI FAIL: max contradiction {max_contra:.2f} — evidence contradicts claim"
-        elif max_entail >= NLI_PASS_THRESHOLD:
-            # Strong entailment → strong pass (skip LLM)
-            passed = True
-            nli_score = max_entail
-            detail = f"NLI PASS: max entailment {max_entail:.2f} (strong signal)"
-        else:
-            # Weak/mixed signals → escalate to LLM
-            passed = True
-            nli_score = 0.4  # Below 0.5 threshold → triggers LLM escalation in run_stage5
-            detail = f"NLI NEUTRAL: max_entail={max_entail:.2f} max_contra={max_contra:.2f} — escalate to LLM"
-
-        return passed, nli_score, detail
-
-    except Exception as e:
-        return False, 0.0, f"NLI check error — QUARANTINE: {e}"
-
+# nli_evidence_check REMOVED (D2298) — superseded by deberta_check(); referenced deleted
+# nli_entailment (F821). DeBERTa-v3-large is the sole NLI verifier.
 
 # ── Core verification functions ────────────────────────────────────────────
 
@@ -275,7 +260,6 @@ def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
     fm = str(fb.get("failure_mode", "")).strip()
     definition = str(fb.get("definition", "")).strip()
     boundary = str(fb.get("boundary", "")).strip()
-    mechanism = str(fb.get("mechanism", "")).strip()
 
     warnings: list[str] = []
     grade: float = 1.0
@@ -295,7 +279,7 @@ def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
                 if context and context.split()[0] in app_lower:
                     pass  # Application acknowledges the boundary condition
                 elif indicator == "fails when" and "when" not in app_lower:
-                    warnings.append(f"ENRICH-APP-BOUNDARY: application doesn't acknowledge boundary condition")
+                    warnings.append("ENRICH-APP-BOUNDARY: application doesn't acknowledge boundary condition")
                     grade -= 0.05
                 break
 
@@ -480,11 +464,30 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
         stats[status] += 1
 
-        # Confidence score: mechanism 15% + DeBERTa NLI 75% + enrichment 10%
-        confidence_score = round(0.15 * mech_score_float + 0.75 * fact_score + 0.10 * enrich_score, 4)
+        # D2310: ISOR computed BEFORE confidence (confidence uses ISOR, not NLI).
+        from pipeline.schema_accessor import isor_score as _isor_score
+        isor = _isor_score(fb)
+        isor_composite = float(isor.get("score", 0.0))
 
-        # Build verified FB
+        # D2310: Confidence = mechanism + enrichment + ISOR (NLI is a binary gate).
+        confidence_score = round(
+            S5_CONF_MECH_WEIGHT * mech_score_float
+            + S5_CONF_ENRICH_WEIGHT * enrich_score
+            + S5_CONF_ISOR_WEIGHT * isor_composite,
+            4,
+        )
+        if not fact_passed:
+            # NLI gate failed → cap confidence (fail-closed, D2093).
+            confidence_score = min(confidence_score, S5_QUARANTINE_CONF_CAP)
+
+        # D2310: human adjudication for QUARANTINED canonical principles (strong ISOR + NLI fail).
+        if not fact_passed and isor.get("rating") == S5_HUMAN_REVIEW_ISOR:
+            needs_human = True
+
+        # Build verified FB. R14/C10: preserve generator provenance from Stage 4
+        # (gen_model stays = generator); verifier identity is captured in verifier_model below.
         vfb = dict(fb)
+        vfb["pipeline_commit"] = pipeline_commit
         vfb["verification_results"] = results
         vfb["confidence_score"] = confidence_score
         vfb["status"] = status
@@ -492,9 +495,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["verifier_model"] = "DeBERTa-v3-large (D2293 calibrated, threshold 0.10)"
         vfb["verification_method"] = method
 
-        # D2284: Epistemic status — ISOR scoring (replaces simple BORP ≥2)
-        from pipeline.schema_accessor import isor_score as _isor_score
-        isor = _isor_score(fb)
+        # D2284: Epistemic status — ISOR scoring
         if isor["rating"] in ("strong",) and fact_passed:
             epistemic_status = "corroborated"
         elif isor["rating"] in ("strong", "medium") and not fact_passed:

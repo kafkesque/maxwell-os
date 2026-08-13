@@ -131,8 +131,8 @@ def _release_process_lock() -> None:
             stored = int(_PID_FILE.read_text().strip())
             if stored == _ospid2.getpid():
                 _PID_FILE.unlink(missing_ok=True)
-    except Exception:
-        pass
+    except Exception as e:  # C16: log cleanup failure, don't silently swallow
+        print(f"⚠️  Process-lock release failed (non-fatal): {e}")
 
 def _kill_stale_diagnostics() -> int:
     """Find and kill any other run_diagnostic processes (not this one).
@@ -200,8 +200,8 @@ def _stop_caffeinate() -> None:
             _ospid5.kill(pid, 9)
             _CAFFEINATE_PID_FILE.unlink(missing_ok=True)
             print("☕ Caffeinate stopped — laptop may sleep normally")
-    except Exception:
-        pass
+    except Exception as e:  # C16: log cleanup failure, don't silently swallow
+        print(f"⚠️  Caffeinate stop failed (non-fatal): {e}")
 
 def _register_signal_handlers() -> None:
     """Register cleanup handlers for SIGINT (Ctrl+C) and SIGTERM.
@@ -489,8 +489,8 @@ def run_diagnostic() -> dict:
     # ═══ S5: Verify ══════════════════════════════════════════════════════
     if _s5_ckpt.exists():
         s5_fbs = [json.loads(l) for l in open(_s5_ckpt) if l.strip()]
-        s5_pass = sum(1 for fb in s5_fbs if fb.get("verification_status") == "PASS")
-        s5_quarantine = sum(1 for fb in s5_fbs if fb.get("verification_status") == "QUARANTINE")
+        s5_pass = sum(1 for fb in s5_fbs if fb.get("status", fb.get("verification_status")) == "PASS")
+        s5_quarantine = sum(1 for fb in s5_fbs if fb.get("status", fb.get("verification_status")) == "QUARANTINE")
         s5_fail = len(s5_fbs) - s5_pass - s5_quarantine
         results.update({"s5_fb_count": len(s5_fbs), "s5_pass": s5_pass,
                         "s5_quarantine": s5_quarantine, "s5_fail": s5_fail,
@@ -650,7 +650,7 @@ def generate_report(summary: dict, s5_fbs: list[dict]) -> str:
 
     for i, fb in enumerate(s5_fbs, 1):
         name = fb.get("name") or fb.get("fb_name") or "(unnamed)"
-        status = fb.get("verification_status", "UNKNOWN")
+        status = fb.get("status", fb.get("verification_status", "UNKNOWN"))
         status_icon = {"PASS": "✅", "QUARANTINE": "🚫", "FLAG": "⚠️", "FAIL": "❌"}.get(status, "❓")
 
         lines.append(f"### {status_icon} FB-{i}: {name}")

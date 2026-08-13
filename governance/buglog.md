@@ -4,6 +4,14 @@
 
 ---
 
+## 🟡 BUG-100 — 2026-08-13 — integrity check [8] false-green (placeholder count never compared)
+- **Symptom:** `just integrity` reported 17/17 PASS even when the S6 INSERT placeholder count diverged from the SQLite column count. Check [8] could not catch the D2337 48→54 column change.
+- **Root cause (2 stacked):** (1) `re.findall(r"INSERT\s+(OR\s+REPLACE\s+)?INTO\s+fbs[^;]*", ...)` — the capturing group made `findall` return the *group* string ("" / "OR REPLACE "), so `placeholder_count = ins.count("?")` was ALWAYS 0 → the `if placeholder_count > 0` branch never fired → silent `return True`. (2) the `[^;]*` tail matched `fbs_fts` (word-prefix) and spanned past the SQL `"""` into Python code, over-counting `?`.
+- **Fix (D2342):** VALUES-anchored `re.search(r"INSERT...INTO\s+fbs\b.*?VALUES\s*\(([^)]*)\)", ...)`; also enhanced check [7] key_fields to include the six D2337 fields.
+- **Status:** 🟢 FIXED (2026-08-13) — check [8] now genuinely compares 54=54 and FAILED at 56≠54 in the intermediate state (proving the fix).
+- **Files:** `pipeline/integrity_check.py`
+- **Source:** In-depth `just integrity` alignment audit (this session)
+
 ## 🔴 BUG-095 — 2026-08-13 — Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (data loss)
 - **Symptom:** S2 produces and S4 carries `mechanism`/`boundary`/`consequence` (`stage4_merge.py:1348-1350`), but SQLite `fbs` table has no such columns — only the older `application`/`failure_mode`/`elaboration`. `content_type`/`extraction_type` (D2323) never reach ANY store; `taxonomy_match_method` is computed then discarded in S4.
 - **Root cause:** `stage6_commit.py` CREATE TABLE (`:67-127`) + INSERT (`:275-345`) predate the D2323 ontology; S4 never copies `content_type`/`extraction_type`/`taxonomy_match_method` into the output FB dict (only uses `content_type` internally for routing).

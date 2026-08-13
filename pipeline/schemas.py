@@ -468,6 +468,30 @@ class FB(StampedRecord):
         description="3-4 sentence definition. S1: name+what. S2: mechanism. S3-4: constraint.",
         min_length=30,
     )
+    # ── D2337: D2323 two-axis ontology + mechanism/boundary/consequence ─────
+    # Was produced by S2 and carried by S4 dicts but absent from the Pydantic
+    # contract AND SQLite — a silent data-loss path if the Pydantic boundary is
+    # enforced. Added so schema/SQLite/Pydantic stay aligned.
+    content_type: str = Field(
+        default="principle",
+        description="D2323 role axis: principle|process_template|process_instance|tool_instruction|growth_edge",
+    )
+    extraction_type: str = Field(
+        default="",
+        description="D2323 epistemic axis: causal_mechanism|descriptive_model|normative_heuristic|empirical_pattern",
+    )
+    mechanism: str = Field(
+        default="",
+        description="Causal mechanism (S2): X→Y because Z. Core epistemic content.",
+    )
+    boundary: str = Field(
+        default="",
+        description="Where the mechanism stops applying. Core epistemic content.",
+    )
+    consequence: str = Field(
+        default="",
+        description="What follows when the mechanism holds. Core epistemic content.",
+    )
     application: str = Field(
         description="When [situation] → do [action]. One concrete example.",
         min_length=10,
@@ -592,6 +616,10 @@ class FB(StampedRecord):
     classification_status: str = Field(
         default="CLEAN",
         description="Classification outcome: CLEAN (canonical match), FALLBACK (synonym mapped), FAILED (quarantined)."
+    )
+    taxonomy_match_method: str | None = Field(
+        default=None,
+        description="D2310/D2337: how the canonical discipline/domain was matched — exact | synonym | emerging.",
     )
 
     @field_validator("domains")

@@ -329,8 +329,15 @@ def check_schema_sqlite_match() -> tuple[bool, str]:
             if field_name and "def " not in field_name and "class " not in field_name and "=" not in field_name:
                 all_model_fields.add(field_name)
 
-    # Check key fields exist in both (use broader set for comparison)
-    key_fields = {"fb_id", "name", "definition", "status", "schema_version"}
+    # Check key fields exist in both (use broader set for comparison).
+    # D2342: include D2337 fields (content_type/extraction_type/mechanism/boundary/
+    # consequence/taxonomy_match_method) so the check actually catches the S6
+    # data-loss regression that D2337 fixed (was only 5 key fields).
+    key_fields = {
+        "fb_id", "name", "definition", "status", "schema_version",
+        "content_type", "extraction_type", "mechanism", "boundary",
+        "consequence", "taxonomy_match_method",
+    }
     missing_in_sqlite = key_fields - sqlite_cols
     missing_in_pydantic = key_fields - all_model_fields
 
@@ -585,16 +592,25 @@ def check_sqlite_insert_placeholders() -> tuple[bool, str]:
     with open(commit_file) as f:
         commit_code = f.read()
 
-    # Count ? placeholders in first INSERT OR REPLACE INTO fbs statement only
-    insert_matches = re.findall(r"INSERT\s+(OR\s+REPLACE\s+)?INTO\s+fbs[^;]*", commit_code, re.IGNORECASE)
-    for ins in insert_matches:
-        placeholder_count = ins.count("?")
-        if placeholder_count > 0 and placeholder_count != col_count:
-            return False, f"INSERT has {placeholder_count} placeholders but fbs table has {col_count} columns"
-        elif placeholder_count > 0 and placeholder_count == col_count:
-            return True, f"INSERT placeholders ({placeholder_count}) match SQLite columns ({col_count})"
+    # Count ? placeholders in the `INSERT OR REPLACE INTO fbs` VALUES clause.
+    # D2342: the prior regexes were broken two ways — (1) re.findall with a capturing
+    # group returned the *group* ("OR REPLACE ") instead of the full match, so
+    # placeholder_count was ALWAYS 0 and the check silently returned True; (2) the
+    # `[^;]*` tail matched `fbs_fts` (prefix) and spanned past the SQL string into
+    # Python code, over-counting. Anchor to the VALUES (...) clause and use \b so
+    # `fbs_fts` is excluded.
+    m = re.search(
+        r"INSERT\s+(?:OR\s+REPLACE\s+)?INTO\s+fbs\b.*?VALUES\s*\(([^)]*)\)",
+        commit_code,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not m:
+        return "skip", "INSERT INTO fbs VALUES clause not found"
 
-    return True, f"INSERT placeholders consistent with SQLite schema ({col_count} columns)"
+    placeholder_count = m.group(1).count("?")
+    if placeholder_count != col_count:
+        return False, f"INSERT has {placeholder_count} placeholders but fbs table has {col_count} columns"
+    return True, f"INSERT placeholders ({placeholder_count}) match SQLite columns ({col_count})"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

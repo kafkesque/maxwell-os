@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-13T16:03:53Z'
-total_decisions: 330
+last_sync: '2026-08-13T16:31:56Z'
+total_decisions: 331
 decisions:
 - id: D2092
   category: INF
@@ -2558,7 +2558,7 @@ decisions:
 - id: D2337
   category: BUGFIX
   state: ACTIVE
-  description: 'Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (silent data loss)'
+  description: Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (silent data loss)
   champion: 2026-08-13 session
   target_files:
   - pipeline/stage6_commit.py
@@ -2577,7 +2577,7 @@ decisions:
 - id: D2339
   category: BUGFIX
   state: ACTIVE
-  description: 'runner --run-id import-ordering breaks run isolation (paths materialized before argparse)'
+  description: runner --run-id import-ordering breaks run isolation (paths materialized before argparse)
   champion: 2026-08-13 session
   target_files:
   - pipeline/runner.py
@@ -2596,25 +2596,35 @@ decisions:
 - id: D2341
   category: ARCH
   state: ACTIVE
-  description: 'Schema corrections adjudicated from 4-LLM audit (three-axis status, typed edges, TI class, feedback config-first, experiential defer)'
+  description: Schema corrections adjudicated from 4-LLM audit (three-axis status, typed edges, TI class, feedback config-first,
+    experiential defer)
   champion: 2026-08-13 session
   target_files:
   - pipeline/schemas.py
   - pipeline/feedback.py
   - config/content_types.yaml
   created: '2026-08-13'
+- id: D2342
+  category: QLT
+  state: ACTIVE
+  description: 'Integrity check false-green (placeholder count never compared) + Pydantic/D2337 alignment'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/integrity_check.py
+  - pipeline/schemas.py
+  created: '2026-08-13'
 summary:
-  total: 330
+  total: 331
   proposed: 0
   draft: 0
-  active: 286
+  active: 287
   stale: 0
   superseded: 12
   archived: 9
   rejected: 7
   by_category:
     INF: 183
-    QLT: 30
+    QLT: 31
     GOV: 20
     RES: 4
     DAT: 4

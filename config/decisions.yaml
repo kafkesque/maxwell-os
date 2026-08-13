@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-13T16:31:56Z'
-total_decisions: 331
+last_sync: '2026-08-13T17:48:52Z'
+total_decisions: 333
 decisions:
 - id: D2092
   category: INF
@@ -2058,7 +2058,8 @@ decisions:
   title: S5 Precision/Recall from Adjudicated Sample (D2293)
   category: VAL
   status: complete
-  note: 'SUPERSEDED by D2322 — P=1.000/R=0.556/F1=0.714 was measured on the broken pre-BUG-092 single-sequence DeBERTa call and is NOT reproducible. Honest auto-cal (D2322): P=0.647/R=0.386/F1=0.484 at threshold 0.10.'
+  note: 'SUPERSEDED by D2322 — P=1.000/R=0.556/F1=0.714 was measured on the broken pre-BUG-092 single-sequence DeBERTa call
+    and is NOT reproducible. Honest auto-cal (D2322): P=0.647/R=0.386/F1=0.484 at threshold 0.10.'
   files: governance/
   state: SUPERSEDED
 - id: D2294
@@ -2474,7 +2475,7 @@ decisions:
   category: BUGFIX
   state: ACTIVE
   description: S6 provenance integrity — per-FB INSERTED/FAILED/SKIPPED; never claim failed rows committed
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/stage6_commit.py
   created: '2026-08-13'
@@ -2482,7 +2483,7 @@ decisions:
   category: BUGFIX
   state: ACTIVE
   description: S0 fail-closed ingestion — conversion failure exits non-zero; quality check tri-state (C16)
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/stage0_convert.py
   created: '2026-08-13'
@@ -2490,7 +2491,7 @@ decisions:
   category: BUGFIX
   state: ACTIVE
   description: S1.3 prefilter wiring — pass --in-place in runner + e2e (was silent dry-run no-op)
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/runner.py
   - pipeline/e2e_test.py
@@ -2500,7 +2501,7 @@ decisions:
   category: VAL
   state: ACTIVE
   description: S5 calibration doc truthfulness + model-table drift (P=0.647/R=0.386/F1=0.484 at 0.10)
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/stage5_verify.py
   - pipeline/runner.py
@@ -2510,7 +2511,7 @@ decisions:
   category: ARCH
   state: ACTIVE
   description: Resume-validity manifest — checkpoint sidecar (hash/count/COMPLETE); existence ≠ validity
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/runner.py
   created: '2026-08-13'
@@ -2518,7 +2519,7 @@ decisions:
   category: VAL
   state: ACTIVE
   description: e2e run-scoping (db_rows→run_id) + quarantine retrieval contract test
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/e2e_test.py
   - pipeline/retrieve.py
@@ -2527,7 +2528,7 @@ decisions:
   category: BUGFIX
   state: ACTIVE
   description: S2 silent-skip fail-closed — failed_clusters gate + S2_MAX_FAILED_RATIO (C16)
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/stage2_extract.py
   created: '2026-08-13'
@@ -2535,7 +2536,7 @@ decisions:
   category: BUGFIX
   state: ACTIVE
   description: S2 checkpoint format integrity — fail-closed load_jsonl at every reader
-  champion: '2026-08-13 session'
+  champion: 2026-08-13 session
   target_files:
   - pipeline/stage2_extract.py
   - pipeline/bridge_s2_to_s4.py
@@ -2622,7 +2623,7 @@ decisions:
 - id: D2342
   category: QLT
   state: ACTIVE
-  description: 'Integrity check false-green (placeholder count never compared) + Pydantic/D2337 alignment'
+  description: Integrity check false-green (placeholder count never compared) + Pydantic/D2337 alignment
   champion: 2026-08-13 session
   target_files:
   - pipeline/integrity_check.py
@@ -2631,7 +2632,8 @@ decisions:
 - id: D2343
   category: BUGFIX
   state: ACTIVE
-  description: 'Pre-T1.1 residual closures — S2 resume fail-closed, e2e prefilter/round-trip, route gate C12, integrity [11] label'
+  description: Pre-T1.1 residual closures — S2 resume fail-closed, e2e prefilter/round-trip, route gate C12, integrity [11]
+    label
   champion: 2026-08-13 session
   target_files:
   - pipeline/stage2_extract.py
@@ -2640,29 +2642,39 @@ decisions:
   - pipeline/pipeline_paths.py
   - config/pipeline_config.yaml
   created: '2026-08-13'
+- id: D2344
+  category: ARCH
+  state: ACTIVE
+  description: ToolInstruction Pydantic class (B15 partial) + delegate_omlx() file-grounded helper (BUG-063)
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/schemas.py
+  - pipeline/omlx_delegate.py
+  - governance/buglog.md
+  created: '2026-08-13'
 summary:
-  total: 332
+  total: 333
   proposed: 0
   draft: 0
-  active: 287
+  active: 289
   stale: 0
-  superseded: 12
-  archived: 9
+  superseded: 13
+  archived: 8
   rejected: 7
   by_category:
-    INF: 183
+    INF: 176
     QLT: 31
     GOV: 20
     RES: 4
     DAT: 4
     DEF: 1
-    VAL: 6
+    VAL: 8
     CLS: 14
     STR: 1
     PERF: 6
-    BUGFIX: 23
+    BUGFIX: 29
     CFG: 5
-    ARCH: 19
+    ARCH: 20
     pipeline-fix: 2
     governance: 1
     BUG: 1

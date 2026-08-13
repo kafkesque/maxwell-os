@@ -453,6 +453,114 @@ class GrowthEdge(StampedRecord):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# Stage 4d: Tool Instruction — tool/software-specific command (D2323)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ToolInstruction(StampedRecord):
+    """A tool/software-specific command or feature (D2323 `tool_instruction` role).
+
+    The field set is grounded in MCP `Tool` + JSON Schema + OpenAPI + man pages
+    (D2323), so a TI can promote into a Recipe step / MCP tool at Layer 2 without
+    rework (C21). It is KNOWLEDGE (documentation), not a live callable binding —
+    the actual invocation happens at Layer 2.
+
+    Distinct from FB (why/when — conceptual) and PT (repeatable how-to method):
+    a TI captures the concrete syntax/parameters/output of ONE tool.
+    """
+    ti_id: str = Field(description="SHA-256 hash of tool_name + platform + version")
+    tool_name: str = Field(description="MCP `name` — canonical tool identifier", min_length=1)
+    platform: str = Field(description="Where it runs: CLI / API / app / OS", min_length=1)
+    description: str = Field(
+        description="MCP `description` / man DESCRIPTION — what it achieves, when to use",
+        min_length=5,
+    )
+    syntax: str = Field(
+        description="man SYNOPSIS — the invocation template",
+        min_length=3,
+    )
+    parameters: list[dict] = Field(
+        default_factory=list,
+        description="JSON Schema `properties` / OpenAPI `parameters` — structured parameter list",
+    )
+    output: str = Field(
+        default="",
+        description="MCP `outputSchema` / man OUTPUT — what it returns",
+    )
+    example: str = Field(
+        default="",
+        description="man EXAMPLES — worked input → output (primary LLM learning signal)",
+    )
+    annotations: list[dict] = Field(
+        default_factory=list,
+        description="MCP `annotations` — readOnlyHint / destructiveHint / idempotentHint",
+    )
+    caveats: str = Field(
+        default="",
+        description="man BUGS — failure modes / gotchas",
+    )
+    version: str = Field(
+        default="",
+        description="Tool version for staleness detection (tools change → knowledge rots)",
+    )
+    source: str = Field(
+        default="",
+        description="Where documented (book / chapter)",
+    )
+    alternatives: list[str] = Field(
+        default_factory=list,
+        description="man SEE ALSO — related tools",
+    )
+
+    # ── Shared classification (S4, same as PT/PI/GE) ──
+    domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
+        min_length=1, max_length=5,
+        description="1-5 canonical domains",
+    )
+    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+        description="Canonical discipline",
+    )
+    depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
+        description="universal | cross-domain | domain | specialized",
+    )
+    evidence: EVIDENCE_LITERAL = Field(  # type: ignore[valid-type]
+        description="cited (from source text) | axiomatic (self-evident)",
+    )
+
+    # ── D2323 core body (epistemic fields shared across content types) ──
+    extraction_type: str = Field(
+        default="",
+        description="D2323 epistemic axis: causal_mechanism|descriptive_model|normative_heuristic|empirical_pattern",
+    )
+    mechanism: str = Field(
+        default="",
+        description="How this tool/command works under the hood (causal)",
+    )
+    boundary: str = Field(
+        default="",
+        description="Where this tool does NOT apply / is the wrong choice",
+    )
+    consequence: str = Field(
+        default="",
+        description="What results from correct use",
+    )
+
+    # ── Provenance ──
+    source_clusters: list[str] = Field(default_factory=list, description="Cluster IDs that formed this TI")
+    source_books: list[str] = Field(description="Distinct source books")
+    source_principles: list[dict] = Field(
+        default_factory=list,
+        description="Source principles with texts embedded",
+    )
+
+    @field_validator("tool_name")
+    @classmethod
+    def tool_name_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Tool name must not be empty")
+        return v.strip()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # Stage 4: Merge + Classify — Clusters → FBs (Qwen3-Coder + GPT-OSS)
 # ═══════════════════════════════════════════════════════════════════════════
 

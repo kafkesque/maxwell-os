@@ -1376,9 +1376,9 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
     "temperature": 0.0
   }'
   ```
-- **Fix needed:** `delegate()` should detect when `provider` is `maxwell_omlx` and route directly through OMLX API with a shell execution backplane (access to `shell()` tool), not through the TypeScript sandbox. Or provide a separate `delegate_omlx()` function that calls the local API directly.
-- **Status:** 🔴 OPEN — Architectural limitation. delegate() and maxwell_omlx provider are incompatible for tool-use tasks.
-- **Priority:** P1 — blocks all local-LLM-driven code analysis workflows.
+- **Fix (D2344):** `pipeline/omlx_delegate.py` — `delegate_omlx()` function + CLI that runs in-process with REAL file access, reads the files you name (`--file`, repeatable), injects them as fenced context, and calls the local OMLX API via `pipeline.omlx_call.call_omlx` (or `call_omlx_json` with `--json`). Default model from config (`models.generator.model`); `--model` override. Verified end-to-end: `--file config/content_types.yaml` returned a correct file-grounded answer via gemma-4-E4B.
+- **Status:** 🟢 FIXED (D2344, 2026-08-13) — the `delegate_omlx()` workaround is now a first-class CLI. The underlying `delegate()` sandbox limitation remains (goose framework), but it no longer blocks local-LLM file analysis — use `python3 pipeline/omlx_delegate.py` instead of `delegate()`.
+- **Priority:** P1 — resolved by `pipeline/omlx_delegate.py`.
 
 *Updated: 2026-08-10 (D2226 cleanup) | Bugs tracked: 55 | Resolved: 46 | Closed (moot): 5 | Open: 4 | Schema version: 1.10*
 

@@ -1,11 +1,35 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-13 12:53 | **Decisions:** D2000-D2332 (321 decisions)
+> **Updated:** 2026-08-13 18:05 | **Decisions:** D2000-D2341 (330 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
-> **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4), DeBERTa-v3-large (S5), bge-m3 (Emb)
+> **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
-> **Diagnostic:** 188 FBs, 72.4% S5 pass rate → T1.1 authorized
+> **Diagnostic:** 188 FBs, 72.4% S5 pass rate → T1.1 authorized (CONDITIONAL-GO — see B1-B15)
 > **Detailed tasks:** `governance/aggregated_remaining_tasks.md`
 > **Buglog:** `governance/buglog.md`
+
+---
+
+# 🔴 NEW THIS SESSION — 4-LLM Audit Adjudication (D2337–D2341, 2026-08-13)
+
+> **4 external LLM audits** of `governance/SCHEMA_PIPELINE_STATE_AUDIT_PROMPT.md` were adjudicated.
+> Kimi/DeepSeek = repo-blocked (correctly refused to fabricate; zero signal). Qwen = repo-blocked but rated the prompt's
+> own claims as VERIFIED (epistemically unsound; PASS verdicts discarded). ChatGPT = only repo-reading audit;
+> independently re-verified here. **Findings surfaced 5 new blockers (B11–B15) on top of the B1–B10 set**, the most
+> serious of which is NOT the S2/OMLX reliability I'd been focused on, but a **Stage 6 SQLite data-loss bug** (D2337).
+
+| # | Decision | Task (code-verified) | Effort | Sev |
+|---|----------|----------------------|--------|-----|
+| **B11** | D2337 | S6 persist `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence` + round-trip test | 2h | 🔴 |
+| **B12** | D2338 | S4/S6 fail-closed — `failed>0 → exit 1`, no COMPLETE manifest | 1.5h | 🔴 |
+| **B13** | D2339 | runner `--run-id` import-ordering — parse args before run-scoped imports | 1h | 🟠 |
+| **B14** | D2340 | model-registry drift — `verifier`→`classifier` (gpt-oss), remove stale `verifier_v2` (Phi) | 0.5h | 🟠 |
+| **B15** | D2341 | schema corrections — three-axis `status`, keep typed edges, add TI class, feedback→YAML (P2) | 3h | 🟡 |
+
+> **Ordering:** B11→B12 first (S6 data loss + fail-open = silent permanent corruption of the first canonical corpus).
+> B13→B14 are config/run-scoping correctness (no data loss, but untrustworthy registry/isolation). B15 is schema
+> contract work deferred to P2 (after the infra blockers). NOTE: ChatGPT's "enable hybrid gate" recommendation is
+> **REJECTED** — BUG-085 A/B test already proved the heuristic HybridGate is net-negative (4.3% negative rejection);
+> run traditional-only.
 
 ---
 

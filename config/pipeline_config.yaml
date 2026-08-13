@@ -192,6 +192,7 @@ stage4:
   depth_focused_classification: true
   depth_max_tokens: 512
   depth_fallback_depth: domain
+  max_failed_ratio: 0.0   # D2338: fail-closed merge — if (failed + classification_errors)/total > this ratio, exit non-zero (0.0 = any failure fatal)
 s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3
@@ -239,6 +240,7 @@ stage5:
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true
+  max_failed_ratio: 0.0   # D2338: fail-closed commit — if failed_inserts/total > this ratio, exit non-zero (0.0 = any failed insert fatal)
 coverage:
   threshold: 0.5
   flag_fraction: 0.3

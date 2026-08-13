@@ -1,11 +1,31 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-13 12:53 | **Decisions:** D2000-D2332 (321) | **T1.1 = CONDITIONAL-GO — 10 must-fix items (B1-B10), ordered data-flow-first**
+> **Updated:** 2026-08-13 18:05 | **Decisions:** D2000-D2341 (330) | **T1.1 = CONDITIONAL-GO — 15 must-fix items (B1-B15), ordered data-flow-first**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
-> **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4) | DeBERTa-v3-large (S5) | bge-m3 (Emb)
-> **Hybrid Gate:** Wired (P0.1, D2276). Enable via `--hybrid` flag in stage2_extract.py.
+> **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
+> **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
 > **ISOR Scoring:** Active (P0.4, D2284). 3-dimension independence rating in verified FB output.
 > **Audit completed:** Runner.py Gemma dead code purged. Stale comments fixed. No silent crash risks found.
 > **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
+> **D2337-D2341 (NEW, 4-LLM audit):** S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections.
+
+---
+
+## 🔴 #0 — NEW BLOCKERS FROM 4-LLM AUDIT (B11–B15, D2337–D2341, 2026-08-13)
+
+> **Surfaced by ChatGPT audit + independently re-verified.** Kimi/DeepSeek = repo-blocked (zero signal); Qwen = unsound
+> (rated prompt's own claims as verified). These are downstream (S4/S6) correctness + config trust issues; the S6 data
+> loss is the highest-severity defect because a successful-looking full run would silently drop fields.
+
+| # | Decision | Task | Effort | Sev |
+|---|----------|------|--------|-----|
+| B11 | D2337 | S6 persist `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence` + round-trip test | 2h | 🔴 |
+| B12 | D2338 | S4/S6 fail-closed — `failed>0 → exit 1`; no COMPLETE manifest on partial commit | 1.5h | 🔴 |
+| B13 | D2339 | runner `--run-id` import-ordering (parse args before run-scoped path materialization) | 1h | 🟠 |
+| B14 | D2340 | model-registry drift — `verifier`→`classifier` (gpt-oss); remove stale `verifier_v2` (Phi) | 0.5h | 🟠 |
+| B15 | D2341 | schema corrections — three-axis `status`, keep typed edges, add TI class, feedback→YAML (P2) | 3h | 🟡 |
+
+> **Ordering:** B11→B12 (silent permanent corruption of the first canonical corpus) → B13→B14 (run-scoping + registry
+> trust) → B15 (schema contract, defer to P2 after infra). ChatGPT's "enable hybrid" recommendation REJECTED (BUG-085).
 
 ---
 

@@ -1,8 +1,48 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-13 (D2324-D2332 — roundtable audit + S2 checkpoint-format integrity + 17 stale OPEN statuses resolved)
+> **Last updated:** 2026-08-13 (D2337-D2341 — 4-LLM audit adjudication: S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🔴 BUG-095 — 2026-08-13 — Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (data loss)
+- **Symptom:** S2 produces and S4 carries `mechanism`/`boundary`/`consequence` (`stage4_merge.py:1348-1350`), but SQLite `fbs` table has no such columns — only the older `application`/`failure_mode`/`elaboration`. `content_type`/`extraction_type` (D2323) never reach ANY store; `taxonomy_match_method` is computed then discarded in S4.
+- **Root cause:** `stage6_commit.py` CREATE TABLE (`:67-127`) + INSERT (`:275-345`) predate the D2323 ontology; S4 never copies `content_type`/`extraction_type`/`taxonomy_match_method` into the output FB dict (only uses `content_type` internally for routing).
+- **Fix (D2337):** Add `content_type`, `extraction_type`, `mechanism`, `boundary`, `consequence` columns + INSERT + `_migrate_add_column` + round-trip test. Couples to B5 (S4 must emit the axes).
+- **Status:** 🟢 FIXED (code, 2026-08-13) — S4 emits the axes, S6 persists 6 new columns, round-trip test passes. Full-corpus canary pending.
+- **Files:** `pipeline/stage6_commit.py`, `pipeline/stage4_merge.py`, `pipeline/schemas.py`
+- **Source:** ChatGPT audit (`chatgpt008.md`) Block #1; independently re-verified against code
+
+## 🔴 BUG-096 — 2026-08-13 — S4/S6 fail-open: partial failure still exits 0 (no fail-closed gate)
+- **Symptom:** S4 increments `failed`/`classification_errors` and prints them but never exits nonzero. S6 `insert_fb()` returns `False` on exception (`:377-379`), `run_stage6()` prints `❌ Failed to commit` (`:560-561`) but exits 0 → `runner.py` writes a `COMPLETE` manifest with failed inserts.
+- **Root cause:** D2331 added fail-closed to S2 only; S4/S6 never received the equivalent `failed > permitted → exit 1` gate.
+- **Fix (D2338):** `failed == 0` (or config tolerance) as exit condition in both stages; distinguish LLM-failure vs classification-failure vs intentional-skip; injected-failure test asserting nonzero exit + no COMPLETE manifest.
+- **Status:** 🟢 FIXED (code, 2026-08-13) — S4/S6 `max_failed_ratio` fail-closed gates added; injected-failure (exit 1) + happy-path (exit 0) tests pass. Canary pending.
+- **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`
+- **Source:** ChatGPT audit Block #2/#3; independently re-verified
+
+## 🟠 BUG-097 — 2026-08-13 — runner `--run-id` import-ordering breaks run isolation
+- **Symptom:** `runner.py --run-id corpus-X` does NOT isolate checkpoints/manifests; run-scoped paths are materialized with the default `latest` run_id before argparse runs.
+- **Root cause:** `STAGE_CHECKPOINTS` (`:84,132,139`) and `_RESUME_MARKER` (`:152`) call `get_run_id()` at MODULE level; `--run-id` sets `MAXWELL_RUN_ID` only in `main()` (`:661-669`) after `pipeline_paths` cached the default.
+- **Fix (D2339):** Parse args before run-scoped imports, or lazy `RunContext` in `pipeline_paths`; two-run isolation test.
+- **Status:** 🟠 OPEN — P1
+- **Files:** `pipeline/runner.py`, `pipeline/pipeline_paths.py`
+- **Source:** ChatGPT audit Block #8; independently re-verified
+
+## 🟡 BUG-098 — 2026-08-13 — `psutil` undeclared in `requirements.txt` (C11/C24)
+- **Symptom:** `psutil` imported by 4 files (`run_monitor.py`, `memory_guard.py`, `run_diagnostic.py`, `n2_watchdog.py`) but absent from `requirements.txt`. Integrity checker's manual `KNOWN_PACKAGES` list masks it.
+- **Root cause:** Dependency declared by convention, never added to the manifest.
+- **Fix:** Add `psutil>=6.0` to `requirements.txt`; make the dependency audit parse the actual requirements file, not a whitelist.
+- **Status:** 🟡 OPEN — P1 (low risk; only matters on fresh install)
+- **Files:** `requirements.txt`, `pipeline/integrity_check.py`
+- **Source:** ChatGPT audit §10; independently re-verified
+
+## 🟠 BUG-099 — 2026-08-13 — Model registry drift: gpt-oss/Phi stale as "verifier" vs DeBERTa-only S5
+- **Symptom:** `stage5_verify.py` = DeBERTa-only (D2298, Phi DELETED), but `pipeline_config.yaml` (`verifier: gpt-oss`, `verifier_v2: Phi`), `model_assignments.yaml` (`S5_VERIFIER: Phi`), `session_seed.yaml` (`verifier: gpt-oss`, `verifier_v2: Phi`) all still list decoder verifiers.
+- **Root cause:** D2298 removed Phi/Gemma from S5 but the role registries were not updated; gpt-oss is actually the S4 classifier (D2249).
+- **Fix (D2340):** `pipeline_config.yaml` `verifier`→`classifier` (gpt-oss), delete/annotate `verifier_v2`; align `session_seed.yaml` + `model_assignments.yaml`. Extends B8/D2328.
+- **Status:** 🟠 OPEN — P1 (config-only; no code reads the stale role, but the registry is untrustworthy)
+- **Files:** `config/pipeline_config.yaml`, `config/model_assignments.yaml`, `agent/session_seed.yaml`
+- **Source:** ChatGPT audit (model attribution); independently re-verified + corrected (ChatGPT's own attribution was stale)
 
 ## 🔴 BUG-094 — 2026-08-13 — S2 checkpoint pretty-printed (JSONL broken) + resume-existence coupling
 

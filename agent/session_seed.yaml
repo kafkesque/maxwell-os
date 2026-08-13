@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-13 (D2323 content-type registry + D2324-D2332 roundtable + B1 checkpoint-format sweep — CONDITIONAL-GO)
+# Updated: 2026-08-13 (D2337-D2341: 4-LLM audit adjudication — S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections — CONDITIONAL-GO)
 
 session:
     version: "3.0.0"
@@ -15,17 +15,17 @@ models:
         provider: omlx
         temperature: 0.0
         family: qwen
-    verifier:
+    classifier:
         model: gpt-oss-20b-MXFP4-Q8
         provider: omlx
         temperature: 0.0
         family: gpt-oss
+        notes: "D2249: S4 classifier (NOT the S5 verifier). D2340 renamed from `verifier` to stop role confusion."
     verifier_v2:
-        model: Phi-4-mini-instruct-8bit
-        provider: omlx
-        temperature: 0.0
+        model: REMOVED
+        provider: null
         family: phi
-        notes: "D2264: S5 deep check (67% acc). R5: DeBERTa FEVER (encoder) ≠ Phi-4-mini (decoder)."
+        notes: "D2298/D2340: Phi-4-mini-instruct-8bit DELETED from S5 (67% acc, hallucination risk). S5 is DeBERTa-only."
     embeddings:
         model: bge-m3
         provider: ollama
@@ -59,7 +59,7 @@ pipeline:
         min_source_diversity: 2
     classification:
         method: multi_label          # D2066: raw labels dethrone canonicals. Not SALSA.
-        model: verifier              # R5: Generator ≠ Classifier
+        model: classifier            # R5: Generator (Qwen3-Coder) ≠ Classifier (gpt-oss). D2340 rename.
         max_domains_per_fb: 5
     verification:
         borp_min_sources: 2
@@ -139,6 +139,11 @@ phase:
         - B8: S5 calibration truth (D2328)
         - B9: S6 provenance (D2325)
         - B10: e2e run-scoping (D2330)
+        - B11 (NEW, P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence (D2337, BUG-095)
+        - B12 (NEW, P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
+        - B13 (NEW, P1): runner --run-id import-order isolation (D2339, BUG-097)
+        - B14 (NEW, P1): model-registry drift correction (D2340, BUG-099)
+        - B15 (NEW, P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)
         - Q6: 5+ book E2E test with meaningful convergent extraction
         - Tier 2: quality calibration (golden set audit, manual FB review)
         - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)

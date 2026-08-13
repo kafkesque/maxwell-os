@@ -166,6 +166,8 @@ S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))
 S4_DEPTH_MAX_TOKENS=int(_CFG.get("stage4", {}).get("depth_max_tokens", 512))
 S4_DEPTH_FALLBACK_DEPTH=str(_CFG.get("stage4", {}).get("depth_fallback_depth", "domain"))
+S4_MAX_FAILED_RATIO=float(_CFG.get("stage4", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed merge
+S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed commit
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])

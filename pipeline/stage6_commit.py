@@ -40,6 +40,7 @@ from pipeline.pipeline_paths import (
     DB_PATH,
     PARQUET_DIR,
     S15_EMBED_DIM,
+    S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
     STAGE5_CHECKPOINT,
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
@@ -71,6 +72,13 @@ CREATE TABLE IF NOT EXISTS fbs (
     application TEXT,
     failure_mode TEXT,
     elaboration TEXT,
+    -- D2337: D2323 two-axis ontology + mechanism/boundary/consequence (was silently dropped at S4→S6)
+    content_type TEXT,
+    extraction_type TEXT,
+    mechanism TEXT,
+    boundary TEXT,
+    consequence TEXT,
+    taxonomy_match_method TEXT,
     keywords TEXT,
     jargon TEXT,
     -- Classification (D316: discipline singular, D150: domains multi-label)
@@ -197,6 +205,13 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "intimacy_boundary", "TEXT")
     _migrate_add_column(conn, "fbs", "provenance", "TEXT")
     _migrate_add_column(conn, "fbs", "source_text", "TEXT")  # D2131
+    # D2337: D2323 two-axis ontology + mechanism/boundary/consequence (was silently dropped)
+    _migrate_add_column(conn, "fbs", "content_type", "TEXT")
+    _migrate_add_column(conn, "fbs", "extraction_type", "TEXT")
+    _migrate_add_column(conn, "fbs", "mechanism", "TEXT")
+    _migrate_add_column(conn, "fbs", "boundary", "TEXT")
+    _migrate_add_column(conn, "fbs", "consequence", "TEXT")
+    _migrate_add_column(conn, "fbs", "taxonomy_match_method", "TEXT")
     return conn
 
 
@@ -273,7 +288,8 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
         conn.execute("""
             INSERT OR REPLACE INTO fbs (
                 fb_id, name, definition, application, failure_mode,
-                elaboration, keywords, jargon,
+                elaboration, content_type, extraction_type, mechanism,
+                boundary, consequence, taxonomy_match_method, keywords, jargon,
                 domains, domains_raw,
                 discipline, discipline_raw,
                 depth, evidence,
@@ -293,7 +309,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 s3_original_domain,
                 created_at, committed_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
@@ -319,6 +335,12 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("application"), ""),
             _safe_str(fb.get("failure_mode"), ""),
             _safe_str(fb.get("elaboration"), ""),
+            _safe_str(fb.get("content_type"), ""),
+            _safe_str(fb.get("extraction_type"), ""),
+            _safe_str(fb.get("mechanism"), ""),
+            _safe_str(fb.get("boundary"), ""),
+            _safe_str(fb.get("consequence"), ""),
+            _safe_str(fb.get("taxonomy_match_method"), ""),
             _safe_str(fb.get("keywords"), ""),
             _safe_str(fb.get("jargon")),
             # domains + discipline (canonical + raw) — D316: discipline singular
@@ -563,6 +585,22 @@ def run_stage6(export_only: bool = False):
     if parquet_path:
         print(f"📦 Parquet:   {parquet_path}")
     print(f"📋 Checkpoint: {STAGE6_CHECKPOINT}")
+
+    # ── D2338: fail-closed commit ───────────────────────────────────────────
+    # insert_fb() returns False on exception and run_stage6() previously printed
+    # the failure but exited 0 — the runner then wrote a COMPLETE manifest despite
+    # permanent data loss. Now a partial commit never looks like success.
+    if not export_only and len(fbs) > 0:
+        failure_ratio: float = failed / len(fbs)
+        if failure_ratio > S6_MAX_FAILED_RATIO:
+            print(f"❌ Stage 6 FAILED: {failed}/{len(fbs)} FBs failed commit "
+                  f"({failure_ratio:.1%} > max_failed_ratio={S6_MAX_FAILED_RATIO}). "
+                  f"Failed inserts = permanent data loss — do NOT mark COMPLETE.")
+            sys.exit(1)
+        if failed > 0:
+            print(f"⚠️  Stage 6 CONDITIONAL_SUCCESS: {failed} FB(s) failed within "
+                  f"tolerance ({failure_ratio:.1%} ≤ {S6_MAX_FAILED_RATIO}). Re-run to retry failed FBs.")
+            sys.exit(2)  # non-zero → runner does NOT auto-advance / mark COMPLETE
 
 
 def main():

@@ -56,6 +56,7 @@ from pipeline.pipeline_paths import (
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
     S4_DEPTH_MAX_TOKENS,  # BUG-075: depth-only call token budget
     S4_GE_OUTPUT,
+    S4_MAX_FAILED_RATIO,  # D2338: fail-closed merge tolerance
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
@@ -1348,6 +1349,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "mechanism": fb_data.get("mechanism", "").strip(),
             "boundary": fb_data.get("boundary", "").strip(),
             "consequence": fb_data.get("consequence", "").strip(),
+            # D2337: persist D2323 two-axis ontology (was dropped at S4→S6)
+            "content_type": (fb_data.get("content_type") or DEFAULT_CONTENT_TYPE).strip(),
+            "extraction_type": (fb_data.get("extraction_type") or "").strip(),
             "application": fb_data.get("application", "").strip(),
             "failure_mode": fb_data.get("failure_mode", "").strip(),
             "elaboration": fb_data.get("elaboration", "").strip(),
@@ -1382,6 +1386,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "feedback_count": 0,
             "fb_version": 1,
             "classification_status": "CLEAN",  # D2214/F-H16: Pydantic default never applied to dict
+            # D2337: surface taxonomy match method (D2310 diagnostic, was computed then discarded)
+            "taxonomy_match_method": class_data.get("taxonomy_match_method"),
         }
         # Only include jargon when specialized terms need explanation
         jargon_val = _serialize_jargon(fb_data.get("jargon"))
@@ -1495,6 +1501,25 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         print(f"📋 GE Checkpoint:            {ge_path}")
     if tool_instructions:
         print(f"📋 TI Checkpoint:            {ti_path}")
+
+    # ── D2338: fail-closed merge ─────────────────────────────────────────────
+    # S4 previously printed `failed`/`classification_errors` but exited 0, so a
+    # partial merge fed a reduced dataset to S5 ("missing knowledge looks like
+    # valid absence"). Now a partial merge never looks like success.
+    total_clusters: int = len(clusters)
+    if total_clusters > 0:
+        combined_failures: int = failed + classification_errors
+        failure_ratio: float = combined_failures / total_clusters
+        if failure_ratio > S4_MAX_FAILED_RATIO:
+            print(f"❌ Stage 4 FAILED: {failed} failed clusters + {classification_errors} classification "
+                  f"errors = {combined_failures}/{total_clusters} "
+                  f"({failure_ratio:.1%} > max_failed_ratio={S4_MAX_FAILED_RATIO}). "
+                  f"Missing FBs = permanent data loss — do NOT advance to S5.")
+            sys.exit(1)
+        if combined_failures > 0:
+            print(f"⚠️  Stage 4 CONDITIONAL_SUCCESS: {combined_failures} failure(s) within "
+                  f"tolerance ({failure_ratio:.1%} ≤ {S4_MAX_FAILED_RATIO}). Re-run to retry failed clusters.")
+            sys.exit(2)  # non-zero → runner does NOT auto-advance to S5
 
 
 def main():

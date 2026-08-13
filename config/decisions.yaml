@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-13T13:46:33Z'
-total_decisions: 325
+last_sync: '2026-08-13T16:03:53Z'
+total_decisions: 330
 decisions:
 - id: D2092
   category: INF
@@ -2555,11 +2555,59 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2337
+  category: BUGFIX
+  state: ACTIVE
+  description: 'Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (silent data loss)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/stage6_commit.py
+  - pipeline/stage4_merge.py
+  - pipeline/schemas.py
+  created: '2026-08-13'
+- id: D2338
+  category: BUGFIX
+  state: ACTIVE
+  description: 'S4/S6 fail-open: partial failures still exit 0 (no fail-closed gate)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  created: '2026-08-13'
+- id: D2339
+  category: BUGFIX
+  state: ACTIVE
+  description: 'runner --run-id import-ordering breaks run isolation (paths materialized before argparse)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/runner.py
+  - pipeline/pipeline_paths.py
+  created: '2026-08-13'
+- id: D2340
+  category: GOV
+  state: ACTIVE
+  description: 'Model registry drift: gpt-oss/Phi stale as verifier vs DeBERTa-only S5 (D2298)'
+  champion: 2026-08-13 session
+  target_files:
+  - config/pipeline_config.yaml
+  - config/model_assignments.yaml
+  - agent/session_seed.yaml
+  created: '2026-08-13'
+- id: D2341
+  category: ARCH
+  state: ACTIVE
+  description: 'Schema corrections adjudicated from 4-LLM audit (three-axis status, typed edges, TI class, feedback config-first, experiential defer)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/schemas.py
+  - pipeline/feedback.py
+  - config/content_types.yaml
+  created: '2026-08-13'
 summary:
-  total: 325
+  total: 330
   proposed: 0
   draft: 0
-  active: 281
+  active: 286
   stale: 0
   superseded: 12
   archived: 9
@@ -2567,7 +2615,7 @@ summary:
   by_category:
     INF: 183
     QLT: 30
-    GOV: 19
+    GOV: 20
     RES: 4
     DAT: 4
     DEF: 1
@@ -2575,9 +2623,9 @@ summary:
     CLS: 14
     STR: 1
     PERF: 6
-    BUGFIX: 20
+    BUGFIX: 23
     CFG: 5
-    ARCH: 18
+    ARCH: 19
     pipeline-fix: 2
     governance: 1
     BUG: 1

@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-13 10:14 | **Decisions:** D2000-D2321 (310 decisions)
+> **Updated:** 2026-08-13 12:53 | **Decisions:** D2000-D2332 (321 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4), DeBERTa-v3-large (S5), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -8,6 +8,45 @@
 > **Buglog:** `governance/buglog.md`
 
 ---
+
+# 🔴 NEW THIS SESSION — T1.1 Roundtable Audit (D2324–D2332, 2026-08-13)
+
+> **CONDITIONAL-GO.** 3-LLM adversarial roundtable (kimii/chatgpt/qwen) independently verified against the code.
+> **A second independent code sweep (2026-08-13) added B1 — the S2 checkpoint format/resume coupling** (D2332, not in the
+> original 7). Blocker ordering below is **data-flow + dependency aware** (upstream integrity → correctness → verification truth),
+> NOT by auditor source. See D2324 for the roundtable verification record (kimii's findings rejected as fabricated; qwen's
+> "0.65 threshold" rejected).
+
+| # | Decision | Task (code-verified) | Effort | Sev |
+|---|----------|----------------------|--------|-----|
+| **B1** | D2332 | S2 checkpoint format assertion + regenerate corrupt `latest`/`e2e` checkpoints | 1h | 🔴 |
+| **B2** | D2329 | Resume-validity manifest — checkpoint sidecar (run_id/schema/count/COMPLETE); existence never implies validity | 2h | 🔴 |
+| **B3** | D2326 | S0 fail-closed — conversion failure → non-zero exit; un-swallow quality-check exception (C16) | 1h | 🔴 |
+| **B4** | D2323 | Content-type golden fix — 12 stale `content_type` values → 5-role ontology | 0.5h | 🔴 |
+| **B5** | D2323 | Content-type enum wiring — import from `config/content_types.yaml`; drop `fact`/`meta`; D2128 route→content_type | 2h | 🟠 |
+| **B6** | D2327 | S1.3 prefilter wiring — pass `--in-place` in runner (or declare disabled) | 0.5h | 🟠 |
+| **B7** | D2331 | S2 silent-skip — `failed_clusters==0` or config max-failure-rate + CONDITIONAL_SUCCESS | 2h | 🟠 |
+| **B8** | D2328 | S5 calibration truth — replace broken `P=1.000/R=0.556/F1=0.714` with D2322 honest numbers; fix runner "Phi-4-mini" description; regenerate audit prompt | 0.5h | 🔴 |
+| **B9** | D2325 | S6 provenance — per-FB `INSERTED/FAILED/SKIPPED`; don't claim failed rows committed | 1h | 🔴 |
+| **B10** | D2330 | e2e run-scoping (db_rows → current run) + quarantine retrieval contract test | 1.5h | 🟠 |
+
+> **Ordering rationale:** B1→B2 first (checkpoint format + resume coupling is the only pair that can silently corrupt the
+> *entire* run). B3 before B4–B7 (garbage-in). B4 before B5 (labels before enum). B5 before B7 (S2 must emit correct types
+> before S4 can route). B8–B9 last (verification/commit truthfulness — corrupts claims, not data).
+
+---
+
+# 🔴 NEW THIS SESSION — Content-Type Ontology Consolidation (D2323, 2026-08-13)
+
+> **The #1 pre-T1.1 architectural fix.** Content-type taxonomy was fractured across 4 places (S2 flat label, S4 dead schema classes, stale golden few-shot vocabulary, v1 ZONE templates). Verified findings this session:
+> 1. **Orphaned non-principle FBs (BUG-093)** — S2 extracted 3 `process_template` + 1 `tool_instruction`; silently dropped at S2→S4 (never reached S4/S5; separate output files absent).
+> 2. **Dead schema code** — `ProcessTemplate` (24 fields) / `ProcessInstance` (16 fields) / `GrowthEdge` classes never instantiated; S4 writes raw S2 dicts.
+> 3. **Stale golden vocabulary** — `stage2_fewshot_convergent.yaml` uses `content_type: model/heuristic/pattern` (extraction_type values) — contamination under temp=0.0.
+> 4. **`fact`/`meta` vestigial** enum values (schemas.py docstring only) — dropped.
+>
+> **Resolution (D2323):** `config/content_types.yaml` — single config-driven registry. Two orthogonal axes: `content_type` (5) × `extraction_type` (4). Core body + per-type extension delta. 13-field `tool_instruction`. D2150 + D2128 mappings. **Contract frozen; code wiring + golden-example fix = NEXT SESSION (before T1.1 full run).**
+>
+> **Files:** `config/content_types.yaml` (NEW) → wire into `pipeline/schemas.py`, `pipeline/stage2_extract.py`, `pipeline/stage4_merge.py`, `config/golden/stage2_fewshot_convergent.yaml`
 
 # 🔴 CRITICAL — BLOCKING T1.1
 
@@ -290,12 +329,13 @@
 ## 🔗 NEXT EXECUTION ORDER
 
 ```
-1. P0.1 (D2276) → Wire hybrid S2 to production (~8h) — highest quality lever
-2. P0.2-P0.6   → Pipeline manifest, schema split, ISOR, golden tiers, DSPy gates (~13h)
-3. T1.1         → Launch full S1.3→S6 run (~26h wall-clock)
-4. T1.2         → Yield diagnostic on full run output
-5. P1.x         → Claim decomposition, golden expansion, enrichment verification
-6. T2.x         → Business PI, atomic evidence, trust state machine
+1. R1-R7 (D2325-D2331) → Roundtable silent-failure fixes (~8.5h total) — BLOCKS T1.1
+2. D2323 wiring (#2-#5)  → Content-type ontology: golden fix + enum wiring + 4-FB flow (~3-4h)
+3. P0.1 (D2276) → Wire hybrid S2 to production (~8h) — highest quality lever (optional, --hybrid NOT enabled for T1.1)
+4. T1.1         → Launch full S1.3→S6 run (~26h wall-clock)
+5. T1.2         → Yield diagnostic on full run output
+6. P1.x         → Claim decomposition, golden expansion, enrichment verification (post-T1.1)
+7. T2.x         → Business PI, atomic evidence, trust state machine
 ```
 
 ## 🧭 HANDOFF POINTER

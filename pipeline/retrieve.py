@@ -49,12 +49,26 @@ def get_conn() -> sqlite3.Connection:
 
 
 
+def _status_predicate(include_quarantine: bool) -> str:
+    """D2330: quarantine is opt-in — never surfaced by default.
+
+    PASS is always retrievable. QUARANTINE is only retrievable when the caller
+    explicitly opts in via include_quarantine=True. This is the retrieval
+    contract that keeps quarantined (unverified/contradicted) FBs out of the
+    default answer path.
+    """
+    if include_quarantine:
+        return "status IN ('PASS', 'QUARANTINE')"
+    return "status = 'PASS'"
+
+
 def search_keyword(
     conn: sqlite3.Connection,
     domain: str = None,
     discipline: str = None,
     depth: str = None,
     status: str = "PASS",
+    include_quarantine: bool = False,
     limit: int = 20,
     exclude_summaries: bool = True,
 ) -> list[dict]:
@@ -71,7 +85,9 @@ def search_keyword(
     conditions: list[str] = []
     params: list = []
 
-    if status:
+    if include_quarantine:
+        conditions.append(_status_predicate(True))
+    elif status:
         conditions.append("status = ?")
         params.append(status)
     if has_class_status:
@@ -97,8 +113,12 @@ def search_keyword(
 
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
-             exclude_summaries: bool = True) -> list[dict]:
+             exclude_summaries: bool = True,
+             include_quarantine: bool = False) -> list[dict]:
     """Full-text search on name, definition, keywords. Column-aware.
+
+    D2330: defaults to status='PASS' — quarantined FBs are never surfaced by
+    default; pass include_quarantine=True to include them.
 
     Gracefully handles missing is_summary and classification_status columns
     which may not exist in older DB schemas.
@@ -107,6 +127,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     has_class_status: bool = "classification_status" in db_cols
     has_is_summary: bool = "is_summary" in db_cols
 
+    status_f: str = f"AND f.{_status_predicate(include_quarantine)}"
     summary_f: str = "AND (f.is_summary = 0 OR f.is_summary IS NULL)" if has_is_summary else ""
     class_f: str = "AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')" if has_class_status else ""
 
@@ -115,6 +136,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
             SELECT f.* FROM fbs f
             JOIN fbs_fts ft ON f.rowid = ft.rowid
             WHERE fbs_fts MATCH ?
+              {status_f}
               {summary_f}
               {class_f}
             ORDER BY rank
@@ -124,11 +146,13 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     except sqlite3.OperationalError:
         # FTS5 may not be available — fall back to LIKE
         like_query: str = f"%{query}%"
+        like_status: str = f"AND {_status_predicate(include_quarantine)}"
         like_summary: str = "AND (is_summary = 0 OR is_summary IS NULL)" if (has_is_summary and exclude_summaries) else ""
         like_class: str = "AND (classification_status IS NULL OR classification_status != 'FAILED')" if has_class_status else ""
         rows = conn.execute(f"""
             SELECT * FROM fbs
             WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
+              {like_status}
               {like_summary}
               {like_class}
             ORDER BY borp_score DESC
@@ -141,6 +165,7 @@ def search_vector(
     conn: sqlite3.Connection,
     query: str,
     limit: int = 20,
+    include_quarantine: bool = False,
 ) -> list[dict]:
     """Vector similarity search using pre-computed sqlite-vec embeddings.
 
@@ -166,11 +191,11 @@ def search_vector(
 
         # Try sqlite-vec similarity search on pre-computed embeddings
         try:
-            rows = conn.execute("""
+            rows = conn.execute(f"""
                 SELECT fbs.*, vec_fbs.distance
                 FROM vec_fbs
                 JOIN fbs ON fbs.rowid = vec_fbs.rowid
-                WHERE fbs.status = 'PASS'
+                WHERE fbs.{_status_predicate(include_quarantine)}
                     AND definition_embedding MATCH ?
                     AND k = ?
                 ORDER BY distance
@@ -200,6 +225,7 @@ def search_hybrid(
     discipline: str = None,
     depth: str = None,
     limit: int = 20,
+    include_quarantine: bool = False,
 ) -> list[dict]:
     """D2176: True hybrid retrieval with Reciprocal Rank Fusion (RRF).
 
@@ -214,11 +240,12 @@ def search_hybrid(
     RRF_K: int = 60  # RRF constant — higher = smoother rank blending
     POOL_SIZE: int = min(limit * 5, 100)  # Candidate pool per method
 
-    # 1. Collect ranked candidates from all three methods
-    fts_results: list[dict] = search_fts(conn, query, limit=POOL_SIZE)
-    vector_results: list[dict] = search_vector(conn, query, limit=POOL_SIZE)
+    # 1. Collect ranked candidates from all three methods (D2330: quarantine opt-in)
+    fts_results: list[dict] = search_fts(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
+    vector_results: list[dict] = search_vector(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
     kw_results: list[dict] = search_keyword(
-        conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE
+        conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE,
+        include_quarantine=include_quarantine,
     )
 
     # 2. Build RRF score map: fb_id → cumulative RRF score

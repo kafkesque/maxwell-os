@@ -1,6 +1,18 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-13 (D2321 S5 NLI premise/hypothesis pairing fix — pass rate 36%→84%)
+> **Last updated:** 2026-08-13 (D2324-D2332 — roundtable audit + S2 checkpoint-format integrity + 17 stale OPEN statuses resolved)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🔴 BUG-094 — 2026-08-13 — S2 checkpoint pretty-printed (JSONL broken) + resume-existence coupling
+
+- **Symptom:** S2 checkpoints on disk are pretty-printed JSON (multi-line per record), but S4/bridge loaders parse with `json.loads(line)`. Code-verified: `latest/checkpoint.jsonl` = 575 lines / 290 non-empty / **30 parseable**; `e2e/checkpoint.jsonl` = 118 / 107 / **91**. Downstream merge silently parses only self-contained lines → corrupt/empty S4 output.
+- **Root cause (2 stacked layers):**
+  1. Format drift — current writer (`stage2_extract.py:1461,1544,1709,1734`) emits compact single-line `json.dumps(fb)`; the on-disk pretty-printed files are a legacy/unresolved-provenance artifact (handoff "still-open #1"). Code and disk disagree.
+  2. Resume keys on existence (`runner.py:185-193` `find_resume_point`) — a corrupt-but-present checkpoint is treated as a completed stage, so resume skips S2 and feeds garbage to S4.
+- **Fix (D2332):** (a) fail-closed JSONL boundary assertion at every S2-checkpoint reader; (b) regenerate corrupt `latest`/`e2e` checkpoints; (c) D2329 resume-validity manifest (existence never implies validity).
+- **Status:** 🔴 OPEN — fix before T1.1
+- **Files:** `pipeline/stage2_extract.py`, `pipeline/bridge_s2_to_s4.py`, `pipeline/stage4_merge.py`, `pipeline/runner.py`
 
 ---
 
@@ -1317,7 +1329,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Golden set was built by extracting the full FB record post-S4 enrichment instead of the S2-only output. No stage-boundary discipline was enforced during curation.
 - **Impact:** DSPy fine-tuning would teach S2 to generate S4 enrichment fields — breaking the pipeline stage contract. S2 would hallucinate CRIBS enrichment, wasting tokens and creating expectation mismatch with S4.
 - **Fix:** D2228 — Strip all S4 fields from expected_fb. Keep only S2 core fields. Create separate stage4_fewshot_enrichment.yaml for CRIBS training.
-- **Status:** 🔴 OPEN — D2228 pending.
+- **Status:** ✅ FIXED (D2228, 2026-08-13) — golden few-shot has 0 S4 enrichment fields (application/elaboration/jargon/failure_mode all absent)
 - **Files:** `config/golden/stage2_fewshot_convergent.yaml`
 
 ## BUG-065 — 2026-08-10 — sqlite-vec Dimension Mismatch: 1024 vs 512 (P0) 🔴
@@ -1325,7 +1337,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Schema was written when embeddings were 1024-dim. D2181 reduced to 512-dim Matryoshka but the CREATE TABLE statement was never updated.
 - **Impact:** `insert_embedding()` packs a 512-float blob into a 1024-float column. sqlite-vec will reject or silently corrupt. Vector search is broken at commit time.
 - **Fix:** D2229 — Change `float[1024]` to `float[512]`, read `S15_EMBED_DIM` from config at schema creation.
-- **Status:** 🔴 OPEN — D2229 pending.
+- **Status:** ✅ FIXED (D2229, 2026-08-13) — stage6 uses float[{S15_EMBED_DIM}] (no hardcoded 1024)
 - **Files:** `pipeline/stage6_commit.py:146`
 
 ## BUG-066 — 2026-08-10 — Golden Evidence Passages Are Paraphrases, Not Exact Source Spans (P0) 🔴
@@ -1333,7 +1345,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Evidence was manually curated from memory/paraphrase of source segments rather than copy-pasted from the canonical segment text.
 - **Impact:** S2 learns "semantically relevant excerpts" rather than "exact source-grounded evidence." Creates evidence hallucination/paraphrase acceptance leak: S2 synthesizes claim → short fragment appears supportive → S5 NLI passes on fragment → FB accepted even though full segment doesn't establish the claim.
 - **Fix:** D2230 — Verify all 60 examples against cluster_segments. Add source_book, segment_id, char_start, char_end, sha256 to each passage.
-- **Status:** 🔴 OPEN — D2230 pending.
+- **Status:** ✅ FIXED (D2230, 2026-08-13) — 177 source_book/segment_id/char_start/char_end/sha256 span fields present in golden
 - **Files:** `config/golden/stage2_fewshot_convergent.yaml`
 
 ## BUG-067 — 2026-08-10 — Stage 2 Convergence Routing via Source Count Alone (P0) 🔴
@@ -1341,7 +1353,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** The `book_count >= 2` clause was a heuristic shortcut. It bypasses the convergence gate (which should verify that different sources describe the SAME mechanism, not just the same topic).
 - **Impact:** False convergence — two books discussing similar topics with different mechanisms get merged into a single FB. The golden negatives explicitly teach that source diversity ≠ convergence, but the code doesn't enforce this.
 - **Fix:** D2231-P0-5 — Require explicit `is_conv` gate or mechanism-similarity check. Source count alone must not trigger convergent extraction.
-- **Status:** 🔴 OPEN — D2231 pending.
+- **Status:** ✅ FIXED (D2231, 2026-08-13) — stage2:1276 'Removed or book_count >= 2'; is_convergent gate only
 - **Files:** `pipeline/stage2_extract.py:1209`
 
 ## BUG-068 — 2026-08-10 — 6 Locations Hardcode Thresholds Bypassing Config (P0 C12 Violation) 🔴
@@ -1354,7 +1366,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** C12 governance not enforced at code review. Thresholds were added inline without config entries.
 - **Impact:** Any attempt to tune these thresholds via `pipeline_config.yaml` is silently ignored. System is not config-driven as Constitution requires.
 - **Fix:** D2231-P0-6 — Move all to `pipeline_config.yaml`, read via `pipeline_paths.py`.
-- **Status:** 🔴 OPEN — D2231 pending.
+- **Status:** ✅ FIXED (D2231-P0-6, 2026-08-13) — all 6 thresholds read from config via pipeline_paths
 - **Files:** `pipeline/reliability.py`, `pipeline/stage4_merge.py`, `pipeline/principle_index.py`, `pipeline/taxonomy_manager.py`, `pipeline/retrieve.py`, `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`
 
 ## BUG-069 — 2026-08-10 — GoldenFB Schema Missing extraction_type Field (P0) 🔴
@@ -1362,7 +1374,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** `GoldenFB` was designed post-S4 (including CRIBS fields like application, jargon, etc.) but never updated when `extraction_type` was added to the golden set for S2 training.
 - **Impact:** DSPy loses the extraction_type training signal. Model cannot learn to distinguish causal_mechanism from descriptive_model from normative_heuristic from empirical_pattern.
 - **Fix:** D2231-P0-4 — Add `extraction_type: str = ""` to `GoldenFB`.
-- **Status:** 🔴 OPEN — D2231 pending.
+- **Status:** ✅ FIXED (D2231-P0-4, 2026-08-13) — GoldenFB has extraction_type: str = '' (schemas.py:925)
 - **Files:** `pipeline/schemas.py:915`
 
 ## BUG-070 — 2026-08-10 — NLI Config-Code Docstring Inversion (P1) 🔴
@@ -1370,7 +1382,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** D2119 decision switched primary to ModernBERT for speed. Config was supposed to be updated but wasn't (still has DeBERTa first). Code docstring was updated to reflect D2119 intent but config wasn't aligned.
 - **Impact:** Runtime uses DeBERTa (slower, 512 ctx) when D2119 intended ModernBERT (faster, 8192 ctx). Documentation ≠ behavior.
 - **Fix:** D2232-P1-3 — Either update config to make ModernBERT primary OR update docstring to match config. Align all three sources.
-- **Status:** 🔴 OPEN — D2232 pending.
+- **Status:** ✅ FIXED (D2232-P1-3, 2026-08-13) — stage5 docstring + pipeline_paths say DeBERTa primary (D2298)
 - **Files:** `config/pipeline_config.yaml`, `pipeline/stage5_verify.py`
 
 ## BUG-071 — 2026-08-10 — NLI Fallback Defaults Landmine (P1) 🔴
@@ -1378,7 +1390,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** D2226 fixed the hardcoded thresholds in `stage5_verify.py` but didn't update the fallback defaults in `pipeline_paths.py`. The defaults are the OLD values, not the config values.
 - **Impact:** Silent regression — if config key disappears, NLI reverts to 0.8 pass threshold, dramatically increasing false escalation rate.
 - **Fix:** D2232-P1-4 — Set fallback defaults to match config values (0.6/0.5/0.3). Add runtime assertion that loaded values match config.
-- **Status:** 🔴 OPEN — D2232 pending.
+- **Status:** ✅ FIXED (D2232-P1-4, 2026-08-13) — NLI fallback defaults now 0.5/0.6/0.3 (match config)
 - **Files:** `pipeline/pipeline_paths.py:160-162`
 
 ## BUG-072 — 2026-08-10 — Taxonomy Version Triple Drift (P1) 🔴
@@ -1386,7 +1398,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Taxonomy was independently versioned (bumped to v5.1 during edits) but version.yaml (single source of truth) was never updated.
 - **Impact:** Version gate in runner.py would fail. Provenance stamps lie. Human reviewers can't tell which taxonomy is canonical.
 - **Fix:** D2232-P1-5 — Align all to single version. Update version.yaml to v5.1 or roll taxonomy back.
-- **Status:** 🔴 OPEN — D2232 pending.
+- **Status:** ✅ FIXED (D2232-P1-5, 2026-08-13) — version.yaml v5.1 == taxonomy_v5.yaml v5.1
 - **Files:** `config/version.yaml`, `config/taxonomy_v5.yaml`
 
 ## BUG-073 — 2026-08-10 — CONV-035 and CONV-037 Likely False Convergence (P1) 🔴
@@ -1396,7 +1408,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 - **Root cause:** Attractive synthesis was mistaken for genuine mechanism convergence. The examples were curated to fill extraction-type diversity targets without rigorous convergence validation.
 - **Impact:** Golden set teaches S2 that topical/conceptual similarity is sufficient for convergence — exactly what the negative set says to reject.
 - **Fix:** D2232-P1-7 — Reclassify as `is_convergent: false` or strengthen mechanism evidence with explicit shared causal structure. If neither source describes the other's mechanism, they don't converge.
-- **Status:** 🔴 OPEN — D2232 pending.
+- **Status:** ✅ FIXED (D2232-P1-7, 2026-08-13) — CONV-035/037 now is_convergent:false with rationale
 - **Files:** `config/golden/stage2_fewshot_convergent.yaml`
 
 *Updated: 2026-08-10 (D2227 cross-examination) | Bugs tracked: 63 | Resolved: 46 | Closed (moot): 5 | Open: 12 | Schema version: 1.11*
@@ -1532,7 +1544,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   Precedence rule (pipeline_config.yaml wins) prevents runtime issue but the desync IS a
   documentation/configuration bug class.
 - **Fix:** Update model_assignments.yaml S5_FB_VERIFIER to Phi-4-mini-instruct-8bit.
-- **Status:** 🟡 OPEN
+- **Status:** ✅ FIXED (2026-08-13) — model_assignments.yaml S5_FB_VERIFIER = Phi-4-mini-instruct-8bit
 - **Files:** `config/model_assignments.yaml`
 - **Source:** Cross-examination: ChatGPT F2, Claude External §6.1
 
@@ -1542,7 +1554,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   `python -m pipeline.runner`
 - **Root cause:** Renamed file at some point (or never named `run.py`); docstring not updated.
 - **Fix:** Change docstring to `python pipeline/runner.py`
-- **Status:** 🟡 OPEN
+- **Status:** ✅ FIXED (2026-08-13) — runner docstring now 'python pipeline/runner.py'
 - **Files:** `pipeline/runner.py`
 - **Source:** Cross-examination: ChatGPT F1
 
@@ -1552,7 +1564,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
 - **Root cause:** Fixed timeout not configurable per stage. S2 runs as single subprocess.
   (Current diagnostic bypasses runner — uses run_diagnostic.py directly — so not affected.)
 - **Fix:** Make timeout configurable per stage in pipeline_config.yaml; S2 = null (unlimited).
-- **Status:** 🔴 OPEN — blocks T1.1 if launched via runner.py
+- **Status:** ✅ FIXED (2026-08-13) — runner _get_stage_timeout reads config; '2': null (unlimited)
 - **Files:** `pipeline/runner.py`, `config/pipeline_config.yaml`
 - **Source:** Cross-examination: ChatGPT F13
 
@@ -1564,7 +1576,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   distinct semantics for mechanism vs application.
 - **Fix:** Schema-version-specific validation: v3 requires strict mechanism/boundary/consequence
   fields; v2 allows legacy substitution.
-- **Status:** 🔴 OPEN
+- **Status:** ✅ FIXED (2026-08-13) — check_completeness removed; no mechanism/application substitution (D2298)
 - **Files:** `pipeline/stage5_verify.py`
 - **Source:** Cross-examination: ChatGPT F8
 
@@ -1574,7 +1586,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
 - **Root cause:** Validation code uses `print("⚠️ ...")` instead of raising error.
 - **Fix:** Change to `sys.exit(1)` or `raise ValueError` — invalid verification config
   is not recoverable.
-- **Status:** 🔴 OPEN
+- **Status:** ✅ FIXED (2026-08-13) — pipeline_paths:210 raises ValueError (FATAL) on misordered thresholds
 - **Files:** `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`
 - **Source:** Cross-examination: ChatGPT F11
 
@@ -1583,7 +1595,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   Ollama path at line 287 only does `arr[:S15_EMBED_DIM]` (silent truncation, no assertion).
 - **Root cause:** D2170 only implemented fail-fast for MPS, not Ollama.
 - **Fix:** Add `assert len(emb) >= S15_EMBED_DIM, f"expected ≥{S15_EMBED_DIM}d, got {len(emb)}d"` before truncation.
-- **Status:** 🟠 OPEN (theoretical — bge-m3 is stable at 1024d)
+- **Status:** ✅ FIXED (2026-08-13) — D2274 Ollama dim assertion present (parity with MPS)
 - **Files:** `pipeline/stage1_5_embed_cluster.py`
 - **Source:** Cross-examination: Audit1 P0.1 (corrected finding)
 
@@ -1592,7 +1604,7 @@ pressure → Apple IOGPUFamily memory prepare count underflow.
   5% embedding failure → 95% corpus → missing convergences silently.
 - **Root cause:** No hard quality gate for embedding drop rate.
 - **Fix:** Add gate: if drop_rate > 0.5%, fail stage with diagnostic message.
-- **Status:** 🟠 OPEN
+- **Status:** ✅ FIXED (2026-08-13) — D2275 drop-rate gate raises if >0.5% dropped
 - **Files:** `pipeline/stage1_5_embed_cluster.py`
 - **Source:** Cross-examination: ChatGPT F4
 

@@ -2,7 +2,7 @@ meta:
   version: '5.0'
   architecture: cluster-before-extract
   total_examples: 75
-  convergent_positives: 55
+  convergent_positives: 52
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -3319,7 +3319,7 @@ examples:
     - New ideas spread through populations following predictable patterns
     - relative advantage, compatibility, complexity, trialability, and observability
     extraction_type: descriptive_model
-    content_type: model
+    content_type: principle
     depth: cross-domain
   rationale: DESCRIPTIVE MODEL — classification framework, not causal mechanism. Two independent sources converge on the adoption
     lifecycle model (Moore's chasm model + Rogers' diffusion attributes). This is a MODEL that DESCRIBES how adoption happens
@@ -3371,7 +3371,7 @@ examples:
     - Simple computational rules can produce behavior of four distinct classes
     - Class 4 systems — like Rule 110 cellular automata — are computationally universal, capable of supporting any computation.
     extraction_type: descriptive_model
-    content_type: model
+    content_type: principle
     depth: cross-domain
   rationale: DESCRIPTIVE MODEL — classification taxonomy of system responses. Taleb's fragile/robust/antifragile and Wolfram's
     four behavioral classes both describe CLASSIFICATION SCHEMES for system behavior. They converge on the insight that systems
@@ -3427,7 +3427,7 @@ examples:
     - Users don't read web pages — they scan them
     - they satisfice, picking the first reasonable option
     extraction_type: descriptive_model
-    content_type: model
+    content_type: principle
     depth: domain
   rationale: 'DESCRIPTIVE MODEL — goal hierarchy classification. Cooper''s three-level goal taxonomy and Krug''s user behavior
     observations converge on a descriptive framework: users operate at multiple goal levels and good design must serve all
@@ -3484,7 +3484,7 @@ examples:
     - Widen options beyond binary choices, Reality-test by seeking disconfirming evidence, Attain distance by asking what
       you'd tell your successor, and Prepare by setting a tripwire that forces reconsideration.
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NORMATIVE HEURISTIC — prescriptive decision technique, properly attributed to Gary Klein. Heath''s WRAP framework
     and Klein''s premortem converge on the same prescriptive principle: counter overconfidence by actively constructing failure
@@ -3543,7 +3543,7 @@ examples:
     - The key is the initial commitment — it must be voluntary, active, and public (or at least privately recorded) to trigger
       the consistency drive.
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: domain
   rationale: NORMATIVE HEURISTIC — complementary mechanisms, NOT convergent. Clear's habit stacking (cue automation) and Cialdini's
     commitment-consistency (self-image drive) are two DISTINCT behavioral mechanisms that address the same problem (behavior
@@ -3602,7 +3602,7 @@ examples:
       and 10% in maximally speculative ones, avoiding the middle entirely.'
     - This is the opposite of the 'medium risk' approach
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NORMATIVE HEURISTIC — prescriptive resource-allocation rule derived from two theoretical frameworks. Christian
     & Griffiths'' explore-exploit formalism and Taleb''s barbell strategy converge on the same prescriptive heuristic: bimodal
@@ -3735,7 +3735,7 @@ examples:
     - Preferential attachment is the mechanism behind many power-law distributions.
     - new nodes preferentially connect to already well-connected nodes
     extraction_type: empirical_pattern
-    content_type: pattern
+    content_type: principle
     depth: cross-domain
   rationale: 'CONVERGENT POSITIVE — COMPLEX SYSTEMS. Barabási (network science originator of preferential attachment) and
     Christian/Griffiths (computer science) converge on the same empirical pattern: power-law distributions emerge from cumulative
@@ -4160,7 +4160,7 @@ examples:
     - if you don't prioritize your time, someone else will
     - Most of what we say yes to is a combination of social pressure, fear of missing out, and the planning fallacy
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Covey and McKeown converge on the same prescriptive
     rule: prioritize importance over urgency. Covey provides the classification framework (the 2×2 matrix), McKeown provides
@@ -4218,7 +4218,7 @@ examples:
     - Repeated questioning — each answer becoming the premise of the next question — is the most reliable method for crossing
       from event-level to structure-level understanding
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Ries and Meadows converge on the same prescriptive
     technique: iterative interrogation to cross from symptom to root cause. Ries provides the tactical implementation (Five
@@ -4273,7 +4273,7 @@ examples:
     - High-quality work produced = time spent × intensity of focus
     - constrain the time to improve the output
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Ferriss and Newport converge on the same prescriptive
     rule: impose time constraints to improve productivity. Ferriss provides Parkinson''s Law (the descriptive observation
@@ -4329,7 +4329,7 @@ examples:
     - explain it to someone else — or, failing that, to write down your mental model in complete sentences
     - Mental models feel complete and coherent until you try to articulate them
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Thomas/Hunt and Meadows converge on the same prescriptive
     technique: articulate your understanding to discover hidden gaps. Both describe it as a procedural heuristic (DO this
@@ -4439,7 +4439,7 @@ examples:
     - before assuming bad intent, ask "what else could explain this?"
     - 'the brain instantly constructs a villain story: they did it because they are selfish, malicious, or indifferent'
     extraction_type: normative_heuristic
-    content_type: heuristic
+    content_type: principle
     depth: cross-domain
   rationale: 'NEW NORMATIVE HEURISTIC (D2234: extraction type expansion). Dobelli and Patterson converge on the same prescriptive
     cognitive heuristic: default to incompetence over malice when interpreting harmful behavior. Dobelli provides the cognitive

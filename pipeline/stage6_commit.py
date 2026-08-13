@@ -446,12 +446,17 @@ def run_stage6(export_only: bool = False):
     conn = init_db(DB_PATH)
     inserted = 0
     failed = 0
+    # D2325: per-FB commit status — INSERTED/FAILED/SKIPPED. Replaces the blanket
+    # `committed_to_sqlite = not export_only` stamp that falsely recorded a failed
+    # row as committed (C16 provenance truthfulness).
+    commit_status: dict[str, str] = {}
 
     if not export_only:
         for i, fb in enumerate(fbs, 1):
             name = fb_name(fb)[:40]
             if insert_fb(conn, fb):
                 inserted += 1
+                commit_status[fb["fb_id"]] = "INSERTED"
                 # BUG-004 FIX: Pre-compute embedding at commit time
                 definition = fb_definition(fb)
                 if definition:
@@ -459,6 +464,7 @@ def run_stage6(export_only: bool = False):
                     insert_embedding(conn, rowid, definition)
             else:
                 failed += 1
+                commit_status[fb["fb_id"]] = "FAILED"
                 print(f"  [{i}] Failed: {name}")
 
         conn.commit()
@@ -521,13 +527,20 @@ def run_stage6(export_only: bool = False):
         print(f"  ✅ Parquet: {parquet_path.name} ({size_kb:.1f} KB)")
 
     # Write checkpoint (commit record)
+    # D2325: per-FB INSERTED/FAILED/SKIPPED — never claim a failed row was committed.
     commit_recs = []
     for fb in fbs:
+        fb_id: str = fb["fb_id"]
+        if export_only:
+            per_fb_status: str = "SKIPPED"
+        else:
+            per_fb_status = commit_status.get(fb_id, "FAILED")  # untracked → FAILED (fail-closed)
         rec = stamp_record({
-            "fb_id": fb["fb_id"],
+            "fb_id": fb_id,
             "name": fb["name"],
             "status": fb.get("status"),
-            "committed_to_sqlite": not export_only,
+            "commit_status": per_fb_status,
+            "committed_to_sqlite": per_fb_status == "INSERTED",
             "parquet_snapshot": str(parquet_path) if parquet_path else None,
         }, gen_model="python")
         rec["pipeline_commit"] = pipeline_commit
@@ -540,7 +553,12 @@ def run_stage6(export_only: bool = False):
 
     # Summary
     print(f"\n{'='*60}")
-    print(f"✅ Committed: {len(fbs)} FBs")
+    if export_only:
+        print(f"📦 Parquet-only: {len(fbs)} FBs (SQLite SKIPPED)")
+    else:
+        print(f"✅ Committed to SQLite: {inserted} FBs")
+        if failed:
+            print(f"❌ Failed to commit:    {failed} FBs (checkpoint commit_status=FAILED)")
     print(f"🗄️  Database:  {DB_PATH}")
     if parquet_path:
         print(f"📦 Parquet:   {parquet_path}")

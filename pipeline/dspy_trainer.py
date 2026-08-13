@@ -32,6 +32,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # project root for `pipeline.*` imports
+
 import yaml
 
 # ── Config (C12: config-driven) ──────────────────────────────────────
@@ -56,10 +58,10 @@ DSPY_MAX_BOOTSTRAPPED_DEMOS = int(_cfg.get("s2", {}).get("dspy_max_bootstrapped_
 OMLX_PORT = int(_cfg.get("omlx", {}).get("port", 11435))
 RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 
-# Extraction types for validation
+# Extraction types for validation — sourced from config/content_types.yaml (D2323/C12).
 # NOTE: Depth is now classified in Stage 4, not S2 (A-001/D2241).
 # DEPTHS removed from S2 metric — see CONSTITUTION §2, D2241.
-EXTRACTION_TYPES = {"causal_mechanism", "empirical_pattern", "normative_heuristic", "descriptive_model"}
+from pipeline.content_types import EXTRACTION_TYPES  # noqa: E402  (config-first enum)
 
 
 # ──────────────────────────────────────────────────────────────────────

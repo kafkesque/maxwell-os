@@ -1,0 +1,229 @@
+# Maxwell OS v3.0 — Content-Type Ontology (single source of truth)
+# =============================================================================
+# Decision: D2323 (2026-08-13) — Content-Type Ontology Consolidation
+#
+# Replaces hardcoded enums scattered across:
+#   pipeline/schemas.py               (content_type docstring + PT/PI/GE classes)
+#   pipeline/stage2_extract.py        (_VALID_CONTENT_TYPES frozenset)
+#   pipeline/stage4_merge.py          (routing lists + D2072/D2073 writes)
+#   config/golden/stage2_fewshot_convergent.yaml  (STALE content_type values)
+#
+# C12: config-first. This file is authoritative — code imports from it, never
+#      re-declares the enum. Append-only: new content_types accumulate via the
+#      `raw` label path (D2066 self-evolving taxonomy), never deleted in place.
+#
+# Two ORTHOGONAL axes (this is the fix — they were conflated):
+#   content_type    = functional ROLE   → consumer: S4 router (where to store)
+#   extraction_type = epistemic FORM    → consumer: S5 verifier (what evidence)
+# Neither is a subtype of the other. A single role accepts multiple forms.
+
+schema_version: "3.0"
+decision: D2323
+last_updated: "2026-08-13"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AXIS 1 — content_type: functional ROLE (what kind of object) — 5 values
+# ─────────────────────────────────────────────────────────────────────────────
+content_types:
+
+  principle:
+    description: "Conceptual knowledge — why/when something works. The Foundation Block."
+    route_to: "foundation_block"
+    output_file: "fbs.jsonl"
+    extension_fields:
+      - application
+      - failure_mode
+      - keywords
+      - jargon
+      - procedural_skill
+      - prerequisite_fbs
+      - contradicts_fbs
+      - related_fbs
+      - context
+      - accessibility
+      - intimacy_boundary
+      - provenance
+      - source_text
+      - difficulty_level
+      - temporal_scope
+      - confidence_score
+    zone_body:
+      - { icon: "🏛️", section: "DEFINITION",   binds: [definition],    note: "what it IS, ≤4 sentences, first word not an action verb" }
+      - { icon: "🔥", section: "APPLICATION",  binds: [application],   note: "when [trigger] → [action]" }
+      - { icon: "⚠️", section: "FAILURE MODE", binds: [failure_mode] }
+      - { icon: "✅", section: "EVIDENCE",      binds: [evidence, source_books], note: "reusable · cross-domain · tested" }
+
+  process_template:
+    description: "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe)."
+    route_to: "process_template"
+    output_file: "process_templates.jsonl"
+    extension_fields:
+      - steps
+      - trigger
+      - prerequisite
+      - done_condition
+      - failure_mode
+      - template_source
+      - consulted_fbs
+      - fb_query_domain
+      - fb_query_intent
+    zone_body:
+      - { icon: "🔥", section: "TRIGGER",        binds: [trigger] }
+      - { icon: "🔧", section: "PREREQUISITE",   binds: [prerequisite] }
+      - { icon: "📋", section: "PHASES",         binds: [steps], note: "Step N [Required/Optional/Conditional] + gate decision matrix" }
+      - { icon: "📦", section: "OUTPUT",         binds: [] }
+      - { icon: "✅", section: "DONE CONDITION", binds: [done_condition] }
+
+  process_instance:
+    description: "Concrete case study of a PT actually executed — the proof it works."
+    route_to: "process_instance"
+    output_file: "process_instances.jsonl"
+    extension_fields:
+      - parent_pt_id
+      - instance_text
+      - actors
+      - outcome_metric
+      - outcome_qualitative
+      - domain_context
+    zone_body:
+      - { icon: "🔥", section: "TRIGGER",        binds: [trigger], note: "filled — what actually triggered it" }
+      - { icon: "📋", section: "PHASES",         binds: [steps],  note: "☑/☐ checkboxes active" }
+      - { icon: "📦", section: "OUTPUT",         binds: [outcome_metric, outcome_qualitative] }
+      - { icon: "✅", section: "DONE CONDITION", binds: [done_condition], note: "filled + real result" }
+
+  tool_instruction:
+    description: "Tool/software-specific command or feature. Knowledge object (NOT a live callable binding)."
+    route_to: "tool_instruction"
+    output_file: "tool_instructions.jsonl"
+    # D2323: 13-field schema grounded in MCP + JSON Schema + OpenAPI + man pages.
+    # Semantically compatible with the MCP `Tool` contract so a TI can be promoted
+    # into a Recipe step / MCP tool at Layer 2 without rework (C21).
+    extension_fields:
+      - tool_name        # MCP `name` — canonical identifier
+      - platform         # where it runs (CLI / API / app / OS)
+      - description      # MCP `description` / man DESCRIPTION — what it achieves, when to use
+      - syntax           # man SYNOPSIS — the invocation template
+      - parameters       # JSON Schema `properties` / OpenAPI `parameters` — structured list
+      - output           # MCP `outputSchema` / man OUTPUT — what it returns
+      - example          # man EXAMPLES — worked input → output (primary LLM learning signal)
+      - annotations      # MCP `annotations` — readOnlyHint / destructiveHint / idempotentHint
+      - caveats          # man BUGS — failure modes / gotchas
+      - version          # OpenAPI — staleness detection (tools change → knowledge rots)
+      - source           # where documented (book / chapter)
+      - alternatives     # man SEE ALSO — related tools
+    zone_body:
+      - { icon: "🗺️", section: "PURPOSE",            binds: [description] }
+      - { icon: "📋", section: "FOUNDATION BLOCKS",  binds: [prerequisite_fbs] }
+      - { icon: "⌨️", section: "SYNTAX",             binds: [syntax, parameters] }
+      - { icon: "📤", section: "OUTPUT",             binds: [output] }
+
+  growth_edge:
+    description: "Speculative/unresolved insight — idea inbox upstream of verified knowledge."
+    route_to: "growth_edge"
+    output_file: "growth_edges.jsonl"
+    extension_fields:
+      - body
+      - source            # manual | pipeline | import
+      - category
+      - actionable
+      - status            # open → investigating → implementing → promoted | archived
+      - parent_fb_ids
+      - parent_pt_id
+      - promoted_to_type
+      - promoted_to_id
+      - promoted_at
+      - tags
+      - priority
+    zone_body:
+      - { icon: "🌊", section: "OPEN TENSION",   binds: [body] }
+      - { icon: "🔗", section: "RELATED FBs",    binds: [parent_fb_ids] }
+      - { icon: "❓", section: "OPEN QUESTIONS", binds: [] }
+      - { icon: "✅", section: "RESOLVES WHEN",  binds: [], note: "tension articulated + pattern tested across 3+ contexts" }
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AXIS 2 — extraction_type: epistemic FORM (how justified) — 4 values
+# ─────────────────────────────────────────────────────────────────────────────
+extraction_types:
+  causal_mechanism:
+    description: "X→Y because Z — a verified cause→effect chain."
+    verification_standard: "evidence must show the causal chain"
+  descriptive_model:
+    description: "A taxonomy/classification describing WHAT categories exist and how they relate."
+    verification_standard: "categories complete + mutually exclusive"
+  normative_heuristic:
+    description: "Practical rule of thumb with clear steps, or a widely-applicable heuristic."
+    verification_standard: "practical efficacy"
+  empirical_pattern:
+    description: "Strong correlation WITHOUT a proven causal chain — speculative."
+    verification_standard: "correlation only — flag, do not assert causation"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# D2150 mapping — extraction_type → content_type (S4 routing DEFAULT)
+#   A deterministic routing heuristic, NOT a type hierarchy. The model may
+#   override when evidence warrants (e.g. normative_heuristic → principle when
+#   it is a general concept without a procedure format).
+# ─────────────────────────────────────────────────────────────────────────────
+extraction_to_content_type:
+  causal_mechanism: principle
+  descriptive_model: principle
+  normative_heuristic: process_template     # repeatable method (general concept → principle via override)
+  empirical_pattern: growth_edge
+
+# ─────────────────────────────────────────────────────────────────────────────
+# D2128 mapping — route (S2 legacy field) → content_type
+#   Closes the route→content_type gap: S2 `route` is currently inert.
+# ─────────────────────────────────────────────────────────────────────────────
+route_to_content_type:
+  FB: principle
+  PT: process_template
+  PI: process_instance
+  GE: growth_edge
+  TI: tool_instruction
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHARED CORE BODY — emitted by S2, identical for ALL content types
+# ─────────────────────────────────────────────────────────────────────────────
+core_body:
+  - name
+  - definition
+  - mechanism
+  - boundary
+  - consequence
+  - elaboration
+  - is_summary
+  - evidence_passages
+  - extraction_type
+  - content_type
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHARED CLASSIFICATION — emitted by S4, all content types
+# ─────────────────────────────────────────────────────────────────────────────
+classification:
+  - domains
+  - discipline
+  - depth
+  - evidence
+  - domains_raw        # raw LLM label preserved forever (G9)
+  - discipline_raw     # raw LLM label preserved forever (G9)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHARED METADATA / STAMPS — R14 + provenance + runtime
+# ─────────────────────────────────────────────────────────────────────────────
+metadata:
+  stamps:       [schema_version, gen_model, pipeline_commit, pipeline_run_id, created_at]
+  provenance:   [source_books, source_clusters, source_segments, evidence_passages]
+  versioning:   [object_version]            # canonical name (currently `fb_version` in code)
+  runtime:      [usage_count, last_retrieved_at, feedback_score, feedback_count]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DROPPED — vestigial content_type enum values (were schema-only, never used)
+#   `fact`  (domain factoid): never emitted/validated/trained; a bare factoid
+#           cannot meet the ≥2-source convergent bar — absorbed into a
+#           principle's evidence_passages or not extracted.
+#   `meta`  (navigation text): filtered at Stage 1.3 prefilter before S2, so an
+#           S2 output type of `meta` is unreachable. Leftover from the old
+#           stage-3a classification taxonomy.
+# ─────────────────────────────────────────────────────────────────────────────
+dropped_content_types:
+  - fact
+  - meta

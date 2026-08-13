@@ -42,6 +42,43 @@ from datetime import datetime
 from pathlib import Path
 
 
+def load_jsonl(path, *, context: str = "", fail_closed: bool = True) -> list[dict]:
+    """Load a JSONL file, one JSON object per line — fail-closed (D2332).
+
+    Guards against pretty-printed JSON (multi-line records) being misread as
+    JSONL. A pretty-printed S2 checkpoint parses as only a *subset* of lines,
+    silently corrupting the downstream merge/verify. This loader raises on any
+    non-empty line that is not standalone JSON so corruption is loud, not silent.
+
+    Args:
+        path: Path to the JSONL file.
+        context: Human-readable stage name for error messages (e.g. "S2 checkpoint").
+        fail_closed: If True (default), raise on any unparseable non-empty line.
+
+    Returns:
+        List of parsed dict records, in file order.
+    """
+    path = Path(path)
+    records: list[dict] = []
+    with open(path, encoding="utf-8") as f:
+        for lineno, line in enumerate(f, 1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            try:
+                records.append(json.loads(stripped))
+            except json.JSONDecodeError as e:
+                if not fail_closed:
+                    continue
+                label = f"{context} " if context else ""
+                raise ValueError(
+                    f"FATAL: {label}JSONL parse failure in {path} line {lineno}: {e}. "
+                    f"File appears pretty-printed/multi-line, not one-JSON-object-per-line. "
+                    f"Regenerate the checkpoint (re-run the upstream stage) — do not hand-edit."
+                ) from e
+    return records
+
+
 def safe_write(path, content, shrink_guard=True, force_shrink=False):
     """Atomic file write with shrink guard.
 

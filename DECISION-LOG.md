@@ -4,6 +4,150 @@
 ---
 
 
+### D2334 — S2 Few-Shot `content_type` Omission (2026-08-13)
+**Category:** BUGFIX
+**Decision:** The S2 extraction system prompt lists `content_type` as field #9 and its inline example output models `"content_type": "principle"`, but `format_golden_fewshot()` (`stage2_extract.py:637`) built the injected few-shot JSON output dict **without** `content_type` — only name/definition/mechanism/boundary/consequence/is_summary/extraction_type/evidence_passages/route. Under temp=0.0 (R7), the injected golden examples are the dominant prior, so the model would deterministically omit `content_type`; downstream (`stage2_extract.py:1369,1706`) then defaults the missing field to `"principle"`, silently collapsing the 5-type content_type ontology (D2323) to a single type and re-introducing the orphaned-PT/TI drift (BUG-093). Fix: add `"content_type": fb_item.get("content_type", "principle")` to the few-shot output dict, sourced from the golden example (convergent default = `principle`). Verified the 77 golden `expected_fb` all carry `content_type: principle` (B4) so the field is faithfully modeled.
+**Files:** `pipeline/stage2_extract.py`
+**Status:** DONE — few-shot now models `content_type`; golden set verified to carry the field.
+
+### D2333 — Corpus Dedup + Test-Result Bloat Cleanup (2026-08-13)
+**Category:** GOV
+**Decision:** Two hygiene actions before T1.1. (a) **Book corpus dedup** — the 969-book source tree contained 29 accidental duplicates: 7 exact-content pairs (identical sha256, e.g. "Obviously Awesome", "Blink", "Thinking with Type" filed under two domains), 8 truncated near-duplicates (keep the most-complete copy, e.g. "Gödel, Escher, Bach" 420,853w vs 302,117w; "Vector Databases" 69,883w vs 39,305w), 6 empty/MEAP stubs (0–19 words), 5 redundant `_clean.md` processed copies, and 2 no-OCR placeholder stubs. Rule: keep the highest-word-count copy ("most agentic read-proof"), delete the truncated/duplicate. Result: 969 → 940 unique books; 0 remaining sha256-duplicate pairs. All deletions via `safe_delete.py` (backed up to `backup/deletions/`). (b) **Test-result bloat** — deleted 34 unreferenced previous-test-run artifacts: 12 governance JSON/CSV results (`adjudication_D2293_100_FBs.json`, `s2_comparison_results.json`, `evidence_audit_report.json`, `calibration_D2293_workbook.json`, `dual_encoder_benchmark.json`, `s4_depth_benchmark*.json` ×3, `e2e_diagnostic_*.json` ×2), 6 governance diagnostic logs/markdown (`e2e_diagnostic_*.md` ×2, `diagnostic_*.log` ×4), 9 probe_output transient artifacts (incl. 46.5 MB `stage2_checkpoint.jsonl`), 3 temp test outputs, 2 evals stat JSONs (`option_c_stats.json`, `single_domain_stats.json`), 1 adjudication CSV. Kept: test *fixtures* (`evals/golden_cases.json`, `evals/s5_test_fbs/`, `config/golden/*`). All unreferenced by active code (verified via grep).
+**Files:** `knowledge pipeline/books/**` (29 removed), `governance/*` (21 removed), `probe_output/*` (9 removed), `temp/*` (3 removed), `evals/option_c_stats.json`, `evals/single_domain_stats.json`
+**Status:** DONE — corpus 940 books, test-result bloat removed, all deletions backed up.
+
+### D2332 — S2 Checkpoint Format Integrity + Resume Coupling (2026-08-13)
+**Category:** BUGFIX
+**Decision:** S2 checkpoints on disk are pretty-printed JSON (multi-line per record), but every downstream loader parses with `json.loads(line)` (`bridge_s2_to_s4.py:30`, `stage4_merge.py:396,448,564`). Code-verified: `latest/checkpoint.jsonl` = 575 lines / 290 non-empty / only 30 parse standalone; `e2e/checkpoint.jsonl` = 118 / 107 / 91. The current writer (`stage2_extract.py:1461,1544,1709,1734`) emits compact single-line `json.dumps(fb)` — so the on-disk format is a legacy/unresolved-provenance artifact that disagrees with the code. S4 will silently parse only the subset of lines that happen to be self-contained, corrupting the merge. Compounding: `find_resume_point` (`runner.py:185-193`) keys resume on checkpoint *existence* only, so a corrupt-but-present checkpoint causes resume to skip S2 and feed garbage to S4. Fix: (a) add a fail-closed JSONL boundary assertion at every S2-checkpoint reader; (b) regenerate the corrupt `latest`/`e2e` checkpoints from a verified source; (c) couple to D2329 (resume-validity manifest) so existence never implies validity.
+**Files:** `pipeline/stage2_extract.py`, `pipeline/bridge_s2_to_s4.py`, `pipeline/stage4_merge.py`, `pipeline/runner.py`
+**Status:** OPEN — fix before T1.1 (silent merge corruption + resume-validity)
+
+### D2331 — S2 Extraction Silent-Skip on LLM Failure (2026-08-13)
+**Category:** BUGFIX
+**Decision:** `call_llm()` returns `None` on LLM error (retries exhausted / parse fail); the extraction worker then skips the cluster without failing the stage — stage2 writes a "successful" checkpoint despite missing clusters (code-verified `stage2_extract.py:583-620`). Roundtable finding (chatgpt). Fix: persist per-cluster terminal status; enforce `failed_clusters == 0` or a config-defined max-failure-rate with an explicit CONDITIONAL_SUCCESS state that cannot auto-advance to S4.
+**Files:** `pipeline/stage2_extract.py`
+**Status:** OPEN — fix before T1.1 (C16)
+
+### D2330 — e2e Run-Scoping + Quarantine Retrieval Contract (2026-08-13)
+**Category:** VAL
+**Decision:** (a) e2e `db_rows` does `SELECT COUNT(*) FROM fbs` on the global DB (`knowledge pipeline/maxwell.db`) with no `run_id` filter — counts historical rows, not the current run (`e2e_test.py:254`). (b) Quarantine tier semantics ("quarantined ≠ deleted") are asserted in schema only, never proven by an executable retrieval test. Fix: scope e2e checks to the current `run_id`; add a retrieval contract test (PASS retrievable; QUARANTINE only when `include_quarantine=true`; never by default).
+**Files:** `pipeline/e2e_test.py`, `pipeline/query.py`, `pipeline/retrieve.py`
+**Status:** OPEN — before T1.1
+
+### D2329 — Resume-Validity Manifest (2026-08-13)
+**Category:** ARCH
+**Decision:** runner resume keys on checkpoint file *existence*, not validity — no run_id / schema_version / record-count / COMPLETE-status check, so a stale or partial checkpoint can be treated as a completed stage. Roundtable finding (chatgpt). Fix: checkpoint manifest/sidecar (`run_id`, `stage_id`, `upstream_checkpoint_hash`, `pipeline_commit`, `schema_version`, `record_count`, `failed_count`, `status=COMPLETE`); resume only from a cryptographically-consistent COMPLETE checkpoint.
+**Files:** `pipeline/runner.py`
+**Status:** OPEN — before T1.1 (resume safety for the ~26h full run)
+
+### D2328 — S5 Calibration Doc Truthfulness + Model-Table Drift (2026-08-13)
+**Category:** VAL
+**Decision:** (a) `stage5_verify.py` docstring + `verifier_model` field still cite the pre-D2321 broken-call calibration `P=1.000/R=0.556/F1=0.714`; D2322's honest auto-cal is `P=0.647/R=0.386/F1=0.484`. (b) `runner.py` S5 description still says "DeBERTa FEVER + Phi-4-mini" (S5 is DeBERTa-only). (c) The roundtable audit prompt §1 model table is stale (lists a Phi-4-mini S4 fast gate) — a contamination source that likely drove one auditor (kimii) to fabricate a non-existent "fast gate". Fix: correct docstrings + runner description; regenerate the audit prompt from config before the next round.
+**Files:** `pipeline/stage5_verify.py`, `pipeline/runner.py`, `governance/T1.1_ROUNDTABLE_AUDIT_PROMPT.md`
+**Status:** OPEN — before T1.1 (docs must not misstate the calibration)
+
+### D2327 — S1.3 Prefilter Wiring (2026-08-13)
+**Category:** BUGFIX
+**Decision:** runner invokes `stage1_3_prefilter.py` with no args (`runner.py:242` `cmd=["python3", script]`); the script's default is dry-run (`stage1_3_prefilter.py:17-18,236`). S1.3 is therefore a no-op in the normal runner — structural garbage reaches S1.5 embedding/clustering. Roundtable finding (chatgpt). Fix: pass `--in-place` in the runner, or explicitly declare the prefilter disabled so "completed-but-not-applied" is impossible.
+**Files:** `pipeline/runner.py`, `pipeline/stage1_3_prefilter.py`
+**Status:** OPEN — before T1.1
+
+### D2326 — S0 Fail-Closed Ingestion (2026-08-13)
+**Category:** BUGFIX
+**Decision:** `stage0_convert` exits 0 even when books fail conversion (the `failed` list is printed but `run_stage0` never raises/`sys.exit(1)`); the post-conversion quality check swallows all exceptions (`stage0_convert.py:298-299` `except Exception: pass`). A broken quality checker or a failed conversion is indistinguishable from success — C16 violation. Fix: conversion failure → non-zero stage result (or a persisted operator-approved exclusion); quality check → passed/failed/unavailable tri-state, never silent.
+**Files:** `pipeline/stage0_convert.py`
+**Status:** OPEN — before T1.1 (C16)
+
+### D2325 — S6 Provenance Integrity (2026-08-13)
+**Category:** BUGFIX
+**Decision:** `stage6_commit` stamps every FB `committed_to_sqlite = not export_only` (`stage6_commit.py:530`) regardless of per-row insert failure — the `inserted`/`failed` counters exist but are not reflected in the checkpoint, so failed rows are falsely recorded as committed. Roundtable finding (chatgpt). Fix: per-FB `INSERTED/FAILED/SKIPPED` status; never claim failed rows were committed (or make the whole commit transactional).
+**Files:** `pipeline/stage6_commit.py`
+**Status:** OPEN — before T1.1 (provenance falsehood)
+
+### D2324 — T1.1 Roundtable Audit: Independent Verification (2026-08-13)
+**Category:** GOV
+**Decision:** 3-LLM adversarial roundtable (kimii / chatgpt / qwen — cross-family per R5) audited T1.1 readiness. Independent code verification of every concrete claim: **chatgpt's findings are overwhelmingly valid and grounded in the actual repo** (S0/S2/S6 silent-partial-success, S1.3 no-op, S5 calibration contamination, resume-validity). **kimii's findings are largely fabricated** — its headline BLOCKER (S5 fast-gate fail-open) does not exist (no `fast_gate` in `pipeline/`), "hardcoded 0.10 / 5× config drift" is false (threshold is config-driven `S5_NLI_PASS_THRESHOLD=0.1`), "S1.5 uses raw filenames" is false (`resolve_source_ids`), "Jaccard dedup 0.85" is fabricated. **qwen's "raise threshold to 0.65" is rejected** (would crater recall; R is already 0.386). Verdict: **CONDITIONAL-GO** contingent on D2325–D2331.
+**Files:** `governance/T1.1_ROUNDTABLE_AUDIT_PROMPT.md`, `temp/kimii007.md`, `temp/chatgpt007.md`, `temp/qwen0006.md`
+**Status:** ADOPTED — findings logged as D2325–D2331; fixes sequenced before T1.1
+
+### D2323 — Content-Type Ontology Consolidation (2026-08-13)
+**Category:** ARCH
+**Decision:** Consolidated the fractured content-type taxonomy into one config-driven registry (`config/content_types.yaml`). Two orthogonal axes: `content_type` (5 roles: principle, process_template, process_instance, tool_instruction, growth_edge) × `extraction_type` (4 forms: causal_mechanism, descriptive_model, normative_heuristic, empirical_pattern). Shared core body (S2) + per-type extension delta (S4). Gave `tool_instruction` a 13-field MCP/JSON-Schema/man-page-grounded schema (was undefined). Dropped vestigial `fact`/`meta` enum values (dead — schema docstring only, never emitted/validated/trained). Reconciles D2072 (5 types) + D2150 (extraction→content map) + D2128 (route→content map) into one source of truth. Rationale: PT/PI are the Layer-2 product (FB→PT→PI→Recipe); they were being orphaned at S2→S4 and trained against a stale vocabulary (`content_type: model/heuristic/pattern`) — a contamination vector under temp=0.0.
+**Files:** `config/content_types.yaml` (NEW), `pipeline/schemas.py`, `pipeline/stage2_extract.py`, `pipeline/stage4_merge.py`, `config/golden/stage2_fewshot_convergent.yaml` (wiring deferred to next session)
+**Status:** ADOPTED — contract frozen; code wiring + golden-example fix next session.
+
+### D2322 — nli_calibrate Re-derivation: 3 bugs + non-reproducible D2293 calibration (2026-08-13)
+**Category:** VAL
+**Decision:** Re-derived the S5 NLI threshold post-BUG-092. Fixed 3 bugs in `nli_calibrate.py` (read the wrong path `STAGE4_OUTPUT`; `deberta_check()` returned 0.0 entailment on every non-pass collapsing the sweep; stale 0.50–0.95 ModernBERT-era sweep range). Honest auto-calibration (466 pairs, 88 FBs): **P=0.647 / R=0.386 / F1=0.484 at 0.10**; D2293's P=1.000 is NOT reproducible. KEEP threshold 0.10 (fail-closed, empirically sound — 84% pass / ~90% manual correctness). Human FB-level re-calibration deferred to post-T1.1.
+**Files:** `pipeline/nli_calibrate.py`, `pipeline/stage5_verify.py`
+**Status:** FIXED — threshold unchanged (0.10); docs carry honest numbers
+
+### D2321 — S5 NLI premise/hypothesis pairing + all-3-label scoring (2026-08-13)
+**Category:** BUGFIX
+**Decision:** Fix for BUG-092. `deberta_check()` now passes `(premise=evidence, hypothesis=definition)` as a proper two-sequence pair (`{"text":…, "text_pair":…}`), reads all three labels (`top_k=3`), distinguishes ENTAIL/NEUTRAL/CONTRA. Truncation moved to config (`nli_max_premise_chars`/`nli_max_hypothesis_chars`, 256). Result: 36% → 84.1% pass rate.
+**Files:** `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+**Status:** FIXED
+
+### D2320 — Stage4 D2072 dedup KeyError on v3.0 fb_id records (2026-08-13)
+**Category:** BUGFIX
+**Decision:** `stage4_merge.py` crashed `KeyError: 'principle_id'` after writing the 88-FB checkpoint — the D2072/D2073 separate-output dedup blocks read `rec["principle_id"]` but v3.0 stage2 records use `fb_id`. Triggered by first appearance of non-principle content_types. Fix: `rec.get("fb_id") or rec.get("principle_id", "")`.
+**Files:** `pipeline/stage4_merge.py`
+**Status:** FIXED
+
+### D2319 — S2 discovery probe used GPT-OSS (reasoning model) → PROBE ABORT (2026-08-13)
+**Category:** BUGFIX
+**Decision:** `discover_principles()` called `call_llm(model=VERIFY_MODEL=gpt-oss-20b)` — VERIFY_MODEL was repointed to GPT-OSS (D2249/D2250) but the probe was designed for Phi-4-mini. GPT-OSS (reasoning model) emits only `reasoning_content` during cold reload → "content missing" → `None` → PROBE ABORT. Fix: repoint probe to `VERIFY_MODEL_V2` (Phi-4-mini). Supersedes D2318.
+**Files:** `pipeline/stage2_extract.py`
+**Status:** FIXED
+
+### D2318 — "Reasoning: none" prefix for S4 reasoning model (2026-08-13)
+**Category:** BUGFIX
+**Decision:** Prefix to suppress `reasoning_content` emission in the merged S4 call. Necessary for stage4 but INSUFFICIENT for the discovery probe (cold-reload reasoning_content persists). Superseded by D2319.
+**Files:** `pipeline/stage4_merged_call.py`
+**Status:** SUPERSEDED by D2319
+
+### D2317 — stage2 stale-FB contamination on segids mismatch (2026-08-12)
+**Category:** BUGFIX
+**Decision:** Resume logic cleared `processed_ids` on segids mismatch but not `all_fbs` → stale FBs from a prior run appended to the new run's checkpoint. Fix: `all_fbs = []` alongside `processed_ids = set()`.
+**Files:** `pipeline/stage2_extract.py`
+**Status:** FIXED
+
+### D2316 — Domain-coherent e2e book sampling (2026-08-12)
+**Category:** DAT
+**Decision:** `just eval` selected the first 20 books alphabetically (domain-diverse grab-bag) → 3% convergence. Fix: `find_books()` subdir filter via `MAXWELL_BOOK_SUBDIR`; `e2e_test.py --subdir` (default 55-book AI/agents cohort).
+**Files:** `pipeline/stage0_convert.py`, `pipeline/e2e_test.py`
+**Status:** FIXED
+
+### D2315 — Black Swan title-concat case: 3rd duplicate-edition collapse (2026-08-12)
+**Category:** BUGFIX
+**Decision:** camelCase-concatenated subtitle ("The Black SwanThe Impact…") defeated `normalize_title` → false divergence. Fix: `_CONCAT_SUBTITLE_SPLIT` regex splits at the camelCase boundary preceding a subtitle-opener. All 3 dup-edition cases collapse.
+**Files:** `pipeline/book_metadata.py`
+**Status:** FIXED
+
+### D2314 — e2e disciplines→domains field drift (2026-08-12)
+**Category:** BUGFIX
+**Decision:** e2e `multi_label` read `fb["disciplines"]` (nonexistent) — S4 writes `domains` + `discipline`. Fix: read `domains`.
+**Files:** `pipeline/e2e_test.py`
+**Status:** FIXED
+
+### D2313 — e2e db_commit KeyError (2026-08-12)
+**Category:** BUGFIX
+**Decision:** `validate_results()` crashed `KeyError: 'threshold'` — the `db_commit` check lacked a `threshold` key; the print loop did `check['threshold']`. Fix: add `threshold:"written"`; defensive `check.get('threshold','—')`.
+**Files:** `pipeline/e2e_test.py`
+**Status:** FIXED
+
+### D2312 — e2e validate_results reads stale "latest" checkpoint (2026-08-12)
+**Category:** BUGFIX
+**Decision:** `pipeline_paths` caches `run_id` at import (default `latest`); `e2e_test.py` imported it before setting `MAXWELL_RUN_ID=e2e` → `STAGE2_CHECKPOINT` resolved to stale `latest/checkpoint.jsonl` (pretty-printed, non-JSONL). Fix: set `os.environ MAXWELL_RUN_ID=e2e` before importing `pipeline_paths`.
+**Files:** `pipeline/e2e_test.py`
+**Status:** FIXED
+
+### D2311 — just eval S2 hardcoded 600s timeout (2026-08-12)
+**Category:** BUGFIX
+**Decision:** `e2e_test.run_stage()` hardcoded `timeout=600` for every stage (C12 violation) → S2 `TimeoutExpired` after 600s. Config already had `stages.timeouts['2']=null` (D2269) for runner.py but e2e ignored it. Fix: `_get_stage_timeout()` reading per-stage timeout from config.
+**Files:** `pipeline/e2e_test.py`
+**Status:** FIXED
+
 ### D2310 — ISOR/Discipline/Confidence Fixes (2026-08-12)
 **Category:** QLT
 **Decision:** Roundtable adjudication fixes. G2: ISOR now uses metadata author + canonical source count with correct precedence — "weak" bucket reachable (5 FBs). G4: S5 confidence decoupled from NLI (NLI is a binary gate, not 75% weight); weights mechanism 0.35 / enrichment 0.25 / ISOR 0.40 with quarantine cap 0.25. G9: discipline "emerging" over-firing fixed — preserve `discipline_raw` + `taxonomy_match_method`.

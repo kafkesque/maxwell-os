@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-07-26 (v3.0 cluster-before-extract architecture + model sync)
+# Updated: 2026-08-13 (D2323 content-type registry + D2324-D2332 roundtable + B1 checkpoint-format sweep — CONDITIONAL-GO)
 
 session:
     version: "3.0.0"
@@ -35,7 +35,7 @@ models:
         model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
         provider: local
         family: deberta
-        notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10 (P=1.000, R=0.556, F1=0.714). RoBERTa/ModernBERT removed (zero signal / superseded)."
+        notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest auto-cal: P=0.647/R=0.386/F1=0.484 (D2293's P=1.000 was on the broken pre-D2321 call — NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded)."
 
 # ── Pipeline (8-stage v3.0 — cluster-before-extract) ──
 # D2197: stage3 removed (D2120). Pipeline is 8-stage, not 9.
@@ -88,6 +88,13 @@ storage:
     parquet: knowledge pipeline/parquet/
     archive: knowledge pipeline/archive/
 
+# ── Content-Type Ontology (D2323) ──
+content_type:
+    registry: config/content_types.yaml   # single source of truth (C12)
+    content_types: [principle, process_template, process_instance, tool_instruction, growth_edge]
+    extraction_types: [causal_mechanism, descriptive_model, normative_heuristic, empirical_pattern]
+    note: "2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction→content) + D2128 (route→content) mappings in registry."
+
 # ── Governance ──
 governance:
     constitution: CONSTITUTION.md
@@ -122,12 +129,22 @@ phase:
         - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
         - D2092-D2114: v3.0 architecture decisions recorded ✅
     pending:
+        - B1-B10 (D2325-D2332): pre-T1.1 blockers, data-flow ordered — BLOCKS T1.1 (CONDITIONAL-GO)
+        - B1: S2 checkpoint format assertion + regenerate corrupt checkpoints (D2332)
+        - B2: resume-validity manifest (D2329)
+        - B3: S0 fail-closed (D2326)
+        - B4-B5: content-type golden fix + enum wiring (D2323)
+        - B6: S1.3 prefilter --in-place (D2327)
+        - B7: S2 silent-skip counter (D2331)
+        - B8: S5 calibration truth (D2328)
+        - B9: S6 provenance (D2325)
+        - B10: e2e run-scoping (D2330)
         - Q6: 5+ book E2E test with meaningful convergent extraction
         - Tier 2: quality calibration (golden set audit, manual FB review)
         - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
         - C8: D2066 dynamic canonical taxonomy
         - C9: D2067 cross-run incremental extraction
-    next_phase: Tier 2 quality calibration → Tier 3 speed → 20-book production run
+    next_phase: B1-B10 pre-flight fixes → T1.1 full run → Tier 2 quality calibration
 
 # ── Book Library ──
 book_library:

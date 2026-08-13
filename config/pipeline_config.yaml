@@ -135,6 +135,8 @@ stage1_5:
   embed_chunk_size: 20000
   embed_batch_size: 64
   max_embed_drop_rate: 0.005
+stage0:
+  max_failed_ratio: 0.0          # D2326: fail-closed — if failed/total > this ratio, exit non-zero (0.0 = any failure is fatal). Operator may raise to approve known-bad exclusions.
 stage1_3:
   min_len: 40
   cite_density: 0.6
@@ -173,6 +175,7 @@ stage2:
   omlx_retry_attempts: 2
   batch_position_monitor: false
   max_workers: 3
+  max_failed_ratio: 0.0   # D2331: fail-closed cluster extraction — if failed_clusters/total > this ratio, exit non-zero (0.0 = any failure fatal). Operator may raise to approve known-bad skips.
 stage4:
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl

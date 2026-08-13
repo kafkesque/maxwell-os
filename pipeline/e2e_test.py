@@ -50,6 +50,7 @@ from pipeline.pipeline_paths import (
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
     STAGE6_CHECKPOINT,
+    get_run_id,
 )
 
 # ── Thresholds (T1.3: de-hardcoded — sourced from pipeline_config.yaml) ────
@@ -247,16 +248,20 @@ def validate_results() -> dict:
         results["checks"].append({"check": "db_commit", "value": "no checkpoint", "threshold": "written", "passed": False})
         results["passed"] = False
 
-    # Check 6: SQLite DB has rows
+    # Check 6: SQLite DB has rows (D2330: scoped to the current run_id —
+    # a global COUNT(*) would count historical rows from prior runs, not this one).
     if DB_PATH.exists():
         import sqlite3
         conn = sqlite3.connect(str(DB_PATH))
-        row_count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
+        row_count = conn.execute(
+            "SELECT COUNT(*) FROM fbs WHERE pipeline_run_id = ?",
+            (get_run_id(),),
+        ).fetchone()[0]
         conn.close()
         ok = row_count >= E2E_MIN_FBS
         results["checks"].append({
             "check": "db_rows",
-            "value": str(row_count),
+            "value": f"{row_count} (run_id={get_run_id()})",
             "threshold": f"≥{E2E_MIN_FBS}",
             "passed": ok,
         })

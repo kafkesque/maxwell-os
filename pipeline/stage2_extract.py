@@ -60,6 +60,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_PATH,
     S2_GOLDEN_POSITIVE,
     S2_MAX_CLUSTER_SAMPLES,
+    S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
     S2_MAX_PROBE_SAMPLES,
     S2_MAX_WORKERS,
     S2_MINHASH_NUM_PERM,
@@ -76,6 +77,11 @@ from pipeline.pipeline_paths import (
     STAGE2_PROBE_CACHE,
 )
 from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
+from pipeline.content_types import (  # D2323: config-first enum source (C12)
+    CONTENT_TYPES,
+    EXTRACTION_TYPES,
+    EXTRACTION_TYPE_ENUM,
+)
 
 # D2276: Hybrid gate — DSPy-inspired pre-extraction filter (BUG-085 fix)
 try:
@@ -107,10 +113,11 @@ _FB_REQUIRED_FIELDS: dict[str, tuple[type, int]] = {
     "route": (str, 0),               # Must be string
 }
 _VALID_ROUTES: frozenset[str] = frozenset({"FB", "NULL"})
-_VALID_CONTENT_TYPES: frozenset[str] = frozenset({
-    "principle", "process_template", "process_instance",
-    "growth_edge", "tool_instruction",
-})
+# D2323: enums sourced from config/content_types.yaml (C12 config-first),
+# never re-declared here. extraction_type is also validated (was previously
+# unvalidated — any string passed through, defaulting to "causal_mechanism").
+_VALID_CONTENT_TYPES: frozenset[str] = CONTENT_TYPES
+_VALID_EXTRACTION_TYPES: frozenset[str] = EXTRACTION_TYPES
 
 
 def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
@@ -162,6 +169,13 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
     ctype = str(result.get("content_type", "")).strip()
     if ctype and ctype not in _VALID_CONTENT_TYPES:
         errors.append(f"Invalid content_type '{ctype}'")
+
+    # D2323: validate extraction_type against the config-sourced enum.
+    # Was previously unvalidated — any string (or a typo) passed through and
+    # silently defaulted to "causal_mechanism" downstream.
+    etype = str(result.get("extraction_type", "")).strip()
+    if etype and etype not in _VALID_EXTRACTION_TYPES:
+        errors.append(f"Invalid extraction_type '{etype}'")
 
     return len(errors) == 0, errors
 
@@ -432,12 +446,13 @@ SINGLE_SOURCE_SYSTEM: str = (
     "Return a JSON object with these EXACT keys:\n"
     "name, definition, mechanism, boundary, consequence, "
     "is_summary (bool), "
-    "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"), "
+    "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
     "extraction_type=causal_mechanism if clear X\u2192Y because Z. "
     "empirical_pattern if strong correlation without proven causal chain. "
     "normative_heuristic if practical rule of thumb. "
+    "descriptive_model if classification system or taxonomy. "
     "content_type=principle for reusable concepts, process_template for repeatable methods, "
     "process_instance for case studies, growth_edge for speculative insights, "
     "tool_instruction for tool-specific commands. "
@@ -451,7 +466,7 @@ SINGLETON_SYSTEM: str = (
     "Return a JSON object with these EXACT keys:\n"
     "name, definition, mechanism, boundary, consequence, "
     "is_summary (bool), "
-    "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"none\"), "
+    "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"|\"none\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
     "MAPPING RULES:\n"
@@ -657,8 +672,12 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
                 "mechanism": fb_item.get("mechanism", ""),
                 "boundary": fb_item.get("boundary", ""),
                 "consequence": fb_item.get("consequence", ""),
-                "extraction_type": fb_item.get("extraction_type", "causal_mechanism"),
                 "is_summary": fb_item.get("is_summary", False),
+                "extraction_type": fb_item.get("extraction_type", "causal_mechanism"),
+                # D2334: model content_type in few-shot (was silently omitted — the
+                # system prompt requires it, but examples didn't show it → temp=0.0
+                # would deterministically drop it). Matches field #9 in the prompt.
+                "content_type": fb_item.get("content_type", "principle"),
                 "evidence_passages": fb_item.get("evidence_passages", [])[:2],
                 "route": fb_item.get("route", "FB"),
             }
@@ -1198,6 +1217,7 @@ def run_stage2(
     total_skipped: int = 0
     total_null: int = 0
     total_gate_violations: int = 0
+    failed_clusters: int = 0  # D2331: terminal LLM failures (silent-skip audit)
     pipeline_commit: str = get_pipeline_commit()
 
     # Resume support
@@ -1462,6 +1482,7 @@ def run_stage2(
                            force_shrink=True)
                 raise  # Abort the run
             except Exception as e:
+                failed_clusters += 1  # D2331: terminal worker failure
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {cid}: {e}")
                 continue
 
@@ -1470,6 +1491,7 @@ def run_stage2(
 
             # D2178: _process_cluster now always returns list[dict]
             if not fb_results:
+                failed_clusters += 1  # D2331: terminal LLM failure (call_llm returned None)
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {conv_tag} {cid}: LLM failed")
                 continue
 
@@ -1558,6 +1580,25 @@ def run_stage2(
         routes = Counter(fb.get("route", "?") for fb in all_fbs)
         print(f"📊 Routes:             {dict(routes)}")
     print(f"📋 Checkpoint:         {STAGE2_CHECKPOINT}")
+
+    # ── D2331: fail-closed cluster extraction ───────────────────────────────
+    # call_llm() returns None on terminal LLM failure and the worker skips the
+    # cluster — previously this wrote a "successful" checkpoint with missing FBs.
+    # Now we count terminal failures and refuse to advance silently.
+    total_attempted: int = len(target_clusters)
+    print(f"❌ Failed clusters:     {failed_clusters}/{total_attempted}")
+    if total_attempted > 0:
+        failure_ratio: float = failed_clusters / total_attempted
+        if failure_ratio > S2_MAX_FAILED_RATIO:
+            print(f"❌ Stage 2 FAILED: {failed_clusters}/{total_attempted} clusters failed extraction "
+                  f"({failure_ratio:.1%} > max_failed_ratio={S2_MAX_FAILED_RATIO}). "
+                  f"Missing clusters = missing FBs — do NOT advance to S4.")
+            sys.exit(1)
+        if failed_clusters > 0:
+            print(f"⚠️  Stage 2 CONDITIONAL_SUCCESS: {failed_clusters} cluster(s) failed within "
+                  f"tolerance ({failure_ratio:.1%} ≤ {S2_MAX_FAILED_RATIO}). Re-run to retry failed "
+                  f"clusters before advancing to S4.")
+            sys.exit(2)  # non-zero → runner does NOT auto-advance to S4
 
 
 

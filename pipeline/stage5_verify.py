@@ -10,7 +10,7 @@ Output: Verified FBs, checkpoint at stage5_verify.jsonl
 Process:
   1. Mechanism quality pre-filter: catch tautological mechanisms (regex, free)
   2. DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI): sole NLI verifier
-  3. Threshold 0.10 — calibrated via human adjudication (12 FBs): P=1.000, R=0.556
+  3. Threshold 0.10 — auto-calibrated (466 pairs, 88 FBs): P=0.647, R=0.386, F1=0.484
   4. Verdict (D2321: premise/hypothesis pairing + all-3-label scoring):
      → ENTAIL ≥ 0.10 → PASS
      → NEUTRAL (unverifiable) → QUARANTINE
@@ -28,7 +28,7 @@ R5 compliance (D2298):
 
 DeBERTa-v3-large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (4.14GB)
   Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%+
-  Calibration: Precision 1.000, Recall 0.556, F1 0.714 at threshold 0.10 (12 FBs)
+  Calibration: Precision 0.647, Recall 0.386, F1 0.484 at threshold 0.10 (466 pairs, 88 FBs)
   Speed: ~290ms per sentence pair on MPS (loaded in 6s)
 
 Usage:
@@ -137,7 +137,7 @@ def _nli_pair_scores(premise: str, hypothesis: str) -> tuple[float, float, float
 def deberta_check(fb: dict) -> tuple[bool, float, str]:
     """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
 
-    Threshold 0.10 from human calibration (12 FBs): P=1.000, R=0.556, F1=0.714.
+    Threshold 0.10 from auto-calibration (466 pairs, 88 FBs): P=0.647, R=0.386, F1=0.484.
     RoBERTa removed (D2298) — added zero signal on paraphrase-based evidence (D2227).
 
     D2321 FIX (BUG-092): previous code concatenated "definition evidence" into ONE
@@ -169,7 +169,7 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     if not _def or len(_def) < 20:
         return False, 0.0, "No definition — QUARANTINE"
 
-    _thresh = S5_NLI_PASS_THRESHOLD  # Config-driven (C12), D2293 calibrated: 0.10
+    _thresh = S5_NLI_PASS_THRESHOLD  # Config-driven (C12), D2322 calibrated: 0.10
     _entail_scores: list[float] = []
     _contra_scores: list[float] = []
     _neutral_scores: list[float] = []
@@ -385,7 +385,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
     print(f"🔍 Stage 5: DeBERTa-Only Verify — {total} FBs")
     print("   DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI) — D2298 calibrated")
-    print(f"   Threshold: {_thresh} (Calibrated: P=1.000 R=0.556 F1=0.714) | Fail-closed: ✅ (D2093)")
+    print(f"   Threshold: {_thresh} (Calibrated: P=0.647 R=0.386 F1=0.484) | Fail-closed: ✅ (D2093)")
     print(f"   ENTAIL ≥ {_thresh} → PASS | Otherwise → QUARANTINE")
     print(f"{'='*60}")
 
@@ -450,7 +450,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
                 "detail": enrich_detail,
             })
 
-        # 3. Determine status — DeBERTa-only (D2293 calibrated)
+        # 3. Determine status — DeBERTa-only (D2322 calibrated)
         if fact_passed:
             status = "PASS"
             needs_human = False
@@ -492,7 +492,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["confidence_score"] = confidence_score
         vfb["status"] = status
         vfb["needs_human_review"] = needs_human
-        vfb["verifier_model"] = "DeBERTa-v3-large (D2293 calibrated, threshold 0.10)"
+        vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold 0.10)"
         vfb["verification_method"] = method
 
         # D2284: Epistemic status — ISOR scoring
@@ -519,7 +519,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     print("📊 VERIFICATION RESULTS")
     for s, c in stats.items():
         print(f"   {s}: {c}")
-    print("\n📊 DeBERTa-ONLY VERIFICATION (D2293 calibrated)")
+    print("\n📊 DeBERTa-ONLY VERIFICATION (D2322 calibrated)")
     print("   ENTAIL ≥ threshold → PASS:     auto")
     print("   CONTRA → QUARANTINE:            auto")
     print(f"   Disagree → FLAG (human): {stats.get('FLAG', 0)} FBs need review")

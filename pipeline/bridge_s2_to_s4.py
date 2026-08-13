@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import load_jsonl  # D2332: fail-closed JSONL boundary
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT, STAGE4_CHECKPOINT
 
 
@@ -24,10 +25,7 @@ def convert() -> None:
         print("❌ Stage 2 checkpoint not found.")
         sys.exit(1)
 
-    fbs: list[dict] = []
-    with open(STAGE2_CHECKPOINT) as f:
-        for line in f:
-            fbs.append(json.loads(line))
+    fbs: list[dict] = load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint")
 
     print(f"📦 Converting {len(fbs)} FBs from Stage 2 → Stage 4 format")
 

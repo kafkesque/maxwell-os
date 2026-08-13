@@ -40,7 +40,12 @@ _CFG_PATH_S4 = Path(__file__).resolve().parent.parent / "config" / "pipeline_con
 with open(_CFG_PATH_S4) as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
 
-from pipeline.io_guard import safe_write
+from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
+from pipeline.content_types import (  # D2323: config-first enum source (C12)
+    CONTENT_TYPES,
+    DEFAULT_CONTENT_TYPE,
+    ROUTE_TO_CONTENT_TYPE,
+)
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
@@ -84,6 +89,34 @@ from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_i
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
+
+# D2323: non-principle role names sourced from config (C12) — routing dispatch
+# references these, never re-declares the literal enum values.
+_ROLE_PROCESS_TEMPLATE: str = ROUTE_TO_CONTENT_TYPE["PT"]
+_ROLE_PROCESS_INSTANCE: str = ROUTE_TO_CONTENT_TYPE["PI"]
+_ROLE_GROWTH_EDGE: str = ROUTE_TO_CONTENT_TYPE["GE"]
+_ROLE_TOOL_INSTRUCTION: str = ROUTE_TO_CONTENT_TYPE["TI"]
+
+
+def _resolve_content_type(fb: dict) -> str:
+    """Resolve a principle's content_type, honoring the D2128 route→content_type fallback.
+
+    D2128: S2's legacy `route` field (FB/PT/PI/GE/TI) was silently ignored by S4 —
+    route=PT/GE outputs were never routed to their non-FB output files. When a
+    record lacks an explicit content_type, fall back to the route mapping;
+    otherwise trust the model's explicit content_type.
+
+    Args:
+        fb: A Stage 2 principle/FB record dict.
+
+    Returns:
+        A valid content_type role name (one of CONTENT_TYPES).
+    """
+    ct: str = (fb.get("content_type") or "").strip()
+    if ct:
+        return ct
+    route: str = (fb.get("route") or "").strip().upper()
+    return ROUTE_TO_CONTENT_TYPE.get(route, DEFAULT_CONTENT_TYPE)
 
 # ── Prompt templates ───────────────────────────────────────────────────────
 
@@ -388,50 +421,46 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
     clusters: list[dict] = []
     principles_idx: dict[str, dict] = {}
 
-    with open(STAGE2_CHECKPOINT) as f:
-        for i, line in enumerate(f, 1):
-            line = line.strip()
-            if not line:
-                continue
-            fb = json.loads(line)
+    # D2332: fail-closed JSONL load — a pretty-printed checkpoint must raise, not silently drop records.
+    s2_records: list[dict] = load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint")
+    for i, fb in enumerate(s2_records, 1):
+        # Index by both fb_id and principle_id (v2.x/v3.0 compat)
+        fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
+        pid_val = fb.get("principle_id", "")
+        if fb_id_val:
+            principles_idx[fb_id_val] = fb
+        if pid_val and pid_val != fb_id_val:
+            principles_idx[pid_val] = fb
 
-            # Index by both fb_id and principle_id (v2.x/v3.0 compat)
-            fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
-            pid_val = fb.get("principle_id", "")
-            if fb_id_val:
-                principles_idx[fb_id_val] = fb
-            if pid_val and pid_val != fb_id_val:
-                principles_idx[pid_val] = fb
+        # Wrap as a single-FB cluster
+        # D2176: Preserve is_noise/is_singleton semantics from S1.5/S2.
+        # OLD: is_noise = not is_convergent — treated ALL single-source and
+        # singleton FBs as noise, overwriting the S1.5 fix (D2171).
+        # NEW: is_noise is an independent quality state. A single-source FB
+        # or singleton is NOT noise — it just has weaker corroboration.
+        # origin field tracks the structural provenance independently.
+        is_convergent: bool = fb.get("is_convergent", False)
+        is_singleton: bool = fb.get("is_singleton_fb", False) or fb.get("is_singleton", False)
+        is_noise: bool = fb.get("is_noise", False)  # Only True if S1.5/S2 explicitly marked noise
 
-            # Wrap as a single-FB cluster
-            # D2176: Preserve is_noise/is_singleton semantics from S1.5/S2.
-            # OLD: is_noise = not is_convergent — treated ALL single-source and
-            # singleton FBs as noise, overwriting the S1.5 fix (D2171).
-            # NEW: is_noise is an independent quality state. A single-source FB
-            # or singleton is NOT noise — it just has weaker corroboration.
-            # origin field tracks the structural provenance independently.
-            is_convergent: bool = fb.get("is_convergent", False)
-            is_singleton: bool = fb.get("is_singleton_fb", False) or fb.get("is_singleton", False)
-            is_noise: bool = fb.get("is_noise", False)  # Only True if S1.5/S2 explicitly marked noise
+        # Derive origin from structural properties
+        if is_singleton:
+            origin: str = "singleton"
+        elif is_convergent:
+            origin: str = "convergent"
+        else:
+            origin: str = "single_source"
 
-            # Derive origin from structural properties
-            if is_singleton:
-                origin: str = "singleton"
-            elif is_convergent:
-                origin: str = "convergent"
-            else:
-                origin: str = "single_source"
-
-            clusters.append({
-                "cluster_id": fb_id_val or f"fb_{i}",
-                "principle_ids": [fb_id_val] if fb_id_val else [f"fb_{i}"],
-                "source_books": fb.get("source_books", []),
-                "is_convergent": is_convergent,
-                "is_noise": is_noise,
-                "is_singleton": is_singleton,
-                "origin": origin,
-                "source": "stage2_fb",  # Mark as directly from Stage 2
-            })
+        clusters.append({
+            "cluster_id": fb_id_val or f"fb_{i}",
+            "principle_ids": [fb_id_val] if fb_id_val else [f"fb_{i}"],
+            "source_books": fb.get("source_books", []),
+            "is_convergent": is_convergent,
+            "is_noise": is_noise,
+            "is_singleton": is_singleton,
+            "origin": origin,
+            "source": "stage2_fb",  # Mark as directly from Stage 2
+        })
 
     # D2176: Also load singleton FBs. Stage 2 writes convergent + single-source FBs
     # to STAGE2_CHECKPOINT and singleton FBs to a separate file. Previously
@@ -440,28 +469,23 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
     from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
     singleton_count: int = 0
     if STAGE2_SINGLETON_OUTPUT.exists():
-        with open(STAGE2_SINGLETON_OUTPUT) as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                fb = json.loads(line)
-                fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
-                if fb_id_val:
-                    principles_idx[fb_id_val] = fb
+        for fb in load_jsonl(STAGE2_SINGLETON_OUTPUT, context="S2 singleton checkpoint"):
+            fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
+            if fb_id_val:
+                principles_idx[fb_id_val] = fb
 
-                # Singleton FBs are always: not convergent, not noise, is singleton
-                clusters.append({
-                    "cluster_id": fb_id_val or f"singleton_{singleton_count}",
-                    "principle_ids": [fb_id_val] if fb_id_val else [f"singleton_{singleton_count}"],
-                    "source_books": fb.get("source_books", []),
-                    "is_convergent": False,
-                    "is_noise": False,
-                    "is_singleton": True,
-                    "origin": "singleton",
-                    "source": "stage2_singleton",
-                })
-                singleton_count += 1
+            # Singleton FBs are always: not convergent, not noise, is singleton
+            clusters.append({
+                "cluster_id": fb_id_val or f"singleton_{singleton_count}",
+                "principle_ids": [fb_id_val] if fb_id_val else [f"singleton_{singleton_count}"],
+                "source_books": fb.get("source_books", []),
+                "is_convergent": False,
+                "is_noise": False,
+                "is_singleton": True,
+                "origin": "singleton",
+                "source": "stage2_singleton",
+            })
+            singleton_count += 1
         print(f"   📂 Loaded {len(clusters) - singleton_count} FBs from Stage 2 + {singleton_count} singletons (Stage 3 bypassed per D2120)")
     else:
         print(f"   📂 Loaded {len(clusters)} FBs from Stage 2 (Stage 3 bypassed per D2120)")
@@ -557,17 +581,14 @@ def load_stage2_principles() -> dict[str, dict]:
         sys.exit(1)
 
     principles: dict[str, dict] = {}
-    with open(STAGE2_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                p = json.loads(line)
-                pid = p.get("principle_id", "")
-                fid = p.get("fb_id", "")
-                if pid:
-                    principles[pid] = p
-                if fid and fid != pid:
-                    principles[fid] = p
+    # D2332: fail-closed JSONL load — pretty-printed checkpoint must raise, not silently drop.
+    for p in load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint"):
+        pid = p.get("principle_id", "")
+        fid = p.get("fb_id", "")
+        if pid:
+            principles[pid] = p
+        if fid and fid != pid:
+            principles[fid] = p
     return principles
 
 
@@ -928,8 +949,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             for pid in pids:
                 if pid in principles_idx:
                     p = principles_idx[pid]
-                    ct = p.get("content_type", "principle")
-                    if ct == "principle":
+                    ct = _resolve_content_type(p)
+                    if ct == DEFAULT_CONTENT_TYPE:
                         cluster_principles.append(p)
             if len(cluster_principles) != 1:
                 continue  # skip non-principle clusters in batch pre-pass
@@ -971,14 +992,14 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         for pid in principle_ids:
             if pid in principles_idx:
                 p = principles_idx[pid]
-                ct = p.get("content_type", "principle")
-                if ct == "process_template":
+                ct = _resolve_content_type(p)
+                if ct == _ROLE_PROCESS_TEMPLATE:
                     process_templates.append(p)
-                elif ct == "process_instance":
+                elif ct == _ROLE_PROCESS_INSTANCE:
                     process_instances.append(p)
-                elif ct == "growth_edge":
+                elif ct == _ROLE_GROWTH_EDGE:
                     growth_edges.append(p)
-                elif ct == "tool_instruction":
+                elif ct == _ROLE_TOOL_INSTRUCTION:
                     tool_instructions.append(p)
                 else:
                     cluster_principles.append(p)

@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-12
+# Last manual edit: 2026-08-13
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-12T19:09:07Z'
-total_decisions: 299
+last_sync: '2026-08-13T13:37:09Z'
+total_decisions: 323
 decisions:
 - id: D2092
   category: INF
@@ -2270,6 +2270,18 @@ decisions:
   files:
   - pipeline/stage5_verify.py
   state: ACTIVE
+- id: D2323
+  title: Content-Type Ontology Consolidation — 5 roles × 4 forms, single config registry
+  category: ARCH
+  date: '2026-08-13'
+  summary: 'Fractured content-type taxonomy consolidated into config/content_types.yaml (single source of truth). Two orthogonal
+    axes: content_type (5 roles) × extraction_type (4 forms). Shared core body + per-type extension delta. tool_instruction
+    gets a 13-field MCP/JSON-Schema/man-page schema (was undefined). Drops vestigial fact/meta. Reconciles D2072 + D2150 +
+    D2128. Rationale: PT/PI are the Layer-2 product, currently orphaned at S2→S4 + trained on stale content_type vocabulary
+    (contamination under temp=0.0). Contract frozen; code wiring + golden-example fix next session.'
+  files:
+  - config/content_types.yaml
+  state: ACTIVE
 - id: D2263
   category: INF
   state: ACTIVE
@@ -2368,29 +2380,190 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2311
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2312
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2313
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2314
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2315
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2316
+  category: INF
+  state: ACTIVE
+  description: '**Category:** DAT'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2317
+  category: INF
+  state: SUPERSEDED
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2318
+  category: INF
+  state: SUPERSEDED
+  description: '**Files:** `pipeline/stage2_extract.py`'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2319
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2320
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2321
+  category: INF
+  state: ACTIVE
+  description: '**Files:** `pipeline/stage5_verify.py`, `pipeline/runner.py`, `governance/T1.1_ROUNDTABLE_AUDIT_PROMPT.md`'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2322
+  category: INF
+  state: ACTIVE
+  description: '**Files:** `pipeline/stage5_verify.py`, `pipeline/runner.py`, `governance/T1.1_ROUNDTABLE_AUDIT_PROMPT.md`'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2324
+  category: INF
+  state: ACTIVE
+  description: '**Category:** GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2325
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2326
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2327
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2328
+  category: INF
+  state: ACTIVE
+  description: '**Category:** VAL'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2329
+  category: INF
+  state: ACTIVE
+  description: '**Category:** ARCH'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2330
+  category: INF
+  state: ARCHIVED
+  description: '**Category:** VAL'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2331
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2332
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2333
+  category: CLS
+  state: ACTIVE
+  description: '**Category:** GOV'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2334
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 299
+  total: 323
   proposed: 0
   draft: 0
-  active: 258
+  active: 279
   stale: 0
-  superseded: 10
-  archived: 8
+  superseded: 12
+  archived: 9
   rejected: 7
   by_category:
-    INF: 159
+    INF: 181
     QLT: 30
     GOV: 19
     RES: 4
     DAT: 4
     DEF: 1
     VAL: 6
-    CLS: 13
+    CLS: 14
     STR: 1
     PERF: 6
     BUGFIX: 20
     CFG: 5
-    ARCH: 17
+    ARCH: 18
     pipeline-fix: 2
     governance: 1
     BUG: 1

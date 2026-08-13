@@ -24,13 +24,15 @@ Architecture: 8 stages (Stage 3 REMOVED per D2120)
     Stage 1.5:  FAISS cosine cluster (R-NN, D2120)
     Stage 2:    Convergent extract (Qwen3-Coder-30B)
     Stage 4:    Classify + format + lightweight dedup (GPT-OSS-20B)
-    Stage 5:    Verify (DeBERTa FEVER NLI + Phi-4-mini cross-family)
+    Stage 5:    Verify (DeBERTa-v3-large NLI, DeBERTa-only)
     Stage 6:    Commit (SQLite + Parquet)
 """
 
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import subprocess
 import sys
 import time
@@ -43,8 +45,10 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 from pipeline.pipeline_paths import (  # noqa: E402
     CHECKPOINT_DIR,
+    PIPELINE_COMMIT,
     S6_DIR,
     S13_DIR,
+    SCHEMA_VERSION,
     STAGE1_5_CHECKPOINT,
     STAGE_CHECKPOINTS,
     get_run_id,
@@ -80,6 +84,9 @@ STAGES: dict[str, dict[str, Any]] = {
         "checkpoint": S13_DIR / get_run_id() / "checkpoint.jsonl",  # D2134: self-contained
         "can_parallelize": False,
         "depends_on": "1",
+        # D2327: prefilter defaults to dry-run — pass --in-place so structural
+        # garbage is actually filtered before S1.5 (was a silent no-op).
+        "args": ["--in-place"],
     },
     "1.5": {
         "name": "FAISS Cluster (R-NN)",
@@ -105,7 +112,7 @@ STAGES: dict[str, dict[str, Any]] = {
         "llm_bound": True,
     },
     "5": {
-        "name": "Verify (DeBERTa FEVER + Phi-4-mini)",
+        "name": "Verify (DeBERTa-v3-large NLI)",
         "script": "pipeline/stage5_verify.py",
         "checkpoint": STAGE_CHECKPOINTS.get(5),
         "can_parallelize": False,
@@ -168,6 +175,91 @@ def _clear_resume_marker() -> None:
         _RESUME_MARKER.unlink()
 
 
+# ── Resume-validity manifest (D2329) ───────────────────────────────────────
+
+def _manifest_path(stage_id: str) -> Path:
+    """Sidecar manifest path for a stage's checkpoint (<checkpoint>.manifest.json)."""
+    ckpt = STAGES.get(stage_id, {}).get("checkpoint")
+    if ckpt is None:
+        return Path(str(_RESUME_MARKER) + f".s{stage_id}.manifest.json")
+    return Path(str(ckpt) + ".manifest.json")
+
+
+def _checkpoint_sha256(ckpt: Path) -> str:
+    """SHA-256 of a checkpoint file's content (empty string for dirs/missing)."""
+    if not ckpt.exists() or ckpt.is_dir():
+        return ""
+    h = hashlib.sha256()
+    with open(ckpt, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _checkpoint_record_count(ckpt: Path) -> int:
+    """Count non-empty lines in a JSONL checkpoint (0 for non-JSONL/dirs/missing)."""
+    if not ckpt.exists() or ckpt.is_dir():
+        return 0
+    if ckpt.suffix != ".jsonl":
+        return 0
+    count = 0
+    with open(ckpt, encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                count += 1
+    return count
+
+
+def _write_checkpoint_manifest(stage_id: str) -> None:
+    """Write a D2329 resume-validity manifest for a freshly completed stage.
+
+    Records the checkpoint content hash + record count + status=COMPLETE so a
+    later resume can prove the checkpoint is the one this stage actually produced
+    (existence alone is insufficient — a corrupt/pretty-printed file must not
+    count as completed).
+    """
+    ckpt = STAGES.get(stage_id, {}).get("checkpoint")
+    manifest: dict[str, Any] = {
+        "run_id": get_run_id(),
+        "stage_id": stage_id,
+        "pipeline_commit": PIPELINE_COMMIT,
+        "schema_version": SCHEMA_VERSION,
+        "status": "COMPLETE",
+        "checkpoint": str(ckpt) if ckpt is not None else None,
+        "checkpoint_sha256": _checkpoint_sha256(ckpt) if ckpt is not None else "",
+        "record_count": _checkpoint_record_count(ckpt) if ckpt is not None else 0,
+        "timestamp": time.time(),
+    }
+    mp = _manifest_path(stage_id)
+    mp.parent.mkdir(parents=True, exist_ok=True)
+    mp.write_text(json.dumps(manifest, indent=2))
+
+
+def _checkpoint_is_valid(stage_id: str) -> bool:
+    """True only if a checkpoint exists AND its manifest proves it COMPLETE + unmodified.
+
+    D2329: existence is not validity. A checkpoint without a manifest, or whose
+    manifest hash disagrees with the current content (corrupt/regenerated/stale),
+    is treated as incomplete so the stage is re-run.
+    """
+    ckpt = STAGES.get(stage_id, {}).get("checkpoint")
+    if ckpt is None or not ckpt.exists():
+        return False
+    mp = _manifest_path(stage_id)
+    if not mp.exists():
+        return False
+    try:
+        manifest = json.loads(mp.read_text())
+    except Exception:
+        return False
+    if manifest.get("status") != "COMPLETE":
+        return False
+    if manifest.get("run_id") != get_run_id():
+        return False
+    stored_hash = manifest.get("checkpoint_sha256", "")
+    return stored_hash == _checkpoint_sha256(ckpt)
+
+
 # ── Runner ────────────────────────────────────────────────────────────────
 
 def find_resume_point(resume_from: str | None = None) -> str | None:
@@ -183,14 +275,14 @@ def find_resume_point(resume_from: str | None = None) -> str | None:
             sys.exit(1)
         return resume_from
 
-    # Auto-detect: find first stage with missing checkpoint
+    # Auto-detect: find first stage whose checkpoint is NOT valid (D2329).
+    # Existence alone is insufficient — a corrupt/pretty-printed checkpoint, or
+    # one whose manifest hash disagrees, is treated as incomplete and re-run.
     for stage_id in STAGE_ORDER:
-        stage = STAGES[stage_id]
-        ckpt = stage.get("checkpoint")
-        if ckpt and not ckpt.exists():
+        if not _checkpoint_is_valid(stage_id):
             return stage_id
 
-    # All checkpoints exist — resume from last stage (re-run it)
+    # All checkpoints are valid+COMPLETE — resume from last stage (re-run it)
     return STAGE_ORDER[-1]
 
 
@@ -239,7 +331,7 @@ def run_stage(
         print(f"   ⚠️  Script not found: {script}")
         return False
 
-    cmd = ["python3", str(script)]
+    cmd = ["python3", str(script), *stage.get("args", [])]
     env = {}
 
     # Build environment overrides
@@ -313,6 +405,8 @@ def run_stage(
             print(f"✅ {label} — {elapsed:.1f}s")
             # ── D2136: Write resume marker after successful stage ──────
             _write_resume_marker(stage_id)
+            # ── D2329: Write resume-validity manifest (hash + count + COMPLETE) ──
+            _write_checkpoint_manifest(stage_id)
             return True
         else:
             print(f"❌ {label} — FAILED (exit code {result.returncode}) — {elapsed:.1f}s")

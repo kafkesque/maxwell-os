@@ -32,6 +32,7 @@ from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     CHECKPOINT_DIR,
+    S0_MAX_FAILED_RATIO,
     SMOKE_BOOK_LIMIT,
     STAGE0_CHECKPOINT,
 )
@@ -284,19 +285,26 @@ def run_stage0(
         if success:
             size_kb = md_path.stat().st_size / 1024
             sha = compute_sha256(md_path)
-            # ── H4: Post-conversion quality check ─────────────────────
+            # ── H4: Post-conversion quality check (D2326: tri-state, never silent) ──
             quality_warnings = []
+            quality_status = "passed"
             try:
                 with open(md_path, encoding="utf-8") as _qf:
                     q_result = check_conversion_quality(_qf.read(), book_path.name)
                 if not q_result["ok"]:
                     print(f"→ ⚠️  {q_result['error']}")
                     quality_warnings.append(q_result["error"])
+                    quality_status = "failed"
                 for w in q_result.get("warnings", []):
                     print(f"   ⚠️  {w}")
                     quality_warnings.append(w)
-            except Exception:
-                pass  # Quality check is best-effort
+            except Exception as e:
+                # D2326/C16: the checker is a verification step, not best-effort —
+                # a broken checker is indistinguishable from success unless recorded.
+                quality_status = "unavailable"
+                msg = f"quality check raised: {type(e).__name__}: {e}"
+                quality_warnings.append(msg)
+                print(f"   ⚠️  {msg}")
 
             rec = stamp_record(
                 {
@@ -308,6 +316,7 @@ def run_stage0(
                     "size_kb": round(size_kb, 1),
                     "elapsed_s": round(elapsed, 1),
                     "quality_warnings": quality_warnings,
+                    "quality_status": quality_status,
                 },
                 gen_model="pandoc/docling",
             )
@@ -335,6 +344,11 @@ def run_stage0(
             print(f"     - {f['file']}")
     print(f"📋 Checkpoint: {STAGE0_CHECKPOINT}")
 
+    # D2326: fail-closed ingestion — a failed conversion must not look like success.
+    # Return (failed_count, converted_count) so the caller (main) can enforce the
+    # config-defined tolerance stage0.max_failed_ratio.
+    return len(failed), len(converted)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Stage 0: Convert EPUB/PDF → Markdown")
@@ -350,7 +364,25 @@ def main():
     args = parser.parse_args()
 
     books_dir = Path(args.books_dir) if args.books_dir else BOOKS_DIR
-    run_stage0(books_dir=books_dir, force=args.force, single_book=args.book, limit=args.limit)
+    result = run_stage0(books_dir=books_dir, force=args.force, single_book=args.book, limit=args.limit)
+
+    # D2326: fail-closed — exit non-zero when the conversion failure ratio exceeds
+    # the operator-approved tolerance (config stage0.max_failed_ratio).
+    if result is None:
+        sys.exit(0)  # no books found — nothing to do, not a failure
+    failed_count, converted_count = result
+    total_attempted = failed_count + converted_count
+    if total_attempted == 0:
+        sys.exit(0)
+    failure_ratio = failed_count / total_attempted
+    if failure_ratio > S0_MAX_FAILED_RATIO:
+        print(
+            f"❌ Stage 0 FAILED: {failed_count}/{total_attempted} book(s) failed conversion "
+            f"({failure_ratio:.1%} > max_failed_ratio={S0_MAX_FAILED_RATIO})"
+        )
+        sys.exit(1)
+    if failed_count > 0:
+        print(f"⚠️  Stage 0: {failed_count} book(s) failed — within operator tolerance ({failure_ratio:.1%} ≤ {S0_MAX_FAILED_RATIO})")
 
 
 if __name__ == "__main__":

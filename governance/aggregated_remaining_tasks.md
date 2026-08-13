@@ -1,11 +1,50 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-13 10:14 | **Decisions:** D2000-D2321 (310) | **T1.1 unblocked — eval 7/8 green**
+> **Updated:** 2026-08-13 12:53 | **Decisions:** D2000-D2332 (321) | **T1.1 = CONDITIONAL-GO — 10 must-fix items (B1-B10), ordered data-flow-first**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4) | DeBERTa-v3-large (S5) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276). Enable via `--hybrid` flag in stage2_extract.py.
 > **ISOR Scoring:** Active (P0.4, D2284). 3-dimension independence rating in verified FB output.
 > **Audit completed:** Runner.py Gemma dead code purged. Stale comments fixed. No silent crash risks found.
 > **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
+
+---
+
+## 🔴 #1 — T1.1 PRE-FLIGHT BLOCKERS (B1–B10, D2324–D2332, 2026-08-13)
+
+> **Blocks T1.1** (CONDITIONAL-GO). Roundtable (7 items) + a second independent code sweep (B1, D2332 — S2 checkpoint
+> format/resume coupling). kimii's BLOCKER (S5 fast-gate) fabricated; chatgpt's findings real; qwen's "0.65" rejected.
+> **Ordered data-flow-first** (upstream integrity → correctness → verification truth), not by auditor source.
+
+| # | Decision | Task | Effort | Sev |
+|---|----------|------|--------|-----|
+| B1 | D2332 | S2 checkpoint format assertion + regenerate corrupt `latest`/`e2e` checkpoints | 1h | 🔴 |
+| B2 | D2329 | Resume-validity manifest — checkpoint sidecar (run_id/schema/count/COMPLETE); existence never implies validity | 2h | 🔴 |
+| B3 | D2326 | S0 fail-closed — conversion failure → non-zero exit; un-swallow quality-check exception (C16) | 1h | 🔴 |
+| B4 | D2323 | Content-type golden fix — 12 stale `content_type` values → 5-role ontology | 0.5h | 🔴 |
+| B5 | D2323 | Content-type enum wiring — import from `config/content_types.yaml`; drop `fact`/`meta`; D2128 route→content_type | 2h | 🟠 |
+| B6 | D2327 | S1.3 prefilter wiring — pass `--in-place` in runner (or declare disabled) | 0.5h | 🟠 |
+| B7 | D2331 | S2 silent-skip — `failed_clusters==0` or config max-failure-rate + CONDITIONAL_SUCCESS | 2h | 🟠 |
+| B8 | D2328 | S5 calibration truth — replace broken `P=1.000/R=0.556/F1=0.714` with D2322 `P=0.647/R=0.386/F1=0.484`; fix runner "Phi-4-mini" description; regenerate audit prompt | 0.5h | 🔴 |
+| B9 | D2325 | S6 provenance — per-FB `INSERTED/FAILED/SKIPPED`; never claim failed rows committed | 1h | 🔴 |
+| B10 | D2330 | e2e run-scoping (`db_rows` → current run) + quarantine retrieval contract test | 1.5h | 🟠 |
+
+> **Ordering rationale:** B1→B2 (only pair that can silently corrupt the *entire* run) → B3 (garbage-in) → B4→B5
+> (labels before enum) → B6→B7 (S2 input/output integrity) → B8→B9 (verification/commit truthfulness) → B10 (validation).
+
+---
+
+## 🔴 #2 — CONTENT-TYPE ONTOLOGY CONSOLIDATION (D2323, 2026-08-13)
+
+> **Blocks the T1.1 full run** (senior RAG review: PT/PI are the Layer-2 product; currently orphaned + dead-schema + stale-trained).
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Freeze contract → `config/content_types.yaml` (2 axes, core+extension, 13-field TI, D2150/D2128) | ✅ DONE (D2323) |
+| 2 | Fix golden few-shot `content_type` values (`model/heuristic/pattern` → correct ontology) | ⏳ NEXT — contamination fix |
+| 3 | Wire enums: `schemas.py` + `stage2_extract._VALID_CONTENT_TYPES` + `stage4_merge` routing → registry | ⏳ NEXT |
+| 4 | Fix route→content_type mapping (D2128) + drop vestigial `fact`/`meta` | ⏳ NEXT |
+| 5 | Verify 4 orphaned FBs (3 PT + 1 TI) flow end-to-end | ⏳ NEXT |
+| 6 | (deferred) S4 rich per-type extension-field generation (steps/trigger/prerequisite…) | post-T1.1 |
 
 ---
 

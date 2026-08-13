@@ -114,6 +114,7 @@ ENHANCE_MIN_HEADER_GAP_CHARS=int(_CFG.get("pipeline", {}).get("enhance_min_heade
 # D2183: HDBSCAN ghost config removed (D2120/D2183). Retained as 0 for backward compat only.
 # No pipeline stage imports this — safe to remove entirely in v3.2.
 BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
+S0_MAX_FAILED_RATIO=float(_CFG.get("stage0", {}).get("max_failed_ratio", 0.0))  # D2326: fail-closed ingestion tolerance
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))
 
@@ -141,6 +142,7 @@ S2_SPLIT_KMEANS_RANDOM_STATE=int(_CFG.get("stage2", {}).get("split_probe_kmeans_
 S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", True))     # D2163: gate master switch
 S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate
 S2_SPLIT_PROBE_MAX_COHESION=float(_CFG.get("stage2", {}).get("split_probe_max_cohesion", 0.85))  # D2163: max cohesion for gate
+S2_MAX_FAILED_RATIO=float(_CFG.get("stage2", {}).get("max_failed_ratio", 0.0))  # D2331: fail-closed cluster-extraction tolerance
 # D2304: DSPy optimized-program persistence path (C12). Was hardcoded /tmp/dspy_mipro_optimized.json.
 # NOTE: the `s2` key (lowercase) holds DSPy training settings; `stage2` holds pipeline extraction settings.
 _dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")

@@ -197,7 +197,7 @@ class Principle(StampedRecord):
                     "'process_template' (repeatable how-to method), "
                     "'process_instance' (concrete case study of a template in action), "
                     "'tool_instruction' (tool-specific command), "
-                    "'fact' (domain factoid), 'meta' (navigation text)"
+                    "'growth_edge' (speculative insight)"
     )
     source_segments: list[str] = Field(
         description="List of segment_ids that generated this principle"

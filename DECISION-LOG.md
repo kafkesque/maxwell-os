@@ -4,6 +4,12 @@
 ---
 
 
+### D2343 — Pre-T1.1 Residual Closures: S2 resume fail-closed + e2e prefilter/round-trip + route gate C12 (2026-08-13)
+**Category:** BUGFIX
+**Decision:** Closed the four genuinely-remaining pre-T1.1 code gaps (B1/B5/B6 residuals + one validation gap) after re-verifying that B2/D2329, B3/D2326, B7/D2331, B8/D2328, B9/D2325, B10/D2330 were already implemented in code (commit 9295ce0) but their DECISION-LOG statuses had never been flipped. The residual work: (1) **B1/D2332** — `stage2_extract.py`'s own resume reader still used raw `json.loads(line)` (the fail-closed `load_jsonl` was only wired into `bridge_s2_to_s4.py` + `stage4_merge.py`); switched the resume path to `load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint")` so a pretty-printed/legacy checkpoint raises (→ fresh start) instead of silently subset-parsing. (2) **B6/D2327** — `e2e_test.py` `run_stage()` ran the prefilter with no args (dry-run) even though `runner.py` passes `--in-place`; added a `_STAGE_EXTRA_ARGS` map so e2e mirrors production and structural garbage is actually filtered. (3) **NEW e2e check [7]** — `validate_results()` now asserts the D2337 ontology round-trip: `≥90%` of current-run SQLite rows must carry non-empty `content_type` + `extraction_type` (a commit that silently drops the D2323 axes would pass `db_rows` yet still be a lossy corpus). (4) **B5/D2323 + C12** — `_VALID_ROUTES = frozenset({"FB","NULL"})` was still a hardcoded literal; sourced it from `config/pipeline_config.yaml` → `stage2.route_values` → `S2_ROUTE_VALUES` (quoted `"NULL"` because YAML parses bare `NULL` as `None`). (5) **D2340 cosmetic** — `integrity_check.py` `check_model_registry_runtime` (check [11]) now labels `gpt-oss` as the S4 *Classifier/Probe* and reports the true S5 verifier (DeBERTa `nli_large`) instead of the misnamed "Verifier" family. `just integrity` 17/17; `just healthcheck` 10/10; `config_audit --strict` clean.
+**Files:** `pipeline/stage2_extract.py`, `pipeline/e2e_test.py`, `pipeline/integrity_check.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+**Status:** DONE — all four residual gaps closed; B1–B10 now fully implemented in code.
+
 ### D2342 — Integrity Check False-Green + Pydantic/D2337 Alignment (2026-08-13)
 **Category:** QLT
 **Decision:** `just integrity` was NOT fully aligned with the D2337 changes, three ways: (1) **check [8] was a false-green** — `re.findall(r"...(OR\s+REPLACE\s+)?...")` returned the *capturing group* ("" or "OR REPLACE "), so `placeholder_count` was ALWAYS 0 and the check silently returned True without comparing; plus `[^;]*` matched `fbs_fts` (prefix) and spanned past the SQL string. Fixed with a VALUES-anchored `re.search(r"INSERT...INTO\s+fbs\b.*?VALUES\s*\(([^)]*)\)")`. (2) **check [7] only validated 5 key fields** — added the six D2337 fields to `key_fields`. (3) **FB Pydantic model lacked the D2337 fields** — `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence`/`taxonomy_match_method` were absent from `class FB` (present only in raw S2/S4 dicts); added all six. Live DB migrated 48→54 columns. `just integrity` now 17/17 with check [7] = 54 cols/108 fields and check [8] genuinely comparing 54=54 (it FAILED at 56≠54 in the intermediate state, proving the fix).
@@ -68,49 +74,49 @@
 **Category:** BUGFIX
 **Decision:** S2 checkpoints on disk are pretty-printed JSON (multi-line per record), but every downstream loader parses with `json.loads(line)` (`bridge_s2_to_s4.py:30`, `stage4_merge.py:396,448,564`). Code-verified: `latest/checkpoint.jsonl` = 575 lines / 290 non-empty / only 30 parse standalone; `e2e/checkpoint.jsonl` = 118 / 107 / 91. The current writer (`stage2_extract.py:1461,1544,1709,1734`) emits compact single-line `json.dumps(fb)` — so the on-disk format is a legacy/unresolved-provenance artifact that disagrees with the code. S4 will silently parse only the subset of lines that happen to be self-contained, corrupting the merge. Compounding: `find_resume_point` (`runner.py:185-193`) keys resume on checkpoint *existence* only, so a corrupt-but-present checkpoint causes resume to skip S2 and feed garbage to S4. Fix: (a) add a fail-closed JSONL boundary assertion at every S2-checkpoint reader; (b) regenerate the corrupt `latest`/`e2e` checkpoints from a verified source; (c) couple to D2329 (resume-validity manifest) so existence never implies validity.
 **Files:** `pipeline/stage2_extract.py`, `pipeline/bridge_s2_to_s4.py`, `pipeline/stage4_merge.py`, `pipeline/runner.py`
-**Status:** OPEN — fix before T1.1 (silent merge corruption + resume-validity)
+**Status:** DONE — `load_jsonl` fail-closed wired into bridge/stage4 (9295ce0) + S2 resume reader (D2343)
 
 ### D2331 — S2 Extraction Silent-Skip on LLM Failure (2026-08-13)
 **Category:** BUGFIX
 **Decision:** `call_llm()` returns `None` on LLM error (retries exhausted / parse fail); the extraction worker then skips the cluster without failing the stage — stage2 writes a "successful" checkpoint despite missing clusters (code-verified `stage2_extract.py:583-620`). Roundtable finding (chatgpt). Fix: persist per-cluster terminal status; enforce `failed_clusters == 0` or a config-defined max-failure-rate with an explicit CONDITIONAL_SUCCESS state that cannot auto-advance to S4.
 **Files:** `pipeline/stage2_extract.py`
-**Status:** OPEN — fix before T1.1 (C16)
+**Status:** DONE — fail-closed `failed_clusters` gate + `S2_MAX_FAILED_RATIO` (9295ce0)
 
 ### D2330 — e2e Run-Scoping + Quarantine Retrieval Contract (2026-08-13)
 **Category:** VAL
 **Decision:** (a) e2e `db_rows` does `SELECT COUNT(*) FROM fbs` on the global DB (`knowledge pipeline/maxwell.db`) with no `run_id` filter — counts historical rows, not the current run (`e2e_test.py:254`). (b) Quarantine tier semantics ("quarantined ≠ deleted") are asserted in schema only, never proven by an executable retrieval test. Fix: scope e2e checks to the current `run_id`; add a retrieval contract test (PASS retrievable; QUARANTINE only when `include_quarantine=true`; never by default).
 **Files:** `pipeline/e2e_test.py`, `pipeline/query.py`, `pipeline/retrieve.py`
-**Status:** OPEN — before T1.1
+**Status:** DONE — `db_rows` scoped to run_id + `tests/test_retrieval_quarantine_contract.py` (9295ce0)
 
 ### D2329 — Resume-Validity Manifest (2026-08-13)
 **Category:** ARCH
 **Decision:** runner resume keys on checkpoint file *existence*, not validity — no run_id / schema_version / record-count / COMPLETE-status check, so a stale or partial checkpoint can be treated as a completed stage. Roundtable finding (chatgpt). Fix: checkpoint manifest/sidecar (`run_id`, `stage_id`, `upstream_checkpoint_hash`, `pipeline_commit`, `schema_version`, `record_count`, `failed_count`, `status=COMPLETE`); resume only from a cryptographically-consistent COMPLETE checkpoint.
 **Files:** `pipeline/runner.py`
-**Status:** OPEN — before T1.1 (resume safety for the ~26h full run)
+**Status:** DONE — `_manifest_path`/`_write_checkpoint_manifest`/`_checkpoint_valid` (9295ce0)
 
 ### D2328 — S5 Calibration Doc Truthfulness + Model-Table Drift (2026-08-13)
 **Category:** VAL
 **Decision:** (a) `stage5_verify.py` docstring + `verifier_model` field still cite the pre-D2321 broken-call calibration `P=1.000/R=0.556/F1=0.714`; D2322's honest auto-cal is `P=0.647/R=0.386/F1=0.484`. (b) `runner.py` S5 description still says "DeBERTa FEVER + Phi-4-mini" (S5 is DeBERTa-only). (c) The roundtable audit prompt §1 model table is stale (lists a Phi-4-mini S4 fast gate) — a contamination source that likely drove one auditor (kimii) to fabricate a non-existent "fast gate". Fix: correct docstrings + runner description; regenerate the audit prompt from config before the next round.
 **Files:** `pipeline/stage5_verify.py`, `pipeline/runner.py`, `governance/T1.1_ROUNDTABLE_AUDIT_PROMPT.md`
-**Status:** OPEN — before T1.1 (docs must not misstate the calibration)
+**Status:** DONE — docstring/runner-desc/audit-prompt all corrected (9295ce0)
 
 ### D2327 — S1.3 Prefilter Wiring (2026-08-13)
 **Category:** BUGFIX
 **Decision:** runner invokes `stage1_3_prefilter.py` with no args (`runner.py:242` `cmd=["python3", script]`); the script's default is dry-run (`stage1_3_prefilter.py:17-18,236`). S1.3 is therefore a no-op in the normal runner — structural garbage reaches S1.5 embedding/clustering. Roundtable finding (chatgpt). Fix: pass `--in-place` in the runner, or explicitly declare the prefilter disabled so "completed-but-not-applied" is impossible.
 **Files:** `pipeline/runner.py`, `pipeline/stage1_3_prefilter.py`
-**Status:** OPEN — before T1.1
+**Status:** DONE — runner `--in-place` (9295ce0) + e2e mirror (D2343)
 
 ### D2326 — S0 Fail-Closed Ingestion (2026-08-13)
 **Category:** BUGFIX
 **Decision:** `stage0_convert` exits 0 even when books fail conversion (the `failed` list is printed but `run_stage0` never raises/`sys.exit(1)`); the post-conversion quality check swallows all exceptions (`stage0_convert.py:298-299` `except Exception: pass`). A broken quality checker or a failed conversion is indistinguishable from success — C16 violation. Fix: conversion failure → non-zero stage result (or a persisted operator-approved exclusion); quality check → passed/failed/unavailable tri-state, never silent.
 **Files:** `pipeline/stage0_convert.py`
-**Status:** OPEN — before T1.1 (C16)
+**Status:** DONE — tri-state quality check + fail-closed exit (9295ce0)
 
 ### D2325 — S6 Provenance Integrity (2026-08-13)
 **Category:** BUGFIX
 **Decision:** `stage6_commit` stamps every FB `committed_to_sqlite = not export_only` (`stage6_commit.py:530`) regardless of per-row insert failure — the `inserted`/`failed` counters exist but are not reflected in the checkpoint, so failed rows are falsely recorded as committed. Roundtable finding (chatgpt). Fix: per-FB `INSERTED/FAILED/SKIPPED` status; never claim failed rows were committed (or make the whole commit transactional).
 **Files:** `pipeline/stage6_commit.py`
-**Status:** OPEN — before T1.1 (provenance falsehood)
+**Status:** DONE — per-FB `INSERTED/FAILED/SKIPPED` + `commit_status` (9295ce0)
 
 ### D2324 — T1.1 Roundtable Audit: Independent Verification (2026-08-13)
 **Category:** GOV

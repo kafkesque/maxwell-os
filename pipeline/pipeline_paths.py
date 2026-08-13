@@ -143,6 +143,7 @@ S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", Tr
 S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate
 S2_SPLIT_PROBE_MAX_COHESION=float(_CFG.get("stage2", {}).get("split_probe_max_cohesion", 0.85))  # D2163: max cohesion for gate
 S2_MAX_FAILED_RATIO=float(_CFG.get("stage2", {}).get("max_failed_ratio", 0.0))  # D2331: fail-closed cluster-extraction tolerance
+S2_ROUTE_VALUES=frozenset(_CFG.get("stage2", {}).get("route_values", ["FB", "NULL"]))  # D2323/C12: S2 route gate
 # D2304: DSPy optimized-program persistence path (C12). Was hardcoded /tmp/dspy_mipro_optimized.json.
 # NOTE: the `s2` key (lowercase) holds DSPy training settings; `stage2` holds pipeline extraction settings.
 _dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")

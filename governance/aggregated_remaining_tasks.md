@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-13 18:05 | **Decisions:** D2000-D2341 (330) | **T1.1 = CONDITIONAL-GO — 15 must-fix items (B1-B15), ordered data-flow-first**
+> **Updated:** 2026-08-13 19:14 | **Decisions:** D2000-D2343 (332) | **T1.1 = CONDITIONAL-GO — B1-B14 implemented (B15 deferred P2)**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
@@ -16,40 +16,38 @@
 > (rated prompt's own claims as verified). These are downstream (S4/S6) correctness + config trust issues; the S6 data
 > loss is the highest-severity defect because a successful-looking full run would silently drop fields.
 
-| # | Decision | Task | Effort | Sev |
-|---|----------|------|--------|-----|
-| B11 | D2337 | S6 persist `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence` + round-trip test | 2h | 🔴 |
-| B12 | D2338 | S4/S6 fail-closed — `failed>0 → exit 1`; no COMPLETE manifest on partial commit | 1.5h | 🔴 |
-| B13 | D2339 | runner `--run-id` import-ordering (parse args before run-scoped path materialization) | 1h | 🟠 |
-| B14 | D2340 | model-registry drift — `verifier`→`classifier` (gpt-oss); remove stale `verifier_v2` (Phi) | 0.5h | 🟠 |
-| B15 | D2341 | schema corrections — three-axis `status`, keep typed edges, add TI class, feedback→YAML (P2) | 3h | 🟡 |
+| # | Decision | Task | Status |
+|---|----------|------|--------|
+| B11 | D2337 | S6 persist D2323 axes + mechanism/boundary/consequence + round-trip test | ✅ DONE |
+| B12 | D2338 | S4/S6 fail-closed — `failure_ratio > max → exit 1`; `>0 → exit 2` | ✅ DONE |
+| B13 | D2339 | runner `--run-id` pre-parse before `pipeline_paths` import | ✅ DONE |
+| B14 | D2340 | model-registry drift — session_seed renamed; config/path rename deferred (post-T1.1) | 🟠 PARTIAL |
+| B15 | D2341 | schema corrections — three-axis `status`, typed edges, TI class, feedback→YAML | 🟡 DEFERRED P2 |
 
-> **Ordering:** B11→B12 (silent permanent corruption of the first canonical corpus) → B13→B14 (run-scoping + registry
-> trust) → B15 (schema contract, defer to P2 after infra). ChatGPT's "enable hybrid" recommendation REJECTED (BUG-085).
+> **Ordering:** B11→B12 (silent permanent corruption) → B13→B14 (run-scoping + registry) → B15 (schema contract, P2).
+> ChatGPT's "enable hybrid" recommendation REJECTED (BUG-085 A/B proved net-negative).
 
 ---
 
-## 🔴 #1 — T1.1 PRE-FLIGHT BLOCKERS (B1–B10, D2324–D2332, 2026-08-13)
+## ✅ #1 — T1.1 PRE-FLIGHT BLOCKERS (B1–B10, D2324–D2332) — ALL IMPLEMENTED
 
-> **Blocks T1.1** (CONDITIONAL-GO). Roundtable (7 items) + a second independent code sweep (B1, D2332 — S2 checkpoint
-> format/resume coupling). kimii's BLOCKER (S5 fast-gate) fabricated; chatgpt's findings real; qwen's "0.65" rejected.
-> **Ordered data-flow-first** (upstream integrity → correctness → verification truth), not by auditor source.
+> **CONDITIONAL-GO → all pre-flight blockers closed.** Implemented across commit 9295ce0 (B2/B3/B4/B7/B8/B9/B10)
+> and D2343 (B1 residual: S2 resume `load_jsonl`; B5 residual: `route_values` config-driven; B6 residual: e2e `--in-place`;
+> NEW e2e ontology round-trip check [7]; integrity [11] label). Roundtable (7 items) + independent code sweep (B1).
+> kimii's BLOCKER (S5 fast-gate) fabricated; chatgpt's findings real; qwen's "0.65" rejected.
 
-| # | Decision | Task | Effort | Sev |
-|---|----------|------|--------|-----|
-| B1 | D2332 | S2 checkpoint format assertion + regenerate corrupt `latest`/`e2e` checkpoints | 1h | 🔴 |
-| B2 | D2329 | Resume-validity manifest — checkpoint sidecar (run_id/schema/count/COMPLETE); existence never implies validity | 2h | 🔴 |
-| B3 | D2326 | S0 fail-closed — conversion failure → non-zero exit; un-swallow quality-check exception (C16) | 1h | 🔴 |
-| B4 | D2323 | Content-type golden fix — 12 stale `content_type` values → 5-role ontology | 0.5h | 🔴 |
-| B5 | D2323 | Content-type enum wiring — import from `config/content_types.yaml`; drop `fact`/`meta`; D2128 route→content_type | 2h | 🟠 |
-| B6 | D2327 | S1.3 prefilter wiring — pass `--in-place` in runner (or declare disabled) | 0.5h | 🟠 |
-| B7 | D2331 | S2 silent-skip — `failed_clusters==0` or config max-failure-rate + CONDITIONAL_SUCCESS | 2h | 🟠 |
-| B8 | D2328 | S5 calibration truth — replace broken `P=1.000/R=0.556/F1=0.714` with D2322 `P=0.647/R=0.386/F1=0.484`; fix runner "Phi-4-mini" description; regenerate audit prompt | 0.5h | 🔴 |
-| B9 | D2325 | S6 provenance — per-FB `INSERTED/FAILED/SKIPPED`; never claim failed rows committed | 1h | 🔴 |
-| B10 | D2330 | e2e run-scoping (`db_rows` → current run) + quarantine retrieval contract test | 1.5h | 🟠 |
-
-> **Ordering rationale:** B1→B2 (only pair that can silently corrupt the *entire* run) → B3 (garbage-in) → B4→B5
-> (labels before enum) → B6→B7 (S2 input/output integrity) → B8→B9 (verification/commit truthfulness) → B10 (validation).
+| # | Decision | Task | Status |
+|---|----------|------|--------|
+| B1 | D2332 | S2 checkpoint fail-closed `load_jsonl` at every reader + resume | ✅ DONE (D2343) |
+| B2 | D2329 | Resume-validity manifest (run_id/schema/count/COMPLETE) | ✅ DONE |
+| B3 | D2326 | S0 fail-closed + tri-state quality check (C16) | ✅ DONE |
+| B4 | D2323 | Content-type golden fix → 5-role ontology | ✅ DONE |
+| B5 | D2323 | Content-type enum wiring + `route_values` config-driven (C12) | ✅ DONE (D2343) |
+| B6 | D2327 | S1.3 prefilter `--in-place` in runner + e2e | ✅ DONE (D2343) |
+| B7 | D2331 | S2 silent-skip fail-closed (`S2_MAX_FAILED_RATIO`) | ✅ DONE |
+| B8 | D2328 | S5 calibration truth (P=0.647/R=0.386/F1=0.484) + runner desc | ✅ DONE |
+| B9 | D2325 | S6 provenance per-FB `INSERTED/FAILED/SKIPPED` | ✅ DONE |
+| B10 | D2330 | e2e run-scoping + quarantine retrieval contract test | ✅ DONE |
 
 ---
 
@@ -261,17 +259,17 @@ POST-T1.1:    4 critical + T1.1-T1.2 + 23 medium + 5 future tax
 ## 🧭 T1.1 HANDOFF
 
 ```bash
-# Full pipeline run with hybrid gate:
-python3 pipeline/runner.py --hybrid --only-convergent
+# Full pipeline run (traditional-only — hybrid gate REJECTED, BUG-085):
+python3 pipeline/runner.py
 
-# Or stage-by-stage:
-python3 pipeline/stage2_extract.py --hybrid --only-convergent
+# Or stage-by-stage (S2 processes convergent + single-source clusters by default):
+python3 pipeline/stage2_extract.py
 python3 pipeline/stage4_merge.py
 python3 pipeline/stage5_verify.py
 python3 pipeline/stage6_commit.py
 
-# Active models: Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4) | DeBERTa-v3-large (S5) | bge-m3 (Emb)
-# S5 threshold: 0.10 (P=1.000, R=0.556) — no human adjudication needed
-# Hybrid gate: ~80% NULL clusters skipped → ~28s saved each
+# Active models: Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
+# S5 threshold: 0.10 — honest auto-cal (D2322): P=0.647, R=0.386, F1=0.484 (D2293's P=1.000 was on the broken call)
+# Hybrid gate: DISABLED for T1.1 (BUG-085 A/B: 4.3% negative rejection — net-negative)
 # ISOR: 3-dimension independence in every verified FB
 ```

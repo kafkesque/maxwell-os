@@ -641,27 +641,38 @@ def check_prompt_ids() -> tuple[bool, str]:
 # CHECK 11: Model registry matches runtime
 # ═══════════════════════════════════════════════════════════════════════════
 def check_model_registry_runtime() -> tuple[bool, str]:
-    """Verify pipeline_config.yaml model names are internally consistent."""
+    """Verify pipeline_config.yaml model names are internally consistent.
+
+    D2340: the `verifier`/`verifier_v2` role keys are misnamed — `verifier`
+    (gpt-oss) is the S4 *classifier* (D2249), and `verifier_v2` (Phi-4-mini)
+    is the S2 *probe* (D2319). The true S5 verifier is DeBERTa (`nli_large`),
+    an encoder — no family string. R5 (Generator ≠ Verifier) therefore reduces
+    to: generator family must differ from the classifier/probe family.
+    """
     with open(CONFIG_DIR / "pipeline_config.yaml") as f:
         config = yaml.safe_load(f)
 
     models = config.get("models", {})
     generator = models.get("generator", {}).get("model", "")
-    verifier = models.get("verifier", {}).get("model", "")
-    verifier_v2 = models.get("verifier_v2", {}).get("model", "")
+    classifier = models.get("verifier", {}).get("model", "")      # D2340: S4 classifier
+    probe = models.get("verifier_v2", {}).get("model", "")        # D2340: S2 probe
+    nli_large = str(models.get("nli_large", ""))
 
-    # R5: Generator ≠ Verifier (different model families)
+    # R5: Generator ≠ Verifier (different model families). The S5 verifier is
+    # DeBERTa (encoder — no LLM family), so only the classifier/probe LLMs are
+    # family-comparable against the generator.
     gen_family = "qwen" if "qwen" in generator.lower() else "unknown"
-    ver_family = "unknown"
+    cls_family = "unknown"
     for fam in ("gpt-oss", "gemma", "phi", "qwen", "deepseek", "llama"):
-        if fam in verifier.lower() or fam in verifier_v2.lower():
-            ver_family = fam
+        if fam in classifier.lower() or fam in probe.lower():
+            cls_family = fam
             break
 
-    if gen_family == ver_family and gen_family != "unknown":
-        return False, f"R5 violation: Generator ({gen_family}) = Verifier ({ver_family}) — must be different families"
+    if gen_family == cls_family and gen_family != "unknown":
+        return False, f"R5 violation: Generator ({gen_family}) = Classifier/Probe ({cls_family}) — must be different families"
 
-    return True, f"R5 compliant: Generator={gen_family}, Verifier={ver_family} (cross-family)"
+    nli_label = "DeBERTa" if "deberta" in nli_large.lower() else (nli_large or "unset")
+    return True, f"R5 compliant: Generator={gen_family}, Classifier/Probe={cls_family}, S5 verifier={nli_label} (cross-family)"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

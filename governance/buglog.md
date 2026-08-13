@@ -1,6 +1,16 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-13 (D2337-D2341 — 4-LLM audit adjudication: S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections)
+> **Last updated:** 2026-08-13 (D2337-D2343 — 4-LLM audit adjudication + pre-T1.1 residual closures)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟠 BUG-101 — 2026-08-13 — T1.1 handoff instructs runner flags that don't exist + stale S5 calibration
+- **Symptom:** `governance/aggregated_remaining_tasks.md` T1.1 handoff said `python3 pipeline/runner.py --hybrid --only-convergent`. `runner.py` argparse rejects both `--hybrid` and `--only-convergent` (they are `stage2_extract.py` flags, never forwarded by the runner — `STAGES["2"]` has no `args`). Running the handoff verbatim fails with `unrecognized arguments`. Also carried the pre-D2321 broken calibration `S5 threshold 0.10 (P=1.000, R=0.556)` and implied hybrid-gate use.
+- **Root cause:** Handoff written before D2327/D2328/D2339 landed; never re-synced when the runner gained resume-validity manifest (D2329) and the calibration was corrected (D2322). The runner never forwards S2 sub-flags by design.
+- **Fix (D2343):** Corrected handoff to `python3 pipeline/runner.py` (traditional-only — hybrid REJECTED per BUG-085) + stage-by-stage `stage2_extract.py` (no sub-flags); corrected S5 numbers to D2322's P=0.647/R=0.386/F1=0.484; annotated hybrid DISABLED.
+- **Status:** 🟢 FIXED (2026-08-13) — handoff now matches the runner's actual interface.
+- **Files:** `governance/aggregated_remaining_tasks.md`
+- **Source:** tooling-alignment audit (`just` recipes + handoff) this session
 
 ---
 

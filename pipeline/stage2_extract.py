@@ -46,7 +46,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.io_guard import safe_write
+from pipeline.io_guard import load_jsonl, safe_write
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
@@ -66,6 +66,7 @@ from pipeline.pipeline_paths import (
     S2_MINHASH_NUM_PERM,
     S2_MINHASH_THRESHOLD,
     S2_OMLX_RETRY,
+    S2_ROUTE_VALUES,  # D2323/C12: S2 route gate (config-driven)
     S2_SPLIT_KMEANS_RANDOM_STATE,
     S2_SPLIT_PROBE_ENABLED,
     S2_SPLIT_PROBE_MAX_COHESION,
@@ -112,7 +113,7 @@ _FB_REQUIRED_FIELDS: dict[str, tuple[type, int]] = {
     "elaboration": (str, -1),        # D2215: optional — Qwen3-Coder omits entirely; empty string is valid
     "route": (str, 0),               # Must be string
 }
-_VALID_ROUTES: frozenset[str] = frozenset({"FB", "NULL"})
+_VALID_ROUTES: frozenset[str] = S2_ROUTE_VALUES  # D2323/C12: config-driven route gate
 # D2323: enums sourced from config/content_types.yaml (C12 config-first),
 # never re-declared here. extraction_type is also validated (was previously
 # unvalidated — any string passed through, defaulting to "causal_mechanism").
@@ -1225,11 +1226,9 @@ def run_stage2(
     segids_file: str = str(STAGE2_CHECKPOINT) + ".segids"
     if STAGE2_CHECKPOINT.exists() and os.path.exists(segids_file):
         try:
-            with open(STAGE2_CHECKPOINT) as f:
-                for line in f:
-                    line = line.strip()
-                    if line:
-                        all_fbs.append(json.loads(line))
+            # D2332: fail-closed JSONL read — a pretty-printed/multi-line checkpoint
+            # must raise (caught below → fresh start), never silently subset-parse.
+            all_fbs.extend(load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint"))
             with open(segids_file) as f:
                 processed_ids = set(json.load(f))
             # D2215: Detect cluster-ID format mismatch between old segids and current probe cache.

@@ -96,6 +96,12 @@ _STAGE_ID_BY_SCRIPT = {
     "stage6_commit.py": "6",
 }
 
+# D2327: mirror runner.py — S1.3 prefilter defaults to dry-run; pass --in-place
+# so structural garbage is actually filtered before S1.5 (was a silent no-op in e2e).
+_STAGE_EXTRA_ARGS: dict[str, list[str]] = {
+    "stage1_3_prefilter.py": ["--in-place"],
+}
+
 
 def _get_stage_timeout(stage_script: str) -> float | None:
     """D2311: Read per-stage timeout from config; fall back to 3600s.
@@ -135,7 +141,7 @@ def run_stage(stage_script: str, quality: str = "balanced", books: int = 20, sub
         env["MAXWELL_SKIP_GEMMA"] = "1"
     stage_timeout = _get_stage_timeout(stage_script)
     result = subprocess.run(
-        [sys.executable, str(PROJECT_ROOT / "pipeline" / stage_script)],
+        [sys.executable, str(PROJECT_ROOT / "pipeline" / stage_script), *_STAGE_EXTRA_ARGS.get(stage_script, [])],
         capture_output=True,
         text=True,
         timeout=stage_timeout,  # D2311: config-driven (S2=null/unlimited)
@@ -266,6 +272,27 @@ def validate_results() -> dict:
             "passed": ok,
         })
         if not ok:
+            results["passed"] = False
+
+        # Check 7: D2337 ontology round-trip — the D2323 axes + mechanism must
+        # survive S4→S5→S6 into SQLite. A commit that silently drops these would
+        # pass db_rows yet still be a degraded (lossy) corpus.
+        conn = sqlite3.connect(str(DB_PATH))
+        populated = conn.execute(
+            "SELECT COUNT(*) FROM fbs WHERE pipeline_run_id = ? "
+            "AND (content_type IS NOT NULL AND content_type != '') "
+            "AND (extraction_type IS NOT NULL AND extraction_type != '')",
+            (get_run_id(),),
+        ).fetchone()[0]
+        conn.close()
+        ontology_ok = row_count > 0 and populated >= row_count * 0.9
+        results["checks"].append({
+            "check": "db_ontology_roundtrip",
+            "value": f"{populated}/{row_count} rows carry content_type+extraction_type",
+            "threshold": "≥90%",
+            "passed": ontology_ok,
+        })
+        if not ontology_ok:
             results["passed"] = False
     else:
         results["checks"].append({"check": "db_rows", "value": "no database", "passed": False})

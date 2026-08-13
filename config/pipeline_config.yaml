@@ -174,6 +174,7 @@ stage2:
   omlx_retry_attempts: 2
   batch_position_monitor: false
   max_workers: 3
+  route_values: ["FB", "NULL"]   # D2323/C12: S2 route gate — FB=forward to S4, NULL=skip cluster (quoted: YAML parses bare NULL as None)
   max_failed_ratio: 0.0   # D2331: fail-closed cluster extraction — if failed_clusters/total > this ratio, exit non-zero (0.0 = any failure fatal). Operator may raise to approve known-bad skips.
 stage4:
   process_template_output: process_templates.jsonl

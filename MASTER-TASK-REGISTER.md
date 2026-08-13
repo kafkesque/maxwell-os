@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-13 18:05 | **Decisions:** D2000-D2341 (330 decisions)
+> **Updated:** 2026-08-13 19:14 | **Decisions:** D2000-D2343 (332 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -17,19 +17,18 @@
 > independently re-verified here. **Findings surfaced 5 new blockers (B11–B15) on top of the B1–B10 set**, the most
 > serious of which is NOT the S2/OMLX reliability I'd been focused on, but a **Stage 6 SQLite data-loss bug** (D2337).
 
-| # | Decision | Task (code-verified) | Effort | Sev |
-|---|----------|----------------------|--------|-----|
-| **B11** | D2337 | S6 persist `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence` + round-trip test | 2h | 🔴 |
-| **B12** | D2338 | S4/S6 fail-closed — `failed>0 → exit 1`, no COMPLETE manifest | 1.5h | 🔴 |
-| **B13** | D2339 | runner `--run-id` import-ordering — parse args before run-scoped imports | 1h | 🟠 |
-| **B14** | D2340 | model-registry drift — `verifier`→`classifier` (gpt-oss), remove stale `verifier_v2` (Phi) | 0.5h | 🟠 |
-| **B15** | D2341 | schema corrections — three-axis `status`, keep typed edges, add TI class, feedback→YAML (P2) | 3h | 🟡 |
+| # | Decision | Task (code-verified) | Effort | Status |
+|---|----------|----------------------|--------|--------|
+| **B11** | D2337 | S6 persist `content_type`/`extraction_type`/`mechanism`/`boundary`/`consequence` + round-trip test | 2h | ✅ DONE |
+| **B12** | D2338 | S4/S6 fail-closed — `failure_ratio > max → exit 1`, `>0 → exit 2`, no COMPLETE manifest | 1.5h | ✅ DONE |
+| **B13** | D2339 | runner `--run-id` import-ordering — pre-parse args before run-scoped imports | 1h | ✅ DONE |
+| **B14** | D2340 | model-registry drift — session_seed renamed; config/path rename deferred (post-T1.1) | 0.5h | 🟠 PARTIAL |
+| **B15** | D2341 | schema corrections — three-axis `status`, keep typed edges, add TI class, feedback→YAML (P2) | 3h | 🟡 DEFERRED |
 
 > **Ordering:** B11→B12 first (S6 data loss + fail-open = silent permanent corruption of the first canonical corpus).
-> B13→B14 are config/run-scoping correctness (no data loss, but untrustworthy registry/isolation). B15 is schema
-> contract work deferred to P2 (after the infra blockers). NOTE: ChatGPT's "enable hybrid gate" recommendation is
-> **REJECTED** — BUG-085 A/B test already proved the heuristic HybridGate is net-negative (4.3% negative rejection);
-> run traditional-only.
+> B13→B14 are config/run-scoping correctness. B15 is schema contract work deferred to P2. NOTE: ChatGPT's "enable hybrid
+> gate" recommendation is **REJECTED** — BUG-085 A/B test already proved the heuristic HybridGate is net-negative
+> (4.3% negative rejection); run traditional-only. **B11–B14 now IMPLEMENTED; B14 config/path rename + B15 deferred post-T1.1.**
 
 ---
 
@@ -41,22 +40,22 @@
 > NOT by auditor source. See D2324 for the roundtable verification record (kimii's findings rejected as fabricated; qwen's
 > "0.65 threshold" rejected).
 
-| # | Decision | Task (code-verified) | Effort | Sev |
-|---|----------|----------------------|--------|-----|
-| **B1** | D2332 | S2 checkpoint format assertion + regenerate corrupt `latest`/`e2e` checkpoints | 1h | 🔴 |
-| **B2** | D2329 | Resume-validity manifest — checkpoint sidecar (run_id/schema/count/COMPLETE); existence never implies validity | 2h | 🔴 |
-| **B3** | D2326 | S0 fail-closed — conversion failure → non-zero exit; un-swallow quality-check exception (C16) | 1h | 🔴 |
-| **B4** | D2323 | Content-type golden fix — 12 stale `content_type` values → 5-role ontology | 0.5h | 🔴 |
-| **B5** | D2323 | Content-type enum wiring — import from `config/content_types.yaml`; drop `fact`/`meta`; D2128 route→content_type | 2h | 🟠 |
-| **B6** | D2327 | S1.3 prefilter wiring — pass `--in-place` in runner (or declare disabled) | 0.5h | 🟠 |
-| **B7** | D2331 | S2 silent-skip — `failed_clusters==0` or config max-failure-rate + CONDITIONAL_SUCCESS | 2h | 🟠 |
-| **B8** | D2328 | S5 calibration truth — replace broken `P=1.000/R=0.556/F1=0.714` with D2322 honest numbers; fix runner "Phi-4-mini" description; regenerate audit prompt | 0.5h | 🔴 |
-| **B9** | D2325 | S6 provenance — per-FB `INSERTED/FAILED/SKIPPED`; don't claim failed rows committed | 1h | 🔴 |
-| **B10** | D2330 | e2e run-scoping (db_rows → current run) + quarantine retrieval contract test | 1.5h | 🟠 |
+| # | Decision | Task (code-verified) | Effort | Status |
+|---|----------|----------------------|--------|--------|
+| **B1** | D2332 | S2 checkpoint fail-closed `load_jsonl` at every reader + resume | 1h | ✅ DONE (D2343) |
+| **B2** | D2329 | Resume-validity manifest — checkpoint sidecar (run_id/schema/count/COMPLETE) | 2h | ✅ DONE |
+| **B3** | D2326 | S0 fail-closed + tri-state quality check (C16) | 1h | ✅ DONE |
+| **B4** | D2323 | Content-type golden fix → 5-role ontology | 0.5h | ✅ DONE |
+| **B5** | D2323 | Content-type enum wiring + `route_values` config-driven (C12) | 2h | ✅ DONE (D2343) |
+| **B6** | D2327 | S1.3 prefilter `--in-place` in runner + e2e | 0.5h | ✅ DONE (D2343) |
+| **B7** | D2331 | S2 silent-skip fail-closed (`S2_MAX_FAILED_RATIO`) | 2h | ✅ DONE |
+| **B8** | D2328 | S5 calibration truth (P=0.647/R=0.386/F1=0.484) + runner desc + audit prompt | 0.5h | ✅ DONE |
+| **B9** | D2325 | S6 provenance per-FB `INSERTED/FAILED/SKIPPED` | 1h | ✅ DONE |
+| **B10** | D2330 | e2e run-scoping + quarantine retrieval contract test | 1.5h | ✅ DONE |
 
 > **Ordering rationale:** B1→B2 first (checkpoint format + resume coupling is the only pair that can silently corrupt the
 > *entire* run). B3 before B4–B7 (garbage-in). B4 before B5 (labels before enum). B5 before B7 (S2 must emit correct types
-> before S4 can route). B8–B9 last (verification/commit truthfulness — corrupts claims, not data).
+> before S4 can route). B8–B9 last (verification/commit truthfulness — corrupts claims, not data). **All B1–B10 IMPLEMENTED.**
 
 ---
 

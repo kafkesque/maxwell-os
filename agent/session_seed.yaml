@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-13 (D2337-D2341: 4-LLM audit adjudication — S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections — CONDITIONAL-GO)
+# Updated: 2026-08-13 (D2337-D2343: 4-LLM audit adjudication + pre-T1.1 residual closures — CONDITIONAL-GO)
 
 session:
     version: "3.0.0"
@@ -128,28 +128,21 @@ phase:
         - Tier 1: architecture restructure (cluster-before-extract) ✅
         - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
         - D2092-D2114: v3.0 architecture decisions recorded ✅
+    completed:
+        - B1-B10 (D2325-D2332): pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343 residual closures)
+        - B11 (P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence (D2337, BUG-095)
+        - B12 (P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
+        - B13 (P1): runner --run-id import-order isolation (D2339, BUG-097)
+        - B14 (P1): model-registry drift correction — session_seed rename done; config/path rename deferred (D2340, BUG-099)
     pending:
-        - B1-B10 (D2325-D2332): pre-T1.1 blockers, data-flow ordered — BLOCKS T1.1 (CONDITIONAL-GO)
-        - B1: S2 checkpoint format assertion + regenerate corrupt checkpoints (D2332)
-        - B2: resume-validity manifest (D2329)
-        - B3: S0 fail-closed (D2326)
-        - B4-B5: content-type golden fix + enum wiring (D2323)
-        - B6: S1.3 prefilter --in-place (D2327)
-        - B7: S2 silent-skip counter (D2331)
-        - B8: S5 calibration truth (D2328)
-        - B9: S6 provenance (D2325)
-        - B10: e2e run-scoping (D2330)
-        - B11 (NEW, P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence (D2337, BUG-095)
-        - B12 (NEW, P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
-        - B13 (NEW, P1): runner --run-id import-order isolation (D2339, BUG-097)
-        - B14 (NEW, P1): model-registry drift correction (D2340, BUG-099)
-        - B15 (NEW, P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)
+        - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)
+        - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml
         - Q6: 5+ book E2E test with meaningful convergent extraction
         - Tier 2: quality calibration (golden set audit, manual FB review)
         - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
         - C8: D2066 dynamic canonical taxonomy
         - C9: D2067 cross-run incremental extraction
-    next_phase: B1-B10 pre-flight fixes → T1.1 full run → Tier 2 quality calibration
+    next_phase: T1.1 full run → Tier 2 quality calibration
 
 # ── Book Library ──
 book_library:

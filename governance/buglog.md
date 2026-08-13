@@ -69,7 +69,7 @@
   1. Format drift — current writer (`stage2_extract.py:1461,1544,1709,1734`) emits compact single-line `json.dumps(fb)`; the on-disk pretty-printed files are a legacy/unresolved-provenance artifact (handoff "still-open #1"). Code and disk disagree.
   2. Resume keys on existence (`runner.py:185-193` `find_resume_point`) — a corrupt-but-present checkpoint is treated as a completed stage, so resume skips S2 and feeds garbage to S4.
 - **Fix (D2332):** (a) fail-closed JSONL boundary assertion at every S2-checkpoint reader; (b) regenerate corrupt `latest`/`e2e` checkpoints; (c) D2329 resume-validity manifest (existence never implies validity).
-- **Status:** 🔴 OPEN — fix before T1.1
+- **Status:** 🟢 FIXED (D2332/D2343, 2026-08-13) — `load_jsonl` fail-closed read wired into `stage2_extract.py` resume reader (D2343) + bridge/S4 (9295ce0). Corrupt `latest/checkpoint.jsonl` already quarantined as `checkpoint.jsonl.orig_48mb`; no active `checkpoint.jsonl` remains → S2 starts fresh, never subset-parses. Resume-validity manifest (D2329) guards existence≠validity.
 - **Files:** `pipeline/stage2_extract.py`, `pipeline/bridge_s2_to_s4.py`, `pipeline/stage4_merge.py`, `pipeline/runner.py`
 
 ---

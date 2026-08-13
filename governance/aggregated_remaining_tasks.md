@@ -58,11 +58,30 @@
 | # | Task | Status |
 |---|------|--------|
 | 1 | Freeze contract → `config/content_types.yaml` (2 axes, core+extension, 13-field TI, D2150/D2128) | ✅ DONE (D2323) |
-| 2 | Fix golden few-shot `content_type` values (`model/heuristic/pattern` → correct ontology) | ⏳ NEXT — contamination fix |
-| 3 | Wire enums: `schemas.py` + `stage2_extract._VALID_CONTENT_TYPES` + `stage4_merge` routing → registry | ⏳ NEXT |
-| 4 | Fix route→content_type mapping (D2128) + drop vestigial `fact`/`meta` | ⏳ NEXT |
-| 5 | Verify 4 orphaned FBs (3 PT + 1 TI) flow end-to-end | ⏳ NEXT |
+| 2 | Fix golden few-shot `content_type` values (`model/heuristic/pattern` → correct ontology) | ✅ DONE — all 77 golden FBs carry `content_type=principle` (verified 2026-08-13) |
+| 3 | Wire enums: `schemas.py` + `stage2_extract._VALID_CONTENT_TYPES` + `stage4_merge` routing → registry | ✅ DONE (except `ToolInstruction` Pydantic class = B15/D2341, P2) |
+| 4 | Fix route→content_type mapping (D2128) + drop vestigial `fact`/`meta` | ✅ DONE — `ROUTE_TO_CONTENT_TYPE` + `DROPPED_CONTENT_TYPES={fact,meta}` live |
+| 5 | Verify 4 orphaned FBs (3 PT + 1 TI) flow end-to-end | ⚪ MOOT — current DB has 0 rows with axes populated (all pre-D2337); re-verify after T1.1 canary |
 | 6 | (deferred) S4 rich per-type extension-field generation (steps/trigger/prerequisite…) | post-T1.1 |
+
+---
+
+## 🔍 #3 — PRE-T1.1 VERIFICATION GATE (canary examine — run BEFORE full corpus)
+
+> The code closures (B1–B14) are committed (50280a1). The **only** thing left before the full run is to *examine*
+> them end-to-end on a small slice — the full corpus has never been through S2 (status: S2 extract = 0).
+
+| # | Task | Status |
+|---|------|--------|
+| V1 | Run a **~1,000-cluster canary** through S1.5→S2→S4→S5→S6 | ⏳ NEXT |
+| V2 | Verify e2e **check [7]** — ≥90% rows carry `content_type`+`extraction_type` (D2337 ontology round-trip) | ⏳ blocked on V1 |
+| V3 | Verify **BUG-095** (S6 persists 6 D2337 columns) on real canary rows (not just unit round-trip) | ⏳ blocked on V1 |
+| V4 | Verify **BUG-096** (S4/S6 fail-closed exit codes on injected partial failure) | ✅ unit-tested (exit 1 / exit 0); canary re-confirm |
+| V5 | Re-open ontology item #5 — confirm PT/PI/TI FBs (if any) survive S4→S6 with non-`principle` `content_type` | ⏳ blocked on V1 |
+| V6 | Confirm **BUG-094** fix: no active `checkpoint.jsonl` → S2 fresh-start (already quarantined `.orig_48mb`) | ✅ verified (no checkpoint.jsonl present) |
+
+> **Decision gate:** if V1–V6 green → launch full T1.1 (`python3 pipeline/runner.py`). If canary shows
+> axes dropped or fail-open, STOP and re-open the relevant D2337/D2338 bug before the full corpus.
 
 ---
 

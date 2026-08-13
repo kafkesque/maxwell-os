@@ -197,24 +197,24 @@
 
 ---
 
-## 🔴 OPEN BUGS
+## 🔴 OPEN BUGS (current — 2026-08-13)
+
+> Older BUG-001/011/012/013/014/045/050/051/054/055/085 resolved in prior sessions (see buglog.md SESSION RESOLUTIONS). None block T1.1.
 
 | Bug ID | Severity | Description |
 |--------|----------|-------------|
-| BUG-001 | 🔴 CRITICAL | Empty pass loop — verification checks random principles |
-| BUG-014 | 🔴 CRITICAL | Cloud burst code violates C1/C3 |
-| BUG-054 | 🔴 CRITICAL | Qwen3-Coder delegate fails — OMLX JSON parse error |
-| BUG-085 | 🔴 CRITICAL | hybrid_s2_extract() not wired to stage2_extract.py |
-| BUG-013 | 🟠 HIGH | OMLX guard uses pkill -f (kills pipeline itself) |
-| BUG-012 | 🟠 HIGH | sqlite-vec not loaded before CREATE VIRTUAL TABLE |
-| BUG-055 | 🟠 HIGH | related_fbs vs related_blocks field name mismatch |
-| BUG-083 | 🟠 MED | domain_anchors.yaml predates current corpus (80.5% "emerging") |
-| BUG-084 | 🟠 MED | Golden depth calibration: universal=1, specialized=1 |
-| BUG-045 | 🟡 MED | Stage 2 evidence passages inflated (metadata bloat) |
-| BUG-050 | 🟡 MED | Only 3 of 20 books chunked — insufficient convergence |
-| BUG-051 | 🟡 MED | just smoke processes ALL 852 books instead of 1 |
-| BUG-011 | 🟡 MED | Zero tests |
-| BUG-073 | ⚪ LOW | CONV-035/037 false convergence (D2232 pending) |
+| BUG-063 | 🔴 OPEN | `delegate()` cannot execute filesystem tasks (architectural; NOT a T1.1 pipeline blocker) |
+| BUG-098 | 🟡 PARTIAL | `psutil` in requirements.txt done; integrity-check whitelist→requirements refactor deferred |
+| BUG-099 | 🟡 PARTIAL | model-registry rename — session_seed done; config/path rename deferred post-T1.1 |
+
+### ⏳ DEFERRED (post-T1.1)
+
+| Bug ID | Description |
+|--------|-------------|
+| BUG-083 | `domain_anchors.yaml` predates corpus (80.5% "emerging") — D2292 golden depth expansion |
+| BUG-084 | Golden depth calibration universal=1/specialized=1 — D2292 |
+| BUG-081 | `evals/golden_cases.json` v2 format migration |
+| BUG-073 | CONV-035/037 false convergence — D2232 |
 
 ### ✅ RESOLVED BUGS (this + recent sessions)
 
@@ -224,7 +224,6 @@
 | BUG-080.1 | _save_diag_state flush/fsync outside with block | ✅ FIXED |
 | BUG-080.9 | S5 method tag dict missing "nli+LLM-echo" | ✅ FIXED |
 | BUG-080.10 | S5 method tag dict missing "mech_quality" | ✅ FIXED |
-| BUG-081 | evals/golden_cases.json v2 format | 🟡 OPEN |
 | BUG-082 | S5 FLAG path practically unreachable (0/185) | ✅ CONFIRMED — FLAG path deleted (D2298) |
 | BUG-076 | S5 NLI config overrides DeBERTa FEVER | ✅ FIXED (D2255) |
 | BUG-077 | stage5_verify.py docstring triple-stale | ✅ FIXED (D2256) |
@@ -239,7 +238,7 @@
 
 | Decision | Description | Status |
 |----------|-------------|--------|
-| D2298 | **DeBERTa-only NLI** — RoBERTa removed. Threshold 0.10 (P=1.000, R=0.556, F1=0.714). Single encoder. No human adjudication needed. | ✅ DONE |
+| D2298 | **DeBERTa-only NLI** — RoBERTa removed. Threshold 0.10. Single encoder. No human adjudication needed. ⚠️ Calibration superseded by D2322: honest P=0.647/R=0.386/F1=0.484 (D2293's P=1.000 was on the broken pre-BUG-092 call). | ✅ DONE |
 | D2299 | **4-value unpack bug fixed** — deberta_check call site updated to 3-value unpack. Docstrings updated to DeBERTa-only. | ✅ DONE |
 | — | RoBERTa-large removed from S5 (zero signal on paraphrase evidence, D2227) | ✅ DONE |
 | — | Phi-4-mini removed from S5 (67% acc, hallucination risk) | ✅ DONE |
@@ -352,22 +351,23 @@
 ## 🔗 NEXT EXECUTION ORDER
 
 ```
-1. R1-R7 (D2325-D2331) → Roundtable silent-failure fixes (~8.5h total) — BLOCKS T1.1
-2. D2323 wiring (#2-#5)  → Content-type ontology: golden fix + enum wiring + 4-FB flow (~3-4h)
-3. P0.1 (D2276) → Wire hybrid S2 to production (~8h) — highest quality lever (optional, --hybrid NOT enabled for T1.1)
-4. T1.1         → Launch full S1.3→S6 run (~26h wall-clock)
-5. T1.2         → Yield diagnostic on full run output
-6. P1.x         → Claim decomposition, golden expansion, enrichment verification (post-T1.1)
-7. T2.x         → Business PI, atomic evidence, trust state machine
+1. ✅ B1-B10 (D2325-D2332) → pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343)
+2. ✅ B11-B14 (D2337-D2340) → S6 data-loss / fail-closed / run-id / registry — IMPLEMENTED (B14 config rename deferred)
+3. ❌ P0.1 (D2276) hybrid gate → REJECTED for T1.1 (BUG-085 A/B net-negative 4.3% rejection) — run traditional-only
+4. ⏳ B15 (D2341) schema corrections (TI class, three-axis status, typed edges, feedback→YAML) → DEFERRED P2
+5. 🚀 T1.1 → Launch full run (canary first, then full corpus)
+6. T1.2 → Yield diagnostic on full run output
+7. P1.x → Claim decomposition, golden expansion, enrichment verification (post-T1.1)
+8. T2.x → Business PI, atomic evidence, trust state machine
 ```
 
 ## 🧭 HANDOFF POINTER
 
 ```
 1. Verify OMLX health: curl -s localhost:11435/health
-2. Active S5: DeBERTa-only, threshold 0.10, stage5_verify.py clean
+2. Active S5: DeBERTa-only, threshold 0.10 (honest cal D2322: P=0.647/R=0.386/F1=0.484), stage5_verify.py clean
 3. Config: verifier=DeBERTa-v3-large, classifier=gpt-oss-20b-MXFP4-Q8, generator=Qwen3-Coder-30B
-4. S2 hybrid NOT wired (BUG-085) — highest priority
+4. Hybrid gate REJECTED for T1.1 (BUG-085) — run traditional-only: python3 pipeline/runner.py
 5. D2298 marks S5 architecture final — no ongoing human adjudication
 ```
 

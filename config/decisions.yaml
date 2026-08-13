@@ -2058,10 +2058,9 @@ decisions:
   title: S5 Precision/Recall from Adjudicated Sample (D2293)
   category: VAL
   status: complete
-  note: Completed via D2298 — DeBERTa-only calibration (12 FBs). P=1.000, R=0.556, F1=0.714 at threshold 0.10. No ongoing
-    adjudication needed.
+  note: 'SUPERSEDED by D2322 — P=1.000/R=0.556/F1=0.714 was measured on the broken pre-BUG-092 single-sequence DeBERTa call and is NOT reproducible. Honest auto-cal (D2322): P=0.647/R=0.386/F1=0.484 at threshold 0.10.'
   files: governance/
-  state: ACTIVE
+  state: SUPERSEDED
 - id: D2294
   title: 'Dual-Encoder S5: DeBERTa-large + RoBERTa-large Replace Phi-4-mini'
   category: INF

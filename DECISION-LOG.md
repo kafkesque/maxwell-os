@@ -4766,6 +4766,9 @@ overnight. (3) Documented in ROUNDTABLE_MASTER_PROMPT.md §G.
   - Recall: 0.556 (4 false negatives — all D2227 evidence-quality issues)
   - F1: 0.714
   - 0.3s/FB on MPS
+  - ⚠️ SUPERSEDED by D2322 (2026-08-13): these numbers were measured on the broken
+    pre-BUG-092 single-sequence DeBERTa call. Honest auto-calibration (466 pairs):
+    **P=0.647 / R=0.386 / F1=0.484 at threshold 0.10**. Threshold unchanged.
 - **Architecture:** Single DeBERTa-v3-large encoder. ENTAIL ≥ 0.10 → PASS.
   Otherwise → QUARANTINE. No decoder LLM. No human FLAG path (DeBERTa is final).
   Delete: BORP (S1.5 guarantees ≥2), Completeness (S4 fills all fields), Phi-4-mini

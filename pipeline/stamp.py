@@ -60,10 +60,23 @@ _PIPELINE_RUN_ID: str | None = None
 
 def get_pipeline_run_id() -> str:
     """Return the current pipeline run ID (created once, reused).
-    P0.9 FIX: was regenerated per call, breaking R14 lineage for 6 of 7 stages."""
+
+    D2335: derive from the pipeline `run_id` (MAXWELL_RUN_ID / config default)
+    instead of a fresh `uuid4()` per process. The UUID singleton was generated
+    once per *process*, but every stage runs as its own subprocess — so S2, S4,
+    and S6 each stamped a different `pipeline_run_id`, breaking R14 lineage
+    across stages AND breaking e2e DB scoping (rows were stamped with a UUID
+    while `e2e_test.py` filters `WHERE pipeline_run_id = get_run_id()`).
+    """
     global _PIPELINE_RUN_ID
     if _PIPELINE_RUN_ID is None:
-        _PIPELINE_RUN_ID = uuid.uuid4().hex
+        from pipeline.pipeline_paths import get_run_id
+
+        run_id = get_run_id() or ""
+        # Use the named run_id so pipeline_run_id == run_id across all stage
+        # subprocesses (stable lineage + scoping). Fall back to a UUID only if
+        # run_id is somehow empty (config always provides `run.default_id`).
+        _PIPELINE_RUN_ID = run_id if run_id else uuid.uuid4().hex
     return _PIPELINE_RUN_ID
 
 

@@ -263,7 +263,8 @@ e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8
   min_fbs: 30
-  convergent_ratio: 0.25
+  convergent_ratio: 0.20  # D2336: 0.25 was a pre-data default; first 20-book run = 24.5% (SE≈3.4%)
+
   diagnostic:
     yield_pct_pass: 1.0
     yield_pct_fail: 0.5

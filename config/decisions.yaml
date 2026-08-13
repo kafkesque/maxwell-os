@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-13T13:37:09Z'
-total_decisions: 323
+last_sync: '2026-08-13T13:46:33Z'
+total_decisions: 325
 decisions:
 - id: D2092
   category: INF
@@ -2541,17 +2541,31 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+- id: D2335
+  category: INF
+  state: ACTIVE
+  description: '**Category:** BUGFIX'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2336
+  category: INF
+  state: ACTIVE
+  description: '**Category:** VAL'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
 summary:
-  total: 323
+  total: 325
   proposed: 0
   draft: 0
-  active: 279
+  active: 281
   stale: 0
   superseded: 12
   archived: 9
   rejected: 7
   by_category:
-    INF: 181
+    INF: 183
     QLT: 30
     GOV: 19
     RES: 4

@@ -79,7 +79,7 @@ models:
     provider: omlx
     temperature: 0.0
     max_tokens: 1024
-  verifier:
+  verifier:  # D2340: MISNAMED — this is actually the S4 classifier (D2249), consumed as VERIFY_MODEL in stage4_merge.py
     model: gpt-oss-20b-MXFP4-Q8
     provider: omlx
     temperature: 0.0
@@ -87,12 +87,11 @@ models:
     reasoning_off_models:
     - gpt-oss-20b-MXFP4-Q8
     max_tokens: 1024
-  verifier_v2:
+  verifier_v2:  # D2340: MISNAMED — this is actually the S2 fast probe (D2319), consumed as VERIFY_MODEL_V2 in stage2_extract.py
     model: Phi-4-mini-instruct-8bit
     provider: omlx
     temperature: 0.0
-    notes: 'D2264: S5 deep check swapped from Gemma-4-E4B (33% acc) to Phi-4-mini (67% acc, 2x better). R5: DeBERTa FEVER
-      (encoder) != Phi-4-mini (decoder).'
+    notes: 'D2319: S2 fast probe (~1.5s). D2298 removed Phi from S5 *verification* only; S5 = DeBERTa-only (models.nli_large).'
   embeddings:
     model: bge-m3
     provider: ollama

@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -42,6 +43,27 @@ from typing import Any
 # Project root (runner.py lives in pipeline/)
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
+
+
+# ── D2339: pre-parse --run-id BEFORE importing pipeline_paths ──────────────
+# pipeline_paths caches get_run_id() on first call, and runner's STAGES /
+# _RESUME_MARKER materialize that id at module import time. Previously argparse
+# set MAXWELL_RUN_ID only inside main(), AFTER those module-level constants were
+# already built with the default "latest" id — so `runner.py --run-id corpus-X`
+# silently wrote into the latest/ run dir. Pre-parse argv so the run id is
+# correct before any run-scoped path is constructed.
+def _pre_parse_run_id(argv: list[str]) -> None:
+    for i, a in enumerate(argv):
+        if a == "--run-id" and i + 1 < len(argv):
+            os.environ["MAXWELL_RUN_ID"] = argv[i + 1]
+            return
+        if a.startswith("--run-id="):
+            os.environ["MAXWELL_RUN_ID"] = a.split("=", 1)[1]
+            return
+
+
+_pre_parse_run_id(sys.argv)
+
 
 from pipeline.pipeline_paths import (  # noqa: E402
     CHECKPOINT_DIR,

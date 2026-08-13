@@ -24,7 +24,7 @@
 - **Symptom:** `runner.py --run-id corpus-X` does NOT isolate checkpoints/manifests; run-scoped paths are materialized with the default `latest` run_id before argparse runs.
 - **Root cause:** `STAGE_CHECKPOINTS` (`:84,132,139`) and `_RESUME_MARKER` (`:152`) call `get_run_id()` at MODULE level; `--run-id` sets `MAXWELL_RUN_ID` only in `main()` (`:661-669`) after `pipeline_paths` cached the default.
 - **Fix (D2339):** Parse args before run-scoped imports, or lazy `RunContext` in `pipeline_paths`; two-run isolation test.
-- **Status:** 🟠 OPEN — P1
+- **Status:** 🟢 FIXED (2026-08-13) — `_pre_parse_run_id()` pre-parses `--run-id` before `pipeline_paths` import; verified both `--run-id X` and `--run-id=X` forms.
 - **Files:** `pipeline/runner.py`, `pipeline/pipeline_paths.py`
 - **Source:** ChatGPT audit Block #8; independently re-verified
 
@@ -32,17 +32,17 @@
 - **Symptom:** `psutil` imported by 4 files (`run_monitor.py`, `memory_guard.py`, `run_diagnostic.py`, `n2_watchdog.py`) but absent from `requirements.txt`. Integrity checker's manual `KNOWN_PACKAGES` list masks it.
 - **Root cause:** Dependency declared by convention, never added to the manifest.
 - **Fix:** Add `psutil>=6.0` to `requirements.txt`; make the dependency audit parse the actual requirements file, not a whitelist.
-- **Status:** 🟡 OPEN — P1 (low risk; only matters on fresh install)
+- **Status:** 🟡 PARTIAL — `psutil>=6.0` added to `requirements.txt` (2026-08-13); `integrity_check.py` whitelist→requirements parsing refactor deferred.
 - **Files:** `requirements.txt`, `pipeline/integrity_check.py`
 - **Source:** ChatGPT audit §10; independently re-verified
 
-## 🟠 BUG-099 — 2026-08-13 — Model registry drift: gpt-oss/Phi stale as "verifier" vs DeBERTa-only S5
-- **Symptom:** `stage5_verify.py` = DeBERTa-only (D2298, Phi DELETED), but `pipeline_config.yaml` (`verifier: gpt-oss`, `verifier_v2: Phi`), `model_assignments.yaml` (`S5_VERIFIER: Phi`), `session_seed.yaml` (`verifier: gpt-oss`, `verifier_v2: Phi`) all still list decoder verifiers.
-- **Root cause:** D2298 removed Phi/Gemma from S5 but the role registries were not updated; gpt-oss is actually the S4 classifier (D2249).
-- **Fix (D2340):** `pipeline_config.yaml` `verifier`→`classifier` (gpt-oss), delete/annotate `verifier_v2`; align `session_seed.yaml` + `model_assignments.yaml`. Extends B8/D2328.
-- **Status:** 🟠 OPEN — P1 (config-only; no code reads the stale role, but the registry is untrustworthy)
-- **Files:** `config/pipeline_config.yaml`, `config/model_assignments.yaml`, `agent/session_seed.yaml`
-- **Source:** ChatGPT audit (model attribution); independently re-verified + corrected (ChatGPT's own attribution was stale)
+## 🟠 BUG-099 — 2026-08-13 — Model registry drift: gpt-oss/Phi misnamed as "verifier" vs DeBERTa-only S5
+- **Symptom:** `stage5_verify.py` = DeBERTa-only (D2298), but role keys are misleading: `pipeline_config.yaml models.verifier` = gpt-oss (actually the **S4 classifier**, D2249), `models.verifier_v2` = Phi-4-mini (actually the **S2 fast probe**, D2319 — still actively used in `stage2_extract.py:815-825`), `model_assignments.yaml S5_VERIFIER`/`S5_FB_VERIFIER` = Phi (stale; S5 = DeBERTa-only). The true S5 verifier is `models.nli_large` = DeBERTa.
+- **Root cause:** D2298 removed Phi from S5 *verification* only, but the role keys were never renamed to reflect the surviving roles (classifier/probe).
+- **Fix (D2340):** rename `verifier`→`classifier` (gpt-oss) + `verifier_v2`→`probe` (Phi); annotate `model_assignments.yaml` S5_* roles as removed. Naming/documentation drift — NOT broken functionality (`VERIFY_MODEL`/`VERIFY_MODEL_V2` both resolve + are consumed correctly).
+- **Status:** 🟡 PARTIAL — `session_seed.yaml` renamed; `pipeline_config.yaml`/`pipeline_paths.py`/`model_assignments.yaml` rename deferred (P1, low risk)
+- **Files:** `config/pipeline_config.yaml`, `config/model_assignments.yaml`, `agent/session_seed.yaml`, `pipeline/pipeline_paths.py`
+- **Source:** ChatGPT audit (model attribution); independently re-verified + corrected (Phi still used as S2 probe, NOT dead)
 
 ## 🔴 BUG-094 — 2026-08-13 — S2 checkpoint pretty-printed (JSONL broken) + resume-existence coupling
 

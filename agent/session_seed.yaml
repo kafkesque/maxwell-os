@@ -21,11 +21,11 @@ models:
         temperature: 0.0
         family: gpt-oss
         notes: "D2249: S4 classifier (NOT the S5 verifier). D2340 renamed from `verifier` to stop role confusion."
-    verifier_v2:
-        model: REMOVED
-        provider: null
+    probe:
+        model: Phi-4-mini-instruct-8bit
+        provider: omlx
         family: phi
-        notes: "D2298/D2340: Phi-4-mini-instruct-8bit DELETED from S5 (67% acc, hallucination risk). S5 is DeBERTa-only."
+        notes: "D2319: S2 fast probe (~1.5s), NOT an S5 verifier. D2298 removed Phi from S5 verification only (67% acc, hallucination risk); S5 = DeBERTa-only. D2340: renamed from misleading `verifier_v2`."
     embeddings:
         model: bge-m3
         provider: ollama

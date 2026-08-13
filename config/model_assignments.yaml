@@ -13,11 +13,11 @@ roles:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # primary generator
     backend: omlx
     family: qwen
-  S5_VERIFIER:
+  S5_VERIFIER:  # D2340: STALE — S5 is DeBERTa-only (D2298); Phi removed from S5 verification. Kept for R5 cross-family registry only.
     model: Phi-4-mini-instruct-8bit
     backend: omlx
     family: phi
-    notes: D2264 S5 deep check (67% acc, 2x Gemma). Structured PASS/FLAG.
+    notes: "D2298/D2340: REMOVED from S5 verification. S5 = DeBERTa-v3-large (config/pipeline_config.yaml models.nli_large)."
   S6_VALIDATOR:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     backend: omlx
@@ -113,11 +113,11 @@ roles:
     model: gemma-4-E4B-it-MLX-4bit
     backend: omlx
     family: gemma
-  S5_FB_VERIFIER:
-    model: Phi-4-mini-instruct-8bit     # D2273: synced with pipeline_config.yaml verifier_v2 (D2264: Phi-4-mini, 67% acc)
+  S5_FB_VERIFIER:  # D2340: STALE — S5 = DeBERTa-only (D2298). Phi-4-mini now only the S2 fast probe (D2319).
+    model: Phi-4-mini-instruct-8bit
     backend: omlx
     family: phi
-    notes: "D2273/D2264: S5 deep check uses Phi-4-mini (67% acc vs Gemma 33%). R5: DeBERTa FEVER (encoder) ≠ Phi-4-mini (decoder)."
+    notes: "D2298/D2340: REMOVED from S5 verification. Phi-4-mini survives only as the S2 fast probe (stage2_extract.py, D2319)."
 verification_tolerance:
   version: 2026-07-08.V2
   s6_validation:

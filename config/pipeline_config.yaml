@@ -172,6 +172,7 @@ stage2:
   source_book_match: exact
   max_cluster_samples: 5
   max_probe_samples: 8
+  max_probe_per_book: 2      # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
   split_probe_kmeans_random_state: 42
   omlx_retry_attempts: 2
   batch_position_monitor: false

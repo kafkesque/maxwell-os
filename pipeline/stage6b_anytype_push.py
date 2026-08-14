@@ -302,13 +302,6 @@ def _render_3zone_body(fb: dict) -> str:
     return body
 
 
-def _render_3zone_body_old_end(fb):  # replaced above
-    pass
-
-
-
-
-
 def _format_fb_markdown(fb: dict) -> str:
     """Format an FB as human-readable markdown with YAML frontmatter.
 

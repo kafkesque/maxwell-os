@@ -61,6 +61,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_POSITIVE,
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
+    S2_MAX_PROBE_PER_BOOK,  # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
     S2_MAX_PROBE_SAMPLES,
     S2_MAX_WORKERS,
     S2_MINHASH_NUM_PERM,
@@ -777,7 +778,7 @@ def discover_principles(
     # every book is represented. If there are distinct principles from different
     # books, the probe sees all of them. Target 12-15 samples with max 2 per book.
     MAX_PROBE_SAMPLES: int = S2_MAX_PROBE_SAMPLES  # T0.1: from config, was 15
-    MAX_PER_BOOK: int = 2
+    MAX_PER_BOOK: int = S2_MAX_PROBE_PER_BOOK  # D2357: from config, was 2
 
     # Group segment IDs by source book
     book_to_segids: dict[str, list[str]] = {}
@@ -971,8 +972,12 @@ def split_cluster_by_kmeans(
 
         if len(sub_clusters) >= 2:
             return sub_clusters
-    except Exception:
-        pass  # Fail-safe: return original cluster if k-means fails
+    except Exception as _split_err:
+        # Fail-safe: return the original cluster if k-means fails (prefer a
+        # coarser extraction to data loss) — but NEVER silent (C16).
+        print(f"   ⚠️  k-means split failed for cluster "
+              f"{cluster.get('cluster_id', '?')!r}: {type(_split_err).__name__}: {_split_err}",
+              flush=True)
 
     return [cluster]
 

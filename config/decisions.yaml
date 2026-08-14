@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-14T15:15:00Z'
-total_decisions: 346
+total_decisions: 347
 decisions:
 - id: D2092
   category: INF
@@ -2776,8 +2776,20 @@ decisions:
   - pipeline/schemas.py
   - pipeline/schema_accessor.py
   created: '2026-08-14'
+- id: D2358
+  category: BUGFIX
+  state: RESOLVED
+  description: 'ChatGPT re-audit (2nd pass, READY-WITH-CONDITIONS) hygiene: legacy direct-classify path now fail-closed (SparseClassificationError, no fabricated emerging/cited regardless of config); k-means split exception logged (was silent pass); removed dead _render_3zone_body_old_end stub (C19); MAX_PER_BOOK -> config stage2.max_probe_per_book (C12). Context taxonomy hardcode (MEDIUM #8) remains deferred.'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/stage2_extract.py
+  - pipeline/stage6b_anytype_push.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  created: '2026-08-14'
 summary:
-  total: 346
+  total: 347
   proposed: 0
   draft: 1
   active: 295

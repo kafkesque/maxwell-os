@@ -1,6 +1,29 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 15:15 (D2357 ChatGPT re-audit fixes + S3/D2354 FrugalGPT gate + S5/W7 closed)
+> **Last updated:** 2026-08-14 15:35 (D2358 — legacy direct-classify fail-closed + k-means logging + C19/C12 hygiene)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟠 BUG-126 — 2026-08-14 — Legacy direct-classify path still not fail-closed (D2357 gap)
+- **Symptom:** D2357 made `merged_cribs_classify()` and `batch_cribs_classify()` fail-closed, but the legacy direct path (`call_omlx_json(class_prompt)` when both batch and merged are disabled/failed) still turned a sparse response into `emerging`/`cited` via empty-raw-label mapping.
+- **Fix (D2358):** the direct path now raises `SparseClassificationError` on missing `discipline`/`domains`/`evidence` and quarantines the FB (`classification_errors += 1`). `depth` is intentionally not checked there (overridden by the focused depth call). BUG-120 is now unconditional across all configs.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** ChatGPT re-audit (2nd pass, HIGH) + independent re-verification
+
+## 🟡 BUG-127 — 2026-08-14 — k-means split exception silently swallowed (`except Exception: pass`)
+- **Symptom:** `split_cluster_by_kmeans()` wrapped the whole embed+cluster step in `except Exception: pass`, hiding split failures (C16).
+- **Fix (D2358):** log the failure (`⚠️ k-means split failed …`) while retaining the deliberate fail-safe (return the unsplit cluster).
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage2_extract.py`
+- **Source:** ChatGPT re-audit (2nd pass, MEDIUM) + independent re-verification
+
+## 🟡 BUG-128 — 2026-08-14 — Dead `_render_3zone_body_old_end()` stub + literal `MAX_PER_BOOK=2`
+- **Symptom:** (1) `_render_3zone_body_old_end()` remained as a dead `pass` compatibility stub (C19). (2) `MAX_PER_BOOK: int = 2` was a local magic number while `max_probe_samples` was already config-driven (C12).
+- **Fix (D2358):** removed the dead stub; added `stage2.max_probe_per_book` (config) → `S2_MAX_PROBE_PER_BOOK`.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage6b_anytype_push.py`, `pipeline/stage2_extract.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+- **Source:** ChatGPT re-audit (2nd pass, LOW) + independent re-verification
 
 ---
 

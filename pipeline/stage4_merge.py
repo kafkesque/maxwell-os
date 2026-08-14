@@ -84,6 +84,7 @@ from pipeline.schemas import (
 # BUG-075: classify_depth_focused — split depth into SHORT prompt (D2247)
 from pipeline.stage4_merged_call import (
     BATCH_SIZE_DEFAULT,
+    SparseClassificationError,  # D2357: fail-closed semantic validation (all classification paths)
     batch_cribs_classify,
     classify_depth_focused,
     merged_cribs_classify,
@@ -1140,6 +1141,29 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     class_data = class_data[0] if class_data else {}
                 if not isinstance(class_data, dict):
                     class_data = {}
+                # D2357 (ChatGPT re-audit HIGH #9): the legacy direct path must be
+                # fail-closed too — a sparse classify response (missing
+                # discipline/domains/evidence) must never fabricate emerging/cited.
+                # depth is intentionally NOT checked here: it is overridden by the
+                # focused depth call below (BUG-075).
+                if (not class_data.get("discipline")
+                        or not class_data.get("domains")
+                        or class_data.get("evidence") not in ("cited", "axiomatic")):
+                    raise SparseClassificationError(
+                        "direct-classify: sparse semantic fields "
+                        "(discipline/domains/evidence)"
+                    )
+            except SparseClassificationError as e:
+                print(f"→ ❌ Classification sparse: {e} — FB QUARANTINED")
+                class_data = {
+                    "discipline": "unclassified",
+                    "domains": ["unclassified"],
+                    "is_specialized": False,
+                    "classification_status": "FAILED",
+                    "classification_error": str(e)[:200],
+                    "evidence": "cited",
+                }
+                classification_errors += 1
             except Exception as e:
                 import traceback
                 print(f"→ ❌ Classification FAILED: {e} — FB QUARANTINED")

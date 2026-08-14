@@ -40,6 +40,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pipeline.pipeline_paths import DB_PATH
 from pipeline.retrieve import search_hybrid, graph_aware_search, agentic_search, EvidencePack
 from pipeline.feedback import get_fb_feedback_stats
+from pipeline.omlx_delegate import delegate_omlx  # BUG-063: file-grounded local delegation (C25)
 
 # MCP SDK
 from mcp.server import Server
@@ -247,6 +248,34 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
         conn.close()
 
 
+async def _tool_delegate_local(args: dict) -> list[TextContent]:
+    """Delegate a file-grounded task to a local OMLX model (BUG-063 fix).
+
+    Reads the named files with REAL filesystem access (unlike the
+    Deno-sandboxed `delegate()` tool) and sends them with `prompt` to a
+    local model. Exposes Maxwell's local inference via MCP (C25).
+    """
+    prompt: str = str(args.get("prompt", ""))
+    if not prompt:
+        return [TextContent(type="text", text=json.dumps({"error": "prompt is required"}))]
+
+    files: list[str] = [str(f) for f in (args.get("files") or [])]
+    kwargs: dict[str, Any] = {"files": files}
+    if args.get("model"):
+        kwargs["model"] = str(args["model"])
+    if args.get("system"):
+        kwargs["system"] = str(args["system"])
+    if args.get("as_json"):
+        kwargs["as_json"] = bool(args["as_json"])
+
+    try:
+        result: str = await asyncio.to_thread(delegate_omlx, prompt, **kwargs)
+    except (FileNotFoundError, RuntimeError, ValueError) as exc:
+        return [TextContent(type="text", text=json.dumps({"error": str(exc)}))]
+
+    return [TextContent(type="text", text=result)]
+
+
 # ── Tool registry ──────────────────────────────────────────────────────
 
 TOOLS: list[Tool] = [
@@ -302,12 +331,33 @@ TOOLS: list[Tool] = [
             "required": ["fb_id"],
         },
     ),
+    Tool(
+        name="delegate_local",
+        description=(
+            "Delegate a file-grounded task to a local OMLX model. Reads the "
+            "named files with real filesystem access and sends them with the "
+            "prompt to a local model (BUG-063 fix: avoids the Deno-sandboxed "
+            "delegate() tool that cannot read project files)."
+        ),
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "prompt": {"type": "string", "description": "Instruction/question for the model"},
+                "files": {"type": "array", "items": {"type": "string"}, "description": "Optional file paths to inject as context"},
+                "model": {"type": "string", "description": "Optional OMLX model name (default: generator from config)"},
+                "system": {"type": "string", "description": "Optional system message"},
+                "as_json": {"type": "boolean", "default": False, "description": "Parse the response as JSON"},
+            },
+            "required": ["prompt"],
+        },
+    ),
 ]
 
 TOOL_HANDLERS: dict[str, Any] = {
     "query_knowledge": _tool_query_knowledge,
     "get_fb_detail": _tool_get_fb_detail,
     "get_fb_reliability": _tool_get_fb_reliability,
+    "delegate_local": _tool_delegate_local,
 }
 
 

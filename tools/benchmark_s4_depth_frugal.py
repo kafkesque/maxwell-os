@@ -21,11 +21,13 @@ from __future__ import annotations
 
 import json
 import random
+import sys
 import time
 from collections import Counter
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))  # allow `pipeline.*` imports from tools/
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 OUT_PATH = PROJECT_ROOT / "governance" / "s4_depth_frugal_benchmark.json"
 

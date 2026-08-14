@@ -575,12 +575,24 @@ def classify_depth_focused(
         as a valid "domain" label.
     """
     from pipeline.omlx_call import call_omlx
+    from pipeline.pipeline_paths import (
+        VERIFY_REASONING_OFF_MODELS,
+        VERIFY_REASONING_OFF_PREFIX,
+    )
 
     # C12/D2354: model from config (FrugalGPT depth model), not hardcoded.
+    # MUST mirror stage4_merge.py's routing: depth uses the cheap model ONLY
+    # when the FrugalGPT cascade is enabled; otherwise GPT-OSS (VERIFY_MODEL).
+    # (Previously defaulted to S4_DEPTH_MODEL unconditionally → silently ran
+    # Gemma even when frugal was OFF — a model-selection mismatch.)
     if model is None:
         try:
-            from pipeline.pipeline_paths import S4_DEPTH_MODEL
-            model = S4_DEPTH_MODEL
+            from pipeline.pipeline_paths import (
+                S4_DEPTH_FRUGAL_ENABLED,
+                S4_DEPTH_MODEL,
+                VERIFY_MODEL,
+            )
+            model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
         except Exception:
             model = "gpt-oss-20b-MXFP4-Q8"
 
@@ -596,9 +608,17 @@ def classify_depth_focused(
         extraction_type=extraction_type,
     )
 
+    # D2359: reasoning models (GPT-OSS) — prepend valid Harmony "Reasoning: low"
+    # to cap chain-of-thought. Previously this path sent NO system message, so
+    # the prefix never reached the focused-depth call (BUG-129 gap).
+    system = None
+    if model in VERIFY_REASONING_OFF_MODELS and VERIFY_REASONING_OFF_PREFIX:
+        system = VERIFY_REASONING_OFF_PREFIX
+
     raw = call_omlx(
         prompt=prompt,
         model=model,
+        system=system,
         max_tokens=max_tokens,
         timeout=timeout,
     )

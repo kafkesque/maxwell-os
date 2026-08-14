@@ -1,0 +1,101 @@
+{
+  "timestamp": "2026-08-14T18:12:31",
+  "n": 8,
+  "gptoss_model": "gpt-oss-20b-MXFP4-Q8",
+  "frugal_model": "gemma-4-E4B-it-MLX-4bit",
+  "gptoss_accuracy": 0.75,
+  "frugal_accuracy": 0.625,
+  "parity": 0.625,
+  "gptoss_failures": 0,
+  "frugal_failures": 0,
+  "gptoss_avg_time_s": 10.05,
+  "frugal_avg_time_s": 11.17,
+  "speedup_x": 0.9,
+  "gate": {
+    "parity_min": 0.9,
+    "accuracy_min": 0.9,
+    "passed": false
+  },
+  "results": [
+    {
+      "fb": "CONV-023",
+      "gold": "universal",
+      "gptoss": "universal",
+      "gptoss_err": null,
+      "gptoss_t": 6.17,
+      "frugal": "universal",
+      "frugal_err": null,
+      "frugal_t": 65.6
+    },
+    {
+      "fb": "CONV-012",
+      "gold": "domain",
+      "gptoss": "domain",
+      "gptoss_err": null,
+      "gptoss_t": 13.41,
+      "frugal": "cross-domain",
+      "frugal_err": null,
+      "frugal_t": 3.36
+    },
+    {
+      "fb": "CONV-021",
+      "gold": "cross-domain",
+      "gptoss": "cross-domain",
+      "gptoss_err": null,
+      "gptoss_t": 7.89,
+      "frugal": "cross-domain",
+      "frugal_err": null,
+      "frugal_t": 2.81
+    },
+    {
+      "fb": "CONV-049",
+      "gold": "cross-domain",
+      "gptoss": "cross-domain",
+      "gptoss_err": null,
+      "gptoss_t": 9.85,
+      "frugal": "domain",
+      "frugal_err": null,
+      "frugal_t": 3.52
+    },
+    {
+      "fb": "CONV-040",
+      "gold": "specialized",
+      "gptoss": "specialized",
+      "gptoss_err": null,
+      "gptoss_t": 5.89,
+      "frugal": "specialized",
+      "frugal_err": null,
+      "frugal_t": 3.72
+    },
+    {
+      "fb": "CONV-011",
+      "gold": "domain",
+      "gptoss": "cross-domain",
+      "gptoss_err": null,
+      "gptoss_t": 19.69,
+      "frugal": "cross-domain",
+      "frugal_err": null,
+      "frugal_t": 3.31
+    },
+    {
+      "fb": "CONV-026",
+      "gold": "cross-domain",
+      "gptoss": "cross-domain",
+      "gptoss_err": null,
+      "gptoss_t": 7.2,
+      "frugal": "cross-domain",
+      "frugal_err": null,
+      "frugal_t": 3.91
+    },
+    {
+      "fb": "CONV-001",
+      "gold": "domain",
+      "gptoss": "cross-domain",
+      "gptoss_err": null,
+      "gptoss_t": 10.27,
+      "frugal": "domain",
+      "frugal_err": null,
+      "frugal_t": 3.14
+    }
+  ]
+}

@@ -1,6 +1,43 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 15:35 (D2358 — legacy direct-classify fail-closed + k-means logging + C19/C12 hygiene)
+> **Last updated:** 2026-08-14 23:40 (D2359 implemented + production-verified: 72.0% acc @ 7.3s/FB; D2361 default-model mismatch fixed)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🔴 BUG-129 — 2026-08-14 — S4 GPT-OSS `reasoning_effort`/`enable_thinking` are silent no-ops (D2359 void)
+- **Symptom:** D2359 claimed `reasoning_effort: low` (~17% faster) + `enable_thinking: false` (~22% faster). Verified against the oMLX 0.5.1 request schema: `ChatCompletionRequest` (pydantic v2, `extra='ignore'`) has **no top-level `reasoning_effort` or `enable_thinking` fields** — the supported knobs are `chat_template_kwargs` (dict) and `thinking_budget` (int). The pipeline sends both as top-level payload keys → **silently dropped**. The observed "17%/22%" speedups were noise.
+- **Root cause:** `pipeline/omlx_call.py` emits `payload["reasoning_effort"]` / `payload["enable_thinking"]` at top level. oMLX only reads `request.chat_template_kwargs` (merged into the chat template) and `request.thinking_budget`.
+- **Verified:** (1) pydantic model dump proves top-level keys are dropped. (2) Live A/B on the production `DEPTH_FOCUSED_PROMPT`: top-level flags + `Reasoning: none` → 5.6s / 394 reasoning chars; `chat_template_kwargs={"enable_thinking": false}` + `Reasoning: low` → 4.6s / 311 chars; `thinking_budget=64` → 4.6s / 306 chars. (3) Harmony format doc confirms valid reasoning levels are only `low`/`medium`/`high` — **`Reasoning: none` is not a valid level** and is ignored.
+- **Correct levers (verified):** `chat_template_kwargs={"enable_thinking": false}` AND/OR `thinking_budget: <N>` (oMLX-native), and system-prompt `Reasoning: low` (harmony). None fully eliminate reasoning (GPT-OSS is a native reasoning MoE, 21B/3.6B-active); they cap CoT length.
+- **Status:** 🟢 FIXED — 2026-08-14 (D2359 implemented: `chat_template_kwargs` + `Reasoning: low`)
+- **Files:** `pipeline/omlx_call.py`, `pipeline/pipeline_paths.py`, `pipeline/stage4_merged_call.py`, `config/pipeline_config.yaml`
+- **Source:** live oMLX 0.5.1 schema + source inspection + empirical A/B (2026-08-14, this session)
+- **A/B VERIFIED (harness, 2026-08-14, 50-FB golden set + 4 real merged CRIBS):**
+  - Focused depth: A=67.3% acc / 14.2s vs **B=76.0% acc / 7.7s (1.84×)**, C(thinking_budget=128)=76.0% / 7.2s (1.97×). Zero fail-closed in B/C.
+  - Merged CRIBS: A=68.3s vs **B=53.5s (1.28×)**, reasoning chars 3012→2079 (−31%), all outputs complete.
+- **PRODUCTION VERIFIED (2026-08-14, 50-FB golden through real `classify_depth_focused()`):**
+  - GPT-OSS focused depth: 67.3% → **72.0% acc (+4.7pt)** and 14.2s → **7.3s median (1.95×)**. Zero fail-closed.
+  - ⚠️ The harness's 76% did NOT reproduce on the production path — the harness used its own `requests.post` with `response_format=json_object` + a fuller system message, not the production `call_omlx` path. Production truth = 72.0%.
+  - **Net: `Reasoning: low` + `chat_template_kwargs={"enable_thinking":false}` is faster AND more accurate than `Reasoning: none` in production (verified).**
+  - Remaining `domain→cross-domain` over-prediction (domain 9/22) is a pre-existing prompt/ontology/golden-label ambiguity, NOT a regression from these flags.
+
+## 🟡 BUG-130 — 2026-08-14 — GPU kernel panic loading dense Qwen3.8-27B in parallel (IOGPUGroupMemory)
+- **Symptom:** `panic(cpu 0): IOGPUGroupMemory.cpp:220 Assertion failed: result != kIOReturnSuccess` in `omlx-server` (Python pid) while loading `Qwen3.8-27B-MLX-4bit` (15 GB dense, 48 linear-attn + 16 full-attn layers) on a second OMLX server (:11436) concurrently with the main pipeline server + 3 research delegates.
+- **Root cause:** Dense 27B model + concurrent GPU consumers exhausted the Metal driver's GPU memory (IOGPUGroupMemory assertion). Qwen3.8-27B is **dense** (not MoE) — ~15 GB weights + KV on a 64 GB M1 Max, and the two OMLX servers + delegates competed for the same GPU budget.
+- **Fix:** Kill the duplicate GUI OMLX server on :11436; keep a single server (:11435). **Run research + benchmark strictly sequentially, one model at a time.** Qwen3.8 loads cleanly in isolation (0 loaded models → 18 GB single load, no panic).
+- **Status:** 🟢 MITIGATED — 2026-08-14 (process discipline; no code change)
+- **Files:** n/a (operational)
+- **Source:** kernel panic report 2026-08-14 + successful isolated re-load
+
+---
+
+## 🟢 BUG-131 — 2026-08-14 — `classify_depth_focused()` default model silently diverged from production (D2361)
+- **Symptom:** `classify_depth_focused(fb_data)` with `model=None` defaulted to `S4_DEPTH_MODEL` (= `gemma-4-E4B-it-MLX-4bit`, the gated FrugalGPT cheap model) unconditionally — even when `depth_frugal_enabled=false`. Any caller that omitted `model` silently ran Gemma instead of GPT-OSS (the production depth classifier).
+- **Root cause:** The function's internal `if model is None` branch read `S4_DEPTH_MODEL` directly, ignoring `S4_DEPTH_FRUGAL_ENABLED`. Production (`stage4_merge.py`) passes `model=depth_model` explicitly (`S4_DEPTH_MODEL if frugal else VERIFY_MODEL`), so the mismatch was masked there — but a naive caller (or a benchmark) got the wrong model. This produced a false "production" benchmark (64% @ 2.3s = Gemma) before it was caught.
+- **Fix (D2361):** default now mirrors `stage4_merge.py` routing: `S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL`.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage4_merged_call.py`
+- **Source:** independent re-verification of D2359 production numbers (discovered the 64% "GPT-OSS" measurement was actually Gemma)
 
 ---
 

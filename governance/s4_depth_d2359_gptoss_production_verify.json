@@ -1,0 +1,310 @@
+{
+  "created_at": "2026-08-14T23:35:48",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "n": 50,
+  "accuracy": 0.72,
+  "fail_closed": 0,
+  "avg_secs": 8.33,
+  "rows": [
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 5.1,
+      "name": "Asymmetric Dominance Decoy"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 11.3,
+      "name": "Implementation Intention Triggering"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 14.4,
+      "name": "Metaphor Complexity Inverted-U"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 6.6,
+      "name": "Similarity-Weighted Social Proof"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 6.4,
+      "name": "Value-First Demonstration"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 9.4,
+      "name": "Default Inertia Effect"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 7.9,
+      "name": "Keynesian Recursive Expectation"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 13.6,
+      "name": "Proximity Grouping"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 18.7,
+      "name": "Objective Uncertainty in AI Alignment"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 6.0,
+      "name": "Progressive Disclosure"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 7.1,
+      "name": "Structural Leverage"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.4,
+      "name": "Emergent Complexity from Simple Rules"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 8.8,
+      "name": "Limited Palette Discipline"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 8.5,
+      "name": "Spaced Retrieval Practice"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.6,
+      "name": "Decision Tempo Superiority"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 6.7,
+      "name": "Habit Anchoring"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 5.7,
+      "name": "Endowment Effect \u2014 Ownership Reference Point"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 6.5,
+      "name": "Incentive-Driven Unintended Consequences"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 18.5,
+      "name": "Spaced Retrieval Effect \u2014 Declarative Memory Strengthening"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 6.5,
+      "name": "Anchor Point Control"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 7.6,
+      "name": "Three-Level Product Management Hierarchy"
+    },
+    {
+      "pred": "universal",
+      "gold": "universal",
+      "secs": 5.6,
+      "name": "Entropy Arrow of Time"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 9.4,
+      "name": "Evolutionary Necessity From Variation"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 8.0,
+      "name": "Treatment-Induced Resistance Evolution"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 6.1,
+      "name": "Attribute Substitution in High-Stakes Judgment"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 5.8,
+      "name": "Communication Overhead Limits Scale"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 6.3,
+      "name": "Correlation-Causation Confounding"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.5,
+      "name": "Explore-Exploit Calibration"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.7,
+      "name": "Preferential Attachment in Network Growth"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 6.8,
+      "name": "Technology Adoption Lifecycle"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.8,
+      "name": "System Fragility Taxonomy"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 8.6,
+      "name": "Goal-Directed Design Hierarchy"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 7.5,
+      "name": "Prospective Hindsight Debiasing"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "domain",
+      "secs": 6.8,
+      "name": "Commitment-Anchored Habit Formation"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 8.8,
+      "name": "Bimodal Risk Allocation"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 15.8,
+      "name": "Power-Law Concentration Pattern"
+    },
+    {
+      "pred": "specialized",
+      "gold": "specialized",
+      "secs": 4.7,
+      "name": "Optical Kerning Adjustment"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.5,
+      "name": "Dunning-Kruger Effect \u2014 Competence-Confidence Inversion"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 5.6,
+      "name": "Zipf's Law \u2014 Rank-Frequency Inverse Distribution"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 10.5,
+      "name": "Sequential Group Development Stages"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 7.0,
+      "name": "Johari Window \u2014 Interpersonal Awareness Matrix"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 14.3,
+      "name": "Urgency-Importance Prioritization Matrix"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 7.5,
+      "name": "Root-Cause Drilling Through Iterative Interrogation"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 8.9,
+      "name": "Parkinson's Law \u2014 Time-Constraint Productivity"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 7.3,
+      "name": "Explanatory Articulation Debugging"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 11.9,
+      "name": "Hierarchical Motivation Taxonomy"
+    },
+    {
+      "pred": "cross-domain",
+      "gold": "cross-domain",
+      "secs": 8.0,
+      "name": "Hanlon's Razor \u2014 Incompetence Over Malice Default"
+    },
+    {
+      "pred": "domain",
+      "gold": "cross-domain",
+      "secs": 8.0,
+      "name": "Five-Factor Personality Taxonomy (OCEAN)"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 7.0,
+      "name": "Five Forces \u2014 Competitive Pressure Taxonomy"
+    },
+    {
+      "pred": "domain",
+      "gold": "domain",
+      "secs": 11.6,
+      "name": "Kano Model \u2014 Feature Satisfaction Taxonomy"
+    }
+  ]
+}

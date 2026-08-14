@@ -85,10 +85,12 @@ models:
     model: gpt-oss-20b-MXFP4-Q8
     provider: omlx
     temperature: 0.0
-    reasoning_off_prefix: 'Reasoning: none'
+    reasoning_off_prefix: 'Reasoning: low'   # D2359: valid Harmony level ('none' is ignored); caps CoT
     reasoning_off_models:
     - gpt-oss-20b-MXFP4-Q8
     max_tokens: 1024
+    chat_template_kwargs: {enable_thinking: false}   # D2359: oMLX-native CoT cap (top-level flags silently dropped)
+    thinking_budget: null   # D2359: optional oMLX-native CoT token cap (verified on focused-depth; off for merged CRIBS)
   verifier_v2:  # D2340: MISNAMED — this is actually the S2 fast probe (D2319), consumed as VERIFY_MODEL_V2 in stage2_extract.py
     model: Phi-4-mini-instruct-8bit
     provider: omlx
@@ -188,8 +190,8 @@ stage4:
   dedup_cosine_threshold: 0.92
   semantic_near_threshold: 0.8
   merged_call_enabled: true
-  merged_call_max_tokens: 512
-  batch_enabled: true
+  merged_call_max_tokens: 2048   # GPT-OSS reasoning+JSON: 1024 truncated sparse (discipline/domains) → quarantine
+  batch_enabled: false            # D2265 batch CRIBS unreliable w/ GPT-OSS (45% malformed + hang) — fall back to individual
   batch_size: 4
   batch_call_max_tokens: 2048
   depth_focused_classification: true

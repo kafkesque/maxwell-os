@@ -45,6 +45,9 @@ from pipeline.pipeline_paths import (
     OMLX_RETRY_DELAY,
     OMLX_URL,
     VERIFY_MODEL,
+    VERIFY_CHAT_TEMPLATE_KWARGS,
+    VERIFY_THINKING_BUDGET,
+    VERIFY_REASONING_OFF_MODELS,
 )
 
 # ── Constants (T0.2: de-hardcoded — sourced from pipeline_config.yaml) ────
@@ -258,6 +261,15 @@ def call_omlx(
     }
     if response_format is not None:
         payload["response_format"] = response_format
+    # D2359: reduce GPT-OSS chain-of-thought (reasoning models only).
+    # Top-level reasoning_effort/enable_thinking are SILENTLY DROPPED by oMLX
+    # (pydantic extra='ignore'). Correct levers: chat_template_kwargs (dict)
+    # and thinking_budget (int). System prefix "Reasoning: low" is applied by callers.
+    if model in VERIFY_REASONING_OFF_MODELS:
+        if VERIFY_CHAT_TEMPLATE_KWARGS:
+            payload["chat_template_kwargs"] = VERIFY_CHAT_TEMPLATE_KWARGS
+        if VERIFY_THINKING_BUDGET is not None:
+            payload["thinking_budget"] = VERIFY_THINKING_BUDGET
 
     last_error = None
     # D2187: Circuit breaker fast-fail (skip retry loop when OPEN)

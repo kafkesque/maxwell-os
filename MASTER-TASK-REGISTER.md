@@ -451,3 +451,64 @@
 | GAP-2 | Remove stale Stage 3a artifacts (prompts/s3a_*.txt) | D2302 |
 | SLA | End-to-end latency SLA | D2305 |
 | SB | StorageBackend protocol (stage6 SQLite) | D2300 |
+
+---
+
+# 🔴 NEW THIS SESSION — Qwen3.8 + Local-LLM Harness + S4 Speed (2026-08-14)
+
+> **Research (goose):** Qwen3.8-27B availability, local-LLM delegation fix, S4 speed unblock.
+> Full findings: `governance/MARKET-RESEARCH-QWEN3.8-HARNESS-2026-08-14.md`.
+> **FOR EVALUATION** — none committed yet; all items below are recommendations awaiting decision.
+
+## S4 SPEED UNBLOCK (D2354 follow-up — root cause confirmed)
+Root cause: `gpt-oss-20b-MXFP4-Q8` is a reasoning model → emits `reasoning_content` (CoT) on EVERY call
+even with `Reasoning: none` (OMLX ignores it). S4 makes 2 GPT-OSS calls/FB: batch CRIBS (~15.3s) + SEQUENTIAL
+focused-depth (~10s) that redundantly recomputes a `depth` the batch already returned. Total ~25s/FB.
+
+| # | Item | Evidence | Recommendation | Effort | Status |
+|---|------|----------|----------------|--------|--------|
+| S4-A | Batch the focused-depth call | A/B (D2354): 8.4s→4.3s/FB (1.9×), accuracy 75%==75% (gate mis-set to A↔B parity, not golden) | Adopt batching; re-gate on golden-parity | 0.5h | 🟡 FOR EVAL |
+| S4-B | FrugalGPT: route depth → gemma-4-E4B | gemma depth correct @ 5s, zero CoT, R5-clean 3rd family | Enable `depth_frugal_enabled` after benchmark ≥90% | 1h | 🟡 FOR EVAL |
+| S4-C | Distill gpt-oss → 3-4B non-reasoning | Hinton distillation (post-T1.1) | defer | 4h | ⏳ P2 |
+
+## LOCAL-LLM HARNESS (FOR EVALUATION)
+| # | Item | Recommendation |
+|---|------|----------------|
+| H1 | Qwen3.8-27B-MLX-4bit (16.08 GB, 262K ctx, VLM, agentic) | Adopt for LONG_CONTEXT / AGENT_ORCHESTRATOR (R5-safe: verifier stays gpt-oss/gemma/DeBERTa). Download in progress. |
+| H2 | goose `active_provider: custom_deepseek` | Switch → `maxwell_omlx` to cut DeepSeek cost (C1). Planner already local. |
+| H3 | BUG-063 delegation | `filesystem` MCP does NOT fix it (subagent = Deno sandbox). Use `omlx_delegate.py` in-process. |
+| H4 | MCP exposure (C25) | `delegate_local` tool ADDED to maxwell_mcp_server.py (this session). |
+| H5 | Coding TUI | Aider (`--openai-api-base` → OMLX :11435) over Zed for autonomous local-model refactors. |
+
+## PLUGINS (goose) — FOR EVALUATION
+| Plugin | Current | Recommendation |
+|--------|---------|----------------|
+| orchestrator | disabled | **Enable** — manage/start/stop agent sessions (task orchestration) |
+| memory | disabled | **Enable** — persistent preferences (sovereign) |
+| chatrecall | disabled | **Enable** — search past sessions |
+| summarize | disabled | **Enable** — one-call LLM file summary (research) |
+| filesystem | disabled | Optional — redundant with `developer` (shell); does NOT fix delegate subagents |
+| fetch / puppeteer | disabled | Optional — web research (not LLM cost) |
+
+
+---
+
+# 🔴 UPDATE — S4 Empirical Validation + OMLX context (2026-08-14 18:12)
+
+> Ran `tools/benchmark_s4_depth_frugal.py` (production path). Full: `governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md` + `s4_depth_frugal_benchmark.json`.
+
+| # | Item | Empirical result | Verdict |
+|---|------|------------------|---------|
+| S4-A | Batch focused-depth | 1.9x (8.4->4.3s), accuracy 75%==75% (D2354 A/B) | ✅ ADOPT |
+| S4-B | FrugalGPT gemma depth | gemma 62.5% acc / 62.5% parity (gate 90%) | ❌ REJECT — do NOT enable |
+| S4-B' | gpt-oss depth baseline | 75% acc (NOT the 87.5% governance claim) | ⚠️ depth accuracy weak |
+| S4-C | Distill gpt-oss -> 3-4B | not yet run | ⏳ only real path to big speedup |
+
+## OMLX context window (verified via `/v1/models`)
+| Model | max_model_len |
+|---|---|
+| Qwen3-Coder-30B-A3B (generator) | 32,768 (32K) — native 256K, OMLX-capped |
+| gpt-oss-20b (classifier) | 131,072 (128K) |
+| Phi-4-mini / gemma-4-E4B / Qwen2.5-3B | 32,768 (32K) |
+| Qwen3.5-9B / gemma-4-31B | 262,144 (256K) |
+

@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-14T15:15:00Z'
-total_decisions: 347
+total_decisions: 350
 decisions:
 - id: D2092
   category: INF
@@ -2788,8 +2788,34 @@ decisions:
   - pipeline/pipeline_paths.py
   - config/pipeline_config.yaml
   created: '2026-08-14'
+- id: D2359
+  category: BUGFIX
+  state: RESOLVED
+  description: 'S4 GPT-OSS reasoning-effort flags are silent no-ops — oMLX drops top-level reasoning_effort/enable_thinking (pydantic extra=ignore); correct levers are chat_template_kwargs + thinking_budget. FIX IMPLEMENTED + verified end-to-end on the PRODUCTION classify_depth_focused() path (GPT-OSS, 50-FB golden): 67.3%→72.0% acc (+4.7pt) AND 14.2s→7.3s median (1.95×), 0 fail-closed. (Harness-only 76% was optimistic — it used its own requests.post with response_format=json_object, not the production call path.)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/omlx_call.py
+  - pipeline/pipeline_paths.py
+  - pipeline/stage4_merged_call.py
+  - config/pipeline_config.yaml
+  created: '2026-08-14'
+- id: D2361
+  category: BUGFIX
+  state: RESOLVED
+  description: 'classify_depth_focused() defaulted model to S4_DEPTH_MODEL (gemma-4-E4B) unconditionally when model was omitted, even with depth_frugal_enabled=false — silently running the gated cheap model instead of GPT-OSS (VERIFY_MODEL). Production (stage4_merge.py) passes model explicitly so the mismatch was masked; any caller omitting model hit Gemma. Fixed: default now mirrors stage4_merge.py routing (S4_DEPTH_MODEL if frugal enabled else VERIFY_MODEL).'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merged_call.py
+  created: '2026-08-14'
+- id: D2360
+  category: MODEL
+  state: ACTIVE
+  description: 'Qwen3.8-27B is 2.8x SLOWER than Qwen3-Coder for S2 extraction (112.8s vs 40.9s avg) and dropped 1 FB to NULL — rejected as S2 generator. Qwen2.5-3B deleted (degenerate depth=2%).'
+  champion: 2026-08-14 session
+  target_files: []
+  created: '2026-08-14'
 summary:
-  total: 347
+  total: 350
   proposed: 0
   draft: 1
   active: 295
@@ -2808,7 +2834,7 @@ summary:
     CLS: 15
     STR: 1
     PERF: 6
-    BUGFIX: 31
+    BUGFIX: 32
     CFG: 5
     ARCH: 22
     pipeline-fix: 2

@@ -1,0 +1,143 @@
+{
+  "created_at": "2026-08-14T21:46:41",
+  "n_clusters": 6,
+  "models": [
+    "Qwen3.8-27B-MLX-4bit"
+  ],
+  "summaries": {
+    "Qwen3.8-27B-MLX-4bit": {
+      "name": "Qwen3.8-27B-MLX-4bit",
+      "n": 6,
+      "avg_secs": 112.83999999999999,
+      "median_secs": 131.01,
+      "min_secs": 32.58,
+      "max_secs": 148.64,
+      "total_secs": 677.04,
+      "n_fb": 5,
+      "n_null": 1,
+      "n_invalid": 0,
+      "n_schema_fail": 0,
+      "fb_rate": 0.8333333333333334,
+      "route_agreement": 1.0
+    }
+  },
+  "per_model_rows": {
+    "Qwen3.8-27B-MLX-4bit": [
+      {
+        "cluster_id": "cluster_66",
+        "n_segments": 5,
+        "route": "FB",
+        "valid": true,
+        "secs": 148.64,
+        "usage": {
+          "prompt_tokens": 1958,
+          "completion_tokens": 596,
+          "total_tokens": 2554,
+          "input_tokens": 1958,
+          "output_tokens": 596,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "model_load_duration": 31.24,
+          "total_time": 117.26
+        },
+        "name": "Heuristic Regularization Under Uncertainty"
+      },
+      {
+        "cluster_id": "cluster_109",
+        "n_segments": 6,
+        "route": "FB",
+        "valid": true,
+        "secs": 109.57,
+        "usage": {
+          "prompt_tokens": 1956,
+          "completion_tokens": 604,
+          "total_tokens": 2560,
+          "input_tokens": 1956,
+          "output_tokens": 604,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 109.51
+        },
+        "name": "Focal Point Convergence"
+      },
+      {
+        "cluster_id": "cluster_113",
+        "n_segments": 8,
+        "route": "FB",
+        "valid": true,
+        "secs": 121.24,
+        "usage": {
+          "prompt_tokens": 1957,
+          "completion_tokens": 711,
+          "total_tokens": 2668,
+          "input_tokens": 1957,
+          "output_tokens": 711,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 121.16
+        },
+        "name": "Individual Rationality Drives Collective Ruin"
+      },
+      {
+        "cluster_id": "cluster_185",
+        "n_segments": 2,
+        "route": "NULL",
+        "valid": true,
+        "secs": 32.58,
+        "usage": {
+          "prompt_tokens": 1680,
+          "completion_tokens": 11,
+          "total_tokens": 1691,
+          "input_tokens": 1680,
+          "output_tokens": 11,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 32.53
+        },
+        "name": ""
+      },
+      {
+        "cluster_id": "cluster_306",
+        "n_segments": 20,
+        "route": "FB",
+        "valid": true,
+        "secs": 134.0,
+        "usage": {
+          "prompt_tokens": 1985,
+          "completion_tokens": 628,
+          "total_tokens": 2613,
+          "input_tokens": 1985,
+          "output_tokens": 628,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 133.91
+        },
+        "name": "Stereotype-Driven Behavioral Priming"
+      },
+      {
+        "cluster_id": "cluster_321",
+        "n_segments": 4,
+        "route": "FB",
+        "valid": true,
+        "secs": 131.01,
+        "usage": {
+          "prompt_tokens": 1865,
+          "completion_tokens": 622,
+          "total_tokens": 2487,
+          "input_tokens": 1865,
+          "output_tokens": 622,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 130.94
+        },
+        "name": "Expectation-Driven Biochemical Reality"
+      }
+    ]
+  }
+}

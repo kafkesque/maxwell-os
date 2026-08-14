@@ -103,6 +103,10 @@ VERIFY_TEMPERATURE=_CFG["models"]["verifier"]["temperature"]
 # D2249/BUG-074: GPT-OSS reasoning models burn max_tokens on CoT. Config-driven prefix + token budget.
 VERIFY_REASONING_OFF_PREFIX=_CFG["models"]["verifier"].get("reasoning_off_prefix", "")
 VERIFY_REASONING_OFF_MODELS=set(_CFG["models"]["verifier"].get("reasoning_off_models", []))  # D2249/C12: no hardcoded names
+# D2359: oMLX silently drops top-level reasoning_effort/enable_thinking (pydantic extra='ignore').
+# Correct levers are chat_template_kwargs (dict) + thinking_budget (int), both oMLX-native.
+VERIFY_CHAT_TEMPLATE_KWARGS=_CFG["models"]["verifier"].get("chat_template_kwargs", None) or {}
+VERIFY_THINKING_BUDGET=_CFG["models"]["verifier"].get("thinking_budget", None)
 VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
 VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2264: cross-family verifier (Phi-4-mini)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]

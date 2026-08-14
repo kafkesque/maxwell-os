@@ -86,6 +86,7 @@ from pipeline.stage4_merged_call import (
     classify_depth_focused,
     merged_cribs_classify,
 )
+from pipeline.intimacy_lattice import resolve_intimacy  # W6/D369: v1 intimacy lattice (replaces hardcoded "public")
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -570,35 +571,6 @@ def dedup_fbs_by_cosine(
     return fbs
 
 
-def load_stage2_clusters() -> list[dict]:
-    """D2198: Renamed from load_stage3_clusters (Stage 3 removed per D2120).
-
-    Always loads from Stage 2 FBs — Stage 1.5 clustering + Stage 2 convergent
-    extraction replaced the old HDBSCAN pipeline. The old function name was
-    misleading (it never loaded Stage 3 data, always loaded Stage 2).
-    """
-    clusters, _ = load_stage2_fbs_via_clusters()
-    return clusters
-
-
-def load_stage2_principles() -> dict[str, dict]:
-    """Load principles from Stage 2, indexed by principle_id and fb_id (v2/v3 compat)."""
-    if not STAGE2_CHECKPOINT.exists():
-        print("❌ Stage 2 checkpoint not found.")
-        sys.exit(1)
-
-    principles: dict[str, dict] = {}
-    # D2332: fail-closed JSONL load — pretty-printed checkpoint must raise, not silently drop.
-    for p in load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint"):
-        pid = p.get("principle_id", "")
-        fid = p.get("fb_id", "")
-        if pid:
-            principles[pid] = p
-        if fid and fid != pid:
-            principles[fid] = p
-    return principles
-
-
 def validate_classification(result: dict) -> tuple[bool, list[str]]:
     """Validate multi-label classification output against canonical taxonomy.
 
@@ -894,8 +866,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         print("❌ OMLX is not running.")
         sys.exit(1)
 
-    clusters = load_stage2_clusters()
-    principles_idx = load_stage2_principles()
+    # D2353/BUG-113: reuse the principles_idx returned by load_stage2_fbs_via_clusters()
+    # (which merges STAGE2_CHECKPOINT + STAGE2_SINGLETON_OUTPUT) instead of re-loading
+    # via load_stage2_principles() — which reads ONLY the checkpoint and silently drops
+    # singleton FBs. Singleton clusters were loaded but their principle_ids never resolved.
+    clusters, principles_idx = load_stage2_fbs_via_clusters()
 
     if cluster_ids:
         clusters = [c for c in clusters if c["cluster_id"] in cluster_ids]
@@ -1232,12 +1207,23 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # When enabled (default), run a SEPARATE short focused depth prompt and
         # OVERRIDE the depth from the long classify call. Cost: +1 fast call/FB.
         if S4_DEPTH_FOCUSED_CLASSIFICATION:
-            depth_val = classify_depth_focused(
-                fb_data,
-                model=VERIFY_MODEL,
-                max_tokens=S4_DEPTH_MAX_TOKENS,
-            )
-            print(f"(depth:{depth_val})", flush=True, end=" ")
+            # D2351/BUG-108: FAIL-CLOSED depth. classify_depth_focused() now RAISES
+            # on transport failure, empty content, or an ambiguous answer instead of
+            # silently returning "domain". An inference failure must never become a
+            # valid-looking semantic label (C16). Count it → max_failed_ratio gate.
+            try:
+                depth_val = classify_depth_focused(
+                    fb_data,
+                    model=VERIFY_MODEL,
+                    max_tokens=S4_DEPTH_MAX_TOKENS,
+                )
+                print(f"(depth:{depth_val})", flush=True, end=" ")
+            except Exception as e:
+                depth_val = S4_DEPTH_FALLBACK_DEPTH
+                class_data["classification_status"] = "FAILED"
+                class_data["classification_error"] = f"depth_focused: {e}"[:200]
+                classification_errors += 1
+                print(f"(depth:FAILED {type(e).__name__})", flush=True, end=" ")
         elif raw_depth in VALID_DEPTHS:
             depth_val = raw_depth
         else:
@@ -1346,8 +1332,15 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         else:
             accessibility_val = "self-evident"
 
-        # intimacy_boundary: default public for pipeline FBs (user can override)
-        intimacy_val = "public"
+        # intimacy_boundary: restore the v1 lattice (D369/D383) instead of a
+        # hardcoded "public". Resolves private/selective/public from three
+        # 2.0-native signals: field routing (source) + topic sensitivity +
+        # context (personal-only → private, mixed → selective).
+        intimacy_val, _intimacy_rule = resolve_intimacy({
+            "context": context_val,
+            "discipline": canonical_discipline,
+            "domains": canonical_domains,
+        })
 
         # provenance: pipeline FBs are always llm_extracted_from_source (C29)
         provenance_val = "llm_extracted_from_source"
@@ -1391,16 +1384,23 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
             "source_principle_ids": [p.get("principle_id", "") for p in cluster_principles if p.get("principle_id")],
+            # D2352/BUG-110: carry segment-level provenance (declared in metadata.provenance, was dropped at S4)
+            "source_segments": list(fb_data.get("source_segments", []) or []),
             "evidence_passages": cluster_principles[0].get("evidence_passages", []) if cluster_principles else [],
             "evidence_passages_shown": cluster_principles[0].get("evidence_passages_shown", []) if cluster_principles else [],
             "source_text": _collect_source_text(cluster_principles),
+            # D2352/BUG-112: persist the summary/principle gate (S2 emits it, S4 dropped it)
+            "is_summary": bool(fb_data.get("is_summary", False)),
             "classification_errors": errors if errors else None,
             # ── Utilization tracking (initialized at zero) ──
             "usage_count": 0,
             "feedback_score": None,
             "feedback_count": 0,
             "fb_version": 1,
-            "classification_status": "CLEAN",  # D2214/F-H16: Pydantic default never applied to dict
+            # D2351: reflect depth/classification failure instead of always CLEAN
+            "classification_status": class_data.get("classification_status", "CLEAN"),
+            # D2351: preserve the failure reason when present (C16 observability)
+            "classification_error": class_data.get("classification_error"),
             # D2337: surface taxonomy match method (D2310 diagnostic, was computed then discarded)
             "taxonomy_match_method": class_data.get("taxonomy_match_method"),
         }

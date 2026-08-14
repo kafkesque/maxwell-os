@@ -1,11 +1,33 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-14 12:22 | **Decisions:** D2000-D2350 (339 decisions)
+> **Updated:** 2026-08-14 13:48 | **Decisions:** D2000-D2355 (344 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
 > **Diagnostic:** 188 FBs, 72.4% S5 pass rate → T1.1 authorized (CONDITIONAL-GO — see B1-B15)
 > **Detailed tasks:** `governance/aggregated_remaining_tasks.md`
 > **Buglog:** `governance/buglog.md`
+
+---
+
+# 🔴 NEW THIS SESSION — 4th Audit Adjudication (BUG-108…119, D2351–D2355, 2026-08-14)
+
+> **4-LLM audit (`chatgpt0010.md`, `claude0010.md`) × independent code re-verification.** S4 depth fail-open + provenance/schema gaps + singleton index + S4 bottleneck. Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`. Two ChatGPT errors corrected.
+
+| # | Decision | Task (code-verified) | Effort | Status |
+|---|----------|----------------------|--------|--------|
+| **M1** | D2351 | S4 depth fail-closed — no silent `"domain"` (BUG-108) | 0.5h | 🔴 OPEN |
+| **M2** | D2351 | `depth_max_tokens` 512 → 1024 (BUG-109) | 0.25h | 🔴 OPEN |
+| **M3** | D2352 | Carry `source_segments` through S4→S6 (BUG-110) | 1h | 🟠 OPEN |
+| **M4** | D2352 | Persist `is_summary` end-to-end (BUG-112) | 0.5h | 🟠 OPEN |
+| **S1** | D2352 | Persist `evidence_passages` to SQLite (BUG-111) | 1h | 🟠 OPEN |
+| **S2** | D2353 | Singleton S2→S4 index fix (BUG-113) | 1h | 🔴 OPEN |
+| **S3** | D2354 | S4 bottleneck resolution — batch focused depth (BUG-114) | 2–3h | 🟠 OPEN |
+| **S4** | D2355 | Batch missing-output fail-closed (BUG-115) | 0.5h | 🟠 OPEN |
+| **S5** | D2351 | Depth benchmark authority (BUG-115) | 1h | 🟠 OPEN |
+| **W1–W7** | D2355+ | Hygiene: dead `s3_original_domain`, secondary writers, `jargon`-FTS, `deathpectation` (BUG-116…119 + drift) | 3h | 🟡 OPEN |
+
+> **Verdict:** canary re-run + T1.1 **NOT clean** until M1+M2 (S4 depth fail-closed + token budget) — live in default path,
+> silently corrupt the depth audit. S4 speed (D2354) is the full-T1.1 *feasibility* gate (62h → ~25–30h).
 
 ---
 

@@ -1,0 +1,112 @@
+{
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "n": 8,
+  "seed": 42,
+  "batch_size": 4,
+  "max_tokens": 1024,
+  "path_a": {
+    "total_s": 67.39,
+    "avg_s": 8.42375,
+    "accuracy": 0.75,
+    "failures": 0
+  },
+  "path_b": {
+    "total_s": 34.8,
+    "avg_s": 4.35,
+    "accuracy": 0.75,
+    "failures": 0
+  },
+  "parity": 0.75,
+  "speedup_x": 1.9364942528735634,
+  "gate_pass": false,
+  "rows": [
+    {
+      "id": "CONV-023",
+      "gold": "universal",
+      "A": "universal",
+      "A_t": 5.53,
+      "A_ok": true,
+      "B": "universal",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": true
+    },
+    {
+      "id": "CONV-053",
+      "gold": "domain",
+      "A": "cross-domain",
+      "A_t": 9.27,
+      "A_ok": false,
+      "B": "domain",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": false
+    },
+    {
+      "id": "CONV-021",
+      "gold": "cross-domain",
+      "A": "cross-domain",
+      "A_t": 6.11,
+      "A_ok": true,
+      "B": "cross-domain",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": true
+    },
+    {
+      "id": "CONV-049",
+      "gold": "cross-domain",
+      "A": "cross-domain",
+      "A_t": 7.64,
+      "A_ok": true,
+      "B": "domain",
+      "B_t": 4.35,
+      "B_ok": false,
+      "agree": false
+    },
+    {
+      "id": "CONV-040",
+      "gold": "specialized",
+      "A": "specialized",
+      "A_t": 4.51,
+      "A_ok": true,
+      "B": "specialized",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": true
+    },
+    {
+      "id": "CONV-012",
+      "gold": "domain",
+      "A": "domain",
+      "A_t": 18.76,
+      "A_ok": true,
+      "B": "domain",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": true
+    },
+    {
+      "id": "CONV-026",
+      "gold": "cross-domain",
+      "A": "cross-domain",
+      "A_t": 5.71,
+      "A_ok": true,
+      "B": "cross-domain",
+      "B_t": 4.35,
+      "B_ok": true,
+      "agree": true
+    },
+    {
+      "id": "CONV-001",
+      "gold": "domain",
+      "A": "cross-domain",
+      "A_t": 9.86,
+      "A_ok": false,
+      "B": "cross-domain",
+      "B_t": 4.35,
+      "B_ok": false,
+      "agree": true
+    }
+  ]
+}

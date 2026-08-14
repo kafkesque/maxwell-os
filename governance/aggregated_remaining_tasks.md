@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-14 12:22 | **Decisions:** D2000-D2350 (339) | **T1.1 canary GREEN (V1–V6); remaining gate = S4 speed**
+> **Updated:** 2026-08-14 13:48 | **Decisions:** D2000-D2355 (344) | **T1.1 canary GREEN (V1–V6); remaining gate = S4 speed + depth correctness**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
@@ -7,6 +7,56 @@
 > **Audit completed:** Runner.py Gemma dead code purged. Stale comments fixed. No silent crash risks found.
 > **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
 > **D2337-D2341 (NEW, 4-LLM audit):** S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections.
+> **D2351-D2355 (NEW, 4-LLM audit × independent re-verification):** S4 depth fail-open, provenance/schema gaps, singleton index, S4 bottleneck. **Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`.**
+
+---
+
+## 🔴 #0.5 — MUST/SHOULD/WORTH before canary re-run + T1.1 (BUG-108…119, D2351–D2355, 2026-08-14)
+
+> **4-LLM audit (`chatgpt0010.md`, `claude0010.md`) × independent code re-verification.** Two ChatGPT errors corrected
+> (`s3_original_domain` is migrated+dead, not a fresh-DB blocker; singleton integration is still broken, not "fixed").
+> Full tiered breakdown: **`governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`**.
+
+> **✅ IMPLEMENTATION STATUS (2026-08-14 14:34):** M1–M4, S1, S2, S4, W1–W6 are **DONE** (verified with
+> `py_compile` + unit + live SQLite tests). **S3 is PARTIAL** — `batch_depth_classify()` was A/B-tested live
+> (n=8): ~1.9× faster but **75% parity (< 90% gate)** → NOT wired into production; the recommendation is a
+> FrugalGPT gemma-4-E4B depth cascade behind the same gate. **S5** (benchmark-through-production) and **W7**
+> (`deathpectation` literal) remain open. **W6 intimacy routing → D2356** (`pipeline/intimacy_lattice.py`).
+
+### 🔴 MUST (blocks a defensible T1.1)
+
+| # | Task | Bug | Decision | Effort |
+|---|------|-----|----------|:------:|
+| M1 | S4 depth fail-closed — no silent `"domain"` on exception/no-match | BUG-108 | D2351 | 0.5h |
+| M2 | `depth_max_tokens` 512 → 1024 + fix stale docstring | BUG-109 | D2351 | 0.25h |
+| M3 | Carry `source_segments` through S4 → S6 | BUG-110 | D2352 | 1h |
+| M4 | Persist `is_summary` end-to-end | BUG-112 | D2352 | 0.5h |
+
+### 🟠 SHOULD (quality / feasibility — before full T1.1)
+
+| # | Task | Bug | Decision | Effort |
+|---|------|-----|----------|:------:|
+| S1 | Persist `evidence_passages`/`_shown` to SQLite (or document Parquet as verbatim store) | BUG-111 | D2352 | 1h |
+| S2 | Singleton S2→S4 index fix (`run_stage4` reuse `principles_idx`) | BUG-113 | D2353 | 1h |
+| S3 | S4 bottleneck resolution (remove batch `depth` + batch focused depth) | — | D2354 | 2–3h |
+| S4 | Batch missing-output fail-closed | BUG-114 | D2355 | 0.5h |
+| S5 | Depth benchmark authority (production path; reconcile 87.5% vs 37.5/50%) | BUG-115 | D2351 | 1h |
+
+### 🟡 WORTH (hygiene / drift / bloat — non-blocking)
+
+| # | Task | Bug / note | Effort |
+|---|------|-----------|:------:|
+| W1 | Remove dead `s3_original_domain` | BUG-116 | 0.5h |
+| W2 | Unify secondary checkpoint writers on `_write_checkpoint_jsonl` | BUG-117 | 0.5h |
+| W3 | `insert_embedding()` per-FB failure logging | BUG-118 | 0.25h |
+| W4 | Add `jargon` to FTS5 | BUG-119 | 0.25h |
+| W5 | Reconcile `extraction_type` "S5 consumer" claim | drift | 0.25h |
+| W6 | Restore/document v2 intimacy routing | drift | 1h |
+| W7 | Define or drop `deathpectation` | drift | 0.25h |
+
+> **S4 bottleneck (D2354) — the ultimate solution:** correctness-first (fail-closed + 1024 tokens) → remove waste
+> (drop `depth` from CRIBS batch) → batch the *focused* depth prompt (keep GPT-OSS + short prompt + `fb_index`) →
+> benchmark gate ≥90% → only then consider gemma-4-E4B. Target: ~25s/FB → ~6–8s/FB, full T1.1 62h → ~25–30h.
 
 ---
 

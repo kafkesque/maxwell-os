@@ -19,6 +19,8 @@ Usage:
     result = merged_cribs_classify(fb_data)
 """
 
+import re
+
 from pipeline.omlx_call import call_omlx_json
 
 MERGED_CRIBS_CLASSIFY_SYSTEM = """You enrich and classify a Foundation Block in a single response. You receive an FB
@@ -279,6 +281,63 @@ Answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No rea
 
 VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
 
+# D2351: fail-closed depth parsing (C16). Order matters for token-level match:
+# "cross-domain" must be tested before "domain" only if using substring search —
+# token-level matching below compares WHOLE tokens, so order is irrelevant here.
+# Kept as an explicit ordering for any substring-based callers.
+DEPTH_ORDER: tuple[str, ...] = ("cross-domain", "universal", "specialized", "domain")
+
+
+class DepthClassificationError(RuntimeError):
+    """Raised when depth cannot be classified unambiguously (fail-closed, C16).
+
+    Do NOT catch this and substitute a semantic label — route it into the
+    stage's classification_errors accounting so a failed inference is never
+    mistaken for a valid depth classification.
+    """
+
+
+def _parse_depth_token(raw: str) -> str:
+    """Parse exactly one depth token from a focused-depth answer (D2351).
+
+    The focused prompt demands EXACTLY ONE WORD. Any answer that is not an
+    unambiguous single depth label is a failure and must fail closed (raise)
+    rather than silently default to "domain".
+
+    Args:
+        raw: Raw model output for the focused depth prompt.
+
+    Returns:
+        One of "universal" | "cross-domain" | "domain" | "specialized".
+
+    Raises:
+        DepthClassificationError: if zero or multiple depth labels are present.
+    """
+    text = (raw or "").strip().lower()
+    # strip surrounding punctuation/quotes/backticks (models often wrap the word)
+    text = text.strip('`"\'.')
+    # exact single-token answer (the common case)
+    if text in VALID_DEPTHS:
+        return text
+    # token-level match — compare WHOLE tokens so "cross-domain" is never
+    # mistaken for "domain" (and vice-versa).
+    tokens = [t for t in re.split(r"[^a-z\-]+", text) if t]
+    present = [d for d in DEPTH_ORDER if d in tokens]
+    if len(present) == 1:
+        return present[0]
+    raise DepthClassificationError(
+        f"ambiguous depth answer {raw!r} (tokens={tokens}, matched={present})"
+    )
+
+
+class BatchClassificationError(RuntimeError):
+    """Raised when a batch classification is incomplete or malformed (D2355/BUG-114).
+
+    A missing or invalid batch entry must never be fabricated into valid-looking
+    semantic labels (domain/emerging/cited). Callers catch this and fall back to
+    individual classification — the missing entry is re-classified, not invented.
+    """
+
 
 # ── D2265: Batch CRIBS + Classification ──────────────────────────────────────
 # S4 bottleneck: GPT-OSS-20B burns ~15-20s on reasoning_content before producing
@@ -423,14 +482,21 @@ def batch_cribs_classify(
         "evidence": "cited",
     }
     output: list[dict] = []
-    valid_depths = {"universal", "cross-domain", "domain", "specialized"}
     for i in range(len(fbs_data)):
-        if i in indexed:
-            entry = indexed[i]
-        else:
-            entry = dict(defaults)
+        if i not in indexed:
+            # D2355/BUG-114: FAIL-CLOSED — a missing batch entry must never be
+            # fabricated into valid-looking semantic labels (domain/emerging/cited).
+            # Raise so the caller falls back to individual classification instead.
+            raise BatchClassificationError(
+                f"batch missing output for fb_index={i} "
+                f"({len(indexed)}/{len(fbs_data)} entries returned)"
+            )
+        entry = indexed[i]
 
-        # Fill missing with defaults
+        # Fill missing fields within a PRESENT entry with safe defaults.
+        # Empty strings / null are non-semantic (safe); the "emerging"/"domain"
+        # semantic defaults mirror the single-call path (merged_cribs_classify),
+        # so a present-but-sparse entry degrades identically to a single call.
         for key, default in defaults.items():
             if key not in entry or entry[key] is None:
                 entry[key] = default
@@ -438,10 +504,6 @@ def batch_cribs_classify(
         # Clean up jargon
         if "jargon" in entry and (not entry["jargon"] or entry["jargon"] == {}):
             del entry["jargon"]
-
-        # Validate depth
-        if entry.get("depth") not in valid_depths:
-            entry["depth"] = "domain"
 
         output.append(entry)
 
@@ -458,7 +520,7 @@ BATCH_SIZE_MAX: int = 6
 def classify_depth_focused(
     fb_data: dict,
     model: str = "gpt-oss-20b-MXFP4-Q8",
-    max_tokens: int = 512,
+    max_tokens: int = 1024,
     timeout: int = 120,
 ) -> str:
     """Classify ONLY the depth of an FB with a short focused prompt (BUG-075).
@@ -466,17 +528,25 @@ def classify_depth_focused(
     D2247: The long combined classify prompt degrades depth accuracy for all
     models (GPT-OSS: 62.5% short → 38% long; cross-domain 0/3 for every model).
     This separate call uses the PROVEN short prompt format from
-    tools/benchmark_s4_depth_gptoss.py (62.5% accuracy).
+    tools/benchmark_s4_depth_gptoss.py.
 
     Args:
         fb_data: FB dict with name, definition, mechanism, extraction_type.
         model: Model to use. Default GPT-OSS-20B (D2249 classifier).
-        max_tokens: Max output tokens (512 is plenty — one word answer).
+        max_tokens: Max output tokens. Default 1024 — GPT-OSS is a *reasoning*
+            model and emits reasoning_content before the answer; 512 truncates
+            reasoning mid-stream, yielding empty content (D2351/BUG-109).
         timeout: Request timeout in seconds.
 
     Returns:
         One of: "universal", "cross-domain", "domain", "specialized".
-        Falls back to "domain" on any error (conservative default, C20).
+
+    Raises:
+        DepthClassificationError: on empty content or an ambiguous/non-label
+            answer. Transport/parse failures from call_omlx also propagate.
+        This is FAIL-CLOSED (C16): callers must route the exception into
+        classification_errors — a failed inference is never silently rebranded
+        as a valid "domain" label.
     """
     from pipeline.omlx_call import call_omlx
 
@@ -492,18 +562,149 @@ def classify_depth_focused(
         extraction_type=extraction_type,
     )
 
-    try:
-        raw = call_omlx(
+    raw = call_omlx(
+        prompt=prompt,
+        model=model,
+        max_tokens=max_tokens,
+        timeout=timeout,
+    )
+    if not raw or not raw.strip():
+        raise DepthClassificationError(
+            "empty content from focused depth call (reasoning-model truncation?)"
+        )
+    return _parse_depth_token(raw)
+
+
+# ── D2354: Batched Focused Depth Classification ─────────────────────────────
+# S4 bottleneck: classify_depth_focused() is SERIALIZED — one GPT-OSS call per
+# FB at ~10s each (reasoning model pays CoT cost every call). Batching N depth
+# queries into ONE call amortizes that cost (~10s/FB → ~1-2s/FB). The SHORT
+# proven prompt (62.5–87.5% accuracy) is preserved verbatim; only the transport
+# changes (one JSON array response instead of one word).
+
+DEPTH_BATCH_SYSTEM = """Classify the DEPTH of each Foundation Block below.
+
+ONTOLOGY:
+- specialized: Requires technical expertise in one narrow field. (e.g., optical kerning in typography)
+- domain: Applies broadly within one discipline only. (e.g., price anchoring in behavioral economics)
+- cross-domain: Same principle applies across multiple disciplines. (e.g., feedback loops in biology AND orgs)
+- universal: A law of nature or mathematics — applies everywhere. (e.g., entropy, power laws)
+
+For EACH FB, answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning.
+Return ONLY a JSON array of objects: [{"fb_index": <number>, "depth": "<one word>"}, ...]
+Match fb_index to the input order. One object per input FB."""
+
+
+def build_depth_batch_prompt(fbs_data: list[dict]) -> str:
+    """Build a batched focused-depth prompt for multiple FBs (D2354).
+
+    Mirrors DEPTH_FOCUSED_PROMPT (the proven short prompt) but lists multiple
+    FBs and requests a JSON array keyed by fb_index.
+    """
+    lines = ["Classify the DEPTH of each Foundation Block below.", ""]
+    for i, fb_data in enumerate(fbs_data):
+        name = fb_data.get("name", "")
+        definition = fb_data.get("definition", "")
+        mechanism = fb_data.get("mechanism", "")
+        extraction_type = fb_data.get("extraction_type", "causal_mechanism")
+        lines.append(f"--- FB {i} ---")
+        lines.append(f"Name: {name}")
+        lines.append(f"Definition: {definition}")
+        if mechanism:
+            lines.append(f"Mechanism: {mechanism}")
+        lines.append(f"Type: {extraction_type}")
+        lines.append("")
+    lines.append(
+        "Return ONLY a JSON array: "
+        '[{"fb_index": <number>, "depth": "<specialized|domain|cross-domain|universal>"}, ...]. '
+        "One word per FB, match fb_index to the input order."
+    )
+    return "\n".join(lines)
+
+
+def batch_depth_classify(
+    fbs_data: list[dict],
+    model: str | None = None,
+    max_tokens: int | None = None,
+    batch_size: int | None = None,
+    timeout: int = 180,
+) -> list[str]:
+    """Batch the focused depth prompt across multiple FBs (D2354).
+
+    Same SHORT prompt + ontology as classify_depth_focused(), but N FBs per
+    GPT-OSS call to amortize the reasoning-model CoT cost (~10s/FB → ~1-2s/FB).
+
+    Args:
+        fbs_data: List of FB dicts (name, definition, mechanism, extraction_type).
+        model: Model. None → VERIFY_MODEL (gpt-oss-20b).
+        max_tokens: None → stage4.depth_max_tokens (1024).
+        batch_size: None → stage4.depth_batch_size (4). Maximum FBs per call.
+        timeout: Request timeout in seconds.
+
+    Returns:
+        List of depth strings, same order as fbs_data.
+
+    Raises:
+        DepthClassificationError: on missing/ambiguous depth for any FB (fail-closed).
+        BatchClassificationError: on a non-list response.
+    """
+    if model is None:
+        try:
+            from pipeline.pipeline_paths import VERIFY_MODEL
+            model = VERIFY_MODEL
+        except Exception:
+            model = "gpt-oss-20b-MXFP4-Q8"
+    if not fbs_data:
+        return []
+    if max_tokens is None:
+        try:
+            from pipeline.pipeline_paths import _CFG
+            max_tokens = int(_CFG.get("stage4", {}).get("depth_max_tokens", 1024))
+        except Exception:
+            max_tokens = 1024
+    if batch_size is None:
+        try:
+            from pipeline.pipeline_paths import _CFG
+            batch_size = int(_CFG.get("stage4", {}).get("depth_batch_size", 4))
+        except Exception:
+            batch_size = 4
+    batch_size = max(1, int(batch_size))
+
+    system = DEPTH_BATCH_SYSTEM
+    if model:
+        from pipeline.pipeline_paths import VERIFY_REASONING_OFF_MODELS, VERIFY_REASONING_OFF_PREFIX
+        if model in VERIFY_REASONING_OFF_MODELS and VERIFY_REASONING_OFF_PREFIX:
+            system = f"{VERIFY_REASONING_OFF_PREFIX}\n\n{system}"
+
+    output: list[str] = []
+    for start in range(0, len(fbs_data), batch_size):
+        chunk = fbs_data[start:start + batch_size]
+        prompt = build_depth_batch_prompt(chunk)
+        result = call_omlx_json(
             prompt=prompt,
             model=model,
+            system=system,
             max_tokens=max_tokens,
             timeout=timeout,
         )
-        text = (raw or "").strip().lower()
-        # Parse the single-word answer (first depth word found)
-        for d in ("cross-domain", "universal", "specialized", "domain"):
-            if d in text:
-                return d
-        return "domain"
-    except Exception:
-        return "domain"
+        if isinstance(result, dict):
+            result = [result]
+        if not isinstance(result, list):
+            raise BatchClassificationError(
+                f"depth batch returned non-list: {type(result)}"
+            )
+        indexed: dict[int, str] = {}
+        for item in result:
+            if isinstance(item, dict):
+                idx = item.get("fb_index", item.get("index", -1))
+                if isinstance(idx, int) and 0 <= idx < len(chunk):
+                    raw_depth = item.get("depth", "")
+                    if isinstance(raw_depth, str) and raw_depth.strip():
+                        indexed[idx] = _parse_depth_token(raw_depth)
+        for i in range(len(chunk)):
+            if i not in indexed:
+                raise DepthClassificationError(
+                    f"depth batch missing fb_index={i} (chunk start={start})"
+                )
+            output.append(indexed[i])
+    return output

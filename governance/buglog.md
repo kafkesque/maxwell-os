@@ -1,6 +1,96 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 13:05 (D2349/D2350 + BUG-106/107 fixed, BUG-104 partial; S4 bottleneck + intimacy-boundary analyses added)
+> **Last updated:** 2026-08-14 14:20 (MUST/SHOULD/WORTH implemented — 11 of 12 bugs FIXED; BUG-115 PARTIAL: benchmark-through-production still open)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🔴 BUG-108 — 2026-08-14 — S4 depth inference failure silently becomes `depth="domain"` (C16 violation)
+- **Symptom:** `classify_depth_focused()` returns `"domain"` on *any* exception (`except Exception: return "domain"`) and on no-match (`return "domain"`). GPT-OSS timeout, cold-reload empty content, transport error, malformed output, unexpected answer, and a *legitimate* `domain` all collapse to the same value — semantic contamination.
+- **Root cause:** the focused depth call omits `Reasoning: none` (batch/merged do send it), uses `depth_max_tokens: 512` (truncates GPT-OSS reasoning), parses by substring (`for d in (...): if d in text`), and the exception handler manufactures `"domain"` instead of propagating/quarantining. `call_omlx()` raises `KeyError` when `content is None` (reasoning-model cold reload), which is exactly what the handler swallows.
+- **Fix (D2351):** fail-closed — propagate failure into `classification_errors` (S4 `max_failed_ratio: 0.0` already exits non-zero); exact-token parser (accept exactly one of 4 labels); single fallback policy via `S4_DEPTH_FALLBACK_DEPTH`; send `Reasoning: none` on the focused path; bump `depth_max_tokens` to 1024.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (fail-closed depth (D2351)).
+- **Files:** `pipeline/stage4_merged_call.py`, `pipeline/omlx_call.py`, `config/pipeline_config.yaml`
+- **Source:** 4-LLM audit (ChatGPT depth-audit) + independent re-verification
+
+## 🔴 BUG-109 — 2026-08-14 — `depth_max_tokens: 512` contradicts measured ~1024 GPT-OSS requirement
+- **Symptom:** governance `S4_BOTTLENECK_ANALYSIS.md` live-measured GPT-OSS needs `max_tokens ≥ 1024` to emit the answer after reasoning (1024 → `"specialized"`); production config `stage4.depth_max_tokens: 512` overrides the verifier model-level `max_tokens: 1024`. The 512 budget truncates reasoning, triggering BUG-108's failure path.
+- **Root cause:** config↔governance drift; the `classify_depth_focused()` docstring "512 is plenty — one word answer" is stale (contradicted by the repo's own measurement).
+- **Fix (D2351):** `depth_max_tokens` 512 → 1024; correct the stale docstring.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (depth_max_tokens 1024 (D2351)).
+- **Files:** `config/pipeline_config.yaml`, `pipeline/stage4_merged_call.py`
+- **Source:** 4-LLM audit + independent re-verification
+
+## 🟠 BUG-110 — 2026-08-14 — `source_segments` declared provenance but dropped at S4/S6
+- **Symptom:** `config/content_types.yaml` declares `metadata.provenance: [..., source_segments, ...]`; S2 emits `source_segments`; but S4's FB record rebuild copies `source_clusters`/`source_books`/`source_principle_ids`/`evidence_passages` and **never `source_segments`**. Zero references in `stage4_merge.py`/`stage5_verify.py`/`stage6_commit.py`. Segment-level provenance is lost.
+- **Fix (D2352):** carry `source_segments` into the S4 FB dict + add an S6 column.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (source_segments S4→S6 (D2352)).
+- **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`, `config/content_types.yaml`
+- **Source:** 4-LLM audit (ChatGPT + Claude) + independent re-verification
+
+## 🟠 BUG-111 — 2026-08-14 — `evidence_passages`/`evidence_passages_shown` not persisted to SQLite
+- **Symptom:** S4 emits `evidence_passages` + `evidence_passages_shown`; S5 passes them through (`vfb = dict(fb)`); but S6's `fbs` schema + INSERT have no such columns — verbatim source quotes are dropped from the primary SQLite KB. (The Parquet snapshot *does* keep them via full-dict `from_pylist`; `source_text` IS a SQLite column.)
+- **Fix (D2352):** add columns, OR formally document Parquet as the verbatim-evidence store.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (evidence_passages/_shown → SQLite (D2352)).
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** Claude audit (Q5) + independent re-verification
+
+## 🟠 BUG-112 — 2026-08-14 — `is_summary` declared classification but dropped end-to-end
+- **Symptom:** `content_types.yaml` declares `is_summary` under `classification`; S2 emits it; but S4's FB dict omits it and S6's INSERT omits it → the `is_summary INTEGER DEFAULT 0` column is never written (always 0).
+- **Fix (D2352):** persist `is_summary` through S4 → S6.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (is_summary end-to-end (D2352)).
+- **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`
+- **Source:** 4-LLM audit + independent re-verification
+
+## 🔴 BUG-113 — 2026-08-14 — Singleton S2→S4 index inconsistency (silently skipped)
+- **Symptom:** `load_stage2_fbs_via_clusters()` loads singleton FBs into the `clusters` list *and* its local `principles_idx`; but `run_stage4()` discards that index and calls `load_stage2_principles()`, which reads ONLY `STAGE2_CHECKPOINT` (never `STAGE2_SINGLETON_OUTPUT`). Singleton clusters therefore have `principle_ids` absent from `principles_idx` → `if not cluster_principles: … "empty" … continue` silently skips them.
+- **Root cause:** two loaders diverge — one (clusters) includes singletons, the other (principles index) does not.
+- **Note:** ChatGPT initially flagged this (correct), then wrongly "retracted" it as FIXED. It is still broken.
+- **Fix (D2353):** `run_stage4()` should reuse the `principles_idx` returned by `load_stage2_fbs_via_clusters()`.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (singleton index reuse (D2353)).
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** ChatGPT audit (Q4, then retracted) + independent re-verification
+
+## 🟠 BUG-114 — 2026-08-14 — Batch missing-output silently becomes synthetic semantic values
+- **Symptom:** `batch_cribs_classify()` fills missing FB entries with `defaults = {"depth":"domain","discipline":"emerging","domains":["emerging"],"evidence":"cited",…}` — a missing model output becomes valid-looking semantic data (same C16 hidden-error class as BUG-108).
+- **Fix (D2355):** fail-closed / flag missing entries instead of manufacturing defaults.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (batch missing fail-closed (D2355)).
+- **Files:** `pipeline/stage4_merged_call.py`
+- **Source:** 4-LLM audit + independent re-verification
+
+## 🟠 BUG-115 — 2026-08-14 — Depth benchmark ≠ production parser; 87.5% vs 37.5/50% drift; fallback orphaned
+- **Symptom:** (1) `tools/benchmark_s4_depth_gptoss.py` uses direct `requests` + `reasoning_content` fallback; production `classify_depth_focused()` uses `call_omlx` (raises on `content=None`) + content-only — the benchmark is not a production-path test. (2) governance claims 87.5% focused vs 38% long, while the benchmark docstring still frames GPT-OSS as "third entrant after Phi 37.5% / Gemma 50%". (3) `S4_DEPTH_FALLBACK_DEPTH` is loaded but never used by the focused classifier (only the `elif` branch when `depth_focused_classification=False`).
+- **Fix (D2351):** run benchmark through production `classify_depth_focused()`; make one authoritative number; route fallback through `S4_DEPTH_FALLBACK_DEPTH`.
+- **Status:** 🟠 PARTIAL — implemented 2026-08-14 (parser/fallback done; benchmark-through-production (S5) still open).
+- **Files:** `tools/benchmark_s4_depth_gptoss.py`, `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`
+- **Source:** ChatGPT depth audit + independent re-verification
+
+## 🟡 BUG-116 — 2026-08-14 — `s3_original_domain` vestigial dead column/field (bloat)
+- **Symptom:** `CREATE TABLE fbs` omits `s3_original_domain` but `insert_fb()` INSERTs it (value always `""` — S4 removed it per D2130). Migrated by `_migrate_add_column()` so NOT a fresh-DB failure (ChatGPT mislabeled this as a BLOCKER). Dead column + dead INSERT field.
+- **Fix (D2355):** remove from INSERT, migration, and (eventually) DB.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (s3_original_domain removed (D2355)).
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** ChatGPT audit (BLOCKER claim) → corrected via independent re-verification
+
+## 🟡 BUG-117 — 2026-08-14 — Secondary `STAGE2_CHECKPOINT` writers bypass self-verifying path
+- **Symptom:** `probe_run.py:225` writes via bare `open(...).write()` (no `safe_write`, no self-verify, violates C6); `repair_elaboration.py:237` uses `safe_write` but skips the `load_jsonl` self-verify re-read. Both are reimplementations instead of calling `_write_checkpoint_jsonl()`.
+- **Fix:** route both through `_write_checkpoint_jsonl()`.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (checkpoint writers unified (BUG-106 residual)).
+- **Files:** `pipeline/probe_run.py`, `pipeline/repair_elaboration.py`
+- **Source:** Claude audit (Q6) + independent re-verification
+
+## 🟠 BUG-118 — 2026-08-14 — `insert_embedding()` swallows failures silently
+- **Symptom:** `insert_embedding()` catches `Exception` and returns `False` with no per-FB log; S6 only reports aggregate vector degradation. A partially-unembedded committed corpus is invisible.
+- **Fix (D2355):** log which FB failed; surface in commit summary.
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (insert_embedding logs failures (D2355)).
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** ChatGPT audit + independent re-verification
+
+## 🟠 BUG-119 — 2026-08-14 — `jargon` (core body) excluded from FTS5
+- **Symptom:** FTS5 virtual table indexes only `name, definition, keywords`; `jargon` is classified `core_body` but is not full-text searchable — body content invisible to retrieval.
+- **Fix:** add `jargon` to the FTS5 index (retrieval-policy decision, not persistence loss).
+- **Status:** 🟢 FIXED — implemented 2026-08-14 (jargon added to FTS5).
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** Claude audit (Q2 side-finding) + independent re-verification
 
 ---
 

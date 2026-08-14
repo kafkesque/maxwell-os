@@ -113,8 +113,12 @@ CREATE TABLE IF NOT EXISTS fbs (
     source_clusters TEXT,          -- JSON array (hash strings)
     source_books TEXT,             -- JSON array
     source_principle_ids TEXT,     -- JSON array (references, not embedded)
+    source_segments TEXT,          -- JSON array of segment_ids (D2352/BUG-110 — was dropped at S4)
+    evidence_passages TEXT,        -- JSON array of verbatim quotes (D2352/BUG-111)
+    evidence_passages_shown TEXT,  -- JSON array (subset actually shown to the LLM)
     classification_errors TEXT,    -- JSON array or NULL
     classification_status TEXT NOT NULL DEFAULT 'CLEAN',  -- D2184: CLEAN | FALLBACK | FAILED (monotonic trust)
+    classification_error TEXT,     -- D2351: failure reason when status != CLEAN
     -- Verification (from Stage 5)
     verification_results TEXT,     -- JSON array
     borp_score REAL,
@@ -137,6 +141,7 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fbs_fts USING fts5(
     name,
     definition,
     keywords,
+    jargon,
     content='fbs',
     content_rowid='rowid'
 );
@@ -144,8 +149,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS fbs_fts USING fts5(
 
 CREATE_FTS_TRIGGERS = """
 CREATE TRIGGER IF NOT EXISTS fbs_ai AFTER INSERT ON fbs BEGIN
-    INSERT INTO fbs_fts(rowid, name, definition, keywords)
-    VALUES (new.rowid, new.name, new.definition, new.keywords);
+    INSERT INTO fbs_fts(rowid, name, definition, keywords, jargon)
+    VALUES (new.rowid, new.name, new.definition, new.keywords, new.jargon);
 END;
 """
 
@@ -199,6 +204,17 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # FTS5 may not be compiled in all SQLite builds
     try:
         conn.execute(CREATE_FTS_TABLE)
+        # BUG-119: FTS index now includes `jargon` (specialized terminology).
+        # Existing DBs were created with a 3-column fbs_fts (name, definition,
+        # keywords). CREATE IF NOT EXISTS will NOT add the jargon column, and the
+        # new 5-column trigger would then fail. Detect the old shape and rebuild.
+        try:
+            fts_cols = {r[1] for r in conn.execute("PRAGMA table_info(fbs_fts)").fetchall()}
+            if "jargon" not in fts_cols:
+                conn.execute("DROP TABLE IF EXISTS fbs_fts")
+                conn.execute(CREATE_FTS_TABLE)
+        except Exception:
+            pass  # PRAGMA unsupported on this FTS build — leave as-is
         # BUG-025 FIX: Rebuild FTS from ALL existing fbs rows (was DELETE which lost history)
         try:
             conn.execute("INSERT INTO fbs_fts(fbs_fts) VALUES('rebuild')")
@@ -211,7 +227,6 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # Add new columns if upgrading from older schema versions
     _migrate_add_column(conn, "fbs", "domains_raw", "TEXT")
     _migrate_add_column(conn, "fbs", "discipline_raw", "TEXT")  # D316: singular
-    _migrate_add_column(conn, "fbs", "s3_original_domain", "TEXT")
     _migrate_add_column(conn, "fbs", "pipeline_run_id", "TEXT")
     # v1 parity columns
     _migrate_add_column(conn, "fbs", "context", "TEXT")
@@ -226,6 +241,12 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "boundary", "TEXT")
     _migrate_add_column(conn, "fbs", "consequence", "TEXT")
     _migrate_add_column(conn, "fbs", "taxonomy_match_method", "TEXT")
+    # D2352: provenance/schema contract closure — segment provenance + verbatim evidence
+    _migrate_add_column(conn, "fbs", "source_segments", "TEXT")
+    _migrate_add_column(conn, "fbs", "evidence_passages", "TEXT")
+    _migrate_add_column(conn, "fbs", "evidence_passages_shown", "TEXT")
+    # D2351: fail-closed observability — reason a row is not CLEAN
+    _migrate_add_column(conn, "fbs", "classification_error", "TEXT")
     return conn
 
 
@@ -292,7 +313,11 @@ def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> b
             (rowid, blob),
         )
         return True
-    except Exception:
+    except Exception as e:
+        # BUG-118: was silently `return False` — a per-FB embedding failure was
+        # invisible. Log it (C16: no silent errors) but stay non-fatal (vector
+        # search falls back to FTS).
+        print(f"  ⚠️  Embedding insert failed (rowid={rowid}): {e}")
         return False  # Non-critical — vector search will fall back to FTS
 
 
@@ -308,38 +333,41 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 discipline, discipline_raw,
                 depth, evidence,
                 context, accessibility, intimacy_boundary, provenance,
-                source_text,
+                source_text, is_summary,
                 difficulty_level, temporal_scope, confidence_score,
                 prerequisite_fbs, procedural_skill,
                 contradicts_fbs, related_fbs,
                 usage_count, last_retrieved_at,
                 feedback_score, feedback_count, fb_version,
-                source_clusters, source_books, source_principle_ids,
-                classification_errors,
+                source_clusters, source_books, source_principle_ids, source_segments,
+                evidence_passages, evidence_passages_shown,
+                classification_errors, classification_status, classification_error,
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
-                s3_original_domain,
                 created_at, committed_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?,
                 ?, ?, ?, ?, ?,
-                ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
-                ?, ?, ?,
-                ?, ?,
-                ?, ?,
-                ?, ?, ?,
+                ?, ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?,
-                ?,
+                ?, ?,
+                ?, ?,
+                ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?,
+                ?, ?, ?,
+                ?, ?, ?,
+                ?, ?,
+                ?, ?, ?,
+                ?, ?,
                 ?, ?
             )
         """, (
@@ -370,8 +398,9 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb_accessibility(fb)),
             _safe_str(fb_intimacy_boundary(fb)),
             _safe_str(fb_provenance(fb), "llm_extracted_from_source"),
-            # source text for verification (D2131)
+            # source text for verification (D2131) + summary/principle gate (D2352)
             _safe_str(fb.get("source_text")),
+            1 if fb.get("is_summary") else 0,
             # agentic metadata (D2130)
             _safe_str(fb.get("difficulty_level")),
             _safe_str(fb.get("temporal_scope")),
@@ -386,12 +415,18 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             fb.get("feedback_score"),
             fb.get("feedback_count", 0),
             fb.get("fb_version", 1),
-            # provenance (simplified)
+            # provenance (simplified) + segment provenance (D2352)
             _safe_json(fb.get("source_clusters", [])),
             _safe_json(fb_source_books(fb)),
             _safe_json(fb.get("source_principle_ids", [])),
-            # classification errors
+            _safe_json(fb.get("source_segments", [])),
+            # verbatim evidence (D2352)
+            _safe_json(fb.get("evidence_passages", [])),
+            _safe_json(fb.get("evidence_passages_shown", [])),
+            # classification errors + fail-closed status (D2351)
             _safe_json(fb.get("classification_errors")),
+            _safe_str(fb.get("classification_status"), "CLEAN"),
+            _safe_str(fb.get("classification_error")),
             # verification
             _safe_json(fb.get("verification_results", [])),
             fb.get("borp_score", 0.0),
@@ -405,7 +440,6 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("pipeline_commit"), "unknown"),
             _safe_str(fb.get("taxonomy_version"), "v5.0"),
             _safe_str(fb.get("pipeline_run_id")),
-            _safe_str(fb.get("s3_original_domain"), ""),
             _safe_str(fb.get("created_at"), ""),
             datetime.now(UTC).isoformat(),
         ))
@@ -430,7 +464,8 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
         jsonlike_fields = {
             "domains", "domains_raw", "source_clusters", "source_books",
             "verification_results", "classification_errors",
-            "jargon", "source_principle_ids",
+            "jargon", "source_principle_ids", "source_segments",
+            "evidence_passages", "evidence_passages_shown",
             "prerequisite_fbs", "contradicts_fbs", "related_fbs",
         }
         for fb in fbs:

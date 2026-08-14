@@ -14,7 +14,9 @@
 #
 # Two ORTHOGONAL axes (this is the fix — they were conflated):
 #   content_type    = functional ROLE   → consumer: S4 router (where to store)
-#   extraction_type = epistemic FORM    → consumer: S5 verifier (what evidence)
+#   extraction_type = epistemic FORM    → persisted S4→S6 for future epistemic-aware
+#                                         verification; S5 (DeBERTa NLI) does NOT yet
+#                                         consume it (W5 drift, documented 2026-08-14).
 # Neither is a subtype of the other. A single role accepts multiple forms.
 
 schema_version: "3.0"

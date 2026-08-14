@@ -56,6 +56,7 @@ from pipeline.pipeline_paths import (
     STAGE5_CHECKPOINT,
     get_run_id,
 )
+from pipeline.intimacy_lattice import route_space  # W6: private/non-private space routing for MCP push
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -473,6 +474,7 @@ def _format_fb_payload(fb: dict) -> dict:
         "context": fb.get("context", "general"),
         "accessibility": fb.get("accessibility", "self-evident"),
         "intimacy_boundary": fb.get("intimacy_boundary", "public"),
+        "space": route_space(fb),  # W6: "private" | "non_private" — resolved from intimacy lattice
         "provenance": fb.get("provenance", "llm_extracted_from_source"),
         # ── Agentic metadata ──
         "difficulty_level": fb.get("difficulty_level", "intermediate"),

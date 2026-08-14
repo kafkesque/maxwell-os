@@ -24,7 +24,7 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 _sys = sys
 _sys.stdout = io.TextIOWrapper(_sys.stdout.buffer, write_through=True, line_buffering=True)
 
-from pipeline.io_guard import safe_write
+from pipeline.io_guard import load_jsonl, safe_write
 from pipeline.json_fixer import parse_json_robust
 from pipeline.omlx_call import CircuitOpenError, call_omlx
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT
@@ -235,6 +235,9 @@ def _save_checkpoint(all_fbs: list[dict], dry_run: bool) -> None:
 
     content: str = "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n"
     safe_write(STAGE2_CHECKPOINT, content, force_shrink=True)
+    # BUG-117: self-verify after write (mirror _write_checkpoint_jsonl) — a
+    # corrupt checkpoint must raise at write time, not silently at resume.
+    load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint self-check (repair_elaboration)")
 
 
 if __name__ == "__main__":

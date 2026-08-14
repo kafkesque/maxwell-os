@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-14T07:50:05Z'
-total_decisions: 339
+last_sync: '2026-08-14T14:34:00Z'
+total_decisions: 345
 decisions:
 - id: D2092
   category: INF
@@ -2705,11 +2705,67 @@ decisions:
   target_files:
   - pipeline/stage4_merge.py
   created: '2026-08-14'
+- id: D2351
+  category: BUGFIX
+  state: RESOLVED
+  description: 'S4 depth correctness: fail-closed classify_depth_focused (no silent "domain"), depth_max_tokens 1024, exact-token parser, Reasoning:none on focused path, single fallback via S4_DEPTH_FALLBACK_DEPTH (BUG-108/109/115)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merged_call.py
+  - config/pipeline_config.yaml
+  created: '2026-08-14'
+- id: D2352
+  category: QLT
+  state: RESOLVED
+  description: 'Provenance/schema contract closure: carry source_segments through S4->S6, persist evidence_passages/is_summary to SQLite (BUG-110/111/112)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  created: '2026-08-14'
+- id: D2353
+  category: BUGFIX
+  state: RESOLVED
+  description: 'Singleton S2->S4 index fix: run_stage4 reuse principles_idx from load_stage2_fbs_via_clusters (singletons excluded by load_stage2_principles) (BUG-113)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merge.py
+  created: '2026-08-14'
+- id: D2354
+  category: PERF
+  state: ACTIVE
+  description: 'S4 bottleneck resolution: batch_depth_classify() added + A/B harness built; LIVE A/B (n=8) showed 1.9x speedup but 75% parity (<90% gate) -> NOT wired into production. Next: benchmark gemma-4-E4B depth swap behind the same gate'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/stage4_merged_call.py
+  - tools/benchmark_s4_depth_gptoss.py
+  created: '2026-08-14'
+- id: D2355
+  category: BUGFIX
+  state: RESOLVED
+  description: 'S4/S6 fail-closed + hygiene: batch missing-output fail-closed, insert_embedding per-FB logging, remove dead s3_original_domain (BUG-114/116/118)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/stage6_commit.py
+  created: '2026-08-14'
+- id: D2356
+  category: ARCH
+  state: RESOLVED
+  description: 'Restore v1 intimacy lattice (D369/D383): resolve_intimacy (private/selective/public) from source-field routing + topic sensitivity + context; route_space() -> private/non_private. Replaces hardcoded intimacy_boundary="public" (W6/BUG drift). Config: config/intimacy_policy.yaml'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/intimacy_lattice.py
+  - config/intimacy_policy.yaml
+  - pipeline/stage4_merge.py
+  - pipeline/stage6b_anytype_push.py
+  created: '2026-08-14'
 summary:
-  total: 339
+  total: 345
   proposed: 0
   draft: 1
-  active: 294
+  active: 295
   stale: 0
   superseded: 13
   archived: 8

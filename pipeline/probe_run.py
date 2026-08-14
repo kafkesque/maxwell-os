@@ -130,7 +130,7 @@ def run_stage2(clusters: list[dict], output_dir: Path) -> list[dict]:
         [sys.executable, "-c", f"""
 import sys, json
 sys.path.insert(0, '{PROJECT_ROOT}')
-from pipeline.stage2_extract import load_segments, _process_cluster, build_convergent_prompt, build_single_source_prompt
+from pipeline.stage2_extract import load_segments, _process_cluster, build_convergent_prompt, build_single_source_prompt, _write_checkpoint_jsonl
 from pipeline.stage2_extract import SYSTEM_PROMPT, SINGLE_SOURCE_SYSTEM, GEN_MODEL, call_llm, load_golden_parity, format_golden_fewshot, S2_GOLDEN_PATH, S2_GOLDEN_POSITIVE, S2_GOLDEN_NEGATIVE, S2_GOLDEN_MAX, S2_GOLDEN_INJECT, enforce_gate, S2_GATE_ENABLED, S2_GATE_STRICT
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT
 from pipeline.io_guard import safe_write
@@ -219,11 +219,8 @@ if S2_GATE_ENABLED:
     all_fbs, gate_violations = enforce_gate(all_fbs, strict=S2_GATE_STRICT)
     print(f'   🚪 Gate: {{gate_violations}} FBs gated, {{len(all_fbs)}} passed')
 
-# Save checkpoint
-STAGE2_CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-checkpoint_text = '\\n'.join(json.dumps(fb, ensure_ascii=False) for fb in all_fbs) + '\\n'
-with open(STAGE2_CHECKPOINT, 'w') as f:
-    f.write(checkpoint_text)
+# Save checkpoint — crash-safe + self-verify (BUG-117: was bare open().write())
+_write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs)
 print(f'\\n✅ Stage 2 complete: {{len(all_fbs)}} FBs → {{STAGE2_CHECKPOINT}}')
 
 # Also save to probe output

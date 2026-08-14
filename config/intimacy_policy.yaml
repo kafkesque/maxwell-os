@@ -1,0 +1,62 @@
+# intimacy_policy.yaml — INTIMACY_BOUNDARY + space routing lattice
+# ============================================================================
+# Ported 2026-08-14 from v1 `tools/intimacy_lattice.py` (D369/D383) + the
+# `routing:` map already present in config/domain_anchors.yaml.
+#
+# Lattice: private > selective > public. Resolution always escalates, never
+# relaxes. Ambiguity/NULL resolves upward toward private (D369).
+#
+# Three signals → lattice MAX (order-independent, removes a whole bug class):
+#   1. source_sensitivity  — field routing from domain_anchors.yaml
+#                            (field_5 personal_practice / field_7 influence → private)
+#   2. topic_sensitivity   — discipline in `topic_sensitive_disciplines`
+#                            (v1 R5: sensitive topic even from an innocent book)
+#   3. context             — personal-only → private, mixed-personal → selective
+#                            (v1 R7/R8, the D314 floor)
+
+lattice_version: "2026-08-14.v2"
+authority: "v1 tools/intimacy_lattice.py (D369/D383) + config/domain_anchors.yaml routing"
+
+# Resolution levels (ordered strictest → least)
+levels:
+  private: 3
+  selective: 2
+  public: 1
+
+# Signal 1 — source sensitivity (v1 R1/R2). Disciplines that belong to the
+# PRIVATE influence/power + personal-practice fields (field_7 / field_5 in
+# domain_anchors.yaml). These resolve to PRIVATE, not merely selective.
+# (Explicit list because the anchor names drift from the canonical taxonomy —
+# e.g. canonical "social engineering" vs anchor "social engineering + profiling".)
+source_private_disciplines:
+  - social engineering
+  - privacy & surveillance
+
+# Signal 2 — topic sensitivity (values are pipeline/schemas.py DISCIPLINE_LITERAL).
+# An FB whose discipline is one of these is personal/sensitive even when its
+# source book is public. Mirrors v1 `topic_sensitivity_values` (mind_health,
+# influence_tactics, personal_finance, relationships_identity) mapped onto the
+# v3.0 canonical discipline taxonomy.
+topic_sensitive_disciplines:
+  - psychology
+  - cognitive science
+  - behavioral economics
+  - decision making
+  - personal productivity
+
+# Signal 3 — context rules (v1 R7/R8, D314 floor).
+# `context` is the S4-derived comma-separated label set
+# (business|design|system|academic|personal).
+context_rules:
+  personal_only: private      # context == [personal] only  → v1 R7
+  mixed_personal: selective   # context includes personal + professional → v1 R8
+
+# null/ambiguity handling (D369): resolve upward on any missing signal.
+null_handling:
+  intimacy: private
+
+# space routing: intimacy_boundary → Anytype space (v1 push_anytype.resolve_space).
+space_routing:
+  private: private
+  selective: private
+  public: non_private

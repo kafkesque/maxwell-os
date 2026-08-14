@@ -94,6 +94,20 @@ except ImportError:
     HybridGate = None  # type: ignore[assignment]
     _fmt_segs_gate = None  # type: ignore[assignment]
 
+
+def _write_checkpoint_jsonl(path, records: list[dict], *, force_shrink: bool = False) -> None:
+    """Write a compact JSONL checkpoint and self-verify (BUG-106).
+
+    The S2 checkpoint MUST be one-JSON-object-per-line. A pretty-printed /
+    multi-line fragment silently corrupts resume (load_jsonl fail-closed raises
+    at resume time, discarding hours of prior work). Self-verify immediately
+    after write so corruption is loud at write time, not resume time.
+    """
+    content = "\n".join(json.dumps(r, ensure_ascii=False) for r in records) + "\n"
+    safe_write(path, content, force_shrink=force_shrink)
+    load_jsonl(path, context="S2 checkpoint self-check")  # raises if corrupt
+
+
 # ── Constants (T0.1: de-hardcoded — sourced from pipeline_config.yaml) ────
 MAX_CLUSTER_SAMPLES: int = S2_MAX_CLUSTER_SAMPLES      # Max segments to feed per cluster (from config)
 MIN_CONVERGENT_BOOKS: int = S15_MIN_SOURCE_DIVERSITY
@@ -1195,7 +1209,15 @@ def run_stage2(
         #  the --only-convergent flag and sending all single-source clusters to extraction)
         if not only_convergent:
             expanded_targets.extend(single_source)
+
+        # BUG-107: a k-means sub-cluster of a convergent parent can drop below the
+        # ≥2-source bar (is_convergent=False). Under --only-convergent those
+        # single-source sub-clusters must NOT be extracted. Filter the extraction
+        # targets only — the cache keeps the UNFILTERED list so a later run without
+        # --only-convergent can still recover them (cache is mode-agnostic).
         target_clusters = expanded_targets
+        if only_convergent:
+            target_clusters = [t for t in target_clusters if t.get("is_convergent")]
         _write_probe_cache(expanded_targets, convergent, single_source, only_convergent)
         print(f"   ✅ Probe: {probes_run} clusters checked in {probe_total:.1f}s")
         print(f"   ✂️  Split: {split_count} clusters → +{extra_fbs_estimate} expected FBs")
@@ -1476,9 +1498,7 @@ def run_stage2(
                 for f in futures:
                     f.cancel()
                 # Write checkpoint with current progress before aborting
-                safe_write(STAGE2_CHECKPOINT,
-                           "\n".join(json.dumps(fb, ensure_ascii=False) for fb in all_fbs) + "\n",
-                           force_shrink=True)
+                _write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs, force_shrink=True)
                 raise  # Abort the run
             except Exception as e:
                 failed_clusters += 1  # D2331: terminal worker failure
@@ -1538,11 +1558,7 @@ def run_stage2(
 
             # D2154: Incremental checkpoint every 5 clusters (inside for future loop)
             if completed % 5 == 0:
-                safe_write(
-                    STAGE2_CHECKPOINT,
-                    "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
-                    force_shrink=True,
-                )
+                _write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs, force_shrink=True)
                 # Atomic segids
                 import tempfile
                 segids_tmp = tempfile.NamedTemporaryFile(
@@ -1559,11 +1575,8 @@ def run_stage2(
                     if os.path.exists(segids_tmp.name):
                         os.unlink(segids_tmp.name)
 
-    # Write final checkpoint
-    safe_write(
-        STAGE2_CHECKPOINT,
-        "\n".join(json.dumps(f, ensure_ascii=False) for f in all_fbs) + "\n",
-    )
+    # Write final checkpoint (BUG-106: self-verifying JSONL)
+    _write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs)
 
     # Summary
     print(f"\n{'='*60}")

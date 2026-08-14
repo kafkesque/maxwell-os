@@ -167,14 +167,28 @@ def init_db(db_path: Path) -> sqlite3.Connection:
 
     # P0.11 FIX: Load sqlite-vec extension BEFORE creating virtual tables.
     # Was: missing entirely, causing "no such module: vec0" on first run.
+    # BUG-104: distinguish ImportError (package missing) from AttributeError
+    # (load_extension unavailable on python.org framework builds) — the broad
+    # `except (ImportError, Exception)` masked the real remediation.
     try:
-        conn.enable_load_extension(True)
         import sqlite_vec
-        sqlite_vec.load(conn)
-        conn.enable_load_extension(False)
-    except (ImportError, Exception) as e:
-        print(f"  ⚠️  sqlite-vec not available: {e}")
-        print("     Vector search will not be available. Install: pip install sqlite-vec")
+    except ImportError:
+        print("  ⚠️  sqlite-vec package not installed — vector search unavailable.")
+        print("     Install: pip install sqlite-vec")
+        sqlite_vec = None
+    else:
+        try:
+            conn.enable_load_extension(True)
+            sqlite_vec.load(conn)
+            conn.enable_load_extension(False)
+        except AttributeError as e:
+            print(f"  ⚠️  sqlite-vec installed but load_extension unavailable: {e}")
+            print("     This Python build lacks enable_load_extension (python.org framework build).")
+            print("     Vector search unavailable. Fix: use Homebrew Python (`brew install python@3.12`)")
+            print("     or conda-forge Python. FTS retrieval still works.")
+        except Exception as e:
+            print(f"  ⚠️  sqlite-vec failed to load: {e}")
+            print("     Vector search unavailable; FTS retrieval still works.")
 
     conn.execute(CREATE_FBS_TABLE)
     # BUG-004 FIX: Create vector embedding table (may fail if sqlite-vec not loaded)

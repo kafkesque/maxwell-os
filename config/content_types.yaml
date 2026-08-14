@@ -195,6 +195,8 @@ core_body:
   - boundary
   - consequence
   - elaboration
+  - application    # S4 (CRIBS) — prescriptive trigger→action, body-only
+  - failure_mode   # S4 (CRIBS) — how the principle breaks, body-only
   - jargon        # S4 (CRIBS) — body-only per D2123, renders AFTER elaboration
 
 # ─────────────────────────────────────────────────────────────────────────────

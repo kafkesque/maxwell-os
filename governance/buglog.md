@@ -1,5 +1,5 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 12:22 (canary deep-audit: D2349 taxonomy + D2350 identity/provenance fixes applied)
+> **Last updated:** 2026-08-14 13:05 (D2349/D2350 + BUG-106/107 fixed, BUG-104 partial; S4 bottleneck + intimacy-boundary analyses added)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
@@ -14,17 +14,26 @@
 
 ## 🟠 BUG-107 — 2026-08-14 — 2 single-source FBs leaked into final DB despite `--only-convergent`
 - **Symptom:** `Hybrid Sorting Algorithm` and `Price Reduction Profit Maximization` are single-source FBs (1 source book) yet present in the final 279-committed DB. 207 convergent parents → 339 sub-cluster targets → 280 FBs; exactly 2 are single-source.
-- **Root cause (TBD):** split-probe k-means sub-clustering (splits large convergent clusters) may emit a sub-cluster that drops below the ≥2-source bar, or singleton-path leakage.
-- **Fix:** root-cause in S2 split-probe; filter at S2 or S4 before commit.
-- **Status:** 🟠 OPEN — non-blocking (2/279 = 0.7%); verify before full T1.1.
+- **Root cause:** `split_cluster_by_kmeans()` emits sub-clusters whose per-sub-cluster
+  `is_convergent` is recomputed as `sub_sid_count >= 2`; a sub-cluster can drop to 1 source
+  (`is_convergent=False`) yet still be appended to `expanded_targets` (fresh-probe path) —
+  bypassing the `--only-convergent` filter.
+- **Fix:** filter sub-clusters by `is_convergent` under `--only-convergent` (fresh-probe
+  path). Cache-load path already filtered (`stage2_extract.py:1129`).
+- **Status:** 🟢 FIXED (2026-08-14) — `stage2_extract.py` split-probe now drops single-source
+  sub-clusters under `--only-convergent`.
 - **Files:** `pipeline/stage2_extract.py`
 - **Source:** T1.1 canary deep-audit (this session)
 
 ## 🟠 BUG-106 — 2026-08-14 — S2 checkpoint mixed JSONL/pretty-printed (breaks re-run/resume)
 - **Symptom:** `stage2_extract/canary/checkpoint.jsonl` has 456 lines but only 274 are standalone JSONL; 102 are pretty-printed fragments (6 of 280 FB records multi-line). `load_jsonl` (D2332 fail-closed) RAISES on it. S4 loaded the 280 FBs correctly *this* run, but a re-run/resume would fail-closed.
-- **Root cause (TBD):** main writes (stage2_extract.py:1479/1541/1563) use `json.dumps(fb, ensure_ascii=False)` (JSONL); a second path likely appends `indent=2` pretty-printed records (resume/probe-cache interleave).
-- **Fix:** single JSONL write path for STAGE2_CHECKPOINT; add a post-write `load_jsonl` self-check.
-- **Status:** 🟠 OPEN — non-blocking (canary results valid); verify before full T1.1 re-run.
+- **Root cause:** legacy on-disk artifact. All current writers were already compact JSONL;
+  the only `indent=2` in `stage2_extract.py` (`:685`) is the few-shot *prompt* builder, NOT a
+  checkpoint write. The corrupt canary checkpoint was written by pre-D2332 code.
+- **Fix:** `_write_checkpoint_jsonl()` — single self-verifying write path (`safe_write` +
+  immediate `load_jsonl` re-read) at all `STAGE2_CHECKPOINT` write sites; quarantined the
+  corrupt on-disk canary checkpoint.
+- **Status:** 🟢 FIXED (2026-08-14) — self-verifying writer + corrupt artifact quarantined.
 - **Files:** `pipeline/stage2_extract.py`
 - **Source:** T1.1 canary post-run checkpoint format audit (this session)
 
@@ -42,7 +51,10 @@
 - **Symptom:** `stage6_commit.py init_db()` warns "sqlite-vec not available" on every run; the `vec_fbs` virtual table is never created (verified: current `maxwell.db` has `fbs`/`fbs_fts` but NO `vec_fbs`). Vector search has therefore silently never worked — retrieval falls back to FTS only. Masked by the broad `except (ImportError, Exception)` catch.
 - **Root cause:** Python 3.12.1 (python.org framework build, `/Library/Frameworks/Python.framework/...`, SQLite 3.43.1) compiled WITHOUT `load_extension`/`enable_load_extension`. `sqlite_vec.load(conn)` internally calls `conn.load_extension(...)` → `AttributeError: 'sqlite3.Connection' object has no attribute 'load_extension'`. The BUG-012/P0.11 fix (`conn.enable_load_extension(True)` → `sqlite_vec.load(conn)`) itself fails on this build. The except prints a misleading "Install: pip install sqlite-vec" (the package IS installed).
 - **Fix:** (1) Use a Python build with `load_extension` support — Homebrew Python (`brew install python@3.12`) or conda-forge Python; OR (2) improve `init_db` to distinguish `ImportError` (package missing) from `AttributeError` (load_extension unavailable) and surface the real remediation. NOT a data-loss blocker: FTS fallback works (verified by stress test).
-- **Status:** 🟠 OPEN — environmental (Python build); non-blocking for T1.1 (FTS fallback). FTS-only retrieval until a load_extension-capable interpreter is used.
+- **Status:** 🟡 PARTIAL (2026-08-14) — code now distinguishes `ImportError` (package missing)
+  from `AttributeError` (load_extension unavailable) and prints the correct remediation; the
+  underlying environmental issue (python.org build lacks `load_extension`) still requires
+  Homebrew/conda Python for vector search. FTS fallback continues to work.
 - **Files:** `pipeline/stage6_commit.py`
 - **Source:** This session — live verification of vector-search readiness during `just preflight` (BUG-012's fix assumed `enable_load_extension` exists).
 

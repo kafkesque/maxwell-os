@@ -1,6 +1,51 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 14:20 (MUST/SHOULD/WORTH implemented — 11 of 12 bugs FIXED; BUG-115 PARTIAL: benchmark-through-production still open)
+> **Last updated:** 2026-08-14 15:15 (D2357 ChatGPT re-audit fixes + S3/D2354 FrugalGPT gate + S5/W7 closed)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🔴 BUG-120 — 2026-08-14 — Semantic fail-open: merged/batch classification fabricates `emerging`/`domain`/`cited` (C16)
+- **Symptom:** `merged_cribs_classify()` and `batch_cribs_classify()` filled a *present-but-sparse* model response's missing `discipline`/`domains`/`depth`/`evidence` with `emerging`/`["emerging"]`/`domain`/`cited`. D2355 had made only the *missing-entry* case fail-closed; a malformed-but-present entry still became valid-looking semantic data without raising, so `max_failed_ratio: 0.0` could not catch it.
+- **Root cause:** a single `defaults` dict mixed non-semantic CRIBS enrichment (`application`/`failure_mode`/`elaboration`/`keywords`) with semantic classification fields, applying the same silent-fill to both.
+- **Fix (D2357):** split the defaults — CRIBS fields default safely (empty); semantic fields are validated fail-closed via `_validate_semantic_classification()` which raises `SparseClassificationError` on any missing/empty/invalid `discipline`/`domains`/`depth`/`evidence`. Callers fall back to individual classification and account the failure.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage4_merged_call.py`
+- **Source:** ChatGPT re-audit (BLOCKER #2/#3) + independent re-verification
+
+## 🔴 BUG-121 — 2026-08-14 — Intimacy lattice not fail-safe: null/config failure resolves `public` (sovereignty)
+- **Symptom:** `config/intimacy_policy.yaml` declares `null_handling: intimacy: private` and "ambiguity/NULL resolves upward (D369)", but `resolve_intimacy()` initialized at `public`, had no null-escalation, and `_load_policy()`/`_load_anchors()` swallowed load exceptions to `{}`. `route_space()` fell back to `non_private`. A policy/config failure could route an FB to public/non-private against the declared privacy floor.
+- **Fix (D2357):** (1) `_load_policy()`/`_load_anchors()` now log AND record failures; (2) `resolve_intimacy()` fails closed to `private` on any config error (`R0-config-failure`) and on a wholly absent signal set (`R0-null`); (3) `route_space()` falls back to `private`, never `non_private`; (4) `LEVELS`/`space_routing` now read from YAML (C12) with a code fallback only for a missing file.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/intimacy_lattice.py`
+- **Source:** ChatGPT re-audit (BLOCKER #4) + independent re-verification
+
+## 🟠 BUG-122 — 2026-08-14 — `source_principle_ids` empty for v3 FBs (provenance gap)
+- **Symptom:** S4 read only `p.get("principle_id")` to build `source_principle_ids`, but S2 v3 records emit `fb_id` (not `principle_id`), so the field was `[]` for every normal v3 FB.
+- **Fix (D2357):** read `fb_id` first, retain `principle_id` as legacy fallback (matches the `fb_id or principle_id` pattern used elsewhere in S4).
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** ChatGPT re-audit (HIGH #5) + independent re-verification
+
+## 🟠 BUG-123 — 2026-08-14 — Downstream FB-ID rehash fallback after S4 name normalization (identity drift)
+- **Symptom:** `fb = {"fb_id": fb_data.get("fb_id") or make_hash_id(name, definition)}` re-hashed a missing-ID record from the *normalized* name, which would drift from S2's hash of the un-normalized name — breaking the D2350 invariant.
+- **Fix (D2357):** missing `fb_id` is now a hard error (FB quarantined, `failed += 1`), never a silent re-hash. Removed the now-unused `make_hash_id` import.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** ChatGPT re-audit (HIGH #9) + independent re-verification
+
+## 🟠 BUG-124 — 2026-08-14 — `keywords` rendered as body content; `jargon` rendered before elaboration
+- **Symptom:** `content_types.yaml` moved `keywords` to `metadata.discovery` and declares `jargon` renders AFTER elaboration (D2349), but `stage6b_anytype_push.py` rendered `**KEYWORDS**` in the body and placed `jargon` in Zone 2 (before Zone 3 elaboration).
+- **Fix (D2357):** `keywords` removed from body rendering and added to YAML frontmatter + JSON payload metadata; `jargon` moved after elaboration in the 3-zone body.
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage6b_anytype_push.py`
+- **Source:** ChatGPT re-audit (HIGH #7/#8) + independent re-verification
+
+## 🟡 BUG-125 — 2026-08-14 — S2 hybrid-gate failure silently swallowed (`except Exception: pass`)
+- **Symptom:** the D2276 pre-extraction hybrid gate wrapped its decision in `except Exception: pass`, so a gate failure was invisible (violates C16 "no silent errors").
+- **Fix (D2357):** log the gate failure (`⚠️ Hybrid gate error …`) while retaining the deliberate fail-open (prefer false-positive extraction to data loss).
+- **Status:** 🟢 FIXED — 2026-08-14.
+- **Files:** `pipeline/stage2_extract.py`
+- **Source:** ChatGPT re-audit (MEDIUM #12) + independent re-verification
 
 ---
 
@@ -60,8 +105,8 @@
 ## 🟠 BUG-115 — 2026-08-14 — Depth benchmark ≠ production parser; 87.5% vs 37.5/50% drift; fallback orphaned
 - **Symptom:** (1) `tools/benchmark_s4_depth_gptoss.py` uses direct `requests` + `reasoning_content` fallback; production `classify_depth_focused()` uses `call_omlx` (raises on `content=None`) + content-only — the benchmark is not a production-path test. (2) governance claims 87.5% focused vs 38% long, while the benchmark docstring still frames GPT-OSS as "third entrant after Phi 37.5% / Gemma 50%". (3) `S4_DEPTH_FALLBACK_DEPTH` is loaded but never used by the focused classifier (only the `elif` branch when `depth_focused_classification=False`).
 - **Fix (D2351):** run benchmark through production `classify_depth_focused()`; make one authoritative number; route fallback through `S4_DEPTH_FALLBACK_DEPTH`.
-- **Status:** 🟠 PARTIAL — implemented 2026-08-14 (parser/fallback done; benchmark-through-production (S5) still open).
-- **Files:** `tools/benchmark_s4_depth_gptoss.py`, `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`
+- **Status:** 🟢 FIXED — 2026-08-14: `tools/benchmark_s4_depth_frugal.py` runs `classify_depth_focused()` through the PRODUCTION path (`call_omlx` + `_parse_depth_token`, fail-closed) for both GPT-OSS and the frugal depth model. This is now the authoritative depth benchmark (S5 closed). The old `benchmark_s4_depth_gptoss.py` remains as a historical direct-API baseline.
+- **Files:** `tools/benchmark_s4_depth_frugal.py` (new), `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`
 - **Source:** ChatGPT depth audit + independent re-verification
 
 ## 🟡 BUG-116 — 2026-08-14 — `s3_original_domain` vestigial dead column/field (bloat)

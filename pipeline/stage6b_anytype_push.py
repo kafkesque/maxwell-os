@@ -65,9 +65,10 @@ PUSH_DIR: Path = S6_DIR / RUN_ID / "anytype_push"
 LEDGER_PATH: Path = PUSH_DIR / "push_ledger.jsonl"
 
 # D2123: Body-only fields (never in YAML frontmatter, render in body section)
+# D2349: `keywords` moved to metadata.discovery (search/retrieval labels) — NOT body.
 BODY_ONLY_FIELDS: frozenset[str] = frozenset({
     "definition", "application", "failure_mode", "elaboration",
-    "keywords", "jargon", "source_text",
+    "jargon", "source_text",
     "mechanism", "boundary", "consequence",
 })
 
@@ -158,7 +159,6 @@ def _render_3zone_body(fb: dict) -> str:
     elaboration = fb.get("elaboration", "")
     consequence = fb.get("consequence", "")
     citation = fb.get("citation", "")
-    keywords = fb.get("keywords", "")
     jargon_val = fb.get("jargon")
     evidence_type = fb.get("evidence", "cited")
     source_books = fb.get("source_books", [])
@@ -233,19 +233,6 @@ def _render_3zone_body(fb: dict) -> str:
             zone2_lines.append(f"> ⚠️ {boundary}")
             zone2_lines.append("")
 
-    if jargon_val:
-        jarg_str = _render_jargon_md(jargon_val)
-        if jarg_str:
-            zone2_lines.append("---")
-            zone2_lines.append("### JARGON")
-            if isinstance(jargon_val, str) and jargon_val.strip():
-                zone2_lines.append(f"> 🤓 {jargon_val}")
-            elif isinstance(jargon_val, dict) and jargon_val:
-                for k, v in jargon_val.items():
-                    if v:
-                        zone2_lines.append(f"> 🤓 **{k}**: {v}")
-            zone2_lines.append("")
-
     parts.append("\n".join(zone2_lines))
 
     # ── ZONE 3 - STABLE GATE ── (RULE 2 + D2015 dynamic stats)
@@ -283,13 +270,19 @@ def _render_3zone_body(fb: dict) -> str:
         zone3_lines.append(f"\n**ELABORATION**: {short_elab}")
         zone3_lines.append("")
 
-    if keywords:
-        if isinstance(keywords, list):
-            kw_str = ", ".join(keywords)
-        else:
-            kw_str = str(keywords)
-        zone3_lines.append(f"\n**KEYWORDS**: {kw_str}")
-        zone3_lines.append("")
+    # D2349: jargon renders AFTER elaboration (core_body contract), not in Zone 2.
+    if jargon_val:
+        jarg_str = _render_jargon_md(jargon_val)
+        if jarg_str:
+            zone3_lines.append("---")
+            zone3_lines.append("### JARGON")
+            if isinstance(jargon_val, str) and jargon_val.strip():
+                zone3_lines.append(f"> 🤓 {jargon_val}")
+            elif isinstance(jargon_val, dict) and jargon_val:
+                for k, v in jargon_val.items():
+                    if v:
+                        zone3_lines.append(f"> 🤓 **{k}**: {v}")
+            zone3_lines.append("")
 
     if citation:
         zone3_lines.append(f"source: {citation}")
@@ -348,6 +341,7 @@ def _format_fb_markdown(fb: dict) -> str:
         "accessibility": fb.get("accessibility", ""),
         "confidence": fb.get("confidence", ""),
         "borp_score": fb.get("borp_score", ""),
+        "keywords": fb.get("keywords", ""),  # D2349: metadata.discovery, not body
         "schema_version": fb.get("schema_version", ""),
         "taxonomy_version": fb.get("taxonomy_version", ""),
     }
@@ -391,13 +385,11 @@ def _format_fb_markdown(fb: dict) -> str:
     if fb.get("boundary"):
         lines.extend(["", "## Boundary", "", fb["boundary"]])
 
-    # ZONE 3: Elaboration + Keywords + Jargon
+    # ZONE 3: Elaboration + Jargon (keywords moved to frontmatter per D2349)
     if fb.get("elaboration"):
         lines.extend(["", "## Elaboration", "", fb["elaboration"]])
     if fb.get("consequence"):
         lines.extend(["", "## Consequence", "", fb["consequence"]])
-    if fb.get("keywords"):
-        lines.extend(["", "## Keywords", "", fb["keywords"]])
 
     jargon_str = _render_jargon_md(fb.get("jargon"))
     if jargon_str:
@@ -466,6 +458,9 @@ def _format_fb_payload(fb: dict) -> dict:
         "source_paragraph_ids": fb.get("source_paragraph_ids", ""),
         "source_principle_ids": fb.get("source_principle_ids", []),
         "grounding_evidence": fb.get("grounding_evidence", ""),
+        # ── Metadata.discovery (D2349): keywords are search/retrieval labels, not body ──
+        "keywords": fb.get("keywords", ""),
+        "jargon": fb.get("jargon"),
         # ── Verification ──
         "confidence": fb.get("confidence"),
         "borp_score": fb.get("borp_score"),

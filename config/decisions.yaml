@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-14T14:34:00Z'
-total_decisions: 345
+last_sync: '2026-08-14T15:15:00Z'
+total_decisions: 346
 decisions:
 - id: D2092
   category: INF
@@ -2734,12 +2734,13 @@ decisions:
 - id: D2354
   category: PERF
   state: ACTIVE
-  description: 'S4 bottleneck resolution: batch_depth_classify() added + A/B harness built; LIVE A/B (n=8) showed 1.9x speedup but 75% parity (<90% gate) -> NOT wired into production. Next: benchmark gemma-4-E4B depth swap behind the same gate'
+  description: 'S4 bottleneck resolution: batch_depth_classify() A/B failed 75% parity (<90% gate) -> unwired. FrugalGPT cascade implemented (depth_frugal_enabled flag + stage4.depth_model=gemma-4-E4B-it-MLX-4bit + tools/benchmark_s4_depth_frugal.py production-path gate). Still GATED default-off pending >=90% parity + >=90% accuracy.'
   champion: 2026-08-14 session
   target_files:
   - pipeline/stage4_merge.py
   - pipeline/stage4_merged_call.py
-  - tools/benchmark_s4_depth_gptoss.py
+  - config/pipeline_config.yaml
+  - tools/benchmark_s4_depth_frugal.py
   created: '2026-08-14'
 - id: D2355
   category: BUGFIX
@@ -2761,8 +2762,22 @@ decisions:
   - pipeline/stage4_merge.py
   - pipeline/stage6b_anytype_push.py
   created: '2026-08-14'
+- id: D2357
+  category: BUGFIX
+  state: RESOLVED
+  description: 'ChatGPT re-audit (commit 5e6f813) remediation: fail-closed semantic classification (SparseClassificationError — no fabricated emerging/domain/cited); intimacy lattice fail-safe (null/config-failure -> private); source_principle_ids from fb_id; drop downstream fb_id rehash (hard error); keywords->metadata.discovery + jargon-after-elaboration rendering; hybrid-gate logging. Verified: re-audit BLOCKER #1 (source_clusters from fb_id) was FALSE — code already used source_cluster first since fd2347a.'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/intimacy_lattice.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage6b_anytype_push.py
+  - pipeline/stage2_extract.py
+  - pipeline/schemas.py
+  - pipeline/schema_accessor.py
+  created: '2026-08-14'
 summary:
-  total: 345
+  total: 346
   proposed: 0
   draft: 1
   active: 295

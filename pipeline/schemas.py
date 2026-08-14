@@ -659,7 +659,7 @@ class FB(StampedRecord):
     )
     intimacy_boundary: INTIMACY_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
-        description="Space routing: public (Knowledge base), selective, private (deathpectation)."
+        description="Space routing: public (Knowledge base), selective, private (private space)."
     )
     provenance: PROVENANCE_LITERAL = Field(  # type: ignore[valid-type]
         default="llm_extracted_from_source",

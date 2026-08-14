@@ -1310,8 +1310,12 @@ def run_stage2(
                 gate_route = _hybrid_gate.decide(seg_text, cluster.get("source_books", []))
                 if gate_route == "NULL":
                     return [{"_null": True, "cluster_id": cid, "_gate_reason": "hybrid-gate-NULL"}]
-            except Exception:
-                pass  # Gate failure → proceed with extraction (fail-open)
+            except Exception as _gate_err:
+                # Fail-open by design (prefer false-positive extraction to data loss),
+                # but NEVER silent (C16): the gate is a cheap negative filter — its
+                # failure must be observable, not swallowed.
+                print(f"   ⚠️  Hybrid gate error (proceeding fail-open): "
+                      f"{type(_gate_err).__name__}: {_gate_err}", flush=True)
 
         # Tiered prompt: convergent = full synthesis, single-source = simplified
         # D2231: Removed "or book_count >= 2" — convergence gate is is_convergent

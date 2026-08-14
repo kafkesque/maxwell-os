@@ -198,7 +198,7 @@ def fb_accessibility(fb: dict[str, Any]) -> str | None:
 
 
 def fb_intimacy_boundary(fb: dict[str, Any]) -> str | None:
-    """v1 parity: Space routing — public (Knowledge base), selective, private (deathpectation)."""
+    """v1 parity: Space routing — public (Knowledge base), selective, private (private space)."""
     return fb.get("intimacy_boundary")
 
 

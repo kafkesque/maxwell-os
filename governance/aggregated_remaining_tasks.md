@@ -51,8 +51,8 @@
 | W3 | `insert_embedding()` per-FB failure logging | BUG-118 | 0.25h |
 | W4 | Add `jargon` to FTS5 | BUG-119 | 0.25h |
 | W5 | Reconcile `extraction_type` "S5 consumer" claim | drift | 0.25h |
-| W6 | Restore/document v2 intimacy routing | drift | 1h |
-| W7 | Define or drop `deathpectation` | drift | 0.25h |
+| W6 | Restore/document v2 intimacy routing | drift | ✅ DONE (D2356) |
+| W7 | Define or drop `deathpectation` | drift | ✅ DROPPED (D2357) — "private space" |
 
 > **S4 bottleneck (D2354) — the ultimate solution:** correctness-first (fail-closed + 1024 tokens) → remove waste
 > (drop `depth` from CRIBS batch) → batch the *focused* depth prompt (keep GPT-OSS + short prompt + `fb_index`) →

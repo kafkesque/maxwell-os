@@ -54,7 +54,9 @@ from pipeline.pipeline_paths import (
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
+    S4_DEPTH_FRUGAL_ENABLED,  # D2354: FrugalGPT cascade (cheap depth model)
     S4_DEPTH_MAX_TOKENS,  # BUG-075: depth-only call token budget
+    S4_DEPTH_MODEL,  # D2354: frugal depth model (Gemma)
     S4_GE_OUTPUT,
     S4_MAX_FAILED_RATIO,  # D2338: fail-closed merge tolerance
     S4_MAX_PRINCIPLES,
@@ -87,7 +89,7 @@ from pipeline.stage4_merged_call import (
     merged_cribs_classify,
 )
 from pipeline.intimacy_lattice import resolve_intimacy  # W6/D369: v1 intimacy lattice (replaces hardcoded "public")
-from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, make_hash_id, stamp_record
+from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
@@ -1212,9 +1214,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             # silently returning "domain". An inference failure must never become a
             # valid-looking semantic label (C16). Count it → max_failed_ratio gate.
             try:
+                # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification;
+                # depth may route to a cheap third-family model (Gemma) when
+                # enabled. Default (flag off) = GPT-OSS (VERIFY_MODEL).
+                depth_model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
                 depth_val = classify_depth_focused(
                     fb_data,
-                    model=VERIFY_MODEL,
+                    model=depth_model,
                     max_tokens=S4_DEPTH_MAX_TOKENS,
                 )
                 print(f"(depth:{depth_val})", flush=True, end=" ")
@@ -1346,12 +1352,22 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         provenance_val = "llm_extracted_from_source"
 
         # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
+        # D2350 (ChatGPT re-audit): fb_id MUST come from S2 (identity fixed at
+        # extraction time). A missing fb_id is a malformed/legacy record — never
+        # re-hash from the normalized name (it would drift from S2's hash and
+        # break the D2350 identity invariant). Fail loudly instead.
+        fb_id_val = fb_data.get("fb_id")
+        if not fb_id_val:
+            print(f"→ ❌ FB missing fb_id (name={name!r}) — QUARANTINED (D2350 invariant)")
+            failed += 1
+            continue
+
         fb = {
             # D2350: preserve S2's fb_id (identity is fixed at extraction time).
             # Previously re-hashed here AFTER name title-casing, so 67 records
             # drifted to a new fb_id between S2→S4, breaking source_clusters
             # provenance and FB identity across stages.
-            "fb_id": fb_data.get("fb_id") or make_hash_id(name, definition),
+            "fb_id": fb_id_val,
             "name": name,
             "definition": definition,
             "mechanism": fb_data.get("mechanism", "").strip(),
@@ -1383,7 +1399,14 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             # ── Provenance (simplified) ──
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
-            "source_principle_ids": [p.get("principle_id", "") for p in cluster_principles if p.get("principle_id")],
+            # D2350 (ChatGPT re-audit): S2 v3 records emit `fb_id`, NOT `principle_id`.
+            # Reading only `principle_id` left source_principle_ids empty for every
+            # normal v3 FB. Use fb_id first, retain principle_id as legacy fallback.
+            "source_principle_ids": [
+                (p.get("fb_id") or p.get("principle_id", ""))
+                for p in cluster_principles
+                if (p.get("fb_id") or p.get("principle_id"))
+            ],
             # D2352/BUG-110: carry segment-level provenance (declared in metadata.provenance, was dropped at S4)
             "source_segments": list(fb_data.get("source_segments", []) or []),
             "evidence_passages": cluster_principles[0].get("evidence_passages", []) if cluster_principles else [],

@@ -194,6 +194,12 @@ stage4:
   depth_focused_classification: true
   depth_max_tokens: 1024   # D2351/BUG-109: GPT-OSS is a reasoning model — 512 truncates reasoning_content → empty content → silent "domain"
   depth_batch_size: 4      # D2354: batch the focused depth prompt (removes the ~10s/FB serialized call)
+  # D2354 FrugalGPT cascade: GPT-OSS keeps the hard CRIBS/classification work;
+  # a cheap third-family model does ONLY the 4-way depth classification.
+  # GATED — default off until tools/benchmark_s4_depth_frugal.py shows ≥90%
+  # agreement with GPT-OSS focused-depth AND ≥90% held-out accuracy.
+  depth_frugal_enabled: false
+  depth_model: gemma-4-E4B-it-MLX-4bit   # fast, non-reasoning (no CoT burn)
   depth_fallback_depth: domain
   max_failed_ratio: 0.0   # D2338: fail-closed merge — if (failed + classification_errors)/total > this ratio, exit non-zero (0.0 = any failure fatal)
 s2:

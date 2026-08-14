@@ -154,19 +154,9 @@ def merged_cribs_classify(
     if not isinstance(result, dict):
         raise ValueError(f"Merged call returned non-dict: {type(result)}")
 
-    # Ensure all expected keys exist with safe defaults
-    defaults = {
-        "application": None,
-        "failure_mode": "",
-        "elaboration": "",
-        "keywords": "",
-        "discipline": "emerging",
-        "domains": ["emerging"],
-        "depth": "domain",
-        "is_specialized": False,
-        "evidence": "cited",
-    }
-    for key, default in defaults.items():
+    # CRIBS enrichment fields — non-semantic, safe to default (C16/D2355).
+    for key, default in (("application", None), ("failure_mode", ""),
+                         ("elaboration", ""), ("keywords", ""), ("is_specialized", False)):
         if key not in result or result[key] is None:
             result[key] = default
 
@@ -174,10 +164,10 @@ def merged_cribs_classify(
     if "jargon" in result and (not result["jargon"] or result["jargon"] == {}):
         del result["jargon"]
 
-    # Validate depth
-    valid_depths = {"universal", "cross-domain", "domain", "specialized"}
-    if result.get("depth") not in valid_depths:
-        result["depth"] = "domain"
+    # Semantic classification fields — FAIL-CLOSED: a sparse model response must
+    # raise (never fabricate "emerging"/"domain"/"cited") so the caller falls
+    # back and the failure is accounted (D2355 ChatGPT re-audit).
+    _validate_semantic_classification(result, source="merged")
 
     return result
 
@@ -339,6 +329,51 @@ class BatchClassificationError(RuntimeError):
     """
 
 
+class SparseClassificationError(RuntimeError):
+    """Raised when a classification response is PRESENT but misses semantic fields.
+
+    D2355 (ChatGPT re-audit): D2355 made the *missing-entry* case fail-closed but
+    left the *present-but-sparse* case fabricating `emerging`/`domain`/`cited`
+    for a missing `discipline`/`domains`/`depth`/`evidence`. A malformed model
+    response must never become valid-looking semantic data (C16) without raising
+    — otherwise `max_failed_ratio: 0.0` cannot catch it.
+    """
+
+
+def _validate_semantic_classification(result: dict, source: str) -> None:
+    """Fail-closed validation of the four semantic classification fields (C16/D2355).
+
+    CRIBS enrichment fields (application/failure_mode/elaboration/keywords) may
+    default to empty — they are non-semantic. But `discipline`, `domains`,
+    `depth`, and `evidence` are semantic: a missing/empty/invalid value must raise
+    so the caller falls back to individual classification and accounts the failure,
+    rather than silently recording plausible-looking labels.
+
+    Args:
+        result: The classification dict returned by a model call.
+        source: Human-readable origin for error messages ("merged"/"batch fb_index=N").
+
+    Raises:
+        SparseClassificationError: if any semantic field is missing/empty/invalid.
+    """
+    discipline = result.get("discipline")
+    if not isinstance(discipline, str) or not discipline.strip():
+        raise SparseClassificationError(f"{source}: empty/missing discipline")
+
+    domains = result.get("domains")
+    if (not isinstance(domains, list) or not domains
+            or not any(isinstance(d, str) and d.strip() for d in domains)):
+        raise SparseClassificationError(f"{source}: empty/missing domains")
+
+    depth = result.get("depth")
+    if depth not in VALID_DEPTHS:
+        raise SparseClassificationError(f"{source}: invalid/missing depth={depth!r}")
+
+    evidence = result.get("evidence")
+    if evidence not in ("cited", "axiomatic"):
+        raise SparseClassificationError(f"{source}: invalid/missing evidence={evidence!r}")
+
+
 # ── D2265: Batch CRIBS + Classification ──────────────────────────────────────
 # S4 bottleneck: GPT-OSS-20B burns ~15-20s on reasoning_content before producing
 # the JSON output. Batch classification amortizes this cost: send 3-5 FBs in one
@@ -469,18 +504,6 @@ def batch_cribs_classify(
             if isinstance(idx, int) and 0 <= idx < len(fbs_data):
                 indexed[idx] = item
 
-    # Build ordered output with defaults
-    defaults = {
-        "application": None,
-        "failure_mode": "",
-        "elaboration": "",
-        "keywords": "",
-        "discipline": "emerging",
-        "domains": ["emerging"],
-        "depth": "domain",
-        "is_specialized": False,
-        "evidence": "cited",
-    }
     output: list[dict] = []
     for i in range(len(fbs_data)):
         if i not in indexed:
@@ -493,17 +516,20 @@ def batch_cribs_classify(
             )
         entry = indexed[i]
 
-        # Fill missing fields within a PRESENT entry with safe defaults.
-        # Empty strings / null are non-semantic (safe); the "emerging"/"domain"
-        # semantic defaults mirror the single-call path (merged_cribs_classify),
-        # so a present-but-sparse entry degrades identically to a single call.
-        for key, default in defaults.items():
+        # CRIBS enrichment fields — non-semantic, safe to default (C16/D2355).
+        for key, default in (("application", None), ("failure_mode", ""),
+                             ("elaboration", ""), ("keywords", ""), ("is_specialized", False)):
             if key not in entry or entry[key] is None:
                 entry[key] = default
 
         # Clean up jargon
         if "jargon" in entry and (not entry["jargon"] or entry["jargon"] == {}):
             del entry["jargon"]
+
+        # Semantic classification fields — FAIL-CLOSED for a PRESENT-but-sparse
+        # entry (D2355 ChatGPT re-audit): missing discipline/domains/depth/evidence
+        # must raise, never fabricate "emerging"/"domain"/"cited".
+        _validate_semantic_classification(entry, source=f"batch fb_index={i}")
 
         output.append(entry)
 
@@ -519,7 +545,7 @@ BATCH_SIZE_MAX: int = 6
 
 def classify_depth_focused(
     fb_data: dict,
-    model: str = "gpt-oss-20b-MXFP4-Q8",
+    model: str | None = None,
     max_tokens: int = 1024,
     timeout: int = 120,
 ) -> str:
@@ -549,6 +575,14 @@ def classify_depth_focused(
         as a valid "domain" label.
     """
     from pipeline.omlx_call import call_omlx
+
+    # C12/D2354: model from config (FrugalGPT depth model), not hardcoded.
+    if model is None:
+        try:
+            from pipeline.pipeline_paths import S4_DEPTH_MODEL
+            model = S4_DEPTH_MODEL
+        except Exception:
+            model = "gpt-oss-20b-MXFP4-Q8"
 
     name = fb_data.get("name", "")
     definition = fb_data.get("definition", "")

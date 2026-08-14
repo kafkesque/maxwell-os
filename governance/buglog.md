@@ -1,6 +1,68 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-13 (D2337-D2343 — 4-LLM audit adjudication + pre-T1.1 residual closures)
+> **Last updated:** 2026-08-14 12:22 (canary deep-audit: D2349 taxonomy + D2350 identity/provenance fixes applied)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟢 D2350 — 2026-08-14 — S4 fb_id drift + source_clusters semantic drift + name-collision hash pollution
+- **Symptom:** Deep-audit of T1.1 canary S4 output found (1) 73 of 279 FBs would get a NEW fb_id between S2→S4 because S4 re-hashed `make_hash_id(name, definition)` AFTER `normalize_fb_name()` title-cased the name — silently breaking FB identity and `source_clusters` provenance; (2) `load_stage2_clusters()` stored the fb_id as `cluster_id`, so `source_clusters` in S4/DB held an fb_id instead of the real cluster id (`cluster_48_s1_sub1`); (3) name collisions got a raw 64-char cluster hash appended (`(Cluster <hash>)`), polluting human-readable names.
+- **Root cause:** identity re-derived at merge time instead of preserved from extraction; cluster id overridden by fb_id; collision suffix used the raw hash.
+- **Fix (D2350):** preserve S2 `fb_id` (`fb_data.get("fb_id") or make_hash_id(...)`); use `fb.get("source_cluster")` as `cluster_id` (convergent + singleton); short numeric probe suffix `(2)`, `(3)`, ….
+- **Status:** 🟢 FIXED (2026-08-14, D2350). Simulated: 73 would-drift records now stable, 200 already stable, 5 no S2 match.
+- **Files:** `pipeline/stage4_merge.py`
+- **Source:** T1.1 canary deep-audit (this session)
+
+## 🟠 BUG-107 — 2026-08-14 — 2 single-source FBs leaked into final DB despite `--only-convergent`
+- **Symptom:** `Hybrid Sorting Algorithm` and `Price Reduction Profit Maximization` are single-source FBs (1 source book) yet present in the final 279-committed DB. 207 convergent parents → 339 sub-cluster targets → 280 FBs; exactly 2 are single-source.
+- **Root cause (TBD):** split-probe k-means sub-clustering (splits large convergent clusters) may emit a sub-cluster that drops below the ≥2-source bar, or singleton-path leakage.
+- **Fix:** root-cause in S2 split-probe; filter at S2 or S4 before commit.
+- **Status:** 🟠 OPEN — non-blocking (2/279 = 0.7%); verify before full T1.1.
+- **Files:** `pipeline/stage2_extract.py`
+- **Source:** T1.1 canary deep-audit (this session)
+
+## 🟠 BUG-106 — 2026-08-14 — S2 checkpoint mixed JSONL/pretty-printed (breaks re-run/resume)
+- **Symptom:** `stage2_extract/canary/checkpoint.jsonl` has 456 lines but only 274 are standalone JSONL; 102 are pretty-printed fragments (6 of 280 FB records multi-line). `load_jsonl` (D2332 fail-closed) RAISES on it. S4 loaded the 280 FBs correctly *this* run, but a re-run/resume would fail-closed.
+- **Root cause (TBD):** main writes (stage2_extract.py:1479/1541/1563) use `json.dumps(fb, ensure_ascii=False)` (JSONL); a second path likely appends `indent=2` pretty-printed records (resume/probe-cache interleave).
+- **Fix:** single JSONL write path for STAGE2_CHECKPOINT; add a post-write `load_jsonl` self-check.
+- **Status:** 🟠 OPEN — non-blocking (canary results valid); verify before full T1.1 re-run.
+- **Files:** `pipeline/stage2_extract.py`
+- **Source:** T1.1 canary post-run checkpoint format audit (this session)
+
+## 🔴 BUG-105 — 2026-08-14 — Embedding instability: 60s timeout + keep_alive thrash (3% drop, D2275 gate exceeded)
+- **Symptom:** T1.1 canary S1.5 embedding: 12 batches failed with HTTP read timeouts (`Read timed out (read timeout=60)`), 768 segments dropped = 3.07% (D2275 gate = 0.5%). A re-run stalled at ~2 seg/s with bge-m3 showing "Stopping..." (VRAM unload mid-run).
+- **Root cause:** (1) `batch_embed` hardcoded `timeout=60` (C12 violation) — too short under 4-worker concurrent load (Ollama serializes `/api/embed`). (2) bge-m3 default 5-min keep_alive → unloaded between batches → cold-reload stalls.
+- **Fix (D2348):** config-driven `services.ollama.embed_timeout: 180` + `embed_keep_alive: -1`. Verified: 0 failures, ~12 seg/s, 34.5 min for 25K segments (was 12 failures / 2-3 seg/s).
+- **Status:** 🟢 FIXED (2026-08-14, D2348).
+- **Files:** `pipeline/ollama_embed.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`
+- **Source:** T1.1 canary run (this session)
+
+---
+
+## 🟠 BUG-104 — 2026-08-13 — sqlite-vec cannot load: `load_extension` missing on python.org Python 3.12.1
+- **Symptom:** `stage6_commit.py init_db()` warns "sqlite-vec not available" on every run; the `vec_fbs` virtual table is never created (verified: current `maxwell.db` has `fbs`/`fbs_fts` but NO `vec_fbs`). Vector search has therefore silently never worked — retrieval falls back to FTS only. Masked by the broad `except (ImportError, Exception)` catch.
+- **Root cause:** Python 3.12.1 (python.org framework build, `/Library/Frameworks/Python.framework/...`, SQLite 3.43.1) compiled WITHOUT `load_extension`/`enable_load_extension`. `sqlite_vec.load(conn)` internally calls `conn.load_extension(...)` → `AttributeError: 'sqlite3.Connection' object has no attribute 'load_extension'`. The BUG-012/P0.11 fix (`conn.enable_load_extension(True)` → `sqlite_vec.load(conn)`) itself fails on this build. The except prints a misleading "Install: pip install sqlite-vec" (the package IS installed).
+- **Fix:** (1) Use a Python build with `load_extension` support — Homebrew Python (`brew install python@3.12`) or conda-forge Python; OR (2) improve `init_db` to distinguish `ImportError` (package missing) from `AttributeError` (load_extension unavailable) and surface the real remediation. NOT a data-loss blocker: FTS fallback works (verified by stress test).
+- **Status:** 🟠 OPEN — environmental (Python build); non-blocking for T1.1 (FTS fallback). FTS-only retrieval until a load_extension-capable interpreter is used.
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** This session — live verification of vector-search readiness during `just preflight` (BUG-012's fix assumed `enable_load_extension` exists).
+
+---
+
+## 🔴 BUG-102 — 2026-08-13 — S1.5 embedding-drop index misalignment (silent cluster→segment corruption)
+- **Symptom:** If the Ollama embedding path drops any segment (batch fails; drop rate ≤0.5% permitted by D2275), the returned embedding array is shorter than the original segment list, but cluster records are built against the original list → embedding[i] no longer corresponds to segments[i]. Wrong segment → wrong cluster → wrong source books → wrong convergence → wrong evidence, with NO exception. Hits the principle path, not just the non-type pass.
+- **Root cause:** `embed_segments()` filters `segments` locally on drop (`stage1_5_embed_cluster.py:320` — `segments = [segments[i] for i in successful_indices]`) then returns only `embeddings` (`:327`). Caller `run_stage1_5` (`:598`) receives embeddings only and passes the ORIGINAL `segments` to `build_clusters` (`:609`). The local reassignment never propagates to the caller.
+- **Fix (D2346):** Return `(filtered_segments, embeddings)` from `embed_segments()` (or raise when `n_dropped > 0`). Assert `len(segments) == len(embeddings)` immediately before FAISS clustering. Add injected-drop tests (first/middle/last segment).
+- **Status:** 🟢 FIXED (2026-08-13) — `embed_segments()` returns `(segments, embeddings)` on both MPS + Ollama paths; caller asserts `len(segments) == len(embeddings)` before `build_clusters()`. `just integrity` 17/17, `just preflight` stress PASS.
+- **Files:** `pipeline/stage1_5_embed_cluster.py`
+- **Source:** ChatGPT audit (`chatgpt009.md`) Block #2 / Seat 2 / Seat 3; independently re-verified against code this session.
+
+## 🟠 BUG-103 — 2026-08-13 — e2e convergence metric uses filename identity, not canonical source IDs
+- **Symptom:** e2e reports `convergent_clusters` 24.5% (39/159) using `len(set(c["source_books"])) >= 2` (filename identity). Production S1.5 gates convergence on canonical work identity (`is_convergent` / `resolve_source_ids()` → author|title). The reported metric can be inflated by duplicate editions and is not the quantity D2336's 20% threshold was meant to calibrate.
+- **Root cause:** `pipeline/e2e_test.py:167` computes convergence from `source_books` filenames, not from `is_convergent` / canonical source IDs.
+- **Fix (D2347):** Compute `sum(c["is_convergent"])` as the primary metric; report filename-diversity separately as a diagnostic.
+- **Status:** 🟢 FIXED (2026-08-13) — `e2e_test.py` Check 1 now gates on `is_convergent` (canonical IDs) and reports filename-diversity as a diagnostic; added a non-gating `vector_completeness` diagnostic check.
+- **Files:** `pipeline/e2e_test.py`
+- **Source:** ChatGPT audit (`chatgpt009.md`) Block #2 / Seat 2; independently re-verified this session.
 
 ---
 

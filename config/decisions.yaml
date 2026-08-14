@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-13
+# Last manual edit: 2026-08-14
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-13T17:48:52Z'
-total_decisions: 333
+last_sync: '2026-08-14T07:50:05Z'
+total_decisions: 339
 decisions:
 - id: D2092
   category: INF
@@ -2652,29 +2652,82 @@ decisions:
   - pipeline/omlx_delegate.py
   - governance/buglog.md
   created: '2026-08-13'
+- id: D2345
+  category: ARCH
+  state: DRAFT
+  description: Principle-first T1.1 + separate single-source non-type second pass (stage2_extract_nontype.py)
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/stage2_extract_nontype.py
+  - config/golden/stage2_fewshot_convergent_nontype.yaml
+  created: '2026-08-13'
+- id: D2346
+  category: INF
+  state: ACTIVE
+  description: 'S1.5 embedding-drop index alignment: return (filtered_segments, embeddings) + len assert (BUG-102)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  - governance/buglog.md
+  created: '2026-08-13'
+- id: D2347
+  category: QLT
+  state: ACTIVE
+  description: 'e2e convergence metric canonical-source correction: sum(c[is_convergent]) vs filename identity (BUG-103)'
+  champion: 2026-08-13 session
+  target_files:
+  - pipeline/e2e_test.py
+  - governance/buglog.md
+  created: '2026-08-13'
+- id: D2348
+  category: BUGFIX
+  state: ACTIVE
+  description: 'Embedding reliability: config-driven embed_timeout:180 + embed_keep_alive:-1 (BUG-105)'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/ollama_embed.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  created: '2026-08-14'
+- id: D2349
+  category: CLS
+  state: ACTIVE
+  description: 'Content-type field taxonomy: core_body vs classification vs metadata; jargon->body, keywords->metadata.discovery, evidence_passages->provenance'
+  champion: 2026-08-14 session
+  target_files:
+  - config/content_types.yaml
+  created: '2026-08-14'
+- id: D2350
+  category: BUGFIX
+  state: ACTIVE
+  description: 'S4 identity/provenance: preserve S2 fb_id (no rehash), preserve real source_cluster id, short numeric name-collision suffix'
+  champion: 2026-08-14 session
+  target_files:
+  - pipeline/stage4_merge.py
+  created: '2026-08-14'
 summary:
-  total: 333
+  total: 339
   proposed: 0
-  draft: 0
-  active: 289
+  draft: 1
+  active: 294
   stale: 0
   superseded: 13
   archived: 8
   rejected: 7
   by_category:
     INF: 176
-    QLT: 31
+    QLT: 32
     GOV: 20
     RES: 4
     DAT: 4
     DEF: 1
     VAL: 8
-    CLS: 14
+    CLS: 15
     STR: 1
     PERF: 6
-    BUGFIX: 29
+    BUGFIX: 31
     CFG: 5
-    ARCH: 20
+    ARCH: 22
     pipeline-fix: 2
     governance: 1
     BUG: 1

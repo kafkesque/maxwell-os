@@ -60,6 +60,8 @@ services:
     nomic_max_chars: 4000
     embed_max_chars: 4000
     batch_size: 100
+    embed_timeout: 180        # D2348: 60s too short under 4-worker concurrent load → read timeouts (3% drop, BUG-105)
+    embed_keep_alive: -1      # D2348: pin bge-m3 in VRAM (keep_alive thrash → cold reload stalls, BUG-105)
   omlx:
     host: localhost
     port: 11435

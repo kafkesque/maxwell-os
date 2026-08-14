@@ -33,8 +33,8 @@ content_types:
     extension_fields:
       - application
       - failure_mode
-      - keywords
-      - jargon
+      # keywords moved to metadata.discovery (search/retrieval labels) per D2349
+      # jargon moved to core_body (body-only, after elaboration) per D2349
       - procedural_skill
       - prerequisite_fbs
       - contradicts_fbs
@@ -181,8 +181,13 @@ route_to_content_type:
   TI: tool_instruction
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SHARED CORE BODY — emitted by S2, identical for ALL content types
+# SHARED CORE BODY — the READABLE knowledge content an agent consumes.
+# S2 emits name→elaboration. S4 appends jargon (body-only, AFTER elaboration).
 # ─────────────────────────────────────────────────────────────────────────────
+# NOTE (D2349): is_summary, evidence_passages, extraction_type, content_type
+# were previously listed here but are NOT body content — they are flags,
+# provenance, and classification labels. Moved to `classification` / `metadata`
+# below so `core_body` reflects only what renders as the knowledge object's body.
 core_body:
   - name
   - definition
@@ -190,19 +195,21 @@ core_body:
   - boundary
   - consequence
   - elaboration
-  - is_summary
-  - evidence_passages
-  - extraction_type
-  - content_type
+  - jargon        # S4 (CRIBS) — body-only per D2123, renders AFTER elaboration
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SHARED CLASSIFICATION — emitted by S4, all content types
+# SHARED CLASSIFICATION — emitted by S2/S4, all content types.
+# D2349: content_type (functional ROLE) + extraction_type (epistemic FORM) are
+# classification labels, NOT body content. is_summary is a gate flag, NOT body.
 # ─────────────────────────────────────────────────────────────────────────────
 classification:
+  - content_type       # functional role (D2323 Axis 1)
+  - extraction_type    # epistemic form (D2323 Axis 2)
+  - is_summary         # gate flag (summary vs principle)
   - domains
   - discipline
   - depth
-  - evidence
+  - evidence          # flag: cited | axiomatic (NOT evidence_passages — those are provenance metadata)
   - domains_raw        # raw LLM label preserved forever (G9)
   - discipline_raw     # raw LLM label preserved forever (G9)
 
@@ -211,7 +218,8 @@ classification:
 # ─────────────────────────────────────────────────────────────────────────────
 metadata:
   stamps:       [schema_version, gen_model, pipeline_commit, pipeline_run_id, created_at]
-  provenance:   [source_books, source_clusters, source_segments, evidence_passages]
+  provenance:   [source_books, source_clusters, source_segments, evidence_passages]  # evidence_passages = up to 5 verbatim source quotes
+  discovery:    [keywords]                  # search/retrieval labels (3-5 comma-separated terms)
   versioning:   [object_version]            # canonical name (currently `fb_version` in code)
   runtime:      [usage_count, last_retrieved_at, feedback_score, feedback_count]
 

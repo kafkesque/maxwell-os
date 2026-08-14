@@ -453,7 +453,11 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
             origin: str = "single_source"
 
         clusters.append({
-            "cluster_id": fb_id_val or f"fb_{i}",
+            # D2350: preserve the REAL S2 cluster id (e.g. "cluster_48_s1_sub1"),
+            # NOT the fb_id. Previously fb_id_val was used here, which caused
+            # `source_clusters` in S4/DB to store an fb_id instead of a cluster id,
+            # breaking cluster→segment provenance tracing.
+            "cluster_id": fb.get("source_cluster") or fb_id_val or f"fb_{i}",
             "principle_ids": [fb_id_val] if fb_id_val else [f"fb_{i}"],
             "source_books": fb.get("source_books", []),
             "is_convergent": is_convergent,
@@ -477,7 +481,9 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
 
             # Singleton FBs are always: not convergent, not noise, is singleton
             clusters.append({
-                "cluster_id": fb_id_val or f"singleton_{singleton_count}",
+                # D2350: preserve the REAL singleton cluster id (S2 emits
+                # `source_cluster` = "singleton_xxx") instead of fb_id.
+                "cluster_id": fb.get("source_cluster") or fb_id_val or f"singleton_{singleton_count}",
                 "principle_ids": [fb_id_val] if fb_id_val else [f"singleton_{singleton_count}"],
                 "source_books": fb.get("source_books", []),
                 "is_convergent": False,
@@ -1267,8 +1273,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         name = normalize_fb_name(name, max_words=5)
         if not check_name_unique(name, existing_names):
             name_collisions += 1
-            # Append cluster_id to disambiguate
-            name = f"{name} (Cluster {cluster_id})"
+            # D2350: short numeric suffix (was "(Cluster <64-char-hash>)" which
+            # polluted human-readable names). Probe until unique.
+            base = name
+            suffix = 2
+            while not check_name_unique(f"{base} ({suffix})", existing_names):
+                suffix += 1
+            name = f"{base} ({suffix})"
             print(f"      ⚠️  Name collision, disambiguated: '{name}'")
         existing_names.add(name)
 
@@ -1343,7 +1354,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
         fb = {
-            "fb_id": make_hash_id(name, definition),
+            # D2350: preserve S2's fb_id (identity is fixed at extraction time).
+            # Previously re-hashed here AFTER name title-casing, so 67 records
+            # drifted to a new fb_id between S2→S4, breaking source_clusters
+            # provenance and FB identity across stages.
+            "fb_id": fb_data.get("fb_id") or make_hash_id(name, definition),
             "name": name,
             "definition": definition,
             "mechanism": fb_data.get("mechanism", "").strip(),

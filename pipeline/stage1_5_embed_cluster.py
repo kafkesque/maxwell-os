@@ -116,7 +116,7 @@ def load_segments() -> list[dict]:
     return segments
 
 
-def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.ndarray:
+def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> tuple[list[dict], np.ndarray]:
     """Embed segment text via configured backend (MPS sentence-transformers, Ollama fallback).
 
     D2181: Unified to bge-m3 (T1.2 Option A) — same model as S4 relationship edges.
@@ -134,7 +134,10 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
         model: Ollama embedding model name (ignored when backend=mps).
 
     Returns:
-        Float32 array of shape (n_segments, S15_EMBED_DIM), normalized to unit vectors.
+        Tuple of (segments, embeddings): `segments` is the list of segment dicts
+        aligned 1:1 with `embeddings` (filtered in lockstep if any batch dropped —
+        D2346). `embeddings` is a float32 array of shape (n_segments, S15_EMBED_DIM),
+        normalized to unit vectors.
     """
     texts: list[str] = [seg["text"][:1500] for seg in segments]
     total: int = len(texts)
@@ -238,7 +241,9 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
 
         # Flush and return the memmap (caller can read or copy)
         embeddings_mmap.flush()
-        return np.array(embeddings_mmap)  # Materialize once (FAISS needs contiguous)
+        # D2346: MPS path never drops, so segments are returned unchanged (1:1
+        # with embeddings). The tuple signature keeps both backends aligned.
+        return segments, np.array(embeddings_mmap)  # Materialize once (FAISS needs contiguous)
 
     # ── Ollama HTTP fallback ────────────────────────────────────────────
     print(f"   🧠 Embedding {total} segments via {model} (Ollama, truncating to {S15_EMBED_DIM}d)...")
@@ -324,7 +329,10 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> np.nda
     norms[norms == 0] = 1.0
     embeddings = embeddings / norms
 
-    return embeddings
+    # D2346: return the (possibly filtered) segments alongside embeddings so the
+    # caller can assert 1:1 alignment before FAISS clustering. `segments` here is
+    # the original list when n_dropped == 0, or the lockstep-filtered list otherwise.
+    return segments, embeddings
 
 
 def faiss_cluster(
@@ -595,8 +603,18 @@ def run_stage1_5(
 
     # Embed
     start: float = time.time()
-    embeddings: np.ndarray = embed_segments(segments)
+    segments, embeddings = embed_segments(segments)
     embed_time: float = time.time() - start
+
+    # D2346: hard invariant — embedding[i] must correspond to segments[i].
+    # A dropped batch (≤0.5% permitted by D2275) would otherwise silently
+    # misalign cluster membership (embedding[i] → some later original segment).
+    if len(segments) != len(embeddings):
+        raise ValueError(
+            f"FATAL: segment/embedding misalignment after embedding: "
+            f"{len(segments)} segments vs {len(embeddings)} embeddings. "
+            f"An embedding-drop path did not filter segments in lockstep."
+        )
 
     # Cluster
     start = time.time()

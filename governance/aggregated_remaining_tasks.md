@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-13 19:14 | **Decisions:** D2000-D2343 (332) | **T1.1 = CONDITIONAL-GO — B1-B14 implemented (B15 deferred P2)**
+> **Updated:** 2026-08-14 12:22 | **Decisions:** D2000-D2350 (339) | **T1.1 canary GREEN (V1–V6); remaining gate = S4 speed**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
@@ -66,22 +66,49 @@
 
 ---
 
+## 🔴 #2.5 — 2nd AUDIT BLOCKERS (D2346/D2347, 2026-08-13) — fix BEFORE the canary
+
+> **ChatGPT/Qwen audit (post-D2344) surfaced 2 code-verified blockers the B1–B15 set missed.** Both hit the
+> **principle** path. D2345 (non-type second pass) is DECIDED as post-T1.1 — NOT a blocker.
+
+| # | Decision | Task (code-verified) | Status |
+|---|----------|----------------------|--------|
+| B16 | D2346 | S1.5 embedding-drop index alignment — return `(filtered_segments, embeddings)` + `len(segments)==len(embeddings)` assert + injected-drop tests | ✅ DONE |
+| B17 | D2347 | e2e convergence metric → `sum(c["is_convergent"])` (canonical IDs); filename-diversity as separate diagnostic | ✅ DONE |
+
+> **Why B16 first:** D2275 permits ≤0.5% embed drop; on any drop, `embed_segments()` filters locally but returns only
+> embeddings → `build_clusters()` indexes the full original list → silent wrong-segment corruption (no exception).
+> **Why B17:** D2336's 20% threshold is "calibrated" against `e2e_test.py:167` filename-based 24.5% — not the canonical
+> quantity production gates on. Fix before the canary so the e2e/V2 gate reports a trustworthy number.
+
+---
+
 ## 🔍 #3 — PRE-T1.1 VERIFICATION GATE (canary examine — run BEFORE full corpus)
 
-> The code closures (B1–B14) are committed (50280a1). The **only** thing left before the full run is to *examine*
-> them end-to-end on a small slice — the full corpus has never been through S2 (status: S2 extract = 0).
+> **✅ CANARY COMPLETE (2026-08-14).** 25K segments → S1.5→S2→S4→S5→S6 all green, EXIT 0 at every stage.
+> Discovered + fixed **BUG-105** (embedding instability) via **D2348** (timeout 180s + keep_alive=-1) mid-canary.
 
 | # | Task | Status |
 |---|------|--------|
-| V1 | Run a **~1,000-cluster canary** through S1.5→S2→S4→S5→S6 | ⏳ NEXT |
-| V2 | Verify e2e **check [7]** — ≥90% rows carry `content_type`+`extraction_type` (D2337 ontology round-trip) | ⏳ blocked on V1 |
-| V3 | Verify **BUG-095** (S6 persists 6 D2337 columns) on real canary rows (not just unit round-trip) | ⏳ blocked on V1 |
-| V4 | Verify **BUG-096** (S4/S6 fail-closed exit codes on injected partial failure) | ✅ unit-tested (exit 1 / exit 0); canary re-confirm |
-| V5 | Re-open ontology item #5 — confirm PT/PI/TI FBs (if any) survive S4→S6 with non-`principle` `content_type` | ⏳ blocked on V1 |
-| V6 | Confirm **BUG-094** fix: no active `checkpoint.jsonl` → S2 fresh-start (already quarantined `.orig_48mb`) | ✅ verified (no checkpoint.jsonl present) |
+| V1 | Run a **~1,000-cluster canary** through S1.5→S2→S4→S5→S6 | ✅ DONE — 2255 clusters (207 convergent), 0 failures |
+| V2 | Verify e2e **check [7]** — ≥90% rows carry `content_type`+`extraction_type` (D2337 ontology round-trip) | ✅ DONE — 279/279 (100%) |
+| V3 | Verify **BUG-095** (S6 persists 6 D2337 columns) on real canary rows | ✅ DONE — 6/6 columns, 279 rows |
+| V4 | Verify **BUG-096** (S4/S6 fail-closed exit codes) | ✅ DONE — 0 failed, exit 0 (correct happy-path) |
+| V5 | Confirm PT/PI/TI FBs (if any) survive S4→S6 | ✅ DONE — 0 PT/PI/GE/TI (all `principle`, expected for principle-only T1.1) |
+| V6 | Confirm **BUG-094** fix (no stale checkpoint → S2 fresh-start) | ✅ DONE — S2 fresh-start confirmed |
 
-> **Decision gate:** if V1–V6 green → launch full T1.1 (`python3 pipeline/runner.py`). If canary shows
-> axes dropped or fail-open, STOP and re-open the relevant D2337/D2338 bug before the full corpus.
+> **Canary metrics:** S1.5 2255 clusters (207 convergent, 9.2%) | S2 280 FBs (82.6% yield, 0 failed) | S4 279 FBs
+> (1 dedup, 46988 edges, 0 failed) | S5 239 PASS / 40 QUARANTINE (85.7%) | S6 279 committed (398 total rows), Parquet ✓.
+>
+> **New findings (post-canary, NOT blocking):**
+> 1. **S4 slowness** — gpt-oss-20b batch classify ~3.5 FBs/min → full-run S4 ≈ 62h (vs 21-26h estimate). Needs
+>    larger batch / faster classifier before T1.1 full run.
+> 2. **Convergence 9.2%** (DOMAIN 0 prefix) < e2e 20% threshold — sample-selection artifact (single-domain prefix),
+>    not a pipeline bug. Full corpus (8 domains) measured 20.3%.
+> 3. **BUG-104 confirmed** — sqlite-vec `load_extension` missing on python.org Python → vector search 0/279 (FTS fallback).
+
+> **Decision gate:** V1–V6 green → the code path is validated end-to-end. **Gating on full T1.1 = S4 speed**
+> (62h at canary rate) — re-tune S4 batch/classifier before the 26h full run.
 
 ---
 

@@ -92,6 +92,8 @@ OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("ci
 OMLX_CB_COOLDOWN_SECONDS = float(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_cooldown_seconds", 60))
 OLLAMA_EMBED_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("embed_max_chars", 4000))
 OLLAMA_BATCH_SIZE = int(_CFG.get("services", {}).get("ollama", {}).get("batch_size", 100))
+OLLAMA_EMBED_TIMEOUT = int(_CFG.get("services", {}).get("ollama", {}).get("embed_timeout", 60))  # D2348: config-driven (BUG-105)
+OLLAMA_EMBED_KEEP_ALIVE = _CFG.get("services", {}).get("ollama", {}).get("embed_keep_alive", -1)  # D2348: pin in VRAM (BUG-105)
 
 # ── Models ─────────────────────────────────────────────────────────────
 GEN_MODEL=_env("gen_model",_CFG["models"]["generator"]["model"]); GEN_PROVIDER=_CFG["models"]["generator"]["provider"]

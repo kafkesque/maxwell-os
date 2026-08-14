@@ -161,15 +161,20 @@ def validate_results() -> dict:
     results: dict = {"passed": True, "checks": []}
 
     # Check 1: Stage 1.5 convergent clusters
+    # D2347: convergence gates on canonical work identity (`is_convergent`, computed
+    # by resolve_source_ids() → author|title), NOT filename diversity. Filename
+    # diversity can be inflated by duplicate editions and is reported only as a
+    # diagnostic alongside the canonical metric.
     if STAGE1_5_CHECKPOINT.exists():
         clusters = _load_jsonl(STAGE1_5_CHECKPOINT)
         total = len(clusters)
-        convergent = sum(1 for c in clusters if len(set(c.get("source_books", []))) >= BORP_MIN_SOURCES)
+        convergent = sum(1 for c in clusters if c.get("is_convergent") is True)
+        by_filename = sum(1 for c in clusters if len(set(c.get("source_books", []))) >= BORP_MIN_SOURCES)
         ratio = convergent / total if total else 0
         ok = ratio >= E2E_CONVERGENT_RATIO
         results["checks"].append({
             "check": "convergent_clusters",
-            "value": f"{convergent}/{total} ({ratio:.1%})",
+            "value": f"{convergent}/{total} canonical ({ratio:.1%}; {by_filename}/{total} by-filename)",
             "threshold": f"≥{E2E_CONVERGENT_RATIO:.0%}",
             "passed": ok,
         })
@@ -294,6 +299,28 @@ def validate_results() -> dict:
         })
         if not ontology_ok:
             results["passed"] = False
+
+        # Check 8 (diagnostic, non-gating): vector completeness — sqlite-vec must
+        # not silently degrade (D2185). Reports vec_fbs coverage for the current
+        # run; vector search falls back to FTS when vec_fbs is missing/partial.
+        # NOT a data-loss gate (ChatGPT Seat 2 finding: degradation vs data loss).
+        conn = sqlite3.connect(str(DB_PATH))
+        try:
+            vec_covered = conn.execute(
+                "SELECT COUNT(*) FROM vec_fbs v "
+                "JOIN fbs f ON v.rowid = f.rowid "
+                "WHERE f.pipeline_run_id = ?",
+                (get_run_id(),),
+            ).fetchone()[0]
+        except Exception:
+            vec_covered = 0
+        conn.close()
+        results["checks"].append({
+            "check": "vector_completeness",
+            "value": f"{vec_covered}/{row_count} rows have vectors",
+            "threshold": "diagnostic (FTS fallback if <100%)",
+            "passed": True,  # diagnostic only — not a hard gate
+        })
     else:
         results["checks"].append({"check": "db_rows", "value": "no database", "passed": False})
         results["passed"] = False

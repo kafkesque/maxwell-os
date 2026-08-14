@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-13 19:14 | **Decisions:** D2000-D2343 (332 decisions)
+> **Updated:** 2026-08-14 12:22 | **Decisions:** D2000-D2350 (339 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -8,6 +8,41 @@
 > **Buglog:** `governance/buglog.md`
 
 ---
+
+# 🔴 NEW THIS SESSION — 3rd Audit Adjudication (D2349–D2350, 2026-08-14)
+
+> **Deep audit of T1.1 canary + taxonomy adjudication.** User rejected several prior audit conclusions and
+> clarified schema/taxonomy definitions. Fixed surgically in strategic order:
+
+| # | Decision | Task (code-verified) | Effort | Status |
+|---|----------|----------------------|--------|--------|
+| **B19** | D2349 | content-type field taxonomy: separate core_body / classification / metadata; jargon→body (after elaboration); keywords→metadata.discovery; evidence_passages→metadata.provenance (verbatim quotes, NOT body) | 0.5h | ✅ DONE |
+| **B20** | D2350 | S4 identity/provenance: preserve S2 fb_id (no rehash after title-case; 73 records were drifting); preserve real source_cluster id (was overwritten with fb_id); short numeric name-collision suffix (was 64-char hash) | 1h | ✅ DONE |
+
+> **Validation:** `config_audit --check-unchecked --strict` ✅ · `just integrity` 17/17 ✅ · `just healthcheck` 10/10 ✅ ·
+> `just preflight` stress ALL_PASS ✅. **Remaining open:** BUG-106 (S2 checkpoint pretty-print corruption), BUG-104
+> (sqlite-vec load_extension), 2 single-source FBs leaked (`Hybrid Sorting Algorithm`, `Price Reduction Profit Maximization`),
+> S4 speed (~3.5 FBs/min). Rerun canary pending after these.
+
+# 🔴 NEW THIS SESSION — 2nd Audit Adjudication (D2345–D2347, 2026-08-13)
+
+> **ChatGPT/Qwen audit of `T1.1_ROUNDTABLE_AUDIT_PROMPT.md` (post-D2344).** Two new code-verified blockers
+> surfaced that the B1–B15 set did not cover — both hit the **principle** path, not just the non-type pass.
+
+| # | Decision | Task (code-verified) | Effort | Status |
+|---|----------|----------------------|--------|--------|
+| **B16** | D2346 | S1.5 embedding-drop index alignment — return `(filtered_segments, embeddings)` + `len` assert + drop tests | 1h | ✅ DONE |
+| **B17** | D2347 | e2e convergence metric → `sum(c["is_convergent"])` (canonical IDs), filename-diversity as diagnostic | 0.5h | ✅ DONE |
+| **B18** | D2348 | embedding reliability — `embed_timeout: 180` + `embed_keep_alive: -1` (config-driven, BUG-105) | 0.5h | ✅ DONE |
+
+> **✅ T1.1 CANARY GREEN (2026-08-14).** 25K segments → S1.5(2255 clusters/207 conv) → S2(280 FBs) → S4(279 FBs)
+> → S5(239 PASS/40 QUAR) → S6(279 committed). V1–V6 all pass. **Remaining gate = S4 speed** (~3.5 FBs/min →
+> 62h full-run; re-tune before full T1.1). BUG-105 (embedding instability) found+fixed mid-canary via D2348.
+
+> **D2345 (non-type second pass):** DECIDED as principle-first + separate single-source `stage2_extract_nontype.py`
+> (post-T1.1). NOT a T1.1 blocker. Whether convergent PT/PI/GE/TI even occur = UNKNOWN; measure offline first.
+> **B16/B17 IMPLEMENTED** (`just integrity` 17/17, `just preflight` stress PASS). **BUG-104** (sqlite-vec
+> `load_extension` missing on python.org Python 3.12.1) discovered — non-blocking (FTS fallback), environmental.
 
 # 🔴 NEW THIS SESSION — 4-LLM Audit Adjudication (D2337–D2341, 2026-08-13)
 

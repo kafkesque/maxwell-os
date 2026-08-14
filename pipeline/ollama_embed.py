@@ -30,7 +30,9 @@ class EmbeddingQuarantineError(Exception):
 
 from pipeline.pipeline_paths import (
     OLLAMA_BATCH_SIZE,
+    OLLAMA_EMBED_KEEP_ALIVE,  # D2348: pin bge-m3 in VRAM (was default 5min → unload thrash, BUG-105)
     OLLAMA_EMBED_MAX_CHARS,
+    OLLAMA_EMBED_TIMEOUT,  # D2348: config-driven (was hardcoded 60 — BUG-105)
     OLLAMA_HOST,
     OLLAMA_PORT,
 )
@@ -82,8 +84,8 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
         try:
             resp = requests.post(
                 OLLAMA_URL,
-                json={"model": model, "input": truncated},
-                timeout=60,
+                json={"model": model, "input": truncated, "keep_alive": OLLAMA_EMBED_KEEP_ALIVE},
+                timeout=OLLAMA_EMBED_TIMEOUT,
             )
             resp.raise_for_status()
             data = resp.json()

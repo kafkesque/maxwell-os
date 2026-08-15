@@ -236,15 +236,11 @@ def ab_test_merged_vs_split(fb_data: dict, verbose: bool = True) -> dict:
 
 def _likely_universal(fb_data: dict) -> bool:
     """Heuristic: is this principle likely universal (physics/cognition/math)? """
+    # D2364/C12 (X7): universal signal substrings from config (was hardcoded list).
+    from pipeline.pipeline_paths import S4_UNIVERSAL_SIGNALS
     name = fb_data.get("name", "").lower()
     mechanism = fb_data.get("mechanism", "").lower()
-    universal_signals = [
-        "entropy", "thermodynamic", "evolution", "natural selection",
-        "system 1", "system 2", "cognitive bias", "feedback loop",
-        "power law", "exponential", "equilibrium", "conservation",
-        "symmetry", "optimization", "gradient",
-    ]
-    return any(s in name or s in mechanism for s in universal_signals)
+    return any(s in name or s in mechanism for s in S4_UNIVERSAL_SIGNALS)
 
 
 # ── BUG-075: Focused S4 Depth Classification ────────────────────────────────

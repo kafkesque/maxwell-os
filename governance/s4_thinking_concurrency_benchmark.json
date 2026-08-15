@@ -1,0 +1,127 @@
+{
+  "timestamp": "2026-08-15T16:18:55",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "x8": [
+    {
+      "fb": "Asymmetric Dominance Decoy",
+      "gold_depth": "cross-domain",
+      "thinking_budget": null,
+      "time_s": 33.94,
+      "reasoning_chars": 2863,
+      "content_chars": 1709,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Asymmetric Dominance Decoy",
+      "gold_depth": "cross-domain",
+      "thinking_budget": 256,
+      "time_s": 24.41,
+      "reasoning_chars": 1218,
+      "content_chars": 1732,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Asymmetric Dominance Decoy",
+      "gold_depth": "cross-domain",
+      "thinking_budget": 384,
+      "time_s": 25.54,
+      "reasoning_chars": 1868,
+      "content_chars": 1836,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Asymmetric Dominance Decoy",
+      "gold_depth": "cross-domain",
+      "thinking_budget": 512,
+      "time_s": 27.13,
+      "reasoning_chars": 2492,
+      "content_chars": 1261,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Implementation Intention Triggering",
+      "gold_depth": "domain",
+      "thinking_budget": null,
+      "time_s": 45.59,
+      "reasoning_chars": 5454,
+      "content_chars": 1632,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Implementation Intention Triggering",
+      "gold_depth": "domain",
+      "thinking_budget": 256,
+      "time_s": 19.63,
+      "reasoning_chars": 1275,
+      "content_chars": 1446,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Implementation Intention Triggering",
+      "gold_depth": "domain",
+      "thinking_budget": 384,
+      "time_s": 25.64,
+      "reasoning_chars": 1900,
+      "content_chars": 1502,
+      "valid_json": true,
+      "finish_reason": "stop"
+    },
+    {
+      "fb": "Implementation Intention Triggering",
+      "gold_depth": "domain",
+      "thinking_budget": 512,
+      "time_s": 31.02,
+      "reasoning_chars": 2581,
+      "content_chars": 1815,
+      "valid_json": true,
+      "finish_reason": "stop"
+    }
+  ],
+  "x9": [
+    {
+      "workers": 1,
+      "total_s": 43.32,
+      "per_fb_s": 7.22,
+      "results": [
+        "cross-domain",
+        "domain",
+        "cross-domain",
+        "cross-domain",
+        "domain",
+        "cross-domain"
+      ]
+    },
+    {
+      "workers": 2,
+      "total_s": 41.35,
+      "per_fb_s": 6.89,
+      "results": [
+        "cross-domain",
+        "domain",
+        "domain",
+        "cross-domain",
+        "cross-domain",
+        "cross-domain"
+      ]
+    },
+    {
+      "workers": 3,
+      "total_s": 42.25,
+      "per_fb_s": 7.04,
+      "results": [
+        "cross-domain",
+        "cross-domain",
+        "cross-domain",
+        "cross-domain",
+        "cross-domain",
+        "cross-domain"
+      ]
+    }
+  ]
+}

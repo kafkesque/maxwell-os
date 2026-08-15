@@ -1,6 +1,47 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-15 10:11 (D2359 production-verified: 72.0% acc @ 7.2s median / 8.3s mean; D2361 default-model mismatch fixed; W7 `deathpectation` resolved = private Anytype space name)
+> **Last updated:** 2026-08-15 16:20 (D2366: X4/X6/X8/X9 benchmarks done — only thinking_budget=256 survives; depth accuracy corrected to ~84% not 98%)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## ✅ DONE (2026-08-15) — S4 speedup options exhausted (D2366, X4/X6/X8/X9)
+
+| ID | Option | Measured result | Verdict |
+|----|--------|-----------------|---------|
+| X4 | Frugal gemma-4-E4B depth (S4-B) | 62.5% acc, 4.5× faster (2.0s warm) | ❌ FAILS 90% gate (relabel did not rescue gemma) |
+| X6 | Batch focused-depth (S4-A) | 66.7% vs 84.4% sequential (n=45), parity 60%, 1.7× | ❌ batching degrades accuracy 17.7pt |
+| X8 | thinking_budget on merged CRIBS | **256 → 1.8× faster (40s→22s), valid JSON** | ✅ SOLE viable speedup (gated on accuracy) |
+| X9 | Concurrency 1/2/3 workers | 43.3s/41.3s/42.2s (flat) | ❌ OMLX serializes — no benefit |
+
+**⚠️ CORRECTION to D2365 X2:** depth accuracy is **~84% (n=45)**, NOT the 98% earlier reported. The 98%
+was an over-correction (re-mapped only the 14 relabeled FBs; the relabel vote missed ~6 more gpt-oss
+cross-domain over-assignments). The residual error is systematic over-assignment of `cross-domain`.
+
+---
+
+## ✅ RESOLVED (2026-08-15) — Cross-LLM audit X1/X2/X5 re-adjudicated (D2365)
+> The three highest-priority audit items from `CROSS-LLM-AUDIT-VERDICT-2026-08-15.md` were re-derived
+> from raw governance JSON. All three resolve in Maxwell's favour.
+
+| ID | Concern | Finding (evidence) | Verdict |
+|----|---------|--------------------|---------|
+| X1 | D2363 golden-relabel circular (gpt-oss-led contamination) | Relabel = cross-model consensus; gpt-oss tie-break in only 3/13 (always paired with qwen); gpt-oss voted *against* relabel in CONV-033. Never sole driver. | ✅ NOT contaminated |
+| X2 | Depth accuracy 72% (n=50), "quality gap > speed gap" | 72% measured vs PRE-relabel gold; 13/14 "errors" were gold errors (gpt-oss was right, later relabeled). Post-relabel accuracy = **49/50 = 98%**. Only genuine error: CONV-016 "Limited Palette Discipline". | ✅ REFUTED — no quality crisis |
+| X5 | 142h denominator unverified (12,964 ≠ FBs) | 12,964 = total clusters; 2,634 convergent (20.3%); 35,239 singletons. Principle-only FBs ≈ 2,634 × 1.35 yield ≈ 3,556 → **~39h** (not 142h). | ✅ 3.6× over-estimate |
+
+**Residual (non-blocking):** 3 relabels (CONV-001/003/051) are gpt-oss-tie-broken → optional 2-family
+re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending (replaces stale 72%/75%).
+
+## 🟢 FIXED (2026-08-15) — C12 (X7): hardcoded S4 signal sets → config (D2364)
+- **Symptom:** `stage4_merge.py` hardcoded `business/design/system/academic_signals` + `temporal_scope`
+  keyword lists; `stage4_merged_call.py:_likely_universal` hardcoded `universal_signals`. C12 violation
+  (Gemini's one genuine catch in the cross-LLM audit).
+- **Fix (D2364):** extracted to `config/pipeline_config.yaml` → `stage4.{context,temporal,universal}_signals`;
+  wired via `pipeline_paths.py` (`S4_CONTEXT_SIGNALS`/`S4_TEMPORAL_SIGNALS`/`S4_UNIVERSAL_SIGNALS`).
+  Behavior-preserving (values byte-identical; verified by diff + live read-back).
+- **Status:** 🟢 FIXED — `py_compile` clean, `config_audit --strict` clean, Qwen3-Coder-30B review PASS.
+- **Files:** `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`, `pipeline/stage4_merge.py`,
+  `pipeline/stage4_merged_call.py`
 
 ---
 

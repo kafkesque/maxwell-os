@@ -259,3 +259,35 @@ Focus areas, highest-value first:
 
 Report findings as (file, line, claim, evidence, verdict). Do not mutate code — flag only.
 
+
+---
+
+# SESSION 2026-08-15 — S4 Bottleneck Speedup Roundtable (D2366)
+
+> **Question:** can the S4 bottleneck (merged CRIBS 32s + focused depth 7s = ~39.5s/FB) be
+> further improved WITHOUT breaking quality?
+> **Method:** I (goose) independently verified X4/X6/X8/X9 against post-relabel gold, then
+> delegated the same exhaustive review to Qwen3-Coder-30B (roundtable) and compared.
+
+## My verified findings (presented to the roundtable)
+1. Depth accuracy ~84% (n=45) — systematic gpt-oss cross-domain over-assignment.
+2. X4 frugal gemma-4-E4B depth = 62.5% (4.5× faster) → FAILS 90% gate.
+3. X6 batch focused-depth = 66.7% vs 84.4% sequential (n=45), parity 60% → REJECTED.
+4. X8 thinking_budget=256 on merged = 1.8× faster, valid JSON → SOLE viable speedup.
+5. X9 concurrency = flat (OMLX serializes) → no benefit.
+6. Market research (llmfit 1.1.6): no ≤4B R5-clean model hits ≥90% depth.
+
+## Roundtable (Qwen3-Coder-30B) response
+- **Agreed with all 6 findings.**
+- Added: (a) thinking_budget=128 (deeper cap), (b) quantize gpt-oss Q8→Q4_K_M, (c) LoRA fine-tune.
+- ⚠️ Its "use Qwen3.6-35B/Qwen3.8-27B as proxy" suggestions violate R5 (S2 generator = Qwen family) — rejected.
+
+## Verification of the roundtable's additions
+- **thinking_budget=128: VERIFIED — 17.6s (vs 33.9s null, 21.9s @256), valid JSON** (reasoning 609 chars).
+  Risk: only 609 reasoning chars → may truncate on complex FBs; budget=256 (1218 chars) is the safer default.
+- Quantization Q4_K_M + LoRA: NOT yet benchmarked (deferred; requires re-quantized weights download).
+
+## Comparison verdict
+Roundtable CONFIRMS my findings and correctly identifies thinking_budget=128 as a deeper lever (now verified).
+Its quantization/LoRA suggestions are legitimate but deferred; its Qwen-family proxies are R5-invalid.
+**Net: thinking_budget (128–256) is the only safe S4 speedup; gated on merged-call accuracy validation.**

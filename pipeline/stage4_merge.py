@@ -51,6 +51,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
+    S4_CONTEXT_SIGNALS,  # D2364/C12 (X7): domain→context signal sets (was hardcoded)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
@@ -63,6 +64,7 @@ from pipeline.pipeline_paths import (
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
     S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: C12 compliance
+    S4_TEMPORAL_SIGNALS,  # D2364/C12 (X7): temporal_scope keyword heuristics (was hardcoded)
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
     STAGE4_CHECKPOINT,
@@ -1255,6 +1257,12 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                 classification_errors += 1
                 print(f"(depth:FAILED {type(e).__name__})", flush=True, end=" ")
         elif raw_depth in VALID_DEPTHS:
+            # D2365/X10 coupling note: this fallback reads `raw_depth` from the merged/batch/
+            # direct classify prompt (which STILL requests `depth`). If `depth` is ever removed
+            # from those prompts (the X10 waste-elimination), this branch silently becomes dead
+            # and depth falls through to S4_DEPTH_FALLBACK_DEPTH below. That is the *only* safe
+            # behaviour for a disabled focused call — but it must be intentional, not accidental.
+            # Keep this branch + remove the prompt field TOGETHER, or leave both.
             depth_val = raw_depth
         else:
             # Fallback: conservative default. If LLM hallucinates depth, assume domain.
@@ -1313,38 +1321,22 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         else:
             difficulty_level = "intermediate"
 
-        # temporal_scope: heuristic from keywords + definition signals
+        # temporal_scope: heuristic from keywords + definition signals (D2364/C12: config-driven)
         def_text = (definition + " " + fb_data.get("elaboration", "")).lower()
-        if any(w in def_text for w in ["always", "universal", "fundamental", "any system", "all"]):
+        if any(w in def_text for w in S4_TEMPORAL_SIGNALS.get("timeless", [])):
             temporal_scope = "timeless"
-        elif any(w in def_text for w in ["202", "current", "modern", "recent", "today", "now"]):
+        elif any(w in def_text for w in S4_TEMPORAL_SIGNALS.get("contemporary", [])):
             temporal_scope = "contemporary"
         else:
             temporal_scope = "timeless"  # default: principles are timeless unless evidence suggests otherwise
 
         # ── Auto-derive v1 Anytype properties (context, accessibility, intimacy_boundary) ─
-        # context: comma-separated routing hints derived from domain signals
+        # context: comma-separated routing hints derived from domain signals (D2364/C12: config-driven)
         context_parts: list[str] = []
-        business_signals = {"business operations", "business development", "entrepreneurship",
-                            "organizational behavior", "marketing"}
-        design_signals = {"graphic design", "brand identity", "editorial & advertising",
-                          "motion design", "environmental design", "digital product",
-                          "illustration", "packaging", "web & ui", "user experience",
-                          "creative technology", "data visualization"}
-        system_signals = {"systems & frameworks", "code & computation", "engineering practice",
-                          "ai & agents", "ai systems", "computational science & physics",
-                          "software engineering"}
-        academic_signals = {"research & methodology", "semiotics & communication",
-                            "computational art", "philosophy"}
         domain_set = set(class_data.get("domains", []))
-        if domain_set & business_signals:
-            context_parts.append("business")
-        if domain_set & design_signals:
-            context_parts.append("design")
-        if domain_set & system_signals:
-            context_parts.append("system")
-        if domain_set & academic_signals:
-            context_parts.append("academic")
+        for ctx_key in ("business", "design", "system", "academic"):
+            if domain_set & set(S4_CONTEXT_SIGNALS.get(ctx_key, [])):
+                context_parts.append(ctx_key)
         if not context_parts:
             context_parts.append("personal")
         context_val = ", ".join(sorted(context_parts))

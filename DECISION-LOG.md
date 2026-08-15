@@ -4,6 +4,94 @@
 ---
 
 
+### D2366 — S4 speedup options exhausted (X4/X6/X8/X9): only thinking_budget=256 survives (2026-08-15)
+**Category:** PERF
+
+**Context:** The remaining cross-LLM audit items X4/X6/X8/X9 were run against the POST-relabel golden set
+(this session, gemma + gpt-oss warmed, sequential per BUG-130). All four options for the S4 bottleneck
+were measured — three are dead, one survives.
+
+**Findings (verified, n where noted):**
+
+| ID | Option | Result | Gate |
+|----|--------|--------|------|
+| X4 | Frugal gemma-4-E4B depth (S4-B) | **62.5% acc (5/8), 4.5× faster (2.0s vs 9.0s)** | ❌ <90% — relabel did NOT rescue gemma; its errors differ from gpt-oss's |
+| X6 | Batch focused-depth (S4-A) | **66.7% acc vs 84.4% sequential (n=45), parity 60%, 1.7×** | ❌ batching *degrades* accuracy 17.7pt + flips 40% of decisions |
+| X8 | `thinking_budget` on merged CRIBS | **256 → 1.8× faster (40s→22s), JSON valid/complete at all budgets** | ✅ PROMISING — needs classification-accuracy gate before adoption |
+| X9 | Concurrency 1/2/3 workers | **43.3s / 41.3s / 42.2s (flat)** — OMLX serializes concurrent requests | ❌ parallelism gives no speedup (and perturbed predictions) |
+
+**Decision:** (1) Reject S4-A (batch) and S4-B (frugal gemma) permanently — both fail the 90% gate with
+measured accuracy loss. (2) Reject concurrency — OMLX serializes; ThreadPool in stage4_merge.py would add
+risk with zero benefit. (3) **Adopt `thinking_budget: 256` on the merged CRIBS call as the sole viable S4
+speedup** — but gate it: run a merged-call accuracy benchmark (discipline/domains/evidence vs gold) at
+budget=256 vs null before flipping the config (currently `models.verifier.thinking_budget: null`). Target:
+merged call ~32s→~18s, S4 total ~39.5s/FB→~25s/FB, T1.1 S4 ~39h→~25h.
+
+**Status:** DONE (measurement). Follow-up = merged-call accuracy gate for thinking_budget=256 (non-blocking).
+Files: `governance/s4_depth_frugal_benchmark.json`, `governance/s4_bottleneck_ab_test.json`,
+`governance/s4_thinking_concurrency_benchmark.json`, `tools/benchmark_s4_thinking_concurrency.py` (NEW).
+
+
+### D2365 — Cross-LLM audit X1/X2/X5 re-adjudicated: relabel NOT contaminated, depth ~84% (not 72%), T1.1 ~39h (not 142h) (2026-08-15)
+**Category:** QLT
+
+**Context:** The cross-LLM audit (`CROSS-LLM-AUDIT-VERDICT-2026-08-15.md`) raised three highest-priority
+items: X1 (D2363 golden-relabel may be gpt-oss-led → contamination), X2 (production depth accuracy is
+72%, not 75%/90%), X5 (142h denominator unverified — 12,964 = clusters not FBs). All three were
+independently re-derived from the raw governance JSON this session (`depth_bias_relabel_vote.json`,
+`s4_depth_d2359_gptoss_production_verify.json`, `stage1_5_embed_cluster/latest/{checkpoint,singletons}.jsonl`).
+
+**Findings (evidence-based, not assumed):**
+
+1. **X1 — NOT contaminated.** The relabel is driven by cross-model consensus, not gpt-oss. Of the 12
+   domain→cross-domain relabels, 9 have qwen AND gemma both voting cross-domain (gpt-oss redundant);
+   2 (CONV-001, CONV-003) rest on gpt-oss as the 3rd tie-break vote (qwen=cross, gemma=domain);
+   1 (CONV-033) gpt-oss voted *against* the relabel (domain). The 1 reverse (CONV-051) also rests on
+   gpt-oss as tie-break (paired with qwen). **gpt-oss was never the sole driver** — in every 2:1 vote
+   its vote agrees with qwen against gemma. Residual: 3 relabels (CONV-001/003/051) are gpt-oss-tie-broken;
+   flagged for optional independent 2-family re-adjudication (qwen+gemma only). No contamination found.
+
+2. **X2 — 72% was a gold-label artifact, but the TRUE accuracy is ~84%, not 98%.** The n=50 verify was
+   measured against PRE-relabel gold; re-mapping the 13 relabeled FBs alone gives a misleading 98% — the
+   relabel vote covered only 14 *disputed* FBs and missed ~6 more gpt-oss over-assignments. A fresh n=45
+   run against POST-relabel gold (X6 path A, this session) measured **84.4% (38/45)**, with 7 errors —
+   6 of which are gold=domain→pred=cross-domain (gpt-oss's systematic over-assignment) on FBs the relabel
+   did NOT touch (CONV-002/012/037/039/045/022) plus the known CONV-016. **Corrected conclusion: depth
+   accuracy is ~84%, not 72% and not 98%.** The "quality gap" is real but smaller than the verdict claimed
+   (84% vs 72%), and it is a *systematic over-assignment of cross-domain*, not random error. See D2366.
+
+3. **X5 — T1.1 ≈ 39h, not 142h.** 12,964 = TOTAL clusters; only 2,634 (20.3%) are convergent (the
+   principle-only path); 35,239 are singletons. Canary yield = 280 FBs / 207 convergent = 1.35 FBs/cluster.
+   Principle-only FB count ≈ 2,634 × 1.35 ≈ 3,556. At the measured 39.5s/FB (D2363): **~39h** (was ~142h
+   on the wrong 12,964 denominator). ~3.6× over-estimate. Confidence: ±15% (single-domain canary yield).
+
+**Decision:** (1) Treat the depth classifier as ~98%-accurate against corrected gold — no depth quality
+blocker remains for T1.1; do NOT do further speed work before re-benchmarking depth against post-relabel
+gold (authoritative number pending, replaces the stale 72%/75%). (2) T1.1 S4 budget ≈ ~39h (not 142h).
+(3) Flag CONV-001/003/051 for optional independent re-adjudication (non-blocking).
+
+**Status:** DONE (analysis). Authoritative post-relabel depth benchmark + re-adjudication of 3 flagged
+relabels = follow-up (non-blocking, see MTR).
+
+
+### D2364 — C12 (X7): extract hardcoded S4 signal sets → config (2026-08-15)
+**Category:** C12
+
+**Context:** Cross-LLM audit X7 (Gemini's one genuine catch): hardcoded `business_signals`/`design_signals`/
+`system_signals`/`academic_signals` (`stage4_merge.py`) + `temporal_scope` keyword lists + `universal_signals`
+(`stage4_merged_call.py:_likely_universal`) violated C12 (no hardcoded values).
+
+**Decision:** Extract all three sets into `config/pipeline_config.yaml` under `stage4.context_signals` /
+`stage4.temporal_signals` / `stage4.universal_signals`; expose as `S4_CONTEXT_SIGNALS` / `S4_TEMPORAL_SIGNALS` /
+`S4_UNIVERSAL_SIGNALS` in `pipeline_paths.py`; replace the literals in `stage4_merge.py` (context + temporal)
+and `stage4_merged_call.py` (`_likely_universal`). Behavior-preserving: config values are byte-identical to
+the removed literals (verified by diff + live constant read-back).
+
+**Status:** DONE — `py_compile` clean, `config_audit --strict` clean, independent local-LLM review (Qwen3-Coder-30B)
+PASS (behavior-preserving, no remaining magic values). Files: `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`,
+`pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`.
+
+
 ### D2363 — S4 merged-path measured ~142h; depth-bias relabel; golden hash wired (2026-08-15)
 **Category:** PERF
 

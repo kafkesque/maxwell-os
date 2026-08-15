@@ -179,6 +179,10 @@ S4_DEPTH_FRUGAL_ENABLED=bool(_CFG.get("stage4", {}).get("depth_frugal_enabled", 
 S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))
 S4_DEPTH_FALLBACK_DEPTH=str(_CFG.get("stage4", {}).get("depth_fallback_depth", "domain"))
 S4_MAX_FAILED_RATIO=float(_CFG.get("stage4", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed merge
+# D2364/C12 (X7): signal sets from config (was hardcoded literals in stage4_merge.py / stage4_merged_call.py)
+S4_CONTEXT_SIGNALS=_CFG.get("stage4", {}).get("context_signals", {})        # {context_key: [domain signals]}
+S4_TEMPORAL_SIGNALS=_CFG.get("stage4", {}).get("temporal_signals", {})      # {timeless|contemporary: [keywords]}
+S4_UNIVERSAL_SIGNALS=_CFG.get("stage4", {}).get("universal_signals", [])    # [name/mechanism substrings]
 S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed commit
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────

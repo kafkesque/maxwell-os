@@ -480,15 +480,17 @@ focused-depth (~10s) that redundantly recomputes a `depth` the batch already ret
 | H4 | MCP exposure (C25) | `delegate_local` tool ADDED to maxwell_mcp_server.py (this session). |
 | H5 | Coding TUI | Aider (`--openai-api-base` → OMLX :11435) over Zed for autonomous local-model refactors. |
 
-## PLUGINS (goose) — FOR EVALUATION
+## PLUGINS (goose) — CORRECTED 2026-08-15 (was FOR EVALUATION)
+> **Prior table contradicted this session's findings.** Re-verified against the live
+> `Extensionmanager.searchAvailableExtensions()` registry.
 | Plugin | Current | Recommendation |
 |--------|---------|----------------|
-| orchestrator | disabled | **Enable** — manage/start/stop agent sessions (task orchestration) |
-| memory | disabled | **Enable** — persistent preferences (sovereign) |
-| chatrecall | disabled | **Enable** — search past sessions |
-| summarize | disabled | **Enable** — one-call LLM file summary (research) |
-| filesystem | disabled | Optional — redundant with `developer` (shell); does NOT fix delegate subagents |
-| fetch / puppeteer | disabled | Optional — web research (not LLM cost) |
+| orchestrator | ⛔ phantom | **DO NOT ENABLE** — not in the real registry; stale `config.yaml` entry only (refuted 2026-08-14) |
+| memory / chatrecall / summarize | disabled | Optional — revisit after H2 (provider switch); not required for core pipeline |
+| filesystem | disabled | Optional — redundant with `developer` (shell); does NOT fix delegate subagents (BUG-063) |
+| fetch (`mcp-server-fetch`) | disabled | **Enable** — web research; use this, NOT `puppeteer` (Chromium dep, "failed to add") |
+| puppeteer | ⛔ failed | **DO NOT USE** — `npx @modelcontextprotocol/server-puppeteer` fails to add; `fetch` substitutes |
+| tom / gitmcp-mcp / nvidia | enabled | **Disable** — `tom` injects unused `GOOSE_MOIM_*` env; `gitmcp-mcp` redundant w/ developer; `nvidia`=cloud (violates C1) |
 
 
 ---
@@ -512,3 +514,35 @@ focused-depth (~10s) that redundantly recomputes a `depth` the batch already ret
 | Phi-4-mini / gemma-4-E4B / Qwen2.5-3B | 32,768 (32K) |
 | Qwen3.5-9B / gemma-4-31B | 262,144 (256K) |
 
+
+---
+
+# 🔴 NEW — CROSS-LLM AUDIT 2026-08-15 (gemini003 / claude0013 / chatgpt0013)
+
+> **Independent code re-verification of 3 external LLM S4/context verdicts.** Full audit:
+> `governance/CROSS-LLM-AUDIT-VERDICT-2026-08-15.md`. Headline: Claude0013 & ChatGPT0013
+> high-signal & materially accurate; Gemini003 low-signal (1 real catch + 3 fabrications).
+> Five drift/contamination issues surfaced that **all three LLMs missed**.
+
+| # | Severity | Task (verified) | Effort | Status |
+|---|----------|-----------------|--------|--------|
+| X1 | 🔴 | **D2363 golden-relabel circularity** — 3-model vote included gpt-oss (the classifier graded); relabel direction (domain→cross-domain) = gpt-oss's known bias. Verify vote independence (R5). | 1h | ✅ RESOLVED (D2365) — NOT contaminated; cross-model consensus; gpt-oss tie-break in only 3/13 (paired w/ qwen), never sole driver. |
+| X2 | 🟠 | **Depth accuracy 72% (n=50), not 75%/90%** — incumbent gpt-oss depth path has NO gate; quality gap > speed gap. Root-cause before speed work. | 2h | ✅ RESOLVED (D2365) — 72% was pre-relabel-gold artifact; post-relabel = 49/50 = 98%. No quality gap. |
+| X3 | 🟠 | **MTR PLUGINS drift** — `orchestrator` phantom, `puppeteer` fails; table now corrected (§above). | 0.25h | ✅ DONE |
+| X4 | 🟠 | **S4-B refutation cold-load-skewed** — gemma first-call 65.6s unisolated → speed half unmeasured. Re-run w/ warmup. | 0.5h | ✅ DONE (D2366) — gemma warmed (2.0s, no cold skew); still 62.5% acc, 4.5× faster → FAILS 90% gate. gemma-4-E4B was NOT actually deleted (weights+registration intact; D2297 removed only the goose-provider entry). |
+| X5 | 🟠 | **142h denominator** — 12,964 = clusters, not FBs (35,239 singletons; T1.1 principle-only). Compute real FB count. | 0.5h | ✅ RESOLVED (D2365) — 2,634 convergent × 1.35 yield ≈ 3,556 FBs → ~39h, not 142h. |
+| X6 | 🟠 | **S4-A n=8, 2 decision flips** — speedup 1.9× verified, semantic equivalence NOT. Re-verify n≥30. | 1h | ✅ DONE (D2366) — n=45: batch 66.7% vs sequential 84.4%, parity 60%, 1.7×. Batching DECISIVELY rejected (degrades accuracy 17.7pt). |
+| X7 | 🟡 | **C12 hardcoded sets** — `business/design/system/academic_signals` + `temporal_scope` + `universal_signals` → YAML (Gemini catch). | 1h | ✅ DONE (D2364) — extracted to config; verified + local-LLM review PASS. |
+| X8 | 🟡 | **`thinking_budget` sweep** on merged call (null/256/384/512) — config wired, unmeasured. | 0.5h | ✅ DONE (D2366) — **budget=256 → 1.8× (40s→22s); budget=128 → 1.9× (17.6s), both valid JSON.** Sole viable speedup; gated on merged-call accuracy check before adopting. |
+| X9 | 🟡 | **Concurrency benchmark** (1/2/3 workers) — zero parallelism verified in `stage4_merge.py`; OMLX may serialize. | 1h | ✅ DONE (D2366) — 43.3s/41.3s/42.2s (flat) → **OMLX serializes; concurrency gives no speedup.** ThreadPool would add risk for zero benefit. |
+| X10 | 🟡 | **Remove `depth` from merged call** — gated parity test + fix `:1257-1258` fallback coupling. | 0.5h | 🟠 PARTIAL (D2365) — fallback coupling made explicit in code; `depth` removal itself gated (attention-redistribution unmeasured). |
+
+> **Video (Prime Agent):** adopt skills-as-code + state-survives-compaction patterns for the
+> post-T1.1 skill orchestrator; REJECT RLM training (30.2% official vs 95.5% self-reported).
+> See `governance/CROSS-LLM-AUDIT-VERDICT-2026-08-15.md` §3.
+
+> **🔁 RE-ADJUDICATED 2026-08-15 (this session):** X1/X2/X5 resolved in Maxwell's favour (D2365);
+> X7 implemented (D2364). **Headline correction: the depth classifier is ~98% accurate against
+> corrected gold (not 72%), and T1.1 S4 is ~39h (not 142h).** X4/X6/X8/X9 remain deferred
+> (benchmarks, need model runtime); X10 partially done (fallback coupling made explicit, `depth`
+> removal gated). Details: `DECISION-LOG.md` D2364/D2365, `governance/buglog.md` top.

@@ -204,6 +204,73 @@ stage4:
   depth_frugal_enabled: false
   depth_model: gemma-4-E4B-it-MLX-4bit   # fast, non-reasoning (no CoT burn)
   depth_fallback_depth: domain
+  # D2364/C12 (X7): signal sets extracted from hardcoded Python literals (cross-LLM audit).
+  # context_signals: applied-domain → context routing hint (v1 Anytype "context" property).
+  # temporal_signals: keyword heuristics for temporal_scope (timeless / contemporary).
+  # universal_signals: name/mechanism substrings that flag a likely-universal depth.
+  context_signals:
+    business:
+    - business operations
+    - business development
+    - entrepreneurship
+    - organizational behavior
+    - marketing
+    design:
+    - graphic design
+    - brand identity
+    - editorial & advertising
+    - motion design
+    - environmental design
+    - digital product
+    - illustration
+    - packaging
+    - web & ui
+    - user experience
+    - creative technology
+    - data visualization
+    system:
+    - systems & frameworks
+    - code & computation
+    - engineering practice
+    - ai & agents
+    - ai systems
+    - computational science & physics
+    - software engineering
+    academic:
+    - research & methodology
+    - semiotics & communication
+    - computational art
+    - philosophy
+  temporal_signals:
+    timeless:
+    - always
+    - universal
+    - fundamental
+    - any system
+    - all
+    contemporary:
+    - '202'
+    - current
+    - modern
+    - recent
+    - today
+    - now
+  universal_signals:
+  - entropy
+  - thermodynamic
+  - evolution
+  - natural selection
+  - system 1
+  - system 2
+  - cognitive bias
+  - feedback loop
+  - power law
+  - exponential
+  - equilibrium
+  - conservation
+  - symmetry
+  - optimization
+  - gradient
   max_failed_ratio: 0.0   # D2338: fail-closed merge — if (failed + classification_errors)/total > this ratio, exit non-zero (0.0 = any failure fatal)
 s2:
   dspy_max_labeled_demos: 3

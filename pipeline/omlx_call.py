@@ -59,6 +59,11 @@ COLD_RELOAD_DELAY: int = OMLX_COLD_RELOAD_DELAY  # D2301: reasoning-model cold r
 # temp=0.0 — NEVER override (R7)
 TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
 
+# D2367/BUG-132: sentinel distinguishing "use global budget" (param omitted) from
+# an explicit per-call budget (incl. explicit None = no cap). Lets the merged
+# CRIBS call and focused-depth call set independent thinking_budget values.
+_UNSET = object()
+
 CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
 
 
@@ -221,6 +226,7 @@ def call_omlx(
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
     response_format: dict | None = None,
+    thinking_budget: int | None = _UNSET,
 ) -> str:
     """Call inference backend (OMLX HTTP or MLX direct) and return text.
 
@@ -268,8 +274,12 @@ def call_omlx(
     if model in VERIFY_REASONING_OFF_MODELS:
         if VERIFY_CHAT_TEMPLATE_KWARGS:
             payload["chat_template_kwargs"] = VERIFY_CHAT_TEMPLATE_KWARGS
-        if VERIFY_THINKING_BUDGET is not None:
-            payload["thinking_budget"] = VERIFY_THINKING_BUDGET
+        # D2367/BUG-132: per-call budget override. Omitted -> global merged-call
+        # budget; explicit value (incl. None) -> this call's own cap.
+        if thinking_budget is _UNSET:
+            thinking_budget = VERIFY_THINKING_BUDGET
+        if thinking_budget is not None:
+            payload["thinking_budget"] = thinking_budget
 
     last_error = None
     # D2187: Circuit breaker fast-fail (skip retry loop when OPEN)
@@ -339,6 +349,7 @@ def call_omlx_json(
     system: str | None = None,
     max_tokens: int = GEN_MAX_TOKENS,
     timeout: int = DEFAULT_TIMEOUT,
+    thinking_budget: int | None = _UNSET,
 ) -> dict | list:
     """Call inference backend and parse the response as JSON.
 
@@ -371,6 +382,7 @@ def call_omlx_json(
         max_tokens=max_tokens,
         timeout=timeout,
         response_format={"type": "json_object"},  # D2219: A/B tested — valid JSON, no fence, 7% faster
+        thinking_budget=thinking_budget,
     )
 
     result = parse_json_robust(raw)

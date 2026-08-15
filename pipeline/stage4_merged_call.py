@@ -572,6 +572,7 @@ def classify_depth_focused(
     """
     from pipeline.omlx_call import call_omlx
     from pipeline.pipeline_paths import (
+        VERIFY_DEPTH_THINKING_BUDGET,
         VERIFY_REASONING_OFF_MODELS,
         VERIFY_REASONING_OFF_PREFIX,
     )
@@ -617,6 +618,7 @@ def classify_depth_focused(
         system=system,
         max_tokens=max_tokens,
         timeout=timeout,
+        thinking_budget=VERIFY_DEPTH_THINKING_BUDGET,  # D2367/BUG-132: independent of merged-call budget
     )
     if not raw or not raw.strip():
         raise DepthClassificationError(

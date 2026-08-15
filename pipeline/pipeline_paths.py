@@ -106,7 +106,8 @@ VERIFY_REASONING_OFF_MODELS=set(_CFG["models"]["verifier"].get("reasoning_off_mo
 # D2359: oMLX silently drops top-level reasoning_effort/enable_thinking (pydantic extra='ignore').
 # Correct levers are chat_template_kwargs (dict) + thinking_budget (int), both oMLX-native.
 VERIFY_CHAT_TEMPLATE_KWARGS=_CFG["models"]["verifier"].get("chat_template_kwargs", None) or {}
-VERIFY_THINKING_BUDGET=_CFG["models"]["verifier"].get("thinking_budget", None)
+VERIFY_THINKING_BUDGET=_CFG["models"]["verifier"].get("thinking_budget", None)  # merged CRIBS call (D2359/X8 candidate)
+VERIFY_DEPTH_THINKING_BUDGET=_CFG["models"]["verifier"].get("depth_thinking_budget", None)  # focused depth call (D2367/BUG-132)
 VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
 VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2264: cross-family verifier (Phi-4-mini)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]

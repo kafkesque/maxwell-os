@@ -90,7 +90,8 @@ models:
     - gpt-oss-20b-MXFP4-Q8
     max_tokens: 1024
     chat_template_kwargs: {enable_thinking: false}   # D2359: oMLX-native CoT cap (top-level flags silently dropped)
-    thinking_budget: null   # D2359: optional oMLX-native CoT token cap (verified on focused-depth; off for merged CRIBS)
+    thinking_budget: null   # D2367/BUG-132: merged CRIBS call CoT cap (X8 candidate 256/128; gated on accuracy)
+    depth_thinking_budget: null   # D2367/BUG-132: focused depth call CoT cap (independent of merged; D2359 verified 128 -> 72%/7.3s)
   verifier_v2:  # D2340: MISNAMED — this is actually the S2 fast probe (D2319), consumed as VERIFY_MODEL_V2 in stage2_extract.py
     model: Phi-4-mini-instruct-8bit
     provider: omlx

@@ -17,19 +17,31 @@
 
 | # | Type | Item | Status |
 |---|------|------|--------|
-| V1 | Bug | **BUG-132**: `thinking_budget` is a GLOBAL key shared by merged+depth calls — blocks D2366 "adopt 256" until per-call threading | 🔴 OPEN |
+| V1 | Bug | **BUG-132**: `thinking_budget` was a GLOBAL key shared by merged+depth calls | ✅ DONE (D2368) — per-call threading + `depth_thinking_budget` config key |
 | V2 | Gov | Golden hash → `just preflight` hard gate (`verify_golden_hash.py`) | ✅ DONE (this session) |
 | V3 | Gov | `decisions.yaml` reconcile to D2367 (+ fix `sync_decisions.py` broken description generator) | ✅ DONE (this session) |
 | V4 | Gov | Purge stale "98%"/"160-200h" from MTR/ROUNDTABLE/S4_BOTTLENECK_ANALYSIS | ✅ DONE (this session) |
 | V5 | Gov | `pipeline_commit` → v3.0-D2367; buglog 18 header/body emoji align | ✅ DONE (this session) |
 | V6 | Bug | `apply_depth_relabel.py:53` list-form silent-drop (CONV-037/039) | ✅ DONE (this session) |
-| V7 | Gov | DECISION-LOG.md D2351–D2361 gap (11 IDs live only in decisions.yaml/buglog) | 🟡 KNOWN-GAP (content preserved; backfill deferred) |
-| V8 | Data | Golden imbalance: universal=1, specialized=1, 23 depth-`None` | 🟡 ACCEPTED limitation (T-015 post-T1.1) |
-| V9 | Ops | Kill/restart resume test on current path before the 39h run | ⏳ PRE-LAUNCH (not code) |
+| V7 | Gov | DECISION-LOG.md D2351–D2363 gap (IDs lived only in decisions.yaml/buglog) | ✅ DONE (D2368) — backfilled 12 entries; D2363 dedup'd |
+| V8 | Data | Golden depth imbalance: universal=1, specialized=1 (23 `None` are NEGATIVE route=NULL examples, NOT gaps) | 🟡 INVESTIGATED — T-015 spec recorded; corpus candidates verified (network effect 221, natural selection 326, kerning 488). Expansion = deliberate verbatim-mining task (deferred) |
+| V9 | Ops | Kill/restart resume test before the 39h run | 🟡 MECHANISM VERIFIED (D2184 run-scoped resume + D2339 --run-id pre-parse + --resume-from). Live kill/restart procedure below |
 
 > **Refuted false alarms (verified):** Qwen "D2229 sqlite-vec 1024→512 → S6 crash" is FALSE (code reads
 > `S15_EMBED_DIM`; only the log status string was stale). DeepSeek/Qwen "CONV-037/039 missing depth" is FALSE
 > (both list-form with `depth: domain`). "~90h"/"160-200h" are stale denominators — correct is ~39h.
+
+### T-015 — Golden depth expansion (universal/specialized) — SPEC
+- **Goal:** positive-set universal 1 → ≥5, specialized 1 → ≥5 (currently 37 cross-domain + 15 domain dominate).
+- **Correction:** the 23 `depth: null` examples are **NEGATIVE** (route=NULL: platitudes, echoes, non-falsifiable), NOT gaps — do not "label" them.
+- **Corpus candidates (verbatim counts):** universal — network effect (221), natural selection (326), power law/Pareto (161), prisoner's dilemma (65), second law/entropy (49); specialized — kerning (488), color space (332), double-entry (17), Nyquist (25), B-tree (9), cryptographic hash (8).
+- **Procedure:** (1) grep `knowledge pipeline/stage1_chunk/latest/checkpoint.jsonl`; (2) confirm the passage states a principle + mechanism + boundary/consequence; (3) extract verbatim `evidence_passage` + `source_book` + `segment_id`; (4) write name/definition/mechanism/boundary/consequence/discipline/domains/depth; (5) re-stamp `.golden_meta.json` (verify_golden_hash.py now hard-gates preflight); (6) re-run depth benchmark to confirm no classifier regression.
+
+### V9 — Kill/restart resume test — PROCEDURE (pre-launch)
+- Start: `python pipeline/runner.py --run-id resume-test-1 --books 3 --stages 1.5,2,4,5,6`
+- After ~20 FBs commit: `kill -TERM <pid>`
+- Resume: `python pipeline/runner.py --run-id resume-test-1 --resume-from stage4`
+- Verify: no duplicate `fb_id`, no skipped FBs, same checkpoint lineage, no COMPLETE manifest before S6.
 
 ---
 

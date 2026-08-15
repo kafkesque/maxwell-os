@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-15T15:11:35Z'
-total_decisions: 356
+last_sync: '2026-08-15T15:41:08Z'
+total_decisions: 357
 decisions:
 - id: D2092
   category: INF
@@ -2904,11 +2904,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-15'
+- id: D2368
+  category: INF / GOV
+  state: ACTIVE
+  description: 'Post-verification implementation: BUG-132 per-call thinking_budget + D2351-2363 backfill + V8/V9 scoped'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-15'
 summary:
-  total: 356
+  total: 357
   proposed: 0
   draft: 1
-  active: 301
+  active: 302
   stale: 0
   superseded: 14
   archived: 8
@@ -2937,3 +2944,4 @@ summary:
     validation: 1
     C12: 1
     GOV / PERF: 1
+    INF / GOV: 1

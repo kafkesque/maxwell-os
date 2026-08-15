@@ -4,6 +4,23 @@
 ---
 
 
+### D2368 — Post-verification implementation: BUG-132 per-call thinking_budget + D2351-2363 backfill + V8/V9 scoped (2026-08-15)
+**Category:** INF / GOV
+
+**Context:** Follow-on to D2367. Executed the P0/P1 items relevant before T1.1, surgically and verified.
+
+**Implemented:**
+1. **BUG-132 FIXED** — `thinking_budget` threaded per-call through `call_omlx()`/`call_omlx_json()` (new `_UNSET` sentinel param: omitted → global merged-call budget; explicit → per-call cap). Added `models.verifier.depth_thinking_budget`; `classify_depth_focused()` now passes it, independent of the merged `thinking_budget`. Both default null (no behavior change), but merged vs depth are now independently scopeable — unblocks D2366's "adopt 256" safely.
+2. **V7 DONE** — backfilled D2351–D2363 into DECISION-LOG.md from config/decisions.yaml (12 new entries; D2363 pre-existed — duplicate removed). All 13 IDs now have exactly one `###` entry.
+
+**Investigated (not fabricable/executable in-session):**
+3. **V8** — the "23 depth-None" golden examples are NEGATIVE examples (route=NULL: platitudes, echoes, non-falsifiable claims), NOT missing labels. The real gap is positive-set imbalance: universal=1, specialized=1 (vs 37 cross-domain + 15 domain). Corpus has abundant verbatim candidates (network effect 221, natural selection 326, power law 161, kerning 488, color space 332). Expansion is a deliberate data task (verbatim evidence + full field accuracy) — NOT rushed here to avoid golden-label fabrication. T-015 spec recorded (MTR).
+4. **V9** — resume mechanism verified present: run-scoped `pipeline_resume.json` (D2184), `--run-id` pre-parse (D2339), `--resume-from stageX`, `--smoke`, `--books N`. Full kill/restart is a monitored operational run; exact procedure documented (MTR V9).
+
+**Files:** pipeline/omlx_call.py, pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py, config/pipeline_config.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md
+**Status:** DONE (code + gov). V8 expansion + V9 live-run deferred (post-T1.1 / pre-launch).
+
+
 ### D2367 — 5-LLM verification round verdict: T1.1 NO-GO-as-governed until preflight + registry sync; `thinking_budget` is GLOBAL not per-call (2026-08-15)
 **Category:** GOV / PERF
 
@@ -30,7 +47,7 @@ irreversible run is bad hygiene).
 **Confirmed governance drift to fix before launch:**
 1. `config/decisions.yaml` missing D2364/65/66; `last_sync` 08-14; `sync_decisions.py` emits broken
    descriptions (captures the `**Category:**` line, not decision text).
-2. `DECISION-LOG.md` lacks D2351–D2361 (11 IDs) entries.
+2. `DECISION-LOG.md` lacked D2351–D2361 entries — backfilled D2351–D2363 this session (D2368).
 3. `buglog.md`: 18 header/body emoji mismatches + internal "98%" contradiction (now corrected).
 4. `S4_BOTTLENECK_ANALYSIS.md` + `ROUNDTABLE_MASTER_PROMPT.md` still recommend rejected P0s / stale 160-200h.
 5. `pipeline_config.yaml` `pipeline_commit: v3.0-D2298` (HEAD = D2366).
@@ -111,10 +128,6 @@ remains; do NOT do further speed work before the authoritative post-relabel dept
 **Status:** DONE (analysis). Authoritative post-relabel depth benchmark + re-adjudication of 3 flagged
 relabels = follow-up (non-blocking, see MTR).
 
-> **⚠️ RECORDING GAP (D2367):** decision IDs **D2351–D2363** have no `###` entries in this log — their
-> content lives in `config/decisions.yaml` (full entries) and `governance/buglog.md` (BUG-108…119 map to
-> D2351–D2355), summarized in `MASTER-TASK-REGISTER.md` §4th-Audit (M1–M4/S1–S5). Not backfilled here
-> (append-only; content is preserved in the registry). See D2367.
 
 
 ### D2364 — C12 (X7): extract hardcoded S4 signal sets → config (2026-08-15)
@@ -153,6 +166,114 @@ full SHA-256 in .golden_meta.json + tools/verify_golden_hash.py (was a 12-char i
 
 **Impact:** S4 is the measured bottleneck (~142-184h serial). Speedup options (batch depth S4-A 75%
 parity, gemma cascade S4-B 62.5% accuracy) remain gated <90%. See governance/s4_merged_production_benchmark.json.
+
+### D2362 — D2253 cost-model reconciliation: S4 ~90h not 3.9h (2026-08-15)
+**Category:** PERF
+
+D2253 cost-model reconciliation (supersedes D2253): S4 is NOT 3.9h. Same-day measured latency (governance/S4_BOTTLENECK_ANALYSIS.md) puts GPT-OSS depth at ~25s/FB serial — 13,000 FBs ≈ 90h for S4 alone, with zero parallelism in stage4_merge.py (no ThreadPool/max_workers). D2253 implied 1.08s/FB, but the fastest GPT-OSS call ever measured is 4.0s (and that one failed empty). Also: production runs merged_cribs_classify() (batch_enabled:false), whose per-FB cost is UNMEASURED in any committed artifact. Corrected T1.1 estimate: ~110-140h serial, not 21-26h. Next actions: (1) measure merged_cribs_classify() per-FB, (2) re-verify S2 40.9s/cluster (D2360) against D2253 tiered ~15-18s assumption, (3) reconcile the 6 docs citing 21-26h.
+
+**Files:** config/decisions.yaml, DECISION-LOG.md, governance/ROUNDTABLE_MASTER_PROMPT.md, governance/aggregated_remaining_tasks.md, MASTER-TASK-REGISTER.md
+
+**Status:** ACTIVE
+
+### D2361 — classify_depth_focused() model-default divergence fix (2026-08-14)
+**Category:** BUGFIX
+
+classify_depth_focused() defaulted model to S4_DEPTH_MODEL (gemma-4-E4B) unconditionally when model was omitted, even with depth_frugal_enabled=false — silently running the gated cheap model instead of GPT-OSS (VERIFY_MODEL). Production (stage4_merge.py) passes model explicitly so the mismatch was masked; any caller omitting model hit Gemma. Fixed: default now mirrors stage4_merge.py routing (S4_DEPTH_MODEL if frugal enabled else VERIFY_MODEL).
+
+**Files:** pipeline/stage4_merged_call.py
+
+**Status:** RESOLVED
+
+### D2360 — Qwen3.8-27B rejected as S2 generator (2.8x slower) (2026-08-14)
+**Category:** MODEL
+
+Qwen3.8-27B is 2.8x SLOWER than Qwen3-Coder for S2 extraction (112.8s vs 40.9s avg) and dropped 1 FB to NULL — rejected as S2 generator. Qwen2.5-3B deleted (degenerate depth=2%).
+
+**Files:** (none)
+
+**Status:** ACTIVE
+
+### D2359 — S4 GPT-OSS reasoning flags are silent no-ops -> chat_template_kwargs + thinking_budget (2026-08-14)
+**Category:** BUGFIX
+
+S4 GPT-OSS reasoning-effort flags are silent no-ops — oMLX drops top-level reasoning_effort/enable_thinking (pydantic extra=ignore); correct levers are chat_template_kwargs + thinking_budget. FIX IMPLEMENTED + verified end-to-end on the PRODUCTION classify_depth_focused() path (GPT-OSS, 50-FB golden): 67.3%→72.0% acc (+4.7pt) AND 14.2s→7.3s median (1.95×), 0 fail-closed. (Harness-only 76% was optimistic — it used its own requests.post with response_format=json_object, not the production call path.)
+
+**Files:** pipeline/omlx_call.py, pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py, config/pipeline_config.yaml
+
+**Status:** RESOLVED
+
+### D2358 — ChatGPT re-audit (2nd pass) hygiene: fail-closed legacy path + C12 (2026-08-14)
+**Category:** BUGFIX
+
+ChatGPT re-audit (2nd pass, READY-WITH-CONDITIONS) hygiene: legacy direct-classify path now fail-closed (SparseClassificationError, no fabricated emerging/cited regardless of config); k-means split exception logged (was silent pass); removed dead _render_3zone_body_old_end stub (C19); MAX_PER_BOOK -> config stage2.max_probe_per_book (C12). Context taxonomy hardcode (MEDIUM #8) remains deferred.
+
+**Files:** pipeline/stage4_merge.py, pipeline/stage2_extract.py, pipeline/stage6b_anytype_push.py, pipeline/pipeline_paths.py, config/pipeline_config.yaml
+
+**Status:** RESOLVED
+
+### D2357 — ChatGPT re-audit remediation: fail-closed semantic classification + provenance (2026-08-14)
+**Category:** BUGFIX
+
+ChatGPT re-audit (commit 5e6f813) remediation: fail-closed semantic classification (SparseClassificationError — no fabricated emerging/domain/cited); intimacy lattice fail-safe (null/config-failure -> private); source_principle_ids from fb_id; drop downstream fb_id rehash (hard error); keywords->metadata.discovery + jargon-after-elaboration rendering; hybrid-gate logging. Verified: re-audit BLOCKER #1 (source_clusters from fb_id) was FALSE — code already used source_cluster first since fd2347a.
+
+**Files:** pipeline/stage4_merged_call.py, pipeline/intimacy_lattice.py, pipeline/stage4_merge.py, pipeline/stage6b_anytype_push.py, pipeline/stage2_extract.py, pipeline/schemas.py, pipeline/schema_accessor.py
+
+**Status:** RESOLVED
+
+### D2356 — Restore v1 intimacy lattice (D369/D383) (2026-08-14)
+**Category:** ARCH
+
+Restore v1 intimacy lattice (D369/D383): resolve_intimacy (private/selective/public) from source-field routing + topic sensitivity + context; route_space() -> private/non_private. Replaces hardcoded intimacy_boundary="public" (W6/BUG drift). Config: config/intimacy_policy.yaml
+
+**Files:** pipeline/intimacy_lattice.py, config/intimacy_policy.yaml, pipeline/stage4_merge.py, pipeline/stage6b_anytype_push.py
+
+**Status:** RESOLVED
+
+### D2355 — S4/S6 fail-closed + hygiene (BUG-114/116/118) (2026-08-14)
+**Category:** BUGFIX
+
+S4/S6 fail-closed + hygiene: batch missing-output fail-closed, insert_embedding per-FB logging, remove dead s3_original_domain (BUG-114/116/118)
+
+**Files:** pipeline/stage4_merged_call.py, pipeline/stage6_commit.py
+
+**Status:** RESOLVED
+
+### D2354 — S4 bottleneck: batch depth rejected; FrugalGPT cascade gated default-off (2026-08-14)
+**Category:** PERF
+
+S4 bottleneck resolution: batch_depth_classify() A/B failed 75% parity (<90% gate) -> unwired. FrugalGPT cascade implemented (depth_frugal_enabled flag + stage4.depth_model=gemma-4-E4B-it-MLX-4bit + tools/benchmark_s4_depth_frugal.py production-path gate). Still GATED default-off pending >=90% parity + >=90% accuracy.
+
+**Files:** pipeline/stage4_merge.py, pipeline/stage4_merged_call.py, config/pipeline_config.yaml, tools/benchmark_s4_depth_frugal.py
+
+**Status:** ACTIVE
+
+### D2353 — Singleton S2->S4 index fix (BUG-113) (2026-08-14)
+**Category:** BUGFIX
+
+Singleton S2->S4 index fix: run_stage4 reuse principles_idx from load_stage2_fbs_via_clusters (singletons excluded by load_stage2_principles) (BUG-113)
+
+**Files:** pipeline/stage4_merge.py
+
+**Status:** RESOLVED
+
+### D2352 — Provenance/schema closure: source_segments + evidence_passages/is_summary to SQLite (BUG-110/111/112) (2026-08-14)
+**Category:** QLT
+
+Provenance/schema contract closure: carry source_segments through S4->S6, persist evidence_passages/is_summary to SQLite (BUG-110/111/112)
+
+**Files:** pipeline/stage4_merge.py, pipeline/stage6_commit.py
+
+**Status:** RESOLVED
+
+### D2351 — S4 depth fail-closed + depth_max_tokens 1024 (BUG-108/109/115) (2026-08-14)
+**Category:** BUGFIX
+
+S4 depth correctness: fail-closed classify_depth_focused (no silent "domain"), depth_max_tokens 1024, exact-token parser, Reasoning:none on focused path, single fallback via S4_DEPTH_FALLBACK_DEPTH (BUG-108/109/115)
+
+**Files:** pipeline/stage4_merged_call.py, config/pipeline_config.yaml
+
+**Status:** RESOLVED
 
 ### D2350 — S4 Identity & Provenance Integrity: preserve S2 fb_id + real cluster id (2026-08-14)
 **Category:** BUGFIX

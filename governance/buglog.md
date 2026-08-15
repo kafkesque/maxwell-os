@@ -16,7 +16,7 @@
 - **Required before enabling any budget:** thread `thinking_budget` as an explicit per-call parameter through
   `call_omlx()` / `call_omlx_json()` (or add a second config key, e.g. `models.verifier.depth_thinking_budget`),
   then gate each call site separately. Found by the 5-LLM verification round (D2367); NOT in D2366.
-- **Status:** 🔴 OPEN — 2026-08-15
+- **Status:** 🟢 FIXED — 2026-08-15 (D2368: `thinking_budget` threaded per-call through `call_omlx`/`call_omlx_json` + `depth_thinking_budget` config key; merged vs depth now independently scopeable)
 
 ---
 

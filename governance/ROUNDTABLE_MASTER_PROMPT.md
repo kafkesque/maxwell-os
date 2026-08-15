@@ -1,6 +1,7 @@
 # LLM Roundtable — Master Prompt
 > Evaluate Maxwell OS v3.0 convergent Foundation Blocks for golden few-shot examples and fine-tuning candidates.
 > **v8 (D2250-D2252, 2026-08-10):** Updated with hybrid S2 result (0.736), S4 GPT-OSS depth fix (87.5%), golden audit findings, full-run cost model.
+> **v9 (D2367, 2026-08-15):** S4 cost corrected to **~39h** (2,634 convergent × 1.35 ≈ 3,556 FBs), NOT 142h/160-200h. X4/X6/X8/X9 benchmarked: batch depth, gemma depth, and concurrency all REJECTED; only `thinking_budget=256/128` survives (1.8-1.9×, gated on accuracy + BUG-132 global-key coupling). 5-LLM verification round + preflight/registry sync below.
 > Delegated to: Qwen3-Coder-30B (primary), Gemma-4-E4B (cross-family validation), Phi-4-mini (summarization)
 > Run: delegate each model independently, compare outputs, rank by consensus.
 >
@@ -209,6 +210,11 @@ additionally assess:
 > in `stage4_merge.py`) = **~142h for S4 alone** (merged 32.29s + depth 7.2s). Corrected T1.1 ≈ **160–200h serial**. Do not plan a
 > 26h launch on this model. See D2362 + `S4_BOTTLENECK_ANALYSIS.md` for the authoritative numbers.
 
+> **⚠️ SUPERSEDED AGAIN by D2365/D2366 (2026-08-15, same day):** the "160–200h" figure above was
+> itself wrong — it multiplied 39.5s/FB by 12,964 **clusters**, but 12,964 is the *total* cluster
+> count (35,239 singletons included). Only **~2,634 are convergent**, and principle-only FB yield is
+> **~3,556 (2,634 × 1.35)** → **~39h serial** at 39.5s/FB. Authoritative: D2365/D2366 + §below.
+
 Naive estimate (12,964 × 28s ÷ 1 worker = 100h). Historical D2253 model (now known-stale):
 
 | Segment | Clusters | Cost/cluster | Subtotal |
@@ -220,7 +226,7 @@ Naive estimate (12,964 × 28s ÷ 1 worker = 100h). Historical D2253 model (now k
 | S4 merged (D2224, ~45% faster) | ~2,634 FBs | ~16s ÷ 3 workers | ~~~3.9h~~ → **~90h measured serial** |
 | S5 verify (Gemma + DeBERTa) | ~2,634 FBs | ~3s ÷ 3 workers | ~0.7h |
 
-**Wall-clock (corrected) ≈ 160–200h** (D2363), NOT 21-26h (D2253) nor 110-140h (D2362). S2 parallelism is real
+**Wall-clock (corrected) ≈ 39h** (D2365/D2366: ~3,556 principle FBs × 39.5s), NOT 160-200h (D2363) nor 21-26h (D2253). S2 parallelism is real
 (`stage2.max_workers: 3`, ThreadPool, config-driven); S4 has **zero** parallelism (serial,
 one FB per GPT-OSS call).
 
@@ -240,9 +246,9 @@ You are re-auditing Maxwell OS v3.0 for residual bugs, blindspots, gaps, conflic
 contradictions, hidden failures, and drift. VERIFY against actual code/config — do not assume.
 Focus areas, highest-value first:
 
-1. **S4 cost model (D2363):** merged_cribs_classify() = 32.29s/FB median (n=6, high variance 30-72s).
+1. **S4 cost model (D2365/D2366):** merged_cribs_classify() = 32.29s/FB median (n=6, high variance 30-72s).
    Re-measure at n≥20; confirm the focused-depth call (~7.2s) is truly additive (not already in the
-   merged output). Verify T1.1 ≈ 160-200h.
+   merged output). Verify T1.1 ≈ 39h (~3,556 FBs), NOT 160-200h.
 2. **S4 speedup gates:** S4-A batch depth (75% parity) and S4-B gemma cascade (62.5% accuracy) both
    fail the ≥90% gate → dormant (batch_enabled:false, depth_frugal_enabled:false). Confirm no path
    silently activates them.

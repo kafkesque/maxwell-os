@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-14 13:48 | **Decisions:** D2000-D2355 (344 decisions)
+> **Updated:** 2026-08-15 17:15 | **Decisions:** D2000-D2367 (356 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -9,25 +9,50 @@
 
 ---
 
+# 🔴 NEW THIS SESSION — 5-LLM Verification Round (D2367) — preflight/registry sync
+
+> **Five independent LLM audits (claude0014/deepseek0013/kimi0013/qwen0013/chatgpt0014) cross-examined
+> against HEAD `786e92f`; every claim re-verified against code. T1.1 = CONDITIONAL GO — data path is
+> fail-closed + canary-green; remaining blockers are release hygiene, not pipeline correctness.**
+
+| # | Type | Item | Status |
+|---|------|------|--------|
+| V1 | Bug | **BUG-132**: `thinking_budget` is a GLOBAL key shared by merged+depth calls — blocks D2366 "adopt 256" until per-call threading | 🔴 OPEN |
+| V2 | Gov | Golden hash → `just preflight` hard gate (`verify_golden_hash.py`) | ✅ DONE (this session) |
+| V3 | Gov | `decisions.yaml` reconcile to D2367 (+ fix `sync_decisions.py` broken description generator) | ✅ DONE (this session) |
+| V4 | Gov | Purge stale "98%"/"160-200h" from MTR/ROUNDTABLE/S4_BOTTLENECK_ANALYSIS | ✅ DONE (this session) |
+| V5 | Gov | `pipeline_commit` → v3.0-D2367; buglog 18 header/body emoji align | ✅ DONE (this session) |
+| V6 | Bug | `apply_depth_relabel.py:53` list-form silent-drop (CONV-037/039) | ✅ DONE (this session) |
+| V7 | Gov | DECISION-LOG.md D2351–D2361 gap (11 IDs live only in decisions.yaml/buglog) | 🟡 KNOWN-GAP (content preserved; backfill deferred) |
+| V8 | Data | Golden imbalance: universal=1, specialized=1, 23 depth-`None` | 🟡 ACCEPTED limitation (T-015 post-T1.1) |
+| V9 | Ops | Kill/restart resume test on current path before the 39h run | ⏳ PRE-LAUNCH (not code) |
+
+> **Refuted false alarms (verified):** Qwen "D2229 sqlite-vec 1024→512 → S6 crash" is FALSE (code reads
+> `S15_EMBED_DIM`; only the log status string was stale). DeepSeek/Qwen "CONV-037/039 missing depth" is FALSE
+> (both list-form with `depth: domain`). "~90h"/"160-200h" are stale denominators — correct is ~39h.
+
+---
+
 # 🔴 NEW THIS SESSION — 4th Audit Adjudication (BUG-108…119, D2351–D2355, 2026-08-14)
 
 > **4-LLM audit (`chatgpt0010.md`, `claude0010.md`) × independent code re-verification.** S4 depth fail-open + provenance/schema gaps + singleton index + S4 bottleneck. Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`. Two ChatGPT errors corrected.
 
 | # | Decision | Task (code-verified) | Effort | Status |
 |---|----------|----------------------|--------|--------|
-| **M1** | D2351 | S4 depth fail-closed — no silent `"domain"` (BUG-108) | 0.5h | 🔴 OPEN |
-| **M2** | D2351 | `depth_max_tokens` 512 → 1024 (BUG-109) | 0.25h | 🔴 OPEN |
-| **M3** | D2352 | Carry `source_segments` through S4→S6 (BUG-110) | 1h | 🟠 OPEN |
-| **M4** | D2352 | Persist `is_summary` end-to-end (BUG-112) | 0.5h | 🟠 OPEN |
-| **S1** | D2352 | Persist `evidence_passages` to SQLite (BUG-111) | 1h | 🟠 OPEN |
-| **S2** | D2353 | Singleton S2→S4 index fix (BUG-113) | 1h | 🔴 OPEN |
-| **S3** | D2354 | S4 bottleneck resolution — batch focused depth (BUG-114) | 2–3h | 🟠 OPEN |
-| **S4** | D2355 | Batch missing-output fail-closed (BUG-115) | 0.5h | 🟠 OPEN |
-| **S5** | D2351 | Depth benchmark authority (BUG-115) | 1h | 🟠 OPEN |
+| **M1** | D2351 | S4 depth fail-closed — no silent `"domain"` (BUG-108) | 0.5h | ✅ DONE |
+| **M2** | D2351 | `depth_max_tokens` 512 → 1024 (BUG-109) | 0.25h | ✅ DONE |
+| **M3** | D2352 | Carry `source_segments` through S4→S6 (BUG-110) | 1h | ✅ DONE |
+| **M4** | D2352 | Persist `is_summary` end-to-end (BUG-112) | 0.5h | ✅ DONE |
+| **S1** | D2352 | Persist `evidence_passages` to SQLite (BUG-111) | 1h | ✅ DONE |
+| **S2** | D2353 | Singleton S2→S4 index fix (BUG-113) | 1h | ✅ DONE |
+| **S3** | D2354 | S4 bottleneck resolution — batch focused depth (BUG-114) | 2–3h | ❌ REJECTED (D2366) — batch 66.7% vs 84.4% seq (n=45), parity 60% |
+| **S4** | D2355 | Batch missing-output fail-closed (BUG-115) | 0.5h | ✅ DONE |
+| **S5** | D2351 | Depth benchmark authority (BUG-115) | 1h | ✅ DONE |
 | **W1–W7** | D2355+ | Hygiene: dead `s3_original_domain`, secondary writers, `jargon`-FTS (BUG-116…119 + drift) | 3h | 🟡 OPEN (W7 `deathpectation` ✅ RESOLVED 2026-08-15 — private Anytype space name) |
 
-> **Verdict:** canary re-run + T1.1 **NOT clean** until M1+M2 (S4 depth fail-closed + token budget) — live in default path,
-> silently corrupt the depth audit. S4 speed (D2354) is the full-T1.1 *feasibility* gate (~142h → ~25–30h, D2363).
+> **Verdict (re-verified 2026-08-15, D2367):** M1/M2/S1-S5 were **all implemented** (D2351-D2355) — the prior
+> "OPEN" statuses were stale. S3 (batch depth) is **REJECTED** by D2366. S4 speed is NOT a correctness gate —
+> T1.1 is **~39h** (not 142h, D2365/D2366). Remaining T1.1 blockers are **governance/release hygiene**, not pipeline code.
 
 ---
 
@@ -58,8 +83,9 @@
 | **B18** | D2348 | embedding reliability — `embed_timeout: 180` + `embed_keep_alive: -1` (config-driven, BUG-105) | 0.5h | ✅ DONE |
 
 > **✅ T1.1 CANARY GREEN (2026-08-14).** 25K segments → S1.5(2255 clusters/207 conv) → S2(280 FBs) → S4(279 FBs)
-> → S5(239 PASS/40 QUAR) → S6(279 committed). V1–V6 all pass. **Remaining gate = S4 speed** (~2.4 FBs/min measured →
-> ~142h full-run (D2363); re-tune before full T1.1). BUG-105 (embedding instability) found+fixed mid-canary via D2348.
+> → S5(239 PASS/40 QUAR) → S6(279 committed). V1–V6 all pass. **S4 speed gate resolved:** full-run is **~39h
+> (D2365/D2366, ~3,556 principle FBs)** — not 142h (that was a cluster-vs-FB denominator error). BUG-105
+> (embedding instability) found+fixed mid-canary via D2348.
 
 > **D2345 (non-type second pass):** DECIDED as principle-first + separate single-source `stage2_extract_nontype.py`
 > (post-T1.1). NOT a T1.1 blocker. Whether convergent PT/PI/GE/TI even occur = UNKNOWN; measure offline first.
@@ -169,7 +195,7 @@
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
-| **T1.1** | **Full S1.3→S6 run on 12,964 clusters** | **~160-200h** (D2363) | Batch-resume capable. S2 parallel ~19h + S4 serial ~142h (measured) + S5 ~1h. ⚠️ prior "~21-26h" was stale (D2253) |
+| **T1.1** | **Full S1.3→S6 run on 12,964 clusters** | **~39h** (D2365/D2366) | Batch-resume capable. S4 serial ~39h on ~3,556 principle FBs (2,634 convergent × 1.35). ⚠️ "160-200h" (D2363) and "~21-26h" (D2253) both stale |
 | **T1.2** | **Yield crisis diagnostic** — re-measure on full run output. 14 FBs / 852 books = 0.004% was v2.0. | 2h | Post-T1.1 |
 | **T-007b-v2** | **Re-optimize MIPROv2 with 3 demos** (overnight) — close DSPy gate FN gap. | 1h setup + overnight | Optional polish |
 | **T-015** | **Extraction type expansion** — 4→12-15 per type + depth class balance. Fixes golden pool imbalance. | 2d | — |
@@ -527,7 +553,7 @@ focused-depth (~10s) that redundantly recomputes a `depth` the batch already ret
 | # | Severity | Task (verified) | Effort | Status |
 |---|----------|-----------------|--------|--------|
 | X1 | 🔴 | **D2363 golden-relabel circularity** — 3-model vote included gpt-oss (the classifier graded); relabel direction (domain→cross-domain) = gpt-oss's known bias. Verify vote independence (R5). | 1h | ✅ RESOLVED (D2365) — NOT contaminated; cross-model consensus; gpt-oss tie-break in only 3/13 (paired w/ qwen), never sole driver. |
-| X2 | 🟠 | **Depth accuracy 72% (n=50), not 75%/90%** — incumbent gpt-oss depth path has NO gate; quality gap > speed gap. Root-cause before speed work. | 2h | ✅ RESOLVED (D2365) — 72% was pre-relabel-gold artifact; post-relabel = 49/50 = 98%. No quality gap. |
+| X2 | 🟠 | **Depth accuracy 72% (n=50), not 75%/90%** — incumbent gpt-oss depth path has NO gate; quality gap > speed gap. Root-cause before speed work. | 2h | ✅ RESOLVED (D2365/D2366) — 72% was pre-relabel-gold artifact; fresh n=45 post-relabel run = **~84% (38/45)**, systematic gpt-oss over-assignment of `cross-domain`. No quality *crisis*, but NOT 98%. |
 | X3 | 🟠 | **MTR PLUGINS drift** — `orchestrator` phantom, `puppeteer` fails; table now corrected (§above). | 0.25h | ✅ DONE |
 | X4 | 🟠 | **S4-B refutation cold-load-skewed** — gemma first-call 65.6s unisolated → speed half unmeasured. Re-run w/ warmup. | 0.5h | ✅ DONE (D2366) — gemma warmed (2.0s, no cold skew); still 62.5% acc, 4.5× faster → FAILS 90% gate. gemma-4-E4B was NOT actually deleted (weights+registration intact; D2297 removed only the goose-provider entry). |
 | X5 | 🟠 | **142h denominator** — 12,964 = clusters, not FBs (35,239 singletons; T1.1 principle-only). Compute real FB count. | 0.5h | ✅ RESOLVED (D2365) — 2,634 convergent × 1.35 yield ≈ 3,556 FBs → ~39h, not 142h. |
@@ -542,7 +568,8 @@ focused-depth (~10s) that redundantly recomputes a `depth` the batch already ret
 > See `governance/CROSS-LLM-AUDIT-VERDICT-2026-08-15.md` §3.
 
 > **🔁 RE-ADJUDICATED 2026-08-15 (this session):** X1/X2/X5 resolved in Maxwell's favour (D2365);
-> X7 implemented (D2364). **Headline correction: the depth classifier is ~98% accurate against
-> corrected gold (not 72%), and T1.1 S4 is ~39h (not 142h).** X4/X6/X8/X9 remain deferred
-> (benchmarks, need model runtime); X10 partially done (fallback coupling made explicit, `depth`
-> removal gated). Details: `DECISION-LOG.md` D2364/D2365, `governance/buglog.md` top.
+> X7 implemented (D2364). **Headline correction: depth is ~84% (n=45) against post-relabel gold
+> (not 72%, NOR the earlier 98% over-correction), and T1.1 S4 is ~39h (not 142h).** X4/X6/X8/X9
+> done (D2366, only `thinking_budget=256` survives — gated + BUG-132); X10 partially done (fallback
+> coupling made explicit, `depth` removal gated). Details: `DECISION-LOG.md` D2364-D2367,
+> `governance/buglog.md` top.

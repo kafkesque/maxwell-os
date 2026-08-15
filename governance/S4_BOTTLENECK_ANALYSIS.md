@@ -11,6 +11,16 @@
 > figure was a governance claim that drifted from the benchmark; **do not cite it as current.**
 > See `governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md`.
 
+> **⚠️ SUPERSEDED (2026-08-15, D2366/D2367):** this doc's §6 "tackle plan" and §7 "recommendation"
+> are **stale — both P0 items were benchmarked and REJECTED**. D2366 measured against the
+> post-relabel golden set: **batch depth = 66.7% vs 84.4% sequential (n=45, parity 60%)** and
+> **gemma-4-E4B depth = 62.5%** — both fail the ≥90% gate. **Speculative decoding (P1) is NOT
+> actionable**: `_MLX_DRAFT_MODELS` (pipeline/omlx_call.py) has no draft pairing for gpt-oss.
+> The **only surviving speedup is `thinking_budget=256/128`** on the merged call (X8, 1.8–1.9×),
+> gated on a merged-call accuracy run and **blocked by BUG-132** (the budget is a global key
+> shared with the depth call). The cost denominator is also corrected: **~3,556 FBs → ~39h,
+> not 142h** (D2365/D2366). Do not resurrect batch-depth or gemma-depth from this doc.
+
 ---
 
 ## 1. TL;DR

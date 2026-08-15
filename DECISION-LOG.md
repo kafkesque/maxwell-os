@@ -4,6 +4,43 @@
 ---
 
 
+### D2367 — 5-LLM verification round verdict: T1.1 NO-GO-as-governed until preflight + registry sync; `thinking_budget` is GLOBAL not per-call (2026-08-15)
+**Category:** GOV / PERF
+
+**Context:** Five independent LLM audits (claude0014 / deepseek0013 / kimi0013 / qwen0013 / chatgpt0014)
+were cross-examined against the repo at HEAD `786e92f`. Every claim was re-verified against code, not the
+prompt's claims.
+
+**Decision:** T1.1 = **CONDITIONAL GO**. The S0→S6 data path is fail-closed and canary-green; the blockers
+are release/governance hygiene, not pipeline correctness. **Do NOT enable `thinking_budget` before T1.1** —
+freeze at `null` baseline and A/B after (mixing corpus production + model-policy experiment into one
+irreversible run is bad hygiene).
+
+**Verified new finding (missed by D2366):** `thinking_budget` is a single global config key shared by
+`merged_cribs_classify()` and `classify_depth_focused()` (both use `VERIFY_MODEL` → `call_omlx`). "Adopt
+256 on the merged call" is not scopeable without threading a per-call override. Logged as **BUG-132**.
+
+**Refuted false alarms (verified against code):**
+- Qwen "D2229 sqlite-vec 1024→512 PENDING → S6 crash": FALSE — `stage6_commit.py` already reads
+  `S15_EMBED_DIM` from config (fixed); only the DECISION-LOG status string is stale.
+- DeepSeek/Qwen "CONV-037/039 missing depth": FALSE — both are list-form with `depth: domain`; the real
+  bug is tools (`apply_depth_relabel.py:53`) silently skipping list-form entries.
+- DeepSeek "~90h" / Qwen "160-200h": STALE denominators; correct = ~39h (D2365/D2366).
+
+**Confirmed governance drift to fix before launch:**
+1. `config/decisions.yaml` missing D2364/65/66; `last_sync` 08-14; `sync_decisions.py` emits broken
+   descriptions (captures the `**Category:**` line, not decision text).
+2. `DECISION-LOG.md` lacks D2351–D2361 (11 IDs) entries.
+3. `buglog.md`: 18 header/body emoji mismatches + internal "98%" contradiction (now corrected).
+4. `S4_BOTTLENECK_ANALYSIS.md` + `ROUNDTABLE_MASTER_PROMPT.md` still recommend rejected P0s / stale 160-200h.
+5. `pipeline_config.yaml` `pipeline_commit: v3.0-D2298` (HEAD = D2366).
+6. Golden hash (`verify_golden_hash.py`) not wired into `just preflight`.
+7. Speculative decoding for gpt-oss: no draft model in `_MLX_DRAFT_MODELS` — S4_BOTTLENECK_ANALYSIS P1 not actionable.
+
+**Files:** DECISION-LOG.md, config/decisions.yaml, governance/buglog.md, governance/S4_BOTTLENECK_ANALYSIS.md, governance/ROUNDTABLE_MASTER_PROMPT.md, config/pipeline_config.yaml
+**Status:** ⏳ ACTION REQUIRED (registry sync + golden-hash preflight gate)
+
+
 ### D2366 — S4 speedup options exhausted (X4/X6/X8/X9): only thinking_budget=256 survives (2026-08-15)
 **Category:** PERF
 
@@ -65,13 +102,19 @@ independently re-derived from the raw governance JSON this session (`depth_bias_
    Principle-only FB count ≈ 2,634 × 1.35 ≈ 3,556. At the measured 39.5s/FB (D2363): **~39h** (was ~142h
    on the wrong 12,964 denominator). ~3.6× over-estimate. Confidence: ±15% (single-domain canary yield).
 
-**Decision:** (1) Treat the depth classifier as ~98%-accurate against corrected gold — no depth quality
-blocker remains for T1.1; do NOT do further speed work before re-benchmarking depth against post-relabel
-gold (authoritative number pending, replaces the stale 72%/75%). (2) T1.1 S4 budget ≈ ~39h (not 142h).
+**Decision:** (1) Treat the depth classifier as **~84%-accurate (n=45, post-relabel)** against corrected
+gold — depth quality is adequate for T1.1 (no crisis), but a systematic `cross-domain` over-assignment
+remains; do NOT do further speed work before the authoritative post-relabel depth benchmark lands
+(replaces the stale 72%/75% and the transient 98%). (2) T1.1 S4 budget ≈ ~39h (not 142h).
 (3) Flag CONV-001/003/051 for optional independent re-adjudication (non-blocking).
 
 **Status:** DONE (analysis). Authoritative post-relabel depth benchmark + re-adjudication of 3 flagged
 relabels = follow-up (non-blocking, see MTR).
+
+> **⚠️ RECORDING GAP (D2367):** decision IDs **D2351–D2363** have no `###` entries in this log — their
+> content lives in `config/decisions.yaml` (full entries) and `governance/buglog.md` (BUG-108…119 map to
+> D2351–D2355), summarized in `MASTER-TASK-REGISTER.md` §4th-Audit (M1–M4/S1–S5). Not backfilled here
+> (append-only; content is preserved in the registry). See D2367.
 
 
 ### D2364 — C12 (X7): extract hardcoded S4 signal sets → config (2026-08-15)

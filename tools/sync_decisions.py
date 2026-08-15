@@ -36,13 +36,28 @@ def extract_decisions_from_log() -> dict[str, dict]:
 
     for d_id_str in sorted(d_ids):
         d_id = f"D{d_id_str}"
-        # Extract description from surrounding context
-        pattern = rf"{d_id}[^\n]*\n([^\n]{{10,200}})"
-        matches = re.findall(pattern, text)
-        desc = matches[0].strip() if matches else "No description extracted"
 
-        # Auto-detect category from context
-        category = _detect_category(d_id, text)
+        # D2367 fix: description/category/date must come from the decision's own
+        # heading block ("### Dxxxx — Title (date)" + "**Category:** X"), not the
+        # line *after* the first D-number mention (which captured the markdown
+        # "**Category:** ..." formatting line and produced garbage descriptions).
+        heading_m = re.search(rf"(?m)^#{{2,4}}\s+{d_id}\s*—\s*(.+)$", text)
+        if heading_m:
+            title = heading_m.group(1).strip()
+            date_m = re.search(r"\((\d{4}-\d{2}-\d{2})\)\s*$", title)
+            created = date_m.group(1) if date_m else "2026-07-26"
+            desc = re.sub(r"\s*\(\d{4}-\d{2}-\d{2}\)\s*$", "", title).strip()
+
+            after = text[heading_m.end(): heading_m.end() + 500]
+            cat_m = re.search(r"\*\*Category:\*\*\s*(.+?)\s*$", after, re.MULTILINE)
+            category = cat_m.group(1).strip() if cat_m else _detect_category(d_id, text)
+        else:
+            # Referenced only (no heading block) — best-effort fallback.
+            pattern = rf"{d_id}[^\n]*\n([^\n]{{10,200}})"
+            matches = re.findall(pattern, text)
+            desc = matches[0].strip() if matches else "No heading in DECISION-LOG.md"
+            created = "2026-07-26"
+            category = _detect_category(d_id, text)
 
         # Auto-detect state
         state = _detect_state(d_id, text)
@@ -54,7 +69,7 @@ def extract_decisions_from_log() -> dict[str, dict]:
             "description": desc[:200],
             "champion": "auto-sync",
             "target_files": [],
-            "created": "2026-07-26",
+            "created": created,
         }
 
         # Check for superseded_by

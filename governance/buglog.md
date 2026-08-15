@@ -1,6 +1,22 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-15 16:20 (D2366: X4/X6/X8/X9 benchmarks done — only thinking_budget=256 survives; depth accuracy corrected to ~84% not 98%)
+> **Last updated:** 2026-08-15 17:10 (D2367: 5-LLM verification round — thinking_budget is GLOBAL not per-call (BUG-132); T1.1 NO-GO-as-governed until preflight+registry sync)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🔴 BUG-132 — 2026-08-15 — `thinking_budget` is a single global key shared by merged + depth calls (blocks D2366 "adopt 256")
+- **Symptom:** `models.verifier.thinking_budget` (`config/pipeline_config.yaml:93`) is read once into
+  `VERIFY_THINKING_BUDGET` (`pipeline/pipeline_paths.py:109`) and applied unconditionally to any model in
+  `VERIFY_REASONING_OFF_MODELS` (`pipeline/omlx_call.py:268-272`). Both `merged_cribs_classify()` and
+  `classify_depth_focused()` use `VERIFY_MODEL` (gpt-oss-20b) → **both call sites share the SAME budget**.
+- **Impact:** D2366's plan to "adopt `thinking_budget: 256` on the merged CRIBS call" is **not scopeable to
+  the merged call alone** in current code — flipping the key silently re-tunes the depth-focused call too.
+  The depth call's D2359 A/B tuning (budget=128 → 72.0% acc / 7.3s) and the merged call's X8 tuning
+  (256 → 1.8×) cannot be set independently today.
+- **Required before enabling any budget:** thread `thinking_budget` as an explicit per-call parameter through
+  `call_omlx()` / `call_omlx_json()` (or add a second config key, e.g. `models.verifier.depth_thinking_budget`),
+  then gate each call site separately. Found by the 5-LLM verification round (D2367); NOT in D2366.
+- **Status:** 🔴 OPEN — 2026-08-15
 
 ---
 
@@ -26,7 +42,7 @@ cross-domain over-assignments). The residual error is systematic over-assignment
 | ID | Concern | Finding (evidence) | Verdict |
 |----|---------|--------------------|---------|
 | X1 | D2363 golden-relabel circular (gpt-oss-led contamination) | Relabel = cross-model consensus; gpt-oss tie-break in only 3/13 (always paired with qwen); gpt-oss voted *against* relabel in CONV-033. Never sole driver. | ✅ NOT contaminated |
-| X2 | Depth accuracy 72% (n=50), "quality gap > speed gap" | 72% measured vs PRE-relabel gold; 13/14 "errors" were gold errors (gpt-oss was right, later relabeled). Post-relabel accuracy = **49/50 = 98%**. Only genuine error: CONV-016 "Limited Palette Discipline". | ✅ REFUTED — no quality crisis |
+| X2 | Depth accuracy 72% (n=50), "quality gap > speed gap" | 72% measured vs PRE-relabel gold; 13/14 "errors" were gold errors (gpt-oss was right, later relabeled). Initial re-map read 49/50=98%, but a fresh n=45 post-relabel run (D2366) showed **~84% (38/45)** — systematic gpt-oss over-assignment of `cross-domain` (~6 more missed). | ✅ RESOLVED — true depth ~84% (no quality *crisis*, but NOT 98%) |
 | X5 | 142h denominator unverified (12,964 ≠ FBs) | 12,964 = total clusters; 2,634 convergent (20.3%); 35,239 singletons. Principle-only FBs ≈ 2,634 × 1.35 yield ≈ 3,556 → **~39h** (not 142h). | ✅ 3.6× over-estimate |
 
 **Residual (non-blocking):** 3 relabels (CONV-001/003/051) are gpt-oss-tie-broken → optional 2-family
@@ -45,7 +61,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🔴 BUG-129 — 2026-08-14 — S4 GPT-OSS `reasoning_effort`/`enable_thinking` are silent no-ops (D2359 void)
+## 🟢 BUG-129 — 2026-08-14 — S4 GPT-OSS `reasoning_effort`/`enable_thinking` are silent no-ops (D2359 void)
 - **Symptom:** D2359 claimed `reasoning_effort: low` (~17% faster) + `enable_thinking: false` (~22% faster). Verified against the oMLX 0.5.1 request schema: `ChatCompletionRequest` (pydantic v2, `extra='ignore'`) has **no top-level `reasoning_effort` or `enable_thinking` fields** — the supported knobs are `chat_template_kwargs` (dict) and `thinking_budget` (int). The pipeline sends both as top-level payload keys → **silently dropped**. The observed "17%/22%" speedups were noise.
 - **Root cause:** `pipeline/omlx_call.py` emits `payload["reasoning_effort"]` / `payload["enable_thinking"]` at top level. oMLX only reads `request.chat_template_kwargs` (merged into the chat template) and `request.thinking_budget`.
 - **Verified:** (1) pydantic model dump proves top-level keys are dropped. (2) Live A/B on the production `DEPTH_FOCUSED_PROMPT`: top-level flags + `Reasoning: none` → 5.6s / 394 reasoning chars; `chat_template_kwargs={"enable_thinking": false}` + `Reasoning: low` → 4.6s / 311 chars; `thinking_budget=64` → 4.6s / 306 chars. (3) Harmony format doc confirms valid reasoning levels are only `low`/`medium`/`high` — **`Reasoning: none` is not a valid level** and is ignored.
@@ -62,7 +78,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
   - **Net: `Reasoning: low` + `chat_template_kwargs={"enable_thinking":false}` is faster AND more accurate than `Reasoning: none` in production (verified).**
   - Remaining `domain→cross-domain` over-prediction (domain 9/22) is a pre-existing prompt/ontology/golden-label ambiguity, NOT a regression from these flags.
 
-## 🟡 BUG-130 — 2026-08-14 — GPU kernel panic loading dense Qwen3.8-27B in parallel (IOGPUGroupMemory)
+## 🟢 BUG-130 — 2026-08-14 — GPU kernel panic loading dense Qwen3.8-27B in parallel (IOGPUGroupMemory)
 - **Symptom:** `panic(cpu 0): IOGPUGroupMemory.cpp:220 Assertion failed: result != kIOReturnSuccess` in `omlx-server` (Python pid) while loading `Qwen3.8-27B-MLX-4bit` (15 GB dense, 48 linear-attn + 16 full-attn layers) on a second OMLX server (:11436) concurrently with the main pipeline server + 3 research delegates.
 - **Root cause:** Dense 27B model + concurrent GPU consumers exhausted the Metal driver's GPU memory (IOGPUGroupMemory assertion). Qwen3.8-27B is **dense** (not MoE) — ~15 GB weights + KV on a 64 GB M1 Max, and the two OMLX servers + delegates competed for the same GPU budget.
 - **Fix:** Kill the duplicate GUI OMLX server on :11436; keep a single server (:11435). **Run research + benchmark strictly sequentially, one model at a time.** Qwen3.8 loads cleanly in isolation (0 loaded models → 18 GB single load, no panic).
@@ -89,14 +105,14 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merge.py`
 - **Source:** ChatGPT re-audit (2nd pass, HIGH) + independent re-verification
 
-## 🟡 BUG-127 — 2026-08-14 — k-means split exception silently swallowed (`except Exception: pass`)
+## 🟢 BUG-127 — 2026-08-14 — k-means split exception silently swallowed (`except Exception: pass`)
 - **Symptom:** `split_cluster_by_kmeans()` wrapped the whole embed+cluster step in `except Exception: pass`, hiding split failures (C16).
 - **Fix (D2358):** log the failure (`⚠️ k-means split failed …`) while retaining the deliberate fail-safe (return the unsplit cluster).
 - **Status:** 🟢 FIXED — 2026-08-14.
 - **Files:** `pipeline/stage2_extract.py`
 - **Source:** ChatGPT re-audit (2nd pass, MEDIUM) + independent re-verification
 
-## 🟡 BUG-128 — 2026-08-14 — Dead `_render_3zone_body_old_end()` stub + literal `MAX_PER_BOOK=2`
+## 🟢 BUG-128 — 2026-08-14 — Dead `_render_3zone_body_old_end()` stub + literal `MAX_PER_BOOK=2`
 - **Symptom:** (1) `_render_3zone_body_old_end()` remained as a dead `pass` compatibility stub (C19). (2) `MAX_PER_BOOK: int = 2` was a local magic number while `max_probe_samples` was already config-driven (C12).
 - **Fix (D2358):** removed the dead stub; added `stage2.max_probe_per_book` (config) → `S2_MAX_PROBE_PER_BOOK`.
 - **Status:** 🟢 FIXED — 2026-08-14.
@@ -105,7 +121,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🔴 BUG-120 — 2026-08-14 — Semantic fail-open: merged/batch classification fabricates `emerging`/`domain`/`cited` (C16)
+## 🟢 BUG-120 — 2026-08-14 — Semantic fail-open: merged/batch classification fabricates `emerging`/`domain`/`cited` (C16)
 - **Symptom:** `merged_cribs_classify()` and `batch_cribs_classify()` filled a *present-but-sparse* model response's missing `discipline`/`domains`/`depth`/`evidence` with `emerging`/`["emerging"]`/`domain`/`cited`. D2355 had made only the *missing-entry* case fail-closed; a malformed-but-present entry still became valid-looking semantic data without raising, so `max_failed_ratio: 0.0` could not catch it.
 - **Root cause:** a single `defaults` dict mixed non-semantic CRIBS enrichment (`application`/`failure_mode`/`elaboration`/`keywords`) with semantic classification fields, applying the same silent-fill to both.
 - **Fix (D2357):** split the defaults — CRIBS fields default safely (empty); semantic fields are validated fail-closed via `_validate_semantic_classification()` which raises `SparseClassificationError` on any missing/empty/invalid `discipline`/`domains`/`depth`/`evidence`. Callers fall back to individual classification and account the failure.
@@ -113,7 +129,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merged_call.py`
 - **Source:** ChatGPT re-audit (BLOCKER #2/#3) + independent re-verification
 
-## 🔴 BUG-121 — 2026-08-14 — Intimacy lattice not fail-safe: null/config failure resolves `public` (sovereignty)
+## 🟢 BUG-121 — 2026-08-14 — Intimacy lattice not fail-safe: null/config failure resolves `public` (sovereignty)
 - **Symptom:** `config/intimacy_policy.yaml` declares `null_handling: intimacy: private` and "ambiguity/NULL resolves upward (D369)", but `resolve_intimacy()` initialized at `public`, had no null-escalation, and `_load_policy()`/`_load_anchors()` swallowed load exceptions to `{}`. `route_space()` fell back to `non_private`. A policy/config failure could route an FB to public/non-private against the declared privacy floor.
 - **Fix (D2357):** (1) `_load_policy()`/`_load_anchors()` now log AND record failures; (2) `resolve_intimacy()` fails closed to `private` on any config error (`R0-config-failure`) and on a wholly absent signal set (`R0-null`); (3) `route_space()` falls back to `private`, never `non_private`; (4) `LEVELS`/`space_routing` now read from YAML (C12) with a code fallback only for a missing file.
 - **Status:** 🟢 FIXED — 2026-08-14.
@@ -141,7 +157,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage6b_anytype_push.py`
 - **Source:** ChatGPT re-audit (HIGH #7/#8) + independent re-verification
 
-## 🟡 BUG-125 — 2026-08-14 — S2 hybrid-gate failure silently swallowed (`except Exception: pass`)
+## 🟢 BUG-125 — 2026-08-14 — S2 hybrid-gate failure silently swallowed (`except Exception: pass`)
 - **Symptom:** the D2276 pre-extraction hybrid gate wrapped its decision in `except Exception: pass`, so a gate failure was invisible (violates C16 "no silent errors").
 - **Fix (D2357):** log the gate failure (`⚠️ Hybrid gate error …`) while retaining the deliberate fail-open (prefer false-positive extraction to data loss).
 - **Status:** 🟢 FIXED — 2026-08-14.
@@ -150,7 +166,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🔴 BUG-108 — 2026-08-14 — S4 depth inference failure silently becomes `depth="domain"` (C16 violation)
+## 🟢 BUG-108 — 2026-08-14 — S4 depth inference failure silently becomes `depth="domain"` (C16 violation)
 - **Symptom:** `classify_depth_focused()` returns `"domain"` on *any* exception (`except Exception: return "domain"`) and on no-match (`return "domain"`). GPT-OSS timeout, cold-reload empty content, transport error, malformed output, unexpected answer, and a *legitimate* `domain` all collapse to the same value — semantic contamination.
 - **Root cause:** the focused depth call omits `Reasoning: none` (batch/merged do send it), uses `depth_max_tokens: 512` (truncates GPT-OSS reasoning), parses by substring (`for d in (...): if d in text`), and the exception handler manufactures `"domain"` instead of propagating/quarantining. `call_omlx()` raises `KeyError` when `content is None` (reasoning-model cold reload), which is exactly what the handler swallows.
 - **Fix (D2351):** fail-closed — propagate failure into `classification_errors` (S4 `max_failed_ratio: 0.0` already exits non-zero); exact-token parser (accept exactly one of 4 labels); single fallback policy via `S4_DEPTH_FALLBACK_DEPTH`; send `Reasoning: none` on the focused path; bump `depth_max_tokens` to 1024.
@@ -158,7 +174,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merged_call.py`, `pipeline/omlx_call.py`, `config/pipeline_config.yaml`
 - **Source:** 4-LLM audit (ChatGPT depth-audit) + independent re-verification
 
-## 🔴 BUG-109 — 2026-08-14 — `depth_max_tokens: 512` contradicts measured ~1024 GPT-OSS requirement
+## 🟢 BUG-109 — 2026-08-14 — `depth_max_tokens: 512` contradicts measured ~1024 GPT-OSS requirement
 - **Symptom:** governance `S4_BOTTLENECK_ANALYSIS.md` live-measured GPT-OSS needs `max_tokens ≥ 1024` to emit the answer after reasoning (1024 → `"specialized"`); production config `stage4.depth_max_tokens: 512` overrides the verifier model-level `max_tokens: 1024`. The 512 budget truncates reasoning, triggering BUG-108's failure path.
 - **Root cause:** config↔governance drift; the `classify_depth_focused()` docstring "512 is plenty — one word answer" is stale (contradicted by the repo's own measurement).
 - **Fix (D2351):** `depth_max_tokens` 512 → 1024; correct the stale docstring.
@@ -187,7 +203,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`
 - **Source:** 4-LLM audit + independent re-verification
 
-## 🔴 BUG-113 — 2026-08-14 — Singleton S2→S4 index inconsistency (silently skipped)
+## 🟢 BUG-113 — 2026-08-14 — Singleton S2→S4 index inconsistency (silently skipped)
 - **Symptom:** `load_stage2_fbs_via_clusters()` loads singleton FBs into the `clusters` list *and* its local `principles_idx`; but `run_stage4()` discards that index and calls `load_stage2_principles()`, which reads ONLY `STAGE2_CHECKPOINT` (never `STAGE2_SINGLETON_OUTPUT`). Singleton clusters therefore have `principle_ids` absent from `principles_idx` → `if not cluster_principles: … "empty" … continue` silently skips them.
 - **Root cause:** two loaders diverge — one (clusters) includes singletons, the other (principles index) does not.
 - **Note:** ChatGPT initially flagged this (correct), then wrongly "retracted" it as FIXED. It is still broken.
@@ -210,14 +226,14 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `tools/benchmark_s4_depth_frugal.py` (new), `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`
 - **Source:** ChatGPT depth audit + independent re-verification
 
-## 🟡 BUG-116 — 2026-08-14 — `s3_original_domain` vestigial dead column/field (bloat)
+## 🟢 BUG-116 — 2026-08-14 — `s3_original_domain` vestigial dead column/field (bloat)
 - **Symptom:** `CREATE TABLE fbs` omits `s3_original_domain` but `insert_fb()` INSERTs it (value always `""` — S4 removed it per D2130). Migrated by `_migrate_add_column()` so NOT a fresh-DB failure (ChatGPT mislabeled this as a BLOCKER). Dead column + dead INSERT field.
 - **Fix (D2355):** remove from INSERT, migration, and (eventually) DB.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (s3_original_domain removed (D2355)).
 - **Files:** `pipeline/stage6_commit.py`
 - **Source:** ChatGPT audit (BLOCKER claim) → corrected via independent re-verification
 
-## 🟡 BUG-117 — 2026-08-14 — Secondary `STAGE2_CHECKPOINT` writers bypass self-verifying path
+## 🟢 BUG-117 — 2026-08-14 — Secondary `STAGE2_CHECKPOINT` writers bypass self-verifying path
 - **Symptom:** `probe_run.py:225` writes via bare `open(...).write()` (no `safe_write`, no self-verify, violates C6); `repair_elaboration.py:237` uses `safe_write` but skips the `load_jsonl` self-verify re-read. Both are reimplementations instead of calling `_write_checkpoint_jsonl()`.
 - **Fix:** route both through `_write_checkpoint_jsonl()`.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (checkpoint writers unified (BUG-106 residual)).
@@ -273,7 +289,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage2_extract.py`
 - **Source:** T1.1 canary post-run checkpoint format audit (this session)
 
-## 🔴 BUG-105 — 2026-08-14 — Embedding instability: 60s timeout + keep_alive thrash (3% drop, D2275 gate exceeded)
+## 🟢 BUG-105 — 2026-08-14 — Embedding instability: 60s timeout + keep_alive thrash (3% drop, D2275 gate exceeded)
 - **Symptom:** T1.1 canary S1.5 embedding: 12 batches failed with HTTP read timeouts (`Read timed out (read timeout=60)`), 768 segments dropped = 3.07% (D2275 gate = 0.5%). A re-run stalled at ~2 seg/s with bge-m3 showing "Stopping..." (VRAM unload mid-run).
 - **Root cause:** (1) `batch_embed` hardcoded `timeout=60` (C12 violation) — too short under 4-worker concurrent load (Ollama serializes `/api/embed`). (2) bge-m3 default 5-min keep_alive → unloaded between batches → cold-reload stalls.
 - **Fix (D2348):** config-driven `services.ollama.embed_timeout: 180` + `embed_keep_alive: -1`. Verified: 0 failures, ~12 seg/s, 34.5 min for 25K segments (was 12 failures / 2-3 seg/s).
@@ -296,7 +312,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🔴 BUG-102 — 2026-08-13 — S1.5 embedding-drop index misalignment (silent cluster→segment corruption)
+## 🟢 BUG-102 — 2026-08-13 — S1.5 embedding-drop index misalignment (silent cluster→segment corruption)
 - **Symptom:** If the Ollama embedding path drops any segment (batch fails; drop rate ≤0.5% permitted by D2275), the returned embedding array is shorter than the original segment list, but cluster records are built against the original list → embedding[i] no longer corresponds to segments[i]. Wrong segment → wrong cluster → wrong source books → wrong convergence → wrong evidence, with NO exception. Hits the principle path, not just the non-type pass.
 - **Root cause:** `embed_segments()` filters `segments` locally on drop (`stage1_5_embed_cluster.py:320` — `segments = [segments[i] for i in successful_indices]`) then returns only `embeddings` (`:327`). Caller `run_stage1_5` (`:598`) receives embeddings only and passes the ORIGINAL `segments` to `build_clusters` (`:609`). The local reassignment never propagates to the caller.
 - **Fix (D2346):** Return `(filtered_segments, embeddings)` from `embed_segments()` (or raise when `n_dropped > 0`). Assert `len(segments) == len(embeddings)` immediately before FAISS clustering. Add injected-drop tests (first/middle/last segment).
@@ -324,7 +340,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🟡 BUG-100 — 2026-08-13 — integrity check [8] false-green (placeholder count never compared)
+## 🟢 BUG-100 — 2026-08-13 — integrity check [8] false-green (placeholder count never compared)
 - **Symptom:** `just integrity` reported 17/17 PASS even when the S6 INSERT placeholder count diverged from the SQLite column count. Check [8] could not catch the D2337 48→54 column change.
 - **Root cause (2 stacked):** (1) `re.findall(r"INSERT\s+(OR\s+REPLACE\s+)?INTO\s+fbs[^;]*", ...)` — the capturing group made `findall` return the *group* string ("" / "OR REPLACE "), so `placeholder_count = ins.count("?")` was ALWAYS 0 → the `if placeholder_count > 0` branch never fired → silent `return True`. (2) the `[^;]*` tail matched `fbs_fts` (word-prefix) and spanned past the SQL `"""` into Python code, over-counting `?`.
 - **Fix (D2342):** VALUES-anchored `re.search(r"INSERT...INTO\s+fbs\b.*?VALUES\s*\(([^)]*)\)", ...)`; also enhanced check [7] key_fields to include the six D2337 fields.
@@ -332,7 +348,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/integrity_check.py`
 - **Source:** In-depth `just integrity` alignment audit (this session)
 
-## 🔴 BUG-095 — 2026-08-13 — Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (data loss)
+## 🟢 BUG-095 — 2026-08-13 — Stage 6 SQLite drops D2323 axes + mechanism/boundary/consequence (data loss)
 - **Symptom:** S2 produces and S4 carries `mechanism`/`boundary`/`consequence` (`stage4_merge.py:1348-1350`), but SQLite `fbs` table has no such columns — only the older `application`/`failure_mode`/`elaboration`. `content_type`/`extraction_type` (D2323) never reach ANY store; `taxonomy_match_method` is computed then discarded in S4.
 - **Root cause:** `stage6_commit.py` CREATE TABLE (`:67-127`) + INSERT (`:275-345`) predate the D2323 ontology; S4 never copies `content_type`/`extraction_type`/`taxonomy_match_method` into the output FB dict (only uses `content_type` internally for routing).
 - **Fix (D2337):** Add `content_type`, `extraction_type`, `mechanism`, `boundary`, `consequence` columns + INSERT + `_migrate_add_column` + round-trip test. Couples to B5 (S4 must emit the axes).
@@ -340,7 +356,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage6_commit.py`, `pipeline/stage4_merge.py`, `pipeline/schemas.py`
 - **Source:** ChatGPT audit (`chatgpt008.md`) Block #1; independently re-verified against code
 
-## 🔴 BUG-096 — 2026-08-13 — S4/S6 fail-open: partial failure still exits 0 (no fail-closed gate)
+## 🟢 BUG-096 — 2026-08-13 — S4/S6 fail-open: partial failure still exits 0 (no fail-closed gate)
 - **Symptom:** S4 increments `failed`/`classification_errors` and prints them but never exits nonzero. S6 `insert_fb()` returns `False` on exception (`:377-379`), `run_stage6()` prints `❌ Failed to commit` (`:560-561`) but exits 0 → `runner.py` writes a `COMPLETE` manifest with failed inserts.
 - **Root cause:** D2331 added fail-closed to S2 only; S4/S6 never received the equivalent `failed > permitted → exit 1` gate.
 - **Fix (D2338):** `failed == 0` (or config tolerance) as exit condition in both stages; distinguish LLM-failure vs classification-failure vs intentional-skip; injected-failure test asserting nonzero exit + no COMPLETE manifest.
@@ -372,7 +388,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `config/pipeline_config.yaml`, `config/model_assignments.yaml`, `agent/session_seed.yaml`, `pipeline/pipeline_paths.py`
 - **Source:** ChatGPT audit (model attribution); independently re-verified + corrected (Phi still used as S2 probe, NOT dead)
 
-## 🔴 BUG-094 — 2026-08-13 — S2 checkpoint pretty-printed (JSONL broken) + resume-existence coupling
+## 🟢 BUG-094 — 2026-08-13 — S2 checkpoint pretty-printed (JSONL broken) + resume-existence coupling
 
 - **Symptom:** S2 checkpoints on disk are pretty-printed JSON (multi-line per record), but S4/bridge loaders parse with `json.loads(line)`. Code-verified: `latest/checkpoint.jsonl` = 575 lines / 290 non-empty / **30 parseable**; `e2e/checkpoint.jsonl` = 118 / 107 / **91**. Downstream merge silently parses only self-contained lines → corrupt/empty S4 output.
 - **Root cause (2 stacked layers):**

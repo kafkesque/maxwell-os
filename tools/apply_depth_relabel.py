@@ -47,13 +47,24 @@ def main() -> int:
 
     golden.write_text("\n".join(lines) + "\n")
 
-    # verify parse + distribution
+    # verify parse + distribution (D2367: also count list-form expected_fb — the
+    # old isinstance(dict) filter silently excluded CONV-037/039-style list entries)
     d = yaml.safe_load(golden.read_text())
     from collections import Counter
-    dist = Counter(e["expected_fb"].get("depth") for e in d["examples"]
-                   if isinstance(e.get("expected_fb"), dict) and e["expected_fb"].get("depth"))
+    dist = Counter()
+    list_form = 0
+    for e in d["examples"]:
+        fb = e.get("expected_fb")
+        if isinstance(fb, dict):
+            if fb.get("depth"):
+                dist[fb["depth"]] += 1
+        elif isinstance(fb, list):
+            list_form += 1
+            for item in fb:
+                if isinstance(item, dict) and item.get("depth"):
+                    dist[item["depth"]] += 1
     print(f"changed {changed} depth lines (expected {len(relabels)})")
-    print(f"new depth distribution: {dict(dist)}")
+    print(f"new depth distribution: {dict(dist)} (list-form examples: {list_form})")
     return 0 if changed == len(relabels) else 1
 
 

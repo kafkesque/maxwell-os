@@ -4,7 +4,7 @@ run:
 pipeline_manifest:
   schema_version: '3.0'
   taxonomy_version: v5.1
-  pipeline_commit: v3.0-D2298
+  pipeline_commit: v3.0-D2367
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     classifier: gpt-oss-20b-MXFP4-Q8
@@ -104,7 +104,7 @@ models:
   # nli_cross: REMOVED (D2298) — RoBERTa-large added zero signal on paraphrase evidence (D2227).
 pipeline:
   schema_version: '3.0'
-  commit: v3.0-D2298
+  commit: v3.0-D2367
   taxonomy_version: v5.1
   max_domains_per_fb: 5
   chunk_size_words: 300

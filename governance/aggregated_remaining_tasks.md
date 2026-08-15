@@ -20,8 +20,9 @@
 > **✅ IMPLEMENTATION STATUS (2026-08-14 14:34):** M1–M4, S1, S2, S4, W1–W6 are **DONE** (verified with
 > `py_compile` + unit + live SQLite tests). **S3 is PARTIAL** — `batch_depth_classify()` was A/B-tested live
 > (n=8): ~1.9× faster but **75% parity (< 90% gate)** → NOT wired into production; the recommendation is a
-> FrugalGPT gemma-4-E4B depth cascade behind the same gate. **S5** (benchmark-through-production) and **W7**
-> (`deathpectation` literal) remain open. **W6 intimacy routing → D2356** (`pipeline/intimacy_lattice.py`).
+> FrugalGPT gemma-4-E4B depth cascade behind the same gate. **S5** (benchmark-through-production) remains open.
+> **W7 (`deathpectation` literal) → RESOLVED (2026-08-15):** it is the user's private Anytype space name.
+> **W6 intimacy routing → D2356** (`pipeline/intimacy_lattice.py`).
 
 ### 🔴 MUST (blocks a defensible T1.1)
 
@@ -52,11 +53,11 @@
 | W4 | Add `jargon` to FTS5 | BUG-119 | 0.25h |
 | W5 | Reconcile `extraction_type` "S5 consumer" claim | drift | 0.25h |
 | W6 | Restore/document v2 intimacy routing | drift | ✅ DONE (D2356) |
-| W7 | Define or drop `deathpectation` | drift | ✅ DROPPED (D2357) — "private space" |
+| W7 | Define or drop `deathpectation` | drift | ✅ RESOLVED (2026-08-15) — private Anytype space name |
 
 > **S4 bottleneck (D2354) — the ultimate solution:** correctness-first (fail-closed + 1024 tokens) → remove waste
 > (drop `depth` from CRIBS batch) → batch the *focused* depth prompt (keep GPT-OSS + short prompt + `fb_index`) →
-> benchmark gate ≥90% → only then consider gemma-4-E4B. Target: ~25s/FB → ~6–8s/FB, full T1.1 62h → ~25–30h.
+> benchmark gate ≥90% → only then consider gemma-4-E4B. Target: ~25s/FB → ~6–8s/FB, full T1.1 ~142h → ~25–30h.
 
 ---
 
@@ -151,14 +152,15 @@
 > (1 dedup, 46988 edges, 0 failed) | S5 239 PASS / 40 QUARANTINE (85.7%) | S6 279 committed (398 total rows), Parquet ✓.
 >
 > **New findings (post-canary, NOT blocking):**
-> 1. **S4 slowness** — gpt-oss-20b batch classify ~3.5 FBs/min → full-run S4 ≈ 62h (vs 21-26h estimate). Needs
->    larger batch / faster classifier before T1.1 full run.
+> 1. **S4 slowness** — gpt-oss-20b classify ~25s/FB **serial** (no parallelism in `stage4_merge.py`) → full-run
+>    S4 ≈ **~142h** (D2363, supersedes D2362's 90h — which used the batch-CRIBS path production does not run — the 62h canary-rate figure and D2253's impossible 3.9h). Needs
+>    batching / faster classifier before T1.1 full run.
 > 2. **Convergence 9.2%** (DOMAIN 0 prefix) < e2e 20% threshold — sample-selection artifact (single-domain prefix),
 >    not a pipeline bug. Full corpus (8 domains) measured 20.3%.
 > 3. **BUG-104 confirmed** — sqlite-vec `load_extension` missing on python.org Python → vector search 0/279 (FTS fallback).
 
 > **Decision gate:** V1–V6 green → the code path is validated end-to-end. **Gating on full T1.1 = S4 speed**
-> (62h at canary rate) — re-tune S4 batch/classifier before the 26h full run.
+> (~142h serial, D2363) — re-tune S4 batch/classifier before any full run. (Prior "26h" was D2253, now superseded.)
 
 ---
 
@@ -218,7 +220,7 @@
 
 ## 🚦 PRE-T1.1 GATE — CONSOLIDATED (2026-08-12, do NOT launch T1.1 before these)
 
-> T1.1 = full S1.3→S6 run on 12,964 clusters (~21-26h). Launching with known bugs either
+> T1.1 = full S1.3→S6 run on 12,964 clusters (**~110-140h**, D2362 — not the stale ~21-26h). Launching with known bugs either
 > **corrupts the output** (false convergence) or **wastes the run** (77.5% quarantine).
 
 ### 🔴 BLOCKING (corrupts output — fix first)
@@ -312,7 +314,7 @@ D2288 (Fleiss kappa), D2300 (StorageBackend), D2305 (latency SLA), T1.2 (yield d
 ### HIGH (pipeline execution)
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
-| **T1.1** | **Full S1.3→S6 run** on 12,964 clusters | ~21-26h | Enable with `--hybrid` for +0.145 quality |
+| **T1.1** | **Full S1.3→S6 run** on 12,964 clusters | **~110-140h** (D2362) | Enable with `--hybrid` for +0.145 quality |
 | **T1.2** | Yield crisis diagnostic | 2h | Post-T1.1 |
 | T-007b-v2 | Re-optimize MIPROv2 with 3 demos | 1h setup | Optional polish |
 | T-015 | Extraction type expansion + depth balance | 2d | Golden pool imbalance |

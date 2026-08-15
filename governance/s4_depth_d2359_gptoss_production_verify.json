@@ -4,7 +4,7 @@
   "n": 50,
   "accuracy": 0.72,
   "fail_closed": 0,
-  "avg_secs": 8.33,
+  "avg_secs": 8.332,
   "rows": [
     {
       "pred": "cross-domain",
@@ -106,7 +106,7 @@
       "pred": "cross-domain",
       "gold": "domain",
       "secs": 5.7,
-      "name": "Endowment Effect \u2014 Ownership Reference Point"
+      "name": "Endowment Effect — Ownership Reference Point"
     },
     {
       "pred": "cross-domain",
@@ -118,7 +118,7 @@
       "pred": "domain",
       "gold": "domain",
       "secs": 18.5,
-      "name": "Spaced Retrieval Effect \u2014 Declarative Memory Strengthening"
+      "name": "Spaced Retrieval Effect — Declarative Memory Strengthening"
     },
     {
       "pred": "domain",
@@ -232,13 +232,13 @@
       "pred": "cross-domain",
       "gold": "cross-domain",
       "secs": 5.5,
-      "name": "Dunning-Kruger Effect \u2014 Competence-Confidence Inversion"
+      "name": "Dunning-Kruger Effect — Competence-Confidence Inversion"
     },
     {
       "pred": "cross-domain",
       "gold": "cross-domain",
       "secs": 5.6,
-      "name": "Zipf's Law \u2014 Rank-Frequency Inverse Distribution"
+      "name": "Zipf's Law — Rank-Frequency Inverse Distribution"
     },
     {
       "pred": "domain",
@@ -250,7 +250,7 @@
       "pred": "cross-domain",
       "gold": "cross-domain",
       "secs": 7.0,
-      "name": "Johari Window \u2014 Interpersonal Awareness Matrix"
+      "name": "Johari Window — Interpersonal Awareness Matrix"
     },
     {
       "pred": "cross-domain",
@@ -268,7 +268,7 @@
       "pred": "cross-domain",
       "gold": "cross-domain",
       "secs": 8.9,
-      "name": "Parkinson's Law \u2014 Time-Constraint Productivity"
+      "name": "Parkinson's Law — Time-Constraint Productivity"
     },
     {
       "pred": "cross-domain",
@@ -286,7 +286,7 @@
       "pred": "cross-domain",
       "gold": "cross-domain",
       "secs": 8.0,
-      "name": "Hanlon's Razor \u2014 Incompetence Over Malice Default"
+      "name": "Hanlon's Razor — Incompetence Over Malice Default"
     },
     {
       "pred": "domain",
@@ -298,13 +298,15 @@
       "pred": "domain",
       "gold": "domain",
       "secs": 7.0,
-      "name": "Five Forces \u2014 Competitive Pressure Taxonomy"
+      "name": "Five Forces — Competitive Pressure Taxonomy"
     },
     {
       "pred": "domain",
       "gold": "domain",
       "secs": 11.6,
-      "name": "Kano Model \u2014 Feature Satisfaction Taxonomy"
+      "name": "Kano Model — Feature Satisfaction Taxonomy"
     }
-  ]
+  ],
+  "median_secs": 7.2,
+  "mean_secs": 8.332
 }

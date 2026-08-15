@@ -201,8 +201,15 @@ additionally assess:
 - **Latency note:** hybrid 45.8s = gate (~13s) + extract (~30s); gate short-circuits
   negatives at ~13s. Full report: `governance/DSPY_VALIDATION_REPORT.md`
 
-### G. Full-Run Cost Model (T1.1 — 12,964 clusters, ~26h not 100h)
-Naive estimate (12,964 × 28s ÷ 1 worker = 100h) is WRONG. Real model:
+### G. Full-Run Cost Model (T1.1 — 12,964 clusters)
+
+> **⚠️ SUPERSEDED by D2363 (2026-08-15).** D2362's ~90h used the batch CRIBS path; production runs merged_cribs_classify() = 32.29s/FB median. The prior "~26h / S4 = 3.9h" figure here was WRONG:
+> it implied 1.08s/FB for S4, but GPT-OSS is a reasoning model whose fastest measured call is 4.0s.
+> Same-day measured latency (`S4_BOTTLENECK_ANALYSIS.md`) puts S4 at ~25s/FB **serial** (no parallelism
+> in `stage4_merge.py`) = **~142h for S4 alone** (merged 32.29s + depth 7.2s). Corrected T1.1 ≈ **160–200h serial**. Do not plan a
+> 26h launch on this model. See D2362 + `S4_BOTTLENECK_ANALYSIS.md` for the authoritative numbers.
+
+Naive estimate (12,964 × 28s ÷ 1 worker = 100h). Historical D2253 model (now known-stale):
 
 | Segment | Clusters | Cost/cluster | Subtotal |
 |---------|----------|-------------|----------|
@@ -210,13 +217,12 @@ Naive estimate (12,964 × 28s ÷ 1 worker = 100h) is WRONG. Real model:
 | Convergent (20.3%) | 2,634 | 28s (full synthesis + few-shot) | 73,750s |
 | Split-probe (5.3%) | 683 | +6s (Phi probe + k-means) | 4,100s |
 | **S2 total ÷ 3 workers** | | | **~18.7h** |
-| S4 merged (D2224, ~45% faster) | ~2,634 FBs | ~16s ÷ 3 workers | ~3.9h |
+| S4 merged (D2224, ~45% faster) | ~2,634 FBs | ~16s ÷ 3 workers | ~~~3.9h~~ → **~90h measured serial** |
 | S5 verify (Gemma + DeBERTa) | ~2,634 FBs | ~3s ÷ 3 workers | ~0.7h |
 
-**Wall-clock ≈ 21-26h** (4-5× faster than naive). Parallelism: `stage2.max_workers: 3`
-(ThreadPool, config-driven). **Validation check:** S2 throughput should approach
-3× single-threaded; if < 2×, workers are contending (OMLX queue) — raise OMLX
-`default_timeout` or reduce `max_workers` to 2.
+**Wall-clock (corrected) ≈ 160–200h** (D2363), NOT 21-26h (D2253) nor 110-140h (D2362). S2 parallelism is real
+(`stage2.max_workers: 3`, ThreadPool, config-driven); S4 has **zero** parallelism (serial,
+one FB per GPT-OSS call).
 
 ### H. Golden Pool Audit Results (D2250 — user-requested)
 - **Quality:** 0 field gaps; **Accuracy:** 73/73 rationale; **Verbatim:** 194/194 evidence
@@ -225,3 +231,31 @@ Naive estimate (12,964 × 28s ÷ 1 worker = 100h) is WRONG. Real model:
 - **Metric calibration:** weights sum 1.00; FP ≤0.20; FN = 0.10; perfects = 1.0
 - **⚠️ Depth imbalance:** universal=1, specialized=1 (4%) — under-represented; benchmark
   confidence on these classes is low → T-015 expansion tracked
+
+---
+
+## AUDIT FOCUS (2026-08-15 — post-D2363, for external LLM re-audit)
+
+You are re-auditing Maxwell OS v3.0 for residual bugs, blindspots, gaps, conflicts,
+contradictions, hidden failures, and drift. VERIFY against actual code/config — do not assume.
+Focus areas, highest-value first:
+
+1. **S4 cost model (D2363):** merged_cribs_classify() = 32.29s/FB median (n=6, high variance 30-72s).
+   Re-measure at n≥20; confirm the focused-depth call (~7.2s) is truly additive (not already in the
+   merged output). Verify T1.1 ≈ 160-200h.
+2. **S4 speedup gates:** S4-A batch depth (75% parity) and S4-B gemma cascade (62.5% accuracy) both
+   fail the ≥90% gate → dormant (batch_enabled:false, depth_frugal_enabled:false). Confirm no path
+   silently activates them.
+3. **Golden hash (NEW):** .golden_meta.json full SHA-256 + tools/verify_golden_hash.py. Confirm it is
+   wired into canary/T1.1 preflight (currently a standalone tool, not yet gated).
+4. **Depth-bias relabel (NEW):** 13 golden FBs relabeled via 3-model vote
+   (governance/depth_bias_relabel_vote.json). Audit whether any of the 13 should revert.
+5. **Golden set defects (unresolved):** universal=1, specialized=1 (imbalanced); CONV-037/CONV-039
+   list-form expected_fb missing depth.
+6. **Decisions registry drift:** DECISION-LOG.md (source of truth) stops at D2350; D2351-D2363 exist
+   only in config/decisions.yaml. Reconcile.
+7. **Buglog header/body mismatch:** ~29 entries have header status emoji contradicting body status.
+8. **Model registry drift:** model_assignments.yaml stale S5 verifier / cloud entries.
+
+Report findings as (file, line, claim, evidence, verdict). Do not mutate code — flag only.
+

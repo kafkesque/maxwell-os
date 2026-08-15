@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-08-15T12:45:00",
+  "tool": "tools/benchmark_s4_merged_production.py",
+  "decision": "D2363",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "path": "merged_cribs_classify() - individual, batch_enabled=false (REAL production path)",
+  "n": 6,
+  "stratified_seed": 42,
+  "warmup_secs": 98.3,
+  "times_secs": [
+    71.94,
+    30.99,
+    59.62,
+    33.58,
+    30.13,
+    30.23
+  ],
+  "median_secs_per_fb": 32.29,
+  "mean_secs_per_fb": 42.75,
+  "min_secs": 30.13,
+  "max_secs": 71.94,
+  "throughput_fbs_per_min": 1.86,
+  "depth_focused_median_secs": 7.2,
+  "depth_focused_mean_secs": 8.332,
+  "full_s4_median_secs_per_fb": 39.49,
+  "full_s4_mean_secs_per_fb": 51.08,
+  "extrapolated_12964_median_hours": 142.2,
+  "extrapolated_12964_mean_hours": 184,
+  "note": "Supersedes D2362 ~25s/FB=90h (which used the batch CRIBS path; batch_enabled=false means production runs the individual merged call). Full S4 = merged (32.29s) + focused depth (7.2s)."
+}

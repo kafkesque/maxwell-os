@@ -1,0 +1,202 @@
+[
+  {
+    "id": "CONV-001",
+    "name": "Asymmetric Dominance Decoy",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 2,
+      "domain": 1
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-003",
+    "name": "Metaphor Complexity Inverted-U",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 2,
+      "domain": 1
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-004",
+    "name": "Similarity-Weighted Social Proof",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-006",
+    "name": "Default Inertia Effect",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-007",
+    "name": "Keynesian Recursive Expectation",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-011",
+    "name": "Proximity Grouping",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-013",
+    "name": "Progressive Disclosure",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-016",
+    "name": "Limited Palette Discipline",
+    "gold": "domain",
+    "votes": {
+      "qwen": "domain",
+      "gemma": "domain",
+      "gptoss": "domain"
+    },
+    "tally": {
+      "domain": 3
+    },
+    "recommend": null
+  },
+  {
+    "id": "CONV-019",
+    "name": "Habit Anchoring",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-020",
+    "name": "Endowment Effect \u2014 Ownership Reference Point",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-027",
+    "name": "Communication Overhead Limits Scale",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-033",
+    "name": "Goal-Directed Design Hierarchy",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "domain"
+    },
+    "tally": {
+      "cross-domain": 2,
+      "domain": 1
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-035",
+    "name": "Commitment-Anchored Habit Formation",
+    "gold": "domain",
+    "votes": {
+      "qwen": "cross-domain",
+      "gemma": "cross-domain",
+      "gptoss": "cross-domain"
+    },
+    "tally": {
+      "cross-domain": 3
+    },
+    "recommend": "cross-domain"
+  },
+  {
+    "id": "CONV-051",
+    "name": "Five-Factor Personality Taxonomy (OCEAN)",
+    "gold": "cross-domain",
+    "votes": {
+      "qwen": "domain",
+      "gemma": "cross-domain",
+      "gptoss": "domain"
+    },
+    "tally": {
+      "domain": 2,
+      "cross-domain": 1
+    },
+    "recommend": "domain"
+  }
+]

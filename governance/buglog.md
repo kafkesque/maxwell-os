@@ -1,5 +1,5 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-14 23:40 (D2359 implemented + production-verified: 72.0% acc @ 7.3s/FB; D2361 default-model mismatch fixed)
+> **Last updated:** 2026-08-15 10:11 (D2359 production-verified: 72.0% acc @ 7.2s median / 8.3s mean; D2361 default-model mismatch fixed; W7 `deathpectation` resolved = private Anytype space name)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
@@ -16,7 +16,7 @@
   - Focused depth: A=67.3% acc / 14.2s vs **B=76.0% acc / 7.7s (1.84×)**, C(thinking_budget=128)=76.0% / 7.2s (1.97×). Zero fail-closed in B/C.
   - Merged CRIBS: A=68.3s vs **B=53.5s (1.28×)**, reasoning chars 3012→2079 (−31%), all outputs complete.
 - **PRODUCTION VERIFIED (2026-08-14, 50-FB golden through real `classify_depth_focused()`):**
-  - GPT-OSS focused depth: 67.3% → **72.0% acc (+4.7pt)** and 14.2s → **7.3s median (1.95×)**. Zero fail-closed.
+  - GPT-OSS focused depth: 67.3% → **72.0% acc (+4.7pt)** and 14.2s → **7.2s median / 8.3s mean (1.95× on median)**. Zero fail-closed.
   - ⚠️ The harness's 76% did NOT reproduce on the production path — the harness used its own `requests.post` with `response_format=json_object` + a fuller system message, not the production `call_omlx` path. Production truth = 72.0%.
   - **Net: `Reasoning: low` + `chat_template_kwargs={"enable_thinking":false}` is faster AND more accurate than `Reasoning: none` in production (verified).**
   - Remaining `domain→cross-domain` over-prediction (domain 9/22) is a pre-existing prompt/ontology/golden-label ambiguity, NOT a regression from these flags.

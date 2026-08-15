@@ -10,11 +10,11 @@
 
 `intimacy_boundary` is a **space-routing** field (which Anytype *space* an FB lands in):
 
-| Value | Meaning (from `pipeline/schemas.py:660` + `pipeline/schema_accessor.py:201`) |
+| Value | Meaning |
 |---|---|
-| `public` | Knowledge base |
-| `selective` | (intermediate tier) |
-| `private` | "deathpectation" |
+| `public` | Knowledge base (Anytype `non_private` space) |
+| `selective` | (intermediate tier) — routes to private space |
+| `private` | the user's private Anytype space, whose **literal space name is `"deathpectation"`** (RESOLVED 2026-08-15) |
 
 `context` is a **property label** (routing hint), per `schemas.py:652`:
 > "Comma-separated multi-select: business, design, system, academic, personal. Never free text."
@@ -99,16 +99,18 @@ Otherwise → **public** (Non-Private).
 
 ---
 
-## 5. The "deathpectation" term — flagged for clarification
+## 5. The "deathpectation" term — RESOLVED
 
-`schemas.py:662` and `schema_accessor.py:201` both describe `private` as
-**"private (deathpectation)"**. This string survives from v1 and appears to be a
-garbled/personal term — likely a personal Anytype *space* name or a
-mortality/legacy-related notebook. It is **not defined anywhere** in the current config
-(`config/intimacy_policy.yaml` is referenced by `doc_guard.py` but does not exist on disk).
+`"deathpectation"` is the **user's own name for their private Anytype space** (confirmed
+2026-08-15). It is not a garbled/personal term or a v1 artifact — it is the literal
+Anytype *space* name that the `private` intimacy tier routes into. `config/intimacy_policy.yaml`
+**does exist on disk** (created 2026-08-14 by D2356) and its `space_routing:` block maps
+`private`/`selective` → the private space; `public` → `non_private`.
 
-**Recommendation:** treat `"deathpectation"` as an unresolved literal until the intended
-meaning is confirmed. Do NOT propagate it as a canonical label without a definition.
+**Status:** ✅ RESOLVED — `"deathpectation"` = private Anytype space name. It is an
+operational identifier (the user's space), not a schema enum value. `schemas.py`/`schema_accessor.py`
+correctly keep the generic `"private space"` description (the literal space name is an
+Anytype-side concern, not a pipeline taxonomy term).
 
 ---
 
@@ -120,7 +122,7 @@ meaning is confirmed. Do NOT propagate it as a canonical label without a definit
    it to `private`/`selective`.
 2. **Keep `context` heuristic** but document it as the successor to the old bridge
    classification (or restore the bridge if deterministic parity is required).
-3. **Define or drop `"deathpectation"`.** It is the single unexplained token in an otherwise
-   well-specified enum.
+3. ~~Define or drop `"deathpectation"`~~ → **RESOLVED (2026-08-15):** it is the user's private
+   Anytype space name, an operational identifier, not a taxonomy enum value.
 4. `intimacy_boundary` must remain a **metadata/property** field (not body), consistent with
    D2349 — it is routing, not readable knowledge.

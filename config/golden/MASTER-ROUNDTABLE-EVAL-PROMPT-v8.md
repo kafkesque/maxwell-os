@@ -104,7 +104,7 @@ The full push is authorized ONLY if every item below passes. Report any item tha
 |------|--------|------|
 | S4 batched depth (D2354) | **NOT wired** — 75% parity < 90% gate | Do not assume it speeds up S4 |
 | S5 benchmark-through-production | Open | Verify S5 is actually fail-closed end-to-end |
-| W7 `deathpectation` literal | Open | Hygiene |
+| W7 `deathpectation` literal | ✅ RESOLVED (2026-08-15) — private Anytype space name | Hygiene |
 | FrugalGPT depth cascade (gemma-4-E4B) | Gated off | Needs ≥90% parity + ≥90% held-out |
 | Hybrid Gate (BUG-085) | Disabled for T1.1 | Net-negative on A/B |
 

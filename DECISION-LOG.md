@@ -4,6 +4,25 @@
 ---
 
 
+### D2363 — S4 merged-path measured ~142h; depth-bias relabel; golden hash wired (2026-08-15)
+**Category:** PERF
+
+**Context:** D2362 next-action #1 was to measure the REAL production path (merged_cribs_classify),
+because batch_enabled=false means production does NOT run the batch CRIBS path that D2362's 25s/FB=90h
+was built on.
+
+**Measured (tools/benchmark_s4_merged_production.py, n=6 stratified):** merged_cribs_classify() =
+32.29s/FB median (42.75s mean; range 30-72s). Full S4 = merged (32.29s) + focused depth (7.2s median)
+= ~39.5s/FB median = **~142h** (mean ~184h) for 12,964 FBs. T1.1 ≈ 160-200h serial.
+
+**Decision:** (1) Supersede D2362's 90h with ~142h. (2) Depth-bias relabel-first: 3-model vote
+(qwen+gemma+gptoss) on 14 disputed FBs → relabeled 13 golden FBs (12 domain→cross-domain, 1 reverse);
+the gold labels — not the model — were wrong for cross-disciplinary fields. (3) Wire the golden hash:
+full SHA-256 in .golden_meta.json + tools/verify_golden_hash.py (was a 12-char inert hash).
+
+**Impact:** S4 is the measured bottleneck (~142-184h serial). Speedup options (batch depth S4-A 75%
+parity, gemma cascade S4-B 62.5% accuracy) remain gated <90%. See governance/s4_merged_production_benchmark.json.
+
 ### D2350 — S4 Identity & Provenance Integrity: preserve S2 fb_id + real cluster id (2026-08-14)
 **Category:** BUGFIX
 **Decision:** Three S4 identity/provenance bugs found in the T1.1 canary deep-audit and fixed surgically: (1) **fb_id drift** — `stage4_merge.py` re-hashed `make_hash_id(name, definition)` AFTER `normalize_fb_name()` title-cased the name, so 73 records drifted to a new fb_id between S2→S4, silently breaking FB identity and `source_clusters` provenance. Now preserves S2's fb_id: `fb_data.get("fb_id") or make_hash_id(name, definition)`. (2) **source_clusters semantic drift** — `load_stage2_clusters()` used `fb_id_val` as `cluster_id`, so S4/DB stored an fb_id where the real cluster id (e.g. `cluster_48_s1_sub1`) belongs, breaking cluster→segment provenance tracing. Now uses `fb.get("source_cluster") or fb_id_val` on both the convergent and singleton paths. (3) **name-collision contamination** — disambiguation appended the raw 64-char cluster hash as `(Cluster <hash>)` to duplicate names, polluting human-readable names. Now probes a short numeric suffix `(2)`, `(3)`, … until unique.
@@ -4303,6 +4322,9 @@ via hybrid. (3) Overnight re-opt (3 demos) is optional polish, tracked in
 aggregated_remaining_tasks.md as T-007b-v2.
 
 ### D2253: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
+
+> **⚠️ SUPERSEDED by D2362 (2026-08-15).** The S4=3.9h figure below is impossible (implies 1.08s/FB;
+> fastest GPT-OSS call measured = 4.0s). Same-day measured: S4 ≈ 25s/FB serial ≈ 90h. Corrected T1.1 ≈ 110-140h.
 
 **Context:** The prior 100h estimate for the 12,964-cluster full run was naive:
 12,964 × 28s ÷ 1 worker. It ignored the tiered+parallel architecture.

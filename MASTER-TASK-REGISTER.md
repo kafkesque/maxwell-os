@@ -24,10 +24,10 @@
 | **S3** | D2354 | S4 bottleneck resolution — batch focused depth (BUG-114) | 2–3h | 🟠 OPEN |
 | **S4** | D2355 | Batch missing-output fail-closed (BUG-115) | 0.5h | 🟠 OPEN |
 | **S5** | D2351 | Depth benchmark authority (BUG-115) | 1h | 🟠 OPEN |
-| **W1–W7** | D2355+ | Hygiene: dead `s3_original_domain`, secondary writers, `jargon`-FTS, `deathpectation` (BUG-116…119 + drift) | 3h | 🟡 OPEN |
+| **W1–W7** | D2355+ | Hygiene: dead `s3_original_domain`, secondary writers, `jargon`-FTS (BUG-116…119 + drift) | 3h | 🟡 OPEN (W7 `deathpectation` ✅ RESOLVED 2026-08-15 — private Anytype space name) |
 
 > **Verdict:** canary re-run + T1.1 **NOT clean** until M1+M2 (S4 depth fail-closed + token budget) — live in default path,
-> silently corrupt the depth audit. S4 speed (D2354) is the full-T1.1 *feasibility* gate (62h → ~25–30h).
+> silently corrupt the depth audit. S4 speed (D2354) is the full-T1.1 *feasibility* gate (~142h → ~25–30h, D2363).
 
 ---
 
@@ -58,8 +58,8 @@
 | **B18** | D2348 | embedding reliability — `embed_timeout: 180` + `embed_keep_alive: -1` (config-driven, BUG-105) | 0.5h | ✅ DONE |
 
 > **✅ T1.1 CANARY GREEN (2026-08-14).** 25K segments → S1.5(2255 clusters/207 conv) → S2(280 FBs) → S4(279 FBs)
-> → S5(239 PASS/40 QUAR) → S6(279 committed). V1–V6 all pass. **Remaining gate = S4 speed** (~3.5 FBs/min →
-> 62h full-run; re-tune before full T1.1). BUG-105 (embedding instability) found+fixed mid-canary via D2348.
+> → S5(239 PASS/40 QUAR) → S6(279 committed). V1–V6 all pass. **Remaining gate = S4 speed** (~2.4 FBs/min measured →
+> ~142h full-run (D2363); re-tune before full T1.1). BUG-105 (embedding instability) found+fixed mid-canary via D2348.
 
 > **D2345 (non-type second pass):** DECIDED as principle-first + separate single-source `stage2_extract_nontype.py`
 > (post-T1.1). NOT a T1.1 blocker. Whether convergent PT/PI/GE/TI even occur = UNKNOWN; measure offline first.
@@ -169,7 +169,7 @@
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
-| **T1.1** | **Full S1.3→S6 run on 12,964 clusters** | ~21-26h | Batch-resume capable. Tiered+parallel: ~19h S2 + ~4h S4 + ~1h S5 |
+| **T1.1** | **Full S1.3→S6 run on 12,964 clusters** | **~160-200h** (D2363) | Batch-resume capable. S2 parallel ~19h + S4 serial ~142h (measured) + S5 ~1h. ⚠️ prior "~21-26h" was stale (D2253) |
 | **T1.2** | **Yield crisis diagnostic** — re-measure on full run output. 14 FBs / 852 books = 0.004% was v2.0. | 2h | Post-T1.1 |
 | **T-007b-v2** | **Re-optimize MIPROv2 with 3 demos** (overnight) — close DSPy gate FN gap. | 1h setup + overnight | Optional polish |
 | **T-015** | **Extraction type expansion** — 4→12-15 per type + depth class balance. Fixes golden pool imbalance. | 2d | — |
@@ -369,7 +369,7 @@
 | T-007b — S2 positive-fidelity gap | ✅ Hybrid DSPy 0.736 (not wired — see P0.1) |
 | Golden audit | ✅ 0 quality gaps |
 | DSPy validation report | ✅ Hybrid approved |
-| Cost model | ✅ T1.1 ~21-26h |
+| Cost model | ⚠️ T1.1 ~110-140h (D2362 superseded D2253's ~21-26h) |
 
 ---
 

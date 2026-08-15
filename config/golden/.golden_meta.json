@@ -1,5 +1,8 @@
 {
-  "golden_sha256": "d0ccb2dbafee",
+  "schema_version": "1.0",
+  "algorithm": "sha256",
+  "golden_sha256": "b3ba636143ede46a25ba7ac79451692ee297ba28a7633ba4ce30733a5e39414e",
+  "pipeline_commit": "31bb363",
   "trimmed_ids": [
     "PRO-002",
     "LEA-001",
@@ -11,5 +14,10 @@
     "DES-005",
     "DES-009",
     "ART-009"
-  ]
+  ],
+  "depth_relabel": {
+    "count": 13,
+    "source": "governance/depth_bias_relabel_vote.json",
+    "note": "cross-model vote (qwen+gemma+gptoss) >=2/3 - relabel-first depth bias fix (D2362)"
+  }
 }

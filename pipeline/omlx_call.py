@@ -292,8 +292,8 @@ def call_omlx(
             data = resp.json()
             msg = data["choices"][0]["message"]
             content = msg.get("content")
-            # C23/Reilience: reasoning models (GPT-OSS) occasionally return only
-            # reasoning_content during cold reload despite "Reasoning: none".
+            # C23/Resilience: reasoning models (GPT-OSS) occasionally return only
+            # reasoning_content during cold reload despite "Reasoning: low" (D2359).
             # Treat as retryable (KeyError-style) instead of crashing.
             if content is None:
                 raise KeyError("content missing from message (reasoning-model cold reload?)")

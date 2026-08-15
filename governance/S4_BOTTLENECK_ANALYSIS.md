@@ -4,6 +4,13 @@
 > **Method:** code trace + live OMLX latency measurements (NOT estimates). All timings below
 > were measured against `http://localhost:11435` on this host.
 
+> **⚠️ CORRECTION (2026-08-14, post-publication):** this doc cites GPT-OSS focused-depth accuracy
+> as **"87.5%"** (the D2249 claim). The authoritative production-path benchmark
+> (`tools/benchmark_s4_depth_frugal.py`, n=8 stratified) measures **75.0%**, and the 50-FB golden
+> production verify (`s4_depth_d2359_gptoss_production_verify.json`) measures **72.0%**. The "87.5%"
+> figure was a governance claim that drifted from the benchmark; **do not cite it as current.**
+> See `governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md`.
+
 ---
 
 ## 1. TL;DR
@@ -56,7 +63,7 @@ optional.
    short prompt restores 87.5%) → ~10 s/FB.
 
 Total ≈ **25 s/FB ≈ 2.4 FBs/min**. (Handoff's "3.5 FBs/min" assumed the depth-focused call
-was cheaper than measured.) At ~13k FBs that is ~62 h.
+was cheaper than measured.) At ~12,964 FBs that is ~142 h (D2363 — production runs merged 39.5s/FB; §3's 25s/FB assumed batch CRIBS which batch_enabled:false disables).
 
 The depth-focused call is **redundant work**: the batch prompt already returns a `depth`
 field, which is then *discarded* and recomputed serially at ~10 s/FB.
@@ -132,7 +139,7 @@ Silicon unified memory (already constrained at ~24 GB).
 ## 7. Recommendation
 
 For the **T1.1 full run**, do **both P0 items** (batch depth + fast-model depth) — they are
-low-risk, code-only, and drop S4 from ~25 s/FB toward ~15–17 s/FB (~62 h → ~40 h). Defer
+low-risk, code-only, and drop S4 from ~25 s/FB toward ~15–17 s/FB (~142 h → re-measure under D2363; the merged call — not depth — is the real bottleneck). Defer
 distillation and speculative decoding to T1.2. **Do not** silently swap the classifier back
 to Phi-4-mini — that re-introduces BUG-053 hallucination risk and the 38% long-prompt depth
 error that D2249 fixed.

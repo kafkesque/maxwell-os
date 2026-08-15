@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-14T15:15:00Z'
-total_decisions: 350
+total_decisions: 352
 decisions:
 - id: D2092
   category: INF
@@ -1827,15 +1827,16 @@ decisions:
 - id: D2253
   date: '2026-08-10'
   category: PERF
-  status: active
+  status: superseded
   title: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
   summary: 'Naive 100h estimate (12964x28s/1 worker) ignored tiered+parallel arch. Real: 79.7% single-source (12s simplified
     prompt), 20.3% convergent (28s few-shot), 3 workers, merged S4 (45% faster), S5 ~3s/FB. Result: S2~18.7h + S4~3.9h + S5~0.7h
-    = ~21-26h wall-clock.'
-  impact: T1.1 demoted from weeks to next-day production job (~1 day).
+    = ~21-26h wall-clock. [SUPERSEDED by D2362: S4 figure was impossible — measured 25s/FB serial = ~90h, not 3.9h.]'
+  impact: 'T1.1 demoted from weeks to next-day production job (~1 day). [INVALIDATED: S4 alone is ~90h serial.]'
   files:
   - governance/ROUNDTABLE_MASTER_PROMPT.md
-  state: ACTIVE
+  state: SUPERSEDED
+  superseded_by: D2362
 - id: D2254
   date: '2026-08-10'
   category: GOV
@@ -2799,6 +2800,18 @@ decisions:
   - pipeline/stage4_merged_call.py
   - config/pipeline_config.yaml
   created: '2026-08-14'
+- id: D2362
+  category: PERF
+  state: ACTIVE
+  description: 'D2253 cost-model reconciliation (supersedes D2253): S4 is NOT 3.9h. Same-day measured latency (governance/S4_BOTTLENECK_ANALYSIS.md) puts GPT-OSS depth at ~25s/FB serial — 13,000 FBs ≈ 90h for S4 alone, with zero parallelism in stage4_merge.py (no ThreadPool/max_workers). D2253 implied 1.08s/FB, but the fastest GPT-OSS call ever measured is 4.0s (and that one failed empty). Also: production runs merged_cribs_classify() (batch_enabled:false), whose per-FB cost is UNMEASURED in any committed artifact. Corrected T1.1 estimate: ~110-140h serial, not 21-26h. Next actions: (1) measure merged_cribs_classify() per-FB, (2) re-verify S2 40.9s/cluster (D2360) against D2253 tiered ~15-18s assumption, (3) reconcile the 6 docs citing 21-26h.'
+  champion: 2026-08-15 session
+  target_files:
+  - config/decisions.yaml
+  - DECISION-LOG.md
+  - governance/ROUNDTABLE_MASTER_PROMPT.md
+  - governance/aggregated_remaining_tasks.md
+  - MASTER-TASK-REGISTER.md
+  created: '2026-08-15'
 - id: D2361
   category: BUGFIX
   state: RESOLVED
@@ -2814,18 +2827,33 @@ decisions:
   champion: 2026-08-14 session
   target_files: []
   created: '2026-08-14'
+- id: D2363
+  category: PERF
+  state: ACTIVE
+  description: 'D2362 next-action #1 COMPLETED: measured merged_cribs_classify() (the REAL production path, batch_enabled=false) = 32.29s/FB median (n=6, range 30-72s) = ~116h merged call alone. Full S4 = merged (32.29s) + focused depth (7.2s) = ~39.5s/FB median = ~142h (mean ~184h), superseding the 25s/FB=90h figure which used the batch CRIBS path production does NOT run. T1.1 ~160-200h serial, not 110-140h. Also: depth-bias relabeled 13 golden FBs (12 domain->cross-domain, 1 reverse) via 3-model vote; golden hash wired to full SHA-256 (tools/verify_golden_hash.py).'
+  champion: 2026-08-15 session
+  target_files:
+  - config/decisions.yaml
+  - DECISION-LOG.md
+  - governance/ROUNDTABLE_MASTER_PROMPT.md
+  - config/golden/.golden_meta.json
+  - tools/verify_golden_hash.py
+  - tools/benchmark_s4_merged_production.py
+  - tools/relabel_depth_bias.py
+  - tools/apply_depth_relabel.py
+  created: '2026-08-15'
 summary:
-  total: 350
+  total: 352
   proposed: 0
   draft: 1
-  active: 295
+  active: 297
   stale: 0
-  superseded: 13
+  superseded: 14
   archived: 8
   rejected: 7
   by_category:
     INF: 176
-    QLT: 32
+    QLT: 33
     GOV: 20
     RES: 4
     DAT: 4
@@ -2833,15 +2861,15 @@ summary:
     VAL: 8
     CLS: 15
     STR: 1
-    PERF: 6
-    BUGFIX: 32
+    PERF: 9
+    BUGFIX: 38
     CFG: 5
-    ARCH: 22
+    ARCH: 23
     pipeline-fix: 2
     governance: 1
     BUG: 1
     QA: 4
     OPS: 1
-    MODEL: 1
+    MODEL: 2
     DATA: 3
     validation: 1

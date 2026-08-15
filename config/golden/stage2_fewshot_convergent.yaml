@@ -145,7 +145,7 @@ examples:
       $279 model suddenly looked reasonable and sales nearly doubled
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'Three independent sources (Ariely, Kahneman, Poundstone) with three different empirical cases
 
     (Economist subscriptions, general dominance logic, Williams-Sonoma bread makers) converging
@@ -356,7 +356,7 @@ examples:
     - this pleasure of resolution is what makes moderately complex figures persuasive
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'Two independent research traditions converge on the inverted-U relationship between
 
     metaphor complexity and persuasive impact: Forceville (cognitive linguistics,
@@ -456,7 +456,7 @@ examples:
     - The effect is strongest when people are uncertain about what to do
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'Cialdini provides the mechanism (similarity amplifies social proof under uncertainty).
 
     Heath provides the narrative application (NFL Films example). Convergent extraction must
@@ -764,7 +764,7 @@ examples:
     - default option is the one that will be chosen if the decision-maker does nothing
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'CONVERGENT POSITIVE — DEFAULT EFFECT. Three independent sources (Thaler/Sunstein on defaults, Thaler on retirement
     savings, Ariely on choice overload, Sunstein on sludge) converge on the same mechanism: defaults stick because opting
     out requires costly analytical deliberation, and the default becomes the loss-reference point. Thaler provides the term
@@ -883,7 +883,7 @@ examples:
       perceptions
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'STEM domain expansion: economics/game theory, sourced from real cluster_90 in the S1.5 bge-m3 run (3 books,
     cohesion=0.865). Three independent sources (Dixit/Nalebuff, Graham, Parrish) converging on Keynes'' beauty contest mechanism.
     The mechanism explicitly traces recursion levels (1→2→k) and identifies the compounding-error dynamic that produces speculative
@@ -976,7 +976,7 @@ examples:
     - elements placed close together are perceived as more related than elements placed far apart
     - When related controls are physically grouped together, users infer a mapping between them
     - Related content shares consistent spacing while unrelated content is separated by larger gaps
-    depth: domain
+    depth: cross-domain
     extraction_type: empirical_pattern
     content_type: principle
   rationale: "Three independent design references (Lidwell, Norman, Lupton) converge on the same\nprinciple: spatial proximity\
@@ -1151,7 +1151,7 @@ examples:
     - Progressive disclosure is the practice of showing only the essential controls
     - Novices need simplicity; experts need efficiency
     - Reducing the number of visible options at any moment
-    depth: domain
+    depth: cross-domain
     extraction_type: normative_heuristic
     content_type: principle
   rationale: "Krug, Cooper, and Norman converge on progressive disclosure as the UX principle for\nmanaging complexity. Demonstrates\
@@ -1881,7 +1881,7 @@ examples:
     - Habit stacking is a strategy for pairing a new habit with an existing one
     - New habits are easier to form when they are attached to an existing cue
     - Anchoring is the most reliable way to install a new habit
-    depth: domain
+    depth: cross-domain
     extraction_type: causal_mechanism
     content_type: principle
   rationale: 'Clear, Duhigg, and Fogg converge on anchoring new habits to existing cues.
@@ -1945,7 +1945,7 @@ examples:
     - Once a product enters the consumer's reference bundle, the consumer will pay more to keep it
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: Three genuinely independent sources converge on the endowment effect from complementary angles — Kahneman providing
     the empirical proof and reference-point model, Thaler coining the term and identifying real-world implications, and Akerlof
     & Shiller providing the market-structure perspective on how firms systematically exploit the bias. The mechanism (loss
@@ -2696,7 +2696,7 @@ examples:
       change a system's architecture, you must first change the team's communication structure.
     extraction_type: causal_mechanism
     content_type: principle
-    depth: domain
+    depth: cross-domain
     evidence_passages:
     - When you add people, the existing team must spend time bringing newcomers up to speed, and the communication channels
       grow quadratically — n people have n(n-1)/2 communication paths.
@@ -3428,7 +3428,7 @@ examples:
     - they satisfice, picking the first reasonable option
     extraction_type: descriptive_model
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: 'DESCRIPTIVE MODEL — goal hierarchy classification. Cooper''s three-level goal taxonomy and Krug''s user behavior
     observations converge on a descriptive framework: users operate at multiple goal levels and good design must serve all
     of them. This is a descriptive MODEL (classifies user goals into a hierarchy), not a causal mechanism. Application is
@@ -3544,7 +3544,7 @@ examples:
       the consistency drive.
     extraction_type: normative_heuristic
     content_type: principle
-    depth: domain
+    depth: cross-domain
   rationale: NORMATIVE HEURISTIC — complementary mechanisms, NOT convergent. Clear's habit stacking (cue automation) and Cialdini's
     commitment-consistency (self-image drive) are two DISTINCT behavioral mechanisms that address the same problem (behavior
     change). They do not share a causal structure — they are complementary tools. Teaches S2 to distinguish 'complementary
@@ -4499,7 +4499,7 @@ examples:
     - The model provides the vocabulary for distinguishing between different flavors of achievement-oriented personality
     extraction_type: descriptive_model
     content_type: principle
-    depth: cross-domain
+    depth: domain
   rationale: 'NEW DESCRIPTIVE MODEL (D2234 completion: DM 9→12). Cain and Duckworth converge on the same descriptive model
     of personality (the Big Five/OCEAN taxonomy), using it for different purposes: Cain to describe the introversion-extraversion
     spectrum, Duckworth to decompose conscientiousness into achievement-relevant sub-facets. This is a DESCRIPTIVE MODEL because

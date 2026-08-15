@@ -25,7 +25,7 @@
 | V6 | Bug | `apply_depth_relabel.py:53` list-form silent-drop (CONV-037/039) | ✅ DONE (this session) |
 | V7 | Gov | DECISION-LOG.md D2351–D2363 gap (IDs lived only in decisions.yaml/buglog) | ✅ DONE (D2368) — backfilled 12 entries; D2363 dedup'd |
 | V8 | Data | Golden depth imbalance: universal=1, specialized=1 (23 `None` are NEGATIVE route=NULL examples, NOT gaps) | ✅ DONE-partial (D2369) — CONV-054 (universal) + CONV-055 (specialized) added with genuine 2-book convergence; universal 1→2, specialized 1→2; hash re-stamped. Full ≥5/≥5 = T-015 remainder |
-| V9 | Ops | Kill/restart resume test before the 39h run | ✅ MECHANISM LIVE-VERIFIED (D2369) — 3-book run confirmed `--run-id` scoping + run-scoped `pipeline_resume.json` + `--resume-from stage2`. Kill-at-20-FBs NOT exercisable at `--books 3` (yields 1 FB) — needs a domain slice (~279 FBs) |
+| V9 | Ops | Kill/restart resume test before the 39h run | ✅ DONE (D2370) — root cause: runner resume is STAGE-granular + SIGINT-only (no SIGTERM handler, no process group); S4 (the 39h stage) had NO intra-stage checkpoint. FIXED: S4 now checkpoints every 5 clusters (`.segids`/`.state.json`) + skip-on-resume. Live `kill -9` + resume verified on 20-cluster subset. The `kill -TERM` procedure was WRONG (orphans child, never writes marker) — superseded |
 
 > **Refuted false alarms (verified):** Qwen "D2229 sqlite-vec 1024→512 → S6 crash" is FALSE (code reads
 > `S15_EMBED_DIM`; only the log status string was stale). DeepSeek/Qwen "CONV-037/039 missing depth" is FALSE
@@ -38,14 +38,17 @@
 - **Corpus candidates (verbatim counts):** universal — network effect (221), natural selection (326), power law/Pareto (161), prisoner's dilemma (65), second law/entropy (49); specialized — kerning (488), color space (332), double-entry (17), Nyquist (25), B-tree (9), cryptographic hash (8).
 - **Procedure:** (1) grep `knowledge pipeline/stage1_chunk/latest/checkpoint.jsonl`; (2) confirm the passage states a principle + mechanism + boundary/consequence; (3) extract verbatim `evidence_passage` + `source_book` + `segment_id`; (4) write name/definition/mechanism/boundary/consequence/discipline/domains/depth; (5) re-stamp `.golden_meta.json` (verify_golden_hash.py now hard-gates preflight); (6) re-run depth benchmark to confirm no classifier regression.
 
-### V9 — Kill/restart resume test — PROCEDURE (pre-launch)
-- ⚠️ **Pre-condition (D2369):** `--books 3` yields only ~1 convergent FB (the 3 default books are single-source-dominant).
-  The kill-at-20-FBs test MUST use a high-overlap domain slice (e.g. the canary pricing/influence 25K-segment set → 279 FBs), not `--books 3`.
-- Start: `python pipeline/runner.py --run-id resume-test-1 --domain pricing --stages 1.5,2,4,5,6`  (or `--books N` with N chosen for ≥20 convergent FBs)
-- After ~20 FBs commit: `kill -TERM <pid>`
-- Resume: `python pipeline/runner.py --run-id resume-test-1 --resume-from stage4`
-- Verify: no duplicate `fb_id`, no skipped FBs, same checkpoint lineage, no COMPLETE manifest before S6.
-- **Verified so far (D2369):** run-scoped `pipeline_resume.json` (D2184), `--run-id` pre-parse (D2339), `--resume-from stage2` — all confirmed live.
+### V9 — Kill/restart resume test — SUPERSEDED by D2370 (S4 intra-stage checkpoint)
+- **Finding (D2370):** the runner's resume marker is **stage-granular** and **SIGINT-only** — there is no SIGTERM
+  handler and `subprocess.run(..., capture_output=False)` launches S4 with no process group. So the old procedure
+  (`kill -TERM <runner_pid>`) would (a) never write the paused marker and (b) orphan the S4 child to keep running.
+  The correct interrupt is SIGINT (Ctrl+C / `kill -INT`), but even that only marks the STAGE, not progress within S4.
+- **Fix shipped (D2370):** S4 now writes an intra-stage incremental checkpoint every `stage4.checkpoint_interval`
+  (5) clusters — atomic `.segids` (processed IDs) + `.state.json` (counters) — and resumes from it on re-entry,
+  independent of the runner's signal handler. **Survives `kill -9`** up to the last checkpoint.
+- **Verified live:** `run_id=s4-restest`, 20-cluster subset — checkpoint fired at 5 clusters, hard `kill -9`, re-run
+  printed `S4 resuming: 5 FBs ... — 15 remaining` and resumed from cluster #6 (skipped the 5 checkpointed).
+- Remaining pre-launch op (optional): re-run the full canary slice to confirm no `fb_id` dup/skip after a live resume.
 
 ---
 

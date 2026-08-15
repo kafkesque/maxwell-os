@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -51,6 +52,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
+    S4_CHECKPOINT_INTERVAL,  # D2370: intra-stage incremental checkpoint cadence (clusters)
     S4_CONTEXT_SIGNALS,  # D2364/C12 (X7): domain→context signal sets (was hardcoded)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
@@ -863,6 +865,59 @@ def _log_cribs_warnings(fb_data: dict) -> None:
         fb_name = str(fb_data.get("name", "?"))[:40]
         print(f"⚠️CRIBS({len(warnings)})", flush=True, end=" ")
 
+def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state: dict) -> None:
+    """D2370: crash-safe intra-stage S4 checkpoint (mirrors S2's D2154 pattern).
+
+    The long serial S4 stage (~39h on ~3,556 FBs) previously wrote its checkpoint
+    ONCE at the end — a mid-run kill lost every FB processed so far. This writes an
+    incremental snapshot, atomically (tempfile → fsync → os.replace, C6), of:
+
+      1. STAGE4_CHECKPOINT — the FB JSONL so far (self-verified, BUG-106 parity).
+      2. <checkpoint>.segids — processed cluster IDs (skip-on-resume).
+      3. <checkpoint>.state.json — counters not recoverable from FB records
+         (classification_errors / name_collisions) so the D2338 fail-closed gate
+         stays correct across a resume. `failed` is deliberately NOT persisted:
+         failed (no-FB) clusters are not marked processed, so they are retried on
+         resume and re-counted (temp=0.0 makes a stale persisted count a double-count).
+
+    Args:
+        fbs: Accumulated FB records (partial).
+        processed_ids: Cluster IDs already appended (successful + quarantined-classification).
+        scalar_state: dict of {classification_errors, name_collisions}.
+    """
+    content = "\n".join(json.dumps(f, ensure_ascii=False) for f in fbs) + "\n"
+    safe_write(STAGE4_CHECKPOINT, content, force_shrink=True)
+    load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint self-check")  # raises if corrupt
+
+    segids_file = str(STAGE4_CHECKPOINT) + ".segids"
+    segids_tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".segids", delete=False, dir=str(STAGE4_CHECKPOINT.parent)
+    )
+    try:
+        json.dump(sorted(processed_ids), segids_tmp)
+        segids_tmp.flush()
+        os.fsync(segids_tmp.fileno())
+        segids_tmp.close()
+        os.replace(segids_tmp.name, segids_file)
+    except Exception:
+        if os.path.exists(segids_tmp.name):
+            os.unlink(segids_tmp.name)
+
+    state_file = str(STAGE4_CHECKPOINT) + ".state.json"
+    state_tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".state", delete=False, dir=str(STAGE4_CHECKPOINT.parent)
+    )
+    try:
+        json.dump(scalar_state, state_tmp)
+        state_tmp.flush()
+        os.fsync(state_tmp.fileno())
+        state_tmp.close()
+        os.replace(state_tmp.name, state_file)
+    except Exception:
+        if os.path.exists(state_tmp.name):
+            os.unlink(state_tmp.name)
+
+
 def run_stage4(cluster_ids: list[int | str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
@@ -902,19 +957,66 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                 if any(pid in valid_ids for pid in c.get("principle_ids", []))
             ]
 
-    print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters")
+    # D2370: capture the pre-resume cluster total BEFORE filtering. The D2338
+    # fail-closed gate must divide failures by the FULL cluster count, not the
+    # remaining-after-resume subset (which would understate the failure ratio).
+    total_clusters: int = len(clusters)
+
+    # ── D2370: intra-stage resume (crash recovery for the long serial S4) ──
+    # Mirrors S2's D2154 resume block: reload the partial checkpoint + segids and
+    # skip already-processed clusters instead of re-running hours of LLM work.
+    fbs: list[dict] = []
+    processed_ids: set[str] = set()
+    _scalar_state: dict = {"classification_errors": 0, "name_collisions": 0}
+    _segids_file: str = str(STAGE4_CHECKPOINT) + ".segids"
+    _state_file: str = str(STAGE4_CHECKPOINT) + ".state.json"
+    if STAGE4_CHECKPOINT.exists() and os.path.exists(_segids_file):
+        try:
+            fbs.extend(load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint"))
+            with open(_segids_file) as _sf:
+                processed_ids = set(json.load(_sf))
+            if os.path.exists(_state_file):
+                with open(_state_file) as _stf:
+                    _scalar_state = json.load(_stf)
+            # D2215-style format guard: zero overlap with current targets means the
+            # sidecar belongs to a different corpus/probe format — discard, don't
+            # silently re-process or silently skip the wrong clusters.
+            target_cids: set[str] = {c.get("cluster_id", "") for c in clusters}
+            if processed_ids and not (processed_ids & target_cids):
+                print(f"   ⚠️  S4 resume segids mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(target_cids)} targets")
+                print("   ⚠️  Starting fresh — prior S4 progress discarded")
+                processed_ids = set()
+                fbs = []
+                _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+            else:
+                _n_remaining = sum(1 for c in clusters if c.get("cluster_id") not in processed_ids)
+                print(f"   📋 S4 resuming: {len(fbs)} FBs from {len(processed_ids)} clusters done — {_n_remaining} remaining")
+                clusters = [c for c in clusters if c.get("cluster_id") not in processed_ids]
+        except Exception as e:
+            # D2177 (C16): log + fresh start — never silently discard or silently trust
+            import traceback
+            print(f"   ⚠️  S4 resume checkpoint corrupted ({type(e).__name__}: {e})")
+            print("   ⚠️  Starting fresh — prior S4 progress discarded")
+            print(f"   ⚠️  Traceback: {traceback.format_exc()[-300:]}")
+            fbs = []
+            processed_ids = set()
+            _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+
+    print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters"
+          + (f" (resuming: {len(fbs)} FBs already done)" if processed_ids else ""))
     print(f"   Model: {VERIFY_MODEL} | temp=0.0 | CRIBS classify")
     print(f"{'='*60}")
 
-    fbs = []
     process_templates = []   # D2072: process templates (repeatable how-to methods)
     process_instances = []   # D2072: concrete case studies
     growth_edges = []        # D2073: speculative insights (pipeline-extracted)
     tool_instructions = []   # D2072: tool-specific commands
-    failed = 0
-    classification_errors = 0
-    name_collisions = 0
-    existing_names: set[str] = set()  # D2069: batch-level uniqueness tracking
+    failed = 0  # D2370: failed clusters are NOT marked processed → retried on resume (re-counted, not restored)
+    classification_errors = int(_scalar_state.get("classification_errors", 0))
+    name_collisions = int(_scalar_state.get("name_collisions", 0))
+    # D2069: rebuild the name-uniqueness set from the partial FBs (names already
+    # normalized + disambiguated, so the set is exactly the taken names).
+    existing_names: set[str] = {fb.get("name", "") for fb in fbs}
     pipeline_commit = get_pipeline_commit()
     pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
 
@@ -1451,10 +1553,18 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         fb["pipeline_run_id"] = pipeline_run_id
         fb["pipeline_commit"] = pipeline_commit
         fbs.append(fb)
+        processed_ids.add(cluster_id)
 
         elapsed = time.time() - start
         err_str = f" ({len(errors)} label errors)" if errors else ""
         print(f"→ ✅ '{name}'{err_str} ({elapsed:.1f}s)")
+
+        # D2370: incremental checkpoint every N clusters (mirrors S2 D2154)
+        if S4_CHECKPOINT_INTERVAL > 0 and len(processed_ids) % S4_CHECKPOINT_INTERVAL == 0:
+            _write_s4_checkpoint(fbs, processed_ids, {
+                "classification_errors": classification_errors,
+                "name_collisions": name_collisions,
+            })
 
     # ── P1.4: Compute FB relationship edges (LightRAG foundation) ────
     if len(fbs) > 1:
@@ -1465,6 +1575,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         STAGE4_CHECKPOINT,
         "\n".join(json.dumps(f, ensure_ascii=False) for f in fbs) + "\n",
     )
+
+    # D2370: clear resume sidecars — a completed run must not read as a partial resume
+    for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json"):
+        if os.path.exists(_sidecar):
+            os.unlink(_sidecar)
 
     # ── D2073: Save growth edges separately ───────────────────────────
     ge_path = STAGE4_CHECKPOINT.parent / S4_GE_OUTPUT
@@ -1560,7 +1675,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     # S4 previously printed `failed`/`classification_errors` but exited 0, so a
     # partial merge fed a reduced dataset to S5 ("missing knowledge looks like
     # valid absence"). Now a partial merge never looks like success.
-    total_clusters: int = len(clusters)
+    # D2370: total_clusters was captured BEFORE the resume filter (see above) —
+    # the gate must divide failures by the full cluster count, not the
+    # remaining-after-resume subset.
     if total_clusters > 0:
         combined_failures: int = failed + classification_errors
         failure_ratio: float = combined_failures / total_clusters

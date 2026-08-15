@@ -1,10 +1,10 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-15 (D2369: V8 golden depth expansion + V9 resume live-verified; 5-LLM verification round adjudicated)
+# Updated: 2026-08-15 (D2370: S4 intra-stage incremental checkpoint — 39h-stage crash recovery, live kill -9 + resume verified)
 
 session:
     version: "3.0.0"
-    pipeline_commit: v3.0-D2369
+    pipeline_commit: v3.0-D2370
     schema_version: "3.0"
     project_root: knowledge pipeline/
 
@@ -141,11 +141,12 @@ phase:
         - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config key
         - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized (1→2 each)
         - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
+        - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume verified on 20-cluster subset
     pending:
         - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py (reuse S1.5 clusters)
         - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256 (gated, BUG-132)
         - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining per-principle)
-        - V9 remainder: kill-at-20-FBs resume test on a high-overlap domain slice (not --books 3)
+        - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id dup/skip after a live resume
         - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now unblocked by BUG-132)
         - BUG-104 (🟠 env, non-blocking): sqlite-vec load_extension missing on python.org Python 3.12.1 → FTS-only retrieval
         - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)

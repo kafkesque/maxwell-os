@@ -4,6 +4,42 @@
 ---
 
 
+### D2370 — S4 intra-stage incremental checkpoint (crash recovery for the 39h serial stage) (2026-08-15)
+**Category:** INF / OPS
+
+**Context:** The V9 "kill/restart" test was found to be testing the wrong layer. The runner's resume marker is
+**stage-granular** (`runner.py: _write_resume_marker` after each completed stage), and the only interrupt path is
+`except KeyboardInterrupt` — there is **no SIGTERM handler**, and `subprocess.run(..., capture_output=False)` launches
+S4 with no process group. So `kill -TERM <runner_pid>` (the MTR V9 procedure) would (a) never write the paused marker
+and (b) orphan the S4 child. Meanwhile **S2 already has intra-stage checkpointing** (D2154: incremental checkpoint every
+5 clusters + atomic `.segids`), but **S4 — the ~39h serial stage — wrote its checkpoint ONCE at the end** (`safe_write`
+after the loop). A mid-run kill on S4 lost every FB processed so far. This was the real single point of failure hiding
+behind the V9 "not enough FB samples" observation.
+
+**Change:** Added D2370 intra-stage incremental checkpointing to `pipeline/stage4_merge.py`, mirroring S2's D2154
+pattern:
+- `_write_s4_checkpoint()` — atomic (tempfile → fsync → `os.replace`, C6) snapshot of: (1) `STAGE4_CHECKPOINT` JSONL
+  (self-verified via `load_jsonl`, BUG-106 parity), (2) `<checkpoint>.segids` (processed cluster IDs), (3)
+  `<checkpoint>.state.json` (counters not recoverable from FB records: `classification_errors` / `name_collisions`).
+- Fires every `stage4.checkpoint_interval` clusters (default 5, config-driven — C12).
+- Resume block at the top of `run_stage4`: reloads partial `fbs` + `segids` + `state`, filters already-processed
+  clusters, rebuilds `existing_names` from partial FBs. D2215-style format guard discards a stale/mismatched sidecar.
+- `failed` is deliberately NOT persisted (failed/no-FB clusters are not marked processed → retried + re-counted);
+  `classification_errors` IS persisted (quarantined FBs are final, marked processed, not retried).
+- `total_clusters` is captured **before** the resume filter so the D2338 fail-closed gate divides by the full count.
+- Sidecars are cleared after the final write so a completed run never reads as a partial resume.
+
+**Verification (live, `run_id=s4-restest`, 20-cluster subset of the canary S2 checkpoint):**
+- Periodic checkpoint fired at 5 clusters: `checkpoint.jsonl` (5 FBs) + `.segids` (5 IDs) + `.state.json` written.
+- Hard `kill -9` (not SIGINT — proving recovery does NOT depend on the runner's signal handler).
+- Re-run detected `S4 resuming: 5 FBs from 5 clusters done — 15 remaining` and resumed from cluster #6 (skipped the 5
+  checkpointed clusters), first re-processed cluster `cluster_48_s1_sub0`.
+- `py_compile`, `config_audit --strict`, `just health` (10/10), and an isolated write/read roundtrip all pass.
+
+**Config:** `stage4.checkpoint_interval: 5` (pipeline_config.yaml) → `S4_CHECKPOINT_INTERVAL` (pipeline_paths.py).
+
+---
+
 ### D2369 — V8 golden depth expansion (2 converged positives) + V9 live resume verification (2026-08-15)
 **Category:** DAT / OPS
 

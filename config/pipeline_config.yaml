@@ -4,7 +4,7 @@ run:
 pipeline_manifest:
   schema_version: '3.0'
   taxonomy_version: v5.1
-  pipeline_commit: v3.0-D2369
+  pipeline_commit: v3.0-D2370
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     classifier: gpt-oss-20b-MXFP4-Q8
@@ -105,7 +105,7 @@ models:
   # nli_cross: REMOVED (D2298) — RoBERTa-large added zero signal on paraphrase evidence (D2227).
 pipeline:
   schema_version: '3.0'
-  commit: v3.0-D2369
+  commit: v3.0-D2370
   taxonomy_version: v5.1
   max_domains_per_fb: 5
   chunk_size_words: 300
@@ -273,6 +273,7 @@ stage4:
   - optimization
   - gradient
   max_failed_ratio: 0.0   # D2338: fail-closed merge — if (failed + classification_errors)/total > this ratio, exit non-zero (0.0 = any failure fatal)
+  checkpoint_interval: 5   # D2370: intra-stage incremental checkpoint cadence (clusters) — crash recovery for the long serial S4
 s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3

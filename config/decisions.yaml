@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-15T19:10:00Z'
-total_decisions: 358
+last_sync: '2026-08-15T20:10:00Z'
+total_decisions: 359
 decisions:
 - id: D2092
   category: INF
@@ -2918,11 +2918,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-15'
+- id: D2370
+  category: INF / OPS
+  state: ACTIVE
+  description: 'S4 intra-stage incremental checkpoint (crash recovery for 39h serial stage) — periodic atomic snapshot + .segids/.state.json skip-on-resume, mirrors S2 D2154; live kill -9 + resume verified on 20-cluster subset'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-15'
 summary:
-  total: 358
+  total: 359
   proposed: 0
   draft: 1
-  active: 303
+  active: 304
   stale: 0
   superseded: 14
   archived: 8
@@ -2953,3 +2960,4 @@ summary:
     GOV / PERF: 1
     INF / GOV: 1
     DAT / OPS: 1
+    INF / OPS: 1

@@ -4,6 +4,42 @@
 ---
 
 
+### D2369 — V8 golden depth expansion (2 converged positives) + V9 live resume verification (2026-08-15)
+**Category:** DAT / OPS
+
+**Context:** Follow-on to D2368, executing the two deferred items (V8 golden expansion, V9 resume test) the user
+requested "logically sequentially."
+
+**V8 — Golden depth expansion (DONE, partial):**
+- Added 2 new convergent-positive golden examples to `config/golden/stage2_fewshot_convergent.yaml`:
+  - **CONV-054** `Price of Anarchy — Rational Self-Interest vs Collective Optimum` (`depth: universal`) — genuine
+    2-book convergence: *Algorithms to Live By* (Christian & Griffiths) + *The Art of Strategy* (Dixit & Nalebuff),
+    both stating the dominant-strategy/equilibrium-suboptimality paradox. extraction_type=`descriptive_model`.
+  - **CONV-055** `Cryptographic One-Way Hashing for Secret Storage` (`depth: specialized`) — genuine 2-book
+    convergence: *Building Generative AI Services with FastAPI* (Parandeh) + *Coding with ChatGPT* (Hall), both stating
+    one-way/non-reversible hashing + MD5 collision weakness. extraction_type=`normative_heuristic`.
+- Depth distribution moved universal 1→2, specialized 1→2 (cross-domain 37, domain 11 unchanged; 23 `depth:null`
+  remain NEGATIVE `route:NULL` examples, correctly NOT labelled).
+- `.golden_meta.json` re-stamped: `golden_sha256` updated, `pipeline_commit: 76b0cce`. `verify_golden_hash.py` PASS.
+- **Deliberately NOT fabricated:** power-law was NOT re-added as universal (already covered as cross-domain CONV-038);
+  the full ≥5/≥5 target remains a verbatim-mining task (corpus candidates identified but second-book convergence must be
+  verified per-principle before authoring — no golden-label fabrication).
+
+**V9 — Resume mechanism verification (DONE, live — kill/restart-at-scale NOT exercisable at 3-book scale):**
+- Ran a real 3-book `--run-id resume-test-1 --stages 0,1,1.3,1.5,2` run (Tipping Point / $100M Offers / Visual Metaphor).
+  Verified live: (1) `--run-id` pre-parse (D2339) correctly scopes ALL stage outputs to `resume-test-1/`; (2) run-scoped
+  `pipeline_resume.json` (D2184) written with correct `run_id`/`last_stage`; (3) `--resume-from stage2` re-enters cleanly.
+- **Finding:** the 3 advertised books yield only **1 convergent FB** (2 convergent clusters; 21 single-source summary-gated;
+  1 NULL; 1 LLM-failure cluster → S2 fail-closed exit). A "kill after ~20 FBs → resume from stage4" test is therefore
+  **not exercisable** with `--books 3`; it requires a domain subset with high cross-book overlap (e.g. the canary's
+  25K-segment pricing/influence slice → 279 FBs). The V9 procedure in MTR is corrected to state this pre-condition.
+- Fail-closed behavior re-confirmed: S2 refused to advance on 1/24 failed cluster (4.2% > `max_failed_ratio=0.0`).
+
+**Files:** config/golden/stage2_fewshot_convergent.yaml, config/golden/.golden_meta.json, DECISION-LOG.md,
+MASTER-TASK-REGISTER.md, config/decisions.yaml, governance/aggregated_remaining_tasks.md, agent/session_seed.yaml
+**Status:** DONE. V8 = partial (2/2 classes seeded, full ≥5/≥5 pending); V9 = mechanism live-verified (scale test pending a domain slice).
+
+
 ### D2368 — Post-verification implementation: BUG-132 per-call thinking_budget + D2351-2363 backfill + V8/V9 scoped (2026-08-15)
 **Category:** INF / GOV
 

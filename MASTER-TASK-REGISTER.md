@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-15 17:15 | **Decisions:** D2000-D2367 (356 decisions)
+> **Updated:** 2026-08-15 19:12 | **Decisions:** D2000-D2369 (358 decisions)
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -24,24 +24,28 @@
 | V5 | Gov | `pipeline_commit` → v3.0-D2367; buglog 18 header/body emoji align | ✅ DONE (this session) |
 | V6 | Bug | `apply_depth_relabel.py:53` list-form silent-drop (CONV-037/039) | ✅ DONE (this session) |
 | V7 | Gov | DECISION-LOG.md D2351–D2363 gap (IDs lived only in decisions.yaml/buglog) | ✅ DONE (D2368) — backfilled 12 entries; D2363 dedup'd |
-| V8 | Data | Golden depth imbalance: universal=1, specialized=1 (23 `None` are NEGATIVE route=NULL examples, NOT gaps) | 🟡 INVESTIGATED — T-015 spec recorded; corpus candidates verified (network effect 221, natural selection 326, kerning 488). Expansion = deliberate verbatim-mining task (deferred) |
-| V9 | Ops | Kill/restart resume test before the 39h run | 🟡 MECHANISM VERIFIED (D2184 run-scoped resume + D2339 --run-id pre-parse + --resume-from). Live kill/restart procedure below |
+| V8 | Data | Golden depth imbalance: universal=1, specialized=1 (23 `None` are NEGATIVE route=NULL examples, NOT gaps) | ✅ DONE-partial (D2369) — CONV-054 (universal) + CONV-055 (specialized) added with genuine 2-book convergence; universal 1→2, specialized 1→2; hash re-stamped. Full ≥5/≥5 = T-015 remainder |
+| V9 | Ops | Kill/restart resume test before the 39h run | ✅ MECHANISM LIVE-VERIFIED (D2369) — 3-book run confirmed `--run-id` scoping + run-scoped `pipeline_resume.json` + `--resume-from stage2`. Kill-at-20-FBs NOT exercisable at `--books 3` (yields 1 FB) — needs a domain slice (~279 FBs) |
 
 > **Refuted false alarms (verified):** Qwen "D2229 sqlite-vec 1024→512 → S6 crash" is FALSE (code reads
 > `S15_EMBED_DIM`; only the log status string was stale). DeepSeek/Qwen "CONV-037/039 missing depth" is FALSE
 > (both list-form with `depth: domain`). "~90h"/"160-200h" are stale denominators — correct is ~39h.
 
 ### T-015 — Golden depth expansion (universal/specialized) — SPEC
-- **Goal:** positive-set universal 1 → ≥5, specialized 1 → ≥5 (currently 37 cross-domain + 15 domain dominate).
+- **Goal:** positive-set universal 1 → ≥5, specialized 1 → ≥5 (currently 37 cross-domain + 11 domain dominate).
+- **Progress (D2369):** universal 1→2 (CONV-054 Price of Anarchy), specialized 1→2 (CONV-055 Crypto One-Way Hashing). Both genuine 2-book convergence, verbatim evidence, hash re-stamped.
 - **Correction:** the 23 `depth: null` examples are **NEGATIVE** (route=NULL: platitudes, echoes, non-falsifiable), NOT gaps — do not "label" them.
 - **Corpus candidates (verbatim counts):** universal — network effect (221), natural selection (326), power law/Pareto (161), prisoner's dilemma (65), second law/entropy (49); specialized — kerning (488), color space (332), double-entry (17), Nyquist (25), B-tree (9), cryptographic hash (8).
 - **Procedure:** (1) grep `knowledge pipeline/stage1_chunk/latest/checkpoint.jsonl`; (2) confirm the passage states a principle + mechanism + boundary/consequence; (3) extract verbatim `evidence_passage` + `source_book` + `segment_id`; (4) write name/definition/mechanism/boundary/consequence/discipline/domains/depth; (5) re-stamp `.golden_meta.json` (verify_golden_hash.py now hard-gates preflight); (6) re-run depth benchmark to confirm no classifier regression.
 
 ### V9 — Kill/restart resume test — PROCEDURE (pre-launch)
-- Start: `python pipeline/runner.py --run-id resume-test-1 --books 3 --stages 1.5,2,4,5,6`
+- ⚠️ **Pre-condition (D2369):** `--books 3` yields only ~1 convergent FB (the 3 default books are single-source-dominant).
+  The kill-at-20-FBs test MUST use a high-overlap domain slice (e.g. the canary pricing/influence 25K-segment set → 279 FBs), not `--books 3`.
+- Start: `python pipeline/runner.py --run-id resume-test-1 --domain pricing --stages 1.5,2,4,5,6`  (or `--books N` with N chosen for ≥20 convergent FBs)
 - After ~20 FBs commit: `kill -TERM <pid>`
 - Resume: `python pipeline/runner.py --run-id resume-test-1 --resume-from stage4`
 - Verify: no duplicate `fb_id`, no skipped FBs, same checkpoint lineage, no COMPLETE manifest before S6.
+- **Verified so far (D2369):** run-scoped `pipeline_resume.json` (D2184), `--run-id` pre-parse (D2339), `--resume-from stage2` — all confirmed live.
 
 ---
 
@@ -79,9 +83,11 @@
 | **B20** | D2350 | S4 identity/provenance: preserve S2 fb_id (no rehash after title-case; 73 records were drifting); preserve real source_cluster id (was overwritten with fb_id); short numeric name-collision suffix (was 64-char hash) | 1h | ✅ DONE |
 
 > **Validation:** `config_audit --check-unchecked --strict` ✅ · `just integrity` 17/17 ✅ · `just healthcheck` 10/10 ✅ ·
-> `just preflight` stress ALL_PASS ✅. **Remaining open:** BUG-106 (S2 checkpoint pretty-print corruption), BUG-104
+> `just preflight` stress ALL_PASS ✅. **Remaining open (as of this session):** BUG-106 (S2 checkpoint pretty-print corruption), BUG-104
 > (sqlite-vec load_extension), 2 single-source FBs leaked (`Hybrid Sorting Algorithm`, `Price Reduction Profit Maximization`),
-> S4 speed (~3.5 FBs/min). Rerun canary pending after these.
+> S4 speed (~3.5 FBs/min). **Subsequently resolved:** BUG-106 ✅ FIXED 2026-08-14 (self-verifying writer); the 2 leaked
+> single-source FBs ✅ FIXED 2026-08-14 (BUG-107 split-probe drops single-source); S4 speed → ~39h not a correctness gate (D2365/D2366).
+> BUG-104 remains 🟠 env-only (FTS fallback, non-blocking).
 
 # 🔴 NEW THIS SESSION — 2nd Audit Adjudication (D2345–D2347, 2026-08-13)
 
@@ -292,13 +298,13 @@
 
 ---
 
-## 🔴 OPEN BUGS (current — 2026-08-13)
+## 🟠 OPEN / PARTIAL BUGS (current — 2026-08-15)
 
 > Older BUG-001/011/012/013/014/045/050/051/054/055/085 resolved in prior sessions (see buglog.md SESSION RESOLUTIONS). None block T1.1.
 
 | Bug ID | Severity | Description |
 |--------|----------|-------------|
-| BUG-063 | 🔴 OPEN | `delegate()` cannot execute filesystem tasks (architectural; NOT a T1.1 pipeline blocker) |
+| BUG-063 | 🟡 PARTIAL | `delegate()` sandbox has no filesystem access (architectural); workaround `pipeline/omlx_delegate.py` is first-class (D2344). NOT a T1.1 pipeline blocker |
 | BUG-098 | 🟡 PARTIAL | `psutil` in requirements.txt done; integrity-check whitelist→requirements refactor deferred |
 | BUG-099 | 🟡 PARTIAL | model-registry rename — session_seed done; config/path rename deferred post-T1.1 |
 
@@ -307,7 +313,7 @@
 | Bug ID | Description |
 |--------|-------------|
 | BUG-083 | `domain_anchors.yaml` predates corpus (80.5% "emerging") — D2292 golden depth expansion |
-| BUG-084 | Golden depth calibration universal=1/specialized=1 — D2292 |
+| BUG-084 | Golden depth calibration — was universal=1/specialized=1; now 2/2 (D2369); full ≥5/≥5 = T-015 |
 | BUG-081 | `evals/golden_cases.json` v2 format migration |
 | BUG-073 | CONV-035/037 false convergence — D2232 |
 
@@ -407,7 +413,7 @@
 | T-007b — S2 positive-fidelity gap | ✅ Hybrid DSPy 0.736 (not wired — see P0.1) |
 | Golden audit | ✅ 0 quality gaps |
 | DSPy validation report | ✅ Hybrid approved |
-| Cost model | ⚠️ T1.1 ~110-140h (D2362 superseded D2253's ~21-26h) |
+| Cost model | ✅ T1.1 ~39h (D2365/D2366 corrected the D2362 ~110-140h and D2253 ~21-26h cluster-vs-FB denominator errors) |
 
 ---
 

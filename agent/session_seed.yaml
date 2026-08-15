@@ -1,10 +1,10 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-14 (T1.1 canary GREEN: S1.5→S6 all exit 0; BUG-105 FIXED via D2348; remaining gate = S4 speed)
+# Updated: 2026-08-15 (D2369: V8 golden depth expansion + V9 resume live-verified; 5-LLM verification round adjudicated)
 
 session:
     version: "3.0.0"
-    pipeline_commit: v3.0-D2298
+    pipeline_commit: v3.0-D2369
     schema_version: "3.0"
     project_root: knowledge pipeline/
 
@@ -120,8 +120,8 @@ boot:
 
 # ── Phase Tracking ──
 phase:
-    current: Phase 1 (v3.0 architecture validation)
-    status: Tier 1 complete (15/18). E2E validated on 3 books. Scaling to 20+ books next.
+    current: Phase 1 (v3.0 architecture validation) — pre-T1.1
+    status: T1.1 CONDITIONAL GO (D2367). All pre-flight blockers closed (B1-B18, V1-V9). Remaining = release hygiene + optional depth/golden balance.
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented
@@ -137,9 +137,16 @@ phase:
         - B17 (P1): e2e convergence metric → sum(c["is_convergent"]) canonical IDs (D2347, BUG-103)
         - B18 (P0): embedding reliability — timeout 180s + keep_alive=-1 (D2348, BUG-105)
         - V1-V6 (P0): T1.1 canary GREEN — 2255 clusters → 279 FBs → 239 PASS → 279 committed
+        - V7 (D2368): DECISION-LOG D2351-D2363 backfilled
+        - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config key
+        - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized (1→2 each)
+        - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
     pending:
         - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py (reuse S1.5 clusters)
-        - S4 SPEED (🟠 blocks full T1.1): gpt-oss-20b classify ~3.5 FBs/min → 62h full-run; re-tune batch/classifier
+        - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256 (gated, BUG-132)
+        - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining per-principle)
+        - V9 remainder: kill-at-20-FBs resume test on a high-overlap domain slice (not --books 3)
+        - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now unblocked by BUG-132)
         - BUG-104 (🟠 env, non-blocking): sqlite-vec load_extension missing on python.org Python 3.12.1 → FTS-only retrieval
         - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)
         - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml

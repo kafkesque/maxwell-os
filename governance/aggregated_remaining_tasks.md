@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-14 13:48 | **Decisions:** D2000-D2355 (344) | **T1.1 canary GREEN (V1–V6); remaining gate = S4 speed + depth correctness**
+> **Updated:** 2026-08-15 19:12 | **Decisions:** D2000-D2369 (358) | **T1.1 canary GREEN (V1–V6); remaining gate = governance/release hygiene (S4 depth + golden depth balance)**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
@@ -8,6 +8,26 @@
 > **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
 > **D2337-D2341 (NEW, 4-LLM audit):** S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections.
 > **D2351-D2355 (NEW, 4-LLM audit × independent re-verification):** S4 depth fail-open, provenance/schema gaps, singleton index, S4 bottleneck. **Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`.**
+
+---
+
+## ✅ #0.6 — D2367/D2368/D2369 verification round + V8/V9 execution (2026-08-15)
+
+> **5-LLM verification round (claude0014/deepseek0013/kimi0013/qwen0013/chatgpt0014) adjudicated + executed.**
+
+| # | Item | Status |
+|---|------|--------|
+| V1 | BUG-132 `thinking_budget` global→per-call (D2368) | ✅ DONE |
+| V2 | Golden-hash → `just preflight` hard gate (D2367) | ✅ DONE |
+| V3 | `decisions.yaml` reconcile + `sync_decisions.py` description fix | ✅ DONE |
+| V4 | Purge stale "98%"/"160-200h"/"~110-140h" denominators | ✅ DONE |
+| V5 | `pipeline_commit` bump + buglog 18 emoji align | ✅ DONE |
+| V6 | `apply_depth_relabel.py` list-form silent-drop | ✅ DONE |
+| V7 | DECISION-LOG D2351–D2363 backfill (D2368) | ✅ DONE |
+| V8 | Golden depth expansion — CONV-054 universal + CONV-055 specialized (D2369) | ✅ DONE-partial (1→2 each; full ≥5/≥5 = T-015) |
+| V9 | Resume mechanism live-verified (D2369) — `--run-id` scoping + run-scoped marker + `--resume-from` | ✅ DONE (kill-at-20-FBs needs a domain slice, not `--books 3`) |
+
+> **Refuted false alarms:** Qwen "D2229 sqlite-vec 1024→512 → S6 crash" (FALSE); DeepSeek/Qwen "CONV-037/039 missing depth" (FALSE — list-form, real bug was relabel tool). Stale "~90h"/"160-200h"/"~110-140h" → correct **~39h**.
 
 ---
 

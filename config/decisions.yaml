@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-15T15:41:08Z'
-total_decisions: 357
+last_sync: '2026-08-15T19:10:00Z'
+total_decisions: 358
 decisions:
 - id: D2092
   category: INF
@@ -2911,11 +2911,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-15'
+- id: D2369
+  category: DAT / OPS
+  state: ACTIVE
+  description: 'V8 golden depth expansion (CONV-054 universal + CONV-055 specialized) + V9 live resume verification (3-book run; kill-at-scale needs domain slice)'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-15'
 summary:
-  total: 357
+  total: 358
   proposed: 0
   draft: 1
-  active: 302
+  active: 303
   stale: 0
   superseded: 14
   archived: 8
@@ -2945,3 +2952,4 @@ summary:
     C12: 1
     GOV / PERF: 1
     INF / GOV: 1
+    DAT / OPS: 1

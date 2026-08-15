@@ -1,10 +1,10 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-15 17:10 (D2367: 5-LLM verification round — thinking_budget is GLOBAL not per-call (BUG-132); T1.1 NO-GO-as-governed until preflight+registry sync)
+> **Last updated:** 2026-08-15 19:12 (D2369: BUG-132 FIXED per-call; V8 golden depth expansion; V9 resume live-verified; T1.1 = CONDITIONAL GO)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
 
-## 🔴 BUG-132 — 2026-08-15 — `thinking_budget` is a single global key shared by merged + depth calls (blocks D2366 "adopt 256")
+## 🟢 BUG-132 — 2026-08-15 — `thinking_budget` was a single global key shared by merged + depth calls (blocks D2366 "adopt 256") — FIXED (D2368)
 - **Symptom:** `models.verifier.thinking_budget` (`config/pipeline_config.yaml:93`) is read once into
   `VERIFY_THINKING_BUDGET` (`pipeline/pipeline_paths.py:109`) and applied unconditionally to any model in
   `VERIFY_REASONING_OFF_MODELS` (`pipeline/omlx_call.py:268-272`). Both `merged_cribs_classify()` and
@@ -98,7 +98,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🟠 BUG-126 — 2026-08-14 — Legacy direct-classify path still not fail-closed (D2357 gap)
+## 🟢 BUG-126 — 2026-08-14 — Legacy direct-classify path still not fail-closed (D2357 gap)
 - **Symptom:** D2357 made `merged_cribs_classify()` and `batch_cribs_classify()` fail-closed, but the legacy direct path (`call_omlx_json(class_prompt)` when both batch and merged are disabled/failed) still turned a sparse response into `emerging`/`cited` via empty-raw-label mapping.
 - **Fix (D2358):** the direct path now raises `SparseClassificationError` on missing `discipline`/`domains`/`evidence` and quarantines the FB (`classification_errors += 1`). `depth` is intentionally not checked there (overridden by the focused depth call). BUG-120 is now unconditional across all configs.
 - **Status:** 🟢 FIXED — 2026-08-14.
@@ -136,21 +136,21 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/intimacy_lattice.py`
 - **Source:** ChatGPT re-audit (BLOCKER #4) + independent re-verification
 
-## 🟠 BUG-122 — 2026-08-14 — `source_principle_ids` empty for v3 FBs (provenance gap)
+## 🟢 BUG-122 — 2026-08-14 — `source_principle_ids` empty for v3 FBs (provenance gap)
 - **Symptom:** S4 read only `p.get("principle_id")` to build `source_principle_ids`, but S2 v3 records emit `fb_id` (not `principle_id`), so the field was `[]` for every normal v3 FB.
 - **Fix (D2357):** read `fb_id` first, retain `principle_id` as legacy fallback (matches the `fb_id or principle_id` pattern used elsewhere in S4).
 - **Status:** 🟢 FIXED — 2026-08-14.
 - **Files:** `pipeline/stage4_merge.py`
 - **Source:** ChatGPT re-audit (HIGH #5) + independent re-verification
 
-## 🟠 BUG-123 — 2026-08-14 — Downstream FB-ID rehash fallback after S4 name normalization (identity drift)
+## 🟢 BUG-123 — 2026-08-14 — Downstream FB-ID rehash fallback after S4 name normalization (identity drift)
 - **Symptom:** `fb = {"fb_id": fb_data.get("fb_id") or make_hash_id(name, definition)}` re-hashed a missing-ID record from the *normalized* name, which would drift from S2's hash of the un-normalized name — breaking the D2350 invariant.
 - **Fix (D2357):** missing `fb_id` is now a hard error (FB quarantined, `failed += 1`), never a silent re-hash. Removed the now-unused `make_hash_id` import.
 - **Status:** 🟢 FIXED — 2026-08-14.
 - **Files:** `pipeline/stage4_merge.py`
 - **Source:** ChatGPT re-audit (HIGH #9) + independent re-verification
 
-## 🟠 BUG-124 — 2026-08-14 — `keywords` rendered as body content; `jargon` rendered before elaboration
+## 🟢 BUG-124 — 2026-08-14 — `keywords` rendered as body content; `jargon` rendered before elaboration
 - **Symptom:** `content_types.yaml` moved `keywords` to `metadata.discovery` and declares `jargon` renders AFTER elaboration (D2349), but `stage6b_anytype_push.py` rendered `**KEYWORDS**` in the body and placed `jargon` in Zone 2 (before Zone 3 elaboration).
 - **Fix (D2357):** `keywords` removed from body rendering and added to YAML frontmatter + JSON payload metadata; `jargon` moved after elaboration in the 3-zone body.
 - **Status:** 🟢 FIXED — 2026-08-14.
@@ -182,21 +182,21 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `config/pipeline_config.yaml`, `pipeline/stage4_merged_call.py`
 - **Source:** 4-LLM audit + independent re-verification
 
-## 🟠 BUG-110 — 2026-08-14 — `source_segments` declared provenance but dropped at S4/S6
+## 🟢 BUG-110 — 2026-08-14 — `source_segments` declared provenance but dropped at S4/S6
 - **Symptom:** `config/content_types.yaml` declares `metadata.provenance: [..., source_segments, ...]`; S2 emits `source_segments`; but S4's FB record rebuild copies `source_clusters`/`source_books`/`source_principle_ids`/`evidence_passages` and **never `source_segments`**. Zero references in `stage4_merge.py`/`stage5_verify.py`/`stage6_commit.py`. Segment-level provenance is lost.
 - **Fix (D2352):** carry `source_segments` into the S4 FB dict + add an S6 column.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (source_segments S4→S6 (D2352)).
 - **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`, `config/content_types.yaml`
 - **Source:** 4-LLM audit (ChatGPT + Claude) + independent re-verification
 
-## 🟠 BUG-111 — 2026-08-14 — `evidence_passages`/`evidence_passages_shown` not persisted to SQLite
+## 🟢 BUG-111 — 2026-08-14 — `evidence_passages`/`evidence_passages_shown` not persisted to SQLite
 - **Symptom:** S4 emits `evidence_passages` + `evidence_passages_shown`; S5 passes them through (`vfb = dict(fb)`); but S6's `fbs` schema + INSERT have no such columns — verbatim source quotes are dropped from the primary SQLite KB. (The Parquet snapshot *does* keep them via full-dict `from_pylist`; `source_text` IS a SQLite column.)
 - **Fix (D2352):** add columns, OR formally document Parquet as the verbatim-evidence store.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (evidence_passages/_shown → SQLite (D2352)).
 - **Files:** `pipeline/stage6_commit.py`
 - **Source:** Claude audit (Q5) + independent re-verification
 
-## 🟠 BUG-112 — 2026-08-14 — `is_summary` declared classification but dropped end-to-end
+## 🟢 BUG-112 — 2026-08-14 — `is_summary` declared classification but dropped end-to-end
 - **Symptom:** `content_types.yaml` declares `is_summary` under `classification`; S2 emits it; but S4's FB dict omits it and S6's INSERT omits it → the `is_summary INTEGER DEFAULT 0` column is never written (always 0).
 - **Fix (D2352):** persist `is_summary` through S4 → S6.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (is_summary end-to-end (D2352)).
@@ -212,14 +212,14 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merge.py`
 - **Source:** ChatGPT audit (Q4, then retracted) + independent re-verification
 
-## 🟠 BUG-114 — 2026-08-14 — Batch missing-output silently becomes synthetic semantic values
+## 🟢 BUG-114 — 2026-08-14 — Batch missing-output silently becomes synthetic semantic values
 - **Symptom:** `batch_cribs_classify()` fills missing FB entries with `defaults = {"depth":"domain","discipline":"emerging","domains":["emerging"],"evidence":"cited",…}` — a missing model output becomes valid-looking semantic data (same C16 hidden-error class as BUG-108).
 - **Fix (D2355):** fail-closed / flag missing entries instead of manufacturing defaults.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (batch missing fail-closed (D2355)).
 - **Files:** `pipeline/stage4_merged_call.py`
 - **Source:** 4-LLM audit + independent re-verification
 
-## 🟠 BUG-115 — 2026-08-14 — Depth benchmark ≠ production parser; 87.5% vs 37.5/50% drift; fallback orphaned
+## 🟢 BUG-115 — 2026-08-14 — Depth benchmark ≠ production parser; 87.5% vs 37.5/50% drift; fallback orphaned
 - **Symptom:** (1) `tools/benchmark_s4_depth_gptoss.py` uses direct `requests` + `reasoning_content` fallback; production `classify_depth_focused()` uses `call_omlx` (raises on `content=None`) + content-only — the benchmark is not a production-path test. (2) governance claims 87.5% focused vs 38% long, while the benchmark docstring still frames GPT-OSS as "third entrant after Phi 37.5% / Gemma 50%". (3) `S4_DEPTH_FALLBACK_DEPTH` is loaded but never used by the focused classifier (only the `elif` branch when `depth_focused_classification=False`).
 - **Fix (D2351):** run benchmark through production `classify_depth_focused()`; make one authoritative number; route fallback through `S4_DEPTH_FALLBACK_DEPTH`.
 - **Status:** 🟢 FIXED — 2026-08-14: `tools/benchmark_s4_depth_frugal.py` runs `classify_depth_focused()` through the PRODUCTION path (`call_omlx` + `_parse_depth_token`, fail-closed) for both GPT-OSS and the frugal depth model. This is now the authoritative depth benchmark (S5 closed). The old `benchmark_s4_depth_gptoss.py` remains as a historical direct-API baseline.
@@ -240,14 +240,14 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/probe_run.py`, `pipeline/repair_elaboration.py`
 - **Source:** Claude audit (Q6) + independent re-verification
 
-## 🟠 BUG-118 — 2026-08-14 — `insert_embedding()` swallows failures silently
+## 🟢 BUG-118 — 2026-08-14 — `insert_embedding()` swallows failures silently
 - **Symptom:** `insert_embedding()` catches `Exception` and returns `False` with no per-FB log; S6 only reports aggregate vector degradation. A partially-unembedded committed corpus is invisible.
 - **Fix (D2355):** log which FB failed; surface in commit summary.
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (insert_embedding logs failures (D2355)).
 - **Files:** `pipeline/stage6_commit.py`
 - **Source:** ChatGPT audit + independent re-verification
 
-## 🟠 BUG-119 — 2026-08-14 — `jargon` (core body) excluded from FTS5
+## 🟢 BUG-119 — 2026-08-14 — `jargon` (core body) excluded from FTS5
 - **Symptom:** FTS5 virtual table indexes only `name, definition, keywords`; `jargon` is classified `core_body` but is not full-text searchable — body content invisible to retrieval.
 - **Fix:** add `jargon` to the FTS5 index (retrieval-policy decision, not persistence loss).
 - **Status:** 🟢 FIXED — implemented 2026-08-14 (jargon added to FTS5).
@@ -264,7 +264,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merge.py`
 - **Source:** T1.1 canary deep-audit (this session)
 
-## 🟠 BUG-107 — 2026-08-14 — 2 single-source FBs leaked into final DB despite `--only-convergent`
+## 🟢 BUG-107 — 2026-08-14 — 2 single-source FBs leaked into final DB despite `--only-convergent`
 - **Symptom:** `Hybrid Sorting Algorithm` and `Price Reduction Profit Maximization` are single-source FBs (1 source book) yet present in the final 279-committed DB. 207 convergent parents → 339 sub-cluster targets → 280 FBs; exactly 2 are single-source.
 - **Root cause:** `split_cluster_by_kmeans()` emits sub-clusters whose per-sub-cluster
   `is_convergent` is recomputed as `sub_sid_count >= 2`; a sub-cluster can drop to 1 source
@@ -277,7 +277,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage2_extract.py`
 - **Source:** T1.1 canary deep-audit (this session)
 
-## 🟠 BUG-106 — 2026-08-14 — S2 checkpoint mixed JSONL/pretty-printed (breaks re-run/resume)
+## 🟢 BUG-106 — 2026-08-14 — S2 checkpoint mixed JSONL/pretty-printed (breaks re-run/resume)
 - **Symptom:** `stage2_extract/canary/checkpoint.jsonl` has 456 lines but only 274 are standalone JSONL; 102 are pretty-printed fragments (6 of 280 FB records multi-line). `load_jsonl` (D2332 fail-closed) RAISES on it. S4 loaded the 280 FBs correctly *this* run, but a re-run/resume would fail-closed.
 - **Root cause:** legacy on-disk artifact. All current writers were already compact JSONL;
   the only `indent=2` in `stage2_extract.py` (`:685`) is the few-shot *prompt* builder, NOT a
@@ -299,7 +299,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🟠 BUG-104 — 2026-08-13 — sqlite-vec cannot load: `load_extension` missing on python.org Python 3.12.1
+## 🟡 BUG-104 — 2026-08-13 — sqlite-vec cannot load: `load_extension` missing on python.org Python 3.12.1
 - **Symptom:** `stage6_commit.py init_db()` warns "sqlite-vec not available" on every run; the `vec_fbs` virtual table is never created (verified: current `maxwell.db` has `fbs`/`fbs_fts` but NO `vec_fbs`). Vector search has therefore silently never worked — retrieval falls back to FTS only. Masked by the broad `except (ImportError, Exception)` catch.
 - **Root cause:** Python 3.12.1 (python.org framework build, `/Library/Frameworks/Python.framework/...`, SQLite 3.43.1) compiled WITHOUT `load_extension`/`enable_load_extension`. `sqlite_vec.load(conn)` internally calls `conn.load_extension(...)` → `AttributeError: 'sqlite3.Connection' object has no attribute 'load_extension'`. The BUG-012/P0.11 fix (`conn.enable_load_extension(True)` → `sqlite_vec.load(conn)`) itself fails on this build. The except prints a misleading "Install: pip install sqlite-vec" (the package IS installed).
 - **Fix:** (1) Use a Python build with `load_extension` support — Homebrew Python (`brew install python@3.12`) or conda-forge Python; OR (2) improve `init_db` to distinguish `ImportError` (package missing) from `AttributeError` (load_extension unavailable) and surface the real remediation. NOT a data-loss blocker: FTS fallback works (verified by stress test).
@@ -320,7 +320,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage1_5_embed_cluster.py`
 - **Source:** ChatGPT audit (`chatgpt009.md`) Block #2 / Seat 2 / Seat 3; independently re-verified against code this session.
 
-## 🟠 BUG-103 — 2026-08-13 — e2e convergence metric uses filename identity, not canonical source IDs
+## 🟢 BUG-103 — 2026-08-13 — e2e convergence metric uses filename identity, not canonical source IDs
 - **Symptom:** e2e reports `convergent_clusters` 24.5% (39/159) using `len(set(c["source_books"])) >= 2` (filename identity). Production S1.5 gates convergence on canonical work identity (`is_convergent` / `resolve_source_ids()` → author|title). The reported metric can be inflated by duplicate editions and is not the quantity D2336's 20% threshold was meant to calibrate.
 - **Root cause:** `pipeline/e2e_test.py:167` computes convergence from `source_books` filenames, not from `is_convergent` / canonical source IDs.
 - **Fix (D2347):** Compute `sum(c["is_convergent"])` as the primary metric; report filename-diversity separately as a diagnostic.
@@ -330,7 +330,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 
 ---
 
-## 🟠 BUG-101 — 2026-08-13 — T1.1 handoff instructs runner flags that don't exist + stale S5 calibration
+## 🟢 BUG-101 — 2026-08-13 — T1.1 handoff instructs runner flags that don't exist + stale S5 calibration
 - **Symptom:** `governance/aggregated_remaining_tasks.md` T1.1 handoff said `python3 pipeline/runner.py --hybrid --only-convergent`. `runner.py` argparse rejects both `--hybrid` and `--only-convergent` (they are `stage2_extract.py` flags, never forwarded by the runner — `STAGES["2"]` has no `args`). Running the handoff verbatim fails with `unrecognized arguments`. Also carried the pre-D2321 broken calibration `S5 threshold 0.10 (P=1.000, R=0.556)` and implied hybrid-gate use.
 - **Root cause:** Handoff written before D2327/D2328/D2339 landed; never re-synced when the runner gained resume-validity manifest (D2329) and the calibration was corrected (D2322). The runner never forwards S2 sub-flags by design.
 - **Fix (D2343):** Corrected handoff to `python3 pipeline/runner.py` (traditional-only — hybrid REJECTED per BUG-085) + stage-by-stage `stage2_extract.py` (no sub-flags); corrected S5 numbers to D2322's P=0.647/R=0.386/F1=0.484; annotated hybrid DISABLED.
@@ -364,7 +364,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `pipeline/stage4_merge.py`, `pipeline/stage6_commit.py`
 - **Source:** ChatGPT audit Block #2/#3; independently re-verified
 
-## 🟠 BUG-097 — 2026-08-13 — runner `--run-id` import-ordering breaks run isolation
+## 🟢 BUG-097 — 2026-08-13 — runner `--run-id` import-ordering breaks run isolation
 - **Symptom:** `runner.py --run-id corpus-X` does NOT isolate checkpoints/manifests; run-scoped paths are materialized with the default `latest` run_id before argparse runs.
 - **Root cause:** `STAGE_CHECKPOINTS` (`:84,132,139`) and `_RESUME_MARKER` (`:152`) call `get_run_id()` at MODULE level; `--run-id` sets `MAXWELL_RUN_ID` only in `main()` (`:661-669`) after `pipeline_paths` cached the default.
 - **Fix (D2339):** Parse args before run-scoped imports, or lazy `RunContext` in `pipeline_paths`; two-run isolation test.
@@ -380,7 +380,7 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
 - **Files:** `requirements.txt`, `pipeline/integrity_check.py`
 - **Source:** ChatGPT audit §10; independently re-verified
 
-## 🟠 BUG-099 — 2026-08-13 — Model registry drift: gpt-oss/Phi misnamed as "verifier" vs DeBERTa-only S5
+## 🟡 BUG-099 — 2026-08-13 — Model registry drift: gpt-oss/Phi misnamed as "verifier" vs DeBERTa-only S5
 - **Symptom:** `stage5_verify.py` = DeBERTa-only (D2298), but role keys are misleading: `pipeline_config.yaml models.verifier` = gpt-oss (actually the **S4 classifier**, D2249), `models.verifier_v2` = Phi-4-mini (actually the **S2 fast probe**, D2319 — still actively used in `stage2_extract.py:815-825`), `model_assignments.yaml S5_VERIFIER`/`S5_FB_VERIFIER` = Phi (stale; S5 = DeBERTa-only). The true S5 verifier is `models.nli_large` = DeBERTa.
 - **Root cause:** D2298 removed Phi from S5 *verification* only, but the role keys were never renamed to reflect the surviving roles (classifier/probe).
 - **Fix (D2340):** rename `verifier`→`classifier` (gpt-oss) + `verifier_v2`→`probe` (Phi); annotate `model_assignments.yaml` S5_* roles as removed. Naming/documentation drift — NOT broken functionality (`VERIFY_MODEL`/`VERIFY_MODEL_V2` both resolve + are consumed correctly).
@@ -1690,7 +1690,7 @@ The following bugs were resolved during the 2026-07-23 session. Fixes applied an
 
 *Updated: 2026-08-10 (D2226 audit) | Bugs tracked: 54 | Resolved: 46 | Closed (moot): 5 | Open: 3 | Schema version: 1.9*
 
-## BUG-063 — 2026-08-10 — delegate() Cannot Execute File System Tasks (Root Cause) 🔴
+## BUG-063 — 2026-08-10 — delegate() Cannot Execute File System Tasks (Root Cause) 🟢
 - **Symptom:** `delegate({provider: "maxwell_omlx", model: "..."})` fails for any task requiring project file access. Attempt 1: gemma-4-E4B returned 404 (model not loaded). Attempt 2: Qwen3-Coder-30B-A3B executed TypeScript code in Deno sandbox that couldn't access project files. Regular occurrence across sessions — "local LLMs useless for delegated tasks."
 - **Root cause:** The `delegate()` function routes ALL providers through `execute_typescript` (Deno/TypeScript sandbox). The `provider` parameter changes which LLM generates the TypeScript code, but the code always executes in the sandbox. The sandbox has NO filesystem access to the project directory — it can only use registered SDK functions. For file analysis, code modifications, or any task requiring `fs` or `Deno.readTextFile`, the sandbox fails silently.
 - **Impact:** Delegate is unusable for: (1) file analysis of project code, (2) YAML validation against project files, (3) pipeline code modifications, (4) any task requiring project context beyond the delegate's instructions text. Effectively reduces delegate to a chat interface with no tool access — equivalent to a simple LLM call with no grounding in project state.

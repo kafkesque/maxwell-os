@@ -1,8 +1,8 @@
 meta:
   version: '5.0'
   architecture: cluster-before-extract
-  total_examples: 75
-  convergent_positives: 52
+  total_examples: 77
+  convergent_positives: 54
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -4676,3 +4676,122 @@ examples:
     content_type: principle
   rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two files are the SAME work (Speculative Everything, Dunne & Raby); co-author list present in only one filename. Canonical author normalization collapses ''Anthony Dunne'' + ''Anthony Dunne, Fiona Raby'' to ONE primary author: source_diversity must be 1 and is_convergent false.'
   tier: CHALLENGE
+
+- id: CONV-054
+  domain: economics
+  discipline: game theory
+  source_books:
+  - Algorithms to Live By — Brian Christian & Tom Griffiths
+  - The Art of Strategy — Avinash Dixit & Barry Nalebuff
+  cluster_segments:
+  - source_book: Algorithms to Live By — Brian Christian & Tom Griffiths
+    text: 'No matter what, you''re always better off defecting than cooperating, regardless of what your accomplice decides.
+      To do otherwise will always make you worse off, no matter what. In fact, this makes defection not merely the equilibrium
+      strategy but what''s known as a dominant strategy. A dominant strategy avoids recursion altogether, by being the best
+      response to all of your opponent''s possible strategies. But now we''ve arrived at the paradox: if everyone does the
+      rational thing and follows the dominant strategy, the story ends dramatically worse for everyone involved. This has
+      emerged as one of the major insights of traditional game theory: the equilibrium for a set of players, all acting
+      rationally in their own interest, may not be the outcome that is actually best for those players. Algorithmic game
+      theory has quantified this as the "price of anarchy."'
+  - source_book: The Art of Strategy — Avinash Dixit & Barry Nalebuff
+    text: 'Defect is the dominant strategy for each, and the combination where both choose Defect yields a worse outcome for
+      both than if both choose Cooperate. Each firm pursuing its own self-interest does not lead to an outcome that is best
+      for them all, in stark contrast to what conventional theories of economics from Adam Smith onward have taught us.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Price of Anarchy — Rational Self-Interest vs Collective Optimum
+    definition: When multiple agents each follow their individually rational dominant strategy, the resulting equilibrium can
+      be dramatically worse for everyone than a coordinated alternative. The "price of anarchy" quantifies the gap between
+      the outcome of self-interested competition and the best achievable collective outcome. This is a general law of strategic
+      interaction, not a domain-specific observation.
+    mechanism: 'The mechanism is a coordination failure. Each player''s dominant strategy is the best response to every possible
+      move by others, so no single player can unilaterally improve their own outcome by cooperating. But because the payoff
+      of cooperation depends on mutual trust, individual defection dominates while mutual defection is collectively ruinous.
+      The equilibrium is self-reinforcing — nobody can deviate to their own advantage — even though it is Pareto-dominated by
+      a cooperative outcome. The gap is largest when the temptation to defect is high and the benefit of mutual cooperation
+      is shared rather than privately capturable.'
+    boundary: 'Applies to non-cooperative games where players act independently and cannot make binding agreements. Fails
+      when: (1) a central authority can enforce cooperation (regulation, contracts); (2) the game is repeated indefinitely,
+      allowing tit-for-tat reciprocity to sustain cooperation; (3) players share identity or strong reputation concerns that
+      convert the game into a cooperative one; (4) there are few players with aligned incentives.'
+    consequence: 'The price of anarchy explains why markets, traffic networks, arms races, and commons-based resources
+      systematically underperform their theoretical optimum. It justifies intervention — congestion pricing, antitrust law,
+      carbon taxes, treaty enforcement — as mechanisms to shrink the gap between selfish equilibrium and social optimum.
+      Policymakers should expect decentralized self-interest to produce a floor, not a ceiling, and design coordinating
+      institutions accordingly.'
+    evidence_passages:
+    - the equilibrium for a set of players, all acting rationally in their own interest, may not be the outcome that is actually
+      best for those players
+    - The price of anarchy measures the gap between cooperation (a centrally designed or coordinated solution) and competition
+    - Defect is the dominant strategy for each, and the combination where both choose Defect yields a worse outcome for both
+      than if both choose Cooperate
+    - Each firm pursuing its own self-interest does not lead to an outcome that is best for them all
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: universal
+  rationale: 'CONVERGENT POSITIVE — UNIVERSAL GAME THEORY (D2368/T-015). Christian/Griffiths (computer science) and
+    Dixit/Nalebuff (economics) independently state the same law of strategic interaction: rational self-interest does not
+    aggregate to the collective optimum. Both name the dominant-strategy mechanism and both state the paradox that mutual
+    defection is worse for everyone than mutual cooperation. Depth is genuinely universal — the price of anarchy applies to
+    any system of interacting self-interested agents (markets, traffic, ecosystems, arms races) in the same domain-independent
+    sense as entropy. Fills the universal-positive gap beyond the single entropy example.'
+  tier: GOLD-A
+- id: CONV-055
+  domain: software engineering
+  discipline: cryptography
+  source_books:
+  - Building Generative AI Services with FastAPI — Alireza Parandeh
+  - Coding with ChatGPT and Other LLMs — Vincent Austin Hall
+  cluster_segments:
+  - source_book: Building Generative AI Services with FastAPI — Alireza Parandeh
+    text: 'The authentication mechanism will leverage a hashing algorithm that converts plain passwords into an encoded string
+      that can''t be decoded back into its original form. Since the decoding process isn''t reversible, cryptographic hashing
+      algorithms differ from standard encoding/decoding functions such as Base64.'
+  - source_book: Coding with ChatGPT and Other LLMs — Vincent Austin Hall
+    text: 'MD5 is a cryptographic hash function, but it''s no longer considered secure for password hashing. It''s vulnerable
+      to collision attacks, where an attacker can find another input that generates the same hash as your password. This could
+      allow them to crack your password.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Cryptographic One-Way Hashing for Secret Storage
+    definition: A cryptographic hash function maps arbitrary input to a fixed-size digest that is computationally infeasible
+      to reverse or to forge by collision. Storing the hash — rather than the secret itself — allows password verification
+      without ever storing or recovering the plaintext. This is a narrow technique within software security, not a general
+      principle of system design.
+    mechanism: 'The function is one-way (preimage-resistant): easy to compute the digest from an input, infeasible to recover
+      the input from the digest, because the mapping discards information and is not reversible. It is also collision-resistant:
+      finding two distinct inputs that produce the same digest is infeasible for a strong hash. Verification works by
+      re-hashing the candidate secret and comparing digests, so the secret itself never needs to be stored. Legacy functions
+      like MD5 break this contract because collision attacks can find a different input with the same digest.'
+    boundary: 'Applies to integrity verification and secret storage where one-way transformation suffices. Fails when: (1)
+      the hash function is cryptographically broken (MD5, SHA-1) and collision attacks are practical; (2) the input space is
+      low-entropy (short human passwords), enabling rainbow-table attacks unless each hash is salted with a per-user random
+      value; (3) the use case requires recoverability — you cannot decrypt a hash back to the original secret; (4) performance
+      demands favor fast hashes, which are the wrong choice for password storage (a slow, memory-hard hash like bcrypt or
+      Argon2 is required).'
+    consequence: 'Systems that store passwords as unsalted fast hashes (MD5/SHA-1) are vulnerable to collision and
+      rainbow-table attacks, so secure services use salted slow hashes (bcrypt, Argon2). Engineers must treat "hashing" and
+      "encryption" as distinct: encryption is reversible, hashing is not. Choosing the wrong primitive for secret storage is
+      a security vulnerability, not a performance optimization.'
+    evidence_passages:
+    - cryptographic hashing algorithms differ from standard encoding/decoding functions such as Base64
+    - a hashing algorithm that converts plain passwords into an encoded string that can''t be decoded back into its original
+      form
+    - MD5 is a cryptographic hash function, but it''s no longer considered secure for password hashing
+    - It''s vulnerable to collision attacks, where an attacker can find another input that generates the same hash
+    extraction_type: normative_heuristic
+    content_type: principle
+    depth: specialized
+  rationale: 'CONVERGENT POSITIVE — SPECIALIZED SOFTWARE SECURITY (D2368/T-015). Parandeh (FastAPI) and Hall (Coding with
+    ChatGPT) both state the same narrow principle: cryptographic hashing is a one-way, non-reversible transformation used to
+    protect secrets, and weak hashes (MD5) fail via collision attacks. Depth is genuinely specialized — a technique within
+    cryptography/software security that a general engineer would not cover; it requires security-specific knowledge. Fills
+    the specialized-positive gap beyond the single typography (kerning) example, on a different sub-domain (software security
+    vs graphic design).'
+  tier: GOLD-A

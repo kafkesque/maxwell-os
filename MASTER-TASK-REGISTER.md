@@ -174,6 +174,11 @@
 
 # 🔴 CRITICAL — BLOCKING T1.1
 
+> ⚠️ **SUPERSEDED (2026-08-15, D2367):** this section predates the 5-LLM verification round. P0.1 (hybrid gate) is
+> **REJECTED** (BUG-085 A/B net-negative); P0.7 (BUG-001) and P0.8 (BUG-014) are **RESOLVED** (see "Older BUG-001/011/012/013/014…
+> resolved in prior sessions"); P0.2-P0.6 (manifest/schema-split/ISOR/golden-tier/DSPy-metric) were **implemented or logged** in
+> D2282-D2287 and do NOT block T1.1. T1.1 = **CONDITIONAL GO**. See D2367/D2369 and the top of this register.
+
 | # | Decision | Task | Effort | Bug |
 |---|----------|------|--------|-----|
 | **P0.1** | D2276 | **Wire hybrid S2 to production** — move hybrid_s2_extract() into stage2_extract.py. DSPy gate + traditional extraction. +0.145 quality (0.736 vs 0.591). | 4-8h | BUG-085 |

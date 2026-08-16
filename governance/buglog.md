@@ -1,5 +1,5 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-16 21:15 (working tree committed `793fd26` D2397; golden verbatim fix D2397/BUG-136; S4 reval running to re-measure D2393/D2394; integrity 17/17)
+> **Last updated:** 2026-08-16 23:55 (S4 reval DONE D2398 — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; preflight + stress green; golden verbatim D2397; DB reset D2396)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---

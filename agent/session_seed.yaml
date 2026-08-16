@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: T1.1 CONDITIONAL GO (D2367). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). Grammar A/B resolved (OFF, D2392); depth prompt fixed (D2393); taxonomy discipline emerging 32%→15.5% (D2394). Remaining = domain-taxonomy governance review + DB reset decision + depth re-measure on next run.
+    status: T1.1 GO (D2398). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). All post-canary fixes re-validated live: grammar OFF (D2392), depth prompt (D2393 → cross-domain 86.3%→21.6%), taxonomy (D2394 → discipline emerging 32.0%→15.5%), DB reset (D2396), golden verbatim (D2397). Preflight + stress + integrity green. Remaining = domain-taxonomy governance review (G3, post-commit remap) + T1.1 full launch.
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented
@@ -151,7 +151,7 @@ phase:
         - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)
         - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
     pending:
-        - G4 re-measure (IN PROGRESS): S4 reval running on 279 canary clusters to confirm D2393 depth shift + D2394 taxonomy live
+        - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%
         - D2394 remainder (governance review): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains (risk management, behavioral economics, psychology, operations research, change management, etc.) requires cap demotion + human review
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
         - D2393 re-measure: rerun S4 depth classification to confirm cross-domain→domain shift (prompt now stricter)

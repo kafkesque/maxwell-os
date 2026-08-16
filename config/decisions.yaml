@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-16T18:40:48Z'
-total_decisions: 385
+last_sync: '2026-08-16T21:54:45Z'
+total_decisions: 387
 decisions:
 - id: D2092
   category: INF
@@ -3109,11 +3109,25 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-16'
+- id: D2397
+  category: GOVERNANCE / QUALITY
+  state: ACTIVE
+  description: 'Pre-T1.1: commit working tree + golden verbatim fix — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2398
+  category: QUALITY / DATA
+  state: ACTIVE
+  description: S4 reval confirms D2393 (depth) + D2394 (taxonomy) live — RESOLVED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
 summary:
-  total: 385
+  total: 387
   proposed: 0
   draft: 1
-  active: 329
+  active: 331
   stale: 0
   superseded: 14
   archived: 8
@@ -3161,8 +3175,9 @@ summary:
     QUALITY / RELIABILITY: 1
     QUALITY / TAXONOMY: 1
     DATA / TAXONOMY: 1
-    QUALITY / DATA: 2
+    QUALITY / DATA: 3
     INFRASTRUCTURE / SOVEREIGNTY: 1
     DATA / RELIABILITY: 2
     DATA / QUALITY: 1
     DATA / GOVERNANCE: 1
+    GOVERNANCE / QUALITY: 1

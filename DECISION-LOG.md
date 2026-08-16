@@ -3,6 +3,27 @@
 
 ---
 
+### D2398 — S4 reval confirms D2393 (depth) + D2394 (taxonomy) live — RESOLVED (2026-08-16)
+**Category:** QUALITY / DATA
+
+**Context:** D2393 (depth prompt tightening) + D2394 (taxonomy synonym/alias) changed S4 behavior
+AFTER the canary, so their live effect was unmeasured. Re-ran S4 on the full canary (279 clusters)
+with the committed code (`793fd26`).
+
+**Result (re-measure):**
+- **Depth:** cross-domain 240 (86.3%) → **60 (21.6%)**; domain 35 (12.6%) → **214 (77.0%)**;
+  universal 1; specialized 3. D2393 "default-to-domain" tightening confirmed — cross-domain
+  over-assignment eliminated.
+- **Discipline `emerging`:** 89/278 (32.0%) → **43/278 (15.5%)** — D2394 synonym kind-filter +
+  alias expansion confirmed live (matches the re-map estimate).
+- S4 exit: CONDITIONAL_SUCCESS (1 failure = `cluster_6241`, 0.4% ≤ 0.01 tolerance, D2386).
+
+**Status:** ✅ RESOLVED — both post-canary S4 fixes re-validated end-to-end. G4 closed.
+**Files:** `pipeline/stage4_merged_call.py`, `pipeline/schemas.py`, `config/taxonomy_v5.yaml`
+**Source:** Session 2026-08-16 — S4 reval (D2397 follow-through).
+
+---
+
 ### D2397 — Pre-T1.1: commit working tree + golden verbatim fix — RESOLVED (2026-08-16)
 **Category:** GOVERNANCE / QUALITY
 

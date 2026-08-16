@@ -3,6 +3,30 @@
 
 ---
 
+### D2397 — Pre-T1.1: commit working tree + golden verbatim fix — RESOLVED (2026-08-16)
+**Category:** GOVERNANCE / QUALITY
+
+**Context:** 39+ pipeline/config/tools files carried uncommitted changes from D2391–D2396, so
+`get_pipeline_commit()` (git HEAD = `7cbbc2a`, D2370) would stamp every T1.1 FB with a STALE,
+untruthful provenance hash (R14 violation). The golden set also carried 6 `golden_validate`
+failures (5 NON_VERBATIM evidence + stale meta count).
+
+**Actions:**
+1. **Committed the full working tree** → `793fd26` (grammar OFF + depth + taxonomy + dead-column
+   drop + golden verbatim + D2396 governance). `get_pipeline_commit()` now truthfully resolves to HEAD.
+2. **Fixed golden NON_VERBATIM** — CONV-054 genuine paraphrase → verbatim "price of anarchy" quote;
+   CONV-055 3× double-apostrophe `''` (literal `can''t`/`it''s`) → single apostrophe; CONV-058
+   fabricated `Generator` quote (source says `Discriminator`) → removed. Re-synced meta counts
+   (total_examples 77→80, convergent_positives 54→57, GOLD-A 49→54). `golden_validate` **80/80 PASS**;
+   hash re-stamped (`70ff3283…`).
+3. Removed two accidental 0-byte files (`knowledge`, `pipeline/maxwell.db`).
+
+**Status:** ✅ RESOLVED — committed `793fd26`; golden 80/80; S4 reval launched to re-measure D2393/D2394.
+**Files:** working tree, `config/golden/stage2_fewshot_convergent.yaml`, `config/golden/.golden_meta.json`
+**Source:** Session 2026-08-16 — pre-T1.1 validation.
+
+---
+
 ### D2396 — DB reset policy for T1.1: fresh-DB now, run-specific-DB as P2 follow-up — RESOLVED (2026-08-16)
 **Category:** DATA / GOVERNANCE
 

@@ -149,7 +149,9 @@ phase:
         - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion — discipline emerging 32%→15.5%
         - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity 17/17 + audit green
         - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)
+        - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
     pending:
+        - G4 re-measure (IN PROGRESS): S4 reval running on 279 canary clusters to confirm D2393 depth shift + D2394 taxonomy live
         - D2394 remainder (governance review): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains (risk management, behavioral economics, psychology, operations research, change management, etc.) requires cap demotion + human review
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
         - D2393 re-measure: rerun S4 depth classification to confirm cross-domain→domain shift (prompt now stricter)

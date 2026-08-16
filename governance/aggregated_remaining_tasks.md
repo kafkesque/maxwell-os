@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-16 20:25 | **Decisions:** D2000-D2395 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395).**
+> **Updated:** 2026-08-16 21:15 | **Decisions:** D2000-D2397 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval RUNNING to re-measure D2393/D2394.**
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
@@ -26,7 +26,7 @@
 | G8 | **DB contamination** — 676 rows / 5 run_ids (canary 557 = old 279 + new 278). Decide reset policy before final T1.1. | ✅ DONE (D2396) — fresh-DB for T1.1 |
 | G9 | **Vector DEGRADED** — `vec_fbs` absent (python.org build lacks `enable_load_extension`). FTS + Parquet still serve retrieval. | P3 |
 | G3 | **Taxonomy expansion** (D2388/D2394) — discipline `emerging` 32%→**15.5%** (schemas kind-filter fix + alias expansion). Domain `emerging` 93.9% = structural gap (design-centric v5 vs business corpus) → **needs governance promotion + demotion review**. | 🟡 P1 (domain promotion deferred) |
-| G4 | **Depth skew fix** (D2387/D2393) — tightened `DEPTH_FOCUSED_PROMPT` + `DEPTH_BATCH_SYSTEM` (default-to-domain; cross-domain = 2+ DISTINCT disciplines). Re-measure on next S4 run. | ✅ DONE (re-measure pending) |
+| G4 | **Depth skew fix** (D2387/D2393) — tightened `DEPTH_FOCUSED_PROMPT` + `DEPTH_BATCH_SYSTEM` (default-to-domain; cross-domain = 2+ DISTINCT disciplines). Re-measure on next S4 run. | 🟡 IN PROGRESS — S4 reval running (279 clusters, D2397) |
 | G5 | **`is_specialized` persistence** — parsed-but-not-persisted (None × 278). | P3 |
 | G6 | **OMLX 0.6.0 evaluation** (D2390/D2392) — xgrammar works but breaks gpt-oss-20b; C3 benchmark-upload opt-in-by-action. Do NOT upgrade for grammar. | ✅ DONE |
 | G10 | **Run-specific DB** (D2396 follow-up) — scope `DB_PATH` by run_id + stable active-KB pointer for retrieval; needs retrieval regression test. | P2 (post-T1.1) |

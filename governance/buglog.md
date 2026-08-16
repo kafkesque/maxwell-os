@@ -1,8 +1,21 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-16 20:25 (integrity 17/17 + audit green; dropped dead `s3_original_domain` column D2395; grammar A/B D2392, depth D2393, taxonomy D2394 all resolved)
+> **Last updated:** 2026-08-16 21:15 (working tree committed `793fd26` D2397; golden verbatim fix D2397/BUG-136; S4 reval running to re-measure D2393/D2394; integrity 17/17)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟢 BUG-136 — 2026-08-16 — Golden set: 5 NON_VERBATIM evidence + stale meta count (77 vs 80) — FIXED (D2397)
+- **Symptom:** `golden_validate.py` FAILED 6 checks: META_MISMATCH (meta `total_examples`=77, actual 80)
+  + 5 NON_VERBATIM evidence passages (CONV-054, CONV-055 ×3, CONV-058).
+- **Root cause:** (1) depth-mining (V8/D2369 + D2377) added 5 examples (CONV-054…058) without re-syncing
+  meta counts (77→80, GOLD-A 49→54); (2) CONV-054 had a genuine paraphrase ("price of anarchy measures
+  the gap…") not verbatim in source; (3) CONV-055 had 3 double-apostrophe `''` YAML-escaping bugs (literal
+  `can''t`/`it''s` instead of `can't`/`it's`); (4) CONV-058 fabricated a `Generator` quote where the source
+  says `Discriminator`.
+- **Fix:** corrected evidence to verbatim; removed the fabricated CONV-058 passage; re-synced meta.
+  Re-stamped `.golden_meta.json` (sha256 `70ff3283…`). `golden_validate` 80/80 PASS; `verify_golden_hash` PASS.
+- **Files:** `config/golden/stage2_fewshot_convergent.yaml`, `config/golden/.golden_meta.json`
+- **Source:** Session 2026-08-16 — pre-T1.1 golden audit.
 
 ## 🟢 BUG-135 — 2026-08-16 — Dead legacy `s3_original_domain` column (DB 61 vs 60 cols) — FIXED (D2395)
 - **Symptom:** `just integrity` full → `[8] INSERT has 60 placeholders but fbs table has 61 columns`.

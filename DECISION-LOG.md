@@ -3,6 +3,52 @@
 
 ---
 
+### D2400 — Field-production contract: S4 is the producer layer, S6 is persistence-only — RESOLVED (2026-08-17)
+**Category:** ARCHITECTURE / GOVERNANCE
+
+**Finding:** `related_fbs` is produced at S4 (`compute_fb_relationships` — undirected similarity via
+domain/discipline/source overlap + cosine). `prerequisite_fbs`, `contradicts_fbs`, `procedural_skill`
+are schema-declared (`schemas.py`, all `None`) + listed in `content_types.yaml` as `principle.extension_fields`
++ committed by S6 — but have **no producer** (S2 never emits them; S4 passes through/ignores them;
+S6 only INSERTs them as empty/None).
+
+**Decision (stage contract):**
+1. **S6 = persistence-only.** It must never derive/classify. Committing these fields at S6 is correct;
+   producing them at S6 would violate the stage contract (and make S6 LLM-dependent).
+2. **S4 = the correct producer layer** for all four — relationship edges require the full classified
+   set (S2 can't see it per-cluster; S5 only verifies), and `procedural_skill` is a per-FB classification
+   like depth/domains/discipline.
+3. Only `related_fbs` is implemented (it's the cheap undirected signal). `prerequisite_fbs` (directed
+   dependency) + `contradicts_fbs` (semantic conflict) need an LLM pass that cosine can't provide, and
+   S4 is already the ~39h bottleneck — so they are correctly deferred and, when built, must be a
+   **post-S4 enrichment** (fold into D2345's second pass or a future stage), NOT inline-S4 and NOT S6.
+   `procedural_skill` is Layer-2 value (PT/PI/TI) with ~zero value for principle-only T1.1.
+
+**Status:** ✅ RESOLVED — no code change for T1.1; contract recorded. Producers = F1 future tax.
+**Source:** Session 2026-08-17 — senior review of field lifecycle (Q2).
+
+---
+
+### D2399 — Domain taxonomy promote/demote: defer to post-T1.1+D2345 full-corpus counts — RESOLVED (2026-08-17)
+**Category:** GOVERNANCE / DATA
+
+**Decision:** The domain-taxonomy promotion/demotion (G3) must run on the **full-corpus**
+`taxonomy_counts` — i.e., after BOTH T1.1 (convergent, `--only-convergent`) AND D2345 (single-source
+non-type second pass) have committed. It must NOT act on canary numbers.
+
+**Why:** The canary was a single-domain (DOMAIN 0) prefix sample, so it under-represents the design
+domains — a domain showing `count 0` in the canary (`motion design`, `brand identity`, …) may be
+non-zero in the full corpus (which still includes the original design books). Demoting on canary
+evidence is statistically unsound. `check_for_replacements()` is inherently post-commit (reads
+`taxonomy_counts` seeded at S6 from committed FBs) and already conservative (emerging > weakest-canonical
+× 1.1, promote-with-demote under the 35-domain cap) — so it self-corrects as more FBs commit.
+
+**Status:** ✅ RESOLVED — G3 re-scoped to post-T1.1+D2345. The canary-derived table in
+`governance/domain_taxonomy_promotion_preview.md` is NON-authoritative (preview only).
+**Source:** Session 2026-08-17 — senior review of domain-promotion timing (Q3).
+
+---
+
 ### D2398 — S4 reval confirms D2393 (depth) + D2394 (taxonomy) live — RESOLVED (2026-08-16)
 **Category:** QUALITY / DATA
 

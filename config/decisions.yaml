@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-16T21:54:45Z'
-total_decisions: 387
+last_sync: '2026-08-16T22:20:35Z'
+total_decisions: 389
 decisions:
 - id: D2092
   category: INF
@@ -3123,11 +3123,25 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-16'
+- id: D2399
+  category: GOVERNANCE / DATA
+  state: DEFERRED
+  description: 'Domain taxonomy promote/demote: defer to post-T1.1+D2345 full-corpus counts — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
+- id: D2400
+  category: ARCHITECTURE / GOVERNANCE
+  state: ACTIVE
+  description: 'Field-production contract: S4 is the producer layer, S6 is persistence-only — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
 summary:
-  total: 387
+  total: 389
   proposed: 0
   draft: 1
-  active: 331
+  active: 332
   stale: 0
   superseded: 14
   archived: 8
@@ -3181,3 +3195,5 @@ summary:
     DATA / QUALITY: 1
     DATA / GOVERNANCE: 1
     GOVERNANCE / QUALITY: 1
+    GOVERNANCE / DATA: 1
+    ARCHITECTURE / GOVERNANCE: 1

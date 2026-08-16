@@ -1,6 +1,10 @@
 # Domain Taxonomy Promotion — Preview & Mechanism (G3 / D2394 remainder)
 
-> **Updated:** 2026-08-16 | **Status:** awaiting human review (post-T1.1) | **Blocks:** nothing (post-commit remap)
+> **Updated:** 2026-08-17 | **Status:** awaiting human review (post-T1.1+D2345) | **Blocks:** nothing (post-commit remap)
+> ⚠️ **D2399 — NON-authoritative tables:** the promote/demote lists below are CANARY-based previews.
+> The canary was a single-domain (DOMAIN 0) prefix, so it under-represents the design domains.
+> Final promote/demote decisions MUST be made from FULL-corpus `taxonomy_counts` after **T1.1 +
+> D2345 (single-source pass)** commit — not from these canary numbers.
 
 ## TL;DR
 

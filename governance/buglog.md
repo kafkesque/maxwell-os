@@ -1,5 +1,5 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-16 23:55 (S4 reval DONE D2398 — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; preflight + stress green; golden verbatim D2397; DB reset D2396)
+> **Last updated:** 2026-08-17 00:20 (D2399 domain-promotion defer to post-T1.1+D2345; D2400 S4-producer/S6-persistence contract; BUG-104 remediation action logged; S4 reval D2398 done)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
@@ -452,6 +452,10 @@ re-adjudication (qwen+gemma). Authoritative post-relabel depth benchmark pending
   from `AttributeError` (load_extension unavailable) and prints the correct remediation; the
   underlying environmental issue (python.org build lacks `load_extension`) still requires
   Homebrew/conda Python for vector search. FTS fallback continues to work.
+- **Action (2026-08-17):** switch runtime to Homebrew Python (`brew install python@3.12`) or
+  conda-forge Python to enable `vec_fbs`. Re-verified this session: `sqlite_vec` 0.1.9 IS installed,
+  but `enable_load_extension`/`load_extension` are absent on the python.org 3.12.1 build (SQLite 3.43.1,
+  `SQLITE_OMIT_LOAD_EXTENSION`). Non-blocking for T1.1 (FTS + Parquet serve retrieval).
 - **Files:** `pipeline/stage6_commit.py`
 - **Source:** This session — live verification of vector-search readiness during `just preflight` (BUG-012's fix assumed `enable_load_extension` exists).
 

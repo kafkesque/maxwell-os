@@ -59,6 +59,7 @@ from pipeline.schema_accessor import (
     fb_name,
     fb_provenance,
     fb_source_books,
+    fb_source_ids,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
@@ -112,6 +113,7 @@ CREATE TABLE IF NOT EXISTS fbs (
     -- Provenance (simplified — bloat removed per D2130)
     source_clusters TEXT,          -- JSON array (hash strings)
     source_books TEXT,             -- JSON array
+    source_ids TEXT,               -- JSON array (canonical SHA-256 author|title, D2176/D2376)
     source_principle_ids TEXT,     -- JSON array (references, not embedded)
     source_segments TEXT,          -- JSON array of segment_ids (D2352/BUG-110 — was dropped at S4)
     evidence_passages TEXT,        -- JSON array of verbatim quotes (D2352/BUG-111)
@@ -243,10 +245,22 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "taxonomy_match_method", "TEXT")
     # D2352: provenance/schema contract closure — segment provenance + verbatim evidence
     _migrate_add_column(conn, "fbs", "source_segments", "TEXT")
+    # D2376: canonical source identity (D2176) — was dropped at S4, now persisted
+    _migrate_add_column(conn, "fbs", "source_ids", "TEXT")
     _migrate_add_column(conn, "fbs", "evidence_passages", "TEXT")
     _migrate_add_column(conn, "fbs", "evidence_passages_shown", "TEXT")
     # D2351: fail-closed observability — reason a row is not CLEAN
     _migrate_add_column(conn, "fbs", "classification_error", "TEXT")
+    # D2386-fix (2026-08-16): is_summary (D2089) + classification_status (D2184) were
+    # added to CREATE TABLE but NOT to the _migrate_add_column list — pre-existing DBs
+    # never got them, so S6 INSERT failed 278/278 ("no column named is_summary").
+    # Auto-heal both columns now.
+    _migrate_add_column(conn, "fbs", "is_summary", "INTEGER DEFAULT 0")
+    _migrate_add_column(conn, "fbs", "classification_status", "TEXT NOT NULL DEFAULT 'CLEAN'")
+    # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
+    # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
+    # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
+    _migrate_drop_column(conn, "fbs", "s3_original_domain")
     return conn
 
 
@@ -256,6 +270,18 @@ def _migrate_add_column(conn, table, column, col_type):
         conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
     except sqlite3.OperationalError:
         pass  # Column already exists
+
+
+def _migrate_drop_column(conn, table, column):
+    """Drop a legacy column if it exists (safe migration, SQLite >=3.35).
+
+    D2395: dead columns left in the DB (e.g. s3_original_domain from the removed
+    stage3, D2130) make the DB column count drift from CREATE TABLE/INSERT, which
+    integrity-check [8] flags. Dropping the dead column re-aligns them.
+    """
+    cols = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+    if column in cols:
+        conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
 
 
 def _get_pipeline_version() -> str:
@@ -339,7 +365,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 contradicts_fbs, related_fbs,
                 usage_count, last_retrieved_at,
                 feedback_score, feedback_count, fb_version,
-                source_clusters, source_books, source_principle_ids, source_segments,
+                source_clusters, source_books, source_ids, source_principle_ids, source_segments,
                 evidence_passages, evidence_passages_shown,
                 classification_errors, classification_status, classification_error,
                 verification_results, borp_score, status,
@@ -361,7 +387,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?,
                 ?, ?,
                 ?, ?, ?,
-                ?, ?, ?, ?,
+                ?, ?, ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?, ?,
@@ -418,6 +444,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             # provenance (simplified) + segment provenance (D2352)
             _safe_json(fb.get("source_clusters", [])),
             _safe_json(fb_source_books(fb)),
+            _safe_json(fb_source_ids(fb)),
             _safe_json(fb.get("source_principle_ids", [])),
             _safe_json(fb.get("source_segments", [])),
             # verbatim evidence (D2352)
@@ -462,7 +489,7 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
         # Flatten JSON arrays/dicts to strings for Parquet compatibility
         rows = []
         jsonlike_fields = {
-            "domains", "domains_raw", "source_clusters", "source_books",
+            "domains", "domains_raw", "source_clusters", "source_books", "source_ids",
             "verification_results", "classification_errors",
             "jargon", "source_principle_ids", "source_segments",
             "evidence_passages", "evidence_passages_shown",

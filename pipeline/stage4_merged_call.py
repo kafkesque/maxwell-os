@@ -28,9 +28,10 @@ with name, definition, mechanism, boundary, and consequence. Your job is to ADD 
 fields AND classify the FB's discipline, domains, and ontological depth.
 
 PART 1 — CRIBS ENRICHMENT:
-- application: Generate ONLY if this principle is prescriptive (actionable technique/method).
-  If descriptive/theoretical, set to null.
-  Format when present: "When [concrete situation] → do [specific action]."
+- application: REQUIRED for EVERY principle — descriptive or prescriptive. NEVER null, never omit.
+  Format: "When [concrete situation] → do [specific action]."
+  For descriptive/theoretical principles (causal mechanisms, empirical patterns),
+  frame it as "When [observing/encountering this pattern] → do [adjust reasoning/behavior accordingly]."
 - failure_mode: "The principle fails when [specific condition]." How it breaks — be specific.
 - elaboration: 3-5 sentences. Edge cases, non-obvious implications, second-order effects.
 - keywords: 3-5 search terms, comma-separated.
@@ -55,7 +56,7 @@ DO NOT over-assign "universal" — most principles are domain-bound.
 
 Return ONLY a JSON object:
 {
-  "application": "string or null",
+  "application": "string (REQUIRED)",
   "failure_mode": "string",
   "elaboration": "string",
   "keywords": "comma, separated, terms",
@@ -155,7 +156,10 @@ def merged_cribs_classify(
         raise ValueError(f"Merged call returned non-dict: {type(result)}")
 
     # CRIBS enrichment fields — non-semantic, safe to default (C16/D2355).
-    for key, default in (("application", None), ("failure_mode", ""),
+    # D2371: application is REQUIRED (schemas.FB.application, min_length=10) —
+    # NOT defaulted here. It is validated fail-closed below so an empty/short
+    # application is never silently recorded.
+    for key, default in (("failure_mode", ""),
                          ("elaboration", ""), ("keywords", ""), ("is_specialized", False)):
         if key not in result or result[key] is None:
             result[key] = default
@@ -163,6 +167,14 @@ def merged_cribs_classify(
     # Remove jargon if empty (preserves the OMIT behavior)
     if "jargon" in result and (not result["jargon"] or result["jargon"] == {}):
         del result["jargon"]
+
+    # D2371: application is REQUIRED (schema min_length=10). Fail-closed like
+    # the semantic fields — never let a null/empty application pass silently.
+    app = result.get("application")
+    if not isinstance(app, str) or len(app.strip()) < 10:
+        raise SparseClassificationError(
+            f"merged: application missing/too short ({len(str(app))} chars < 10)"
+        )
 
     # Semantic classification fields — FAIL-CLOSED: a sparse model response must
     # raise (never fabricate "emerging"/"domain"/"cited") so the caller falls
@@ -252,10 +264,13 @@ def _likely_universal(fb_data: dict) -> bool:
 DEPTH_FOCUSED_PROMPT = """Classify the DEPTH of this Foundation Block (a convergent principle from multiple books).
 
 ONTOLOGY:
-- specialized: Requires technical expertise in one narrow field. (e.g., optical kerning in typography)
-- domain: Applies broadly within one discipline only. (e.g., price anchoring in behavioral economics)
-- cross-domain: Same principle applies across multiple disciplines. (e.g., feedback loops in biology AND orgs)
-- universal: A law of nature or mathematics — applies everywhere. (e.g., entropy, power laws)
+- specialized: A narrow sub-technique within a sub-field, or a tool-specific skill. (e.g., optical kerning in typography)
+- domain: Operates within ONE field and requires that field's context. (e.g., price anchoring in behavioral economics)
+- cross-domain: Bridges 2+ DISTINCT disciplines via a SHARED mechanism. (e.g., feedback loops explaining homeostasis in biology AND equilibrium in org design)
+- universal: A law of nature or mathematics that applies to ALL systems. (e.g., entropy, power laws, scale invariance)
+
+DEFAULT to "domain" unless the mechanism clearly transcends a single discipline.
+DO NOT over-assign "universal" or "cross-domain" — most principles are domain-bound.
 
 FB:
 Name: {name}
@@ -383,7 +398,7 @@ Your job is to ADD enrichment fields AND classify each FB's discipline, domains,
 FOR EACH FB, return a SEPARATE JSON object with:
 {
   "fb_index": <number matching the input index>,
-  "application": "string or null",
+  "application": "string (REQUIRED)",
   "failure_mode": "string",
   "elaboration": "string",
   "keywords": "comma, separated, terms",
@@ -513,10 +528,20 @@ def batch_cribs_classify(
         entry = indexed[i]
 
         # CRIBS enrichment fields — non-semantic, safe to default (C16/D2355).
-        for key, default in (("application", None), ("failure_mode", ""),
+        # D2371: application is REQUIRED (schema min_length=10) — validated
+        # fail-closed below, not defaulted.
+        for key, default in (("failure_mode", ""),
                              ("elaboration", ""), ("keywords", ""), ("is_specialized", False)):
             if key not in entry or entry[key] is None:
                 entry[key] = default
+
+        # D2371: application is REQUIRED (schema min_length=10). Fail-closed.
+        app = entry.get("application")
+        if not isinstance(app, str) or len(app.strip()) < 10:
+            raise SparseClassificationError(
+                f"batch fb_index={i}: application missing/too short "
+                f"({len(str(app))} chars < 10)"
+            )
 
         # Clean up jargon
         if "jargon" in entry and (not entry["jargon"] or entry["jargon"] == {}):
@@ -596,7 +621,7 @@ def classify_depth_focused(
     name = fb_data.get("name", "")
     definition = fb_data.get("definition", "")
     mechanism = fb_data.get("mechanism", "")
-    extraction_type = fb_data.get("extraction_type", "causal_mechanism")
+    extraction_type = fb_data.get("extraction_type", "")  # D2376: absent → "" (no over-claim)
 
     prompt = DEPTH_FOCUSED_PROMPT.format(
         name=name,
@@ -637,10 +662,13 @@ def classify_depth_focused(
 DEPTH_BATCH_SYSTEM = """Classify the DEPTH of each Foundation Block below.
 
 ONTOLOGY:
-- specialized: Requires technical expertise in one narrow field. (e.g., optical kerning in typography)
-- domain: Applies broadly within one discipline only. (e.g., price anchoring in behavioral economics)
-- cross-domain: Same principle applies across multiple disciplines. (e.g., feedback loops in biology AND orgs)
-- universal: A law of nature or mathematics — applies everywhere. (e.g., entropy, power laws)
+- specialized: A narrow sub-technique within a sub-field, or a tool-specific skill. (e.g., optical kerning in typography)
+- domain: Operates within ONE field and requires that field's context. (e.g., price anchoring in behavioral economics)
+- cross-domain: Bridges 2+ DISTINCT disciplines via a SHARED mechanism. (e.g., feedback loops explaining homeostasis in biology AND equilibrium in org design)
+- universal: A law of nature or mathematics that applies to ALL systems. (e.g., entropy, power laws, scale invariance)
+
+DEFAULT to "domain" unless the mechanism clearly transcends a single discipline.
+DO NOT over-assign "universal" or "cross-domain" — most principles are domain-bound.
 
 For EACH FB, answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning.
 Return ONLY a JSON array of objects: [{"fb_index": <number>, "depth": "<one word>"}, ...]
@@ -658,7 +686,7 @@ def build_depth_batch_prompt(fbs_data: list[dict]) -> str:
         name = fb_data.get("name", "")
         definition = fb_data.get("definition", "")
         mechanism = fb_data.get("mechanism", "")
-        extraction_type = fb_data.get("extraction_type", "causal_mechanism")
+        extraction_type = fb_data.get("extraction_type", "")  # D2376: absent → "" (no over-claim)
         lines.append(f"--- FB {i} ---")
         lines.append(f"Name: {name}")
         lines.append(f"Definition: {definition}")

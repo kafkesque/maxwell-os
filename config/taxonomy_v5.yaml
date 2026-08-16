@@ -961,6 +961,9 @@ disciplines:
   - clinical psychology
   - behavioral psychology
   - cognitive psychology
+  - positive psychology
+  - productivity psychology
+  - performance psychology
 - canonical: linguistics
   group: Behavioral & Cognitive
   raw:
@@ -982,6 +985,8 @@ disciplines:
   - human resources
   - people management
   - organizational leadership
+  - leadership studies
+  - organizational design
 - canonical: strategic thinking
   group: Operational & Strategy
   raw:
@@ -1006,6 +1011,7 @@ disciplines:
   - Operations Management
   - Supply Chain Management
   - Resource Management
+  - business process management
 - canonical: risk management
   group: Operational & Strategy
   raw:
@@ -1097,6 +1103,10 @@ disciplines:
   - Computational Modeling
   - emergence
   - Emergence
+  - complex systems science
+  - complex systems theory
+  - complexity science
+  - chaos theory
 - canonical: systems engineering
   group: Systems & Method
   raw:
@@ -1135,6 +1145,8 @@ disciplines:
   - business analytics
   - statistical methods
   - evaluation research
+  - history of science
+  - statistical inference
 - canonical: operations research
   group: Systems & Method
   raw:
@@ -1145,6 +1157,7 @@ disciplines:
   - Information Theory
   - Game Theory
   - Simulation
+  - management science
 - canonical: prompt engineering
   group: AI & Computing
   raw:
@@ -1416,6 +1429,10 @@ disciplines:
   - Educational Finance
   - economic theory
   - microeconomics
+  - financial economics
+  - environmental economics
+  - productivity economics
+  - auction theory
 - canonical: sociology
   group: Heterodox
   raw:
@@ -1532,6 +1549,7 @@ disciplines:
   - Neurology
   - cognitive neuroscience
   - neurobiology
+  - psychoneuroimmunology
 - canonical: robotics
   group: AI & Computing
   raw:

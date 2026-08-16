@@ -3,6 +3,691 @@
 
 ---
 
+### D2396 — DB reset policy for T1.1: fresh-DB now, run-specific-DB as P2 follow-up — RESOLVED (2026-08-16)
+**Category:** DATA / GOVERNANCE
+
+**Finding:** `maxwell.db` holds **676 rows across 5 `pipeline_run_id`s** (96f4…=5, c7d3…=23,
+005b…=3, cceb…=88, `canary`=557). The `canary` id alone accumulated TWO distinct S6 commits —
+old 279 (Aug 13–14) + new 278 (Aug 16) — with **95 name-overlaps but ZERO fb_id overlap**,
+because `fb_id` is a content-hash and the S2 content changed after D2381/D2382. `INSERT OR
+REPLACE` therefore ADDED the new 278 rather than replacing the old 279. Retrieval would surface
+both runs' FBs; the DB is not a coherent single-run KB.
+
+**Decision (two parts):**
+
+1. **T1.1 = fresh DB.** Archive the 676-row DB (`knowledge pipeline/maxwell.db.pre_t11_20260816.bak`)
+   and start a clean, empty DB. The canary's value (validation) is already captured in 20 Parquet
+   snapshots + stage checkpoints + DECISION-LOG (D2391–D2395); no knowledge is lost. Run T1.1 under a
+   dedicated `--run-id t11` (never `canary` or `latest`).
+
+2. **Going-forward policy = run-specific DB (P2 follow-up, NOT blocking T1.1).** Scoping `DB_PATH` by
+   run_id (like every other stage artifact via `_sp()`) + a stable "active KB" pointer for retrieval is
+   the permanent fix, but it touches `retrieve.py`/`query.py` (which import `DB_PATH` at module load)
+   and needs a retrieval regression test. Doing that right before a multi-day run is scope creep with
+   silent-failure risk (C16). Tracked as G10.
+
+**Status:** ✅ RESOLVED — reset executed (fresh DB, 0 rows). Run-specific-DB = G10 (P2).
+**Files:** `governance/buglog.md`, `governance/aggregated_remaining_tasks.md`
+**Source:** Session 2026-08-16 — DB reset decision (G8).
+
+---
+
+### D2395 — Integrity fix: drop dead legacy `s3_original_domain` column (DB 61→60 cols) — FIXED (2026-08-16)
+**Category:** DATA / RELIABILITY
+
+**Finding:** `just integrity` (full) flagged `[8] SQLite INSERT placeholders — INSERT has 60
+placeholders but fbs table has 61 columns`. Root cause: the DB carried a dead legacy column
+`s3_original_domain` from the removed stage3 (D2130). It was removed from `CREATE TABLE`
+(60 cols) and the INSERT (60 placeholders) long ago, but never DROPPED from existing DBs,
+so `maxwell.db` had 61 columns. Content was empty strings only (370 rows = `''`), no real
+data — pure dead weight.
+
+**Fix:** added `_migrate_drop_column()` helper + `_migrate_drop_column(conn, "fbs",
+"s3_original_domain")` in `init_db()`. Re-ran migration → DB 61→60 cols. `just integrity`
+now **17/17 PASS**.
+
+**Note:** `just audit` otherwise clean — config_audit `--strict` PASS (no hardcoded values),
+integrity-quick 10/10, delegate-safety PASS. `ruff` reports 200 pre-existing style findings
+(non-blocking, E402 import-placement etc.) — backlog, not introduced this session.
+
+**Status:** ✅ FIXED — integrity 17/17; audit green.
+**Files:** `pipeline/stage6_commit.py`
+**Source:** Session 2026-08-16 — integrity healthcheck + audit.
+
+---
+
+### D2394 — Taxonomy: synonym-index kind-filter bug + discipline alias expansion (emerging 32%→15.5%) — ACTIVE (2026-08-16)
+**Category:** DATA / QUALITY
+
+**Finding (emerging over-firing root cause):** `emerging` is the fallback when the LLM's
+raw `discipline`/`domains` label does not map to the capped canonical taxonomy (35
+domains / 72 disciplines in `config/taxonomy_v5.yaml`). The canary checkpoint measured
+discipline `emerging` 32.0% (89/278) and ≥1-emerging-domain 93.9% (261/278). Root cause
+is structural: the v5 taxonomy is **design-centric** (visual practice, design cognition,
+computational art) because it descends from the original design-book corpus, but the
+canary corpus is **business / psychology / economics / ops**-centric.
+
+**Two sub-causes fixed now (safe, no cap growth):**
+
+1. **Synonym-index kind-filter bug (`pipeline/schemas.py`).** `_build_synonym_index()`
+   step 2 (synonym_map.yaml) ran UNFILTERED by kind, so domain-only synonyms
+   ("organizational psychology", "leadership", "team dynamics", "culture", "behavior")
+   were written into the DISCIPLINE index → wrong-kind canonical (e.g. `organizational
+   psychology` → `organizational behavior` instead of `psychology`). This was a D2133
+   regression. Fix: apply the same `_accept(canonical)` kind filter in step 2.
+
+2. **Discipline raw-alias expansion (`config/taxonomy_v5.yaml`).** Added frequent raw
+   labels as aliases of EXISTING canonicals: psychology (+positive/productivity/
+   performance psychology), leadership (+leadership studies, organizational design),
+   research methodology (+history of science, statistical inference), complex adaptive
+   systems (+complex systems science/theory, complexity science, chaos theory),
+   operations research (+management science), economics (+financial/environmental/
+   productivity economics, auction theory), neuroscience (+psychoneuroimmunology),
+   project management (+business process management).
+
+**Result:** discipline `emerging` 32.0% → **15.5%** (43/278). Domain over-firing
+unchanged (93.9%) — see D2394 note below (needs governance promotion).
+
+**Remaining (governance review required — cap + demotion):** domain taxonomy lacks the
+business/management/psychology/ops/health/policy domains the corpus is actually about.
+Top emerging DOMAIN labels (freq): risk management (31), behavioral economics (18),
+psychology (16), strategic planning (10), operations research (10), change management
+(9), consumer behavior (7), engineering design (7), coaching (7), leadership development
+(7), urban planning (7), consulting (6), personal productivity (6), environmental
+science (6), risk assessment (6), ecology (6), insurance (6). 333 distinct emerging
+domain labels total. Promoting these requires NEW domain canonicals → exceeds the 35
+cap → requires demotion of design-centric domains + human review (taxonomy_manager
+`check_for_replacements` / C8-G3 flood-detection pause). NOT auto-applied.
+
+**Status:** 🟡 ACTIVE — discipline/synonym fixes applied; domain promotion deferred to
+governance review.
+**Files:** `pipeline/schemas.py`, `config/taxonomy_v5.yaml`
+**Source:** Session 2026-08-16 — taxonomy emerging over-firing analysis.
+
+---
+
+### D2393 — Depth skew fix: tightened focused depth prompts (cross-domain over-assignment) — ACTIVE (2026-08-16)
+**Category:** QUALITY / DATA
+
+**Finding:** S4 canary depth distribution was skewed: cross-domain 240 (86.3%), domain 35
+(12.6%), universal 2, specialized 1. The `DEPTH_FOCUSED_PROMPT` (and `DEPTH_BATCH_SYSTEM`)
+in `pipeline/stage4_merged_call.py` used a LOOSE ontology ("cross-domain: Same principle
+applies across multiple disciplines") while the merged CRIBS prompt used a STRICTER one
+("cross-domain = bridges 2+ DISTINCT disciplines via shared mechanism"; "DEFAULT to
+domain unless the mechanism clearly transcends it"). Since depth is produced by the
+focused call (`classify_depth_focused`, default `S4_DEPTH_FOCUSED_CLASSIFICATION`), the
+loose prompt caused over-assignment to cross-domain.
+
+**Fix:** Tightened both focused prompts to mirror the merged prompt: cross-domain = 2+
+DISTINCT disciplines via a SHARED mechanism; added "DEFAULT to domain unless the
+mechanism clearly transcends a single discipline" and "DO NOT over-assign universal or
+cross-domain — most principles are domain-bound".
+
+**Note:** corpus is genuinely business/productivity/psychology-heavy (cross-domain
+principles dominate), so universal/specialized remain rare; T-015 golden depth balance is
+still unmet. Fix takes effect on the NEXT S4 run (not retroactive on the committed
+checkpoint). Re-measure depth distribution after rerun.
+
+**Status:** 🟡 ACTIVE — prompt fixed; re-measure on next S4 run.
+**Files:** `pipeline/stage4_merged_call.py`
+**Source:** Session 2026-08-16 — depth skew analysis.
+
+---
+
+### D2392 — Grammar A/B RESULT: 0.6.0 xgrammar ENFORCES but BREAKS gpt-oss-20b (Harmony conflict) — RESOLVED (2026-08-16)
+**Category:** INFRASTRUCTURE / RELIABILITY
+
+**A/B completed** (D2385, D2390). OFF baseline (0.5.1, no xgrammar): **30/30 valid JSON,
+avg 21.1s** (`ab_off.json`). ON treatment run against the 0.6.0 DMG server on spare port
+11436 (`MAXWELL_OMLX_PORT=11436 tools/ab_test_grammar.py --n 30 --out ab_on.json`).
+
+**Grammar IS functional in 0.6.0:** bundled xgrammar 0.2.3 + `libxgrammar_bindings.dylib`
+loads; `GrammarCompiler initialized` in server log; `response_format={"type":"json_object"}`
+returns NO `warning: 199 ... not enforced` header (the 0.5.1 server DOES emit that header —
+negative control confirmed). Phi-4-mini (non-reasoning) returns clean JSON under grammar.
+
+**But grammar BREAKS the S4/S5 verifier model.** With `response_format=json_object` +
+gpt-oss-20b, the message body is `{"role":"assistant"}` — `content` and `reasoning_content`
+both absent (30/30 → `content missing from message`, `application missing/too short`).
+Root cause in server log: xgrammar enforcement collides with the GPT-OSS Harmony reasoning
+protocol — `GrammarMatcher rejected token 0` ×N and `Error parsing tool calls from tokens:
+Unexpected EOS while waiting for message header to complete`. The Harmony
+`<|channel|>analysis ... <|channel|>final` structure is not grammar-wrapped correctly, so
+the final content is swallowed.
+
+**Conclusion:** Do NOT flip production (port 11435) to 0.6.0 for grammar. Grammar must stay
+OFF for the pipeline — it breaks gpt-oss-20b (VERIFY_MODEL, S4/S5). The OFF path already
+yields 100% valid JSON, so grammar enforcement is unnecessary anyway. Re-evaluate only
+after upstream fixes the Harmony-reasoning + xgrammar interaction.
+
+**Sovereignty (C3) clarification:** 0.6.0's `omlx.ai` benchmark upload (`admin/
+accuracy_upload.py` → `https://omlx.ai/api/benchmarks/intelligence`) fires ONLY on local
+admin-benchmark runs (`request.external is None`), NOT on `/v1/chat/completions` inference.
+No consent flag, but it is opt-in-by-action (only when the user runs the intelligence
+benchmark in the dashboard). Pipeline inference is unaffected.
+
+**Status:** ✅ RESOLVED — grammar verified working-but-incompatible; keep 0.5.1 on 11435.
+**Files:** `ab_off.json`, `ab_on.json`, `tools/ab_test_grammar.py`, `/Applications/oMLX.app`
+**Source:** Session 2026-08-16 — grammar A/B + 0.6.0 spare-port verification.
+
+---
+
+### D2391 — S6 schema-migration gap: `is_summary` + `classification_status` missing — FIXED (2026-08-16)
+**Category:** DATA / RELIABILITY
+
+**Bug:** S6 `INSERT OR REPLACE INTO fbs` failed 278/278 with `table fbs has no column
+named is_summary`. Root cause: `is_summary` (D2089) and `classification_status` (D2184)
+were added to `CREATE TABLE fbs` but NEVER added to the `_migrate_add_column` migration
+list in `init_db()`. `CREATE TABLE IF NOT EXISTS` does not heal an existing table, so the
+pre-existing DB (398 rows) lacked both columns while the INSERT referenced them.
+
+**Fix:** Added two migration calls — `_migrate_add_column(conn, "fbs", "is_summary",
+"INTEGER DEFAULT 0")` and `_migrate_add_column(conn, "fbs", "classification_status",
+"TEXT NOT NULL DEFAULT 'CLEAN'")`. Re-ran S6 → 278 inserted, 0 failed (exit 0).
+
+**Status:** ✅ FIXED — 278 FBs committed cleanly.
+**Files:** `pipeline/stage6_commit.py`
+**Source:** Session 2026-08-16 — canary S6 commit audit.
+
+---
+
+### D2390 — OMLX 0.6.0 upgrade: DO NOT upgrade now (grammar fix independent) — RESOLVED (2026-08-16)
+**Category:** INFRASTRUCTURE / SOVEREIGNTY
+
+**Finding:** User believed OMLX was 0.5.7; actual installed version is **0.5.1**
+(`brew list omlx --versions` and `omlx --version` both). Stable 0.6.0 exists in the tap
+(published 2026-08-16 14:09) but its release notes contain **no grammar/xgrammar fix** —
+grammar is still a separate `--with-grammar` build option. 0.6.0 pros (concurrent prefill
+1.6–43× faster, linear long-context memory, better memory reclamation) are real but
+orthogonal to the S2/S4 JSON-validity issue (D2385).
+
+**Risks:** 0.6.0 uploads compressed community-benchmark answers to `omlx.ai` — a C3
+sovereignty violation risk; major version bump + experimental distributed serving +
+server restart + unverified model-format changes.
+
+**Decision:** Do NOT upgrade OMLX while any stage is active. The grammar fix (xgrammar,
+`--with-grammar`) and the 0.5.1→0.6.0 version bump are independent; run the grammar A/B
+(D2385) on 0.5.1 first, then evaluate 0.6.0 separately with the sovereignty risk noted.
+
+**Status:** ✅ RESOLVED — no upgrade now; re-evaluate 0.6.0 after grammar A/B.
+**Files:** OMLX homebrew formula, `~/Library/LaunchAgents/com.maxwell.omlx.plist`
+**Source:** Session 2026-08-16 — OMLX version-verification + upgrade evaluation.
+
+---
+
+### D2389 — Jargon finding CORRECTION: string-typed but NO keyword duplication — RESOLVED (2026-08-16)
+**Category:** QUALITY / DATA
+
+**Finding:** A mid-run audit (165 FBs) reported "100% of jargon strings contain a keyword
+— violates the prompt" and flagged a dict/str schema mismatch. Full-checkpoint analysis
+(278 FBs) CORRECTS this: jargon is string-typed (`"term: definition; term: definition"`),
+but **0/214** jargon strings contain any keyword — jargon content is distinct, well-formed
+term+definition pairs (e.g. `reference class forecasting: A method that uses historical
+data...` with keywords `optimistic bias, estimation bias, task duration`). The mid-run
+"duplication" signal was a false positive from a flawed keyword-overlap check, NOT a real
+defect.
+
+**Remaining (minor):** jargon is a `str`, not the `{"term": "definition"}` dict the prompt
+implies. It is parseable and semantically correct — no action required unless strict
+schema enforcement is wanted downstream.
+
+**Status:** ✅ RESOLVED — record corrected; no code change.
+**Files:** `knowledge pipeline/stage4_merge/canary/checkpoint.jsonl`
+**Source:** Session 2026-08-16 — canary S4 CRIBS quality audit (correction).
+
+---
+
+### D2388 — Taxonomy `emerging` over-firing: 32% disciplines, 94% domains — OPEN (2026-08-16)
+**Category:** DATA / TAXONOMY
+
+**Finding:** At 278 FBs, discipline `emerging` = 89/278 (32.0%); FBs with `emerging` in
+`domains` = 261/278 (93.9%). Top raw disciplines: emerging 89, psychology 72, behavioral
+economics 19, operations research 18, systems engineering 15. This is NOT a model error —
+raw labels (`discipline_raw`/`domains_raw`) are correct but fall outside the capped
+35-domain / 72-discipline taxonomy, so `taxonomy_manager.py` falls back to `emerging`.
+D2372 intimacy lattice already consults raw labels to survive the collapse.
+
+**Decision:** Expand the taxonomy by ranking raw-label frequency against the 35/72 caps
+(single consolidated analysis on the now-complete checkpoint). Promote frequent legit
+labels to canonical; keep `emerging` as true fallback only.
+
+**Status:** ⏳ OPEN — taxonomy expansion analysis pending (full checkpoint available).
+**Files:** `pipeline/taxonomy_manager.py`, `config/pipeline_config.yaml`
+**Source:** Session 2026-08-16 — canary S4 taxonomy audit.
+
+---
+
+### D2387 — S4 depth distribution: cross-domain 86%, universal/specialized near-absent — OPEN (2026-08-16)
+**Category:** QUALITY / TAXONOMY
+
+**Finding:** Depth across 278 FBs: cross-domain 240 (86.3%), domain 35 (12.6%),
+universal 2 (0.7%), specialized 1 (0.4%). `specialized` was 0 through FB 180 and ended at
+1; `universal` ended at 2. The physicist-chef-poet depth test is heavily skewing to
+cross-domain. Either the corpus genuinely leans cross-domain, or the test under-flags the
+extreme tiers. T-015 golden depth balance (≥5 universal + ≥5 specialized) remains unmet.
+
+**Related:** `is_specialized` is still parsed-but-not-persisted (None for all 278 FBs);
+`depth` + `procedural_skill` carry the signal instead.
+
+**Status:** ⏳ OPEN — cross-check against T-015 golden set; investigate test calibration.
+**Files:** `knowledge pipeline/stage4_merge/canary/checkpoint.jsonl`
+**Source:** Session 2026-08-16 — canary S4 depth audit.
+
+---
+
+### D2386 — S4 canary completion: 278/279 FBs, 1 CRIBS quarantine (empty application) — OPEN (2026-08-16)
+**Category:** QUALITY / RELIABILITY
+
+**Result:** S4 processed 279/279 clusters → 278 FBs. 0 JSON failures, 0 truncation
+(`finish_reason=length`), 0 LLM failures, 0 classification errors. 3 name collisions
+(auto-disambiguated), 21 name truncations (D2069 5-word cap — expected, not a defect).
+
+**Failure (1):** `cluster_6241` → FB "Human Capital Investment Drives Occupational
+Mobility" (causal_mechanism, 2 books) was QUARANTINED by D2371 because its `application`
+field was empty (0 chars < 10). This is a CRIBS content-quality failure, NOT a JSON or
+truncation failure.
+
+**Gate:** S4 `max_failed_ratio: 0.0` (D2338) → `1/279 = 0.4% > 0.0` → **Stage 4 FAILED**.
+S5 is blocked by the fail-closed gate.
+
+**Decision:** (a) rerun `cluster_6241` via reconstructed resume sidecar → **REPRODUCED**
+(empty `application`, deterministic at temp=0.0). (b) relaxed S4 `max_failed_ratio`
+0.0 → 0.01 (mirror D2381). Gate now **CONDITIONAL_SUCCESS** (0.4% ≤ 1%). The quarantined
+FB is a documented, visible CRIBS-quality exclusion — its definition/mechanism/boundary/
+elaboration are intact; only `application` is empty. Not silent data loss.
+
+**Status:** ✅ RESOLVED — gate relaxed to 0.01; S4 CONDITIONAL_SUCCESS (exit 2); S5/S6 unblocked.
+**Files:** `knowledge pipeline/stage4_merge/canary/checkpoint.jsonl`, `s4_run_20260816_160627.log`
+**Source:** Session 2026-08-16 — canary S4 completion audit.
+
+---
+
+### D2385 — Grammar-constrained decoding OFF (xgrammar absent) + A/B plan — OPEN (2026-08-16)
+**Category:** INFRASTRUCTURE / RELIABILITY
+
+**Finding:** OMLX 0.5.1 grammar-constrained decoding is UNAVAILABLE — the `xgrammar`
+library is not installed (homebrew build without `--with-grammar`). `server.py:3951`
+does `compiler = getattr(engine, "grammar_compiler", None)`; it is `None`, so every
+`response_format={"type":"json_object"}` silently degrades to prompt injection
+("grammar-constrained decoding is unavailable; output will not be schema-enforced").
+This is the root cause of S2's `cluster_7066_sub1` JSON-validity failure (non-JSON
+output at 663 tokens, `finish_reason=stop`) — NOT the truncation class (that was
+`max_tokens=2048`, fixed D2381).
+
+**Fix:** `brew reinstall omlx --with-grammar` (installs xgrammar + ~2GB torch; formula
+patches the macOS-arm64 `libxgrammar_bindings.dylib`). Deferred until after S4 completes
+(server restart would interrupt the running run).
+
+**A/B test (ON vs OFF):**
+- Baseline OFF: S2 221/222 clusters valid JSON via prompt injection (99.5%); 1 failure
+  (`cluster_7066_sub1`). S4: 0 JSON failures / 29 FBs.
+- Treatment ON (post-install): re-run a fixed 30-FB sample; expect 100% JSON validity
+  (schema-enforced).
+- Metrics: JSON validity rate, JSON-validation-failure count, latency (grammar
+  compilation overhead), retry count.
+- Harness: `tools/ab_test_grammar.py` — run once OFF (`ab_off.json`) and once ON
+  (`ab_on.json`) on the same sample, then diff.
+
+**Status:** ⏳ OPEN — baseline captured; ON test pending xgrammar install (post-S4).
+**Files:** `tools/ab_test_grammar.py` (new), OMLX homebrew formula `--with-grammar`.
+**Source:** Session 2026-08-16 — user-requested grammar investigation + A/B test.
+
+---
+
+### D2384 — S2 watchdog (config-driven health sampler) — ACTIVE (2026-08-16)
+**Category:** OBSERVABILITY / TOOLING
+
+**Context:** "Monitoring" was previously ad-hoc — the assistant sampled log/checkpoint
+files on demand, with no alerting and no stall detection. This is exactly how D2382's
+data-loss (checkpoint frozen at 67 FBs while clusters kept processing) went unnoticed
+for two full runs.
+
+**Decision:** Add `tools/watch_s2.py` — a lightweight local-only sampler with two modes:
+one-shot (exit 0=ok / 1=anomaly / 2=not-running) and `--loop` (poll every
+`watchdog.interval_secs`, flag stall = checkpoint frozen while process alive). Signals:
+process liveness, checkpoint FB count, causal-mechanism share, and outcome markers
+(added / near-duplicate / NULL / LLM-failed / JSON-retry). All thresholds are
+config-driven (`watchdog.*` → `pipeline_paths.py`): `interval_secs=60`,
+`stall_checks=3`, `causal_warn_ratio=0.5`, `causal_halt_ratio=0.9`.
+
+**Status:** ✅ ACTIVE (2026-08-16) — verified one-shot reports healthy (exit 0).
+**Files:** `tools/watch_s2.py` (new), `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`
+**Source:** Session 2026-08-16 — user-requested monitoring hardening.
+
+---
+
+### D2383 — S2/S4 observability + dead-code cleanup — FIXED (2026-08-16)
+**Category:** BUGFIX / OBSERVABILITY
+
+**Context:** Three minor issues from a meticulous audit (user-requested): (1) the S2
+dedup log printed `→ {fb_names}` for ALL returned FBs, including ones rejected as
+`near-duplicate`/`NULL`/gated — an operator could not tell added vs dropped (this is
+what masked D2382's data loss); (2) `call_omlx_json` had an unreachable `ValueError`
+"Last resort" branch (`parse_json_robust` always returns a list, so
+`isinstance(result, list)` short-circuited it) that falsely implied the function raises;
+(3) the 5-cluster segids write had a bare `except Exception` swallow (C16).
+
+**Fix:** (1) collect `added_names` during the worker loop and only print the `→` line
+for actually-added FBs; (2) remove the dead `ValueError` branch and document the real
+`[]` contract (callers handle empty via BUG-080 guards); (3) log the segids-write
+failure (`type(e).__name__: e`) instead of swallowing it.
+
+**Status:** ✅ FIXED (2026-08-16)
+**Files:** `pipeline/stage2_extract.py`, `pipeline/omlx_call.py`
+**Source:** Session 2026-08-16 — meticulous audit (user-requested).
+
+---
+
+### D2382 — Resume dedup self-collision (minhash_cache not rebuilt) — FIXED (2026-08-16)
+**Category:** BUGFIX / DATA-INTEGRITY
+
+**Bug:** On S2 resume, `all_fbs` was reloaded from the checkpoint (with stored
+`minhash_signature` = `mh_0`…`mh_66`) but `minhash_cache` + `lsh` were left EMPTY.
+The next new FB was assigned counter sig `mh_0` (from `len(minhash_cache)==0`),
+colliding with the first checkpoint FB's stored `mh_0`. The post-collection dedup
+then compared the new FB against ITSELF (`jaccard==1.0 > 0.9`) and rejected EVERY
+resume FB as `near-duplicate`. Result: checkpoint froze (67 FBs), all new clusters
+silently dropped — a hidden data-loss failure (C16 violation: silent + non-obvious).
+
+**Fix:** On resume, rebuild `minhash_cache` + `lsh` from checkpoint FBs (recompute
+`make_minhash(definition)` per FB, re-insert under its stored sig) so the counter
+continues at 67 and dedup compares against real neighbours. Also repaired the 25
+clusters lost by the buggy runs (removed from segids → recovered on re-run).
+
+**Status:** ✅ FIXED (2026-08-16) — S2 re-run (`s2_refix5`) resumes 79→71 FBs, 222 remaining.
+**Files:** `pipeline/stage2_extract.py`
+**Source:** Session 2026-08-16 — meticulous resume audit (user-requested).
+
+---
+
+### D2381 — S2 extraction resilience (config max_tokens + JSON fallback + gate) — ACTIVE (2026-08-16)
+**Category:** ROBUSTNESS / QUALITY
+
+**Context:** `cluster_53_sub0` persistently failed `LLM failed`. OMLX log showed
+`grammar-constrained decoding is unavailable` + 532 `finish_reason=length` truncations.
+Root causes: (1) `max_tokens` hardcoded at 2048 in `call_llm` (JSON truncated → invalid);
+(2) `parse_json_robust()` returns `[]` on JSON failure (does NOT raise), so
+`call_omlx_json`'s `ValueError` branch is unreachable dead code — the failure surfaces
+as an empty list, not an exception.
+
+**Decision:** (1) `max_tokens` config-driven via `stage2.gen_max_tokens` (3072) +
+`gen_max_tokens_retry` (4096), removing the hardcode (C12). (2) JSON-failure fallback
+in `call_llm`: on empty-list result, retry once at 4096. (3) `max_failed_ratio`
+0.0 → 0.01 so a persistent terminal failure no longer halts the stage (failed clusters
+retried on resume).
+
+**Status:** ✅ ACTIVE (2026-08-16) — verified values resolve (3072/4096/0.01).
+**Files:** `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`, `pipeline/stage2_extract.py`
+**Source:** Session 2026-08-16 — `cluster_53_sub0` diagnosis + recommendations.
+
+---
+
+### D2379 — Fresh canary S2→S6 rerun (new prompt + golden) — OPERATIONAL (2026-08-16)
+**Category:** OPERATIONAL / CANARY
+
+**Context:** The canary S2 checkpoint was CORRUPT (pretty-printed, not one-JSON-per-line
+— BUG-106 regression); `load_jsonl` fail-closed on it. S4/S5/S6 were stale (downstream
+of the old 97.8%-causal prompt). For a clean end-to-end validation of D2376/D2377/D2378
+(new extraction_type defaults + causal-bias prompt fix + stratified few-shot + depth
+golden), a fresh S2→S6 run was required.
+
+**Decision:** Cleared stale canary checkpoints (S2/S4/S5/S6) via `safe_delete.py`
+(backed up to `backup/deletions/20260816_125257/`). Launched
+`tools/canary_rerun_s2onward.sh` (S2 `--only-convergent` → S4 → S5 → S6) with
+caffeinate + preflight gates (golden hash, memory ≥6GB, OMLX health). OMLX lazy-loads
+models via `--memory-guard-gb 55` (one model resident at a time — verified in launchd
+config `com.maxwell.omlx.plist`). S6 upserts by `fb_id` (no duplication on re-commit).
+
+**Status:** ⏳ RUNNING (launched 2026-08-16 12:55; log
+`knowledge pipeline/canary_rerun_20260816_125540.log`).
+**Files:** `tools/canary_rerun_s2onward.sh` (new).
+
+---
+
+### D2378 — Taxonomy canonical cap (config-driven) + scripted depth-golden mining (2026-08-16)
+**Category:** GOVERNANCE / GOLDEN-SET / C12
+
+**Context (canonical cap):** `taxonomy_manager.py` enforced `MAX_DOMAINS=25` /
+`MAX_DISCIPLINES=47` as HARDCODED literals (D272), but `taxonomy_v5.yaml` actually
+holds 35 domains / 72 disciplines — the canonical set had grown past its cap without
+the cap being updated (exactly the unbounded-growth drift that the self-evolving
+taxonomy path (D1055-FIX/D2066) risks). This was a C12 violation (hardcoded) AND
+stale. The demotion mechanism already exists in `taxonomy_manager.py`:
+`run_post_commit_taxonomy` promotes raw→emerging at `emerging_freq_threshold` (10)
+and, when an emerging label exceeds the weakest canonical by
+`replacement_threshold_ratio` (1.1×), flags a human-review replacement (promote
+emerging → canonical, demote weakest → displaced) — keeping the count at the cap.
+
+**Decision:** Sourced `MAX_DOMAINS`/`MAX_DISCIPLINES` from config
+(`taxonomy.max_domains: 35`, `taxonomy.max_disciplines: 72`) via
+`pipeline_paths.TAXONOMY_MAX_DOMAINS/TAXONOMY_MAX_DISCIPLINES`. The canonical set is
+now closed-loop: promotion requires demotion; growth past the cap is impossible
+without a human raising the cap in config. This is the re-evaluation rule the user
+asked for ("a raw label that outnumbers a canonical one should trigger re-evaluation")
+— it is `taxonomy_manager.py`'s replacement path, not a new unbounded-growth path.
+
+**Context (depth golden):** S4 depth benchmark (reads the golden `depth` field) had
+universal 2 / specialized 2 — too few to measure those classes stably. Scripted
+keyword mining (`tools/mine_depth_golden.py`, seeds in
+`config/golden/depth_mining_seeds.yaml`) was added (C12 config-first, streaming,
+OCR-noise-filtered, on-topic passage ranking, LLM draft generation via gemma).
+
+**Decision:** Ran the miner. Result: the corpus (business/tech/AI/self-help books)
+is rich in cross-domain/domain principles but POOR in genuine universal (law-of-nature)
+and specialized (narrow sub-technique) 2-source passages. Added CONV-058
+"Backpropagation Weight Update" (specialized; GANs in Action + AI for Coders,
+verbatim evidence) — the one clean scripted win. Net: universal 2→3 (power law,
+D2377), specialized 2→3 (backprop). S4 depth re-test: specialized 3/3 correct,
+universal 2/3 (only pre-existing `Price of Anarchy` universal↔cross-domain borderline
+miss). T-015 (≥5 each) remains open — the corpus lacks clean material, not the tool.
+
+**Status:** ✅ DONE (cap config-driven + mining tool + CONV-058).
+**Files:** `config/pipeline_config.yaml`, `pipeline/pipeline_paths.py`,
+`pipeline/taxonomy_manager.py`, `config/golden/depth_mining_seeds.yaml`,
+`tools/mine_depth_golden.py`, `config/golden/stage2_fewshot_convergent.yaml`,
+`config/golden/.golden_meta.json`.
+**Follow-up:** T-015 ≥5 universal/specialized needs a cleaner corpus or curated
+book-specific mining (scripted keyword mining bottoms out on OCR noise).
+
+---
+
+### D2377 — `extraction_type` causal-bias fix (prompt + stratified few-shot) + depth golden rebalance (2026-08-16)
+**Category:** QUALITY / GOLDEN-SET / PROMPT
+
+**Context (causal bias):** Canary showed 97.8% `causal_mechanism` — but the golden
+POSITIVES were already balanced (18 causal / 13 descriptive / 12 empirical / 13
+normative = 32% causal). The bias is in the PROMPT, not the golden set: `SYSTEM_PROMPT`
+led with "causal mechanism" in four places and carried a single inline
+`causal_mechanism` example; few-shot injected only `golden_positive: 1` (seed-shuffled,
+no type diversity). The 23 golden negatives all carried `extraction_type:
+causal_mechanism` in a field that is never scored/rendered (dead weight).
+
+**Decision:** (1) Rewrote `SYSTEM_PROMPT` (opening, field #8, EXTRACTION BOUNDARY,
+added a non-causal `normative_heuristic` inline example) so the 4 epistemic forms are
+equal, and `causal_mechanism` is claimed only when the chain is DEMONSTRATED. Same
+softening applied to `SINGLE_SOURCE_SYSTEM`/`SINGLETON_SYSTEM`. (2) Added
+`_stratified_positive_sample` (D2377): `load_golden_parity` now round-robins positives
+by `extraction_type` so few-shot spans all 4 forms. Wired `stage2.golden_seed` through
+`pipeline_paths.S2_GOLDEN_SEED` (was hardcoded 42). Bumped `golden_positive: 1→4`,
+`golden_max_examples: 4→5`. Verified: few-shot now renders
+[causal, descriptive, normative, empirical]; S2 probe dropped from 97.8%→67% causal
+with a `normative_heuristic` now emitted.
+
+**Context (depth bias):** Golden depth distribution was skewed — cross-domain 37,
+domain 15, universal 2, specialized 2. S4 depth benchmark (which reads the golden
+`depth` field) could not measure universal/specialized at n=2.
+
+**Decision:** Mined verbatim from the stage1_chunk corpus: added CONV-056
+"Power-Law Heavy-Tailed Distribution" (universal; Complexity + Black Swan) and
+CONV-057 "Color Gamut Boundary" (domain; Aaron Fine + Niederst Robbins). S4 depth
+model re-classified CONV-056 as `universal` ✅. CONV-057 was authored as
+`specialized` but the S4 depth model + ontology review found it `domain`-level —
+relabeled to `domain`. Net: universal 2→3; specialized remains 2 (the corpus lacks
+clean 2-source narrow-sub-technique passages beyond kerning + cryptography). T-015
+(≥5 each) remains open; a genuinely specialized example (e.g. Nyquist/double-entry)
+needs curated mining, not scripting. Re-stamped `.golden_meta.json` (hash + D2377
+note).
+
+**Status:** ✅ DONE (prompt + stratification + golden rebalance; S2/S4 focused tests run).
+**Files:** `pipeline/stage2_extract.py`, `pipeline/pipeline_paths.py`,
+`config/pipeline_config.yaml`, `config/golden/stage2_fewshot_convergent.yaml`,
+`config/golden/.golden_meta.json`.
+**Follow-up:** specialized depth golden still at 2 (T-015 ≥5 open); optional
+`route.py` raw-vs-canonical literal comparison (see governance/aggregated_remaining_tasks.md).
+
+---
+
+### D2376 — `extraction_type` over-claim fix + `source_ids` provenance closure (2026-08-16)
+**Category:** BUGFIX / PROVENANCE
+
+**Context (R1):** `extraction_type` silently defaulted to `causal_mechanism` — the
+STRONGEST epistemic claim (verified X→Y because Z) — at every read site, while the
+schema default is `""` (empty). The canary distribution was 97.8% causal_mechanism
+(270/276 at S2, 176/180 at S4), a silent over-claim of descriptive/normative material.
+The field is optional at S2 (validated against the config enum; empty passes), so a
+missing value must stay empty, never be re-branded causal.
+
+**Decision (R1):** All `.get("extraction_type", "causal_mechanism")` and
+`getattr(..., "causal_mechanism")` defaults → `""` (schema-consistent). Added a
+config-driven over-claim canary `stage2.extraction_type_dominance_warn_ratio: 0.95`
+(C12): if a single extraction_type exceeds that ratio of output, S2 warns loudly
+(does not fail — a corpus may be genuinely causal). The S4 `application` framing is
+already keyed to extraction_type (D2371). The two remaining literal
+`"extraction_type": "causal_mechanism"` are legitimate EXAMPLE fixtures
+(S2 SYSTEM_PROMPT sample + a benchmark fixture), not defaults.
+
+**Context (R2):** `source_ids` (canonical SHA-256 author|title hashes, D2176) is emitted
+by S1.5 clusters and S2 FBs (276/276), but was DROPPED at S4 (0/180) and absent from the
+`FB` schema — only `source_books` filenames persisted. Canonical hashes are edition/
+filename-invariant; BORP/ISOR epistemic counting depends on them.
+
+**Decision (R2):** Added `source_ids: list[str]` to `FB` (inherited by `VerifiedFB`/
+`FBRecord`). S4 now derives `source_ids` (prefer S2 FB → fallback S1.5 cluster → fallback
+`resolve_source_ids(source_books)`) and persists it. S6 adds a `source_ids TEXT` column
+(create + `_migrate_add_column` + INSERT + Parquet jsonlike). `bridge_s2_to_s4.py` also
+carries it.
+
+**Status:** ✅ DONE (verified: py_compile, config YAML, INSERT 60=60 balanced, functional canary warns at 97.8%, source_ids round-trips)
+**Files:** `pipeline/stage2_extract.py`, `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`, `pipeline/schemas.py`, `pipeline/stage6_commit.py`, `pipeline/bridge_s2_to_s4.py`, `pipeline/pipeline_paths.py`, `pipeline/probe_run.py`, `pipeline/dspy_trainer.py`, `config/pipeline_config.yaml`, `tools/*` (benchmark harnesses)
+**Source:** Session 2026-08-16 — R1/R2 remaining-task execution + S2–S4–S5 derivation audit
+
+### D2375 — Shared `derive_context` + fresh context/intimacy re-derivation at push (2026-08-16)
+**Category:** ARCH / GOV
+
+**Context:** S4 derived `context`+`intimacy_boundary` once at merge, but `stage6b`
+(Anytype) read the *stale* persisted `context`/`intimacy_boundary` while re-deriving
+`space` via `route_space(fb)` fresh — an inconsistency where the pushed label could
+disagree with the routing decision. The lattice is deterministic (no LLM), so it is
+cheap to re-derive at the exact point of consumption.
+
+**Decision:** Extract the domain→context signal matching into a single shared helper
+`derive_context()` in `pipeline/intimacy_lattice.py` (reads `stage4.context_signals`
+from config, C12). S4 calls it (replacing the inline copy); `stage6b`/`stage6c`
+re-derive `context` + `intimacy_boundary` + `space` FRESH at push/export time so the
+label and routing always agree with the current lattice code (no version drift, no
+stale value).
+
+**Status:** ✅ DONE (verified `py_compile` + functional: emerging→general, psychology→private R10, psychology+UX→selective R5, ML→public)
+**Files:** `pipeline/intimacy_lattice.py`, `pipeline/stage4_merge.py`, `pipeline/stage6b_anytype_push.py`, `pipeline/stage6c_obsidian_export.py`
+**Source:** Session 2026-08-16 — context/intimacy push-boundary review
+
+### D2374 — Restore v2.0 `content_based` routing (personal disciplines → private + design/business escape) (2026-08-16)
+**Category:** GOV / ARCH
+
+**Context:** The v2.0 `routing.content_based` rule (`discipline ∈ personal_disciplines
+AND domains ∩ design_business_domains == ∅ → Private`) was lost in the v2→v3 lattice
+migration. The current lattice mapped psychology/cognitive-science/decision-making/
+behavioral-economics/personal-productivity only to `selective` (R5), a privacy
+downshift vs. the old agreement, and had no design/business escape hatch.
+
+**Decision:** Add a `content_based` signal (R10 → private) to the lattice: a
+"personal/mind" discipline that is NOT clearly design/business work product resolves
+PRIVATE. The design/business escape (professional content → not private) is restored.
+Discipline matching is fuzzy (canonical + raw) so the `emerging` collapse (BUG-083)
+does not drop the signal. Config lives in `config/intimacy_policy.yaml` (C12).
+
+**Status:** ✅ DONE (functional-verified: psychology+no-design/biz→private R10; psychology+UX→selective R5)
+**Files:** `config/intimacy_policy.yaml`, `pipeline/intimacy_lattice.py`
+**Source:** Session 2026-08-16 — old-vs-current intimacy audit (governance/INTIMACY_BOUNDARY_AND_CONTEXT_LABELLING.md)
+
+### D2373 — Context fallback "personal" → "general" (fixes the contamination cascade) (2026-08-16)
+**Category:** BUGFIX / GOV
+
+**Context:** `stage4_merge.py` defaulted `context` to `"personal"` when no domain
+matched a business/design/system/academic signal. Per the old agreement (`d383`),
+"personal" is a POSITIVE label that flips intimacy to PRIVATE — using it as a catch-all
+misrouted every `emerging`-domain FB (AI/ML/physics/finance) into `intimacy=private`.
+Audit of the 180-FB canary checkpoint: all 31 "personal" FBs were technical/systemic,
+not personal practice (e.g. "Parameter-efficient Fine-tuning", "Hybrid Retrieval Strategy").
+
+**Decision:** Unmatched domains → `"general"` (neutral; already the `stage6b` fallback).
+"personal" is reserved for positive personal-practice signals (field_5/field_7 routing +
+topic sensitivity), never a fallback. Verified: 31 wrongly-private FBs re-resolve to
+20 public + 11 selective.
+
+**Status:** ✅ DONE (later folded into D2375's shared `derive_context`)
+**Files:** `pipeline/stage4_merge.py`
+**Source:** Session 2026-08-16 — contamination-cascade audit
+
+### D2372 — Intimacy lattice consults RAW labels (survive the `emerging` collapse) (2026-08-16)
+**Category:** BUGFIX / GOV
+
+**Context:** `get_topic_sensitivity()`/`get_source_sensitivity()` checked only the
+canonical `discipline`/`domains`. When a discipline collapsed to `emerging` (taxonomy
+gap, BUG-083), topic/source sensitivity was lost and sensitive FBs degraded to `public`.
+
+**Decision:** Consult both canonical and raw (`discipline_raw`/`domains_raw`) labels in
+both signals, with fuzzy (exact or substring either-direction) matching. 13 emerging
+FBs re-resolved from `public` to `selective`/`private`.
+
+**Status:** ✅ DONE
+**Files:** `pipeline/intimacy_lattice.py`, `pipeline/stage4_merge.py` (passes raw labels)
+**Source:** Session 2026-08-16 — intimacy-cascade fix
+
+### D2371 — `application` is REQUIRED (schema contract enforced fail-closed at S4) (2026-08-16)
+**Category:** BUGFIX / VAL
+
+**Context:** `schemas.FB.application` is required (`min_length=10`, no default), but the
+prompt told the model to emit it only for prescriptive principles (null for descriptive)
+and the validator defaulted missing→`None`, so ~56% of FBs shipped empty `application`.
+The field is the prescriptive bridge ("When X → do Y") and is required by schema for
+every FB; the prompt+validator were the drift.
+
+**Decision:** Prompt now requires `application` for every principle (descriptive or
+prescriptive) with type-appropriate framing; merged+batch validation fail closed
+(`SparseClassificationError`) on missing/short application; S4 adds a hard FB-level
+quarantine gate.
+
+**Status:** ✅ DONE (verified at budget=256: application ≥10 chars on 4/4 sampled FBs)
+**Files:** `pipeline/stage4_merged_call.py`, `pipeline/stage4_merge.py`
+**Source:** Session 2026-08-16 — application-rate audit (44%→root-caused)
+
+### Session revelations 2026-08-16 (audit findings — not all fixed)
+- **S4 parallelism is a dead end (X9):** OMLX serializes concurrent requests to one
+  loaded model (workers 1/2/3 → 43.3/41.4/42.3s). No speedup. No second model download
+  is warranted. The real speed lever is the CoT cap (below).
+- **`thinking_budget` cap is the accuracy-preserving speedup (X8):** merged call
+  `thinking_budget: 256` = 39.8s→22.0s (~45%) with valid JSON preserved. Re-measured at
+  budget=256 (n=4): latency 26.8s mean (vs 42.75s null baseline), CRIBS complete 4/4,
+  application ≥10ch 4/4, 0 exceptions. Depth `depth_thinking_budget: 128` = D2359-verified
+  72%/7.3s. Both now flipped in `config/pipeline_config.yaml`.
+- **Depth A/B results (already-run, saved):** sequential gpt-oss-20b = 84.4%; batch=4 =
+  66.7% (parity 60%); frugal gemma-4-E4B = 62.5% (parity 62.5%). Both speed hacks FAIL
+  the ≥90% parity gate → depth stays gpt-oss-20b sequential.
+- **`extraction_type` defaults to `causal_mechanism` (BUG — FIXED in D2376):** 6 code
+  sites used `.get("extraction_type", "causal_mechanism")`; schema default is `""`. Canary
+  showed 176/180 (97.8%) causal_mechanism — a silent over-claim (causal = strongest
+  epistemic claim). Now default `""` everywhere + a config-driven >95% dominance canary.
+  Note: the 97.8% is driven by LLM emission (explicitly emitting `causal_mechanism`), not
+  just the parse default — the canary now surfaces this for golden/prompt rebalancing.
+- **Hash alignment audit:** `manifest_hash` (D2282 config fingerprint) consistent across
+  all 180 FBs (1 value); `schema_version`=3.0, `pipeline_commit`=7cbbc2a. `fb_id` =
+  sha256(name|definition) is STABLE S2→S4→S5 (D2350 preserves, no re-hash) but 48/180 no
+  longer re-derive from the final S4 name|definition (title-casing normalization) — by
+  design, not a bug. **`source_ids` (canonical book hashes) is DROPPED at S4** (0/180 have
+  it; only `source_books` filenames persist) — a provenance gap, **FIXED in D2376**.
+
+---
 
 ### D2370 — S4 intra-stage incremental checkpoint (crash recovery for the 39h serial stage) (2026-08-15)
 **Category:** INF / OPS

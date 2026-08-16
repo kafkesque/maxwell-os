@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-15
+# Last manual edit: 2026-08-16
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-15T20:10:00Z'
-total_decisions: 359
+last_sync: '2026-08-16T18:40:48Z'
+total_decisions: 385
 decisions:
 - id: D2092
   category: INF
@@ -2914,26 +2914,210 @@ decisions:
 - id: D2369
   category: DAT / OPS
   state: ACTIVE
-  description: 'V8 golden depth expansion (CONV-054 universal + CONV-055 specialized) + V9 live resume verification (3-book run; kill-at-scale needs domain slice)'
+  description: V8 golden depth expansion (CONV-054 universal + CONV-055 specialized) + V9 live resume verification (3-book
+    run; kill-at-scale needs domain slice)
   champion: auto-sync
   target_files: []
   created: '2026-08-15'
 - id: D2370
   category: INF / OPS
   state: ACTIVE
-  description: 'S4 intra-stage incremental checkpoint (crash recovery for 39h serial stage) — periodic atomic snapshot + .segids/.state.json skip-on-resume, mirrors S2 D2154; live kill -9 + resume verified on 20-cluster subset'
+  description: S4 intra-stage incremental checkpoint (crash recovery for 39h serial stage) — periodic atomic snapshot + .segids/.state.json
+    skip-on-resume, mirrors S2 D2154; live kill -9 + resume verified on 20-cluster subset
   champion: auto-sync
   target_files: []
   created: '2026-08-15'
+- id: D2371
+  category: BUGFIX / VAL
+  state: ACTIVE
+  description: '`application` is REQUIRED (schema contract enforced fail-closed at S4)'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2372
+  category: BUGFIX / GOV
+  state: ACTIVE
+  description: Intimacy lattice consults RAW labels (survive the `emerging` collapse)
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2373
+  category: BUGFIX / GOV
+  state: ACTIVE
+  description: Context fallback "personal" → "general" (fixes the contamination cascade)
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2374
+  category: GOV / ARCH
+  state: ACTIVE
+  description: Restore v2.0 `content_based` routing (personal disciplines → private + design/business escape)
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2375
+  category: ARCH / GOV
+  state: ACTIVE
+  description: Shared `derive_context` + fresh context/intimacy re-derivation at push
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2376
+  category: BUGFIX / PROVENANCE
+  state: ACTIVE
+  description: '`extraction_type` over-claim fix + `source_ids` provenance closure'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2377
+  category: QUALITY / GOLDEN-SET / PROMPT
+  state: ACTIVE
+  description: '`extraction_type` causal-bias fix (prompt + stratified few-shot) + depth golden rebalance'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D1055
+  category: CLS
+  state: ACTIVE
+  description: 'stale. The demotion mechanism already exists in `taxonomy_manager.py`:'
+  champion: auto-sync
+  target_files: []
+  created: '2026-07-26'
+- id: D2378
+  category: GOVERNANCE / GOLDEN-SET / C12
+  state: ACTIVE
+  description: Taxonomy canonical cap (config-driven) + scripted depth-golden mining
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2379
+  category: OPERATIONAL / CANARY
+  state: ACTIVE
+  description: Fresh canary S2→S6 rerun (new prompt + golden) — OPERATIONAL
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2381
+  category: ROBUSTNESS / QUALITY
+  state: ACTIVE
+  description: S2 extraction resilience (config max_tokens + JSON fallback + gate) — ACTIVE
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2382
+  category: BUGFIX / DATA-INTEGRITY
+  state: ACTIVE
+  description: Resume dedup self-collision (minhash_cache not rebuilt) — FIXED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2383
+  category: BUGFIX / OBSERVABILITY
+  state: REJECTED
+  description: S2/S4 observability + dead-code cleanup — FIXED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2384
+  category: OBSERVABILITY / TOOLING
+  state: ACTIVE
+  description: S2 watchdog (config-driven health sampler) — ACTIVE
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2385
+  category: INFRASTRUCTURE / RELIABILITY
+  state: ACTIVE
+  description: Grammar-constrained decoding OFF (xgrammar absent) + A/B plan — OPEN
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2386
+  category: QUALITY / RELIABILITY
+  state: ACTIVE
+  description: 'S4 canary completion: 278/279 FBs, 1 CRIBS quarantine (empty application) — OPEN'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2387
+  category: QUALITY / TAXONOMY
+  state: ACTIVE
+  description: 'S4 depth distribution: cross-domain 86%, universal/specialized near-absent — OPEN'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2388
+  category: DATA / TAXONOMY
+  state: ACTIVE
+  description: 'Taxonomy `emerging` over-firing: 32% disciplines, 94% domains — OPEN'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2389
+  category: QUALITY / DATA
+  state: ACTIVE
+  description: 'Jargon finding CORRECTION: string-typed but NO keyword duplication — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2390
+  category: INFRASTRUCTURE / SOVEREIGNTY
+  state: ACTIVE
+  description: 'OMLX 0.6.0 upgrade: DO NOT upgrade now (grammar fix independent) — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2391
+  category: DATA / RELIABILITY
+  state: ACTIVE
+  description: 'S6 schema-migration gap: `is_summary` + `classification_status` missing — FIXED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2392
+  category: INFRASTRUCTURE / RELIABILITY
+  state: ACTIVE
+  description: 'Grammar A/B RESULT: 0.6.0 xgrammar ENFORCES but BREAKS gpt-oss-20b (Harmony conflict) — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2393
+  category: QUALITY / DATA
+  state: ACTIVE
+  description: 'Depth skew fix: tightened focused depth prompts (cross-domain over-assignment) — ACTIVE'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2394
+  category: DATA / QUALITY
+  state: ACTIVE
+  description: 'Taxonomy: synonym-index kind-filter bug + discipline alias expansion (emerging 32%→15.5%) — ACTIVE'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2395
+  category: DATA / RELIABILITY
+  state: ACTIVE
+  description: 'Integrity fix: drop dead legacy `s3_original_domain` column (DB 61→60 cols) — FIXED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
+- id: D2396
+  category: DATA / GOVERNANCE
+  state: ACTIVE
+  description: 'DB reset policy for T1.1: fresh-DB now, run-specific-DB as P2 follow-up — RESOLVED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-16'
 summary:
-  total: 359
+  total: 385
   proposed: 0
   draft: 1
-  active: 304
+  active: 329
   stale: 0
   superseded: 14
   archived: 8
-  rejected: 7
+  rejected: 8
   by_category:
     INF: 176
     QLT: 34
@@ -2942,7 +3126,7 @@ summary:
     DAT: 4
     DEF: 1
     VAL: 8
-    CLS: 15
+    CLS: 16
     STR: 1
     PERF: 10
     BUGFIX: 38
@@ -2961,3 +3145,24 @@ summary:
     INF / GOV: 1
     DAT / OPS: 1
     INF / OPS: 1
+    BUGFIX / VAL: 1
+    BUGFIX / GOV: 2
+    GOV / ARCH: 1
+    ARCH / GOV: 1
+    BUGFIX / PROVENANCE: 1
+    QUALITY / GOLDEN-SET / PROMPT: 1
+    GOVERNANCE / GOLDEN-SET / C12: 1
+    OPERATIONAL / CANARY: 1
+    ROBUSTNESS / QUALITY: 1
+    BUGFIX / DATA-INTEGRITY: 1
+    BUGFIX / OBSERVABILITY: 1
+    OBSERVABILITY / TOOLING: 1
+    INFRASTRUCTURE / RELIABILITY: 2
+    QUALITY / RELIABILITY: 1
+    QUALITY / TAXONOMY: 1
+    DATA / TAXONOMY: 1
+    QUALITY / DATA: 2
+    INFRASTRUCTURE / SOVEREIGNTY: 1
+    DATA / RELIABILITY: 2
+    DATA / QUALITY: 1
+    DATA / GOVERNANCE: 1

@@ -144,18 +144,28 @@ def get_source_sensitivity(fb: dict[str, Any]) -> str:
     """
     policy = _load_policy()
     private_disc = {_norm(d) for d in policy.get("source_private_disciplines", []) or []}
-    if _norm(fb.get("discipline", "")) in private_disc:
+    disc = _norm(fb.get("discipline", ""))
+    disc_raw = _norm(fb.get("discipline_raw", ""))
+    if disc in private_disc or (disc_raw and disc_raw in private_disc):
         return "private"
 
     anchors = _load_anchors()
     routing = anchors.get("routing", {}) or {}
     index = _build_field_index()
 
+    # D2372: consult BOTH canonical and raw labels — the field-routing signal
+    # must survive the "emerging" collapse the same way topic-sensitivity does.
     names = [fb.get("discipline", "")]
+    if disc_raw:
+        names.append(disc_raw)
     domains = fb.get("domains", []) or []
     if isinstance(domains, str):
         domains = [d.strip() for d in domains.split(",") if d.strip()]
     names.extend(domains)
+    domains_raw = fb.get("domains_raw", []) or []
+    if isinstance(domains_raw, str):
+        domains_raw = [d.strip() for d in domains_raw.split(",") if d.strip()]
+    names.extend(domains_raw)
 
     for n in names:
         field_id = index.get(_norm(n))
@@ -165,10 +175,80 @@ def get_source_sensitivity(fb: dict[str, Any]) -> str:
 
 
 def get_topic_sensitivity(fb: dict[str, Any]) -> bool:
-    """Signal 2 — topic sensitivity (v1 R5)."""
+    """Signal 2 — topic sensitivity (v1 R5).
+
+    D2372: also consults `discipline_raw`. When the canonical discipline
+    collapses to "emerging" (taxonomy gap, BUG-083), the raw label still
+    carries the true discipline — e.g. raw "positive psychology" must match
+    topic-sensitive "psychology" even though canonical is "emerging". Match is
+    exact OR substring (either direction) so "organizational psychology" ⊃
+    "psychology" and "decision sciences" ⊃ "decision making" are caught.
+    """
     policy = _load_policy()
     sensitive = {_norm(d) for d in policy.get("topic_sensitive_disciplines", []) or []}
-    return _norm(fb.get("discipline", "")) in sensitive
+    labels = {_norm(fb.get("discipline", ""))}
+    raw = _norm(fb.get("discipline_raw", ""))
+    if raw:
+        labels.add(raw)
+    for lbl in labels:
+        if not lbl:
+            continue
+        if lbl in sensitive:
+            return True
+        for s in sensitive:
+            if s and (s in lbl or lbl in s):
+                return True
+    return False
+
+
+def get_content_sensitivity(fb: dict[str, Any]) -> bool:
+    """Signal 4 — content_based routing (restored v2.0 rule, D2374).
+
+    True → PRIVATE when the FB's discipline is a "personal/mind" discipline
+    (psychology, cognitive science, decision making, behavioral economics,
+    personal productivity) AND none of its domains is a professional
+    design/business domain (the v2.0 escape hatch). Reproduces the old
+    `routing.content_based` rule exactly: personal discipline that is not
+    clearly design/business work product → private.
+
+    Discipline matching is fuzzy (canonical + raw, substring either direction)
+    so the "emerging" collapse (BUG-083) does not silently drop the signal.
+    Domain escape is exact membership against the config list.
+    """
+    policy = _load_policy()
+    cb = policy.get("content_based", {}) or {}
+    personal = {_norm(d) for d in cb.get("personal_disciplines", []) or []}
+    design_business = {_norm(d) for d in cb.get("design_business_domains", []) or []}
+    if not personal:
+        return False
+
+    # discipline (canonical + raw) ∈ personal_disciplines
+    is_personal = False
+    for lbl in (_norm(fb.get("discipline", "")), _norm(fb.get("discipline_raw", ""))):
+        if not lbl:
+            continue
+        if lbl in personal:
+            is_personal = True
+            break
+        for p in personal:
+            if p and (p in lbl or lbl in p):
+                is_personal = True
+                break
+    if not is_personal:
+        return False
+
+    # escape hatch: any domain (canonical + raw) ∈ design_business → NOT private
+    domains = fb.get("domains", []) or []
+    if isinstance(domains, str):
+        domains = [d.strip() for d in domains.split(",") if d.strip()]
+    domains_raw = fb.get("domains_raw", []) or []
+    if isinstance(domains_raw, str):
+        domains_raw = [d.strip() for d in domains_raw.split(",") if d.strip()]
+    for d in list(domains) + list(domains_raw):
+        if _norm(d) in design_business:
+            return False
+
+    return True
 
 
 def get_annotation_sensitivity(fb: dict[str, Any]) -> bool:
@@ -216,6 +296,7 @@ def resolve_intimacy(fb: dict[str, Any]) -> tuple[str, str]:
 
     source_sens = get_source_sensitivity(fb)
     topic_sensitive = get_topic_sensitivity(fb)
+    content_sensitive = get_content_sensitivity(fb)
     has_annotation = get_annotation_sensitivity(fb)
     ctx = _context_labels(fb)
 
@@ -243,6 +324,7 @@ def resolve_intimacy(fb: dict[str, Any]) -> tuple[str, str]:
         ("R3", levels.get("private", 3), has_annotation and has_personal),     # annotation on personal context
         ("R4", levels.get("selective", 2), has_annotation),                    # any personal annotation
         ("R5", levels.get("selective", 2), topic_sensitive),                   # topic is sensitive
+        ("R10", levels.get("private", 3), content_sensitive),                  # content_based personal discipline → private (D2374)
         ("R7", levels.get("private", 3), personal_only),                       # personal-only context (D314 floor)
         ("R8", levels.get("selective", 2), mixed_personal),                    # mixed personal context
     ]
@@ -272,3 +354,29 @@ def route_space(fb: dict[str, Any]) -> str:
         "public": "non_private",
     }
     return space_routing.get(boundary, "private")
+
+
+def derive_context(fb: dict[str, Any]) -> str:
+    """Derive the `context` routing label from domains (D2375: shared S4/S6b/S6c).
+
+    Reproduces stage4_merge.py's domain→context signal matching so the push
+    stages can re-derive a FRESH, consistent context label instead of reading a
+    stale persisted value. Unmatched domains → "general" (neutral), NOT
+    "personal" (D2373 — "personal" is a positive classification, never a
+    catch-all for unrecognized domains).
+    """
+    from pipeline.pipeline_paths import S4_CONTEXT_SIGNALS  # lazy: avoid import cycle
+
+    domains = fb.get("domains", []) or []
+    if isinstance(domains, str):
+        domains = [d.strip() for d in domains.split(",") if d.strip()]
+    domain_set = {_norm(d) for d in domains}
+
+    parts: list[str] = []
+    for ctx_key in ("business", "design", "system", "academic"):
+        signals = S4_CONTEXT_SIGNALS.get(ctx_key, []) or []
+        if domain_set & {_norm(s) for s in signals}:
+            parts.append(ctx_key)
+    if not parts:
+        parts.append("general")
+    return ", ".join(sorted(parts))

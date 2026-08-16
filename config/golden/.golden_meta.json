@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "algorithm": "sha256",
-  "golden_sha256": "31ca501babcc86b436654c02c032006801175c09c44356995c56b75744746e4c",
-  "pipeline_commit": "76b0cce",
+  "golden_sha256": "70ff3283a26a3b2f39f8670c6b1d6ffdf946e88b34b627e93b5a0f63d722c266",
+  "pipeline_commit": "caf30ae",
   "trimmed_ids": [
     "PRO-002",
     "LEA-001",
@@ -19,5 +19,25 @@
     "count": 13,
     "source": "governance/depth_bias_relabel_vote.json",
     "note": "cross-model vote (qwen+gemma+gptoss) >=2/3 - relabel-first depth bias fix (D2362)"
+  },
+  "depth_rebalance_d2377": {
+    "added": [
+      "CONV-056 (universal: power-law heavy-tailed distribution)",
+      "CONV-057 (domain: color gamut)",
+      "CONV-058 (specialized: backpropagation)"
+    ],
+    "universal_before": 2,
+    "universal_after": 3,
+    "specialized_before": 2,
+    "specialized_after": 3,
+    "note": "D2377/D2378: universal += power-law; specialized += backpropagation (scripted-mined via tools/mine_depth_golden.py). Color gamut authored as specialized but relabeled domain. T-015 >=5 each still open \u2014 corpus is business/tech-heavy, poor in genuine universal/specialized 2-source passages."
+  },
+  "verbatim_fix_20260816": {
+    "note": "D2396-fix: corrected 5 NON_VERBATIM evidence passages (CONV-054 paraphrase, CONV-055 3x double-apostrophe, CONV-058 fabricated Generator quote) + meta count 77->80. golden_validate 80/80 PASS.",
+    "examples": [
+      "CONV-054",
+      "CONV-055",
+      "CONV-058"
+    ]
   }
 }

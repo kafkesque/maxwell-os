@@ -1,0 +1,102 @@
+{
+  "feedback_loop": {
+    "depth_target": "universal",
+    "passages": [
+      {
+        "book": "Building AI Agent Platforms (for Isabel Garcia) -- Ben O'Mahony and Fabian Nonnenmacher -- 2026 -- O'Reilly Media, Inc_ -- 0cd870ebd42c3c37eb0a817985df2e9e -- Anna’s Archive.md",
+        "text": "developer joy include the wish for working with modern tools, having fast feedback loops, and even moments of pure whimsy. Rapid feedback loops are an essential aspect of developer productivity and, in a way, the ultimate representation of removing friction. This begins with having swift local development setups allowing developers to iterate quickly on their code, and continues with fast deployment pipelines and timely feedback from monitoring and alerting systems from the real production systems."
+      },
+      {
+        "book": "LLMOps Managing Large Language Models in Production (Abi Aryan) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "are, however, additional complexities: Dynamic behavior Context sensitivity Continuous learning Feedback loops Integration with existing systems Environmental variability Multiple goals : Agents may have conflicting objectives or collaborate in ways that require balancing multiple criteria, complicating evaluation metrics. Sometimes two agents have poor metrics individually but collaborate well and generate output that is better than would be produced by collaboration between two different agents with better individual metrics."
+      },
+      {
+        "book": "Beyond Vibe Coding_ From Coder to AI-Era Developer -- Addy Osmani -- ISBN_ 979-8-341-63475-6_, 2025 -- O'Reilly Media, Inc_ -- f0473318f8e70e15c253b9c07075d409 -- Anna’s Archive.md",
+        "text": "an iterative development process.[]{#ch02.html_id421 contenteditable=\"false\" primary=\"iterative refinement of prompts\" data-type=\"indexterm\"} This is the feedback loop I touched on in {data-type=\"xref\"}. When the AI gives you code, review it critically, just as you would code written by a human. Does it meet the requirements? If not, identify what's missing or wrong. Then provide feedback or a refined prompt. This can be done in a conversational AI by simply continuing the dialogue, or in an editor by writing another comment for the AI to respond to."
+      }
+    ],
+    "draft": {
+      "name": "Iterative Refinement Cycle",
+      "definition": "A cyclical process involving generation, critical review, and provision of feedback to improve an output until desired quality is achieved.",
+      "mechanism": "The process involves generating an initial output, subjecting it to critical evaluation against requirements, and then providing specific feedback or a refined prompt to guide the next iteration.",
+      "boundary": "The cycle begins with an initial generation and continues through successive rounds of review and refinement until the desired outcome is reached.",
+      "consequence": "The successful application of this cycle leads to improved output quality, potentially surpassing the individual capabilities of components when collaboration is involved.",
+      "extraction_type": "normative_heuristic",
+      "depth": "universal"
+    }
+  },
+  "network_effect": {
+    "depth_target": "universal",
+    "passages": [
+      {
+        "book": "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md",
+        "text": "carrying the distinctive Jerry cans. When you hesitate to host someone in your home because you don’t have clean water to offer them. This is a ratchet, but not one based on obvious software network effects. It’s based on the original network effect, the one built around people in proximity. As more and more people in the village get clean water, those without become socially isolated and feel stupid as well. Most can afford the water (because of the time and impact savings), but the emotional shift is the difficult part. Within months, the water has crossed the local chasm from the early adopters to the rest of the village."
+      },
+      {
+        "book": "Business Model Innovation Game Changers and Contemporary Issues (Annabeth Aagaard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "of sensing and seizing in business model innovation. The Journal of Strategic Information Systems, 31, 101742. Boudreau, K. J., Jeppesen, L. B., & Miric, M. (2022). Competing on freemium: Digital competition with network effects. Strategic Management Journal, 43, 1374–1401. Ceccagnoli, M., Forman, C., Huang, P., & Wu, D. J. (2012). Cocreation of value in a platform ecosystem! The case of enterprise software. MIS Quarterly, 36 , 263. 118 P. Ritala and M. Jovanovic"
+      }
+    ],
+    "draft": {
+      "name": "Network Effect Adoption",
+      "definition": "The process where the value of a product or service increases proportionally to the number of users who use it.",
+      "mechanism": "The presence of early adopters creates a critical mass (e.g., clean water in a village) which, once established, causes subsequent users to adopt due to social pressure or increased utility, leading to the isolation of those who do not adopt.",
+      "boundary": "The transition from early adopters to the broader market/village.",
+      "consequence": "Social isolation or feeling 'stupid' among those who lag in adoption.",
+      "extraction_type": "causal_mechanism",
+      "depth": "universal"
+    }
+  },
+  "backpropagation": {
+    "depth_target": "specialized",
+    "passages": [
+      {
+        "book": "LLMOps Managing Large Language Models in Production (Abi Aryan) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "prevent memory overflow, it can also cause some input data to be ignored during training---a trade-off that needs careful tuning. During[]{#ch05.html_id912 contenteditable=\"false\" primary=\"backpropagation\" data-type=\"indexterm\"} backpropagation, gradients flow only through the experts that were activated for each token. Experts not involved in processing a given token receive no gradient updates. Thus, computation and memory use are less than they would otherwise be, given the model's huge parameter count. This sparsity in gradient flow is one reason MoEs can scale efficiently."
+      },
+      {
+        "book": "GANs in Action Deep learning with Generative Adversarial Networks by Jakub Langr, Vladimir Bok (z-lib.org).md",
+        "text": "Discriminator network to classify x and x. d Compute the classification errors and backpropagate the total error to update the Discriminator weights and biases, seeking to minimize the clas- sification errors. 2 Train the Generator: (b) and (c) x Discriminator Classification error (a) x* Generator z GANs in action 11 a Get a new random noise vector z and, using the Generator network, syn- thesize a fake example x. b Use the Discriminator network to classify x. c Compute the classification error and backpropagate the error to update the Generator weights and biases, seeking to maximize the Discrimina- tor’s error."
+      },
+      {
+        "book": "AI and machine learning for coders _ a programmer's guide to -- Laurence Moroney; Andrew Ng; O'Reilly Media -- 1st edition, Sebastopol, California, -- isbn13 9781492078166 -- bc7d2f44b7172a46eb939596bda2bc38 -- Anna’s Archive.md",
+        "text": "of a word, and words with similar vectors---i.e., pointing in roughly the same direction---could be considered related to that word. The embedding layer will be initialized randomly---that is, the coordinates of the vectors will be completely random to start and will be learned[]{#ch06.html_back06 contenteditable=\"false\" primary=\"backpropagation\" data-type=\"indexterm\"} during training using backpropagation. When training is complete, the embeddings will roughly encode similarities between words, allowing us to identify words that are somewhat similar based on the direction of the vectors for those words."
+      }
+    ],
+    "draft": {
+      "name": "Backpropagation",
+      "definition": "A process used to adjust weights and biases in neural networks based on classification errors or desired outputs.",
+      "mechanism": "Errors are computed (e.g., classification error) and then propagated backward through the network to update the parameters (weights and biases) of the layers, seeking to minimize error (in discriminators) or maximize error (in generators).",
+      "boundary": "The process begins with an output/error signal and flows backward through the network layers to adjust parameters. In sparse models (like MoEs), gradient flow is restricted only to activated experts.",
+      "consequence": "Successful application leads to the network learning to encode relationships (e.g., word similarities in embeddings) or achieving convergence toward a desired state (e.g., minimizing classification error).",
+      "extraction_type": "causal_mechanism",
+      "depth": "specialized"
+    }
+  },
+  "normal_distribution": {
+    "depth_target": "universal",
+    "passages": [
+      {
+        "book": "Hands-On Generative AI with Transformers and Diffusion -- Pedro Cuenca, Apolinário Passos, Omar Sanseviero & Jonathan -- 6, 2024 -- O'Reilly Media, -- 4a3dd41c0fe610c053b13d3817350636 -- Anna’s Archive.md",
+        "text": "trying to avoid diverging too much from a normal distribution. Let's explore what happened after we added this new goal. If we plot the means of the standard distribution encoded by the model for the test set, we obtain a slightly better-behaved result than in the AutoEncoder case (Figure 3-21). Results are now better centered around zero and don't get as far away as in the AutoEncoder case. Areas taken by the different classes are of similar size, although there's still overlap between similar-looking numbers."
+      },
+      {
+        "book": "Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "the null hypothesis, suggesting the data is probably Gaussian. If p \\ 0.05: print('Probably Gaussian') else: print('Probably not Gaussian') ` - If the p-value is greater than 0.05, we fail to reject the null hypothesis, which means we cannot rule out the possibility that the data comes from a normal distribution. In this case, the code prints \"[Probably Gaussian\".]{.No-Break} - If the p-value is less than or equal to 0.05, we reject the null hypothesis, indicating we have evidence to suggest the data is not likely from a normal distribution. In this case, the code prints \"Probably [not Gaussian\".]{.No-Break} Important note"
+      },
+      {
+        "book": "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "plan, access to lots of content and hands-on environments, and a personal and continued commitment to the investment of upskilling. The good news is, like any innovation, adopting new skills[]{#ch06.html_id823 contenteditable=\"false\" primary=\"Innovation Adoption Lifecycle\" data-type=\"indexterm\"} can be mapped to the Innovation Adoption Lifecycle curve (also known as the [Rogers]{.keep-together} bell curve) in Figure 6-1{data-type=\"xref\"}. Figure 6-1. The Innovation Adoption Lifecycle curve"
+      }
+    ],
+    "draft": {
+      "name": "Convergence to Normal Distribution",
+      "definition": "A tendency for data distributions or model representations to approximate a normal (Gaussian) distribution.",
+      "mechanism": "This is an empirical/descriptive pattern, not a causal mechanism",
+      "boundary": "The degree of overlap between classes or the statistical significance threshold (e.g., p > 0.05 for Gaussian assumption).",
+      "consequence": "Achieving a better-behaved result centered around zero, or failing to reject the null hypothesis that the data is Gaussian.",
+      "extraction_type": "empirical_pattern",
+      "depth": "universal"
+    }
+  }
+}

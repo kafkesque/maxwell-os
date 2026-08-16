@@ -53,7 +53,6 @@ from pipeline.pipeline_paths import (
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
     S4_CHECKPOINT_INTERVAL,  # D2370: intra-stage incremental checkpoint cadence (clusters)
-    S4_CONTEXT_SIGNALS,  # D2364/C12 (X7): domain→context signal sets (was hardcoded)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
@@ -93,7 +92,7 @@ from pipeline.stage4_merged_call import (
     classify_depth_focused,
     merged_cribs_classify,
 )
-from pipeline.intimacy_lattice import resolve_intimacy  # W6/D369: v1 intimacy lattice (replaces hardcoded "public")
+from pipeline.intimacy_lattice import derive_context, resolve_intimacy  # W6/D369/D2375: v1 intimacy lattice + shared context derivation
 from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -135,9 +134,10 @@ CRIBS_ENRICHMENT_SYSTEM = """You enrich Foundation Blocks with CRIBS-quality fie
 name + definition already written. Your job is to ADD the missing fields.
 
 CRITICAL RULES:
-- application: Generate ONLY if this principle is prescriptive (actionable technique/method).
-  If descriptive/theoretical, set to null.
+- application: REQUIRED for EVERY principle — descriptive or prescriptive. NEVER null, never omit.
   REQUIRED FORMAT: "When [concrete situation], [specific action] because [reason]."
+  For descriptive/theoretical principles (causal mechanisms, empirical patterns),
+  frame it as "When [observing this pattern], [adjust reasoning/behavior] because [reason]."
   Example: "When launching a product in a crowded market, identify an underserved niche
   and dominate it before expanding, because concentrated resources create defensible momentum."
   ❌ ANTI-PATTERNS (DO NOT OUTPUT):
@@ -166,7 +166,7 @@ CRITICAL RULES:
   ⚠️ NEVER copy keywords into jargon. Jargon is for pedagogy, keywords for search.
 
 Return ONLY a JSON object:
-{"application": "...", "failure_mode": "...", "elaboration": "...", "keywords": "...", "jargon": {...} or omit}"""
+{"application": "REQUIRED — never null", "failure_mode": "...", "elaboration": "...", "keywords": "...", "jargon": {...} or omit}"""
 
 
 def _build_cribs_enrichment_prompt(fb_data: dict) -> str:
@@ -1206,6 +1206,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             failed += 1
             continue
 
+        # D2371: application is REQUIRED (schemas.FB.application, min_length=10).
+        # Fail-closed at the FB level: an empty/short application must quarantine
+        # the FB (failed → retried on resume, consistent with D2338 max_failed_ratio: 0.0),
+        # never flow silently into SQLite. This is the enforcement the schema declares
+        # but the pipeline previously skipped (enrichment exception was swallowed).
+        _app = str(fb_data.get("application") or "").strip()
+        if len(_app) < 10:
+            print(f"→ ❌ Empty/short application ({len(_app)} chars < 10) — FB QUARANTINED (D2371)")
+            failed += 1
+            continue
+
         # Phase 2: TWO-STAGE classification (D2138) + semantic depth (D2220)
         # D2226: When merged S4 call produced classification, use it directly.
         # Otherwise fall back to separate classify call (original two-call path).
@@ -1391,9 +1402,20 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         # Collect source books
         source_books = set()
+        source_ids = set()  # D2376: canonical source identity (D2176) — was dropped at S4
         for p in cluster_principles:
             for sb in p.get("source_books", []):
                 source_books.add(sb)
+            for sid in p.get("source_ids", []) or []:
+                source_ids.add(sid)
+        # D2376: fall back to the S1.5 cluster's canonical hashes, then derive from
+        # filenames. Prefer the canonical hash set — it is edition/filename invariant.
+        if not source_ids:
+            for sid in cluster.get("source_ids", []) or []:
+                source_ids.add(sid)
+        if not source_ids and source_books:
+            from pipeline.book_metadata import resolve_source_ids
+            source_ids = resolve_source_ids(list(source_books))
 
         # D2069: Name normalization + uniqueness
         name = normalize_fb_name(name, max_words=5)
@@ -1433,15 +1455,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             temporal_scope = "timeless"  # default: principles are timeless unless evidence suggests otherwise
 
         # ── Auto-derive v1 Anytype properties (context, accessibility, intimacy_boundary) ─
-        # context: comma-separated routing hints derived from domain signals (D2364/C12: config-driven)
-        context_parts: list[str] = []
-        domain_set = set(class_data.get("domains", []))
-        for ctx_key in ("business", "design", "system", "academic"):
-            if domain_set & set(S4_CONTEXT_SIGNALS.get(ctx_key, [])):
-                context_parts.append(ctx_key)
-        if not context_parts:
-            context_parts.append("personal")
-        context_val = ", ".join(sorted(context_parts))
+        # context: derive via the shared lattice helper (D2375) so S4/S6b/S6c never
+        # drift. D2373: unmatched domains → "general" (neutral), never "personal".
+        context_val = derive_context({"domains": class_data.get("domains", [])})
 
         # accessibility: derived from prerequisite_fbs and difficulty
         # D2132: expert→prerequisite is a default, not a law.
@@ -1460,10 +1476,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # hardcoded "public". Resolves private/selective/public from three
         # 2.0-native signals: field routing (source) + topic sensitivity +
         # context (personal-only → private, mixed → selective).
+        # D2372: pass RAW labels too — the intimacy lattice must consult the
+        # accurate raw discipline/domains, not only the canonical mapping. When
+        # discipline collapses to "emerging" (taxonomy gap, BUG-083), the topic-
+        # sensitivity signal would otherwise be lost and sensitive FBs degrade
+        # to "public".
         intimacy_val, _intimacy_rule = resolve_intimacy({
             "context": context_val,
             "discipline": canonical_discipline,
             "domains": canonical_domains,
+            "discipline_raw": discipline_raw,
+            "domains_raw": domains_raw,
         })
 
         # provenance: pipeline FBs are always llm_extracted_from_source (C29)
@@ -1517,6 +1540,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             # ── Provenance (simplified) ──
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
+            "source_ids": sorted(source_ids),  # D2376: canonical hashes (D2176) — restore provenance
             # D2350 (ChatGPT re-audit): S2 v3 records emit `fb_id`, NOT `principle_id`.
             # Reading only `principle_id` left source_principle_ids empty for every
             # normal v3 FB. Use fb_id first, retain principle_id as legacy fallback.

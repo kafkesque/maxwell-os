@@ -194,7 +194,7 @@ for i, cluster in enumerate(clusters, 1):
             'boundary': principle.get('boundary', '').strip(),
             'consequence': principle.get('consequence', '').strip(),
             'is_summary': principle.get('is_summary', False),
-            'extraction_type': principle.get('extraction_type', 'causal_mechanism'),
+            'extraction_type': principle.get('extraction_type', ''),  # D2376: absent → "" (no over-claim)
             'content_type': principle.get('content_type', 'principle'),
             'evidence_passages': evidence_passages if isinstance(evidence_passages, list) else json.loads(evidence_passages) if isinstance(evidence_passages, str) else [],
             'evidence_passages_shown': principle.get('evidence_passages', []),

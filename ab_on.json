@@ -1,0 +1,188 @@
+{
+  "n": 30,
+  "valid_json": 0,
+  "valid_rate": 0.0,
+  "avg_latency_s": 63.5,
+  "results": [
+    {
+      "name": "Asymmetric Estimation Bias",
+      "valid_json": false,
+      "latency_s": 58.2,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Probabilistic Reasoning Under Uncertainty",
+      "valid_json": false,
+      "latency_s": 47.7,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Placebo-Induced Biochemical Change",
+      "valid_json": false,
+      "latency_s": 49.6,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Cognitive Bias in Decision Making",
+      "valid_json": false,
+      "latency_s": 54.7,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Tool-Identity Overload",
+      "valid_json": false,
+      "latency_s": 49.0,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Information Asymmetry in Strategic Interaction",
+      "valid_json": false,
+      "latency_s": 147.2,
+      "status": "SparseClassificationError: merged: application missing/too short (4 chars < 10)"
+    },
+    {
+      "name": "Perspective-Driven Competitive Insight",
+      "valid_json": false,
+      "latency_s": 97.0,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Cognitive Ease and Confirmation Bias",
+      "valid_json": false,
+      "latency_s": 48.8,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Causal Layer Distinction",
+      "valid_json": false,
+      "latency_s": 49.6,
+      "status": "SparseClassificationError: merged: application missing/too short (4 chars < 10)"
+    },
+    {
+      "name": "Attention Residue From Context Switching",
+      "valid_json": false,
+      "latency_s": 49.0,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Strategic Boundary Setting",
+      "valid_json": false,
+      "latency_s": 48.5,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Autonomous Team Design",
+      "valid_json": false,
+      "latency_s": 145.6,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Mediocristan vs Extremistan Randomness",
+      "valid_json": false,
+      "latency_s": 105.9,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Strategy-Driven Outcome Focus",
+      "valid_json": false,
+      "latency_s": 49.1,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Overconfidence Bias in Decision Making",
+      "valid_json": false,
+      "latency_s": 48.1,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Editorial and Community Feedback Integration",
+      "valid_json": false,
+      "latency_s": 48.1,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Competence Boundary Management",
+      "valid_json": false,
+      "latency_s": 47.7,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Lollapalooza Effect in Behavioral Change",
+      "valid_json": false,
+      "latency_s": 52.2,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Instructional Alignment Through Supervised Fine-Tuning",
+      "valid_json": false,
+      "latency_s": 96.8,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Strategic Information Gathering",
+      "valid_json": false,
+      "latency_s": 50.4,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Reliability as Life Strategy",
+      "valid_json": false,
+      "latency_s": 54.0,
+      "status": "SparseClassificationError: merged: application missing/too short (4 chars < 10)"
+    },
+    {
+      "name": "Idea Exchange and Team Learning",
+      "valid_json": false,
+      "latency_s": 48.2,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Bottleneck-Driven Innovation",
+      "valid_json": false,
+      "latency_s": 51.4,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Minimalist Communication Principle",
+      "valid_json": false,
+      "latency_s": 60.5,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Beneficial Network Building",
+      "valid_json": false,
+      "latency_s": 48.6,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Educational Advancement and Labor Market Participation",
+      "valid_json": false,
+      "latency_s": 48.2,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Genetic Diversity as Resistance Buffer",
+      "valid_json": false,
+      "latency_s": 48.0,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Map-Territory Reduction Principle",
+      "valid_json": false,
+      "latency_s": 48.3,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Explore-Exploit Tradeoff",
+      "valid_json": false,
+      "latency_s": 52.2,
+      "status": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode"
+    },
+    {
+      "name": "Hierarchical Process Rigidity",
+      "valid_json": false,
+      "latency_s": 102.9,
+      "status": "SparseClassificationError: merged: application missing/too short (4 chars < 10)"
+    }
+  ]
+}

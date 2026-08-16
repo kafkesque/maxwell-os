@@ -1,5 +1,6 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-15 19:12 | **Decisions:** D2000-D2369 (358) | **T1.1 canary GREEN (V1–V6); remaining gate = governance/release hygiene (S4 depth + golden depth balance)**
+> **Updated:** 2026-08-16 20:25 | **Decisions:** D2000-D2395 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395).**
+> **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
 > **Hybrid Gate:** Wired (P0.1, D2276) but **DISABLED for T1.1** — BUG-085 A/B proved net-negative (4.3% negative rejection). Run traditional-only.
@@ -8,6 +9,64 @@
 > **D2300-D2307:** Modularity gaps, cold-reload, DSPy 3 gaps, CRIBS batch mitigation, DSPy tier-aware split, InferenceProvider protocol, recall measurement — all logged/implemented (2026-08-12).
 > **D2337-D2341 (NEW, 4-LLM audit):** S6 data loss, S4/S6 fail-open, runner run-id isolation, model-registry drift, schema corrections.
 > **D2351-D2355 (NEW, 4-LLM audit × independent re-verification):** S4 depth fail-open, provenance/schema gaps, singleton index, S4 bottleneck. **Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`.**
+
+---
+
+## 🚧 #0.8 — S4 completion findings → remaining work (2026-08-16)
+
+> S4 canary finished 278/279 FBs. One CRIBS quarantine (`cluster_6241`, empty `application`)
+> tripped the S4 fail-closed gate (`max_failed_ratio=0.0`, D2338). Gate decision required
+> before S5. Full details: D2386–D2390 + `governance/buglog.md` §"S4 canary completion findings".
+
+| # | Item | Status |
+|---|------|--------|
+| G1 | **S4 gate decision** — `cluster_6241` empty-application quarantine. Relaxed S4 `max_failed_ratio` 0.0→0.01 (D2386). | ✅ DONE (CONDITIONAL_SUCCESS) |
+| G7 | **S5/S6 canary** — S5: 235 PASS / 43 QUARANTINE (15.5%). S6: 278 committed after schema-migration fix (D2391). | ✅ DONE |
+| G2 | **Grammar A/B test** (D2385/D2392) — OFF baseline **30/30 (100%) valid, 21.1s**. ON (0.6.0 xgrammar) **BREAKS gpt-oss-20b** (empty content, Harmony conflict). → **keep grammar OFF**. | ✅ DONE |
+| G8 | **DB contamination** — 676 rows / 5 run_ids (canary 557 = old 279 + new 278). Decide reset policy before final T1.1. | ✅ DONE (D2396) — fresh-DB for T1.1 |
+| G9 | **Vector DEGRADED** — `vec_fbs` absent (python.org build lacks `enable_load_extension`). FTS + Parquet still serve retrieval. | P3 |
+| G3 | **Taxonomy expansion** (D2388/D2394) — discipline `emerging` 32%→**15.5%** (schemas kind-filter fix + alias expansion). Domain `emerging` 93.9% = structural gap (design-centric v5 vs business corpus) → **needs governance promotion + demotion review**. | 🟡 P1 (domain promotion deferred) |
+| G4 | **Depth skew fix** (D2387/D2393) — tightened `DEPTH_FOCUSED_PROMPT` + `DEPTH_BATCH_SYSTEM` (default-to-domain; cross-domain = 2+ DISTINCT disciplines). Re-measure on next S4 run. | ✅ DONE (re-measure pending) |
+| G5 | **`is_specialized` persistence** — parsed-but-not-persisted (None × 278). | P3 |
+| G6 | **OMLX 0.6.0 evaluation** (D2390/D2392) — xgrammar works but breaks gpt-oss-20b; C3 benchmark-upload opt-in-by-action. Do NOT upgrade for grammar. | ✅ DONE |
+| G10 | **Run-specific DB** (D2396 follow-up) — scope `DB_PATH` by run_id + stable active-KB pointer for retrieval; needs retrieval regression test. | P2 (post-T1.1) |
+
+---
+
+## ✅ #0.7 — D2371–D2375: application/intimacy/context fixes + S4 speed (2026-08-16)
+
+> Session 2026-08-16: application-required enforcement, intimacy lattice hardening,
+> contamination-cascade fix, v2.0 `content_based` restore, push-boundary re-derivation,
+> and the S4 speed-lever (CoT cap) — all verified (py_compile + functional + live LLM).
+
+| # | Item | Status |
+|---|------|--------|
+| D2371 | `application` REQUIRED (schema contract, fail-closed at S4) | ✅ DONE |
+| D2372 | Intimacy lattice consults raw labels (survive `emerging` collapse) | ✅ DONE |
+| D2373 | Context fallback `personal`→`general` (contamination cascade) | ✅ DONE (folded into D2375) |
+| D2374 | v2.0 `content_based` routing restored (personal disciplines→private + design/business escape) | ✅ DONE |
+| D2375 | Shared `derive_context` + fresh context/intimacy at push (S6b/S6c) | ✅ DONE |
+| S4 speed | `thinking_budget: 256` + `depth_thinking_budget: 128` flipped | ✅ DONE (CRIBS 4/4 complete, ~37% faster, 0 exc) |
+| Hash audit | fb_id/source_ids/manifest_hash alignment verified | ✅ DONE (see revelations) |
+| **D2376** | `extraction_type` default `""` + >95% dominance canary + `source_ids` provenance closure (R1+R2) | ✅ DONE (this session) |
+
+### Remaining before T1.1 (new, 2026-08-16)
+
+| # | Item | Priority |
+|---|------|----------|
+| R1 | **`extraction_type` default over-claim** — all `.get(..., "causal_mechanism")` → `""` + >95% dominance canary (D2376). | ✅ DONE (D2376) |
+| R2 | **`source_ids` provenance gap** — restored schema field + S4 derivation + S6 column (D2376). | ✅ DONE (D2376) |
+| R3 | **Canary S4→S6 rerun** — verify D2371–D2376 + speed knobs end-to-end against the fixed 180-FB checkpoint (see `tools/canary_rerun_s4onward.sh`). | P1 (pre-launch) — **DEFERRED to next query (user)** |
+| R4 | T-015 golden depth balance (≥5 universal + ≥5 specialized) — verbatim-mining deferred. | P2 (spec in MTR T-015) |
+
+### New findings this session (2026-08-16 — D2376 audit)
+
+| # | Finding | Severity |
+|---|---------|----------|
+| F1 | **Orphan fields — `prerequisite_fbs`, `contradicts_fbs`, `procedural_skill` are schema-defined + committed (S6) + traversed (retrieve.py) but NEVER populated** by any stage. `related_fbs` IS populated (P1.4). Accessibility correlates with `prerequisite_fbs` in code, but 0/180 FBs have prereqs → all 6 `accessibility=prerequisite` come from the `expert AND def>200` heuristic (D2132), not dependency edges. | Medium (future tax) |
+| F2 | **`Cluster` schema class is stale v2** (`cluster_id:int`, `centroid_text`, `distinct_books`) vs actual S1.5 v3 output (`cluster_id:str`, `segment_ids`, `source_ids`, `source_diversity`, `is_convergent`, `is_noise`, `is_singleton`). Not used for validation (dead schema), but a drift blindspot. | Low |
+| F3 | **`isor_score` recomputes `resolve_source_ids(source_books)`** instead of using the now-persisted `fb.source_ids` (redundant but correct — same canonical hash). | Low |
+| F4 | **`accessibility` enum = `self-evident` \| `prerequisite`** (TWO labels). `prerequisite` is BOTH a label value AND distinct fields (`prerequisite_fbs` on FB; `prerequisite` string on PT; v1 had `prerequisites` string). They logically correlate (non-empty `prerequisite_fbs` → `accessibility=prerequisite`), and the code implements this — but see F1 (vacuous in practice). | Info |
 
 ---
 

@@ -364,10 +364,9 @@ def call_omlx_json(
         timeout: Request timeout (OMLX only).
 
     Returns:
-        Parsed JSON (dict or list).
-
-    Raises:
-        ValueError: If the response cannot be parsed as JSON.
+        Parsed JSON (dict or non-empty list). Returns an EMPTY list ``[]`` when the
+        response cannot be parsed as JSON — callers must handle the empty case
+        (see BUG-080 guards in stage4_merge.py / stage4_merged_call.py).
     """
     if _INFERENCE_BACKEND == "mlx":
         return _call_mlx_json(prompt, model, system or "", max_tokens)
@@ -386,20 +385,11 @@ def call_omlx_json(
     )
 
     result = parse_json_robust(raw)
-
-    if isinstance(result, (dict, list)):
-        return result
-
-    # Last resort: try to extract JSON from the text
-    repaired = repair_json(raw)
-    try:
-        return json.loads(repaired)
-    except json.JSONDecodeError as e:
-        raise ValueError(
-            f"OMLX response could not be parsed as JSON. "
-            f"Raw (first 200 chars): {raw[:200]}... "
-            f"Error: {e}"
-        ) from e
+    # D2383: parse_json_robust() ALWAYS returns a list (empty [] on parse failure),
+    # so [] is the de facto contract and callers handle it (BUG-080). The previous
+    # "Last resort" ValueError branch here was unreachable dead code — isinstance([],
+    # list) is always True — and falsely implied the function raises when it does not.
+    return result
 
 
 def get_omlx_version() -> str | None:

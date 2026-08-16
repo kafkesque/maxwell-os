@@ -713,6 +713,14 @@ class FB(StampedRecord):
     # ── Provenance (simplified — bloat removed per D2130) ─────────────────
     source_clusters: list[str] = Field(default_factory=list, description="Cluster IDs that formed this FB (hash strings post-D2120)")
     source_books: list[str] = Field(description="Distinct source books")
+    # D2376: canonical source identity (SHA-256 author|title, D2176). Emitted by
+    # S1.5 clusters and S2 FBs; previously dropped at S4 (0/180 canary FBs kept it).
+    # source_diversity/epistemic counting depends on these canonical hashes, NOT
+    # filenames (same book, different edition/filename would otherwise inflate).
+    source_ids: list[str] = Field(
+        default_factory=list,
+        description="Canonical source IDs (SHA-256 author|title) for BORP/epistemic counting (D2176)."
+    )
     source_principle_ids: list[str] = Field(
         default_factory=list,
         description="Principle IDs from Stage 2. Source texts retrieved on-demand, not embedded (D2130: was source_principles)."
@@ -938,8 +946,14 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             syn_map = yaml.safe_load(f)
         for _key, entry in syn_map.get("synonyms", {}).items():
             canonical = entry.get("canonical", "").strip()
-            if canonical:
-                lookup[canonical.lower()] = canonical
+            # D2394: synonym_map.yaml is DOMAIN-only. Apply the same kind filter as
+            # step 1 so domain synonyms never pollute the discipline index (and vice
+            # versa). Previously this step ran unfiltered, so "organizational
+            # psychology" / "leadership" / "team dynamics" (all domain synonyms) were
+            # written into the DISCIPLINE index → wrong-kind canonical (D2133 regression).
+            if not canonical or not _accept(canonical):
+                continue
+            lookup[canonical.lower()] = canonical
             for syn in entry.get("synonyms", []):
                 syn_clean = syn.strip()
                 if syn_clean:

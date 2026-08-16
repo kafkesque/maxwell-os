@@ -1,0 +1,122 @@
+{
+  "feedback_loop": {
+    "depth": "universal",
+    "books": 12,
+    "passages": [
+      {
+        "book": "Building AI Agent Platforms (for Isabel Garcia) -- Ben O'Mahony and Fabian Nonnenmacher -- 2026 -- O'Reilly Media, Inc_ -- 0cd870ebd42c3c37eb0a817985df2e9e -- Anna’s Archive.md",
+        "text": "developer joy include the wish for working with modern tools, having fast feedback loops, and even moments of pure whimsy. Rapid feedback loops are an essential aspect of developer productivity and, in a way, the ultimate representation of removing friction. This begins with having swift local development setups allowing developers to iterate quickly on their code, and continues with fast deployment pipelines and timely feedback from monitoring and alerting systems from the real production systems."
+      },
+      {
+        "book": "LLMOps Managing Large Language Models in Production (Abi Aryan) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "are, however, additional complexities: Dynamic behavior Context sensitivity Continuous learning Feedback loops Integration with existing systems Environmental variability Multiple goals : Agents may have conflicting objectives or collaborate in ways that require balancing multiple criteria, complicating evaluation metrics. Sometimes two agents have poor metrics individually but collaborate well and generate output that is better than would be produced by collaboration between two different agents with better individual metrics."
+      },
+      {
+        "book": "Beyond Vibe Coding_ From Coder to AI-Era Developer -- Addy Osmani -- ISBN_ 979-8-341-63475-6_, 2025 -- O'Reilly Media, Inc_ -- f0473318f8e70e15c253b9c07075d409 -- Anna’s Archive.md",
+        "text": "an iterative development process.[]{#ch02.html_id421 contenteditable=\"false\" primary=\"iterative refinement of prompts\" data-type=\"indexterm\"} This is the feedback loop I touched on in {data-type=\"xref\"}. When the AI gives you code, review it critically, just as you would code written by a human. Does it meet the requirements? If not, identify what's missing or wrong. Then provide feedback or a refined prompt. This can be done in a conversational AI by simply continuing the dialogue, or in an editor by writing another comment for the AI to respond to."
+      },
+      {
+        "book": "Building Applications with AI Agents_ Designing and Implementing Multiagent Systems{Albada, Michael}(2025 October 21, O&_039_Reilly Media){111959655} libgen.li.md",
+        "text": "questions traditional monitoring systems are built to answer, but they are critical to ensuring agents remain trustworthy, helpful, and aligned. Build a layered []{#ch10.html_id877 contenteditable=\"false\" data-type=\"indexterm\" primary=\"layered feedback loops, monitoring\"}feedback loop: instrument runtime events (tool calls, generations, fallbacks) with context, streaming to backends like Loki (logs), Tempo (traces), and Grafana (visualization/alerting). Append evaluation signals---hallucination scores or drift indicators---via external critics in real time."
+      },
+      {
+        "book": "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "you to understand when considering an agentic deployment---and that's why we wrote this section: Computational complexity and infinite feedback loops : Because AI agents often leverage multiple inference calls[]{#ch07.html_id1030 contenteditable=\"false\" primary=\"infinite feedback loops, agentic systems\" data-type=\"indexterm\"} to respond to a single prompt, they can become very computationally expensive, particularly for simple NLP tasks. It may be more efficient and cost-effective to run a standard LLM workflow, without bringing in a broader agentic system."
+      },
+      {
+        "book": "Building AI-Powered Products (The Essential Guide to AI and -- Dr_ Marily Nika -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098152703 -- 22277afa7b29825788fc713c796a3dfc -- Anna’s Archive.md",
+        "text": "that automated metrics might overlook, which is crucial for models deployed in high-stakes environments such as healthcare and autonomous driving. Even after deployment, human []{#ch03.html_id861 contenteditable=\"false\" primary=\"feedback loops\" data-type=\"indexterm\"}feedback loops are necessary. AI products should allow users to provide real-time feedback on recommendations or decisions. This feedback can then be fed back into the data collection and model retraining phases, creating an ongoing cycle of improvement."
+      },
+      {
+        "book": "The Design Process (Karl Aspelund) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "both cases, visualization must proceed quickly to keep the idea fresh and to keep you from getting bogged down in the mechanics of drawing. It’s a fine line, but if you find yourself spending more time on making the sketch look good rather than examining the idea, stop and refocus. Sketch quickly and sketch again to cement what you have done. This procedure also allows you to set up a quick feedback loop in which you can look at the first quick sketch, decide what needs improving, sketch again, and so on. A good method is to first decide on the number of sketches and, when you’ve sped through those, pick the best."
+      },
+      {
+        "book": "[David_Machin]_Visual_Communication(z-lib.org).md",
+        "text": "power relations, metaphors or other collectively shared fields of reference determine how destination culture appears outside audiences (Crump 1999). As mentioned previously, measurement and causality are problematic issues in destination image research because imagery circulates as a semiotic feedback loop, blurring distinctions between visitors’ perceptions and experiences and marketers’ intentions. However, in the study described in the following sections, the emphasis is on the projected element of destination imagery, evidenced by the fact that the material analyzed was 4 The Seoul destination image"
+      },
+      {
+        "book": "Expanded Cinema_ Fiftieth Anniversary Edition_Gene Youngblood_ R. Buckminster Fuller_liber3.md",
+        "text": "reproduced on the right, then on the left, and so on. The pattern thus achieved is symmetrical around a central vertical line. Further convolutions were obtained by combining scan reversals with raster misregistrations. These are some of the feedback possibilities employing only a blank scanned raster and attendant noise patterns. An entirely different range of effects can be obtained if a second and a third video source are introduced into the feedback loop. Closed-Circuit Television and Teledynamic Environments"
+      },
+      {
+        "book": "AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media, Inc_ -- b57e125db20a0a2b8d5bddf3990288cc -- Anna’s Archive.md",
+        "text": "result to the user, use the feedback it gathered to do another action, or gather more feedback from the user. Let's take a look at a common use for agents, and what this loop would look like for each outcome. For this example, let's imagine a coding task: you are in an AI-powered code editor like Cursor or Windsurf and you ask the chatbot to write unit tests for your code. The action/feedback loops may look something like this: (Figure coming soon)"
+      },
+      {
+        "book": "Mastering Enterprise Platform Engineering (Mark Peters, Gautham Pallapa) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "to drive innovation and improve decision-making across ]{#B24465_10.xhtml_kobo.730.2 .koboSpan xmlns=\" organization.]{#B24465_10.xhtml_kobo.731.1 .koboSpan xmlns=\" [Continuous improvement and feedback loops]{#B24465_10.xhtml_kobo.732.1 .koboSpan xmlns=\" [Hiring strategies should evolve based on feedback and changing needs. ]{#B24465_10.xhtml_kobo.733.1 .koboSpan xmlns=\" following approaches help optimize the process and enhance the ]{#B24465_10.xhtml_kobo.733.2 .koboSpan xmlns=\" experience:]{#B24465_10.xhtml_kobo.734.1 .koboSpan xmlns=\""
+      },
+      {
+        "book": "The AI-Enabled Engineer_ A Comprehensive Framework for -- Kevin Cai; -- 2026 -- John Wiley & Sons, Incorporated -- isbn13 9781394375783 -- 17a9c99a5aee1a9797efc680516bb06d -- Anna’s Archive.md",
+        "text": "standard, but natural to most due to the rigorous engineering training.]{#c02.xhtml_c02-li-0135} The data-driven approach in modern engineering encompasses additional dimensions: - [Predictive analytics for maintenance and optimization]{#c02.xhtml_c02-li-0136} - [Machine learning for pattern recognition]{#c02.xhtml_c02-li-0137} - [Digital twins for system modeling]{#c02.xhtml_c02-li-0138} - [Automated quality control systems]{#c02.xhtml_c02-li-0139} - [Continuous monitoring and feedback loops]{#c02.xhtml_c02-li-0140}"
+      }
+    ]
+  },
+  "network_effect": {
+    "depth": "universal",
+    "books": 2,
+    "passages": [
+      {
+        "book": "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md",
+        "text": "carrying the distinctive Jerry cans. When you hesitate to host someone in your home because you don’t have clean water to offer them. This is a ratchet, but not one based on obvious software network effects. It’s based on the original network effect, the one built around people in proximity. As more and more people in the village get clean water, those without become socially isolated and feel stupid as well. Most can afford the water (because of the time and impact savings), but the emotional shift is the difficult part. Within months, the water has crossed the local chasm from the early adopters to the rest of the village."
+      },
+      {
+        "book": "Business Model Innovation Game Changers and Contemporary Issues (Annabeth Aagaard) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "of sensing and seizing in business model innovation. The Journal of Strategic Information Systems, 31, 101742. Boudreau, K. J., Jeppesen, L. B., & Miric, M. (2022). Competing on freemium: Digital competition with network effects. Strategic Management Journal, 43, 1374–1401. Ceccagnoli, M., Forman, C., Huang, P., & Wu, D. J. (2012). Cocreation of value in a platform ecosystem! The case of enterprise software. MIS Quarterly, 36 , 263. 118 P. Ritala and M. Jovanovic"
+      }
+    ]
+  },
+  "backpropagation": {
+    "depth": "specialized",
+    "books": 7,
+    "passages": [
+      {
+        "book": "LLMOps Managing Large Language Models in Production (Abi Aryan) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "prevent memory overflow, it can also cause some input data to be ignored during training---a trade-off that needs careful tuning. During[]{#ch05.html_id912 contenteditable=\"false\" primary=\"backpropagation\" data-type=\"indexterm\"} backpropagation, gradients flow only through the experts that were activated for each token. Experts not involved in processing a given token receive no gradient updates. Thus, computation and memory use are less than they would otherwise be, given the model's huge parameter count. This sparsity in gradient flow is one reason MoEs can scale efficiently."
+      },
+      {
+        "book": "GANs in Action Deep learning with Generative Adversarial Networks by Jakub Langr, Vladimir Bok (z-lib.org).md",
+        "text": "Discriminator network to classify x and x. d Compute the classification errors and backpropagate the total error to update the Discriminator weights and biases, seeking to minimize the clas- sification errors. 2 Train the Generator: (b) and (c) x Discriminator Classification error (a) x* Generator z GANs in action 11 a Get a new random noise vector z and, using the Generator network, syn- thesize a fake example x. b Use the Discriminator network to classify x. c Compute the classification error and backpropagate the error to update the Generator weights and biases, seeking to maximize the Discrimina- tor’s error."
+      },
+      {
+        "book": "AI and machine learning for coders _ a programmer's guide to -- Laurence Moroney; Andrew Ng; O'Reilly Media -- 1st edition, Sebastopol, California, -- isbn13 9781492078166 -- bc7d2f44b7172a46eb939596bda2bc38 -- Anna’s Archive.md",
+        "text": "of a word, and words with similar vectors---i.e., pointing in roughly the same direction---could be considered related to that word. The embedding layer will be initialized randomly---that is, the coordinates of the vectors will be completely random to start and will be learned[]{#ch06.html_back06 contenteditable=\"false\" primary=\"backpropagation\" data-type=\"indexterm\"} during training using backpropagation. When training is complete, the embeddings will roughly encode similarities between words, allowing us to identify words that are somewhat similar based on the direction of the vectors for those words."
+      },
+      {
+        "book": "Hands-on unsupervised learning using Python _ how to build -- Ankur A_ Patel -- First edition, Sebastopol, CA, 2019 -- O'Reilly Media, Incorporated -- isbn13 9781492035596 -- c1f79be2b525c431a658b4184d88353e -- Anna’s Archive.md",
+        "text": "of the original input data, which the supervised portion then takes advantage of to solve the specific task at hand. This approach is called \"greedy\" because each portion of the neural network is trained independently, not jointly. \"Layer-wise\" refers to the layers of the network. In most modern neural networks, pretraining is usually not necessary. Instead, all the layers are trained jointly using backpropagation. Major computer advances have made the vanishing gradient problem and the exploding gradient problem much more [manageable]{.calibre}."
+      },
+      {
+        "book": "Vector Databases_ A Practical Introduction -- Nitin Borwankar -- 1, 2026 apr 06 -- O'Reilly Media -- 2934a7b8cf5eaf1d3ac6e978f89eafeb -- Anna’s Archive.md",
+        "text": "semantic relationships between papers, missing relevant work that uses different terminology or approaches the same problem from a different angle. Consider a researcher investigating \"neural network optimization techniques.\" A keyword search might miss papers discussing \"gradient descent improvements\" or \"backpropagation efficiency,\" even though these are directly relevant. This semantic gap between search queries and relevant content is where vector databases excel: understanding the meaning behind text rather than just matching keywords."
+      },
+      {
+        "book": "Hands-On Generative AI with Transformers and Diffusion -- Pedro Cuenca, Apolinário Passos, Omar Sanseviero & Jonathan -- 6, 2024 -- O'Reilly Media, -- 4a3dd41c0fe610c053b13d3817350636 -- Anna’s Archive.md",
+        "text": "random amounts of noise, so we'll pick a random number of timesteps. 3. Feed the noisy images into the model. 4. Calculate the loss using mean squared error (MSE). MSE is a common loss function for regression tasks, including the UNet model's noise prediction. It measures the average squared difference between predicted and true values, penalizing larger errors more. In the UNet model, MSE is calculated between predicted and actual noise, helping the model generate more realistic images by minimizing the loss. This is called the noise or epsilon objective. 5. Backpropagate the loss and update the model weights with the optimizer."
+      },
+      {
+        "book": "Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "Team, [Google, ]{.No-Break}[[ - Hooper: \"How to Spend \\$1 trillion\", Rowan Hooper ([2021), ]{.No-Break}[[ - HuggingFace: \"describeai/gemini\", Hugging [Face, ]{.No-Break}[[ - LeCun1989: \"Backpropagation Applied to Handwritten Zip Code Recognition\", Y. LeCun; B.J..S. Boser; J.S. Denker; D. Henderson; R.E. Howard; W. Hubbard; L.D. Jackel (1989) Advances in Neural Information Processing Systems, 1, [323-331. ]{.No-Break}[[ - Life_Architecture: \"Amazon Olympus (large language model due 2024H2)\", Alan D. [Thompson, ]{.No-Break}[[ - Llama3: \"Llama3 8b\", [Meta, ]{.No-Break}[ - Mandlik: \"How GPT-4 Image Works?\", Sanman [Mandlik, ]{.No-Break}[["
+      }
+    ]
+  },
+  "normal_distribution": {
+    "depth": "universal",
+    "books": 3,
+    "passages": [
+      {
+        "book": "Hands-On Generative AI with Transformers and Diffusion -- Pedro Cuenca, Apolinário Passos, Omar Sanseviero & Jonathan -- 6, 2024 -- O'Reilly Media, -- 4a3dd41c0fe610c053b13d3817350636 -- Anna’s Archive.md",
+        "text": "trying to avoid diverging too much from a normal distribution. Let's explore what happened after we added this new goal. If we plot the means of the standard distribution encoded by the model for the test set, we obtain a slightly better-behaved result than in the AutoEncoder case (Figure 3-21). Results are now better centered around zero and don't get as far away as in the AutoEncoder case. Areas taken by the different classes are of similar size, although there's still overlap between similar-looking numbers."
+      },
+      {
+        "book": "Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "the null hypothesis, suggesting the data is probably Gaussian. If p \\ 0.05: print('Probably Gaussian') else: print('Probably not Gaussian') ` - If the p-value is greater than 0.05, we fail to reject the null hypothesis, which means we cannot rule out the possibility that the data comes from a normal distribution. In this case, the code prints \"[Probably Gaussian\".]{.No-Break} - If the p-value is less than or equal to 0.05, we reject the null hypothesis, indicating we have evidence to suggest the data is not likely from a normal distribution. In this case, the code prints \"Probably [not Gaussian\".]{.No-Break} Important note"
+      },
+      {
+        "book": "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "text": "plan, access to lots of content and hands-on environments, and a personal and continued commitment to the investment of upskilling. The good news is, like any innovation, adopting new skills[]{#ch06.html_id823 contenteditable=\"false\" primary=\"Innovation Adoption Lifecycle\" data-type=\"indexterm\"} can be mapped to the Innovation Adoption Lifecycle curve (also known as the [Rogers]{.keep-together} bell curve) in Figure 6-1{data-type=\"xref\"}. Figure 6-1. The Innovation Adoption Lifecycle curve"
+      }
+    ]
+  }
+}

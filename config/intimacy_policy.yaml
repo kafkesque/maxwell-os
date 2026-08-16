@@ -44,6 +44,37 @@ topic_sensitive_disciplines:
   - decision making
   - personal productivity
 
+# Signal 4 — content_based routing (restored from v2.0 `routing.content_based`, D2374).
+# The OLD agreement: a "personal/mind" discipline resolves PRIVATE when the FB does
+# NOT sit in a professional design/business domain. This is STRICTER than
+# topic_sensitivity (selective): personal-discipline content that is not clearly
+# design/business work product → private (the v2.0 content_based rule).
+content_based:
+  personal_disciplines:   # the "personal/mind" cluster (== topic_sensitive_disciplines)
+    - psychology
+    - cognitive science
+    - behavioral economics
+    - decision making
+    - personal productivity
+  design_business_domains:   # escape hatch: professional work product → NOT private
+    - graphic design
+    - brand identity
+    - editorial & advertising
+    - motion design
+    - environmental design
+    - digital product
+    - web & ui
+    - user experience
+    - illustration
+    - packaging
+    - creative technology
+    - business operations
+    - business development
+    - entrepreneurship
+    - organizational behavior
+    - marketing
+  rule: "discipline in personal_disciplines AND domains ∩ design_business_domains == ∅ → Private"
+
 # Signal 3 — context rules (v1 R7/R8, D314 floor).
 # `context` is the S4-derived comma-separated label set
 # (business|design|system|academic|personal).

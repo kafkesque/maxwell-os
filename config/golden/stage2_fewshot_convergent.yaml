@@ -1,8 +1,8 @@
 meta:
   version: '5.0'
   architecture: cluster-before-extract
-  total_examples: 77
-  convergent_positives: 54
+  total_examples: 80
+  convergent_positives: 57
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -37,16 +37,16 @@ meta:
   - empirical_pattern_diversity
   - genuine_specialized_positive
   calibrated_date: '2026-08-10'
-  notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 75 examples total.'
-  updated: '2026-08-12'
-  example_count: 75
+  notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 80 examples total.'
+  updated: '2026-08-16'
+  example_count: 80
   tier_definitions:
     description: 'D2286: Golden tiered classification for DSPy training safety'
     GOLD-A: Human-adjudicated, multi-source convergent, clear mechanism/boundary/consequence. Train DSPy.
     GOLD-B: Strong positives with minor ambiguity. Evaluate DSPy. Never train.
     CHALLENGE: Hard negatives, edge cases, adversarial. Test DSPy robustness. NEVER train.
   tier_counts:
-    GOLD-A: 49
+    GOLD-A: 54
     CHALLENGE: 23
     GOLD-B: 3
 examples:
@@ -4725,7 +4725,7 @@ examples:
     evidence_passages:
     - the equilibrium for a set of players, all acting rationally in their own interest, may not be the outcome that is actually
       best for those players
-    - The price of anarchy measures the gap between cooperation (a centrally designed or coordinated solution) and competition
+    - Algorithmic game theory has quantified this as the "price of anarchy."
     - Defect is the dominant strategy for each, and the combination where both choose Defect yields a worse outcome for both
       than if both choose Cooperate
     - Each firm pursuing its own self-interest does not lead to an outcome that is best for them all
@@ -4781,10 +4781,10 @@ examples:
       a security vulnerability, not a performance optimization.'
     evidence_passages:
     - cryptographic hashing algorithms differ from standard encoding/decoding functions such as Base64
-    - a hashing algorithm that converts plain passwords into an encoded string that can''t be decoded back into its original
+    - a hashing algorithm that converts plain passwords into an encoded string that can't be decoded back into its original
       form
-    - MD5 is a cryptographic hash function, but it''s no longer considered secure for password hashing
-    - It''s vulnerable to collision attacks, where an attacker can find another input that generates the same hash
+    - MD5 is a cryptographic hash function, but it's no longer considered secure for password hashing
+    - It's vulnerable to collision attacks, where an attacker can find another input that generates the same hash
     extraction_type: normative_heuristic
     content_type: principle
     depth: specialized
@@ -4794,4 +4794,181 @@ examples:
     cryptography/software security that a general engineer would not cover; it requires security-specific knowledge. Fills
     the specialized-positive gap beyond the single typography (kerning) example, on a different sub-domain (software security
     vs graphic design).'
+  tier: GOLD-A
+
+- id: CONV-056
+  domain: complex systems
+  discipline: statistics
+  source_books:
+  - 'Complexity: A Guided Tour — Melanie Mitchell'
+  - The Black Swan — Nassim Nicholas Taleb
+  cluster_segments:
+  - source_book: 'Complexity: A Guided Tour — Melanie Mitchell'
+    text: 'A major discovery to date of network science is that high-clustering, skewed
+      degree distributions, and hub structure seem to be characteristic of the vast
+      majority of all the natural, social, and technological networks that network
+      scientists have studied.'
+  - source_book: The Black Swan — Nassim Nicholas Taleb
+    text: 'Almost everything in social life is produced by rare but consequential shocks
+      and jumps; all the while almost everything studied about social life focuses
+      on the "normal," particularly with "bell curve" methods of inference that tell
+      you close to nothing.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Power-Law Heavy-Tailed Distribution
+    definition: In many natural, social, and technological systems the distribution
+      of sizes, frequencies, or degrees is heavily skewed — a few extreme members
+      dominate while the vast majority are small. A power law describes this heavy
+      tail, in which the probability of an event falls off polynomially rather than
+      exponentially, so rare-but-extreme events are far more common than a bell curve
+      predicts.
+    mechanism: This is an empirical regularity, not a causal mechanism. A heavy tail
+      arises when small advantages compound or when units are not independent (rich-get-richer
+      attachment, scale-free growth), but the passages document the pattern itself
+      rather than isolate a single cause. The key epistemic point is that bell-curve
+      inference — which assumes thin tails and independence — systematically underestimates
+      the frequency and impact of extreme events in such systems.
+    boundary: Applies to systems where elements interact or grow multiplicatively and
+      are not independently sampled (networks, city sizes, wealth, word frequencies,
+      earthquake magnitudes). Fails for genuinely independent, additive processes
+      with a well-defined scale, where the central limit theorem yields a thin-tailed
+      normal distribution.
+    consequence: Because heavy tails are ubiquitous, statistical tools built on the
+      normal distribution will understate tail risk. This is why extreme events —
+      market crashes, pandemics, superstars, hub failures — recur more often than
+      thin-tailed models predict, and why robustness must be designed for the tail,
+      not the mean.
+    evidence_passages:
+    - high-clustering, skewed degree distributions, and hub structure seem to be characteristic
+      of the vast majority of all the natural, social, and technological networks
+    - Almost everything in social life is produced by rare but consequential shocks
+      and jumps
+    - particularly with "bell curve" methods of inference that tell you close to nothing
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: universal
+  rationale: 'CONVERGENT POSITIVE — UNIVERSAL POWER LAW (T-015/D2377). Mitchell (complexity
+    science) and Taleb (statistics/risk) independently state the same law: real systems
+    are heavy-tailed (skewed, hub-dominated) and bell-curve methods fail to capture
+    them. Depth is genuinely universal — a power law applies across physics (earthquakes),
+    biology (metabolic scaling), economics (wealth), and language (word frequency)
+    in the same domain-independent sense as entropy. Fills the universal-positive
+    depth gap beyond the single entropy example.'
+  tier: GOLD-A
+- id: CONV-057
+  domain: graphic design
+  discipline: color theory
+  source_books:
+  - 'Color Theory: A Critical Introduction — Aaron Fine'
+  - Learning Web Design — Jennifer Niederst Robbins
+  cluster_segments:
+  - source_book: 'Color Theory: A Critical Introduction — Aaron Fine'
+    text: 'A color gamut is a range of colors made possible under a given set of constraints.
+      The color gamut of a painter using any set of red, yellow, and blue colors will
+      be more limited than the color gamut which adds a bright green pigment.'
+  - source_book: Learning Web Design — Jennifer Niederst Robbins
+    text: 'The grayscale color space defines colors according to one numeric parameter:
+      the percentage of brightness. Colors in the RGB color space are defined by three
+      number values: amounts of red, green, and blue light. In the HSL color model,
+      the three number values represent hue, saturation, and lightness. CMYK colors
+      used in printing are defined by four parameters: percentages of cyan, magenta,
+      yellow, and black ink.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Color Gamut Boundary
+    definition: A color gamut is the finite range of colors a given set of primaries
+      or a color space can represent or reproduce. Every color space — grayscale,
+      RGB, HSL, CMYK — encodes color as a small number of numeric parameters, and
+      that parameterization defines the boundary of the colors the space can express.
+    mechanism: This is a descriptive model, not a causal mechanism. The gamut is determined
+      by the geometric shape that a finite set of primaries (or ink parameters) spans
+      in color space. A system with more, or more saturated, primaries encloses a
+      larger volume and therefore a wider gamut; subtractive pigment mixing and additive
+      light mixing bound the gamut differently because they combine primaries by different
+      physical operations.
+    boundary: Applies to any color reproduction or encoding system with a finite set
+      of primaries or parameters (screens, printers, paint sets, digital color spaces).
+      Fails as a meaningful constraint only when discussing color perception in the
+      abstract, without reference to a specific reproduction device or encoding.
+    consequence: Because a device's gamut is bounded by its primaries, colors outside
+      the gamut cannot be reproduced and must be mapped (gamut mapping) to the nearest
+      in-gamut color. This is why the same design can render differently across screens,
+      printers, and paint media, and why wide-gamut displays and printing profiles
+      exist.
+    evidence_passages:
+    - A color gamut is a range of colors made possible under a given set of constraints
+    - The color gamut of a painter using any set of red, yellow, and blue colors will
+      be more limited than the color gamut which adds a bright green pigment
+    - 'Colors in the RGB color space are defined by three number values: amounts of
+      red, green, and blue light'
+    extraction_type: descriptive_model
+    content_type: principle
+    depth: domain
+  rationale: 'CONVERGENT POSITIVE — DOMAIN COLOR GAMUT (T-015/D2377). Aaron Fine
+    (color theory) and Niederst Robbins (web design) independently define the same
+    concept: a color gamut/space is a bounded range of colors defined by a finite
+    set of numeric parameters or primaries. Depth is domain, not specialized — color
+    gamut is a foundational concept that applies broadly within the single discipline
+    of color science/management (displays, print, paint, photography), unlike a narrow
+    sub-technique such as optical kerning. S4 depth model agreed (domain).'
+  tier: GOLD-A
+
+- id: CONV-058
+  domain: data science
+  discipline: machine learning
+  source_books:
+  - 'GANs in Action — Jakub Langr & Vladimir Bok'
+  - 'AI and Machine Learning for Coders — Laurence Moroney'
+  cluster_segments:
+  - source_book: 'GANs in Action — Jakub Langr & Vladimir Bok'
+    text: 'Compute the classification errors and backpropagate the total error to
+      update the Discriminator weights and biases, seeking to minimize the classification
+      errors.'
+  - source_book: 'AI and Machine Learning for Coders — Laurence Moroney'
+    text: 'The embedding layer will be initialized randomly and will be learned during
+      training using backpropagation. When training is complete, the embeddings will
+      roughly encode similarities between words.'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Backpropagation Weight Update
+    definition: Backpropagation is the training algorithm that propagates a neural
+      network's output error backward through its layers to compute how each weight
+      and bias should change, so the network iteratively reduces its prediction error.
+    mechanism: The causal chain is error → gradient → weight update. The network makes
+      a forward pass to produce an output, computes the error between that output and
+      the target, then propagates the error backward layer-by-layer to compute a gradient
+      for each weight and bias. Each weight is updated in the direction that reduces
+      the error, so the next forward pass produces a lower error.
+    boundary: Applies to differentiable neural networks trained by gradient descent.
+      Fails when the network contains non-differentiable operations, when gradients
+      vanish or explode in very deep or recurrent networks, or when the loss surface
+      provides no useful gradient signal.
+    consequence: Because backpropagation converts error into weight updates, networks
+      can learn complex input-output mappings end-to-end. Sparse gradient flow (e.g.,
+      mixture-of-experts models that update only the experts activated for a token)
+      reduces computation; vanishing or exploding gradients bound how deep a network
+      can be trained.
+    evidence_passages:
+    - Compute the classification errors and backpropagate the total error to update
+      the Discriminator weights and biases
+    - will be learned during training using backpropagation
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: specialized
+  rationale: 'CONVERGENT POSITIVE — SPECIALIZED BACKPROPAGATION (D2378 scripted-mining).
+    Langr/Bok (GANs) and Moroney (AI for coders) independently state the same narrow
+    technique: output error is propagated backward through a network to update weights
+    and biases so the next pass errs less. Depth is genuinely specialized — a sub-technique
+    within deep learning that a general engineer would not cover; it requires ML-specific
+    expertise. Mined by tools/mine_depth_golden.py (seeds: config/golden/depth_mining_seeds.yaml),
+    human-reviewed for verbatim evidence.'
   tier: GOLD-A

@@ -1,6 +1,138 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-15 19:12 (D2369: BUG-132 FIXED per-call; V8 golden depth expansion; V9 resume live-verified; T1.1 = CONDITIONAL GO)
+> **Last updated:** 2026-08-16 20:25 (integrity 17/17 + audit green; dropped dead `s3_original_domain` column D2395; grammar A/B D2392, depth D2393, taxonomy D2394 all resolved)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟢 BUG-135 — 2026-08-16 — Dead legacy `s3_original_domain` column (DB 61 vs 60 cols) — FIXED (D2395)
+- **Symptom:** `just integrity` full → `[8] INSERT has 60 placeholders but fbs table has 61 columns`.
+- **Root cause:** `s3_original_domain` (removed stage3, D2130) dropped from CREATE TABLE + INSERT
+  long ago but never DROPPED from existing DBs. 370 rows held empty strings — dead weight.
+- **Fix:** `_migrate_drop_column()` + drop in `init_db()`. DB 61→60 cols; integrity 17/17.
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** Session 2026-08-16 — integrity healthcheck + audit (D2395).
+
+## 🟢 BUG-134 — 2026-08-16 — Synonym-index kind-filter bug: domain synonyms polluted discipline index — FIXED (D2394)
+- **Symptom:** `organizational psychology`, `leadership`, `team dynamics`, `culture`,
+  `behavior` mapped to the DOMAIN canonical `organizational behavior` even in the
+  DISCIPLINE synonym index (`get_synonym_index('discipline')`). Consequence: wrong-kind
+  canonical labels and inflated `emerging` fallback (discipline 32.0%).
+- **Root cause:** `_build_synonym_index()` step 2 (synonym_map.yaml) ran UNFILTERED by
+  kind. synonym_map.yaml is domain-only, but its synonyms/keywords were written into the
+  DISCIPLINE index too, overwriting correct step-1 mappings. This was a D2133 regression
+  (D2133 added the kind filter to step 1 but not step 2).
+- **Fix:** apply the same `_accept(canonical)` kind filter in step 2. Verified:
+  `organizational psychology → psychology`, `leadership → leadership` (was both →
+  `organizational behavior`).
+- **Files:** `pipeline/schemas.py`
+- **Source:** Session 2026-08-16 — taxonomy emerging over-firing analysis (D2394).
+
+### ⚠️ NOTE (2026-08-16) — Grammar A/B: 0.6.0 xgrammar breaks gpt-oss-20b (NOT a pipeline bug, external)
+- Grammar enforcement WORKS in 0.6.0 (Phi-4-mini returns clean JSON, no `warning` header),
+  but with `response_format=json_object` + gpt-oss-20b the message content is empty
+  (`{"role":"assistant"}`) — xgrammar enforcement collides with the Harmony reasoning
+  protocol (`GrammarMatcher rejected token 0`; `Unexpected EOS while waiting for message
+  header`). OFF baseline (0.5.1) = 30/30 valid JSON. **Keep grammar OFF.** See D2392.
+
+## 🟢 BUG-133 — 2026-08-16 — S6 schema-migration gap: `is_summary` + `classification_status` missing from DB — FIXED (D2391)
+- **Symptom:** S6 `INSERT OR REPLACE INTO fbs` failed 278/278 with `table fbs has no column named is_summary`.
+- **Root cause:** `is_summary` (D2089) + `classification_status` (D2184) added to `CREATE TABLE fbs`
+  but never added to `_migrate_add_column()` list. `CREATE TABLE IF NOT EXISTS` can't heal an existing
+  table, so the pre-existing DB (398 rows) lacked both columns. Same class as BUG-110/BUG-119
+  (schema drift on existing DBs) but in the *migration* list, not the CREATE TABLE.
+- **Fix:** added `_migrate_add_column` for both columns. S6 re-ran → 278 inserted / 0 failed (exit 0).
+- **Files:** `pipeline/stage6_commit.py`
+- **Source:** Session 2026-08-16 — canary S6 commit audit (D2391).
+
+### ⚠️ NEW (2026-08-16) — Vector search DEGRADED: `vec_fbs` table absent (sqlite-vec load fails)
+- **Symptom:** S6 log: `⚠️ Embedding insert failed: no such table: vec_fbs` ×278, and
+  `⚠️ Vector: DEGRADED — 0 embeddings`. `vec_fbs` virtual table never created.
+- **Root cause:** `sqlite_vec.load(conn)` requires `conn.enable_load_extension(True)`, which raises
+  `AttributeError` on the python.org framework Python build (no `enable_load_extension`). Documented
+  in BUG-104; remediation = Homebrew Python (`brew install python@3.12`). FTS retrieval still works.
+- **Action:** non-blocking — vector search unavailable; FTS + Parquet still serve retrieval. Revisit
+  if vector search becomes a T1.1 requirement.
+
+### ⚠️ NEW (2026-08-16) — DB contamination: 676 rows across 5 run_ids (canary accumulated)
+- **Symptom:** after S6, `maxwell.db` has 676 rows: `canary` 557 (old 279 + new 278), plus 4 other
+  run_ids (88+23+5+3 = 119). The two canary runs produced different `fb_id`s (content hashes changed
+  after D2381/D2382 S2 fixes), so `INSERT OR REPLACE` ADDED the new 278 rather than replacing old rows.
+- **Impact:** DB is NOT a clean single-run KB — stale/duplicate FBs accumulate across canary reruns.
+  `pipeline_run_id` column preserves provenance, but retrieval would surface BOTH runs' FBs.
+- **Action:** before final T1.1, decide DB reset policy — either reset `maxwell.db` (or use a fresh
+  DB path per run) so the committed KB reflects one coherent run. Flagged for operator decision.
+- **✅ RESOLVED (D2396):** fresh-DB for T1.1 (archive + empty DB); run-specific-DB tracked as G10 (P2).
+  Reset executed 2026-08-16 → `knowledge pipeline/maxwell.db.pre_t11_20260816.bak` + fresh empty DB.
+
+---
+
+## ⚠️ NEW (2026-08-16) — S4 canary completion findings (D2386–D2390)
+
+## ⚠️ NEW (2026-08-16) — S4 canary completion findings (D2386–D2390)
+
+### 1. CRIBS quarantine: `cluster_6241` empty `application` (→ D2386)
+- **Symptom:** `[215/279] Cluster cluster_6241 → ❌ Empty/short application (0 chars < 10) — FB QUARANTINED (D2371)`.
+  FB "Human Capital Investment Drives Occupational Mobility" (causal_mechanism, 2 books)
+  lost. S4 gate `max_failed_ratio=0.0` (D2338) → **Stage 4 FAILED** (1/279 = 0.4%).
+- **Class:** CRIBS content-quality failure (empty `application`), NOT JSON/truncation. Model
+  `gpt-oss-20b` emitted an empty application for a causal-mechanism FB.
+- **Action:** operator decision pending — rerun cluster_6241 only, relax S4 gate to 0.01
+  (D2381 precedent), or manual annotate. See D2386.
+
+### 2. `is_specialized` parsed-but-not-persisted (None × 278)
+- **Symptom:** `is_specialized` = None for all 278 FBs; the signal is folded into `depth` +
+  `procedural_skill` instead. Schema field exists but is dead at S4.
+- **Class:** provenance/schema gap (same family as BUG-110/BUG-122/D2376 R2).
+- **Action:** decide whether to persist `is_specialized` or remove from schema (see D2387).
+
+### 3. Name truncation loses specificity (21 FBs)
+- **Symptom:** D2069 5-word cap truncates 21/278 names mid-thought, e.g.
+  `'Cognitive Dissonance in Memory and'`, `'Margin Of Safety In Complex'`, `'Status Quo Bias With Multiple'`.
+  The full name is preserved in `definition`/`elaboration`, but the searchable `name` is
+  an incomplete fragment.
+- **Class:** cosmetic/UX — expected by D2069, but the 5-word cap may be too aggressive for
+  compound conceptual names. Non-blocking.
+
+### 4. Taxonomy `emerging` over-firing (→ D2388)
+- **Symptom:** discipline `emerging` 89/278 (32.0%); FBs with `emerging` in `domains`
+  261/278 (93.9%). Raw labels correct but outside capped 35/72 taxonomy → fallback.
+- **Action:** taxonomy expansion analysis on full checkpoint (D2388).
+
+### 5. Jargon schema: string not dict (→ D2389, CORRECTED)
+- **Symptom:** jargon is `str` (`"term: definition; term: definition"`), not the
+  `{"term": "definition"}` dict the prompt implies. BUT — correcting a mid-run false
+  positive — **0/214 jargon strings contain any keyword**; jargon is distinct + valid.
+- **Action:** none required (parseable + semantically correct). Record corrected.
+
+---
+
+## 🟢 D2376 (2026-08-16) — `extraction_type` silent over-claim + `source_ids` dropped at S4 — FIXED
+- **Symptom (over-claim):** read sites defaulted missing `extraction_type` → `"causal_mechanism"`
+  (the strongest epistemic claim: "verified X→Y because Z"), while the schema default is `""`.
+  Canary distribution collapsed to 97.8% causal_mechanism (270/276 S2, 176/180 S4) — descriptive/
+  normative material was being silently re-branded causal.
+- **Root cause:** `.get("extraction_type", "causal_mechanism")` / `getattr(..., "causal_mechanism")`
+  at 9 pipeline + 8 benchmark-tool sites. Field is optional at S2 (validated vs config enum; empty passes).
+- **Fix (R1):** all defaults → `""`; added a config-driven over-claim canary
+  (`stage2.extraction_type_dominance_warn_ratio: 0.95`) that warns (not fails) when a single form
+  dominates. `application` framing already keyed to type (D2371).
+- **Symptom (provenance):** `source_ids` (canonical `sha256(author|title)` hashes, D2176) emitted by
+  S1.5 + S2 (276/276) was DROPPED at S4 (0/180) and absent from the `FB` schema — only `source_books`
+  filenames persisted. Same class as BUG-110/BUG-122 (provenance field dropped end-to-end).
+- **Fix (R2):** added `source_ids: list[str]` to `FB`; S4 derives (S2 FB → S1.5 cluster → resolve from
+  filenames) + persists; S6 adds a `source_ids` column (create + migrate + INSERT + Parquet) + read-back
+  parsing (`query.py`/`retrieve.py`); `integrity_check.py` key-field.
+- **Status:** 🟢 FIXED — py_compile clean, INSERT 60=60 balanced, functional canary + round-trip verified.
+- **Files:** `stage2_extract.py`, `stage4_merged_call.py`, `stage4_merge.py`, `schemas.py`,
+  `stage6_commit.py`, `pipeline_paths.py`, `probe_run.py`, `dspy_trainer.py`, `query.py`,
+  `retrieve.py`, `integrity_check.py`, `bridge_s2_to_s4.py`, `config/pipeline_config.yaml`, `tools/*`
+- **Source:** Session 2026-08-16 — R1/R2 remaining-task execution (DECISION-LOG D2376)
+
+### ⚠️ NEW (2026-08-16) — Orphan fields: `prerequisite_fbs` / `contradicts_fbs` / `procedural_skill`
+- **Finding:** these are schema-defined + committed (S6) + traversed (`retrieve.py`) but **NEVER populated
+  by any stage** (`related_fbs` IS populated via P1.4). `accessibility=prerequisite` is therefore derived
+  only from the `expert AND def>200` heuristic (D2132) — 0/180 FBs have `prerequisite_fbs`. Future tax:
+  the dependency/conflict/tool-binding edges are dead data until a producer is added. Logged (not blocking).
 
 ---
 

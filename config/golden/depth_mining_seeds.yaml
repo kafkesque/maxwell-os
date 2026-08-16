@@ -1,0 +1,48 @@
+# Depth golden mining seeds (D2378) — config-first (C12)
+# =============================================================================
+# Seed terms for mining universal + specialized depth examples from the
+# stage1_chunk corpus. Each entry: term(s) to search + target depth + min books.
+# The miner (tools/mine_depth_golden.py) streams the chunk checkpoint, finds
+# terms across >= min_books distinct books, extracts clean verbatim passages,
+# and (optionally) generates FB drafts via a local model for human review.
+# Never auto-committed to the golden set — output goes to
+# config/golden/_depth_mined_drafts.json for review (C8-G2 human gate).
+
+schema_version: "1.0"
+
+noise_patterns:
+  - ":::"          # pandoc footnote/epub artifacts
+  - "s1 :::"
+  - "z-library"
+  - "1lib"
+  - ".sk"
+  - "http"
+  - "ISBN"
+  - "footnote"
+  - ".epub"
+  - "references"
+  - "bibliograph"
+  - "table of contents"
+  - "contents ix"
+
+universal:
+  - name: network_effect
+    terms: ["network effect", "network effects"]
+    min_books: 2
+  - name: normal_distribution
+    terms: ["normal distribution", "gaussian distribution", "bell curve"]
+    min_books: 2
+  - name: feedback_loop
+    terms: ["feedback loop", "feedback loops", "positive feedback", "negative feedback"]
+    min_books: 2
+
+specialized:
+  - name: nyquist_sampling
+    terms: ["nyquist", "sampling theorem", "aliasing"]
+    min_books: 2
+  - name: backpropagation
+    terms: ["backpropagation", "backprop", "gradient descent"]
+    min_books: 2
+  - name: double_entry
+    terms: ["double-entry", "double entry bookkeeping", "debit and credit"]
+    min_books: 2

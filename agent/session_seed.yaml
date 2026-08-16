@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-15 (D2370: S4 intra-stage incremental checkpoint — 39h-stage crash recovery, live kill -9 + resume verified)
+# Updated: 2026-08-16 (D2392 grammar A/B RESOLVED — keep grammar OFF; D2393 depth prompt fix; D2394 taxonomy synonym fix + alias expansion — discipline emerging 32%→15.5%; D2395 dropped dead s3_original_domain column — integrity 17/17 + audit green; D2396 DB reset policy RESOLVED — fresh DB for T1.1, run-specific DB = G10 P2)
 
 session:
     version: "3.0.0"
@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: T1.1 CONDITIONAL GO (D2367). All pre-flight blockers closed (B1-B18, V1-V9). Remaining = release hygiene + optional depth/golden balance.
+    status: T1.1 CONDITIONAL GO (D2367). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). Grammar A/B resolved (OFF, D2392); depth prompt fixed (D2393); taxonomy discipline emerging 32%→15.5% (D2394). Remaining = domain-taxonomy governance review + DB reset decision + depth re-measure on next run.
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented
@@ -142,7 +142,17 @@ phase:
         - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized (1→2 each)
         - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
         - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume verified on 20-cluster subset
+        - D2386: S4 gate relaxed 0.0→0.01 (cluster_6241 empty-application quarantine within 1% tolerance)
+        - D2391: S6 schema-migration gap fixed (is_summary + classification_status auto-heal) — 278 committed cleanly
+        - D2392: grammar A/B RESOLVED — 0.6.0 xgrammar breaks gpt-oss-20b (Harmony conflict) → keep grammar OFF; 0.5.1 stays on 11435
+        - D2393: depth skew fixed — focused prompts tightened (default-to-domain; cross-domain = 2+ DISTINCT disciplines)
+        - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion — discipline emerging 32%→15.5%
+        - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity 17/17 + audit green
+        - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)
     pending:
+        - D2394 remainder (governance review): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains (risk management, behavioral economics, psychology, operations research, change management, etc.) requires cap demotion + human review
+        - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
+        - D2393 re-measure: rerun S4 depth classification to confirm cross-domain→domain shift (prompt now stricter)
         - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py (reuse S1.5 clusters)
         - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256 (gated, BUG-132)
         - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining per-principle)

@@ -109,7 +109,7 @@ def dspy_s2_extract(
             "mechanism": getattr(result, "mechanism", ""),
             "boundary": getattr(result, "boundary", ""),
             "consequence": getattr(result, "consequence", ""),
-            "extraction_type": getattr(result, "extraction_type", "causal_mechanism"),
+            "extraction_type": getattr(result, "extraction_type", ""),
             # Depth no longer in S2 (A-001/D2241)
             "is_summary": getattr(result, "is_summary", False),
             "evidence_passages": getattr(result, "evidence_passages", "[]"),
@@ -283,7 +283,7 @@ def run_comparison(
             trad_pred = dspy.Example(
                 route=trad_result.get("route", "NULL"),
                 name=trad_result.get("name", ""),
-                extraction_type=trad_result.get("extraction_type", "causal_mechanism"),
+                extraction_type=trad_result.get("extraction_type", ""),
                 # Depth no longer in S2 (A-001/D2241)
                 mechanism=trad_result.get("mechanism", ""),
                 boundary=trad_result.get("boundary", ""),
@@ -312,7 +312,7 @@ def run_comparison(
                 dspy_pred = dspy.Example(
                     route=dspy_result.get("route", "NULL"),
                     name=dspy_result.get("name", ""),
-                    extraction_type=dspy_result.get("extraction_type", "causal_mechanism"),
+                    extraction_type=dspy_result.get("extraction_type", ""),
                     # Depth no longer in S2 (A-001/D2241)
                     mechanism=dspy_result.get("mechanism", ""),
                     boundary=dspy_result.get("boundary", ""),
@@ -344,7 +344,7 @@ def run_comparison(
                 hybrid_pred = dspy.Example(
                     route=hybrid_result.get("route", "NULL"),
                     name=hybrid_result.get("name", ""),
-                    extraction_type=hybrid_result.get("extraction_type", "causal_mechanism"),
+                    extraction_type=hybrid_result.get("extraction_type", ""),
                     mechanism=hybrid_result.get("mechanism", ""),
                     boundary=hybrid_result.get("boundary", ""),
                     consequence=hybrid_result.get("consequence", ""),

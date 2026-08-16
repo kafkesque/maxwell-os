@@ -336,7 +336,7 @@ def check_schema_sqlite_match() -> tuple[bool, str]:
     key_fields = {
         "fb_id", "name", "definition", "status", "schema_version",
         "content_type", "extraction_type", "mechanism", "boundary",
-        "consequence", "taxonomy_match_method",
+        "consequence", "taxonomy_match_method", "source_ids",
     }
     missing_in_sqlite = key_fields - sqlite_cols
     missing_in_pydantic = key_fields - all_model_fields

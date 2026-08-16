@@ -31,15 +31,21 @@ from pipeline.pipeline_paths import (
     SCHEMA_VERSION,
     TAXONOMY_EMERGING_FREQ,
     TAXONOMY_FLOOD_THRESHOLD,
+    TAXONOMY_MAX_DISCIPLINES,  # D2378: canonical cap (config-driven)
+    TAXONOMY_MAX_DOMAINS,      # D2378: canonical cap (config-driven)
     TAXONOMY_REPLACEMENT_THRESHOLD,
     TAXONOMY_VERSION,
 )
 from pipeline.stamp import get_pipeline_commit
 
-# ── Constants (D2231: C12 — read from config via pipeline_paths) ─────────
+# ── Constants (D2231/D2378: C12 — read from config via pipeline_paths) ─────────
 
-MAX_DOMAINS: int = 25       # D272
-MAX_DISCIPLINES: int = 47   # D272
+# D2378: caps were hardcoded (25/47) and stale vs taxonomy_v5.yaml (35 domains/72
+# disciplines). Now config-driven via pipeline_paths. Closed-loop: promotion of a
+# raw/emerging label REQUIRES demotion of the weakest canonical, so the canonical
+# set never grows past the cap (governance/domain_labelling.md §5).
+MAX_DOMAINS: int = TAXONOMY_MAX_DOMAINS
+MAX_DISCIPLINES: int = TAXONOMY_MAX_DISCIPLINES
 REPLACEMENT_THRESHOLD_RATIO: float = TAXONOMY_REPLACEMENT_THRESHOLD  # emerging must exceed canonical by 10%
 EMERGING_FREQ_THRESHOLD: int = TAXONOMY_EMERGING_FREQ              # raw→emerging promotion threshold
 FLOOD_THRESHOLD_RATIO: float = TAXONOMY_FLOOD_THRESHOLD            # >20% unmatched = flood warning (C8-G3)

@@ -56,7 +56,7 @@ from pipeline.pipeline_paths import (
     STAGE5_CHECKPOINT,
     get_run_id,
 )
-from pipeline.intimacy_lattice import route_space  # W6: private/non-private space routing for MCP push
+from pipeline.intimacy_lattice import derive_context, resolve_intimacy, route_space  # W6/D2375: fresh space routing at push
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -420,6 +420,13 @@ def _format_fb_payload(fb: dict) -> dict:
 
     body = _render_3zone_body(fb)
 
+    # D2375: re-derive context + intimacy FRESH at the push boundary from the
+    # final discipline/domains, so the pushed label and space routing always
+    # agree with the current lattice (never a stale S4-persisted value).
+    ctx = derive_context(fb)
+    _fb = {**fb, "context": ctx}
+    boundary, _boundary_rule = resolve_intimacy(_fb)
+
     return {
         # ── Identity ──
         "name": name,
@@ -459,10 +466,10 @@ def _format_fb_payload(fb: dict) -> dict:
         "borp_score": fb.get("borp_score"),
         "classification_errors": fb.get("classification_errors"),
         # ── v1 Anytype properties ──
-        "context": fb.get("context", "general"),
+        "context": ctx,
         "accessibility": fb.get("accessibility", "self-evident"),
-        "intimacy_boundary": fb.get("intimacy_boundary", "public"),
-        "space": route_space(fb),  # W6: "private" | "non_private" — resolved from intimacy lattice
+        "intimacy_boundary": boundary,
+        "space": route_space(_fb),  # W6/D2375: "private" | "non_private" — fresh lattice resolution
         "provenance": fb.get("provenance", "llm_extracted_from_source"),
         # ── Agentic metadata ──
         "difficulty_level": fb.get("difficulty_level", "intermediate"),

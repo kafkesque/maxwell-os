@@ -43,6 +43,7 @@ from pipeline.pipeline_paths import (
     get_run_id,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.intimacy_lattice import derive_context, resolve_intimacy  # D2375: fresh context/intimacy at export
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -101,6 +102,10 @@ def _format_frontmatter(fb: dict) -> str:
     schema_version = fb.get("schema_version", "")
     gen_model = fb.get("gen_model", "")
 
+    # D2375: derive context + intimacy fresh (consistent with the Anytype push)
+    ctx = derive_context(fb)
+    boundary, _boundary_rule = resolve_intimacy({**fb, "context": ctx})
+
     lines = ["---"]
     lines.append(f"fb_id: \"{fb_id}\"")
     lines.append("type: foundation_block")
@@ -110,6 +115,8 @@ def _format_frontmatter(fb: dict) -> str:
     lines.append(f"depth: {depth}")
     lines.append(f"evidence: {evidence}")
     lines.append(f"accessibility: {accessibility}")
+    lines.append(f"context: {ctx}")
+    lines.append(f"intimacy_boundary: {boundary}")
     lines.append(f"source_books: {json.dumps(source_books)}")
     lines.append(f"schema_version: {schema_version}")
     lines.append(f"gen_model: {gen_model}")

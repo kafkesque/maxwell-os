@@ -90,8 +90,8 @@ models:
     - gpt-oss-20b-MXFP4-Q8
     max_tokens: 1024
     chat_template_kwargs: {enable_thinking: false}   # D2359: oMLX-native CoT cap (top-level flags silently dropped)
-    thinking_budget: null   # D2367/BUG-132: merged CRIBS call CoT cap (X8 candidate 256/128; gated on accuracy)
-    depth_thinking_budget: null   # D2367/BUG-132: focused depth call CoT cap (independent of merged; D2359 verified 128 -> 72%/7.3s)
+    thinking_budget: 256   # D2367/BUG-132: merged CRIBS call CoT cap (X8 verified 256 -> 45% faster, valid JSON)
+    depth_thinking_budget: 128   # D2367/BUG-132: focused depth call CoT cap (D2359 verified 128 -> 72%/7.3s)
   verifier_v2:  # D2340: MISNAMED — this is actually the S2 fast probe (D2319), consumed as VERIFY_MODEL_V2 in stage2_extract.py
     model: Phi-4-mini-instruct-8bit
     provider: omlx
@@ -159,9 +159,9 @@ stage2:
   minhash_threshold: 0.9
   minhash_num_perm: 128
   golden_path: config/golden/stage2_fewshot_convergent.yaml
-  golden_positive: 1
+  golden_positive: 4      # D2377: one per epistemic form (stratified selection)
   golden_negative: 1
-  golden_max_examples: 4
+  golden_max_examples: 5
   golden_inject_enabled: true
   golden_seed: 42
   split_probe_enabled: true
@@ -178,10 +178,18 @@ stage2:
   max_probe_per_book: 2      # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
   split_probe_kmeans_random_state: 42
   omlx_retry_attempts: 2
+  gen_max_tokens: 3072       # D2381: S2 extraction output budget (was hardcoded 2048 in call_llm → JSON truncation / finish_reason=length)
+  gen_max_tokens_retry: 4096 # D2381: JSON-failure fallback budget (retry with more room before giving up)
   batch_position_monitor: false
   max_workers: 3
   route_values: ["FB", "NULL"]   # D2323/C12: S2 route gate — FB=forward to S4, NULL=skip cluster (quoted: YAML parses bare NULL as None)
-  max_failed_ratio: 0.0   # D2331: fail-closed cluster extraction — if failed_clusters/total > this ratio, exit non-zero (0.0 = any failure fatal). Operator may raise to approve known-bad skips.
+  max_failed_ratio: 0.01   # D2381: allow ≤1% terminal failures (was 0.0) — persistent JSON-failure clusters no longer halt the stage; failed clusters retried on resume (D2331).
+  extraction_type_dominance_warn_ratio: 0.95   # D2376: warn if a single extraction_type > this ratio of output (over-claim canary — causal_mechanism is the strongest epistemic claim)
+watchdog:
+  interval_secs: 60        # D2384: S2 watchdog poll interval
+  stall_checks: 3          # D2384: consecutive no-growth polls before flagging "stuck" (D2382 signature)
+  causal_warn_ratio: 0.5   # D2384: warn if causal_mechanism share exceeds this (D2377 bias drift)
+  causal_halt_ratio: 0.9   # D2384: exit non-zero if causal share exceeds this (bias confirmed)
 stage4:
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl
@@ -272,7 +280,7 @@ stage4:
   - symmetry
   - optimization
   - gradient
-  max_failed_ratio: 0.0   # D2338: fail-closed merge — if (failed + classification_errors)/total > this ratio, exit non-zero (0.0 = any failure fatal)
+  max_failed_ratio: 0.01   # D2386: allow ≤1% terminal failures (was 0.0, D2338) — mirror S2 D2381; 1 CRIBS-quality exclusion (empty application) within tolerance
   checkpoint_interval: 5   # D2370: intra-stage incremental checkpoint cadence (clusters) — crash recovery for the long serial S4
 s2:
   dspy_max_labeled_demos: 3
@@ -342,6 +350,8 @@ taxonomy:
   flood_threshold_ratio: 0.2
   replacement_threshold_ratio: 1.1
   emerging_freq_threshold: 10
+  max_domains: 35       # D2378: canonical domain cap (matches taxonomy_v5.yaml; closed-loop — promote requires demote)
+  max_disciplines: 72   # D2378: canonical discipline cap (matches taxonomy_v5.yaml)
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8

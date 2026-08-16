@@ -1,0 +1,188 @@
+{
+  "n": 30,
+  "valid_json": 30,
+  "valid_rate": 1.0,
+  "avg_latency_s": 21.1,
+  "results": [
+    {
+      "name": "Asymmetric Estimation Bias",
+      "valid_json": true,
+      "latency_s": 17.6,
+      "status": "ok"
+    },
+    {
+      "name": "Probabilistic Reasoning Under Uncertainty",
+      "valid_json": true,
+      "latency_s": 21.1,
+      "status": "ok"
+    },
+    {
+      "name": "Placebo-Induced Biochemical Change",
+      "valid_json": true,
+      "latency_s": 21.8,
+      "status": "ok"
+    },
+    {
+      "name": "Cognitive Bias in Decision Making",
+      "valid_json": true,
+      "latency_s": 21.5,
+      "status": "ok"
+    },
+    {
+      "name": "Tool-Identity Overload",
+      "valid_json": true,
+      "latency_s": 22.9,
+      "status": "ok"
+    },
+    {
+      "name": "Information Asymmetry in Strategic Interaction",
+      "valid_json": true,
+      "latency_s": 21.4,
+      "status": "ok"
+    },
+    {
+      "name": "Perspective-Driven Competitive Insight",
+      "valid_json": true,
+      "latency_s": 21.3,
+      "status": "ok"
+    },
+    {
+      "name": "Cognitive Ease and Confirmation Bias",
+      "valid_json": true,
+      "latency_s": 20.9,
+      "status": "ok"
+    },
+    {
+      "name": "Causal Layer Distinction",
+      "valid_json": true,
+      "latency_s": 23.6,
+      "status": "ok"
+    },
+    {
+      "name": "Attention Residue From Context Switching",
+      "valid_json": true,
+      "latency_s": 20.0,
+      "status": "ok"
+    },
+    {
+      "name": "Strategic Boundary Setting",
+      "valid_json": true,
+      "latency_s": 19.9,
+      "status": "ok"
+    },
+    {
+      "name": "Autonomous Team Design",
+      "valid_json": true,
+      "latency_s": 20.3,
+      "status": "ok"
+    },
+    {
+      "name": "Mediocristan vs Extremistan Randomness",
+      "valid_json": true,
+      "latency_s": 24.6,
+      "status": "ok"
+    },
+    {
+      "name": "Strategy-Driven Outcome Focus",
+      "valid_json": true,
+      "latency_s": 21.5,
+      "status": "ok"
+    },
+    {
+      "name": "Overconfidence Bias in Decision Making",
+      "valid_json": true,
+      "latency_s": 21.8,
+      "status": "ok"
+    },
+    {
+      "name": "Editorial and Community Feedback Integration",
+      "valid_json": true,
+      "latency_s": 20.4,
+      "status": "ok"
+    },
+    {
+      "name": "Competence Boundary Management",
+      "valid_json": true,
+      "latency_s": 20.5,
+      "status": "ok"
+    },
+    {
+      "name": "Lollapalooza Effect in Behavioral Change",
+      "valid_json": true,
+      "latency_s": 22.0,
+      "status": "ok"
+    },
+    {
+      "name": "Instructional Alignment Through Supervised Fine-Tuning",
+      "valid_json": true,
+      "latency_s": 23.6,
+      "status": "ok"
+    },
+    {
+      "name": "Strategic Information Gathering",
+      "valid_json": true,
+      "latency_s": 20.2,
+      "status": "ok"
+    },
+    {
+      "name": "Reliability as Life Strategy",
+      "valid_json": true,
+      "latency_s": 21.7,
+      "status": "ok"
+    },
+    {
+      "name": "Idea Exchange and Team Learning",
+      "valid_json": true,
+      "latency_s": 20.2,
+      "status": "ok"
+    },
+    {
+      "name": "Bottleneck-Driven Innovation",
+      "valid_json": true,
+      "latency_s": 20.5,
+      "status": "ok"
+    },
+    {
+      "name": "Minimalist Communication Principle",
+      "valid_json": true,
+      "latency_s": 20.1,
+      "status": "ok"
+    },
+    {
+      "name": "Beneficial Network Building",
+      "valid_json": true,
+      "latency_s": 20.2,
+      "status": "ok"
+    },
+    {
+      "name": "Educational Advancement and Labor Market Participation",
+      "valid_json": true,
+      "latency_s": 20.3,
+      "status": "ok"
+    },
+    {
+      "name": "Genetic Diversity as Resistance Buffer",
+      "valid_json": true,
+      "latency_s": 23.1,
+      "status": "ok"
+    },
+    {
+      "name": "Map-Territory Reduction Principle",
+      "valid_json": true,
+      "latency_s": 19.2,
+      "status": "ok"
+    },
+    {
+      "name": "Explore-Exploit Tradeoff",
+      "valid_json": true,
+      "latency_s": 21.1,
+      "status": "ok"
+    },
+    {
+      "name": "Hierarchical Process Rigidity",
+      "valid_json": true,
+      "latency_s": 21.2,
+      "status": "ok"
+    }
+  ]
+}

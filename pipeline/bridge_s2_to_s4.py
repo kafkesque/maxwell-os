@@ -49,6 +49,7 @@ def convert() -> None:
             "route": fb.get("route", "FB"),
             "source_principle_ids": [fb.get("fb_id", "")],
             "source_books": fb.get("source_books", []),
+            "source_ids": fb.get("source_ids", []),  # D2376: canonical hashes (D2176) — restore provenance
             "source_segments": fb.get("source_segments", []),
             "source_cluster": fb.get("source_cluster", ""),
             "is_convergent": fb.get("is_convergent", False),

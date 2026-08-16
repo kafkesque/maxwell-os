@@ -70,7 +70,7 @@ def load_fbs() -> list[dict]:
                 "mechanism": fb.get("mechanism", ""),
                 "boundary": fb.get("boundary", ""),
                 "consequence": fb.get("consequence", ""),
-                "extraction_type": fb.get("extraction_type", "causal_mechanism"),
+                "extraction_type": fb.get("extraction_type", ""),
                 "gold_depth": fb["depth"],
             })
     return fbs

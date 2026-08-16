@@ -134,6 +134,7 @@ S2_GOLDEN_POSITIVE=int(_CFG["stage2"]["golden_positive"])
 S2_GOLDEN_NEGATIVE=int(_CFG["stage2"]["golden_negative"])
 S2_GOLDEN_MAX=int(_CFG["stage2"]["golden_max_examples"])
 S2_GOLDEN_INJECT=_CFG["stage2"].get("golden_inject_enabled", False)
+S2_GOLDEN_SEED=int(_CFG["stage2"].get("golden_seed", 42))  # D2377: deterministic stratified few-shot seed
 S2_GATE_ENABLED=bool(_CFG["stage2"]["gate_enabled"])
 S2_GATE_STRICT=bool(_CFG["stage2"]["gate_strict"])
 S2_EVIDENCE_TRACKING=bool(_CFG["stage2"]["evidence_tracking"])
@@ -141,6 +142,8 @@ S2_HIGH_COHESION_THRESHOLD=float(_CFG.get("stage2", {}).get("high_cohesion_thres
 S2_MED_COHESION_THRESHOLD=float(_CFG.get("stage2", {}).get("med_cohesion_threshold", 0.75))    # C12
 S2_SOURCE_BOOK_MATCH=_CFG["stage2"]["source_book_match"]
 S2_OMLX_RETRY=int(_CFG["stage2"]["omlx_retry_attempts"])
+S2_GEN_MAX_TOKENS=int(_CFG.get("stage2", {}).get("gen_max_tokens", 3072))  # D2381: S2 output budget (was hardcoded 2048)
+S2_GEN_MAX_TOKENS_RETRY=int(_CFG.get("stage2", {}).get("gen_max_tokens_retry", 4096))  # D2381: JSON-failure fallback budget
 S2_BATCH_POSITION_MONITOR=bool(_CFG["stage2"]["batch_position_monitor"])
 S2_MAX_CLUSTER_SAMPLES=int(_CFG.get("stage2", {}).get("max_cluster_samples", 15))       # T0.1
 S2_MAX_PROBE_SAMPLES=int(_CFG.get("stage2", {}).get("max_probe_samples", 15))           # T0.1
@@ -152,6 +155,11 @@ S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 2
 S2_SPLIT_PROBE_MAX_COHESION=float(_CFG.get("stage2", {}).get("split_probe_max_cohesion", 0.85))  # D2163: max cohesion for gate
 S2_MAX_FAILED_RATIO=float(_CFG.get("stage2", {}).get("max_failed_ratio", 0.0))  # D2331: fail-closed cluster-extraction tolerance
 S2_ROUTE_VALUES=frozenset(_CFG.get("stage2", {}).get("route_values", ["FB", "NULL"]))  # D2323/C12: S2 route gate
+S2_EXTRACTION_TYPE_DOMINANCE_WARN_RATIO=float(_CFG.get("stage2", {}).get("extraction_type_dominance_warn_ratio", 0.95))  # D2376: over-claim canary
+WATCHDOG_INTERVAL_SECS=int(_CFG.get("watchdog", {}).get("interval_secs", 60))  # D2384: S2 watchdog poll interval
+WATCHDOG_STALL_CHECKS=int(_CFG.get("watchdog", {}).get("stall_checks", 3))  # D2384: stall polls before flagging
+WATCHDOG_CAUSAL_WARN_RATIO=float(_CFG.get("watchdog", {}).get("causal_warn_ratio", 0.5))  # D2384: causal drift warn
+WATCHDOG_CAUSAL_HALT_RATIO=float(_CFG.get("watchdog", {}).get("causal_halt_ratio", 0.9))  # D2384: causal bias halt
 # D2304: DSPy optimized-program persistence path (C12). Was hardcoded /tmp/dspy_mipro_optimized.json.
 # NOTE: the `s2` key (lowercase) holds DSPy training settings; `stage2` holds pipeline extraction settings.
 _dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")
@@ -242,6 +250,8 @@ RELIABILITY_GARBAGE_THRESHOLD = float(_CFG.get("reliability", {}).get("garbage_t
 TAXONOMY_FLOOD_THRESHOLD = float(_CFG.get("taxonomy", {}).get("flood_threshold_ratio", 0.20))
 TAXONOMY_REPLACEMENT_THRESHOLD = float(_CFG.get("taxonomy", {}).get("replacement_threshold_ratio", 1.1))
 TAXONOMY_EMERGING_FREQ = int(_CFG.get("taxonomy", {}).get("emerging_freq_threshold", 10))
+TAXONOMY_MAX_DOMAINS = int(_CFG.get("taxonomy", {}).get("max_domains", 35))      # D2378: canonical cap (was hardcoded 25 in taxonomy_manager.py)
+TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 72))  # D2378: canonical cap (was hardcoded 47)
 
 # ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))

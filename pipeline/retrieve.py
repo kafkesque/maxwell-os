@@ -286,7 +286,7 @@ def search_hybrid(
 def _row_to_dict(row: sqlite3.Row) -> dict:
     """Convert sqlite3.Row to dict, parsing JSON fields."""
     d = dict(row)
-    for field in ["domains", "source_clusters", "source_books",
+    for field in ["domains", "source_clusters", "source_books", "source_ids",
                   "verification_results", "classification_errors"]:
         if field in d and isinstance(d[field], str):
             try:

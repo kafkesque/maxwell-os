@@ -52,6 +52,8 @@ from pipeline.pipeline_paths import (
     GEN_MODEL,
     S2_GATE_ENABLED,
     S2_GATE_STRICT,
+    S2_GEN_MAX_TOKENS,  # D2381: S2 output budget (was hardcoded 2048)
+    S2_GEN_MAX_TOKENS_RETRY,  # D2381: JSON-failure fallback budget
     S2_HIGH_COHESION_THRESHOLD,  # C12: config-driven cohesion tiers
     S2_MED_COHESION_THRESHOLD,   # C12: config-driven cohesion tiers
     S2_GOLDEN_INJECT,
@@ -59,6 +61,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_NEGATIVE,
     S2_GOLDEN_PATH,
     S2_GOLDEN_POSITIVE,
+    S2_GOLDEN_SEED,  # D2377: config-driven stratified few-shot seed
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
     S2_MAX_PROBE_PER_BOOK,  # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
@@ -72,6 +75,7 @@ from pipeline.pipeline_paths import (
     S2_SPLIT_PROBE_ENABLED,
     S2_SPLIT_PROBE_MAX_COHESION,
     S2_SPLIT_PROBE_MIN_SIZE,
+    S2_EXTRACTION_TYPE_DOMINANCE_WARN_RATIO,  # D2376: extraction_type over-claim canary
     S15_MIN_SOURCE_DIVERSITY,
     STAGE1_5_CHECKPOINT,
     STAGE1_CHECKPOINT,
@@ -195,6 +199,34 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
 
     return len(errors) == 0, errors
 
+
+def _warn_extraction_type_dominance(dist: "Counter[str]", *, total: int, where: str) -> None:
+    """D2376: over-claim canary — flag a lopsided extraction_type distribution.
+
+    `causal_mechanism` is the STRONGEST epistemic claim (verified X→Y because Z).
+    If a single extraction_type dominates output above the config threshold, it
+    usually means the prompt/golden bias is silently over-claiming descriptive or
+    normative material as causal. Warn loudly (do not fail — the operator may be
+    running a genuinely causal corpus) so the imbalance is never invisible.
+
+    Args:
+        dist: Counter of extraction_type → count.
+        total: Total number of FBs (denominator).
+        where: Label for the log line (convergent | singleton).
+    """
+    if total <= 0 or not dist:
+        return
+    top_type, top_count = dist.most_common(1)[0]
+    ratio = top_count / total
+    if ratio > S2_EXTRACTION_TYPE_DOMINANCE_WARN_RATIO:
+        print(
+            f"⚠️  EXTRACTION-TYPE DOMINANCE ({where}): '{top_type}' = {top_count}/{total} "
+            f"({ratio:.1%}) > {S2_EXTRACTION_TYPE_DOMINANCE_WARN_RATIO:.0%} — possible over-claim "
+            f"(causal_mechanism is the strongest epistemic form). Rebalance golden set/prompt if "
+            f"the corpus is not genuinely dominated by one form."
+        )
+
+
 # D2163: Principle Discovery Gate — probe thresholds (T0.1: now from config)
 # D2176: Lowered MIN_SIZE from 50→20. A 40-segment cluster with 2 distinct
 # principles would previously escape the gate and get compressed into ONE FB.
@@ -207,8 +239,8 @@ SPLIT_KMEANS_RANDOM_STATE: int = S2_SPLIT_KMEANS_RANDOM_STATE  # Deterministic k
 
 SYSTEM_PROMPT = """You are a convergent principle extraction engine. You receive multiple related text
 passages from DIFFERENT books. Your task is to identify the underlying principle(s)
-that transcend any single source — the causal mechanism(s), concept(s), or method(s) that
-these passages collectively reveal.
+that transcend any single source — the mechanism(s), concept(s), method(s), or
+pattern(s) that these passages collectively reveal.
 
 D2182: Changed extraction bias from conservative-merge to aggressive-split.
 The 291:1 compression death spiral (323K segments → ~800 FBs) was caused by
@@ -234,7 +266,16 @@ PRINCIPLE STRUCTURE (required for every extraction):
    ❌ Do NOT describe WHEN it applies/fails (that's boundary).
    ❌ Do NOT state WHAT happens as a result (that's consequence).
    ✅ Just name the phenomenon, pattern, or insight — crisp and scannable.
-3. mechanism: "X causes/enables/prevents Y because Z" — the causal chain. HOW it works.
+3. mechanism: HOW the principle works — written in the SAME epistemic register as
+   extraction_type (field 8). The two MUST agree:
+   - causal_mechanism    → "X causes Y because Z" (a demonstrated cause→effect chain)
+   - empirical_pattern   → "X and Y are observed to co-occur/co-vary" (association only, no cause claimed)
+   - normative_heuristic → "doing X tends to produce Y" (prescription + intended effect)
+   - descriptive_model   → "categories relate as follows" (structure, not causation)
+   ⚠️ Do NOT write causal language ("causes", "because", "enables", "leads to") for a
+   non-causal claim. A mechanism that says "X causes Y" forces extraction_type to be
+   causal_mechanism — if the passages do not demonstrate a cause→effect chain, write the
+   mechanism in the weaker register and label it honestly.
 4. boundary: "The principle applies when [condition]. It fails when [counter-condition]."
 5. consequence: "Because of this principle, [what follows]."
 6. elaboration: 3-5 sentences of deeper nuance — edge cases, exceptions,
@@ -242,19 +283,30 @@ PRINCIPLE STRUCTURE (required for every extraction):
    if the passages genuinely add nothing beyond mechanism/boundary.
 7. is_summary: true ONLY if you can only restate the passages without identifying
    a convergent mechanism. Be honest — self-flag if summarizing.
-8. extraction_type: "causal_mechanism" if X→Y because Z. "empirical_pattern" if strong
-   correlation without proven causal chain. "normative_heuristic" if practical rule of thumb.
-   "descriptive_model" if classification system or taxonomy describing WHAT
-   categories exist and how they relate — patterns of identity/organization
-   rather than causal mechanisms (what type? how organized?).
+8. extraction_type: the EPISTEMIC FORM — how strongly justified the claim is. Choose
+   HONESTLY. The strongest form (causal_mechanism) is NOT the default: claim it only
+   when the passages actually DEMONSTRATE the cause→effect chain, never as a fallback.
+   - "causal_mechanism": X→Y because Z — a VERIFIED cause→effect chain (chain shown).
+   - "empirical_pattern": a strong correlation WITHOUT a proven causal chain. If the
+     passages only show "X goes with Y" but never WHY, this is the honest label.
+   - "normative_heuristic": a practical rule of thumb or repeatable method ("do X to
+     achieve Y") — prescriptive advice, not an explanation of why something happens.
+   - "descriptive_model": a taxonomy/classification of WHAT categories exist and how
+     they relate (what type? how organized?) — identity/organization, not causation.
+   CALIBRATION: In a typical convergent corpus only ~1 in 3 principles is a verified
+   causal_mechanism. Most passages show association, advice, or taxonomy. If there is no
+   verbatim "X causes/leads to Y" chain in the evidence, the honest label is
+   empirical_pattern, normative_heuristic, or descriptive_model. Do NOT upgrade a
+   correlation or rule of thumb to causal_mechanism just because it has an explanation.
 9. content_type: "principle" (reusable concept), "process_template" (repeatable how-to),
    "process_instance" (case study), "growth_edge" (speculative insight),
    "tool_instruction" (tool-specific command).
 
-EXTRACTION BOUNDARY — extract if and only if:
-1. The passages collectively reveal a CAUSAL MECHANISM (X→Y because Z), OR
-2. They converge on a CONCEPT with boundary conditions, OR
-3. They demonstrate a repeatable METHOD with failure modes
+EXTRACTION BOUNDARY — extract if and only if the passages collectively reveal one of:
+1. A VERIFIED CAUSAL MECHANISM (X→Y because Z — the chain is demonstrated), OR
+2. A STRONG EMPIRICAL PATTERN (consistent correlation without a proven cause), OR
+3. A NORMATIVE HEURISTIC (a repeatable rule/method with failure modes), OR
+4. A DESCRIPTIVE MODEL (a taxonomy of categories and how they relate)
 
 Do NOT extract if passages:
 - Share a topic but don't converge on a mechanism
@@ -288,6 +340,22 @@ Example output:
   "evidence_passages": [
     "Dropbox used a 3-minute demo video showing file sync... beta signups jumped from 5,000 to 75,000.",
     "The best SaaS companies demonstrate value before asking for money. Slack let users invite teammates before requiring payment."
+  ],
+  "route": "FB"
+}
+
+Example output (a NON-causal principle — note extraction_type is NOT causal_mechanism):
+{
+  "name": "Progressive Disclosure",
+  "definition": "Show only the controls relevant to the current task; reveal advanced functionality progressively as the user requests it. This reduces the cognitive load of a dense interface.",
+  "mechanism": "This is a practical heuristic, not a causal mechanism: limiting the interface to the current task reduces the working-memory load on the user, but the passages prescribe the practice without isolating a single proven cause→effect chain.",
+  "boundary": "Applies to interfaces where beginners and experts share the same surface. Fails when hiding controls makes critical actions undiscoverable or slower than showing them.",
+  "consequence": "Interfaces that stage complexity progressively support faster onboarding and lower error rates than those that expose every control at once.",
+  "is_summary": false,
+  "extraction_type": "normative_heuristic",
+  "content_type": "principle",
+  "evidence_passages": [
+    "Progressive disclosure is the practice of showing only the essential controls."
   ],
   "route": "FB"
 }"""
@@ -465,10 +533,11 @@ SINGLE_SOURCE_SYSTEM: str = (
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
-    "extraction_type=causal_mechanism if clear X\u2192Y because Z. "
-    "empirical_pattern if strong correlation without proven causal chain. "
-    "normative_heuristic if practical rule of thumb. "
-    "descriptive_model if classification system or taxonomy. "
+    "Choose extraction_type HONESTLY (do NOT default to causal_mechanism): "
+    "causal_mechanism only when the passages DEMONSTRATE a cause→effect chain (X→Y because Z). "
+    "empirical_pattern for correlation WITHOUT a proven cause. "
+    "normative_heuristic for a rule of thumb or method. "
+    "descriptive_model for a taxonomy/classification of categories. "
     "content_type=principle for reusable concepts, process_template for repeatable methods, "
     "process_instance for case studies, growth_edge for speculative insights, "
     "tool_instruction for tool-specific commands. "
@@ -485,6 +554,11 @@ SINGLETON_SYSTEM: str = (
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"|\"none\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
+    "Choose extraction_type HONESTLY (do NOT default to causal_mechanism): "
+    "causal_mechanism only when the passage DEMONSTRATES a cause→effect chain. "
+    "empirical_pattern for correlation WITHOUT a proven cause. "
+    "normative_heuristic for a rule of thumb. "
+    "descriptive_model for a taxonomy of categories. "
     "MAPPING RULES:\n"
     "- extraction_type=causal_mechanism + reusable concept → content_type=principle\n"
     "- extraction_type=empirical_pattern (correlation without proven cause) → content_type=growth_edge\n"
@@ -524,6 +598,52 @@ def build_single_source_prompt(
 
 # ── Golden few-shot (D2080, preserved from v2.2) ────────────────────────────
 
+def _golden_primary_type(example: dict) -> str:
+    """Return the primary extraction_type of a golden example (first FB's type)."""
+    fb = example.get("expected_fb", {})
+    fbs = fb if isinstance(fb, list) else [fb]
+    for item in fbs:
+        t = str(item.get("extraction_type", "")).strip()
+        if t:
+            return t
+    return ""
+
+
+def _stratified_positive_sample(
+    all_pos: list[dict], pos_count: int, seed: int
+) -> list[dict]:
+    """Deterministically select positives maximizing extraction_type coverage.
+
+    D2377: golden few-shot bias — a plain shuffle can sample only causal_mechanism
+    examples (e.g. seed-42 with pos_count=1 picks one type and the model never sees
+    descriptive/normative/empirical few-shots). Group by extraction_type and
+    round-robin so the injected few-shot spans as many epistemic forms as possible.
+    """
+    if pos_count <= 0 or not all_pos:
+        return []
+    rng = random.Random(seed)
+    groups: dict[str, list[dict]] = {}
+    for e in all_pos:
+        groups.setdefault(_golden_primary_type(e), []).append(e)
+    # Deterministic shuffle within each group (iterate sorted keys, not dict order).
+    for key in sorted(groups.keys()):
+        rng.shuffle(groups[key])
+    # Canonical epistemic order (strongest→weakest) so ties resolve consistently.
+    canonical = ("causal_mechanism", "descriptive_model", "normative_heuristic", "empirical_pattern")
+    order = [t for t in canonical if t in groups]
+    order += sorted(t for t in groups if t not in order)
+    picked: list[dict] = []
+    while len(picked) < pos_count and any(groups[t] for t in order):
+        progressed = False
+        for t in order:
+            if groups[t] and len(picked) < pos_count:
+                picked.append(groups[t].pop(0))
+                progressed = True
+        if not progressed:
+            break
+    return picked
+
+
 def load_golden_parity(
     golden_path: str | None,
     pos_count: int,
@@ -544,12 +664,12 @@ def load_golden_parity(
     examples: list[dict] = golden.get("examples", [])
     all_pos: list[dict] = [e for e in examples if e.get("should_extract") and e.get("id") != "GE-001"]
     all_neg: list[dict] = [e for e in examples if not e.get("should_extract")]
-    # D2159: deterministic golden selection (seed 42; TODO: move to config pipeline_config.yaml → stage2.golden_seed)
-    random.seed(42)
-    random.shuffle(all_pos)
-    random.shuffle(all_neg)
-
-    pos: list[dict] = all_pos[:min(pos_count, len(all_pos))]
+    # D2159/D2377: deterministic selection from config (stage2.golden_seed).
+    # Positives are STRATIFIED by extraction_type (D2377) so few-shot spans
+    # epistemic forms instead of accidentally sampling only causal_mechanism.
+    pos: list[dict] = _stratified_positive_sample(all_pos, pos_count, S2_GOLDEN_SEED)
+    rng = random.Random(S2_GOLDEN_SEED)
+    rng.shuffle(all_neg)
     neg: list[dict] = all_neg[:min(neg_count, len(all_neg))]
     while len(pos) + len(neg) > max_total:
         if len(pos) > len(neg):
@@ -626,7 +746,7 @@ def call_llm(prompt: str, system: str, model: str, provider: str = "omlx",
     if few_shot:
         system = system + "\n\n" + few_shot
 
-    max_tokens: int = 2048
+    max_tokens: int = S2_GEN_MAX_TOKENS  # D2381: config-driven (was hardcoded 2048)
 
     if provider == "mlx":
         try:
@@ -641,7 +761,15 @@ def call_llm(prompt: str, system: str, model: str, provider: str = "omlx",
     # OMLX path
     try:
         from pipeline.omlx_call import CircuitOpenError, call_omlx_json
-        return call_omlx_json(prompt=prompt, model=model, system=system, max_tokens=max_tokens)
+        result = call_omlx_json(prompt=prompt, model=model, system=system, max_tokens=max_tokens)
+        # D2381: parse_json_robust() returns [] on JSON failure — call_omlx_json does
+        # NOT raise for this case (its ValueError branch is unreachable: isinstance([],
+        # list) is True). Detect the empty list and retry ONCE with a higher budget
+        # (truncation at max_tokens → invalid JSON) so persistent clusters recover.
+        if isinstance(result, list) and not result and max_tokens < S2_GEN_MAX_TOKENS_RETRY:
+            print(f"      🔁 Empty JSON result — retrying max_tokens={S2_GEN_MAX_TOKENS_RETRY}")
+            result = call_omlx_json(prompt=prompt, model=model, system=system, max_tokens=S2_GEN_MAX_TOKENS_RETRY)
+        return result
     except CircuitOpenError:
         # D2211: Circuit breaker open — abort, don't return None
         raise
@@ -689,7 +817,10 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
                 "boundary": fb_item.get("boundary", ""),
                 "consequence": fb_item.get("consequence", ""),
                 "is_summary": fb_item.get("is_summary", False),
-                "extraction_type": fb_item.get("extraction_type", "causal_mechanism"),
+                # D2376: no silent causal_mechanism default — an example that lacks
+                # extraction_type shows "" (honest), never over-claims the strongest
+                # epistemic form. Schema default is "" (schemas.py).
+                "extraction_type": fb_item.get("extraction_type", ""),
                 # D2334: model content_type in few-shot (was silently omitted — the
                 # system prompt requires it, but examples didn't show it → temp=0.0
                 # would deterministically drop it). Matches field #9 in the prompt.
@@ -1277,6 +1408,21 @@ def run_stage2(
                                    if c.get("cluster_id") not in processed_ids]
                 print(f"   📋 Remaining after resume filter: {len(target_clusters)} clusters "
                       f"(skipped {n_before_resume - len(target_clusters)} already-processed)")
+                # D2382: rebuild dedup infra from checkpoint FBs. Resume loaded
+                # all_fbs but left minhash_cache + lsh EMPTY — the post-collection
+                # dedup then assigned each new FB a counter sig ("mh_0") that collides
+                # with the first checkpoint FB's stored sig, so every new FB was
+                # compared against ITSELF (jaccard=1.0) and rejected as near-duplicate.
+                if minhash_ok:
+                    for _fb in all_fbs:
+                        _sig = _fb.get("minhash_signature")
+                        _def = _fb.get("definition", _fb.get("name", ""))
+                        if not _sig or not _def:
+                            continue
+                        _mh = make_minhash(_def)
+                        minhash_cache[_sig] = (_def, _mh)
+                        if lsh is not None:
+                            lsh.insert(_sig, _mh)
         except Exception as e:
             # D2177 (C16): Don't silently discard all prior work on resume failure.
             # Log the error and start fresh — but the operator must know.
@@ -1399,7 +1545,7 @@ def run_stage2(
         boundary: str = result.get("boundary", result.get("application", "")).strip()
         consequence: str = result.get("consequence", result.get("failure_mode", "")).strip()
         is_summary: bool = result.get("is_summary", False)
-        extraction_type: str = result.get("extraction_type", "causal_mechanism").strip()
+        extraction_type: str = result.get("extraction_type", "").strip()  # D2376: absent → "" (no over-claim)
         content_type: str = result.get("content_type", "principle").strip()
 
         # D2214: Removed redundant check — validate_fb_output already enforces definition ≥30 chars.
@@ -1523,6 +1669,7 @@ def run_stage2(
                 print(f"  [{completed}/{len(target_clusters)}] ❌ {conv_tag} {cid}: LLM failed")
                 continue
 
+            added_names: list[str] = []
             for fb in fb_results:
                 if fb.get("_null"):
                     total_null += 1
@@ -1556,14 +1703,16 @@ def run_stage2(
 
                 all_fbs.append(fb)
                 total_extracted += 1
+                added_names.append(fb.get('name', '?')[:30])
             processed_ids.add(cid)
             book_count: int = cluster.get("source_diversity",
                           len(cluster.get("source_ids", cluster.get("source_books", []))))
-            fb_names: str = ", ".join(f.get('name', '?')[:30] for f in fb_results[:3])
-            if len(fb_results) > 3:
-                fb_names += f" +{len(fb_results) - 3} more"
-            print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid} "
-                  f"({cluster.get('size', 0)} segs, {book_count} books) → {fb_names}")
+            if added_names:
+                fb_names: str = ", ".join(added_names[:3])
+                if len(added_names) > 3:
+                    fb_names += f" +{len(added_names) - 3} more"
+                print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid} "
+                      f"({cluster.get('size', 0)} segs, {book_count} books) → {fb_names}")
 
             # D2154: Incremental checkpoint every 5 clusters (inside for future loop)
             if completed % 5 == 0:
@@ -1580,7 +1729,11 @@ def run_stage2(
                     os.fsync(segids_tmp.fileno())
                     segids_tmp.close()
                     os.replace(segids_tmp.name, segids_file)
-                except Exception:
+                except Exception as e:
+                    # D2383 (C16): never swallow silently — a segids write failure only
+                    # means those clusters get re-processed on resume (safe), but it
+                    # MUST be observable.
+                    print(f"   ⚠️  segids checkpoint write failed: {type(e).__name__}: {e}", flush=True)
                     if os.path.exists(segids_tmp.name):
                         os.unlink(segids_tmp.name)
 
@@ -1600,6 +1753,8 @@ def run_stage2(
         print(f"📊 Depths:             {dict(depths)}")
         routes = Counter(fb.get("route", "?") for fb in all_fbs)
         print(f"📊 Routes:             {dict(routes)}")
+        _et_dist = Counter(fb.get("extraction_type", "") for fb in all_fbs)  # D2376
+        _warn_extraction_type_dominance(_et_dist, total=len(all_fbs), where="convergent")
     print(f"📋 Checkpoint:         {STAGE2_CHECKPOINT}")
 
     # ── D2331: fail-closed cluster extraction ───────────────────────────────
@@ -1727,7 +1882,7 @@ def process_singletons(
         is_summary = result.get("is_summary", False)
         if is_summary and gate_enabled:
             return {"_gate": True}
-        extraction_type = result.get("extraction_type", "causal_mechanism").strip()
+        extraction_type = result.get("extraction_type", "").strip()  # D2376: absent → "" (no over-claim)
         content_type = result.get("content_type", "principle").strip()
         return {
             "fb_id": make_hash_id(name, definition),
@@ -1803,9 +1958,10 @@ def process_singletons(
     # Content type distribution
     from collections import Counter
     ct_dist = Counter(fb.get("content_type", "principle") for fb in all_fbs)
-    et_dist = Counter(fb.get("extraction_type", "causal_mechanism") for fb in all_fbs)
+    et_dist = Counter(fb.get("extraction_type", "") for fb in all_fbs)  # D2376: absent → "" (no over-claim)
     print(f"   Content types:  {dict(ct_dist)}")
     print(f"   Extraction types: {dict(et_dist)}")
+    _warn_extraction_type_dominance(et_dist, total=len(all_fbs), where="singleton")
 
     return all_fbs, total_extracted, total_null
 

@@ -212,7 +212,7 @@ def golden_to_examples(
                 mechanism=fb.get("mechanism", ""),
                 boundary=fb.get("boundary", ""),
                 consequence=fb.get("consequence", ""),
-                extraction_type=fb.get("extraction_type", "causal_mechanism"),
+                extraction_type=fb.get("extraction_type", ""),  # D2376: absent → "" (no over-claim)
                 # Depth no longer in S2 (A-001/D2241) — classified in Stage 4
                 evidence_passages=evidence_json,
                 route="FB" if should_extract and fb.get("route", "NULL") != "NULL" else "NULL",
@@ -493,7 +493,7 @@ def extraction_metric(
 
     # ── Extraction type (P1: 20%) ──
     gold_type = gold.extraction_type
-    pred_type = getattr(pred, "extraction_type", "causal_mechanism")
+    pred_type = getattr(pred, "extraction_type", "")  # D2376: absent → "" (no over-claim)
     if gold_type == pred_type:
         score += 0.20
     elif gold_type in EXTRACTION_TYPES and pred_type in EXTRACTION_TYPES:

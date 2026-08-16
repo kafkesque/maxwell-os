@@ -55,7 +55,7 @@ def load_golden() -> list[dict]:
                 "name": fb.get("name", ""),
                 "definition": fb.get("definition", ""),
                 "mechanism": fb.get("mechanism", ""),
-                "extraction_type": fb.get("extraction_type", "causal_mechanism"),
+                "extraction_type": fb.get("extraction_type", ""),
                 "gold_depth": fb["depth"],
             })
     return fbs

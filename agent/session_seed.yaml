@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-17 (D2391-D2400: grammar OFF; depth prompt; taxonomy synonym/alias; dead-column drop; DB reset; golden verbatim; S4 reval confirm D2398; domain-promotion defer D2399; S4/S6 field-production contract D2400)
+# Updated: 2026-08-17 (D2391-D2408: grammar OFF; depth prompt; taxonomy synonym/alias; dead-column drop; DB reset; golden verbatim; S4 reval confirm D2398; domain-promotion defer D2399; S4/S6 field-production contract D2400; session_seed YAML break D2406; dead-code purge D2407; response_format fix D2408; R3 canary S4→S6 rerun COMPLETE)
 
 session:
     version: "3.0.0"
@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: 'T1.1 GO (D2398). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). All post-canary fixes re-validated live: grammar OFF (D2392), depth prompt (D2393 → cross-domain 86.3%→21.6%), taxonomy (D2394 → discipline emerging 32.0%→15.5%), DB reset (D2396), golden verbatim (D2397). Preflight + stress + integrity green. Remaining = T1.1 full launch; domain-taxonomy promotion (G3) deferred to post-T1.1+D2345 (D2399).'
+    status: 'T1.1 GO. R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39) — S4 279/279 FBs (0 failed), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet, ~87 min; D2408 validated live; no regression vs 235/43 prior canary. 34 tests + integrity 10/10 + config audit green. Remaining = T1.1 full launch (fresh run from S0, fresh DB per D2396); domain-taxonomy promotion (G3) deferred to post-T1.1+D2345 (D2399).'
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented
@@ -161,6 +161,7 @@ phase:
         - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status + D2402 scalars — FIXED
         - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests (9 tests) — DONE
         - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict) → skip for reasoning models — FIXED
+        - R3 (D2408 validation): canary S4→S6 rerun COMPLETE — S4 279/279 FBs (0 failed clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87 min; D2408 validated live; no regression vs prior 235/43
     pending:
         - D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary)
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)

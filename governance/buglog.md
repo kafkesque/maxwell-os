@@ -1,8 +1,14 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-17 18:00 (canary S4→S6 rerun: response_format=json_object → empty gpt-oss-20b content, BUG-142 fixed D2408; also OMLX launchd port-conflict crash loop cleaned up)
+> **Last updated:** 2026-08-17 20:05 (R3 canary S4→S6 rerun COMPLETE — S4 279/279, S5 236 PASS/43 QUARANTINE, S6 279 committed; response_format=json_object → empty gpt-oss-20b content BUG-142 fixed D2408; OMLX launchd port-conflict crash loop cleaned up)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟢 R3 CANARY S4→S6 RERUN — COMPLETE (2026-08-17 19:22:39, ~87 min)
+- **Result:** S4 279/279 FBs (0 failed clusters, 0 quarantines, 52911 edges, 0 isolated) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (`pipeline_run_id=canary`), FTS 279, Parquet `fbs_snapshot_20260817_192235.parquet` (4482.4 KB), 0 taxonomy replacements.
+- **Regression check:** 236/43 ≈ prior canary 235/43 → D2402–D2405 + D2408 produced no behavioral drift.
+- **Validated live:** D2408 (gpt-oss-20b full responses once `response_format` skipped), D2371 fail-closed gate (0 trips), S5 classification_failed gate (0 trips). Resume/fail paths NOT exercised in-vivo (0 failures) — decision logic unit-covered (D2407, 9 tests).
+- **Environment:** caffeinate -disu active throughout; OMLX lazy-loaded (only Phi-4-mini + gpt-oss-20b resident, ~69% mem free at end); `com.maxwell.omlx` launchd crash loop unloaded (BUG-142 side note).
 
 ## 🔴 BUG-142 — 2026-08-17 — `response_format={"type":"json_object"}` returns EMPTY content from gpt-oss-20b — FIXED (D2408)
 - **Symptom:** canary S4→S6 rerun quarantined every FB (`Empty/short application — D2371`); `call_omlx` logged "content missing from message (reasoning-model cold reload?)". gpt-oss-20b returned 2-token/0-token responses despite being loaded.

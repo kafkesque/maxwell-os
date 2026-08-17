@@ -1,7 +1,8 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-17 | **Decisions:** D2000-D2407 (396 decisions)
+> **Updated:** 2026-08-17 | **Decisions:** D2000-D2408 (397 decisions)
 > **F1/D2401 (this session):** post-S4 enrichment `pipeline/stage4_5_enrich.py` implemented — produces `prerequisite_fbs`/`contradicts_fbs`/`procedural_skill` (gated `stage4_5.enabled: false` for T1.1).
 > **D2406/D2407 (this session):** session_seed.yaml YAML parse break fixed (boot/integrity); `run_production.py` dead code archived (C19); fail-closed regression tests added (`tests/test_fail_closed_d2402_2405.py`, 9 tests).
+> **D2408 + R3 canary rerun (this session):** `response_format=json_object` forced xgrammar constrained decoding → empty gpt-oss-20b content (Harmony conflict, same family as D2392) — now skipped for reasoning-off models (config-first). **R3 canary S4→S6 rerun COMPLETE (19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (`pipeline_run_id=canary`) + Parquet, ~87 min — no regression vs 235/43.**
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -26,6 +27,7 @@
 **Also worth doing now (DONE in D2402-D2405 session):** vectorize compute_fb_relationships (O(n²)→matmul); S5 mechanism thresholds → config (C12).
 **Post-fix integrity audit (D2406/D2407, 2026-08-17):** session_seed.yaml YAML parse break fixed → integrity 10/10, 12/12 YAML parse;
 `run_production.py` dead code archived (C19); 9 fail-closed regression tests added → 34-test suite green.
+**R3 canary S4→S6 rerun (2026-08-17, 19:22:39):** COMPLETE — S4 279/279 FBs (0 failed clusters, 52911 edges, 0 isolated) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (`pipeline_run_id=canary`), FTS 279, Parquet `fbs_snapshot_20260817_192235.parquet` (4482.4 KB). ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression from D2402–D2405. Failure-injection kill/restart in-vivo still pending (canary had 0 failures) — unit-tested only (D2407).
 **Post-T1.1 hardening (logged, not blocking):** MPS renormalization, K-means degraded-marker, probe-cache fingerprint,
 canonical source_id grouping, verbatim evidence verification, S4.5 runner registration, NLI calibration-data commit.
 # 🔴 NEW THIS SESSION — 5-LLM Verification Round (D2367) — preflight/registry sync

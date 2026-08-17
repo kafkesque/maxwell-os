@@ -1532,11 +1532,12 @@ def run_stage2(
         # D2180: Schema validation (T2.2) — catch malformed LLM output before it enters pipeline
         is_valid, schema_errors = validate_fb_output(result)
         if not is_valid:
-            # Log schema violations for debugging but don't crash — treat as NULL
+            # D2403: schema/inference failure is NOT a semantic NULL — mark FAILED so the
+            # caller counts it in failed_clusters (D2331 gate) and does NOT mark it processed.
             import sys as _sys
             print(f"   ⚠️  Schema validation failed for {cid}: {'; '.join(schema_errors[:3])}",
                   file=_sys.stderr)
-            return {"_null": True, "cluster_id": cid, "_schema_errors": schema_errors}
+            return {"_failed": True, "cluster_id": cid, "_schema_errors": schema_errors}
 
         # Validate required fields — unified reading with fallback for single-source schema
         name: str = result.get("name", "").strip()
@@ -1670,7 +1671,14 @@ def run_stage2(
                 continue
 
             added_names: list[str] = []
+            cluster_failed = False
             for fb in fb_results:
+                if fb.get("_failed"):
+                    failed_clusters += 1
+                    cluster_failed = True
+                    print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: schema FAILED")
+                    continue
+
                 if fb.get("_null"):
                     total_null += 1
                     print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: NULL/skip")
@@ -1704,7 +1712,8 @@ def run_stage2(
                 all_fbs.append(fb)
                 total_extracted += 1
                 added_names.append(fb.get('name', '?')[:30])
-            processed_ids.add(cid)
+            if not cluster_failed:
+                processed_ids.add(cid)
             book_count: int = cluster.get("source_diversity",
                           len(cluster.get("source_ids", cluster.get("source_books", []))))
             if added_names:

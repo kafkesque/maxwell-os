@@ -771,6 +771,10 @@ def compute_fb_relationships(
     edge_counts: dict[str, int] = {"domain_overlap": 0, "discipline_overlap": 0,
                                       "source_crossover": 0, "semantic_near": 0}
 
+    # D2404: precompute pairwise cosine matrix once instead of np.dot per pair
+    if has_embeddings and embeddings is not None:
+        sim_matrix: np.ndarray = embeddings @ embeddings.T
+
     # Pairwise comparison (upper triangle)
     for i in range(n):
         for j in range(i + 1, n):
@@ -790,8 +794,7 @@ def compute_fb_relationships(
 
             # Semantic similarity
             if has_embeddings and embeddings is not None:
-                sim: float = float(np.dot(embeddings[i], embeddings[j]))
-                if sim >= similarity_threshold:
+                if float(sim_matrix[i, j]) >= similarity_threshold:
                     relationships.append("semantic_near")
 
             if relationships:
@@ -1012,7 +1015,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     growth_edges = []        # D2073: speculative insights (pipeline-extracted)
     tool_instructions = []   # D2072: tool-specific commands
     failed = 0  # D2370: failed clusters are NOT marked processed → retried on resume (re-counted, not restored)
-    classification_errors = int(_scalar_state.get("classification_errors", 0))
+    # D2404: classification failures are now retried on resume (like `failed`) — re-count per run
+    classification_errors = 0
     name_collisions = int(_scalar_state.get("name_collisions", 0))
     # D2069: rebuild the name-uniqueness set from the partial FBs (names already
     # normalized + disambiguated, so the set is exactly the taken names).
@@ -1276,7 +1280,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     "is_specialized": False,
                     "classification_status": "FAILED",
                     "classification_error": str(e)[:200],
-                    "evidence": "cited",
+                    "evidence": None,
                 }
                 classification_errors += 1
             except Exception as e:
@@ -1289,7 +1293,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     "is_specialized": False,
                     "classification_status": "FAILED",
                     "classification_error": str(e)[:200],
-                    "evidence": "cited",
+                    "evidence": None,
                 }
                 classification_errors += 1
 
@@ -1303,9 +1307,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         if not isinstance(is_specialized, bool):
             is_specialized = str(is_specialized).lower() in ("true", "1", "yes")
 
-        # Validate evidence (still LLM-classified)
-        if class_data.get("evidence") not in ("cited", "axiomatic"):
-            class_data["evidence"] = "cited"
+        # Validate evidence (still LLM-classified) — D2405: never fabricate "cited" on FAILED
+        if class_data.get("classification_status") != "FAILED":
+            if class_data.get("evidence") not in ("cited", "axiomatic"):
+                class_data["evidence"] = "cited"
 
         # ── Stage 2: Map raw → canonical (D2138) ──
         canonical_discipline = map_to_canonical_with_fallback(
@@ -1576,12 +1581,15 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         fb = stamp_record(fb, gen_model=GEN_MODEL)
         fb["pipeline_run_id"] = pipeline_run_id
         fb["pipeline_commit"] = pipeline_commit
-        fbs.append(fb)
-        processed_ids.add(cluster_id)
-
-        elapsed = time.time() - start
-        err_str = f" ({len(errors)} label errors)" if errors else ""
-        print(f"→ ✅ '{name}'{err_str} ({elapsed:.1f}s)")
+        if class_data.get("classification_status") == "FAILED":
+            # D2404: failed classification must be retried on resume — do not checkpoint as done.
+            print(f"→ ❌ '{name}' classification FAILED — will retry on resume")
+        else:
+            fbs.append(fb)
+            processed_ids.add(cluster_id)
+            elapsed = time.time() - start
+            err_str = f" ({len(errors)} label errors)" if errors else ""
+            print(f"→ ✅ '{name}'{err_str} ({elapsed:.1f}s)")
 
         # D2370: incremental checkpoint every N clusters (mirrors S2 D2154)
         if S4_CHECKPOINT_INTERVAL > 0 and len(processed_ids) % S4_CHECKPOINT_INTERVAL == 0:

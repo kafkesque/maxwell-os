@@ -1,8 +1,28 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-17 00:20 (D2399 domain-promotion defer to post-T1.1+D2345; D2400 S4-producer/S6-persistence contract; BUG-104 remediation action logged; S4 reval D2398 done)
+> **Last updated:** 2026-08-17 16:30 (frontier T1.1 audit 4b55797: 4 blockers D2402-D2405 fixed — S4 timeout, S2 NULL-rebrand, S4 resume retry, S4 fabricated cited + S5 FAILED gate; BUG-137..140 logged)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟠 BUG-137 — 2026-08-17 — S4 runner timeout '4': 3600 (1h) vs multi-hour full-corpus S4 — FIXED (D2402)
+- **Symptom:** unattended T1.1 run killed at S4 after 1h; runner.py treats TimeoutExpired as stage failure and stops.
+- **Root cause:** config/pipeline_config.yaml stages.timeouts.'4': 3600; '2': null intended for S2 only.
+- **Fix:** '4': null. **Files:** config/pipeline_config.yaml. **Source:** frontier audit 2026-08-17 (4b55797).
+
+## 🟠 BUG-138 — 2026-08-17 — S2 schema-invalid output rebranded as NULL + permanently processed — FIXED (D2403)
+- **Symptom:** malformed Qwen output -> NULL -> checkpointed as processed -> never retried; D2331 gate misses it (C16).
+- **Root cause:** _build_fb_from_result returns {"_null": True, "_schema_errors": ...} on validate_fb_output failure; caller counts total_null and adds cluster to processed_ids.
+- **Fix:** 3-state FB/NULL/FAILED; schema failure = failed_clusters, not processed. **Files:** pipeline/stage2_extract.py.
+
+## 🟠 BUG-139 — 2026-08-17 — S4 classification-failed clusters unrecoverable on resume — FIXED (D2404)
+- **Symptom:** "re-run to retry failed clusters" never retries classification failures (already in processed_ids).
+- **Root cause:** stage4_merge.py appends FAILED FB then unconditionally processed_ids.add(cluster_id).
+- **Fix:** FAILED clusters not appended / not marked processed. **Files:** pipeline/stage4_merge.py.
+
+## 🟠 BUG-140 — 2026-08-17 — S4 fabricates evidence="cited" + S5 can PASS classification_status=FAILED — FIXED (D2405)
+- **Symptom:** classification failure -> looks like clean cited FB -> S5 can certify -> committed (Parquet/raw SQL carry FAILED-as-clean).
+- **Root cause:** stage4_merge.py hardcodes "evidence": "cited" in both failure sentinels; stage5_verify.py has no classification_status gate.
+- **Fix:** remove fabricated "cited"; S5 gates FAILED -> QUARANTINE. **Files:** pipeline/stage4_merge.py, pipeline/stage5_verify.py.
 
 ## 🟢 BUG-136 — 2026-08-16 — Golden set: 5 NON_VERBATIM evidence + stale meta count (77 vs 80) — FIXED (D2397)
 - **Symptom:** `golden_validate.py` FAILED 6 checks: META_MISMATCH (meta `total_examples`=77, actual 80)

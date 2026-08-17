@@ -154,6 +154,10 @@ phase:
         - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts (post-T1.1+D2345), NOT canary
         - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only; orphan-field producers = post-S4 enrichment (F1)
         - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests pass)
+        - D2402: S4 runner timeout '4': 3600 → null (unlimited, like S2) — FIXED
+        - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
+        - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from processed_ids — FIXED
+        - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate FAILED→QUARANTINE — FIXED
     pending:
         - D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary)
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
@@ -170,6 +174,13 @@ phase:
         - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
         - C8: D2066 dynamic canonical taxonomy
         - C9: D2067 cross-run incremental extraction
+        - MPS backend: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors) — post-T1.1 (ollama is prod backend)
+        - S1.5 K-means fallback: mark positional-split clusters degraded — post-T1.1
+        - S2 probe cache: fingerprint (not just counts) — post-T1.1
+        - S2 sampling: group by canonical source_id (not truncated basename) — post-T1.1
+        - S2 evidence: verbatim substring verification — post-T1.1
+        - S4.5: register in runner STAGE_ORDER — post-T1.1
+        - NLI calibration data (evals/nli_golden.jsonl) not committed → threshold not reproducible — post-T1.1
     next_phase: T1.1 full run → Tier 2 quality calibration
 
 # ── Book Library ──

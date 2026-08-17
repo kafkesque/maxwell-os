@@ -3149,11 +3149,45 @@ decisions:
   - config/pipeline_config.yaml
   - tests/test_stage4_5_enrich.py
   created: '2026-08-17'
+- id: D2402
+  category: BUGFIX / RELIABILITY
+  state: ACTIVE
+  description: 'Frontier T1.1 audit (4b55797): S4 runner timeout "4": 3600 (1h) vs multi-hour full-corpus S4 — set to null (unlimited, like S2)'
+  champion: 2026-08-17 session
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/runner.py
+  created: '2026-08-17'
+- id: D2403
+  category: BUGFIX / FAIL-CLOSED
+  state: ACTIVE
+  description: 'Frontier T1.1 audit: S2 schema-invalid output rebranded as NULL + permanently processed — 3-state FB/NULL/FAILED; schema failure = failed_clusters (retried on resume)'
+  champion: 2026-08-17 session
+  target_files:
+  - pipeline/stage2_extract.py
+  created: '2026-08-17'
+- id: D2404
+  category: BUGFIX / FAIL-CLOSED
+  state: ACTIVE
+  description: 'Frontier T1.1 audit: S4 classification-failed clusters marked processed -> unrecoverable on resume — exclude FAILED clusters from processed_ids so resume retries them'
+  champion: 2026-08-17 session
+  target_files:
+  - pipeline/stage4_merge.py
+  created: '2026-08-17'
+- id: D2405
+  category: BUGFIX / FAIL-CLOSED
+  state: ACTIVE
+  description: 'Frontier T1.1 audit: S4 fabricates evidence="cited" on classification failure + S5 can PASS classification_status=FAILED — remove fabricated cited; S5 gates FAILED -> QUARANTINE'
+  champion: 2026-08-17 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/stage5_verify.py
+  created: '2026-08-17'
 summary:
-  total: 390
+  total: 394
   proposed: 0
   draft: 1
-  active: 333
+  active: 337
   stale: 0
   superseded: 14
   archived: 8

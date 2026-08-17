@@ -3,6 +3,48 @@
 
 ---
 
+### D2402 — S4 runner timeout 1h vs multi-hour full-corpus — FIXED (2026-08-17)
+**Category:** BUGFIX / RELIABILITY
+
+**Finding:** config/pipeline_config.yaml stages.timeouts.'4': 3600 (1 hour) while S4 is a
+multi-hour full-corpus stage; '2': null sits two lines above. runner.py applies
+timeout=stage_timeout and treats TimeoutExpired as stage failure, so an unattended T1.1
+run is killed at S4 after 1h. Frontier audit (ChatGPT + Claude, 4b55797).
+
+**Fix:** set '4': null (unlimited, matching S2). Intra-S4 checkpoint (D2370) retained for crash recovery.
+**Files:** config/pipeline_config.yaml
+
+### D2403 — S2 schema-invalid output rebranded as NULL + permanently processed — FIXED (2026-08-17)
+**Category:** BUGFIX / FAIL-CLOSED
+
+**Finding:** stage2_extract.py returns {"_null": True, "_schema_errors": ...} when
+validate_fb_output fails; counted as total_null (not failed_clusters) and the cluster is
+added to processed_ids so it is never retried. The D2331 fail-closed gate cannot catch it (C16 violation).
+
+**Fix:** three-state (FB / NULL / FAILED); schema failure -> FAILED, counted in failed_clusters,
+cluster NOT marked processed -> retried on resume.
+**Files:** pipeline/stage2_extract.py
+
+### D2404 — S4 classification-failed clusters unrecoverable on resume — FIXED (2026-08-17)
+**Category:** BUGFIX / FAIL-CLOSED
+
+**Finding:** stage4_merge.py appends classification-FAILED FBs and unconditionally adds their
+cluster_id to processed_ids; the resume filter skips processed clusters, so the documented
+"re-run to retry failed clusters" never retries classification failures.
+
+**Fix:** classification-failed clusters are not appended / not marked processed -> retried on resume.
+**Files:** pipeline/stage4_merge.py
+
+### D2405 — S4 fabricates evidence="cited" + S5 can PASS classification_status=FAILED — FIXED (2026-08-17)
+**Category:** BUGFIX / FAIL-CLOSED
+
+**Finding:** stage4_merge.py hardcodes "evidence": "cited" in both classification-failure
+sentinels; stage5_verify.py has no classification_status gate; export_parquet takes the raw
+list, so FAILED records look like clean cited FBs in Parquet/raw SQL (only retrieve.py filters them).
+
+**Fix:** remove fabricated "cited" (explicit non-valid state); S5 gates classification_status == "FAILED" -> QUARANTINE.
+**Files:** pipeline/stage4_merge.py, pipeline/stage5_verify.py
+
 ### D2401 — F1 implemented: post-S4 enrichment producers for orphan fields — DONE (2026-08-17)
 **Category:** ARCHITECTURE / PIPELINE
 

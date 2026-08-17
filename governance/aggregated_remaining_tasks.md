@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-17 00:25 | **Decisions:** D2000-D2400 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400).**
+> **Updated:** 2026-08-17 16:30 | **Decisions:** D2000-D2405 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400).**
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
@@ -12,6 +12,23 @@
 
 ---
 
+## 🚧 Frontier T1.1 audit (4b55797) — 4 blockers fixed this session (D2402-D2405)
+
+| # | Item | Status |
+|---|------|--------|
+| F1 | S4 runner timeout '4': 3600 → null | ✅ D2402 |
+| F2 | S2 schema-failure → NULL → 3-state FB/NULL/FAILED (retry on resume) | ✅ D2403 |
+| F3 | S4 classification-failed → not processed (retry on resume) | ✅ D2404 |
+| F4 | S4 fabricated evidence="cited" + S5 FAILED gate → QUARANTINE | ✅ D2405 |
+
+**Post-T1.1 hardening (remaining, non-blocking):**
+- S1.5 MPS: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors; ollama is prod backend)
+- S1.5 K-means fallback: mark positional-split clusters degraded
+- S2 probe cache: fingerprint (not just counts)
+- S2 sampling: group by canonical source_id (not truncated basename)
+- S2 evidence: verbatim substring verification (epistemic provenance)
+- S4.5: register in runner STAGE_ORDER (flipping enabled:true must actually run it)
+- NLI calibration data (evals/nli_golden.jsonl) not committed → 0.10 threshold not reproducible
 ## 🚧 #0.8 — S4 completion findings → remaining work (2026-08-16)
 
 > S4 canary finished 278/279 FBs. One CRIBS quarantine (`cluster_6241`, empty `application`)

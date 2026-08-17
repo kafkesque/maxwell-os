@@ -59,6 +59,7 @@ from pipeline.pipeline_paths import (
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
 )
+from pipeline.pipeline_paths import _CFG  # D2405: C12 config-first threshold source
 
 # fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
 # deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
@@ -231,18 +232,19 @@ def load_stage4_fbs() -> list[dict]:
 
 # ── Mechanism quality pre-filter (D2220: guards against citation echo gaming NLI) ──
 
-# D2220: Citation echo detection thresholds — configurable via pipeline_config.yaml
-# fallback defaults if config keys not present
-MECHANISM_MIN_LENGTH: int = 150  # Minimum mechanism character length
-CITATION_ECHO_SOURCE_THRESHOLD: int = 20  # Source count triggering citation echo check
-BANNED_MECHANISM_PREFIXES: tuple[str, ...] = (
+# D2220/D2405: Citation echo detection thresholds — config-first (C12) via stage5.* keys;
+# fallback defaults if keys not present.
+_cfg5 = _CFG.get("stage5", {})
+MECHANISM_MIN_LENGTH: int = int(_cfg5.get("mechanism_min_length", 150))
+CITATION_ECHO_SOURCE_THRESHOLD: int = int(_cfg5.get("citation_echo_source_threshold", 20))
+BANNED_MECHANISM_PREFIXES: tuple[str, ...] = tuple(_cfg5.get("banned_mechanism_prefixes", [
     "because it enables",
     "because it allows",
     "because it helps",
     "because it provides",
     "because it makes",
     "because it can",
-)
+]))
 
 
 def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
@@ -418,7 +420,13 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
 
         method: str = "deberta-nli"
 
-        if not mech_passed:
+        if fb.get("classification_status") == "FAILED":
+            # D2405: S4 classification failure must NEVER PASS — force QUARANTINE, skip NLI
+            fact_passed = False
+            fact_score = 0.0
+            fact_detail = f"S4 classification FAILED: {str(fb.get('classification_error', 'unknown'))[:120]}"
+            method = "classification_failed"
+        elif not mech_passed:
             # Tautological mechanism → auto-quarantine
             fact_passed = False
             fact_score = 0.0

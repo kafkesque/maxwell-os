@@ -30,7 +30,7 @@ stages:
     '1.3': 3600
     '1.5': 3600
     '2': null
-    '4': 3600
+    '4': null
     '5': 3600
     '6': 3600
 stage_files:
@@ -320,6 +320,15 @@ stage5:
   nli_marginal_threshold: 0.1
   nli_max_premise_chars: 256
   nli_max_hypothesis_chars: 256
+  mechanism_min_length: 150
+  citation_echo_source_threshold: 20
+  banned_mechanism_prefixes:
+    - "because it enables"
+    - "because it allows"
+    - "because it helps"
+    - "because it provides"
+    - "because it makes"
+    - "because it can"
   confidence:
     mechanism_weight: 0.35
     enrichment_weight: 0.25

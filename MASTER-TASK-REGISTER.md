@@ -1,5 +1,5 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-17 | **Decisions:** D2000-D2401 (390 decisions)
+> **Updated:** 2026-08-17 | **Decisions:** D2000-D2405 (394 decisions)
 > **F1/D2401 (this session):** post-S4 enrichment `pipeline/stage4_5_enrich.py` implemented — produces `prerequisite_fbs`/`contradicts_fbs`/`procedural_skill` (gated `stage4_5.enabled: false` for T1.1).
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
@@ -10,6 +10,21 @@
 
 ---
 
+# 🔴 NEW THIS SESSION — Frontier T1.1 Audit (4b55797) — 4 blockers found + fixed (D2402-D2405)
+
+> **Three frontier LLMs (claude0015 / chatgpt0015 / kimi0015) audited HEAD 4b55797 against code.
+> 4 launch-blockers converged + independently re-verified. All fail-closed/state-machine fixes — no redesign.**
+
+| # | Priority | Finding | Fix | Status |
+|---|----------|---------|-----|--------|
+| 1 | P1 | S4 runner timeout '4': 3600 (1h) vs multi-hour full-corpus | '4': null (unlimited, like S2) | ✅ D2402 |
+| 2 | P2 | S2 schema-invalid output rebranded as NULL + permanently processed | 3-state FB/NULL/FAILED; schema failure = failed_clusters | ✅ D2403 |
+| 3 | P3 | S4 classification-failed clusters unrecoverable on resume | exclude FAILED clusters from processed_ids | ✅ D2404 |
+| 4 | P4 | S4 fabricates evidence="cited" + S5 can PASS classification_status=FAILED | remove cited; S5 gates FAILED→QUARANTINE | ✅ D2405 |
+
+**Also worth doing now (non-blocking):** vectorize compute_fb_relationships (O(n²)→matmul); S5 mechanism thresholds → config (C12).
+**Post-T1.1 hardening (logged, not blocking):** MPS renormalization, K-means degraded-marker, probe-cache fingerprint,
+canonical source_id grouping, verbatim evidence verification, S4.5 runner registration, NLI calibration-data commit.
 # 🔴 NEW THIS SESSION — 5-LLM Verification Round (D2367) — preflight/registry sync
 
 > **Five independent LLM audits (claude0014/deepseek0013/kimi0013/qwen0013/chatgpt0014) cross-examined

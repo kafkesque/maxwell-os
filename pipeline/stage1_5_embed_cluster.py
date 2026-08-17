@@ -33,9 +33,11 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import os
 import sys
+import tempfile
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -50,8 +52,10 @@ from pipeline.ollama_embed import batch_embed
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     S13_DIR,
+    S15_DIR,  # D2409: run-scoped embedding cache dir
     S15_EMBED_BACKEND,
     S15_EMBED_BATCH_SIZE,  # D2190: MPS forward batch size
+    S15_EMBED_CHECKPOINT_ENABLED,  # D2409: crash-safe incremental embedding cache
     S15_EMBED_CHUNK_SIZE,  # D2189: chunked embedding
     S15_EMBED_DIM,
     S15_EMBED_MODEL,
@@ -72,6 +76,70 @@ from pipeline.stamp import get_pipeline_commit, stamp_record
 # ── Constants ──────────────────────────────────────────────────────────────
 FAISS_SEED: int = 42
 BATCH_SIZE: int = 64  # Segments per embedding batch
+
+
+# ── D2409: incremental embedding checkpoint (crash-safe resume) ────────────
+
+def _embed_cache_dir() -> Path:
+    """Run-scoped directory holding the incremental Ollama embedding cache."""
+    return S15_DIR / get_run_id() / "embeddings_cache"
+
+
+def _embed_state_path() -> Path:
+    """Path to the embedding cache manifest (fingerprint + completed batch indices)."""
+    return _embed_cache_dir() / "state.json"
+
+
+def _segments_fingerprint(segments: list[dict]) -> str:
+    """Stable fingerprint of the segment set (count + segment_id + text length).
+
+    Detects upstream corpus drift: if S1/S1.3 re-runs and produces different
+    segments, the cached embeddings for the OLD segments must NOT be reused.
+    """
+    h = hashlib.sha256()
+    h.update(str(len(segments)).encode("ascii"))
+    for seg in segments:
+        h.update((seg.get("segment_id", "") or "").encode("utf-8", "ignore"))
+        h.update(str(len(seg.get("text", ""))).encode("ascii"))
+    return h.hexdigest()
+
+
+def _atomic_npy_write(path: Path, arr: np.ndarray) -> None:
+    """Crash-safe binary write of a .npy array (C6: tempfile → fsync → os.replace).
+
+    Embedding cache files are regenerable intermediates, so os.replace atomicity
+    is the correctness guarantee (a reader never sees a half-written batch);
+    fsync provides power-loss durability per C6.
+    """
+    fd, tmp_path = tempfile.mkstemp(dir=str(path.parent), suffix=".npy")
+    try:
+        os.close(fd)
+        np.save(tmp_path, arr)
+        with open(tmp_path, "rb") as _f:
+            os.fsync(_f.fileno())
+        os.replace(tmp_path, str(path))
+    except Exception:
+        try:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
+def _write_embed_state(fp: str, total: int, dim: int, done_batches: set[int]) -> None:
+    """Persist the embedding cache manifest (atomic, crash-safe)."""
+    state_path = _embed_state_path()
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    safe_write(
+        state_path,
+        json.dumps({
+            "fingerprint": fp,
+            "total": total,
+            "dim": dim,
+            "done_batches": sorted(done_batches),
+        }),
+    )
 
 
 def load_segments() -> list[dict]:
@@ -255,20 +323,77 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> tuple[
     for i in range(0, total, BATCH_SIZE):
         batches[i] = texts[i : i + BATCH_SIZE]
 
-    print(f"      Sending {len(batches)} batches to {model} (parallel workers=4)...")
     results: dict[int, list[list[float]]] = {}
-    completed_count: int = 0
+    done_batches: set[int] = set()
+
+    # ── D2409: incremental embedding checkpoint (crash-safe resume) ───────
+    # S1.5's Ollama embedding is the serial long pole (~5h on the full corpus).
+    # Previously a mid-embedding crash discarded every embedding and re-embedded
+    # from scratch. Now completed batches are persisted per-batch + a manifest
+    # so a resume skips already-embedded batches instead of re-doing hours.
+    if S15_EMBED_CHECKPOINT_ENABLED:
+        cache_dir = _embed_cache_dir()
+        state_path = _embed_state_path()
+        fp = _segments_fingerprint(segments)
+
+        if state_path.exists():
+            try:
+                state = json.loads(state_path.read_text())
+            except Exception:
+                state = {}
+            if (state.get("fingerprint") == fp and state.get("total") == total
+                    and state.get("dim") == S15_EMBED_DIM):
+                done_batches = set(state.get("done_batches", []))
+                loaded_batches: set[int] = set()
+                for idx in sorted(done_batches):
+                    bf = cache_dir / f"batch_{idx}.npy"
+                    if bf.exists():
+                        try:
+                            arr = np.load(bf)
+                            results[idx] = [row.tolist() for row in arr]
+                            loaded_batches.add(idx)
+                        except Exception:
+                            pass
+                # D2409: drop "done" batches whose cache file is missing/corrupt so
+                # they are re-embedded rather than silently dropped from the corpus.
+                done_batches = loaded_batches
+                if done_batches:
+                    print(f"      ♻️  Resuming embeddings: {len(done_batches)}/{len(batches)} "
+                          f"batches cached (~{len(done_batches) * BATCH_SIZE}/{total} segments)")
+            else:
+                # Fingerprint/size mismatch → discard stale cache (corpus changed).
+                import shutil
+                shutil.rmtree(cache_dir, ignore_errors=True)
+                done_batches = set()
+                results = {}
+
+    if S15_EMBED_CHECKPOINT_ENABLED:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+    pending = {idx: batch_texts for idx, batch_texts in batches.items() if idx not in done_batches}
+    print(f"      Sending {len(pending)} batches to {model} "
+          f"(parallel workers=4, {len(done_batches)} cached)...")
+    completed_count: int = len(done_batches)
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         future_to_idx = {
             executor.submit(batch_embed, batch_texts, model): idx
-            for idx, batch_texts in batches.items()
+            for idx, batch_texts in pending.items()
         }
         for future in as_completed(future_to_idx):
             idx = future_to_idx[future]
             try:
                 raw = future.result()
                 results[idx] = raw
+                if S15_EMBED_CHECKPOINT_ENABLED and raw:
+                    # D2409: persist completed batch BEFORE advancing the counter
+                    # (write order guarantees a "done" batch is always fully on disk).
+                    _batch_arr = np.asarray(raw, dtype=np.float32)
+                    if _batch_arr.ndim == 2 and S15_EMBED_DIM < _batch_arr.shape[1]:
+                        _batch_arr = _batch_arr[:, :S15_EMBED_DIM]  # Matryoshka truncation at rest
+                    _atomic_npy_write(cache_dir / f"batch_{idx}.npy", _batch_arr)
+                    done_batches.add(idx)
+                    _write_embed_state(fp, total, S15_EMBED_DIM, done_batches)
                 completed_count += 1
                 if completed_count % 10 == 0 or completed_count == len(batches):
                     segments_done = min(completed_count * BATCH_SIZE, total)
@@ -657,6 +782,12 @@ def run_stage1_5(
             STAGE1_5_SINGLETONS,
             "\n".join(json.dumps(s, ensure_ascii=False) for s in singleton_records) + "\n",
         )
+
+    # D2409: the embedding cache is a regenerable intermediate — drop it once the
+    # cluster checkpoint is safely on disk (avoids ~640MB/run of stale-cache bloat).
+    if S15_EMBED_CHECKPOINT_ENABLED:
+        import shutil
+        shutil.rmtree(_embed_cache_dir(), ignore_errors=True)
 
     print(f"\n📋 Clusters:     {STAGE1_5_CHECKPOINT}")
     if singleton_records:

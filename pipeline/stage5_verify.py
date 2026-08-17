@@ -50,6 +50,7 @@ from pipeline.pipeline_paths import (
     S5_CONF_ISOR_WEIGHT,  # D2310: confidence ISOR weight
     S5_CONF_MECH_WEIGHT,  # D2310: confidence mechanism weight
     S5_HUMAN_REVIEW_ISOR,  # D2310: ISOR rating triggering human review
+    S5_CHECKPOINT_INTERVAL,  # D2409: intra-stage incremental checkpoint cadence (FBs)
     S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
     S5_NLI_MAX_HYPOTHESIS_CHARS,  # D2321: hypothesis(definition) truncation for NLI pairing
     S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
@@ -373,6 +374,17 @@ def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
 
 # ── Main ────────────────────────────────────────────────────────────────────
 
+def _write_s5_checkpoint(verified: list[dict]) -> None:
+    """Serialize verified FBs to the S5 checkpoint (fail-closed JSONL, crash-safe).
+
+    D2409: used both for the final write and for intra-stage incremental writes
+    so a crash mid-S5 loses at most the trailing <S5_CHECKPOINT_INTERVAL> FBs
+    (a deterministic re-verify) rather than the entire stage.
+    """
+    checkpoint_text = "\n".join(json.dumps(vfb, ensure_ascii=False) for vfb in verified) + "\n"
+    safe_write(STAGE5_CHECKPOINT, checkpoint_text)
+
+
 def run_stage5(strict: bool = False, skip_nli: bool = False):
     """D2298: DeBERTa-only S5 — single NLI verification, calibrated at threshold 0.10.
     No decoder LLM. No BORP (S1.5 guarantees ≥2 sources). No Completeness (S4 fills all fields).
@@ -381,6 +393,39 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage4_fbs()
+
+    # ── D2409: intra-stage resume (crash recovery for the serial S5) ───────
+    # Reload the partial checkpoint and skip already-verified FBs instead of
+    # re-running DeBERTa on every FB. Verification is deterministic (temp=0.0),
+    # so re-verifying is only wasteful — but skipping via stable fb_id is both
+    # cheap and safe. A corrupt partial checkpoint is discarded (fail-closed),
+    # never silently trusted.
+    verified: list[dict] = []
+    done_ids: set[str] = set()
+    if STAGE5_CHECKPOINT.exists():
+        try:
+            prior = load_jsonl(STAGE5_CHECKPOINT, context="S5 checkpoint")
+            done_ids = {vfb.get("fb_id") for vfb in prior if vfb.get("fb_id")}
+            verified = prior
+        except Exception as e:
+            print(f"   ⚠️  S5 resume checkpoint unreadable ({type(e).__name__}: {e}) — re-verifying all")
+            verified = []
+            done_ids = set()
+    # D2409: discard a checkpoint from a DIFFERENT run (no fb_id overlap with the
+    # current S4 output). Mirrors S2's D2317 and S4's D2370 stale-checkpoint guard —
+    # carrying forward stale FBs would silently mix two runs' output into one checkpoint.
+    if done_ids:
+        current_ids = {fb.get("fb_id") for fb in fbs if fb.get("fb_id")}
+        if not (done_ids & current_ids):
+            print(f"   ⚠️  S5 resume checkpoint is from a different run "
+                  f"({len(done_ids)} stale IDs, 0 overlap) — discarding")
+            verified = []
+            done_ids = set()
+    if done_ids:
+        remaining = [fb for fb in fbs if fb.get("fb_id") not in done_ids]
+        print(f"   📋 S5 resuming: {len(done_ids)} FBs already verified → {len(remaining)} remaining")
+        fbs = remaining
+
     total = len(fbs)
     _thresh = S5_NLI_PASS_THRESHOLD  # config-driven (C12), calibrated: 0.10
 
@@ -393,8 +438,10 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     print(f"   ENTAIL ≥ {_thresh} → PASS | Otherwise → QUARANTINE")
     print(f"{'='*60}")
 
-    verified = []
+    # Seed stats from any resumed FBs so the final tallies reflect the full run.
     stats = {"PASS": 0, "FLAG": 0, "QUARANTINE": 0}
+    for vfb in verified:
+        stats[vfb.get("status", "QUARANTINE")] = stats.get(vfb.get("status", "QUARANTINE"), 0) + 1
     pipeline_commit = get_pipeline_commit()
 
     for i, fb in enumerate(fbs, 1):
@@ -522,9 +569,12 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         print(f"→ {icon} {status} ({elapsed:.1f}s)")
         verified.append(vfb)
 
-    # Save checkpoint — serialize to JSONL (D2299: was passing list, caused TypeError)
-    checkpoint_text = "\n".join(json.dumps(vfb, ensure_ascii=False) for vfb in verified) + "\n"
-    safe_write(STAGE5_CHECKPOINT, checkpoint_text)
+        # D2409: incremental checkpoint every N FBs — crash recovery for the serial S5.
+        if i % S5_CHECKPOINT_INTERVAL == 0:
+            _write_s5_checkpoint(verified)
+
+    # Save final checkpoint — serialize to JSONL (D2299: was passing list, caused TypeError)
+    _write_s5_checkpoint(verified)
     print(f"\n{'='*60}")
     print("📊 VERIFICATION RESULTS")
     for s, c in stats.items():

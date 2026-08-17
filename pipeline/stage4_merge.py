@@ -27,6 +27,7 @@ Usage:
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 import time
@@ -59,6 +60,7 @@ from pipeline.pipeline_paths import (
     S4_DEPTH_FRUGAL_ENABLED,  # D2354: FrugalGPT cascade (cheap depth model)
     S4_DEPTH_MAX_TOKENS,  # BUG-075: depth-only call token budget
     S4_DEPTH_MODEL,  # D2354: frugal depth model (Gemma)
+    S4_DIFFICULTY_MAP,  # D2410/C12: depth→difficulty mapping (config-first)
     S4_GE_OUTPUT,
     S4_MAX_FAILED_RATIO,  # D2338: fail-closed merge tolerance
     S4_MAX_PRINCIPLES,
@@ -97,6 +99,48 @@ from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, stamp_recor
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
+
+# D2410: temporal-signal match cache (compiled regexes keyed by lowercased signal).
+_TEMPORAL_SIGNAL_RE_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
+def _temporal_signal_hit(text: str, signals: list[str]) -> bool:
+    """Boundary-aware temporal-signal match (D2410).
+
+    Numeric signals (e.g. ``"202"``) match as a plain substring so a year
+    prefix like "2024" is caught. Word signals use lookaround boundaries so a
+    signal like "now" cannot false-match inside "knowledge", or "all" inside
+    "allocation". Returns True on the first hit.
+    """
+    for raw in signals or []:
+        sig = (raw or "").strip().lower()
+        if not sig:
+            continue
+        if sig.isdigit():
+            if sig in text:
+                return True
+            continue
+        pattern = _TEMPORAL_SIGNAL_RE_CACHE.get(sig)
+        if pattern is None:
+            pattern = re.compile(rf"(?<![a-z0-9]){re.escape(sig)}(?![a-z0-9])")
+            _TEMPORAL_SIGNAL_RE_CACHE[sig] = pattern
+        if pattern.search(text):
+            return True
+    return False
+
+
+def _derive_difficulty_level(depth: str, n_domains: int) -> str:
+    """Map depth → difficulty via config (D2410/C12).
+
+    ``domain`` is cardinality-aware: a single-domain FB is deep specialization
+    ("expert") while a multi-domain FB is breadth ("intermediate"). Unknown
+    depths fall back to "intermediate" (conservative, no over-claim).
+    """
+    if depth == "domain":
+        key = "domain_single" if n_domains == 1 else "domain_multi"
+        return S4_DIFFICULTY_MAP.get(key, "intermediate")
+    return S4_DIFFICULTY_MAP.get(depth, "intermediate")
+
 
 # D2323: non-principle role names sourced from config (C12) — routing dispatch
 # references these, never re-declares the literal enum values.
@@ -1439,23 +1483,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
         # ── Auto-derive agentic metadata (D2130) ──────────────────────────
         n_domains = len(class_data.get("domains", []))
 
-        # difficulty_level: derived from depth (discipline is singular, no cardinality check)
+        # difficulty_level: derived from depth via config map (D2410/C12).
         depth_val = class_data.get("depth", "domain")
-        if depth_val == "specialized":
-            difficulty_level = "expert"
-        elif depth_val == "universal":
-            difficulty_level = "beginner"  # universal = accessible to all
-        elif depth_val == "domain":
-            difficulty_level = "expert" if n_domains == 1 else "intermediate"
-        else:
-            difficulty_level = "intermediate"
+        difficulty_level = _derive_difficulty_level(depth_val, n_domains)
 
-        # temporal_scope: heuristic from keywords + definition signals (D2364/C12: config-driven)
+        # temporal_scope: heuristic from keywords + definition signals (D2364/C12:
+        # config-driven). D2410: boundary-aware matching (no stopword-like "all"
+        # or substring "now" false-hits) + contemporary-first ordering (a decay
+        # signal is stronger than a timeless signal — "always now" → contemporary).
         def_text = (definition + " " + fb_data.get("elaboration", "")).lower()
-        if any(w in def_text for w in S4_TEMPORAL_SIGNALS.get("timeless", [])):
-            temporal_scope = "timeless"
-        elif any(w in def_text for w in S4_TEMPORAL_SIGNALS.get("contemporary", [])):
+        if _temporal_signal_hit(def_text, S4_TEMPORAL_SIGNALS.get("contemporary", [])):
             temporal_scope = "contemporary"
+        elif _temporal_signal_hit(def_text, S4_TEMPORAL_SIGNALS.get("timeless", [])):
+            temporal_scope = "timeless"
         else:
             temporal_scope = "timeless"  # default: principles are timeless unless evidence suggests otherwise
 

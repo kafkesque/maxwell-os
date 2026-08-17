@@ -3,6 +3,71 @@
 
 ---
 
+### D2410 — S4 metadata derivation audit fixes: temporal_scope boundary-match + difficulty_map C12 + context "general" — DONE (2026-08-17)
+**Category:** CLS / CFG
+
+**Finding:** Deep audit of the canary output (`maxwell.db`, 279 rows) found three
+metadata-derivation defects:
+1. **temporal_scope near-collapse** — 271/279 `"timeless"`, 8 `"contemporary"`.
+   Root cause: `any(w in def_text)` used bare substring matching, and the timeless
+   list contained the stopword `"all"` (substring-matched 238/279 definitions).
+   Substring matching also let `"now"` false-match inside `"knowledge"`/`"renowed"`,
+   and timeless-first ordering shadowed a genuine contemporary signal.
+2. **difficulty_level** — mapping was hardcoded in `stage4_merge.py` while a stale
+   `test.difficulty_map` config block disagreed (`domain: intermediate` vs code
+   `domain → expert if n_domains==1 else intermediate`). Schema doc said "discipline
+   count" but code uses domain cardinality.
+3. **context "general"** — `derive_context` (D2373/D2375) emits `"general"` for
+   unmatched domains (66/279 rows), but `CONTEXT_LITERAL` did not declare it.
+
+**Fix:**
+- temporal_scope: `_temporal_signal_hit()` — boundary-aware (`(?<![a-z0-9])…(?![a-z0-9])`)
+  word matching, numeric `"202"` prefix handled as substring, contemporary-first
+  ordering; removed bare `"all"` from `stage4.temporal_signals.timeless`.
+- difficulty_level: `_derive_difficulty_level()` + `stage4.difficulty_map` in live
+  config (`specialized: expert`, `universal: beginner`, `cross-domain: intermediate`,
+  `domain_single: expert`, `domain_multi: intermediate`) via `pipeline_paths.S4_DIFFICULTY_MAP`.
+- context: `"general"` added to `CONTEXT_LITERAL` + field description; difficulty doc
+  corrected to "depth + domain cardinality".
+
+**Verification:** difficulty re-derivation = 0/279 mismatches (behavior-preserving);
+temporal re-derivation = 13/279 corrected (conservative; residual "timeless" dominance
+is real corpus content, not the substring bug). 47-test suite green, config audit
+strict clean, integrity 10/10.
+**Files:** `pipeline/stage4_merge.py`, `pipeline/pipeline_paths.py`, `pipeline/schemas.py`, `config/pipeline_config.yaml`, `tests/test_stage4_metadata_derivation_d2410.py`
+**Source:** Session 2026-08-17 — canary metadata deep audit follow-up.
+
+---
+
+### D2409 — S1.5/S5 checkpoint + resume (crash recovery for the two long serial stages) — DONE (2026-08-17)
+**Category:** INF
+
+**Finding:** The T1.1 checkpoint/resume audit found two stages lacked crash-safe resume:
+1. **S1.5 Ollama embedding** was atomic-only — a mid-embedding crash lost the ~5h
+   full-corpus embed pass (no incremental cache).
+2. **S5 verification** wrote its checkpoint only at the end — a mid-run crash lost
+   all verified FBs (DeBERTa-only, no incremental checkpoint).
+
+**Fix:**
+- S1.5: incremental per-batch `.npy` embedding cache + `state.json` manifest keyed by
+  a corpus fingerprint (segment_id + text-length). Atomic `.npy` writes
+  (tempfile→fsync→os.replace). Stale-cache detection (fingerprint/total/dim mismatch →
+  discard). Missing/corrupt cache file → re-embed. Cache dir deleted after S1.5
+  checkpoint commit. Config: `stage1_5.embed_checkpoint_enabled`.
+- S5: incremental checkpoint every `stage5.checkpoint_interval` FBs (default 50) +
+  resume-by-`fb_id`. Fail-closed `load_jsonl` for prior checkpoint. Stale-run overlap
+  guard (no `fb_id` overlap with current S4 input → discard stale checkpoint).
+- Fixed a real cross-run S5 resume bug surfaced by the existing
+  `test_s5_failed_classification_quarantines` test (40 stale `latest` FBs mixed into
+  the current run).
+
+**Verification:** 6 new tests in `tests/test_checkpoint_resume_d2409.py`; full suite
+34→40→47 green.
+**Files:** `pipeline/stage1_5_embed_cluster.py`, `pipeline/stage5_verify.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `tests/test_checkpoint_resume_d2409.py`
+**Source:** Session 2026-08-17 — T1.1 checkpoint/resume audit.
+
+---
+
 ### D2408 — response_format=json_object forces constrained decoding → empty gpt-oss-20b content — FIXED (2026-08-17)
 **Category:** BUGFIX / FAIL-CLOSED
 

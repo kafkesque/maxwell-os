@@ -1,5 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-17 | **Decisions:** D2000-D2408 (397 decisions)
+> **Updated:** 2026-08-17 | **Decisions:** D2000-D2410 (399 decisions)
+> **D2409/D2410 (this session):** S1.5 embedding cache + S5 incremental checkpoint/resume (crash recovery, 6 tests) — DONE. S4 metadata derivation audit fixes: temporal_scope boundary-match + no stopword "all" + contemporary-first, difficulty_map → live config (C12, 0/279 behavior drift), context "general" schema-legal (66/279 rows) — 7 tests → 47-test suite green. T1.1 stage PREPARED (caffeinate active, OMLX lazy-load 2/7 models, preflight clean).
 > **F1/D2401 (this session):** post-S4 enrichment `pipeline/stage4_5_enrich.py` implemented — produces `prerequisite_fbs`/`contradicts_fbs`/`procedural_skill` (gated `stage4_5.enabled: false` for T1.1).
 > **D2406/D2407 (this session):** session_seed.yaml YAML parse break fixed (boot/integrity); `run_production.py` dead code archived (C19); fail-closed regression tests added (`tests/test_fail_closed_d2402_2405.py`, 9 tests).
 > **D2408 + R3 canary rerun (this session):** `response_format=json_object` forced xgrammar constrained decoding → empty gpt-oss-20b content (Harmony conflict, same family as D2392) — now skipped for reasoning-off models (config-first). **R3 canary S4→S6 rerun COMPLETE (19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (`pipeline_run_id=canary`) + Parquet, ~87 min — no regression vs 235/43.**

@@ -28,26 +28,33 @@ import json
 import sys
 import time
 import urllib.request
+from pathlib import Path
 
-# ── Import from centralized config ────────────────────────────────────
+# ── Import from centralized config (D2410: was broken `tools.pipeline_paths` + no API key) ──
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT))
 try:
-    from tools.pipeline_paths import OMLX_URL
-except ImportError:
+    from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL
+except Exception:  # pragma: no cover — fallback for standalone use
     OMLX_URL = "http://localhost:11435"
+    OMLX_API_KEY = "sk-maxwell-local"
 
 OMLX_MODELS_URL = f"{OMLX_URL}/v1/models"
 
 # ── Pinned models (never auto-unload) ─────────────────────────────────
-PINNED_MODELS = {"Phi-4-mini-instruct-8bit", "gemma-4-E2B-it-MLX-4bit"}
+# T1.1: Phi-4-mini is the small probe model — stays hot (~3.8GB). The big
+# S2/S4 models (Qwen3-Coder-30B, gpt-oss-20b) are lazy-loaded on demand and
+# auto-unloaded when idle so the ~24GB combined budget is never exceeded.
+PINNED_MODELS = {"Phi-4-mini-instruct-8bit"}
 
 # ── Model memory estimates (GB, from OMLX observations) ──────────────
 MODEL_SIZES = {
     "Phi-4-mini-instruct-8bit": 3.80,
-    "gemma-4-E2B-it-MLX-4bit": 4.04,
     "gemma-4-E4B-it-MLX-4bit": 6.36,
     "Qwopus-GLM-18B": 8.73,
     "Ornith-1.0-9B-4bit": 4.69,
     "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 16.00,
+    "gpt-oss-20b-MXFP4-Q8": 15.00,  # D2410: S4 classifier — was missing (showed 0.0GB)
     "gemma-4-26B-A4B-it-OptiQ-4bit": 18.36,
     # "Qwen3.6-35B-A3B-4bit": 19.95,  # PHANTOM (BUG-036: config only, no weights)
     "gemma-4-31B-it-OptiQ-4bit": 22.43,
@@ -61,18 +68,25 @@ _last_used: dict[str, float] = {}
 
 
 def _api_get(url: str) -> dict:
-    """GET OMLX API, return JSON."""
-    req = urllib.request.Request(url, headers={"Content-Type": "application/json"})
+    """GET OMLX API, return JSON (D2410: auth header — /v1/models requires key)."""
+    req = urllib.request.Request(
+        url,
+        headers={"Content-Type": "application/json",
+                 "Authorization": f"Bearer {OMLX_API_KEY}"},
+    )
     with urllib.request.urlopen(req, timeout=10) as resp:
         return json.loads(resp.read())
 
 
 def _api_post(url: str, data: dict = None) -> dict:
-    """POST to OMLX API."""
+    """POST to OMLX API (D2410: auth header)."""
     body = json.dumps(data or {}).encode()
-    req = urllib.request.Request(url, data=body,
-                                  headers={"Content-Type": "application/json"},
-                                  method="POST")
+    req = urllib.request.Request(
+        url, data=body,
+        headers={"Content-Type": "application/json",
+                 "Authorization": f"Bearer {OMLX_API_KEY}"},
+        method="POST",
+    )
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.loads(resp.read())
 

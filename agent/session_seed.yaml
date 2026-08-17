@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: 'T1.1 GO. R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39) — S4 279/279 FBs (0 failed), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet, ~87 min; D2408 validated live; no regression vs 235/43 prior canary. 34 tests + integrity 10/10 + config audit green. Remaining = T1.1 full launch (fresh run from S0, fresh DB per D2396); domain-taxonomy promotion (G3) deferred to post-T1.1+D2345 (D2399).'
+    status: 'T1.1 GO / STAGE PREPARED (2026-08-17 21:17). D2409 (S1.5 embed cache + S5 incremental checkpoint/resume) + D2410 (temporal_scope boundary-match, difficulty_map C12, context "general") — 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. caffeinate -disu active, OMLX lazy-load (1/7 models resident after watchdog restart, on-demand per stage). Preflight clean (golden hash PASS, stress ALL_PASS). Canary DB archived → maxwell.db.pre_t11_20260817_211632.bak. Remaining = T1.1 full launch (operator go/no-go): archive/reset DB → python3 pipeline/runner.py --run-id t11 (fresh run from S0, D2396).'
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented

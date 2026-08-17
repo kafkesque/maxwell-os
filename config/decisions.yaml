@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-17T20:10:00Z'
-total_decisions: 397
+last_sync: '2026-08-17T19:14:38Z'
+total_decisions: 399
 decisions:
 - id: D2092
   category: INF
@@ -3209,17 +3209,32 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
+- id: D2409
+  category: INF
+  state: ACTIVE
+  description: S1.5/S5 checkpoint + resume (crash recovery for the two long serial stages) — DONE
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
+- id: D2410
+  category: CLS / CFG
+  state: ACTIVE
+  description: 'S4 metadata derivation audit fixes: temporal_scope boundary-match + difficulty_map C12 + context "general"
+    — DONE'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
 summary:
-  total: 397
+  total: 399
   proposed: 0
   draft: 1
-  active: 340
+  active: 342
   stale: 0
   superseded: 14
   archived: 8
   rejected: 8
   by_category:
-    INF: 176
+    INF: 177
     QLT: 34
     GOV: 20
     RES: 4
@@ -3274,3 +3289,4 @@ summary:
     BUGFIX / FAIL-CLOSED: 4
     BUGFIX / INTEGRITY: 1
     HYGIENE / TESTING: 1
+    CLS / CFG: 1

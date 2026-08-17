@@ -192,6 +192,7 @@ S4_CHECKPOINT_INTERVAL=int(_CFG.get("stage4", {}).get("checkpoint_interval", 5))
 # D2364/C12 (X7): signal sets from config (was hardcoded literals in stage4_merge.py / stage4_merged_call.py)
 S4_CONTEXT_SIGNALS=_CFG.get("stage4", {}).get("context_signals", {})        # {context_key: [domain signals]}
 S4_TEMPORAL_SIGNALS=_CFG.get("stage4", {}).get("temporal_signals", {})      # {timeless|contemporary: [keywords]}
+S4_DIFFICULTY_MAP=dict(_CFG.get("stage4", {}).get("difficulty_map", {}))    # D2410: {depth|domain_single|domain_multi: difficulty} (C12)
 S4_UNIVERSAL_SIGNALS=_CFG.get("stage4", {}).get("universal_signals", [])    # [name/mechanism substrings]
 S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed commit
 
@@ -217,6 +218,7 @@ S5_CONF_ENRICH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("en
 S5_CONF_ISOR_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("isor_weight", 0.40))
 S5_QUARANTINE_CONF_CAP=float(_CFG.get("stage5", {}).get("confidence", {}).get("quarantine_cap", 0.25))
 S5_HUMAN_REVIEW_ISOR=str(_CFG.get("stage5", {}).get("confidence", {}).get("human_review_isor_rating", "strong"))
+S5_CHECKPOINT_INTERVAL=int(_CFG.get("stage5", {}).get("checkpoint_interval", 50))  # D2409: intra-stage incremental checkpoint cadence (FBs)
 
 # ── NLI threshold sanity check (D2185: T1.4 — catch misconfigured thresholds) ──
 def _validate_nli_thresholds():
@@ -296,6 +298,7 @@ S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-m3
 S15_EMBED_CHUNK_SIZE = int(_CFG.get("stage1_5", {}).get("embed_chunk_size", 20000))  # D2189: chunked embedding
 S15_EMBED_BATCH_SIZE = int(_CFG.get("stage1_5", {}).get("embed_batch_size", 64))  # D2190: MPS forward batch
 S15_MAX_EMBED_DROP_RATE = float(_CFG.get("stage1_5", {}).get("max_embed_drop_rate", 0.005))  # D2275: embed quality gate
+S15_EMBED_CHECKPOINT_ENABLED = bool(_CFG.get("stage1_5", {}).get("embed_checkpoint_enabled", True))  # D2409: crash-safe incremental embedding cache
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])

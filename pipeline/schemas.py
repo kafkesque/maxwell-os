@@ -114,7 +114,7 @@ DIFFICULTY_LITERAL = Literal["beginner", "intermediate", "expert"]
 TEMPORAL_LITERAL = Literal["timeless", "contemporary", "era-specific"]
 ACCESSIBILITY_LITERAL = Literal["self-evident", "prerequisite"]
 INTIMACY_LITERAL = Literal["public", "selective", "private"]
-CONTEXT_LITERAL = Literal["business", "design", "system", "academic", "personal"]
+CONTEXT_LITERAL = Literal["business", "design", "system", "academic", "personal", "general"]
 PROVENANCE_LITERAL = Literal["human_verbatim", "llm_extracted_from_source", "llm_hypothesis"]
 VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 
@@ -651,7 +651,7 @@ class FB(StampedRecord):
     # ── Anytype properties (v1 schema parity) ─────────────────────────────
     context: str | None = Field(
         default=None,
-        description="Comma-separated multi-select: business, design, system, academic, personal. Never free text."
+        description="Comma-separated multi-select: business, design, system, academic, personal, general (unmatched domains). Never free text."
     )
     accessibility: ACCESSIBILITY_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
@@ -676,7 +676,7 @@ class FB(StampedRecord):
     # ── Agentic metadata (D2130) ──────────────────────────────────────────
     difficulty_level: DIFFICULTY_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
-        description="beginner | intermediate | expert — derived from depth + discipline count"
+        description="beginner | intermediate | expert — derived from depth + domain cardinality (config-first, D2410)"
     )
     temporal_scope: TEMPORAL_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,

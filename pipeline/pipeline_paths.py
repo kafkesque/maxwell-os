@@ -241,6 +241,23 @@ def _validate_nli_thresholds():
 _validate_nli_thresholds()
 S6_OKF_EXPORT_ENABLED=bool(_CFG.get("stage6", {}).get("okf_export_enabled", True))  # D2120
 
+# ── Stage 4.5 (F1/D2400): post-S4 enrichment — orphan-field producers ──
+# prerequisite_fbs / contradicts_fbs / procedural_skill are schema-declared and
+# committed by S6 but had NO producer (F1 finding). This enrichment is a
+# SEPARATE post-S4 stage — NOT inline-S4 (the ~39h bottleneck) and NOT S6
+# (persistence-only). Gated behind stage4_5.enabled (default false for T1.1).
+STAGE4_5_CHECKPOINT = S4_DIR / _rid() / "checkpoint_enriched.jsonl"
+S4_5_ENABLED = bool(_CFG.get("stage4_5", {}).get("enabled", False))
+S4_5_MODEL = str(_CFG.get("stage4_5", {}).get("model") or VERIFY_MODEL)
+S4_5_PROCEDURAL_ENABLED = bool(_CFG.get("stage4_5", {}).get("procedural_skill_enabled", True))
+S4_5_EDGE_ENABLED = bool(_CFG.get("stage4_5", {}).get("edge_enabled", True))
+S4_5_EDGE_CANDIDATE_THRESHOLD = float(_CFG.get("stage4_5", {}).get("edge_candidate_threshold", S4_SEMANTIC_NEAR_THRESHOLD))
+S4_5_EDGE_MAX_CANDIDATES_PER_FB = int(_CFG.get("stage4_5", {}).get("edge_max_candidates_per_fb", 10))
+S4_5_EDGE_MAX_TOKENS = int(_CFG.get("stage4_5", {}).get("edge_max_tokens", 512))
+S4_5_PROCEDURAL_MAX_TOKENS = int(_CFG.get("stage4_5", {}).get("procedural_skill_max_tokens", 256))
+S4_5_MAX_FAILED_RATIO = float(_CFG.get("stage4_5", {}).get("max_failed_ratio", 0.01))
+S4_5_CHECKPOINT_INTERVAL = int(_CFG.get("stage4_5", {}).get("checkpoint_interval", 5))
+
 # ── Reliability settings (D2231: C12 compliance) ──────────────────────
 RELIABILITY_STABLE_THRESHOLD = float(_CFG.get("reliability", {}).get("stable_threshold", 0.85))
 RELIABILITY_WATCH_THRESHOLD = float(_CFG.get("reliability", {}).get("watch_threshold", 0.50))

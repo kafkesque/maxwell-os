@@ -1,5 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-16 10:42 | **Decisions:** D2000-D2376 (365 decisions)
+> **Updated:** 2026-08-17 | **Decisions:** D2000-D2401 (390 decisions)
+> **F1/D2401 (this session):** post-S4 enrichment `pipeline/stage4_5_enrich.py` implemented — produces `prerequisite_fbs`/`contradicts_fbs`/`procedural_skill` (gated `stage4_5.enabled: false` for T1.1).
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants

@@ -153,11 +153,11 @@ phase:
         - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%
         - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts (post-T1.1+D2345), NOT canary
         - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only; orphan-field producers = post-S4 enrichment (F1)
+        - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests pass)
     pending:
         - D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary)
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
         - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py (reuse S1.5 clusters)
-        - F1 (future tax, D2400): build post-S4 producers for prerequisite_fbs/contradicts_fbs/procedural_skill (fold into D2345)
         - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256 (gated, BUG-132)
         - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining per-principle)
         - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id dup/skip after a live resume

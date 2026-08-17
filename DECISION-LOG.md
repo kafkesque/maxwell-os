@@ -3,6 +3,37 @@
 
 ---
 
+### D2401 — F1 implemented: post-S4 enrichment producers for orphan fields — DONE (2026-08-17)
+**Category:** ARCHITECTURE / PIPELINE
+
+**Finding (F1/D2400):** `prerequisite_fbs`, `contradicts_fbs`, and `procedural_skill` were
+schema-declared (`schemas.py`) + committed by S6 but had NO producer anywhere in the pipeline.
+`related_fbs` was the only one produced (via `compute_fb_relationships` at S4).
+
+**Decision (implementation):** Build a SEPARATE post-S4 enrichment stage — `pipeline/stage4_5_enrich.py` —
+that produces all three, honoring the D2400 contract:
+1. **NOT inline-S4** (S4 is the ~39h bottleneck) and **NOT S6** (persistence-only).
+2. `procedural_skill` = per-FB LLM classification (declarative knowledge vs executable tool name).
+3. `prerequisite_fbs` (directed upstream) + `contradicts_fbs` (bidirectional) = cosine-similarity
+   candidate generation (reusing S4's `semantic_near` signal) → ONE LLM call per candidate pair
+   to classify the directed dependency and/or conflict — avoids the infeasible O(n²) LLM pass.
+4. Config-first (C12): thresholds/model/flags under `stage4_5.*` in `pipeline_config.yaml`;
+   prompts are module constants (matches `stage4_merged_call.py` convention).
+5. R5: enrichment model = gpt-oss-20b (cross-family from the qwen S2 generator).
+6. C16 fail-closed: malformed LLM responses raise; `max_failed_ratio` gate mirrors D2338.
+7. C6 crash-safe `safe_write` + D2370-style intra-stage resume sidecar (`.state.json`).
+
+**Gating:** `stage4_5.enabled: false` — OFF for T1.1 (principle-only; the edge LLM pass is
+post-T1.1 cost). S5's `load_stage4_fbs()` prefers `STAGE4_5_CHECKPOINT` when present (backwards
+compatible — falls back to `STAGE4_CHECKPOINT`).
+
+**Status:** ✅ DONE (13 unit tests pass; py_compile + config parse + import smoke green).
+**Files:** `pipeline/stage4_5_enrich.py` (new), `pipeline/pipeline_paths.py`, `pipeline/stage5_verify.py`,
+`config/pipeline_config.yaml`, `tests/test_stage4_5_enrich.py` (new).
+**Source:** Session 2026-08-17 — operator request to implement F1 (D2400).
+
+---
+
 ### D2400 — Field-production contract: S4 is the producer layer, S6 is persistence-only — RESOLVED (2026-08-17)
 **Category:** ARCHITECTURE / GOVERNANCE
 

@@ -43,7 +43,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.io_guard import safe_write
+from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     S5_CONF_ENRICH_WEIGHT,  # D2310: confidence enrichment weight
@@ -55,6 +55,7 @@ from pipeline.pipeline_paths import (
     S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
     S5_QUARANTINE_CONF_CAP,  # D2310: confidence cap for QUARANTINE
+    STAGE4_5_CHECKPOINT,  # F1/D2400: enriched S4 checkpoint (preferred when present)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
 )
@@ -206,18 +207,19 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
 # ── Core verification functions ────────────────────────────────────────────
 
 def load_stage4_fbs() -> list[dict]:
-    """Load FBs from Stage 4 checkpoint."""
-    if not STAGE4_CHECKPOINT.exists():
+    """Load FBs from the (possibly enriched) Stage 4 checkpoint.
+
+    F1/D2400: prefer the post-S4 enriched checkpoint (STAGE4_5_CHECKPOINT) when
+    it exists, else fall back to the plain STAGE4_CHECKPOINT. Uses fail-closed
+    `load_jsonl` (D2332) so a pretty-printed/corrupt checkpoint raises instead
+    of silently dropping records.
+    """
+    source = STAGE4_5_CHECKPOINT if STAGE4_5_CHECKPOINT.exists() else STAGE4_CHECKPOINT
+    if not source.exists():
         print("❌ Stage 4 checkpoint not found. Run stage4_merge.py first.")
         sys.exit(1)
 
-    fbs = []
-    with open(STAGE4_CHECKPOINT) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                fbs.append(json.loads(line))
-    return fbs
+    return load_jsonl(source, context="S4 checkpoint")
 
 
 # ── D2298/D2283: Dead check functions removed ─────────────────────────────

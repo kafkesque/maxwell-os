@@ -3137,11 +3137,23 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
+- id: D2401
+  category: ARCHITECTURE / PIPELINE
+  state: ACTIVE
+  description: 'F1 implemented: post-S4 enrichment producers for prerequisite_fbs/contradicts_fbs/procedural_skill (stage4_5_enrich.py) — DONE'
+  champion: 2026-08-17 session
+  target_files:
+  - pipeline/stage4_5_enrich.py
+  - pipeline/pipeline_paths.py
+  - pipeline/stage5_verify.py
+  - config/pipeline_config.yaml
+  - tests/test_stage4_5_enrich.py
+  created: '2026-08-17'
 summary:
-  total: 389
+  total: 390
   proposed: 0
   draft: 1
-  active: 332
+  active: 333
   stale: 0
   superseded: 14
   archived: 8

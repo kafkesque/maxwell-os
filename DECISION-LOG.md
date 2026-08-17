@@ -3,6 +3,23 @@
 
 ---
 
+### D2408 — response_format=json_object forces constrained decoding → empty gpt-oss-20b content — FIXED (2026-08-17)
+**Category:** BUGFIX / FAIL-CLOSED
+
+**Finding:** `pipeline/omlx_call.py::call_omlx_json` hardcoded `response_format={"type": "json_object"}`
+(D2219). oMLX 0.6.0 translates this into constrained decoding (xgrammar), which conflicts with the
+Harmony reasoning format of gpt-oss-20b → returns empty content (0–2 tokens). Surface during the
+canary S4→S6 rerun as 100% D2371 "Empty/short application" quarantines + "content missing from message
+(reasoning-model cold reload?)" retries. Reproduced deterministically: 8/8 empty WITH response_format,
+10/10 full WITHOUT it (model warm). Same failure family as D2392 (grammar ON breaks gpt-oss-20b).
+
+**Fix:** skip `response_format` for models in `VERIFY_REASONING_OFF_MODELS` (gpt-oss-20b). Unfenced
+JSON is already handled by `parse_json_robust`. Non-reasoning models keep `json_object` mode.
+**Files:** pipeline/omlx_call.py
+**Source:** Session 2026-08-17 — operator-run canary S4→S6 rerun + close monitoring.
+
+---
+
 ### D2406 — session_seed.yaml YAML parse break (boot/integrity blocker) — FIXED (2026-08-17)
 **Category:** BUGFIX / INTEGRITY
 

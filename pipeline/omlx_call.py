@@ -374,13 +374,18 @@ def call_omlx_json(
     if system is None:
         system = "You are a precise JSON generator. Return ONLY valid JSON. No markdown, no explanation."
 
+    # D2408: response_format={"type": "json_object"} forces constrained decoding
+    # (xgrammar), which returns EMPTY content for Harmony reasoning models
+    # (gpt-oss-20b) — the same "empty content / Harmony conflict" as D2392.
+    # Skip it for reasoning-off models; parse_json_robust handles fences anyway.
+    _response_format = None if model in VERIFY_REASONING_OFF_MODELS else {"type": "json_object"}
     raw = call_omlx(
         prompt=prompt,
         model=model,
         system=system,
         max_tokens=max_tokens,
         timeout=timeout,
-        response_format={"type": "json_object"},  # D2219: A/B tested — valid JSON, no fence, 7% faster
+        response_format=_response_format,
         thinking_budget=thinking_budget,
     )
 

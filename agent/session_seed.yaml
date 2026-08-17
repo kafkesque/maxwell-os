@@ -160,6 +160,7 @@ phase:
         - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate FAILED→QUARANTINE — FIXED
         - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status + D2402 scalars — FIXED
         - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests (9 tests) — DONE
+        - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict) → skip for reasoning models — FIXED
     pending:
         - D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary)
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)

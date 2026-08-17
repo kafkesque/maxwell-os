@@ -1,8 +1,16 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-17 17:10 (pre-canary integrity audit: session_seed.yaml YAML parse break fixed D2406 + BUG-141; run_production.py dead code archived + fail-closed regression tests D2407)
+> **Last updated:** 2026-08-17 18:00 (canary S4→S6 rerun: response_format=json_object → empty gpt-oss-20b content, BUG-142 fixed D2408; also OMLX launchd port-conflict crash loop cleaned up)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🔴 BUG-142 — 2026-08-17 — `response_format={"type":"json_object"}` returns EMPTY content from gpt-oss-20b — FIXED (D2408)
+- **Symptom:** canary S4→S6 rerun quarantined every FB (`Empty/short application — D2371`); `call_omlx` logged "content missing from message (reasoning-model cold reload?)". gpt-oss-20b returned 2-token/0-token responses despite being loaded.
+- **Root cause:** `call_omlx_json` hardcoded `response_format={"type":"json_object"}` (D2219). This forces oMLX constrained decoding (xgrammar), which conflicts with gpt-oss-20b's Harmony reasoning format → empty content. Same family as D2392 ("grammar ON breaks gpt-oss-20b, empty content / Harmony conflict"). Reproduced: 8/8 empty WITH response_format, 10/10 full WITHOUT (model warm).
+- **Fix:** skip `response_format` for models in `VERIFY_REASONING_OFF_MODELS` (gpt-oss-20b); `parse_json_robust` handles unfenced JSON. **Files:** pipeline/omlx_call.py.
+- **Also cleaned this session (not a code bug):** `com.maxwell.omlx` launchd service was crash-looping on `[Errno 48] Address already in use` (86K errors) because it double-binds port 11435 against the oMLX.app server; unloaded it → CPU churn gone, gpt-oss-20b stabilized.
+
+
 
 ## 🟠 BUG-141 — 2026-08-17 — session_seed.yaml YAML parse break (boot/integrity blocker) — FIXED (D2406)
 - **Symptom:** 4/10 integrity checks FAIL (YAML parse, referenced-files, vector-dimensions, version-stamps), all cascading from one parse error; boot step 2 would fail loading the session config.

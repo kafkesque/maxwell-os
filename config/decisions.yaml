@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-17T15:06:10Z'
-total_decisions: 396
+last_sync: '2026-08-17T16:00:45Z'
+total_decisions: 397
 decisions:
 - id: D2092
   category: INF
@@ -3202,11 +3202,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
+- id: D2408
+  category: BUGFIX / FAIL-CLOSED
+  state: ACTIVE
+  description: response_format=json_object forces constrained decoding → empty gpt-oss-20b content — FIXED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
 summary:
-  total: 396
+  total: 397
   proposed: 0
   draft: 1
-  active: 339
+  active: 340
   stale: 0
   superseded: 14
   archived: 8
@@ -3264,6 +3271,6 @@ summary:
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     BUGFIX / RELIABILITY: 1
-    BUGFIX / FAIL-CLOSED: 3
+    BUGFIX / FAIL-CLOSED: 4
     BUGFIX / INTEGRITY: 1
     HYGIENE / TESTING: 1

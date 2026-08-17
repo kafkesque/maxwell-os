@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-17T19:14:38Z'
-total_decisions: 399
+last_sync: '2026-08-17T20:33:16Z'
+total_decisions: 400
 decisions:
 - id: D2092
   category: INF
@@ -3224,11 +3224,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
+- id: D2411
+  category: BUGFIX / CFG
+  state: ACTIVE
+  description: S1/S1.5 runner timeout null (long-pole stages) — FIXED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
 summary:
-  total: 399
+  total: 400
   proposed: 0
   draft: 1
-  active: 342
+  active: 343
   stale: 0
   superseded: 14
   archived: 8
@@ -3290,3 +3297,4 @@ summary:
     BUGFIX / INTEGRITY: 1
     HYGIENE / TESTING: 1
     CLS / CFG: 1
+    BUGFIX / CFG: 1

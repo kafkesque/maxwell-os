@@ -4,6 +4,12 @@
 
 ---
 
+## 🔴 BUG-143 — 2026-08-17 — S1 chunk + S1.5 embed runner timeouts (3600s) kill full-corpus T1.1 — FIXED (D2411)
+- **Symptom:** T1.1 launch (`--run-id t11`) stopped after 1h: `[Stage 1] Chunk — TIMEOUT (3600.0s); Pipeline complete — 2 done, 1 failed`. S1 was at ~414/940 books when killed (~1.5h needed for full corpus).
+- **Root cause:** `config/pipeline_config.yaml stages.timeouts.'1': 3600` and `'1.5': 3600`. D2402 nulled S2/S4 (same BUG-137 class) but missed S1 (chunk ~1.5h) and S1.5 (embed ~5h, D2409 incremental cache).
+- **Fix:** `'1': null`, `'1.5': null` (unlimited, like S2/S4). **Files:** config/pipeline_config.yaml. **Source:** live T1.1 run 2026-08-17 21:24 (kill 22:28) — verify-don't-assume caught what the frontier audits missed.
+- **Recovery:** `runner.py --run-id t11 --resume-from 1` — S0/S0.5 manifests COMPLETE (skipped); S1 re-runs deterministically (~1.5h). Time lost: ~1h of chunking.
+
 ## 🟢 R3 CANARY S4→S6 RERUN — COMPLETE (2026-08-17 19:22:39, ~87 min)
 - **Result:** S4 279/279 FBs (0 failed clusters, 0 quarantines, 52911 edges, 0 isolated) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (`pipeline_run_id=canary`), FTS 279, Parquet `fbs_snapshot_20260817_192235.parquet` (4482.4 KB), 0 taxonomy replacements.
 - **Regression check:** 236/43 ≈ prior canary 235/43 → D2402–D2405 + D2408 produced no behavioral drift.

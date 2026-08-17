@@ -3,6 +3,23 @@
 
 ---
 
+### D2411 — S1/S1.5 runner timeout null (long-pole stages) — FIXED (2026-08-17)
+**Category:** BUGFIX / CFG
+
+**Finding:** Live T1.1 launch (`--run-id t11`, 21:24) stopped after 1h at
+`[Stage 1] Chunk — TIMEOUT (3600.0s)` with S1 only ~414/940 books through the corpus.
+`stages.timeouts` had `'1': 3600` and `'1.5': 3600` — D2402 (BUG-137) nulled S2/S4
+but missed the other two long-pole stages: S1 chunk (~1.5h for 940 books → ~323K
+segments) and S1.5 embed+cluster (~5h, D2409 incremental cache). Same failure family
+as BUG-137; the frontier audits never flagged S1/S1.5 because the canary covered only
+a corpus subset.
+
+**Fix:** `'1': null`, `'1.5': null` (unlimited, like S2/S4).
+**Files:** `config/pipeline_config.yaml`
+**Source:** Session 2026-08-17 — live T1.1 run (kill at 22:28) — verify-don't-assume.
+
+---
+
 ### D2410 — S4 metadata derivation audit fixes: temporal_scope boundary-match + difficulty_map C12 + context "general" — DONE (2026-08-17)
 **Category:** CLS / CFG
 

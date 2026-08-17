@@ -26,9 +26,9 @@ stages:
   timeouts:
     '0': 3600
     '0.5': 3600
-    '1': 3600
+    '1': null        # BUG-143/D2411: full-corpus chunk (940 books → ~323K segs) takes ~1.5h
     '1.3': 3600
-    '1.5': 3600
+    '1.5': null      # BUG-143/D2411: full-corpus embed+cluster is multi-hour (D2409 incremental cache)
     '2': null
     '4': null
     '5': 3600

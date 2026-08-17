@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: T1.1 GO (D2398). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). All post-canary fixes re-validated live: grammar OFF (D2392), depth prompt (D2393 → cross-domain 86.3%→21.6%), taxonomy (D2394 → discipline emerging 32.0%→15.5%), DB reset (D2396), golden verbatim (D2397). Preflight + stress + integrity green. Remaining = T1.1 full launch; domain-taxonomy promotion (G3) deferred to post-T1.1+D2345 (D2399).
+    status: 'T1.1 GO (D2398). Canary S2→S6 complete (279→278 FBs, S5 235 PASS, S6 278 committed). All post-canary fixes re-validated live: grammar OFF (D2392), depth prompt (D2393 → cross-domain 86.3%→21.6%), taxonomy (D2394 → discipline emerging 32.0%→15.5%), DB reset (D2396), golden verbatim (D2397). Preflight + stress + integrity green. Remaining = T1.1 full launch; domain-taxonomy promotion (G3) deferred to post-T1.1+D2345 (D2399).'
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented
@@ -154,10 +154,12 @@ phase:
         - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts (post-T1.1+D2345), NOT canary
         - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only; orphan-field producers = post-S4 enrichment (F1)
         - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests pass)
-        - D2402: S4 runner timeout '4': 3600 → null (unlimited, like S2) — FIXED
+        - "D2402: S4 runner timeout '4': 3600 → null (unlimited, like S2) — FIXED"
         - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
         - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from processed_ids — FIXED
         - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate FAILED→QUARANTINE — FIXED
+        - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status + D2402 scalars — FIXED
+        - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests (9 tests) — DONE
     pending:
         - D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary)
         - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)

@@ -3,6 +3,38 @@
 
 ---
 
+### D2406 — session_seed.yaml YAML parse break (boot/integrity blocker) — FIXED (2026-08-17)
+**Category:** BUGFIX / INTEGRITY
+
+**Finding:** Two unquoted scalars in agent/session_seed.yaml contained `: ` (colon-space) sequences
+that YAML parses as nested mapping keys: `phase.status` (…re-validated live: grammar OFF…) and the
+`D2402` list entry (…runner timeout '4': 3600…). This broke the whole file's YAML parse, cascading
+into 4/10 integrity-check failures (YAML parse, referenced-files, vector-dimensions, version-stamps)
+and would break boot step 2 ("Load agent/session_seed.yaml").
+
+**Fix:** single-quote `phase.status`; double-quote the D2402 list entry (it contains a single-quoted
+`'4'`). Re-verified: 12/12 YAML files parse, integrity 10/10.
+**Files:** agent/session_seed.yaml
+
+### D2407 — Dead-code purge (run_production.py) + fail-closed regression coverage — DONE (2026-08-17)
+**Category:** HYGIENE / TESTING
+
+**Finding:**
+1. `pipeline/run_production.py` was an orphaned v2.0 alternate entry point — per-book extraction over
+   hardcoded `DOMAIN N …` paths, referencing a non-existent `full_run.py`, with zero references from
+   justfile/runner/orchestration (C19 dead code).
+2. The D2402–D2405 fail-closed fixes had no automated regression coverage (code-review only).
+
+**Fix:**
+1. Archive `pipeline/run_production.py` → `archive/run_production.py.archived-2026-08-17` (C19).
+2. Add `tests/test_fail_closed_d2402_2405.py` — 9 model-free tests: S5 mechanism-quality config-first
+   thresholds, S5 classification-FAILED→QUARANTINE gate (D2405), S2 schema gate (D2403), S4
+   classification gate (D2404). 34-test suite green.
+**Files:** `pipeline/run_production.py` (archived), `tests/test_fail_closed_d2402_2405.py` (new)
+**Source:** Session 2026-08-17 — pre-canary integrity audit + remaining-priority execution.
+
+---
+
 ### D2402 — S4 runner timeout 1h vs multi-hour full-corpus — FIXED (2026-08-17)
 **Category:** BUGFIX / RELIABILITY
 

@@ -1,8 +1,15 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-17 16:30 (frontier T1.1 audit 4b55797: 4 blockers D2402-D2405 fixed — S4 timeout, S2 NULL-rebrand, S4 resume retry, S4 fabricated cited + S5 FAILED gate; BUG-137..140 logged)
+> **Last updated:** 2026-08-17 17:10 (pre-canary integrity audit: session_seed.yaml YAML parse break fixed D2406 + BUG-141; run_production.py dead code archived + fail-closed regression tests D2407)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟠 BUG-141 — 2026-08-17 — session_seed.yaml YAML parse break (boot/integrity blocker) — FIXED (D2406)
+- **Symptom:** 4/10 integrity checks FAIL (YAML parse, referenced-files, vector-dimensions, version-stamps), all cascading from one parse error; boot step 2 would fail loading the session config.
+- **Root cause:** unquoted `: ` (colon-space) in `phase.status` (`…live: grammar OFF…`) and the `D2402` completed-list entry (`…'4': 3600…`) → YAML treats them as nested mapping keys.
+- **Fix:** quote both scalars (single-quote `status`; double-quote the `'4'`-containing list entry). **Files:** agent/session_seed.yaml. **Source:** 2026-08-17 pre-canary integrity audit.
+
+
 
 ## 🟠 BUG-137 — 2026-08-17 — S4 runner timeout '4': 3600 (1h) vs multi-hour full-corpus S4 — FIXED (D2402)
 - **Symptom:** unattended T1.1 run killed at S4 after 1h; runner.py treats TimeoutExpired as stage failure and stops.

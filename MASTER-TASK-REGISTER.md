@@ -1,6 +1,7 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-17 | **Decisions:** D2000-D2405 (394 decisions)
+> **Updated:** 2026-08-17 | **Decisions:** D2000-D2407 (396 decisions)
 > **F1/D2401 (this session):** post-S4 enrichment `pipeline/stage4_5_enrich.py` implemented — produces `prerequisite_fbs`/`contradicts_fbs`/`procedural_skill` (gated `stage4_5.enabled: false` for T1.1).
+> **D2406/D2407 (this session):** session_seed.yaml YAML parse break fixed (boot/integrity); `run_production.py` dead code archived (C19); fail-closed regression tests added (`tests/test_fail_closed_d2402_2405.py`, 9 tests).
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298). Final. No ongoing human adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2), GPT-OSS-20B (S4 classifier), DeBERTa-v3-large (S5 verifier), bge-m3 (Emb)
 > **Redundant/Removed:** RoBERTa-large, Phi-4-mini (S5), all Gemma variants
@@ -22,7 +23,9 @@
 | 3 | P3 | S4 classification-failed clusters unrecoverable on resume | exclude FAILED clusters from processed_ids | ✅ D2404 |
 | 4 | P4 | S4 fabricates evidence="cited" + S5 can PASS classification_status=FAILED | remove cited; S5 gates FAILED→QUARANTINE | ✅ D2405 |
 
-**Also worth doing now (non-blocking):** vectorize compute_fb_relationships (O(n²)→matmul); S5 mechanism thresholds → config (C12).
+**Also worth doing now (DONE in D2402-D2405 session):** vectorize compute_fb_relationships (O(n²)→matmul); S5 mechanism thresholds → config (C12).
+**Post-fix integrity audit (D2406/D2407, 2026-08-17):** session_seed.yaml YAML parse break fixed → integrity 10/10, 12/12 YAML parse;
+`run_production.py` dead code archived (C19); 9 fail-closed regression tests added → 34-test suite green.
 **Post-T1.1 hardening (logged, not blocking):** MPS renormalization, K-means degraded-marker, probe-cache fingerprint,
 canonical source_id grouping, verbatim evidence verification, S4.5 runner registration, NLI calibration-data commit.
 # 🔴 NEW THIS SESSION — 5-LLM Verification Round (D2367) — preflight/registry sync

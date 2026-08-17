@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-16
+# Last manual edit: 2026-08-17
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-16T22:20:35Z'
-total_decisions: 389
+last_sync: '2026-08-17T15:06:10Z'
+total_decisions: 396
 decisions:
 - id: D2092
   category: INF
@@ -3140,7 +3140,8 @@ decisions:
 - id: D2401
   category: ARCHITECTURE / PIPELINE
   state: ACTIVE
-  description: 'F1 implemented: post-S4 enrichment producers for prerequisite_fbs/contradicts_fbs/procedural_skill (stage4_5_enrich.py) — DONE'
+  description: 'F1 implemented: post-S4 enrichment producers for prerequisite_fbs/contradicts_fbs/procedural_skill (stage4_5_enrich.py)
+    — DONE'
   champion: 2026-08-17 session
   target_files:
   - pipeline/stage4_5_enrich.py
@@ -3152,7 +3153,8 @@ decisions:
 - id: D2402
   category: BUGFIX / RELIABILITY
   state: ACTIVE
-  description: 'Frontier T1.1 audit (4b55797): S4 runner timeout "4": 3600 (1h) vs multi-hour full-corpus S4 — set to null (unlimited, like S2)'
+  description: 'Frontier T1.1 audit (4b55797): S4 runner timeout "4": 3600 (1h) vs multi-hour full-corpus S4 — set to null
+    (unlimited, like S2)'
   champion: 2026-08-17 session
   target_files:
   - config/pipeline_config.yaml
@@ -3161,7 +3163,8 @@ decisions:
 - id: D2403
   category: BUGFIX / FAIL-CLOSED
   state: ACTIVE
-  description: 'Frontier T1.1 audit: S2 schema-invalid output rebranded as NULL + permanently processed — 3-state FB/NULL/FAILED; schema failure = failed_clusters (retried on resume)'
+  description: 'Frontier T1.1 audit: S2 schema-invalid output rebranded as NULL + permanently processed — 3-state FB/NULL/FAILED;
+    schema failure = failed_clusters (retried on resume)'
   champion: 2026-08-17 session
   target_files:
   - pipeline/stage2_extract.py
@@ -3169,7 +3172,8 @@ decisions:
 - id: D2404
   category: BUGFIX / FAIL-CLOSED
   state: ACTIVE
-  description: 'Frontier T1.1 audit: S4 classification-failed clusters marked processed -> unrecoverable on resume — exclude FAILED clusters from processed_ids so resume retries them'
+  description: 'Frontier T1.1 audit: S4 classification-failed clusters marked processed -> unrecoverable on resume — exclude
+    FAILED clusters from processed_ids so resume retries them'
   champion: 2026-08-17 session
   target_files:
   - pipeline/stage4_merge.py
@@ -3177,17 +3181,32 @@ decisions:
 - id: D2405
   category: BUGFIX / FAIL-CLOSED
   state: ACTIVE
-  description: 'Frontier T1.1 audit: S4 fabricates evidence="cited" on classification failure + S5 can PASS classification_status=FAILED — remove fabricated cited; S5 gates FAILED -> QUARANTINE'
+  description: 'Frontier T1.1 audit: S4 fabricates evidence="cited" on classification failure + S5 can PASS classification_status=FAILED
+    — remove fabricated cited; S5 gates FAILED -> QUARANTINE'
   champion: 2026-08-17 session
   target_files:
   - pipeline/stage4_merge.py
   - pipeline/stage5_verify.py
   created: '2026-08-17'
+- id: D2406
+  category: BUGFIX / INTEGRITY
+  state: ACTIVE
+  description: session_seed.yaml YAML parse break (boot/integrity blocker) — FIXED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
+- id: D2407
+  category: HYGIENE / TESTING
+  state: ACTIVE
+  description: Dead-code purge (run_production.py) + fail-closed regression coverage — DONE
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-17'
 summary:
-  total: 394
+  total: 396
   proposed: 0
   draft: 1
-  active: 337
+  active: 339
   stale: 0
   superseded: 14
   archived: 8
@@ -3243,3 +3262,8 @@ summary:
     GOVERNANCE / QUALITY: 1
     GOVERNANCE / DATA: 1
     ARCHITECTURE / GOVERNANCE: 1
+    ARCHITECTURE / PIPELINE: 1
+    BUGFIX / RELIABILITY: 1
+    BUGFIX / FAIL-CLOSED: 3
+    BUGFIX / INTEGRITY: 1
+    HYGIENE / TESTING: 1

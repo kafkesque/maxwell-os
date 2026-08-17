@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-17 16:30 | **Decisions:** D2000-D2405 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400).**
+> **Updated:** 2026-08-17 17:10 | **Decisions:** D2000-D2407 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407).**
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
@@ -73,7 +73,7 @@
 |---|------|----------|
 | R1 | **`extraction_type` default over-claim** — all `.get(..., "causal_mechanism")` → `""` + >95% dominance canary (D2376). | ✅ DONE (D2376) |
 | R2 | **`source_ids` provenance gap** — restored schema field + S4 derivation + S6 column (D2376). | ✅ DONE (D2376) |
-| R3 | **Canary S4→S6 rerun** — verify D2371–D2376 + speed knobs end-to-end against the fixed 180-FB checkpoint (see `tools/canary_rerun_s4onward.sh`). | P1 (pre-launch) — **DEFERRED to next query (user)** |
+| R3 | **Canary S4→S6 rerun** — verify D2371–D2376 + speed knobs + D2402-D2405 fail-closed paths end-to-end against the fixed 180-FB checkpoint (see `tools/canary_rerun_s4onward.sh`). Fail-closed *decision logic* now unit-covered (`tests/test_fail_closed_d2402_2405.py`, 9 tests, D2407); a full failure-injection pass (kill/restart on a real cluster) remains part of this rerun. | P1 (pre-launch) — **DEFERRED to next query (user)** |
 | R4 | T-015 golden depth balance (≥5 universal + ≥5 specialized) — verbatim-mining deferred. | P2 (spec in MTR T-015) |
 
 ### New findings this session (2026-08-16 — D2376 audit)

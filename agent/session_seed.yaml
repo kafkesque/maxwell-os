@@ -121,7 +121,7 @@ boot:
 # ── Phase Tracking ──
 phase:
     current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: 'T1.1 GO / STAGE PREPARED (2026-08-17 21:17). D2409 (S1.5 embed cache + S5 incremental checkpoint/resume) + D2410 (temporal_scope boundary-match, difficulty_map C12, context "general") — 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. caffeinate -disu active, OMLX lazy-load (1/7 models resident after watchdog restart, on-demand per stage). Preflight clean (golden hash PASS, stress ALL_PASS). Canary DB archived → maxwell.db.pre_t11_20260817_211632.bak. Remaining = T1.1 full launch (operator go/no-go): archive/reset DB → python3 pipeline/runner.py --run-id t11 (fresh run from S0, D2396).'
+    status: 'T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge pipeline/runner_t11_20260817_212404.log). S0 ✅ 940/940, S0.5 ✅ cached, S1 chunking → S1.5 embed (D2409 incremental cache) → S2 (~25-40h long pole) → S4 (~39h) → S5 → S6. Fresh DB per D2396 (canary archived maxwell.db.pre_t11_20260817_211632.bak). caffeinate -disu active, OMLX lazy-load on demand, watchdog per-stage. D2409/D2410 committed 3e6a383. Monitor: python3 pipeline/status.py; tail -f "knowledge pipeline/runner_t11_20260817_212404.log" (block-buffered under nohup — bursts); resume: python3 pipeline/runner.py --run-id t11 --resume-from <stage>.'
     completed:
         - Phase 0: 14/14 foundation fixes ✅
         - Phase 0.5: cleaning pipeline spec'd, partially implemented

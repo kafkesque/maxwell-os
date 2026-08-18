@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-18T05:37:38Z'
-total_decisions: 401
+last_sync: '2026-08-18T12:25:00Z'
+total_decisions: 402
 decisions:
 - id: D2092
   category: INF
@@ -3238,11 +3238,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-18'
+- id: D2414
+  category: OPS / DATA
+  state: ACTIVE
+  description: 'T1.1 disk-full remediation: purge stale pre-T1.1 diagnostic corpus dirs — DONE'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-18'
 summary:
-  total: 401
+  total: 402
   proposed: 0
   draft: 1
-  active: 344
+  active: 345
   stale: 0
   superseded: 14
   archived: 8
@@ -3306,3 +3313,4 @@ summary:
     CLS / CFG: 1
     BUGFIX / CFG: 1
     PERF / BUGFIX: 1
+    OPS / DATA: 1

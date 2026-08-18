@@ -3,6 +3,25 @@
 
 ---
 
+### D2414 — T1.1 disk-full remediation: purge stale pre-T1.1 diagnostic corpus dirs — DONE (2026-08-18)
+**Category:** OPS / DATA
+
+**Finding:** Disk at 100% capacity (~1.7Gi free of 926Gi) during T1.1 S2. Project held
+~9G of stale pre-T1.1 diagnostic chunk dirs — six × 1.4G duplicates of the same
+299K-segment chunking (symlink_test, final_diag, latest, diagnostic_20260812_002246,
+diagnostic_20260811_232853, "Klaus Beyer's conflicted copy") + stage1_5/latest — all
+superseded by t11 (S2 reads stage1_chunk/t11 only). Also a D2409 embed-cache deletion
+backup (604M) that was already confirmed-deleted.
+
+**Decision:** delete stale diagnostic dirs via safe_delete.py (R-D410), then purge the
+transient deletion backups so the space is actually freed (they'd otherwise negate the
+reclaim). Regenerable from books/ via S0→S1; canary output already captured in DB
+backups + Parquet + DECISION-LOG.
+**Files:** safe_delete.py + backup purge.
+**Source:** Session 2026-08-18 — disk-full during T1.1.
+
+---
+
 ### D2412 — S1.5 build_clusters 27-min grind: get_git_commit() subprocess-per-record — FIXED (2026-08-18)
 **Category:** PERF / BUGFIX
 

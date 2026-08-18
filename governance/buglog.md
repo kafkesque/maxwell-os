@@ -4,6 +4,11 @@
 
 ---
 
+## 🔴 BUG-144 — 2026-08-18 — S1.5 build_clusters ~27 min silent grind (git subprocess per record) — FIXED (D2412)
+- **Symptom:** T1.1 S1.5 looked hung ~27 min after "sub-clusters created" — ~78% CPU, no log output, checkpoint not written. NOT a deadlock (CPU busy) but a pathological slowdown.
+- **Root cause:** `stamp_record()` (pipeline/stamp.py:133) → `get_pipeline_commit()` → `get_git_commit()` spawned `git rev-parse --short HEAD` as a subprocess on EVERY call, with NO memoization. `build_clusters()` stamps every cluster AND every singleton (~200K records) → ~200K subprocess spawns (~10ms each ≈ 27-33 min). `_PIPELINE_RUN_ID` (P0.9) and `_MANIFEST_HASH` (D2282) were memoized; `get_git_commit` was missed.
+- **Fix:** memoize `get_git_commit()` via module-level `_GIT_COMMIT` singleton. 2 calls now 12.8ms (incl. first spawn) vs ~10ms each. **Files:** pipeline/stamp.py. **Source:** live T1.1 run 2026-08-18.
+
 ## 🔴 BUG-143 — 2026-08-17 — S1 chunk + S1.5 embed runner timeouts (3600s) kill full-corpus T1.1 — FIXED (D2411)
 - **Symptom:** T1.1 launch (`--run-id t11`) stopped after 1h: `[Stage 1] Chunk — TIMEOUT (3600.0s); Pipeline complete — 2 done, 1 failed`. S1 was at ~414/940 books when killed (~1.5h needed for full corpus).
 - **Root cause:** `config/pipeline_config.yaml stages.timeouts.'1': 3600` and `'1.5': 3600`. D2402 nulled S2/S4 (same BUG-137 class) but missed S1 (chunk ~1.5h) and S1.5 (embed ~5h, D2409 incremental cache).

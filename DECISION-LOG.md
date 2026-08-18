@@ -3,6 +3,22 @@
 
 ---
 
+### D2412 — S1.5 build_clusters 27-min grind: get_git_commit() subprocess-per-record — FIXED (2026-08-18)
+**Category:** PERF / BUGFIX
+
+**Finding:** T1.1 S1.5 stalled silently ~27 min at ~78% CPU after "sub-clusters created"
+(build_clusters — a step with no progress logging). Root cause: `stamp_record()` →
+`get_pipeline_commit()` → `get_git_commit()` spawned `git rev-parse --short HEAD` as a
+subprocess on EVERY call with no memoization. build_clusters stamps ~200K cluster+singleton
+records → ~200K subprocess spawns (~10ms each ≈ 27-33 min). `_PIPELINE_RUN_ID` (P0.9) and
+`_MANIFEST_HASH` (D2282) were memoized, but `get_git_commit` was missed.
+
+**Fix:** memoize `get_git_commit()` via `_GIT_COMMIT` module singleton (mirrors existing pattern).
+**Files:** `pipeline/stamp.py`
+**Source:** Session 2026-08-18 — live T1.1 run — verify-don't-assume.
+
+---
+
 ### D2411 — S1/S1.5 runner timeout null (long-pole stages) — FIXED (2026-08-17)
 **Category:** BUGFIX / CFG
 

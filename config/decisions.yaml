@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-17
+# Last manual edit: 2026-08-18
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-17T20:33:16Z'
-total_decisions: 400
+last_sync: '2026-08-18T05:37:38Z'
+total_decisions: 401
 decisions:
 - id: D2092
   category: INF
@@ -3231,11 +3231,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
+- id: D2412
+  category: PERF / BUGFIX
+  state: ACTIVE
+  description: 'S1.5 build_clusters 27-min grind: get_git_commit() subprocess-per-record — FIXED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-18'
 summary:
-  total: 400
+  total: 401
   proposed: 0
   draft: 1
-  active: 343
+  active: 344
   stale: 0
   superseded: 14
   archived: 8
@@ -3298,3 +3305,4 @@ summary:
     HYGIENE / TESTING: 1
     CLS / CFG: 1
     BUGFIX / CFG: 1
+    PERF / BUGFIX: 1

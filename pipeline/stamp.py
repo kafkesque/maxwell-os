@@ -29,8 +29,22 @@ from pathlib import Path
 from pipeline.pipeline_paths import SCHEMA_VERSION, TAXONOMY_VERSION
 
 
+# Memoized: the git commit never changes within a process. Caching here stops
+# ~200K subprocess spawns when stamp_record() is called per cluster/singleton in
+# S1.5 build_clusters (BUG-144: 27+ min silent grind). Mirrors _PIPELINE_RUN_ID
+# and _MANIFEST_HASH singleton pattern.
+_GIT_COMMIT: str | None = None
+
+
 def get_git_commit() -> str:
-    """Get current git commit hash (short). Returns 'unknown' if not in git repo."""
+    """Get current git commit hash (short). Returns 'unknown' if not in git repo.
+
+    Memoized: git rev-parse is a subprocess (~5-10ms); stamp_record() calls
+    this once per record, which in S1.5's build_clusters loop is ~200K spawns (~27 min).
+    """
+    global _GIT_COMMIT
+    if _GIT_COMMIT is not None:
+        return _GIT_COMMIT
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
@@ -39,10 +53,12 @@ def get_git_commit() -> str:
             timeout=5,
         )
         if result.returncode == 0:
-            return result.stdout.strip()
+            _GIT_COMMIT = result.stdout.strip()
+            return _GIT_COMMIT
     except Exception:
         pass
-    return "unknown"
+    _GIT_COMMIT = "unknown"
+    return _GIT_COMMIT
 
 
 def get_pipeline_commit() -> str:

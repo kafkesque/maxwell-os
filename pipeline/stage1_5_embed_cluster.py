@@ -647,6 +647,10 @@ def build_clusters(
     pipeline_commit: str = get_pipeline_commit()
     cluster_records: list[dict] = []
     singleton_records: list[dict] = []
+    # D2413: progress logging — build_clusters previously ran silently over ~200K
+    # records (27+ min with no output; BUG-144). Emit a line every 5000 records.
+    total_records: int = len(multi) + len(singles)
+    _built: int = 0
 
     # D2176: Canonical source identity for diversity counting.
     # OLD: source_diversity = len(distinct filenames). Same book with
@@ -675,6 +679,9 @@ def build_clusters(
         cluster = stamp_record(cluster, gen_model=S15_EMBED_MODEL)
         cluster["pipeline_commit"] = pipeline_commit
         cluster_records.append(cluster)
+        _built += 1
+        if total_records and _built % 5000 == 0:
+            print(f"      build_clusters: {_built}/{total_records} records ({100 * _built / total_records:.1f}%)")
 
     for cid, idxs in singles.items():
         seg_ids = [segments[i].get("segment_id", f"seg_{i}") for i in idxs]
@@ -700,6 +707,9 @@ def build_clusters(
         singleton = stamp_record(singleton, gen_model=S15_EMBED_MODEL)
         singleton["pipeline_commit"] = pipeline_commit
         singleton_records.append(singleton)
+        _built += 1
+        if total_records and _built % 5000 == 0:
+            print(f"      build_clusters: {_built}/{total_records} records ({100 * _built / total_records:.1f}%)")
 
     return cluster_records, singleton_records
 

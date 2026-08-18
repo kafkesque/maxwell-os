@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-18T12:25:00Z'
-total_decisions: 402
+last_sync: '2026-08-18T14:44:29Z'
+total_decisions: 403
 decisions:
 - id: D2092
   category: INF
@@ -3245,11 +3245,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-18'
+- id: D2415
+  category: QLT / PROMPT
+  state: ACTIVE
+  description: 'S2 taxonomy conflation: tool_instruction in extraction_type — LOGGED'
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-18'
 summary:
-  total: 402
+  total: 403
   proposed: 0
   draft: 1
-  active: 345
+  active: 346
   stale: 0
   superseded: 14
   archived: 8
@@ -3314,3 +3321,4 @@ summary:
     BUGFIX / CFG: 1
     PERF / BUGFIX: 1
     OPS / DATA: 1
+    QLT / PROMPT: 1

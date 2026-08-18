@@ -3,6 +3,17 @@
 
 ---
 
+### D2415 — S2 taxonomy conflation: tool_instruction in extraction_type — LOGGED (2026-08-18)
+**Category:** QLT / PROMPT
+
+**Finding:** 3 schema-validation failures in T1.1 S2, all `Invalid extraction_type 'tool_instruction'` — Qwen3-Coder writes a content_type value into extraction_type on tooling clusters (Grammar of Graphics, Interactive Chart Customization/Visualization). Systematic, not random. Fail-closed gate (D2323) correctly rejects; clusters marked FAILED (D2403), auto-retried on resume.
+
+**Decision:** non-blocking. Fix S2 prompt post-T1.1 (1-line content_type/extraction_type disambiguation), then targeted `--resume-from 2` to retry the 3 failed clusters. No full S2 rerun (3 FBs of ~3,556; 25–40h rerun not warranted).
+**Files:** governance/buglog.md (BUG-145)
+**Source:** Session 2026-08-18 — live T1.1 run.
+
+---
+
 ### D2414 — T1.1 disk-full remediation: purge stale pre-T1.1 diagnostic corpus dirs — DONE (2026-08-18)
 **Category:** OPS / DATA
 

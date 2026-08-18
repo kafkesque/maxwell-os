@@ -4,6 +4,13 @@
 
 ---
 
+## 🟡 BUG-145 — 2026-08-18 — S2 model conflates extraction_type/content_type ('tool_instruction') — OPEN (post-T1.1 prompt fix)
+- **Symptom:** 3 schema-validation failures in S2, all identical: `Invalid extraction_type 'tool_instruction'` (cluster_14150_s7_sub2, cluster_17097_s1_sub1, cluster_17097_s1_sub2 — all data-viz/tooling clusters: Grammar of Graphics, Interactive Chart Customization/Visualization).
+- **Root cause:** Qwen3-Coder emits `tool_instruction` into `extraction_type`, but that value belongs in `content_type`. `extraction_type` = epistemic form (causal_mechanism|empirical_pattern|normative_heuristic|descriptive_model|none); `content_type` = object kind (principle|process_template|process_instance|growth_edge|tool_instruction). The model flags tool-specific content but writes it into the wrong field. Systematic (not random) — all 3 in tooling clusters.
+- **Impact:** 3/1142 clusters (0.26%). Fail-closed gate (D2323) correctly rejects → cluster marked FAILED (D2403) → auto-retried on resume. No data loss; 3 potential FBs of ~3,556 missed if unfixed.
+- **Fix (post-T1.1):** 1-line prompt tightening in S2 SYSTEM_PROMPT/SINGLETON_SYSTEM, then targeted `--resume-from 2` to retry the 3 failed clusters. No full S2 rerun.
+- **Source:** live T1.1 run 2026-08-18.
+
 ## 🔴 BUG-144 — 2026-08-18 — S1.5 build_clusters ~27 min silent grind (git subprocess per record) — FIXED (D2412)
 - **Symptom:** T1.1 S1.5 looked hung ~27 min after "sub-clusters created" — ~78% CPU, no log output, checkpoint not written. NOT a deadlock (CPU busy) but a pathological slowdown.
 - **Root cause:** `stamp_record()` (pipeline/stamp.py:133) → `get_pipeline_commit()` → `get_git_commit()` spawned `git rev-parse --short HEAD` as a subprocess on EVERY call, with NO memoization. `build_clusters()` stamps every cluster AND every singleton (~200K records) → ~200K subprocess spawns (~10ms each ≈ 27-33 min). `_PIPELINE_RUN_ID` (P0.9) and `_MANIFEST_HASH` (D2282) were memoized; `get_git_commit` was missed.

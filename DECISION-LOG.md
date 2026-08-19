@@ -3,6 +3,17 @@
 
 ---
 
+### D2416 — S2 summary gate content_type-blindness (PT/PI/GE potential discarded) — LOGGED (2026-08-19)
+**Category:** QLT / PROMPT
+
+**Finding:** The S2 summary gate keys solely on `is_summary` with no content_type awareness — a cluster flagged is_summary is skipped wholesale even if it could yield a process_template/process_instance/growth_edge. 6,127 clusters (63%) gated; checkpoint content_type is ~99% principle (0 process_instance, 0 growth_edge). Prompt conflates "no extractable mechanism" with "no extractable object of any type".
+
+**Decision:** post-T1.1 fix (with BUG-145): content_type-aware gate + prompt tightening. Non-blocking for T1.1.
+**Files:** governance/buglog.md (BUG-146)
+**Source:** Session 2026-08-19 — live T1.1 run audit.
+
+---
+
 ### D2415 — S2 taxonomy conflation: tool_instruction in extraction_type — LOGGED (2026-08-18)
 **Category:** QLT / PROMPT
 

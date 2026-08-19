@@ -2,7 +2,7 @@
 # ================================
 # Authority: governance/decision_lifecycle.yaml §expansion_policy
 # Auto-synced from DECISION-LOG.md by tools/sync_decisions.py
-# Last manual edit: 2026-08-18
+# Last manual edit: 2026-08-19
 #
 # This file tracks the STATE of each decision from DECISION-LOG.md.
 # DECISION-LOG.md is the source of truth for decision CONTENT.
@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-18T14:44:29Z'
-total_decisions: 403
+last_sync: '2026-08-19T09:46:26Z'
+total_decisions: 404
 decisions:
 - id: D2092
   category: INF
@@ -3252,11 +3252,18 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-08-18'
+- id: D2416
+  category: QLT / PROMPT
+  state: ACTIVE
+  description: S2 summary gate content_type-blindness (PT/PI/GE potential discarded) — LOGGED
+  champion: auto-sync
+  target_files: []
+  created: '2026-08-19'
 summary:
-  total: 403
+  total: 404
   proposed: 0
   draft: 1
-  active: 346
+  active: 347
   stale: 0
   superseded: 14
   archived: 8
@@ -3321,4 +3328,4 @@ summary:
     BUGFIX / CFG: 1
     PERF / BUGFIX: 1
     OPS / DATA: 1
-    QLT / PROMPT: 1
+    QLT / PROMPT: 2

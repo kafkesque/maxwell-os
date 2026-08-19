@@ -4,6 +4,13 @@
 
 ---
 
+## 🟡 BUG-146 — 2026-08-19 — S2 summary gate is content_type-blind — discards PT/PI/GE potential — OPEN (post-T1.1)
+- **Symptom:** 6,127 clusters (63% of processed) "summary gated" — skipped wholesale. The gate keys ONLY on `is_summary` (`stage2_extract.py:1558`: `if is_summary and gate_enabled: return _gate`) with NO content_type awareness — a cluster flagged is_summary is dropped even if it could yield a process_template/process_instance/growth_edge/tool_instruction.
+- **Root cause:** prompt ties `is_summary` to "without identifying a convergent mechanism" — conflates "no extractable principle" with "no extractable object of ANY type". Single-source prompt never defines is_summary beyond "(bool)".
+- **Evidence:** checkpoint content_type = principle 2,778, process_template 32, tool_instruction 1, process_instance 0, growth_edge 0 (of 2,811 FBs). Pipeline is ~99% principle; the 6,127 gated clusters likely include PT/PI/GE-worthy content.
+- **Fix (post-T1.1, alongside BUG-145):** content_type-aware gate (is_summary must NOT gate PT/PI/GE/TI) + prompt tightening ("is_summary=true means NO extractable object of ANY type").
+- **Source:** live T1.1 run 2026-08-19 — audit of summary-gate behavior.
+
 ## 🟡 BUG-145 — 2026-08-18 — S2 model conflates extraction_type/content_type ('tool_instruction') — OPEN (post-T1.1 prompt fix)
 - **Symptom:** ESCALATED (3 @ 16:44 → 128 @ 09:59 Aug 19): 71× `Invalid extraction_type 'tool_instruction'` + 57× `Invalid extraction_type 'process_template'` + 2× `definition too short`. Conflation spikes in the single-source phase — the model writes content_type values (tool_instruction/process_template) into extraction_type.
 - **Root cause:** Qwen3-Coder emits `tool_instruction` into `extraction_type`, but that value belongs in `content_type`. `extraction_type` = epistemic form (causal_mechanism|empirical_pattern|normative_heuristic|descriptive_model|none); `content_type` = object kind (principle|process_template|process_instance|growth_edge|tool_instruction). The model flags tool-specific content but writes it into the wrong field. Systematic (not random) — all 3 in tooling clusters.

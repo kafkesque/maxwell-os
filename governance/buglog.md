@@ -5,9 +5,9 @@
 ---
 
 ## 🟡 BUG-145 — 2026-08-18 — S2 model conflates extraction_type/content_type ('tool_instruction') — OPEN (post-T1.1 prompt fix)
-- **Symptom:** 3 schema-validation failures in S2, all identical: `Invalid extraction_type 'tool_instruction'` (cluster_14150_s7_sub2, cluster_17097_s1_sub1, cluster_17097_s1_sub2 — all data-viz/tooling clusters: Grammar of Graphics, Interactive Chart Customization/Visualization).
+- **Symptom:** ESCALATED (3 @ 16:44 → 128 @ 09:59 Aug 19): 71× `Invalid extraction_type 'tool_instruction'` + 57× `Invalid extraction_type 'process_template'` + 2× `definition too short`. Conflation spikes in the single-source phase — the model writes content_type values (tool_instruction/process_template) into extraction_type.
 - **Root cause:** Qwen3-Coder emits `tool_instruction` into `extraction_type`, but that value belongs in `content_type`. `extraction_type` = epistemic form (causal_mechanism|empirical_pattern|normative_heuristic|descriptive_model|none); `content_type` = object kind (principle|process_template|process_instance|growth_edge|tool_instruction). The model flags tool-specific content but writes it into the wrong field. Systematic (not random) — all 3 in tooling clusters.
-- **Impact:** 3/1142 clusters (0.26%). Fail-closed gate (D2323) correctly rejects → cluster marked FAILED (D2403) → auto-retried on resume. No data loss; 3 potential FBs of ~3,556 missed if unfixed.
+- **Impact:** 128/9618 targets (1.3%). Fail-closed gate (D2323) correctly rejects → cluster marked FAILED (D2403) → auto-retried on resume. ~128 potential FBs (~2%) missed if unfixed. Prompt fix post-T1.1 is now REQUIRED (was 'nice to have') — the single-source prompt needs explicit extraction_type/content_type disambiguation.
 - **Fix (post-T1.1):** 1-line prompt tightening in S2 SYSTEM_PROMPT/SINGLETON_SYSTEM, then targeted `--resume-from 2` to retry the 3 failed clusters. No full S2 rerun.
 - **Source:** live T1.1 run 2026-08-18.
 

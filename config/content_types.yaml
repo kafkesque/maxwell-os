@@ -183,6 +183,22 @@ route_to_content_type:
   TI: tool_instruction
 
 # ─────────────────────────────────────────────────────────────────────────────
+# D2417 — content_type → extraction_type (conflation-rescue default)
+#   BUG-145: the model occasionally writes a content_type ROLE into the
+#   extraction_type FORM field (e.g. extraction_type="tool_instruction").
+#   Rather than fail-closed (discarding a correctly-identified object), trust
+#   the role and default the FORM to the epistemic register that role most
+#   commonly expresses. S4 may re-derive the form during classification.
+#   Weakest-honest default chosen per role to avoid over-claiming (D2376).
+# ─────────────────────────────────────────────────────────────────────────────
+content_to_extraction_type:
+  principle: descriptive_model       # conceptual statement → structure/identity (weakest, no over-claim)
+  process_template: normative_heuristic  # repeatable method → prescriptive "do X"
+  process_instance: descriptive_model    # case study → what happened (structure)
+  growth_edge: empirical_pattern         # speculative insight → correlation w/o proven cause
+  tool_instruction: normative_heuristic  # command → prescriptive "do X"
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SHARED CORE BODY — the READABLE knowledge content an agent consumes.
 # S2 emits name→elaboration. S4 appends jargon (body-only, AFTER elaboration).
 # ─────────────────────────────────────────────────────────────────────────────

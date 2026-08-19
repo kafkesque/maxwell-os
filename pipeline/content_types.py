@@ -43,6 +43,13 @@ EXTRACTION_TO_CONTENT_TYPE: dict[str, str] = dict(
 # ── D2128 — legacy S2 `route` field → content_type ────────────────────────
 ROUTE_TO_CONTENT_TYPE: dict[str, str] = dict(_CT.get("route_to_content_type", {}))
 
+# ── D2417 — content_type → extraction_type (conflation-rescue default) ─────
+# BUG-145: when the model writes a content_type ROLE into extraction_type, remap
+# to a weakest-honest epistemic default rather than fail-closed. S4 may re-derive.
+CONTENT_TO_EXTRACTION_TYPE: dict[str, str] = dict(
+    _CT.get("content_to_extraction_type", {})
+)
+
 # ── D2323 — vestigial content_type values, never used ─────────────────────
 DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
     _CT.get("dropped_content_types", [])

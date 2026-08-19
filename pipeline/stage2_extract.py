@@ -87,6 +87,7 @@ from pipeline.content_types import (  # D2323: config-first enum source (C12)
     CONTENT_TYPES,
     EXTRACTION_TYPES,
     EXTRACTION_TYPE_ENUM,
+    CONTENT_TO_EXTRACTION_TYPE,  # D2417: conflation-rescue mapping (BUG-145)
 )
 
 # D2276: Hybrid gate — DSPy-inspired pre-extraction filter (BUG-085 fix)
@@ -198,6 +199,41 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
         errors.append(f"Invalid extraction_type '{etype}'")
 
     return len(errors) == 0, errors
+
+
+def _normalize_role_fields(result: dict) -> dict:
+    """D2417 (BUG-145): repair extraction_type/content_type conflation.
+
+    The model occasionally writes a content_type ROLE (tool_instruction,
+    process_template, process_instance, growth_edge, principle) into the
+    extraction_type FORM field. This is the 183-cluster failure in T1.1.
+
+    Rather than fail-closed (discarding a correctly-identified object), trust
+    the role and default the FORM to the weakest-honest epistemic register for
+    that role (CONTENT_TO_EXTRACTION_TYPE). S4 may re-derive the form.
+
+    Handles both directions:
+      - extraction_type holds a ROLE value  → move it to content_type, default the form
+      - content_type holds a FORM value      → move it to extraction_type
+
+    Mutates and returns `result`.
+    """
+    etype: str = str(result.get("extraction_type", "")).strip()
+    ctype: str = str(result.get("content_type", "")).strip()
+
+    # Direction 1: role leaked into the FORM field (the T1.1 failure mode).
+    if etype and etype in CONTENT_TYPES and etype not in EXTRACTION_TYPES:
+        result["content_type"] = etype
+        result["extraction_type"] = CONTENT_TO_EXTRACTION_TYPE.get(
+            etype, "descriptive_model"
+        )
+
+    # Direction 2: FORM leaked into the role field.
+    elif ctype and ctype in EXTRACTION_TYPES and ctype not in CONTENT_TYPES:
+        result["extraction_type"] = ctype
+        result["content_type"] = "principle"
+
+    return result
 
 
 def _warn_extraction_type_dominance(dist: "Counter[str]", *, total: int, where: str) -> None:
@@ -526,13 +562,20 @@ Classification (depth, domains, discipline) happens in Stage 4 -- do NOT include
 # ── Simplified single-source prompt (D2148: tiered extraction) ─────────────
 
 SINGLE_SOURCE_SYSTEM: str = (
-    "You extract principles from text passages. "
+    "You extract knowledge objects from text passages. "
     "Return a JSON object with these EXACT keys:\n"
     "name, definition, mechanism, boundary, consequence, "
     "is_summary (bool), "
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
+    "⚠️ extraction_type and content_type are TWO DIFFERENT axes — never swap them:\n"
+    "- extraction_type = the EPISTEMIC FORM (how strongly justified): causal_mechanism, "
+    "empirical_pattern, normative_heuristic, descriptive_model. It is NEVER "
+    "\"tool_instruction\", \"process_template\", \"process_instance\", \"growth_edge\", or \"principle\".\n"
+    "- content_type = the functional ROLE (what kind of object): principle, "
+    "process_template, process_instance, growth_edge, tool_instruction. It is NEVER "
+    "a form word like \"causal_mechanism\" or \"descriptive_model\".\n"
     "Choose extraction_type HONESTLY (do NOT default to causal_mechanism): "
     "causal_mechanism only when the passages DEMONSTRATE a cause→effect chain (X→Y because Z). "
     "empirical_pattern for correlation WITHOUT a proven cause. "
@@ -541,7 +584,11 @@ SINGLE_SOURCE_SYSTEM: str = (
     "content_type=principle for reusable concepts, process_template for repeatable methods, "
     "process_instance for case studies, growth_edge for speculative insights, "
     "tool_instruction for tool-specific commands. "
-    "If the passages are just factual descriptions without a principle, "
+    "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
+    "object of any kind (no principle, no method, no case study, no tool command). "
+    "A tool command, repeatable method, or concrete case study IS an extractable object "
+    "— set is_summary=false for it. "
+    "If the passages are just factual descriptions without any extractable object, "
     'return {{\"route\": \"NULL\"}}.'
 )
 # ── Singleton extraction prompt (D2149: single-segment, no synthesis) ──────
@@ -554,6 +601,12 @@ SINGLETON_SYSTEM: str = (
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"|\"none\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
     "route (\"FB\" or \"NULL\").\n"
+    "⚠️ extraction_type and content_type are TWO DIFFERENT axes — never swap them:\n"
+    "- extraction_type = EPISTEMIC FORM only: causal_mechanism, empirical_pattern, "
+    "normative_heuristic, descriptive_model, none. It is NEVER \"tool_instruction\", "
+    "\"process_template\", \"process_instance\", \"growth_edge\", or \"principle\".\n"
+    "- content_type = functional ROLE only: principle, process_template, process_instance, "
+    "growth_edge, tool_instruction. It is NEVER a form word like \"causal_mechanism\".\n"
     "Choose extraction_type HONESTLY (do NOT default to causal_mechanism): "
     "causal_mechanism only when the passage DEMONSTRATES a cause→effect chain. "
     "empirical_pattern for correlation WITHOUT a proven cause. "
@@ -566,7 +619,9 @@ SINGLETON_SYSTEM: str = (
     "- Tool-specific commands/features → content_type=tool_instruction\n"
     "- Case studies/specific examples → content_type=process_instance\n"
     "- extraction_type=none + no principle → route=NULL\n"
-    "If the passage contains no extractable principle, return {\"route\": \"NULL\"}."
+    "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
+    "object of any kind (no principle, no method, no case study, no tool command). "
+    "If the passage contains no extractable object, return {\"route\": \"NULL\"}."
 )
 
 def build_single_source_prompt(
@@ -1529,6 +1584,11 @@ def run_stage2(
         if route == "NULL":
             return {"_null": True, "cluster_id": cid}
 
+        # D2417 (BUG-145): repair extraction_type/content_type conflation BEFORE
+        # validation, so a role leaked into the FORM field is rescued rather than
+        # rejected (the 183-cluster T1.1 failure).
+        result = _normalize_role_fields(result)
+
         # D2180: Schema validation (T2.2) — catch malformed LLM output before it enters pipeline
         is_valid, schema_errors = validate_fb_output(result)
         if not is_valid:
@@ -1554,8 +1614,16 @@ def run_stage2(
         if not name or not definition:
             return {"_null": True, "cluster_id": cid}
 
-        # Gate: reject summaries
-        if is_summary and gate_enabled:
+        # Gate: reject summaries (D2417/BUG-146: content_type-aware).
+        # is_summary=true means "pure restatement, no extractable object". But a
+        # non-principle role (process_template/process_instance/growth_edge/
+        # tool_instruction) IS an extractable object — the model often flags
+        # is_summary=true for single-source method/tool/case content because the
+        # convergent prompt ties is_summary to "no convergent mechanism" (which is
+        # structurally always-true for single-source). Only gate when the object is
+        # (or defaults to) a principle — i.e. a genuine restatement.
+        non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
+        if is_summary and gate_enabled and content_type not in non_principle_roles:
             return {"_gate": True, "cluster_id": cid}
 
         # Build FB record
@@ -1884,15 +1952,20 @@ def process_singletons(
         route = result.get("route", "FB").strip().upper()
         if route == "NULL":
             return {"_null": True}
+        # D2417 (BUG-145): repair extraction_type/content_type conflation.
+        result = _normalize_role_fields(result)
         name = result.get("name", "").strip()
         definition = result.get("definition", "").strip()
         if not name or len(definition) < 30:
             return {"_null": True}
         is_summary = result.get("is_summary", False)
-        if is_summary and gate_enabled:
-            return {"_gate": True}
         extraction_type = result.get("extraction_type", "").strip()  # D2376: absent → "" (no over-claim)
         content_type = result.get("content_type", "principle").strip()
+        # Gate: reject summaries (D2417/BUG-146: content_type-aware — do not gate
+        # a non-principle role that the model identified as an extractable object).
+        non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
+        if is_summary and gate_enabled and content_type not in non_principle_roles:
+            return {"_gate": True}
         return {
             "fb_id": make_hash_id(name, definition),
             "name": name,

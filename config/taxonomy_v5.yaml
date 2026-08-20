@@ -687,6 +687,7 @@ disciplines:
   - Color Theory
   - color theory
   - computer vision
+  - visual design
 - canonical: visual semiotics
   group: Perception & Signal
   raw:
@@ -797,6 +798,7 @@ disciplines:
   - Film Editing
   - Film Production
   - Film Studies
+  - motion graphics design
 - canonical: iconography
   group: Form & Structure
   raw:
@@ -877,6 +879,7 @@ disciplines:
   - UX Strategy
   - Design Education
   - Strategy
+  - design studies
 - canonical: creative process
   group: Design Cognition
   raw:
@@ -964,6 +967,9 @@ disciplines:
   - positive psychology
   - productivity psychology
   - performance psychology
+  - educational psychology
+  - developmental psychology
+  - industrial-organizational psychology
 - canonical: linguistics
   group: Behavioral & Cognitive
   raw:
@@ -972,6 +978,9 @@ disciplines:
   - Linguistics
   - Philosophy of Language
   - cognitive linguistics
+  - computational linguistics
+  - sociolinguistics
+  - pragmatics
 - canonical: leadership
   group: Operational & Strategy
   raw:
@@ -1000,6 +1009,7 @@ disciplines:
   - Strategic Decision Making
   - strategy formulation
   - competitive strategy
+  - organizational change management
 - canonical: project management
   group: Operational & Strategy
   raw:
@@ -1069,6 +1079,8 @@ disciplines:
   - Collaborative Platforms
   - growth marketing
   - brand marketing
+  - marketing science
+  - marketing analytics
 - canonical: systems thinking
   group: Systems & Method
   raw:
@@ -1147,6 +1159,8 @@ disciplines:
   - evaluation research
   - history of science
   - statistical inference
+  - qualitative research methodology
+  - qualitative research methods
 - canonical: operations research
   group: Systems & Method
   raw:
@@ -1241,6 +1255,7 @@ disciplines:
   - systems programming
   - software architecture
   - DevOps
+  - frontend web development
 - canonical: creative coding
   group: Computational Craft
   raw:
@@ -1362,6 +1377,8 @@ disciplines:
   - business ethics
   - ethics
   - moral philosophy
+  - design ethics
+  - artificial intelligence ethics
 - canonical: artificial intelligence
   group: AI & Computing
   raw:
@@ -1378,6 +1395,8 @@ disciplines:
   - Multimodal Communication
   - communications
   - Communication Studies
+  - interpersonal communication
+  - political communication
 - canonical: human-computer interaction
   group: Design Cognition
   raw:
@@ -1389,6 +1408,8 @@ disciplines:
   - VR
   - interactive systems
   - interaction design
+  - user experience design
+  - human-centered design
 - canonical: interdisciplinary studies
   group: Heterodox
   raw:
@@ -1408,6 +1429,7 @@ disciplines:
   - bioinformatics
   - information studies
   - library science
+  - information visualization
 - canonical: finance
   group: Operational & Strategy
   raw:
@@ -1418,6 +1440,7 @@ disciplines:
   - Financial Planning
   - financial analysis
   - corporate finance
+  - entrepreneurial finance
 - canonical: economics
   group: Operational & Strategy
   raw:
@@ -1433,6 +1456,7 @@ disciplines:
   - environmental economics
   - productivity economics
   - auction theory
+  - business economics
 - canonical: sociology
   group: Heterodox
   raw:
@@ -1445,6 +1469,7 @@ disciplines:
   - sociological theory
   - Sociology of Work and Organizations
   - sociology of work
+  - sociology of science
 - canonical: anthropology
   group: Heterodox
   raw:
@@ -1520,6 +1545,7 @@ disciplines:
   - cybersecurity
   - network security
   - infosec
+  - computer security
 - canonical: evolutionary biology
   group: Systems & Method
   raw:
@@ -1585,6 +1611,7 @@ disciplines:
   - Performance Art
   - drama
   - musical composition
+  - performance studies
 - canonical: literary theory
   group: Perception & Signal
   raw:
@@ -1594,6 +1621,7 @@ disciplines:
   - criticism
   - literary criticism
   - poetics
+  - narratology
 - canonical: engineering
   group: Systems & Method
   raw:
@@ -1603,11 +1631,31 @@ disciplines:
   - electrical engineering
   - chemical engineering
   - materials engineering
+  - design engineering
+  - computer architecture
+- canonical: design thinking
+  group: Design Cognition
+  raw:
+  - design thinking
+  - Design Thinking
+- canonical: product design
+  group: Design Cognition
+  raw:
+  - product design
+  - Product Design
+- canonical: industrial design
+  group: Design Cognition
+  raw:
+  - industrial design
+  - Industrial Design
+- canonical: information retrieval
+  group: AI & Computing
+  raw:
+  - information retrieval
+  - Information Retrieval
 meta:
   catch_all_domain: emerging
   catch_all_discipline: emerging
-  catch_all_description: 'Used when no canonical domain or discipline fits the principle
-    ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
-    for future taxonomy expansion when enough principles accumulate under a label.
+  catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.
 
     '

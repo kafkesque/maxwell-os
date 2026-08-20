@@ -385,7 +385,7 @@ taxonomy:
   replacement_threshold_ratio: 1.1
   emerging_freq_threshold: 10
   max_domains: 35       # D2378: canonical domain cap (matches taxonomy_v5.yaml; closed-loop — promote requires demote)
-  max_disciplines: 71   # D2378: canonical discipline cap (matches taxonomy_v5.yaml; D2422 removed education overlap)
+  max_disciplines: 75   # D2378: canonical discipline cap (matches taxonomy_v5.yaml; D2422 removed education overlap; +4 promotions 2026-08-20: design thinking, product design, industrial design, information retrieval)
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8

@@ -172,7 +172,7 @@ stage2:
   golden_single_source_path: config/golden/stage2_fewshot_single_source.yaml
   golden_single_source_inject_enabled: true
   golden_single_source_negative: 3
-  golden_single_source_max: 8    # 5 positives (one per role) + up to 3 negatives
+  golden_single_source_max: 9    # 6 positives (incl. 2× TI contrastive) + up to 3 negatives
   split_probe_enabled: true
   split_probe_min_size: 20
   split_probe_max_cohesion: 0.85

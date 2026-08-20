@@ -92,6 +92,7 @@ from pipeline.content_types import (  # D2323: config-first enum source (C12)
     EXTRACTION_TYPES,
     EXTRACTION_TYPE_ENUM,
     CONTENT_TO_EXTRACTION_TYPE,  # D2417: conflation-rescue mapping (BUG-145)
+    S2_BODY_FIELDS,  # P2-1: type-specific body fields (BUG-152 follow-up)
 )
 
 # D2276: Hybrid gate — DSPy-inspired pre-extraction filter (BUG-085 fix)
@@ -565,6 +566,55 @@ Classification (depth, domains, discipline) happens in Stage 4 -- do NOT include
 
 # ── Simplified single-source prompt (D2148: tiered extraction) ─────────────
 
+def _build_body_schema_text() -> str:
+    """P2-1 (BUG-152 follow-up): type-specific body field instruction, from config.
+
+    The single-source/singleton prompt must emit type-specific body fields BEYOND
+    the shared core_body. Field names are sourced from `s2_body_fields` in
+    content_types.yaml (C12) so prompt, golden, and builder never re-declare them.
+    """
+    lines: list[str] = [
+        "BODY SCHEMA BY content_type — emit the body fields for the role you choose:",
+        "- principle: name, definition, mechanism, boundary, consequence, elaboration",
+    ]
+    for role in ("process_template", "tool_instruction", "process_instance", "growth_edge"):
+        fields = S2_BODY_FIELDS.get(role, [])
+        if fields:
+            lines.append(f"- {role}: {', '.join(fields)}")
+    lines.append(
+        "  (steps/actors/parameters are JSON arrays; every other field is a string. "
+        "Leave a field empty when the passage does not provide it.)"
+    )
+    return "\n".join(lines)
+
+
+_S2_BODY_SCHEMA: str = _build_body_schema_text()
+
+
+def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
+    """P2-1: capture type-specific body fields from a single-source result.
+
+    Returns a dict of non-empty type-specific fields (sourced from `S2_BODY_FIELDS`),
+    preserving JSON arrays (steps/actors/parameters) as lists. Empty/absent fields
+    are omitted so the FB record stays lean and the shared core_body is not duplicated.
+    """
+    out: dict = {}
+    for field in S2_BODY_FIELDS.get(content_type, []):
+        val = result.get(field)
+        if val is None:
+            continue
+        if isinstance(val, str):
+            val = val.strip()
+            if val:
+                out[field] = val
+        elif isinstance(val, list):
+            if val:
+                out[field] = val
+        elif isinstance(val, (dict, int, float, bool)):
+            out[field] = val
+    return out
+
+
 SINGLE_SOURCE_SYSTEM: str = (
     "You extract knowledge objects from text passages. "
     "Return a JSON object with these EXACT keys:\n"
@@ -599,7 +649,7 @@ SINGLE_SOURCE_SYSTEM: str = (
     "— set is_summary=false for it. "
     "If the passages are just factual descriptions without any extractable object, "
     'return {{\"route\": \"NULL\"}}.'
-)
+) + "\n" + _S2_BODY_SCHEMA
 # ── Singleton extraction prompt (D2149: single-segment, no synthesis) ──────
 
 SINGLETON_SYSTEM: str = (
@@ -636,7 +686,7 @@ SINGLETON_SYSTEM: str = (
     "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
     "object of any kind (no principle, no method, no case study, no tool command). "
     "If the passage contains no extractable object, return {\"route\": \"NULL\"}."
-)
+) + "\n" + _S2_BODY_SCHEMA
 
 def build_single_source_prompt(
     cluster: dict,
@@ -815,21 +865,26 @@ def load_golden_single_source(
         return [], [], 0
 
     examples: list[dict] = golden.get("examples", [])
-    pos_by_role: dict[str, dict] = {}
+    # Collect ALL positives, grouped by role in deterministic order. A single
+    # example per role is NOT enough for contrastive disambiguation — e.g. the
+    # tool_instruction role needs BOTH a clear library call AND the ambiguous
+    # "algorithm described as steps" case (BUG-147) to teach PT-vs-TI.
+    by_role: dict[str, list[dict]] = {}
     for e in examples:
         if not e.get("should_extract"):
             continue
         fb = e.get("expected_fb", {})
         fbs = fb if isinstance(fb, list) else [fb]
         role: str = str(fbs[0].get("content_type", "principle")).strip() or "principle"
-        if role not in pos_by_role:
-            pos_by_role[role] = e
+        by_role.setdefault(role, []).append(e)
 
     role_order: tuple[str, ...] = (
         "principle", "process_template", "tool_instruction",
         "process_instance", "growth_edge",
     )
-    pos: list[dict] = [pos_by_role[r] for r in role_order if r in pos_by_role]
+    pos: list[dict] = []
+    for r in role_order:
+        pos.extend(by_role.get(r, []))
 
     rng = random.Random(S2_GOLDEN_SEED)
     neg: list[dict] = [e for e in examples if not e.get("should_extract")]
@@ -1033,7 +1088,7 @@ def format_golden_fewshot_single_source(
     parts: list[str] = ["# FEW-SHOT EXAMPLES (knowledge objects)\n"]
     parts.append("Study these examples of correct knowledge-object extraction:\n")
 
-    for i, ex in enumerate(pos_examples[:5], 1):
+    for i, ex in enumerate(pos_examples, 1):
         fb = ex.get("expected_fb", {})
         fbs = fb if isinstance(fb, list) else [fb]
         name = fbs[0].get("name", "Untitled")
@@ -1054,6 +1109,11 @@ def format_golden_fewshot_single_source(
                 "content_type": fb_item.get("content_type", "principle"),
                 "route": fb_item.get("route", "FB"),
             }
+            # P2-1: surface type-specific body fields in the few-shot so the model
+            # sees the correct shape for PT/TI/PI/GE (steps, syntax, instance_text…).
+            for _field in S2_BODY_FIELDS.get(role, []):
+                if _field in fb_item:
+                    output[_field] = fb_item[_field]
             parts.append(json.dumps(output, indent=2, ensure_ascii=False))
             parts.append("```")
         if rationale:
@@ -1864,6 +1924,10 @@ def run_stage2(
             "is_convergent": cluster.get("is_convergent", True),
         }
 
+        # P2-1: capture type-specific body fields (PT steps/trigger, TI syntax/
+        # parameters, PI instance_text, GE body, etc.) beyond the shared core_body.
+        fb.update(_capture_type_specific_fields(result, content_type))
+
         # Enrich with author/title/year (BUG-061 FIX)
         src_books_list: list[str] = cluster.get("source_books", [])
         if src_books_list:
@@ -2231,6 +2295,7 @@ def process_singletons(
             "source_diversity": 1,
             "is_convergent": False,
             "is_singleton_fb": True,
+            **_capture_type_specific_fields(result, content_type),  # P2-1
         }
 
     print(f"⚡ Processing {len(viable)} singletons with {max_workers} workers...")

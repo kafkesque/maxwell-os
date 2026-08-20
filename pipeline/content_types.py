@@ -55,6 +55,14 @@ DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
     _CT.get("dropped_content_types", [])
 )
 
+# ── P2-1 — S2-extractable body fields per content_type (beyond core_body) ─
+# Sourced from content_types.yaml `s2_body_fields`. The single-source/singleton
+# prompt emits these fields when it chooses the corresponding content_type role.
+# Cross-reference/metadata fields are DERIVED later (S4.5/D2345), not extracted.
+S2_BODY_FIELDS: dict[str, list[str]] = {
+    str(k): [str(f) for f in v] for k, v in _CT.get("s2_body_fields", {}).items()
+}
+
 # Default role emitted by convergent S2 extraction (foundation block).
 DEFAULT_CONTENT_TYPE: str = "principle"
 

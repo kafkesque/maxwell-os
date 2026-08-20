@@ -88,6 +88,14 @@ examples:
     elaboration: ""
     extraction_type: normative_heuristic
     content_type: process_template
+    trigger: "When a person must retain many critical items under time pressure"
+    prerequisite: ""
+    steps:
+    - "Write down the critical information"
+    - "Enter it into equipment as it is read, minimizing memory load"
+    - "Remember selectively — hold only the few items needed in the next few minutes"
+    done_condition: "All critical information is externalized and only the immediately-needed items are held in memory"
+    failure_mode: "Fails when the items cannot be externalized or must all be held simultaneously"
     evidence_passages:
     - "Pilots remember critical information using three techniques: first they write it down, second they enter it into their equipment, and third they remember selectively."
   rationale: "A repeatable human how-to method with ordered steps a person follows. content_type=process_template (NOT principle, NOT tool_instruction)."
@@ -114,6 +122,17 @@ examples:
     elaboration: ""
     extraction_type: descriptive_model
     content_type: tool_instruction
+    tool_name: "faiss"
+    platform: "Python (FAISS library)"
+    description: "Load a persisted vector index from a file so it can be reused across sessions instead of rebuilt from scratch"
+    syntax: "index = faiss.read_index(\"data/my_index.index\")"
+    parameters:
+    - name: path
+      type: str
+      description: "File path to the persisted index"
+    output: "The deserialized FAISS index object"
+    example: "index = faiss.read_index(\"data/my_index.index\")"
+    caveats: "Fails when the file path is absent or the file is not a valid FAISS index"
     evidence_passages:
     - "Load a persisted index from disk with: index = faiss.read_index(\"data/my_index.index\")."
   rationale: "A specific command/API/library call. content_type=tool_instruction (NOT process_template — it is not a human how-to method)."
@@ -140,6 +159,20 @@ examples:
     elaboration: ""
     extraction_type: descriptive_model
     content_type: tool_instruction
+    tool_name: "Depth-First Search"
+    platform: "algorithm (language-agnostic)"
+    description: "Traverse a graph depth-first using an explicit stack, marking visited nodes so each is visited once"
+    syntax: "push(start); while stack not empty: pop node, mark visited, push unvisited neighbors"
+    parameters:
+    - name: graph
+      type: Graph
+      description: "The graph to traverse"
+    - name: start
+      type: Node
+      description: "The starting node"
+    output: "A visitation order covering all reachable nodes"
+    example: "dfs(graph, start) visits each reachable node exactly once"
+    caveats: "Requires a visited set to avoid infinite loops on cyclic graphs"
     evidence_passages:
     - "Depth-first search visits a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor."
   rationale: "An algorithm/code description. content_type=tool_instruction, NOT process_template — it is a computational procedure, not a repeatable human how-to (BUG-147 contrastive)."
@@ -166,6 +199,14 @@ examples:
     elaboration: ""
     extraction_type: descriptive_model
     content_type: process_instance
+    instance_text: "Researchers ran a scam at a cafe on Oxford Street; the mark realized her bag was gone only after the accomplice was already out of sight."
+    actors:
+    - "researchers"
+    - "accomplice"
+    - "mark (victim)"
+    outcome_metric: ""
+    outcome_qualitative: "The victim realized her bag was stolen only after the thief left the scene, preventing pursuit"
+    domain_context: "confidence tricks / theft in a public retail setting"
     evidence_passages:
     - "To prove the point the researchers ran the scam at a local cafe on the top floor of a mall on Oxford Street in London."
   rationale: "A concrete case study of something actually executed. content_type=process_instance (NOT principle, NOT process_template)."
@@ -192,6 +233,11 @@ examples:
     elaboration: ""
     extraction_type: empirical_pattern
     content_type: growth_edge
+    body: "Whether mind-blindness could be a temporary rather than chronic condition, which would explain transient social tone-deafness in otherwise neurotypical people"
+    category: "neuroscience hypothesis"
+    actionable: false
+    status: "open"
+    priority: "medium"
     evidence_passages:
     - "What if it were possible for autism—for mind-blindness—to be a temporary condition instead of a chronic one?"
   rationale: "A speculative/unresolved 'what if' open question. content_type=growth_edge (NOT principle — it is not established reusable knowledge)."

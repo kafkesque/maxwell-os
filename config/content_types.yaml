@@ -244,6 +244,46 @@ metadata:
   runtime:      [usage_count, last_retrieved_at, feedback_score, feedback_count]
 
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# S2 EXTRACTABLE BODY FIELDS — per content_type (P2-1, BUG-152 follow-up)
+#   The fields S2's single-source/singleton prompt must emit BEYOND the shared
+#   core_body (name/definition/mechanism/boundary/consequence/elaboration).
+#   Cross-reference/metadata fields (consulted_fbs, fb_query_*, parent_pt_id,
+#   parent_fb_ids, promoted_*, template_source, source, version, tags,
+#   annotations, alternatives) are DERIVED later (S4.5/D2345), NOT extracted here.
+#   `steps` (PT/PI), `actors` (PI) and `parameters` (TI) are JSON arrays; the
+#   rest are strings.
+# ─────────────────────────────────────────────────────────────────────────────
+s2_body_fields:
+  principle: []   # shared core_body only
+  process_template:
+    - trigger
+    - prerequisite
+    - steps            # array of step strings (ordered)
+    - done_condition
+    - failure_mode
+  process_instance:
+    - instance_text
+    - actors           # array of actor/role strings
+    - outcome_metric
+    - outcome_qualitative
+    - domain_context
+  tool_instruction:
+    - tool_name
+    - platform
+    - description
+    - syntax
+    - parameters       # array of {name, type, description}
+    - output
+    - example
+    - caveats
+  growth_edge:
+    - body
+    - category
+    - actionable
+    - status
+    - priority
+
 # DROPPED — vestigial content_type enum values (were schema-only, never used)
 #   `fact`  (domain factoid): never emitted/validated/trained; a bare factoid
 #           cannot meet the ≥2-source convergent bar — absorbed into a

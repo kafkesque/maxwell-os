@@ -64,6 +64,28 @@ def test_deterministic_selection() -> None:
     assert a_n == b_n
 
 
+def test_tool_instruction_has_contrastive_pair() -> None:
+    """Both the clear library-call AND the ambiguous algorithm (DFS) TI examples
+    must reach the few-shot. A single TI example is not enough to teach PT-vs-TI
+    (BUG-147 — the DFS algorithm was mislabelled process_template)."""
+    pos, neg, _ = load_golden_single_source(GOLDEN, NEG, MAXT)
+    ti = [e for e in pos if e["expected_fb"]["content_type"] == "tool_instruction"]
+    assert len(ti) >= 2, "must include both clear + ambiguous tool_instruction examples"
+
+
+def test_body_fields_present_on_non_principle_positives() -> None:
+    """Every non-principle positive must carry its type-specific body fields (P2-1),
+    so the few-shot shows the agreed schema (steps/syntax/instance_text/body)."""
+    from pipeline.content_types import S2_BODY_FIELDS
+    pos, neg, _ = load_golden_single_source(GOLDEN, NEG, MAXT)
+    for e in pos:
+        ct = e["expected_fb"]["content_type"]
+        if ct == "principle":
+            continue
+        missing = [f for f in S2_BODY_FIELDS.get(ct, []) if f not in e["expected_fb"]]
+        assert not missing, f"{e['id']} ({ct}) missing body fields: {missing}"
+
+
 if __name__ == "__main__":
     test_single_source_golden_has_all_five_roles()
     test_single_source_golden_has_negatives()

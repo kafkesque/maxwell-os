@@ -35,7 +35,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_SINGLE_SOURCE_NEGATIVE,
     S2_GOLDEN_SINGLE_SOURCE_PATH,
 )
-from pipeline.content_types import CONTENT_TYPES, EXTRACTION_TYPES
+from pipeline.content_types import CONTENT_TYPES, EXTRACTION_TYPES, S2_BODY_FIELDS
 
 OUT_DIR = Path("audit_output")
 
@@ -126,6 +126,20 @@ def _role(r: dict | None) -> str:
     return str(r.get("content_type", "")).strip() or "NULL"
 
 
+def _body_fields(r: dict | None) -> str:
+    """Compact summary of type-specific body fields present on a record (P2-1)."""
+    if r is None:
+        return ""
+    role = _role(r)
+    present = []
+    for f in S2_BODY_FIELDS.get(role, []):
+        v = r.get(f)
+        if v is None or v == "" or v == []:
+            continue
+        present.append(f)
+    return ",".join(present)
+
+
 def _verdict(baseline: dict | None, wired: dict | None, expected: str) -> str:
     br, wr = _role(baseline), _role(wired)
     # Wired (golden) must produce the correct role or NULL.
@@ -203,6 +217,9 @@ def main() -> None:
         print(f"▶ {label.upper()}  (expected: {expect})")
         print(f"  probe: {probe}")
         print(f"  baseline: role={_role(baseline):<16} wired: role={_role(wired):<16}")
+        bf_w = _body_fields(wired)
+        if bf_w:
+            print(f"  wired body fields: {bf_w}")
         print(f"  verdict: {verdict}")
 
         md_lines.append(f"## {label}  (expected `{expect}`)")

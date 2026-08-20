@@ -7,6 +7,7 @@ pydantic>=2.0
 pyyaml>=6.0
 tqdm>=4.0
 psutil>=6.0            # D2341/BUG-098: memory_guard.py, run_monitor.py, run_diagnostic.py, n2_watchdog.py (C24 hardware-adaptive)
+pypandoc>=1.13         # C11/D2423: batch_convert_epubs.py + fix_remaining.py (S0 EPUB→MD fallback converter, unguarded import)
 
 # ── Data storage ─────────────────────────────────────
 # sqlite3 is stdlib (no pip needed)

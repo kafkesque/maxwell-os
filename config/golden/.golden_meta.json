@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "algorithm": "sha256",
-  "golden_sha256": "70ff3283a26a3b2f39f8670c6b1d6ffdf946e88b34b627e93b5a0f63d722c266",
+  "golden_sha256": "661abd7521eb9264a7cf3f1387f2a165b4a199fc8b46abc27a3819f3ecb8529a",
   "pipeline_commit": "caf30ae",
   "trimmed_ids": [
     "PRO-002",

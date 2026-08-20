@@ -53,6 +53,7 @@ from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     GEN_MODEL,
     MAX_DOMAINS_PER_FB,
+    FB_NAME_MAX_WORDS,  # BUG-149: C12 — name word cap (was hardcoded 5)
     S4_CHECKPOINT_INTERVAL,  # D2370: intra-stage incremental checkpoint cadence (clusters)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
@@ -1467,7 +1468,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
             source_ids = resolve_source_ids(list(source_books))
 
         # D2069: Name normalization + uniqueness
-        name = normalize_fb_name(name, max_words=5)
+        name = normalize_fb_name(name, max_words=FB_NAME_MAX_WORDS)
         if not check_name_unique(name, existing_names):
             name_collisions += 1
             # D2350: short numeric suffix (was "(Cluster <64-char-hash>)" which

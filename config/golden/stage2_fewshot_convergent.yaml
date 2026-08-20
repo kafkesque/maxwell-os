@@ -1,8 +1,8 @@
 meta:
   version: '5.0'
   architecture: cluster-before-extract
-  total_examples: 80
-  convergent_positives: 57
+  total_examples: 84
+  convergent_positives: 61
   hard_negatives: 23
   expected_coverage:
   - convergent_multi_source_synthesis
@@ -39,14 +39,14 @@ meta:
   calibrated_date: '2026-08-10'
   notes: 'D2286: Golden tiered classification (GOLD-A/B/CHALLENGE). 80 examples total.'
   updated: '2026-08-16'
-  example_count: 80
+  example_count: 84
   tier_definitions:
     description: 'D2286: Golden tiered classification for DSPy training safety'
     GOLD-A: Human-adjudicated, multi-source convergent, clear mechanism/boundary/consequence. Train DSPy.
     GOLD-B: Strong positives with minor ambiguity. Evaluate DSPy. Never train.
     CHALLENGE: Hard negatives, edge cases, adversarial. Test DSPy robustness. NEVER train.
   tier_counts:
-    GOLD-A: 54
+    GOLD-A: 58
     CHALLENGE: 23
     GOLD-B: 3
 examples:
@@ -4971,4 +4971,127 @@ examples:
     within deep learning that a general engineer would not cover; it requires ML-specific
     expertise. Mined by tools/mine_depth_golden.py (seeds: config/golden/depth_mining_seeds.yaml),
     human-reviewed for verbatim evidence.'
+  tier: GOLD-A
+
+- id: CONV-059
+  domain: systems & frameworks
+  discipline: systems thinking
+  source_books:
+  - Building AI Agent Platforms (for Isabel Garcia) (Ben OMahony and Fabian Nonnenmacher) (z-library.sk, 1lib.sk, z-lib.sk).md
+  - The Design Process (Karl Aspelund) (z-library.sk, 1lib.sk, z-lib.sk).md
+  cluster_segments:
+  - source_book: Building AI Agent Platforms (for Isabel Garcia) (Ben OMahony and Fabian Nonnenmacher) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: 'the other ingredients, readily prepared by the chefs. :::: :::: Developer [Experience] Joy Lastly, in the context of DevEx, the aspect of joy should not be overlooked. Research clearly indicates that happy developers are more productive and more likely to stay with the company.^17 ^ So far, the sections have focused on speeding up delivery of the stream-aligned teams by removing friction. Few things are more frustrating than being slowed down by tools and processes. However, the removal of pain is not the same as the addition of joy. This speaks to a fundamental truth of software development, one that is even captured as the first point in the Agile Manifesto: Individuals and interactions over processes and tools.^18 ^ This focus on the individual is the key. Aspects that contribute to developer joy include the wish for working with modern tools, having fast feedback loops, and even moments of pure whimsy. Rapid feedback loops are an essential aspect of developer productivity
+      and, in a way, the ultimate representation of removing friction. This begins with having swift local development setups allowing developers to iterate quickly on their code, and continues with fast deployment pipelines and timely feedback from monitoring and alerting systems from the real production systems. The wish for modern tools is also a source of joy. This encompasses the profound satisfaction of using a tool that feels magical, like \k9s\^19 ^ making complex Kubernetes operations feel simple, or \thefuck\`^20 ^ intuitively correcting a typo. These tools are joyful because they are thoughtfully crafted to create a state of flow.'
+  - source_book: The Design Process (Karl Aspelund) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: both cases, visualization must proceed quickly to keep the idea fresh and to keep you from getting bogged down in the mechanics of drawing. It’s a fine line, but if you find yourself spending more time on making the sketch look good rather than examining the idea, stop and refocus. Sketch quickly and sketch again to cement what you have done. This procedure also allows you to set up a quick feedback loop in which you can look at the first quick sketch, decide what needs improving, sketch again, and so on. A good method is to first decide on the number of sketches and, when you’ve sped through those, pick the best.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Rapid Feedback Loop Refinement
+    definition: A cyclical process in which an output is generated, evaluated against a desired standard, and the observed gap feeds back into the next iteration to improve the result. Rapid feedback loops are the core mechanism by which iterative refinement converges on quality.
+    mechanism: 'This is a normative heuristic, not a demonstrated causal law: iterating quickly (generate, review, correct, regenerate) removes friction so the gap between current and desired output shrinks each cycle, but the passages prescribe the practice rather than isolate one cause-effect chain.'
+    boundary: Applies when the cost of one iteration is low and the evaluation signal is reliable. Fails when feedback is delayed, noisy, or more expensive than the value of a single cycle.
+    consequence: Because of rapid feedback, designs, code, and skills converge toward their goal faster and with fewer compounding errors than a single-shot attempt.
+    evidence_passages:
+    - Rapid feedback loops are an essential aspect of developer productivity and, in a way, the ultimate representation of removing friction
+    - This procedure also allows you to set up a quick feedback loop in which you can look at the first quick sketch, decide what needs improving, sketch again, and so on
+    extraction_type: normative_heuristic
+    content_type: principle
+    depth: universal
+  rationale: 'CONVERGENT POSITIVE — UNIVERSAL FEEDBACK LOOP (T-015/D2421). Software engineering (AI agent platforms) and design (sketch iteration) independently state the same mechanism: quick generate-review-correct cycles converge on quality. Depth is universal — feedback loops appear across engineering (control), biology (homeostasis), economics (cycles), and design in the same domain-independent sense as entropy.'
+  tier: GOLD-A
+- id: CONV-060
+  domain: systems & frameworks
+  discipline: statistics
+  source_books:
+  - Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md
+  - AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md
+  cluster_segments:
+  - source_book: Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: 'the null hypothesis, suggesting the data is probably Gaussian. If p \ 0.05: print(''Probably Gaussian'') else: print(''Probably not Gaussian'') ` - If the p-value is greater than 0.05, we fail to reject the null hypothesis, which means we cannot rule out the possibility that the data comes from a normal distribution. In this case, the code prints "[Probably Gaussian".] - If the p-value is less than or equal to 0.05, we reject the null hypothesis, indicating we have evidence to suggest the data is not likely from a normal distribution. In this case, the code prints "Probably [not Gaussian".] Important note'
+  - source_book: AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: 'all pose major problems when it comes to AI adoption. Future-proofing your organization to thrive requires an intentional skilling plan. If you are at the beginning of your skills journey, do not panic. This chapter will lay out the thinking to help you begin to frame your plan of attack. Skills at an enterprise level can be categorized generally into a few main buckets: • Business critical (think: those at the very core to a business strategy) • Role specific (think: department, job family, etc.) • Core “soft” skills (think: collaboration, design thinking, industry, communica‐ tion, etc.) • Technical skills (think: minimally comfortable in low-code environments, coding, model building, etc.) While these are important, the scope of this particular chapter is on the technical skills. And don’t be misled into the false belief that technical skills are needed only for your developers—with GenAI and agents, every role will be influenced, improved, and disrupted—perhaps even more so
+      for non-technical roles. And finally, dear reader, to thrive, you need a robust skills program. One that includes a blend of all your skills, but is also clearly calibrated to fuel the technical innovations ahead. This is not a one-and-done training session, or an intensive threeday all-hands at a fancy offsite, and it’s not something you can just hire into a new position. Long-term success will require a plan, access to lots of content and handson environments, and a personal and continued commitment to the investment of upskilling. 148 | : Skills That Thrill The good news is, like any innovation, adopting new skills can be mapped to the Innovation Adoption Lifecycle curve (also known as the Rogers bell curve) in Figure 6-1. Figure 6-1. The Innovation Adoption Lifecycle curve'
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Normal Distribution Prevalence
+    definition: Many naturally occurring quantities — measurement errors, biological traits, and aggregated human behaviors — cluster symmetrically around a central value with a characteristic bell-curve shape, so that extreme deviations are rare.
+    mechanism: 'This is an empirical regularity, not a causal mechanism: when a quantity aggregates many small independent influences it tends toward a bell curve (central-limit tendency), but the passages document the pattern and its use in statistical inference rather than isolate a single cause.'
+    boundary: Applies to aggregated, roughly independent, additive quantities. Fails for heavy-tailed (power-law) systems where extreme events are far more common than the bell curve predicts.
+    consequence: Because many phenomena are bell-curve-shaped, statistical inference that assumes normality is broadly applicable — but it misleads wherever tails are fat.
+    evidence_passages:
+    - 'If p \ 0.05: print(''Probably Gaussian'') else: print(''Probably not Gaussian'') ` - If the p-value is greater than 0.05, we fail to reject the null hypothesis, which means we cannot rule out the possibility that the data comes from a normal distribution'
+    - '148 | : Skills That Thrill The good news is, like any innovation, adopting new skills can be mapped to the Innovation Adoption Lifecycle curve (also known as the Rogers bell curve) in Figure 6-1'
+    extraction_type: empirical_pattern
+    content_type: principle
+    depth: universal
+  rationale: CONVERGENT POSITIVE — UNIVERSAL NORMAL DISTRIBUTION (T-015/D2421). Statistical hypothesis testing (Coding with ChatGPT) and innovation diffusion (AI Value Creators) both invoke the bell curve as a baseline distribution. Depth is universal — the Gaussian appears across measurement error, natural traits, and aggregated behavior in the same domain-independent sense as a power law.
+  tier: GOLD-A
+- id: CONV-061
+  domain: computational science & physics
+  discipline: information science
+  source_books:
+  - The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md
+  - Information Visualization Perception for Design (Colin Ware) (z-lib.org).md
+  cluster_segments:
+  - source_book: The Art of Doing Science and Engineering Learning to Learn (Richard W. Hamming) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: message, when we average over all code books, the encoding runs through all possible values, hence the average probability that a point is in the sphere is the ratio of the volume of the sphere to the total volume of the space. The volume of the sphere is The aliased band, therefore, is less than half a rotation, plus or minus. If we use the two real trigonometric functions, sine and cosine, we have a pair of eigenfunctions for each frequency, and the band is from [0] to [1/2] rotation, but when we use the complex exponential notation then we have one eigenfunction for each frequency, but now the band reaches from [--1/2] to [1/2] rotations. This avoidance of the multiple eigenvalues is part of the reason the complex frequencies are so much easier to handle than are the real sine and cosine functions. The maximum sampling rate for which aliasing does not occur is two samples in the cycle, and is called the Nyquist rate. From the samples the original signal cannot be determined
+      to within the aliased frequencies; only the basic frequencies that fall in the fundamental interval of unaliased frequencies ([--1/2] to [1/2] ) can be determined uniquely. The signals from the various aliased frequencies go to a single frequency in the band and are algebraically added; that is what we see once the sampling has been done. Hence addition or cancellation may occur during the aliasing, and we cannot know from the aliased signal what we originally had. At the maximum sampling rate one cannot tell the result from [1] , hence the unaliased frequencies must be within the band.
+  - source_book: Information Visualization Perception for Design (Colin Ware) (z-lib.org).md
+    text: makes small misalignments completely obvious. The spatial frequency amplification illustrated in Figure 2.29 can be used as a deliberate technique to magnify certain kinds of regular patterns to make invisibly fine variations visible (Post et al., 1997). It is used in optics to judge the sphericity of mirrors and lenses. Mathematical analysis of aliasing is based on a fundamental theorem of signal transmission called the Nyquist limit (Gonzalez & Woods, 1993). It is often (wrongly) stated that the consequence of the Nyquist limit is that a signal can be reconstructed from its samples if the samples are obtained at a frequency at least twice the highest frequency contained in the source. However this is only correct for the frequency, not the amplitude, and only for infinitely long signal trains. Figure 2.31 shows a pure sine wave, represented as a gray-scale image and the same data represented with sampling at 2.05, 3.05, 4.05, 5.05, and 6.05 times the spatial frequency of the
+      original. To get a reasonable representation clearly requires sampling at a frequency considerably greater than the Nyquist limit. 30 sec, 1.0 pixels 100 15 sec, 0.5 pixels Percentage judged to the left 75 50 Aliased Anti–aliased 25 Figure 2.32 Results from an experiment showing that vernier acuity can be improved by antialiasing. The threshold is defined as half the horizontal difference between the 25% threshold and the 75% threshold.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Nyquist Sampling Limit
+    definition: To reconstruct a continuous signal from discrete samples without distortion, the sampling rate must exceed twice the highest frequency present in the signal. Below this rate, distinct frequencies become indistinguishable (aliased).
+    mechanism: Sampling below twice the signal's highest frequency causes higher frequencies to fold down and masquerade as lower ones (aliasing), so the original signal cannot be recovered from the samples.
+    boundary: Applies to band-limited signals sampled uniformly. Fails (or requires anti-aliasing filtering) when the signal contains frequencies above the Nyquist frequency.
+    consequence: Because of the Nyquist limit, systems that digitize signals must sample fast enough or pre-filter, otherwise the reconstruction is corrupted by aliasing artifacts.
+    evidence_passages:
+    - The maximum sampling rate for which aliasing does not occur is two samples in the cycle, and is called the Nyquist rate
+    - Mathematical analysis of aliasing is based on a fundamental theorem of signal transmission called the Nyquist limit (Gonzalez & Woods, 1993)
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: specialized
+  rationale: CONVERGENT POSITIVE — SPECIALIZED NYQUIST SAMPLING (T-015/D2421). Signal processing (Hamming, The Art of Doing Science and Engineering) and information visualization (Ware, Perception for Design) independently state the Nyquist sampling limit. Depth is specialized — a domain-specific theorem of signal reconstruction, not a cross-domain law.
+  tier: GOLD-A
+- id: CONV-062
+  domain: finance & investment
+  discipline: finance
+  source_books:
+  - '[Colin Barrow_ Paul Barrow_ Robert Brown] The Busi.md'
+  - Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md
+  cluster_segments:
+  - source_book: '[Colin Barrow_ Paul Barrow_ Robert Brown] The Busi.md'
+    text: of invoices and receipts. The double-entry system requires two entries for each transaction – this provides built-in checks and balances to ensure accuracy. Each transaction requires an entry as a debit and as a credit. This may sound a little complicated, but you only need to get a general idea. A double-entry system is more complicated and time-consuming if done by hand, since everything is recorded twice. If done manually, the method requires a formal set of books – journals and ledgers. All transactions would be first entered into a journal and then ‘posted’ (written) on a ledger sheet – the same amount would be written down in two different places. Typical ledger accounts include those for titled income, expenses, assets and liabilities (debts). To give an example, a payment of rent in a double-entry system might result in two separate journal entries – a debit for an expense of, say, £/$/€250 and a corresponding credit of £/$/€250 – a double entry (see Table 25.3). The debits
+      in a double-entry system must always equal the credits. If they don’t, you know there is an error somewhere. So, double entry allows you to balance your books, which you can’t do with the single-entry method. Table 25.3 An example of a double-entry ledger General journal of Andrew’s Bookshop Date Description of entry Debit Credit 10th July Rent expense Cash £/$/€250 £/$/€250 Paper-based bookkeeping systems
+  - source_book: Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md
+    text: and use it routinely in life---just the way that if you want to become a golfer, you can't use the natural swing that broad evolution gave you. You have to learn to have a certain grip and swing in a different way to realize your full potential as a golfer. If you don't get this elementary, but mildly unnatural, mathematics of elementary probability into your repertoire, then you go through a long life like a one legged man in an ass kicking contest. You're giving a huge advantage to everybody else. One of the advantages of a fellow like Buffett, whom I've worked with all these years, is that he automatically thinks in terms of decision trees and the elementary math of permutations and combinations. Obviously, you have to know accounting. It's the language of practical business life. It was a very useful thing to deliver to civilization. I've heard it came to civilization through Venice, which, of course, was once the great commercial power in the Mediterranean. However, double
+      entry bookkeeping was a hell of an invention. And it's not that hard to understand. But you have to know enough about it to understand its limitations---because although accounting is the starting place, it's only a crude approximation. And it's not very hard to understand its limitations. For example, everyone can see that you have to more or less just guess at the useful life of a jet airplane or anything like that. Just because you express the depreciation rate in neat numbers doesn't make it anything you really know.
+  is_convergent: true
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Double-Entry Bookkeeping Balance
+    definition: A bookkeeping method in which every transaction is recorded as both a debit and a credit of equal value, so that the books must always balance and any discrepancy signals a recording error.
+    mechanism: 'Recording each transaction twice — once as a debit and once as a credit — creates an internal consistency check: because debits must equal credits, a mismatch directly signals that a recording error occurred.'
+    boundary: Applies to financial accounting where every transaction has two aspects. Fails (becomes insufficient) when accounts are misclassified or off-balance-sheet items are excluded.
+    consequence: Because of double-entry, bookkeepers can detect errors and keep balanced books — a structural integrity that single-entry records cannot provide.
+    evidence_passages:
+    - The debits in a double-entry system must always equal the credits
+    - However, double entry bookkeeping was a hell of an invention
+    extraction_type: causal_mechanism
+    content_type: principle
+    depth: specialized
+  rationale: CONVERGENT POSITIVE — SPECIALIZED DOUBLE-ENTRY BOOKKEEPING (T-015/D2421). Accounting practice (Barrow, The Business) and investing wisdom (Poor Charlie's Almanack) independently state the double-entry balancing mechanism. Depth is specialized — a domain-specific accounting method, not a cross-domain law.
   tier: GOLD-A

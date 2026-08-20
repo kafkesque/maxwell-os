@@ -1558,18 +1558,6 @@ disciplines:
   - autonomous systems
   - mechatronics
   - robot control
-- canonical: education
-  group: Operational & Strategy
-  raw:
-  - education
-  - Education
-  - Education Policy
-  - instructional design
-  - art education
-  - academic curriculum development
-  - pedagogy
-  - Academia
-  - learning science
 - canonical: health & medicine
   group: Heterodox
   raw:

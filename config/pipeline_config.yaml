@@ -292,6 +292,7 @@ stage4:
   - gradient
   max_failed_ratio: 0.01   # D2386: allow ≤1% terminal failures (was 0.0, D2338) — mirror S2 D2381; 1 CRIBS-quality exclusion (empty application) within tolerance
   checkpoint_interval: 5   # D2370: intra-stage incremental checkpoint cadence (clusters) — crash recovery for the long serial S4
+  fb_name_max_words: 8        # BUG-149: max words in normalized FB names (C12 — was hardcoded 5 in normalize_fb_name)
 s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3
@@ -382,7 +383,7 @@ taxonomy:
   replacement_threshold_ratio: 1.1
   emerging_freq_threshold: 10
   max_domains: 35       # D2378: canonical domain cap (matches taxonomy_v5.yaml; closed-loop — promote requires demote)
-  max_disciplines: 72   # D2378: canonical discipline cap (matches taxonomy_v5.yaml)
+  max_disciplines: 71   # D2378: canonical discipline cap (matches taxonomy_v5.yaml; D2422 removed education overlap)
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8

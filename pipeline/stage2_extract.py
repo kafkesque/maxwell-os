@@ -564,7 +564,7 @@ Classification (depth, domains, discipline) happens in Stage 4 -- do NOT include
 SINGLE_SOURCE_SYSTEM: str = (
     "You extract knowledge objects from text passages. "
     "Return a JSON object with these EXACT keys:\n"
-    "name, definition, mechanism, boundary, consequence, "
+    "name, definition, mechanism, boundary, consequence, elaboration, "
     "is_summary (bool), "
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
@@ -584,6 +584,11 @@ SINGLE_SOURCE_SYSTEM: str = (
     "content_type=principle for reusable concepts, process_template for repeatable methods, "
     "process_instance for case studies, growth_edge for speculative insights, "
     "tool_instruction for tool-specific commands. "
+    "⚠️ process_template vs tool_instruction: a process_template is a REPEATABLE HUMAN "
+    "METHOD with steps a person follows (a how-to, workflow, checklist, or protocol). "
+    "A tool_instruction is a COMMAND/API/ALGORITHM for a specific tool or code (a function, "
+    "syntax, library call, or code snippet). Code snippets, API descriptions, and algorithms "
+    "are tool_instruction — NOT process_template. "
     "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
     "object of any kind (no principle, no method, no case study, no tool command). "
     "A tool command, repeatable method, or concrete case study IS an extractable object "
@@ -596,7 +601,7 @@ SINGLE_SOURCE_SYSTEM: str = (
 SINGLETON_SYSTEM: str = (
     "You extract and classify content from a single text passage. "
     "Return a JSON object with these EXACT keys:\n"
-    "name, definition, mechanism, boundary, consequence, "
+    "name, definition, mechanism, boundary, consequence, elaboration, "
     "is_summary (bool), "
     "extraction_type (\"causal_mechanism\"|\"empirical_pattern\"|\"normative_heuristic\"|\"descriptive_model\"|\"none\"), "
     "content_type (\"principle\"|\"process_template\"|\"process_instance\"|\"growth_edge\"|\"tool_instruction\"), "
@@ -617,6 +622,11 @@ SINGLETON_SYSTEM: str = (
     "- extraction_type=empirical_pattern (correlation without proven cause) → content_type=growth_edge\n"
     "- extraction_type=normative_heuristic (rule of thumb): → content_type=process_template if a repeatable method, else content_type=principle\n"
     "- Tool-specific commands/features → content_type=tool_instruction\n"
+    "⚠️ process_template vs tool_instruction: a process_template is a REPEATABLE HUMAN "
+    "METHOD with steps a person follows (how-to, workflow, checklist). A tool_instruction is "
+    "a COMMAND/API/ALGORITHM for a specific tool or code (function, syntax, library call, "
+    "code snippet). Code snippets and API/algorithm descriptions are tool_instruction — NOT "
+    "process_template.\n"
     "- Case studies/specific examples → content_type=process_instance\n"
     "- extraction_type=none + no principle → route=NULL\n"
     "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
@@ -1224,6 +1234,7 @@ def run_stage2(
     gate_enabled: bool = S2_GATE_ENABLED,
     gate_strict: bool = S2_GATE_STRICT,
     hybrid_gate: bool = False,
+    reprocess_gated: bool = False,
 ) -> None:
     """Run Stage 2: Convergent principle extraction from clusters.
 
@@ -1233,6 +1244,9 @@ def run_stage2(
         gate_enabled: Enable gate enforcement.
         gate_strict: Force [] on NULL-route with content.
         hybrid_gate: D2276 — Use DSPy-inspired pre-extraction gate to skip non-principle clusters.
+        reprocess_gated: D2421 — Re-process clusters summary-gated (is_summary=true) on resume.
+            Un-marks gated IDs from processed_ids so they re-enter extraction with the
+            content_type-aware gate (D2417). Requires a prior run's .gated_ids sidecar.
     """
     # D2215: Force write-through logging (tee/nohup/pipe corrupt buffered output on macOS)
     # python3 -u should be enough, but TextIOWrapper on macOS still buffers on
@@ -1436,7 +1450,9 @@ def run_stage2(
 
     # Resume support
     processed_ids: set[str] = set()
+    gated_ids: set[str] = set()  # D2421: cluster IDs gated by is_summary (reprocessable)
     segids_file: str = str(STAGE2_CHECKPOINT) + ".segids"
+    gated_ids_file: str = str(STAGE2_CHECKPOINT) + ".gated_ids"
     if STAGE2_CHECKPOINT.exists() and os.path.exists(segids_file):
         try:
             # D2332: fail-closed JSONL read — a pretty-printed/multi-line checkpoint
@@ -1444,6 +1460,16 @@ def run_stage2(
             all_fbs.extend(load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint"))
             with open(segids_file) as f:
                 processed_ids = set(json.load(f))
+            # D2421: load gated cluster IDs (is_summary-gated) for optional re-processing.
+            if os.path.exists(gated_ids_file):
+                try:
+                    with open(gated_ids_file) as f:
+                        gated_ids = set(json.load(f))
+                except Exception:
+                    gated_ids = set()
+            if reprocess_gated and gated_ids:
+                processed_ids -= gated_ids
+                print(f"   ♻️  Reprocessing {len(gated_ids)} previously-gated clusters (--reprocess-gated)")
             # D2215: Detect cluster-ID format mismatch between old segids and current probe cache.
             # Old probe used "cluster_N_subN", new probe uses "cluster_N_sN_subN". Zero overlap
             # means the segids are from a different probe format — discard them to avoid silent reprocessing.
@@ -1754,6 +1780,7 @@ def run_stage2(
 
                 if fb.get("_gate"):
                     total_gate_violations += 1
+                    gated_ids.add(cid)  # D2421: persist gated IDs for --reprocess-gated
                     print(f"  [{completed}/{len(target_clusters)}] {conv_tag} {cid}: summary gated")
                     continue
 
@@ -1813,9 +1840,34 @@ def run_stage2(
                     print(f"   ⚠️  segids checkpoint write failed: {type(e).__name__}: {e}", flush=True)
                     if os.path.exists(segids_tmp.name):
                         os.unlink(segids_tmp.name)
+                # D2421: persist gated IDs alongside segids (atomic, crash-safe).
+                gated_tmp = tempfile.NamedTemporaryFile(
+                    mode="w", suffix=".gated_ids", delete=False,
+                    dir=str(STAGE2_CHECKPOINT.parent)
+                )
+                try:
+                    json.dump(list(gated_ids), gated_tmp)
+                    gated_tmp.flush()
+                    os.fsync(gated_tmp.fileno())
+                    gated_tmp.close()
+                    os.replace(gated_tmp.name, gated_ids_file)
+                except Exception as e:
+                    print(f"   ⚠️  gated_ids checkpoint write failed: {type(e).__name__}: {e}", flush=True)
+                    if os.path.exists(gated_tmp.name):
+                        os.unlink(gated_tmp.name)
 
     # Write final checkpoint (BUG-106: self-verifying JSONL)
     _write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs)
+    # D2421: final atomic write of gated IDs (incremental write fires only every 5 clusters).
+    import tempfile as _tmp_final
+    try:
+        _gated_final = _tmp_final.NamedTemporaryFile(mode="w", suffix=".gated_ids", delete=False,
+                                                     dir=str(STAGE2_CHECKPOINT.parent))
+        json.dump(list(gated_ids), _gated_final)
+        _gated_final.flush(); os.fsync(_gated_final.fileno()); _gated_final.close()
+        os.replace(_gated_final.name, gated_ids_file)
+    except Exception as e:
+        print(f"   ⚠️  final gated_ids write failed: {type(e).__name__}: {e}", flush=True)
 
     # Summary
     print(f"\n{'='*60}")
@@ -2062,6 +2114,8 @@ def main() -> None:
                         help="Disable gate enforcement (debug only)")
     parser.add_argument("--hybrid", action="store_true",
                         help="D2276: Enable DSPy-inspired hybrid gate — pre-filter clusters before extraction")
+    parser.add_argument("--reprocess-gated", action="store_true",
+                        help="D2421: Re-process clusters that were summary-gated (is_summary=true) on resume")
     args: argparse.Namespace = parser.parse_args()
 
     run_stage2(
@@ -2069,6 +2123,7 @@ def main() -> None:
         only_convergent=args.only_convergent,
         gate_enabled=not args.no_gate,
         hybrid_gate=args.hybrid,
+        reprocess_gated=args.reprocess_gated,
     )
 
     if args.process_singletons:

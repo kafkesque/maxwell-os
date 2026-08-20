@@ -4,6 +4,20 @@
 
 ---
 
+## 🟢 BUG-154 — 2026-08-21 — MinHash LSH key collision on resume ("The given key already exists") — FIXED
+- **Symptom:** the t11 `--only-single-source --reset-single-source` rerun failed on EVERY FB-producing cluster with `❌ cluster_X: The given key already exists` (a datasketch `MinHashLSH.insert` ValueError). Only NULL/skip clusters advanced; every extractable object was lost.
+- **Root cause:** `is_near_duplicate()` assigned new signatures with `f"mh_{len(minhash_cache)}"`. On resume the D2382 rebuild inserts the checkpoint FBs' *stored* signatures ("mh_0"…"mh_2642") into a fresh LSH, but those keys have a GAP (a near-dup/other FB consumed a slot without persisting → 2641 keys, max index 2642). `len(minhash_cache)` = 2641 therefore lands on the occupied "mh_2641" → `lsh.insert` raises. This was NOT specific to `--reset-single-source` — any t11 resume (`--reprocess-gated` included) would have hit it. Latent since D2382.
+- **Fix (2026-08-21):** `is_near_duplicate()` now finds the next FREE index (`while f"mh_{idx}" in minhash_cache: idx += 1`) instead of assuming contiguous keys. Regression: `tests/test_stage2_minhash_resume_collision.py` (2 tests).
+- **Source:** 2026-08-21 live t11 single-source rerun (first 44 clusters) + signature-gap audit of the pre-rerun checkpoint.
+
+## 🟢 BUG-153 — 2026-08-21 — `process_singletons` references undefined `ss_few_shot_text` → NameError — FIXED
+- **Symptom:** the BUG-152 singleton golden wiring left `ss_few_shot_text` referenced inside `process_singletons._process_one` (`few_shot=ss_few_shot_text if ss_few_shot_text else None`), but that name is a **local** of `run_stage2`, not a module global. `process_singletons` (a standalone function) had no such binding → the first singleton extraction would raise `NameError: name 'ss_few_shot_text' is not defined`, silently (the workers swallow exceptions into `return None`).
+- **Root cause:** cross-function scope assumption — the BUG-152 wiring threaded `ss_few_shot_text` into the single-source call site inside `run_stage2`, but the singleton call site lives in a separate function whose golden-loading block was never added.
+- **Impact:** `--process-singletons` was dead on arrival — 35,122 t11 singletons would produce zero FBs (or crash). Hidden failure: the worker-level `except Exception: return None` masked it as "no output" rather than a loud error (C16 violation by proximity).
+- **Fix (2026-08-21):** `process_singletons` now loads the single-source golden independently (`load_golden_single_source` + `format_golden_fewshot_single_source`) and binds its own `ss_few_shot_text`, mirroring `run_stage2`. Verified by `py_compile` + scope audit (no remaining cross-function references).
+- **Note (follow-up):** `process_singletons` still lacks a resume mechanism (`processed_ids` is initialized empty and `singleton.segids` is never read) — a crash partway through a 35K-singleton run would restart from scratch. Defer full singleton run until a resume skip is added.
+- **Source:** 2026-08-21 preflight scope-audit of the BUG-152 golden wiring (`grep ss_few_shot_text` across function scopes).
+
 ## 🟢 BUG-152 — 2026-08-20 — S2 single-source zero-golden → re-labelling + over-fire — FIXED (single-source balanced golden wired)
 - **Symptom:** A drafted mono-type prompt (`tools/s2_contamination_audit.py`) instructing "extract ONLY principle, else route=NULL" was A/B'd against the current multi-type `SINGLE_SOURCE_SYSTEM` on 8 curated passages (all 5 roles + `empirical_pattern` boundary + negative control). The mono prompt was **worse**, not better:
   - `process_template` (pilots 3-techniques) → mono emitted `principle` (normative_heuristic) instead of NULL.
@@ -34,11 +48,12 @@
 - **Fix (T1.2):** either remove `route` from S2 prompts + builder, or wire D2128 mapping so `route` is computed from `content_type` (single source of truth). Verify no consumer reads `route` first.
 - **Source:** 2026-08-20 senior audit of t11 checkpoint (content_type×route cross-tab).
 
-## 🔴 BUG-147 — 2026-08-20 — S2 over-assigns `process_template`, under-assigns `tool_instruction` (role-label precision) — OPEN
+## 🟢 BUG-147 — 2026-08-20 — S2 over-assigns `process_template`, under-assigns `tool_instruction` (role-label precision) — FIXED (single-source path, via BUG-152 contrastive golden)
 - **Symptom:** 39/40 non-principle FBs are `process_template`, only 1 is `tool_instruction`. But ~25 of the 39 "process_templates" are *code/API/algorithm descriptions* (DFS tree traversal, Point Class Constructor, Matrix Reshaping, Closure-based State Management, DoWhy causal framework, patch vertex consistency, safe string extraction). These are tool_instruction / descriptive_model / principle — NOT repeatable human how-to methods.
 - **Root cause:** D2417 fixed the *field* conflation (ROLE leaking into extraction_type), but the *role-label* precision is still weak. Qwen3-Coder treats any technical/procedural prose as `process_template`, reserving `tool_instruction` almost never. The single-source prompt describes the 5 roles in one sentence with no contrastive PT-vs-TI disambiguation.
 - **Impact:** if PT/TI ever become Layer-1 retrieval buckets (D2418), ~25/40 = 62% of non-principle objects would land in the wrong bucket. Tool grounding (MCP/Recipe promotion) would be starved of the very TI objects the 13-field schema was designed to capture.
-- **Fix (T1.2, D2418):** contrastive PT-vs-TI examples in the single-source prompt ("a command/API/algorithm is tool_instruction; a repeatable human method with steps is process_template"); add golden few-shot pairs; extend D2417 tests with PT/TI hybrid cases.
+- **Fix (single-source path — IMPLEMENTED + VERIFIED 2026-08-20/21):** the BUG-152 balanced single-source golden (`config/golden/stage2_fewshot_single_source.yaml`) added a SECOND `tool_instruction` contrastive positive (DFS algorithm described as steps) alongside the clear library-call TI, and `load_golden_single_source()` was changed to return ALL positives (6) so the contrastive pair is never dropped. The `SINGLE_SOURCE_SYSTEM`/`SINGLETON_SYSTEM` prompts carry an explicit "⚠️ process_template vs tool_instruction" disambiguation. `tools/s2_contamination_audit.py` `tool_vs_template` probe now emits `tool_instruction` (was `process_template`) — **8/8 audit correct**.
+- **Remaining (T1.2, D2418):** re-measure the PT/TI split on the FULL single-source corpus after the t11 `--only-single-source --reset-single-source` rerun; the convergent path (principle-only by D2323 design) needs no change. Regression coverage: `tests/test_stage2_single_source_golden.py::test_tool_instruction_has_contrastive_pair`.
 - **Source:** 2026-08-20 senior audit — t11 checkpoint non-principle sample (source books: Coding with ChatGPT, Graphics Shaders, Grammar of Graphics, RAG-Driven, The Self-taught Programmer).
 
 ## 🔴 BUG-150 — 2026-08-20 — S4 discipline `emerging` regression: 38.4% on full T1.1 (was 15.5% canary) — OPEN

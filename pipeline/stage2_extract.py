@@ -938,7 +938,16 @@ def is_near_duplicate(text: str, lsh, minhash_cache: dict) -> tuple[bool, str | 
     results = lsh.query(mh)
     if results:
         return True, None
-    sig: str = f"mh_{len(minhash_cache)}"
+    # BUG-154 (2026-08-21): the old counter scheme `f"mh_{len(minhash_cache)}"`
+    # collides on resume — the D2382 rebuild inserts stored signatures ("mh_0"…
+    # "mh_2642") with a GAP (a near-duplicate/other FB consumed a slot without
+    # persisting), so `len(minhash_cache)` lands on an already-occupied index and
+    # `lsh.insert` raises "The given key already exists" for every FB-producing
+    # cluster (run-killer). Find the next FREE index instead.
+    idx: int = len(minhash_cache)
+    while f"mh_{idx}" in minhash_cache:
+        idx += 1
+    sig: str = f"mh_{idx}"
     lsh.insert(sig, mh)
     # D2208: LRU eviction — prevent unbounded cache growth
     if len(minhash_cache) >= 10000:
@@ -1453,9 +1462,29 @@ def _write_probe_cache(
         print(f"   ⚠️  Probe cache write failed ({type(e).__name__}: {e})")
 
 
+def _validate_mode_flags(
+    only_convergent: bool,
+    only_single_source: bool,
+    reset_single_source: bool,
+) -> None:
+    """Fail fast on contradictory/unsafe mode-flag combinations (P2-1 / BUG-152).
+
+    Guards against a silent data-loss footgun: --reset-single-source drops old
+    single-source FBs, so it must never run while convergent clusters are also
+    being extracted (only_single_source=False). And the two mode-selector flags
+    are mutually exclusive by construction.
+    """
+    if only_convergent and only_single_source:
+        raise ValueError("--only-convergent and --only-single-source are mutually exclusive")
+    if reset_single_source and not only_single_source:
+        raise ValueError("--reset-single-source requires --only-single-source")
+
+
 def run_stage2(
     provider: str = "omlx",
     only_convergent: bool = False,
+    only_single_source: bool = False,
+    reset_single_source: bool = False,
     gate_enabled: bool = S2_GATE_ENABLED,
     gate_strict: bool = S2_GATE_STRICT,
     hybrid_gate: bool = False,
@@ -1466,6 +1495,15 @@ def run_stage2(
     Args:
         provider: "omlx" or "mlx" for LLM inference.
         only_convergent: Skip single-source clusters.
+        only_single_source: Extract ONLY single-source clusters (skip convergent).
+            P2-1 / BUG-152 follow-up — re-extract the single-source phase with the
+            balanced golden + per-type body schemas while leaving the already-correct
+            convergent FBs untouched. Mutually exclusive with only_convergent.
+        reset_single_source: On resume, drop OLD single-source FBs (is_convergent=False)
+            and un-mark single-source cluster IDs so they are RE-extracted (the pre-fix
+            single-source FBs were re-labelled as principle and lacked type-specific
+            body fields — BUG-152). Convergent FBs are preserved. Only meaningful with
+            only_single_source.
         gate_enabled: Enable gate enforcement.
         gate_strict: Force [] on NULL-route with content.
         hybrid_gate: D2276 — Use DSPy-inspired pre-extraction gate to skip non-principle clusters.
@@ -1492,12 +1530,16 @@ def run_stage2(
     clusters: list[dict] = load_clusters()
 
     # Filter: convergent vs single-source
+    _validate_mode_flags(only_convergent, only_single_source, reset_single_source)
+
     convergent: list[dict] = [c for c in clusters if c.get("is_convergent")]
     single_source: list[dict] = [c for c in clusters if not c.get("is_convergent") and not c.get("is_noise", False)]
     noise: list[dict] = [c for c in clusters if c.get("is_noise", False)]
 
     if only_convergent:
         target_clusters: list[dict] = convergent
+    elif only_single_source:
+        target_clusters: list[dict] = single_source
     else:
         target_clusters = convergent + single_source
 
@@ -1579,8 +1621,15 @@ def run_stage2(
     # ═══════════════════════════════════════════════════════════════════════
     split_count: int = 0
     extra_fbs_estimate: int = 0
-    cached_targets: list[dict] | None = _load_probe_cache(convergent, single_source, only_convergent)
-    if cached_targets is not None:
+    cached_targets: list[dict] | None = None
+    if not only_single_source:
+        cached_targets = _load_probe_cache(convergent, single_source, only_convergent)
+    if only_single_source:
+        # Single-source-only: the split-probe only ever sub-divides CONVERGENT
+        # clusters, so it is irrelevant here. target_clusters already == single_source.
+        cached_targets = None
+        print(f"   🎯 Single-source-only: {len(single_source)} clusters (convergent skipped)")
+    elif cached_targets is not None:
         target_clusters = cached_targets
         # D2215: If running --only-convergent but cache includes single-source,
         # filter to convergent-only targets. Cache built with full corpus can
@@ -1712,12 +1761,31 @@ def run_stage2(
             if reprocess_gated and gated_ids:
                 processed_ids -= gated_ids
                 print(f"   ♻️  Reprocessing {len(gated_ids)} previously-gated clusters (--reprocess-gated)")
+            # P2-1 / BUG-152: --reset-single-source — replace the pre-fix single-source
+            # FBs (re-labelled as principle, missing type-specific body fields) with a
+            # clean re-extraction. Drop OLD is_convergent=False FBs from the checkpoint
+            # and un-mark single-source cluster IDs so they re-enter extraction. The
+            # already-correct convergent FBs (is_convergent=True) are preserved verbatim.
+            if reset_single_source:
+                ss_cids: set[str] = {c.get("cluster_id", "") for c in single_source}
+                kept: list[dict] = [fb for fb in all_fbs if fb.get("is_convergent")]
+                n_dropped: int = len(all_fbs) - len(kept)
+                all_fbs[:] = kept
+                n_unmarked: int = len(processed_ids & ss_cids)
+                processed_ids -= ss_cids
+                gated_ids -= ss_cids
+                print(f"   ♻️  Reset single-source: dropped {n_dropped} old single-source FBs, "
+                      f"un-marked {n_unmarked} single-source cluster IDs for re-extraction")
             # D2215: Detect cluster-ID format mismatch between old segids and current probe cache.
             # Old probe used "cluster_N_subN", new probe uses "cluster_N_sN_subN". Zero overlap
             # means the segids are from a different probe format — discard them to avoid silent reprocessing.
-            target_cids: set[str] = {c.get("cluster_id", "") for c in target_clusters}
-            if processed_ids and not (processed_ids & target_cids):
-                print(f"   ⚠️  Resume segids format mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(target_cids)} targets")
+            # NOTE: compare against the FULL corpus (convergent + single_source), not the
+            # mode-filtered target_clusters — in --only-single-source mode the convergent IDs
+            # in processed_ids are intentionally absent from target_clusters, which must not
+            # be misread as a format mismatch (that would discard the preserved convergent FBs).
+            all_cids: set[str] = {c.get("cluster_id", "") for c in (convergent + single_source)}
+            if processed_ids and not (processed_ids & all_cids):
+                print(f"   ⚠️  Resume segids format mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(all_cids)} corpus clusters")
                 print("   ⚠️  Starting fresh — all clusters will be processed")
                 processed_ids = set()
                 all_fbs = []  # D2317: discard stale FBs from a different run's checkpoint
@@ -2198,6 +2266,22 @@ def process_singletons(
     # Load segments for text lookup
     segments = load_segments()
 
+    # BUG-152 fix (2026-08-21): load the balanced single-source golden for the
+    # singleton path. `ss_few_shot_text` was previously referenced here but only
+    # defined in run_stage2 — a latent NameError that would crash the first
+    # singleton extraction. Load it independently (process_singletons is standalone).
+    ss_golden_path: str | None = S2_GOLDEN_SINGLE_SOURCE_PATH
+    if ss_golden_path and not os.path.isabs(str(ss_golden_path)):
+        ss_golden_path = str(Path(__file__).resolve().parent.parent / ss_golden_path)
+    _ss_pos, _ss_neg, _ = load_golden_single_source(
+        ss_golden_path, S2_GOLDEN_SINGLE_SOURCE_NEGATIVE, S2_GOLDEN_SINGLE_SOURCE_MAX
+    )
+    ss_few_shot_text: str = ""
+    if S2_GOLDEN_SINGLE_SOURCE_INJECT and _ss_pos:
+        ss_few_shot_text = format_golden_fewshot_single_source(_ss_pos, _ss_neg)
+        print(f"   🎯 Singleton golden few-shot: {len(_ss_pos)} pos + {len(_ss_neg)} neg "
+              f"({len(ss_few_shot_text)} chars)")
+
     # D2211: Health check — use stress_test (real chat requests, not just /v1/models)
     if provider == "omlx":
         from pipeline.omlx_call import CircuitOpenError, stress_test_omlx
@@ -2363,6 +2447,10 @@ def main() -> None:
     )
     parser.add_argument("--only-convergent", action="store_true",
                         help="Skip single-source clusters (extract only from ≥2 book clusters)")
+    parser.add_argument("--only-single-source", action="store_true",
+                        help="P2-1/BUG-152: extract ONLY single-source clusters (skip convergent)")
+    parser.add_argument("--reset-single-source", action="store_true",
+                        help="P2-1/BUG-152: on resume, drop old single-source FBs + re-extract them (use with --only-single-source)")
     parser.add_argument("--process-singletons", action="store_true",
                         help="Extract principles from singleton (unclustered) segments (D2149)")
     parser.add_argument("--provider", choices=["omlx", "mlx"], default="omlx",
@@ -2378,6 +2466,8 @@ def main() -> None:
     run_stage2(
         provider=args.provider,
         only_convergent=args.only_convergent,
+        only_single_source=args.only_single_source,
+        reset_single_source=args.reset_single_source,
         gate_enabled=not args.no_gate,
         hybrid_gate=args.hybrid,
         reprocess_gated=args.reprocess_gated,

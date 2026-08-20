@@ -124,6 +124,21 @@ stage1_5:
     python3 pipeline/stage1_5_embed_cluster.py
 stage2:
     python3 pipeline/stage2_extract.py
+
+# P2-1 / BUG-152 (2026-08-21): re-extract the t11 single-source clusters with the
+# balanced golden + per-type body schemas, skipping the already-correct convergent
+# FBs. S2 ONLY — stops before S4/S5/S6 so the single-source output can be visually
+# inspected before any classification/verification/commit. Logs to
+# knowledge pipeline/stage2_extract/t11/single_source_rerun.log AND stdout (tee).
+s2-single-source-rerun:
+    @echo "=== S2 single-source rerun (t11, P2-1/BUG-152) — convergent skipped ==="
+    @mkdir -p "knowledge pipeline/stage2_extract/t11"
+    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_extract.py --only-single-source --reset-single-source 2>&1 | tee "knowledge pipeline/stage2_extract/t11/single_source_rerun.log"
+
+# Tail the live S2 single-source rerun log (progress tracker).
+s2-single-source-status:
+    @tail -n 60 -f "knowledge pipeline/stage2_extract/t11/single_source_rerun.log"
+
 # D2177: stage3 removed (D2120) — redirects to runner
 stage4:
     python3 pipeline/stage4_merge.py

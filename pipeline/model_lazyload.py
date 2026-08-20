@@ -6,16 +6,16 @@ Manages OMLX model lifecycle: load on demand, auto-unload when idle.
 
 Usage:
   # Pre-warm a model (loads and keeps warm for N seconds)
-  python3 tools/model_lazyload.py --load Qwen3-Coder-30B-A3B-Instruct-MLX-4bit --warm 120
+  python3 pipeline/model_lazyload.py --load Qwen3-Coder-30B-A3B-Instruct-MLX-4bit --warm 120
 
   # Unload specific model immediately
-  python3 tools/model_lazyload.py --unload gemma-4-26B-A4B-it-OptiQ-4bit
+  python3 pipeline/model_lazyload.py --unload gemma-4-26B-A4B-it-OptiQ-4bit
 
   # Unload ALL non-pinned models (reset to baseline)
-  python3 tools/model_lazyload.py --reset
+  python3 pipeline/model_lazyload.py --reset
 
   # Daemon mode: auto-unload idle models after N seconds
-  python3 tools/model_lazyload.py --daemon --idle-timeout 300
+  python3 pipeline/model_lazyload.py --daemon --idle-timeout 300
 
 Architecture:
   - Pinned models (Phi-4-mini, gemma-4-E4B): always hot (~8GB)

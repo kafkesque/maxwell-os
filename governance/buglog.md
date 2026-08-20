@@ -1,14 +1,50 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-17 20:05 (R3 canary S4→S6 rerun COMPLETE — S4 279/279, S5 236 PASS/43 QUARANTINE, S6 279 committed; response_format=json_object → empty gpt-oss-20b content BUG-142 fixed D2408; OMLX launchd port-conflict crash loop cleaned up)
+> **Last updated:** 2026-08-20 13:14 (D2420-D2422 + BUG-151: quarantine policy decided, mixed remediation strategy, domain/discipline disjointness audit)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
 
-## 🟡 BUG-146 — 2026-08-19 — S2 summary gate is content_type-blind — discards PT/PI/GE potential — OPEN (post-T1.1)
+## 🔴 BUG-151 — 2026-08-20 — domain/discipline taxonomy structural overlap (`education` dual-listed + 267 raw-alias overlaps) — OPEN
+- **Symptom:** `config/taxonomy_v5.yaml` lists `education` as canonical in BOTH `domains` (line 510) and `disciplines` (line 1561). Additionally 267 raw-alias strings appear in both a domain entry and a discipline entry (`artificial intelligence`, `brand strategy`, `clinical psychology`, `computer graphics`, …). This means the domain/discipline boundary is fuzzy for 267 concepts.
+- **Root cause:** taxonomy authored as two lists without a disjointness invariant. Mapping code IS kind-aware (D2133/D2394 `_accept()` filters by canonical list; `synonym_map.yaml` is domain-only), so cross-kind *mapping* leak is already prevented — but the `education` canonical is valid in both `is_valid_domain()` and `is_valid_discipline()`, so a model can emit it in either field and pass validation.
+- **Impact:** structural ambiguity only (1 canonical); the 38.4% `emerging` (BUG-150) is the larger *miss* and is distinct. A model emitting `discipline="education"` where `education`-the-domain was meant goes uncaught.
+- **Fix (T1.2, D2422):** remove `education` from one list; add CI test asserting `domain_canonicals ∩ discipline_canonicals == ∅`; add validation that a discipline raw-label resolving only in the domain index re-classifies rather than silently `emerging`.
+- **Source:** 2026-08-20 — taxonomy_v5.yaml canonical/raw-alias intersection audit (Python).
+
+## 🔴 BUG-148 — 2026-08-20 — S2 `route` field is stale/uniform (`route="FB"` on ALL 2,878 records) — OPEN
+- **Symptom:** every record in `stage2_extract/t11/checkpoint.jsonl` has `route="FB"` — including the 39 `process_template` and 1 `tool_instruction`. The route field no longer discriminates; it is inert noise (D2128 route→content_type mapping is never exercised in practice).
+- **Root cause:** S2 prompts (convergent + single-source + singleton) emit `route: "FB" | "NULL"` as a legacy field. `_resolve_content_type()` in S4 correctly prefers `content_type`, so routing survives — but `route` itself is vestigial.
+- **Impact:** low today (S4 ignores it), but a C12/C19 violation — dead field retained in every record, and any downstream code trusting `route` would silently misroute PT/PI/GE/TI into the FB bucket.
+- **Fix (T1.2):** either remove `route` from S2 prompts + builder, or wire D2128 mapping so `route` is computed from `content_type` (single source of truth). Verify no consumer reads `route` first.
+- **Source:** 2026-08-20 senior audit of t11 checkpoint (content_type×route cross-tab).
+
+## 🔴 BUG-147 — 2026-08-20 — S2 over-assigns `process_template`, under-assigns `tool_instruction` (role-label precision) — OPEN
+- **Symptom:** 39/40 non-principle FBs are `process_template`, only 1 is `tool_instruction`. But ~25 of the 39 "process_templates" are *code/API/algorithm descriptions* (DFS tree traversal, Point Class Constructor, Matrix Reshaping, Closure-based State Management, DoWhy causal framework, patch vertex consistency, safe string extraction). These are tool_instruction / descriptive_model / principle — NOT repeatable human how-to methods.
+- **Root cause:** D2417 fixed the *field* conflation (ROLE leaking into extraction_type), but the *role-label* precision is still weak. Qwen3-Coder treats any technical/procedural prose as `process_template`, reserving `tool_instruction` almost never. The single-source prompt describes the 5 roles in one sentence with no contrastive PT-vs-TI disambiguation.
+- **Impact:** if PT/TI ever become Layer-1 retrieval buckets (D2418), ~25/40 = 62% of non-principle objects would land in the wrong bucket. Tool grounding (MCP/Recipe promotion) would be starved of the very TI objects the 13-field schema was designed to capture.
+- **Fix (T1.2, D2418):** contrastive PT-vs-TI examples in the single-source prompt ("a command/API/algorithm is tool_instruction; a repeatable human method with steps is process_template"); add golden few-shot pairs; extend D2417 tests with PT/TI hybrid cases.
+- **Source:** 2026-08-20 senior audit — t11 checkpoint non-principle sample (source books: Coding with ChatGPT, Graphics Shaders, Grammar of Graphics, RAG-Driven, The Self-taught Programmer).
+
+## 🔴 BUG-150 — 2026-08-20 — S4 discipline `emerging` regression: 38.4% on full T1.1 (was 15.5% canary) — OPEN
+- **Symptom:** 1088/2830 FBs (38.4%) have `discipline=emerging` (fallback), vs D2398's measured 15.5% on the canary. `domains` contains `emerging` on 2554/2830 (90.2%).
+- **Root cause:** the D2394 synonym/alias fix held only on the 279-cluster design-canary. The full T1.1 corpus (940 books: business/psych/econ/ops/health/policy) is far broader than the design-centric `taxonomy_v5`. Raw labels falling back to `emerging` include `graphic design` (92!), `organizational behavior` (31), `data visualization` (27), `design studies` (23), `design thinking` (18) — note `graphic design` itself does not map to a canonical discipline, so this is a synonym/alias gap, not just corpus-mismatch.
+- **Impact:** 38.4% of FBs are unclassifiable by discipline → retrieval/filtering by discipline is ~62% blind. This is the single biggest classification-quality gap.
+- **Fix (T1.2):** promote `graphic design`, `data visualization`, `organizational behavior`, `design thinking`, `product design`, `ux design` to canonical disciplines (or map as aliases). Re-measure after. See D2388/D2394.
+- **Source:** 2026-08-20 — t11 S4 checkpoint discipline/domains cross-tab.
+
+## 🔴 BUG-149 — 2026-08-20 — S4 name truncation: `max_words=5` hardcoded truncates 176 FB names — OPEN
+- **Symptom:** 176/2830 FB names truncated to ≤5 words by `normalize_fb_name(name, max_words=5)` (stage4_merge.py:672,1470). E.g. "Perceived Complexity and Deviation in Metaphor" → "Perceived Complexity and Deviation in". 933 more names case-normalized (1109 changed total). Truncation propagated to S5 (2822/2822 S5 names == S4 names).
+- **Root cause:** C12 violation — `max_words=5` is a hardcoded magic number; `config/pipeline_config.yaml` already declares `fb_name_max_chars: 200` but that key is consumed ONLY by `retrieval_evaluator.py`, never by S4. So the config value is dead and the real limit is an undocumented hardcoded 5-word cap.
+- **Impact:** 176 FB names lost their distinguishing suffix (e.g. "…in Metaphor" dropped). Search/retrieval by name degraded; truncated names look identical to unrelated FBs.
+- **Fix (T1.2):** wire `fb_name_max_chars` (or a new `fb_name_max_words`) into `normalize_fb_name`, defaulting to ≥8 words or the 200-char cap. A post-hoc name-restore script can recover the 176 full names from the S2 checkpoint (they are intact there) without re-running S4/S5.
+- **Source:** 2026-08-20 — S2→S4→S5 name diff (176 truncated, 0 with ellipsis, max S4 name 62 chars).
+
+## 🟡 BUG-146 — 2026-08-19 — S2 summary gate is content_type-blind — discards PT/PI/GE potential — OPEN (D2417 committed, NOT re-run)
 - **Symptom:** 6,127 clusters (63% of processed) "summary gated" — skipped wholesale. The gate keys ONLY on `is_summary` (`stage2_extract.py:1558`: `if is_summary and gate_enabled: return _gate`) with NO content_type awareness — a cluster flagged is_summary is dropped even if it could yield a process_template/process_instance/growth_edge/tool_instruction.
 - **Root cause:** prompt ties `is_summary` to "without identifying a convergent mechanism" — conflates "no extractable principle" with "no extractable object of ANY type". Single-source prompt never defines is_summary beyond "(bool)".
 - **Evidence:** checkpoint content_type = principle 2,778, process_template 32, tool_instruction 1, process_instance 0, growth_edge 0 (of 2,811 FBs). Pipeline is ~99% principle; the 6,127 gated clusters likely include PT/PI/GE-worthy content.
-- **Fix (post-T1.1, alongside BUG-145):** content_type-aware gate (is_summary must NOT gate PT/PI/GE/TI) + prompt tightening ("is_summary=true means NO extractable object of ANY type").
+- **Fix (post-T1.1, alongside BUG-145):** content_type-aware gate (is_summary must NOT gate PT/PI/GE/TI) + prompt tightening ("is_summary=true means NO extractable object of ANY type"). **D2417 committed 2026-08-19 17:20 — but t11 S2 checkpoint mtime 15:56 predates it, so the 2,878 FBs are pre-fix. Re-extraction requires a `--reprocess-gated` flag (gated clusters ARE in processed_ids: 13,712/13,899 processed, only 187 unprocessed → `--resume-from 2` would skip the 9,842 gated silently).**
+- **Value audit (D2418, 2026-08-20):** 40 gated clusters sampled → ~35-40% genuine principles, ~20% genuine PT/PI/TI, ~35-40% correctly gated noise. The gate discarded substantial extractable value (~5,500–6,000 objects).
 - **Source:** live T1.1 run 2026-08-19 — audit of summary-gate behavior.
 
 ## 🟡 BUG-145 — 2026-08-18 — S2 model conflates extraction_type/content_type ('tool_instruction') — OPEN (post-T1.1 prompt fix)

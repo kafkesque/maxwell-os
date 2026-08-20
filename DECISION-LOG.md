@@ -3,6 +3,78 @@
 
 ---
 
+### D2422 — Domain/discipline disjointness: 1 canonical overlap + 267 raw-alias overlaps (2026-08-20)
+**Category:** QLT / AUDIT
+
+**Finding (verified against taxonomy_v5.yaml + schemas.py, not assumed):** `taxonomy_v5.yaml` has 35 domain canonicals / 72 discipline canonicals. `education` is canonical in BOTH lists (line 510 domain, 1561 discipline) — the only direct canonical overlap. 267 raw-alias strings appear in both a domain entry and a discipline entry (`artificial intelligence`, `brand strategy`, `clinical psychology`, `computer graphics`, …). Crucially, mapping is ALREADY kind-aware: `_build_synonym_index()` + `_accept()` (D2133/D2394) filter by canonical list, and `synonym_map.yaml` is explicitly domain-only — so cross-kind structural leak is already prevented EXCEPT the `education` canonical. The 38.4% `discipline=emerging` (BUG-150) is a MISS, not a leak: the model emits domain labels as disciplines, no discipline alias matches, → `emerging`.
+
+**Decision:** (1) Remove `education` from one list + add CI test `domain_canonicals ∩ discipline_canonicals == ∅` (guarantees structural disjointness). (2) Expand discipline aliases for top misses. (3) Add validation: discipline raw-label resolving only in the domain index → re-classify, not silent `emerging`. Semantic correctness is NOT guaranteed by the LLM — only structural disjointness + safe fallback are.
+**Files:** config/taxonomy_v5.yaml, pipeline/schemas.py, pipeline/stage4_merge.py
+**Source:** Session 2026-08-20 — taxonomy/alias intersection audit.
+
+---
+
+### D2421 — Mixed remediation strategy: re-extract extraction bugs, post-hoc fix classification/naming (2026-08-20)
+**Category:** QLT / AUDIT
+
+**Decision (consequential, cost-minimizing ordering):** different bug classes get different fixes. BUG-145/146 (183 failed + 9,842 gated) → RE-EXTRACT (183 auto-retry; 9,842 need `--reprocess-gated`). BUG-147 (PT/TI, 40 FBs) → targeted `content_type` re-classify. BUG-148 (stale route) + BUG-149 (176 names) → scripted post-hoc fix (no LLM). BUG-150 (38% emerging) → post-hoc S4-only re-classify (S2 does not assign discipline). Verified: gate results are NOT persisted (`_gate` counted then dropped), so `processed_ids − checkpoint_FB_ids = 10,834` mixes gated+NULL+dedup — add a durable `.gated_ids` sidecar and derive the current list once from `runner_t11_v3.log`. S4 merge/resume over new S2 FBs must be verified before the re-run.
+**Files:** pipeline/stage2_extract.py, pipeline/stage4_merge.py
+**Source:** Session 2026-08-20 — checkpoint/resume mechanics verification.
+
+---
+
+### D2420 — Quarantine policy DECIDED: commit-with-status + retrieval-time filter (2026-08-20)
+**Category:** QLT / AUDIT
+
+**Decision (among 4 options):** commit ALL S5 records with explicit `status` + `needs_human_review` (option 1), AND enforce `status='PASS'` default in retrieval/export (S6b/6c + future query path) with explicit `include_quarantine` opt-in (option 3). Rejected: exclude-from-commit (silent loss of 347 incl. 130 `needs_human_review`); separate-table (premature — no retrieval layer yet). S6 `insert_fb` has no status filter, so the filter must be added at read time, not write time.
+**Files:** pipeline/stage6_commit.py, pipeline/retrieve.py, pipeline/stage6b_anytype_push.py
+**Source:** Session 2026-08-20 — quarantine-policy elaboration (4 options).
+
+---
+
+### D2419 — S4/S5 classification audit: discipline/depth accuracy, name truncation, quarantine commit (2026-08-20)
+**Category:** QLT / AUDIT
+
+**Finding (all verified against t11 S4/S5 checkpoints, not commit messages):**
+1. **Discipline `emerging` regression.** 1088/2830 (38.4%) FBs fall back to `discipline=emerging` — vs D2398's measured 15.5% on the 279-cluster design-canary. Root cause: the full 940-book corpus is business/psych/econ/ops/health/policy-centric, but `taxonomy_v5` is design-centric. Raw labels falling back include `graphic design` (92), `organizational behavior` (31), `data visualization` (27) — a synonym/alias gap, not just corpus mismatch. `domains` contain `emerging` on 90.2%.
+2. **Depth distribution is post-D2393-correct but skewed.** domain 2393 (84.5%), cross-domain 337 (11.9%), specialized 98 (3.5%), universal 2 (0.07%). 119 schema-rule violations (depth vs n_domains cardinality, e.g. 40 cross-domain FBs with 1 domain; 78 specialized with 2-5 domains). `universal` at 0.07% is suspiciously low for a corpus containing physics/econ/compounding laws.
+3. **Name truncation.** `normalize_fb_name(max_words=5)` hardcoded (C12) truncates 176 FB names ("Perceived Complexity and Deviation in Metaphor" → "…and Deviation in"). `fb_name_max_chars: 200` in config is consumed only by `retrieval_evaluator.py` — dead in S4. Truncation propagated to S5 (2822/2822 match S4). Recoverable from S2 checkpoint.
+4. **Quarantine commit behavior.** 347 QUARANTINE (2483 PASS) — all fail `factual` (NEUTRAL ent≈0.01). 130 need_human_review=True (strong ISOR + NLI fail). S6 `insert_fb` has NO status filter → quarantines commit to SQLite with `status=QUARANTINE`, confidence capped 0.25. They are NOT re-run and NOT separated into a quarantine table.
+
+**Decision:** (1) Fix `normalize_fb_name` to consume config (`fb_name_max_chars` or new `fb_name_max_words`), restore 176 names from S2 checkpoint post-hoc. (2) Promote missing canonical disciplines (graphic design, data visualization, organizational behavior, design thinking) or add aliases — re-measure `emerging` after. (3) Decide quarantine policy: commit-with-status (current) vs separate quarantine table vs exclude-from-retrieve — document explicitly. (4) Do NOT run S6 until the above + D2418 P0/P1 decisions land.
+**Files:** governance/buglog.md (BUG-149, BUG-150)
+**Source:** Session 2026-08-20 — t11 S4/S5 checkpoint audit.
+
+---
+
+### D2418 — Senior audit: PT/TI role conflation + stale route + elaboration gap + S4/S6 non-FB dead-end (2026-08-20)
+**Category:** QLT / AUDIT
+
+**Finding:** Evidence-first re-audit of the t11 S2 checkpoint (2,878 FBs) beyond the two external LLM reviews. Four load-bearing findings, all verified against live artifacts (not commit messages):
+1. **PT/TI role conflation (new, missed by both reviews).** Of 40 non-principle S2 FBs, 39 are `process_template` and only 1 is `tool_instruction` — but ~25 of the 39 "process_templates" are *code snippets/API/algorithm descriptions* (DFS traversal, Point constructor, Matrix Reshaping, Closure State Management, DoWhy framework, patch vertex consistency). These belong in `tool_instruction` (or `principle`/`descriptive_model`), not `process_template`. The model is over-assigning `process_template` to technical/procedural prose and under-assigning `tool_instruction`. The D2417 normalization rescues the *field* conflation (extraction_type ← role), but the *role-label* precision (PT vs TI) is still weak.
+2. **`route` field is stale/uniform.** All 2,878 records carry `route="FB"` — including the 39 `process_template` + 1 `tool_instruction`. S4's `_resolve_content_type` trusts `content_type` (correct), so routing survives, but `route` is inert noise (D2128 mapping unused in practice).
+3. **`elaboration` absent on ALL 229 single-source FBs** (convergent: 2649/2649 present; single-source: 0/229). Confirms the single-source prompt omits field 6 while the convergent prompt asks for it.
+4. **S4/S6 non-FB dead-end confirmed** (worse than ChatGPT's framing). `commit_non_fb_types: false` + `S6_COMMIT_NON_FB` is defined but never read by `stage6_commit.py` (only `STAGE5_CHECKPOINT` → `fbs` table). S4 writes PT/PI/GE/TI to side JSONL, consumed only by `stage6b_anytype_push.py` raw, never NLI-verified, never queryable via `retrieve.py`. Canonical SQLite is principle-only.
+
+**Summary-gate value (user question answered):** sampled 40 gated clusters → ~35–40% genuine principles (e.g. "controversy gains attention" marketing; "mental filter" CBT distortion; "second-order thinking"), ~20% genuine PT/PI/TI (writing/grammar heuristics, interview methodology, case-study structure), ~35–40% correctly gated noise (fiction narrative, political commentary, catalog captions). **The gate is NOT pure noise — it discarded substantial extractable value.** Estimate ~5,500–6,000 of the 9,842 gated clusters carry a real object.
+
+**Decision:** (1) Do NOT rerun S2/S4 on current code until D2418 fixes land (elaboration in single-source prompt; PT/TI disambiguation in prompt; decide `route` field removal or wiring). (2) Build `--reprocess-gated` flag: gated clusters ARE in `processed_ids` (13,712 processed / 187 unprocessed), so `--resume-from 2` silently skips them — need to un-mark gated clusters. (3) Fix S4/S6 to make PT/TI at minimum NLI-verified + retrievable, or explicitly document JSONL-only for T1.2. (4) Adopt ChatGPT's corrected "3 retrieval buckets, 5 promotable shapes" over the original "one free-text field".
+**Files:** governance/buglog.md (BUG-147, BUG-148); pipeline/stage2_extract.py, stage4_merge.py, stage6_commit.py
+**Source:** Session 2026-08-20 — senior evidence-first audit of t11 artifacts.
+
+---
+
+### D2417 — S2 content-type conflation rescue + content_type-aware summary gate — FIXED in code, NOT re-run (2026-08-19)
+**Category:** QLT / PROMPT
+
+**Finding:** BUG-145 (model writes ROLE into extraction_type) + BUG-146 (gate is content_type-blind). 180/183 t11 failures are ROLE-leak; 9,950 clusters gated. Fix committed 17:20 — but the t11 S2 checkpoint (mtime 15:56) PREDATES the commit, so the 2,878 FBs are pre-fix. The fix is code-only; the data has not been re-extracted.
+
+**Decision:** `_normalize_role_fields()` rescues swapped content_type/extraction_type; config-first `content_to_extraction_type` mapping (C12); content_type-aware gate (only gate when content_type is principle). 8 regression tests green. Re-run requires `--reprocess-gated` (gated clusters are in processed_ids) — see D2418.
+**Files:** pipeline/stage2_extract.py, config/content_types.yaml, pipeline/content_types.py, tests/test_stage2_d2417.py
+**Source:** Session 2026-08-19.
+
+---
+
 ### D2416 — S2 summary gate content_type-blindness (PT/PI/GE potential discarded) — LOGGED (2026-08-19)
 **Category:** QLT / PROMPT
 

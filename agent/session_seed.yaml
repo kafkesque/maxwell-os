@@ -1,6 +1,7 @@
 # Maxwell OS v3.0 — Session Seed
 # Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-08-17 (D2391-D2408: grammar OFF; depth prompt; taxonomy synonym/alias; dead-column drop; DB reset; golden verbatim; S4 reval confirm D2398; domain-promotion defer D2399; S4/S6 field-production contract D2400; session_seed YAML break D2406; dead-code purge D2407; response_format fix D2408; R3 canary S4→S6 rerun COMPLETE)
+# Updated: 2026-08-20 (T1.1 S2→S5 complete, S6 HELD; D2417-D2422 + BUG-145..151; quarantine policy DECIDED D2420, re-extract approved D2421, domain/discipline disjointness D2422; see governance/SESSION-HANDOFF-2026-08-20.md)
+# PREVIOUS: 2026-08-17 (D2391-D2408: grammar OFF; depth prompt; taxonomy synonym/alias; dead-column drop; DB reset; golden verbatim; S4 reval confirm D2398; domain-promotion defer D2399; S4/S6 field-production contract D2400; session_seed YAML break D2406; dead-code purge D2407; response_format fix D2408; R3 canary S4→S6 rerun COMPLETE)
 
 session:
     version: "3.0.0"

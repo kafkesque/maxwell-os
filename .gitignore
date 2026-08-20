@@ -85,3 +85,6 @@ probe_output/s5_run_retry.log
 
 # Diagnostic runtime logs (transient)
 governance/diagnostic_live_*.log
+
+# S2 contamination audit + test-result artifacts (regenerable diagnostics)
+audit_output/

@@ -1,8 +1,24 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-20 13:14 (D2420-D2422 + BUG-151: quarantine policy decided, mixed remediation strategy, domain/discipline disjointness audit)
+> **Last updated:** 2026-08-20 23:35 (BUG-152 FIXED: single-source balanced golden wired; BUG-147 DFS→TI + negative-control overfire resolved on audit)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟢 BUG-152 — 2026-08-20 — S2 single-source zero-golden → re-labelling + over-fire — FIXED (single-source balanced golden wired)
+- **Symptom:** A drafted mono-type prompt (`tools/s2_contamination_audit.py`) instructing "extract ONLY principle, else route=NULL" was A/B'd against the current multi-type `SINGLE_SOURCE_SYSTEM` on 8 curated passages (all 5 roles + `empirical_pattern` boundary + negative control). The mono prompt was **worse**, not better:
+  - `process_template` (pilots 3-techniques) → mono emitted `principle` (normative_heuristic) instead of NULL.
+  - `tool_instruction` (faiss.read_index) → mono emitted `principle` + `route=NULL` (internally inconsistent).
+  - `growth_edge` (autism "what if") → mono emitted `content_type=growth_edge` despite "ALWAYS principle" instruction (structural LEAK).
+  - Negative control (1950s advertising fact) → BOTH prompts overfired (baseline `process_instance`, mono `principle`); neither NULL'd a pure fact.
+- **Root cause:** stripping the role vocabulary (forcing "principle or NULL") removes the model's rejection outlet. Without golden hard-negatives showing *what NULL looks like*, Qwen3-Coder defaults to re-labeling the object as a principle rather than rejecting it. The 100%-principle convergent golden is what taught "principle" as the universal fallback in the first place — so a mono-type prompt with no golden inherits the same bias.
+- **Impact:** the "extract principle first, skip everything else" sequential-mono-type architecture (proposed D2345) would SILENTLY convert methods/tools/case-studies into principles — the exact principle↔non-principle contamination the user flagged. Mono-type is **not** viable as prompt-only; it needs a hard schema gate + per-type golden hard-negatives to work.
+- **Fix (IMPLEMENTED + VERIFIED 2026-08-20 23:35):** kept the MULTI-type prompt (it labeled 5/6 non-principle roles correctly live), and wired a BALANCED single-source golden (`config/golden/stage2_fewshot_single_source.yaml`) into the single-source/singleton path via `S2_GOLDEN_SINGLE_SOURCE_PATH`. The golden has 5 positives (one per content_type role: principle/process_template/tool_instruction/process_instance/growth_edge) + 3 hard negatives (pure fact → NULL, platitude → NULL, unfalsifiable speculation → NULL). Rejection examples now carry the actual passage text (not just rationale) — the text→NULL mapping that fixed the over-fire.
+  - New: `load_golden_single_source()` + `format_golden_fewshot_single_source()` in `stage2_extract.py`; `S2_GOLDEN_SINGLE_SOURCE_*` config keys; `tests/test_stage2_single_source_golden.py` (4 tests).
+  - **Audit result (8/8 correct in wired path):** BUG-147 DFS→`process_template` → now `tool_instruction` (FIXED); negative-control over-fire → now `route=NULL` (FIXED); all 5 roles + ambiguous `empirical_pattern` correct. 64/64 tests pass; convergent golden hash unchanged.
+- **Also re-confirmed live:** BUG-147 (DFS algorithm → `process_template` mislabel) reproduced on the `tool_vs_template` passage pre-fix; resolved post-fix.
+- **Source:** 2026-08-20 — `tools/s2_contamination_audit.py` (read-only, production `SINGLE_SOURCE_SYSTEM` + `_normalize_role_fields` + `validate_fb_output`; emits `audit_output/*.jsonl|md`).
+
+## 🔴 BUG-151 — 2026-08-20 — domain/discipline taxonomy structural overlap (`education` dual-listed + 267 raw-alias overlaps) — OPEN
 
 ## 🔴 BUG-151 — 2026-08-20 — domain/discipline taxonomy structural overlap (`education` dual-listed + 267 raw-alias overlaps) — OPEN
 - **Symptom:** `config/taxonomy_v5.yaml` lists `education` as canonical in BOTH `domains` (line 510) and `disciplines` (line 1561). Additionally 267 raw-alias strings appear in both a domain entry and a discipline entry (`artificial intelligence`, `brand strategy`, `clinical psychology`, `computer graphics`, …). This means the domain/discipline boundary is fuzzy for 267 concepts.

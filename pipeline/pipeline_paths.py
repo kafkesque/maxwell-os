@@ -135,6 +135,11 @@ S2_GOLDEN_NEGATIVE=int(_CFG["stage2"]["golden_negative"])
 S2_GOLDEN_MAX=int(_CFG["stage2"]["golden_max_examples"])
 S2_GOLDEN_INJECT=_CFG["stage2"].get("golden_inject_enabled", False)
 S2_GOLDEN_SEED=int(_CFG["stage2"].get("golden_seed", 42))  # D2377: deterministic stratified few-shot seed
+# BUG-152 (2026-08-20): balanced single-source/singleton golden (all 5 roles + negatives).
+S2_GOLDEN_SINGLE_SOURCE_PATH=_CFG["stage2"].get("golden_single_source_path")
+S2_GOLDEN_SINGLE_SOURCE_INJECT=bool(_CFG["stage2"].get("golden_single_source_inject_enabled", False))
+S2_GOLDEN_SINGLE_SOURCE_NEGATIVE=int(_CFG["stage2"].get("golden_single_source_negative", 2))
+S2_GOLDEN_SINGLE_SOURCE_MAX=int(_CFG["stage2"].get("golden_single_source_max", 7))
 S2_GATE_ENABLED=bool(_CFG["stage2"]["gate_enabled"])
 S2_GATE_STRICT=bool(_CFG["stage2"]["gate_strict"])
 S2_EVIDENCE_TRACKING=bool(_CFG["stage2"]["evidence_tracking"])

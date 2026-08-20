@@ -62,6 +62,10 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_PATH,
     S2_GOLDEN_POSITIVE,
     S2_GOLDEN_SEED,  # D2377: config-driven stratified few-shot seed
+    S2_GOLDEN_SINGLE_SOURCE_INJECT,  # BUG-152: balanced single-source golden
+    S2_GOLDEN_SINGLE_SOURCE_MAX,
+    S2_GOLDEN_SINGLE_SOURCE_NEGATIVE,
+    S2_GOLDEN_SINGLE_SOURCE_PATH,
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
     S2_MAX_PROBE_PER_BOOK,  # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
@@ -783,6 +787,65 @@ def load_golden_parity(
     return pos, neg, len(pos) + len(neg)
 
 
+def load_golden_single_source(
+    golden_path: str | None,
+    neg_count: int,
+    max_total: int,
+) -> tuple[list[dict], list[dict], int]:
+    """Load a role-balanced single-source golden set (BUG-152).
+
+    Single-source/singleton extraction needs few-shot spanning ALL 5 content_type
+    roles (principle, process_template, tool_instruction, process_instance,
+    growth_edge) plus hard negatives — otherwise the model inherits the convergent
+    100%-principle bias and re-labels non-principle objects as principle.
+
+    Selection is deterministic: one positive per role (in canonical order), then
+    `neg_count` negatives (seeded shuffle). No stratification by extraction_type
+    here — the axis we need to span is the functional ROLE (content_type), not the
+    epistemic FORM.
+    """
+    if golden_path is None or not os.path.exists(str(golden_path)):
+        return [], [], 0
+
+    try:
+        import yaml
+        with open(str(golden_path)) as f:
+            golden = yaml.safe_load(f)
+    except Exception:
+        return [], [], 0
+
+    examples: list[dict] = golden.get("examples", [])
+    pos_by_role: dict[str, dict] = {}
+    for e in examples:
+        if not e.get("should_extract"):
+            continue
+        fb = e.get("expected_fb", {})
+        fbs = fb if isinstance(fb, list) else [fb]
+        role: str = str(fbs[0].get("content_type", "principle")).strip() or "principle"
+        if role not in pos_by_role:
+            pos_by_role[role] = e
+
+    role_order: tuple[str, ...] = (
+        "principle", "process_template", "tool_instruction",
+        "process_instance", "growth_edge",
+    )
+    pos: list[dict] = [pos_by_role[r] for r in role_order if r in pos_by_role]
+
+    rng = random.Random(S2_GOLDEN_SEED)
+    neg: list[dict] = [e for e in examples if not e.get("should_extract")]
+    rng.shuffle(neg)
+    neg = neg[:min(neg_count, len(neg))]
+
+    while len(pos) + len(neg) > max_total:
+        if len(pos) > len(neg):
+            pos.pop()
+        elif neg:
+            neg.pop()
+        else:
+            break
+    return pos, neg, len(pos) + len(neg)
+
+
 # ── MinHash dedup infrastructure ────────────────────────────────────────────
 
 def init_minhash_lsh() -> tuple:
@@ -949,6 +1012,72 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
 
     parts.append("---")
     parts.append("Now apply the same extraction rigor to the cluster below.")
+    return "\n".join(parts)
+
+
+def format_golden_fewshot_single_source(
+    pos_examples: list[dict],
+    neg_examples: list[dict] | None = None,
+) -> str:
+    """Format a role-balanced single-source few-shot block (BUG-152).
+
+    Differs from `format_golden_fewshot` (convergent) in three ways:
+      1. Intro frames multi-type knowledge-object extraction (not "principle").
+      2. Output shows the single-source schema (NO evidence_passages — the
+         SINGLE_SOURCE_SYSTEM/SINGLETON_SYSTEM prompts do not request it).
+      3. The example header names the content_type so the model sees all 5 roles.
+    """
+    if not pos_examples:
+        return ""
+
+    parts: list[str] = ["# FEW-SHOT EXAMPLES (knowledge objects)\n"]
+    parts.append("Study these examples of correct knowledge-object extraction:\n")
+
+    for i, ex in enumerate(pos_examples[:5], 1):
+        fb = ex.get("expected_fb", {})
+        fbs = fb if isinstance(fb, list) else [fb]
+        name = fbs[0].get("name", "Untitled")
+        role = fbs[0].get("content_type", "principle")
+        rationale = ex.get("rationale", "")
+
+        parts.append(f"## Example {i}: {name}  → content_type = {role}")
+        for fb_item in fbs:
+            parts.append("```json")
+            output = {
+                "name": fb_item.get("name", ""),
+                "definition": fb_item.get("definition", ""),
+                "mechanism": fb_item.get("mechanism", ""),
+                "boundary": fb_item.get("boundary", ""),
+                "consequence": fb_item.get("consequence", ""),
+                "is_summary": fb_item.get("is_summary", False),
+                "extraction_type": fb_item.get("extraction_type", ""),
+                "content_type": fb_item.get("content_type", "principle"),
+                "route": fb_item.get("route", "FB"),
+            }
+            parts.append(json.dumps(output, indent=2, ensure_ascii=False))
+            parts.append("```")
+        if rationale:
+            first_sentence = rationale.strip().split(".")[0] + "."
+            parts.append(f"Key insight: {first_sentence}")
+        parts.append("")
+
+    if neg_examples:
+        parts.append("## REJECTION EXAMPLES")
+        parts.append("These passages should produce route=NULL (NO extractable object):\n")
+        for i, ex in enumerate(neg_examples[:3], 1):
+            segs = ex.get("cluster_segments", [])
+            text = segs[0].get("text", "").strip()[:220] if segs else ""
+            rationale = ex.get("rationale", "")
+            parts.append(f"### Rejection {i}")
+            if text:
+                parts.append(f"PASSAGE: {text}")
+            first_sentence = rationale.strip().split(".")[0] + "." if rationale else "No extractable object."
+            parts.append(f"REJECT: {first_sentence}")
+            parts.append("")
+        parts.append("")
+
+    parts.append("---")
+    parts.append("Now apply the same extraction rigor to the passage below.")
     return "\n".join(parts)
 
 
@@ -1329,6 +1458,21 @@ def run_stage2(
         few_shot_text = format_golden_fewshot(pos_ex, neg_ex)
         print(f"   🎯 Golden few-shot: {len(pos_ex)} pos + {len(neg_ex)} neg examples ({len(few_shot_text)} chars)")
 
+    # BUG-152: balanced single-source golden — inject into single-source/singleton
+    # extraction (previously zero few-shot there, causing re-labelling + over-fire).
+    ss_golden_path: str | None = S2_GOLDEN_SINGLE_SOURCE_PATH
+    if ss_golden_path and not os.path.isabs(str(ss_golden_path)):
+        ss_golden_path = str(Path(__file__).resolve().parent.parent / ss_golden_path)
+    ss_pos, ss_neg, ss_golden_total = load_golden_single_source(
+        ss_golden_path, S2_GOLDEN_SINGLE_SOURCE_NEGATIVE, S2_GOLDEN_SINGLE_SOURCE_MAX
+    )
+    ss_few_shot_text: str = ""
+    if S2_GOLDEN_SINGLE_SOURCE_INJECT and ss_pos:
+        ss_few_shot_text = format_golden_fewshot_single_source(ss_pos, ss_neg)
+        ss_roles = [str(e.get("expected_fb", {}).get("content_type", "principle")) for e in ss_pos]
+        print(f"   🎯 Single-source golden few-shot: {len(ss_pos)} pos (roles={ss_roles}) "
+              f"+ {len(ss_neg)} neg ({len(ss_few_shot_text)} chars)")
+
     # D2211: Health check — use stress_test (real chat requests, not just /v1/models)
     if provider == "omlx":
         from pipeline.omlx_call import CircuitOpenError, stress_test_omlx
@@ -1604,7 +1748,10 @@ def run_stage2(
             try:
                 result = call_llm(
                     prompt, system, GEN_MODEL, provider,
-                    few_shot=few_shot_text if few_shot_text and is_conv else None,
+                    few_shot=(
+                        few_shot_text if (few_shot_text and is_conv)
+                        else (ss_few_shot_text if (ss_few_shot_text and not is_conv) else None)
+                    ),
                 )
                 if result is not None:
                     break
@@ -2040,7 +2187,8 @@ def process_singletons(
     def _process_one(item: dict) -> dict | None:
         prompt = f"Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}"
         try:
-            result = call_llm(prompt, SINGLETON_SYSTEM, GEN_MODEL, provider)
+            result = call_llm(prompt, SINGLETON_SYSTEM, GEN_MODEL, provider,
+                              few_shot=ss_few_shot_text if ss_few_shot_text else None)
         except Exception:
             return None
         if result is None:

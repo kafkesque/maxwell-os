@@ -1,0 +1,273 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# stage2_fewshot_single_source.yaml
+# Purpose: balanced few-shot for SINGLE-SOURCE / SINGLETON S2 extraction.
+#
+# WHY THIS FILE EXISTS (BUG-152, 2026-08-20): single-source/singleton clusters
+# previously received ZERO golden few-shot (`few_shot=... if is_conv else None`),
+# so the model inherited the 100%-principle bias of the convergent golden and
+# either (a) re-labelled methods/tools/case-studies/speculation as `principle`, or
+# (b) over-fired on pure factual description. A mono-type "principle-only" prompt
+# was A/B tested and made it WORSE (the model re-labels to principle instead of
+# returning NULL). The fix is a BALANCED few-shot showing all 5 content_type roles
+# + hard negatives, injected into the multi-type single-source prompt.
+#
+# This SUPERSEDES config/golden/stage2_fewshot_convergent_nontype.yaml (which is
+# convergent-framed and was never wired). Archive that fork (C19).
+#
+# Contrast with the convergent golden (stage2_fewshot_convergent.yaml): convergent
+# clusters are ~99% principle, so that golden stays principle-only. Single-source
+# is where process_template / tool_instruction / process_instance / growth_edge
+# actually live, so its golden must be role-balanced.
+# ═══════════════════════════════════════════════════════════════════════════
+meta:
+  version: '1.0'
+  architecture: cluster-before-extract
+  purpose: single-source balanced few-shot (all 5 content_type roles)
+  d2345_fork: false
+  status: WIRED
+  total_examples: 8
+  single_source_positives: 5
+  hard_negatives: 3
+  expected_coverage:
+  - role_balance_all_5_content_types
+  - process_template_positive
+  - tool_instruction_positive
+  - tool_vs_template_disambiguation
+  - process_instance_positive
+  - growth_edge_positive
+  - pure_fact_rejection
+  - platitude_rejection
+  - speculation_not_principle_rejection
+
+examples:
+
+# ── POSITIVE: principle (reusable concept, causal) ─────────────────────────
+- id: SS-POS-001
+  domain: behavior-change
+  source_books:
+  - Atomic Habits — James Clear
+  cluster_segments:
+  - source_book: Atomic Habits — James Clear
+    text: "Once a small habit is established, it compounds. Marginal gains of one percent per day accumulate into roughly thirty-seven times improvement over a year because each increment builds on the last rather than adding linearly."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Compounding Habit Gains
+    definition: "Small habits compound because each marginal improvement builds on the previous one, producing exponential rather than linear growth over time."
+    mechanism: "Each 1% improvement raises the baseline from which the next improvement starts, so gains multiply geometrically instead of adding arithmetically."
+    boundary: "Applies when improvements are retained and stacked. Fails when gains are one-off and do not raise the subsequent baseline."
+    consequence: "Consistent marginal improvement yields outsized long-term results that linear effort estimates under-predict."
+    elaboration: ""
+    extraction_type: causal_mechanism
+    content_type: principle
+    evidence_passages:
+    - "Marginal gains of one percent per day accumulate into roughly thirty-seven times improvement over a year because each increment builds on the last."
+  rationale: "Reusable conceptual statement (why small habits compound) with a demonstrated cause→effect chain. A principle, not a method."
+  tier: CORE
+
+# ── POSITIVE: process_template (repeatable human method) ───────────────────
+- id: SS-POS-002
+  domain: aviation
+  source_books:
+  - Checklist Manifesto — Atul Gawande
+  cluster_segments:
+  - source_book: Checklist Manifesto — Atul Gawande
+    text: "Pilots remember critical information using three techniques: first they write it down, second they enter it into their equipment as it is read so minimal memory is required, and third they remember selectively, holding only the few items needed in the next few minutes."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Pilot Memory Protocol
+    definition: "A repeatable three-step method for managing critical information: write it down, enter it into equipment as read, and remember selectively only what is needed in the next few minutes."
+    mechanism: "Externalizing information to paper and equipment offloads memory, while selective retention limits the remaining load to the few items immediately needed."
+    boundary: "Applies when a person must retain many critical items under time pressure. Fails when the items cannot be externalized or must all be held simultaneously."
+    consequence: "Practitioners who externalize and remember selectively retain critical information more reliably than those who try to hold everything in mind."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: process_template
+    evidence_passages:
+    - "Pilots remember critical information using three techniques: first they write it down, second they enter it into their equipment, and third they remember selectively."
+  rationale: "A repeatable human how-to method with ordered steps a person follows. content_type=process_template (NOT principle, NOT tool_instruction)."
+  tier: CORE
+
+# ── POSITIVE: tool_instruction (code/API — contrastive vs process_template) ─
+- id: SS-POS-003
+  domain: computer-science
+  source_books:
+  - The Self-taught Programmer — Cory Althoff
+  cluster_segments:
+  - source_book: The Self-taught Programmer — Cory Althoff
+    text: "Load a persisted index from disk with: index = faiss.read_index(\"data/my_index.index\"). This lets you reuse the index across sessions instead of rebuilding it from scratch each time."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: FAISS read_index
+    definition: "Load a persisted FAISS vector index from a file with faiss.read_index(path), so the index can be reused across sessions instead of rebuilt."
+    mechanism: "The read_index call deserializes a previously saved index file back into memory, restoring the indexed vectors and their search structure."
+    boundary: "Applies when an index was previously written to disk in a FAISS-compatible format. Fails when the file path is absent or the file is not a valid index."
+    consequence: "Persisting and reloading an index avoids recomputing it from scratch on every session."
+    elaboration: ""
+    extraction_type: descriptive_model
+    content_type: tool_instruction
+    evidence_passages:
+    - "Load a persisted index from disk with: index = faiss.read_index(\"data/my_index.index\")."
+  rationale: "A specific command/API/library call. content_type=tool_instruction (NOT process_template — it is not a human how-to method)."
+  tier: CORE
+
+# ── POSITIVE: tool_instruction (algorithm — the BUG-147 trap case) ─────────
+- id: SS-POS-004
+  domain: computer-science
+  source_books:
+  - Grokking Algorithms — Aditya Bhargava
+  cluster_segments:
+  - source_book: Grokking Algorithms — Aditya Bhargava
+    text: "Depth-first search visits a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor back onto the stack until the stack is empty."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Depth-First Search Traversal
+    definition: "An algorithm that traverses a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor until the stack empties."
+    mechanism: "The stack enforces last-in-first-out ordering, so the traversal goes as deep as possible down one branch before backtracking to explore siblings."
+    boundary: "Applies to connected graph traversal where depth-first order is acceptable. Fails when breadth-first or weighted shortest-path order is required."
+    consequence: "Depth-first search visits every reachable node without tracking a visited set producing infinite loops, and terminates when the stack is empty."
+    elaboration: ""
+    extraction_type: descriptive_model
+    content_type: tool_instruction
+    evidence_passages:
+    - "Depth-first search visits a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor."
+  rationale: "An algorithm/code description. content_type=tool_instruction, NOT process_template — it is a computational procedure, not a repeatable human how-to (BUG-147 contrastive)."
+  tier: CORE
+
+# ── POSITIVE: process_instance (concrete case study) ───────────────────────
+- id: SS-POS-005
+  domain: psychology
+  source_books:
+  - The Confidence Game — Maria Konnikova
+  cluster_segments:
+  - source_book: The Confidence Game — Maria Konnikova
+    text: "To prove the point the researchers ran the scam at a local cafe on the top floor of a mall on Oxford Street in London. Once out of sight the accomplice headed quickly for the parking garage; it did not take long for the mark to realize her bag was gone."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Oxford Street Cafe Con
+    definition: "A concrete case study of a confidence trick executed at a London cafe, where the mark only realized her bag was stolen after the accomplice was already out of sight."
+    mechanism: "The scam separated the victim from her bag and delayed her realization until the thief had left the scene, preventing pursuit."
+    boundary: "Applies as a specific executed instance rather than a general method. Its value is evidentiary, not prescriptive."
+    consequence: "The incident demonstrates how quickly a theft can be completed before the victim notices."
+    elaboration: ""
+    extraction_type: descriptive_model
+    content_type: process_instance
+    evidence_passages:
+    - "To prove the point the researchers ran the scam at a local cafe on the top floor of a mall on Oxford Street in London."
+  rationale: "A concrete case study of something actually executed. content_type=process_instance (NOT principle, NOT process_template)."
+  tier: CORE
+
+# ── POSITIVE: growth_edge (speculative open question) ──────────────────────
+- id: SS-POS-006
+  domain: neuroscience
+  source_books:
+  - The Mind's Eye — Oliver Sacks
+  cluster_segments:
+  - source_book: The Mind's Eye — Oliver Sacks
+    text: "What if it were possible for autism—for mind-blindness—to be a temporary condition instead of a chronic one? Could that explain why otherwise normal people sometimes reach conclusions that are socially tone-deaf?"
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Temporary Mind-Blindness Hypothesis
+    definition: "A speculative open question: whether mind-blindness (autism) could be a temporary rather than chronic condition, which might explain transient social tone-deafness in otherwise neurotypical people."
+    mechanism: "The passage poses a correlation between transient social misjudgment and a hypothetical temporary mind-blindness state, but does not demonstrate any causal chain."
+    boundary: "Applies as an unresolved hypothesis awaiting evidence. It is not yet established knowledge."
+    consequence: "If true, it would reframe mind-blindness as a state rather than a trait, opening new explanatory territory."
+    elaboration: ""
+    extraction_type: empirical_pattern
+    content_type: growth_edge
+    evidence_passages:
+    - "What if it were possible for autism—for mind-blindness—to be a temporary condition instead of a chronic one?"
+  rationale: "A speculative/unresolved 'what if' open question. content_type=growth_edge (NOT principle — it is not established reusable knowledge)."
+  tier: CORE
+
+# ── NEGATIVE: pure factual description → NULL (over-fire guard) ────────────
+- id: SS-NEG-001
+  domain: history
+  source_books:
+  - The Image — Daniel Boorstin
+  cluster_segments:
+  - source_book: The Image — Daniel Boorstin
+    text: "The 1950s saw the rise of modernist institutional advertising in the United States. The Container Corporation of America produced some of the most progressive institutional advertising of that era."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: descriptive_model
+    content_type: principle
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — pure factual/historical description. A principle REQUIRES a mechanism (why/how something works) and a boundary; this passage only states WHAT happened. Even if you can name it, a description with no mechanism and no cause→effect chain is route=NULL."
+  tier: CHALLENGE
+
+# ── NEGATIVE: platitude → NULL ─────────────────────────────────────────────
+- id: SS-NEG-002
+  domain: motivation
+  source_books:
+  - Awaken the Giant Within — Tony Robbins
+  cluster_segments:
+  - source_book: Awaken the Giant Within — Tony Robbins
+    text: "If you want to succeed, you need to believe in yourself and never give up. Success comes to those who work hard and stay positive every single day."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: normative_heuristic
+    content_type: principle
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — motivational platitude without a specific mechanism or failure mode. Must produce route=NULL."
+  tier: CHALLENGE
+
+# ── NEGATIVE: unfalsifiable speculation → NULL (contrastive vs growth_edge) ─
+- id: SS-NEG-003
+  domain: futurism
+  source_books:
+  - The Singularity is Near — Ray Kurzweil
+  cluster_segments:
+  - source_book: The Singularity is Near — Ray Kurzweil
+    text: "In the future, artificial intelligence will solve all of humanity's problems and usher in an era of unlimited abundance and happiness for everyone."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: empirical_pattern
+    content_type: growth_edge
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — unfalsifiable hand-waving speculation with no articulated open tension or testable question (contrast with SS-POS-006, which poses a concrete testable hypothesis). Must produce route=NULL."
+  tier: CHALLENGE

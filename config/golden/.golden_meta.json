@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "algorithm": "sha256",
-  "golden_sha256": "661abd7521eb9264a7cf3f1387f2a165b4a199fc8b46abc27a3819f3ecb8529a",
+  "golden_sha256": "631425a2923c5ba60afe9aa8f94b052940ebf855a47a59f3b6c4cc27df6dc7de",
   "pipeline_commit": "caf30ae",
   "trimmed_ids": [
     "PRO-002",
@@ -30,7 +30,7 @@
     "universal_after": 3,
     "specialized_before": 2,
     "specialized_after": 3,
-    "note": "D2377/D2378: universal += power-law; specialized += backpropagation (scripted-mined via tools/mine_depth_golden.py). Color gamut authored as specialized but relabeled domain. T-015 >=5 each still open \u2014 corpus is business/tech-heavy, poor in genuine universal/specialized 2-source passages."
+    "note": "D2377/D2378: universal += power-law; specialized += backpropagation (scripted-mined via tools/mine_depth_golden.py). Color gamut authored as specialized but relabeled domain. T-015 >=5 each still open — corpus is business/tech-heavy, poor in genuine universal/specialized 2-source passages."
   },
   "verbatim_fix_20260816": {
     "note": "D2396-fix: corrected 5 NON_VERBATIM evidence passages (CONV-054 paraphrase, CONV-055 3x double-apostrophe, CONV-058 fabricated Generator quote) + meta count 77->80. golden_validate 80/80 PASS.",
@@ -38,6 +38,13 @@
       "CONV-054",
       "CONV-055",
       "CONV-058"
+    ]
+  },
+  "depth_relabel_d2425": {
+    "note": "Roundtable adjudication (Claude+ChatGPT): CONV-059 (rapid feedback loop) and CONV-060 (normal distribution) labeled universal but evidence only demonstrates 2-domain convergence; CONV-060 passage 2 (Rogers bell curve) is a descriptive adoption shape, not a statistical Gaussian. Relabeled universal->cross-domain (universal 5->3, cross-domain 37->39).",
+    "examples": [
+      "CONV-059",
+      "CONV-060"
     ]
   }
 }

@@ -28,86 +28,12 @@ from pydantic import BaseModel, Field, field_validator
 # Invalid labels are structurally impossible at the Pydantic boundary.
 # ═══════════════════════════════════════════════════════════════════════════
 
-DOMAIN_LITERAL = Literal[
-    "graphic design",
-    "brand identity",
-    "editorial & advertising",
-    "motion design",
-    "environmental design",
-    "digital product",
-    "data visualization",
-    "creative technology",
-    "web & ui",
-    "user experience",
-    "illustration",
-    "packaging",
-    "business operations",
-    "business development",
-    "entrepreneurship",
-    "organizational behavior",
-    "ai & agents",
-    "ai systems",
-    "engineering practice",
-    "computational art",
-    "code & computation",
-    "computational science & physics",
-    "systems & frameworks",
-    "semiotics & communication",
-    "research & methodology",
-    "emerging",  # catch-all for unclassified
-]
-
-DISCIPLINE_LITERAL = Literal[
-    "visual perception",
-    "visual semiotics",
-    "cultural design",
-    "semiotics",
-    "multimodal metaphor",
-    "typography",
-    "color theory",
-    "composition & layout",
-    "geometry & proportion",
-    "motion & time",
-    "iconography",
-    "design psychology",
-    "information architecture",
-    "narrative design",
-    "design systems",
-    "design strategy",
-    "creative process",
-    "cognitive science",
-    "behavioral economics",
-    "decision making",
-    "psychology",
-    "linguistics",
-    "leadership",
-    "strategic thinking",
-    "project management",
-    "risk management",
-    "personal productivity",
-    "marketing",
-    "systems thinking",
-    "complex adaptive systems",
-    "systems engineering",
-    "research methodology",
-    "operations research",
-    "prompt engineering",
-    "agentic architecture",
-    "machine learning",
-    "generative ai",
-    "software engineering",
-    "creative coding",
-    "generative design",
-    "computational physics & simulation",
-    "computational geometry",
-    "game design",
-    "social engineering",
-    "political economy",
-    "privacy & surveillance",
-    "philosophy",
-    "emerging",  # catch-all
-]
-
+# D2425: DOMAIN_LITERAL / DISCIPLINE_LITERAL removed. These hardcoded Literal enums
+# drifted from config/taxonomy_v5.yaml (26/48 vs 35/71 canonicals) and are dead code:
+# the pydantic models below are never instantiated at runtime. Canonical validation
+# uses is_valid_domain()/is_valid_discipline() -> load_taxonomy() (single source of
+# truth per C12). Field annotations are plain str/list[str] to avoid re-introducing
+# a hardcoded, drift-prone taxonomy copy.
 DEPTH_LITERAL = Literal["universal", "cross-domain", "domain", "specialized"]
 EVIDENCE_LITERAL = Literal["cited", "axiomatic"]
 DIFFICULTY_LITERAL = Literal["beginner", "intermediate", "expert"]
@@ -287,11 +213,11 @@ class ProcessTemplate(StampedRecord):
     )
 
     # ── Classification (shared with FB) ──
-    domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
+    domains: list[str] = Field(  # type: ignore[valid-type]
         min_length=1, max_length=5,
         description="1-5 canonical domains"
     )
-    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+    discipline: str = Field(  # type: ignore[valid-type]
         description="Canonical discipline"
     )
     depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
@@ -512,11 +438,11 @@ class ToolInstruction(StampedRecord):
     )
 
     # ── Shared classification (S4, same as PT/PI/GE) ──
-    domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
+    domains: list[str] = Field(  # type: ignore[valid-type]
         min_length=1, max_length=5,
         description="1-5 canonical domains",
     )
-    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+    discipline: str = Field(  # type: ignore[valid-type]
         description="Canonical discipline",
     )
     depth: DEPTH_LITERAL = Field(  # type: ignore[valid-type]
@@ -621,12 +547,12 @@ class FB(StampedRecord):
     # ── Classification (Literal types enforce validity at construction) ──
     # D316: Multi-label applies to DOMAINS only (max 5). Discipline is ALWAYS singular.
     # D2066 amendment: discipline was incorrectly made multi-label; reverted per D316 original.
-    domains: list[DOMAIN_LITERAL] = Field(  # type: ignore[valid-type]
+    domains: list[str] = Field(  # type: ignore[valid-type]
         description="1-5 canonical domains (D150: max 5). Validated via synonym matching; 'emerging' if no match.",
         min_length=1,
         max_length=5,
     )
-    discipline: DISCIPLINE_LITERAL = Field(  # type: ignore[valid-type]
+    discipline: str = Field(  # type: ignore[valid-type]
         description="Single canonical discipline from 48-discipline taxonomy. Validated; 'emerging' if no match."
     )
 

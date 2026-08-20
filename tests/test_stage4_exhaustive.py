@@ -244,6 +244,7 @@ print(f"OVERALL: Logic={passed}/{total} ✅ | Live classification complete")
 print(f"{'='*70}")
 
 out = ROOT / "temp" / "exhaustive_test_results.json"
+out.parent.mkdir(parents=True, exist_ok=True)  # clean checkout has no temp/ (gitignored)
 with open(out, "w") as f:
     json.dump({
         "logic_passed": passed, "logic_total": total,

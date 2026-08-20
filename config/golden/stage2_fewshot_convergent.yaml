@@ -5000,8 +5000,8 @@ examples:
     - This procedure also allows you to set up a quick feedback loop in which you can look at the first quick sketch, decide what needs improving, sketch again, and so on
     extraction_type: normative_heuristic
     content_type: principle
-    depth: universal
-  rationale: 'CONVERGENT POSITIVE — UNIVERSAL FEEDBACK LOOP (T-015/D2421). Software engineering (AI agent platforms) and design (sketch iteration) independently state the same mechanism: quick generate-review-correct cycles converge on quality. Depth is universal — feedback loops appear across engineering (control), biology (homeostasis), economics (cycles), and design in the same domain-independent sense as entropy.'
+    depth: cross-domain
+  rationale: 'CONVERGENT POSITIVE — CROSS-DOMAIN FEEDBACK LOOP (T-015/D2421). Software engineering (AI agent platforms) and design (sketch iteration) independently state the same mechanism: quick generate-review-correct cycles converge on quality. Depth is cross-domain — the two-source evidence demonstrates the mechanism in two unrelated fields (software and design); a universal claim would require additional domains (control, biology, economics) beyond what these passages establish.'
   tier: GOLD-A
 - id: CONV-060
   domain: systems & frameworks
@@ -5030,8 +5030,8 @@ examples:
     - '148 | : Skills That Thrill The good news is, like any innovation, adopting new skills can be mapped to the Innovation Adoption Lifecycle curve (also known as the Rogers bell curve) in Figure 6-1'
     extraction_type: empirical_pattern
     content_type: principle
-    depth: universal
-  rationale: CONVERGENT POSITIVE — UNIVERSAL NORMAL DISTRIBUTION (T-015/D2421). Statistical hypothesis testing (Coding with ChatGPT) and innovation diffusion (AI Value Creators) both invoke the bell curve as a baseline distribution. Depth is universal — the Gaussian appears across measurement error, natural traits, and aggregated behavior in the same domain-independent sense as a power law.
+    depth: cross-domain
+  rationale: CONVERGENT POSITIVE — CROSS-DOMAIN BELL-CURVE PATTERN (T-015/D2421). Statistical hypothesis testing (Coding with ChatGPT) invokes the Gaussian as a statistical baseline, while innovation diffusion (AI Value Creators) invokes the Rogers adoption bell curve — a descriptive category shape, not a statistical Gaussian. The passages converge only on the weaker claim that bell-curve-shaped distributions recur as a descriptive pattern across fields, so depth is cross-domain, not universal.
   tier: GOLD-A
 - id: CONV-061
   domain: computational science & physics

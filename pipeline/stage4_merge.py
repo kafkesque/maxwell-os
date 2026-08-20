@@ -1018,19 +1018,33 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     _scalar_state: dict = {"classification_errors": 0, "name_collisions": 0}
     _segids_file: str = str(STAGE4_CHECKPOINT) + ".segids"
     _state_file: str = str(STAGE4_CHECKPOINT) + ".state.json"
-    if STAGE4_CHECKPOINT.exists() and os.path.exists(_segids_file):
+    if STAGE4_CHECKPOINT.exists():
         try:
             fbs.extend(load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint"))
-            with open(_segids_file) as _sf:
-                processed_ids = set(json.load(_sf))
+            if os.path.exists(_segids_file):
+                with open(_segids_file) as _sf:
+                    processed_ids = set(json.load(_sf))
+            else:
+                # D2424: a completed run deletes .segids (below). Reconstruct the
+                # already-processed cluster set from checkpoint provenance so a
+                # `--cluster <delta>` merge can skip prior work without discarding it.
+                processed_ids = {
+                    str(sc)
+                    for _fb in fbs
+                    for sc in (_fb.get("source_clusters") or [])
+                    if sc
+                }
             if os.path.exists(_state_file):
                 with open(_state_file) as _stf:
                     _scalar_state = json.load(_stf)
             # D2215-style format guard: zero overlap with current targets means the
             # sidecar belongs to a different corpus/probe format — discard, don't
-            # silently re-process or silently skip the wrong clusters.
+            # silently re-process or silently skip the wrong clusters. D2424: this guard
+            # applies ONLY to a full-run resume. An explicit --cluster delta-merge is
+            # EXPECTED to have zero/partial overlap with prior processed_ids and must
+            # NOT discard the preserved checkpoint FBs.
             target_cids: set[str] = {c.get("cluster_id", "") for c in clusters}
-            if processed_ids and not (processed_ids & target_cids):
+            if (not cluster_ids) and processed_ids and not (processed_ids & target_cids):
                 print(f"   ⚠️  S4 resume segids mismatch — {len(processed_ids)} old IDs, 0 overlap with {len(target_cids)} targets")
                 print("   ⚠️  Starting fresh — prior S4 progress discarded")
                 processed_ids = set()

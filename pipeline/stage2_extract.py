@@ -674,19 +674,43 @@ def _golden_primary_type(example: dict) -> str:
     return ""
 
 
+def _golden_depth(example: dict) -> str:
+    """Return the primary depth of a golden example (first FB's depth)."""
+    fb = example.get("expected_fb", {})
+    fbs = fb if isinstance(fb, list) else [fb]
+    for item in fbs:
+        d = str(item.get("depth", "")).strip()
+        if d:
+            return d
+    return ""
+
+
 def _stratified_positive_sample(
     all_pos: list[dict], pos_count: int, seed: int
 ) -> list[dict]:
-    """Deterministically select positives maximizing extraction_type coverage.
+    """Deterministically select positives maximizing extraction_type AND depth coverage.
 
     D2377: golden few-shot bias — a plain shuffle can sample only causal_mechanism
     examples (e.g. seed-42 with pos_count=1 picks one type and the model never sees
     descriptive/normative/empirical few-shots). Group by extraction_type and
     round-robin so the injected few-shot spans as many epistemic forms as possible.
+    D2425: within each round, prefer the example whose depth is least represented
+    among already-picked examples, so the few-shot also spans depth levels
+    (universal/cross-domain/domain/specialized). This wires the T-015 depth-bias
+    correction into selection itself (previously depth was ignored — adding
+    universal/specialized examples to the golden set did NOT guarantee they reached
+    the model's few-shot prompt).
     """
     if pos_count <= 0 or not all_pos:
         return []
     rng = random.Random(seed)
+    # Global depth frequency: used only as a tie-breaker so a minority universal/
+    # specialized example is surfaced even when its group is dominated by cross-domain.
+    depth_freq: dict[str, int] = {}
+    for e in all_pos:
+        d = _golden_depth(e)
+        if d:
+            depth_freq[d] = depth_freq.get(d, 0) + 1
     groups: dict[str, list[dict]] = {}
     for e in all_pos:
         groups.setdefault(_golden_primary_type(e), []).append(e)
@@ -698,11 +722,23 @@ def _stratified_positive_sample(
     order = [t for t in canonical if t in groups]
     order += sorted(t for t in groups if t not in order)
     picked: list[dict] = []
+    picked_depths: dict[str, int] = {}
     while len(picked) < pos_count and any(groups[t] for t in order):
         progressed = False
         for t in order:
             if groups[t] and len(picked) < pos_count:
-                picked.append(groups[t].pop(0))
+                # Prefer the depth least-picked so far (diversity — span all 4 depths
+                # before repeating), then the globally-rarest (bias correction — surface
+                # universal/specialized over cross-domain). Ties break by shuffle order.
+                best = min(groups[t], key=lambda e: (
+                    picked_depths.get(_golden_depth(e), 0),
+                    depth_freq.get(_golden_depth(e), 0),
+                ))
+                groups[t].remove(best)
+                picked.append(best)
+                d = _golden_depth(best)
+                if d:
+                    picked_depths[d] = picked_depths.get(d, 0) + 1
                 progressed = True
         if not progressed:
             break
@@ -1247,6 +1283,8 @@ def run_stage2(
         reprocess_gated: D2421 — Re-process clusters summary-gated (is_summary=true) on resume.
             Un-marks gated IDs from processed_ids so they re-enter extraction with the
             content_type-aware gate (D2417). Requires a prior run's .gated_ids sidecar.
+            A cluster that clears the gate on a reprocess pass is pruned from gated_ids
+            (D2421-fix), so a second --reprocess-gated run does not re-extract it.
     """
     # D2215: Force write-through logging (tee/nohup/pipe corrupt buffered output on macOS)
     # python3 -u should be enough, but TextIOWrapper on macOS still buffers on
@@ -1766,6 +1804,12 @@ def run_stage2(
 
             added_names: list[str] = []
             cluster_failed = False
+            # D2421-fix: clear any stale gated entry at the start of this pass. If the
+            # cluster is still summary-gated below, gated_ids.add(cid) re-adds it; if it
+            # now yields a valid FB (or NULL/near-dup), it correctly leaves the reprocess
+            # pool. Without this, successfully-reprocessed clusters are re-extracted on
+            # every subsequent --reprocess-gated run (unbounded wasted LLM calls).
+            gated_ids.discard(cid)
             for fb in fb_results:
                 if fb.get("_failed"):
                     failed_clusters += 1

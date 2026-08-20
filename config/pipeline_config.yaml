@@ -185,6 +185,8 @@ stage2:
   max_workers: 3
   route_values: ["FB", "NULL"]   # D2323/C12: S2 route gate — FB=forward to S4, NULL=skip cluster (quoted: YAML parses bare NULL as None)
   max_failed_ratio: 0.01   # D2381: allow ≤1% terminal failures (was 0.0) — persistent JSON-failure clusters no longer halt the stage; failed clusters retried on resume (D2331).
+  gated_seed_marker: "summary gated"   # D2421: runner-log marker for a summary-gated cluster (scripts/seed_gated_ids.py)
+  gated_seed_id_regex: 'cluster_\d+(_s\d+)?(_sub\d+)?'   # D2421: cluster-id pattern on gated log lines
   extraction_type_dominance_warn_ratio: 0.95   # D2376: warn if a single extraction_type > this ratio of output (over-claim canary — causal_mechanism is the strongest epistemic claim)
 watchdog:
   interval_secs: 60        # D2384: S2 watchdog poll interval

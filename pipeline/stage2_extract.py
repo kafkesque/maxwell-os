@@ -1938,7 +1938,13 @@ def run_stage2(
             except Exception as _repair_err:
                 print(f"      ⚠️  repair retry failed for {cid}: "
                       f"{type(_repair_err).__name__}: {_repair_err}", flush=True)
-        if not isinstance(result, (dict, list)):
+        # Normalize: drop non-dict elements from an array response (the model
+        # emitting a bare list of strings — e.g. obeying instructions embedded in
+        # a prompt-engineering source passage). Collapse to a SINGLE cluster
+        # failure if nothing extractable remains — never N per-element failures.
+        if isinstance(result, list):
+            result = [x for x in result if isinstance(x, dict)]
+        if not isinstance(result, dict) and not (isinstance(result, list) and result):
             return [{"_failed": True, "cluster_id": cid,
                      "_schema_errors": [f"non-object result: {type(result).__name__}"]}]
 

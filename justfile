@@ -139,6 +139,18 @@ s2-single-source-rerun:
 s2-single-source-status:
     @tail -n 60 -f "knowledge pipeline/stage2_extract/t11/single_source_rerun.log"
 
+# Resume the t11 single-source rerun from its checkpoint. NO --reset-single-source:
+# keeps the already-extracted single-source FBs (incl. backfilled elaboration) and
+# continues the remaining clusters with the FIXED elaboration-required prompt.
+s2-single-source-resume:
+    @echo "=== S2 single-source RESUME (t11) — continues from checkpoint, fixed prompt ==="
+    @mkdir -p "knowledge pipeline/stage2_extract/t11"
+    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_extract.py --only-single-source 2>&1 | tee "knowledge pipeline/stage2_extract/t11/single_source_rerun_resume.log"
+
+# Tail the elaboration-backfill log (BUG-155 post-hoc fix, ~1760 records).
+s2-backfill-status:
+    @tail -n 40 -f "knowledge pipeline/stage2_extract/t11/backfill_elaboration.log"
+
 # D2177: stage3 removed (D2120) — redirects to runner
 stage4:
     python3 pipeline/stage4_merge.py

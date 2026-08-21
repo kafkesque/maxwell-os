@@ -320,8 +320,12 @@ PRINCIPLE STRUCTURE (required for every extraction):
 4. boundary: "The principle applies when [condition]. It fails when [counter-condition]."
 5. consequence: "Because of this principle, [what follows]."
 6. elaboration: 3-5 sentences of deeper nuance — edge cases, exceptions,
-   and how the mechanism behaves under different conditions. Empty string
-   if the passages genuinely add nothing beyond mechanism/boundary.
+   and how the mechanism behaves under different conditions. ALWAYS provide
+   elaboration (never empty). If the passages add no explicit nuance, DERIVE
+   it from the implications of mechanism + boundary + consequence (how the
+   principle behaves at its limits, what it implies but does not state). Do
+   not invent new factual claims — elaborate within what mechanism/boundary/
+   consequence already support.
 7. is_summary: true ONLY if you can only restate the passages without identifying
    a convergent mechanism. Be honest — self-flag if summarizing.
 8. extraction_type: the EPISTEMIC FORM — how strongly justified the claim is. Choose
@@ -554,7 +558,7 @@ def build_convergent_prompt(
 Extract the convergent principle(s). If genuinely distinct mechanisms exist, return a
 JSON array of principle objects. If only ONE mechanism, return a single object.
 Each principle must have:
-- name, definition, mechanism, boundary, consequence, elaboration (3-5 sentences; empty string if no added nuance), is_summary (bool), evidence_passages (up to 5 verbatim quotes)
+- name, definition, mechanism, boundary, consequence, elaboration (3-5 sentences; ALWAYS filled — derive from mechanism/boundary implications if the passage adds no explicit nuance), is_summary (bool), evidence_passages (up to 5 verbatim quotes)
 - route: "FB" (convergent principle -> Stage 4 classifies) | "NULL" (no principle)
 
 No principle -> {{"route": "NULL"}}
@@ -583,7 +587,10 @@ def _build_body_schema_text() -> str:
             lines.append(f"- {role}: {', '.join(fields)}")
     lines.append(
         "  (steps/actors/parameters are JSON arrays; every other field is a string. "
-        "Leave a field empty when the passage does not provide it.)"
+        "elaboration is REQUIRED for principle — never leave it empty: write 3-5 "
+        "sentences of deeper nuance; if the passage adds no explicit nuance, DERIVE it "
+        "from the implications of mechanism + boundary + consequence. Other fields may "
+        "be left empty only when the passage does not provide them.)"
     )
     return "\n".join(lines)
 

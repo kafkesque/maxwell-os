@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-20T13:14:00Z'
-total_decisions: 410
+total_decisions: 412
 decisions:
 - id: D2092
   category: INF
@@ -3616,11 +3616,47 @@ decisions:
   target_files:
   - pipeline/stage2_extract.py
   created: '2026-08-21'
+- id: D2427
+  category: ARCH
+  state: ACTIVE
+  description: 'R2 — epistemic-axis refactor (DEFERRED to after S4-S6 sign-off). The S2
+    "orthogonal axes" contract (D2323) is violated by two deterministic role↔form routing
+    tables: extraction_to_content_type (D2150, e.g. normative_heuristic → process_template)
+    and content_to_extraction_type (D2417). The FORM axis also flattens three distinct cuts
+    (justification-strength / modality / content-structure) into one 4-way label, so
+    causal_mechanism is read as "causal vocabulary present" rather than "verified chain".
+    Fix: split FORM into two orthogonal facets — justification ∈ {causal, correlational,
+    definitional} × modality ∈ {prescriptive, descriptive, predictive}; keep content_type
+    (ROLE) separate; delete form→role routing defaults. Root cause of the 11%→60% causal
+    drift.'
+  champion: goose
+  target_files:
+  - config/content_types.yaml
+  - config/decisions.yaml
+  - pipeline/content_types.py
+  - pipeline/stage2_extract.py
+  created: '2026-08-21'
+- id: D2428
+  category: QLT / PROMPT
+  state: ACTIVE
+  description: 'R1 — extraction_type drift mitigation. (1) stage2_extract.py SYSTEM_PROMPT
+    carries a strict DECISION-ORDER precedence tree (prescriptive → normative_heuristic;
+    demonstrated chain → causal_mechanism; co-occurrence → empirical_pattern; else
+    descriptive_model) plus a DECOUPLING rule (select form from EVIDENCE first, then write
+    mechanism in that register). (2) pipeline/stage2_relabel_extraction_type.py re-labels
+    existing FBs via LLM, grounded in evidence, fb_id-stable, copy-first. LLM-driven (not
+    deterministic) because FORM is a property of the CLAIM, not the ROLE. NOT yet run
+    against t11 — the sweep is a separate task (copy first, then production).'
+  champion: goose
+  target_files:
+  - pipeline/stage2_extract.py
+  - pipeline/stage2_relabel_extraction_type.py
+  created: '2026-08-21'
 summary:
-  total: 410
+  total: 412
   proposed: 0
   draft: 1
-  active: 353
+  active: 355
   stale: 0
   superseded: 14
   archived: 8
@@ -3638,7 +3674,7 @@ summary:
     PERF: 10
     BUGFIX: 38
     CFG: 5
-    ARCH: 23
+    ARCH: 24
     pipeline-fix: 2
     governance: 1
     BUG: 1
@@ -3685,5 +3721,5 @@ summary:
     BUGFIX / CFG: 1
     PERF / BUGFIX: 1
     OPS / DATA: 1
-    QLT / PROMPT: 2
+    QLT / PROMPT: 3
     QLT / AUDIT: 5

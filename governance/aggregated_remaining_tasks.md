@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-21 | **Decisions:** D2000-D2426 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407); response_format=json_object → empty gpt-oss-20b fixed (D2408). **R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (pipeline_run_id=canary) + Parquet. ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression.** **D2409 + D2410 (2026-08-17): S1.5 embed cache + S5 incremental checkpoint/resume (6 tests) + S4 metadata derivation audit fixes (temporal_scope boundary-match, difficulty_map C12 with 0/279 drift, context "general" schema-legal) — 7 more tests → 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. T1.1 stage PREPARED: caffeinate active, OMLX lazy-load (2/7 models), preflight clean.**
+> **Updated:** 2026-08-21 | **Decisions:** D2000-D2428 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407); response_format=json_object → empty gpt-oss-20b fixed (D2408). **R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (pipeline_run_id=canary) + Parquet. ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression.** **D2409 + D2410 (2026-08-17): S1.5 embed cache + S5 incremental checkpoint/resume (6 tests) + S4 metadata derivation audit fixes (temporal_scope boundary-match, difficulty_map C12 with 0/279 drift, context "general" schema-legal) — 7 more tests → 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. T1.1 stage PREPARED: caffeinate active, OMLX lazy-load (2/7 models), preflight clean.**
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
@@ -11,6 +11,28 @@
 > **D2351-D2355 (NEW, 4-LLM audit × independent re-verification):** S4 depth fail-open, provenance/schema gaps, singleton index, S4 bottleneck. **Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`.**
 
 ---
+
+## 🚧 This session (R1 extraction_type drift, D2427/D2428) — remaining tasks
+
+> Ontological audit of the FORM axis found a non-partitioning 4-way label set + two
+> role↔form routing tables (D2150/D2417) violating the D2323 "orthogonal axes" contract.
+> Drift confirmed: causal_mechanism 11%→60% single-source; n=30 sample ~43% mislabeled.
+> R1 committed (df1fbfd). Remaining, in priority order:
+
+| # | Task | Status |
+|---|------|--------|
+| R1.1 | **Confirm drift error rate** — adjudicate n=30 sample (my pre-score ~43%, 7/18 causal over-claimed + under-labeling) | 🟡 needs user |
+| R1.2 | **Run R1 relabel sweep** (`stage2_relabel_extraction_type.py`) on a COPY, audit diff, then production | 🟡 ready, copy-first |
+| R1.3 | "the passage" meta-commentary (1,036 records) prompt fix + post-hoc sweep | 🟡 P1 |
+| R1.4 | Near-dup surface (38 name groups, ~80 records) dedup before S4 | 🟡 P1 |
+| R1.5 | content_type instability (PT 19%→8%, TI 4%→1%, GE 4 records) — monitor/decide | 🟡 P1 |
+| R2 | FORM axis refactor → justification × modality facets (D2427) | ⏸ after S4-S6 |
+| H1 | BUG-159 prompt hardening (treat passage as DATA) + contamination canary | 🟡 P2 |
+| H2 | BUG-160 evidence-relevance pass (add topical-relevance check) | 🟡 P2 |
+| H3 | minhash_signature empty on 8 records | 🟡 P2 |
+| H4 | route="FB" inert field cleanup | 🟡 P2 |
+| SEQ1 | Singleton benchmark on copy (batched vs single) — now unblocked | ⏸ gated |
+| SEQ2 | **STOP before S4/S5/S6** for visual inspection | ⏸ gated |
 
 ## 🚧 Frontier T1.1 audit (4b55797) — 4 blockers fixed this session (D2402-D2405)
 

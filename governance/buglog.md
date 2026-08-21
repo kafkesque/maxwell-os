@@ -1,8 +1,14 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-21 (P0 remediation: BUG-155/156/157/158 FIXED; BUG-159 prompt-injection contamination OPEN — cluster_11649)
+> **Last updated:** 2026-08-21 (R1 extraction_type drift: D2428 precedence-tree + relabel script committed; D2427 R2 axis-refactor logged; BUG-159 OPEN; BUG-160 evidence-relevance OPEN)
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟠 BUG-160 — 2026-08-21 — evidence-passage relevance in drift sample (1/30) — OPEN
+- **Symptom:** In the n=30 extraction_type drift review (seed=7), record "Racial Disparities in Maternal Health Prediction Tools" (fb_id 1977c1a5…) has 1 of 3 evidence_passages about a carbon-emission model ("influx of carbon 9.1 billion metric tons per year…"), unrelated to maternal health.
+- **Root cause:** cluster-internal conflation — the cluster mixed two feedback-loop examples (carbon inflow/outflow + maternal-health predictive tool) from "Closing the Loop: Systems Thinking for Designers"; the model cited the carbon passage as evidence for the maternal-health claim.
+- **Impact:** 1 FB in a 30-record sample. Prior full audit found 0 cross-FB evidence contamination, so likely low-rate. Evidence-passage relevance is not auto-verified today (S5 NLI checks entailment, not topical relevance of each passage).
+- **Status:** 🟠 OPEN — log-only. Defer a systematic evidence-relevance pass until after the R1 relabel sweep (D2428); add a topical-relevance check to the relabel audit.
 
 ## 🔴 BUG-159 — 2026-08-21 — prompt-injection contamination (cluster_11649) — OPEN
 - **Symptom:** cluster_11649 (2 segments from "Generative AI Design Patterns" prompt-engineering book) fails S2 extraction, returning a bare list of strings instead of the JSON schema. Its segments contain literal instructions ("Respond with just a list of words without any introduction or preamble", "Give me the best {n} adjectives that would complete the phrase…").

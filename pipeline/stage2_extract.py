@@ -66,6 +66,8 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_SINGLE_SOURCE_MAX,
     S2_GOLDEN_SINGLE_SOURCE_NEGATIVE,
     S2_GOLDEN_SINGLE_SOURCE_PATH,
+    S2_SINGLETON_BATCH_SIZE,                 # D2xxx: batched singleton extraction
+    S2_SINGLETON_BATCH_MAX_TOKENS_PER_ITEM,  # D2xxx: per-item output budget in a batch call
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
     S2_MAX_PROBE_PER_BOOK,  # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
@@ -694,6 +696,24 @@ SINGLETON_SYSTEM: str = (
     "object of any kind (no principle, no method, no case study, no tool command). "
     "If the passage contains no extractable object, return {\"route\": \"NULL\"}."
 ) + "\n" + _S2_BODY_SCHEMA
+
+# D2xxx (option-1 speedup): batched singleton extraction — ONE LLM call per batch of N
+# passages returns a JSON ARRAY (one object per passage, in order). Built from
+# SINGLETON_SYSTEM by swapping the single-object instruction for the array instruction;
+# every other rule (two-axis, content_type guidance, body schema) is inherited.
+SINGLETON_BATCH_SYSTEM: str = (
+    SINGLETON_SYSTEM.replace(
+        "Return a JSON object with these EXACT keys:",
+        "Return a JSON ARRAY — exactly ONE object per passage, in the SAME ORDER as "
+        "the numbered passages (each object includes \"index\": N matching its passage "
+        "number). Each object has these EXACT keys:",
+    )
+    + "\nFormat example (2 passages):\n"
+    '[{"index": 1, "name": "...", "definition": "...", "mechanism": "...", "'
+    '"boundary": "...", "consequence": "...", "elaboration": "...", "is_summary": false, "'
+    '"extraction_type": "normative_heuristic", "content_type": "process_template", "route": "FB"}, "'
+    '{"index": 2, "route": "NULL"}]'
+)
 
 def build_single_source_prompt(
     cluster: dict,
@@ -2239,6 +2259,80 @@ def run_stage2(
 
 # ── Singleton processing (D2149: extract principles from unclustered segments) ──
 
+def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dict | None:
+    """Convert one singleton LLM result into an FB record (D2xxx).
+
+    Shared by the per-singleton and batched paths. Returns
+    None / {"_null": True} / {"_gate": True} / the FB dict.
+    """
+    route: str = result.get("route", "FB").strip().upper()
+    if route == "NULL":
+        return {"_null": True}
+    # D2417 (BUG-145): repair extraction_type/content_type conflation.
+    result = _normalize_role_fields(result)
+    name: str = result.get("name", "").strip()
+    definition: str = result.get("definition", "").strip()
+    if not name or len(definition) < 30:
+        return {"_null": True}
+    is_summary: bool = result.get("is_summary", False)
+    extraction_type: str = result.get("extraction_type", "").strip()  # D2376
+    content_type: str = result.get("content_type", "principle").strip()
+    non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
+    if is_summary and gate_enabled and content_type not in non_principle_roles:
+        return {"_gate": True}
+    return {
+        "fb_id": make_hash_id(name, definition),
+        "name": name,
+        "definition": definition,
+        "mechanism": result.get("mechanism", "").strip(),
+        "boundary": result.get("boundary", result.get("application", "")).strip(),
+        "consequence": result.get("consequence", result.get("failure_mode", "")).strip(),
+        "is_summary": is_summary,
+        "extraction_type": extraction_type,
+        "content_type": content_type,
+        "evidence_passages": [item["text"][:500]],
+        "route": route,
+        "source_cluster": item["singleton"].get("cluster_id", f"singleton_{item['segment_id'][:8]}"),
+        "source_books": item["singleton"].get("source_books", [item["source_book"]]),
+        "source_ids": item["singleton"].get("source_ids", []),
+        "source_segments": [item["segment_id"]],
+        "cluster_cohesion": 1.0,
+        "cluster_size": 1,
+        "source_diversity": 1,
+        "is_convergent": False,
+        "is_singleton_fb": True,
+        **_capture_type_specific_fields(result, content_type),  # P2-1
+    }
+
+
+def _map_batch_results(raw: object, n: int) -> list[dict | None]:
+    """Map a batched LLM response (JSON array) to per-passage results (D2xxx).
+
+    Prefers embedded "index" (1..N) alignment; falls back to positional order;
+    a position with no object -> None (the caller then falls back to a
+    per-singleton call so no singleton is dropped).
+    """
+    results: list[dict | None] = [None] * n
+    if isinstance(raw, list):
+        indexed: dict[int, dict] = {}
+        positional: list[dict] = []
+        for obj in raw:
+            if not isinstance(obj, dict):
+                continue
+            idx = obj.get("index")
+            if isinstance(idx, int) and 1 <= idx <= n:
+                indexed[idx] = obj
+            elif len(positional) < n:
+                positional.append(obj)
+        for i in range(n):
+            results[i] = indexed.get(i + 1) if (i + 1) in indexed else (
+                positional[i] if i < len(positional) else None
+            )
+    elif isinstance(raw, dict):
+        results[0] = raw
+    return results
+
+
 def process_singletons(
     provider: str = "omlx",
     gate_enabled: bool = True,
@@ -2348,55 +2442,61 @@ def process_singletons(
             return None
         if result is None:
             return None
-        route = result.get("route", "FB").strip().upper()
-        if route == "NULL":
-            return {"_null": True}
-        # D2417 (BUG-145): repair extraction_type/content_type conflation.
-        result = _normalize_role_fields(result)
-        name = result.get("name", "").strip()
-        definition = result.get("definition", "").strip()
-        if not name or len(definition) < 30:
-            return {"_null": True}
-        is_summary = result.get("is_summary", False)
-        extraction_type = result.get("extraction_type", "").strip()  # D2376: absent → "" (no over-claim)
-        content_type = result.get("content_type", "principle").strip()
-        # Gate: reject summaries (D2417/BUG-146: content_type-aware — do not gate
-        # a non-principle role that the model identified as an extractable object).
-        non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
-        if is_summary and gate_enabled and content_type not in non_principle_roles:
-            return {"_gate": True}
-        return {
-            "fb_id": make_hash_id(name, definition),
-            "name": name,
-            "definition": definition,
-            "mechanism": result.get("mechanism", "").strip(),
-            "boundary": result.get("boundary", result.get("application", "")).strip(),
-            "consequence": result.get("consequence", result.get("failure_mode", "")).strip(),
-            "is_summary": is_summary,
-            "extraction_type": extraction_type,
-            "content_type": content_type,
-            "evidence_passages": [item["text"][:500]],
-            "route": route,
-            "source_cluster": item["singleton"].get("cluster_id", f"singleton_{item['segment_id'][:8]}"),
-            "source_books": item["singleton"].get("source_books", [item["source_book"]]),
-            "source_ids": item["singleton"].get("source_ids", []),
-            "source_segments": [item["segment_id"]],
-            "cluster_cohesion": 1.0,
-            "cluster_size": 1,
-            "source_diversity": 1,
-            "is_convergent": False,
-            "is_singleton_fb": True,
-            **_capture_type_specific_fields(result, content_type),  # P2-1
-        }
+        return _singleton_result_to_fb(result, item, gate_enabled)
 
-    print(f"⚡ Processing {len(viable)} singletons with {max_workers} workers...")
+    def _build_batch_prompt(batch: list[dict]) -> str:
+        parts: list[str] = []
+        for i, item in enumerate(batch, 1):
+            parts.append(f"[{i}] Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}")
+        return "\n\n".join(parts)
+
+    def _process_batch(batch: list[dict]) -> list[dict]:
+        """D2xxx: process a batch of singletons in ONE LLM call (option-1 speedup).
+
+        One call returns a JSON ARRAY aligned to the numbered passages; positions the
+        batched call failed to return fall back to a per-singleton call so no singleton
+        is silently dropped. Returns one result marker per item (None / {"_null": True}
+        / {"_gate": True} / FB dict) in batch order.
+        """
+        n: int = len(batch)
+        try:
+            from pipeline.omlx_call import call_omlx_json
+            batch_system: str = SINGLETON_BATCH_SYSTEM
+            if ss_few_shot_text:
+                batch_system = batch_system + "\n\n" + ss_few_shot_text
+            raw = call_omlx_json(
+                prompt=_build_batch_prompt(batch),
+                model=GEN_MODEL,
+                system=batch_system,
+                max_tokens=n * S2_SINGLETON_BATCH_MAX_TOKENS_PER_ITEM,
+            )
+        except CircuitOpenError:
+            raise
+        except Exception:
+            raw = None
+        results: list[dict | None] = _map_batch_results(raw, n)
+        out: list[dict] = []
+        for i, item in enumerate(batch):
+            r = results[i]
+            if r is None:
+                out.append(_process_one(item))  # fallback: never drop a singleton
+            else:
+                out.append(_singleton_result_to_fb(r, item, gate_enabled))
+        return out
+
+    print(f"⚡ Processing {len(viable)} singletons with {max_workers} workers "
+          f"in batches of {S2_SINGLETON_BATCH_SIZE}...")
+    batches: list[list[dict]] = [
+        viable[i:i + S2_SINGLETON_BATCH_SIZE]
+        for i in range(0, len(viable), S2_SINGLETON_BATCH_SIZE)
+    ]
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(_process_one, item): i for i, item in enumerate(viable)}
+        futures = {executor.submit(_process_batch, b): i for i, b in enumerate(batches)}
         completed = 0
         for future in concurrent.futures.as_completed(futures):
             completed += 1
             try:
-                fb = future.result()
+                batch_out: list[dict] = future.result()
             except CircuitOpenError:
                 # D2211: Breaker open — cancel all futures, preserve checkpoint, abort
                 print("\n❌ CIRCUIT BREAKER OPEN during singleton extraction — aborting")
@@ -2410,19 +2510,20 @@ def process_singletons(
                 raise
             except Exception as e:
                 # D2177 (C16): Log singleton extraction failures
-                print(f"  [{completed}/{len(viable)}] ⚠️  singleton worker error: {type(e).__name__}: {e}")
+                print(f"  [{completed}/{len(batches)}] ⚠️  batch worker error: {type(e).__name__}: {e}")
                 continue
-            if fb is None:
-                continue
-            if fb.get("_null"):
-                total_null += 1
-                continue
-            if fb.get("_gate"):
-                continue
-            all_fbs.append(fb)
-            total_extracted += 1
-            if completed % 100 == 0:
-                print(f"  [{completed}/{len(viable)}] {total_extracted} extracted, {total_null} NULL")
+            for fb in batch_out:
+                if fb is None:
+                    continue
+                if fb.get("_null"):
+                    total_null += 1
+                    continue
+                if fb.get("_gate"):
+                    continue
+                all_fbs.append(fb)
+                total_extracted += 1
+            if completed % 50 == 0:
+                print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL")
 
     # Write output
     from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT

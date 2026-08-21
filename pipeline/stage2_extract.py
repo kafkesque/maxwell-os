@@ -340,11 +340,25 @@ PRINCIPLE STRUCTURE (required for every extraction):
      achieve Y") — prescriptive advice, not an explanation of why something happens.
    - "descriptive_model": a taxonomy/classification of WHAT categories exist and how
      they relate (what type? how organized?) — identity/organization, not causation.
+   DECISION ORDER (apply strictly, top-down — answer the FIRST question that matches):
+   1. Is the passage PRESCRIPTIVE — a how-to, method, command, or "do X to get Y" advice?
+      → normative_heuristic.
+   2. Else, does the evidence DEMONSTRATE a cause→effect chain (verbatim "X causes / leads
+      to / because Y", not merely an explanation offered for an association)?
+      → causal_mechanism.
+   3. Else, is the passage an OBSERVED co-occurrence / correlation / regularity (X goes
+      with Y, with no proven why)?
+      → empirical_pattern.
+   4. Else — a taxonomy, typology, or classification ("categories relate as follows"):
+      → descriptive_model.
+   DECOUPLING RULE: decide extraction_type from the EVIDENCE FIRST (the 4 questions above),
+   and ONLY THEN write the mechanism field in that chosen register. Never pick a causal-
+   sounding register first and let it drag the label upward. If the mechanism wording would
+   say "causes/because", but the evidence only shows association/advice, DOWNGRADE the
+   wording to match the honest label — never upgrade the label to match the wording.
    CALIBRATION: In a typical convergent corpus only ~1 in 3 principles is a verified
-   causal_mechanism. Most passages show association, advice, or taxonomy. If there is no
-   verbatim "X causes/leads to Y" chain in the evidence, the honest label is
-   empirical_pattern, normative_heuristic, or descriptive_model. Do NOT upgrade a
-   correlation or rule of thumb to causal_mechanism just because it has an explanation.
+   causal_mechanism. Most passages show association, advice, or taxonomy. Do NOT upgrade a
+   correlation, method, or taxonomy to causal_mechanism just because it has an explanation.
 9. content_type: "principle" (reusable concept), "process_template" (repeatable how-to),
    "process_instance" (case study), "growth_edge" (speculative insight),
    "tool_instruction" (tool-specific command).

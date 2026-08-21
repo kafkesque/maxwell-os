@@ -1921,6 +1921,27 @@ def run_stage2(
         if result is None:
             return []
 
+        # BUG-157: non-object LLM responses (bare string/number) from
+        # parse_json_robust. Retry ONCE with an explicit object-only instruction;
+        # if still non-object, fail closed (D2331) — no opaque AttributeError.
+        if not isinstance(result, (dict, list)):
+            print(f"      ⚠️  Non-object result ({type(result).__name__}) for {cid} — "
+                  f"retrying with JSON-only repair", flush=True)
+            try:
+                result = call_llm(
+                    prompt + "\n\nReturn ONLY a single JSON object. No prose, no quotes wrapping the object.",
+                    system, GEN_MODEL, provider,
+                    few_shot=None,
+                )
+            except CircuitOpenError:
+                raise
+            except Exception as _repair_err:
+                print(f"      ⚠️  repair retry failed for {cid}: "
+                      f"{type(_repair_err).__name__}: {_repair_err}", flush=True)
+        if not isinstance(result, (dict, list)):
+            return [{"_failed": True, "cluster_id": cid,
+                     "_schema_errors": [f"non-object result: {type(result).__name__}"]}]
+
         # D2176: Handle both single-object and array responses.
         # If LLM returns [{...}, {...}], process each as a separate FB.
         # If LLM returns {...}, process as single FB (backward compatible).
@@ -1945,6 +1966,14 @@ def run_stage2(
 
         Extracted from _process_one to support both single and multi-principle returns.
         """
+        # BUG-157: parse_json_robust can return a bare JSON string (the model
+        # emitted a string literal like "null" or prose instead of an object).
+        # Guard BEFORE any .get() — otherwise AttributeError crashes the worker
+        # with an opaque message instead of the fail-closed (D2331) schema path.
+        if not isinstance(result, dict):
+            return {"_failed": True, "cluster_id": cid,
+                    "_schema_errors": [f"non-object result: {type(result).__name__}"]}
+
         # Check for NULL route
         route: str = result.get("route", "FB").strip().upper()
         if route == "NULL":
@@ -2218,6 +2247,19 @@ def run_stage2(
         os.replace(_gated_final.name, gated_ids_file)
     except Exception as e:
         print(f"   ⚠️  final gated_ids write failed: {type(e).__name__}: {e}", flush=True)
+
+    # BUG-156: final segids write. The incremental segids write fires only every
+    # 5 clusters (completed % 5 == 0), so the trailing <5 clusters were
+    # checkpointed but never marked processed — a resume would re-extract them
+    # and produce duplicate FBs (same fb_id). Mirror the gated_ids final write.
+    try:
+        _segids_final = _tmp_final.NamedTemporaryFile(mode="w", suffix=".segids", delete=False,
+                                                      dir=str(STAGE2_CHECKPOINT.parent))
+        json.dump(list(processed_ids), _segids_final)
+        _segids_final.flush(); os.fsync(_segids_final.fileno()); _segids_final.close()
+        os.replace(_segids_final.name, segids_file)
+    except Exception as e:
+        print(f"   ⚠️  final segids write failed: {type(e).__name__}: {e}", flush=True)
 
     # Summary
     print(f"\n{'='*60}")

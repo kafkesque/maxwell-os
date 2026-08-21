@@ -17,12 +17,15 @@
 > Ontological audit of the FORM axis found a non-partitioning 4-way label set + two
 > role↔form routing tables (D2150/D2417) violating the D2323 "orthogonal axes" contract.
 > Drift confirmed: causal_mechanism 11%→60% single-source; n=30 sample ~43% mislabeled.
-> R1 committed (df1fbfd). Remaining, in priority order:
+> R1 committed (df1fbfd). D2429 (ensemble adjudication): drift CONFIRMED — judges downgrade
+> ~40-50% of sampled causal labels; FORM-axis ambiguity validated (D2427); consensus is
+> silver-standard (third pass needed). Human-review queue = 10 records. Remaining, in priority order:
 
 | # | Task | Status |
 |---|------|--------|
-| R1.1 | **Confirm drift error rate** — adjudicate n=30 sample (my pre-score ~43%, 7/18 causal over-claimed + under-labeling) | 🟡 needs user |
-| R1.2 | **Run R1 relabel sweep** (`stage2_relabel_extraction_type.py`) on a COPY, audit diff, then production | 🟡 ready, copy-first |
+| R1.1 | **Confirm drift error rate** — ✅ DONE (D2429). Ensemble confirms ~40-50% causal over-claim. Human-review queue = 10 records: 1,2,9,11,12,15,25,26,27,30 | ✅ done |
+| R1.6 | **Third independent pass** on the 10-record disagreement set (2 LLMs correlate — don't treat 2-way majority as golden) | 🟡 optional |
+| R1.2 | **Run R1 relabel sweep** (`stage2_relabel_extraction_type.py`) on a COPY, audit diff, then production | 🟡 justified (drift confirmed) |
 | R1.3 | "the passage" meta-commentary (1,036 records) prompt fix + post-hoc sweep | 🟡 P1 |
 | R1.4 | Near-dup surface (38 name groups, ~80 records) dedup before S4 | 🟡 P1 |
 | R1.5 | content_type instability (PT 19%→8%, TI 4%→1%, GE 4 records) — monitor/decide | 🟡 P1 |

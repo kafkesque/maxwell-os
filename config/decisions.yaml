@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-20T13:14:00Z'
-total_decisions: 412
+total_decisions: 413
 decisions:
 - id: D2092
   category: INF
@@ -3652,11 +3652,30 @@ decisions:
   - pipeline/stage2_extract.py
   - pipeline/stage2_relabel_extraction_type.py
   created: '2026-08-21'
+- id: D2429
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'R1.1 ensemble adjudication result (Claude + ChatGPT, cross-reviewed).
+    Drift CONFIRMED: the judges independently downgrade ~40-50% of the 18 sampled
+    causal_mechanism labels (records 1,2,4,7,8,9,15; borderline 5,14), matching the ~43%
+    pre-score. Under-labeling also seen (26 → causal; 20/22 borderline). Two methodological
+    findings: (1) FORM-axis boundaries are empirically ambiguous — the decisive test is
+    "does the EVIDENCE make it prescriptive/causal", not surface form (validates D2427);
+    (2) two LLMs reasoning from the same decision-order correlate, so consensus is
+    silver-standard, NOT golden — a THIRD independent pass is required before trusting a
+    majority vote. ChatGPT hand-tally arithmetic error (stated 13/8/7/2 vs actual 12/9/6/3)
+    — programmatic tallying required. Human-review queue narrowed to 10 records:
+    1,2,9,11,12,15,25,26,27,30 (1 and 25 are explicit ties).'
+  champion: goose
+  target_files:
+  - temp/chatgpt0020.md
+  - temp/claude 0020.md
+  created: '2026-08-21'
 summary:
-  total: 412
+  total: 413
   proposed: 0
   draft: 1
-  active: 355
+  active: 356
   stale: 0
   superseded: 14
   archived: 8
@@ -3722,4 +3741,4 @@ summary:
     PERF / BUGFIX: 1
     OPS / DATA: 1
     QLT / PROMPT: 3
-    QLT / AUDIT: 5
+    QLT / AUDIT: 6

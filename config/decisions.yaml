@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-22T12:05:00Z'
-total_decisions: 435
+total_decisions: 436
 decisions:
 - id: D2092
   category: INF
@@ -4056,11 +4056,33 @@ decisions:
   - tests/test_decision_summary_sync.py
   - config/decisions.yaml
   created: '2026-08-24'
+- id: D2448
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'S2 prompt hardening + non-principle commit-frontier verdict (factoring
+    singleton extraction). Non-principle types are 1147/8410 S2 records (13.6%: PT
+    796, PI 204, TI 143, GE 4); commit_non_fb_types is dead config (pipeline_paths.py
+    never read by stage6_commit.py); S6 has only fbs tables; stage4_5_enrich.py derives
+    FB edges only. Singleton extraction imminent would re-amplify S2 prompt defects at
+    scale. FIXED NOW (pre-extraction, no re-extraction cost): _build_body_schema_text()
+    now emits elaboration PRINCIPLE-ONLY (empty for PT/PI/GE/TI — BUG-173) and parameters
+    REQUIRED for tool_instruction (BUG-169), propagating to SINGLE_SOURCE + SINGLETON +
+    SINGLETON_BATCH via _S2_BODY_SCHEMA. COMMIT-FRONTIER: sequenced B→A — document
+    non-principle sidecars now (they carry full skeleton+body+provenance+stamps), commit
+    later as ONE coherent work item. Path A infeasible now: requires S6 non-principle
+    tables + wiring commit_non_fb_types + a producer for non-principle cross-ref fields
+    (consulted_fbs/fb_query_*/parent_pt_id/promoted_to_*) + non-principle S5 verification.
+    Trigger to revisit: after BUG-165 validates the principle path S4→S5→S6.'
+  champion: goose
+  target_files:
+  - pipeline/stage2_extract.py
+  - governance/buglog.md
+  created: '2026-08-24'
 summary:
-  total: 435
+  total: 436
   proposed: 0
   draft: 1
-  active: 377
+  active: 378
   stale: 0
   superseded: 15
   archived: 8
@@ -4117,7 +4139,7 @@ summary:
     PERF / BUGFIX: 1
     QA: 4
     QLT: 39
-    QLT / AUDIT: 15
+    QLT / AUDIT: 16
     QLT / DATA: 1
     QLT / PROMPT: 4
     QUALITY / DATA: 3

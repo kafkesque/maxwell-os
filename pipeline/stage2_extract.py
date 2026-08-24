@@ -603,10 +603,14 @@ def _build_body_schema_text() -> str:
             lines.append(f"- {role}: {', '.join(fields)}")
     lines.append(
         "  (steps/actors/parameters are JSON arrays; every other field is a string. "
-        "elaboration is REQUIRED for principle — never leave it empty: write 3-5 "
-        "sentences of deeper nuance; if the passage adds no explicit nuance, DERIVE it "
-        "from the implications of mechanism + boundary + consequence. Other fields may "
-        "be left empty only when the passage does not provide them.)"
+        "elaboration is PRINCIPLE-ONLY: REQUIRED for principle — never leave it empty, "
+        "write 3-5 sentences of deeper nuance; if the passage adds no explicit nuance, "
+        "DERIVE it from the implications of mechanism + boundary + consequence. For "
+        "process_template / process_instance / growth_edge / tool_instruction, elaboration "
+        'MUST be empty (""). parameters is REQUIRED for tool_instruction — extract every '
+        "input/argument the tool takes (name, type, what it does); emit [] ONLY if the "
+        "passage clearly shows the tool takes no inputs; never omit the key. Other fields "
+        "may be left empty only when the passage does not provide them.)"
     )
     return "\n".join(lines)
 

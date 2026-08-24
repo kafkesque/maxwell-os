@@ -592,8 +592,8 @@ examples:
     consequence: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE: Both segments say "good people are important" in different words. This is
 
     a platitude, not a principle. There is no mechanism (HOW do great people cause great
@@ -649,8 +649,8 @@ examples:
     consequence: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — FALSE CONVERGENCE. Both segments use the word "feedback" and discuss its role in organizations,
     creating a strong topical overlap. But they operate at completely different levels of analysis: Stone & Heen address interpersonal
     psychology (emotional triggers, identity threat, individual defensiveness), while Laloux addresses organizational structure
@@ -701,8 +701,8 @@ examples:
     boundary: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — JARGON ECHO. Both segments use the word ''leverage'' but describe
 
     unrelated mechanisms: Meadows means system intervention points (feedback structure),
@@ -746,8 +746,8 @@ examples:
     boundary: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — GENUINE CITATION ECHO (D2221). Three best-selling business books all state the same platitude
     ("communication is key to success") without a SINGLE causal mechanism. Covey says "seek to understand," Carnegie says
     "express clearly," Sinek says "communicate openly" — but none explain WHY communication produces better outcomes through
@@ -787,8 +787,8 @@ examples:
     boundary: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — TAXONOMY, NOT CAUSAL PRINCIPLE (D2221). The sources converge on a classification system (icons,
     indices, symbols) that categorizes signs by their mode of reference. But this is a taxonomy — it answers "what category
     does X belong to?" rather than "what will happen IF...?" Taxonomies classify; principles predict. The "mechanism" from
@@ -823,8 +823,8 @@ examples:
     boundary: ''
     evidence_passages: []
     elaboration: ''
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — SAME OBSERVATION, DIFFERENT MECHANISMS (D2223). Both sources agree that spaced retrieval improves
     memory, but they propose DIFFERENT causal mechanisms: Brown says retrieval practice reconsolidates memory traces; Walker
     says sleep-dependent consolidation is the mechanism. These are not the same causal explanation. A naive convergent extractor

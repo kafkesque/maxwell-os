@@ -19,7 +19,7 @@ DECISION_LOG = ROOT / "DECISION-LOG.md"
 DECISIONS_YAML = ROOT / "config" / "decisions.yaml"
 
 CATEGORIES = ["INF", "DAT", "CLS", "QLT", "GOV", "PRD", "RES", "DEF", "VAL"]
-STATES = ["PROPOSED", "DRAFT", "ACTIVE", "STALE", "SUPERSEDED", "ARCHIVED", "REJECTED"]
+STATES = ["PROPOSED", "DRAFT", "ACTIVE", "STALE", "SUPERSEDED", "ARCHIVED", "REJECTED", "DEFERRED", "RESOLVED", "PLANNED"]
 
 
 def extract_decisions_from_log() -> dict[str, dict]:

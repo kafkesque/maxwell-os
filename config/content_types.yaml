@@ -160,20 +160,10 @@ extraction_types:
     verification_standard: "correlation only — flag, do not assert causation"
 
 # ─────────────────────────────────────────────────────────────────────────────
-# D2150 mapping — extraction_type → content_type (S4 routing DEFAULT)
-#   A deterministic routing heuristic, NOT a type hierarchy. The model may
-#   override when evidence warrants (e.g. normative_heuristic → principle when
-#   it is a general concept without a procedure format).
-# ─────────────────────────────────────────────────────────────────────────────
-extraction_to_content_type:
-  causal_mechanism: principle
-  descriptive_model: principle
-  normative_heuristic: process_template     # repeatable method (general concept → principle via override)
-  empirical_pattern: growth_edge
-
-# ─────────────────────────────────────────────────────────────────────────────
 # D2128 mapping — route (S2 legacy field) → content_type
-#   Closes the route→content_type gap: S2 `route` is currently inert.
+#   ACTIVE fallback in stage4._resolve_content_type: when a record lacks an
+#   explicit content_type, S2's legacy `route` (FB/PT/PI/GE/TI) is mapped here.
+#   (Previously inert; D2128 closed the gap and it is now live — NOT dead.)
 # ─────────────────────────────────────────────────────────────────────────────
 route_to_content_type:
   FB: principle
@@ -190,6 +180,11 @@ route_to_content_type:
 #   the role and default the FORM to the epistemic register that role most
 #   commonly expresses. S4 may re-derive the form during classification.
 #   Weakest-honest default chosen per role to avoid over-claiming (D2376).
+#   RECONCILIATION (D2432/D1 vs D2427): this table is a REPAIR fail-safe, NOT a
+#   routing rule — it fires ONLY when the model confuses the two orthogonal axes
+#   (D2323). D2427's justification×modality split would remove the need for a
+#   role→form default entirely; until that lands, these values are weakest-honest
+#   ASSUMPTIONS (e.g. tool_instruction→normative_heuristic), revisited post-R2.
 # ─────────────────────────────────────────────────────────────────────────────
 content_to_extraction_type:
   principle: descriptive_model       # conceptual statement → structure/identity (weakest, no over-claim)
@@ -200,21 +195,26 @@ content_to_extraction_type:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SHARED CORE BODY — the READABLE knowledge content an agent consumes.
-# S2 emits name→elaboration. S4 appends jargon (body-only, AFTER elaboration).
+# S2 emits the name→consequence skeleton for every content_type. `elaboration`
+# is S2-emitted but PRINCIPLE-ONLY (empty for PT/PI/GE/TI). S4 (CRIBS) appends
+# application / failure_mode (principle) / jargon (body-only, AFTER elaboration).
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTE (D2349): is_summary, evidence_passages, extraction_type, content_type
 # were previously listed here but are NOT body content — they are flags,
 # provenance, and classification labels. Moved to `classification` / `metadata`
 # below so `core_body` reflects only what renders as the knowledge object's body.
+# NOTE (D2432/C2): `failure_mode` has DUAL provenance — S4-CRIBS for `principle`
+# (how the principle breaks), but S2-extracted for `process_template` (see
+# `s2_body_fields`). Both are valid; the source differs by content_type.
 core_body:
-  - name
-  - definition
-  - mechanism
-  - boundary
-  - consequence
-  - elaboration
+  - name           # S2 — shared skeleton (all content_types)
+  - definition     # S2 — shared skeleton
+  - mechanism      # S2 — shared skeleton
+  - boundary       # S2 — shared skeleton
+  - consequence    # S2 — shared skeleton
+  - elaboration    # S2 — PRINCIPLE-ONLY (REQUIRED for principle; empty for PT/PI/GE/TI)
   - application    # S4 (CRIBS) — prescriptive trigger→action, body-only
-  - failure_mode   # S4 (CRIBS) — how the principle breaks, body-only
+  - failure_mode   # principle: S4 (CRIBS); process_template: S2 (see s2_body_fields)
   - jargon        # S4 (CRIBS) — body-only per D2123, renders AFTER elaboration
 
 # ─────────────────────────────────────────────────────────────────────────────

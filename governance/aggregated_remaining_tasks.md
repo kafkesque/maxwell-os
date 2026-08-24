@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-21 | **Decisions:** D2000-D2428 | **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407); response_format=json_object → empty gpt-oss-20b fixed (D2408). **R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (pipeline_run_id=canary) + Parquet. ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression.** **D2409 + D2410 (2026-08-17): S1.5 embed cache + S5 incremental checkpoint/resume (6 tests) + S4 metadata derivation audit fixes (temporal_scope boundary-match, difficulty_map C12 with 0/279 drift, context "general" schema-legal) — 7 more tests → 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. T1.1 stage PREPARED: caffeinate active, OMLX lazy-load (2/7 models), preflight clean.**
+> **Updated:** 2026-08-24 | **Decisions:** D2000-D2438 | **D2437/D2438 (2026-08-24): deterministic value-filter (`scripts/score_single_source.py` + `scripts/prefilter_clusters.py` + `config/filtering.yaml`) + S4 preflight/smoke/stress harness (28 tests) + `scripts/render_s4_visual.py`. Pre-S4 hygiene done: dedup (8,402) + passage sweep (841 flagged). Taxonomy "discipline promotion" REVERTED (broke D2422 disjointness — 3 labels already domains). 110/110 tests green.** **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407); response_format=json_object → empty gpt-oss-20b fixed (D2408). **R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (pipeline_run_id=canary) + Parquet. ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression.** **D2409 + D2410 (2026-08-17): S1.5 embed cache + S5 incremental checkpoint/resume (6 tests) + S4 metadata derivation audit fixes (temporal_scope boundary-match, difficulty_map C12 with 0/279 drift, context "general" schema-legal) — 7 more tests → 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. T1.1 stage PREPARED: caffeinate active, OMLX lazy-load (2/7 models), preflight clean.**
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)
@@ -11,6 +11,84 @@
 > **D2351-D2355 (NEW, 4-LLM audit × independent re-verification):** S4 depth fail-open, provenance/schema gaps, singleton index, S4 bottleneck. **Must/Should/Worth tiers → `governance/T1.1_CANARY_READINESS_MUST_SHOULD_WORTH.md`.**
 
 ---
+
+## 🎯 AGGREGATED REMAINING TASKS — 2026-08-23 (most-critical-first)
+
+> **D2437 (this session):** deterministic value-filtering built + run. `scripts/score_single_source.py`
+> post-hoc triage on 8,410 → **KEEP 4,892 / DROP 3,510 / DEDUP 8** (DEDUP=8 matches BUG-164's surplus exactly).
+> `scripts/prefilter_clusters.py` pre-LLM gate, dual-use single-source + singletons → **EXTRACT 18.0% of 35,122
+> singletons** (and 36.9% of a 3,000 single-source cluster sample). Thresholds in `config/filtering.yaml` (C12).
+
+1. 🔴 **BUG-165 — S4→S5→S6 rerun ONCE** on finalized S2 (8,410, or the 4,892 keep-list). S6 EMPTY; S4/S5 stale at 2,830. This is THE product build.
+2. ✅ **R1.4 / BUG-164 dedup** — DONE (2026-08-24): `scripts/dedup_s2.py` dropped 8 surplus exact-fb_id records → `checkpoint.deduped.jsonl` (8,402). Near-dup name groups (35) flagged REVIEW, not auto-dropped.
+3. 🔴 **BUG-150 discipline `emerging` 38.4%** — re-measure on FRESH S4 (was stale 2,830); promote `graphic design`/`organizational behavior`/`data visualization`/`design thinking` only after. ⚠️ **2026-08-24:** a premature "discipline promotion" (added those 3 as disciplines when they already exist as DOMAINS) broke D2422/BUG-151 disjointness — REVERTED. Promotion stays gated on a fresh S4 re-measure.
+4. ✅ **R1.3 "the passage" meta-commentary** — DONE (2026-08-24): `scripts/sweep_passage_meta.py` flagged 841 records (678 leading-framing stripped; embedded flagged for review, not auto-stripped) → `checkpoint.passage_cleaned.jsonl`.
+5. 🟠 **P1.3 gpt-oss cross-family FLAG** — wire disagreement flag in `stage2_relabel_extraction_type.py` (0 gpt-oss refs today).
+6. 🟠 **BUG-148 `route="FB"`** — vestigial on all 8,410; derive-from-content_type or remove.
+7. 🟡 **BUG-151 taxonomy** — 269 raw-alias overlaps; CI disjointness test now EXISTS + GREEN (`tests/test_taxonomy_disjointness.py`, education dual-listing resolved, domain∩discipline = only `emerging`).
+8. 🟡 **DECISION-LOG backfill** — D2423–D2438 (15+ decisions).
+9. ✅ **Golden single-source meta header** — FIXED: `9 ex / 6 pos / 3 hard-neg` (was 8/5/3).
+10. 🟡 **BUG-149 residual** — dead `max_words=5` default in `normalize_fb_name`.
+11. ⏸ **Singletons (35,122)** — prefilter flags 18% (6,317) EXTRACT; extract only if single-source recall is a product requirement.
+12. ⏸ **DSPy/golden expansion** — wire MIPROv2; add content_type hard negatives (PT-vs-TI contrastive pairs).
+13. ⏸ **R2 FORM refactor · P2.x batch S5 · GAP-1 DSPy wiring · BUG-145/159/160 (P2).**
+
+> **✅ S4 preflight/smoke/stress (D2438, 2026-08-24):** 28-test harness
+> `tests/test_stage4_preflight_smoke_stress.py` + `scripts/render_s4_visual.py` (human-readable
+> S4 output). Live OMLX smoke on a diverse 7-FB batch → 3 principles classified + 4 non-principle
+> routed (PT/PI/GE/TI), 0 failed, 0 classification errors. Full suite **110/110 green**. Config audit
+> clean, no drift. `--only-fb-ids` wiring verified fail-closed (missing/empty/no-fb_id/0-match → exit 1).
+
+## 🔴 CRITICAL — FORENSIC FINDINGS 2026-08-23 (verified, ordered by severity)
+
+> **⚠️ SEQUENCING (2026-08-23, CORRECTED):** S2 is FINAL — 8,410 records. P0.x is already recovered by the
+> single-source rerun (only `cluster_11649` still failing, BUG-159). The S4→S5→S6 rerun must run **ONCE**
+> on the finalized S2 (convergent + post-hoc-filtered single-source = 4,892 keep-list, or all 8,410). Do NOT run twice.
+
+> **🔴 BUG-166 — single-source is ~99.9% non-convergent & generic (2026-08-23, MEASURED):**
+> non-principle types = 1,146/1,147 single-source (1 convergent PT total). Single-source records are
+> book-level paraphrases (descriptions, case studies, code snippets) — retrieval value but **no
+> epistemic-independence value**. This means the single-source layer needs a **post-hoc value filter**,
+> not a re-extraction.
+
+0. **🔴 STRATEGIC GATE (decide FIRST, zero compute):** is single-source content part of the product,
+   or is the product convergent-only (2,649 records)? Given BUG-166, recommend **convergent-first**:
+   run S4→S5→S6 on convergent (2,649) + the post-hoc-filtered single-source survivors (~1,800), not
+   the full 8,410. This determines the S4→S5→S6 input size.
+
+1. **P0.x / BUG-146 — gated recovery (✅ ALREADY DONE — corrected 2026-08-23):** the "9,950 gated"
+   figure is **STALE** (pre-D2417 original run). The single-source rerun (2026-08-21) already
+   re-processed all 10,812 single-source clusters with the content-type-aware gate → `13,891 processed
+   → 8,410 FBs`, `Gate violations: 0`. Remaining un-extracted = **~1 failing cluster (`cluster_11649`,
+   BUG-159)**, not 9,950. Do NOT re-run `--reprocess-gated` — nothing left to recover.
+2. **R1.4 / BUG-164 — dedup (pre-S4):** 3 fb_id groups = 11 records + 38 name groups/~80 records.
+3. **BUG-165 — S4/S5/S6 stage-drift (BLOCKING, run LAST):** S4/S5 = 2,830 records (commit `b14462f`), S6 = empty; S2 = 8,410 (FINAL). **Rerun S4→S5→S6 ONCE on the finalized S2** — do NOT run it twice.
+4. **BUG-150 — discipline `emerging` 38.4%** (measured on STALE 2,830-record S4 — re-measure on the final full S2 before promoting disciplines).
+4. **R1.4 / BUG-164 — dedup:** 3 fb_id groups, **11 records** (not 6). 38 name groups / ~80 records.
+5. **R1.3 — "the passage" meta-commentary:** **1,161 records** (not 1,036).
+6. **P1.3 residual — gpt-oss cross-family FLAG:** not wired (`stage2_relabel_extraction_type.py` has 0 gpt-oss refs).
+7. **BUG-151 — taxonomy:** education dual-listing already resolved; **269 raw-alias overlaps** remain + CI disjointness test.
+8. **BUG-148 — `route="FB"`** on all 8,410 records (vestigial).
+9. **DECISION-LOG.md lags** `decisions.yaml` (D2422 vs D2436) — backfill D2423–D2436.
+10. **Golden single-source meta header wrong:** claims `total_examples: 8, positives: 5`; actual = 9 examples / 6 positives.
+
+### 🧭 EXACT TASK SEQUENCE (pragmatic, BUG-166-aware — 2026-08-23)
+
+> One decision, then cheap hygiene, then ONE expensive run, then measure. Do NOT run S4→S5→S6 more than once.
+
+| Step | Task | Cost | Gate |
+|------|------|------|------|
+| **G0** | **Decide product scope** — convergent-only (2,649) vs + post-hoc-filtered single-source (~1,800) vs + all single-source (8,410). Default: **convergent + filtered survivors (~4.5k)**. P0.x is already done (BUG-146 corrected). | 0 | blocks all |
+| **H1** | R1.4 / BUG-164 dedup — 3 fb_id groups (11 records) + 38 name groups (~80 records) on S2 checkpoint. | min | before S4 |
+| **H0** | **Post-hoc value filter** on the 5,761 single-source (new `scripts/score_single_source.py`): keep convergent + actionable/general; drop thin paraphrase/anecdote. Keeps ~32%. | min | after G0 |
+| **H2** | Fix golden single-source meta header (9 ex / 6 pos). | min | CI |
+| **H3** | DECISION-LOG backfill D2423–D2436 (14 decisions). | min | doc |
+| **H4** | BUG-151 CI disjointness test (education already resolved; 269 raw-alias overlaps remain). | ~1h | CI |
+| **R1** | **S4 → S5 → S6 ONCE** on the finalized S2 (per G0 size). This is the actual product build; S6 is currently EMPTY. | multi-hr | ✅ the one run |
+| **M1** | Re-measure BUG-150 discipline `emerging` on the fresh S4 (was 38.4% on stale 2,830); promote disciplines only if still high. | min | after R1 |
+| **M2** | Verify BUG-149 truncation = 0 on fresh S4 (fix already committed). | min | after R1 |
+| **M3** | BUG-148 `route="FB"` cleanup / D2128 derive-from-content_type. | ~1h | hygiene |
+| **D1** | P1.3 gpt-oss cross-family FLAG wiring; R1.3 "the passage" sweep; BUG-145/150/151 deferred items; DSPy/golden expansion. | varies | post-R1 |
 
 ## 🚧 This session (R1 extraction_type drift, D2427/D2428) — remaining tasks
 
@@ -25,7 +103,7 @@
 |---|------|--------|
 | R1.1 | **Confirm drift error rate** — ✅ DONE (D2429). Ensemble confirms ~40-50% causal over-claim. Human-review queue = 10 records: 1,2,9,11,12,15,25,26,27,30 | ✅ done |
 | R1.6 | **Third independent pass** on the 10-record disagreement set (2 LLMs correlate — don't treat 2-way majority as golden) | 🟡 optional |
-| R1.2 | **Run R1 relabel sweep** (`stage2_relabel_extraction_type.py`) on a COPY, audit diff, then production | 🟡 justified (drift confirmed) |
+| R1.2 | **Run R1 relabel sweep** (`stage2_relabel_extraction_type.py`) on a COPY, audit diff, then production | ✅ DONE (D2434) — gemma judge, promoted; P1.3 verdicts applied (D2435) |
 | R1.3 | "the passage" meta-commentary (1,036 records) prompt fix + post-hoc sweep | 🟡 P1 |
 | R1.4 | Near-dup surface (38 name groups, ~80 records) dedup before S4 | 🟡 P1 |
 | R1.5 | content_type instability (PT 19%→8%, TI 4%→1%, GE 4 records) — monitor/decide | 🟡 P1 |
@@ -33,9 +111,32 @@
 | H1 | BUG-159 prompt hardening (treat passage as DATA) + contamination canary | 🟡 P2 |
 | H2 | BUG-160 evidence-relevance pass (add topical-relevance check) | 🟡 P2 |
 | H3 | minhash_signature empty on 8 records | 🟡 P2 |
-| H4 | route="FB" inert field cleanup | 🟡 P2 |
+| H4 | ~~route="FB" inert field cleanup~~ → RESOLVED: `route` is a live D2128 fallback (not inert) — see P2.4 | ✅ P2.4 |
 | SEQ1 | Singleton benchmark on copy (batched vs single) — now unblocked | ⏸ gated |
 | SEQ2 | **STOP before S4/S5/S6** for visual inspection | ⏸ gated |
+
+### 🔑 D2431 + D2432 (2026-08-22) — A/B refutes S4 ownership; FORM fixed in S2; forensic audit
+
+> A/B (n=20): Qwen3+ladder = 25% causal vs 55% current; gpt-oss = 0% causal / 60% empirical (its own
+> bias). Cross-family agreement 35%. Keep FORM in S2 (unified ladder); gpt-oss = disagreement FLAG.
+> Forensic audit (D2432) added dead-config/dead-code + provenance findings. D2430 superseded.
+
+| # | Task | Status |
+|---|------|--------|
+| P1.0 | F1/F5 + DECOUPLING + remove MAPPING RULES — all 4 S2 prompts unified | ✅ D2431/D2432 |
+| P1.1 | F3/F4 — fix golden single_source (TI→normative_heuristic; strip negative causal) | ✅ D2433 |
+| P1.2 | Re-label 5,761 single-source/singleton records with fixed ladder (copy-first) | ✅ DONE (D2434) — gemma-4-E4B judge, promoted; causal 44.8%→5.8%. **SCOPE CONFIRMED 2026-08-23: single-source ONLY — convergent 0/2,641 touched (forensic diff).** |
+| P1.3 | Cross-family gpt-oss disagreement FLAG + human-review queue | 🟡 PARTIAL — 49 human verdicts applied (D2435, 14 corrections + 9 quarantine); gpt-oss FLAG wiring still open |
+| P1.4 | A2 — remove `|"none"` from singleton extraction_type enum (BUG-163) | ✅ D2433 |
+| P0.x | Close non-principle dead-end — route PT/PI/TI/GE through S4/S5/S6 (D2418) | 🔴 P0 — CODE DONE (D2417/D2421); RUN pending: `seed_gated_ids.py --log runner_t11_v3.log` + `--reprocess-gated`. **SCOPE: (1) seed 158→~9,950 gated IDs; (2) re-extract gated clusters content_type-aware; (3) S4→S5→S6. Plus 183 failed auto-retry.** |
+| P2.1 | B1 — delete dead D2150 EXTRACTION_TO_CONTENT_TYPE (BUG-162) | ✅ D2433 |
+| P2.2 | B2/B3 — remove dead schemas.py PT/PI/GE/TI classes; align actors type (BUG-162) | ✅ D2433 |
+| P2.3 | C1/C2 — clarify elaboration (principle-only) + failure_mode provenance in config | ✅ D2433 |
+| P2.4 | C3 — correct H4 route-inert status (route is a D2128 fallback) | ✅ D2433 |
+| P2.5 | D1 — reconcile D2417 role-form coupling vs D2427 (keep as fail-safe, document) | ✅ D2433 |
+| P2.6 | R2 justification×modality split (reduce 65% cross-family ambiguity) | 🟡 P2 |
+| P2.7 | Golden CI validator | 🟡 P2 |
+| P2.8 | Batch S5 DeBERTa inference | 🟡 P2 |
 
 ## 🚧 Frontier T1.1 audit (4b55797) — 4 blockers fixed this session (D2402-D2405)
 

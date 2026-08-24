@@ -1,6 +1,94 @@
 # Maxwell OS — Buglog
-> **Last updated:** 2026-08-21 (R1 extraction_type drift: D2428 precedence-tree + relabel script committed; D2427 R2 axis-refactor logged; BUG-159 OPEN; BUG-160 evidence-relevance OPEN)
+> **Last updated:** 2026-08-24 (D2437/D2438: S4 preflight+smoke+stress harness — 28 tests + live 7-FB OMLX smoke; `scripts/render_s4_visual.py` for human-readable S4 output; **BUG-167 taxonomy "discipline promotion" REVERTED** — added 3 labels as disciplines that already exist as domains, breaking D2422 disjointness, caught by CI `test_taxonomy_disjointness.py`; dedup + passage sweep DONE; 110/110 tests green)
+> **Prior (2026-08-23):** forensic audit: S4/S5/S6 stage-drift 2,830 vs 8,410; relabel scope = single-source-only CONFIRMED; BUG-164 = 11 records not 6; BUG-149 FIXED in code; R1.3 = 1,161 not 1,036; **BUG-146/P0.x ✅ RECOVERED** — single-source rerun already re-processed the 9,950 gated, only `cluster_11649` failing; **BUG-166** — single-source is 99.9% non-convergent & generic; **D2437** — deterministic value-filter built: `scripts/score_single_source.py` (post-hoc) + `scripts/prefilter_clusters.py` (pre-LLM, dual-use single-source+singletons) + `config/filtering.yaml`)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟢 BUG-167 — 2026-08-24 — premature taxonomy "discipline promotion" broke D2422 disjointness — FIXED (reverted)
+- **Symptom:** `tests/test_taxonomy_disjointness.py` failed: domain∩discipline overlap = `{graphic design, data visualization, organizational behavior}` (in addition to `emerging`).
+- **Root cause:** task #3 (BUG-150 discipline promotion) added `graphic design` / `data visualization` / `organizational behavior` as new DISCIPLINE canonicals, but all three already exist as DOMAIN canonicals (`graphic design` = Visual Practice domain, `data visualization` = Digital & Interactive domain, `organizational behavior` = Business & Strategy domain). This created dual-listing — exactly the structural ambiguity D2422/BUG-151 forbids (a model can emit the label into either field and pass validation).
+- **Impact:** would have silently re-opened the BUG-151 cross-kind ambiguity; `is_valid_discipline()` and `is_valid_domain()` would both accept the same string.
+- **Fix:** reverted the 3 duplicate discipline entries. Promotion remains gated on re-measuring BUG-150 `discipline=emerging` on a FRESH full-corpus S4 (per the task register — do NOT promote against the stale 2,830-record S4).
+- **Status:** ✅ FIXED — domain∩discipline = `{emerging}` only; `test_taxonomy_disjointness.py` green.
+
+## 📌 D2438 — 2026-08-24 — S4 preflight + smoke + stress test harness + visual renderer
+- **What:** `tests/test_stage4_preflight_smoke_stress.py` (28 tests) exhausts S4's deterministic surface:
+  - `--only-fb-ids` allow-list fail-closed (missing → exit 1, empty → exit 1, no `fb_id` field → exit 1, 0-match → exit 1).
+  - content-type routing (PT/PI/GE/TI → sidecar files; explicit `content_type` beats `route` fallback).
+  - taxonomy exact/synonym/emerging + cross-kind collision (`user experience design` → `user experience` domain / `human-computer interaction` discipline).
+  - name normalization + collision; classification validation; difficulty/temporal/jargon derivation.
+  - live OMLX smoke on a diverse 7-FB batch: 3 principles classified (depth cross-domain/domain), 4 non-principle routed, 0 failed, 0 classification errors.
+- **Also fixed (D2438):** the "Non-principle cluster" log line printed CUMULATIVE PT/PI/TI counts across prior clusters (misleading) — now prints the per-cluster split.
+- **Visual examinability:** `scripts/render_s4_visual.py` renders `stage4_merge/{run_id}/checkpoint.jsonl` + PT/PI/GE/TI sidecars into a readable Markdown report (`visual.md`).
+- **Status:** ✅ DONE — full suite 110/110 green, config audit clean (no drift).
+
+---
+
+## 🔴 BUG-165 — 2026-08-23 — S4/S5/S6 stage drift: 2,830 records vs S2's 8,410 — OPEN (NEW, blocking)
+- **Symptom:** `stage4_merge/t11/checkpoint.jsonl` = 2,830 records, `stage5_verify/t11/checkpoint.jsonl` = 2,830, `stage6_commit/t11/` = EMPTY. S2 `checkpoint.jsonl` = 8,410 (2,649 convergent + 5,761 single-source). S4/S5 carry `pipeline_commit=b14462f` (created 2026-08-19) vs S2's `7e48f36` (2026-08-18) — an OLDER code state.
+- **Root cause:** the P1.2/P1.3 relabel (D2434/D2435) rewrote `extraction_type` across the full 8,410 S2 records, but S4/S5/S6 were **never re-run** after the single-source expansion + relabel. Everything downstream of S2 is frozen at ~34% of the current corpus.
+- **Impact:** the entire discipline/domain/depth classification (BUG-150's 38.4% `emerging`), name truncation (BUG-149's 176), and verification/commit layers are operating on stale data. Any downstream conclusion (discipline distribution, causal share, PASS/QUARANTINE counts) is invalid until S4→S6 is re-run on the 8,410-record S2.
+- **Fix (CRITICAL, before any S4-classification work):** re-run S4→S5→S6 against current S2 checkpoint after P0.x gated recovery + R1.4 dedup. Do NOT tune BUG-150 discipline promotion against the stale 2,830-record S4 — re-measure on the full corpus.
+- **Status:** 🔴 OPEN — blocks BUG-150 remediation and any T1.1 downstream quality claims.
+
+## 🔴 BUG-166 — 2026-08-23 — single-source S2 output is ~99.9% non-convergent & largely generic — OPEN (strategic; reframes P0.x)
+- **Symptom (measured on t11 checkpoint = 8,410 records):** convergent vs single-source split by content_type:
+  - `principle`: 2,648 convergent / 4,615 single-source
+  - `process_template`: **1** convergent / 795 single-source
+  - `process_instance`: 0 / 204
+  - `tool_instruction`: 0 / 143
+  - `growth_edge`: 0 / 4
+  - **Non-principle types are 99.9% single-source (1,146/1,147).** Only ONE convergent process_template exists ("Render Queue Workflow").
+- **Root cause:** the single-source second pass (D2345) extracts per-book passages with no cross-source convergence requirement. `is_convergent=False` by construction; ISOR independence (D2284) does not apply.
+- **Value assessment (pragmatic sample):** single-source records are mostly **book-level paraphrases** — descriptive observations ("bioRxiv Impact…", "Evergreen Magazine's Editorial Policy"), case studies ("Olive AI", "Thales' Olive Option", "Zola Marathon Reading"), and code snippets ("Angr Framework", "Loan Processing Decision Logic"). A minority are genuinely applicable ("Extreme Customer Research Method", "Render Queue Workflow"). They carry **retrieval/recall value but NOT epistemic-independence value** — the core Maxwell OS claim (cross-source convergence).
+- **Impact on P0.x / BUG-146:** P0.x would recover ~5,500–6,000 MORE single-source gated clusters. The D2418 "value audit" counted *extractability* (35-40% "genuine principles"), not *epistemic value*. Since single-source output is dominated by generic paraphrase, P0.x is **low-value as a P0**. Re-scope: (a) CANCEL P0.x and run S4→S5→S6 on the existing 8,410, or (b) recover ONLY convergent gated clusters (~0 — gated clusters are single-source by nature). Recommend (a).
+- **Status:** 🔴 OPEN — decide BEFORE any S4→S5→S6 run (determines input corpus size).
+
+## 🟡 BUG-164 — 2026-08-23 — 3 duplicate fb_ids in S2 checkpoint (pre-existing) — OPEN (count corrected)
+- **Symptom:** `stage2_extract/t11/checkpoint.jsonl` has 3 fb_ids appearing **11 times total** (Value-First Demonstration ×6, Progressive Disclosure ×3, Power-Law ×2) — i.e. 8 surplus records, NOT "6 records" as first logged. The same 3 duplicates exist in the pristine `checkpoint.jsonl.pre_relabel` backup → NOT introduced by the P1.2 relabel or P1.3 human-verdict pass.
+- **Root cause:** likely a pre-D2421 resume re-extraction (cf. BUG-156 duplicate-FB path) predating the final-segids fix; `fb_id = hash(name, definition)`, so identical name+definition → identical fb_id.
+- **Impact:** 3 near-duplicate groups (11/8,410 ≈ 0.13%). Fold into R1.4 near-dup dedup (38 name groups / ~80 records) before S4.
+- **Status:** 🟡 OPEN — defer to R1.4 dedup pass.
+
+## 📌 SESSION 2026-08-23 — P1.2 relabel + P1.3 human verdicts + OMLX fixes (D2434–D2436)
+- **P1.2 (D2434):** relabeled single-source/singleton `extraction_type` with gemma-4-E4B as judge (R5 cross-family; Qwen3 = 8% human agreement vs gemma 73% on the hardest 49). Promoted to production (backup `.pre_relabel`). Full-checkpoint causal_mechanism 44.8% → 5.8%.
+- **⚠️ RELABEL SCOPE CONFIRMED (2026-08-23, forensic diff pre_relabel→current):** **single-source ONLY.** Convergent records: **0 changed / 2,641 unchanged**. Single-source: 4,057 changed / 1,704 unchanged (gemma sweep 4,058 + P1.3 human 14, net −1 reverted). The `--single-source-only` flag skips `is_convergent` records by design. Convergent clusters were deliberately NOT relabeled (handoff notes "Convergent cluster healthy — 11.3% causal, gemma×Qwen agreement 75%; NOT relabeled"). Log's `changed 3412 / unchanged 1348 / failed 1` (resume2 pass) under-counts the cumulative diff — the authoritative figure is the 4,057/1,704 file diff.
+- **P1.3 (D2435):** applied 49 human-adjudicated verdicts → 14 corrections + 35 already-agree; 9 NONE (USER-FLAG content_type) records quarantined. Backup `.pre_p13`.
+- **OMLX (D2436):** `--memory-guard safe` (eviction on) + `--no-cache` (185GB SSD thrash gone). Residual gemma prefill slowness (256 head_dim), not config-fixable.
+- **Judge evidence (this session):** ladder tightening 49%→45% (rejected); mechanism-field poisoning; few-shot hurts gemma; self-reported confidence uninformative.
+- **🔴 NEW — BUG-165 (stage-drift) + forensic findings:** see BUG-165 entry above. S4/S5/S6 are frozen at 2,830 records (old commit `b14462f`) while S2 holds 8,410 — downstream is stale. BUG-164 = 11 records (not 6). BUG-149 already fixed in code. R1.3 "the passage" = 1,161 records (not 1,036).
+
+## 🟢 BUG-162 — 2026-08-22 — config/code drift: dead D2150 + dead schemas classes + field-provenance ambiguity — FIXED (D2433)
+- **Symptom (forensic audit D2432):** config and code carried stale, mutually-contradicting artifacts.
+- **Root cause + fix:**
+  - **B1** — `EXTRACTION_TO_CONTENT_TYPE` (D2150) dead → **REMOVED** from `pipeline/content_types.py` (definition + stale docstring) and `config/content_types.yaml` (block). Zero importers confirmed. `ROUTE_TO_CONTENT_TYPE` (D2128) kept — it is live in `stage4._resolve_content_type`.
+  - **B2** — `pipeline/schemas.py` `ProcessTemplate/ProcessInstance/GrowthEdge/ToolInstruction` dead pydantic classes → **REMOVED** (324 lines). Schema contract fully preserved in `content_types.yaml` (`extension_fields`/`s2_body_fields`/`zone_body`).
+  - **B3** — `actors` array-vs-str mismatch → resolved by deleting the dead `ProcessInstance` class (the only `actors: str` declaration).
+  - **C2** — `failure_mode` provenance → **DOCUMENTED** dual-provenance in `core_body` (S4-CRIBS for principle; S2-extracted for process_template per `s2_body_fields`).
+  - **C3** — `route` not inert → **CORRECTED** the D2128 config comment + H4 task (route is a live fallback).
+- **Status:** ✅ FIXED — 82 tests pass; schemas.py, content_types.py, stage4_merge import cleanly.
+
+## 🟢 BUG-163 — 2026-08-22 — extraction_type=none singleton-only (prompt↔config enum mismatch) — FIXED (D2433)
+- **Symptom (D2432 A2):** `SINGLETON_SYSTEM` offered `extraction_type ... |"none"` (a 5th value), but `config/content_types.yaml` `extraction_types` defines only 4. If a singleton emitted `none`, validation rejected it.
+- **Root cause:** singleton prompt pre-dated the D2323 4-value FORM enum; the "no object" case is already handled by `route=NULL`, making `none` redundant.
+- **Fix (D2433):** removed `|"none"` from the singleton `extraction_type` enum and the FORM list; rewrote the `extraction_type=none + no principle → route=NULL` bullet to "No extractable object … → route=NULL". `grep -n none pipeline/stage2_extract.py` → 0 hits; file compiles.
+- **Status:** ✅ FIXED
+
+---
+
+## 🟢 BUG-161 — 2026-08-22 — extraction_type FORM drift: 4 divergent S2 prompt paths — FIXED (D2431/D2434); data re-label DONE
+- **Symptom:** single-source/singleton causal_mechanism ≈ 60% vs convergent ≈ 11%. 5,761 single-source+singleton records carry inflated causal_mechanism.
+- **Root cause (3 confirmed S2 prompt defects + golden contamination):**
+  - **F1** — DECISION ORDER + CALIBRATION existed only in convergent SYSTEM_PROMPT; absent from SINGLE_SOURCE_SYSTEM / SINGLETON_SYSTEM / SINGLETON_BATCH_SYSTEM.
+  - **F5** — SINGLETON_SYSTEM "MAPPING RULES" coupled FORM→ROLE (empirical_pattern→growth_edge, causal_mechanism→principle, normative_heuristic→process_template), violating D2323; inherited by SINGLETON_BATCH_SYSTEM via .replace.
+  - **F6** — stage2_relabel_extraction_type.py uses GEN_MODEL=Qwen3 (same family as generator) → R5 violation if used as a *verifier*; acceptable as a *re-generator* with the fixed ladder.
+  - **F3/F4** — golden single_source labels 2 tool_instruction examples as descriptive_model (conflicts D2417); hard negatives carry bogus causal_mechanism. **→ FIXED (D2433):** the 2 TI examples relabelled normative_heuristic; all 55 hard negatives across the 4 golden files stripped of extraction_type/content_type.
+- **A/B test result (D2431, n=20 live):** Qwen3 + decision-order ladder = 25% causal (vs 55-60% current); gpt-oss cross-family + same ladder = 0% causal / 60% empirical_pattern. Cross-family agreement only 35% → FORM is high-ambiguity, and gpt-oss has its own empirical_pattern bias (does NOT auto-correct). "Move FORM to S4" (D2430) refuted.
+- **Resolution (implemented):** fix IN S2 — added DECISION ORDER + CALIBRATION to SINGLE_SOURCE_SYSTEM and SINGLETON_SYSTEM; removed MAPPING RULES; SINGLETON_BATCH_SYSTEM inherits. File parses; MAPPING RULES=0, DECISION ORDER=3.
+- **Remaining:** (1) ~~F3/F4 golden fix~~ ✅ done; (2) re-label the 5,761 existing single-source/singleton records with the fixed ladder (copy-first) — P1.2; (3) use cross-family gpt-oss as a disagreement FLAG, not an owner — P1.3.
+- **Impact:** latent today — S5 (DeBERTa NLI) does not yet consume FORM, so no downstream corruption yet. Fix before R2 (D2427) consumes FORM.
+- **Status:** 🟢 FIXED — prompt (D2431) + data re-label sweep DONE (D2434, gemma judge, promoted to production). P1.3 human verdicts applied (D2435).
 
 ---
 
@@ -95,20 +183,28 @@
 - **Fix (T1.2):** promote `graphic design`, `data visualization`, `organizational behavior`, `design thinking`, `product design`, `ux design` to canonical disciplines (or map as aliases). Re-measure after. See D2388/D2394.
 - **Source:** 2026-08-20 — t11 S4 checkpoint discipline/domains cross-tab.
 
-## 🔴 BUG-149 — 2026-08-20 — S4 name truncation: `max_words=5` hardcoded truncates 176 FB names — OPEN
-- **Symptom:** 176/2830 FB names truncated to ≤5 words by `normalize_fb_name(name, max_words=5)` (stage4_merge.py:672,1470). E.g. "Perceived Complexity and Deviation in Metaphor" → "Perceived Complexity and Deviation in". 933 more names case-normalized (1109 changed total). Truncation propagated to S5 (2822/2822 S5 names == S4 names).
-- **Root cause:** C12 violation — `max_words=5` is a hardcoded magic number; `config/pipeline_config.yaml` already declares `fb_name_max_chars: 200` but that key is consumed ONLY by `retrieval_evaluator.py`, never by S4. So the config value is dead and the real limit is an undocumented hardcoded 5-word cap.
-- **Impact:** 176 FB names lost their distinguishing suffix (e.g. "…in Metaphor" dropped). Search/retrieval by name degraded; truncated names look identical to unrelated FBs.
-- **Fix (T1.2):** wire `fb_name_max_chars` (or a new `fb_name_max_words`) into `normalize_fb_name`, defaulting to ≥8 words or the 200-char cap. A post-hoc name-restore script can recover the 176 full names from the S2 checkpoint (they are intact there) without re-running S4/S5.
-- **Source:** 2026-08-20 — S2→S4→S5 name diff (176 truncated, 0 with ellipsis, max S4 name 62 chars).
+## 🟢 BUG-149 — 2026-08-20 — S4 name truncation: `max_words=5` hardcoded truncates 176 FB names — FIXED in code (doc corrected 2026-08-23)
+- **Symptom:** 176/2830 FB names truncated to ≤5 words by `normalize_fb_name(name, max_words=5)` (stage4_merge.py). Truncation propagated to S5.
+- **Root cause:** C12 violation — `max_words=5` was a hardcoded magic number.
+- **Fix (ALREADY COMMITTED, verified 2026-08-23):** `config/pipeline_config.yaml` `stage4.fb_name_max_words: 8` → `pipeline_paths.py:199` `FB_NAME_MAX_WORDS` → `stage4_merge.py:1485` `normalize_fb_name(name, max_words=FB_NAME_MAX_WORDS)`. `scripts/restore_fb_names.py` exists to patch the 176 truncated names in S4/S5 in place (no re-run). ⚠️ RESIDUAL: function signature default is still `max_words: int = 5` (dead default — one call site, but a footgun). Also `retrieval_eval.fb_name_max_chars: 200` is a near-duplicate key consumed only by `retrieval_evaluator.py`.
+- **Note (BUG-165 interaction):** the 176 truncated names live in the stale 2,830-record S4/S5 — re-running S4 on the full 8,410 S2 will re-truncate nothing (fix is in); prefer the re-run over the restore script.
+- **Source:** 2026-08-20 — S2→S4→S5 name diff; 2026-08-23 forensic verify (config+code committed).
 
-## 🟡 BUG-146 — 2026-08-19 — S2 summary gate is content_type-blind — discards PT/PI/GE potential — OPEN (D2417 committed, NOT re-run)
+## 🟡 BUG-146 / P0.x — 2026-08-19 — S2 summary gate is content_type-blind — discards PT/PI/GE potential — ✅ RECOVERED (2026-08-23 forensic correction)
+- **⚠️ SUPERSEDED (2026-08-23, verified from `single_source_rerun.log` + `retry_failed.log`):** the "9,950 summary gated" figure is **STALE** — it counts the ORIGINAL run (runner_t11_v3.log, 2026-08-19 15:56, pre-D2417). The **single-source rerun (2026-08-21, post-D2417) already re-processed all 10,812 single-source clusters with the content-type-aware gate**, which is why the final state is `13,891 processed → 8,410 FBs` and `Gate violations: 0 (self-flagged as summary)`.
+- **Remaining genuinely-un-extracted work = ~1 cluster, not 9,950:** `cluster_11649` (BUG-159 contamination, schema FAILED ×8 retries) + 2 NULL (47441/47443). D2421's "183 failed" was already reduced by the auto-retry to these 3. **P0.x is NOT a multi-hour job — it is ~1 failing cluster.**
+- The genuinely un-extracted population is the **35,122 singletons** (separate S1.5 file), not the gated clusters.
 - **Symptom:** 6,127 clusters (63% of processed) "summary gated" — skipped wholesale. The gate keys ONLY on `is_summary` (`stage2_extract.py:1558`: `if is_summary and gate_enabled: return _gate`) with NO content_type awareness — a cluster flagged is_summary is dropped even if it could yield a process_template/process_instance/growth_edge/tool_instruction.
 - **Root cause:** prompt ties `is_summary` to "without identifying a convergent mechanism" — conflates "no extractable principle" with "no extractable object of ANY type". Single-source prompt never defines is_summary beyond "(bool)".
 - **Evidence:** checkpoint content_type = principle 2,778, process_template 32, tool_instruction 1, process_instance 0, growth_edge 0 (of 2,811 FBs). Pipeline is ~99% principle; the 6,127 gated clusters likely include PT/PI/GE-worthy content.
 - **Fix (post-T1.1, alongside BUG-145):** content_type-aware gate (is_summary must NOT gate PT/PI/GE/TI) + prompt tightening ("is_summary=true means NO extractable object of ANY type"). **D2417 committed 2026-08-19 17:20 — but t11 S2 checkpoint mtime 15:56 predates it, so the 2,878 FBs are pre-fix. Re-extraction requires a `--reprocess-gated` flag (gated clusters ARE in processed_ids: 13,712/13,899 processed, only 187 unprocessed → `--resume-from 2` would skip the 9,842 gated silently).**
 - **Value audit (D2418, 2026-08-20):** 40 gated clusters sampled → ~35-40% genuine principles, ~20% genuine PT/PI/TI, ~35-40% correctly gated noise. The gate discarded substantial extractable value (~5,500–6,000 objects).
-- **Source:** live T1.1 run 2026-08-19 — audit of summary-gate behavior.
+- **⚠️ P0.x SCOPE (clarified 2026-08-23):** P0.x = the RECOVERY RUN for this bug. It includes exactly three steps:
+  1. **seed gated IDs** — `scripts/seed_gated_ids.py --log "knowledge pipeline/runner_t11_v3.log" --validate-segids "…/checkpoint.jsonl.segids"`. Current `.gated_ids` has **158** entries; the runner log has **9,950** "summary gated" lines → seed writes the full ~9,950. (D2421 cites 9,842 — reconcilable off-by-~108.)
+  2. **re-extract gated clusters** — `pipeline/stage2_extract.py --reprocess-gated` (content_type-aware gate, D2417/D2421) to recover PT/PI/TI/GE.
+  3. **route recovered objects through S4 → S5 → S6** (NOT yet possible — see BUG-165 stage-drift).
+  Plus D2421's **183 failed auto-retry** (separate from gated; those clusters are absent from `processed_ids`). ~~This is a multi-hour LLM job~~ **⚠️ CORRECTED 2026-08-23: already done by the single-source rerun; only `cluster_11649` remains failing (schema FAILED, BUG-159).**
+- **Source:** live T1.1 run 2026-08-19 — audit of summary-gate behavior; 2026-08-23 forensic scope verification.
 
 ## 🟡 BUG-145 — 2026-08-18 — S2 model conflates extraction_type/content_type ('tool_instruction') — OPEN (post-T1.1 prompt fix)
 - **Symptom:** ESCALATED (3 @ 16:44 → 128 @ 09:59 Aug 19): 71× `Invalid extraction_type 'tool_instruction'` + 57× `Invalid extraction_type 'process_template'` + 2× `definition too short`. Conflation spikes in the single-source phase — the model writes content_type values (tool_instruction/process_template) into extraction_type.

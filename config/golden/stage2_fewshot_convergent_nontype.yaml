@@ -594,8 +594,8 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE: This is a single-source segment passed as a "cluster" with only ONE book.
 
     Stage 2 should detect that source_diversity < 2 and route this to non-convergent path
@@ -641,8 +641,8 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE: Both segments say "good people are important" in different words. This is
 
     a platitude, not a principle. There is no mechanism (HOW do great people cause great
@@ -698,8 +698,8 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — FALSE CONVERGENCE. Both segments use the word "feedback" and discuss its role in organizations,
     creating a strong topical overlap. But they operate at completely different levels of analysis: Stone & Heen address interpersonal
     psychology (emotional triggers, identity threat, individual defensiveness), while Laloux addresses organizational structure
@@ -1473,8 +1473,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'SINGLE SOURCE — only Graham. Cannot satisfy BORP (min 2 independent sources).
 
     Additionally, the claim itself (bad investments always recover) is a platitude that
@@ -1518,8 +1518,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'PLATITUDE — the claim ''turn shoulds into musts'' is motivational rhetoric without a specific mechanism, boundary,
     or falsifiable consequence. Second source (Duhigg) adds no specific convergent content. REJECT: platitude detection.'
   tier: CHALLENGE
@@ -1559,8 +1559,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'FALSE CONVERGENCE — Moore discusses the technology adoption lifecycle (a
 
     market-segmentation model); Godin discusses word-of-mouth virality (a
@@ -1607,8 +1607,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'CITATION ECHO — both books are by the same author (Eric Ries). The second book
 
     cites the first. These are NOT independent sources — BORP requires ≥2 independent
@@ -2102,8 +2102,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — JARGON ECHO. Both segments use the word ''leverage'' but describe
 
     unrelated mechanisms: Meadows means system intervention points (feedback structure),
@@ -2275,8 +2275,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — GENUINE CITATION ECHO (D2221). Three best-selling business books all state the same platitude
     ("communication is key to success") without a SINGLE causal mechanism. Covey says "seek to understand," Carnegie says
     "express clearly," Sinek says "communicate openly" — but none explain WHY communication produces better outcomes through
@@ -2316,8 +2316,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — PURE TAXONOMY, NOT DESCRIPTIVE MODEL (D2233 update). Peirce''s icon/index/symbol trichotomy
     is a classification system that categorizes signs by mode of reference — it answers ''what category does X belong to?''
     without describing behavioral patterns. CONTRAST with CONV-032: System Fragility Taxonomy is a valid descriptive_model
@@ -2413,8 +2413,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — GENUINE PLATITUDE (D2221). Three best-selling business books repeat the same platitude ("culture
     and alignment drive success") without a SINGLE falsifiable causal mechanism. Collins says "right people + shared values
     → success," Sinek says "alignment → unstoppable," Coyle says "trust + purpose → success." None of them specify HOW culture
@@ -2934,8 +2934,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — ENGINEERING TRADEOFF, NOT CAUSAL PRINCIPLE (D2223). Both segments describe design tradeoffs (CAP
     theorem, storage engine selection) but these are CONSTRAINT statements, not causal principles. "More X = less Y" describes
     a resource allocation boundary, not a mechanism that produces outcomes. The segments share a pattern (system design involves
@@ -2976,8 +2976,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — HISTORICAL OBSERVATION, NOT CAUSAL PRINCIPLE (D2223). All three segments describe HOW art/design
     evolved over time, but none specify a causal mechanism that predicts future evolution. "Typography evolved from X to Y"
     is a historical narrative, not a principle. Historical observations answer "what happened?" while principles answer "what
@@ -3014,8 +3014,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — CORRELATION WITHOUT CAUSAL MECHANISM. Both segments describe correlations (books→achievement,
     football→stock market) but explicitly identify hidden confounding variables or pure chance that prevent causal inference.
     The segments converge on the PATTERN (correlation with confounded/absent cause) but do NOT converge on a single causal
@@ -3049,8 +3049,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE — SAME OBSERVATION, DIFFERENT MECHANISMS (D2223). Both sources agree that spaced retrieval improves
     memory, but they propose DIFFERENT causal mechanisms: Brown says retrieval practice reconsolidates memory traces; Walker
     says sleep-dependent consolidation is the mechanism. These are not the same causal explanation. A naive convergent extractor
@@ -3090,8 +3090,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — DOMAIN BEST PRACTICE WITHOUT SPECIFIC MECHANISM (D2223). Three management books agree that "focusing
     on strengths is better than fixing weaknesses." This is a widely repeated management platitude — but none of the sources
     provides a falsifiable causal mechanism. Buckingham says "position people to use strengths," Drucker says "build on strengths,"
@@ -3125,8 +3125,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — DIFFERENT MECHANISMS, SAME DOMAIN (D2223). Piketty describes wealth concentration through r >
     g; Smith describes productivity growth through division of labor. Both are economic mechanisms but they explain DIFFERENT
     phenomena (inequality vs. growth) through DIFFERENT causal structures. The shared domain (economics) creates the illusion
@@ -3160,8 +3160,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — RELATED BUT DISTINCT MECHANISMS (D2223). Duckworth's grit (passion + perseverance → achievement)
     and Dweck's growth mindset (belief in malleability → effort) are psychologically related — a growth mindset enables grit
     — but they are DISTINCT causal mechanisms. Grit is a trait; mindset is a belief. A naive extractor might merge them into
@@ -3195,8 +3195,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — NON-FALSIFIABLE CLAIM MASQUERADING AS PRINCIPLE (D2223). Both sources claim that "positive thinking
     causes positive outcomes" but the proposed mechanism ("universal law of attraction," "higher power activation") is non-falsifiable
     — there is no condition under which it could be disproven. No boundary conditions are specified. This is not a causal
@@ -3230,8 +3230,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — SPECULATION WITHOUT MECHANISM (D2223). Both sources agree that AI will be "transformative" or
     "consequential" — but this is a PREDICTION, not a causal principle. Neither segment specifies a mechanism that could be
     tested or falsified. "AI will transform society" is a forecast; "feedback loops cause system instability" is a principle.
@@ -3275,8 +3275,8 @@ examples:
     consequence: ''
     boundary: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: HARD NEGATIVE — SAME-AUTHOR ECHO. All three segments are from the SAME author (Steven Pinker), describing related
     but distinct concepts across his major works. This is NOT convergent extraction from independent sources — it is one author
     developing his ideas across multiple books. The segments are thematically related (human nature, progress, violence) but
@@ -4656,8 +4656,8 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two source files are the SAME work (Pieter Levels, MAKE Bootstrapper''s Handbook) from different mirrors. Canonical source-id resolution collapses them to ONE distinct work: source_diversity must be 1 (not 2) and is_convergent must be false.'
   tier: CHALLENGE
 - id: NEG-DUP-002
@@ -4682,7 +4682,7 @@ examples:
     boundary: ''
     consequence: ''
     evidence_passages: []
-    extraction_type: causal_mechanism
-    content_type: principle
+    extraction_type: ''
+    content_type: ''
   rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two files are the SAME work (Speculative Everything, Dunne & Raby); co-author list present in only one filename. Canonical author normalization collapses ''Anthony Dunne'' + ''Anthony Dunne, Fiona Raby'' to ONE primary author: source_diversity must be 1 and is_convergent false.'
   tier: CHALLENGE

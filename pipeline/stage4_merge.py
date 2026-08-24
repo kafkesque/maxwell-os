@@ -457,7 +457,27 @@ def map_to_canonical_with_fallback(raw_label: str, kind: str,
     return "emerging"
 
 
-def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
+def _load_fb_id_allowlist(path: str | None) -> set[str] | None:
+    """Load an fb_id allow-list from a JSONL file (each line {"fb_id": ...}).
+
+    Fail-closed (C16/D2332): a missing or empty allow-list exits with an error —
+    never silently falls back to processing the full corpus when a filter was requested.
+    """
+    if not path:
+        return None
+    p = Path(path)
+    if not p.exists():
+        print(f"❌ --only-fb-ids allow-list not found: {path}")
+        sys.exit(1)
+    rows = load_jsonl(p, context="--only-fb-ids allow-list")
+    ids: set[str] = {r["fb_id"] for r in rows if isinstance(r, dict) and r.get("fb_id")}
+    if not ids:
+        print(f"❌ --only-fb-ids allow-list is empty or has no fb_id field: {path}")
+        sys.exit(1)
+    return ids
+
+
+def load_stage2_fbs_via_clusters(only_fb_ids: set[str] | None = None) -> tuple[list[dict], dict[str, dict]]:
     """D2120: Load FBs from Stage 2, wrapping each as a single-FB cluster.
 
     Stage 3 (HDBSCAN dedup) has been REMOVED — architecturally redundant in
@@ -477,6 +497,16 @@ def load_stage2_fbs_via_clusters() -> tuple[list[dict], dict[str, dict]]:
 
     # D2332: fail-closed JSONL load — a pretty-printed checkpoint must raise, not silently drop records.
     s2_records: list[dict] = load_jsonl(STAGE2_CHECKPOINT, context="S2 checkpoint")
+    if only_fb_ids is not None:
+        _before = len(s2_records)
+        s2_records = [
+            fb for fb in s2_records
+            if (fb.get("fb_id") or fb.get("principle_id", "")) in only_fb_ids
+        ]
+        if not s2_records:
+            print(f"❌ --only-fb-ids matched 0 records (allow-list={len(only_fb_ids)} ids). Refusing empty run.")
+            sys.exit(1)
+        print(f"ℹ️  --only-fb-ids filter: {_before} → {len(s2_records)} S2 records")
     for i, fb in enumerate(s2_records, 1):
         # Index by both fb_id and principle_id (v2.x/v3.0 compat)
         fb_id_val = fb.get("fb_id") or fb.get("principle_id", "")
@@ -966,7 +996,7 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
             os.unlink(state_tmp.name)
 
 
-def run_stage4(cluster_ids: list[int | str] | None = None):
+def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -978,7 +1008,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
     # (which merges STAGE2_CHECKPOINT + STAGE2_SINGLETON_OUTPUT) instead of re-loading
     # via load_stage2_principles() — which reads ONLY the checkpoint and silently drops
     # singleton FBs. Singleton clusters were loaded but their principle_ids never resolved.
-    clusters, principles_idx = load_stage2_fbs_via_clusters()
+    clusters, principles_idx = load_stage2_fbs_via_clusters(only_fb_ids=only_fb_ids)
 
     if cluster_ids:
         clusters = [c for c in clusters if c["cluster_id"] in cluster_ids]
@@ -1141,6 +1171,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 
         # Gather principles for this cluster, split by content_type (D2072)
         cluster_principles = []
+        # D2438: report THIS cluster's routing split (per-cluster), not the
+        # running totals — the old message showed cumulative PT/PI/TI counts
+        # across all prior clusters, misleading readers into thinking one
+        # cluster dropped many types when it dropped one.
+        _cluster_split: dict[str, int] = {}
         for pid in principle_ids:
             if pid in principles_idx:
                 p = principles_idx[pid]
@@ -1155,12 +1190,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
                     tool_instructions.append(p)
                 else:
                     cluster_principles.append(p)
+                _cluster_split[ct] = _cluster_split.get(ct, 0) + 1
 
         if not cluster_principles:
-            skipped_types = []
-            if process_templates: skipped_types.append(f"{len(process_templates)} PTs")
-            if process_instances: skipped_types.append(f"{len(process_instances)} PIs")
-            if tool_instructions: skipped_types.append(f"{len(tool_instructions)} TIs")
+            skipped_types = [f"{n} {ct}" for ct, n in _cluster_split.items()]
             print(f"→ ⏭️  Non-principle cluster ({', '.join(skipped_types) if skipped_types else 'empty'})")
             continue
 
@@ -1783,6 +1816,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None):
 def main():
     parser = argparse.ArgumentParser(description="Stage 4: Merge Clusters → FBs + Multi-label Classification")
     parser.add_argument("--cluster", help="Comma-separated cluster IDs to process (int or string)")
+    parser.add_argument("--only-fb-ids", help="Path to a JSONL allow-list of fb_ids (e.g. value_keep_ids.jsonl); fail-closed")
     args = parser.parse_args()
 
     cluster_ids = None
@@ -1794,7 +1828,8 @@ def main():
         except ValueError:
             cluster_ids = raw_ids
 
-    run_stage4(cluster_ids=cluster_ids)
+    only_fb_ids = _load_fb_id_allowlist(args.only_fb_ids) if args.only_fb_ids else None
+    run_stage4(cluster_ids=cluster_ids, only_fb_ids=only_fb_ids)
 
 
 if __name__ == "__main__":

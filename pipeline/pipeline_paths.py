@@ -111,6 +111,7 @@ VERIFY_DEPTH_THINKING_BUDGET=_CFG["models"]["verifier"].get("depth_thinking_budg
 VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
 VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2264: cross-family verifier (Phi-4-mini)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]
+RELABEL_MAX_WORKERS=int(_env("relabel_max_workers", _CFG.get("stage2", {}).get("relabel_max_workers", 4)))  # D2434: R1 relabel sweep parallelism
 
 # ── Settings ───────────────────────────────────────────────────────────
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]

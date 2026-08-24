@@ -12,25 +12,39 @@ CLAIM (does the evidence demonstrate a cause→effect chain?), not the ROLE. A
 deterministic role→form relabel would re-introduce the D2417 coupling that
 D2427 (R2) removes. So each record is re-judged against its own evidence.
 
+Scope (BUG-160 — evidence relevance): this script repairs FORM drift ONLY. It
+does NOT gate on evidence-passage topical relevance. BUG-160 (cluster-internal
+evidence conflation) is deferred to the systematic evidence-relevance pass
+(D2428), per BUG-160's own note. A relevance gate was investigated and REVERTED:
+(1) the relabel generator (Qwen3) does not self-flag its own conflation (R5 —
+verified all-true on the known BUG-160 record); (2) cross-encoder rerankers
+(bge-reranker-base, bge-reranker-v2-m3, ms-marco-MiniLM) cannot cleanly separate
+"off-topic coherent text" from "on-topic truncated fragment" — an A/B test on a
+curated labeled set showed the confound is semantic, not model-bound. No gate =
+no false-positive flags = no wrongly-skipped relabels.
+
 Stable fields: fb_id, name, definition, content_type, and every body field are
 NOT touched — only `extraction_type` is re-written. Stamps (pipeline_commit,
 gen_model, schema_version) are left as-is (this is a label repair, not a
 re-generation; R14 tracks the GENERATING revision).
 
-Idempotent + crash-safe (safe_write → tempfile+fsync+os.replace). ALWAYS verify
-on a COPY of the checkpoint before running against production.
+Idempotent + crash-safe (safe_write → tempfile+fsync+os.replace) + resumable
+(incremental checkpoint every N candidates via a sidecar progress marker, C23).
 
 Usage:
     MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_relabel_extraction_type.py --checkpoint COPY --dry-run
     MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_relabel_extraction_type.py --checkpoint COPY --limit 20 --single-source-only
-    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_relabel_extraction_type.py --checkpoint COPY --types causal_mechanism
+    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_relabel_extraction_type.py --checkpoint COPY --single-source-only --checkpoint-every 50
+    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_relabel_extraction_type.py --checkpoint COPY --single-source-only --resume
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -38,7 +52,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.content_types import EXTRACTION_TYPES
 from pipeline.io_guard import load_jsonl, safe_write
 from pipeline.omlx_call import call_omlx_json
-from pipeline.pipeline_paths import GEN_MODEL, STAGE2_CHECKPOINT
+from pipeline.pipeline_paths import GEN_MODEL, RELABEL_MAX_WORKERS, STAGE2_CHECKPOINT
 
 
 SYSTEM_PROMPT: str = "You are a precise JSON generator. Return ONLY valid JSON. No markdown."
@@ -95,9 +109,71 @@ def _dist(records: list[dict]) -> Counter:
     return Counter(r.get("extraction_type") for r in records)
 
 
+def _acquire_lock(checkpoint_path: str) -> Path:
+    """Prevent concurrent relabel runs on the same checkpoint (D2434 hygiene).
+
+    Writes a lockfile beside the checkpoint holding this process's PID. If a
+    lockfile already exists AND its PID is alive, refuse to start — two runs
+    mutating the same checkpoint silently corrupt each other (observed: orphaned
+    nohup children from `kill` of a bash wrapper, not the Python child).
+    """
+    lock_path = Path(checkpoint_path).with_suffix(".relabel_lock")
+    if lock_path.exists():
+        try:
+            owner = int(lock_path.read_text().strip())
+            os.kill(owner, 0)  # raises OSError if not alive
+            print(f"❌ another relabel run is active (PID {owner}) — refusing to start", file=sys.stderr)
+            sys.exit(3)
+        except (ValueError, OSError):
+            # stale lock (owner dead) — safe to take over
+            pass
+    lock_path.write_text(f"{os.getpid()}\n")
+    return lock_path
+
+
+def _release_lock(lock_path: Path) -> None:
+    """Remove the lockfile (best-effort, never raises)."""
+    try:
+        if lock_path.exists():
+            lock_path.unlink()
+    except OSError:
+        pass
+
+
+def _checkpoint_now(checkpoint_path: str, records: list[dict],
+                    done: int, progress_path: Path) -> None:
+    """Persist incremental progress: full checkpoint + resume marker, all via
+    crash-safe writes (C6/C23).
+
+    The marker records the candidate count ALREADY processed so a resume skips
+    them. Candidate order is deterministic (stable file order + stable filters),
+    so a marker value is a valid resume offset.
+    """
+    content = "\n".join(json.dumps(r, ensure_ascii=False) for r in records) + "\n"
+    safe_write(checkpoint_path, content)
+    safe_write(progress_path, f"{done}\n")
+    print(f"   💾 checkpoint @ {done}/{len(records)} records", flush=True)
+
+
+def _judge(rec: dict, model: str = GEN_MODEL) -> str:
+    """One FORM re-judgment call (worker-safe). Returns the valid new label, or
+    "" when the model returned no valid label."""
+    result = call_omlx_json(
+        prompt=_build_prompt(rec),
+        model=model,
+        system=SYSTEM_PROMPT,
+        max_tokens=64,
+    )
+    return _extract_label(result)
+
+
 def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
-            single_source_only: bool, types: frozenset[str] | None) -> dict:
+            single_source_only: bool, types: frozenset[str] | None,
+            resume: bool = False, checkpoint_every: int = 50,
+            workers: int = RELABEL_MAX_WORKERS,
+            model: str = GEN_MODEL) -> dict:
     checkpoint_path = str(Path(checkpoint_path))
+    lock_path = _acquire_lock(checkpoint_path)
     records = load_jsonl(checkpoint_path, context="relabel checkpoint")
 
     candidates: list[int] = []
@@ -114,46 +190,84 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
     if limit is not None:
         candidates = candidates[:limit]
 
+    progress_path = Path(checkpoint_path).with_suffix(".relabel_progress")
+    start_pos: int = 0
+    if resume and progress_path.exists():
+        try:
+            start_pos = int(progress_path.read_text().strip())
+            print(f"   ⏩ resuming from candidate #{start_pos}")
+        except ValueError:
+            start_pos = 0
+
+    # Active candidates: drop the resume offset. Parallelism is safe because each
+    # record's `extraction_type` is mutated independently (no cross-record deps);
+    # mutations are applied on the main thread in candidate order, so checkpoint
+    # writes and the resume marker stay deterministic (D2434).
+    active: list[tuple[int, int]] = [(pos, i) for pos, i in enumerate(candidates) if pos >= start_pos]
+
     changed: int = 0
     unchanged: int = 0
     failed: int = 0
-    for i in candidates:
-        rec = records[i]
-        old = rec.get("extraction_type")
-        label = f"{rec.get('name', '?')[:40]}"
+    workers = max(1, workers)
+
+    for chunk_start in range(0, len(active), workers):
+        chunk = active[chunk_start:chunk_start + workers]
+        # Collect judgments concurrently (or serially for workers==1 / dry-run).
         if dry_run:
-            print(f"   [dry-run] would re-judge #{i} {label} (now {old})")
+            for pos, i in chunk:
+                rec = records[i]
+                print(f"   [dry-run] would re-judge #{i} {rec.get('name', '?')[:40]} "
+                      f"(now {rec.get('extraction_type')})")
             continue
-        try:
-            result = call_omlx_json(
-                prompt=_build_prompt(rec),
-                model=GEN_MODEL,
-                system=SYSTEM_PROMPT,
-                max_tokens=64,
-            )
-            new = _extract_label(result)
-            if not new:
+
+        results: dict[int, tuple[str, str]] = {}  # i -> (label, error)
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futures = {ex.submit(_judge, records[i], model): i for _, i in chunk}
+            for fut in futures:
+                i = futures[fut]
+                try:
+                    results[i] = (fut.result(), "")
+                except Exception as e:
+                    results[i] = ("", f"{type(e).__name__}: {e}")
+
+        # Apply in deterministic candidate order.
+        for pos, i in chunk:
+            rec = records[i]
+            old = rec.get("extraction_type")
+            label = f"{rec.get('name', '?')[:40]}"
+            new, err = results[i]
+            if err:
+                failed += 1
+                print(f"   ❌ #{i} {label}: {err}", file=sys.stderr, flush=True)
+            elif not new:
                 failed += 1
                 print(f"   ⚠️  #{i} {label}: no valid label returned", file=sys.stderr, flush=True)
-                continue
-            if new == old:
+            elif new == old:
                 unchanged += 1
             else:
                 rec["extraction_type"] = new
                 changed += 1
                 print(f"   🔁 #{i} {label}: {old} → {new}")
-        except Exception as e:
-            failed += 1
-            print(f"   ❌ #{i} {label}: {type(e).__name__}: {e}", file=sys.stderr, flush=True)
+
+        # Checkpoint at chunk boundaries (deterministic, C23). The marker stores
+        # the CUMULATIVE candidate count (start_pos + this-run progress), matching
+        # the resume offset semantics.
+        if not dry_run:
+            done_cum = start_pos + min(chunk_start + workers, len(active))
+            if done_cum % checkpoint_every == 0 or chunk_start + workers >= len(active):
+                _checkpoint_now(checkpoint_path, records, done_cum, progress_path)
 
     if not dry_run:
         content = "\n".join(json.dumps(r, ensure_ascii=False) for r in records) + "\n"
         safe_write(checkpoint_path, content)
         load_jsonl(checkpoint_path, context="relabel self-check")
+        if progress_path.exists():
+            progress_path.unlink()
 
     after = _dist(records)
     print(f"   after : {dict(after)}")
     print(f"✅ Relabel done: changed {changed}, unchanged {unchanged}, failed {failed}")
+    _release_lock(lock_path)
     return {"changed": changed, "unchanged": unchanged, "failed": failed}
 
 
@@ -168,6 +282,14 @@ def main() -> None:
                         help="Only reconsider single-source (non-convergent) records")
     parser.add_argument("--types", default=None,
                         help="Comma-separated extraction_type values to reconsider (default: all)")
+    parser.add_argument("--resume", action="store_true",
+                        help="Resume from the last incremental checkpoint")
+    parser.add_argument("--checkpoint-every", type=int, default=50,
+                        help="Persist a crash-safe checkpoint every N candidates (default: 50)")
+    parser.add_argument("--workers", type=int, default=RELABEL_MAX_WORKERS,
+                        help="Parallel relabel workers (default: from config stage2.relabel_max_workers)")
+    parser.add_argument("--model", default=GEN_MODEL,
+                        help="Judge model (default: pipeline GEN_MODEL; pass S4_DEPTH_MODEL for gemma)")
     args = parser.parse_args()
     types: frozenset[str] | None = None
     if args.types:
@@ -178,7 +300,9 @@ def main() -> None:
             sys.exit(2)
         types = frozenset(vals)
     r = relabel(args.checkpoint, dry_run=args.dry_run, limit=args.limit,
-                single_source_only=args.single_source_only, types=types)
+                single_source_only=args.single_source_only, types=types,
+                resume=args.resume, checkpoint_every=args.checkpoint_every,
+                workers=args.workers, model=args.model)
     sys.exit(0 if r["failed"] == 0 else 1)
 
 

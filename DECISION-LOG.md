@@ -3,6 +3,30 @@
 
 ---
 
+### D2438 — S4 preflight+smoke+stress harness + visual renderer (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (verified live, not assumed):** S4 (`stage4_merge.py`) had no dedicated test suite covering the newly-wired `--only-fb-ids` allow-list or the deterministic classification/metadata surface. A live OMLX smoke run on a diverse 7-FB batch exposed a logging bug: the "Non-principle cluster" line printed CUMULATIVE PT/PI/TI counts across prior clusters (misleading) instead of the per-cluster split.
+
+**Decision:** (1) Add `tests/test_stage4_preflight_smoke_stress.py` (28 tests): `--only-fb-ids` fail-closed (missing/empty/no-fb_id/0-match → exit 1), content-type routing, taxonomy exact/synonym/emerging + cross-kind collision, name normalization/collision, classification validation, difficulty/temporal/jargon derivation, plus a live OMLX smoke on a diverse batch. (2) Add `scripts/render_s4_visual.py` to render `checkpoint.jsonl` + PT/PI/GE/TI sidecars into readable Markdown (`visual.md`). (3) Fix the per-cluster routing-log bug (D2438). (4) REVERT a premature taxonomy "discipline promotion" that added `graphic design`/`data visualization`/`organizational behavior` as DISCIPLINES when they already exist as DOMAINS — broke D2422/BUG-151 disjointness, caught by `test_taxonomy_disjointness.py` (now green: domain∩discipline = `{emerging}` only).
+
+**Files:** tests/test_stage4_preflight_smoke_stress.py, scripts/render_s4_visual.py, pipeline/stage4_merge.py, config/taxonomy_v5.yaml
+**Source:** Session 2026-08-24 — S4 readiness preflight.
+
+---
+
+### D2437 — Deterministic value filtering for single-source/singleton S2 output (2026-08-23)
+**Category:** QLT / DATA
+
+**Finding (BUG-166):** single-source S2 output is ~99.9% non-convergent & largely generic (book-level paraphrases, case studies, code snippets) — retrieval value but no epistemic-independence value. Re-extracting is wasteful.
+
+**Decision:** two model-free filters: (1) `scripts/score_single_source.py` post-hoc triage of already-extracted S2 → KEEP 4892 / DROP 3510 / DEDUP 8 (DEDUP==BUG-164 surplus exactly); (2) `scripts/prefilter_clusters.py` pre-LLM gate, dual-use for single-source clusters AND singletons (both carry `segment_ids`) → EXTRACT 18.0% of 35,122 singletons. Thresholds in `config/filtering.yaml` (C12). Signals: richness, imperative-verb density, step/trigger/done/params/example presence, anti-signals (case study/biography/anecdote). Peer-verified against LexRank/MMR/ClaimBuster/specificity methods.
+
+**Files:** scripts/score_single_source.py, scripts/prefilter_clusters.py, config/filtering.yaml
+**Source:** Session 2026-08-23 — BUG-166 value audit.
+
+---
+
 ### D2422 — Domain/discipline disjointness: 1 canonical overlap + 267 raw-alias overlaps (2026-08-20)
 **Category:** QLT / AUDIT
 

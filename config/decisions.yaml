@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-20T13:14:00Z'
-total_decisions: 413
+last_sync: '2026-08-22T12:05:00Z'
+total_decisions: 421
 decisions:
 - id: D2092
   category: INF
@@ -3671,18 +3671,214 @@ decisions:
   - temp/chatgpt0020.md
   - temp/claude 0020.md
   created: '2026-08-21'
+- id: D2430
+  category: ARCH
+  state: SUPERSEDED
+  description: 'extraction_type (epistemic FORM) ownership moved from S2 to S4. FORM is a
+    classification (like depth/domain/discipline), not an extraction artifact, so it belongs
+    at S4 where gpt-oss-20b already classifies cross-family (R5) on the merged FB. S2 emits
+    content_type (ROLE) only. This structurally eliminates the 4-path FORM drift: F1
+    decision-order asymmetry (DECISION ORDER + CALIBRATION exist only in convergent
+    SYSTEM_PROMPT, absent from SINGLE_SOURCE_SYSTEM/SINGLETON_SYSTEM/SINGLETON_BATCH_SYSTEM),
+    F5 MAPPING RULES coupling (SINGLETON_SYSTEM couples FORM to ROLE, violating D2323), F6
+    relabel script reusing Qwen3 GEN_MODEL (same family as generator, R5 violation). F3/F4
+    golden contamination (single_source tool_instruction as descriptive_model; hard-negative
+    bogus causal_mechanism) fixed in place regardless. PREREQUISITE: close the non-principle
+    dead-end (D2418 commit_non_fb_types=false) so PT/PI/TI/GE reach S4 and do not lose FORM.
+    Existing 5,761 single-source/singleton records re-derived via S4 (no S2 re-extraction);
+    convergent S2 FORM (~33% causal) is the holdout baseline.'
+  champion: goose
+  target_files:
+  - pipeline/stage2_extract.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage4_merged_call.py
+  - pipeline/stage2_relabel_extraction_type.py
+  - config/content_types.yaml
+  - config/golden/stage2_fewshot_single_source.yaml
+  created: '2026-08-22'
+- id: D2431
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'A/B test (n=20 single-source/singleton records, 3 arms) on extraction_type
+    FORM reliability, run live on OMLX. Results: S2-current (broken single-source prompt) =
+    55% causal_mechanism; S2-fixed (Qwen3 + decision-order ladder) = 25% causal; S4 (gpt-oss
+    cross-family + same ladder) = 0% causal and 60% empirical_pattern. Cross-family agreement
+    (gpt-oss vs Qwen3, same ladder) = 35%; s2_current vs s4 = 45%. Conclusions: (1) the drift
+    is PROMPT-driven, not family-driven — the decision-order ladder alone cuts causal 60%→25%,
+    so F1/F5 are fixed IN S2 (implemented: ladder added to SINGLE_SOURCE_SYSTEM +
+    SINGLETON_SYSTEM, MAPPING RULES removed, SINGLETON_BATCH_SYSTEM inherits); (2) gpt-oss does
+    NOT auto-correct — it has its own systematic empirical_pattern bias (0 causal), so the D2430
+    move-FORM-to-S4 claim is REFUTED as a reliability win (D2430 superseded); (3) FORM is
+    genuinely high-ambiguity (~65% cross-family disagreement), validating D2429/D2427. Revised:
+    keep FORM in S2 with the unified ladder, use cross-family gpt-oss as a VERIFICATION signal
+    that flags disagreements for review, and prioritize R2 (justification×modality split) to
+    reduce ambiguity.'
+  champion: goose
+  target_files:
+  - temp/ab_test_s2_vs_s4.py
+  - temp/ab_test_s2_vs_s4_result.json
+  - pipeline/stage2_extract.py
+  created: '2026-08-22'
+- id: D2432
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Forensic audit (S2↔S4, scripts↔config↔decisions↔buglog) after the D2431 A/B
+    test. Findings: A1 DECOUPLING RULE was missing from 3/4 S2 prompts (FIXED — added to
+    SINGLE_SOURCE_SYSTEM + SINGLETON_SYSTEM, now 3/3, batch inherits); A2 singleton prompt
+    offers extraction_type=none (5th value) but config EXTRACTION_TYPES has 4 → prompt-config
+    enum mismatch; B1 D2150 EXTRACTION_TO_CONTENT_TYPE is DEAD config (never imported by any
+    stage; a role-form coupling D2427 said to delete); B2 schemas.py
+    ProcessTemplate/ProcessInstance/GrowthEdge/ToolInstruction classes are DEAD (superseded by
+    flat-FB + content_type, never removed); B3 actors type mismatch (config says array,
+    schemas.py ProcessInstance.actors is str); C1 elaboration listed in shared core_body but is
+    principle-only per user decision + prompt; C2 failure_mode provenance ambiguous (core_body
+    S4 + PT extension_fields + PT s2_body_fields S2); C3 route is NOT inert (D2128
+    _resolve_content_type uses it as fallback) — H4 task is stale; D1 D2417
+    CONTENT_TO_EXTRACTION_TYPE active in _normalize_role_fields (conflation-rescue role-form
+    coupling, tension with D2427); E1 non-principle dead-end (D2418) still P0 (stage6 supports
+    content_type; dead-end is stage4 routing + stage5); F1/F2 BUG-159/160 still open. No new
+    leak/contamination from the prompt change.'
+  champion: goose
+  target_files:
+  - pipeline/stage2_extract.py
+  - pipeline/content_types.py
+  - pipeline/schemas.py
+  - config/content_types.yaml
+  - temp/audit_form_2026-08-22.md
+  created: '2026-08-22'
+
+- id: D2433
+  category: QLT
+  state: ACTIVE
+  description: 'P2 hygiene sweep (execution of the D2432 audit findings). (1) F3/F4 golden fix:
+    relabelled the 2 tool_instruction positives in stage2_fewshot_single_source.yaml from
+    descriptive_model to normative_heuristic (D2417), and stripped the bogus
+    extraction_type/content_type from all 55 hard negatives across the 4 golden files
+    (block-scoped script, comments preserved). (2) A2 fix: removed extraction_type=none from
+    the SINGLETON_SYSTEM enum + FORM list + route bullet (grep none=0). (3) B1 fix: deleted
+    dead D2150 EXTRACTION_TO_CONTENT_TYPE from content_types.py + content_types.yaml (zero
+    importers; ROUTE_TO_CONTENT_TYPE D2128 kept as live). (4) B2/B3 fix: removed dead
+    schemas.py ProcessTemplate/ProcessInstance/GrowthEdge/ToolInstruction classes (324 lines)
+    + orphaned GE_CATEGORY/GE_STATUS; resolves the actors array-vs-str mismatch by deletion.
+    (5) C1/C2 fix: documented elaboration as principle-only and failure_mode as dual-provenance
+    in content_types.yaml core_body. (6) C3 fix: corrected the D2128 route comment + H4 task
+    (route is a live fallback, not inert). (7) D1 fix: documented D2417 CONTENT_TO_EXTRACTION_TYPE
+    as a repair fail-safe (not a routing rule), reconciled with D2427. Verification: 82 tests
+    pass; schemas.py/content_types.py/stage4_merge import cleanly; content_types.yaml parses.'
+  champion: goose
+  target_files:
+  - pipeline/content_types.py
+  - pipeline/schemas.py
+  - pipeline/stage2_extract.py
+  - config/content_types.yaml
+  - config/golden/stage2_fewshot_single_source.yaml
+  - config/golden/stage2_fewshot_convergent.yaml
+  - config/golden/stage2_fewshot_trimmed_12.yaml
+  - config/golden/stage2_fewshot_convergent_nontype.yaml
+  created: '2026-08-22'
+- id: D2434
+  category: QLT
+  state: ACTIVE
+  description: 'P1.2 extraction_type relabel sweep COMPLETE + promoted. Judge = gemma-4-E4B
+    (S4_DEPTH_MODEL), NOT Qwen3 (R5 cross-family: Qwen3 agrees with human only 8% on the
+    hardest 49 records vs gemma 73%). Ladder tightening rejected (49%->45% human agreement).
+    Mechanism-field poisoning confirmed (dropping mechanism/boundary/consequence raises Qwen
+    to 41% but hurts gemma 73%->69%). Few-shot leave-one-out hurts gemma (73%->59%);
+    self-reported confidence uninformative. Relabeled single-source/singleton extraction_type
+    only (3,412 changed / 1,348 unchanged / 1 failed). Promoted to production (backup
+    checkpoint.jsonl.pre_relabel md5 fc17b4ee4c4634d66988524ceff5bb9b). Full-checkpoint
+    causal_mechanism 44.8% -> 5.8%. Integrity: 8,410 records, 0 fb_id reorder, 0 invalid
+    labels, 0 convergent touched, 0 non-extraction_type field changes.'
+  champion: goose
+  target_files:
+  - pipeline/stage2_relabel_extraction_type.py
+  - pipeline/disagreement_sample.py
+  - knowledge pipeline/stage2_extract/t11/checkpoint.jsonl
+  created: '2026-08-23'
+- id: D2435
+  category: QLT
+  state: ACTIVE
+  description: 'P1.3 human-adjudicated extraction_type verdicts applied. 49/58 verdicts
+    adjudicated (9 NONE = USER-FLAG content_type concerns). 14 records corrected to human
+    label (35 already matched gemma); 9 NONE records quarantined to
+    relabel_work/quarantine_none_records.jsonl. Backup checkpoint.jsonl.pre_p13. Post-P1.3
+    distribution: descriptive 3,874 / empirical 2,069 / normative 1,976 / causal 491.
+    Discovered 3 pre-existing duplicate fb_ids (also in pristine backup) -> BUG-164, fold
+    into R1.4 dedup.'
+  champion: goose
+  target_files:
+  - knowledge pipeline/stage2_extract/t11/checkpoint.jsonl
+  - knowledge pipeline/stage2_extract/t11/relabel_work/quarantine_none_records.jsonl
+  created: '2026-08-23'
+- id: D2436
+  category: OPS
+  state: ACTIVE
+  description: 'OMLX server fixes. (1) launchd plist --memory-guard-gb 55 produced
+    "estimator-only, eviction disabled"; changed to --memory-guard safe -> eviction enabled
+    (free pages ~27k -> ~2.1M). (2) 185GB paged-SSD cache thrash (store_cache_main_dispatch
+    ~9.8s/request) -> added --no-cache -> dispatch ~2-7ms. Residual: gemma-4-E4B 256 head_dim
+    forces slow SDPA prefill (~72 tok/s on 700-token prompts), not config-fixable.'
+  champion: goose
+  target_files:
+  - /Users/barn/Library/LaunchAgents/com.maxwell.omlx.plist
+  created: '2026-08-23'
+- id: D2437
+  category: QLT / DATA
+  state: ACTIVE
+  description: 'Deterministic (model-free) value filtering for single-source/singleton
+    S2 output. BUG-166 measured single-source as ~99.9% non-convergent/generic — re-extraction
+    wastes LLM time. Two scripts: (1) scripts/score_single_source.py post-hoc triage of
+    already-extracted S2 → KEEP 4892 / DROP 3510 / DEDUP 8 (DEDUP=8 == BUG-164 surplus
+    exactly); classifies via richness (definition+mechanism length), imperative-verb density,
+    step/trigger/done/params/example presence, and anti-signals (case study/biography/anecdote).
+    (2) scripts/prefilter_clusters.py pre-LLM gate, dual-use for single-source clusters AND
+    singletons (both carry segment_ids): EXTRACT 18.0% of 35,122 singletons, 36.9% of a
+    3,000-cluster single-source sample (AND logic: imperative>=1 AND procedural>=1 AND
+    anti==0). Thresholds live in config/filtering.yaml (C12). Peer-verified against
+    LexRank/MMR/ClaimBuster/specificity-signal methods.'
+  champion: goose
+  target_files:
+  - scripts/score_single_source.py
+  - scripts/prefilter_clusters.py
+  - config/filtering.yaml
+  created: '2026-08-23'
+- id: D2438
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'S4 preflight+smoke+stress test harness (tests/test_stage4_preflight_smoke_stress.py,
+    28 tests) + human-readable S4 visual renderer (scripts/render_s4_visual.py). Exhausts S4
+    deterministic surface: --only-fb-ids allow-list fail-closed (missing/empty/no-fb_id/0-match),
+    content-type routing (PT/PI/GE/TI sidecars), taxonomy exact/synonym/emerging + cross-kind
+    collision, name normalization/collision, classification validation, metadata derivation,
+    and a live OMLX smoke run on a diverse 7-FB batch (3 principles classified + 4 non-principle
+    routed, 0 failed, 0 classification errors). Also fixed a per-cluster routing-log bug (was
+    printing cumulative PT/PI/TI counts, misleading). CAUGHT + REVERTED a taxonomy conflict:
+    the prior "discipline promotion" added graphic design / data visualization / organizational
+    behavior as DISCIPLINES when they already exist as DOMAINS, breaking D2422/BUG-151
+    disjointness (CI test test_taxonomy_disjointness.py failed) — reverted; promotion remains
+    gated on BUG-150 re-measurement on a fresh S4.'
+  champion: goose
+  target_files:
+  - tests/test_stage4_preflight_smoke_stress.py
+  - scripts/render_s4_visual.py
+  - pipeline/stage4_merge.py
+  - config/taxonomy_v5.yaml
+  created: '2026-08-24'
 summary:
-  total: 413
+  total: 424
   proposed: 0
   draft: 1
-  active: 356
+  active: 363
   stale: 0
-  superseded: 14
+  superseded: 15
   archived: 8
   rejected: 8
+  deferred: 13
+  resolved: 10
+  planned: 3
   by_category:
     INF: 177
-    QLT: 34
+    QLT: 35
     GOV: 20
     RES: 4
     DAT: 4

@@ -11,9 +11,17 @@
 - ✅ D2445 renderer content-type-aware (examinability)
 
 **SHOULD (before/at rerun — correctness, cheap):**
+- ⏳ **S2 singleton extraction FIRST (gated)** — extract the 18%-prefiltered singletons (6,317) via `--process-singletons` BEFORE the S4 rerun, so S4 runs ONCE on the complete S2 frontier (convergent + single-source + singletons). Running S4 first, then singletons later, forces a second S4 merge. D2448 prompt fixes (elaboration principle-only / parameters-required-TI) are already in place for this.
 - ⏳ BUG-165 — the rerun itself: `stage4_merge.py --only-fb-ids value_keep_ids.jsonl` → S5 → S6
 - ⏳ D2440 — S5 verifier calibration (AlignScore + MiniCheck vs DeBERTa) BEFORE the S5 leg; gate F1 > 0.484
 - ⏳ BUG-150 — re-measure discipline `emerging` on fresh S4 output (taxonomy promotion gate)
+
+**POST-RERUN — NON-PRINCIPLE COMMIT (Path A, D2448) — one coherent work item, gated on BUG-165:**
+- ⏳ S6 non-principle tables (TI/PT/PI/GE) + wire `commit_non_fb_types` (currently dead config)
+- ⏳ non-principle cross-ref producer (`consulted_fbs`, `fb_query_*`, `parent_pt_id`, `parent_fb_ids`, `promoted_to_*`) — `stage4_5_enrich.py` is FB-only today
+- ⏳ non-principle S5 verification (NLI is principles-only today)
+- ⏳ BUG-170 enrichment (classification + keywords + fb_version + runtime) — only after the three above exist
+- ⏸ **Singleton-extraction quality gates (from live smoke 2026-08-24):** completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) is MANDATORY — live sample produced a thin PT (no steps/trigger/done) and a 4/4 `tool_instruction`→`process_template` mislabel (SQLAlchemy/MongoEngine/Superlinked) + 4/4 `causal_mechanism` over-claim. Confirms task #12 (PT-vs-TI contrastive hard negatives) is load-bearing.
 
 **WORTH (post-rerun, non-blocking):**
 - ⏳ BUG-169 — TI `parameters` missing (verify full 143-TI corpus)

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-22T12:05:00Z'
-total_decisions: 432
+total_decisions: 435
 decisions:
 - id: D2092
   category: INF
@@ -3991,11 +3991,76 @@ decisions:
   champion: goose
   target_files: []
   created: '2026-08-24'
+- id: D2445
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'S4 render + ontology verdict (forensic follow-up). (1) FIXED
+    scripts/render_s4_visual.py — was principle-only (hardcoded 8-field core body)
+    so TI/PT/GE sidecars rendered without their type-specific body fields; now
+    content-type-aware (per-type body mirrors content_types.yaml s2_body_fields) +
+    robust loader (JSONL + pretty-printed whole-doc JSON fallback). (2) VERDICT:
+    core-body type-specificity (stop forcing mechanism/boundary/consequence onto
+    non-principles) — worth it for agentic-correctness (GE fake "mechanism" is
+    misleading), NOT for speed (<5%); DEFER to post-BUG-165 decision (extraction
+    frontier, golden-set gated). (3) Metadata (id/provenance/evidence-tier/stamps/
+    temporal/intimacy/accessibility) stays UNIVERSAL; classification depth/
+    difficulty is principle-only; discipline/domains type-conditional.'
+  champion: goose
+  target_files:
+  - scripts/render_s4_visual.py
+  created: '2026-08-24'
+- id: D2446
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Divergent-5type field crosscheck verdict (no code change). Field-by-field
+    audit of smoke_divergent_5types vs content_types.yaml: FB (principle) fully
+    compliant. Non-principle sidecars (PT/PI/TI/GE) carry the correct shared
+    skeleton + type-specific body + R14 stamps + full provenance (citation/
+    source_authors/source_diversity/primary_source all present — F1 verified) but
+    miss classification (depth/discipline/domains/evidence), discovery (keywords),
+    versioning (fb_version), and runtime (usage_count/feedback_score/feedback_count)
+    — BUG-170 expanded. Three verdicts: (1) BUG-170 enrichment DEFERRED — gated on
+    commit_non_fb_types:false, so enriching uncommitted JSONL is bloat + a new LLM
+    classify surface for data nobody persists; do it atomically with the
+    commit_non_fb_types decision post-BUG-165. (2) BUG-173 elaboration drift
+    (PT/GE non-empty vs ontology principle-only) DOCUMENTED, NOT stripped —
+    stripping is destructive (drops S2 context never rendered/committed);
+    reconcile at next S2 prompt revision. (3) source_cluster (singular S2 origin)
+    vs source_clusters (plural S4 merged) are semantically distinct, NOT a bug;
+    normalized at commit. (4) BUG-169 TI parameters is an S2 data gap, no S4 fix;
+    verify on the full 143-TI corpus at BUG-165 rerun.'
+  champion: goose
+  target_files:
+  - governance/buglog.md
+  created: '2026-08-24'
+- id: D2447
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Decision-registry summary drift fix + guard. Root cause: total_decisions
+    and the summary block (state buckets + by_category) are REDUNDANT DERIVED data
+    hand-maintained in parallel with the authoritative decisions list, so they
+    drifted (active off by 1; 10 by_category entries drifted, worst QLT/AUDIT 7 vs
+    14; QLT/DATA missing). No runtime consumer and no validator existed, so drift
+    was silent. FIX: (1) scripts/recompute_decision_summary.py deterministically
+    recomputes total_decisions + summary from the decisions list and surgically
+    rewrites ONLY those derived fields (decisions byte-identical; no full re-dump);
+    (2) tests/test_decision_summary_sync.py independently recomputes and fails CI on
+    drift. Also found: tools/sync_decisions.py has an INVERTED source-of-truth model
+    (declares DECISION-LOG.md authoritative, but it has ~237 heading blocks vs 434
+    decisions here) and heuristic state/category detection — running it would corrupt
+    ~181 records. DEFERRED: add a --force guard / retire sync_decisions.py; do NOT
+    run it as-is.'
+  champion: goose
+  target_files:
+  - scripts/recompute_decision_summary.py
+  - tests/test_decision_summary_sync.py
+  - config/decisions.yaml
+  created: '2026-08-24'
 summary:
-  total: 432
+  total: 435
   proposed: 0
   draft: 1
-  active: 374
+  active: 377
   stale: 0
   superseded: 15
   archived: 8
@@ -4004,64 +4069,65 @@ summary:
   resolved: 10
   planned: 3
   by_category:
-    INF: 177
-    QLT: 39
-    GOV: 20
-    RES: 4
-    DAT: 4
-    DEF: 1
-    VAL: 8
-    CLS: 16
-    STR: 1
-    PERF: 10
-    BUGFIX: 38
-    CFG: 5
-    ARCH: 24
-    pipeline-fix: 2
-    governance: 1
-    BUG: 1
-    QA: 4
-    OPS: 1
-    MODEL: 2
-    DATA: 3
-    validation: 1
-    C12: 1
-    GOV / PERF: 1
-    INF / GOV: 1
-    DAT / OPS: 1
-    INF / OPS: 1
-    BUGFIX / VAL: 1
-    BUGFIX / GOV: 2
-    GOV / ARCH: 1
+    ARCH: 25
     ARCH / GOV: 1
-    BUGFIX / PROVENANCE: 1
-    QUALITY / GOLDEN-SET / PROMPT: 1
-    GOVERNANCE / GOLDEN-SET / C12: 1
-    OPERATIONAL / CANARY: 1
-    ROBUSTNESS / QUALITY: 1
-    BUGFIX / DATA-INTEGRITY: 1
-    BUGFIX / OBSERVABILITY: 1
-    OBSERVABILITY / TOOLING: 1
-    INFRASTRUCTURE / RELIABILITY: 2
-    QUALITY / RELIABILITY: 1
-    QUALITY / TAXONOMY: 1
-    DATA / TAXONOMY: 1
-    QUALITY / DATA: 3
-    INFRASTRUCTURE / SOVEREIGNTY: 1
-    DATA / RELIABILITY: 2
-    DATA / QUALITY: 1
-    DATA / GOVERNANCE: 1
-    GOVERNANCE / QUALITY: 1
-    GOVERNANCE / DATA: 1
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
-    BUGFIX / RELIABILITY: 1
-    BUGFIX / FAIL-CLOSED: 4
-    BUGFIX / INTEGRITY: 1
-    HYGIENE / TESTING: 1
-    CLS / CFG: 1
+    BUG: 1
+    BUGFIX: 38
     BUGFIX / CFG: 1
-    PERF / BUGFIX: 1
+    BUGFIX / DATA-INTEGRITY: 2
+    BUGFIX / FAIL-CLOSED: 5
+    BUGFIX / GOV: 2
+    BUGFIX / INTEGRITY: 2
+    BUGFIX / OBSERVABILITY: 1
+    BUGFIX / PROVENANCE: 2
+    BUGFIX / RELIABILITY: 1
+    BUGFIX / VAL: 1
+    C12: 1
+    CFG: 5
+    CLS: 16
+    CLS / CFG: 1
+    DAT: 4
+    DAT / OPS: 1
+    DATA: 3
+    DATA / GOVERNANCE: 1
+    DATA / QUALITY: 1
+    DATA / RELIABILITY: 2
+    DATA / TAXONOMY: 1
+    DEF: 1
+    GOV: 20
+    GOV / ARCH: 1
+    GOV / PERF: 1
+    GOVERNANCE / DATA: 1
+    GOVERNANCE / GOLDEN-SET / C12: 1
+    GOVERNANCE / QUALITY: 1
+    HYGIENE / TESTING: 1
+    INF: 177
+    INF / GOV: 1
+    INF / OPS: 1
+    INFRASTRUCTURE / RELIABILITY: 2
+    INFRASTRUCTURE / SOVEREIGNTY: 1
+    MODEL: 2
+    OBSERVABILITY / TOOLING: 1
+    OPERATIONAL / CANARY: 1
+    OPS: 2
     OPS / DATA: 1
-    QLT / PROMPT: 3
-    QLT / AUDIT: 6
+    PERF: 10
+    PERF / BUGFIX: 1
+    QA: 4
+    QLT: 39
+    QLT / AUDIT: 15
+    QLT / DATA: 1
+    QLT / PROMPT: 4
+    QUALITY / DATA: 3
+    QUALITY / GOLDEN-SET / PROMPT: 1
+    QUALITY / RELIABILITY: 1
+    QUALITY / TAXONOMY: 1
+    RES: 4
+    ROBUSTNESS / QUALITY: 2
+    STR: 1
+    VAL: 8
+    governance: 1
+    pipeline-fix: 2
+    validation: 1

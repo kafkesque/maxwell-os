@@ -5,6 +5,15 @@ Run: python3 tools/sync_decisions.py [--dry-run]
 Reads DECISION-LOG.md as the single source of truth.
 Updates config/decisions.yaml with any missing decisions.
 Tags decisions with auto-detected states (SUPERSEDED if D2104 says so, etc.).
+
+⚠️  DEPRECATED — DO NOT RUN (D2447). The source-of-truth model here is INVERTED:
+DECISION-LOG.md has ~237 heading blocks vs 434 decisions in config/decisions.yaml,
+so this script would overwrite ~181 hand-curated descriptions with its
+"No heading in DECISION-LOG.md" fallback and mis-detect states/categories via
+keyword heuristics. For summary/total count drift, use instead:
+    python3 scripts/recompute_decision_summary.py   # recompute derived fields
+    python3 scripts/recompute_decision_summary.py --check  # CI guard
+Retire this script (or add a --force guard) before any future use.
 """
 
 import re

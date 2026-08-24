@@ -1,7 +1,32 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-24 | **Decisions:** D2000-D2440 | **D2437/D2438 (2026-08-24): deterministic value-filter (`scripts/score_single_source.py` + `scripts/prefilter_clusters.py` + `config/filtering.yaml`) + S4 preflight/smoke/stress harness (28 tests) + `scripts/render_s4_visual.py`. Pre-S4 hygiene done: dedup (8,402) + passage sweep (841 flagged). Taxonomy "discipline promotion" REVERTED (broke D2422 disjointness — 3 labels already domains). 110/110 tests green.**
+> **Updated:** 2026-08-24
+
+## 🔥 S4 RERUN — CRITICAL PATH (2026-08-24, post-external-audit)
+
+**MUST (done — skipping any would have forced a re-run):**
+- ✅ BUG-171 evidence-tier (`is_convergent`/`origin`) — D2442
+- ✅ BUG-172 provenance (`citation`/`source_authors`/`source_diversity`/`primary_source`) — D2443
+- ✅ F2 sidecar re-stamp (`routed_by_stage`, `gen_model` preserved) — BUG-170 half
+- ✅ D2441 leak redaction + C12 hardcoded-path scanner (blocking for any public run)
+- ✅ D2445 renderer content-type-aware (examinability)
+
+**SHOULD (before/at rerun — correctness, cheap):**
+- ⏳ BUG-165 — the rerun itself: `stage4_merge.py --only-fb-ids value_keep_ids.jsonl` → S5 → S6
+- ⏳ D2440 — S5 verifier calibration (AlignScore + MiniCheck vs DeBERTa) BEFORE the S5 leg; gate F1 > 0.484
+- ⏳ BUG-150 — re-measure discipline `emerging` on fresh S4 output (taxonomy promotion gate)
+
+**WORTH (post-rerun, non-blocking):**
+- ⏳ BUG-169 — TI `parameters` missing (verify full 143-TI corpus)
+- ⏳ BUG-170 — non-principle classification (latent until `commit_non_fb_types`)
+- ⏳ BUG-168 — dspy_trainer.py wire-or-archive
+- ⏳ D2439 accept-defer — Leiden swap / contextual retrieval / cross-encoder reranker / DuckDB (P2)
+- ⏳ D2445 verdict — core-body type-specificity refactor (post-BUG-165 decision, golden-set gated)
+
+---
+ | **Decisions:** D2000-D2440 | **D2437/D2438 (2026-08-24): deterministic value-filter (`scripts/score_single_source.py` + `scripts/prefilter_clusters.py` + `config/filtering.yaml`) + S4 preflight/smoke/stress harness (28 tests) + `scripts/render_s4_visual.py`. Pre-S4 hygiene done: dedup (8,402) + passage sweep (841 flagged). Taxonomy "discipline promotion" REVERTED (broke D2422 disjointness — 3 labels already domains). 110/110 tests green.**
 > **D2439/D2440 (2026-08-24):** 6-LLM external SOTA audit (claude/qwen/chatgpt × 0021/0023/0024) claim-by-claim verified. D2439 = verdict (accept-defer Leiden; accept-P2 contextual-retrieval/cross-encoder-reranker/DuckDB; reject SetFit/CRAG/ColPali/ColBERTv2; DSPy is exists-but-unwired → BUG-168). D2440 = run AlignScore+MiniCheck through existing `calibrate.py` harness vs DeBERTa before any S5 threshold change. **No SOTA swap before BUG-165 produces a current corpus to measure against.**
 > **D2441/D2442 (2026-08-24):** external-audit A+B executed. D2441 = public leak redacted (929-title manifest → runtime glob) + C12 hardcoded-path scanner recursive (162 files) + 9 hardcoded paths fixed. D2442 = **evidence-tier preservation FIXED** (`is_convergent`/`origin` through S4→S6, was silently dropped → BUG-171) + `scripts/freeze_run_manifest.py` + `scripts/audit_s4_fields.py`. Live 6-FB smoke: 2 principles classified + 4 routed, 0 failures, tier lands correctly. New bugs: BUG-169 (TI `parameters` missing), BUG-170 (non-principle not classified). 110/110 tests green. **T1.1 canary: S2 ✅ (279 FBs) → S4 ✅ 278/279 FBs (1 CRIBS quarantine → gate relaxed D2386) → S5 ✅ (235 PASS / 43 QUARANTINE) → S6 ✅ (278 committed, D2391). Integrity 17/17 + audit green (D2395). Working tree committed `793fd26` (D2397); golden verbatim fixed 80/80 (D2397/BUG-136); S4 reval DONE (D2398) — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%; domain-promotion defer (D2399); S4/S6 field contract (D2400). Frontier T1.1 audit 4 blockers fixed (D2402-D2405); session_seed YAML parse break fixed (D2406); run_production.py archived + fail-closed regression tests (D2407); response_format=json_object → empty gpt-oss-20b fixed (D2408). **R3 canary S4→S6 rerun COMPLETE (2026-08-17 19:22:39): S4 279/279 FBs (0 failed) → S5 236 PASS / 43 QUARANTINE / 0 FLAG → S6 279 committed (pipeline_run_id=canary) + Parquet. ~87 min. D2408 validated live; 236/43 ≈ 235/43 → no regression.** **D2409 + D2410 (2026-08-17): S1.5 embed cache + S5 incremental checkpoint/resume (6 tests) + S4 metadata derivation audit fixes (temporal_scope boundary-match, difficulty_map C12 with 0/279 drift, context "general" schema-legal) — 7 more tests → 47-test suite green, config audit strict clean, integrity 10/10, smoke-plumbing S0→S1.5 green. T1.1 stage PREPARED: caffeinate active, OMLX lazy-load (2/7 models), preflight clean.**
+> **D2443/D2444/D2445 + F2 (2026-08-24):** forensic-audit F1/F2/F3 + render fix (see buglog). D2443 = provenance carry-through (citation/source_authors/source_diversity/primary_source S2→S4→S6 — BUG-172 FIXED). D2444 = difficulty-map verified NOT-a-bug. D2445 = render_s4_visual.py content-type-aware. F2 = sidecar re-stamp (routed_by_stage, gen_model preserved). Live smoke ✅; 35 S4 tests green; integrity 15/17; audit clean except BUG-169.
 > **S4 completion (2026-08-16):** 278 FBs | depth cross-domain 240 / domain 35 / universal 2 / specialized 1 | causal_mechanism 53 (19%) | 0 JSON/truncation/LLM failures | 3 name collisions, 21 name truncations | grammar A/B ✅ RESOLVED (OFF wins, D2392) | depth prompt ✅ fixed (D2393) | taxonomy discipline `emerging` 32%→15.5% (D2394), domain 93.9% pending review
 > **S5 Architecture:** DeBERTa-only NLI, threshold 0.10 (D2298) + premise/hypothesis pairing (D2321). Final. No ongoing adjudication.
 > **Active Models:** Qwen3-Coder-30B (S2) | GPT-OSS-20B (S4 classifier) | DeBERTa-v3-large (S5 verifier) | bge-m3 (Emb)

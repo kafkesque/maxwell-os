@@ -6,6 +6,11 @@ not something a human can eyeball. This renders each FB (and the PT/PI/GE/TI
 routing sidecars) into a compact visual summary so a reviewer can inspect the
 actual knowledge content, classification, and provenance without parsing JSON.
 
+D2323 content-type-aware rendering: each content_type renders its OWN body
+fields (tool_instruction → description/output/example/caveats; process_template →
+trigger/prerequisite/steps; growth_edge → body/category/…), not the one-size
+principle core body. Field names mirror config/content_types.yaml s2_body_fields.
+
 Usage:
     python3 scripts/render_s4_visual.py \
         --in-dir "knowledge pipeline/stage4_merge/smoke_real" \
@@ -23,10 +28,19 @@ from pathlib import Path
 from typing import Any
 
 
-FIELDS = (
-    "definition", "mechanism", "boundary", "consequence",
-    "application", "failure_mode", "elaboration", "jargon",
-)
+# D2323: shared skeleton — S2 emits these for EVERY content_type, so render them
+# first. Then the type-specific body renders for its content_type below.
+_SHARED_BODY: tuple[str, ...] = ("definition", "mechanism", "boundary", "consequence")
+
+# Per-content-type body fields — mirrors config/content_types.yaml s2_body_fields
+# + principle CRIBS fields. Keep in sync with the ontology (C12).
+_TYPE_BODY: dict[str, tuple[str, ...]] = {
+    "principle": ("application", "failure_mode", "elaboration", "jargon"),
+    "process_template": ("trigger", "prerequisite", "steps", "done_condition", "failure_mode"),
+    "process_instance": ("instance_text", "actors", "outcome_metric", "outcome_qualitative", "domain_context"),
+    "tool_instruction": ("tool_name", "platform", "description", "syntax", "parameters", "output", "example", "caveats"),
+    "growth_edge": ("body", "category", "actionable", "status", "priority"),
+}
 
 
 def _s(v: Any) -> str:
@@ -35,6 +49,20 @@ def _s(v: Any) -> str:
     if isinstance(v, (list, dict)):
         return json.dumps(v, ensure_ascii=False)
     return str(v).strip()
+
+
+def _load_records(path: Path) -> list[dict[str, Any]]:
+    """Load a checkpoint/sidecar as JSONL, falling back to whole-doc JSON.
+
+    S4 writes JSONL (one object per line), but older/pretty-printed sidecars
+    (whole-doc JSON with newlines inside a single object) also occur. Handle both.
+    """
+    txt = path.read_text(encoding="utf-8")
+    try:
+        return [json.loads(l) for l in txt.splitlines() if l.strip()]
+    except json.JSONDecodeError:
+        obj = json.loads(txt)
+        return obj if isinstance(obj, list) else [obj]
 
 
 def render_record(idx: int, r: dict[str, Any]) -> list[str]:
@@ -63,7 +91,8 @@ def render_record(idx: int, r: dict[str, Any]) -> list[str]:
                  f"**difficulty:** {_s(r.get('difficulty_level'))}  ·  "
                  f"**temporal:** {_s(r.get('temporal_scope'))}{prov}")
     lines.append("")
-    for f in FIELDS:
+    # D2323: shared skeleton + type-specific body, in order.
+    for f in _SHARED_BODY + _TYPE_BODY.get(content_type, ()):
         v = _s(r.get(f))
         if v:
             lines.append(f"**{f}:** {v}")
@@ -74,7 +103,7 @@ def render_record(idx: int, r: dict[str, Any]) -> list[str]:
 def render_file(title: str, path: Path) -> list[str]:
     if not path.exists():
         return []
-    rows = [json.loads(l) for l in open(path, encoding="utf-8") if l.strip()]
+    rows = _load_records(path)
     if not rows:
         return []
     lines: list[str] = [f"# {title} ({len(rows)})", ""]

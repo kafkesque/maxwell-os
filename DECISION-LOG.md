@@ -3,6 +3,48 @@
 
 ---
 
+### D2447 — Decision-registry summary drift fix + guard (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding:** `config/decisions.yaml` carries `total_decisions` and a `summary` block (state buckets + `by_category`) that are **redundant derived data** hand-maintained in parallel with the authoritative `decisions` list. They drifted: `active` off by 1 (375 vs 376), and 10 `by_category` entries wrong (worst: `QLT / AUDIT` declared 7 vs 14 actual; `QLT / DATA` missing entirely). No runtime consumer and no validator existed, so the drift was silent.
+
+**Decision:** (1) `scripts/recompute_decision_summary.py` recomputes the derived fields deterministically from the `decisions` list and surgically rewrites only those fields (every decision record stays byte-identical — no full re-dump). (2) `tests/test_decision_summary_sync.py` independently recomputes and fails CI on any future drift.
+
+**Also found — `tools/sync_decisions.py` has an INVERTED source-of-truth model.** It declares DECISION-LOG.md authoritative, but DECISION-LOG.md has ~237 heading blocks vs 434 decisions in decisions.yaml, and its state/category detection is keyword-heuristic. Running it would overwrite ~181 descriptions with its `"No heading in DECISION-LOG.md"` fallback and mis-detect states. **DEFERRED:** add a `--force` guard or retire it; do **not** run as-is.
+
+**Files:** scripts/recompute_decision_summary.py, tests/test_decision_summary_sync.py, config/decisions.yaml
+**Source:** Session 2026-08-24 — registry count-drift remediation.
+
+---
+
+### D2446 — Divergent-5type crosscheck verdict: no code change (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (field-by-field crosscheck of `smoke_divergent_5types` vs `config/content_types.yaml`):** FB (principle) fully compliant. Non-principle sidecars carry the correct shared skeleton + type-specific body + R14 stamps + full provenance (F1 verified) but miss classification (`depth`/`discipline`/`domains`/`evidence`), discovery (`keywords`), versioning (`fb_version`), and runtime (`usage_count`/`feedback_score`/`feedback_count`). Two drifts surfaced: `elaboration` non-empty on PT/GE (ontology says principle-only), and `source_cluster` singular vs `source_clusters` plural.
+
+**Decision (verdicts):**
+1. **BUG-170 enrichment DEFERRED** — the whole classification/keywords/fb_version/runtime gap is gated on `commit_non_fb_types: false`. Fixing now = enriching uncommitted JSONL (bloat) + a new LLM classify path across 4 types (new failure surface for data nobody persists). Do it atomically with the `commit_non_fb_types` decision, post-BUG-165.
+2. **BUG-173 elaboration drift DOCUMENTED, NOT stripped** — stripping S2-emitted `elaboration` from PT/GE sidecars is destructive (drops process/hypothesis context that is never rendered as body nor committed). Reconcile at next S2 prompt revision.
+3. **`source_cluster` vs `source_clusters` NOT a bug** — singular = S2 origin cluster id (string); plural = S4-merged cluster list. Semantically distinct; normalized at commit.
+4. **BUG-169 TI `parameters` = S2 data gap, no S4 fix** — S4 passes S2 fields verbatim; verify on full 143-TI corpus at BUG-165 rerun.
+
+**Files:** governance/buglog.md (BUG-170 expanded, BUG-173 added, BUG-169 verdict)
+**Source:** Session 2026-08-24 — divergent-5type smoke crosscheck.
+
+---
+
+### D2445 — S4 renderer content-type-aware + core-body type-specificity verdict (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (forensic follow-up):** `scripts/render_s4_visual.py` hardcoded a principle-only 8-field body, so the TI/PT/GE sidecars rendered with their type-specific fields (TI `description/output/example/caveats`, PT `trigger/prerequisite/steps`, GE `body/category/…`) absent from `visual.md` — even though the data contained them. (The `smoke_preflight_plumbing` "application on TI/PT/GE" was a test-injected stub, not real output.)
+
+**Decision:** (1) Made the renderer content-type-aware (per-type body mirrors `content_types.yaml` `s2_body_fields`) + added a robust loader (JSONL + pretty-printed whole-doc JSON fallback). (2) Verdict on core-body type-specificity: worth it for agentic-correctness (GE's fake `mechanism` implies a causal chain where only a hypothesis exists), NOT for speed (<5%). DEFER to a post-BUG-165 decision (extraction frontier, golden-set gated). (3) Metadata stays universal; classification `depth`/`difficulty` is principle-only; `discipline`/`domains` are type-conditional.
+
+**Files:** scripts/render_s4_visual.py
+**Source:** Session 2026-08-24 — forensic audit follow-up.
+
+---
+
 ### D2444 — Difficulty-map "inversion" verified NOT-a-bug (2026-08-24)
 **Category:** QLT / AUDIT
 

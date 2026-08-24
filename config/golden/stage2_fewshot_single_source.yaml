@@ -25,20 +25,28 @@ meta:
   purpose: single-source balanced few-shot (all 5 content_type roles)
   d2345_fork: false
   status: WIRED
-  total_examples: 12
-  single_source_positives: 9
-  hard_negatives: 3
+  total_examples: 20
+  single_source_positives: 13
+  hard_negatives: 7
   expected_coverage:
   - role_balance_all_5_content_types
   - process_template_positive
   - tool_instruction_positive
   - framework_library_tool_instruction_positive
+  - frontend_component_tool_instruction_positive
   - tool_vs_template_disambiguation
+  - human_method_with_tool_not_tool_instruction
   - process_instance_positive
   - growth_edge_positive
+  - descriptive_model_principle_not_always_causal
+  - normative_heuristic_principle_not_always_causal
   - pure_fact_rejection
   - platitude_rejection
   - speculation_not_principle_rejection
+  - thin_one_off_event_rejection
+  - bare_deployment_event_rejection
+  - bare_procedure_mention_rejection
+  - bare_personnel_event_rejection
 
 examples:
 
@@ -210,7 +218,7 @@ examples:
     domain_context: "confidence tricks / theft in a public retail setting"
     evidence_passages:
     - "To prove the point the researchers ran the scam at a local cafe on the top floor of a mall on Oxford Street in London."
-  rationale: "A concrete case study of something actually executed. content_type=process_instance (NOT principle, NOT process_template)."
+  rationale: "A concrete case study OF the confidence-trick method actually executed — the proof it works. content_type=process_instance (NOT principle, NOT process_template). A process_instance REQUIRES a repeatable method it instantiates; a bare one-off event with no method is NULL, not a PI (see SS-NEG-004/005/007)."
   tier: CORE
 
 # ── POSITIVE: growth_edge (speculative open question) ──────────────────────
@@ -372,6 +380,148 @@ examples:
   rationale: "A vector-search framework API pattern. content_type=tool_instruction, NOT process_template — it is a framework API, not a repeatable human how-to (BUG-166 PT-vs-TI contrastive)."
   tier: CORE
 
+# ── POSITIVE: principle (descriptive_model — NOT causal) ───────────────────
+# SS-POS-001 shows principle=causal_mechanism; this shows the SAME role can be a
+# descriptive taxonomy. Guards against the live-smoke 4/4 causal_mechanism
+# over-claim (normative/descriptive patterns labeled causal). D2323: one role
+# accepts multiple extraction_types.
+- id: SS-POS-010
+  domain: decision-science
+  source_books:
+  - Noise — Daniel Kahneman, Olivier Sibony, Cass Sunstein
+  cluster_segments:
+  - source_book: Noise — Daniel Kahneman, Olivier Sibony, Cass Sunstein
+    text: "Judgment errors come in two distinct kinds: bias and noise. Bias is a systematic error that pushes judgments consistently in one direction, while noise is random scatter that pushes different judgments unpredictably in different directions, and the two require different remedies."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Bias Versus Noise Taxonomy
+    definition: "A classification of judgment error into two kinds: bias, a systematic error pushing judgments consistently in one direction, and noise, random scatter pushing judgments unpredictably in different directions."
+    mechanism: "Bias and noise partition judgment error by structure — bias is directional and consistent, noise is non-directional and variable — which determines whether a bias correction or a noise-reduction procedure applies."
+    boundary: "Applies to aggregate or repeated judgments where error can be measured. Fails to distinguish bias from noise from a single judgment, since one data point cannot show direction versus scatter."
+    consequence: "Diagnosing which kind of error dominates tells practitioners whether to apply a bias correction or a noise-reduction procedure."
+    elaboration: "The bias-versus-noise distinction matters because the two error types respond to opposite interventions: bias is reduced by changing the judge's reference point or incentives, while noise is reduced by averaging independent judgments or standardizing the decision procedure. Most real judgment systems contain both, so a practitioner must measure the relative contribution of each before choosing a remedy; treating noise as bias (or vice versa) leaves the dominant error uncorrected."
+    extraction_type: descriptive_model
+    content_type: principle
+    evidence_passages:
+    - "Judgment errors come in two distinct kinds: bias and noise. Bias is a systematic error, while noise is random scatter, and the two require different remedies."
+  rationale: "A reusable conceptual taxonomy (bias vs. noise), NOT a cause→effect chain. content_type=principle with extraction_type=descriptive_model — a principle is not always causal_mechanism."
+  tier: CORE
+
+# ── POSITIVE: process_template (human method that USES a tool — NOT TI) ────
+# Contrasts with SS-POS-007/008/009 (software API → TI). This is a repeatable
+# HUMAN how-to that happens to mention tests/bisection; naive models label it
+# tool_instruction. Guards PT-vs-TI in the reverse direction.
+- id: SS-POS-011
+  domain: software-engineering
+  source_books:
+  - The Pragmatic Programmer — Andrew Hunt, David Thomas
+  cluster_segments:
+  - source_book: The Pragmatic Programmer — Andrew Hunt, David Thomas
+    text: "To debug effectively, first reproduce the failure with a minimal test case, then narrow the cause by repeatedly bisecting the suspect code, then write a failing test that captures the bug, and only then fix the underlying cause so the test passes."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Reproduce-Bisect-Test Debugging Protocol
+    definition: "A repeatable method for fixing a defect: reproduce the failure with a minimal case, bisect to narrow the cause, capture it in a failing test, then fix the cause so the test passes."
+    mechanism: "Reproduction makes the failure observable and deterministic; bisection halves the search space per step; the failing test localizes the defect and guards against regression; fixing is then verified when the test turns green."
+    boundary: "Applies to reproducible software defects. Fails when the bug is non-deterministic or cannot be reproduced in a minimal case, which blocks bisection."
+    consequence: "Debuggers who reproduce, bisect, and test-lock the bug before fixing spend less time in unfocused code inspection and prevent regressions."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: process_template
+    trigger: "When a software defect needs to be located and fixed"
+    prerequisite: ""
+    steps:
+    - "Reproduce the failure with a minimal test case"
+    - "Bisect the suspect code to narrow the cause"
+    - "Write a failing test that captures the bug"
+    - "Fix the underlying cause until the test passes"
+    done_condition: "The failing test passes and the defect no longer reproduces"
+    failure_mode: "Fails when the bug cannot be reproduced in a minimal case, blocking bisection"
+    evidence_passages:
+    - "To debug effectively, first reproduce the failure with a minimal test case, then narrow the cause by bisecting, then write a failing test, and only then fix the cause."
+  rationale: "A repeatable HUMAN how-to method with ordered steps. content_type=process_template (NOT tool_instruction — mentioning tests/bisection does not make it a software API)."
+  tier: CORE
+
+# ── POSITIVE: tool_instruction (frontend component framework — NOT PT) ─────
+# SS-POS-007/008/009 cover DB/ORM/vector-search APIs. Live smoke showed the
+# model STILL mislabeled a React component pattern as process_template. This
+# closes the frontend-component gap: a UI framework API, NOT a human how-to.
+- id: SS-POS-012
+  domain: computer-science
+  source_books:
+  - LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+  cluster_segments:
+  - source_book: LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+    text: "In React, declare a component as a function that returns JSX, manage local state with the useState hook, and pass data from a parent to a child component via props."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: React Component Function Pattern
+    definition: "Declare a React UI component as a function returning JSX, manage its local state with the useState hook, and pass data down via props."
+    mechanism: "The function returns JSX that React reconciles against a virtual DOM; useState returns a state value plus a setter whose call triggers a re-render; props pass read-only data from parent to child, so state flows down while events flow up."
+    boundary: "Applies to React function components. Fails when state must be shared across distant components without lifting state up or adding a state-management layer."
+    consequence: "Developers build reusable UI by composing function components whose state and props are explicit instead of mutating a shared view."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: tool_instruction
+    tool_name: "React"
+    platform: "JavaScript (UI framework)"
+    description: "Declare a UI component as a function returning JSX, manage state with useState, and pass data via props"
+    syntax: "function Component(props) { const [state, setState] = useState(initial); return <JSX/>; }"
+    parameters:
+    - name: props
+      type: object
+      description: "Read-only data passed from the parent component"
+    - name: initial
+      type: any
+      description: "Initial value for the useState hook"
+    output: "The rendered JSX element reconciled against the virtual DOM"
+    example: "function Greeting({ name }) { return <h1>Hello {name}</h1>; }"
+    caveats: "Fails when state must be shared across distant components without lifting state or adding a state manager"
+    evidence_passages:
+    - "In React, declare a component as a function that returns JSX, manage local state with the useState hook, and pass data from a parent to a child component via props."
+  rationale: "A UI framework API usage pattern (component function + hooks + props). content_type=tool_instruction, NOT process_template — it is a framework's API contract, not a repeatable human how-to (frontend-component PT-vs-TI contrastive)."
+  tier: CORE
+
+# ── POSITIVE: principle (normative_heuristic — NOT causal) ─────────────────
+# SS-POS-001 shows principle=causal, SS-POS-010 shows principle=descriptive.
+# This shows the THIRD form: a prescriptive rule of thumb. The 50-sample live
+# smoke mislabeled normative rules (precautionary principle, market-growth
+# strategy) as causal_mechanism because the golden had NO principle+normative
+# example — the model defaulted "rule of thumb" to causal.
+- id: SS-POS-013
+  domain: risk-management
+  source_books:
+  - Antifragile — Nassim Nicholas Taleb
+  cluster_segments:
+  - source_book: Antifragile — Nassim Nicholas Taleb
+    text: "Where the results of a new technology are still unknown, or where there is a lack of scientific knowledge or consensus regarding its safety, the precautionary principle says it is smarter not to use it until its safety is established."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Precautionary Principle
+    definition: "A prescriptive rule: when a new technology's effects are unknown or lack scientific consensus on safety, avoid using it until safety is established."
+    mechanism: "The rule routes decision-making under uncertainty toward inaction: because the downside risk is unquantified and potentially irreversible, the burden of proof shifts to the proponent to demonstrate safety before adoption."
+    boundary: "Applies to novel technologies with unknown or contested safety. Fails when the risk is well-characterized and reversible, where the precautionary stance would block beneficial low-risk adoption."
+    consequence: "Following the rule avoids irreversible harm from technologies whose risks only become apparent after widespread adoption."
+    elaboration: "The principle is a decision heuristic, not a causal law: it does not claim uncertainty causes harm, but prescribes caution because the harm is unquantified. It is contested precisely because its application is a value trade-off — it protects against irreversible downside at the cost of slowing beneficial innovation, so its force depends on how risk-averse the decision context is."
+    extraction_type: normative_heuristic
+    content_type: principle
+    evidence_passages:
+    - "The precautionary principle says it is smarter not to use it until its safety is established."
+  rationale: "A prescriptive rule of thumb ('when uncertain, don't adopt'), NOT a cause→effect chain. content_type=principle with extraction_type=normative_heuristic — a principle can be a normative heuristic, not always causal_mechanism."
+  tier: CORE
+
 # ── NEGATIVE: pure factual description → NULL (over-fire guard) ────────────
 - id: SS-NEG-001
   domain: history
@@ -445,4 +595,107 @@ examples:
     content_type: ''
     evidence_passages: []
   rationale: "HARD NEGATIVE — unfalsifiable hand-waving speculation with no articulated open tension or testable question (contrast with SS-POS-006, which poses a concrete testable hypothesis). Must produce route=NULL."
+  tier: CHALLENGE
+
+# ── NEGATIVE: thin one-off event → NULL (over-split guard) ─────────────────
+# Singleton extraction must NOT fabricate a structured object from a bare
+# one-off event with no method/steps/repeatability. process_instance requires a
+# process_template it instantiates; a bare event log is neither PI nor PT.
+- id: SS-NEG-004
+  domain: operations
+  source_books:
+  - The Phoenix Project — Gene Kim, Kevin Behr, George Spafford
+  cluster_segments:
+  - source_book: The Phoenix Project — Gene Kim, Kevin Behr, George Spafford
+    text: "On Tuesday the team moved the database server to the new rack, and the migration finished by noon without incident."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: ''
+    content_type: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — a bare one-off event with no method, steps, actors, or outcome structure. process_instance requires a process_template it instantiates (a repeatable method executed); this is just an event log. Must produce route=NULL, NOT a fabricated process_template/process_instance (over-split guard for singleton thin passages)."
+  tier: CHALLENGE
+
+# ── NEGATIVE: bare deployment event → NULL (over-split guard) ──────────────
+- id: SS-NEG-005
+  domain: operations
+  source_books:
+  - The Phoenix Project — Gene Kim, Kevin Behr, George Spafford
+  cluster_segments:
+  - source_book: The Phoenix Project — Gene Kim, Kevin Behr, George Spafford
+    text: "On Friday the company shipped the new software release to production, and no customers reported any problems over the weekend."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: ''
+    content_type: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — a bare deployment event with no method, steps, or repeatability. process_instance requires a process_template it instantiates (a case study OF a method, like SS-POS-005); this is just an event log. Must produce route=NULL, NOT a fabricated process_instance."
+  tier: CHALLENGE
+
+# ── NEGATIVE: mere mention of a procedure (no steps shown) → NULL ──────────
+- id: SS-NEG-006
+  domain: operations
+  source_books:
+  - The Checklist Manifesto — Atul Gawande
+  cluster_segments:
+  - source_book: The Checklist Manifesto — Atul Gawande
+    text: "In March the lab ran its annual equipment audit and found nothing out of calibration."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: ''
+    content_type: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — a mere mention that an audit happened, with NO steps described. A process_template requires the actual ordered steps; this passage names a procedure without showing any method. Must produce route=NULL, NOT a fabricated process_template."
+  tier: CHALLENGE
+
+# ── NEGATIVE: bare personnel event → NULL (over-split guard) ───────────────
+- id: SS-NEG-007
+  domain: business operations
+  source_books:
+  - Good to Great — Jim Collins
+  cluster_segments:
+  - source_book: Good to Great — Jim Collins
+    text: "Last quarter the company hired a new head of marketing, and the onboarding completed within a month."
+  is_convergent: false
+  should_extract: false
+  expected_fb:
+    is_summary: true
+    route: 'NULL'
+    name: ''
+    definition: ''
+    mechanism: ''
+    boundary: ''
+    consequence: ''
+    elaboration: ''
+    extraction_type: ''
+    content_type: ''
+    evidence_passages: []
+  rationale: "HARD NEGATIVE — a bare personnel event with no method or steps. No repeatable process is instantiated. Must produce route=NULL, NOT a fabricated process_instance/process_template."
   tier: CHALLENGE

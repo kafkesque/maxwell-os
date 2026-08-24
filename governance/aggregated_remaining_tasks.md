@@ -11,7 +11,7 @@
 - ✅ D2445 renderer content-type-aware (examinability)
 
 **SHOULD (before/at rerun — correctness, cheap):**
-- ⏳ **S2 singleton extraction FIRST (gated)** — extract the 18%-prefiltered singletons (6,317) via `--process-singletons` BEFORE the S4 rerun, so S4 runs ONCE on the complete S2 frontier (convergent + single-source + singletons). Running S4 first, then singletons later, forces a second S4 merge. D2448 prompt fixes (elaboration principle-only / parameters-required-TI) are already in place for this.
+- ⏳ **S2 singleton extraction FIRST (gated)** — extract the 18%-prefiltered singletons (6,317) via `just s2-singletons` (new, D2452) BEFORE the S4 rerun, so S4 runs ONCE on the complete S2 frontier (convergent + single-source + singletons). Running S4 first, then singletons later, forces a second S4 merge. **Prefilter is now WIRED (D2452):** `process_singletons` consumes `singletons.prefiltered.jsonl` EXTRACT verdicts and skips the 28,805 SKIP noise; D2448 prompt fixes + D2452 builder-level `elaboration`/`steps` schema enforcement are in place.
 - ⏳ BUG-165 — the rerun itself: `stage4_merge.py --only-fb-ids value_keep_ids.jsonl` → S5 → S6
 - ⏳ D2440 — S5 verifier calibration (AlignScore + MiniCheck vs DeBERTa) BEFORE the S5 leg; gate F1 > 0.484
 - ⏳ BUG-150 — re-measure discipline `emerging` on fresh S4 output (taxonomy promotion gate)
@@ -21,7 +21,7 @@
 - ⏳ non-principle cross-ref producer (`consulted_fbs`, `fb_query_*`, `parent_pt_id`, `parent_fb_ids`, `promoted_to_*`) — `stage4_5_enrich.py` is FB-only today
 - ⏳ non-principle S5 verification (NLI is principles-only today)
 - ⏳ BUG-170 enrichment (classification + keywords + fb_version + runtime) — only after the three above exist
-- ⏸ **Singleton-extraction quality gates (from live smoke 2026-08-24):** completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) is MANDATORY — live sample produced a thin PT (no steps/trigger/done) and a 4/4 `tool_instruction`→`process_template` mislabel (SQLAlchemy/MongoEngine/Superlinked) + 4/4 `causal_mechanism` over-claim. **Task #12 PT-vs-TI contrastive golden DONE (D2450)** — 3 framework-API TI positives added; live re-verification pending next smoke. `causal_mechanism` over-claim remains a separate calibration item.
+- ⏸ **Singleton-extraction quality gates (from live smoke 2026-08-24):** completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) is MANDATORY — live sample produced a thin PT (no steps/trigger/done) and a 4/4 `tool_instruction`→`process_template` mislabel (SQLAlchemy/MongoEngine/Superlinked) + 4/4 `causal_mechanism` over-claim. **Task #12 PT-vs-TI contrastive golden DONE (D2450)** — 3 framework-API TI positives added. **Live OMLX re-smoke 7/7 PASS (D2451):** held-out passages now correctly label pandas/React→TI, weekly-review→PT, intrinsic/extrinsic→principle+descriptive_model, and 3 thin events→NULL. Over-split hardened with SS-NEG-005/006/007 + SS-POS-012 (React); `DROP_THIN`/`DROP_ANECDOTE` gate remains the hard backstop.
 
 **WORTH (post-rerun, non-blocking):**
 - ⏳ BUG-169 — TI `parameters` missing (verify full 143-TI corpus)
@@ -64,14 +64,17 @@
 8. 🟡 **DECISION-LOG backfill** — D2423–D2438 (15+ decisions).
 9. ✅ **Golden single-source meta header** — FIXED: `9 ex / 6 pos / 3 hard-neg` (was 8/5/3).
 10. 🟡 **BUG-149 residual** — dead `max_words=5` default in `normalize_fb_name`.
-11. ⏸ **Singletons (35,122)** — prefilter flags 18% (6,317) EXTRACT; extract only if single-source recall is a product requirement.
-12. 🔶 **DSPy/golden expansion** — wire MIPROv2 (pending); PT-vs-TI contrastive golden ✅ DONE (D2450: SS-POS-007/008/009).
+11. 🔶 **Singletons (35,122)** — prefilter flags 18% (6,317) EXTRACT. **WIRED (D2452):** `just s2-singletons` runs the gated pass; `just s2-singletons-prefilter` regenerates verdicts. Extract only if single-source recall is a product requirement.
+12. 🔶 **DSPy/golden expansion** — wire MIPROv2 (pending); PT-vs-TI contrastive golden ✅ DONE (D2450: SS-POS-007/008/009) + contrastive negatives ✅ DONE (D2451: SS-POS-010 descriptive-principle / SS-POS-011 PT-not-TI / SS-NEG-004 over-split). **Schema enforcement ✅ DONE (D2452):** `elaboration` blanked for non-principle + typed `s2_body_field` placeholders (`[]`/`False`/`""`) + `load_golden_single_source` truncation round-robin (preserves all 5 roles).
 13. ⏸ **R2 FORM refactor · P2.x batch S5 · GAP-1 DSPy wiring · BUG-145/159/160 (P2).**
 14. 🟠 **D2440 — S5 verifier calibration (AlignScore + MiniCheck vs DeBERTa)** — run through existing `pipeline/calibrate.py` + `nli_calibrate.py` harness. Gate: adopt only if F1 > 0.484 AND fail-closed (D2093) preserved. P2, post-BUG-165.
 15. 🟠 **BUG-168 — `pipeline/dspy_trainer.py` exists-but-unwired** — wire into `stage2_extract.py` as few-shot source, or archive to stop audit false-positives. P2, post-BUG-165.
 16. 🟡 **D2439 accept-defer (P2, post-BUG-165):** Leiden swap (needs igraph/leidenalg C-dep, already documented D2168) · contextual retrieval/late chunking · cross-encoder reranker after RRF · DuckDB analytics.
 17. 🟡 **BUG-170 — non-principle types not classified** — PT/PI/TI/GE sidecars have empty depth/discipline/domains (S4 skips CRIBS for non-principle). Latent until `commit_non_fb_types: true`. P2.
+19. 🟠 **D2454 — wire S4 classification golden** — `config/golden/stage4_golden.yaml` is AUTHORED + test-validated (D2451, `tests/test_stage4_golden_contract.py`) but NOT yet injected into the 4 S4 classification prompts (`CLASSIFY_SYSTEM_PROMPT` / `MERGED_CRIBS_CLASSIFY_SYSTEM` / `BATCH_CRIBS_CLASSIFY_SYSTEM` / depth-focused). Extracts the hardcoded inline depth examples → config-driven golden; needs a live smoke before BUG-165 (touches S4 hot path). *(renumbered: was "D2452" in D2451, then "D2453" after D2452 = S2 readiness; now D2454 after D2453 = checkpoint/resume.)*
 18. 🟡 **BUG-169 — TI `parameters` missing** — 1 single-source TI lacks `parameters`. Verify on full 143-TI corpus during BUG-165 rerun. P2.
+20. 🟡 **Ext-audit #5 — `check_stage_order()` doesn't verify sequence** (D2453, tracked) — string-matches "8-stage" + stage3-absent only; counts `timeouts` key as a stage. Low-priority hardening: compare `config.stages` keys against `EXPECTED_STAGES` and assert the actual order.
+21. 🟡 **Ext-audit #14 — OMLX "health endpoint lies"** (D2453, tracked) — `/v1/models` returns the full 7-model *catalog*, so `model_lazyload.py --status` reports 41.2GB "loaded" when ground-truth `/health` `loaded_count=2` / `omlx-server` RSS=20.4GB. Wired-memory leak itself already G10-covered (flat −0.11%). Fix: read `engine_pool.loaded_count` not the catalog; root-cause is OMLX v0.5.1, compensating control = `stress_test` tripwire.
 
 > **✅ S4 preflight/smoke/stress (D2438, 2026-08-24):** 28-test harness
 > `tests/test_stage4_preflight_smoke_stress.py` + `scripts/render_s4_visual.py` (human-readable

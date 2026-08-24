@@ -463,6 +463,11 @@ def _s15_path(filename: str) -> Path:
 
 STAGE1_5_CHECKPOINT = _s15_path("checkpoint.jsonl")
 STAGE1_5_SINGLETONS = _s15_path("singletons.jsonl")
+# D2452: deterministic pre-LLM singleton gate (scripts/prefilter_clusters.py).
+# Produces {cluster_id -> EXTRACT/SKIP} from config/filtering.yaml thresholds so
+# the S2 singleton pass skips noise/junk singletons before any LLM call.
+STAGE1_5_SINGLETONS_PREFILTERED = _s15_path("singletons.prefiltered.jsonl")
+S2_SINGLETON_PREFILTER_ENABLED = bool(_CFG.get("stage2", {}).get("singleton_prefilter_enabled", False))
 
 # ── Smoke test config (D2120) ────────────────────────────────────────────
 SMOKE_PLUMBING_SKIP_LLM = bool(_CFG.get("smoke", {}).get("plumbing", {}).get("skip_llm", True))

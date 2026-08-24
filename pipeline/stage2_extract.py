@@ -618,6 +618,14 @@ def _build_body_schema_text() -> str:
 _S2_BODY_SCHEMA: str = _build_body_schema_text()
 
 
+# D2452: JSON-array body fields — must ALWAYS be present as [] (never None/absent)
+# when the model omits them, so the per-type schema never silently drops steps/
+# actors/parameters (confirmed live-smoke: a process_template emitted steps=None).
+S2_ARRAY_BODY_FIELDS: frozenset[str] = frozenset({"steps", "actors", "parameters"})
+# D2452: boolean body fields — default to False (never None/absent) when omitted.
+S2_BOOL_BODY_FIELDS: frozenset[str] = frozenset({"actionable"})
+
+
 def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
     """P2-1: capture type-specific body fields from a single-source result.
 
@@ -627,12 +635,25 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
     `caveats` (possibly ""), etc. (matches the golden set + the D2448 prompt note
     "other fields may be left empty only when the passage does not provide them").
     JSON arrays (steps/actors/parameters) are preserved as lists; an empty array is
-    a meaningful "no segments" signal and is therefore emitted verbatim too.
+    a meaningful "no segments" signal. D2452: array fields omitted by the model
+    (None) now default to [] rather than being dropped, so `steps`/`actors`/
+    `parameters` are always present for PT/PI/TI respectively.
     """
     out: dict = {}
     for field in S2_BODY_FIELDS.get(content_type, []):
         val = result.get(field)
         if val is None:
+            # D2452: emit a typed placeholder so EVERY s2_body_field is present
+            # (contract: audit_content_type_contract.py requires field presence;
+            # the golden always shows string fields present-as-empty). Arrays → [],
+            # booleans → False, strings → "". Quality of empty values is triaged
+            # downstream (score_single_source.py), not silently dropped here.
+            if field in S2_ARRAY_BODY_FIELDS:
+                out[field] = []
+            elif field in S2_BOOL_BODY_FIELDS:
+                out[field] = False
+            else:
+                out[field] = ""
             continue
         if isinstance(val, str):
             out[field] = val.strip()
@@ -641,6 +662,17 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
         elif isinstance(val, (dict, int, float, bool)):
             out[field] = val
     return out
+
+
+def _blank_elaboration_for_non_principle(elaboration: str, content_type: str) -> str:
+    """D2452: elaboration is PRINCIPLE-ONLY (content_types.yaml core_body).
+
+    The model occasionally emits elaboration for PT/PI/GE/TI despite the prompt
+    instruction (BUG-173, confirmed live-smoke: 602-char elaboration on a
+    process_template). Enforce empty at the builder boundary (schema-level), so the
+    prompt-level rule is never silently violated on the way to S4.
+    """
+    return "" if content_type != "principle" else (elaboration or "")
 
 
 def _enrich_provenance(source_books: list[str], evidence_passages: list[str]) -> dict:
@@ -1010,13 +1042,29 @@ def load_golden_single_source(
     rng.shuffle(neg)
     neg = neg[:min(neg_count, len(neg))]
 
-    while len(pos) + len(neg) > max_total:
-        if len(pos) > len(neg):
-            pos.pop()
-        elif neg:
-            neg.pop()
+    # Truncate to max_total while PRESERVING role balance. The naive `pos.pop()`
+    # removes the LAST element — and since `pos` is grouped in canonical role
+    # order (principle → process_template → tool_instruction → process_instance
+    # → growth_edge), popping the tail drops the RAREST roles (growth_edge,
+    # process_instance) first — the exact opposite of the function's purpose.
+    # Round-robin across roles instead so every present role keeps a share and
+    # no role is silently starved below 1 example. (D2452)
+    if len(pos) + len(neg) > max_total:
+        budget = max_total - len(neg)
+        if budget <= 0:
+            neg = neg[:max_total]
+            pos = []
         else:
-            break
+            pools: dict[str, list[dict]] = {
+                r: list(by_role[r]) for r in role_order if by_role.get(r)
+            }
+            kept: list[dict] = []
+            while len(kept) < budget and any(pools.values()):
+                for r in role_order:
+                    pool = pools.get(r)
+                    if pool and len(kept) < budget:
+                        kept.append(pool.pop(0))
+            pos = kept
     return pos, neg, len(pos) + len(neg)
 
 
@@ -1252,7 +1300,10 @@ def format_golden_fewshot_single_source(
     if neg_examples:
         parts.append("## REJECTION EXAMPLES")
         parts.append("These passages should produce route=NULL (NO extractable object):\n")
-        for i, ex in enumerate(neg_examples[:3], 1):
+        # D2451: show ALL negatives (the loader already truncates to the
+        # config-driven `golden_single_source_negative`). The hardcoded [:3]
+        # silently dropped contrastive negatives added after the original 3.
+        for i, ex in enumerate(neg_examples, 1):
             segs = ex.get("cluster_segments", [])
             text = segs[0].get("text", "").strip()[:220] if segs else ""
             rationale = ex.get("rationale", "")
@@ -2128,7 +2179,11 @@ def run_stage2(
             "mechanism": mechanism,
             "boundary": boundary,
             "consequence": consequence,
-            "elaboration": result.get("elaboration", ""),  # D2215: was silently dropped — LLM produces it, builder discarded it
+            # D2452: elaboration is PRINCIPLE-ONLY — blank for non-principle roles
+            # (the model sometimes emits it for PT/PI/GE/TI despite BUG-173 prompt fix).
+            "elaboration": _blank_elaboration_for_non_principle(
+                result.get("elaboration", ""), content_type
+            ),
             "is_summary": is_summary,
             "extraction_type": extraction_type,
             "content_type": content_type,
@@ -2413,7 +2468,10 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
         "mechanism": result.get("mechanism", "").strip(),
         "boundary": result.get("boundary", result.get("application", "")).strip(),
         "consequence": result.get("consequence", result.get("failure_mode", "")).strip(),
-        "elaboration": result.get("elaboration", ""),  # D2449: was silently dropped by this builder
+        # D2452: elaboration is PRINCIPLE-ONLY — blank for non-principle roles.
+        "elaboration": _blank_elaboration_for_non_principle(
+            result.get("elaboration", ""), content_type
+        ),
         "is_summary": is_summary,
         "extraction_type": extraction_type,
         "content_type": content_type,
@@ -2479,7 +2537,11 @@ def process_singletons(
     Returns:
         (fbs, total_extracted, total_null) — fbs list, extraction counts.
     """
-    from pipeline.pipeline_paths import STAGE1_5_SINGLETONS
+    from pipeline.pipeline_paths import (
+        STAGE1_5_SINGLETONS,
+        STAGE1_5_SINGLETONS_PREFILTERED,
+        S2_SINGLETON_PREFILTER_ENABLED,
+    )
 
     if not STAGE1_5_SINGLETONS.exists():
         print(f"❌ No singletons file at {STAGE1_5_SINGLETONS}")
@@ -2536,15 +2598,77 @@ def process_singletons(
     total_null: int = 0
     pipeline_commit: str = get_pipeline_commit()
 
-    # Resume support
+    # Resume support (D2453): the singleton pass previously wrote FBs ONLY at the
+    # very end (plus a circuit-breaker bailout) and declared `processed_ids`/`segids`
+    # but never read or wrote them — a kill/logout/OOM mid-run lost everything in
+    # `all_fbs`. Now it (a) resumes prior FBs + processed cluster_ids, and (b)
+    # incremental-checkpoints after every N batches so nothing is lost.
     processed_ids: set[str] = set()
     from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
     singleton_segids_file = str(STAGE2_SINGLETON_OUTPUT.parent / "singleton.segids")
     Path(singleton_segids_file).parent.mkdir(parents=True, exist_ok=True)
+    if STAGE2_SINGLETON_OUTPUT.exists() and STAGE2_SINGLETON_OUTPUT.stat().st_size > 0:
+        all_fbs = load_jsonl(STAGE2_SINGLETON_OUTPUT, context="singleton FBs")
+        total_extracted = len(all_fbs)
+        print(f"   📋 Resuming singleton pass: {len(all_fbs)} FBs already extracted")
+    if os.path.exists(singleton_segids_file):
+        with open(singleton_segids_file, encoding="utf-8") as _sf:
+            processed_ids = set(json.load(_sf))
+        print(f"   📋 Resume segids: {len(processed_ids)} singletons already processed")
 
-    # Filter to viable singletons (skip fragments)
+    def _write_singleton_checkpoint(fbs: list[dict], pids: set[str]) -> None:
+        """D2453: crash-safe incremental checkpoint — FBs + processed segids (C6).
+
+        Uses safe_write (tempfile → fsync → os.replace) for BOTH files. Written
+        FBs-first then segids: on a crash between the two, the worst case is a
+        small number of re-extracted singletons whose fb_ids are re-derived
+        deterministically and caught by downstream dedup — never data loss.
+        """
+        STAGE2_SINGLETON_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        safe_write(
+            STAGE2_SINGLETON_OUTPUT,
+            "\n".join(json.dumps(fb, ensure_ascii=False) for fb in fbs) + ("\n" if fbs else ""),
+            force_shrink=True,
+        )
+        safe_write(
+            Path(singleton_segids_file),
+            json.dumps(sorted(pids), ensure_ascii=False),
+            force_shrink=True,
+        )
+
+    # D2452: gate the singleton pass on the deterministic pre-LLM prefilter
+    # (scripts/prefilter_clusters.py → singletons.prefiltered.jsonl). The prefilter
+    # is model-free and cheap; skipping its SKIP verdicts avoids spending LLM time
+    # on noise/summary/narrative singletons. Fail LOUD if enabled but the verdict
+    # file is absent (C16: no silent fallback that would quietly extract junk).
+    prefilter_extract: set[str] | None = None
+    if S2_SINGLETON_PREFILTER_ENABLED:
+        if not STAGE1_5_SINGLETONS_PREFILTERED.exists():
+            raise FileNotFoundError(
+                f"singleton_prefilter_enabled=true but no prefiltered verdict file "
+                f"at {STAGE1_5_SINGLETONS_PREFILTERED}. Run "
+                f"scripts/prefilter_clusters.py --clusters {STAGE1_5_SINGLETONS} "
+                f"--chunks <stage1_chunk checkpoint> --config config/filtering.yaml "
+                f"--out {STAGE1_5_SINGLETONS_PREFILTERED} first (D2437/D2452)."
+            )
+        prefilter_extract = set()
+        with open(STAGE1_5_SINGLETONS_PREFILTERED, encoding="utf-8") as pf:
+            for line in pf:
+                line = line.strip()
+                if not line:
+                    continue
+                row = json.loads(line)
+                if row.get("verdict") == "EXTRACT":
+                    prefilter_extract.add(row.get("cluster_id"))
+
+    # Filter to viable singletons (skip fragments + prefilter SKIP verdicts)
     viable: list[dict] = []
     for sn in singletons:
+        cid = sn.get("cluster_id")
+        if prefilter_extract is not None and cid not in prefilter_extract:
+            continue
+        if cid in processed_ids:
+            continue  # D2453: resume — skip already-processed singletons
         sid_raw = sn.get("segment_ids", [])
         if isinstance(sid_raw, str):
             try:
@@ -2556,9 +2680,13 @@ def process_singletons(
         for sid in sid_list:
             seg = segments.get(sid)
             if seg and len(seg.get("text", "").strip()) >= 50:
-                viable.append({"singleton": sn, "segment_id": sid, "text": seg["text"], "source_book": seg.get("source_book", "?")})
+                viable.append({"singleton": sn, "cluster_id": cid, "segment_id": sid,
+                               "text": seg["text"], "source_book": seg.get("source_book", "?")})
                 break  # One FB per singleton
 
+    if prefilter_extract is not None:
+        print(f"   Prefilter (D2452): {len(prefilter_extract)} EXTRACT verdicts loaded from "
+              f"{STAGE1_5_SINGLETONS_PREFILTERED.name}")
     print(f"   Viable singletons (text >= 50 chars): {len(viable)}/{len(singletons)}")
     print(f"   Provider: {provider} | Model: {GEN_MODEL} | temp=0.0")
 
@@ -2623,10 +2751,12 @@ def process_singletons(
         viable[i:i + S2_SINGLETON_BATCH_SIZE]
         for i in range(0, len(viable), S2_SINGLETON_BATCH_SIZE)
     ]
+    checkpoint_every: int = 25  # D2453: incremental crash-safe checkpoint cadence
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(_process_batch, b): i for i, b in enumerate(batches)}
         completed = 0
         for future in concurrent.futures.as_completed(futures):
+            bi: int = futures[future]
             completed += 1
             try:
                 batch_out: list[dict] = future.result()
@@ -2636,13 +2766,11 @@ def process_singletons(
                 print(f"   Preserving {len(all_fbs)} singleton FBs")
                 for f in futures:
                     f.cancel()
-                STAGE2_SINGLETON_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-                safe_write(STAGE2_SINGLETON_OUTPUT,
-                           "\n".join(json.dumps(fb, ensure_ascii=False) for fb in all_fbs) + "\n",
-                           force_shrink=True)
+                _write_singleton_checkpoint(all_fbs, processed_ids)
                 raise
             except Exception as e:
-                # D2177 (C16): Log singleton extraction failures
+                # D2177 (C16): Log singleton extraction failures. Do NOT mark the
+                # batch processed — its singletons re-enter on resume.
                 print(f"  [{completed}/{len(batches)}] ⚠️  batch worker error: {type(e).__name__}: {e}")
                 continue
             for fb in batch_out:
@@ -2655,21 +2783,22 @@ def process_singletons(
                     continue
                 all_fbs.append(fb)
                 total_extracted += 1
-            if completed % 50 == 0:
+            # D2453: mark this batch's singletons processed + incremental checkpoint
+            processed_ids.update(item["cluster_id"] for item in batches[bi])
+            if completed % checkpoint_every == 0:
+                _write_singleton_checkpoint(all_fbs, processed_ids)
+                print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL — checkpointed")
+            elif completed % 50 == 0:
                 print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL")
 
-    # Write output
-    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
-    singleton_output = STAGE2_SINGLETON_OUTPUT
-    singleton_output.parent.mkdir(parents=True, exist_ok=True)
-    with open(singleton_output, "w") as f:
-        for fb in all_fbs:
-            f.write(json.dumps(fb) + "\n")
+    # Final checkpoint (D2453: crash-safe write — replaces the old single non-atomic
+    # end-of-run write). This is idempotent with the incremental checkpoints above.
+    _write_singleton_checkpoint(all_fbs, processed_ids)
 
     print("\n✅ Singleton extraction complete:")
     print(f"   Extracted FBs: {total_extracted}")
     print(f"   NULL routes:   {total_null}")
-    print(f"   Output:        {singleton_output}")
+    print(f"   Output:        {STAGE2_SINGLETON_OUTPUT}")
 
     # Content type distribution
     from collections import Counter
@@ -2694,6 +2823,8 @@ def main() -> None:
                         help="P2-1/BUG-152: on resume, drop old single-source FBs + re-extract them (use with --only-single-source)")
     parser.add_argument("--process-singletons", action="store_true",
                         help="Extract principles from singleton (unclustered) segments (D2149)")
+    parser.add_argument("--only-singletons", action="store_true",
+                        help="D2453: run ONLY the singleton pass (skip run_stage2 single-source/convergent)")
     parser.add_argument("--provider", choices=["omlx", "mlx"], default="omlx",
                         help="LLM provider (default: omlx)")
     parser.add_argument("--no-gate", action="store_true",
@@ -2703,6 +2834,18 @@ def main() -> None:
     parser.add_argument("--reprocess-gated", action="store_true",
                         help="D2421: Re-process clusters that were summary-gated (is_summary=true) on resume")
     args: argparse.Namespace = parser.parse_args()
+
+    if args.only_singletons:
+        # D2453: singleton-only mode — skip run_stage2 (single-source/convergent is
+        # already extracted + post-hoc filtered; re-running it here would waste time
+        # or risk touching the finalized 8,410-record checkpoint).
+        print("\\n🧩 ===== PROCESSING SINGLETONS ONLY (D2453) =====\\n")
+        singleton_fbs, sn_extracted, sn_null = process_singletons(
+            provider=args.provider,
+            gate_enabled=not args.no_gate,
+        )
+        print(f"\\n🧩 Singleton pass: {sn_extracted} FBs, {sn_null} NULLs")
+        return
 
     run_stage2(
         provider=args.provider,

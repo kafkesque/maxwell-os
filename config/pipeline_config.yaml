@@ -16,6 +16,7 @@ pipeline_manifest:
     s5_factual_check: v3.0
 stages:
   stage0_convert: knowledge pipeline/stage0_convert
+  stage0_5_extract_metadata: knowledge pipeline/stage0_5_extract_metadata
   stage1_chunk: knowledge pipeline/stage1_chunk
   stage1_3_prefilter: knowledge pipeline/stage1_3_prefilter
   stage1_5_embed: knowledge pipeline/stage1_5_embed_cluster
@@ -171,8 +172,8 @@ stage2:
   # negatives) is injected into the multi-type single-source prompt instead.
   golden_single_source_path: config/golden/stage2_fewshot_single_source.yaml
   golden_single_source_inject_enabled: true
-  golden_single_source_negative: 3
-  golden_single_source_max: 12   # 9 positives (1 principle + 1 PT + 5 TI + 1 PI + 1 GE) + 3 negatives (D2449 golden expansion)
+  golden_single_source_negative: 7
+  golden_single_source_max: 20   # 13 positives (3 principle + 2 PT + 6 TI + 1 PI + 1 GE) + 7 negatives (D2451 over-split + frontend TI + normative-principle)
   split_probe_enabled: true
   split_probe_min_size: 20
   split_probe_max_cohesion: 0.85
@@ -193,6 +194,7 @@ stage2:
   max_workers: 3
   singleton_batch_size: 4        # D2xxx: batch N singletons per LLM call (option-1 speedup, BUG-155 follow-up)
   singleton_batch_max_tokens_per_item: 1000  # per-singleton output budget inside a batch call (batch max_tokens = size x this)
+  singleton_prefilter_enabled: true  # D2452: gate singleton pass on singletons.prefiltered.jsonl EXTRACT verdicts (D2437 prefilter)
   route_values: ["FB", "NULL"]   # D2323/C12: S2 route gate — FB=forward to S4, NULL=skip cluster (quoted: YAML parses bare NULL as None)
   max_failed_ratio: 0.01   # D2381: allow ≤1% terminal failures (was 0.0) — persistent JSON-failure clusters no longer halt the stage; failed clusters retried on resume (D2331).
   gated_seed_marker: "summary gated"   # D2421: runner-log marker for a summary-gated cluster (scripts/seed_gated_ids.py)
@@ -227,6 +229,11 @@ stage4:
   depth_frugal_enabled: false
   depth_model: gemma-4-E4B-it-MLX-4bit   # fast, non-reasoning (no CoT burn)
   depth_fallback_depth: domain
+  # D2451: config-driven S4 classification golden few-shot (was hardcoded inline in
+  # CLASSIFY_SYSTEM_PROMPT). Spans all 4 depth levels; validated against content_types.yaml.
+  golden_path: config/golden/stage4_golden.yaml
+  golden_inject_enabled: true
+  golden_max_examples: 4
   # D2364/C12 (X7): signal sets extracted from hardcoded Python literals (cross-LLM audit).
   # context_signals: applied-domain → context routing hint (v1 Anytype "context" property).
   # temporal_signals: keyword heuristics for temporal_scope (timeless / contemporary).

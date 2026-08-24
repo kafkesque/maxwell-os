@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# stage4_golden.yaml
+# Purpose: S4 classification few-shot (depth / discipline / domains / evidence).
+#
+# WHY (D2451, 2026-08-24): S4 classification had its depth examples HARDCODED
+# inline in CLASSIFY_SYSTEM_PROMPT (C12 violation + untestable). The live smoke
+# showed depth cross-domain 21.6% and discipline `emerging` 15.5% — calibration
+# drift that only a config-driven golden set can tighten reproducibly.
+#
+# This file makes those examples config-first (C12), spans all 4 depth levels,
+# and is validated by tests/test_stage4_golden_contract.py against
+# config/content_types.yaml + the canonical taxonomy (pipeline/schemas.py).
+#
+# Scope: CLASSIFICATION only (depth/discipline/domains/evidence/is_specialized).
+# CRIBS (application/failure_mode/jargon) has its own inline prompt and is out
+# of scope for this golden — keep the two concerns separated.
+# ═══════════════════════════════════════════════════════════════════════════
+meta:
+  version: '1.0'
+  purpose: S4 classification golden few-shot (depth/discipline/domains/evidence)
+  decision: D2451
+  status: AUTHORED   # wiring into the 4 S4 classification prompts = D2452 (pending)
+  total_examples: 4
+  expected_coverage:
+  - depth_universal
+  - depth_cross_domain
+  - depth_domain
+  - depth_specialized
+
+examples:
+
+# ── universal: mechanism applies across ALL reality ────────────────────────
+- id: S4-GOLD-001
+  depth: universal
+  input_fb:
+    name: Power-Law Heavy-Tailed Distribution
+    definition: "Many natural and social quantities follow a power-law distribution, where a small number of large events dominate and a long tail of small events is disproportionately common."
+    mechanism: "Preferential attachment and multiplicative growth produce scale-free structure: each increment is proportional to current size, so large entities grow faster and the distribution becomes heavy-tailed across many orders of magnitude."
+    boundary: "Applies to systems with multiplicative growth or preferential attachment. Fails for quantities with a characteristic scale (normal distribution) or hard upper bounds."
+  expected_classification:
+    discipline: "complex adaptive systems"
+    domains: ["science & research", "business operations"]
+    depth: "universal"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "The heavy-tailed mechanism (proportional growth → scale-free) applies across wealth, earthquakes, word frequency, and city sizes — ALL reality, not one field. depth=universal. discipline is the structural science (complex adaptive systems), NOT a single application domain."
+
+# ── cross-domain: mechanism bridges two+ DISTINCT disciplines ──────────────
+- id: S4-GOLD-002
+  depth: cross-domain
+  input_fb:
+    name: Feedback Loop
+    definition: "A circular causal structure where a system's output is routed back as input, either amplifying (positive) or dampening (negative) the original signal."
+    mechanism: "The output of a process feeds back into its input, so positive feedback compounds deviations (runaway growth or collapse) while negative feedback stabilizes the system around a set point."
+    boundary: "Applies to systems with a detectable output→input path and a delay shorter than the response needed. Fails when feedback is absent or too slow to correct the deviation."
+  expected_classification:
+    discipline: "complex adaptive systems"
+    domains: ["ai systems", "organizational behavior", "engineering & infrastructure"]
+    depth: "cross-domain"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "The SAME causal structure (output routed back to input) bridges biology (homeostasis), engineering (control systems), and economics (supply/demand). It structurally connects distinct disciplines → depth=cross-domain, not domain."
+
+# ── domain: mechanism operates within ONE field ────────────────────────────
+- id: S4-GOLD-003
+  depth: domain
+  input_fb:
+    name: Color Gamut
+    definition: "The range of colors a device or color space can represent, bounded by the chromaticities of its primaries."
+    mechanism: "A gamut is the convex hull of the primary color coordinates in a color space; any color inside the hull can be reproduced by mixing the primaries, while colors outside cannot."
+    boundary: "Applies to a specific color space or output device. Fails when comparing across color spaces with different primaries or rendering intents."
+  expected_classification:
+    discipline: "color theory"
+    domains: ["graphic design", "digital product"]
+    depth: "domain"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "Gamut math is meaningful only within color science/design — strip the field's vocabulary and the mechanism becomes meaningless. It does NOT bridge distinct disciplines → depth=domain (NOT cross-domain, NOT universal)."
+
+# ── specialized: narrow sub-technique within a field ───────────────────────
+- id: S4-GOLD-004
+  depth: specialized
+  input_fb:
+    name: Backpropagation
+    definition: "An algorithm for computing the gradient of a loss function with respect to every weight in a neural network by applying the chain rule backward from the output layer."
+    mechanism: "The chain rule propagates the error gradient layer-by-layer from output to input, so each weight's contribution to the total loss is computed in a single backward pass and used to update the weight."
+    boundary: "Applies to differentiable neural-network architectures. Fails for non-differentiable components or when gradients vanish/explode over many layers."
+  expected_classification:
+    discipline: "machine learning"
+    domains: ["ai & agents"]
+    depth: "specialized"
+    evidence: "cited"
+    is_specialized: true
+  rationale: "A narrow sub-technique within machine learning — a specific algorithm, not a field-spanning principle. Strip ML jargon and it is meaningless. depth=specialized, is_specialized=true."

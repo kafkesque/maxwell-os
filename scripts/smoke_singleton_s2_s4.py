@@ -73,6 +73,11 @@ def patch_paths(run_id: str) -> dict[str, Path]:
     # Inline-imported inside functions → patch the module attribute.
     pp.STAGE1_5_SINGLETONS = singleton_in
     pp.STAGE2_SINGLETON_OUTPUT = singleton_out
+    # D2452: the smoke samples a handful of singletons for inspection, so the
+    # deterministic pre-LLM prefilter gate (which requires singletons.prefiltered.jsonl
+    # for the sampled run dir) is OFF here — this is a smoke, not the gated
+    # production singleton pass (just s2-singletons).
+    pp.S2_SINGLETON_PREFILTER_ENABLED = False
 
     # Module-level imported in stage4_merge → patch the consumer's attributes.
     import pipeline.stage4_merge as s4m

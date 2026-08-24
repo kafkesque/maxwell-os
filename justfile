@@ -18,7 +18,7 @@ preflight:
     @python3 pipeline/config_audit.py --check-unchecked --strict || { echo "  ❌ Config drift or unchecked hardcoded values — fix before continuing"; exit 1; }
     @python3 -c "from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES; print(f'✅ Taxonomy: {len(CANONICAL_DOMAINS)} domains, {len(CANONICAL_DISCIPLINES)} disciplines')"
     @python3 -c "from pipeline.omlx_call import check_omlx_health; ok = check_omlx_health(); print('✅ OMLX UP' if ok else '❌ OMLX DOWN')"
-    @python3 tools/sync_decisions.py
+    @python3 scripts/recompute_decision_summary.py --check || { echo "  ❌ Decision summary drift — run scripts/recompute_decision_summary.py"; exit 1; }
     @echo "  🔍 Dependency check..."
     @pip3 check 2>&1 || echo "    ⚠️  Dependency conflicts found (non-blocking — see above)"
     @echo "    📦 Outdated packages:"
@@ -150,6 +150,25 @@ s2-single-source-resume:
 # Tail the elaboration-backfill log (BUG-155 post-hoc fix, ~1760 records).
 s2-backfill-status:
     @tail -n 40 -f "knowledge pipeline/stage2_extract/t11/backfill_elaboration.log"
+
+# D2437/D2452: deterministic pre-LLM singleton gate (EXTRACT/SKIP verdicts, model-free).
+# Produces singletons.prefiltered.jsonl consumed by s2-singletons below. Re-run only
+# when singletons.jsonl or config/filtering.yaml changes.
+s2-singletons-prefilter:
+    python3 scripts/prefilter_clusters.py \
+        --clusters "knowledge pipeline/stage1_5_embed_cluster/t11/singletons.jsonl" \
+        --chunks "knowledge pipeline/stage1_chunk/t11/checkpoint.jsonl" \
+        --config config/filtering.yaml \
+        --out "knowledge pipeline/stage1_5_embed_cluster/t11/singletons.prefiltered.jsonl"
+
+# D2452/D2453: singleton extraction — gated by singletons.prefiltered.jsonl (EXTRACT only).
+# --only-singletons skips run_stage2 (single-source/convergent already extracted +
+# post-hoc filtered). Skips the 28,805 SKIP (noise/junk) singletons, extracts only the
+# ~6,317 EXTRACT. Crash-safe + resumable (D2453 checkpoint/resume). Stops before S4/S5/S6.
+s2-singletons:
+    @echo "=== S2 singleton extraction (t11, prefilter-gated, resumable) ==="
+    @mkdir -p "knowledge pipeline/stage2_extract/t11"
+    MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_extract.py --only-singletons 2>&1 | tee "knowledge pipeline/stage2_extract/t11/singleton_run.log"
 
 # D2177: stage3 removed (D2120) — redirects to runner
 stage4:

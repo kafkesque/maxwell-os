@@ -3,6 +3,68 @@
 
 ---
 
+### D2453 — S2 singleton crash-safety + resume + external-audit #5/#14 capture (2026-08-24)
+**Category:** BUGFIX / RELIABILITY
+
+**Finding:** `process_singletons` wrote FBs **only at the end** (plus a circuit-breaker bailout) and declared `processed_ids`/`singleton.segids` but never read or wrote them — a kill/logout/OOM mid-run would lose every in-memory FB. This matters because the singleton pass is ~6,317 singletons (multi-hour), run unattended.
+
+**Decision:**
+1. **Resume** — load prior FBs from `singleton_fbs.jsonl` + processed cluster_ids from `singleton.segids` at start; skip already-processed singletons in the viable filter.
+2. **Incremental checkpoint** — `_write_singleton_checkpoint` (crash-safe `safe_write` → tempfile/fsync/`os.replace`, C6) writes FBs + segids every 25 batches (and on circuit-open + at end).
+3. **Verified live** — 2-run smoke: run 2 logged "Resuming 4 FBs / 4 segids" → `viable 0/4`, 0 re-extraction, 0 loss.
+
+**External-audit findings captured to governance:**
+- **#5** — `check_stage_order()` does not actually verify the stage *sequence* (string-matches "8-stage" + stage3-absent; counts the `timeouts` key as a stage). Open, low-priority hardening.
+- **#14** — OMLX "health endpoint lies": `/health` `engine_pool.loaded_count` is authoritative, but `/v1/models` returns the full 7-model *catalog*, so `model_lazyload.py --status` reports 41.2GB "loaded" when ground-truth `omlx-server` RSS = 20.4GB / `loaded_count=2`. Confirmed empirically this session. Wired-memory leak itself is already covered by G10 (`omlx_wired_stress` PASS, flat −0.11%).
+
+**Files:** pipeline/stage2_extract.py, governance/buglog.md, governance/aggregated_remaining_tasks.md, justfile (preflight no longer calls deprecated `sync_decisions.py` — the bogus-"No heading" entry source)
+**Source:** Session 2026-08-24 — pre-run crash-safety + resume forensic pass.
+
+---
+
+### D2452 — S2 singleton-readiness hardening + fail-closed schema enforcement (2026-08-24)
+**Category:** BUGFIX / FAIL-CLOSED
+
+**Finding (pre-S4 singleton run):** the D2437 prefilter produced `singletons.prefiltered.jsonl` (6,317 EXTRACT / 28,805 SKIP) but was **not wired into `process_singletons`** — the S2 singleton pass read all 35,122 singletons and filtered only on `text >= 50`, so junk/noise singletons would still reach the LLM. Separately, a live singleton smoke exposed a **BUG-173 enforcement gap**: the builder carried `result.get("elaboration")` through unmodified, so a `process_template` was emitted with a 602-char `elaboration` and `steps=None` — the D2448/D2450 "elaboration PRINCIPLE-ONLY" fix was prompt-level only, with no schema-level backstop.
+
+**Decision:**
+1. **Wired the prefilter into S2** — `process_singletons` now consumes the EXTRACT verdicts (config `stage2.singleton_prefilter_enabled: true`). Fail-LOUD if the verdict file is absent (C16: no silent junk extraction).
+2. **`_blank_elaboration_for_non_principle`** — both builders now blank `elaboration` for PT/PI/GE/TI at the builder boundary, so the BUG-173 rule is enforced even when the model ignores the prompt.
+3. **Typed s2_body_field placeholders** — `_capture_type_specific_fields` now emits `[]`/`False`/`""` for omitted array/bool/string fields, so every PT/PI/TI/GE record is structurally complete (closes the D2450 "always emit" claim that the code did not actually enforce for `None`).
+4. **`load_golden_single_source` truncation fix** — the old `pos.pop()` removed the LAST element, dropping the rarest roles (growth_edge, process_instance) first; now round-robins so all 5 roles keep a share.
+5. **`pipeline_config.yaml` stages** gained the missing `stage0_5_extract_metadata` (external-audit finding #6).
+6. **`just s2-singletons` + `just s2-singletons-prefilter`** — first-class, documented singleton-run targets.
+
+**PI-vs-PT:** `process_instance` stays a **separate content_type** — own `output_file`, `route`, and `extension_fields` (`instance_text`/`actors`/`outcome_metric`/`outcome_qualitative`/`domain_context`). It is NOT a PT segment: PT expresses the repeatable method (`steps`/`trigger`/`prerequisite`/`done_condition`); PI expresses the executed proof, and its `parent_pt_id` links back to the PT it instantiates. Folding PI into PT would teach the model to emit `instance_text`/`actors` on a method object (schema-wrong).
+
+**Verified:** full suite 121/121 green; live singleton re-smoke now emits `elaboration: ""` + `steps: []` for non-principle. S4 golden wiring (the D2451 forward-reference formerly tagged "D2452") is renumbered **D2454** — still pending.
+
+**Files:** pipeline/stage2_extract.py, pipeline/pipeline_paths.py, config/pipeline_config.yaml, justfile, scripts/smoke_singleton_s2_s4.py
+**Source:** Session 2026-08-24 — S2 singleton readiness forensic pass.
+
+---
+
+### D2451 — Golden-set contrastive negatives + S4 classification golden (config-first) (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding:** D2450 fixed the PT-vs-TI *positive* coverage but left two gaps. (1) All 3 single-source negatives were generic rejections (fact/platitude/speculation) — zero *type-confusion* negatives, so the model had no teaching signal for "this looks like X but is actually Y". (2) Positives were lopsided — TI 5, but PT/PI/GE 1 each, and the only principle example was `causal_mechanism`, so the model over-assigned causal to normative/descriptive patterns (the live-smoke **4/4 causal over-claim**).
+
+**Decision (three S2 additions + S4 config-first golden):**
+1. **SS-POS-010** — a `descriptive_model` principle (bias-vs-noise taxonomy). Teaches the role `principle` is NOT always `causal_mechanism` (D2323: one role accepts multiple forms).
+2. **SS-POS-011** — a HUMAN debugging method that mentions tests/bisection. `process_template`, NOT `tool_instruction` — the reverse direction of the D2450 PT-vs-TI boundary.
+3. **SS-NEG-004** — a bare one-off event → NULL, NOT a fabricated PT/PI (over-split guard for singleton thin passages).
+4. `golden_single_source_max` 12→15, `golden_single_source_negative` 3→4; fixed `format_golden_fewshot_single_source` to show ALL negatives (was hardcoded `[:3]`, silently dropping any 4th+ contrastive negative).
+5. **S4:** authored `config/golden/stage4_golden.yaml` — the first config-driven S4 classification golden (depth/discipline/domains/evidence/is_specialized), spanning all 4 depth levels. It replaces the HARDCODED inline depth examples in `CLASSIFY_SYSTEM_PROMPT` (a C12 violation).
+
+**Guard:** `tests/test_stage4_golden_contract.py` validates every S4 golden label against `content_types.yaml` + the canonical taxonomy (`pipeline/schemas.py`). 121/121 tests green.
+
+**Deferred to D2454:** the S4 golden is AUTHORED + test-validated but NOT yet wired into the 4 classification prompts (`CLASSIFY_SYSTEM_PROMPT` / `MERGED_CRIBS_CLASSIFY_SYSTEM` / `BATCH_CRIBS_CLASSIFY_SYSTEM` / depth-focused). Wiring touches the S4 hot path on the BUG-165 critical path, so it needs a separate decision + live smoke.
+
+**Files:** config/golden/stage2_fewshot_single_source.yaml, config/golden/stage4_golden.yaml, config/pipeline_config.yaml, pipeline/stage2_extract.py, tests/test_stage4_golden_contract.py
+**Source:** Session 2026-08-24 — golden-set examination + S4 golden authoring.
+
+---
+
 ### D2450 — Golden-set PT-vs-TI contrastive expansion + content-type schema conformance audit (2026-08-24)
 **Category:** QLT / AUDIT
 

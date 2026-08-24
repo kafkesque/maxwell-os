@@ -21,7 +21,7 @@
 - ⏳ non-principle cross-ref producer (`consulted_fbs`, `fb_query_*`, `parent_pt_id`, `parent_fb_ids`, `promoted_to_*`) — `stage4_5_enrich.py` is FB-only today
 - ⏳ non-principle S5 verification (NLI is principles-only today)
 - ⏳ BUG-170 enrichment (classification + keywords + fb_version + runtime) — only after the three above exist
-- ⏸ **Singleton-extraction quality gates (from live smoke 2026-08-24):** completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) is MANDATORY — live sample produced a thin PT (no steps/trigger/done) and a 4/4 `tool_instruction`→`process_template` mislabel (SQLAlchemy/MongoEngine/Superlinked) + 4/4 `causal_mechanism` over-claim. Confirms task #12 (PT-vs-TI contrastive hard negatives) is load-bearing.
+- ⏸ **Singleton-extraction quality gates (from live smoke 2026-08-24):** completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) is MANDATORY — live sample produced a thin PT (no steps/trigger/done) and a 4/4 `tool_instruction`→`process_template` mislabel (SQLAlchemy/MongoEngine/Superlinked) + 4/4 `causal_mechanism` over-claim. **Task #12 PT-vs-TI contrastive golden DONE (D2450)** — 3 framework-API TI positives added; live re-verification pending next smoke. `causal_mechanism` over-claim remains a separate calibration item.
 
 **WORTH (post-rerun, non-blocking):**
 - ⏳ BUG-169 — TI `parameters` missing (verify full 143-TI corpus)
@@ -65,7 +65,7 @@
 9. ✅ **Golden single-source meta header** — FIXED: `9 ex / 6 pos / 3 hard-neg` (was 8/5/3).
 10. 🟡 **BUG-149 residual** — dead `max_words=5` default in `normalize_fb_name`.
 11. ⏸ **Singletons (35,122)** — prefilter flags 18% (6,317) EXTRACT; extract only if single-source recall is a product requirement.
-12. ⏸ **DSPy/golden expansion** — wire MIPROv2; add content_type hard negatives (PT-vs-TI contrastive pairs).
+12. 🔶 **DSPy/golden expansion** — wire MIPROv2 (pending); PT-vs-TI contrastive golden ✅ DONE (D2450: SS-POS-007/008/009).
 13. ⏸ **R2 FORM refactor · P2.x batch S5 · GAP-1 DSPy wiring · BUG-145/159/160 (P2).**
 14. 🟠 **D2440 — S5 verifier calibration (AlignScore + MiniCheck vs DeBERTa)** — run through existing `pipeline/calibrate.py` + `nli_calibrate.py` harness. Gate: adopt only if F1 > 0.484 AND fail-closed (D2093) preserved. P2, post-BUG-165.
 15. 🟠 **BUG-168 — `pipeline/dspy_trainer.py` exists-but-unwired** — wire into `stage2_extract.py` as few-shot source, or archive to stop audit false-positives. P2, post-BUG-165.

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-22T12:05:00Z'
-total_decisions: 437
+total_decisions: 438
 decisions:
 - id: D2092
   category: INF
@@ -4105,11 +4105,39 @@ decisions:
   - config/filtering.yaml
   - tests/test_stage2_singleton_parity_d2449.py
   created: '2026-08-24'
+- id: D2450
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Golden-set PT-vs-TI contrastive expansion (task #12) + content-type
+    schema conformance audit. Live singleton smoke (D2448) mislabeled framework/library
+    patterns as process_template 4/4 (SQLAlchemy ORM, MongoEngine ODM, Superlinked, repo
+    crawler). FIX: added 3 tool_instruction positives (SS-POS-007/008/009) to
+    stage2_fewshot_single_source.yaml capturing exactly those framework-API patterns with
+    explicit "NOT process_template" rationale; also fixed the principle example (SS-POS-001)
+    to carry non-empty elaboration (D2448 requires it — the golden predates that rule).
+    golden_single_source_max 9→12 so all 9 positives (1 principle + 1 PT + 5 TI + 1 PI +
+    1 GE) + 3 negatives reach the model. CONSISTENCY FIX: _capture_type_specific_fields
+    now ALWAYS emits string s2_body_fields (empty "" when the passage lacks them) — it
+    previously omitted empty strings, so a PT''s `prerequisite` was sometimes absent vs
+    the golden which shows it present-as-empty (schema drift). GUARD: new
+    scripts/audit_content_type_contract.py (S2 + S4 contract check driven entirely by
+    content_types.yaml) + tests/test_content_type_contract.py (asserts golden set AND
+    singleton builder conform for all 5 content types). RESULT: golden set conforms;
+    non-principle sidecars have ZERO structural gaps — only the known BUG-170 deferred
+    enrichment (domains/discipline/depth/evidence/fb_version) remains, sequenced B→A.'
+  champion: goose
+  target_files:
+  - config/golden/stage2_fewshot_single_source.yaml
+  - config/pipeline_config.yaml
+  - pipeline/stage2_extract.py
+  - scripts/audit_content_type_contract.py
+  - tests/test_content_type_contract.py
+  created: '2026-08-24'
 summary:
-  total: 437
+  total: 438
   proposed: 0
   draft: 1
-  active: 379
+  active: 380
   stale: 0
   superseded: 15
   archived: 8
@@ -4166,7 +4194,7 @@ summary:
     PERF / BUGFIX: 1
     QA: 4
     QLT: 39
-    QLT / AUDIT: 17
+    QLT / AUDIT: 18
     QLT / DATA: 1
     QLT / PROMPT: 4
     QUALITY / DATA: 3

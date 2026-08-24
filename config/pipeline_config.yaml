@@ -172,7 +172,7 @@ stage2:
   golden_single_source_path: config/golden/stage2_fewshot_single_source.yaml
   golden_single_source_inject_enabled: true
   golden_single_source_negative: 3
-  golden_single_source_max: 9    # 6 positives (incl. 2× TI contrastive) + up to 3 negatives
+  golden_single_source_max: 12   # 9 positives (1 principle + 1 PT + 5 TI + 1 PI + 1 GE) + 3 negatives (D2449 golden expansion)
   split_probe_enabled: true
   split_probe_min_size: 20
   split_probe_max_cohesion: 0.85

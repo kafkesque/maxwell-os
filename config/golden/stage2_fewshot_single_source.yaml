@@ -25,13 +25,14 @@ meta:
   purpose: single-source balanced few-shot (all 5 content_type roles)
   d2345_fork: false
   status: WIRED
-  total_examples: 9
-  single_source_positives: 6
+  total_examples: 12
+  single_source_positives: 9
   hard_negatives: 3
   expected_coverage:
   - role_balance_all_5_content_types
   - process_template_positive
   - tool_instruction_positive
+  - framework_library_tool_instruction_positive
   - tool_vs_template_disambiguation
   - process_instance_positive
   - growth_edge_positive
@@ -59,7 +60,7 @@ examples:
     mechanism: "Each 1% improvement raises the baseline from which the next improvement starts, so gains multiply geometrically instead of adding arithmetically."
     boundary: "Applies when improvements are retained and stacked. Fails when gains are one-off and do not raise the subsequent baseline."
     consequence: "Consistent marginal improvement yields outsized long-term results that linear effort estimates under-predict."
-    elaboration: ""
+    elaboration: "The 37x figure assumes each day's 1% gain is retained and stacked, so the baseline keeps rising rather than resetting. Because the effect is multiplicative, the curve is nearly flat at first and only diverges dramatically from linear growth after sustained repetition, which is why early results feel underwhelming. The compounding rate collapses toward linear if gains decay or are lost between sessions. The same logic generalizes to any system where one cycle's output becomes the next cycle's input."
     extraction_type: causal_mechanism
     content_type: principle
     evidence_passages:
@@ -241,6 +242,134 @@ examples:
     evidence_passages:
     - "What if it were possible for autism—for mind-blindness—to be a temporary condition instead of a chronic one?"
   rationale: "A speculative/unresolved 'what if' open question. content_type=growth_edge (NOT principle — it is not established reusable knowledge)."
+  tier: CORE
+
+# ── POSITIVE: tool_instruction (framework/library usage — BUG-166 trap) ────
+# Live singleton smoke (D2448) mislabeled framework/library patterns as
+# process_template 4/4 (SQLAlchemy ORM, MongoEngine ODM, Superlinked, repo
+# crawler). These are software APIs/features, NOT repeatable human how-tos.
+# Adding explicit positives sharpens the PT-vs-TI boundary (BUG-166, task #12).
+- id: SS-POS-007
+  domain: computer-science
+  source_books:
+  - LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+  cluster_segments:
+  - source_book: LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+    text: "Using SQLAlchemy, define a User ORM class with a declarative base, set the table name with __tablename__, and declare columns as class attributes. Then create the engine and metadata, call metadata.create_all() to create the table, and use session.add() and session.commit() to persist a record."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: SQLAlchemy ORM Mapping
+    definition: "Map a Python class to a database table via SQLAlchemy's declarative base (declaring columns as class attributes), then create the table and persist records with session.add() and session.commit()."
+    mechanism: "The declarative base maps class attributes to table columns and __tablename__ to the table name, so the ORM translates object operations into the underlying SQL INSERT/SELECT statements."
+    boundary: "Applies to Python applications using SQLAlchemy against a relational database. Fails when the database connection is not established or the class does not map to a valid table."
+    consequence: "Developers create, read, update, and delete records through Python objects instead of writing raw SQL queries."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: tool_instruction
+    tool_name: "SQLAlchemy"
+    platform: "Python (ORM library)"
+    description: "Map a Python class to a database table and run CRUD operations through the ORM instead of raw SQL"
+    syntax: "class User(Base): __tablename__ = 'users'; ...; session.add(user); session.commit()"
+    parameters:
+    - name: declarative_base
+      type: class
+      description: "Base class that maps subclasses to database tables"
+    - name: __tablename__
+      type: str
+      description: "Database table name the class maps to"
+    - name: session
+      type: Session
+      description: "ORM session used for add/commit/query operations"
+    output: "The mapped table and persisted records in the database"
+    example: "class User(Base): __tablename__ = 'users'; id = Column(Integer, primary_key=True)"
+    caveats: "Fails when the database connection is not established or class attributes do not map to valid columns"
+    evidence_passages:
+    - "Using SQLAlchemy, define a User ORM class with a declarative base, set the table name with __tablename__, and declare columns as class attributes."
+  rationale: "A software library/API usage pattern (ORM mapping + CRUD calls). content_type=tool_instruction, NOT process_template — it is a framework's API, not a repeatable human how-to (BUG-166 PT-vs-TI contrastive)."
+  tier: CORE
+
+- id: SS-POS-008
+  domain: computer-science
+  source_books:
+  - LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+  cluster_segments:
+  - source_book: LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+    text: "The ODM implementation uses a base class with a nested Settings class to configure the collection name. A classmethod get_collection_name() raises ImproperlyConfigured if the subclass does not define Settings.name, and returns Settings.name otherwise, so each subclass configures its own MongoDB collection."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: MongoEngine ODM Collection Config
+    definition: "Configure a MongoDB collection per document class by defining a nested Settings class with a name attribute on a MongoEngine Document subclass, validated by a get_collection_name() classmethod."
+    mechanism: "The classmethod checks for the presence of Settings.name and raises ImproperlyConfigured when absent, returning the configured collection name otherwise so each subclass maps to its own collection."
+    boundary: "Applies to Python applications using MongoEngine for MongoDB document mapping. Fails when a subclass does not define the nested Settings class with a name."
+    consequence: "Developers create specific document classes that inherit from a base ODM class, each with its own collection configuration."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: tool_instruction
+    tool_name: "MongoEngine"
+    platform: "Python (ODM library)"
+    description: "Configure a MongoDB collection name per document class via a nested Settings class and a validating classmethod"
+    syntax: "class Document(Base): class Settings: name = 'collection'; @classmethod get_collection_name(cls) -> str"
+    parameters:
+    - name: Settings
+      type: class
+      description: "Nested configuration class holding the collection name"
+    - name: name
+      type: str
+      description: "MongoDB collection name for the document subclass"
+    output: "The configured collection name, or ImproperlyConfigured if Settings.name is missing"
+    example: "class User(Document): class Settings: name = 'users'"
+    caveats: "Raises ImproperlyConfigured if the subclass does not define Settings.name"
+    evidence_passages:
+    - "The ODM implementation uses a base class with a nested Settings class to configure the collection name."
+  rationale: "A software ODM/library configuration pattern. content_type=tool_instruction, NOT process_template — it is a framework API contract, not a repeatable human how-to (BUG-166 PT-vs-TI contrastive)."
+  tier: CORE
+
+- id: SS-POS-009
+  domain: computer-science
+  source_books:
+  - LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+  cluster_segments:
+  - source_book: LLM Engineer's Handbook — Paul Iusztin, Maxime Labonne
+    text: "Frameworks such as Superlinked make multi-indexing easy. Define schema objects with specific fields, create a text similarity space for content search and a categorical similarity space for platform filtering, then combine them into a single index structure for semantic-plus-categorical search."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: Superlinked Multi-Indexing
+    definition: "Build a multi-dimensional vector index by defining schema objects with fields, creating text and categorical similarity spaces, and combining them into a single index for semantic-plus-categorical search."
+    mechanism: "Each similarity space encodes one dimension (text content or categorical platform), and combining the spaces into one index lets a single query match on semantic similarity and categorical filters simultaneously."
+    boundary: "Applies to vector database applications needing multi-dimensional search. Fails when the framework is not configured or the vector database connection is unavailable."
+    consequence: "A single search operation combines semantic content matching with categorical filtering instead of issuing separate queries."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: tool_instruction
+    tool_name: "Superlinked"
+    platform: "Python (vector-search framework)"
+    description: "Create a multi-dimensional index combining text similarity and categorical similarity spaces for semantic-plus-categorical search"
+    syntax: "from superlinked... import Schema; schema = Schema(...); text_space = TextSimilaritySpace(...); cat_space = CategoricalSimilaritySpace(...); index = Index([text_space, cat_space])"
+    parameters:
+    - name: schema
+      type: Schema
+      description: "Schema object defining the indexed fields"
+    - name: text_space
+      type: TextSimilaritySpace
+      description: "Similarity space for semantic content search"
+    - name: cat_space
+      type: CategoricalSimilaritySpace
+      description: "Similarity space for categorical filtering"
+    output: "A single index supporting combined semantic and categorical queries"
+    example: "index = Index([text_space, cat_space]) then deploy as a REST API"
+    caveats: "Fails when the framework is not configured or the vector database connection is unavailable"
+    evidence_passages:
+    - "Frameworks such as Superlinked make multi-indexing easy. Define schema objects with specific fields, create a text similarity space and a categorical similarity space, then combine them into a single index."
+  rationale: "A vector-search framework API pattern. content_type=tool_instruction, NOT process_template — it is a framework API, not a repeatable human how-to (BUG-166 PT-vs-TI contrastive)."
   tier: CORE
 
 # ── NEGATIVE: pure factual description → NULL (over-fire guard) ────────────

@@ -621,9 +621,13 @@ _S2_BODY_SCHEMA: str = _build_body_schema_text()
 def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
     """P2-1: capture type-specific body fields from a single-source result.
 
-    Returns a dict of non-empty type-specific fields (sourced from `S2_BODY_FIELDS`),
-    preserving JSON arrays (steps/actors/parameters) as lists. Empty/absent fields
-    are omitted so the FB record stays lean and the shared core_body is not duplicated.
+    D2449: string fields are ALWAYS emitted (empty when the passage does not
+    provide them) so the per-type schema is CONSISTENT — a process_template always
+    carries `prerequisite` (possibly ""), a tool_instruction always carries
+    `caveats` (possibly ""), etc. (matches the golden set + the D2448 prompt note
+    "other fields may be left empty only when the passage does not provide them").
+    JSON arrays (steps/actors/parameters) are preserved as lists; an empty array is
+    a meaningful "no segments" signal and is therefore emitted verbatim too.
     """
     out: dict = {}
     for field in S2_BODY_FIELDS.get(content_type, []):
@@ -631,12 +635,9 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
         if val is None:
             continue
         if isinstance(val, str):
-            val = val.strip()
-            if val:
-                out[field] = val
+            out[field] = val.strip()
         elif isinstance(val, list):
-            if val:
-                out[field] = val
+            out[field] = val
         elif isinstance(val, (dict, int, float, bool)):
             out[field] = val
     return out

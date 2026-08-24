@@ -3,6 +3,26 @@
 
 ---
 
+### D2450 — Golden-set PT-vs-TI contrastive expansion + content-type schema conformance audit (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding:** live singleton smoke (D2448) mislabeled framework/library patterns as `process_template` **4/4** (SQLAlchemy ORM, MongoEngine ODM, Superlinked, repo crawler). The golden set's TI positives covered a bare function call (FAISS) and an algorithm (DFS) but NOT the framework-API pattern, so the model couldn't distinguish "software API usage" from "human how-to".
+
+**Decision (task #12):**
+1. **Added 3 `tool_instruction` positives** (SS-POS-007/008/009) capturing SQLAlchemy/MongoEngine/Superlinked framework-API patterns, each with an explicit "NOT process_template — it is a framework API, not a repeatable human how-to" rationale.
+2. **Fixed the principle example** (SS-POS-001) to carry non-empty `elaboration` — it predated the D2448 rule that elaboration is REQUIRED for principle.
+3. **`golden_single_source_max` 9→12** so all 9 positives (1 principle + 1 PT + 5 TI + 1 PI + 1 GE) + 3 negatives reach the model.
+4. **Consistency fix in `_capture_type_specific_fields`:** string `s2_body_fields` are now ALWAYS emitted (empty `""` when the passage lacks them). Previously empty strings were omitted, so a PT's `prerequisite` was sometimes *absent* while the golden showed it *present-as-empty* — a schema drift.
+
+**Guard (new):** `scripts/audit_content_type_contract.py` checks the S2 contract (shared core_body + PRINCIPLE-ONLY elaboration + per-type `s2_body_fields` + valid classification labels) and the S4 contract (R14 stamps + provenance + classification/versioning/runtime), driven entirely by `content_types.yaml`. `tests/test_content_type_contract.py` asserts the golden set AND the singleton builder conform for all 5 content types.
+
+**Result:** golden set conforms; non-principle sidecars have **zero structural gaps** — the only remaining items are the known BUG-170 deferred enrichment (domains/discipline/depth/evidence/fb_version), already sequenced B→A in D2448.
+
+**Files:** config/golden/stage2_fewshot_single_source.yaml, config/pipeline_config.yaml, pipeline/stage2_extract.py, scripts/audit_content_type_contract.py, tests/test_content_type_contract.py
+**Source:** Session 2026-08-24 — golden-set + conformance follow-up.
+
+---
+
 ### D2449 — Singleton-builder schema drift unification + source-filename noise sanitization (2026-08-24)
 **Category:** QLT / AUDIT
 

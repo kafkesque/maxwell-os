@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """A/B test: Original EPUB/PDF → stage0_convert.py vs pre-converted MD quality."""
 
-import json, re, subprocess, sys, tempfile, shutil
+import json, re, subprocess, sys, tempfile, shutil, os
 from pathlib import Path
 from collections import Counter
 
-ORIGINALS_BASE = Path("/Users/barn/Library/CloudStorage/Dropbox/education/books")
-PIPELINE_BASE = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books")
-STAGE0_SCRIPT = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/pipeline/stage0_convert.py")
+# D2439: derive repo paths from repo root (C12 — no hardcoded user paths).
+# External source corpus lives OUTSIDE the repo; override via env var.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+ORIGINALS_BASE = Path(os.environ.get("MAXWELL_ORIGINALS_BASE", "")) or (REPO_ROOT.parent / "education" / "books")
+PIPELINE_BASE = REPO_ROOT / "knowledge pipeline" / "books"
+STAGE0_SCRIPT = REPO_ROOT / "pipeline" / "stage0_convert.py"
 
 # ── 5 test candidates (diverse domains + formats) ──
 TEST_BOOKS = [

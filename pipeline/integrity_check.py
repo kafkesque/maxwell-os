@@ -337,6 +337,7 @@ def check_schema_sqlite_match() -> tuple[bool, str]:
         "fb_id", "name", "definition", "status", "schema_version",
         "content_type", "extraction_type", "mechanism", "boundary",
         "consequence", "taxonomy_match_method", "source_ids",
+        "citation", "source_authors", "source_diversity", "primary_source",
     }
     missing_in_sqlite = key_fields - sqlite_cols
     missing_in_pydantic = key_fields - all_model_fields
@@ -434,20 +435,47 @@ def check_deprecated_config() -> tuple[bool, str]:
 # CHECK 14: No hardcoded paths (C12 compliance)
 # ═══════════════════════════════════════════════════════════════════════════
 def check_hardcoded_paths() -> tuple[bool, str]:
-    """Scan pipeline/ for hardcoded user paths (C12)."""
-    issues = []
-    user_paths = re.compile(r'["\'](/Users/\w+|/home/\w+|C:\\Users\\)[^"\']*["\']')
+    """Scan the whole repo (pipeline/, tools/, scripts/, tests/, root *.sh) for hardcoded user paths (C12).
 
-    py_files = list(PIPELINE_DIR.glob("*.py"))
-    for pyf in sorted(py_files):
-        with open(pyf) as f:
-            for i, line in enumerate(f, 1):
-                if user_paths.search(line) and "REMOVED" not in line and "archive" not in line:
-                    issues.append(f"  {pyf.name}:{i}: hardcoded path")
+    D2439: previously only globbed PIPELINE_DIR.glob("*.py") — flat, non-recursive,
+    .py-only. It could not see tools/, tests/, scripts/, pipeline/providers/,
+    pipeline/storage/, or any .sh — 9 hardcoded /Users/barn paths were invisible.
+    """
+    issues = []
+    # `/Users/...`, `/home/...`, `C:\Users\...` — match the leading path portion only
+    user_paths = re.compile(r'["\'](/Users/[^\s"\']+|/home/[^\s"\']+|C:\\Users\\[^\s"\']+)')
+
+    scan_roots = [
+        PIPELINE_DIR,
+        REPO_ROOT / "tools",
+        REPO_ROOT / "scripts",
+        REPO_ROOT / "tests",
+        REPO_ROOT / "pipeline" / "providers",
+        REPO_ROOT / "pipeline" / "storage",
+    ]
+    targets: list[Path] = []
+    for root in scan_roots:
+        if not root.exists():
+            continue
+        if root.name in ("tools", "scripts", "tests"):
+            targets.extend(sorted(root.rglob("*.py")) + sorted(root.rglob("*.sh")))
+        else:
+            targets.extend(sorted(root.rglob("*.py")))
+    # root-level shell scripts
+    targets.extend(sorted(REPO_ROOT.glob("*.sh")))
+
+    for pf in sorted(set(targets)):
+        try:
+            with open(pf, encoding="utf-8") as f:
+                for i, line in enumerate(f, 1):
+                    if user_paths.search(line) and "REMOVED" not in line:
+                        issues.append(f"  {pf.relative_to(REPO_ROOT)}:{i}: hardcoded path")
+        except (OSError, UnicodeDecodeError):
+            continue
 
     if issues:
-        return False, "Hardcoded paths found (C12 violation):\n" + "\n".join(issues[:10])
-    return True, f"No hardcoded paths in {len(py_files)} pipeline files (C12 compliant)"
+        return False, "Hardcoded paths found (C12 violation):\n" + "\n".join(issues[:15])
+    return True, f"No hardcoded paths in {len(set(targets))} scanned files (C12 compliant)"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

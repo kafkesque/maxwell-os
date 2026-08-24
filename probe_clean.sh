@@ -9,7 +9,7 @@
 #   4. lazy model loading (unload after each stage)
 set -euo pipefail
 
-cd "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0"
+cd "$(dirname "$0")"
 OUT="probe_output"
 S15="knowledge pipeline/stage1_5_embed_cluster/latest/checkpoint.jsonl"
 S15_BAK="${S15}.bak"

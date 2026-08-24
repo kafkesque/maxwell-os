@@ -3,6 +3,82 @@
 
 ---
 
+### D2444 — Difficulty-map "inversion" verified NOT-a-bug (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (forensic-audit F3):** `cross-domain → intermediate` was flagged as "semantically suspect / possibly inverted."
+
+**Decision:** **Not a bug — no change.** The apparent inversion only holds if `difficulty_level` is read as "discipline-span complexity." D2410 defines the axis as **specialization depth**: breadth = transferable = `intermediate` (cross-domain / domain_multi), depth = `expert` (domain_single / specialized), universal = `beginner`. `tests/test_stage4_metadata_derivation_d2410.py::test_difficulty_map_is_config_first_and_complete` asserts this exact mapping, so changing it would be a spec change, not a bugfix. **Residual (low-priority):** `test.full_run.difficulty_map` still has the stale pre-D2410 `domain: intermediate` (no cardinality split) vs live `stage4.difficulty_map` (`domain_single`/`domain_multi`) — test-harness-only C12 drift, not a production path.
+
+**Files:** (none changed)
+**Source:** Session 2026-08-24 — forensic audit follow-up (F3).
+
+---
+
+### D2443 — S2 provenance carry-through: citation/source_authors/source_diversity/primary_source (2026-08-24)
+**Category:** BUGFIX / PROVENANCE
+
+**Finding (forensic-audit F1, verified by trace):** `citation`, `source_authors`, `source_diversity`, `primary_source` are emitted by S2 on **all 5,002 deduped records** but dropped at S4 — the S4 FB-record dict (`stage4_merge.py`) only carried `source_books`/`source_ids`/`source_segments`/`evidence_passages`, never these four. Silent data loss: bibliographic + epistemic-diversity provenance was forfeited at S4→S6, so agents could not cite or rank sources by distinct-source count without re-reading books.
+
+**Decision:** Add the 4 fields end-to-end: `FB` schema (schemas.py) → S4 FB record (stage4_merge.py) → SQLite (stage6_commit.py CREATE TABLE + INSERT + `_migrate_add_column` auto-heal) + Parquet `jsonlike_fields`. S5 pass-through confirmed (`vfb = dict(fb)`). Extended `integrity_check.py` `key_fields` to guard against recurrence; updated `content_types.yaml` `metadata.provenance`. Verified: 66 columns == 66 placeholders; `FB` pydantic constructs; `init_db`+`insert_fb` round-trip writes correct values.
+
+**Files:** pipeline/schemas.py, pipeline/stage4_merge.py, pipeline/stage6_commit.py, pipeline/integrity_check.py, config/content_types.yaml
+**Source:** Session 2026-08-24 — forensic audit follow-up (F1).
+
+---
+
+### D2442 — Evidence-tier preservation + run-manifest freeze + S4 field audit (2026-08-24)
+**Category:** QLT
+
+**Finding (verified by trace, not assumed):** `is_convergent`/`origin` were derived in the S4 cluster wrapper (`stage4_merge.py` L526-549) but **never carried into the FB record, the `FB` schema, or SQLite**. The stale S4 checkpoint confirmed it (`is_convergent=None` on all 2,830 records). This is a silent data-loss path: the keep-list strategy's convergent-vs-single-source distinction was forfeited at S4→S6 — retrieval could not tell "2+ books independently agree" from "1 book asserts."
+
+**Decision:** (1) Add `is_convergent: bool` + `origin: str` to `FB` (schemas.py); carry them into the S4 FB record; persist via 2 SQLite columns (CREATE TABLE + INSERT + `_migrate_add_column` auto-heal). Live-verified: INSERT writes `is_convergent=1/origin=convergent`; S5 pass-through confirmed (`vfb = dict(fb)`). (2) `scripts/freeze_run_manifest.py` — SHA-256 run manifest (config+golden+requirements+git HEAD) so the BUG-165 rerun is reproducible. (3) `scripts/audit_s4_fields.py` — per-content-type field-completeness audit against D2323. 110/110 tests green.
+
+**Files:** pipeline/schemas.py, pipeline/stage4_merge.py, pipeline/stage6_commit.py, scripts/freeze_run_manifest.py, scripts/audit_s4_fields.py
+**Source:** Session 2026-08-24 — external-audit A.
+
+---
+
+### D2441 — Public-repo leak redaction + C12 hardcoded-path scanner fix (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (verified):** (1) `config/pipeline_config.yaml` `test.full_run.books` was a **tracked** 929-title filename manifest containing **1147 shadow-library provenance hits** (`z-library.sk`, `1lib.sk`, `libgen`, `Anna's Archive`) — a live public-repo exposure, not pipeline hygiene. (2) `check_hardcoded_paths()` only globbed flat `pipeline/*.py` — blind to `tools/`, `tests/`, `scripts/`, `providers/`, `.sh` (9 hardcoded `/Users/barn` paths invisible).
+
+**Decision:** (1) Redact the manifest to `[]`; `tests/full_run.py` + `full_run_streaming.py` derive books via `sorted(books_dir.rglob("*.md"))` (config 1953→524 lines). (2) Make `check_hardcoded_paths()` recursive over the whole repo (162 files). (3) Fix the 9 hardcoded paths: `probe_clean.sh` + 3 `tools/canary_rerun*.sh` → `cd "$(dirname "$0")"[/..]`; 3 `tests/*.py` → repo-root-derived. Check [14] now passes across 162 files.
+
+**Files:** config/pipeline_config.yaml, pipeline/integrity_check.py, probe_clean.sh, tools/canary_rerun*.sh, tests/full_run*.py, tests/{compare_md_quality,fix_golden_set,update_golden_taxonomy}.py
+**Source:** Session 2026-08-24 — external-audit B.
+
+---
+
+### D2440 — S5 verifier calibration experiment: AlignScore + MiniCheck vs DeBERTa (2026-08-24)
+**Category:** QLT
+
+**Finding (claim-by-claim verified, not assumed):** the 6-LLM external SOTA audit (claude/qwen/chatgpt × rounds 0021/0023/0024) converged on one high-leverage, already-tooled action: the S5 gate is DeBERTa-only with a 0.10 threshold, and its own honest calibration (D2322) is P=0.647/R=0.386/F1=0.484 — a **model-choice ceiling**, not a threshold problem. Both DeBERTa (435M, generic NLI/FEVER) and the suggested AlignScore (355M, factual-consistency) / MiniCheck (fact-checking LLM output against grounding docs) are smaller/equal, local, and runnable through the **existing** `pipeline/calibrate.py` + `pipeline/nli_calibrate.py` harness.
+
+**Decision:** run AlignScore + MiniCheck through the existing calibration harness against DeBERTa before touching any S5 threshold. Adopt only if F1 materially exceeds 0.484 **and** fail-closed semantics (D2093) are preserved. This is a measured comparison, not a guess — the harness already exists.
+
+**Files:** pipeline/calibrate.py, pipeline/nli_calibrate.py, config/pipeline_config.yaml
+**Source:** Session 2026-08-24 — 6-LLM SOTA audit verification.
+
+---
+
+### D2439 — External SOTA audit verdict: accept Leiden/defer, reject SetFit/CRAG/ColPali (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (each claim verified against live code):** 6 external LLM audits proposed 2024–2026 SOTA method swaps. Verification separated them into accept/defer vs reject:
+
+- **ACCEPT (deferred):** Leiden swap — valid, but already documented in `stage1_5_embed_cluster.py` (D2168 comment: "Leiden would be preferred but requires igraph/leidenalg C-dep"). Not new.
+- **ACCEPT (P2):** contextual retrieval / late chunking (300-word section chunks sever book context); cross-encoder reranker after existing RRF (RRF exists in `retrieve.py` `search_hybrid`, D2176 — the reranker does not); DuckDB analytics (Parquet export covers most).
+- **REJECT:** SetFit for S4 (category error — a few-shot closed-set classifier cannot do open-set `emerging` + depth reasoning that gpt-oss-20b does; "39h→5min" ignores that the cost IS the reasoning); CRAG for S5 (contradicts D2298 — re-introduces the LLM-based verification removed for hallucination risk); ColPali/ColBERTv2 (VLM/late-interaction bloat vs the local-first sqlite-vec path, C28); "DSPy is missing" (factual error — `pipeline/dspy_trainer.py` MIPROv2 **already exists** but has **0 refs** in `stage2_extract.py`/`runner.py` — built-not-wired, same pattern as BUG-085).
+
+**Decision:** log the verified verdict; defer the P2 items; gate the single convergent action as D2440. No SOTA swap until BUG-165 (S4→S5→S6 rerun) produces a current corpus to measure against — swapping methods on stale 2,830-record S4 would validate nothing.
+
+**Files:** pipeline/stage1_5_embed_cluster.py, pipeline/retrieve.py, pipeline/dspy_trainer.py
+**Source:** Session 2026-08-24 — 6-LLM SOTA audit verification.
+
+---
+
 ### D2438 — S4 preflight+smoke+stress harness + visual renderer (2026-08-24)
 **Category:** QLT / AUDIT
 

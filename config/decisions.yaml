@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-22T12:05:00Z'
-total_decisions: 421
+total_decisions: 432
 decisions:
 - id: D2092
   category: INF
@@ -3864,11 +3864,138 @@ decisions:
   - pipeline/stage4_merge.py
   - config/taxonomy_v5.yaml
   created: '2026-08-24'
+- id: D2439
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'External SOTA audit verdict — 6 LLM audits cross-examined against live
+    repo (claude/qwen/chatgpt x rounds 0021/0023/0024; claim-by-claim verification).
+    ACCEPT (deferred): Leiden swap (Louvain->Leiden) — valid, but ALREADY documented in
+    stage1_5_embed_cluster.py code comment D2168 ("Leiden preferred but needs igraph
+    C-dep"); not a new finding. ACCEPT (P2): contextual retrieval / late chunking (chunk
+    300w on section boundaries severs book context); cross-encoder reranker AFTER the
+    existing RRF fusion (retrieve.py search_hybrid D2176 — reranker itself absent);
+    DuckDB analytics (Parquet export already covers most). REJECT: SetFit for S4 (category
+    error — few-shot closed-set classifier cannot do open-set `emerging` + depth reasoning
+    of gpt-oss-20b; "39h->5min" ignores that the cost IS the reasoning); CRAG for S5
+    (contradicts D2298 — re-introduces LLM-based verification removed for hallucination);
+    ColPali/ColBERTv2 (VLM/late-interaction bloat vs local-first sqlite-vec path, C28);
+    DSPy-as-missing (factual error — pipeline/dspy_trainer.py MIPROv2 ALREADY exists but
+    0 refs in stage2_extract.py/runner.py — built-not-wired, same pattern as BUG-085).'
+  champion: goose
+  target_files:
+  - pipeline/stage1_5_embed_cluster.py
+  - pipeline/retrieve.py
+  - pipeline/dspy_trainer.py
+  created: '2026-08-24'
+- id: D2440
+  category: QLT
+  state: ACTIVE
+  description: 'S5 verifier calibration experiment — the single convergent top action from
+    the 6-LLM SOTA audit. Run AlignScore (355M, ACL 2023) + MiniCheck (EMNLP 2024) through
+    the EXISTING pipeline/calibrate.py + nli_calibrate.py harness against DeBERTa-v3-large
+    before any S5 threshold change. DeBERTa current P=0.647/R=0.386/F1=0.484 (D2322)
+    = model-choice ceiling, not threshold. Gate: adopt only if F1 materially > 0.484 AND
+    fail-closed semantics (D2093) preserved. Pending: evals/nli_golden.jsonl not committed
+    -> threshold non-reproducible (blocker noted).'
+  champion: goose
+  target_files:
+  - pipeline/calibrate.py
+  - pipeline/nli_calibrate.py
+  - config/pipeline_config.yaml
+  created: '2026-08-24'
+- id: D2441
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Public-repo leak redaction + C12 hardcoded-path scanner fix (external-audit
+    B). (1) config/pipeline_config.yaml test.full_run.books was a tracked 929-title
+    filename manifest with 1147 shadow-library provenance hits (z-lib/libgen/Anna''s) —
+    REDACTED to empty list; tests/full_run.py + full_run_streaming.py now derive books
+    via sorted(books_dir.rglob("*.md")) at runtime. 1953→524 lines. (2) pipeline/
+    integrity_check.py check_hardcoded_paths() only globbed PIPELINE_DIR/*.py flat —
+    made recursive over pipeline/+tools/+scripts/+tests/+providers/+storage + *.sh +
+    root *.sh (161→162 files). (3) Fixed 9 hardcoded /Users/barn paths: probe_clean.sh +
+    3 tools/canary_rerun*.sh → cd "$(dirname "$0")"[/..]; tests/compare_md_quality.py /
+    fix_golden_set.py / update_golden_taxonomy.py → repo-root-derived. Check [14] now
+    PASSES across 162 files (was blind to 5).'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/integrity_check.py
+  - probe_clean.sh
+  - tools/canary_rerun.sh
+  - tools/canary_rerun_s4onward.sh
+  - tools/canary_rerun_s2onward.sh
+  - tests/full_run.py
+  - tests/full_run_streaming.py
+  - tests/compare_md_quality.py
+  - tests/fix_golden_set.py
+  - tests/update_golden_taxonomy.py
+  created: '2026-08-24'
+- id: D2442
+  category: QLT
+  state: ACTIVE
+  description: 'Evidence-tier preservation + run-manifest freeze + S4 field audit
+    (external-audit A). (1) FIXED silent data loss: is_convergent/origin (convergent|
+    single_source|singleton) were tracked in the S4 cluster wrapper but NOT carried into
+    the FB record/schema/DB — the keep-list strategy''s convergent-vs-single-source
+    distinction was forfeited at S4→S6. Added is_convergent (bool) + origin (str) to
+    pipeline/schemas.py FB, carried into the S4 FB record (stage4_merge.py), and persisted
+    via 2 new SQLite columns (stage6_commit.py CREATE TABLE + INSERT + _migrate_add_column
+    auto-heal). Live-verified: INSERT writes is_convergent=1/origin=convergent. S5 pass-
+    through confirmed (vfb=dict(fb)). (2) scripts/freeze_run_manifest.py — reproducible
+    run manifest (SHA-256 of config+golden+requirements + git HEAD + dirty flag). (3)
+    scripts/audit_s4_fields.py — per-content-type field-completeness audit against
+    D2323 ontology. 110/110 tests green; integrity 15/17 (2 skipped, no DB).'
+  champion: goose
+  target_files:
+  - pipeline/schemas.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  - scripts/freeze_run_manifest.py
+  - scripts/audit_s4_fields.py
+  created: '2026-08-24'
+- id: D2443
+  category: BUGFIX / PROVENANCE
+  state: ACTIVE
+  description: 'S2 provenance carry-through (forensic-audit F1). citation /
+    source_authors / source_diversity / primary_source were emitted by S2 (all 5002
+    deduped records) but dropped at S4 → permanently lost from SQLite/Parquet. FIXED:
+    added 4 fields to pipeline/schemas.py FB (citation str|None, source_authors
+    list[dict]|None, source_diversity int|None, primary_source dict|None), carried into
+    the S4 FB record (stage4_merge.py fb dict), and persisted via 4 new SQLite columns
+    (stage6_commit.py CREATE TABLE + INSERT + _migrate_add_column auto-heal) + Parquet
+    jsonlike_fields. S5 passthrough confirmed (vfb=dict(fb)). integrity_check key_fields
+    extended to guard the 4 fields. content_types.yaml metadata.provenance updated.
+    Verified: 66 cols == 66 placeholders; FB pydantic constructs; init_db+insert_fb
+    round-trip writes correct citation/authors/diversity/primary_source.'
+  champion: goose
+  target_files:
+  - pipeline/schemas.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  - pipeline/integrity_check.py
+  - config/content_types.yaml
+  created: '2026-08-24'
+- id: D2444
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Difficulty-map "inversion" VERIFIED NOT-A-BUG (forensic-audit F3).
+    cross-domain -> intermediate appears inverted only if difficulty is read as
+    "discipline-span complexity". D2410 defines the axis as specialization depth
+    (breadth=transferable=intermediate, single-domain=depth=expert), and
+    test_difficulty_map_is_config_first_and_complete asserts the exact mapping
+    (cross-domain==intermediate). No code change. Residual: test.full_run.difficulty_map
+    still carries the stale pre-D2410 "domain: intermediate" (no cardinality split)
+    vs live stage4.difficulty_map domain_single/domain_multi — low-priority C12
+    cleanup, test-harness-only, not a production path.'
+  champion: goose
+  target_files: []
+  created: '2026-08-24'
 summary:
-  total: 424
+  total: 432
   proposed: 0
   draft: 1
-  active: 363
+  active: 374
   stale: 0
   superseded: 15
   archived: 8
@@ -3878,7 +4005,7 @@ summary:
   planned: 3
   by_category:
     INF: 177
-    QLT: 35
+    QLT: 39
     GOV: 20
     RES: 4
     DAT: 4

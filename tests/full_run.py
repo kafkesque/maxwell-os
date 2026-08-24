@@ -51,12 +51,15 @@ if meta_path.exists():
                 "title": d.get("title", ""),
             }
 
-# ── Resolve book paths from config ──
+# ── Resolve book paths (D2439: config manifest redacted — derive at runtime) ──
 SELECTED: list[Path] = []
-for book_rel in TEST_CFG["books"]:
-    p = BOOKS_DIR / book_rel
-    assert p.exists(), f"Missing: {p}"
-    SELECTED.append(p)
+if TEST_CFG.get("books"):
+    for book_rel in TEST_CFG["books"]:
+        p = BOOKS_DIR / book_rel
+        assert p.exists(), f"Missing: {p}"
+        SELECTED.append(p)
+else:
+    SELECTED = sorted(BOOKS_DIR.rglob("*.md"))
 
 for b in SELECTED:
     print(f"✅ {b.name[:70]} ({b.stat().st_size:,}B)")

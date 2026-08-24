@@ -4,7 +4,7 @@
 # survives the controlling terminal.
 set -uo pipefail
 
-cd "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0"
+cd "$(dirname "$0")/.."
 
 TS="$(date +%Y%m%d_%H%M%S)"
 LOG="knowledge pipeline/canary_rerun_${TS}.log"

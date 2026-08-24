@@ -4,7 +4,7 @@
 import yaml
 from pathlib import Path
 
-YAML_PATH = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/tests/golden_classification_edge_cases.yaml")
+YAML_PATH = Path(__file__).resolve().parent / "golden_classification_edge_cases.yaml"  # D2439: C12
 
 # ── Stale → Canonical Mapping (case-by-case with rationale) ──
 DISCIPLINE_MAP = {

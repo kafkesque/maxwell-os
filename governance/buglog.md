@@ -1,7 +1,49 @@
 # Maxwell OS — Buglog
 > **Last updated:** 2026-08-24 (D2437/D2438: S4 preflight+smoke+stress harness — 28 tests + live 7-FB OMLX smoke; `scripts/render_s4_visual.py` for human-readable S4 output; **BUG-167 taxonomy "discipline promotion" REVERTED** — added 3 labels as disciplines that already exist as domains, breaking D2422 disjointness, caught by CI `test_taxonomy_disjointness.py`; dedup + passage sweep DONE; 110/110 tests green)
+> **D2439/D2440 (2026-08-24):** 6-LLM external SOTA audit (claude/qwen/chatgpt × 0021/0023/0024) claim-by-claim verified against live repo. Accept-deferred: Leiden swap (already documented D2168). Accept-P2: contextual retrieval, cross-encoder reranker after RRF, DuckDB. Reject: SetFit (category error), CRAG (contradicts D2298), ColPali/ColBERTv2 (bloat), "DSPy missing" (exists-but-unwired — see BUG-168). Single convergent action → **D2440: run AlignScore+MiniCheck through existing `calibrate.py` harness vs DeBERTa.**
+> **D2441/D2442 (2026-08-24):** external-audit A+B executed. D2441: public leak redacted (929-title manifest, 1147 provenance hits → `[]`, runtime glob) + C12 hardcoded-path scanner made recursive (162 files) + 9 hardcoded paths fixed. D2442: **evidence-tier preservation** — `is_convergent`/`origin` added to schema+S4+S6+SQLite (was silently dropped → BUG-171); `scripts/freeze_run_manifest.py` + `scripts/audit_s4_fields.py`. Live smoke: 6-FB diverse batch (2 principles classified + 4 routed, 0 failures), evidence-tier lands correctly. 110/110 tests green.
 > **Prior (2026-08-23):** forensic audit: S4/S5/S6 stage-drift 2,830 vs 8,410; relabel scope = single-source-only CONFIRMED; BUG-164 = 11 records not 6; BUG-149 FIXED in code; R1.3 = 1,161 not 1,036; **BUG-146/P0.x ✅ RECOVERED** — single-source rerun already re-processed the 9,950 gated, only `cluster_11649` failing; **BUG-166** — single-source is 99.9% non-convergent & generic; **D2437** — deterministic value-filter built: `scripts/score_single_source.py` (post-hoc) + `scripts/prefilter_clusters.py` (pre-LLM, dual-use single-source+singletons) + `config/filtering.yaml`)
 > **Next review:** After T1.1 full S1.5→S6 run
+
+---
+
+## 🟢 BUG-172 — 2026-08-24 — S2 provenance (citation/source_authors/source_diversity/primary_source) dropped at S4 — FIXED (D2443)
+- **Symptom:** S2 emits `citation`, `source_authors`, `source_diversity`, `primary_source` on all 5,002 deduped records, but S4's FB-record builder only carried `source_books`/`source_ids`/`source_segments`/`evidence_passages`. The four bibliographic/epistemic-diversity fields were silently lost at S4→S6.
+- **Root cause:** same pattern as BUG-171 — the S4 FB dict copies a fixed field list and omitted the four; `FB` schema had no such fields; S6's INSERT column map had no such columns.
+- **Impact:** agents could not cite or rank sources by distinct-source count (`source_diversity`) without re-reading source books.
+- **Fix (D2443):** added the 4 fields to `FB` (schemas.py), S4 FB record (stage4_merge.py), SQLite (stage6_commit.py CREATE TABLE + INSERT + `_migrate_add_column`) + Parquet `jsonlike_fields`; extended `integrity_check.py` `key_fields`; updated `content_types.yaml` `metadata.provenance`.
+- **Status:** ✅ FIXED — verified 66 cols == 66 placeholders; FB pydantic constructs; init_db+insert_fb round-trip writes correct values.
+
+## 🟢 BUG-171 — 2026-08-24 — evidence tier (is_convergent/origin) silently dropped at S4→S6 — FIXED (D2442)
+- **Symptom:** `is_convergent`/`origin` were derived in the S4 cluster wrapper but never carried into the FB record, `FB` schema, or SQLite. Stale S4 checkpoint confirmed `is_convergent=None` on all 2,830 records.
+- **Root cause:** the S4 FB-record builder (the dict at `stage4_merge.py` FB construction) copied structural provenance into the cluster wrapper but not the FB dict; the `FB` schema had no such field; S6's explicit INSERT column map had no such column.
+- **Impact:** the keep-list strategy's convergent-vs-single-source distinction (the entire reason we chose 4,892 over 2,641) would be forfeited — retrieval could not tier "2+ sources agree" vs "1 source asserts."
+- **Fix (D2442):** added `is_convergent` (bool) + `origin` (str) to schemas.py FB, carried into the S4 FB record, persisted via 2 SQLite columns (+ auto-heal migration). Live smoke verified: `is_convergent=True/origin=convergent` and `False/single_source` land correctly; S5 `vfb=dict(fb)` pass-through confirmed.
+- **Status:** ✅ FIXED — live-verified end-to-end; 110/110 tests green.
+
+## 🟡 BUG-170 — 2026-08-24 — non-principle content types (PT/PI/TI/GE) routed but NOT classified — OPEN (pre-existing, minor)
+- **Symptom:** in the live 6-FB smoke, the PT/PI/TI/GE sidecar records have empty `depth`/`discipline`/`domains`/`evidence` — S4 routes them to sidecars but skips the CRIBS classify call (only principles are classified).
+- **Impact:** if `commit_non_fb_types` is ever enabled (S6), non-principle rows would land with empty classification. Currently latent (S6 only commits principles; `commit_non_fb_types: false`).
+- **Status:** 🟡 OPEN — P2, no data loss today; revisit when/if non-FB types are committed.
+- **Files:** pipeline/stage4_merge.py (routing path), config/pipeline_config.yaml (`commit_non_fb_types`)
+
+## 🟡 BUG-169 — 2026-08-24 — TI `parameters` field missing on single-source tool_instruction — OPEN (minor)
+- **Symptom:** the only TI in the diverse smoke batch ("B&B booking tool", single-source) is missing `parameters` (None) — a required field in the D2323 TI `s2_body_fields`. All other TI fields (tool_name/platform/description/syntax/output/example/caveats) present.
+- **Root cause:** single-source S2 extraction did not emit `parameters` for this tool (possibly the tool has no parameters, or the extractor omitted them).
+- **Impact:** minor; single-source content, 1 of 143 TI records. Field audit (`scripts/audit_s4_fields.py`) flags it correctly.
+- **Status:** 🟡 OPEN — P2; verify on the full 143-record TI corpus during BUG-165 rerun.
+- **Files:** config/content_types.yaml (TI s2_body_fields), scripts/audit_s4_fields.py
+
+---
+
+## 🟠 BUG-168 — 2026-08-24 — `pipeline/dspy_trainer.py` exists but is NOT wired to any stage — OPEN (built-not-wired)
+- **Symptom:** the 6-LLM SOTA audit (Qwen 0022) claimed "DSPy is the missing SOTA solution." Verified FALSE: `pipeline/dspy_trainer.py` (MIPROv2 optimizer, `ConvergentExtraction` signature) already exists. But `grep dspy pipeline/stage2_extract.py pipeline/runner.py` → **0 references**. DSPy is a standalone harness, not the production extraction path.
+- **Root cause:** same built-not-wired pattern as BUG-085 (hybrid gate) — the optimizer was validated standalone (D2250) but never integrated into `stage2_extract.py`.
+- **Impact:** zero — no data corruption, no silent failure. It is dead/vestigial compute surface until wired. But it creates a false impression of "DSPy-optimized extraction" in external audits and wastes review attention.
+- **Fix:** either (a) wire `dspy_trainer.py` output into `stage2_extract.py` as the few-shot prompt source (D2250 follow-up), or (b) archive it under `archive/` to stop external audits tripping on it. Do NOT prioritize over BUG-165.
+- **Status:** 🟠 OPEN — P2, post-BUG-165.
+- **Files:** `pipeline/dspy_trainer.py`, `pipeline/stage2_extract.py`, `pipeline/runner.py`
+- **Source:** 6-LLM SOTA audit verification 2026-08-24 (Qwen 0022 claim cross-check).
 
 ---
 

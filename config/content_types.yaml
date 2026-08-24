@@ -238,7 +238,7 @@ classification:
 # ─────────────────────────────────────────────────────────────────────────────
 metadata:
   stamps:       [schema_version, gen_model, pipeline_commit, pipeline_run_id, created_at]
-  provenance:   [source_books, source_clusters, source_segments, evidence_passages]  # evidence_passages = up to 5 verbatim source quotes
+  provenance:   [source_books, source_clusters, source_segments, evidence_passages, citation, source_authors, source_diversity, primary_source]  # evidence_passages = up to 5 verbatim source quotes; citation/source_authors/source_diversity/primary_source carried from S2 (F1)
   discovery:    [keywords]                  # search/retrieval labels (3-5 comma-separated terms)
   versioning:   [object_version]            # canonical name (currently `fb_version` in code)
   runtime:      [usage_count, last_retrieved_at, feedback_score, feedback_count]

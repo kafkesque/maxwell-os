@@ -96,6 +96,9 @@ CREATE TABLE IF NOT EXISTS fbs (
     provenance TEXT NOT NULL DEFAULT 'llm_extracted_from_source',  -- C29: provenance tier
     source_text TEXT,              -- concatenated source paragraph text for verification (D2131)
     is_summary INTEGER DEFAULT 0,  -- D2089: 1=summary (not actionable), 0=principle
+    -- D2439: structural evidence tier (convergence axis) — convergent|single_source|singleton
+    is_convergent INTEGER DEFAULT 0,  -- 1 = cross-source convergent cluster (>=2 sources)
+    origin TEXT DEFAULT 'single_source',  -- convergent | single_source | singleton
     -- Agentic metadata (D2130)
     difficulty_level TEXT,         -- beginner | intermediate | expert
     temporal_scope TEXT,           -- timeless | contemporary | era-specific
@@ -114,6 +117,10 @@ CREATE TABLE IF NOT EXISTS fbs (
     source_clusters TEXT,          -- JSON array (hash strings)
     source_books TEXT,             -- JSON array
     source_ids TEXT,               -- JSON array (canonical SHA-256 author|title, D2176/D2376)
+    citation TEXT,                 -- bibliographic citation string (S2 provenance, was dropped at S4)
+    source_authors TEXT,           -- JSON array of {book, author, title, year} (S2 provenance)
+    source_diversity INTEGER,      -- distinct-source count (S2 epistemic diversity)
+    primary_source TEXT,           -- JSON object {book, reason} (S2 provenance)
     source_principle_ids TEXT,     -- JSON array (references, not embedded)
     source_segments TEXT,          -- JSON array of segment_ids (D2352/BUG-110 — was dropped at S4)
     evidence_passages TEXT,        -- JSON array of verbatim quotes (D2352/BUG-111)
@@ -247,6 +254,11 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "source_segments", "TEXT")
     # D2376: canonical source identity (D2176) — was dropped at S4, now persisted
     _migrate_add_column(conn, "fbs", "source_ids", "TEXT")
+    # F1: S2 provenance carry-through — was dropped at S4, now persisted
+    _migrate_add_column(conn, "fbs", "citation", "TEXT")
+    _migrate_add_column(conn, "fbs", "source_authors", "TEXT")
+    _migrate_add_column(conn, "fbs", "source_diversity", "INTEGER")
+    _migrate_add_column(conn, "fbs", "primary_source", "TEXT")
     _migrate_add_column(conn, "fbs", "evidence_passages", "TEXT")
     _migrate_add_column(conn, "fbs", "evidence_passages_shown", "TEXT")
     # D2351: fail-closed observability — reason a row is not CLEAN
@@ -257,6 +269,9 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # Auto-heal both columns now.
     _migrate_add_column(conn, "fbs", "is_summary", "INTEGER DEFAULT 0")
     _migrate_add_column(conn, "fbs", "classification_status", "TEXT NOT NULL DEFAULT 'CLEAN'")
+    # D2439: structural evidence tier (convergence axis) — auto-heal for pre-existing DBs
+    _migrate_add_column(conn, "fbs", "is_convergent", "INTEGER DEFAULT 0")
+    _migrate_add_column(conn, "fbs", "origin", "TEXT DEFAULT 'single_source'")
     # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
     # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
     # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
@@ -360,12 +375,14 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 depth, evidence,
                 context, accessibility, intimacy_boundary, provenance,
                 source_text, is_summary,
+                is_convergent, origin,
                 difficulty_level, temporal_scope, confidence_score,
                 prerequisite_fbs, procedural_skill,
                 contradicts_fbs, related_fbs,
                 usage_count, last_retrieved_at,
                 feedback_score, feedback_count, fb_version,
-                source_clusters, source_books, source_ids, source_principle_ids, source_segments,
+                source_clusters, source_books, source_ids, citation, source_authors,
+                source_diversity, primary_source, source_principle_ids, source_segments,
                 evidence_passages, evidence_passages_shown,
                 classification_errors, classification_status, classification_error,
                 verification_results, borp_score, status,
@@ -382,12 +399,14 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?,
                 ?, ?, ?, ?,
                 ?, ?,
+                ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?, ?, ?, ?,
+                ?, ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
                 ?, ?, ?,
@@ -427,6 +446,9 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             # source text for verification (D2131) + summary/principle gate (D2352)
             _safe_str(fb.get("source_text")),
             1 if fb.get("is_summary") else 0,
+            # D2439: structural evidence tier (convergence axis)
+            1 if fb.get("is_convergent") else 0,
+            _safe_str(fb.get("origin"), "single_source"),
             # agentic metadata (D2130)
             _safe_str(fb.get("difficulty_level")),
             _safe_str(fb.get("temporal_scope")),
@@ -445,6 +467,10 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_json(fb.get("source_clusters", [])),
             _safe_json(fb_source_books(fb)),
             _safe_json(fb_source_ids(fb)),
+            _safe_str(fb.get("citation")),
+            _safe_json(fb.get("source_authors")),
+            fb.get("source_diversity"),
+            _safe_json(fb.get("primary_source")),
             _safe_json(fb.get("source_principle_ids", [])),
             _safe_json(fb.get("source_segments", [])),
             # verbatim evidence (D2352)
@@ -490,6 +516,7 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
         rows = []
         jsonlike_fields = {
             "domains", "domains_raw", "source_clusters", "source_books", "source_ids",
+            "source_authors", "primary_source",
             "verification_results", "classification_errors",
             "jargon", "source_principle_ids", "source_segments",
             "evidence_passages", "evidence_passages_shown",

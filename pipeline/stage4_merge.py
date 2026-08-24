@@ -996,6 +996,21 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
             os.unlink(state_tmp.name)
 
 
+def _stamp_sidecar(rec: dict, pipeline_run_id: str, pipeline_commit: str) -> dict:
+    """R14 + BUG-170: re-stamp a routed non-principle sidecar with S4 run traceability.
+
+    Non-principle records (PT/PI/TI/GE) pass through S4 UNCHANGED — their content is
+    still S2's extraction. So we must NOT overwrite `gen_model` / `created_at` (S2
+    content provenance). We only refresh the run-traceability stamps so the sidecar is
+    attributable to the S4 run that wrote it (previously it carried only S2's
+    `pipeline_run_id`, making it untraceable — the "stale stamps" finding).
+    """
+    rec["pipeline_run_id"] = pipeline_run_id
+    rec["pipeline_commit"] = pipeline_commit
+    rec["routed_by_stage"] = "stage4_merge"
+    return rec
+
+
 def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
@@ -1625,6 +1640,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "accessibility": accessibility_val,
             "intimacy_boundary": intimacy_val,
             "provenance": provenance_val,
+            # D2439: structural evidence tier — carried from the S4 cluster wrapper
+            # (convergent/single_source/singleton) so it survives into the DB and
+            # retrieval can tier "2+ sources agree" vs "1 source asserts". Without
+            # this the keep-list strategy's convergent/single-source distinction is
+            # silently forfeited at S4→S6.
+            "is_convergent": bool(cluster.get("is_convergent", False)),
+            "origin": cluster.get("origin", "single_source"),
             # ── Agentic metadata ──
             "difficulty_level": difficulty_level,
             "temporal_scope": temporal_scope,
@@ -1634,6 +1656,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "source_clusters": [cluster_id],
             "source_books": sorted(source_books),
             "source_ids": sorted(source_ids),  # D2376: canonical hashes (D2176) — restore provenance
+            # F1: S2 provenance carry-through — citation/source_authors/
+            # source_diversity/primary_source were emitted by S2 but dropped at S4,
+            # losing bibliographic + epistemic-diversity provenance from the DB.
+            "citation": fb_data.get("citation"),
+            "source_authors": fb_data.get("source_authors"),
+            "source_diversity": fb_data.get("source_diversity"),
+            "primary_source": fb_data.get("primary_source"),
             # D2350 (ChatGPT re-audit): S2 v3 records emit `fb_id`, NOT `principle_id`.
             # Reading only `principle_id` left source_principle_ids empty for every
             # normal v3 FB. Use fb_id first, retain principle_id as legacy fallback.
@@ -1710,7 +1739,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _k = ge.get("fb_id") or ge.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
             if _k and _k not in seen_ge:
                 seen_ge.add(_k)
-                deduped_ge.append(ge)
+                deduped_ge.append(_stamp_sidecar(ge, pipeline_run_id, pipeline_commit))
         safe_write(
             ge_path,
             "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ge) + "\n",
@@ -1725,7 +1754,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _k = pt.get("fb_id") or pt.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
             if _k and _k not in seen_pt:
                 seen_pt.add(_k)
-                deduped_pt.append(pt)
+                deduped_pt.append(_stamp_sidecar(pt, pipeline_run_id, pipeline_commit))
         safe_write(
             pt_path,
             "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pt) + "\n",
@@ -1740,7 +1769,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _k = pi.get("fb_id") or pi.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
             if _k and _k not in seen_pi:
                 seen_pi.add(_k)
-                deduped_pi.append(pi)
+                deduped_pi.append(_stamp_sidecar(pi, pipeline_run_id, pipeline_commit))
         safe_write(
             pi_path,
             "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pi) + "\n",
@@ -1755,7 +1784,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _k = ti.get("fb_id") or ti.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
             if _k and _k not in seen_ti:
                 seen_ti.add(_k)
-                deduped_ti.append(ti)
+                deduped_ti.append(_stamp_sidecar(ti, pipeline_run_id, pipeline_commit))
         safe_write(
             ti_path,
             "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ti) + "\n",

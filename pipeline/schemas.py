@@ -250,6 +250,19 @@ class FB(StampedRecord):
         description="Provenance tier (C29): human_verbatim | llm_extracted_from_source | llm_hypothesis."
     )
 
+    # D2439: structural evidence tier (convergence axis) — must survive S4→S6 so
+    # retrieval can distinguish "2+ books independently agree" from "1 book asserts".
+    # Orthogonal to `provenance` (C29 extraction honesty) above: provenance says
+    # WHERE the text came from; is_convergent/origin says HOW MANY sources agree.
+    is_convergent: bool = Field(
+        default=False,
+        description="True if this FB came from a cross-source convergent cluster (>=2 distinct canonical sources)."
+    )
+    origin: str = Field(
+        default="single_source",
+        description="Structural evidence tier: convergent | single_source | singleton."
+    )
+
     # ── Source text for verification ──────────────────────────────────────
     source_text: str | None = Field(
         default=None,
@@ -304,6 +317,26 @@ class FB(StampedRecord):
     source_ids: list[str] = Field(
         default_factory=list,
         description="Canonical source IDs (SHA-256 author|title) for BORP/epistemic counting (D2176)."
+    )
+    # ── S2 provenance carry-through (F1) ────────────────────────────────────
+    # citation/source_authors/source_diversity/primary_source are emitted by S2
+    # but were dropped at S4 → silently lost from SQLite/Parquet. Carried now so
+    # agents can cite + rank sources by epistemic diversity without re-reading books.
+    citation: str | None = Field(
+        default=None,
+        description="Bibliographic citation string (S2 provenance, e.g. 'Author (Title)')."
+    )
+    source_authors: list[dict] | None = Field(
+        default=None,
+        description="Per-source {book, author, title, year} entries (S2 provenance)."
+    )
+    source_diversity: int | None = Field(
+        default=None,
+        description="Distinct-source count (S2 epistemic diversity)."
+    )
+    primary_source: dict | None = Field(
+        default=None,
+        description="{book, reason} for the earliest/most-canonical source (S2 provenance)."
     )
     source_principle_ids: list[str] = Field(
         default_factory=list,

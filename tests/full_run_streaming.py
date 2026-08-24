@@ -360,15 +360,18 @@ def process_book(path: Path, extract_model: str, extract_max_tokens: int,
 
 
 def main() -> None:
-    # ── Resolve book paths from config ──
+    # ── Resolve book paths (D2439: config manifest redacted — derive at runtime) ──
     selected: list[Path] = []
     skipped = 0
-    for book_rel in TEST_CFG["books"]:
-        p = BOOKS_DIR / book_rel
-        if p.exists():
-            selected.append(p)
-        else:
-            skipped += 1
+    if TEST_CFG.get("books"):
+        for book_rel in TEST_CFG["books"]:
+            p = BOOKS_DIR / book_rel
+            if p.exists():
+                selected.append(p)
+            else:
+                skipped += 1
+    else:
+        selected = sorted(BOOKS_DIR.rglob("*.md"))
     print(f"✅ {len(selected)} books found in {BOOKS_DIR} ({skipped} config paths missing)")
 
     from pipeline.omlx_call import check_omlx_health

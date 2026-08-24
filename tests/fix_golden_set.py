@@ -244,7 +244,7 @@ def split_golden_file(fbs: list[dict], preamble: str, base_dir: str) -> None:
 
 
 def main():
-    base_dir = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/tests")
+    base_dir = Path(__file__).resolve().parent  # D2439: C12 — no hardcoded user path
     
     # ── Action 1 & 2: Parse and fix CONTEXT + D02 YAML ──
     golden_md = base_dir / "golden_classification_edge_cases.md"

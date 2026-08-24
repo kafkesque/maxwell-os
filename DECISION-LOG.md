@@ -3,6 +3,25 @@
 
 ---
 
+### D2449 — Singleton-builder schema drift unification + source-filename noise sanitization (2026-08-24)
+**Category:** QLT / AUDIT
+
+**Finding (root cause of the singleton/single-source drift):** `_singleton_result_to_fb` was a **forked** code path that diverged from the shared `_build_fb_from_result` used by convergent + single-source. It dropped four things the shared builder does: (1) `elaboration`, (2) bibliographic provenance (`source_authors`/`citation`/`primary_source` — the BUG-061 block), (3) `evidence_passages_shown`, (4) every R14 stamp (`schema_version`/`gen_model`/`pipeline_commit`/`taxonomy_version`/`manifest_hash`/`pipeline_run_id`/`created_at`). Consequence: singleton FBs shipped `source_authors: null` even when the author was embedded in the source filename ("Algorithms to Live By … (Brian Christian, Tom Griffiths)"), and un-stamped records violating R14.
+
+**Decision (unify, don't patch):** extract shared `_enrich_provenance()` + `_sanitize_books()` helpers and wire **both** builders to them, so provenance, stamping, and sanitization cannot drift between S2 paths again. Add `sanitize_source_book()` (config-driven markers in `config/filtering.yaml → source_noise`, C12) that strips piracy-site artifacts — `(z-library.sk, 1lib.sk, z-lib.sk)`, `(z-lib.org)`, `-- Anna's Archive`, `-- <32-hex>` — from `source_books`/`source_text`/`citation`/`primary_source`.
+
+**Guard:** `tests/test_stage2_singleton_parity_d2449.py` asserts the singleton record now carries the full canonical core + stamp + provenance field set and de-noised `source_books` (5 tests; the drift cannot silently return).
+
+**Remaining (documented, not in this change):**
+- Singleton path still skips `validate_fb_output` (single-source path validates) — a fail-closed parity gap, tracked as follow-up (adding it changes singleton yield, needs a golden-set check).
+- `procedural_skill: null` / `prerequisite_fbs: []` in the smoke are **correct pre-S4.5 defaults** — populated by `stage4_5_enrich.py` (FB-only), which was not run in the smoke.
+- PT-vs-TI mislabeling ("Agent-Based Request Delegation System" → thin PT) is BUG-166 model quality, not schema.
+
+**Files:** pipeline/stage2_extract.py, pipeline/book_metadata.py, config/filtering.yaml, tests/test_stage2_singleton_parity_d2449.py
+**Source:** Session 2026-08-24 — singleton-object audit vs content_types.yaml.
+
+---
+
 ### D2448 — S2 prompt hardening + non-principle commit-frontier verdict (2026-08-24)
 **Category:** QLT / AUDIT
 

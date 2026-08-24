@@ -57,3 +57,20 @@ passage_meta:
   subjects: [passage, text, excerpt, article, book, section, paragraph, quote, snippet]
   verbs: [describes, discusses, poses, argues, examines, explores, presents, illustrates, contains, outlines, highlights, focuses, shows, demonstrates, explains, reports, suggests, proposes]
   author_verbs: [states, argues, notes, writes, claims, describes, discusses, suggests]
+
+# D2449 — source-filename noise markers (piracy-site / archive artifacts).
+# Consumed by book_metadata.sanitize_source_book() to strip download-site junk
+# from source_books / source_text / citation so persisted metadata carries only
+# the real author/title, not "(z-library.sk, 1lib.sk, z-lib.sk)" etc.
+source_noise:
+  markers:
+    - z-library
+    - z-lib
+    - 1lib
+    - libgen
+    - "anna's archive"
+    - annas archive
+    - pdfdrive
+    - liber
+    - ebook
+  strip_hex_hashes: true   # remove trailing "-- <32-hex>" identifiers (Anna's Archive / ISBN noise)

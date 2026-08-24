@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-22T12:05:00Z'
-total_decisions: 436
+total_decisions: 437
 decisions:
 - id: D2092
   category: INF
@@ -4078,11 +4078,38 @@ decisions:
   - pipeline/stage2_extract.py
   - governance/buglog.md
   created: '2026-08-24'
+- id: D2449
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'Singleton-builder schema drift unification + source-filename noise
+    sanitization. Root cause of the singleton/single-source schema drift: _singleton_result_to_fb
+    was a forked code path that (unlike _build_fb_from_result) dropped elaboration,
+    bibliographic provenance (source_authors/citation/primary_source) and all R14 stamps
+    (schema_version/gen_model/pipeline_commit/taxonomy_version/manifest_hash/pipeline_run_id/
+    created_at). Consequence: singleton FBs shipped source_authors:null even when the
+    author was in the filename (e.g. Brian Christian, Tom Griffiths), and unstamped
+    records violating R14. FIX: extracted shared _enrich_provenance() + _sanitize_books()
+    helpers, wired both builders to call them, so provenance/stamping/sanitization can
+    never drift between S2 paths again. Added sanitize_source_book() (config/filtering.yaml
+    source_noise markers, C12) stripping piracy-site artifacts ((z-library.sk, 1lib.sk,
+    z-lib.sk), (z-lib.org), -- Anna''s Archive, -- <32-hex>) from source_books/source_text/
+    citation. GUARD: tests/test_stage2_singleton_parity_d2449.py asserts the singleton
+    record carries the full canonical core+stamp+provenance field set and de-noised
+    source_books. REMAINING (documented, not fixed here): singleton path still skips
+    validate_fb_output (single-source path validates) — tracked as a follow-up parity
+    gap; PT-vs-TI misclassification is BUG-166 model quality, not schema.'
+  champion: goose
+  target_files:
+  - pipeline/stage2_extract.py
+  - pipeline/book_metadata.py
+  - config/filtering.yaml
+  - tests/test_stage2_singleton_parity_d2449.py
+  created: '2026-08-24'
 summary:
-  total: 436
+  total: 437
   proposed: 0
   draft: 1
-  active: 378
+  active: 379
   stale: 0
   superseded: 15
   archived: 8
@@ -4139,7 +4166,7 @@ summary:
     PERF / BUGFIX: 1
     QA: 4
     QLT: 39
-    QLT / AUDIT: 16
+    QLT / AUDIT: 17
     QLT / DATA: 1
     QLT / PROMPT: 4
     QUALITY / DATA: 3

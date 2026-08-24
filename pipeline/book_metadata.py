@@ -38,6 +38,75 @@ def _normalize_key(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", name.lower())
 
 
+# ── Source-filename noise sanitization (D2449) ──────────────────────────────
+# Piracy-site / archive artifacts ("(z-library.sk, 1lib.sk, z-lib.sk)",
+# "(z-lib.org)", "-- Anna's Archive", "-- <32-hex hash>") pollute source_books /
+# source_text / citation. Markers are config-driven (C12) — config/filtering.yaml.
+def _load_noise_markers() -> list[str]:
+    """Load source-noise markers from config/filtering.yaml (C12 config-first)."""
+    try:
+        import yaml
+
+        from pipeline.pipeline_paths import PROJECT_ROOT
+        cfg_path = PROJECT_ROOT / "config" / "filtering.yaml"
+        with open(cfg_path) as _f:
+            _cfg = yaml.safe_load(_f) or {}
+        markers = (_cfg.get("source_noise") or {}).get("markers") or []
+        return [str(m).strip() for m in markers if str(m).strip()]
+    except Exception:
+        # Never let a config read failure break extraction (fail-open on markers).
+        return []
+
+
+_SOURCE_NOISE_MARKERS: list[str] = _load_noise_markers()
+
+
+def _has_noise_marker(text: str) -> bool:
+    # Normalize apostrophes (curly ' / ' vs straight ') so "Anna's Archive"
+    # matches the config marker regardless of quote style.
+    norm = re.sub(r"['\u2019\u2018\u201b]", "", text.lower())
+    return any(
+        re.sub(r"['\u2019\u2018\u201b]", "", m.lower()) in norm
+        for m in _SOURCE_NOISE_MARKERS
+    )
+
+
+def sanitize_source_book(filename: str) -> str:
+    """Strip piracy-site / archive noise from a source filename (D2449).
+
+    Removes parenthetical groups (e.g. "(z-library.sk, 1lib.sk, z-lib.sk)")
+    and trailing "-- <noise>" segments (e.g. "-- Anna's Archive", "-- <32-hex
+    hash>") so persisted source_books / source_text / citation carry only the
+    real author/title. Idempotent; returns the original when nothing matches.
+    """
+    name = (filename or "").strip()
+    if not name:
+        return name
+    # Remove any parenthetical group containing a noise marker.
+    name = re.sub(
+        r"\([^()]*\)",
+        lambda m: "" if _has_noise_marker(m.group(0)) else m.group(0),
+        name,
+    )
+    # Remove trailing "-- <noise>" segments (site name or 32-hex identifier).
+    def _strip_dash(seg: re.Match) -> str:
+        seg_text = seg.group(0)
+        if _has_noise_marker(seg_text):
+            return ""
+        if re.search(r"[0-9a-f]{32}", seg_text):
+            return ""
+        return seg_text
+
+    name = re.sub(r"--[^-]*(?=$|--)", _strip_dash, name)
+    # Tidy: empty parens, doubled whitespace, stray leading/trailing separators,
+    # and whitespace left before a file extension (".md") after noise removal.
+    name = re.sub(r"\(\s*\)", "", name)
+    name = re.sub(r"\s{2,}", " ", name)
+    name = re.sub(r"\s+\.", ".", name)
+    name = name.strip(" -()")
+    return name or (filename or "").strip()
+
+
 def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
     """Load book_metadata.jsonl → {source_book: {author, title, year}}.
 
@@ -275,11 +344,16 @@ def resolve_book_metadata(filename: str) -> dict[str, str]:
     if not fname:
         return {"author": "Unknown Author", "title": "Unknown Title", "year": ""}
 
-    # 1. Authoritative cache (exact key → name → normalized fuzzy)
+    # 1. Authoritative cache (exact key → name → sanitized → normalized fuzzy).
+    # D2449: also try the sanitized name so a caller that already stripped
+    # piracy markers still hits the raw-keyed cache.
+    fname_san = sanitize_source_book(fname)
     cache = load_metadata_cache()
     cached = (
         cache.get(fname)
         or cache.get(Path(fname).name)
+        or cache.get(fname_san)
+        or cache.get(Path(fname_san).name)
         or {}
     )
     if not cached:

@@ -642,6 +642,58 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
     return out
 
 
+def _enrich_provenance(source_books: list[str], evidence_passages: list[str]) -> dict:
+    """BUG-061 / D2449: derive author/title/year + citation + primary_source.
+
+    Shared by the single-source/convergent builder (`_build_fb_from_result`) AND
+    the singleton builder (`_singleton_result_to_fb`) so all three S2 paths carry
+    identical bibliographic provenance. Historically only the single-source path
+    ran this block — singleton FBs shipped with `source_authors: null` even when
+    the author was embedded in the source filename (e.g. "Brian Christian, Tom
+    Griffiths"). Returns {} when there are no source books (nothing to enrich).
+    """
+    if not source_books:
+        return {}
+    from pipeline.book_metadata import (
+        build_citation,
+        resolve_book_metadata,
+        sanitize_source_book,
+        select_primary_source,
+    )
+    source_authors: list[dict] = []
+    for sb in source_books:
+        m = resolve_book_metadata(sb)
+        source_authors.append({
+            # D2449: persist the sanitized display name (no piracy markers).
+            "book": sanitize_source_book(sb),
+            "author": m.get("author", ""),
+            "title": m.get("title", ""),
+            "year": m.get("year", ""),
+        })
+    primary_source = select_primary_source(source_books, evidence_passages)
+    prim = primary_source.get("book", source_books[0])
+    # D2449: persist the sanitized primary-source display name (no piracy markers).
+    primary_source["book"] = sanitize_source_book(prim)
+    prim_meta = next(
+        (sa for sa in source_authors if sa["book"] == sanitize_source_book(prim)),
+        {"author": "Unknown Author", "title": "Unknown Title"},
+    )
+    return {
+        "source_authors": source_authors,
+        "primary_source": primary_source,
+        "citation": build_citation(
+            prim_meta.get("author", ""), prim_meta.get("title", ""),
+            sanitize_source_book(prim),
+        ),
+    }
+
+
+def _sanitize_books(books: list[str]) -> list[str]:
+    """D2449: strip piracy-site noise from the `source_books` display field."""
+    from pipeline.book_metadata import sanitize_source_book
+    return [sanitize_source_book(b) for b in (books or [])]
+
+
 SINGLE_SOURCE_SYSTEM: str = (
     "You extract knowledge objects from text passages. "
     "Return a JSON object with these EXACT keys:\n"
@@ -2083,7 +2135,7 @@ def run_stage2(
             "evidence_passages_shown": evidence_passages,
             "route": route,
             "source_cluster": cid,
-            "source_books": cluster.get("source_books", []),
+            "source_books": _sanitize_books(cluster.get("source_books", [])),  # D2449
             "source_ids": cluster.get("source_ids", []),
             "source_segments": cluster.get("segment_ids", []),
             "cluster_cohesion": cluster.get("cohesion", 0.0),
@@ -2097,31 +2149,10 @@ def run_stage2(
         # parameters, PI instance_text, GE body, etc.) beyond the shared core_body.
         fb.update(_capture_type_specific_fields(result, content_type))
 
-        # Enrich with author/title/year (BUG-061 FIX)
-        src_books_list: list[str] = cluster.get("source_books", [])
-        if src_books_list:
-            from pipeline.book_metadata import (
-                build_citation,
-                resolve_book_metadata,
-                select_primary_source,
-            )
-            source_authors: list[dict] = []
-            for sb in src_books_list:
-                m = resolve_book_metadata(sb)
-                source_authors.append({
-                    "book": sb, "author": m.get("author", ""),
-                    "title": m.get("title", ""), "year": m.get("year", ""),
-                })
-            fb["source_authors"] = source_authors
-            fb["primary_source"] = select_primary_source(src_books_list, evidence_passages)
-            prim = fb["primary_source"].get("book", src_books_list[0])
-            prim_meta = next(
-                (sa for sa in source_authors if sa["book"] == prim),
-                {"author": "Unknown Author", "title": "Unknown Title"},
-            )
-            fb["citation"] = build_citation(
-                prim_meta.get("author", ""), prim_meta.get("title", ""), prim,
-            )
+        # Enrich with author/title/year + citation + primary_source (BUG-061).
+        # D2449: shared `_enrich_provenance` helper — identical to the singleton
+        # path so bibliographic provenance can never drift between S2 paths.
+        fb.update(_enrich_provenance(cluster.get("source_books", []), evidence_passages))
 
         fb = stamp_record(fb, gen_model=GEN_MODEL)
         fb["pipeline_commit"] = pipeline_commit
@@ -2367,20 +2398,29 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
     non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
     if is_summary and gate_enabled and content_type not in non_principle_roles:
         return {"_gate": True}
-    return {
+    # D2449: align the singleton record with the single-source/convergent record.
+    # Historically this builder forked and dropped `elaboration`, bibliographic
+    # provenance (source_authors/citation/primary_source) and the R14 stamps —
+    # the source of the singleton/single-source schema drift. It now emits the
+    # same field set as `_build_fb_from_result`.
+    evidence: list[str] = [item["text"][:500]]
+    src_books: list[str] = item["singleton"].get("source_books", [item["source_book"]])
+    fb: dict = {
         "fb_id": make_hash_id(name, definition),
         "name": name,
         "definition": definition,
         "mechanism": result.get("mechanism", "").strip(),
         "boundary": result.get("boundary", result.get("application", "")).strip(),
         "consequence": result.get("consequence", result.get("failure_mode", "")).strip(),
+        "elaboration": result.get("elaboration", ""),  # D2449: was silently dropped by this builder
         "is_summary": is_summary,
         "extraction_type": extraction_type,
         "content_type": content_type,
-        "evidence_passages": [item["text"][:500]],
+        "evidence_passages": evidence,
+        "evidence_passages_shown": evidence,  # D2449: parity with single-source path
         "route": route,
         "source_cluster": item["singleton"].get("cluster_id", f"singleton_{item['segment_id'][:8]}"),
-        "source_books": item["singleton"].get("source_books", [item["source_book"]]),
+        "source_books": _sanitize_books(src_books),  # D2449: strip piracy markers
         "source_ids": item["singleton"].get("source_ids", []),
         "source_segments": [item["segment_id"]],
         "cluster_cohesion": 1.0,
@@ -2390,6 +2430,11 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
         "is_singleton_fb": True,
         **_capture_type_specific_fields(result, content_type),  # P2-1
     }
+    # D2449: shared bibliographic provenance + R14 stamps (parity with the
+    # single-source/convergent builder — no more null source_authors / missing stamps).
+    fb.update(_enrich_provenance(src_books, evidence))
+    fb = stamp_record(fb, gen_model=GEN_MODEL)
+    return fb
 
 
 def _map_batch_results(raw: object, n: int) -> list[dict | None]:

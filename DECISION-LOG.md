@@ -3,6 +3,30 @@
 
 ---
 
+### D2460 — S2 singleton ETA root-cause: cache-thrash regression + MoE decode ceiling (2026-08-25)
+**Category:** OPS / PERF
+
+**Decision:** Investigate why singleton S2 ran ~10-30h vs a recalled ~1.5h estimate. Three root causes found; one fixed (agreed D2436 enhancement was LOST), two are structural.
+
+**1. Cache-thrash regression (FIXED — the agreed enhancement):** D2436 fixed a 185GB paged-SSD cache thrash (`store_cache_main_dispatch ~9.8s/request` → `--no-cache` → 2-7ms). The D2455/D2456 homebrew→GUI migration silently REVERTED this — the server relaunched via the GUI app (2026-08-24 23:28) with `cache.enabled=true` + `gdn_ssd_split_enabled=true`. Symptom reproduced: `store_cache_main_dispatch` grew 817ms→3.08s, decode crashed to ~4-7 tok/s (from ~50). **Fixed:** `cache.enabled=false` in settings.json (→ `--no-cache`), decode recovered 10× (49.7 tok/s single). Also tried `hot_cache_only=true` — it ALSO thrashes (dispatch 1ms→305ms over 2.5min as the 8GB hot cache filled), confirming `--no-cache` is the only correct mode.
+
+**2. MoE decode ceiling (structural, not config):** `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` is `model_type=qwen3_moe`, `num_experts=128`, `num_experts_per_tok=8`. oMLX 0.6.2 decodes it at ~50 tok/s single-request (raw MLX matmul 3.5 TFLOPS ≈ 33% M1 Max peak; 10× below the ~500 tok/s a 3.3B-active MoE should hit → MoE routing/kernel gap, not config). 6 concurrent batches DEGRADE (server serializes the MoE; per-batch 167→610s).
+
+**3. Golden few-shot prefill (structural, config-tunable):** the single-source golden (22,397 chars ≈ 6,000 tokens, `golden_single_source_max=20`) is injected into EVERY singleton batch system prompt. With `--no-cache` (no prefix cache) it is re-prefilled all ~1,535 batches = ~9.2M redundant prefill tokens ≈ ~12h of pure prefill. This is the dominant remaining cost (~78% of each 7,664-token batch prompt).
+
+**Verdict on "1.5h":** NOT achievable on this stack. 6,317 singletons × ~300 tokens = ~1.9M decode tokens; at the measured ~50 tok/s single / ~69 tok/s aggregate ceiling → ~7.6h hard floor for decode alone, plus the golden-prefill overhead → realistic ~8-22h. 1.5h would need ~350 tok/s (5-7× the actual ceiling).
+
+**Levers to actually go faster (flagged, NOT applied — quality-sensitive):**
+1. Reduce `golden_single_source_max` 20→~3-8 for the BATCH path (halves-to-thirds the prompt → ~3× faster prefill). Largest lever.
+2. A dense/smaller model (Qwen2.5-Coder-7B) — violates R5 generator choice.
+3. Accept ~8-22h background run (caffeinated, checkpointed, resumable).
+
+- **Status:** ✅ INVESTIGATED — cache fix applied; run resumed (3 workers, `--no-cache`); golden-reduction deferred to operator decision.
+- **Files:** `~/.omlx/settings.json` (cache.enabled=false; backup at settings.json.bak-d2459-pre-cache-fix), `config/pipeline_config.yaml` (max_workers 6→3)
+- **Source:** 2026-08-25 — operator ETA challenge + pause-and-investigate directive
+
+---
+
 ### D2459 — BUG-175 author-sentinel validation + singleton checkpoint hardening (2026-08-25)
 **Category:** BUGFIX / PROVENANCE
 

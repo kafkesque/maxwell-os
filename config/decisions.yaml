@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-25T11:30:00Z'
-total_decisions: 446
+last_sync: '2026-08-25T12:45:00Z'
+total_decisions: 447
 decisions:
 - id: D2092
   category: INF
@@ -4012,11 +4012,29 @@ decisions:
   - tests/test_book_metadata_sentinels_d2459.py
   - pipeline/stage2_extract.py
   created: '2026-08-25'
+- id: D2460
+  category: OPS / PERF
+  state: ACTIVE
+  description: 'S2 singleton ETA root-cause: D2436 --no-cache fix was LOST in the
+    D2455/D2456 homebrew→GUI migration (server relaunched with cache.enabled=true →
+    paged-SSD thrash, store_cache_main_dispatch 817ms→3.08s, decode crashed to ~4-7
+    tok/s). FIXED: cache.enabled=false → decode recovered 10× (49.7 tok/s). hot_cache_only
+    also thrashes (1ms→305ms) → --no-cache is the only correct mode. Structural: model
+    is qwen3_moe 128 experts / 8 active → oMLX decodes ~50 tok/s single (10× below
+    theoretical; MoE kernel gap, not config); 6 concurrent batches serialize+degrade.
+    Golden few-shot (22K chars) re-prefilled every batch with --no-cache = ~12h
+    redundant prefill. "1.5h" NOT achievable: ~7.6h hard floor (1.9M tokens / 69 tok/s
+    ceiling). Levers flagged: reduce golden_single_source_max 20→3-8, dense model, or
+    accept ~8-22h background run.'
+  champion: 2026-08-25 session
+  target_files:
+  - config/pipeline_config.yaml
+  created: '2026-08-25'
 summary:
-  total: 446
+  total: 447
   proposed: 0
   draft: 1
-  active: 388
+  active: 389
   stale: 0
   superseded: 15
   archived: 8
@@ -4069,6 +4087,7 @@ summary:
     OPERATIONAL / CANARY: 1
     OPS: 2
     OPS / DATA: 1
+    OPS / PERF: 1
     OPS / RELIABILITY: 2
     PERF: 10
     PERF / BUGFIX: 1

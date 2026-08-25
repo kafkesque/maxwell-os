@@ -214,7 +214,7 @@ stage2:
   gen_max_tokens: 3072       # D2381: S2 extraction output budget (was hardcoded 2048 in call_llm → JSON truncation / finish_reason=length)
   gen_max_tokens_retry: 4096 # D2381: JSON-failure fallback budget (retry with more room before giving up)
   batch_position_monitor: false
-  max_workers: 6        # D2459: OMLX batched engine scales with concurrency (6 concurrent 128-tok gens = 3.7× serial); server max_concurrent_requests=6
+  max_workers: 3        # D2459: reverted 6→3 — 6 concurrent batches DEGRADE on the 128-expert MoE (server serializes + KV-store dispatch thrash); 3 = original T0.2
   singleton_batch_size: 4        # D2xxx: batch N singletons per LLM call (option-1 speedup, BUG-155 follow-up)
   singleton_batch_max_tokens_per_item: 1000  # per-singleton output budget inside a batch call (batch max_tokens = size x this)
   singleton_prefilter_enabled: true  # D2452: gate singleton pass on singletons.prefiltered.jsonl EXTRACT verdicts (D2437 prefilter)

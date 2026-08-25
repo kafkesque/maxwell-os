@@ -1,6 +1,18 @@
 # Maxwell OS — Aggregated Task Register
 > **Updated:** 2026-08-25
 
+## 🔧 EXTERNAL-AUDIT CROSS-EXAM REMEDIATION (D2463, 2026-08-25) — PARTIAL (4 done, 3 queued)
+- ✅ **DONE — golden fail-closed (D2463):** `load_golden_parity` + `load_golden_single_source` now raise on missing/unparseable/empty golden (was silent `([], [], 0)` → zero-shot). `None` path = only legit empty case.
+- ✅ **DONE — OMLX cache gate (D2463):** `assert_omlx_no_cache()` in `omlx_call.py` refuses launch if `cache.enabled`/`hot_cache_only`/`gdn_ssd_split_enabled` set (D2460 thrash flags); wired into `just s2-singletons`; warns on `preserve_mid_system_cache`.
+- ✅ **DONE — D2461 ghost closed:** retroactively logged in DECISION-LOG + registered in decisions.yaml.
+- ✅ **DONE — golden metadata sync:** `stage2_fewshot_single_source.yaml` `meta` 20/13→21/14 (was stale; cosmetic — loader uses config `max`, not YAML metadata).
+- ⏳ **QUEUED — BUG-177 C16 silent-error class:** `parallel.py` (typed failure, raise by default), `stage5_verify._nli_pair_scores` (typed `NLIInferenceError` + `verification_error_type`), `model_lazyload` (remove silent fallback).
+- ⏳ **QUEUED — BUG-178 S6 Parquet C6:** tempfile→fsync→os.replace + manifest checksum.
+- ⏳ **QUEUED — BUG-179 AGENTS.md stale + `tools/delegate_guard.py` phantom:** regenerate loader metadata (D2000–D2463 / 450) + drop phantom import.
+- ⏳ **VERIFY — `preserve_mid_system_cache=true`:** benign mid-request KV vs D2460-class page-cache risk (one targeted check).
+
+None of the queued items block the running S2 singleton extraction.
+
 ## 🔧 SINGLE-SOURCE + SINGLETON S2 UNIFICATION (D2462, 2026-08-25) — PLANNED
 - 🎯 **Decision (D2462):** collapse S2's 3 entry points → 2 passes. Keep `--only-convergent` separate (cross-source synthesis, 322KB golden, 75/75 principle, `is_convergent`). Merge single-source + singleton into ONE shared extractor (already share `stage2_fewshot_single_source.yaml` 14+7; duplication already caused BUG-152).
 - 📌 **Why:** DRY + drift-prevention (no future D2461-style single-golden edit divergence); ZERO accuracy impact (golden/prompt unchanged). `is_singleton_fb` → provenance flag from input metadata.

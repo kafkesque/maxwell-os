@@ -1,4 +1,5 @@
 # Maxwell OS — Buglog
+> **D2463 (2026-08-25):** external-audit cross-exam (Qwen+ChatGPT vs commit `4aeeb6f`) → 3 remediations executed (golden fail-closed, OMLX cache gate, D2461 ghost closed) + 3 NEW bugs catalogued (BUG-177 C16 silent-error class, BUG-178 S6 Parquet C6, BUG-179 loader drift). `preserve_mid_system_cache=true` flagged UNVERIFIED (not a bug — one targeted check). None block the running S2.
 > **D2459 (2026-08-25):** BUG-175 FIXED (root cause + backfill). Phi-4-mini hallucination sentinels (`_AUTHOR_SENTINELS` in `book_metadata.py`: "string"/"Unknown"/type-names — case-sensitive so legit `Anonymous`/`Various` survive) blanked at cache-load AND guarded in `resolve_book_metadata()`; `_AUTHOR_JUNK` extended (etc./unknown/domains); `scripts/backfill_author_sentinels.py` rewrote the 10 contaminated metadata entries (crash-safe C6, never fabricates: `Thinknetic` derived, 9 → `Unknown Author`). Singleton resume HARDENED: transient `None` results no longer mark a cluster processed (re-enters on resume — previously silently dropped forever). 140/140 tests (9 new). SEE ALSO: BUG-175 entry below for full detail.
 > **D2456 (2026-08-24):** Forensic audit found Ollama had the IDENTICAL dual-install clusterfuck as OMLX (homebrew 0.30.0 crash-looping on `bind: address already in use` vs app 0.32.15 serving 11434) — the exact D2455 pattern. FIXED: uninstalled homebrew ollama, archived stale plist, autoremoved orphaned brew mlx/mlx-c (pip mlx verified untouched). BLINDSPOTS fixed: status.py now reports VERSIONS (was "UP" only — drift silent); get_ollama_version added; guard generalized to `guard_stacks_single_source.py` (covers OMLX+Ollama, config-first) with a critical false-positive fix (app-owned CLI shim `/opt/homebrew/bin/omlx`→`~/.omlx/bin/omlx` is LEGIT; now only flags shims resolving into Cellar/opt). NEW `scripts/monitor_stacks.py` one-panel monitor (status+version+min_version drift+single-source) wired into `just preflight` + `just stacks`. 126/126 tests, 10/10 integrity, config audit clean. OMLX server did a GRACEFUL shutdown at 23:23:11 mid-audit (not a crash; recovered clean, no data loss, settings preserved).
 > **D2455 (2026-08-24):** OMLX single-source-of-truth + permanent re-infection guard. ROOT CAUSE of the "two-version clusterfuck": TWO OMLX installs (GUI app 0.6.2 vs homebrew 0.5.1) both claimed port 11435 AND both rewrote `~/.omlx/settings.json`. The homebrew launchd agent (`com.maxwell.omlx.plist` → `/opt/homebrew/bin/omlx serve --max-concurrent-requests 3 --no-cache`) crash-looped every ~11s (`[Errno 48] Address already in use`) and clobbered scheduler settings (silently reverting `max_concurrent_requests=6`→`3`). FIXED: uninstalled homebrew omlx 0.5.1 (kept GUI app 0.6.2 as single source of truth), archived all 6 stale launchd plists, added `scripts/guard_omlx_single_source.py` (fail-loud on forbidden binary/stale agent/port conflict), wired into `just health`+`just preflight`. QUALITY: batching byte-identical to solo (temp=0.0 greedy; empirical). Ollama dual-install (`com.ollama.ollama` + stale `homebrew.mxcl.ollama`) flagged, not touched.
@@ -19,6 +20,34 @@
 > **Next review:** After T1.1 full S1.5→S6 run
 
 ---
+
+## 🟡 BUG-177 — 2026-08-25 — C16 silent-error class (parallel.py + S5 NLI + model_lazyload fallback) — OPEN
+- **Symptom:** Three production paths swallow errors contrary to C16 ("exceptions must log AND raise"):
+  1. `pipeline/parallel.py parallel_map()` catches `TimeoutError`/`Exception`, prints, appends `None`, returns the list. `None` is ambiguous downstream (looks like "processed but empty").
+  2. `pipeline/stage5_verify.py _nli_pair_scores()` returns `(0.0, 0.0, 0.0)` on any exception — an infra/model error becomes indistinguishable from a genuine "not entailed" verdict.
+  3. `pipeline/model_lazyload.py` falls back to hardcoded `http://localhost:11435` + `sk-maxwell-local` if importing centralized OMLX config fails (C12 + C16).
+- **Impact:** silent data-quality loss (worker results dropped as `None`), observability loss (NLI runtime errors look like semantic negatives), and a silent endpoint/key swap in production.
+- **Note:** the golden-loader half of this class (`load_golden_*` → `([], [], 0)`) is FIXED by D2463 (fail-closed raise).
+- **Fix (queued):** (1) `parallel_map` → typed failure object only on explicit opt-in, default raise aggregate; (2) `_nli_pair_scores` → raise typed `NLIInferenceError` while keeping QUARANTINE at the stage boundary + record `verification_error_type`; (3) `model_lazyload` → remove silent fallback, add explicit `--standalone` mode.
+- **Files:** pipeline/parallel.py, pipeline/stage5_verify.py, pipeline/model_lazyload.py
+- **Status:** 🟡 OPEN (queued — does not block S2)
+- **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #4/#9/#21)
+
+## 🟡 BUG-178 — 2026-08-25 — S6 Parquet export not crash-safe (C6) — OPEN
+- **Symptom:** `pipeline/stage6_commit.py export_parquet()` writes the snapshot directly with `pq.write_table(table, str(parquet_path), compression="snappy")` — no tempfile→fsync→os.replace. A kill mid-write leaves a partially-written/truncated `.parquet` snapshot that a downstream reader will fail on.
+- **Impact:** persistent-output corruption on forced process kill (SQLite checkpoint writes are already crash-safe; Parquet is not).
+- **Fix (queued):** write to a unique temp file → `fsync` → `os.replace()` into place + add a checksum/manifest entry.
+- **Files:** pipeline/stage6_commit.py
+- **Status:** 🟡 OPEN (queued — S6 is not running during S2)
+- **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #17)
+
+## 🟡 BUG-179 — 2026-08-25 — AGENTS.md loader stale + tools/delegate_guard.py phantom — OPEN
+- **Symptom:** `AGENTS.md` still declares "DECISION-LOG.md (D2000–D2310)" and "config/decisions.yaml — 299 decisions" (reality: D2463 / 450). The v2.0 loader block still imports `tools.delegate_guard` / `tools.pipeline_paths` / `tools.safe_delete` etc., but the `tools/` layout was migrated to `pipeline/` (v3.0) — `tools/delegate_guard.py` does NOT exist (the mandated preflight gate is a phantom; the real gate is `pipeline/omlx_delegate.py` D2344).
+- **Impact:** agents bootstrapped from the stale loader get obsolete governance + a non-existent preflight import.
+- **Fix (queued):** regenerate AGENTS.md knowledge-source metadata from canonical files (D2463 / 450 / D2000–D2463) + drop the `tools/delegate_guard` phantom from the v2.0 block. Add CI asserting documented decision count/range == DECISION-LOG/decisions.yaml.
+- **Files:** AGENTS.md
+- **Status:** 🟡 OPEN (queued)
+- **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #1, Qwen #2)
 
 ## 🟢 BUG-176 — 2026-08-25 — tool_instruction misclassified as process_template (code framed procedurally) — FIXED (D2457)
 - **Symptom (smoke matrix 5×3, `singleton_fbs.jsonl`):** the singleton "R Data Import and Analysis Workflow" was classified `content_type=process_template` with an **empty body** (`trigger=""`, `prerequisite=""`, `steps=[]`, `done_condition=""`, `failure_mode=""`). Its evidence is R code — `setwd("C:/...") dir() data<-read.csv("...") View(data)` — which is unambiguously a `tool_instruction`, not a human how-to method.

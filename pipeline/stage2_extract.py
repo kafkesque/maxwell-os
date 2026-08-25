@@ -1107,18 +1107,33 @@ def load_golden_parity(
     neg_count: int,
     max_total: int,
 ) -> tuple[list[dict], list[dict], int]:
-    """Load golden examples and subsample to parity."""
-    if golden_path is None or not os.path.exists(str(golden_path)):
-        return [], [], 0
+    """Load golden examples and subsample to parity.
 
+    Fail-closed (D2463, 2026-08-25): a CONFIGURED golden path that cannot be
+    loaded raises — never silently degrades to zero-shot, which would strip the
+    dominant quality control and let the LLM run unfenced. A None path is the only
+    legitimate empty-golden case (injection disabled by config).
+    """
+    if golden_path is None:
+        return [], [], 0
+    if not os.path.exists(str(golden_path)):
+        raise FileNotFoundError(
+            f"Golden parity file missing (fail-closed): {golden_path} — fix the path "
+            "or disable golden injection; do NOT run S2 zero-shot."
+        )
     try:
         import yaml
         with open(str(golden_path)) as f:
             golden = yaml.safe_load(f)
-    except Exception:
-        return [], [], 0
-
-    examples: list[dict] = golden.get("examples", [])
+    except Exception as e:
+        raise RuntimeError(
+            f"Golden parity file unparseable (fail-closed): {golden_path}"
+        ) from e
+    examples: list[dict] = golden.get("examples", []) if isinstance(golden, dict) else []
+    if not examples:
+        raise RuntimeError(
+            f"Golden parity file has no examples (fail-closed): {golden_path}"
+        )
     all_pos: list[dict] = [e for e in examples if e.get("should_extract") and e.get("id") != "GE-001"]
     all_neg: list[dict] = [e for e in examples if not e.get("should_extract")]
     # D2159/D2377: deterministic selection from config (stage2.golden_seed).
@@ -1155,18 +1170,30 @@ def load_golden_single_source(
     `neg_count` negatives (seeded shuffle). No stratification by extraction_type
     here — the axis we need to span is the functional ROLE (content_type), not the
     epistemic FORM.
-    """
-    if golden_path is None or not os.path.exists(str(golden_path)):
-        return [], [], 0
 
+    Fail-closed (D2463, 2026-08-25): a CONFIGURED golden path that cannot be
+    loaded raises — never silently degrades to zero-shot.
+    """
+    if golden_path is None:
+        return [], [], 0
+    if not os.path.exists(str(golden_path)):
+        raise FileNotFoundError(
+            f"Golden single-source file missing (fail-closed): {golden_path} — fix the "
+            "path or disable golden injection; do NOT run S2 zero-shot."
+        )
     try:
         import yaml
         with open(str(golden_path)) as f:
             golden = yaml.safe_load(f)
-    except Exception:
-        return [], [], 0
-
-    examples: list[dict] = golden.get("examples", [])
+    except Exception as e:
+        raise RuntimeError(
+            f"Golden single-source file unparseable (fail-closed): {golden_path}"
+        ) from e
+    examples: list[dict] = golden.get("examples", []) if isinstance(golden, dict) else []
+    if not examples:
+        raise RuntimeError(
+            f"Golden single-source file has no examples (fail-closed): {golden_path}"
+        )
     # Collect ALL positives, grouped by role in deterministic order. A single
     # example per role is NOT enough for contrastive disambiguation — e.g. the
     # tool_instruction role needs BOTH a clear library call AND the ambiguous

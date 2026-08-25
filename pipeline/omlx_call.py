@@ -451,6 +451,50 @@ def check_omlx_health() -> bool:
         return False
 
 
+def assert_omlx_no_cache() -> None:
+    """Fail-closed preflight: refuse inference if OMLX paged-SSD cache is enabled.
+
+    D2460 root cause: the homebrew→GUI migration silently re-enabled
+    `cache.enabled` + `gdn_ssd_split_enabled`, thrashing `store_cache_main_dispatch`
+    (817ms→3.08s) and collapsing decode ~50→~4-7 tok/s. `hot_cache_only` also
+    thrashes. Only `cache.enabled=false` (`--no-cache`) is safe. This gate makes
+    the silent regression IMPOSSIBLE by aborting any launch that would thrash.
+
+    Reads `~/.omlx/settings.json` — the server's launch-time source of truth (oMLX
+    0.6.2 exposes no runtime cache-config API). Raises RuntimeError on any
+    known-thrash flag; logs a WARNING (not a failure) on the unverified
+    `preserve_mid_system_cache` flag.
+    """
+    settings_path = _os.path.expanduser("~/.omlx/settings.json")
+    if not _os.path.exists(settings_path):
+        # No settings file = GUI default. Default is cache-disabled but unverifiable.
+        print(f"⚠️  OMLX cache gate: {settings_path} not found — cannot verify --no-cache; proceeding")
+        return
+    try:
+        with open(settings_path) as f:
+            settings = json.load(f)
+    except Exception as e:
+        raise RuntimeError(f"OMLX cache gate: cannot parse {settings_path}: {e}") from e
+
+    cache = settings.get("cache", {}) if isinstance(settings, dict) else {}
+    bad = []
+    if cache.get("enabled"):
+        bad.append("cache.enabled=true")
+    if cache.get("hot_cache_only"):
+        bad.append("cache.hot_cache_only=true")
+    if cache.get("gdn_ssd_split_enabled"):
+        bad.append("cache.gdn_ssd_split_enabled=true")
+    if bad:
+        raise RuntimeError(
+            "OMLX cache gate FAILED (D2460 thrash guard): " + ", ".join(bad)
+            + f" in {settings_path}. Set cache.enabled=false (--no-cache) and retry."
+        )
+    if settings.get("preserve_mid_system_cache"):
+        print("⚠️  OMLX cache gate: preserve_mid_system_cache=true is UNVERIFIED — "
+              "confirm it is benign mid-request KV reuse, not a D2460-class page-cache risk.")
+    print("✅ OMLX cache gate: --no-cache verified (cache.enabled=false, no SSD split)")
+
+
 def stress_test_omlx(model: str = None, prompt_sizes: list[int] = None,
                      timeout: int = 30, verbose: bool = True) -> dict:
     """Stress-test OMLX chat completions at increasing prompt sizes.

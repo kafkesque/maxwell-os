@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-25T12:45:00Z'
-total_decisions: 448
+total_decisions: 450
 decisions:
 - id: D2092
   category: INF
@@ -4030,6 +4030,21 @@ decisions:
   target_files:
   - config/pipeline_config.yaml
   created: '2026-08-25'
+- id: D2461
+  category: BUGFIX / DRIFT
+  state: ACTIVE
+  description: 'golden_single_source_max was 20 but golden holds 14 positives (SS-POS-014
+    added in D2457 → 7 tool_instruction) + 7 negatives = 21; the D2452 round-robin
+    budget (13) silently dropped SS-POS-014 (the R→TI anchor, BUG-176 case). Bumped
+    max 20→21 so all 14 pos + 7 neg load. Added test_ss_pos_014_r_to_ti_anchor_present;
+    141/141 tests. Spot-check 176 FBs (101 principle/40 PT/34 TI/1 PI), 0 code-laden
+    PTs. Retroactively logged (committed+tested but never entered DECISION-LOG or
+    decisions.yaml).'
+  champion: 2026-08-25 session
+  target_files:
+  - config/pipeline_config.yaml
+  - tests/test_stage2_single_source_golden.py
+  created: '2026-08-25'
 - id: D2462
   category: ARCH
   state: PLANNED
@@ -4038,11 +4053,29 @@ decisions:
   target_files:
   - pipeline/stage2_extract.py
   created: '2026-08-25'
+- id: D2463
+  category: ROBUSTNESS / QUALITY
+  state: ACTIVE
+  description: 'External-audit cross-exam remediation. Golden loading fail-closed
+    (load_golden_parity + load_golden_single_source now raise on missing/unparseable
+    golden instead of silently running zero-shot). OMLX cache preflight gate
+    (assert_omlx_no_cache reads ~/.omlx/settings.json, refuses launch if cache.enabled
+    / hot_cache_only / gdn_ssd_split_enabled are set — the D2460 thrash flags; wired
+    into just s2-singletons). D2461 ghost closed. Catalogued BUG-177 (C16 silent-error
+    class: parallel.py None-swallow, S5 NLI (0,0,0), model_lazyload hardcoded fallback),
+    BUG-178 (S6 Parquet non-atomic, C6), BUG-179 (AGENTS.md stale + delegate_guard
+    phantom), plus preserve_mid_system_cache=true flagged UNVERIFIED.'
+  champion: 2026-08-25 session
+  target_files:
+  - pipeline/stage2_extract.py
+  - pipeline/omlx_call.py
+  - justfile
+  created: '2026-08-25'
 summary:
-  total: 448
+  total: 450
   proposed: 0
   draft: 1
-  active: 389
+  active: 391
   stale: 0
   superseded: 15
   archived: 8
@@ -4059,6 +4092,7 @@ summary:
     BUGFIX: 38
     BUGFIX / CFG: 1
     BUGFIX / DATA-INTEGRITY: 2
+    BUGFIX / DRIFT: 1
     BUGFIX / FAIL-CLOSED: 6
     BUGFIX / GOV: 2
     BUGFIX / INTEGRITY: 2
@@ -4109,7 +4143,7 @@ summary:
     QUALITY / RELIABILITY: 1
     QUALITY / TAXONOMY: 1
     RES: 4
-    ROBUSTNESS / QUALITY: 2
+    ROBUSTNESS / QUALITY: 3
     STR: 1
     VAL: 8
     governance: 1

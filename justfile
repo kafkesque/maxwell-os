@@ -173,6 +173,7 @@ s2-singletons-prefilter:
 # ~6,317 EXTRACT. Crash-safe + resumable (D2453 checkpoint/resume). Stops before S4/S5/S6.
 s2-singletons:
     @echo "=== S2 singleton extraction (t11, prefilter-gated, resumable) ==="
+    @python3 -c "from pipeline.omlx_call import assert_omlx_no_cache; assert_omlx_no_cache()"
     @mkdir -p "knowledge pipeline/stage2_extract/t11"
     MAXWELL_RUN_ID=t11 python3 -u pipeline/stage2_extract.py --only-singletons 2>&1 | tee "knowledge pipeline/stage2_extract/t11/singleton_run.log"
 

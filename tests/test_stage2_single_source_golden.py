@@ -11,6 +11,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.stage2_extract import (
@@ -93,6 +95,35 @@ def test_body_fields_present_on_non_principle_positives() -> None:
             continue
         missing = [f for f in S2_BODY_FIELDS.get(ct, []) if f not in e["expected_fb"]]
         assert not missing, f"{e['id']} ({ct}) missing body fields: {missing}"
+
+
+def test_golden_missing_file_fails_closed() -> None:
+    """D2463: a CONFIGURED golden path that is missing must raise, never silently
+    return zero-shot (which would strip the few-shot quality control)."""
+    with pytest.raises(FileNotFoundError):
+        load_golden_single_source("config/golden/__does_not_exist__.yaml", NEG, MAXT)
+
+
+def test_golden_none_path_returns_empty() -> None:
+    """A None path is the ONLY legitimate empty-golden case (injection disabled)."""
+    pos, neg, n = load_golden_single_source(None, NEG, MAXT)
+    assert pos == [] and neg == [] and n == 0
+
+
+def test_golden_unparseable_yaml_fails_closed(tmp_path) -> None:
+    """D2463: unparseable golden YAML must raise, not silently degrade to zero-shot."""
+    p = tmp_path / "bad_golden.yaml"
+    p.write_text("{ invalid: [ yaml")
+    with pytest.raises(RuntimeError):
+        load_golden_single_source(str(p), NEG, MAXT)
+
+
+def test_golden_empty_examples_fails_closed(tmp_path) -> None:
+    """D2463: a golden file with no examples must raise (fail-closed)."""
+    p = tmp_path / "empty_golden.yaml"
+    p.write_text("examples: []\n")
+    with pytest.raises(RuntimeError):
+        load_golden_single_source(str(p), NEG, MAXT)
 
 
 if __name__ == "__main__":

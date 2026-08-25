@@ -3,6 +3,27 @@
 
 ---
 
+### D2463 — External-audit cross-exam remediation: golden fail-closed + OMLX cache gate + issue catalog (2026-08-25)
+**Category:** ROBUSTNESS / QUALITY
+
+**Decision:** Cross-examined the Qwen + ChatGPT external audits against the live repo (commit `4aeeb6f`). Both independently converged on three real risk classes — registry drift, the C16 silent-error class, and the un-enforced `--no-cache` setting — plus several concrete gaps not previously catalogued. Three remediations executed (zero impact on the running S2 singleton extraction; Python import-once isolates the live process):
+
+1. **Golden loading fail-closed** (`pipeline/stage2_extract.py`): `load_golden_parity` + `load_golden_single_source` previously returned `([], [], 0)` on missing/unparseable golden → the LLM silently ran zero-shot (stripping the dominant quality control). Now a CONFIGURED golden path that cannot load raises (`FileNotFoundError`/`RuntimeError`). A `None` path remains the only legitimate empty-golden case (injection disabled).
+2. **OMLX cache preflight gate** (`pipeline/omlx_call.py` `assert_omlx_no_cache()`): reads `~/.omlx/settings.json` and refuses to launch (raises) if `cache.enabled` / `hot_cache_only` / `gdn_ssd_split_enabled` are truthy — the exact flags that caused the D2460 paged-SSD thrash. Wired into `just s2-singletons`. Warns (not fails) on the unverified `preserve_mid_system_cache`.
+3. **D2461 governance ghost closed** — the config-drift fix (golden max 20→21) was committed+tested but never entered DECISION-LOG or decisions.yaml. Retroactively logged + registered.
+
+**Newly catalogued (previously uncatalogued) issues — logged to buglog + task register:**
+- **BUG-177** — C16 silent-error class: `parallel.py parallel_map` swallows `TimeoutError`/`Exception` → `None`; `stage5_verify._nli_pair_scores` returns `(0,0,0)` on error (indistinguishable from neutral); `model_lazyload` silently falls back to hardcoded `http://localhost:11435` + `sk-maxwell-local` on import failure.
+- **BUG-178** — S6 Parquet export not crash-safe (`pq.write_table` direct, no tempfile→fsync→os.replace; violates C6).
+- **BUG-179** — `AGENTS.md` loader stale (D2000–D2310 / 299 decisions vs D2462 / 448) + phantom `tools/delegate_guard.py` reference in the v2.0 loader block.
+- ⚠️ `~/.omlx/settings.json` has `preserve_mid_system_cache: true` — UNVERIFIED (benign mid-request KV vs D2460-class page-cache risk); flagged for one targeted check.
+
+- **Status:** ✅ DONE (code + governance; catalogued items queued — none block the running S2)
+- **Files:** `pipeline/stage2_extract.py`, `pipeline/omlx_call.py`, `justfile`, `config/golden/stage2_fewshot_single_source.yaml` (meta 20/13→21/14), `DECISION-LOG.md`, `config/decisions.yaml`, `governance/buglog.md`, `governance/aggregated_remaining_tasks.md`
+- **Source:** 2026-08-25 — operator "cross-examine external audits, execute 1-3, log new issues" directive
+
+---
+
 ### D2462 — Unify single-source + singleton S2 extraction into one extractor (2026-08-25)
 **Category:** ARCHITECTURE / REFACTOR
 
@@ -21,6 +42,23 @@
 - **Status:** ✅ DECIDED — queued as a post-S2 refactor (NOT a blocker for the current singleton run, which already emits correct multi-class output).
 - **Files:** `pipeline/stage2_extract.py` (unify `process_singletons` + single-source path), `config/golden/stage2_fewshot_single_source.yaml` (shared), `config/pipeline_config.yaml`
 - **Source:** 2026-08-25 — operator "merge or not" architecture review
+
+---
+
+### D2461 — Fix golden/config drift: SS-POS-014 (R→TI anchor) silently dropped (2026-08-25)
+**Category:** BUGFIX / DRIFT
+
+**Decision:** `golden_single_source_max` was 20 but the golden set holds 14 positives (SS-POS-014 added in D2457 → 7 tool_instruction) + 7 negatives = 21. The D2452 round-robin budget (13 = 20−7 negatives) silently dropped SS-POS-014 — the R-data-import→tool_instruction anchor (the exact BUG-176 case). Bump `golden_single_source_max` 20→21 so all 14 positives + 7 negatives load; fix the stale inline comment.
+
+**Root cause:** D2457 added golden anchor SS-POS-014 (code→tool_instruction) but did not bump the load cap. The D2452 round-robin truncation preserves role balance by cycling roles, but with a 13-positive budget and 7 tool_instruction positives, the 7th TI (SS-POS-014) was the overflow victim — silently dropped, re-opening the BUG-176 code-as-PT misclassification surface it was meant to close.
+
+**Fix:** `golden_single_source_max` 20→21 (C12 config). Added regression test `test_ss_pos_014_r_to_ti_anchor_present`. Verified: golden now loads 14 pos + 7 neg (was 13+7); 141/141 tests green.
+
+**Classification spot-check:** 176 FBs (101 principle / 40 process_template / 34 tool_instruction / 1 process_instance), PT-vs-TI boundary correct, 0 code-laden PTs (D2457 works). 1 minor edge: TI 'Adobe Photoshop Vector Path Creation' has empty `tool_name` (borderline PI).
+
+- **Status:** ✅ DONE (commit `53dea05`; retroactively logged — the decision was committed+tested but never entered DECISION-LOG or decisions.yaml)
+- **Files:** `config/pipeline_config.yaml`, `tests/test_stage2_single_source_golden.py`
+- **Source:** 2026-08-25 — golden/config drift audit + external-audit cross-exam
 
 ---
 

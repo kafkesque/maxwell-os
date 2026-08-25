@@ -25,8 +25,8 @@ meta:
   purpose: single-source balanced few-shot (all 5 content_type roles)
   d2345_fork: false
   status: WIRED
-  total_examples: 20
-  single_source_positives: 13
+  total_examples: 21
+  single_source_positives: 14
   hard_negatives: 7
   expected_coverage:
   - role_balance_all_5_content_types

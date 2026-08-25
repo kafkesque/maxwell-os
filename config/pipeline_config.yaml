@@ -196,7 +196,7 @@ stage2:
   golden_single_source_path: config/golden/stage2_fewshot_single_source.yaml
   golden_single_source_inject_enabled: true
   golden_single_source_negative: 7
-  golden_single_source_max: 20   # 13 positives (3 principle + 2 PT + 6 TI + 1 PI + 1 GE) + 7 negatives (D2451 over-split + frontend TI + normative-principle)
+  golden_single_source_max: 21   # 14 positives (3 principle + 2 PT + 7 TI + 1 PI + 1 GE) + 7 negatives. D2457 added SS-POS-014 (R→TI) but max stayed 20 → round-robin budget 13 silently dropped the 7th TI (SS-POS-014). Bumped to 21 so all roles + anchors load.
   split_probe_enabled: true
   split_probe_min_size: 20
   split_probe_max_cohesion: 0.85

@@ -64,6 +64,15 @@ def test_deterministic_selection() -> None:
     assert a_n == b_n
 
 
+def test_ss_pos_014_r_to_ti_anchor_present() -> None:
+    """D2457's R-data-import→tool_instruction anchor (SS-POS-014) must reach the
+    few-shot. It is the 7th TI positive — with golden_single_source_max=20 the
+    round-robin budget (13) silently dropped it (config/golden drift, D2461)."""
+    pos, neg, _ = load_golden_single_source(GOLDEN, NEG, MAXT)
+    ids = {e["id"] for e in pos}
+    assert "SS-POS-014" in ids, "SS-POS-014 (R→TI anchor) silently dropped from few-shot"
+
+
 def test_tool_instruction_has_contrastive_pair() -> None:
     """Both the clear library-call AND the ambiguous algorithm (DFS) TI examples
     must reach the few-shot. A single TI example is not enough to teach PT-vs-TI

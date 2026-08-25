@@ -58,11 +58,23 @@ services:
   ollama:
     host: localhost
     port: 11434
+    min_version: 0.32.0      # D2456: version drift detection (was silent before — homebrew 0.30.0 vs app 0.32.15)
     nomic_max_chars: 4000
     embed_max_chars: 4000
     batch_size: 100
     embed_timeout: 180        # D2348: 60s too short under 4-worker concurrent load → read timeouts (3% drop, BUG-105)
     embed_keep_alive: -1      # D2348: pin bge-m3 in VRAM (keep_alive thrash → cold reload stalls, BUG-105)
+    single_source_guard:  # D2456: exactly ONE Ollama install (GUI app). Same pattern as D2455 OMLX.
+      canonical_app: /Applications/Ollama.app
+      forbidden_bins:  # unambiguous homebrew formula markers
+        - /opt/homebrew/opt/ollama
+        - /opt/homebrew/Cellar/ollama
+      shim_paths:  # ambiguous: the app writes /usr/local/bin/ollama -> /Applications/Ollama.app/...
+        - /opt/homebrew/bin/ollama
+        - /usr/local/bin/ollama
+      forbidden_launchd_labels:
+        - homebrew.mxcl.ollama
+      launch_agents_dir: ~/Library/LaunchAgents
   omlx:
     host: localhost
     port: 11435
@@ -76,6 +88,17 @@ services:
     circuit_breaker_enabled: true
     circuit_breaker_failure_threshold: 5
     circuit_breaker_cooldown_seconds: 60
+    single_source_guard:  # D2455: exactly ONE OMLX install (GUI app). Detect homebrew/duplicate re-infection.
+      canonical_app: /Applications/oMLX.app
+      forbidden_bins:  # unambiguous homebrew formula markers (only homebrew creates Cellar/opt)
+        - /opt/homebrew/opt/omlx
+        - /opt/homebrew/Cellar/omlx
+      shim_paths:  # ambiguous: the APP also writes /opt/homebrew/bin/omlx -> ~/.omlx/bin/omlx. Flag only if it resolves to a Cellar install.
+        - /opt/homebrew/bin/omlx
+      forbidden_launchd_labels:
+        - com.maxwell.omlx
+        - homebrew.mxcl.omlx
+      launch_agents_dir: ~/Library/LaunchAgents
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -191,7 +214,7 @@ stage2:
   gen_max_tokens: 3072       # D2381: S2 extraction output budget (was hardcoded 2048 in call_llm → JSON truncation / finish_reason=length)
   gen_max_tokens_retry: 4096 # D2381: JSON-failure fallback budget (retry with more room before giving up)
   batch_position_monitor: false
-  max_workers: 3
+  max_workers: 6        # D2459: OMLX batched engine scales with concurrency (6 concurrent 128-tok gens = 3.7× serial); server max_concurrent_requests=6
   singleton_batch_size: 4        # D2xxx: batch N singletons per LLM call (option-1 speedup, BUG-155 follow-up)
   singleton_batch_max_tokens_per_item: 1000  # per-singleton output budget inside a batch call (batch max_tokens = size x this)
   singleton_prefilter_enabled: true  # D2452: gate singleton pass on singletons.prefiltered.jsonl EXTRACT verdicts (D2437 prefilter)

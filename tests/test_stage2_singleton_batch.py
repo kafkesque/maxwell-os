@@ -92,3 +92,45 @@ def test_singleton_result_non_principle_not_gated():
     assert fb is not None and "_gate" not in fb
     assert fb["content_type"] == "process_template"
     assert fb["steps"] == ["s1"]
+
+
+# ── D2457 — code-detection (PT-vs-TI disambiguation) ──────────────────────
+def test_detect_code_r_import():
+    from pipeline.stage2_extract import detect_code_in_text
+    r = 'import data into R: setwd("C:/x") dir() data<-read.csv("p.csv") View(data)'
+    assert detect_code_in_text(r) is True
+
+
+def test_detect_code_human_method_not_code():
+    from pipeline.stage2_extract import detect_code_in_text
+    human = 'organize a fruit party: invite guests, buy fruit, set up tables, serve drinks'
+    assert detect_code_in_text(human) is False
+
+
+def test_code_role_guard_reclassifies_empty_pt():
+    from pipeline.stage2_extract import _code_role_guard
+    ev = 'import data into R: setwd("C:/x") dir() data<-read.csv("p.csv") View(data)'
+    result = {
+        "content_type": "process_template", "steps": [], "name": "R Data Import",
+        "definition": "A workflow to import data into R for analysis",
+        "mechanism": "setwd then read.csv then View", "boundary": "applies to R",
+        "consequence": "data loaded",
+    }
+    ct, body, flag = _code_role_guard("process_template", result, ev)
+    assert flag is True
+    assert ct == "tool_instruction"
+    assert body["tool_name"] == "R"
+
+
+def test_code_role_guard_preserves_populated_pt():
+    from pipeline.stage2_extract import _code_role_guard
+    ev = 'organize a fruit party: invite guests, buy fruit'
+    result = {"content_type": "process_template", "steps": ["invite guests", "buy fruit"], "name": "Fruit Party"}
+    ct, body, flag = _code_role_guard("process_template", result, ev)
+    assert flag is False
+    assert ct == "process_template"
+
+
+def test_code_hint_empty_without_code():
+    from pipeline.stage2_extract import _code_hint
+    assert _code_hint("a plain principle about design systems") == ""

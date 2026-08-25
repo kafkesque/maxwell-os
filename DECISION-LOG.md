@@ -3,6 +3,131 @@
 
 ---
 
+### D2459 — BUG-175 author-sentinel validation + singleton checkpoint hardening (2026-08-25)
+**Category:** BUGFIX / PROVENANCE
+
+**Decision:** Fix `author="string"` provenance contamination at its root (Phi-4-mini hallucination pattern BUG-053) and harden the singleton resume path before the 6,317-singleton S2 launch.
+
+**BUG-175 root cause:** `config/checkpoints/book_metadata.jsonl` carried 10 entries (7 books `author="string"`, 3 books `author="Unknown"`) all produced by `llm:Phi-4-mini-instruct-8bit` on open-ended filename→author extraction. The type-name "string" / placeholder "Unknown" propagated into `citation` / `source_authors` / `primary_source` on 253 S2 records (~3.0%). The LLM path "succeeded" with a non-empty bogus value so the heuristic fallback never ran.
+
+**Actions:**
+1. **Sentinel validation** — `pipeline/book_metadata.py`: `_AUTHOR_SENTINELS` (type-name/placeholder set, case-SENSITIVE so legit `Anonymous`/`Various` survive) + `is_sentinel_author()`; blanked at cache-load (read boundary) AND guarded in `resolve_book_metadata()` (defense-in-depth). A sentinel can never propagate again.
+2. **Heuristic junk rejection** — `_AUTHOR_JUNK` extended with `etc.`/`unknown`/domain-suffix patterns: the filename heuristic no longer derives junk authors from parens like `( etc.)` or `(ColorPsychology.org)`.
+3. **Data backfill** — new `scripts/backfill_author_sentinels.py` (crash-safe C6, idempotent, dry-run) rewrote the 10 entries: `string`/`Unknown` → deterministic heuristic result (`Thinknetic` for Mental Models via paren convention; `""` → `Unknown Author` at read time for the other 9). Never fabricates.
+4. **Singleton resume hardening** — `process_singletons` previously marked a batch processed even when individual results were `None` (transient transport/parse failure) → singleton silently dropped forever. Now only DEFINITE verdicts (FB/NULL/gate) mark a cluster processed; `None` re-enters on resume. Also fixed literal `\n` print artifacts in `main()`.
+
+**Verification:** 9 new regression tests (`tests/test_book_metadata_sentinels_d2459.py`); 140/140 tests green. Resolver now returns `Unknown Author`/`Thinknetic` — never `string`. Backfill idempotent (2nd run: 0 changes).
+
+**S2 singleton launch (this decision):** stale PID 41569 confirmed dead (no checkpoint files existed — nothing to resume); prefilter fresh (Aug 23 > singletons Aug 18); launched `just s2-singletons` under `caffeinate -i -s` (no sleep), `nohup`, 6 workers. **Performance finding:** oMLX decode runs at 4.5-7 tok/s per request (M1 Max should do 30+; raw MLX matmul 3.5 TFLOPS ≈ 33% of peak — server-side decode bottleneck, not memory/thermal: 0 swap, no thermal warnings). Concurrency scales 3.7× (6 parallel 128-tok gens = 26.2 tok/s aggregate vs 7.2 serial) → `stage2.max_workers` 3→6 (C12). ETA ~25-30h for 6,317 singletons — background job, crash-safe every 5 batches, resume-proven (D2453). First checkpoint verified: 16 FBs (6 principle + 10 PT), 16/16 R14-stamped, provenance intact. gpt-oss-20b (S4) stays unloaded during S2 (only Qwen3-Coder + pinned Phi-4-mini resident, 20.3GB).
+
+**Residual:** the 253 S2 records in `checkpoint.deduped.jsonl` keep their baked-in provenance until a post-hoc re-stamp (deferred — cosmetic; blocks nothing). `extraction_method` on backfilled entries unchanged (traceability via `backfilled_by: D2459/BUG-175`). Server-side decode speed investigation (oMLX version/scheduler/GPU-slice) = separate perf task.
+
+- **Status:** ✅ DONE
+- **Files:** `pipeline/book_metadata.py`, `scripts/backfill_author_sentinels.py`, `tests/test_book_metadata_sentinels_d2459.py`, `knowledge pipeline/checkpoints/book_metadata.jsonl`, `pipeline/stage2_extract.py`, `config/pipeline_config.yaml` (max_workers 6)
+- **Source:** 2026-08-25 — BUG-175 operator report + pre-launch hardening review
+
+---
+
+### D2458 — E2E cohesion proof + 9-class failure audit (2026-08-25)
+**Category:** QLT / AUDIT
+
+**Decision:** Prove (or disprove) S2→S4→S5 reliability for all 5 content types × 3 origins with a CONTROLLED LIVE run, and audit the full corpus for leaks/cascades/hidden failures/contamination/drift/bugs/blindspots/gaps/conflicts — after the smoke matrix "only ran S2" finding.
+
+**Root cause of the misleading smoke matrix** (three distinct causes, all proven):
+1. The 5×3 smoke ran S2 singleton + S4 only — S5 was never executed.
+2. S4/S5/S6 artifacts were stale (Aug 20) vs S2 (Aug 23) — the 7,904 "drift" and 150 "conflict" findings are stale-data artifacts, NOT live code defects (live e2e shows intact fields).
+3. The empty PT body was BUG-176 (misclassification), not a schema defect.
+
+**Actions:**
+1. **`scripts/e2e_proof.py`** — controlled live S2→S4→S5 on 7 representatives (all 5 types × convergent/single-source): stages a fresh S2 checkpoint, runs REAL S4 (OMLX) + REAL S5 (DeBERTa), traces R14 stamps + provenance field integrity. Result: **all 7 survive S2→S4 intact; only the 2 principles reach S5 (both PASS)**.
+2. **Structural finding (deferred design, not a bug):** S5 verifies `principle` ONLY — `load_stage4_fbs` reads `checkpoint.jsonl`, never PT/PI/TI/GE sidecars. Non-principle types dead-end at S4 by construction → Path A (non-principle S5 verification + S6 tables) tracked.
+3. **`scripts/audit_e2e_cohesion.py`** — full-corpus audit with 9 failure classes: leak=46, drift=7,904 (stale artifact), conflict=150 (pre-D2452, now blanked), blindspot=1 (singleton origin has 0 records — 6,317 EXTRACT singletons never extracted, stale PID 41569), gap=1 (S6 empty), hidden-failure/contamination/cascade/bug = 0.
+4. **BLINDSPOT confirmed:** the "3-origin" matrix was never actually satisfied on the real corpus — only `smoke_matrix_5x3b` (S2+S4 only) touched singletons.
+
+**Verification:** reports at `stage4_merge/e2e_proof/e2e_proof_report.md` + `stage4_merge/t11/e2e_cohesion_report.md`.
+
+**Trigger:** singleton S2 extraction (6,317 EXTRACT) → BUG-165 (S4→S5→S6 rerun) → Path A (non-principle commit) — the critical path this audit de-blocked.
+
+- **Status:** ✅ DONE (audit); actions land with BUG-165/Path A
+- **Files:** `scripts/e2e_proof.py`, `scripts/audit_e2e_cohesion.py`, `stage4_merge/e2e_proof/e2e_proof_report.md`, `stage4_merge/t11/e2e_cohesion_report.md`
+- **Source:** 2026-08-25 — operator demand for end-to-end reliability proof
+
+---
+
+### D2457 — TI-vs-PT ontological classification fix: deterministic code detection (2026-08-25)
+**Category:** DATA / TAXONOMY
+
+**Decision:** Root-cause fix for BUG-176 — "R Data Import and Analysis Workflow" was classified `process_template` with an empty body when its substance is R code framed procedurally. Add deterministic code-detection so code-laden passages route to `tool_instruction` regardless of "how to…" framing.
+
+**Root cause:** the passage is framed procedurally ("how to import the data into R") but its substance is executable code (`setwd/dir/read.csv/View`). The LLM latched onto the framing → chose PT → couldn't extract human "steps" from code → empty PT body. No deterministic code signal existed; the PT-vs-TI prompt rule is text-only. Systemic scope: 46/796 (5.8%) process_templates carry code markers in evidence.
+
+**Actions (three layers):**
+1. `config/filtering.yaml` `code_markers` — 46 R/Python/JS/SQL/CLI signals (C12 config-first).
+2. `stage2_extract.py` `detect_code_in_text()` + `_code_hint()` — deterministic "⚠️ CODE DETECTED → tool_instruction NOT process_template" annotation injected into singleton (per-item + batch) and single-source prompts on ≥2 distinct markers.
+3. `_code_role_guard()` — post-hoc deterministic fail-safe: reclassifies code-laden `process_template` with empty `steps` → `tool_instruction`, derives best-effort `tool_name`/`syntax`/`example`, stamps `code_role_corrected=true`.
+4. Golden anchor SS-POS-014 (R data import → tool_instruction) appended to `stage2_fewshot_single_source.yaml`.
+
+**Verification:** 131/131 tests (5 new); live OMLX re-run of the exact passage → `content_type=tool_instruction, tool_name=R, syntax="setwd(), dir(), read.csv(), View()"`; guard unit-test reclassifies the historical misclassification deterministically.
+
+**Residual:** 46 PTs with code markers in full corpus → re-run S2 single-source on those or post-hoc reclassify via `scripts/score_single_source.py`.
+
+- **Status:** ✅ DONE
+- **Files:** `config/filtering.yaml`, `pipeline/stage2_extract.py`, `config/golden/stage2_fewshot_single_source.yaml`, `tests/test_stage2_singleton_batch.py`
+- **Source:** 2026-08-25 — operator insight ("R data import is not tool instruction") + smoke-matrix 5×3 examination
+
+---
+
+### D2456 — Forensic audit: Ollama had the SAME clusterfuck + stack guard generalized (2026-08-24)
+**Category:** OPS / RELIABILITY
+
+**Finding:** The forensic audit (following the D2455 OMLX fix) found **Ollama had the identical dual-install clusterfuck**:
+
+| | App (canonical) | Homebrew (stale) |
+|---|---|---|
+| Binary | `Ollama.app` **0.32.15** | `homebrew-core/ollama` **0.30.0** |
+| Launchd | `com.ollama.ollama` ✅ serving 11434 | `homebrew.mxcl.ollama` **`error 1`** crash-looping |
+| Log | — | `bind: address already in use` (every seconds) |
+
+Plus **two blindspots** that kept drift invisible: `status.py` reported "UP" but never checked *versions*; `get_omlx_version()` existed but was unwired; no `get_ollama_version()` at all.
+
+**Actions:**
+1. Unpinned + uninstalled homebrew `ollama` 0.30.0; archived `homebrew.mxcl.ollama.plist`; autoremoved orphaned brew `mlx`/`mlx-c` (verified: pipeline uses pip `mlx`, untouched).
+2. **Guard generalized** — `guard_omlx_single_source.py` → `guard_stacks_single_source.py`, iterating every service with a `single_source_guard` block (config-first, future-tax-free). **Critical fix:** the original guard false-positived on the app-owned CLI shim (`/opt/homebrew/bin/omlx` → `~/.omlx/bin/omlx` → `omlx-cli`, written by oMLX 0.6.2 on every start). New discrimination: `forbidden_bins` (unambiguous Cellar/opt markers) vs `shim_paths` (flag only if resolving into Cellar/opt). A/B tested 3 ways.
+3. **NEW `scripts/monitor_stacks.py`** — one panel: status + version + `min_version` drift verdict + single-source guard. Added `min_version` pins (omlx 0.4.0, ollama 0.32.0). `just stacks` target; `just preflight` now runs the monitor.
+4. `get_ollama_version()` added; `status.py` now prints `Versions: OMLX x | Ollama y`.
+
+**Verification:** 126/126 tests, 10/10 integrity, config audit clean, embedding 1024→512 Matryoshka correct.
+
+**Note:** OMLX server did a *graceful* shutdown at 23:23:11 during the audit (clean "Engine pool shutdown", RAM 91% free, not a crash; `crash.log` entries are stale Aug 6-7 from removed homebrew builds) — recovered via app relaunch, no data loss, settings preserved. `pip check` conflicts are all third-party (0 pipeline refs); only `dspy` touches pipeline but `dspy_trainer.py` is unwired (BUG-168).
+
+---
+
+### D2455 — OMLX single-source-of-truth + permanent re-infection guard (2026-08-24)
+**Category:** OPS / RELIABILITY
+
+**Finding (root cause of the "two-version clusterfuck"):** TWO independent OMLX installs both claimed port `11435` and both rewrote `~/.omlx/settings.json`:
+
+| Install | Version | State | Threat |
+|---|---|---|---|
+| GUI app `oMLX.app` | **0.6.2** (stable, self-contained) | ✅ Serving (PID 48492) | Canonical |
+| Homebrew `jundot/omlx/omlx` | **0.5.1** (stale) | ⚠️ Linked + launchd plists present | Contaminator |
+
+The homebrew launchd agent (`com.maxwell.omlx.plist` → `/opt/homebrew/bin/omlx serve --max-concurrent-requests 3 --no-cache`) crash-looped every ~11s (`[Errno 48] Address already in use`) and clobbered `settings.json`, silently reverting `max_concurrent_requests=6` → `3`. It was the re-infection vector: `RunAtLoad=true` + `KeepAlive=true` meant it would re-arm on every login.
+
+**Decision:** Do **not** "sync both versions up to date" — two installs, even identical versions, still fight over the port and race on `settings.json`. The correct fix is **exactly one canonical OMLX**. Removed the stale homebrew install entirely, kept the GUI app as single source of truth.
+
+**Actions:**
+1. `brew uninstall omlx` (0.5.1, 35,418 files / 1.6GB) + autoremoved its orphaned `python@3.11` dep. Pipeline uses `/usr/local/bin/python3` (3.12.1) — unaffected. Verified `mlx`/`mlx-c`/`ollama` (Ollama 11434 deps) survive.
+2. Archived all 6 stale launchd plists (`com.maxwell.omlx` ×4, `homebrew.mxcl.omlx` ×2) → `~/.omlx/archive-single-source-*`.
+3. **New** `scripts/guard_omlx_single_source.py` — config-first (C12) guard, wired into `just health` + `just preflight`, failing loudly on: forbidden homebrew binary present, stale launchd label loaded OR plist present, port 11435 not owned by exactly one process. Fail-loud A/B verified (touch forbidden plist → exit 1 → cleanup → exit 0).
+4. `tools/ab_test_grammar.py` stale `brew reinstall omlx` / `com.maxwell.omlx` comment fixed.
+
+**Quality verdict (empirical):** `max_concurrent_requests` batching is **byte-identical** to solo — `temperature=0.0` (greedy) + continuous batching is a pure *scheduling* optimization, not a *sampling* change. Zero quality/accuracy impact. Verified: solo==solo deterministic, all 3 concurrent == solo baseline.
+
+**Note:** Ollama exhibits the same dual-install pattern (`com.ollama.ollama` + stale `homebrew.mxcl.ollama`, last exit 1). Flagged for a future decision; NOT touched (out of scope).
+
+---
+
 ### D2453 — S2 singleton crash-safety + resume + external-audit #5/#14 capture (2026-08-24)
 **Category:** BUGFIX / RELIABILITY
 
@@ -257,6 +382,78 @@
 
 **Files:** scripts/score_single_source.py, scripts/prefilter_clusters.py, config/filtering.yaml
 **Source:** Session 2026-08-23 — BUG-166 value audit.
+
+---
+
+### D2436 — OMLX server fixes (memory-guard + no-cache) (2026-08-22)
+**Category:** OPS | **State:** ACTIVE
+
+OMLX server fixes. (1) launchd plist --memory-guard-gb 55 produced "estimator-only, eviction disabled"; changed to --memory-guard safe -> eviction enabled (free pages ~27k -> ~2.1M). (2) 185GB paged-SSD cache thrash (store_cache_main_dispatch ~9.8s/request) -> added --no-cache -> dispatch ~2-7ms. Residual: gemma-4-E4B 256 head_dim forces slow SDPA prefill (~72 tok/s on 700-token prompts), not config-fixable.
+
+### D2435 — P1.3 human-adjudicated extraction_type verdicts applied (2026-08-22)
+**Category:** QLT | **State:** ACTIVE
+
+P1.3 human-adjudicated extraction_type verdicts applied. 49/58 verdicts adjudicated (9 NONE = USER-FLAG content_type concerns). 14 records corrected to human label (35 already matched gemma); 9 NONE records quarantined to relabel_work/quarantine_none_records.jsonl. Backup checkpoint.jsonl.pre_p13. Post-P1.3 distribution: descriptive 3,874 / empirical 2,069 / normative 1,976 / causal 491. Discovered 3 pre-existing duplicate fb_ids (also in pristine backup) -> BUG-164, fold into R1.4 dedup.
+
+### D2434 — P1.2 extraction_type relabel sweep COMPLETE + promoted (2026-08-22)
+**Category:** QLT | **State:** ACTIVE
+
+P1.2 extraction_type relabel sweep COMPLETE + promoted. Judge = gemma-4-E4B (S4_DEPTH_MODEL), NOT Qwen3 (R5 cross-family: Qwen3 agrees with human only 8% on the hardest 49 records vs gemma 73%). Ladder tightening rejected (49%->45% human agreement). Mechanism-field poisoning confirmed (dropping mechanism/boundary/consequence raises Qwen to 41% but hurts gemma 73%->69%). Few-shot leave-one-out hurts gemma (73%->59%); self-reported confidence uninformative. Relabeled single-source/singleton extraction_type only (3,412 changed / 1,348 unchanged / 1 failed). Promoted to production (backup checkpoint.jsonl.pre_relabel md5 fc17b4ee4c4634d66988524ceff5bb9b). Full-checkpoint causal_mechanism 44.8% -> 5.8%. Integrity: 8,410 records, 0 fb_id reorder, 0 invalid labels, 0 convergent touched, 0 non-extraction_type field changes.
+
+### D2433 — P2 hygiene sweep (golden fix + dead-code purge) (2026-08-22)
+**Category:** QLT | **State:** ACTIVE
+
+P2 hygiene sweep (execution of the D2432 audit findings). (1) F3/F4 golden fix: relabelled the 2 tool_instruction positives in stage2_fewshot_single_source.yaml from descriptive_model to normative_heuristic (D2417), and stripped the bogus extraction_type/content_type from all 55 hard negatives across the 4 golden files (block-scoped script, comments preserved). (2) A2 fix: removed extraction_type=none from the SINGLETON_SYSTEM enum + FORM list + route bullet (grep none=0). (3) B1 fix: deleted dead D2150 EXTRACTION_TO_CONTENT_TYPE from content_types.py + content_types.yaml (zero importers; ROUTE_TO_CONTENT_TYPE D2128 kept as live). (4) B2/B3 fix: removed dead schemas.py ProcessTemplate/ProcessInstance/GrowthEdge/ToolInstruction classes (324 lines) + orphaned GE_CATEGORY/GE_STATUS; resolves the actors array-vs-str mismatch by deletion. (5) C1/C2 fix: documented elaboration as principle-only and failure_mode as dual-provenance in content_types.yaml core_body. (6) C3 fix: corrected the D2128 route comment + H4 task (route is a live fallback, not inert). (7) D1 fix: documented D2417 CONTENT_TO_EXTRACTION_TYPE as a repair fail-safe (not a routing rule), reconciled with D2427. Verification: 82 tests pass; schemas.py/content_types.py/stage4_merge import cleanly; content_types.yaml parses.
+
+### D2432 — Forensic audit S2/S4/config/decisions/buglog (2026-08-22)
+**Category:** QLT / AUDIT | **State:** ACTIVE
+
+Forensic audit (S2↔S4, scripts↔config↔decisions↔buglog) after the D2431 A/B test. Findings: A1 DECOUPLING RULE was missing from 3/4 S2 prompts (FIXED — added to SINGLE_SOURCE_SYSTEM + SINGLETON_SYSTEM, now 3/3, batch inherits); A2 singleton prompt offers extraction_type=none (5th value) but config EXTRACTION_TYPES has 4 → prompt-config enum mismatch; B1 D2150 EXTRACTION_TO_CONTENT_TYPE is DEAD config (never imported by any stage; a role-form coupling D2427 said to delete); B2 schemas.py ProcessTemplate/ProcessInstance/GrowthEdge/ToolInstruction classes are DEAD (superseded by flat-FB + content_type, never removed); B3 actors type mismatch (config says array, schemas.py ProcessInstance.actors is str); C1 elaboration listed in shared core_body but is principle-only per user decision + prompt; C2 failure_mode provenance ambiguous (core_body S4 + PT extension_fields + PT s2_body_fields S2); C3 route is NOT inert (D2128 _resolve_content_type uses it as fallback) — H4 task is stale; D1 D2417 CONTENT_TO_EXTRACTION_TYPE active in _normalize_role_fields (conflation-rescue role-form coupling, tension with D2427); E1 non-principle dead-end (D2418) still P0 (stage6 supports content_type; dead-end is stage4 routing + stage5); F1/F2 BUG-159/160 still open. No new leak/contamination from the prompt change.
+
+### D2431 — A/B test refutes S4 FORM ownership; keep FORM in S2 (2026-08-22)
+**Category:** QLT / AUDIT | **State:** ACTIVE
+
+A/B test (n=20 single-source/singleton records, 3 arms) on extraction_type FORM reliability, run live on OMLX. Results: S2-current (broken single-source prompt) = 55% causal_mechanism; S2-fixed (Qwen3 + decision-order ladder) = 25% causal; S4 (gpt-oss cross-family + same ladder) = 0% causal and 60% empirical_pattern. Cross-family agreement (gpt-oss vs Qwen3, same ladder) = 35%; s2_current vs s4 = 45%. Conclusions: (1) the drift is PROMPT-driven, not family-driven — the decision-order ladder alone cuts causal 60%→25%, so F1/F5 are fixed IN S2 (implemented: ladder added to SINGLE_SOURCE_SYSTEM + SINGLETON_SYSTEM, MAPPING RULES removed, SINGLETON_BATCH_SYSTEM inherits); (2) gpt-oss does NOT auto-correct — it has its own systematic empirical_pattern bias (0 causal), so the D2430 move-FORM-to-S4 claim is REFUTED as a reliability win (D2430 superseded); (3) FORM is genuinely high-ambiguity (~65% cross-family disagreement), validating D2429/D2427. Revised: keep FORM in S2 with the unified ladder, use cross-family gpt-oss as a VERIFICATION signal that flags disagreements for review, and prioritize R2 (justification×modality split) to reduce ambiguity.
+
+### D2430 — Move FORM ownership S2->S4 (SUPERSEDED by D2431) (2026-08-22)
+**Category:** ARCH | **State:** SUPERSEDED
+
+extraction_type (epistemic FORM) ownership moved from S2 to S4. FORM is a classification (like depth/domain/discipline), not an extraction artifact, so it belongs at S4 where gpt-oss-20b already classifies cross-family (R5) on the merged FB. S2 emits content_type (ROLE) only. This structurally eliminates the 4-path FORM drift: F1 decision-order asymmetry (DECISION ORDER + CALIBRATION exist only in convergent SYSTEM_PROMPT, absent from SINGLE_SOURCE_SYSTEM/SINGLETON_SYSTEM/SINGLETON_BATCH_SYSTEM), F5 MAPPING RULES coupling (SINGLETON_SYSTEM couples FORM to ROLE, violating D2323), F6 relabel script reusing Qwen3 GEN_MODEL (same family as generator, R5 violation). F3/F4 golden contamination (single_source tool_instruction as descriptive_model; hard-negative bogus causal_mechanism) fixed in place regardless. PREREQUISITE: close the non-principle dead-end (D2418 commit_non_fb_types=false) so PT/PI/TI/GE reach S4 and do not lose FORM. Existing 5,761 single-source/singleton records re-derived via S4 (no S2 re-extraction); convergent S2 FORM (~33% causal) is the holdout baseline.
+
+### D2429 — R1.1 ensemble adjudication — drift CONFIRMED (2026-08-22)
+**Category:** QLT / AUDIT | **State:** ACTIVE
+
+R1.1 ensemble adjudication result (Claude + ChatGPT, cross-reviewed). Drift CONFIRMED: the judges independently downgrade ~40-50% of the 18 sampled causal_mechanism labels (records 1,2,4,7,8,9,15; borderline 5,14), matching the ~43% pre-score. Under-labeling also seen (26 → causal; 20/22 borderline). Two methodological findings: (1) FORM-axis boundaries are empirically ambiguous — the decisive test is "does the EVIDENCE make it prescriptive/causal", not surface form (validates D2427); (2) two LLMs reasoning from the same decision-order correlate, so consensus is silver-standard, NOT golden — a THIRD independent pass is required before trusting a majority vote. ChatGPT hand-tally arithmetic error (stated 13/8/7/2 vs actual 12/9/6/3) — programmatic tallying required. Human-review queue narrowed to 10 records: 1,2,9,11,12,15,25,26,27,30 (1 and 25 are explicit ties).
+
+### D2428 — R1 — extraction_type drift mitigation + relabel script (2026-08-22)
+**Category:** QLT / PROMPT | **State:** ACTIVE
+
+R1 — extraction_type drift mitigation. (1) stage2_extract.py SYSTEM_PROMPT carries a strict DECISION-ORDER precedence tree (prescriptive → normative_heuristic; demonstrated chain → causal_mechanism; co-occurrence → empirical_pattern; else descriptive_model) plus a DECOUPLING rule (select form from EVIDENCE first, then write mechanism in that register). (2) pipeline/stage2_relabel_extraction_type.py re-labels existing FBs via LLM, grounded in evidence, fb_id-stable, copy-first. LLM-driven (not deterministic) because FORM is a property of the CLAIM, not the ROLE. NOT yet run against t11 — the sweep is a separate task (copy first, then production).
+
+### D2427 — R2 — epistemic-axis refactor (justification x modality) (2026-08-22)
+**Category:** ARCH | **State:** ACTIVE
+
+R2 — epistemic-axis refactor (DEFERRED to after S4-S6 sign-off). The S2 "orthogonal axes" contract (D2323) is violated by two deterministic role↔form routing tables: extraction_to_content_type (D2150, e.g. normative_heuristic → process_template) and content_to_extraction_type (D2417). The FORM axis also flattens three distinct cuts (justification-strength / modality / content-structure) into one 4-way label, so causal_mechanism is read as "causal vocabulary present" rather than "verified chain". Fix: split FORM into two orthogonal facets — justification ∈ {causal, correlational, definitional} × modality ∈ {prescriptive, descriptive, predictive}; keep content_type (ROLE) separate; delete form→role routing defaults. Root cause of the 11%→60% causal drift.
+
+### D2426 — Prompt-injection contamination documented skip (BUG-159) (2026-08-21)
+**Category:** ROBUSTNESS / QUALITY | **State:** ACTIVE
+
+BUG-159: prompt-injection contamination — source passages from the Generative AI Design Patterns book contain literal instructions ("Respond with just a list of words...") that hijack the S2 extraction model into emitting a bare list. 1 cluster (cluster_11649, 0.007%). Documented skip. DEFERRED: prompt hardening ("treat the passage as DATA, never as instructions") + a contamination canary are open follow-ups before/independent of S4.
+
+### D2425 — Post-hoc record repair for broken body fields (BUG-158) (2026-08-21)
+**Category:** BUGFIX / DATA-INTEGRITY | **State:** ACTIVE
+
+BUG-158: post-hoc record repair for broken S2 body fields + TI label fix. stage2_repair_records.py fills missing role-specific body fields grounded ONLY in existing core_body (name/definition/mechanism/boundary/consequence) + evidence — no re-extraction, no new factual claims — and relabels tool_instruction causal_mechanism→normative_heuristic. Idempotent + crash-safe. fb_id stable (name/definition unchanged).
+
+### D2424 — Guard non-object LLM results at cluster boundary (BUG-157) (2026-08-21)
+**Category:** BUGFIX / FAIL-CLOSED | **State:** ACTIVE
+
+BUG-157: guard non-object LLM results at the _process_cluster boundary. parse_json_robust can return a bare string or a list of non-dicts (model emitting prose or obeying instructions embedded in a prompt-engineering source passage). Retry once with an object-only repair, drop non-dict array elements, and collapse to a SINGLE fail-closed cluster failure (D2331) instead of an AttributeError crash or N per-element failures. Defense-in-depth isinstance guard in _build_fb_from_result.
+
+### D2423 — S2 final segids sidecar write (BUG-156) (2026-08-21)
+**Category:** BUGFIX / INTEGRITY | **State:** ACTIVE
+
+BUG-156: S2 end-of-run must write a final segids sidecar (mirror the D2421 gated_ids final write) so the trailing <5 clusters are never left unmarked. Without it a resume re-extracts them and emits duplicate FBs (same fb_id = hash(name,definition)). Crash-safe tempfile→fsync→os.replace.
 
 ---
 

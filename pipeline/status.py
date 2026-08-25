@@ -22,7 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.omlx_call import check_omlx_health
+from pipeline.omlx_call import check_omlx_health, get_omlx_version
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     DB_PATH,
@@ -30,6 +30,22 @@ from pipeline.pipeline_paths import (
     SCHEMA_VERSION,
     STAGE_CHECKPOINTS,
 )
+
+
+def get_ollama_version() -> str | None:
+    """Get Ollama server version (D2456: make drift visible).
+
+    Uses /api/version (authoritative server version), falls back to the
+    client binary. Returns None if unreachable.
+    """
+    try:
+        import requests
+        resp = requests.get("http://localhost:11434/api/version", timeout=5)
+        if resp.status_code == 200:
+            return resp.json().get("version")
+    except Exception:
+        pass
+    return None
 
 
 def count_jsonl(path: Path) -> int:
@@ -107,6 +123,8 @@ def get_status(json_output: bool = False) -> dict:
     book_count = count_books()
     omlx_ok = check_omlx_health()
     ollama_ok = check_ollama_health()
+    omlx_version = get_omlx_version()
+    ollama_version = get_ollama_version()
 
     status = {
         "schema_version": SCHEMA_VERSION,
@@ -125,6 +143,8 @@ def get_status(json_output: bool = False) -> dict:
         "services": {
             "omlx": "UP" if omlx_ok else "DOWN",
             "ollama": "UP" if ollama_ok else "DOWN",
+            "omlx_version": omlx_version,
+            "ollama_version": ollama_version,
         },
     }
 
@@ -141,6 +161,8 @@ def get_status(json_output: bool = False) -> dict:
     omlx_icon = "✅" if omlx_ok else "❌"
     ollama_icon = "✅" if ollama_ok else "❌"
     print(f"  Services:  OMLX {omlx_icon}  |  Ollama {ollama_icon}")
+    if omlx_version:
+        print(f"  Versions:  OMLX {omlx_version}  |  Ollama {ollama_version or '?'}")
     print(f"  Books:     {book_count} available in books/")
     print()
 

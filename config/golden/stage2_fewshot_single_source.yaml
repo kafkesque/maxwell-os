@@ -699,3 +699,43 @@ examples:
     evidence_passages: []
   rationale: "HARD NEGATIVE — a bare personnel event with no method or steps. No repeatable process is instantiated. Must produce route=NULL, NOT a fabricated process_instance/process_template."
   tier: CHALLENGE
+
+# ── POSITIVE: R data import (code → tool_instruction, D2457 PT-vs-TI anchor) ─
+- id: SS-POS-014
+  domain: data-science
+  source_books:
+  - "R for Data Science — Hadley Wickham, Garrett Grolemund"
+  cluster_segments:
+  - source_book: "R for Data Science — Hadley Wickham, Garrett Grolemund"
+    text: "Before analysis, import the data into R: setwd(\"C:/Users/USER/Desktop/House Pricing \"), then dir(), then data<-read.csv(\"Regression-Analysis-House Pricing.csv\", na.strings = \"\"), then View(data)."
+  is_convergent: false
+  should_extract: true
+  expected_fb:
+    is_summary: false
+    route: FB
+    name: R Data Import Commands
+    definition: "Import a CSV into R by setting the working directory, listing files, reading the CSV into a data frame, and viewing it."
+    mechanism: "setwd() sets the working directory so relative paths resolve; dir() lists files to confirm the target; read.csv() parses the file into a data frame with na.strings mapping missing-value codes; View() opens a spreadsheet-style preview of the result."
+    boundary: "Applies to importing delimited data into R with base R functions. Fails when the file is not a valid CSV, the path is wrong, or the package is not installed."
+    consequence: "The analyst gets the data into a structured R data frame ready for downstream analysis without a GUI."
+    elaboration: ""
+    extraction_type: normative_heuristic
+    content_type: tool_instruction
+    tool_name: R
+    platform: "R (base / stats language)"
+    description: "Import a CSV into an R data frame via setwd/dir/read.csv/View"
+    syntax: 'data <- read.csv("file.csv", na.strings = "")'
+    parameters:
+    - name: file
+      type: str
+      description: "Path to the CSV file to read"
+    - name: na.strings
+      type: str
+      description: "String(s) treated as missing values"
+    output: "An R data frame holding the imported rows"
+    example: 'setwd("~/data"); dir(); data <- read.csv("prices.csv", na.strings = ""); View(data)'
+    caveats: "Fails when the file is not a valid CSV, the path is wrong, or the package is not installed"
+    evidence_passages:
+    - "setwd(\"C:/Users/USER/Desktop/House Pricing \") dir() data<-read.csv(\"Regression-Analysis-House Pricing.csv\", na.strings = \"\") View(data)"
+  rationale: "A passage framed procedurally ('how to import data') but whose substance is executable R code (setwd/dir/read.csv/View). content_type=tool_instruction, NOT process_template — code commands, not a repeatable human how-to (the exact D2457 R Data Import misclassification this anchor corrects)."
+  tier: CORE

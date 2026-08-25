@@ -626,6 +626,86 @@ S2_ARRAY_BODY_FIELDS: frozenset[str] = frozenset({"steps", "actors", "parameters
 S2_BOOL_BODY_FIELDS: frozenset[str] = frozenset({"actionable"})
 
 
+# ── D2457 — deterministic code detection (PT-vs-TI disambiguation) ──────────
+# Root cause of "R Data Import and Analysis Workflow" misclassification: a passage
+# whose substance is executable code (setwd()/dir()/read.csv()/View()) was labeled
+# process_template because it is FRAMED procedurally ("how to import data into R").
+# The model then could not extract human "steps" from code → empty PT body.
+# These signals are a PRIOR, not a verdict: they annotate the prompt so the LLM
+# classifies the ROLE correctly (code → tool_instruction). Markers are config-driven
+# (config/filtering.yaml code_markers, C12) — never re-declared here.
+
+def _load_code_markers() -> tuple[str, ...]:
+    """Load code-marker signals from config/filtering.yaml (C12). Cached.
+
+    Returns a tuple of marker strings (regex substrings) in config order. Never
+    raises — a missing/empty config degrades to the empty tuple (no annotation),
+    which is safe (the prompt still carries the PT-vs-TI text rule).
+    """
+    global _CODE_MARKERS
+    if _CODE_MARKERS is not None:
+        return _CODE_MARKERS
+    markers: list[str] = []
+    try:
+        import yaml
+        _cfg_path = Path(__file__).resolve().parent.parent / "config" / "filtering.yaml"
+        with open(_cfg_path, encoding="utf-8") as _f:
+            _cfg = yaml.safe_load(_f) or {}
+        raw = _cfg.get("code_markers") or []
+        markers = [str(m) for m in raw if str(m).strip()]
+    except Exception:
+        markers = []
+    _CODE_MARKERS = tuple(markers)
+    return _CODE_MARKERS
+
+
+_CODE_MARKERS: tuple[str, ...] | None = None
+
+
+def detect_code_in_text(text: str, min_hits: int = 2) -> bool:
+    """D2457: deterministic code detection — True when `text` carries ≥min_hits
+    distinct code-marker signals (R/Python/JS/SQL/CLI). Model-free, config-driven.
+
+    Distinct-marker counting (not raw substring count) prevents a single repeated
+    marker (e.g. `()` appearing in prose) from tripping the signal. min_hits=2 is
+    conservative: one marker (`import `) can appear in non-code prose ("import of
+    goods"), but two distinct code markers ("import ", "def ", "()") are a strong
+    code signal.
+    """
+    text_l = (text or "").lower()
+    if not text_l:
+        return False
+    markers = _load_code_markers()
+    hits: int = 0
+    for m in markers:
+        if m in text_l:
+            hits += 1
+            if hits >= min_hits:
+                return True
+    return False
+
+
+def _code_hint(text: str) -> str:
+    """D2457: prompt annotation when code is detected. Empty string otherwise.
+
+    Injects a deterministic disambiguation that overrides the procedural framing
+    ("how to …") that otherwise biases the LLM toward process_template. This is
+    the fix that makes classification ontologically accurate for code-laden
+    passages: code/commands → tool_instruction, never process_template.
+    """
+    if not detect_code_in_text(text):
+        return ""
+    return (
+        "⚠️ CODE DETECTED: this passage contains executable code/commands "
+        "(function calls, assignment, imports, or CLI). If its substance is "
+        "tool/software commands, API calls, or code syntax, set "
+        'content_type="tool_instruction" — NOT process_template — and populate '
+        "tool_name/platform/syntax/parameters/example. Only choose "
+        "process_template if the passage describes a HUMAN method with steps a "
+        "person follows and contains NO code."
+    )
+
+
 def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
     """P2-1: capture type-specific body fields from a single-source result.
 
@@ -662,6 +742,71 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
         elif isinstance(val, (dict, int, float, bool)):
             out[field] = val
     return out
+
+
+def _code_role_guard(
+    content_type: str,
+    result: dict,
+    evidence_text: str,
+) -> tuple[str, dict, bool]:
+    """D2457: deterministic residual guard — reclassify a code-laden passage that
+    the LLM labeled process_template but could not populate (empty steps).
+
+    The prompt hint (_code_hint) is the PRIOR; this is the fail-safe. When the
+    passage carries ≥2 code markers AND the model emitted process_template with no
+    steps (the exact "R Data Import" signature), the role is deterministically
+    corrected to tool_instruction and a best-effort TI body is derived from the
+    evidence (tool_name = first code library/command signal, syntax = evidence
+    excerpt, description = definition, example = evidence). The returned flag
+    marks the correction for audit traceability.
+
+    Returns (content_type, extra_body_fields, corrected_flag). No-op when the
+    guard does not fire.
+    """
+    if content_type != "process_template":
+        return content_type, {}, False
+    steps = result.get("steps")
+    if steps:  # populated steps → genuinely a human method, not code
+        return content_type, {}, False
+    if not detect_code_in_text(evidence_text):
+        return content_type, {}, False
+
+    # Best-effort tool name from the first code marker hit (R/Python/JS/SQL/CLI).
+    _text_l = (evidence_text or "").lower()
+    tool_name = "code"
+    for m in _load_code_markers():
+        if m in _text_l:
+            # map marker → readable platform hint
+            if m in ("setwd(", "read.csv(", "read_csv(", "read.table(",
+                     "data.frame(", "library(", "require(", "View(",
+                     "ggplot(", "dplyr::", "mutate(", "filter(", "group_by(",
+                     "<-", "str(", "summary("):
+                tool_name = "R"
+            elif m in ("import ", "def ", "class ", "np.", "pd.", "df.",
+                       "plt.", "self.", "lambda ", "pip install", "print(",
+                       "return "):
+                tool_name = "Python"
+            elif m in ("const ", "let ", "var ", "function(", "=>",
+                       "console.log(", "npm install"):
+                tool_name = "JavaScript"
+            elif m in ("SELECT ", "CREATE TABLE", "INSERT INTO", "WHERE "):
+                tool_name = "SQL"
+            elif m in ("sudo ", "git ", "curl ", "chmod ", "$ "):
+                tool_name = "shell"
+            break
+
+    body = {
+        "tool_name": result.get("tool_name") or tool_name,
+        "platform": result.get("platform") or "code/command",
+        "description": result.get("description") or result.get("definition", ""),
+        "syntax": result.get("syntax") or (evidence_text or "")[:300],
+        "parameters": result.get("parameters") or [],
+        "output": result.get("output") or "",
+        "example": result.get("example") or (evidence_text or "")[:300],
+        "caveats": result.get("caveats") or result.get("boundary", ""),
+    }
+    # extraction_type for a tool/command is normative_heuristic (D2417 default).
+    return "tool_instruction", body, True
 
 
 def _blank_elaboration_for_non_principle(elaboration: str, content_type: str) -> str:
@@ -863,6 +1008,12 @@ def build_single_source_prompt(
         evidence_passages.append(text)
 
     prompt: str = "\n".join(texts)
+    # D2457: annotate code-laden passages so the LLM classifies the ROLE correctly
+    # (code/commands → tool_instruction, never process_template). The hint is only
+    # injected when ≥2 distinct code markers are present (conservative).
+    _hint = _code_hint(" ".join(evidence_passages))
+    if _hint:
+        prompt = _hint + "\n\n" + prompt
     return prompt, evidence_passages
 
 
@@ -2170,6 +2321,17 @@ def run_stage2(
         if is_summary and gate_enabled and content_type not in non_principle_roles:
             return {"_gate": True, "cluster_id": cid}
 
+        # D2457: deterministic code-role guard (single-source path) — same fail-safe
+        # as the singleton builder: code + empty process_template → tool_instruction.
+        _cg_ct, _cg_body, _cg_flag = _code_role_guard(
+            content_type, result, " ".join(evidence_passages)
+        )
+        if _cg_flag:
+            content_type = _cg_ct
+            result = {**result, **_cg_body}
+            if not extraction_type:
+                extraction_type = "normative_heuristic"
+
         # Build FB record
         fb_id: str = make_hash_id(name, definition)
         fb: dict = {
@@ -2204,6 +2366,8 @@ def run_stage2(
         # P2-1: capture type-specific body fields (PT steps/trigger, TI syntax/
         # parameters, PI instance_text, GE body, etc.) beyond the shared core_body.
         fb.update(_capture_type_specific_fields(result, content_type))
+        if _cg_flag:  # D2457: record the deterministic correction for audit traceability
+            fb["code_role_corrected"] = True
 
         # Enrich with author/title/year + citation + primary_source (BUG-061).
         # D2449: shared `_enrich_provenance` helper — identical to the singleton
@@ -2454,6 +2618,14 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
     non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
     if is_summary and gate_enabled and content_type not in non_principle_roles:
         return {"_gate": True}
+    # D2457: deterministic code-role guard — if the passage is code but the model
+    # emitted an empty process_template, correct the role to tool_instruction.
+    _cg_ct, _cg_body, _cg_flag = _code_role_guard(content_type, result, item["text"])
+    if _cg_flag:
+        content_type = _cg_ct
+        result = {**result, **_cg_body}
+        if not extraction_type:
+            extraction_type = "normative_heuristic"
     # D2449: align the singleton record with the single-source/convergent record.
     # Historically this builder forked and dropped `elaboration`, bibliographic
     # provenance (source_authors/citation/primary_source) and the R14 stamps —
@@ -2489,6 +2661,8 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
         "is_singleton_fb": True,
         **_capture_type_specific_fields(result, content_type),  # P2-1
     }
+    if _cg_flag:  # D2457: record the deterministic correction for audit traceability
+        fb["code_role_corrected"] = True
     # D2449: shared bibliographic provenance + R14 stamps (parity with the
     # single-source/convergent builder — no more null source_authors / missing stamps).
     fb.update(_enrich_provenance(src_books, evidence))
@@ -2695,7 +2869,10 @@ def process_singletons(
     max_workers: int = S2_MAX_WORKERS
 
     def _process_one(item: dict) -> dict | None:
+        _hint = _code_hint(item["text"])
         prompt = f"Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}"
+        if _hint:
+            prompt = _hint + "\n\n" + prompt
         try:
             result = call_llm(prompt, SINGLETON_SYSTEM, GEN_MODEL, provider,
                               few_shot=ss_few_shot_text if ss_few_shot_text else None)
@@ -2708,7 +2885,11 @@ def process_singletons(
     def _build_batch_prompt(batch: list[dict]) -> str:
         parts: list[str] = []
         for i, item in enumerate(batch, 1):
-            parts.append(f"[{i}] Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}")
+            _hint = _code_hint(item["text"])
+            _p = f"[{i}] Text passage:\n{item['text'][:2000]}\n\nSource: {item['source_book'][:80]}"
+            if _hint:
+                _p = f"[{i}] ⚠️ CODE DETECTED → tool_instruction (not process_template).\n" + _p
+            parts.append(_p)
         return "\n\n".join(parts)
 
     def _process_batch(batch: list[dict]) -> list[dict]:
@@ -2751,7 +2932,9 @@ def process_singletons(
         viable[i:i + S2_SINGLETON_BATCH_SIZE]
         for i in range(0, len(viable), S2_SINGLETON_BATCH_SIZE)
     ]
-    checkpoint_every: int = 25  # D2453: incremental crash-safe checkpoint cadence
+    checkpoint_every: int = 5   # D2453/D2459: incremental crash-safe checkpoint cadence
+                                # (5 batches ≈ 20 singletons — first checkpoint lands
+                                # fast; full-file rewrite cost is acceptable on SSD)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(_process_batch, b): i for i, b in enumerate(batches)}
         completed = 0
@@ -2773,18 +2956,24 @@ def process_singletons(
                 # batch processed — its singletons re-enter on resume.
                 print(f"  [{completed}/{len(batches)}] ⚠️  batch worker error: {type(e).__name__}: {e}")
                 continue
-            for fb in batch_out:
+            # D2453/D2459: only mark a singleton processed on a DEFINITE verdict.
+            # None = transient transport/parse failure → NOT marked → it re-enters
+            # on resume (previously silently dropped forever). NULL/gate/FB are
+            # definite outcomes → marked (no re-ask on resume).
+            for fb, item in zip(batch_out, batches[bi]):
                 if fb is None:
                     continue
                 if fb.get("_null"):
                     total_null += 1
+                    processed_ids.add(item["cluster_id"])
                     continue
                 if fb.get("_gate"):
+                    processed_ids.add(item["cluster_id"])
                     continue
                 all_fbs.append(fb)
                 total_extracted += 1
-            # D2453: mark this batch's singletons processed + incremental checkpoint
-            processed_ids.update(item["cluster_id"] for item in batches[bi])
+                processed_ids.add(item["cluster_id"])
+            # D2453: incremental crash-safe checkpoint
             if completed % checkpoint_every == 0:
                 _write_singleton_checkpoint(all_fbs, processed_ids)
                 print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL — checkpointed")
@@ -2839,12 +3028,12 @@ def main() -> None:
         # D2453: singleton-only mode — skip run_stage2 (single-source/convergent is
         # already extracted + post-hoc filtered; re-running it here would waste time
         # or risk touching the finalized 8,410-record checkpoint).
-        print("\\n🧩 ===== PROCESSING SINGLETONS ONLY (D2453) =====\\n")
+        print("\n🧩 ===== PROCESSING SINGLETONS ONLY (D2453) =====\n")
         singleton_fbs, sn_extracted, sn_null = process_singletons(
             provider=args.provider,
             gate_enabled=not args.no_gate,
         )
-        print(f"\\n🧩 Singleton pass: {sn_extracted} FBs, {sn_null} NULLs")
+        print(f"\n🧩 Singleton pass: {sn_extracted} FBs, {sn_null} NULLs")
         return
 
     run_stage2(
@@ -2858,12 +3047,12 @@ def main() -> None:
     )
 
     if args.process_singletons:
-        print("\\n🧩 ===== PROCESSING SINGLETONS (D2149) =====\\n")
+        print("\n🧩 ===== PROCESSING SINGLETONS (D2149) =====\n")
         singleton_fbs, sn_extracted, sn_null = process_singletons(
             provider=args.provider,
             gate_enabled=not args.no_gate,
         )
-        print(f"\\n🧩 Singleton pass: {sn_extracted} FBs, {sn_null} NULLs")
+        print(f"\n🧩 Singleton pass: {sn_extracted} FBs, {sn_null} NULLs")
 
 
 if __name__ == "__main__":

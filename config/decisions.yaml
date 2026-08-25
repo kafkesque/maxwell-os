@@ -10,8 +10,8 @@
 #
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-24T18:28:33Z'
-total_decisions: 441
+last_sync: '2026-08-25T11:30:00Z'
+total_decisions: 446
 decisions:
 - id: D2092
   category: INF
@@ -3126,7 +3126,7 @@ decisions:
 - id: D2399
   category: GOVERNANCE / DATA
   state: DEFERRED
-  description: 'Domain taxonomy promote/demote: defer to post-T1.1+D2345 full-corpus counts — RESOLVED'
+  description: 'Domain taxonomy promote/demote: defer to post-T1.1+D2345 full-corpus counts — DEFERRED'
   champion: auto-sync
   target_files: []
   created: '2026-08-17'
@@ -3887,11 +3887,136 @@ decisions:
   - governance/buglog.md
   - governance/aggregated_remaining_tasks.md
   created: '2026-08-24'
+- id: D2455
+  category: OPS / RELIABILITY
+  state: ACTIVE
+  description: 'OMLX single-source-of-truth + permanent re-infection guard. Root cause
+    of the 2026-08-24 "two-version clusterfuck": TWO OMLX installs — GUI app oMLX.app
+    0.6.2 (self-contained: bundles its own Python 3.11 + MLX, zero homebrew refs) and
+    homebrew jundot/omlx/omlx 0.5.1 (stale; 0.6.3rc3 available) — both claimed port
+    11435 and both rewrote ~/.omlx/settings.json. The homebrew launchd agent
+    (com.maxwell.omlx.plist → /opt/homebrew/bin/omlx serve --max-concurrent-requests 3
+    --no-cache) crash-looped every ~11s ([Errno 48] Address already in use) and
+    clobbered scheduler settings, silently reverting max_concurrent_requests=6 → 3.
+    FIX: (1) uninstalled homebrew omlx 0.5.1 + autoremoved its orphaned python@3.11
+    dep (pipeline uses /usr/local/bin/python3 3.12.1, unaffected); verified mlx/mlx-c/
+    ollama (Ollama 11434 deps) survive. (2) archived ALL 6 stale launchd plists
+    (com.maxwell.omlx ×4 + homebrew.mxcl.omlx ×2) to ~/.omlx/archive-single-source-*.
+    (3) NEW scripts/guard_omlx_single_source.py — config-first (C12) guard failing
+    loudly on: forbidden homebrew binary present, stale launchd label loaded OR plist
+    present, port 11435 not owned by exactly one process. Wired into just health +
+    just preflight. Fail-loud A/B verified (touch forbidden plist → exit 1 → cleanup →
+    exit 0). (4) QUALITY: empirically proven max_concurrent_requests batching is
+    byte-identical to solo (temp=0.0 greedy + continuous batching = pure scheduling,
+    zero sampling change). NOTE: Ollama exhibits the SAME dual-install pattern
+    (com.ollama.ollama + stale homebrew.mxcl.ollama) — flagged, NOT touched (out of
+    scope this decision). tools/ab_test_grammar.py stale brew reinstall comment fixed.'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - scripts/guard_omlx_single_source.py
+  - justfile
+  - tools/ab_test_grammar.py
+  created: '2026-08-24'
+- id: D2456
+  category: OPS / RELIABILITY
+  state: ACTIVE
+  description: 'Forensic audit — Ollama had the IDENTICAL dual-install clusterfuck as
+    OMLX (D2455), plus the single-source guard generalized to all stacks + version
+    drift monitoring. FINDINGS: (1) Ollama dual-install: GUI app Ollama.app 0.32.15
+    (com.ollama.ollama, serving 11434) vs homebrew-core/ollama 0.30.0
+    (homebrew.mxcl.ollama, status error 1, crash-looping "bind: address already in
+    use" every seconds) — the EXACT OMLX pattern. FIXED: unpinned + uninstalled
+    homebrew ollama 0.30.0, archived homebrew.mxcl.ollama.plist, autoremoved orphaned
+    mlx/mlx-c (brew; the pipeline uses pip mlx at /Library/Frameworks — verified
+    untouched). (2) BLINDSPOT: status.py reported "UP" but never checked VERSIONS, so
+    the 0.30.0-vs-0.32.15 drift was silent; get_omlx_version existed but unwired; no
+    get_ollama_version. FIXED: get_ollama_version added; status.py now prints
+    "Versions: OMLX x | Ollama y". (3) GUARD generalized: scripts/guard_omlx_single_source.py
+    → scripts/guard_stacks_single_source.py iterating EVERY service with a
+    single_source_guard block (config-first C12, future-tax-free). CRITICAL FIX: the
+    original guard false-positived on the APP-OWNED CLI shim (/opt/homebrew/bin/omlx →
+    ~/.omlx/bin/omlx → omlx-cli, written by oMLX 0.6.2 on every server start). New
+    discrimination: forbidden_bins = unambiguous Cellar/opt markers (must NOT exist);
+    shim_paths = flag ONLY if they RESOLVE into a Cellar/opt install. A/B tested (app
+    shim → green; simulated Cellar marker → fail; simulated shim-resolves-to-Cellar →
+    fail). (4) NEW scripts/monitor_stacks.py — ONE panel for all inference stacks:
+    status + version + min_version drift verdict + single-source guard. min_version
+    pins: omlx 0.4.0, ollama 0.32.0 (new). just stacks target added; preflight now
+    runs monitor_stacks. (5) QUALITY/pipeline verified unbroken: 126/126 tests, 10/10
+    integrity, config audit clean, embedding 1024→512 Matryoshka correct. NOTE: OMLX
+    server did a GRACEFUL shutdown at 23:23:11 during the audit (clean Engine pool
+    shutdown, RAM 91% free, not a crash; crash.log entries are stale Aug 6-7 from
+    removed homebrew builds) — recovered via app relaunch, no data loss, settings
+    preserved (max_concurrent_requests=6). (6) pip check conflicts are all third-party
+    (gpt-researcher/marker-pdf/surya-ocr/prawcore/opentelemetry — 0 pipeline refs);
+    only dspy touches pipeline but dspy_trainer.py is UNWIRED (already BUG-168).'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - scripts/guard_stacks_single_source.py
+  - scripts/monitor_stacks.py
+  - pipeline/status.py
+  - justfile
+  - tests/test_stack_guard_d2456.py
+  created: '2026-08-24'
+- id: D2457
+  category: DATA / TAXONOMY
+  state: ACTIVE
+  description: 'TI-vs-PT ontological classification fix (BUG-176): deterministic code
+    detection. Root cause: "R Data Import" was framed procedurally but its substance
+    is R code — LLM chose process_template then could not extract steps → empty PT
+    body. Fix: config/filtering.yaml code_markers (46 signals) + detect_code_in_text()
+    + _code_hint() prompt annotation + _code_role_guard() post-hoc reclassify
+    (stamps code_role_corrected) + golden anchor SS-POS-014. 131/131 tests; live OMLX
+    re-run → tool_instruction, tool_name=R. Residual: 46 PTs with code markers in
+    full corpus → S2 single-source re-run or score_single_source.py reclassify.'
+  champion: 2026-08-25 session
+  target_files:
+  - config/filtering.yaml
+  - pipeline/stage2_extract.py
+  - config/golden/stage2_fewshot_single_source.yaml
+  - tests/test_stage2_singleton_batch.py
+  created: '2026-08-25'
+- id: D2458
+  category: QLT / AUDIT
+  state: ACTIVE
+  description: 'E2E cohesion proof + 9-class failure audit. Proved the smoke matrix
+    "only ran S2" finding: (1) S5 never executed, (2) stale S4/S5/S6 artifacts (Aug
+    20 vs S2 Aug 23) explain 7,904 drift + 150 conflict findings — not live code
+    bugs, (3) empty PT = BUG-176. scripts/e2e_proof.py: live S2→S4→S5 on 7 reps —
+    all survive S2→S4 intact, only 2 principles reach S5 (both PASS). Structural
+    finding: S5 verifies principle-only by construction (load_stage4_fbs reads
+    checkpoint.jsonl) → Path A (non-principle S5+S6) deferred. scripts/audit_e2e_cohesion.py:
+    leak=46, blindspot=1 (singletons never extracted — stale PID 41569), gap=1 (S6 empty).'
+  champion: 2026-08-25 session
+  target_files:
+  - scripts/e2e_proof.py
+  - scripts/audit_e2e_cohesion.py
+  created: '2026-08-25'
+- id: D2459
+  category: BUGFIX / PROVENANCE
+  state: ACTIVE
+  description: 'BUG-175 author-sentinel validation: Phi-4-mini hallucinated
+    author="string" (7 books) + "Unknown" (3 books) → contaminated citation/
+    source_authors/primary_source on 253 S2 records. Fix: _AUTHOR_SENTINELS +
+    is_sentinel_author() in book_metadata.py (blanked at cache-load + guarded in
+    resolve_book_metadata), _AUTHOR_JUNK extended (etc./unknown/domains), backfill
+    script scripts/backfill_author_sentinels.py (crash-safe, 10 entries → heuristic,
+    never fabricate). Singleton resume hardening: None results no longer marked
+    processed (transient failures re-enter on resume). 140/140 tests.'
+  champion: 2026-08-25 session
+  target_files:
+  - pipeline/book_metadata.py
+  - scripts/backfill_author_sentinels.py
+  - tests/test_book_metadata_sentinels_d2459.py
+  - pipeline/stage2_extract.py
+  created: '2026-08-25'
 summary:
-  total: 441
+  total: 446
   proposed: 0
   draft: 1
-  active: 383
+  active: 388
   stale: 0
   superseded: 15
   archived: 8
@@ -3912,7 +4037,7 @@ summary:
     BUGFIX / GOV: 2
     BUGFIX / INTEGRITY: 2
     BUGFIX / OBSERVABILITY: 1
-    BUGFIX / PROVENANCE: 2
+    BUGFIX / PROVENANCE: 3
     BUGFIX / RELIABILITY: 2
     BUGFIX / VAL: 1
     C12: 1
@@ -3925,7 +4050,7 @@ summary:
     DATA / GOVERNANCE: 1
     DATA / QUALITY: 1
     DATA / RELIABILITY: 2
-    DATA / TAXONOMY: 1
+    DATA / TAXONOMY: 2
     DEF: 1
     GOV: 20
     GOV / ARCH: 1
@@ -3944,11 +4069,12 @@ summary:
     OPERATIONAL / CANARY: 1
     OPS: 2
     OPS / DATA: 1
+    OPS / RELIABILITY: 2
     PERF: 10
     PERF / BUGFIX: 1
     QA: 4
     QLT: 39
-    QLT / AUDIT: 19
+    QLT / AUDIT: 20
     QLT / DATA: 1
     QLT / PROMPT: 4
     QUALITY / DATA: 3

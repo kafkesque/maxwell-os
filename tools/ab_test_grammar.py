@@ -9,8 +9,10 @@ ON (xgrammar installed) states can be diffed directly.
 Run the SAME sample once in each state, then diff the two JSON summaries:
 
     python3 tools/ab_test_grammar.py --n 30 --out ab_off.json   # before reinstall
-    brew reinstall omlx --with-grammar                          # install xgrammar
-    # restart OMLX (launchctl kickstart -k gui/$UID/com.maxwell.omlx)
+    # D2455: OMLX is the GUI app (single source of truth). Install grammar via the
+    # app's update/package mechanism (NOT `brew install omlx` — homebrew removed).
+    # restart OMLX via the app control socket, e.g.:
+    #   python3 -c 'import json,socket; s=socket.socket(socket.AF_UNIX); s.connect("~/Library/Application Support/oMLX/control.sock"); s.send(b"{\"command\":\"restart\"}\n")'
     python3 tools/ab_test_grammar.py --n 30 --out ab_on.json    # after reinstall
 
 Note: do NOT run while another stage is using OMLX (it competes for the single

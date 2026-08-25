@@ -140,8 +140,13 @@ def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
                     if sp:
                         key = Path(sp).name
                 if key:
+                    # D2459 (BUG-175): blank hallucinated placeholder authors
+                    # ("string", "Unknown", ...) so the filename heuristic /
+                    # "Unknown Author" fallback runs instead of propagating.
+                    author_raw = str(d.get("author", "") or "").strip()
+                    author_val = "" if is_sentinel_author(author_raw) else author_raw
                     cache[key] = {
-                        "author": str(d.get("author", "") or "").strip(),
+                        "author": author_val,
                         "title": str(d.get("title", "") or "").strip(),
                         "year": str(d.get("year", "") or "").strip(),
                     }
@@ -151,6 +156,32 @@ def load_metadata_cache(force: bool = False) -> dict[str, dict[str, str]]:
     _metadata_cache = cache
     _normalized_index = norm_index
     return cache
+
+
+# ── BUG-175 (D2459): Phi-4-mini author-hallucination sentinels ─────────────
+# Phi-4-mini-instruct-8bit occasionally returns a JSON *type name* ("string")
+# or a generic placeholder ("Unknown") instead of a real author on open-ended
+# filename→author extraction (BUG-053 hallucination pattern). These are NEVER
+# valid author names. Case-SENSITIVE by design: "Anonymous" and "Various" are
+# legitimate corpus values and MUST NOT match.
+_AUTHOR_SENTINELS: frozenset[str] = frozenset({
+    "", "string", "str", "none", "null", "undefined",
+    "unknown", "Unknown", "missing", "todo", "tbd",
+    "n/a", "na", "number", "integer", "int", "float",
+    "boolean", "bool", "object", "array", "any",
+    "author", "title", "unknown author",
+})
+
+
+def is_sentinel_author(author: str) -> bool:
+    """True if author is a known hallucination/placeholder sentinel (D2459).
+
+    BUG-175: Phi-4-mini emitted the type-name "string" as an author on 7 books
+    (253 S2 records) and "Unknown" on 3 more. Sentinel authors are treated as
+    unknown so the deterministic filename heuristic / "Unknown Author" fallback
+    runs instead of propagating the bogus value into provenance.
+    """
+    return str(author or "").strip() in _AUTHOR_SENTINELS
 
 
 # ── Canonical source identity (D2176: prevents false convergence) ──────────
@@ -276,7 +307,9 @@ def resolve_source_ids(source_books: list[str]) -> set[str]:
 
 # ── Filename heuristic fallback (robust, handles leading parens) ────────────
 _AUTHOR_JUNK = re.compile(
-    r"^(z-library|libgen|anna|isbn|http|www\.|\d{4})$", re.IGNORECASE
+    r"^(z-library|libgen|anna|isbn|http|www\.|etc\.?|unknown|\d{4}|"
+    r"[\w.-]+\.(org|com|net|io|edu|gov|co))$",
+    re.IGNORECASE,
 )
 
 
@@ -366,6 +399,11 @@ def resolve_book_metadata(filename: str) -> dict[str, str]:
     author = (cached.get("author") or "").strip()
     title = (cached.get("title") or "").strip()
     year = (cached.get("year") or "").strip()
+
+    # D2459 (BUG-175): defense-in-depth — a sentinel author can never propagate
+    # past this resolver, even from a stale/uncached path.
+    if is_sentinel_author(author):
+        author = ""
 
     # 2. Filename heuristic
     if not author and not title:

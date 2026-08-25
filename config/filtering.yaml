@@ -58,6 +58,69 @@ passage_meta:
   verbs: [describes, discusses, poses, argues, examines, explores, presents, illustrates, contains, outlines, highlights, focuses, shows, demonstrates, explains, reports, suggests, proposes]
   author_verbs: [states, argues, notes, writes, claims, describes, discusses, suggests]
 
+# D2457 — deterministic code-detection signals (model-free, C12).
+# Consumed by stage2_extract.py to steer code-laden passages toward
+# content_type=tool_instruction (NOT process_template). Root cause of the
+# "R Data Import" misclassification: the passage is framed procedurally
+# ("how to import data into R") but its substance is executable code
+# (setwd()/dir()/read.csv()/View()), so the LLM chose process_template and then
+# could not extract human "steps" from code — leaving an EMPTY PT body.
+# These markers are a PRIOR signal, not a verdict: when a passage matches, the
+# prompt is annotated so the LLM classifies the ROLE correctly (code → TI).
+code_markers:
+  # R / statistical computing
+  - "<-"                      # R assignment operator
+  - "setwd("
+  - "read.csv("
+  - "read_csv("
+  - "read.table("
+  - "data.frame("
+  - "library("
+  - "require("
+  - "View("
+  - "str("
+  - "summary("
+  - "ggplot("
+  - "mutate("
+  - "filter("
+  - "group_by("
+  - "dplyr::"
+  # Python
+  - "import "
+  - "from .* import"
+  - "def "
+  - "class "
+  - "np."
+  - "pd."
+  - "df."
+  - "plt."
+  - "print("
+  - "return "
+  - "self."
+  - "lambda "
+  - "pip install"
+  # JavaScript / TypeScript
+  - "const "
+  - "let "
+  - "var "
+  - "function("
+  - "=>"
+  - "console.log("
+  - "npm install"
+  # SQL
+  - "SELECT "
+  - "CREATE TABLE"
+  - "INSERT INTO"
+  - "WHERE "
+  # shell / CLI
+  - "sudo "
+  - "git "
+  - "curl "
+  - "chmod "
+  - "$ "
+  # generic code signals
+  - "()"
+
 # D2449 — source-filename noise markers (piracy-site / archive artifacts).
 # Consumed by book_metadata.sanitize_source_book() to strip download-site junk
 # from source_books / source_text / citation so persisted metadata carries only

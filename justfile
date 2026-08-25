@@ -4,13 +4,19 @@
 # ── Health ───────────────────────────────────────────────────
 health:
     @echo "=== Maxwell OS v3.0 Health Check ==="
+    python3 scripts/guard_stacks_single_source.py || exit 1
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
 
 healthcheck: health
 
+# ── One-panel inference stack monitor (D2456): versions + drift + single-source ──
+stacks:
+    @python3 scripts/monitor_stacks.py
+
 preflight:
     @echo "=== Maxwell OS Preflight ==="
+    @python3 scripts/monitor_stacks.py || exit 1
     @python3 -c "from pipeline.pipeline_paths import ensure_dirs; ensure_dirs(); print('✅ Directories OK')"
     @python3 -c "from pipeline.pipeline_paths import check_books_source; ok, msg = check_books_source(); print(msg); exit(0 if ok else 1)"
     @python3 -c "from pipeline.pipeline_paths import check_pipeline_state; print(check_pipeline_state())"

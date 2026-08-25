@@ -1,5 +1,42 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-24
+> **Updated:** 2026-08-25
+
+## 🛡️ BUG-175 FIX + GOV SYNC + S2 PRE-LAUNCH HARDENING (D2459, 2026-08-25) — DONE
+- ✅ **BUG-175 FIXED (D2459).** `author="string"`/`"Unknown"` provenance contamination (10 metadata entries, 253 S2 records) root-caused to Phi-4-mini hallucination (BUG-053). Fix: `_AUTHOR_SENTINELS` + `is_sentinel_author()` in `book_metadata.py` (case-sensitive; blanked at cache-load + guarded in resolver); `_AUTHOR_JUNK` extended (etc./unknown/domains); `scripts/backfill_author_sentinels.py` backfilled 10 entries crash-safe (Thinknetic derived, 9 → Unknown Author, never fabricates). 9 new tests → 140/140 green.
+- ✅ **Governance synced:** DECISION-LOG D2457/D2458/D2459 appended (newest-first, hash-chain intact); config/decisions.yaml 443 → 446 (summary recomputed via `recompute_decision_summary.py --check` ✅); buglog BUG-175 → 🟢 FIXED; config audit clean.
+- ✅ **Singleton resume hardened:** `process_singletons` — transient `None` results (transport/parse failure) no longer mark a cluster processed → they re-enter on resume (previously silently dropped forever). Literal `\n` prints in `main()` fixed.
+- 🚀 **S2 singleton LAUNCHED (11:24, 2026-08-25):** `just s2-singletons` under `caffeinate -i -s` + nohup, 6 workers (`max_workers` 3→6 — OMLX batched engine scales 3.7× with concurrency). First checkpoint at 5 batches verified (16 FBs: 6 principle + 10 PT, 16/16 R14-stamped). **Perf finding:** oMLX decode 4.5-7 tok/s/request (raw MLX 3.5 TFLOPS ≈ 33% M1 Max peak — server-side bottleneck; 0 swap, no thermal) → ETA ~25-30h for 6,317 singletons. Crash-safe every 5 batches, resume-proven. gpt-oss (S4) unloaded during S2; RSS 20.3GB.
+
+## 🔬 E2E COHESION PROOF + FAILURE-CLASS AUDIT (D2458, 2026-08-25) — DONE (findings logged)
+- ✅ **Root cause of "why the smoke looked wrong" — three distinct, now-proven causes:**
+  1. **"only ran S2" is literally true.** `scripts/smoke_matrix_5x3.py` ran S2 singleton + S4, but NEVER S5. And its convergent/single-source rows were STAGED COPIES from t11 (not freshly extracted), so "S2→S4" for those origins was a re-route of existing records, not an extraction.
+  2. **"S4 still yesterday's results" = S4/S5/S6 are STALE (Aug 20) vs S2 (Aug 23).** S4 t11 holds 2,830 principles (39% of 7,255), 39 PT (4.9% of 796), 1 TI (0.7% of 143), 0 PI (of 204), 0 GE (of 4). S5 t11 = 2,830 principles. S6 t11 = EMPTY. This is exactly BUG-165 ("S4→S5→S6 rerun ONCE") — never executed.
+  3. **"PT segments empty"** = tool_instruction misclassified as process_template (BUG-176, FIXED via D2457). The empty `steps/trigger/...` was a SYMPTOM of the wrong ROLE, not a schema defect.
+- ✅ **Live e2e proof (`scripts/e2e_proof.py`, run `e2e_proof`):** 7 representatives (all 5 types × convergent/single-source) ran through REAL S4 (OMLX) + REAL S5 (DeBERTa). **S2→S4: all 7 survive with intact R14 stamps + provenance (citation/source_authors/source_segments).** S4→S5: only the 2 principles reach S5 (both PASS); the 5 non-principle sidecars (PT/PI/TI/GE) do NOT reach S5.
+- ✅ **Structural finding (not a bug — a deferred design):** S5 verifies `principle` ONLY (`load_stage4_fbs` reads `checkpoint.jsonl`, never the PT/PI/TI/GE sidecars). So "S2→S5 cohesive for all 5 types" is FALSE today by construction — non-principle types dead-end at S4. Tracked as Path A (non-principle S5 verification).
+- ✅ **BLINDSPOT confirmed:** singleton origin has **0 records** in S2 t11 deduped — the 6,317 EXTRACT singletons were never extracted (stale PID 41569, `singleton_run.log` ends mid-run). So the "3-origin" matrix was NEVER actually satisfied on the real corpus; only `smoke_matrix_5x3b` (S2+S4 only) touched singletons.
+- ✅ **Failure-class audit (`scripts/audit_e2e_cohesion.py`, report `stage4_merge/t11/e2e_cohesion_report.md`):** leak=46 (S2→S4 drops + S4-sidecar→S5 drops), drift=7,904 (S4 missing provenance the stale S2 carried — explained by stale artifact, NOT a code bug: current S4 carries citation/source_authors, proven live), conflict=150 (non-principle `elaboration` non-empty in the STALE S2 — pre-D2452, now blanked), blindspot=1 (singleton never extracted), gap=1 (S6 empty).
+
+## 🛡️ TI-vs-PT ONTOLOGICAL CLASSIFICATION FIX (D2457, 2026-08-25) — DONE
+- ✅ **BUG-176 root-caused + fixed.** "R Data Import and Analysis Workflow" was labeled `process_template` with EMPTY body because the passage is *framed* procedurally ("how to import data into R") but its *substance* is R code (`setwd/dir/read.csv/View`). No deterministic code-detection existed → LLM chose PT, then couldn't extract human steps from code.
+- ✅ **Three-layer fix:** (1) `config/filtering.yaml` `code_markers` (46 signals, C12); (2) `detect_code_in_text()` + `_code_hint()` prompt annotation (singleton per-item + batch + single-source); (3) `_code_role_guard()` post-hoc deterministic reclassify (code + empty-steps PT → tool_instruction, stamps `code_role_corrected`). Golden anchor SS-POS-014 (R code → TI) added.
+- ✅ 131/131 tests (5 new in `test_stage2_singleton_batch.py`); live OMLX re-run of the exact passage → `tool_instruction, tool_name=R`.
+- ⏳ **Residual (BUG-176):** 46/796 (5.8%) process_templates in full S2 corpus carry code markers in evidence (SQLite Setup, User Input Loop, PublicPrivateExample, etc.). Re-run S2 single-source on those 46, or post-hoc reclassify via `scripts/score_single_source.py`.
+
+## 🛡️ GOVERNANCE SYNC + SMOKE MATRIX 5×3 (2026-08-25) — DONE
+- ✅ **Governance drift reconciled:** DECISION-LOG D2423–D2436 backfilled (14 decisions); BUG-149 dead `max_words=5` default → `FB_NAME_MAX_WORDS`; BUG-151 + BUG-169 duplicate headings deduped; BUG-164 status → FIXED (dedup done); D2399 description drift fixed.
+- ✅ **Smoke matrix 5×3** (`scripts/smoke_matrix_5x3.py`, run `smoke_matrix_5x3b`): exercised GE/FB/TI/PT/PI across convergent + single-source + singleton clusters through live S2→S4. Rendered examinable `visual.md` (metadata/provenance/segments/properties/classification). Matrix: principle conv=1/single=1/singleton=5; PT conv=1/single=1/singleton=2; PI/TI/GE single=1 each (convergent structurally produces FB-only — BUG-166).
+- ✅ **BUG-175 discovered + logged** — `author="string"` provenance contamination on 253 S2 records (8 books) from Phi-4-mini metadata hallucination (BUG-053 pattern).
+- ✅ 126/126 tests, config audit clean, decision sync 443, stacks single-source PASS.
+
+## 🛡️ STACK SINGLE-SOURCE + ONE-PANEL MONITOR (D2455+D2456, 2026-08-24) — DONE
+- ✅ OMLX (D2455): homebrew omlx 0.5.1 uninstalled; 6 stale launchd plists archived; guard wired.
+- ✅ Ollama (D2456): SAME clusterfuck fixed — homebrew ollama 0.30.0 uninstalled (app 0.32.15 = single source), stale `homebrew.mxcl.ollama.plist` archived, orphaned brew mlx/mlx-c autoremoved (pip mlx untouched).
+- ✅ Guard generalized → `scripts/guard_stacks_single_source.py` (OMLX+Ollama, config-first, future-tax-free) with false-positive fix for app-owned CLI shims (flags only shims resolving into Cellar/opt).
+- ✅ ONE panel → `scripts/monitor_stacks.py` (`just stacks`) + `just preflight`: status + version + min_version drift verdict + single-source guard. `status.py` now prints versions.
+- ✅ 126/126 tests, 10/10 integrity, config audit clean.
+
+## 🔥 S4 RERUN — CRITICAL PATH (2026-08-24, post-external-audit)
 
 ## 🔥 S4 RERUN — CRITICAL PATH (2026-08-24, post-external-audit)
 
@@ -61,9 +98,9 @@
 5. 🟠 **P1.3 gpt-oss cross-family FLAG** — wire disagreement flag in `stage2_relabel_extraction_type.py` (0 gpt-oss refs today).
 6. 🟠 **BUG-148 `route="FB"`** — vestigial on all 8,410; derive-from-content_type or remove.
 7. 🟡 **BUG-151 taxonomy** — 269 raw-alias overlaps; CI disjointness test now EXISTS + GREEN (`tests/test_taxonomy_disjointness.py`, education dual-listing resolved, domain∩discipline = only `emerging`).
-8. 🟡 **DECISION-LOG backfill** — D2423–D2438 (15+ decisions).
+8. ✅ **DECISION-LOG backfill** — DONE (2026-08-25): D2423–D2436 (14 decisions) backfilled into DECISION-LOG.md.
 9. ✅ **Golden single-source meta header** — FIXED: `9 ex / 6 pos / 3 hard-neg` (was 8/5/3).
-10. 🟡 **BUG-149 residual** — dead `max_words=5` default in `normalize_fb_name`.
+10. ✅ **BUG-149 residual** — FIXED (2026-08-25): dead `max_words=5` default → `FB_NAME_MAX_WORDS` (config-driven, C12).
 11. 🔶 **Singletons (35,122)** — prefilter flags 18% (6,317) EXTRACT. **WIRED (D2452):** `just s2-singletons` runs the gated pass; `just s2-singletons-prefilter` regenerates verdicts. Extract only if single-source recall is a product requirement.
 12. 🔶 **DSPy/golden expansion** — wire MIPROv2 (pending); PT-vs-TI contrastive golden ✅ DONE (D2450: SS-POS-007/008/009) + contrastive negatives ✅ DONE (D2451: SS-POS-010 descriptive-principle / SS-POS-011 PT-not-TI / SS-NEG-004 over-split). **Schema enforcement ✅ DONE (D2452):** `elaboration` blanked for non-principle + typed `s2_body_field` placeholders (`[]`/`False`/`""`) + `load_golden_single_source` truncation round-robin (preserves all 5 roles).
 13. ⏸ **R2 FORM refactor · P2.x batch S5 · GAP-1 DSPy wiring · BUG-145/159/160 (P2).**
@@ -125,7 +162,7 @@
 | **H1** | R1.4 / BUG-164 dedup — 3 fb_id groups (11 records) + 38 name groups (~80 records) on S2 checkpoint. | min | before S4 |
 | **H0** | **Post-hoc value filter** on the 5,761 single-source (new `scripts/score_single_source.py`): keep convergent + actionable/general; drop thin paraphrase/anecdote. Keeps ~32%. | min | after G0 |
 | **H2** | Fix golden single-source meta header (9 ex / 6 pos). | min | CI |
-| **H3** | DECISION-LOG backfill D2423–D2436 (14 decisions). | min | doc |
+| **H3** | ✅ DECISION-LOG backfill D2423–D2436 (14 decisions) — DONE 2026-08-25. | min | doc |
 | **H4** | BUG-151 CI disjointness test (education already resolved; 269 raw-alias overlaps remain). | ~1h | CI |
 | **R1** | **S4 → S5 → S6 ONCE** on the finalized S2 (per G0 size). This is the actual product build; S6 is currently EMPTY. | multi-hr | ✅ the one run |
 | **M1** | Re-measure BUG-150 discipline `emerging` on the fresh S4 (was 38.4% on stale 2,830); promote disciplines only if still high. | min | after R1 |

@@ -700,7 +700,7 @@ def validate_classification(result: dict) -> tuple[bool, list[str]]:
     return len(errors) == 0, errors
 
 
-def normalize_fb_name(name: str, max_words: int = 5) -> str:
+def normalize_fb_name(name: str, max_words: int = FB_NAME_MAX_WORDS) -> str:
     """Normalize FB name: title case, word count enforcement, strip punctuation.
 
     D2069: Ensures consistent, searchable, non-sentence-style names.

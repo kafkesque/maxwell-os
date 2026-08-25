@@ -1,6 +1,12 @@
 # Maxwell OS — Aggregated Task Register
 > **Updated:** 2026-08-25
 
+## 🔧 SINGLE-SOURCE + SINGLETON S2 UNIFICATION (D2462, 2026-08-25) — PLANNED
+- 🎯 **Decision (D2462):** collapse S2's 3 entry points → 2 passes. Keep `--only-convergent` separate (cross-source synthesis, 322KB golden, 75/75 principle, `is_convergent`). Merge single-source + singleton into ONE shared extractor (already share `stage2_fewshot_single_source.yaml` 14+7; duplication already caused BUG-152).
+- 📌 **Why:** DRY + drift-prevention (no future D2461-style single-golden edit divergence); ZERO accuracy impact (golden/prompt unchanged). `is_singleton_fb` → provenance flag from input metadata.
+- ⚠️ **Gate before code:** diff single-source vs singleton prompt-builders; reconcile `source_book` context injection to one optional-context prompt. Keep input feeding separate (single-doc clusters vs singleton orphans via D2452 prefilter).
+- ⏳ **Status:** PLANNED — queue AFTER singleton S2 completes (not a blocker for the current run).
+
 ## 🛡️ BUG-175 FIX + GOV SYNC + S2 PRE-LAUNCH HARDENING (D2459, 2026-08-25) — DONE
 - ✅ **BUG-175 FIXED (D2459).** `author="string"`/`"Unknown"` provenance contamination (10 metadata entries, 253 S2 records) root-caused to Phi-4-mini hallucination (BUG-053). Fix: `_AUTHOR_SENTINELS` + `is_sentinel_author()` in `book_metadata.py` (case-sensitive; blanked at cache-load + guarded in resolver); `_AUTHOR_JUNK` extended (etc./unknown/domains); `scripts/backfill_author_sentinels.py` backfilled 10 entries crash-safe (Thinknetic derived, 9 → Unknown Author, never fabricates). 9 new tests → 140/140 green.
 - ✅ **Governance synced:** DECISION-LOG D2457/D2458/D2459 appended (newest-first, hash-chain intact); config/decisions.yaml 443 → 446 (summary recomputed via `recompute_decision_summary.py --check` ✅); buglog BUG-175 → 🟢 FIXED; config audit clean.

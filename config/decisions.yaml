@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-25T12:45:00Z'
-total_decisions: 447
+total_decisions: 448
 decisions:
 - id: D2092
   category: INF
@@ -4030,8 +4030,16 @@ decisions:
   target_files:
   - config/pipeline_config.yaml
   created: '2026-08-25'
+- id: D2462
+  category: ARCH
+  state: PLANNED
+  description: 'Unify single-source + singleton S2 extraction into ONE extractor (2 passes, not 3). They already share stage2_fewshot_single_source.yaml (14 pos + 7 neg, multi-class role); duplication already caused BUG-152 (latent NameError in golden-loading). Merge = DRY + drift-prevention with ZERO accuracy impact (golden/prompt unchanged). Keep --only-convergent separate (cross-source synthesis, 322KB golden, 75/75 principle, is_convergent). is_singleton_fb becomes a provenance flag from input metadata. Gate: diff single-source vs singleton prompt-builders first; reconcile source_book context to one optional-context prompt.'
+  champion: 2026-08-25 session
+  target_files:
+  - pipeline/stage2_extract.py
+  created: '2026-08-25'
 summary:
-  total: 447
+  total: 448
   proposed: 0
   draft: 1
   active: 389
@@ -4041,9 +4049,9 @@ summary:
   rejected: 8
   deferred: 13
   resolved: 10
-  planned: 3
+  planned: 4
   by_category:
-    ARCH: 25
+    ARCH: 26
     ARCH / GOV: 1
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1

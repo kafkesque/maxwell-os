@@ -3,6 +3,27 @@
 
 ---
 
+### D2462 — Unify single-source + singleton S2 extraction into one extractor (2026-08-25)
+**Category:** ARCHITECTURE / REFACTOR
+
+**Decision:** Collapse S2's three mutually-exclusive entry points into TWO logical passes. Keep `--only-convergent` separate; merge single-source + singleton into ONE shared extractor/code-path. `is_singleton_fb` becomes a provenance flag set from input metadata, not a separate pipeline.
+
+**Context:** S2 today has `--only-convergent` (multi-source clusters, `stage2_fewshot_convergent.yaml` 322KB, 75/75 principle, `is_convergent=True`), `--only-single-source` (single-doc clusters, `stage2_fewshot_single_source.yaml` 14 pos + 7 neg, multi-class role), and `--only-singletons`/`--process-singletons` (orphan segments). Singletons ALREADY reuse the single-source golden (`S2_GOLDEN_SINGLE_SOURCE_PATH` in `process_singletons`) — the duplication already produced BUG-152 (a latent `NameError` because the golden was loaded in `run_stage2` but referenced in the standalone `process_singletons`).
+
+**Why merge single-source + singleton:** identical operation (one segment → one multi-class FB), identical golden (already shared), identical prompt builder, identical output schema. The only difference is provenance (`is_singleton_fb=True` + `source_book=None` for orphans). Merging removes one of two checkpoint systems, one of two golden-load sites, and the drift class that caused D2461 (a single-golden edit that could apply to one path and not the other).
+
+**Why keep convergent separate:** it is a different cognitive task (cross-source synthesis) with a different golden (322KB, source-diversity/cohesion requirements) and a different output contract (`is_convergent`, `source_diversity`, `cluster_cohesion`, principle-only role by D2323). Forcing it into the single-source prompt means either a bloated mode-switch or a 75/75-principle-vs-multi-class conflict.
+
+**Accuracy/quality:** merging changes NOTHING about the golden or prompt → zero accuracy delta. It is a pure DRY/drift-prevention refactor.
+
+**Implementation gate:** before unifying, diff the two prompt-builders. If single-source injects `source_book` context that singleton omits (or vice-versa), reconcile to ONE prompt with an optional context field — do not silently pick one, or classification behavior shifts. Keep the INPUT feeding separate (single-doc clusters vs singleton orphans via the D2452 prefilter); only the extractor unifies.
+
+- **Status:** ✅ DECIDED — queued as a post-S2 refactor (NOT a blocker for the current singleton run, which already emits correct multi-class output).
+- **Files:** `pipeline/stage2_extract.py` (unify `process_singletons` + single-source path), `config/golden/stage2_fewshot_single_source.yaml` (shared), `config/pipeline_config.yaml`
+- **Source:** 2026-08-25 — operator "merge or not" architecture review
+
+---
+
 ### D2460 — S2 singleton ETA root-cause: cache-thrash regression + MoE decode ceiling (2026-08-25)
 **Category:** OPS / PERF
 

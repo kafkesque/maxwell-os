@@ -13,6 +13,11 @@
 
 None of the queued items block the running S2 singleton extraction.
 
+## 🔬 CLAUDE AUDIT CROSS-EXAM #2 (claude0029.txt, 2026-08-26) — 2 new items logged
+- ⏳ **QUEUED (post-S2 A/B) — `singleton_batch_size` 4→8 lever:** halves golden-prefill repetitions (~12h→6h prefill), net **~17% of total run** (~6h off ~35h). Code is generic in `n` (`_map_batch_results`), pure config change (`config/pipeline_config.yaml` line 218). **NOT worth pausing the current run** (A/B cost ~1–2h ≈ savings on remaining ~10h; changing mid-run = mixed size-4/size-8 corpus → full rerun needed for consistency). Gate: A/B 50–100 frozen items at 4 vs 8 (temp=0.0 deterministic), adopt only with ≥99% label agreement (array-JSON position-drift risk on later items).
+- ⏳ **QUEUED (spike) — BUG-180 `mlx_provider.py` stub KV cache:** dead code (empty KV list, `prompt_cache=` never wired). Park as future spike (direct-MLX already deferred D2055). Logged in buglog.
+- ❌ **REJECTED — Claude claim #1 (cache-thrash re-diagnosis):** DISPROVEN for live state — cache off, 0 swap, flat 42–46/hr, ~4–7 tok/s = MoE ceiling (D2460 #2), not a config revert.
+
 ## 🔧 SINGLE-SOURCE + SINGLETON S2 UNIFICATION (D2462, 2026-08-25) — PLANNED
 - 🎯 **Decision (D2462):** collapse S2's 3 entry points → 2 passes. Keep `--only-convergent` separate (cross-source synthesis, 322KB golden, 75/75 principle, `is_convergent`). Merge single-source + singleton into ONE shared extractor (already share `stage2_fewshot_single_source.yaml` 14+7; duplication already caused BUG-152).
 - 📌 **Why:** DRY + drift-prevention (no future D2461-style single-golden edit divergence); ZERO accuracy impact (golden/prompt unchanged). `is_singleton_fb` → provenance flag from input metadata.

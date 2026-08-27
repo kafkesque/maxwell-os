@@ -3,6 +3,29 @@
 
 ---
 
+### D2478 — S4 parallelism A/B (negative) + file-drift root-cause fix (2026-08-27)
+**Category:** OPS / PERFORMANCE
+
+**Decision:** Two-part.
+
+**(1) Parallelism A/B (the last untested quality-neutral lever) — NEGATIVE.** `scripts/benchmark_s4_parallel.py` ran `merged_cribs_classify` (the ~19.5s/FB dominant cost) on an identical 8-FB sample at 1/2/3 workers against gpt-oss-20b (128-expert MoE):
+
+| workers | elapsed | speedup | discipline agree |
+|---|---|---|---|
+| 1 | 151.3s | 1.00x | 100% |
+| 2 | 155.9s | **0.97x** | **75%** |
+| 3 | 160.5s | **0.94x** | **75%** |
+
+gpt-oss **does not scale with concurrency** — 2-3 workers are *slower* AND degrade discipline labels 25% (KV-store dispatch thrash, confirming D2459). Parallelism is **not** a quality-neutral lever for gpt-oss. Quality-neutral S4 floor confirmed ≈48h (batch depth only).
+
+**(2) File-drift root-cause FIXED.** The non-destructive cleanup tools wrote to `.fixed`/`.final`/`.deduped` but were never promoted to the canonical filenames `stage4_merge.py` reads. Added `scripts/promote_cleaned.py` (atomic promote with backup) + integrity check #18 (`check_canonical_promotion`, detects un-promoted terminal cleanup). **Executed promote**: canonical `singleton_fbs.jsonl` → 5,244 (229 empty-shell, was 446), `checkpoint.jsonl` → 8,402 (deduped + passage-cleaned, was 8,410). Guard verified FAIL→PASS.
+
+- **Status:** ✅ DONE
+- **Files:** scripts/promote_cleaned.py, pipeline/integrity_check.py, scripts/benchmark_s4_parallel.py
+- **Source:** 2026-08-27 — operator "A/B parallelism + which is more reliable + root cause fixed?" directive
+
+---
+
 ### D2477 — Wire D2354 batch depth + A/B bottleneck benchmark (2026-08-27)
 **Category:** PERFORMANCE
 

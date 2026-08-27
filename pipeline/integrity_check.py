@@ -44,6 +44,7 @@ PIPELINE_DIR = REPO_ROOT / "pipeline"
 CONFIG_DIR = REPO_ROOT / "config"
 KNOWLEDGE_DIR = REPO_ROOT / "knowledge pipeline"
 GOVERNANCE_DIR = REPO_ROOT / "governance"
+sys.path.insert(0, str(REPO_ROOT))  # D2478: allow `from pipeline.* import` in checks (check_canonical_promotion)
 
 # ── ANSI colours ───────────────────────────────────────────────────────────
 GREEN = "\033[92m"
@@ -713,6 +714,50 @@ def check_model_registry_runtime() -> tuple[bool, str]:
     return True, f"R5 compliant: Generator={gen_family}, Classifier/Probe={cls_family}, S5 verifier={nli_label} (cross-family)"
 
 
+def check_canonical_promotion() -> tuple[bool, str]:
+    """D2478: detect UN-PROMOTED post-hoc cleanup (the 2026-08-27 file-drift root cause).
+
+    Post-hoc cleanup tools (fix_singleton_quality.py → .fixed, fix_residual_violations.py
+    → .final, the S2 dedup → .deduped) are "non-destructive" — they write to NEW
+    filenames and rely on a manual promote (rename → canonical) that never ran. The
+    pipeline reads the CANONICAL files (checkpoint.jsonl / singleton_fbs.jsonl), so a
+    cleaned-but-unpromoted sibling means the canonical is STALE. This check fails when
+    a cleaned variant exists and its content differs from the canonical.
+
+    Skip (not fail) when the canonical does not exist (no run for this run_id yet).
+    """
+    import hashlib
+    from pipeline.pipeline_paths import STAGE2_CHECKPOINT, STAGE2_SINGLETON_OUTPUT
+
+    def _sha(p) -> str | None:
+        return hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
+
+    issues: list[str] = []
+    # (canonical, [TERMINAL cleaned variant names]) — only the FINAL cleanup output.
+    # Intermediates (.fixed, .passage_cleaned) are superseded by the terminal file
+    # (.final, .deduped) and must NOT be flagged (they legitimately differ).
+    variants: list[tuple[str, list[str]]] = [
+        (STAGE2_SINGLETON_OUTPUT, ["singleton_fbs.final.jsonl"]),
+        (STAGE2_CHECKPOINT, ["checkpoint.deduped.jsonl"]),
+    ]
+    any_canonical = False
+    for canon, names in variants:
+        if not canon.exists():
+            continue
+        any_canonical = True
+        c_hash = _sha(canon)
+        for name in names:
+            v = canon.with_name(name)
+            if v.exists() and _sha(v) != c_hash:
+                issues.append(f"{v.name} differs from canonical {canon.name} (cleaned but NOT promoted)")
+
+    if not any_canonical:
+        return "skip", "no S2 canonical files for this run_id (nothing to check)"
+    if issues:
+        return False, "; ".join(issues)
+    return True, "canonical S2 files are the promoted (cleanest) versions — no drift"
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════
@@ -734,6 +779,7 @@ CHECKS = [
     (15, "Silent exceptions (C16)", check_silent_exceptions),
     (16, "Zero-vector fallback (D2196)", check_zero_vector),
     (17, "Monotonic trust (D2184)", check_monotonic_trust),
+    (18, "Canonical promotion drift (D2478)", check_canonical_promotion),
 ]
 
 

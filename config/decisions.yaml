@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-25T12:45:00Z'
-total_decisions: 465
+total_decisions: 466
 decisions:
 - id: D2092
   category: INF
@@ -4236,12 +4236,22 @@ decisions:
   - config/pipeline_config.yaml
   - scripts/benchmark_s4_ab.py
   created: '2026-08-27'
+- id: D2478
+  category: OPS
+  state: ACTIVE
+  description: 'Root-cause fix for the S2 file-drift (cleanup wrote .fixed/.final/.deduped but never promoted to canonical). (1) scripts/promote_cleaned.py atomically promotes the TERMINAL cleaned files (singleton_fbs.final.jsonl→singleton_fbs.jsonl, checkpoint.deduped.jsonl→checkpoint.jsonl) with timestamped backup — EXECUTED: canonical now 5,244 singleton (229 empty-shell, was 446) + 8,402 checkpoint (deduped+passage-cleaned, was 8,410). (2) integrity check #18 check_canonical_promotion detects un-promoted terminal cleanup (FAIL before promote, PASS after). (3) S4 parallelism A/B (scripts/benchmark_s4_parallel.py, n=8): gpt-oss 128-expert MoE does NOT scale — 1w=151.3s/1.00x/100% disc-agree, 2w=155.9s/0.97x/75%, 3w=160.5s/0.94x/75% (KV-dispatch thrash degrades discipline 25%). Parallelism is NOT a quality-neutral lever for gpt-oss. Quality-neutral S4 floor confirmed ~48h (batch depth only).'
+  champion: 2026-08-27 session
+  target_files:
+  - scripts/promote_cleaned.py
+  - pipeline/integrity_check.py
+  - scripts/benchmark_s4_parallel.py
+  created: '2026-08-27'
 
 summary:
-  total: 465
+  total: 466
   proposed: 0
   draft: 1
-  active: 406
+  active: 407
   stale: 0
   superseded: 15
   archived: 8
@@ -4293,7 +4303,7 @@ summary:
     MODEL: 2
     OBSERVABILITY / TOOLING: 1
     OPERATIONAL / CANARY: 1
-    OPS: 2
+    OPS: 3
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / RELIABILITY: 2

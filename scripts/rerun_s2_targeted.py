@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """rerun_s2_targeted.py — identify + prepare a TARGETED S2 re-extraction (D2475/D2474).
 
-Forensic audit (stress_test_s2_exhaustive) surfaced 451 records that need S2
-re-extraction. This script enumerates them and (optionally) prepares the resume
-paths so a subsequent `stage2_extract.py` run re-extracts ONLY those records —
-not the whole corpus.
+Forensic audit (stress_test_s2_exhaustive) surfaced 451 records needing S2
+re-extraction; post-hoc fixes (fix_s2_posthoc.py) resolved 191 of them, leaving
+260 LLM-required records. This script enumerates those and (optionally) prepares
+the resume paths so a subsequent `stage2_extract.py` run re-extracts ONLY those
+records — not the whole corpus.
 
-Target classes (455 hard-gap issues across 451 records):
+Target classes (260 hard-gap issues across 260 records — post-hoc fixes applied):
   1. 229 singleton empty-shell   — 70 PT empty-steps, 48 PI empty-actors,
-                                   111 TI empty-parameters (in singleton_fbs.final.jsonl).
-  2. 221 single-source stale     — elaboration non-empty on a non-principle AND/OR
-                                   missing parameters/outcome_metric (is_convergent=False).
-  3.   1 convergent PT anomaly   — BUG-166 (is_convergent=True, process_template).
+                                   111 TI empty-parameters (in singleton_fbs.jsonl).
+  2.  31 single-source stale     — missing parameters (is_convergent=False, TI).
+  3.   0 convergent PT anomaly   — BUG-166 already post-hoc blanked.
 
 Mechanism (reuses existing resume logic — no new LLM surface):
   * Singleton:  drop the `singleton_*` segids + FBs → `--only-singletons` resume
@@ -26,7 +26,7 @@ Safety (C6 + R-D410):
   * Writes use tempfile → fsync → os.replace (crash-safe).
 
 Modes:
-  --manifest PATH   (default) write the 451-record manifest JSONL, no mutation.
+  --manifest PATH   (default) write the 260-record manifest JSONL, no mutation.
   --dry-run         print what WOULD be cleared, no mutation.
   --apply           clear segids + drop FBs (backs up first).
 """
@@ -44,9 +44,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 T11 = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11"
 
-CONVERGENT_CKPT = T11 / "checkpoint.deduped.jsonl"
+# D2478/D2479: target CANONICAL files only. The `.deduped`/`.final`/`.fixed`
+# sibling variants are dead-ends — writing to them drifts canonical and the S2
+# resume reads canonical (`checkpoint.jsonl` + `singleton_fbs.jsonl`), so a drop
+# against a sibling would silently leave stale FBs and produce duplicates.
+CONVERGENT_CKPT = T11 / "checkpoint.jsonl"
 CONVERGENT_SEGIDS = T11 / "checkpoint.jsonl.segids"
-SINGLETON_FBS = T11 / "singleton_fbs.final.jsonl"
+SINGLETON_FBS = T11 / "singleton_fbs.jsonl"
 SINGLETON_SEGIDS = T11 / "singleton.segids"
 
 

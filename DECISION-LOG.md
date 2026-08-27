@@ -3,6 +3,21 @@
 
 ---
 
+### D2479 — Root-cause verdict (a) + targeted S2 LLM rerun 229+31 (2026-08-27)
+**Category:** OPS / QUALITY
+
+**Decision:** Two-part.
+
+**(1) File-drift root cause — option (a) CHOSEN over (b).** The 2026-08-27 drift (cleanup tools writing `.fixed`/`.final`/`.deduped` siblings that were never promoted) had two candidate fixes: (a) refactor cleanup tools to write in-place to canonical (crash-safe C6 + backup), eliminating the dead-end sibling class entirely; (b) wire `promote_cleaned.py` into the `just` recipe so promote→verify is standard. **Chose (a)**: it makes the wrong thing structurally impossible (no sibling exists to drift), whereas (b) is detection/remediation that assumes drift will recur and can be bypassed by running tools outside `just`. Evidence surfaced live this session: `scripts/rerun_s2_targeted.py` itself still hardcoded `checkpoint.deduped.jsonl` + `singleton_fbs.final.jsonl` (dead-end names) while `stage2_extract.py` reads canonical `checkpoint.jsonl` + `singleton_fbs.jsonl` — the exact drift recurring inside a brand-new tool. Fixed `rerun_s2_targeted.py` to target canonical only; retired the 4 stale dead-end siblings (`singleton_fbs.final.jsonl`, `singleton_fbs.fixed.jsonl`, `checkpoint.deduped.jsonl`, `checkpoint.passage_cleaned.jsonl`) via `safe_delete.py` (backups preserved). Integrity check #18 retained as defense-in-depth.
+
+**(2) Targeted S2 LLM rerun (229 singleton + 31 single-source TI) EXECUTED.** `--apply` dropped 260 empty-shell/stale FBs + segids from canonical, then resumed: `--only-singletons` re-extracted 229 (→ 5,202 singleton FBs, 21 NULL), `--only-single-source` re-extracted 31 TI missing-parameters (→ 8,402 checkpoint FBs, 0 failed). **Residual:** 48 singleton empty-shell *deterministically* re-returned empty (temp=0.0) — 32 TI empty-parameters, 11 PT empty-steps, 5 PI empty-actors — all with genuine source content, so this is a model-level type-specific-field extraction gap, NOT a pipeline bug. Logged as BUG-182 for follow-up (probe/prompt, not S4 blocker).
+
+- **Status:** ✅ DONE (rerun complete; 48-residual → BUG-182)
+- **Files:** scripts/rerun_s2_targeted.py (canonical-path fix), pipeline/integrity_check.py (#18 retained)
+- **Source:** 2026-08-27 — operator "root cause a/b + task b rerun + accept floor" directive
+
+---
+
 ### D2478 — S4 parallelism A/B (negative) + file-drift root-cause fix (2026-08-27)
 **Category:** OPS / PERFORMANCE
 

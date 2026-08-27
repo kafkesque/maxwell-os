@@ -50,7 +50,7 @@ def _load_jsonl(path: Path) -> list[dict]:
 
 def pick_representatives() -> dict[str, dict]:
     """One representative per (origin, content_type) from the real S2 checkpoint."""
-    s2 = pp.S2_DIR / "t11" / "checkpoint.deduped.jsonl"
+    s2 = pp.S2_DIR / "t11" / "checkpoint.jsonl"
     rows = _load_jsonl(s2)
     picks: dict[str, dict] = {}
     for r in rows:

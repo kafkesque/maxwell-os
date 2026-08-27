@@ -715,47 +715,40 @@ def check_model_registry_runtime() -> tuple[bool, str]:
 
 
 def check_canonical_promotion() -> tuple[bool, str]:
-    """D2478: detect UN-PROMOTED post-hoc cleanup (the 2026-08-27 file-drift root cause).
+    """D2479: assert the option-(a) invariant — NO dead-end siblings may exist.
 
-    Post-hoc cleanup tools (fix_singleton_quality.py → .fixed, fix_residual_violations.py
-    → .final, the S2 dedup → .deduped) are "non-destructive" — they write to NEW
-    filenames and rely on a manual promote (rename → canonical) that never ran. The
-    pipeline reads the CANONICAL files (checkpoint.jsonl / singleton_fbs.jsonl), so a
-    cleaned-but-unpromoted sibling means the canonical is STALE. This check fails when
-    a cleaned variant exists and its content differs from the canonical.
+    The 2026-08-27 file-drift root cause was post-hoc cleanup tools writing to
+    `.fixed`/`.final`/`.deduped` siblings that were never promoted to canonical, so
+    `stage4_merge.py` read STALE files. D2479 chose option (a): cleanup tools now
+    write IN-PLACE to canonical (crash-safe C6 + backup), and the dead-end siblings
+    were retired via `safe_delete.py`. This check now fails if ANY dead-end sibling
+    EXISTS — their presence is itself the drift hazard, regardless of content.
 
     Skip (not fail) when the canonical does not exist (no run for this run_id yet).
     """
-    import hashlib
     from pipeline.pipeline_paths import STAGE2_CHECKPOINT, STAGE2_SINGLETON_OUTPUT
 
-    def _sha(p) -> str | None:
-        return hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
-
     issues: list[str] = []
-    # (canonical, [TERMINAL cleaned variant names]) — only the FINAL cleanup output.
-    # Intermediates (.fixed, .passage_cleaned) are superseded by the terminal file
-    # (.final, .deduped) and must NOT be flagged (they legitimately differ).
-    variants: list[tuple[str, list[str]]] = [
-        (STAGE2_SINGLETON_OUTPUT, ["singleton_fbs.final.jsonl"]),
-        (STAGE2_CHECKPOINT, ["checkpoint.deduped.jsonl"]),
+    # (canonical, [FORBIDDEN dead-end sibling names]) — any existence = violation.
+    forbidden: list[tuple[str, list[str]]] = [
+        (STAGE2_SINGLETON_OUTPUT, ["singleton_fbs.final.jsonl", "singleton_fbs.fixed.jsonl"]),
+        (STAGE2_CHECKPOINT, ["checkpoint.deduped.jsonl", "checkpoint.passage_cleaned.jsonl"]),
     ]
     any_canonical = False
-    for canon, names in variants:
+    for canon, names in forbidden:
         if not canon.exists():
             continue
         any_canonical = True
-        c_hash = _sha(canon)
         for name in names:
             v = canon.with_name(name)
-            if v.exists() and _sha(v) != c_hash:
-                issues.append(f"{v.name} differs from canonical {canon.name} (cleaned but NOT promoted)")
+            if v.exists():
+                issues.append(f"{v.name} exists (dead-end sibling — option-(a) forbids it)")
 
     if not any_canonical:
         return "skip", "no S2 canonical files for this run_id (nothing to check)"
     if issues:
         return False, "; ".join(issues)
-    return True, "canonical S2 files are the promoted (cleanest) versions — no drift"
+    return True, "canonical S2 files only — no dead-end siblings (option-a invariant holds)"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

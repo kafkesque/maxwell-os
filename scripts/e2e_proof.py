@@ -63,7 +63,7 @@ def main() -> int:
     import pipeline.stage4_merge as s4m
 
     # ── 1. Pick representatives ─────────────────────────────────────────────
-    s2_all = _load_jsonl(pp.S2_DIR / "t11" / "checkpoint.deduped.jsonl")
+    s2_all = _load_jsonl(pp.S2_DIR / "t11" / "checkpoint.jsonl")
     picks: dict[tuple[str, str], dict] = {}
     for r in s2_all:
         ct = r.get("content_type")

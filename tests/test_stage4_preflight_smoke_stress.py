@@ -330,7 +330,7 @@ def _stage_smoke_s2(run_id: str, picks: list[dict[str, Any]], inject_application
 
 def _pick_diverse_s2() -> dict[str, dict[str, Any]]:
     """Return one representative per content_type from the real S2 checkpoint."""
-    s2 = ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.deduped.jsonl"
+    s2 = ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"
     rows = [json.loads(l) for l in open(s2, encoding="utf-8") if l.strip()]
     picks: dict[str, dict[str, Any]] = {}
     for r in rows:

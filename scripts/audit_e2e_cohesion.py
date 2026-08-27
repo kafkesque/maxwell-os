@@ -62,7 +62,7 @@ def main() -> int:
     s6_dir = ROOT / "knowledge pipeline" / "stage6_commit" / rid
 
     # ── Load all stages (index by fb_id) ────────────────────────────────────
-    s2 = _load_jsonl(s2_dir / "checkpoint.deduped.jsonl") or _load_jsonl(s2_dir / "checkpoint.jsonl")
+    s2 = _load_jsonl(s2_dir / "checkpoint.jsonl") or _load_jsonl(s2_dir / "checkpoint.jsonl")
     s2_singleton = _load_jsonl(s2_dir / "singleton_fbs.jsonl")
 
     s4_ckpt = _load_jsonl(s4_dir / "checkpoint.jsonl")

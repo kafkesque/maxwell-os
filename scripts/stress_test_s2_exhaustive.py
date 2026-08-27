@@ -2,8 +2,8 @@
 """stress_test_s2_exhaustive.py — exhaust ALL S2 records against content_types.yaml.
 
 Unlike `audit_diverse_smoke.py` (which *samples* ~12 per cell), this stress test
-audits EVERY record in the two real S2 corpora — singleton_fbs.final.jsonl and
-checkpoint.deduped.jsonl (single-source + convergent) — bucketed by
+audits EVERY record in the two real S2 corpora — singleton_fbs.jsonl and
+checkpoint.jsonl (single-source + convergent) — bucketed by
 (origin × content_type), and cross-examines each against the FULL content_types.yaml
 contract:
 
@@ -43,8 +43,8 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from audit_content_type_contract import audit_s2, audit_s4, _load_ontology  # noqa: E402
 
-SINGLETON = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "singleton_fbs.final.jsonl"
-DEDUP = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.deduped.jsonl"
+SINGLETON = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "singleton_fbs.jsonl"
+DEDUP = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"
 OUT_DIR = REPO_ROOT / "knowledge pipeline" / "stage4_merge" / "stress_s2_exhaustive"
 
 CONTENT_TYPES = ("principle", "process_template", "process_instance", "tool_instruction", "growth_edge")

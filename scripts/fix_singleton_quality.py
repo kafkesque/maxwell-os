@@ -166,7 +166,7 @@ def main() -> int:
         print('DRY-RUN — no write.')
         return 0
 
-    out = src.with_name(src.stem + '.fixed.jsonl')
+    out = src  # D2479 option-(a): write in-place to canonical (no .fixed dead-end)
     content = '\n'.join(json.dumps(r, ensure_ascii=False) for r in records) + '\n'
     fd, tmp = tempfile.mkstemp(dir=out.parent, prefix=out.name + '.', suffix='.tmp')
     try:

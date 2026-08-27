@@ -39,8 +39,8 @@ from pipeline import pipeline_paths as pp  # noqa: E402
 from audit_content_type_contract import audit_s4_dir, _load_ontology  # noqa: E402
 
 VALID_CT = {"principle", "process_template", "process_instance", "growth_edge", "tool_instruction"}
-DEDUP = pp.S2_DIR / "t11" / "checkpoint.deduped.jsonl"
-SINGLETON = pp.S2_DIR / "t11" / "singleton_fbs.final.jsonl"
+DEDUP = pp.S2_DIR / "t11" / "checkpoint.jsonl"
+SINGLETON = pp.S2_DIR / "t11" / "singleton_fbs.jsonl"
 
 
 def _load_jsonl(path: Path) -> list[dict]:

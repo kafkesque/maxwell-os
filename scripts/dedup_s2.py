@@ -83,14 +83,14 @@ def main() -> int:
     atomic_write_jsonl(out / "s2_dedup_report.jsonl", report)
     atomic_write_jsonl(out / "s2_dedup_drop_ids.jsonl",
                        [{"fb_id": rows[i]["fb_id"], "name": rows[i]["name"]} for i in sorted(drop_idx)])
-    atomic_write_jsonl(out / "checkpoint.deduped.jsonl", kept)
+    atomic_write_jsonl(out / "checkpoint.jsonl", kept)
 
     exact = sum(1 for r in report if r["kind"] == "exact_fb_id")
     neardup = sum(1 for r in report if r["kind"] == "near_dup_name")
     print(f"total: {len(rows)}")
     print(f"auto-dropped (exact fb_id): {exact}")
     print(f"near-dup name REVIEW candidates: {neardup}")
-    print(f"kept in checkpoint.deduped.jsonl: {len(kept)}")
+    print(f"kept in checkpoint.jsonl: {len(kept)}")
     return 0
 
 

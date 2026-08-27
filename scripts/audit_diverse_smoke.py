@@ -9,9 +9,9 @@ two real S2 corpora and audits every sampled record against config/content_types
 (shared core_body, per-type s2_body_fields, classification labels) via `audit_s2`.
 
 Origins:
-  * convergent    — multi-source (checkpoint.deduped.jsonl, is_convergent=True). Structurally
+  * convergent    — multi-source (checkpoint.jsonl, is_convergent=True). Structurally
                     principle-only (BUG-166); any non-principle convergent record is flagged.
-  * single_source — one book (checkpoint.deduped.jsonl, not convergent, not singleton).
+  * single_source — one book (checkpoint.jsonl, not convergent, not singleton).
   * singleton     — one segment (singleton_fbs.jsonl, is_singleton_fb=True).
 
 Deterministic (seeded), no LLM, no network. Read-only — never mutates the corpus.
@@ -41,7 +41,7 @@ from audit_content_type_contract import audit_s2, _load_ontology  # noqa: E402
 # C12: corpus paths are NOT hardcoded here — they are resolved via pipeline_paths,
 # but the two S2 artifacts are the canonical single-source+convergent and singleton
 # outputs. Kept as module constants for the audit (read-only).
-DEDUP_PATH = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.deduped.jsonl"
+DEDUP_PATH = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"
 SINGLETON_PATH = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "singleton_fbs.jsonl"
 
 CONTENT_TYPES = ("principle", "process_template", "process_instance", "tool_instruction", "growth_edge")
@@ -91,7 +91,7 @@ def main() -> int:
         ct = rec.get("content_type") or "principle"
         buckets[(_origin_of(rec), ct)].append(rec)
 
-    print(f"Corpora: checkpoint.deduped.jsonl={len(dedup)} records, "
+    print(f"Corpora: checkpoint.jsonl={len(dedup)} records, "
           f"singleton_fbs.jsonl={len(singleton)} records")
     print(f"Sampling ≤{args.per_cell} per (origin × type) cell (seed={args.seed}); "
           "rare cells sampled exhaustively.\n")

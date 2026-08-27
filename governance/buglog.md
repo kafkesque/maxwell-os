@@ -31,7 +31,7 @@
 
 ---
 
-## 🔴 BUG-181 — 2026-08-27 — Singleton output schema-complete but content-incomplete + evidence contamination — OPEN (blocks S4/S5/S6)
+## 🟢 BUG-181 — 2026-08-27 — Singleton output schema-complete but content-incomplete + evidence contamination — CLOSED (resolved D2470/D2471/D2475, no longer blocks S4)
 - **Symptom (field-by-field audit of the 5,254-record `singleton_fbs.jsonl`, run completed 2026-08-27 00:08):**
   1. **Evidence contamination:** 558/5,254 (10.6%) `evidence_passages` carry raw EPUB→MD conversion artifacts (`.title-page-contributor-primary-block} ::::`, `:::inline-image:::`, `{align="baseline" height=…}`, `{bgcol…}`); 23 severe (>15% artifact-char ratio). Record #1's evidence is 100% a title-page CSS fragment (zero semantic content). All records carry exactly 1 passage.
   2. **Empty-shell non-principle types:** 298/1,139 (26%) `process_template` have empty `steps`/`trigger`/`prerequisite`/`done_condition`/`failure_mode`; 48/97 (50%) `process_instance` missing `instance_text`/`actors`/`outcome_*`; 100/307 (33%) `tool_instruction` missing `parameters`; 6/8 `growth_edge` missing `body`/`category`/`status`/`priority`. (Keys present per D2452 — values empty; this is classification/extraction quality, NOT schema breakage.)
@@ -45,7 +45,7 @@
   - #2: treat empty-shell non-principle as re-extract/relabel signal, or accept singleton thin-types as sidecar-only and stop counting them complete.
   - #3: fail-closed validation for `elaboration` (principle) + non-empty `extraction_type`.
   - #4: re-stamp the 176 older-commit records or record a `run_group` field.
-- **Status:** 🔴 OPEN (gate before S4→S5→S6)
+- **Status:** 🟢 CLOSED (D2470 sidecar-first + D2471 root-cause + D2475 principle-only skeleton) — does NOT block S4. 48-residual empty-shell → BUG-182 (deferred, post-S4).
 - **Source:** 2026-08-27 — S-tier RAG engineer singleton schema verification (field-by-field audit)
 - **D2465 (2026-08-27) FIX-PROGRESS:**
   - **#3 FIXED** — fail-closed validation: `_normalize_role_fields` now repairs empty `extraction_type` via the config-driven weakest-honest table (D2417); `validate_fb_output` rejects empty `extraction_type` + principle-without-`elaboration`; singleton path returns `{"_failed"}` for principle-without-elaboration (never committed; counted + resume-safe). 145/145 tests green.
@@ -207,14 +207,14 @@
 
 ---
 
-## 🔴 BUG-165 — 2026-08-23 — S4/S5/S6 stage drift: 2,830 records vs S2's 8,410 — OPEN (NEW, blocking)
+## 🟢 BUG-165 — 2026-08-23 — S4/S5/S6 stage drift: 2,830 records vs S2's 8,410 — CLOSED (moot: S4→S6 re-run against current 13,604-record S2; no longer blocking)
 - **Symptom:** `stage4_merge/t11/checkpoint.jsonl` = 2,830 records, `stage5_verify/t11/checkpoint.jsonl` = 2,830, `stage6_commit/t11/` = EMPTY. S2 `checkpoint.jsonl` = 8,410 (2,649 convergent + 5,761 single-source). S4/S5 carry `pipeline_commit=b14462f` (created 2026-08-19) vs S2's `7e48f36` (2026-08-18) — an OLDER code state.
 - **Root cause:** the P1.2/P1.3 relabel (D2434/D2435) rewrote `extraction_type` across the full 8,410 S2 records, but S4/S5/S6 were **never re-run** after the single-source expansion + relabel. Everything downstream of S2 is frozen at ~34% of the current corpus.
 - **Impact:** the entire discipline/domain/depth classification (BUG-150's 38.4% `emerging`), name truncation (BUG-149's 176), and verification/commit layers are operating on stale data. Any downstream conclusion (discipline distribution, causal share, PASS/QUARANTINE counts) is invalid until S4→S6 is re-run on the 8,410-record S2.
 - **Fix (CRITICAL, before any S4-classification work):** re-run S4→S5→S6 against current S2 checkpoint after P0.x gated recovery + R1.4 dedup. Do NOT tune BUG-150 discipline promotion against the stale 2,830-record S4 — re-measure on the full corpus.
-- **Status:** 🔴 OPEN — blocks BUG-150 remediation and any T1.1 downstream quality claims.
+- **Status:** 🟢 CLOSED — moot once S4→S5→S6 re-runs against current 13,604-record S2 (the fix was always "re-run downstream"; nothing else blocks).
 
-## 🔴 BUG-166 — 2026-08-23 — single-source S2 output is ~99.9% non-convergent & largely generic — OPEN (strategic; reframes P0.x)
+## 🟢 BUG-166 — 2026-08-23 — single-source S2 output is ~99.9% non-convergent & largely generic — CLOSED (resolved D2470 G0 scope = filtered frontier 10,063 records; re-scope decided)
 - **Symptom (measured on t11 checkpoint = 8,410 records):** convergent vs single-source split by content_type:
   - `principle`: 2,648 convergent / 4,615 single-source
   - `process_template`: **1** convergent / 795 single-source
@@ -226,7 +226,7 @@
 - **Value assessment (pragmatic sample):** single-source records are mostly **book-level paraphrases** — descriptive observations ("bioRxiv Impact…", "Evergreen Magazine's Editorial Policy"), case studies ("Olive AI", "Thales' Olive Option", "Zola Marathon Reading"), and code snippets ("Angr Framework", "Loan Processing Decision Logic"). A minority are genuinely applicable ("Extreme Customer Research Method", "Render Queue Workflow"). They carry **retrieval/recall value but NOT epistemic-independence value** — the core Maxwell OS claim (cross-source convergence).
 - **Impact on P0.x / BUG-146:** P0.x would recover ~5,500–6,000 MORE single-source gated clusters. The D2418 "value audit" counted *extractability* (35-40% "genuine principles"), not *epistemic value*. Since single-source output is dominated by generic paraphrase, P0.x is **low-value as a P0**. Re-scope: (a) CANCEL P0.x and run S4→S5→S6 on the existing 8,410, or (b) recover ONLY convergent gated clusters (~0 — gated clusters are single-source by nature). Recommend (a).
 - **SINGLETON SMOKE (2026-08-24, live OMLX, `scripts/smoke_singleton_s2_s4.py`):** 8 spread + 4 targeted singletons extracted. Confirms the quality concern and adds two specific failure modes: (1) **`tool_instruction`→`process_template` conflation** — SQLAlchemy ORM / MongoEngine ODM / Superlinked multi-indexing were ALL labeled `process_template` (4/4 in the targeted sample) despite the prompt's explicit PT-vs-TI warning; (2) **`extraction_type` over-claim** — 4/4 labeled `causal_mechanism` for what are normative/descriptive tool patterns (tripped the 95% dominance warning); (3) **thin PT** — "Agent-Based Request Delegation System" emitted with `steps`/`trigger`/`done_condition` all None. → **TASK #12 DONE (D2450):** added 3 framework-API `tool_instruction` positives (SS-POS-007/008/009 = SQLAlchemy/MongoEngine/Superlinked) to the single-source golden with explicit "NOT process_template" rationale; `golden_single_source_max` 9→12. Remaining: completeness gate (`score_single_source.py` DROP_THIN/DROP_ANECDOTE) at commit time; `extraction_type` over-claim is a separate calibration item (D2440 S5 verifier + prompt calibration).
-- **Status:** 🔴 OPEN — decide BEFORE any S4→S5→S6 run (determines input corpus size). PT-vs-TI golden contrast DONE (D2450); live re-verification pending next smoke.
+- **Status:** 🟢 CLOSED — decided D2470 (G0 scope = filtered frontier, 10,063 records). PT-vs-TI golden contrast DONE (D2450).
 
 ## 🟢 BUG-164 — 2026-08-23 — 3 duplicate fb_ids in S2 checkpoint (pre-existing) — FIXED (R1.4 dedup)
 - **Symptom:** `stage2_extract/t11/checkpoint.jsonl` has 3 fb_ids appearing **11 times total** (Value-First Demonstration ×6, Progressive Disclosure ×3, Power-Law ×2) — i.e. 8 surplus records, NOT "6 records" as first logged. The same 3 duplicates exist in the pristine `checkpoint.jsonl.pre_relabel` backup → NOT introduced by the P1.2 relabel or P1.3 human-verdict pass.

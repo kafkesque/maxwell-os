@@ -12,8 +12,9 @@ The 451-record forensic audit splits into two tiers:
         falsely claim "no inputs" (BUG-169). Must re-extract.
       - singleton empty-shell (empty steps/actors/parameters) → must re-extract.
 
-Safety (C6 + R-D410): backs up checkpoint.deduped.jsonl before mutation, then writes
-via tempfile → fsync → os.replace. Idempotent — re-running changes nothing further.
+Safety (C6 + R-D410): backs up checkpoint.jsonl (canonical) before mutation, then
+writes via tempfile → fsync → os.replace. Idempotent — re-running changes nothing
+further.
 
 Usage:
     python3 scripts/fix_s2_posthoc.py --dry-run     # report only
@@ -31,7 +32,7 @@ import time
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CKPT = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.deduped.jsonl"
+CKPT = REPO_ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"  # D2479: canonical (no .deduped)
 
 
 def _load() -> list[dict]:

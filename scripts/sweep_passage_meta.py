@@ -85,11 +85,11 @@ def main() -> int:
 
     out = Path(args.out_dir)
     atomic_write_jsonl(out / "s2_passage_meta_report.jsonl", report)
-    atomic_write_jsonl(out / "checkpoint.passage_cleaned.jsonl", rows)
+    atomic_write_jsonl(out / "checkpoint.jsonl", rows)
 
     print(f"records flagged: {len(report)}")
     print(f"leading-framing stripped: {stripped}")
-    print(f"wrote: s2_passage_meta_report.jsonl, checkpoint.passage_cleaned.jsonl")
+    print(f"wrote: s2_passage_meta_report.jsonl, checkpoint.jsonl (in-place)")
     return 0
 
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """fix_residual_violations.py — drop/fill the 20 skeleton-gap residuals (D2474).
 
-Operates on singleton_fbs.fixed.jsonl (output of fix_singleton_quality.py) and
-emits singleton_fbs.final.jsonl. Deterministic, verifiable, non-destructive.
+Operates on singleton_fbs.jsonl (canonical) and writes in-place (D2479 option-a:
+no .fixed/.final dead-end siblings). Deterministic, verifiable, crash-safe (C6).
 
 Three classes of residual S2-contract violation (the ones fix_singleton_quality.py
 could NOT deterministically repair):
@@ -38,7 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.content_types import CONTENT_TO_EXTRACTION_TYPE  # D2417 config-first
 
-INPUT = "knowledge pipeline/stage2_extract/t11/singleton_fbs.fixed.jsonl"
+INPUT = "knowledge pipeline/stage2_extract/t11/singleton_fbs.jsonl"  # D2479: canonical (no .fixed)
 
 _SKELETON = ("mechanism", "boundary", "consequence")
 
@@ -107,7 +107,7 @@ def main() -> int:
 
     # Crash-safe write (C6): tempfile → fsync → os.replace. Never overwrite pipeline
     # output in place (R-D410).
-    out = src.with_name(src.stem.replace(".fixed", ".final") + ".jsonl")
+    out = src  # D2479 option-(a): write in-place to canonical (no .final dead-end)
     manifest = src.with_name("drop_manifest.jsonl")
     content = "\n".join(json.dumps(r, ensure_ascii=False) for r in kept) + "\n"
 

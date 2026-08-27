@@ -98,6 +98,48 @@ def clean_markdown(text: str) -> str:
     return text.strip()
 
 
+# ── BUG-181#1: Pandoc/calibre converter-artifact stripper (D2471) ────────
+# clean_markdown() above strips standard Markdown/HTML but MISSES Pandoc's
+# {...} attribute syntax, ::: fenced divs, and calibre span markers — the exact
+# residue that leaked into evidence_passages (BUG-181#1). Imported by
+# stage1_3_prefilter (root-cause) and scripts/fix_singleton_quality.py (post-hoc).
+
+_CLEAN_SUBS: tuple[tuple[str, str], ...] = (
+    (r'\{[^}]*\.(?:keep-together|num-string|calibre\d+)[^}]*\}', ' '),
+    (r'\{=(?:html|latex)\}', ' '),
+    (r'\{align="[^"]*"\}', ' '),
+    (r'\{width="[^"]*"\}', ' '),
+    (r'\{height="[^"]*"\}', ' '),
+    (r'\{bgcol[^}]*\}', ' '),
+    (r'\{#(?:chapter|part|sec|ch)[^}]*\}', ' '),
+    (r'!Image\{[^}]*\}', ' '),
+    (r':::\s*imagel[^:]*:::*', ' '),
+    (r':{3,}', ' '),
+    (r'\^\d+\^', ' '),
+    (r'&#\d+;', ' '),
+    (r'\[\s*\]\{[^}]*\}', ' '),
+    (r'\.\s*xhtml_p\d+', ' '),
+)
+
+
+def clean_evidence_passage(text: str, collapse: bool = True) -> str:
+    """Strip Pandoc/calibre converter residue from one evidence passage (D2471).
+
+    Conservative: only removes the unambiguous artifacts above; never touches
+    prose. collapse=True collapses whitespace runs to a single space (correct for
+    short evidence passages); pass collapse=False for S1 segments to preserve
+    line structure.
+    """
+    if not text:
+        return text
+    t = text
+    for pat, rep in _CLEAN_SUBS:
+        t = re.sub(pat, rep, t)
+    if collapse:
+        return re.sub(r'\s+', ' ', t).strip()
+    return t.strip()
+
+
 # ── H2: Paragraph Normalization (~30 LOC) ────────────────────────────────
 
 def _is_index_or_table(text: str) -> bool:

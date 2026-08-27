@@ -201,9 +201,22 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
     # D2323: validate extraction_type against the config-sourced enum.
     # Was previously unvalidated — any string (or a typo) passed through and
     # silently defaulted to "causal_mechanism" downstream.
+    # BUG-181#3 (2026-08-27): empty form is now INVALID too — _normalize_role_fields
+    # repairs it, so reaching here with '' means the repair was bypassed (fail-closed).
     etype = str(result.get("extraction_type", "")).strip()
-    if etype and etype not in _VALID_EXTRACTION_TYPES:
+    if not etype:
+        errors.append(
+            "Missing extraction_type — must be one of: causal_mechanism, "
+            "descriptive_model, normative_heuristic, empirical_pattern"
+        )
+    elif etype not in _VALID_EXTRACTION_TYPES:
         errors.append(f"Invalid extraction_type '{etype}'")
+
+    # BUG-181#3 (2026-08-27): content-aware — principle REQUIRES non-empty
+    # elaboration (D2448 + content_types.yaml core_body contract).
+    ctype = str(result.get("content_type", "")).strip()
+    if ctype == "principle" and not str(result.get("elaboration", "")).strip():
+        errors.append("principle requires non-empty elaboration (D2448)")
 
     return len(errors) == 0, errors
 
@@ -239,6 +252,15 @@ def _normalize_role_fields(result: dict) -> dict:
     elif ctype and ctype in EXTRACTION_TYPES and ctype not in CONTENT_TYPES:
         result["extraction_type"] = ctype
         result["content_type"] = "principle"
+
+    # BUG-181#3 (2026-08-27): empty/missing extraction_type → weakest-honest
+    # epistemic form for the role (config-driven D2417 table). Never ship an
+    # un-typed FB. This runs BEFORE validation in every path, so a repaired
+    # record never trips the fail-closed check below.
+    if not str(result.get("extraction_type", "")).strip():
+        result["extraction_type"] = CONTENT_TO_EXTRACTION_TYPE.get(
+            str(result.get("content_type", "")).strip(), "descriptive_model"
+        )
 
     return result
 
@@ -807,6 +829,48 @@ def _code_role_guard(
     }
     # extraction_type for a tool/command is normative_heuristic (D2417 default).
     return "tool_instruction", body, True
+
+def _has_step_language(text: str) -> bool:
+    """D2471: heuristic — does the passage enumerate a procedure? Used by
+    _narrative_role_guard to decide whether an empty-steps PT is a genuine
+    (fragmented) process vs a mislabeled narrative description."""
+    t = (text or "").lower()
+    markers = ("step", "first,", "second,", "third,", "next,", "then,",
+               "finally,", "begin by", "start by", "procedure", "how to",
+               "phase", "sequence")
+    return any(m in t for m in markers)
+
+
+def _narrative_role_guard(
+    content_type: str,
+    result: dict,
+    evidence_text: str,
+) -> tuple[str, dict, bool]:
+    """D2471: deterministic residual guard — the INVERSE of _code_role_guard.
+
+    A process_template REQUIRES steps (content_types.yaml). When the passage is a
+    descriptive account of a concept/framework (no code, no step-enumeration
+    language) but the LLM emitted process_template with empty steps, the role is
+    deterministically corrected to principle + descriptive_model (weakest-honest
+    D2417 default). Mirrors the D2457 code guard; the returned flag marks the
+    correction for audit traceability.
+
+    Returns (content_type, extra_body_fields, corrected_flag). No-op when not
+    fired.
+    """
+    if content_type != "process_template":
+        return content_type, {}, False
+    if result.get("steps"):
+        return content_type, {}, False
+    if detect_code_in_text(evidence_text):
+        return content_type, {}, False  # _code_role_guard owns the code case
+    if _has_step_language(evidence_text):
+        return content_type, {}, False  # genuine-but-fragmented process — keep PT
+
+    body = {
+        "elaboration": (result.get("definition") or result.get("summary") or "").strip(),
+    }
+    return "principle", body, True
 
 
 def _blank_elaboration_for_non_principle(elaboration: str, content_type: str) -> str:
@@ -2358,6 +2422,15 @@ def run_stage2(
             result = {**result, **_cg_body}
             if not extraction_type:
                 extraction_type = "normative_heuristic"
+        # D2471: narrative-role guard — empty PT that is NOT code → principle.
+        _ng_ct, _ng_body, _ng_flag = _narrative_role_guard(
+            content_type, result, " ".join(evidence_passages)
+        )
+        if _ng_flag:
+            content_type = _ng_ct
+            result = {**result, **_ng_body}
+            if not extraction_type:
+                extraction_type = "descriptive_model"
 
         # Build FB record
         fb_id: str = make_hash_id(name, definition)
@@ -2645,6 +2718,14 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
     non_principle_roles: frozenset[str] = CONTENT_TYPES - {"principle"}
     if is_summary and gate_enabled and content_type not in non_principle_roles:
         return {"_gate": True}
+    # BUG-181#3 (2026-08-27): fail-closed content-aware validation for the
+    # singleton path (validate_fb_output is convergent-path only). Runs AFTER the
+    # NULL/gate checks so precedence is preserved; a principle without elaboration
+    # is incomplete by spec (D2448) — mark FAILED so it is never silently
+    # committed to S4/S5/S6.
+    if content_type == "principle" and not str(result.get("elaboration", "")).strip():
+        return {"_failed": True,
+                "_schema_errors": ["principle requires non-empty elaboration (D2448)"]}
     # D2457: deterministic code-role guard — if the passage is code but the model
     # emitted an empty process_template, correct the role to tool_instruction.
     _cg_ct, _cg_body, _cg_flag = _code_role_guard(content_type, result, item["text"])
@@ -2653,6 +2734,13 @@ def _singleton_result_to_fb(result: dict, item: dict, gate_enabled: bool) -> dic
         result = {**result, **_cg_body}
         if not extraction_type:
             extraction_type = "normative_heuristic"
+    # D2471: narrative-role guard — empty PT that is NOT code → principle.
+    _ng_ct, _ng_body, _ng_flag = _narrative_role_guard(content_type, result, item["text"])
+    if _ng_flag:
+        content_type = _ng_ct
+        result = {**result, **_ng_body}
+        if not extraction_type:
+            extraction_type = "descriptive_model"
     # D2449: align the singleton record with the single-source/convergent record.
     # Historically this builder forked and dropped `elaboration`, bibliographic
     # provenance (source_authors/citation/primary_source) and the R14 stamps —
@@ -2797,6 +2885,7 @@ def process_singletons(
     all_fbs: list[dict] = []
     total_extracted: int = 0
     total_null: int = 0
+    total_failed: int = 0  # BUG-181#3 (2026-08-27): schema-defective records (fail-closed)
     pipeline_commit: str = get_pipeline_commit()
 
     # Resume support (D2453): the singleton pass previously wrote FBs ONLY at the
@@ -2997,13 +3086,17 @@ def process_singletons(
                 if fb.get("_gate"):
                     processed_ids.add(item["cluster_id"])
                     continue
+                if fb.get("_failed"):  # BUG-181#3: definite schema verdict — no re-ask on resume
+                    total_failed += 1
+                    processed_ids.add(item["cluster_id"])
+                    continue
                 all_fbs.append(fb)
                 total_extracted += 1
                 processed_ids.add(item["cluster_id"])
             # D2453: incremental crash-safe checkpoint
             if completed % checkpoint_every == 0:
                 _write_singleton_checkpoint(all_fbs, processed_ids)
-                print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL — checkpointed")
+                print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL, {total_failed} FAILED — checkpointed")
             elif completed % 50 == 0:
                 print(f"  [{completed}/{len(batches)}] {total_extracted} extracted, {total_null} NULL")
 
@@ -3014,6 +3107,7 @@ def process_singletons(
     print("\n✅ Singleton extraction complete:")
     print(f"   Extracted FBs: {total_extracted}")
     print(f"   NULL routes:   {total_null}")
+    print(f"   Schema-FAILED: {total_failed}")  # BUG-181#3 (2026-08-27): fail-closed
     print(f"   Output:        {STAGE2_SINGLETON_OUTPUT}")
 
     # Content type distribution

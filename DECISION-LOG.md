@@ -3,6 +3,150 @@
 
 ---
 
+### D2476 — `classify_model` S4 stamp (2026-08-27)
+**Category:** QUALITY / OBSERVABILITY
+
+**Decision:** Added a `classify_model` provenance stamp to S4 output, distinct from `gen_model`. `gen_model` records the S2 generator (Qwen3-Coder-30B); `classify_model` records the S4 classifier (gpt-oss-20b-MXFP4-Q8 = `VERIFY_MODEL`), honoring R5 (Generator ≠ Classifier family). `stamp_record()` gained an optional `classify_model` param (key omitted when `None`, so S2-side generation stays unstamped); `stage4_merge` now stamps each classified FB with `classify_model=VERIFY_MODEL`. **Principle-only** — non-principle sidecars are routed (LLM-free), not classified, so they carry no `classify_model`. Documented in `content_types.yaml` `classification` and enforced in `audit_s4` (principle check).
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/stamp.py, pipeline/stage4_merge.py, config/content_types.yaml, scripts/audit_content_type_contract.py
+- **Source:** 2026-08-27 — operator "add classify model stamp for S4 and log it" directive
+
+---
+
+### D2475 — mechanism/boundary/consequence are PRINCIPLE-ONLY (2026-08-27)
+**Category:** ARCH
+
+**Decision:** Made the causal skeleton (`mechanism`/`boundary`/`consequence`) **principle-only** in the ontology — they are the epistemic register of a Foundation Block (how/why it works), not a shared skeleton for every role. Config-first (C12): `content_types.yaml` now carries machine-readable `shared_body` (`name`/`definition` — required for ALL types) + `principle_only_body` (`mechanism`/`boundary`/`consequence` — required non-empty ONLY for principle, OPTIONAL for PT/PI/TI/GE). Relaxed `audit_s2`, `check_record` (audit_singleton_s2_contract), and `audit_s4_fields` accordingly. This **eliminates the 9-TI-skeleton false positives** (3 TI records × empty mechanism/boundary/consequence wrongly flagged as hard gaps). Non-principle roles keep their tailored segments (`steps`/`actors`/`parameters`/`body`). `elaboration` remains separately special-cased. Backward-compatible: legacy S2 still emits the skeleton for non-principles — now optional extras, not requirements.
+
+- **Status:** ✅ DONE
+- **Files:** config/content_types.yaml, scripts/audit_content_type_contract.py, scripts/audit_singleton_s2_contract.py, scripts/audit_s4_fields.py
+- **Source:** 2026-08-27 — operator "implement D275" (D2475) directive
+
+---
+
+### D2474 — 20-residual drop/fill + exhaustive S2 conformance stress test (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** Executed the agreed drop/fill on the 20 skeleton-gap residuals: FILLED 1 empty `extraction_type` (process_template → normative_heuristic via D2417 config default — verifiable, non-hallucinated); DROPPED 10 empty-elaboration principles (`drop_manifest.jsonl` — elaboration cannot be filled without LLM re-derivation); NOTED 3 TI empty-skeleton as schema-fit (`skeleton_schema_fit_note`, NOT dropped — description/output/caveats/parameters already populated). Output: `singleton_fbs.final.jsonl` (5,244 records). Empty-shell (229 singleton records: 70 PT empty-steps + 48 PI empty-actors + 111 TI empty-parameters) LEFT for the S2 rerun (BUG-165) — not back-filled, since `parameters: []` would falsely claim "no inputs" (BUG-169).
+
+Built two deterministic audit tools: `scripts/audit_diverse_smoke.py` (sampled 15-cell) + `scripts/stress_test_s2_exhaustive.py` (exhaustive — all 13,646 records across 15 (origin × content_type) cells audited against content_types.yaml, with `visual.md` + `samples/*.jsonl` rendered to `stage4_merge/stress_s2_exhaustive/`). Exhaustive result: **464 hard gaps** = 225 stale single-source (pre-D2452 elaboration-nonempty + missing parameters/outcome_metric — vanish on rerun) + 229 singleton empty-shell + 9 TI skeleton (3 records × 3 fields) + 1 convergent PT anomaly (BUG-166). Added regression guard `test_omitted_s2_body_fields_get_typed_placeholders` (D2452 placeholder emission). **146/146 tests green.**
+
+- **Status:** ✅ DONE
+- **Files:** scripts/fix_residual_violations.py, scripts/audit_diverse_smoke.py, scripts/stress_test_s2_exhaustive.py, tests/test_content_type_contract.py, config/decisions.yaml
+- **Source:** 2026-08-27 — operator "drop/fill + empty-shell rerun + log + exhaustive stress test" directive
+
+---
+
+### D2473 — Gov-drift fixes: BUG-179/180 + C1/C22 + date + ext-audit #5 (2026-08-27)
+**Category:** GOVERNANCE / QUALITY
+
+**Decision:** BUG-179 FIXED — AGENTS.md loader updated (D2000-D2472, 460 decisions, models relabeled Classifier/Probe per D2249/D2298) + MASTERPROMPT.md phantom tools/delegate_guard.py → tools/delegate_safe.py. BUG-180 addressed — mlx_provider.py deprecation banner (direct-MLX deferred D2055; batch KV cache no-op documented). C1/C22 precedence clarified (C1 "NO cloud by default", C22 = sole explicit opt-in exception). CONSTITUTION footer date fixed (07-22 → 07-26, v2.1.1 → v3.0). ext-audit #5 FIXED — check_stage_order now asserts the RELATIVE order of the 9 stages (permutation detection). 10/10 integrity quick passes.
+
+- **Status:** ✅ DONE
+- **Files:** AGENTS.md, MASTERPROMPT.md, pipeline/providers/mlx_provider.py, CONSTITUTION.md, pipeline/integrity_check.py
+- **Source:** 2026-08-27 — operator "fix BUG-179/180 + C1/C22 + ext-audit #5" directive
+
+---
+### D2472 — BUG-181#1/#2 + BUG-169 root-cause + post-hoc FIXED (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** BUG-181#1: pipeline/text_cleaner.py gained clean_evidence_passage() — strips the Pandoc/calibre residue that clean_markdown() missed ({...} span/attr syntax, ::: fenced divs, footnote markers, !Image{...}); wired into stage1_3_prefilter (root-cause: strip before clustering) + scripts/fix_singleton_quality.py (post-hoc: 1,819 passages cleaned, 6 residual edge cases). BUG-181#2: _narrative_role_guard() in stage2_extract (empty-PT + narrative → principle, mirrors the D2457 _code_role_guard) + fix_singleton_quality.py reclassified 217 PT→principle / 11 PT→tool_instruction / 70 flagged body_incomplete. BUG-169: 100 empty-parameters TI flagged parameter_origin=technique (accepted as code/prompt techniques). Output: singleton_fbs.fixed.jsonl (non-destructive, R-D410). 145/145 tests green.
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/text_cleaner.py, pipeline/stage1_3_prefilter.py, pipeline/stage2_extract.py, scripts/fix_singleton_quality.py
+- **Source:** 2026-08-27 — operator "fix BUG-181#1/#2 + BUG-169" directive
+
+---
+### D2471 — Pre-S4 readiness verification + quarantine list + root-causes (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** Pre-S4 verification complete and S4 is READY. Integrity 15/17 (2 skipped: no maxwell.db — expected pre-S6). Config audit (C12 strict) clean, golden hash PASS, content-type contract PASS (all 5 types conform), stacks single-source PASS (ollama 0.33.0 / omlx 0.6.2). Severe evidence quarantine list EMITTED (temp/severe_evidence_quarantine.jsonl, 29 records: 18 principle / 8 PT / 3 TI). BUG-181#2 root-caused: empty-shell PT = narrative description mislabeled as process_template (steps genuinely absent from the source passage, not dropped by the extractor). BUG-169 root-caused: 73% of empty-parameters TI are code/prompt techniques with parameters implicit in syntax (not a schema bug). S4-C distillation BLOCKED on fresh S4 teacher labels + eval harness.
+
+- **Status:** ✅ DONE
+- **Files:** scripts/audit_evidence_cleanliness.py, scripts/audit_content_type_contract.py, pipeline/integrity_check.py, agent/session_seed.yaml
+- **Source:** 2026-08-27 — operator "forensic audit + S4 readiness" directive
+
+---
+### D2470 — Pre-S4 commit decisions: G0 filtered frontier 10,146 + 176 accept + evidence accept-and-flag + BUG-181#2 sidecar-first (2026-08-27)
+**Category:** PRODUCT / QUALITY
+
+**Decision:** Locked the four gate decisions before the S4→S5→S6 rerun:
+1. **G0 scope** — S4 input = FILTERED frontier **10,146** (4,892 value-keep + 5,254 singletons), NOT the full 13,656 (8,402 checkpoint.deduped + 5,254).
+2. **176 older-commit singletons** — ACCEPTED (measured 0 author-sentinel hits → BUG-175 contamination did not reach them; no provenance re-check).
+3. **BUG-181 #1** — accept-and-flag + quarantine the 29 severe (>15% artifact ratio); NOT full re-clean. Contamination = deterministic EPUB→MD converter artifacts (calibre markers, CSS selector residue, inline style), not hallucination. Fix text_cleaner / stage1_3_prefilter for the NEXT corpus.
+4. **BUG-181 #2** — sidecar-first CONFIRMED: empty-shell non-principle documented in sidecar (skeleton + route + evidence), empty body filled later via cross-examination (recipe-builder workflow). No re-extraction.
+
+- **Status:** ✅ DECIDED
+- **Files:** governance/aggregated_remaining_tasks.md, governance/buglog.md, config/decisions.yaml
+- **Source:** 2026-08-27 — operator "G0 scope + do-items + gov sync" directive
+
+---
+
+### D2469 — P1.3 gpt-oss cross-family FLAG wired into S2 relabel (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** Wired the Generator≠Verifier (R5) cross-family disagreement FLAG into stage2_relabel_extraction_type.py. A second judge from a DIFFERENT model family (config stage2.relabel_cross_family_model, empty = disabled) re-judges each FORM relabel candidate; on disagreement with the primary judge the record is flagged (relabel_flag = cross_family_disagreement) and the change is NOT auto-applied. Config-first (C12), default-off, CLI --cross-family-model.
+
+- **Status:** ✅ DONE (compiles; --help + dry-run verified against checkpoint.deduped.jsonl)
+- **Files:** pipeline/stage2_relabel_extraction_type.py, pipeline/pipeline_paths.py, config/pipeline_config.yaml
+- **Source:** 2026-08-27 — task register P1.3
+
+---
+
+### D2468 — BUG-178 S6 Parquet crash-safe write (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** export_parquet now tempfile.mkstemp → write → fsync → os.replace (C6), temp cleaned on failure. 145/145 tests green.
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/stage6_commit.py
+- **Source:** 2026-08-27 external-audit remediation
+
+---
+
+### D2467 — BUG-177 C16 silent-error class FIXED (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** parallel.py raises ParallelMapError by default (on_error="collect" opt-in); stage5_verify adds NLIInferenceError + raise_on_error + records verification_error_type; model_lazyload no silent fallback (explicit MAXWELL_STANDALONE=1).
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/parallel.py, pipeline/stage5_verify.py, pipeline/model_lazyload.py
+- **Source:** 2026-08-27 external-audit remediation
+
+---
+
+### D2466 — D2454 golden wiring + S4 re-benchmark (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** pipeline/s4_golden.py fail-closed loader + injection into all 4 S4 prompts (CLASSIFY/MERGED/BATCH/DEPTH) honoring stage4.golden_inject_enabled. Re-benchmark: 17.71s median / 19.02s mean per FB (old ~30s baseline was cache-contaminated → S4-research §1 CONFIRMED).
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/s4_golden.py, pipeline/stage4_merge.py, pipeline/stage4_merged_call.py
+- **Source:** 2026-08-27
+
+---
+
+### D2465 — BUG-181 remediation (#3 fix + #4 manifest + #1 gate) (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** #3 fail-closed S2 validation FIXED (empty-extraction_type repair + principle-elaboration requirement + singleton _failed path + total_failed counter); #4 singleton_run_manifest.json (3-commit split, stamps truthful); #1 evidence-cleanliness gate (scripts/audit_evidence_cleanliness.py → 515/5,254 = 9.8% contaminated). 145/145 tests green.
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/stage2_extract.py, scripts/audit_evidence_cleanliness.py
+- **Source:** 2026-08-27
+
+---
+
+### D2464 — S2 singleton run complete + field-by-field schema audit → BUG-181 (2026-08-27)
+**Category:** QUALITY
+
+**Decision:** Singleton extraction COMPLETE (5,254 FBs / 1,018 NULL). Field-by-field audit vs agreed segments/properties/metadata → schema-perfect (R14 stamps 100%, provenance 100%, conflation 0) but content-imperfect → BUG-181. MAXWELL-OS-AUDIT-RESPONSE.md verified claim-by-claim: 10/12 TRUE.
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/stage2_extract.py
+- **Source:** 2026-08-27
+
 ### D2463 — External-audit cross-exam remediation: golden fail-closed + OMLX cache gate + issue catalog (2026-08-25)
 **Category:** ROBUSTNESS / QUALITY
 

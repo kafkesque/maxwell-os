@@ -108,20 +108,44 @@ def _load_dual_encoders():
     return _DEBERTA_LARGE, None
 
 
-def _nli_pair_scores(premise: str, hypothesis: str) -> tuple[float, float, float]:
+class NLIInferenceError(RuntimeError):
+    """Raised by _nli_pair_scores(..., raise_on_error=True) on NLI runtime failure (C16/BUG-177).
+
+    A transport/model error must never be indistinguishable from a genuine
+    "not entailed" verdict. Callers that want fail-closed behavior catch this
+    and record `verification_error_type`; they must NOT substitute a semantic
+    label (D2093 fail-closed).
+    """
+
+
+def _nli_pair_scores(
+    premise: str,
+    hypothesis: str,
+    *,
+    raise_on_error: bool = False,
+) -> tuple[float, float, float]:
     """D2322: Raw DeBERTa NLI scores for one (premise, hypothesis) pair.
 
     Returns (entailment, neutral, contradiction) probabilities. Shared primitive
     used by deberta_check() and nli_calibrate.py so both read all three labels
-    from a properly-paired input (BUG-092 fix). Never raises — returns zeros on
-    any failure (caller decides fail-closed handling).
+    from a properly-paired input (BUG-092 fix).
+
+    C16/BUG-177: previously never raised — returned (0,0,0) on any failure,
+    making an infra error look like "not entailed". With raise_on_error=True
+    the caller gets a typed NLIInferenceError instead and can record it as
+    verification_error_type. Default False preserves the legacy contract for
+    nli_calibrate.py (which treats (0,0,0) as a skip).
     """
     debert, _ = _load_dual_encoders()
     if debert is None:
+        if raise_on_error:
+            raise NLIInferenceError("DeBERTa model not loaded")
         return 0.0, 0.0, 0.0
     try:
         _r = debert({"text": premise, "text_pair": hypothesis}, top_k=3)
-    except Exception:
+    except Exception as e:
+        if raise_on_error:
+            raise NLIInferenceError(f"NLI inference failed: {e}") from e
         return 0.0, 0.0, 0.0
     _entail = _neutral = _contra = 0.0
     if isinstance(_r, list):
@@ -176,19 +200,29 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     _entail_scores: list[float] = []
     _contra_scores: list[float] = []
     _neutral_scores: list[float] = []
+    _nli_errors: list[str] = []  # C16/BUG-177: observability — never silent
 
     for _ep in _eps[:8]:
         if not _ep.strip():
             continue
         _prem = _ep[:S5_NLI_MAX_PREMISE_CHARS]  # premise = evidence passage
         _hyp = _def[:S5_NLI_MAX_HYPOTHESIS_CHARS]  # hypothesis = FB definition
-        _ent, _neu, _con = _nli_pair_scores(_prem, _hyp)
+        try:
+            _ent, _neu, _con = _nli_pair_scores(_prem, _hyp, raise_on_error=True)
+        except NLIInferenceError as e:
+            # C16/BUG-177: an NLI runtime error is NOT a semantic "not entailed" —
+            # record it so the operator can distinguish infra failure from verdict.
+            _nli_errors.append(str(e))
+            continue
         if _ent == 0.0 and _neu == 0.0 and _con == 0.0:
             continue  # NLI scoring failed for this passage
         _entail_scores.append(_ent)
         _neutral_scores.append(_neu)
         _contra_scores.append(_con)
 
+    if _nli_errors:
+        fb["verification_error_type"] = "NLIInferenceError"
+        fb["verification_errors"] = _nli_errors[:5]
     if not (_entail_scores or _contra_scores or _neutral_scores):
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 

@@ -224,6 +224,7 @@ stage2:
   gated_seed_id_regex: 'cluster_\d+(_s\d+)?(_sub\d+)?'   # D2421: cluster-id pattern on gated log lines
   extraction_type_dominance_warn_ratio: 0.95   # D2376: warn if a single extraction_type > this ratio of output (over-claim canary — causal_mechanism is the strongest epistemic claim)
   relabel_max_workers: 4   # D2434: R1 relabel sweep parallelism — OMLX serves concurrent requests; 4 workers ≈ 2-3× throughput on the ~15-20s/rec Qwen3 FORM re-judgment
+  relabel_cross_family_model: ""   # P1.3 (D2469): cross-family FLAG judge (Generator≠Verifier, R5). Empty = disabled. Set to a DIFFERENT-family model (e.g. models.verifier.model "gpt-oss-20b-MXFP4-Q8") to flag disagreements instead of auto-applying relabels.
 watchdog:
   interval_secs: 60        # D2384: S2 watchdog poll interval
   stall_checks: 3          # D2384: consecutive no-growth polls before flagging "stuck" (D2382 signature)

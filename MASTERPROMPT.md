@@ -82,7 +82,7 @@ Verify that the **inference stack**, the **pipeline**, the **configs**, and the 
 Audit `pipeline/omlx_call.py`, `pipeline/model_lazyload.py`, `pipeline/parallel.py`, and `~/.omlx/settings.json` + `~/.omlx/model_settings.json`. Check:
 - Does the code's assumed model name/endpoint match what oMLX actually serves? Any hardcoded model strings violating C12?
 - Is the `--no-cache` fix enforced in code, or does it rely on manual settings that the GUI can silently revert (as happened in D2460)?
-- Are the delegate rules (`delegate_rules` in the agent loader: never `custom_deepseek`, never >1 heavy model concurrent, `delegate_guard.preflight()` first) actually enforced in `tools/delegate_guard.py`?
+- Are the delegate rules (`delegate_rules` in the agent loader: never `custom_deepseek`, never >1 heavy model concurrent) actually enforced in `tools/delegate_safe.py` (just delegate-check / delegate-fix — no preflight)?
 - Is there a single source of truth for model routing, or are there competing decision trees (agent loader vs `pipeline/omlx_call.py` vs config)?
 
 ### 3.2 Pipeline + config + decision alignment

@@ -52,7 +52,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.content_types import EXTRACTION_TYPES
 from pipeline.io_guard import load_jsonl, safe_write
 from pipeline.omlx_call import call_omlx_json
-from pipeline.pipeline_paths import GEN_MODEL, RELABEL_MAX_WORKERS, STAGE2_CHECKPOINT
+from pipeline.pipeline_paths import GEN_MODEL, RELABEL_CROSS_FAMILY_MODEL, RELABEL_MAX_WORKERS, STAGE2_CHECKPOINT
 
 
 SYSTEM_PROMPT: str = "You are a precise JSON generator. Return ONLY valid JSON. No markdown."
@@ -171,7 +171,8 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
             single_source_only: bool, types: frozenset[str] | None,
             resume: bool = False, checkpoint_every: int = 50,
             workers: int = RELABEL_MAX_WORKERS,
-            model: str = GEN_MODEL) -> dict:
+            model: str = GEN_MODEL,
+            cross_family_model: str = RELABEL_CROSS_FAMILY_MODEL) -> dict:
     checkpoint_path = str(Path(checkpoint_path))
     lock_path = _acquire_lock(checkpoint_path)
     records = load_jsonl(checkpoint_path, context="relabel checkpoint")
@@ -208,6 +209,8 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
     changed: int = 0
     unchanged: int = 0
     failed: int = 0
+    disagreements: int = 0
+    cross_failed: int = 0
     workers = max(1, workers)
 
     for chunk_start in range(0, len(active), workers):
@@ -230,6 +233,22 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
                 except Exception as e:
                     results[i] = ("", f"{type(e).__name__}: {e}")
 
+        # P1.3 cross-family FLAG (Generator≠Verifier, R5): a second judge from a
+        # DIFFERENT model family re-judges each candidate. Disagreement on a
+        # proposed change → record flagged, change NOT auto-applied.
+        cross: dict[int, str] = {}  # i -> cross-family label ("" = no signal/error)
+        if cross_family_model:
+            with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
+                cfutures = {ex.submit(_judge, records[i], cross_family_model): i for _, i in chunk}
+                for fut in cfutures:
+                    i = cfutures[fut]
+                    try:
+                        cross[i] = fut.result()
+                    except Exception as e:
+                        cross[i] = ""
+                        cross_failed += 1
+                        print(f"   ⚠️  #{i} cross-family judge failed: {type(e).__name__}", file=sys.stderr, flush=True)
+
         # Apply in deterministic candidate order.
         for pos, i in chunk:
             rec = records[i]
@@ -245,9 +264,15 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
             elif new == old:
                 unchanged += 1
             else:
-                rec["extraction_type"] = new
-                changed += 1
-                print(f"   🔁 #{i} {label}: {old} → {new}")
+                cross_label = cross.get(i, "")
+                if cross_family_model and cross_label and cross_label != new:
+                    rec["relabel_flag"] = "cross_family_disagreement"
+                    disagreements += 1
+                    print(f"   🚩 #{i} {label}: {old} → {new} DISAGREED by cross-family ({cross_label}) — flagged, not applied")
+                else:
+                    rec["extraction_type"] = new
+                    changed += 1
+                    print(f"   🔁 #{i} {label}: {old} → {new}")
 
         # Checkpoint at chunk boundaries (deterministic, C23). The marker stores
         # the CUMULATIVE candidate count (start_pos + this-run progress), matching
@@ -266,9 +291,11 @@ def relabel(checkpoint_path: str, *, dry_run: bool, limit: int | None,
 
     after = _dist(records)
     print(f"   after : {dict(after)}")
-    print(f"✅ Relabel done: changed {changed}, unchanged {unchanged}, failed {failed}")
+    print(f"✅ Relabel done: changed {changed}, unchanged {unchanged}, failed {failed}, "
+          f"cross-family disagreements {disagreements}, cross-family failures {cross_failed}")
     _release_lock(lock_path)
-    return {"changed": changed, "unchanged": unchanged, "failed": failed}
+    return {"changed": changed, "unchanged": unchanged, "failed": failed,
+            "disagreements": disagreements, "cross_failed": cross_failed}
 
 
 def main() -> None:
@@ -290,6 +317,9 @@ def main() -> None:
                         help="Parallel relabel workers (default: from config stage2.relabel_max_workers)")
     parser.add_argument("--model", default=GEN_MODEL,
                         help="Judge model (default: pipeline GEN_MODEL; pass S4_DEPTH_MODEL for gemma)")
+    parser.add_argument("--cross-family-model", default=RELABEL_CROSS_FAMILY_MODEL,
+                        help="Cross-family FLAG judge (P1.3/R5, different model family; empty = disabled; "
+                             "default from config stage2.relabel_cross_family_model)")
     args = parser.parse_args()
     types: frozenset[str] | None = None
     if args.types:
@@ -302,7 +332,8 @@ def main() -> None:
     r = relabel(args.checkpoint, dry_run=args.dry_run, limit=args.limit,
                 single_source_only=args.single_source_only, types=types,
                 resume=args.resume, checkpoint_every=args.checkpoint_every,
-                workers=args.workers, model=args.model)
+                workers=args.workers, model=args.model,
+                cross_family_model=args.cross_family_model)
     sys.exit(0 if r["failed"] == 0 else 1)
 
 

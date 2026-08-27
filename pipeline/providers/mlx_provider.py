@@ -1,5 +1,10 @@
 """pipeline/providers/mlx_provider.py — MLX direct inference provider.
 
+⚠️ DEPRECATED (BUG-180/D2473): direct-MLX is deferred (D2055) — no pipeline stage
+imports this provider (only tests/test_mlx_integration.py). The batch path's
+system-prompt KV cache is a no-op (prompt_caches=[None]*N). Do NOT wire into
+production until direct-MLX is un-deferred.
+
 Authority: CONSTITUTION.md C1 ($0 marginal cost), C21 (Swappable Infrastructure), D2055.
 Ratified: 2026-07-25.
 

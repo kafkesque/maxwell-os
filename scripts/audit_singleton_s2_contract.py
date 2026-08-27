@@ -36,7 +36,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # ── Ontology (single source of truth: config/content_types.yaml — C12) ──────
-SHARED_SKELETON = ["name", "definition", "mechanism", "boundary", "consequence"]
+# D2475: shared_body (name/definition) vs principle_only_body (mechanism/boundary/
+# consequence) is read from content_types.yaml inside check_record — not hardcoded.
 STAMPS = ["schema_version", "gen_model", "pipeline_commit", "pipeline_run_id", "created_at"]
 PROVENANCE = ["source_books", "source_segments", "evidence_passages", "citation",
               "source_authors", "source_diversity", "primary_source"]
@@ -112,10 +113,17 @@ def check_record(fb: dict, onto: dict) -> list[str]:
     if not _nonempty(fb.get("evidence_passages_shown")):
         v.append("missing evidence_passages_shown")
 
-    # 4. Shared core_body — present + non-empty for EVERY content type
-    for k in SHARED_SKELETON:
+    # 4. Shared core_body — present + non-empty for EVERY content type (D2475)
+    for k in (onto.get("shared_body") or ["name", "definition"]):
         if not _nonempty(fb.get(k)):
             v.append(f"core_body '{k}' empty")
+
+    # 4b. D2475: mechanism/boundary/consequence are PRINCIPLE-ONLY — required
+    # non-empty only for principle, OPTIONAL for PT/PI/TI/GE.
+    if ct == "principle":
+        for k in (onto.get("principle_only_body") or ["mechanism", "boundary", "consequence"]):
+            if not _nonempty(fb.get(k)):
+                v.append(f"principle_only_body '{k}' empty")
 
     # 5. elaboration PRINCIPLE-ONLY (D2448/D2452 — schema-guaranteed)
     elab = str(fb.get("elaboration") or "").strip()

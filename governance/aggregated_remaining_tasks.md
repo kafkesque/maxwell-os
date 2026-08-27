@@ -1,5 +1,39 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-25
+> **Updated:** 2026-08-27
+
+## 🚦 PRE-S4/S5/S6 COMMIT GATE — AGGREGATED CRITICAL TASKS (2026-08-27)
+
+> **S2 frontier is now FINAL:** 8,410 (2,649 convergent + 5,761 single-source) + 5,254 singletons = **13,664 FBs** (1,018 singletons NULL-routed). Singleton run COMPLETED 2026-08-27 00:08. S4/S5/S6 still frozen at 2,830 (BUG-165). S6 EMPTY.
+>
+> **✅ DECIDED 2026-08-27 (D2469/D2470):**
+> - **G0 product scope = FILTERED frontier 10,146** (4,892 value-keep + 5,254 singletons) — NOT the full 13,656. This is the S4 input.
+> - **176 older-commit singletons ACCEPTED** (measured 0 author-sentinel hits → BUG-175 did not touch them; no provenance re-check).
+> - **BUG-181#1 DECIDED** — accept-and-flag + quarantine 29 severe (>15% artifact ratio); NOT full re-clean.
+> - **BUG-181#2 DECIDED** — sidecar-first (empty body filled via cross-examination).
+> - **P1.3 WIRED (D2469)** — gpt-oss cross-family FLAG in stage2_relabel_extraction_type.py (default-off).
+
+**🔴 MUST-FIX BEFORE S4→S5→S6 (correctness — these corrupt or silently degrade the corpus):**
+1. **BUG-181 #1 — evidence-passage contamination** (9.8% of singletons) — **GATE OPERATIONALIZED** + **DECIDED**: accept-and-flag + quarantine 29 severe at S5; fix `text_cleaner`/`stage1_3_prefilter` next corpus. (Not a full re-clean.)
+2. **BUG-181 #2 — empty-shell non-principle** (298 PT / 48 PI / 100 TI / 6 GE) — **DECIDED: sidecar-first.** Empty body documented in sidecar, filled via cross-examination (recipe-builder). No re-extraction.
+3. **BUG-181 #3 — schema skeleton gaps** — ✅ **FIXED (D2465):** `_normalize_role_fields` repairs empty `extraction_type`; `validate_fb_output` rejects empty `extraction_type` + principle-without-`elaboration`; singleton path fail-closed `{"_failed"}`. 145/145 tests green.
+4. **D2440 — S5 verifier calibration** (AlignScore + MiniCheck vs DeBERTa) — **BLOCKED:** `alignscore`/`minicheck` not installed; `evals/nli_golden.jsonl` missing (threshold not reproducible — session_seed post-T1.1). Do not force; re-open when packages + labeled data exist.
+5. **D2454 — wire `stage4_golden.yaml`** — ✅ **WIRED (D2466):** loader `pipeline/s4_golden.py` (fail-closed) + injection into all 4 prompts (CLASSIFY / MERGED / BATCH / DEPTH), honoring `stage4.golden_inject_enabled: true`. Contract test + smoke pass.
+
+**🟠 SHOULD (cheap, before/at rerun):**
+6. **BUG-177 — C16 silent-error class** — ✅ **FIXED (D2467):** `parallel.py` raises `ParallelMapError` by default (`on_error="collect"` opt-in); `stage5_verify` adds `NLIInferenceError` + `raise_on_error` + records `verification_error_type`; `model_lazyload` no silent fallback (explicit `MAXWELL_STANDALONE=1`).
+7. **BUG-178 — S6 Parquet crash-safe write** — ✅ **FIXED (D2468):** `export_parquet` now tempfile→fsync→os.replace (C6), temp cleaned on failure.
+8. **Re-benchmark S4 under fixed `--no-cache` config** — ✅ **RUN (2026-08-27):** production merged path = **17.71s median / 19.02s mean per FB** (was ~29-34s assumed) → **S4-research §1 CONFIRMED: the old baseline WAS cache-contaminated (~40% faster than assumed).** Full-corpus estimate at 3,556 principles ≈ **~18h** (was ~29-34h).
+9. **BUG-181 #4 — homogenize `pipeline_commit`** — ✅ **DONE (D2465):** `singleton_run_manifest.json` documents the 3-commit split (0a0e0c3×5,078 / 3a4b0e9×141 / d8ba816×35); stamps kept truthful (R14); 176 older-commit records **→ ACCEPTED (D2470): 0 author-sentinel hits.**
+
+**🟡 WORTH (post-rerun, non-blocking):**
+10. **BUG-150** discipline `emerging` re-measure on fresh S4 (taxonomy promotion gate). Baseline 38.4% (stale 2,830) / 15.5% (canary post-D2398); gate = compute % `discipline=="emerging"` on the new S4 checkpoint (no dedicated script yet — measure inline). Do NOT promote against stale data (BUG-167 lesson).
+11. **BUG-169** TI `parameters` — **RESIDUAL MEASURED (2026-08-27):** 31/143 (21.7%) single-source + 100/307 (32.6%) singleton TI have empty `parameters` (key present, value empty). Content-completeness gap, not schema. Verify/fill at rerun. **BUG-170** non-principle classification (latent until `commit_non_fb_types: true`).
+12. **P1.3 gpt-oss cross-family FLAG — A/B TEST REQUIRED before enabling** (D2469 wired default-off). A/B: run `stage2_relabel_extraction_type.py` on a frozen 50–100-record set WITH and WITHOUT `--cross-family-model`, compare label agreement; adopt cross-family only with ≥99% agreement AND measure the disagreement-flag rate (expect low — gpt-oss vs Qwen3 should agree on clear FORM cases). Gate: no auto-apply on disagreement (already wired). Do NOT enable in production until the A/B passes.
+12. **BUG-179** AGENTS.md loader stale + `delegate_guard.py` phantom; **ext-audit #5** `check_stage_order()` blind spot; **C1/C22 precedence + CONSTITUTION header/footer date contradiction** (MAXWELL-OS-AUDIT-RESPONSE.md finding #6 — NOT yet tracked).
+
+**❌ DEFERRED (speed/market — do ONLY after correctness):**
+13. **S4-research §2/§4** — vLLM-MLX pilot + S4-C distillation (only after re-benchmark confirms the true baseline).
+14. **Competitive-assessment Layer 2** — `fb_relationships`/`fb_reliability` tables + FB→PT→Recipe bridge (the actual product; post-corpus).
 
 ## 🔧 EXTERNAL-AUDIT CROSS-EXAM REMEDIATION (D2463, 2026-08-25) — PARTIAL (4 done, 3 queued)
 - ✅ **DONE — golden fail-closed (D2463):** `load_golden_parity` + `load_golden_single_source` now raise on missing/unparseable/empty golden (was silent `([], [], 0)` → zero-shot). `None` path = only legit empty case.

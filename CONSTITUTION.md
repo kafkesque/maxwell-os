@@ -6,7 +6,7 @@
 
 | # | Rule |
 |----|------|
-| **C1** | $0 marginal cost — all generation on local hardware. NO cloud. |
+| **C1** | $0 marginal cost — all generation on local hardware. NO cloud by default (C22 is the sole exception: explicit API opt-in). |
 | **C2** | No vendor lock-in — every component has open-source replacement path |
 | **C3** | Sovereign — all data and compute remain local |
 | **C4** | Future-proof — no single-provider dependency |
@@ -112,4 +112,4 @@ Phase 4: Launch
 ## §6 — FOLDER STRUCTURE
 See governance/folder_protocol.md — books/ for source, stage{N}_{name}/{run_id}/ for self-contained output.
 
-*Schema: 2.1 | Commit: v2.1.1 | Amended: 2026-07-22 (M1+II)*
+*Schema: 3.0 | Commit: v3.0 | Amended: 2026-07-26 (v3.0 cluster-before-extract)*

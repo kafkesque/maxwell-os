@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-25T12:45:00Z'
-total_decisions: 450
+total_decisions: 464
 decisions:
 - id: D2092
   category: INF
@@ -3887,6 +3887,26 @@ decisions:
   - governance/buglog.md
   - governance/aggregated_remaining_tasks.md
   created: '2026-08-24'
+- id: D2454
+  category: QLT / PROMPT
+  state: ACTIVE
+  description: 'Wire config/golden/stage4_golden.yaml (authored D2451, 4 examples spanning
+    all 4 depth levels) into the four S4 classification prompts: CLASSIFY_SYSTEM_PROMPT,
+    MERGED_CRIBS_CLASSIFY_SYSTEM, BATCH_CRIBS_CLASSIFY_SYSTEM, DEPTH_FOCUSED_PROMPT.
+    Replaces hardcoded inline depth anchors with a versioned config-driven golden
+    (C12). IMPLEMENTED 2026-08-27 (D2466): pipeline/s4_golden.py loader (fail-closed,
+    D2463 pattern) + injection into all 4 prompts honoring stage4.golden_inject_enabled
+    (already true in pipeline_config.yaml). Post-wiring S4 benchmark: 19.50s median/FB
+    vs 17.71s baseline (+1.8s golden prefill cost). Success gate: re-measured depth
+    cross-domain drift < 10% (D2451: was 21.6%).'
+  champion: '2026-08-27 session'
+  target_files:
+  - pipeline/s4_golden.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage4_merged_call.py
+  - pipeline/pipeline_paths.py
+  - config/golden/stage4_golden.yaml
+  created: '2026-08-27'
 - id: D2455
   category: OPS / RELIABILITY
   state: ACTIVE
@@ -4071,11 +4091,146 @@ decisions:
   - pipeline/omlx_call.py
   - justfile
   created: '2026-08-25'
+- id: D2464
+  category: QLT
+  state: ACTIVE
+  description: 'S2 singleton extraction COMPLETE (5,254 FBs / 1,018 NULL); field-by-field schema audit → schema-perfect, content-imperfect → BUG-181 (evidence contamination + empty-shell non-principle + non-homogeneous pipeline_commit). MAXWELL-OS-AUDIT-RESPONSE.md claim-by-claim verified 10/12 TRUE'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stage2_extract.py
+  created: '2026-08-27'
+- id: D2465
+  category: QLT
+  state: ACTIVE
+  description: 'BUG-181 remediation: #3 fail-closed S2 validation FIXED (empty-extraction_type repair + principle-elaboration requirement + singleton _failed path + total_failed counter); #4 singleton_run_manifest.json written (3-commit split, stamps truthful); #1 evidence-cleanliness gate operationalized (scripts/audit_evidence_cleanliness.py → 515/5,254 = 9.8% contaminated). 145/145 tests green'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stage2_extract.py
+  - scripts/audit_evidence_cleanliness.py
+  created: '2026-08-27'
+- id: D2466
+  category: QLT
+  state: ACTIVE
+  description: 'D2454 golden wiring: pipeline/s4_golden.py fail-closed loader + injection into all 4 S4 prompts (CLASSIFY/MERGED/BATCH/DEPTH) honoring stage4.golden_inject_enabled. S4 re-benchmark 17.71s median / 19.02s mean per FB (old ~30s baseline was cache-contaminated)'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/s4_golden.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage4_merged_call.py
+  created: '2026-08-27'
+- id: D2467
+  category: QLT
+  state: ACTIVE
+  description: 'BUG-177 C16 silent-error class FIXED: parallel.py raises ParallelMapError by default (on_error=collect opt-in); stage5_verify adds NLIInferenceError + raise_on_error + verification_error_type; model_lazyload no silent fallback (explicit MAXWELL_STANDALONE=1)'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/parallel.py
+  - pipeline/stage5_verify.py
+  - pipeline/model_lazyload.py
+  created: '2026-08-27'
+- id: D2468
+  category: QLT
+  state: ACTIVE
+  description: 'BUG-178 S6 Parquet crash-safe write FIXED: export_parquet now tempfile.mkstemp → write → fsync → os.replace (C6), temp cleaned on failure'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stage6_commit.py
+  created: '2026-08-27'
+- id: D2469
+  category: QLT
+  state: ACTIVE
+  description: 'P1.3 gpt-oss cross-family FLAG wired into stage2_relabel_extraction_type.py: a second judge from a DIFFERENT model family (config stage2.relabel_cross_family_model, empty = disabled) re-judges each relabel candidate; disagreement on a proposed change → record flagged relabel_flag=cross_family_disagreement, change NOT auto-applied (Generator≠Verifier, R5)'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stage2_relabel_extraction_type.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  created: '2026-08-27'
+- id: D2470
+  category: PRD
+  state: ACTIVE
+  description: 'Pre-S4 commit decisions: G0 product scope = FILTERED frontier 10,146 (4,892 keep + 5,254 singletons), NOT full 13,656. 176 older-commit singleton records ACCEPTED (0 author-sentinel hits → clean, no provenance re-check). BUG-181#1 = accept-and-flag + quarantine 29 severe, NOT full re-clean (converter artifacts; fix text_cleaner/prefilter next corpus). BUG-181#2 = sidecar-first CONFIRMED (empty-shell non-principle documented in sidecar, filled via cross-examination)'
+  champion: 2026-08-27 session
+  target_files:
+  - governance/aggregated_remaining_tasks.md
+  - governance/buglog.md
+  created: '2026-08-27'
+
+- id: D2471
+  category: QLT
+  state: ACTIVE
+  description: 'Pre-S4 readiness verification complete: integrity 15/17 (2 skipped: no maxwell.db), config audit (C12 strict) clean, golden hash PASS, content-type contract PASS (all 5 types conform), stacks single-source PASS. Severe evidence quarantine list EMITTED (temp/severe_evidence_quarantine.jsonl, 29 records: 18 principle / 8 PT / 3 TI). BUG-181#2 root-caused (empty-shell PT = narrative description mislabeled as process_template, steps genuinely absent from source). BUG-169 root-caused (73% of empty-parameters TI are code/prompt techniques, parameters implicit in syntax). S4-C distillation BLOCKED on training data + eval harness'
+  champion: 2026-08-27 session
+  target_files:
+  - scripts/audit_evidence_cleanliness.py
+  - scripts/audit_content_type_contract.py
+  - pipeline/integrity_check.py
+  - agent/session_seed.yaml
+  created: '2026-08-27'
+
+- id: D2472
+  category: QLT
+  state: ACTIVE
+  description: 'BUG-181#1/#2 + BUG-169 FIXED (root-cause + post-hoc). BUG-181#1: pipeline/text_cleaner.py gained clean_evidence_passage() (strips Pandoc/calibre residue that clean_markdown() missed: {...} span/attr syntax, ::: fenced divs, footnote markers, !Image{...}); wired into stage1_3_prefilter + scripts/fix_singleton_quality.py (1,819 passages cleaned, 6 residual). BUG-181#2: _narrative_role_guard() in stage2_extract (empty-PT + narrative → principle, mirrors _code_role_guard) + fix_singleton_quality.py reclassified 217 PT→principle / 11 PT→tool_instruction / 70 flagged body_incomplete. BUG-169: 100 empty-parameters TI flagged parameter_origin=technique. Output singleton_fbs.fixed.jsonl. 145/145 tests green'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/text_cleaner.py
+  - pipeline/stage1_3_prefilter.py
+  - pipeline/stage2_extract.py
+  - scripts/fix_singleton_quality.py
+  created: '2026-08-27'
+
+- id: D2473
+  category: GOV
+  state: ACTIVE
+  description: 'BUG-179 FIXED (AGENTS.md loader: D2000-D2472, 460 decisions, models relabeled Classifier/Probe per D2249/D2298; MASTERPROMPT.md delegate_guard.py phantom → delegate_safe.py). BUG-180 addressed (mlx_provider.py deprecation banner — direct-MLX deferred D2055, batch KV cache no-op documented). C1/C22 precedence clarified (C1 NO cloud by default, C22 = explicit opt-in exception). CONSTITUTION footer date fixed (07-22 → 07-26, v2.1.1 → v3.0). ext-audit #5 FIXED (check_stage_order asserts RELATIVE order of 9 stages — permutation detection). 10/10 integrity quick passes'
+  champion: 2026-08-27 session
+  target_files:
+  - AGENTS.md
+  - MASTERPROMPT.md
+  - pipeline/providers/mlx_provider.py
+  - CONSTITUTION.md
+  - pipeline/integrity_check.py
+  created: '2026-08-27'
+- id: D2474
+  category: QLT
+  state: ACTIVE
+  description: 'Drop/fill of 20 skeleton-gap residuals + exhaustive S2 conformance stress test. FILLED 1 empty extraction_type (process_template → normative_heuristic via D2417 config default, non-hallucinated); DROPPED 10 empty-elaboration principles (drop_manifest.jsonl — elaboration not fillable without LLM re-derivation); NOTED 3 TI empty-skeleton as schema-fit (skeleton_schema_fit_note, NOT dropped — description/output/caveats/parameters already populated). Output singleton_fbs.final.jsonl (5,244). Empty-shell (229 singleton: 70 PT empty-steps + 48 PI empty-actors + 111 TI empty-parameters) LEFT for S2 rerun (BUG-165), not back-filled (parameters:[] would falsely claim no-inputs per BUG-169). New scripts/audit_diverse_smoke.py (sampled) + scripts/stress_test_s2_exhaustive.py (exhaustive 13,646 records × 15 cells + visual.md samples in stage4_merge/stress_s2_exhaustive). Exhaustive result: 464 hard gaps = 225 stale single-source (pre-D2452 elaboration-nonempty + missing parameters/outcome_metric) + 229 singleton empty-shell + 9 TI skeleton (3×3) + 1 convergent PT anomaly (BUG-166). Regression guard test_omitted_s2_body_fields_get_typed_placeholders (D2452 placeholder). 146/146 tests green'
+  champion: 2026-08-27 session
+  target_files:
+  - scripts/fix_residual_violations.py
+  - scripts/audit_diverse_smoke.py
+  - scripts/stress_test_s2_exhaustive.py
+  - tests/test_content_type_contract.py
+  created: '2026-08-27'
+- id: D2475
+  category: ARCH
+  state: ACTIVE
+  description: 'Schema: mechanism/boundary/consequence are PRINCIPLE-ONLY (not a shared skeleton). Made config-first (C12): content_types.yaml gains machine-readable shared_body (name/definition — required for ALL types) + principle_only_body (mechanism/boundary/consequence — required non-empty ONLY for principle, OPTIONAL for PT/PI/TI/GE). Relaxed audit_s2 (audit_content_type_contract.py), check_record (audit_singleton_s2_contract.py), and audit_s4_fields.py to scope the causal skeleton to principle. ELIMINATES the 9-TI-skeleton false positives (3 TI records × empty mechanism/boundary/consequence were wrongly flagged as hard gaps under the old shared-skeleton contract). Non-principle roles carry tailored segments (steps/actors/parameters/body — s2_body_fields). elaboration stays separately special-cased (principle REQUIRED non-empty, non-principle REQUIRED empty). Backward-compatible: legacy S2 still emits mechanism/boundary/consequence for non-principles, now treated as optional extras, not requirements.'
+  champion: 2026-08-27 session
+  target_files:
+  - config/content_types.yaml
+  - scripts/audit_content_type_contract.py
+  - scripts/audit_singleton_s2_contract.py
+  - scripts/audit_s4_fields.py
+  created: '2026-08-27'
+- id: D2476
+  category: QLT
+  state: ACTIVE
+  description: 'classify_model provenance stamp for S4. Distinct from gen_model (Qwen3-Coder generator) — records the CLASSIFIER model (gpt-oss-20b-MXFP4-Q8, VERIFY_MODEL) that labelled the FB, honoring R5 (Generator ≠ Classifier family). stamp_record() gains optional classify_model param (key omitted when None → S2-side generation unstamped); stage4_merge stamps classified FBs with classify_model=VERIFY_MODEL. PRINCIPLE-ONLY: non-principle sidecars are routed (LLM-free), not classified, so they carry no classify_model. Documented in content_types.yaml classification + audited in audit_s4 (principle check).'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stamp.py
+  - pipeline/stage4_merge.py
+  - config/content_types.yaml
+  - scripts/audit_content_type_contract.py
+  created: '2026-08-27'
+
 summary:
-  total: 450
+  total: 464
   proposed: 0
   draft: 1
-  active: 391
+  active: 405
   stale: 0
   superseded: 15
   archived: 8
@@ -4084,7 +4239,7 @@ summary:
   resolved: 10
   planned: 4
   by_category:
-    ARCH: 26
+    ARCH: 27
     ARCH / GOV: 1
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
@@ -4112,7 +4267,7 @@ summary:
     DATA / RELIABILITY: 2
     DATA / TAXONOMY: 2
     DEF: 1
-    GOV: 20
+    GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
     GOVERNANCE / DATA: 1
@@ -4133,11 +4288,12 @@ summary:
     OPS / RELIABILITY: 2
     PERF: 10
     PERF / BUGFIX: 1
+    PRD: 1
     QA: 4
-    QLT: 39
+    QLT: 49
     QLT / AUDIT: 20
     QLT / DATA: 1
-    QLT / PROMPT: 4
+    QLT / PROMPT: 5
     QUALITY / DATA: 3
     QUALITY / GOLDEN-SET / PROMPT: 1
     QUALITY / RELIABILITY: 1

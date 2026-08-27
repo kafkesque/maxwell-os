@@ -4,7 +4,9 @@ schema (metadata + properties + segments) in config/content_types.yaml (D2449).
 
 Two contracts are checked:
   * S2 contract  — what stage2_extract must emit per content_type:
-      shared core_body (name/definition/mechanism/boundary/consequence),
+      shared core_body (name/definition), the principle-only skeleton
+      (mechanism/boundary/consequence — REQUIRED non-empty for principle,
+      OPTIONAL for PT/PI/GE/TI per D2475),
       elaboration PRINCIPLE-ONLY (non-empty for principle, empty for PT/PI/GE/TI),
       the per-type `s2_body_fields`, and classification labels
       (content_type ∈ 5 roles, extraction_type ∈ 4 forms, is_summary, route).
@@ -42,7 +44,19 @@ def _nonempty(v) -> bool:
     return True
 
 
-SHARED_SKELETON = ["name", "definition", "mechanism", "boundary", "consequence"]
+# D2475: shared vs principle-only body cardinality is sourced from
+# content_types.yaml (C12 config-first) — nothing re-declared here. Fallbacks
+# mirror the YAML for resilience if the key is ever renamed/dropped.
+_SHARED_BODY_FALLBACK = ["name", "definition"]
+_PRINCIPLE_ONLY_FALLBACK = ["mechanism", "boundary", "consequence"]
+
+
+def _shared_body(onto: dict) -> list[str]:
+    return [str(f) for f in onto.get("shared_body", _SHARED_BODY_FALLBACK)]
+
+
+def _principle_only_body(onto: dict) -> list[str]:
+    return [str(f) for f in onto.get("principle_only_body", _PRINCIPLE_ONLY_FALLBACK)]
 
 
 # ── Loaders ─────────────────────────────────────────────────────────────────
@@ -78,9 +92,16 @@ REQUIRED_NONEMPTY_ARRAYS: dict[str, list[str]] = {
 
 
 def audit_s2(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
-    for f in SHARED_SKELETON:
+    for f in _shared_body(onto):
         if f not in rec or not _nonempty(rec.get(f)):
             issues.append(f"missing/empty shared:{f}")
+
+    # D2475: mechanism/boundary/consequence are PRINCIPLE-ONLY — required non-empty
+    # only for principle; OPTIONAL (may be absent/empty) for PT/PI/TI/GE.
+    if ct == "principle":
+        for f in _principle_only_body(onto):
+            if f not in rec or not _nonempty(rec.get(f)):
+                issues.append(f"missing/empty principle-only:{f}")
 
     # elaboration PRINCIPLE-ONLY (D2448)
     elab = rec.get("elaboration")
@@ -133,7 +154,7 @@ def audit_s4(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
         for f in ("source_clusters", "source_diversity", "primary_source"):
             if f not in rec:
                 issues.append(f"missing provenance:{f}")
-        for f in ("domains", "discipline", "depth", "evidence"):
+        for f in ("domains", "discipline", "depth", "evidence", "classify_model"):
             if f not in rec or not _nonempty(rec.get(f)):
                 issues.append(f"missing/empty classification:{f}")
         if "fb_version" not in rec:

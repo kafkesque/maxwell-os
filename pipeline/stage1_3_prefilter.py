@@ -32,6 +32,7 @@ from pipeline.pipeline_paths import (
     S13_MIN_LEN,
     STAGE1_CHECKPOINT,
 )
+from pipeline.text_cleaner import clean_evidence_passage  # D2471: BUG-181#1 root-cause strip
 
 # ── Patterns configurable via pipeline_config.yaml → stage1_3 section ──
 # Environment overrides: MAXWELL_S13_MIN_LEN, MAXWELL_S13_CITE_DENSITY
@@ -182,7 +183,8 @@ def run_prefilter(in_place: bool = False, min_len: int = None,
     no_markers_kept = 0
 
     for seg in segments:
-        text = seg.get("text", "")
+        text = clean_evidence_passage(seg.get("text", ""), collapse=False)  # D2471
+        seg["text"] = text
         drop, reason = should_drop_heuristic(text, min_len, cite_density)
 
         if drop:

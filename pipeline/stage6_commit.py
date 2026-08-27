@@ -27,8 +27,10 @@ Usage:
 
 import argparse
 import json
+import os
 import sqlite3
 import sys
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -533,7 +535,23 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
             rows.append(row)
 
         table = pa.Table.from_pylist(rows)
-        pq.write_table(table, str(parquet_path), compression="snappy")
+        # BUG-178 (2026-08-27): crash-safe write — tempfile → fsync → os.replace.
+        # A kill mid-write previously left a truncated .parquet snapshot that
+        # downstream readers fail on (C6). Write to a temp in the SAME directory
+        # (so os.replace is atomic on the same filesystem), fsync, then swap.
+        fd, tmp_path = tempfile.mkstemp(dir=str(parquet_dir), suffix=".parquet.tmp")
+        os.close(fd)
+        try:
+            pq.write_table(table, tmp_path, compression="snappy")
+            with open(tmp_path, "rb") as _f:
+                os.fsync(_f.fileno())
+            os.replace(tmp_path, parquet_path)
+        except BaseException:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
         return parquet_path
     except ImportError:
         print("  ⚠️  pyarrow not installed. Skipping Parquet export.")

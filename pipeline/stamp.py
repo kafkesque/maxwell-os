@@ -134,18 +134,25 @@ def get_manifest_hash() -> str:
 def stamp_record(
     record: dict,
     gen_model: str | None = None,
+    classify_model: str | None = None,
 ) -> dict:
     """Add provenance stamps to a dict record.
 
     Args:
         record: Dict to stamp.
-        gen_model: Model that generated this record.
+        gen_model: Model that generated this record (S2 extraction).
+        classify_model: Model that CLASSIFIED this record (S4 taxonomy, D2476).
+            Distinct from gen_model — the classifier (gpt-oss) is a different
+            family from the generator (Qwen3-Coder) per R5. Omitted (key absent)
+            when the record was not classified (e.g. S2-side generation).
 
     Returns:
         Same dict with added stamp fields including manifest_hash (D2282).
     """
     record["schema_version"] = SCHEMA_VERSION
     record["gen_model"] = gen_model
+    if classify_model is not None:
+        record["classify_model"] = classify_model
     record["pipeline_commit"] = get_pipeline_commit()
     record["taxonomy_version"] = TAXONOMY_VERSION
     record["manifest_hash"] = get_manifest_hash()  # D2282: config fingerprint

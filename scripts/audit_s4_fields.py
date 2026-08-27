@@ -50,12 +50,15 @@ def _nonempty(v) -> bool:
     return v is not None
 
 
-# D2323 ontology: the shared skeleton is name/definition/mechanism/boundary/
-# consequence. elaboration/application/failure_mode are PRINCIPLE-ONLY (S4 CRIBS);
-# jargon is optional everywhere (omitted when empty, D2123). Per-type extras come
-# from s2_body_fields. Treating the ontology's `core_body` UNION as universal is
-# the wrong model — it over-flags legitimately-empty fields on PT/PI/GE/TI.
-SHARED_SKELETON: list[str] = ["name", "definition", "mechanism", "boundary", "consequence"]
+# D2323 ontology + D2475: the SHARED skeleton is name/definition. mechanism/
+# boundary/consequence are PRINCIPLE-ONLY (D2475 — the epistemic register of a
+# Foundation Block). elaboration/application/failure_mode are PRINCIPLE-ONLY
+# (S4 CRIBS); jargon is optional everywhere (omitted when empty, D2123). Per-type
+# extras come from s2_body_fields. Treating the ontology's `core_body` UNION as
+# universal is the wrong model — it over-flags legitimately-empty fields on
+# PT/PI/GE/TI.
+SHARED_SKELETON: list[str] = ["name", "definition"]
+PRINCIPLE_ONLY: list[str] = ["mechanism", "boundary", "consequence"]
 PRINCIPLE_REQUIRED: list[str] = ["elaboration"]
 PRINCIPLE_OPTIONAL: list[str] = ["application", "failure_mode", "jargon"]
 
@@ -63,7 +66,7 @@ PRINCIPLE_OPTIONAL: list[str] = ["application", "failure_mode", "jargon"]
 def _required_for(ct: str, s2_fields: dict) -> list[str]:
     required = list(SHARED_SKELETON) + s2_fields.get(ct, [])
     if ct == "principle":
-        required += PRINCIPLE_REQUIRED
+        required += PRINCIPLE_ONLY + PRINCIPLE_REQUIRED
     return required
 
 

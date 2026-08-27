@@ -112,6 +112,7 @@ VERIFY_MAX_TOKENS=int(_CFG["models"]["verifier"].get("max_tokens", 1024))
 VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  # D2264: cross-family verifier (Phi-4-mini)
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]
 RELABEL_MAX_WORKERS=int(_env("relabel_max_workers", _CFG.get("stage2", {}).get("relabel_max_workers", 4)))  # D2434: R1 relabel sweep parallelism
+RELABEL_CROSS_FAMILY_MODEL=str(_CFG.get("stage2", {}).get("relabel_cross_family_model", ""))  # P1.3 (D2469): cross-family FLAG judge; "" = disabled
 
 # ── Settings ───────────────────────────────────────────────────────────
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]
@@ -186,6 +187,11 @@ S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]
 S4_PI_OUTPUT=_CFG["stage4"]["process_instance_output"]
 S4_GE_OUTPUT=_CFG["stage4"]["growth_edge_output"]
 S4_TI_OUTPUT=_CFG["stage4"]["tool_instruction_output"]
+# D2454 (2026-08-27): config-driven S4 classification golden (config/golden/stage4_golden.yaml).
+# Keys existed in pipeline_config.yaml since D2451 but were never consumed — wiring here.
+S4_GOLDEN_PATH = _CFG.get("stage4", {}).get("golden_path", "config/golden/stage4_golden.yaml")
+S4_GOLDEN_INJECT_ENABLED = bool(_CFG.get("stage4", {}).get("golden_inject_enabled", False))
+S4_GOLDEN_MAX_EXAMPLES = int(_CFG.get("stage4", {}).get("golden_max_examples", 4))
 S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long combined).
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))

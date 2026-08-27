@@ -68,6 +68,21 @@ Return ONLY a JSON object:
   "evidence": "cited|axiomatic"
 }"""
 
+# ── D2454 (2026-08-27): inject the config-driven S4 classification golden. ──
+# Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise.
+try:
+    from pipeline.pipeline_paths import S4_GOLDEN_INJECT_ENABLED, S4_GOLDEN_MAX_EXAMPLES, S4_GOLDEN_PATH
+    if S4_GOLDEN_INJECT_ENABLED:
+        from pipeline.s4_golden import format_classify_golden, load_stage4_golden
+        _s4_examples = load_stage4_golden(S4_GOLDEN_PATH)[:S4_GOLDEN_MAX_EXAMPLES]
+        MERGED_CRIBS_CLASSIFY_SYSTEM = (
+            MERGED_CRIBS_CLASSIFY_SYSTEM
+            + "\n\nFEW-SHOT EXAMPLES (config-driven, D2454):\n"
+            + format_classify_golden(_s4_examples)
+        )
+except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
+    raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
+
 
 def build_merged_prompt(fb_data: dict) -> str:
     """Build a merged CRIBS + classification prompt for a single FB.
@@ -280,6 +295,21 @@ Type: {extraction_type}
 
 Answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning."""
 
+# ── D2454 (2026-08-27): inject the config-driven depth few-shot (compact). ──
+# Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise.
+try:
+    from pipeline.pipeline_paths import S4_GOLDEN_INJECT_ENABLED, S4_GOLDEN_MAX_EXAMPLES, S4_GOLDEN_PATH
+    if S4_GOLDEN_INJECT_ENABLED:
+        from pipeline.s4_golden import format_depth_golden, load_stage4_golden
+        _s4_examples = load_stage4_golden(S4_GOLDEN_PATH)[:S4_GOLDEN_MAX_EXAMPLES]
+        DEPTH_FOCUSED_PROMPT = (
+            DEPTH_FOCUSED_PROMPT
+            + "\n\nFEW-SHOT DEPTH EXAMPLES (config-driven, D2454):\n"
+            + format_depth_golden(_s4_examples)
+        )
+except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
+    raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
+
 VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
 
 # D2351: fail-closed depth parsing (C16). Order matters for token-level match:
@@ -419,6 +449,21 @@ DEFAULT to "domain" unless mechanism clearly transcends it.
 
 Return ONLY a JSON array: [{"fb_index": 0, ...}, {"fb_index": 1, ...}, ...]
 One object per input FB. Match fb_index to input order."""
+
+# ── D2454 (2026-08-27): inject the config-driven S4 classification golden. ──
+# Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise.
+try:
+    from pipeline.pipeline_paths import S4_GOLDEN_INJECT_ENABLED, S4_GOLDEN_MAX_EXAMPLES, S4_GOLDEN_PATH
+    if S4_GOLDEN_INJECT_ENABLED:
+        from pipeline.s4_golden import format_classify_golden, load_stage4_golden
+        _s4_examples = load_stage4_golden(S4_GOLDEN_PATH)[:S4_GOLDEN_MAX_EXAMPLES]
+        BATCH_CRIBS_CLASSIFY_SYSTEM = (
+            BATCH_CRIBS_CLASSIFY_SYSTEM
+            + "\n\nFEW-SHOT EXAMPLES (config-driven, D2454):\n"
+            + format_classify_golden(_s4_examples)
+        )
+except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
+    raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
 
 
 def build_batch_prompt(fbs_data: list[dict]) -> str:

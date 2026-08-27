@@ -348,6 +348,21 @@ FEW-SHOT EXAMPLES (D2245 — cross-domain anchors):
 
 Return ONLY a JSON object: {"discipline": "discipline_name", "domains": ["d1", "d2"], "depth": "universal|cross-domain|domain|specialized", "is_specialized": true/false, "evidence": "..."}"""
 
+# ── D2454 (2026-08-27): inject the config-driven S4 classification golden. ──
+# The golden (config/golden/stage4_golden.yaml, authored D2451) replaces the
+# hardcoded inline depth anchors above with a versioned, test-validated set.
+# Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise, so the
+# pipeline never silently degrades to zero-shot. Gate: `stage4.golden_inject_enabled`.
+try:
+    from pipeline.pipeline_paths import S4_GOLDEN_INJECT_ENABLED, S4_GOLDEN_MAX_EXAMPLES, S4_GOLDEN_PATH
+    if S4_GOLDEN_INJECT_ENABLED:
+        from pipeline.s4_golden import format_classify_golden, load_stage4_golden
+        _s4_examples = load_stage4_golden(S4_GOLDEN_PATH)[:S4_GOLDEN_MAX_EXAMPLES]
+        _s4_golden_block = "\n\nFEW-SHOT EXAMPLES (config-driven, D2454):\n" + format_classify_golden(_s4_examples)
+        CLASSIFY_SYSTEM_PROMPT = CLASSIFY_SYSTEM_PROMPT + _s4_golden_block
+except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
+    raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
+
 
 def build_classify_prompt(
     fb_name: str,
@@ -1695,7 +1710,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         jargon_val = _serialize_jargon(fb_data.get("jargon"))
         if jargon_val:
             fb["jargon"] = jargon_val
-        fb = stamp_record(fb, gen_model=GEN_MODEL)
+        fb = stamp_record(fb, gen_model=GEN_MODEL, classify_model=VERIFY_MODEL)  # D2476
         fb["pipeline_run_id"] = pipeline_run_id
         fb["pipeline_commit"] = pipeline_commit
         if class_data.get("classification_status") == "FAILED":

@@ -179,8 +179,10 @@ s2-singletons:
 
 # D2177: stage3 removed (D2120) — redirects to runner
 stage4:
+    @python3 -c "from pipeline.omlx_call import assert_omlx_no_cache; assert_omlx_no_cache()"
     python3 pipeline/stage4_merge.py
 stage5:
+    @python3 -c "from pipeline.omlx_call import assert_omlx_no_cache; assert_omlx_no_cache()"
     python3 pipeline/stage5_verify.py
 stage6:
     python3 pipeline/stage6_commit.py

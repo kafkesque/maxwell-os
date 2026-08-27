@@ -37,6 +37,15 @@ from typing import Any, TypeVar
 T = TypeVar("T")
 
 
+class ParallelMapError(RuntimeError):
+    """Raised by parallel_map() when items fail and on_error='raise' (C16/BUG-177).
+
+    A worker timeout or exception must never be indistinguishable from a
+    legitimately-processed item (the legacy None-in-results behavior). Callers
+    that explicitly want best-effort collection can pass on_error='collect'.
+    """
+
+
 def _worker_init() -> None:
     """Initialize worker process — suppress OMLX env issues."""
     # Workers shouldn't inherit thinking mode flags
@@ -51,6 +60,7 @@ def parallel_map(  # noqa: UP047
     *,
     desc: str = "",
     timeout_per_item: float = 300.0,
+    on_error: str = "raise",
 ) -> list[T]:
     """Execute func(item) in parallel across items using subprocess pool.
 
@@ -60,10 +70,15 @@ def parallel_map(  # noqa: UP047
         max_workers: Number of parallel workers (default 4).
         desc: Description for progress output.
         timeout_per_item: Max seconds per item before timeout error.
+        on_error: "raise" (default, C16/BUG-177) — collect failures and raise
+            ParallelMapError so a dropped item is never silent; "collect" —
+            legacy best-effort behavior (None in results + printed warnings).
 
     Returns:
         List of results in the same order as items.
-        None values indicate items that timed out or errored.
+
+    Raises:
+        ParallelMapError: if any item timed out or errored and on_error='raise'.
     """
     if not items:
         return []
@@ -110,6 +125,12 @@ def parallel_map(  # noqa: UP047
     )
     if errors:
         print(f"   ⚠️  {len(errors)} failures: " + "; ".join(errors[:3]))
+        # C16/BUG-177: a dropped item must never be silent — raise unless the
+        # caller explicitly opted into best-effort collection.
+        if on_error == "raise":
+            raise ParallelMapError(
+                f"{len(errors)}/{len(items)} items failed: " + "; ".join(errors[:5])
+            )
 
     return results
 

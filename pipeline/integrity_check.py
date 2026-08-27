@@ -282,6 +282,16 @@ def check_stage_order() -> tuple[bool, str]:
     if "stage3_cluster" in config_stages or "stage3" in str(config_stages):
         return False, "Stage 3 still present in pipeline_config.yaml stages"
 
+    # D2473/ext-audit #5: verify the RELATIVE ORDER of the pipeline stages
+    # (the old check only verified count + stage3 absence — a permutation like
+    # stage5 before stage4 was undetected).
+    expected = ["stage0_convert", "stage0_5_extract_metadata", "stage1_chunk",
+                "stage1_3_prefilter", "stage1_5_embed", "stage2_extract",
+                "stage4_merge", "stage5_verify", "stage6_commit"]
+    actual = [s for s in config_stages if s in expected]
+    if actual != expected:
+        return False, f"Stage order mismatch: {actual} != {expected}"
+
     # Verify CONSTITUTION says 8-stage
     if pipeline_line and "8-stage" not in pipeline_line:
         return False, "CONSTITUTION.md does not say 8-stage"

@@ -25,6 +25,7 @@ Architecture:
 
 import argparse
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -35,7 +36,16 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_PROJECT_ROOT))
 try:
     from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL
-except Exception:  # pragma: no cover — fallback for standalone use
+except Exception as _cfg_exc:  # pragma: no cover
+    # C16/BUG-177 (2026-08-27): no SILENT fallback. The hardcoded localhost
+    # values are only used when standalone operation is EXPLICITLY requested
+    # (MAXWELL_STANDALONE=1); otherwise the import failure propagates loudly.
+    if os.environ.get("MAXWELL_STANDALONE") != "1":
+        raise RuntimeError(
+            "Cannot import pipeline config (C16/BUG-177 — no silent fallback). "
+            f"Set MAXWELL_STANDALONE=1 to allow the hardcoded localhost defaults. "
+            f"Original error: {_cfg_exc}"
+        ) from _cfg_exc
     OMLX_URL = "http://localhost:11435"
     OMLX_API_KEY = "sk-maxwell-local"
 

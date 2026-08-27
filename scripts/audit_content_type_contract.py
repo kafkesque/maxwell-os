@@ -163,6 +163,19 @@ def audit_s4(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
             if f not in rec:
                 issues.append(f"missing runtime:{f}")
     else:
+        # F6/BUG-182: the S2 type-specific body passes through S4 UNCHANGED, so
+        # the contract MUST enforce s2_body_fields here too (presence = hard;
+        # empty arrays = reported). A record flagged `body_incomplete` by the
+        # BUG-182 sweep is an accepted sidecar-first shell (D2470), so its empty
+        # array is a deferred NOTE, not a structural failure.
+        for f in onto.get("s2_body_fields", {}).get(ct, []):
+            if f not in rec:
+                issues.append(f"missing s2_body_field:{f}")
+            elif f in REQUIRED_NONEMPTY_ARRAYS.get(ct, []) and not _nonempty(rec.get(f)):
+                if rec.get("body_incomplete"):
+                    issues.append(f"DEFERRED(sidecar-first) empty s2_body_field:{f}")
+                else:
+                    issues.append(f"empty array s2_body_field:{f}")
         # BUG-170 deferred enrichment — note, don't fail
         for f in ("domains", "discipline", "depth", "evidence", "fb_version"):
             if f not in rec:

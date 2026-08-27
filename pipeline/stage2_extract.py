@@ -763,6 +763,23 @@ def _capture_type_specific_fields(result: dict, content_type: str) -> dict:
             out[field] = val
         elif isinstance(val, (dict, int, float, bool)):
             out[field] = val
+    # BUG-169 (D2479): `parameter_origin` was previously stamped ONLY by the
+    # post-hoc `scripts/fix_singleton_quality.py` (D2472), which wrote to an
+    # intermediate `singleton_fbs.fixed.jsonl` that was never promoted to the
+    # canonical checkpoint. The D2479 in-place rerun therefore "lost" the flag.
+    # Derive it deterministically at the builder boundary (shared by BOTH the
+    # single-source and singleton builders) so it can never drift again — no
+    # model, no post-hoc pass:
+    #   "api"       → parameters list non-empty (formal named inputs)
+    #   "technique" → parameters empty + syntax present (code/DSL snippet where
+    #                  formal named parameters do not apply; how-to lives in
+    #                  `syntax` — D2471)
+    #   (absent)    → parameters empty + syntax empty (genuinely unresolved)
+    if content_type == "tool_instruction":
+        if out.get("parameters"):
+            out["parameter_origin"] = "api"
+        elif out.get("syntax"):
+            out["parameter_origin"] = "technique"
     return out
 
 

@@ -197,6 +197,7 @@ S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))
 S4_DEPTH_MAX_TOKENS=int(_CFG.get("stage4", {}).get("depth_max_tokens", 1024))  # D2351/BUG-109: 1024 (was 512) — reasoning model needs room to finish CoT + answer
 S4_DEPTH_BATCH_SIZE=int(_CFG.get("stage4", {}).get("depth_batch_size", 4))      # D2354: batched focused depth
+S4_DEPTH_BATCH_ENABLED=bool(_CFG.get("stage4", {}).get("depth_batch_enabled", False))  # D2477: wire D2354 batch depth into stage4 (quality-neutral — same short prompt, batched transport)
 # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification, a cheap model does depth only.
 S4_DEPTH_FRUGAL_ENABLED=bool(_CFG.get("stage4", {}).get("depth_frugal_enabled", False))
 S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))

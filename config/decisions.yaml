@@ -11,7 +11,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-25T12:45:00Z'
-total_decisions: 464
+total_decisions: 465
 decisions:
 - id: D2092
   category: INF
@@ -4225,12 +4225,23 @@ decisions:
   - config/content_types.yaml
   - scripts/audit_content_type_contract.py
   created: '2026-08-27'
+- id: D2477
+  category: PERF
+  state: ACTIVE
+  description: 'Wired the D2354 batched focused-depth (batch_depth_classify) into stage4_merge as a depth pre-pass (gated on new stage4.depth_batch_enabled), which was fully implemented but never imported. A/B benchmark (scripts/benchmark_s4_ab.py, n=8 live gpt-oss): depth batch = 2.69x speedup (6.46s→2.40s/FB) with 100% label agreement (quality-neutral). Batch CRIBS (D2265) A/B = 2.67x speedup BUT domain granularity degrades (12% canonical exact-match, Jaccard 0.48 — batch returns fewer/coarser domains), so batch_enabled REVERTED to false (quality-tradeoff, not neutral). Full-run per-FB: 27.5s→22.0s (serial merged + batched depth). Quality-neutral ETA ≈48h for 7,859 principles (was ~60h). Remaining untested lever: gpt-oss MoE parallelism (D2459: 6 workers degrade).'
+  champion: 2026-08-27 session
+  target_files:
+  - pipeline/stage4_merge.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  - scripts/benchmark_s4_ab.py
+  created: '2026-08-27'
 
 summary:
-  total: 464
+  total: 465
   proposed: 0
   draft: 1
-  active: 405
+  active: 406
   stale: 0
   superseded: 15
   archived: 8
@@ -4286,7 +4297,7 @@ summary:
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / RELIABILITY: 2
-    PERF: 10
+    PERF: 11
     PERF / BUGFIX: 1
     PRD: 1
     QA: 4

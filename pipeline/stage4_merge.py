@@ -57,6 +57,8 @@ from pipeline.pipeline_paths import (
     S4_CHECKPOINT_INTERVAL,  # D2370: intra-stage incremental checkpoint cadence (clusters)
     S4_DEDUP_COSINE_THRESHOLD,  # D2231: C12 compliance
     S4_DEPTH_FALLBACK_DEPTH,  # BUG-075: conservative default when depth call fails
+    S4_DEPTH_BATCH_ENABLED,  # D2477: wire D2354 batch depth into stage4
+    S4_DEPTH_BATCH_SIZE,  # D2477: batch depth chunk size
     S4_DEPTH_FOCUSED_CLASSIFICATION,  # BUG-075: split depth into short prompt
     S4_DEPTH_FRUGAL_ENABLED,  # D2354: FrugalGPT cascade (cheap depth model)
     S4_DEPTH_MAX_TOKENS,  # BUG-075: depth-only call token budget
@@ -91,6 +93,7 @@ from pipeline.schemas import (
 from pipeline.stage4_merged_call import (
     BATCH_SIZE_DEFAULT,
     SparseClassificationError,  # D2357: fail-closed semantic validation (all classification paths)
+    batch_depth_classify,  # D2477: batch the focused depth call (quality-neutral)
     batch_cribs_classify,
     classify_depth_focused,
     merged_cribs_classify,
@@ -1193,6 +1196,50 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                   f"({_per_fb:.1f}s/FB amortized — vs ~26s/FB unbatched)")
             _batch_used = True
 
+    # ── D2477: Batched focused depth (D2354) — wire the otherwise-unused batch ──
+    # classify_depth_focused() is serialized (~10s/FB — reasoning-model CoT cost on
+    # every call). batch_classify_depth() amortizes that (~1-2s/FB) using the SAME
+    # short proven prompt, only the transport changes (JSON array response). Gated on
+    # S4_DEPTH_BATCH_ENABLED so it is independently A/B-able from batch CRIBS.
+    _pre_depth: dict[int | str, str] = {}
+    _depth_batch_used: bool = False
+    if (S4_DEPTH_BATCH_ENABLED and S4_DEPTH_FOCUSED_CLASSIFICATION
+            and not os.environ.get("MAXWELL_SKIP_LLM")):
+        _depth_pending: list[tuple[int | str, dict]] = []  # (cluster_id, fb_data)
+        for cluster in clusters:
+            cid = cluster["cluster_id"]
+            pids = cluster.get("principle_ids", [])
+            _depth_principles = []
+            for pid in pids:
+                if pid in principles_idx:
+                    p = principles_idx[pid]
+                    if _resolve_content_type(p) == DEFAULT_CONTENT_TYPE:
+                        _depth_principles.append(p)
+            if len(_depth_principles) != 1:
+                continue  # non-principle clusters have no depth classification
+            _depth_pending.append((cid, dict(_depth_principles[0])))
+        if _depth_pending:
+            print(f"   🧠 D2477: Batch pre-classifying depth for {len(_depth_pending)} FBs "
+                  f"(batch_size={S4_DEPTH_BATCH_SIZE})...")
+            _depth_start = time.time()
+            _depth_ok = 0
+            _depth_fbs = [fb for _, fb in _depth_pending]
+            try:
+                _depth_vals = batch_depth_classify(
+                    _depth_fbs, model=VERIFY_MODEL, batch_size=S4_DEPTH_BATCH_SIZE,
+                )
+                for (cid, _), dv in zip(_depth_pending, _depth_vals):
+                    _pre_depth[cid] = dv
+                    _depth_ok += 1
+                _depth_batch_used = True
+            except Exception as e:
+                print(f"      ⚠️ Batch depth FAILED: {e} — main loop will fall back to serial")
+            _depth_elapsed = time.time() - _depth_start
+            if _depth_ok:
+                print(f"   ✅ Batch depth pre-classification: {_depth_ok} FBs in "
+                      f"{_depth_elapsed:.1f}s ({_depth_elapsed / _depth_ok:.2f}s/FB amortized)")
+            _depth_batch_used = _depth_ok > 0
+
     for i, cluster in enumerate(clusters, 1):
         cluster_id = cluster["cluster_id"]
         principle_ids = cluster["principle_ids"]
@@ -1480,16 +1527,22 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             # silently returning "domain". An inference failure must never become a
             # valid-looking semantic label (C16). Count it → max_failed_ratio gate.
             try:
-                # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification;
-                # depth may route to a cheap third-family model (Gemma) when
-                # enabled. Default (flag off) = GPT-OSS (VERIFY_MODEL).
-                depth_model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
-                depth_val = classify_depth_focused(
-                    fb_data,
-                    model=depth_model,
-                    max_tokens=S4_DEPTH_MAX_TOKENS,
-                )
-                print(f"(depth:{depth_val})", flush=True, end=" ")
+                # D2477: use the batched depth result when the pre-pass produced one
+                # (quality-neutral — same short prompt, only transport batched).
+                if cluster_id in _pre_depth:
+                    depth_val = _pre_depth[cluster_id]
+                    print(f"(depth:{depth_val})", flush=True, end=" ")
+                else:
+                    # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification;
+                    # depth may route to a cheap third-family model (Gemma) when
+                    # enabled. Default (flag off) = GPT-OSS (VERIFY_MODEL).
+                    depth_model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
+                    depth_val = classify_depth_focused(
+                        fb_data,
+                        model=depth_model,
+                        max_tokens=S4_DEPTH_MAX_TOKENS,
+                    )
+                    print(f"(depth:{depth_val})", flush=True, end=" ")
             except Exception as e:
                 depth_val = S4_DEPTH_FALLBACK_DEPTH
                 class_data["classification_status"] = "FAILED"

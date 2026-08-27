@@ -240,12 +240,13 @@ stage4:
   semantic_near_threshold: 0.8
   merged_call_enabled: true
   merged_call_max_tokens: 2048   # GPT-OSS reasoning+JSON: 1024 truncated sparse (discipline/domains) → quarantine
-  batch_enabled: false            # D2265 batch CRIBS unreliable w/ GPT-OSS (45% malformed + hang) — fall back to individual
+  batch_enabled: false            # D2265 batch CRIBS — D2477 A/B: 2.67x speed BUT domain granularity degrades (12% canonical exact-match, Jaccard 0.48 vs merged). Quality-tradeoff → keep OFF for full run.
   batch_size: 4
   batch_call_max_tokens: 2048
   depth_focused_classification: true
   depth_max_tokens: 1024   # D2351/BUG-109: GPT-OSS is a reasoning model — 512 truncates reasoning_content → empty content → silent "domain"
   depth_batch_size: 4      # D2354: batch the focused depth prompt (removes the ~10s/FB serialized call)
+  depth_batch_enabled: true        # D2477: wire D2354 batch depth into stage4 (quality-neutral — same short prompt, batched transport)
   # D2354 FrugalGPT cascade: GPT-OSS keeps the hard CRIBS/classification work;
   # a cheap third-family model does ONLY the 4-way depth classification.
   # GATED — default off until tools/benchmark_s4_depth_frugal.py shows ≥90%

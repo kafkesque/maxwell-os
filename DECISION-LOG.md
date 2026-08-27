@@ -3,6 +3,24 @@
 
 ---
 
+### D2477 — Wire D2354 batch depth + A/B bottleneck benchmark (2026-08-27)
+**Category:** PERFORMANCE
+
+**Decision:** Wired the fully-implemented-but-never-imported `batch_depth_classify()` (D2354) into `stage4_merge.py` as a depth pre-pass, gated on a new `stage4.depth_batch_enabled` flag. **A/B benchmark** (`scripts/benchmark_s4_ab.py`, n=8 live gpt-oss-20b):
+
+| Enhancement | Speedup | Agreement vs serial |
+|---|---|---|
+| **Batch depth** | **2.69x** (6.46→2.40s/FB) | **100%** (quality-neutral) |
+| **Batch CRIBS (D2265)** | 2.67x (19.47→7.28s/FB) | **domains 12% exact / Jaccard 0.48** (degraded granularity) |
+
+Batch depth is quality-neutral (same short prompt, only transport batched) → **SHIPPED**. Batch CRIBS degrades domain granularity (returns fewer/coarser domains) → **REVERTED** (`batch_enabled: false`, was briefly flipped for the A/B). Full-run per-FB: **27.5s → 22.0s** (serial merged + batched depth). Quality-neutral ETA **≈48h** for 7,859 principles (was ~60h). Remaining untested lever: gpt-oss MoE parallelism (D2459 shows 6 workers degrade; 2-3 untested). 37 S4-related tests green.
+
+- **Status:** ✅ DONE
+- **Files:** pipeline/stage4_merge.py, pipeline/pipeline_paths.py, config/pipeline_config.yaml, scripts/benchmark_s4_ab.py
+- **Source:** 2026-08-27 — operator "wire batch depth + flip batch + A/B test" directive
+
+---
+
 ### D2476 — `classify_model` S4 stamp (2026-08-27)
 **Category:** QUALITY / OBSERVABILITY
 

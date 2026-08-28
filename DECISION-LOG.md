@@ -3,6 +3,40 @@
 
 ---
 
+### D2481 — S4 hardening: BUG-184 batch-depth fix + BUG-183 stale-resume guard + graceful pause/resume (2026-08-28)
+**Category:** RESILIENCE / QUALITY
+
+**Decision:** Kill the serial-depth S4 run and harden `stage4_merge.py` in three coupled ways before relaunching, rather than shipping a slow-but-correct serial fallback.
+
+**(1) BUG-184 — batch-depth truncation (root cause + resilience).** `batch_depth_classify` had THREE faults: it read `depth_max_tokens=1024` (single-FB budget) for a 4-FB batch; it omitted `thinking_budget` so `call_omlx` fell back to the MERGED-call budget (256) instead of the depth budget (128); and it raised all-or-nothing on the first missing `fb_index`. Fix: `stage4.depth_batch_max_tokens: 2048` → `S4_DEPTH_BATCH_MAX_TOKENS`; pass `thinking_budget=VERIFY_DEPTH_THINKING_BUDGET`; per-chunk retry (×1) then per-chunk serial `classify_depth_focused` fallback for MISSING indices only.
+
+**(2) BUG-183 — stale-resume guard.** Cluster IDs are stable across corpus relabels, so D2424's "0-overlap → discard" never fired. New `_s2_input_fingerprint` (sha256 of `pipeline_run_id` + S2 checkpoint/singleton size+mtime_ns) is persisted in `.state.json` and compared on resume; mismatch discards the checkpoint AND its `.depth.json`.
+
+**(3) Graceful pause/resume.** SIGINT/SIGTERM handlers set `_INTERRUPT_REQUESTED`; main loop + depth pre-pass check it at safe boundaries and `_write_s4_checkpoint`+`_write_depth_checkpoint` before `sys.exit(130)` (0-cluster loss). Depth pre-pass now INCREMENTALLY checkpointed to `.depth.json` (crash-safe, resume-aware) — previously an uncheckpointed ~1-2h block.
+
+- **Status:** ✅ DONE — live-verified (8-FB batch → 8/8 valid labels, 1.99 s/FB vs 6.23 s/FB serial; SIGINT→checkpoint→resume skipped 2/3 clusters + reused pre-computed depth; completed run cleared sidecars). Full-run relaunch pending.
+- **Files:** `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `governance/buglog.md`, `governance/aggregated_remaining_tasks.md`
+- **Source:** 2026-08-28 — operator "kill and fix it / checkpoints + pause + resumable / full S4 audit / verified bottleneck mitigation" directive
+
+---
+
+### D2480 — Option-(a) dead-end sweep + buglog closure + S4 test green (2026-08-27)
+**Category:** OPS / QUALITY
+
+**Decision:** Complete the D2479 option-(a) commit by eliminating every dangling reference to the retired dead-end siblings and flipping stale buglog status headers. Three parts.
+
+**(1) Sweep-and-fix all dead-end references.** 11 read-only audit/benchmark/test tools (`test_stage4_preflight_smoke_stress.py`, `stress_test_s4_live.py`, `benchmark_s4_parallel.py`, `benchmark_s4_ab.py`, `e2e_proof.py`, `audit_e2e_cohesion.py`, `smoke_matrix_5x3.py`, `audit_diverse_smoke.py`, `stress_test_s2_exhaustive.py`, + 2 docstrings) repointed from `.deduped`/`.final` → canonical `checkpoint.jsonl`/`singleton_fbs.jsonl`. 5 write tools (`dedup_s2.py`, `sweep_passage_meta.py`, `fix_singleton_quality.py`, `fix_residual_violations.py`, `fix_s2_posthoc.py`) refactored to write IN-PLACE to canonical (no more `.deduped`/`.final`/`.fixed` output). `promote_cleaned.py` (the option-b remediation) retired → `archive/`. Integrity check #18 **inverted** from "detect un-promoted terminal cleanup" to "fail if any dead-end sibling EXISTS" — presence is the hazard, regardless of content.
+
+**(2) Buglog header closure.** BUG-181 → CLOSED (D2470/D2471/D2475), BUG-165 → CLOSED (moot: downstream re-run against current 13,604-record S2), BUG-166 → CLOSED (D2470 G0 scope decided). Bodies' trailing `Status:` lines matched to remove stale `🔴 OPEN (blocks)` claims.
+
+**(3) Test/ETA verification.** S4 suite 50/50 (was 48/50 after the 2 `FileNotFoundError: checkpoint.deduped.jsonl` failures); full suite 148/148; integrity 16/18 (2 skip = no DB). ETA on filtered frontier re-derived: **7,898 principles × 22.0s/FB = 48.3h** (≈53–56h with resume/retry overhead). The 48 empty-shell residual (BUG-182) are non-principle → route to sidecars LLM-free, add zero S4 classification time.
+
+- **Status:** ✅ DONE
+- **Files:** 16 scripts/tests + pipeline/integrity_check.py + governance/buglog.md + archive/promote_cleaned.py
+- **Source:** 2026-08-27 — operator "commit and push + fresh edge-case batch + S4 contract audit" directive
+
+---
+
 ### D2479 — Root-cause verdict (a) + targeted S2 LLM rerun 229+31 (2026-08-27)
 **Category:** OPS / QUALITY
 

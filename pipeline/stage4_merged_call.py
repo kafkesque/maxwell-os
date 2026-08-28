@@ -20,6 +20,7 @@ Usage:
 """
 
 import re
+import time
 
 from pipeline.omlx_call import call_omlx_json
 
@@ -783,10 +784,10 @@ def batch_depth_classify(
         return []
     if max_tokens is None:
         try:
-            from pipeline.pipeline_paths import _CFG
-            max_tokens = int(_CFG.get("stage4", {}).get("depth_max_tokens", 1024))
+            from pipeline.pipeline_paths import S4_DEPTH_BATCH_MAX_TOKENS
+            max_tokens = S4_DEPTH_BATCH_MAX_TOKENS
         except Exception:
-            max_tokens = 1024
+            max_tokens = 2048
     if batch_size is None:
         try:
             from pipeline.pipeline_paths import _CFG
@@ -794,6 +795,16 @@ def batch_depth_classify(
         except Exception:
             batch_size = 4
     batch_size = max(1, int(batch_size))
+    # D2367/BUG-132 parity: the focused-depth call caps CoT at depth_thinking_budget
+    # (128). batch_depth_classify previously omitted thinking_budget, so call_omlx
+    # silently fell back to the MERGED-call budget (256) — more CoT, slower, and it
+    # ate the output budget (BUG-184 truncation). Use the proven depth budget + a
+    # batch-sized token headroom (depth_batch_max_tokens) instead of the single-FB 1024.
+    try:
+        from pipeline.pipeline_paths import VERIFY_DEPTH_THINKING_BUDGET, S4_DEPTH_MAX_TOKENS
+    except Exception:
+        VERIFY_DEPTH_THINKING_BUDGET = None
+        S4_DEPTH_MAX_TOKENS = 1024
 
     system = DEPTH_BATCH_SYSTEM
     if model:
@@ -804,32 +815,51 @@ def batch_depth_classify(
     output: list[str] = []
     for start in range(0, len(fbs_data), batch_size):
         chunk = fbs_data[start:start + batch_size]
-        prompt = build_depth_batch_prompt(chunk)
-        result = call_omlx_json(
-            prompt=prompt,
-            model=model,
-            system=system,
-            max_tokens=max_tokens,
-            timeout=timeout,
-        )
-        if isinstance(result, dict):
-            result = [result]
-        if not isinstance(result, list):
-            raise BatchClassificationError(
-                f"depth batch returned non-list: {type(result)}"
-            )
+        # BUG-184: per-chunk retry + serial fallback. A truncated batch (gpt-oss
+        # intermittently returns N-1 of N objects) must NOT abort the whole pre-pass.
+        # Retry the chunk once; whatever is still missing falls back to the proven
+        # single-FB classify_depth_focused() (fail-closed: a serial failure propagates).
         indexed: dict[int, str] = {}
-        for item in result:
-            if isinstance(item, dict):
-                idx = item.get("fb_index", item.get("index", -1))
-                if isinstance(idx, int) and 0 <= idx < len(chunk):
-                    raw_depth = item.get("depth", "")
-                    if isinstance(raw_depth, str) and raw_depth.strip():
-                        indexed[idx] = _parse_depth_token(raw_depth)
-        for i in range(len(chunk)):
-            if i not in indexed:
-                raise DepthClassificationError(
-                    f"depth batch missing fb_index={i} (chunk start={start})"
+        for _attempt in (1, 2):
+            try:
+                prompt = build_depth_batch_prompt(chunk)
+                result = call_omlx_json(
+                    prompt=prompt,
+                    model=model,
+                    system=system,
+                    max_tokens=max_tokens,
+                    timeout=timeout,
+                    thinking_budget=VERIFY_DEPTH_THINKING_BUDGET,
                 )
-            output.append(indexed[i])
+                if isinstance(result, dict):
+                    result = [result]
+                if not isinstance(result, list):
+                    raise BatchClassificationError(
+                        f"depth batch returned non-list: {type(result)}"
+                    )
+                for item in result:
+                    if isinstance(item, dict):
+                        idx = item.get("fb_index", item.get("index", -1))
+                        if isinstance(idx, int) and 0 <= idx < len(chunk):
+                            raw_depth = item.get("depth", "")
+                            if isinstance(raw_depth, str) and raw_depth.strip():
+                                try:
+                                    indexed[idx] = _parse_depth_token(raw_depth)
+                                except DepthClassificationError:
+                                    continue  # ambiguous single entry → serial fallback
+            except Exception:
+                indexed = {}
+            if len(indexed) == len(chunk):
+                break
+            time.sleep(1.0)  # brief backoff before retry / serial fallback
+
+        for i in range(len(chunk)):
+            if i in indexed:
+                output.append(indexed[i])
+            else:
+                # Serial fallback for the missing index only (retry exhausted or
+                # truncated). Same proven prompt + depth CoT budget as the single call.
+                output.append(classify_depth_focused(
+                    chunk[i], model=model, max_tokens=S4_DEPTH_MAX_TOKENS,
+                ))
     return output

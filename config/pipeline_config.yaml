@@ -246,6 +246,7 @@ stage4:
   depth_focused_classification: true
   depth_max_tokens: 1024   # D2351/BUG-109: GPT-OSS is a reasoning model — 512 truncates reasoning_content → empty content → silent "domain"
   depth_batch_size: 4      # D2354: batch the focused depth prompt (removes the ~10s/FB serialized call)
+  depth_batch_max_tokens: 2048   # BUG-184: 4-FB batch needs > depth_max_tokens (1024) headroom — gpt-oss truncates the Nth JSON object otherwise (reasoning_content consumes the budget)
   depth_batch_enabled: true        # D2477: wire D2354 batch depth into stage4 (quality-neutral — same short prompt, batched transport)
   # D2354 FrugalGPT cascade: GPT-OSS keeps the hard CRIBS/classification work;
   # a cheap third-family model does ONLY the 4-way depth classification.

@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import re
+import signal
 import sys
 import tempfile
 import time
@@ -106,6 +107,43 @@ MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardco
 
 # D2410: temporal-signal match cache (compiled regexes keyed by lowercased signal).
 _TEMPORAL_SIGNAL_RE_CACHE: dict[str, "re.Pattern[str]"] = {}
+
+
+# ── Graceful pause/resume (SIGINT/SIGTERM) ──────────────────────────────────
+# A hard Ctrl-C previously lost ≤ S4_CHECKPOINT_INTERVAL clusters of LLM work
+# (no signal handler). The handler only SETS a flag; the main loop / depth
+# pre-pass checks it at a safe boundary (between clusters / chunks) and calls
+# _write_s4_checkpoint() + _write_depth_checkpoint() before exiting. Loss is
+# capped at 0 clusters (the in-flight call is allowed to complete first).
+_INTERRUPT_REQUESTED: bool = False
+
+
+def _signal_handler(signum: int, frame) -> None:
+    global _INTERRUPT_REQUESTED
+    _INTERRUPT_REQUESTED = True
+    print(f"\n⚠️  Signal {signum} received — finishing current unit, then checkpointing...", flush=True)
+
+
+# ── BUG-183: stale-resume guard ─────────────────────────────────────────────
+# Cluster IDs are STABLE across corpus changes (a relabeled S2 keeps the same
+# hash-based IDs), so the D2424 "0-overlap → discard" guard never fires and a
+# stale completed checkpoint would silently skip ~all clusters on resume.
+# Fingerprint the ACTUAL S2 input (run_id + file size + mtime_ns) — any S2
+# regeneration changes size/mtime_ns, so a mismatch = stale checkpoint.
+_S2_INPUT_FINGERPRINT: str | None = None
+
+
+def _s2_input_fingerprint(run_id: str) -> str:
+    import hashlib
+    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
+    parts = [run_id or ""]
+    for _p in (STAGE2_CHECKPOINT, STAGE2_SINGLETON_OUTPUT):
+        try:
+            _st = _p.stat()
+            parts.append(f"{_p.name}:{_st.st_size}:{_st.st_mtime_ns}")
+        except OSError:
+            parts.append(f"{_p.name}:missing")
+    return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
 
 
 def _temporal_signal_hit(text: str, signals: list[str]) -> bool:
@@ -961,6 +999,30 @@ def _log_cribs_warnings(fb_data: dict) -> None:
         fb_name = str(fb_data.get("name", "?"))[:40]
         print(f"⚠️CRIBS({len(warnings)})", flush=True, end=" ")
 
+def _write_depth_checkpoint(pre_depth: dict, path: Path) -> None:
+    """BUG-184: crash-safe incremental depth pre-classification checkpoint.
+
+    The D2477 depth pre-pass (~1-2h batched) previously lived ONLY in the
+    in-memory ``_pre_depth`` dict — a mid-pre-pass kill lost it all. Persist the
+    cluster_id→depth map atomically (tempfile → fsync → os.replace, C6) after
+    every chunk so a resume skips already-classified clusters and only re-runs
+    the remainder.
+    """
+    tmp = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".depth", delete=False, dir=str(path.parent)
+    )
+    try:
+        json.dump(pre_depth, tmp)
+        tmp.flush()
+        os.fsync(tmp.fileno())
+        tmp.close()
+        os.replace(tmp.name, str(path))
+    except Exception:
+        if os.path.exists(tmp.name):
+            os.unlink(tmp.name)
+        raise
+
+
 def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state: dict) -> None:
     """D2370: crash-safe intra-stage S4 checkpoint (mirrors S2's D2154 pattern).
 
@@ -1004,7 +1066,12 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
         mode="w", suffix=".state", delete=False, dir=str(STAGE4_CHECKPOINT.parent)
     )
     try:
-        json.dump(scalar_state, state_tmp)
+        # BUG-183: persist the S2-input fingerprint alongside the counters so a
+        # resume can detect a stale checkpoint (S2 corpus regenerated in place).
+        _state = dict(scalar_state)
+        if _S2_INPUT_FINGERPRINT is not None:
+            _state["s2_input_fingerprint"] = _S2_INPUT_FINGERPRINT
+        json.dump(_state, state_tmp)
         state_tmp.flush()
         os.fsync(state_tmp.fileno())
         state_tmp.close()
@@ -1032,6 +1099,15 @@ def _stamp_sidecar(rec: dict, pipeline_run_id: str, pipeline_commit: str) -> dic
 def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str] | None = None):
     """Run Stage 4: Merge clusters into Foundation Blocks."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Graceful pause/resume: install SIGINT/SIGTERM handlers so a Ctrl-C or
+    # `kill` checkpoints at the next safe boundary instead of dropping in-flight
+    # work. Handler only sets _INTERRUPT_REQUESTED (no work in signal context).
+    try:
+        signal.signal(signal.SIGINT, _signal_handler)
+        signal.signal(signal.SIGTERM, _signal_handler)
+    except (ValueError, OSError):
+        pass  # non-main thread / restricted platform — checkpointing still works
 
     if not check_omlx_health():
         print("❌ OMLX is not running.")
@@ -1081,6 +1157,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     _scalar_state: dict = {"classification_errors": 0, "name_collisions": 0}
     _segids_file: str = str(STAGE4_CHECKPOINT) + ".segids"
     _state_file: str = str(STAGE4_CHECKPOINT) + ".state.json"
+    _depth_file: str = str(STAGE4_CHECKPOINT) + ".depth.json"
+    # BUG-183: compute provenance BEFORE the resume block so the stale-checkpoint
+    # guard can compare it against the checkpoint's own stamped provenance.
+    pipeline_commit = get_pipeline_commit()
+    pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
+    global _S2_INPUT_FINGERPRINT
+    _S2_INPUT_FINGERPRINT = _s2_input_fingerprint(pipeline_run_id)
     if STAGE4_CHECKPOINT.exists():
         try:
             fbs.extend(load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint"))
@@ -1100,6 +1183,20 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             if os.path.exists(_state_file):
                 with open(_state_file) as _stf:
                     _scalar_state = json.load(_stf)
+            # BUG-183: stale-resume guard — discard a checkpoint whose S2 input
+            # fingerprint differs from the current S2 corpus (relabeled/regenerated
+            # in place). This catches the case D2424's cluster-ID-overlap guard
+            # misses (stable IDs across corpus changes). Guard ONLY on full-run
+            # resume; a --cluster delta-merge keeps its own provenance handling.
+            _saved_fp = _scalar_state.get("s2_input_fingerprint") if isinstance(_scalar_state, dict) else None
+            if (not cluster_ids) and _saved_fp and _saved_fp != _S2_INPUT_FINGERPRINT:
+                print(f"   ⚠️  S4 resume S2-input mismatch — checkpoint fingerprint {_saved_fp!r} != current {_S2_INPUT_FINGERPRINT!r}")
+                print("   ⚠️  Starting fresh — stale S4 progress discarded (BUG-183 guard)")
+                processed_ids = set()
+                fbs = []
+                _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+                if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
+                    os.unlink(_depth_file)
             # D2215-style format guard: zero overlap with current targets means the
             # sidecar belongs to a different corpus/probe format — discard, don't
             # silently re-process or silently skip the wrong clusters. D2424: this guard
@@ -1113,6 +1210,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 processed_ids = set()
                 fbs = []
                 _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+                if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
+                    os.unlink(_depth_file)
             else:
                 _n_remaining = sum(1 for c in clusters if c.get("cluster_id") not in processed_ids)
                 print(f"   📋 S4 resuming: {len(fbs)} FBs from {len(processed_ids)} clusters done — {_n_remaining} remaining")
@@ -1126,6 +1225,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             fbs = []
             processed_ids = set()
             _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+            if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
+                os.unlink(_depth_file)
 
     print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters"
           + (f" (resuming: {len(fbs)} FBs already done)" if processed_ids else ""))
@@ -1205,6 +1306,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     _depth_batch_used: bool = False
     if (S4_DEPTH_BATCH_ENABLED and S4_DEPTH_FOCUSED_CLASSIFICATION
             and not os.environ.get("MAXWELL_SKIP_LLM")):
+        # BUG-184: load the incremental depth checkpoint so a resume skips already-
+        # classified clusters instead of re-running the whole ~1-2h pre-pass.
+        if os.path.exists(_depth_file):
+            try:
+                with open(_depth_file) as _df:
+                    _loaded_depth = json.load(_df)
+                if isinstance(_loaded_depth, dict):
+                    _pre_depth.update(_loaded_depth)
+                    print(f"   📋 Depth resume: {len(_pre_depth)} clusters already classified")
+            except Exception as _e:
+                print(f"   ⚠️  Depth checkpoint corrupt ({type(_e).__name__}: {_e}) — restarting depth pre-pass")
+                _pre_depth = {}
+
         _depth_pending: list[tuple[int | str, dict]] = []  # (cluster_id, fb_data)
         for cluster in clusters:
             cid = cluster["cluster_id"]
@@ -1217,23 +1331,36 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                         _depth_principles.append(p)
             if len(_depth_principles) != 1:
                 continue  # non-principle clusters have no depth classification
+            if cid in _pre_depth:
+                continue  # BUG-184 resume: already classified in a prior run
             _depth_pending.append((cid, dict(_depth_principles[0])))
+
         if _depth_pending:
             print(f"   🧠 D2477: Batch pre-classifying depth for {len(_depth_pending)} FBs "
                   f"(batch_size={S4_DEPTH_BATCH_SIZE})...")
             _depth_start = time.time()
             _depth_ok = 0
-            _depth_fbs = [fb for _, fb in _depth_pending]
-            try:
-                _depth_vals = batch_depth_classify(
-                    _depth_fbs, model=VERIFY_MODEL, batch_size=S4_DEPTH_BATCH_SIZE,
-                )
-                for (cid, _), dv in zip(_depth_pending, _depth_vals):
-                    _pre_depth[cid] = dv
-                    _depth_ok += 1
-                _depth_batch_used = True
-            except Exception as e:
-                print(f"      ⚠️ Batch depth FAILED: {e} — main loop will fall back to serial")
+            # BUG-184: chunk-iterate + checkpoint incrementally so a mid-pre-pass
+            # kill resumes instead of losing the whole pre-pass. batch_depth_classify
+            # is itself truncation-resilient (retry + per-chunk serial fallback).
+            for _ci in range(0, len(_depth_pending), S4_DEPTH_BATCH_SIZE):
+                if _INTERRUPT_REQUESTED:
+                    print(f"\n   🛑 Interrupt during depth pre-pass — {_depth_ok}/{len(_depth_pending)} classified; resume will continue from here")
+                    _write_depth_checkpoint(_pre_depth, Path(_depth_file))
+                    sys.exit(130)
+                _chunk = _depth_pending[_ci:_ci + S4_DEPTH_BATCH_SIZE]
+                _chunk_fbs = [fb for _, fb in _chunk]
+                try:
+                    _vals = batch_depth_classify(_chunk_fbs, model=VERIFY_MODEL,
+                                                 batch_size=S4_DEPTH_BATCH_SIZE)
+                    for (cid, _), dv in zip(_chunk, _vals):
+                        _pre_depth[cid] = dv
+                        _depth_ok += 1
+                except Exception as e:
+                    # Transport-level failure on the whole chunk — leave these
+                    # clusters unclassified; the main loop classifies them serially.
+                    print(f"      ⚠️ Depth chunk [{_ci}-{_ci + len(_chunk)}) FAILED: {e} — main loop will fall back to serial")
+                _write_depth_checkpoint(_pre_depth, Path(_depth_file))
             _depth_elapsed = time.time() - _depth_start
             if _depth_ok:
                 print(f"   ✅ Batch depth pre-classification: {_depth_ok} FBs in "
@@ -1241,6 +1368,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _depth_batch_used = _depth_ok > 0
 
     for i, cluster in enumerate(clusters, 1):
+        # Graceful pause: a SIGINT/SIGTERM sets _INTERRUPT_REQUESTED; the in-flight
+        # cluster completes, then we checkpoint here and exit cleanly (0-cluster loss).
+        if _INTERRUPT_REQUESTED:
+            print(f"\n🛑 Interrupt requested — checkpointing at cluster {i - 1}/{total_clusters}...")
+            _write_s4_checkpoint(fbs, processed_ids, {
+                "classification_errors": classification_errors,
+                "name_collisions": name_collisions,
+            })
+            _write_depth_checkpoint(_pre_depth, Path(_depth_file))
+            print("   ✅ Checkpoint written — resume with the same command to continue.")
+            sys.exit(130)
         cluster_id = cluster["cluster_id"]
         principle_ids = cluster["principle_ids"]
         print(f"  [{i}/{len(clusters)}] Cluster {cluster_id} "
@@ -1794,7 +1932,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     )
 
     # D2370: clear resume sidecars — a completed run must not read as a partial resume
-    for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json"):
+    for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",
+                     str(STAGE4_CHECKPOINT) + ".depth.json"):
         if os.path.exists(_sidecar):
             os.unlink(_sidecar)
 

@@ -489,9 +489,13 @@ def assert_omlx_no_cache() -> None:
             "OMLX cache gate FAILED (D2460 thrash guard): " + ", ".join(bad)
             + f" in {settings_path}. Set cache.enabled=false (--no-cache) and retry."
         )
-    if settings.get("preserve_mid_system_cache"):
-        print("⚠️  OMLX cache gate: preserve_mid_system_cache=true is UNVERIFIED — "
-              "confirm it is benign mid-request KV reuse, not a D2460-class page-cache risk.")
+    # D2484 (2026-08-28): preserve_mid_system_cache lives under `server.` (NOT top-level)
+    # — the prior top-level check never fired. It is server-side mid-request KV reuse,
+    # distinct from the cache.* disk/page-cache thrash flags (D2460) refused above.
+    # VERIFIED benign via live S4 probe (22.8s/FB, no decode collapse, cache.enabled=false).
+    if (settings.get("server") or {}).get("preserve_mid_system_cache"):
+        print("ℹ️  OMLX cache gate: server.preserve_mid_system_cache=true (verified benign — "
+              "mid-request KV reuse, NOT a D2460-class disk-cache flag)")
     print("✅ OMLX cache gate: --no-cache verified (cache.enabled=false, no SSD split)")
 
 

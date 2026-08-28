@@ -101,6 +101,7 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
 # They mirror the config defaults in pipeline_paths.py — NOT drift risks.
 ACKNOWLEDGED_HARDCODED: set[str] = {
     "BORP_MIN_SOURCES",      # e2e_test.py — except fallback (mirrors config default=2)
+    "S4_DEPTH_MAX_TOKENS",   # stage4_merged_call.py — except fallback (mirrors stage4.depth_max_tokens=1024)
     "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)
     "E2E_MIN_FBS",           # e2e_test.py — except fallback (mirrors config default=30)
     "E2E_CONVERGENT_RATIO",  # e2e_test.py — except fallback (mirrors config default=0.25)

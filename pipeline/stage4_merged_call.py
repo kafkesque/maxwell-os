@@ -311,6 +311,59 @@ try:
 except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
     raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
 
+# ── D2483/BUG-185: depth-prompt goldilocks variant (A/B-verified) ──────────
+# The production depth prompt's "DEFAULT to 'domain'" instruction drives the
+# 97.5% collapse (BUG-185). A pure bias-removal over-corrects into over-assigning
+# cross-domain (the D2365 failure mode). The A/B-verified fix (scripts/
+# benchmark_s4_depth_prompt_ab.py, n=20 sample + 5 goldens) = strip the bias +
+# forced 4-way choice + contrastive boundary anchors. Config-gated: default
+# "baseline" leaves prompts byte-identical; "v3_contrastive" applies the fix.
+_DEPTH_VARIANT_FORCED = (
+    "Choose among EXACTLY these four labels, evaluating each before answering:\n"
+    "- universal  = mechanism applies to ALL systems (physics, cooking, poetry)\n"
+    "- cross-domain = bridges 2+ DISTINCT disciplines via a SHARED mechanism\n"
+    "- domain = operates within ONE field and requires that field's context\n"
+    "- specialized = narrow sub-technique within a sub-field or a tool-specific skill"
+)
+_DEPTH_VARIANT_ANCHORS = (
+    "BOUNDARY ANCHORS (disambiguation):\n"
+    "- universal, NOT domain: a heavy-tailed power law holds across wealth, earthquakes, word frequency, city sizes.\n"
+    "- cross-domain, NOT domain: a feedback loop bridges biology homeostasis + engineering control + economics supply/demand.\n"
+    "- domain, NOT universal: color gamut is meaningful only within color science — strip its vocabulary and it is meaningless.\n"
+    "- specialized, NOT cross-domain: backpropagation is a narrow ML sub-technique, not a field-spanning principle."
+)
+_DEPTH_VARIANT_ANSWER_LINES = (
+    "Answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning.",
+    "For EACH FB, answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning.",
+)
+
+
+def _apply_depth_prompt_variant(prompt: str) -> str:
+    """Strip the DEFAULT-to-"domain" bias and add forced choice + contrastive
+    boundary anchors (D2483/BUG-185 goldilocks). Pure text transform — temp=0,
+    model routing, and transport are untouched."""
+    prompt = prompt.replace(
+        'DEFAULT to "domain" unless the mechanism clearly transcends a single discipline.\n', ""
+    ).replace(
+        'DO NOT over-assign "universal" or "cross-domain" — most principles are domain-bound.\n', ""
+    )
+    block = (
+        _DEPTH_VARIANT_FORCED + "\n\n" + _DEPTH_VARIANT_ANCHORS
+        + "\n\nAnswer with EXACTLY ONE of the four labels. No reasoning."
+    )
+    for old in _DEPTH_VARIANT_ANSWER_LINES:
+        prompt = prompt.replace(old, block)
+    return prompt
+
+
+try:
+    from pipeline.pipeline_paths import S4_DEPTH_PROMPT_VARIANT
+except Exception:
+    S4_DEPTH_PROMPT_VARIANT = "baseline"  # C12 fallback: default = no change
+
+if S4_DEPTH_PROMPT_VARIANT == "v3_contrastive":
+    DEPTH_FOCUSED_PROMPT = _apply_depth_prompt_variant(DEPTH_FOCUSED_PROMPT)
+
 VALID_DEPTHS = {"universal", "cross-domain", "domain", "specialized"}
 
 # D2351: fail-closed depth parsing (C16). Order matters for token-level match:
@@ -719,6 +772,9 @@ DO NOT over-assign "universal" or "cross-domain" — most principles are domain-
 For EACH FB, answer EXACTLY ONE WORD: specialized, domain, cross-domain, or universal. No reasoning.
 Return ONLY a JSON array of objects: [{"fb_index": <number>, "depth": "<one word>"}, ...]
 Match fb_index to the input order. One object per input FB."""
+
+if S4_DEPTH_PROMPT_VARIANT == "v3_contrastive":
+    DEPTH_BATCH_SYSTEM = _apply_depth_prompt_variant(DEPTH_BATCH_SYSTEM)
 
 
 def build_depth_batch_prompt(fbs_data: list[dict]) -> str:

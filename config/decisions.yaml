@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-27T20:07:29Z'
-total_decisions: 469
+last_sync: '2026-08-28T15:05:00Z'
+total_decisions: 472
 decisions:
 - id: D2092
   category: INF
@@ -4744,11 +4744,76 @@ decisions:
   - governance/buglog.md
   - governance/aggregated_remaining_tasks.md
   created: '2026-08-28'
+- id: D2482
+  category: QUALITY / RELIABILITY
+  state: ACTIVE
+  description: 'R5 cross-family FLAG judge ON (relabel_cross_family_model=gpt-oss-20b-MXFP4-Q8,
+    flags-not-applies) + DSPy DirectOMLXLM auth fix (hardcoded not-needed -> OMLX_API_KEY)
+    + s2.dspy_enabled gate (default off) + skill-safety guardrail (tool_instruction empty
+    parameters AND syntax -> fail-closed reject) + stage4_golden WIRED + S4-GOLD-005
+    cross-domain boundary golden. Verified: 40 stage2/content tests pass; DSPy dry-run
+    clean; local-LLM delegation WORKS (maxwell_omlx -> gemma-4-E4B live). Finding: depth
+    probe n=40 -> 97.5% "domain" collapse -> BUG-185.'
+  champion: 2026-08-28 session
+  target_files:
+  - pipeline/dspy_trainer.py
+  - pipeline/stage2_extract.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  - config/golden/stage4_golden.yaml
+  created: '2026-08-28'
+- id: D2483
+  category: QLT / PROMPT
+  state: ACTIVE
+  description: 'BUG-185 depth-collapse root cause confirmed + goldilocks prompt fix
+    (A/B-verified). LLM roundtable (qwen/claude/chatgpt) reviewed against repo ground
+    truth: Claude 9/9 master-prompt corrections TRUE; ChatGPT repo facts correct but 2
+    fabricated arXiv citations (2602.14862/2605.18796); Qwen no-repo-access (hallucinated
+    file paths). Root cause: depth prompt literally instructs DEFAULT-to-"domain". A/B
+    (scripts/benchmark_s4_depth_prompt_ab.py, n=20 samples + 5 goldens): V0 baseline 90%
+    domain (collapse reproduced); V1 pure-bias-removal over-corrects to 10% domain (D2365
+    over-assign-cross-domain failure); V3 contrastive = 50% domain, defensible boundary
+    (corrects Lindy Effect/Network Amplification to cross-domain, keeps Four Kinds of
+    Good/Conspiracy Theory as domain), speed-neutral (~7s/FB). Implemented config-gated:
+    stage4.depth_prompt_variant = baseline (default, no change) | v3_contrastive
+    (_apply_depth_prompt_variant in stage4_merged_call.py, applies to DEPTH_FOCUSED_PROMPT
+    + DEPTH_BATCH_SYSTEM). 9 S4 tests green. Batch-path A/B (n=20): baseline golden 3/5 ->
+    v3 5/5 (recovers Feedback Loop/Backpropagation), speed-neutral 1.88->1.95s/FB, no
+    over-assignment (80% domain) -> flag flipped to v3_contrastive (enabled) for the
+    7,898-FB full run. v2 master prompt shipped with DEFAULT-to-"domain" root cause folded in.'
+  champion: 2026-08-28 session
+  target_files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  - scripts/benchmark_s4_depth_prompt_ab.py
+  created: '2026-08-28'
+- id: D2484
+  category: OPS / AUDIT
+  state: ACTIVE
+  description: 'S4 forensic probe + pre-run hygiene. (1) Live probe n=45 (12 principles,
+    0 failed): depth balanced {domain:6,specialized:6} (collapse broken), 22.8s/FB, 1 hard
+    gap = BUG-169 TI empty-parameters. (2) MUST: stale S5 t11 checkpoint (866MB/2,830, 93.3%
+    fb_id overlap) archived to backup/stale_s5_t11_20260828_155213/ — prevents D2409
+    0-overlap-guard bypass + silent stale-resume. (3) C12: S4_DEPTH_MAX_TOKENS except-fallback
+    acknowledged in config_audit. (4) Gov-dot sync: BUG-177/178/179 -> DONE (D2467/8/3);
+    preserve_mid_system_cache VERIFIED (gate check mislocated top-level -> fixed to server.*).
+    (5) BUG-150 measure: discipline-emerging 33% (4/12) + 100% domain-emerging; defer S4-C +
+    D2440 until fresh S4; do NOT promote labels (BUG-167). (6) BUG-186 logged (is_specialized
+    dead field -> derive from depth).'
+  champion: goose
+  target_files:
+  - pipeline/config_audit.py
+  - pipeline/omlx_call.py
+  - governance/aggregated_remaining_tasks.md
+  - governance/buglog.md
+  - AGENTS.md
+  created: '2026-08-28'
 summary:
-  total: 469
+  total: 472
   proposed: 0
   draft: 1
-  active: 410
+  active: 413
   stale: 0
   superseded: 15
   archived: 8
@@ -4801,6 +4866,7 @@ summary:
     OBSERVABILITY / TOOLING: 1
     OPERATIONAL / CANARY: 1
     OPS: 3
+    OPS / AUDIT: 1
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / QUALITY: 2
@@ -4812,10 +4878,10 @@ summary:
     QLT: 49
     QLT / AUDIT: 20
     QLT / DATA: 1
-    QLT / PROMPT: 5
+    QLT / PROMPT: 6
     QUALITY / DATA: 3
     QUALITY / GOLDEN-SET / PROMPT: 1
-    QUALITY / RELIABILITY: 1
+    QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
     RES: 4
     RESILIENCE / QUALITY: 1

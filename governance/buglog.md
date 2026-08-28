@@ -31,13 +31,21 @@
 
 ---
 
-## 🔴 BUG-185 — 2026-08-28 — S4 depth classifier collapses 97.5% to "domain" — OPEN
+## 🟢 BUG-185 — 2026-08-28 — S4 depth classifier collapses 97.5% to "domain" — FIXED (D2483, 2026-08-28)
 - **Symptom:** Live depth probe (n=40 principle FBs, `batch_depth_classify` via gpt-oss-20b) → **39 "domain", 1 "cross-domain", 0 "universal", 0 "specialized"**. The depth distribution is dominated by the "domain" default.
-- **Root cause:** TBD — likely few-shot under-coverage of non-domain depths (only 4→5 goldens) + "domain" acting as the reasoning model's fallback when uncertain. NOT a transport failure (OMLX + delegation verified working).
-- **Fix:** Added S4-GOLD-005 (cross-domain boundary anchor, real FB). Broader fix needs depth-prompt/threshold review + universal/specialized boundary goldens.
-- **Status:** 🟠 OPEN — depth-prompt calibration needed.
-- **Files:** `config/golden/stage4_golden.yaml`, `pipeline/stage4_merged_call.py`
-- **Source:** Live probe 2026-08-28 (`temp/probe_depth_dist.py`)
+- **Root cause (CONFIRMED, D2483):** the depth prompt literally instructs `DEFAULT to "domain" unless the mechanism clearly transcends a single discipline.` — a decision-policy bias, not few-shot under-coverage. A/B (n=20 samples) reproduced 90% domain on V0; pure bias-removal over-corrects to 10% domain (the D2365 over-assign-cross-domain failure); the contrastive variant lands balanced (~50% domain) with a defensible boundary.
+- **Fix (D2483, SHIPPED):** `stage4.depth_prompt_variant: v3_contrastive` (now the enabled default) in `config/pipeline_config.yaml` → `_apply_depth_prompt_variant()` in `stage4_merged_call.py` strips the bias + adds forced 4-way choice + contrastive boundary anchors to BOTH `DEPTH_FOCUSED_PROMPT` and `DEPTH_BATCH_SYSTEM`. A/B-verified on both paths: FOCUSED (n=20) V0=90% domain → V3=50% balanced, speed-neutral; BATCH (n=20, production `batch_depth_classify`) golden accuracy 3/5→5/5 (recovers "Feedback Loop"→cross-domain, "Backpropagation"→specialized), speed-neutral 1.88→1.95s/FB, no over-assignment (80% domain — avoids the V1 over-correction to 10% domain / D2365 failure).
+- **Status:** 🟢 FIXED — enabled (`depth_prompt_variant: v3_contrastive`). 9 S4 tests green; golden contract test passes post-flip; both focused + batch paths A/B-confirmed.
+- **Files:** `config/golden/stage4_golden.yaml`, `pipeline/stage4_merged_call.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `scripts/benchmark_s4_depth_prompt_ab.py`
+- **Source:** Live probe 2026-08-28 (`temp/probe_depth_dist.py`) + A/B (`scripts/benchmark_s4_depth_prompt_ab.py`, D2483)
+
+## 🔴 BUG-186 — 2026-08-28 — `is_specialized` is a dead classification field: Anytype consumer always False — OPEN (derive-from-depth, pre-S6)
+- **Symptom:** S4 forensic probe (n=12 principles, `forensic_probe_0828`) → `is_specialized` absent from every FB record (0/12). Yet `stage6b_anytype_push.py` reads `fb.get("is_specialized", False)` → the Anytype product property is **always False** (silent constant).
+- **Root cause:** `is_specialized` is asked-for in the classify prompt (`stage4_merge.py`), declared in `stage4_golden.yaml` (5 examples), and parsed by `stage4_merge.py`, but it is (a) NOT in `schemas.FB` (55 fields, no `is_specialized`) and (b) never written into the FB record. Depth is now a separate 4-way focused call (D2220/D2247/D2477), so the merged-call `is_specialized` is redundant and dropped.
+- **Verdict (D2484):** `is_specialized` ⟺ `depth == "specialized"` (confirmed by the 5-example golden set). Best fix = **derive deterministically from `depth`** (add the field to `schemas.FB` + persist `is_specialized = (depth == "specialized")`), and **strip the redundant prompt instruction** — do NOT add it as a separately-classified field (the merged-call signal is the low-accuracy 38% path; a redundant classified field adds zero info + a new cross-field consistency invariant, the BUG-151 class).
+- **Status:** 🔴 OPEN (pre-S6 — Anytype push not yet run; no urgency before the full S4→S5→S6 pass).
+- **Files:** `pipeline/schemas.py`, `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`, `pipeline/stage6b_anytype_push.py`, `config/golden/stage4_golden.yaml`
+- **Source:** Forensic S4 probe 2026-08-28 (D2484)
 
 ## 🟢 BUG-181 — 2026-08-27 — Singleton output schema-complete but content-incomplete + evidence contamination — CLOSED (resolved D2470/D2471/D2475, no longer blocks S4)
 - **Symptom (field-by-field audit of the 5,254-record `singleton_fbs.jsonl`, run completed 2026-08-27 00:08):**
@@ -1273,6 +1281,21 @@ Comprehensive cross-examination of 4 LLM audits (DeepSeek, ChatGPT, Qwen, Kimi) 
 | **Long-term Fix** | Goose framework needs reasoning_content passthrough in delegate system. |
 | **Files** | `temp/DELEGATE-FIX-ROOT-CAUSE-2026-07-26.md` |
 | **Status** | 🟢 IMPROVED (2026-07-26) — gemma-4-E4B-it-MLX-4bit confirmed working via OMLX (0.48s response, accurate code review). Qwen3-Coder also confirmed working via curl. Workaround: use provider=maxwell_omlx with model=gemma-4-E4B-it-MLX-4bit for code review/summarization, model=Qwen3-Coder-30B-A3B-Instruct-MLX-4bit for code gen. Subprocess parallelism (pipeline/parallel.py) provides practical alternative for pipeline-level parallelism. Long-term fix still requires Goose framework reasoning_content passthrough. |
+
+---
+
+### DELEGATE-002: Qwen3-Coder-30B agentic decode collapse — cannot run multi-turn delegate tasks 🟡 MITIGATED
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔴 HIGH (blocks multi-turn agentic delegation to Qwen3-Coder-30B) |
+| **Discovered** | 2026-08-28 — delegated the S4 depth A/B (read files → write script → run gpt-oss inference) to `maxwell_omlx`/`Qwen3-Coder-30B-A3B-Instruct-MLX-4bit`; task stalled (16 turns / 9 min / 0 files written) and was cancelled. |
+| **Symptom** | Delegate issued tool calls (context grew) but produced no files; turns went idle 20s→1m; "Task did not stop in time (aborted)". |
+| **Root Cause** | **Monotonic decode-throughput collapse under context growth.** Server log (`~/.omlx/logs/server.log`) shows, across 8 successive turns: output tokens 258→119→53→52→51→54→51→49; throughput 6.8→3.3→1.6→1.6→0.9→0.7→0.6→**0.4 tok/s**; prompt tokens 6369→…→**19769**; per-turn wall 38s→…→110s. Qwen3-Coder-30B is a 128-expert MoE (D2360) decoding ~5-17 tok/s on M1 Max; as the agent's context accumulates tool results each turn, attention over the growing context collapses decode speed and the model's responses shrink to ~50-token stubs that make no forward progress. Aggravated by `supports_streaming: false` (full generation before return) + `max_tokens=32768` (unbounded reasoning) + a cold-load at 14:17:12 that evicted `Qwen3.8-27B` to fit the model under the 39GB admission soft target. |
+| **Impact** | Multi-turn agentic delegation to Qwen3-Coder-30B is effectively unusable (death-spirals to ~0.4 tok/s). Distinct from DELEGATE-001 (reasoning_content passthrough) and BUG-053 (Phi-4-mini hallucination). |
+| **Fix (Workaround)** | (1) Use Qwen3-Coder-30B ONLY for **single-shot** code generation (one prompt → one artifact), not multi-step tool orchestration. (2) Short/single-turn delegation → `gemma-4-E4B` (small, fast, confirmed working). (3) Multi-step agentic work → keep in the main agent, or decompose into single-shot sub-tasks. (4) Pipeline-level parallelism → `pipeline/parallel.py` subprocesses, NOT LLM delegates. |
+| **Long-term Fix** | Cap delegate `max_tokens`/turn; enable streaming; constrain per-turn context growth; or use a smaller non-MoE model for the agent loop. |
+| **Files** | `~/.omlx/logs/server.log` (14:17-14:25 window), delegate task `20260828_14` |
+| **Status** | 🟡 MITIGATED (2026-08-28) — task completed by senior-agent backstop; delegation policy documented in D2483. |
 
 ---
 

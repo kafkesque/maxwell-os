@@ -47,9 +47,9 @@
 <!-- KNOWLEDGE SOURCES -->
 <knowledge_sources>
 - CONSTITUTION.md (single source of truth, v3.0)
-- DECISION-LOG.md (all architectural decisions D2000-D2472)
+- DECISION-LOG.md (all architectural decisions D2000-D2484)
 - MASTER-TASK-REGISTER.md (task tracker)
-- config/decisions.yaml (auto-synced decision registry — 460 decisions)
+- config/decisions.yaml (auto-synced decision registry — 472 decisions)
 - governance/buglog.md (live bug register)
 - governance/aggregated_remaining_tasks.md (prioritized task register)
 - governance/folder_protocol.md (file creation rules)
@@ -76,7 +76,7 @@
 - ALWAYS specify provider and model: delegate({provider: "maxwell_omlx", model: "..."})
 - ⚠️ DELEGATION STATUS (2026-07-26, CONFIRMED):
   - ✅ gemma-4-E4B-it-MLX-4bit: CONFIRMED working. 0.48s response. Use for: code review, summarization, classification.
-  - ✅ Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: CONFIRMED working via curl. Use for: code generation.
+  - ⚠️ Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: SINGLE-SHOT code gen ONLY (via curl/one-shot). Do NOT delegate multi-turn agentic tasks — decode collapses monotonically (~6.8→0.4 tok/s) as agent context grows, responses shrink to ~50-token stubs (DELEGATE-002, 2026-08-28).
   - ⚠️ Phi-4-mini-instruct-8bit: HALLUCINATES on open-ended research (BUG-053). Only for summarization WITH source text.
   - ❌ NEVER use custom_deepseek: reasoning_content passthrough bug (DELEGATE-001).
   - For research/fact-finding: use shell/curl directly. Do NOT delegate open-ended research.

@@ -24,6 +24,7 @@
 7. **BUG-178 — S6 Parquet crash-safe write** — ✅ **FIXED (D2468):** `export_parquet` now tempfile→fsync→os.replace (C6), temp cleaned on failure.
 8. **Re-benchmark S4 under fixed `--no-cache` config** — ✅ **RUN (2026-08-27):** production merged path = **17.71s median / 19.02s mean per FB** (was ~29-34s assumed) → **S4-research §1 CONFIRMED: the old baseline WAS cache-contaminated (~40% faster than assumed).** Full-corpus estimate at 3,556 principles ≈ **~18h** (was ~29-34h).
 9. **BUG-181 #4 — homogenize `pipeline_commit`** — ✅ **DONE (D2465):** `singleton_run_manifest.json` documents the 3-commit split (0a0e0c3×5,078 / 3a4b0e9×141 / d8ba816×35); stamps kept truthful (R14); 176 older-commit records **→ ACCEPTED (D2470): 0 author-sentinel hits.**
+10. **BUG-185 depth-collapse goldilocks fix (D2483)** — ✅ **ROOT CAUSE CONFIRMED + fix implemented (config-gated, default off):** the depth prompt's `DEFAULT to "domain"` instruction drives the 97.5% collapse (roundtable diagnosis confirmed by A/B). A/B (`scripts/benchmark_s4_depth_prompt_ab.py`, n=20 samples + 5 goldens): V0=90% domain, V1 bias-removal over-corrects to 10% domain (the D2365 over-assign-cross-domain failure), V3 contrastive=50% balanced with defensible boundary, speed-neutral ~7s/FB. Fix = `stage4.depth_prompt_variant: baseline|v3_contrastive` applied to DEPTH_FOCUSED_PROMPT + DEPTH_BATCH_SYSTEM. **✅ DONE — batch-path A/B confirm** (n=20, `scripts/benchmark_s4_depth_batch_variant_ab.py`): golden accuracy 3/5→5/5, speed-neutral 1.88→1.95s/FB, no over-assignment (80% domain) → **flag flipped to `v3_contrastive` (enabled)** for the 7,898-FB full run. v2 master prompt shipped with the DEFAULT-to-"domain" root cause folded in. Roundtable side-findings logged in D2483 (Claude 9/9 corrections → v2 master prompt; ChatGPT architecture direction S4-C discriminative classifier — still gated on D2440).
 
 **🟡 WORTH (post-rerun, non-blocking):**
 10. **BUG-150** discipline `emerging` re-measure on fresh S4 (taxonomy promotion gate). Baseline 38.4% (stale 2,830) / 15.5% (canary post-D2398); gate = compute % `discipline=="emerging"` on the new S4 checkpoint (no dedicated script yet — measure inline). Do NOT promote against stale data (BUG-167 lesson).
@@ -37,15 +38,15 @@
 13. **S4-research §2/§4** — vLLM-MLX pilot + S4-C distillation (only after re-benchmark confirms the true baseline).
 14. **Competitive-assessment Layer 2** — `fb_relationships`/`fb_reliability` tables + FB→PT→Recipe bridge (the actual product; post-corpus).
 
-## 🔧 EXTERNAL-AUDIT CROSS-EXAM REMEDIATION (D2463, 2026-08-25) — PARTIAL (4 done, 3 queued)
+## 🔧 EXTERNAL-AUDIT CROSS-EXAM REMEDIATION (D2463, 2026-08-25) — COMPLETE (7 resolved, D2484)
 - ✅ **DONE — golden fail-closed (D2463):** `load_golden_parity` + `load_golden_single_source` now raise on missing/unparseable/empty golden (was silent `([], [], 0)` → zero-shot). `None` path = only legit empty case.
 - ✅ **DONE — OMLX cache gate (D2463):** `assert_omlx_no_cache()` in `omlx_call.py` refuses launch if `cache.enabled`/`hot_cache_only`/`gdn_ssd_split_enabled` set (D2460 thrash flags); wired into `just s2-singletons`; warns on `preserve_mid_system_cache`.
 - ✅ **DONE — D2461 ghost closed:** retroactively logged in DECISION-LOG + registered in decisions.yaml.
 - ✅ **DONE — golden metadata sync:** `stage2_fewshot_single_source.yaml` `meta` 20/13→21/14 (was stale; cosmetic — loader uses config `max`, not YAML metadata).
-- ⏳ **QUEUED — BUG-177 C16 silent-error class:** `parallel.py` (typed failure, raise by default), `stage5_verify._nli_pair_scores` (typed `NLIInferenceError` + `verification_error_type`), `model_lazyload` (remove silent fallback).
-- ⏳ **QUEUED — BUG-178 S6 Parquet C6:** tempfile→fsync→os.replace + manifest checksum.
-- ⏳ **QUEUED — BUG-179 AGENTS.md stale + `tools/delegate_guard.py` phantom:** regenerate loader metadata (D2000–D2463 / 450) + drop phantom import.
-- ⏳ **VERIFY — `preserve_mid_system_cache=true`:** benign mid-request KV vs D2460-class page-cache risk (one targeted check).
+- ✅ **DONE — BUG-177 C16 silent-error class (D2467):** `parallel.py` raises `ParallelMapError` by default, `stage5_verify._nli_pair_scores` typed `NLIInferenceError` + `verification_error_type`, `model_lazyload` no silent fallback.
+- ✅ **DONE — BUG-178 S6 Parquet C6 (D2468):** tempfile→fsync→os.replace + temp cleanup.
+- ✅ **DONE — BUG-179 AGENTS.md stale + `tools/delegate_guard.py` phantom (D2473):** loader metadata regenerated (D2000–D2484 / 472); phantom import dropped (`tools/delegate_safe.py`).
+- ✅ **VERIFIED — `preserve_mid_system_cache=true` (D2484):** benign — lives under `server.` (mid-request RAM KV reuse), NOT `cache.` (D2460 disk-thrash flags, all refused by the gate). Fixed the gate's mislocated top-level check → `server.preserve_mid_system_cache`; live S4 probe confirms no decode collapse.
 
 None of the queued items block the running S2 singleton extraction.
 

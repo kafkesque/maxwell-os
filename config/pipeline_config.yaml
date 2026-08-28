@@ -248,6 +248,14 @@ stage4:
   depth_batch_size: 4      # D2354: batch the focused depth prompt (removes the ~10s/FB serialized call)
   depth_batch_max_tokens: 2048   # BUG-184: 4-FB batch needs > depth_max_tokens (1024) headroom — gpt-oss truncates the Nth JSON object otherwise (reasoning_content consumes the budget)
   depth_batch_enabled: true        # D2477: wire D2354 batch depth into stage4 (quality-neutral — same short prompt, batched transport)
+  # D2483 (2026-08-28): BUG-185 depth-collapse (97.5%->"domain") prompt fix, A/B-verified on BOTH paths.
+  # "baseline" = unchanged production prompt. "v3_contrastive" = strip the DEFAULT-to-"domain"
+  # bias lines + forced 4-way choice + contrastive boundary anchors. FOCUSED-path A/B (n=20): V3
+  # breaks the collapse without over-assigning cross-domain (D2365 failure) and is speed-neutral.
+  # BATCH-path A/B (n=20, production batch_depth_classify): V3 golden accuracy 3/5→5/5 (recovers
+  # Feedback Loop→cross-domain, Backpropagation→specialized), speed-neutral 1.88→1.95s/FB, no
+  # over-assignment (80% domain). Confirmed safe → enabled for the 7,898-FB full run.
+  depth_prompt_variant: v3_contrastive
   # D2354 FrugalGPT cascade: GPT-OSS keeps the hard CRIBS/classification work;
   # a cheap third-family model does ONLY the 4-way depth classification.
   # GATED — default off until tools/benchmark_s4_depth_frugal.py shows ≥90%

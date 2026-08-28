@@ -62,6 +62,7 @@ RANDOM_SEED = int(_cfg.get("pipeline", {}).get("random_seed", 42))
 # NOTE: Depth is now classified in Stage 4, not S2 (A-001/D2241).
 # DEPTHS removed from S2 metric — see CONSTITUTION §2, D2241.
 from pipeline.content_types import EXTRACTION_TYPES  # noqa: E402  (config-first enum)
+from pipeline.pipeline_paths import OMLX_API_KEY  # noqa: E402  (D2482: fix DirectOMLXLM auth — was hardcoded "not-needed", OMLX now enforces sk-maxwell-local)
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -567,7 +568,7 @@ class DirectOMLXLM(dspy.LM):
         self,
         model: str = DSPY_MODEL,
         api_base: str = f"http://localhost:{OMLX_PORT}/v1",
-        api_key: str = "not-needed",
+        api_key: str = OMLX_API_KEY,
         temperature: float = DSPY_TEMPERATURE,
         max_tokens: int = DSPY_MAX_TOKENS,
         **kwargs,

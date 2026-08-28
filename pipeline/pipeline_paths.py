@@ -174,6 +174,7 @@ WATCHDOG_CAUSAL_HALT_RATIO=float(_CFG.get("watchdog", {}).get("causal_halt_ratio
 _dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")
 _dspy_program_p = Path(str(_dspy_program_raw))
 DSPY_PROGRAM_PATH = _dspy_program_p if _dspy_program_p.is_absolute() else PROJECT_ROOT / _dspy_program_p
+S2_DSPY_ENABLED=bool(_CFG.get("s2", {}).get("dspy_enabled", False))  # D2482: gate DSPy extraction path in stage2 (default off)
 
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────
 S13_MIN_LEN=int(_CFG["stage1_3"]["min_len"]); S13_CITE_DENSITY=float(_CFG["stage1_3"]["cite_density"]); S13_ENABLED=bool(_CFG["stage1_3"]["enabled"])

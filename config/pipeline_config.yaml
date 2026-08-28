@@ -224,7 +224,7 @@ stage2:
   gated_seed_id_regex: 'cluster_\d+(_s\d+)?(_sub\d+)?'   # D2421: cluster-id pattern on gated log lines
   extraction_type_dominance_warn_ratio: 0.95   # D2376: warn if a single extraction_type > this ratio of output (over-claim canary — causal_mechanism is the strongest epistemic claim)
   relabel_max_workers: 4   # D2434: R1 relabel sweep parallelism — OMLX serves concurrent requests; 4 workers ≈ 2-3× throughput on the ~15-20s/rec Qwen3 FORM re-judgment
-  relabel_cross_family_model: ""   # P1.3 (D2469): cross-family FLAG judge (Generator≠Verifier, R5). Empty = disabled. Set to a DIFFERENT-family model (e.g. models.verifier.model "gpt-oss-20b-MXFP4-Q8") to flag disagreements instead of auto-applying relabels.
+  relabel_cross_family_model: "gpt-oss-20b-MXFP4-Q8"   # P1.3 (D2469): cross-family FLAG judge (Generator≠Verifier, R5). D2482: ENABLED — gpt-oss is cross-family from the S2 generator (Qwen3-Coder); flags (does not auto-apply) extraction_type disagreements.
 watchdog:
   interval_secs: 60        # D2384: S2 watchdog poll interval
   stall_checks: 3          # D2384: consecutive no-growth polls before flagging "stuck" (D2382 signature)
@@ -344,6 +344,7 @@ s2:
   dspy_max_bootstrapped_demos: 3
   dspy_max_tokens: 4096  # D2304/C12: ConvergentExtraction needs 4K for 11 output fields (was hardcoded in dspy_trainer.py)
   dspy_program_path: data/dspy_mipro_optimized.json  # D2304: C12 config-driven (was hardcoded /tmp)
+  dspy_enabled: false  # D2482: gate the DSPy extraction path in stage2. Default off — few-shot prompt injection stays the safe default until a program is trained (data/dspy_mipro_optimized.json) + live-smoked.
   gate:
     enabled: false
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

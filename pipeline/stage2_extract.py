@@ -218,6 +218,22 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
     if ctype == "principle" and not str(result.get("elaboration", "")).strip():
         errors.append("principle requires non-empty elaboration (D2448)")
 
+    # D2482 (2026-08-28): skill-safety guardrail — a tool_instruction is an
+    # actionable skill/command; a skill with no actionable body (no parameters
+    # and no syntax) is unresolved-or-unsafe and must NOT auto-adopt.
+    # Ref: Microsoft Research "Agent Skills Can Be Harmful" (skill-induced
+    # failures) + code4AI SKILL.md persistence finding (one unsafe experience
+    # persisting as a skill that contaminates a fresh session).
+    if ctype == "tool_instruction":
+        params = result.get("parameters")
+        has_params = bool(params) if not isinstance(params, str) else bool(params.strip())
+        has_syntax = bool(str(result.get("syntax", "")).strip())
+        if not (has_params or has_syntax):
+            errors.append(
+                "tool_instruction requires non-empty parameters or syntax "
+                "(D2482 skill-safety — unresolved/unsafe skill rejected)"
+            )
+
     return len(errors) == 0, errors
 
 

@@ -231,6 +231,12 @@ class FB(StampedRecord):
     evidence: EVIDENCE_LITERAL = Field(  # type: ignore[valid-type]
         description="cited (from source text) | axiomatic (self-evident)"
     )
+    is_specialized: bool = Field(  # type: ignore[valid-type]
+        default=False,
+        description="DERIVED (D2485): depth == 'specialized'. Not LLM-classified — "
+                    "deterministic mirror of `depth` so the Anytype consumer (stage6b) "
+                    "never reads a silently-false value (BUG-186).",
+    )
 
     # ── Anytype properties (v1 schema parity) ─────────────────────────────
     context: str | None = Field(
@@ -352,7 +358,8 @@ class FB(StampedRecord):
     )
     taxonomy_match_method: str | None = Field(
         default=None,
-        description="D2310/D2337: how the canonical discipline/domain was matched — exact | synonym | emerging.",
+        description="D2310/D2337/D2485: how the canonical discipline/domain was matched — "
+                    "exact | synonym | emerging_real | emerging_unmapped.",
     )
 
     @field_validator("domains")

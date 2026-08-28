@@ -3,6 +3,14 @@
 
 ---
 
+### D2485 — S4→S5 launch hardening: S5 input fingerprint (P0) + is_specialized derive + emerging-real/unmapped + pipeline_commit sync (2026-08-28)
+**Category:** OPS / RELIABILITY / QUALITY
+
+**Decision:** (1) **P0 — S5 input fingerprint (hard-discard stale checkpoint).** `stage5_verify.py` now writes `checkpoint.jsonl.input_fingerprint.json` (S4 checkpoint sha256 + schema_version + taxonomy_version + pipeline_commit + manifest_hash + gen/classify/nli model identity) BEFORE verification, and on resume hard-discards any checkpoint whose fingerprint is absent or mismatched. This closes the D2409 blind spot ChatGPT flagged: the 0-overlap fb_id guard cannot detect a content-stable stale checkpoint (the BUG-150 t11 archive was 93.3% fb_id overlap). The manual archive ritual is eliminated — mismatched provenance is now discarded automatically (fail-closed, C16). (2) **P1 — BUG-186 `is_specialized` derive.** `schemas.FB` gains `is_specialized: bool`; `stage4_merge.py` persists `is_specialized = (depth == "specialized")` and removes the dead `class_data.get("is_specialized", ...)` read. Not separately classified, not stripped (Anytype consumer exists) — the D2484 verdict applied. (3) **P1 — emerging_real vs emerging_unmapped.** `taxonomy_match_method` now distinguishes a genuine taxonomy gap (`emerging_real`, promotion candidate) from an empty/invalid raw label that would FABRICATE the semantic `emerging` (`emerging_unmapped`, garbage detector). Only `emerging_real` counts toward promotion. (4) **P1 — post-S4 emerging-rate gate.** New `scripts/gate_emerging_rate.py` + `taxonomy.emerging_discipline_rate_max/emerging_domain_rate_max/emerging_unmapped_rate_max` (C12 config-driven). Fails closed after S4 so labels are never promoted against stale data (BUG-167). (5) **P1/P2 — pipeline_commit sync.** `pipeline.commit` + `pipeline_manifest.pipeline_commit` both `v3.0-D2370` → `v3.0-D2485` (ChatGPT-caught two-identity drift resolved; runtime stamps use git short-hash via `get_pipeline_commit()`).
+- **Status:** ✅ DONE (code + config; S4 launch next)
+- **Files:** `pipeline/stage5_verify.py`, `pipeline/schemas.py`, `pipeline/stage4_merge.py`, `scripts/gate_emerging_rate.py`, `config/pipeline_config.yaml`, `governance/buglog.md`, `AGENTS.md`, `config/decisions.yaml`
+- **Source:** Session 2026-08-28 — P0/P1/P2 pre-launch hardening + gov sync
+
 ### D2484 — S4 forensic probe + pre-run hygiene (stale S5 archive, C12 ack, gov-dot sync, BUG-150 measure) (2026-08-28)
 **Category:** OPS / QUALITY / AUDIT
 

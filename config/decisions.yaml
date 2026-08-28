@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-28T15:05:00Z'
-total_decisions: 472
+total_decisions: 473
 decisions:
 - id: D2092
   category: INF
@@ -4809,11 +4809,34 @@ decisions:
   - governance/buglog.md
   - AGENTS.md
   created: '2026-08-28'
+- id: D2485
+  category: OPS / RELIABILITY
+  state: ACTIVE
+  description: 'S4->S5 launch hardening. (1) P0: S5 input fingerprint sidecar
+    (S4 checkpoint sha256 + schema/taxonomy/pipeline_commit + manifest_hash + gen/classify/nli
+    model identity) hard-discards stale/mismatched S5 checkpoints — closes D2409 0-overlap
+    blind spot (BUG-150 t11 was 93.3% fb_id overlap), eliminates manual archive ritual. (2)
+    P1: BUG-186 is_specialized derived = (depth == specialized) in schemas.FB + stage4_merge,
+    dead class_data read removed. (3) P1: taxonomy_match_method splits emerging_real (genuine
+    gap) vs emerging_unmapped (empty/invalid raw label — no longer fabricates "emerging"). (4)
+    P1: post-S4 emerging-rate gate scripts/gate_emerging_rate.py + taxonomy.*_rate_max thresholds
+    (C12). (5) P1/P2: pipeline.commit + pipeline_manifest.pipeline_commit v3.0-D2370 -> v3.0-D2485.'
+  champion: goose
+  target_files:
+  - pipeline/stage5_verify.py
+  - pipeline/schemas.py
+  - pipeline/stage4_merge.py
+  - scripts/gate_emerging_rate.py
+  - config/pipeline_config.yaml
+  - governance/buglog.md
+  - DECISION-LOG.md
+  - AGENTS.md
+  created: '2026-08-28'
 summary:
-  total: 472
+  total: 473
   proposed: 0
   draft: 1
-  active: 413
+  active: 414
   stale: 0
   superseded: 15
   archived: 8
@@ -4870,7 +4893,7 @@ summary:
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / QUALITY: 2
-    OPS / RELIABILITY: 2
+    OPS / RELIABILITY: 3
     PERF: 11
     PERF / BUGFIX: 1
     PRD: 1

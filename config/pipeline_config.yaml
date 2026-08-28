@@ -4,7 +4,7 @@ run:
 pipeline_manifest:
   schema_version: '3.0'
   taxonomy_version: v5.1
-  pipeline_commit: v3.0-D2370
+  pipeline_commit: v3.0-D2485
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     classifier: gpt-oss-20b-MXFP4-Q8
@@ -129,7 +129,7 @@ models:
   # nli_cross: REMOVED (D2298) — RoBERTa-large added zero signal on paraphrase evidence (D2227).
 pipeline:
   schema_version: '3.0'
-  commit: v3.0-D2370
+  commit: v3.0-D2485
   taxonomy_version: v5.1
   max_domains_per_fb: 5
   chunk_size_words: 300
@@ -439,6 +439,13 @@ taxonomy:
   emerging_freq_threshold: 10
   max_domains: 35       # D2378: canonical domain cap (matches taxonomy_v5.yaml; closed-loop — promote requires demote)
   max_disciplines: 75   # D2378: canonical discipline cap (matches taxonomy_v5.yaml; D2422 removed education overlap; +4 promotions 2026-08-20: design thinking, product design, industrial design, information retrieval)
+  # D2485: post-S4 emerging-rate gate (BUG-150 discipline-emerging 33% on probe).
+  # emerging_real = genuine taxonomy gap (promotion candidate, counted);
+  # emerging_unmapped = empty/invalid raw label (NOT a promotion signal, excluded
+  # from promotion logic — fabricating "emerging" from garbage was the BUG-167-adjacent risk).
+  emerging_discipline_rate_max: 0.35   # frac of FBs with discipline == 'emerging' (real gaps)
+  emerging_domain_rate_max: 0.30       # frac of FBs whose domains collapsed ENTIRELY to ['emerging']
+  emerging_unmapped_rate_max: 0.05     # frac of FBs with empty/invalid raw label (garbage detector — should be ~0)
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8

@@ -36,6 +36,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -59,12 +60,16 @@ from pipeline.pipeline_paths import (
     STAGE4_5_CHECKPOINT,  # F1/D2400: enriched S4 checkpoint (preferred when present)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
+    SCHEMA_VERSION,  # D2485: S5 input fingerprint
+    TAXONOMY_VERSION,  # D2485: S5 input fingerprint
+    GEN_MODEL,  # D2485: S5 input fingerprint (generator identity)
+    VERIFY_MODEL,  # D2485: S5 input fingerprint (classifier identity)
 )
 from pipeline.pipeline_paths import _CFG  # D2405: C12 config-first threshold source
 
 # fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
 # deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
-from pipeline.stamp import get_pipeline_commit
+from pipeline.stamp import get_manifest_hash, get_pipeline_commit  # D2485: manifest fingerprint
 
 # ── Constants ──────────────────────────────────────────────────────────────
 NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2298: from config (0.10, calibrated)
@@ -406,6 +411,84 @@ def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
     return True, 1.0, "Mechanism quality OK"
 
 
+# ── D2485 (P0): S5 input fingerprint — bind checkpoint to the S4 input it verified ──
+
+S5_INPUT_FINGERPRINT_PATH = Path(str(STAGE5_CHECKPOINT) + ".input_fingerprint.json")
+
+
+def _sha256_file(path: Path) -> str:
+    """SHA-256 of a file's bytes (stable, ignores mtime). Empty for missing files."""
+    if not path.exists() or path.is_dir():
+        return ""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _s5_input_fingerprint() -> dict:
+    """D2485 (P0): fingerprint the S4 input that S5 is about to verify.
+
+    Binds the S5 checkpoint to the exact S4 output (content hash) + config
+    (manifest_hash) + model lineup it verified. A content-stable fb_id cannot
+    detect a stale S4 checkpoint — the D2409 0-overlap guard FAILS when two runs
+    share ~93% of fb_ids (the BUG-150 stale t11 archive was the manual workaround).
+    This fingerprint hard-discards any S5 checkpoint whose input fingerprint
+    differs, eliminating the manual archive ritual.
+    """
+    source = STAGE4_5_CHECKPOINT if STAGE4_5_CHECKPOINT.exists() else STAGE4_CHECKPOINT
+    return {
+        "s4_checkpoint": str(source),
+        "s4_checkpoint_sha256": _sha256_file(source),
+        "schema_version": SCHEMA_VERSION,
+        "taxonomy_version": TAXONOMY_VERSION,
+        "pipeline_commit": get_pipeline_commit(),
+        "manifest_hash": get_manifest_hash(),  # config + prompt fingerprint (D2282)
+        "gen_model": GEN_MODEL,
+        "classify_model": VERIFY_MODEL,
+        "nli_model": S5_NLI_MODEL_LARGE,
+    }
+
+
+def _fingerprint_id(fp: dict) -> str:
+    """Deterministic ID for an input fingerprint (canonical JSON + SHA-256)."""
+    return hashlib.sha256(
+        json.dumps(fp, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+
+
+def _load_stored_fingerprint_id() -> str | None:
+    """Return the fingerprint ID recorded alongside the S5 checkpoint, or None."""
+    if not S5_INPUT_FINGERPRINT_PATH.exists():
+        return None
+    try:
+        data = json.loads(S5_INPUT_FINGERPRINT_PATH.read_text())
+        return data.get("fingerprint_id")
+    except Exception:
+        return None
+
+
+def _write_input_fingerprint() -> None:
+    """Persist the current S4 input fingerprint alongside the S5 checkpoint.
+
+    Written BEFORE verification begins so a mid-run crash leaves a valid
+    fingerprint for the next resume attempt to validate against.
+    """
+    fp = _s5_input_fingerprint()
+    payload = {
+        "fingerprint_id": _fingerprint_id(fp),
+        "input": fp,
+    }
+    try:
+        S5_INPUT_FINGERPRINT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        S5_INPUT_FINGERPRINT_PATH.write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        )
+    except Exception as e:
+        print(f"   ⚠️  Could not persist S5 input fingerprint: {e}")
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 
 def _write_s5_checkpoint(verified: list[dict]) -> None:
@@ -436,7 +519,21 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     # never silently trusted.
     verified: list[dict] = []
     done_ids: set[str] = set()
-    if STAGE5_CHECKPOINT.exists():
+
+    # ── D2485 (P0): S5 input fingerprint — hard-discard stale/unvalidated checkpoints ──
+    # The D2409 fb_id-overlap guard CANNOT detect a stale S5 checkpoint whose
+    # fb_ids are content-stable (SHA256(name,definition)) — two runs can share
+    # ~93% of fb_ids while verifying a DIFFERENT S4 output (the BUG-150 stale
+    # t11 archive). The fingerprint binds the checkpoint to the exact S4 input
+    # (hash) + config + model lineup, and hard-discards on any mismatch. A missing
+    # fingerprint is treated as a mismatch (fail-closed, C16) so the manual
+    # archive ritual is no longer required.
+    _cur_fp = _s5_input_fingerprint()
+    _cur_fp_id = _fingerprint_id(_cur_fp)
+    _stored_fp_id = _load_stored_fingerprint_id()
+    _fp_mismatch = _stored_fp_id != _cur_fp_id  # None (absent) → mismatch
+
+    if STAGE5_CHECKPOINT.exists() and not _fp_mismatch:
         try:
             prior = load_jsonl(STAGE5_CHECKPOINT, context="S5 checkpoint")
             done_ids = {vfb.get("fb_id") for vfb in prior if vfb.get("fb_id")}
@@ -445,9 +542,15 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             print(f"   ⚠️  S5 resume checkpoint unreadable ({type(e).__name__}: {e}) — re-verifying all")
             verified = []
             done_ids = set()
-    # D2409: discard a checkpoint from a DIFFERENT run (no fb_id overlap with the
-    # current S4 output). Mirrors S2's D2317 and S4's D2370 stale-checkpoint guard —
-    # carrying forward stale FBs would silently mix two runs' output into one checkpoint.
+    elif STAGE5_CHECKPOINT.exists():
+        _reason = "fingerprint absent" if _stored_fp_id is None else "fingerprint MISMATCH"
+        print(f"   🛑 S5 checkpoint {_reason} — hard-discarding and re-verifying all "
+              f"(D2485: no manual archive needed)")
+        verified = []
+        done_ids = set()
+
+    # D2409 (defense-in-depth): discard a checkpoint with zero fb_id overlap with
+    # the current S4 output. Mirrors S2's D2317 and S4's D2370 stale-checkpoint guard.
     if done_ids:
         current_ids = {fb.get("fb_id") for fb in fbs if fb.get("fb_id")}
         if not (done_ids & current_ids):
@@ -459,6 +562,9 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         remaining = [fb for fb in fbs if fb.get("fb_id") not in done_ids]
         print(f"   📋 S5 resuming: {len(done_ids)} FBs already verified → {len(remaining)} remaining")
         fbs = remaining
+
+    # Persist the input fingerprint so the NEXT resume validates against THIS input.
+    _write_input_fingerprint()
 
     total = len(fbs)
     _thresh = S5_NLI_PASS_THRESHOLD  # config-driven (C12), calibrated: 0.10

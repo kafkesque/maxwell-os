@@ -1639,9 +1639,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if isinstance(discipline_raw_raw, list):
             discipline_raw_raw = discipline_raw_raw[0] if discipline_raw_raw else ""
         discipline_raw = str(discipline_raw_raw) if discipline_raw_raw else ""
-        is_specialized = class_data.get("is_specialized", False)
-        if not isinstance(is_specialized, bool):
-            is_specialized = str(is_specialized).lower() in ("true", "1", "yes")
+        # BUG-186 (D2485): is_specialized is NOT LLM-classified anymore. It is derived
+        # deterministically from depth (depth == "specialized") at FB assembly below,
+        # so it can never silently default to False for a specialized FB (the old
+        # class_data.get("is_specialized", False) was never persisted and always False).
 
         # Validate evidence (still LLM-classified) — D2405: never fabricate "cited" on FAILED
         if class_data.get("classification_status") != "FAILED":
@@ -1649,19 +1650,30 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 class_data["evidence"] = "cited"
 
         # ── Stage 2: Map raw → canonical (D2138) ──
-        canonical_discipline = map_to_canonical_with_fallback(
-            discipline_raw, "discipline", synonym_index, CANONICAL_DISCIPLINES
-        )
-        # D2310: Preserve raw label + record match method (diagnose "emerging" over-firing, BUG-083).
-        # The raw label was previously discarded after mapping — losing the signal needed to
-        # expand the taxonomy. match_method: "exact" | "synonym" | "emerging".
+        # D2485: distinguish a genuine taxonomy gap (emerging_real) from an
+        # empty/invalid raw label that would otherwise FABRICATE the semantic
+        # label "emerging" (emerging_unmapped). An unmapped label is NOT a
+        # promotion signal — only emerging_real counts toward the post-S4
+        # emerging-rate gate (BUG-167 lesson).
         class_data["discipline_raw"] = discipline_raw
-        if canonical_discipline == "emerging":
-            class_data["taxonomy_match_method"] = "emerging"
-        elif canonical_discipline.lower() == discipline_raw.lower():
-            class_data["taxonomy_match_method"] = "exact"
+        if not discipline_raw or not discipline_raw.strip():
+            # Empty/garbage raw discipline → "emerging" is fabricated here, so
+            # mark it unmapped. The raw label was never a real scientific term.
+            canonical_discipline = "emerging"
+            class_data["taxonomy_match_method"] = "emerging_unmapped"
         else:
-            class_data["taxonomy_match_method"] = "synonym"
+            canonical_discipline = map_to_canonical_with_fallback(
+                discipline_raw, "discipline", synonym_index, CANONICAL_DISCIPLINES
+            )
+            # D2310: Preserve raw label + record match method (diagnose "emerging" over-firing, BUG-083).
+            # The raw label was previously discarded after mapping — losing the signal needed to
+            # expand the taxonomy. match_method: "exact" | "synonym" | "emerging_real".
+            if canonical_discipline == "emerging":
+                class_data["taxonomy_match_method"] = "emerging_real"
+            elif canonical_discipline.lower() == discipline_raw.lower():
+                class_data["taxonomy_match_method"] = "exact"
+            else:
+                class_data["taxonomy_match_method"] = "synonym"
         canonical_domains: list[str] = []
         seen_canonical: set[str] = set()
         for d in domains_raw:
@@ -1869,6 +1881,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "domains_raw": domains_raw,
             "discipline_raw": discipline_raw if discipline_raw else None,
             "depth": depth_val,
+            # BUG-186 (D2485): is_specialized derived deterministically from depth,
+            # NOT LLM-classified. Anytype consumer (stage6b) reads this — it must
+            # never be a silently-false dead field.
+            "is_specialized": depth_val == "specialized",
             "evidence": class_data.get("evidence", "cited"),
             # ── v1 Anytype properties ──
             "context": context_val,

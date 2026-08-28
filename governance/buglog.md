@@ -39,13 +39,14 @@
 - **Files:** `config/golden/stage4_golden.yaml`, `pipeline/stage4_merged_call.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `scripts/benchmark_s4_depth_prompt_ab.py`
 - **Source:** Live probe 2026-08-28 (`temp/probe_depth_dist.py`) + A/B (`scripts/benchmark_s4_depth_prompt_ab.py`, D2483)
 
-## 🔴 BUG-186 — 2026-08-28 — `is_specialized` is a dead classification field: Anytype consumer always False — OPEN (derive-from-depth, pre-S6)
+## 🟢 BUG-186 — 2026-08-28 — `is_specialized` is a dead classification field: Anytype consumer always False — FIXED (D2485, 2026-08-28)
 - **Symptom:** S4 forensic probe (n=12 principles, `forensic_probe_0828`) → `is_specialized` absent from every FB record (0/12). Yet `stage6b_anytype_push.py` reads `fb.get("is_specialized", False)` → the Anytype product property is **always False** (silent constant).
 - **Root cause:** `is_specialized` is asked-for in the classify prompt (`stage4_merge.py`), declared in `stage4_golden.yaml` (5 examples), and parsed by `stage4_merge.py`, but it is (a) NOT in `schemas.FB` (55 fields, no `is_specialized`) and (b) never written into the FB record. Depth is now a separate 4-way focused call (D2220/D2247/D2477), so the merged-call `is_specialized` is redundant and dropped.
 - **Verdict (D2484):** `is_specialized` ⟺ `depth == "specialized"` (confirmed by the 5-example golden set). Best fix = **derive deterministically from `depth`** (add the field to `schemas.FB` + persist `is_specialized = (depth == "specialized")`), and **strip the redundant prompt instruction** — do NOT add it as a separately-classified field (the merged-call signal is the low-accuracy 38% path; a redundant classified field adds zero info + a new cross-field consistency invariant, the BUG-151 class).
-- **Status:** 🔴 OPEN (pre-S6 — Anytype push not yet run; no urgency before the full S4→S5→S6 pass).
+- **Fix (D2485):** `schemas.FB` gains `is_specialized: bool` (derived, default False); `stage4_merge.py` persists `is_specialized = (depth == "specialized")` and removes the dead `class_data.get("is_specialized", ...)` read. The redundant classify-prompt instruction is intentionally left in place for this pass (stripping it changes the merged-call JSON contract → deferred, must be A/B tested, not done blind pre-launch).
+- **Status:** 🟢 FIXED (D2485, 2026-08-28) — derived from depth; Anytype consumer now reads a correct value.
 - **Files:** `pipeline/schemas.py`, `pipeline/stage4_merge.py`, `pipeline/stage4_merged_call.py`, `pipeline/stage6b_anytype_push.py`, `config/golden/stage4_golden.yaml`
-- **Source:** Forensic S4 probe 2026-08-28 (D2484)
+- **Source:** Forensic S4 probe 2026-08-28 (D2484); fixed D2485
 
 ## 🟢 BUG-181 — 2026-08-27 — Singleton output schema-complete but content-incomplete + evidence contamination — CLOSED (resolved D2470/D2471/D2475, no longer blocks S4)
 - **Symptom (field-by-field audit of the 5,254-record `singleton_fbs.jsonl`, run completed 2026-08-27 00:08):**

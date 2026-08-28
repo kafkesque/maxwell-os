@@ -112,7 +112,7 @@
 - **Status:** 🟡 OPEN (parked as spike — does not block S2)
 - **Source:** 2026-08-26 — Claude external-audit cross-exam #2 (claude0029.txt claim #4, CONFIRMED)
 
-## 🟡 BUG-177 — 2026-08-25 — C16 silent-error class (parallel.py + S5 NLI + model_lazyload fallback) — OPEN
+## 🟢 BUG-177 — 2026-08-25 — C16 silent-error class (parallel.py + S5 NLI + model_lazyload fallback) — FIXED (D2467, 2026-08-27)
 - **Symptom:** Three production paths swallow errors contrary to C16 ("exceptions must log AND raise"):
   1. `pipeline/parallel.py parallel_map()` catches `TimeoutError`/`Exception`, prints, appends `None`, returns the list. `None` is ambiguous downstream (looks like "processed but empty").
   2. `pipeline/stage5_verify.py _nli_pair_scores()` returns `(0.0, 0.0, 0.0)` on any exception — an infra/model error becomes indistinguishable from a genuine "not entailed" verdict.
@@ -121,23 +121,23 @@
 - **Note:** the golden-loader half of this class (`load_golden_*` → `([], [], 0)`) is FIXED by D2463 (fail-closed raise).
 - **Fix (queued):** (1) `parallel_map` → typed failure object only on explicit opt-in, default raise aggregate; (2) `_nli_pair_scores` → raise typed `NLIInferenceError` while keeping QUARANTINE at the stage boundary + record `verification_error_type`; (3) `model_lazyload` → remove silent fallback, add explicit `--standalone` mode.
 - **Files:** pipeline/parallel.py, pipeline/stage5_verify.py, pipeline/model_lazyload.py
-- **Status:** 🟡 OPEN (queued — does not block S2)
+- **Status:** 🟢 FIXED (D2467, 2026-08-27) — `ParallelMapError` raise-by-default (`on_error="collect"` opt-in); `NLIInferenceError` + `verification_error_type`; `model_lazyload` explicit `MAXWELL_STANDALONE=1`.
 - **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #4/#9/#21)
 
-## 🟡 BUG-178 — 2026-08-25 — S6 Parquet export not crash-safe (C6) — OPEN
+## 🟢 BUG-178 — 2026-08-25 — S6 Parquet export not crash-safe (C6) — FIXED (D2468, 2026-08-27)
 - **Symptom:** `pipeline/stage6_commit.py export_parquet()` writes the snapshot directly with `pq.write_table(table, str(parquet_path), compression="snappy")` — no tempfile→fsync→os.replace. A kill mid-write leaves a partially-written/truncated `.parquet` snapshot that a downstream reader will fail on.
 - **Impact:** persistent-output corruption on forced process kill (SQLite checkpoint writes are already crash-safe; Parquet is not).
 - **Fix (queued):** write to a unique temp file → `fsync` → `os.replace()` into place + add a checksum/manifest entry.
 - **Files:** pipeline/stage6_commit.py
-- **Status:** 🟡 OPEN (queued — S6 is not running during S2)
+- **Status:** 🟢 FIXED (D2468, 2026-08-27) — `export_parquet` tempfile→fsync→os.replace (C6), temp cleaned on failure.
 - **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #17)
 
-## 🟡 BUG-179 — 2026-08-25 — AGENTS.md loader stale + tools/delegate_guard.py phantom — OPEN
+## 🟢 BUG-179 — 2026-08-25 — AGENTS.md loader stale + tools/delegate_guard.py phantom — FIXED (D2473, 2026-08-27)
 - **Symptom:** `AGENTS.md` still declares "DECISION-LOG.md (D2000–D2310)" and "config/decisions.yaml — 299 decisions" (reality: D2463 / 450). The v2.0 loader block still imports `tools.delegate_guard` / `tools.pipeline_paths` / `tools.safe_delete` etc., but the `tools/` layout was migrated to `pipeline/` (v3.0) — `tools/delegate_guard.py` does NOT exist (the mandated preflight gate is a phantom; the real gate is `pipeline/omlx_delegate.py` D2344).
 - **Impact:** agents bootstrapped from the stale loader get obsolete governance + a non-existent preflight import.
 - **Fix (queued):** regenerate AGENTS.md knowledge-source metadata from canonical files (D2463 / 450 / D2000–D2463) + drop the `tools/delegate_guard` phantom from the v2.0 block. Add CI asserting documented decision count/range == DECISION-LOG/decisions.yaml.
 - **Files:** AGENTS.md
-- **Status:** 🟡 OPEN (queued)
+- **Status:** 🟢 FIXED (D2473, 2026-08-27) — AGENTS.md loader regenerated (D2000–D2484 / 472); `tools/delegate_guard.py` phantom dropped (`tools/delegate_safe.py`).
 - **Source:** 2026-08-25 — external-audit cross-exam (ChatGPT #1, Qwen #2)
 
 ## 🟢 BUG-176 — 2026-08-25 — tool_instruction misclassified as process_template (code framed procedurally) — FIXED (D2457)

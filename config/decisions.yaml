@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-27T20:07:29Z'
-total_decisions: 468
+total_decisions: 469
 decisions:
 - id: D2092
   category: INF
@@ -4818,6 +4818,7 @@ summary:
     QUALITY / RELIABILITY: 1
     QUALITY / TAXONOMY: 1
     RES: 4
+    RESILIENCE / QUALITY: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1
     VAL: 8

@@ -31,6 +31,14 @@
 
 ---
 
+## 🔴 BUG-185 — 2026-08-28 — S4 depth classifier collapses 97.5% to "domain" — OPEN
+- **Symptom:** Live depth probe (n=40 principle FBs, `batch_depth_classify` via gpt-oss-20b) → **39 "domain", 1 "cross-domain", 0 "universal", 0 "specialized"**. The depth distribution is dominated by the "domain" default.
+- **Root cause:** TBD — likely few-shot under-coverage of non-domain depths (only 4→5 goldens) + "domain" acting as the reasoning model's fallback when uncertain. NOT a transport failure (OMLX + delegation verified working).
+- **Fix:** Added S4-GOLD-005 (cross-domain boundary anchor, real FB). Broader fix needs depth-prompt/threshold review + universal/specialized boundary goldens.
+- **Status:** 🟠 OPEN — depth-prompt calibration needed.
+- **Files:** `config/golden/stage4_golden.yaml`, `pipeline/stage4_merged_call.py`
+- **Source:** Live probe 2026-08-28 (`temp/probe_depth_dist.py`)
+
 ## 🟢 BUG-181 — 2026-08-27 — Singleton output schema-complete but content-incomplete + evidence contamination — CLOSED (resolved D2470/D2471/D2475, no longer blocks S4)
 - **Symptom (field-by-field audit of the 5,254-record `singleton_fbs.jsonl`, run completed 2026-08-27 00:08):**
   1. **Evidence contamination:** 558/5,254 (10.6%) `evidence_passages` carry raw EPUB→MD conversion artifacts (`.title-page-contributor-primary-block} ::::`, `:::inline-image:::`, `{align="baseline" height=…}`, `{bgcol…}`); 23 severe (>15% artifact-char ratio). Record #1's evidence is 100% a title-page CSS fragment (zero semantic content). All records carry exactly 1 passage.

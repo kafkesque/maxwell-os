@@ -3,6 +3,13 @@
 
 ---
 
+### D2482 — R5 flag judge ON + DSPy unblock + skill-safety guardrail + S4 boundary golden (2026-08-28)
+- **Decision:** (1) Enable `stage2.relabel_cross_family_model` = `gpt-oss-20b-MXFP4-Q8` (R5 Generator≠Verifier cross-family FLAG judge — flags, does not auto-apply). (2) Fix `dspy_trainer.DirectOMLXLM` hardcoded `api_key="not-needed"` → `OMLX_API_KEY` (OMLX enforces `sk-maxwell-local`; DSPy would 401 on every call). (3) Add `s2.dspy_enabled` (default false) + `S2_DSPY_ENABLED` as the DSPy-wiring gate. (4) Skill-safety guardrail in `validate_fb_output`: `tool_instruction` with empty `parameters` AND `syntax` → fail-closed reject (ref MSR "Agent Skills Can Be Harmful"). (5) `stage4_golden.yaml` meta.status → WIRED (D2454); add S4-GOLD-005 cross-domain boundary golden from real corpus FB "Cross-Industry Insight Transfer".
+- **Verified:** 40 stage2/content tests pass; DSPy `--dry-run` clean (86 ex, tier split 58/5/23); golden violations 0; contract test 2/2; py_compile OK. **Local-LLM delegation WORKS** — live `delegate` → `maxwell_omlx`/`gemma-4-E4B` returned real responses.
+- **Findings:** (a) Depth probe n=40 → 97.5% "domain" collapse → **BUG-185**. (b) OMLX already serves `Qwen3.8-27B-MLX-4bit` (256K ctx) — resolves the "local context too small" pain. (c) goose 1.48.0 `active_provider=custom_deepseek`; `maxwell_omlx` provider (base_url `http://localhost:11435/v1`, api_key_env `OMLX_API_KEY`) is configured but its model list is STALE (lists Qwen3.6-35B-A3B, omits Qwen3.8-27B).
+- **Files:** `pipeline/dspy_trainer.py`, `pipeline/stage2_extract.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `config/golden/stage4_golden.yaml`
+- **Source:** Session 2026-08-28 — S4 readiness + delegation verification + gov sync
+
 ### D2481 — S4 hardening: BUG-184 batch-depth fix + BUG-183 stale-resume guard + graceful pause/resume (2026-08-28)
 **Category:** RESILIENCE / QUALITY
 

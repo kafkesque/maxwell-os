@@ -20,7 +20,7 @@ meta:
   purpose: S4 classification golden few-shot (depth/discipline/domains/evidence)
   decision: D2451
   status: WIRED      # wiring into the 4 S4 classification prompts = D2454 (2026-08-27, fail-closed)
-  total_examples: 4
+  total_examples: 5
   expected_coverage:
   - depth_universal
   - depth_cross_domain
@@ -92,3 +92,23 @@ examples:
     evidence: "cited"
     is_specialized: true
   rationale: "A narrow sub-technique within machine learning — a specific algorithm, not a field-spanning principle. Strip ML jargon and it is meaningless. depth=specialized, is_specialized=true."
+
+# ── cross-domain BOUNDARY case (D2482): analogical transfer across industries ──
+# Added 2026-08-28 after live depth probe showed the classifier collapsing 97.5%
+# of principle FBs to "domain". This is a REAL corpus FB (S2 extraction, 2 sources:
+# Creative Confidence + HBR Guide to Unlocking Creativity) that the depth pass
+# itself classifies cross-domain — the boundary the collapse erases.
+- id: S4-GOLD-005
+  depth: cross-domain
+  input_fb:
+    name: Cross-Industry Insight Transfer
+    definition: "Drawing meaningful insights from seemingly unrelated industries or domains can reveal novel solutions to problems within one's own field. This principle describes the process of recognizing parallels between different contexts and applying learned patterns to new situations."
+    mechanism: "This is a practical heuristic for innovation: when facing a challenge in one's field, deliberately seeking analogies from other domains can trigger novel solutions. The mechanism works through pattern recognition and metaphorical thinking, where a solution from one context is adapted to fit a different but structurally similar problem. The process requires both domain expertise in the target field and exposure to diverse sources of information or unrelated fields."
+    boundary: "Applies when there is sufficient structural similarity between domains to enable meaningful analogy. Fails when the domains are completely dissimilar or when the transfer requires extensive adaptation that loses the original solution's effectiveness."
+  expected_classification:
+    discipline: "creative process"
+    domains: ["business operations", "science & research"]
+    depth: "cross-domain"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "The mechanism (analogical transfer via pattern recognition + metaphorical thinking) is structurally domain-independent — it works across any pair of structurally-similar fields. It is NOT a single field's method (depth=domain) and NOT a universal law (it requires structural similarity, so it fails across truly dissimilar domains). depth=cross-domain. Discipline is the structural science of creative ideation (creative process), not one application domain."

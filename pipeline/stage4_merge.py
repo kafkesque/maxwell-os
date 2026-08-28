@@ -999,20 +999,20 @@ def _log_cribs_warnings(fb_data: dict) -> None:
         fb_name = str(fb_data.get("name", "?"))[:40]
         print(f"⚠️CRIBS({len(warnings)})", flush=True, end=" ")
 
-def _write_depth_checkpoint(pre_depth: dict, path: Path) -> None:
-    """BUG-184: crash-safe incremental depth pre-classification checkpoint.
+def _write_sidecar_json(data: dict, path: Path) -> None:
+    """BUG-184/D2481: crash-safe incremental pre-pass sidecar checkpoint.
 
-    The D2477 depth pre-pass (~1-2h batched) previously lived ONLY in the
-    in-memory ``_pre_depth`` dict — a mid-pre-pass kill lost it all. Persist the
-    cluster_id→depth map atomically (tempfile → fsync → os.replace, C6) after
-    every chunk so a resume skips already-classified clusters and only re-runs
-    the remainder.
+    The D2477 depth / D2265 CRIBS pre-passes previously lived ONLY in in-memory
+    dicts (``_pre_depth`` / ``_pre_classified``) — a mid-pre-pass kill lost them
+    all. Persist the cluster_id→result map atomically (tempfile → fsync →
+    os.replace, C6) after every chunk so a resume skips already-classified
+    clusters and only re-runs the remainder.
     """
     tmp = tempfile.NamedTemporaryFile(
-        mode="w", suffix=".depth", delete=False, dir=str(path.parent)
+        mode="w", suffix=".json", delete=False, dir=str(path.parent)
     )
     try:
-        json.dump(pre_depth, tmp)
+        json.dump(data, tmp)
         tmp.flush()
         os.fsync(tmp.fileno())
         tmp.close()
@@ -1021,6 +1021,11 @@ def _write_depth_checkpoint(pre_depth: dict, path: Path) -> None:
         if os.path.exists(tmp.name):
             os.unlink(tmp.name)
         raise
+
+
+def _write_depth_checkpoint(pre_depth: dict, path: Path) -> None:
+    """Compatibility alias for ``_write_sidecar_json`` (depth pre-pass)."""
+    _write_sidecar_json(pre_depth, path)
 
 
 def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state: dict) -> None:
@@ -1158,6 +1163,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     _segids_file: str = str(STAGE4_CHECKPOINT) + ".segids"
     _state_file: str = str(STAGE4_CHECKPOINT) + ".state.json"
     _depth_file: str = str(STAGE4_CHECKPOINT) + ".depth.json"
+    _cribs_file: str = str(STAGE4_CHECKPOINT) + ".cribs.json"
     # BUG-183: compute provenance BEFORE the resume block so the stale-checkpoint
     # guard can compare it against the checkpoint's own stamped provenance.
     pipeline_commit = get_pipeline_commit()
@@ -1195,8 +1201,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 processed_ids = set()
                 fbs = []
                 _scalar_state = {"classification_errors": 0, "name_collisions": 0}
-                if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
-                    os.unlink(_depth_file)
+                for _stale_sidecar in (_depth_file, _cribs_file):  # stale pre-pass sidecars are also invalid
+                    if os.path.exists(_stale_sidecar):
+                        os.unlink(_stale_sidecar)
             # D2215-style format guard: zero overlap with current targets means the
             # sidecar belongs to a different corpus/probe format — discard, don't
             # silently re-process or silently skip the wrong clusters. D2424: this guard
@@ -1210,8 +1217,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 processed_ids = set()
                 fbs = []
                 _scalar_state = {"classification_errors": 0, "name_collisions": 0}
-                if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
-                    os.unlink(_depth_file)
+                for _stale_sidecar in (_depth_file, _cribs_file):  # stale pre-pass sidecars are also invalid
+                    if os.path.exists(_stale_sidecar):
+                        os.unlink(_stale_sidecar)
             else:
                 _n_remaining = sum(1 for c in clusters if c.get("cluster_id") not in processed_ids)
                 print(f"   📋 S4 resuming: {len(fbs)} FBs from {len(processed_ids)} clusters done — {_n_remaining} remaining")
@@ -1225,8 +1233,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             fbs = []
             processed_ids = set()
             _scalar_state = {"classification_errors": 0, "name_collisions": 0}
-            if os.path.exists(_depth_file):  # stale depth pre-pass is also invalid
-                os.unlink(_depth_file)
+            for _stale_sidecar in (_depth_file, _cribs_file):  # stale pre-pass sidecars are also invalid
+                if os.path.exists(_stale_sidecar):
+                    os.unlink(_stale_sidecar)
 
     print(f"🧩 Stage 4: Classify + Format — {len(clusters)} clusters"
           + (f" (resuming: {len(fbs)} FBs already done)" if processed_ids else ""))
@@ -1256,6 +1265,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     _batch_used: bool = False
 
     if _BATCH_ENABLED and not os.environ.get("MAXWELL_SKIP_LLM"):
+        # D2481: load the incremental CRIBS checkpoint so a resume skips already-
+        # classified clusters instead of re-running the whole pre-pass.
+        if os.path.exists(_cribs_file):
+            try:
+                with open(_cribs_file) as _cf:
+                    _loaded_cribs = json.load(_cf)
+                if isinstance(_loaded_cribs, dict):
+                    _pre_classified.update(_loaded_cribs)
+                    print(f"   📋 CRIBS resume: {len(_pre_classified)} clusters already classified")
+            except Exception as _e:
+                print(f"   ⚠️  CRIBS checkpoint corrupt ({type(_e).__name__}: {_e}) — restarting CRIBS pre-pass")
+                _pre_classified = {}
+
         # Collect all fb_data without making LLM calls
         _pending: list[tuple[int | str, list[dict], dict]] = []  # (cluster_id, cluster_principles, fb_data)
         for cluster in clusters:
@@ -1270,6 +1292,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                         cluster_principles.append(p)
             if len(cluster_principles) != 1:
                 continue  # skip non-principle clusters in batch pre-pass
+            if cid in _pre_classified:
+                continue  # D2481 resume: already classified in a prior run
             fb_data = dict(cluster_principles[0])
             fb_data["_gen_skipped"] = True
             _pending.append((cid, cluster_principles, fb_data))
@@ -1279,6 +1303,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             _batch_start_time = time.time()
             _batch_total = 0
             for _batch_start in range(0, len(_pending), _BATCH_SIZE):
+                if _INTERRUPT_REQUESTED:
+                    print(f"\n   🛑 Interrupt during CRIBS pre-pass — {_batch_total}/{len(_pending)} classified; resume will continue from here")
+                    _write_sidecar_json(_pre_classified, Path(_cribs_file))
+                    sys.exit(130)
                 _batch = _pending[_batch_start:_batch_start + _BATCH_SIZE]
                 _batch_fbs = [fb for _, _, fb in _batch]
                 try:
@@ -1291,6 +1319,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 except Exception as e:
                     print(f"      ⚠️ Batch {_batch_start // _BATCH_SIZE + 1} FAILED: {e}")
                     # Fall back: let main loop handle these individually
+                _write_sidecar_json(_pre_classified, Path(_cribs_file))
             _batch_elapsed = time.time() - _batch_start_time
             _per_fb = _batch_elapsed / max(_batch_total, 1)
             print(f"   ✅ Batch pre-classification: {_batch_total} FBs in {_batch_elapsed:.1f}s "
@@ -1933,7 +1962,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
 
     # D2370: clear resume sidecars — a completed run must not read as a partial resume
     for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",
-                     str(STAGE4_CHECKPOINT) + ".depth.json"):
+                     str(STAGE4_CHECKPOINT) + ".depth.json", str(STAGE4_CHECKPOINT) + ".cribs.json"):
         if os.path.exists(_sidecar):
             os.unlink(_sidecar)
 

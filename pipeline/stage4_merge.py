@@ -1659,7 +1659,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # (GPT-OSS: 62.5% short → 38% long; cross-domain 0/3 everywhere).
         # When enabled (default), run a SEPARATE short focused depth prompt and
         # OVERRIDE the depth from the long classify call. Cost: +1 fast call/FB.
-        if S4_DEPTH_FOCUSED_CLASSIFICATION:
+        if S4_DEPTH_FOCUSED_CLASSIFICATION and not _skip_llm:
             # D2351/BUG-108: FAIL-CLOSED depth. classify_depth_focused() now RAISES
             # on transport failure, empty content, or an ambiguous answer instead of
             # silently returning "domain". An inference failure must never become a
@@ -2007,6 +2007,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     print(f"❌ Failed clusters:          {failed}")
     if _batch_used:
         print(f"⚡ Batch classified:          {len(_pre_classified)} FBs (D2265)")
+    if _pre_depth:
+        print(f"🧠 Depth pre-classified:      {len(_pre_depth)} FBs (D2477)")
     print(f"🏷️  Classification errors:     {classification_errors}")
     if name_collisions:
         print(f"🔤 Name collisions:          {name_collisions} (auto-disambiguated)")

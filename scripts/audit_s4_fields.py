@@ -50,34 +50,44 @@ def _nonempty(v) -> bool:
     return v is not None
 
 
-# D2323 ontology + D2475: the SHARED skeleton is name/definition. mechanism/
-# boundary/consequence are PRINCIPLE-ONLY (D2475 — the epistemic register of a
-# Foundation Block). elaboration/application/failure_mode are PRINCIPLE-ONLY
-# (S4 CRIBS); jargon is optional everywhere (omitted when empty, D2123). Per-type
-# extras come from s2_body_fields. Treating the ontology's `core_body` UNION as
-# universal is the wrong model — it over-flags legitimately-empty fields on
-# PT/PI/GE/TI.
-SHARED_SKELETON: list[str] = ["name", "definition"]
-PRINCIPLE_ONLY: list[str] = ["mechanism", "boundary", "consequence"]
-PRINCIPLE_REQUIRED: list[str] = ["elaboration"]
-PRINCIPLE_OPTIONAL: list[str] = ["application", "failure_mode", "jargon"]
+# D2323 ontology + D2475 + D2488: cardinality is read from content_types.yaml
+# (single source of truth, C12) — NOT re-declared here. For `principle`:
+#   shared_body             → REQUIRED non-empty (name, definition)
+#   principle_only_body     → REQUIRED non-empty (mechanism, boundary, consequence)
+#   principle_required_body → REQUIRED non-empty (application D2371, failure_mode
+#                             D2488, elaboration) — S4 CRIBS, NOT optional.
+#   principle_optional_body → OPTIONAL (jargon only, D2123 — omit if empty).
+# Per-type non-principle extras come from s2_body_fields. Treating the ontology's
+# `core_body` UNION as universal is the wrong model — it over-flags
+# legitimately-empty fields on PT/PI/GE/TI.
 
 
-def _required_for(ct: str, s2_fields: dict) -> list[str]:
-    required = list(SHARED_SKELETON) + s2_fields.get(ct, [])
+def _cardinality(onto: dict) -> dict[str, list[str]]:
+    """Return the body-field cardinality contract from content_types.yaml (C12)."""
+    return {
+        "shared": list(onto.get("shared_body", ["name", "definition"])),
+        "principle_only": list(onto.get("principle_only_body", ["mechanism", "boundary", "consequence"])),
+        "principle_required": list(onto.get("principle_required_body", ["application", "failure_mode", "elaboration"])),
+        "principle_optional": list(onto.get("principle_optional_body", ["jargon"])),
+    }
+
+
+def _required_for(ct: str, s2_fields: dict, card: dict[str, list[str]]) -> list[str]:
+    required = list(card["shared"]) + s2_fields.get(ct, [])
     if ct == "principle":
-        required += PRINCIPLE_ONLY + PRINCIPLE_REQUIRED
+        required += card["principle_only"] + card["principle_required"]
     return required
 
 
-def _optional_for(ct: str) -> list[str]:
-    return PRINCIPLE_OPTIONAL if ct == "principle" else ["jargon"]
+def _optional_for(ct: str, card: dict[str, list[str]]) -> list[str]:
+    return card["principle_optional"] if ct == "principle" else ["jargon"]
 
 
 def audit_dir(in_dir: Path) -> dict:
     """Audit an S4 output dir (checkpoint.jsonl + PT/PI/GE/TI sidecars)."""
     onto = _load_ontology()
     s2_fields = onto.get("s2_body_fields", {})
+    card = _cardinality(onto)
 
     results: dict[str, dict] = {}
 
@@ -85,12 +95,12 @@ def audit_dir(in_dir: Path) -> dict:
         results.setdefault(ct, {"n": 0, "missing": {}, "empty": {}, "optional_empty": {}})
         r = results[ct]
         r["n"] += 1
-        for f in _required_for(ct, s2_fields):
+        for f in _required_for(ct, s2_fields, card):
             if f not in rec:
                 r["missing"][f] = r["missing"].get(f, 0) + 1
             elif not _nonempty(rec.get(f)):
                 r["empty"][f] = r["empty"].get(f, 0) + 1
-        for f in _optional_for(ct):
+        for f in _optional_for(ct, card):
             if f not in rec or not _nonempty(rec.get(f)):
                 r["optional_empty"][f] = r["optional_empty"].get(f, 0) + 1
 

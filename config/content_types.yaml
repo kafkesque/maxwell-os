@@ -227,11 +227,16 @@ core_body:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # D2475 — body-field cardinality contract (machine-readable, config-first C12).
-#   shared_body        → REQUIRED non-empty for EVERY content_type.
-#   principle_only_body → REQUIRED non-empty ONLY for `principle`; OPTIONAL
-#                         (may be absent or empty) for PT/PI/TI/GE.
-#   elaboration is special-cased (principle: REQUIRED non-empty; non-principle:
-#   REQUIRED empty) and kept out of both lists below.
+#   shared_body             → REQUIRED non-empty for EVERY content_type.
+#   principle_only_body     → REQUIRED non-empty ONLY for `principle`; OPTIONAL
+#                             (may be absent or empty) for PT/PI/TI/GE.
+#   principle_required_body → S4 CRIBS fields REQUIRED non-empty ONLY for
+#                             `principle` (application D2371, failure_mode D2488,
+#                             elaboration). NOT optional — an empty application/
+#                             failure_mode/elaboration must quarantine the FB.
+#   principle_optional_body → S4 CRIBS fields OPTIONAL for `principle` (jargon only).
+#   (D2488: previously `application`/`failure_mode` were only prose-mentioned and
+#    misread as optional by audit_s4_fields.py. Now machine-readable + enforced.)
 # ─────────────────────────────────────────────────────────────────────────────
 shared_body:
   - name
@@ -240,6 +245,12 @@ principle_only_body:
   - mechanism
   - boundary
   - consequence
+principle_required_body:
+  - application       # D2371 — enforced: empty/short → quarantine
+  - failure_mode      # D2488 — enforced: empty/short → quarantine
+  - elaboration       # REQUIRED (was prose-special-cased, now explicit)
+principle_optional_body:
+  - jargon            # D2123 — omit entirely if no specialized terms
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SHARED CLASSIFICATION — emitted by S2/S4, all content types.

@@ -322,6 +322,9 @@ def _stage_smoke_s2(run_id: str, picks: list[dict[str, Any]], inject_application
         rec = dict(p)
         if inject_application:
             rec["application"] = "When testing the pipeline, apply this principle because it verifies plumbing."
+            # D2488: failure_mode is now REQUIRED for principles too — inject a stub so
+            # the LLM-off plumbing smoke still passes the fail-closed gate.
+            rec["failure_mode"] = "When the pipeline has no plumbing, this principle fails because nothing verifies the write path."
         rows.append(rec)
     with open(s2_dir / "checkpoint.jsonl", "w", encoding="utf-8") as f:
         for r in rows:

@@ -1638,6 +1638,16 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             failed += 1
             continue
 
+        # D2488: failure_mode is REQUIRED for every principle (schemas.FB.failure_mode,
+        # min_length=10; CRIBS prompt "REQUIRED FORMAT"). D2371 enforced application but
+        # failure_mode had no runtime gate — an empty/short failure_mode flowed silently
+        # into S5/S6. Fail-closed parity with D2371: quarantine + retry on resume.
+        _fm = str(fb_data.get("failure_mode") or "").strip()
+        if len(_fm) < 10:
+            print(f"→ ❌ Empty/short failure_mode ({len(_fm)} chars < 10) — FB QUARANTINED (D2488)")
+            failed += 1
+            continue
+
         # Phase 2: TWO-STAGE classification (D2138) + semantic depth (D2220)
         # D2226: When merged S4 call produced classification, use it directly.
         # Otherwise fall back to separate classify call (original two-call path).

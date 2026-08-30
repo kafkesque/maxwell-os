@@ -3,7 +3,7 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-07-27T14:24:00Z</dateModified>
+    <dateModified>2026-08-29T22:05:00Z</dateModified>
     <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
   </head>
   <body>
@@ -51,6 +51,11 @@
                description="Apple MLX framework ecosystem: inference engines, servers, tools, models"/>
       <outline type="rss" text="Apple Silicon" xmlUrl="https://github.com/topics/apple-silicon"
                description="Apple Silicon native tools: LLM inference, optimization, monitoring"/>
+      <!-- 2026-08-29: RLM (Recursive Language Models) + sPTC — long-context / recursive inference -->
+      <outline type="rss" text="RLM" xmlUrl="https://github.com/topics/rlm"
+               description="Recursive Language Models: decompose + recursively sub-query context via REPL (context-rot mitigation)"/>
+      <outline type="rss" text="RLMs" xmlUrl="https://github.com/topics/rlms"
+               description="Recursive Language Models (plural topic alias)"/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -76,7 +81,7 @@
       <!-- OMLX — Current baseline -->
       <outline type="link" text="✅ OMLX — Current Maxwell baseline" 
                url="https://github.com/nlpxio/omlx"
-               description="⭐18,215 | Python | Apache-2.0 | LLM inference server with continuous batching & SSD caching. Already deployed on port 11435. 30 tok/s on Qwen3.6-35B-A3B. Works with HF cache. PROVEN, STABLE."/>
+               description="⭐18,215 | Python | Apache-2.0 | LLM inference server with continuous batching &amp; SSD caching. Already deployed on port 11435. 30 tok/s on Qwen3.6-35B-A3B. Works with HF cache. PROVEN, STABLE."/>
 
       <!-- mlx-serve — No-Python server -->
       <outline type="link" text="mlx-serve — No-Python MLX server" 

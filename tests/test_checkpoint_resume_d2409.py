@@ -162,6 +162,17 @@ def test_s5_resume_skips_verified_fbs(monkeypatch, tmp_path):
     ckpt = tmp_path / "verified.jsonl"
     monkeypatch.setattr(s5, "STAGE5_CHECKPOINT", ckpt)
 
+    # D2485: isolate the S5 input fingerprint sidecar + S4 input to tmp_path.
+    # Previously this test read/wrote the REAL `checkpoint.jsonl.input_fingerprint.json`
+    # (S5_INPUT_FINGERPRINT_PATH is a module constant, not monkeypatched) and hashed the
+    # real 2GB S4 checkpoint — order-dependent (fails when the sidecar is absent, then
+    # self-heals after the first run writes it) and pollutes the live knowledge dir.
+    s4_input = tmp_path / "s4_input.jsonl"
+    s4_input.write_text("{}\n")
+    monkeypatch.setattr(s5, "STAGE4_CHECKPOINT", s4_input)
+    monkeypatch.setattr(s5, "STAGE4_5_CHECKPOINT", tmp_path / "s4_5_absent.jsonl")
+    monkeypatch.setattr(s5, "S5_INPUT_FINGERPRINT_PATH", tmp_path / "verified.jsonl.input_fingerprint.json")
+
     fbs = [_valid_fb(f"fb_{i}") for i in range(5)]
 
     # Simulate a prior partial run that verified fb_0 (PASS) and fb_1 (QUARANTINE).
@@ -176,6 +187,7 @@ def test_s5_resume_skips_verified_fbs(monkeypatch, tmp_path):
          "needs_human_review": False, "pipeline_commit": "test"},
     ]
     s5._write_s5_checkpoint(prior)
+    s5._write_input_fingerprint()  # D2485: persist a matching fingerprint so resume is validated
 
     monkeypatch.setattr(s5, "load_stage4_fbs", lambda: fbs)
     monkeypatch.setattr(s5, "_load_dual_encoders", lambda: (None, None))

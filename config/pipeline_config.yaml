@@ -238,6 +238,8 @@ stage4:
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
   semantic_near_threshold: 0.8
+  related_fbs_max_neighbors: 20     # BUG-188: hard cap on per-FB related_fbs neighbors (bounds graph to O(n·k); was unbounded O(n²) → 32M edges → 2GB truncation)
+  related_fbs_exclude_domains: [emerging]  # BUG-188: fallback domains excluded from domain_overlap (shared fallback label ≠ meaningful relationship)
   merged_call_enabled: true
   merged_call_max_tokens: 2048   # GPT-OSS reasoning+JSON: 1024 truncated sparse (discipline/domains) → quarantine
   batch_enabled: false            # D2265 batch CRIBS — D2477 A/B: 2.67x speed BUT domain granularity degrades (12% canonical exact-match, Jaccard 0.48 vs merged). Quality-tradeoff → keep OFF for full run.

@@ -47,9 +47,9 @@
 <!-- KNOWLEDGE SOURCES -->
 <knowledge_sources>
 - CONSTITUTION.md (single source of truth, v3.0)
-- DECISION-LOG.md (all architectural decisions D2000-D2485)
+- DECISION-LOG.md (all architectural decisions D2000-D2487)
 - MASTER-TASK-REGISTER.md (task tracker)
-- config/decisions.yaml (auto-synced decision registry — 473 decisions)
+- config/decisions.yaml (auto-synced decision registry — 475 decisions)
 - governance/buglog.md (live bug register)
 - governance/aggregated_remaining_tasks.md (prioritized task register)
 - governance/folder_protocol.md (file creation rules)

@@ -1,5 +1,5 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-27
+> **Updated:** 2026-08-29
 
 ## 🚦 PRE-S4/S5/S6 COMMIT GATE — AGGREGATED CRITICAL TASKS (2026-08-27)
 
@@ -18,6 +18,16 @@
 > - **P1 emerging_real vs emerging_unmapped** — `taxonomy_match_method` no longer fabricates `emerging` from an empty/invalid raw label.
 > - **P1 post-S4 emerging gate** — `scripts/gate_emerging_rate.py` + `taxonomy.*_rate_max` (C12).
 > - **P1/P2 pipeline_commit** — `pipeline.commit` + `pipeline_manifest.pipeline_commit` `v3.0-D2370` → `v3.0-D2485`.
+
+> **📋 NEW 2026-08-29 (D2486 audit) — post-S4 examinations:**
+> - **Case-study content-type fidelity** — S2 extracted **270 `process_instance` (case-study) records** (204 convergent + 66 singleton); **0 misclassified as principle** (S4 routes them via `_resolve_content_type()` → sidecar, never folded into `principle`). But **0 of 270 reach the committed KB**: 204 excluded by value_keep scope (it selected 0 `process_instance`), 66 sidecar-routed yet uncommitted (`commit_non_fb_types: false`, D2446). ~17 principles (0.35%) carry case-study markers (years/company names in name/definition) — mostly legitimate "principle abstracted from a case"; ~5 borderline (`Bremont Company Story and Identity`, `Rothko Exhibition Experience`, `Wehrmacht As Illustration for Superforecasting`). **POST-S4 TASK:** (a) eyeball the ~17 borderline principles; (b) decide whether the 270 uncommitted case studies should enter the KB (enable `commit_non_fb_types`, or a dedicated case-study tier).
+> - **RLM/sPTC — WATCH-ONLY** (see D2486): context-rot mitigation ↔ DELEGATE-002; long-context retrieval = future-runtime hook.
+
+> **🔴 S4 COMPLETE 2026-08-30 — CONDITIONAL_SUCCESS but checkpoint TRUNCATED (BUG-188):**
+> - S4 finished: **7,874 FBs + 1,701 PT + 66 PI + 13 GE + 382 TI**; 7 failures (6 failed clusters + 1 classification error) within tolerance. Depth 546/6,541/716/71 (specialized/domain/cross-domain/universal).
+> - **❌ CRITICAL:** `t11/checkpoint.jsonl` truncated at **2GB** (dense O(n²) `related_fbs` → 32M edges → ~6.5GB → silent 2GB truncation). **~5,322 of 7,874 FBs lost (~68%).** Blocks S5.
+> - **✅ FIXED (D2487, 2026-08-30):** (1) `related_fbs` capped to O(n·k) — per-FB top-k (`related_fbs_max_neighbors=20`, priority semantic_near > source_crossover > discipline_overlap > domain_overlap) + `related_fbs_exclude_domains=[emerging]`; (2) `safe_write` now fail-loud on truncation (loops partial writes + asserts size) + new streaming `safe_write_jsonl` (byte+record-count verify). Both checkpoint write sites migrated. Unit-verified.
+> - **MUST before S5 (remaining):** (1) **re-run S4** to recover the 5,322 FBs (reuse depth pre-pass `checkpoint.jsonl.depth.json` 7,880 to skip ~4h); (2) retry the 7 failed clusters; (3) run `scripts/gate_emerging_rate.py` on the COMPLETE checkpoint (fail-closed).
 
 **🔴 MUST-FIX BEFORE S4→S5→S6 (correctness — these corrupt or silently degrade the corpus):**
 1. **BUG-181 #1 — evidence-passage contamination** (9.8% of singletons) — **GATE OPERATIONALIZED** + **DECIDED**: accept-and-flag + quarantine 29 severe at S5; fix `text_cleaner`/`stage1_3_prefilter` next corpus. (Not a full re-clean.)

@@ -3,6 +3,22 @@
 
 ---
 
+### D2487 — BUG-188 fix: S4 checkpoint 2GB truncation (fail-loud safe_write + streaming JSONL + related_fbs cap) (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** Fix the BUG-188 truncation that silently lost ~5,322/7,874 S4 FBs (checkpoint EXACTLY 2,147,483,647 bytes = 2³¹−1, ends mid-record). Root cause was a **silent failure, not an audit miss** (see root-cause section in handoff): (1) `compute_fb_relationships` built an unbounded O(n²) adjacency — `domain_overlap` fired on the ubiquitous `emerging` fallback domain, producing 32,335,994 edges (~8,200 per FB); (2) `_write_s4_checkpoint` joined all FBs into ONE multi-GB string; (3) `safe_write` ignored the `os.write` return value, so the macOS 2³¹−1-per-call cap silently dropped the tail — and `CONDITIONAL_SUCCESS` still printed (C16 fail-loud violation). **Fix (all verified):** (a) `safe_write` loops partial writes (`_write_all_bytes`) and asserts post-write `fstat` size == expected, raising `IOError` on truncation; (b) new `safe_write_jsonl` streams records line-by-line with byte+record-count verification (no multi-GB join, no memory spike); (c) `compute_fb_relationships` bounded to O(n·k) via per-FB top-k cap (`related_fbs_max_neighbors=20`) ranked `semantic_near > source_crossover > discipline_overlap > domain_overlap` with cosine tiebreak, and `related_fbs_exclude_domains=[emerging]` removes the fallback from `domain_overlap`. New config keys are C12 config-first; the two checkpoint write sites in `stage4_merge.py` now use `safe_write_jsonl`.
+- **Status:** ACTIVE — code fixed + unit-verified; S4 re-run pending (depth pre-pass reusable)
+- **Files:** `pipeline/io_guard.py`, `pipeline/stage4_merge.py`, `pipeline/pipeline_paths.py`, `config/pipeline_config.yaml`, `governance/buglog.md`
+- **Source:** Session 2026-08-30 — S4 post-completion forensic audit + fix
+
+### D2486 — RLM/sPTC external-technique evaluation (watch-only) (2026-08-29)
+**Category:** RESEARCH
+
+**Decision:** Evaluate Recursive Language Models (RLM, arXiv 2512.24601) + Speculative Programmatic Tool-Calling (sPTC, github.com/alexzhang13/spec-ptc) for Maxwell OS. **Verdict: WATCH-ONLY — do NOT integrate now.** RLM = decompose + recursively sub-query context via a REPL to beat "context rot" and process unbounded context; sPTC = speculate/queue sub-LLM calls during codegen. Two relevance hooks logged for future review: **(1) context-rot mitigation ↔ DELEGATE-002** — RLM's recursive decomposition maps to Maxwell's own decode-collapse problem (Qwen3-Coder monotonic ~6.8→0.4 tok/s as agent context grows, responses shrink to ~50-token stubs); the fix is a delegation-layer change, not S4. **(2) long-context retrieval ↔ future runtime** — RLM (GPT-5) beat ReAct+BM25 on BrowseComp-Plus with NO retriever and no degradation at 10M+ tokens, an alternative to the current sqlite-vec/FAISS/bge-m3 stack — but requires frontier-class models, violating C1/C3 (local, sovereign, 4-bit 20-30B). **Does NOT improve S4 latency** (S4 = short per-FB calls ~18-22s; RLM targets long-context reasoning, not per-record classification). `feed.opml` += `github.com/topics/rlm` + `rlms`.
+- **Status:** WATCH-ONLY (feeds added; no code change)
+- **Files:** `feed.opml`
+- **Source:** Session 2026-08-29 — external technique evaluation
+
 ### D2485 — S4→S5 launch hardening: S5 input fingerprint (P0) + is_specialized derive + emerging-real/unmapped + pipeline_commit sync (2026-08-28)
 **Category:** OPS / RELIABILITY / QUALITY
 

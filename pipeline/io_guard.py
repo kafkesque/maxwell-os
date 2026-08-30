@@ -79,18 +79,40 @@ def load_jsonl(path, *, context: str = "", fail_closed: bool = True) -> list[dic
     return records
 
 
+def _write_all_bytes(fd: int, data: bytes) -> None:
+    """Write all bytes to fd, looping to handle partial writes (C16 fail-loud).
+
+    os.write() is NOT guaranteed to write the entire buffer in one call — on
+    macOS write(2) caps a single call at 2**31-1 bytes, and the previous code
+    ignored the return value, silently truncating large files (BUG-188). Loop
+    until every byte is written; raise if a write makes no progress.
+    """
+    view = memoryview(data)
+    written_total = 0
+    while written_total < len(data):
+        n = os.write(fd, view[written_total:])
+        if n <= 0:
+            raise OSError(
+                f"os.write returned {n} after {written_total}/{len(data)} bytes — "
+                f"write stalled; refusing to leave a truncated file"
+            )
+        written_total += n
+
+
 def safe_write(path, content, shrink_guard=True, force_shrink=False):
-    """Atomic file write with shrink guard.
+    """Atomic file write with shrink guard + truncation detection (BUG-188).
 
     Args:
         path: Target file path (string or Path).
-        content: String content to write.
+        content: String or bytes content to write.
         shrink_guard: If True, refuse to replace existing file with
                       content >10% smaller (partial-state guard).
         force_shrink: Bypass shrink guard (use explicitly).
 
     Raises:
         ValueError: If shrink guard triggers and not force_shrink.
+        IOError: If the written byte count does not match the intended content
+                 (C16 fail-loud — a partial write is never silently accepted).
     """
     path = Path(path)
     content_bytes = content.encode("utf-8") if isinstance(content, str) else content
@@ -115,17 +137,98 @@ def safe_write(path, content, shrink_guard=True, force_shrink=False):
     # os.write() and the OS flush cycle corrupts the checkpoint.
     fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
     try:
-        os.write(fd, content_bytes)
+        _write_all_bytes(fd, content_bytes)
         os.fsync(fd)  # D2177: flush to physical media before close
+        # BUG-188: verify the FULL byte count landed on disk BEFORE replace.
+        st = os.fstat(fd)
+        if st.st_size != content_size:
+            raise IOError(
+                f"TRUNCATION: {path.name} wrote {st.st_size} bytes but expected "
+                f"{content_size} bytes (missing {content_size - st.st_size}). "
+                f"Refusing to replace with a partial file."
+            )
         os.close(fd)
         os.replace(tmp_path, path)
     except Exception:
-        # Clean up temp file on failure
+        # Clean up temp file on failure (fd may already be closed)
+        try:
+            os.close(fd)
+        except OSError:
+            pass
         try:
             os.unlink(tmp_path)
         except OSError:
             pass
         raise
+
+
+def safe_write_jsonl(path, records, shrink_guard=True, force_shrink=False):
+    """Stream records to a JSONL file atomically (BUG-188: no multi-GB join).
+
+    Unlike safe_write — which requires the caller to build one giant in-memory
+    string — this writes one JSON object per line incrementally to a temp file,
+    fsyncs, verifies both byte count AND record count on disk, then atomically
+    replaces the target. This is the crash-safe + fail-loud writer for large
+    JSONL checkpoints (the S4 checkpoint exceeded 2GB when built as a single
+    join string and was silently truncated).
+
+    Args:
+        path: Target JSONL path.
+        records: Iterable of dict records.
+        shrink_guard: If True, refuse to replace an existing larger file with
+                      >10% smaller content (partial-state guard).
+        force_shrink: Bypass shrink guard.
+
+    Raises:
+        ValueError: If shrink guard triggers and not force_shrink.
+        IOError: If the on-disk byte/record count does not match the records.
+
+    Returns:
+        Number of records written.
+    """
+    path = Path(path)
+    records = list(records)  # materialize for count verification (cheap: refs)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+    try:
+        expected_bytes = 0
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            for rec in records:
+                line = json.dumps(rec, ensure_ascii=False) + "\n"
+                f.write(line)
+                expected_bytes += len(line.encode("utf-8"))
+            f.flush()
+            os.fsync(f.fileno())  # D2177: flush before close
+        # fd is now closed by the fdopen context; verify bytes landed on disk
+        actual_bytes = os.stat(tmp_path).st_size
+        if actual_bytes != expected_bytes:
+            raise IOError(
+                f"TRUNCATION: {path.name} wrote {actual_bytes} bytes but expected "
+                f"{expected_bytes} bytes (missing {expected_bytes - actual_bytes})."
+            )
+        # Shrink guard (mirror safe_write)
+        if shrink_guard and not force_shrink and path.exists():
+            existing_size = path.stat().st_size
+            if existing_size > 0 and actual_bytes < existing_size * 0.9:
+                raise ValueError(
+                    f"SHRINK GUARD: {path.name} would shrink "
+                    f"{existing_size} bytes → {actual_bytes} bytes "
+                    f"({(1 - actual_bytes / existing_size) * 100:.1f}% reduction). "
+                    f"Use force_shrink=True to override."
+                )
+        os.replace(tmp_path, path)
+    except Exception:
+        try:
+            os.close(fd)
+        except OSError:
+            pass
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+    return len(records)
 
 
 def supersede_dir(path):

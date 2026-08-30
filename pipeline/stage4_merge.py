@@ -25,6 +25,7 @@ Usage:
 """
 
 import argparse
+import heapq
 import json
 import os
 import re
@@ -43,7 +44,7 @@ _CFG_PATH_S4 = Path(__file__).resolve().parent.parent / "config" / "pipeline_con
 with open(_CFG_PATH_S4) as _f:
     _PIPELINE_CFG = _yaml.safe_load(_f)
 
-from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
+from pipeline.io_guard import load_jsonl, safe_write, safe_write_jsonl  # D2332 fail-closed + BUG-188 streaming/fail-loud writer
 from pipeline.content_types import (  # D2323: config-first enum source (C12)
     CONTENT_TYPES,
     DEFAULT_CONTENT_TYPE,
@@ -70,6 +71,8 @@ from pipeline.pipeline_paths import (
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
+    S4_RELATED_FBS_EXCLUDE_DOMAINS,  # BUG-188: fallback domains excluded from domain_overlap
+    S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB related_fbs neighbor cap (bounds graph to O(n·k))
     S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: C12 compliance
     S4_TEMPORAL_SIGNALS,  # D2364/C12 (X7): temporal_scope keyword heuristics (was hardcoded)
     S4_TI_OUTPUT,
@@ -840,9 +843,41 @@ def _serialize_jargon(jargon_value) -> str | None:
 
 # ── P1.4: FB Relationship Edge Detection ──────────────────────────────────
 
+# BUG-188: relationship-type priority for the per-FB neighbor cap.
+# Lower priority = more informative edge = retained first when an FB has more
+# than S4_RELATED_FBS_MAX_NEIGHBORS candidates. semantic_near (cosine) is the
+# strongest signal; bare domain_overlap (esp. the ubiquitous "emerging" fallback)
+# is the weakest and is capped away first.
+_RELATIONSHIP_PRIORITY: dict[str, int] = {
+    "semantic_near": 0,
+    "source_crossover": 1,
+    "discipline_overlap": 2,
+    "domain_overlap": 3,
+}
+
+
+def _push_neighbor(heap: list, k: int, entry: tuple) -> None:
+    """Keep the top-k entries by goodness in a bounded min-heap (BUG-188).
+
+    entry = (goodness, neighbor_index, relationships) where goodness is the
+    comparable tuple `(-priority, similarity)` — larger is better. A min-heap
+    exposes the WORST kept entry at index 0, so when full we replace it only
+    if the candidate is better. Bounds memory to O(n·k) regardless of graph
+    density (the old unbounded O(n²) adjacency blew the checkpoint past 2GB).
+    """
+    if k <= 0:
+        return
+    if len(heap) < k:
+        heapq.heappush(heap, entry)
+    elif entry[0] > heap[0][0]:
+        heapq.heapreplace(heap, entry)
+
+
 def compute_fb_relationships(
     fbs: list[dict],
     similarity_threshold: float = S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: from config (was hardcoded 0.80)
+    max_neighbors: int = S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB cap
+    exclude_domains: set[str] | frozenset[str] | None = None,
 ) -> list[dict]:
     """Compute FB-to-FB relationships for LightRAG graph foundation.
 
@@ -853,11 +888,21 @@ def compute_fb_relationships(
       - source_crossover: FBs derived from ≥1 shared source book
       - semantic_near: Cosine similarity ≥ threshold on definition embeddings
 
+    BUG-188: the graph is bounded to O(n·k) edges — each FB keeps at most
+    `max_neighbors` neighbours, ranked semantic_near > source_crossover >
+    discipline_overlap > domain_overlap, with cosine similarity as tiebreak.
+    Fallback domains (e.g. "emerging") are excluded from domain_overlap because
+    a shared *fallback* label is not a meaningful relationship and previously
+    fabricated a near-complete graph (32M edges) that truncated the checkpoint.
+
     Writes `related_fbs` list onto each FB dict (mutates in place).
 
     Args:
         fbs: List of FB dicts (with domains, disciplines, source_books, definition).
         similarity_threshold: Cosine similarity threshold for semantic_near edges.
+        max_neighbors: Hard cap on related_fbs neighbours per FB (BUG-188).
+        exclude_domains: Fallback domains excluded from domain_overlap. Defaults
+                         to config `related_fbs_exclude_domains`.
 
     Returns:
         The same fbs list, mutated with `related_fbs` fields.
@@ -867,8 +912,11 @@ def compute_fb_relationships(
             fb.setdefault("related_fbs", [])
         return fbs
 
+    if exclude_domains is None:
+        exclude_domains = frozenset(S4_RELATED_FBS_EXCLUDE_DOMAINS)
+
     n: int = len(fbs)
-    print(f"\n🔗 Computing FB relationships for {n} FBs...")
+    print(f"\n🔗 Computing FB relationships for {n} FBs (cap {max_neighbors}/FB, excluding fallback domains {sorted(exclude_domains)})...")
 
     # Embed definitions for semantic similarity
     try:
@@ -888,9 +936,10 @@ def compute_fb_relationships(
         has_embeddings = False
         embeddings = None
 
-    # Pre-extract sets for fast comparison
+    # Pre-extract sets for fast comparison — strip fallback domains (e.g. "emerging")
+    # so a shared fallback label no longer fabricates a dense domain_overlap graph.
     fb_id_list: list[str] = [fb["fb_id"] for fb in fbs]
-    domain_sets: list[set[str]] = [set(fb.get("domains", [])) for fb in fbs]
+    domain_sets: list[set[str]] = [set(fb.get("domains", [])) - exclude_domains for fb in fbs]
     # D316: discipline is singular — wrap in set for comparison
     discipline_sets: list[set[str]] = [{fb.get("discipline", "")} if fb.get("discipline") else set() for fb in fbs]
     book_sets: list[set[str]] = [set(fb.get("source_books", [])) for fb in fbs]
@@ -899,6 +948,9 @@ def compute_fb_relationships(
     for fb in fbs:
         fb["related_fbs"] = []
 
+    # Bounded per-FB neighbour heaps (BUG-188: O(n·k) memory, not O(n²))
+    heaps: list[list] = [[] for _ in range(n)]
+
     edge_counts: dict[str, int] = {"domain_overlap": 0, "discipline_overlap": 0,
                                       "source_crossover": 0, "semantic_near": 0}
 
@@ -906,12 +958,12 @@ def compute_fb_relationships(
     if has_embeddings and embeddings is not None:
         sim_matrix: np.ndarray = embeddings @ embeddings.T
 
-    # Pairwise comparison (upper triangle)
+    # Pairwise comparison (upper triangle) → bounded per-FB neighbour heaps.
     for i in range(n):
         for j in range(i + 1, n):
             relationships: list[str] = []
 
-            # Domain overlap
+            # Domain overlap (fallback domains already stripped)
             if domain_sets[i] & domain_sets[j]:
                 relationships.append("domain_overlap")
 
@@ -928,27 +980,34 @@ def compute_fb_relationships(
                 if float(sim_matrix[i, j]) >= similarity_threshold:
                     relationships.append("semantic_near")
 
-            if relationships:
-                # Bidirectional edges
-                fbs[i]["related_fbs"].append({
-                    "fb_id": fb_id_list[j],
-                    "relationships": relationships,
-                })
-                fbs[j]["related_fbs"].append({
-                    "fb_id": fb_id_list[i],
-                    "relationships": relationships,
-                })
-                for rel in relationships:
-                    edge_counts[rel] = edge_counts.get(rel, 0) + 1
+            if not relationships:
+                continue
 
-    # Summary
-    print(f"   Domain overlap:       {edge_counts['domain_overlap']} edges")
-    print(f"   Discipline overlap:   {edge_counts['discipline_overlap']} edges")
-    print(f"   Source crossover:     {edge_counts['source_crossover']} edges")
+            # BUG-188: keep only the top-k most informative neighbours per FB.
+            priority = min(_RELATIONSHIP_PRIORITY[r] for r in relationships)
+            sim = float(sim_matrix[i, j]) if has_embeddings and embeddings is not None else 0.0
+            goodness = (-priority, sim)  # larger = better
+            _push_neighbor(heaps[i], max_neighbors, (goodness, j, relationships))
+            _push_neighbor(heaps[j], max_neighbors, (goodness, i, relationships))
+
+    # Materialize bounded neighbour lists onto each FB.
+    for i in range(n):
+        for goodness, j, relationships in sorted(heaps[i], key=lambda x: x[0], reverse=True):
+            fbs[i]["related_fbs"].append({
+                "fb_id": fb_id_list[j],
+                "relationships": relationships,
+            })
+            for rel in relationships:
+                edge_counts[rel] = edge_counts.get(rel, 0) + 1
+
+    # Summary (edge_counts are bidirectional stored entries — halve for undirected edges)
+    print(f"   Domain overlap:       {edge_counts['domain_overlap'] // 2} edges")
+    print(f"   Discipline overlap:   {edge_counts['discipline_overlap'] // 2} edges")
+    print(f"   Source crossover:     {edge_counts['source_crossover'] // 2} edges")
     if has_embeddings:
-        print(f"   Semantic near (cos≥{similarity_threshold:.2f}): {edge_counts['semantic_near']} edges")
+        print(f"   Semantic near (cos≥{similarity_threshold:.2f}): {edge_counts['semantic_near'] // 2} edges")
 
-    total_edges: int = sum(edge_counts.values())
+    total_edges: int = sum(edge_counts.values()) // 2
     isolated: int = sum(1 for fb in fbs if not fb["related_fbs"])
     print(f"   Total edges: {total_edges} | Isolated FBs: {isolated}/{n}")
 
@@ -1048,9 +1107,14 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
         processed_ids: Cluster IDs already appended (successful + quarantined-classification).
         scalar_state: dict of {classification_errors, name_collisions}.
     """
-    content = "\n".join(json.dumps(f, ensure_ascii=False) for f in fbs) + "\n"
-    safe_write(STAGE4_CHECKPOINT, content, force_shrink=True)
-    load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint self-check")  # raises if corrupt
+    # BUG-188: stream + verify byte/record count instead of building one multi-GB join string.
+    safe_write_jsonl(STAGE4_CHECKPOINT, fbs, force_shrink=True)
+    loaded = load_jsonl(STAGE4_CHECKPOINT, context="S4 checkpoint self-check")  # raises if corrupt
+    if len(loaded) != len(fbs):
+        raise IOError(
+            f"S4 checkpoint record-count mismatch: wrote {len(fbs)} FBs but read "
+            f"{len(loaded)} — partial write/truncation, refusing to continue"
+        )
 
     segids_file = str(STAGE4_CHECKPOINT) + ".segids"
     segids_tmp = tempfile.NamedTemporaryFile(
@@ -1970,11 +2034,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     if len(fbs) > 1:
         compute_fb_relationships(fbs)
 
-    # Write FB checkpoint
-    safe_write(
-        STAGE4_CHECKPOINT,
-        "\n".join(json.dumps(f, ensure_ascii=False) for f in fbs) + "\n",
-    )
+    # Write FB checkpoint — BUG-188: stream + verify count (no multi-GB join string)
+    safe_write_jsonl(STAGE4_CHECKPOINT, fbs)
 
     # D2370: clear resume sidecars — a completed run must not read as a partial resume
     for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-28T15:05:00Z'
-total_decisions: 473
+total_decisions: 475
 decisions:
 - id: D2092
   category: INF
@@ -4832,11 +4832,50 @@ decisions:
   - DECISION-LOG.md
   - AGENTS.md
   created: '2026-08-28'
+- id: D2486
+  category: RESEARCH
+  state: ACTIVE
+  description: 'RLM (Recursive Language Models, arXiv 2512.24601) + sPTC (Speculative
+    Programmatic Tool-Calling) external-technique evaluation — WATCH-ONLY, do NOT
+    integrate. Two relevance hooks: (1) context-rot mitigation maps to DELEGATE-002
+    (Qwen3-Coder monotonic decode collapse ~6.8->0.4 tok/s as agent context grows);
+    (2) long-context retrieval-without-retriever (BrowseComp-Plus) is a future alternative
+    to sqlite-vec/FAISS/bge-m3 but needs frontier-class models, violating C1/C3. Does
+    NOT improve S4 latency (S4 = short per-FB calls). Added github.com/topics/rlm +
+    rlms to feed.opml.'
+  champion: goose
+  target_files:
+  - feed.opml
+  created: '2026-08-29'
+- id: D2487
+  category: OPS / RELIABILITY
+  state: ACTIVE
+  description: 'BUG-188 fix — S4 checkpoint.jsonl truncated at 2GB (2**31-1). Root
+    cause: compute_fb_relationships built an unbounded O(n^2) domain_overlap graph
+    (32,335,994 edges from the ubiquitous "emerging" fallback domain) and _write_s4_checkpoint
+    joined it into ONE giant string that safe_write silently truncated (os.write return
+    value ignored — C16 fail-loud violation; process still printed CONDITIONAL_SUCCESS).
+    Fix (verified): (1) io_guard.safe_write loops partial writes (_write_all_bytes) and
+    asserts post-write size == expected (raises IOError on truncation); (2) new
+    io_guard.safe_write_jsonl streams records line-by-line + verifies byte AND record
+    count (no multi-GB join); (3) compute_fb_relationships bounded to O(n*k) via per-FB
+    top-k cap (config related_fbs_max_neighbors=20) with priority semantic_near >
+    source_crossover > discipline_overlap > domain_overlap, and excludes fallback domains
+    (related_fbs_exclude_domains=[emerging]) from domain_overlap. S4 must be re-run to
+    recover ~5,322 lost FBs (depth pre-pass checkpoint reusable to skip ~4h).'
+  champion: goose
+  target_files:
+  - pipeline/io_guard.py
+  - pipeline/stage4_merge.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  - governance/buglog.md
+  created: '2026-08-30'
 summary:
-  total: 473
+  total: 475
   proposed: 0
   draft: 1
-  active: 414
+  active: 416
   stale: 0
   superseded: 15
   archived: 8
@@ -4893,7 +4932,7 @@ summary:
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / QUALITY: 2
-    OPS / RELIABILITY: 3
+    OPS / RELIABILITY: 4
     PERF: 11
     PERF / BUGFIX: 1
     PRD: 1
@@ -4907,6 +4946,7 @@ summary:
     QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
     RES: 4
+    RESEARCH: 1
     RESILIENCE / QUALITY: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1

@@ -59,6 +59,7 @@ triad:
     python3 pipeline/stage1_5_embed_cluster.py
     python3 pipeline/stage2_extract.py
     python3 pipeline/stage4_merge.py
+    python3 scripts/gate_emerging_rate.py || exit 1
     python3 pipeline/stage5_verify.py
     python3 pipeline/stage6_commit.py
     python3 pipeline/status.py
@@ -186,6 +187,12 @@ stage5:
     python3 pipeline/stage5_verify.py
 stage6:
     python3 pipeline/stage6_commit.py
+
+# D2485 (D2491): post-S4 emerging-rate gate (BUG-150) — fail-closed between S4 and S5.
+# Measures discipline/domain/unmapped emerging rates; exit 1 if any exceed config
+# thresholds (config/pipeline_config.yaml → taxonomy.*). Never promote stale labels.
+gate-emerging:
+    python3 scripts/gate_emerging_rate.py
 
 # ── Export & Backup ───────────────────────────────────────────
 export:

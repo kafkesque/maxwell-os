@@ -137,13 +137,40 @@ _S2_INPUT_FINGERPRINT: str | None = None
 
 
 def _s2_input_fingerprint(run_id: str) -> str:
+    """BUG-183/D2491: content-hash the S4 input corpus, not size/mtime.
+
+    The prior fingerprint used (run_id + file size + mtime_ns). That is fragile:
+    Dropbox sync, `touch`, or `mv` can change mtime (or size reporting) without
+    changing content, so a stale checkpoint could be silently accepted or a fresh
+    one falsely rejected. Hashing the BYTE CONTENT of the S2 checkpoints plus the
+    pipeline identity (schema, taxonomy, commit, manifest, model lineup) binds the
+    S4 checkpoint to the exact input it merged — any regeneration OR config/model
+    drift is detected fail-closed.
+    """
     import hashlib
-    from pipeline.pipeline_paths import STAGE2_SINGLETON_OUTPUT
-    parts = [run_id or ""]
+    from pipeline.pipeline_paths import (
+        SCHEMA_VERSION,
+        STAGE2_SINGLETON_OUTPUT,
+        TAXONOMY_VERSION,
+    )
+    from pipeline.stamp import get_manifest_hash
+
+    parts: list[str] = [
+        f"run_id={run_id or ''}",
+        f"schema_version={SCHEMA_VERSION}",
+        f"taxonomy_version={TAXONOMY_VERSION}",
+        f"pipeline_commit={get_pipeline_commit()}",
+        f"manifest_hash={get_manifest_hash()}",
+        f"gen_model={GEN_MODEL}",
+        f"classify_model={VERIFY_MODEL}",
+    ]
     for _p in (STAGE2_CHECKPOINT, STAGE2_SINGLETON_OUTPUT):
         try:
-            _st = _p.stat()
-            parts.append(f"{_p.name}:{_st.st_size}:{_st.st_mtime_ns}")
+            h = hashlib.sha256()
+            with open(_p, "rb") as _fh:
+                for _chunk in iter(lambda: _fh.read(1 << 20), b""):
+                    h.update(_chunk)
+            parts.append(f"{_p.name}:sha256:{h.hexdigest()}")
         except OSError:
             parts.append(f"{_p.name}:missing")
     return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]

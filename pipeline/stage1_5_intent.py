@@ -42,11 +42,17 @@ from pipeline.stamp import get_pipeline_run_id
 # ── Embedding helper ──────────────────────────────────────────────────
 
 def embed_texts(texts: list[str], model: str = None) -> list[list[float]]:
-    """Batch-embed texts via Ollama. Returns list of embedding vectors."""
+    """Batch-embed texts via Ollama. Returns list of embedding vectors.
+
+    C16 (D2491): a failed embedding is LOGGED (index + reason) and returned as an
+    empty list so callers can distinguish "unscored" from a genuine zero-vector.
+    Previously an embedding failure was appended as ``[]`` with no log, so a chunk
+    silently scored 0.0 (and could be dropped by the intent filter) with no trace.
+    """
     if model is None:
         model = EMBED_MODEL
-    embeddings = []
-    for text in texts:
+    embeddings: list[list[float]] = []
+    for i, text in enumerate(texts):
         try:
             r = requests.post(
                 f"{OLLAMA_URL}/api/embeddings",
@@ -54,11 +60,16 @@ def embed_texts(texts: list[str], model: str = None) -> list[list[float]]:
                 timeout=30,
             )
             if r.status_code == 200:
-                embeddings.append(r.json()["embedding"])
-            else:
-                embeddings.append([])
-        except Exception:
-            embeddings.append([])
+                payload = r.json()
+                emb = payload.get("embedding")
+                if emb:
+                    embeddings.append(emb)
+                    continue
+                raise ValueError(f"embedding field missing from response: {list(payload)[:6]!r}")
+            print(f"   ⚠️  embed[{i}] HTTP {r.status_code}: {r.text[:200]!r} (C16)", file=sys.stderr)
+        except Exception as e:
+            print(f"   ⚠️  embed[{i}] failed: {type(e).__name__}: {e} (C16)", file=sys.stderr)
+        embeddings.append([])
     return embeddings
 
 

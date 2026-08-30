@@ -387,15 +387,21 @@ def main() -> None:
             sys.exit(1)
 
         print(f"  📖 Loading FBs from: {ckpt_path}")
+        bad_lines = 0
         with open(ckpt_path) as f:
-            for line in f:
+            for line_no, line in enumerate(f, 1):
                 line = line.strip()
                 if line:
                     try:
                         fbs.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        pass
+                    except json.JSONDecodeError as e:
+                        bad_lines += 1
+                        print(f"   ⚠️  OKF export: malformed JSON on line {line_no}: {e} "
+                              f"(skipped; {bad_lines} bad line(s) so far) (C16)", file=sys.stderr)
         print(f"     → {len(fbs)} FBs loaded from checkpoint")
+        if bad_lines:
+            print(f"     ⚠️  {bad_lines} line(s) skipped as malformed JSON — "
+                  f"OKF export is INCOMPLETE (C16, D2491)", file=sys.stderr)
 
     elif args.source == "sqlite":
         import sqlite3

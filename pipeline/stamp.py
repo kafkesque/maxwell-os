@@ -21,6 +21,7 @@ Usage:
 import hashlib
 import json
 import subprocess
+import sys
 import uuid
 from datetime import UTC, datetime
 from functools import wraps
@@ -55,8 +56,14 @@ def get_git_commit() -> str:
         if result.returncode == 0:
             _GIT_COMMIT = result.stdout.strip()
             return _GIT_COMMIT
-    except Exception:
-        pass
+        # C16 (D2491): non-zero exit was previously swallowed silently → R14
+        # provenance stamped "unknown" with no trace.
+        print(f"   ⚠️  git rev-parse exited {result.returncode}: "
+              f"{result.stderr.strip()[:200]!r} — falling back to 'unknown' (C16)",
+              file=sys.stderr)
+    except Exception as e:
+        print(f"   ⚠️  git rev-parse raised {type(e).__name__}: {e} — "
+              f"falling back to 'unknown' (C16)", file=sys.stderr)
     _GIT_COMMIT = "unknown"
     return _GIT_COMMIT
 

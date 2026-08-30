@@ -2996,7 +2996,12 @@ def process_singletons(
         if isinstance(sid_raw, str):
             try:
                 sid_list = ast.literal_eval(sid_raw)
-            except Exception:
+            except Exception as e:
+                # C16 (D2491): malformed segment_ids was silently coerced to [],
+                # which silently dropped the singleton's principles with no trace.
+                print(f"   ⚠️  singleton {cid!r} has malformed segment_ids "
+                      f"{sid_raw[:120]!r}: {type(e).__name__}: {e} — skipping (C16)",
+                      file=sys.stderr)
                 sid_list = []
         else:
             sid_list = sid_raw
@@ -3025,7 +3030,13 @@ def process_singletons(
         try:
             result = call_llm(prompt, SINGLETON_SYSTEM, GEN_MODEL, provider,
                               few_shot=ss_few_shot_text if ss_few_shot_text else None)
-        except Exception:
+        except Exception as e:
+            # C16 (D2491): an LLM transport/parse crash was silently conflated
+            # with "no result" (both returned None). None is still handled
+            # correctly downstream (NOT marked processed → re-enters on resume),
+            # but the failure must be visible.
+            print(f"   ⚠️  singleton LLM call failed (will re-enter on resume): "
+                  f"{type(e).__name__}: {e} (C16)", file=sys.stderr)
             return None
         if result is None:
             return None

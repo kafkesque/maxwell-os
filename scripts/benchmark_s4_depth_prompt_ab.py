@@ -144,6 +144,8 @@ def atomic_write(path: Path, text: str) -> None:
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(text)
+            f.flush()
+            os.fsync(f.fileno())  # D2177/D2487: flush to disk before replace
         os.replace(tmp, path)
     finally:
         if os.path.exists(tmp):

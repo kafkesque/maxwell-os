@@ -28,6 +28,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))  # allow `pipeline.*` imports from tools/
+from pipeline.io_guard import safe_write  # D2487: atomic + fsync + fail-loud
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 OUT_PATH = PROJECT_ROOT / "governance" / "s4_depth_frugal_benchmark.json"
 
@@ -166,8 +167,7 @@ def main() -> None:
         },
         "results": results,
     }
-    with open(OUT_PATH, "w") as f:
-        json.dump(out, f, indent=2)
+    safe_write(OUT_PATH, json.dumps(out, indent=2), force_shrink=True)  # D2487: fsync + atomic
     print(f"\nResults saved to {OUT_PATH}")
 
 

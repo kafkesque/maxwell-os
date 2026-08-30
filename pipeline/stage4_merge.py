@@ -1129,6 +1129,7 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
     except Exception:
         if os.path.exists(segids_tmp.name):
             os.unlink(segids_tmp.name)
+        raise  # C16: sidecar write failure must be loud (stale resume state = silent corruption)
 
     state_file = str(STAGE4_CHECKPOINT) + ".state.json"
     state_tmp = tempfile.NamedTemporaryFile(
@@ -1148,6 +1149,7 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
     except Exception:
         if os.path.exists(state_tmp.name):
             os.unlink(state_tmp.name)
+        raise  # C16: sidecar write failure must be loud (stale resume state = silent corruption)
 
 
 def _stamp_sidecar(rec: dict, pipeline_run_id: str, pipeline_commit: str) -> dict:

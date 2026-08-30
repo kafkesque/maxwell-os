@@ -72,6 +72,22 @@
 - **F3 — `related_fbs` O(n²) is the root-size cause:** 32,335,994 edges (ubiquitous `emerging` domain).
   Now capped to 20/FB → ~34.7MB at 7,874 FBs.
 
-## 4. Delegate audit results (appended)
+## 4. Delegate audit results (3 read-only forensic subagents, 2026-08-30)
 
-*(pending — three read-only forensic audits running)*
+### 4a. Silent-exception audit (C16) — 4 HIGH + pervasive config-fallback pattern
+- **HIGH (data corruption/loss, BUG-188 analog):** `stage1_5_intent.py:60` (embedding failure → empty vector consumed as real data); `stage2_extract.py:2999` (malformed segment_ids → silently dropped); `stage6_okf_export.py:396` (bad line → silently skipped, count under-reports); `stage2_extract.py:3028` (LLM crash vs no-result indistinguishable).
+- **Pervasive C12+C16 pattern:** config-read failures return hardcoded fallbacks with no log — `stage4_merged_call.py:140/146/574/584/717/837/845/851/861`, `stamp.py:58` (git → `"unknown"`, breaks R14), `stamp.py:112`, `stage1_3_prefilter.py:77`, `stage2_extract.py:694`, `hybrid_gate.py:46`, `runner.py:329`, `stage6_commit.py:310`, `config_audit.py:143/187`, `model_lazyload.py:109`.
+- ~18 minor C16 (state/status/DB/provenance silent degradation).
+
+### 4b. Checkpoint write→read boundary audit
+- **1 true silent-acceptance reader:** `stage0_convert.py:160-162` `load_existing_checkpoint` (`except JSONDecodeError: continue`) — S0 resume silently skips corrupt lines.
+- **2 non-atomic writers bypassing io_guard:** `stage1_5_fastembed.py:214`, `stage1_5_domain_cluster.py:236-239` (plain `open(...,"w")` loop). **NOT on the active path** — `justfile stage1_5` uses `stage1_5_embed_cluster.py` (safe_write).
+- **Universal blind spot:** clean record-boundary truncation (whole trailing records dropped at a `\n`) is undetectable at every read boundary — only `_write_s4_checkpoint` does a write-side record-count self-check. No downstream reader validates against an expected total.
+
+### 4c. Silent-truncation audit (BUG-188 class)
+- **TIER 1 (non-atomic `open(...,"w")` checkpoint writes):** `bridge_s2_to_s4.py:68` (writes the S4 checkpoint, but it's a standalone one-off converter, NOT the active `stage4_merge.py` path); `stage1_5_fastembed.py:214/219`; `stage1_5_domain_cluster.py:236/239`; `probe_run.py:264/123`; `stage0_5_extract_metadata.py:400`; `golden_sampler.py:264`; `run_diagnostic.py:348`.
+- **TIER 2 (missing fsync before replace, D2177):** `scripts/benchmark_s4_depth_prompt_ab.py:142-147`.
+- **TIER 3 (giant `"\n".join` + buffered write, no byte/record verify — defense-in-depth):** `scripts/fix_residual_violations.py:112/119`, `fix_singleton_48_posthoc.py:183/201`, `fix_singleton_quality.py:170`, `fix_s2_posthoc.py:95`, `rerun_s2_targeted.py:194/211/157`.
+
+### 4d. Verdict for the S4 re-run
+The active S2→S4→S5→S6 path is **fail-closed** (fixed `safe_write`/`safe_write_jsonl` + `load_jsonl` readers). The findings above are **real but mostly off the active path** (alternate S1.5 impls, one-off scripts, post-hoc fixers, latent config-read fallbacks). Priority for follow-up (MUST before next full corpus pass, not blocking the S4 re-run): convert the 7 Tier-1 non-atomic writers to `safe_write_jsonl`; fix the 1 S0 silent-resume reader; add fsync to the benchmark script; add a record-count/trailing-record verification to the universal read-side blind spot.

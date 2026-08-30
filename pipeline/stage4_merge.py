@@ -1267,6 +1267,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # fail-closed gate must divide failures by the FULL cluster count, not the
     # remaining-after-resume subset (which would understate the failure ratio).
     total_clusters: int = len(clusters)
+    # D2496: authoritative expected FB count (S2-derived) — the number of principle
+    # clusters S4 MUST turn into FBs. Computed pre-resume (full corpus) so a resume
+    # cannot understate the expectation, and INDEPENDENT of the on-disk record_count
+    # so S5 can detect a silent S4-side drop (clusters skipped, not truncated).
+    expected_fb_count: int = sum(
+        1
+        for _c in clusters
+        if len([_pid for _pid in _c.get("principle_ids", [])
+                if _pid in principles_idx
+                and _resolve_content_type(principles_idx[_pid]) == DEFAULT_CONTENT_TYPE]) == 1
+    )
 
     # ── D2370: intra-stage resume (crash recovery for the long serial S4) ──
     # Mirrors S2's D2154 resume block: reload the partial checkpoint + segids and
@@ -2086,10 +2097,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             # D2337: surface taxonomy match method (D2310 diagnostic, was computed then discarded)
             "taxonomy_match_method": class_data.get("taxonomy_match_method"),
         }
-        # Only include jargon when specialized terms need explanation
-        jargon_val = _serialize_jargon(fb_data.get("jargon"))
-        if jargon_val:
-            fb["jargon"] = jargon_val
+        # D2496/BUG-187: always emit jargon — omit-when-empty was the schema-drift
+        # source (key absent vs key present-empty). None when no specialized terms.
+        fb["jargon"] = _serialize_jargon(fb_data.get("jargon"))
         fb = stamp_record(fb, gen_model=GEN_MODEL, classify_model=VERIFY_MODEL)  # D2476
         fb["pipeline_run_id"] = pipeline_run_id
         fb["pipeline_commit"] = pipeline_commit
@@ -2116,6 +2126,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
 
     # Write FB checkpoint — BUG-188: stream + verify count (no multi-GB join string)
     safe_write_jsonl(STAGE4_CHECKPOINT, fbs)
+
+    # D2496: persist the authoritative expected count so S5's preflight can assert
+    # on-disk == S2-derived expectation (catches a silent S4-side record DROP).
+    # Written AFTER the checkpoint and NOT deleted below (survives completion).
+    _expected_count_path = str(STAGE4_CHECKPOINT) + ".expected_count.json"
+    safe_write(_expected_count_path, json.dumps({
+        "expected_fb_count": expected_fb_count,
+        "s2_input_fingerprint": _S2_INPUT_FINGERPRINT,
+        "pipeline_run_id": pipeline_run_id,
+        "written_at": time.time(),
+    }, indent=2))
 
     # D2370: clear resume sidecars — a completed run must not read as a partial resume
     for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",

@@ -23,8 +23,11 @@ Usage:
 """
 
 import csv
+import io
 from collections import Counter
 from pathlib import Path
+
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 
 def route_fb_folder(fb: dict) -> str:
@@ -124,16 +127,17 @@ def export_raw_label_report(fbs: list[dict], output_path: Path):
     counts = count_raw_labels(fbs)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["raw_label", "count", "pct_of_total", "recommendation"])
-        for label, count in counts.items():
-            pct = (count / total * 100) if total else 0
-            rec = ""
-            if pct >= 10:
-                rec = "REVIEW — consider adding to taxonomy"
-            elif pct >= 5:
-                rec = "WATCH — accumulating"
-            writer.writerow([label, count, f"{pct:.1f}%", rec])
+    _buf = io.StringIO()
+    writer = csv.writer(_buf)
+    writer.writerow(["raw_label", "count", "pct_of_total", "recommendation"])
+    for label, count in counts.items():
+        pct = (count / total * 100) if total else 0
+        rec = ""
+        if pct >= 10:
+            rec = "REVIEW — consider adding to taxonomy"
+        elif pct >= 5:
+            rec = "WATCH — accumulating"
+        writer.writerow([label, count, f"{pct:.1f}%", rec])
+    safe_write(output_path, _buf.getvalue())  # D2496: C6 crash-safe
 
     return output_path

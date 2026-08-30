@@ -248,19 +248,43 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
 
 # ── Core verification functions ────────────────────────────────────────────
 
+def _load_expected_fb_count(source: Path) -> int | None:
+    """D2496: read the authoritative expected FB count S4 persisted at completion.
+
+    Looked up next to the source checkpoint first (S4.5 enrichment output), then next
+    to the plain S4 checkpoint (enrichment preserves record count). Returns None when
+    absent so the preflight degrades to the manifest-only check (no hard failure on
+    legacy checkpoints that predate the sidecar).
+    """
+    candidates = [Path(str(source) + ".expected_count.json")]
+    if source != STAGE4_CHECKPOINT:
+        candidates.append(Path(str(STAGE4_CHECKPOINT) + ".expected_count.json"))
+    for c in candidates:
+        if c.exists():
+            try:
+                return int(json.loads(c.read_text(encoding="utf-8")).get("expected_fb_count"))
+            except (ValueError, TypeError, KeyError, json.JSONDecodeError) as e:
+                print(f"   ⚠️  Expected-count sidecar unreadable {c.name}: {e} (C16)", file=sys.stderr)
+                return None
+    return None
+
+
 def _preflight_gate(source: Path) -> None:
     """D2490: BUG-188 checkpoint boundary + sha256 gate before S5 consumes S4.
 
     Runs scripts/preflight_checkpoint_check.py --check (D2487): verifies every
     line is standalone JSON + newline-terminated, and — when a manifest exists —
-    that sha256 + record_count match. Fail-closed: a truncated / pretty-printed /
-    corrupt checkpoint aborts S5 instead of being silently mis-read.
+    that sha256 + record_count match. D2496: also asserts on-disk count == the
+    authoritative S2-derived expected count (independent of the self-referential
+    manifest) so a silent S4-side record DROP fails closed. Fail-closed: a
+    truncated / pretty-printed / corrupt / short checkpoint aborts S5.
     """
     preflight = Path(__file__).resolve().parent.parent / "scripts" / "preflight_checkpoint_check.py"
-    r = subprocess.run(
-        [sys.executable, str(preflight), "--check", str(source)],
-        capture_output=True, text=True,
-    )
+    cmd = [sys.executable, str(preflight), "--check", str(source)]
+    expected_count: int | None = _load_expected_fb_count(source)
+    if expected_count is not None:
+        cmd += ["--expect-count", str(expected_count)]
+    r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         print(f"🛑 Preflight checkpoint gate FAILED for {source.name}:")
         print(r.stdout + r.stderr)
@@ -514,6 +538,40 @@ def _write_input_fingerprint() -> None:
 
 # ── Main ────────────────────────────────────────────────────────────────────
 
+# D2496/BUG-181#1: severe evidence-contamination threshold — matches the
+# scripts/audit_evidence_cleanliness.py "severe" cutoff (artifact-char ratio > 0.15).
+EVIDENCE_CONTAMINATION_RATIO: float = 0.15
+
+
+def _evidence_cleanliness_gate(fbs: list[dict]) -> set[str]:
+    """D2496/BUG-181#1: quarantine FBs whose evidence_passages carry EPUB→MD
+    conversion artifacts (CSS fragments, {=html} markers, image placeholders).
+
+    S5 DeBERTa NLI verifies against evidence_passages; verifying against garbage
+    yields meaningless scores and lets contaminated records PASS into S6. Severe
+    contamination must QUARANTINE instead. Returns the set of fb_ids to quarantine.
+    """
+    scripts_dir = Path(__file__).resolve().parent.parent / "scripts"
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    try:
+        import audit_evidence_cleanliness as _evc  # noqa: PLC0415 — deferred, standalone audit tool
+    except Exception as e:  # noqa: BLE001 — C16: fail-loud, never silent
+        print(f"   ⚠️  Evidence-cleanliness gate unavailable ({type(e).__name__}: {e}) — NOT enforcing BUG-181#1 (C16)", file=sys.stderr)
+        return set()
+    contaminated: set[str] = set()
+    for fb in fbs:
+        for ep in fb.get("evidence_passages") or []:
+            _matched, ratio = _evc.classify_passage(ep)
+            if ratio > EVIDENCE_CONTAMINATION_RATIO:
+                contaminated.add(fb.get("fb_id", ""))
+                break
+    if contaminated:
+        print(f"   🧼 BUG-181#1 evidence gate: {len(contaminated)} FB(s) with severe "
+              f"EPUB→MD evidence contamination → QUARANTINE (no NLI)")
+    return contaminated
+
+
 def _write_s5_checkpoint(verified: list[dict]) -> None:
     """Serialize verified FBs to the S5 checkpoint (fail-closed JSONL, crash-safe).
 
@@ -533,6 +591,10 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage4_fbs()
+
+    # D2496/BUG-181#1: evidence-cleanliness gate — quarantine severe EPUB→MD
+    # evidence contamination before any NLI (verifying against garbage is meaningless).
+    severe_evidence_ids: set[str] = _evidence_cleanliness_gate(fbs)
 
     # ── D2409: intra-stage resume (crash recovery for the serial S5) ───────
     # Reload the partial checkpoint and skip already-verified FBs instead of
@@ -636,6 +698,12 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             fact_score = 0.0
             fact_detail = f"S4 classification FAILED: {str(fb.get('classification_error', 'unknown'))[:120]}"
             method = "classification_failed"
+        elif fb.get("fb_id") in severe_evidence_ids:
+            # D2496/BUG-181#1: contaminated evidence → QUARANTINE, skip NLI
+            fact_passed = False
+            fact_score = 0.0
+            fact_detail = "BUG-181#1: evidence_passages carry EPUB→MD conversion artifacts — QUARANTINE (no NLI)"
+            method = "evidence_contaminated"
         elif not mech_passed:
             # Tautological mechanism → auto-quarantine
             fact_passed = False

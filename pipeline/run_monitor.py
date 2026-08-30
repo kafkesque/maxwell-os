@@ -33,6 +33,7 @@ from pathlib import Path
 
 # D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
 from pipeline.pipeline_paths import DATA_DIR
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 METRICS_DIR = DATA_DIR / "metrics"
@@ -281,8 +282,7 @@ def monitor_run(cmd: list[str], run_id: str | None = None) -> dict:
 
     # Write per-run metrics
     run_file = METRICS_DIR / f"{run_id}.json"
-    with open(run_file, "w") as f:
-        json.dump(report, f, indent=2, default=str)
+    safe_write(run_file, json.dumps(report, indent=2, default=str))  # D2496: C6
 
     # Append to history
     history_file = METRICS_DIR / "run_history.jsonl"
@@ -342,8 +342,7 @@ def main():
     report = monitor_run(args.cmd, run_id=args.run_id)
 
     if args.output:
-        with open(args.output, "w") as f:
-            json.dump(report, f, indent=2, default=str)
+        safe_write(args.output, json.dumps(report, indent=2, default=str))  # D2496: C6
         print(f"Report saved to: {args.output}")
 
     sys.exit(report["exit_code"])

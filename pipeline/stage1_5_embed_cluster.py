@@ -158,8 +158,8 @@ def load_segments() -> list[dict]:
             flag_data = json.loads(prefilter_flag.read_text().strip())
             if flag_data.get("completed"):
                 print(f"   ✅ Stage 1.3 prefilter completed ({flag_data.get('kept', '?')}/{flag_data.get('total', '?')} kept)")
-        except (json.JSONDecodeError, KeyError):
-            pass
+        except (json.JSONDecodeError, KeyError) as e:
+            print(f"   ⚠️  Stage 1.3 prefilter flag unreadable ({type(e).__name__}: {e}) — falling through to STAGE1_CHECKPOINT (C16)", file=sys.stderr)
         # Fall through to load from STAGE1_CHECKPOINT (which IS the filtered output)
 
     if STAGE1_CHECKPOINT.exists():

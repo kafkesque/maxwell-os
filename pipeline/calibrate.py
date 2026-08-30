@@ -12,6 +12,10 @@ Usage:
 import json
 import os
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 WORKBOOK = "governance/calibration_D2293_workbook.json"
 PROGRESS = "governance/calibration_D2293_progress.json"
@@ -27,8 +31,7 @@ def load_progress():
     return {}
 
 def save_progress(progress):
-    with open(PROGRESS, "w") as f:
-        json.dump(progress, f, indent=2)
+    safe_write(PROGRESS, json.dumps(progress, indent=2))  # D2496: C6
 
 def display_fb(fb, index, total):
     """Display one FB for adjudication."""

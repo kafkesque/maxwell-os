@@ -58,6 +58,10 @@ class StampedRecord(BaseModel):
         description="UUID identifying a single pipeline run. All records from the same run share this ID."
     )
     taxonomy_version: str = Field(default="v5.0")
+    manifest_hash: str | None = Field(
+        default=None,
+        description="Config+prompt manifest fingerprint (D2282), stamped by stamp_record().",
+    )
     created_at: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat() + "Z"
     )
@@ -348,9 +352,31 @@ class FB(StampedRecord):
         default_factory=list,
         description="Principle IDs from Stage 2. Source texts retrieved on-demand, not embedded (D2130: was source_principles)."
     )
+    # D2496/BUG-187: fields S4 emitted for years but were absent from the contract
+    # (C27 future-tax). Re-added so schema/SQLite/Pydantic stay aligned.
+    source_segments: list[str] = Field(
+        default_factory=list,
+        description="Segment IDs that sourced this FB (D2352/BUG-110 provenance, carried by S4).",
+    )
+    evidence_passages: list[str] = Field(
+        default_factory=list,
+        description="Verbatim source passages this FB is grounded in (S5 NLI premise, BUG-181).",
+    )
+    evidence_passages_shown: list[str] = Field(
+        default_factory=list,
+        description="Subset of evidence_passages actually shown to the S2 LLM.",
+    )
+    is_summary: bool = Field(
+        default=False,
+        description="True if S2 judged the passage a pure restatement (no extractable principle, D2352/BUG-112).",
+    )
     classification_errors: list[str] | None = Field(
         default=None,
         description="Label validation errors. None if classification was clean."
+    )
+    classification_error: str | None = Field(
+        default=None,
+        description="Singular classification failure reason (D2351), e.g. invalid depth fallback.",
     )
     classification_status: str = Field(
         default="CLEAN",
@@ -360,6 +386,11 @@ class FB(StampedRecord):
         default=None,
         description="D2310/D2337/D2485: how the canonical discipline/domain was matched — "
                     "exact | synonym | emerging_real | emerging_unmapped.",
+    )
+    classify_model: str | None = Field(
+        default=None,
+        description="Classifier model that labelled this record (D2476, gpt-oss-20b). "
+                    "Distinct from gen_model per R5.",
     )
 
     @field_validator("domains")

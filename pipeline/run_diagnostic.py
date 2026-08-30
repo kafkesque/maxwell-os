@@ -36,7 +36,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 os.chdir(str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT))
-from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
+from pipeline.io_guard import safe_write, safe_write_jsonl  # D2487: atomic writes
 
 # ── Load pipeline config for defaults (before Maxwell imports) ─────────
 import yaml as _yaml
@@ -451,11 +451,13 @@ def run_diagnostic() -> dict:
             if args.s4_limit and s4.STAGE2_CHECKPOINT.exists():
                 _limited = s4.STAGE2_CHECKPOINT.parent / "checkpoint_limited.jsonl"
                 _n = 0
-                with open(s4.STAGE2_CHECKPOINT) as fin, open(_limited, "w") as fout:
+                _buf: list[str] = []
+                with open(s4.STAGE2_CHECKPOINT) as fin:
                     for _n, line in enumerate(fin):
                         if _n >= args.s4_limit:
                             break
-                        fout.write(line)
+                        _buf.append(line)
+                safe_write(_limited, "".join(_buf))  # D2496: C6 crash-safe
                 s4.STAGE2_CHECKPOINT = _limited
                 print(f"🔢 S4 limited to {min(args.s4_limit, _n)} FBs")
             # D2226/D2263: merged call via config (C12)
@@ -929,11 +931,8 @@ def main() -> None:
     print(f"\n📝 Generating report: {report_path}")
     report = generate_report(summary, s5_fbs)
 
-    with open(report_path, "w") as f:
-        f.write(report)
-
-    with open(summary_path, "w") as f:
-        json.dump(summary, f, indent=2, ensure_ascii=False, default=str)
+    safe_write(report_path, report)  # D2496: C6 crash-safe
+    safe_write(summary_path, json.dumps(summary, indent=2, ensure_ascii=False, default=str))  # D2496: C6
 
     # ── Step 7: Print summary ───────────────────────────────────────────
     print(f"\n{'='*60}")

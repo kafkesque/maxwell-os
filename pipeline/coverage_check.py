@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write_jsonl  # D2496: C6 crash-safe JSONL writes
 
 from pipeline.pipeline_paths import (
     COVERAGE_FLAG_FRACTION,
@@ -126,9 +127,7 @@ def main():
         for r in sorted(flagged, key=lambda x: -x["under_covered_fraction"])[:10]:
             print(f"  [{r['under_covered_fraction']*100:.0f}%] {r['name'][:55]} ({r['under_covered']}/{r['total_segments']} segs)")
         if args.output:
-            with open(args.output, "w") as f:
-                for r in flagged:
-                    f.write(json.dumps(r) + "\n")
+            safe_write_jsonl(args.output, flagged)  # D2496: C6 crash-safe JSONL
             print(f"\nExported {len(flagged)} flagged to {args.output}")
 
 

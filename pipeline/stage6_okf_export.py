@@ -118,8 +118,8 @@ def _format_frontmatter(fb: dict) -> str:
         if isinstance(vrf, str):
             try:
                 vrf = json.loads(vrf)
-            except (json.JSONDecodeError, TypeError):
-                pass
+            except (json.JSONDecodeError, TypeError) as e:
+                print(f"   ⚠️  OKF export: verification_results unparseable for {fb.get('fb_id', '?')}: {type(e).__name__}: {e} (verification count under-reports) (C16)", file=sys.stderr)
         if isinstance(vrf, list):
             passed = sum(1 for v in vrf if v.get("passed", False))
             total_v = len(vrf)

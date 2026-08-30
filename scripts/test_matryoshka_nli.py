@@ -20,6 +20,9 @@ import sys
 from pathlib import Path
 from typing import List, Tuple, Dict, Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
+
 # ═══════════════════════════════════
 # CONFIG — C12: no hardcoded values
 # ═══════════════════════════════════
@@ -467,8 +470,7 @@ def main():
     
     out_path = Path("temp/test_matryoshka_nli_results.json")
     out_path.parent.mkdir(exist_ok=True)
-    with open(out_path, "w") as f:
-        json.dump(output, f, indent=2, default=str)
+    safe_write(out_path, json.dumps(output, indent=2, default=str))  # D2496: C6
     print(f"\n  Results saved to: {out_path}")
 
 

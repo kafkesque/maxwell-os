@@ -80,7 +80,10 @@
   - ⚠️ Phi-4-mini-instruct-8bit: HALLUCINATES on open-ended research (BUG-053). Only for summarization WITH source text.
   - ❌ NEVER use custom_deepseek: reasoning_content passthrough bug (DELEGATE-001).
   - For research/fact-finding: use shell/curl directly. Do NOT delegate open-ended research.
-- Memory budget: ~24GB of 64GB for all models combined
+- Memory budget labels (THREE distinct concepts — do not conflate, D2496):
+  - `delegate_model_budget` = ~24GB of 64GB — total for all delegate-served models combined (this file)
+  - `omlx_guard_ceiling`  = 55GB — OMLX server memory-guard ceiling (D1804/D2208)
+  - `run_wall_budget`     = 48GB — user hard wall for a pipeline run (memory_guard.py uses dynamic psutil.available, min_free_gb=8)
 - Pipeline parallelism: use subprocess (pipeline/parallel.py), NOT delegates
 </delegate_rules>
 

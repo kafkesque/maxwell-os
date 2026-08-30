@@ -24,6 +24,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 from pipeline.pipeline_paths import (
     DB_PATH,
@@ -432,8 +433,7 @@ def generate_taxonomy_yaml(conn: sqlite3.Connection, output_path: Path | None = 
         }
     }
 
-    with open(output_path, 'w') as f:
-        yaml.dump(new_taxonomy, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
+    safe_write(output_path, yaml.dump(new_taxonomy, default_flow_style=False, sort_keys=False, allow_unicode=True))  # D2496: C6
 
     return output_path
 
@@ -503,8 +503,7 @@ def run_post_commit_taxonomy(conn: sqlite3.Connection, human_review_dir: Path) -
         ),
     }
 
-    with open(review_path, 'w') as f:
-        json.dump(review_data, f, indent=2)
+    safe_write(review_path, json.dumps(review_data, indent=2))  # D2496: C6
 
     return review_path
 

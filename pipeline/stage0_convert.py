@@ -108,10 +108,10 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> bool:
                 if docling_output != output_path:
                     docling_output.rename(output_path)
                 return True
-    except FileNotFoundError:
-        pass
-    except subprocess.TimeoutExpired:
-        pass
+    except FileNotFoundError as e:
+        print(f"  ⚠️  Docling not found ({e}) — falling back to Pandoc for PDF (C16)", file=sys.stderr)
+    except subprocess.TimeoutExpired as e:
+        print(f"  ⚠️  Docling timed out after {e.timeout}s — falling back to Pandoc for PDF (C16)", file=sys.stderr)
 
     # Fallback to Pandoc
     print("  ℹ️  Docling not available, trying Pandoc for PDF...")

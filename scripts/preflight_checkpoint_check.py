@@ -135,13 +135,18 @@ def check(path: Path, expect_count: int | None) -> int:
             print(f"❌ RECORD COUNT MISMATCH: on-disk {count} vs manifest {manifest['record_count']}")
             return 1
         print(f"✅ Record count matches manifest: {count}")
-    elif expect_count is not None:
-        if expect_count != count:
-            print(f"❌ RECORD COUNT MISMATCH: on-disk {count} vs --expect-count {expect_count}")
-            return 1
-        print(f"✅ Record count matches --expect-count: {count}")
     else:
-        print("⚠️  No manifest and no --expect-count — boundary verified but integrity not pinned.")
+        print("⚠️  No manifest — boundary verified but content hash not pinned.")
+
+    # D2496: authoritative count is checked INDEPENDENTLY of the self-referential
+    # manifest (the manifest record_count is written by the SAME writer that wrote
+    # the checkpoint, so it cannot catch a silent record DROP). --expect-count is an
+    # S2-derived authoritative total that a drop would violate.
+    if expect_count is not None:
+        if expect_count != count:
+            print(f"❌ AUTHORITATIVE COUNT MISMATCH: on-disk {count} vs --expect-count {expect_count}")
+            return 1
+        print(f"✅ Authoritative record count matches --expect-count: {count}")
     return 0
 
 

@@ -274,7 +274,7 @@ classification:
 # SHARED METADATA / STAMPS — R14 + provenance + runtime
 # ─────────────────────────────────────────────────────────────────────────────
 metadata:
-  stamps:       [schema_version, gen_model, pipeline_commit, pipeline_run_id, created_at]
+  stamps:       [schema_version, gen_model, classify_model, pipeline_commit, pipeline_run_id, taxonomy_version, manifest_hash, created_at]
   provenance:   [source_books, source_clusters, source_segments, evidence_passages, citation, source_authors, source_diversity, primary_source]  # evidence_passages = up to 5 verbatim source quotes; citation/source_authors/source_diversity/primary_source carried from S2 (F1)
   discovery:    [keywords]                  # search/retrieval labels (3-5 comma-separated terms)
   versioning:   [object_version]            # canonical name (currently `fb_version` in code)

@@ -17,6 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 from tools.pipeline_paths import RUNTIME_RUNNING_FLAG, STAGE_PATHS
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 RUNNING_FLAG = RUNTIME_RUNNING_FLAG
 
@@ -44,8 +45,7 @@ def set_running(domain):
     """Call from s3_converge_local.py on start. Sets a domain-specific flag."""
     current = RUNNING_FLAG.read_text().strip().split("\n") if RUNNING_FLAG.exists() else []
     if domain not in current:
-        with open(RUNNING_FLAG, "w") as f:
-            f.write("\n".join(current + [domain]))
+        safe_write(RUNNING_FLAG, "\n".join(current + [domain]))  # D2496: C6
 
 
 def clear_running(domain):
@@ -53,7 +53,7 @@ def clear_running(domain):
     if not RUNNING_FLAG.exists():
         return
     current = [l for l in RUNNING_FLAG.read_text().strip().split("\n") if l and l != domain]
-    RUNNING_FLAG.write_text("\n".join(current) + "\n")
+    safe_write(RUNNING_FLAG, "\n".join(current) + "\n")  # D2496: C6
 
 
 if __name__ == "__main__":

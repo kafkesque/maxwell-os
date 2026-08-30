@@ -40,6 +40,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
+from pipeline.io_guard import safe_write_jsonl  # D2496: C6 crash-safe JSONL
 
 from audit_content_type_contract import audit_s2, audit_s4, _load_ontology  # noqa: E402
 
@@ -222,8 +223,7 @@ def main() -> int:
                 cell_visual.extend(_render_record(i, rec, origin, tag, iss))
                 sample_records.append(rec)
             visual.extend(cell_visual)
-            with open(samples_dir / f"{origin}__{ct}.jsonl", "w", encoding="utf-8") as f:
-                f.write("\n".join(json.dumps(r, ensure_ascii=False) for r in sample_records) + "\n")
+            safe_write_jsonl(samples_dir / f"{origin}__{ct}.jsonl", sample_records)  # D2496: C6
 
     # Summary
     report.insert(0, "# S2 Exhaustive Conformance Report\n")

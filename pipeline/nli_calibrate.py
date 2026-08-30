@@ -32,6 +32,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 import numpy as np
 
@@ -270,8 +271,7 @@ def print_report(calibration: dict) -> None:
     # Save raw scores for analysis
     out_path = Path("knowledge pipeline/metrics/nli_calibration.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
-        json.dump(calibration, f, indent=2, default=str)
+    safe_write(out_path, json.dumps(calibration, indent=2, default=str))  # D2496: C6
     print(f"\n💾 Full results saved to {out_path}")
 
 

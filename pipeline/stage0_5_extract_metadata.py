@@ -37,6 +37,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 from pipeline.omlx_call import call_omlx_json
 from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR
@@ -397,9 +398,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
     records: list[dict] = list(cache.values())
     records.sort(key=lambda r: r["source_book"])
 
-    with open(cache_path, "w") as f:
-        for rec in records:
-            f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+    safe_write_jsonl(cache_path, records, force_shrink=True)  # D2487: atomic + fail-loud
 
     print(f"\n{'='*60}")
     print(f"📊 RESULTS: {len(md_files)} files")

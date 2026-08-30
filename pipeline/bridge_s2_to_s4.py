@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.io_guard import load_jsonl  # D2332: fail-closed JSONL boundary
+from pipeline.io_guard import load_jsonl, safe_write_jsonl  # D2332 + D2487 fail-closed JSONL
 from pipeline.pipeline_paths import STAGE2_CHECKPOINT, STAGE4_CHECKPOINT
 
 
@@ -65,9 +65,7 @@ def convert() -> None:
         stage4_records.append(record)
 
     STAGE4_CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-    with open(STAGE4_CHECKPOINT, "w") as f:
-        for r in stage4_records:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    safe_write_jsonl(STAGE4_CHECKPOINT, stage4_records, force_shrink=True)  # D2487: atomic + fail-loud
 
     print(f"✅ Wrote {len(stage4_records)} records to {STAGE4_CHECKPOINT}")
 

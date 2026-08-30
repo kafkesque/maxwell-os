@@ -28,7 +28,7 @@ from pathlib import Path
 # ── Paths ──────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.io_guard import safe_write
+from pipeline.io_guard import load_jsonl, safe_write  # D2332 fail-closed read + D2487 atomic write
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     CHECKPOINT_DIR,
@@ -149,18 +149,19 @@ def compute_sha256(file_path: Path) -> str:
 
 
 def load_existing_checkpoint() -> dict[str, dict]:
-    """Load already-converted books from checkpoint."""
-    existing = {}
+    """Load already-converted books from checkpoint (fail-closed, D2332).
+
+    Previously swallowed json.JSONDecodeError — a truncated/corrupt S0 line was
+    silently skipped, dropping that book from the resume set (C16 violation).
+    load_jsonl raises on any unparseable non-empty line so a corrupt checkpoint
+    is loud, not silent.
+    """
+    existing: dict[str, dict] = {}
     if STAGE0_CHECKPOINT.exists():
-        with open(STAGE0_CHECKPOINT) as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    try:
-                        rec = json.loads(line)
-                        existing[rec["source_file"]] = rec
-                    except json.JSONDecodeError:
-                        continue
+        for rec in load_jsonl(STAGE0_CHECKPOINT, context="S0 checkpoint"):
+            src = rec.get("source_file")
+            if src:
+                existing[src] = rec
     return existing
 
 

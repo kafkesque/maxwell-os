@@ -21,6 +21,8 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
+
 import yaml
 
 # Load config
@@ -210,15 +212,10 @@ def main() -> None:
 
     # Write checkpoints
     STAGE1_5_CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(STAGE1_5_CHECKPOINT, "w") as f:
-        for c in clusters:
-            f.write(json.dumps(c, ensure_ascii=False) + "\n")
+    safe_write_jsonl(STAGE1_5_CHECKPOINT, clusters, force_shrink=True)  # D2487: atomic + fail-loud
 
     singleton_path = STAGE1_5_CHECKPOINT.parent / "singletons.jsonl"
-    with open(singleton_path, "w") as f:
-        for s in singletons:
-            f.write(json.dumps(s, ensure_ascii=False) + "\n")
+    safe_write_jsonl(singleton_path, singletons, force_shrink=True)  # D2487: atomic + fail-loud
 
     # Summary
     total_clustered = sum(c["size"] for c in clusters)

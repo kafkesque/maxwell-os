@@ -26,6 +26,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.io_guard import safe_write, safe_write_jsonl  # D2487: atomic writes
 
 
 def load_clusters(checkpoint: Path) -> list[dict]:
@@ -261,14 +262,11 @@ def export_annotation_batch(
 
     # Write JSONL (for programmatic API calls)
     jsonl_path = output_dir / "annotation_batch.jsonl"
-    with open(jsonl_path, "w") as f:
-        for item in batch:
-            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    safe_write_jsonl(jsonl_path, batch, force_shrink=True)  # D2487: atomic + fail-loud
 
     # Write human-readable markdown
     md_path = output_dir / "annotation_batch.md"
-    with open(md_path, "w") as f:
-        f.write("\n".join(md_lines))
+    safe_write(md_path, "\n".join(md_lines), force_shrink=True)  # D2487: atomic + fail-loud
 
     return jsonl_path
 

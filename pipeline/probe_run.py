@@ -30,6 +30,7 @@ from typing import Any
 # Ensure project root is on path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 # ── Config paths ──────────────────────────────────────────────────────
 S15_CHECKPOINT = PROJECT_ROOT / "knowledge pipeline/stage1_5_embed_cluster/latest/checkpoint.jsonl"
@@ -120,9 +121,7 @@ def run_stage2(clusters: list[dict], output_dir: Path) -> list[dict]:
     
     # Write temporary cluster file for stage2 to read
     tmp_clusters = output_dir / "probe_clusters.jsonl"
-    with open(tmp_clusters, "w") as f:
-        for c in clusters:
-            f.write(json.dumps(c) + "\n")
+    safe_write_jsonl(tmp_clusters, clusters, force_shrink=True)  # D2487: atomic + fail-loud
     
     # Run stage2 with our cluster file
     s2_start = time.time()
@@ -261,9 +260,7 @@ def run_stage4(fbs: list[dict], output_dir: Path) -> list[dict]:
     
     # Write input FBs
     s4_input = output_dir / "stage4_input.jsonl"
-    with open(s4_input, "w") as f:
-        for fb in fbs:
-            f.write(json.dumps(fb, ensure_ascii=False) + "\n")
+    safe_write_jsonl(s4_input, fbs, force_shrink=True)  # D2487: atomic + fail-loud
     
     s4_start = time.time()
     result = subprocess.run(

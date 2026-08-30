@@ -27,6 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 import numpy as np
 import yaml
@@ -194,10 +195,9 @@ def main():
     tmp_segs = OUT_DIR / "_segs.jsonl"
     tmp_npy = OUT_DIR / "_embs.npy"
     # One segs file for both workers: embedding texts + cross-book book map
-    with open(tmp_segs, "w") as f:
-        for s in segs:
-            f.write(json.dumps({"text": s["text"][:500],
-                                "source_path": s.get("source_path", "")}) + "\n")
+    safe_write_jsonl(tmp_segs, (
+        {"text": s["text"][:500], "source_path": s.get("source_path", "")} for s in segs
+    ), force_shrink=True)  # D2487: atomic + fail-loud
 
     if EMBED_BACKEND == "mps":
         el = embed_subprocess(tmp_segs, tmp_npy)
@@ -233,13 +233,11 @@ def main():
         if i not in in_cluster:
             singleton_ids.append(i)
 
-    with open(OUT_DIR / "checkpoint.jsonl", "w") as f:
-        for c in clusters:
-            f.write(json.dumps(c) + "\n")
-    with open(OUT_DIR / "singletons.jsonl", "w") as f:
-        for i in singleton_ids:
-            f.write(json.dumps({"segment_id": segs[i].get("segment_id"),
-                                "source_book": segs[i].get("source_book")}) + "\n")
+    safe_write_jsonl(OUT_DIR / "checkpoint.jsonl", clusters, force_shrink=True)  # D2487: atomic + fail-loud
+    safe_write_jsonl(OUT_DIR / "singletons.jsonl", (
+        {"segment_id": segs[i].get("segment_id"), "source_book": segs[i].get("source_book")}
+        for i in singleton_ids
+    ), force_shrink=True)  # D2487: atomic + fail-loud
 
     n_conv = sum(1 for c in clusters if c["is_convergent"])
     print(f"clusters: {len(clusters)} | CONVERGENT: {n_conv} "

@@ -36,6 +36,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 os.chdir(str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT))
+from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 # ── Load pipeline config for defaults (before Maxwell imports) ─────────
 import yaml as _yaml
@@ -345,9 +346,7 @@ def write_diagnostic_clusters(convergent: list[dict], single_source: list[dict])
         )
     diag_path.parent.mkdir(parents=True, exist_ok=True)
     all_filtered = convergent + single_source
-    with open(diag_path, "w") as f:
-        for c in all_filtered:
-            f.write(json.dumps(c, ensure_ascii=False) + "\n")
+    safe_write_jsonl(diag_path, all_filtered, force_shrink=True)  # D2487: atomic + fail-loud
     print(f"💾 Wrote {len(all_filtered)} clusters to {DIAGNOSTIC_S15_CHECKPOINT}")
     return len(all_filtered)
 

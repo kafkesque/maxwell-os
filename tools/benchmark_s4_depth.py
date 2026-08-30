@@ -22,6 +22,9 @@ from pathlib import Path
 from collections import Counter, defaultdict
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+from pipeline.io_guard import safe_write  # D2487: atomic + fsync + fail-loud
+
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 DEPTH_ORDER = ["specialized", "domain", "cross-domain", "universal"]
 OMLX_URL = "http://localhost:11435/v1/chat/completions"
@@ -176,8 +179,7 @@ def main():
         "safety": "OMLX-served both models; no mlx_lm direct load (D2243 panic prevention)",
     }
     out_path = PROJECT_ROOT / "governance" / "s4_depth_benchmark.json"
-    with open(out_path, "w") as f:
-        json.dump(out, f, indent=2, ensure_ascii=False)
+    safe_write(out_path, json.dumps(out, indent=2, ensure_ascii=False), force_shrink=True)  # D2487: fsync + atomic
     print(f"\n📁 Saved: {out_path}")
 
 

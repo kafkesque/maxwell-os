@@ -404,3 +404,72 @@ def test_smoke_diverse_batch_writes_checkpoint_and_routes(tmp_path: Path) -> Non
     ti = s4_dir / "tool_instructions.jsonl"
     ge = s4_dir / "growth_edges.jsonl"
     assert pt.exists() and ti.exists() and ge.exists()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# D2490 — LIVE CRIBS contract smoke (closes the LLM-off stub blind spot)
+# ═══════════════════════════════════════════════════════════════════════════
+def _omlx_up() -> bool:
+    """Quick TCP reachability probe so the live smoke skips cleanly when OMLX is down."""
+    import socket
+
+    from pipeline.pipeline_paths import OMLX_HOST, OMLX_PORT
+    try:
+        with socket.create_connection((OMLX_HOST, OMLX_PORT), timeout=2):
+            return True
+    except Exception:
+        return False
+
+
+def _assert_cribs_contract(fb: dict) -> None:
+    """D2490: assert a real CRIBS-enriched principle matches the agreed contract.
+
+    Fail-closed version of the D2293 warn-only `_validate_cribs_quality`. The
+    plumbing smoke stubs `application`/`failure_mode` (LLM off), so it never
+    exercises the real enrichment path — this assertion catches a regression that
+    makes the LLM emit empty/short/non-CRIBS enrichment.
+    """
+    app = str(fb.get("application", "")).strip()
+    fm = str(fb.get("failure_mode", "")).strip()
+    elab = str(fb.get("elaboration", "")).strip()
+    kw = str(fb.get("keywords", "")).strip()
+    assert len(app) >= 10, f"application too short/empty: {app!r}"
+    assert len(fm) >= 10, f"failure_mode too short/empty: {fm!r}"
+    assert len(elab) >= 20, f"elaboration too short/empty: {elab!r}"
+    assert kw, f"keywords empty for {fb.get('name')!r}"
+    # CRIBS format: application = "when X → do Y"; failure_mode names a failure condition.
+    assert ("→" in app) or ("when " in app.lower()), f"application missing 'when/→' pattern: {app[:80]!r}"
+    assert "fails when" in fm.lower() or "principle fails" in fm.lower(), \
+        f"failure_mode missing 'fails when' pattern: {fm[:80]!r}"
+
+
+def test_smoke_live_cribs_contract(tmp_path: Path) -> None:
+    """D2490: live (LLM-on) smoke — real CRIBS output must match the contract.
+
+    Skips when OMLX is unreachable so the fast deterministic suite still runs
+    offline.
+    """
+    if not _omlx_up():
+        pytest.skip("OMLX not reachable — skipping live CRIBS contract smoke")
+
+    picks = _pick_diverse_s2()
+    principle = picks.get("principle")
+    if principle is None:
+        pytest.skip("no principle record in the staged S2 checkpoint")
+
+    run_id = "smoke_live_cribs"
+    _stage_smoke_s2(run_id, [principle], inject_application=False)
+    allow = tmp_path / "allow.jsonl"
+    with open(allow, "w", encoding="utf-8") as f:
+        f.write(json.dumps({"fb_id": principle["fb_id"]}) + "\n")
+
+    r = _run_s4_subprocess(["--only-fb-ids", str(allow)], {"MAXWELL_RUN_ID": run_id})
+    out = r.stdout + r.stderr
+    assert r.returncode == 0, f"S4 live smoke failed:\n{out}"
+
+    ckpt = ROOT / "knowledge pipeline" / "stage4_merge" / run_id / "checkpoint.jsonl"
+    assert ckpt.exists(), f"no checkpoint written:\n{out}"
+    written = [json.loads(l) for l in open(ckpt, encoding="utf-8") if l.strip()]
+    assert written, "no FBs written in live smoke"
+    for fb in written:
+        _assert_cribs_contract(fb)

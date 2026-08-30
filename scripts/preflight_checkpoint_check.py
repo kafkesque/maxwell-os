@@ -48,20 +48,36 @@ def _sha256(path: Path) -> str:
 
 
 def boundary_check(path: Path) -> tuple[int, list[str]]:
-    """Return (record_count, problems). A problem means a partial/corrupt record."""
+    """Return (record_count, problems). A problem means a partial/corrupt record.
+
+    D2490: also detects pretty-printed/editor-formatted JSON (multi-line records).
+    The signature is a line that ends with a comma but is not standalone JSON — an
+    editor that re-indents a checkpoint breaks the one-record-per-line contract and
+    must be reported loudly (regenerate from the pipeline, do not hand-edit).
+    """
     problems: list[str] = []
     count = 0
     last_had_newline = True
+    saw_pretty_printed = False
     with open(path, encoding="utf-8") as f:
         for lineno, line in enumerate(f, 1):
             last_had_newline = line.endswith("\n")
-            if not line.strip():
+            stripped = line.strip()
+            if not stripped:
                 continue
             try:
                 json.loads(line)
                 count += 1
             except json.JSONDecodeError as e:
+                if stripped.endswith(",") and stripped.lstrip().startswith(('"', "{", "[")):
+                    saw_pretty_printed = True
                 problems.append(f"line {lineno}: unparseable/partial JSON — {e}")
+    if saw_pretty_printed:
+        problems.insert(
+            0,
+            "file appears pretty-printed/editor-formatted (multi-line JSON records, "
+            "not one-object-per-line) — regenerate from the pipeline, do not hand-edit",
+        )
     if not last_had_newline:
         problems.append("file does not end with a newline (possible tail truncation)")
     return count, problems

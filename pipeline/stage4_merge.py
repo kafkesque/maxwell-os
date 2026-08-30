@@ -670,42 +670,53 @@ def dedup_fbs_by_cosine(
     definitions = [fb_definition(fb) for fb in fbs]
     raw_embs = batch_embed(definitions, model=model)
 
-    # Convert to numpy, normalize
     import numpy as np
-    embeddings = np.array([np.array(e, dtype=np.float32) for e in raw_embs if len(e) > 0])
-    if len(embeddings) < 2:
+
+    # D2490: align embeddings to fbs by index. An empty embedding (embedding
+    # failure) maps to None and is excluded from dedup rather than silently
+    # dropping the row — the old code filtered empty rows but kept n=len(fbs),
+    # so `similarity[i, j]` IndexError'd whenever any FB failed to embed.
+    aligned: list[np.ndarray | None] = [
+        np.asarray(e, dtype=np.float32) if e is not None and len(e) > 0 else None
+        for e in raw_embs
+    ]
+    valid = [i for i, e in enumerate(aligned) if e is not None]
+    if len(valid) < 2:
         return fbs
 
-    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+    embs = np.stack([aligned[i] for i in valid]).astype(np.float32, copy=False)
+    norms = np.linalg.norm(embs, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
-    embeddings = embeddings / norms
+    embs = embs / norms
 
-    # Compute pairwise cosine similarity (upper triangle only)
-    similarity = embeddings @ embeddings.T
-    n = len(fbs)
-    removed: set[int] = set()
-    dupes_found = 0
+    m = len(valid)
+    removed: set[int] = set()  # indices into `valid`
 
-    for i in range(n):
-        if i in removed:
-            continue
-        for j in range(i + 1, n):
-            if j in removed:
+    # D2490: chunk the cosine matrix so peak memory is O(chunk·m), not O(m²).
+    _DEDUP_CHUNK = 512
+    for i_start in range(0, m, _DEDUP_CHUNK):
+        i_end = min(i_start + _DEDUP_CHUNK, m)
+        sim_chunk = embs[i_start:i_end] @ embs.T  # (chunk, m)
+        for i in range(i_start, i_end):
+            if i in removed:
                 continue
-            if similarity[i, j] >= threshold:
-                # Keep FB with more source diversity
-                books_i = len(fb_source_books(fbs[i]))
-                books_j = len(fb_source_books(fbs[j]))
-                if books_i >= books_j:
-                    removed.add(j)
-                else:
-                    removed.add(i)
-                    break  # i removed, stop checking j against i
-                dupes_found += 1
+            for j in range(i + 1, m):
+                if j in removed:
+                    continue
+                if float(sim_chunk[i - i_start, j]) >= threshold:
+                    # Keep FB with more source diversity
+                    books_i = len(fb_source_books(fbs[valid[i]]))
+                    books_j = len(fb_source_books(fbs[valid[j]]))
+                    if books_i >= books_j:
+                        removed.add(j)
+                    else:
+                        removed.add(i)
+                        break  # i removed, stop checking j against i
 
-    if dupes_found > 0:
-        kept = [fbs[i] for i in range(n) if i not in removed]
-        print(f"   🔍 Dedup: {dupes_found} near-duplicate FBs removed "
+    if removed:
+        removed_orig = {valid[k] for k in removed}
+        kept = [fbs[i] for i in range(len(fbs)) if i not in removed_orig]
+        print(f"   🔍 Dedup: {len(removed_orig)} near-duplicate FBs removed "
               f"(cos ≥ {threshold}), {len(kept)} kept")
         return kept
 
@@ -954,41 +965,50 @@ def compute_fb_relationships(
     edge_counts: dict[str, int] = {"domain_overlap": 0, "discipline_overlap": 0,
                                       "source_crossover": 0, "semantic_near": 0}
 
-    # D2404: precompute pairwise cosine matrix once instead of np.dot per pair
-    if has_embeddings and embeddings is not None:
-        sim_matrix: np.ndarray = embeddings @ embeddings.T
+    # D2490: chunk the pairwise cosine matrix so peak memory is O(chunk·n), not
+    # O(n²). Also guard against embeddings that don't align 1:1 with fbs (an
+    # embedding failure) so semantic access can never IndexError.
+    _REL_CHUNK = 512
+    _emb_ok = has_embeddings and embeddings is not None and embeddings.shape[0] == n
+    if has_embeddings and embeddings is not None and not _emb_ok:
+        print(f"   ⚠️  Embedding count {embeddings.shape[0]} != FB count {n} — skipping semantic edges")
+        has_embeddings = False
+        embeddings = None
 
     # Pairwise comparison (upper triangle) → bounded per-FB neighbour heaps.
-    for i in range(n):
-        for j in range(i + 1, n):
-            relationships: list[str] = []
+    for i_start in range(0, n, _REL_CHUNK):
+        i_end = min(i_start + _REL_CHUNK, n)
+        sim_chunk = embeddings[i_start:i_end] @ embeddings.T if _emb_ok else None
+        for i in range(i_start, i_end):
+            for j in range(i + 1, n):
+                relationships: list[str] = []
 
-            # Domain overlap (fallback domains already stripped)
-            if domain_sets[i] & domain_sets[j]:
-                relationships.append("domain_overlap")
+                # Domain overlap (fallback domains already stripped)
+                if domain_sets[i] & domain_sets[j]:
+                    relationships.append("domain_overlap")
 
-            # Discipline overlap (D2066 multi-label)
-            if discipline_sets[i] & discipline_sets[j]:
-                relationships.append("discipline_overlap")
+                # Discipline overlap (D2066 multi-label)
+                if discipline_sets[i] & discipline_sets[j]:
+                    relationships.append("discipline_overlap")
 
-            # Source crossover
-            if book_sets[i] & book_sets[j]:
-                relationships.append("source_crossover")
+                # Source crossover
+                if book_sets[i] & book_sets[j]:
+                    relationships.append("source_crossover")
 
-            # Semantic similarity
-            if has_embeddings and embeddings is not None:
-                if float(sim_matrix[i, j]) >= similarity_threshold:
-                    relationships.append("semantic_near")
+                # Semantic similarity
+                if sim_chunk is not None:
+                    if float(sim_chunk[i - i_start, j]) >= similarity_threshold:
+                        relationships.append("semantic_near")
 
-            if not relationships:
-                continue
+                if not relationships:
+                    continue
 
-            # BUG-188: keep only the top-k most informative neighbours per FB.
-            priority = min(_RELATIONSHIP_PRIORITY[r] for r in relationships)
-            sim = float(sim_matrix[i, j]) if has_embeddings and embeddings is not None else 0.0
-            goodness = (-priority, sim)  # larger = better
-            _push_neighbor(heaps[i], max_neighbors, (goodness, j, relationships))
-            _push_neighbor(heaps[j], max_neighbors, (goodness, i, relationships))
+                # BUG-188: keep only the top-k most informative neighbours per FB.
+                priority = min(_RELATIONSHIP_PRIORITY[r] for r in relationships)
+                sim = float(sim_chunk[i - i_start, j]) if sim_chunk is not None else 0.0
+                goodness = (-priority, sim)  # larger = better
+                _push_neighbor(heaps[i], max_neighbors, (goodness, j, relationships))
+                _push_neighbor(heaps[j], max_neighbors, (goodness, i, relationships))
 
     # Materialize bounded neighbour lists onto each FB.
     for i in range(n):

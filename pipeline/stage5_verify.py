@@ -38,6 +38,7 @@ Usage:
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -247,6 +248,26 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
 
 # ── Core verification functions ────────────────────────────────────────────
 
+def _preflight_gate(source: Path) -> None:
+    """D2490: BUG-188 checkpoint boundary + sha256 gate before S5 consumes S4.
+
+    Runs scripts/preflight_checkpoint_check.py --check (D2487): verifies every
+    line is standalone JSON + newline-terminated, and — when a manifest exists —
+    that sha256 + record_count match. Fail-closed: a truncated / pretty-printed /
+    corrupt checkpoint aborts S5 instead of being silently mis-read.
+    """
+    preflight = Path(__file__).resolve().parent.parent / "scripts" / "preflight_checkpoint_check.py"
+    r = subprocess.run(
+        [sys.executable, str(preflight), "--check", str(source)],
+        capture_output=True, text=True,
+    )
+    if r.returncode != 0:
+        print(f"🛑 Preflight checkpoint gate FAILED for {source.name}:")
+        print(r.stdout + r.stderr)
+        sys.exit(1)
+    print(f"✅ Preflight checkpoint gate passed for {source.name}")
+
+
 def load_stage4_fbs() -> list[dict]:
     """Load FBs from the (possibly enriched) Stage 4 checkpoint.
 
@@ -259,6 +280,8 @@ def load_stage4_fbs() -> list[dict]:
     if not source.exists():
         print("❌ Stage 4 checkpoint not found. Run stage4_merge.py first.")
         sys.exit(1)
+
+    _preflight_gate(source)  # D2490: boundary + sha256 + record-count gate (D2487)
 
     return load_jsonl(source, context="S4 checkpoint")
 

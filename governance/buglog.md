@@ -32,13 +32,25 @@
 
 ---
 
-## 🟡 BUG-189 — 2026-08-30 — `tools.pipeline_paths` phantom import drift (protect.py + nuke_anytype.py unimportable)
-- **Symptom:** `pipeline/protect.py:19` (`from tools.pipeline_paths import RUNTIME_RUNNING_FLAG, STAGE_PATHS`) and `pipeline/nuke_anytype.py:1` (`from tools.pipeline_paths import get_space_id`) fail at import with `ModuleNotFoundError: No module named 'tools.pipeline_paths'` — `tools/pipeline_paths.py` DOES NOT EXIST (only `pipeline/pipeline_paths.py`). `get_space_id`, `STAGE_PATHS`, `RUNTIME_RUNNING_FLAG` have **NO definition anywhere in the repo** (phantom symbols — no `def`/assignment).
-- **Root cause:** `tools/` is a stale namespace; `pipeline_paths` was migrated to `pipeline/` but two tools kept `tools.*` module-level imports. `doc_guard.py`/`io_guard.py` reference `tools.*` only in docstrings/try-except fallbacks (harmless).
-- **Impact:** **NON-BLOCKING for the active S4→S6 path** — `stage6b_anytype_push.py:49` and `stage6c_obsidian_export.py:40` both use `from pipeline.pipeline_paths import ...` (correct). Only the one-off `nuke_anytype.py` (destructive Anytype space wipe) and `protect.py` (s3 converge flag) are dead/broken.
-- **Fix:** re-home `get_space_id`/`RUNTIME_RUNNING_FLAG`/`STAGE_PATHS` to their correct current module (or delete the dead tools) and update the two imports. Deferred — off active path; a dedicated `tools/`-vs-`pipeline/` sweep is warranted.
-- **Files:** `pipeline/protect.py`, `pipeline/nuke_anytype.py`
-- **Source:** D2496 import smoke (`import pipeline.protect` → ModuleNotFoundError) 2026-08-30
+## 🟢 BUG-189 — 2026-08-30 — `tools.pipeline_paths` phantom import drift — FIXED (D2496-followup)
+- **Symptom:** `pipeline/protect.py:19` (`from tools.pipeline_paths import RUNTIME_RUNNING_FLAG, STAGE_PATHS`) and `pipeline/nuke_anytype.py:1` (`from tools.pipeline_paths import get_space_id`) fail at import with `ModuleNotFoundError: No module named 'tools.pipeline_paths'` — `tools/pipeline_paths.py` DOES NOT EXIST (only `pipeline/pipeline_paths.py`). `get_space_id`, `STAGE_PATHS`, `RUNTIME_RUNNING_FLAG` have **NO definition anywhere in the repo** (phantom symbols — no `def`/assignment). `validate_book_structure.py` was a THIRD dead tool (imported phantom `STAGE_PATHS`/`CONFIG_DIR`/`EDUCATION_*`).
+- **Root cause:** `tools/` is a stale namespace; `pipeline_paths` was migrated to `pipeline/` but three tools kept `tools.*`/`pipeline_paths` module-level imports. `doc_guard.py`/`io_guard.py` reference `tools.*` only in docstrings/try-except fallbacks (harmless).
+- **Impact:** **NON-BLOCKING for the active S4→S6 path** — `stage6b_anytype_push.py:49` and `stage6c_obsidian_export.py:40` both use `from pipeline.pipeline_paths import ...` (correct). Only the one-off `nuke_anytype.py` (destructive Anytype space wipe), `protect.py` (guards `s3_converge_local.py` — Stage 3 REMOVED D2120, so dead), and `validate_book_structure.py` (phantom imports, 0 callers) are dead/broken.
+- **Fix (this session):** archived all three dead tools to `archive/*.archived-2026-08-30` (C19 — no dead code in repo). Zero remaining `tools.pipeline_paths`/`get_space_id`/`RUNTIME_RUNNING_FLAG`/`STAGE_PATHS`/`EDUCATION_*` phantom imports. **`get_space_id` is NOT needed by stage6b** — stage6b resolves Anytype space via `intimacy_lattice.route_space()` (returns "private"/"non_private" string labels, not numeric space IDs); the numeric space-ID mapping never existed in the repo and belongs to the Anytype MCP server side.
+- **Files:** `archive/protect.py.archived-2026-08-30`, `archive/nuke_anytype.py.archived-2026-08-30`, `archive/validate_book_structure.py.archived-2026-08-30`
+- **Source:** D2496 import smoke 2026-08-30 → fixed 2026-08-30
+
+## 🟢 BUG-190 — 2026-08-30 — OMLX `/v1/models` health-endpoint lie — FIXED (ext-audit #14, D2453)
+- **Symptom:** `model_lazyload.py --status` reported "41.2GB loaded" because `get_loaded_models()` reads `/v1/models` (the 7-model *catalog*) instead of ground truth `/health` (`engine_pool.loaded_count` / `current_model_memory`).
+- **Fix:** added `get_health()` (reads authoritative `/health`); `--status` now prints `loaded models: N/M` + RSS-level loaded memory from `/health`, and labels the catalog read explicitly as "all registered models, NOT load state". `get_loaded_models()` docstring documents the distinction. Live-verified: `loaded 1/7, 4.0 GB` (was "41.2GB").
+- **Files:** `pipeline/model_lazyload.py`
+- **Source:** D2453 ext-audit #14, fixed 2026-08-30
+
+## 🟢 BUG-191 — 2026-08-30 — `check_stage_order()` counted `timeouts` as a stage — FIXED (ext-audit #5)
+- **Symptom:** `check_stage_order()` reported "10 stages" — the `timeouts` non-stage key was counted in the stage total (config `stages` has 9 real stages + 1 `timeouts` key).
+- **Fix:** exclude `timeouts` (and fail-loud on any OTHER unexpected non-stage key); report now reads "9 stages". Relative-order assert already present (D2473) and still green.
+- **Files:** `pipeline/integrity_check.py`
+- **Source:** ext-audit #5, fixed 2026-08-30
 
 ## 🟢 BUG-185 — 2026-08-28 — S4 depth classifier collapses 97.5% to "domain" — FIXED (D2483, 2026-08-28)
 - **Symptom:** Live depth probe (n=40 principle FBs, `batch_depth_classify` via gpt-oss-20b) → **39 "domain", 1 "cross-domain", 0 "universal", 0 "specialized"**. The depth distribution is dominated by the "domain" default.

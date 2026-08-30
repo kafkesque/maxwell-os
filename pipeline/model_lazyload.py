@@ -50,6 +50,7 @@ except Exception as _cfg_exc:  # pragma: no cover
     OMLX_API_KEY = "sk-maxwell-local"
 
 OMLX_MODELS_URL = f"{OMLX_URL}/v1/models"
+OMLX_HEALTH_URL = f"{OMLX_URL}/health"  # D2453/ext-audit #14: authoritative loaded_count/current_model_memory (the /v1/models catalog lies)
 
 # ── Pinned models (never auto-unload) ─────────────────────────────────
 # T1.1: Phi-4-mini is the small probe model — stays hot (~3.8GB). The big
@@ -101,8 +102,28 @@ def _api_post(url: str, data: dict = None) -> dict:
         return json.loads(resp.read())
 
 
+def get_health() -> dict:
+    """Return the authoritative OMLX /health payload (no auth required).
+
+    D2453/ext-audit #14: /v1/models returns the FULL 7-model *catalog* (owned_by=omlx),
+    so `get_loaded_models()` over-reported "41.2GB loaded". Ground truth is
+    /health → engine_pool.loaded_count + current_model_memory (bytes).
+    """
+    try:
+        req = urllib.request.Request(OMLX_HEALTH_URL)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read())
+    except Exception:
+        return {}
+
+
 def get_loaded_models() -> dict[str, float]:
-    """Return dict of loaded model names → estimated memory (GB)."""
+    """Return dict of loaded model names → estimated memory (GB).
+
+    NOTE (D2453/ext-audit #14): this reads the /v1/models CATALOG, not actual
+    loaded state — used only to enumerate candidate names for unload/reset.
+    Callers that need true memory/loaded-count must use get_health().
+    """
     try:
         data = _api_get(OMLX_MODELS_URL)
         return {m["id"]: MODEL_SIZES.get(m["id"], 0) for m in data.get("data", [])}
@@ -212,16 +233,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.status:
+        # D2453/ext-audit #14: report GROUND TRUTH from /health, not the catalog.
+        health = get_health()
+        pool = health.get("engine_pool", {})
+        loaded_count = pool.get("loaded_count")
+        cur_mem = pool.get("current_model_memory")
+        model_count = pool.get("model_count")
+        if loaded_count is not None:
+            loaded_gb = (cur_mem or 0) / (1024 ** 3)
+            print(f"🔥 OMLX engine pool (authoritative /health):")
+            print(f"   loaded models : {loaded_count}/{model_count}")
+            print(f"   loaded memory : {loaded_gb:.1f} GB (RSS-level, not catalog estimate)")
+        else:
+            print("⚠️  /health unavailable — falling back to catalog estimate")
         loaded = get_loaded_models()
-        total = sum(loaded.values())
-        print(f"🔥 Loaded models ({total:.1f}GB):")
+        print(f"   catalog (all registered models, NOT load state):")
         for name, size in sorted(loaded.items(), key=lambda x: x[1], reverse=True):
             pinned = "📌" if name in PINNED_MODELS else "  "
-            last = _last_used.get(name, 0)
-            idle = f" (idle {time.time()-last:.0f}s)" if name not in PINNED_MODELS and last else ""
-            print(f"  {pinned} {name}: {size:.1f}GB{idle}")
-        if not loaded:
-            print("  (no models loaded)")
+            print(f"     {pinned} {name}: {size:.1f}GB est")
         sys.exit(0)
 
     if args.daemon:

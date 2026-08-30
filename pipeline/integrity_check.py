@@ -293,11 +293,17 @@ def check_stage_order() -> tuple[bool, str]:
     if actual != expected:
         return False, f"Stage order mismatch: {actual} != {expected}"
 
+    # D2496/ext-audit #5: `timeouts` is a legit non-stage key — exclude it (and
+    # any other non-stage key) from the stage count so the report is truthful.
+    non_stage = [s for s in config_stages if s not in expected and s != "timeouts"]
+    if non_stage:
+        return False, f"Unexpected non-stage keys in config stages: {non_stage}"
+
     # Verify CONSTITUTION says 8-stage
     if pipeline_line and "8-stage" not in pipeline_line:
         return False, "CONSTITUTION.md does not say 8-stage"
 
-    return True, f"Stage order consistent: {len(config_stages)} stages, Stage 3 removed"
+    return True, f"Stage order consistent: {len(expected)} stages, Stage 3 removed"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

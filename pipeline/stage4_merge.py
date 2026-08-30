@@ -1876,7 +1876,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             depth_val = raw_depth
         else:
             # Fallback: conservative default. If LLM hallucinates depth, assume domain.
+            # D2493: mark the fallback so a hallucinated/invalid depth is NEVER
+            # indistinguishable from a confident "domain" classification (C16).
+            # (The depth-call-FAILURE path above sets status=FAILED; this path covers
+            # an invalid raw_depth that never raised.)
             depth_val = S4_DEPTH_FALLBACK_DEPTH
+            class_data["classification_status"] = "FALLBACK"
+            class_data["classification_error"] = f"depth: invalid raw_depth {raw_depth!r}"[:200]
 
         # ── Assemble class_data with CANONICAL labels + semantic depth ──
         class_data["discipline"] = canonical_discipline

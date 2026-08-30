@@ -70,6 +70,25 @@ capable" ⇒ more active params ⇒ slower. There is no free lunch in this tier.
 4. **Classification-specific model:** none exists; the correct path is local fine-tuning via
    the already-built (gated) DSPy harness, not a public download.
 
+## 4b. Q4-vs-Q8 A/B RESULT (run 2026-08-30, live OMLX, golden depth set)
+
+`scripts/benchmark_s4_quant_ab.py`, n=16 stratified golden depth FBs (seed 42), same prompt,
+`enable_thinking=false` on both, one warmup call each. Production path = depth-focused short prompt.
+
+| Quant | median | mean | min–max | Accuracy | throughput |
+|---|---|---|---|---|---|
+| **Q8** (current, MXFP4-Q8) | **5.09s** | 6.50s | 3.5–15.7s | **15/16 = 93.8%** | 11.8 FB/min |
+| Q4 (MXFP4-Q4) | 14.41s | 16.49s | 7.0–27.9s | 10/16 = 62.5% | 4.2 FB/min |
+
+**Verdict: Q4 is ~2.8× SLOWER and 31 points LESS accurate.** The memory-bandwidth hypothesis
+("lower-bit quant improves long-context classification latency") is **REFUTED for gpt-oss-20b on M1 Max**.
+Q4 also drifts off the one-word label more often (emits "behavior.", "it's", "the" — reasoning leakage),
+so the drop is a real instruction-following/reliability regression, not a parse artifact.
+
+**Conclusion: keep `gpt-oss-20b-MXFP4-Q8`. There is NO faster-or-equal quant, and no last-month
+model that fits 64 GB and beats it.** Q4 model retained on disk (~11 GB) + registered in OMLX for
+reference; can be removed if disk is a concern.
+
 ## 5. What was DONE this session (no S4 rerun)
 
 - BUG-189 fixed (archived 3 dead `tools.pipeline_paths` phantom-import tools).

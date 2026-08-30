@@ -74,15 +74,17 @@ def load_test_set() -> list[dict]:
 def classify_via_omlx(model: str, prompt: str, max_tokens: int = 512) -> tuple[str, float]:
     """Classify via OMLX API. Returns (prediction, elapsed_seconds)."""
     import requests
+    from pipeline.pipeline_paths import OMLX_API_KEY
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
         "temperature": 0.0,
     }
+    headers = {"Authorization": f"Bearer {OMLX_API_KEY}"}
     t0 = time.time()
     try:
-        resp = requests.post(OMLX_URL, json=payload, timeout=300)
+        resp = requests.post(OMLX_URL, json=payload, headers=headers, timeout=300)
         resp.raise_for_status()
         msg = resp.json()["choices"][0]["message"]
         elapsed = time.time() - t0

@@ -1215,8 +1215,14 @@ def _stamp_sidecar(rec: dict, pipeline_run_id: str, pipeline_commit: str) -> dic
     return rec
 
 
-def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str] | None = None):
-    """Run Stage 4: Merge clusters into Foundation Blocks."""
+def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str] | None = None,
+               depth_only: bool = False):
+    """Run Stage 4: Merge clusters into Foundation Blocks.
+
+    depth_only (D2497): run ONLY the D2477 batched depth pre-pass, checkpoint it,
+    then exit 0 BEFORE the main serial classify loop. The .depth.json sidecar
+    survives so a subsequent full run resumes the pre-pass instead of re-running it.
+    """
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Graceful pause/resume: install SIGINT/SIGTERM handlers so a Ctrl-C or
@@ -1472,6 +1478,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # S4_DEPTH_BATCH_ENABLED so it is independently A/B-able from batch CRIBS.
     _pre_depth: dict[int | str, str] = {}
     _depth_batch_used: bool = False
+    _depth_pending: list[tuple[int | str, dict]] = []  # D2497: defined at top so --depth-only can report it even if the batch gate is off
+    _depth_ok: int = 0  # D2497: same — avoids NameError in the --depth-only summary when the gate never ran
     if (S4_DEPTH_BATCH_ENABLED and S4_DEPTH_FOCUSED_CLASSIFICATION
             and not os.environ.get("MAXWELL_SKIP_LLM")):
         # BUG-184: load the incremental depth checkpoint so a resume skips already-
@@ -1534,6 +1542,15 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 print(f"   ✅ Batch depth pre-classification: {_depth_ok} FBs in "
                       f"{_depth_elapsed:.1f}s ({_depth_elapsed / _depth_ok:.2f}s/FB amortized)")
             _depth_batch_used = _depth_ok > 0
+
+    # D2497: --depth-only pauses here (before the main serial loop). The depth
+    # sidecar is already written incrementally above; the full run resumes from it.
+    if depth_only:
+        _write_depth_checkpoint(_pre_depth, Path(_depth_file))
+        print(f"\n🛑 --depth-only: depth pre-pass complete ({_depth_ok}/{len(_depth_pending)} FBs classified).")
+        print(f"   Depth checkpoint: {_depth_file}")
+        print(f"   Paused BEFORE main classify loop. Resume with `python3 pipeline/stage4_merge.py`.")
+        sys.exit(0)
 
     for i, cluster in enumerate(clusters, 1):
         # Graceful pause: a SIGINT/SIGTERM sets _INTERRUPT_REQUESTED; the in-flight
@@ -2250,6 +2267,8 @@ def main():
     parser = argparse.ArgumentParser(description="Stage 4: Merge Clusters → FBs + Multi-label Classification")
     parser.add_argument("--cluster", help="Comma-separated cluster IDs to process (int or string)")
     parser.add_argument("--only-fb-ids", help="Path to a JSONL allow-list of fb_ids (e.g. value_keep_ids.jsonl); fail-closed")
+    parser.add_argument("--depth-only", action="store_true",
+                        help="D2497: run only the batched depth pre-pass, checkpoint, then pause before the main loop")
     args = parser.parse_args()
 
     cluster_ids = None
@@ -2262,7 +2281,7 @@ def main():
             cluster_ids = raw_ids
 
     only_fb_ids = _load_fb_id_allowlist(args.only_fb_ids) if args.only_fb_ids else None
-    run_stage4(cluster_ids=cluster_ids, only_fb_ids=only_fb_ids)
+    run_stage4(cluster_ids=cluster_ids, only_fb_ids=only_fb_ids, depth_only=args.depth_only)
 
 
 if __name__ == "__main__":

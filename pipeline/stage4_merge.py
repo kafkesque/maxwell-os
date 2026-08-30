@@ -1141,6 +1141,7 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
         _state = dict(scalar_state)
         if _S2_INPUT_FINGERPRINT is not None:
             _state["s2_input_fingerprint"] = _S2_INPUT_FINGERPRINT
+        _state["record_count"] = len(fbs)  # D2487: asserted on resume (clean-cut truncation guard)
         json.dump(_state, state_tmp)
         state_tmp.flush()
         os.fsync(state_tmp.fileno())
@@ -1268,6 +1269,20 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 fbs = []
                 _scalar_state = {"classification_errors": 0, "name_collisions": 0}
                 for _stale_sidecar in (_depth_file, _cribs_file):  # stale pre-pass sidecars are also invalid
+                    if os.path.exists(_stale_sidecar):
+                        os.unlink(_stale_sidecar)
+            # D2487: record-count guard — a checkpoint truncated at a `\n` boundary
+            # (whole records dropped, every remaining line valid JSON) is invisible to
+            # load_jsonl. Assert on-disk count matches the count recorded at the last
+            # checkpoint write, else the truncation is silent.
+            _expected_count = _scalar_state.get("record_count") if isinstance(_scalar_state, dict) else None
+            if (not cluster_ids) and _expected_count is not None and len(fbs) != _expected_count:
+                print(f"   ⚠️  S4 resume record-count mismatch — checkpoint has {len(fbs)} FBs but .state.json recorded {_expected_count} (clean-cut truncation)")
+                print("   ⚠️  Starting fresh — prior S4 progress discarded")
+                processed_ids = set()
+                fbs = []
+                _scalar_state = {"classification_errors": 0, "name_collisions": 0}
+                for _stale_sidecar in (_depth_file, _cribs_file):
                     if os.path.exists(_stale_sidecar):
                         os.unlink(_stale_sidecar)
             # D2215-style format guard: zero overlap with current targets means the
@@ -2055,10 +2070,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             if _k and _k not in seen_ge:
                 seen_ge.add(_k)
                 deduped_ge.append(_stamp_sidecar(ge, pipeline_run_id, pipeline_commit))
-        safe_write(
-            ge_path,
-            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ge) + "\n",
-        )
+        safe_write_jsonl(ge_path, deduped_ge)  # D2487: stream, no single-join string
 
     # ── D2072: Save process templates separately ──────────────────────
     pt_path = STAGE4_CHECKPOINT.parent / S4_PT_OUTPUT
@@ -2070,10 +2082,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             if _k and _k not in seen_pt:
                 seen_pt.add(_k)
                 deduped_pt.append(_stamp_sidecar(pt, pipeline_run_id, pipeline_commit))
-        safe_write(
-            pt_path,
-            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pt) + "\n",
-        )
+        safe_write_jsonl(pt_path, deduped_pt)  # D2487: stream, no single-join string
 
     # ── D2072: Save process instances separately ──────────────────────
     pi_path = STAGE4_CHECKPOINT.parent / S4_PI_OUTPUT
@@ -2085,10 +2094,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             if _k and _k not in seen_pi:
                 seen_pi.add(_k)
                 deduped_pi.append(_stamp_sidecar(pi, pipeline_run_id, pipeline_commit))
-        safe_write(
-            pi_path,
-            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_pi) + "\n",
-        )
+        safe_write_jsonl(pi_path, deduped_pi)  # D2487: stream, no single-join string
 
     # ── D2072: Save tool instructions separately ──────────────────────
     ti_path = STAGE4_CHECKPOINT.parent / S4_TI_OUTPUT
@@ -2100,10 +2106,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             if _k and _k not in seen_ti:
                 seen_ti.add(_k)
                 deduped_ti.append(_stamp_sidecar(ti, pipeline_run_id, pipeline_commit))
-        safe_write(
-            ti_path,
-            "\n".join(json.dumps(t, ensure_ascii=False) for t in deduped_ti) + "\n",
-        )
+        safe_write_jsonl(ti_path, deduped_ti)  # D2487: stream, no single-join string
 
     # Summary
     print(f"\n{'='*60}")

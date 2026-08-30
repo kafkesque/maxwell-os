@@ -31,6 +31,15 @@
 
 > **🔎 ROUNDTABLE (2026-08-30, 3 forensic subagents) — latent silent-failure sites OFF the S4 critical path** (full detail in `governance/ROUNDTABLE_BUG188_FORENSIC_2026-08-30.md`). Active S2→S4→S5→S6 path is fail-closed. **✅ DONE (e4bd07e, 2026-08-30):** 7 non-atomic `open(...,"w")` writers to `safe_write_jsonl` (`bridge_s2_to_s4.py:68`, `stage1_5_fastembed.py:214`, `stage1_5_domain_cluster.py:236`, `probe_run.py:264`, `stage0_5_extract_metadata.py:400`, `golden_sampler.py:264`, `run_diagnostic.py:348`); fix 1 silent S0 resume reader (`stage0_convert.py:160-162`); fsync added (`benchmark_s4_depth_prompt_ab.py`, `benchmark_s4_depth.py`, `benchmark_s4_depth_frugal.py`); preflight checkpoint gate added (`scripts/preflight_checkpoint_check.py`) + 6-FB live smoke passed. SHOULD (still open): C16 config-read fallbacks (`stamp.py:58` git→"unknown", `stage4_merged_call.py` model/token literals, `hybrid_gate.py:46`); 4 HIGH silent data-loss (`stage1_5_intent.py:60`, `stage2_extract.py:2999/3028`, `stage6_okf_export.py:396`).
 
+> **🔎 ROUNDTABLE — LLM master-prompt audit (Claude, 2026-08-30)** (`governance/ROUNDTABLE_LLM_MASTER_PROMPT.md`). Findings + status:
+> - ✅ **FIXED** — `.segids`/`.state.json` sidecar writers now `raise` on failure (C16; was silent stale-resume).
+> - ✅ **FIXED** — GE/PT/PI/TI sidecars write via `safe_write_jsonl` (no single-join string).
+> - ✅ **FIXED** — `PrincipleJournal.append` uses `_write_all_bytes` + fsync (ignored `f.write` return).
+> - ✅ **FIXED** — resume record-count guard: `.state.json` records `record_count`; resume asserts `len(fbs)` matches (catches clean-cut `\n` truncation `load_jsonl` can't see).
+> - ⏳ **OPEN (reader→consumer gate)** — `scripts/preflight_checkpoint_check.py` built + smoke-verified but NOT wired into S5; S5 consumes S4 without a sha256+count gate.
+> - ⏳ **OPEN (scaling)** — `dedup_fbs_by_cosine` + `compute_fb_relationships` materialize full n×n float32 sim matrices (~282 MB @8.4k, ~3.6 GB @30k); chunk/FAISS top-k before next corpus growth.
+> - ⏳ **OPEN (landmine)** — `dedup_fbs_by_cosine` can `IndexError` if embeddings return short (loud, not silent).
+
 **🔴 MUST-FIX BEFORE S4→S5→S6 (correctness — these corrupt or silently degrade the corpus):**
 1. **BUG-181 #1 — evidence-passage contamination** (9.8% of singletons) — **GATE OPERATIONALIZED** + **DECIDED**: accept-and-flag + quarantine 29 severe at S5; fix `text_cleaner`/`stage1_3_prefilter` next corpus. (Not a full re-clean.)
 2. **BUG-181 #2 — empty-shell non-principle** (298 PT / 48 PI / 100 TI / 6 GE) — **DECIDED: sidecar-first.** Empty body documented in sidecar, filled via cross-examination (recipe-builder). No re-extraction.

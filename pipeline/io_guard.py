@@ -282,10 +282,18 @@ class PrincipleJournal:
             self.path.write_text("")
 
     def append(self, record):
-        """Append one JSONL line. Thread-safe via append-mode open."""
-        line = json.dumps(record, ensure_ascii=False) + "\n"
-        with open(self.path, "a") as f:
-            f.write(line)
+        """Append one JSONL line. Thread-safe via O_APPEND (fail-loud write).
+
+        A short/partial append is never silently accepted (BUG-188 class) —
+        _write_all_bytes loops the os.write and raises if it stalls.
+        """
+        line = (json.dumps(record, ensure_ascii=False) + "\n").encode("utf-8")
+        fd = os.open(self.path, os.O_APPEND | os.O_WRONLY)
+        try:
+            _write_all_bytes(fd, line)
+            os.fsync(fd)  # D2177: durable before returning
+        finally:
+            os.close(fd)
 
     def replay(self):
         """Yield all records in order."""

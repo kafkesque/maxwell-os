@@ -691,7 +691,8 @@ def _load_code_markers() -> tuple[str, ...]:
             _cfg = yaml.safe_load(_f) or {}
         raw = _cfg.get("code_markers") or []
         markers = [str(m) for m in raw if str(m).strip()]
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  stage2: code_markers unreadable ({type(e).__name__}: {e}) — no code markers (C16)", file=sys.stderr)
         markers = []
     _CODE_MARKERS = tuple(markers)
     return _CODE_MARKERS

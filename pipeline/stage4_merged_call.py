@@ -23,6 +23,7 @@ import re
 import time
 
 from pipeline.omlx_call import call_omlx_json
+import sys
 
 MERGED_CRIBS_CLASSIFY_SYSTEM = """You enrich and classify a Foundation Block in a single response. You receive an FB
 with name, definition, mechanism, boundary, and consequence. Your job is to ADD enrichment
@@ -137,13 +138,15 @@ def merged_cribs_classify(
         try:
             from pipeline.pipeline_paths import VERIFY_MODEL
             model = VERIFY_MODEL
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: VERIFY_MODEL config unreadable ({type(e).__name__}: {e}) — fallback 'gpt-oss-20b-MXFP4-Q8' (C16)", file=sys.stderr)
             model = "gpt-oss-20b-MXFP4-Q8"
     if max_tokens is None:
         try:
             from pipeline.pipeline_paths import _CFG
             max_tokens = int(_CFG.get("stage4", {}).get("merged_call_max_tokens", 512))
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: merged_call_max_tokens unreadable ({type(e).__name__}: {e}) — fallback 512 (C16)", file=sys.stderr)
             max_tokens = 512
 
     prompt = build_merged_prompt(fb_data)
@@ -358,7 +361,8 @@ def _apply_depth_prompt_variant(prompt: str) -> str:
 
 try:
     from pipeline.pipeline_paths import S4_DEPTH_PROMPT_VARIANT
-except Exception:
+except Exception as e:
+    print(f"   ⚠️  stage4: S4_DEPTH_PROMPT_VARIANT unreadable ({type(e).__name__}: {e}) — fallback 'baseline' (C16)", file=sys.stderr)
     S4_DEPTH_PROMPT_VARIANT = "baseline"  # C12 fallback: default = no change
 
 if S4_DEPTH_PROMPT_VARIANT == "v3_contrastive":
@@ -571,7 +575,8 @@ def batch_cribs_classify(
         try:
             from pipeline.pipeline_paths import VERIFY_MODEL
             model = VERIFY_MODEL
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: VERIFY_MODEL config unreadable ({type(e).__name__}: {e}) — fallback 'gpt-oss-20b-MXFP4-Q8' (C16)", file=sys.stderr)
             model = "gpt-oss-20b-MXFP4-Q8"
     if not fbs_data:
         return []
@@ -581,7 +586,8 @@ def batch_cribs_classify(
         try:
             from pipeline.pipeline_paths import _CFG
             max_tokens = int(_CFG.get("stage4", {}).get("batch_call_max_tokens", 2048))
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: batch_call_max_tokens unreadable ({type(e).__name__}: {e}) — fallback 2048 (C16)", file=sys.stderr)
             max_tokens = 2048
 
     prompt = build_batch_prompt(fbs_data)
@@ -714,7 +720,8 @@ def classify_depth_focused(
                 VERIFY_MODEL,
             )
             model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: depth-model config unreadable ({type(e).__name__}: {e}) — fallback 'gpt-oss-20b-MXFP4-Q8' (C16)", file=sys.stderr)
             model = "gpt-oss-20b-MXFP4-Q8"
 
     name = fb_data.get("name", "")
@@ -834,7 +841,8 @@ def batch_depth_classify(
         try:
             from pipeline.pipeline_paths import VERIFY_MODEL
             model = VERIFY_MODEL
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: VERIFY_MODEL config unreadable ({type(e).__name__}: {e}) — fallback 'gpt-oss-20b-MXFP4-Q8' (C16)", file=sys.stderr)
             model = "gpt-oss-20b-MXFP4-Q8"
     if not fbs_data:
         return []
@@ -842,13 +850,15 @@ def batch_depth_classify(
         try:
             from pipeline.pipeline_paths import S4_DEPTH_BATCH_MAX_TOKENS
             max_tokens = S4_DEPTH_BATCH_MAX_TOKENS
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: S4_DEPTH_BATCH_MAX_TOKENS unreadable ({type(e).__name__}: {e}) — fallback 2048 (C16)", file=sys.stderr)
             max_tokens = 2048
     if batch_size is None:
         try:
             from pipeline.pipeline_paths import _CFG
             batch_size = int(_CFG.get("stage4", {}).get("depth_batch_size", 4))
-        except Exception:
+        except Exception as e:
+            print(f"   ⚠️  stage4: depth_batch_size unreadable ({type(e).__name__}: {e}) — fallback 4 (C16)", file=sys.stderr)
             batch_size = 4
     batch_size = max(1, int(batch_size))
     # D2367/BUG-132 parity: the focused-depth call caps CoT at depth_thinking_budget
@@ -858,7 +868,8 @@ def batch_depth_classify(
     # batch-sized token headroom (depth_batch_max_tokens) instead of the single-FB 1024.
     try:
         from pipeline.pipeline_paths import VERIFY_DEPTH_THINKING_BUDGET, S4_DEPTH_MAX_TOKENS
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  stage4: depth budget config unreadable ({type(e).__name__}: {e}) — fallback budget=None/tokens=1024 (C16)", file=sys.stderr)
         VERIFY_DEPTH_THINKING_BUDGET = None
         S4_DEPTH_MAX_TOKENS = 1024
 

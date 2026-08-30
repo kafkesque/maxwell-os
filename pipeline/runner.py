@@ -326,7 +326,8 @@ def _get_stage_timeout(stage_id: str) -> float | None:
         _timeouts = _cfg.get("stages", {}).get("timeouts", {})
         # Direct key lookup — config keys match STAGES dict keys (C12: no hardcoded mapping)
         return _timeouts.get(stage_id, 3600.0)
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  runner: stages.timeouts unreadable ({type(e).__name__}: {e}) — fallback 3600s (C16)", file=sys.stderr)
         return 3600.0  # fallback default
 
 

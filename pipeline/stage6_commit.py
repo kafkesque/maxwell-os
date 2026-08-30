@@ -307,7 +307,8 @@ def _get_pipeline_version() -> str:
         import yaml
         vcfg = yaml.safe_load(Path("config/version.yaml").read_text())
         return str(vcfg.get("pipeline_version", "3.0"))
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  stage6: version.yaml unreadable ({type(e).__name__}: {e}) — fallback '3.0' (C16)", file=sys.stderr)
         return "3.0"
 
 

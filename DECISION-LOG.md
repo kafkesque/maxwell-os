@@ -3,6 +3,62 @@
 
 ---
 
+### D2497 — C16 config-read fallback sweep + BUG-189/190/191 + Q4-vs-Q8 A/B + S4 model research (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** Close the last open forensic-audit #4a item — the pervasive C16 config-read silent-fallback pattern (~15 sites returning hardcoded defaults with no log). Every site now logs the fallback to stderr: `stage4_merged_call.py` (10 model/max_tokens/batch_size/budget fallbacks), `stage1_3_prefilter.py` (`drop_patterns_extra`), `stage2_extract.py` (`code_markers`), `hybrid_gate.py` (`s2.gate`), `runner.py` (`stages.timeouts`), `stage6_commit.py` (`version.yaml`), `stamp.py` (`pipeline_manifest`). Also resolved: **BUG-189** (archived 3 dead `tools.pipeline_paths` phantom-import tools: `protect.py`, `nuke_anytype.py`, `validate_book_structure.py` — Stage 3 was removed D2120, `get_space_id` never existed, `stage6b` uses `route_space()`), **BUG-190** (`model_lazyload.py --status` now reads authoritative `/health` not the `/v1/models` catalog), **BUG-191** (`check_stage_order()` no longer counts `timeouts` as a stage). **Q4-vs-Q8 quant A/B run** (n=16 golden depth): Q4 = 14.41s median / 62.5% vs Q8 = 5.09s / 93.8% → **Q4 is 2.8× slower AND 31pt less accurate; keep `gpt-oss-20b-MXFP4-Q8`.** **S4 model research** (last-month releases): every major new model is a 100B–1.6T MoE that won't fit 64 GB; no classification-specific fine-tune exists. 149/149 tests green.
+- **Status:** ✅ DONE — no S4 rerun performed
+- **Files:** `pipeline/stage4_merged_call.py`, `pipeline/stage1_3_prefilter.py`, `pipeline/stage2_extract.py`, `pipeline/hybrid_gate.py`, `pipeline/runner.py`, `pipeline/stage6_commit.py`, `pipeline/stamp.py`, `pipeline/model_lazyload.py`, `pipeline/integrity_check.py`, `archive/*.archived-2026-08-30`, `scripts/benchmark_s4_quant_ab.py`, `governance/S4_MODEL_RESEARCH_2026-08-30.md`, `governance/buglog.md`
+- **Source:** Session 2026-08-30 — C16 sweep + gov sync (no S4 rerun)
+
+### D2496 — MUST+SHOULD+WORTH pre-rerun hardening (no S4 rerun) (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** (1) **MUST — authoritative `--expect-count`:** S4 persists a S2-derived `expected_fb_count` sidecar (`<checkpoint>.expected_count.json`); S5 `_preflight_gate` passes `--expect-count`; `preflight_checkpoint_check.py` checks it INDEPENDENT of the self-referential manifest → a silent S4-side record DROP fails closed. (2) **MUST — BUG-187 schema drift:** 7 fields added to `schemas.FB` (`source_segments`, `evidence_passages`, `evidence_passages_shown`, `is_summary`, `classification_error`, `classify_model`, `manifest_hash`); `jargon` ALWAYS emitted; `content_types.yaml` `metadata.stamps` += `classify_model`/`taxonomy_version`/`manifest_hash`. (3) **MUST — BUG-181#1 evidence gate:** S5 quarantines severe EPUB→MD evidence contamination (>0.15 artifact ratio) before NLI. **SHOULD:** log 3 silent-exception swallows (stage0_convert Docling fallback, stage1_5_embed_cluster prefilter flag, stage6_okf_export verification_results parse); pin 3 memory-budget labels (`delegate_model_budget` ~24GB / `omlx_guard_ceiling` 55GB / `run_wall_budget` 48GB). **WORTH:** 10 non-atomic auxiliary writers → `safe_write`/`safe_write_jsonl`. 149/149 tests green.
+- **Status:** ✅ DONE
+- **Files:** `pipeline/schemas.py`, `pipeline/stage4_merge.py`, `pipeline/stage5_verify.py`, `scripts/preflight_checkpoint_check.py`, `config/content_types.yaml`, `AGENTS.md`
+- **Source:** Session 2026-08-30 — MUST+SHOULD+WORTH pre-rerun hardening
+
+### D2493 — Forensic audit (4 local LLMs parallel) + mark depth-fallback (C16) (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** `stage4_merge.py` invalid `raw_depth` fallback now sets `classification_status='FALLBACK'` + `classification_error`, so a hallucinated depth is never indistinguishable from a confident `domain` classification (C16). Added reusable `scripts/run_forensic_audit_parallel.py` (uses `call_omlx` non-streaming; delegate transport flaky on long OMLX streams).
+- **Status:** ✅ DONE
+- **Files:** `pipeline/stage4_merge.py`, `scripts/run_forensic_audit_parallel.py`
+- **Source:** Session 2026-08-30 — forensic audit
+
+### D2492 — Byte-identity A/B: gpt-oss MoE parallelism is NOT quality-neutral (2026-08-30)
+**Category:** RESEARCH
+
+**Decision:** `scripts/benchmark_s4_parallel_byteidentical.py` (n=6, 4 workers, seed=42): serial-vs-serial byte-identical (temp=0.0 greedy deterministic solo); parallel(4w) = 0.98× speedup (server serializes MoE dispatch) AND 0/6 byte-identical (discipline/domain/depth/elaboration all drift). Confirms D2478 with a stricter byte-identity check. Quality-neutral S4 floor stays ~48h; no parallel lever exists for the 128-expert MoE classifier.
+- **Status:** ✅ DONE
+- **Files:** `scripts/benchmark_s4_parallel_byteidentical.py`
+- **Source:** Session 2026-08-30 — parallelism A/B
+
+### D2491 — Fix 4 silent-exception sites (C16) + emerging-rate gate + SHA-256 S4 fingerprint (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** (1) `stage1_5_intent.py` logs embedding failures (was silent `[]` append → chunk scored 0.0). (2) `stamp.py` logs git rev-parse failures (was silent `unknown` fallback, R14). (3) `stage2_extract.py` logs malformed segment_ids + singleton LLM crash (was silent None/[]). (4) `stage6_okf_export.py` counts+logs malformed JSON lines. Also wired `scripts/gate_emerging_rate.py` into `triad` + `gate-emerging` recipe; `stage4_merge.py` `_s2_input_fingerprint` now content-hashes S2 checkpoints + schema/taxonomy/commit/manifest/model lineup.
+- **Status:** ✅ DONE
+- **Files:** `pipeline/stage1_5_intent.py`, `pipeline/stamp.py`, `pipeline/stage2_extract.py`, `pipeline/stage6_okf_export.py`, `pipeline/stage4_merge.py`, `Justfile`
+- **Source:** Session 2026-08-30 — C16 sweep + S4 fingerprint
+
+### D2490 — Roundtable findings #3/#4/#5 + preflight pretty-print guard + live CRIBS smoke (2026-08-30)
+**Category:** OPS / RELIABILITY
+
+**Decision:** (1) **#5 dedup IndexError:** align embeddings to fbs by index (empty → None, excluded) instead of filtering rows while keeping n=len(fbs). (2) **#4 O(n²) memory:** chunk the pairwise cosine matrix in `dedup_fbs_by_cosine` + `compute_fb_relationships` (O(chunk·n) peak); guard misaligned embedding count. (3) **#3 preflight→S5:** `_preflight_gate` runs boundary+sha256+record-count check before S5 consumes the S4 checkpoint; boundary_check loudly detects pretty-printed checkpoints. Live CRIBS contract smoke (`test_smoke_live_cribs_contract`) closes the LLM-off plumbing-stub blind spot.
+- **Status:** ✅ DONE
+- **Files:** `pipeline/stage4_merge.py`, `pipeline/stage5_verify.py`, `scripts/preflight_checkpoint_check.py`, `tests/test_smoke_live_cribs_contract.py`
+- **Source:** Session 2026-08-30 — roundtable remediation
+
+### D2488 — application/failure_mode REQUIRED (not optional) for principles (2026-08-30)
+**Category:** QLT
+
+**Decision:** `content_types.yaml` gains `principle_required_body` (application/failure_mode/elaboration) + `principle_optional_body` (jargon only) as machine-readable cardinality; `audit_s4_fields.py` reads cardinality from YAML via `_cardinality()` (fixes a C12 violation — was hardcoding `PRINCIPLE_OPTIONAL`); `stage4_merge.py` D2488 fail-closed gate quarantines empty/short `failure_mode` (parity with D2371 application gate).
+- **Status:** ✅ DONE
+- **Files:** `config/content_types.yaml`, `scripts/audit_s4_fields.py`, `pipeline/stage4_merge.py`
+- **Source:** Session 2026-08-30 — content-type cardinality
+
 ### D2487 — BUG-188 fix: S4 checkpoint 2GB truncation (fail-loud safe_write + streaming JSONL + related_fbs cap) (2026-08-30)
 **Category:** OPS / RELIABILITY
 

@@ -13,7 +13,7 @@ Why two files / two phases:
 Usage:
     python3 scripts/s4_status.py          # full status
     python3 scripts/s4_status.py --json   # machine-readable
-    tail -f "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/stage4_merge/t11/s4_run.log"
+    tail -f "<S4DIR>/s4_run.log"          # S4DIR derived from pipeline_paths + run_id
 """
 from __future__ import annotations
 
@@ -22,11 +22,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO = Path("/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0")
-S4DIR = REPO / "knowledge pipeline" / "stage4_merge" / "t11"
+# D2497/C12: derive paths from the project root + pipeline_paths (no hardcoded
+# home-dir absolute paths). Safe to run from ANY directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from pipeline.pipeline_paths import STAGE4_CHECKPOINT, S4_DIR, get_run_id
+
+RUN_ID = get_run_id()
+S4DIR = S4_DIR / RUN_ID
 LOG = S4DIR / "s4_run.log"
-DEPTH = S4DIR / "checkpoint.jsonl.depth.json"
-CKPT = S4DIR / "checkpoint.jsonl"
+DEPTH = STAGE4_CHECKPOINT.with_name(STAGE4_CHECKPOINT.name + ".depth.json")
+CKPT = STAGE4_CHECKPOINT
 
 
 def _jsonl_count(p: Path) -> int:

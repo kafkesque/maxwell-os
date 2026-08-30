@@ -30,6 +30,7 @@ Usage (from stage2_extract.py):
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -43,7 +44,8 @@ def _load_gate_config() -> dict[str, Any]:
         with open(_cfg_path) as _f:
             _cfg = _yaml.safe_load(_f) or {}
         return _cfg.get("s2", {}).get("gate", {})
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  hybrid_gate: s2.gate config unreadable ({type(e).__name__}: {e}) — empty gate config (C16)", file=sys.stderr)
         return {}
 
 

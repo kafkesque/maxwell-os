@@ -74,7 +74,8 @@ def _load_extra_drop_patterns():
         pats = (_cfg.get("stage1_3", {}) or {}).get("drop_patterns_extra", []) or []
         # ".*" prefix gives search semantics (re.match is anchored at pos 0)
         return [(r".*" + re.escape(p), re.I) for p in pats if p and p.strip()]
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  stage1_3: drop_patterns_extra unreadable ({type(e).__name__}: {e}) — no extra drop patterns (C16)", file=sys.stderr)
         return []
 
 _EXTRA_DROP_PATTERNS = _load_extra_drop_patterns()

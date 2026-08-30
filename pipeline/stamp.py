@@ -116,7 +116,8 @@ def _load_manifest() -> dict:
         with open(_cfg_path) as _f:
             _cfg = _yaml.safe_load(_f) or {}
         return _cfg.get("pipeline_manifest", {})
-    except Exception:
+    except Exception as e:
+        print(f"   ⚠️  stamp: pipeline_manifest unreadable ({type(e).__name__}: {e}) — empty manifest (C16)", file=sys.stderr)
         return {}
 
 

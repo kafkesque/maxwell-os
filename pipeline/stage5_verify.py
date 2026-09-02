@@ -726,6 +726,22 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         _reason = "fingerprint absent" if _stored_fp_id is None else "fingerprint MISMATCH"
         print(f"   🛑 S5 checkpoint {_reason} — hard-discarding and re-verifying all "
               f"(D2485: no manual archive needed)")
+        # D2507 (BUG-206): archive the stale checkpoint BEFORE re-verifying. The
+        # io_guard.safe_write shrink guard refuses a >10% smaller first incremental
+        # write over the stale 100MB file (reads as a partial-state overwrite), so
+        # the "hard-discard" path must move the old file aside rather than rely on
+        # in-place overwrite. R-D410-safe: RENAME (never delete) to a timestamped
+        # .stale_* backup so the old verdicts remain recoverable.
+        _stale_ts = time.strftime("%Y%m%d_%H%M%S")
+        try:
+            _stale_ckpt = Path(str(STAGE5_CHECKPOINT) + f".stale_{_stale_ts}")
+            STAGE5_CHECKPOINT.replace(_stale_ckpt)
+            _stale_fp = Path(str(STAGE5_CHECKPOINT) + ".input_fingerprint.json")
+            if _stale_fp.exists():
+                _stale_fp.replace(str(_stale_fp) + f".stale_{_stale_ts}")
+        except OSError as e:
+            print(f"   🛑 could not archive stale S5 checkpoint ({type(e).__name__}: {e}) — aborting (fail-closed)")
+            raise
         verified = []
         done_ids = set()
 

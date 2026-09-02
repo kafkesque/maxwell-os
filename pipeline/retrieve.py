@@ -39,13 +39,40 @@ from pipeline.pipeline_paths import DB_PATH
 
 
 def get_conn() -> sqlite3.Connection:
-    """Get a read-only connection to the database."""
+    """Get a read-only connection to the database.
+
+    D2509 (M1 fix): loads sqlite-vec into the connection so vec_fbs MATCH
+    queries work. Gracefully no-ops (vector leg falls back to FTS in
+    search_vector) when sqlite-vec is missing OR the Python build lacks
+    enable_load_extension (python.org framework build).
+    """
     if not DB_PATH.exists():
         print(f"❌ Database not found: {DB_PATH}")
         sys.exit(1)
     conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
+    _try_load_sqlite_vec(conn)
     return conn
+
+
+def _try_load_sqlite_vec(conn: sqlite3.Connection) -> bool:
+    """Load sqlite-vec into a connection if available (D2509).
+
+    Non-fatal by design: when sqlite-vec is missing or the Python build lacks
+    enable_load_extension, vector search degrades to FTS (C23 resilient path).
+    Returns True only when the vec0 module is registered.
+    """
+    try:
+        import sqlite_vec
+    except ImportError:
+        return False
+    try:
+        conn.enable_load_extension(True)
+        sqlite_vec.load(conn)
+        conn.enable_load_extension(False)
+        return True
+    except Exception:
+        return False
 
 
 
@@ -176,29 +203,39 @@ def search_vector(
     try:
         import struct
 
-        import numpy as np
+        from pipeline.embeddings import embed_texts_bge_m3
 
-        from pipeline.ollama_embed import batch_embed
-
-        # Embed the query
-        embeddings = batch_embed([query])
-        if not embeddings or not embeddings[0]:
+        # Embed the query (D2509: 512d Matryoshka + L2-normalized to match
+        # vec_fbs float[512]. Was raw bge-m3 1024d via batch_embed — a
+        # dimension mismatch that broke vector search even when vec_fbs existed.)
+        arr = embed_texts_bge_m3([query])
+        if arr.size == 0:
             print("  ⚠️  Embedding failed, falling back to FTS")
             return search_fts(conn, query, limit)
 
-        query_vec = embeddings[0]
+        query_vec = [float(x) for x in arr[0]]
         query_blob = struct.pack(f'{len(query_vec)}f', *query_vec)
 
-        # Try sqlite-vec similarity search on pre-computed embeddings
+        # D2509 (M1 fix): sqlite-vec requires the `k` constraint on a top-level
+        # vec0 KNN query — `definition_embedding MATCH ?` in a JOIN breaks its
+        # constraint detection (returns 0 rows). Use a KNN subquery + outer
+        # JOIN, and OVERSAMPLE (`k = limit*5`, floor 100) because the KNN top-k
+        # is computed BEFORE the status filter and QUARANTINE dominates the
+        # corpus (58%) — filtering top-k=limit directly starves PASS to 0.
+        knn_k = max(limit * 5, 100)
         try:
             rows = conn.execute(f"""
-                SELECT fbs.*, vec_fbs.distance
-                FROM vec_fbs
-                JOIN fbs ON fbs.rowid = vec_fbs.rowid
-                WHERE fbs.{_status_predicate(include_quarantine)}
-                    AND definition_embedding MATCH ?
-                    AND k = ?
-                ORDER BY distance
+                SELECT f.*, v.distance
+                FROM (
+                    SELECT rowid, distance
+                    FROM vec_fbs
+                    WHERE definition_embedding MATCH ?
+                      AND k = {int(knn_k)}
+                ) v
+                JOIN fbs f ON f.rowid = v.rowid
+                WHERE f.{_status_predicate(include_quarantine)}
+                ORDER BY v.distance
+                LIMIT ?
             """, (query_blob, limit)).fetchall()
 
             if rows:

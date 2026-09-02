@@ -36,7 +36,7 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 |--------|------|--------|
 | **BEFORE S6 (already done, D2507)** | BUG-205 book dedup + B2 majority rule + evidence-garbage filter | ✅ code committed; re-verification via S5 re-run |
 | **BEFORE S6 (gate)** | `just pre-s6` (count / fb_id-unique / contamination / tally) | ✅ script ready; run after S5 re-run |
-| **AT S6 (verify, not adopt)** | M1 vector-dim contract (bge-m3 512d ↔ `vec_fbs float[512]`) | 🔴 **CONFIRMED DEGRADED (D2508)** — `vec_fbs` absent (python.org SQLite lacks `enable_load_extension`); FTS-only fallback live |
+| **AT S6 (verify, not adopt)** | M1 vector-dim contract (bge-m3 512d ↔ `vec_fbs float[512]`) | ✅ **FIXED + VERIFIED (D2509)** — 7867/7867 backfilled; vector leg LIVE in RRF |
 | **AFTER S6 (SHOULD)** | S1 contextual embeddings, S2 cross-encoder rerank (gated), S3 HyDE (gated) | ⏳ |
 | **AFTER S6 (WORTH)** | USearch / TurboVec / LightRAG / ColBERT / GraphRAG / RAPTOR | ⏳ monitor/conditional |
 
@@ -44,8 +44,8 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 
 ## MUST (adopt now / verify at S6 — correctness + sovereignty, near-zero cost)
 
-### M1. Verify the vector-dimension contract (bge-m3 512d ↔ `vec_fbs float[512]`) — 🔴 NOW A LIVE BLOCKER (D2508)
-> **D2508 finding:** at S6 commit, `vec_fbs` was ABSENT and all 7867 embedding inserts failed (`no such table: vec_fbs`). Root cause is NOT the dimension contract but the **Python runtime**: `/usr/local/bin/python3` (python.org framework 3.12.1) has SQLite compiled WITHOUT `enable_load_extension` (`SQLITE_OMIT_LOAD_EXTENSION`), so `sqlite_vec.load()` raises `AttributeError` even though `sqlite-vec` is pip-installed and `vec0.dylib` is present. **Fix:** run under `/opt/homebrew/bin/python3` (SQLite 3.53.3, `enable_load_extension=True`) or the `knowledge-pipeline` conda env (3.11.15, SQLite 3.52.0) + `pip install sqlite-vec`, then backfill embeddings from persisted `fbs.definition` (no S5 re-run). Until then, RRF degrades to FTS-only (C23 path already smoke-tested).
+### M1. Verify the vector-dimension contract (bge-m3 512d ↔ `vec_fbs float[512]`) — ✅ FIXED + VERIFIED (D2509)
+> **D2509 finding (supersedes D2508):** the degradation was **FOUR independent bugs**, and the env was only the first. (1) **Env** — `/usr/local/bin/python3` SQLite lacks `enable_load_extension` (fixed by running under `/opt/homebrew/bin/python3`, SQLite 3.53.3). (2) **Dimension contract (the M1 latent bug)** — `insert_embedding` + `search_vector` packed **raw bge-m3 1024d** into `vec_fbs float[512]` via `ollama_embed.batch_embed`; this would silently misrank *even after* sqlite-vec loaded. (3) **Read path** — `retrieve.get_conn()` never loaded sqlite-vec → `no such module: vec0`. (4) **Query form** — `JOIN + MATCH + k` broke sqlite-vec KNN constraint detection (0 rows) AND applied `k=limit` before the status filter (QUARANTINE 58% starved PASS to 0). **Fixes:** both embed paths → `pipeline.embeddings.embed_texts_bge_m3` (Matryoshka 512d + L2-normalized); `get_conn()` loads sqlite-vec (graceful FTS fallback, C23); `search_vector` → KNN subquery with oversample (`k=limit*5`, floor 100) + outer JOIN + status filter; new `pipeline/backfill_embeddings.py`. **Verified:** 7867/7867 backfilled (0 orphaned); FTS returns **0** for "how do organizations bounce back after a major crisis" while **hybrid RRF recovers "Collective Intelligence Recovery"** — semantic recall proven; 174 + 5 new M1 contract tests pass.
 - **What:** `stage6_commit.py` pre-computes `definition_embedding` at commit time (BUG-004) and stores
   it in `vec_fbs` (`float[S15_EMBED_DIM]`); `search_vector` embeds the query and packs `len(query_vec)f`.
   A dimension drift (e.g. bge-m3 pulled at 1024d native vs the 512d Matryoshka truncation in config) would
@@ -121,9 +121,21 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 3. ✅ **B2 majority entailment** — 8/8 new tests on the pure `_b2_majority_verdict` (single-passage parity,
    majority-vote, contradiction-veto, score contract). Full suite **174 passed**.
 
-### Deferred live tests (need the S6-committed DB)
-- Vector-dimension contract (M1) — requires `just stage6` first.
-- End-to-end agentic retrieval precision — requires the full FB corpus + a golden query set.
+### D2509 live stress tests (M1 fixed — the "does the vector leg actually work" mandate)
+1. ✅ **Vector dimension contract** — `embed_texts_bge_m3` returns `(n, 512)` L2-normalized (live Ollama bge-m3);
+   `S15_EMBED_DIM == embeddings.EMBED_DIM == 512`; `CREATE_VEC_TABLE` declares `float[512]` (5/5 new tests).
+2. ✅ **Backfill** — `pipeline/backfill_embeddings.py` → **7867/7867** rows, **0 orphaned**, 2m52s (Homebrew Python).
+3. ✅ **Semantic recall (the M1 payoff)** — FTS returns **0** for *"how do organizations bounce back after a major
+   crisis"* (vocabulary mismatch), while **hybrid RRF recovers "Collective Intelligence Recovery"** — proving the
+   vector leg adds real recall that FTS alone cannot.
+4. ✅ **Quarantine contract intact** — `search_vector` oversamples (`k=limit*5`) so a QUARANTINE-heavy top-k no
+   longer starves PASS to 0; default still `status='PASS'` (D2330).
+5. ✅ **No regression** — full suite 174 passed + FTS/keyword/hybrid/vector all smoke-tested.
+
+### Remaining deferred live tests
+- End-to-end agentic retrieval precision — requires a golden query set (still open).
+- S2 cross-encoder A/B — **blocked**: no local reranker model installed (`ollama list` has none); needs a
+  held-out precision benchmark before enabling (per research doc gate).
 
 ---
 

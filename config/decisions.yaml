@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-02T00:00:00Z'
-total_decisions: 492
+total_decisions: 493
 decisions:
 - id: D2092
   category: INF
@@ -5113,11 +5113,22 @@ decisions:
   - pipeline/stage6_commit.py
   - pipeline/book_metadata.py
   created: '2026-09-02'
+- id: D2509
+  category: BUGFIX
+  state: ACTIVE
+  description: 'M1 VECTOR SEARCH FIXED + 7867 embeddings backfilled (RESOLVES D2508 M1 degradation). Root cause was FOUR independent failures, not one: (1) ENV — /usr/local/bin/python3 (python.org framework 3.12.1) SQLite lacks enable_load_extension, so sqlite-vec never loaded; (2) DIMENSION CONTRACT (M1 latent bug) — insert_embedding + search_vector used ollama_embed.batch_embed (raw bge-m3 1024d) against vec_fbs float[512]; (3) READ PATH — retrieve.get_conn() never loaded sqlite-vec, so vec_fbs MATCH failed "no such module: vec0"; (4) QUERY FORM — the JOIN + definition_embedding MATCH + k pattern broke sqlite-vec KNN constraint detection (0 rows) and applied the k limit BEFORE the status filter (QUARANTINE 58% starved PASS to 0). FIXES: insert_embedding + search_vector now route through pipeline.embeddings.embed_texts_bge_m3 (Matryoshka 512d + L2-normalized); get_conn() loads sqlite-vec (graceful FTS fallback, C23); search_vector uses a KNN subquery (k=limit*5 oversample, floor 100) + outer JOIN + status filter; new pipeline/backfill_embeddings.py (idempotent, runs under /opt/homebrew/bin/python3) backfilled 7867/7867 (0 orphaned, 2m52s). VERIFIED: vector top-5 returns sane PASS results; FTS returns 0 for "bounce back after a crisis" while hybrid RRF recovers "Collective Intelligence Recovery" (semantic recall proven); all 174 tests + 5 new M1 contract tests pass. RRF KEPT (M2). SHOULD/WORTH (S1 contextual, S2 cross-encoder rerank, S3 HyDE) remain GATED post-S6 — no reranker model installed locally, no A/B benchmark yet.'
+  champion: goose
+  target_files:
+  - pipeline/stage6_commit.py
+  - pipeline/retrieve.py
+  - pipeline/backfill_embeddings.py
+  - tests/test_vector_dim_contract_d2509.py
+  created: '2026-09-02'
 summary:
-  total: 492
+  total: 493
   proposed: 0
   draft: 1
-  active: 433
+  active: 434
   stale: 0
   superseded: 15
   archived: 8
@@ -5131,7 +5142,7 @@ summary:
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     BUG: 1
-    BUGFIX: 38
+    BUGFIX: 39
     BUGFIX / CFG: 1
     BUGFIX / DATA-INTEGRITY: 2
     BUGFIX / DRIFT: 1

@@ -339,17 +339,23 @@ def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> b
 
     Embeds the definition once at commit time and stores in vec_fbs.
     Eliminates O(n) re-embedding on every search_vector() query.
+
+    D2509 (M1 fix): route through pipeline.embeddings.embed_texts_bge_m3
+    (Matryoshka 512d + L2-normalized) instead of ollama_embed.batch_embed
+    (raw bge-m3 1024d). The raw 1024d vector violated the vec_fbs float[512]
+    dimension contract (M1, D2508) — every insert would have silently
+    misranked or errored even after sqlite-vec loaded.
     """
     try:
         import struct
 
-        from pipeline.ollama_embed import batch_embed
+        from pipeline.embeddings import embed_texts_bge_m3
 
-        embeddings = batch_embed([definition])
-        if not embeddings or not embeddings[0]:
+        arr = embed_texts_bge_m3([definition])
+        if arr.size == 0:
             return False
 
-        emb = embeddings[0]
+        emb = [float(x) for x in arr[0]]
         # Pack float32 array into binary blob for sqlite-vec
         blob = struct.pack(f'{len(emb)}f', *emb)
         conn.execute(

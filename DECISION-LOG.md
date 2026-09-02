@@ -3,6 +3,22 @@
 
 ---
 
+### D2509 — M1 VECTOR SEARCH FIXED + 7867 embeddings backfilled (RESOLVES D2508 M1 degradation) (2026-09-02)
+- **Category:** BUGFIX (vector dimension contract + sqlite-vec read path) + INFRASTRUCTURE (env)
+- **Decision/findings:** The D2508 "M1 vector degradation" was actually **FOUR independent failures**, not just the environment:
+  1. **ENV** — `/usr/local/bin/python3` (python.org framework 3.12.1) SQLite lacks `enable_load_extension` → sqlite-vec never loads. Verified `/opt/homebrew/bin/python3` (SQLite 3.53.3, `enable_load_extension=True`, has sqlite-vec + numpy + pandas + pyarrow) is the fix.
+  2. **DIMENSION CONTRACT (M1 latent bug, not just env).** `insert_embedding` (`stage6_commit.py`) and `search_vector` (`retrieve.py`) used `ollama_embed.batch_embed`, which returns **raw bge-m3 1024d**, against `vec_fbs float[512]` (`S15_EMBED_DIM=512`). Every insert would have silently misranked/errored **even after** sqlite-vec loaded. This is exactly the latent corruption M1 warned about.
+  3. **READ PATH** — `retrieve.get_conn()` never loaded sqlite-vec, so `vec_fbs MATCH` failed `no such module: vec0` even with backfilled data.
+  4. **QUERY FORM** — the `JOIN + definition_embedding MATCH + k` pattern broke sqlite-vec KNN constraint detection (0 rows), and applied `k=limit` **before** the status filter — with QUARANTINE at 58% of the corpus, PASS was starved to 0.
+- **Fixes (surgical, all verified):** `insert_embedding` + `search_vector` route through `pipeline.embeddings.embed_texts_bge_m3` (Matryoshka 512d + L2-normalized); `get_conn()` loads sqlite-vec (graceful FTS fallback, C23); `search_vector` uses a KNN subquery with oversample (`k=limit*5`, floor 100) + outer JOIN + status filter; new `pipeline/backfill_embeddings.py` (idempotent, crash-safe, runs under Homebrew Python).
+- **Result:** backfilled **7867/7867** (`0 orphaned`, 2m52s). `fbs=7867`, `vec_fbs=7867`, `PASS=3274`, `QUARANTINE=4593`, FTS intact. **Stress-tested:** vector top-5 returns sane PASS results; FTS returns **0** for "how do organizations bounce back after a major crisis" while **hybrid RRF recovers "Collective Intelligence Recovery"** (semantic recall proven — vocabulary mismatch FTS misses, vector catches). 174 tests + 5 new M1 contract tests (`tests/test_vector_dim_contract_d2509.py`) pass.
+- **RRF question → KEPT (M2).** RRF is the correct scale-free, deterministic fusion primitive (Cormack/Clarke/Buettcher SIGIR 2009); the problem was a dead vector *leg*, not the fusion. Do NOT swap to score fusion.
+- **SHOULD/WORTH → remain GATED post-S6.** S1 (contextual/late-chunk), S2 (local cross-encoder rerank — no reranker model installed locally), S3 (HyDE) all deferred: no local reranker model, no held-out A/B benchmark, and each adds a dependency/latency (violates C1/C5) without a verified precision win. WORTH items (USearch/TurboVec/LightRAG/ColBERT/GraphRAG/RAPTOR) remain monitor-only.
+- **Status:** ✅ M1 FIXED + VERIFIED; RRF kept; S1/S2/S3 gated.
+- **Files:** `pipeline/stage6_commit.py`, `pipeline/retrieve.py`, `pipeline/backfill_embeddings.py`, `tests/test_vector_dim_contract_d2509.py`
+- **Tests:** 5/5 new M1 contract tests; full suite 174 passed; live vector/hybrid/FTS/keyword retrieval smoke.
+- **Source:** Session 2026-09-02 — "fix fbs.definition embedding backfill + RRF question + stress-test MUST/SHOULD/WORTH + examine DB for adaptations"
+
 ### D2508 — S6 COMMITTED (7867 FBs) + M1 vector degradation CONFIRMED + B2 materialized (2026-09-02)
 - **Category:** INFRASTRUCTURE (M1 vector) + CORRECTNESS (B2 materialization)
 - **Decision/findings:**

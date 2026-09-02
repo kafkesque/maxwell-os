@@ -3,6 +3,15 @@
 
 ---
 
+### D2508 — S6 COMMITTED (7867 FBs) + M1 vector degradation CONFIRMED + B2 materialized (2026-09-02)
+- **Category:** INFRASTRUCTURE (M1 vector) + CORRECTNESS (B2 materialization)
+- **Decision/findings:**
+  1. **S6 COMMITTED.** Post-hoc S5 re-run (D2507) → `just pre-s6` (**PASSED**: 7867 == expected, fb_id unique 7867/7867, evidence-contamination 8 severe→QUARANTINE) → `just stage6`: **7867 FBs inserted, 0 failed**, FTS populated, Parquet `fbs_snapshot_20260902_151043.parquet` (41.6 MB).
+  2. **B2 majority rule MATERIALIZED** — PASS **5074→3274**, QUARANTINE **2793→4593**. Current breakdown: ENTAIL-majority 3274 / NEUTRAL 3727 / CONTRA-veto 293 / all-garbage 550 / MECH-FAIL 15 / evidence-garbage 8. Quarantine is **commit-with-status (D2420), NOT data loss** — all 7867 committed; 626 flagged `needs_human_review`.
+  3. **M1 vector degradation CONFIRMED (NEW).** `vec_fbs` table ABSENT → 0 embeddings. Root cause: active Python (`/usr/local/bin/python3`, python.org framework 3.12.1) has SQLite 3.43.1 compiled **without `enable_load_extension`** (`SQLITE_OMIT_LOAD_EXTENSION`); `sqlite-vec` **IS installed** (`vec0.dylib` present) but `sqlite_vec.load()` raises `AttributeError` → `vec0` module never registers → `CREATE VIRTUAL TABLE vec_fbs USING vec0(...)` fails. FTS retrieval works; vector search DEGRADED. **Fix:** run under Homebrew Python (`/opt/homebrew/bin/python3`, SQLite 3.53.3, `enable_load_extension=True`) or `knowledge-pipeline` conda env (3.11.15, SQLite 3.52.0) + `pip install sqlite-vec` + backfill embeddings from persisted `fbs.definition` (NO S5 re-run needed).
+  4. **BUG-205 residual FALSE-MERGE found.** `Build a Large Language Model (From Scratch)` vs `Build a Reasoning Model (From Scratch) MEAP V01` (Raschka, 2 DISTINCT books) collapse to one source_id — `_SPACE_SUBTITLE_SPLIT` treats the mid-title article "a" as a subtitle opener → both normalize to `"build"`. Fix: drop `a`/`an` from the opener list (post-S6, surgical re-resolve of 2 source_ids; NOT a full re-run).
+- **Status:** ✅ S6 COMMITTED; M1 vector env + BUG-205 `a`/`an` opener are post-S6 blockers for vector search.
+
 ### D2507 — BUG-205 book dedup + B2 synthesis-entailment majority rule + retrieval research (2026-09-02)
 - **Category:** CORRECTNESS
 - **Decision:**

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-31T00:00:00Z'
-total_decisions: 491
+last_sync: '2026-09-02T00:00:00Z'
+total_decisions: 492
 decisions:
 - id: D2092
   category: INF
@@ -5104,11 +5104,20 @@ decisions:
   - tests/test_b2_majority_entailment.py
   - governance/RETRIEVAL-RESEARCH-2026-09-02.md
   created: '2026-09-02'
+- id: D2508
+  category: INFRASTRUCTURE
+  state: ACTIVE
+  description: 'S6 COMMITTED (7867 FBs, 0 failed) + M1 vector degradation CONFIRMED + B2 majority materialized. (1) S6: post-hoc S5 re-run (D2507) -> just pre-s6 (PASSED: 7867==expected, fb_id unique, 8 severe evidence->QUARANTINE) -> just stage6: 7867 inserted / 0 failed, FTS populated, Parquet fbs_snapshot_20260902_151043.parquet (41.6 MB). (2) B2 majority MATERIALIZED: PASS 5074->3274, QUARANTINE 2793->4593 (ENTAIL-majority 3274 / NEUTRAL 3727 / CONTRA-veto 293 / all-garbage 550 / MECH-FAIL 15 / evidence-garbage 8); quarantine is commit-with-status (D2420), NOT data loss — all 7867 committed, 626 needs_human_review. (3) M1 VECTOR DEGRADED (NEW): vec_fbs table ABSENT -> 0 embeddings; active Python (/usr/local/bin/python3, python.org framework 3.12.1) has SQLite 3.43.1 compiled WITHOUT enable_load_extension (SQLITE_OMIT_LOAD_EXTENSION); sqlite-vec IS installed (vec0.dylib present) but sqlite_vec.load() raises AttributeError -> vec0 module never registers -> CREATE VIRTUAL TABLE vec_fbs USING vec0(...) fails. FTS works; vector search DEGRADED. FIX: Homebrew Python (/opt/homebrew/bin/python3, SQLite 3.53.3, enable_load_extension=True) or knowledge-pipeline conda env (3.11.15, SQLite 3.52.0) + pip install sqlite-vec + backfill from fbs.definition (NO S5 re-run). (4) BUG-205 residual FALSE-MERGE: Build a Large Language Model vs Build a Reasoning Model (Raschka, 2 DISTINCT books) collapse via _SPACE_SUBTITLE_SPLIT mid-title "a" opener -> drop a/an from opener list (post-S6 surgical re-resolve).'
+  champion: goose
+  target_files:
+  - pipeline/stage6_commit.py
+  - pipeline/book_metadata.py
+  created: '2026-09-02'
 summary:
-  total: 491
+  total: 492
   proposed: 0
   draft: 1
-  active: 432
+  active: 433
   stale: 0
   superseded: 15
   archived: 8
@@ -5156,6 +5165,7 @@ summary:
     INF: 177
     INF / GOV: 1
     INF / OPS: 1
+    INFRASTRUCTURE: 1
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     MODEL: 2

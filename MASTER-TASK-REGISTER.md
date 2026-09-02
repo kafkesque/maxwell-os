@@ -1,5 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-09-02 | **Decisions:** D2000-D2507
+> **Updated:** 2026-09-02 | **Decisions:** D2000-D2508
+> **D2508 (this session):** S6 COMMITTED 7867 FBs (0 failed) + FTS + Parquet. B2 majority MATERIALIZED (PASS 5074→3274, QUARANTINE 2793→4593 — commit-with-status, 626 needs_human_review). M1 vector DEGRADED (NEW) — python.org SQLite lacks `enable_load_extension` → `vec_fbs` absent (fix: Homebrew/conda Python + `pip install sqlite-vec` + backfill). BUG-205 residual false-merge (Raschka "Build a LLM" vs "Build a Reasoning Model" via mid-title `a` opener). NEXT: M1 vector env fix + BUG-197 reclass + D2399 + 25 empty-shells.
 > **D2507 (this session):** BUG-205 book dedup FIXED (`book_metadata.py` `_unicode_fold` + `_SPACE_SUBTITLE_SPLIT` + fallback sanitize; 962→910 source_ids) + B2 synthesis-entailment FIXED (`_b2_majority_verdict` strict-majority, config `b2_majority_ratio`) + retrieval research (`governance/RETRIEVAL-RESEARCH-2026-09-02.md`). 174 tests green. NEXT: post-hoc S5 re-run → `just pre-s6` → `just stage6`.
 > **D2506 (this session, post-S5 hardening + frontier-review validation):** golden canonicalization (45 dormant stage2 domain/discipline alias→canonical, surgical) + B2 evidence-garbage filter (`_is_garbage_passage`) + quarantine triage (50-record sample + batch-adjudication prompt). Frontier reviews (claude0041/chatgpt0041) validated → BUG-205 (`source_diversity` inflated by near-duplicate book files). NLI distribution bimodal → threshold recalibration RULED OUT. S6 = GO (pre-s6 gate PASSED). Post-S6: B2 synthesis-entailment + evidence-filter S5 re-run (post-hoc); BUG-205 book-dedup; BUG-197 reclass.
 > **D2505 (prior session):** pre-S6 gate (`scripts/pre_s6_gate.py`) + BUG-195 fail-loud guard (`_assert_fb_id_unique`). Committed `6e621fd`; decision entry backfilled in D2506 governance pass.
@@ -34,7 +35,7 @@
 | 3 | P0 | Unattended watcher monitoring S4 finish | `s4_post_finish.py --watch` (PID 45537) | ✅ LIVE |
 | 4 | P1 | **At S4 completion (auto):** backup → dedup → remap → gate → audit → report | orchestrator | ⏳ awaiting S4 |
 | 5 | P1 | **Human review before S5:** verify the 6 dedup merges (13→6), gate result (emerging ~25%), audit PASS | `checkpoint_deduped.jsonl` + `s4_post_finish_report.json` | ✅ DONE (D2504 — 6 groups verified; count 7,867) |
-| 6 | P2 | Authorize S5 (only after audit PASS) → S6 | `just stage5` / `just stage6` | ⏳ |
+| 6 | P2 | Authorize S5 (only after audit PASS) → S6 | `just stage5` / `just stage6` | ✅ DONE (D2508 — S5 rerun 7867 → pre-s6 gate PASSED → S6 committed 7867 FBs, 0 failed; vector DEGRADED → M1 post-S6) |
 | 7 | P3 | S4 code fix: cross-cluster dedup + S6 duplicate-fb_id fail-loud guard (BUG-195) | `stage4_merge.py` / `stage6_commit.py` | future batch |
 | 8 | P3 | S4 code fix: name truncation — raise `fb_name_max_words` / ellipsis / concise generator (BUG-196) | `stage4_merge.py` / config | future batch |
 | 9 | P3 | S4 classifier fix: enforce domain/discipline disjointness D2422 (BUG-197) | `stage4_merged_call.py` prompt + golden | future batch |
@@ -63,6 +64,7 @@
 | 32 | P1 | **B2 synthesis-entailment** — cross-passage entailment/majority (not single max-entail) + contradiction-veto only from clean passages | `stage5_verify.py` | ✅ DONE (D2507 — `_b2_majority_verdict`; post-hoc S5 re-run still PENDING to materialize) |
 | 33 | P2 | Re-export quarantine triage w/ `evidence_passages` + run frontier batch-adjudication (κ≥0.6) | `quarantine_triage.py` + prompt | ✅ DONE (D2506 — CSV fixed, prompt updated) |
 | 34 | P2 | Contextual/late-chunk embeddings + RRF hybrid retrieval (weak-ISOR single-source tail) | `stage1_5`/retrieval | ⏳ post-S6 |
+| 36 | P1 | **M1 vector search DEGRADED** — `vec_fbs` absent (python.org SQLite lacks `enable_load_extension`) → switch to Homebrew Python / `knowledge-pipeline` conda env + `pip install sqlite-vec` + backfill embeddings from `fbs.definition` | `stage6_commit.py` / env | ⏳ post-S6 (D2508) |
 | 35 | P2 | Tautological-mechanism STS (def↔mech bge-m3 cosine) — measured weak signal (20.6% vs 29.8% causal-word) | `stage5_verify.py` | ⏳ low-priority |
 
 ---

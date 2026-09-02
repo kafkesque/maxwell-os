@@ -36,7 +36,7 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 |--------|------|--------|
 | **BEFORE S6 (already done, D2507)** | BUG-205 book dedup + B2 majority rule + evidence-garbage filter | ✅ code committed; re-verification via S5 re-run |
 | **BEFORE S6 (gate)** | `just pre-s6` (count / fb_id-unique / contamination / tally) | ✅ script ready; run after S5 re-run |
-| **AT S6 (verify, not adopt)** | M1 vector-dim contract (bge-m3 512d ↔ `vec_fbs float[512]`) | ⏳ post-S6 live test |
+| **AT S6 (verify, not adopt)** | M1 vector-dim contract (bge-m3 512d ↔ `vec_fbs float[512]`) | 🔴 **CONFIRMED DEGRADED (D2508)** — `vec_fbs` absent (python.org SQLite lacks `enable_load_extension`); FTS-only fallback live |
 | **AFTER S6 (SHOULD)** | S1 contextual embeddings, S2 cross-encoder rerank (gated), S3 HyDE (gated) | ⏳ |
 | **AFTER S6 (WORTH)** | USearch / TurboVec / LightRAG / ColBERT / GraphRAG / RAPTOR | ⏳ monitor/conditional |
 
@@ -44,7 +44,8 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 
 ## MUST (adopt now / verify at S6 — correctness + sovereignty, near-zero cost)
 
-### M1. Verify the vector-dimension contract (bge-m3 512d ↔ `vec_fbs float[512]`)
+### M1. Verify the vector-dimension contract (bge-m3 512d ↔ `vec_fbs float[512]`) — 🔴 NOW A LIVE BLOCKER (D2508)
+> **D2508 finding:** at S6 commit, `vec_fbs` was ABSENT and all 7867 embedding inserts failed (`no such table: vec_fbs`). Root cause is NOT the dimension contract but the **Python runtime**: `/usr/local/bin/python3` (python.org framework 3.12.1) has SQLite compiled WITHOUT `enable_load_extension` (`SQLITE_OMIT_LOAD_EXTENSION`), so `sqlite_vec.load()` raises `AttributeError` even though `sqlite-vec` is pip-installed and `vec0.dylib` is present. **Fix:** run under `/opt/homebrew/bin/python3` (SQLite 3.53.3, `enable_load_extension=True`) or the `knowledge-pipeline` conda env (3.11.15, SQLite 3.52.0) + `pip install sqlite-vec`, then backfill embeddings from persisted `fbs.definition` (no S5 re-run). Until then, RRF degrades to FTS-only (C23 path already smoke-tested).
 - **What:** `stage6_commit.py` pre-computes `definition_embedding` at commit time (BUG-004) and stores
   it in `vec_fbs` (`float[S15_EMBED_DIM]`); `search_vector` embeds the query and packs `len(query_vec)f`.
   A dimension drift (e.g. bge-m3 pulled at 1024d native vs the 512d Matryoshka truncation in config) would

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-31T00:00:00Z'
-total_decisions: 483
+total_decisions: 488
 decisions:
 - id: D2092
   category: INF
@@ -5056,11 +5056,23 @@ decisions:
   - scripts/rename_ai_systems_domain.py
   - pipeline/stage5_verify.py
   created: '2026-09-02'
+- id: D2504
+  category: CORRECTNESS
+  state: ACTIVE
+  description: 'Pre-S5 hardening batch + forensic gate validation. (1) BUG-203 FIXED: S5 FLAG status was dead code (never assigned; stats init + "Disagree → FLAG (human)" print lied about a human-review path removed by D2322) — DELETED FLAG from stats/icon, replaced misleading line with honest "Quarantined needing human review" count. Schema VERIFICATION_STATUS still allows FLAG for other stages/legacy data. (2) BUG-204 FIXED: TAXONOMY_MAX_DISCIPLINES default 72→75 (live taxonomy_v5.yaml has 75 disciplines); removed dead MAX_DOMAINS/MAX_DISCIPLINES aliases + unused _max_count loop var in check_for_replacements (closed-loop preserves cardinality — cap was never read, C19). (3) .golden_meta.json regenerated: pipeline_commit→HEAD (9aa5fa5), added total_examples=84/convergent_positives=61/hard_negatives=23; hash unchanged (golden file unchanged since ecb9ade); new CI test_golden_meta_contract.py (hash==actual, count==actual, arithmetic, commit-valid). (4) Decision summary recomputed 483→487 (+4 by_category). (5) FORENSIC: dedup was 6 collision groups (13→6 records, removed 7), NOT the 4 groups (9 records) recorded in BUG-195 — 2 groups (Compounding Habit Gains, Pineconing) missed by the pre-finish partial-checkpoint audit. Record lineage 7880→7874 (−6 BUG-198 application:None)→7867 (−7 dedup). Count=7,867 CONFIRMED (NOT 7,687 — digit transposition). Pre-S5 gates all green: integrity 10/10, config-audit no-drift, emerging-rate PASS (26.4%/27.4%/0.0%), audit_s4_final PASS, stress PASSED.'
+  champion: goose
+  target_files:
+  - pipeline/stage5_verify.py
+  - pipeline/pipeline_paths.py
+  - pipeline/taxonomy_manager.py
+  - config/golden/.golden_meta.json
+  - tests/test_golden_meta_contract.py
+  created: '2026-09-02'
 summary:
-  total: 487
+  total: 488
   proposed: 0
   draft: 1
-  active: 428
+  active: 429
   stale: 0
   superseded: 15
   archived: 8
@@ -5089,6 +5101,7 @@ summary:
     CFG: 5
     CLS: 16
     CLS / CFG: 1
+    CORRECTNESS: 2
     DAT: 4
     DAT / OPS: 1
     DATA: 3
@@ -5127,6 +5140,7 @@ summary:
     QLT / DATA: 1
     QLT / PROMPT: 6
     QUALITY / DATA: 3
+    QUALITY / GOLDEN-SET: 1
     QUALITY / GOLDEN-SET / PROMPT: 1
     QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
@@ -5135,7 +5149,9 @@ summary:
     RESILIENCE / QUALITY: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1
+    TAXONOMY: 1
     VAL: 8
+    VERIFICATION: 1
     governance: 1
     pipeline-fix: 2
     validation: 1

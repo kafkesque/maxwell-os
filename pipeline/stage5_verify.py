@@ -666,7 +666,10 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     print(f"{'='*60}")
 
     # Seed stats from any resumed FBs so the final tallies reflect the full run.
-    stats = {"PASS": 0, "FLAG": 0, "QUARANTINE": 0}
+    # BUG-203/D2504: S5 is DeBERTa-only (D2322) — it emits only PASS/QUARANTINE.
+    # `FLAG` (human-adjudication) was removed from S5; a legacy resumed record
+    # with status FLAG is tallied dynamically below via .get(status, 0).
+    stats = {"PASS": 0, "QUARANTINE": 0}
     for vfb in verified:
         stats[vfb.get("status", "QUARANTINE")] = stats.get(vfb.get("status", "QUARANTINE"), 0) + 1
     pipeline_commit = get_pipeline_commit()
@@ -798,7 +801,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["isor"] = isor  # D2284: Full ISOR scores embedded in verified FB
 
         elapsed = time.time() - start
-        icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}.get(status, "❓")
+        icon = {"PASS": "✅", "QUARANTINE": "🚫"}.get(status, "❓")
         print(f"→ {icon} {status} ({elapsed:.1f}s)")
         verified.append(vfb)
 
@@ -815,7 +818,7 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     print("\n📊 DeBERTa-ONLY VERIFICATION (D2322 calibrated)")
     print("   ENTAIL ≥ threshold → PASS:     auto")
     print("   CONTRA → QUARANTINE:            auto")
-    print(f"   Disagree → FLAG (human): {stats.get('FLAG', 0)} FBs need review")
+    print(f"   Quarantined needing human review: {sum(1 for fb in verified if fb.get('needs_human_review'))}")
     print(f"   Mechanisms auto-rejected: {sum(1 for fb in verified if 'MECH FAIL' in str(fb.get('verification_results', [])))}")
     print(f"\n📋 Checkpoint: {STAGE5_CHECKPOINT}")
     return verified

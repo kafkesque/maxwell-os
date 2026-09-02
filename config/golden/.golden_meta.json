@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "algorithm": "sha256",
   "golden_sha256": "600cb509ddee02ba7e96f494288e8e1b569bcdd413be70775ad5bf910d358ffe",
-  "pipeline_commit": "055998d",
+  "pipeline_commit": "9aa5fa5",
   "trimmed_ids": [
     "PRO-002",
     "LEA-001",
@@ -46,5 +46,10 @@
       "CONV-059",
       "CONV-060"
     ]
-  }
+  },
+  "total_examples": 84,
+  "convergent_positives": 61,
+  "hard_negatives": 23,
+  "golden_path": "config/golden/stage2_fewshot_convergent.yaml",
+  "restamped_note": "D2504: re-stamped commit->HEAD, added total_examples/convergent_positives/hard_negatives; hash unchanged (golden file unchanged since ecb9ade)"
 }

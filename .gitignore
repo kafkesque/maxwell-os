@@ -92,3 +92,6 @@ audit_output/
 # Ad-hoc config/runtime backups (real backups owned by pipeline/backup_guardian.sh)
 *.bak_*
 checkpoint.jsonl.depth.json
+
+# macOS drag/drop text-clipping artifacts (accidental drops, never repo content)
+*.textClipping

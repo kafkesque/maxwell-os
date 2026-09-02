@@ -292,7 +292,7 @@ TAXONOMY_FLOOD_THRESHOLD = float(_CFG.get("taxonomy", {}).get("flood_threshold_r
 TAXONOMY_REPLACEMENT_THRESHOLD = float(_CFG.get("taxonomy", {}).get("replacement_threshold_ratio", 1.1))
 TAXONOMY_EMERGING_FREQ = int(_CFG.get("taxonomy", {}).get("emerging_freq_threshold", 10))
 TAXONOMY_MAX_DOMAINS = int(_CFG.get("taxonomy", {}).get("max_domains", 35))      # D2378: canonical cap (was hardcoded 25 in taxonomy_manager.py)
-TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 72))  # D2378: canonical cap (was hardcoded 47)
+TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 75))  # D2378/D2504: canonical cap (was hardcoded 47; default 72→75 to match live taxonomy_v5.yaml)
 
 # ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))

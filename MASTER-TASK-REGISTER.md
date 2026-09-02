@@ -30,7 +30,7 @@
 | 2 | P0 | Log BUG-195 (fb_id collision) + BUG-196 (name truncation) + BUG-197 (domain-not-discipline) + D2499 | buglog + DECISION-LOG | ✅ DONE |
 | 3 | P0 | Unattended watcher monitoring S4 finish | `s4_post_finish.py --watch` (PID 45537) | ✅ LIVE |
 | 4 | P1 | **At S4 completion (auto):** backup → dedup → remap → gate → audit → report | orchestrator | ⏳ awaiting S4 |
-| 5 | P1 | **Human review before S5:** verify the 4 dedup merges (9→4), gate result (emerging ~25%), audit PASS | `checkpoint_deduped.jsonl` + `s4_post_finish_report.json` | ⏳ |
+| 5 | P1 | **Human review before S5:** verify the 6 dedup merges (13→6), gate result (emerging ~25%), audit PASS | `checkpoint_deduped.jsonl` + `s4_post_finish_report.json` | ✅ DONE (D2504 — 6 groups verified; count 7,867) |
 | 6 | P2 | Authorize S5 (only after audit PASS) → S6 | `just stage5` / `just stage6` | ⏳ |
 | 7 | P3 | S4 code fix: cross-cluster dedup + S6 duplicate-fb_id fail-loud guard (BUG-195) | `stage4_merge.py` / `stage6_commit.py` | future batch |
 | 8 | P3 | S4 code fix: name truncation — raise `fb_name_max_words` / ellipsis / concise generator (BUG-196) | `stage4_merge.py` / config | future batch |
@@ -50,11 +50,11 @@
 | 22 | P2 | Commit `config/alias_map.yaml` (was untracked) + `.gitignore` the `.bak_*` config backups | git | ✅ DONE (committed in D2501 push) |
 | 23 | P3 | Taxonomy semantic near-duplicate: `ai systems` vs `ai & agents` (both canonical, both taught by golden) | `taxonomy_v5.yaml` | ⏳ future (needs D2399 human review, not this session) |
 | 24 | P0 | Fix BUG-202 `_evidence_cleanliness_gate` fail-open (`return set()` → fail-closed) — the one near-blocker from roundtable | `stage5_verify.py:559` | ✅ DONE (raise RuntimeError; smoke: import OK, happy path returns set()) |
-| 25 | P1 | Fix BUG-203 S5 `FLAG` dead code — wire it or delete it (reporting layer currently lies) | `stage5_verify.py` + `status.py` | ⏳ |
-| 26 | P1 | Fix BUG-204 stale `TAXONOMY_MAX_DISCIPLINES` 72→75 (+ drop unused `_max_count`) | `pipeline_paths.py` / `taxonomy_manager.py` | ⏳ |
+| 25 | P1 | Fix BUG-203 S5 `FLAG` dead code — wire it or delete it (reporting layer currently lies) | `stage5_verify.py` + `status.py` | ✅ DONE (D2504 — DELETED; honest `needs_human_review` count) |
+| 26 | P1 | Fix BUG-204 stale `TAXONOMY_MAX_DISCIPLINES` 72→75 (+ drop unused `_max_count`) | `pipeline_paths.py` / `taxonomy_manager.py` | ✅ DONE (D2504) |
 | 27 | P1 | S5 weak max-entailment rule (ChatGPT B2) — add contradiction veto + coverage + re-calibrate | `stage5_verify.py` `deberta_check` | ⏳ (conservative today: recall 0.386 → QUARANTINE-leaning) |
 | 28 | P2 | De-overlap `ai systems`/`ai & agents` raw aliases ("AI Systems" in both) + rename `ai systems` for clarity; then D2399 human review | `taxonomy_v5.yaml` | ✅ DONE (D2503: `ai systems`→`ml systems & infrastructure`, alias de-overlapped, 15 checkpoint records remapped; D2399 review still ⏳) |
-| 29 | P2 | Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual | `config/golden/.golden_meta.json` | ⏳ |
+| 29 | P2 | Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual | `config/golden/.golden_meta.json` | ✅ DONE (D2504 + `tests/test_golden_meta_contract.py`) |
 | 30 | P2 | Rename/gut `tests/test_stage4_d2138.py` + `tests/test_stage4_exhaustive.py` (0 `test_*` functions — inflate coverage) | `tests/` | ⏳ |
 
 ---
@@ -65,14 +65,14 @@
 1. ✅ **BUG-202** evidence-cleanliness gate fail-closed (`stage5_verify.py` `raise RuntimeError`) — DONE + smoke-tested.
 2. ✅ **D2500** cross-kind contamination fix (kind-safe matcher + D2399 guard + config cleanup) — DONE.
 3. ✅ **D2503** `ai systems`→`ml systems & infrastructure` rename + alias de-overlap + 15-record checkpoint remap — DONE.
-4. ⏳ **Human-review gate**: verify 6 dedup merges, gate emerging rate, `audit_s4_final.py` PASS, record count = 7,867.
-5. ⏳ **BUG-198 decision** (6 dropped principles `application:'None'`): RECOMMEND defer into BUG-197 re-classification — do NOT re-classify with the buggy prompt now.
+4. ✅ **Human-review gate** (D2504): 6 dedup merges verified (13→6 records, removed 7), gate emerging rate PASS, `audit_s4_final.py` PASS, record count = 7,867 CONFIRMED.
+5. ✅ **BUG-198 decision** (6 dropped principles `application:'None'`): RECOMMEND **defer into the BUG-197 re-classification pass** — do NOT re-classify with the buggy prompt now. The 6 records are recoverable from `singleton_fbs.jsonl` (not lost), so S5 is not blocked.
 
 ### SHOULD (hardening — cheap, low-risk, do before or alongside S5)
 6. ✅ Standalone `audit_evidence_cleanliness.py` on live checkpoint → **8 severe (>15%) will QUARANTINE** (187 contaminated total, 2.4%).
-7. ⏳ **BUG-203** wire-or-delete S5 `FLAG` status (reporting layer currently prints "Disagree→FLAG: 0" misleadingly).
-8. ⏳ **BUG-204** `TAXONOMY_MAX_DISCIPLINES` 72→75 + drop unused `_max_count`.
-9. ⏳ Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual.
+7. ✅ **BUG-203** S5 `FLAG` status DELETED (D2504) — reporting no longer prints "Disagree→FLAG: 0"; replaced with honest `needs_human_review` count.
+8. ✅ **BUG-204** `TAXONOMY_MAX_DISCIPLINES` 72→75 + dropped unused `_max_count` (D2504).
+9. ✅ Regenerate stale `.golden_meta.json` (hash/commit/count) + CI `tests/test_golden_meta_contract.py` (D2504).
 
 ### WORTH (post-S5 — do NOT block on these)
 10. B2 max-entailment decision-rule hardening (contradiction veto + coverage + recalibrate) — conservative today (recall 0.386 → QUARANTINE-leaning).

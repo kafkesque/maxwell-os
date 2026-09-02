@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-08-31T00:00:00Z'
-total_decisions: 490
+total_decisions: 491
 decisions:
 - id: D2092
   category: INF
@@ -5091,11 +5091,24 @@ decisions:
   - scripts/quarantine_triage.py
   - config/golden/QUARANTINE-BATCH-ADJUDICATION-PROMPT.md
   created: '2026-09-02'
+- id: D2507
+  category: CORRECTNESS
+  state: ACTIVE
+  description: 'BUG-205 book-level dedup + B2 synthesis-entailment majority rule + retrieval research. (1) BUG-205 FIXED (pipeline/book_metadata.py): _unicode_fold() (NFKC->NFKD->strip combining marks) added to normalize_author/normalize_title/_normalize_key so Unicode-equivalent metadata collapses ("Brené"=="Brene", full-width, ligatures); _SPACE_SUBTITLE_SPLIT added to normalize_title so a space-separated subtitle opener collapses with the colon edition ("Blink The Power..."=="Blink: The Power..."->"blink"); fallback key sanitized (sanitize_source_book) in resolve_source_id so cache-miss piracy noise does not hash into source_id. Measured: 962 metadata files -> 910 distinct canonical source_ids. Residual (NOT deterministic-hash-fixable, logged): same-book TITLE RENAME across editions ("Systemantics"=="The Systems Bible"), space-separated co-author lists, truncated metadata titles — require a post-S6 Stage 0.5 metadata re-extraction + fuzzy matcher. (2) B2 SYNTHESIS-ENTAILMENT (pipeline/stage5_verify.py): extracted pure _b2_majority_verdict() — strict majority (>0.5, config stage5.b2_majority_ratio) of CLEAN evidence passages must entail to PASS, strict majority must contradict to veto (contradiction-veto only from clean passages), else NEUTRAL. Replaces the weak single-passage max-entailment rule (ChatGPT B2 / MTR task 32); returned score stays max(entail) for nli_calibrate compatibility. Also promoted the D2506 evidence_garbage_* fallback defaults into config (C12). (3) RETRIEVAL RESEARCH (governance/RETRIEVAL-RESEARCH-2026-09-02.md): MUST = verify bge-m3 512d<->vec_fbs float[512] contract post-S6 + keep RRF; SHOULD = contextual/late-chunk embeddings (weak-ISOR tail, MTR 34) + local cross-encoder rerank (gated) + HyDE (gated); WORTH = USearch/TurboVec/LightRAG/ColBERT/GraphRAG/RAPTOR (monitor/conditional). TESTED: RRF hybrid smoke (185-FB diagnostic DB, graceful vec_fbs-absent FTS fallback); 16/16 book-dedup + 8/8 B2 majority tests; full suite 174 passed.'
+  champion: goose
+  target_files:
+  - pipeline/book_metadata.py
+  - pipeline/stage5_verify.py
+  - config/pipeline_config.yaml
+  - tests/test_book_dedup_bug205.py
+  - tests/test_b2_majority_entailment.py
+  - governance/RETRIEVAL-RESEARCH-2026-09-02.md
+  created: '2026-09-02'
 summary:
-  total: 490
+  total: 491
   proposed: 0
   draft: 1
-  active: 431
+  active: 432
   stale: 0
   superseded: 15
   archived: 8
@@ -5124,7 +5137,7 @@ summary:
     CFG: 5
     CLS: 16
     CLS / CFG: 1
-    CORRECTNESS: 4
+    CORRECTNESS: 5
     DAT: 4
     DAT / OPS: 1
     DATA: 3

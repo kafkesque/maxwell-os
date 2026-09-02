@@ -391,6 +391,15 @@ stage5:
   nli_max_hypothesis_chars: 256
   mechanism_min_length: 150
   citation_echo_source_threshold: 20
+  # D2506 (B2): deterministic evidence-passage garbage filter — excludes caption/title/UI
+  # fragments from NLI scoring before any verdict is computed. (Config-first C12.)
+  evidence_garbage_min_words: 6       # passages with fewer words than this are non-evidence
+  evidence_garbage_max_underscore: 2  # underscore-run threshold ("Data ____ stories")
+  evidence_garbage_min_alpha_ratio: 0.5  # symbol-dense fragment threshold (alpha-chars/len)
+  # D2507 (B2): cross-passage majority-aggregation — strict majority (> this ratio) of CLEAN
+  # evidence passages must entail to PASS, and a strict majority must contradict to veto.
+  # Replaces the weak single-passage max-entailment rule (ChatGPT B2 / MTR task 32).
+  b2_majority_ratio: 0.5
   banned_mechanism_prefixes:
     - "because it enables"
     - "because it allows"

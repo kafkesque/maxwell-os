@@ -193,6 +193,54 @@ def _is_garbage_passage(text: str) -> bool:
     return False
 
 
+def _b2_majority_verdict(
+    entail_scores: list[float],
+    contra_scores: list[float],
+    neutral_scores: list[float],
+    thresh: float,
+) -> tuple[bool, float, str]:
+    """D2507 (B2): cross-passage majority aggregation (pure, model-free).
+
+    OLD (weak max-entailment): `max(entail)` let a SINGLE passage pass the whole FB
+    and a single contradicting passage was ignored when max-entail cleared `thresh`
+    first. NEW: majority vote over CLEAN passages — PASS requires a strict majority
+    to entail, CONTRA requires a strict majority to contradict, else NEUTRAL.
+
+    The returned score remains `max(entail)` (the continuous entailment probability)
+    so `nli_calibrate.py`'s threshold sweep is unaffected; only the DECISION changes.
+
+    Args:
+        entail_scores: Per-passage entailment probabilities (aligned 1:1).
+        contra_scores: Per-passage contradiction probabilities.
+        neutral_scores: Per-passage neutral probabilities.
+        thresh: Entailment threshold (a passage "entails" if entail >= thresh).
+
+    Returns:
+        (passed, score, detail) — same contract as deberta_check().
+    """
+    _max_entail = max(entail_scores, default=0.0)
+    _n_clean = len(entail_scores)
+    _n_entail = sum(1 for s in entail_scores if s >= thresh)
+    _n_contra = sum(
+        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores)
+        if c > e and c > u
+    )
+    _entail_ratio = _n_entail / _n_clean if _n_clean else 0.0
+    _contra_ratio = _n_contra / _n_clean if _n_clean else 0.0
+
+    if _entail_ratio > B2_MAJORITY_RATIO:
+        return True, round(_max_entail, 4), (
+            f"ENTAIL (majority {_n_entail}/{_n_clean}): ent={_entail_ratio:.2f} max={_max_entail:.2f}"
+        )
+    if _contra_ratio > B2_MAJORITY_RATIO:
+        return False, round(_max_entail, 4), (
+            f"CONTRA (majority {_n_contra}/{_n_clean}): ent={_entail_ratio:.2f} cont={_contra_ratio:.2f}"
+        )
+    return False, round(_max_entail, 4), (
+        f"NEUTRAL (ent {_n_entail}/{_n_clean}, cont {_n_contra}/{_n_clean}): max={_max_entail:.2f}"
+    )
+
+
 def deberta_check(fb: dict) -> tuple[bool, float, str]:
     """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
 
@@ -269,15 +317,8 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
             )
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 
-    _entail = max(_entail_scores, default=0.0)
-    _contra = max(_contra_scores, default=0.0)
-    _neutral = max(_neutral_scores, default=0.0)
-
-    if _entail >= _thresh:
-        return True, round(_entail, 4), f"ENTAIL: {_entail:.2f}"
-    if _neutral > _entail and _neutral > _contra:
-        return False, round(_entail, 4), f"NEUTRAL: ent={_entail:.2f} neu={_neutral:.2f} cont={_contra:.2f}"
-    return False, round(_entail, 4), f"CONTRA: ent={_entail:.2f} cont={_contra:.2f}"
+    # D2507 (B2): cross-passage MAJORITY aggregation (extracted — see _b2_majority_verdict).
+    return _b2_majority_verdict(_entail_scores, _contra_scores, _neutral_scores, _thresh)
 
 
 # nli_evidence_check REMOVED (D2298) — superseded by deberta_check(); referenced deleted
@@ -378,6 +419,12 @@ BANNED_MECHANISM_PREFIXES: tuple[str, ...] = tuple(_cfg5.get("banned_mechanism_p
 EVIDENCE_GARBAGE_MIN_WORDS: int = int(_cfg5.get("evidence_garbage_min_words", 6))
 EVIDENCE_GARBAGE_MAX_UNDERSCORE: int = int(_cfg5.get("evidence_garbage_max_underscore", 2))
 EVIDENCE_GARBAGE_MIN_ALPHA_RATIO: float = float(_cfg5.get("evidence_garbage_min_alpha_ratio", 0.5))
+
+# ── D2507 (B2): cross-passage majority-aggregation threshold (config-first, C12) ──
+# Strict majority (> 0.5) of CLEAN evidence passages must entail to PASS, and a strict
+# majority must contradict to veto. Replaces the weak single-passage max-entailment rule
+# (ChatGPT B2 / MTR task 32). Read at import time alongside the other stage5.* keys.
+B2_MAJORITY_RATIO: float = float(_cfg5.get("b2_majority_ratio", 0.5))
 
 
 def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:

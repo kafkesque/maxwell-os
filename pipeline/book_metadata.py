@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 # ── Cache (lazy-loaded once per process) ─────────────────────────────────────
@@ -33,9 +34,26 @@ except ImportError:
     METADATA_PATH: Path = Path("knowledge pipeline/checkpoints/book_metadata.jsonl")
 
 
+def _unicode_fold(text: str) -> str:
+    """Fold Unicode to a canonical ASCII-ish form (D2507/BUG-205).
+
+    NFKC (compatibility: full-width, ligatures, curly quotes) → NFKD (canonical
+    decomposition: "é" → "e" + combining acute) → strip combining marks. This makes
+    "Brené" == "Brene", "ﬁ" == "fi", "ｆｕｌｌ" == "full" so near-duplicate book
+    metadata collapses to one canonical source_id.
+    """
+    text = unicodedata.normalize("NFKC", text or "")
+    text = unicodedata.normalize("NFKD", text)
+    return "".join(ch for ch in text if not unicodedata.combining(ch))
+
+
 def _normalize_key(name: str) -> str:
-    """Normalize a filename for fuzzy matching (alphanumerics only, lower)."""
-    return re.sub(r"[^a-z0-9]", "", name.lower())
+    """Normalize a filename for fuzzy matching (alphanumerics only, lower).
+
+    D2507 (BUG-205): Unicode-fold first so equivalent filenames (curly quotes,
+    composed/decomposed accents, full-width chars) collapse.
+    """
+    return re.sub(r"[^a-z0-9]", "", _unicode_fold(name.lower()))
 
 
 # ── Source-filename noise sanitization (D2449) ──────────────────────────────
@@ -199,27 +217,38 @@ _CAMEL_CONCAT = re.compile(r"([a-z0-9])([A-Z])")
 # the subtitle so it collapses with "The Black Swan" (same work, different
 # edition). Lookahead requires a lowercase/digit before + word boundary after.
 _CONCAT_SUBTITLE_SPLIT = re.compile(r"(?<=[a-z0-9])(?=(?:The|A|An|How|Why|What)\b)")
+# D2507 (BUG-205): SPACE-separated subtitle opener — the "Blink The Power of
+# Thinking Without Thinking" vs "Blink: The Power…" asymmetry. A title whose
+# subtitle-opener word ("the"/"a"/"how"/"why"/"what") is separated by a SPACE
+# (not a colon/dash, not concatenated) also splits, so edition variants collapse.
+# Applied AFTER lowercasing (so the opener list is lowercase); requires whitespace
+# BEFORE the opener so a leading "The/A" ("The Compound Effect") is never split.
+_SPACE_SUBTITLE_SPLIT = re.compile(r"\s+(?=(?:the|a|an|how|why|what)\b)")
 
 
 def normalize_author(author: str) -> str:
-    """D2308: Canonicalize an author string to primary-author form.
+    """D2308/D2507: Canonicalize an author string to primary-author form.
 
     'Anthony Dunne, Fiona Raby' -> 'anthony dunne'
-    Collapses co-author lists (','/'and'/'&'), case, and punctuation drift so
-    that edition variants of the same work resolve to the same author key.
+    Collapses co-author lists (','/'and'/'&'), case, punctuation, and Unicode
+    drift (NFKC) so that edition variants of the same work resolve to the same
+    author key.
     """
     a = (author or "").strip().lower()
+    a = _unicode_fold(a)
     a = _COAUTHOR_SPLIT.split(a, maxsplit=1)[0].strip()
     a = re.sub(r"[^a-z ]", "", a)
     return re.sub(r"\s+", " ", a).strip()
 
 
 def normalize_title(title: str) -> str:
-    """D2308/D2315: Canonicalize a title string (strip subtitle, fix concatenation).
+    """D2308/D2315/D2507: Canonicalize a title string (strip subtitle, fix concatenation).
 
     'Make Bootstrappers Handbook: Learn to build...' -> 'make bootstrappers handbook'
     'The Black SwanThe Impact of...' -> 'the black swan' (D2315: split at concat
     subtitle-opener and drop the subtitle, so edition variants collapse).
+    'Blink The Power of Thinking...' -> 'blink' (D2507: split at the SPACE-separated
+    subtitle-opener so the colon-less edition collapses with the colon edition).
     """
     raw = (title or "").strip()
     # D2315: camelCase-concatenated subtitle — split at the concat boundary
@@ -227,9 +256,10 @@ def normalize_title(title: str) -> str:
     m = _CONCAT_SUBTITLE_SPLIT.search(raw)
     if m:
         raw = raw[:m.start()].rstrip()
-    t = raw.lower()
+    t = _unicode_fold(raw.lower())
     t = _CAMEL_CONCAT.sub(r"\1 \2", t)
     t = _SUBTITLE_SPLIT.split(t, maxsplit=1)[0]
+    t = _SPACE_SUBTITLE_SPLIT.split(t, maxsplit=1)[0]
     t = re.sub(r"[^a-z0-9]+", " ", t)
     return t.strip()
 
@@ -281,10 +311,14 @@ def resolve_source_id(source_book: str) -> str:
         return _source_id_cache[fname]
 
     meta: dict[str, str] = resolve_book_metadata(fname)
+    # D2507 (BUG-205): sanitize the fallback key (download-source strip) so a
+    # cache-miss with unknown author/title does not hash piracy-site noise into
+    # the source_id ("…_liber3", "…(z-lib.org)" etc. would otherwise diverge).
+    fallback_key = sanitize_source_book(Path(fname).name)
     sid: str = compute_source_id(
         author=meta.get("author", ""),
         title=meta.get("title", ""),
-        fallback_key=Path(fname).name,
+        fallback_key=fallback_key,
     )
     _source_id_cache[fname] = sid
     return sid

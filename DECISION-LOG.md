@@ -3,6 +3,17 @@
 
 ---
 
+### D2507 — BUG-205 book dedup + B2 synthesis-entailment majority rule + retrieval research (2026-09-02)
+- **Category:** CORRECTNESS
+- **Decision:**
+  1. **BUG-205 book-level dedup (FIXED — `pipeline/book_metadata.py`).** Added `_unicode_fold()` (NFKC→NFKD→strip combining marks) to `normalize_author`/`normalize_title`/`_normalize_key` so Unicode-equivalent metadata collapses (`"Brené"=="Brene"`, full-width, ligatures); added `_SPACE_SUBTITLE_SPLIT` to `normalize_title` so a space-separated subtitle opener collapses with the colon edition (`"Blink The Power…"=="Blink: The Power…"`→`"blink"` — the frontier-review root case); sanitized the `resolve_source_id` fallback key (`sanitize_source_book`) so a cache-miss does not hash piracy noise into `source_id`. Measured **962 metadata files → 910 distinct canonical source_ids**. Residual (NOT deterministic-hash-fixable, logged): same-book title RENAME across editions (`"Systemantics"=="The Systems Bible"`), space-separated co-author lists, truncated metadata titles → require post-S6 Stage 0.5 metadata re-extraction + fuzzy matcher.
+  2. **B2 synthesis-entailment majority rule (FIXED — `pipeline/stage5_verify.py`).** Extracted pure `_b2_majority_verdict()`: a **strict majority** (>0.5, config `stage5.b2_majority_ratio`) of CLEAN evidence passages must entail to PASS; a strict majority must contradict to veto (contradiction-veto **only from clean passages**); else NEUTRAL. Replaces the weak single-passage max-entailment rule (ChatGPT B2 / MTR task 32). Returned score stays `max(entail)` for `nli_calibrate.py` compatibility. Also promoted the D2506 `evidence_garbage_*` fallback defaults into `config/pipeline_config.yaml` (they were code-only fallbacks — a C12 gap).
+  3. **Retrieval research (`governance/RETRIEVAL-RESEARCH-2026-09-02.md`).** MUST = verify bge-m3 512d ↔ `vec_fbs float[512]` contract post-S6 + keep RRF; SHOULD = contextual/late-chunk embeddings (weak-ISOR tail, MTR 34) + local cross-encoder rerank (gated) + HyDE (gated); WORTH = USearch/TurboVec/LightRAG/ColBERT/GraphRAG/RAPTOR (monitor/conditional).
+- **Status:** ✅ DONE — BUG-205 + B2 + research committed; **post-hoc S5 re-run + `just pre-s6` + `just stage6` are the next actions** to materialize the fixes into the committed DB.
+- **Files:** `pipeline/book_metadata.py`, `pipeline/stage5_verify.py`, `config/pipeline_config.yaml`, `tests/test_book_dedup_bug205.py`, `tests/test_b2_majority_entailment.py`, `governance/RETRIEVAL-RESEARCH-2026-09-02.md`
+- **Tests:** 16/16 book-dedup + 8/8 B2-majority new; full suite **174 passed**; RRF hybrid smoke (graceful `vec_fbs`-absent FTS fallback).
+- **Source:** Session 2026-09-02 — "research retrieval + implement BUG-205 + B2 synthesis-entailment + sync governance"
+
 ### D2506 — Post-S5 hardening: golden canonicalization + B2 evidence filter + quarantine triage + frontier-review validation (2026-09-02)
 - **Category:** CORRECTNESS
 - **Decision:**

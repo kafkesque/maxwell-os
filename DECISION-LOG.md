@@ -3,6 +3,25 @@
 
 ---
 
+### D2506 — Post-S5 hardening: golden canonicalization + B2 evidence filter + quarantine triage + frontier-review validation (2026-09-02)
+- **Category:** CORRECTNESS
+- **Decision:**
+  1. **Golden canonicalization.** `scripts/canonicalize_golden_metadata.py` surgically canonicalized **45** dormant `stage2_fewshot_convergent.yaml` domain/discipline alias→canonical values (line-level edit, production `match_to_canonical`, kind-safe) — e.g. `advertising→editorial & advertising`, `business→business operations`, `computer science→software engineering`, `social science→social sciences`. 123 cross-kind/missing values left untouched (dormant fields, no author-intent guessing). `.golden_meta.json` re-stamped (sha256 verified). 9/9 golden contract tests + `golden_validate` 84/84 PASS.
+  2. **B2 evidence-garbage filter.** `stage5_verify.py` `_is_garbage_passage()` deterministically excludes non-evidence fragments (captions/titles/UI: <6 words, underscore-runs, symbol-dense) from `deberta_check()` before NLI scoring; config-first (`evidence_garbage_min_words=6/max_underscore=2/min_alpha_ratio=0.5`). Measured: 205/2793 quarantined (7.3%) have ≥1 garbage passage, 154 (5.5%) all-garbage.
+  3. **Quarantine triage.** `scripts/quarantine_triage.py` (deterministic 50-record stratified sample: 20 strong/15 medium/10 weak NEUTRAL + 5 CONTRA) + `config/golden/QUARANTINE-BATCH-ADJUDICATION-PROMPT.md` (frontier batch-adjudication, 7 labels → fix path).
+  4. **Frontier-review validation (claude0041/chatgpt0041) — both claims TRUE:** (a) triage CSV was missing `evidence_passages` (only `evidence=cited`) — FIXED; (b) `source_diversity` INFLATED by near-duplicate book files (same book, different download source/edition) → **BUG-205** S1/S2 book-dedup gap; `source_diversity>=3` is not a trustworthy B2 synthesis discriminator until fixed. Also adopted Cohen-κ ≥ 0.6 per-record agreement.
+  5. **NLI distribution bimodal** — PASS median 0.716 vs QUARANTINE median 0.016 (746@0.00, 608@0.01, 180 in 0.08–0.10). Threshold recalibration **RULED OUT** — quarantine is synthesis/garbage/single-source-paraphrase, not a tunable boundary.
+- **Status:** ✅ DONE — golden fix + filter committed; B2 synthesis-entailment + book-dedup (BUG-205) deferred post-S6.
+- **Files:** `scripts/canonicalize_golden_metadata.py`, `config/golden/stage2_fewshot_convergent.yaml`, `config/golden/.golden_meta.json`, `pipeline/stage5_verify.py`, `scripts/quarantine_triage.py`, `config/golden/QUARANTINE-BATCH-ADJUDICATION-PROMPT.md`
+- **Source:** Session 2026-09-02 — "do both c) + validate frontier reviews"
+
+### D2505 — Pre-S6 commit gate + BUG-195 fail-loud duplicate guard (2026-09-02)
+- **Category:** CORRECTNESS
+- **Decision:** Added `scripts/pre_s6_gate.py` (record count vs `expected_count.json`, fb_id uniqueness, severe evidence-contamination all QUARANTINE; fail-closed) and `_assert_fb_id_unique()` in `pipeline/stage6_commit.py` (raises RuntimeError on duplicate fb_id before `INSERT OR REPLACE` — which would silently overwrite). Justfile `pre-s6` recipe.
+- **Status:** ✅ DONE — gate PASSED (7867==7867, fb_id unique 7867/7867, 8 severe all QUARANTINE, tally PASS 5074 / QUARANTINE 2793). Note: committed as `6e621fd` but its decision entry was NOT synced to decisions.yaml/DECISION-LOG/buglog until this D2506 governance pass backfilled it.
+- **Files:** `scripts/pre_s6_gate.py`, `pipeline/stage6_commit.py`, `Justfile`
+- **Source:** Session 2026-09-02 — "do a) pre-S6 gate, b) BUG-195 guard"
+
 ### D2504 — BUG-203/BUG-204 fixes + `.golden_meta.json` contract + pre-S5 gate validation (2026-09-02)
 - **Category:** CORRECTNESS
 - **Decision:** Pre-S5 hardening batch + forensic gate validation.

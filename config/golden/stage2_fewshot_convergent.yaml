@@ -266,7 +266,7 @@ examples:
   discipline: psychology
   tier: GOLD-A
 - id: CONV-003
-  domain: advertising
+  domain: editorial & advertising
   source_books:
   - Pictorial Metaphor in Advertising — Charles Forceville (Routledge, 1996)
   - 'Visual Rhetoric in Advertising: Text-Interpretive, Experimental, and Reader-Response Analyses — Edward F. McQuarrie &
@@ -464,7 +464,7 @@ examples:
     synthesize the mechanism with the application, not just paraphrase Cialdini.
 
     '
-  discipline: social psychology
+  discipline: psychology
   tier: GOLD-A
 - id: CONV-005
   domain: marketing
@@ -599,7 +599,7 @@ examples:
     '
   tier: CHALLENGE
 - id: NEG-CONV-002
-  domain: business
+  domain: business operations
   source_books:
   - Good to Great — Jim Collins
   - Built to Last — Jim Collins
@@ -661,7 +661,7 @@ examples:
     '
   tier: CHALLENGE
 - id: NEG-CONV-003
-  domain: management
+  domain: organizational behavior
   source_books:
   - Thanks for the Feedback — Douglas Stone & Sheila Heen
   - Reinventing Organizations — Frederic Laloux
@@ -2235,7 +2235,7 @@ examples:
     claimed "specialized" — corrected to match depth=domain field.)'
   tier: GOLD-A
 - id: NEG-007
-  domain: knowledge management
+  domain: business operations
   discipline: information science
   source_books:
   - The 7 Habits of Highly Effective People — Stephen Covey
@@ -2276,7 +2276,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-008
   domain: semiotics
-  discipline: philosophy of language
+  discipline: linguistics
   source_books:
   - Philosophical Writings of Peirce — Charles Sanders Peirce
   - 'Semiotics: The Basics — Daniel Chandler'
@@ -2317,7 +2317,7 @@ examples:
     ''what TYPE is this?'''
   tier: CHALLENGE
 - id: NEG-009
-  domain: product management
+  domain: digital product
   discipline: organizational behavior
   source_books:
   - Escaping the Build Trap — Melissa Perri
@@ -2373,7 +2373,7 @@ examples:
     valid domain FBs rather than reject for classification errors.'
   tier: GOLD-A
 - id: NEG-010
-  domain: brand strategy
+  domain: brand identity
   discipline: marketing
   source_books:
   - Good to Great — Jim Collins
@@ -2414,7 +2414,7 @@ examples:
     signal.
   tier: CHALLENGE
 - id: CONV-023
-  domain: physics
+  domain: computational science & physics
   discipline: thermodynamics
   source_books:
   - A Brief History of Time — Stephen Hawking
@@ -2525,8 +2525,8 @@ examples:
     cultural evolution, and market dynamics. Fills hard-science gap. Application is null (descriptive law).
   tier: GOLD-A
 - id: CONV-025
-  domain: medicine
-  discipline: pharmacology
+  domain: health & wellness
+  discipline: health & medicine
   source_books:
   - The Emperor of All Maladies — Siddhartha Mukherjee
   - The Body — Bill Bryson
@@ -2652,7 +2652,7 @@ examples:
   tier: GOLD-A
 - id: CONV-027
   domain: engineering
-  discipline: computer science
+  discipline: software engineering
   source_books:
   - The Mythical Man-Month — Frederick Brooks
   - The Pragmatic Programmer — Hunt & Thomas
@@ -2710,8 +2710,8 @@ examples:
     principle extend it.
   tier: GOLD-A
 - id: CONV-028
-  domain: data science
-  discipline: statistics
+  domain: research & methodology
+  discipline: research methodology
   source_books:
   - The Book of Why — Judea Pearl
   - Calling Bullshit — Bergstrom & West
@@ -2774,7 +2774,7 @@ examples:
   tier: GOLD-A
 - id: CONV-029
   domain: decision making
-  discipline: cognitive psychology
+  discipline: psychology
   source_books:
   - Algorithms to Live By — Christian & Griffiths
   - The Paradox of Choice — Barry Schwartz
@@ -2838,7 +2838,7 @@ examples:
   tier: GOLD-A
 - id: CONV-030
   domain: network science
-  discipline: mathematics
+  discipline: computational geometry
   source_books:
   - Linked — Albert-László Barabási
   - The Tipping Point — Malcolm Gladwell
@@ -2898,7 +2898,7 @@ examples:
   tier: GOLD-A
 - id: NEG-011
   domain: engineering
-  discipline: computer science
+  discipline: software engineering
   source_books:
   - Designing Data-Intensive Applications — Martin Kleppmann
   - Database Internals — Alex Petrov
@@ -2934,7 +2934,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-012
   domain: design history
-  discipline: design history
+  discipline: cultural design
   source_books:
   - Meggs' History of Graphic Design — Philip Meggs
   - The Story of Art — E.H. Gombrich
@@ -2974,7 +2974,7 @@ examples:
     will happen IF...?" S2 must learn to reject convergent historical descriptions that lack predictive causal mechanisms.
   tier: CHALLENGE
 - id: NEG-013
-  domain: social science
+  domain: social sciences
   discipline: sociology
   source_books:
   - Freakonomics — Levitt & Dubner
@@ -3014,7 +3014,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-014
   domain: education
-  discipline: cognitive psychology
+  discipline: psychology
   source_books:
   - Make It Stick — Brown, Roediger & McDaniel
   - Why We Sleep — Matthew Walker
@@ -3049,7 +3049,7 @@ examples:
     false-convergence pattern.'
   tier: CHALLENGE
 - id: NEG-015
-  domain: business
+  domain: business operations
   discipline: management
   source_books:
   - First, Break All the Rules — Buckingham & Coffman
@@ -3091,7 +3091,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-016
   domain: economics
-  discipline: macroeconomics
+  discipline: political economy
   source_books:
   - Capital in the Twenty-First Century — Thomas Piketty
   - The Wealth of Nations — Adam Smith
@@ -3125,7 +3125,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-017
   domain: psychology
-  discipline: positive psychology
+  discipline: psychology
   source_books:
   - Grit — Angela Duckworth
   - Mindset — Carol Dweck
@@ -3195,7 +3195,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-019
   domain: technology
-  discipline: computer science
+  discipline: software engineering
   source_books:
   - Life 3.0 — Max Tegmark
   - Superintelligence — Nick Bostrom
@@ -3230,7 +3230,7 @@ examples:
   tier: CHALLENGE
 - id: NEG-020
   domain: philosophy
-  discipline: epistemology
+  discipline: philosophy
   source_books:
   - The Better Angels of Our Nature — Steven Pinker
   - Enlightenment Now — Steven Pinker
@@ -3328,7 +3328,7 @@ examples:
   tier: GOLD-A
 - id: CONV-032
   domain: systems thinking
-  discipline: systems science
+  discipline: systems thinking
   source_books:
   - Antifragile — Nassim Nicholas Taleb
   - A New Kind of Science — Stephen Wolfram
@@ -3380,7 +3380,7 @@ examples:
   tier: GOLD-A
 - id: CONV-033
   domain: design
-  discipline: interaction design
+  discipline: human-computer interaction
   source_books:
   - About Face — Alan Cooper
   - Don't Make Me Think — Steve Krug
@@ -3494,7 +3494,7 @@ examples:
   tier: GOLD-A
 - id: CONV-035
   domain: behavior change
-  discipline: behavioral psychology
+  discipline: psychology
   source_books:
   - Atomic Habits — James Clear
   - Influence — Robert Cialdini
@@ -3552,8 +3552,8 @@ examples:
     same causal structure).
   tier: GOLD-B
 - id: CONV-036
-  domain: strategy
-  discipline: strategic management
+  domain: business development
+  discipline: strategic thinking
   source_books:
   - Algorithms to Live By — Brian Christian & Tom Griffiths
   - Antifragile — Nassim Nicholas Taleb
@@ -3681,8 +3681,8 @@ examples:
     split, not merge, when sources describe different phenomena. is_convergent=false despite 2 books.
   tier: GOLD-B
 - id: CONV-038
-  domain: complex systems
-  discipline: network science
+  domain: systems & frameworks
+  discipline: social network analysis
   source_books:
   - Linked — Albert-László Barabási
   - Algorithms to Live By — Brian Christian & Tom Griffiths
@@ -3882,7 +3882,7 @@ examples:
   tier: GOLD-A
 - id: CONV-041
   domain: psychology
-  discipline: cognitive psychology
+  discipline: psychology
   source_books:
   - The Invisible Gorilla — Christopher Chabris & Daniel Simons
   - The Confidence Game — Maria Konnikova
@@ -4058,7 +4058,7 @@ examples:
   tier: GOLD-A
 - id: CONV-044
   domain: psychology
-  discipline: interpersonal communication
+  discipline: communication theory
   source_books:
   - Emotional Intelligence — Daniel Goleman
   - Daring Greatly — Brené Brown
@@ -4114,7 +4114,7 @@ examples:
   tier: GOLD-A
 - id: CONV-045
   domain: productivity
-  discipline: time management
+  discipline: personal productivity
   source_books:
   - The 7 Habits of Highly Effective People — Stephen Covey
   - Essentialism — Greg McKeown
@@ -4228,7 +4228,7 @@ examples:
   tier: GOLD-A
 - id: CONV-047
   domain: productivity
-  discipline: time management
+  discipline: personal productivity
   source_books:
   - The 4-Hour Workweek — Timothy Ferriss
   - Deep Work — Cal Newport
@@ -4507,8 +4507,8 @@ examples:
     not WHY individuals differ.'
   tier: GOLD-A
 - id: CONV-052
-  domain: strategy
-  discipline: competitive strategy
+  domain: business development
+  discipline: strategic thinking
   source_books:
   - Understanding Michael Porter — Joan Magretta
   - The Lean Startup — Eric Ries
@@ -4565,7 +4565,7 @@ examples:
     for teaching S2 that strategic frameworks are often descriptive models, not causal mechanisms.'
   tier: GOLD-A
 - id: CONV-053
-  domain: product management
+  domain: digital product
   discipline: customer experience design
   source_books:
   - Inspired — Marty Cagan
@@ -4651,7 +4651,7 @@ examples:
   rationale: 'HARD NEGATIVE - DUPLICATE EDITION FALSE CONVERGENCE (D2308). Two source files are the SAME work (Pieter Levels, MAKE Bootstrapper''s Handbook) from different mirrors. Canonical source-id resolution collapses them to ONE distinct work: source_diversity must be 1 (not 2) and is_convergent must be false.'
   tier: CHALLENGE
 - id: NEG-DUP-002
-  domain: art
+  domain: arts & culture
   discipline: emerging
   source_books:
   - Speculative Everything Design, Fiction, and Social Dreaming (Anthony Dunne) (z-library.sk, 1lib.sk, z-lib.sk).md
@@ -4679,7 +4679,7 @@ examples:
 
 - id: CONV-054
   domain: economics
-  discipline: game theory
+  discipline: operations research
   source_books:
   - Algorithms to Live By — Brian Christian & Tom Griffiths
   - The Art of Strategy — Avinash Dixit & Barry Nalebuff
@@ -4797,8 +4797,8 @@ examples:
   tier: GOLD-A
 
 - id: CONV-056
-  domain: complex systems
-  discipline: statistics
+  domain: systems & frameworks
+  discipline: research methodology
   source_books:
   - 'Complexity: A Guided Tour — Melanie Mitchell'
   - The Black Swan — Nassim Nicholas Taleb
@@ -4920,7 +4920,7 @@ examples:
   tier: GOLD-A
 
 - id: CONV-058
-  domain: data science
+  domain: research & methodology
   discipline: machine learning
   source_books:
   - 'GANs in Action — Jakub Langr & Vladimir Bok'
@@ -5005,7 +5005,7 @@ examples:
   tier: GOLD-A
 - id: CONV-060
   domain: systems & frameworks
-  discipline: statistics
+  discipline: research methodology
   source_books:
   - Coding with ChatGPT and Other LLMs (Dr. Vincent Austin Hall) (z-library.sk, 1lib.sk, z-lib.sk).md
   - AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md

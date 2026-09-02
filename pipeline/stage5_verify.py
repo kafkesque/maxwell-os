@@ -38,6 +38,7 @@ Usage:
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import time
@@ -167,6 +168,31 @@ def _nli_pair_scores(
     return _entail, _neutral, _contra
 
 
+def _is_garbage_passage(text: str) -> bool:
+    """D2506/B2: deterministic heuristic for non-evidence fragments (captions/titles/UI).
+
+    Conservative — only flags UNAMBIGUOUS garbage so legitimate short quotes are not
+    dropped: (1) too few words to be a claim, (2) underscore placeholders ("Data ____
+    stories"), (3) symbol-dense non-prose (figure captions, arrow diagrams). Applied in
+    deberta_check() BEFORE NLI scoring so contradiction/neutral verdicts are never
+    computed from garbage premises.
+    """
+    t = (text or "").strip()
+    if not t:
+        return True
+    words = re.findall(r"[A-Za-z][A-Za-z'-]*", t)
+    if not words:
+        return True
+    if len(words) < EVIDENCE_GARBAGE_MIN_WORDS:
+        return True  # "Time 3 minutes", "Data ____ stories"
+    if t.count("_") > EVIDENCE_GARBAGE_MAX_UNDERSCORE:
+        return True  # title placeholder with underscore runs
+    alpha_chars = sum(len(w) for w in words)
+    if alpha_chars / max(len(t), 1) < EVIDENCE_GARBAGE_MIN_ALPHA_RATIO:
+        return True  # punctuation/symbol-dense fragment
+    return False
+
+
 def deberta_check(fb: dict) -> tuple[bool, float, str]:
     """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
 
@@ -207,10 +233,14 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     _contra_scores: list[float] = []
     _neutral_scores: list[float] = []
     _nli_errors: list[str] = []  # C16/BUG-177: observability — never silent
+    _garbage_skipped: int = 0  # D2506/B2: non-evidence fragments excluded from NLI
 
     for _ep in _eps[:8]:
         if not _ep.strip():
             continue
+        if _is_garbage_passage(_ep):
+            _garbage_skipped += 1
+            continue  # D2506/B2: never score NLI against a caption/title/UI fragment
         _prem = _ep[:S5_NLI_MAX_PREMISE_CHARS]  # premise = evidence passage
         _hyp = _def[:S5_NLI_MAX_HYPOTHESIS_CHARS]  # hypothesis = FB definition
         try:
@@ -229,7 +259,14 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     if _nli_errors:
         fb["verification_error_type"] = "NLIInferenceError"
         fb["verification_errors"] = _nli_errors[:5]
+    if _garbage_skipped:
+        fb["evidence_garbage_skipped"] = _garbage_skipped  # D2506/B2: observability
     if not (_entail_scores or _contra_scores or _neutral_scores):
+        if _garbage_skipped:
+            return False, 0.0, (
+                f"All {_garbage_skipped} evidence passages are non-evidence fragments — "
+                "QUARANTINE (no clean premise for NLI)"
+            )
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 
     _entail = max(_entail_scores, default=0.0)
@@ -332,6 +369,15 @@ BANNED_MECHANISM_PREFIXES: tuple[str, ...] = tuple(_cfg5.get("banned_mechanism_p
     "because it makes",
     "because it can",
 ]))
+
+# ── D2506/B2: deterministic evidence-passage garbage filter (config-first, C12) ──
+# EPUB→MD evidence_passages frequently carry figure captions, book/chapter titles, and
+# UI strings ("Time 3 minutes", "Data ____ stories", "The cloud template…") that are NOT
+# verbatim source prose. Verifying against them yields meaningless NLI scores (validated
+# false-CONTRA in the D2506 stratified sample — claude0041/chatgpt0041).
+EVIDENCE_GARBAGE_MIN_WORDS: int = int(_cfg5.get("evidence_garbage_min_words", 6))
+EVIDENCE_GARBAGE_MAX_UNDERSCORE: int = int(_cfg5.get("evidence_garbage_max_underscore", 2))
+EVIDENCE_GARBAGE_MIN_ALPHA_RATIO: float = float(_cfg5.get("evidence_garbage_min_alpha_ratio", 0.5))
 
 
 def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:

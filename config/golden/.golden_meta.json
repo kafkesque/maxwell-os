@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "algorithm": "sha256",
-  "golden_sha256": "600cb509ddee02ba7e96f494288e8e1b569bcdd413be70775ad5bf910d358ffe",
-  "pipeline_commit": "9aa5fa5",
+  "golden_sha256": "25e8339179e55b07d282843c8d1cab373f265cfefad4fd2b9420c6c8baa0b519",
+  "pipeline_commit": "6e621fd",
   "trimmed_ids": [
     "PRO-002",
     "LEA-001",
@@ -30,7 +30,7 @@
     "universal_after": 3,
     "specialized_before": 2,
     "specialized_after": 3,
-    "note": "D2377/D2378: universal += power-law; specialized += backpropagation (scripted-mined via tools/mine_depth_golden.py). Color gamut authored as specialized but relabeled domain. T-015 >=5 each still open \u2014 corpus is business/tech-heavy, poor in genuine universal/specialized 2-source passages."
+    "note": "D2377/D2378: universal += power-law; specialized += backpropagation (scripted-mined via tools/mine_depth_golden.py). Color gamut authored as specialized but relabeled domain. T-015 >=5 each still open — corpus is business/tech-heavy, poor in genuine universal/specialized 2-source passages."
   },
   "verbatim_fix_20260816": {
     "note": "D2396-fix: corrected 5 NON_VERBATIM evidence passages (CONV-054 paraphrase, CONV-055 3x double-apostrophe, CONV-058 fabricated Generator quote) + meta count 77->80. golden_validate 80/80 PASS.",
@@ -51,5 +51,5 @@
   "convergent_positives": 61,
   "hard_negatives": 23,
   "golden_path": "config/golden/stage2_fewshot_convergent.yaml",
-  "restamped_note": "D2504: re-stamped commit->HEAD, added total_examples/convergent_positives/hard_negatives; hash unchanged (golden file unchanged since ecb9ade)"
+  "restamped_note": "D2506: surgical line-level canonicalization of dormant stage2 golden domain/discipline alias->canonical (45 values); cross-kind/missing untouched"
 }

@@ -575,11 +575,32 @@ def load_stage5_fbs() -> list[dict]:
     return fbs
 
 
+def _assert_fb_id_unique(fbs: list[dict]) -> None:
+    """BUG-195/D2505: fail-loud guard against duplicate fb_id BEFORE the upsert.
+
+    `INSERT OR REPLACE INTO fbs` (fb_id TEXT PRIMARY KEY) silently overwrites the
+    earlier row on any fb_id collision — the exact BUG-195 silent-data-loss class.
+    The post-hoc `dedup_fb_id.py` made THIS run's fb_ids unique, but a duplicate
+    reaching S6 would mean permanent silent loss. Abort instead of overwriting.
+    """
+    from collections import Counter
+
+    dupes = sorted(fid for fid, k in Counter(fb.get("fb_id") for fb in fbs).items() if k > 1)
+    if dupes:
+        raise RuntimeError(
+            f"{len(dupes)} duplicate fb_id in S5 checkpoint — refusing to commit "
+            f"(INSERT OR REPLACE would silently overwrite). First duplicates: {dupes[:5]}"
+        )
+
+
 def run_stage6(export_only: bool = False):
     """Run Stage 6: Commit FBs to SQLite + Parquet."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage5_fbs()
+
+    # BUG-195/D2505: fail-loud duplicate guard (runs before any INSERT).
+    _assert_fb_id_unique(fbs)
 
     print(f"💾 Stage 6: Commit — {len(fbs)} verified FBs")
     print(f"{'='*60}")

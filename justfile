@@ -188,6 +188,11 @@ stage4:
 stage5:
     @python3 -c "from pipeline.omlx_call import assert_omlx_no_cache; assert_omlx_no_cache()"
     python3 pipeline/stage5_verify.py
+# D2505: pre-S6 commit gate — verify S5 checkpoint (count/uniqueness/contamination)
+# before S6's INSERT OR REPLACE. Fail-closed; run before `just stage6`.
+pre-s6:
+    python3 scripts/pre_s6_gate.py
+
 stage6:
     python3 pipeline/stage6_commit.py
 

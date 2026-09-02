@@ -43,7 +43,7 @@ visual semiotics
 ### Domains (27 — pick 1-5 per FB, D150)
 
 ```
-ai & agents, ai systems, brand identity, business development,
+ai & agents, ml systems & infrastructure, brand identity, business development,
 business operations, code & computation, computational art,
 computational science & physics, creative technology, data visualization,
 digital product, editorial & advertising, emerging, engineering practice,
@@ -72,7 +72,7 @@ business  = business operations, business development, entrepreneurship, organiz
 design    = graphic design, brand identity, editorial & advertising, motion design, environmental design,
             digital product, illustration, packaging, web & ui, user experience, creative technology,
             data visualization
-system    = systems & frameworks, code & computation, engineering practice, ai & agents, ai systems,
+system    = systems & frameworks, code & computation, engineering practice, ai & agents, ml systems & infrastructure,
             computational science & physics, software engineering
 academic  = research & methodology, semiotics & communication, computational art, philosophy
 personal  = fallback when no other context matches

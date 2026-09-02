@@ -44,7 +44,7 @@ available_domains:
   - entrepreneurship
   - organizational behavior
   - ai & agents
-  - ai systems
+  - ml systems & infrastructure
   - engineering practice
   - computational art
   - code & computation

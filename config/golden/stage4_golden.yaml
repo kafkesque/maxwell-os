@@ -55,7 +55,7 @@ examples:
     boundary: "Applies to systems with a detectable output→input path and a delay shorter than the response needed. Fails when feedback is absent or too slow to correct the deviation."
   expected_classification:
     discipline: "complex adaptive systems"
-    domains: ["ai systems", "organizational behavior", "engineering & infrastructure"]
+    domains: ["ml systems & infrastructure", "organizational behavior", "engineering & infrastructure"]
     depth: "cross-domain"
     evidence: "cited"
     is_specialized: false

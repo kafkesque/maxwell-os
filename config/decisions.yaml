@@ -5044,11 +5044,23 @@ decisions:
   - MASTER-TASK-REGISTER.md
   - config/pipeline_config.yaml
   created: '2026-09-02'
+- id: D2503
+  category: TAXONOMY
+  state: ACTIVE
+  description: 'ai systems → ml systems & infrastructure rename (disambiguation, NOT merge — distinct agentic 66 vs ML-infra 15). Renamed across taxonomy_v5 + synonym_map + pipeline_config x2 + domain_disciplines + stage4_golden S4-GOLD-002 + prompts/n5_modular + fix_golden_set + llm_golden_review_form; removed overlapping "AI Systems" alias from ai & agents (case-variant synonym-index collision). Post-hoc remap scripts/rename_ai_systems_domain.py → 15/7867 records (backup_pre_ai_systems_rename_*). BUG-202 FIXED: _evidence_cleanliness_gate return set() → raise RuntimeError (fail-closed). audit_evidence_cleanliness.py: 187 contaminated (2.4%), 8 severe → QUARANTINE. 23/23 tests green.'
+  champion: goose
+  target_files:
+  - config/taxonomy_v5.yaml
+  - config/synonym_map.yaml
+  - config/golden/stage4_golden.yaml
+  - scripts/rename_ai_systems_domain.py
+  - pipeline/stage5_verify.py
+  created: '2026-09-02'
 summary:
-  total: 486
+  total: 487
   proposed: 0
   draft: 1
-  active: 427
+  active: 428
   stale: 0
   superseded: 15
   archived: 8

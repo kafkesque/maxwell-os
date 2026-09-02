@@ -25,7 +25,7 @@ DESIGN_SIGNALS = {
 }
 SYSTEM_SIGNALS = {
     "systems & frameworks", "code & computation", "engineering practice",
-    "ai & agents", "ai systems", "computational science & physics",
+    "ai & agents", "ml systems & infrastructure", "computational science & physics",
     "software engineering",
 }
 ACADEMIC_SIGNALS = {

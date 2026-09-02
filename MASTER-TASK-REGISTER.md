@@ -49,13 +49,38 @@
 | 21 | P2 | stage2 golden `domain`/`discipline` metadata drift (~108 cross-kind/non-canonical labels, dormant) — migrate to canonical OR deprecate fields | `stage2_fewshot_*.yaml` | ⏳ future (not consumed — zero runtime impact) |
 | 22 | P2 | Commit `config/alias_map.yaml` (was untracked) + `.gitignore` the `.bak_*` config backups | git | ✅ DONE (committed in D2501 push) |
 | 23 | P3 | Taxonomy semantic near-duplicate: `ai systems` vs `ai & agents` (both canonical, both taught by golden) | `taxonomy_v5.yaml` | ⏳ future (needs D2399 human review, not this session) |
-| 24 | P0 | Fix BUG-202 `_evidence_cleanliness_gate` fail-open (`return set()` → fail-closed) — the one near-blocker from roundtable | `stage5_verify.py:559` | ⏳ next (mitigated tonight by standalone `audit_evidence_cleanliness.py` gate) |
+| 24 | P0 | Fix BUG-202 `_evidence_cleanliness_gate` fail-open (`return set()` → fail-closed) — the one near-blocker from roundtable | `stage5_verify.py:559` | ✅ DONE (raise RuntimeError; smoke: import OK, happy path returns set()) |
 | 25 | P1 | Fix BUG-203 S5 `FLAG` dead code — wire it or delete it (reporting layer currently lies) | `stage5_verify.py` + `status.py` | ⏳ |
 | 26 | P1 | Fix BUG-204 stale `TAXONOMY_MAX_DISCIPLINES` 72→75 (+ drop unused `_max_count`) | `pipeline_paths.py` / `taxonomy_manager.py` | ⏳ |
 | 27 | P1 | S5 weak max-entailment rule (ChatGPT B2) — add contradiction veto + coverage + re-calibrate | `stage5_verify.py` `deberta_check` | ⏳ (conservative today: recall 0.386 → QUARANTINE-leaning) |
-| 28 | P2 | De-overlap `ai systems`/`ai & agents` raw aliases ("AI Systems" in both) + rename `ai systems` for clarity; then D2399 human review | `taxonomy_v5.yaml` | ⏳ (do NOT merge — distinct) |
+| 28 | P2 | De-overlap `ai systems`/`ai & agents` raw aliases ("AI Systems" in both) + rename `ai systems` for clarity; then D2399 human review | `taxonomy_v5.yaml` | ✅ DONE (D2503: `ai systems`→`ml systems & infrastructure`, alias de-overlapped, 15 checkpoint records remapped; D2399 review still ⏳) |
 | 29 | P2 | Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual | `config/golden/.golden_meta.json` | ⏳ |
 | 30 | P2 | Rename/gut `tests/test_stage4_d2138.py` + `tests/test_stage4_exhaustive.py` (0 `test_*` functions — inflate coverage) | `tests/` | ⏳ |
+
+---
+
+## 🔴 AGGREGATED PRE-S5 TASK LIST (MUST → SHOULD → WORTH) — 2026-09-02
+
+### MUST (blockers / near-blockers — complete before `just stage5`)
+1. ✅ **BUG-202** evidence-cleanliness gate fail-closed (`stage5_verify.py` `raise RuntimeError`) — DONE + smoke-tested.
+2. ✅ **D2500** cross-kind contamination fix (kind-safe matcher + D2399 guard + config cleanup) — DONE.
+3. ✅ **D2503** `ai systems`→`ml systems & infrastructure` rename + alias de-overlap + 15-record checkpoint remap — DONE.
+4. ⏳ **Human-review gate**: verify 6 dedup merges, gate emerging rate, `audit_s4_final.py` PASS, record count = 7,867.
+5. ⏳ **BUG-198 decision** (6 dropped principles `application:'None'`): RECOMMEND defer into BUG-197 re-classification — do NOT re-classify with the buggy prompt now.
+
+### SHOULD (hardening — cheap, low-risk, do before or alongside S5)
+6. ✅ Standalone `audit_evidence_cleanliness.py` on live checkpoint → **8 severe (>15%) will QUARANTINE** (187 contaminated total, 2.4%).
+7. ⏳ **BUG-203** wire-or-delete S5 `FLAG` status (reporting layer currently prints "Disagree→FLAG: 0" misleadingly).
+8. ⏳ **BUG-204** `TAXONOMY_MAX_DISCIPLINES` 72→75 + drop unused `_max_count`.
+9. ⏳ Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual.
+
+### WORTH (post-S5 — do NOT block on these)
+10. B2 max-entailment decision-rule hardening (contradiction veto + coverage + recalibrate) — conservative today (recall 0.386 → QUARANTINE-leaning).
+11. Fingerprint load/write fail-closed (P1-1/P1-2 observability).
+12. **BUG-197** classifier prompt fix (disjointness + closed vocab) + targeted re-classification (~2,080 emerging + 6 dropped + 518 axis-swapped + `machine learning`-as-raw-domain 48× + 231 cross-axis aliases).
+13. D2399 human-reviewed promote/demote (only after BUG-197 re-classification).
+14. Backfill 25 sidecar empty shells (10 PT / 5 PI / 6 GE / 4 TI) via cross-examination.
+15. P1-6 config-read fallbacks: promote from "log" to "raise" (D2497 left them log-only).
 
 ---
 

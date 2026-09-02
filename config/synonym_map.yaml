@@ -368,8 +368,8 @@ synonyms:
       - "rag"
       - "fine.tun"
 
-  ai_systems:
-    canonical: ai systems
+  ml_systems_infrastructure:
+    canonical: ml systems & infrastructure
     synonyms:
       - ai systems
       - ai infrastructure

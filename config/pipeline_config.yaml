@@ -300,7 +300,7 @@ stage4:
     - code & computation
     - engineering practice
     - ai & agents
-    - ai systems
+    - ml systems & infrastructure
     - computational science & physics
     - software engineering
     academic:
@@ -503,7 +503,7 @@ test:
       - data visualization
       ai:
       - ai & agents
-      - ai systems
+      - ml systems & infrastructure
       - code & computation
       - computational art
       - software engineering

@@ -55,7 +55,7 @@ domains:
     - systems thinking
     - visual perception
     - visual semiotics
-  ai systems:
+  ml systems & infrastructure:
     group: AI & Computing
     disciplines:
     - agentic architecture

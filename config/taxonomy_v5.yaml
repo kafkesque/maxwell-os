@@ -266,14 +266,13 @@ domains:
   - Multi-Agent Systems
   - multi-agent systems
   - Multi-Agent Systems Architecture
-  - AI Systems
   - Agentic Systems
   - AI Agent Architecture
   - AI
   - AI agents
   - agentic workflows
   - agent frameworks
-- canonical: ai systems
+- canonical: ml systems & infrastructure
   group: AI & Computing
   raw:
   - Machine Learning Engineering

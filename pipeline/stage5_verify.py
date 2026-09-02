@@ -556,9 +556,11 @@ def _evidence_cleanliness_gate(fbs: list[dict]) -> set[str]:
         sys.path.insert(0, str(scripts_dir))
     try:
         import audit_evidence_cleanliness as _evc  # noqa: PLC0415 — deferred, standalone audit tool
-    except Exception as e:  # noqa: BLE001 — C16: fail-loud, never silent
-        print(f"   ⚠️  Evidence-cleanliness gate unavailable ({type(e).__name__}: {e}) — NOT enforcing BUG-181#1 (C16)", file=sys.stderr)
-        return set()
+    except Exception as e:  # BUG-202: fail-CLOSED — a missing gate must abort S5, never verify against possibly-contaminated evidence blind
+        raise RuntimeError(
+            f"BUG-181#1 evidence-cleanliness gate unavailable — aborting S5 (fail-closed): "
+            f"{type(e).__name__}: {e}"
+        ) from e
     contaminated: set[str] = set()
     for fb in fbs:
         for ep in fb.get("evidence_passages") or []:

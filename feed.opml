@@ -3,7 +3,7 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-08-29T22:05:00Z</dateModified>
+    <dateModified>2026-08-31T00:00:00Z</dateModified>
     <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
   </head>
   <body>
@@ -56,6 +56,9 @@
                description="Recursive Language Models: decompose + recursively sub-query context via REPL (context-rot mitigation)"/>
       <outline type="rss" text="RLMs" xmlUrl="https://github.com/topics/rlms"
                description="Recursive Language Models (plural topic alias)"/>
+      <!-- 2026-08-31: D2498 — speculative decoding (lossless draft-model acceleration) -->
+      <outline type="rss" text="Speculative Decoding" xmlUrl="https://github.com/topics/speculative-decoding"
+               description="Draft-model speculative decoding: DFlash, DFlare, DSpark, EAGLE, MTP, AngelSpec. Lossless; temp=0.0-safe."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -87,6 +90,35 @@
       <outline type="link" text="mlx-serve — No-Python MLX server" 
                url="https://github.com/ddalcu/mlx-serve"
                description="⭐374 | Swift | No Python runtime. Smaller footprint. Same MLX backend — no performance advantage over OMLX. Monitor for maturity."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SPECULATIVE DECODING — evaluated 2026-08-31 (D2498, watch-only) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="Speculative Decoding" description="Lossless draft-model acceleration — not an OMLX replacement, a runtime feature">
+
+      <!-- AngelSpec — Tencent unified drafter-training workbench -->
+      <outline type="link" text="⭐ AngelSpec — Tencent speculative-decoding workbench" 
+               url="https://github.com/Tencent/AngelSpec"
+               description="⭐219 | Python | Apache-2.0 | Unified PyTorch training workbench unifying 6 drafter architectures (DFly/DFlash/DFlare/Eagle-3/DSpark/MTP) behind one config flag. D-Cut batch verification budgeting +15.7%. ISSUE: PyTorch/NVIDIA training violates C1/C3 — pre-trained drafter weights only."/>
+      <outline type="link" text="AngelSpec paper (arXiv:2607.25852)" 
+               url="https://arxiv.org/abs/2607.25852"
+               description="DFly = 4.79 accepted tokens on Hunyuan-3 (~30% over DFlash; 1.98-2.40x end-to-end at 4-64 concurrent users). Key finding: no single drafter wins — train specialists, not a generalist."/>
+
+      <!-- DFlash — block-diffusion drafter, ships MLX backend -->
+      <outline type="link" text="⭐ DFlash — block-diffusion drafter (MLX backend)" 
+               url="https://z-lab.ai/projects/dflash"
+               description="⭐5,894 repo | MIT | Whole-block parallel drafting; ships MLX backend for Apple Silicon (best near-term local option). 4.6x headline is generation-workload only. Paper arXiv:2602.06036."/>
+
+      <!-- DSpark — parallel + re-injected sequence -->
+      <outline type="link" text="DSpark — parallel + re-injected sequence (PKU/DeepSeek)" 
+               url="https://arxiv.org/abs/2607.05147"
+               description="Re-injects sequence into parallel block drafting to slow acceptance decay. Published 3 weeks before DFly — convergent conclusion. Watch-only."/>
+
+      <!-- EAGLE-3 — autoregressive layer-fused drafter -->
+      <outline type="link" text="EAGLE-3 — autoregressive layer-fused drafter" 
+               url="https://arxiv.org/abs/2503.01840"
+               description="NeurIPS 2025. Autoregressive drafter fusing multi-layer features; claimed 3-6.5x. Default in most serving stacks. See also MTPLX (native-MTP MLX path) in MLX Inference Engines above."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->

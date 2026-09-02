@@ -579,6 +579,18 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     def _accept(canonical: str) -> bool:
         return valid_canonicals is None or canonical.lower() in valid_canonicals
 
+    # D2422/BUG-200: prevent cross-kind SOURCE-alias pollution. A raw alias whose
+    # lowercase form is a canonical of the OPPOSITE kind must NOT register in this
+    # kind's index — otherwise match_to_canonical() silently COERCES a discipline
+    # label into a domain canonical (e.g. 'typography' → 'graphic design') instead
+    # of returning None → "emerging". The flat index (kind=None) stays combined and
+    # is verified downstream in match_to_canonical()/map_to_canonical_with_fallback().
+    forbidden_keys: set[str] = set()
+    if kind == "domain":
+        forbidden_keys = {c.lower() for c in CANONICAL_DISCIPLINES}
+    elif kind == "discipline":
+        forbidden_keys = {c.lower() for c in CANONICAL_DOMAINS}
+
     # 1. Taxonomy raw aliases (both domains and disciplines)
     tax_path = config_root / "taxonomy_v5.yaml"
     if tax_path.exists():
@@ -591,7 +603,7 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             lookup[canonical.lower()] = canonical
             for raw in entry.get("raw", []):
                 raw_clean = raw.strip()
-                if raw_clean:
+                if raw_clean and raw_clean.lower() not in forbidden_keys:
                     lookup[raw_clean.lower()] = canonical
 
     # 2. Synonym_map.yaml (domain synonyms, keywords, patterns)
@@ -611,12 +623,12 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             lookup[canonical.lower()] = canonical
             for syn in entry.get("synonyms", []):
                 syn_clean = syn.strip()
-                if syn_clean:
+                if syn_clean and syn_clean.lower() not in forbidden_keys:
                     lookup[syn_clean.lower()] = canonical
             # keywords are also useful for matching
             for kw in entry.get("keywords", []):
                 kw_clean = kw.strip()
-                if kw_clean and kw_clean.lower() not in lookup:
+                if kw_clean and kw_clean.lower() not in lookup and kw_clean.lower() not in forbidden_keys:
                     lookup[kw_clean.lower()] = canonical
 
     return lookup
@@ -658,6 +670,13 @@ def match_to_canonical(label: str, kind: str = "domain") -> str | None:
 
     label_lower = label.strip().lower()
     canonical_list = CANONICAL_DOMAINS if kind == "domain" else CANONICAL_DISCIPLINES
+
+    # BUG-200/D2422: a label that is canonical on the OPPOSITE axis must never
+    # resolve on this axis — prevents silent cross-kind coercion via the flat
+    # index/synonym_map (e.g. 'software engineering' → 'engineering practice').
+    opposite = CANONICAL_DISCIPLINES if kind == "domain" else CANONICAL_DOMAINS
+    if label_lower in {c.lower() for c in opposite}:
+        return None
 
     # 1. Direct canonical match (case-insensitive)
     for c in canonical_list:

@@ -25,6 +25,7 @@ Exit codes:
 """
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -117,7 +118,11 @@ def _check_stack(name: str, guard: dict[str, Any]) -> list[str]:
         violations.append(f"{tag} launchctl list failed: {exc}")
         listed = ""
     for label in labels:
-        if label in listed:
+        # Exact whole-field match: `label in listed` was a substring test, so
+        # `com.maxwell.omlx` falsely matched the legit `com.maxwell.omlx-api-key`
+        # (one-shot OMLX_API_KEY setenv agent). Match the label as the last
+        # whitespace-delimited column of a `launchctl list` line.
+        if re.search(rf"(?m)(?:^|\s){re.escape(label)}\s*$", listed):
             violations.append(f"{tag} stale launchd agent LOADED: {label}")
         plist = agents_dir / f"{label}.plist"
         if plist.exists():

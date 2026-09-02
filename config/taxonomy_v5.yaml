@@ -29,13 +29,9 @@ domains:
   - print design
   - poster design
   - digital art
-  - typography
-  - Typography
   - typographic style
   - typographic history
-  - Color Theory
   - Color Psychology
-  - color theory
   - color psychology
 - canonical: brand identity
   group: Visual Practice
@@ -75,7 +71,6 @@ domains:
   - Environmental Design
   - interior design
   - wayfinding
-  - industrial design
 - canonical: digital product
   group: Digital & Interactive
   raw:
@@ -88,21 +83,16 @@ domains:
   - Web Design
   - interaction design
   - Interaction Design
-  - product design
-  - Product Design
   - service design
   - Service Design
   - Design Research
   - Design Research Investigation
   - Design Operations
   - DesignOps
-  - Design Thinking
   - Product Development
   - Product Management
-  - Design Systems
   - Design System
   - design system
-  - design systems
   - product management
   - SaaS
 - canonical: data visualization
@@ -121,10 +111,6 @@ domains:
   group: Digital & Interactive
   raw:
   - Creative Technology
-  - creative coding
-  - Creative Coding
-  - software engineering
-  - Software Engineering
   - web development
   - Web Development
   - front-end
@@ -149,7 +135,6 @@ domains:
   - UX Research
   - UX
   - Usability
-  - Human-Computer Interaction
   - HCI
   - User Interface Design
   - UI Design
@@ -182,15 +167,11 @@ domains:
   - Business
   - operations
   - Business Operations
-  - Finance
   - accounting
   - Accounting
   - Corporate Finance
-  - finance
   - business
   - business management
-  - economics
-  - Economics
   - economic analysis
   - economic policy
   - Monetary Policy
@@ -221,8 +202,6 @@ domains:
   group: Business & Strategy
   raw:
   - Business Development
-  - marketing
-  - Marketing
   - Marketing Strategy
   - sales
   - Sales Communication
@@ -268,7 +247,6 @@ domains:
   - Organizational Management
   - Organizational Leadership
   - Corporate Governance
-  - Leadership
   - management
   - Management
   - Human Resources Management
@@ -291,8 +269,6 @@ domains:
   - AI Systems
   - Agentic Systems
   - AI Agent Architecture
-  - Artificial Intelligence
-  - artificial intelligence
   - AI
   - AI agents
   - agentic workflows
@@ -300,13 +276,10 @@ domains:
 - canonical: ai systems
   group: AI & Computing
   raw:
-  - Machine Learning
-  - machine learning
   - Machine Learning Engineering
   - Machine Learning Systems
   - Neural Networks
   - Deep Learning
-  - Generative AI
   - Generative AI Systems
   - Generative AI Engineering
   - Generative AI Infrastructure
@@ -321,8 +294,6 @@ domains:
 - canonical: engineering practice
   group: AI & Computing
   raw:
-  - Software Engineering
-  - software engineering
   - Software Development
   - Software Architecture
   - Programming
@@ -342,7 +313,6 @@ domains:
   - Computational Creativity
   - Generative Art
   - generative art
-  - Creative Coding
   - Creative Programming
   - Multimedia Programming
   - computational aesthetics
@@ -370,12 +340,10 @@ domains:
   - computational biology
   - computational ecology
   - computational neuroscience
-  - computational geometry
   - computational systems
   - computational evolution
   - computational pedagogy
   - Simulation
-  - Computer Graphics
   - Computer Graphics / Simulation
   - Computer Graphics / Physics Simulation
   - Physics Simulation
@@ -388,20 +356,16 @@ domains:
   group: Systems, Semiotics & Knowledge
   raw:
   - Systems Theory
-  - Systems Thinking
-  - systems thinking
   - Systems Science
   - Systems Analysis
   - systems analysis
   - Systems Design
-  - Systems Engineering
   - Systems Management
   - System Dynamics
   - System Design
   - System Behavior
   - System Architecture
   - Complex Systems
-  - Complex Adaptive Systems
   - General Systems Theory
   - General Systems
   - Cybernetics
@@ -421,14 +385,8 @@ domains:
 - canonical: semiotics & communication
   group: Systems, Semiotics & Knowledge
   raw:
-  - semiotics
-  - Semiotics
-  - visual semiotics
-  - Visual Semiotics
   - Visual Rhetoric
   - visual rhetoric
-  - Multimodal Metaphor
-  - multimodal metaphor
   - Peircean Semiotics
   - Peircean semiotics
   - biosemiotics
@@ -438,15 +396,12 @@ domains:
   - sociosemiotics
   - media semiotics
   - history of semiotics
-  - linguistics
-  - Linguistics
   - Cognitive Linguistics
   - Philosophy of Language
   - Phenomenology
   - phenomenology
   - Umwelt theory
   - Communication
-  - Communication Theory
   - Communication Studies
   - Communication Strategy
   - Business Communication
@@ -455,8 +410,6 @@ domains:
   - Nonverbal Communication Analysis
   - body language
   - Body Language Analysis
-  - Media Studies
-  - Cultural Studies
   - Visual Communication
   - visual communication
   - Communication Design
@@ -464,8 +417,6 @@ domains:
 - canonical: research & methodology
   group: Systems, Semiotics & Knowledge
   raw:
-  - Research Methodology
-  - research methodology
   - Research Methods
   - Research Design
   - Research Ethics
@@ -496,7 +447,6 @@ domains:
   - Data Science
   - Probability Theory
   - Information Theory
-  - Information Science
   - Library Science
   - Decision Science
   - Epistemology
@@ -571,8 +521,6 @@ domains:
 - canonical: legal & public policy
   group: Business & Strategy
   raw:
-  - law
-  - Law
   - legal studies
   - public policy
   - Public Administration
@@ -587,8 +535,6 @@ domains:
 - canonical: science & research
   group: Systems, Semiotics & Knowledge
   raw:
-  - neuroscience
-  - Neuroscience
   - genetics
   - Genetics
   - Bioinformatics
@@ -616,15 +562,12 @@ domains:
   - literature
   - criticism
   - art criticism
-  - literary theory
   - art education
   - museum studies
   - cultural heritage
 - canonical: engineering & infrastructure
   group: AI & Computing
   raw:
-  - robotics
-  - Robotics
   - Mechanical Engineering
   - Aerospace Engineering
   - Cloud Computing
@@ -666,10 +609,6 @@ domains:
 - canonical: social sciences
   group: Systems, Semiotics & Knowledge
   raw:
-  - sociology
-  - Sociology
-  - anthropology
-  - Anthropology
   - Social Work
   - social science
   - criminology
@@ -786,7 +725,6 @@ disciplines:
   raw:
   - motion+time
   - Motion and Time
-  - Motion Design
   - Motion Graphics
   - motion graphics
   - Motion Graphic Design
@@ -1262,7 +1200,6 @@ disciplines:
   - Creative Coding
   - creative coding
   - Creative Programming
-  - Creative Technology
   - openFrameworks
   - Processing
   - Multimedia Programming

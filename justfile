@@ -59,7 +59,10 @@ triad:
     python3 pipeline/stage1_5_embed_cluster.py
     python3 pipeline/stage2_extract.py
     python3 pipeline/stage4_merge.py
+    python3 scripts/dedup_fb_id.py
+    python3 scripts/remap_emerging.py
     python3 scripts/gate_emerging_rate.py || exit 1
+    python3 scripts/audit_s4_final.py || exit 1
     python3 pipeline/stage5_verify.py
     python3 pipeline/stage6_commit.py
     python3 pipeline/status.py
@@ -193,6 +196,32 @@ stage6:
 # thresholds (config/pipeline_config.yaml → taxonomy.*). Never promote stale labels.
 gate-emerging:
     python3 scripts/gate_emerging_rate.py
+
+# BUG-150 recurrence guard: post-S4 fb_id collision dedup (D2350/D2069). Merges
+# true duplicates that collided on fb_id so S6's INSERT OR REPLACE never silently
+# drops rows. Runs before remap/gate/S5/S6.
+dedup-fb-id:
+    python3 scripts/dedup_fb_id.py
+
+# BUG-150 recurrence guard: Phase 0a (Unicode fold) + Phase 0b (alias map) remap
+# of emerging discipline/domains to existing canonicals. Reduces the raw emerging
+# rate (36.2% → ~25%) so the gate passes without blind promotion. Alias-only: does
+# NOT bump taxonomy_version; raw labels preserved verbatim.
+remap-emerging:
+    python3 scripts/remap_emerging.py
+
+# Pre-S5 deterministic forensic audit (completeness / uniqueness / ontology /
+# stamps / raw-preserve / provenance / drift). Fail-closed; no LLM. Default gate
+# between S4 and S5 — do NOT advance to S5 on a non-zero exit.
+audit-s4:
+    python3 scripts/audit_s4_final.py
+
+# BUG-150 recurrence guard: crash-safe, idempotent S4-completion handler.
+# Waits for S4, validates, backs up, then runs dedup → remap → gate. Stops before
+# S5/S6 (review the gate first). Unattended:
+#   nohup python3 scripts/s4_post_finish.py --watch > logs/s4_post_finish.log 2>&1 &
+post-s4:
+    python3 scripts/s4_post_finish.py --watch
 
 # ── Export & Backup ───────────────────────────────────────────
 export:

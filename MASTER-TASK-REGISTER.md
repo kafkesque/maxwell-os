@@ -1,5 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER
-> **Updated:** 2026-08-25 | **Decisions:** D2000-D2462
+> **Updated:** 2026-09-01 | **Decisions:** D2000-D2499
+> **D2499 (this session, Phase 0 BUG-150 recurrence guard):** post-S4 forensic audit (6,715 FBs) → BUG-195 (fb_id collision → S6 `INSERT OR REPLACE` silent 5-row loss) + BUG-196 (name truncation @8-word cap) + BUG-197 (domain-not-discipline). **Post-hoc (NO S4 rerun — checkpoint is raw/immutable):** `dedup_fb_id.py` (merge collisions) + `remap_emerging.py` (Phase 0a Unicode fold + 0b alias map; emerging 36.2%→25.5%) + `audit_s4_final.py` (pre-S5 deterministic forensic gate) + `s4_post_finish.py` (unattended orchestrator) + `alias_map.yaml` (215 validated aliases). **Default S4→S5 chain = stage4 → dedup → remap → gate → audit → S5 → S6.** BUG-188/D2487 truncation fix CONFIRMED already applied.
 > **D2462 (this session, S2 architecture):** single-source + singleton S2 extraction unified into ONE extractor (2 passes, not 3) — keep convergent separate; `is_singleton_fb` becomes a provenance flag. PLANNED post-S2. See DECISION-LOG + `governance/aggregated_remaining_tasks.md`.
 > **D2429 (this session, R1.1 ensemble adjudication):** Claude+ChatGPT cross-review of n=30 CONFIRMS the drift — judges independently downgrade ~40-50% of sampled causal_mechanism labels (matching the ~43% pre-score). FORM-axis ambiguity validated (D2427); consensus is silver-standard, not golden — third independent pass needed before trusting a 2-way majority. Human-review queue narrowed to 10 records (1,2,9,11,12,15,25,26,27,30). ChatGPT hand-tally arithmetic error noted (13/8/7/2 vs 12/9/6/3). Files: temp/chatgpt0020.md, temp/claude 0020.md.
 > **D2427/D2428 (this session, R1 extraction_type drift):** ontological audit found the FORM axis is a non-partitioning 4-way flattening of three cuts (justification-strength / modality / structure) + two role↔form routing tables (D2150/D2417) violating the D2323 "orthogonal axes" contract. Drift confirmed: causal_mechanism 11%→60% single-source; n=30 sample ~43% mislabeled (7/18 causal over-claimed + under-labeling). R1 committed (df1fbfd): strict DECISION-ORDER precedence tree + DECOUPLING rule in S2 prompt + `pipeline/stage2_relabel_extraction_type.py` (LLM-driven relabel, fb_id-stable, copy-first, NOT yet run). D2427 (R2): split FORM into justification × modality facets after S4-S6 sign-off. BUG-160 evidence-relevance logged. Relabel sweep + P1 review are the next tasks.
@@ -16,6 +17,38 @@
 > **Diagnostic:** 188 FBs, 72.4% S5 pass rate → T1.1 authorized (CONDITIONAL-GO — see B1-B15)
 > **Detailed tasks:** `governance/aggregated_remaining_tasks.md`
 > **Buglog:** `governance/buglog.md`
+
+---
+
+# 🔴 CURRENT SESSION (2026-09-01) — Post-S4 task queue (BUG-150 recurrence guard)
+
+> **Live:** S4 at ~84% (PID 1933); watcher `s4_post_finish.py` live (PID 45537). Default S4→S5 chain = stage4 → dedup → remap → gate → audit → S5 → S6.
+
+| # | Pri | Task | Where | Status |
+|---|-----|------|-------|--------|
+| 1 | P0 | Build + stress-test Phase 0 scripts (dedup / remap / orchestrator / audit / alias map) | `scripts/` + `config/alias_map.yaml` | ✅ DONE (idempotent + fail-closed verified) |
+| 2 | P0 | Log BUG-195 (fb_id collision) + BUG-196 (name truncation) + BUG-197 (domain-not-discipline) + D2499 | buglog + DECISION-LOG | ✅ DONE |
+| 3 | P0 | Unattended watcher monitoring S4 finish | `s4_post_finish.py --watch` (PID 45537) | ✅ LIVE |
+| 4 | P1 | **At S4 completion (auto):** backup → dedup → remap → gate → audit → report | orchestrator | ⏳ awaiting S4 |
+| 5 | P1 | **Human review before S5:** verify the 4 dedup merges (9→4), gate result (emerging ~25%), audit PASS | `checkpoint_deduped.jsonl` + `s4_post_finish_report.json` | ⏳ |
+| 6 | P2 | Authorize S5 (only after audit PASS) → S6 | `just stage5` / `just stage6` | ⏳ |
+| 7 | P3 | S4 code fix: cross-cluster dedup + S6 duplicate-fb_id fail-loud guard (BUG-195) | `stage4_merge.py` / `stage6_commit.py` | future batch |
+| 8 | P3 | S4 code fix: name truncation — raise `fb_name_max_words` / ellipsis / concise generator (BUG-196) | `stage4_merge.py` / config | future batch |
+| 9 | P3 | S4 classifier fix: enforce domain/discipline disjointness D2422 (BUG-197) | `stage4_merged_call.py` prompt + golden | future batch |
+| 10 | P3 | C12: extract route.py hardcoded 10%/5% promotion thresholds → config | `pipeline/route.py` | post-S4 |
+| 11 | P3 | D2399 dynamic promote/demote human review (organizational behavior, graphic design) — do NOT blind-promote | taxonomy hooks | post-S6 |
+| 12 | P1 | Recover 6 dropped principles (`application:'None'`, BUG-198) — targeted backfill + re-inject pre-S5 | `rerun_s2_targeted.py` on 6 fb_ids | ⏳ before S5 |
+| 13 | P2 | Backfill 25 sidecar empty shells (10 PT / 5 PI / 6 GE / 4 TI, body_incomplete) via cross-examination (D2470/D2474) — NOT same-extractor rerun (temp=0.0 no-op) | recipe-builder cross-exam | post-S5 |
+| 14 | P0 | `audit_s4_final.py` sidecar sweep (body_incomplete + ontology + wrong_ct) | `scripts/audit_s4_final.py` | ✅ DONE (WARN default / `--strict-sidecars` FAIL) |
+| 15 | P0 | Fix BUG-200 static-taxonomy cross-kind coercion (kind-safe `match_to_canonical` + `map_to_canonical_with_fallback` + CI guard) | `schemas.py` + `stage4_merge.py` + `test_taxonomy_disjointness.py` | ✅ DONE (4/4 green) |
+| 16 | P0 | Fix BUG-199 D2399 promotion cross-kind guard | `taxonomy_manager.py` (`_is_opposite_kind`) | ✅ DONE |
+| 17 | P1 | Post-hoc re-derive `domains` from raw (kind-safe) — 2,007 records fixed | `scripts/rederive_kindsafe_domains.py` | ✅ DONE + PROMOTED to `checkpoint_enriched.jsonl` (backup `backup_pre_kindsafe_promote_20260902_005603`) |
+| 18 | P0 | Config cleanup — remove cross-kind aliases from `taxonomy_v5.yaml` (63) + `synonym_map.yaml` (18); `alias_map.yaml` verified clean (no change) | config/*.yaml (backed up `.bak_20260902_005929`) | ✅ DONE (all 3 configs 0 cross-kind) |
+| 19 | P0 | Golden/few-shot forensic audit — S4 golden CLEAN; **BUG-201 `golden_max_examples=4` dropped S4-GOLD-005** → bump 4→5 + CI guard | `config/pipeline_config.yaml` + `tests/test_stage4_golden_contract.py` | ✅ DONE (D2501; 21/21 tests green) |
+| 20 | P1 | Write S4/S5 bulletproof roundtable master prompt (Claude+ChatGPT) | `config/golden/MASTER-ROUNDTABLE-EVAL-PROMPT-v9-S4S5-BULLETPROOF.md` | ✅ DONE |
+| 21 | P2 | stage2 golden `domain`/`discipline` metadata drift (~108 cross-kind/non-canonical labels, dormant) — migrate to canonical OR deprecate fields | `stage2_fewshot_*.yaml` | ⏳ future (not consumed — zero runtime impact) |
+| 22 | P2 | Commit `config/alias_map.yaml` (was untracked) + `.gitignore` the `.bak_*` config backups | git | ✅ DONE (committed in D2501 push) |
+| 23 | P3 | Taxonomy semantic near-duplicate: `ai systems` vs `ai & agents` (both canonical, both taught by golden) | `taxonomy_v5.yaml` | ⏳ future (needs D2399 human review, not this session) |
 
 ---
 

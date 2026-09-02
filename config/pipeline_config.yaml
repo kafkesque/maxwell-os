@@ -240,6 +240,7 @@ stage4:
   semantic_near_threshold: 0.8
   related_fbs_max_neighbors: 20     # BUG-188: hard cap on per-FB related_fbs neighbors (bounds graph to O(n·k); was unbounded O(n²) → 32M edges → 2GB truncation)
   related_fbs_exclude_domains: [emerging]  # BUG-188: fallback domains excluded from domain_overlap (shared fallback label ≠ meaningful relationship)
+  related_fbs_exclude_disciplines: [emerging]  # BUG-194: fallback discipline excluded from discipline_overlap (shared placeholder ≠ relationship)
   merged_call_enabled: true
   merged_call_max_tokens: 2048   # GPT-OSS reasoning+JSON: 1024 truncated sparse (discipline/domains) → quarantine
   batch_enabled: false            # D2265 batch CRIBS — D2477 A/B: 2.67x speed BUT domain granularity degrades (12% canonical exact-match, Jaccard 0.48 vs merged). Quality-tradeoff → keep OFF for full run.
@@ -269,7 +270,7 @@ stage4:
   # CLASSIFY_SYSTEM_PROMPT). Spans all 4 depth levels; validated against content_types.yaml.
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
-  golden_max_examples: 4
+  golden_max_examples: 5   # D2501: file has 5 examples (incl S4-GOLD-005 D2482 cross-domain boundary); 4 silently dropped it
   # D2364/C12 (X7): signal sets extracted from hardcoded Python literals (cross-LLM audit).
   # context_signals: applied-domain → context routing hint (v1 Anytype "context" property).
   # temporal_signals: keyword heuristics for temporal_scope (timeless / contemporary).

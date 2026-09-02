@@ -88,3 +88,7 @@ governance/diagnostic_live_*.log
 
 # S2 contamination audit + test-result artifacts (regenerable diagnostics)
 audit_output/
+
+# Ad-hoc config/runtime backups (real backups owned by pipeline/backup_guardian.sh)
+*.bak_*
+checkpoint.jsonl.depth.json

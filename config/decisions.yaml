@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-08-28T15:05:00Z'
-total_decisions: 482
+last_sync: '2026-08-31T00:00:00Z'
+total_decisions: 483
 decisions:
 - id: D2092
   category: INF
@@ -5001,11 +5001,43 @@ decisions:
   - scripts/benchmark_s4_quant_ab.py
   - governance/S4_MODEL_RESEARCH_2026-08-30.md
   created: '2026-08-30'
+- id: D2498
+  category: RESEARCH
+  state: ACTIVE
+  description: 'AngelSpec (Tencent, arXiv:2607.25852) + speculative-decoding evaluation — WATCH-ONLY, do NOT integrate. Category error: speculative decoding is a lossless acceleration algorithm the RUNTIME implements, not a competitor to OMLX. MLX already supports draft_model (mlx_lm.generate); DFlash 2 ships MIT MLX backends for Apple Silicon. Relevance hooks: (1) lossless = accepted tokens follow exact target distribution → temp=0.0 greedy output is bit-identical (R7-safe); (2) workload mismatch — speedup scales with output length, but Maxwell S4 bottleneck is short per-FB depth/CRIBS calls (~2s/FB), so drafter overhead eats most of the gain; would only pay off on rare long-form generation. Training own drafters via AngelSpec = PyTorch/NVIDIA, violates C1/C3 (pre-trained weights only). Added AngelSpec/DFlash/DSpark/EAGLE-3 to feed.opml (MTPLX already tracked as native-MTP MLX drafter).'
+  champion: goose
+  target_files:
+  - feed.opml
+  created: '2026-08-31'
+- id: D2500
+  category: CORRECTNESS
+  state: ACTIVE
+  description: 'Cross-kind domain/discipline contamination FIXED (BUG-200/BUG-199). Root cause: taxonomy_v5.yaml (36 cross-kind domain aliases) + synonym_map.yaml (9) cross-pollinate the synonym index, so match_to_canonical COERCED a discipline label into a domain canonical (typography→graphic design, software engineering→engineering practice). Decision: enforce kind-safety at the MATCHING layer (code), NOT by stripping curated config. Fixes: match_to_canonical + map_to_canonical_with_fallback short-circuit to None/emerging for opposite-axis canonicals; _build_synonym_index skips opposite-kind aliases; D2399 _is_opposite_kind guard; CI test_synonym_index_kind_safe + test_match_to_canonical_no_cross_kind_coercion. Post-hoc scripts/rederive_kindsafe_domains.py fixed 2,007 records (25.5%), 0 non-domains drift. Config NOT modified. Classifier prompt fix (BUG-197) + targeted re-classification deferred post-S5.'
+  champion: goose
+  target_files:
+  - pipeline/schemas.py
+  - pipeline/stage4_merge.py
+  - pipeline/taxonomy_manager.py
+  - tests/test_taxonomy_disjointness.py
+  - scripts/rederive_kindsafe_domains.py
+  created: '2026-09-02'
+- id: D2501
+  category: QUALITY / GOLDEN-SET
+  state: ACTIVE
+  description: 'Golden/few-shot forensic audit (post-D2500 cross-kind fix). Findings: (1) stage4_golden.yaml (the ONLY classification few-shot INJECTED into S4) is canonical-clean + cross-kind-free — D2500 did NOT corrupt it; (2) config golden_max_examples=4 silently DROPPED S4-GOLD-005 (D2482 cross-domain boundary example) though meta.total_examples=5 and the D2483 A/B benchmark used all 5 — FIXED golden_max_examples 4→5 + CI guard test_s4_golden_not_silently_truncated; (3) stage2_fewshot_* top-level domain/discipline metadata carries ~108 cross-kind/non-canonical labels (typography→domain, software engineering→domain, economics/psychology/marketing→domain, etc.) but is NOT consumed by any code (format_golden_fewshot omits them; no reader) — dormant drift, logged P2, NOT silently rewritten; (4) alias_map.yaml (215 discipline aliases) UNTRACKED in git — commit it. Observation: "ai systems" vs "ai & agents" both canonical domains, both taught by golden = semantic near-duplicate (taxonomy redundancy, not cross-kind).'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - tests/test_stage4_golden_contract.py
+  - config/golden/stage4_golden.yaml
+  - config/golden/stage2_fewshot_convergent.yaml
+  - config/alias_map.yaml
+  created: '2026-09-02'
 summary:
-  total: 482
+  total: 485
   proposed: 0
   draft: 1
-  active: 423
+  active: 426
   stale: 0
   superseded: 15
   archived: 8
@@ -5076,7 +5108,7 @@ summary:
     QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
     RES: 4
-    RESEARCH: 2
+    RESEARCH: 3
     RESILIENCE / QUALITY: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1

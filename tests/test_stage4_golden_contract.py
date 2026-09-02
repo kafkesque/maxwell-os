@@ -89,3 +89,18 @@ def test_s4_golden_ids_unique() -> None:
     golden = _load()
     ids = [e.get("id") for e in golden.get("examples", [])]
     assert len(ids) == len(set(ids)), "S4 golden ids must be unique"
+
+
+def test_s4_golden_not_silently_truncated() -> None:
+    """D2501: config golden_max_examples must not truncate authored examples.
+
+    S4-GOLD-005 (the D2482 cross-domain boundary example) was silently dropped
+    because golden_max_examples=4 while the file carries 5 examples (and the
+    D2483 A/B benchmark used all 5). This guard fails if the config truncates.
+    """
+    from pipeline.pipeline_paths import S4_GOLDEN_MAX_EXAMPLES
+    examples = _load().get("examples", [])
+    assert S4_GOLDEN_MAX_EXAMPLES >= len(examples), (
+        f"golden_max_examples={S4_GOLDEN_MAX_EXAMPLES} truncates {len(examples)} "
+        f"authored examples — dropped: {[e['id'] for e in examples[S4_GOLDEN_MAX_EXAMPLES:]]}"
+    )

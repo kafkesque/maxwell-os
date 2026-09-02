@@ -31,8 +31,6 @@ synonyms:
     keywords:
       - composition
       - layout
-      - typography
-      - color theory
       - visual hierarchy
     patterns:
       - "graphic"
@@ -123,7 +121,6 @@ synonyms:
     canonical: digital product
     synonyms:
       - digital product
-      - product design
       - app design
       - saas design
       - interaction design
@@ -277,7 +274,6 @@ synonyms:
       - management
       - efficiency
       - agile
-      - project management
     patterns:
       - "business operations"
       - "workflow"
@@ -335,11 +331,9 @@ synonyms:
       - org behavior
       - organizational psychology
       - team dynamics
-      - leadership
     keywords:
       - organization
       - team
-      - leadership
       - culture
       - behavior
     patterns:
@@ -353,19 +347,15 @@ synonyms:
     canonical: ai & agents
     synonyms:
       - ai
-      - artificial intelligence
       - agents
       - llm
-      - machine learning
       - nlp
     keywords:
       - ai
       - agent
       - llm
-      - machine learning
       - neural network
       - deep learning
-      - prompt engineering
       - rag
       - fine-tuning
     patterns:
@@ -401,12 +391,10 @@ synonyms:
     canonical: engineering practice
     synonyms:
       - engineering practice
-      - software engineering
       - engineering methodology
       - dev practices
     keywords:
       - software
-      - engineering
       - code
       - programming
       - testing
@@ -432,7 +420,6 @@ synonyms:
       - generative
       - algorithmic
       - procedural
-      - creative coding
     patterns:
       - "generative art"
       - "algorithmic art"
@@ -484,7 +471,6 @@ synonyms:
   systems_frameworks:
     canonical: systems & frameworks
     synonyms:
-      - systems thinking
       - frameworks
       - system design
       - methodology
@@ -504,13 +490,10 @@ synonyms:
   semiotics_communication:
     canonical: semiotics & communication
     synonyms:
-      - semiotics
-      - communication theory
       - signs
       - symbols
       - meaning
     keywords:
-      - semiotics
       - sign
       - symbol
       - meaning
@@ -527,7 +510,6 @@ synonyms:
   research_methodology:
     canonical: research & methodology
     synonyms:
-      - research methodology
       - research methods
       - empirical research
       - experimental design

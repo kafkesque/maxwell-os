@@ -72,6 +72,7 @@ from pipeline.pipeline_paths import (
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
     S4_RELATED_FBS_EXCLUDE_DOMAINS,  # BUG-188: fallback domains excluded from domain_overlap
+    S4_RELATED_FBS_EXCLUDE_DISCIPLINES,  # BUG-194: fallback discipline excluded from discipline_overlap
     S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB related_fbs neighbor cap (bounds graph to O(n·k))
     S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: C12 compliance
     S4_TEMPORAL_SIGNALS,  # D2364/C12 (X7): temporal_scope keyword heuristics (was hardcoded)
@@ -517,6 +518,12 @@ def map_to_canonical_with_fallback(raw_label: str, kind: str,
 
     raw_lower = raw_label.strip().lower()
 
+    # BUG-200/D2422: never coerce a label that is canonical on the OPPOSITE axis
+    # (e.g. 'software engineering' → 'engineering practice' via the flat index).
+    _opposite = CANONICAL_DOMAINS if kind == "discipline" else CANONICAL_DISCIPLINES
+    if raw_lower in {c.lower() for c in _opposite}:
+        return "emerging"
+
     # 1. Exact canonical match (case-insensitive) — principle fits 100%
     for c in canonical_list:
         if c.lower() == raw_lower:
@@ -916,6 +923,7 @@ def compute_fb_relationships(
     similarity_threshold: float = S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: from config (was hardcoded 0.80)
     max_neighbors: int = S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB cap
     exclude_domains: set[str] | frozenset[str] | None = None,
+    exclude_disciplines: set[str] | frozenset[str] | None = None,
 ) -> list[dict]:
     """Compute FB-to-FB relationships for LightRAG graph foundation.
 
@@ -952,6 +960,8 @@ def compute_fb_relationships(
 
     if exclude_domains is None:
         exclude_domains = frozenset(S4_RELATED_FBS_EXCLUDE_DOMAINS)
+    if exclude_disciplines is None:
+        exclude_disciplines = frozenset(S4_RELATED_FBS_EXCLUDE_DISCIPLINES)
 
     n: int = len(fbs)
     print(f"\n🔗 Computing FB relationships for {n} FBs (cap {max_neighbors}/FB, excluding fallback domains {sorted(exclude_domains)})...")
@@ -979,7 +989,10 @@ def compute_fb_relationships(
     fb_id_list: list[str] = [fb["fb_id"] for fb in fbs]
     domain_sets: list[set[str]] = [set(fb.get("domains", [])) - exclude_domains for fb in fbs]
     # D316: discipline is singular — wrap in set for comparison
-    discipline_sets: list[set[str]] = [{fb.get("discipline", "")} if fb.get("discipline") else set() for fb in fbs]
+    # BUG-194: strip fallback disciplines (e.g. "emerging") so a shared placeholder
+    # label no longer fabricates a dense discipline_overlap graph (same failure
+    # class as BUG-188 domain_overlap).
+    discipline_sets: list[set[str]] = [({fb.get("discipline", "")} if fb.get("discipline") else set()) - exclude_disciplines for fb in fbs]
     book_sets: list[set[str]] = [set(fb.get("source_books", [])) for fb in fbs]
 
     # Initialize related_fbs on all FBs

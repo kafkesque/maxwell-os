@@ -38,6 +38,7 @@ from pipeline.pipeline_paths import (
     TAXONOMY_VERSION,
 )
 from pipeline.stamp import get_pipeline_commit
+from pipeline.schemas import get_synonym_index  # D2399: long-tail challenger detection
 
 # ── Constants (D2231/D2378: C12 — read from config via pipeline_paths) ─────────
 
@@ -66,6 +67,43 @@ def _get_next_taxonomy_path() -> Path:
         return PROJECT_ROOT / "config" / f"taxonomy_v{major + 1}.yaml"
     except (ValueError, IndexError):
         return PROJECT_ROOT / "config" / "taxonomy_v6.yaml"
+
+
+def _load_canonical_set(kind: str) -> set[str]:
+    """Return lowercase canonical label set for `kind` ('domain' | 'discipline')."""
+    key = "domains" if kind == "domain" else "disciplines"
+    with open(_get_taxonomy_path()) as f:
+        taxa = yaml.safe_load(f)
+    return {
+        entry["canonical"].lower().strip()
+        for entry in taxa.get(key, [])
+        if entry.get("canonical")
+    }
+
+
+def _is_long_tail(raw_label: str, canon_set: set[str], syn_index: dict[str, str]) -> bool:
+    """True if `raw_label` maps to no canonical (long-tail challenger, D2399)."""
+    lbl = (raw_label or "").lower().strip()
+    if not lbl or lbl == "emerging":
+        return False
+    if lbl in canon_set:
+        return False
+    if lbl in syn_index:
+        return False
+    return True
+
+
+def _is_opposite_kind(raw_label: str, kind: str) -> bool:
+    """True if `raw_label` resolves to the OPPOSITE axis (BUG-199).
+
+    A domain label emitted into the discipline slot (or vice versa) must never be
+    filed as a long-tail challenger and later promoted into the wrong canonical set,
+    which would re-introduce the D2422 cross-kind collision at runtime.
+    """
+    from pipeline.schemas import match_to_canonical
+
+    other = "domain" if kind == "discipline" else "discipline"
+    return match_to_canonical(raw_label, other) is not None
 
 
 # ── Table initialization ─────────────────────────────────────────────────
@@ -163,15 +201,25 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
     unmatched_labels = 0
 
     rows = conn.execute("""
-        SELECT domains, discipline FROM fbs
+        SELECT domains, domains_raw, discipline, discipline_raw FROM fbs
         WHERE committed_at >= datetime('now', '-24 hours')
     """).fetchall()
 
     # If no recent FBs, scan all
     if not rows:
-        rows = conn.execute("SELECT domains, discipline FROM fbs").fetchall()
+        rows = conn.execute(
+            "SELECT domains, domains_raw, discipline, discipline_raw FROM fbs"
+        ).fetchall()
 
-    for domains_json, discipline in rows:
+    # D2399: previously only canonical `domains`/`discipline` were read, so raw
+    # labels that mapped to 'emerging' never accumulated in taxonomy_counts and
+    # the promote/demote competition could never fire on the long tail.
+    _canon_domains = _load_canonical_set("domain")
+    _canon_disciplines = _load_canonical_set("discipline")
+    _syn_domains = get_synonym_index("domain")
+    _syn_disciplines = get_synonym_index("discipline")
+
+    for domains_json, domains_raw_json, discipline, discipline_raw in rows:
         # ── Domain labels ──
         try:
             domain_labels = json.loads(domains_json) if isinstance(domains_json, str) else domains_json
@@ -235,6 +283,64 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
 
             changes["discipline"][disc_str] = new_count
 
+        # ── Long-tail raw labels (D2399 challengers) ──
+        if discipline == "emerging" and discipline_raw:
+            _disc_raw = discipline_raw.lower().strip()
+            if _is_long_tail(_disc_raw, _canon_disciplines, _syn_disciplines) and not _is_opposite_kind(_disc_raw, "discipline"):
+                total_labels += 1
+                _existing = conn.execute(
+                    "SELECT count, status FROM taxonomy_counts WHERE label = ? AND label_type = 'discipline'",
+                    (_disc_raw,)
+                ).fetchone()
+                if _existing:
+                    conn.execute(
+                        "UPDATE taxonomy_counts SET count = count + 1, last_updated = ? "
+                        "WHERE label = ? AND label_type = 'discipline'",
+                        (now, _disc_raw)
+                    )
+                    changes["discipline"][_disc_raw] = _existing[0] + 1
+                else:
+                    conn.execute(
+                        "INSERT INTO taxonomy_counts (label, label_type, count, status, first_seen, last_updated) "
+                        "VALUES (?, 'discipline', 1, 'raw', ?, ?)",
+                        (_disc_raw, now, now)
+                    )
+                    changes["discipline"][_disc_raw] = 1
+                    unmatched_labels += 1
+
+        try:
+            _dom_raw_list = json.loads(domains_raw_json) if isinstance(domains_raw_json, str) else (domains_raw_json or [])
+        except (json.JSONDecodeError, TypeError):
+            _dom_raw_list = []
+        for _raw_dom in (_dom_raw_list or []):
+            if not isinstance(_raw_dom, str):
+                continue
+            _raw_dom_lbl = _raw_dom.lower().strip()
+            if _is_opposite_kind(_raw_dom_lbl, "domain"):
+                continue  # BUG-199: discipline label in the domain slot — not a domain challenger
+            if not _is_long_tail(_raw_dom_lbl, _canon_domains, _syn_domains):
+                continue
+            total_labels += 1
+            _existing = conn.execute(
+                "SELECT count, status FROM taxonomy_counts WHERE label = ? AND label_type = 'domain'",
+                (_raw_dom_lbl,)
+            ).fetchone()
+            if _existing:
+                conn.execute(
+                    "UPDATE taxonomy_counts SET count = count + 1, last_updated = ? "
+                    "WHERE label = ? AND label_type = 'domain'",
+                    (now, _raw_dom_lbl)
+                )
+                changes["domain"][_raw_dom_lbl] = _existing[0] + 1
+            else:
+                conn.execute(
+                    "INSERT INTO taxonomy_counts (label, label_type, count, status, first_seen, last_updated) "
+                    "VALUES (?, 'domain', 1, 'raw', ?, ?)",
+                    (_raw_dom_lbl, now, now)
+                )
+                changes["domain"][_raw_dom_lbl] = 1
+                unmatched_labels += 1
+
     # Auto-promote raw → emerging at frequency threshold
     conn.execute(
         "UPDATE taxonomy_counts SET status = 'emerging' WHERE status = 'raw' AND count >= ?",
@@ -289,6 +395,8 @@ def check_for_replacements(conn: sqlite3.Connection) -> list[dict]:
         displaced_count = weakest_count
 
         for emerging_label, emerging_count in emerging:
+            if _is_opposite_kind(emerging_label, label_type):
+                continue  # BUG-199: cross-kind — never propose promotion onto the wrong axis
             if emerging_count > displaced_count * REPLACEMENT_THRESHOLD_RATIO:
                 candidates.append({
                     "label_type": label_type,

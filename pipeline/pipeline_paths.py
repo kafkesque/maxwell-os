@@ -186,6 +186,7 @@ S4_DEDUP_COSINE_THRESHOLD = float(_CFG.get("stage4", {}).get("dedup_cosine_thres
 S4_SEMANTIC_NEAR_THRESHOLD = float(_CFG.get("stage4", {}).get("semantic_near_threshold", 0.80))     # D2231: C12 (was hardcoded)
 S4_RELATED_FBS_MAX_NEIGHBORS = int(_CFG.get("stage4", {}).get("related_fbs_max_neighbors", 20))       # BUG-188: per-FB related_fbs neighbor cap (was unbounded O(n²) → 32M edges → 2GB truncation)
 S4_RELATED_FBS_EXCLUDE_DOMAINS = list(_CFG.get("stage4", {}).get("related_fbs_exclude_domains", ["emerging"]))  # BUG-188: fallback domains excluded from domain_overlap (shared fallback ≠ relationship)
+S4_RELATED_FBS_EXCLUDE_DISCIPLINES = list(_CFG.get("stage4", {}).get("related_fbs_exclude_disciplines", ["emerging"]))  # BUG-194: fallback discipline excluded from discipline_overlap (shared placeholder ≠ relationship)
 S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]
 S4_PI_OUTPUT=_CFG["stage4"]["process_instance_output"]
 S4_GE_OUTPUT=_CFG["stage4"]["growth_edge_output"]

@@ -49,6 +49,13 @@
 | 21 | P2 | stage2 golden `domain`/`discipline` metadata drift (~108 cross-kind/non-canonical labels, dormant) — migrate to canonical OR deprecate fields | `stage2_fewshot_*.yaml` | ⏳ future (not consumed — zero runtime impact) |
 | 22 | P2 | Commit `config/alias_map.yaml` (was untracked) + `.gitignore` the `.bak_*` config backups | git | ✅ DONE (committed in D2501 push) |
 | 23 | P3 | Taxonomy semantic near-duplicate: `ai systems` vs `ai & agents` (both canonical, both taught by golden) | `taxonomy_v5.yaml` | ⏳ future (needs D2399 human review, not this session) |
+| 24 | P0 | Fix BUG-202 `_evidence_cleanliness_gate` fail-open (`return set()` → fail-closed) — the one near-blocker from roundtable | `stage5_verify.py:559` | ⏳ next (mitigated tonight by standalone `audit_evidence_cleanliness.py` gate) |
+| 25 | P1 | Fix BUG-203 S5 `FLAG` dead code — wire it or delete it (reporting layer currently lies) | `stage5_verify.py` + `status.py` | ⏳ |
+| 26 | P1 | Fix BUG-204 stale `TAXONOMY_MAX_DISCIPLINES` 72→75 (+ drop unused `_max_count`) | `pipeline_paths.py` / `taxonomy_manager.py` | ⏳ |
+| 27 | P1 | S5 weak max-entailment rule (ChatGPT B2) — add contradiction veto + coverage + re-calibrate | `stage5_verify.py` `deberta_check` | ⏳ (conservative today: recall 0.386 → QUARANTINE-leaning) |
+| 28 | P2 | De-overlap `ai systems`/`ai & agents` raw aliases ("AI Systems" in both) + rename `ai systems` for clarity; then D2399 human review | `taxonomy_v5.yaml` | ⏳ (do NOT merge — distinct) |
+| 29 | P2 | Regenerate stale `.golden_meta.json` (hash/commit/count) + CI assert meta==actual | `config/golden/.golden_meta.json` | ⏳ |
+| 30 | P2 | Rename/gut `tests/test_stage4_d2138.py` + `tests/test_stage4_exhaustive.py` (0 `test_*` functions — inflate coverage) | `tests/` | ⏳ |
 
 ---
 

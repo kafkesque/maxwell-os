@@ -5033,11 +5033,22 @@ decisions:
   - config/golden/stage2_fewshot_convergent.yaml
   - config/alias_map.yaml
   created: '2026-09-02'
+- id: D2502
+  category: VERIFICATION
+  state: ACTIVE
+  description: 'Roundtable S4/S5 bulletproof audit adjudicated. Claude=CONDITIONAL-GO, ChatGPT=NO-GO. Verified ~10/12 claims TRUE (BUG-202 evidence-gate fail-open; BUG-203 FLAG dead code; BUG-204 MAX_DISCIPLINES 72 vs 75; B2 weak max-entailment; P1-1/2 fingerprint fail-open; P1-3 stale golden_meta; P1-6 config fallbacks logged), 1 FALSE (P1-5 Color Psychology cross-axis = 231 cross-axis raw aliases handled by kind-scoped index, root cause open-set B3/BUG-197), 1 partial (P1-4 emerging repair = D2066/D2138 design + D2485 emerging_real). Corrected: deberta_check uses raise_on_error=True → NLIInferenceError → QUARANTINE (production fail-closed). New: 231 cross-axis raw aliases + machine-learning-as-raw-domain 48x = BUG-197 surface. ai systems(15) vs ai & agents(66) DISTINCT, do NOT merge. Final verdict CONDITIONAL-GO. Local gemma cross-check unreliable (confabulated line numbers).'
+  champion: goose
+  target_files:
+  - tests/test_stage2_golden_metadata_isolation.py
+  - governance/buglog.md
+  - MASTER-TASK-REGISTER.md
+  - config/pipeline_config.yaml
+  created: '2026-09-02'
 summary:
-  total: 485
+  total: 486
   proposed: 0
   draft: 1
-  active: 426
+  active: 427
   stale: 0
   superseded: 15
   archived: 8

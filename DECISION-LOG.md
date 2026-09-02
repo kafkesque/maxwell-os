@@ -3,6 +3,18 @@
 
 ---
 
+### D2510 — BUG-205 a/an FIXED + BUG-197 prompt FIXED + stack audit + reranker research (2026-09-02)
+- **Category:** BUGFIX (correctness) + INFRASTRUCTURE (stack audit) + RESEARCH (reranker)
+- **Decision/findings:**
+  1. **BUG-205 `a`/`an` residual FIXED** — dropped `a`/`an` from `_SPACE_SUBTITLE_SPLIT` (`pipeline/book_metadata.py`). A mid-title article ("Build a Large Language Model" vs "Build a Reasoning Model") was falsely treated as a subtitle opener → both normalize to `build`. **Critical verification:** the committed DB is **already correct** — the two Raschka books carry distinct source_ids (`92d597f3efa1cd12` vs `122fb1e8b4b66f17`), because the buggy regex was introduced in **D2507 (this session)**, *after* S4 merge computed the committed source_ids. So the bug is **latent** (affects future re-extraction only), and **no data re-resolve is needed**. 11/11 book-dedup tests (4 new: mid-title-article-not-opener, distinct-Raschka-no-collapse, a-subtitle-still-collapses-via-colon).
+  2. **BUG-197 classifier prompt FIXED** — added an explicit DISCIPLINE-vs-DOMAIN disjointness block to `stage4_merged_call.py` PART 2 (discipline = academic field; domains = applied practice/industry; never emit `graphic design`/`organizational behavior`/`data visualization`/`entrepreneurship`/`marketing`/`HR` as `discipline`). **Re-classification** of the ~2,080 `emerging` + 3,184 raw-leak + 422 domain-not-discipline records is a **future-batch LLM run** (gpt-oss over thousands of records) — NOT executed now.
+  3. **Stack audit** — `/opt/homebrew/bin/python3` has ALL pipeline deps **except** `datasketch` + `pypandoc` (PEP 668 externally-managed blocks `pip install`); `/usr/local/bin/python3` has ALL deps but **no `enable_load_extension`**. **Split retained:** full pipeline (S0–S6) on system Python; vector backfill + retrieval on Homebrew Python (`backfill_embeddings.py` run post-S6). No risky upgrades (174 tests green; `just preflight` decision-summary in sync).
+  4. **Reranker research (llmfit)** — candidates: `BAAI/bge-reranker-large` (560M, Q4_K_M) + `drawais/Qwen3-Reranker-4B` (4.1B, AWQ-INT4). **Neither installed in Ollama.** S2 cross-encoder rerank stays **gated** until a local reranker is pulled + a held-out A/B precision benchmark exists.
+- **Status:** ✅ BUG-205 code-fix DONE (committed data already correct); BUG-197 prompt-fix DONE, re-classification = future batch; S2 gated.
+- **Files:** `pipeline/book_metadata.py`, `pipeline/stage4_merged_call.py`, `tests/test_book_dedup_bug205.py`
+- **Tests:** 11/11 book-dedup (4 new); full suite 174 + 5 M1 (D2509) green.
+- **Source:** Session 2026-09-02 — "do first 2 critical tasks + S1/S2/S3 research + D2399 + stack audit"
+
 ### D2509 — M1 VECTOR SEARCH FIXED + 7867 embeddings backfilled (RESOLVES D2508 M1 degradation) (2026-09-02)
 - **Category:** BUGFIX (vector dimension contract + sqlite-vec read path) + INFRASTRUCTURE (env)
 - **Decision/findings:** The D2508 "M1 vector degradation" was actually **FOUR independent failures**, not just the environment:

@@ -43,6 +43,15 @@ PART 1 — CRIBS ENRICHMENT:
 PART 2 — CLASSIFICATION:
 - discipline: SINGLE most precise academic discipline. "computational neuroscience" > "neuroscience."
 - domains: 1-5 applied domains where a practitioner would USE this knowledge.
+- DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):
+  * discipline = an ACADEMIC FIELD OF STUDY (e.g., cognitive science, economics, philosophy,
+    computer science, psychology, linguistics, systems engineering).
+  * domains = APPLIED PRACTICE/INDUSTRY areas where the knowledge is USED (e.g., graphic
+    design, organizational behavior, data visualization, marketing, product design, HR).
+  * A label naming an applied practice or industry is a DOMAIN, NOT a discipline. Never emit
+    "graphic design", "organizational behavior", "data visualization", "entrepreneurship",
+    "marketing", or "human resource management" as `discipline` — put them in `domains`.
+  * Never emit the same label in BOTH fields. Each field draws from its own vocabulary.
 - depth: ontological scope using the physicist-chef-poet test:
   universal = mechanism applies to ALL systems (physics, cooking, poetry)
   cross-domain = bridges 2+ DISTINCT disciplines via shared mechanism

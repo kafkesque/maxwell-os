@@ -75,3 +75,25 @@ def test_distinct_books_do_not_collapse():
     a = bm.resolve_source_id("Outliers (Malcolm Gladwell) (z-library.sk).md")
     b = bm.resolve_source_id("Blink The Power Of Thinking Without Thinking (Malcolm Gladwell) (z-library.sk, 1lib.sk, z-lib.sk).md")
     assert a != b
+
+
+def test_mid_title_article_is_not_a_subtitle_opener():
+    # D2509 (BUG-205 residual): the mid-title article "a" must NOT be treated as
+    # a subtitle opener — otherwise 2 DISTINCT Raschka books collapse to "build".
+    assert bm.normalize_title("Build a Large Language Model (From Scratch)") == \
+        "build a large language model from scratch"
+    assert bm.normalize_title("Build a Reasoning Model (From Scratch) MEAP V01") == \
+        "build a reasoning model from scratch meap v01"
+
+
+def test_distinct_raschka_books_do_not_collapse():
+    a = bm.resolve_source_id("Build a Large Language Model (From Scratch) -- Sebastian Raschka -- 2024.md")
+    b = bm.resolve_source_id("Build a Reasoning Model (From Scratch) MEAP V01 (Sebastian Raschka).md")
+    assert a != b
+
+
+def test_a_subtitle_opener_still_collapses_via_colon_path():
+    # "Sapiens: A Brief History…" still collapses to "sapiens" via the colon path
+    # (a/an subtitle openers are handled by _SUBTITLE_SPLIT, not the space split).
+    assert bm.normalize_title("Sapiens: A Brief History of Humankind") == "sapiens"
+    assert bm.normalize_title("Sapiens A Brief History of Humankind") == "sapiens a brief history of humankind"

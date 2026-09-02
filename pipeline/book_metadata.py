@@ -219,11 +219,17 @@ _CAMEL_CONCAT = re.compile(r"([a-z0-9])([A-Z])")
 _CONCAT_SUBTITLE_SPLIT = re.compile(r"(?<=[a-z0-9])(?=(?:The|A|An|How|Why|What)\b)")
 # D2507 (BUG-205): SPACE-separated subtitle opener — the "Blink The Power of
 # Thinking Without Thinking" vs "Blink: The Power…" asymmetry. A title whose
-# subtitle-opener word ("the"/"a"/"how"/"why"/"what") is separated by a SPACE
+# subtitle-opener word ("the"/"how"/"why"/"what") is separated by a SPACE
 # (not a colon/dash, not concatenated) also splits, so edition variants collapse.
 # Applied AFTER lowercasing (so the opener list is lowercase); requires whitespace
-# BEFORE the opener so a leading "The/A" ("The Compound Effect") is never split.
-_SPACE_SUBTITLE_SPLIT = re.compile(r"\s+(?=(?:the|a|an|how|why|what)\b)")
+# BEFORE the opener so a leading "The" ("The Compound Effect") is never split.
+# D2509 (BUG-205 residual): `a`/`an` REMOVED from the opener list — a mid-title
+# article ("Build a Large Language Model" vs "Build a Reasoning Model") was
+# falsely treated as a subtitle opener, collapsing 2 DISTINCT Raschka books into
+# one source_id. The colon/dash `_SUBTITLE_SPLIT` path still handles "a/an"
+# subtitle openers ("Sapiens: A Brief History"), so only the ambiguous
+# space-separated article is dropped (missed-collapse is safer than false-merge).
+_SPACE_SUBTITLE_SPLIT = re.compile(r"\s+(?=(?:the|how|why|what)\b)")
 
 
 def normalize_author(author: str) -> str:

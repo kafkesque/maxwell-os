@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-02T00:00:00Z'
-total_decisions: 493
+total_decisions: 494
 decisions:
 - id: D2092
   category: INF
@@ -5124,11 +5124,21 @@ decisions:
   - pipeline/backfill_embeddings.py
   - tests/test_vector_dim_contract_d2509.py
   created: '2026-09-02'
+- id: D2510
+  category: BUGFIX
+  state: ACTIVE
+  description: 'BUG-205 a/an residual FIXED + BUG-197 classifier prompt FIXED + stack audit + reranker research. (1) BUG-205: dropped a/an from _SPACE_SUBTITLE_SPLIT (pipeline/book_metadata.py) — a mid-title article ("Build a Large Language Model" vs "Build a Reasoning Model") was falsely treated as a subtitle opener. VERIFIED the committed DB is ALREADY correct (distinct source_ids 92d597f3efa1cd12 vs 122fb1e8b4b66f17) — the bug was introduced in D2507 (this session) so it is LATENT (affects future re-extraction only, NOT committed data); no data re-resolve needed. 11/11 book-dedup tests (4 new: mid-title-article, distinct-Raschka, a-subtitle-via-colon). (2) BUG-197: added explicit DISCIPLINE-vs-DOMAIN disjointness instruction to stage4_merged_call.py PART 2 (discipline=academic field, domains=applied practice; never emit graphic design/organizational behavior/data visualization/entrepreneurship/marketing/HR as discipline). RE-CLASSIFICATION (~2,080 emerging + 3,184 raw-leak + 422 domain-not-discipline) is a FUTURE-BATCH LLM run, NOT executed now. (3) STACK AUDIT: /opt/homebrew/bin/python3 has ALL pipeline deps (numpy/pandas/pyarrow/faiss/sentence-transformers/transformers/networkx/sqlite_vec/dspy...) EXCEPT datasketch+pypandoc (PEP 668 externally-managed blocks pip install); /usr/local/bin/python3 has ALL deps but NO enable_load_extension. SPLIT RETAINED: full pipeline (S0-S6) on system python; vector backfill + retrieval on Homebrew python (backfill_embeddings.py run post-S6). No risky upgrades (174 tests green). (4) RERANKER research (llmfit): candidates BAAI/bge-reranker-large (560M, Q4_K_M) + drawais/Qwen3-Reranker-4B (4.1B AWQ-INT4); NEITHER installed in Ollama; S2 cross-encoder rerank remains GATED until a local reranker + held-out A/B benchmark.'
+  champion: goose
+  target_files:
+  - pipeline/book_metadata.py
+  - pipeline/stage4_merged_call.py
+  - tests/test_book_dedup_bug205.py
+  created: '2026-09-02'
 summary:
-  total: 493
+  total: 494
   proposed: 0
   draft: 1
-  active: 434
+  active: 435
   stale: 0
   superseded: 15
   archived: 8
@@ -5142,7 +5152,7 @@ summary:
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     BUG: 1
-    BUGFIX: 39
+    BUGFIX: 40
     BUGFIX / CFG: 1
     BUGFIX / DATA-INTEGRITY: 2
     BUGFIX / DRIFT: 1

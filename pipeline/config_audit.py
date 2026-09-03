@@ -105,6 +105,9 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
     "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)
     "E2E_MIN_FBS",           # e2e_test.py — except fallback (mirrors config default=30)
     "E2E_CONVERGENT_RATIO",  # e2e_test.py — except fallback (mirrors config default=0.25)
+    "E2E_CORPUS_AWARE_PASS_RATE",       # e2e_test.py — except fallback (mirrors e2e.corpus_aware_pass_rate.enabled=false)
+    "E2E_CONVERGENT_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors e2e.corpus_aware_pass_rate.convergent_min_pass_rate=0.25)
+    "E2E_SINGLE_SOURCE_MIN_PASS_RATE",  # e2e_test.py — except fallback (mirrors e2e.corpus_aware_pass_rate.single_source_min_pass_rate=0.20)
     "INTERVAL",              # n2_watchdog.py — 300s polling loop (P3: migrate to config.stage2.watchdog_interval)
     "TRADITIONAL_EXTRACT_SECONDS",  # hybrid_gate_ab.py — documented benchmark estimate, not a runtime threshold
 }

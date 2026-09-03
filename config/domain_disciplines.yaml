@@ -1,8 +1,3 @@
-# domain_disciplines.yaml — Per-domain discipline whitelist (v2.0 — regenerated from data)
-# Generated: 2026-07-09T19:44:06 | Classification: v5.0
-# Maps each v5 canonical domain to disciplines found in classified converged data.
-# Source: 25,667 principles across 9 converged domains.
-# Includes "emerging" domain for pipeline-placeholder FBs.
 version: '2.0'
 classification_version: v5.0
 generated: '2026-07-09T19:44:06'
@@ -28,15 +23,12 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -48,52 +40,18 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
     - systems thinking
     - visual perception
     - visual semiotics
-  ml systems & infrastructure:
-    group: AI & Computing
-    disciplines:
-    - agentic architecture
-    - behavioral economics
-    - cognitive science
-    - complex adaptive systems
-    - computational geometry
-    - computational physics & simulation
-    - creative process
-    - design psychology
-    - design strategy
-    - design systems
-    - generative ai
-    - generative design
-    - information architecture
-    - linguistics
-    - machine learning
-    - operations research
-    - philosophy
-    - political economy
-    - privacy & surveillance
-    - project management
-    - prompt engineering
-    - research methodology
-    - risk management
-    - semiotics
-    - social engineering
-    - software engineering
-    - systems engineering
-    - systems thinking
-    - visual perception
   brand identity:
     group: Visual Practice
     disciplines:
     - behavioral economics
     - cognitive science
     - color theory
-    - composition & layout
     - creative coding
     - creative process
     - cultural design
@@ -103,22 +61,17 @@ domains:
     - design systems
     - game design
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - political economy
     - project management
     - psychology
     - research methodology
     - semiotics
-    - social engineering
     - strategic thinking
     - systems engineering
     - systems thinking
@@ -143,8 +96,6 @@ domains:
     - linguistics
     - machine learning
     - marketing
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - political economy
@@ -154,7 +105,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -180,8 +130,6 @@ domains:
     - linguistics
     - machine learning
     - marketing
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -192,7 +140,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -240,11 +187,9 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
     - information architecture
     - machine learning
     - motion & time
-    - multimodal metaphor
     - philosophy
     - prompt engineering
     - semiotics
@@ -268,7 +213,6 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
     - information architecture
     - linguistics
     - machine learning
@@ -308,8 +252,6 @@ domains:
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - political economy
     - privacy & surveillance
@@ -318,7 +260,6 @@ domains:
     - psychology
     - research methodology
     - semiotics
-    - social engineering
     - software engineering
     - systems engineering
     - systems thinking
@@ -333,7 +274,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational geometry
     - computational physics & simulation
     - creative coding
@@ -345,16 +285,12 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - political economy
@@ -392,7 +328,6 @@ domains:
     - information architecture
     - marketing
     - motion & time
-    - narrative design
     - political economy
     - project management
     - research methodology
@@ -410,7 +345,6 @@ domains:
     disciplines:
     - behavioral economics
     - color theory
-    - composition & layout
     - computational geometry
     - creative coding
     - creative process
@@ -418,14 +352,11 @@ domains:
     - design psychology
     - design strategy
     - design systems
-    - geometry & proportion
     - information architecture
     - leadership
     - linguistics
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - political economy
     - privacy & surveillance
@@ -458,12 +389,10 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
     - information architecture
     - machine learning
     - marketing
     - motion & time
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -505,7 +434,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems thinking
@@ -517,7 +445,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational physics & simulation
     - creative coding
     - cultural design
@@ -526,21 +453,16 @@ domains:
     - design systems
     - game design
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - linguistics
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - political economy
     - psychology
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - systems engineering
     - systems thinking
     - typography
@@ -552,7 +474,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational geometry
     - creative coding
     - creative process
@@ -563,15 +484,11 @@ domains:
     - design systems
     - game design
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - project management
     - psychology
@@ -585,18 +502,13 @@ domains:
     group: Illustration & Craft
     disciplines:
     - color theory
-    - composition & layout
     - creative coding
     - creative process
     - cultural design
     - design strategy
-    - geometry & proportion
-    - iconography
     - linguistics
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - political economy
     - psychology
     - research methodology
@@ -608,7 +520,6 @@ domains:
     group: Visual Practice
     disciplines:
     - color theory
-    - composition & layout
     - computational geometry
     - computational physics & simulation
     - creative coding
@@ -619,16 +530,12 @@ domains:
     - design systems
     - game design
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - project management
     - psychology
@@ -656,8 +563,6 @@ domains:
     - leadership
     - linguistics
     - marketing
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -668,7 +573,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -679,7 +583,6 @@ domains:
     group: Illustration & Craft
     disciplines:
     - color theory
-    - composition & layout
     - creative process
     - cultural design
     - design psychology
@@ -703,7 +606,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational physics & simulation
     - creative coding
     - creative process
@@ -715,16 +617,12 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -736,7 +634,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -751,7 +648,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational physics & simulation
     - creative process
     - cultural design
@@ -767,8 +663,6 @@ domains:
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - philosophy
     - political economy
     - project management
@@ -776,7 +670,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - strategic thinking
     - systems engineering
     - systems thinking
@@ -791,7 +684,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational geometry
     - computational physics & simulation
     - creative process
@@ -803,15 +695,11 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -822,7 +710,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -838,7 +725,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - creative coding
     - creative process
     - cultural design
@@ -849,14 +735,11 @@ domains:
     - game design
     - generative ai
     - generative design
-    - iconography
     - information architecture
     - leadership
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -868,7 +751,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - systems engineering
     - systems thinking
@@ -879,7 +761,6 @@ domains:
     group: Digital & Interactive
     disciplines:
     - color theory
-    - composition & layout
     - computational geometry
     - creative process
     - cultural design
@@ -889,13 +770,10 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - machine learning
     - marketing
     - motion & time
-    - narrative design
     - philosophy
     - project management
     - prompt engineering
@@ -915,7 +793,6 @@ domains:
     - cognitive science
     - color theory
     - complex adaptive systems
-    - composition & layout
     - computational geometry
     - computational physics & simulation
     - creative coding
@@ -928,16 +805,12 @@ domains:
     - game design
     - generative ai
     - generative design
-    - geometry & proportion
-    - iconography
     - information architecture
     - leadership
     - linguistics
     - machine learning
     - marketing
     - motion & time
-    - multimodal metaphor
-    - narrative design
     - operations research
     - personal productivity
     - philosophy
@@ -949,7 +822,6 @@ domains:
     - research methodology
     - risk management
     - semiotics
-    - social engineering
     - software engineering
     - strategic thinking
     - systems engineering
@@ -957,4 +829,5 @@ domains:
     - typography
     - visual perception
     - visual semiotics
-    note: D34 pipeline placeholder — FBs awaiting S3a classification. All disciplines valid.
+    note: D34 pipeline placeholder — FBs awaiting S3a classification. All disciplines
+      valid.

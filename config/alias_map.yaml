@@ -1,230 +1,204 @@
-# config/alias_map.yaml — Phase 0b curated alias remap (BUG-150 recurrence guard)
-#
-# Maps raw long-tail DISCIPLINE labels → EXISTING canonical disciplines ONLY.
-# Targets are validated against config/taxonomy_v5.yaml at generation time;
-# remap_emerging.py re-validates on load and fails loudly on any non-canonical target.
-#
-# Invariants:
-#   - Alias-only remap does NOT bump taxonomy_version (D2485).
-#   - Raw labels (discipline_raw) are preserved verbatim; only the canonical
-#     `discipline` field is rewritten (D2378/D2399 raw-preservation).
-#   - Keys are pre-normalized (NFKC + Unicode dash/quote fold + lowercase).
-#     remap_emerging.py folds the incoming label identically before lookup.
 version: 1
 discipline_aliases:
-  'ai ethics': 'artificial intelligence'
-  'ai ethics and governance': 'artificial intelligence'
-  'ai governance': 'artificial intelligence'
-  'ai safety engineering': 'artificial intelligence'
-  'ai security': 'information security'
-  'ai strategy & governance': 'artificial intelligence'
-  'artificial intelligence governance': 'artificial intelligence'
-  'artificial intelligence management': 'artificial intelligence'
-  'accessibility engineering': 'human-computer interaction'
-  'accounting': 'finance'
-  'advertising communication': 'marketing'
-  'advertising research': 'marketing'
-  'animation studies': 'computer graphics'
-  'architectural design': 'design thinking'
-  'art history and studio arts': 'performing arts'
-  'artificial intelligence engineering': 'artificial intelligence'
-  'artificial intelligence safety': 'artificial intelligence'
-  'artificial intelligence strategy': 'artificial intelligence'
-  'artificial intelligence systems engineering': 'systems engineering'
-  'atmospheric physics': 'theoretical physics'
-  'augmented reality': 'computer graphics'
-  'augmented reality design': 'computer graphics'
-  'autonomous systems engineering': 'robotics'
-  'autonomous vehicle control': 'robotics'
-  'behavioral data science': 'behavioral economics'
-  'behavioral finance': 'behavioral economics'
-  'behavioral neuroscience': 'neuroscience'
-  'biometrics': 'information science'
-  'biophysics': 'theoretical physics'
-  'blockchain economics': 'economics'
-  'brand design': 'design strategy'
-  'business law': 'law'
-  'business model innovation': 'design strategy'
-  'career counseling': 'psychology'
-  'change management': 'project management'
-  'chemical physics': 'theoretical physics'
-  'chronobiology': 'neuroscience'
-  'circadian biology': 'neuroscience'
-  'classical mechanics': 'theoretical physics'
-  'clinical neuroscience': 'neuroscience'
-  'cognitive anthropology': 'anthropology'
-  'color science': 'visual perception'
-  'communication design': 'design thinking'
-  'communication science': 'communication theory'
-  'comparative cognition': 'cognitive science'
-  'comparative religion': 'anthropology'
-  'computational economics': 'economics'
-  'computer science - simulation engineering': 'computational physics & simulation'
-  'conceptual metaphor theory': 'linguistics'
-  'consumer neuroscience': 'neuroscience'
-  'contract theory': 'philosophy'
-  'conversational ai': 'artificial intelligence'
-  'corporate sustainability management': 'systems thinking'
-  'creative arts practice': 'performing arts'
-  'creative cognition': 'cognitive science'
-  'creative management': 'project management'
-  'creative production management': 'project management'
-  'critical theory': 'cultural studies'
-  'cultural economics': 'economics'
-  'cultural psychology': 'psychology'
-  'customer experience management': 'design thinking'
-  'data communication': 'information science'
-  'data engineering': 'information science'
-  'database systems': 'information science'
-  'deep learning architecture': 'machine learning'
-  'deep learning engineering': 'machine learning'
-  'deep learning systems engineering': 'machine learning'
-  'design aesthetics': 'aesthetics'
-  'design cognition': 'cognitive science'
-  'design for development': 'interdisciplinary studies'
-  'design science': 'design thinking'
-  'design systems engineering': 'design systems'
-  'development studies': 'interdisciplinary studies'
-  'developmental cognitive neuroscience': 'neuroscience'
-  'digital communication studies': 'communication theory'
-  'digital forensics': 'information security'
-  'digital identity management': 'information security'
-  'digital platform studies': 'sociology'
-  'digital product management': 'product design'
-  'digital publishing': 'media studies'
-  'distributed artificial intelligence': 'artificial intelligence'
-  'distributed systems security': 'information security'
-  'ecological psychology': 'cognitive science'
-  'embodied cognition': 'cognitive science'
-  'engineering risk management': 'risk management'
-  'enterprise architecture': 'systems engineering'
-  'enterprise artificial intelligence': 'artificial intelligence'
-  'enterprise software architecture': 'software engineering'
-  'environmental communication': 'communication theory'
-  'environmental engineering': 'engineering'
-  'exercise physiology': 'health & medicine'
-  'existential psychology': 'philosophy'
-  'experience design': 'design thinking'
-  'experimental design': 'research methodology'
-  'explainable artificial intelligence': 'artificial intelligence'
-  'financial accounting': 'finance'
-  'financial management': 'finance'
-  'financial mathematics': 'finance'
-  'financial regulation': 'law'
-  'generative artificial intelligence': 'generative ai'
-  'generative linguistics': 'linguistics'
-  'genetic engineering': 'evolutionary biology'
-  'grounded theory methodology': 'research methodology'
-  'health communication': 'communication theory'
-  'health economics': 'health & medicine'
-  'healthcare management': 'health & medicine'
-  'historical linguistics': 'linguistics'
-  'human factors and ergonomics': 'human-computer interaction'
-  'human genetics': 'evolutionary biology'
-  'human-centered ai': 'human-computer interaction'
-  'industrial and organizational psychology': 'psychology'
-  'industrial economics': 'economics'
-  'industrial engineering': 'systems engineering'
-  'industrial organization economics': 'economics'
-  'information economics': 'economics'
-  'information technology law': 'law'
-  'interdisciplinary studies of science communication': 'communication theory'
-  'investment strategy': 'finance'
-  'journalism studies': 'media studies'
-  'knowledge engineering': 'information science'
-  'knowledge representation and reasoning': 'artificial intelligence'
-  'leadership theory': 'leadership'
-  'learning science': 'cognitive science'
-  'learning sciences': 'cognitive science'
-  'logistics and supply chain management': 'operations research'
-  'machine learning ethics': 'artificial intelligence'
-  'machine learning operations': 'machine learning'
-  'marketing economics': 'economics'
-  'marketing management': 'marketing'
-  'marketing research': 'marketing'
-  'mathematical logic': 'philosophy'
-  'mathematical physics': 'theoretical physics'
-  'media arts': 'performing arts'
-  'media arts and design': 'performing arts'
-  'media economics': 'economics'
-  'medical informatics': 'health & medicine'
-  'military strategy': 'strategic thinking'
-  'military studies': 'strategic thinking'
-  'military technology integration': 'systems engineering'
-  'molecular biology': 'evolutionary biology'
-  'moral psychology': 'psychology'
-  'multimedia design': 'computer graphics'
-  'multimedia systems engineering': 'systems engineering'
-  'music psychology': 'cognitive science'
-  'mythology': 'literary theory'
-  'narrative theory': 'literary theory'
-  'nonlinear dynamics': 'complex adaptive systems'
-  'numerical analysis': 'computational physics & simulation'
-  'optical engineering': 'engineering'
-  'optics': 'computational physics & simulation'
-  'optimization theory': 'operations research'
-  'organizational economics': 'economics'
-  'organizational risk management': 'risk management'
-  'organizational strategy': 'strategic thinking'
-  'performance engineering': 'systems engineering'
-  'performance measurement': 'operations research'
-  'personal finance': 'finance'
-  'platform economics': 'economics'
-  'political philosophy': 'philosophy'
-  'political sociology': 'sociology'
-  'primatology': 'anthropology'
-  'psycholinguistics': 'linguistics'
-  'publishing studies': 'media studies'
-  'quality engineering': 'systems engineering'
-  'reliability engineering': 'systems engineering'
-  'religious studies': 'anthropology'
-  'retail management': 'marketing'
-  'rhetorical theory': 'communication theory'
-  'sales and marketing': 'marketing'
-  'science and technology policy': 'cultural studies'
-  'science and technology studies': 'cultural studies'
-  'science communication': 'communication theory'
-  'second language acquisition': 'linguistics'
-  'semantic web engineering': 'information science'
-  'service design': 'design thinking'
-  'service management': 'operations research'
-  'social economics': 'economics'
-  'social media studies': 'sociology'
-  'social systems theory': 'complex adaptive systems'
-  'sociology of religion': 'sociology'
-  'sociology of technology': 'sociology'
-  'software licensing': 'law'
-  'software reliability engineering': 'software engineering'
-  'software testing': 'software engineering'
-  'statistical modeling': 'operations research'
-  'statistical physics': 'theoretical physics'
-  'statistical theory': 'operations research'
-  'strategic communications': 'communication theory'
-  'strategic studies': 'strategic thinking'
-  'sustainable design': 'design thinking'
-  'sustainable technology management': 'systems thinking'
-  'systems biology': 'evolutionary biology'
-  'technology law': 'law'
-  'technology studies': 'cultural studies'
-  'theology': 'philosophy'
-  'time series forecasting': 'operations research'
-  'translation studies': 'linguistics'
-  'transportation economics': 'economics'
-  'type design': 'typography'
-  'unsupervised machine learning': 'machine learning'
-  'urban design': 'design thinking'
-  'urban planning': 'interdisciplinary studies'
-  'urban studies': 'interdisciplinary studies'
-  'user experience engineering': 'design thinking'
-  'user experience research': 'design thinking'
-  'user interface design': 'human-computer interaction'
-  'video art technology': 'performing arts'
-  'visual analytics': 'information science'
-  'visual cognition': 'cognitive science'
-  'visual communication studies': 'communication theory'
-  'visual effects technology': 'computer graphics'
-  'visual neuroscience': 'neuroscience'
-  'web accessibility': 'human-computer interaction'
-  'web engineering': 'software engineering'
-  'web security': 'information security'
+  ai ethics: artificial intelligence
+  ai ethics and governance: artificial intelligence
+  ai governance: artificial intelligence
+  ai safety engineering: artificial intelligence
+  ai security: information security
+  ai strategy & governance: artificial intelligence
+  artificial intelligence governance: artificial intelligence
+  artificial intelligence management: artificial intelligence
+  accessibility engineering: human-computer interaction
+  accounting: finance
+  animation studies: computer graphics
+  architectural design: design thinking
+  art history and studio arts: performing arts
+  artificial intelligence engineering: artificial intelligence
+  artificial intelligence safety: artificial intelligence
+  artificial intelligence strategy: artificial intelligence
+  artificial intelligence systems engineering: systems engineering
+  atmospheric physics: theoretical physics
+  augmented reality: computer graphics
+  augmented reality design: computer graphics
+  autonomous systems engineering: robotics
+  autonomous vehicle control: robotics
+  behavioral data science: behavioral economics
+  behavioral finance: behavioral economics
+  behavioral neuroscience: neuroscience
+  biometrics: information science
+  biophysics: theoretical physics
+  blockchain economics: economics
+  business law: law
+  career counseling: psychology
+  chemical physics: theoretical physics
+  chronobiology: neuroscience
+  circadian biology: neuroscience
+  classical mechanics: theoretical physics
+  clinical neuroscience: neuroscience
+  cognitive anthropology: anthropology
+  color science: visual perception
+  communication design: design thinking
+  communication science: communication theory
+  comparative cognition: cognitive science
+  comparative religion: anthropology
+  computational economics: economics
+  computer science - simulation engineering: computational physics & simulation
+  conceptual metaphor theory: linguistics
+  consumer neuroscience: neuroscience
+  contract theory: philosophy
+  conversational ai: artificial intelligence
+  corporate sustainability management: systems thinking
+  creative arts practice: performing arts
+  creative cognition: cognitive science
+  critical theory: cultural studies
+  cultural economics: economics
+  cultural psychology: psychology
+  customer experience management: design thinking
+  data communication: information science
+  data engineering: information science
+  database systems: information science
+  deep learning architecture: machine learning
+  deep learning engineering: machine learning
+  deep learning systems engineering: machine learning
+  design aesthetics: aesthetics
+  design cognition: cognitive science
+  design for development: interdisciplinary studies
+  design science: design thinking
+  development studies: interdisciplinary studies
+  developmental cognitive neuroscience: neuroscience
+  digital communication studies: communication theory
+  digital forensics: information security
+  digital identity management: information security
+  digital platform studies: sociology
+  digital publishing: media studies
+  distributed artificial intelligence: artificial intelligence
+  distributed systems security: information security
+  ecological psychology: cognitive science
+  embodied cognition: cognitive science
+  engineering risk management: risk management
+  enterprise architecture: systems engineering
+  enterprise artificial intelligence: artificial intelligence
+  enterprise software architecture: software engineering
+  environmental communication: communication theory
+  environmental engineering: engineering
+  exercise physiology: health & medicine
+  existential psychology: philosophy
+  experience design: design thinking
+  experimental design: research methodology
+  explainable artificial intelligence: artificial intelligence
+  financial accounting: finance
+  financial management: finance
+  financial mathematics: finance
+  financial regulation: law
+  generative artificial intelligence: generative ai
+  generative linguistics: linguistics
+  genetic engineering: evolutionary biology
+  grounded theory methodology: research methodology
+  health communication: communication theory
+  health economics: health & medicine
+  healthcare management: health & medicine
+  historical linguistics: linguistics
+  human factors and ergonomics: human-computer interaction
+  human genetics: evolutionary biology
+  human-centered ai: human-computer interaction
+  industrial and organizational psychology: psychology
+  industrial economics: economics
+  industrial engineering: systems engineering
+  industrial organization economics: economics
+  information economics: economics
+  information technology law: law
+  interdisciplinary studies of science communication: communication theory
+  investment strategy: finance
+  journalism studies: media studies
+  knowledge engineering: information science
+  knowledge representation and reasoning: artificial intelligence
+  learning science: cognitive science
+  learning sciences: cognitive science
+  logistics and supply chain management: operations research
+  machine learning ethics: artificial intelligence
+  machine learning operations: machine learning
+  marketing economics: economics
+  mathematical logic: philosophy
+  mathematical physics: theoretical physics
+  media arts: performing arts
+  media arts and design: performing arts
+  media economics: economics
+  medical informatics: health & medicine
+  military strategy: strategic thinking
+  military studies: strategic thinking
+  military technology integration: systems engineering
+  molecular biology: evolutionary biology
+  moral psychology: psychology
+  multimedia design: computer graphics
+  multimedia systems engineering: systems engineering
+  music psychology: cognitive science
+  mythology: literary theory
+  narrative theory: literary theory
+  nonlinear dynamics: complex adaptive systems
+  numerical analysis: computational physics & simulation
+  optical engineering: engineering
+  optics: computational physics & simulation
+  optimization theory: operations research
+  organizational economics: economics
+  organizational risk management: risk management
+  organizational strategy: strategic thinking
+  performance engineering: systems engineering
+  performance measurement: operations research
+  personal finance: finance
+  platform economics: economics
+  political philosophy: philosophy
+  political sociology: sociology
+  primatology: anthropology
+  psycholinguistics: linguistics
+  publishing studies: media studies
+  quality engineering: systems engineering
+  reliability engineering: systems engineering
+  religious studies: anthropology
+  rhetorical theory: communication theory
+  science and technology policy: cultural studies
+  science and technology studies: cultural studies
+  science communication: communication theory
+  second language acquisition: linguistics
+  semantic web engineering: information science
+  service design: design thinking
+  service management: operations research
+  social economics: economics
+  social media studies: sociology
+  social systems theory: complex adaptive systems
+  sociology of religion: sociology
+  sociology of technology: sociology
+  software licensing: law
+  software reliability engineering: software engineering
+  software testing: software engineering
+  statistical modeling: operations research
+  statistical physics: theoretical physics
+  statistical theory: operations research
+  strategic communications: communication theory
+  strategic studies: strategic thinking
+  sustainable design: design thinking
+  sustainable technology management: systems thinking
+  systems biology: evolutionary biology
+  technology law: law
+  technology studies: cultural studies
+  theology: philosophy
+  time series forecasting: operations research
+  translation studies: linguistics
+  transportation economics: economics
+  type design: typography
+  unsupervised machine learning: machine learning
+  urban design: design thinking
+  urban planning: interdisciplinary studies
+  urban studies: interdisciplinary studies
+  user experience engineering: design thinking
+  user experience research: design thinking
+  user interface design: human-computer interaction
+  video art technology: performing arts
+  visual analytics: information science
+  visual cognition: cognitive science
+  visual communication studies: communication theory
+  visual effects technology: computer graphics
+  visual neuroscience: neuroscience
+  web accessibility: human-computer interaction
+  web engineering: software engineering
+  web security: information security
 domain_aliases: {}

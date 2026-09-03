@@ -20,12 +20,13 @@ meta:
   purpose: S4 classification golden few-shot (depth/discipline/domains/evidence)
   decision: D2451
   status: WIRED      # wiring into the 4 S4 classification prompts = D2454 (2026-08-27, fail-closed)
-  total_examples: 5
+  total_examples: 7
   expected_coverage:
   - depth_universal
   - depth_cross_domain
   - depth_domain
   - depth_specialized
+  - domain_discipline_disjointness
 
 examples:
 
@@ -55,7 +56,7 @@ examples:
     boundary: "Applies to systems with a detectable output→input path and a delay shorter than the response needed. Fails when feedback is absent or too slow to correct the deviation."
   expected_classification:
     discipline: "complex adaptive systems"
-    domains: ["ml systems & infrastructure", "organizational behavior", "engineering & infrastructure"]
+    domains: ["systems & frameworks", "organizational behavior", "engineering & infrastructure"]
     depth: "cross-domain"
     evidence: "cited"
     is_specialized: false
@@ -112,3 +113,39 @@ examples:
     evidence: "cited"
     is_specialized: false
   rationale: "The mechanism (analogical transfer via pattern recognition + metaphorical thinking) is structurally domain-independent — it works across any pair of structurally-similar fields. It is NOT a single field's method (depth=domain) and NOT a universal law (it requires structural similarity, so it fails across truly dissimilar domains). depth=cross-domain. Discipline is the structural science of creative ideation (creative process), not one application domain."
+
+# ── domain/discipline disjointness (D2528 / BUG-197): "data visualization" is a
+# DOMAIN, NEVER a discipline. Emitting it as a discipline fails canonical matching
+# → wrongly `emerging` (the BUG-197 leak). The classifier must keep the two axes
+# DISJOINT (D2422): domain labels land in `domains`, discipline labels in `discipline`.
+- id: S4-GOLD-006
+  depth: domain
+  input_fb:
+    name: Data-Ink Ratio
+    definition: "The proportion of ink in a chart that encodes data, versus decorative ink that adds no information; maximizing data-ink minimizes chart junk and improves readability."
+    mechanism: "Every non-data element (gridlines, 3D effects, decorative fill) competes for the viewer's limited visual attention, so removing it raises the signal-to-noise ratio and speeds comprehension."
+    boundary: "Applies to static 2D explanatory charts. Fails for artistic or exploratory visualization where decoration is the point."
+  expected_classification:
+    discipline: "information science"
+    domains: ["data visualization"]
+    depth: "domain"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "Data-ink is a principle of visualization practice — a DOMAIN. `data visualization` must land in `domains`, NEVER `discipline` (D2422 disjointness); the epistemic discipline is information science. Emitting `data visualization` as a discipline would fail canonical matching → wrongly `emerging` (BUG-197)."
+
+# ── domain/discipline disjointness (D2528 / BUG-197): "organizational behavior" is a
+# DOMAIN (Business & Strategy), NOT a discipline — the discipline is organizational theory.
+- id: S4-GOLD-007
+  depth: domain
+  input_fb:
+    name: Structural Inertia
+    definition: "Organizations resist change because their routines, capabilities, and sunk investments lock them into past behavior even when the environment shifts."
+    mechanism: "Established structures and processes create self-reinforcing commitments; the cost of reconfiguring them exceeds the perceived benefit of adaptation, so the organization reproduces prior patterns."
+    boundary: "Applies to mature organizations with entrenched routines. Fails for young, small organizations that can reconfigure cheaply."
+  expected_classification:
+    discipline: "organizational theory"
+    domains: ["organizational behavior"]
+    depth: "domain"
+    evidence: "cited"
+    is_specialized: false
+  rationale: "Structural inertia is organizational behavior — a DOMAIN. `organizational behavior` is a domain, NOT a discipline; the discipline is organizational theory. Same BUG-197 boundary: domain labels stay in `domains`, discipline labels in `discipline`."

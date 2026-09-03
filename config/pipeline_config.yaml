@@ -3,7 +3,7 @@ run:
   default_id: t11
 pipeline_manifest:
   schema_version: '3.0'
-  taxonomy_version: v5.1
+  taxonomy_version: v5.5
   pipeline_commit: v3.0-D2485
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -27,9 +27,9 @@ stages:
   timeouts:
     '0': 3600
     '0.5': 3600
-    '1': null        # BUG-143/D2411: full-corpus chunk (940 books → ~323K segs) takes ~1.5h
+    '1': null
     '1.3': 3600
-    '1.5': null      # BUG-143/D2411: full-corpus embed+cluster is multi-hour (D2409 incremental cache)
+    '1.5': null
     '2': null
     '4': null
     '5': 3600
@@ -58,22 +58,22 @@ services:
   ollama:
     host: localhost
     port: 11434
-    min_version: 0.32.0      # D2456: version drift detection (was silent before — homebrew 0.30.0 vs app 0.32.15)
+    min_version: 0.32.0
     nomic_max_chars: 4000
     embed_max_chars: 4000
     batch_size: 100
-    embed_timeout: 180        # D2348: 60s too short under 4-worker concurrent load → read timeouts (3% drop, BUG-105)
-    embed_keep_alive: -1      # D2348: pin bge-m3 in VRAM (keep_alive thrash → cold reload stalls, BUG-105)
-    single_source_guard:  # D2456: exactly ONE Ollama install (GUI app). Same pattern as D2455 OMLX.
+    embed_timeout: 180
+    embed_keep_alive: -1
+    single_source_guard:
       canonical_app: /Applications/Ollama.app
-      forbidden_bins:  # unambiguous homebrew formula markers
-        - /opt/homebrew/opt/ollama
-        - /opt/homebrew/Cellar/ollama
-      shim_paths:  # ambiguous: the app writes /usr/local/bin/ollama -> /Applications/Ollama.app/...
-        - /opt/homebrew/bin/ollama
-        - /usr/local/bin/ollama
+      forbidden_bins:
+      - /opt/homebrew/opt/ollama
+      - /opt/homebrew/Cellar/ollama
+      shim_paths:
+      - /opt/homebrew/bin/ollama
+      - /usr/local/bin/ollama
       forbidden_launchd_labels:
-        - homebrew.mxcl.ollama
+      - homebrew.mxcl.ollama
       launch_agents_dir: ~/Library/LaunchAgents
   omlx:
     host: localhost
@@ -84,20 +84,20 @@ services:
     default_timeout: 300
     max_retries: 2
     retry_delay: 3
-    cold_reload_delay: 45  # D2301: wait for reasoning-model cold reload (GPT-OSS evict/reload ~30-60s)
+    cold_reload_delay: 45
     circuit_breaker_enabled: true
     circuit_breaker_failure_threshold: 5
     circuit_breaker_cooldown_seconds: 60
-    single_source_guard:  # D2455: exactly ONE OMLX install (GUI app). Detect homebrew/duplicate re-infection.
+    single_source_guard:
       canonical_app: /Applications/oMLX.app
-      forbidden_bins:  # unambiguous homebrew formula markers (only homebrew creates Cellar/opt)
-        - /opt/homebrew/opt/omlx
-        - /opt/homebrew/Cellar/omlx
-      shim_paths:  # ambiguous: the APP also writes /opt/homebrew/bin/omlx -> ~/.omlx/bin/omlx. Flag only if it resolves to a Cellar install.
-        - /opt/homebrew/bin/omlx
+      forbidden_bins:
+      - /opt/homebrew/opt/omlx
+      - /opt/homebrew/Cellar/omlx
+      shim_paths:
+      - /opt/homebrew/bin/omlx
       forbidden_launchd_labels:
-        - com.maxwell.omlx
-        - homebrew.mxcl.omlx
+      - com.maxwell.omlx
+      - homebrew.mxcl.omlx
       launch_agents_dir: ~/Library/LaunchAgents
 models:
   generator:
@@ -105,32 +105,33 @@ models:
     provider: omlx
     temperature: 0.0
     max_tokens: 1024
-  verifier:  # D2340: MISNAMED — this is actually the S4 classifier (D2249), consumed as VERIFY_MODEL in stage4_merge.py
+  verifier:
     model: gpt-oss-20b-MXFP4-Q8
     provider: omlx
     temperature: 0.0
-    reasoning_off_prefix: 'Reasoning: low'   # D2359: valid Harmony level ('none' is ignored); caps CoT
+    reasoning_off_prefix: 'Reasoning: low'
     reasoning_off_models:
     - gpt-oss-20b-MXFP4-Q8
     max_tokens: 1024
-    chat_template_kwargs: {enable_thinking: false}   # D2359: oMLX-native CoT cap (top-level flags silently dropped)
-    thinking_budget: 256   # D2367/BUG-132: merged CRIBS call CoT cap (X8 verified 256 -> 45% faster, valid JSON)
-    depth_thinking_budget: 128   # D2367/BUG-132: focused depth call CoT cap (D2359 verified 128 -> 72%/7.3s)
-  verifier_v2:  # D2340: MISNAMED — this is actually the S2 fast probe (D2319), consumed as VERIFY_MODEL_V2 in stage2_extract.py
+    chat_template_kwargs:
+      enable_thinking: false
+    thinking_budget: 256
+    depth_thinking_budget: 128
+  verifier_v2:
     model: Phi-4-mini-instruct-8bit
     provider: omlx
     temperature: 0.0
-    notes: 'D2319: S2 fast probe (~1.5s). D2298 removed Phi from S5 *verification* only; S5 = DeBERTa-only (models.nli_large).'
+    notes: 'D2319: S2 fast probe (~1.5s). D2298 removed Phi from S5 *verification*
+      only; S5 = DeBERTa-only (models.nli_large).'
   embeddings:
     model: bge-m3
     provider: ollama
     alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ
   nli_large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
-  # nli_cross: REMOVED (D2298) — RoBERTa-large added zero signal on paraphrase evidence (D2227).
 pipeline:
   schema_version: '3.0'
   commit: v3.0-D2485
-  taxonomy_version: v5.1
+  taxonomy_version: v5.5
   max_domains_per_fb: 5
   chunk_size_words: 300
   chunk_overlap_words: 50
@@ -163,9 +164,9 @@ stage1_5:
   embed_chunk_size: 20000
   embed_batch_size: 64
   max_embed_drop_rate: 0.005
-  embed_checkpoint_enabled: true   # D2409: crash-safe incremental embedding cache (Ollama) — resume S1.5 mid-embedding instead of re-embedding ~5h
+  embed_checkpoint_enabled: true
 stage0:
-  max_failed_ratio: 0.0          # D2326: fail-closed — if failed/total > this ratio, exit non-zero (0.0 = any failure is fatal). Operator may raise to approve known-bad exclusions.
+  max_failed_ratio: 0.0
 stage1_3:
   min_len: 40
   cite_density: 0.6
@@ -184,19 +185,15 @@ stage2:
   minhash_threshold: 0.9
   minhash_num_perm: 128
   golden_path: config/golden/stage2_fewshot_convergent.yaml
-  golden_positive: 4      # D2377: one per epistemic form (stratified selection)
+  golden_positive: 4
   golden_negative: 1
   golden_max_examples: 5
   golden_inject_enabled: true
   golden_seed: 42
-  # BUG-152 (2026-08-20): single-source/singleton clusters previously got ZERO
-  # golden few-shot, inheriting the convergent 100%-principle bias (re-labelling
-  # + over-fire). A balanced single-source golden (all 5 content_type roles +
-  # negatives) is injected into the multi-type single-source prompt instead.
   golden_single_source_path: config/golden/stage2_fewshot_single_source.yaml
   golden_single_source_inject_enabled: true
   golden_single_source_negative: 7
-  golden_single_source_max: 21   # 14 positives (3 principle + 2 PT + 7 TI + 1 PI + 1 GE) + 7 negatives. D2457 added SS-POS-014 (R→TI) but max stayed 20 → round-robin budget 13 silently dropped the 7th TI (SS-POS-014). Bumped to 21 so all roles + anchors load.
+  golden_single_source_max: 21
   split_probe_enabled: true
   split_probe_min_size: 20
   split_probe_max_cohesion: 0.85
@@ -208,28 +205,30 @@ stage2:
   source_book_match: exact
   max_cluster_samples: 5
   max_probe_samples: 8
-  max_probe_per_book: 2      # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
+  max_probe_per_book: 2
   split_probe_kmeans_random_state: 42
   omlx_retry_attempts: 2
-  gen_max_tokens: 3072       # D2381: S2 extraction output budget (was hardcoded 2048 in call_llm → JSON truncation / finish_reason=length)
-  gen_max_tokens_retry: 4096 # D2381: JSON-failure fallback budget (retry with more room before giving up)
+  gen_max_tokens: 3072
+  gen_max_tokens_retry: 4096
   batch_position_monitor: false
-  max_workers: 3        # D2459: reverted 6→3 — 6 concurrent batches DEGRADE on the 128-expert MoE (server serializes + KV-store dispatch thrash); 3 = original T0.2
-  singleton_batch_size: 4        # D2xxx: batch N singletons per LLM call (option-1 speedup, BUG-155 follow-up)
-  singleton_batch_max_tokens_per_item: 1000  # per-singleton output budget inside a batch call (batch max_tokens = size x this)
-  singleton_prefilter_enabled: true  # D2452: gate singleton pass on singletons.prefiltered.jsonl EXTRACT verdicts (D2437 prefilter)
-  route_values: ["FB", "NULL"]   # D2323/C12: S2 route gate — FB=forward to S4, NULL=skip cluster (quoted: YAML parses bare NULL as None)
-  max_failed_ratio: 0.01   # D2381: allow ≤1% terminal failures (was 0.0) — persistent JSON-failure clusters no longer halt the stage; failed clusters retried on resume (D2331).
-  gated_seed_marker: "summary gated"   # D2421: runner-log marker for a summary-gated cluster (scripts/seed_gated_ids.py)
-  gated_seed_id_regex: 'cluster_\d+(_s\d+)?(_sub\d+)?'   # D2421: cluster-id pattern on gated log lines
-  extraction_type_dominance_warn_ratio: 0.95   # D2376: warn if a single extraction_type > this ratio of output (over-claim canary — causal_mechanism is the strongest epistemic claim)
-  relabel_max_workers: 4   # D2434: R1 relabel sweep parallelism — OMLX serves concurrent requests; 4 workers ≈ 2-3× throughput on the ~15-20s/rec Qwen3 FORM re-judgment
-  relabel_cross_family_model: "gpt-oss-20b-MXFP4-Q8"   # P1.3 (D2469): cross-family FLAG judge (Generator≠Verifier, R5). D2482: ENABLED — gpt-oss is cross-family from the S2 generator (Qwen3-Coder); flags (does not auto-apply) extraction_type disagreements.
+  max_workers: 3
+  singleton_batch_size: 4
+  singleton_batch_max_tokens_per_item: 1000
+  singleton_prefilter_enabled: true
+  route_values:
+  - FB
+  - 'NULL'
+  max_failed_ratio: 0.01
+  gated_seed_marker: summary gated
+  gated_seed_id_regex: cluster_\d+(_s\d+)?(_sub\d+)?
+  extraction_type_dominance_warn_ratio: 0.95
+  relabel_max_workers: 4
+  relabel_cross_family_model: gpt-oss-20b-MXFP4-Q8
 watchdog:
-  interval_secs: 60        # D2384: S2 watchdog poll interval
-  stall_checks: 3          # D2384: consecutive no-growth polls before flagging "stuck" (D2382 signature)
-  causal_warn_ratio: 0.5   # D2384: warn if causal_mechanism share exceeds this (D2377 bias drift)
-  causal_halt_ratio: 0.9   # D2384: exit non-zero if causal share exceeds this (bias confirmed)
+  interval_secs: 60
+  stall_checks: 3
+  causal_warn_ratio: 0.5
+  causal_halt_ratio: 0.9
 stage4:
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl
@@ -238,50 +237,35 @@ stage4:
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
   semantic_near_threshold: 0.8
-  related_fbs_max_neighbors: 20     # BUG-188: hard cap on per-FB related_fbs neighbors (bounds graph to O(n·k); was unbounded O(n²) → 32M edges → 2GB truncation)
-  related_fbs_exclude_domains: [emerging]  # BUG-188: fallback domains excluded from domain_overlap (shared fallback label ≠ meaningful relationship)
-  related_fbs_exclude_disciplines: [emerging]  # BUG-194: fallback discipline excluded from discipline_overlap (shared placeholder ≠ relationship)
+  related_fbs_max_neighbors: 20
+  related_fbs_exclude_domains:
+  - emerging
+  related_fbs_exclude_disciplines:
+  - emerging
   merged_call_enabled: true
-  merged_call_max_tokens: 2048   # GPT-OSS reasoning+JSON: 1024 truncated sparse (discipline/domains) → quarantine
-  batch_enabled: false            # D2265 batch CRIBS — D2477 A/B: 2.67x speed BUT domain granularity degrades (12% canonical exact-match, Jaccard 0.48 vs merged). Quality-tradeoff → keep OFF for full run.
+  merged_call_max_tokens: 2048
+  batch_enabled: false
   batch_size: 4
   batch_call_max_tokens: 2048
   depth_focused_classification: true
-  depth_max_tokens: 1024   # D2351/BUG-109: GPT-OSS is a reasoning model — 512 truncates reasoning_content → empty content → silent "domain"
-  depth_batch_size: 4      # D2354: batch the focused depth prompt (removes the ~10s/FB serialized call)
-  depth_batch_max_tokens: 2048   # BUG-184: 4-FB batch needs > depth_max_tokens (1024) headroom — gpt-oss truncates the Nth JSON object otherwise (reasoning_content consumes the budget)
-  depth_batch_enabled: true        # D2477: wire D2354 batch depth into stage4 (quality-neutral — same short prompt, batched transport)
-  # D2483 (2026-08-28): BUG-185 depth-collapse (97.5%->"domain") prompt fix, A/B-verified on BOTH paths.
-  # "baseline" = unchanged production prompt. "v3_contrastive" = strip the DEFAULT-to-"domain"
-  # bias lines + forced 4-way choice + contrastive boundary anchors. FOCUSED-path A/B (n=20): V3
-  # breaks the collapse without over-assigning cross-domain (D2365 failure) and is speed-neutral.
-  # BATCH-path A/B (n=20, production batch_depth_classify): V3 golden accuracy 3/5→5/5 (recovers
-  # Feedback Loop→cross-domain, Backpropagation→specialized), speed-neutral 1.88→1.95s/FB, no
-  # over-assignment (80% domain). Confirmed safe → enabled for the 7,898-FB full run.
+  depth_max_tokens: 1024
+  depth_batch_size: 4
+  depth_batch_max_tokens: 2048
+  depth_batch_enabled: true
   depth_prompt_variant: v3_contrastive
-  # D2354 FrugalGPT cascade: GPT-OSS keeps the hard CRIBS/classification work;
-  # a cheap third-family model does ONLY the 4-way depth classification.
-  # GATED — default off until tools/benchmark_s4_depth_frugal.py shows ≥90%
-  # agreement with GPT-OSS focused-depth AND ≥90% held-out accuracy.
   depth_frugal_enabled: false
-  depth_model: gemma-4-E4B-it-MLX-4bit   # fast, non-reasoning (no CoT burn)
+  depth_model: gemma-4-E4B-it-MLX-4bit
   depth_fallback_depth: domain
-  # D2451: config-driven S4 classification golden few-shot (was hardcoded inline in
-  # CLASSIFY_SYSTEM_PROMPT). Spans all 4 depth levels; validated against content_types.yaml.
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
-  golden_max_examples: 5   # D2501: file has 5 examples (incl S4-GOLD-005 D2482 cross-domain boundary); 4 silently dropped it
-  # D2364/C12 (X7): signal sets extracted from hardcoded Python literals (cross-LLM audit).
-  # context_signals: applied-domain → context routing hint (v1 Anytype "context" property).
-  # temporal_signals: keyword heuristics for temporal_scope (timeless / contemporary).
-  # universal_signals: name/mechanism substrings that flag a likely-universal depth.
+  golden_max_examples: 7
   context_signals:
     business:
     - business operations
     - business development
     - entrepreneurship
     - organizational behavior
-    - marketing
+    - marketing & communications
     design:
     - graphic design
     - brand identity
@@ -300,14 +284,11 @@ stage4:
     - code & computation
     - engineering practice
     - ai & agents
-    - ml systems & infrastructure
     - computational science & physics
-    - software engineering
     academic:
     - research & methodology
     - semiotics & communication
     - computational art
-    - philosophy
   temporal_signals:
     timeless:
     - always
@@ -321,10 +302,6 @@ stage4:
     - recent
     - today
     - now
-  # D2410: difficulty_level mapping (C12) — depth → difficulty. `domain` is
-  # cardinality-aware: single-domain FB = deep specialization ("expert");
-  # multi-domain FB = breadth ("intermediate"). Mirrors the prior hardcoded
-  # branch exactly (config-first only, no behavior change).
   difficulty_map:
     specialized: expert
     universal: beginner
@@ -347,22 +324,24 @@ stage4:
   - symmetry
   - optimization
   - gradient
-  max_failed_ratio: 0.01   # D2386: allow ≤1% terminal failures (was 0.0, D2338) — mirror S2 D2381; 1 CRIBS-quality exclusion (empty application) within tolerance
-  checkpoint_interval: 5   # D2370: intra-stage incremental checkpoint cadence (clusters) — crash recovery for the long serial S4
-  fb_name_max_words: 8        # BUG-149: max words in normalized FB names (C12 — was hardcoded 5 in normalize_fb_name)
+  max_failed_ratio: 0.01
+  checkpoint_interval: 5
+  fb_name_max_words: 8
 s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3
-  dspy_max_tokens: 4096  # D2304/C12: ConvergentExtraction needs 4K for 11 output fields (was hardcoded in dspy_trainer.py)
-  dspy_program_path: data/dspy_mipro_optimized.json  # D2304: C12 config-driven (was hardcoded /tmp)
-  dspy_enabled: false  # D2482: gate the DSPy extraction path in stage2. Default off — few-shot prompt injection stays the safe default until a program is trained (data/dspy_mipro_optimized.json) + live-smoked.
+  dspy_max_tokens: 4096
+  dspy_program_path: data/dspy_mipro_optimized.json
+  dspy_enabled: false
   gate:
     enabled: false
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     max_tokens: 64
     temperature: 0.0
-    system_prompt: You are a principle discovery gate. Answer ONLY with 'FB' or 'NULL'. No explanation.
-    user_prompt_template: 'Examine these text segments from {n_sources} different books.
+    system_prompt: You are a principle discovery gate. Answer ONLY with 'FB' or 'NULL'.
+      No explanation.
+    user_prompt_template: 'Examine these text segments from {n_sources} different
+      books.
 
 
       {segments}
@@ -383,7 +362,6 @@ stage5:
   - tool_instruction
   factscore_enabled: false
   nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
-  # nli_model_fallback: REMOVED (D2298) — ModernBERT fallback deleted with RoBERTa.
   nli_entailment_threshold: 0.1
   nli_pass_threshold: 0.1
   nli_marginal_threshold: 0.1
@@ -391,44 +369,39 @@ stage5:
   nli_max_hypothesis_chars: 256
   mechanism_min_length: 150
   citation_echo_source_threshold: 20
-  # D2506 (B2): deterministic evidence-passage garbage filter — excludes caption/title/UI
-  # fragments from NLI scoring before any verdict is computed. (Config-first C12.)
-  evidence_garbage_min_words: 6       # passages with fewer words than this are non-evidence
-  evidence_garbage_max_underscore: 2  # underscore-run threshold ("Data ____ stories")
-  evidence_garbage_min_alpha_ratio: 0.5  # symbol-dense fragment threshold (alpha-chars/len)
-  # D2507 (B2): cross-passage majority-aggregation — strict majority (> this ratio) of CLEAN
-  # evidence passages must entail to PASS, and a strict majority must contradict to veto.
-  # Replaces the weak single-passage max-entailment rule (ChatGPT B2 / MTR task 32).
+  evidence_garbage_min_words: 6
+  evidence_garbage_max_underscore: 2
+  evidence_garbage_min_alpha_ratio: 0.5
   b2_majority_ratio: 0.5
   banned_mechanism_prefixes:
-    - "because it enables"
-    - "because it allows"
-    - "because it helps"
-    - "because it provides"
-    - "because it makes"
-    - "because it can"
+  - because it enables
+  - because it allows
+  - because it helps
+  - because it provides
+  - because it makes
+  - because it can
   confidence:
     mechanism_weight: 0.35
     enrichment_weight: 0.25
-    isor_weight: 0.40
+    isor_weight: 0.4
     quarantine_cap: 0.25
     human_review_isor_rating: strong
-  checkpoint_interval: 50   # D2409: intra-stage incremental checkpoint cadence (FBs) — crash recovery for the serial S5
+  checkpoint_interval: 50
 stage6:
   commit_non_fb_types: false
   okf_export_enabled: true
-  max_failed_ratio: 0.0   # D2338: fail-closed commit — if failed_inserts/total > this ratio, exit non-zero (0.0 = any failed insert fatal)
-stage4_5:   # F1/D2400: post-S4 enrichment — producers for prerequisite_fbs / contradicts_fbs / procedural_skill (NOT inline-S4, NOT S6)
-  enabled: false                 # OFF for T1.1 (principle-only; the LLM edge pass is post-T1.1 cost). Flip to true to run.
-  model: gpt-oss-20b-MXFP4-Q8   # R5: cross-family from S2 generator (qwen); same family as S4 classifier (gpt-oss)
+  max_failed_ratio: 0.0
+stage4_5:
+  enabled: false
+  model: gpt-oss-20b-MXFP4-Q8
   procedural_skill_enabled: true
   edge_enabled: true
-  edge_candidate_threshold: 0.80           # cosine threshold proposing candidate FB pairs (mirrors S4 semantic_near_threshold)
-  edge_max_candidates_per_fb: 10           # bloat/health guard: cap candidate pairs per FB
+  edge_candidate_threshold: 0.8
+  edge_max_candidates_per_fb: 10
   edge_max_tokens: 512
   procedural_skill_max_tokens: 256
-  max_failed_ratio: 0.01        # D2338-style fail-closed tolerance
-  checkpoint_interval: 5        # D2370-style intra-stage incremental checkpoint cadence (FBs)
+  max_failed_ratio: 0.01
+  checkpoint_interval: 5
 coverage:
   threshold: 0.5
   flag_fraction: 0.3
@@ -441,6 +414,35 @@ retrieval_eval:
   max_fbs_to_evaluate: 15
   fb_definition_max_chars: 300
   fb_name_max_chars: 200
+retrieval_benchmark:
+  top_k: 10
+  candidate_pool: 30
+rerank:
+  enabled: true
+  model: BAAI/bge-reranker-v2-m3
+  device: cpu
+  max_length: 512
+  batch_size: 8
+ranking:
+  # D2537: opt-in fused quality ranking. borp_score is ~all 0.0 (verified 3310/3310
+  # PASS rows), so the legacy `ORDER BY borp_score` collapses to rowid order. When
+  # enabled, rank by S5 NLI confidence_score + epistemic boosts (convergent /
+  # source-diverse). OFF by default so legacy behaviour stays the benchmark baseline.
+  quality_score_enabled: false
+  confidence_weight: 1.0
+  convergent_boost: 0.10
+  diversity_boost: 0.05
+contextual_embed:
+  enabled: false
+  context_fields:
+  - discipline
+  - domains
+  - name
+  max_context_chars: 200
+hyde:
+  enabled: false
+  model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  max_tokens: 256
 reliability:
   stable_threshold: 0.85
   watch_threshold: 0.5
@@ -449,21 +451,37 @@ taxonomy:
   flood_threshold_ratio: 0.2
   replacement_threshold_ratio: 1.1
   emerging_freq_threshold: 10
-  max_domains: 35       # D2378: canonical domain cap (matches taxonomy_v5.yaml; closed-loop — promote requires demote)
-  max_disciplines: 75   # D2378: canonical discipline cap (matches taxonomy_v5.yaml; D2422 removed education overlap; +4 promotions 2026-08-20: design thinking, product design, industrial design, information retrieval)
-  # D2485: post-S4 emerging-rate gate (BUG-150 discipline-emerging 33% on probe).
-  # emerging_real = genuine taxonomy gap (promotion candidate, counted);
-  # emerging_unmapped = empty/invalid raw label (NOT a promotion signal, excluded
-  # from promotion logic — fabricating "emerging" from garbage was the BUG-167-adjacent risk).
-  emerging_discipline_rate_max: 0.35   # frac of FBs with discipline == 'emerging' (real gaps)
-  emerging_domain_rate_max: 0.30       # frac of FBs whose domains collapsed ENTIRELY to ['emerging']
-  emerging_unmapped_rate_max: 0.05     # frac of FBs with empty/invalid raw label (garbage detector — should be ~0)
+  max_domains: 43
+  max_disciplines: 61
+  emerging_discipline_rate_max: 0.35
+  emerging_domain_rate_max: 0.3
+  emerging_unmapped_rate_max: 0.05
+  # D2519 (D2399 policy A): promotion governance. promotions_frozen is a manual
+  # kill-switch (set true to halt all D2399 promote/demote). allow_both_axes_emerging
+  # = false enforces "never promote a label emerging on BOTH axes" (axis-confused
+  # labels like 'human factors engineering' are rejected, not promoted).
+  d2399_promotions_frozen: true
+  d2399_allow_both_axes_emerging: false
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8
   min_fbs: 30
-  convergent_ratio: 0.20  # D2336: 0.25 was a pre-data default; first 20-book run = 24.5% (SE≈3.4%)
-
+  convergent_ratio: 0.2
+  # D2531: corpus-aware verify pass-rate (OPT-IN, NOT auto-applied).
+  # The single min_pass_rate: 0.8 above is calibrated for a convergent-dominant
+  # corpus. The 2026-09-03 e2e run exposed that single-source FBs (origin=
+  # single_source) are genuinely unentailed by NLI (27.4% PASS) and even
+  # convergent FBs sit at 31.1% — NEITHER reaches 80%. This is NOT a threshold
+  # bug: it is a real signal that (a) evidence passages are weak/truncated and
+  # (b) the B2 strict-majority vote is harsh for this corpus. Until evidence
+  # quality is fixed in a separate investigation, this OPT-IN block lets
+  # validate_results gate each origin tier against its own observed floor so a
+  # genuinely degraded run still FAILS. enabled: false keeps the legacy single
+  # threshold active (no silent behavior change — the recommendation is explicit).
+  corpus_aware_pass_rate:
+    enabled: false
+    convergent_min_pass_rate: 0.25
+    single_source_min_pass_rate: 0.20
   diagnostic:
     yield_pct_pass: 1.0
     yield_pct_fail: 0.5
@@ -473,29 +491,33 @@ e2e:
     default_books: 100
 test:
   full_run:
-    books: []   # D2439: shadow-library filename manifest REDACTED from public repo (929 titles w/ z-lib/libgen/Anna's provenance). Derive at runtime: sorted(BOOKS_DIR.rglob("*.md")).
+    books: []
     output_subdir: full-run
     pipeline_commit: full-run-v3
     schema_version: '2.3'
-    taxonomy_version: v5.1
+    taxonomy_version: v5.5
     extract_model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     extract_max_tokens: 2048
     classify_max_tokens: 512
-    extract_system_prompt: "You extract reusable principles from text.\nReturn a JSON array of principle objects:\n[{\"name\"\
-      : \"Principle Name\", \"definition\": \"2-3 sentence definition...\",\n  \"mechanism\": \"X causes/enables/prevents\
-      \ Y because Z\",\n  \"boundary\": \"Applies when...; fails when...\",\n  \"consequence\": \"What follows from this mechanism\"\
-      ,\n  \"elaboration\": \"3-5 sentences of deeper nuance (edge cases, exceptions, conditions). Empty string if passages\
-      \ add nothing beyond mechanism/boundary.\",\n  \"is_summary\": false,\n  \"evidence_passages\": [\"verbatim quote 1\"\
-      , \"verbatim quote 2\"],\n  \"application\": \"When [situation] -> do [action]\",\n  \"failure_mode\": \"The principle\
-      \ fails when...\",\n  \"keywords\": \"term1, term2\",\n  \"jargon\": {\"term\": \"explanation\"} or omit if none,\n\
-      \  \"route\": \"FB\"}].\nevidence_passages MUST be verbatim quotes from the source text — never paraphrase.\nDefault\
+    extract_system_prompt: "You extract reusable principles from text.\nReturn a JSON\
+      \ array of principle objects:\n[{\"name\": \"Principle Name\", \"definition\"\
+      : \"2-3 sentence definition...\",\n  \"mechanism\": \"X causes/enables/prevents\
+      \ Y because Z\",\n  \"boundary\": \"Applies when...; fails when...\",\n  \"\
+      consequence\": \"What follows from this mechanism\",\n  \"elaboration\": \"\
+      3-5 sentences of deeper nuance (edge cases, exceptions, conditions). Empty string\
+      \ if passages add nothing beyond mechanism/boundary.\",\n  \"is_summary\": false,\n\
+      \  \"evidence_passages\": [\"verbatim quote 1\", \"verbatim quote 2\"],\n  \"\
+      application\": \"When [situation] -> do [action]\",\n  \"failure_mode\": \"\
+      The principle fails when...\",\n  \"keywords\": \"term1, term2\",\n  \"jargon\"\
+      : {\"term\": \"explanation\"} or omit if none,\n  \"route\": \"FB\"}].\nevidence_passages\
+      \ MUST be verbatim quotes from the source text — never paraphrase.\nDefault\
       \ route is FB; use NULL only when the passage clearly contains no principle."
     context_signals:
       business:
       - business operations
       - business development
       - entrepreneurship
-      - marketing
+      - marketing & communications
       - organizational behavior
       design:
       - graphic design
@@ -512,14 +534,11 @@ test:
       - data visualization
       ai:
       - ai & agents
-      - ml systems & infrastructure
       - code & computation
       - computational art
-      - software engineering
       research:
       - research & methodology
       - semiotics & communication
-      - philosophy
       system:
       - systems & frameworks
       - engineering practice
@@ -564,11 +583,6 @@ test:
     extraction_prompt_limit: 3000
 source_epub_dir: null
 source_pdf_dir: null
-
-# ── G10 / P0.0 / D2020 Layer 1: OMLX wired-memory leak stress test ──
-# Detects GitHub #2184-style kernel wired-memory leaks before a 26h run.
-# Kill criteria: cumulative wired growth > growth_threshold_pct → FAIL (leak).
-# round_trend_gb matches BUG-017 watchdog trend threshold (2GB → restart).
 omlx_wired_stress:
   rounds: 5
   prompts_per_round: 20
@@ -578,7 +592,5 @@ omlx_wired_stress:
   round_trend_gb: 2.0
   per_request_timeout: 30
   model: null
-
-# ── D2307: Recall measurement (golden-set yield) — config-driven threshold (C12) ──
 recall:
   match_threshold: 0.55

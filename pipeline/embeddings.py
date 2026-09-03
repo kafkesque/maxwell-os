@@ -102,6 +102,47 @@ def embed_single(text: str) -> np.ndarray:
     return embed_texts_bge_m3([text])[0]
 
 
+def contextualize_text(fb: dict, max_context_chars: int = 200) -> str:
+    """S1 (D2511): prepend lightweight context to a definition before embedding.
+
+    Contextual/late-chunk retrieval: a bare FB definition loses the
+    discipline/domain/name signal that disambiguates near-duplicate definitions
+    (e.g. "optimize for X" appearing under both 'economics' and 'design'). By
+    prepending a short context prefix at EMBED time, the vector captures that
+    axis without a full S2-S6 re-extraction.
+
+    Config-driven (C12): context_fields + max_context_chars from
+    config → contextual_embed. The `enabled` flag in config is the PRODUCTION
+    adoption gate (read by call sites deciding whether the canonical embed path
+    uses context); this function itself is PURE and always contextualizes —
+    a silent no-op here would be a C16 trap. Opt into the A/B via
+    `backfill --contextual` (writes a separate vec_fbs_ctx table).
+
+    Args:
+        fb: FB dict with discipline/domains/name/definition fields.
+        max_context_chars: cap on the context prefix length.
+
+    Returns:
+        context-prefixed text for embedding (or bare definition if the FB
+        carries no context fields).
+    """
+    _CCTX = _CFG.get("contextual_embed", {})
+    fields = _CCTX.get("context_fields", ["discipline", "domains", "name"])
+    cap = int(_CCTX.get("max_context_chars", max_context_chars))
+
+    parts: list[str] = []
+    for f in fields:
+        v = fb.get(f)
+        if isinstance(v, list):
+            v = ", ".join(str(x) for x in v if x)
+        v = str(v or "").strip()
+        if v:
+            parts.append(v)
+    prefix = " | ".join(parts)[:cap]
+    definition = fb.get("definition", "") or ""
+    return f"{prefix}. {definition}" if prefix else definition
+
+
 if __name__ == "__main__":
     # Smoke test (no LLM, verifies endpoint + model)
     t0 = time.time()

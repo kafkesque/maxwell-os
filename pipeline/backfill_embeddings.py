@@ -80,8 +80,22 @@ def _embed(texts: list[str]) -> list[list[float]]:
     return [[float(x) for x in row] for row in arr]
 
 
-def backfill(db_path: Path, limit: int | None, batch_size: int, dry_run: bool) -> int:
-    """Backfill vec_fbs from fbs.definition. Returns number of rows embedded."""
+def backfill(
+    db_path: Path,
+    limit: int | None,
+    batch_size: int,
+    dry_run: bool,
+    contextual: bool = False,
+    vec_table: str = "vec_fbs",
+) -> int:
+    """Backfill a vec table from fbs (definition or contextual text).
+
+    D2511 (S1): `contextual=True` embeds context-prefixed text (discipline/domains/
+    name + definition) into a SEPARATE table (`vec_fbs_ctx` by default) so the
+    production vec_fbs is untouched — enabling a clean A/B in retrieval_benchmark.
+
+    Returns number of rows embedded.
+    """
     if not db_path.exists():
         print(f"  ❌ DB not found: {db_path}")
         sys.exit(1)
@@ -94,31 +108,42 @@ def backfill(db_path: Path, limit: int | None, batch_size: int, dry_run: bool) -
         conn.close()
         sys.exit(1)
 
-    # Create vec_fbs (may already exist — IF NOT EXISTS is safe)
-    conn.execute(CREATE_VEC_TABLE)
+    # Create the vec table (may already exist — IF NOT EXISTS is safe)
+    conn.execute(CREATE_VEC_TABLE.replace("vec_fbs", vec_table))
 
     # Clear any stale rows so we never mix 1024d (pre-fix) with 512d (post-fix)
     # vectors in the same table. Idempotent re-run replaces the whole index.
-    conn.execute("DELETE FROM vec_fbs")
+    conn.execute(f"DELETE FROM {vec_table}")
 
-    # Read definitions (single source of truth: committed fbs rows)
-    sql = "SELECT rowid, definition FROM fbs"
+    # Read rows (single source of truth: committed fbs rows). For contextual mode
+    # we also need discipline/domains/name to build the context prefix.
+    select_cols = "rowid, definition"
+    if contextual:
+        select_cols += ", discipline, domains, name"
+    sql = f"SELECT {select_cols} FROM fbs"
     if limit:
         sql += f" ORDER BY rowid LIMIT {int(limit)}"
     rows = conn.execute(sql).fetchall()
     total = len(rows)
-    print(f"  🧠 Backfilling {total} definition embeddings "
-          f"(bge-m3 → {S15_EMBED_DIM}d, batch={batch_size})")
+    mode = "contextual (S1)" if contextual else "definition"
+    print(f"  🧠 Backfilling {total} {mode} embeddings "
+          f"(bge-m3 → {S15_EMBED_DIM}d, batch={batch_size}, table={vec_table})")
 
     if dry_run:
         print("  🔍 --dry-run: would embed (no writes).")
         conn.close()
         return total
 
+    if contextual:
+        from pipeline.embeddings import contextualize_text
+
     done = 0
     for i in range(0, total, batch_size):
         batch = rows[i : i + batch_size]
-        texts = [r["definition"] or "" for r in batch]
+        if contextual:
+            texts = [contextualize_text(dict(r)) for r in batch]
+        else:
+            texts = [r["definition"] or "" for r in batch]
         try:
             embs = _embed(texts)
         except Exception as e:
@@ -131,7 +156,7 @@ def backfill(db_path: Path, limit: int | None, batch_size: int, dry_run: bool) -
         for r, emb in zip(batch, embs):
             blob = struct.pack(f"{len(emb)}f", *emb)
             conn.execute(
-                "INSERT INTO vec_fbs(rowid, definition_embedding) VALUES (?, ?)",
+                f"INSERT INTO {vec_table}(rowid, definition_embedding) VALUES (?, ?)",
                 (r["rowid"], blob),
             )
         done += len(batch)
@@ -140,17 +165,18 @@ def backfill(db_path: Path, limit: int | None, batch_size: int, dry_run: bool) -
 
     conn.commit()
 
-    vec_count = conn.execute("SELECT COUNT(*) FROM vec_fbs").fetchone()[0]
+    vec_count = conn.execute(f"SELECT COUNT(*) FROM {vec_table}").fetchone()[0]
     orphaned = conn.execute(
-        "SELECT COUNT(*) FROM vec_fbs v LEFT JOIN fbs f ON v.rowid = f.rowid WHERE f.rowid IS NULL"
+        f"SELECT COUNT(*) FROM {vec_table} v LEFT JOIN fbs f ON v.rowid = f.rowid "
+        "WHERE f.rowid IS NULL"
     ).fetchone()[0]
     conn.close()
 
-    print(f"  ✅ vec_fbs: {vec_count} rows, {orphaned} orphaned")
+    print(f"  ✅ {vec_table}: {vec_count} rows, {orphaned} orphaned")
     if vec_count == total:
         print("  ✅ Vector index READY (matches fbs count)")
     else:
-        print(f"  ⚠️  vec_fbs={vec_count} vs fbs subset={total} (expected on --limit runs)")
+        print(f"  ⚠️  {vec_table}={vec_count} vs fbs subset={total} (expected on --limit runs)")
     return vec_count
 
 
@@ -160,9 +186,16 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None, help="Only embed first N rows (smoke)")
     parser.add_argument("--batch-size", type=int, default=32, help="Embedding batch size")
     parser.add_argument("--dry-run", action="store_true", help="Report without writing")
+    parser.add_argument("--contextual", action="store_true",
+                        help="S1: embed context-prefixed text into a separate vec_fbs_ctx table")
+    parser.add_argument("--vec-table", default="vec_fbs",
+                        help="Target vec table name (default vec_fbs; contextual → vec_fbs_ctx)")
     args = parser.parse_args()
 
-    backfill(args.db, args.limit, args.batch_size, args.dry_run)
+    vec_table = args.vec_table
+    if args.contextual and vec_table == "vec_fbs":
+        vec_table = "vec_fbs_ctx"
+    backfill(args.db, args.limit, args.batch_size, args.dry_run, args.contextual, vec_table)
 
 
 if __name__ == "__main__":

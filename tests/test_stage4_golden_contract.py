@@ -91,6 +91,65 @@ def test_s4_golden_ids_unique() -> None:
     assert len(ids) == len(set(ids)), "S4 golden ids must be unique"
 
 
+def test_s4_golden_axis_disjointness() -> None:
+    """D2532: the few-shot must never teach cross-axis contamination (BUG-197).
+
+    A contaminated golden (a DOMAIN label filed as `discipline`, or a discipline
+    filed as a `domain`) would propagate the exact leak this golden exists to fix.
+    Assert full disjointness between the two axes and forbid the `emerging`
+    placeholder in either field. NOTE: CANONICAL_DISCIPLINES/CANONICAL_DOMAINS
+    each still contain `emerging` as a legal placeholder, so the plain
+    `in CANONICAL_*` check above alone would NOT catch an `emerging` golden —
+    these explicit guards do.
+    """
+    from pipeline.schemas import normalize_label
+
+    golden = _load()
+    domain_norms = {normalize_label(d) for d in CANONICAL_DOMAINS}
+    discipline_norms = {normalize_label(d) for d in CANONICAL_DISCIPLINES}
+
+    for ex in golden.get("examples", []):
+        eid = ex.get("id", "?")
+        exp = ex.get("expected_classification", {})
+        disc = exp.get("discipline", "")
+        domains = exp.get("domains", [])
+        disc_norm = normalize_label(disc)
+
+        # discipline must not be a canonical domain (cross-axis leak).
+        assert disc_norm not in domain_norms, (
+            f"{eid}: discipline {disc!r} is a canonical DOMAIN (cross-axis leak)"
+        )
+        # discipline must not be the emerging placeholder.
+        assert disc != "emerging", f"{eid}: discipline must not be 'emerging'"
+
+        for d in domains:
+            d_norm = normalize_label(d)
+            # domain must not be a canonical discipline (reverse leak).
+            assert d_norm not in discipline_norms, (
+                f"{eid}: domain {d!r} is a canonical DISCIPLINE (reverse leak)"
+            )
+            # domain must not be the emerging placeholder.
+            assert d != "emerging", f"{eid}: domain must not be 'emerging'"
+            # no label may appear in BOTH axes.
+            assert d_norm != disc_norm, (
+                f"{eid}: {d!r} appears in both discipline and domains (disjointness)"
+            )
+
+
+def test_s4_golden_no_raw_axis_fields() -> None:
+    """D2532: the golden's expected_classification must carry ONLY canonical labels.
+
+    Raw (LLM free-text) discipline/domains do not belong in the few-shot — the
+    prompt renders the *expected* canonical output, so any `discipline_raw` /
+    `domains_raw` key would inject unvetted labels into the classifier. Forbid it.
+    """
+    golden = _load()
+    for ex in golden.get("examples", []):
+        exp = ex.get("expected_classification", {})
+        assert "discipline_raw" not in exp, f"{ex.get('id')}: unexpected discipline_raw"
+        assert "domains_raw" not in exp, f"{ex.get('id')}: unexpected domains_raw"
+
+
 def test_s4_golden_not_silently_truncated() -> None:
     """D2501: config golden_max_examples must not truncate authored examples.
 

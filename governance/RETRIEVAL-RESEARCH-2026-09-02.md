@@ -78,6 +78,12 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
   would recover these.
 - **Why SHOULD:** single-largest recall lever for the long tail; fully local (bge-m3); deterministic (R7).
 - **Reference:** Anthropic, "Introducing Contextual Retrieval" (2024); Weaviate, "Late Chunking" (2024).
+- **⚖️ D2511 MEASURED — GATED OFF.** Implemented `embeddings.contextualize_text()` + `backfill --contextual`
+  (separate `vec_fbs_ctx`) + `search_vector(vec_table=)` + benchmark `--contextual`. A/B on the 7-query
+  golden set: **hybrid-ctx DROPS recall 1.000→0.857** (loses "how to build resilient distributed systems" —
+  the discipline/domains/name prefix dilutes the definition signal). Do NOT enable until the golden set
+  grows (~30 queries) and a re-run shows a net win. (Also fixed a C16 footgun: `contextualize_text` initially
+  returned bare def when `enabled=False`; now pure.)
 
 ### S2. Local cross-encoder rerank of the top-K hybrid candidates
 - **What:** Rerank the top ~50 RRF candidates with a local cross-encoder (e.g. `bge-reranker-v2-m3`,
@@ -86,6 +92,11 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
   (`stage2_relabel_extraction_type.py`) found cross-encoders could NOT cleanly separate relabel classes —
   a DIFFERENT task. Gate on a held-out retrieval-precision A/B before enabling.
 - **Reference:** Nogueira & Cho, "Passage Re-ranking with BERT", arXiv:1901.04085 (2019).
+- **⚖️ D2511 MEASURED — GATED OFF.** Implemented `pipeline/rerank.py` (bge-reranker-v2-m3, already cached +
+  verified). A/B on the 7-query golden set: rerank keeps recall 1.000 but **DROPS MRR 0.857→0.606**
+  (demotes "Psychological Safety Through Shared Risk" rank 1→2, promotes "Mission Impossible Framework for
+  Leadership"). Cross-encoder over-fits query-term overlap on this small set. Do NOT enable until a larger
+  golden set + a held-out precision benchmark shows a net win.
 
 ### S3. HyDE-style query expansion (hypothetical-answer embedding) — gated
 - **What:** Generate a short hypothetical answer to the query (local Phi-4-mini/Qwen), embed it, and fuse
@@ -93,6 +104,8 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
 - **Why SHOULD (conditional):** improves recall on queries with vocabulary mismatch; adds one local LLM
   call of latency and must be temp=0.0 (R7). Gate on recall@k improvement over baseline.
 - **Reference:** Gao et al., "Precise Zero-Shot Dense Retrieval without Relevance Labels", arXiv:2212.10496 (2022).
+- **⚖️ D2511 STILL GATED.** Depends on S1 + a larger golden set first. The benchmark harness is now in place
+  (`retrieval_benchmark.py`) to measure recall@k vs baseline once implemented.
 
 ---
 
@@ -132,10 +145,23 @@ surfaced, and the graph surfaces contradictions alongside support (not just simi
    longer starves PASS to 0; default still `status='PASS'` (D2330).
 5. ✅ **No regression** — full suite 174 passed + FTS/keyword/hybrid/vector all smoke-tested.
 
+### D2511 live stress tests (RRF bug + S1/S2 benchmark)
+1. ✅ **RRF keyword-leg bug FIXED** — live: with no filter, `search_hybrid` returned "High Contrast Visual Design"
+   at rank ~2 in EVERY query (constant `borp_score≈0 → ROWID` list). After fix, crisis query → "Collective
+   Intelligence Recovery" rank 1. 4-check regression test added.
+2. ✅ **Golden query set + benchmark harness delivered** — `config/golden/retrieval_queries.yaml` (7 queries,
+   fb_ids verified live before locking) + `pipeline/retrieval_benchmark.py`.
+3. ✅ **Baseline measured** — vector=hybrid **recall 1.000 / MRR 0.857 / P@k 0.100**; FTS recall 0.000 (natural-
+   language vocabulary mismatch — proves vector leg carries retrieval).
+4. ⚖️ **S2 reranker A/B (bge-reranker-v2-m3, cached+verified)** — MRR 0.857→0.606 → **GATED OFF**.
+5. ⚖️ **S1 contextual A/B** — recall 1.000→0.857 → **GATED OFF**.
+6. ✅ **No regression** — full suite 182 passed (was 174).
+
 ### Remaining deferred live tests
-- End-to-end agentic retrieval precision — requires a golden query set (still open).
-- S2 cross-encoder A/B — **blocked**: no local reranker model installed (`ollama list` has none); needs a
-  held-out precision benchmark before enabling (per research doc gate).
+- Enlarge golden query set 7→~30 (the current 7 all resolve at recall 1.0 via vector, so the harness cannot yet
+  discriminate S1/S2 wins — a larger, harder set with near-miss distractors is the next un-gating step).
+- S3 HyDE — gated on S1 + a larger golden set.
+- End-to-end agentic retrieval precision — needs the enlarged golden set.
 
 ---
 

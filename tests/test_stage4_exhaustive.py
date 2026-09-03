@@ -33,7 +33,9 @@ mapping_tests = [
     ("visual communication", "domain", "graphic design", "synonym match"),
     ("neuroaesthetics", "domain", "emerging", "novel label → emerging"),
     ("thermo-economics", "discipline", "emerging", "novel discipline → emerging"),
-    ("design strategy", "discipline", "design strategy", "exact discipline match"),
+    # D2512: was "design strategy" — demoted to a DOMAIN (Drift C). Use a still-canonical
+    # discipline for the "exact discipline match" case.
+    ("design thinking", "discipline", "design thinking", "exact discipline match"),
     ("", "domain", "emerging", "empty string → emerging"),
     ("cognitive science", "discipline", "cognitive science", "exact discipline match"),
     # D2133 (2026-08-03): "artificial intelligence" added to taxonomy. Using a

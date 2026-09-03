@@ -70,15 +70,30 @@ try:
     from pipeline.pipeline_paths import (
         E2E_MIN_PASS_RATE as _E2E_MIN_PASS_RATE_CFG,
     )
+    from pipeline.pipeline_paths import (
+        E2E_CORPUS_AWARE_PASS_RATE as _E2E_CORPUS_AWARE_PASS_RATE_CFG,
+    )
+    from pipeline.pipeline_paths import (
+        E2E_CONVERGENT_MIN_PASS_RATE as _E2E_CONVERGENT_MIN_PASS_RATE_CFG,
+    )
+    from pipeline.pipeline_paths import (
+        E2E_SINGLE_SOURCE_MIN_PASS_RATE as _E2E_SINGLE_SOURCE_MIN_PASS_RATE_CFG,
+    )
     BORP_MIN_SOURCES: int = E2E_BORP_MIN_SOURCES
     E2E_MIN_PASS_RATE: float = _E2E_MIN_PASS_RATE_CFG
     E2E_MIN_FBS: int = _E2E_MIN_FBS_CFG
     E2E_CONVERGENT_RATIO: float = _E2E_CONVERGENT_RATIO_CFG
+    E2E_CORPUS_AWARE_PASS_RATE: bool = _E2E_CORPUS_AWARE_PASS_RATE_CFG
+    E2E_CONVERGENT_MIN_PASS_RATE: float = _E2E_CONVERGENT_MIN_PASS_RATE_CFG
+    E2E_SINGLE_SOURCE_MIN_PASS_RATE: float = _E2E_SINGLE_SOURCE_MIN_PASS_RATE_CFG
 except (ImportError, AttributeError):
     BORP_MIN_SOURCES = 2
     E2E_MIN_PASS_RATE = 0.80
     E2E_MIN_FBS = 30
     E2E_CONVERGENT_RATIO = 0.25
+    E2E_CORPUS_AWARE_PASS_RATE = False
+    E2E_CONVERGENT_MIN_PASS_RATE = 0.25
+    E2E_SINGLE_SOURCE_MIN_PASS_RATE = 0.20
 
 
 # D2311/C12: per-stage timeout from pipeline_config.yaml (no hardcoded 600s).
@@ -239,13 +254,43 @@ def validate_results() -> dict:
         count = len(fbs)
         passed = sum(1 for fb in fbs if fb.get("status") == "PASS")
         rate = passed / count if count else 0
-        ok = rate >= E2E_MIN_PASS_RATE
-        results["checks"].append({
-            "check": "verify_pass_rate",
-            "value": f"{passed}/{count} ({rate:.1%})",
-            "threshold": f"≥{E2E_MIN_PASS_RATE:.0%}",
-            "passed": ok,
-        })
+        if E2E_CORPUS_AWARE_PASS_RATE:
+            # D2531: corpus-aware gate — each origin tier vs its own observed floor.
+            # origin == "convergent" (or is_convergent True) is the NLI-verifiable
+            # tier; single_source FBs are structurally less entailable (weak/absent
+            # cross-source evidence), so they get a lower floor. This is OPT-IN:
+            # the legacy single-threshold path below remains the default.
+            conv = [fb for fb in fbs if fb.get("origin") == "convergent" or fb.get("is_convergent") is True]
+            ss = [fb for fb in fbs if fb not in conv]
+
+            def _rate(items: list[dict]) -> float:
+                return sum(1 for fb in items if fb.get("status") == "PASS") / len(items) if items else 0.0
+
+            conv_rate = _rate(conv)
+            ss_rate = _rate(ss)
+            conv_ok = conv_rate >= E2E_CONVERGENT_MIN_PASS_RATE
+            ss_ok = ss_rate >= E2E_SINGLE_SOURCE_MIN_PASS_RATE
+            ok = conv_ok and ss_ok
+            results["checks"].append({
+                "check": "verify_pass_rate",
+                "value": (
+                    f"{passed}/{count} overall ({rate:.1%}); "
+                    f"convergent {_rate(conv):.1%} (≥{E2E_CONVERGENT_MIN_PASS_RATE:.0%} "
+                    f"{'✓' if conv_ok else '✗'}); "
+                    f"single-source {_rate(ss):.1%} (≥{E2E_SINGLE_SOURCE_MIN_PASS_RATE:.0%} "
+                    f"{'✓' if ss_ok else '✗'})"
+                ),
+                "threshold": "corpus-aware (D2531, opt-in)",
+                "passed": ok,
+            })
+        else:
+            ok = rate >= E2E_MIN_PASS_RATE
+            results["checks"].append({
+                "check": "verify_pass_rate",
+                "value": f"{passed}/{count} ({rate:.1%})",
+                "threshold": f"≥{E2E_MIN_PASS_RATE:.0%}",
+                "passed": ok,
+            })
         if not ok:
             results["passed"] = False
     else:

@@ -1,0 +1,146 @@
+# Golden retrieval query set — D2511 (benchmark harness un-gates S1/S2/S3).
+# =============================================================================
+# Each entry maps a natural-language query to the fb_id(s) it MUST retrieve.
+# fb_ids are committed FBs (status=PASS) verified to be the semantically-correct
+# answer via live hybrid search BEFORE locking them in (no false-positive goldens).
+#
+# Contract:
+#   - `query`      : natural-language retrieval query (what a user would type)
+#   - `expected`   : list of fb_id prefixes (≥8 hex chars) that are correct hits
+#   - `query_type` : vocabulary-overlap | synonym | cross-domain | abstract
+#                    (used to segment benchmark results by difficulty)
+#
+# Vocabulary-overlap queries are "easy" for FTS; synonym/abstract queries are
+# where the VECTOR leg must carry the retrieval (the exact gap M1/D2509 fixed).
+# Do NOT edit expected ids without re-verifying against the live DB.
+
+version: 1
+queries:
+  - query: "how do organizations recover from a major crisis"
+    expected: ["569e02f7758cd4b0"]   # Collective Intelligence Recovery
+    query_type: synonym
+
+  - query: "what makes teams psychologically safe"
+    expected: ["ab309999655e95c5"]   # Psychological Safety Through Shared Risk
+    query_type: synonym
+
+  - query: "why do feedback loops stabilize a system"
+    expected: ["46ff833cc83971dc"]   # Optimization Through Feedback Loops
+    query_type: vocabulary-overlap
+
+  - query: "how to build resilient distributed systems"
+    expected: ["cd98caf61c6ab956"]   # Site Reliability Engineering (sre) Principles
+    query_type: synonym
+
+  - query: "how does the decoy effect influence choice"
+    expected: ["d5caf12be54189f5"]   # Paradox of Choice Overload
+    query_type: abstract
+
+  - query: "can a large language model be compressed into a smaller one"
+    expected: ["be2fda2c919d983b"]   # Model Distillation Efficiency
+    query_type: synonym
+
+  - query: "why is time treated like money"
+    expected: ["1cb6217d2ca696bf"]   # Time As Commodity
+    query_type: abstract
+
+  # ── D2511 enlargement: 9 clean PASS FBs (source_diversity ≥ 46, diverse disciplines) ──
+  # Each query→fb_id verified live (hybrid top-10) BEFORE locking. These are all
+  # "clean" = PASS + convergent (sd ≥ 2) + non-summary, so the golden set is not
+  # contaminated by quarantine or near-duplicate FBs.
+
+  - query: "why is a task that matches your skill level more engaging"
+    expected: ["af3dddb499d8b5fb"]   # Optimal Challenge Drive (psychology)
+    query_type: synonym
+
+  - query: "why does the same color mean different things in different cultures"
+    expected: ["3a01753c57091244"]   # Color As Cultural and Emotional Marker (cultural studies)
+    query_type: abstract
+
+  - query: "how do signs and symbols get their meaning from context"
+    expected: ["85f3d9ee31e5e055"]   # Indexical Signification Through Contextual Relation (semiotics)
+    query_type: synonym
+
+  - query: "why does too much information make it hard to understand a design"
+    expected: ["14a097edd4af3831"]   # Information Processing Load (psychology)
+    query_type: abstract
+
+  - query: "how does brainstorming produce more ideas"
+    expected: ["2351d0bdb479fda4"]   # Idea Generation Through Divergent Thinking (cognitive science)
+    query_type: synonym
+
+  - query: "why should you accept that problems are too complex to fully solve"
+    expected: ["9eb33a81d599fd95"]   # Mindful Acceptance of Complexity (operations research)
+    query_type: abstract
+
+  - query: "how do decision makers gather information before choosing"
+    expected: ["976a9ec288694754"]   # Information-driven Decision Making (operations research)
+    query_type: synonym
+
+  - query: "how do machine learning systems get better over time automatically"
+    expected: ["cd0c3b87a00d7fd2"]   # Adaptive Learning Through Feedback Loops (machine learning)
+    query_type: synonym
+
+  - query: "why do myths and symbols carry shared meaning across a society"
+    expected: ["790421dac5e59d40"]   # Symbolic Meaning Translation (anthropology)
+    query_type: abstract
+
+  # ── D2517 enlargement: 14 clean PASS FBs (source_diversity ≥ 39, diverse disciplines) ──
+  # Each query→fb_id verified live (hybrid top-10) BEFORE locking. Same contract
+  # as above: clean PASS + convergent + non-summary, no false-positive goldens.
+
+  - query: "why does creating knowledge require collaboration across contributors"
+    expected: ["1939bc62db425c8d"]   # Collaborative Knowledge Construction (information science)
+    query_type: synonym
+
+  - query: "how does the style of a typeface convey meaning"
+    expected: ["b7c837fbf5ee70ae"]   # Typeface As Communicative Medium (typography)
+    query_type: synonym
+
+  - query: "how does combining doing, thinking, and refining produce creative change"
+    expected: ["d608b87f4681bdc5"]   # Flow-state Integration (psychology)
+    query_type: abstract
+
+  - query: "why does ai not need full human intelligence to be useful"
+    expected: ["8b96113ad8c4f596"]   # Artificial Enough Intelligence (artificial intelligence)
+    query_type: abstract
+
+  - query: "why must charts accurately represent the underlying data"
+    expected: ["21e3916ee2c3b3ad"]   # Data Visualization Truthfulness (information science)
+    query_type: synonym
+
+  - query: "why does focused practice with feedback improve a skill"
+    expected: ["6bb5b9da3adb938f"]   # Deliberate Practice Through Feedback Loops (psychology)
+    query_type: synonym
+
+  - query: "how does retrieval augmented generation keep answers coherent"
+    expected: ["46e671635de128dd"]   # Retrieval-augmented Generation for Contextual Coordination (machine learning)
+    query_type: synonym
+
+  - query: "how to make ai systems dependable before adding features"
+    expected: ["49fe3a3b4cfbcaad"]   # Reliability-first Ai Integration (generative ai)
+    query_type: synonym
+
+  - query: "how do controlled experiments establish cause and effect"
+    expected: ["ddc3f974d46918bd"]   # Controlled Experimentation (research methodology)
+    query_type: synonym
+
+  - query: "how do ai systems amplify existing biases"
+    expected: ["1ec884b263abc5bd"]   # Bias Amplification in Ai Systems (artificial intelligence)
+    query_type: synonym
+
+  - query: "how do signs get their meaning from the relationship between sign, object, and interpreter"
+    expected: ["12a1f8b5b210a350"]   # Semiotic Sign Process (semiotics)
+    query_type: synonym
+
+  - query: "why does the first piece of information anchor our judgment"
+    expected: ["31d4c18164a3c895"]   # First-information Bias (psychology)
+    query_type: synonym
+
+  - query: "how do small consistent investments compound over time"
+    expected: ["318671a7afa2ca0a"]   # Compound Effect of Strategic Investment (operations research)
+    query_type: synonym
+
+  - query: "how does visual tone and contrast shape a design"
+    expected: ["211a5a82380864bc"]   # Visual Tone and Contrast in Design (visual perception)
+    query_type: synonym

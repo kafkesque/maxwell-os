@@ -293,9 +293,21 @@ TAXONOMY_REPLACEMENT_THRESHOLD = float(_CFG.get("taxonomy", {}).get("replacement
 TAXONOMY_EMERGING_FREQ = int(_CFG.get("taxonomy", {}).get("emerging_freq_threshold", 10))
 TAXONOMY_MAX_DOMAINS = int(_CFG.get("taxonomy", {}).get("max_domains", 35))      # D2378: canonical cap (was hardcoded 25 in taxonomy_manager.py)
 TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 75))  # D2378/D2504: canonical cap (was hardcoded 47; default 72→75 to match live taxonomy_v5.yaml)
+D2399_PROMOTIONS_FROZEN = bool(_CFG.get("taxonomy", {}).get("d2399_promotions_frozen", False))          # D2519/D2399 policy A: manual freeze kill-switch
+D2399_ALLOW_BOTH_AXES_EMERGING = bool(_CFG.get("taxonomy", {}).get("d2399_allow_both_axes_emerging", False))  # D2519: never promote a both-axes-emerging label
 
 # ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
+RERANK_ENABLED = bool(_CFG.get("rerank", {}).get("enabled", False))   # D2521 (S2): production rerank adoption gate
+
+# D2537: opt-in fused quality ranking (replaces dead borp_score ordering)
+RANKING_QUALITY_SCORE_ENABLED = bool(_CFG.get("ranking", {}).get("quality_score_enabled", False))
+RANKING_CONFIDENCE_WEIGHT = float(_CFG.get("ranking", {}).get("confidence_weight", 1.0))
+RANKING_CONVERGENT_BOOST = float(_CFG.get("ranking", {}).get("convergent_boost", 0.10))
+RANKING_DIVERSITY_BOOST = float(_CFG.get("ranking", {}).get("diversity_boost", 0.05))
+HYDE_ENABLED = bool(_CFG.get("hyde", {}).get("enabled", False))       # D2521 (S3): HyDE harness gate
+HYDE_MODEL = str(_CFG.get("hyde", {}).get("model") or GEN_MODEL)      # D2521 (S3): hypothetical-doc generator model
+HYDE_MAX_TOKENS = int(_CFG.get("hyde", {}).get("max_tokens", 256))    # D2521 (S3): hypothesis length cap
 
 # ── Coverage settings (T0.3) ─────────────────────────────────────────
 COVERAGE_THRESHOLD = float(_CFG.get("coverage", {}).get("threshold", 0.50))
@@ -306,6 +318,10 @@ E2E_BORP_MIN_SOURCES = int(_CFG.get("e2e", {}).get("borp_min_sources", 2))
 E2E_MIN_PASS_RATE = float(_CFG.get("e2e", {}).get("min_pass_rate", 0.80))
 E2E_MIN_FBS = int(_CFG.get("e2e", {}).get("min_fbs", 30))
 E2E_CONVERGENT_RATIO = float(_CFG.get("e2e", {}).get("convergent_ratio", 0.25))
+# D2531: corpus-aware verify pass-rate (OPT-IN). See e2e.corpus_aware_pass_rate.
+E2E_CORPUS_AWARE_PASS_RATE = bool(_CFG.get("e2e", {}).get("corpus_aware_pass_rate", {}).get("enabled", False))
+E2E_CONVERGENT_MIN_PASS_RATE = float(_CFG.get("e2e", {}).get("corpus_aware_pass_rate", {}).get("convergent_min_pass_rate", 0.25))
+E2E_SINGLE_SOURCE_MIN_PASS_RATE = float(_CFG.get("e2e", {}).get("corpus_aware_pass_rate", {}).get("single_source_min_pass_rate", 0.20))
 
 # ── Stage 1.5 settings (D2094: FAISS cluster) ─────────────────────────
 S15_FAISS_THRESHOLD = float(_CFG.get("stage1_5", {}).get("faiss_threshold", 0.75))

@@ -641,14 +641,21 @@ def _build_body_schema_text() -> str:
             lines.append(f"- {role}: {', '.join(fields)}")
     lines.append(
         "  (steps/actors/parameters are JSON arrays; every other field is a string. "
-        "elaboration is PRINCIPLE-ONLY: REQUIRED for principle — never leave it empty, "
-        "write 3-5 sentences of deeper nuance; if the passage adds no explicit nuance, "
-        "DERIVE it from the implications of mechanism + boundary + consequence. For "
-        "process_template / process_instance / growth_edge / tool_instruction, elaboration "
-        'MUST be empty (""). parameters is REQUIRED for tool_instruction — extract every '
-        "input/argument the tool takes (name, type, what it does); emit [] ONLY if the "
-        "passage clearly shows the tool takes no inputs; never omit the key. Other fields "
-        "may be left empty only when the passage does not provide them.)"
+        "For process_template / process_instance / growth_edge / tool_instruction, "
+        'elaboration MUST be empty (""). parameters is REQUIRED for tool_instruction — '
+        "extract every input/argument the tool takes (name, type, what it does); emit [] "
+        "ONLY if the passage clearly shows the tool takes no inputs; never omit the key. "
+        "Other fields may be left empty only when the passage does not provide them.)"
+    )
+    lines.append(
+        "⚠️ elaboration is MANDATORY for principle: ALWAYS emit a NON-EMPTY elaboration "
+        "(3-5 sentences) — never omit the key and never set it to \"\". Write deeper "
+        "nuance: edge cases, exceptions, hidden assumptions, and when/why the principle "
+        "breaks down. If the passage adds no explicit nuance, DERIVE it from the "
+        "implications of mechanism + boundary + consequence. If you genuinely cannot "
+        "write any elaboration, the object is NOT a principle — reclassify content_type "
+        "(process_template / process_instance / growth_edge / tool_instruction) or return "
+        "route=NULL."
     )
     return "\n".join(lines)
 
@@ -1487,6 +1494,11 @@ def format_golden_fewshot(pos_examples: list[dict], neg_examples: list[dict] | N
                 "mechanism": fb_item.get("mechanism", ""),
                 "boundary": fb_item.get("boundary", ""),
                 "consequence": fb_item.get("consequence", ""),
+                # D2448 fix: elaboration is core_body and REQUIRED for principle.
+                # It was silently omitted from the convergent few-shots too — the
+                # model could learn "elaboration is optional" and drop it on thin
+                # clusters (same root cause as the single-source empty-elaboration).
+                "elaboration": fb_item.get("elaboration", ""),
                 "is_summary": fb_item.get("is_summary", False),
                 # D2376: no silent causal_mechanism default — an example that lacks
                 # extraction_type shows "" (honest), never over-claims the strongest
@@ -1556,6 +1568,11 @@ def format_golden_fewshot_single_source(
                 "mechanism": fb_item.get("mechanism", ""),
                 "boundary": fb_item.get("boundary", ""),
                 "consequence": fb_item.get("consequence", ""),
+                # D2448 fix: elaboration is core_body and PRINCIPLE-ONLY (empty for
+                # PT/PI/GE/TI). It MUST appear in the principle few-shots with its
+                # non-empty value, otherwise the model learns "elaboration is
+                # optional" and omits it on thin single-source clusters.
+                "elaboration": fb_item.get("elaboration", ""),
                 "is_summary": fb_item.get("is_summary", False),
                 "extraction_type": fb_item.get("extraction_type", ""),
                 "content_type": fb_item.get("content_type", "principle"),
@@ -1639,6 +1656,13 @@ def discover_principles(
                        across calls without shared global state. If provided,
                        error_counter[0] is incremented on LLM failures.
     """
+    # BUG-193 (D2525): `CircuitOpenError` is caught below (D2211 breaker-open
+    # abort) but was never imported in this scope — a breaker-open would raise
+    # `NameError` and mask the real condition (C16 fail-loud violation).
+    # Deferred local import matches the existing call_llm/run_stage2 pattern
+    # (no module-level circular-import risk).
+    from pipeline.omlx_call import CircuitOpenError  # noqa: F401
+
     seg_ids: list[str] = cluster.get("segment_ids", [])
     if not seg_ids:
         return 1

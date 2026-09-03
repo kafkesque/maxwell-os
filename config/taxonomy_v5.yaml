@@ -1,4 +1,4 @@
-version: v5.1
+version: v5.5
 classification_version: v5.0.1
 groups:
   domain:
@@ -45,6 +45,14 @@ domains:
   - brand strategy
   - Brand Strategy
   - Branding
+  - brand communication
+  - corporate branding
+  - personal branding
+  - product branding
+  - digital branding
+  - brand development
+  - brand storytelling
+  - brand identity design
 - canonical: editorial & advertising
   group: Visual Practice
   raw:
@@ -55,6 +63,12 @@ domains:
   - copywriting
   - presentation
   - Presentation Design
+  - advertising strategy
+  - online advertising
+  - advertising research
+  - media planning
+  - printing technology
+  - Printing Technology
 - canonical: motion design
   group: Visual Practice
   raw:
@@ -107,6 +121,8 @@ domains:
   - Information Visualization
   - Data Storytelling
   - infographics
+  - cartography
+  - Cartography
 - canonical: creative technology
   group: Digital & Interactive
   raw:
@@ -198,6 +214,12 @@ domains:
   - Knowledge Management
   - business analytics
   - operations management
+  - human resource management
+  - Human Resource Management
+  - retail management
+  - Retail Management
+  - technology management
+  - Technology Management
 - canonical: business development
   group: Business & Strategy
   raw:
@@ -207,6 +229,8 @@ domains:
   - Sales Communication
   - Sales Psychology
   - Sales and Persuasion
+  - sales management
+  - Sales Management
 - canonical: entrepreneurship
   group: Business & Strategy
   raw:
@@ -236,6 +260,8 @@ domains:
   - startup
   - startups
   - founders
+  - entrepreneurial management
+  - Entrepreneurial Management
 - canonical: organizational behavior
   group: Business & Strategy
   raw:
@@ -253,6 +279,8 @@ domains:
   - organizational culture
   - team dynamics
   - workplace psychology
+  - change management
+  - Change Management
 - canonical: ai & agents
   group: AI & Computing
   raw:
@@ -272,24 +300,15 @@ domains:
   - AI agents
   - agentic workflows
   - agent frameworks
-- canonical: ml systems & infrastructure
-  group: AI & Computing
+- canonical: urban planning
+  group: Business & Strategy
   raw:
-  - Machine Learning Engineering
-  - Machine Learning Systems
-  - Neural Networks
-  - Deep Learning
-  - Generative AI Systems
-  - Generative AI Engineering
-  - Generative AI Infrastructure
-  - Generative AI Output Reliability
-  - Large Language Models
-  - LLM Architecture
-  - LLM Serving and Optimization
-  - LLM Application Development
-  - AI systems
-  - model deployment
-  - MLOps
+  - Urban Planning
+  - urban planning
+  - urbanism
+  - city planning
+  - town planning
+  - urban design
 - canonical: engineering practice
   group: AI & Computing
   raw:
@@ -468,6 +487,8 @@ domains:
   - academic curriculum development
   - e-learning
   - training
+  - educational technology
+  - Educational Technology
 - canonical: health & wellness
   group: Systems, Semiotics & Knowledge
   raw:
@@ -487,6 +508,8 @@ domains:
   - spirituality
   - psychedelic studies
   - wellbeing
+  - public health policy
+  - Public Health Policy
 - canonical: finance & investment
   group: Business & Strategy
   raw:
@@ -517,6 +540,39 @@ domains:
   - Collaborative Platforms
   - brand marketing
   - advertising
+  - Marketing
+  - marketing
+  - Marketing Strategy
+  - Brand Management
+  - Brand Strategy
+  - brand strategy
+  - Content Strategy
+  - Sales
+  - Sales Communication
+  - Sales Psychology
+  - e-commerce
+  - growth marketing
+  - marketing science
+  - marketing analytics
+  - product marketing
+  - marketing research
+  - sales enablement
+  - marketing automation
+  - marketing operations
+  - consumer marketing
+  - retail marketing
+  - global marketing
+  - content marketing
+  - sales operations
+  - market analysis
+  - event marketing
+  - experiential marketing
+  - b2b marketing
+  - email marketing
+  - direct marketing
+  - search engine marketing
+  - marketing management
+  - Marketing Management
 - canonical: legal & public policy
   group: Business & Strategy
   raw:
@@ -605,6 +661,8 @@ domains:
   - digital media
   - Digital Media Studies
   - film studies
+  - audio engineering
+  - Audio Engineering
 - canonical: social sciences
   group: Systems, Semiotics & Knowledge
   raw:
@@ -614,6 +672,114 @@ domains:
   - social research
   - demography
   - Anthropological Linguistics
+- canonical: product design
+  group: Digital & Interactive
+  raw:
+  - product design
+  - Product Design
+- canonical: design strategy
+  group: Business & Strategy
+  raw:
+  - practice strategy
+  - Practice Strategy
+  - Design Strategy
+  - design strategy
+  - Design Management
+  - Design Process
+  - design process
+  - Design Research
+  - Design Research Investigation
+  - Scoping
+  - scoping
+  - Product Strategy
+  - UX Strategy
+  - Design Education
+  - Strategy
+  - design studies
+- canonical: project management
+  group: Business & Strategy
+  raw:
+  - Project Management
+  - project management
+  - Product Management
+  - Product Development
+  - Product Discovery
+  - Operations Management
+  - Supply Chain Management
+  - Resource Management
+  - business process management
+- canonical: leadership
+  group: Business & Strategy
+  raw:
+  - Leadership
+  - leadership
+  - Organizational Leadership
+  - Strategic Leadership
+  - Team Dynamics
+  - Conflict Resolution
+  - Stakeholder Engagement
+  - human resources
+  - people management
+  - organizational leadership
+  - leadership studies
+  - organizational design
+  - creative management
+  - Creative Management
+- canonical: personal productivity
+  group: Business & Strategy
+  raw:
+  - Personal Productivity
+  - personal productivity
+  - personal development
+  - Personal Development
+  - Personal Effectiveness
+  - Time Management
+  - Career Development
+  - Career Strategy
+  - Professional Development
+  - Professional Practice
+  - Execution
+  - Productivity
+  - productivity
+  - Remote Work and Burnout Prevention
+- canonical: industrial design
+  group: Illustration & Craft
+  raw:
+  - industrial design
+  - Industrial Design
+- canonical: information architecture
+  group: Digital & Interactive
+  raw:
+  - Information Architecture
+  - information architecture
+  - Information Architecture For the Web and Beyond
+  - Information Design
+  - Information Graphics
+  - Information Graphics and Visualization
+  - Labeling Systems
+  - Taxonomy Design
+  - Taxonomy and Classification
+  - Controlled Vocabularies
+  - Search and Navigation
+  - Navigation Design
+  - Search Interface Design
+  - Search Systems
+  - Web Navigation
+  - Web Navigation Design
+- canonical: design systems
+  group: Digital & Interactive
+  raw:
+  - Design Systems
+  - design systems
+  - Design System
+  - design system
+  - Atomic Design
+  - atomic design
+  - Building Design Systems
+  - Design That Scales
+  - Design Systems Governance
+  - Design Operations
+  - Modularity
 disciplines:
 - canonical: visual perception
   group: Perception & Signal
@@ -662,13 +828,6 @@ disciplines:
   - media semiotics
   - history of semiotics
   - classical semiotic theory
-- canonical: multimodal metaphor
-  group: Perception & Signal
-  raw:
-  - Multimodal Metaphor
-  - multimodal metaphor
-  - Metaphorically Selling
-  - Metaphorical Selling
 - canonical: typography
   group: Form & Structure
   raw:
@@ -694,31 +853,6 @@ disciplines:
   - Color Psychology
   - Color and design
   - Color Theory & Layout
-- canonical: composition & layout
-  group: Form & Structure
-  raw:
-  - composition+layout
-  - Composition + Layout
-  - Layout
-  - Layout Essentials
-  - Layout and Composition
-  - Layout Design
-  - Layout and Typography
-  - Grid Systems
-  - Grid & Spatial Systems
-  - grid+spatial system
-  - Layout & Typography
-  - Layout and Grid Systems
-  - page layout
-  - Graphic Design Layout
-  - structural forms
-- canonical: geometry & proportion
-  group: Form & Structure
-  raw:
-  - geometry+proportion
-  - Geometry and Proportions
-  - Geometry
-  - sacred geometry
 - canonical: motion & time
   group: Form & Structure
   raw:
@@ -736,14 +870,6 @@ disciplines:
   - Film Production
   - Film Studies
   - motion graphics design
-- canonical: iconography
-  group: Form & Structure
-  raw:
-  - visual language+iconography
-  - Iconography & Visual Language
-  - iconography
-  - Visual Language
-  - symbolism
 - canonical: design psychology
   group: Design Cognition
   raw:
@@ -754,69 +880,6 @@ disciplines:
   - Emotional Design
   - emotional design
   - Design Psychology
-- canonical: information architecture
-  group: Design Cognition
-  raw:
-  - Information Architecture
-  - information architecture
-  - Information Architecture For the Web and Beyond
-  - Information Design
-  - Information Graphics
-  - Information Graphics and Visualization
-  - Labeling Systems
-  - Taxonomy Design
-  - Taxonomy and Classification
-  - Controlled Vocabularies
-  - Search and Navigation
-  - Navigation Design
-  - Search Interface Design
-  - Search Systems
-  - Web Navigation
-  - Web Navigation Design
-- canonical: narrative design
-  group: Design Cognition
-  raw:
-  - narrative design
-  - Narrative Design
-  - Storytelling
-  - storytelling
-  - Narrative
-  - Visual Storytelling
-  - Data Storytelling
-  - Design is storytelling
-- canonical: design systems
-  group: Design Cognition
-  raw:
-  - Design Systems
-  - design systems
-  - Design System
-  - design system
-  - Atomic Design
-  - atomic design
-  - Building Design Systems
-  - Design That Scales
-  - Design Systems Governance
-  - Design Operations
-  - Modularity
-- canonical: design strategy
-  group: Design Cognition
-  raw:
-  - practice strategy
-  - Practice Strategy
-  - Design Strategy
-  - design strategy
-  - Design Management
-  - Design Process
-  - design process
-  - Design Research
-  - Design Research Investigation
-  - Scoping
-  - scoping
-  - Product Strategy
-  - UX Strategy
-  - Design Education
-  - Strategy
-  - design studies
 - canonical: creative process
   group: Design Cognition
   raw:
@@ -873,6 +936,14 @@ disciplines:
   - persuasion
   - Rhetoric
   - rhetoric
+- canonical: organizational theory
+  group: Behavioral & Cognitive
+  raw:
+  - Organizational Theory
+  - organizational theory
+  - organization theory
+  - organisational theory
+  - organizational studies
 - canonical: decision making
   group: Behavioral & Cognitive
   raw:
@@ -907,6 +978,8 @@ disciplines:
   - educational psychology
   - developmental psychology
   - industrial-organizational psychology
+  - environmental psychology
+  - Environmental Psychology
 - canonical: linguistics
   group: Behavioral & Cognitive
   raw:
@@ -918,21 +991,6 @@ disciplines:
   - computational linguistics
   - sociolinguistics
   - pragmatics
-- canonical: leadership
-  group: Operational & Strategy
-  raw:
-  - Leadership
-  - leadership
-  - Organizational Leadership
-  - Strategic Leadership
-  - Team Dynamics
-  - Conflict Resolution
-  - Stakeholder Engagement
-  - human resources
-  - people management
-  - organizational leadership
-  - leadership studies
-  - organizational design
 - canonical: strategic thinking
   group: Operational & Strategy
   raw:
@@ -947,18 +1005,6 @@ disciplines:
   - strategy formulation
   - competitive strategy
   - organizational change management
-- canonical: project management
-  group: Operational & Strategy
-  raw:
-  - Project Management
-  - project management
-  - Product Management
-  - Product Development
-  - Product Discovery
-  - Operations Management
-  - Supply Chain Management
-  - Resource Management
-  - business process management
 - canonical: risk management
   group: Operational & Strategy
   raw:
@@ -967,57 +1013,6 @@ disciplines:
   - Quality Assurance
   - compliance
   - safety engineering
-- canonical: personal productivity
-  group: Operational & Strategy
-  raw:
-  - Personal Productivity
-  - personal productivity
-  - personal development
-  - Personal Development
-  - Personal Effectiveness
-  - Time Management
-  - Career Development
-  - Career Strategy
-  - Professional Development
-  - Professional Practice
-  - Execution
-  - Productivity
-  - productivity
-  - Remote Work and Burnout Prevention
-- canonical: marketing
-  group: Operational & Strategy
-  raw:
-  - Marketing
-  - marketing
-  - Marketing Strategy
-  - Brand Management
-  - Brand Strategy
-  - brand strategy
-  - Content Strategy
-  - advertising
-  - Advertising
-  - Sales
-  - Sales Communication
-  - Sales Psychology
-  - Marketing Communications
-  - Digital Marketing
-  - Strategic Marketing
-  - public relations
-  - sensory marketing
-  - pricing strategy
-  - Market Research
-  - Social Media Marketing
-  - Influencer Marketing
-  - Consumer Psychology
-  - Customer Psychology
-  - e-commerce
-  - Crowdsourcing
-  - Social Media
-  - Collaborative Platforms
-  - growth marketing
-  - brand marketing
-  - marketing science
-  - marketing analytics
 - canonical: systems thinking
   group: Systems & Method
   raw:
@@ -1098,6 +1093,8 @@ disciplines:
   - statistical inference
   - qualitative research methodology
   - qualitative research methods
+  - survey methodology
+  - Survey Methodology
 - canonical: operations research
   group: Systems & Method
   raw:
@@ -1109,31 +1106,6 @@ disciplines:
   - Game Theory
   - Simulation
   - management science
-- canonical: prompt engineering
-  group: AI & Computing
-  raw:
-  - Prompt Engineering
-  - prompt engineering
-  - Prompt Engineering for Generative AI
-  - prompt design
-  - few-shot prompting
-- canonical: agentic architecture
-  group: AI & Computing
-  raw:
-  - Agentic Architectural Patterns
-  - Agentic Architectural Patterns for Building Multi Agent Systems
-  - Multi-Agent Systems
-  - multi-agent systems
-  - Multi-Agent Systems Architecture
-  - AI Agent Architecture
-  - Agentic Systems
-  - Agentic AI
-  - Agentic AI Systems
-  - Agentic Artificial Intelligence
-  - Designing Multi-Agent Systems
-  - Agentic AI for Engineers
-  - AI Agents and Applications
-  - autonomous agents
 - canonical: machine learning
   group: AI & Computing
   raw:
@@ -1152,6 +1124,8 @@ disciplines:
   - pattern recognition
   - supervised learning
   - deep learning
+  - reinforcement learning
+  - Reinforcement Learning
 - canonical: generative ai
   group: AI & Computing
   raw:
@@ -1248,13 +1222,6 @@ disciplines:
   - game design
   - Game Studies
   - Interactive Design
-- canonical: social engineering
-  group: Heterodox
-  raw:
-  - Social Engineering
-  - social engineering
-  - OSINT
-  - Intelligence Analysis
 - canonical: political economy
   group: Heterodox
   raw:
@@ -1281,6 +1248,8 @@ disciplines:
   - community development
   - governance
   - public policy analysis
+  - international relations
+  - International Relations
 - canonical: privacy & surveillance
   group: Heterodox
   raw:
@@ -1315,6 +1284,10 @@ disciplines:
   - moral philosophy
   - design ethics
   - artificial intelligence ethics
+  - bioethics
+  - Bioethics
+  - formal logic
+  - Formal Logic
 - canonical: artificial intelligence
   group: AI & Computing
   raw:
@@ -1323,6 +1296,8 @@ disciplines:
   - AI
   - AGI
   - general intelligence
+  - AI safety
+  - AI Safety
 - canonical: communication theory
   group: Perception & Signal
   raw:
@@ -1393,6 +1368,8 @@ disciplines:
   - productivity economics
   - auction theory
   - business economics
+  - econometrics
+  - Econometrics
 - canonical: sociology
   group: Heterodox
   raw:
@@ -1406,6 +1383,8 @@ disciplines:
   - Sociology of Work and Organizations
   - sociology of work
   - sociology of science
+  - social movement theory
+  - Social Movement Theory
 - canonical: anthropology
   group: Heterodox
   raw:
@@ -1472,6 +1451,8 @@ disciplines:
   - Privacy Law
   - jurisprudence
   - legal theory
+  - constitutional law
+  - Constitutional Law
 - canonical: information security
   group: Heterodox
   raw:
@@ -1569,29 +1550,40 @@ disciplines:
   - materials engineering
   - design engineering
   - computer architecture
+  - manufacturing engineering
+  - Manufacturing Engineering
 - canonical: design thinking
   group: Design Cognition
   raw:
   - design thinking
   - Design Thinking
-- canonical: product design
-  group: Design Cognition
-  raw:
-  - product design
-  - Product Design
-- canonical: industrial design
-  group: Design Cognition
-  raw:
-  - industrial design
-  - Industrial Design
 - canonical: information retrieval
   group: AI & Computing
   raw:
   - information retrieval
   - Information Retrieval
+- canonical: computational theory
+  group: AI & Computing
+  raw:
+  - computational theory
+  - Computational Theory
+  - theory of computation
+  - Theory of Computation
+- canonical: computer networking
+  group: AI & Computing
+  raw:
+  - computer networking
+  - Computer Networking
+  - computer networks
+  - Computer Networks
 meta:
+  displaced_canonicals:
+  - social engineering
+  - ml systems & infrastructure
   catch_all_domain: emerging
   catch_all_discipline: emerging
-  catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.
+  catch_all_description: 'Used when no canonical domain or discipline fits the principle
+    ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
+    for future taxonomy expansion when enough principles accumulate under a label.
 
     '

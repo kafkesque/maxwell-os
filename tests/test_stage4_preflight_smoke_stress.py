@@ -211,6 +211,10 @@ def test_normalize_fb_name_title_case() -> None:
 def test_normalize_fb_name_truncation() -> None:
     out = normalize_fb_name("one two three four five six seven eight nine ten", max_words=4)
     assert len(out.split()) == 4
+    # BUG-196/D2517: truncation must slice the title-cased list (not the raw
+    # lowercase `words`) and append an ellipsis sentinel — a silent mid-word cut
+    # that also reverted casing was the bug.
+    assert out == "One Two Three Four\u2026"
 
 
 def test_check_name_unique_and_disambiguation() -> None:
@@ -223,8 +227,10 @@ def test_check_name_unique_and_disambiguation() -> None:
 # PREFLIGHT — classification validation + metadata derivation
 # ═══════════════════════════════════════════════════════════════════════════
 def test_validate_classification_clean() -> None:
+    # D2512: discipline was "design strategy" — demoted to a DOMAIN (Drift C);
+    # use a still-canonical discipline ("design thinking").
     ok, errors = validate_classification({
-        "discipline": "design strategy",
+        "discipline": "design thinking",
         "domains": ["graphic design"],
         "depth": "domain",
         "evidence": "cited",
@@ -243,9 +249,10 @@ def test_validate_classification_invalid() -> None:
 
 
 def test_validate_classification_discipline_list_backcompat() -> None:
-    res = {"discipline": ["design strategy"], "domains": ["graphic design"], "depth": "domain", "evidence": "cited"}
+    # D2512: "design strategy" demoted to DOMAIN (Drift C); use a still-canonical discipline.
+    res = {"discipline": ["design thinking"], "domains": ["graphic design"], "depth": "domain", "evidence": "cited"}
     validate_classification(res)
-    assert res["discipline"] == "design strategy"  # list → first element
+    assert res["discipline"] == "design thinking"  # list → first element
 
 
 def test_derive_difficulty_all_depths() -> None:

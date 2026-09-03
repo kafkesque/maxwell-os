@@ -31,6 +31,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
+from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
+from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
+    RANKING_QUALITY_SCORE_ENABLED,
+    RANKING_CONFIDENCE_WEIGHT,
+    RANKING_CONVERGENT_BOOST,
+    RANKING_DIVERSITY_BOOST,
+)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -89,6 +96,28 @@ def _status_predicate(include_quarantine: bool) -> str:
     return "status = 'PASS'"
 
 
+def _quality_field() -> str:
+    """D2537: the verified-populated quality signal vs the dead borp_score.
+
+    borp_score is ~all 0.0 (verified 3,310/3,310 PASS rows), so any `ORDER BY
+    borp_score` degenerates to rowid order. When RANKING_QUALITY_SCORE_ENABLED,
+    use S5 NLI confidence_score (avg 0.917, fully populated) instead.
+    """
+    return "confidence_score" if RANKING_QUALITY_SCORE_ENABLED else "borp_score"
+
+
+def _rank_sql() -> str:
+    """D2537: fused quality-score ORDER BY clause (config-gated)."""
+    if not RANKING_QUALITY_SCORE_ENABLED:
+        return "borp_score DESC"
+    return (
+        f"COALESCE(confidence_score, 0.5) * {RANKING_CONFIDENCE_WEIGHT} "
+        f"+ CASE WHEN is_convergent = 1 THEN {RANKING_CONVERGENT_BOOST} ELSE 0.0 END "
+        f"+ CASE WHEN source_diversity IS NOT NULL AND source_diversity >= 2 "
+        f"THEN {RANKING_DIVERSITY_BOOST} ELSE 0.0 END DESC"
+    )
+
+
 def search_keyword(
     conn: sqlite3.Connection,
     domain: str = None,
@@ -98,6 +127,8 @@ def search_keyword(
     include_quarantine: bool = False,
     limit: int = 20,
     exclude_summaries: bool = True,
+    discipline_raw: str = None,
+    domains_raw: str = None,
 ) -> list[dict]:
     """Keyword-based SQL search. Gracefully handles missing optional columns.
 
@@ -128,11 +159,18 @@ def search_keyword(
     if depth:
         conditions.append("depth = ?")
         params.append(depth)
+    # D2537: raw-label facets (surgical precision — finer grain than canonical buckets)
+    if discipline_raw:
+        conditions.append("LOWER(TRIM(discipline_raw)) = LOWER(?)")
+        params.append(discipline_raw)
+    if domains_raw:
+        conditions.append("domains_raw LIKE ?")
+        params.append(f"%{domains_raw}%")
     if exclude_summaries and has_is_summary:
         conditions.append("(is_summary = 0 OR is_summary IS NULL)")
 
     where: str = " AND ".join(conditions) if conditions else "1=1"
-    query: str = f"SELECT * FROM fbs WHERE {where} ORDER BY borp_score DESC LIMIT ?"
+    query: str = f"SELECT * FROM fbs WHERE {where} ORDER BY {_rank_sql()} LIMIT ?"
     params.append(limit)
 
     rows = conn.execute(query, params).fetchall()
@@ -182,7 +220,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
               {like_status}
               {like_summary}
               {like_class}
-            ORDER BY borp_score DESC
+            ORDER BY {_rank_sql()}
             LIMIT ?
         """, (like_query, like_query, like_query, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
@@ -193,12 +231,17 @@ def search_vector(
     query: str,
     limit: int = 20,
     include_quarantine: bool = False,
+    vec_table: str = "vec_fbs",
 ) -> list[dict]:
     """Vector similarity search using pre-computed sqlite-vec embeddings.
 
     BUG-004 FIX: Embeddings are pre-computed at Stage 6 commit time and stored
     in vec_fbs. Only the query is embedded at search time (O(1) not O(n)).
     Falls back to FTS if vec_fbs is not available.
+
+    D2511 (S1): `vec_table` lets callers query an alternate index (e.g.
+    `vec_fbs_ctx` built by backfill --contextual) for A/B without touching the
+    production vec_fbs.
     """
     try:
         import struct
@@ -223,12 +266,16 @@ def search_vector(
         # is computed BEFORE the status filter and QUARANTINE dominates the
         # corpus (58%) — filtering top-k=limit directly starves PASS to 0.
         knn_k = max(limit * 5, 100)
+        # C12/D2511: vec_table is a caller-supplied identifier (validated, not
+        # user-freeform) — sqlite-vec table names cannot be parameterized, and
+        # f-string interpolation is safe here because vec_table is an internal
+        # constant, never raw user input.
         try:
             rows = conn.execute(f"""
                 SELECT f.*, v.distance
                 FROM (
                     SELECT rowid, distance
-                    FROM vec_fbs
+                    FROM {vec_table}
                     WHERE definition_embedding MATCH ?
                       AND k = {int(knn_k)}
                 ) v
@@ -263,6 +310,9 @@ def search_hybrid(
     depth: str = None,
     limit: int = 20,
     include_quarantine: bool = False,
+    rerank: bool | None = None,
+    discipline_raw: str = None,
+    domains_raw: str = None,
 ) -> list[dict]:
     """D2176: True hybrid retrieval with Reciprocal Rank Fusion (RRF).
 
@@ -273,6 +323,10 @@ def search_hybrid(
 
     Falls back gracefully if vector search is unavailable (pre-computed
     vec_fbs table may not exist).
+
+    D2521 (S2): `rerank` controls the cross-encoder post-pass. None follows the
+    config `rerank.enabled` gate; True forces it; False disables it (so the
+    benchmark's raw-RRF "hybrid" baseline stays a clean A/B control).
     """
     RRF_K: int = 60  # RRF constant — higher = smoother rank blending
     POOL_SIZE: int = min(limit * 5, 100)  # Candidate pool per method
@@ -280,10 +334,19 @@ def search_hybrid(
     # 1. Collect ranked candidates from all three methods (D2330: quarantine opt-in)
     fts_results: list[dict] = search_fts(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
     vector_results: list[dict] = search_vector(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
-    kw_results: list[dict] = search_keyword(
-        conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE,
-        include_quarantine=include_quarantine,
-    )
+    # D2511 (BUG — RRF keyword-leg pollution): the "metadata/keyword" leg is only
+    # meaningful when the caller actually filters by domain/discipline/depth.
+    # With NO filter, search_keyword() returned `ORDER BY borp_score DESC` — and
+    # with borp_score ~all 0.0 that collapses to ROWID order, i.e. a CONSTANT list
+    # (e.g. "High Contrast Visual Design") injected into every query's RRF fusion.
+    # That diluted the real FTS+vector signal and made hybrid WORSE than vector.
+    kw_results: list[dict] = []
+    if domain or discipline or depth or discipline_raw or domains_raw:
+        kw_results = search_keyword(
+            conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE,
+            include_quarantine=include_quarantine,
+            discipline_raw=discipline_raw, domains_raw=domains_raw,
+        )
 
     # 2. Build RRF score map: fb_id → cumulative RRF score
     rrf_scores: dict[str, float] = {}
@@ -316,6 +379,18 @@ def search_hybrid(
         fb: dict = dict(fb_map[fid])
         fb["_rrf_score"] = round(rrf_scores[fid], 6)
         results.append(fb)
+
+    # D2521 (S2): cross-encoder re-rank over a slightly wider RRF pool. None
+    # defers to config `rerank.enabled`; True/False are explicit (benchmark A/B).
+    should_rerank = RERANK_ENABLED if rerank is None else rerank
+    if should_rerank and ranked_ids:
+        try:
+            from pipeline.rerank import rerank_candidates
+            pool_size = min(max(limit * 5, 20), 100)
+            pool = [dict(fb_map[fid]) for fid in ranked_ids[:pool_size]]
+            results = rerank_candidates(query, pool, top_k=limit)
+        except Exception as e:  # C24: degrade gracefully but loudly (no silent error)
+            print(f"  ⚠️  rerank unavailable ({e}); returning unfused RRF list")
 
     return results
 
@@ -617,7 +692,7 @@ def graph_aware_search(
     placeholders: str = ",".join("?" * len(all_fb_ids))
     rows = conn.execute(
         f"""SELECT *,
-            COALESCE(borp_score, 0.5) AS _borp,
+            COALESCE({_quality_field()}, 0.5) AS _borp,
             COALESCE(feedback_score, 0.5) AS _feedback
             FROM fbs
             WHERE fb_id IN ({placeholders})
@@ -636,7 +711,7 @@ def graph_aware_search(
         fb["_is_seed"] = is_seed
 
         # Graph-aware score: boost seed FBs, penalize distant ones
-        borp: float = float(fb.get("borp_score", 0.5) or 0.5)
+        borp: float = float(fb.get(_quality_field(), 0.5) or 0.5)
         feedback: float = float(fb.get("feedback_score", 0.5) or 0.5)
         graph_boost: float = 1.2 if is_seed else 0.9  # D2205: seed bias
         fb["_graph_score"] = borp * (1.0 + feedback) * graph_boost
@@ -849,6 +924,8 @@ def main():
     parser.add_argument("--domain", "-d", help="Filter by domain")
     parser.add_argument("--discipline", help="Filter by discipline")
     parser.add_argument("--depth", help="Filter by depth")
+    parser.add_argument("--discipline-raw", help="D2537: filter by raw discipline label (surgical facet)")
+    parser.add_argument("--domains-raw", help="D2537: filter by raw domain label (surgical facet)")
     parser.add_argument("--status", default="PASS", help="Filter by status (default: PASS)")
     parser.add_argument("--limit", "-n", type=int, default=10, help="Max results")
     parser.add_argument("--json", action="store_true", help="JSON output")
@@ -906,7 +983,7 @@ def main():
             discipline=args.discipline,
             depth=args.depth,
         )
-    elif args.keyword or (args.domain or args.discipline or args.depth):
+    elif args.keyword or (args.domain or args.discipline or args.depth or args.discipline_raw or args.domains_raw):
         results = search_keyword(
             conn,
             domain=args.domain,
@@ -914,6 +991,8 @@ def main():
             depth=args.depth,
             status=args.status,
             limit=args.limit,
+            discipline_raw=args.discipline_raw,
+            domains_raw=args.domains_raw,
         )
     elif args.fts:
         results = search_fts(conn, args.fts, limit=args.limit)
@@ -926,6 +1005,8 @@ def main():
             discipline=args.discipline,
             depth=args.depth,
             limit=args.limit,
+            discipline_raw=args.discipline_raw,
+            domains_raw=args.domains_raw,
         )
     elif args.query:
         # Default: hybrid search

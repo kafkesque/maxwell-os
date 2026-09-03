@@ -1,5 +1,7 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-08-29
+> **Updated:** 2026-09-03 (D2522)
+
+> **⚠️ CURRENT STATE (2026-09-03):** This register's older sections predate the S4/S5/S6 commit (7,873 FBs committed 2026-09-02, D2508/D2519). The "S4/S5/S6 frozen at 2,830" framing below is **stale** — S6 is COMMITTED. Retrieval A/B is now fully resolved: **S1 contextual REJECTED, S3 HyDE REJECTED, S2 rerank ENABLED** (D2522). See `SESSION-HANDOFF-2026-09-03.md` §3 for the authoritative priority/severity list of remaining tasks/bugs/decisions.
 
 ## 🚦 PRE-S4/S5/S6 COMMIT GATE — AGGREGATED CRITICAL TASKS (2026-08-27)
 

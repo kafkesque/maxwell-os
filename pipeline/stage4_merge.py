@@ -90,6 +90,8 @@ from pipeline.schemas import (
     get_synonym_index,
     is_valid_discipline,
     is_valid_domain,
+    normalize_label,
+    split_compound,
 )
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
@@ -516,25 +518,25 @@ def map_to_canonical_with_fallback(raw_label: str, kind: str,
     if not raw_label or not raw_label.strip():
         return "emerging"
 
-    raw_lower = raw_label.strip().lower()
+    raw_lower = normalize_label(raw_label)
 
     # BUG-200/D2422: never coerce a label that is canonical on the OPPOSITE axis
     # (e.g. 'software engineering' → 'engineering practice' via the flat index).
     _opposite = CANONICAL_DOMAINS if kind == "discipline" else CANONICAL_DISCIPLINES
-    if raw_lower in {c.lower() for c in _opposite}:
+    if raw_lower in {normalize_label(c) for c in _opposite}:
         return "emerging"
 
     # 1. Exact canonical match (case-insensitive) — principle fits 100%
     for c in canonical_list:
-        if c.lower() == raw_lower:
+        if normalize_label(c) == raw_lower:
             return c  # Return canonical casing
 
     # 2. Synonym index match (e.g., "visual communication" → "graphic design")
     matched = synonym_index.get(raw_lower)
     if matched:
-        matched_lower = matched.lower()
+        matched_lower = normalize_label(matched)
         for c in canonical_list:
-            if matched_lower == c.lower():
+            if matched_lower == normalize_label(c):
                 return c
         # Flat index may have resolved to the wrong KIND (D2133: e.g. raw
         # "cloud computing" → discipline "software engineering" when we need a
@@ -543,7 +545,7 @@ def map_to_canonical_with_fallback(raw_label: str, kind: str,
         kind_matched = _get_kind_syn(kind).get(raw_lower)
         if kind_matched:
             for c in canonical_list:
-                if kind_matched.lower() == c.lower():
+                if normalize_label(kind_matched) == normalize_label(c):
                     return c
 
     # 3. No match — genuinely novel. Raw label preserved; canonical = "emerging"
@@ -825,9 +827,12 @@ def normalize_fb_name(name: str, max_words: int = FB_NAME_MAX_WORDS) -> str:
         else:
             normalized.append(w.lower())
     name = ' '.join(normalized)
-    # Word count enforcement: truncate if too long
-    if max_words and len(words) > max_words:
-        name = ' '.join(words[:max_words])
+    # Word count enforcement: truncate if too long (BUG-196/D2517: slice the
+    # title-cased `normalized` list, NOT the raw `words` list — the raw slice
+    # silently reverted the title case just applied; and append an ellipsis
+    # sentinel so truncation is visible, not a silent mid-word cut).
+    if max_words and len(normalized) > max_words:
+        name = ' '.join(normalized[:max_words]) + '\u2026'
         print(f"      ⚠️  Name truncated to {max_words} words: '{name}'")
     return name
 
@@ -1859,9 +1864,29 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             mapped = map_to_canonical_with_fallback(
                 d, "domain", synonym_index, CANONICAL_DOMAINS
             )
-            if mapped not in seen_canonical:
-                seen_canonical.add(mapped)
-                canonical_domains.append(mapped)
+            if mapped != "emerging":
+                if mapped not in seen_canonical:
+                    seen_canonical.add(mapped)
+                    canonical_domains.append(mapped)
+                continue
+            # D2515: compound labels ("marketing & advertising") decompose into
+            # their constituent canonicals rather than being parked as "emerging".
+            parts = split_compound(d)
+            decomposed_any = False
+            if len(parts) > 1:
+                for part in parts:
+                    pm = map_to_canonical_with_fallback(
+                        part, "domain", synonym_index, CANONICAL_DOMAINS
+                    )
+                    if pm != "emerging":
+                        decomposed_any = True
+                        if pm not in seen_canonical:
+                            seen_canonical.add(pm)
+                            canonical_domains.append(pm)
+            if not decomposed_any:
+                if "emerging" not in seen_canonical:
+                    seen_canonical.add("emerging")
+                    canonical_domains.append("emerging")
         if not canonical_domains:
             canonical_domains = ["emerging"]
 

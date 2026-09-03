@@ -62,6 +62,11 @@ PART 2 — CLASSIFICATION:
 - evidence: "cited" (grounded in source text) or "axiomatic" (self-evident truth)
 
 DO NOT use "emerging" as a discipline — use the most specific real discipline name.
+- Be PRECISE in `domains`, never coarse-round: a branding principle → "brand identity" (NOT
+  "marketing"); a logo principle → "brand identity"/"graphic design"; a mapping principle →
+  "cartography" (NOT "data visualization"). Name the ACTUAL practice area, not the nearest
+  broad category. If the FB is fundamentally an applied practice (no academic field), put the
+  precise practice name in `domains` and leave `discipline` as the closest real academic field.
 DO NOT copy keywords into jargon.
 DO NOT over-assign "universal" — most principles are domain-bound.
 
@@ -119,6 +124,9 @@ def build_merged_prompt(fb_data: dict) -> str:
         lines.append(f"BOUNDARY: {boundary}")
     if consequence:
         lines.append(f"CONSEQUENCE: {consequence}")
+    source = fb_data.get("source_text", "")
+    if source:
+        lines.append(f"SOURCE TEXT: {source[:600]}")
     lines.append("")
     lines.append("Return a JSON object with: application, failure_mode, elaboration, "
                  "keywords, jargon, discipline, domains, depth, is_specialized, evidence")
@@ -507,6 +515,17 @@ FOR EACH FB, return a SEPARATE JSON object with:
   "evidence": "cited|axiomatic"
 }
 
+CLASSIFICATION RULES (D2422 / BUG-197 — enforced, never mix the axes):
+- discipline = an ACADEMIC FIELD OF STUDY (e.g., cognitive science, economics, philosophy,
+  computer science, psychology, linguistics, systems engineering).
+- domains = APPLIED PRACTICE/INDUSTRY areas where the knowledge is USED (e.g., graphic
+  design, organizational behavior, data visualization, marketing, product design, HR).
+- A label naming an applied practice or industry is a DOMAIN, NOT a discipline. Never emit
+  "graphic design", "organizational behavior", "data visualization", "entrepreneurship",
+  "marketing", or "human resource management" as `discipline` — put them in `domains`.
+- Never emit the same label in BOTH fields. Each field draws from its own vocabulary.
+- DO NOT use "emerging" as a discipline — use the most specific real discipline name.
+
 DEPTH ONTOLOGY (physicist-chef-poet test):
 - universal: mechanism applies to ALL systems (physics, cooking, poetry)
 - cross-domain: bridges 2+ DISTINCT disciplines via shared mechanism
@@ -554,6 +573,9 @@ def build_batch_prompt(fbs_data: list[dict]) -> str:
             lines.append(f"BOUNDARY: {boundary}")
         if consequence:
             lines.append(f"CONSEQUENCE: {consequence}")
+        source = fb_data.get("source_text", "")
+        if source:
+            lines.append(f"SOURCE TEXT: {source[:600]}")
         lines.append("")
     lines.append("Return a JSON array with one object per FB. Match fb_index to the FB number above.")
     return "\n".join(lines)

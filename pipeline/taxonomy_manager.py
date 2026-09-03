@@ -28,6 +28,8 @@ from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 from pipeline.pipeline_paths import (
     DB_PATH,
+    D2399_ALLOW_BOTH_AXES_EMERGING,
+    D2399_PROMOTIONS_FROZEN,
     PROJECT_ROOT,
     SCHEMA_VERSION,
     TAXONOMY_EMERGING_FREQ,
@@ -36,7 +38,7 @@ from pipeline.pipeline_paths import (
     TAXONOMY_VERSION,
 )
 from pipeline.stamp import get_pipeline_commit
-from pipeline.schemas import get_synonym_index  # D2399: long-tail challenger detection
+from pipeline.schemas import get_synonym_index, normalize_label, split_compound  # D2399 long-tail + D2515 NFKC/compound
 
 # ── Constants (D2231/D2378: C12 — read from config via pipeline_paths) ─────────
 
@@ -73,7 +75,7 @@ def _load_canonical_set(kind: str) -> set[str]:
     with open(_get_taxonomy_path()) as f:
         taxa = yaml.safe_load(f)
     return {
-        entry["canonical"].lower().strip()
+        normalize_label(entry["canonical"])
         for entry in taxa.get(key, [])
         if entry.get("canonical")
     }
@@ -81,12 +83,17 @@ def _load_canonical_set(kind: str) -> set[str]:
 
 def _is_long_tail(raw_label: str, canon_set: set[str], syn_index: dict[str, str]) -> bool:
     """True if `raw_label` maps to no canonical (long-tail challenger, D2399)."""
-    lbl = (raw_label or "").lower().strip()
+    lbl = normalize_label(raw_label or "")
     if not lbl or lbl == "emerging":
         return False
     if lbl in canon_set:
         return False
     if lbl in syn_index:
+        return False
+    # D2515: a compound label ("marketing & advertising") whose parts ALL resolve to
+    # canonicals/synonyms is covered by decomposition — not a long-tail challenger.
+    parts = split_compound(lbl)
+    if len(parts) > 1 and all(p in canon_set or p in syn_index for p in parts):
         return False
     return True
 
@@ -102,6 +109,22 @@ def _is_opposite_kind(raw_label: str, kind: str) -> bool:
 
     other = "domain" if kind == "discipline" else "discipline"
     return match_to_canonical(raw_label, other) is not None
+
+
+def _is_both_axes_emerging(conn: sqlite3.Connection, label: str, kind: str) -> bool:
+    """D2519 (D2399 policy A): True if `label` also has a live entry on the OPPOSITE axis.
+
+    An axis-confused label (e.g. 'human factors engineering' filed as both a domain
+    AND a discipline) must never be promoted — promoting it onto one axis would
+    leave the twin entry on the other axis and re-introduce cross-kind ambiguity.
+    """
+    other = "discipline" if kind == "domain" else "domain"
+    lbl = normalize_label(label)
+    row = conn.execute(
+        "SELECT 1 FROM taxonomy_counts WHERE label = ? AND label_type = ? AND count > 0",
+        (lbl, other),
+    ).fetchone()
+    return row is not None
 
 
 # ── Table initialization ─────────────────────────────────────────────────
@@ -124,6 +147,80 @@ def init_taxonomy_counts_table(conn: sqlite3.Connection) -> None:
         ON taxonomy_counts(label_type, status);
     """)
     conn.commit()
+
+
+def reconcile_canonical_status(conn: sqlite3.Connection) -> int:
+    """D2512/BUG-208 (Drift B): force `taxonomy_counts.status` to match the YAML.
+
+    `seed_from_taxonomy_yaml()` only INSERT-OR-IGNOREs and only runs when the
+    table is empty; labels promoted to canonical in YAML AFTER the first seed
+    (e.g. the "+4 promotions 2026-08-20": design thinking, product design,
+    industrial design, information retrieval) never had their status flipped, and
+    `update_counts_from_fbs()` has no emerging→canonical path. Result: `economics`
+    (108 FBs) and `color theory` sat as `emerging`/`raw` in taxonomy_counts while
+    canonical in YAML — so D2399's `check_for_replacements()` would propose
+    promoting a label that is ALREADY canonical (and demote a real discipline).
+
+    This function is the single reconcile point (idempotent, run every
+    post-commit):
+      1. Every YAML canonical → status='canonical' (preserving its count).
+      2. Every DB row with status='canonical' whose label is NOT a YAML canonical
+         → demoted to 'emerging' (so a removed YAML canonical can't stay
+         canonically-privileged in the counts table).
+
+    Returns the number of status transitions applied.
+    """
+    taxonomy_path = _get_taxonomy_path()
+    if not taxonomy_path.exists():
+        return 0
+
+    with open(taxonomy_path) as f:
+        tax = yaml.safe_load(f)
+
+    now = datetime.now(UTC).isoformat()
+    transitions = 0
+
+    # 1. Promote every YAML canonical to canonical status (preserve count).
+    for axis, key in (("domain", "domains"), ("discipline", "disciplines")):
+        for entry in tax.get(key, []):
+            canonical = entry["canonical"]
+            existing = conn.execute(
+                "SELECT count, status FROM taxonomy_counts WHERE label = ? AND label_type = ?",
+                (canonical, axis),
+            ).fetchone()
+            if existing is None:
+                conn.execute(
+                    "INSERT INTO taxonomy_counts (label, label_type, count, status, first_seen, last_updated) "
+                    "VALUES (?, ?, 0, 'canonical', ?, ?)",
+                    (canonical, axis, now, now),
+                )
+                transitions += 1
+            elif existing["status"] != "canonical":
+                conn.execute(
+                    "UPDATE taxonomy_counts SET status = 'canonical', last_updated = ? "
+                    "WHERE label = ? AND label_type = ?",
+                    (now, canonical, axis),
+                )
+                transitions += 1
+
+    # 2. Demote any DB-canonical label that is no longer a YAML canonical.
+    yaml_canon_dom = {normalize_label(e["canonical"]) for e in tax.get("domains", [])}
+    yaml_canon_disc = {normalize_label(e["canonical"]) for e in tax.get("disciplines", [])}
+    for axis, canon_set in (("domain", yaml_canon_dom), ("discipline", yaml_canon_disc)):
+        for row in conn.execute(
+            "SELECT label FROM taxonomy_counts WHERE label_type = ? AND status = 'canonical'",
+            (axis,),
+        ).fetchall():
+            if normalize_label(row["label"]) not in canon_set:
+                conn.execute(
+                    "UPDATE taxonomy_counts SET status = 'emerging', last_updated = ? "
+                    "WHERE label = ? AND label_type = ?",
+                    (now, row["label"], axis),
+                )
+                transitions += 1
+
+    conn.commit()
+    return transitions
 
 
 def seed_from_taxonomy_yaml(conn: sqlite3.Connection) -> int:
@@ -151,8 +248,8 @@ def seed_from_taxonomy_yaml(conn: sqlite3.Connection) -> int:
         count += 1
         # Also seed raw aliases as 'raw' status for tracking
         for raw_label in domain_entry.get("raw", []):
-            raw_lower = raw_label.lower().strip()
-            if raw_lower == canonical:
+            raw_lower = normalize_label(raw_label)
+            if raw_lower == normalize_label(canonical):
                 continue
             conn.execute(
                 """INSERT OR IGNORE INTO taxonomy_counts (label, label_type, count, status, first_seen, last_updated)
@@ -169,8 +266,8 @@ def seed_from_taxonomy_yaml(conn: sqlite3.Connection) -> int:
         )
         count += 1
         for raw_label in disc_entry.get("raw", []):
-            raw_lower = raw_label.lower().strip()
-            if raw_lower == canonical:
+            raw_lower = normalize_label(raw_label)
+            if raw_lower == normalize_label(canonical):
                 continue
             conn.execute(
                 """INSERT OR IGNORE INTO taxonomy_counts (label, label_type, count, status, first_seen, last_updated)
@@ -198,16 +295,17 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
     total_labels = 0
     unmatched_labels = 0
 
-    rows = conn.execute("""
-        SELECT domains, domains_raw, discipline, discipline_raw FROM fbs
-        WHERE committed_at >= datetime('now', '-24 hours')
-    """).fetchall()
-
-    # If no recent FBs, scan all
-    if not rows:
-        rows = conn.execute(
-            "SELECT domains, domains_raw, discipline, discipline_raw FROM fbs"
-        ).fetchall()
+    # D2514/BUG-211 (Drift F): counts must be an idempotent FULL recount, never an
+    # increment. The prior logic counted `committed_at >= now - 24h` and fell back
+    # to a full scan that INCREMENTED on top of existing counts, so every fallback
+    # run re-added the whole corpus (observed ~3x inflation: "marketing & advertising"
+    # read 360 in taxonomy_counts while the DB actually held 120). Reset to 0 first,
+    # then recount every FB. 7867 rows is a trivial full scan; idempotency is worth
+    # more than the incremental-window micro-optimization it replaces.
+    conn.execute("UPDATE taxonomy_counts SET count = 0, last_updated = ?", (now,))
+    rows = conn.execute(
+        "SELECT domains, domains_raw, discipline, discipline_raw FROM fbs"
+    ).fetchall()
 
     # D2399: previously only canonical `domains`/`discipline` were read, so raw
     # labels that mapped to 'emerging' never accumulated in taxonomy_counts and
@@ -225,7 +323,7 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
             domain_labels = []
 
         for label in (domain_labels or []):
-            label_str = label.lower().strip()
+            label_str = normalize_label(label)
             if not label_str or label_str == "emerging":
                 continue
             total_labels += 1
@@ -255,7 +353,7 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
 
         # ── Discipline label ──
         if discipline and discipline != "emerging":
-            disc_str = discipline.lower().strip()
+            disc_str = normalize_label(discipline)
             total_labels += 1
 
             existing = conn.execute(
@@ -283,7 +381,7 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
 
         # ── Long-tail raw labels (D2399 challengers) ──
         if discipline == "emerging" and discipline_raw:
-            _disc_raw = discipline_raw.lower().strip()
+            _disc_raw = normalize_label(discipline_raw)
             if _is_long_tail(_disc_raw, _canon_disciplines, _syn_disciplines) and not _is_opposite_kind(_disc_raw, "discipline"):
                 total_labels += 1
                 _existing = conn.execute(
@@ -313,7 +411,7 @@ def update_counts_from_fbs(conn: sqlite3.Connection) -> dict:
         for _raw_dom in (_dom_raw_list or []):
             if not isinstance(_raw_dom, str):
                 continue
-            _raw_dom_lbl = _raw_dom.lower().strip()
+            _raw_dom_lbl = normalize_label(_raw_dom)
             if _is_opposite_kind(_raw_dom_lbl, "domain"):
                 continue  # BUG-199: discipline label in the domain slot — not a domain challenger
             if not _is_long_tail(_raw_dom_lbl, _canon_domains, _syn_domains):
@@ -363,6 +461,9 @@ def check_for_replacements(conn: sqlite3.Connection) -> list[dict]:
         List of replacement candidate dicts, each with:
         label_type, emerging_label, emerging_count, displace_canonical, displace_count
     """
+    if D2399_PROMOTIONS_FROZEN:
+        return []  # D2519 (D2399 policy A): manual freeze — no candidates surface
+
     candidates: list[dict] = []
 
     for label_type in ("domain", "discipline"):
@@ -395,6 +496,8 @@ def check_for_replacements(conn: sqlite3.Connection) -> list[dict]:
         for emerging_label, emerging_count in emerging:
             if _is_opposite_kind(emerging_label, label_type):
                 continue  # BUG-199: cross-kind — never propose promotion onto the wrong axis
+            if not D2399_ALLOW_BOTH_AXES_EMERGING and _is_both_axes_emerging(conn, emerging_label, label_type):
+                continue  # D2519 (D2399 policy A): axis-confused — never promote a both-axes-emerging label
             if emerging_count > displaced_count * REPLACEMENT_THRESHOLD_RATIO:
                 candidates.append({
                     "label_type": label_type,
@@ -414,7 +517,13 @@ def check_for_replacements(conn: sqlite3.Connection) -> list[dict]:
 
 def apply_replacements(conn: sqlite3.Connection, approved: list[dict]) -> int:
     """
-    Apply approved replacements: promote emerging→canonical, demote displaced→displaced.
+    Apply approved replacements: promote emerging→canonical, demote canonical→raw.
+
+    D2536 (Q2): the demoted canonical is reverted to `raw` (NOT `displaced`) so it
+    stays retrievable via the raw-label surface (taxonomy_counts + synonym index).
+    `generate_taxonomy_yaml` preserves `status IN ('raw','emerging')` labels, so the
+    demoted label survives as a raw alias of the promoted canonical instead of dying
+    as a `displaced` tombstone.
 
     Args:
         approved: list of replacement dicts with 'approved': true
@@ -432,7 +541,7 @@ def apply_replacements(conn: sqlite3.Connection, approved: list[dict]) -> int:
             (now, repl["emerging_label"], repl["label_type"])
         )
         conn.execute(
-            "UPDATE taxonomy_counts SET status = 'displaced', last_updated = ? "
+            "UPDATE taxonomy_counts SET status = 'raw', last_updated = ? "
             "WHERE label = ? AND label_type = ?",
             (now, repl["displace_canonical"], repl["label_type"])
         )
@@ -476,12 +585,12 @@ def generate_taxonomy_yaml(conn: sqlite3.Connection, output_path: Path | None = 
     for entry in current_tax.get("domains", []):
         canonical_to_group[entry["canonical"]] = entry.get("group", "Uncategorized")
         for raw_label in entry.get("raw", []):
-            raw_map_domain[raw_label.lower()] = entry["canonical"]
+            raw_map_domain[normalize_label(raw_label)] = entry["canonical"]
 
     for entry in current_tax.get("disciplines", []):
         canonical_to_group[entry["canonical"]] = entry.get("group", "Uncategorized")
         for raw_label in entry.get("raw", []):
-            raw_map_discipline[raw_label.lower()] = entry["canonical"]
+            raw_map_discipline[normalize_label(raw_label)] = entry["canonical"]
 
     # ── All raw labels from DB that map to each canonical ──
     all_raw_labels = conn.execute(
@@ -560,6 +669,14 @@ def run_post_commit_taxonomy(conn: sqlite3.Connection, human_review_dir: Path) -
     Returns:
         Path to human_review_taxonomy.json if replacements need review, None otherwise.
     """
+    # BUG-214 (D2527): stage6_commit passes a conn with the default tuple
+    # row_factory; reconcile_canonical_status() uses row["label"] / existing["status"],
+    # which raise "tuple indices must be integers or slices, not str" on a tuple.
+    # Set sqlite3.Row here (the single entry point) so every sub-function gets
+    # column-name access. Integer indexing (row[0]) and tuple unpacking both still
+    # work on sqlite3.Row, so no caller breaks.
+    conn.row_factory = sqlite3.Row
+
     # 1. Ensure table exists
     init_taxonomy_counts_table(conn)
 
@@ -572,6 +689,14 @@ def run_post_commit_taxonomy(conn: sqlite3.Connection, human_review_dir: Path) -
         seeded = seed_from_taxonomy_yaml(conn)
         if seeded == 0:
             print("⚠️  WARNING: Could not seed taxonomy_counts — taxonomy YAML not found or empty.")
+
+    # 2b. D2512/BUG-208 (Drift B): reconcile canonical status EVERY run, not just
+    #     first-run seed — labels promoted in YAML after the first seed (e.g. the
+    #     "+4 promotions 2026-08-20") must flip to canonical in taxonomy_counts,
+    #     else check_for_replacements() competes garbage against a stale canonical set.
+    reconciled = reconcile_canonical_status(conn)
+    if reconciled:
+        print(f"  🔄 taxonomy_counts canonical status reconciled ({reconciled} transition(s))")
 
     # 3. Update counts from committed FBs
     changes = update_counts_from_fbs(conn)

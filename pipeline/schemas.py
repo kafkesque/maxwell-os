@@ -18,6 +18,8 @@ Inter-stage contracts (8 stages — Stage 3 removed per D2120):
 All objects stamped: schema_version, gen_model, pipeline_commit (R14).
 """
 
+import re
+import unicodedata
 from datetime import datetime
 from typing import Literal
 
@@ -547,6 +549,49 @@ def is_valid_discipline(discipline: str) -> bool:
 _SYNONYM_INDEX = None  # Lazy-built cache (flat, backward compat)
 _SYNONYM_INDEX_BY_KIND: dict[str, dict[str, str]] = {}
 
+_COMPOUND_SPLIT_RE = re.compile(r"\s*(?:&|\band\b)\s*", re.IGNORECASE)
+
+# D2515/BUG-212: NFKC does NOT collapse dash/hyphen variants (U+2010/U+2011/U+2013
+# stay non-ASCII). Canonical labels use ASCII hyphen-minus (U+002D), so fold every
+# hyphen-like dash to it before comparing. This is what actually makes
+# "human‑computer interaction" (U+2011) ≡ "human–computer interaction" (U+2013) ≡
+# "human-computer interaction" (U+002D).
+_DASH_FOLD = str.maketrans({
+    "\u2010": "-",  # HYPHEN
+    "\u2011": "-",  # NON-BREAKING HYPHEN
+    "\u2012": "-",  # FIGURE DASH
+    "\u2013": "-",  # EN DASH
+    "\u2014": "-",  # EM DASH
+    "\u2015": "-",  # HORIZONTAL BAR
+    "\u2212": "-",  # MINUS SIGN
+})
+
+
+def normalize_label(s: str) -> str:
+    """NFKC-fold → dash-fold → strip → lowercase a taxonomy label.
+
+    D2515/BUG-212 (Drift G): NFKC collapses most compatibility variants, then
+    `_DASH_FOLD` collapses every hyphen-like dash to ASCII U+002D so
+    "human‑computer interaction" (U+2011) and "human–computer interaction"
+    (U+2013) both resolve to the canonical "human-computer interaction"
+    (U+002D), and "e‑commerce" (U+2011) resolves like "e-commerce". Without it
+    the same label accumulates as N separate taxonomy_counts rows and never
+    matches. Idempotent and pure — safe for keys and query labels alike.
+    """
+    return unicodedata.normalize("NFKC", s or "").translate(_DASH_FOLD).strip().lower()
+
+
+def split_compound(label: str) -> list[str]:
+    """Split a compound domain label into its components.
+
+    D2515: "marketing & advertising" / "marketing and branding" are
+    co-occurrence artifacts (one FB spanning two domains), NOT clean categories.
+    They decompose into their constituent canonicals rather than being promoted
+    as a new canonical. Non-compound labels return a single-element list.
+    """
+    parts = [p.strip() for p in _COMPOUND_SPLIT_RE.split(label or "") if p.strip()]
+    return parts if len(parts) > 1 else [label or ""]
+
 
 def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     """Build {synonym_lower: canonical} lookup from taxonomy + synonym_map.
@@ -572,12 +617,12 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     # Constrain canonicals to the requested kind when provided
     valid_canonicals: set[str] | None = None
     if kind == "domain":
-        valid_canonicals = {c.lower() for c in CANONICAL_DOMAINS}
+        valid_canonicals = {normalize_label(c) for c in CANONICAL_DOMAINS}
     elif kind == "discipline":
-        valid_canonicals = {c.lower() for c in CANONICAL_DISCIPLINES}
+        valid_canonicals = {normalize_label(c) for c in CANONICAL_DISCIPLINES}
 
     def _accept(canonical: str) -> bool:
-        return valid_canonicals is None or canonical.lower() in valid_canonicals
+        return valid_canonicals is None or normalize_label(canonical) in valid_canonicals
 
     # D2422/BUG-200: prevent cross-kind SOURCE-alias pollution. A raw alias whose
     # lowercase form is a canonical of the OPPOSITE kind must NOT register in this
@@ -587,9 +632,9 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
     # is verified downstream in match_to_canonical()/map_to_canonical_with_fallback().
     forbidden_keys: set[str] = set()
     if kind == "domain":
-        forbidden_keys = {c.lower() for c in CANONICAL_DISCIPLINES}
+        forbidden_keys = {normalize_label(c) for c in CANONICAL_DISCIPLINES}
     elif kind == "discipline":
-        forbidden_keys = {c.lower() for c in CANONICAL_DOMAINS}
+        forbidden_keys = {normalize_label(c) for c in CANONICAL_DOMAINS}
 
     # 1. Taxonomy raw aliases (both domains and disciplines)
     tax_path = config_root / "taxonomy_v5.yaml"
@@ -600,11 +645,11 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             canonical = entry["canonical"].strip()
             if not _accept(canonical):
                 continue
-            lookup[canonical.lower()] = canonical
+            lookup[normalize_label(canonical)] = canonical
             for raw in entry.get("raw", []):
                 raw_clean = raw.strip()
-                if raw_clean and raw_clean.lower() not in forbidden_keys:
-                    lookup[raw_clean.lower()] = canonical
+                if raw_clean and normalize_label(raw_clean) not in forbidden_keys:
+                    lookup[normalize_label(raw_clean)] = canonical
 
     # 2. Synonym_map.yaml (domain synonyms, keywords, patterns)
     syn_path = config_root / "synonym_map.yaml"
@@ -620,16 +665,16 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             # written into the DISCIPLINE index → wrong-kind canonical (D2133 regression).
             if not canonical or not _accept(canonical):
                 continue
-            lookup[canonical.lower()] = canonical
+            lookup[normalize_label(canonical)] = canonical
             for syn in entry.get("synonyms", []):
                 syn_clean = syn.strip()
-                if syn_clean and syn_clean.lower() not in forbidden_keys:
-                    lookup[syn_clean.lower()] = canonical
+                if syn_clean and normalize_label(syn_clean) not in forbidden_keys:
+                    lookup[normalize_label(syn_clean)] = canonical
             # keywords are also useful for matching
             for kw in entry.get("keywords", []):
                 kw_clean = kw.strip()
-                if kw_clean and kw_clean.lower() not in lookup and kw_clean.lower() not in forbidden_keys:
-                    lookup[kw_clean.lower()] = canonical
+                if kw_clean and normalize_label(kw_clean) not in lookup and normalize_label(kw_clean) not in forbidden_keys:
+                    lookup[normalize_label(kw_clean)] = canonical
 
     return lookup
 
@@ -668,19 +713,19 @@ def match_to_canonical(label: str, kind: str = "domain") -> str | None:
     if not label or not label.strip():
         return None
 
-    label_lower = label.strip().lower()
+    label_lower = normalize_label(label)
     canonical_list = CANONICAL_DOMAINS if kind == "domain" else CANONICAL_DISCIPLINES
 
     # BUG-200/D2422: a label that is canonical on the OPPOSITE axis must never
     # resolve on this axis — prevents silent cross-kind coercion via the flat
     # index/synonym_map (e.g. 'software engineering' → 'engineering practice').
     opposite = CANONICAL_DISCIPLINES if kind == "domain" else CANONICAL_DOMAINS
-    if label_lower in {c.lower() for c in opposite}:
+    if label_lower in {normalize_label(c) for c in opposite}:
         return None
 
     # 1. Direct canonical match (case-insensitive)
     for c in canonical_list:
-        if label_lower == c.lower():
+        if label_lower == normalize_label(c):
             return c
 
     # 2. Synonym index lookup — kind-aware first (D2133: resolves cross-kind
@@ -695,9 +740,9 @@ def match_to_canonical(label: str, kind: str = "domain") -> str | None:
     matched = synonym_index_flat.get(label_lower)
     if matched:
         # Verify matched canonical is in the right list
-        matched_lower = matched.lower()
+        matched_lower = normalize_label(matched)
         for c in canonical_list:
-            if matched_lower == c.lower():
+            if matched_lower == normalize_label(c):
                 return c
         # Matched a canonical from the wrong list (e.g., matched a domain
         # when looking for a discipline). Don't return it; let caller fall back.
@@ -710,12 +755,23 @@ def match_domains_to_canonical(labels: list[str]) -> list[str]:
     """Match a list of domain labels to canonical via synonyms.
 
     Returns list of canonical labels. Unmatched labels are omitted.
+
+    D2515: compound labels ("marketing & advertising", "marketing and branding")
+    are decomposed into their constituent canonicals (a single FB can legitimately
+    span two domains) rather than left unmatched → "emerging".
     """
     results = []
     for label in labels:
         matched = match_to_canonical(label, kind="domain")
         if matched:
             results.append(matched)
+            continue
+        parts = split_compound(label)
+        if len(parts) > 1:
+            for part in parts:
+                m = match_to_canonical(part, kind="domain")
+                if m:
+                    results.append(m)
     # Deduplicate while preserving order
     seen = set()
     unique = []

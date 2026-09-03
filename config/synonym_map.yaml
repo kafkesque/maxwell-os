@@ -368,25 +368,6 @@ synonyms:
       - "rag"
       - "fine.tun"
 
-  ml_systems_infrastructure:
-    canonical: ml systems & infrastructure
-    synonyms:
-      - ai systems
-      - ai infrastructure
-      - ml systems
-      - ai platform
-    keywords:
-      - ai system
-      - ml system
-      - ai infrastructure
-      - platform
-      - deployment
-    patterns:
-      - "ai system"
-      - "ml system"
-      - "ai infrastructure"
-      - "platform"
-
   engineering_practice:
     canonical: engineering practice
     synonyms:

@@ -1,0 +1,13 @@
+# Maxwell OS v3.0 — pre-commit gates (D2552/GOV-CI)
+# C11: every import ∈ requirements ∪ stdlib ∪ local modules.
+# C12: no hardcoded /Users/ /home/ C:\Users absolute paths.
+# Reuses pipeline/integrity_check.py (single source of truth).
+repos:
+  - repo: local
+    hooks:
+      - id: c11-c12-gate
+        name: C11 import⊂requirements + C12 no hardcoded paths
+        entry: python3 scripts/pre_commit_gate.py
+        language: system
+        pass_filenames: false
+        always_run: true

@@ -35,6 +35,8 @@ from pipeline.pipeline_paths import (
     OLLAMA_EMBED_TIMEOUT,  # D2348: config-driven (was hardcoded 60 — BUG-105)
     OLLAMA_HOST,
     OLLAMA_PORT,
+    S15_EMBED_DIM,
+    S15_EMBED_NATIVE_MRL,
 )
 
 OLLAMA_URL = f"http://{OLLAMA_HOST}:{OLLAMA_PORT}/api/embed"  # BUG-028 FIX
@@ -82,9 +84,12 @@ def batch_embed(texts: list[str], model: str = None) -> list[list[float]]:
         # Truncate long texts
         truncated = [t[:EMBED_MAX_CHARS] for t in batch]
         try:
+            _req: dict = {"model": model, "input": truncated, "keep_alive": OLLAMA_EMBED_KEEP_ALIVE}
+            if S15_EMBED_NATIVE_MRL:
+                _req["dimensions"] = S15_EMBED_DIM  # D2551: native MRL 512d head (Ollama) vs manual truncate
             resp = requests.post(
                 OLLAMA_URL,
-                json={"model": model, "input": truncated, "keep_alive": OLLAMA_EMBED_KEEP_ALIVE},
+                json=_req,
                 timeout=OLLAMA_EMBED_TIMEOUT,
             )
             resp.raise_for_status()

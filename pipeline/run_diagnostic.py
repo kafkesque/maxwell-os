@@ -78,6 +78,7 @@ os.environ["MAXWELL_RUN_ID"] = RUN_ID
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     DATA_DIR,
+    OMLX_API_KEY,
     S15_DIR,
 )
 
@@ -358,7 +359,7 @@ def _unload_omlx_model(model_name: str) -> None:
         req = urllib.request.Request(
             f"http://localhost:11435/v1/models/{model_name}/unload",
             method="POST",
-            headers={"Authorization": "Bearer sk-maxwell-local"},
+            headers={"Authorization": f"Bearer {OMLX_API_KEY}"},
         )
         urllib.request.urlopen(req, timeout=10)
         print(f"   🗑️  Unloaded {model_name}")

@@ -58,6 +58,7 @@ from pipeline.pipeline_paths import (
     S5_NLI_MAX_HYPOTHESIS_CHARS,  # D2321: hypothesis(definition) truncation for NLI pairing
     S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
+    S5_EVIDENCE_CONTAMINATION_RATIO,  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (C12 config-first)
     S5_QUARANTINE_CONF_CAP,  # D2310: confidence cap for QUARANTINE
     STAGE4_5_CHECKPOINT,  # F1/D2400: enriched S4 checkpoint (preferred when present)
     STAGE4_CHECKPOINT,
@@ -633,7 +634,7 @@ def _write_input_fingerprint() -> None:
 
 # D2496/BUG-181#1: severe evidence-contamination threshold — matches the
 # scripts/audit_evidence_cleanliness.py "severe" cutoff (artifact-char ratio > 0.15).
-EVIDENCE_CONTAMINATION_RATIO: float = 0.15
+EVIDENCE_CONTAMINATION_RATIO: float = S5_EVIDENCE_CONTAMINATION_RATIO  # D2545: from config (C12)
 
 
 def _evidence_cleanliness_gate(fbs: list[dict]) -> set[str]:

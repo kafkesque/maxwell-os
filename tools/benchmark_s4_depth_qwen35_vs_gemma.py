@@ -33,12 +33,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from pipeline.stage4_merged_call import DEPTH_FOCUSED_PROMPT, _parse_depth_token, DepthClassificationError  # noqa: E402
-from pipeline.pipeline_paths import VERIFY_MODEL, S4_DEPTH_MODEL  # noqa: E402
+from pipeline.pipeline_paths import OMLX_API_KEY, VERIFY_MODEL, S4_DEPTH_MODEL  # noqa: E402
 
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 OUT_PATH = PROJECT_ROOT / "governance" / "s4_depth_qwen35_vs_gemma_benchmark.json"
 OMLX_URL = "http://127.0.0.1:11435/v1/chat/completions"
-API_KEY = "sk-maxwell-local"
+API_KEY = OMLX_API_KEY
 
 QWEN35_MODEL = "Qwen3.5-9B-4bit"
 GEMMA_MODEL = S4_DEPTH_MODEL  # gemma-4-E4B-it-MLX-4bit

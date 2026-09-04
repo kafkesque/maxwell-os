@@ -33,6 +33,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from pipeline.pipeline_paths import OMLX_API_KEY  # noqa: E402  (C12: single source, D2552)
 
 # Reuse the PRODUCTION prompt + validation, not reimplementations.
 from pipeline.stage2_extract import (  # noqa: E402
@@ -90,7 +91,7 @@ def call_omlx_raw(prompt: str, system: str, model: str, max_tokens: int = 2048) 
     import requests
 
     url = "http://127.0.0.1:11435/v1/chat/completions"
-    headers = {"Authorization": "Bearer sk-maxwell-local", "Content-Type": "application/json"}
+    headers = {"Authorization": f"Bearer {OMLX_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "model": model,
         "messages": [

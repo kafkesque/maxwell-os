@@ -62,7 +62,7 @@ MODELS: Gen=Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | Classify=gpt-oss-20b-MXFP4-Q
 
 PIPELINE (v3.0 cluster-before-extract, D2120: 8-stage): 0-convert → 0.5-metadata → 1-chunk → 1.3-prefilter → 1.5-FAISS-RNN-cluster → 2-convergent-extract(+hybrid-gate D2276) → 4-classify+dedup(D2120: Stage 3 removed) → 5-verify(DeBERTa-v3-large-NLI-only D2298, threshold 0.10 calibrated, fail-closed D2093) → 6-commit
 
-STORAGE: SQLite (canonical) + sqlite-vec (vectors) + Parquet (portability) | TAXONOMY: 35 domains, 72 disciplines (+1 "emerging" each), max 5 per FB (D2066: dynamic, raw labels can dethrone canonicals)
+STORAGE: SQLite (canonical) + sqlite-vec (vectors) + Parquet (portability) | TAXONOMY: 43 domains, 61 disciplines (+1 "emerging" each), max 5 per FB (D2066: dynamic, raw labels can dethrone canonicals; D2540 corrected counts)
 
 ## §3 — KEY DECISIONS (chronological)
 R5: Generator≠Verifier | R7: temp=0.0 | R14: Schema stamps | D150: Max 5 domains | D316: Multi-label → RESOLVED by D2066 (dynamic multi-label, SALSA rejected)

@@ -178,6 +178,7 @@ STDLIB_MODULES = {
     "multiprocessing", "asyncio", "concurrent", "socket", "ssl",
     "signal", "mmap", "gc", "atexit", "pdb", "pprint", "platform",
     "getpass", "getopt", "configparser", "secrets",
+    "unicodedata", "heapq",
     "tomllib", "tomli", "zipfile", "tarfile", "gzip", "bz2", "lzma",
     "__future__",  # stdlib: used for annotations
 }
@@ -194,7 +195,8 @@ KNOWN_PACKAGES = {
     "fastembed",       # stage1_5_fastembed: alternative embedding backend
     "dspy",            # dspy_trainer: MIPROv2 optimization harness (optional, post-T1.1)
 }
-LOCAL_MODULES = {"pipeline", "config", "tools", "tests", "providers", "storage", "sync", "memory", "pipeline_paths"}
+LOCAL_MODULES = {"pipeline", "config", "tools", "tests", "providers", "storage", "sync", "memory", "pipeline_paths",
+                 "scripts", "audit_evidence_cleanliness"}  # audit_evidence_cleanliness: deferred standalone scripts/ import (stage5_verify.py)
 
 
 def check_import_dependencies() -> tuple[bool, str]:

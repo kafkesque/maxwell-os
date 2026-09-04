@@ -70,6 +70,12 @@ from pipeline.stage4_merged_call import (  # noqa: E402
 
 DEFAULT_WHERE = "discipline = 'emerging'"
 
+# Checkpoint/apply granularity: number of FBs classified before an ATOMIC apply
+# + crash-safe harvest append. A crash mid-run loses at most one chunk; re-running
+# the same --where skips already-applied FBs (they no longer match: discipline
+# changed OR discipline_raw filled), so resume is automatic (D2533 hardening).
+CHUNK_SIZE_DEFAULT = 200
+
 # FB fields the merged/batch classifier consumes (prompt input). Everything else
 # (domains, evidence, application, elaboration, keywords, jargon, depth,
 # is_specialized) is deliberately NOT re-generated — this script only repairs the
@@ -351,50 +357,30 @@ def _sync_checkpoints() -> None:
             print(f"  ✅ {s.name} re-synced")
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="BUG-197 targeted merged-axis DISCIPLINE re-classification (D2532)")
-    parser.add_argument("--db", default=str(DB_PATH), help="Path to maxwell.db (default from config)")
-    parser.add_argument("--where", default=DEFAULT_WHERE, help="SQL predicate selecting affected FBs")
-    parser.add_argument("--limit", type=int, default=None, help="Cap rows (A/B sample); deterministic ORDER BY fb_id")
-    parser.add_argument("--batch", dest="batch", action="store_true", default=None, help="Force batch mode")
-    parser.add_argument("--slim", dest="slim", action="store_true", default=False, help="Discipline-only prompt (D2534; ~2x faster, experimental)")
-    parser.add_argument("--no-slim", dest="slim", action="store_false", help="Full merged CRIBS+classification (slow)")
-    parser.add_argument("--no-batch", dest="batch", action="store_false", help="Force sequential (merged-call) mode")
-    parser.add_argument("--batch-size", type=int, default=None, help="Batch chunk size (default stage4.batch_size)")
-    parser.add_argument("--model", default=None, help="Classifier model (default VERIFY_MODEL)")
-    parser.add_argument("--apply", action="store_true", help="Write resolved disciplines to DB (backup + integrity gate)")
-    parser.add_argument("--harvest", default=None, help="JSONL path for harvested raw labels (BUG-150 promotion input)")
-    parser.add_argument("--sync", dest="sync", action="store_true", default=True, help="Re-sync S4/S5 checkpoints after apply (default; fixes DB↔checkpoint drift)")
-    parser.add_argument("--no-sync", dest="sync", action="store_false", help="Skip checkpoint re-sync after apply")
-    parser.add_argument("--skip-backup", action="store_true", help="DANGER: skip pre-write backup (dev only)")
-    parser.add_argument("--skip-integrity", action="store_true", help="DANGER: skip integrity gate (dev only)")
-    args = parser.parse_args()
+def _append_harvest(path: Path, entries: list[dict]) -> None:
+    """Crash-safe APPEND of harvest entries (C6: fsync before returning).
 
-    db_path = Path(args.db)
-    batch_size = args.batch_size if args.batch_size is not None else int(_cfg_stage4("batch_size", BATCH_SIZE_DEFAULT))
-    batch = args.batch if args.batch is not None else bool(_cfg_stage4("batch_enabled", False))
-    model = args.model or VERIFY_MODEL
+    Appends (never overwrites) so each checkpoint chunk's corrected raw labels
+    accumulate. A duplicate entry on a crash-retry is harmless — the BUG-150
+    consumer dedups by fb_id.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        for e in entries:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+        f.flush()
+        os.fsync(f.fileno())
 
-    fbs = load_affected(db_path, args.where, args.limit)
-    if not fbs:
-        print(f"⚠️  No FBs match `{args.where}` — nothing to do.")
-        return 0
 
-    mode = "BATCH" if batch else "SEQUENTIAL"
-    print(f"🎯 D2532 discipline re-classification: {len(fbs)} FBs | mode={mode} | batch_size={batch_size} | model={model}")
-    print(f"   where: {args.where}")
+def _process_batch(chunk: list[dict], results: list[tuple[dict, dict | None]],
+                   synonym_index: dict[str, str]) -> tuple[list[dict], list[dict], dict]:
+    """Compute DB updates + harvest entries for one classified chunk.
 
-    # D2534: unbuffered stdout so the backgrounded run's log is tail-able in real time.
-    try:
-        sys.stdout.reconfigure(line_buffering=True)
-    except Exception as e:  # C16: fail-loud, never silently swallow
-        print(f"  ⚠️  stdout.reconfigure failed ({type(e).__name__}: {e}) — progress log will be buffered", file=sys.stderr)
-
-    synonym_index = get_synonym_index()
-    t0 = time.time()
-    results = classify_fbs(fbs, batch, batch_size, model, slim=args.slim)
-    elapsed = time.time() - t0
-
+    Returns (updates, harvest_entries, stats). Mirrors the D2532/D2540 remap rules:
+    resolve emerging → real canonical discipline; else if unresolved and the LLM
+    emitted a domain, use that as the raw label (D2540: precise for the follow-up
+    kind-swap); else leave as-is (genuine taxonomy gap → BUG-150).
+    """
     updates: list[dict] = []
     harvest: list[dict] = []
     resolved = raw_fixed = still_emerging = failed = 0
@@ -404,17 +390,12 @@ def main() -> int:
             failed += 1
             continue
         canonical, raw, match = remap_discipline(result, synonym_index)
-        # D2540: when the discipline is unresolved (domain-topic FB), prefer the LLM's
-        # accurate `domains` output over the coarse discipline guess (e.g. "branding"
-        # vs "marketing") so the raw label is precise for the follow-up kind-swap.
         if canonical == "emerging" and isinstance(result, dict):
             doms = result.get("domains") or []
             if isinstance(doms, list) and doms and str(doms[0]).strip():
                 raw = str(doms[0]).strip()
         old_disc = fb["discipline"]
         old_raw = fb.get("discipline_raw") or ""
-
-        # Harvest every corrected raw label (resolved AND still-emerging) for BUG-150.
         harvest.append({
             "fb_id": fb["fb_id"],
             "name": fb["name"],
@@ -423,10 +404,6 @@ def main() -> int:
             "canonical_discipline": canonical,
             "taxonomy_match_method": match,
         })
-
-        # D2532: write when the re-decision changes EITHER the canonical discipline
-        # OR the raw label. This resolves emerging→real AND repairs the D2378
-        # empty-discipline_raw violation (1097 pre-existing rows) in one pass.
         changed = (canonical != old_disc) or (raw != old_raw)
         if changed:
             updates.append({
@@ -445,43 +422,116 @@ def main() -> int:
                     samples.append(f"  {fb['fb_id'][:16]}  raw {old_raw!r} → {raw!r} (still emerging)")
         if canonical == "emerging" and raw == old_raw:
             still_emerging += 1
+    return updates, harvest, {
+        "resolved": resolved, "raw_fixed": raw_fixed,
+        "still_emerging": still_emerging, "failed": failed, "samples": samples,
+    }
 
-    n_ok = len(fbs) - failed
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="BUG-197 targeted merged-axis DISCIPLINE re-classification (D2532)")
+    parser.add_argument("--db", default=str(DB_PATH), help="Path to maxwell.db (default from config)")
+    parser.add_argument("--where", default=DEFAULT_WHERE, help="SQL predicate selecting affected FBs")
+    parser.add_argument("--limit", type=int, default=None, help="Cap rows (A/B sample); deterministic ORDER BY fb_id")
+    parser.add_argument("--batch", dest="batch", action="store_true", default=None, help="Force batch mode")
+    parser.add_argument("--slim", dest="slim", action="store_true", default=False, help="Discipline-only prompt (D2534; ~2x faster, experimental)")
+    parser.add_argument("--no-slim", dest="slim", action="store_false", help="Full merged CRIBS+classification (slow)")
+    parser.add_argument("--no-batch", dest="batch", action="store_false", help="Force sequential (merged-call) mode")
+    parser.add_argument("--batch-size", type=int, default=None, help="Batch chunk size (default stage4.batch_size)")
+    parser.add_argument("--model", default=None, help="Classifier model (default VERIFY_MODEL)")
+    parser.add_argument("--apply", action="store_true", help="Write resolved disciplines to DB (backup + integrity gate)")
+    parser.add_argument("--harvest", default=None, help="JSONL path for harvested raw labels (BUG-150 promotion input)")
+    parser.add_argument("--sync", dest="sync", action="store_true", default=True, help="Re-sync S4/S5 checkpoints after apply (default; fixes DB↔checkpoint drift)")
+    parser.add_argument("--no-sync", dest="sync", action="store_false", help="Skip checkpoint re-sync after apply")
+    parser.add_argument("--chunk", type=int, default=CHUNK_SIZE_DEFAULT, help="FBs per atomic apply (checkpoint/resume granularity)")
+    parser.add_argument("--skip-backup", action="store_true", help="DANGER: skip pre-write backup (dev only)")
+    parser.add_argument("--skip-integrity", action="store_true", help="DANGER: skip integrity gate (dev only)")
+    args = parser.parse_args()
+
+    db_path = Path(args.db)
+    batch_size = args.batch_size if args.batch_size is not None else int(_cfg_stage4("batch_size", BATCH_SIZE_DEFAULT))
+    batch = args.batch if args.batch is not None else bool(_cfg_stage4("batch_enabled", False))
+    model = args.model or VERIFY_MODEL
+
+    fbs = load_affected(db_path, args.where, args.limit)
+    if not fbs:
+        print(f"⚠️  No FBs match `{args.where}` — nothing to do.")
+        return 0
+
+    chunk_size = max(1, args.chunk)
+    mode = "BATCH" if batch else "SEQUENTIAL"
+    print(f"🎯 D2532 discipline re-classification: {len(fbs)} FBs | mode={mode} | batch_size={batch_size} | chunk={chunk_size} | model={model}")
+    print(f"   where: {args.where}")
+
+    # D2534: unbuffered stdout so the backgrounded run's log is tail-able in real time.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception as e:  # C16: fail-loud, never silently swallow
+        print(f"  ⚠️  stdout.reconfigure failed ({type(e).__name__}: {e}) — progress log will be buffered", file=sys.stderr)
+
+    synonym_index = get_synonym_index()
+
+    # C13: backup + integrity gate ONCE, before the first write (not per chunk).
+    if args.apply and not args.skip_backup:
+        _backup_db(db_path)
+    elif args.apply:
+        print("  ⚠️  --skip-backup: proceeding WITHOUT a pre-write backup (dev only)")
+    if args.apply and not args.skip_integrity:
+        _integrity_gate(db_path)
+    elif args.apply:
+        print("  ⚠️  --skip-integrity: proceeding WITHOUT integrity gate (dev only)")
+
+    harvest_path = Path(args.harvest) if args.harvest else None
+    t0 = time.time()
+    n_chunks = (len(fbs) + chunk_size - 1) // chunk_size
+    total_updates = 0
+    total_resolved = total_raw_fixed = total_still = total_failed = 0
+    all_samples: list[str] = []
+
+    # D2533 resume: process in checkpoint chunks. Each chunk is classified, its
+    # harvest appended (crash-safe), then applied ATOMICALLY. A crash mid-run loses
+    # at most one chunk; re-running the same --where skips already-applied FBs
+    # (their discipline changed OR discipline_raw filled), so resume is automatic.
+    for ci in range(n_chunks):
+        chunk = fbs[ci * chunk_size:(ci + 1) * chunk_size]
+        results = classify_fbs(chunk, batch, batch_size, model, slim=args.slim)
+        updates, harvest, stats = _process_batch(chunk, results, synonym_index)
+        total_updates += len(updates)
+        total_resolved += stats["resolved"]
+        total_raw_fixed += stats["raw_fixed"]
+        total_still += stats["still_emerging"]
+        total_failed += stats["failed"]
+        all_samples.extend(stats["samples"])
+        if harvest_path and harvest:
+            _append_harvest(harvest_path, harvest)
+        if args.apply and updates:
+            _apply_updates(db_path, updates)
+        done = min((ci + 1) * chunk_size, len(fbs))
+        print(f"   chunk {ci + 1}/{n_chunks}: {done}/{len(fbs)} classified | +{len(updates)} applied | {time.time() - t0:.0f}s elapsed")
+
+    elapsed = time.time() - t0
+    n_ok = len(fbs) - total_failed
     print(f"\n📊 RESULTS ({mode}, {elapsed:.1f}s, {elapsed / max(n_ok, 1):.1f}s/FB successful):")
-    print(f"   classified: {n_ok}/{len(fbs)}  failed: {failed}")
-    print(f"   RESOLVED (emerging → real canonical discipline): {resolved}")
-    print(f"   raw-corrected (still emerging, raw label repaired): {raw_fixed}")
-    print(f"   still emerging + unchanged (genuine taxonomy gap → BUG-150): {still_emerging}")
-    print(f"   DB rows to write: {len(updates)}")
-    for s in samples:
+    print(f"   classified: {n_ok}/{len(fbs)}  failed: {total_failed}")
+    print(f"   RESOLVED (emerging → real canonical discipline): {total_resolved}")
+    print(f"   raw-corrected (still emerging, raw label repaired): {total_raw_fixed}")
+    print(f"   still emerging + unchanged (genuine taxonomy gap → BUG-150): {total_still}")
+    print(f"   DB rows written: {total_updates}")
+    for s in all_samples[:10]:
         print(s)
 
-    if args.harvest:
-        hp = Path(args.harvest)
-        hp.parent.mkdir(parents=True, exist_ok=True)
-        # C6: crash-safe write (tempfile → fsync → os.replace) via io_guard.safe_write.
-        safe_write(hp, "".join(json.dumps(h, ensure_ascii=False) + "\n" for h in harvest), force_shrink=True)
-        print(f"\n🌾 Harvested {len(harvest)} corrected raw disciplines → {hp} (BUG-150 promotion input)")
+    if harvest_path:
+        print(f"\n🌾 Harvested corrected raw disciplines → {harvest_path} (BUG-150 promotion input)")
 
-    if not updates:
+    if total_updates == 0:
         print("\n✅ No discipline/raw changes — nothing to write.")
         return 0
 
     if not args.apply:
-        print(f"\n🔍 DRY-RUN — no writes. Re-run with --apply to persist {len(updates)} resolved disciplines.")
+        print(f"\n🔍 DRY-RUN — no writes. Re-run with --apply to persist {total_updates} resolved disciplines.")
         return 0
 
-    if not args.skip_backup:
-        _backup_db(db_path)
-    else:
-        print("  ⚠️  --skip-backup: proceeding WITHOUT a pre-write backup (dev only)")
-    if not args.skip_integrity:
-        _integrity_gate(db_path)
-    else:
-        print("  ⚠️  --skip-integrity: proceeding WITHOUT integrity gate (dev only)")
-
-    n = _apply_updates(db_path, updates)
-    print(f"\n✅ Applied {n} resolved disciplines to {db_path}.")
+    print(f"\n✅ Applied {total_updates} resolved disciplines to {db_path}.")
     if args.sync:
         _sync_checkpoints()
     else:

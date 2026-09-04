@@ -4,7 +4,12 @@ Authority: CONSTITUTION.md C21, D2056.
 Ratified: 2026-07-22.
 
 Swap SQLite -> PostgreSQL -> LanceDB -> JSON files by changing ONE config line.
-Default: sqlite_backend.py (SQLite + FTS5 + sqlite-vec, zero-dependency).
+
+NOTE (D2552): no `sqlite_backend.py` concrete class exists — this Protocol has
+no default implementation. SQLite storage is inlined in `retrieve.py` (FTS5),
+`stage6_commit.py` (write), and `backfill_embeddings.py` (sqlite-vec), bypassing
+the abstraction. Do not cite `sqlite_backend.py` as a live file; it is a future
+refactor target (D2056).
 """
 
 from abc import abstractmethod

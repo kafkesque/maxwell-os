@@ -9,10 +9,14 @@ previous one causes cumulative memory growth. This module provides
 on-demand unloading between pipeline stages.
 """
 
+import sys
+from pathlib import Path
+
 import requests
 
-OMLX_URL = "http://localhost:11435"
-OMLX_API_KEY = "sk-maxwell-local"
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT))
+from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL  # noqa: E402  (C12: single source, D2552)
 
 
 def unload_model(model_name: str) -> bool:

@@ -66,7 +66,7 @@ These are already-established findings. Do not re-litigate them; build on them.
 4. **MoE decode ceiling is structural.** Qwen3-Coder-30B decodes ~50 tok/s single / ~16 tok/s per-request under 3-way concurrency (128-expert sparse MoE serializes). Not a config issue. 6 workers degrade; 3 optimal.
 5. **S2 singleton classification IS multi-class** (verified: 101 principle / 40 process_template / 34 tool_instruction / 1 process_instance in 176 FBs). "Default principle" applies to **convergent only** (D2323). S4 `_resolve_content_type` preserves explicit roles; does not override.
 6. **S5 is principle-only by construction** (`load_stage4_fbs` reads `checkpoint.jsonl`, never the PT/PI/TI/GE sidecars). Non-principle types dead-end at S4. (D2458, BUG-165, "Path A".)
-7. **S4 golden is tiny and NOT wired into prompts** — `config/golden/stage4_golden.yaml` (4 examples, 6.4KB) is not injected (D2454 quality gap).
+7. **S4 golden IS wired into prompts (D2454)** — `config/golden/stage4_golden.yaml` (7 examples, `meta.status: WIRED`) is injected via `pipeline/s4_golden.py` honoring `stage4.golden_inject_enabled: true`. (Prior "4 examples / not wired" note was pre-D2454 and is stale.)
 8. **S4 is decode-bound**: gpt-oss-20b 20B MoE / 4 active experts, ~4-6h floor.
 9. **oMLX speed levers already investigated** (see §6 exclusions): SpecPrefill (needs same-vocab draft, lossless in theory), dflash (needs trained draft — N/A), TurboQuant KV (conflicts with `--no-cache`), ANE prefill (kernels only for Qwen3.5/3.6/3.8, not `qwen3_moe`).
 10. **BUG-175 fixed**: `author="string"` provenance contamination (Phi-4-mini hallucination) → sentinel validation + backfill (D2459).

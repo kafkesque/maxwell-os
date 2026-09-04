@@ -74,6 +74,11 @@ delegate-check:
 delegate-fix:
     python3 tools/delegate_safe.py --fix
 
+# ── Standardized one-shot local-LLM delegation (BUG-220 / D2543) ──
+# Qwen3-Coder single-shot code gen ONLY — never multi-turn (DELEGATE-002).
+oneshot model prompt:
+    python3 pipeline/omlx_delegate.py --model "{{model}}" --prompt "{{prompt}}"
+
 # ── Two-tier Smoke Tests (D2120) ────────────────────────────────────────
 
 # Tier 1: Plumbing smoke — no LLM, validates pipeline plumbing (<30s)

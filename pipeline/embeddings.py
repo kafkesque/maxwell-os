@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 # ── Config (C12: no hardcoded values) ──────────────────────────────────────
 import yaml
 
-from pipeline.pipeline_paths import OLLAMA_URL
+from pipeline.pipeline_paths import OLLAMA_URL, S15_EMBED_NATIVE_MRL
 
 _CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
 with open(_CFG_PATH) as f:
@@ -63,7 +63,10 @@ def embed_texts_bge_m3(texts: list[str], batch_size: int = BATCH_SIZE) -> np.nda
 
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i + batch_size]
-        payload = json.dumps({"model": EMBED_MODEL, "input": batch}).encode("utf-8")
+        _req: dict[str, Any] = {"model": EMBED_MODEL, "input": batch}
+        if S15_EMBED_NATIVE_MRL:
+            _req["dimensions"] = EMBED_DIM  # D2551: native MRL 512d head (Ollama) vs manual truncate
+        payload = json.dumps(_req).encode("utf-8")
         req = urllib.request.Request(
             endpoint, data=payload,
             headers={"Content-Type": "application/json"},

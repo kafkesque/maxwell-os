@@ -1,0 +1,57 @@
+# config/taxonomy_shacl.ttl — SHACL formalization of Maxwell OS taxonomy (D2546)
+# AUTO-GENERATED from config/taxonomy_v5.yaml — do NOT edit by hand.
+# Regenerate: python3 scripts/generate_taxonomy_shacl.py
+# Canonicals: 43 domains + 61 disciplines = 104 (taxonomy v5.5)
+
+@prefix maxwell: <https://maxwell.os/taxonomy#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ── R14: persistent-object stamps (every committed FB) ─────────────────────
+maxwell:FoundationBlockShape
+    a sh:NodeShape ;
+    sh:targetClass maxwell:FoundationBlock ;
+    sh:property [
+        sh:path maxwell:fb_id ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+    ] ;
+    sh:property [
+        sh:path maxwell:schema_version ;
+        sh:minCount 1 ;
+    ] ;
+    sh:property [
+        sh:path maxwell:taxonomy_version ;
+        sh:minCount 1 ;
+        sh:in ( "v5.5" ) ;
+    ] .
+
+# ── Closed canonical sets ──────────────────────────────────────────────────
+maxwell:CanonicalDomainShape
+    a sh:NodeShape ;
+    sh:targetClass maxwell:CanonicalDomain ;
+    sh:closed true ;
+    sh:property [
+        sh:path maxwell:label ;
+        sh:in ( "graphic design" "brand identity" "editorial & advertising" "motion design" "environmental design" "digital product" "data visualization" "creative technology" "web & ui" "user experience" "illustration" "packaging" "business operations" "business development" "entrepreneurship" "organizational behavior" "ai & agents" "urban planning" "engineering practice" "computational art" "code & computation" "computational science & physics" "systems & frameworks" "semiotics & communication" "research & methodology" "education" "health & wellness" "finance & investment" "marketing & communications" "legal & public policy" "science & research" "arts & culture" "engineering & infrastructure" "media & entertainment" "social sciences" "product design" "design strategy" "project management" "leadership" "personal productivity" "industrial design" "information architecture" "design systems" ) ;
+    ] .
+
+maxwell:CanonicalDisciplineShape
+    a sh:NodeShape ;
+    sh:targetClass maxwell:CanonicalDiscipline ;
+    sh:closed true ;
+    sh:property [
+        sh:path maxwell:label ;
+        sh:in ( "visual perception" "visual semiotics" "cultural design" "semiotics" "typography" "color theory" "motion & time" "design psychology" "creative process" "cognitive science" "behavioral economics" "organizational theory" "decision making" "psychology" "linguistics" "strategic thinking" "risk management" "systems thinking" "complex adaptive systems" "systems engineering" "research methodology" "operations research" "machine learning" "generative ai" "software engineering" "creative coding" "generative design" "computational physics & simulation" "computational geometry" "game design" "political economy" "privacy & surveillance" "philosophy" "artificial intelligence" "communication theory" "human-computer interaction" "interdisciplinary studies" "information science" "finance" "economics" "sociology" "anthropology" "cultural studies" "theoretical physics" "aesthetics" "media studies" "computer graphics" "law" "information security" "evolutionary biology" "social network analysis" "neuroscience" "robotics" "health & medicine" "performing arts" "literary theory" "engineering" "design thinking" "information retrieval" "computational theory" "computer networking" ) ;
+    ] .
+
+# ── Kind-safety (D2500): domain and discipline canonicals are DISJOINT ─────
+maxwell:CanonicalDomain
+    a rdfs:Class ;
+    owl:disjointWith maxwell:CanonicalDiscipline .
+maxwell:CanonicalDiscipline
+    a rdfs:Class ;
+    owl:disjointWith maxwell:CanonicalDomain .

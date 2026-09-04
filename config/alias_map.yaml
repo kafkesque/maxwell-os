@@ -17,7 +17,7 @@ discipline_aliases:
   artificial intelligence safety: artificial intelligence
   artificial intelligence strategy: artificial intelligence
   artificial intelligence systems engineering: systems engineering
-  atmospheric physics: theoretical physics
+  atmospheric physics: computational physics & simulation
   augmented reality: computer graphics
   augmented reality design: computer graphics
   autonomous systems engineering: robotics
@@ -26,18 +26,18 @@ discipline_aliases:
   behavioral finance: behavioral economics
   behavioral neuroscience: neuroscience
   biometrics: information science
-  biophysics: theoretical physics
+  biophysics: computational physics & simulation
   blockchain economics: economics
   business law: law
   career counseling: psychology
-  chemical physics: theoretical physics
+  chemical physics: computational physics & simulation
   chronobiology: neuroscience
   circadian biology: neuroscience
   classical mechanics: theoretical physics
   clinical neuroscience: neuroscience
   cognitive anthropology: anthropology
-  color science: visual perception
-  communication design: design thinking
+  color science: color theory
+  communication design: communication theory
   communication science: communication theory
   comparative cognition: cognitive science
   comparative religion: anthropology
@@ -45,21 +45,21 @@ discipline_aliases:
   computer science - simulation engineering: computational physics & simulation
   conceptual metaphor theory: linguistics
   consumer neuroscience: neuroscience
-  contract theory: philosophy
+  contract theory: economics
   conversational ai: artificial intelligence
-  corporate sustainability management: systems thinking
-  creative arts practice: performing arts
+  corporate sustainability management: organizational theory
+  creative arts practice: aesthetics
   creative cognition: cognitive science
   critical theory: cultural studies
   cultural economics: economics
   cultural psychology: psychology
-  customer experience management: design thinking
-  data communication: information science
-  data engineering: information science
-  database systems: information science
+  customer experience management: design psychology
+  data communication: computer networking
+  data engineering: software engineering
+  database systems: software engineering
   deep learning architecture: machine learning
   deep learning engineering: machine learning
-  deep learning systems engineering: machine learning
+  deep learning systems engineering: software engineering
   design aesthetics: aesthetics
   design cognition: cognitive science
   design for development: interdisciplinary studies
@@ -82,7 +82,7 @@ discipline_aliases:
   environmental communication: communication theory
   environmental engineering: engineering
   exercise physiology: health & medicine
-  existential psychology: philosophy
+  existential psychology: psychology
   experience design: design thinking
   experimental design: research methodology
   explainable artificial intelligence: artificial intelligence
@@ -92,18 +92,18 @@ discipline_aliases:
   financial regulation: law
   generative artificial intelligence: generative ai
   generative linguistics: linguistics
-  genetic engineering: evolutionary biology
+  genetic engineering: engineering
   grounded theory methodology: research methodology
   health communication: communication theory
-  health economics: health & medicine
+  health economics: economics
   healthcare management: health & medicine
   historical linguistics: linguistics
   human factors and ergonomics: human-computer interaction
-  human genetics: evolutionary biology
+  human genetics: health & medicine
   human-centered ai: human-computer interaction
   industrial and organizational psychology: psychology
   industrial economics: economics
-  industrial engineering: systems engineering
+  industrial engineering: engineering
   industrial organization economics: economics
   information economics: economics
   information technology law: law
@@ -118,26 +118,26 @@ discipline_aliases:
   machine learning ethics: artificial intelligence
   machine learning operations: machine learning
   marketing economics: economics
-  mathematical logic: philosophy
+  mathematical logic: computational theory
   mathematical physics: theoretical physics
-  media arts: performing arts
-  media arts and design: performing arts
+  media arts: media studies
+  media arts and design: media studies
   media economics: economics
   medical informatics: health & medicine
   military strategy: strategic thinking
   military studies: strategic thinking
   military technology integration: systems engineering
-  molecular biology: evolutionary biology
+  molecular biology: health & medicine
   moral psychology: psychology
   multimedia design: computer graphics
   multimedia systems engineering: systems engineering
   music psychology: cognitive science
-  mythology: literary theory
+  mythology: cultural studies
   narrative theory: literary theory
   nonlinear dynamics: complex adaptive systems
   numerical analysis: computational physics & simulation
   optical engineering: engineering
-  optics: computational physics & simulation
+  optics: theoretical physics
   optimization theory: operations research
   organizational economics: economics
   organizational risk management: risk management
@@ -201,4 +201,864 @@ discipline_aliases:
   web accessibility: human-computer interaction
   web engineering: software engineering
   web security: information security
-domain_aliases: {}
+  distributed systems engineering: software engineering
+  human-centered design research: human-computer interaction
+  music production: performing arts
+  public policy and administration: political economy
+  digital media design: media studies
+  interactive media development: media studies
+  real-time systems engineering: software engineering
+  interactive media design: media studies
+  interactive media engineering: media studies
+  human-centered ai design: human-computer interaction
+  art theory and practice: aesthetics
+  social science theory: sociology
+  problem solving theory: decision making
+  music theory: performing arts
+  history of science and intellectual history: research methodology
+  motion graphics production: motion & time
+  digital media production: media studies
+  visual effects production: computer graphics
+  publishing design: media studies
+  fractals and complex systems: complex adaptive systems
+  healthcare design: health & medicine
+  law and legal studies: law
+  theatre studies: performing arts
+  innovation studies: creative process
+  engineering management: engineering
+  family systems theory: systems thinking
+  virtual reality studies: human-computer interaction
+  virtual reality design: human-computer interaction
+  visual culture studies: visual perception
+  media and communication studies: communication theory
+  architectural design theory: design thinking
+  interactive media studies: media studies
+  software engineering management: software engineering
+  animation theory: motion & time
+  social systems engineering: systems thinking
+  artificial intelligence and creative computing: artificial intelligence
+  art history and theory: cultural design
+  social science methodology: sociology
+  creative process studies: creative process
+  visual communication theory: visual semiotics
+  library and information science: information science
+  creative practice theory: creative process
+  consumer behavior studies: behavioral economics
+  consumer behavior research: behavioral economics
+  engineering design: engineering
+  history of science and technology: research methodology
+  public policy analytics: political economy
+  law and technology: law
+  film production design: motion & time
+  film and media studies: media studies
+  animation production: motion & time
+  social systems research: systems thinking
+  human factors engineering: human-computer interaction
+  organizational learning: organizational theory
+  social science research methods: research methodology
+  architectural theory: cultural design
+  literary studies: literary theory
+  design systems engineering: systems engineering
+  creative studies: creative process
+  technical communication: communication theory
+  phonology: linguistics
+  agile software development: software engineering
+  competitive intelligence: strategic thinking
+  time series analysis: operations research
+  philosophy of logic: philosophy
+  prompt engineering: generative ai
+  international business strategy: strategic thinking
+  energy economics: economics
+  cultural geography: cultural studies
+  entrepreneurial psychology: psychology
+  entrepreneurial economics: economics
+  corporate law: law
+  legal informatics: information science
+  rhetorical studies: communication theory
+  higher education administration: organizational theory
+  agricultural economics: economics
+  sports psychology: psychology
+  data mining: machine learning
+  statistical risk analysis: risk management
+  automotive engineering: engineering
+  construction economics: economics
+  programming languages: software engineering
+  psychophysiology: neuroscience
+  education technology: human-computer interaction
+  nutrition science: health & medicine
+  team management: organizational theory
+  statistical learning: machine learning
+  film theory: media studies
+  social movement studies: sociology
+  organizational communication: communication theory
+  art practice: aesthetics
+  digital media arts: media studies
+  design studios: design thinking
+  cross-cultural communication: communication theory
+  ethology: evolutionary biology
+  advertising communication: communication theory
+  digital humanities: interdisciplinary studies
+  history of communication: communication theory
+  transpersonal psychology: psychology
+  artistic psychology: psychology
+  digital economics: economics
+  contract law: law
+  design economics: economics
+  art economics: economics
+  performance management: organizational theory
+  comparative mythology: cultural studies
+  social anthropology: anthropology
+  phenomenological philosophy: philosophy
+  biological semiotics: semiotics
+  animation technology: computer graphics
+  clinical nutrition: health & medicine
+  maternal and child health: health & medicine
+  architectural sociology: sociology
+  narrative psychology: psychology
+  community-based participatory research: research methodology
+  technology ethics: philosophy
+  real estate economics: economics
+  consumer economics: economics
+  computability theory: computational theory
+  semiconductor engineering: engineering
+  business finance: finance
+  ecological engineering: engineering
+  legal psychology: psychology
+  clinical informatics: information science
+  neuroimaging: neuroscience
+  interactive media technology: human-computer interaction
+  psychodynamic psychology: psychology
+  corporate social responsibility: organizational theory
+  industrial relations: sociology
+  digital transformation strategy: strategic thinking
+  historical methodology: research methodology
+  sports science: health & medicine
+  ecommerce analytics: information science
+  clinical epidemiology: health & medicine
+  implementation science: research methodology
+  environmental ethics: philosophy
+  quantitative finance: finance
+  celestial mechanics: theoretical physics
+  military ethics: philosophy
+  workforce development: organizational theory
+  health services research: health & medicine
+  advertising technology: information science
+  medical ethics: philosophy
+  financial ethics: philosophy
+  psychoanalytic theory: psychology
+  animal cognition: cognitive science
+  philosophy of epistemology: philosophy
+  evolutionary anthropology: anthropology
+  historical sociology: sociology
+  academic administration: organizational theory
+  affective computing: human-computer interaction
+  Information Systems: information science
+  information systems: information science
+  Information systems: information science
+  Health Informatics: information science
+  health informatics: information science
+domain_aliases:
+  marketing & advertising:
+  - marketing & communications
+  - editorial & advertising
+  advertising & branding:
+  - editorial & advertising
+  - brand identity
+  marketing & branding:
+  - marketing & communications
+  - brand identity
+  advertising & marketing:
+  - editorial & advertising
+  - marketing & communications
+  publishing & editorial design:
+  - media & entertainment
+  - editorial & advertising
+  ux/ui design:
+  - user experience
+  - web & ui
+  digital media design: media & entertainment
+  branding & identity: brand identity
+  digital media production: media & entertainment
+  policy & regulation: legal & public policy
+  training & education: education
+  ai & machine learning: ai & agents
+  ai & machine learning deployment: ai & agents
+  sales & business development:
+  - marketing & communications
+  - business development
+  finance & accounting: finance & investment
+  ai ethics & governance: legal & public policy
+  nlp research: ai & agents
+  education & training: education
+  human resources development: organizational behavior
+  research management: research & methodology
+  social media design: marketing & communications
+  user experience research: user experience
+  research & development: research & methodology
+  digital product development: digital product
+  usability engineering: user experience
+  digital product management: digital product
+  film and animation: motion design
+  art & illustration:
+  - arts & culture
+  - illustration
+  architecture & interior design:
+  - engineering practice
+  - environmental design
+  human factors & ergonomics: user experience
+  ai & autonomous systems:
+  - ai & agents
+  - engineering & infrastructure
+  ai & robotics: ai & agents
+  film & media production: media & entertainment
+  human factors engineering: user experience
+  coaching & counseling: health & wellness
+  e-commerce analytics: marketing & communications
+  product engineering: digital product
+  education & curriculum design: education
+  marketing & sales: marketing & communications
+  leadership development: leadership
+  business model design: business operations
+  sales and marketing operations: marketing & communications
+  video analytics: data visualization
+  frontend development: web & ui
+  mental health & counseling: health & wellness
+  healthcare management: health & wellness
+  training & development: education
+  psychology & mental health: health & wellness
+  environmental management: business operations
+  operations & devops:
+  - business operations
+  - engineering practice
+  cloud infrastructure management: engineering practice
+  business analysis: business operations
+  art & design: arts & culture
+  fashion & interior design: industrial design
+  robotics & autonomous systems: engineering practice
+  negotiation & sales: marketing & communications
+  education & cooperative learning: education
+  agile development: project management
+  customer experience management: user experience
+  music production: arts & culture
+  responsive design: web & ui
+  frontend engineering: web & ui
+  education & pedagogy: education
+  scientific research: science & research
+  complex systems analysis: systems & frameworks
+  accessibility engineering: user experience
+  digital design: graphic design
+  customer experience design: user experience
+  public policy design: legal & public policy
+  productivity & time management: personal productivity
+  interactive media design: media & entertainment
+  film & animation: motion design
+  startup development: entrepreneurship
+  coaching & personal development: personal productivity
+  interactive installation design: creative technology
+  organizational leadership development: leadership
+  design & branding: brand identity
+  branding & marketing:
+  - brand identity
+  - marketing & communications
+  policy & governance: legal & public policy
+  architecture & design: engineering practice
+  law & governance: legal & public policy
+  virtual reality development: media & entertainment
+  education research: education
+  healthcare research: health & wellness
+  team management: organizational behavior
+  counseling & therapy: health & wellness
+  art & visual communication:
+  - arts & culture
+  - graphic design
+  productivity management: personal productivity
+  education & skill development: education
+  productivity analytics: personal productivity
+  printing & publishing: media & entertainment
+  digital art & design: computational art
+  negotiation & conflict resolution: leadership
+  human resources & hiring: leadership
+  marketing & brand strategy: marketing & communications
+  leadership & management:
+  - leadership
+  - organizational behavior
+  research & analytics: research & methodology
+  ai & machine learning engineering: ai & agents
+  interactive media development: media & entertainment
+  ai & nlp: ai & agents
+  ai research: ai & agents
+  ai training & fine-tuning: ai & agents
+  ai development: ai & agents
+  front-end engineering: web & ui
+  system engineering: systems & frameworks
+  agile methodology: business operations
+  marketing & consumer behavior: marketing & communications
+  cultural heritage management: arts & culture
+  sales & negotiation: marketing & communications
+  research analytics: research & methodology
+  dashboard design: data visualization
+  e-learning development: education
+  simulation engineering: computational science & physics
+  command and control systems: systems & frameworks
+  branding & storytelling: brand identity
+  communication & storytelling: semiotics & communication
+  education & learning: education
+  app development: digital product
+  sales & marketing: marketing & communications
+  sales & distribution: marketing & communications
+  sales & account management: marketing & communications
+  innovation design: entrepreneurship
+  education & instructional design: education
+  psychology & counseling: health & wellness
+  communication & public speaking: semiotics & communication
+  communication & rhetoric: semiotics & communication
+  media & communication: semiotics & communication
+  social media analytics: marketing & communications
+  innovation & design: entrepreneurship
+  advertising & media: editorial & advertising
+  sales & revenue optimization: marketing & communications
+  e-commerce design: marketing & communications
+  ai & knowledge graphs: ai & agents
+  design & visual communication: graphic design
+  human resources & organizational behavior:
+  - leadership
+  - organizational behavior
+  public policy & regulation: legal & public policy
+  design & user experience: user experience
+  business & finance: business operations
+  sales & revenue management: marketing & communications
+  public policy & risk communication: legal & public policy
+  media and communication: semiotics & communication
+  social science methodology: social sciences
+  public policy research: legal & public policy
+  coaching & personal growth: personal productivity
+  ai strategy & governance: ai & agents
+  healthcare analytics: health & wellness
+  ai ethics and governance: ai & agents
+  retail analytics: business operations
+  artificial intelligence & agents: ai & agents
+  operations & logistics: business operations
+  visual effects production: media & entertainment
+  animation production: motion design
+  operations & monitoring: business operations
+  process engineering: engineering practice
+  data science & analytics: data visualization
+  human resources & training:
+  - leadership
+  - education
+  mental health & well-being: health & wellness
+  education & communication:
+  - education
+  - semiotics & communication
+  branding & visual identity: brand identity
+  advertising design: editorial & advertising
+  education & literacy: education
+  architecture & construction: engineering practice
+  interactive media production: media & entertainment
+  public health research: health & wellness
+  environmental studies: science & research
+  entrepreneurship & venture creation: entrepreneurship
+  broadcasting & digital media: media & entertainment
+  virtual reality design: digital product
+  virtual reality & game design: media & entertainment
+  research & academia:
+  - research & methodology
+  - education
+  product research: digital product
+  public health studies: health & wellness
+  qualitative studies: research & methodology
+  simulation & modeling: computational science & physics
+  infrastructure development: engineering & infrastructure
+  information technology & software maintenance: code & computation
+  infrastructure & utilities: engineering & infrastructure
+  retail design: environmental design
+  art & architecture:
+  - arts & culture
+  - engineering practice
+  human resources & leadership: organizational behavior
+  cybersecurity & social engineering: code & computation
+  leadership & organizational behavior:
+  - leadership
+  - organizational behavior
+  public policy & communication:
+  - legal & public policy
+  - semiotics & communication
+  human resources & organizational change: organizational behavior
+  customer service & sales:
+  - business operations
+  - marketing & communications
+  visual arts management: arts & culture
+  art practice: arts & culture
+  law and governance: legal & public policy
+  innovation studies: research & methodology
+  public policy & social change: legal & public policy
+  ux/ui development: user experience
+  graphic design practice: graphic design
+  web & interface design: web & ui
+  print & editorial design: editorial & advertising
+  signage design: environmental design
+  art & visual culture: arts & culture
+  communication research: semiotics & communication
+  music analysis: arts & culture
+  product development research: product design
+  qualitative methodology: research & methodology
+  social science studies: social sciences
+  scientific methodology: research & methodology
+  humanities & social sciences: social sciences
+  design & ux: user experience
+  communication engineering: engineering practice
+  education and training: education
+  art history & criticism: arts & culture
+  animation & motion graphics: motion design
+  animation design: motion design
+  video production: motion design
+  publishing design: editorial & advertising
+  public information & signage: environmental design
+  public policy & political science: legal & public policy
+  communication & media studies: semiotics & communication
+  communication & media: semiotics & communication
+  digital media analysis: media & entertainment
+  education & curriculum development: education
+  team design: organizational behavior
+  interactive media studies: media & entertainment
+  customer service management: business operations
+  governance and anti-corruption: legal & public policy
+  editorial practice: editorial & advertising
+  research & innovation:
+  - research & methodology
+  - entrepreneurship
+  complex systems studies: systems & frameworks
+  quality assurance & control: engineering practice
+  digital media management: media & entertainment
+  print & publishing: media & entertainment
+  design system development: design systems
+  ai & machine learning (bias): ai & agents
+  numerical analysis: computational science & physics
+  wellness & stress management: health & wellness
+  ethics & governance: ai & agents
+  government & public policy: legal & public policy
+  branding & advertising:
+  - brand identity
+  - editorial & advertising
+  wellness & mindfulness: health & wellness
+  business strategy & decision analysis: business operations
+  therapeutic & counseling: health & wellness
+  marketing & brand storytelling:
+  - marketing & communications
+  - brand identity
+  public speaking & leadership: leadership
+  logistics and supply chain management: business operations
+  media technology development: media & entertainment
+  advertising & brand management:
+  - editorial & advertising
+  - marketing & communications
+  mental health practice: health & wellness
+  team development: organizational behavior
+  publishing & editing: media & entertainment
+  wellness & health management: health & wellness
+  professional services management: business operations
+  engineering & control systems: engineering practice
+  optimization theory: computational science & physics
+  communication & journalism: semiotics & communication
+  editing & publishing: media & entertainment
+  art & critical design: arts & culture
+  public policy & governance: legal & public policy
+  media & communication studies: semiotics & communication
+  literature studies: arts & culture
+  innovation & entrepreneurship: entrepreneurship
+  environmental engineering: engineering practice
+  film and media production: media & entertainment
+  algorithm design: code & computation
+  physics research: computational science & physics
+  research and development: science & research
+  healthcare design: product design
+  political science & public policy: legal & public policy
+  social media management: marketing & communications
+  animation & visual arts:
+  - motion design
+  - arts & culture
+  museum & cultural heritage: arts & culture
+  education & demonstration: education
+  theatre production: arts & culture
+  creative technology management: creative technology
+  architecture & building design: engineering practice
+  communication & persuasion: semiotics & communication
+  human resources & talent management: organizational behavior
+  advertising & media planning: editorial & advertising
+  software design: code & computation
+  deep learning research: ai & agents
+  marketing and audience research: marketing & communications
+  magazine design: editorial & advertising
+  illustration and graphic design:
+  - illustration
+  - graphic design
+  music theory: arts & culture
+  publishing studies: media & entertainment
+  product packaging design: packaging
+  art & aesthetics: arts & culture
+  human resources & talent development: leadership
+  wellness & preventive health: health & wellness
+  social media analysis: marketing & communications
+  media production analysis: media & entertainment
+  marketing & audience analytics: marketing & communications
+  virtual reality & simulation:
+  - media & entertainment
+  - computational science & physics
+  art research: arts & culture
+  digital art practice: computational art
+  operations & reliability: business operations
+  economic policy analysis: legal & public policy
+  complex systems research: systems & frameworks
+  infrastructure management: engineering & infrastructure
+  marketing design: marketing & communications
+  art & media: arts & culture
+  governance & public policy: legal & public policy
+  art and design education:
+  - arts & culture
+  - design strategy
+  signage & wayfinding: environmental design
+  theatre & dance: arts & culture
+  art & design education:
+  - arts & culture
+  - design strategy
+  agile & scrum: business operations
+  research & evaluation: research & methodology
+  writing and publishing: media & entertainment
+  design & innovation: design strategy
+  accessibility design: user experience
+  art and design industry: arts & culture
+  design & visualization: data visualization
+  visual arts research: arts & culture
+  marketing & brand management: marketing & communications
+  software ui/ux: user experience
+  ai & automation: ai & agents
+  product analytics: digital product
+  mental health & wellbeing: health & wellness
+  physics & engineering: computational science & physics
+  personal health & wellness: health & wellness
+  art & performance: arts & culture
+  art & visual design: arts & culture
+  simulation & training:
+  - computational science & physics
+  - education
+  simulation and training:
+  - computational science & physics
+  - education
+  ui/ux development: web & ui
+  algorithmic design: computational art
+  complex systems management: systems & frameworks
+  public relations & advocacy: marketing & communications
+  program analysis: code & computation
+  architecture & design research:
+  - engineering practice
+  - design strategy
+  ai & ml infrastructure: ai & agents
+  public policy & criminal justice: legal & public policy
+  retail & wholesale: business operations
+  food science & culinary arts: science & research
+  construction & infrastructure: engineering & infrastructure
+  automation & control systems: systems & frameworks
+  literature & creative writing: arts & culture
+  architecture & urban planning:
+  - engineering practice
+  - urban planning
+  physics & astronomy: computational science & physics
+  public speaking & presentation: marketing & communications
+  cybersecurity & threat intelligence: code & computation
+  human factors research: user experience
+  startup analytics: entrepreneurship
+  ai & machine learning research: ai & agents
+  branding & identity design: brand identity
+  retail & e-commerce:
+  - packaging
+  - marketing & communications
+  healthcare practice: health & wellness
+  interactive installation development: creative technology
+  rhetoric & communication: semiotics & communication
+  management & leadership:
+  - organizational behavior
+  - leadership
+  research & development strategy: research & methodology
+  marketing & sales management:
+  - marketing & communications
+  - business development
+  innovation & technology transfer: entrepreneurship
+  marketing & consumer behaviour: marketing & communications
+  fitness & wellness: health & wellness
+  academic research management: research & methodology
+  management & strategy:
+  - organizational behavior
+  - design strategy
+  statistics & data science: data visualization
+  physics & spectroscopy: computational science & physics
+  ai & language model development: ai & agents
+  marketing & persuasion: marketing & communications
+  sales & customer relationship management: marketing & communications
+  cultural heritage studies: arts & culture
+  business strategy development: business operations
+  digital analytics: digital product
+  psychotherapy & counseling: health & wellness
+  entrepreneurship & startup development: entrepreneurship
+  modeling & simulation: computational science & physics
+  urban planning & design: urban planning
+  mental health research: health & wellness
+  spirituality & religion: arts & culture
+  literature & storytelling: arts & culture
+  art & design pedagogy: education
+  publishing & book production: media & entertainment
+  art & exhibition design:
+  - arts & culture
+  - environmental design
+  operations & maintenance: business operations
+  design & visual arts: arts & culture
+  mental health & therapy: health & wellness
+  counseling & psychotherapy: health & wellness
+  interactive analytics: data visualization
+  entertainment management: media & entertainment
+  gaming & entertainment: media & entertainment
+  digital art design: computational art
+  museum & exhibition design: environmental design
+  product development management: project management
+  simulation design: computational science & physics
+  healthcare law and regulation: legal & public policy
+  law & regulation: legal & public policy
+  governance studies: legal & public policy
+  process design: business operations
+  visual communication studies: graphic design
+  literature & writing: arts & culture
+  architecture & urban design:
+  - engineering practice
+  - urban planning
+  social research methodology: social sciences
+  branding & corporate identity: brand identity
+  art & painting: arts & culture
+  venture development: entrepreneurship
+  motion graphics production: motion design
+  publishing & book marketing: media & entertainment
+  healthcare & medical devices: health & wellness
+  cartography & gis: data visualization
+  publishing & editorial illustration: media & entertainment
+  engineering & physics: computational science & physics
+  mobile ui/ux design: user experience
+  animation engineering: code & computation
+  ai & data strategy: ai & agents
+  arts & entertainment: media & entertainment
+  art and visual culture: arts & culture
+  cultural heritage & museum studies: arts & culture
+  product design research: product design
+  digital media research: media & entertainment
+  visual communication research: graphic design
+  education & child development: education
+  communication & visualization:
+  - semiotics & communication
+  - data visualization
+  advertising and marketing:
+  - editorial & advertising
+  - marketing & communications
+  visual arts practice: arts & culture
+  music & audio production: arts & culture
+  software & digital content: engineering practice
+  theatre analysis: arts & culture
+  comedy & entertainment: media & entertainment
+  education & experiential learning: education
+  magazine & editorial design: editorial & advertising
+  poetry & literature: arts & culture
+  advertising analytics: editorial & advertising
+  newspaper production: editorial & advertising
+  illustration studies: illustration
+  music & entertainment marketing: arts & culture
+  publishing & book design: media & entertainment
+  marketing & customer engagement: marketing & communications
+  art & cultural studies: arts & culture
+  ai & machine learning application development: ai & agents
+  ai & machine learning development: ai & agents
+  startup engineering: entrepreneurship
+  organizational development: organizational behavior
+  organizational change: organizational behavior
+  business intelligence: data visualization
+  creative writing: arts & culture
+  creative arts: arts & culture
+  creative industries: arts & culture
+  architectural design: engineering & infrastructure
+  data analytics: data visualization
+  cross-cultural communication: semiotics & communication
+  journalism: media & entertainment
+  regulatory compliance: legal & public policy
+  higher education: education
+  consulting: business operations
+  religious studies: social sciences
+  management consulting: business operations
+  mental health counseling: health & wellness
+  corporate training: education
+  language education: education
+  cultural heritage preservation: arts & culture
+  ai system design: ai & agents
+  ai product development: ai & agents
+  innovation strategy: design strategy
+  digital humanities: arts & culture
+  psychotherapy: health & wellness
+  curriculum design: education
+  team leadership: leadership
+  manufacturing: engineering & infrastructure
+  customer relationship management: marketing & communications
+  personal finance: finance & investment
+  visual storytelling: illustration
+  consumer research: research & methodology
+  coaching & mentoring: leadership
+  financial services: finance & investment
+  business consulting: business operations
+  literary analysis: arts & culture
+  clinical research: science & research
+  print media: editorial & advertising
+  technology strategy: design strategy
+  corporate communications: marketing & communications
+  organizational decision making: organizational behavior
+  performance management: business operations
+  financial risk management: finance & investment
+  executive coaching: leadership
+  data journalism: data visualization
+  educational design: education
+  financial regulation: legal & public policy
+  mathematics education: education
+  science education: education
+  ai ethics: ai & agents
+  social media strategy: marketing & communications
+  environmental policy: legal & public policy
+  competitive intelligence: business development
+  financial modeling: finance & investment
+  screenwriting: media & entertainment
+  retail operations: business operations
+  experience design: user experience
+  consumer behavior research: social sciences
+  international business: business development
+  competitive analysis: business development
+  consumer goods: product design
+  medical education: education
+  legal compliance: legal & public policy
+  interdisciplinary research: research & methodology
+  policy design: legal & public policy
+  interactive storytelling: media & entertainment
+  technology policy: legal & public policy
+  design practice: design strategy
+  computer science education: education
+  performance arts: arts & culture
+  digital media strategy: marketing & communications
+  artistic practice: arts & culture
+  professional training: education
+  process improvement: business operations
+  leadership coaching: leadership
+  retail strategy: marketing & communications
+  innovation consulting: design strategy
+  business transformation: business operations
+  mental health treatment: health & wellness
+  music education: education
+  corporate management: business operations
+  event management: project management
+  consumer behavior analysis: social sciences
+  k-12 education: education
+  consumer protection: legal & public policy
+  television production: media & entertainment
+  online community management: marketing & communications
+  personal development coaching: personal productivity
+  government policy: legal & public policy
+  healthcare policy: legal & public policy
+  early childhood education: education
+  health policy: legal & public policy
+  relationship counseling: health & wellness
+  music composition: arts & culture
+  social innovation: design strategy
+  semantic web: information architecture
+  behavioral science: social sciences
+  visual analytics: data visualization
+  mobile app development: digital product
+  healthcare quality improvement: health & wellness
+  scientific visualization: data visualization
+  cross-cultural studies: social sciences
+  fine arts: arts & culture
+  knowledge representation: information architecture
+  media analysis: media & entertainment
+  epidemiology: science & research
+  leadership training: leadership
+  film & television production: media & entertainment
+  film & video production: media & entertainment
+  investment strategy: finance & investment
+  health psychology: health & wellness
+  corporate leadership: leadership
+  digital health: health & wellness
+  cultural analysis: arts & culture
+  visual arts education: education
+  museum curation: arts & culture
+  literary studies: arts & culture
+  pharmaceutical development: science & research
+  investment analysis: finance & investment
+  social policy: legal & public policy
+  artistic production: arts & culture
+  executive leadership: leadership
+  digital asset management: digital product
+  small business development: business development
+  clinical trials: science & research
+  criminal justice: legal & public policy
+  science policy: legal & public policy
+  public art: arts & culture
+  digital storytelling: media & entertainment
+  sports analytics: data visualization
+  organizational learning: organizational behavior
+  chatbot development: ai & agents
+  financial engineering: finance & investment
+  mental health therapy: health & wellness
+  systems biology: science & research
+  environmental science: science & research
+  enterprise architecture: systems & frameworks
+  synthetic biology: science & research
+  life coaching: personal productivity
+  curriculum development: education
+  sustainability management: business operations
+  family therapy: health & wellness
+  machine learning operations: ai & agents
+  humanities: arts & culture
+  neuroscience research: science & research
+  photography: arts & culture
+  digital communication: marketing & communications
+  gender studies: social sciences
+  business process improvement: business operations
+  organizational strategy: design strategy
+  mobile app design: digital product
+  research evaluation: research & methodology
+  music industry: media & entertainment
+  agile project management: project management
+  stress management: health & wellness
+  corporate sustainability: business operations
+  trauma counseling: health & wellness
+  team facilitation: leadership
+  impact investing: finance & investment
+  nonprofit leadership: leadership
+  healthcare delivery: health & wellness
+  design consulting: design strategy
+  applied mathematics: computational science & physics
+  art conservation: arts & culture
+  energy policy: legal & public policy
+  consumer insights: marketing & communications
+  creative arts education: education
+  spiritual practice: health & wellness
+  heritage conservation: arts & culture
+  language documentation: social sciences
+  digital illustration: illustration
+  regulatory affairs: legal & public policy
+  psycholinguistics: social sciences
+  ai product design: product design
+  customer support: business operations
+  customer support automation: ai & agents
+  policy development: legal & public policy
+  telecommunications: engineering & infrastructure
+  environmental regulation: legal & public policy
+  corporate communication: marketing & communications
+  growth hacking: marketing & communications
+  performance coaching: leadership
+  cinematography: media & entertainment
+  online education: education
+  sound design: media & entertainment
+  augmented reality: creative technology
+  technology scouting: business development
+  forensic psychology: social sciences
+  financial risk assessment: finance & investment
+  sports psychology: social sciences

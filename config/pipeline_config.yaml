@@ -87,6 +87,7 @@ services:
     cold_reload_delay: 45
     circuit_breaker_enabled: true
     circuit_breaker_failure_threshold: 5
+    circuit_breaker_failure_threshold_floor: 25
     circuit_breaker_cooldown_seconds: 60
     single_source_guard:
       canonical_app: /Applications/oMLX.app
@@ -161,6 +162,7 @@ stage1_5:
   embed_dim: 512
   embed_backend: ollama
   embed_model_hf: BAAI/bge-m3
+  embed_native_mrl: false  # D2551: Ollama 'dimensions' (trained MRL 512d head) vs manual 1024→512 truncate. Default false (index built with truncation); enable only with full re-embed + index rebuild.
   embed_chunk_size: 20000
   embed_batch_size: 64
   max_embed_drop_rate: 0.005
@@ -256,6 +258,9 @@ stage4:
   depth_frugal_enabled: false
   depth_model: gemma-4-E4B-it-MLX-4bit
   depth_fallback_depth: domain
+  # D2556 (D2548): grammar-constrained decoding pilot for S4 enum output.
+  # Outlines/XGrammar NOT installed (assessed 2026-09-04) — gate OFF until added.
+  grammar_decoding_enabled: false
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
   golden_max_examples: 7
@@ -365,8 +370,9 @@ stage5:
   nli_entailment_threshold: 0.1
   nli_pass_threshold: 0.1
   nli_marginal_threshold: 0.1
-  nli_max_premise_chars: 256
-  nli_max_hypothesis_chars: 256
+  nli_max_premise_chars: 1500
+  nli_max_hypothesis_chars: 500
+  evidence_contamination_ratio: 0.15
   mechanism_min_length: 150
   citation_echo_source_threshold: 20
   evidence_garbage_min_words: 6
@@ -405,6 +411,8 @@ stage4_5:
 coverage:
   threshold: 0.5
   flag_fraction: 0.3
+retrieval:
+  fts_stopwords: [a, an, the, and, or, of, to, in, on, for, with, is, are, was, were, be, been, how, what, why, when, where, which, who, do, does, did, can, could, should, would, will, this, that, these, those, it, its, as, at, by, from, about, into, than, then, so, if, but, not, no, have, has, had, i, me, my, we, our, you, your, they, them, their]
 retrieval_eval:
   model: Phi-4-mini-instruct-8bit
   provider: omlx
@@ -462,6 +470,111 @@ taxonomy:
   # labels like 'human factors engineering' are rejected, not promoted).
   d2399_promotions_frozen: true
   d2399_allow_both_axes_emerging: false
+  # D2556 (D2547): retire the global 5% semantic-error rule — config-driven
+  # per-axis cost-weighted thresholds. per_label is calibrated by the k-NN audit
+  # (D2544) + NLI entailment audit (T-NLI); empty = fall back to per_axis.
+  semantic_error_rate_max:
+    default: 0.05
+    per_axis:
+      domain: 0.05
+      discipline: 0.05
+    per_label:
+      aesthetics: 0.2222
+      anthropology: 0.9358
+      artificial intelligence: 0.3287
+      behavioral economics: 0.839
+      cognitive science: 0.7984
+      communication theory: 0.6301
+      complex adaptive systems: 0.6857
+      computational geometry: 0.775
+      computational physics & simulation: 0.75
+      computer graphics: 0.3117
+      creative process: 0.4957
+      cultural design: 0.7634
+      cultural studies: 0.8242
+      decision making: 0.2273
+      design thinking: 0.4509
+      economics: 0.4023
+      engineering: 0.6237
+      evolutionary biology: 0.8485
+      finance: 0.2167
+      game design: 0.6667
+      generative ai: 0.75
+      health & medicine: 0.3571
+      human-computer interaction: 0.4918
+      information retrieval: 0.1765
+      information science: 0.3561
+      information security: 0.3171
+      interdisciplinary studies: 0.88
+      law: 0.2241
+      linguistics: 0.3605
+      literary theory: 0.7869
+      machine learning: 0.3365
+      media studies: 0.9007
+      motion & time: 0.3364
+      neuroscience: 0.5217
+      operations research: 0.9236
+      organizational theory: 0.7029
+      performing arts: 0.2273
+      philosophy: 0.7672
+      political economy: 0.8587
+      psychology: 0.8085
+      research methodology: 0.4053
+      risk management: 0.625
+      semiotics: 0.2474
+      social network analysis: 0.6923
+      sociology: 0.8298
+      software engineering: 0.5931
+      strategic thinking: 0.4472
+      systems engineering: 0.7481
+      systems thinking: 0.2558
+      theoretical physics: 0.931
+      typography: 0.0226
+      visual perception: 0.0541
+      visual semiotics: 0.3
+      ai & agents: 0.3833
+      arts & culture: 0.3959
+      brand identity: 0.7971
+      business development: 0.6716
+      business operations: 0.4769
+      code & computation: 0.523
+      computational art: 0.3902
+      computational science & physics: 0.7115
+      creative technology: 0.2292
+      data visualization: 0.4756
+      design strategy: 0.7166
+      design systems: 0.1
+      digital product: 0.8466
+      editorial & advertising: 0.86
+      education: 0.8446
+      engineering & infrastructure: 0.7855
+      engineering practice: 0.7189
+      entrepreneurship: 0.767
+      environmental design: 0.766
+      finance & investment: 0.6142
+      graphic design: 0.4511
+      health & wellness: 0.7277
+      illustration: 0.4314
+      industrial design: 0.9023
+      information architecture: 0.6627
+      leadership: 0.7954
+      legal & public policy: 0.8838
+      marketing & communications: 0.5533
+      media & entertainment: 0.4784
+      motion design: 0.4565
+      organizational behavior: 0.654
+      packaging: 0.9
+      personal productivity: 0.7978
+      product design: 0.7863
+      project management: 0.9425
+      research & methodology: 0.527
+      science & research: 0.338
+      semiotics & communication: 0.4818
+      social sciences: 0.5455
+      systems & frameworks: 0.4808
+      urban planning: 0.8369
+      user experience: 0.5807
+      web & ui: 0.6533
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8
@@ -594,3 +707,15 @@ omlx_wired_stress:
   model: null
 recall:
   match_threshold: 0.55
+
+mcp:
+  delegate_local:
+    allowed_models:
+    - gemma-4-E4B-it-MLX-4bit
+    - gpt-oss-20b-MXFP4-Q8
+    - Phi-4-mini-instruct-8bit
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    - Qwen3.8-27B-MLX-4bit
+    max_system_chars: 4000
+    max_files: 20
+    allow_absolute_paths: false

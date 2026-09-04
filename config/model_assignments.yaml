@@ -73,12 +73,12 @@ roles:
     family: qwen
   # MEMORY_MCP_PATH: Disabled per P0.14 — not part of v2.0 pipeline.
   # MEMORY_MCP_PATH:
-  #   model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/memory_mcp_server.py
+  #   model: <redacted>/tools/memory_mcp_server.py
   #   backend: path
   #   family: engramory-adapted
   # HARNESS_STAGE: Disabled per P0.14 — not part of v2.0 pipeline.
   # HARNESS_STAGE:
-  #   model: /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os/tools/harness_stage.py
+  #   model: <redacted>/tools/harness_stage.py
   #   backend: path
   #   family: path
   EMBEDDINGS:

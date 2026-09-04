@@ -1,0 +1,35 @@
+{
+  "total_fbs": 7995,
+  "malformed_evidence_rows": 0,
+  "char_limits": {
+    "premise_chars": 1500,
+    "hypothesis_chars": 500
+  },
+  "definition": {
+    "over_hyp_chars": 0,
+    "pct_over_hyp_chars": 0.0,
+    "over_512_tokens": 0,
+    "pct_over_512_tokens": 0.0,
+    "median_tokens": 33,
+    "p90_tokens": 51,
+    "p95_tokens": 55,
+    "max_tokens": 85
+  },
+  "evidence_max_passage": {
+    "over_premise_chars": 3,
+    "pct_over_premise_chars": 0.04,
+    "over_512_tokens": 0,
+    "pct_over_512_tokens": 0.0,
+    "median_tokens": 87,
+    "p90_tokens": 117,
+    "p95_tokens": 128,
+    "max_tokens": 470
+  },
+  "combined_premise_hypothesis": {
+    "over_512_tokens": 0,
+    "pct_over_512_tokens": 0.0,
+    "median_tokens": 119,
+    "p90_tokens": 147,
+    "max_tokens": 498
+  }
+}

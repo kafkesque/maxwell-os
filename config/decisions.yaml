@@ -1,8 +1,259 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-03T13:55:00Z'
-total_decisions: 519
+last_sync: '2026-09-04T12:30:00Z'
+total_decisions: 544
 decisions:
+- id: D2568
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'Next-5 execution: cascade deregistration + alias review + BUG-150 promotion + re-audit + per-label thresholds EXECUTED. (1) CASCADE DEREG (Task 3): scripts/cascade_deregister_domains.py removed the 3 systematic catch-all domains from audit-flagged FBs — project management 257, business operations 202, legal & public policy 156 (615 deregistrations; 75 single-domain FBs → honest "emerging"); counts 879/1756/806 → 622/1554/650. (2) ALIAS REVIEW (Task 2): scripts/review_aliases.py — Qwen3.8-27B re-reviewed 927 single-value aliases → 76 flags → DeepSeek-v4-pro cross-family verify → scripts/apply_alias_corrections.py applied 66 corrections (49 domain + 17 discipline), 9 kept, 1 no-op; D2567 corpus-dependent fixes protected (video production→motion design, statistics & data science→data visualization). (3) BUG-150 PROMOTION (Task 1): (a) bug197_kind_swap re-run 1,235 FBs (56 discipline + 140 domain recovered); (b) scripts/resolve_emerging_promotion.py deterministic suffix/compound resolution 54 FBs (curated exclusion of "graph theory"→data viz false-positives); (c) LLM promotion 24 FBs (Information Systems + Health Informatics → information science discipline, Qwen3.8×DeepSeek agreement). NET discipline=emerging 1,010→927 (-83), domains∋emerging 716→772. Remaining 250 genuine gaps (Ecology/Musicology/History of Technology/audio signal processing + 221 tail) = D2399 candidates (frozen). (4) RE-AUDIT (Task 5): k-NN mean agreement 41.2%→40.7% (FLAT — measures topical diversity not label accuracy; audited pairs 12,667→14,334 as more FBs gained canonicals); T-NLI contradict rate 21.5%→19.9% (-1.6pp) + domain mean entail 0.248→0.265 (improved). (5) THRESHOLDS (Task 4): scripts/populate_semantic_error_thresholds.py populated 96 per-label NLI contradiction rates → taxonomy.semantic_error_rate_max.per_label (flag-rate proxy; cost-weighting pending). integrity ok, 0 FK violations.'
+  champion: goose
+  target_files:
+  - scripts/cascade_deregister_domains.py
+  - scripts/review_aliases.py
+  - scripts/apply_alias_corrections.py
+  - scripts/resolve_emerging_promotion.py
+  - scripts/populate_semantic_error_thresholds.py
+  - config/alias_map.yaml
+  - config/pipeline_config.yaml
+  created: '2026-09-04'
+- id: D2567
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'Track B slim re-classification + domain-axis emerging resolution + alias corrections EXECUTED. (1) pipeline/reclassify_merged_axis.py --slim --apply: 1,488 remaining discipline=emerging FBs re-classified via gpt-oss-20b discipline-only prompt (~1.4s/FB vs ~9.5s/FB full mode) — 478 resolved to canonical discipline + 981 raw-corrected (still emerging, raw label repaired for BUG-150 promotion); harvested temp/trackb_slim.jsonl; checkpoints re-synced (sync_checkpoint_from_db + sync_s5_checkpoint_from_db). (2) scripts/resolve_domains_emerging.py --apply: 846 FBs with domains ∋ emerging resolved to real canonical domains (deterministic, kind-safe). (3) Quality pass: cross-model agreement (Qwen3.8 × gpt-oss) MISSED 8 shared-bias wrong aliases (e.g. "video analytics"→motion design, "scientific research"→computational science & physics) — fixed 7 in config/alias_map.yaml + reverted 1 ("video production"→motion design is CORRECT for this corpus); scripts/correct_wrong_enrichments.py fixed 19 FBs that inherited a wrong domain. Net emerging reduction: discipline 1,842→1,010 (-832), domains∋emerging 1,562→716 (-846). integrity 18/18, 0 FK violations. Remaining 1,010 discipline=emerging are genuine taxonomy gaps → BUG-150 promotion (raw labels harvested).'
+  champion: goose
+  target_files:
+  - pipeline/reclassify_merged_axis.py
+  - scripts/resolve_domains_emerging.py
+  - scripts/correct_wrong_enrichments.py
+  - config/alias_map.yaml
+  created: '2026-09-04'
+- id: D2566
+  category: LABEL QUALITY / ENRICHMENT
+  state: RESOLVED
+  description: 'Alias extension + Phase 2b enrichment/emerging-resolution EXECUTED (the recommended critical task). (1) scripts/extend_alias_index.py: maps unmapped raw labels -> canonical via a deterministic pass (canonical-self + Unicode/dash fold + compound split + suffix strip) then LLM bulk-mapping (generator=Qwen3.8-27B-MLX-4bit, verifier=gpt-oss-20b-MXFP4-Q8, cross-family R5; only cross-model AGREEMENT accepted). Produced 618 domain + 151 discipline aliases, written add-only to config/alias_map.yaml (201 existing discipline_aliases preserved; 0 -> 618 domain_aliases). Fixed a cross-axis bug (flat-index exclusion wrongly dropped domain raw labels matching discipline-alias keys, D2133). (2) Wired alias_map.yaml into pipeline/schemas.py _build_synonym_index (step 3) so S4 + enrichment + remap_emerging all consume the extended index; kind-safety verified (typography does NOT leak into domain axis). (3) Rewrote scripts/apply_enrichment.py to use the full domain index (taxonomy raw + synonym_map SYNONYMS-only + alias_map + canonical-self + compound split); synonym_map KEYWORDS excluded (false-positive "e-commerce" -> finance & investment). (4) Enrichment re-run: 727 FBs enriched (vs 75 in Phase 2a) — cross-disciplinary FBs now carry all constituent canonical domains. (5) scripts/resolve_emerging_deterministic.py: 354 emerging FBs resolved to canonical discipline with NO LLM via the extended index. DB backups: maxwell.db.bak_20260904_164617_pre_enrich + _164621_pre_emerging_resolve. Remaining discipline=emerging 1,488 -> Track B re-classification (D2567).'
+  champion: goose
+  target_files:
+  - scripts/extend_alias_index.py
+  - scripts/apply_enrichment.py
+  - scripts/resolve_emerging_deterministic.py
+  - pipeline/schemas.py
+  - config/alias_map.yaml
+  created: '2026-09-04'
+- id: D2565
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'Phase 1 + 2a relabel/enrichment EXECUTED. Phase 1: applied 8 human-review FB domain changes (1 enrich Color As Cultural Marker +social sciences; 4 retarget Structural Theory->design strategy, Community Mapping->project management, Figma AI/Hamburger->web & ui; 3 deregister Visual Builder/Apple Design/Toxic Material remove catch-alls) via scripts/apply_relabel_plan.py (C13 backup + integrity gate + atomic txn). Phase 2a: applied 75 safe enrichments via scripts/apply_enrichment.py (clean raw->canonical alias map, non-catch-all). KEY FINDING: the 1,926-FB enrichment backlog is mostly a MAPPING GAP — 2,139 distinct raw labels are unmapped by the 500-entry taxonomy alias index; only 107 FBs mapped cleanly (75 after excluding catch-alls). Remaining ~1,850 FBs need taxonomy alias extension OR LLM-assisted raw->canonical mapping (overlaps Track B).'
+  champion: goose
+  target_files:
+  - scripts/apply_relabel_plan.py
+  - scripts/apply_enrichment.py
+  created: '2026-09-04'
+- id: D2564
+  category: LABEL QUALITY / ENRICHMENT
+  state: RESOLVED
+  description: 'Cross-disciplinary enrichment plan. Confirmed retrieval is semantic-first (search_hybrid = FTS + vector + optional keyword, RRF-fused; contextual_embed.enabled=false so labels are NOT in the production embedding) and domains is a JSON array, so cross-disciplinary FBs must carry ALL scopes to stay retrievable under facet filters. Classified 11 human-review FBs: 1 enrich (Color As Cultural Marker -> add social sciences), 4 retarget (Structural Theory -> design strategy; Community Mapping -> project management; Figma AI/Hamburger -> web & ui), 6 deregister (remove catch-alls project management/business operations/legal/editorial). Measured enrichment backlog: 1,926 FBs single-concrete-domain + 2+ raw labels (immediate enrich via raw->canonical re-map); 1,842 discipline=emerging + 1,562 domains contains emerging (Track B resolve first). Plan -> governance/enrichment_plan.md.'
+  champion: goose
+  target_files:
+  - governance/enrichment_plan.md
+  created: '2026-09-04'
+- id: D2563
+  category: LABEL QUALITY / HUMAN REVIEW
+  state: RESOLVED
+  description: 'Relabel plan built from human-review marks. scripts/build_relabel_plan.py parses the annotated governance/human_review_sample.md (64 sample FBs, 8 worst labels), joins each FB to its DB record, and emits governance/relabel_plan.json/.md (PLAN-ONLY, no DB mutation). Verdicts: SYSTEMATIC mislabeling of domain catch-alls project management (260 flagged, 7/8 relabel), business operations (199, 7/8), legal & public policy (150, 6/8); MIXED for marketing & communications, engineering & infrastructure (surveillance/social-engineering contamination), organizational behavior; MOSTLY-KEEP for editorial & advertising, user experience (ux-vs-ui split). Actions: 5 retarget (ui->web & ui, brand->design strategy/brand identity, psychology/sociology->social sciences, community-mapping->project management), 40 deregister-domain, 14 keep, 5 unreviewed. Execution pending user approval.'
+  champion: goose
+  target_files:
+  - scripts/build_relabel_plan.py
+  - governance/relabel_plan.json
+  - governance/relabel_plan.md
+  created: '2026-09-04'
+- id: D2562
+  category: FORENSIC AUDIT / CODE HYGIENE
+  state: RESOLVED
+  description: 'Forensic audit of recent changes (Qwen3.8-27B local reviewer + DeepSeek-v4-pro verifier). Qwen3.8 verdict NEEDS-FIX (8 findings); DeepSeek verification confirmed 6 real and rejected 2 false-positives. FIXED: (1) scripts/knn_label_disagreement.py write_text -> safe_write (C6); (2) knn timeout=60 -> OLLAMA_EMBED_TIMEOUT and dim=512 -> S15_EMBED_DIM (C12); (3) pipeline/nli_label_audit.py checkpoint skip now logs loudly (C16); (4) nli checkpoint flush -> os.fsync (C6); (5) pipeline/retrieve.py hardcoded _FTS_STOPWORDS -> config retrieval.fts_stopwords + pipeline_paths.FTS_STOPWORDS constant (C12). REJECTED false-positives: tokenizer regex (code logic, not a config value) and limit=20 default param. Verified: py_compile clean, integrity 18/18, FTS_STOPWORDS=64 from config.'
+  champion: goose
+  target_files:
+  - scripts/knn_label_disagreement.py
+  - pipeline/nli_label_audit.py
+  - pipeline/retrieve.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  created: '2026-09-04'
+- id: D2561
+  category: MEASUREMENT / LABEL QUALITY
+  state: RESOLVED
+  description: 'D2547 calibration measurement + mislabel triage queue. Built scripts/build_mislabel_triage.py (deterministic, C6 safe_write) joining the two audits: (1) D2547 per-(axis,label) calibration table — 440 labels with empirical flagged-subset entail/agreement/contradiction stats → governance/d2547_calibration.json; (2) triaged mislabel queue — 1,989 FBs flagged by BOTH k-NN low-agreement (6,211) AND T-NLI contradiction (4,497), ranked by contra−entail gap → governance/mislabel_triage.json/.md. Worst-calibrated labels: project management (841 flagged), digital product (663), education (394), leadership (411), philosophy (110). Threshold-setting (populate taxonomy.semantic_error_rate_max per label) remains a follow-up (D2547).'
+  champion: goose
+  target_files:
+  - scripts/build_mislabel_triage.py
+  - governance/d2547_calibration.json
+  - governance/mislabel_triage.json
+  - governance/mislabel_triage.md
+  created: '2026-09-04'
+- id: D2560
+  category: GOVERNANCE / SOVEREIGNTY
+  state: RESOLVED
+  description: 'DeepSeek API verification (user-requested). CORRECTED 2026-09-04 after live re-verify: DeepSeek is NOT dead. active_provider=custom_deepseek (deepseek-v4-pro) is LIVE and AUTHENTICATED — credential = macOS Keychain internet-password (srvr=https://api.deepseek.com/v1, acct=Bearer, created 2026-06-28); live evidence = goose serve holds an ESTABLISHED TCP connection to 3.173.21.63:443 (= api.deepseek.com via CloudFront) and the session responds. Prior claim "no credentials → HTTP 401" was WRONG: the anonymous probe returned 401 only because it sent no key, and keychain searches used the wrong service names. ACCURATE finding: DeepSeek is a remote CLOUD API → violates C1 ($0 marginal cost, all generation on local hardware) + C3 (sovereign, data/compute remain local) BY DESIGN, regardless of authentication. Recommendation unchanged: set active_provider=maxwell_omlx (local MLX, live, 8 models) — user decision affecting the goose runtime. DELEGATE-001 (reasoning_content passthrough) NOT re-verified this session; treat as unconfirmed pending a live delegate test.'
+  champion: goose
+  target_files:
+  - ~/.config/goose/config.yaml
+  created: '2026-09-04'
+- id: D2559
+  category: BUGFIX / OBSERVABILITY
+  state: RESOLVED
+  description: 'C16 silent-error fix in pipeline/retrieve.py search_fts(). The pre-existing `except sqlite3.OperationalError` fallback silently swallowed the FTS5 failure and fell back to LIKE with no logging (flagged by the Qwen3.8 forensic audit, NOT introduced this session). FIXED: bind the exception (`as e`) and print a loud warning consistent with the search_vector degradation convention. No behavior change to the LIKE fallback itself — only observability added.'
+  champion: goose
+  target_files:
+  - pipeline/retrieve.py
+  created: '2026-09-04'
+- id: D2558
+  category: ONTOLOGY / VERIFICATION
+  state: RESOLVED
+  description: 'T-NLI label-consistency audit script DELIVERED + Qwen3.8-reviewed. pipeline/nli_label_audit.py (D2542 target — was planned but the async delegate never wrote it) runs DeBERTa-v3-large NLI per FB as an independent label verifier: premise=definition, hypothesis="This text is about {label}." → records entail/neutral/contra, flags contradiction-dominant (likely mislabel) and weak-support (entail < nli_pass_threshold). C6 safe_write for the JSON/MD reports + incremental JSONL checkpoint with --resume (reader tolerates a torn last line). Qwen3.8-27B R5 review: APPROVE — 2 MINOR C20 magic-numbers fixed (_ERROR_MSG_MAX_LEN, _MD_TOP_N); C12 taxonomy path + C6 checkpoint-appending are consistent with codebase convention and are acceptable (progress-log, not a final artifact). FULL RUN COMPLETE (Homebrew Python, MPS): 20,929 pairings (6,153 discipline + 14,776 domain), mean entail discipline 0.332 / domain 0.248, 4,497 contradict-label (21.5% — strong mislabel signal), 8,978 weak-support (42.9%), 0 NLI errors. Reports: governance/nli_label_audit.json + .md. This + D2557 k-NN (41.2% mean agreement, 49% low-agreement) now MEASURE the semantic-correctness gap D2540 declared unmeasured; they feed D2547 per-label threshold calibration + human review.'
+  champion: goose
+  target_files:
+  - pipeline/nli_label_audit.py
+  created: '2026-09-04'
+- id: D2557
+  category: AUDIT / ONTOLOGY / BUGFIX
+  state: RESOLVED
+  description: 'D2544 k-NN label-disagreement audit EXECUTED + latent domain-comparison bug fixed. BEFORE the full run, fixed a bug in scripts/knn_label_disagreement.py: the domain axis did `.split("|")[0]` on the JSON-encoded domains column, so it compared the whole JSON array string as a single "label" and measured nothing real (and "".startswith("") inflated agreement to 1.0 for empty-domain FBs). FIXED: parse domains JSON → set intersection (neighbour shares ≥1 canonical domain) + filter the discipline axis to canonical labels only (exclude emerging/empty). RESULT (k=10, 12,667 pairings over 7,995 FBs): mean neighbor-label agreement 41.2%, 6,211 pairings (49.03%) ≤30% agreement → low-agreement candidates for human review. Report: governance/knn_label_disagreement.json.'
+  champion: goose
+  target_files:
+  - scripts/knn_label_disagreement.py
+  - governance/knn_label_disagreement.json
+  created: '2026-09-04'
+- id: D2556
+  category: RETRIEVAL / ONTOLOGY / GOVERNANCE
+  state: RESOLVED
+  description: 'Next-3 tasks + code-review LLM benchmark + Qwen3.8 forensic audit. (1) Code-review benchmark: all 4 local models (gemma-4-E4B, Qwen3.8-27B, gpt-oss-20b-Q8, Qwen3-Coder-30B) scored 5/5 with 0 hallucination on a seeded 5-bug snippet — gemma is NOT inferior; the earlier 5-false-positive review was a length/context artifact. KEEP gemma = fast first-pass (D2549), Qwen3.8-27B = deep auditor (D2543). No download warranted (memory budget ~24GB; a 70B+ coding model would exceed it). (2) BUG-104 VERIFIED FIXED: Homebrew Python (/opt/homebrew/bin/python3, 3.14) has enable_load_extension + sqlite_vec 0.1.9 → vector leg recall@k = 1.000 (was 0.000), hybrid 0.900. Retrieval/vector ops must run under Homebrew Python (Framework 3.12.1 lacks the extension API). (3) D2547: config taxonomy.semantic_error_rate_max (default 0.05, per_axis, per_label) + pipeline_paths SEMANTIC_ERROR_RATE_* — retires the global 5% rule; calibration pending measurement. (4) D2548: Outlines/XGrammar NOT installed — added stage4.grammar_decoding_enabled=false gate. (5) Qwen3.8 forensic audit of last-4-queries changes: VERDICT CONCERNS, 8 legit findings (C20 magic numbers + C12 hardcoded model/URL in new scripts) FIXED; 1 borderline (FTS stopwords kept as named constant, codebase convention); 2 pre-existing (C16 LIKE fallback in search_fts); 1 duplicate.'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  - scripts/knn_label_disagreement.py
+  - scripts/measure_deberta_truncation.py
+  created: '2026-09-04'
+- id: D2555
+  category: ONTOLOGY / MEASUREMENT
+  state: RESOLVED
+  description: 'D2546 SHACL formalization + D2544 k-NN audit tooling. (1) SHACL: scripts/generate_taxonomy_shacl.py reads config/taxonomy_v5.yaml and emits config/taxonomy_shacl.ttl (104 canonicals = 43 domains + 61 disciplines as closed disjoint classes + R14 stamp shape + kind-safety owl:disjointWith). Regenerate from YAML, never hand-edit (C12). (2) D2544: scripts/knn_label_disagreement.py — k-NN label-disagreement audit replacing centroid-outlier (embeds FB definitions via Ollama bge-m3, reports per-FB neighbor label-agreement; low agreement = likely mislabeled). Smoke-tested (sample=3 works); full 7,995-FB audit deferred to a batch run (~8k embeddings).'
+  champion: goose
+  target_files:
+  - scripts/generate_taxonomy_shacl.py
+  - config/taxonomy_shacl.ttl
+  - scripts/knn_label_disagreement.py
+  created: '2026-09-04'
+- id: D2554
+  category: RETRIEVAL / VERIFICATION
+  state: RESOLVED
+  description: 'BUG-221 FTS fix + MEASURE-DEBERTA follow-up. (1) BUG-221: retrieval was 0.000 recall because FTS5 multi-word MATCH = implicit AND (full-sentence golden queries match 0 docs). Added _fts_query() in retrieve.py (stopword-stripped OR prefix terms, e.g. how-to-design-a-logo → design* OR logo*) wired into search_fts. VERIFIED: recall@k 0.000 → 0.667 (20/30 golden queries hit); remaining 10 misses are synonym/abstract queries needing the vector leg, blocked by BUG-104 (enable_load_extension missing on python.org Python 3.12.1). (2) MEASURE-DEBERTA follow-up: raised S5_NLI char caps 256 → premise 1500 / hypothesis 500 (config nli_max_premise_chars/hypothesis_chars) since the 256-char cap (not the DeBERTa 512-token window) was the binding constraint. Re-measured: 0.0% definitions/evidence truncated, 0.0% exceed 512 tokens. CAVEAT: nli_pass_threshold 0.1 was calibrated at 256-char truncation — re-validate on golden set before trusting the new quarantine rate.'
+  champion: goose
+  target_files:
+  - pipeline/retrieve.py
+  - config/pipeline_config.yaml
+  created: '2026-09-04'
+- id: D2553
+  category: MEASUREMENT / QUALITY
+  state: RESOLVED
+  description: 'MEASURE-DEBERTA: measured DeBERTa-v3-large 512-token truncation exposure across all 7,995 FBs (scripts/measure_deberta_truncation.py, tokenizer-only, 0 malformed evidence rows). RESULT: 0.0% exceed the 512-token window (max combined premise+hypothesis = 498 tokens), so the DeBERTa token limit is NEVER the binding constraint. The real exposure is the 256-CHAR truncation (S5_NLI_MAX_PREMISE_CHARS/HYPOTHESIS_CHARS): 30.28% of definitions and 77.21% of evidence passages exceed 256 chars and lose content before NLI. Implication: char limits can be raised toward the 512-token ceiling (roughly 1000-1400 chars) with no DeBERTa truncation risk if evidence-completeness is prioritized. Report: governance/measure_deberta_truncation.md + .json.'
+  champion: goose
+  target_files:
+  - scripts/measure_deberta_truncation.py
+  - governance/measure_deberta_truncation.md
+  - governance/measure_deberta_truncation.json
+  created: '2026-09-04'
+- id: D2552
+  category: GOVERNANCE / C11 / C12
+  state: RESOLVED
+  description: 'GOV consolidation batch (claude0045 adjudication MUST items). (1) GOV-SKILL: regenerated agent/skills/maxwell-os-SKILL.md v3.0 from AGENTS.md + CONSTITUTION.md, replacing the dead v5.0 skill (6/6 dependency paths stale). (2) GOV-TURBO: archived pipeline/storage/turbovec_backend.py (dead, undeclared turbovec import, C11/C19) to archive/turbovec_backend.py.archived-2026-09-04; KEPT mlx_provider.py per instruction, flagged UNUSED and clarified purpose (C21 in-process MLX alternative, deferred D2055). (3) GOV-SQLITE: fixed pipeline/storage/base.py docstring, removing the false Default: sqlite_backend.py claim (file never existed; SQLite inlined in retrieve.py/stage6_commit.py/backfill_embeddings.py). (4) GOV-CI: added .pre-commit-config.yaml + scripts/pre_commit_gate.py (C11 import-subset-requirements + C12 no /Users/ paths, reusing integrity_check.py). (5) GOV-VERSION: taxonomy_v5.yaml classification_version v5.0.1 → v5.5; filename taxonomy_v5.yaml is a MAJOR-version marker (deliberate per D2513 file-stays-taxonomy_v5.yaml for minor bumps); all 4 labels now unified under v5.5. (6) GOV-SENTINEL: consolidated sk-maxwell-local from 6 code copies (unloader.py, run_diagnostic.py, delegate_safe.py, benchmark_s2, ab_test, benchmark_s4) to import OMLX_API_KEY from pipeline_paths (config services.omlx.api_key); model_lazyload.py MAXWELL_STANDALONE fallback kept as deliberate config-first fallback. (7) GOV-HEADINGS: codified DECISION-LOG heading convention (tier sections + table rows). (8) BUG-098: confirmed psutil>=6.0 already declared in requirements.txt (D2341), closed. gemma-4-E4B review of the 2 new scripts: 1 legit finding (C16 silent JSON-drop, fixed) + 5 false positives (claimed missing type-hints/docstrings that are present; R7 misread as path).'
+  champion: goose
+  target_files:
+  - agent/skills/maxwell-os-SKILL.md
+  - archive/turbovec_backend.py.archived-2026-09-04
+  - pipeline/providers/mlx_provider.py
+  - pipeline/storage/base.py
+  - .pre-commit-config.yaml
+  - scripts/pre_commit_gate.py
+  - config/taxonomy_v5.yaml
+  - pipeline/unloader.py
+  - pipeline/run_diagnostic.py
+  - tools/delegate_safe.py
+  - tools/benchmark_s2_qwen38_vs_coder.py
+  - tools/ab_test_d2359_depth.py
+  - tools/benchmark_s4_depth_qwen35_vs_gemma.py
+  created: '2026-09-04'
+- id: D2551
+  category: EMBEDDING / MEASUREMENT
+  state: RESOLVED
+  description: 'MEASURE-DIM: bge-m3 512-d Matryoshka contract VERIFIED. Live measurement: native dim = 1024; Ollama natively supports dimensions:512 (returns the TRAINED MRL 512-d head, NOT the first-512-of-1024 — max abs diff 0.095, mean 0.009); manual 1024→512 truncation preserves 87.5% top-1 neighbor overlap on 8 samples (contract VALID, bge-m3 is MRL-trained). Lever added: config stage1_5.embed_native_mrl (default false) wired into embeddings.py + ollama_embed.py to request dimensions:512 (proper MRL head) — requires full re-embed + vec_fbs rebuild before enabling. Manual truncate kept as default to avoid index invalidation.'
+  champion: goose
+  target_files:
+  - pipeline/embeddings.py
+  - pipeline/ollama_embed.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  created: '2026-09-04'
+- id: D2550
+  category: DELEGATION / GOVERNANCE / MCP
+  state: RESOLVED
+  description: 'BUG-220-MCP guard + F-03 enum + BUG-220 standardization. (1) maxwell_mcp_server.py _tool_delegate_local now enforces a model allowlist (config mcp.delegate_local.allowed_models), a system-prompt cap (4000 chars), a file-count cap (20), and path-containment (files resolve within PROJECT_ROOT; absolute paths rejected unless allow_absolute_paths). (2) query_knowledge depth enum fixed: contextual → ["universal","cross-domain","domain","specialized"] (canonical DEPTH_LITERAL). (3) BUG-220: delegate() Qwen breakage standardized on direct one-shot curl (D2543/D2549) — live-verified Qwen3-Coder one-shot code-gen; goose provider maxwell_omlx.json synced (+gpt-oss-20b-MXFP4-Q4); just oneshot recipe added. gemma-4-E4B code review 6/6 PASS (R5 generator≠verifier).'
+  champion: goose
+  target_files:
+  - maxwell_mcp_server.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+  - justfile
+  created: '2026-09-04'
+- id: D2549
+  category: DELEGATION / GOVERNANCE
+  state: ACTIVE
+  description: 'Local-LLM delegation routing rule (refines D2542/D2543). Task-type → right local LLM, enforced going forward: deterministic data-repair scripts (T-311/kind-swap/FTS) execute LLM-free but delegate CODE REVIEW of any NEW repair script to gemma-4-E4B-it-MLX-4bit before --apply (R5 generator≠verifier); classification → gpt-oss-20b-MXFP4-Q8; summarization-with-source → Phi-4-mini-instruct-8bit; single-shot code-gen → Qwen3-Coder-30B (curl one-shot); open-ended research → shell/curl (never delegate). Verified 2026-09-04: gemma approved T-311 script. Rule codified in AGENTS.md delegate_rules.'
+  champion: goose
+  target_files:
+  - AGENTS.md
+  created: '2026-09-04'
+- id: D2544
+  category: ONTOLOGY / AUDIT
+  state: RESOLVED
+  description: 'Replace centroid-outlier semantic audit with deep k-NN label-disagreement (Bahri et al. 2020) on the same bge-m3 embeddings. Accepted refinement of D2540/D2541 — centroid distance measures "far from mean", not "neighbor to differently-labeled items" (the actual failure mode). RESOLVED 2026-09-04 (D2557): full 7,995-FB audit executed, mean neighbor-label agreement 41.2%.'
+  champion: goose
+  target_files:
+  - DECISION-LOG.md
+  created: '2026-09-03'
+- id: D2545
+  category: C12 / GOVERNANCE / BUGFIX
+  state: RESOLVED
+  description: 'C12 config-first de-hardcoding EXECUTED: EVIDENCE_CONTAMINATION_RATIO 0.15 -> stage5.evidence_contamination_ratio; circuit-breaker max(...,25) -> circuit_breaker_failure_threshold_floor. Also F-07 CONSTITUTION taxonomy 35/72->43/61, D2184 PII /Users/barn path redact, MASTERPROMPT golden-staleness fix. Files: config/pipeline_config.yaml, pipeline/pipeline_paths.py, pipeline/stage5_verify.py, pipeline/omlx_call.py, CONSTITUTION.md, config/model_assignments.yaml, MASTERPROMPT.md.'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  created: '2026-09-03'
+- id: D2546
+  category: ONTOLOGY / AUDIT
+  state: PLANNED
+  description: 'SHACL hot-path + OWL periodic (not OWL-DL everywhere). Formalize 105 canonical labels as sh:disjoint / sh:closed / sh:in before Track B reclassification of 1,174 emerging-empty-raw FBs.'
+  champion: goose
+  target_files:
+  - DECISION-LOG.md
+  created: '2026-09-03'
+- id: D2547
+  category: ONTOLOGY / AUDIT
+  state: PLANNED
+  description: 'Per-label/per-axis cost-weighted thresholds — retire the global 5% semantic-error rule (all four external models converged; no global 5%).'
+  champion: goose
+  target_files:
+  - DECISION-LOG.md
+  created: '2026-09-03'
+- id: D2548
+  category: PIPELINE / CONTAMINATION
+  state: PLANNED
+  description: 'Grammar-constrained decoding pilot on S4 discipline/domain enums (Outlines/XGrammar) — move contamination prevention from detect-and-correct to prevent-by-construction; latency A/B before adoption.'
+  champion: goose
+  target_files:
+  - DECISION-LOG.md
+  created: '2026-09-03'
 - id: D2543
   category: GOVERNANCE / WORKFLOW
   state: ACTIVE
@@ -4333,22 +4584,23 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 519
+  total: 544
   proposed: 0
   draft: 1
-  active: 460
+  active: 461
   stale: 0
   superseded: 15
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 10
-  planned: 4
+  resolved: 31
+  planned: 7
   by_category:
     ARCH: 27
     ARCH / GOV: 1
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
+    AUDIT / ONTOLOGY / BUGFIX: 1
     BUG: 1
     BUGFIX: 45
     BUGFIX / CFG: 1
@@ -4358,13 +4610,14 @@ summary:
     BUGFIX / GOV: 2
     BUGFIX / GOVERNANCE: 1
     BUGFIX / INTEGRITY: 2
-    BUGFIX / OBSERVABILITY: 1
+    BUGFIX / OBSERVABILITY: 2
     BUGFIX / PROMPT: 1
     BUGFIX / PROVENANCE: 3
     BUGFIX / RELIABILITY: 2
     BUGFIX / ROBUSTNESS: 1
     BUGFIX / VAL: 1
     C12: 1
+    C12 / GOVERNANCE / BUGFIX: 1
     CFG: 5
     CLS: 16
     CLS / CFG: 1
@@ -4377,14 +4630,20 @@ summary:
     DATA / RELIABILITY: 2
     DATA / TAXONOMY: 2
     DEF: 1
+    DELEGATION / GOVERNANCE: 1
+    DELEGATION / GOVERNANCE / MCP: 1
+    EMBEDDING / MEASUREMENT: 1
+    FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
+    GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1
     GOVERNANCE / FORENSIC AUDIT / BUGFIX: 1
     GOVERNANCE / GOLDEN-SET / C12: 1
     GOVERNANCE / QUALITY: 1
+    GOVERNANCE / SOVEREIGNTY: 1
     GOVERNANCE / WORKFLOW: 1
     HYGIENE / TESTING: 1
     INF: 177
@@ -4393,10 +4652,18 @@ summary:
     INFRASTRUCTURE: 1
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
+    LABEL QUALITY / ENRICHMENT: 2
+    LABEL QUALITY / EXECUTION: 3
+    LABEL QUALITY / HUMAN REVIEW: 1
+    MEASUREMENT / LABEL QUALITY: 1
+    MEASUREMENT / QUALITY: 1
     MODEL: 2
     OBSERVABILITY / TOOLING: 1
+    ONTOLOGY / AUDIT: 3
     ONTOLOGY / AUDIT / STRATEGY: 1
+    ONTOLOGY / MEASUREMENT: 1
     ONTOLOGY / PIPELINE / RESEARCH: 1
+    ONTOLOGY / VERIFICATION: 1
     OPERATIONAL / CANARY: 1
     OPS: 3
     OPS / AUDIT: 1
@@ -4407,6 +4674,7 @@ summary:
     PERF: 11
     PERF / BUGFIX: 1
     PERFORMANCE / DATA INTEGRITY / GOVERNANCE: 1
+    PIPELINE / CONTAMINATION: 1
     PIPELINE / GOVERNANCE: 1
     PIPELINE / QUALITY: 1
     PIPELINE / QUALITY / BUGFIX: 1
@@ -4425,7 +4693,9 @@ summary:
     RES: 4
     RESEARCH: 3
     RESILIENCE / QUALITY: 1
+    RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
     RETRIEVAL / VALIDATION: 1
+    RETRIEVAL / VERIFICATION: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1
     TAXONOMY: 4

@@ -1,6 +1,6 @@
 constitution_version: '3.0'
 schema_version: '3.0'
-taxonomy_version: v5.1
+taxonomy_version: v5.5
 requirements_version: '3.0'
 query_banner_version: '3.0'
 config_schema_version: '3.0'

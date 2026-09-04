@@ -39,6 +39,7 @@ from pipeline.pipeline_paths import (
     OMLX_CB_COOLDOWN_SECONDS,
     OMLX_CB_ENABLED,
     OMLX_CB_FAILURE_THRESHOLD,
+    OMLX_CB_FAILURE_THRESHOLD_FLOOR,
     OMLX_COLD_RELOAD_DELAY,
     OMLX_DEFAULT_TIMEOUT,
     OMLX_MAX_RETRIES,
@@ -121,7 +122,7 @@ class CircuitBreaker:
 
 
 # Module-level singleton (process-wide state survives across calls)
-_breaker = CircuitBreaker(max(OMLX_CB_FAILURE_THRESHOLD, 25), OMLX_CB_COOLDOWN_SECONDS)
+_breaker = CircuitBreaker(max(OMLX_CB_FAILURE_THRESHOLD, OMLX_CB_FAILURE_THRESHOLD_FLOOR), OMLX_CB_COOLDOWN_SECONDS)
 
 
 class CircuitOpenError(RuntimeError):

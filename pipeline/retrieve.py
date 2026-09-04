@@ -24,6 +24,7 @@ Usage:
 
 import argparse
 import json
+import re
 import sqlite3
 import sys
 from collections import deque
@@ -32,6 +33,7 @@ from pathlib import Path
 
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
+from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
 from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
     RANKING_QUALITY_SCORE_ENABLED,
     RANKING_CONFIDENCE_WEIGHT,
@@ -177,6 +179,25 @@ def search_keyword(
     return [_row_to_dict(r) for r in rows]
 
 
+def _fts_query(query: str) -> str:
+    """Build an FTS5 OR/prefix MATCH query from a natural-language query (D2554/BUG-221).
+
+    FTS5 default semantics treat a multi-word MATCH as implicit AND (every term
+    must appear), which returns 0 hits on full-sentence queries. This converts
+    the query into OR'd prefix terms (stopwords removed) so any matching term
+    contributes a hit. If every token is a stopword, fall back to the raw
+    quoted query.
+    """
+    tokens: list[str] = []
+    for tok in re.findall(r"[A-Za-z0-9]+", query.lower()):
+        if tok in FTS_STOPWORDS:
+            continue
+        tokens.append(f"{tok}*")
+    if not tokens:
+        return f'"{query.lower().strip()}"'
+    return " OR ".join(tokens)
+
+
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
              exclude_summaries: bool = True,
              include_quarantine: bool = False) -> list[dict]:
@@ -206,10 +227,13 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
               {class_f}
             ORDER BY rank
             LIMIT ?
-        """, (query, limit)).fetchall()
+        """, (_fts_query(query), limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
-    except sqlite3.OperationalError:
-        # FTS5 may not be available — fall back to LIKE
+    except sqlite3.OperationalError as e:
+        # FTS5 may not be available — fall back to LIKE.
+        # C16: log the reason loudly instead of silently swallowing the error
+        # (matches the search_vector degradation convention).
+        print(f"  ⚠️  FTS5 MATCH failed ({e}); falling back to LIKE")
         like_query: str = f"%{query}%"
         like_status: str = f"AND {_status_predicate(include_quarantine)}"
         like_summary: str = "AND (is_summary = 0 OR is_summary IS NULL)" if (has_is_summary and exclude_summaries) else ""

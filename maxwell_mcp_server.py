@@ -37,7 +37,14 @@ from typing import Any
 
 # Maxwell internal
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pipeline.pipeline_paths import DB_PATH
+PROJECT_ROOT: Path = Path(__file__).resolve().parent  # BUG-220-MCP: containment root for delegate_local file guard
+from pipeline.pipeline_paths import (
+    DB_PATH,
+    MCP_DELEGATE_ALLOW_ABSOLUTE_PATHS,
+    MCP_DELEGATE_ALLOWED_MODELS,
+    MCP_DELEGATE_MAX_FILES,
+    MCP_DELEGATE_MAX_SYSTEM_CHARS,
+)
 from pipeline.retrieve import search_hybrid, graph_aware_search, agentic_search, EvidencePack
 from pipeline.feedback import get_fb_feedback_stats
 from pipeline.omlx_delegate import delegate_omlx  # BUG-063: file-grounded local delegation (C25)
@@ -254,17 +261,59 @@ async def _tool_delegate_local(args: dict) -> list[TextContent]:
     Reads the named files with REAL filesystem access (unlike the
     Deno-sandboxed `delegate()` tool) and sends them with `prompt` to a
     local model. Exposes Maxwell's local inference via MCP (C25).
+
+    BUG-220-MCP guard: restricts the model/system/files surface — no arbitrary
+    remote model name, no path escape beyond PROJECT_ROOT, bounded system prompt
+    and file count (C25 agent-agnostic + C22 hybrid-sovereignty fail-closed).
     """
     prompt: str = str(args.get("prompt", ""))
     if not prompt:
         return [TextContent(type="text", text=json.dumps({"error": "prompt is required"}))]
 
+    # ── BUG-220-MCP: model allowlist (reject arbitrary/remote model names) ──
+    model: str | None = str(args.get("model")) if args.get("model") else None
+    if model and MCP_DELEGATE_ALLOWED_MODELS and model not in MCP_DELEGATE_ALLOWED_MODELS:
+        return [TextContent(type="text", text=json.dumps({
+            "error": f"model '{model}' is not in the delegate_local allowlist",
+        }))]
+
+    # ── BUG-220-MCP: system-prompt length bound ──
+    system: str | None = str(args.get("system")) if args.get("system") else None
+    if system and len(system) > MCP_DELEGATE_MAX_SYSTEM_CHARS:
+        return [TextContent(type="text", text=json.dumps({
+            "error": f"system prompt exceeds {MCP_DELEGATE_MAX_SYSTEM_CHARS} chars",
+        }))]
+
     files: list[str] = [str(f) for f in (args.get("files") or [])]
+    if len(files) > MCP_DELEGATE_MAX_FILES:
+        return [TextContent(type="text", text=json.dumps({
+            "error": f"too many files ({len(files)} > {MCP_DELEGATE_MAX_FILES})",
+        }))]
+
+    # ── BUG-220-MCP: path-containment guard (no read outside PROJECT_ROOT) ──
+    _root: Path = PROJECT_ROOT.resolve()
+    _resolved: list[str] = []
+    for f in files:
+        p = Path(f)
+        if p.is_absolute() and not MCP_DELEGATE_ALLOW_ABSOLUTE_PATHS:
+            return [TextContent(type="text", text=json.dumps({
+                "error": f"absolute path not allowed: '{f}'",
+            }))]
+        _abs = p if p.is_absolute() else (_root / p)
+        try:
+            _abs.resolve().relative_to(_root)
+        except ValueError:
+            return [TextContent(type="text", text=json.dumps({
+                "error": f"file '{f}' escapes project root",
+            }))]
+        _resolved.append(str(_abs.resolve()))
+    files = _resolved
+
     kwargs: dict[str, Any] = {"files": files}
-    if args.get("model"):
-        kwargs["model"] = str(args["model"])
-    if args.get("system"):
-        kwargs["system"] = str(args["system"])
+    if model:
+        kwargs["model"] = model
+    if system:
+        kwargs["system"] = system
     if args.get("as_json"):
         kwargs["as_json"] = bool(args["as_json"])
 
@@ -292,7 +341,7 @@ TOOLS: list[Tool] = [
             "properties": {
                 "query": {"type": "string", "description": "Natural language search query"},
                 "domain": {"type": "string", "description": "Optional domain filter (e.g., 'pricing')"},
-                "depth": {"type": "string", "enum": ["universal", "domain", "contextual"]},
+                "depth": {"type": "string", "enum": ["universal", "cross-domain", "domain", "specialized"]},
                 "graph_aware": {"type": "boolean", "default": True, "description": "Enable graph expansion"},
                 "agentic": {"type": "boolean", "default": False, "description": "Enable iterative critique loop"},
                 "limit": {"type": "integer", "minimum": 1, "maximum": 50, "default": 10},

@@ -676,6 +676,30 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
                 if kw_clean and normalize_label(kw_clean) not in lookup and normalize_label(kw_clean) not in forbidden_keys:
                     lookup[normalize_label(kw_clean)] = canonical
 
+    # 3. alias_map.yaml (curated raw->canonical overrides; D2566)
+    #    domain_aliases / discipline_aliases are single-source curated overrides
+    #    layered on top of the taxonomy + synonym_map. Compound values (a list)
+    #    cannot be represented in this flat index and are skipped here — the
+    #    multi-domain enrichment path expands them separately.
+    alias_path = config_root / "alias_map.yaml"
+    if alias_path.exists():
+        with open(alias_path) as f:
+            alias_map = yaml.safe_load(f) or {}
+        for raw, target in (alias_map.get("domain_aliases", {}) or {}).items():
+            if isinstance(target, list):
+                continue
+            if not _accept(target):
+                continue
+            if normalize_label(raw) not in forbidden_keys:
+                lookup[normalize_label(raw)] = str(target).strip()
+        for raw, target in (alias_map.get("discipline_aliases", {}) or {}).items():
+            if isinstance(target, list):
+                continue
+            if not _accept(target):
+                continue
+            if normalize_label(raw) not in forbidden_keys:
+                lookup[normalize_label(raw)] = str(target).strip()
+
     return lookup
 
 

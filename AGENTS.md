@@ -80,6 +80,13 @@
   - ⚠️ Phi-4-mini-instruct-8bit: HALLUCINATES on open-ended research (BUG-053). Only for summarization WITH source text.
   - ❌ NEVER use custom_deepseek: reasoning_content passthrough bug (DELEGATE-001).
   - For research/fact-finding: use shell/curl directly. Do NOT delegate open-ended research.
+- DELEGATION ROUTING (D2549 — task-type → right local LLM; ALWAYS route by this map):
+  - Deterministic data-repair (SQL/scripts: T-311, kind-swap, FTS rebuild): EXECUTE directly (LLM-free). But delegate CODE REVIEW of any NEW repair script to gemma-4-E4B-it-MLX-4bit BEFORE --apply (R5: generator ≠ verifier).
+  - Code review / classification sanity / summarization WITH source → gemma-4-E4B-it-MLX-4bit (CONFIRMED working; verified 2026-09-04 approving the T-311 script).
+  - S4 discipline/domain classification → gpt-oss-20b-MXFP4-Q8 (OMLX classifier; batch via subprocess, NOT a delegate).
+  - Single-shot code generation → Qwen3-Coder-30B (curl one-shot ONLY — never multi-turn).
+  - Summarization WITH source text → Phi-4-mini-instruct-8bit (never open-ended; BUG-053).
+  - Open-ended research/fact-finding → shell/curl directly (NEVER delegate).
 - Memory budget labels (THREE distinct concepts — do not conflate, D2496):
   - `delegate_model_budget` = ~24GB of 64GB — total for all delegate-served models combined (this file)
   - `omlx_guard_ceiling`  = 55GB — OMLX server memory-guard ceiling (D1804/D2208)

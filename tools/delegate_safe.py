@@ -29,8 +29,11 @@ from pathlib import Path
 # ── Constants: delegate model configuration ──────────────────────────────
 PREFERRED_DELEGATE_MODEL = "gemma-4-E4B-it-MLX-4bit"
 SECONDARY_DELEGATE_MODEL = "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit"
-OMLX_URL = "http://localhost:11435/v1/models"
-OMLX_API_KEY = "sk-maxwell-local"
+_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(_ROOT))
+from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL  # noqa: E402  (C12: single source, D2552)
+
+OMLX_MODELS_URL = f"{OMLX_URL}/v1/models"
 
 # ── Dangerous env vars that trigger DELEGATE-001 ─────────────────────────
 DANGEROUS_VARS = [
@@ -62,7 +65,7 @@ def check_omlx_models() -> bool:
     """
     try:
         result = subprocess.run(
-            ["curl", "-s", OMLX_URL, "-H", f"Authorization: Bearer {OMLX_API_KEY}"],
+            ["curl", "-s", OMLX_MODELS_URL, "-H", f"Authorization: Bearer {OMLX_API_KEY}"],
             capture_output=True, text=True, timeout=10,
         )
         if result.returncode != 0:

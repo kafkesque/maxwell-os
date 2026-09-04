@@ -1,0 +1,4740 @@
+{
+  "note": "Per-(axis,label) flagged-subset statistics. NOTE: the NLI/kNN artifacts carry only FLAGGED rows (contradict/weak/low-agreement), so these are flag-rate statistics, not full-population means.",
+  "weak_threshold": 0.1,
+  "labels": [
+    {
+      "axis": "discipline",
+      "label": "aesthetics",
+      "nli_flagged": 10,
+      "mean_entail": 0.0521,
+      "mean_contra": 0.1078,
+      "knn_low_agreement": 42,
+      "mean_agreement": 0.157
+    },
+    {
+      "axis": "discipline",
+      "label": "anthropology",
+      "nli_flagged": 102,
+      "mean_entail": 0.003,
+      "mean_contra": 0.1052,
+      "knn_low_agreement": 72,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "discipline",
+      "label": "artificial intelligence",
+      "nli_flagged": 47,
+      "mean_entail": 0.0076,
+      "mean_contra": 0.0893,
+      "knn_low_agreement": 83,
+      "mean_agreement": 0.145
+    },
+    {
+      "axis": "discipline",
+      "label": "behavioral economics",
+      "nli_flagged": 198,
+      "mean_entail": 0.0096,
+      "mean_contra": 0.1299,
+      "knn_low_agreement": 177,
+      "mean_agreement": 0.149
+    },
+    {
+      "axis": "discipline",
+      "label": "cognitive science",
+      "nli_flagged": 103,
+      "mean_entail": 0.0147,
+      "mean_contra": 0.1508,
+      "knn_low_agreement": 123,
+      "mean_agreement": 0.099
+    },
+    {
+      "axis": "discipline",
+      "label": "color theory",
+      "nli_flagged": 1,
+      "mean_entail": 0.0302,
+      "mean_contra": 0.0823,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "discipline",
+      "label": "communication theory",
+      "nli_flagged": 109,
+      "mean_entail": 0.0188,
+      "mean_contra": 0.1451,
+      "knn_low_agreement": 151,
+      "mean_agreement": 0.119
+    },
+    {
+      "axis": "discipline",
+      "label": "complex adaptive systems",
+      "nli_flagged": 24,
+      "mean_entail": 0.0144,
+      "mean_contra": 0.0932,
+      "knn_low_agreement": 34,
+      "mean_agreement": 0.068
+    },
+    {
+      "axis": "discipline",
+      "label": "computational geometry",
+      "nli_flagged": 31,
+      "mean_entail": 0.004,
+      "mean_contra": 0.2321,
+      "knn_low_agreement": 39,
+      "mean_agreement": 0.087
+    },
+    {
+      "axis": "discipline",
+      "label": "computational physics & simulation",
+      "nli_flagged": 12,
+      "mean_entail": 0.0195,
+      "mean_contra": 0.3304,
+      "knn_low_agreement": 16,
+      "mean_agreement": 0.113
+    },
+    {
+      "axis": "discipline",
+      "label": "computational theory",
+      "nli_flagged": 3,
+      "mean_entail": 0.025,
+      "mean_contra": 0.3231,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.017
+    },
+    {
+      "axis": "discipline",
+      "label": "computer graphics",
+      "nli_flagged": 24,
+      "mean_entail": 0.0117,
+      "mean_contra": 0.1486,
+      "knn_low_agreement": 62,
+      "mean_agreement": 0.152
+    },
+    {
+      "axis": "discipline",
+      "label": "computer networking",
+      "nli_flagged": 1,
+      "mean_entail": 0.009,
+      "mean_contra": 0.0008,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.075
+    },
+    {
+      "axis": "discipline",
+      "label": "creative coding",
+      "nli_flagged": 5,
+      "mean_entail": 0.0394,
+      "mean_contra": 0.1184,
+      "knn_low_agreement": 9,
+      "mean_agreement": 0.044
+    },
+    {
+      "axis": "discipline",
+      "label": "creative process",
+      "nli_flagged": 57,
+      "mean_entail": 0.0202,
+      "mean_contra": 0.7028,
+      "knn_low_agreement": 98,
+      "mean_agreement": 0.147
+    },
+    {
+      "axis": "discipline",
+      "label": "cultural design",
+      "nli_flagged": 200,
+      "mean_entail": 0.0337,
+      "mean_contra": 0.5374,
+      "knn_low_agreement": 169,
+      "mean_agreement": 0.155
+    },
+    {
+      "axis": "discipline",
+      "label": "cultural studies",
+      "nli_flagged": 75,
+      "mean_entail": 0.0158,
+      "mean_contra": 0.3017,
+      "knn_low_agreement": 91,
+      "mean_agreement": 0.065
+    },
+    {
+      "axis": "discipline",
+      "label": "decision making",
+      "nli_flagged": 5,
+      "mean_entail": 0.0086,
+      "mean_contra": 0.6613,
+      "knn_low_agreement": 22,
+      "mean_agreement": 0.059
+    },
+    {
+      "axis": "discipline",
+      "label": "design psychology",
+      "nli_flagged": 2,
+      "mean_entail": 0.0036,
+      "mean_contra": 0.5027,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "discipline",
+      "label": "design thinking",
+      "nli_flagged": 78,
+      "mean_entail": 0.0205,
+      "mean_contra": 0.2221,
+      "knn_low_agreement": 152,
+      "mean_agreement": 0.138
+    },
+    {
+      "axis": "discipline",
+      "label": "economics",
+      "nli_flagged": 70,
+      "mean_entail": 0.015,
+      "mean_contra": 0.1195,
+      "knn_low_agreement": 153,
+      "mean_agreement": 0.11
+    },
+    {
+      "axis": "discipline",
+      "label": "engineering",
+      "nli_flagged": 58,
+      "mean_entail": 0.0165,
+      "mean_contra": 0.0627,
+      "knn_low_agreement": 85,
+      "mean_agreement": 0.076
+    },
+    {
+      "axis": "discipline",
+      "label": "evolutionary biology",
+      "nli_flagged": 28,
+      "mean_entail": 0.0145,
+      "mean_contra": 0.177,
+      "knn_low_agreement": 31,
+      "mean_agreement": 0.097
+    },
+    {
+      "axis": "discipline",
+      "label": "finance",
+      "nli_flagged": 13,
+      "mean_entail": 0.0289,
+      "mean_contra": 0.1728,
+      "knn_low_agreement": 58,
+      "mean_agreement": 0.116
+    },
+    {
+      "axis": "discipline",
+      "label": "game design",
+      "nli_flagged": 10,
+      "mean_entail": 0.0061,
+      "mean_contra": 0.6254,
+      "knn_low_agreement": 15,
+      "mean_agreement": 0.02
+    },
+    {
+      "axis": "discipline",
+      "label": "generative ai",
+      "nli_flagged": 9,
+      "mean_entail": 0.0108,
+      "mean_contra": 0.0519,
+      "knn_low_agreement": 12,
+      "mean_agreement": 0.092
+    },
+    {
+      "axis": "discipline",
+      "label": "generative design",
+      "nli_flagged": 3,
+      "mean_entail": 0.0167,
+      "mean_contra": 0.0347,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.017
+    },
+    {
+      "axis": "discipline",
+      "label": "health & medicine",
+      "nli_flagged": 45,
+      "mean_entail": 0.0126,
+      "mean_contra": 0.5271,
+      "knn_low_agreement": 88,
+      "mean_agreement": 0.144
+    },
+    {
+      "axis": "discipline",
+      "label": "human-computer interaction",
+      "nli_flagged": 179,
+      "mean_entail": 0.0156,
+      "mean_contra": 0.3027,
+      "knn_low_agreement": 214,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "discipline",
+      "label": "information retrieval",
+      "nli_flagged": 3,
+      "mean_entail": 0.0642,
+      "mean_contra": 0.6298,
+      "knn_low_agreement": 13,
+      "mean_agreement": 0.177
+    },
+    {
+      "axis": "discipline",
+      "label": "information science",
+      "nli_flagged": 73,
+      "mean_entail": 0.0349,
+      "mean_contra": 0.2349,
+      "knn_low_agreement": 126,
+      "mean_agreement": 0.127
+    },
+    {
+      "axis": "discipline",
+      "label": "information security",
+      "nli_flagged": 13,
+      "mean_entail": 0.0232,
+      "mean_contra": 0.1462,
+      "knn_low_agreement": 41,
+      "mean_agreement": 0.11
+    },
+    {
+      "axis": "discipline",
+      "label": "interdisciplinary studies",
+      "nli_flagged": 22,
+      "mean_entail": 0.0071,
+      "mean_contra": 0.7561,
+      "knn_low_agreement": 24,
+      "mean_agreement": 0.071
+    },
+    {
+      "axis": "discipline",
+      "label": "law",
+      "nli_flagged": 13,
+      "mean_entail": 0.0144,
+      "mean_contra": 0.1607,
+      "knn_low_agreement": 49,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "discipline",
+      "label": "linguistics",
+      "nli_flagged": 53,
+      "mean_entail": 0.0195,
+      "mean_contra": 0.2452,
+      "knn_low_agreement": 91,
+      "mean_agreement": 0.164
+    },
+    {
+      "axis": "discipline",
+      "label": "literary theory",
+      "nli_flagged": 48,
+      "mean_entail": 0.0184,
+      "mean_contra": 0.1143,
+      "knn_low_agreement": 51,
+      "mean_agreement": 0.114
+    },
+    {
+      "axis": "discipline",
+      "label": "machine learning",
+      "nli_flagged": 71,
+      "mean_entail": 0.0164,
+      "mean_contra": 0.1429,
+      "knn_low_agreement": 112,
+      "mean_agreement": 0.165
+    },
+    {
+      "axis": "discipline",
+      "label": "media studies",
+      "nli_flagged": 136,
+      "mean_entail": 0.0203,
+      "mean_contra": 0.1954,
+      "knn_low_agreement": 127,
+      "mean_agreement": 0.125
+    },
+    {
+      "axis": "discipline",
+      "label": "motion & time",
+      "nli_flagged": 36,
+      "mean_entail": 0.0286,
+      "mean_contra": 0.7314,
+      "knn_low_agreement": 57,
+      "mean_agreement": 0.172
+    },
+    {
+      "axis": "discipline",
+      "label": "neuroscience",
+      "nli_flagged": 36,
+      "mean_entail": 0.0141,
+      "mean_contra": 0.0506,
+      "knn_low_agreement": 59,
+      "mean_agreement": 0.102
+    },
+    {
+      "axis": "discipline",
+      "label": "operations research",
+      "nli_flagged": 133,
+      "mean_entail": 0.0059,
+      "mean_contra": 0.2002,
+      "knn_low_agreement": 128,
+      "mean_agreement": 0.116
+    },
+    {
+      "axis": "discipline",
+      "label": "organizational theory",
+      "nli_flagged": 97,
+      "mean_entail": 0.0233,
+      "mean_contra": 0.1363,
+      "knn_low_agreement": 123,
+      "mean_agreement": 0.094
+    },
+    {
+      "axis": "discipline",
+      "label": "performing arts",
+      "nli_flagged": 10,
+      "mean_entail": 0.01,
+      "mean_contra": 0.528,
+      "knn_low_agreement": 37,
+      "mean_agreement": 0.081
+    },
+    {
+      "axis": "discipline",
+      "label": "philosophy",
+      "nli_flagged": 145,
+      "mean_entail": 0.0037,
+      "mean_contra": 0.4334,
+      "knn_low_agreement": 170,
+      "mean_agreement": 0.108
+    },
+    {
+      "axis": "discipline",
+      "label": "political economy",
+      "nli_flagged": 158,
+      "mean_entail": 0.009,
+      "mean_contra": 0.325,
+      "knn_low_agreement": 159,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "discipline",
+      "label": "privacy & surveillance",
+      "nli_flagged": 1,
+      "mean_entail": 0.0004,
+      "mean_contra": 0.99,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.06
+    },
+    {
+      "axis": "discipline",
+      "label": "psychology",
+      "nli_flagged": 722,
+      "mean_entail": 0.0095,
+      "mean_contra": 0.0594,
+      "knn_low_agreement": 313,
+      "mean_agreement": 0.183
+    },
+    {
+      "axis": "discipline",
+      "label": "research methodology",
+      "nli_flagged": 107,
+      "mean_entail": 0.0225,
+      "mean_contra": 0.4703,
+      "knn_low_agreement": 156,
+      "mean_agreement": 0.141
+    },
+    {
+      "axis": "discipline",
+      "label": "risk management",
+      "nli_flagged": 35,
+      "mean_entail": 0.0122,
+      "mean_contra": 0.2291,
+      "knn_low_agreement": 55,
+      "mean_agreement": 0.04
+    },
+    {
+      "axis": "discipline",
+      "label": "robotics",
+      "nli_flagged": 4,
+      "mean_entail": 0.0024,
+      "mean_contra": 0.0167,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.025
+    },
+    {
+      "axis": "discipline",
+      "label": "semiotics",
+      "nli_flagged": 24,
+      "mean_entail": 0.0222,
+      "mean_contra": 0.1171,
+      "knn_low_agreement": 36,
+      "mean_agreement": 0.094
+    },
+    {
+      "axis": "discipline",
+      "label": "social network analysis",
+      "nli_flagged": 9,
+      "mean_entail": 0.0199,
+      "mean_contra": 0.3034,
+      "knn_low_agreement": 13,
+      "mean_agreement": 0.038
+    },
+    {
+      "axis": "discipline",
+      "label": "sociology",
+      "nli_flagged": 78,
+      "mean_entail": 0.0091,
+      "mean_contra": 0.0482,
+      "knn_low_agreement": 88,
+      "mean_agreement": 0.097
+    },
+    {
+      "axis": "discipline",
+      "label": "software engineering",
+      "nli_flagged": 188,
+      "mean_entail": 0.0131,
+      "mean_contra": 0.1597,
+      "knn_low_agreement": 225,
+      "mean_agreement": 0.151
+    },
+    {
+      "axis": "discipline",
+      "label": "strategic thinking",
+      "nli_flagged": 195,
+      "mean_entail": 0.0263,
+      "mean_contra": 0.3374,
+      "knn_low_agreement": 175,
+      "mean_agreement": 0.159
+    },
+    {
+      "axis": "discipline",
+      "label": "systems engineering",
+      "nli_flagged": 98,
+      "mean_entail": 0.0127,
+      "mean_contra": 0.067,
+      "knn_low_agreement": 108,
+      "mean_agreement": 0.126
+    },
+    {
+      "axis": "discipline",
+      "label": "systems thinking",
+      "nli_flagged": 11,
+      "mean_entail": 0.0395,
+      "mean_contra": 0.0742,
+      "knn_low_agreement": 41,
+      "mean_agreement": 0.078
+    },
+    {
+      "axis": "discipline",
+      "label": "theoretical physics",
+      "nli_flagged": 27,
+      "mean_entail": 0.0104,
+      "mean_contra": 0.2411,
+      "knn_low_agreement": 29,
+      "mean_agreement": 0.059
+    },
+    {
+      "axis": "discipline",
+      "label": "typography",
+      "nli_flagged": 3,
+      "mean_entail": 0.066,
+      "mean_contra": 0.0182,
+      "knn_low_agreement": 19,
+      "mean_agreement": 0.211
+    },
+    {
+      "axis": "discipline",
+      "label": "visual perception",
+      "nli_flagged": 2,
+      "mean_entail": 0.0029,
+      "mean_contra": 0.9699,
+      "knn_low_agreement": 28,
+      "mean_agreement": 0.118
+    },
+    {
+      "axis": "discipline",
+      "label": "visual semiotics",
+      "nli_flagged": 42,
+      "mean_entail": 0.0537,
+      "mean_contra": 0.2242,
+      "knn_low_agreement": 105,
+      "mean_agreement": 0.139
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents",
+      "nli_flagged": 87,
+      "mean_entail": 0.0272,
+      "mean_contra": 0.2123,
+      "knn_low_agreement": 48,
+      "mean_agreement": 0.177
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|arts & culture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|business operations",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|computational science & physics",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|creative technology|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|design strategy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|digital product",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|digital product|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|education|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|engineering & infrastructure|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|legal & public policy|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 10,
+      "mean_agreement": 0.23
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "ai & agents|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture",
+      "nli_flagged": 211,
+      "mean_entail": 0.0157,
+      "mean_contra": 0.303,
+      "knn_low_agreement": 92,
+      "mean_agreement": 0.178
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|brand identity|editorial & advertising|engineering practice|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|business operations",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|computational science & physics|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|creative technology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|design strategy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.16
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|design strategy|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|design strategy|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|editorial & advertising|graphic design|illustration|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 18,
+      "mean_agreement": 0.189
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|education|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|education|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.225
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|engineering practice|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|illustration",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|industrial design|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 16,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.186
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.217
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "arts & culture|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity",
+      "nli_flagged": 330,
+      "mean_entail": 0.0091,
+      "mean_contra": 0.4973,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|digital product|editorial & advertising|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|editorial & advertising",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|editorial & advertising|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|editorial & advertising|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|education|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|graphic design|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|health & wellness|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|legal & public policy|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 10,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|marketing & communications|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "brand identity|marketing & communications|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "business development",
+      "nli_flagged": 137,
+      "mean_entail": 0.0206,
+      "mean_contra": 0.3951,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "business development|business operations|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business development|digital product|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business development|digital product|marketing & communications|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business development|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "business development|leadership",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business development|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.275
+    },
+    {
+      "axis": "domain",
+      "label": "business development|marketing & communications|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business development|marketing & communications|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business development|marketing & communications|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations",
+      "nli_flagged": 743,
+      "mean_entail": 0.0122,
+      "mean_contra": 0.2731,
+      "knn_low_agreement": 38,
+      "mean_agreement": 0.208
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|code & computation",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|code & computation|graphic design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|code & computation|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|code & computation|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|data visualization",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|design strategy|digital product|media & entertainment|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|digital product|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|digital product|leadership|personal productivity|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|digital product|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|education|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|education|leadership",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|engineering & infrastructure|leadership",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|environmental design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|industrial design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|leadership",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.188
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|leadership|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|leadership|organizational behavior|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|leadership|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|leadership|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.257
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|research & methodology|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "business operations|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation",
+      "nli_flagged": 91,
+      "mean_entail": 0.0179,
+      "mean_contra": 0.8465,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.071
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|computational art",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|computational art|digital product",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|computational art|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|computational science & physics|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|creative technology|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|digital product",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|digital product|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|digital product|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|digital product|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|editorial & advertising|marketing & communications|media & entertainment|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|education|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering & infrastructure|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering & infrastructure|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering & infrastructure|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 17,
+      "mean_agreement": 0.135
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering practice|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering practice|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|engineering practice|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|entrepreneurship|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|graphic design|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|media & entertainment|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|product design|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|project management|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "code & computation|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational art",
+      "nli_flagged": 16,
+      "mean_entail": 0.0087,
+      "mean_contra": 0.3867,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.067
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|creative technology|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|creative technology|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|editorial & advertising|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational art|media & entertainment|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics",
+      "nli_flagged": 37,
+      "mean_entail": 0.0179,
+      "mean_contra": 0.2174,
+      "knn_low_agreement": 13,
+      "mean_agreement": 0.085
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|data visualization",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|education|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.033
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "computational science & physics|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology",
+      "nli_flagged": 11,
+      "mean_entail": 0.0098,
+      "mean_contra": 0.4982,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.083
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology|design strategy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology|digital product|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.05
+    },
+    {
+      "axis": "domain",
+      "label": "creative technology|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.08
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization",
+      "nli_flagged": 107,
+      "mean_entail": 0.0145,
+      "mean_contra": 0.5777,
+      "knn_low_agreement": 20,
+      "mean_agreement": 0.105
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|digital product",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|digital product|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|digital product|marketing & communications|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.28
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|education|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.125
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|engineering practice|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|information architecture|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|marketing & communications|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "data visualization|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy",
+      "nli_flagged": 220,
+      "mean_entail": 0.0242,
+      "mean_contra": 0.6894,
+      "knn_low_agreement": 15,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|digital product",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.225
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|digital product|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|digital product|industrial design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|education",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.05
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|engineering practice|environmental design|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|engineering practice|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|finance & investment|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|product design|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design strategy|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design systems",
+      "nli_flagged": 2,
+      "mean_entail": 0.0244,
+      "mean_contra": 0.5154,
+      "knn_low_agreement": 0,
+      "mean_agreement": null
+    },
+    {
+      "axis": "domain",
+      "label": "design systems|digital product|graphic design|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "design systems|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "design systems|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product",
+      "nli_flagged": 690,
+      "mean_entail": 0.0046,
+      "mean_contra": 0.1359,
+      "knn_low_agreement": 32,
+      "mean_agreement": 0.138
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|engineering & infrastructure",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|entrepreneurship|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|entrepreneurship|project management|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|entrepreneurship|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|finance & investment|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|industrial design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|industrial design|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|leadership|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|leadership|organizational behavior|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|marketing & communications|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|marketing & communications|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|motion design|user experience|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.237
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|project management|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|project management|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|research & methodology|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.271
+    },
+    {
+      "axis": "domain",
+      "label": "digital product|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.275
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising",
+      "nli_flagged": 467,
+      "mean_entail": 0.0143,
+      "mean_contra": 0.488,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.233
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design|marketing & communications|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design|media & entertainment|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|graphic design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|legal & public policy|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|marketing & communications|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|marketing & communications|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|media & entertainment|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "editorial & advertising|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education",
+      "nli_flagged": 625,
+      "mean_entail": 0.0032,
+      "mean_contra": 0.3361,
+      "knn_low_agreement": 128,
+      "mean_agreement": 0.147
+    },
+    {
+      "axis": "domain",
+      "label": "education|engineering & infrastructure|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "education|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.22
+    },
+    {
+      "axis": "domain",
+      "label": "education|engineering practice|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|entrepreneurship",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "education|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|graphic design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "education|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.188
+    },
+    {
+      "axis": "domain",
+      "label": "education|health & wellness|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|health & wellness|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "education|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "education|leadership",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "education|leadership|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|leadership|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "education|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 12,
+      "mean_agreement": 0.192
+    },
+    {
+      "axis": "domain",
+      "label": "education|legal & public policy|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "education|legal & public policy|marketing & communications|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|legal & public policy|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "education|marketing & communications|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "education|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "education|media & entertainment|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "education|organizational behavior|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "education|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.229
+    },
+    {
+      "axis": "domain",
+      "label": "education|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.233
+    },
+    {
+      "axis": "domain",
+      "label": "education|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "education|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 16,
+      "mean_agreement": 0.212
+    },
+    {
+      "axis": "domain",
+      "label": "education|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "education|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.283
+    },
+    {
+      "axis": "domain",
+      "label": "education|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.225
+    },
+    {
+      "axis": "domain",
+      "label": "education|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.233
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure",
+      "nli_flagged": 227,
+      "mean_entail": 0.0112,
+      "mean_contra": 0.574,
+      "knn_low_agreement": 72,
+      "mean_agreement": 0.118
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|engineering practice",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 16,
+      "mean_agreement": 0.144
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|engineering practice|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|health & wellness|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|industrial design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|industrial design|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|packaging",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|science & research|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|urban planning|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering & infrastructure|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice",
+      "nli_flagged": 179,
+      "mean_entail": 0.0105,
+      "mean_contra": 0.4474,
+      "knn_low_agreement": 26,
+      "mean_agreement": 0.158
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|environmental design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|environmental design|organizational behavior|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|environmental design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|environmental design|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|environmental design|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.05
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|health & wellness|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|industrial design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|industrial design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|information architecture",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|leadership|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|leadership|organizational behavior|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|leadership|organizational behavior|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|legal & public policy|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|product design|urban planning|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "engineering practice|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship",
+      "nli_flagged": 214,
+      "mean_entail": 0.0056,
+      "mean_contra": 0.2125,
+      "knn_low_agreement": 11,
+      "mean_agreement": 0.136
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|environmental design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|finance & investment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|finance & investment|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|marketing & communications|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|marketing & communications|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "entrepreneurship|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design",
+      "nli_flagged": 36,
+      "mean_entail": 0.0152,
+      "mean_contra": 0.4573,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "environmental design|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment",
+      "nli_flagged": 121,
+      "mean_entail": 0.0111,
+      "mean_contra": 0.486,
+      "knn_low_agreement": 45,
+      "mean_agreement": 0.118
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|health & wellness",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.05
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.183
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.225
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "finance & investment|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design",
+      "nli_flagged": 360,
+      "mean_entail": 0.0156,
+      "mean_contra": 0.2121,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|illustration",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.275
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|motion design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "graphic design|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness",
+      "nli_flagged": 302,
+      "mean_entail": 0.0075,
+      "mean_contra": 0.5418,
+      "knn_low_agreement": 78,
+      "mean_agreement": 0.131
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|legal & public policy",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|legal & public policy|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|marketing & communications",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|media & entertainment|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|project management|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 11,
+      "mean_agreement": 0.182
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.171
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "health & wellness|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "illustration",
+      "nli_flagged": 22,
+      "mean_entail": 0.0278,
+      "mean_contra": 0.7221,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.075
+    },
+    {
+      "axis": "domain",
+      "label": "illustration|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "illustration|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "industrial design",
+      "nli_flagged": 120,
+      "mean_entail": 0.0037,
+      "mean_contra": 0.1409,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.129
+    },
+    {
+      "axis": "domain",
+      "label": "industrial design|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "industrial design|product design|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "information architecture",
+      "nli_flagged": 55,
+      "mean_entail": 0.0241,
+      "mean_contra": 0.3847,
+      "knn_low_agreement": 12,
+      "mean_agreement": 0.125
+    },
+    {
+      "axis": "domain",
+      "label": "information architecture|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "information architecture|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "information architecture|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "leadership",
+      "nli_flagged": 416,
+      "mean_entail": 0.0052,
+      "mean_contra": 0.362,
+      "knn_low_agreement": 17,
+      "mean_agreement": 0.141
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|legal & public policy|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|marketing & communications|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.171
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|organizational behavior|personal productivity",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|organizational behavior|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "leadership|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy",
+      "nli_flagged": 578,
+      "mean_entail": 0.0087,
+      "mean_contra": 0.2033,
+      "knn_low_agreement": 124,
+      "mean_agreement": 0.181
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|organizational behavior",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|organizational behavior|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.125
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|social sciences|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "legal & public policy|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 13,
+      "mean_agreement": 0.185
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications",
+      "nli_flagged": 774,
+      "mean_entail": 0.0139,
+      "mean_contra": 0.3088,
+      "knn_low_agreement": 30,
+      "mean_agreement": 0.187
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|media & entertainment",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 7,
+      "mean_agreement": 0.271
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.22
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|research & methodology|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "marketing & communications|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment",
+      "nli_flagged": 233,
+      "mean_entail": 0.0165,
+      "mean_contra": 0.4011,
+      "knn_low_agreement": 73,
+      "mean_agreement": 0.163
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|motion design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.267
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 3,
+      "mean_agreement": 0.133
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "media & entertainment|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "motion design",
+      "nli_flagged": 42,
+      "mean_entail": 0.0096,
+      "mean_contra": 0.5322,
+      "knn_low_agreement": 6,
+      "mean_agreement": 0.167
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior",
+      "nli_flagged": 482,
+      "mean_entail": 0.0135,
+      "mean_contra": 0.4518,
+      "knn_low_agreement": 43,
+      "mean_agreement": 0.184
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|product design",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|project management",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.275
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|research & methodology|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "organizational behavior|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "packaging",
+      "nli_flagged": 36,
+      "mean_entail": 0.0004,
+      "mean_contra": 0.5929,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "personal productivity",
+      "nli_flagged": 284,
+      "mean_entail": 0.0169,
+      "mean_contra": 0.4613,
+      "knn_low_agreement": 25,
+      "mean_agreement": 0.168
+    },
+    {
+      "axis": "domain",
+      "label": "personal productivity|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "product design",
+      "nli_flagged": 471,
+      "mean_entail": 0.0093,
+      "mean_contra": 0.3268,
+      "knn_low_agreement": 16,
+      "mean_agreement": 0.175
+    },
+    {
+      "axis": "domain",
+      "label": "product design|research & methodology",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "product design|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "product design|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 5,
+      "mean_agreement": 0.26
+    },
+    {
+      "axis": "domain",
+      "label": "project management",
+      "nli_flagged": 590,
+      "mean_entail": 0.0058,
+      "mean_contra": 0.4389,
+      "knn_low_agreement": 9,
+      "mean_agreement": 0.178
+    },
+    {
+      "axis": "domain",
+      "label": "project management|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology",
+      "nli_flagged": 332,
+      "mean_entail": 0.0196,
+      "mean_contra": 0.3123,
+      "knn_low_agreement": 100,
+      "mean_agreement": 0.176
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|science & research",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 9,
+      "mean_agreement": 0.256
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|semiotics & communication",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 4,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|semiotics & communication|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 8,
+      "mean_agreement": 0.225
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "research & methodology|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.15
+    },
+    {
+      "axis": "domain",
+      "label": "science & research",
+      "nli_flagged": 48,
+      "mean_entail": 0.0342,
+      "mean_contra": 0.0907,
+      "knn_low_agreement": 48,
+      "mean_agreement": 0.09
+    },
+    {
+      "axis": "domain",
+      "label": "science & research|systems & frameworks",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "semiotics & communication",
+      "nli_flagged": 132,
+      "mean_entail": 0.0301,
+      "mean_contra": 0.3351,
+      "knn_low_agreement": 26,
+      "mean_agreement": 0.158
+    },
+    {
+      "axis": "domain",
+      "label": "semiotics & communication|social sciences",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.2
+    },
+    {
+      "axis": "domain",
+      "label": "social sciences",
+      "nli_flagged": 90,
+      "mean_entail": 0.0189,
+      "mean_contra": 0.3686,
+      "knn_low_agreement": 43,
+      "mean_agreement": 0.074
+    },
+    {
+      "axis": "domain",
+      "label": "social sciences|urban planning",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "social sciences|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.0
+    },
+    {
+      "axis": "domain",
+      "label": "systems & frameworks",
+      "nli_flagged": 25,
+      "mean_entail": 0.0379,
+      "mean_contra": 0.3763,
+      "knn_low_agreement": 10,
+      "mean_agreement": 0.04
+    },
+    {
+      "axis": "domain",
+      "label": "urban planning",
+      "nli_flagged": 118,
+      "mean_entail": 0.0073,
+      "mean_contra": 0.3393,
+      "knn_low_agreement": 34,
+      "mean_agreement": 0.1
+    },
+    {
+      "axis": "domain",
+      "label": "urban planning|user experience",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 1,
+      "mean_agreement": 0.3
+    },
+    {
+      "axis": "domain",
+      "label": "user experience",
+      "nli_flagged": 457,
+      "mean_entail": 0.0122,
+      "mean_contra": 0.4263,
+      "knn_low_agreement": 33,
+      "mean_agreement": 0.158
+    },
+    {
+      "axis": "domain",
+      "label": "user experience|web & ui",
+      "nli_flagged": 0,
+      "mean_entail": null,
+      "mean_contra": null,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.25
+    },
+    {
+      "axis": "domain",
+      "label": "web & ui",
+      "nli_flagged": 98,
+      "mean_entail": 0.0144,
+      "mean_contra": 0.3048,
+      "knn_low_agreement": 2,
+      "mean_agreement": 0.1
+    }
+  ]
+}

@@ -30,12 +30,13 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from pipeline.stage4_merged_call import DEPTH_FOCUSED_PROMPT, _parse_depth_token  # noqa: E402
+from pipeline.pipeline_paths import OMLX_API_KEY  # noqa: E402  (C12: single source, D2552)
 
 GOLDEN_PATH = ROOT / "config" / "golden" / "stage2_fewshot_convergent.yaml"
 OUT_PATH = ROOT / "governance" / "s4_depth_d2359_ab_benchmark.json"
 
 URL = "http://127.0.0.1:11435/v1/chat/completions"
-H = {"Authorization": "Bearer sk-maxwell-local", "Content-Type": "application/json"}
+H = {"Authorization": f"Bearer {OMLX_API_KEY}", "Content-Type": "application/json"}
 MODEL = "gpt-oss-20b-MXFP4-Q8"
 
 DEPTH_ORDER = ["specialized", "domain", "cross-domain", "universal"]

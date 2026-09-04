@@ -89,6 +89,7 @@ OMLX_COLD_RELOAD_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("cold_
 # D2187: OMLX circuit breaker (P1-3) — config-driven, no hardcoding
 OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
 OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))
+OMLX_CB_FAILURE_THRESHOLD_FLOOR = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold_floor", 25))  # D2545: floor was hardcoded max(...,25)
 OMLX_CB_COOLDOWN_SECONDS = float(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_cooldown_seconds", 60))
 OLLAMA_EMBED_MAX_CHARS = int(_CFG.get("services", {}).get("ollama", {}).get("embed_max_chars", 4000))
 OLLAMA_BATCH_SIZE = int(_CFG.get("services", {}).get("ollama", {}).get("batch_size", 100))
@@ -230,10 +231,11 @@ S5_NLI_MODEL_FALLBACK=_CFG.get("stage5", {}).get("nli_model_fallback", "")  # D2
 S5_NLI_MODEL_LARGE=_CFG["models"]["nli_large"]  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
 # S5_NLI_MODEL_CROSS removed (D2298): RoBERTa-large added zero signal on paraphrase evidence (D2227).
 S5_NLI_ENTAILMENT_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_entailment_threshold", 0.5))  # D2231: fallback matches config
-S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.6))  # D2231: fallback matches config
-S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.3))  # D2231: fallback matches config
+S5_NLI_PASS_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_pass_threshold", 0.1))  # D2231/D2556: fallback aligned to config (was stale 0.6 — D2322 recalibrated to 0.1)
+S5_NLI_MARGINAL_THRESHOLD=float(_CFG.get("stage5", {}).get("nli_marginal_threshold", 0.1))  # D2231/D2556: fallback aligned to config (was stale 0.3)
 S5_NLI_MAX_PREMISE_CHARS=int(_CFG.get("stage5", {}).get("nli_max_premise_chars", 256))  # D2321: premise(evidence) truncation for NLI pairing
 S5_NLI_MAX_HYPOTHESIS_CHARS=int(_CFG.get("stage5", {}).get("nli_max_hypothesis_chars", 256))  # D2321: hypothesis(definition) truncation
+S5_EVIDENCE_CONTAMINATION_RATIO=float(_CFG.get("stage5", {}).get("evidence_contamination_ratio", 0.15))  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (was hardcoded 0.15)
 # D2310: Confidence weights — NLI is a binary gate, not a score component (C12 config-driven).
 S5_CONF_MECH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("mechanism_weight", 0.35))
 S5_CONF_ENRICH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("enrichment_weight", 0.25))
@@ -295,10 +297,16 @@ TAXONOMY_MAX_DOMAINS = int(_CFG.get("taxonomy", {}).get("max_domains", 35))     
 TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 75))  # D2378/D2504: canonical cap (was hardcoded 47; default 72→75 to match live taxonomy_v5.yaml)
 D2399_PROMOTIONS_FROZEN = bool(_CFG.get("taxonomy", {}).get("d2399_promotions_frozen", False))          # D2519/D2399 policy A: manual freeze kill-switch
 D2399_ALLOW_BOTH_AXES_EMERGING = bool(_CFG.get("taxonomy", {}).get("d2399_allow_both_axes_emerging", False))  # D2519: never promote a both-axes-emerging label
+# D2556 (D2547): config-driven per-axis/per-label semantic-error thresholds (retire global 5%).
+SEMANTIC_ERROR_RATE = _CFG.get("taxonomy", {}).get("semantic_error_rate_max", {})
+SEMANTIC_ERROR_RATE_DEFAULT = float(SEMANTIC_ERROR_RATE.get("default", 0.05))
+SEMANTIC_ERROR_RATE_PER_AXIS = dict(SEMANTIC_ERROR_RATE.get("per_axis", {}))
+S4_GRAMMAR_DECODING_ENABLED = bool(_CFG.get("stage4", {}).get("grammar_decoding_enabled", False))  # D2556 (D2548): gate OFF until Outlines/XGrammar added
 
 # ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
 RERANK_ENABLED = bool(_CFG.get("rerank", {}).get("enabled", False))   # D2521 (S2): production rerank adoption gate
+FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 
 # D2537: opt-in fused quality ranking (replaces dead borp_score ordering)
 RANKING_QUALITY_SCORE_ENABLED = bool(_CFG.get("ranking", {}).get("quality_score_enabled", False))
@@ -331,6 +339,7 @@ S15_MIN_SOURCE_DIVERSITY = int(_CFG.get("stage1_5", {}).get("min_source_diversit
 S15_NEIGHBOR_K = int(_CFG.get("stage1_5", {}).get("neighbor_k", 150))
 S15_EMBED_MODEL = _CFG.get("stage1_5", {}).get("embed_model", "bge-m3")
 S15_EMBED_DIM = int(_CFG.get("stage1_5", {}).get("embed_dim", 512))  # D2181: Matryoshka 512d (E7)
+S15_EMBED_NATIVE_MRL = bool(_CFG.get("stage1_5", {}).get("embed_native_mrl", False))  # D2551: Ollama 'dimensions' MRL head vs manual 1024→512 truncate
 S15_EMBED_BACKEND = _CFG.get("stage1_5", {}).get("embed_backend", "ollama")  # D2190: Ollama stable (MPS deadlocks on bge-m3)
 S15_EMBED_MODEL_HF = _CFG.get("stage1_5", {}).get("embed_model_hf", "BAAI/bge-m3")  # D2181: unified
 S15_EMBED_CHUNK_SIZE = int(_CFG.get("stage1_5", {}).get("embed_chunk_size", 20000))  # D2189: chunked embedding
@@ -503,3 +512,9 @@ SMOKE_PLUMBING_SKIP_LLM = bool(_CFG.get("smoke", {}).get("plumbing", {}).get("sk
 SMOKE_FAST_MODEL = _CFG.get("smoke", {}).get("fast", {}).get("fast_model", "Phi-4-mini-instruct-8bit")
 SMOKE_FAST_SKIP_GEMMA = bool(_CFG.get("smoke", {}).get("fast", {}).get("skip_gemma_deep_check", True))
 SMOKE_MAX_BOOKS = int(_CFG.get("smoke", {}).get("fast", {}).get("max_books", 3))
+
+# ── MCP server delegate_local guard (D2550 / BUG-220-MCP) ─────────────────
+MCP_DELEGATE_ALLOWED_MODELS = set(_CFG.get("mcp", {}).get("delegate_local", {}).get("allowed_models", []))
+MCP_DELEGATE_MAX_SYSTEM_CHARS = int(_CFG.get("mcp", {}).get("delegate_local", {}).get("max_system_chars", 4000))
+MCP_DELEGATE_MAX_FILES = int(_CFG.get("mcp", {}).get("delegate_local", {}).get("max_files", 20))
+MCP_DELEGATE_ALLOW_ABSOLUTE_PATHS = bool(_CFG.get("mcp", {}).get("delegate_local", {}).get("allow_absolute_paths", False))

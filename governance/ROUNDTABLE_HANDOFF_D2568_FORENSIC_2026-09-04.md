@@ -1,7 +1,7 @@
 # LLM ROUNDTABLE HANDOFF — Forensic Audit: S4 Taxonomy Labelling (post-D2568)
 
 > **Prepared:** 2026-09-04 · **Repo:** `github.com/kafkesque/maxwell-os` · **Branch:** `main`
-> **Reference commit:** see `git log -1 --oneline` after the D2568 push (this file is committed at the same HEAD as everything it references).
+> **Reference commit:** `be34c04` (contains every file referenced in §9 at a fixed, auditable revision). Check out with `git checkout be34c04` to reproduce exactly.
 > **Auditors:** Claude + GPT (independent), as senior RAG engineers. Reconcile afterwards; do **not** let either see the other's answer first (avoids shared-bias collusion — same reason R5 demands generator ≠ verifier).
 > **Mode:** READ-ONLY forensic. Do not mutate `knowledge pipeline/maxwell.db`, `config/*.yaml`, or any governance file. Write findings to a new `governance/ROUNDTABLE_FINDINGS_<model>_2026-09-04.md`.
 

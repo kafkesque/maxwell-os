@@ -98,7 +98,8 @@ def _load_checkpoint() -> set[int]:
     for line in _OUT.read_text(encoding="utf-8").splitlines():
         try:
             done.add(int(json.loads(line)["i"]))
-        except (json.JSONDecodeError, KeyError, ValueError):
+        except (json.JSONDecodeError, KeyError, ValueError) as exc:  # C16: log, don't swallow
+            print(f"  ⚠️  checkpoint: skipping malformed line {line[:80]!r} ({exc})", file=sys.stderr)
             continue
     return done
 

@@ -74,7 +74,7 @@ DEFAULT_WHERE = "discipline = 'emerging'"
 # + crash-safe harvest append. A crash mid-run loses at most one chunk; re-running
 # the same --where skips already-applied FBs (they no longer match: discipline
 # changed OR discipline_raw filled), so resume is automatic (D2533 hardening).
-CHUNK_SIZE_DEFAULT = 200
+CHUNK_SIZE_DEFAULT = int(_CFG.get("stage4", {}).get("reclassify_chunk_size", 200))  # C12: config-driven
 
 # FB fields the merged/batch classifier consumes (prompt input). Everything else
 # (domains, evidence, application, elaboration, keywords, jargon, depth,

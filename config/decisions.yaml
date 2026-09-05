@@ -1,8 +1,22 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 545
+total_decisions: 546
 decisions:
+- id: D2570
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'Next-5 execution (post-D2569) + forensic audit + P1 ontology layer. (0) BASELINE: committed+pushed D2569 as 2c866c3 (14 files + corrected handoff v2). FORENSIC AUDIT (clean): integrity 18/18; config-audit no drift; decision-summary sync 545; DB integrity_check ok, 0 FK, 0 non-canonical disciplines, 0 null R14 stamps; emerging 969 (623 empty + 54 literal-[] + 292 genuine unmapped), 0 residual non-emerging empty-raw. (1) C16 FIX: scripts/review_aliases.py _load_checkpoint silent except (json.JSONDecodeError/KeyError/ValueError) now logs to stderr + continue (matches pipeline/nli_label_audit.py pattern — skip-on-malformed-line is correct resume behavior, not re-raise). (2) C12 FIX: pipeline/reclassify_merged_axis.py CHUNK_SIZE_DEFAULT=200 (unregistered hardcode, flagged by audit --check-unchecked) → config stage4.reclassify_chunk_size=200 + CONFIG_TO_CODE registry entry; audit now clean. (3) TEST: tests/test_per_label_threshold_contract.py (5 tests) guards the 96-entry per_label block (canonical keys only, numeric values in [0,1], 43/43 domains present, YAML round-trip type-safe). (4) P1 ONTOLOGY DEFINITION LAYER: added definition+exclude to all 104 canonicals (43 domains + 61 disciplines) in config/taxonomy_v5.yaml — authored by Qwen3.8-27B (single-shot, temp 0), cross-family verified by gemma-4-E4B (0/25 flagged wrong), applied additively via ruamel round-trip (canonical/group/raw/meta/version byte-identical; 199/199 tests green). Unblocks the definition-bearing NLI hypothesis control for anomaly C (under-entailment confound). (5) BUG-223 logged: 54 emerging FBs store discipline_raw literal "[]" instead of ""/NULL.'
+  champion: goose
+  target_files:
+  - scripts/review_aliases.py
+  - pipeline/reclassify_merged_axis.py
+  - pipeline/config_audit.py
+  - config/pipeline_config.yaml
+  - config/taxonomy_v5.yaml
+  - tests/test_per_label_threshold_contract.py
+  - governance/buglog.md
+  created: '2026-09-05'
 - id: D2569
   category: LABEL QUALITY / EXECUTION
   state: RESOLVED
@@ -4598,7 +4612,7 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 545
+  total: 546
   proposed: 0
   draft: 1
   active: 459
@@ -4607,7 +4621,7 @@ summary:
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 34
+  resolved: 35
   planned: 7
   by_category:
     ARCH: 27
@@ -4667,7 +4681,7 @@ summary:
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / ENRICHMENT: 2
-    LABEL QUALITY / EXECUTION: 4
+    LABEL QUALITY / EXECUTION: 5
     LABEL QUALITY / HUMAN REVIEW: 1
     MEASUREMENT / LABEL QUALITY: 1
     MEASUREMENT / QUALITY: 1

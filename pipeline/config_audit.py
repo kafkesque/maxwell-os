@@ -85,6 +85,7 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "stage2.evidence_tracking":         ("pipeline.pipeline_paths", "S2_EVIDENCE_TRACKING", "bool"),
     # ── Stage 4 tuning ──
     "stage4.max_principles_per_cluster": ("pipeline.pipeline_paths", "S4_MAX_PRINCIPLES", "int"),
+    "stage4.reclassify_chunk_size":       ("pipeline.reclassify_merged_axis", "CHUNK_SIZE_DEFAULT", "int"),
     # ── Stage 5 tuning ──
     "stage5.factscore_enabled":         ("pipeline.pipeline_paths", "S5_FACTSCORE_ENABLED", "bool"),
     # ── Stage 6 tuning ──

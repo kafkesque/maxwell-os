@@ -248,6 +248,7 @@ stage4:
   merged_call_max_tokens: 2048
   batch_enabled: false
   batch_size: 4
+  reclassify_chunk_size: 200
   batch_call_max_tokens: 2048
   depth_focused_classification: true
   depth_max_tokens: 1024

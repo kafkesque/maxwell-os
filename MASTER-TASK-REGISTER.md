@@ -15,55 +15,55 @@
 
 ## 🟠 SHOULD — open
 
-1. **DEF-BEARING-NLI** — run the definition-bearing NLI hypothesis control (hypothesis = canonical `definition` from `taxonomy_v5.yaml`, now populated by D2570/P1) vs the flat `"This text is about {label}."` template. Resolves anomaly C (under-entailment confound) and calibrates the per-label rates before D2547 cost-weighting.
-2. **CLEANLAB** — adopt `cleanlab` Confident Learning (Northcutt et al. JAIR 2021) as the third independent mislabel instrument; retire k-NN (`scripts/knn_label_disagreement.py`) as a mislabel detector (keep its output for topical-coherence analysis only).
-3. **CLASSIFIER** — expand S4 golden set 7→750–1200 (stratified) + train a discriminative `microsoft/deberta-v3-base` + LoRA classifier (softmax-61 discipline + sigmoid-43 domain heads) with class-balanced loss + calibrated reject/abstain so `emerging` = open-world state. Target macro-F1 ≥ 0.75 on held-out pre-mutation gold.
-4. **D2547** — per-label/per-axis cost-weighted thresholds (retire global 5%). THRESHOLDS POPULATED (D2568): `scripts/populate_semantic_error_thresholds.py` → 96 per-label NLI-contradiction rates in `taxonomy.semantic_error_rate_max.per_label` (flag-rate proxy). REMAINING: cost-weighting model + gate consumer (per_label is data, not yet consumed).
-5. **D2548** — grammar-constrained decoding pilot on S4 enums. Outlines/XGrammar NOT installed; gate added (`stage4.grammar_decoding_enabled=false`, D2556). BLOCKED on dependency.
-6. **T-OWL** — OWL/SKOS axiom spec for 105 canonicals (D2541).
-7. **D2399 (BUG-150 tail)** — 250 discipline=emerging FBs are genuine taxonomy gaps (Ecology 5, Musicology 4, History of Technology 3, audio signal processing 3 + 221 tail labels). Promotion CANDIDATES harvested; `d2399_promotions_frozen: true` blocks auto-promote → human review when unfrozen.
-8. **BUG-151** — taxonomy structural overlap (177 raw-alias cross-axis; kind-safe-guarded).
-9. **BUG-148** — S2 `route` field stale (`route="FB"` on all 2,878).
-10. **BUG-182** — 48 singleton empty-shells deterministic.
-11. **BUG-170** — non-principle types (PT/PI/TI/GE) not classified/enriched.
-12. **BUG-159** — prompt-injection contamination (cluster_11649, 0.007%).
-13. **GOV-GOLDEN** — archive 8/9 versioned `MASTER-ROUNDTABLE-EVAL-PROMPT-*` + 2 dead golden files.
-14. **D2462** — unify single-source + singleton S2 into one extractor.
-15. **D2345** — single-source non-type second pass.
-16. **BUG-168** — `dspy_trainer.py` built-not-wired: wire OR archive (P2 dead code).
-17. **BUG-195-code** — S4 cross-cluster dedup + S6 duplicate-fb_id fail-loud guard (post-hoc done; CODE fix for future batches).
-18. **C12-ROUTE** — extract `route.py` hardcoded 10%/5% promotion thresholds → config (C12).
-19. **P1-6** — config-read fallbacks promote from log to raise (C16 observability).
-20. **FINGERPRINT** — S5 input fingerprint load/write fail-closed (P1-1/P1-2).
-21. **DEEPSEEK-PROVIDER** — goose `active_provider=custom_deepseek` (deepseek-v4-pro) is LIVE+AUTHENTICATED (Keychain internet-password `https://api.deepseek.com/v1`; live `goose serve → api.deepseek.com:443` connection). NOT dead (D2560 CORRECTED 2026-09-04). Real issue = remote CLOUD API → C1 ($0) + C3 (sovereignty) violation BY DESIGN. Switch `active_provider` → `maxwell_omlx` in `~/.config/goose/config.yaml` (user decision — affects the goose runtime itself).
+1. **CLASSIFIER** — TRAINING SCRIPT WRITTEN (D2571: `scripts/train_discipline_classifier.py`, deberta-v3-base + LoRA + 2 heads + abstain→emerging, fail-loud <100 golden). BLOCKED: expand S4 golden 7→750–1200 first (currently statistically underpowered). Fix the label-map padding fragility (gemma flag) before training. Target macro-F1 ≥ 0.75.
+2. **D2547** — GATE SCRIPT WRITTEN (D2571: `scripts/apply_cost_weighted_thresholds.py`, cost = n/median). REMAINING: (a) domain-axis frequencies (script queries `discipline` only → domain labels get n=0); (b) cost-model calibration (policy decision); (c) re-derive per-label rates with definition-bearing hypotheses (D2571 finding).
+3. **D2548** — grammar-constrained decoding pilot on S4 enums. Outlines/XGrammar NOT installed; gate added (`stage4.grammar_decoding_enabled=false`, D2556). BLOCKED on dependency.
+4. **T-OWL** — OWL/SKOS axiom spec for 105 canonicals (D2541).
+5. **D2399 (BUG-150 tail)** — 250 discipline=emerging FBs are genuine taxonomy gaps (Ecology 5, Musicology 4, History of Technology 3, audio signal processing 3 + 221 tail labels). Promotion CANDIDATES harvested; `d2399_promotions_frozen: true` blocks auto-promote → human review when unfrozen.
+6. **BUG-151** — taxonomy structural overlap (177 raw-alias cross-axis; kind-safe-guarded).
+7. **BUG-148** — S2 `route` field stale (`route="FB"` on all 2,878).
+8. **BUG-182** — 48 singleton empty-shells deterministic.
+9. **BUG-170** — non-principle types (PT/PI/TI/GE) not classified/enriched.
+10. **BUG-159** — prompt-injection contamination (cluster_11649, 0.007%).
+11. **GOV-GOLDEN** — archive 8/9 versioned `MASTER-ROUNDTABLE-EVAL-PROMPT-*` + 2 dead golden files.
+12. **D2462** — unify single-source + singleton S2 into one extractor.
+13. **D2345** — single-source non-type second pass.
+14. **BUG-168** — `dspy_trainer.py` built-not-wired: wire OR archive (P2 dead code).
+15. **BUG-195-code** — S4 cross-cluster dedup + S6 duplicate-fb_id fail-loud guard (post-hoc done; CODE fix for future batches).
+16. **C12-ROUTE** — extract `route.py` hardcoded 10%/5% promotion thresholds → config (C12).
+17. **P1-6** — config-read fallbacks promote from log to raise (C16 observability).
+18. **FINGERPRINT** — S5 input fingerprint load/write fail-closed (P1-1/P1-2).
+19. **DEEPSEEK-PROVIDER** — goose `active_provider=custom_deepseek` (deepseek-v4-pro) is LIVE+AUTHENTICATED (Keychain internet-password `https://api.deepseek.com/v1`; live `goose serve → api.deepseek.com:443` connection). NOT dead (D2560 CORRECTED 2026-09-04). Real issue = remote CLOUD API → C1 ($0) + C3 (sovereignty) violation BY DESIGN. Switch `active_provider` → `maxwell_omlx` in `~/.config/goose/config.yaml` (user decision — affects the goose runtime itself).
 
 ---
 
-22. **D2440** — S5 verifier calibration experiment (AlignScore 355M + MiniCheck EMNLP-2024 vs DeBERTa-v3-large via `pipeline/calibrate.py` + `nli_calibrate.py`). BLOCKED: `evals/nli_golden.jsonl` not committed → threshold non-reproducible. Adopt only if F1 materially > 0.484 AND fail-closed (D2093) preserved.
+20. **D2440** — S5 verifier calibration experiment (AlignScore 355M + MiniCheck EMNLP-2024 vs DeBERTa-v3-large via `pipeline/calibrate.py` + `nli_calibrate.py`). BLOCKED: `evals/nli_golden.jsonl` not committed → threshold non-reproducible. Adopt only if F1 materially > 0.484 AND fail-closed (D2093) preserved.
 
 ## 🟡 WORTH — open (later / after measurement)
 
-23. **T-S1** — S1 contextual embeddings adopt-vs-gate decision.
-24. **T-S3** — S3 HyDE A/B run.
-25. **D2399** — domain promote/demote (frozen — reopen post-reclass).
-26. **D2164/D2165/D2166** — sparse architectural planning (see DECISION-LOG reference links).
-27. **D2009…D2084** — 15 legacy DEFERRED infra/CLS items (see DECISION-LOG reference links).
-28. **BUG-160** — systematic evidence-passage topical-relevance pass (log-only today).
-29. **BUG-169** — verify TI `parameters` at rerun (technique-type vs API TI ontology nuance).
-30. **TEST-CLEANUP** — gut/rename `tests/test_stage4_d2138.py` + `test_stage4_exhaustive.py` (0 `test_*` fns).
-31. **T-STS** — tautological-mechanism STS (def↔mech cosine; weak signal measured).
-32. **T-015/D2292** — golden depth expansion ≥5 universal + ≥5 specialized (BUG-083/084).
-33. **BUG-081** — `evals/golden_cases.json` v2 format migration.
-34. **BUG-073** — CONV-035/037 false convergence (D2232).
-35. **GAP-2** — remove stale Stage 3a artifacts (`prompts/s3a_*.txt`).
-36. **SLA** — end-to-end latency SLA (D2305).
-37. **B15/D2341** — schema corrections: TI class, three-axis `status`, typed edges, feedback→YAML.
-38. **T2.x** — Business PI, atomic evidence, trust state machine.
+21. **T-S1** — S1 contextual embeddings adopt-vs-gate decision.
+22. **T-S3** — S3 HyDE A/B run.
+23. **D2399** — domain promote/demote (frozen — reopen post-reclass).
+24. **D2164/D2165/D2166** — sparse architectural planning (see DECISION-LOG reference links).
+25. **D2009…D2084** — 15 legacy DEFERRED infra/CLS items (see DECISION-LOG reference links).
+26. **BUG-160** — systematic evidence-passage topical-relevance pass (log-only today).
+27. **BUG-169** — verify TI `parameters` at rerun (technique-type vs API TI ontology nuance).
+28. **TEST-CLEANUP** — gut/rename `tests/test_stage4_d2138.py` + `test_stage4_exhaustive.py` (0 `test_*` fns).
+29. **T-STS** — tautological-mechanism STS (def↔mech cosine; weak signal measured).
+30. **T-015/D2292** — golden depth expansion ≥5 universal + ≥5 specialized (BUG-083/084).
+31. **BUG-081** — `evals/golden_cases.json` v2 format migration.
+32. **BUG-073** — CONV-035/037 false convergence (D2232).
+33. **GAP-2** — remove stale Stage 3a artifacts (`prompts/s3a_*.txt`).
+34. **SLA** — end-to-end latency SLA (D2305).
+35. **B15/D2341** — schema corrections: TI class, three-axis `status`, typed edges, feedback→YAML.
+36. **T2.x** — Business PI, atomic evidence, trust state machine.
 
 ---
 
 ## ✅ DONE — bottom (recent, resolved this/prior sessions)
 
+- **DEF-BEARING-NLI control (D2571)** — `pipeline/nli_definition_control.py` (500-FB sample): definition-bearing hypothesis is a LABEL-SPECIFIC confound fix, not uniform (anthropology 0.004→0.44, evolutionary biology 0.024→0.41, cognitive science 0.01→0.31; overall mean entail flat 0.27→0.24, pass rate up 0.37→0.42). Per-label rates must be re-derived with definitions, not blanket-switched ✅ (2026-09-05)
+- **Cleanlab Confident Learning (D2571)** — `scripts/cleanlab_label_audit.py` (TF-IDF + 5-fold CV-LR): 3424/7026 flagged (48.7%; top behavioral economics 150, philosophy 133). Third instrument wired. CAVEAT: TF-IDF weak — bge-m3 embeddings upgrade = follow-up ✅ (2026-09-05)
 - **P1 ontology definition layer (D2570)** — added `definition`+`exclude` to all 104 canonicals (43 domains + 61 disciplines) in `config/taxonomy_v5.yaml`; authored by Qwen3.8-27B (single-shot, temp 0), cross-family verified by gemma-4-E4B (0/25 flagged wrong), applied additively via ruamel round-trip (canonical/group/raw/meta byte-identical; 199/199 tests green). Unblocks the definition-bearing NLI hypothesis control (anomaly C). ✅ (2026-09-05)
 - **C12-CHUNK (D2570)** — `pipeline/reclassify_merged_axis.py` `CHUNK_SIZE_DEFAULT=200` hardcode → config `stage4.reclassify_chunk_size=200` + `CONFIG_TO_CODE` registry entry; `config_audit.py --check-unchecked --strict` now clean ✅ (2026-09-05)
 - **C16 review_aliases (D2570)** — `scripts/review_aliases.py` `_load_checkpoint` silent `except (json.JSONDecodeError, KeyError, ValueError)` → logs to stderr + continue (matches `nli_label_audit.py` pattern) ✅ (2026-09-05)

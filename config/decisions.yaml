@@ -1,8 +1,21 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 546
+total_decisions: 547
 decisions:
+- id: D2571
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'Next-4 execution: DEF-BEARING-NLI control + cleanlab + classifier skeleton + D2547 gate. (1) DEF-BEARING-NLI CONTROL (pipeline/nli_definition_control.py, 500-FB sample, 1496 pairs): flat template "is about {label}" vs definition-bearing hypothesis (canonical definition from taxonomy_v5.yaml). RESULT: overall mean entail flat 0.2731→0.2414 but PASS RATE up 0.3717→0.4238; definition-bearing dramatically helps SPECIFIC labels (anthropology 0.004→0.441, evolutionary biology 0.024→0.407, cognitive science 0.010→0.306, cultural design 0.030→0.321, risk management 0.010→0.269) but not others (sociology 0.005→0.018). CONCLUSION: anomaly C is a LABEL-SPECIFIC confound, not uniform — flat template under-entails on broad/catch-all labels with concrete definitions; per-label thresholds must be re-derived with definition-bearing hypotheses, not a blanket switch. (2) CLEANLAB (scripts/cleanlab_label_audit.py): installed cleanlab 2.9.0; TF-IDF + 5-fold CV LogisticRegression → cleanlab Confident Learning on discipline axis; 3424/7026 flagged (48.7%, top: behavioral economics 150, philosophy 133, political economy 118). CAVEAT: TF-IDF features are weak for 61-class imbalanced semantics — bge-m3 embeddings (512d, vec_fbs) would give a much stronger classifier; treat as third TRIANGULATION signal, not standalone. (3) CLASSIFIER (scripts/train_discipline_classifier.py): microsoft/deberta-v3-base + LoRA (rank 16) + 2 heads (softmax-61 discipline, sigmoid-43 domain), class-balanced loss, abstain→emerging (thr 0.35), FAIL-LOUD if golden <100 examples. BLOCKED on golden expansion 7→750 (statistically underpowered); gemma flagged a padding fragility to fix before training. (4) D2547 GATE (scripts/apply_cost_weighted_thresholds.py): cost-weighted gate consuming taxonomy.semantic_error_rate_max.per_label; cost model = n/median (high-freq → stricter); dry-run: 96 labels, 80 REJECT/16 PASS. KNOWN LIMITATION: domain-axis labels get n=0 (queries discipline column only) + cost model is a placeholder policy needing user calibration. Verification: Qwen3.8-27B generated (3)+(4), gemma-4-E4B cross-family review (found DB-path critical bug — fixed — + classifier padding fragility). DeepSeek NOT used: remote CLOUD (C1/C3 violation, D2560) + keychain credential not shell-retrievable.'
+  champion: goose
+  target_files:
+  - pipeline/nli_definition_control.py
+  - scripts/cleanlab_label_audit.py
+  - scripts/train_discipline_classifier.py
+  - scripts/apply_cost_weighted_thresholds.py
+  - governance/nli_definition_control.json
+  - governance/cleanlab_label_audit.json
+  created: '2026-09-05'
 - id: D2570
   category: LABEL QUALITY / EXECUTION
   state: RESOLVED
@@ -4612,7 +4625,7 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 546
+  total: 547
   proposed: 0
   draft: 1
   active: 459
@@ -4621,7 +4634,7 @@ summary:
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 35
+  resolved: 36
   planned: 7
   by_category:
     ARCH: 27
@@ -4681,7 +4694,7 @@ summary:
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / ENRICHMENT: 2
-    LABEL QUALITY / EXECUTION: 5
+    LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 1
     MEASUREMENT / LABEL QUALITY: 1
     MEASUREMENT / QUALITY: 1

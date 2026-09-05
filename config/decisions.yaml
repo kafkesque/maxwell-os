@@ -1,8 +1,22 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 544
+total_decisions: 545
 decisions:
+- id: D2569
+  category: LABEL QUALITY / EXECUTION
+  state: RESOLVED
+  description: 'P0 execution (post-roundtable adjudication) + governance drift sync. (1) GOV-SYNC: removed D2544/D2545 double-listing from DECISION-LOG OPEN section (kept RESOLVED bottom); re-surfaced D2440 (S5 verifier calibration, BLOCKED on evals/nli_golden.jsonl) into MTR SHOULD #20; flipped D2454/D2483 ACTIVE→RESOLVED (both applied — D2454 golden wiring via D2466, D2483 depth-prompt v3_contrastive). (2) BUG-215 RESIDUAL (66 FBs): discipline != emerging + empty discipline_raw + stale taxonomy_match_method=emerging_real. scripts/fix_bug215_residual.py recovered the lost raw label from backups (filename-timestamp sorted — mtime is unreliable under shutil.copy2) and split: 24 VERIFIED (Information Systems/Health Informatics → information science, alias-index-backed) → restore raw + method=alias; 42 UNVERIFIED (raw label does not resolve to the assigned discipline, e.g. Marketing→finance, music education→psychology, Applied Mathematics→theoretical physics, plus an information-science catch-all over-assignment) → revert discipline=emerging + method=emerging_real (honest open-world gap per D2399, not a failure state). NET discipline=emerging 927→969; 0 residual empty-raw non-emerging FBs; integrity ok, 0 FK violations. (3) P0 #2: pipeline/nli_label_audit.py now persists the FULL population (results, 23,364 records) alongside the flagged contradicts/weak lists, so downstream per-label stats are full-population means, not flag-rate proxies. (4) P0 #1 contradict/weak split: scripts/build_mislabel_triage.py outputs nli_total/nli_contradict/nli_weak (no longer a conflated nli_flagged union); scripts/populate_semantic_error_thresholds.py uses nli_contradict (true contradiction) and is now idempotent (regex block replacement) — project management rate 0.9425→0.3914 (was 590/626 flagged; now 245/626 true contradiction). Cross-verified with Qwen3.8-27B (REJECT → 2 valid defensive fixes applied: explicit emerging_real scope filter + try/finally conn.close).'
+  champion: goose
+  target_files:
+  - scripts/fix_bug215_residual.py
+  - pipeline/nli_label_audit.py
+  - scripts/build_mislabel_triage.py
+  - scripts/populate_semantic_error_thresholds.py
+  - config/pipeline_config.yaml
+  - governance/d2547_calibration.json
+  - governance/nli_label_audit.json
+  created: '2026-09-05'
 - id: D2568
   category: LABEL QUALITY / EXECUTION
   state: RESOLVED
@@ -3942,7 +3956,7 @@ decisions:
   created: '2026-08-24'
 - id: D2454
   category: QLT / PROMPT
-  state: ACTIVE
+  state: RESOLVED
   description: 'Wire config/golden/stage4_golden.yaml (authored D2451, 4 examples spanning all 4 depth levels) into the four S4 classification prompts: CLASSIFY_SYSTEM_PROMPT, MERGED_CRIBS_CLASSIFY_SYSTEM, BATCH_CRIBS_CLASSIFY_SYSTEM, DEPTH_FOCUSED_PROMPT. Replaces hardcoded inline depth anchors with a versioned config-driven golden (C12). IMPLEMENTED 2026-08-27 (D2466): pipeline/s4_golden.py loader (fail-closed, D2463 pattern) + injection into all 4 prompts honoring stage4.golden_inject_enabled (already true in pipeline_config.yaml). Post-wiring S4 benchmark: 19.50s median/FB vs 17.71s baseline (+1.8s golden prefill cost). Success gate: re-measured depth cross-domain drift < 10% (D2451: was 21.6%).'
   champion: 2026-08-27 session
   target_files:
@@ -4258,7 +4272,7 @@ decisions:
   created: '2026-08-28'
 - id: D2483
   category: QLT / PROMPT
-  state: ACTIVE
+  state: RESOLVED
   description: 'BUG-185 depth-collapse root cause confirmed + goldilocks prompt fix (A/B-verified). LLM roundtable (qwen/claude/chatgpt) reviewed against repo ground truth: Claude 9/9 master-prompt corrections TRUE; ChatGPT repo facts correct but 2 fabricated arXiv citations (2602.14862/2605.18796); Qwen no-repo-access (hallucinated file paths). Root cause: depth prompt literally instructs DEFAULT-to-"domain". A/B (scripts/benchmark_s4_depth_prompt_ab.py, n=20 samples + 5 goldens): V0 baseline 90% domain (collapse reproduced); V1 pure-bias-removal over-corrects to 10% domain (D2365 over-assign-cross-domain failure); V3 contrastive = 50% domain, defensible boundary (corrects Lindy Effect/Network Amplification to cross-domain, keeps Four Kinds of Good/Conspiracy Theory as domain), speed-neutral (~7s/FB). Implemented config-gated: stage4.depth_prompt_variant = baseline (default, no change) | v3_contrastive (_apply_depth_prompt_variant in stage4_merged_call.py, applies to DEPTH_FOCUSED_PROMPT
     + DEPTH_BATCH_SYSTEM). 9 S4 tests green. Batch-path A/B (n=20): baseline golden 3/5 -> v3 5/5 (recovers Feedback Loop/Backpropagation), speed-neutral 1.88->1.95s/FB, no over-assignment (80% domain) -> flag flipped to v3_contrastive (enabled) for the 7,898-FB full run. v2 master prompt shipped with DEFAULT-to-"domain" root cause folded in.'
   champion: 2026-08-28 session
@@ -4584,16 +4598,16 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 544
+  total: 545
   proposed: 0
   draft: 1
-  active: 461
+  active: 459
   stale: 0
   superseded: 15
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 31
+  resolved: 34
   planned: 7
   by_category:
     ARCH: 27
@@ -4653,7 +4667,7 @@ summary:
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / ENRICHMENT: 2
-    LABEL QUALITY / EXECUTION: 3
+    LABEL QUALITY / EXECUTION: 4
     LABEL QUALITY / HUMAN REVIEW: 1
     MEASUREMENT / LABEL QUALITY: 1
     MEASUREMENT / QUALITY: 1

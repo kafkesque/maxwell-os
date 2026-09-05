@@ -37,28 +37,35 @@
 
 ---
 
+20. **D2440** — S5 verifier calibration experiment (AlignScore 355M + MiniCheck EMNLP-2024 vs DeBERTa-v3-large via `pipeline/calibrate.py` + `nli_calibrate.py`). BLOCKED: `evals/nli_golden.jsonl` not committed → threshold non-reproducible. Adopt only if F1 materially > 0.484 AND fail-closed (D2093) preserved.
+
 ## 🟡 WORTH — open (later / after measurement)
 
-20. **T-S1** — S1 contextual embeddings adopt-vs-gate decision.
-21. **T-S3** — S3 HyDE A/B run.
-22. **D2399** — domain promote/demote (frozen — reopen post-reclass).
-23. **D2164/D2165/D2166** — sparse architectural planning (see DECISION-LOG reference links).
-24. **D2009…D2084** — 15 legacy DEFERRED infra/CLS items (see DECISION-LOG reference links).
-25. **BUG-160** — systematic evidence-passage topical-relevance pass (log-only today).
-26. **BUG-169** — verify TI `parameters` at rerun (technique-type vs API TI ontology nuance).
-27. **TEST-CLEANUP** — gut/rename `tests/test_stage4_d2138.py` + `test_stage4_exhaustive.py` (0 `test_*` fns).
-28. **T-STS** — tautological-mechanism STS (def↔mech cosine; weak signal measured).
-29. **T-015/D2292** — golden depth expansion ≥5 universal + ≥5 specialized (BUG-083/084).
-30. **BUG-081** — `evals/golden_cases.json` v2 format migration.
-31. **BUG-073** — CONV-035/037 false convergence (D2232).
-32. **GAP-2** — remove stale Stage 3a artifacts (`prompts/s3a_*.txt`).
-33. **SLA** — end-to-end latency SLA (D2305).
-34. **B15/D2341** — schema corrections: TI class, three-axis `status`, typed edges, feedback→YAML.
-35. **T2.x** — Business PI, atomic evidence, trust state machine.
+21. **T-S1** — S1 contextual embeddings adopt-vs-gate decision.
+22. **T-S3** — S3 HyDE A/B run.
+23. **D2399** — domain promote/demote (frozen — reopen post-reclass).
+24. **D2164/D2165/D2166** — sparse architectural planning (see DECISION-LOG reference links).
+25. **D2009…D2084** — 15 legacy DEFERRED infra/CLS items (see DECISION-LOG reference links).
+26. **BUG-160** — systematic evidence-passage topical-relevance pass (log-only today).
+27. **BUG-169** — verify TI `parameters` at rerun (technique-type vs API TI ontology nuance).
+28. **TEST-CLEANUP** — gut/rename `tests/test_stage4_d2138.py` + `test_stage4_exhaustive.py` (0 `test_*` fns).
+29. **T-STS** — tautological-mechanism STS (def↔mech cosine; weak signal measured).
+30. **T-015/D2292** — golden depth expansion ≥5 universal + ≥5 specialized (BUG-083/084).
+31. **BUG-081** — `evals/golden_cases.json` v2 format migration.
+32. **BUG-073** — CONV-035/037 false convergence (D2232).
+33. **GAP-2** — remove stale Stage 3a artifacts (`prompts/s3a_*.txt`).
+34. **SLA** — end-to-end latency SLA (D2305).
+35. **B15/D2341** — schema corrections: TI class, three-axis `status`, typed edges, feedback→YAML.
+36. **T2.x** — Business PI, atomic evidence, trust state machine.
 
 ---
 
 ## ✅ DONE — bottom (recent, resolved this/prior sessions)
+
+- **Governance drift sync (D2569)** — removed D2544/D2545 double-listing from DECISION-LOG OPEN section; re-surfaced D2440 into MTR SHOULD #20; flipped D2454/D2483 ACTIVE→RESOLVED ✅ (2026-09-05)
+- **BUG-215 residual fix (D2569)** — `scripts/fix_bug215_residual.py --apply`: 66 FBs (discipline≠emerging + empty raw + stale `emerging_real`) → **24 verified alias restore** (Information Systems/Health Informatics → information science) + **42 reverted to emerging** (raw label doesn't resolve to the assigned discipline — `Marketing`→finance, `music education`→psychology, `Applied Mathematics`→theoretical physics, plus an information-science catch-all over-assignment). NET discipline=emerging 927→969; 0 residual; integrity ok, 0 FK ✅ (2026-09-05)
+- **P0 #2 NLI full population (D2569)** — `pipeline/nli_label_audit.py` now persists `results` (23,364 full-population records) alongside the flagged contradicts/weak lists → downstream stats are full-population means, not flag-rate proxies ✅ (2026-09-05)
+- **P0 #1 contradict/weak split (D2569)** — `scripts/build_mislabel_triage.py` outputs `nli_total`/`nli_contradict`/`nli_weak` (no conflated union); `scripts/populate_semantic_error_thresholds.py` uses `nli_contradict` + made idempotent → **project management 0.9425→0.3914** (true contradiction 245/626, not the 590/626 flag union) ✅ (2026-09-05)
 
 - **Cascade deregistration (D2568)** — `scripts/cascade_deregister_domains.py --apply`: 615 FB domain deregistrations across the 3 SYSTEMATIC catch-all domains (project management 257 / business operations 202 / legal & public policy 156) from the k-NN∩T-NLI flagged set; 75 single-domain FBs → honest "emerging"; counts 879/1756/806 → 622/1554/650. Fixed a double-flag overwrite bug (24 FBs) by unioning all flagged catch-all domains per FB. C13 backup + integrity gate + atomic + recount ✅ (2026-09-04)
 - **Alias review + correction (D2568)** — `scripts/review_aliases.py` (Qwen3.8-27B re-reviewed 927 single-value aliases → 76 flags) + DeepSeek-v4-pro cross-family verify → `scripts/apply_alias_corrections.py --apply`: **66 corrections** (49 domain + 17 discipline), 9 kept, 1 no-op. Protected D2567 corpus-dependent fixes (`video production`→motion design, `statistics & data science`→data visualization) ✅ (2026-09-04)

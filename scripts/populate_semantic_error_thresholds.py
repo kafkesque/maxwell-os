@@ -6,7 +6,12 @@ with the EMPIRICAL per-label mislabel rate derived from the D2547 calibration
 (`governance/d2547_calibration.json`) and the current corpus counts.
 
 Formula (data-driven baseline; cost-weighting is a separate future policy):
-    error_rate(label) = nli_contradiction_flag_count(label) / total_count(label)
+    error_rate(label) = nli_contradict(label) / nli_total(label)
+
+  * `nli_contradict` = contradiction-dominant pairs (contra > entail AND neutral),
+    the direct "definition contradicts label" mislabel signal (P0 #1 split).
+  * `nli_total` = full audited population for the label (P0 #2), NOT the flagged
+    subset — so this is a full-population contradiction rate, not a flag-rate proxy.
 
   * discipline axis (61 canonical labels, single-valued):
         flagged = calibration[(discipline, L)].nli_flagged
@@ -16,9 +21,10 @@ Formula (data-driven baseline; cost-weighting is a separate future policy):
                   contains D, of (nli_flagged / |label-set|)   [even split]
         total   = count(FBs WHERE D ∈ domains)
 
-NOTE: nli_flagged is the T-NLI contradiction rate (definition contradicts the
-label hypothesis) — a flag-rate PROXY for the semantic error rate, not ground
-truth. Cost-weighting + ground-truth calibration remain future work (D2547).
+NOTE: the rate is now the FULL-POPULATION contradiction rate (nli_contradict /
+nli_total), not the conflated contradiction+weak flag rate. Weak-entailment pairs
+are excluded from this numerator (they are a separate signal, see nli_weak).
+Cost-weighting + ground-truth calibration remain future work (D2547).
 
 Surgical write: ONLY the `    per_label: {}` line under `semantic_error_rate_max`
 is replaced (comments and all other config preserved). The value is the observed
@@ -32,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -47,7 +54,10 @@ _CALIBRATION = _ROOT / "governance" / "d2547_calibration.json"
 _TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
 _CFG = _ROOT / "config" / "pipeline_config.yaml"
 
-_PER_LABEL_MARKER = "    per_label: {}"  # C20: unique anchor line in the config
+# C20: match the whole `per_label:` block (key line + indented entries), so the
+# script is idempotent — it replaces either the empty `{}` marker OR a previously
+# populated block of label entries.
+_PER_LABEL_BLOCK_RE = re.compile(r"    per_label:[^\n]*\n(?:      [^\n]*\n)*")
 _ROUND_DIGITS = 4                        # C20: output precision
 _COMBO_SEP = "|"                         # C20: calibration pipe-joins domain sets
 _DEFAULT_MIN_SAMPLE = 10                 # C20: fallback if config omits the threshold
@@ -103,9 +113,10 @@ def _compute_per_label() -> dict[str, float]:
     dom_flagged: dict[str, float] = {}
     for rec in cal.get("labels", []):
         axis, label = rec["axis"], rec["label"]
-        # NLI contradiction flag = the more direct "definition contradicts label"
-        # mislabel signal (vs k-NN agreement, which tracks topical diversity).
-        flagged = int(rec.get("nli_flagged") or 0)
+        # NLI contradiction count (P0 #1 split) = the more direct "definition
+        # contradicts label" mislabel signal (vs k-NN agreement, which tracks
+        # topical diversity). Weak-entailment is deliberately NOT folded in here.
+        flagged = int(rec.get("nli_contradict") or 0)
         if axis == "discipline" and label in canon_disc:
             disc_flagged[label] = disc_flagged.get(label, 0) + flagged
         elif axis == "domain":
@@ -152,13 +163,14 @@ def main() -> int:
     replacement = "\n".join(block_lines)
 
     cfg_text = _CFG.read_text(encoding="utf-8")
-    if _PER_LABEL_MARKER not in cfg_text:
-        print(f"❌ marker {_PER_LABEL_MARKER!r} not found in {_CFG}")
+    if not _PER_LABEL_BLOCK_RE.search(cfg_text):
+        print(f"❌ per_label block not found in {_CFG}")
         return 1
-    new_text = cfg_text.replace(_PER_LABEL_MARKER, replacement, 1)
+    # Replace the whole block (empty marker or prior populated entries) idempotently.
+    new_text = _PER_LABEL_BLOCK_RE.sub(replacement + "\n", cfg_text, count=1)
 
     if not args.apply:
-        print(f"\n(dry-run — would replace {_PER_LABEL_MARKER!r} with {len(per_label)} entries)")
+        print(f"\n(dry-run — would replace the per_label block with {len(per_label)} entries)")
         print("preview of first lines:")
         print(replacement[:400])
         return 0

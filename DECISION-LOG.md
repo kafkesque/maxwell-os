@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-04 | **Machine source of truth:** `config/decisions.yaml` (544 decisions)
+> **Updated:** 2026-09-05 | **Machine source of truth:** `config/decisions.yaml` (545 decisions)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -14,11 +14,9 @@
 ### New from cross-model adjudication (2026-09-03)
 | ID | State | Decision |
 |---|---|---|
-| D2544 | ✅ DONE | Replace centroid-outlier semantic audit with **k-NN label-disagreement** (Bahri 2020) on the same bge-m3 embeddings. EXECUTED 2026-09-04 (D2557): mean neighbor-label agreement 41.2% over 7,995 FBs. |
 | D2546 | PENDING | **SHACL hot-path + OWL periodic** (not OWL-DL everywhere). Formalize 105 canonicals as `sh:disjoint`/`sh:closed`/`sh:in` before Track B. |
 | D2547 | PENDING | **Per-label/per-axis cost-weighted thresholds** — retire the global 5% semantic-error rule. Calibration measurement DONE (D2561): 440 labels → `governance/d2547_calibration.json`; remaining = populate per-label thresholds. |
 | D2548 | PENDING | **Grammar-constrained decoding pilot** on S4 discipline/domain enums (Outlines/XGrammar) — latency A/B before adoption. |
-| D2545 | ✅ DONE | C12 config-first de-hardcoding: `EVIDENCE_CONTAMINATION_RATIO`→`stage5.evidence_contamination_ratio`; circuit-breaker `max(…,25)`→`circuit_breaker_failure_threshold_floor`. Also fixed CONSTITUTION taxonomy drift (35/72→43/61), PII path, MASTERPROMPT golden staleness. |
 
 ### Pending from registry
 | ID | State | Decision |
@@ -51,9 +49,9 @@
 
 ---
 
-## 🟢 ACTIVE — in effect (460)
+## 🟢 ACTIVE — in effect (459)
 
-The 460 ACTIVE decisions are canonical rules in force (not "pending work"). **Machine list: `config/decisions.yaml`.** Recent critical ACTIVE decisions:
+The 459 ACTIVE decisions are canonical rules in force (not "pending work"). **Machine list: `config/decisions.yaml`.** Recent critical ACTIVE decisions:
 
 | ID | Decision |
 |---|---|
@@ -69,11 +67,11 @@ The 460 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 
 ---
 
-## ⚪ DONE / CLOSED — bottom (62)
+## ⚪ DONE / CLOSED — bottom (65)
 
-**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568
+**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569
 **SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430
 **ARCHIVED:** D2000, D2001, D2002, D2034, D2052, D2195, D2196, D2204
 **REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383
 
-> Full titles/descriptions for all 59 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).
+> Full titles/descriptions for all 65 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).

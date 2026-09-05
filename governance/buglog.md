@@ -27,6 +27,7 @@ _None open_ — BUG-098 (the last MUST) resolved 2026-09-04 (`psutil` declared).
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-223 | 2026-09-05 | `'[]'` literal-array hygiene: 54 `emerging` FBs store `discipline_raw = '[]'` (JSON-empty-array string) instead of `''`/NULL. Queries testing `discipline_raw != ''` will wrongly count these as "has raw". Correct empty-test = `(discipline_raw IS NULL OR TRIM(discipline_raw)='' OR discipline_raw='[]')`. Minor (all 54 are legitimately `emerging`); normalize `'[]'`→`''` or add a shared empty-check helper in `pipeline/schemas.py`. D2569. |
 | BUG-169 | 2026-08-24 | TI `parameters` empty on 31/143 single-source + 100/307 singleton TI — ontology nuance (technique-type vs API TI); verify at rerun |
 | BUG-099 | 2026-08-13 | Model registry drift: gpt-oss/Phi misnamed "verifier" (rename deferred) |
 
@@ -41,7 +42,7 @@ _None open_ — BUG-098 (the last MUST) resolved 2026-09-04 (`psutil` declared).
 - **BUG-220** — `delegate()` broken for Qwen models STANDARDIZED on direct one-shot OMLX curl (D2543/D2549): live-verified Qwen3-Coder one-shot code-gen; goose provider `maxwell_omlx.json` synced (+`gpt-oss-20b-MXFP4-Q4`); `just oneshot` recipe added ✅ (2026-09-04)
 - **BUG-220-MCP** — MCP `delegate_local` hardened: model allowlist + system cap + file-count cap + path-containment (config `mcp.delegate_local`); gemma-4-E4B code review 6/6 PASS ✅ (2026-09-04)
 - **F-03** — MCP `depth` enum fixed → canonical 4 values (`universal|cross-domain|domain|specialized`) ✅ (2026-09-04)
-- **BUG-215** — 1,097 empty `discipline_raw` REPAIRED: Track B (1,172 classified → 419 resolved + 753 raw-corrected) + T-311 (311 metadata-copy) + kind-swap (62 domain recovered). 0 empty `discipline_raw` remaining ✅ (2026-09-04)
+- **BUG-215** — 1,097 empty `discipline_raw` REPAIRED: Track B (1,172 classified → 419 resolved + 753 raw-corrected) + T-311 (311 metadata-copy) + kind-swap (62 domain recovered). 0 empty `discipline_raw` remaining ✅ (2026-09-04). RESIDUAL (2026-09-05, D2569): 66 non-emerging FBs re-gained empty raw via D2568 promotion (raw cleared + stale `emerging_real`); `scripts/fix_bug215_residual.py` restored raw (24 alias) + reverted 42 unverified promotions to emerging ✅
 - **BUG-219** — integrity-check #4 FP FIXED (`unicodedata`/`heapq` → STDLIB_MODULES; `scripts`/`audit_evidence_cleanliness` → LOCAL_MODULES) ✅ (2026-09-03)
 - **BUG-216** — 28 FBs `domains_raw` backfilled from `checkpoint_enriched_kindsafe.jsonl` via `scripts/fix_bug216_domains_raw.py`; 1 genuine empty `emerging` accepted ✅ (2026-09-03)
 - **BUG-217** — `taxonomy_version` unified v5.1→v5.5 (DB + `config/version.yaml`); `pipeline_commit`/`manifest_hash` kept as per-record provenance ✅ (2026-09-03)

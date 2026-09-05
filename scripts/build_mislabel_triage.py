@@ -44,14 +44,12 @@ def _load(path: Path) -> dict:
 
 def _per_label_stats(nli: dict, knn: dict) -> list[dict]:
     """Join the two audits per (axis,label): entail + agreement distributions."""
-    # NLI: group by (axis,label)
+    # NLI: group by (axis,label) over the FULL population (P0 #2), so the
+    # statistics are full-population means, not flagged-subset flag-rates.
     nli_by_label: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    for rec in nli.get("contradicts_label", []) + nli.get("weak_support", []):
+    for rec in nli.get("results", []):
         if rec.get("entail") is not None:
             nli_by_label[(rec["axis"], rec["label"])].append(rec)
-    # also include clean (non-flagged) records if present in the artifact
-    # (the artifact only carries flagged rows, so stats reflect flagged subsets
-    #  only — we note this limitation explicitly in the output)
 
     # kNN: group by (axis,label)
     knn_by_label: dict[tuple[str, str], list[dict]] = defaultdict(list)
@@ -66,10 +64,17 @@ def _per_label_stats(nli: dict, knn: dict) -> list[dict]:
         entails = [r["entail"] for r in nli_recs]
         contras = [r["contra"] for r in nli_recs]
         agrees = [r["agreement"] for r in knn_recs]
+        # P0 #1: split contradiction-dominant vs weak-entailment into separate
+        # counts instead of a conflated union ("nli_flagged").
+        n_contradict = sum(1 for r in nli_recs if r.get("contra_dominant"))
+        n_weak = sum(1 for r in nli_recs if r.get("weak") and not r.get("contra_dominant"))
         rows.append({
             "axis": axis,
             "label": label,
-            "nli_flagged": len(nli_recs),
+            "nli_total": len(nli_recs),
+            "nli_contradict": n_contradict,
+            "nli_weak": n_weak,
+            "nli_flagged": n_contradict + n_weak,  # backward-compat union (P0 #1)
             "mean_entail": round(sum(entails) / len(entails), 4) if entails else None,
             "mean_contra": round(sum(contras) / len(contras), 4) if contras else None,
             "knn_low_agreement": len(knn_recs),
@@ -138,9 +143,10 @@ def main() -> int:
     triage = _triage(nli, knn)
 
     safe_write(_OUT_CALIB, json.dumps({
-        "note": ("Per-(axis,label) flagged-subset statistics. NOTE: the NLI/kNN "
-                 "artifacts carry only FLAGGED rows (contradict/weak/low-agreement), "
-                 "so these are flag-rate statistics, not full-population means."),
+        "note": ("Per-(axis,label) FULL-POPULATION NLI statistics (P0 #2) with "
+                 "contradict/weak split (P0 #1): nli_contradict = contradiction-"
+                 "dominant pairs, nli_weak = weak-entailment pairs, nli_total = "
+                 "full audited population. kNN remains a flag-subset (low-agreement)."),
         "weak_threshold": S5_NLI_PASS_THRESHOLD,
         "labels": calib,
     }, indent=2) + "\n", force_shrink=True)

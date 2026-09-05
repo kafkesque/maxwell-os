@@ -479,102 +479,102 @@ taxonomy:
       domain: 0.05
       discipline: 0.05
     per_label:
-      aesthetics: 0.2222
-      anthropology: 0.9358
-      artificial intelligence: 0.3287
-      behavioral economics: 0.839
-      cognitive science: 0.7984
-      communication theory: 0.6301
-      complex adaptive systems: 0.6857
-      computational geometry: 0.775
-      computational physics & simulation: 0.75
-      computer graphics: 0.3117
-      creative process: 0.4957
-      cultural design: 0.7634
-      cultural studies: 0.8242
-      decision making: 0.2273
-      design thinking: 0.4509
-      economics: 0.4023
-      engineering: 0.6237
-      evolutionary biology: 0.8485
-      finance: 0.2167
-      game design: 0.6667
-      generative ai: 0.75
-      health & medicine: 0.3571
-      human-computer interaction: 0.4918
-      information retrieval: 0.1765
-      information science: 0.3561
-      information security: 0.3171
-      interdisciplinary studies: 0.88
-      law: 0.2241
-      linguistics: 0.3605
-      literary theory: 0.7869
-      machine learning: 0.3365
-      media studies: 0.9007
-      motion & time: 0.3364
-      neuroscience: 0.5217
-      operations research: 0.9236
-      organizational theory: 0.7029
-      performing arts: 0.2273
-      philosophy: 0.7672
-      political economy: 0.8587
-      psychology: 0.8085
-      research methodology: 0.4053
-      risk management: 0.625
-      semiotics: 0.2474
-      social network analysis: 0.6923
-      sociology: 0.8298
-      software engineering: 0.5931
-      strategic thinking: 0.4472
-      systems engineering: 0.7481
-      systems thinking: 0.2558
-      theoretical physics: 0.931
-      typography: 0.0226
+      aesthetics: 0.0
+      anthropology: 0.0833
+      artificial intelligence: 0.028
+      behavioral economics: 0.1021
+      cognitive science: 0.124
+      communication theory: 0.0809
+      complex adaptive systems: 0.0571
+      computational geometry: 0.15
+      computational physics & simulation: 0.25
+      computer graphics: 0.039
+      creative process: 0.3739
+      cultural design: 0.4389
+      cultural studies: 0.2527
+      decision making: 0.1364
+      design thinking: 0.0882
+      economics: 0.0412
+      engineering: 0.0233
+      evolutionary biology: 0.1515
+      finance: 0.0339
+      game design: 0.4
+      generative ai: 0.0
+      health & medicine: 0.1825
+      human-computer interaction: 0.1429
+      information retrieval: 0.125
+      information science: 0.0837
+      information security: 0.0244
+      interdisciplinary studies: 0.72
+      law: 0.0172
+      linguistics: 0.0816
+      literary theory: 0.082
+      machine learning: 0.0381
+      media studies: 0.1701
+      motion & time: 0.2547
+      neuroscience: 0.0145
+      operations research: 0.1736
+      organizational theory: 0.0896
+      performing arts: 0.1163
+      philosophy: 0.3333
+      political economy: 0.2935
+      psychology: 0.0427
+      research methodology: 0.2045
+      risk management: 0.1346
+      semiotics: 0.0206
+      social network analysis: 0.2308
+      sociology: 0.0426
+      software engineering: 0.0789
+      strategic thinking: 0.1517
+      systems engineering: 0.0305
+      systems thinking: 0.0233
+      theoretical physics: 0.2308
+      typography: 0.0
       visual perception: 0.0541
-      visual semiotics: 0.3
-      ai & agents: 0.3833
-      arts & culture: 0.3959
-      brand identity: 0.7971
-      business development: 0.6716
-      business operations: 0.4769
-      code & computation: 0.523
-      computational art: 0.3902
-      computational science & physics: 0.7115
-      creative technology: 0.2292
-      data visualization: 0.4756
-      design strategy: 0.7166
-      design systems: 0.1
-      digital product: 0.8466
-      editorial & advertising: 0.86
-      education: 0.8446
-      engineering & infrastructure: 0.7855
-      engineering practice: 0.7189
-      entrepreneurship: 0.767
-      environmental design: 0.766
-      finance & investment: 0.6142
-      graphic design: 0.4511
-      health & wellness: 0.7277
-      illustration: 0.4314
-      industrial design: 0.9023
-      information architecture: 0.6627
-      leadership: 0.7954
-      legal & public policy: 0.8838
-      marketing & communications: 0.5533
-      media & entertainment: 0.4784
-      motion design: 0.4565
-      organizational behavior: 0.654
-      packaging: 0.9
-      personal productivity: 0.7978
-      product design: 0.7863
-      project management: 0.9425
-      research & methodology: 0.527
-      science & research: 0.338
-      semiotics & communication: 0.4818
-      social sciences: 0.5455
-      systems & frameworks: 0.4808
-      urban planning: 0.8369
-      user experience: 0.5807
-      web & ui: 0.6533
+      visual semiotics: 0.0714
+      ai & agents: 0.0705
+      arts & culture: 0.1163
+      brand identity: 0.3841
+      business development: 0.2696
+      business operations: 0.1213
+      code & computation: 0.4655
+      computational art: 0.1463
+      computational science & physics: 0.1731
+      creative technology: 0.1042
+      data visualization: 0.2889
+      design strategy: 0.5309
+      design systems: 0.05
+      digital product: 0.1055
+      editorial & advertising: 0.4346
+      education: 0.2743
+      engineering & infrastructure: 0.4498
+      engineering practice: 0.3293
+      entrepreneurship: 0.1613
+      environmental design: 0.383
+      finance & investment: 0.2944
+      graphic design: 0.094
+      health & wellness: 0.3976
+      illustration: 0.3333
+      industrial design: 0.1053
+      information architecture: 0.2771
+      leadership: 0.2734
+      legal & public policy: 0.1437
+      marketing & communications: 0.1644
+      media & entertainment: 0.1992
+      motion design: 0.2391
+      organizational behavior: 0.2972
+      packaging: 0.55
+      personal productivity: 0.3736
+      product design: 0.2437
+      project management: 0.3914
+      research & methodology: 0.1587
+      science & research: 0.0211
+      semiotics & communication: 0.1569
+      social sciences: 0.2061
+      systems & frameworks: 0.1731
+      urban planning: 0.2766
+      user experience: 0.2389
+      web & ui: 0.2
 e2e:
   borp_min_sources: 2
   min_pass_rate: 0.8

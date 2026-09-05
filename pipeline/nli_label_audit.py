@@ -249,8 +249,17 @@ def main() -> int:
     }
 
     _JSON_FILE.parent.mkdir(parents=True, exist_ok=True)
+    # P0 #2: persist the FULL population (results) alongside the flagged lists,
+    # so downstream per-label statistics are full-population means, not flag-rate
+    # proxies. `contradicts_label` / `weak_support` remain as derived convenience
+    # subsets (they are sub-lists of `results`).
     safe_write(_JSON_FILE, json.dumps(
-        {"summary": summary, "contradicts_label": contradicts, "weak_support": weak},
+        {
+            "summary": summary,
+            "results": results,
+            "contradicts_label": contradicts,
+            "weak_support": weak,
+        },
         indent=2,
     ) + "\n", force_shrink=True)
     safe_write(_MD_FILE, _build_md(summary, contradicts, weak), force_shrink=True)

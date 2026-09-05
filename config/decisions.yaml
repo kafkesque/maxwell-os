@@ -1,8 +1,18 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 547
+total_decisions: 548
 decisions:
+- id: D2572
+  category: LABEL QUALITY / HUMAN REVIEW
+  state: RESOLVED
+  description: 'D2399 user-adjudication applied (see governance/d2399_manual_review.md). FORENSIC FINDING: the 292 gaps split into 42 KIND-LEAKS (raw resolves to a DOMAIN canonical only — domain label in the discipline slot, BUG-197) + 250 TRUE-GAPS (resolve on neither axis). 250 is the true-gap count (why the figure recurred). APPLIED via scripts/apply_d2399_user_decisions.py (deterministic LLM-free; gemma-4-E4B R5 code-review APPROVE): (A) 6 discipline aliases added to config/alias_map.yaml — history of philosophy→philosophy, financial engineering→finance (dual-axis: also a domain alias), Medical Humanities→health & medicine, Experimental Psychology→psychology, Educational Measurement→research methodology, Design Studies→design thinking (dual-axis: also in design strategy raw[]) — 12 FBs re-resolved; (B) Marketing kind-swap → marketing & communications domain + discipline_raw cleared, 5 FBs (4 Marketing + 1 marketing). NET discipline=emerging 969→957; remaining gaps 292→275 (33 kind-leaks + 242 true-gaps); 0 residual non-emerging empty-raw; integrity 18/18; 5/5 per-label contract. (C) Ecology promotion (5 FBs) DEFERRED: D2378 closed-loop requires demoting the weakest canonical (computer networking 4 FBs; REPLACEMENT_THRESHOLD_RATIO 1.10 → 5>4.4 qualifies) — demotion is a separate user decision, NOT implied by the C mark.'
+  champion: goose
+  target_files:
+  - config/alias_map.yaml
+  - scripts/apply_d2399_user_decisions.py
+  - governance/d2399_manual_review.md
+  created: '2026-09-05'
 - id: D2571
   category: LABEL QUALITY / EXECUTION
   state: RESOLVED
@@ -4625,7 +4635,7 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 547
+  total: 548
   proposed: 0
   draft: 1
   active: 459
@@ -4634,7 +4644,7 @@ summary:
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 36
+  resolved: 37
   planned: 7
   by_category:
     ARCH: 27
@@ -4695,7 +4705,7 @@ summary:
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
-    LABEL QUALITY / HUMAN REVIEW: 1
+    LABEL QUALITY / HUMAN REVIEW: 2
     MEASUREMENT / LABEL QUALITY: 1
     MEASUREMENT / QUALITY: 1
     MODEL: 2

@@ -19,7 +19,7 @@
 2. **D2547** — GATE SCRIPT WRITTEN (D2571: `scripts/apply_cost_weighted_thresholds.py`, cost = n/median). REMAINING: (a) domain-axis frequencies (script queries `discipline` only → domain labels get n=0); (b) cost-model calibration (policy decision); (c) re-derive per-label rates with definition-bearing hypotheses (D2571 finding).
 3. **D2548** — grammar-constrained decoding pilot on S4 enums. Outlines/XGrammar NOT installed; gate added (`stage4.grammar_decoding_enabled=false`, D2556). BLOCKED on dependency.
 4. **T-OWL** — OWL/SKOS axiom spec for 105 canonicals (D2541).
-5. **D2399 (BUG-150 tail)** — 250 discipline=emerging FBs are genuine taxonomy gaps (Ecology 5, Musicology 4, History of Technology 3, audio signal processing 3 + 221 tail labels). Promotion CANDIDATES harvested; `d2399_promotions_frozen: true` blocks auto-promote → human review when unfrozen.
+5. **D2399 (BUG-150 tail)** — 275 remaining gap FBs (33 kind-leaks + 242 true-gaps). USER ADJUDICATED 2026-09-05 (D2572): 6 discipline aliases applied (12 FBs) + Marketing kind-swap (5 FBs). REMAINING: (a) **Ecology promotion (5 FBs)** — DEFERRED on D2378 closed-loop demotion decision (candidate: `computer networking`, 4 FBs; see `governance/d2399_manual_review.md` §Ecology); (b) 33 kind-leaks (domain labels in the discipline slot) — kind-swap candidates if approved; (c) 242 true-gaps (long-tail singletons) — leave as `emerging`.
 6. **BUG-151** — taxonomy structural overlap (177 raw-alias cross-axis; kind-safe-guarded).
 7. **BUG-148** — S2 `route` field stale (`route="FB"` on all 2,878).
 8. **BUG-182** — 48 singleton empty-shells deterministic.

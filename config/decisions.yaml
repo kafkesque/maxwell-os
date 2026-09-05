@@ -1,8 +1,36 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 548
+total_decisions: 551
 decisions:
+- id: D2573
+  category: LABEL QUALITY / TAXONOMY
+  state: RESOLVED
+  description: 'D2399 closed-loop replacement (option 1, user-approved): promote ecology → canonical discipline; demote computer networking → displaced. config/taxonomy_v5.yaml: +ecology (Systems & Method, definition, raw [Ecology, ecology]) inserted before evolutionary biology; -computer networking (moved to meta.displaced_canonicals). config/alias_map.yaml: removed dangling data communication→computer networking (its 1 FB already resolved to information science). scripts/apply_d2399_ecology_promotion.py (gemma-4-E4B R5 APPROVE, mirrors D2516): 5 ecology FBs → ecology, 4 computer networking FBs → emerging (raw preserved). Canonical disciplines 61→61. integrity 18/18.'
+  champion: goose
+  target_files:
+  - config/taxonomy_v5.yaml
+  - config/alias_map.yaml
+  - scripts/apply_d2399_ecology_promotion.py
+  created: '2026-09-05'
+- id: D2574
+  category: LABEL QUALITY / TAXONOMY
+  state: RESOLVED
+  description: 'D2399 kind-leak cleanup: 33 FBs (discipline=emerging + non-empty discipline_raw resolving to a DOMAIN canonical only) — domain labels leaked into the discipline slot (BUG-197 Direction B). Verified 33/33 already carry the domain in domains + the raw in domains_raw, so the only mutation is discipline_raw cleared. scripts/apply_d2399_kindleak_cleanup.py. D2399 now FULLY adjudicated: 292 gaps → 241 true-gaps, 0 kind-leaks. NET emerging 969→956.'
+  champion: goose
+  target_files:
+  - scripts/apply_d2399_kindleak_cleanup.py
+  created: '2026-09-05'
+- id: D2575
+  category: MEASUREMENT / PLANNING
+  state: RESOLVED
+  description: 'k-NN mislabel-detector retired (deprecation note in scripts/knn_label_disagreement.py — measures topical coherence, not label correctness; use T-NLI + cleanlab instead). S4 golden stratification spec: Qwen3.8-27B (single-shot OMLX call, temp/qwen38_golden_strat.py) → governance/d2575_s4_golden_stratification_qwen38.json (target 1000: universal 81 / cross-domain 150 / domain 600 / specialized 169; discipline min 10 / max 30; domain min 15). gemma-4-E4B cross-family APPROVE_WITH_CAVEATS. KEY FINDING (verified): universal depth has only 81 FBs (37 convergent, 44 single-source) — the all-81-universal target CONFLICTS with convergent-only sourcing; universal is the binding bottleneck. convergent FBs cover all 61 disciplines (stratification feasible).'
+  champion: goose
+  target_files:
+  - scripts/knn_label_disagreement.py
+  - governance/d2575_s4_golden_stratification_qwen38.json
+  - temp/qwen38_golden_strat.py
+  created: '2026-09-05'
 - id: D2572
   category: LABEL QUALITY / HUMAN REVIEW
   state: RESOLVED
@@ -4635,7 +4663,7 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 548
+  total: 551
   proposed: 0
   draft: 1
   active: 459
@@ -4644,7 +4672,7 @@ summary:
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 37
+  resolved: 40
   planned: 7
   by_category:
     ARCH: 27
@@ -4706,7 +4734,9 @@ summary:
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 2
+    LABEL QUALITY / TAXONOMY: 2
     MEASUREMENT / LABEL QUALITY: 1
+    MEASUREMENT / PLANNING: 1
     MEASUREMENT / QUALITY: 1
     MODEL: 2
     OBSERVABILITY / TOOLING: 1

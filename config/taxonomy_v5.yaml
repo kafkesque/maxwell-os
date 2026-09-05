@@ -1880,6 +1880,13 @@ disciplines:
   - privacy & surveillance
   - computer networking
   - software engineering
+- canonical: ecology
+  group: Systems & Method
+  raw:
+  - Ecology
+  - ecology
+  definition: The scientific study of the relationships between organisms and their physical and biological environments.
+  exclude: []
 - canonical: evolutionary biology
   group: Systems & Method
   raw:
@@ -2041,22 +2048,11 @@ disciplines:
   - software engineering
   - artificial intelligence
   - computer networking
-- canonical: computer networking
-  group: AI & Computing
-  raw:
-  - computer networking
-  - Computer Networking
-  - computer networks
-  - Computer Networks
-  definition: The study of the design, implementation, and management of interconnected computer systems.
-  exclude:
-  - information security
-  - software engineering
-  - computer graphics
 meta:
   displaced_canonicals:
   - social engineering
   - ml systems & infrastructure
+  - computer networking
   catch_all_domain: emerging
   catch_all_discipline: emerging
   catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.

@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """scripts/knn_label_disagreement.py — D2544: k-NN label-disagreement audit.
 
+⚠️ DEPRECATED as a mislabel detector (2026-09-05, D2575). The forensic audit
+showed k-NN low-agreement measures TOPICAL COHERENCE (are an FB's neighbors about
+the same *topic*), NOT label CORRECTNESS. Evidence: (1) single-domain FBs dominate
+low-agreement (58.2%), (2) the single-valued discipline axis has MORE low-agreement
+than the multi-valued domain axis, (3) re-audit after kind-swap/alias fixes showed
+mean agreement FLAT (~41%→40.7%). Keep this script ONLY for topical-coherence
+analysis. For mislabel detection use T-NLI contradiction (nli_label_audit.py) and
+cleanlab Confident Learning (cleanlab_label_audit.py) instead.
+
 Replaces the centroid-outlier audit. Centroid distance measures "far from the
-mean", NOT the actual failure mode — a mislabeled FB is one whose nearest
-neighbors are labeled differently. This script finds, for each FB, its k nearest
+mean", NOT the actual failure mode. This script finds, for each FB, its k nearest
 neighbors in bge-m3 embedding space and reports the label-agreement rate (the
-fraction of neighbors sharing the FB's discipline/domain). Low agreement =
-likely mislabeled (the semantic-correctness gap D2540 flagged as unmeasured).
+fraction of neighbors sharing the FB's discipline/domain).
 
 Embedding source (first available):
   1. live Ollama bge-m3 (default) — embeds each FB definition on demand

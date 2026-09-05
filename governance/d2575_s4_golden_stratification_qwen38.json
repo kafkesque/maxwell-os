@@ -1,0 +1,33 @@
+{
+  "target_total": 1000,
+  "per_depth": {
+    "universal": 81,
+    "cross-domain": 150,
+    "domain": 600,
+    "specialized": 169
+  },
+  "depth_strategy": "All 81 universal FBs are included to maximize signal for the rarest class. Cross-domain and specialized classes are oversampled from the 2699 convergent pool to reach 150 and 169 instances respectively, ensuring sufficient representation for the 61-class head. Domain depth is sampled to 600 instances to maintain the corpus's natural majority distribution while providing volume for the 43-domain sigmoid head.",
+  "per_discipline_min": 10,
+  "per_discipline_max": 30,
+  "per_domain_coverage": "Stratified sampling ensures every one of the 43 domains has at least 15 examples, with high-frequency domains (e.g., graphic design, web & ui) capped at 40 to prevent class imbalance in the multi-label head.",
+  "sampling_rules": [
+    "Source exclusively from the 2699 convergent FBs (2+ sources) to ensure high-quality golden labels.",
+    "Enforce a hard cap of 30 examples per discipline to prevent over-representation of large fields like 'design thinking' or 'engineering'.",
+    "Prioritize 'universal' and 'cross-domain' FBs for the 61-class discipline head to improve generalization.",
+    "Ensure at least 10 examples per discipline to satisfy the minimum threshold for stable LoRA training.",
+    "Balance the 43-domain labels such that no single domain exceeds 40% of the total dataset."
+  ],
+  "authoring_workflow": [
+    "Query the knowledge base for all 2699 convergent FBs and filter by the 61 discipline labels.",
+    "Apply stratified sampling to select 1000 FBs based on the per_depth and per_discipline constraints.",
+    "Manually verify the 81 universal and 150 cross-domain examples to ensure label accuracy.",
+    "Format the selected FBs into the few-shot prompt template for the DeBERTa-v3-base model.",
+    "Split the 1000 examples into 800 training and 200 validation sets with stratified shuffling."
+  ],
+  "validation": [
+    "Verify that the macro-F1 for the 61-class discipline head exceeds 0.75 on the held-out 200 validation examples.",
+    "Confirm that the 43-domain sigmoid head achieves a macro-F1 of at least 0.70.",
+    "Check that no discipline has fewer than 10 or more than 30 examples in the final training set.",
+    "Ensure all 81 universal FBs are present in the dataset."
+  ]
+}

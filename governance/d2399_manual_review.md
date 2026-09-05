@@ -69,6 +69,10 @@ population is NOT homogeneous. Splitting by which axis the raw label resolves on
 
 ## §Ecology — the one promotion (C) has a hidden prerequisite
 
+> ✅ **RESOLVED 2026-09-05 (D2573):** user chose **option 1** — `ecology` promoted to
+> canonical, `computer networking` (4 FBs) demoted to `displaced`. Cardinality
+> 61→61. Applied via `scripts/apply_d2399_ecology_promotion.py` (gemma R5 APPROVE).
+
 D2378 established a **closed-loop**: the discipline cardinality is fixed at **61**, so
 promoting `ecology` requires **demoting the weakest canonical discipline**. Verified:
 

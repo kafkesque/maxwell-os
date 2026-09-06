@@ -43,8 +43,10 @@ from pipeline.pipeline_paths import (
     OMLX_COLD_RELOAD_DELAY,
     OMLX_DEFAULT_TIMEOUT,
     OMLX_MAX_RETRIES,
+    OMLX_READ_TIMEOUT,
     OMLX_RETRY_DELAY,
     OMLX_URL,
+    OMLX_WEDGE_RECOVERY_SLEEP,
     VERIFY_MODEL,
     VERIFY_CHAT_TEMPLATE_KWARGS,
     VERIFY_THINKING_BUDGET,
@@ -56,6 +58,8 @@ DEFAULT_TIMEOUT: int = OMLX_DEFAULT_TIMEOUT     # seconds (from config)
 MAX_RETRIES: int = OMLX_MAX_RETRIES             # (from config)
 RETRY_DELAY: int = OMLX_RETRY_DELAY             # seconds (from config)
 COLD_RELOAD_DELAY: int = OMLX_COLD_RELOAD_DELAY  # D2301: reasoning-model cold reload wait (from config)
+READ_TIMEOUT: int = OMLX_READ_TIMEOUT            # BUG-224: per-read socket timeout (from config)
+WEDGE_RECOVERY_SLEEP: int = OMLX_WEDGE_RECOVERY_SLEEP  # BUG-224: recovery sleep after a mid-response wedge (from config)
 
 # temp=0.0 — NEVER override (R7)
 TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
@@ -293,11 +297,17 @@ def call_omlx(
         )
     for attempt in range(1, MAX_RETRIES + 1):
         try:
+            # BUG-224: `timeout` as a single int applies to BOTH connect and read,
+            # so a wedged server that trickles bytes (decode collapse) never trips
+            # the read deadline — the call "hangs beyond the requests timeout".
+            # A (connect, read) tuple bounds the READ separately: a server that
+            # stalls mid-response (no byte for READ_TIMEOUT) now trips fast instead
+            # of holding the request open for the full `timeout`.
             resp = requests.post(
                 CHAT_ENDPOINT,
                 json=payload,
                 headers=headers,
-                timeout=timeout,
+                timeout=(timeout, READ_TIMEOUT),
             )
             resp.raise_for_status()
             data = resp.json()
@@ -311,6 +321,19 @@ def call_omlx(
             if OMLX_CB_ENABLED:
                 _breaker.record_success()
             return content.strip()
+        except requests.exceptions.ReadTimeout:
+            # BUG-224: mid-response wedge (server accepted the request but stalled
+            # producing bytes). The server needs 15-60s to recover before even tiny
+            # requests respond — hammering it with the 3s retry_delay backoff makes
+            # the wedge worse. Sleep the longer wedge_recovery_sleep instead.
+            last_error = f"Read timeout (wedge) after {READ_TIMEOUT}s without a byte"
+            if attempt < MAX_RETRIES:
+                print(f"      🧊  OMLX wedge (read stall) — sleeping {WEDGE_RECOVERY_SLEEP}s to let server recover", flush=True)
+                time.sleep(WEDGE_RECOVERY_SLEEP)
+        except requests.exceptions.ConnectTimeout:
+            last_error = f"Connect timeout after {timeout}s"
+            if attempt < MAX_RETRIES:
+                time.sleep(RETRY_DELAY * attempt)
         except requests.exceptions.Timeout:
             last_error = f"Timeout after {timeout}s"
             if attempt < MAX_RETRIES:

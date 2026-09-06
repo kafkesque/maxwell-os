@@ -1,13 +1,19 @@
 """Discriminative taxonomy classifier for the local RAG pipeline.
 
-Trains a DeBERTa-v3-base model with LoRA adapters and dual heads
-(discipline: 61-way softmax, domain: 43-way sigmoid) on the golden
-training set. Implements class-balanced loss, abstain logic, and
-crash-safe checkpointing.
+Trains a ModernBERT-base encoder (FULL fine-tune, NO LoRA) with dual heads
+(discipline: 61-way softmax, domain: 43-way sigmoid) on the mined golden
+training set. Implements class-balanced loss, abstain logic, and crash-safe
+checkpointing.
+
+D2577: LoRA was dropped — (a) peft adds a dependency and (b) the old
+target_modules (q_proj/value_proj) were a silent no-op on DeBERTa's disentangled
+attention. Full fine-tune removes both failure modes. Base swapped
+microsoft/deberta-v3-base -> answerdotai/ModernBERT-base (8192 ctx, ~2x faster).
 """
 
 from __future__ import annotations
 
+import io
 import logging
 import os
 import tempfile
@@ -19,21 +25,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import yaml
-from peft import LoraConfig, TaskType, get_peft_model
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
-from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.data import DataLoader, Dataset
-from transformers import AutoModel, AutoTokenizer, DebertaV3Config
+from transformers import AutoModel, AutoTokenizer
 
 # ---------------------------------------------------------------------------
 # C12 / C20: Named constants (no magic numbers)
 # ---------------------------------------------------------------------------
 
-BASE_MODEL_NAME: str = "microsoft/deberta-v3-base"
-LORA_RANK: int = 16
-LORA_ALPHA: int = 32
-LORA_TARGET_MODULES: Tuple[str, ...] = ("q_proj", "v_proj")
+BASE_MODEL_NAME: str = "answerdotai/ModernBERT-base"
 
 NUM_DISCIPLINE_CLASSES: int = 61
 NUM_DOMAIN_CLASSES: int = 43
@@ -42,15 +43,19 @@ ABSTAIN_THRESHOLD: float = 0.35
 EMERGING_LABEL: str = "emerging"
 
 MIN_GOLDEN_EXAMPLES: int = 100
-GOLDEN_CONFIG_PATH: str = "config/golden/stage4_golden.yaml"
-CHECKPOINT_DIR: str = "knowledge_pipeline/classifier_deberta_lora"
+MIN_EXAMPLES_PER_CLASS: int = 5
+# The few-shot golden (config/golden/stage4_golden.yaml, 7 hand-curated examples)
+# is WIRED into the S4 prompt and stays small. This is the SEPARATE classifier
+# TRAINING set, mined from convergent FBs by scripts/mine_classifier_golden.py.
+TRAINING_DATA_PATH: str = "config/golden/stage4_golden_mined.yaml"
+CHECKPOINT_DIR: str = "knowledge pipeline/classifier_modernbert"
 
 TRAIN_TEST_SPLIT_SIZE: float = 0.2
 RANDOM_STATE: int = 42
 TARGET_MACRO_F1: float = 0.75
 
 BATCH_SIZE: int = 8
-MAX_LENGTH: int = 512
+MAX_LENGTH: int = 320  # p99 token length is 247; 512 wasted >50% compute on padding
 LEARNING_RATE: float = 2e-5
 NUM_EPOCHS: int = 3
 WARMUP_RATIO: float = 0.1
@@ -65,6 +70,28 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
+
+
+def _load_training_config() -> Dict[str, Any]:
+    """Load classifier-training config from config/pipeline_config.yaml (C12).
+
+    The student model and checkpoint dir live in the `classifier_training` block
+    of the canonical config. Module-level constants are fallbacks so the script
+    remains runnable standalone (e.g. CI without a full config tree).
+
+    Returns:
+        Dict with keys `student_model` and `checkpoint_dir` (possibly empty).
+    """
+    cfg_path = Path("config/pipeline_config.yaml")
+    if not cfg_path.exists():
+        logger.warning("%s not found — using in-script defaults", cfg_path)
+        return {}
+    try:
+        full = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        logger.warning("Could not read %s (%s) — using in-script defaults", cfg_path, exc)
+        return {}
+    return full.get("classifier_training") or {}
 
 
 # ---------------------------------------------------------------------------
@@ -102,14 +129,48 @@ def safe_write(path: Path, data: bytes) -> None:
 # ---------------------------------------------------------------------------
 
 
-def load_golden_set(config_path: str) -> Dict[str, Any]:
-    """Load and validate the golden training set from YAML.
+def _flatten_golden_example(ex: Dict[str, Any]) -> Dict[str, Any]:
+    """Flatten a nested golden example into the flat row the Dataset consumes.
+
+    On-disk form (stage4_golden*.yaml) is NESTED:
+        {id, depth, input_fb{name,definition,mechanism,boundary},
+         expected_classification{discipline,domains,depth,evidence,is_specialized}}
+    The training Dataset consumes FLAT rows. Flatten here so the loader stays
+    robust to the on-disk schema.
 
     Args:
-        config_path: Path to the golden YAML file.
+        ex: Nested golden example dict.
 
     Returns:
-        Parsed dictionary with 'meta' and 'examples' keys.
+        Flat dict with name/definition/mechanism/boundary/discipline/domains/depth.
+
+    Raises:
+        KeyError: If a required nested field (name, definition, discipline) is absent.
+    """
+    fb = ex.get("input_fb") or {}
+    exp = ex.get("expected_classification") or {}
+    return {
+        "id": ex.get("id", ""),
+        "name": fb["name"],
+        "definition": fb["definition"],
+        "mechanism": fb.get("mechanism", ""),
+        "boundary": fb.get("boundary", ""),
+        "discipline": exp["discipline"],
+        "domains": exp.get("domains", []),
+        "depth": exp.get("depth", ""),
+        "evidence": exp.get("evidence", ""),
+        "is_specialized": exp.get("is_specialized", False),
+    }
+
+
+def load_golden_set(config_path: str) -> Dict[str, Any]:
+    """Load, validate, and flatten the golden training set from YAML.
+
+    Args:
+        config_path: Path to the golden/training YAML file.
+
+    Returns:
+        Dict with 'examples' key holding FLAT example rows.
 
     Raises:
         FileNotFoundError: If the config file does not exist.
@@ -118,27 +179,27 @@ def load_golden_set(config_path: str) -> Dict[str, Any]:
     path = Path(config_path)
     if not path.exists():
         raise FileNotFoundError(
-            f"Golden config not found at {config_path}. "
-            "Ensure config/golden/stage4_golden.yaml exists."
+            f"Training data not found at {config_path}. "
+            "Run scripts/mine_classifier_golden.py to mine it from convergent FBs."
         )
 
     with open(path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     if data is None:
-        raise ValueError(f"Golden config {config_path} is empty.")
+        raise ValueError(f"Training config {config_path} is empty.")
 
-    examples: List[Dict[str, Any]] = data.get("examples", [])
-    if len(examples) < MIN_GOLDEN_EXAMPLES:
+    raw_examples: List[Dict[str, Any]] = data.get("examples", [])
+    if len(raw_examples) < MIN_GOLDEN_EXAMPLES:
         raise ValueError(
-            f"Golden set has only {len(examples)} examples; "
+            f"Training set has only {len(raw_examples)} examples; "
             f"minimum required is {MIN_GOLDEN_EXAMPLES}. "
-            "Expand the golden set in config/golden/stage4_golden.yaml "
-            "before running the classifier training."
+            "Mine more via scripts/mine_classifier_golden.py before training."
         )
 
-    logger.info("Loaded %d golden examples from %s", len(examples), config_path)
-    return data
+    examples = [_flatten_golden_example(ex) for ex in raw_examples]
+    logger.info("Loaded %d training examples from %s", len(examples), config_path)
+    return {"examples": examples}
 
 
 # ---------------------------------------------------------------------------
@@ -169,6 +230,10 @@ class GoldenDataset(Dataset):
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         ex = self.examples[idx]
         text = f"{ex['name']}: {ex['definition']}"
+        if ex.get("mechanism"):
+            text += f" Mechanism: {ex['mechanism']}"
+        if ex.get("boundary"):
+            text += f" Boundary: {ex['boundary']}"
         encoding = self.tokenizer(
             text,
             max_length=self.max_length,
@@ -200,7 +265,7 @@ class GoldenDataset(Dataset):
 
 
 class DisciplineClassifier(nn.Module):
-    """Dual-head classifier on top of a LoRA-adapted DeBERTa backbone.
+    """Dual-head classifier on top of a full-fine-tuned ModernBERT backbone.
 
     Heads:
         - discipline: 61-way softmax (multi-class)
@@ -244,28 +309,21 @@ class DisciplineClassifier(nn.Module):
         return discipline_logits, domain_logits
 
 
-def build_model() -> Tuple[AutoTokenizer, nn.Module]:
-    """Build the LoRA-adapted DeBERTa backbone and dual-head classifier.
+def build_model(base_model_name: str) -> Tuple[AutoTokenizer, nn.Module]:
+    """Build the full-fine-tuned ModernBERT backbone and dual-head classifier.
+
+    Args:
+        base_model_name: HuggingFace model id of the encoder backbone.
 
     Returns:
         Tuple of (tokenizer, classifier_model).
     """
-    logger.info("Loading base model: %s", BASE_MODEL_NAME)
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL_NAME)
-    base_model = AutoModel.from_pretrained(BASE_MODEL_NAME)
-
-    lora_config = LoraConfig(
-        task_type=TaskType.SEQ_CLS,
-        r=LORA_RANK,
-        lora_alpha=LORA_ALPHA,
-        lora_dropout=0.1,
-        target_modules=list(LORA_TARGET_MODULES),
-    )
-    peft_model = get_peft_model(base_model, lora_config)
-    peft_model.print_trainable_parameters()
+    logger.info("Loading base model: %s", base_model_name)
+    tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+    base_model = AutoModel.from_pretrained(base_model_name)
 
     classifier = DisciplineClassifier(
-        backbone=peft_model,
+        backbone=base_model,
         num_discipline=NUM_DISCIPLINE_CLASSES,
         num_domain=NUM_DOMAIN_CLASSES,
     )
@@ -277,23 +335,57 @@ def build_model() -> Tuple[AutoTokenizer, nn.Module]:
 # ---------------------------------------------------------------------------
 
 
+def _filter_trainable(
+    examples: List[Dict[str, Any]], min_per_class: int
+) -> List[Dict[str, Any]]:
+    """Drop examples whose discipline has too few samples to stratify-split.
+
+    A discipline with < min_per_class examples cannot appear in BOTH the train
+    and test folds (sklearn stratify requires >=2 per class), and its balanced
+    class weight would be absurdly large. Drop them with a warning instead of
+    crashing mid-run.
+
+    Args:
+        examples: Flat golden/training examples.
+        min_per_class: Minimum examples per discipline to keep it trainable.
+
+    Returns:
+        Filtered examples.
+    """
+    counts: Dict[str, int] = {}
+    for ex in examples:
+        counts[ex["discipline"]] = counts.get(ex["discipline"], 0) + 1
+    dropped = sorted(d for d, c in counts.items() if c < min_per_class)
+    if dropped:
+        logger.warning(
+            "Dropping %d disciplines with < %d examples (untrainable): %s",
+            len(dropped),
+            min_per_class,
+            dropped,
+        )
+    return [ex for ex in examples if counts[ex["discipline"]] >= min_per_class]
+
+
 def compute_class_weights(
     labels: np.ndarray, num_classes: int
 ) -> torch.Tensor:
     """Compute class-balanced weights for the discipline head.
 
+    Robust to missing classes: disciplines with zero training examples (e.g.
+    robotics/computational theory, absent from the convergent set) get the
+    uniform weight instead of raising a sklearn ValueError.
+
     Args:
-        labels: Array of integer class labels.
-        num_classes: Total number of classes.
+        labels: Array of integer class labels (may not cover all num_classes).
+        num_classes: Total number of classes (head width).
 
     Returns:
         Tensor of shape (num_classes,) with per-class weights.
     """
-    weights = compute_class_weight(
-        class_weight="balanced",
-        classes=np.arange(num_classes),
-        y=labels,
-    )
+    counts = np.bincount(labels, minlength=num_classes).astype(np.float64)
+    counts[counts == 0] = 1.0  # guard: avoid div-by-zero; missing classes -> uniform
+    n = labels.shape[0]
+    weights = n / (num_classes * counts)
     return torch.tensor(weights, dtype=torch.float32)
 
 
@@ -376,6 +468,7 @@ def train(
         Dictionary of final validation metrics.
     """
     model.to(device)
+    class_weights = class_weights.to(device)
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY
     )
@@ -395,7 +488,7 @@ def train(
     for epoch in range(NUM_EPOCHS):
         model.train()
         total_loss = 0.0
-        for batch in train_loader:
+        for step, batch in enumerate(train_loader):
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
             disc_labels = batch["discipline_label"].to(device)
@@ -422,6 +515,14 @@ def train(
             optimizer.step()
             scheduler.step()
             total_loss += loss.item()
+            if (step + 1) % 25 == 0:
+                logger.info(
+                    "  epoch %d/%d step %d/%d",
+                    epoch + 1,
+                    NUM_EPOCHS,
+                    step + 1,
+                    len(train_loader),
+                )
 
         avg_loss = total_loss / len(train_loader)
         logger.info(
@@ -519,8 +620,10 @@ def save_checkpoint(
     ckpt_path = Path(checkpoint_dir)
     ckpt_path.mkdir(parents=True, exist_ok=True)
 
-    # Save model state dict
-    state_bytes = torch.save(model.state_dict())
+    # Save model state dict (serialize to a bytes buffer for crash-safe write)
+    buffer = io.BytesIO()
+    torch.save(model.state_dict(), buffer)
+    state_bytes = buffer.getvalue()
     safe_write(ckpt_path / "model_state.pt", state_bytes)
 
     # Save tokenizer
@@ -543,9 +646,15 @@ def save_checkpoint(
 
 def main() -> None:
     """Entry point: load data, build model, train, evaluate, and checkpoint."""
-    # Load golden set (raises if < MIN_GOLDEN_EXAMPLES)
-    golden_data = load_golden_set(GOLDEN_CONFIG_PATH)
+    cfg = _load_training_config()
+    student_model: str = cfg.get("student_model", BASE_MODEL_NAME)
+    checkpoint_dir: str = cfg.get("checkpoint_dir", CHECKPOINT_DIR)
+    logger.info("Training config: student=%s, checkpoint=%s", student_model, checkpoint_dir)
+
+    # Load training set (raises if < MIN_GOLDEN_EXAMPLES)
+    golden_data = load_golden_set(TRAINING_DATA_PATH)
     examples: List[Dict[str, Any]] = golden_data["examples"]
+    examples = _filter_trainable(examples, MIN_EXAMPLES_PER_CLASS)
 
     # Build label maps
     disciplines = sorted(
@@ -577,7 +686,7 @@ def main() -> None:
     )
 
     # Tokenizer and model
-    tokenizer, model = build_model()
+    tokenizer, model = build_model(student_model)
 
     # Dataset and split
     dataset = GoldenDataset(
@@ -628,8 +737,13 @@ def main() -> None:
         train_labels, NUM_DISCIPLINE_CLASSES
     )
 
-    # Device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Device: prefer CUDA, then MPS (Apple Silicon), else CPU.
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cpu")
     logger.info("Using device: %s", device)
 
     # Train
@@ -651,7 +765,7 @@ def main() -> None:
             logger.info("  %s: %.4f", key, val)
 
     # Checkpoint
-    save_checkpoint(model, tokenizer, metrics)
+    save_checkpoint(model, tokenizer, metrics, checkpoint_dir=checkpoint_dir)
 
     logger.info("Training complete.")
 

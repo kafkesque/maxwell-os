@@ -14,6 +14,10 @@ pipeline_manifest:
     s2_convergent_extract: v7.0
     s4_cribs_classify: v2.0
     s5_factual_check: v3.0
+classifier_training:
+  # D2577: auto-sorter student — full fine-tune (NO LoRA).
+  student_model: answerdotai/ModernBERT-base
+  checkpoint_dir: knowledge pipeline/classifier_modernbert
 stages:
   stage0_convert: knowledge pipeline/stage0_convert
   stage0_5_extract_metadata: knowledge pipeline/stage0_5_extract_metadata
@@ -85,6 +89,8 @@ services:
     max_retries: 2
     retry_delay: 3
     cold_reload_delay: 45
+    read_timeout: 60
+    wedge_recovery_sleep: 20
     circuit_breaker_enabled: true
     circuit_breaker_failure_threshold: 5
     circuit_breaker_failure_threshold_floor: 25
@@ -129,6 +135,30 @@ models:
     provider: ollama
     alternative: mlx-community/Qwen3-Embedding-0.6B-4bit-DWQ
   nli_large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+label_vote:
+  # D2577/D2580 3-model label vote. Three INDEPENDENT (cross-family) voters that
+  # must NOT include gpt-oss-20b (the S4 teacher whose silver labels this vote
+  # verifies). D2577 specified Qwen3.8-27B + DeepSeek-v4-pro + gemma; DeepSeek is
+  # CLOUD (C1 $0 / C3 sovereignty) and carries the DELEGATE-001 reasoning_content
+  # bug, so the default third voter is Phi-4-mini-instruct-8bit (local). The
+  # model list is config-driven (C12) — swap the third model as policy allows.
+  models:
+  - model: Qwen3.8-27B-MLX-4bit
+    provider: omlx
+  - model: gemma-4-E4B-it-MLX-4bit
+    provider: omlx
+  - model: Phi-4-mini-instruct-8bit
+    provider: omlx
+  majority_threshold: 2
+  fail_closed_discipline: emerging
+  fail_closed_depth: domain
+  catch_all_disciplines:
+  - interdisciplinary studies
+  single_fb_calls: true
+  recovery_sleep_seconds: 1.0
+  checkpoint_interval: 25
+  max_tokens: 256
+  timeout: 120
 pipeline:
   schema_version: '3.0'
   commit: v3.0-D2485

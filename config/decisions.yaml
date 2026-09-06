@@ -1,8 +1,95 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-04T12:30:00Z'
-total_decisions: 551
+last_sync: '2026-09-05T21:30:00Z'
+total_decisions: 560
 decisions:
+- id: D2584
+  category: LABEL QUALITY / DATA
+  state: RESOLVED
+  description: 'DATA-ABSENT DISCIPLINES RESOLVED via domain-axis re-derivation (D2579 follow-up). Re-inspection after bug197_kind_swap (D2583) showed the 3 classifier-training "data-absent" disciplines (computational theory, ecology, robotics) were NOT missing FB content — the FBs exist with complete skeletons — but had an UNRESOLVED DOMAIN AXIS: domains=["emerging"] (or [..., "emerging"]) while domains_raw carried real, resolvable labels that lacked alias-map entries. FIX (deterministic, LLM-free): (1) added 19 robotics/autonomous-systems + theoretical-CS raw labels to config/alias_map.yaml → domain_aliases (→ "engineering & infrastructure" and "computational science & physics" respectively, consistent with existing curation e.g. "manufacturing"→"engineering & infrastructure"); (2) scripts/resolve_data_absent_domains.py re-derives canonical domains from domains_raw via match_to_canonical, preserving domains_raw byte-identical and leaving discipline/discipline_raw/taxonomy_match_method untouched; (3) re-mined golden set. RESULT: computational theory 4→5, ecology 4→5 (via D2583 kind-swap), robotics 1→5; disciplines covered 61/61 with trainable (>=5) 58→61; golden set 1026→1027 examples. NOTE: bug197_kind_swap applied 400 FBs (2 discipline + 35 domain recovered) as the documented D2583 next-step. This is a domain-axis hygiene fix, NOT new FB fabrication — existing content was correctly resolved, so no new FB generation was required.'
+  champion: goose
+  target_files:
+  - config/alias_map.yaml
+  - scripts/resolve_data_absent_domains.py
+  - config/golden/stage4_golden_mined.yaml
+  created: '2026-09-06'
+- id: D2583
+  category: LABEL QUALITY / DATA
+  state: RESOLVED
+  description: 'TRACK B RE-LAUNCH COMPLETE (D2540 tail). Re-classified the 661 empty-raw emerging FBs re-introduced by the 2026-09-05 D2399 demotions (the "1,174" figure was the pre-run D2540 count; Track B full 1,172 + slim 1,488 already ran 2026-09-03/04). RESULT (full mode, gpt-oss-20b batch, 6,418.7s / 9.7s/FB): 661/661 classified, 0 failed; 195 RESOLVED (emerging → real canonical discipline); 466 raw-corrected (still emerging, raw label repaired — honest open-world provenance); 0 unchanged. Net discipline=emerging 956 → 761; remaining empty-raw emerging = 0. Harvested temp/trackb_full_20260905.jsonl (BUG-150 promotion input); checkpoints re-synced (sync_checkpoint_from_db + sync_s5_checkpoint_from_db). ONE transient BatchClassificationError (batch missing output 3/4) auto-recovered via serial fallback. NEXT: bug197_kind_swap to move the harvested DOMAIN raw labels to the domain axis (preflight showed ~75% of the empty-raw population are domain topics, not disciplines).'
+  champion: goose
+  target_files:
+  - pipeline/reclassify_merged_axis.py
+  created: '2026-09-05'
+- id: D2582
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: '3-MODEL LABEL VOTE SCAFFOLD (D2577 + D2580). Created scripts/label_vote.py + config label_vote section. DESIGN: three INDEPENDENT cross-family voters assign (discipline, domains, depth) per FB, then majority-vote aggregation (>=2/3 agree), FAIL-CLOSED on disagreement (discipline→emerging, depth→domain, domains→empty). D2580 flags implemented: (a) missing close domains (voter-proposed domain absent from current+consensus set), (b) catch-all disciplines (interdisciplinary studies). Model independence (R5): voters MUST NOT include gpt-oss-20b (the S4 teacher being verified — circular). D2577 specified Qwen3.8-27B + DeepSeek-v4-pro + gemma; DeepSeek is CLOUD (C1/C3) + DELEGATE-001 bug, so default third voter = Phi-4-mini-instruct-8bit (local). BUG-224: single-FB calls + recovery_sleep_seconds, wedge-recovery already in omlx_call (D2581). Checkpointed/resumable JSONL (crash-safe C6/C23). Aggregation logic unit-verified (full-agree, 3-way-split fail-closed, domain >=2, catch-all + missing-domain flags). TODO: (1) upgrade missing-close-domain from "any-absent" to embedding-similarity closeness; (2) wire into training-set refresh after 3 data-absent disciplines are generated; (3) confirm the third-voter policy (DeepSeek vs Phi-4-mini).'
+  champion: goose
+  target_files:
+  - scripts/label_vote.py
+  - config/pipeline_config.yaml
+  created: '2026-09-05'
+- id: D2581
+  category: OPS / RELIABILITY
+  state: RESOLVED
+  description: 'OMLX BUG-224 WEDGE-RECOVERY MITIGATION. Root cause: OMLX server wedges under sustained load on Qwen3.8-27B — large-output calls hang BEYOND the requests timeout because a single-int `timeout` applies to BOTH connect and read, so a decode-collapsed server that trickles bytes never trips the read deadline; the server then needs ~15-60s to recover. MITIGATION (config-driven, C12): (1) added services.omlx.read_timeout=60 + services.omlx.wedge_recovery_sleep=20 to pipeline_config.yaml; (2) pipeline_paths.py exports OMLX_READ_TIMEOUT + OMLX_WEDGE_RECOVERY_SLEEP; (3) omlx_call.call_omlx now sends timeout=(connect, read) so a mid-response stall trips fast, and distinguishes requests.exceptions.ReadTimeout (wedge) → sleeps wedge_recovery_sleep (20s) before retry instead of the 3s retry_delay backoff that hammers the server and worsens the wedge; ConnectTimeout/ConnectionError keep normal backoff. This unblocks the 3-model label vote + depth classifier (both gated on BUG-224). NOTE: Track B re-launch (661 empty-raw emerging FBs — D2540 tail; the "1,174" figure was the pre-run count, Track B full+slim already ran 2026-09-03/04, and the 2026-09-05 D2399 demotions re-introduced 661) uses gpt-oss-20b (VERIFY_MODEL), which is NOT Qwen3.8 and is therefore unaffected by BUG-224.'
+  champion: goose
+  target_files:
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  - pipeline/omlx_call.py
+  created: '2026-09-05'
+- id: D2580
+  category: ONTOLOGY / LABEL QUALITY
+  state: RESOLVED
+  description: 'DISCIPLINE-STAYS-SINGULAR + domain-cardinality clarification (user Q/A). (1) DECISION: discipline remains SINGULAR (61-way softmax) — multi-label discipline REJECTED. Rationale: D2422 discipline(academic)/domain(applied) disjointness is the cross-kind contamination guard (BUG-197); breadth is ALREADY multi-label via the 43-way sigmoid domain axis; the gpt-oss teacher over-assigns rare categories (D2576) so a discipline LIST would multiply label noise; data is thin (~20 ex/discipline). (2) DOMAIN ORDERING REJECTED: domains stay an unordered set — sigmoid probabilities already give a de-facto rank (primary = highest prob) for free, no schema change. (3) DEPTH↔DOMAIN-COUNT = soft BAND not hard rule (universal ≥3, cross-domain ≥2, domain 1..N adjacent, specialized 1); D2130 docstring clarified to stop implying "domain == exactly 1" (it never warned for domain >1). (4) FINDING: 52 FBs (0.65%) exceed MAX_DOMAINS_PER_FB=5 (46×6, 6×7 domains), all classification_status=CLEAN → cap NOT enforced on a post-commit path (kind-swap/domain-swap relabel scripts bypass validate_fb_output). Low severity. (5) D2577 EXTENSION: the 3-model vote must also flag (a) MISSING close domains and (b) catch-all disciplines (interdisciplinary studies, 25 FBs) that should resolve to a specific field.'
+  champion: goose
+  target_files:
+  - pipeline/schemas.py
+  created: '2026-09-05'
+- id: D2579
+  category: LABEL QUALITY / DATA
+  state: RESOLVED
+  description: 'SINGLE-SOURCE BACKFILL + stratification-bug fix for the auto-sorter training set. (1) BUG: mine_classifier_golden.py stratify() applied the 1000-cap by sorting sampled rows by fb_id then slicing [:1000], silently dropping valid convergent examples from sparse AND late-alphabetical disciplines (theoretical physics had 5 valid convergent but only 3 survived; systems engineering 50→0; strategic thinking 148→2). FIX: per-discipline floor (every discipline with data keeps up to MIN_PER_DISCIPLINE=5) + seeded round-robin top-up toward the 30 cap, so the global cap is the only limit and no discipline is starved by sort order. (2) BACKFILL: top up disciplines below 5 convergent examples with single-source (is_convergent=0) FBs, flagged is_backfill=true. RESULT: training set 1000→1026 examples; disciplines covered 59/61→61/61; trainable classes 50→58. (3) DATA-ABSENCE FINDING (NOT backfillable): 3 disciplines cannot reach 5 examples even with full single-source backfill — computational theory (0 convergent + 4 single-source), ecology (2+2), robotics (0+1). These need NEW FB generation (re-mining from sources / targeted curation), NOT backfill. Silver-label ceiling + ~20 examples/discipline remain the dominant macro-F1 limit (D2578).'
+  champion: goose
+  target_files:
+  - scripts/mine_classifier_golden.py
+  - config/golden/stage4_golden_mined.yaml
+  created: '2026-09-05'
+- id: D2578
+  category: MEASUREMENT / LABEL QUALITY
+  state: RESOLVED
+  description: 'AUTO-SORTER TRAINING RUN #1 (answerdotai/ModernBERT-base full fine-tune, no LoRA) + data-thinness finding. Trained scripts/train_discipline_classifier.py on the mined 1000-example silver set (config/golden/stage4_golden_mined.yaml). RESULT: discipline macro-F1 0.2621 (target 0.75), domain F1 ~0.0000 — nowhere near the gate. ROOT CAUSE = DATA, not code: (1) ~16 examples/discipline across 50 trainable classes (9 disciplines dropped <5 examples, 2 absent: computational theory, robotics); (2) labels are silver-standard gpt-oss teacher output (~75-90% accurate) — the student cannot exceed its noisy teacher; (3) only 3 epochs with loss still decreasing (3.80→2.96). FIXED 7 blockers en route: peft/LoRA removed (target_modules q_proj/value_proj invalid for disentangled attention → silent no-op), base swapped deberta-v3-base → ModernBERT-base (uncached), nested-YAML flatten, MPS device + class_weights.to(device), np.bincount class weights (sklearn compute_class_weight ValueError on absent classes), _filter_trainable(min=5) stratify ValueError, torch.save→io.BytesIO (TypeError). MAX_LENGTH=320 (token p50=186/p99=247). VERDICT: 0.26 macro-F1 is EXPECTED at this data volume and is NOT a model-selection failure — the gate cannot be reached by architecture alone. NEXT: single-source backfill for sparse disciplines, then 3-model label vote (gated on BUG-224) + longer training/hparam sweep before re-training.'
+  champion: goose
+  target_files:
+  - scripts/train_discipline_classifier.py
+  - config/golden/stage4_golden_mined.yaml
+  - temp/train_classifier.log
+  created: '2026-09-05'
+- id: D2577
+  category: ONTOLOGY / PIPELINE / RESEARCH
+  state: RESOLVED
+  description: 'MARKET RESEARCH (exhaustive arXiv/GitHub/HuggingFace/YouTube via temp/market_research_depth.py + _depth2.py) + S4 ARCHITECTURE REVISION (depth → dedicated classifier, user-approved). (1) FINDING: no off-the-shelf model matches the bespoke 4-way depth ontology (universal/cross-domain/domain/specialized); closest trained analogs = manzarimalik/ModernBERT-Bloom-Taxonomy (Bloom 6-way cognitive depth, dl=82), j-hartmann/concreteness-english-distilroberta-base (universal-vs-domain semantic analog, dl=51), jinaai/jina-embeddings-v5-text-small-classification (native classification head, dl=3205). (2) DECISION: depth → dedicated 4-way ModernBERT-base classifier (FULL fine-tune, NO LoRA — drop target_modules fragility), NOT a generative LLM call nor a generative teacher+agreement gate; CRIBS+discipline/domain (61-way softmax + 43-way sigmoid head) stays a SEPARATE ModernBERT-base student with gpt-oss-20b teacher. Rationale: rare/imbalanced depth classes must not be swamped by the 61/43-way taxonomy head; gemma frugal depth route already REFUTED (62.5%, D2454). (3) TRAINING SET: 3-model vote (Qwen3.8-27B + DeepSeek-v4-pro + gemma) on 81 universal + 713 cross-domain + ~200 domain/specialized controls; keep labels where >=2/3 agree, fail-closed to domain; target macro-F1 >= 0.85; then A/B the classifier vs the gpt-oss generative call on a held-out 50-FB frontier sample (DeepSeek referee) before swapping. Transfer-learning shortcuts to evaluate first: warm-start from ModernBERT-Bloom-Taxonomy + SetFit-on-ModernBERT for the few-shot regime. (4) DO NOT patch the ~624 over-assigned depth FBs now (50-FB sample projection; blanket downgrade would be lossy) — re-run depth with the classifier once it passes the gate.'
+  champion: goose
+  target_files:
+  - temp/market_research_depth.py
+  - temp/market_research_depth2.py
+  - temp/market_research/market_research_depth.json
+  - temp/market_research/market_research_depth2.json
+  - scripts/train_discipline_classifier.py
+  created: '2026-09-05'
+- id: D2576
+  category: MEASUREMENT / LABEL QUALITY
+  state: RESOLVED
+  description: 'DEPTH-ACCURACY AUDIT (cross-family 3-way) + classifier-base research. (1) DEPTH AUDIT (temp/depth_audit_summary.py, stratified sample 30 universal + 20 cross-domain + 12-FB Qwen overlap): gpt-oss-20b depth labels vs Qwen3.8-27B (local) + DeepSeek-v4-pro (frontier, delegate custom_deepseek). RESULT: gpt-oss(DB) vs DeepSeek agreement 33.3% (universal 10/30) and 20.0% (cross-domain 4/20); Qwen↔DeepSeek 66.7% (8/12) vs Qwen↔gpt-oss 33.3% (4/12) — the two independent verifiers AGREE WITH EACH OTHER while disagreeing with the origin label. CONCLUSION: depth OVER-ASSIGNS the rare categories (universal ~2/3 wrong, cross-domain ~4/5 wrong; e.g. "Future Technology Trends", "Sherlock Holmes'' Observation of Silence", "Divine Proportion in Nautilus Shell" tagged universal). Projected corpus impact: universal 81→~27, cross-domain 713→~143 (~624 over-assigned → should be domain). (2) BENCHMARK RECONCILIATION: gpt-oss empirical depth accuracy is 75% (n=8 stratified, governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md) — the 87.5% (D2277) was a drifted governance claim; 75% reflects domain-vs-specialized discrimination, NOT the hard universal/cross-domain distinction (which the 5-example golden cannot measure). (3) CLASSIFIER-BASE: gpt-oss-20b is the TEACHER (label oracle), NOT the fine-tuning base; the auto-sorter student = microsoft/deberta-v3-base (137M). VERIFIED 4 blockers: peft not installed; deberta-v3-base not cached; golden set 7 examples (needs 750-1000); LoRA target_modules (q_proj,v_proj) WRONG for DeBERTa disentangled attention (query_proj/value_proj) → silent no-op. RECOMMEND ModernBERT-base (139M, ~2x faster, 8192 ctx) full-fine-tune as student. (4) OMLX RELIABILITY → BUG-224: direct Qwen3.8 OMLX calls wedge under sustained load (large-output calls >1200 tokens hang beyond timeout, need ~15-60s recovery) — blocked the delegated Qwen3.8 market research. Market-research + CRIBS/depth model-separation evaluation delivered as cross-family analyst judgment (goose) pending user decision.'
+  champion: goose
+  target_files:
+  - temp/depth_audit_summary.py
+  - temp/depth_audit_results.json
+  - temp/qwen38_classifier_market_research.py
+  - governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md
+  created: '2026-09-05'
 - id: D2573
   category: LABEL QUALITY / TAXONOMY
   state: RESOLVED
@@ -4663,16 +4750,16 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 551
+  total: 560
   proposed: 0
   draft: 1
-  active: 459
+  active: 460
   stale: 0
   superseded: 15
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 40
+  resolved: 48
   planned: 7
   by_category:
     ARCH: 27
@@ -4731,19 +4818,21 @@ summary:
     INFRASTRUCTURE: 1
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
+    LABEL QUALITY / DATA: 4
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 2
     LABEL QUALITY / TAXONOMY: 2
-    MEASUREMENT / LABEL QUALITY: 1
+    MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1
     MEASUREMENT / QUALITY: 1
     MODEL: 2
     OBSERVABILITY / TOOLING: 1
     ONTOLOGY / AUDIT: 3
     ONTOLOGY / AUDIT / STRATEGY: 1
+    ONTOLOGY / LABEL QUALITY: 1
     ONTOLOGY / MEASUREMENT: 1
-    ONTOLOGY / PIPELINE / RESEARCH: 1
+    ONTOLOGY / PIPELINE / RESEARCH: 2
     ONTOLOGY / VERIFICATION: 1
     OPERATIONAL / CANARY: 1
     OPS: 3
@@ -4751,7 +4840,7 @@ summary:
     OPS / DATA: 1
     OPS / PERF: 1
     OPS / QUALITY: 2
-    OPS / RELIABILITY: 9
+    OPS / RELIABILITY: 10
     PERF: 11
     PERF / BUGFIX: 1
     PERFORMANCE / DATA INTEGRITY / GOVERNANCE: 1

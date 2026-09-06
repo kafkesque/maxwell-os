@@ -86,6 +86,8 @@ OMLX_DEFAULT_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("default
 OMLX_MAX_RETRIES = int(_CFG.get("services", {}).get("omlx", {}).get("max_retries", 3))
 OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay", 5))
 OMLX_COLD_RELOAD_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("cold_reload_delay", 45))  # D2301: reasoning-model cold reload wait
+OMLX_READ_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("read_timeout", 60))  # BUG-224: per-read socket timeout — bounds a wedged/stalled server (decode collapse) that otherwise hangs beyond default_timeout
+OMLX_WEDGE_RECOVERY_SLEEP = int(_CFG.get("services", {}).get("omlx", {}).get("wedge_recovery_sleep", 20))  # BUG-224: recovery sleep after a mid-response wedge (server needs 15-60s to recover)
 # D2187: OMLX circuit breaker (P1-3) — config-driven, no hardcoding
 OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
 OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))

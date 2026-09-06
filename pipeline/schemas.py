@@ -411,8 +411,12 @@ class FB(StampedRecord):
     def depth_consistent_with_labels(cls, v: str, info) -> str:
         """D2130: Warn if depth is inconsistent with domain cardinality.
 
-        Depth hierarchy: universal (≥3 domains) > cross-domain (≥2) > domain (1) > specialized (1+ narrow).
-        Discipline is singular so no cardinality check needed there.
+        Depth hierarchy: universal (≥3 domains) > cross-domain (≥2) > domain (1..N
+        adjacent-cluster, bounded by MAX_DOMAINS_PER_FB) > specialized (1 narrow).
+        Note: 'domain' deliberately carries NO cardinality warning — a principle
+        may span several design-adjacent domains and still be 'domain' (D2393:
+        depth is NOT domain count). Discipline is singular so no cardinality
+        check is needed there.
         """
         data = info.data
         n_domains = len(data.get("domains", []))

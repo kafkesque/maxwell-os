@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-05 | **Machine source of truth:** `config/decisions.yaml` (545 decisions)
+> **Updated:** 2026-09-06 | **Machine source of truth:** `config/decisions.yaml` (560 decisions)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -49,12 +49,13 @@
 
 ---
 
-## 🟢 ACTIVE — in effect (459)
+## 🟢 ACTIVE — in effect (460)
 
-The 459 ACTIVE decisions are canonical rules in force (not "pending work"). **Machine list: `config/decisions.yaml`.** Recent critical ACTIVE decisions:
+The 460 ACTIVE decisions are canonical rules in force (not "pending work"). **Machine list: `config/decisions.yaml`.** Recent critical ACTIVE decisions:
 
 | ID | Decision |
 |---|---|
+| D2582 | 3-model label vote scaffold (`scripts/label_vote.py` + `label_vote` config): 3 cross-family voters (default Qwen3.8-27B + gemma-4-E4B + Phi-4-mini; gpt-oss excluded — circular; DeepSeek excluded — C1/C3 + DELEGATE-001), majority >=2/3 fail-closed, D2580 flags (missing close domains + catch-all disciplines). EXTENDED (2026-09-06): `--golden PATH` source added — vote can target the mined golden training set directly (`config/golden/stage4_golden_mined.yaml`) so consensus labels line up 1:1 with the classifier examples. |
 | D2549 | Local-LLM delegation routing (task-type → model, enforced going forward): data-repair code-review → gemma-4-E4B-it-MLX-4bit (R5); classification → gpt-oss-20b-MXFP4-Q8; code-gen → Qwen3-Coder-30B one-shot; research → shell/curl. |
 | D2540 | Measure-first verdict: REJECT full 7,995-FB reclassification; 0 axis leaks = structural proof only; semantic correctness is the unmeasured gap. |
 | D2541 | Peer-review adoption + S4 integration (source_text/evidence injection, precision rules, batch 2×, thinking_budget 1.8×). |
@@ -63,13 +64,13 @@ The 459 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 | D2537 | Ranking fix + raw-label facet (opt-in). |
 | D2532/D2533 | BUG-197 reclassification prep + corpus-aware pass-rate opt-in. |
 
-> Full ACTIVE set (455 others) lives in `config/decisions.yaml` — read fresh, do not trust any snapshot.
+> Full ACTIVE set (452 others) lives in `config/decisions.yaml` — read fresh, do not trust any snapshot.
 
 ---
 
-## ⚪ DONE / CLOSED — bottom (71)
+## ⚪ DONE / CLOSED — bottom (77)
 
-**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575
+**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584
 **SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430
 **ARCHIVED:** D2000, D2001, D2002, D2034, D2052, D2195, D2196, D2204
 **REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383

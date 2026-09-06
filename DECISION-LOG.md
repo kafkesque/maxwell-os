@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-06 | **Machine source of truth:** `config/decisions.yaml` (560 decisions)
+> **Updated:** 2026-09-06 | **Machine source of truth:** `config/decisions.yaml` (562 decisions)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -55,7 +55,7 @@ The 460 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 
 | ID | Decision |
 |---|---|
-| D2582 | 3-model label vote scaffold (`scripts/label_vote.py` + `label_vote` config): 3 cross-family voters (default Qwen3.8-27B + gemma-4-E4B + Phi-4-mini; gpt-oss excluded — circular; DeepSeek excluded — C1/C3 + DELEGATE-001), majority >=2/3 fail-closed, D2580 flags (missing close domains + catch-all disciplines). EXTENDED (2026-09-06): `--golden PATH` source added — vote can target the mined golden training set directly (`config/golden/stage4_golden_mined.yaml`) so consensus labels line up 1:1 with the classifier examples. |
+| D2585 | **Label-quality architecture final verdict (roundtable adjudication + 2nd-round peer review, 2026-09-06).** RETIRE the full-corpus 3-model vote (supersedes D2582) and adopt a weak-supervision label model as the durable architecture: `gpt-oss teacher → { T-NLI + cleanlab + limited generative challenger } labeling functions → Snorkel/Dawid-Skene label model → human GOLD-A/B/CHALLENGE (300-500 stratified, book/author-disjoint) → ModernBERT-base classifier (train → temperature-scale → conformal/selective abstention)`. **MANDATORY LF-audit/dependency gate BEFORE `build_label_model.py`** (the LFs are NOT automatically independent — gpt-oss/NLI/cleanlab/challenger share correlated failure modes; alias-canonicalization is deterministic preprocessing, NOT a voter; cleanlab issue-probability is NOT a calibrated mislabel probability). Benchmarks: ΔF1 > +0.02 (label-model vs silver labels on ModernBERT) + >70% agreement on a 10% held-out flagged subset; selective prediction for the 61-way rare classes. Priority P0–P6 (P0 = train ModernBERT baseline NOW; P6 = retire `label_vote.py` to spot-checks). |
 | D2549 | Local-LLM delegation routing (task-type → model, enforced going forward): data-repair code-review → gemma-4-E4B-it-MLX-4bit (R5); classification → gpt-oss-20b-MXFP4-Q8; code-gen → Qwen3-Coder-30B one-shot; research → shell/curl. |
 | D2540 | Measure-first verdict: REJECT full 7,995-FB reclassification; 0 axis leaks = structural proof only; semantic correctness is the unmeasured gap. |
 | D2541 | Peer-review adoption + S4 integration (source_text/evidence injection, precision rules, batch 2×, thinking_budget 1.8×). |
@@ -68,11 +68,11 @@ The 460 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 
 ---
 
-## ⚪ DONE / CLOSED — bottom (77)
+## ⚪ DONE / CLOSED — bottom (81)
 
-**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584
-**SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430
+**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584, D2586
+**SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430, D2582
 **ARCHIVED:** D2000, D2001, D2002, D2034, D2052, D2195, D2196, D2204
 **REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383
 
-> Full titles/descriptions for all 67 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).
+> Full titles/descriptions for all 81 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).

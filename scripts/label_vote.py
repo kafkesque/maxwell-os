@@ -57,6 +57,7 @@ import yaml  # noqa: E402
 
 from pipeline.omlx_call import call_omlx_json  # noqa: E402
 from pipeline.pipeline_paths import DB_PATH, MAX_DOMAINS_PER_FB  # noqa: E402
+from pipeline.model_lazyload import PINNED_MODELS, unload_model  # noqa: E402
 from pipeline.schemas import CANONICAL_DISCIPLINES, CANONICAL_DOMAINS  # noqa: E402
 
 # ── Config (C12: no hardcoding — all from pipeline_config.yaml) ──────────
@@ -218,6 +219,23 @@ def _safe_write(path: Path, text: str) -> None:
         raise
 
 
+def _load_high_suspicion(path: Path) -> set[str]:
+    """Return the example-id set flagged high-suspicion by build_label_model.py.
+
+    Reads the per-FB JSONL emitted by scripts/build_label_model.py and selects
+    the rows in the `both` / `nli_only` tiers (the P3 challenger / GOLD-A seed).
+    """
+    ids: set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        r = json.loads(line)
+        if r.get("tier") in ("both", "nli_only"):
+            ids.add(r.get("example_id") or r.get("fb_id"))
+    return ids
+
+
 def load_target_fbs(db_path: Path, where: str, limit: int | None) -> list[dict[str, Any]]:
     """Load FBs to vote on. ``where`` is an optional SQL predicate (default: all)."""
     conn = sqlite3.connect(db_path)
@@ -294,6 +312,11 @@ def vote_one_fb(fb: dict[str, Any]) -> dict[str, Any]:
             votes.append({"model": model, "discipline": None, "domains": [], "depth": None,
                           "error": f"{type(e).__name__}: {e}"})
         time.sleep(RECOVERY_SLEEP)
+        # Residency fix (D2585 / Claude finding): sequential CALLS do not imply
+        # sequential RESIDENCY. Unload each non-pinned voter so only ONE
+        # generative voter is resident at a time (memory budget D2496).
+        if model not in PINNED_MODELS:
+            unload_model(model)
     agg = aggregate_votes(votes)
     return {
         "fb_id": fb["fb_id"],
@@ -315,6 +338,12 @@ def main() -> int:
         default=None,
         help="Path to a mined golden YAML (config/golden/stage4_golden_mined.yaml) to vote on instead of the DB",
     )
+    parser.add_argument(
+        "--high-suspicion",
+        default=None,
+        metavar="JSONL",
+        help="Restrict to high-suspicion FBs (output of scripts/build_label_model.py); pairs with --golden",
+    )
     parser.add_argument("--where", default=None, help="SQL predicate selecting FBs (DB source only)")
     parser.add_argument("--limit", type=int, default=None, help="Cap FBs (deterministic ORDER BY fb_id)")
     parser.add_argument("--output", default="temp/label_vote.jsonl", help="Checkpoint JSONL path")
@@ -327,6 +356,10 @@ def main() -> int:
         fbs = load_target_fbs_from_golden(Path(args.golden), args.limit)
     else:
         fbs = load_target_fbs(db_path, args.where, args.limit)
+    if args.high_suspicion:
+        hs_ids = _load_high_suspicion(Path(args.high_suspicion))
+        fbs = [fb for fb in fbs if fb["fb_id"] in hs_ids]
+        print(f"   high-suspicion filter → {len(fbs)} FBs")
     print(f"🎯 3-model vote: {len(fbs)} FBs | voters={[v['model'] for v in VOTERS]} | "
           f"majority>={MAJORITY_THRESHOLD}/3 | output={out_path}")
 

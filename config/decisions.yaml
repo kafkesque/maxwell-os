@@ -1,8 +1,30 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-05T21:30:00Z'
-total_decisions: 560
+last_sync: '2026-09-06T09:16:00Z'
+total_decisions: 562
 decisions:
+- id: D2586
+  category: LABEL QUALITY / DATA
+  state: RESOLVED
+  description: 'LABEL-MODEL EXECUTION (D2585 P0/P1/P2/P3 — measurements). (1) P0 BASELINE: ModernBERT-base trained on the 1,027-example 61-class golden set → discipline macro-F1 0.1845 (target 0.75; DOWN from D2578 0.2621 because 61/61 now trainable — 11 newly-resolved rare classes at 5 ex each drag the macro mean; 28/61 F1>0, 33 data-starved, nonzero-class mean 0.402, loss 4.71→3.08 still decreasing → data-limited not model-limited). Confusion matrix + per-class F1 saved to knowledge pipeline/classifier_modernbert/. (2) P1 LF-AUDIT (scripts/lf_dependency_audit.py): T-NLI-contradiction vs cleanlab are near-INDEPENDENT (phi=0.093, kappa=0.062; both=532 / cleanlab-only=2,890 / NLI-only=342 / neither=3,278, n=7,042). REFINES the ChatGPT correlation worry — the Dawid-Skene independence assumption is NOT grossly violated; the binding constraint is cleanlab UNcalibrated 48.7% flag rate (theta=0.41 = 41% false-positive on correct labels), not LF correlation. (3) P2 LABEL MODEL (scripts/build_label_model.py, regularized Dawid-Skene EM over 2 binary LFs): pi_correct=0.785; T-NLI theta=0.057/psi=0.364 (high precision); cleanlab theta=0.410/psi=0.701 (high recall). Golden set: 135 high-suspicion FBs (101 both-flag + 34 NLI-only) = the P3 generative-challenger / GOLD-A seed; mean P(mislabel) 0.236. Outputs governance/label_model_output.{json,md} + temp/golden_labels_probabilistic.jsonl. (4) P3 CHALLENGER PREP: residency fix (unload each non-pinned voter after its vote in label_vote.py — Claude finding) + --high-suspicion filter (135 FBs) + gemma-4-E4B re-classification path validated live. Full 135-FB challenger run = flagged monitored operation (BUG-224).'
+  champion: goose
+  target_files:
+  - scripts/train_discipline_classifier.py
+  - scripts/lf_dependency_audit.py
+  - scripts/build_label_model.py
+  - scripts/label_vote.py
+  created: '2026-09-06'
+- id: D2585
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: 'LABEL-QUALITY ARCHITECTURE FINAL VERDICT (roundtable adjudication + second-round peer review). Three independent auditors (Claude/ChatGPT/Qwen at pinned commit 436fabc) + adjudicator synthesis + second-round peer review (ChatGPT, Qwen) CONVERGED: the 3-model generative vote is NOT the ultimate label-quality solution — it is one weak labeling function, not an oracle. DECISION: retire full-corpus 1,027-FB 3-model vote (wasted compute on the ~80% correct labels; cleanlab already flags 48.7% = 3,424/7,026) and adopt a weak-supervision label model as the durable architecture. PIPELINE: gpt-oss teacher → { T-NLI (per-label thresholds, taxonomy.semantic_error_rate_max.per_label, 96 entries) + cleanlab + (limited generative challenger) } as labeling functions → weak-supervision label model (Snorkel LabelModel / Dawid-Skene EM) → human adjudication on the high-disagreement subset (GOLD-A/B/CHALLENGE, 300-500 stratified, book/author-disjoint) → ModernBERT-base classifier (train → temperature-scale → conformal/selective abstention on top of ABSTAIN_THRESHOLD=0.35). SECOND-ROUND REFINEMENTS (adopted from ChatGPT+Qwen): (1) MANDATORY LF-audit/dependency gate BEFORE writing build_label_model.py — the LFs are NOT automatically independent (gpt-oss/NLI/cleanlab/challenger share correlated failure modes; alias-canonicalization is deterministic preprocessing, NOT a voter; cleanlab issue-probability is NOT a calibrated mislabel probability) → Step 3A = LF schema + conditional-dependence analysis, Step 3B = label model; (2) evaluate against frozen human GOLD, never against gpt-oss agreement (D2286); (3) benchmark gate = ΔF1 > +0.02 (label-model labels vs silver labels on ModernBERT) + >70% agreement on a 10% held-out flagged subset; (4) selective prediction to trade coverage for accuracy on the 61-way rare classes. PRIORITY: P0 train ModernBERT baseline NOW (macro-F1 + confusion matrix, from D2578 0.2621); P1 LF audit; P2 build_label_model.py; P3 targeted generative challenger on ~100-200 cleanlab∩T-NLI-flagged FBs ONLY; P4 retrain + calibrate + abstain; P5 freeze GOLD-A/B/CHALLENGE; P6 retire label_vote.py to rare spot-checks. MEMORY: only one non-pinned generative voter resident at a time (sequential calls do NOT imply sequential residency — wire model_lazyload.py --unload first).'
+  champion: goose
+  target_files:
+  - scripts/build_label_model.py
+  - scripts/train_discipline_classifier.py
+  - scripts/label_vote.py
+  - pipeline/model_lazyload.py
+  created: '2026-09-06'
 - id: D2584
   category: LABEL QUALITY / DATA
   state: RESOLVED
@@ -23,8 +45,8 @@ decisions:
   created: '2026-09-05'
 - id: D2582
   category: LABEL QUALITY / DATA
-  state: ACTIVE
-  description: '3-MODEL LABEL VOTE SCAFFOLD (D2577 + D2580). Created scripts/label_vote.py + config label_vote section. DESIGN: three INDEPENDENT cross-family voters assign (discipline, domains, depth) per FB, then majority-vote aggregation (>=2/3 agree), FAIL-CLOSED on disagreement (discipline→emerging, depth→domain, domains→empty). D2580 flags implemented: (a) missing close domains (voter-proposed domain absent from current+consensus set), (b) catch-all disciplines (interdisciplinary studies). Model independence (R5): voters MUST NOT include gpt-oss-20b (the S4 teacher being verified — circular). D2577 specified Qwen3.8-27B + DeepSeek-v4-pro + gemma; DeepSeek is CLOUD (C1/C3) + DELEGATE-001 bug, so default third voter = Phi-4-mini-instruct-8bit (local). BUG-224: single-FB calls + recovery_sleep_seconds, wedge-recovery already in omlx_call (D2581). Checkpointed/resumable JSONL (crash-safe C6/C23). Aggregation logic unit-verified (full-agree, 3-way-split fail-closed, domain >=2, catch-all + missing-domain flags). TODO: (1) upgrade missing-close-domain from "any-absent" to embedding-similarity closeness; (2) wire into training-set refresh after 3 data-absent disciplines are generated; (3) confirm the third-voter policy (DeepSeek vs Phi-4-mini).'
+  state: SUPERSEDED
+  description: '3-MODEL LABEL VOTE SCAFFOLD (D2577 + D2580). Created scripts/label_vote.py + config label_vote section. DESIGN: three INDEPENDENT cross-family voters assign (discipline, domains, depth) per FB, then majority-vote aggregation (>=2/3 agree), FAIL-CLOSED on disagreement (discipline→emerging, depth→domain, domains→empty). D2580 flags implemented: (a) missing close domains (voter-proposed domain absent from current+consensus set), (b) catch-all disciplines (interdisciplinary studies). Model independence (R5): voters MUST NOT include gpt-oss-20b (the S4 teacher being verified — circular). D2577 specified Qwen3.8-27B + DeepSeek-v4-pro + gemma; DeepSeek is CLOUD (C1/C3) + DELEGATE-001 bug, so default third voter = Phi-4-mini-instruct-8bit (local). BUG-224: single-FB calls + recovery_sleep_seconds, wedge-recovery already in omlx_call (D2581). Checkpointed/resumable JSONL (crash-safe C6/C23). Aggregation logic unit-verified (full-agree, 3-way-split fail-closed, domain >=2, catch-all + missing-domain flags). TODO: (1) upgrade missing-close-domain from "any-absent" to embedding-similarity closeness; (2) wire into training-set refresh after 3 data-absent disciplines are generated; (3) confirm the third-voter policy (DeepSeek vs Phi-4-mini). SUPERSEDED (2026-09-06, by D2585): downgraded from THE label-quality mechanism to ONE labeling function (LF-3 generative challenger) targeted at the ~100-200 cleanlab∩T-NLI-flagged subset only; full-corpus 1,027-FB voting REJECTED. scripts/label_vote.py (incl. --golden source) survives as a targeted spot-check tool.'
   champion: goose
   target_files:
   - scripts/label_vote.py
@@ -4750,16 +4772,16 @@ decisions:
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
 summary:
-  total: 560
+  total: 562
   proposed: 0
   draft: 1
   active: 460
   stale: 0
-  superseded: 15
+  superseded: 16
   archived: 8
   rejected: 8
   deferred: 13
-  resolved: 48
+  resolved: 49
   planned: 7
   by_category:
     ARCH: 27
@@ -4818,7 +4840,7 @@ summary:
     INFRASTRUCTURE: 1
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
-    LABEL QUALITY / DATA: 4
+    LABEL QUALITY / DATA: 6
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 2

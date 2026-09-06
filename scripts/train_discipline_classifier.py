@@ -53,6 +53,7 @@ CHECKPOINT_DIR: str = "knowledge pipeline/classifier_modernbert"
 TRAIN_TEST_SPLIT_SIZE: float = 0.2
 RANDOM_STATE: int = 42
 TARGET_MACRO_F1: float = 0.75
+WORST_CLASSES_TO_LOG: int = 15
 
 BATCH_SIZE: int = 8
 MAX_LENGTH: int = 320  # p99 token length is 247; 512 wasted >50% compute on padding
@@ -435,6 +436,22 @@ def evaluate(
         all_disc_true, all_disc_pred, average="macro", zero_division=0
     )
 
+    # P0 deliverable: per-class discipline F1 + confusion matrix, so the run
+    # names the data-starved disciplines rather than reporting only the macro
+    # average (D2585 P0).
+    per_class_f1_disc = f1_score(
+        all_disc_true,
+        all_disc_pred,
+        average=None,
+        labels=list(range(NUM_DISCIPLINE_CLASSES)),
+        zero_division=0,
+    )
+    confusion = np.zeros(
+        (NUM_DISCIPLINE_CLASSES, NUM_DISCIPLINE_CLASSES), dtype=np.int64
+    )
+    for true_idx, pred_idx in zip(all_disc_true.tolist(), all_disc_pred.tolist()):
+        confusion[true_idx, pred_idx] += 1
+
     per_domain_f1: Dict[str, float] = {}
     for i in range(NUM_DOMAIN_CLASSES):
         f1_i = f1_score(
@@ -444,6 +461,8 @@ def evaluate(
 
     return {
         "macro_f1_discipline": float(macro_f1_disc),
+        "per_class_f1_discipline": [float(x) for x in per_class_f1_disc],
+        "confusion_matrix": confusion,
         **per_domain_f1,
     }
 
@@ -639,6 +658,22 @@ def save_checkpoint(
     return ckpt_path
 
 
+def _save_confusion_matrix(confusion: np.ndarray, path: Path) -> None:
+    """Save the confusion matrix crash-safely as a .npy file (C6).
+
+    Args:
+        confusion: Square integer confusion matrix (true x predicted).
+        path: Destination .npy path.
+
+    Raises:
+        OSError: If the crash-safe write fails.
+    """
+    buf = io.BytesIO()
+    np.save(buf, confusion)
+    safe_write(path, buf.getvalue())
+    logger.info("Confusion matrix saved to %s", path)
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -764,8 +799,31 @@ def main() -> None:
         if key.startswith("domain_"):
             logger.info("  %s: %.4f", key, val)
 
+    # P0 deliverable: name the data-starved disciplines and persist the
+    # confusion matrix for later label-model ΔF1 comparisons (D2585).
+    idx_to_discipline = {i: name for name, i in discipline_label_map.items()}
+    per_class_f1 = metrics.get("per_class_f1_discipline", [])
+    worst = sorted(
+        (
+            (idx_to_discipline[i], per_class_f1[i])
+            for i in range(len(per_class_f1))
+            if not idx_to_discipline[i].startswith("__pad_")
+        ),
+        key=lambda x: x[1],
+    )[:WORST_CLASSES_TO_LOG]
+    logger.info(
+        "Weakest %d disciplines (per-class F1): %s",
+        WORST_CLASSES_TO_LOG,
+        ", ".join(f"{name}={f1:.2f}" for name, f1 in worst),
+    )
+    confusion = metrics.pop("confusion_matrix", None)
+
     # Checkpoint
     save_checkpoint(model, tokenizer, metrics, checkpoint_dir=checkpoint_dir)
+    if confusion is not None:
+        _save_confusion_matrix(
+            confusion, Path(checkpoint_dir) / "confusion_matrix.npy"
+        )
 
     logger.info("Training complete.")
 

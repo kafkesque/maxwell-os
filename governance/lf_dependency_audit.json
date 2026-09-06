@@ -1,0 +1,458 @@
+{
+  "inputs": {
+    "nli_discipline_fbs": 7068,
+    "cleanlab_assessed_fbs": 7236,
+    "cleanlab_flagged_fbs": 3422,
+    "cleanlab_pct_flagged": 0.4873
+  },
+  "contra_variant": {
+    "both": 532,
+    "cleanlab_only": 2890,
+    "nli_only": 342,
+    "neither": 3278,
+    "n": 7042,
+    "p_cleanlab_given_nli": 0.6087,
+    "p_cleanlab_given_not_nli": 0.4685,
+    "p_nli_given_cleanlab": 0.1555,
+    "p_nli_given_not_cleanlab": 0.0945,
+    "phi": 0.0925,
+    "kappa": 0.0623,
+    "agreement": 0.541
+  },
+  "weak_variant": {
+    "both": 2137,
+    "cleanlab_only": 1285,
+    "nli_only": 1911,
+    "neither": 1709,
+    "n": 7042,
+    "p_cleanlab_given_nli": 0.5279,
+    "p_cleanlab_given_not_nli": 0.4292,
+    "p_nli_given_cleanlab": 0.6245,
+    "p_nli_given_not_cleanlab": 0.5279,
+    "phi": 0.0976,
+    "kappa": 0.0961,
+    "agreement": 0.5462
+  },
+  "per_label": [
+    {
+      "label": "philosophy",
+      "cleanlab": 133,
+      "nli": 63,
+      "both": 48,
+      "n": 189
+    },
+    {
+      "label": "behavioral economics",
+      "cleanlab": 150,
+      "nli": 24,
+      "both": 11,
+      "n": 235
+    },
+    {
+      "label": "political economy",
+      "cleanlab": 118,
+      "nli": 54,
+      "both": 35,
+      "n": 184
+    },
+    {
+      "label": "research methodology",
+      "cleanlab": 97,
+      "nli": 54,
+      "both": 35,
+      "n": 264
+    },
+    {
+      "label": "human-computer interaction",
+      "cleanlab": 102,
+      "nli": 52,
+      "both": 29,
+      "n": 364
+    },
+    {
+      "label": "software engineering",
+      "cleanlab": 115,
+      "nli": 25,
+      "both": 14,
+      "n": 317
+    },
+    {
+      "label": "cognitive science",
+      "cleanlab": 112,
+      "nli": 16,
+      "both": 12,
+      "n": 129
+    },
+    {
+      "label": "health & medicine",
+      "cleanlab": 101,
+      "nli": 23,
+      "both": 22,
+      "n": 126
+    },
+    {
+      "label": "design thinking",
+      "cleanlab": 107,
+      "nli": 15,
+      "both": 14,
+      "n": 171
+    },
+    {
+      "label": "communication theory",
+      "cleanlab": 112,
+      "nli": 14,
+      "both": 9,
+      "n": 173
+    },
+    {
+      "label": "operations research",
+      "cleanlab": 98,
+      "nli": 25,
+      "both": 17,
+      "n": 144
+    },
+    {
+      "label": "creative process",
+      "cleanlab": 84,
+      "nli": 43,
+      "both": 31,
+      "n": 115
+    },
+    {
+      "label": "cultural design",
+      "cleanlab": 72,
+      "nli": 115,
+      "both": 41,
+      "n": 262
+    },
+    {
+      "label": "media studies",
+      "cleanlab": 91,
+      "nli": 24,
+      "both": 19,
+      "n": 150
+    },
+    {
+      "label": "economics",
+      "cleanlab": 104,
+      "nli": 6,
+      "both": 5,
+      "n": 171
+    },
+    {
+      "label": "information science",
+      "cleanlab": 93,
+      "nli": 16,
+      "both": 12,
+      "n": 203
+    },
+    {
+      "label": "linguistics",
+      "cleanlab": 95,
+      "nli": 12,
+      "both": 10,
+      "n": 147
+    },
+    {
+      "label": "systems engineering",
+      "cleanlab": 94,
+      "nli": 4,
+      "both": 3,
+      "n": 131
+    },
+    {
+      "label": "organizational theory",
+      "cleanlab": 87,
+      "nli": 11,
+      "both": 8,
+      "n": 135
+    },
+    {
+      "label": "strategic thinking",
+      "cleanlab": 74,
+      "nli": 66,
+      "both": 19,
+      "n": 436
+    },
+    {
+      "label": "cultural studies",
+      "cleanlab": 70,
+      "nli": 23,
+      "both": 18,
+      "n": 91
+    },
+    {
+      "label": "visual semiotics",
+      "cleanlab": 82,
+      "nli": 10,
+      "both": 5,
+      "n": 140
+    },
+    {
+      "label": "sociology",
+      "cleanlab": 73,
+      "nli": 4,
+      "both": 3,
+      "n": 94
+    },
+    {
+      "label": "anthropology",
+      "cleanlab": 70,
+      "nli": 9,
+      "both": 5,
+      "n": 109
+    },
+    {
+      "label": "artificial intelligence",
+      "cleanlab": 68,
+      "nli": 4,
+      "both": 4,
+      "n": 143
+    },
+    {
+      "label": "motion & time",
+      "cleanlab": 52,
+      "nli": 27,
+      "both": 20,
+      "n": 107
+    },
+    {
+      "label": "machine learning",
+      "cleanlab": 61,
+      "nli": 8,
+      "both": 2,
+      "n": 211
+    },
+    {
+      "label": "engineering",
+      "cleanlab": 59,
+      "nli": 2,
+      "both": 2,
+      "n": 91
+    },
+    {
+      "label": "computer graphics",
+      "cleanlab": 57,
+      "nli": 3,
+      "both": 3,
+      "n": 77
+    },
+    {
+      "label": "typography",
+      "cleanlab": 58,
+      "nli": 0,
+      "both": 0,
+      "n": 133
+    },
+    {
+      "label": "semiotics",
+      "cleanlab": 54,
+      "nli": 2,
+      "both": 2,
+      "n": 97
+    },
+    {
+      "label": "literary theory",
+      "cleanlab": 49,
+      "nli": 5,
+      "both": 5,
+      "n": 61
+    },
+    {
+      "label": "neuroscience",
+      "cleanlab": 52,
+      "nli": 1,
+      "both": 0,
+      "n": 69
+    },
+    {
+      "label": "risk management",
+      "cleanlab": 43,
+      "nli": 7,
+      "both": 4,
+      "n": 55
+    },
+    {
+      "label": "law",
+      "cleanlab": 44,
+      "nli": 1,
+      "both": 1,
+      "n": 58
+    },
+    {
+      "label": "finance",
+      "cleanlab": 42,
+      "nli": 2,
+      "both": 2,
+      "n": 59
+    },
+    {
+      "label": "performing arts",
+      "cleanlab": 36,
+      "nli": 5,
+      "both": 5,
+      "n": 44
+    },
+    {
+      "label": "computational geometry",
+      "cleanlab": 34,
+      "nli": 6,
+      "both": 5,
+      "n": 40
+    },
+    {
+      "label": "aesthetics",
+      "cleanlab": 39,
+      "nli": 0,
+      "both": 0,
+      "n": 45
+    },
+    {
+      "label": "systems thinking",
+      "cleanlab": 35,
+      "nli": 1,
+      "both": 1,
+      "n": 43
+    },
+    {
+      "label": "psychology",
+      "cleanlab": 27,
+      "nli": 37,
+      "both": 8,
+      "n": 890
+    },
+    {
+      "label": "interdisciplinary studies",
+      "cleanlab": 20,
+      "nli": 18,
+      "both": 15,
+      "n": 25
+    },
+    {
+      "label": "information security",
+      "cleanlab": 32,
+      "nli": 1,
+      "both": 1,
+      "n": 41
+    },
+    {
+      "label": "visual perception",
+      "cleanlab": 31,
+      "nli": 2,
+      "both": 2,
+      "n": 37
+    },
+    {
+      "label": "evolutionary biology",
+      "cleanlab": 29,
+      "nli": 5,
+      "both": 3,
+      "n": 33
+    },
+    {
+      "label": "complex adaptive systems",
+      "cleanlab": 29,
+      "nli": 2,
+      "both": 1,
+      "n": 35
+    },
+    {
+      "label": "theoretical physics",
+      "cleanlab": 25,
+      "nli": 5,
+      "both": 5,
+      "n": 26
+    },
+    {
+      "label": "decision making",
+      "cleanlab": 17,
+      "nli": 3,
+      "both": 2,
+      "n": 22
+    },
+    {
+      "label": "computational physics & simulation",
+      "cleanlab": 15,
+      "nli": 4,
+      "both": 3,
+      "n": 16
+    },
+    {
+      "label": "game design",
+      "cleanlab": 12,
+      "nli": 6,
+      "both": 5,
+      "n": 15
+    },
+    {
+      "label": "information retrieval",
+      "cleanlab": 13,
+      "nli": 2,
+      "both": 2,
+      "n": 17
+    },
+    {
+      "label": "social network analysis",
+      "cleanlab": 10,
+      "nli": 3,
+      "both": 1,
+      "n": 13
+    },
+    {
+      "label": "generative ai",
+      "cleanlab": 8,
+      "nli": 0,
+      "both": 0,
+      "n": 12
+    },
+    {
+      "label": "creative coding",
+      "cleanlab": 7,
+      "nli": 1,
+      "both": 0,
+      "n": 9
+    },
+    {
+      "label": "color theory",
+      "cleanlab": 6,
+      "nli": 0,
+      "both": 0,
+      "n": 7
+    },
+    {
+      "label": "computational theory",
+      "cleanlab": 5,
+      "nli": 1,
+      "both": 1,
+      "n": 6
+    },
+    {
+      "label": "robotics",
+      "cleanlab": 6,
+      "nli": 0,
+      "both": 0,
+      "n": 8
+    },
+    {
+      "label": "privacy & surveillance",
+      "cleanlab": 4,
+      "nli": 1,
+      "both": 1,
+      "n": 5
+    },
+    {
+      "label": "generative design",
+      "cleanlab": 5,
+      "nli": 0,
+      "both": 0,
+      "n": 6
+    },
+    {
+      "label": "design psychology",
+      "cleanlab": 4,
+      "nli": 1,
+      "both": 1,
+      "n": 6
+    }
+  ]
+}

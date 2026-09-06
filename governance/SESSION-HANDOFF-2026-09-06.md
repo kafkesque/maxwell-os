@@ -1,28 +1,24 @@
-# Session Handoff — 2026-09-06 (data-absent disciplines resolved + vote prep)
+# Session Handoff — 2026-09-06 (data-absent resolved + vote-model verdict + label-model path)
 
 > **Phase:** v3.0 auto-sorter (discipline/domain classifier) + label-quality pipeline
-> **Current time:** 2026-09-06 ~10:00 +02:00
-> **Working tree:** UNCOMMITTED (this session + prior D2578→D2583 work)
+> **Current time:** 2026-09-06 ~11:16 +02:00
 > **Supersedes:** SESSION-HANDOFF-2026-09-05.md
+> **Decision state:** 561 total / 460 active / 48 resolved (recompute clean)
 
 ---
 
 ## 0. TL;DR — where we are
 
-The three "next critical steps" from 2026-09-05 were picked up:
+The three "next critical steps" from 2026-09-05 were picked up **and then re-scoped by a
+roundtable verdict**:
 
-1. **`bug197_kind_swap` — DONE.** 400 FBs kind-swapped (2 discipline + 35 domain
-   recovered). Net discipline=emerging 761→759.
-2. **Generate FBs for the 3 data-absent disciplines — DONE via D2584 (refined).**
-   Re-inspection showed the 3 disciplines were NOT missing content — their FBs
-   exist with complete skeletons but had **unresolved domain axes**
-   (`domains=["emerging"]` despite real `domains_raw`). Fixed deterministically
-   (alias-map extension + re-derivation), **no new FB fabrication needed**.
-   Result: computational theory 4→5, ecology 4→5, robotics 1→5; **61/61
-   disciplines trainable** (was 58); golden set 1026→1027 examples.
-3. **3-model vote — PREPARED, BLOCKED on OMLX (down).** `--golden` source added
-   to `scripts/label_vote.py`; dry-run validated. The actual `--run` needs the
-   OMLX server up (currently not listening on port 11435).
+1. **`bug197_kind_swap` — DONE.** 400 FBs (2 discipline + 35 domain recovered). Net emerging 761→759.
+2. **3 data-absent disciplines — DONE via D2584.** Not missing content — unresolved domain axes.
+   Fixed deterministically (19 aliases + `resolve_data_absent_domains.py`); 61/61 trainable.
+3. **3-model vote — RE-SCOPED (D2585).** The roundtable (3 auditors + adjudication + 2nd-round
+   peer review) **rejected the full-corpus vote as the ultimate solution** and adopted a
+   weak-supervision label model. The vote survives only as a *targeted generative challenger*
+   (LF-3) on ~100–200 cleanlab∩T-NLI-flagged FBs.
 
 ---
 
@@ -30,73 +26,69 @@ The three "next critical steps" from 2026-09-05 were picked up:
 
 | Item | State | What |
 |---|---|---|
-| bug197_kind_swap | ✅ APPLIED | 400 FBs (2 discipline + 35 domain recovered). DB backed up `maxwell.db.bak_20260906_080236`. |
-| **D2584** | RESOLVED | Domain-axis re-derivation for data-absent disciplines. Added 19 robotics/autonomous-systems + theoretical-CS aliases to `config/alias_map.yaml` → `domain_aliases` (→ `engineering & infrastructure`, `computational science & physics`). New `scripts/resolve_data_absent_domains.py` (dry-run/apply, idempotent, backup+reconcile). Re-mined golden set. |
-| ecology | ✅ (via D2583 swap) | 4→5 golden examples. |
-| computational theory | ✅ (D2584) | 4→5. |
-| robotics | ✅ (D2584) | 1→5. |
-| `label_vote.py --golden` | ✅ ADDED | New `--golden PATH` source (targets the mined golden YAML 1:1 with classifier examples); dry-run validated. |
-| Governance | ✅ SYNCED | `decisions.yaml` 559→560 (D2584); summary recomputed (resolved 47→48); DECISION-LOG.md + MASTER-TASK-REGISTER.md updated. |
+| bug197_kind_swap | ✅ APPLIED | 400 FBs (2 discipline + 35 domain recovered). Backup `maxwell.db.bak_20260906_080236`. |
+| **D2584** | RESOLVED | Domain-axis re-derivation for data-absent disciplines. 19 aliases + `resolve_data_absent_domains.py`. Golden 1026→1027, 61/61 trainable. |
+| **D2585** | ACTIVE | **Label-quality architecture final verdict.** Retire full-corpus vote (D2582→SUPERSEDED); adopt weak-supervision label model + ModernBERT + calibrate + conformal abstention; MANDATORY LF-audit gate before `build_label_model.py`. |
+| Roundtable | ✅ COMPLETE | Handoff brief (`436fabc`), 3 auditor findings (Claude/ChatGPT/Qwen) → `governance/ROUNDTABLE_FINDINGS_*`, adjudication → `ROUNDTABLE_ADJUDICATION_*`; 5 handoff factual errors corrected (corrigendum); pushed `ec175d2`/`b6e9030`. 2nd-round peer review (`chatgpt0052`, `QWEN0052`) folded into D2585. |
+| Governance | ✅ SYNCED | `decisions.yaml` 560→561 (D2585 + D2582 superseded); DECISION-LOG + MTR + buglog reconciled. |
 
 ---
 
-## 2. Current system state (verified ~10:00)
+## 2. Current system state (verified ~11:16)
 
-- **DB:** `knowledge pipeline/maxwell.db` — total 7,995 FBs; discipline=emerging **759**.
-- **Golden set:** `config/golden/stage4_golden_mined.yaml` — **1,027** examples, 61/61 disciplines, all trainable (≥5). backfilled=27.
-- **Decisions:** total **560**, active 460, resolved **48** — `recompute_decision_summary.py --check` exit 0.
-- **OMLX:** **DOWN** (port 11435 not listening — no process). Required for the vote.
-- **DB backups created:** `maxwell.db.bak_20260906_080236` (kind-swap), `maxwell.db.bak_20260906_080915` (resolve).
-- **alias_map backup:** `config/alias_map.yaml.bak_20260906_080819_pre_d2584_domains`.
+- **DB:** `pipeline/maxwell.db` — 7,995 FBs; discipline=emerging **759**.
+- **Golden set:** `config/golden/stage4_golden_mined.yaml` — **1,027** examples, 61/61 trainable (≥5).
+- **Decisions:** total **561**, active 460, resolved 48 — `recompute_decision_summary.py --check` exit 0.
+- **OMLX:** **DOWN** (port 11435 not listening). Needed for any generative pass.
+- **Cleanlab:** 3,424/7,026 flagged (48.7%). **T-NLI:** 4,497/20,929 contradict (21.5%); per-label thresholds live in `taxonomy.semantic_error_rate_max.per_label` (96 entries).
 
 ---
 
-## 3. Next critical steps (priority order)
+## 3. Next critical steps (priority order — see D2585)
 
-1. **Start OMLX** (via `/Applications/oMLX.app` — the single-source canonical
-   launcher) and load the 3 voter models (Qwen3.8-27B-MLX-4bit,
-   gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit).
-2. **Run the 3-model vote** over the golden set (small first, then full):
-   ```
-   python3 scripts/label_vote.py --golden config/golden/stage4_golden_mined.yaml --limit 5 --run --output temp/label_vote_golden_validate.jsonl
-   python3 scripts/label_vote.py --golden config/golden/stage4_golden_mined.yaml --run --output temp/label_vote_golden.jsonl
-   ```
-   BUG-224 note: single-FB calls are already enforced; Qwen3.8 may wedge on long
-   output — the D2581 wedge-recovery handles it, but keep an eye on the first ~20
-   FBs. 1,027 FBs × 3 voters ≈ 6–8 h.
-3. **Re-train the auto-sorter** (`scripts/train_discipline_classifier.py`) with the
-   now-complete 61/61 training set — longer epochs + hparam/label-smoothing sweep;
-   hold macro-F1 ≥ 0.75 (baseline 0.2621).
-4. **Stand up the 4-way depth classifier** (ModernBERT) + A/B vs gpt-oss (gate ≥0.85).
+- ~~**P0 — train ModernBERT baseline NOW**~~ ✅ **DONE (2026-09-06).** macro-F1 **0.1845** (target 0.75),
+  loss 4.71→3.08 over 3 epochs (still decreasing → data-limited, not model-limited). Confusion matrix
+  + per-class F1 saved to `knowledge pipeline/classifier_modernbert/` (`confusion_matrix.npy`, `metrics.yaml`).
+  **28/61 disciplines have F1>0**; 33 are data-starved (F1=0). Note: macro-F1 DROPPED from D2578's 0.2621
+  → 0.1845 because 61/61 are now trainable — the 11 newly-resolved rare classes (5 ex each) drag the macro
+  average. The nonzero-class mean is 0.402, confirming the classes WITH data learn. → P4 retrain is the fix path.
+- ~~**P1 — LF-audit / dependency analysis**~~ ✅ **DONE (2026-09-06).** `scripts/lf_dependency_audit.py` →
+  `governance/lf_dependency_audit.{json,md}`. **T-NLI-contradiction vs cleanlab are near-INDEPENDENT**
+  (phi=0.093, kappa=0.062): both-flag=532, cleanlab-only=2,890, NLI-only=342, neither=3,278 (n=7,042).
+  cleanlab = broad flagger (48.7%), T-NLI-contra = narrow (12.4%). Intersection = **532 FBs** (the P3
+  challenger target, larger than the ~100–200 estimate). **Design implication for P2:** Dawid-Skene's
+  independence assumption is NOT grossly violated (phi≪0.5), so either estimator is defensible — but
+  cleanlab's 48.7% flag is a high-recall *uncalibrated* signal (weight it, do NOT treat it as a
+  mislabel probability). alias-canonicalization remains preprocessing, NOT a voter.
+- ~~**P2 — `scripts/build_label_model.py`**~~ ✅ **DONE (2026-09-06).** Regularized Dawid-Skene EM over the 2
+  near-independent LFs → `governance/label_model_output.{json,md}` + `temp/golden_labels_probabilistic.jsonl`.
+  π=0.785 (P label correct); T-NLI θ=0.057/ψ=0.364 (precision), cleanlab θ=0.410/ψ=0.701 (recall). **135
+  high-suspicion golden FBs** (101 both-flag + 34 NLI-only) = the challenger/GOLD-A seed; mean P(mislabel) 0.236.
+- ~~**P3 — targeted generative challenger**~~ ✅ **PREP DONE (2026-09-06).** Residency fix (unload non-pinned
+  voter after each vote in `label_vote.py` — Claude finding) + `--high-suspicion` filter (135 FBs) + gemma-4-E4B
+  re-classification path validated live. **FULL 135-FB run PENDING** (OMLX up; BUG-224-monitored; ~135×3 voters).
+- **P4 — retrain ModernBERT on cleaned labels + temperature-scale + conformal/selective abstention.**
+- **P5 — freeze GOLD-A/B/CHALLENGE** (300–500 stratified, book/author-disjoint) as the true eval target.
+- **P6 — retire `label_vote.py`** to rare spot-checks.
 
 ---
 
 ## 4. Open items / notes
 
-- **D2582 TODO(1)** — upgrade missing-close-domain flag from "any-absent" to
-  bge-m3 embedding-similarity closeness (still open).
-- **D2582 TODO(3)** — third-voter policy: default Phi-4-mini is already wired in
-  config; confirm before the full vote run (DeepSeek rejected: CLOUD + DELEGATE-001).
-- **BUG-224 full verification** — wedge-recovery (D2581) still unverified under a
-  live sustained-load wedge; the full vote run is the natural test.
-- **Latent bug (from 2026-09-05 §5)** — kind-swap/demotion scripts clear
-  `discipline_raw` without resetting `taxonomy_match_method` → `emerging_unmapped`.
-  `scripts/resolve_data_absent_domains.py` deliberately does NOT touch either field.
-  Still worth a low-severity fix + regression check.
-- **`bug197_kind_swap.py` docstring/code mismatch** — docstring says `--apply`, but
-  the code applies by default (no `--apply` flag). Fix the CLI flag for safety.
+- **BUG-224** — OMLX wedge-recovery (D2581) still UNVERIFIED under live sustained load; P3 is the test.
+- **D2582 TODO(1)** — missing-close-domain flag still "any-absent" (embedding-similarity upgrade open).
+- **Latent (2026-09-05 §5)** — kind-swap/demotion clears `discipline_raw` without resetting
+  `taxonomy_match_method` → `emerging_unmapped`; low-severity fix + regression check pending.
+- **`bug197_kind_swap.py`** — docstring says `--apply` but code applies by default (no flag); fix CLI.
+- **Residency gap (Claude finding)** — sequential *calls* ≠ sequential *residency*: `label_vote.py`
+  never unloads voter N before N+1 loads. Wire `model_lazyload.py --unload` before any multi-model run.
+- **Depth training-set vote (D2577)** — separate, still-relevant use of the vote (81 universal + 713
+  cross-domain + controls → depth classifier). The same weak-supervision principle should eventually
+  apply, but no T-NLI/cleanlab detector exists for the depth axis yet.
 
 ---
 
-## 5. Uncommitted working tree
+## 5. Working tree
 
-**Modified (this session):** `DECISION-LOG.md`, `MASTER-TASK-REGISTER.md`,
-`config/alias_map.yaml`, `config/decisions.yaml`, `scripts/label_vote.py`.
-
-**Modified (prior session, still uncommitted):** `config/pipeline_config.yaml`,
-`governance/buglog.md`, `pipeline/omlx_call.py`, `pipeline/pipeline_paths.py`,
-`pipeline/schemas.py`, `scripts/train_discipline_classifier.py`.
-
-**Untracked (new):** `scripts/resolve_data_absent_domains.py` (this session);
-`config/golden/stage4_golden_mined.yaml`, `scripts/label_vote.py`,
-`scripts/mine_classifier_golden.py` (prior session).
+Committed at `b6e9030` (roundtable adjudication). This session's governance edits (D2585, D2582
+supersession, DECISION-LOG/MTR/handoff sync) are **uncommitted** — push after review.

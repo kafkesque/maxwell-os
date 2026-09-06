@@ -1,0 +1,29 @@
+{
+  "params": {
+    "pi_correct": 0.7845272816291199,
+    "theta": [
+      0.05709254949157298,
+      0.4101843705742649
+    ],
+    "psi": [
+      0.3641326465096081,
+      0.7005363240646362
+    ]
+  },
+  "population": {
+    "n": 7236,
+    "p_correct_prior": 0.8
+  },
+  "golden": {
+    "n": 1027,
+    "tiers": {
+      "cleanlab_only": 539,
+      "both": 101,
+      "neither": 353,
+      "nli_only": 34
+    },
+    "p_mislabel_mean": 0.2358,
+    "p_mislabel_median": 0.1879,
+    "n_high_suspicion": 135
+  }
+}

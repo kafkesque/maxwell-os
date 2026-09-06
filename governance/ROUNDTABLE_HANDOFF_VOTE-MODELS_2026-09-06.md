@@ -1,7 +1,7 @@
 # LLM ROUNDTABLE HANDOFF — Vote-Model Selection & Approach Adjudication (post-D2584)
 
 > **Prepared:** 2026-09-06 · **Repo:** `github.com/kafkesque/maxwell-os` · **Branch:** `main`
-> **Reference commit:** see `git log -1` after this handoff is pushed (the commit titled "D2584: data-absent disciplines + vote-model roundtable brief").
+> **Reference commit:** `436fabc1d41635a2d429dc10efdf487c38589c88` (`main`). Check out with `git checkout 436fabc` to reproduce the exact audited revision.
 > **Auditors:** Claude + GPT + one additional frontier model of your choice, as senior RAG/systems/ML engineers, working **independently**. Reconcile afterwards; do **not** let any auditor see another's answer first (shared-bias collusion — the same reason R5 demands generator ≠ verifier).
 > **Mode:** READ-ONLY forensic + market research. Do not mutate `knowledge pipeline/maxwell.db`, `config/*.yaml`, or any governance file. Write findings to `governance/ROUNDTABLE_FINDINGS_<model>_VOTE-MODELS_2026-09-06.md`.
 

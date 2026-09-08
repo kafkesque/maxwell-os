@@ -29,7 +29,7 @@ last_updated: "2026-08-13"
 content_types:
 
   principle:
-    description: "Conceptual knowledge — why/when something works. The Foundation Block."
+    description: "Conceptual knowledge — why/when something works. The Foundation Block. D2587: a SINGLE transferable prescriptive instruction (a normative heuristic stated in one sentence that passes the depth test: act as a filter across 3+ domains) is a PRINCIPLE, NOT a process_template."
     route_to: "foundation_block"
     output_file: "fbs.jsonl"
     extension_fields:
@@ -56,7 +56,8 @@ content_types:
       - { icon: "✅", section: "EVIDENCE",      binds: [evidence, source_books], note: "reusable · cross-domain · tested" }
 
   process_template:
-    description: "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe)."
+    description: "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe). D2587: requires a SEQUENCE of >=2 steps (phases + at least one gate or a done condition). A single step/instruction is NOT a template."
+    min_steps: 2
     route_to: "process_template"
     output_file: "process_templates.jsonl"
     extension_fields:
@@ -192,6 +193,31 @@ content_to_extraction_type:
   process_instance: descriptive_model    # case study → what happened (structure)
   growth_edge: empirical_pattern         # speculative insight → correlation w/o proven cause
   tool_instruction: normative_heuristic  # command → prescriptive "do X"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT-TYPE CLASSIFICATION RULES (D2587) — decision procedure for the
+# content_type axis. Enforces the three discriminators that the 2026-09-08
+# triage exposed as the root cause of the vacuous 100%-principle axis.
+# Order matters: answer the FIRST rule that matches, top-down.
+# ─────────────────────────────────────────────────────────────────────────────
+content_type_rules:
+  # Q1 (D2587): a process_template is a SEQUENCE, never a single step.
+  process_template_min_steps: 2
+  single_step_resolution:
+    # A single step/instruction is NOT a template. Resolve it:
+    tool_specific: tool_instruction       # software/tool command, syntax, feature
+    transferable_instruction: principle   # one-sentence heuristic passing the depth test (3+ domains)
+    method_bound_step: inline_step        # belongs inside a PT's steps; never a standalone object
+  # Q2 (D2587): a decision matrix is NEVER a standalone content type.
+  decision_matrix:
+    specific_grid: inline_gate_content    # lives in a PT's gate (steps/decision field)
+    reusable_methodology: principle_or_process_template  # by the depth test / sequence test
+  # Q3 (D2587): instruction-vs-principle is decided by the depth test, not by
+  # whether the text prescribes. A prescriptive single claim that transfers
+  # across 3+ domains is a PRINCIPLE (extraction_type stays normative_heuristic).
+  instruction_is_principle_when: "one-sentence prescriptive claim that acts as a filter across 3+ domains (depth test passes)"
+  instruction_is_process_template_when: "sequence of >=2 steps with a gate or done condition"
+  depth_test_domains_threshold: 3
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SHARED CORE BODY — the READABLE knowledge content an agent consumes.

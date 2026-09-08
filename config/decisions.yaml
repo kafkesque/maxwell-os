@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-06T09:16:00Z'
-total_decisions: 562
+last_sync: '2026-09-08T14:50:00Z'
+total_decisions: 563
 decisions:
 - id: D2586
   category: LABEL QUALITY / DATA
@@ -4771,11 +4771,22 @@ decisions:
   - tests/test_stage4_exhaustive.py
   - tests/test_stage4_preflight_smoke_stress.py
   created: '2026-09-02'
+
+- id: D2587
+  category: CONTENT-TYPE ONTOLOGY / DATA
+  state: ACTIVE
+  description: 'CONTENT-TYPE CLASSIFICATION RULES — 3 discriminators locked after 2026-09-08 triage. User clarified the object-type logic (affects ~10k extracted objects). (Q1) process_template is a SEQUENCE of >=2 steps (phases + a gate or done condition); a single step/instruction is NOT a template. (Q2) a decision matrix is NEVER a standalone content type — specific scoring grid = inline PT gate content; reusable matrix methodology = principle or PT by the depth/sequence test. (Q3) instruction-vs-principle is decided by the depth test, not by whether the text prescribes: a single transferable prescriptive claim that acts as a filter across 3+ domains is a PRINCIPLE (extraction_type stays normative_heuristic), NOT a process_template. Encoded in config/content_types.yaml content_type_rules + min_steps on process_template + description annotations. Consequence: prior triage artifacts (p5_ct758_flags.csv 51 PT flags, few-shot manifest 14 PT rows, sheet1 PT retypes 00548/00668/00971 + 00713) must be re-evaluated under Q1/Q3 — ~31/51 PT flags are single-step candidates that likely flip BACK to principle.'
+  champion: goose
+  target_files:
+  - config/content_types.yaml
+  - config/decisions.yaml
+  created: '2026-09-08'
+
 summary:
-  total: 562
+  total: 563
   proposed: 0
   draft: 1
-  active: 460
+  active: 461
   stale: 0
   superseded: 16
   archived: 8
@@ -4809,6 +4820,7 @@ summary:
     CFG: 5
     CLS: 16
     CLS / CFG: 1
+    CONTENT-TYPE ONTOLOGY / DATA: 1
     CORRECTNESS: 5
     DAT: 4
     DAT / OPS: 1

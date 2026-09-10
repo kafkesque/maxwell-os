@@ -155,6 +155,25 @@ label_vote:
     provider: omlx
   - model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     provider: omlx
+  # D2610 (2026-09-10) LABEL POLICY v2 - measured, not assumed:
+  #   DeepSeek-v4-pro vs Qwen3.8-27B agree on 678/982 = 69.0% of co-voted FBs;
+  #   Qwen3-Coder-30B matches that consensus on only 303/678 = 44.7% and, under
+  #   2-of-3, can only ever DECIDE the 304 rows where the pair disagrees (the
+  #   hardest 31%) - so 2/3 majorities were partly coin flips (BUG-236).
+  #   fail-closed-to-domain fabricated a label for 8.1% of FBs and the encoder
+  #   scores 0.300 accuracy on exactly those rows (BUG-235).
+  # Policy: reliable voters must be UNANIMOUS -> label + confidence high; anything
+  # else ABSTAINS (confidence low + needs_review) and is queued for adjudication.
+  # Advisory voters are recorded for the audit trail and never decide.
+  policy: reliable_pair_agreement
+  reliable_voters:
+  - deepseek-v4-pro
+  - Qwen3.8-27B-MLX-4bit
+  advisory_voters:
+  - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  abstain_on_disagreement: true
+  # legacy (D2577, superseded by the D2610 policy above): kept so old checkpoints
+  # and the label_vote.py challenger path still resolve their keys.
   majority_threshold: 2
   fail_closed_discipline: emerging
   fail_closed_depth: domain

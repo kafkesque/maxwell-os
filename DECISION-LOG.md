@@ -27,6 +27,7 @@
 | D2084 | DEFERRED | PI/TI/GE/PT written to jsonl in S4 but never committed to DB (→ BUG-170). Registry has full description. |
 | D2592 | DEFERRED | DSPy trainer ARCHIVED (BUG-168 wire-or-archive → ARCHIVE). Re-open gate (revised, D2594): Tier1 spotless + Tier2 statistically-clean + Tier3 ≥150 adjudicated (NOT all-1027). |
 
+| D2611 | PLANNED | **Depth serving architecture** - the generative (S4, prompt-versioned) call stays labeler of record, the encoder becomes a regenerable selective cache; RETIRE the D2577 0.85 gate (labels self-agree only 69%, 30% unanimous -> unreachable by construction) in favour of kappa vs the frozen consensus core + coverage/precision + the 133-row core slice as CI regression; serve depth_scope broad|narrow (0.690 vs 0.645) for anything gating retrieval. |
 ### Sparse decisions — thin/empty descriptions in registry (reference links to full text)
 
 `config/decisions.yaml` carries `description: "No description extracted"` for the DEFERRED INF/CLS batch (sync defect) and only a `summary` for D2164-D2166. Full decision text lives in the archived log — full path with line number:
@@ -77,9 +78,11 @@ The 475 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 
 ---
 
-## ⚪ DONE / CLOSED — bottom (83)
+| D2610 | **DEPTH LABEL POLICY v2 (2026-09-10) - reliable-pair agreement, abstain instead of fabricate.** Reliable voters (DeepSeek-v4-pro + Qwen3.8-27B) must be unanimous; anything else ABSTAINS into governance/depth_review_queue.yaml; advisory voters recorded, never decisive; checkpoint upserted (BUG-234/235/236 resolved). Re-derived 996 FBs with no model calls -> 678 confirmed / 318 abstained. Controlled effect on the identical 133-row consensus slice: 0.4298 macro-F1 / 0.594 acc vs 0.4073 / 0.526 for the v1-labelled encoder, with 251 fewer train rows. Coverage cost 67%. |
 
-**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584, D2586, D2601, D2604, D2605, D2606, D2607, D2608, D2609
+## ⚪ DONE / CLOSED — bottom (84)
+
+**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584, D2586, D2601, D2604, D2605, D2606, D2607, D2608, D2609, D2610
 **SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430, D2582
 **ARCHIVED:** D2000, D2001, D2002, D2034, D2052, D2195, D2196, D2204
 **REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383

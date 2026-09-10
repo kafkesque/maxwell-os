@@ -1,0 +1,102 @@
+{
+  "question": "clean depth labels: does the label policy improve quality more than the model or the prompt?",
+  "date": "2026-09-10",
+  "policy_v2": {
+    "reliable_voters": [
+      "deepseek-v4-pro",
+      "Qwen3.8-27B-MLX-4bit"
+    ],
+    "advisory_voters": [
+      "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit"
+    ],
+    "rule": "reliable unanimity -> label; else abstain (needs_review)",
+    "rederived_no_api_calls": true,
+    "n_records": 996,
+    "n_confirmed": 678,
+    "n_abstained": 318,
+    "confirmed_dist": {
+      "domain": 330,
+      "cross-domain": 287,
+      "specialized": 45,
+      "universal": 16
+    },
+    "checkpoint_lines_before": 1780,
+    "checkpoint_lines_after": 996
+  },
+  "controlled_encoder_ab": {
+    "eval_slice": "governance/depth_v2_test.yaml == governance/depth_core_test.yaml (133 rows, identical ids AND labels under v1 and v2)",
+    "train_rows": {
+      "v1_3voter_labels": 796,
+      "v2_reliable_pair_labels": 545
+    },
+    "macro_f1": {
+      "v1": 0.4073,
+      "v2": 0.4298
+    },
+    "accuracy": {
+      "v1": 0.526,
+      "v2": 0.594
+    },
+    "selective_prediction_accuracy": {
+      "coverage_100pct": {
+        "v1": 0.526,
+        "v2": 0.594
+      },
+      "coverage_50pct": {
+        "v1": 0.621,
+        "v2": 0.712
+      },
+      "coverage_30pct": {
+        "v1": 0.725,
+        "v2": 0.725
+      }
+    },
+    "note": "macro-F1 is dragged by the 3-row universal class (F1 0.0 in both arms); accuracy is the more informative delta here."
+  },
+  "path_ab_200_rows": {
+    "gold": "D2577 3-voter clean labels (200 held-out FBs)",
+    "encoder_cleanC": {
+      "macro_f1": 0.479,
+      "acc": 0.53,
+      "s_per_fb": 0.0006
+    },
+    "gptoss_zero_shot": {
+      "macro_f1": 0.4433,
+      "acc": 0.58,
+      "s_per_fb": 2.15
+    },
+    "gptoss_fewshot_3_per_class": {
+      "macro_f1": 0.4571,
+      "acc": 0.55,
+      "s_per_fb": 3.02
+    },
+    "collapse_2way_acc": {
+      "encoder": 0.645,
+      "gptoss_zero_shot": 0.69,
+      "gptoss_fewshot": 0.66
+    }
+  },
+  "label_ceiling": {
+    "unanimous_3of3": "303/996 (30.4%)",
+    "majority_2of3": "612/996 (61.4%)",
+    "no_majority": "81/996 (8.1%)",
+    "reliable_pair_agreement": "678/982 (69.0%)",
+    "advisory_match_vs_consensus": "303/678 (44.7%)",
+    "endemic_boundaries": {
+      "cross_domain_vs_domain": "174/304 pair disagreements (57%)",
+      "domain_vs_specialized": 75,
+      "universal_vs_cross_domain": 42
+    },
+    "encoder_kappa_4way": 0.224
+  },
+  "production_state": {
+    "fbs_rows": 7995,
+    "audited_rows": 996,
+    "db_depth_equals_silver": "996/996 (100%)",
+    "db_depth_matches_vote": "458/996 (46.0%)",
+    "gen_model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit"
+  },
+  "schema_version": "3.0",
+  "pipeline_commit": "v3.0-D2485",
+  "created": "2026-09-10T14:38:15Z"
+}

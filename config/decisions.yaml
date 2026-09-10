@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-10T09:20:00Z'
-total_decisions: 585
+last_sync: '2026-09-10T14:38:15Z'
+total_decisions: 587
 decisions:
 - id: D2586
   category: LABEL QUALITY / DATA
@@ -6967,6 +6967,20 @@ decisions:
   - governance/buglog.md
   created: '2026-09-09'
 
+- id: D2610
+  category: LABEL QUALITY / DATA
+  state: RESOLVED
+  description: 'DEPTH LABEL POLICY v2 - reliable-pair agreement + abstain-instead-of-fabricate (supersedes the D2577 2-of-3-majority + fail-closed-to-domain rule). MEASURED BASIS (2026-09-10): DeepSeek-v4-pro and Qwen3.8-27B agree on 678/982 = 69.0% of co-voted FBs; Qwen3-Coder-30B matches that consensus on only 303/678 = 44.7% and, under 2-of-3, can never overturn the pair - it only DECIDES the 304 rows where the pair disagrees (the hardest 31%), so 612/996 2-of-3 majorities were partly coin flips (BUG-236). fail-closed-to-domain fabricated a label for 81/996 = 8.1% of FBs and the encoder scores 0.300 accuracy on exactly those rows (BUG-235). POLICY: (1) the reliable voters must be UNANIMOUS -> label + depth_confidence high; (2) anything else ABSTAINS (depth empty, confidence low, needs_review) and is written to governance/depth_review_queue.yaml - a label is NEVER fabricated; (3) advisory voters are recorded for the audit trail but never decide; (4) the checkpoint is upserted, one record per fb_id (BUG-234: 1780 lines / 996 unique -> 996). IMPLEMENTATION: scripts/build_depth_vote_set.py (--rederive / --report / --compact); config label_vote {policy, reliable_voters, advisory_voters, abstain_on_disagreement}. RESULT (no model calls needed - re-derived from stored votes): 678 confirmed / 318 abstained; confirmed dist domain 330 / cross-domain 287 / specialized 45 / universal 16. EFFECT on the identical 133-row consensus slice (controlled): encoder trained on v2 labels 0.4298 macro-F1 / 0.594 accuracy vs v1-labelled 0.4073 / 0.526 = +0.0225 macro-F1 and +0.068 accuracy with 251 FEWER training rows; selective prediction 0.712 accuracy at 50% coverage, 0.725 at 30%. COST: coverage 67% - the 318 pair-disagreement rows need adjudication, not a coin flip.'
+  champion: goose
+  target_files: '[''scripts/build_depth_vote_set.py'', ''config/pipeline_config.yaml'', ''governance/depth_vote_checkpoint.jsonl'', ''governance/depth_vote_training_set.yaml'', ''governance/depth_review_queue.yaml'', ''governance/depth_v2_train.yaml'', ''governance/depth_v2_test.yaml'', ''governance/buglog.md'']'
+  created: '2026-09-10'
+- id: D2611
+  category: LABEL QUALITY / CLASSIFIER STRATEGY
+  state: PLANNED
+  description: 'DEPTH SERVING ARCHITECTURE - generative labeler of record + encoder as a regenerable selective cache; retire the 0.85 gate. EVIDENCE (2026-09-10 A/B on the SAME 200 held-out FBs, gold = the D2610 vote set): encoder (139M ModernBERT, clean labels) macro-F1 0.4790 / acc 0.530 / 0.6 ms per FB; the PRODUCTION S4 gpt-oss-20b batch depth call (v3_contrastive, batch 4) 0.4433 / 0.580 / 2.15 s; gpt-oss + 3 exemplars per class 0.4571 / 0.550 / 3.02 s - all three inside the same +-0.05 band, so no model swap buys quality. Collapse to 2-way scope (broad = universal + cross-domain, narrow = domain + specialized): gpt-oss 0.690 acc / 0.680 macro-F1 vs encoder 0.645 - the 4-way label costs 10-13 accuracy points. Production fbs.depth is unverified silver: 100% identical to the raw gpt-oss label and only 46.0% agreement with the vote (BUG-237). RULING: (1) depth stays a prompt-versioned S4 generative call as labeler of record - ontology churn invalidates weights, not prompts (relabelling 7995 FBs = ~1.2 h at batch 4, vs re-annotation + retrain + re-gate for a fixed head); (2) the encoder is a distilled, regenerable serving cache (3500x cheaper, offline, C1/C3) promoted to labeler of record only once the ontology freezes; (3) the D2577 0.85 macro-F1 gate is RETIRED - the labels agree with each other only 69% and just 30% are unanimous, so 0.85 is unreachable by construction; replace it with kappa vs the frozen consensus core + coverage-precision (scripts/depth_selective_prediction.py) + the 133-row core slice as a CI regression; (4) publish depth_scope broad|narrow for anything gating retrieval/difficulty and keep the 4-way depth as a stored, re-derivable annotation; (5) 200 rows with 13 universal / 9 specialized cannot support a 0.85-class decision - grow the reference to >=100 rows/class and report kappa, never bare accuracy on a 50%-prior class. VALIDATION: governance/depth_path_recommendation_2026-09-10.md, governance/depth_path_evidence_2026-09-10.json, governance/depth_selective_prediction.json. NEXT: adjudicate the 318 abstained FBs from the review queue and relabel the 7995 production rows under D2610.'
+  champion: goose
+  target_files: '[''pipeline/stage4_merge.py'', ''pipeline/stage4_merged_call.py'', ''config/pipeline_config.yaml'', ''scripts/depth_selective_prediction.py'', ''governance/depth_path_recommendation_2026-09-10.md'']'
+  created: '2026-09-10'
 summary:
   total: 585
   proposed: 0

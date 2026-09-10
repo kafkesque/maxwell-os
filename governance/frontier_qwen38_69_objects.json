@@ -1,0 +1,759 @@
+{
+  "S4-GOLD-MINED-00020": {
+    "name": "Metaphorical Conceptualization From Cultural Traces",
+    "definition": "Abstract concepts are formed through metaphorical mapping from concrete, culturally significant experiences or narratives. These metaphors persist in everyday language and symbolic systems, often retaining vestiges of their original cultural or historical context even when the source meaning is obscured.",
+    "final_depth": "cross-domain",
+    "final_discipline": "linguistics",
+    "final_domains": [
+      "semiotics & communication"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00022": {
+    "name": "Systems-wide Optimization",
+    "definition": "Optimization efforts should focus on enhancing the overall properties of a system rather than optimizing individual components or subsystems in isolation. The principle emphasizes that system-level outcomes like growth, stability, diversity, resilience, and sustainability are more important than local optimizations that may harm the whole.",
+    "final_depth": "cross-domain",
+    "final_discipline": "systems thinking",
+    "final_domains": [
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00051": {
+    "name": "Viral Network Effects Through Social Play",
+    "definition": "Games that require social interaction and multiplayer participation can achieve rapid growth through network effects, where user adoption increases exponentially as more people join the platform. The principle describes how social mechanics create self-reinforcing user acquisition loops.",
+    "final_depth": "domain",
+    "final_discipline": "game design",
+    "final_domains": [
+      "media & entertainment",
+      "business development"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00065": {
+    "name": "Black and White Color Usage in Design",
+    "definition": "A design principle where black and white are used as primary colors in combination with other vibrant colors to create fundamental communication through simplicity and stark contrast.",
+    "final_depth": "domain",
+    "final_discipline": "color theory",
+    "final_domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00085": {
+    "name": "Network Robustness Through Structural Diversity",
+    "definition": "Networks maintain functional integrity across structural variations because their essential properties emerge from the collective relationships rather than specific node arrangements. The same network can be represented in multiple ways without altering its core behavior or meaning.",
+    "final_depth": "domain",
+    "final_discipline": "social network analysis",
+    "final_domains": [
+      "data visualization",
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00087": {
+    "name": "Programmable Computational Memory",
+    "definition": "Computational systems can store and execute sequences of operations through programmable memory structures that separate data from instructions, enabling flexible automation of complex tasks. This principle describes the foundational architecture where stored programs allow machines to perform arbitrary computations by following sequences of encoded operations.",
+    "final_depth": "domain",
+    "final_discipline": "computational theory",
+    "final_domains": [
+      "engineering practice",
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00094": {
+    "name": "Multi-use Licensing Revenue Model",
+    "definition": "Illustrators and designers can generate additional revenue streams by licensing their work for multiple uses beyond the initial commission, including extended formats like billboards, web, and publications. This model enables creators to maximize the value of their intellectual property across various media channels.",
+    "final_depth": "domain",
+    "final_discipline": "strategic thinking",
+    "final_domains": [
+      "entrepreneurship",
+      "illustration"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00096": {
+    "name": "Visual Metaphor in Advertising (2)",
+    "definition": "Visual metaphors in advertising leverage iconic imagery and symbolic representation to communicate abstract concepts or brand attributes through direct visual analogy. These metaphors function by mapping familiar visual domains onto unfamiliar product or service domains, enabling rapid comprehension and emotional resonance.",
+    "final_depth": "domain",
+    "final_discipline": "cognitive science",
+    "final_domains": [
+      "brand identity",
+      "marketing & communications",
+      "editorial & advertising",
+      "semiotics & communication"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00097": {
+    "name": "Divine Proportion System",
+    "definition": "The divine proportion (φ ≈ 1.618) is a mathematical relationship where the ratio of the whole to the larger segment equals the ratio of the larger segment to the smaller segment. This proportion creates a harmonious geometric relationship that appears in both natural and designed systems.",
+    "final_depth": "universal",
+    "final_discipline": "computational geometry",
+    "final_domains": [
+      "graphic design",
+      "product design",
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00139": {
+    "name": "Genetic Code Semiosis",
+    "definition": "The genetic code represents a form of semiotic process that operates at the biochemical level, where nucleotide sequences encode amino acid sequences through a system of signs and meanings that function analogously to linguistic communication. This process constitutes a shift from organism-to-organism communication (exosemiosis) to intracellular communication (endosemiosis).",
+    "final_depth": "cross-domain",
+    "final_discipline": "semiotics",
+    "final_domains": [
+      "science & research",
+      "semiotics & communication"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00145": {
+    "name": "Llm Data Privacy and Safety Guidelines",
+    "definition": "A set of practical recommendations for safely using LLMs with sensitive data, emphasizing the importance of understanding privacy policies and seeking assistance when encountering confusion.",
+    "final_depth": "domain",
+    "final_discipline": "privacy & surveillance",
+    "final_domains": [
+      "ai & agents",
+      "legal & public policy"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00148": {
+    "name": "Sensor-driven Decision Making",
+    "definition": "Systems that collect environmental data through multiple sensory inputs and process this information to make real-time decisions. The principle describes a mechanism where sensory data is gathered, interpreted, and used to trigger automated responses or actions.",
+    "final_depth": "domain",
+    "final_discipline": "robotics",
+    "final_domains": [
+      "ai & agents",
+      "engineering & infrastructure"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00161": {
+    "name": "Investor Classification and Regulatory Framework",
+    "definition": "Investors are classified into distinct categories based on their relationship with the company and regulatory requirements, with each category subject to different levels of disclosure, restriction, and legal protection. The framework distinguishes between institutional investors, retail investors, and general public users, each with unique rights and obligations under securities law.",
+    "final_depth": "domain",
+    "final_discipline": "law",
+    "final_domains": [
+      "legal & public policy",
+      "finance & investment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00168": {
+    "name": "Color Management in Graphic Design",
+    "definition": "A method for using color as a primary visual element to create contrast, symbolize ideas, and influence audience response through psychological and cultural understanding.",
+    "final_depth": "domain",
+    "final_discipline": "color theory",
+    "final_domains": [
+      "graphic design",
+      "editorial & advertising",
+      "brand identity"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00173": {
+    "name": "Visual Information Architecture",
+    "definition": "Effective data visualization requires organizing information into clear, hierarchical structures that guide viewers through a logical flow from raw data to meaningful insights. The principle describes how visual design must balance complexity management with accessibility to ensure non-specialist audiences can understand and engage with data.",
+    "final_depth": "domain",
+    "final_discipline": "information science",
+    "final_domains": [
+      "data visualization",
+      "information architecture",
+      "graphic design"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00177": {
+    "name": "Basic Authentication Credential Format",
+    "definition": "User credentials in basic authentication are transmitted as a base64-encoded string containing a username and password separated by a single colon character. This format is standardized for HTTP authentication and is processed by the client and server using base64 decoding and colon splitting.",
+    "final_depth": "domain",
+    "final_discipline": "information security",
+    "final_domains": [
+      "engineering practice",
+      "web & ui"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00184": {
+    "name": "Sound-to-visual Design Mapping Principles",
+    "definition": "A conceptual framework for translating auditory properties into visual design elements, where rhythmic patterns map to horizontal positioning, pitch to vertical positioning, tempo to frequency/repetition, and volume/dynamics to scale.",
+    "final_depth": "domain",
+    "final_discipline": "motion & time",
+    "final_domains": [
+      "creative technology",
+      "motion design",
+      "performing arts"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00188": {
+    "name": "Schematic Meaning in Linguistic Expression",
+    "definition": "Linguistic expressions derive meaning from abstract, recurring conceptual structures called schemas that map physical or conceptual relationships onto language. These schemas provide the foundational meaning for words and phrases, enabling semantic interpretation through structural mapping rather than direct reference.",
+    "final_depth": "cross-domain",
+    "final_discipline": "linguistics",
+    "final_domains": [
+      "semiotics & communication"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00232": {
+    "name": "Consistent Prompt Engineering",
+    "definition": "Effective prompt engineering requires maintaining consistent structure, tone, and information across prompts to ensure reliable outputs and facilitate integration with automated systems. The principle emphasizes that variability in prompts leads to unpredictable results that complicate quality control and system integration.",
+    "final_depth": "specialized",
+    "final_discipline": "generative ai",
+    "final_domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00237": {
+    "name": "Two-mode Network Visualization",
+    "definition": "A two-mode network visualization represents relationships between two distinct types of entities (e.g., people and events) using different node shapes and layout algorithms that emphasize connections based on shared attributes. This approach reveals structural patterns and clustering within complex relational data.",
+    "final_depth": "domain",
+    "final_discipline": "social network analysis",
+    "final_domains": [
+      "data visualization",
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00253": {
+    "name": "Intense Creative Isolation",
+    "definition": "Extreme creative environments that isolate participants from external distractions and social support structures can produce breakthrough artistic output by forcing deep focus and internal competition. The principle describes a method of artistic development that uses physical and psychological separation to eliminate competing priorities and amplify creative drive.",
+    "final_depth": "domain",
+    "final_discipline": "creative process",
+    "final_domains": [
+      "arts & culture"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00263": {
+    "name": "Distributed Coordination Without Central Control",
+    "definition": "Systems can achieve coordinated behavior and formation maintenance through local interactions and self-correction mechanisms, without requiring central command or global coordination. The principle describes how decentralized agents can synchronize their actions based on local information and neighbor states.",
+    "final_depth": "cross-domain",
+    "final_discipline": "complex adaptive systems",
+    "final_domains": [
+      "systems & frameworks",
+      "ai & agents"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00313": {
+    "name": "Voronoi Diagrams in Ecological Space",
+    "definition": "Voronoi diagrams provide a geometric method for partitioning space around ecological entities, where each region represents the territory owned by a particular organism based on its spatial distribution.",
+    "final_depth": "domain",
+    "final_discipline": "computational geometry",
+    "final_domains": [
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00316": {
+    "name": "Computational Automaton Stability Principle",
+    "definition": "A computational system requires a balanced regime of neither too chaotic nor too ordered behavior to produce reliable answers, with stable patterns emerging from initial conditions that have more ones than zeros.",
+    "final_depth": "domain",
+    "final_discipline": "computational theory",
+    "final_domains": [
+      "code & computation",
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00323": {
+    "name": "Data Visualization As Narrative Tool",
+    "definition": "Data visualization serves as a powerful narrative device that transforms numerical information into compelling stories capable of informing, persuading, and emotionally engaging audiences. The principle describes how visual representations can effectively communicate complex trends, patterns, and relationships in ways that resonate with viewers beyond simple data presentation.",
+    "final_depth": "domain",
+    "final_discipline": "information science",
+    "final_domains": [
+      "data visualization",
+      "marketing & communications",
+      "editorial & advertising"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00334": {
+    "name": "Equity Capital Source Diversity",
+    "definition": "Equity capital for ventures comes from multiple distinct sources with different characteristics, investment criteria, and operational structures. These sources include business angels, venture capital firms, and angel funds, each serving different stages and needs of startup development.",
+    "final_depth": "domain",
+    "final_discipline": "finance",
+    "final_domains": [
+      "entrepreneurship",
+      "finance & investment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00337": {
+    "name": "Business Entity Accounting Framework",
+    "definition": "Business accounting systems require a standardized framework that treats all financial elements consistently, regardless of their source or nature. The framework enables meaningful aggregation and comparison of financial data across different entities and time periods.",
+    "final_depth": "domain",
+    "final_discipline": "finance",
+    "final_domains": [
+      "business operations",
+      "finance & investment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00385": {
+    "name": "Popular Language Standardization",
+    "definition": "Everyday language forms, including slang and pop culture expressions, undergo a process of social acceptance and semantic shift that transforms them from niche or contextual speech into widely recognized and standardized linguistic elements. This process involves the gradual adoption of terms and phrases that originate in subcultural or marginal speech into mainstream communication.",
+    "final_depth": "domain",
+    "final_discipline": "linguistics",
+    "final_domains": [
+      "social sciences",
+      "media & entertainment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00386": {
+    "name": "Search Refinement Through Synonym Expansion",
+    "definition": "Expanding search queries to include synonyms and related terms increases the likelihood of retrieving relevant information by capturing alternative phrasings of the same concept. This approach helps overcome the limitations of keyword-based search by broadening the scope of results while maintaining semantic relevance.",
+    "final_depth": "domain",
+    "final_discipline": "information retrieval",
+    "final_domains": [
+      "research & methodology",
+      "personal productivity"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00418": {
+    "name": "Prompt Response Iteration Framework",
+    "definition": "A systematic approach to generating and organizing multiple prompt variants and their model responses in a structured format for analysis and comparison. The framework enables rapid experimentation and evaluation of different prompt designs by capturing each variant's output in a tabular format.",
+    "final_depth": "specialized",
+    "final_discipline": "",
+    "final_domains": [
+      "research & methodology",
+      "ai & agents"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00422": {
+    "name": "Multimodal Conceptual Representation",
+    "definition": "Visual and linguistic semiotic systems can independently represent conceptual structures while maintaining structural correspondence, enabling each modality to supplement and reinforce the other in composite texts. This dual representation allows for the expression of complex ideas through complementary semantic channels.",
+    "final_depth": "domain",
+    "final_discipline": "semiotics",
+    "final_domains": [
+      "semiotics & communication",
+      "data visualization"
+    ],
+    "confidence": "medium"
+  },
+  "S4-GOLD-MINED-00454": {
+    "name": "Geometric Proof Synthesis",
+    "definition": "Multiple geometric proofs of the same theorem or principle can be synthesized into a unified framework that reveals deeper structural relationships. This synthesis combines different approaches—such as lever-based mechanics, calculus-based integration, and classical Euclidean methods—into a coherent understanding that transcends individual proof techniques.",
+    "final_depth": "cross-domain",
+    "final_discipline": "computational geometry",
+    "final_domains": [
+      "education",
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00461": {
+    "name": "Spectrum-based Navigation Posture",
+    "definition": "Websites and web applications exist on a spectrum of navigation postures, ranging from highly structured and rigid to loosely organized and exploratory, with each type requiring different design approaches and user expectations. This classification system recognizes that navigation design is not binary but exists as a continuous spectrum of organizational approaches.",
+    "final_depth": "domain",
+    "final_discipline": "human-computer interaction",
+    "final_domains": [
+      "user experience",
+      "web & ui",
+      "information architecture"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00477": {
+    "name": "Type Design Evolution Through Technological Shift",
+    "definition": "Type design adapts systematically to changes in production technology, with each technological shift introducing new constraints and possibilities that reshape letterform structure and spacing. The evolution reflects a continuous feedback loop between technical capability and typographic form.",
+    "final_depth": "domain",
+    "final_discipline": "typography",
+    "final_domains": [
+      "graphic design"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00495": {
+    "name": "Light-induced Melatonin Suppression",
+    "definition": "Exposure to specific wavelengths of light, particularly blue light, can suppress nocturnal melatonin production in humans, with effects measurable through physiological responses. This suppression is a key mechanism in circadian regulation and can be quantified using standardized experimental protocols.",
+    "final_depth": "domain",
+    "final_discipline": "neuroscience",
+    "final_domains": [
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00509": {
+    "name": "Physiological Feedback in Therapeutic Contexts",
+    "definition": "Therapeutic interventions can be informed by real-time physiological monitoring to understand emotional and psychological states during treatment. This approach allows for direct observation of how mental processes manifest in bodily responses.",
+    "final_depth": "cross-domain",
+    "final_discipline": "health & medicine",
+    "final_domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00516": {
+    "name": "Serotonin Pump Inhibition Mechanism",
+    "definition": "Antidepressant medications work by blocking serotonin reuptake pumps (transporters) that remove serotonin from the synaptic cleft, thereby increasing serotonin availability in the brain. This mechanism is central to the therapeutic action of most modern antidepressants, though the specific pump targets and side effect profiles vary across drug classes.",
+    "final_depth": "domain",
+    "final_discipline": "health & medicine",
+    "final_domains": [
+      "science & research",
+      "health & wellness"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00531": {
+    "name": "Design Process Iteration and Constraint Refinement",
+    "definition": "Design processes are iterative cycles that refine constraints and evolve from initial definition through creative exploration to final translation, with each phase building on previous insights and adjustments. The process includes structured steps for understanding, defining, and translating design problems while maintaining flexibility to address gaps and uncertainties.",
+    "final_depth": "domain",
+    "final_discipline": "creative process",
+    "final_domains": [
+      "design strategy",
+      "product design"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00536": {
+    "name": "Intellectual Property Protection and Enforcement",
+    "definition": "Legal mechanisms such as patents and trademarks provide formal protection for intellectual assets, enabling creators to control commercial use and prevent unauthorized imitation. These protections are enforced through public registries and legal action, creating a framework for managing competitive and reputational risks.",
+    "final_depth": "domain",
+    "final_discipline": "law",
+    "final_domains": [
+      "legal & public policy",
+      "brand identity"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00547": {
+    "name": "Targeted Osint Platform Enumeration",
+    "definition": "OSINT investigators systematically identify and enumerate alternative platforms where a target may maintain presence or activity, particularly when primary platforms show signs of restriction or limitation. This involves cross-referencing account names, content, and metadata across multiple social or public platforms to build a more complete profile.",
+    "final_depth": "domain",
+    "final_discipline": "privacy & surveillance",
+    "final_domains": [
+      "social sciences",
+      "research & methodology"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00558": {
+    "name": "Pseudo-event Text-in-the-making",
+    "definition": "Media texts that are constructed as ongoing, unscripted narratives create a 'text-in-the-making' that blurs the line between reality and fiction, generating pseudo-events for audience consumption. These texts function as both documentary and drama, reflecting real lives while simultaneously shaping them through their very production.",
+    "final_depth": "domain",
+    "final_discipline": "media studies",
+    "final_domains": [
+      "media & entertainment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00562": {
+    "name": "User-centric Outcome Mapping",
+    "definition": "Effective product design requires identifying and prioritizing the primary outcomes users seek, then structuring the user journey to directly support those outcomes rather than following generic design patterns or internal process incentives. This principle emphasizes aligning product features with user intent over organizational metrics or copycat design approaches.",
+    "final_depth": "domain",
+    "final_discipline": "human-computer interaction",
+    "final_domains": [
+      "digital product",
+      "user experience",
+      "project management"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00567": {
+    "name": "Fragility of Corporate Employment",
+    "definition": "Corporate employment structures create systemic fragility by aligning manager incentives with volatile outcomes while exposing workers to instability, low wages, and reduced benefits. This arrangement benefits managers through option-like compensation but leaves employees vulnerable to economic shocks and precarious conditions.",
+    "final_depth": "domain",
+    "final_discipline": "economics",
+    "final_domains": [
+      "business operations",
+      "organizational behavior"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00584": {
+    "name": "Vector-based Semantic Retrieval",
+    "definition": "Semantic retrieval systems convert textual content into dense vector embeddings and use distance metrics to find semantically similar documents. These systems rely on vector databases to perform similarity searches across large collections of embeddings.",
+    "final_depth": "domain",
+    "final_discipline": "information retrieval",
+    "final_domains": [
+      "engineering practice",
+      "ai & agents"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00586": {
+    "name": "Scale-driven Technological Evolution",
+    "definition": "Technological systems evolve through scaling operations that amplify and accelerate their dynamic properties, creating emergent behaviors that transcend their original design intentions. This evolution occurs when systems operate at sufficient scale to generate feedback loops and adaptation mechanisms similar to natural evolutionary processes.",
+    "final_depth": "cross-domain",
+    "final_discipline": "complex adaptive systems",
+    "final_domains": [
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00590": {
+    "name": "Attention Economy Value Proposition",
+    "definition": "The fundamental value of a media or information product is not its content or service, but the attention of its audience, which can be monetized through advertising. This creates a competitive dynamic where the primary goal is audience capture and retention rather than content quality or informational value.",
+    "final_depth": "domain",
+    "final_discipline": "economics",
+    "final_domains": [
+      "media & entertainment",
+      "marketing & communications"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00594": {
+    "name": "Optical Illusions in Design",
+    "definition": "Design techniques that use visual deception to create hyper-realistic imagery and capture human attention through the psychological gap between seeing and believing.",
+    "final_depth": "domain",
+    "final_discipline": "visual perception",
+    "final_domains": [
+      "graphic design",
+      "media & entertainment",
+      "editorial & advertising"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00601": {
+    "name": "Mindset Correction in Casting",
+    "definition": "A casting director can successfully realign a performer's mindset to match the role's demands by addressing emotional or psychological barriers that prevent authentic character embodiment. The principle describes how a director's intervention can shift a performer's internal state to align with the character's required intensity and commitment.",
+    "final_depth": "domain",
+    "final_discipline": "performing arts",
+    "final_domains": [
+      "arts & culture"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00613": {
+    "name": "Design Psychology Through Visual Analogy and Aesthetic Flow",
+    "definition": "A design approach that uses visual analogies and controlled aesthetic flow to create deeper conceptual connections through micro associations.",
+    "final_depth": "domain",
+    "final_discipline": "design psychology",
+    "final_domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00629": {
+    "name": "Inverse Square Law of Light Intensity",
+    "definition": "The intensity of light decreases proportionally to the square of the distance from the source. This relationship governs how light behaves as it travels through space and affects both photographic measurements and visual rendering in animation.",
+    "final_depth": "universal",
+    "final_discipline": "computational physics & simulation",
+    "final_domains": [
+      "computational science & physics",
+      "motion design"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00641": {
+    "name": "Unit Mapping in Simulation",
+    "definition": "In simulation environments, physical properties like mass must be mapped to visual or computational units when direct measurement is not available. This mapping creates a conceptual bridge between real-world quantities and abstract computational representations.",
+    "final_depth": "domain",
+    "final_discipline": "computational physics & simulation",
+    "final_domains": [
+      "computational science & physics",
+      "code & computation"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00642": {
+    "name": "Genetic Variability in Longevity",
+    "definition": "Longevity outcomes are not determined by a single genetic pathway but emerge from multiple possible genetic configurations, with some variants offering protection while others increase risk. The principle reflects that genetic diversity in aging mechanisms allows for varied but equally viable routes to extreme old age.",
+    "final_depth": "domain",
+    "final_discipline": "evolutionary biology",
+    "final_domains": [
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00650": {
+    "name": "Metafont Design Evolution",
+    "definition": "A typeface design process that begins with a foundational form and evolves through iterative refinement, digital adaptation, and extended family development while maintaining core legibility and functional characteristics. The principle describes how a typeface can be systematically reimagined and expanded across multiple platforms and formats.",
+    "final_depth": "domain",
+    "final_discipline": "typography",
+    "final_domains": [
+      "graphic design",
+      "code & computation"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00686": {
+    "name": "Data Quality and Retrieval Precision",
+    "definition": "The accuracy and relevance of retrieved information depends on both the quality of input data and the precision of retrieval mechanisms. Poor data quality or outdated information can lead to incorrect conclusions or suboptimal decision-making, while effective retrieval systems must balance query construction, filtering, and relevance scoring to ensure meaningful results.",
+    "final_depth": "domain",
+    "final_discipline": "information retrieval",
+    "final_domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00714": {
+    "name": "Generative Systems Creative Expression",
+    "definition": "Machine learning systems can generate novel creative outputs such as artwork, text, music, and strategies by learning patterns from training data and synthesizing new content according to those learned structures. This capability represents a shift in how creative expression is produced, extending beyond human intuition to include algorithmic generation.",
+    "final_depth": "cross-domain",
+    "final_discipline": "generative ai",
+    "final_domains": [
+      "computational art",
+      "code & computation"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00716": {
+    "name": "Financial Autonomy Through Conscious Management",
+    "definition": "True financial autonomy requires deliberate tracking, conscious investment of resources, and alignment of spending with long-term goals rather than reactive management of immediate needs. The principle emphasizes that meaningful financial security comes from understanding and directing money flow, not from accumulating wealth without purpose.",
+    "final_depth": "domain",
+    "final_discipline": "finance",
+    "final_domains": [
+      "finance & investment"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00738": {
+    "name": "Difference Between Numerical Analysis and Filter Theory Approaches",
+    "definition": "A conceptual distinction between numerical methods that approximate functions using polynomials versus filter theory that uses frequency-based approaches for solving differential equations.",
+    "final_depth": "domain",
+    "final_discipline": "computational physics & simulation",
+    "final_domains": [
+      "computational science & physics",
+      "engineering & infrastructure"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00835": {
+    "name": "Ai-enhanced Medical Diagnostics",
+    "definition": "AI systems trained on large datasets of medical images can detect subtle pathological signs with higher accuracy and speed than human practitioners, enabling earlier diagnosis and treatment of diseases like breast cancer and brain cancer. The principle describes a technological shift where machine learning algorithms outperform traditional human expertise in specific diagnostic tasks.",
+    "final_depth": "domain",
+    "final_discipline": "health & medicine",
+    "final_domains": [
+      "ai & agents",
+      "health & wellness"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00852": {
+    "name": "Nutritional and Physiological Interdependence",
+    "definition": "Nutritional and physiological systems are deeply interconnected, such that deficiencies or disruptions in one domain can cascade into broader health consequences across multiple bodily functions. The body's systems are not isolated; instead, they rely on each other for optimal function and resilience.",
+    "final_depth": "domain",
+    "final_discipline": "health & medicine",
+    "final_domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00875": {
+    "name": "Systemic Environmental Probe",
+    "definition": "Organisms or systems learn system characteristics by actively exploring their environment to identify safe and unsafe operational zones. This behavior emerges from self-interested adaptation rather than formal instruction.",
+    "final_depth": "domain",
+    "final_discipline": "ecology",
+    "final_domains": [
+      "systems & frameworks",
+      "science & research"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00882": {
+    "name": "Digital Identity As Infrastructure",
+    "definition": "Digital identity systems function as foundational infrastructure that enables new forms of value creation, governance, and control over personal data. These systems are evolving from liability-bearing collections of information into mechanisms that can serve as assets and governance tools.",
+    "final_depth": "cross-domain",
+    "final_discipline": "privacy & surveillance",
+    "final_domains": [
+      "systems & frameworks",
+      "legal & public policy"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00883": {
+    "name": "Type Design Aesthetics and Reception",
+    "definition": "The reception and evaluation of type design is influenced by both aesthetic standards and cultural context, with designers often facing criticism for perceived lack of refinement or deviation from established norms. The principle reflects how type design is judged not only on technical execution but also on alignment with prevailing aesthetic expectations.",
+    "final_depth": "domain",
+    "final_discipline": "typography",
+    "final_domains": [
+      "graphic design"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00896": {
+    "name": "Idea Virus Spread Through Social Networks",
+    "definition": "Ideas or products can spread rapidly through populations via social networks, behaving like viral infections where each adopter becomes a vector for further propagation. The principle describes how successful growth occurs when the product itself becomes a vehicle for amplification and when the target audience is reached through messengers or influencers who help propagate the idea.",
+    "final_depth": "domain",
+    "final_discipline": "social network analysis",
+    "final_domains": [
+      "marketing & communications",
+      "business development"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00900": {
+    "name": "Musical Textual Organization",
+    "definition": "Musical works are constructed from basic acoustic units called tones, which are organized into melodic and harmonic structures according to rhythmic patterns. These compositions are created through a process of combining individual tones into larger musical texts, with composers serving as the primary creators of these organized sound structures.",
+    "final_depth": "domain",
+    "final_discipline": "performing arts",
+    "final_domains": [
+      "arts & culture"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00911": {
+    "name": "Privacy-aware Recommendation Systems",
+    "definition": "Recommendation systems can be designed to balance data utility with individual privacy by integrating differential privacy techniques and contextual awareness. These systems process aggregate data while preserving individual anonymity and mitigating risks of re-identification.",
+    "final_depth": "domain",
+    "final_discipline": "privacy & surveillance",
+    "final_domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00922": {
+    "name": "Iterative Design Refinement",
+    "definition": "Design processes improve through repeated cycles of experimentation, feedback, and adjustment. Each iteration builds on previous insights to refine solutions and address emergent challenges.",
+    "final_depth": "domain",
+    "final_discipline": "creative process",
+    "final_domains": [
+      "design strategy",
+      "project management"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00934": {
+    "name": "Coordinate System Transformation",
+    "definition": "A coordinate system is defined by the arrangement and scaling of axes that map data points to geometric positions. Different axis arrangements enable specific types of visualizations and computational operations, with Cartesian and polar systems being fundamental examples.",
+    "final_depth": "domain",
+    "final_discipline": "computational geometry",
+    "final_domains": [
+      "data visualization",
+      "code & computation"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-00950": {
+    "name": "Church-turing Thesis, Public-processes Version",
+    "definition": "A principle stating that any method followed by a sentient being to sort numbers into two classes, which always yields a finite answer and can be communicated reliably through language, corresponds to some terminating FlooP program (general recursive function).",
+    "final_depth": "domain",
+    "final_discipline": "computational theory",
+    "final_domains": [
+      "code & computation",
+      "systems & frameworks"
+    ],
+    "confidence": "high"
+  },
+  "S4-GOLD-MINED-01013": {
+    "name": "Steady State Earth System",
+    "definition": "The Earth operates as a steady state system where the inflow of energy equals the outflow, and material imports from space equal exports, allowing for qualitative development but not aggregate quantitative growth.",
+    "final_depth": "domain",
+    "final_discipline": "ecology",
+    "final_domains": [
+      "systems & frameworks",
+      "science & research"
+    ],
+    "confidence": "high"
+  }
+}

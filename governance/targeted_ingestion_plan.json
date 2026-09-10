@@ -1,0 +1,158 @@
+{
+  "generated_from": {
+    "golden": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/config/golden/stage4_golden_mined.yaml",
+    "db": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
+    "min_golden_target": 10,
+    "min_convergent_target": 20
+  },
+  "n_starved": 18,
+  "n_critical": 9,
+  "n_high": 8,
+  "n_moderate": 1,
+  "entries": [
+    {
+      "discipline": "design psychology",
+      "golden_count": 4,
+      "convergent_count": 1,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 19,
+      "golden_shortfall": 6
+    },
+    {
+      "discipline": "ecology",
+      "golden_count": 4,
+      "convergent_count": 1,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 19,
+      "golden_shortfall": 6
+    },
+    {
+      "discipline": "game design",
+      "golden_count": 3,
+      "convergent_count": 2,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 18,
+      "golden_shortfall": 7
+    },
+    {
+      "discipline": "generative design",
+      "golden_count": 5,
+      "convergent_count": 2,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 18,
+      "golden_shortfall": 5
+    },
+    {
+      "discipline": "computational theory",
+      "golden_count": 6,
+      "convergent_count": 2,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 18,
+      "golden_shortfall": 4
+    },
+    {
+      "discipline": "robotics",
+      "golden_count": 4,
+      "convergent_count": 3,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 17,
+      "golden_shortfall": 6
+    },
+    {
+      "discipline": "computational physics & simulation",
+      "golden_count": 4,
+      "convergent_count": 3,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 17,
+      "golden_shortfall": 6
+    },
+    {
+      "discipline": "color theory",
+      "golden_count": 5,
+      "convergent_count": 3,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 17,
+      "golden_shortfall": 5
+    },
+    {
+      "discipline": "creative coding",
+      "golden_count": 5,
+      "convergent_count": 3,
+      "tier": "CRITICAL",
+      "convergent_shortfall": 17,
+      "golden_shortfall": 5
+    },
+    {
+      "discipline": "decision making",
+      "golden_count": 6,
+      "convergent_count": 4,
+      "tier": "HIGH",
+      "convergent_shortfall": 16,
+      "golden_shortfall": 4
+    },
+    {
+      "discipline": "privacy & surveillance",
+      "golden_count": 7,
+      "convergent_count": 5,
+      "tier": "HIGH",
+      "convergent_shortfall": 15,
+      "golden_shortfall": 3
+    },
+    {
+      "discipline": "generative ai",
+      "golden_count": 5,
+      "convergent_count": 6,
+      "tier": "HIGH",
+      "convergent_shortfall": 14,
+      "golden_shortfall": 5
+    },
+    {
+      "discipline": "social network analysis",
+      "golden_count": 6,
+      "convergent_count": 7,
+      "tier": "HIGH",
+      "convergent_shortfall": 13,
+      "golden_shortfall": 4
+    },
+    {
+      "discipline": "theoretical physics",
+      "golden_count": 6,
+      "convergent_count": 8,
+      "tier": "HIGH",
+      "convergent_shortfall": 12,
+      "golden_shortfall": 4
+    },
+    {
+      "discipline": "information retrieval",
+      "golden_count": 8,
+      "convergent_count": 8,
+      "tier": "HIGH",
+      "convergent_shortfall": 12,
+      "golden_shortfall": 2
+    },
+    {
+      "discipline": "interdisciplinary studies",
+      "golden_count": 9,
+      "convergent_count": 9,
+      "tier": "HIGH",
+      "convergent_shortfall": 11,
+      "golden_shortfall": 1
+    },
+    {
+      "discipline": "evolutionary biology",
+      "golden_count": 6,
+      "convergent_count": 10,
+      "tier": "HIGH",
+      "convergent_shortfall": 10,
+      "golden_shortfall": 4
+    },
+    {
+      "discipline": "information security",
+      "golden_count": 9,
+      "convergent_count": 11,
+      "tier": "MODERATE",
+      "convergent_shortfall": 9,
+      "golden_shortfall": 1
+    }
+  ]
+}

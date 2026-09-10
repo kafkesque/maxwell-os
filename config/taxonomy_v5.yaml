@@ -2048,6 +2048,81 @@ disciplines:
   - software engineering
   - artificial intelligence
   - computer networking
+# D2607 (B): 10 coarse classifier groups for the hierarchical discipline head.
+# Single source of truth — consumed by scripts/train_hierarchical_classifier.py
+# and pipeline/student_classifier.py (frozen into discipline_groups.json).
+discipline_groups:
+  design & visual arts:
+  - aesthetics
+  - color theory
+  - computer graphics
+  - creative coding
+  - creative process
+  - cultural design
+  - design psychology
+  - design thinking
+  - game design
+  - generative design
+  - motion & time
+  - performing arts
+  - typography
+  - visual perception
+  - visual semiotics
+  human & behavioral science:
+  - anthropology
+  - behavioral economics
+  - cognitive science
+  - cultural studies
+  - neuroscience
+  - psychology
+  - sociology
+  computing, ai & information:
+  - artificial intelligence
+  - generative ai
+  - human-computer interaction
+  - information retrieval
+  - information science
+  - information security
+  - machine learning
+  - privacy & surveillance
+  - software engineering
+  economics & business:
+  - decision making
+  - economics
+  - finance
+  - organizational theory
+  - political economy
+  - strategic thinking
+  communication & media:
+  - communication theory
+  - linguistics
+  - literary theory
+  - media studies
+  - semiotics
+  systems & operations:
+  - complex adaptive systems
+  - operations research
+  - research methodology
+  - systems engineering
+  - systems thinking
+  philosophy & law:
+  - law
+  - philosophy
+  - risk management
+  engineering, math & physics:
+  - computational geometry
+  - computational physics & simulation
+  - computational theory
+  - engineering
+  - robotics
+  - theoretical physics
+  life & health science:
+  - ecology
+  - evolutionary biology
+  - health & medicine
+  interdisciplinary:
+  - interdisciplinary studies
+  - social network analysis
 meta:
   displaced_canonicals:
   - social engineering

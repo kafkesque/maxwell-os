@@ -121,7 +121,7 @@ content_types:
       - { icon: "📤", section: "OUTPUT",             binds: [output] }
 
   growth_edge:
-    description: "Speculative/unresolved insight — idea inbox upstream of verified knowledge."
+    description: "Speculative/unresolved insight — idea inbox upstream of verified knowledge. POSITIVE ENTRY CRITERION (BUG-230): MUST articulate an OPEN TENSION or an UNVERIFIED CORRELATION — NOT a dump for failed depth-tests, and NOT a bare 'utilizable fact' (a bare fact/trend with no articulated tension → noise_drop)."
     route_to: "growth_edge"
     output_file: "growth_edges.jsonl"
     extension_fields:
@@ -218,6 +218,25 @@ content_type_rules:
   instruction_is_principle_when: "one-sentence prescriptive claim that acts as a filter across 3+ domains (depth test passes)"
   instruction_is_process_template_when: "sequence of >=2 steps with a gate or done condition"
   depth_test_domains_threshold: 3
+  # D2591 (2026-09-08): descriptive summaries + ambiguous objects are NOT roles.
+  descriptive_summary_resolution: noise_drop  # historical/descriptive summary with no prescriptive filter, no template, no named method-execution → DROP (a "fact", D2323 dropped it)
+  ambiguous_resolution: quarantine           # carries SOME value but no clean role (no steps / method / applicable mechanism / transferable principle) → HOLD for later identification
+  # D2596/BUG-230 (2026-09-09): growth_edge is NOT the catch-all for "utilizable facts".
+  growth_edge_entry_criterion: "MUST articulate an OPEN TENSION or UNVERIFIED CORRELATION; NOT a dump for failed depth-tests or bare utilizable facts (those → noise_drop)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DISPOSITIONS (D2591) — what to DO when an object has no clean role.
+# NOT content_types (the 5-role axis stays CLOSED — no 6th type). These are
+# OUTCOMES the classifier emits instead of force-fitting an ambiguous object:
+#   classified = the object has one of the 5 roles
+#   noise_drop = descriptive/historical summary or fact — no prescriptive filter,
+#                no template, no named method-execution, no transferable value
+#   quarantine = carries SOME value but no clean role — hold, do not force.
+# ─────────────────────────────────────────────────────────────────────────────
+dispositions:
+  classified: "object has a content_type (one of the 5 roles)"
+  noise_drop: "descriptive/historical summary or fact — no prescriptive filter, no template, no named method-execution, no transferable value → DROP"
+  quarantine: "carries SOME value but no clean role (ambiguous) → HOLD for later identification (does it carry steps? a method? an applicable mechanism? a transferable principle?)"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SHARED CORE BODY — the READABLE knowledge content an agent consumes.

@@ -80,6 +80,21 @@ def _content_type_of(rec: dict) -> str:
     return (rec.get("content_type") or "principle").strip() or "principle"
 
 
+def _check_d2587_rules(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
+    """D2587 Q1: process_template requires >= min_steps (config-driven, C12).
+
+    Previously the contract only enforced `steps` non-empty (REQUIRED_NONEMPTY_ARRAYS);
+    a single-step process_template passed clean. D2587 makes the floor explicit and
+    this check closes the gap so a single-step template is flagged, not silently accepted.
+    """
+    if ct != "process_template":
+        return
+    min_steps = int(onto.get("content_type_rules", {}).get("process_template_min_steps", 2))
+    steps = rec.get("steps")
+    if isinstance(steps, list) and len(steps) < min_steps:
+        issues.append(f"process_template steps={len(steps)} < min_steps={min_steps} (D2587 Q1)")
+
+
 # ── Auditors ────────────────────────────────────────────────────────────────
 # Array fields that MUST be non-empty for the content type to be meaningful
 # (the "segments" of the object). String fields may be legitimately empty when
@@ -118,6 +133,9 @@ def audit_s2(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
             issues.append(f"missing s2_body_field:{f}")
         elif f in REQUIRED_NONEMPTY_ARRAYS.get(ct, []) and not _nonempty(rec.get(f)):
             issues.append(f"empty array s2_body_field:{f}")
+
+    # D2587 Q1: process_template >= min_steps (config-driven)
+    _check_d2587_rules(rec, ct, onto, issues)
 
     # classification labels
     content_type = rec.get("content_type")
@@ -176,6 +194,8 @@ def audit_s4(rec: dict, ct: str, onto: dict, issues: list[str]) -> None:
                     issues.append(f"DEFERRED(sidecar-first) empty s2_body_field:{f}")
                 else:
                     issues.append(f"empty array s2_body_field:{f}")
+        # D2587 Q1: process_template >= min_steps (config-driven)
+        _check_d2587_rules(rec, ct, onto, issues)
         # BUG-170 deferred enrichment — note, don't fail
         for f in ("domains", "discipline", "depth", "evidence", "fb_version"):
             if f not in rec:

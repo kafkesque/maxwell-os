@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "decision": "D2605",
+    "title": "P5 final adjudication — A(content_type) + B(discipline) + C(domain)",
+    "date": "2026-09-09",
+    "arbiter": "human (barn)",
+    "note": "Final human ruling on the 69-FB P5 review queue. A = content_type 'not-a-principle' flags re-examined pragmatically; B = discipline FIX_LABEL; C = domain FIX_LABEL. Source: temp/ds124_user_decisions.json + temp/forensic_merged.json annotations + inline p5_review_pack.txt comments, reconciled against config/content_types.yaml (D2587) and config/taxonomy_v5.yaml (61/43). RESOLVED 2026-09-09: 00631 discipline = risk management (human re-decision; prior 'strategic thinking' domain conflation cleared). RESOLVED 2026-09-09: 00631 domains = [ai & agents] (human re-decision, discipline=risk management).",
+    "agreement": {
+      "A_content_type": "9 noise_drop + 4 principle + 1 process_template(kept) + 1 process_instance(kept) + 1 borderline-resolved(00650->process_template kept)",
+      "B_discipline": "12 FIX_LABEL, all canonical (00631 resolved -> risk management)",
+      "C_domain": "6 FIX_LABEL applied + 00631 resolved (discipline=risk management, domains=[ai & agents])"
+    }
+  },
+  "content_type": {
+    "S4-GOLD-MINED-00434": "noise_drop",
+    "S4-GOLD-MINED-00972": "noise_drop",
+    "S4-GOLD-MINED-00995": "noise_drop",
+    "S4-GOLD-MINED-00984": "noise_drop",
+    "S4-GOLD-MINED-00272": "noise_drop",
+    "S4-GOLD-MINED-00975": "noise_drop",
+    "S4-GOLD-MINED-00507": "noise_drop",
+    "S4-GOLD-MINED-00423": "principle",
+    "S4-GOLD-MINED-00790": "principle",
+    "S4-GOLD-MINED-00278": "principle",
+    "S4-GOLD-MINED-00606": "principle"
+  },
+  "discipline": {
+    "S4-GOLD-MINED-00063": "computer graphics",
+    "S4-GOLD-MINED-00228": "psychology",
+    "S4-GOLD-MINED-00239": "visual perception",
+    "S4-GOLD-MINED-00274": "cultural design",
+    "S4-GOLD-MINED-00587": "human-computer interaction",
+    "S4-GOLD-MINED-00734": "decision making",
+    "S4-GOLD-MINED-00862": "aesthetics",
+    "S4-GOLD-MINED-00864": "visual perception",
+    "S4-GOLD-MINED-00912": "systems thinking",
+    "S4-GOLD-MINED-00932": "information security",
+    "S4-GOLD-MINED-00955": "media studies",
+    "S4-GOLD-MINED-00631": "risk management"
+  },
+  "domains": {
+    "S4-GOLD-MINED-00037": [
+      "research & methodology"
+    ],
+    "S4-GOLD-MINED-00067": [
+      "design strategy",
+      "user experience"
+    ],
+    "S4-GOLD-MINED-00199": [
+      "research & methodology"
+    ],
+    "S4-GOLD-MINED-00671": [
+      "computational science & physics"
+    ],
+    "S4-GOLD-MINED-00703": [
+      "engineering & infrastructure",
+      "legal & public policy"
+    ],
+    "S4-GOLD-MINED-00895": [
+      "semiotics & communication"
+    ],
+    "S4-GOLD-MINED-00631": [
+      "ai & agents"
+    ]
+  },
+  "flagged": {}
+}

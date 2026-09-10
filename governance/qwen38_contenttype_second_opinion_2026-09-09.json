@@ -1,0 +1,50 @@
+{
+  "model": "Qwen3.8-27B-MLX-4bit (local OMLX, temp=0.0)",
+  "backend": "omlx",
+  "port": 11435,
+  "note": "R5 second-opinion SIGNAL, not proof. Qwen3.8 is Qwen-family; cross-family check was DeepSeek-v4-pro (D2596).",
+  "verdicts": [
+    {
+      "example_id": "S4-GOLD-MINED-00177",
+      "content_type": "tool_instruction",
+      "confidence": "high",
+      "human": "tool_instruction",
+      "deepseek": "noise_drop"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00547",
+      "content_type": "principle",
+      "confidence": "medium",
+      "human": "process_template",
+      "deepseek": "process_template"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00650",
+      "content_type": "principle",
+      "confidence": "medium",
+      "human": "process_template",
+      "deepseek": "process_template"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00934",
+      "content_type": "noise_drop",
+      "confidence": "high",
+      "human": "tool_instruction",
+      "deepseek": "noise_drop"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00668",
+      "content_type": "process_instance",
+      "confidence": "high",
+      "human": "process_instance",
+      "deepseek": null
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00006",
+      "content_type": "growth_edge",
+      "confidence": "high",
+      "human": "growth_edge",
+      "deepseek": null
+    }
+  ]
+}

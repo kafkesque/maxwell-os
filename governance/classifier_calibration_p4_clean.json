@@ -1,0 +1,28 @@
+{
+  "checkpoint": "knowledge pipeline/classifier_modernbert_p4_clean",
+  "golden": "config/golden/stage4_golden_mined.yaml",
+  "n_test": 206,
+  "n_calib": 103,
+  "n_eval": 103,
+  "temperature_T_star": 0.6,
+  "macro_f1_raw_T1": 0.2875,
+  "macro_f1_temp_scaled": 0.2875,
+  "delta_f1_temperature": 0.0,
+  "eval_accuracy_at_T_star": 0.3981,
+  "eval_ece_at_T_star": 0.144,
+  "selective_macro_f1_by_coverage": {
+    "1.0": 0.2875,
+    "0.95": 0.2933,
+    "0.9": 0.2968,
+    "0.8": 0.2845,
+    "0.7": 0.2424,
+    "0.6": 0.2364,
+    "0.5": 0.2391
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "q_hat": 0.9889,
+    "avg_set_size": 16.379,
+    "empirical_coverage": 0.8932
+  }
+}

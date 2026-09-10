@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""scripts/build_label_model.py — D2585 P2 (Step 3B) weak-supervision label model.
+"""scripts/build_label_model.py — D2585 P2/P4 weak-supervision label model.
 
-Combines the two near-independent labeling functions into a probabilistic
-mislabel score per FB, then ranks the golden training set by suspicion so the
-high-disagreement subset can feed the generative challenger (P3) and the human
-GOLD-A/B/C freeze (P5).
+Combines three labeling functions into a probabilistic mislabel score per FB,
+then ranks the golden training set by suspicion so the high-disagreement subset
+feeds the human GOLD-A/B/C freeze (P5) and the corrected training set (P4).
 
 Labeling functions (verified near-independent by scripts/lf_dependency_audit.py):
-  LF-1 T-NLI   — definition<->discipline contradiction (contra_dominant), high precision
-  LF-2 cleanlab — Confident Learning self-confidence flag, high recall (uncalibrated)
+  LF-1 T-NLI       — definition<->discipline contradiction (contra_dominant), high precision
+  LF-2 cleanlab    — Confident Learning self-confidence flag, high recall (uncalibrated)
+  LF-3 challenger  — 3-model generative challenger (P3): votes 1 where a 2/3
+                     majority DISAGREES with the teacher silver label, 0 where it
+                     AGREES, abstains on no-majority (fail-closed) FBs.
 
 Estimator: regularized Dawid-Skene EM over a binary latent (silver label
-CORRECT vs WRONG), anchored by a prior on the silver-label accuracy. Because only
-2 LFs are available the model is WEAKLY identified — a 3rd LF (the generative
-challenger, P3) is required for full identifiability; this script reports the
-2-LF estimate transparently and emits the challenger target set.
+CORRECT vs WRONG), anchored by a prior on the silver-label accuracy. With LF-3
+added the model is identified on the 135 challenger-voted golden FBs (was weakly
+identified with 2 LFs only).
 
 Read-only w.r.t. the DB. Writes governance/label_model_output.{json,md} and
 temp/golden_labels_probabilistic.jsonl.
@@ -41,6 +42,7 @@ _CLEANLAB_JSON = _ROOT / "governance" / "cleanlab_label_audit.json"
 _OUT_JSON = _ROOT / "governance" / "label_model_output.json"
 _OUT_MD = _ROOT / "governance" / "label_model_output.md"
 _OUT_JSONL = _ROOT / "temp" / "golden_labels_probabilistic.jsonl"
+_CHALLENGER_JSONL = _ROOT / "temp" / "label_vote_high_suspicion.jsonl"
 
 # C20: Dawid-Skene regularization constants.
 _PRIOR_CORRECT = 0.80   # prior P(silver label correct) — gpt-oss teacher accuracy
@@ -97,16 +99,49 @@ def _load_cleanlab(path: Path) -> tuple[set[str], set[str]]:
     return flagged, assessed
 
 
-def _build_votes(
-    fb_ids: list[str], nli: dict[str, dict], cleanlab_flags: set[str]
-) -> tuple[np.ndarray, np.ndarray]:
-    """Build the (n, 2) binary vote matrix + availability mask.
+def _load_challenger(path: Path) -> dict[str, dict]:
+    """Return example_id -> challenger vote record for the P3 high-suspicion run.
 
-    Column 0 = T-NLI contra_dominant, column 1 = cleanlab flagged. Missing NLI
+    The challenger record's fb_id IS the golden example id (label_vote.py keys
+    golden targets by example id). The LF-3 vote is derived from the consensus:
+      vote 1  = 2/3 challenger majority DISAGREES with the teacher silver label,
+      vote 0  = challenger majority AGREES with the teacher,
+      abstain = no 2/3 majority (fail-closed 'emerging') -> no LF signal.
+    """
+    out: dict[str, dict] = {}
+    raw_records: list[dict] = json.loads(path.read_text(encoding="utf-8"))
+    for r in raw_records:
+        cons = r.get("consensus") or {}
+        cons_disc = cons.get("discipline")
+        cur_disc = r.get("current_discipline")
+        if cons_disc is None or cons_disc == "emerging" or cons_disc == cur_disc:
+            vote: int | None = None if (cons_disc is None or cons_disc == "emerging") else 0
+            correction: str | None = None
+        else:
+            vote, correction = 1, cons_disc
+        out[r["fb_id"]] = {
+            "vote": vote,
+            "correction": correction,
+            "consensus_discipline": cons_disc,
+            "current_discipline": cur_disc,
+        }
+    return out
+
+
+def _build_votes(
+    fb_ids: list[str],
+    nli: dict[str, dict],
+    cleanlab_flags: set[str],
+    challenger: dict[str, dict],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Build the (n, 3) binary vote matrix + availability mask.
+
+    Column 0 = T-NLI contra_dominant, column 1 = cleanlab flagged,
+    column 2 = challenger disagreement (LF-3). Missing NLI / challenger-abstain
     is encoded as 0 and masked out of the EM (so it does not bias the estimate).
     """
-    votes = np.zeros((len(fb_ids), 2), dtype=np.float64)
-    avail = np.zeros((len(fb_ids), 2), dtype=np.float64)
+    votes = np.zeros((len(fb_ids), 3), dtype=np.float64)
+    avail = np.zeros((len(fb_ids), 3), dtype=np.float64)
     for i, fb_id in enumerate(fb_ids):
         rec = nli.get(fb_id)
         if rec is not None:
@@ -114,6 +149,10 @@ def _build_votes(
             avail[i, 0] = 1.0
         votes[i, 1] = 1.0 if fb_id in cleanlab_flags else 0.0
         avail[i, 1] = 1.0
+        ch = challenger.get(fb_id)
+        if ch is not None and ch["vote"] is not None:
+            votes[i, 2] = float(ch["vote"])
+            avail[i, 2] = 1.0
     return votes, avail
 
 
@@ -178,21 +217,32 @@ def main() -> int:
     golden = _load_golden(_GOLDEN_YAML)
     nli = _load_nli(_NLI_JSON)
     cleanlab_flags, cleanlab_assessed = _load_cleanlab(_CLEANLAB_JSON)
+    challenger_by_example = _load_challenger(_CHALLENGER_JSONL)
+    # LF-3 is keyed by golden EXAMPLE id (S4-GOLD-MINED-*); NLI/cleanlab and the
+    # DB operate on the 64-hex source fb_id. Align through the golden mapping so
+    # the vote matrices stay in one id space.
+    challenger: dict[str, dict] = {}
+    for g in golden:
+        ch = challenger_by_example.get(g["example_id"])
+        if ch is not None:
+            challenger[g["fb_id"]] = ch
 
     # 1) Estimate LF params on the FULL assessed population (more data = stable params).
     assessed_sorted = sorted(cleanlab_assessed)
-    pop_votes, pop_avail = _build_votes(assessed_sorted, nli, cleanlab_flags)
+    pop_votes, pop_avail = _build_votes(assessed_sorted, nli, cleanlab_flags, challenger)
     params, pop_p_wrong = _dawid_skene(pop_votes, pop_avail)
 
     # 2) Apply to the golden training set.
     golden_ids = [g["fb_id"] for g in golden]
-    gold_votes, gold_avail = _build_votes(golden_ids, nli, cleanlab_flags)
+    gold_votes, gold_avail = _build_votes(golden_ids, nli, cleanlab_flags, challenger)
     _, gold_p_wrong = _dawid_skene(gold_votes, gold_avail)
 
     rows: list[dict] = []
     for g, votes, avail, p_wrong in zip(golden, gold_votes, gold_avail, gold_p_wrong):
         nli_flag = int(votes[0])
         cl_flag = int(votes[1])
+        ch_flag = int(votes[2]) if avail[2] else None
+        ch = challenger_by_example.get(g["example_id"])
         rows.append({
             "fb_id": g["fb_id"],
             "example_id": g["example_id"],
@@ -201,10 +251,12 @@ def main() -> int:
             "silver_depth": g["silver_depth"],
             "is_backfill": g["is_backfill"],
             "p_mislabel": round(float(p_wrong), 4),
-            "lf_votes": {"t_nli": nli_flag, "cleanlab": cl_flag},
+            "lf_votes": {"t_nli": nli_flag, "cleanlab": cl_flag,
+                         "challenger": ch_flag},
             "nli_available": bool(avail[0]),
             "tier": _tier(nli_flag, cl_flag),
-            "source": "label_model_v1",
+            "challenger_correction": (ch or {}).get("correction"),
+            "source": "label_model_v2",
         })
 
     # Summary: how many golden FBs fall in each tier + distribution of p_mislabel.
@@ -217,6 +269,10 @@ def main() -> int:
     high_suspicion = [r for r in rows if r["tier"] in ("both", "nli_only")]
     high_suspicion.sort(key=lambda r: -r["p_mislabel"])
 
+    ch_avail = sum(1 for r in rows if r["lf_votes"]["challenger"] is not None)
+    ch_vote1 = sum(1 for r in rows if r["lf_votes"]["challenger"] == 1)
+    ch_vote0 = sum(1 for r in rows if r["lf_votes"]["challenger"] == 0)
+
     report = {
         "params": params,
         "population": {"n": len(assessed_sorted), "p_correct_prior": _PRIOR_CORRECT},
@@ -226,6 +282,12 @@ def main() -> int:
             "p_mislabel_mean": round(float(p_arr.mean()), 4),
             "p_mislabel_median": round(float(np.median(p_arr)), 4),
             "n_high_suspicion": len(high_suspicion),
+            "challenger_lf3": {
+                "n_available": ch_avail,
+                "n_disagree_vote1": ch_vote1,
+                "n_agree_vote0": ch_vote0,
+                "n_abstain": len(rows) - ch_avail,
+            },
         },
     }
     _OUT_JSON.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -235,18 +297,19 @@ def main() -> int:
     )
 
     md = [
-        "# LABEL MODEL OUTPUT — Step 3B (D2585 P2)",
+        "# LABEL MODEL OUTPUT — Step 3B/3C (D2585 P2 + P4 LF-3)",
         "",
-        "## Estimated LF parameters (Dawid-Skene, 2 LF, weakly identified)",
+        "## Estimated LF parameters (Dawid-Skene, 3 LF)",
         "",
         "| LF | P(flag\\|correct) θ | P(flag\\|wrong) ψ |",
         "|---|---|---|",
         f"| T-NLI contradiction | {params['theta'][0]:.4f} | {params['psi'][0]:.4f} |",
         f"| cleanlab | {params['theta'][1]:.4f} | {params['psi'][1]:.4f} |",
+        f"| challenger (LF-3) | {params['theta'][2]:.4f} | {params['psi'][2]:.4f} |",
         "",
         f"P(label correct) π = {params['pi_correct']:.4f} (prior {_PRIOR_CORRECT}).",
         "",
-        "## Golden-set suspicion tiers",
+        "## Golden-set suspicion tiers (2-LF tier retained for P3-compat)",
         "",
         "| Tier | Count |",
         "|---|---|",

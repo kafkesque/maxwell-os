@@ -17,7 +17,13 @@ pipeline_manifest:
 classifier_training:
   # D2577: auto-sorter student — full fine-tune (NO LoRA).
   student_model: answerdotai/ModernBERT-base
-  checkpoint_dir: knowledge pipeline/classifier_modernbert
+  # D2608 (forensic): align training output dir with the student inference dir
+  # (stage4.student_preclassifier_checkpoint). Was drift: training default wrote
+  # to classifier_modernbert while the student loaded classifier_modernbert_p5final.
+  # NOTE: p5final (macro-F1 0.2036) < p4_clean (0.2758) on ONE noisy held-out run,
+  # but p5final carries the 28 latest human-corrected labels — preferred on
+  # label-quality grounds; the F1 delta is within run variance (±0.05).
+  checkpoint_dir: knowledge pipeline/classifier_modernbert_p5final
 stages:
   stage0_convert: knowledge pipeline/stage0_convert
   stage0_5_extract_metadata: knowledge pipeline/stage0_5_extract_metadata
@@ -289,6 +295,13 @@ stage4:
   depth_frugal_enabled: false
   depth_model: gemma-4-E4B-it-MLX-4bit
   depth_fallback_depth: domain
+  # D2607 (C): LLM-hybrid student pre-classifier. ModernBERT student classifies
+  # discipline/domains; low-confidence/abstain falls back to gpt-oss (VERIFY_MODEL).
+  # OFF by default — enable only after R5 review + agreement-threshold A/B.
+  student_preclassifier_enabled: false
+  student_preclassifier_checkpoint: knowledge pipeline/classifier_hierarchical
+  student_preclassifier_threshold: 0.35
+  student_preclassifier_coarse_threshold: 0.70
   # D2556 (D2548): grammar-constrained decoding pilot for S4 enum output.
   # Outlines/XGrammar NOT installed (assessed 2026-09-04) — gate OFF until added.
   grammar_decoding_enabled: false

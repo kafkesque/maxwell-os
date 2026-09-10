@@ -211,6 +211,11 @@ S4_DEPTH_PROMPT_VARIANT=str(_CFG.get("stage4", {}).get("depth_prompt_variant", "
 S4_DEPTH_FRUGAL_ENABLED=bool(_CFG.get("stage4", {}).get("depth_frugal_enabled", False))
 S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))
 S4_DEPTH_FALLBACK_DEPTH=str(_CFG.get("stage4", {}).get("depth_fallback_depth", "domain"))
+# D2607 (C): LLM-hybrid student pre-classifier (ModernBERT student + gpt-oss fallback).
+S4_STUDENT_PRECLASSIFIER_ENABLED=bool(_CFG.get("stage4", {}).get("student_preclassifier_enabled", False))
+S4_STUDENT_PRECLASSIFIER_CHECKPOINT=str(_CFG.get("stage4", {}).get("student_preclassifier_checkpoint", "knowledge pipeline/classifier_modernbert_p5final"))
+S4_STUDENT_PRECLASSIFIER_THRESHOLD=float(_CFG.get("stage4", {}).get("student_preclassifier_threshold", 0.35))
+S4_STUDENT_PRECLASSIFIER_COARSE_THRESHOLD=float(_CFG.get("stage4", {}).get("student_preclassifier_coarse_threshold", 0.70))
 S4_MAX_FAILED_RATIO=float(_CFG.get("stage4", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed merge
 FB_NAME_MAX_WORDS=int(_CFG.get("stage4", {}).get("fb_name_max_words", 8))  # BUG-149: C12 — name word cap (was hardcoded 5 in normalize_fb_name)
 S4_CHECKPOINT_INTERVAL=int(_CFG.get("stage4", {}).get("checkpoint_interval", 5))  # D2370: intra-stage incremental checkpoint cadence

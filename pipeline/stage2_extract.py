@@ -237,6 +237,11 @@ def validate_fb_output(result: dict) -> tuple[bool, list[str]]:
     return len(errors) == 0, errors
 
 
+# BUG-226 (D2589): counter for silently-defaulted extraction_type — reported in
+# the run summaries so the empty-form repair is OBSERVABLE, never silent (C16).
+_EXTRACTION_TYPE_DEFAULTED_COUNT: int = 0
+
+
 def _normalize_role_fields(result: dict) -> dict:
     """D2417 (BUG-145): repair extraction_type/content_type conflation.
 
@@ -277,6 +282,14 @@ def _normalize_role_fields(result: dict) -> dict:
         result["extraction_type"] = CONTENT_TO_EXTRACTION_TYPE.get(
             str(result.get("content_type", "")).strip(), "descriptive_model"
         )
+        # BUG-226 (D2589): the empty-form default is now OBSERVABLE — stamp the repair
+        # so S5/S6 and audits can tell a model-reasoned form from a patched default
+        # (a Q3-valid normative principle whose form was omitted/truncated must not be
+        # silently downgraded to descriptive_model with no trail). Never silent (C16).
+        result["_extraction_type_defaulted"] = True
+        result["_extraction_type_default_reason"] = "empty_form"
+        global _EXTRACTION_TYPE_DEFAULTED_COUNT
+        _EXTRACTION_TYPE_DEFAULTED_COUNT += 1
 
     return result
 
@@ -397,9 +410,12 @@ PRINCIPLE STRUCTURE (required for every extraction):
    CALIBRATION: In a typical convergent corpus only ~1 in 3 principles is a verified
    causal_mechanism. Most passages show association, advice, or taxonomy. Do NOT upgrade a
    correlation, method, or taxonomy to causal_mechanism just because it has an explanation.
-9. content_type: "principle" (reusable concept), "process_template" (repeatable how-to),
-   "process_instance" (case study), "growth_edge" (speculative insight),
-   "tool_instruction" (tool-specific command).
+9. content_type: this CONVERGENT path synthesizes Foundation Blocks, so emit
+   "principle" (reusable concept) with route "FB". The non-principle roles
+   (process_template / process_instance / growth_edge / tool_instruction) are classified
+   by the SINGLE-SOURCE / singleton paths, not here. (D2587 Q3) a single transferable
+   prescriptive claim (a heuristic stated in one sentence) is still a PRINCIPLE — never
+   let "prescriptive" pull the role away from principle.
 
 EXTRACTION BOUNDARY — extract if and only if the passages collectively reveal one of:
 1. A VERIFIED CAUSAL MECHANISM (X→Y because Z — the chain is demonstrated), OR
@@ -977,6 +993,27 @@ def _sanitize_books(books: list[str]) -> list[str]:
     return [sanitize_source_book(b) for b in (books or [])]
 
 
+# D2587 (2026-09-08): content-type classification decision procedure (Q1/Q2/Q3).
+# Injected into the SINGLE-SOURCE + SINGLETON prompts — the paths that actually
+# classify content_type. The CONVERGENT path is principle-only by design (BUG-231:
+# build_convergent_prompt emits "principle(s)" + route FB/NULL with a principle-only
+# body schema), so item 9 of its SYSTEM_PROMPT listing all 5 roles is vestigial.
+_CONTENT_TYPE_RULES_TEXT: str = (
+    "CONTENT-TYPE DECISION ORDER (apply strictly, top-down — answer the FIRST that matches):\n"
+    "1. COMMAND/API/ALGORITHM for a specific tool or code (function, syntax, library call, code snippet)? → tool_instruction.\n"
+    "2. CONCRETE CASE STUDY of a method actually executed (specific actors, instance, outcome)? → process_instance.\n"
+    "3. SPECULATIVE/UNRESOLVED (an open tension, unverified correlation, or empirical pattern with no causal mechanism)? → growth_edge.\n"
+    "4. REPEATABLE METHOD with >=2 ordered steps AND a gate or done condition? → process_template.\n"
+    "5. REUSABLE PROPOSITION or heuristic (a claim that stays useful across multiple contexts/instances)? → principle.\n"
+    "6. Otherwise → route \"NULL\" (no extractable object).\n"
+    "SINGLE-STEP RESOLUTION (Q1): a single instruction is NEVER a process_template.\n"
+    "  - tool/software-specific single step → tool_instruction.\n"
+    "  - a transferable single-sentence prescriptive claim (a heuristic) → PRINCIPLE (NOT process_template); extraction_type stays normative_heuristic.\n"
+    "  - a step that only makes sense inside a larger method → an inline step of a process_template, never a standalone object.\n"
+    "INSTRUCTION-vs-PRINCIPLE (Q3): a single prescriptive claim is a PRINCIPLE if it is a transferable heuristic — do NOT auto-assign process_template just because the text prescribes (\"do X\"). Acting as a filter across 3+ domains is strong POSITIVE evidence of a principle, NOT a hard requirement; a deep single-domain principle is still a principle.\n"
+    "DECISION MATRIX (Q2): a decision matrix is NEVER a standalone content type. A specific scoring grid = inline content in a process_template's gate; a reusable matrix methodology = principle (or process_template only if it is an executable multi-step procedure)."
+)
+
 SINGLE_SOURCE_SYSTEM: str = (
     "You extract knowledge objects from text passages. "
     "Return a JSON object with these EXACT keys:\n"
@@ -1021,7 +1058,7 @@ SINGLE_SOURCE_SYSTEM: str = (
     "— set is_summary=false for it. "
     "If the passages are just factual descriptions without any extractable object, "
     'return {{\"route\": \"NULL\"}}.'
-) + "\n" + _S2_BODY_SCHEMA
+) + "\n" + _CONTENT_TYPE_RULES_TEXT + "\n" + _S2_BODY_SCHEMA
 # ── Singleton extraction prompt (D2149: single-segment, no synthesis) ──────
 
 SINGLETON_SYSTEM: str = (
@@ -1069,7 +1106,7 @@ SINGLETON_SYSTEM: str = (
     "is_summary=true ONLY if the passage is a PURE factual description with NO extractable "
     "object of any kind (no principle, no method, no case study, no tool command). "
     "If the passage contains no extractable object, return {\"route\": \"NULL\"}."
-) + "\n" + _S2_BODY_SCHEMA
+) + "\n" + _CONTENT_TYPE_RULES_TEXT + "\n" + _S2_BODY_SCHEMA
 
 # D2xxx (option-1 speedup): batched singleton extraction — ONE LLM call per batch of N
 # passages returns a JSON ARRAY (one object per passage, in order). Built from
@@ -2722,6 +2759,7 @@ def run_stage2(
     print(f"⏭️  NULL routes:        {total_null}")
     print(f"🗑️  Near-duplicates:    {total_skipped}")
     print(f"📦 Total FBs:          {len(all_fbs)}")
+    print(f"🔧 extraction_type defaulted: {_EXTRACTION_TYPE_DEFAULTED_COUNT} (BUG-226)")
     if all_fbs:
         from collections import Counter
         depths = Counter(fb.get("depth", "?") for fb in all_fbs)
@@ -3177,6 +3215,7 @@ def process_singletons(
     print(f"   Extracted FBs: {total_extracted}")
     print(f"   NULL routes:   {total_null}")
     print(f"   Schema-FAILED: {total_failed}")  # BUG-181#3 (2026-08-27): fail-closed
+    print(f"   extraction_type defaulted: {_EXTRACTION_TYPE_DEFAULTED_COUNT} (BUG-226)")
     print(f"   Output:        {STAGE2_SINGLETON_OUTPUT}")
 
     # Content type distribution

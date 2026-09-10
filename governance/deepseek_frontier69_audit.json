@@ -1,0 +1,1035 @@
+{
+  "S4-GOLD-MINED-00020": {
+    "example_id": "S4-GOLD-MINED-00020",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "linguistics",
+    "domains_verdict": "agree",
+    "domains": [
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition expresses a transferable theoretical claim about metaphorical mapping that applies across language and symbolic systems."
+  },
+  "S4-GOLD-MINED-00022": {
+    "example_id": "S4-GOLD-MINED-00022",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "systems thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It is a single prescriptive rule favoring system-level optimization over local optimization, transferable across many domains."
+  },
+  "S4-GOLD-MINED-00051": {
+    "example_id": "S4-GOLD-MINED-00051",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "game design",
+    "domains_verdict": "agree",
+    "domains": [
+      "media & entertainment",
+      "business development"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It states a domain-specific principle about network effects in social games, serving as a reusable heuristic."
+  },
+  "S4-GOLD-MINED-00065": {
+    "example_id": "S4-GOLD-MINED-00065",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "color theory",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition gives a single design rule about using black and white with vibrant colors for contrast and simplicity."
+  },
+  "S4-GOLD-MINED-00085": {
+    "example_id": "S4-GOLD-MINED-00085",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "systems thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "data visualization",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Network invariance across representations is a general systems property applicable beyond social networks, so cross-domain depth and systems thinking discipline are more accurate."
+  },
+  "S4-GOLD-MINED-00087": {
+    "example_id": "S4-GOLD-MINED-00087",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational theory",
+    "domains_verdict": "agree",
+    "domains": [
+      "engineering practice",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It describes the stored-program concept as a foundational computational principle with transferable value within computing."
+  },
+  "S4-GOLD-MINED-00094": {
+    "example_id": "S4-GOLD-MINED-00094",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "strategic thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "entrepreneurship",
+      "illustration"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition offers a reusable business heuristic for illustrators to monetize intellectual property through licensing."
+  },
+  "S4-GOLD-MINED-00096": {
+    "example_id": "S4-GOLD-MINED-00096",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "agree",
+    "domains": [
+      "brand identity",
+      "marketing & communications",
+      "editorial & advertising",
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It states a domain-specific principle about visual metaphor mapping in advertising, transferable across marketing contexts."
+  },
+  "S4-GOLD-MINED-00097": {
+    "example_id": "S4-GOLD-MINED-00097",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "computational geometry",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "product design",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The golden ratio is a universal mathematical relationship with reusable application across design and science."
+  },
+  "S4-GOLD-MINED-00139": {
+    "example_id": "S4-GOLD-MINED-00139",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research",
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The biosemiotic claim about genetic code as sign process is a transferable theoretical principle bridging biology and semiotics."
+  },
+  "S4-GOLD-MINED-00145": {
+    "example_id": "S4-GOLD-MINED-00145",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "privacy & surveillance",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "legal & public policy"
+    ],
+    "content_type": "quarantine",
+    "confidence": "low",
+    "reason": "The definition is a vague set of recommendations without a single clear prescriptive rule or sequence, so it is held as quarantine."
+  },
+  "S4-GOLD-MINED-00148": {
+    "example_id": "S4-GOLD-MINED-00148",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "robotics",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "engineering & infrastructure"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It describes a sensory-motor decision loop as a reusable principle in robotics and automated systems."
+  },
+  "S4-GOLD-MINED-00161": {
+    "example_id": "S4-GOLD-MINED-00161",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "law",
+    "domains_verdict": "agree",
+    "domains": [
+      "legal & public policy",
+      "finance & investment"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The classification framework gives a reusable regulatory categorization scheme with no explicit steps, functioning as a principle."
+  },
+  "S4-GOLD-MINED-00168": {
+    "example_id": "S4-GOLD-MINED-00168",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "color theory",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "editorial & advertising",
+      "brand identity"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It articulates a method-like use of color as a single transferable design principle, albeit without sequential steps."
+  },
+  "S4-GOLD-MINED-00173": {
+    "example_id": "S4-GOLD-MINED-00173",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information science",
+    "domains_verdict": "agree",
+    "domains": [
+      "data visualization",
+      "information architecture",
+      "graphic design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The statement is a prescriptive rule for effective data visualization design, transferable within the domain."
+  },
+  "S4-GOLD-MINED-00177": {
+    "example_id": "S4-GOLD-MINED-00177",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information security",
+    "domains_verdict": "agree",
+    "domains": [
+      "engineering practice",
+      "web & ui"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "medium",
+    "reason": "It merely describes the base64 format of basic auth credentials, a factual specification with no transferable prescriptive value beyond the protocol detail."
+  },
+  "S4-GOLD-MINED-00184": {
+    "example_id": "S4-GOLD-MINED-00184",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "motion & time",
+    "domains_verdict": "agree",
+    "domains": [
+      "creative technology",
+      "motion design",
+      "performing arts"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It provides a reusable mapping framework from auditory properties to visual elements, functioning as a single design principle."
+  },
+  "S4-GOLD-MINED-00188": {
+    "example_id": "S4-GOLD-MINED-00188",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "linguistics",
+    "domains_verdict": "agree",
+    "domains": [
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Schema-based meaning is a cross-domain theoretical principle in linguistics and semiotics."
+  },
+  "S4-GOLD-MINED-00232": {
+    "example_id": "S4-GOLD-MINED-00232",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "generative ai",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "It states a specialized prescriptive rule for prompt engineering consistency, applicable to generative AI systems."
+  },
+  "S4-GOLD-MINED-00237": {
+    "example_id": "S4-GOLD-MINED-00237",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "social network analysis",
+    "domains_verdict": "agree",
+    "domains": [
+      "data visualization",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The two-mode network visualization is a reusable technique described as a single principle for revealing structural patterns."
+  },
+  "S4-GOLD-MINED-00253": {
+    "example_id": "S4-GOLD-MINED-00253",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "creative process",
+    "domains_verdict": "agree",
+    "domains": [
+      "arts & culture"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The isolation method for breakthrough creative output is a prescriptive principle within artistic development."
+  },
+  "S4-GOLD-MINED-00263": {
+    "example_id": "S4-GOLD-MINED-00263",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks",
+      "ai & agents"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Decentralized coordination via local interactions is a cross-domain principle applicable to many complex systems."
+  },
+  "S4-GOLD-MINED-00313": {
+    "example_id": "S4-GOLD-MINED-00313",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational geometry",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Voronoi diagrams are a reusable geometric method for spatial partitioning in ecology, acting as a principle."
+  },
+  "S4-GOLD-MINED-00316": {
+    "example_id": "S4-GOLD-MINED-00316",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational theory",
+    "domains_verdict": "agree",
+    "domains": [
+      "code & computation",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Prescriptive rule about balancing order and chaos in computational systems."
+  },
+  "S4-GOLD-MINED-00323": {
+    "example_id": "S4-GOLD-MINED-00323",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information science",
+    "domains_verdict": "agree",
+    "domains": [
+      "data visualization",
+      "marketing & communications",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "General truth that data visualization acts as narrative device to engage audiences."
+  },
+  "S4-GOLD-MINED-00334": {
+    "example_id": "S4-GOLD-MINED-00334",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "finance",
+    "domains_verdict": "agree",
+    "domains": [
+      "entrepreneurship",
+      "finance & investment"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive enumeration of equity capital sources with no transferable prescriptive claim."
+  },
+  "S4-GOLD-MINED-00337": {
+    "example_id": "S4-GOLD-MINED-00337",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "finance",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "finance & investment"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive rule that accounting systems require standardized consistent frameworks."
+  },
+  "S4-GOLD-MINED-00385": {
+    "example_id": "S4-GOLD-MINED-00385",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "linguistics",
+    "domains_verdict": "agree",
+    "domains": [
+      "social sciences",
+      "media & entertainment"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "medium",
+    "reason": "Observational description of language change without prescriptive transferable rule."
+  },
+  "S4-GOLD-MINED-00386": {
+    "example_id": "S4-GOLD-MINED-00386",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information retrieval",
+    "domains_verdict": "agree",
+    "domains": [
+      "research & methodology",
+      "personal productivity"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Actionable heuristic that expanding query terms improves retrieval."
+  },
+  "S4-GOLD-MINED-00418": {
+    "example_id": "S4-GOLD-MINED-00418",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "override",
+    "discipline": "generative ai",
+    "domains_verdict": "agree",
+    "domains": [
+      "research & methodology",
+      "ai & agents"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Reusable methodology for prompt variant comparison without explicit step sequence, so principle."
+  },
+  "S4-GOLD-MINED-00422": {
+    "example_id": "S4-GOLD-MINED-00422",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "agree",
+    "domains": [
+      "semiotics & communication",
+      "data visualization"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "General semiotic principle on dual modal representation and structural correspondence."
+  },
+  "S4-GOLD-MINED-00454": {
+    "example_id": "S4-GOLD-MINED-00454",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational geometry",
+    "domains_verdict": "agree",
+    "domains": [
+      "education",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Synthesis of multiple proof techniques reveals deeper structure; general mathematical insight."
+  },
+  "S4-GOLD-MINED-00461": {
+    "example_id": "S4-GOLD-MINED-00461",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "agree",
+    "domains": [
+      "user experience",
+      "web & ui",
+      "information architecture"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Classification framework for navigation postures guiding design decisions."
+  },
+  "S4-GOLD-MINED-00477": {
+    "example_id": "S4-GOLD-MINED-00477",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "typography",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "General truth about typographic evolution responding to technology, transferable insight."
+  },
+  "S4-GOLD-MINED-00495": {
+    "example_id": "S4-GOLD-MINED-00495",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "neuroscience",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Factual scientific finding on light and melatonin with no prescriptive rule."
+  },
+  "S4-GOLD-MINED-00509": {
+    "example_id": "S4-GOLD-MINED-00509",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "health & medicine",
+    "domains_verdict": "agree",
+    "domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Prescriptive approach to use physiological monitoring in therapy to inform interventions."
+  },
+  "S4-GOLD-MINED-00516": {
+    "example_id": "S4-GOLD-MINED-00516",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "health & medicine",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research",
+      "health & wellness"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive pharmacological mechanism without actionable guidance."
+  },
+  "S4-GOLD-MINED-00531": {
+    "example_id": "S4-GOLD-MINED-00531",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "creative process",
+    "domains_verdict": "agree",
+    "domains": [
+      "design strategy",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "General iterative model of design process, not an explicit step-by-step template."
+  },
+  "S4-GOLD-MINED-00536": {
+    "example_id": "S4-GOLD-MINED-00536",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "law",
+    "domains_verdict": "agree",
+    "domains": [
+      "legal & public policy",
+      "brand identity"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive explanation of IP legal protections with no transferable prescriptive claim."
+  },
+  "S4-GOLD-MINED-00547": {
+    "example_id": "S4-GOLD-MINED-00547",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "privacy & surveillance",
+    "domains_verdict": "agree",
+    "domains": [
+      "social sciences",
+      "research & methodology"
+    ],
+    "content_type": "process_template",
+    "confidence": "medium",
+    "reason": "Describes a reusable procedure with steps of identifying alternative platforms and cross-referencing data."
+  },
+  "S4-GOLD-MINED-00558": {
+    "example_id": "S4-GOLD-MINED-00558",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "media studies",
+    "domains_verdict": "agree",
+    "domains": [
+      "media & entertainment"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Analytical general truth about unscripted media blurring reality and fiction."
+  },
+  "S4-GOLD-MINED-00562": {
+    "example_id": "S4-GOLD-MINED-00562",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "override",
+    "domains": [
+      "digital product",
+      "user experience",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive rule aligning product design with user outcomes rather than internal incentives."
+  },
+  "S4-GOLD-MINED-00567": {
+    "example_id": "S4-GOLD-MINED-00567",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "economics",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "organizational behavior"
+    ],
+    "content_type": "quarantine",
+    "confidence": "low",
+    "reason": "Carries analytical value about systemic fragility but lacks a clean prescriptive role."
+  },
+  "S4-GOLD-MINED-00584": {
+    "example_id": "S4-GOLD-MINED-00584",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information retrieval",
+    "domains_verdict": "agree",
+    "domains": [
+      "engineering practice",
+      "ai & agents"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Factual description of semantic retrieval system operations without prescriptive value."
+  },
+  "S4-GOLD-MINED-00586": {
+    "example_id": "S4-GOLD-MINED-00586",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "General truth that scaling technological systems creates emergent behaviors beyond design intent."
+  },
+  "S4-GOLD-MINED-00590": {
+    "example_id": "S4-GOLD-MINED-00590",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "economics",
+    "domains_verdict": "agree",
+    "domains": [
+      "media & entertainment",
+      "marketing & communications"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Analytical principle that attention, not content, is the monetizable value in media."
+  },
+  "S4-GOLD-MINED-00594": {
+    "example_id": "S4-GOLD-MINED-00594",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "visual perception",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "media & entertainment",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Single prescriptive claim about visual deception to capture attention across design fields."
+  },
+  "S4-GOLD-MINED-00601": {
+    "example_id": "S4-GOLD-MINED-00601",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "performing arts",
+    "domains_verdict": "agree",
+    "domains": [
+      "arts & culture"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Single transferable rule for casting directors to realign performer mindset."
+  },
+  "S4-GOLD-MINED-00613": {
+    "example_id": "S4-GOLD-MINED-00613",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "design psychology",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive approach using visual analogies for conceptual connections."
+  },
+  "S4-GOLD-MINED-00629": {
+    "example_id": "S4-GOLD-MINED-00629",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "theoretical physics",
+    "domains_verdict": "agree",
+    "domains": [
+      "computational science & physics",
+      "motion design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Universal inverse-square law of light, core physics principle applicable to rendering."
+  },
+  "S4-GOLD-MINED-00641": {
+    "example_id": "S4-GOLD-MINED-00641",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational physics & simulation",
+    "domains_verdict": "agree",
+    "domains": [
+      "computational science & physics",
+      "code & computation"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Rule for mapping physical properties in simulations."
+  },
+  "S4-GOLD-MINED-00642": {
+    "example_id": "S4-GOLD-MINED-00642",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "evolutionary biology",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Scientific principle about multiple genetic pathways to longevity."
+  },
+  "S4-GOLD-MINED-00650": {
+    "example_id": "S4-GOLD-MINED-00650",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "typography",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "code & computation"
+    ],
+    "content_type": "process_template",
+    "confidence": "medium",
+    "reason": "Describes sequential phases (foundational form, refinement, adaptation, family development) with a legibility/function gate."
+  },
+  "S4-GOLD-MINED-00686": {
+    "example_id": "S4-GOLD-MINED-00686",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "information retrieval",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive claim about retrieval quality relying on data quality and precision."
+  },
+  "S4-GOLD-MINED-00714": {
+    "example_id": "S4-GOLD-MINED-00714",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "generative ai",
+    "domains_verdict": "agree",
+    "domains": [
+      "computational art",
+      "code & computation"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "General principle about generative AI producing creative outputs across modalities."
+  },
+  "S4-GOLD-MINED-00716": {
+    "example_id": "S4-GOLD-MINED-00716",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "finance",
+    "domains_verdict": "agree",
+    "domains": [
+      "finance & investment"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive financial autonomy rule about deliberate tracking and goal alignment."
+  },
+  "S4-GOLD-MINED-00738": {
+    "example_id": "S4-GOLD-MINED-00738",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational physics & simulation",
+    "domains_verdict": "agree",
+    "domains": [
+      "computational science & physics",
+      "engineering & infrastructure"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive conceptual distinction without actionable transferable value."
+  },
+  "S4-GOLD-MINED-00835": {
+    "example_id": "S4-GOLD-MINED-00835",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "health & medicine",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "health & wellness"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Claim that AI outperforms humans in medical image diagnosis, a transferable insight."
+  },
+  "S4-GOLD-MINED-00852": {
+    "example_id": "S4-GOLD-MINED-00852",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "health & medicine",
+    "domains_verdict": "agree",
+    "domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Principle about interconnected body systems and cascading health effects."
+  },
+  "S4-GOLD-MINED-00875": {
+    "example_id": "S4-GOLD-MINED-00875",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "ecology",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "General mechanism of safe exploration by organisms/systems, transferable as a rule."
+  },
+  "S4-GOLD-MINED-00882": {
+    "example_id": "S4-GOLD-MINED-00882",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "privacy & surveillance",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks",
+      "legal & public policy"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "medium",
+    "reason": "Descriptive trend about digital identity systems without actionable prescriptive rule."
+  },
+  "S4-GOLD-MINED-00883": {
+    "example_id": "S4-GOLD-MINED-00883",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "typography",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Principle about type design evaluation being shaped by aesthetics and cultural context."
+  },
+  "S4-GOLD-MINED-00896": {
+    "example_id": "S4-GOLD-MINED-00896",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "social network analysis",
+    "domains_verdict": "agree",
+    "domains": [
+      "marketing & communications",
+      "business development"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive viral growth principle based on social network propagation."
+  },
+  "S4-GOLD-MINED-00900": {
+    "example_id": "S4-GOLD-MINED-00900",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "performing arts",
+    "domains_verdict": "agree",
+    "domains": [
+      "arts & culture"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive definition of how music is constructed from tones; no transferable rule."
+  },
+  "S4-GOLD-MINED-00911": {
+    "example_id": "S4-GOLD-MINED-00911",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "privacy & surveillance",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Prescriptive design principle for balancing utility and privacy in recommendation systems."
+  },
+  "S4-GOLD-MINED-00922": {
+    "example_id": "S4-GOLD-MINED-00922",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "creative process",
+    "domains_verdict": "agree",
+    "domains": [
+      "design strategy",
+      "project management"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Single prescriptive rule that iteration improves design processes."
+  },
+  "S4-GOLD-MINED-00934": {
+    "example_id": "S4-GOLD-MINED-00934",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational geometry",
+    "domains_verdict": "agree",
+    "domains": [
+      "data visualization",
+      "code & computation"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "Descriptive definition of coordinate systems without actionable guidance."
+  },
+  "S4-GOLD-MINED-00950": {
+    "example_id": "S4-GOLD-MINED-00950",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "computational theory",
+    "domains_verdict": "agree",
+    "domains": [
+      "code & computation",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Formal principle (Church-Turing-like) about computable sorting methods."
+  },
+  "S4-GOLD-MINED-01013": {
+    "example_id": "S4-GOLD-MINED-01013",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "ecology",
+    "domains_verdict": "agree",
+    "domains": [
+      "systems & frameworks",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Steady-state Earth system principle balancing energy and material flows."
+  }
+}

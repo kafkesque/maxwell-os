@@ -211,6 +211,38 @@
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- TARGETED INGESTION SOURCES — D2607-D (2026-09-10)             -->
+    <!-- Domain-knowledge feeds for the 9 CRITICAL starved disciplines   -->
+    <!-- (design psychology, ecology, game design, generative design,    -->
+    <!-- computational theory, robotics, computational physics &         -->
+    <!-- simulation, color theory, creative coding). arXiv RSS =          -->
+    <!-- sovereign (C3) + machine-ingestible (S0). See governance/        -->
+    <!-- targeted_ingestion_sources.md for the full mapping.             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="Targeted Ingestion (D2607-D)" description="arXiv domain feeds for the 9 CRITICAL starved disciplines">
+      <outline type="rss" text="Robotics (cs.RO)" xmlUrl="https://rss.arxiv.org/rss/cs.RO"
+               description="D2607-D: robotics discipline (CRITICAL, convergent 3)"/>
+      <outline type="rss" text="Computational Complexity (cs.CC)" xmlUrl="https://rss.arxiv.org/rss/cs.CC"
+               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
+      <outline type="rss" text="Data Structures &amp; Algorithms (cs.DS)" xmlUrl="https://rss.arxiv.org/rss/cs.DS"
+               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
+      <outline type="rss" text="Formal Languages (cs.FL)" xmlUrl="https://rss.arxiv.org/rss/cs.FL"
+               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
+      <outline type="rss" text="Computational Physics (physics.comp-ph)" xmlUrl="https://rss.arxiv.org/rss/physics.comp-ph"
+               description="D2607-D: computational physics &amp; simulation discipline (CRITICAL, convergent 3)"/>
+      <outline type="rss" text="Graphics (cs.GR)" xmlUrl="https://rss.arxiv.org/rss/cs.GR"
+               description="D2607-D: generative design / creative coding disciplines (CRITICAL)"/>
+      <outline type="rss" text="Computational Engineering (cs.CE)" xmlUrl="https://rss.arxiv.org/rss/cs.CE"
+               description="D2607-D: generative design / computational physics (CRITICAL)"/>
+      <outline type="rss" text="HCI (cs.HC)" xmlUrl="https://rss.arxiv.org/rss/cs.HC"
+               description="D2607-D: game design / design psychology / creative coding (CRITICAL)"/>
+      <outline type="rss" text="Computer Vision (cs.CV)" xmlUrl="https://rss.arxiv.org/rss/cs.CV"
+               description="D2607-D: color theory / color constancy (CRITICAL, convergent 3)"/>
+      <outline type="rss" text="Populations &amp; Evolution (q-bio.PE)" xmlUrl="https://rss.arxiv.org/rss/q-bio.PE"
+               description="D2607-D: ecology discipline (CRITICAL, convergent 1)"/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- SYSTEM MONITORING & DIAGNOSTICS — evaluated 2026-07-27        -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <outline text="System Monitoring" description="Apple Silicon diagnostics and optimization">

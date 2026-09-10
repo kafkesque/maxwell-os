@@ -1,0 +1,1979 @@
+schema_version: '1.0'
+decision: D2589
+created: '2026-09-08'
+tier: CHALLENGE
+eval_scope: rules_regression_only   # D2609: content_type rules regression — NOT model-eval
+held_out_from_training: true        # D2609: example_ids are a never-train set for content_type
+agreement_rule: 2-of-3 independent adjudicators; disagreements -> human tiebreak
+adjudication_schema:
+  sequence_present: bool|null   — is there an ordered multi-action sequence?
+  repeatable_method: bool|null   — is it a reusable procedure vs a historical trace?
+  transferability: enum|null   — domain_specific | cross_domain | unknown
+  epistemic_status: enum|null   — established | empirical | speculative
+  content_type_derived: string|null — the label the 4 features IMPLY (filled by adjudicator)
+  rationale: string      — why, in one line
+boundary_case_categories:
+- id: C01
+  case: 1-step tool command
+  expected: tool_instruction
+- id: C02
+  case: 1-step domain instruction
+  expected: inline_step
+- id: C03
+  case: 1-step cross-domain heuristic
+  expected: principle
+- id: C04
+  case: 2-step reusable method
+  expected: process_template
+- id: C05
+  case: 2-step accidental instruction
+  expected: tool_instruction
+- id: C06
+  case: 5-step historical case study
+  expected: process_instance
+- id: C07
+  case: 5-step reusable method
+  expected: process_template
+- id: C08
+  case: domain-specific deep principle
+  expected: principle
+- id: C09
+  case: 3-domain shallow slogan
+  expected: principle
+- id: C10
+  case: speculative principle
+  expected: growth_edge
+- id: C11
+  case: decision matrix inside a PT gate
+  expected: inline_gate_content
+- id: C12
+  case: reusable decision methodology
+  expected: principle
+- id: C13
+  case: tool procedure (by abstraction)
+  expected: tool_instruction
+- id: C14
+  case: empirical correlation (no cause)
+  expected: growth_edge
+- id: C15
+  case: normative heuristic (transferable)
+  expected: principle
+- id: C16
+  case: descriptive method (reusable, no explicit steps)
+  expected: quarantine
+cases:
+- example_id: S4-GOLD-MINED-00548
+  name: Illustration-driven Book Quality
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: The quality and appeal of illustrated books in the nineteenth century improved dramatically
+    due to technological advances in printing, binding, and manufacturing, enabling publishers to produce
+    books that were both visually rich and commercially successful.
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: noise_drop
+  rationale: 'human review: historical description of 19th-c book quality — no prescriptive filter, no
+    template, no transferable value → DROP (a ''fact'')'
+- example_id: S4-GOLD-MINED-00668
+  name: Hetionet Drug Discovery Methodology
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: A computational approach for identifying potential drug treatments by analyzing network
+    connectivity between compounds and diseases in the Hetionet knowledge graph (metapath features across
+    compound-disease pairs).
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  content_type_derived: process_instance
+  rationale: 'human review: named methodology (Hetionet) = an example/illustration of a method, not a
+    transferable truth'
+- example_id: S4-GOLD-MINED-00971
+  name: Perspective As Visual Representation Framework
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: Perspective serves as a foundational framework for visual representation that enables artists
+    to translate three-dimensional reality onto two-dimensional surfaces while maintaining spatial relationships
+    and depth perception.
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: noise_drop
+  rationale: 'human review: historical description (Alberti/Brunelleschi art history) — no transferable
+    value → DROP'
+- example_id: S4-GOLD-MINED-00713
+  name: Material Speculation Framework
+  prior_human_disposition: process_template
+  d2587_flip: growth_edge
+  definition: A design research methodology combining speculative artifact creation with empirical field
+    studies to explore counterfactual futures and lived experiences — a descriptive model of research
+    methodology, not a causal mechanism.
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: quarantine
+  rationale: 'human review: AMBIGUOUS — carries value (research methodology) but no clean role (no steps
+    / no named execution / no transferable truth). HOLD for later identification.'
+- example_id: S4-GOLD-MINED-00859
+  name: Incremental Efficacy Evaluation
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: A study design approach that assesses whether modifying the timing of treatment initiation
+    provides greater effectiveness than the standard treatment protocol. This method evaluates incremental
+    benefits by comparing modified versus conventional treatment regimens.
+  sequence_present: null
+  repeatable_method: true
+  transferability: domain_specific
+  epistemic_status: established
+  disposition: quarantine
+  rationale: 're-sweep: generic study-design METHODOLOGY (reusable) but descriptive, no explicit >=2 steps.
+    HOLD — candidate for process_template step-extraction.'
+- example_id: S4-GOLD-MINED-00969
+  name: Low-rank Adaptation Mechanism
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: Low-Rank Adaptation (LoRA) is a parameter-efficient fine-tuning method that modifies only
+    a small subset of model parameters by injecting low-rank update matrices into specific layers, typically
+    attention blocks. The approach trains these updates as a 'difference' from the original parameters
+    rather than retraining the full model.
+  sequence_present: null
+  repeatable_method: true
+  transferability: domain_specific
+  epistemic_status: established
+  disposition: quarantine
+  rationale: 're-sweep: describes a REUSABLE fine-tuning method (LoRA) descriptively, no explicit steps.
+    HOLD — candidate for process_template step-extraction.'
+- example_id: S4-GOLD-MINED-01012
+  name: Model Fine-tuning Through Layer Adaptation
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: Training large language models involves updating only specific layers while keeping the
+    base model frozen, enabling efficient adaptation to new tasks without full retraining. This approach
+    allows for task-specific learning while preserving the pre-trained knowledge in the base model.
+  sequence_present: null
+  repeatable_method: true
+  transferability: domain_specific
+  epistemic_status: established
+  disposition: quarantine
+  rationale: 're-sweep: describes a REUSABLE layer-adaptation method descriptively, no explicit steps.
+    HOLD — candidate for process_template step-extraction.'
+- example_id: S4-GOLD-MINED-01000
+  name: Pixel-based Generative Transformation
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: Individual image pixels can be treated as discrete data points that can be analyzed, transformed,
+    and reinterpreted into new visual or auditory representations. This approach enables the conversion
+    of existing media into generative design elements or sound mappings.
+  sequence_present: null
+  repeatable_method: true
+  transferability: domain_specific
+  epistemic_status: established
+  disposition: quarantine
+  rationale: 're-sweep: describes a REUSABLE pixel-as-data technique descriptively, no explicit steps.
+    HOLD — candidate for process_template step-extraction.'
+- example_id: S4-GOLD-MINED-00919
+  name: Standardized Mass Production
+  prior_human_disposition: process_template
+  d2587_flip: principle
+  definition: Mass production achieves efficiency through standardization of parts, assembly-line processes,
+    and functional design that enables rapid, low-cost manufacturing of large quantities of identical
+    goods. The principle describes a manufacturing paradigm where uniformity, simplicity, and division
+    of labor drive economies of scale.
+  sequence_present: null
+  repeatable_method: false
+  transferability: unknown
+  epistemic_status: established
+  disposition: noise_drop
+  rationale: 're-sweep: historical/descriptive manufacturing PARADIGM (Fordism) — closed, no reusable
+    method, no transferable value. DROP (matches Illustration-driven Book Quality).'
+- example_id: S4-GOLD-MINED-00485
+  name: Iterative Timeline Refinement
+  definition: Creating effective multimedia timelines requires repeated cycles of construction, evaluation,
+    and correction to achieve a polished final product. The process involves iterative feedback loops
+    where initial drafts are reviewed, flaws are identified, and improvements are systematically applied
+    until the timeline meets quality standards.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00653
+  name: Iterative Type Design Process
+  definition: Effective type design follows a cyclical, experimental approach where designers begin with
+    simple prototypes, test variations, and refine based on visual feedback rather than attempting comprehensive
+    planning upfront. This process emphasizes hands-on experimentation and iterative improvement.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00677
+  name: Creative Motion Design Process
+  definition: Motion design development follows a structured yet iterative process that integrates technical
+    skill, creative experimentation, and client collaboration. The process begins with understanding project
+    constraints and ends with delivery, incorporating both analytical and intuitive design approaches.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00761
+  name: Strategic Uncertainty Management
+  definition: Effective strategic planning requires identifying and managing key uncertainties in the
+    business environment to build robust scenarios and derive actionable implications. The principle emphasizes
+    that strategic foresight must address both environmental complexity and organizational adaptability.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00765
+  name: Social Network Analysis
+  definition: Social network analysis is a method for mapping and analyzing relationships between entities
+    in a community by observing, recording, and visualizing connections to identify key individuals, groups,
+    and influence patterns. The approach treats entities as nodes and their associations as links in a
+    network graph.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00808
+  name: Iterative Keyword Refinement
+  definition: Improving keyword guides through iterative evaluation of query results enables progressively
+    more accurate data retrieval. The process involves systematically testing and adjusting keywords based
+    on performance feedback.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00820
+  name: Idea Challenge Iteration
+  definition: Repeatedly running idea generation challenges with structured selection and reward mechanisms
+    produces scalable innovation that can shift organizational practices. The principle describes a process
+    where initial challenges generate large volumes of ideas, which are then filtered and implemented
+    to create systemic change.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00205
+  name: Construct Validity Assessment
+  definition: A systematic approach to validating measurement constructs by evaluating their reliability,
+    convergent validity, discriminant validity, and nomological validity to ensure they accurately represent
+    the theoretical concepts they are intended to measure.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00311
+  name: Data Storytelling Narrative Arc
+  definition: 'A structured narrative framework for presenting data insights that mirrors classical storytelling
+    arcs, mapping research findings or policy recommendations onto a five-part story structure: exposition,
+    inciting incident, rising action, climax, and resolution. The framework adapts Freytag''s pyramid
+    to guide data storytellers in organizing findings into compelling, sequentially logical narratives.'
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00357
+  name: User-centered Design Process (2)
+  definition: Effective design requires systematic exploration of user needs, context, and behaviors through
+    multiple research methods and iterative analysis. The process integrates qualitative insights with
+    structured frameworks to inform design decisions and create meaningful solutions.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00563
+  name: Progressive Refinement Process
+  definition: Iterative improvement through successive cycles of evaluation, adjustment, and re-creation
+    produces higher-quality outcomes than initial attempts. The principle describes a methodical approach
+    where each iteration builds upon previous work while maintaining focus on core objectives.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00646
+  name: Collaborative Design Process
+  definition: A design process where multiple creative individuals work together through independent sketching,
+    shared critique, and iterative refinement to produce innovative and communicative outcomes. The process
+    emphasizes both individual contribution and collective evaluation.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00649
+  name: Strategic Relationship Building (2)
+  definition: Effective relationship development requires gradual trust-building through multiple stages
+    of engagement, where each interaction advances the relationship toward deeper collaboration and mutual
+    benefit. The process involves managing both objective and subjective resistance while maintaining
+    a consistent, value-driven approach.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00682
+  name: Iterative Hypothesis Refinement
+  definition: Research hypotheses and theoretical frameworks evolve through continuous interaction with
+    data, requiring researchers to question, amend, and expand initial assumptions based on emerging evidence.
+    The process involves constant testing of fit between observations and expectations, with adjustments
+    made to better reflect the phenomenon under study.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00692
+  name: Interactive Media Development Workflow
+  definition: Creative media development involves iterative cycles of code implementation, visual feedback,
+    and system integration that require specific hardware and software environments to function effectively.
+    The workflow combines real-time rendering, interactive controls, and cross-platform compatibility
+    considerations.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00856
+  name: Whirling Square Rectangle Construction
+  definition: A geometric construction method that generates rectangles with specific proportional relationships
+    through iterative squaring and diagonal extensions. These rectangles are derived from fundamental
+    geometric principles and exhibit consistent mathematical properties across different applications.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00899
+  name: Situational Analysis in Practice Mapping
+  definition: Situational analysis is a methodological approach that systematically maps and interprets
+    the context of social phenomena by identifying key actors, relationships, and dynamics that shape
+    outcomes. It emphasizes understanding the situated nature of social processes and how local conditions
+    influence broader patterns.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00908
+  name: Creative Programming Process
+  definition: A structured approach to creative programming that involves input processing, data manipulation,
+    and behavior-driven output generation in a layered system.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00149
+  name: Iterative Ux Process Abstraction
+  definition: The UX process operates within a structured lifecycle template that supports iterative development,
+    evaluation, and adaptation. This abstraction provides a framework for organizing activities, identifying
+    project parameters, and mapping them to appropriate process choices.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00398
+  name: Alpha Blending Control
+  definition: Controlling transparency in graphics rendering requires explicit enabling and disabling
+    of alpha blending functionality. The principle describes a specific technical procedure for managing
+    visual layering through transparency states.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00926
+  name: Model Augmentation for Diagnostic Visualization
+  definition: Statistical model outputs can be augmented with observation-level diagnostics and influence
+    statistics to enable comprehensive visualization and diagnostic analysis of model fit and performance.
+    The augmented data frame includes original variables, residuals, and diagnostic measures that support
+    plotting and interpretation.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00238
+  name: Text Layer Manipulation in Motion Graphics
+  definition: In motion graphics production, text layers can be manipulated through multiple methods including
+    direct composition editing, style customization, and conversion from external sources. The choice
+    of approach affects both the flexibility of text modification and the integration of text with other
+    visual elements.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00277
+  name: Tensor Data Type Conversion
+  definition: In deep learning frameworks like PyTorch, tensors can be converted between different data
+    types to optimize memory usage, computational efficiency, or hardware compatibility. This conversion
+    process involves changing the underlying representation of tensor elements while preserving their
+    structural properties.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00295
+  name: Langgraph Agent Workflow Graph Structure
+  definition: LangGraph represents agentic workflows as explicit graph structures where each step is a
+    node and transitions between steps are managed as state evolution. This graph-based approach enables
+    structured orchestration of multi-step agent interactions and state tracking across complex workflows.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00588
+  name: Expression-based Animation Synchronization
+  definition: Animation synchronization across multiple elements in After Effects can be achieved through
+    shared expressions that reference a master element's properties, enabling consistent motion behavior
+    without direct keyframe linking. This approach allows complex mechanical relationships like rotating
+    wheels to maintain proportional speed and direction based on size.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00910
+  name: Geometric Shape Manipulation
+  definition: Geometric shapes can be transformed, combined, and modified through specific tools and operations
+    to create new forms and designs. The principle describes how basic geometric elements can be systematically
+    altered or merged to produce complex visual outcomes.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00931
+  name: Visual Vs. Structural Layout Control
+  definition: 'Layout and ordering of webpage elements can be controlled through two distinct mechanisms:
+    CSS-based visual manipulation (like ''order'' and ''position'') that does not alter the DOM structure,
+    and HTML-based structural control that changes the actual document flow. These mechanisms operate
+    at different levels of the web development stack.'
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00954
+  name: Vector-based Spatial Representation
+  definition: Spatial entities in computational systems are best represented as vector objects that encapsulate
+    directional and magnitude properties, enabling efficient manipulation and transformation of geometric
+    relationships. This approach provides a unified framework for handling points, coordinates, and motion
+    in interactive and creative coding environments.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00203
+  name: Ligature Management in Digital Typography
+  definition: Ligatures are special character combinations that improve readability and aesthetics by
+    replacing standard letter pairs with custom-designed glyphs. Their management requires careful selection
+    and control to avoid visual conflicts or unintended effects in digital typography.
+  source_content_type: tool_instruction
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00031
+  name: Futurist Typographic Revolution
+  definition: Futurist typography emerged from the Italian Futurist movement's artistic and philosophical
+    revolution, emphasizing technology, speed, violence, and movement. It rejected traditional form in
+    favor of dynamic, experimental layouts that intensified both meaning and form through radical typographic
+    innovation.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00303
+  name: Collective Design Movement From Student Revolt
+  definition: Student-led political upheaval in 1968 Paris catalyzed the formation of a graphic design
+    collective, Grapus, composed of designers who had studied under Polish master poster artist Henryk
+    Tomaszewski and were influenced by anarchist design principles. The collective emerged from the intersection
+    of political activism, artistic training, and shared ideological commitment to social change through
+    visual communication.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00469
+  name: Design Thinking in Large Organizations
+  definition: Design thinking can successfully drive innovation and process improvement within large,
+    mature organizations that are traditionally conservative and risk-averse. The approach enables cross-functional
+    collaboration between frontline staff, experts, and stakeholders to address real user needs and systemic
+    problems.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00555
+  name: Daily Deals Industry Vulnerability
+  definition: The daily deals industry is characterized by intense competitive pressure, low barriers
+    to entry, and rapid market saturation that erodes long-term profitability and industry attractiveness.
+    This sector is particularly susceptible to commoditization and price competition due to its reliance
+    on promotional strategies and thin profit margins.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00013
+  name: Digital Financial Supermarket Model
+  definition: A digital platform evolves from a specialized service provider into a comprehensive financial
+    ecosystem that serves diverse user segments and merchant partners through integrated, scalable solutions.
+    The model emphasizes rapid adaptation to user needs, leveraging technology to simplify transactions,
+    and building trust through consistent value delivery.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00791
+  name: Asemic Languages Installation Process
+  definition: A machine learning art installation that uses unsupervised learning to analyze and transform
+    handwritten data into visual representations.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00956
+  name: Annual Investment Allowance
+  definition: A tax relief scheme that provides 100% deduction on qualifying business equipment, plant,
+    and machinery purchases up to a specified limit. The scheme allows businesses to immediately write
+    off qualifying capital expenditures rather than depreciating them over time.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00994
+  name: Chartreuse Color Cultural Significance
+  definition: A color analysis that examines the cultural meanings, historical usage, and successful applications
+    of chartreuse (a bright yellow-green color) in design and branding.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00511
+  name: Freelancer Workforce Evolution
+  definition: The modern freelance workforce is expanding rapidly as economies shift toward hiring independent
+    professionals over permanent employees, with freelancers increasingly seen as a sustainable long-term
+    employment model. This trend reflects broader economic adaptation to flexible, project-based work
+    arrangements.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00518
+  name: Feedback Policy Implementation
+  definition: Effective policy design requires understanding and leveraging feedback loops to address
+    system behavior. Policies that align with feedback structures can successfully manage system dynamics,
+    but their success depends on the ability to recognize and communicate these relationships.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00524
+  name: Sacrificial Investment for Long-term Potential
+  definition: Strategic short-term sacrifices—such as taking on debt or reducing living standards—are
+    justified when they unlock superior long-term outcomes. The principle recognizes that optimal future
+    returns often require immediate trade-offs in current comfort or stability.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00550
+  name: Personal Responsibility Bias
+  definition: Individuals tend to attribute outcomes to external factors or victimhood rather than personal
+    agency, even when they possess the capacity to change their situation through conscious choice and
+    responsibility. This bias manifests in patterns of blame, expectation of external solutions, and avoidance
+    of self-accountability.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00566
+  name: Systemic Strategy Stagnation
+  definition: Systems tend to fail most dramatically immediately after achieving their greatest success,
+    because they become trapped in applying previously successful strategies to new challenges. This creates
+    a paradox where the very competence that led to triumph becomes the source of catastrophic malfunction.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00579
+  name: Extended Skill Acquisition Investment
+  definition: High-stakes skill development requires prolonged, intensive practice and professional training
+    that extends well beyond typical learning timelines. The principle describes a pattern where mastery
+    of complex skills demands years of dedicated effort, even for individuals with natural aptitude.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00715
+  name: Genai Acceleration Effect
+  definition: Generative AI enables rapid scaling of AI initiatives by reducing the time, data, and resource
+    requirements traditionally needed for deployment. The principle describes a performance improvement
+    in AI implementation speed and efficiency when using generative AI technologies.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00728
+  name: Premonitory Signals in Systemic Change
+  definition: Early warning signals of systemic shifts can be detected through observable behavioral and
+    energetic cues, even when explicit communication about impending change is absent. These signals manifest
+    as subtle shifts in environment, energy, or context that precede major disruptions or transformations.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00749
+  name: Collaborative Paradigm Evolution
+  definition: Organizational collaborative models evolve through a gradual, adaptive process where companies
+    experiment with hybrid approaches rather than adopting clean theoretical frameworks. The transition
+    involves both conscious adaptation and unconscious lag as organizations respond to emerging paradigms.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00767
+  name: Partisan Segregation in Book Networks
+  definition: Political book networks exhibit strong clustering by partisan affiliation, with distinct
+    red and blue clusters that remain largely isolated from each other. The principle describes a pattern
+    where purchase behavior reflects and reinforces political polarization, creating segregated information
+    ecosystems.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00903
+  name: Simple Ai Attack Vector
+  definition: AI systems can be successfully attacked using straightforward, low-complexity methods that
+    exploit known vulnerabilities in their training data or decision-making processes. The principle demonstrates
+    that sophisticated adversarial techniques are not always necessary to compromise AI systems.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00914
+  name: Technology Use Prediction Bias
+  definition: People consistently underestimate the range of future uses for new technologies, often failing
+    to anticipate the transformative potential of innovations. This occurs because users and designers
+    operate within familiar mental models that constrain their ability to envision novel applications.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00925
+  name: Intended Consequence Vs. Actual Outcome
+  definition: Human actions and decisions often produce unintended consequences that differ from the actor's
+    original intentions. This disconnect arises because individuals fail to fully consider the cascading
+    effects of their choices, leading to outcomes that contradict their stated goals or values.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-01009
+  name: Superstar Effect and Winner-take-all Dynamics
+  definition: In modern economies, a small number of high-performing individuals or entities capture the
+    majority of rewards and attention, creating winner-take-all outcomes. This phenomenon amplifies the
+    impact of small advantages and makes the distribution of success highly skewed.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-01015
+  name: Safety Factor Erosion
+  definition: Organizational pressure to reduce costs and optimize resources leads to systematic erosion
+    of safety margins and risk tolerance, even when the underlying system is not fundamentally flawed.
+    This process creates a gradual degradation of protective measures that can culminate in catastrophic
+    failure when conditions exceed the system's adapted tolerance.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00043
+  name: Exception-driven Conceptual Expansion
+  definition: The expansion of conceptual frameworks in cultural and social analysis occurs through the
+    systematic incorporation of exceptions, ambiguities, and irregularities as legitimate objects of study.
+    This process represents a methodological shift where previously excluded phenomena become central
+    to understanding broader cultural patterns.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00045
+  name: Automation-driven Task Liberation
+  definition: When routine tasks become automated or highly accessible, the time and resources previously
+    dedicated to execution can be redirected toward higher-value, non-routine work. This principle describes
+    a pattern where technological advancement enables workforce reallocation from mechanistic to creative
+    or strategic functions.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00048
+  name: Performance Context Dependency
+  definition: The effectiveness of a performance or presentation is highly dependent on the specific context,
+    audience, and environment in which it occurs. A performance that succeeds in one setting may fail
+    in another, regardless of the inherent quality of the content or execution.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00071
+  name: Process Culture Inhibition of Critical Feedback
+  definition: When organizational processes become rigid and institutionalized, they systematically suppress
+    critical feedback from lower levels, even when that feedback could prevent catastrophic failures.
+    The principle describes how over-standardization and procedural rigidity create barriers to essential
+    communication channels.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00072
+  name: Process-oriented Artistic Expression
+  definition: Artistic expression shifts from finished product to ongoing process, emphasizing the dynamic
+    relationship between creator, observer, and medium. This approach prioritizes the act of creation
+    and interaction over static representation.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00171
+  name: Behavioral Debt Escalation
+  definition: When individuals face financial constraints and lack self-control, they often resort to
+    borrowing to maintain current spending levels, which creates a feedback loop that amplifies debt and
+    reduces long-term financial stability. The principle describes a pattern where short-term behavioral
+    choices compound into systemic financial problems.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00172
+  name: Systemic Pest Cycle
+  definition: A feedback loop in which ecosystem disruption leads to pest outbreaks, prompting pesticide
+    use that further degrades the system and intensifies future pest problems. The cycle demonstrates
+    how short-term fixes compound long-term instability in managed systems.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00189
+  name: Generous Design Through Vulnerability
+  definition: Design that embraces risk and vulnerability rather than seeking protection through restrictive,
+    minimalistic constraints. This principle advocates for intentionally exposing systems to potential
+    failure or harm as a means to enable more expansive, generous, and meaningful outcomes.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00193
+  name: Execution Gap From Technological Readiness
+  definition: Organizations can recognize disruptive technologies and invest in them, yet still fail to
+    achieve market success when they do not align their execution strategy with the new technological
+    paradigm. The principle identifies a gap between technological readiness and organizational capability
+    to capitalize on innovation.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00211
+  name: Agentic Ai Operational Ambiguity
+  definition: Agentic AI systems can appear operationally healthy while failing to achieve their intended
+    goals, creating a disconnect between system performance metrics and task success. This ambiguity arises
+    because agents operate in complex, dynamic environments where success is not solely determined by
+    internal system health.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00247
+  name: Digital Superpower Dominance
+  definition: The global economy is increasingly dominated by a small number of digital superpowers that
+    control key platforms and ecosystems, creating a hub-and-spoke economic structure where most value
+    creation flows through these central platforms.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00269
+  name: Neural Resonance in Brand Engagement
+  definition: Brand engagement activates neural pathways associated with emotional resonance and automatic
+    decision-making, similar to how religious experiences or sensory stimuli trigger deep cognitive responses.
+    The principle describes a neurological basis for why brands can evoke strong, often unconscious reactions
+    that bypass rational deliberation.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00288
+  name: Graffiti Cost and Policy Response
+  definition: Graffiti is perceived as vandalism that incurs substantial public costs for removal and
+    is associated with property devaluation, prompting government spending on enforcement and cleanup.
+    The principle reflects a policy and economic response to graffiti as a social and financial problem.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00215
+  name: Triadic Transformation Structure
+  definition: A triadic form serves as a structural mechanism for transformation by integrating input
+    at its base, compressing and directing it through a central point, and preparing it for transition
+    to a higher dimension or state. This form acts as both a conduit and a transformer of energy, information,
+    or matter.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00543
+  name: Catholic Reading for Design Inspiration
+  definition: Designers benefit from reading widely across diverse genres and subjects, even when the
+    direct application to their work is not immediately apparent. The subconscious absorption of ideas
+    from varied sources enhances creative thinking and problem-solving capabilities.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00560
+  name: Interactive Media Integration
+  definition: Artistic works that incorporate live media broadcasts and audience participation create
+    dynamic, evolving compositions where the content and meaning are co-constructed through real-time
+    interaction. The principle describes how media elements become raw material for artistic expression
+    when integrated with audience engagement.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00571
+  name: Mythological Symbolic Resonance
+  definition: Mythological symbols and archetypal forms maintain consistent meaning across diverse cultural
+    and historical contexts, appearing as recurring motifs in religious, spiritual, and esoteric traditions.
+    These symbols often manifest in multiple forms—animals, celestial bodies, geometric patterns, or sacred
+    texts—while carrying overlapping psychological and spiritual significance.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00574
+  name: Identity Reformation Through Ideological Shift
+  definition: Societies undergoing radical transformation restructure fundamental beliefs about human
+    nature, social organization, and truth-telling to establish new collective identities. This process
+    involves replacing existing worldviews with ideologically driven frameworks that redefine what it
+    means to be human and how people should relate to one another.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00605
+  name: Divine Inspiration Vs. Technique
+  definition: True artistic excellence emerges from a fusion of divine inspiration and technical skill,
+    rather than from either alone. The principle asserts that pure technique without spiritual or creative
+    inspiration produces sterile work that is ultimately overshadowed by inspired but imperfect creations.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00616
+  name: Unexpected Association Memory
+  definition: Novel or incongruent pairings of elements create stronger and more lasting memories than
+    ordinary associations. This principle describes how the brain encodes unexpected connections more
+    deeply, making them more memorable and impactful for learning and retention.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00621
+  name: Accident Rate Normalization
+  definition: Accident rates in highly regulated systems can be normalized to a baseline level of occurrence,
+    allowing for meaningful comparison and prediction of outcomes. The principle enables risk assessment
+    by establishing a stable reference point for rare events.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00630
+  name: Multi-agent System Evolution
+  definition: AI agent systems evolve from narrow, task-specific implementations toward flexible, multi-agent
+    architectures that combine diverse capabilities and human-in-the-loop coordination. This evolution
+    reflects growing recognition that single-agent solutions are insufficient for complex, real-world
+    applications.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00700
+  name: Market Efficiency Pricing Bias
+  definition: Market pricing strategies often reflect a bias toward efficiency and competitive parity
+    rather than value creation, leading to price-based competition that can undermine long-term strategic
+    positioning. This principle describes how businesses frequently price according to market averages
+    or competitor benchmarks rather than unique value propositions.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00719
+  name: Infographic Cultural Evolution
+  definition: Infographics have evolved from specialized print formats into widely recognized visual communication
+    tools through cultural adoption, technological integration, and institutional support. The principle
+    describes the transformation of infographics from niche design elements to mainstream informational
+    media.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00766
+  name: Healing Through Self-sovereignty
+  definition: The process of healing personal trauma and inner conflict occurs through the cultivation
+    of self-sovereignty, which emerges as a stronger and more resilient inner core when faced with adversity.
+    This principle describes how personal suffering becomes a catalyst for deeper self-awareness and psychological
+    strength.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00002
+  name: Long-term Time Horizon Advantage
+  definition: Systems that operate with extended time horizons—spanning multiple generations or long-term
+    consequences—demonstrate superior resilience, adaptability, and survival outcomes compared to systems
+    optimized for short-term gains or immediate returns. This principle reflects a fundamental tension
+    between temporal discounting and systemic stability.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00006
+  name: Golden Ratio in Art and Architecture
+  definition: The golden ratio (φ) has been historically associated with aesthetic beauty and has been
+    claimed to appear in artistic and architectural works, particularly in ancient structures like the
+    Egyptian pyramids. However, evidence for its intentional use in historical artworks or monuments is
+    often unsubstantiated or requires complex analysis to detect.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00032
+  name: Pseudodoxy and Feedback Loop Risk
+  definition: When a system's behavior becomes increasingly erratic or deteriorates faster than expected,
+    it may indicate that the solution being applied is flawed or misaligned with the system's actual dynamics.
+    This pattern often emerges from overconfidence in a single correct approach or from escalation of
+    a faulty intervention.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00042
+  name: Systemic Blind Spot
+  definition: Systems practitioners observe that established institutions and dominant paradigms often
+    fail to recognize their own structural limitations, leading to responses that exacerbate rather than
+    address root problems. This creates a paradox where the very tools meant to solve systemic issues
+    become part of the problem.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00786
+  name: Sacred Tree Oracular Communication
+  definition: Ancient cultures attributed divine communication to specific trees, particularly oaks and
+    sacred groves, through natural phenomena like rustling leaves or divine presence. These trees served
+    as intermediaries between humans and deities, functioning as oracular sites where divine voices were
+    interpreted through environmental cues.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00796
+  name: Symphonic Ai Development
+  definition: The evolution of artificial intelligence toward agentic systems mirrors the composition
+    of a symphony — requiring multiple specialized components (agents) that must be orchestrated together
+    to achieve complex, emergent capabilities. This principle describes a developmental trajectory where
+    AI systems progress from isolated tools to collaborative entities that function as a unified whole.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00798
+  name: Innovation Through Disruption
+  definition: Innovative ideas are recognized by their ability to provoke fear and discomfort in audiences,
+    particularly when they challenge established norms or practices. This principle identifies a cultural
+    marker of breakthrough creativity that transcends logical or functional improvements.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00827
+  name: Posthuman Design Commitment
+  definition: Design practices that prioritize posthuman values over humanist ones, creating speculative
+    space for investigating nomadic approaches to designing things beyond traditional human-centered frameworks.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00830
+  name: Strategic Focus Constraint
+  definition: Organizations tend to focus narrowly on a single strategic approach or utility space, even
+    when multiple viable paths exist. This constraint limits exploration of alternative strategies and
+    utility spaces, often due to cognitive biases, organizational inertia, or the need for clear decision-making
+    frameworks.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00866
+  name: Usefulness-driven Survival
+  definition: Entities that appear useless or unvaluable to utilitarian systems often survive longer and
+    thrive in environments where efficiency and productivity are prioritized. This principle describes
+    a pattern where apparent inefficiency or non-productivity becomes a protective mechanism.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00881
+  name: Imagination in Disaster
+  definition: Effective management requires the ability to anticipate and prevent disasters through imaginative
+    foresight rather than reactive problem-solving. This capability represents a critical competence that
+    defines managerial worth beyond mere task completion.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00940
+  name: Inner Creativity Independence
+  definition: True creative work requires internal commitment and self-reliance rather than external validation
+    or support from others. The principle identifies a fundamental tension between seeking external validation
+    and maintaining the psychological autonomy necessary for creative achievement.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00944
+  name: Authorial Identity in Design Practice
+  definition: Designers who integrate personal narrative and biographical context into their professional
+    identity create a more authentic and meaningful connection between their work and the broader cultural
+    or natural systems they engage with. This principle describes how personal experience and values shape
+    design philosophy and practice.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00953
+  name: Strategic Misalignment Indicator
+  definition: When individuals or organizations present a facade of engagement and professionalism while
+    internally disengaged or operating under conflicting incentives, it signals strategic misalignment
+    between public presentation and private motivation. This pattern reveals that surface-level compliance
+    masks deeper operational or motivational discord.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00960
+  name: Unfamiliar Territory Innovation
+  definition: Innovation emerges when individuals or teams venture into unfamiliar territory, abandoning
+    conventional approaches and embracing experimental methods. This principle describes a pattern where
+    discomfort with new methods or environments becomes a catalyst for creative breakthroughs.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00964
+  name: Digital Transformation Imperative
+  definition: Organizations face urgent pressure to undergo digital transformation due to rapid technological
+    change, pandemic acceleration, and strategic necessity. This transformation is not optional but a
+    fundamental requirement for survival and competitive advantage in the modern business environment.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00989
+  name: Contemporary Issue Resonance
+  definition: Research topics that resonate with contemporary issues gain heightened relevance and urgency
+    when they align with current social, political, or cultural agendas. These topics often experience
+    renewed interest or expanded scope due to their timeliness and public attention.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-01019
+  name: Context Awareness Pervasion
+  definition: Context awareness technologies evolve from experimental user-centered services into pervasive
+    tracking systems that fundamentally alter individual privacy and data ownership. The principle describes
+    how initially benign technological capabilities expand into comprehensive surveillance mechanisms.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00052
+  name: Problem-finding As Creative Art
+  definition: Creative research and innovation are fundamentally about identifying solvable problems rather
+    than solving pre-existing ones. This approach treats problem identification as a skill that can be
+    taught and refined through mentorship and practice.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00111
+  name: Bias Amplification in Ai Systems
+  definition: AI systems amplify existing biases present in training data or design parameters, leading
+    to discriminatory outcomes that reflect societal prejudices. The principle describes how bias in input
+    data, algorithmic design, or user interaction can propagate through AI systems to affect real-world
+    decisions and social outcomes.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00117
+  name: Nonlinear Vulnerability to Squeeze Events
+  definition: Large systems or entities experience disproportionately higher costs and risks from unexpected
+    shocks or 'squeeze' events compared to smaller systems. The relationship between system size and vulnerability
+    is nonlinear, meaning that as size increases, the impact of adverse events grows at an accelerating
+    rate.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00187
+  name: Lgbtq Mainstreaming in Brand Communication
+  definition: Brands increasingly integrate LGBTQ themes and values into their communication strategies
+    as societal acceptance has shifted from marginalization to mainstream normalization. This transformation
+    reflects both cultural evolution and the strategic alignment of brand identity with evolving consumer
+    values.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00217
+  name: Simplification and Comprehensibility in Communication
+  definition: Communication systems evolve toward greater simplicity and comprehensibility as a response
+    to the need for global understanding and cognitive efficiency. This trend manifests in both linguistic
+    and cultural expression, where complex forms are reduced to more accessible representations.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00231
+  name: Founder Vision Vs. Product Evolution
+  definition: Startups often begin with a founder's personal vision or interest in people and technology
+    that bears little resemblance to the eventual products or market positioning. The initial founder
+    vision is frequently unrelated to the company's future success or market trajectory.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00250
+  name: Accident Waiting to Happen
+  definition: A situation or event is described as 'an accident waiting to happen' when it results from
+    accumulated tensions, contradictions, or systemic flaws that make the outcome inevitable despite appearing
+    to be a random occurrence. The phrase indicates that the conditions for failure or conflict were already
+    present and merely required a trigger to manifest.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00298
+  name: Cultural Adaptation in Personal Evolution
+  definition: Successful personal and professional evolution requires continuous adaptation to changing
+    cultural contexts and norms. This principle describes the necessity of remaining culturally relevant
+    while maintaining personal growth trajectories.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00302
+  name: Reliability-first Ai Integration
+  definition: Integrating AI systems into real-world applications requires prioritizing reliability and
+    controlled deployment over raw capability demonstrations. The principle emphasizes that successful
+    AI integration demands systematic approaches to safety, context management, and operational control.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00306
+  name: Chance Operations in Creative Practice
+  definition: Creative practitioners employ random or chance-based methods to generate artistic works,
+    prioritizing spontaneity and emotional impact over structured planning or logical derivation. This
+    approach is rooted in a belief that randomness can unlock creative potential and bypass conventional
+    constraints.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00315
+  name: Archetypal Transformation Through Accumulation
+  definition: Meaningful transformation occurs through the accumulation and refinement of symbolic processes
+    across generations, where each iteration builds upon previous understanding to achieve deeper spiritual
+    or psychological insight. This principle describes how archetypal narratives and transformative practices
+    evolve through layers of interpretation and application.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00318
+  name: Aesthetic Pattern Recognition
+  definition: Human perception of beauty and visual harmony follows recurring structural patterns that
+    transcend individual artistic expression. These patterns reflect universal principles of composition
+    and proportion that guide aesthetic judgment across diverse creative domains.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00339
+  name: Recurring Visual Language in Art Nouveau
+  definition: Art Nouveau movements across different cultural contexts (Vienna, Britain) exhibit recurring
+    visual elements and design strategies that reflect shared aesthetic principles and stylistic evolution.
+    These include the use of flowing forms, symbolic motifs, and standardized formats for repeated application.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00355
+  name: Selective Data Presentation Bias
+  definition: Data can be selectively framed or subset to produce different conclusions, even when the
+    underlying statistics remain the same. This occurs when researchers or analysts choose specific groupings,
+    comparisons, or visualizations that emphasize certain patterns while obscuring others.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00358
+  name: Open Data Implementation Gap
+  definition: The gap between the theoretical promises of open data and its practical implementation reflects
+    systemic challenges in data collection, presentation, and institutional adoption. This disconnect
+    is particularly pronounced for disadvantaged communities who are most affected by data collection
+    practices.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00364
+  name: Intellectual Property Vulnerability
+  definition: Ideas and creative concepts are inherently difficult to protect legally because they lack
+    the tangible form that copyright law typically protects. This vulnerability creates a paradox where
+    the very foundation of competitive advantage—innovation and originality—can be easily copied or adapted
+    by competitors.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00522
+  name: Sacred Garden Symbolism
+  definition: Gardens function as sacred spaces that unite conscious and unconscious aspects of the self,
+    representing spiritual, cultural, and natural harmony. They embody the integration of divine and earthly
+    realms, often symbolizing paradise, renewal, and the cyclical nature of life.
+  source_content_type: noise
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00809
+  name: Neural Art Community and Practices
+  definition: A community of artist-coders who experiment with deep neural networks for artistic creation,
+    particularly focusing on generative systems like DeepDream and inceptionism techniques.
+  source_content_type: noise
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_ct758_flags.csv (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00423
+  name: Periodic Table Ordering Principle
+  definition: Elements are systematically organized by atomic weight into a tabular structure that reveals
+    periodic chemical behavior patterns. This arrangement enables the prediction of element properties
+    and the discovery of missing elements based on the regularity of their chemical characteristics.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00606
+  name: Variation Decomposition in Statistical Modeling
+  definition: Statistical models decompose total variation in a dependent variable into components attributable
+    to different sources, such as systematic effects, random error, and shared variance. This decomposition
+    enables the assessment of each factor's contribution to explaining the outcome and allows for adjustments
+    in the presence of confounding variables.
+  source_content_type: process_instance
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00507
+  name: Cosmic Order Representation
+  definition: Historical cosmic models reflect the cultural and scientific understanding of humanity's
+    place in the universe, evolving from geocentric to heliocentric frameworks while maintaining symbolic
+    and illustrative traditions. These representations serve both explanatory and aesthetic functions
+    in visual communication.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00790
+  name: Virtuous Design As Anti-consumerism
+  definition: Design can serve a virtuous role by creating objects that resist commodification and promote
+    sustainable use rather than endless consumption. This approach values function, durability, and ethical
+    production over profit-driven design that encourages waste and overconsumption.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00242
+  name: Silent Weapons for Quiet Wars
+  definition: A covert strategy of social control that manipulates societal structures through indirect
+    means, using tools like media, education, and political systems to influence public behavior and perception
+    without overt conflict or visible coercion. The approach seeks to reshape society through subtle psychological
+    and systemic interventions.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00278
+  name: Stigler's Law of Eponymy
+  definition: The phenomenon that scientific discoveries are often named after the wrong person, with
+    the correct attribution typically going to someone who was not the original discoverer. The principle
+    describes a recurring pattern in the history of science where credit is misattributed due to the timing
+    and visibility of discoveries.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00348
+  name: Cultural Style Evolution Through Adaptation
+  definition: Graphic design styles evolve through a cycle of innovation, imitation, and commodification
+    where new aesthetic movements emerge from cultural rebellion, are adopted by commercial entities,
+    and eventually become standardized or co-opted for mass production. This process reflects broader
+    patterns of cultural transmission and economic adaptation.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00366
+  name: Genetic Engineering Revolution
+  definition: The development of CRISPR-Cas9 gene editing technology represents a transformative shift
+    in biological intervention, enabling precise modification of DNA sequences with unprecedented ease
+    and accuracy. This advancement emerged rapidly following the completion of the Human Genome Project,
+    marking a pivotal moment in the application of genetic knowledge.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00650
+  name: Metafont Design Evolution
+  definition: A typeface design process that begins with a foundational form and evolves through iterative
+    refinement, digital adaptation, and extended family development while maintaining core legibility
+    and functional characteristics. The principle describes how a typeface can be systematically reimagined
+    and expanded across multiple platforms and formats.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00693
+  name: Cultural Typographic Revolution
+  definition: The emergence of a new typographic culture in the late 20th century was driven by the intersection
+    of technological innovation, creative experimentation, and the rise of independent design practices.
+    This period saw the transformation of typography from a primarily functional tool into a form of artistic
+    and cultural expression.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00722
+  name: Arbitrary Rule Enforcement
+  definition: Totalitarian systems enforce rules that are often arbitrary, inconsistent, and lack logical
+    justification, yet they are strictly enforced to maintain control over populations. These systems
+    demonstrate a pattern where the authority of the rule-maker supersedes rationality or human rights.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00850
+  name: Material Transparency in Sculpture
+  definition: In sculpture, successful material mastery renders the medium invisible to viewers, creating
+    an illusion of seamless representation. This effect is achieved when the material's inherent properties
+    are overcome or harmonized with the artistic vision, producing a surface that appears to dissolve
+    into its subject matter.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00909
+  name: Hierarchical Numerical Base System
+  definition: Numerical systems evolve from direct physical representation to abstract hierarchical structures
+    through the adoption of base units and positional notation. This evolution enables efficient representation
+    of large numbers using fewer symbols and supports mathematical abstraction.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00945
+  name: Angelic Assistance in Creative Work
+  definition: Creative individuals experience supernatural or transcendent support that guides their work,
+    often manifesting as unexpected opportunities, material assistance, and intuitive insights. This principle
+    describes a belief system where higher intelligences or spiritual forces actively assist human creativity
+    and evolution.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00972
+  name: Semiotic Evolution Through Philosophical Ages
+  definition: The development of semiotic theory progresses through distinct philosophical ages, each
+    marked by a dominant approach to understanding signs and inference. These ages reflect broader shifts
+    in philosophical methodology and epistemological frameworks, with Peirce's work representing a pivotal
+    transition in semiotic consciousness.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00418
+  name: Prompt Response Iteration Framework
+  definition: A systematic approach to generating and organizing multiple prompt variants and their model
+    responses in a structured format for analysis and comparison. The framework enables rapid experimentation
+    and evaluation of different prompt designs by capturing each variant's output in a tabular format.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00434
+  name: Technical Reviewer Identity
+  definition: A technical reviewer's professional identity encompasses both their academic role and personal
+    interests, creating a unique blend of expertise and practical engagement with their field. This dual
+    identity influences their approach to teaching, coding, and content creation.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00624
+  name: Feminist Data Visualization
+  definition: Data visualization that centers marginalized perspectives and lived experiences to challenge
+    dominant narratives and create more authentic representations of complex phenomena. The principle
+    emphasizes the integration of personal storytelling with structured data formats to reveal hidden
+    dimensions of social issues.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00656
+  name: Arts and Crafts Ethical Design
+  definition: The Arts and Crafts Movement emerged as a response to industrialization's dehumanizing effects,
+    advocating for design that restores artistic integrity and social meaning by rejecting mass production's
+    anonymity. This principle emphasizes the moral and spiritual value of handmade objects and the artist's
+    role in the creative process.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00984
+  name: Creative Coding Community
+  definition: Creative coding is a domain where technical expertise intersects with artistic expression,
+    fostering innovation through interdisciplinary collaboration between software developers, human-computer
+    interaction specialists, and visual artists. This community produces work that bridges technology
+    and creativity, often gaining recognition in mainstream media and entertainment.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00995
+  name: Critical Research and Social Justice
+  definition: Critical research in social sciences focuses on documenting systemic injustices, reproductions
+    of inequality, and the impacts of changing economic structures like capitalism. It emphasizes qualitative
+    methods and is rooted in Marxist and post-Marxist traditions that critique power dynamics and advocate
+    for social transformation.
+  source_content_type: noise_drop
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00272
+  name: Symbolic Resonance in Egyptian Culture
+  definition: Egyptian cultural symbols like the scarab beetle, ankh, and eye of Horus function as both
+    protective amulets and metaphoric representations of divine power, linking earthly experience to spiritual
+    transcendence. These symbols carry layered meanings that bridge physical and metaphysical realms,
+    operating as conduits for divine favor, protection, and rebirth.
+  source_content_type: negative_example
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00975
+  name: B-corp Social Impact Alignment
+  definition: Companies can achieve certification as B Corporations by meeting rigorous standards of social
+    and environmental performance, accountability, and transparency. This certification process aligns
+    business practices with broader societal and planetary needs, demonstrating that financial success
+    and positive impact are mutually reinforcing.
+  source_content_type: negative_example
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00319
+  name: Data Analysis and Representation
+  definition: Qualitative data analysis involves systematic processes of reducing, organizing, and interpreting
+    data to identify meaningful patterns and themes that align with research questions. The process typically
+    includes steps like data reduction, coding, theme development, and interpretation, with attention
+    to emergent ideas and ethical considerations.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00644
+  name: Ai Agent-driven Business Transformation
+  definition: AI agents represent a transformative shift in how businesses operate, enabling autonomous
+    decision-making and optimization across processes while creating new value through reduced waste,
+    improved efficiency, and novel economic multipliers. The principle describes a systemic change in
+    organizational capability where AI agents become integral to both operational execution and strategic
+    adaptation.
+  source_content_type: growth_edge
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00490
+  name: Anxiety-induced Mortality Belief
+  definition: The belief that anxiety or fear can directly cause death through supernatural or psychological
+    mechanisms, particularly in contexts where scientific evidence is not required to validate this connection.
+    This belief is rooted in cultural and anthropological understanding of fear's power.
+  source_content_type: noise
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-01001
+  name: Contractual Offer and Acceptance in Visual Art Sales
+  definition: The sale of visual art involves a structured process where an artist makes an offer (typically
+    through a contract or quotation), the buyer makes a counter-offer or acceptance, and the transaction
+    is finalized through mutual agreement and documentation. This process governs the exchange of artwork,
+    rights, and payment.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+- example_id: S4-GOLD-MINED-00806
+  name: Grounded Theory Methodology (2)
+  definition: A systematic qualitative research approach that emphasizes iterative data analysis, theoretical
+    development, and constant comparison of data to build theories grounded in empirical observation.
+    The method involves coding processes that move from initial data coding to theoretical coding and
+    substantive coding.
+  source_content_type: process_template
+  sequence_present: null
+  repeatable_method: null
+  transferability: null
+  epistemic_status: null
+  disposition: null
+  rationale: mined from p5_fewshot_manifest.json (D2594 Tier3 scaffold); pending 2-of-3 adjudication
+mining_sources:
+- path: temp/p5_ct758_flags.csv
+  note: 113 non-principle (19 PT / 10 TI / 8 PI / 74 GE / 2 noise) — the 74 GE + 19 PT are the highest-value
+    near-boundary pool
+- path: temp/p5_fewshot_manifest.json
+  note: 87 human-calibrated rows (44 principle / 15 GE / 14 PT / 6 noise_drop / 3 PI / 2 neg / 1 noise
+    / 1 undecided / 1 TI)
+- path: temp/p5_pending_human_fixes.csv
+  note: 5 ambiguous domain fixes (discipline leakage) — adjacent, not content_type
+confirmed_principle_flips:
+- S4-GOLD-MINED-00088
+- S4-GOLD-MINED-00647
+- S4-GOLD-MINED-00271
+- S4-GOLD-MINED-00387
+_last_mined: 2026-09-09 (D2607 Tier3 scaffold)
+_contamination_note: 'D2609 RESOLVED (option b+): the 150 CHALLENGE cases overlap ~100% with Tier2
+  discipline/domain training golden (150/150 example_ids) — CROSS-TASK (discipline/domain TRAINING vs
+  content_type EVAL), and content_type is rules-based (not trained), so zero contamination today. RULING:
+  this corpus is a RULES-REGRESSION-ONLY eval, NOT a model-eval benchmark. Its example_ids are HELD-OUT
+  from any future content_type training (enforced by pipeline/boundary_holdout_guard.py). Option (a)
+  REJECTED: excluding 150 IDs from discipline training would starve a data-limited classifier to protect
+  a hypothetical future. Plain prose-only note REJECTED as a latent trap.'

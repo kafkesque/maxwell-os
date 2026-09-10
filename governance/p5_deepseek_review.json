@@ -1,0 +1,747 @@
+{
+  "S4-GOLD-MINED-00156": {
+    "example_id": "S4-GOLD-MINED-00156",
+    "discipline": "systems thinking",
+    "domains": [
+      "urban planning"
+    ],
+    "confidence": "high",
+    "reason": "The critique of functional zoning and spontaneous interaction in planned cities uses a systems lens on urban dynamics.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00423": {
+    "example_id": "S4-GOLD-MINED-00423",
+    "discipline": "theoretical physics",
+    "domains": [
+      "education",
+      "science & research"
+    ],
+    "confidence": "medium",
+    "reason": "The periodic table ordering by atomic weight reflects atomic structure and chemical periodicity, a physical science principle.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00440": {
+    "example_id": "S4-GOLD-MINED-00440",
+    "discipline": "creative coding",
+    "domains": [
+      "arts & culture",
+      "media & entertainment",
+      "computational art"
+    ],
+    "confidence": "high",
+    "reason": "Algorithmic composition uses computational processes to generate audio and visual structures, a core creative coding practice.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00602": {
+    "example_id": "S4-GOLD-MINED-00602",
+    "discipline": "generative design",
+    "domains": [
+      "computational art",
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "The foundation of generative art through computational elements and parameter expansion is a generative design approach.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00009": {
+    "example_id": "S4-GOLD-MINED-00009",
+    "discipline": "generative design",
+    "domains": [
+      "computational art",
+      "product design",
+      "industrial design"
+    ],
+    "confidence": "medium",
+    "reason": "Parametric design systems use adjustable variables to generate variations, exemplifying generative design methodology.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00014": {
+    "example_id": "S4-GOLD-MINED-00014",
+    "discipline": "motion & time",
+    "domains": [
+      "media & entertainment",
+      "motion design"
+    ],
+    "confidence": "high",
+    "reason": "Coordinating audio and visuals in motion graphics projects is a motion and time discipline.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00056": {
+    "example_id": "S4-GOLD-MINED-00056",
+    "discipline": "aesthetics",
+    "domains": [
+      "media & entertainment",
+      "motion design"
+    ],
+    "confidence": "high",
+    "reason": "Systems esthetics integrates media forms into unified expressive frameworks, an aesthetic discipline.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00057": {
+    "example_id": "S4-GOLD-MINED-00057",
+    "discipline": "cultural studies",
+    "domains": [
+      "brand identity",
+      "marketing & communications"
+    ],
+    "confidence": "high",
+    "reason": "This analyzes how brands commodify cultural markers, a cultural studies lens.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00063": {
+    "example_id": "S4-GOLD-MINED-00063",
+    "discipline": "software engineering",
+    "domains": [
+      "digital product",
+      "graphic design"
+    ],
+    "confidence": "high",
+    "reason": "Vector file interoperability between design tools is a software engineering concern.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00091": {
+    "example_id": "S4-GOLD-MINED-00091",
+    "discipline": "philosophy",
+    "domains": [
+      "science & research"
+    ],
+    "confidence": "medium",
+    "reason": "The observation that abstract mathematics later becomes physically useful is an epistemological pattern in philosophy of science.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00114": {
+    "example_id": "S4-GOLD-MINED-00114",
+    "discipline": "machine learning",
+    "domains": [
+      "data visualization",
+      "research & methodology"
+    ],
+    "confidence": "high",
+    "reason": "PCA and t-SNE are machine learning techniques for dimensionality reduction used in visualization.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00134": {
+    "example_id": "S4-GOLD-MINED-00134",
+    "discipline": "philosophy",
+    "domains": [
+      "user experience",
+      "product design",
+      "urban planning"
+    ],
+    "confidence": "high",
+    "reason": "Inclusive design politics raises ethical and political questions about nonhuman stakeholders, a philosophical design concern.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00147": {
+    "example_id": "S4-GOLD-MINED-00147",
+    "discipline": "sociology",
+    "domains": [
+      "digital product",
+      "web & ui"
+    ],
+    "confidence": "high",
+    "reason": "Web 2.0 platforms enable multi-party interaction and collective social outcomes, a sociological framework.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00163": {
+    "example_id": "S4-GOLD-MINED-00163",
+    "discipline": "risk management",
+    "domains": [
+      "engineering & infrastructure"
+    ],
+    "confidence": "high",
+    "reason": "The 3-copy backup strategy mitigates data loss risks through redundancy, a risk management heuristic.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00176": {
+    "example_id": "S4-GOLD-MINED-00176",
+    "discipline": "visual perception",
+    "domains": [
+      "graphic design",
+      "motion design"
+    ],
+    "confidence": "high",
+    "reason": "Contrast directs attention and hierarchy through opposing visual elements, a perceptual design principle.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00228": {
+    "example_id": "S4-GOLD-MINED-00228",
+    "discipline": "psychology",
+    "domains": [
+      "personal productivity"
+    ],
+    "confidence": "high",
+    "reason": "The inner critic is a psychological defense mechanism affecting creative individuals' productivity.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00233": {
+    "example_id": "S4-GOLD-MINED-00233",
+    "discipline": "evolutionary biology",
+    "domains": [
+      "science & research"
+    ],
+    "confidence": "high",
+    "reason": "Genetic regulatory networks are a biological concept explaining gene expression hierarchy and evolutionary adaptability.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00242": {
+    "example_id": "S4-GOLD-MINED-00242",
+    "discipline": "political economy",
+    "domains": [
+      "legal & public policy"
+    ],
+    "confidence": "medium",
+    "reason": "The model describes covert social control through manipulation of societal systems, analyzed from a political economy perspective.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00273": {
+    "example_id": "S4-GOLD-MINED-00273",
+    "discipline": "organizational theory",
+    "domains": [
+      "business operations",
+      "project management",
+      "entrepreneurship"
+    ],
+    "confidence": "high",
+    "reason": "Innovation failure rates reflect organizational behavior and project management practices in business contexts.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00274": {
+    "example_id": "S4-GOLD-MINED-00274",
+    "discipline": "cultural design",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "product design"
+    ],
+    "confidence": "high",
+    "reason": "The principle guides culturally sensitive and inclusive design across graphic, brand, and product contexts.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00278": {
+    "example_id": "S4-GOLD-MINED-00278",
+    "discipline": "sociology",
+    "domains": [
+      "science & research"
+    ],
+    "confidence": "high",
+    "reason": "Stigler's Law describes a social pattern in scientific attribution, best analyzed through sociology.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00294": {
+    "example_id": "S4-GOLD-MINED-00294",
+    "discipline": "visual semiotics",
+    "domains": [
+      "data visualization"
+    ],
+    "confidence": "medium",
+    "reason": "The method uses visual encoding to reveal textual structure, applying semiotic principles to data visualization.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00343": {
+    "example_id": "S4-GOLD-MINED-00343",
+    "discipline": "political economy",
+    "domains": [
+      "finance & investment"
+    ],
+    "confidence": "high",
+    "reason": "Social innovation funding models are structured by political and economic forces, analyzed through political economy.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00348": {
+    "example_id": "S4-GOLD-MINED-00348",
+    "discipline": "cultural studies",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "marketing & communications"
+    ],
+    "confidence": "high",
+    "reason": "The evolution of design styles follows cultural transmission and commodification processes studied in cultural studies.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00366": {
+    "example_id": "S4-GOLD-MINED-00366",
+    "discipline": "evolutionary biology",
+    "domains": [
+      "science & research"
+    ],
+    "confidence": "medium",
+    "reason": "CRISPR-Cas9 gene editing is a biological technology with evolutionary implications, classified under evolutionary biology.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00368": {
+    "example_id": "S4-GOLD-MINED-00368",
+    "discipline": "creative coding",
+    "domains": [
+      "creative technology",
+      "code & computation",
+      "user experience"
+    ],
+    "confidence": "high",
+    "reason": "Dynamic shape rendering is a creative coding technique applied in interactive media and user experience.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00372": {
+    "example_id": "S4-GOLD-MINED-00372",
+    "discipline": "computer graphics",
+    "domains": [
+      "graphic design",
+      "web & ui",
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "Resolution and scaling control are technical aspects of computer graphics applied in digital media workflows.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00373": {
+    "example_id": "S4-GOLD-MINED-00373",
+    "discipline": "cultural design",
+    "domains": [
+      "graphic design",
+      "industrial design",
+      "digital product",
+      "design systems"
+    ],
+    "confidence": "medium",
+    "reason": "Cultural synthesis in design reflects cultural design principles across multiple design domains.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00411": {
+    "example_id": "S4-GOLD-MINED-00411",
+    "discipline": "creative coding",
+    "domains": [
+      "arts & culture",
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "Parameterized sound variation is a creative coding technique for dynamic audio in media and arts contexts.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00420": {
+    "example_id": "S4-GOLD-MINED-00420",
+    "discipline": "information science",
+    "domains": [
+      "business operations",
+      "legal & public policy",
+      "marketing & communications"
+    ],
+    "confidence": "high",
+    "reason": "Data-driven bias arises from information systems and their social context, analyzed through information science.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00421": {
+    "example_id": "S4-GOLD-MINED-00421",
+    "discipline": "computer graphics",
+    "domains": [
+      "graphic design",
+      "motion design"
+    ],
+    "confidence": "high",
+    "reason": "Layer ordering controls visual stacking and rendering order in digital design and animation software, which is a core topic of computer graphics.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00434": {
+    "example_id": "S4-GOLD-MINED-00434",
+    "discipline": "sociology",
+    "domains": [
+      "education"
+    ],
+    "confidence": "medium",
+    "reason": "The composite of academic role and personal interests shaping professional identity is a sociological analysis of roles and self-presentation in education.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00481": {
+    "example_id": "S4-GOLD-MINED-00481",
+    "discipline": "behavioral economics",
+    "domains": [
+      "marketing & communications",
+      "leadership"
+    ],
+    "confidence": "medium",
+    "reason": "The perception of mutual benefit in two-way exchanges and its influence on cooperation aligns with behavioral economics principles applied to marketing and leadership.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00482": {
+    "example_id": "S4-GOLD-MINED-00482",
+    "discipline": "color theory",
+    "domains": [
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "Systematic color meanings and cultural associations as emotional narrative cues in film directly address color theory within media storytelling.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00505": {
+    "example_id": "S4-GOLD-MINED-00505",
+    "discipline": "operations research",
+    "domains": [
+      "business operations",
+      "data visualization"
+    ],
+    "confidence": "high",
+    "reason": "Pareto chart analysis is a quantitative decision-making tool rooted in operations research, used to prioritize factors in business operations through data visualization.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00507": {
+    "example_id": "S4-GOLD-MINED-00507",
+    "discipline": "visual semiotics",
+    "domains": [
+      "graphic design",
+      "semiotics & communication"
+    ],
+    "confidence": "medium",
+    "reason": "Cosmic maps blend scientific observation with symbolic interpretation, functioning as visual signs that communicate cosmic order, which is the study of visual semiotics.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00525": {
+    "example_id": "S4-GOLD-MINED-00525",
+    "discipline": "cultural studies",
+    "domains": [
+      "urban planning"
+    ],
+    "confidence": "high",
+    "reason": "The embedding of colonial power structures into mapping platforms through translation of local knowledge is a cultural studies critique of representation and power in spatial systems.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00527": {
+    "example_id": "S4-GOLD-MINED-00527",
+    "discipline": "privacy & surveillance",
+    "domains": [
+      "urban planning"
+    ],
+    "confidence": "high",
+    "reason": "The cartographic gaze as an elevated observational perspective enabling surveillance and social control is a core concept in privacy and surveillance studies applied to mapped urban space.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00541": {
+    "example_id": "S4-GOLD-MINED-00541",
+    "discipline": "philosophy",
+    "domains": [
+      "user experience",
+      "product design",
+      "urban planning"
+    ],
+    "confidence": "high",
+    "reason": "The critique of human-centered design's neglect of ecological and long-term consequences raises philosophical questions about values and responsibility in design practice.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00548": {
+    "example_id": "S4-GOLD-MINED-00548",
+    "discipline": "media studies",
+    "domains": [
+      "editorial & advertising"
+    ],
+    "confidence": "high",
+    "reason": "The transformation of illustrated book quality through technological advances in printing and binding is a historical media studies topic within editorial publishing.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00587": {
+    "example_id": "S4-GOLD-MINED-00587",
+    "discipline": "sociology",
+    "domains": [],
+    "confidence": "low",
+    "reason": "Thing-powered agency as distributed across human and nonhuman actors is a sociological actor-network theory concept without a specific application domain in the text.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00604": {
+    "example_id": "S4-GOLD-MINED-00604",
+    "discipline": "economics",
+    "domains": [
+      "organizational behavior",
+      "leadership"
+    ],
+    "confidence": "medium",
+    "reason": "Flexibility as a third currency in value exchange models is an economic concept applied to negotiating work conditions and autonomy in organizational leadership contexts.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00624": {
+    "example_id": "S4-GOLD-MINED-00624",
+    "discipline": "cultural studies",
+    "domains": [
+      "data visualization"
+    ],
+    "confidence": "medium",
+    "reason": "Feminist data visualization centering marginalized perspectives to challenge dominant narratives is a cultural studies approach applied to data visualization practice.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00631": {
+    "example_id": "S4-GOLD-MINED-00631",
+    "discipline": "risk management",
+    "domains": [
+      "ai & agents"
+    ],
+    "confidence": "high",
+    "reason": "Ethical safeguards and proactive risk mitigation for AI systems are core risk management practices applied within the AI & agents domain.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00655": {
+    "example_id": "S4-GOLD-MINED-00655",
+    "discipline": "computer graphics",
+    "domains": [
+      "motion design",
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "Visual effects, compositing, and motion graphics workflow integration through layer management and scripting are technical computer graphics topics applied in motion design and media production.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00656": {
+    "example_id": "S4-GOLD-MINED-00656",
+    "discipline": "philosophy",
+    "domains": [
+      "product design",
+      "industrial design"
+    ],
+    "confidence": "high",
+    "reason": "Ethical design principle about moral value of craft and rejection of mass production.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00665": {
+    "example_id": "S4-GOLD-MINED-00665",
+    "discipline": "information science",
+    "domains": [
+      "legal & public policy",
+      "research & methodology",
+      "education",
+      "science & research"
+    ],
+    "confidence": "high",
+    "reason": "Open data ecosystems are about shared information infrastructure and reuse across sectors.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00668": {
+    "example_id": "S4-GOLD-MINED-00668",
+    "discipline": "machine learning",
+    "domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "confidence": "high",
+    "reason": "Computational method using network-derived features for drug discovery prediction.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00671": {
+    "example_id": "S4-GOLD-MINED-00671",
+    "discipline": "computational theory",
+    "domains": [
+      "code & computation"
+    ],
+    "confidence": "high",
+    "reason": "Theoretical problem about recursive set generation and ordering unpredictability.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00693": {
+    "example_id": "S4-GOLD-MINED-00693",
+    "discipline": "cultural studies",
+    "domains": [
+      "graphic design",
+      "arts & culture"
+    ],
+    "confidence": "high",
+    "reason": "Historical cultural shift in typography toward artistic and cultural expression.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00699": {
+    "example_id": "S4-GOLD-MINED-00699",
+    "discipline": "strategic thinking",
+    "domains": [
+      "business operations",
+      "digital product",
+      "project management",
+      "entrepreneurship"
+    ],
+    "confidence": "high",
+    "reason": "Resource-constrained focus strategy for prioritizing a single objective under scarcity.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00722": {
+    "example_id": "S4-GOLD-MINED-00722",
+    "discipline": "political economy",
+    "domains": [
+      "legal & public policy"
+    ],
+    "confidence": "high",
+    "reason": "Arbitrary rule enforcement in totalitarian systems as a mechanism of political control.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00729": {
+    "example_id": "S4-GOLD-MINED-00729",
+    "discipline": "software engineering",
+    "domains": [
+      "media & entertainment"
+    ],
+    "confidence": "high",
+    "reason": "Systematic debugging and testing methodology for interactive media systems.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00746": {
+    "example_id": "S4-GOLD-MINED-00746",
+    "discipline": "media studies",
+    "domains": [
+      "education",
+      "legal & public policy"
+    ],
+    "confidence": "high",
+    "reason": "Selective historical representation in narrative construction and timeline curation.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00795": {
+    "example_id": "S4-GOLD-MINED-00795",
+    "discipline": "semiotics",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "marketing & communications"
+    ],
+    "confidence": "high",
+    "reason": "Archetypal symbols and their shared meanings across cultural and design contexts.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00807": {
+    "example_id": "S4-GOLD-MINED-00807",
+    "discipline": "artificial intelligence",
+    "domains": [
+      "ai & agents"
+    ],
+    "confidence": "medium",
+    "reason": "Neural network phenomenon of bidirectional processing leading to emergent meaning.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00850": {
+    "example_id": "S4-GOLD-MINED-00850",
+    "discipline": "aesthetics",
+    "domains": [
+      "arts & culture"
+    ],
+    "confidence": "high",
+    "reason": "Material transparency in sculpture as artistic mastery rendering the medium invisible.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00864": {
+    "example_id": "S4-GOLD-MINED-00864",
+    "discipline": "visual perception",
+    "domains": [
+      "editorial & advertising",
+      "graphic design",
+      "media & entertainment",
+      "user experience"
+    ],
+    "confidence": "high",
+    "reason": "Structural composition dynamics and how viewers perceive and process graphic design.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00895": {
+    "example_id": "S4-GOLD-MINED-00895",
+    "discipline": "philosophy",
+    "domains": [
+      "graphic design",
+      "semiotics & communication"
+    ],
+    "confidence": "high",
+    "reason": "Ethical dimensions and responsibilities inherent in graphic design practice.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00927": {
+    "example_id": "S4-GOLD-MINED-00927",
+    "discipline": "risk management",
+    "domains": [
+      "health & wellness"
+    ],
+    "confidence": "high",
+    "reason": "Asymmetric risk trade-off favoring early and frequent medical screening.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00932": {
+    "example_id": "S4-GOLD-MINED-00932",
+    "discipline": "psychology",
+    "domains": [],
+    "confidence": "high",
+    "reason": "The principle focuses on predictable human behavior and cognitive biases in social engineering, making psychology the correct theoretical lens.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00945": {
+    "example_id": "S4-GOLD-MINED-00945",
+    "discipline": "creative process",
+    "domains": [
+      "arts & culture"
+    ],
+    "confidence": "medium",
+    "reason": "The principle prescribes a practical mindset and method for creative work, aligning with the creative process discipline; its application is in arts and culture.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00955": {
+    "example_id": "S4-GOLD-MINED-00955",
+    "discipline": "cultural design",
+    "domains": [
+      "graphic design",
+      "user experience"
+    ],
+    "confidence": "high",
+    "reason": "The principle concerns integration of digital culture into graphic design practice, which is cultural design; it applies to graphic design and UX.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00963": {
+    "example_id": "S4-GOLD-MINED-00963",
+    "discipline": "theoretical physics",
+    "domains": [],
+    "confidence": "high",
+    "reason": "The mechanism describes light scattering and atmospheric optics, a topic in theoretical physics, with no specific application domain.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00975": {
+    "example_id": "S4-GOLD-MINED-00975",
+    "discipline": "organizational theory",
+    "domains": [
+      "business operations"
+    ],
+    "confidence": "high",
+    "reason": "B-Corp certification involves organizational standards and governance, studied under organizational theory; its application is business operations.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-00977": {
+    "example_id": "S4-GOLD-MINED-00977",
+    "discipline": "economics",
+    "domains": [
+      "business operations",
+      "digital product",
+      "marketing & communications"
+    ],
+    "confidence": "high",
+    "reason": "The mechanism describes market penetration and displacement of technologies, an economics topic; it applies to business, product, and marketing.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-01010": {
+    "example_id": "S4-GOLD-MINED-01010",
+    "discipline": "economics",
+    "domains": [
+      "ai & agents",
+      "business operations",
+      "entrepreneurship"
+    ],
+    "confidence": "medium",
+    "reason": "The visibility threshold is determined by investment and market conditions, an economics pattern; applied to AI commercialization and business.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-01017": {
+    "example_id": "S4-GOLD-MINED-01017",
+    "discipline": "anthropology",
+    "domains": [],
+    "confidence": "medium",
+    "reason": "The principle provides a descriptive model of how religious systems use symbols and rituals to organize moral behavior, which is anthropological; no specific application domain.",
+    "contamination": []
+  },
+  "S4-GOLD-MINED-01021": {
+    "example_id": "S4-GOLD-MINED-01021",
+    "discipline": "aesthetics",
+    "domains": [
+      "creative technology",
+      "media & entertainment",
+      "computational art",
+      "arts & culture"
+    ],
+    "confidence": "high",
+    "reason": "The object describes aesthetic effects emerging from video feedback systems, making aesthetics the disciplinary lens, applied in creative technology and arts/media contexts.",
+    "contamination": []
+  }
+}

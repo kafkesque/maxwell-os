@@ -42,6 +42,14 @@ CONTENT_TO_EXTRACTION_TYPE: dict[str, str] = dict(
     _CT.get("content_to_extraction_type", {})
 )
 
+# ── D2587 — content-type classification rules (Q1/Q2/Q3) ───────────────────
+# Loaded so the auditor can ENFORCE the rules (process_template.min_steps, etc.)
+# rather than leave them as decorative YAML. C12: read from YAML, never re-declare.
+CONTENT_TYPE_RULES: dict = dict(_CT.get("content_type_rules", {}))
+PROCESS_TEMPLATE_MIN_STEPS: int = int(
+    CONTENT_TYPE_RULES.get("process_template_min_steps", 2)
+)
+
 # ── D2323 — vestigial content_type values, never used ─────────────────────
 DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
     _CT.get("dropped_content_types", [])

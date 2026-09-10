@@ -1,13 +1,15 @@
 {
   "params": {
-    "pi_correct": 0.7845272816291199,
+    "pi_correct": 0.7616251008887065,
     "theta": [
-      0.05709254949157298,
-      0.4101843705742649
+      0.040196925047186395,
+      0.414879775979027,
+      0.6247331507815826
     ],
     "psi": [
-      0.3641326465096081,
-      0.7005363240646362
+      0.3884449803983006,
+      0.6576044751797493,
+      0.9458302135332547
     ]
   },
   "population": {
@@ -22,8 +24,14 @@
       "neither": 353,
       "nli_only": 34
     },
-    "p_mislabel_mean": 0.2358,
-    "p_mislabel_median": 0.1879,
-    "n_high_suspicion": 135
+    "p_mislabel_mean": 0.2506,
+    "p_mislabel_median": 0.1748,
+    "n_high_suspicion": 135,
+    "challenger_lf3": {
+      "n_available": 70,
+      "n_disagree_vote1": 63,
+      "n_agree_vote0": 7,
+      "n_abstain": 957
+    }
   }
 }

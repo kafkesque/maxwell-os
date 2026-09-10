@@ -1,0 +1,1256 @@
+{
+  "note": "same-author echoes: source_diversity>=2 but <2 distinct authors (false convergence)",
+  "total_scanned": 1012,
+  "echo_count": 96,
+  "echoes": [
+    {
+      "fb_id": "b35e022fd1c41634d52b71d68995f37bf1a8e0955dbca11b09f09dcb83ded9dc",
+      "name": "Abstraction As Truth Revelation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "d0884c15a5964ed07c408899db31c40b9f47a38a3ed023baa8525e54bae05937",
+      "name": "Accounting Rule Adaptation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "8b6956fe67c9874bd4e727679bfac7a9ac7c6514ff249d28c3a016252f740c8b",
+      "name": "Aesthetic Refinement Through Iteration",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marty Neumeier"
+      ],
+      "source_books": [
+        "The Brand Gap - How to Bridge the Distance Between Business Strategy and Design (Marty Neumeier) @.md",
+        "The Brand Gap, Revised Edition -- Marty Neumeier -- 2005 -- Pearson Education (US) -- 80264045cb7a79faa7ea63e629cacc3c -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "2dd3dd8f90fad67d7335c9837773b0d9089777e441c85c0c49ecddd9eb4c88b2",
+      "name": "Ai Implementation Readiness",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "2aa3bd4f4ce53217c49fe19037433c5f54d1831952120f3f773f9ab66de4e2cb",
+      "name": "Ai Output Legal Ambiguity",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "5c4efcbb3ad49c7ef23ebc7915ede3fe6bc05a2de05b8edcf58c1970c5fd5e69",
+      "name": "Ai-driven Content Distillation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "8dc102a1d2072070249cc25853c484e3ced656b549efa089949d5982194e03ff",
+      "name": "Ai-optimized Hardware Architecture",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "e9973d8fd57c2af80f63d1cfd70b8e612bfb75cca4bdeede193ed5191b330448",
+      "name": "Appetite Metaphor",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "9332af1d116118bd8833078dde3e99c0dad54bf6dc39dd59e31e416d986560a6",
+      "name": "Association Principle in Compliance",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Robert B. Cialdini"
+      ],
+      "source_books": [
+        "Influence - The Psychology of Persuasion (Collins Business Essentials) by Robert B. Cialdini (z-lib.org).md",
+        "Robert B. Cialdini, PhD - Influence, New and Expanded_ The Psychology of Persuasion (2021, HarperCollins) - libgen.li.md"
+      ]
+    },
+    {
+      "fb_id": "45051a123a4dde395b51f1ff0ca1daa683ea4c03d0e2b48fa54dc906bed1d615",
+      "name": "Author Compensation in Ai Training",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "0a746b080eb817f2594638984b4ee289fc66ac1ba51830c07c99188d77c0d336",
+      "name": "Automation-driven Task Liberation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Seth Godin"
+      ],
+      "source_books": [
+        "This Is Marketing You Can_t Be Seen Until You Learn to See.md",
+        "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "2f4d1249c9ee04b0818c4ac93a0487cbeb5148edc75b26bb847370382e32d7ab",
+      "name": "Basic Authentication Credential Format",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Alireza Parandeh"
+      ],
+      "source_books": [
+        "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "3902f208cebef7037e6066f8854f01b0b5d448b8b1b958c4f168a04c9527f785",
+      "name": "Behavioral Response Variability",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "09c081dd79a2182496fb34a30fa5002a379ecc282c6968dd859aa817bf56488a",
+      "name": "Business Harvesting Motivation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Harvard Business Review"
+      ],
+      "source_books": [
+        "The Harvard Business Review Entrepreneur_s Handbook.md",
+        "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "4426eaf5745d3bcd764392b07278ed6e4339b9e61247dc7c3abc507cb2a981bd",
+      "name": "Cinematic Narrative Construction",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marcel Danesi"
+      ],
+      "source_books": [
+        "[Marcel_Danesi]_Understanding_Media_Semiotics(z-lib.org).md",
+        "[Marcel_Danesi_(auth.)]_Of_Cigarettes,_High_Heels,(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "b559969950ea9800f33364f5f18faa8386ed21aa5a87a5a83084b3ef8b0ddceb",
+      "name": "Collaborative Paradigm Evolution",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marty Neumeier"
+      ],
+      "source_books": [
+        "The Brand Gap - How to Bridge the Distance Between Business Strategy and Design (Marty Neumeier) @.md",
+        "The Brand Gap, Revised Edition -- Marty Neumeier -- 2005 -- Pearson Education (US) -- 80264045cb7a79faa7ea63e629cacc3c -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "465e596a07345d42ddb6e6c709d2295706767faef2c66dc700def598cc838466",
+      "name": "Collective Identity Storytelling",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Seth Godin"
+      ],
+      "source_books": [
+        "This Is Marketing You Can_t Be Seen Until You Learn to See.md",
+        "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "23838baa88b949ceb0b470ae3628e327b5653fe8e0c6d1e6d82c731b0342afc5",
+      "name": "Column-responsive Numeric Design",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Ellen Lupton"
+      ],
+      "source_books": [
+        "Thinking with Type A Critical Guide for Designers, Writers, Editors, Students (Second and Revised Edition) (Ellen Lupton) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "[Ellen_Lupton]_Thinking_with_Type__A_Critical_Guid(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "9bd0cf8d543ab0092d0566a9ba1b2bd6f7f5fcdb6593a22ad16bcf9a2cfd67b5",
+      "name": "Communication Saturation Point",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "7f080b6beaae458f4715c697118fb7cc07af1754357b3fdbcd0f162967ebe1c7",
+      "name": "Consumerist Individualism",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marcel Danesi"
+      ],
+      "source_books": [
+        "[Marcel_Danesi]_Understanding_Media_Semiotics(z-lib.org).md",
+        "[Marcel_Danesi_(auth.)]_Of_Cigarettes,_High_Heels,(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "cdb24a04e93dd60cb7088b9a012d288adba7ec23d06bd2d7ffe4a4448fa743fa",
+      "name": "Convexity of Small Probabilities",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Nassim Nicholas Taleb"
+      ],
+      "source_books": [
+        "Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Black Swan (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "bdcfee448b761fb03b7eacc8e5e4722a2b7937a255811f04006a4b8b2323446e",
+      "name": "Cost Shifting Through Systemic Encroachment",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "b6da0fa8e4e4f9fc6aff3eddda04fa24e2e08c60593647b403861e2ec2b20feb",
+      "name": "Creative Identity Through Constraint",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Mike Monteiro"
+      ],
+      "source_books": [
+        "Design Is a Job by Mike Monteiro (2012-05-04).md",
+        "Youre My Favorite Client by Mike Monteiro.md"
+      ]
+    },
+    {
+      "fb_id": "8fc9c8871daece9cf68abcb8b955b3f9525e1d5d593ec9ac843578b88f8ac96f",
+      "name": "Creative Practice Through Public Expression",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Austin Kleon"
+      ],
+      "source_books": [
+        "Keep Going 10 Ways to Stay Creative in Good Times and Bad by Austin Kleon.md",
+        "Show Your Work 10 Ways to Share Your Creativity and Get Discovered by Austin Kleon.md"
+      ]
+    },
+    {
+      "fb_id": "a41a5738c14fcccbf5f199486cae747de028b7d557662a82709f15afb9290750",
+      "name": "Cross-origin Resource Sharing Blocking",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Alireza Parandeh"
+      ],
+      "source_books": [
+        "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "b6d5a57a0385238242cee15875a8e7d2617c27bf31db1dec99604de7ce07465a",
+      "name": "Curiosity-driven Learning Loop",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "73835679ce76d2b79423fe0921c9d44847cef3937806b55068edf42d640f32e0",
+      "name": "Detail-driven Ai Strategy",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "c4773c2c3f9d73b8687722b770fdb190e2aa65ab6382b024f2f61249ec2ead54",
+      "name": "Entrepreneurial Decision Under Uncertainty",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Harvard Business Review"
+      ],
+      "source_books": [
+        "The Harvard Business Review Entrepreneur_s Handbook.md",
+        "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "d229788ba2db7b8e58333a0fb5d02c0fe2dbfb33f554075eb1f690ccf7c96ad4",
+      "name": "Entrepreneurial Disruption Pattern",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Harvard Business Review"
+      ],
+      "source_books": [
+        "The Harvard Business Review Entrepreneur_s Handbook.md",
+        "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "f70193583abe0e04192ee2bebd1d90aa48ecf918a460a4089315de077a34943a",
+      "name": "Expensive-is-good Heuristic",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Robert B. Cialdini"
+      ],
+      "source_books": [
+        "Influence - The Psychology of Persuasion (Collins Business Essentials) by Robert B. Cialdini (z-lib.org).md",
+        "Robert B. Cialdini, PhD - Influence, New and Expanded_ The Psychology of Persuasion (2021, HarperCollins) - libgen.li.md"
+      ]
+    },
+    {
+      "fb_id": "e76825770925f933597dcc76d13753a4054e519b69be6546811fd14ccf7f3ba8",
+      "name": "Explainable Ai Decision Transparency",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "8f0f463bf3fdf09f67e6aca2b6e5d7aa7023487e60981a858a0494d055638aec",
+      "name": "Expression-based Animation Synchronization",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Trish and Chris Meyer"
+      ],
+      "source_books": [
+        "The After effects apprentice real-world skills for the aspiring motion graphics artist (Meyer, Chris, Meyer, Trish) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "after-effects-apprentice-real-chris-meyer(www.ebook-dl.com).md"
+      ]
+    },
+    {
+      "fb_id": "8d33243368212827f7d46573d7aa7a3ac76022891bf56fb99180fc92e05a62f9",
+      "name": "Extended Skill Acquisition Investment",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "23603e0bb1c8a66fa0a4b4b42bdffdb125c14d4860ff12d142a9aaec5b9b69da",
+      "name": "Figure-ground Relationship (2)",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Richard Poulin"
+      ],
+      "source_books": [
+        "The Language of Graphic Design An Illustrated Handbook for Understanding Fundamental Design Principles, Revised Edition (Richard Poulin) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "[Richard Poulin] Design School Layout A Practica.md"
+      ]
+    },
+    {
+      "fb_id": "c0a12008bb6a5074b4ef7f8ea33050bb239c79f837cb280df95b8fa0efa2483c",
+      "name": "Futile Effort Metaphor",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "ad358abd29266d0bc8070a96d62e5cdc17b7e90d4ca8c6d3ce553d3e3444955f",
+      "name": "Genai Acceleration Effect",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c",
+      "name": "Generous Audacious Marketing",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Seth Godin"
+      ],
+      "source_books": [
+        "This Is Marketing You Can_t Be Seen Until You Learn to See.md",
+        "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22",
+      "name": "Harvest Time Strategic Planning",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Harvard Business Review"
+      ],
+      "source_books": [
+        "The Harvard Business Review Entrepreneur_s Handbook.md",
+        "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "f9a37730c1c9dddfdadeea795213b455179fd88bbf8d9071ff8a2169fca3e629",
+      "name": "Human Educability As Species Strength",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "c7b3b12be4e9ec7b6ecc4df3adfd1aec8c663f6d9392f1b0a23e29d8f5125c1e",
+      "name": "Idea Challenge Iteration",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "d54a622a21b8d76dad829034423459af7823b6666a681ec9ce78ce8d6575bb8b",
+      "name": "Imagination in Disaster",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "141273d2390c490ab3d48bc07a90f27133b088a52bf169ae11363e864491ca48",
+      "name": "Implicit Function Representation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Alireza Parandeh"
+      ],
+      "source_books": [
+        "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "c0e4f3a4403d779228f645be07714721c3a32f8799e7b94f5321d2c3df667568",
+      "name": "Innovation Through Disruption",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marty Neumeier"
+      ],
+      "source_books": [
+        "The Brand Gap - How to Bridge the Distance Between Business Strategy and Design (Marty Neumeier) @.md",
+        "The Brand Gap, Revised Edition -- Marty Neumeier -- 2005 -- Pearson Education (US) -- 80264045cb7a79faa7ea63e629cacc3c -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "5fc50253c9646794e1c0bd1ba52bdb86a379ece0bc7d573792481632a71302e3",
+      "name": "Institutional Response to Crisis",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Robert B. Cialdini"
+      ],
+      "source_books": [
+        "Influence - The Psychology of Persuasion (Collins Business Essentials) by Robert B. Cialdini (z-lib.org).md",
+        "Robert B. Cialdini, PhD - Influence, New and Expanded_ The Psychology of Persuasion (2021, HarperCollins) - libgen.li.md"
+      ]
+    },
+    {
+      "fb_id": "ca381bc50e42c3a2d414c94b2d7182a9619ebb9b090b6a35e285d922610605a7",
+      "name": "Intermittent Failure Detection",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "2f5da1b7560ef10a43ac9c18bc853acd4ebb804580bbc9d17f9a3b36d9a79a10",
+      "name": "Manufacturing Process Innovation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Harvard Business Review"
+      ],
+      "source_books": [
+        "The Harvard Business Review Entrepreneur_s Handbook.md",
+        "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "cc35c808e2652a96f8b5e6ef3bf2c59a88111fffcc28033002423b7ee9572d3c",
+      "name": "Material Transparency in Sculpture",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "fba10d9bd2f3351fb1a94db5847b14d6ecb29cb37144f888ec9893e9c0d5f2b5",
+      "name": "Mediocristan Vs Extremistan Distribution",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Nassim Nicholas Taleb"
+      ],
+      "source_books": [
+        "Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Black Swan (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Black SwanThe Impact of the Highly Improbable (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "3aac2b338552b5ef6bff720447a3d7b3f2d7447952894317e2930255265d74f6",
+      "name": "Meta-problem Recognition",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "3826a6ed226959eac61b786d828344322187fd21d1db45e9f8573809c7a40e54",
+      "name": "Metaphor As Persuasive Tool",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "83b581487410cbc5f391918fbd31dd6b5021de77da109661e8d6d5a5d292c1b6",
+      "name": "Metaphor Selection Bias",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "44765a2a0ac8067afbc672079b2828df9a5dd5f2ea104f8f6bc8334a250ab68a",
+      "name": "Metaphor-driven Sales Persuasion",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "3d54cb0b099153a87eee88d2672d35475a87e68cd20a8f4381af345bfbd8cfaf",
+      "name": "Metaphorical Attenuation Strategy",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "2a2b6ff07e1fa3f0b23e6ac7106965877bdf2d32ed26583177f07e89145d09c2",
+      "name": "Metaphorical Framing for Policy Advocacy",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "cba1b96479af30e64e8139d09ba478f1e76c07787a5a91ba180c69c3dbdbaa2e",
+      "name": "Modality-based Social Addressing",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "67a213e128469ee1b0d4fdb640e2d427c7e678d55fbe615022b4fe3689afac7e",
+      "name": "Multimodal Conceptual Representation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "d893324f415e28fe000657fb2dabd3d601d0a2ec864b6aebf346750f1fafb992",
+      "name": "Naming Fallacy",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "203673c6cfaeb48e68c66d114e8b0da22f8d2bf48db8055094a92bc25954b0de",
+      "name": "Nonlinear Vulnerability to Squeeze Events",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Nassim Nicholas Taleb"
+      ],
+      "source_books": [
+        "Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Black Swan (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "87022bd3f2c94067dc9abfc0a2712b00e3dc50634074448f9a44c40f7059198f",
+      "name": "Operational Fallacy in Systemic Thinking",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "e211d167e832724fa6857d04ee4831792ac1129d1a1f836d8b364f2ea51dace8",
+      "name": "Optimized Container Image Reduction",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Alireza Parandeh"
+      ],
+      "source_books": [
+        "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "4b31821f73a9310b7baa0f24e01a2e3bc9f0084b093f6cba8d11de7e41f36f1c",
+      "name": "Path Following Normal Vector Calculation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Daniel Shiffman"
+      ],
+      "source_books": [
+        "The Nature of Code Simulating Natural Systems with JavaScript (Daniel Shiffman) (Z-Library).md",
+        "The Nature of Code Simulating Natural Systems with.md"
+      ]
+    },
+    {
+      "fb_id": "3deed9d817aa25f8b3a7bde1fe4cbc501580ee41354120333702dc756524d135",
+      "name": "Pictorial Representation Focus",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "5da045b7e457bf0971024aa42be70b4739749df7e45f4d247306c121333f8962",
+      "name": "Popular Language Standardization",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marcel Danesi"
+      ],
+      "source_books": [
+        "[Marcel_Danesi]_The_Semiotics_of_Emoji__The_Rise_o(z-lib.org).md",
+        "[Marcel_Danesi_(auth.)]_Of_Cigarettes,_High_Heels,(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "3d73aa9e86d6e6a8513063f8bda826b9a7b45edaaf8d8b587cc81a34e6a42177",
+      "name": "Probabilistic Misalignment",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Nassim Nicholas Taleb"
+      ],
+      "source_books": [
+        "Antifragile (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Black Swan (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "1c6c6c44577ec3dcc406f7b23d8b26b87dfd3051a9a754b87533f23c6102759a",
+      "name": "Problem Avoidance Through System Selection",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "0b432ef20f5e314c734fa28040a3af9ba1dc21c1abbbd3e6a597fff4d64c4f41",
+      "name": "Problem-finding As Creative Art",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "06e8bfba990ea261381e5faac28f95db875f5ca5ebfd17f474db657fed44736c",
+      "name": "Pseudodoxy and Feedback Loop Risk",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "278ef6a8165610f8f629ea8e5b84e519d759b6b6d3ca91339d9861a9a5afd99f",
+      "name": "Rareness-driven Memory Encoding",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "0e6143f7b6270b1257d75cac6229e90e070af0b0da1ca9a21eb979febbce1678",
+      "name": "Self-referential Systemic Patterns",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "fc87d6ff7c5fd7bde49b009c0d27eb66471401c44cade2adcd5617cf81a9f3ad",
+      "name": "Sequential Time Logic in Narrative Representation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "d9964a95928076d69f3305cdce35fb5755ab33c2f7d5cbe2c427c86fe3101596",
+      "name": "Simple Ai Attack Vector",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "38b675d0fc18280e80876ff1c7ce35bf687f5b4418d630b94d4e0b0320302be8",
+      "name": "Simplification and Comprehensibility in Communication",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Marcel Danesi"
+      ],
+      "source_books": [
+        "[Marcel_Danesi]_The_Semiotics_of_Emoji__The_Rise_o(z-lib.org).md",
+        "[Marcel_Danesi_(auth.)]_Of_Cigarettes,_High_Heels,(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "3c4aa9eb98dc46ad679a788cdc88e96afd2165841eb030a190ff813229effe89",
+      "name": "Social Learning Model",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Rob Thomas, Paul Zikopoulos, Kate Soule"
+      ],
+      "source_books": [
+        "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "87acbee01af04113d368bec955bf30a9912073736bd6aa96ca8922cf81c97c5a",
+      "name": "Solution-problem Entanglement",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "f0dbebfe89e417f4954b1cc24c37c5983724c2ac8fa4963c8ac88a94dc6ad31c",
+      "name": "Source Code Inspection Method",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Joey Korenman"
+      ],
+      "source_books": [
+        "The Freelance Manifesto A Field Guide for the Modern Motion Designer by Joey Korenman.md",
+        "The_Freelance_Manifesto_A_Field_Guide_for_the_Modern_Motion_Designer.md"
+      ]
+    },
+    {
+      "fb_id": "7a39d1974ec744b0c4e07338a00a6b685cdc1eb1bfc0c8b0c21ce0446d4fd91c",
+      "name": "Standardized Input Processing for Ai Models",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Alireza Parandeh"
+      ],
+      "source_books": [
+        "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md"
+      ]
+    },
+    {
+      "fb_id": "000e035798b39c4d4ada638aef410061175cfe7b7c6eb37e50ae2024d5d50724",
+      "name": "Status-driven Narrative Structure",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Seth Godin"
+      ],
+      "source_books": [
+        "This Is Marketing You Can_t Be Seen Until You Learn to See.md",
+        "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "79524e42f7335ca838ebd6fd125326f2d2a68eecf1f75a4ff27592c05d84cb47",
+      "name": "Symbolic Destruction Metaphor",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "38f5307df87f37493607f29c2fda0acf58cec5e005ad2943e97f8a23ae84790c",
+      "name": "Symbolic Representation Through Visual and Literary Metaphor",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "c87adcc215202bb4bea8aa0f48b114d0ee6fbe0aead71a8f46a17ced91765696",
+      "name": "Systemantic Intervention",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "7fad7317eeb3f2f84d743eb896f6c8d9694b476baf74ca12eec7a56d8f96a371",
+      "name": "Systemantics Operational Fallacy",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "0a4ea76cb3511212d80f04d589759731528aa968ac32679a987c11635a2e03c5",
+      "name": "Systemic Blind Spot",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "8381a4f5da61972cb2d56c0e700d0700e086eb71531e02b87388eff78749126f",
+      "name": "Systemic Bug Emergence",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "d34230335691cc924c100ddb618c857bcebd361626c3cf51f4333375ca0a4b47",
+      "name": "Systemic Environmental Probe",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "d97b49d0971e7b20c7fa36dee5cbd5164dba09d94af270b4880639f13ffec129",
+      "name": "Systemic Expansion and Encroachment",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "e661915c5d09257be1f5cff20a59394ef005b2bf65d58c638f9f6081f85e0517",
+      "name": "Systemic Paradox of Prevention",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "1dfb2151a14672ab6a12d89b8d0a866f947e2817868b32c8eac5985e853f398c",
+      "name": "Systemic Reinforcement of Problem Framing",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "89f2b0f789c9dc31e6b7a9510c0aa22a352df13aee1a3ad786a36fc6dd50d0ad",
+      "name": "Systemic Strategy Stagnation",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "69329f82fe99fe5b0ca40400677e04063c22023a0d5fa898d0492b899f413db2",
+      "name": "Technical Reviewer Identity",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Daniel Shiffman"
+      ],
+      "source_books": [
+        "The Nature of Code Simulating Natural Systems with JavaScript (Daniel Shiffman) (Z-Library).md",
+        "The Nature of Code Simulating Natural Systems with.md"
+      ]
+    },
+    {
+      "fb_id": "dae59af174d9ee45843cd86b247ca24609369ecced16dad08cd334b827ee9545",
+      "name": "Technology Use Prediction Bias",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Anne Miller"
+      ],
+      "source_books": [
+        "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md"
+      ]
+    },
+    {
+      "fb_id": "073c43e39a84829c4d1e37c3b276451ffeb2e269be7628fc71e9a3638ca11a6e",
+      "name": "Top-bottom Visual Semiotic Structure",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "6bba3fa4ec918f648b2d333fb9c08d3c42c19ad7c5f5298f37fb0456ad3ae41e",
+      "name": "Topological Vs. Topographical Mapping",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    },
+    {
+      "fb_id": "a6d37b3460955f37aab1f006c6325b777b3b9eb0d3079173647dd07d30a46a67",
+      "name": "Unexpected Interactions in Complex Systems",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "John Gall"
+      ],
+      "source_books": [
+        "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+        "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md"
+      ]
+    },
+    {
+      "fb_id": "ad7b00088610660ec9cc8dece28c5c29b212a6edeca5313206835b75b47389d2",
+      "name": "Visual Balance Through Symmetry",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Richard Poulin"
+      ],
+      "source_books": [
+        "The Language of Graphic Design An Illustrated Handbook for Understanding Fundamental Design Principles, Revised Edition (Richard Poulin) (z-library.sk, 1lib.sk, z-lib.sk).md",
+        "[Richard Poulin] Design School Layout A Practica.md"
+      ]
+    },
+    {
+      "fb_id": "510b00cdc73f2594abf46c8957f0e7c34f12d8afb3108b576c9e1ba402dda9a9",
+      "name": "Visual Design Consistency",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Joey Korenman"
+      ],
+      "source_books": [
+        "The Freelance Manifesto A Field Guide for the Modern Motion Designer by Joey Korenman.md",
+        "The_Freelance_Manifesto_A_Field_Guide_for_the_Modern_Motion_Designer.md"
+      ]
+    },
+    {
+      "fb_id": "ec970e76df207748b524769247613a2de1a0a1f9f2923707939cf1c9c9f96794",
+      "name": "Visual-verbal Syntactic Equivalence",
+      "source_diversity": 2,
+      "distinct_authors": 1,
+      "authors": [
+        "Gunther Kress"
+      ],
+      "source_books": [
+        "Reading Images The Grammar of Visual Design Gunther Kress, Theo van Leeuwen liber3.md",
+        "[Gunther_Kress]_Reading_Images__The_Grammar_of_Vis(z-lib.org).md"
+      ]
+    }
+  ]
+}

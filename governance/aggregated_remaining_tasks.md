@@ -1,5 +1,58 @@
 # Maxwell OS — Aggregated Task Register
-> **Updated:** 2026-09-03 (D2522)
+> **Updated:** 2026-09-08 (D2593)
+
+## 🆕 CONTENT-TYPE VERIFICATION BACKLOG + DSPy ARCHIVE (2026-09-08, D2592/D2593)
+
+> **FINDING (D2593):** content_type is the LEAST-verified golden axis. Of 1027 mined rows: **286 UNLABELED** (no content_type verdict ever) + **701 MODEL-ONLY** (332 high / 356 medium / 13 low) + **40 human-attended** (26 reswept / 1 retriaged / 13 human-confirmed) = **3.9% human-verified**. The D2591 re-sweep (48% error on 31 flips) proves the model verdicts are untrusted.
+> **VERIFICATION ORDER LOCKED:** `content_type` → `extraction_type` → `domain/discipline/depth`. Do NOT re-verify domain labels before content_type is clean.
+
+**LOCKED (D2594, 2026-09-09) — 3-TIER GOLDEN ARCHITECTURE (Option C):**
+> The golden set has two consumers with opposing needs, so a single all-1027 "spotless" bar is both unbounded cost AND insufficient. We do NOT sweep all 1027 by hand. We also do NOT retire to ~70 (breaks classifier MIN_GOLDEN_EXAMPLES=100 + throws ~950 statistically-usable examples).
+
+- [x] **Tier2 — STATISTICALLY-CLEANED TRAINING CORPUS (DONE 2026-09-05/06).** `stage4_golden_mined.yaml` (+`stage4_golden_mined_p4.yaml`) ~1027 examples → 61-way discipline + 43-way domain classifier. Cleaned via weak-supervision label model (D2585/D2586 Dawid-Skene π=0.785, 135 high-suspicion, 59 P4 corrections applied) + cleanlab Confident Learning (D2571) + T-NLI. NOT hand-verified — hand-verifying 1027 is the unbounded cost we are eliminating.
+- [~] **Tier1 — SPOTLESS FEW-SHOT (IN PROGRESS, RETARGETED D2595/D2596).** (a) **DeepSeek frontier audit DONE (D2596):** 69 objects cross-verified — depth 98.6% / discipline 97.1% / domains 98.6% agreement; 4 depth/domain/discipline overrides recorded (00085/00418/00562/00629). **17 human content_type decisions applied** (7 principle / 4 growth_edge / 2 quarantine / 2 tool_instruction / 2 noise_drop) → ledger + backlog (human_confirmed 28→45). **52 objects remain** DeepSeek-proposal-only → human-confirm them. ✅ **BUG-230 RESOLVED (option 1 + criterion codified):** the 4 growth_edge assignments (00334/00385/00495/00882) re-classified → noise_drop, and the positive entry criterion is now codified in `content_types.yaml` (`growth_edge_entry_criterion` + growth_edge description). ✅ **FRONTIER69 GOLDEN SEED COMPLETE (D2597):** all 69 objects human-adjudicated — 57 principle / 6 noise_drop / 2 quarantine / 2 tool_instruction / 2 process_template (ledger 84, backlog human_confirmed 97). ⚠️ **CORRECTION:** the "30 empty content_type/extraction_type" in the few-shot files are NEGATIVE/rejection examples (`should_extract: False`, `route: NULL`, `tier: CHALLENGE`) — correctly empty, NOT gaps. No fill needed. **Real remaining few-shot task = add 2–4 non-principle few-shots to `stage2_fewshot_convergent.yaml` (D2587 P0 role diversity)** — currently 100% principle positives. (b) the actual **injected few-shot files** (`stage2_fewshot_convergent.yaml` CONV-XXX 84 + `stage2_fewshot_single_source.yaml` 21) still carry **30 empty content_type + 30 empty extraction_type** — fill those too.
+- ✅ **FORENSIC AUDIT + QWEN3.8 DOUBLE-CHECK + P1 PROPAGATION (D2598, 2026-09-09).** Forensic audit (`governance/FORENSIC_AUDIT_CONTENT_TYPE_2026-09-09.md`) + Qwen3.8-27B local second-opinion triangulated the 6 non-principle objects. **Final human verdicts:** 00177→tool_instruction, 00547→process_template, 00650→process_template, 00934→principle, 00668→process_instance, 00006→growth_edge. **Fixed:** `noise`→`noise_drop` (2 rows). **P1 DONE:** `scripts/propagate_content_type_decisions.py` writes the 97 merged human content_types back to `stage4_golden_mined.yaml` + `gold_frozen.yaml` + `maxwell.db` (C13 backup).
+- ✅ **P4 SPLIT-BRAIN MERGE + P2 FALSE-CONVERGENCE AUDIT + CONVERGENT=PRINCIPLE-BY-DESIGN CORRECTION (D2599, 2026-09-09).** (1) **P4 DONE:** 12 boundary-corpus cases appended to the ledger (source=boundary_corpus) → ledger 97 = single complete source of truth. (2) **P2 DONE:** `scripts/audit_false_convergence.py` → **96/1012 golden FBs (~9.5%) are same-author echoes** (source_diversity≥2 but <2 distinct authors); emitted `governance/false_convergence_echoes.json`. Re-tier is a human decision. (3) **⚠️ CORRECTION (resolves phantom task-a):** `stage2_fewshot_convergent.yaml` is 100% principle **BY DESIGN** — S2 convergent path emits ONLY `principle`/`route:FB`; non-principle roles (PT/PI/TI/GE) are classified by the **single-source/singleton** paths. `stage2_fewshot_single_source.yaml` **already has 11 non-principle positives** (2 PT + 7 TI + 1 PI + 1 GE). The prior "add 2–4 non-principle to convergent few-shot" note conflated the S2 convergent few-shot (principle-by-design) with the S4 golden_mined classification (vacuously 100% principle — now fixed by D2598). **→ There is NO non-principle few-shot gap; do not inject non-principle into the convergent few-shot.**
+- [~] **Tier3 — BOUNDARY/REGRESSION CORPUS (SCAFFOLDED).** `d2587_boundary_corpus.yaml` 9 seed cases → target ~150-250 CHALLENGE cases, 4-feature schema + 2-of-3 3-adjudicator review. Populate ~145 more.
+- [x] T-CT2 **S2 smoke test (deterministic)** — D2593 GREEN: D2587 rules present in all 3 prompts; `_check_d2587_rules` fires; BUG-226/148 instrumentation present. **FIXED** a validator gap: empty `steps=[]` now flagged (was silently clean). Ready for scoped 300–500-cluster run (`just s2-singletons`) as a code-behavior smoke, NOT a golden eval.
+- [x] T-CT3 **DSPy ARCHIVED (D2592) + gate REVISED (D2594).** RE-OPEN = Tier1 spotless + Tier2 statistically clean + Tier3 ≥150 adjudicated (NOT all-1027).
+
+**Downstream (after Tier1+Tier3):** extraction_type sweep → domain/discipline/depth sweep → rebuild golden v3 → wire `stage2_fewshot_single_source.yaml` → `commit_non_fb_types` S6 build → DSPy re-open (once gate met).
+
+---
+
+## 🆕 D2587/D2588 CONTENT-TYPE ONTOLOGY — P0/P1/P2 (2026-09-08)
+
+> Source: `ROUNDTABLE_ADJUDICATION_D2587_CONTENT_TYPE_2026-09-08.md` + D2588. All bugs new in this session: BUG-225…230.
+
+**P0 — make D2587 executable before any S2 rerun (blocks everything):**
+- [x] T-P0.1 Inject D2587 decision procedure into `SINGLE_SOURCE_SYSTEM` + `SINGLETON_SYSTEM` (`stage2_extract.py`, `_CONTENT_TYPE_RULES_TEXT`; ordered precedence + Q1/Q2/Q3; SINGLETON_BATCH inherits). Convergent SYSTEM_PROMPT item 9 clarified to principle-only (BUG-231). ✅ D2589
+- [x] T-P0.2 **REFRAMED** (BUG-231): convergent golden is principle-only BY DESIGN — no convergent few-shot change. Single-source golden already role-balanced (3/2/7/1/1). The 8 contested manifest rows move to P2 regression corpus. ✅ D2589
+- [x] T-P0.3 Wire `content_type_rules` + `min_steps` into `pipeline/content_types.py` loader + `scripts/audit_content_type_contract.py` (`_check_d2587_rules`: `len(steps)>=min_steps`, wired into audit_s2 + audit_s4). Closes BUG-225. ✅ D2589
+
+**P1 — silent-failure paths (data integrity):**
+- [ ] T-P1.0 **DECIDED (D2590): ENABLE `commit_non_fb_types`** — but it is a SCOPED S6 build, NOT a toggle (`S6_COMMIT_NON_FB` is dead config; fbs has a `content_type` column but S6 never ingests the 4 non-principle sidecars). Implementation: (a) ingest PT/PI/GE/TI sidecars, (b) store type-specific body (steps/trigger/done_condition/actors/parameters → new columns or type_body JSON), (c) wire `S6_COMMIT_NON_FB`, (d) defer cross-ref producer (`consulted_fbs`/`parent_pt_id`). Also: decide convergent-emits-non-principle design fork.
+- [x] T-P1.1 Flag+log empty-extraction_type default → **DONE D2590**: `_extraction_type_defaulted:true` + `_extraction_type_default_reason:empty_form` + counter in both summaries. Closes BUG-226. (Rename map → CONTENT_TYPE_CONFLATION_REPAIR_DEFAULT deferred, cosmetic.)
+- [~] T-P1.2 Deprecate `route` as ontology carrier → **PARTIAL D2590**: observability log added (missing content_type → stderr, C16). Full route-deprecation (missing→quarantine, not principle) remains. BUG-148 mitigated, not closed.
+- [x] T-P1.3 Extend cosine dedup to PT/PI/GE/TI → **DONE D2590**: `dedup_fbs_by_cosine` before exact-`fb_id` loop on all 4 non-principle write paths. Closes BUG-227.
+
+**P2 — falsifiability + human-legibility:**
+- [~] T-P2.1 **SCAFFOLDED D2590**: `config/golden/d2587_boundary_corpus.yaml` (CHALLENGE tier) = 15 case categories + 4-feature adjudication schema + 2-of-3 rule + 4 seed cases (collision rows) + mining sources. REMAINS: populate ~145 cases + run 3-adjudicator review.
+- [ ] T-P2.2 Bound `growth_edge` with positive entry criterion (`config/content_types.yaml`). Closes BUG-230.
+- [ ] T-P2.3 Prune-or-ship 6 dead fields + backfill `parent_pt_id` when PT exists. Closes BUG-228.
+- [ ] T-P2.4 Fix stale `content_types.py` docstring (75/75 → 59/61; "by architecture" → "few-shot bias"). Closes BUG-229.
+
+**Human review (blocking — user's call supersedes model):**
+- [x] T-H1 **DONE D2591** — 8 rows adjudicated: 00548→noise_drop, 00668→process_instance, 00971→noise_drop, 00713→**quarantine** (ambiguous), 00088/00647/00271/00387→principle (confirmed). New `dispositions` axis added (noise_drop / quarantine, NOT a 6th type).
+- [~] T-H1.1 **RUN (D2591, preliminary):** re-swept 31 PT→principle flips → `temp/p5_ct_resweep_descriptive.json`. Result: **16 principle (keep) / 7 process_template / 5 quarantine / 2 tool_instruction / 1 noise_drop** — i.e. 15/31 (48%) were wrong. 12 borderline (conf ≤0.7) need human confirm. **Refinement:** of the original 5 noise_drop, 4 were "method-descriptions" (00859/00969/01012/01000) → moved to quarantine (carry reusable method, no explicit steps); only 00919 (mass production) is true noise.
+- [ ] T-H2 Confirm remaining 5 ambiguous domain fixes (00631 / 00703 / 00199 / 00037 / 00671) — see `temp/p5_pending_human_fixes.csv`.
+- [ ] T-H3 Confirm 00474 "Visual Communication Overload" dedup verdict (recommend keep + related_fbs edge to Visual Clutter Reduction).
+- [ ] T-H4 Human review of the 113 non-principle flags (19 PT / 10 TI / 8 PI / 74 GE / 2 noise) after P0 rules land.
+
+**Do NOT (guardrails from D2588):** bulk-reclassify ~10k yet · widen `content_to_extraction_type` to many-to-many · add a 6th content type.
+
+---
+
 
 > **⚠️ CURRENT STATE (2026-09-03):** This register's older sections predate the S4/S5/S6 commit (7,873 FBs committed 2026-09-02, D2508/D2519). The "S4/S5/S6 frozen at 2,830" framing below is **stale** — S6 is COMMITTED. Retrieval A/B is now fully resolved: **S1 contextual REJECTED, S3 HyDE REJECTED, S2 rerank ENABLED** (D2522). See `SESSION-HANDOFF-2026-09-03.md` §3 for the authoritative priority/severity list of remaining tasks/bugs/decisions.
 

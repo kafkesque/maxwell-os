@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
-"""scripts/label_vote.py — 3-model label vote (D2577 + D2580). SCAFFOLD.
+"""scripts/label_vote.py — 3-model label vote (D2577 + D2580). RETIRED TO SPOT-CHECK (P6).
+
+RETIRED (D2585 P6, 2026-09-06): the full-corpus 3-model vote is SUPERSEDED as the
+label-quality solution by the weak-supervision label model (Dawid-Skene over
+{T-NLI + cleanlab + limited generative challenger} LFs -> ModernBERT classifier).
+This script's only remaining role is OCCASIONAL SPOT-CHECKS on small target sets
+(e.g. a human wants a 3-model second opinion on a handful of FBs). Do NOT run it
+full-corpus as a label-quality gate.
+
+The P3 challenger run (135 high-suspicion FBs) has already completed; its output
+(`temp/label_vote_high_suspicion.jsonl`) is consumed by `build_label_model.py`.
 
 Purpose
 =======

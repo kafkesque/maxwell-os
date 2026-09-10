@@ -27,6 +27,7 @@ Usage:
 import argparse
 import heapq
 import json
+import logging
 import os
 import re
 import signal
@@ -75,6 +76,10 @@ from pipeline.pipeline_paths import (
     S4_RELATED_FBS_EXCLUDE_DISCIPLINES,  # BUG-194: fallback discipline excluded from discipline_overlap
     S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB related_fbs neighbor cap (bounds graph to O(n·k))
     S4_SEMANTIC_NEAR_THRESHOLD,  # D2231: C12 compliance
+    S4_STUDENT_PRECLASSIFIER_CHECKPOINT,  # D2607 (C): hybrid student checkpoint
+    S4_STUDENT_PRECLASSIFIER_COARSE_THRESHOLD,  # D2607 (B): coarse-head abstain floor
+    S4_STUDENT_PRECLASSIFIER_ENABLED,  # D2607 (C): hybrid student gate (default off)
+    S4_STUDENT_PRECLASSIFIER_THRESHOLD,  # D2607 (C): student abstain confidence floor
     S4_TEMPORAL_SIGNALS,  # D2364/C12 (X7): temporal_scope keyword heuristics (was hardcoded)
     S4_TI_OUTPUT,
     STAGE2_CHECKPOINT,
@@ -243,7 +248,19 @@ def _resolve_content_type(fb: dict) -> str:
     if ct:
         return ct
     route: str = (fb.get("route") or "").strip().upper()
-    return ROUTE_TO_CONTENT_TYPE.get(route, DEFAULT_CONTENT_TYPE)
+    resolved: str = ROUTE_TO_CONTENT_TYPE.get(route, DEFAULT_CONTENT_TYPE)
+    # BUG-148 (D2589): content_type is AUTHORITATIVE; `route` is LEGACY transport.
+    # A record reaching S4 with no content_type is resolved from the (often stale,
+    # uniform-FB) route for back-compat — but now OBSERVABLY, so the silent
+    # drift (2,878 route='FB' → forced principle) is no longer invisible (C16).
+    print(
+        f"   ⚠️  _resolve_content_type: content_type missing on "
+        f"{fb.get('name') or fb.get('fb_id') or fb.get('principle_id') or '?'!r} "
+        f"— resolved from legacy route {route!r} → {resolved!r}",
+        file=sys.stderr,
+        flush=True,
+    )
+    return resolved
 
 # ── Prompt templates ───────────────────────────────────────────────────────
 
@@ -1123,6 +1140,45 @@ def _log_cribs_warnings(fb_data: dict) -> None:
         fb_name = str(fb_data.get("name", "?"))[:40]
         print(f"⚠️CRIBS({len(warnings)})", flush=True, end=" ")
 
+def _maybe_student_override(fb_data: dict, merged_result: dict) -> None:
+    """D2607 (C): hybrid student pre-classifier — override discipline/domains with
+    the ModernBERT student when confident, else keep gpt-oss (fallback).
+
+    OFF by default (S4_STUDENT_PRECLASSIFIER_ENABLED=false). Best-effort: any
+    student load/predict error is logged and swallowed (C16 observability, never
+    crash the S4 pipeline on an optional optimization).
+    """
+    if not S4_STUDENT_PRECLASSIFIER_ENABLED:
+        return
+    if not isinstance(merged_result, dict) or not merged_result.get("discipline"):
+        return
+    text = " ".join(str(fb_data.get(k, "")) for k in ("name", "definition", "mechanism", "boundary")).strip()
+    if not text:
+        return
+    try:
+        from pipeline.student_classifier import get_student_classifier
+        student = get_student_classifier(
+            checkpoint_dir=S4_STUDENT_PRECLASSIFIER_CHECKPOINT,
+            threshold=S4_STUDENT_PRECLASSIFIER_THRESHOLD,
+            coarse_threshold=S4_STUDENT_PRECLASSIFIER_COARSE_THRESHOLD,
+        )
+        r = student.predict_with_fallback(
+            text,
+            fallback_discipline=merged_result.get("discipline"),
+            fallback_domains=merged_result.get("domains") or [],
+        )
+        if r["source"] == "student":
+            merged_result["discipline"] = r["discipline"]
+            merged_result["domains"] = r["domains"]
+            merged_result["_student_override"] = True
+            print("🎓student", flush=True, end=" ")
+        else:
+            print("🎓fallback", flush=True, end=" ")
+    except Exception as e:  # C16: optional optimization must never crash the pipeline — but must be OBSERVABLE
+        logging.getLogger(__name__).exception("student pre-classifier override failed (%s)", type(e).__name__)
+        fb_data["student_override_error"] = f"{type(e).__name__}: {e}"
+        print(f"⚠️student:{type(e).__name__}", flush=True, end=" ")
+
 def _write_sidecar_json(data: dict, path: Path) -> None:
     """BUG-184/D2481: crash-safe incremental pre-pass sidecar checkpoint.
 
@@ -1674,6 +1730,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                               "keywords", "jargon"):
                     if merged_result.get(field):
                         fb_data[field] = merged_result[field]
+                # D2607 (C): hybrid student override (no-op unless flag enabled)
+                _maybe_student_override(fb_data, merged_result)
                 # Stash classification for Phase 2
                 fb_data["_merged_classification"] = merged_result
                 _log_cribs_warnings(fb_data)
@@ -2202,6 +2260,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # ── D2073: Save growth edges separately ───────────────────────────
     ge_path = STAGE4_CHECKPOINT.parent / S4_GE_OUTPUT
     if growth_edges:
+        # BUG-227 (D2589): semantic near-dup dedup (was exact fb_id only — two
+        # edges describing the same open tension from different books both shipped).
+        growth_edges = dedup_fbs_by_cosine(growth_edges)
         seen_ge: set[str] = set()
         deduped_ge = []
         for ge in growth_edges:
@@ -2214,6 +2275,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # ── D2072: Save process templates separately ──────────────────────
     pt_path = STAGE4_CHECKPOINT.parent / S4_PT_OUTPUT
     if process_templates:
+        # BUG-227 (D2589): semantic near-dup dedup (was exact fb_id only — two
+        # templates describing the same method from different books both shipped).
+        process_templates = dedup_fbs_by_cosine(process_templates)
         seen_pt: set[str] = set()
         deduped_pt = []
         for pt in process_templates:
@@ -2226,6 +2290,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # ── D2072: Save process instances separately ──────────────────────
     pi_path = STAGE4_CHECKPOINT.parent / S4_PI_OUTPUT
     if process_instances:
+        # BUG-227 (D2589): semantic near-dup dedup (was exact fb_id only).
+        process_instances = dedup_fbs_by_cosine(process_instances)
         seen_pi: set[str] = set()
         deduped_pi = []
         for pi in process_instances:
@@ -2238,6 +2304,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # ── D2072: Save tool instructions separately ──────────────────────
     ti_path = STAGE4_CHECKPOINT.parent / S4_TI_OUTPUT
     if tool_instructions:
+        # BUG-227 (D2589): semantic near-dup dedup (was exact fb_id only — two
+        # tool instructions for the same command/API from different books both shipped).
+        tool_instructions = dedup_fbs_by_cosine(tool_instructions)
         seen_ti: set[str] = set()
         deduped_ti = []
         for ti in tool_instructions:

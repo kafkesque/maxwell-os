@@ -683,11 +683,20 @@ def main() -> None:
     """Entry point: load data, build model, train, evaluate, and checkpoint."""
     cfg = _load_training_config()
     student_model: str = cfg.get("student_model", BASE_MODEL_NAME)
-    checkpoint_dir: str = cfg.get("checkpoint_dir", CHECKPOINT_DIR)
-    logger.info("Training config: student=%s, checkpoint=%s", student_model, checkpoint_dir)
+    # C12/env override (D2585 P4): GOLDEN_YAML / CHECKPOINT_DIR let a run retrain
+    # on the label-model-corrected COPY into a fresh checkpoint dir without
+    # touching the silver baseline artifacts.
+    train_data_path: str = os.environ.get("GOLDEN_YAML", TRAINING_DATA_PATH)
+    checkpoint_dir = os.environ.get(
+        "CHECKPOINT_DIR", cfg.get("checkpoint_dir", CHECKPOINT_DIR)
+    )
+    logger.info(
+        "Training config: student=%s, checkpoint=%s, golden=%s",
+        student_model, checkpoint_dir, train_data_path,
+    )
 
     # Load training set (raises if < MIN_GOLDEN_EXAMPLES)
-    golden_data = load_golden_set(TRAINING_DATA_PATH)
+    golden_data = load_golden_set(train_data_path)
     examples: List[Dict[str, Any]] = golden_data["examples"]
     examples = _filter_trainable(examples, MIN_EXAMPLES_PER_CLASS)
 
@@ -731,17 +740,38 @@ def main() -> None:
         domain_label_map=domain_label_map,
     )
 
-    # Stratified split
+    # Stratified split (or a fixed held-out id list via GOLDEN_TEST_IDS — the
+    # D2585 P4 A/B: both the silver and corrected models evaluate on the SAME
+    # held-out fold so ΔF1 is not confounded by split mismatch).
     labels_array = np.array(
         [discipline_label_map[ex["discipline"]] for ex in examples]
     )
     indices = np.arange(len(examples))
-    train_idx, test_idx = train_test_split(
-        indices,
-        test_size=TRAIN_TEST_SPLIT_SIZE,
-        random_state=RANDOM_STATE,
-        stratify=labels_array,
-    )
+    held_out_ids = os.environ.get("GOLDEN_TEST_IDS")
+    if held_out_ids:
+        ids = {
+            line.strip()
+            for line in Path(held_out_ids).read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        }
+        train_idx = [i for i, ex in enumerate(examples) if ex.get("id") not in ids]
+        test_idx = [i for i, ex in enumerate(examples) if ex.get("id") in ids]
+        logger.info(
+            "Fixed held-out split: %d train / %d test (GOLDEN_TEST_IDS)",
+            len(train_idx), len(test_idx),
+        )
+        if len(test_idx) < 2 or not train_idx:
+            raise ValueError(
+                f"GOLDEN_TEST_IDS produced unusable split: "
+                f"{len(train_idx)} train / {len(test_idx)} test"
+            )
+    else:
+        train_idx, test_idx = train_test_split(
+            indices,
+            test_size=TRAIN_TEST_SPLIT_SIZE,
+            random_state=RANDOM_STATE,
+            stratify=labels_array,
+        )
 
     train_examples = [examples[i] for i in train_idx]
     test_examples = [examples[i] for i in test_idx]

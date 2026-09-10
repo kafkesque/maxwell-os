@@ -1,0 +1,292 @@
+{
+  "question": "What fraction of the 7995 fbs rows labelled content_type=principle are actually NOT principles?",
+  "method": "simple random sample (seed 7) of 150 rows from fbs where content_type=principle; classified by the agent against the D2587 content-type rules.",
+  "n_sample": 150,
+  "n_classified": 150,
+  "n_excluded_unseen": 0,
+  "n_non_principle_clear": 19,
+  "n_non_principle_borderline": 25,
+  "rate_clear": 0.1267,
+  "rate_clear_ci95": [
+    0.073,
+    0.18
+  ],
+  "rate_inclusive": 0.2933,
+  "rate_inclusive_ci95": [
+    0.22,
+    0.366
+  ],
+  "stored_rate_for_comparison": "29/7995 = 0.4% (unverified Qwen3-Coder-30B content_type column)",
+  "human_ledger_for_comparison": "35/114 = 30.7% (governance/content_type_human_decisions.jsonl)",
+  "clear_rows": [
+    {
+      "idx": 26,
+      "name": "Traveling Salesman Problem Computational Complexity",
+      "reason": "problem/fact def",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 29,
+      "name": "Performance Variability in Poetry Recitation",
+      "reason": "descriptive observation",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 33,
+      "name": "Llm System Access Control and Compliance",
+      "reason": "implementation checklist",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 36,
+      "name": "Precision-driven Industrial Efficiency",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 38,
+      "name": "Digital Media Evolution and Synaesthesia",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 42,
+      "name": "Transhumanist Ideology and Technocratic Influence",
+      "reason": "socio-political observation",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 45,
+      "name": "Influence of Avant-garde Movements on Modern Design",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 47,
+      "name": "Hindu-arabic Numerals and Mathematical Transmission",
+      "reason": "historical account",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 61,
+      "name": "Audio-visual Multimedia Performance",
+      "reason": "descriptive account of art form",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 68,
+      "name": "Art Direction Evolution in Magazine Design",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 71,
+      "name": "Golden Section Construction Method",
+      "reason": "specific construction technique",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 76,
+      "name": "Untitled Game Prototype Framework",
+      "reason": "specific naming practice",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 77,
+      "name": "Guinness Pouring Ritual",
+      "reason": "marketing campaign case",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 87,
+      "name": "Dylan's Hair As Visual Metaphor",
+      "reason": "specific case/trivia",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 90,
+      "name": "Enterprise Data Standards and Accessibility Framework",
+      "reason": "self-labeled process template",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 106,
+      "name": "Amazon Bedrock Rag Evaluation",
+      "reason": "specific AWS product",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 115,
+      "name": "Early Infographic Development in British Newspapers",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 120,
+      "name": "Music Industry Digital Distribution Shift",
+      "reason": "industry history",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 126,
+      "name": "Antifascist Propaganda Poster Campaign",
+      "reason": "specific campaign",
+      "extraction_type": "causal_mechanism"
+    }
+  ],
+  "borderline_rows": [
+    {
+      "idx": 5,
+      "name": "Infant Hunger and Magical-religious Experience",
+      "reason": "psychoanalytic claim",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 10,
+      "name": "Cia Torture Program Prosecution Gap",
+      "reason": "named case/design",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 22,
+      "name": "Orwellian Courage As Resistance to Surveillance Capitalism",
+      "reason": "normative essay stance",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 31,
+      "name": "Simulation-based Mission Decision Framework",
+      "reason": "methodology/process",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 35,
+      "name": "Corporate Brand Refresh Strategy",
+      "reason": "strategy/process",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 43,
+      "name": "Third Currency Flexibility",
+      "reason": "thin framing",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 58,
+      "name": "Knowledge Agent Design",
+      "reason": "system/architecture desc",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 59,
+      "name": "Marshall's Officer Development System",
+      "reason": "named case/method",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 62,
+      "name": "Water-related Trauma and Identity Formation",
+      "reason": "narrative trope",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 73,
+      "name": "Symbolic Ambivalence of White",
+      "reason": "single-color observation",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 81,
+      "name": "Loss Curve Monitoring",
+      "reason": "monitoring technique",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 84,
+      "name": "Recursive Terrain Subdivision",
+      "reason": "specific algorithm",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 95,
+      "name": "War Metaphor in Medical Treatment Narratives",
+      "reason": "metaphor analysis",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 96,
+      "name": "Projective and Visual Qualitative Research Methods",
+      "reason": "taxonomy catalog",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 101,
+      "name": "Digital Type Family Expansion",
+      "reason": "historical account",
+      "extraction_type": "empirical_pattern"
+    },
+    {
+      "idx": 105,
+      "name": "Responsive Card Design for Mobile",
+      "reason": "UI pattern/technique",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 110,
+      "name": "Agentic Ai As Goal-oriented Autonomous Systems",
+      "reason": "tech definition",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 117,
+      "name": "Angelic Assistance in Creative Work",
+      "reason": "mystical claim",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 119,
+      "name": "Existential Risk As Freedom Expression",
+      "reason": "philosophical stance",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 121,
+      "name": "Graphics Automation Through Programming Languages",
+      "reason": "specific technique",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 125,
+      "name": "Scientific Materialist Worldview",
+      "reason": "worldview/philosophy",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 129,
+      "name": "Dynamic Statistical Recalculation in Interactive Graphics",
+      "reason": "technical requirement",
+      "extraction_type": "causal_mechanism"
+    },
+    {
+      "idx": 132,
+      "name": "Faking Absence of Mistreatment in Healthcare",
+      "reason": "descriptive practice",
+      "extraction_type": "descriptive_model"
+    },
+    {
+      "idx": 135,
+      "name": "Everything Is Figureoutable",
+      "reason": "motivational slogan",
+      "extraction_type": "normative_heuristic"
+    },
+    {
+      "idx": 148,
+      "name": "Software Development Method Evolution Framework",
+      "reason": "historical account",
+      "extraction_type": "causal_mechanism"
+    }
+  ],
+  "conclusion": "The true non-principle rate is ~13% (clear cases) to ~30% (incl. borderline) - 30-70x the stored 0.4%. content_type is a vacuous axis written by the least-reliable model and never verified. Depth must not be re-run on the whole corpus until content_type is settled.",
+  "schema_version": "3.0",
+  "created": "2026-09-10T15:30:56Z"
+}

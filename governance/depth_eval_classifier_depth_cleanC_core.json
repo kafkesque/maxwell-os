@@ -1,0 +1,53 @@
+{
+  "checkpoint": "knowledge pipeline/classifier_depth_cleanC",
+  "eval_yaml": "governance/depth_core_test.yaml",
+  "n_examples": 133,
+  "macro_f1_depth": 0.4073183813093159,
+  "per_class_f1_depth": {
+    "universal": 0.0,
+    "cross-domain": 0.5309734513274337,
+    "domain": 0.5528455284552846,
+    "specialized": 0.5454545454545454
+  },
+  "test_rows_per_class": [
+    3,
+    57,
+    64,
+    9
+  ],
+  "confusion_matrix": [
+    [
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      4,
+      30,
+      22,
+      1
+    ],
+    [
+      1,
+      23,
+      34,
+      6
+    ],
+    [
+      0,
+      0,
+      3,
+      6
+    ]
+  ],
+  "classes": [
+    "universal",
+    "cross-domain",
+    "domain",
+    "specialized"
+  ],
+  "schema_version": "3.0",
+  "gen_model": "answerdotai/ModernBERT-base",
+  "pipeline_commit": "v3.0-D2485"
+}

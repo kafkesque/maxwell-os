@@ -1,0 +1,210 @@
+{
+  "n_test": 200,
+  "gold_dist": {
+    "domain": 101,
+    "cross-domain": 77,
+    "universal": 13,
+    "specialized": 9
+  },
+  "paths": {
+    "encoder_cleanC": {
+      "macro_f1": 0.479,
+      "acc": 0.53,
+      "kappa": 0.2244,
+      "model": "ModernBERT-base 139M (clean labels)",
+      "per_fb_s": 0.0006,
+      "collapse_2way": {
+        "acc": 0.645,
+        "macro_f1": 0.6435,
+        "broad_f1": 0.6203,
+        "narrow_f1": 0.6667,
+        "cm": [
+          [
+            58,
+            32
+          ],
+          [
+            39,
+            71
+          ]
+        ]
+      },
+      "confusion": [
+        [
+          4,
+          7,
+          2,
+          0
+        ],
+        [
+          4,
+          43,
+          29,
+          1
+        ],
+        [
+          2,
+          37,
+          53,
+          9
+        ],
+        [
+          0,
+          0,
+          3,
+          6
+        ]
+      ]
+    },
+    "gptoss_baseline": {
+      "macro_f1": 0.4433,
+      "acc": 0.58,
+      "per_fb_s": 2.15,
+      "collapse_2way": {
+        "acc": 0.69,
+        "macro_f1": 0.6796,
+        "broad_f1": 0.622,
+        "narrow_f1": 0.7373,
+        "cm": [
+          [
+            51,
+            39
+          ],
+          [
+            23,
+            87
+          ]
+        ]
+      },
+      "confusion": [
+        [
+          1,
+          7,
+          4,
+          1
+        ],
+        [
+          3,
+          40,
+          34,
+          0
+        ],
+        [
+          6,
+          16,
+          69,
+          10
+        ],
+        [
+          0,
+          1,
+          2,
+          6
+        ]
+      ],
+      "per_class": {
+        "universal": {
+          "f1": 0.087,
+          "n": 13,
+          "tp": 1
+        },
+        "cross-domain": {
+          "f1": 0.5674,
+          "n": 77,
+          "tp": 40
+        },
+        "domain": {
+          "f1": 0.6571,
+          "n": 101,
+          "tp": 69
+        },
+        "specialized": {
+          "f1": 0.4615,
+          "n": 9,
+          "tp": 6
+        }
+      },
+      "kappa": "not comparable (per-example preds not stored; silence)"
+    },
+    "gptoss_fewshot": {
+      "macro_f1": 0.4571,
+      "acc": 0.55,
+      "per_fb_s": 3.02,
+      "collapse_2way": {
+        "acc": 0.66,
+        "macro_f1": 0.6558,
+        "broad_f1": 0.618,
+        "narrow_f1": 0.6937,
+        "cm": [
+          [
+            55,
+            35
+          ],
+          [
+            33,
+            77
+          ]
+        ]
+      },
+      "confusion": [
+        [
+          3,
+          4,
+          5,
+          1
+        ],
+        [
+          6,
+          42,
+          28,
+          1
+        ],
+        [
+          9,
+          24,
+          59,
+          9
+        ],
+        [
+          0,
+          0,
+          3,
+          6
+        ]
+      ],
+      "per_class": {
+        "universal": {
+          "f1": 0.1935,
+          "n": 13,
+          "tp": 3
+        },
+        "cross-domain": {
+          "f1": 0.5714,
+          "n": 77,
+          "tp": 42
+        },
+        "domain": {
+          "f1": 0.602,
+          "n": 101,
+          "tp": 59
+        },
+        "specialized": {
+          "f1": 0.4615,
+          "n": 9,
+          "tp": 6
+        }
+      },
+      "kappa": "not comparable (per-example preds not stored; silence)"
+    }
+  },
+  "core_slice_133": {
+    "cleanC_macro_f1": 0.4073,
+    "silverC_macro_f1": 0.3437,
+    "cleanC_per_class": {
+      "universal": 0.0,
+      "cross-domain": 0.531,
+      "domain": 0.553,
+      "specialized": 0.545
+    }
+  }
+}

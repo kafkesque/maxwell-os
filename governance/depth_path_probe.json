@@ -1,0 +1,141 @@
+{
+  "test_yaml": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/depth_clean_test.yaml",
+  "train_yaml": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/depth_clean_train.yaml",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "n_test": 200,
+  "n_train": 796,
+  "fewshot_per_class": 3,
+  "batch_size": 4,
+  "gold_dist": {
+    "domain": 101,
+    "cross-domain": 77,
+    "universal": 13,
+    "specialized": 9
+  },
+  "arms": {
+    "baseline": {
+      "macro_f1": 0.4433,
+      "accuracy": 0.58,
+      "n_labeled": 200,
+      "per_class": {
+        "universal": {
+          "f1": 0.087,
+          "n": 13,
+          "tp": 1
+        },
+        "cross-domain": {
+          "f1": 0.5674,
+          "n": 77,
+          "tp": 40
+        },
+        "domain": {
+          "f1": 0.6571,
+          "n": 101,
+          "tp": 69
+        },
+        "specialized": {
+          "f1": 0.4615,
+          "n": 9,
+          "tp": 6
+        }
+      },
+      "confusion_matrix": [
+        [
+          1,
+          7,
+          4,
+          1
+        ],
+        [
+          3,
+          40,
+          34,
+          0
+        ],
+        [
+          6,
+          16,
+          69,
+          10
+        ],
+        [
+          0,
+          1,
+          2,
+          6
+        ]
+      ],
+      "errors": 0,
+      "elapsed_s": 430.9,
+      "per_fb_s": 2.15,
+      "pred_dist": {
+        "domain": 109,
+        "cross-domain": 64,
+        "specialized": 17,
+        "universal": 10
+      }
+    },
+    "fewshot": {
+      "macro_f1": 0.4571,
+      "accuracy": 0.55,
+      "n_labeled": 200,
+      "per_class": {
+        "universal": {
+          "f1": 0.1935,
+          "n": 13,
+          "tp": 3
+        },
+        "cross-domain": {
+          "f1": 0.5714,
+          "n": 77,
+          "tp": 42
+        },
+        "domain": {
+          "f1": 0.602,
+          "n": 101,
+          "tp": 59
+        },
+        "specialized": {
+          "f1": 0.4615,
+          "n": 9,
+          "tp": 6
+        }
+      },
+      "confusion_matrix": [
+        [
+          3,
+          4,
+          5,
+          1
+        ],
+        [
+          6,
+          42,
+          28,
+          1
+        ],
+        [
+          9,
+          24,
+          59,
+          9
+        ],
+        [
+          0,
+          0,
+          3,
+          6
+        ]
+      ],
+      "errors": 0,
+      "elapsed_s": 603.6,
+      "per_fb_s": 3.02,
+      "pred_dist": {
+        "domain": 95,
+        "cross-domain": 70,
+        "universal": 18,
+        "specialized": 17
+      }
+    }
+  }
+}

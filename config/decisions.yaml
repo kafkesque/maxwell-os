@@ -238,8 +238,23 @@ decisions:
     0.4796 (below 0.85 gate) with per-class F1 universal 0.000 / cross-domain 0.437 / domain 0.815 / specialized 0.667.
     INTERPRETATION: universal collapses (18 ex, and D2576 showed gpt-oss over-assigns universal ~2/3 wrong -> the class
     is mostly mislabeled domain FBs); domain is strong (0.815, consistent with gpt-oss 75% domain-vs-specialized). The
-    baseline is DATA-NOISE-LIMITED, NOT model-limited — the 3-model-vote clean set (Qwen3.8+Phi-4-mini+gemma, >=2/3 agree,
-    fail-closed to domain) is the intended training set and the NEXT step before this classifier can pass the gate.'
+    baseline is DATA-NOISE-LIMITED, NOT model-limited — the 3-model-vote clean set (DeepSeek-v4-pro + Qwen3.8-27B +
+    Qwen3-Coder-30B, >=2/3 agree, fail-closed to domain; Phi-4-mini/gemma RULED UNRELIABLE 2026-09-10) is the intended
+    training set and the NEXT step before this classifier can pass the gate. DEPTH VOTE EXECUTED (2026-09-10):
+    scripts/build_depth_vote_set.py voted 996 FBs (716 cross-domain + 80 universal + 100 domain + 100 specialized
+    controls) with the 3 voters -> governance/depth_vote_checkpoint.jsonl + depth_vote_training_set.yaml. FIRST PASS
+    COMPROMISED: DeepSeek returned HTTP 402 "Insufficient Balance" on 781/996 calls -> 78% of FBs degraded to the
+    2-voter conservative degenerate (any split -> domain); recovered the live key from shell history (the .zsh_history
+    sk-4719... key; sk-b266... revoked, sk-laUw... = Moonshot) + added --retry-failures/--workers (concurrent) ->
+    982/996 full 3-voter coverage, 915 agreed. CLEAN DISTRIBUTION: domain 501 / cross-domain 384 / universal 65 /
+    specialized 46 (vs silver twin on the SAME 996 FBs: cross-domain 716 / universal 80 / domain 100 / specialized 100)
+    — the vote downshifts ~330 silver cross-domain to domain, confirming D2576. CONTROLLED EXPERIMENT (fixed 796-FB
+    train / 200-FB held-out split, labels from the vote as reference; scripts/eval_depth_classifier.py): training on
+    CLEAN labels macro-F1 0.4790 vs SILVER labels 0.3409 on the IDENTICAL test set = +0.138 (+40% relative), biggest
+    gain in domain 0.252->0.564, universal 0.143->0.348, specialized 0.381->0.480 (cross-domain 0.588->0.524). LESSON:
+    a naive per-set macro-F1 comparison was CONFOUNDED by class proportion (silver scored 0.6153 on its OWN
+    cross-domain-heavy split). VERDICT: the vote materially improves depth label quality but the classifier remains
+    BELOW the 0.85 gate -> depth is annotation-limited; the per-FB 4-way task is genuinely hard for a 139M encoder.'
   champion: goose
   target_files:
   - temp/market_research_depth.py
@@ -248,6 +263,8 @@ decisions:
   - temp/market_research/market_research_depth2.json
   - scripts/train_discipline_classifier.py
   - scripts/train_depth_classifier.py
+  - scripts/build_depth_vote_set.py
+  - scripts/eval_depth_classifier.py
   created: '2026-09-05'
 - id: D2576
   category: MEASUREMENT / LABEL QUALITY

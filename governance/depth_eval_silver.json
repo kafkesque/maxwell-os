@@ -1,0 +1,53 @@
+{
+  "checkpoint": "knowledge pipeline/classifier_depth_silverC",
+  "eval_yaml": "governance/depth_clean_test.yaml",
+  "n_examples": 200,
+  "macro_f1_depth": 0.3408970223160354,
+  "per_class_f1_depth": {
+    "universal": 0.14285714285714285,
+    "cross-domain": 0.5876777251184834,
+    "domain": 0.25210084033613445,
+    "specialized": 0.38095238095238093
+  },
+  "test_rows_per_class": [
+    13,
+    77,
+    101,
+    9
+  ],
+  "confusion_matrix": [
+    [
+      2,
+      11,
+      0,
+      0
+    ],
+    [
+      8,
+      62,
+      3,
+      4
+    ],
+    [
+      5,
+      60,
+      15,
+      21
+    ],
+    [
+      0,
+      1,
+      0,
+      8
+    ]
+  ],
+  "classes": [
+    "universal",
+    "cross-domain",
+    "domain",
+    "specialized"
+  ],
+  "schema_version": "3.0",
+  "gen_model": "answerdotai/ModernBERT-base",
+  "pipeline_commit": "v3.0-D2485"
+}

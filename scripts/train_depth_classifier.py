@@ -430,17 +430,25 @@ def main() -> None:
 
     tokenizer, model = build_model(BASE_MODEL_NAME)
 
-    # Stratified split by depth label.
+    # Stratified split by depth label. TRAIN_ALL=1 trains on the full file
+    # (used by the D2577 controlled comparison: both label sources must train on
+    # the identical FB subset, so the internal split is disabled and the held-out
+    # set is supplied separately to scripts/eval_depth_classifier.py).
     labels_array = np.array([depth_label_map[ex["depth"]] for ex in examples])
     indices = np.arange(len(examples))
-    train_idx, test_idx = train_test_split(
-        indices,
-        test_size=TRAIN_TEST_SPLIT_SIZE,
-        random_state=RANDOM_STATE,
-        stratify=labels_array,
-    )
-    train_examples = [examples[i] for i in train_idx]
-    test_examples = [examples[i] for i in test_idx]
+    if os.environ.get("TRAIN_ALL"):
+        train_examples = examples
+        test_examples = examples
+        logger.info("TRAIN_ALL set — training on all %d examples (no internal split)", len(examples))
+    else:
+        train_idx, test_idx = train_test_split(
+            indices,
+            test_size=TRAIN_TEST_SPLIT_SIZE,
+            random_state=RANDOM_STATE,
+            stratify=labels_array,
+        )
+        train_examples = [examples[i] for i in train_idx]
+        test_examples = [examples[i] for i in test_idx]
 
     train_dataset = DepthDataset(train_examples, tokenizer, depth_label_map)
     test_dataset = DepthDataset(test_examples, tokenizer, depth_label_map)

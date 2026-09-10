@@ -164,6 +164,7 @@ def _call_deepseek(prompt: str, key: str, model: str) -> Optional[str]:
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.0,
+        "max_tokens": 1024,  # headroom for v4-pro reasoning_content + final JSON
         "response_format": {"type": "json_object"},
     }).encode("utf-8")
     ctx = ssl.create_default_context(cafile=certifi.where())
@@ -176,7 +177,12 @@ def _call_deepseek(prompt: str, key: str, model: str) -> Optional[str]:
             data = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         raise RuntimeError(f"DeepSeek HTTP {exc.code}: {exc.read()[:200]!r}") from exc
-    content = data["choices"][0]["message"]["content"]
+    msg = data["choices"][0]["message"]
+    # v4-pro emits chain-of-thought in `reasoning_content` and the FINAL answer in
+    # `content`. Parse ONLY `content` (never CoT — that is the DELEGATE-001 trap).
+    content = (msg.get("content") or "").strip()
+    if not content:
+        raise RuntimeError("DeepSeek returned empty content (truncated reasoning?)")
     try:
         return _parse_depth(json.loads(content))
     except json.JSONDecodeError:

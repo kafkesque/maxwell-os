@@ -33,8 +33,11 @@ import sqlite3
 import ssl
 import sys
 import tempfile
+import threading
+import urllib.error
 import urllib.request
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,8 +60,10 @@ FAIL_CLOSED_DEPTH: str = "domain"    # disagreement -> conservative domain (D257
 CONTROL_DOMAIN: int = 100            # domain controls to sample
 CONTROL_SPECIALIZED: int = 100       # specialized controls to sample
 MAX_TOKENS: int = 256
+DEEPSEEK_MAX_TOKENS: int = 2048   # v4-pro burns ~315 reasoning tokens before the 8-token answer
 RECOVERY_SLEEP: float = 1.0
 TIMEOUT: int = 120
+DEFAULT_WORKERS: int = 6          # network-bound DeepSeek retry: concurrent calls
 
 DB = Path(os.environ.get("MAXWELL_DB", ROOT / "knowledge pipeline" / "maxwell.db"))
 OUT_CHECKPOINT = ROOT / "governance" / "depth_vote_checkpoint.jsonl"
@@ -164,7 +169,7 @@ def _call_deepseek(prompt: str, key: str, model: str) -> Optional[str]:
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.0,
-        "max_tokens": 1024,  # headroom for v4-pro reasoning_content + final JSON
+        "max_tokens": DEEPSEEK_MAX_TOKENS,  # headroom for v4-pro reasoning_content + final JSON
         "response_format": {"type": "json_object"},
     }).encode("utf-8")
     ctx = ssl.create_default_context(cafile=certifi.where())
@@ -194,22 +199,29 @@ def _call_omlx(prompt: str, model: str) -> Optional[str]:
     return _parse_depth(call_omlx_json(prompt, model=model, max_tokens=MAX_TOKENS))
 
 
-def vote_once(fb: Dict[str, Any], voters: List[Dict[str, str]], key: str) -> Dict[str, Any]:
+def vote_once(fb: Dict[str, Any], voters: List[Dict[str, str]], key: str,
+              prior_votes: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Run all voters on one FB and aggregate depth (>=2/3, fail-closed to domain).
 
     Args:
         fb: Target FB row.
         voters: Configured voters [{model, provider}].
         key: DeepSeek API key (empty string disables the deepseek provider).
+        prior_votes: Optional prior per-model votes; a voter with a valid prior
+            vote is NOT re-called (used by --retry-failures to re-vote only the
+            voters that errored).
 
     Returns:
         Record {fb_id, votes: {model: depth}, depth, agreed, n_voters}.
     """
     prompt = _depth_prompt(fb)
-    votes: Dict[str, Optional[str]] = {}
+    votes: Dict[str, Any] = dict(prior_votes or {})
     for v in voters:
         model = v.get("model", "")
         provider = v.get("provider", "omlx")
+        existing = votes.get(model)
+        if isinstance(existing, str) and existing in VALID_DEPTHS:
+            continue  # keep the prior successful vote (don't re-pay)
         try:
             if provider == "deepseek":
                 votes[model] = _call_deepseek(prompt, key, model)
@@ -235,6 +247,16 @@ def vote_once(fb: Dict[str, Any], voters: List[Dict[str, str]], key: str) -> Dic
         "agreed": bool(agreed),
         "n_voters": len(valid),
     }
+
+
+def _all_voters_ok(rec: Dict[str, Any], voters: List[Dict[str, str]]) -> bool:
+    """True if every configured voter produced a valid depth in this record."""
+    votes = rec.get("votes", {})
+    for v in voters:
+        d = votes.get(v.get("model", ""))
+        if not (isinstance(d, str) and d in VALID_DEPTHS):
+            return False
+    return True
 
 
 def _load_checkpoint() -> Dict[str, Dict[str, Any]]:
@@ -308,6 +330,9 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0, help="cap target FBs (0 = all)")
     ap.add_argument("--key", default=os.environ.get("DEEPSEEK_API_KEY", ""), help="DeepSeek API key")
     ap.add_argument("--voters", default="", help="comma-separated model names (default: config)")
+    ap.add_argument("--retry-failures", action="store_true",
+                    help="re-vote ONLY the voters that errored on already-checkpointed FBs")
+    ap.add_argument("--workers", type=int, default=1, help="concurrent FBs (network-bound)")
     args = ap.parse_args()
 
     targets = select_targets(args.limit)
@@ -330,21 +355,57 @@ def main() -> int:
     print(f"voters: {[v['model'] for v in voters]}")
 
     done = _load_checkpoint()
-    with OUT_CHECKPOINT.open("a", encoding="utf-8") as fh:
-        for i, fb in enumerate(targets):
-            if fb["fb_id"] in done:
-                continue
-            rec = vote_once(fb, voters, args.key)
-            fh.write(json.dumps(rec) + "\n")
-            fh.flush()
-            print(f"[{i + 1}/{len(targets)}] {fb['fb_id']} silver={fb['depth']} "
-                  f"-> {rec['depth']} (agreed={rec['agreed']}, n={rec['n_voters']})",
-                  flush=True)
+
+    # Build the work list: new FBs, plus (in retry mode) FBs missing any voter.
+    work: List[Tuple[Dict[str, Any], Optional[Dict[str, Any]]]] = []
+    for fb in targets:
+        prior = done.get(fb["fb_id"])
+        if prior is None:
+            work.append((fb, None))
+        elif args.retry_failures and not _all_voters_ok(prior, voters):
+            work.append((fb, prior.get("votes", {})))
+    print(f"work list: {len(work)} FBs "
+          f"({sum(1 for _, p in work if p is None)} new, "
+          f"{sum(1 for _, p in work if p is not None)} retry)")
+
+    if not work:
+        print("nothing to do — all voters complete.")
+    else:
+        write_lock = threading.Lock()
+        done_count = 0
+        with OUT_CHECKPOINT.open("a", encoding="utf-8") as fh:
+            def _handle(fb: Dict[str, Any], prior_votes: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+                return vote_once(fb, voters, args.key, prior_votes)
+
+            if args.workers > 1:
+                with ThreadPoolExecutor(max_workers=args.workers) as pool:
+                    futures = {pool.submit(_handle, fb, pv): fb for fb, pv in work}
+                    for fut in as_completed(futures):
+                        fb = futures[fut]
+                        rec = fut.result()
+                        with write_lock:
+                            fh.write(json.dumps(rec) + "\n")
+                            fh.flush()
+                        done_count += 1
+                        print(f"[{done_count}/{len(work)}] {fb['fb_id'][:10]} "
+                              f"-> {rec['depth']} (agreed={rec['agreed']}, n={rec['n_voters']})",
+                              flush=True)
+            else:
+                for fb, pv in work:
+                    rec = _handle(fb, pv)
+                    fh.write(json.dumps(rec) + "\n")
+                    fh.flush()
+                    done_count += 1
+                    print(f"[{done_count}/{len(work)}] {fb['fb_id'][:10]} "
+                          f"-> {rec['depth']} (agreed={rec['agreed']}, n={rec['n_voters']})",
+                          flush=True)
 
     records = list(_load_checkpoint().values())
     agreed = sum(1 for r in records if r["agreed"])
+    n_full = sum(1 for r in records if r["n_voters"] == len(voters))
     print(f"\ndone: {len(records)} voted, {agreed} agreed (>=2/3), "
           f"{len(records) - agreed} fail-closed to {FAIL_CLOSED_DEPTH}")
+    print(f"full {len(voters)}-voter coverage: {n_full}/{len(records)}")
     final_depth = Counter(r["depth"] for r in records)
     print("final depth distribution:", dict(final_depth))
 

@@ -144,16 +144,16 @@ models:
 label_vote:
   # D2577/D2580 3-model label vote. Three INDEPENDENT (cross-family) voters that
   # must NOT include gpt-oss-20b (the S4 teacher whose silver labels this vote
-  # verifies). D2577 specified Qwen3.8-27B + DeepSeek-v4-pro + gemma; DeepSeek is
-  # CLOUD (C1 $0 / C3 sovereignty) and carries the DELEGATE-001 reasoning_content
-  # bug, so the default third voter is Phi-4-mini-instruct-8bit (local). The
-  # model list is config-driven (C12) — swap the third model as policy allows.
+  # verifies). 2026-09-10 (user override): Phi-4-mini + gemma ruled unreliable for
+  # this pass; voters are now DeepSeek-v4-pro (frontier, C22 opt-in) + Qwen3.8-27B
+  # + Qwen3-Coder-30B. DeepSeek is CLOUD (C1 $0 / C3 sovereignty) — explicit opt-in
+  # via DEEPSEEK_API_KEY / --key; falls back to the two local Qwen voters if absent.
   models:
+  - model: deepseek-v4-pro
+    provider: deepseek
   - model: Qwen3.8-27B-MLX-4bit
     provider: omlx
-  - model: gemma-4-E4B-it-MLX-4bit
-    provider: omlx
-  - model: Phi-4-mini-instruct-8bit
+  - model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     provider: omlx
   majority_threshold: 2
   fail_closed_discipline: emerging

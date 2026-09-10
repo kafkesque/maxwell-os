@@ -52,7 +52,6 @@ from train_discipline_classifier import (  # noqa: E402
     TRAIN_TEST_SPLIT_SIZE,
     WARMUP_RATIO,
     WEIGHT_DECAY,
-    _flatten_golden_example,
     compute_class_weights,
     safe_write,
 )
@@ -79,6 +78,35 @@ logging.basicConfig(
 )
 
 
+def _flatten_depth_example(ex: Dict[str, Any]) -> Dict[str, Any]:
+    """Flatten a golden/vote-set example into a depth-only flat row.
+
+    Unlike ``_flatten_golden_example`` (which REQUIRES a discipline), the depth
+    vote-set has ``expected_classification`` with only a ``depth`` field. Read
+    only the depth-relevant fields so the loader works for both the full golden
+    set and the D2577 clean vote set.
+
+    Args:
+        ex: Nested example dict.
+
+    Returns:
+        Flat dict with id/name/definition/mechanism/boundary/depth.
+
+    Raises:
+        KeyError: If a required nested field (name, definition, depth) is absent.
+    """
+    fb = ex.get("input_fb") or {}
+    exp = ex.get("expected_classification") or {}
+    return {
+        "id": ex.get("id", ""),
+        "name": fb["name"],
+        "definition": fb["definition"],
+        "mechanism": fb.get("mechanism", ""),
+        "boundary": fb.get("boundary", ""),
+        "depth": exp.get("depth", ""),
+    }
+
+
 def load_depth_examples(golden_path: str) -> List[Dict[str, Any]]:
     """Load flattened golden examples and keep only canonical-depth rows.
 
@@ -101,7 +129,7 @@ def load_depth_examples(golden_path: str) -> List[Dict[str, Any]]:
     examples: List[Dict[str, Any]] = []
     skipped = 0
     for ex in raw:
-        flat = _flatten_golden_example(ex)
+        flat = _flatten_depth_example(ex)
         if flat.get("depth") in DEPTH_CLASSES:
             examples.append(flat)
         else:

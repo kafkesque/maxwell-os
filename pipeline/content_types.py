@@ -12,7 +12,9 @@ One routing mapping lives here:
 Note on convergent vs single-source (D2323 resolution):
   - Convergent (multi-source) S2 extraction emits `content_type: principle`
     (foundation block) with `extraction_type` carrying the epistemic form. The
-    golden file (stage2_fewshot_convergent.yaml) reflects this: 75/75 principle.
+    golden file (stage2_fewshot_convergent.yaml) is NOT that assertion: it holds
+    84 examples / 61 should_extract with NO top-level content_type field — any
+    apparent all-principle skew is few-shot bias, not an axis invariant (BUG-229).
   - Single-source extraction may emit any of the 5 roles; the model chooses the
     role directly (independent of extraction_type, per D2323).
 """

@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-10 | **Machine source of truth:** `config/decisions.yaml` (585 decisions)
+> **Updated:** 2026-09-13 | **Machine source of truth:** `config/decisions.yaml` (590 decisions)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -79,12 +79,14 @@ The 475 ACTIVE decisions are canonical rules in force (not "pending work"). **Ma
 ---
 
 | D2610 | **DEPTH LABEL POLICY v2 (2026-09-10) - reliable-pair agreement, abstain instead of fabricate.** Reliable voters (DeepSeek-v4-pro + Qwen3.8-27B) must be unanimous; anything else ABSTAINS into governance/depth_review_queue.yaml; advisory voters recorded, never decisive; checkpoint upserted (BUG-234/235/236 resolved). Re-derived 996 FBs with no model calls -> 678 confirmed / 318 abstained. Controlled effect on the identical 133-row consensus slice: 0.4298 macro-F1 / 0.594 acc vs 0.4073 / 0.526 for the v1-labelled encoder, with 251 fewer train rows. Coverage cost 67%. |
+| D2612 | **CONTENT-TYPE ADJUDICATION + DEPTH RELABEL SCOPE (2026-09-11).** 217 unlabeled golden-mined rows human-adjudicated then R5-verified by DeepSeek-v4-pro on full text (definition+mechanism+boundary). Agreement 201/217 = 92.6% (up from 79.3% first pass); 16 contested -> governance/content_type_contested_16_form.md. Frozen non-principle rate 15.7-16.6%, confirmed-principle 82.0%. BUG-239 FIXED (form generator dropped boundary 217/217 + truncated mechanism 185/217). RULING: depth relabel scoped to confirmed-principle subset, NOT 7,995. **CORRECTED by D2613: production principle = 61.0% (pilot), not 82.0%.** D2610 policy ported to scripts/label_vote.py. |
+| D2613 | **GOLDEN-SET TRUST GAP + VERIFIED-CORE INVENTORY (2026-09-11).** The 1,027-example "golden" set is gpt-oss teacher silver — every rationale says "NOT hand-reviewed" (provenance gpt-oss 1027 / DeepSeek 0 / human 0). Verified labels: content_type 314, domain/discipline 138, depth 133+69; **4-axis intersection = 69 (frontier69) = 6.7%**. Canonical counts corrected to 43 domains / 61 disciplines. RULING: freeze a human+DeepSeek-verified core (69→~150) as the sole eval target, demote the 1,027 to silver pool, no further classification/voting until the verified core exists. Joint-vote pilot: production principle 61.0%, relabel target ~3,800-4,900 rows. Strategy: object type at S2 (S4 trusts), depth = reliable-pair + encoder cache, domain/discipline = bge-m3→taxonomy-match, one-model end state via weak-supervision seeded from the verified core. |
 
-## ⚪ DONE / CLOSED — bottom (84)
+## ⚪ DONE / CLOSED — bottom (92)
 
-**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584, D2586, D2601, D2604, D2605, D2606, D2607, D2608, D2609, D2610
+**RESOLVED:** D2032, D2351, D2352, D2353, D2355, D2356, D2357, D2358, D2359, D2361, D2454, D2483, D2544, D2545, D2550, D2551, D2552, D2553, D2554, D2555, D2556, D2557, D2558, D2559, D2560, D2561, D2562, D2563, D2564, D2565, D2566, D2567, D2568, D2569, D2570, D2571, D2572, D2573, D2574, D2575, D2576, D2577, D2578, D2579, D2580, D2581, D2583, D2584, D2586, D2601, D2604, D2605, D2606, D2607, D2608, D2609, D2610, D2612, D2613
 **SUPERSEDED:** D2070, D2080, D2085, D2087, D2091, D2100, D2223, D2224, D2253, D2293, D2294, D2296, D2317, D2318, D2430, D2582
 **ARCHIVED:** D2000, D2001, D2002, D2034, D2052, D2195, D2196, D2204
-**REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383
+**REJECTED:** D2005, D2008, D2010, D2028, D2074, D2221, D2226, D2383, D2614
 
-> Full titles/descriptions for all 83 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).
+> Full titles/descriptions for all 92 are in `config/decisions.yaml` (state ∈ {RESOLVED, SUPERSEDED, ARCHIVED, REJECTED}).

@@ -89,6 +89,11 @@ governance/diagnostic_live_*.log
 # NLI label-audit checkpoint (transient runtime state, regenerable)
 governance/nli_label_audit.checkpoint.jsonl
 
+# Joint-vote runtime logs + backups + embedding cache (regenerable / redundant)
+governance/joint_vote_*.log
+governance/backups/
+governance/.taxonomy_emb_v5.npz
+
 # S2 contamination audit + test-result artifacts (regenerable diagnostics)
 audit_output/
 

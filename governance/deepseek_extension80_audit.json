@@ -1,0 +1,1207 @@
+{
+  "S4-GOLD-MINED-00005": {
+    "example_id": "S4-GOLD-MINED-00005",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "machine learning",
+    "domains_verdict": "override",
+    "domains": [
+      "research & methodology"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition describes a specific technical mechanism (normalization) within a single field (ML), fitting the 'specialized' depth and 'principle' content type as a reusable rule for training stability."
+  },
+  "S4-GOLD-MINED-00006": {
+    "example_id": "S4-GOLD-MINED-00006",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "cultural design",
+    "domains_verdict": "override",
+    "domains": [
+      "arts & culture",
+      "engineering practice"
+    ],
+    "content_type": "growth_edge",
+    "confidence": "high",
+    "reason": "The object discusses the contested historical application of a mathematical constant in art, bridging aesthetics and history, which is a cross-domain topic characterized by open/unproven claims (growth_edge)."
+  },
+  "S4-GOLD-MINED-00010": {
+    "example_id": "S4-GOLD-MINED-00010",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "override",
+    "domains": [
+      "user experience"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "This is a specific classification rule for UI controls within the HCI field, making it a specialized principle rather than a universal or cross-domain truth."
+  },
+  "S4-GOLD-MINED-00025": {
+    "example_id": "S4-GOLD-MINED-00025",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "override",
+    "discipline": "generative ai",
+    "domains_verdict": "override",
+    "domains": [
+      "research & methodology"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text is a historical summary of the evolution of generative models, which fits the 'noise_drop' definition of describing history without transferable value, and the discipline is specifically Generative AI."
+  },
+  "S4-GOLD-MINED-00049": {
+    "example_id": "S4-GOLD-MINED-00049",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "override",
+    "domains": [
+      "business operations",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Reframing is a ubiquitous cognitive heuristic applicable across business, design, and problem-solving, qualifying it as a universal principle."
+  },
+  "S4-GOLD-MINED-00061": {
+    "example_id": "S4-GOLD-MINED-00061",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "machine learning",
+    "domains_verdict": "override",
+    "domains": [
+      "ai & agents"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The technique of prompt sampling for diversity is a specific methodological heuristic within the AI/ML domain, classifying it as a specialized principle."
+  },
+  "S4-GOLD-MINED-00062": {
+    "example_id": "S4-GOLD-MINED-00062",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "systems thinking",
+    "domains_verdict": "override",
+    "domains": [
+      "organizational behavior",
+      "leadership"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Recursive self-observation and feedback loops are fundamental systems-level truths applicable to biology, computing, and organizations, fitting the 'universal' depth and 'principle' type."
+  },
+  "S4-GOLD-MINED-00069": {
+    "example_id": "S4-GOLD-MINED-00069",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "linguistics",
+    "domains_verdict": "override",
+    "domains": [
+      "education",
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Metaphor as a cognitive mapping tool bridges linguistics, education, and communication, making it a cross-domain principle rather than a universal law or specialized tool."
+  },
+  "S4-GOLD-MINED-00082": {
+    "example_id": "S4-GOLD-MINED-00082",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "override",
+    "domains": [
+      "engineering & infrastructure"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Chaos theory is a fundamental physical/mathematical law applicable across physics, engineering, and economics, fitting the 'universal' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00100": {
+    "example_id": "S4-GOLD-MINED-00100",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "psychology",
+    "domains_verdict": "agree",
+    "domains": [
+      "health & wellness"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition explicitly states the pattern emerges across substances, technologies, and behaviors, indicating transferability across multiple domains (cross-domain) rather than being limited to one field."
+  },
+  "S4-GOLD-MINED-00108": {
+    "example_id": "S4-GOLD-MINED-00108",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "science & research"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Reframing is a general cognitive heuristic applicable to problem-solving in both business and science, fitting the 'cross-domain' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00116": {
+    "example_id": "S4-GOLD-MINED-00116",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "creative process",
+    "domains_verdict": "agree",
+    "domains": [
+      "digital product",
+      "project management"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Analogical reasoning is a transferable method for generating insights across distinct fields, fitting the 'cross-domain' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00124": {
+    "example_id": "S4-GOLD-MINED-00124",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "strategic thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "organizational behavior",
+      "leadership"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The concept of organizational purpose is a core tenet of management and strategy, holding within the cluster of business/organizational domains."
+  },
+  "S4-GOLD-MINED-00133": {
+    "example_id": "S4-GOLD-MINED-00133",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "decision making",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "digital product",
+      "legal & public policy",
+      "project management",
+      "personal productivity"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Iterative decision-making is a general heuristic applicable across management, product, and personal contexts, fitting the 'cross-domain' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00140": {
+    "example_id": "S4-GOLD-MINED-00140",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "risk management",
+    "domains_verdict": "agree",
+    "domains": [
+      "finance & investment",
+      "legal & public policy"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The statistical reality of fat-tailed distributions and the cognitive bias of underestimating rare events is a universal truth in probability and decision theory."
+  },
+  "S4-GOLD-MINED-00159": {
+    "example_id": "S4-GOLD-MINED-00159",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "political economy",
+    "domains_verdict": "override",
+    "domains": [
+      "legal & public policy"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "medium",
+    "reason": "The definition describes a specific historical trend or observation about public sector adoption rather than a transferable rule or principle, fitting the 'noise_drop' content type."
+  },
+  "S4-GOLD-MINED-00175": {
+    "example_id": "S4-GOLD-MINED-00175",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "entrepreneurship",
+      "education",
+      "research & methodology"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The claim that problem-solving relies on transferring core concepts is a ubiquitous cognitive heuristic applicable across at least three distinct domains, fitting the 'universal' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00200": {
+    "example_id": "S4-GOLD-MINED-00200",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "decision making",
+    "domains_verdict": "override",
+    "domains": [
+      "business operations",
+      "legal & public policy",
+      "leadership"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Balancing structured analysis with intuition is a fundamental cognitive strategy for handling uncertainty that applies universally across all decision-making contexts, not just operations research."
+  },
+  "S4-GOLD-MINED-00206": {
+    "example_id": "S4-GOLD-MINED-00206",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "systems thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "legal & public policy"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The necessity of adaptation for survival is a general truth applicable to biological, economic, and social systems, classifying it as a universal principle."
+  },
+  "S4-GOLD-MINED-00221": {
+    "example_id": "S4-GOLD-MINED-00221",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "theoretical physics",
+    "domains_verdict": "agree",
+    "domains": [
+      "engineering & infrastructure",
+      "computational science & physics"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Newton's laws of motion are fundamental physical laws that hold true across all physical domains, making this a universal principle."
+  },
+  "S4-GOLD-MINED-00272": {
+    "example_id": "S4-GOLD-MINED-00272",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "anthropology",
+    "domains_verdict": "agree",
+    "domains": [
+      "social sciences"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition describes specific historical and cultural facts about Egyptian symbols without offering a transferable rule or method, fitting the noise_drop category."
+  },
+  "S4-GOLD-MINED-00277": {
+    "example_id": "S4-GOLD-MINED-00277",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "machine learning",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents"
+    ],
+    "content_type": "tool_instruction",
+    "confidence": "high",
+    "reason": "The description details a specific technical operation (tensor dtype conversion) within a specific framework (PyTorch), which is a tool instruction."
+  },
+  "S4-GOLD-MINED-00281": {
+    "example_id": "S4-GOLD-MINED-00281",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "law",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "legal & public policy"
+    ],
+    "content_type": "growth_edge",
+    "confidence": "high",
+    "reason": "The definition explicitly highlights an 'ethical and legal ambiguity' and 'tension' regarding AI training data, which characterizes an open, unproven, or speculative issue (growth_edge) rather than a settled principle."
+  },
+  "S4-GOLD-MINED-00295": {
+    "example_id": "S4-GOLD-MINED-00295",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "software engineering",
+    "domains_verdict": "agree",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "tool_instruction",
+    "confidence": "high",
+    "reason": "The definition explains the specific architectural mechanism of a named software tool (LangGraph) for managing state, which is a tool instruction."
+  },
+  "S4-GOLD-MINED-00296": {
+    "example_id": "S4-GOLD-MINED-00296",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "override",
+    "domains": [
+      "science & research",
+      "systems & frameworks",
+      "computational science & physics"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Power laws are a fundamental statistical distribution observed across physics, biology, and social systems, fitting the definition of a universal principle."
+  },
+  "S4-GOLD-MINED-00297": {
+    "example_id": "S4-GOLD-MINED-00297",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "operations research",
+    "domains_verdict": "override",
+    "domains": [
+      "finance & investment",
+      "science & research",
+      "systems & frameworks"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The distinction between Mediocristan and Extremistan is a general heuristic for risk and probability that applies across multiple fields, classifying it as a universal principle."
+  },
+  "S4-GOLD-MINED-00322": {
+    "example_id": "S4-GOLD-MINED-00322",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "override",
+    "domains": [
+      "arts & culture",
+      "systems & frameworks",
+      "research & methodology"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Peirce's categories are a foundational philosophical and logical framework applicable to all phenomena, making it a universal principle."
+  },
+  "S4-GOLD-MINED-00329": {
+    "example_id": "S4-GOLD-MINED-00329",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "typography",
+    "domains_verdict": "override",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The use of handwriting-style type is a specific heuristic within the field of visual communication and typography, not a universal truth."
+  },
+  "S4-GOLD-MINED-00336": {
+    "example_id": "S4-GOLD-MINED-00336",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "agree",
+    "domains": [
+      "semiotics & communication",
+      "arts & culture"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The concept of the semiosphere constraining perception is a core theoretical principle specific to the field of semiotics and cultural studies."
+  },
+  "S4-GOLD-MINED-00341": {
+    "example_id": "S4-GOLD-MINED-00341",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "override",
+    "domains": [
+      "user experience",
+      "software engineering",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Contextual adaptability is a design principle transferable across software, hardware, and service design, but not a universal law of nature."
+  },
+  "S4-GOLD-MINED-00384": {
+    "example_id": "S4-GOLD-MINED-00384",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "design thinking",
+    "domains_verdict": "override",
+    "domains": [
+      "arts & culture",
+      "engineering practice",
+      "user experience"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The recognition of recurring structural patterns is a fundamental cognitive and biological truth that bridges design, biology, and physics."
+  },
+  "S4-GOLD-MINED-00390": {
+    "example_id": "S4-GOLD-MINED-00390",
+    "depth_verdict": "override",
+    "depth": "noise_drop",
+    "discipline_verdict": "agree",
+    "discipline": "artificial intelligence",
+    "domains_verdict": "agree",
+    "domains": [
+      "business operations",
+      "code & computation",
+      "research & methodology"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The statement is a generic summary of AI's capabilities without providing a specific, transferable rule or heuristic, fitting the definition of noise."
+  },
+  "S4-GOLD-MINED-00398": {
+    "example_id": "S4-GOLD-MINED-00398",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "computer graphics",
+    "domains_verdict": "agree",
+    "domains": [
+      "media & entertainment"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The statement is a specific technical rule (enable/disable alpha blending) that acts as a reusable heuristic within the single domain of computer graphics, fitting the 'deep single-domain principle' definition."
+  },
+  "S4-GOLD-MINED-00434": {
+    "example_id": "S4-GOLD-MINED-00434",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "agree",
+    "domains": [
+      "education"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text describes a specific individual's professional identity and interests, which is a descriptive summary with no transferable value or reusable rule."
+  },
+  "S4-GOLD-MINED-00439": {
+    "example_id": "S4-GOLD-MINED-00439",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "sociology",
+    "domains_verdict": "agree",
+    "domains": [
+      "organizational behavior"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The concept of symbolic rebellion through norm violation is a general sociological/psychological truth applicable across multiple social contexts (e.g., organizational, political, cultural), making it cross-domain rather than specialized."
+  },
+  "S4-GOLD-MINED-00444": {
+    "example_id": "S4-GOLD-MINED-00444",
+    "depth_verdict": "override",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "computational geometry",
+    "domains_verdict": "agree",
+    "domains": [
+      "education"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The statement describes a specific mathematical property of magic squares (aesthetics/uniqueness) which is a factual observation about a specific object type, not a universal law or transferable design principle."
+  },
+  "S4-GOLD-MINED-00448": {
+    "example_id": "S4-GOLD-MINED-00448",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "neuroscience",
+    "domains_verdict": "agree",
+    "domains": [
+      "digital product",
+      "marketing & communications",
+      "editorial & advertising"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The mechanism of attentional focus triggering emotional response is a general cognitive truth that bridges neuroscience, marketing, and product design, fitting the cross-domain principle definition."
+  },
+  "S4-GOLD-MINED-00455": {
+    "example_id": "S4-GOLD-MINED-00455",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "systems engineering",
+    "domains_verdict": "agree",
+    "domains": [
+      "engineering practice",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The trade-off between short-term ease and long-term viability is a ubiquitous systems-level truth applicable to software, physical engineering, and organizational design, qualifying as universal."
+  },
+  "S4-GOLD-MINED-00464": {
+    "example_id": "S4-GOLD-MINED-00464",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "agree",
+    "domains": [
+      "industrial design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The assertion that real-world systems are dynamic and context-dependent is a general theoretical truth applicable to any field dealing with complex systems, fitting the cross-domain principle definition."
+  },
+  "S4-GOLD-MINED-00467": {
+    "example_id": "S4-GOLD-MINED-00467",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "agree",
+    "domains": [
+      "user experience",
+      "product design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The use of constraints to reduce cognitive burden is a fundamental design and cognitive heuristic that applies across UX, industrial design, and information architecture, qualifying as universal."
+  },
+  "S4-GOLD-MINED-00507": {
+    "example_id": "S4-GOLD-MINED-00507",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "override",
+    "discipline": "visual semiotics",
+    "domains_verdict": "override",
+    "domains": [
+      "semiotics & communication"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition is a historical summary of how cosmic models evolved and their aesthetic function, lacking a transferable rule or method, fitting the noise_drop boundary."
+  },
+  "S4-GOLD-MINED-00527": {
+    "example_id": "S4-GOLD-MINED-00527",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "political economy",
+    "domains_verdict": "override",
+    "domains": [
+      "urban planning",
+      "legal & public policy"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The concept of the 'cartographic gaze' as a mechanism of power and surveillance is a transferable theoretical principle applicable to urban planning and policy, not a specific process or tool."
+  },
+  "S4-GOLD-MINED-00541": {
+    "example_id": "S4-GOLD-MINED-00541",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "philosophy",
+    "domains_verdict": "override",
+    "domains": [
+      "product design",
+      "urban planning",
+      "user experience"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "This is a critical heuristic identifying a systemic failure in human-centered design (ignoring ecological consequences), which is a transferable principle across design and planning domains."
+  },
+  "S4-GOLD-MINED-00548": {
+    "example_id": "S4-GOLD-MINED-00548",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "media studies",
+    "domains_verdict": "agree",
+    "domains": [
+      "editorial & advertising"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text is a historical summary of 19th-century printing technology and its impact on book quality, containing no transferable design or research value."
+  },
+  "S4-GOLD-MINED-00552": {
+    "example_id": "S4-GOLD-MINED-00552",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "information science",
+    "domains_verdict": "agree",
+    "domains": [
+      "education",
+      "marketing & communications",
+      "data visualization"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The statement that data communication requires narrative structure to evoke response is a general, transferable principle applicable across education, marketing, and visualization."
+  },
+  "S4-GOLD-MINED-00561": {
+    "example_id": "S4-GOLD-MINED-00561",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "visual semiotics",
+    "domains_verdict": "override",
+    "domains": [
+      "brand identity",
+      "graphic design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The relationship between visual elements (color, type) and cognitive/emotional response is a core principle of visual semiotics and design psychology, specific to the design cluster rather than universal."
+  },
+  "S4-GOLD-MINED-00624": {
+    "example_id": "S4-GOLD-MINED-00624",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "political economy",
+    "domains_verdict": "override",
+    "domains": [
+      "data visualization",
+      "education"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "Centering marginalized perspectives to challenge dominant narratives is a transferable methodological principle in data visualization and social science, not a specialized tool instruction."
+  },
+  "S4-GOLD-MINED-00645": {
+    "example_id": "S4-GOLD-MINED-00645",
+    "depth_verdict": "override",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "linguistics",
+    "domains_verdict": "override",
+    "domains": [
+      "health & wellness",
+      "education"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The concept of 'bounded novelty' as a mechanism for cognitive processing is a linguistic and psychological principle transferable to health communication and education, not limited to one narrow context."
+  },
+  "S4-GOLD-MINED-00655": {
+    "example_id": "S4-GOLD-MINED-00655",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "override",
+    "discipline": "computer graphics",
+    "domains_verdict": "override",
+    "domains": [
+      "motion design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition describes a general rule for managing layers and automation in visual production, which is a field-level principle within computer graphics/motion design rather than a specific tool instruction or process template."
+  },
+  "S4-GOLD-MINED-00662": {
+    "example_id": "S4-GOLD-MINED-00662",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "override",
+    "discipline": "creative process",
+    "domains_verdict": "override",
+    "domains": [
+      "graphic design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition outlines a heuristic for generating inspiration (collecting/studying materials) which is a general practice within the creative process discipline, not a specific named method or tool instruction."
+  },
+  "S4-GOLD-MINED-00665": {
+    "example_id": "S4-GOLD-MINED-00665",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "information science",
+    "domains_verdict": "override",
+    "domains": [
+      "research & methodology",
+      "legal & public policy"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition is a descriptive summary of what open data ecosystems are, lacking a specific transferable rule, method, or tension that would qualify it as a principle or growth edge."
+  },
+  "S4-GOLD-MINED-00668": {
+    "example_id": "S4-GOLD-MINED-00668",
+    "depth_verdict": "override",
+    "depth": "specialized",
+    "discipline_verdict": "override",
+    "discipline": "computational physics & simulation",
+    "domains_verdict": "agree",
+    "domains": [
+      "science & research"
+    ],
+    "content_type": "process_instance",
+    "confidence": "high",
+    "reason": "The definition refers to a specific named approach (Hetionet knowledge graph analysis) for a narrow domain (drug discovery), making it a specialized process instance rather than a cross-domain principle."
+  },
+  "S4-GOLD-MINED-00682": {
+    "example_id": "S4-GOLD-MINED-00682",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "research methodology",
+    "domains_verdict": "agree",
+    "domains": [
+      "research & methodology"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The iterative refinement of hypotheses based on data is a fundamental epistemological truth applicable across all scientific and analytical fields, qualifying it as a universal principle."
+  },
+  "S4-GOLD-MINED-00684": {
+    "example_id": "S4-GOLD-MINED-00684",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "systems thinking",
+    "domains_verdict": "agree",
+    "domains": [
+      "digital product",
+      "user experience",
+      "project management"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition articulates a core systems thinking heuristic (internal structure over external intervention) that is transferable across various organizational and technical domains."
+  },
+  "S4-GOLD-MINED-00713": {
+    "example_id": "S4-GOLD-MINED-00713",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "human-computer interaction",
+    "domains_verdict": "agree",
+    "domains": [
+      "user experience",
+      "design strategy"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The definition describes a reusable methodological approach (combining speculative artifacts with empirical studies) within the design research field, which functions as a principle of methodology rather than a specific named instance or tool instruction."
+  },
+  "S4-GOLD-MINED-00737": {
+    "example_id": "S4-GOLD-MINED-00737",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "override",
+    "discipline": "creative process",
+    "domains_verdict": "agree",
+    "domains": [
+      "digital product",
+      "entrepreneurship",
+      "project management"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition presents a general heuristic for overcoming inertia through immediate execution, which is a transferable principle of the creative process applicable across multiple domains."
+  },
+  "S4-GOLD-MINED-00743": {
+    "example_id": "S4-GOLD-MINED-00743",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "systems thinking",
+    "domains_verdict": "override",
+    "domains": [
+      "systems & frameworks",
+      "organizational behavior",
+      "legal & public policy"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The concept of systemic failure enabling parasitic behavior is a general systems-level truth applicable across biology, sociology, and engineering, fitting the 'universal' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00759": {
+    "example_id": "S4-GOLD-MINED-00759",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "economics",
+    "domains_verdict": "override",
+    "domains": [
+      "business operations",
+      "entrepreneurship"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Economies of scale are a core economic principle (domain depth) describing a reusable rule about cost and volume, not a specific process or tool."
+  },
+  "S4-GOLD-MINED-00791": {
+    "example_id": "S4-GOLD-MINED-00791",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "generative design",
+    "domains_verdict": "override",
+    "domains": [
+      "computational art",
+      "creative technology"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition describes a specific, named art installation (a concrete instance) rather than a transferable principle, process, or tool instruction, making it a descriptive summary with no generalizable value."
+  },
+  "S4-GOLD-MINED-00823": {
+    "example_id": "S4-GOLD-MINED-00823",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "computational theory",
+    "domains_verdict": "override",
+    "domains": [
+      "code & computation",
+      "computational science & physics"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text describes the specific definition and educational utility of cellular automata, which is a descriptive fact about a specific computational model rather than a transferable principle or method."
+  },
+  "S4-GOLD-MINED-00824": {
+    "example_id": "S4-GOLD-MINED-00824",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "override",
+    "domains": [
+      "systems & frameworks",
+      "information architecture"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The idea that information is defined by distinction and relational structure is a foundational, universal truth in information theory and semiotics that applies across all domains of communication and data."
+  },
+  "S4-GOLD-MINED-00847": {
+    "example_id": "S4-GOLD-MINED-00847",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "computer graphics",
+    "domains_verdict": "override",
+    "domains": [
+      "code & computation",
+      "media & entertainment"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition articulates the specific architectural principle of GPU parallelism (SIMD) for graphics, which is a deep, specialized rule within the computer graphics domain."
+  },
+  "S4-GOLD-MINED-00859": {
+    "example_id": "S4-GOLD-MINED-00859",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "health & medicine",
+    "domains_verdict": "agree",
+    "domains": [
+      "health & wellness",
+      "science & research"
+    ],
+    "content_type": "process_template",
+    "confidence": "medium",
+    "reason": "The definition outlines a specific study design method involving a sequence of actions (assessing timing, comparing modified vs. standard regimens) to evaluate effectiveness, fitting the process_template role."
+  },
+  "S4-GOLD-MINED-00862": {
+    "example_id": "S4-GOLD-MINED-00862",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "aesthetics",
+    "domains_verdict": "agree",
+    "domains": [
+      "graphic design",
+      "brand identity",
+      "editorial & advertising"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text is a descriptive summary of Japanese design characteristics (history/style) without offering a transferable heuristic, rule, or method, classifying it as noise."
+  },
+  "S4-GOLD-MINED-00891": {
+    "example_id": "S4-GOLD-MINED-00891",
+    "depth_verdict": "override",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "cognitive science",
+    "domains_verdict": "override",
+    "domains": [
+      "ai & agents",
+      "project management",
+      "business operations"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition describes a general cognitive heuristic (decomposition) applicable to both human and AI systems across multiple domains, fitting the 'universal' depth and 'principle' content type."
+  },
+  "S4-GOLD-MINED-00919": {
+    "example_id": "S4-GOLD-MINED-00919",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "systems engineering",
+    "domains_verdict": "override",
+    "domains": [
+      "industrial design",
+      "business operations"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Mass production is a specific manufacturing paradigm (domain depth) and the text describes a reusable rule of efficiency (principle), not a historical summary (noise_drop)."
+  },
+  "S4-GOLD-MINED-00938": {
+    "example_id": "S4-GOLD-MINED-00938",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "agree",
+    "discipline": "complex adaptive systems",
+    "domains_verdict": "override",
+    "domains": [
+      "computational science & physics",
+      "computational art"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Fractals are a mathematical/geometric truth found in nature and computation (universal depth) and the definition states a general property (principle) rather than a specific instance."
+  },
+  "S4-GOLD-MINED-00969": {
+    "example_id": "S4-GOLD-MINED-00969",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "machine learning",
+    "domains_verdict": "override",
+    "domains": [
+      "ai & agents"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "LoRA is a specific technical method (specialized depth) and the definition explains its core mechanism (low-rank updates) as a reusable rule (principle), not a step-by-step template."
+  },
+  "S4-GOLD-MINED-00970": {
+    "example_id": "S4-GOLD-MINED-00970",
+    "depth_verdict": "agree",
+    "depth": "cross-domain",
+    "discipline_verdict": "agree",
+    "discipline": "semiotics",
+    "domains_verdict": "agree",
+    "domains": [
+      "arts & culture",
+      "graphic design",
+      "semiotics & communication"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The equivalence of visual and verbal grammar is a theoretical bridge between communication fields (cross-domain) and is stated as a general truth (principle)."
+  },
+  "S4-GOLD-MINED-00971": {
+    "example_id": "S4-GOLD-MINED-00971",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "cultural design",
+    "domains_verdict": "agree",
+    "domains": [
+      "arts & culture",
+      "graphic design",
+      "media & entertainment",
+      "motion design"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "Perspective is a foundational framework specific to visual representation (domain depth) and the text describes its function as a reusable rule (principle), not a historical summary."
+  },
+  "S4-GOLD-MINED-00972": {
+    "example_id": "S4-GOLD-MINED-00972",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "override",
+    "discipline": "semiotics",
+    "domains_verdict": "override",
+    "domains": [
+      "semiotics & communication"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text describes the historical progression of semiotic theory (philosophical ages), which is a descriptive summary (noise_drop) rather than a transferable principle."
+  },
+  "S4-GOLD-MINED-00975": {
+    "example_id": "S4-GOLD-MINED-00975",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "override",
+    "discipline": "strategic thinking",
+    "domains_verdict": "override",
+    "domains": [
+      "business operations",
+      "legal & public policy"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition describes the specific criteria and outcome of B-Corp certification, which is a factual summary of a regulatory/business standard (noise_drop) rather than a general principle."
+  },
+  "S4-GOLD-MINED-00984": {
+    "example_id": "S4-GOLD-MINED-00984",
+    "depth_verdict": "override",
+    "depth": "domain",
+    "discipline_verdict": "override",
+    "discipline": "creative coding",
+    "domains_verdict": "override",
+    "domains": [
+      "computational art",
+      "creative technology"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The definition is a descriptive summary of the creative coding community and its interdisciplinary nature, lacking a transferable rule or method, which fits the noise_drop boundary."
+  },
+  "S4-GOLD-MINED-00995": {
+    "example_id": "S4-GOLD-MINED-00995",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "cultural studies",
+    "domains_verdict": "override",
+    "domains": [
+      "social sciences",
+      "research & methodology"
+    ],
+    "content_type": "noise_drop",
+    "confidence": "high",
+    "reason": "The text is a descriptive summary of the focus and roots of critical research in social sciences, providing no reusable heuristic or process, thus classifying as noise_drop."
+  },
+  "S4-GOLD-MINED-01000": {
+    "example_id": "S4-GOLD-MINED-01000",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "generative design",
+    "domains_verdict": "override",
+    "domains": [
+      "computational art",
+      "code & computation"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The statement posits a specific, reusable rule (treating pixels as discrete data points for transformation) within the narrow domain of generative design, fitting the definition of a deep single-domain principle."
+  },
+  "S4-GOLD-MINED-01012": {
+    "example_id": "S4-GOLD-MINED-01012",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "machine learning",
+    "domains_verdict": "override",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The definition describes a specific, reusable technical strategy (freezing base layers) for efficient model adaptation, which acts as a deep single-domain principle rather than a multi-step process template."
+  },
+  "S4-GOLD-MINED-01014": {
+    "example_id": "S4-GOLD-MINED-01014",
+    "depth_verdict": "agree",
+    "depth": "domain",
+    "discipline_verdict": "agree",
+    "discipline": "software engineering",
+    "domains_verdict": "override",
+    "domains": [
+      "ai & agents",
+      "engineering practice"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The text outlines a reusable architectural rule for maintaining system integrity under stress, which is a field-level heuristic (principle) rather than a step-by-step process template."
+  },
+  "S4-GOLD-MINED-01018": {
+    "example_id": "S4-GOLD-MINED-01018",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "systems thinking",
+    "domains_verdict": "override",
+    "domains": [
+      "finance & investment",
+      "systems & frameworks",
+      "social sciences"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The classification of systems into Mediocristan and Extremistan is a general truth applicable across multiple distinct domains (finance, physics, social systems), fitting the universal depth and principle content type."
+  },
+  "S4-GOLD-MINED-01023": {
+    "example_id": "S4-GOLD-MINED-01023",
+    "depth_verdict": "agree",
+    "depth": "universal",
+    "discipline_verdict": "override",
+    "discipline": "cognitive science",
+    "domains_verdict": "override",
+    "domains": [
+      "finance & investment",
+      "business operations",
+      "legal & public policy"
+    ],
+    "content_type": "principle",
+    "confidence": "high",
+    "reason": "The description of Black Swan events and hindsight bias is a ubiquitous cognitive and statistical truth applicable across diverse fields, classifying it as a universal principle."
+  },
+  "S4-GOLD-MINED-01027": {
+    "example_id": "S4-GOLD-MINED-01027",
+    "depth_verdict": "agree",
+    "depth": "specialized",
+    "discipline_verdict": "agree",
+    "discipline": "typography",
+    "domains_verdict": "override",
+    "domains": [
+      "graphic design",
+      "arts & culture"
+    ],
+    "content_type": "principle",
+    "confidence": "medium",
+    "reason": "The statement asserts a specific pedagogical rule (manual spacing develops awareness) within the narrow field of typography, fitting the definition of a deep single-domain principle."
+  }
+}

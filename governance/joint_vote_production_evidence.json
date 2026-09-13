@@ -1,0 +1,28 @@
+{
+ "schema_version": "3.0",
+ "gen_model": "joint vote: deepseek-v4-pro + Qwen3.8-27B-MLX-4bit",
+ "pipeline_commit": "v3.0-D2485",
+ "created": "2026-09-13T08:32:27.103840+00:00",
+ "policy": "reliable_pair_agreement",
+ "policy_version": "v2",
+ "checkpoint": "governance/joint_vote_production_checkpoint.jsonl",
+ "n": 7966,
+ "content_type_distribution": {
+  "principle": 4920,
+  "(abstain)": 1681,
+  "noise_drop": 1037,
+  "process_template": 177,
+  "process_instance": 120,
+  "tool_instruction": 15,
+  "growth_edge": 16
+ },
+ "depth_distribution_principle": {
+  "(abstain)": 1048,
+  "domain": 3113,
+  "cross-domain": 733,
+  "universal": 22,
+  "specialized": 4
+ },
+ "needs_review": 2729,
+ "voter_error_rows": 0
+}

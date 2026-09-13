@@ -47,7 +47,15 @@ def load_definitions() -> Dict[str, Dict[str, str]]:
     out: Dict[str, Dict[str, str]] = {}
     for r in rows:
         fb = r.get("input_fb") or {}
-        out[r["id"]] = {"name": fb.get("name", ""), "definition": fb.get("definition", "")}
+        # BUG-239: include the FULL mechanism + boundary, not just definition.
+        # The boundary field carries the "applies when / fails when" scope that
+        # discriminates principle (broad) from noise_drop/process_instance (narrow).
+        out[r["id"]] = {
+            "name": fb.get("name", ""),
+            "definition": fb.get("definition", ""),
+            "mechanism": fb.get("mechanism", ""),
+            "boundary": fb.get("boundary", ""),
+        }
     return out
 
 
@@ -80,6 +88,8 @@ def main() -> None:
         meta = defs.get(eid, {})
         name = meta.get("name", r.get("name", ""))
         definition = meta.get("definition", "").strip()
+        mechanism = meta.get("mechanism", "").strip()
+        boundary = meta.get("boundary", "").strip()
         prop = r.get("content_type")
         conf = r.get("confidence")
         reason = r.get("reason", "")
@@ -88,6 +98,12 @@ def main() -> None:
         lines.append("")
         lines.append(f"**Definition:** {definition}")
         lines.append("")
+        if mechanism:
+            lines.append(f"**Mechanism:** {mechanism}")
+            lines.append("")
+        if boundary:
+            lines.append(f"**Boundary:** {boundary}")
+            lines.append("")
         if prop:
             lines.append(f"**MODEL hint (non-binding):** `{prop}` (confidence: `{conf}`) — {reason}")
             lines.append("")

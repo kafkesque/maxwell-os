@@ -1,0 +1,24 @@
+{
+ "schema_version": "3.0",
+ "gen_model": "joint vote: deepseek-v4-pro + Qwen3.8-27B-MLX-4bit",
+ "pipeline_commit": "v3.0-D2485",
+ "created": "2026-09-11T12:07:24.668921+00:00",
+ "policy": "reliable_pair_agreement",
+ "policy_version": "v2",
+ "n": 200,
+ "content_type_distribution": {
+  "principle": 122,
+  "noise_drop": 28,
+  "(abstain)": 40,
+  "process_template": 3,
+  "growth_edge": 2,
+  "process_instance": 4,
+  "tool_instruction": 1
+ },
+ "depth_distribution_principle": {
+  "domain": 80,
+  "(abstain)": 27,
+  "cross-domain": 15
+ },
+ "needs_review": 67
+}

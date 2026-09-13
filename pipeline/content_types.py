@@ -52,6 +52,18 @@ PROCESS_TEMPLATE_MIN_STEPS: int = int(
     CONTENT_TYPE_RULES.get("process_template_min_steps", 2)
 )
 
+# ── D2587 — full 7-value content_type axis (5 roles + 2 dispositions) ──────
+# The S4 router only COMMITS the 5 roles (content_types); noise_drop + quarantine
+# are DISPOSITIONS (drop / hold) that a classification pass may still emit. The
+# D2587 adjudication and the joint content_type+depth vote use all 7.
+# NOTE: `dispositions:` also carries the `classified` STATUS flag ("already has a
+# role"), which is NOT a classification outcome — it is excluded from the axis.
+_DISPOSITION_STATUS_KEYS: frozenset[str] = frozenset({"classified"})
+CONTENT_TYPE_DISPOSITIONS: frozenset[str] = frozenset(
+    k for k in _CT.get("dispositions", {}).keys() if k not in _DISPOSITION_STATUS_KEYS
+)
+CONTENT_TYPES_ALL: frozenset[str] = CONTENT_TYPES | CONTENT_TYPE_DISPOSITIONS
+
 # ── D2323 — vestigial content_type values, never used ─────────────────────
 DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
     _CT.get("dropped_content_types", [])

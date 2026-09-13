@@ -79,10 +79,21 @@ MAJORITY_THRESHOLD: int = int(_VOTE.get("majority_threshold", 2))
 FAIL_CLOSED_DISCIPLINE: str = _VOTE.get("fail_closed_discipline", "emerging")
 FAIL_CLOSED_DEPTH: str = _VOTE.get("fail_closed_depth", "domain")
 CATCH_ALL_DISCIPLINES: set[str] = {str(d) for d in _VOTE.get("catch_all_disciplines", [])}
+
+# D2610 LABEL POLICY v2 (2026-09-10): the reliable voters must be UNANIMOUS to
+# produce a label; anything else ABSTAINS (empty + needs_review) instead of
+# fabricating a fail-closed label (BUG-235/236). Advisory voters are recorded
+# for the audit trail but never decide. Supersedes the legacy 2-of-3 majority.
+RELIABLE_VOTERS: list[str] = [str(v) for v in _VOTE.get("reliable_voters", [])]
+ADVISORY_VOTERS: list[str] = [str(v) for v in _VOTE.get("advisory_voters", [])]
+POLICY: str = str(_VOTE.get("policy", "reliable_pair_agreement"))
+ABSTAIN_ON_DISAGREEMENT: bool = bool(_VOTE.get("abstain_on_disagreement", True))
 RECOVERY_SLEEP: float = float(_VOTE.get("recovery_sleep_seconds", 1.0))
 CHECKPOINT_INTERVAL: int = int(_VOTE.get("checkpoint_interval", 25))
 MAX_TOKENS: int = int(_VOTE.get("max_tokens", 256))
 TIMEOUT: int = int(_VOTE.get("timeout", 120))
+DEEPSEEK_MAX_TOKENS: int = 2048  # v4-pro burns ~315 reasoning tokens before the answer
+DEEPSEEK_URL: str = "https://api.deepseek.com/v1/chat/completions"
 
 _VALID_DEPTHS: tuple[str, ...] = ("universal", "cross-domain", "domain", "specialized")
 
@@ -157,21 +168,15 @@ def parse_voter_output(raw: Any) -> dict[str, Any]:
 
 
 def _majority(counter: Counter, key: str) -> str:
-    """Return the majority key or the fail-closed default on disagreement."""
+    """Legacy majority key or fail-closed default on disagreement (D2577)."""
     if not counter:
         return key
     (winner, count) = counter.most_common(1)[0]
     return winner if count >= MAJORITY_THRESHOLD else key
 
 
-def aggregate_votes(votes: list[dict[str, Any]]) -> dict[str, Any]:
-    """Aggregate N voter labels into a single consensus label + disagreement map.
-
-    discipline → mode (fail-closed to FAIL_CLOSED_DISCIPLINE on no majority)
-    depth      → mode (fail-closed to FAIL_CLOSED_DEPTH on no majority)
-    domains    → keep a domain only if >= MAJORITY_THRESHOLD voters proposed it
-                 (fail-closed to empty set if none clear the bar)
-    """
+def _aggregate_legacy(votes: list[dict[str, Any]]) -> dict[str, Any]:
+    """Legacy 2-of-3 majority + fail-closed (D2577), kept for old checkpoints."""
     discs = Counter(v["discipline"] for v in votes if v.get("discipline"))
     depths = Counter(v["depth"] for v in votes if v.get("depth"))
 
@@ -189,6 +194,71 @@ def aggregate_votes(votes: list[dict[str, Any]]) -> dict[str, Any]:
         "domain_votes": dict(domain_counts),
         "depth_votes": dict(depths),
     }
+
+
+def _unanimous(values: list[Any]) -> Any:
+    """Return the value if every element is identical AND non-empty, else None."""
+    vals = [v for v in values if v not in (None, "", [])]
+    if not vals or len(vals) != len(values):
+        return None
+    return vals[0] if len(set(str(v) for v in vals)) == 1 else None
+
+
+def _aggregate_reliable_pair(votes: list[dict[str, Any]]) -> dict[str, Any]:
+    """D2610 policy v2: reliable unanimity → label, else abstain (never fabricate).
+
+    discipline/depth → all RELIABLE voters must agree on the same value, else None.
+    domains          → intersection of all reliable voters' domain sets (a domain
+                       is kept only if every reliable voter proposed it).
+    Advisory voters  → recorded in ``advisory_votes`` but never decide.
+    Any abstain sets ``needs_review`` True and ``agreed`` False.
+    """
+    reliable = [v for v in votes if v.get("model") in RELIABLE_VOTERS and not v.get("error")]
+    advisory = [v for v in votes if v.get("model") in ADVISORY_VOTERS and not v.get("error")]
+
+    discipline = _unanimous([v.get("discipline") for v in reliable])
+    depth = _unanimous([v.get("depth") for v in reliable])
+
+    domain_sets = [set(v.get("domains") or []) for v in reliable]
+    kept_domains = sorted(set.intersection(*domain_sets)) if domain_sets else []
+
+    agreed = discipline is not None and depth is not None and bool(kept_domains)
+
+    # Full-vote record for the audit trail (all voters, reliable + advisory).
+    discs = Counter(v["discipline"] for v in votes if v.get("discipline"))
+    depths = Counter(v["depth"] for v in votes if v.get("depth"))
+    domain_counts: Counter = Counter()
+    for v in votes:
+        domain_counts.update(v.get("domains", []))
+
+    return {
+        "discipline": discipline,
+        "domains": kept_domains,
+        "depth": depth,
+        "needs_review": not agreed,
+        "agreed": agreed,
+        "policy": POLICY,
+        "discipline_votes": dict(discs),
+        "domain_votes": dict(domain_counts),
+        "depth_votes": dict(depths),
+        "reliable_voters": RELIABLE_VOTERS,
+        "advisory_votes": {
+            v["model"]: {"discipline": v.get("discipline"), "domains": v.get("domains"),
+                         "depth": v.get("depth")}
+            for v in advisory
+        },
+    }
+
+
+def aggregate_votes(votes: list[dict[str, Any]]) -> dict[str, Any]:
+    """Aggregate N voter labels under the configured label policy.
+
+    D2610 ``reliable_pair_agreement`` (default) → reliable unanimity + abstain.
+    Legacy ``majority`` → 2-of-3 + fail-closed (D2577).
+    """
+    if POLICY == "reliable_pair_agreement":
+        return _aggregate_reliable_pair(votes)
+    return _aggregate_legacy(votes)
 
 
 def flag_issues(fb: dict[str, Any], votes: list[dict[str, Any]], agg: dict[str, Any]) -> list[str]:
@@ -307,14 +377,67 @@ def load_checkpoint(path: Path) -> dict[str, Any]:
         return {}
 
 
-def vote_one_fb(fb: dict[str, Any]) -> dict[str, Any]:
+def _call_deepseek_json(prompt: str, key: str, model: str) -> Any:
+    """Call DeepSeek (cloud, C22 opt-in) for one FB; return the parsed JSON object.
+
+    Parses ONLY ``content`` (never ``reasoning_content`` — the DELEGATE-001 trap).
+    """
+    import re
+    import ssl
+    import urllib.error
+    import urllib.request
+
+    import certifi
+
+    body = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You are a precise JSON-only ontology labeler."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.0,
+        "max_tokens": DEEPSEEK_MAX_TOKENS,
+        "response_format": {"type": "json_object"},
+    }).encode("utf-8")
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    req = urllib.request.Request(
+        DEEPSEEK_URL, data=body, method="POST",
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=ctx) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"DeepSeek HTTP {exc.code}: {exc.read()[:200]!r}") from exc
+    content = (data["choices"][0]["message"].get("content") or "").strip()
+    if not content:
+        raise RuntimeError("DeepSeek returned empty content (truncated reasoning?)")
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", content, re.DOTALL)
+        return json.loads(m.group(0)) if m else {}
+
+
+def _call_voter(voter: dict[str, str], prompt: str, key: str) -> Any:
+    """Route a voter by provider: deepseek → cloud HTTP, else local OMLX (C21)."""
+    provider = str(voter.get("provider") or "omlx").lower()
+    model = voter["model"]
+    if provider == "deepseek":
+        if not key:
+            raise RuntimeError("DeepSeek voter requires DEEPSEEK_API_KEY (C22 opt-in)")
+        return _call_deepseek_json(prompt, key, model)
+    return call_omlx_json(prompt, model=model, max_tokens=MAX_TOKENS, timeout=TIMEOUT)
+
+
+def vote_one_fb(fb: dict[str, Any], key: str = "") -> dict[str, Any]:
     """Run all voters on one FB (single-FB calls, BUG-224 workload shaping)."""
     prompt = build_label_prompt(fb)
     votes: list[dict[str, Any]] = []
     for voter in VOTERS:
         model = voter["model"]
         try:
-            raw = call_omlx_json(prompt, model=model, max_tokens=MAX_TOKENS, timeout=TIMEOUT)
+            raw = _call_voter(voter, prompt, key)
             votes.append({"model": model, **parse_voter_output(raw)})
         except Exception as e:  # noqa: BLE001 — per-FB capture, fail-loud below (C16)
             print(f"  ⚠️  voter {model} FAILED on {fb['fb_id'][:12]}: {type(e).__name__}: {e}",
@@ -357,6 +480,8 @@ def main() -> int:
     parser.add_argument("--where", default=None, help="SQL predicate selecting FBs (DB source only)")
     parser.add_argument("--limit", type=int, default=None, help="Cap FBs (deterministic ORDER BY fb_id)")
     parser.add_argument("--output", default="temp/label_vote.jsonl", help="Checkpoint JSONL path")
+    parser.add_argument("--key", default=os.environ.get("DEEPSEEK_API_KEY", ""),
+                        help="DeepSeek API key (C22 opt-in; empty disables the deepseek voter)")
     parser.add_argument("--run", action="store_true", help="Actually call voters (default = dry-run)")
     args = parser.parse_args()
 
@@ -388,7 +513,7 @@ def main() -> int:
     for i, fb in enumerate(fbs, 1):
         if fb["fb_id"] in done:
             continue
-        done[fb["fb_id"]] = vote_one_fb(fb)
+        done[fb["fb_id"]] = vote_one_fb(fb, args.key)
         if i % CHECKPOINT_INTERVAL == 0 or i == len(fbs):
             _safe_write(out_path, json.dumps(list(done.values()), ensure_ascii=False, indent=1))
             print(f"   {i}/{len(fbs)} voted | {len(done)} records | {time.time() - t0:.0f}s")

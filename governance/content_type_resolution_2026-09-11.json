@@ -1,0 +1,150 @@
+{
+ "schema_version": "1.0",
+ "gen_model": "human (adjudicator) + deepseek-v4-pro (R5 second-opinion verifier)",
+ "pipeline_commit": "1d3dc19",
+ "created": "2026-09-11T10:41:23.105751+00:00",
+ "axis": "content_type",
+ "policy": "reliable-pair: user==deepseek -> CONFIRMED; user!=deepseek -> contested (review queue)",
+ "n": 217,
+ "confirmed": 201,
+ "contested": 16,
+ "agreement_rate": 0.9263,
+ "confirmed_principle": 178,
+ "confirmed_nonprinciple": 23,
+ "user_distribution": {
+  "principle": 181,
+  "quarantine": 14,
+  "noise_drop": 10,
+  "tool_instruction": 1,
+  "process_template": 7,
+  "growth_edge": 4
+ },
+ "deepseek_distribution": {
+  "principle": 183,
+  "noise_drop": 19,
+  "quarantine": 2,
+  "tool_instruction": 1,
+  "process_template": 7,
+  "growth_edge": 5
+ },
+ "user_nonprinciple_rate": 0.1659,
+ "deepseek_nonprinciple_rate": 0.1567,
+ "contested_breakdown": {
+  "quarantine_hold": 12,
+  "committed_disagreement": 4
+ },
+ "contested_rows": [
+  {
+   "example_id": "S4-GOLD-MINED-00012",
+   "user": "quarantine",
+   "deepseek": "principle",
+   "deepseek_confidence": "medium",
+   "reason": "General pattern of medium evolution from replication to exploitation."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00115",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "medium",
+   "reason": "Summarizes legal protection criteria without a prescriptive filter."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00174",
+   "user": "principle",
+   "deepseek": "growth_edge",
+   "deepseek_confidence": "high",
+   "reason": "Speculative emerging economic paradigm for tokenized AI agents."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00272",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Specific cultural description of Egyptian symbols with no transferable rule."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00474",
+   "user": "principle",
+   "deepseek": "growth_edge",
+   "deepseek_confidence": "medium",
+   "reason": "Highlights an open tension between visual abundance and communication clarity, an unverified correlation."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00484",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "medium",
+   "reason": "Historical summary of narrative's social function with no prescriptive filter."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00490",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Describes a cultural belief pattern without transferable rule."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00525",
+   "user": "quarantine",
+   "deepseek": "principle",
+   "deepseek_confidence": "medium",
+   "reason": "Reusable critical lens for identifying colonial bias in mapping platforms."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00693",
+   "user": "growth_edge",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Historical descriptive summary of a cultural typographic shift."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00862",
+   "user": "principle",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Descriptive classification of Japanese graphic style aesthetics with no prescriptive filter or transferable rule."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00927",
+   "user": "quarantine",
+   "deepseek": "principle",
+   "deepseek_confidence": "high",
+   "reason": "Prescriptive heuristic about asymmetric risk in screening."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00963",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Describes a physical phenomenon without transferable prescriptive value."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00978",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "medium",
+   "reason": "Descriptive definition of an art category with no transferable prescriptive rule."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00994",
+   "user": "quarantine",
+   "deepseek": "noise_drop",
+   "deepseek_confidence": "high",
+   "reason": "Specific descriptive analysis of chartreuse color significance with no transferable prescriptive filter."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-00997",
+   "user": "quarantine",
+   "deepseek": "principle",
+   "deepseek_confidence": "high",
+   "reason": "Single-domain aesthetic principle about open works, offering a reusable rule for enduring appeal."
+  },
+  {
+   "example_id": "S4-GOLD-MINED-01008",
+   "user": "quarantine",
+   "deepseek": "principle",
+   "deepseek_confidence": "high",
+   "reason": "General claim about human educability as a core competitive advantage."
+  }
+ ]
+}

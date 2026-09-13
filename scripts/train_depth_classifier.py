@@ -65,7 +65,8 @@ from pipeline.pipeline_paths import PIPELINE_COMMIT, SCHEMA_VERSION  # noqa: E40
 DEPTH_CLASSES: Tuple[str, ...] = tuple(DEPTH_LITERAL.__args__)  # type: ignore[attr-defined]
 NUM_DEPTH_CLASSES: int = len(DEPTH_CLASSES)
 
-GOLDEN = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
+# D2618 P0.5: silver training pool retired from the live golden path (BUG-241).
+GOLDEN = ROOT / "archive" / "golden_retired_D2618" / "stage4_golden_mined.yaml"
 CHECKPOINT = ROOT / "knowledge pipeline" / "classifier_depth"
 
 MIN_EXAMPLES_PER_DEPTH: int = 2  # >=2 needed for a stratified train/test split
@@ -434,9 +435,19 @@ def main() -> None:
     # (used by the D2577 controlled comparison: both label sources must train on
     # the identical FB subset, so the internal split is disabled and the held-out
     # set is supplied separately to scripts/eval_depth_classifier.py).
+    #
+    # D2618 P0.5: GOLDEN_EVAL points at the verified 4-axis core; when present the
+    # held-out eval is drawn from it (contract-first), not a silver fold.
     labels_array = np.array([depth_label_map[ex["depth"]] for ex in examples])
     indices = np.arange(len(examples))
-    if os.environ.get("TRAIN_ALL"):
+    eval_golden = os.environ.get("GOLDEN_EVAL", str(ROOT / "governance" / "gold_4axis.jsonl"))
+    if eval_golden and eval_golden.lower() != "off" and Path(eval_golden).exists():
+        from train_discipline_classifier import load_gold_4axis  # local import (avoid cycle)
+        eval_examples = load_gold_4axis(eval_golden)["examples"]
+        logger.info("D2618: verified core %s as held-out eval (%d rows)", eval_golden, len(eval_examples))
+        train_examples = examples
+        test_examples = eval_examples
+    elif os.environ.get("TRAIN_ALL"):
         train_examples = examples
         test_examples = examples
         logger.info("TRAIN_ALL set — training on all %d examples (no internal split)", len(examples))

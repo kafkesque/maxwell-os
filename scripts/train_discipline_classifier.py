@@ -14,6 +14,7 @@ microsoft/deberta-v3-base -> answerdotai/ModernBERT-base (8192 ctx, ~2x faster).
 from __future__ import annotations
 
 import io
+import json
 import logging
 import os
 import tempfile
@@ -47,7 +48,7 @@ MIN_EXAMPLES_PER_CLASS: int = 5
 # The few-shot golden (config/golden/stage4_golden.yaml, 7 hand-curated examples)
 # is WIRED into the S4 prompt and stays small. This is the SEPARATE classifier
 # TRAINING set, mined from convergent FBs by scripts/mine_classifier_golden.py.
-TRAINING_DATA_PATH: str = "config/golden/stage4_golden_mined.yaml"
+TRAINING_DATA_PATH: str = "archive/golden_retired_D2618/stage4_golden_mined.yaml"
 CHECKPOINT_DIR: str = "knowledge pipeline/classifier_modernbert"
 
 TRAIN_TEST_SPLIT_SIZE: float = 0.2
@@ -201,6 +202,94 @@ def load_golden_set(config_path: str) -> Dict[str, Any]:
     examples = [_flatten_golden_example(ex) for ex in raw_examples]
     logger.info("Loaded %d training examples from %s", len(examples), config_path)
     return {"examples": examples}
+
+
+def load_gold_4axis(jsonl_path: str, db_path: Optional[str] = None) -> Dict[str, Any]:
+    """Load the D2618 verified 4-axis core (gold_4axis.jsonl) as an eval set.
+
+    The verified core is a FLAT JSONL (fb_id, name, discipline, domains, depth,
+    content_type) with NO definition/mechanism/boundary text — those live in the
+    DB. This loader joins the DB by fb_id to reconstruct the SAME flat example
+    shape the training Dataset consumes, so the verified core can be used as the
+    held-out EVAL split (contract-first authority, D2618 P0.5) without trusting
+    the silver stage4_golden_mined.yaml.
+
+    Only principle rows with a complete 4-axis label (discipline + domains +
+    depth) are returned (non-principles carry no depth and are not classifier
+    eval targets).
+
+    Args:
+        jsonl_path: Path to governance/gold_4axis.jsonl.
+        db_path:    Optional override of the live DB path (defaults to pipeline DB).
+
+    Returns:
+        Dict with 'examples' key holding FLAT example rows.
+
+    Raises:
+        FileNotFoundError: If the JSONL or DB is missing.
+        ValueError: If no principle rows carry a complete 4-axis label.
+    """
+    import sqlite3
+
+    path = Path(jsonl_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Verified core not found at {jsonl_path}")
+
+    db = db_path or _default_db_path()
+    if not Path(db).exists():
+        raise FileNotFoundError(f"DB not found at {db} (needed for text join)")
+
+    rows = [json.loads(line) for line in path.open(encoding="utf-8") if line.strip()]
+    principle = [
+        r for r in rows
+        if r.get("content_type") == "principle"
+        and r.get("discipline")
+        and r.get("domains")
+        and r.get("depth")
+    ]
+    if not principle:
+        raise ValueError(f"{jsonl_path} has no principle rows with a complete 4-axis label")
+
+    fb_ids = [r["fb_id"] for r in principle]
+    con = sqlite3.connect(db)
+    con.row_factory = sqlite3.Row
+    text_by_fb: Dict[str, Dict[str, Any]] = {}
+    try:
+        for r in principle:
+            cur = con.execute(
+                "SELECT name, definition, mechanism, boundary FROM fbs WHERE fb_id=?",
+                (r["fb_id"],),
+            )
+            row = cur.fetchone()
+            if row is not None:
+                text_by_fb[r["fb_id"]] = dict(row)
+    finally:
+        con.close()
+
+    examples: List[Dict[str, Any]] = []
+    for r in principle:
+        t = text_by_fb.get(r["fb_id"], {})
+        examples.append({
+            "id": r.get("example_id") or r["fb_id"],
+            "name": r.get("name") or t.get("name") or "",
+            "definition": t.get("definition") or "",
+            "mechanism": t.get("mechanism") or "",
+            "boundary": t.get("boundary") or "",
+            "discipline": r["discipline"],
+            "domains": r["domains"],
+            "depth": r["depth"],
+            "evidence": "",
+            "is_specialized": r.get("depth") == "specialized",
+        })
+    logger.info("Loaded %d verified-core eval examples from %s", len(examples), jsonl_path)
+    return {"examples": examples}
+
+
+def _default_db_path() -> str:
+    """Return the live DB path (C12: env override -> pipeline_paths)."""
+    from pipeline.pipeline_paths import DB_PATH as _DB
+
+    return os.environ.get("MAXWELL_DB", str(_DB))
 
 
 # ---------------------------------------------------------------------------
@@ -740,41 +829,65 @@ def main() -> None:
         domain_label_map=domain_label_map,
     )
 
-    # Stratified split (or a fixed held-out id list via GOLDEN_TEST_IDS — the
-    # D2585 P4 A/B: both the silver and corrected models evaluate on the SAME
-    # held-out fold so ΔF1 is not confounded by split mismatch).
-    labels_array = np.array(
-        [discipline_label_map[ex["discipline"]] for ex in examples]
-    )
-    indices = np.arange(len(examples))
-    held_out_ids = os.environ.get("GOLDEN_TEST_IDS")
-    if held_out_ids:
-        ids = {
-            line.strip()
-            for line in Path(held_out_ids).read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        }
-        train_idx = [i for i, ex in enumerate(examples) if ex.get("id") not in ids]
-        test_idx = [i for i, ex in enumerate(examples) if ex.get("id") in ids]
+    # D2618 P0.5: the held-out EVAL split must be the verified 4-axis core
+    # (governance/gold_4axis.jsonl), NOT a random fold of the silver pool.
+    # GOLDEN_EVAL points at the verified core (or "off" to disable). This is the
+    # contract-first authority: training may still use silver, but evaluation is
+    # measured ONLY against the verified core.
+    eval_golden = os.environ.get("GOLDEN_EVAL", "governance/gold_4axis.jsonl")
+    if eval_golden and eval_golden.lower() != "off" and Path(eval_golden).exists():
+        eval_examples = load_gold_4axis(eval_golden)["examples"]
+        # Eval must use the SAME label maps as training; drop any eval row whose
+        # discipline/domains are not in the training vocabulary.
+        eval_examples = [
+            ex for ex in eval_examples
+            if ex["discipline"] in discipline_label_map
+        ]
         logger.info(
-            "Fixed held-out split: %d train / %d test (GOLDEN_TEST_IDS)",
-            len(train_idx), len(test_idx),
+            "D2618: using verified core %s as held-out eval (%d rows)",
+            eval_golden, len(eval_examples),
         )
-        if len(test_idx) < 2 or not train_idx:
+        if len(eval_examples) < 2:
             raise ValueError(
-                f"GOLDEN_TEST_IDS produced unusable split: "
-                f"{len(train_idx)} train / {len(test_idx)} test"
+                f"Verified-core eval split has only {len(eval_examples)} rows — "
+                "refusing to evaluate on a degenerate split (D2618 P0.5)."
             )
+        train_examples = examples
+        test_examples = eval_examples
     else:
-        train_idx, test_idx = train_test_split(
-            indices,
-            test_size=TRAIN_TEST_SPLIT_SIZE,
-            random_state=RANDOM_STATE,
-            stratify=labels_array,
+        # Legacy fallback: stratified hold-out of the silver pool (kept for
+        # backward compatibility; do NOT rely on it for authority).
+        labels_array = np.array(
+            [discipline_label_map[ex["discipline"]] for ex in examples]
         )
-
-    train_examples = [examples[i] for i in train_idx]
-    test_examples = [examples[i] for i in test_idx]
+        indices = np.arange(len(examples))
+        held_out_ids = os.environ.get("GOLDEN_TEST_IDS")
+        if held_out_ids:
+            ids = {
+                line.strip()
+                for line in Path(held_out_ids).read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            }
+            train_idx = [i for i, ex in enumerate(examples) if ex.get("id") not in ids]
+            test_idx = [i for i, ex in enumerate(examples) if ex.get("id") in ids]
+            logger.info(
+                "Fixed held-out split: %d train / %d test (GOLDEN_TEST_IDS)",
+                len(train_idx), len(test_idx),
+            )
+            if len(test_idx) < 2 or not train_idx:
+                raise ValueError(
+                    f"GOLDEN_TEST_IDS produced unusable split: "
+                    f"{len(train_idx)} train / {len(test_idx)} test"
+                )
+        else:
+            train_idx, test_idx = train_test_split(
+                indices,
+                test_size=TRAIN_TEST_SPLIT_SIZE,
+                random_state=RANDOM_STATE,
+                stratify=labels_array,
+            )
+        train_examples = [examples[i] for i in train_idx]
+        test_examples = [examples[i] for i in test_idx]
 
     train_dataset = GoldenDataset(
         examples=train_examples,

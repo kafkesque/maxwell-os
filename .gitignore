@@ -103,3 +103,6 @@ checkpoint.jsonl.depth.json
 
 # macOS drag/drop text-clipping artifacts (accidental drops, never repo content)
 *.textClipping
+
+# Stray root-level SQLite (real DB lives in "knowledge pipeline/maxwell.db")
+maxwell.db

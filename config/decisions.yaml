@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-13T19:20:00+02:00'
-total_decisions: 593
+last_sync: '2026-09-13T22:27:00+02:00'
+total_decisions: 594
 decisions:
 - id: D2586
   category: LABEL QUALITY / DATA
@@ -6761,11 +6761,37 @@ decisions:
   target_files: '[scripts/build_verified_core.py, scripts/apply_phase1_finalize.py, governance/verified_core.jsonl, governance/verified_core_manifest.json, governance/golden_synced_4axis.jsonl, governance/flagged_core_human_verdicts.jsonl, governance/flagged_core_review.md, governance/phase1_finalize_manifest.jsonl]'
   created: '2026-09-13'
 
+- id: D2618
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: 'A/B-GATED S4 ARCHITECTURE ADOPTION (2026-09-13). Three frontier auditors produced three divergent classifier
+    architectures — Claude: hierarchical ModernBERT + SetFit rare-leaves + conformal abstention; Qwen: RAC (bge-m3 cosine-to-definitions
+    + SetFit) rejecting the brittle _masked_fine_pred hierarchy; GPT: contract-first (4-axis gold as the authority, classifier a
+    replaceable implementation) + flat+conformal. RULING: A/B-test the ARCHITECTURE choices; do NOT A/B the CORRECTNESS prerequisites
+    (deterministic and already cross-adjudicated by all three). (1) NON-NEGOTIABLE P0 (deterministic, 0 LLM): split
+    governance/verified_core.jsonl into immutable gold_4axis.jsonl / pending_4axis.jsonl / silver_4axis.jsonl (never re-merge
+    provenance tiers); normalize p5:* provenance strings (p5:claude+guman / p5:claude+juman / p5:claud+human → p5:claude+human so
+    human-verified counts are deterministic); re-PASS the 1,750 pair-agreed high-confidence principle rows wrongly quarantined
+    (verify count against live maxwell.db first, C13 backup + R14 manifest); reconcile the 25 fb_ids missing from s4_review_queue.jsonl
+    vs live checkpoint abstains; wire gold_4axis.jsonl into all train_*.py load_golden_set() and archive config/golden/stage4_golden_mined.yaml
+    from eval (it remains the de facto authority = the exact drift BUG-241 was meant to kill). (2) A/B HARNESS (build once; reuse the
+    D2577/D2610 fixed-split pattern): frozen gold_4axis held-out, identical metrics (macro-F1, coverage@precision, abstain rate).
+    ARM-1 classifier: hierarchical ModernBERT vs RAC vs flat+conformal (all $0 local). ARM-2 CRIBS: gpt-oss baseline vs Qwen3-Coder
+    replacement on a frozen D2293 format-check benchmark (retain gpt-oss until a replacement WINS — Claude immediate-move rejected for
+    lack of benchmark). ARM-3 abstention: raw 0.35/0.70 threshold vs conformal/selective vs SetFit calibration. NO architecture committed
+    until arms report. (3) UNCONDITIONAL FIXES: Qwen flat-logit fallback for _masked_fine_pred all -inf mask; S5 char→token truncation
+    (DeBERTa WordPiece); remove dead route=FB field from S2 schema; GPT S5 classification-entailment (does FB entail {discipline}? in
+    addition to evidence-NLI). HONEST GUARANTEE: 100% prevention of silent acceptance outside the confidence envelope, NOT semantic
+    100% accuracy.'
+  champion: goose
+  target_files: '[governance/gold_4axis.jsonl, governance/pending_4axis.jsonl, governance/silver_4axis.jsonl, scripts/train_hierarchical_classifier.py, scripts/train_discipline_classifier.py, scripts/train_depth_classifier.py, pipeline/stage5_verify.py, pipeline/stage2_extract.py, scripts/build_ab_harness.py]'
+  created: '2026-09-13'
+
 summary:
-  total: 593
+  total: 594
   proposed: 0
   draft: 1
-  active: 478
+  active: 479
   stale: 0
   superseded: 16
   archived: 8
@@ -6834,7 +6860,7 @@ summary:
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / CLASSIFIER STRATEGY: 2
-    LABEL QUALITY / DATA: 13
+    LABEL QUALITY / DATA: 14
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 5

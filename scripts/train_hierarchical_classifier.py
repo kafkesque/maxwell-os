@@ -59,6 +59,7 @@ from train_discipline_classifier import (  # noqa: E402
     _filter_trainable,
     _save_confusion_matrix,
     compute_class_weights,
+    load_gold_4axis,
     load_golden_set,
     save_checkpoint,
 )
@@ -71,7 +72,10 @@ GRAD_CLIP_NORM: float = 1.0
 
 # C12: paths overridable via env (same convention as the flat trainer).
 TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy_v5.yaml"))
-GOLDEN = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
+# D2618 P0.5: silver training pool retired from the live golden path (BUG-241).
+# TRAINING may use silver (it is the only set large enough); EVAL must use
+# governance/gold_4axis.jsonl via GOLDEN_EVAL. The archived file is train-only.
+GOLDEN = ROOT / "archive" / "golden_retired_D2618" / "stage4_golden_mined.yaml"
 CHECKPOINT = ROOT / "knowledge pipeline" / "classifier_hierarchical"
 
 
@@ -276,6 +280,8 @@ def main() -> None:
 
     golden = load_golden_set(os.environ.get("GOLDEN_YAML", str(GOLDEN)))
     examples = _filter_trainable(golden["examples"], MIN_EXAMPLES_PER_CLASS)
+    # D2618 P0.5: held-out eval must be the verified core, not a silver fold.
+    eval_golden = os.environ.get("GOLDEN_EVAL", str(ROOT / "governance" / "gold_4axis.jsonl"))
 
     disciplines = sorted({ex["discipline"] for ex in examples})
     domains = sorted({d for ex in examples for d in ex.get("domains", []) if d})
@@ -314,10 +320,21 @@ def main() -> None:
     labels = np.array([discipline_label_map[ex["discipline"]] for ex in examples])
     coarse_labels = np.array([discipline_to_coarse.get(ex["discipline"], 0) for ex in examples])
     indices = np.arange(len(examples))
-    train_idx, test_idx = train_test_split(indices, test_size=TRAIN_TEST_SPLIT_SIZE,
-                                           random_state=RANDOM_STATE, stratify=labels)
-    train_examples = [examples[i] for i in train_idx]
-    test_examples = [examples[i] for i in test_idx]
+    if eval_golden and eval_golden.lower() != "off" and Path(eval_golden).exists():
+        eval_examples = [
+            ex for ex in load_gold_4axis(eval_golden)["examples"]
+            if ex["discipline"] in discipline_label_map
+        ]
+        print(f"D2618: verified core {eval_golden} as held-out eval ({len(eval_examples)} rows)", flush=True)
+        train_idx = indices
+        test_idx = np.arange(len(eval_examples))
+        train_examples = examples
+        test_examples = eval_examples
+    else:
+        train_idx, test_idx = train_test_split(indices, test_size=TRAIN_TEST_SPLIT_SIZE,
+                                               random_state=RANDOM_STATE, stratify=labels)
+        train_examples = [examples[i] for i in train_idx]
+        test_examples = [examples[i] for i in test_idx]
 
     train_ds = HierarchicalDataset(train_examples, tokenizer, coarse_label_map,
                                    discipline_label_map, domain_label_map,

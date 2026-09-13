@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-11T20:01:37Z'
-total_decisions: 590
+last_sync: '2026-09-13T19:20:00+02:00'
+total_decisions: 593
 decisions:
 - id: D2586
   category: LABEL QUALITY / DATA
@@ -6722,11 +6722,50 @@ decisions:
   target_files: '[scripts/calibrate_depth_tiebreak.py, scripts/build_phase0_adjudication_form.py, governance/phase0_149core_adjudication_form.md, governance/phase0_adjudication_ledger.jsonl]'
   created: '2026-09-11'
 
+- id: D2615
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: 'S4 ACTIVE-LEARNING STRATIFICATION (2026-09-13). The 2,729 joint-vote needs_review rows are honest abstains (DeepSeek-v4-pro + Qwen3.8-27B disagreed), NOT errors — no automated resolver exists (3rd-voter 44.7% coin-flip BUG-236, bge-m3 20% D2614, ModernBERT 27.7% top-1, Snorkel/Dawid-Skene 48.7% false-flag). Bulk-manual-review of all 2,729 is the anti-pattern active learning avoids. RULING (Settles uncertainty-sampling + Geifman/El-Yaniv selective abstention): stratify the 2,729 by (axis, disagreement-pair) — depth abstain is dominated by domain<->cross-domain (827/1048 = 79%), content_type abstain by noise_drop<->principle (1,148/1,681 = 68%) — sample a boundary-focused batch (target 300, per-stratum floor 3), human-adjudicate only that, and route the remainder to a persistent abstain review queue (never fabricate a label). IMPLEMENTED: config/s4_active_learning.yaml + scripts/build_active_learning_sample.py -> governance/s4_active_learning_sample.{jsonl,md} (298 sampled: 190 content_type + 108 depth) + governance/s4_review_queue.jsonl (2,431) + governance/s4_active_learning_report.json. Deterministic (seed 0), vote-only (checkpoint/DB untouched), C6 atomic writes. The 298-vertex human sample is the seed for the future free fine-tune (D2607/D2611: retire DeepSeek by fine-tuning a local labeler on verified human labels).'
+  champion: goose
+  target_files: '[config/s4_active_learning.yaml, scripts/build_active_learning_sample.py, governance/s4_active_learning_sample.jsonl, governance/s4_active_learning_sample.md, governance/s4_review_queue.jsonl, governance/s4_active_learning_report.json]'
+  created: '2026-09-13'
+- id: D2616
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: 'S2/S4/S5 FORENSIC AUDIT ADJUDICATION + ULTIMATE SOLUTION + PHASE 0 EXECUTED (2026-09-13). Four frontier auditors (Claude/GPT/GPT-5.6-Luna/Qwen) forensically audited S2/S4/S5 at commit 6e295d4; goose + Qwen3.8-27B (local OMLX) verified every claim deterministically against the repo. VERIFIED (deterministic): commit_non_fb_types:false silently discards 1,147/8,410 (13.6%) detected non-principle; _resolve_content_type falls back route=FB→principle (BUG-148 third drift source); golden 1,027 = 93.3% unverified silver (only 69 = 6.7% 4-axis verified, BUG-241); schemas.py Pydantic models never instantiated at runtime. REJECTED: Qwen''s "golden ~38% corrupted" (conflates unverified with corrupted — honest number is 93.3% unverified) and "retire gpt-oss now + Snorkel/Dawid-Skene" (Dawid-Skene already measured 48.7% false-flag in-repo). ULTIMATE SOLUTION (4 phases): Phase 0 stop bleeding (flip commit_non_fb_types:true per D2590; deprecate route as ontology carrier — missing content_type→quarantine never principle; apply 1,365 vote-confirmed non-principle relabels to DB; instantiate Pydantic runtime boundary); Phase 1 freeze ~435 verified rows (149-core + 298-sample) as sole eval target, demote 1,027 silver; Phase 2 rebuild local $0 label stack (weak supervision + hierarchical ModernBERT coarse-gate + SetFit rare-class + conformal/selective abstention + S5 classification-entailment); Phase 3 gated gpt-oss retirement (local labeler must beat it on frozen book/author-disjoint holdout); Phase 4 rebuild store once + 11-mode invariant release gates. DeepSeek UNUSABLE for open-ended adjudication (reasoning-passthrough empty content — BUG-243 logged). PHASE 0 EXECUTED: commit_non_fb_types true; QUARANTINE_CONTENT_TYPE/NOISE_DROP_CONTENT_TYPE constants + _resolve_content_type→quarantine + quarantined sidecar (S4_QUARANTINE_OUTPUT=quarantined.jsonl); scripts/apply_phase0_relabels.py applied 1,365 relabels (content_type demoted, depth='''', status=QUARANTINE) with C13 backup maxwell.db.bak_*_pre_phase0_relabel + R14 manifest governance/phase0_relabel_manifest.jsonl + integrity_check ok; validate_fb_content_type/validate_fb_depth runtime boundary wired into stage6_commit.insert_fb (fail-closed). Result: fbs content_type principle 7,966→6,601, noise_drop 1,054, process_template 179, process_instance 121, tool_instruction 16, growth_edge 17, quarantine 7. 2 tests updated to assert route-deprecation (quarantine, not principle). 199 tests green.'
+  champion: goose
+  target_files: '[config/pipeline_config.yaml, config/content_types.yaml, pipeline/content_types.py, pipeline/stage4_merge.py, pipeline/pipeline_paths.py, pipeline/schemas.py, pipeline/stage6_commit.py, pipeline/config_audit.py, scripts/apply_phase0_relabels.py, tests/test_stage4_preflight_smoke_stress.py, governance/phase0_relabel_manifest.jsonl, governance/ROUNDTABLE_ADJUDICATION_S2S4S5_FORENSIC_2026-09-13.md]'
+  created: '2026-09-13'
+
+- id: D2617
+  category: LABEL QUALITY / DATA
+  state: ACTIVE
+  description: 'VERIFIED-CORE FREEZE + PHASE-1 FINALIZE + SPOTLESS RECOUNT (2026-09-13). PHASE 1 COMPLETE: scripts/build_verified_core.py
+    (deterministic, LLM-free) froze the sole eval target governance/verified_core.jsonl = 443 unique rows (149-core + 298-sample,
+    4 fb_ids overlap deduped — 149+298=447 additive). R14-stamped (schema_version 3.0 / gen_model / pipeline_commit v3.0-D2617-phase1);
+    verification_status honest: human-verified 28 / joint-vote-verified 121 / pending-human 294 (the 298-sample D2615 boundary batch
+    is NOT yet human-adjudicated — carried with disagreement_pair, never re-branded verified). Retires BUG-241 "93.3% unverified
+    silver" AT THE DATA LEVEL: the 1,027 stage4_golden_mined.yaml is demoted to a silver candidate pool; eval must use verified_core.jsonl.
+    ALSO APPLIED (149-core finalize): #85 Iterative Design Refinement depth domain→cross-domain (human); scripts/apply_phase1_finalize.py
+    materialized 88 DB state changes (8 content_type flips, 49 depth flips, 66 PASS / 22 QUARANTINE) + blanked the 21 residual
+    non-principle depth rows (29→0); C13 backup + R14 manifest + integrity_check ok; post-finalize fbs total 7,995, PASS 3,012,
+    QUARANTINE 4,983, non-principle-with-depth = 0. SPOTLESS RECOUNT (deterministic on golden_synced_4axis.jsonl, 1,027 rows):
+    content_type+depth DeepSeek+Qwen/human cross-checked = 702 (561 principle + 141 non-principle); strict 4-axis (ct+depth verified
+    AND discipline/domains non-silver p5:*) = 153 (111 principle + 42 non-principle); discipline/domains non-silver total = 209/1,027
+    (the BINDING CONSTRAINT — DeepSeek+Qwen have NEVER voted domain/discipline, only content_type+depth, so "4-axis DeepSeek approval"
+    is NOT yet claimable). VERDICT: the verified set is far too small to beat gpt-oss on the 61/43 taxonomy (61 disciplines ≈ 16.8
+    examples/class, 19 classes <10) — it is sufficient ONLY for a local coarse 7-way content_type + 4-way depth gate and as the frozen
+    eval core; the discipline/domain lever requires a DeepSeek+Qwen3.8 domain/discipline verification pass on principle rows, NOT more
+    golden-set spot-checking.'
+  champion: goose
+  target_files: '[scripts/build_verified_core.py, scripts/apply_phase1_finalize.py, governance/verified_core.jsonl, governance/verified_core_manifest.json, governance/golden_synced_4axis.jsonl, governance/flagged_core_human_verdicts.jsonl, governance/flagged_core_review.md, governance/phase1_finalize_manifest.jsonl]'
+  created: '2026-09-13'
+
 summary:
-  total: 590
+  total: 593
   proposed: 0
   draft: 1
-  active: 475
+  active: 478
   stale: 0
   superseded: 16
   archived: 8
@@ -6795,7 +6834,7 @@ summary:
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
     LABEL QUALITY / CLASSIFIER STRATEGY: 2
-    LABEL QUALITY / DATA: 11
+    LABEL QUALITY / DATA: 13
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 5

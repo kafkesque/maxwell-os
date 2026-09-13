@@ -1,0 +1,95 @@
+{
+  "schema_version": "3.0",
+  "gen_model": "active-learning sampler (deterministic; no generation)",
+  "pipeline_commit": "v3.0-D2485",
+  "created_at": "2026-09-13T09:07:32.159110+00:00",
+  "total_rows": 7966,
+  "needs_review": 2729,
+  "strata": {
+    "content_type|growth_edge<->noise_drop": {
+      "count": 73,
+      "sampled": 9
+    },
+    "content_type|growth_edge<->principle": {
+      "count": 35,
+      "sampled": 6
+    },
+    "content_type|noise_drop<->principle": {
+      "count": 1148,
+      "sampled": 104
+    },
+    "content_type|noise_drop<->process_instance": {
+      "count": 72,
+      "sampled": 9
+    },
+    "content_type|noise_drop<->process_template": {
+      "count": 15,
+      "sampled": 4
+    },
+    "content_type|noise_drop<->quarantine": {
+      "count": 18,
+      "sampled": 5
+    },
+    "content_type|noise_drop<->tool_instruction": {
+      "count": 7,
+      "sampled": 4
+    },
+    "content_type|principle<->process_instance": {
+      "count": 57,
+      "sampled": 8
+    },
+    "content_type|principle<->process_template": {
+      "count": 210,
+      "sampled": 22
+    },
+    "content_type|principle<->quarantine": {
+      "count": 10,
+      "sampled": 4
+    },
+    "content_type|principle<->tool_instruction": {
+      "count": 15,
+      "sampled": 4
+    },
+    "content_type|process_instance<->process_template": {
+      "count": 11,
+      "sampled": 4
+    },
+    "content_type|process_instance<->tool_instruction": {
+      "count": 5,
+      "sampled": 3
+    },
+    "content_type|process_template<->tool_instruction": {
+      "count": 5,
+      "sampled": 4
+    },
+    "depth|None<->universal": {
+      "count": 1,
+      "sampled": 1
+    },
+    "depth|cross-domain<->domain": {
+      "count": 827,
+      "sampled": 76
+    },
+    "depth|cross-domain<->specialized": {
+      "count": 3,
+      "sampled": 3
+    },
+    "depth|cross-domain<->universal": {
+      "count": 94,
+      "sampled": 11
+    },
+    "depth|domain<->specialized": {
+      "count": 110,
+      "sampled": 13
+    },
+    "depth|domain<->universal": {
+      "count": 13,
+      "sampled": 4
+    }
+  },
+  "sample_size": 298,
+  "review_queue_size": 2431,
+  "target_sample_size": 300,
+  "min_per_stratum": 3,
+  "seed": 0
+}

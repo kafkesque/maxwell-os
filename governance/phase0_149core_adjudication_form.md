@@ -23,10 +23,10 @@
 
 | Axis | AUDIT (Qwen3.8) | differs? | silver (gpt-oss) | Human: CONFIRM / OVERRIDE |
 |---|---|---|---|---|
-| content_type | `growth_edge` | no | `growth_edge` | [ ] confirm / [ ] override: ____ |
+| content_type | `growth_edge` | no | `growth_edge` | [ ] confirm / [Y] override: ____ |
 | depth | `N/A (non-principle)` | — | `domain` | — (only if principle) |
 | discipline | `cultural design` | no | `cultural design` | [ ] confirm / [ ] override: ____ |
-| domains | `arts & culture, engineering practice` | no | `arts & culture, engineering practice` | [ ] confirm / [ ] override: ____ |
+| domains | `arts & culture, engineering practice` | no | `arts & culture, engineering practice` | [y] confirm / [ ] override: ____ |
 
 ---
 

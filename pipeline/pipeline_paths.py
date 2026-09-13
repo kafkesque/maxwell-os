@@ -194,6 +194,7 @@ S4_PT_OUTPUT=_CFG["stage4"]["process_template_output"]
 S4_PI_OUTPUT=_CFG["stage4"]["process_instance_output"]
 S4_GE_OUTPUT=_CFG["stage4"]["growth_edge_output"]
 S4_TI_OUTPUT=_CFG["stage4"]["tool_instruction_output"]
+S4_QUARANTINE_OUTPUT=_CFG["stage4"]["quarantine_output"]
 # D2454 (2026-08-27): config-driven S4 classification golden (config/golden/stage4_golden.yaml).
 # Keys existed in pipeline_config.yaml since D2451 but were never consumed — wiring here.
 S4_GOLDEN_PATH = _CFG.get("stage4", {}).get("golden_path", "config/golden/stage4_golden.yaml")

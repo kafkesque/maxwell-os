@@ -161,23 +161,27 @@ def test_stage2_filter_zero_match_fails_closed(tmp_path: Path, monkeypatch: pyte
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# PREFLIGHT — content-type routing (D2323 axis-1 + D2128 route fallback)
+# PREFLIGHT — content-type routing (D2323 axis-1 + D2616 route-deprecation)
 # ═══════════════════════════════════════════════════════════════════════════
 def test_resolve_content_type_explicit_wins() -> None:
     assert _resolve_content_type({"content_type": "tool_instruction", "route": "FB"}) == "tool_instruction"
 
 
-def test_resolve_content_type_route_fallback() -> None:
-    assert _resolve_content_type({"route": "PT"}) == "process_template"
-    assert _resolve_content_type({"route": "PI"}) == "process_instance"
-    assert _resolve_content_type({"route": "GE"}) == "growth_edge"
-    assert _resolve_content_type({"route": "TI"}) == "tool_instruction"
-    assert _resolve_content_type({"route": "FB"}) == "principle"
+def test_resolve_content_type_route_deprecated() -> None:
+    """D2616 Phase 0 (BUG-148): `route` is LEGACY transport, NOT an ontology
+    carrier. A missing content_type resolves to QUARANTINE (hold), never a
+    route-derived role — closes the silent drift where the uniform-FB route
+    forced records to `principle`."""
+    assert _resolve_content_type({"route": "PT"}) == "quarantine"
+    assert _resolve_content_type({"route": "PI"}) == "quarantine"
+    assert _resolve_content_type({"route": "GE"}) == "quarantine"
+    assert _resolve_content_type({"route": "TI"}) == "quarantine"
+    assert _resolve_content_type({"route": "FB"}) == "quarantine"
 
 
-def test_resolve_content_type_default_principle() -> None:
-    assert _resolve_content_type({}) == "principle"
-    assert _resolve_content_type({"route": "UNKNOWN"}) == "principle"
+def test_resolve_content_type_default_quarantine() -> None:
+    assert _resolve_content_type({}) == "quarantine"
+    assert _resolve_content_type({"route": "UNKNOWN"}) == "quarantine"
 
 
 # ═══════════════════════════════════════════════════════════════════════════

@@ -86,6 +86,7 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     # ── Stage 4 tuning ──
     "stage4.max_principles_per_cluster": ("pipeline.pipeline_paths", "S4_MAX_PRINCIPLES", "int"),
     "stage4.reclassify_chunk_size":       ("pipeline.reclassify_merged_axis", "CHUNK_SIZE_DEFAULT", "int"),
+    "stage4.quarantine_output":           ("pipeline.pipeline_paths", "S4_QUARANTINE_OUTPUT", "str"),
     # ── Stage 5 tuning ──
     "stage5.factscore_enabled":         ("pipeline.pipeline_paths", "S5_FACTSCORE_ENABLED", "bool"),
     # ── Stage 6 tuning ──

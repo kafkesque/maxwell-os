@@ -50,6 +50,8 @@ from pipeline.content_types import (  # D2323: config-first enum source (C12)
     CONTENT_TYPES,
     DEFAULT_CONTENT_TYPE,
     ROUTE_TO_CONTENT_TYPE,
+    QUARANTINE_CONTENT_TYPE,  # D2616 Phase 0: BUG-148 route-deprecation (missing content_type → hold)
+    NOISE_DROP_CONTENT_TYPE,  # D2616 Phase 0: disposition (drop) — never routed to principle
 )
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
@@ -72,6 +74,7 @@ from pipeline.pipeline_paths import (
     S4_MAX_PRINCIPLES,
     S4_PI_OUTPUT,
     S4_PT_OUTPUT,
+    S4_QUARANTINE_OUTPUT,  # D2616 Phase 0: BUG-148 missing-content_type → quarantine sidecar
     S4_RELATED_FBS_EXCLUDE_DOMAINS,  # BUG-188: fallback domains excluded from domain_overlap
     S4_RELATED_FBS_EXCLUDE_DISCIPLINES,  # BUG-194: fallback discipline excluded from discipline_overlap
     S4_RELATED_FBS_MAX_NEIGHBORS,  # BUG-188: per-FB related_fbs neighbor cap (bounds graph to O(n·k))
@@ -231,36 +234,36 @@ _ROLE_TOOL_INSTRUCTION: str = ROUTE_TO_CONTENT_TYPE["TI"]
 
 
 def _resolve_content_type(fb: dict) -> str:
-    """Resolve a principle's content_type, honoring the D2128 route→content_type fallback.
+    """Resolve a principle's content_type.
 
-    D2128: S2's legacy `route` field (FB/PT/PI/GE/TI) was silently ignored by S4 —
-    route=PT/GE outputs were never routed to their non-FB output files. When a
-    record lacks an explicit content_type, fall back to the route mapping;
-    otherwise trust the model's explicit content_type.
+    D2128 (superseded by D2616 Phase 0 / BUG-148): the legacy `route` field
+    (FB/PT/PI/GE/TI) was previously used as a fallback ontology carrier — a record
+    with a missing content_type but a stale `route='FB'` was silently forced to
+    `principle`, bypassing D2587 (the third drift source; route is uniform-FB on
+    all 2,878 records). RULING: content_type is AUTHORITATIVE; a missing
+    content_type resolves to **quarantine** (HOLD for later identification), never
+    `principle`. This closes BUG-148's open route-deprecation item.
 
     Args:
         fb: A Stage 2 principle/FB record dict.
 
     Returns:
-        A valid content_type role name (one of CONTENT_TYPES).
+        A valid content_type role name (one of CONTENT_TYPES) or the
+        `quarantine` disposition when content_type is absent.
     """
     ct: str = (fb.get("content_type") or "").strip()
     if ct:
         return ct
-    route: str = (fb.get("route") or "").strip().upper()
-    resolved: str = ROUTE_TO_CONTENT_TYPE.get(route, DEFAULT_CONTENT_TYPE)
-    # BUG-148 (D2589): content_type is AUTHORITATIVE; `route` is LEGACY transport.
-    # A record reaching S4 with no content_type is resolved from the (often stale,
-    # uniform-FB) route for back-compat — but now OBSERVABLY, so the silent
-    # drift (2,878 route='FB' → forced principle) is no longer invisible (C16).
+    # BUG-148 (D2616 Phase 0): content_type missing → QUARANTINE, never route→principle.
+    # `route` is legacy transport and must no longer carry the ontology (C16: loud).
     print(
         f"   ⚠️  _resolve_content_type: content_type missing on "
         f"{fb.get('name') or fb.get('fb_id') or fb.get('principle_id') or '?'!r} "
-        f"— resolved from legacy route {route!r} → {resolved!r}",
+        f"— routed to {QUARANTINE_CONTENT_TYPE!r} (route field deprecated as ontology carrier)",
         file=sys.stderr,
         flush=True,
     )
-    return resolved
+    return QUARANTINE_CONTENT_TYPE
 
 # ── Prompt templates ───────────────────────────────────────────────────────
 
@@ -1465,6 +1468,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     process_instances = []   # D2072: concrete case studies
     growth_edges = []        # D2073: speculative insights (pipeline-extracted)
     tool_instructions = []   # D2072: tool-specific commands
+    quarantined = []         # D2616 Phase 0 (BUG-148): missing-content_type → quarantine (HOLD, never principle)
     failed = 0  # D2370: failed clusters are NOT marked processed → retried on resume (re-counted, not restored)
     # D2404: classification failures are now retried on resume (like `failed`) — re-count per run
     classification_errors = 0
@@ -1662,6 +1666,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                     growth_edges.append(p)
                 elif ct == _ROLE_TOOL_INSTRUCTION:
                     tool_instructions.append(p)
+                elif ct == QUARANTINE_CONTENT_TYPE or ct == NOISE_DROP_CONTENT_TYPE:
+                    # D2616 Phase 0 (BUG-148): dispositions are NOT principles.
+                    quarantined.append(p)
                 else:
                     cluster_principles.append(p)
                 _cluster_split[ct] = _cluster_split.get(ct, 0) + 1
@@ -2316,6 +2323,20 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 deduped_ti.append(_stamp_sidecar(ti, pipeline_run_id, pipeline_commit))
         safe_write_jsonl(ti_path, deduped_ti)  # D2487: stream, no single-join string
 
+    # ── D2616 Phase 0 (BUG-148): Save quarantined records separately ────
+    # A record with a missing content_type is HOLD (never forced to principle).
+    # Persist it to a sidecar so it is not silently dropped (C16).
+    qu_path = STAGE4_CHECKPOINT.parent / S4_QUARANTINE_OUTPUT
+    if quarantined:
+        seen_qu: set[str] = set()
+        deduped_qu = []
+        for qu in quarantined:
+            _k = qu.get("fb_id") or qu.get("principle_id", "")  # D2320: v3.0 fb_id / v2.x principle_id
+            if _k and _k not in seen_qu:
+                seen_qu.add(_k)
+                deduped_qu.append(_stamp_sidecar(qu, pipeline_run_id, pipeline_commit))
+        safe_write_jsonl(qu_path, deduped_qu)  # D2487: stream, no single-join string
+
     # Summary
     print(f"\n{'='*60}")
     print(f"✅ FBs generated:            {len(fbs)}")
@@ -2323,6 +2344,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     print(f"📖 Process instances:        {len(process_instances)} (→ {S4_PI_OUTPUT})")
     print(f"🌱 Growth edges:             {len(growth_edges)} (→ {S4_GE_OUTPUT})")
     print(f"🛠️  Tool instructions:        {len(tool_instructions)} (→ {S4_TI_OUTPUT})")
+    print(f"🚧 Quarantined (no ct):      {len(quarantined)} (→ {S4_QUARANTINE_OUTPUT})")
     print(f"❌ Failed clusters:          {failed}")
     if _batch_used:
         print(f"⚡ Batch classified:          {len(_pre_classified)} FBs (D2265)")

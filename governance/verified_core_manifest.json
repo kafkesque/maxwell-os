@@ -1,0 +1,28 @@
+{
+  "schema_version": "3.0",
+  "gen_model": "verified-core-freezer (deterministic; no generation)",
+  "pipeline_commit": "v3.0-D2617-phase1",
+  "created_at": "2026-09-13T17:19:30.318818+00:00",
+  "input_ledger_rows": 149,
+  "input_sample_rows": 298,
+  "input_human_verdicts": 28,
+  "golden_synced_rows": 1027,
+  "missing_golden_for_core": [],
+  "overlap_fbids_between_core_and_sample": [
+    "1b0b34718d0f732e74cb1392e460e8ab81bee4ec55167c86bf5f367d1f1eeac1",
+    "6ee95415f29af4356a788954acfcebf62af9fbcd4a604784f77623a5c11257f3",
+    "ad293c079412a83482e24c37dff870d021a38abc11f57fa4dbcc80355616380a",
+    "c7f9e33a1de6b30424bea318b43e0b084b7b1113f4d69c33152cbaa19033b444"
+  ],
+  "total_unique_rows": 443,
+  "verification_status_counts": {
+    "pending-human": 294,
+    "joint-vote-verified": 121,
+    "human-verified": 28
+  },
+  "core_source_counts": {
+    "298-sample": 294,
+    "149-core": 145,
+    "149-core+298-sample": 4
+  }
+}

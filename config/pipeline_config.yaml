@@ -291,6 +291,7 @@ stage4:
   process_instance_output: process_instances.jsonl
   growth_edge_output: growth_edges.jsonl
   tool_instruction_output: tool_instructions.jsonl
+  quarantine_output: quarantined.jsonl
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
   semantic_near_threshold: 0.8
@@ -457,7 +458,7 @@ stage5:
     human_review_isor_rating: strong
   checkpoint_interval: 50
 stage6:
-  commit_non_fb_types: false
+  commit_non_fb_types: true
   okf_export_enabled: true
   max_failed_ratio: 0.0
 stage4_5:

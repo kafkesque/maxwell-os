@@ -21,7 +21,7 @@ All objects stamped: schema_version, gen_model, pipeline_commit (R14).
 import re
 import unicodedata
 from datetime import datetime
-from typing import Literal
+from typing import Literal, get_args
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -542,6 +542,48 @@ def is_valid_domain(domain: str) -> bool:
 def is_valid_discipline(discipline: str) -> bool:
     """Check if a discipline label is canonical (including 'emerging')."""
     return discipline in CANONICAL_DISCIPLINES
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# D2616 Phase 0 — runtime content_type / depth boundary (BUG-148 + C6).
+# The Pydantic models above were documentation-only (never instantiated at
+# runtime — forensic finding C6). This function is the actual runtime guard:
+# it validates the two S4 semantic axes against the config ontology and is
+# wired into S6 commit (stage6_commit.insert_fb) to fail-closed on invalid
+# labels instead of silently persisting a hallucinated enum. C12: enums come
+# from pipeline.content_types (config-driven), never re-declared here.
+# ═══════════════════════════════════════════════════════════════════════════
+
+def validate_fb_content_type(content_type: str | None) -> str | None:
+    """Return the content_type if valid (or empty), else None (invalid).
+
+    Valid values are the 5 roles + 2 dispositions (principle, process_template,
+    process_instance, tool_instruction, growth_edge, noise_drop, quarantine)
+    sourced from config/content_types.yaml via pipeline.content_types (C12).
+    An empty/None content_type is tolerated here (upstream may still be pre-
+    classification); the caller decides whether empty is acceptable.
+    """
+    if content_type is None:
+        return None
+    ct = (content_type or "").strip()
+    if ct == "":
+        return ""
+    from pipeline.content_types import CONTENT_TYPES_ALL
+    if ct not in CONTENT_TYPES_ALL:
+        return None
+    return ct
+
+
+def validate_fb_depth(depth: str | None) -> str | None:
+    """Return the depth if valid (or empty), else None (invalid)."""
+    if depth is None:
+        return None
+    d = (depth or "").strip()
+    if d == "":
+        return ""
+    if d not in get_args(DEPTH_LITERAL):
+        return None
+    return d
 
 
 # ═══════════════════════════════════════════════════════════════════════════

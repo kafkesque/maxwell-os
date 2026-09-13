@@ -64,6 +64,7 @@ from pipeline.schema_accessor import (
     fb_source_ids,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.schemas import validate_fb_content_type, validate_fb_depth  # D2616 Phase 0: runtime ontology boundary
 
 # ── SQLite schema ──────────────────────────────────────────────────────────
 
@@ -373,6 +374,20 @@ def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> b
 
 def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     """Insert or replace an FB into the database (D2130 schema)."""
+    # D2616 Phase 0: runtime ontology boundary (BUG-148 + C6 fail-closed).
+    # A hallucinated content_type or depth is rejected here instead of being
+    # silently persisted. `None` = invalid; `""` = empty (tolerated only when
+    # the value is genuinely absent). The DB defaults (fb_depth→"domain",
+    # content_type→"") must NOT re-introduce a fabricated enum, so a *present*
+    # but invalid value fails closed before the INSERT.
+    ct = fb.get("content_type")
+    if ct is not None and ct != "" and validate_fb_content_type(ct) is None:
+        print(f"   ❌ insert_fb: invalid content_type {ct!r} on {fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2616)")
+        return False
+    dp = fb.get("depth")
+    if dp is not None and dp != "" and validate_fb_depth(dp) is None:
+        print(f"   ❌ insert_fb: invalid depth {dp!r} on {fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2616)")
+        return False
     try:
         conn.execute("""
             INSERT OR REPLACE INTO fbs (

@@ -80,6 +80,14 @@ S2_BODY_FIELDS: dict[str, list[str]] = {
 # Default role emitted by convergent S2 extraction (foundation block).
 DEFAULT_CONTENT_TYPE: str = "principle"
 
+# D2591 dispositions (from config/content_types.yaml `dispositions:`): what to DO
+# when an object has no clean role. QUARANTINE = HOLD for later identification
+# (ambiguous); NOISE_DROP = DROP (descriptive/historical summary or fact). BUG-148
+# (D2616 Phase 0): a record reaching S4 with NO explicit content_type is routed to
+# QUARANTINE (never silently forced to `principle` via the legacy `route` field).
+QUARANTINE_CONTENT_TYPE: str = "quarantine"
+NOISE_DROP_CONTENT_TYPE: str = "noise_drop"
+
 # Enum strings for prompt interpolation (sorted for deterministic output).
 CONTENT_TYPE_ENUM: str = '"' + '"|"'.join(sorted(CONTENT_TYPES)) + '"'
 EXTRACTION_TYPE_ENUM: str = '"' + '"|"'.join(sorted(EXTRACTION_TYPES)) + '"'

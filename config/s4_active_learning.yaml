@@ -1,0 +1,48 @@
+# Maxwell OS v3.0 — S4 active-learning stratification (D2615)
+# =============================================================================
+# Config-first (C12): every threshold/path below is authoritative. Nothing is
+# hardcoded in scripts/build_active_learning_sample.py.
+#
+# Purpose: the joint vote (D2612) produced 2,729 `needs_review` rows = honest
+# abstain (DeepSeek-v4-pro and Qwen3.8-27B disagreed; D2610 refused to
+# coin-flip). Bulk-manual-reviewing all 2,729 is the anti-pattern active
+# learning exists to avoid. This config drives:
+#   1. Stratification of the 2,729 by disagreement-pair (the uncertainty clusters).
+#   2. A boundary-focused human-adjudication batch (target_sample_size).
+#   3. A persistent abstain review queue for the remainder.
+#
+# Method refs: Settles "Active Learning" (uncertainty sampling); Geifman &
+# El-Yaniv "SelectiveNet" (selective abstention).
+# =============================================================================
+
+schema_version: "3.0"
+
+# Source checkpoint (D2612 vote-only output; DB is untouched).
+checkpoint: "governance/joint_vote_production_checkpoint.jsonl"
+
+# The reliable voters whose per-axis disagreement defines a stratum.
+reliable_voters:
+  - "deepseek-v4-pro"
+  - "Qwen3.8-27B-MLX-4bit"
+
+# Human-adjudication batch size (boundary sample). Remainder -> review queue.
+target_sample_size: 300
+
+# Floor per disagreement-pair stratum — protects the long tail (e.g. the 3
+# domain<->specialized rows must still be represented, not zeroed out).
+min_per_stratum: 3
+
+# Deterministic sampling seed.
+seed: 0
+
+# The two truth-critical axes under adjudication. `depth` applies only to rows
+# already confirmed `principle`; `content_type` applies to the rest.
+axes:
+  content_type: {}
+  depth: {}
+
+outputs:
+  sample_jsonl: "governance/s4_active_learning_sample.jsonl"
+  sample_form:  "governance/s4_active_learning_form.md"
+  review_queue: "governance/s4_review_queue.jsonl"
+  report:       "governance/s4_active_learning_report.json"

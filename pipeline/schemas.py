@@ -632,7 +632,13 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
       - "non-canonical-discipline: '<x>'"
       - "non-canonical-domain: '<x>'"
       - "undeclared-axis-collision: discipline '<a>' collides with domain '<b>'"
-      - "declared-axis-collision: discipline '<a>' vs domain '<b>' (known debt, decision pending)"
+      - "DECLARED: declared-axis-collision: discipline '<a>' vs domain '<b>' (<ruling text from config>)"
+
+    D271a (2026-09-19): a declared collision is a RULING, not pending work. The flag is prefixed
+    "DECLARED: " and its parenthetical text is read from `config/eval_integrity.yaml` (C12), so the
+    guard can never again report a decided question as open -- which it did for two days after the
+    ruling, when it still said "known debt, decision pending" (BUG-284). The list is still
+    non-empty, so every fail-closed call site keeps failing closed unchanged.
     """
     flags: list[str] = []
     contract = _axis_contract()
@@ -641,6 +647,14 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
         (_norm_label(c.get("discipline")), _norm_label(c.get("domain")))
         for c in (contract.get("known_collisions") or [])
     ]
+    # D271a (2026-09-17): a DECLARED collision is a ruling, not pending work. The wording is read
+    # from config (C12) so the guard can never again report a decided question as open -- which it
+    # did for two days after the ruling ("known debt, decision pending").
+    declared_note = {}
+    for _c in (contract.get("known_collisions") or []):
+        _txt = str(_c.get("decision") or "").strip() or "declared in config/eval_integrity.yaml"
+        _short = _txt.split(".")[0].split(" \u2014 ")[0].strip()
+        declared_note[(_norm_label(_c.get("discipline")), _norm_label(_c.get("domain")))] = _short
     dom_norm = {_norm_label(d): d for d in CANONICAL_DOMAINS}
     disc_norm = {_norm_label(d): d for d in CANONICAL_DISCIPLINES}
 
@@ -663,8 +677,8 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
     if discipline and discipline in CANONICAL_DISCIPLINES and key not in shared and key in dom_norm:
         other = dom_norm[key]
         if any(key == a and _norm_label(other) == b for a, b in declared):
-            flags.append(f"declared-axis-collision: discipline '{discipline}' vs domain '{other}'"
-                         " (known debt, decision pending)")
+            flags.append(f"DECLARED: declared-axis-collision: discipline '{discipline}' vs domain"
+                         f" '{other}' ({declared_note.get((key, _norm_label(other)), 'declared debt')})")
         else:
             flags.append(f"undeclared-axis-collision: discipline '{discipline}'"
                          f" collides with domain '{other}'")
@@ -673,8 +687,8 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
         if dom in CANONICAL_DOMAINS and key not in shared and key in disc_norm:
             other = disc_norm[key]
             if any(_norm_label(other) == a and key == b for a, b in declared):
-                flags.append(f"declared-axis-collision: discipline '{other}' vs domain '{dom}'"
-                             " (known debt, decision pending)")
+                flags.append(f"DECLARED: declared-axis-collision: discipline '{other}' vs domain"
+                             f" '{dom}' ({declared_note.get((_norm_label(other), key), 'declared debt')})")
             else:
                 flags.append(f"undeclared-axis-collision: discipline '{other}' collides with"
                              f" domain '{dom}'")

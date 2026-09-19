@@ -929,3 +929,43 @@ counts** as a datum (a reviewer holding the full menu and abstaining is evidence
 **Meta:** the tooling was validated against an *idealised* sheet (indices, complete) and not against a *real* one.
 The lesson is recorded in the measurement report: validate instruments against the worst realistic input, not the
 best.
+
+---
+
+## BUG-284 — the tooling kept reporting a RULED question as an open defect, and the ruler validator failed a decided sheet (2026-09-19)
+
+**Severity:** MEDIUM (instrument vs ruling divergence; FIXED same day). **Status:** FIXED.
+
+Class of defect: **the guard, the validator and the docs disagreed with the ruling for two days after the
+ruling.** Three faces of one problem:
+
+1. `pipeline/schemas.py::validate_discipline_domain` emitted
+   `declared-axis-collision: … (known debt, decision pending)` for the `research methodology` /
+   `research & methodology` pair — but D-271a had already RULED it a **DECLARED HOMONYM** ("change nothing").
+   The guard was reporting a decided question as open work.
+2. `scripts/build_ruler_sheet.py --validate` treated the same declared pair as a **FAIL**, so a correctly
+   filled sheet could never validate; and it read answer cells as integers only, so the real sheet produced
+   **450 spurious failures** (see BUG-283).
+3. `governance/CONTEXT_INDEX.md` carried the same "decision pending" framing.
+
+**Fix (all three):**
+- the guard now emits `DECLARED: declared-axis-collision: … (<ruling text read from config>)`. The wording is
+  read from `config/eval_integrity.yaml::label_axes.known_collisions[].decision` (C12 — the ruling is the single
+  source, so the guard can never again paraphrase it wrongly by hand). The returned list stays **non-empty**, so
+  every fail-closed call site still fails closed; the `DECLARED: ` prefix is what lets a caller distinguish a
+  RULING from a DEFECT.
+- the ruler validator now separates `problems` from `notes`: a declared collision is a **NOTE**, blanks are
+  **ABSTENTIONS** (a datum about the vocabulary, excluded from both sides of the accuracy denominator), and
+  typos are itemised. Result on the real sheet: **2 problems** (both `leadership`, a genuine vocabulary gap the
+  reviewer hit at R027/R146), 6 declared notes, 51 abstentions, 31 typo resolutions.
+- `resolve_answer()` moved to a **single definition** in the sheet builder (which owns the menus); the scorer
+  imports it, so the validator and the scorer can never again disagree about what an answer means.
+
+Verification: `tests/test_taxonomy_disjointness.py` updated for the new prefix and **205/205 tests pass**;
+scorer output is byte-identical to before the refactor (regression-checked).
+
+**Why this entry matters beyond the fix:** it is the **third** instance this session of the same failure class —
+*an instrument asserting something the architecture had already decided* (BUG-275's withdrawn "66% noise" claim,
+BUG-277's menu built from the wrong key, and now a guard contradicting its own ruling). The meta-lesson is
+recorded in the forensic report: **when a ruling lands, the guards, validators, menus and docs that encode the
+old state must be updated in the same commit** — otherwise the system spends the next days re-litigating itself.

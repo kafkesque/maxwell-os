@@ -84,36 +84,17 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 def resolve_answer(raw: Any, menu: list[str]) -> tuple[str | None, str]:
     """Resolve a written answer cell to its canonical menu entry.
 
-    Accepts the 1-based index OR the label written out in any casing/spacing/punctuation,
-    because the first reviewer filled the sheet by NAME ("causal mechanism", "descriptive_model")
-    rather than by index -- a scorer that read only integers would have crashed on 150 valid
-    answers (observed 2026-09-19). Near-misses are accepted at a 0.85 ratio and REPORTED
-    individually so a typo can never pass silently (C16).
+    Thin delegation to the SINGLE definition in the sheet builder (which owns the menus), so the
+    validator and the scorer can never disagree about what an answer means.
 
     Args:
         raw: the cell value as written by the reviewer.
         menu: the ordered menu for that axis.
 
     Returns:
-        (canonical label, how it resolved) where how is one of
-        index | exact | fuzzy | blank | UNRESOLVED, and label is None when unresolved.
+        (canonical label, how it resolved) -- see build_ruler_sheet.resolve_answer.
     """
-    s = str(raw or "").strip()
-    if not s:
-        return (None, "blank")
-    if s.isdigit():
-        i = int(s)
-        return (menu[i - 1], "index") if 1 <= i <= len(menu) else (None, "UNRESOLVED")
-    target = norm(s)
-    for m in menu:
-        if norm(m) == target:
-            return (m, "exact")
-    hits = difflib.get_close_matches(target, [norm(m) for m in menu], n=1, cutoff=0.85)
-    if hits:
-        for m in menu:
-            if norm(m) == hits[0]:
-                return (m, "fuzzy")
-    return (None, "UNRESOLVED")
+    return _module().resolve_answer(raw, menu)
 
 
 def spread(raw: Any) -> list[str]:

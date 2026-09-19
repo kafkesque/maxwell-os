@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import difflib
 import csv
 import json
 import random
@@ -489,6 +490,58 @@ def render_menus(menus: dict[str, Any], rows: list[dict[str, Any]], sheet_ids: s
     return "\n".join(out)
 
 
+def norm_label(v: Any) -> str:
+    """Normalise a label for comparison, and for accepting a written answer.
+
+    Args:
+        v: raw value.
+
+    Returns:
+        Lowercased alphanumeric-only string, so `descriptive_model`, `descriptive model` and
+        `Descriptive-Model` all collapse to the same key.
+    """
+    return re.sub(r"[^a-z0-9]", "", str(v or "").lower())
+
+
+def resolve_answer(raw: Any, menu: list[str]) -> tuple[str | None, str]:
+    """Resolve a written answer cell to its canonical menu entry.
+
+    SINGLE DEFINITION lives here (the builder owns the menus); the scorer imports it rather than
+    duplicating it. Accepts a 1-based index OR the label written out in any casing/spacing/
+    punctuation, because the first reviewer filled the sheet by NAME ("causal mechanism",
+    "descriptive_model") and left 51 cells blank -- a validator that read only integers reported
+    450 failures on 150 valid answers (observed 2026-09-19, BUG-283).
+
+    Near-misses are accepted at a 0.85 ratio and RETURNED AS "fuzzy" so a typo can never pass
+    silently (C16); the caller is expected to itemise them.
+
+    Args:
+        raw: the cell value as written by the reviewer.
+        menu: the ordered menu for that axis.
+
+    Returns:
+        (canonical label, how it resolved). `how` is one of index | exact | fuzzy | blank |
+        UNRESOLVED. The label is always an element of `menu`, or None when unresolved (R5
+        gemma-4-E4B APPROVE, 2026-09-19).
+    """
+    s = str(raw or "").strip()
+    if not s:
+        return (None, "blank")
+    if s.isdigit():
+        i = int(s)
+        return (menu[i - 1], "index") if 1 <= i <= len(menu) else (None, "UNRESOLVED")
+    target = norm_label(s)
+    for m in menu:
+        if norm_label(m) == target:
+            return (m, "exact")
+    hits = difflib.get_close_matches(target, [norm_label(m) for m in menu], n=1, cutoff=0.85)
+    if hits:
+        for m in menu:
+            if norm_label(m) == hits[0]:
+                return (m, "fuzzy")
+    return (None, "UNRESOLVED")
+
+
 def validate(cfg: dict[str, Any], menus: dict[str, Any]) -> int:
     """Validate a FILLED sheet: completeness, menu ranges and namespace cleanliness.
 
@@ -508,9 +561,10 @@ def validate(cfg: dict[str, Any], menus: dict[str, Any]) -> int:
         sheet = list(csv.DictReader(fh))
     tax = yaml.safe_load(TAX.read_text(encoding="utf-8"))
     domains = {re.sub(r"[^a-z0-9]", "", str(x.get("canonical")).lower()) for x in tax["domains"]}
-    limits = {"CT (1-7)": len(menus["content_type"]), "DISC (1-62)": len(menus["discipline"]),
-              "FORM (1-4)": len(menus["extraction_type"])}
     problems: list[str] = []
+    notes: list[str] = []
+    abstained = collections.Counter()
+    fuzzy: list[str] = []
     filled = 0
     for r in sheet:
         got = {c: str(r.get(c) or "").strip() for c in ANSWER_COLUMNS}
@@ -518,16 +572,44 @@ def validate(cfg: dict[str, Any], menus: dict[str, Any]) -> int:
             continue
         filled += 1
         for col, val in got.items():
-            if not val.isdigit() or not 1 <= int(val) <= limits[col]:
-                problems.append("%s: %s=%r out of range 1-%d" % (r["item_id"], col, val, limits[col]))
-        if got["DISC (1-62)"].isdigit() and 1 <= int(got["DISC (1-62)"]) <= limits["DISC (1-62)"]:
-            chosen = menus["discipline"][int(got["DISC (1-62)"]) - 1]
-            if re.sub(r"[^a-z0-9]", "", chosen.lower()) in domains:
-                problems.append("%s: discipline resolves to a DOMAIN label (%s)" % (r["item_id"], chosen))
-            flags = validate_discipline_domain(chosen, None)
+            axis = {"CT (1-7)": "content_type", "DISC (1-62)": "discipline",
+                    "FORM (1-4)": "extraction_type"}[col]
+            chosen, how = resolve_answer(val, menus[axis])
+            if how == "blank":
+                # A blank cell is an ABSTENTION, not an error: the reviewer held the full menu and
+                # could assign nothing. It is counted and reported (and excluded from BOTH sides of
+                # the accuracy computation by the scorer), never treated as a completion failure.
+                abstained[axis] += 1
+                continue
+            if how == "UNRESOLVED":
+                problems.append("%s: %s=%r is not a menu value and no near match >=0.85" % (r["item_id"], col, val))
+                continue
+            if how == "fuzzy":
+                fuzzy.append("%s %s: %r -> %r" % (axis, r["item_id"], val, chosen))
+        chosen_disc, how_disc = resolve_answer(got["DISC (1-62)"], menus["discipline"])
+        if chosen_disc is not None:
+            # A DECLARED axis collision (D271a: discipline 'research methodology' vs domain
+            # 'research & methodology') is a RULING, not a defect. It is reported as a note so the
+            # validator stops failing a decided question -- which is exactly the failure class this
+            # forensic round is documenting (tooling contradicting the ruling).
+            if re.sub(r"[^a-z0-9]", "", chosen_disc.lower()) in domains:
+                notes.append("%s: discipline shares its name with a DOMAIN (DECLARED, D271a): %s"
+                             % (r["item_id"], chosen_disc))
+                continue
+            flags = [f for f in validate_discipline_domain(chosen_disc, None) if not f.startswith("DECLARED:")]
             if flags:
                 problems.append("%s: %s" % (r["item_id"], flags[0]))
-    print("sheet rows %d | answered %d | problems %d" % (len(sheet), filled, len(problems)))
+    print("sheet rows %d | answered %d | abstained %d | problems %d | declared notes %d"
+          % (len(sheet), filled, sum(abstained.values()), len(problems), len(notes)))
+    for n in notes[:4]:
+        print("  NOTE " + n)
+    if abstained:
+        print("  ABSTENTIONS (a datum about the vocabulary, excluded from the accuracy denominator): %s"
+              % dict(abstained))
+    if fuzzy:
+        print("  TYPO RESOLUTIONS (accepted at 0.85, itemised so none is silent): %d" % len(fuzzy))
+        for f in fuzzy[:5]:
+            print("    " + f)
     for p in problems[:20]:
         print("  FAIL " + p)
     if filled < len(sheet):

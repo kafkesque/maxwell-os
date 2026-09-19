@@ -439,3 +439,67 @@ Do **not** produce any of the following. Each has already happened in this proje
 ---
 
 *End of master prompt. Participants: answer independently; do not read another participant's answer before writing yours.*
+
+---
+
+## PART 7 — ROUND 2: THE THREE RESPONSES, ADJUDICATED (2026-09-19)
+
+Three reviews were returned against this prompt: temp/qwen0080.md, temp/chatgpt0080.md,
+temp/claude0080.md. Their claims were re-derived against the repository and the live DB before
+acceptance, and the record is governance/ROUNDTABLE_CROSSEXAM_20260919.md. Read it before answering
+anything in this prompt: several premises stated here in PART 1-PART 6 have been corrected by it.
+
+### 7.1 New premises you must accept before you answer
+
+**P1 (new, critical). The serving gate is a LABEL, not a verification verdict.** Stage 5 sets
+status from fact_passed, but scripts/apply_phase1_finalize.py:18 sets
+status = 'PASS' if content_type == 'principle' else 'QUARANTINE' and writes it. The live DB matches
+that rule on 4,745/4,745 PASS rows and 0/1,470 non-principle rows. Consequently 2,447 rows (30.6%)
+disagree with their own persisted verification_results[factual].passed: 138 NLI CONTRA-majority rows
+and 1,514 NEUTRAL rows are served, 278 served rows had all their evidence flagged as non-evidence
+fragments, and 506 ENTAIL-majority rows are hidden. An honest gate moves PASS from 4,745 to 3,310.
+**ROLE is therefore the highest-leverage axis, not a decorative one.**
+
+**P2 (correction).** D272g's F-14 pocket retarget is statistically null — content_type 0.566
+[0.459, 0.668] untraceable vs 0.687 [0.568, 0.785] traceable; FORM 0.821 vs 0.787. Neither contrast
+is significant. Do not build on P1-era D272g reasoning.
+
+**P3 (correction, my instrument).** The ruler FLOOR column compares stored-label ACCURACY to
+min_human_share, which eval_integrity.yaml defines as a HUMAN-provenance SHARE. The STOPPED/CONTINUE
+verdicts are void as stated. Only the lift over the constant-answer baseline survives.
+
+**P4 (correction).** "QUARANTINE conflates NEUTRAL and CONTRA" is a projection problem, not a
+persistence problem: verification_results is populated on 7,995/7,995 rows and carries the three-way
+detail string. And stage5 already computes a 4-tier epistemic_status that stage6 has no column for.
+
+**P5 (new).** No label-provenance column exists in the DB, so min_human_share is unsatisfiable and,
+by eval_integrity.yaml's own rule, no axis is currently eligible as ground truth for a model
+comparison.
+
+### 7.2 Obligations added to PART 2 of this prompt
+
+For every claim you make: state the frame (which population, which status, which arms) and give an
+interval or say why none is possible. Do not repeat a claim from PART 1-PART 6 without marking
+whether you independently verified it, and explicitly flag any claim in this prompt you believe is
+wrong — two of the three round-2 reviews confirmed a claim (the pocket retarget) that is not
+significant, and one asserted the wrong direction on ROLE. Agreement between reviewers is not
+evidence.
+
+### 7.3 Gates opened by the round-2 adjudication
+
+| gate | decision |
+|---|---|
+| **G17** | re-derive status from verification_results, and make label-derived status writes impossible (serving set 4,745 -> 3,310; de-serves 1,941 rows; deletes nothing) |
+| **G18** | approve the guard SPLIT instead of the G13 exemption list |
+| **G19** | persist the tier stage 5 already computes, and withdraw the ruler's FLOOR estimand; G4a is withdrawn pending a test-retest ceiling |
+| **G20** | one writer for status, with an audit stamp on any script that may touch it |
+
+### 7.4 Question 10 (new) — the anchor, not the training set
+
+Given P5: is the correct next move a versioned human-adjudicated conformance set (ANCHOR-1 = the
+existing 150 blind rows frozen with their 51 abstentions; ANCHOR-2 = ~100 fresh rows drawn after the
+vocabulary freeze; a 30-row test-retest; per-axis positive/near-neighbour/OOV/contradiction sets;
+must-link pairs for work identity; known-item queries derived from source_segments rather than from
+live search output) — or is there a better instrument? And separately: is there any argument for
+fine-tuning S2/S4 before an honest gate and an anchor exist, or does that only distil the current
+defect? Answer both, and say what you would do first if you had one engineer-day.

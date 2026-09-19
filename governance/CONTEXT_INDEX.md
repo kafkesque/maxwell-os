@@ -266,3 +266,47 @@ leg **before F-28 is fixed amplifies the filter leak**.
 - Rebuild: `python3 scripts/build_reference_library.py` (fetch) / `--cached` (offline) / `--check` (report only).
 - Cited from: `MARKET_RESEARCH_ONTOLOGY_20260919`, `ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919`,
   `ONTOLOGY_FORENSIC_20260919`, `buglog.md` (BUG-285…BUG-294), `DECISION_D271_IDENTITY_20260917`.
+
+## 6e. ROUNDTABLE CROSS-EXAMINATION + STRATEGIC VERDICT (2026-09-19)
+
+Three frontier reviews were returned against ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919.md
+(temp/qwen0080.md, temp/chatgpt0080.md, temp/claude0080.md). Every load-bearing claim was re-derived
+against the repo or the live DB before acceptance. Record: governance/ROUNDTABLE_CROSSEXAM_20260919.md.
+
+**THE FINDING NONE OF THE THREE REACHED — the serving gate is a LABEL, not a verification verdict.**
+
+| id | sev | finding |
+|---|---|---|
+| F-38 | **crit** | status is set by scripts/apply_phase1_finalize.py:18 as (content_type == 'principle'); 4,745/4,745 PASS rows are principle, 0/1,470 non-principle rows pass; 2,447 rows (30.6%) disagree with their own persisted verification_results[factual].passed; 1,941 unverified/contradicted rows are served (138 NLI CONTRA-majority, 1,514 NEUTRAL, 278 evidence-flagged, 9 MECH FAIL, 2 conversion artifacts); 506 verified rows are hidden. An honest gate moves PASS 4,745 to 3,310 |
+| F-39 | **crit** | therefore ROLE is the highest-leverage axis, not decorative — D6 / BUG-280 / D272g are inverted |
+| F-40 | high | the RRF keyword leg is query-blind (retrieve.py:123 has no query param), insertion-ordered (borp_score 0.0 everywhere) and credited equal weight (:355-390); the rerank pool is cut from the fused list (:411-415) |
+| F-41 | high | the ruler FLOOR column compares stored-label ACCURACY to min_human_share, a PROVENANCE SHARE (score_ruler_labels.py:136/184 vs eval_integrity.yaml:28-31). The STOPPED/CONTINUE verdicts are void as stated; only the constant-baseline lift survives |
+| F-42 | high | the F-14 pocket retarget is statistically null (content_type 0.566 [0.459,0.668] vs 0.687 [0.568,0.785]; FORM 0.821 vs 0.787). The claim is withdrawn; the action survives for a different reason |
+| F-43 | high | stage5 computes epistemic_status / isor / verification_method; stage6 has no columns for them. R3 is a wiring job, and :898 hardcodes the verifier stamp |
+| F-44 | med | no label-provenance column exists anywhere, so min_human_share is unsatisfiable and NO axis is eligible as model-comparison ground truth — S2/S4 may not be trained or swapped on the current labels |
+| F-45 | med | the D2128 route -> content_type fallback is documented as live and NOT dead; the route column does not exist in the DB |
+| F-46 | med | three hand-run scripts can move serving eligibility on label grounds, unguarded and unstamped |
+
+**Adjudication of the reviews.** Claude 10/10 load-bearing claims confirmed (D11 "worse", the guard
+split, the verifier literal, parse-not-rerun, the catch-all sentinel, D19, the floor confusion, the
+golden-set circularity) and it stopped one step short of F-38. ChatGPT confirms the diagnosis and is
+best on architecture and market, but CONFIRMED D3 wrongly and asserts D6 in the wrong direction; its
+claim that stage 5 does not preserve the NLI distinction is wrong (it is preserved and never queried).
+Qwen is derivative (18 CONFIRMED rows, no re-derivation), repeats the D3 error, and adds two category
+errors (constrained decoding cannot replace a semantic verifier; RAGAS/ARES measure retrieval quality,
+not label correctness). **Consensus to act on:** retrieval correctness precedes label repair; emerging
+must never be a facet value; the write guard must be split, not exempted; graph neighbours carry their
+own tier; relevance is a versioned sidecar; FTS the body before embedding it; retire the alias map;
+R5 -> R1 -> R2; every prior retrieval number measured an unconstrained system; do not tune RRF weights
+at n=30.
+
+**Programme order now:** 0a serving gate from the verification record -> 0b facet predicate in every leg
+-> 0c guard split -> 1 persist the tier -> 2 correct the ruler estimand -> 3 R5 then R1 -> 4 index what
+is already in the DB -> 5 work-identity dedup -> 6 S5 aggregation fix -> 7 chunk/evidence leg -> 8
+distilled classifier.
+
+**Explicitly excluded on priority grounds:** re-labelling the corpus, buying ~85 more stratum-A rows,
+training S2/S4 on the current labels, extending the alias map, ACORN, re-cutting the ontology,
+re-deriving FORM on the pocket, the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF
+before 0a-0b, deleting the junk rows, and R2 before R5/R1. The D-2637 model-eval workstream is NOT on
+the critical path.

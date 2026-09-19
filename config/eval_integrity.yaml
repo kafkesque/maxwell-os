@@ -255,3 +255,21 @@ ruler_measurement:                 # D272a (2026-09-19): the FIRST certified sto
   # same 150 rows before min_human_share is re-anchored to the certified core.
   second_coder_required_before_repointing: true
   next: continue_stratum_a_to_about_185_rows   # stop rule margin is 0.094 < 0.10 -> CONTINUE (D272g)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ESTIMAND CORRECTION (2026-09-19) — BUG-295 / D274c
+# The min_human_share block above is a HUMAN-PROVENANCE SHARE gate: the minimum share of labels
+# that must come from a HUMAN-authoritative source before the axis may be used as ground truth for
+# a MODEL comparison. It is NOT an accuracy floor, and it is NOT a target for stored-label accuracy.
+# scripts/score_ruler_labels.py:136/184 read this key as the accuracy floor, so the FLOOR column and
+# every STOPPED / CONTINUE verdict in ruler_measurement_20260917.md are WITHDRAWN as stated: two
+# estimands were being answered by one number.
+# What stands, and must be quoted instead: the lift over the constant-answer baseline (BUG-269) —
+# content_type -0.010 (no better than a constant), discipline +0.422, extraction_type +0.472 —
+# reported beside coverage and abstention bounds, and crossed with the serving gate once D274a lands.
+# min_human_share cannot currently be evaluated on ANY axis: no provenance column exists
+# (there is no content_type_source / discipline_source column; primary_source is a book field).
+# Per this file's own rule that means no axis is eligible as ground truth for a model comparison
+# today — which is the state the comment above predicted ("the floor documents the target, not the
+# state"). G4a (repointing the floors) is WITHDRAWN until (a) a provenance column exists and
+# (b) a test-retest ceiling exists. A floor may not be re-anchored on a single coder.

@@ -1190,3 +1190,101 @@ retrievable and hidden rows. Re-measured restricted to `status='PASS'`:
 Two different questions — *"is the stored label trustworthy across the KB?"* and *"is what I retrieve correctly
 labelled?"* — are being answered by one number. **Fix:** cross the ruler strata with `status` and report both
 frames; the scorer must never quote a single frame as if it were the answer.
+
+## BUG-295 — The ruler compares stored-label ACCURACY to a human-provenance SHARE (MEDIUM, my instrument)
+
+config/eval_integrity.yaml defines the floor as: *"Minimum share of labels that must come from a
+HUMAN-authoritative source before the axis may be used as ground truth for a MODEL comparison...
+A floor is a gate for the retrain, not a blocker for reading the axis."*
+
+scripts/score_ruler_labels.py:136 reads that same key — floors = cfg.get("min_human_share") — and
+line 184 uses it as the accuracy floor. The published FLOOR table therefore compares an ACCURACY
+(0.506, 0.831, 0.740) against a PROVENANCE SHARE (0.60). Two estimands, one number.
+
+Consequence: the STOPPED: decisive / CONTINUE: inside the margin verdicts and the 0.60 floor are
+**void as stated**; verdict: FLOOR_UNRESOLVED for discipline is meaningless. What survives is the lift
+over the constant-answer baseline (BUG-269, the project's own rule): content_type -0.010, discipline
++0.422, extraction_type +0.472.
+
+Found by an external reviewer (temp/claude0080.md Q5); confirmed in source. Fix: report the
+constant-baseline lift plus coverage and abstention bounds; express the floor separately as a per-axis
+provenance share, computed from a provenance column that does not yet exist (BUG-298).
+
+## BUG-296 — F-14 pocket retarget is statistically null; the claim is withdrawn (MEDIUM, my instrument)
+
+D272g retargeted F-14 to ROLE on the strength of a pocket contrast (content_type 0.667 untraceable vs
+0.816 traceable; extraction_type 0.860 vs 0.804). Re-measured with Wilson intervals:
+content_type 47/83 = 0.566 [0.459, 0.668] vs 46/67 = 0.687 [0.568, 0.785]; extraction_type 55/67 =
+0.821 [0.713, 0.894] vs 48/61 = 0.787 [0.669, 0.871]. **Neither contrast is significant** — the
+intervals overlap heavily in both directions.
+
+The action survives (do not re-derive FORM on 3,348 rows) but for a different reason: FORM is already
+the best-measured axis, not because the pocket is clean. D272g must be restated, not silently kept.
+
+## BUG-297 — "ROLE is decorative" is INVERTED: ROLE is the only serving gate (CRITICAL, my instrument)
+
+BUG-280 / D6 / D272g all assert that content_type influences nothing. The opposite is true — see BUG-299.
+
+## BUG-298 — No label carries human provenance; the floor gate is unsatisfiable (MEDIUM)
+
+min_human_share cannot be evaluated on any axis because there is no provenance column: the fbs table
+has primary_source (a book field) and NO content_type_source / discipline_source. The ruler key renders
+those fields as null because the columns are absent, not because they are empty.
+
+So by the config's own rule, **no axis is currently eligible as ground truth for a model comparison** —
+exactly the state the config predicted ("the floor documents the target, not the state"). Direct
+consequence for the fine-tuning question: S2/S4 must not be trained, distilled or swapped on the current
+labels. A model fitted here would learn the script's gate (BUG-299) and the verdict of a verifier whose
+own calibration record is P=0.647 R=0.386 F1=0.484 on 466 pairs.
+
+## BUG-299 — The serving gate is a LABEL, not a verification verdict (CRITICAL, 2026-09-19)
+
+scripts/apply_phase1_finalize.py:18
+
+    status = 'PASS' if content_type == 'principle' else 'QUARANTINE'
+
+and :163 writes it: UPDATE fbs SET content_type=?, depth=?, status=?, needs_human_review=?
+
+The live DB matches that rule with 100% fidelity: **4,745/4,745 PASS rows are content_type='principle'
+and 0/1,470 non-principle rows are PASS.** Nothing in pipeline/ links PASS to content_type — the gate was
+established, and is still moved, outside the pipeline (apply_phase1_adjudication.py: "principle -> keep
+principle, un-quarantine (status=PASS)"; repass_pair_agreed.py also un-quarantines on label agreement).
+
+Measured against the persisted verification_results (populated on 7,995/7,995 rows):
+
+| measurement | value |
+|---|---|
+| status disagrees with verification_results[factual].passed | **2,447 (30.6%)** |
+| PASS rows whose own verification says passed=False | **1,941** |
+| — NLI CONTRA majority (contradicted, served) | **138** |
+| — NLI NEUTRAL (unverified, served) | **1,514** |
+| — all evidence flagged non-evidence fragments (served) | **278** |
+| — mechanism-quality FAIL (served) | 9 |
+| — BUG-181#1 conversion artifacts (served) | 2 |
+| QUARANTINE rows that are NLI ENTAIL majority (verified, hidden) | **506** |
+| honest gate ablation (status := factual.passed) | PASS **4,745 -> 3,310** (net -1,435) |
+
+The axis that decides what is retrievable is the axis with **lift -0.010 over a constant answer**, and
+81.6% of the KB carries the gate value, so the gate admits almost everything and refuses nothing. None of
+the three external reviews found this; Claude stopped one step short (it marked "where a non-principle
+role becomes QUARANTINE" as UNVERIFIED). Human gate G17.
+
+## BUG-300 — The RRF keyword leg is query-blind, insertion-ordered and weighted equally (HIGH)
+
+pipeline/retrieve.py:123-134: search_keyword accepts domain/discipline/depth/status/limit and **no query
+text**. :363-370: it is called only when a facet is present. With borp_score at 0.0 for all 7,995 rows and
+ranking.quality_score_enabled: false, its ORDER BY collapses to rowid order. :355-390 credits each of its
+rows 1/(60+rank) — **equal weight to the best FTS match and the best vector match**. So a facet-bearing
+query is answered in part by the first-N-inserted rows that carry the facet, and :411-415 then cuts the
+rerank pool from that fused list, so a violator can be promoted. Found by temp/claude0080.md (D11,
+"confirmed, worse"); verified in source. Fix is inside D273a (programme step 0b).
+
+## BUG-301 — Stage 5 computes a verification tier that Stage 6 has no column for (HIGH)
+
+pipeline/stage5_verify.py computes epistemic_status in {corroborated, source-supported,
+cross-source-unverified, speculative}, plus isor and verification_method. The live DB has **no
+epistemic_status, no isor, no verification_method column** — stage6_commit.py's fixed column list drops
+them. The tier vocabulary that R3/D272d asks for already exists and is discarded at the write boundary.
+Also :898 stamps a literal — vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold
+0.10)" — a C12/R14 violation that lies after any config change.
+

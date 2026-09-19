@@ -6521,8 +6521,113 @@ decisions:
   - scripts/build_ruler_sheet.py
   - config/eval_integrity.yaml
 
+- id: D274a
+  category: RETRIEVAL / VERIFICATION
+  state: OPEN
+  date: '2026-09-19'
+  title: The serving gate must be a function of the verification record, not of content_type (D-274a)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: status disagrees with verification_results[factual].passed on 2,447 rows (30.6%); an honest gate moves PASS 4,745 -> 3,310 (BUG-299)'
+  description: 'Stage 5 sets status from fact_passed, but scripts/apply_phase1_finalize.py:18 sets status = PASS if content_type == principle else QUARANTINE and writes it at :163, and two further hand-run scripts (apply_phase1_adjudication.py, repass_pair_agreed.py) move rows across the gate on label grounds. The live DB matches the label rule with 100% fidelity: 4,745/4,745 PASS rows are content_type=principle, 0/1,470 non-principle rows are PASS. Result: 1,941 PASS rows have factual.passed=False (138 NLI CONTRA-majority, 1,514 NEUTRAL, 278 with all evidence flagged non-evidence fragments, 9 mechanism FAIL, 2 BUG-181 conversion artifacts) and 506 QUARANTINE rows are NLI ENTAIL-majority. THE AXIS THAT DECIDES WHAT IS RETRIEVABLE IS THE AXIS WITH LIFT -0.010 OVER A CONSTANT ANSWER. Ruling: status is derived from verification_results plus a typed s5_reason; one writer only; a label-derived status write is a hard error; CI invariant: status=PASS implies factual.passed AND reason NOT IN (CONTRA, MECH_FAIL, EVIDENCE_CONTAMINATED, NO_EVIDENCE, VACUOUS). This DE-SERVES 1,941 rows; it deletes nothing (R-D410). Human gate G17. Supersedes the framing of D272d and inverts D272g.'
+  files:
+  - scripts/apply_phase1_finalize.py
+  - scripts/apply_phase1_adjudication.py
+  - scripts/repass_pair_agreed.py
+  - pipeline/stage5_verify.py
+  - pipeline/stage6_commit.py
+
+- id: D274b
+  category: RETRIEVAL / ONTOLOGY
+  state: OPEN
+  date: '2026-09-19'
+  title: ROLE is the highest-leverage axis, not a decorative one (D-274b)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: 4,745/4,745 PASS rows are content_type=principle (BUG-299); ruler content_type accuracy 0.740 against a 0.750 constant-answer baseline'
+  description: 'BUG-280 / D6 stated that content_type influences nothing and called it decorative. That is inverted: content_type IS the serving gate, because a hand-run script defined status from it. Consequences: (1) ROLE error is not cosmetic, it is the KB exposure rate; (2) on the blind ruler content_type agrees with a human 0.740 of the time against a constant-answer baseline of 0.750, so roughly a quarter of served rows are not principles by a human reading; (3) the ruler cross-tab is asymmetric - 13 stored-principle rows are not principles by the human (false positives IN the serving set) and 29 human-principle rows carry a non-principle stored label (true principles HIDDEN). Fix order: make the gate verification-derived (D274a) BEFORE repairing ROLE, so that ROLE repair is measured on an honest serving set. D6 and BUG-280 must be restated, not deleted.'
+  files:
+  - pipeline/stage5_verify.py
+  - scripts/score_ruler_labels.py
+  - config/content_types.yaml
+
+- id: D274c
+  category: LABEL QUALITY / MEASUREMENT
+  state: OPEN
+  date: '2026-09-19'
+  title: 'The ruler FLOOR column is void: accuracy was compared to a provenance share (D-274c)'
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: score_ruler_labels.py:136 reads min_human_share and :184 uses it as the accuracy floor; eval_integrity.yaml:28-31 defines it as a HUMAN-provenance share (BUG-295)'
+  description: 'config/eval_integrity.yaml defines min_human_share as the minimum share of labels that must come from a HUMAN-authoritative source before an axis may be used as ground truth for a MODEL comparison, and says explicitly that a floor is a gate for the retrain, not a blocker for reading the axis. score_ruler_labels.py reads that key as the accuracy floor. Two estimands, one number. Ruling: the FLOOR column and all STOPPED/CONTINUE floor verdicts are withdrawn; every reading reports (a) accuracy against the constant-answer baseline (BUG-269), (b) coverage, (c) abstention bounds, and (d) the axis crossed with the serving gate once D274a lands. The floor is re-expressed as a per-axis provenance share and is NOT re-anchored until a provenance column exists (D274d) and a test-retest ceiling exists. G4a is withdrawn pending this.'
+  files:
+  - scripts/score_ruler_labels.py
+  - config/eval_integrity.yaml
+
+- id: D274d
+  category: MEASUREMENT / PROVENANCE
+  state: OPEN
+  date: '2026-09-19'
+  title: No label carries human provenance; no axis may gate a model comparison (D-274d)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: the fbs table has primary_source (a book field) and NO content_type_source / discipline_source column; the ruler key renders both as null (BUG-298)'
+  description: 'min_human_share is unsatisfiable today because the provenance it measures is not recorded anywhere. By the config own rule that means no axis is currently eligible as ground truth for a model comparison (retrain, classifier swap, ensemble choice) - the state the config predicted in its own comment. Direct ruling for the fine-tuning question: S2/S4 must NOT be trained, distilled or swapped on the current labels. A model fitted on them learns the hand-run gate (D274a) and the verdict of a verifier whose own calibration record is P=0.647 R=0.386 F1=0.484 on 466 pairs. Prerequisite: an anchor (D274f) plus a label-provenance column written by the classifier that emitted the label.'
+  files:
+  - config/eval_integrity.yaml
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+
+- id: D274e
+  category: VERIFICATION
+  state: OPEN
+  date: '2026-09-19'
+  title: Persist the verification tier Stage 5 already computes; fix the literal verifier stamp (D-274e)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: stage5_verify.py computes epistemic_status/isor/verification_method; stage6_commit.py has no columns for them; :898 hardcodes the verifier model AND the threshold (BUG-301)'
+  description: 'R3 / D272d asked for a QUARANTINE split into UNVERIFIED and CONTRADICTED. That vocabulary already exists in code - epistemic_status in {corroborated, source-supported, cross-source-unverified, speculative} - and the stage6 fixed column list drops it on the floor. Ruling: (1) persist epistemic_status, isor, verification_method, a typed s5_reason and the confidence_score provenance; (2) keep epistemic state and retrieval eligibility as separate explicit dimensions rather than deriving one from the other; (3) compute verifier_model and the threshold from config, never a literal, so the stamp cannot lie after a config change. This converts R3 from a modelling task into a schema-and-wiring task.'
+  files:
+  - pipeline/stage5_verify.py
+  - pipeline/stage6_commit.py
+
+- id: D274f
+  category: MEASUREMENT / ANCHOR
+  state: OPEN
+  date: '2026-09-19'
+  title: The anchor is a conformance set, not a training set (D-274f)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'ruler 150 blind rows already certified with 51 abstentions retained; no provenance column exists (BUG-298)'
+  description: 'Ruling on the question whether a clean anchor is needed for golden examples or to train S2 and S4: an anchor is required, a training set is not, and no training set may be built from the current labels (D274d). The anchor is versioned and human-adjudicated: (1) ANCHOR-1 = the existing 150 blind rows, frozen, with the 51 abstentions retained as abstentions; (2) ANCHOR-2 = about 100 fresh rows drawn AFTER the vocabulary freeze, to control contamination by the R5 edits; (3) a test-retest of 30 rows after at least two weeks, which is the single-coder ceiling the floors should be anchored to; (4) per-axis conformance sets - positive, near-neighbour negative, out-of-vocabulary, contradiction-trap; (5) must-link/cannot-link pairs for work identity; (6) known-item retrieval queries derived from source_segments, which is system-independent unlike the current golden set whose ids were chosen from live hybrid search output. Every item stamped anchor_version, menu_hash, taxonomy_version, coder, date, abstention. The first thing NOT to do with the anchor is fine-tune on it.'
+  files:
+  - governance/RULER_BLIND_SHEET_20260917.csv
+  - config/golden/retrieval_queries.yaml
+  - config/eval_integrity.yaml
+
+- id: D274g
+  category: LABEL QUALITY / PROCEDURE
+  state: OPEN
+  date: '2026-09-19'
+  title: Implement the decision procedure the config already declares instead of free generation (D-274g)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: config/content_types.yaml content_type_rules (D2587) is a complete top-down ROLE decision procedure with thresholds and resolutions; route_to_content_type (D2128) is documented as now live and NOT dead, yet the route column does not exist in the DB (BUG-300 class, F-45)'
+  description: 'config/content_types.yaml already contains the ROLE decision procedure: ordered rules, process_template_min_steps 2, the single-step resolutions, the decision-matrix resolutions, instruction_is_principle_when with depth_test_domains_threshold 3, descriptive_summary_resolution noise_drop, ambiguous_resolution quarantine. Neither it nor the D2128 route fallback is implemented; an LLM free-generates a discipline and a content_type, and a hand-run script then promotes that free generation to the serving gate. Ruling: implement the declared procedure as code; keep the LLM only where the rules underdetermine; let it answer none as a first-class outcome (never emerging); render any closed menu from config/taxonomy_v5.yaml at call time and stamp menu_hash; require a second and different-family signal to overturn a rule, never to replace it. This is the substance of R1 and it is a conformance task, not a modelling one. Also corrects the stale D2128 comment.'
+  files:
+  - config/content_types.yaml
+  - pipeline/stage4_merge.py
+  - pipeline/schemas.py
+
+- id: D274h
+  category: GOVERNANCE
+  state: OPEN
+  date: '2026-09-19'
+  title: One writer for the serving gate, with an audit stamp on every script that may touch it (D-274h)
+  source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  verification: 'measured: three hand-run scripts in scripts/ can move status on label grounds, with no pipeline-side guard and no audit stamp (BUG-299)'
+  description: 'The documented root cause of the circling - verification by the artefact own outputs - has a concrete new instance: the serving gate was redefined by a hand-run script, so every later measurement inherited an unstated membership rule, and each adjudication round silently re-defined the gate again. Ruling: (1) exactly one writer may set status, and it derives it from the verification record (D274a); (2) any script outside pipeline/ that writes status must declare its rule as config, stamp an audit record (script, commit, rule hash, row count, before/after distribution) and be re-runnable from that record; (3) a CI invariant asserts that no label column can determine status. Same class as BUG-284 and D-271a: a governed question answered outside the governance path.'
+  files:
+  - scripts/apply_phase1_finalize.py
+  - scripts/apply_phase1_adjudication.py
+  - scripts/repass_pair_agreed.py
+  - pipeline/integrity_check.py
+
 summary:
-  total: 631
+  total: 639
   proposed: 2
   draft: 1
   active: 479

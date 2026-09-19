@@ -6,7 +6,7 @@
 
 ## 0. The one-paragraph verdict
 
-The ruler was answered blind, by a human, against the same menus the pipeline is supposed to use. Three of the four label axes measured **below or at their own floor**, and the two axes the KB actually uses for retrieval are **the two least reliable ones**. The cause is not bad luck and not the human: the production classifier is instructed, in writing, to **invent a free-text label** rather than choose from the closed vocabulary (`stage4_merge.py:341`, `:472` — *"no canonical lists"*), and a post-hoc synonym table then squeezes 1,089 raw discipline strings and 4,982 raw domain strings into 61 + 43 slots. Every rescue the table performs costs accuracy (exact 0.61 → synonym 0.49 → dumped-as-emerging 0.33 human agreement). Meanwhile 40.7% of the KB is hidden from retrieval by a fail-closed rule that **treats "unverifiable" as "untrue"**, and 24 of 45 attribute columns are dead or near-dead constants. The ontology is not the problem; **the labeling instrument is**, and it is a bounded, fixable instrument.
+The ruler was answered blind, by a human, against the same menus the pipeline is supposed to use. Three of the four label axes measured **below or at their own floor**, and the two axes the KB actually uses for retrieval are **the two least reliable ones**. The cause is not bad luck and not the human: the production classifier is instructed, in writing, to **invent a free-text label** rather than choose from the closed vocabulary (`stage4_merge.py:345`, `:472` — *"no canonical lists"*), and a post-hoc synonym table then squeezes 1,089 raw discipline strings and 4,982 raw domain strings into 61 + 43 slots. Every rescue the table performs costs accuracy (exact 0.61 → synonym 0.49 → dumped-as-emerging 0.33 human agreement). Meanwhile 40.7% of the KB is hidden from retrieval by a fail-closed rule that **treats "unverifiable" as "untrue"**, and 24 of 45 attribute columns are dead or near-dead constants. The ontology is not the problem; **the labeling instrument is**, and it is a bounded, fixable instrument.
 
 ---
 
@@ -80,7 +80,7 @@ stage4    FB text → LLM FREE-GENERATION of a raw discipline string ← the lab
 
 The label is produced **per-FB, from the FB's own prose, by a model that has never seen the corpus, the cluster, or the other rows**. `build_classify_prompt` says so explicitly:
 
-> `"""Build a FREE scientific classification prompt — no canonical lists.` (`stage4_merge.py:472`)
+> `"""Build a FREE scientific classification prompt — no canonical lists.` (`stage4_merge.py:468`)
 > *"CRITICAL: Classify based on what the principle IS, not what label fits best from a predefined list."* (`:341`)
 > *"Use precise, scientifically accurate names. If the principle is about 'neuroaesthetics', say 'neuroaesthetics'"* (`:341`)
 > *"(Use the most precise discipline name you know — not generic buckets)"* (`:500`)

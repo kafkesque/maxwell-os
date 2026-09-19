@@ -311,3 +311,46 @@ book_library:
         - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
         - Pricing subset (3 books, 237 segments — E2E test)
     source: knowledge pipeline/books/
+
+# ── CURRENT STATE (2026-09-19) ──────────────────────────────────────────────
+# Read governance/SESSION-HANDOFF-2026-09-19.md FIRST, then CONTEXT_INDEX.md §6e, then
+# governance/ROUNDTABLE_CROSSEXAM_20260919.md.
+current_state:
+    date: 2026-09-19
+    critical_finding: >
+        BUG-299 / D-274a — the serving gate is a LABEL, not a verification verdict.
+        scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle'
+        else 'QUARANTINE' (written at :163). 4,745/4,745 PASS rows are content_type='principle';
+        0/1,470 non-principle rows pass. 2,447 rows (30.6%) disagree with their own persisted
+        verification_results[factual].passed: 138 NLI CONTRA-majority and 1,514 NEUTRAL rows are
+        SERVED, 278 served rows had all evidence flagged non-evidence fragments, and 506
+        ENTAIL-majority rows are HIDDEN. Honest gate: PASS 4,745 -> 3,310.
+        => ROLE is the highest-leverage axis, not decorative (D6 / BUG-280 / D272g INVERTED).
+    next_phase: >
+        0a G17 re-derive status from the verification record (+ typed s5_reason, one writer,
+        CI invariant). Then 0b G12 facet predicate in every leg. Then 0c G18 guard split.
+        Do NOT relabel, retrain, benchmark or rerun before 0a-0b.
+    ruling_artifacts:
+        - governance/ROUNDTABLE_CROSSEXAM_20260919.md
+        - governance/SESSION-HANDOFF-2026-09-19.md
+        - governance/ONTOLOGY_FORENSIC_20260919.md
+        - governance/PRIORITY_REGISTER_20260917.md
+        - governance/SEQUENCE_STATUS_20260917.md
+    open_gates: [G1, G2, G3, G5, G6, G7, G8, G9, G10, G11, G12, G14, G15, G16, G17, G18, G19, G20]
+    withdrawn_gates: [G4a, G13]
+    registry: {decisions: 639, highest_bug: BUG-301, buglog_entries: 50}
+    do_not:
+        - relabel the corpus
+        - buy more stratum-A ruler rows
+        - train or swap S2/S4 on the current labels (no provenance column exists)
+        - extend the alias map
+        - re-cut the 61/43 ontology
+        - add the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF before 0a-0b
+        - run R2 before R5/R1
+        - treat the D-2637 model-eval workstream as a blocker (it is not on the critical path)
+    do_not_quote:
+        - the 0.60 floor (two estimands, one number - BUG-295)
+        - the F-14 pocket retarget (statistically null - BUG-296)
+        - any PASS-only frame as an epistemic frame (it is a ROLE frame)
+        - the golden retrieval set as ground truth (ids chosen from live search output)
+

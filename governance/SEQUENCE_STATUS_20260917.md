@@ -282,3 +282,63 @@ instrument that reports a decision as pending, or a filter that does not filter,
 wrong label — it makes the system unmeasurable.*
 
 Registry now **631 decisions**; buglog now **BUG-294**.
+
+---
+
+## D-274 — RULED (2026-09-19, later the same day): the round-2 cross-examination
+
+Three frontier reviews (temp/qwen0080.md, temp/chatgpt0080.md, temp/claude0080.md) were returned against
+ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919.md and every load-bearing claim was re-derived against the repo
+or the live DB. **Full record: governance/ROUNDTABLE_CROSSEXAM_20260919.md.**
+
+**THE FINDING NONE OF THE THREE REACHED.** The serving gate is a **label**, not a verification verdict.
+scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle' else 'QUARANTINE'
+and writes it at :163; three hand-run scripts can move rows across the gate on label grounds. The DB
+matches that rule on **4,745/4,745 PASS rows and 0/1,470 non-principle rows**.
+
+| measurement | value |
+|---|---|
+| status disagrees with its own persisted verification_results[factual].passed | **2,447 (30.6%)** |
+| PASS rows whose own verification says passed=False | **1,941** |
+| — NLI CONTRA-majority (contradicted, served) | **138** |
+| — NLI NEUTRAL (unverified, served) | **1,514** |
+| — all evidence flagged non-evidence fragments (served) | **278** |
+| — MECH FAIL / conversion artifacts (served) | 11 |
+| QUARANTINE rows that are NLI ENTAIL-majority (verified, hidden) | **506** |
+| honest gate (status := factual.passed) | PASS **4,745 → 3,310** |
+
+⇒ **ROLE is the highest-leverage axis, not decorative.** D6 / BUG-280 / D272g are **INVERTED**, and the
+gating axis is the one with **lift −0.010 over a constant answer** on a column that is 81.6% one value.
+
+**Confirmed from the reviews (all re-derived):** Claude's D11 "confirmed, worse" — search_keyword takes
+**no query text** (retrieve.py:123-134), is called only when a facet is present (:363-370), and its
+insertion-ordered rows receive **equal RRF weight** (:355-390), with the rerank pool cut from the fused
+list (:411-415); the **guard SPLIT** (better than the G13 exemption); the hardcoded verifier stamp
+(stage5_verify.py:898); the QUARANTINE split as a **parse, not a re-run** (verification_results populated
+on 7,995/7,995); the catch-all sentinel by design (taxonomy_v5.yaml:2131); the golden set whose ids were
+chosen from live search output ("verified via live hybrid search BEFORE locking them in").
+
+**Corrected in my own record:** BUG-295 (the FLOOR estimand), BUG-296 (F-14 retarget null),
+BUG-297/299 (ROLE inversion), BUG-298 (no provenance column), BUG-300 (query-blind leg),
+BUG-301 (stage5 tier dropped by stage6; verifier literal).
+
+**Rejected:** ChatGPT's and Qwen's "D3 CONFIRMED" (both replicated my error — the pocket contrasts are
+null); ChatGPT's "stage 5 does not preserve the NLI distinction" (it does; it is never queried);
+ChatGPT's D6 direction; Qwen's "Outlines replaces R1/R2" (constrained decoding enforces membership, not
+semantic correctness) and "RAGAS/ARES replace the ruler" (category error — they measure retrieval, not
+label correctness).
+
+**Programme order is now:** 0a serving gate from the verification record → 0b facet predicate in every leg
+→ 0c guard split → 1 persist the tier → 2 fix the estimand → 3 R5/R1 → 4 index what is in the DB →
+5 work-identity dedup → 6 S5 aggregation fix → 7 chunk/evidence leg → 8 distilled model.
+
+**Explicitly excluded:** re-labelling the corpus; ~85 more stratum-A rows; training S2/S4 on the current
+labels; extending the alias map; ACORN; re-cutting the ontology; re-deriving FORM on the pocket; the chunk
+leg / vec_fbs_ctx / contextual embeddings / weighted RRF before 0a-0b; R2 before R5/R1; deleting the junk
+rows. The D-2637 model-eval workstream is **not on the critical path**.
+
+**Standing rule added:** *a governed value that a hand-run script can redefine is not governed. A label
+may not determine serving eligibility, and a filter that is not asserted on the final pool is not a
+filter.*
+
+Registry now **639 decisions**; buglog now **BUG-301**; new gates **G17–G20**; **G4a withdrawn**.

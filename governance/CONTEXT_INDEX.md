@@ -138,6 +138,17 @@ content_type, NOT the yaml `content_types` key (BUG-277).
 | **G6** | decide the Dropbox/synced-folder question (C3) | `FORENSIC_AUDIT_20260917.md` F-09 | leak-risk posture |
 | **G7** | decide domain aggregation policy (63 contested rows) | `governance/domain_aggregation_policy_decision.md` | domain axis |
 
+| **G12** | approve constraining the facet filters (predicate in every leg + assert on the fused pool) | ROUNDTABLE_CROSSEXAM_20260919.md | correctness of every retrieval number |
+| **G13** | ~~approve the write-guard exemption~~ **SUPERSEDED BY G18** | — | — |
+| **G14** | approve work-identity dedup at ingestion (re-run affected merges, or prevent future ones only?) | BUG-289 | the S1.5 merge criterion |
+| **G15** | approve indexing what is already in the DB (body fields into FTS; evidence_passages as a leg) | BUG-288 | retrieval coverage (11.1% today) |
+| **G16** | approve the chunk/evidence leg, and decide whether a hit returns the parent FB or the segment | D-273g | grounding precision |
+| **G17** | **re-derive status from the verification record; make label-derived status writes impossible** (serving 4,745 → 3,310; de-serves 1,941; deletes nothing) | BUG-299 / D-274a | **everything measurable** |
+| **G18** | approve the guard SPLIT (row guard vs vocabulary lint) | D-274 / ROUNDTABLE_CROSSEXAM | R1, and the 261 research-methodology rows |
+| **G19** | persist the tier stage 5 already computes; withdraw the FLOOR estimand (**G4a withdrawn**) | BUG-295 / BUG-301 | the ruler's validity |
+| **G20** | one writer for status + an audit stamp on any script that may touch it | BUG-299 | governance of the gate |
+| **G4a** | ~~repoint the floors at the certified core~~ **WITHDRAWN** — the estimand is confused and a floor may not be re-anchored on a single coder | BUG-295 / BUG-296 | — |
+
 ## 8. ANTI-DRIFT RULES
 
 1. **Never restate a config value in prose.** Cite the path. (Floors, sentinel, axis values and

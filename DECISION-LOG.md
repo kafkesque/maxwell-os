@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-15 | **Machine source of truth:** `config/decisions.yaml` (611 decisions)
+> **Updated:** 2026-09-19 | **Machine source of truth:** `config/decisions.yaml` (639 decisions)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -146,3 +146,33 @@ the `domains LIKE` substring match with JSON-aware membership, and index `fbs(di
 
 **Interim rule in force (part of D-271c):** NO renames — object names, discipline, domain or content_type —
 until the identity layer exists. Cost 0; it prevents the only irreversible event in the taxonomy.
+
+
+## 2026-09-19 — D-272 / D-273 / D-274 rulings (see governance/ROUNDTABLE_CROSSEXAM_20260919.md)
+
+| ID | State | Decision |
+|---|---|---|
+| D-272a | RESOLVED | **The ruler is certified.** 150 blind human labels (100 proportional stratum A + 50 forced-minority B), no stored-label column exposed. Valid: confirmation of everything downstream. |
+| D-272b | ACTIVE | **THE AXIS INVERSION** — retrieval facets ranked inversely to measured reliability: FORM 0.831 unused, discipline 0.506 the primary exact filter, ROLE 0.740 with lift −0.010. |
+| D-272c | RESOLVED | **Constrained, definition-anchored classification supersedes D2138 free generation** — the free-generation prompt (stage4_merge.py:345/468 with the :13 docstring claiming the opposite) is the root cause of the 999-rule alias map. |
+| D-272d | OPEN | Split QUARANTINE into UNVERIFIED | CONTRADICTED. |
+| D-272e | OPEN | Relevance becomes its own axis (relational, per Saracevic 2007). |
+| D-272f | RESOLVED | **Instrument repair, NOT re-engineering.** The ontology is structurally sound; 5 bounded repairs. |
+| D-272g | **WITHDRAWN 2026-09-19** | F-14 was retargeted to ROLE on a pocket contrast that is **statistically null** (BUG-296). The action survives for a different reason: FORM is already the best-measured axis. **Do not quote the retarget.** |
+| D-273a | OPEN | Facet predicates in EVERY retrieval leg + assert on the fused pool. → G12 |
+| D-273b | OPEN | Write-guard exemption for declared collisions (superseded by the guard SPLIT — D-274 / G18). |
+| D-273c | OPEN | Graph expansion must propagate/report the neighbour's OWN tier. |
+| D-273d | OPEN | Index what is already in the DB (body fields into FTS; evidence_passages as a leg). → G15 |
+| D-273e | OPEN | Work-identity dedup at ingestion (source_diversity counts filenames: 29.1% of "convergence" is one book twice). → G14 |
+| D-273f | OPEN | emerging must stop being a facet value (447 PASS discipline rows, 744 domain rows). |
+| D-273g | OPEN | Chunk/evidence leg at step 8 (the join is 100%: 205,813/205,813; ~214k vectors). → G16 |
+| D-273h | OPEN | Cross the ruler strata with status; report both frames. |
+| **D-274a** | **OPEN — CRITICAL** | **The serving gate must be a function of the verification record, not of content_type.** status is set by scripts/apply_phase1_finalize.py:18 as content_type == 'principle'; 2,447 rows (30.6%) disagree with their own persisted verification; 1,941 failed rows are served, 506 verified rows are hidden. Honest gate: PASS 4,745 → 3,310. De-serves 1,941; deletes nothing. → **G17** |
+| **D-274b** | **RESOLVED** | **ROLE is the highest-leverage axis, not decorative — D6 / BUG-280 are INVERTED.** The gating axis has lift −0.010 over a constant; ~a quarter of served rows are not principles by a human reading (13 false positives in the served set, 29 true principles hidden). |
+| D-274c | RESOLVED | **The ruler FLOOR column is void** — an accuracy was compared to a provenance share. All STOPPED/CONTINUE verdicts withdrawn; only the constant-baseline lift stands. **G4a WITHDRAWN.** |
+| D-274d | RESOLVED | **No label carries human provenance** (no content_type_source / discipline_source column). min_human_share is unsatisfiable ⇒ **no axis may gate a model comparison** ⇒ S2/S4 must not be trained or swapped on the current labels. |
+| D-274e | OPEN | Persist the tier stage 5 already computes (epistemic_status / isor / verification_method) and compute the verifier stamp from config. → G19 |
+| D-274f | OPEN | **The anchor is a conformance set, not a training set** (ANCHOR-1 frozen 150 + 51 abstentions; ANCHOR-2 ~100 fresh rows after the vocabulary freeze; 30-row test–retest; per-axis positive/near-neighbour/OOV/contradiction sets; must-link pairs; known-item queries from source_segments). |
+| D-274g | OPEN | **Implement the decision procedure the config already declares** (content_type_rules / D2587 + route_to_content_type / D2128) instead of free generation; allow none; render menus from config with a menu_hash stamp. |
+| D-274h | OPEN | **One writer for the serving gate, with an audit stamp on every script that may touch it.** → G20 |
+

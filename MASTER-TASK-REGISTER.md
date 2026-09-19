@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER (tiered)
 
-> **Updated:** 2026-09-14 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
+> **Updated:** 2026-09-19 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
 > **Companion:** `governance/aggregated_remaining_tasks.md` (archived copy in same folder)
 >
 > **Convention (standing rule):** unresolved/undone tasks at the TOP (most critical first, MUST→SHOULD→WORTH); resolved/done at the BOTTOM.
@@ -8,6 +8,22 @@
 ---
 
 ## 🔴 MUST — open (strategic-consequential order)
+
+> **⚠️ SUPERSEDING ENTRY — 2026-09-19 (D-274a–h, BUG-295–BUG-301, F-38–F-46). Add this ABOVE everything below; the entries after it were written before the serving gate was understood.** Read first: governance/ROUNDTABLE_CROSSEXAM_20260919.md and governance/SESSION-HANDOFF-2026-09-19.md.
+>
+> **THE CRITICAL FINDING: the serving gate is a LABEL, not a verification verdict.** scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle' else 'QUARANTINE' and writes it at :163 (apply_phase1_adjudication.py and repass_pair_agreed.py also move rows across the gate on label grounds). The live DB matches that rule on **4,745/4,745 PASS rows and 0/1,470 non-principle rows**. Consequences, measured against verification_results (populated on 7,995/7,995 rows): **2,447 rows (30.6%) disagree with their own persisted factual.passed**; **1,941** served rows failed their own verification (**138 NLI CONTRA-majority**, 1,514 NEUTRAL, 278 with all evidence flagged non-evidence fragments, 11 MECH/artifact); **506 ENTAIL-majority rows are hidden**. An honest gate moves PASS **4,745 → 3,310**. => **ROLE is the highest-leverage axis, not decorative; D6 / BUG-280 / D272g are INVERTED.** The gating axis has **lift −0.010 over a constant answer**.
+>
+> **REVISED CRITICAL PATH (do these before any relabel, retrain, rerun or benchmark):**
+> **(0a)** re-derive status from the verification record + typed s5_reason; one writer; label-derived status writes become hard errors; CI invariant PASS ⟹ factual.passed AND reason ∉ {CONTRA, MECH_FAIL, EVIDENCE_CONTAMINATED, NO_EVIDENCE}. **de-serves 1,941 rows, deletes nothing (R-D410).** No human needed. ~1 day. → **G17**
+> **(0b)** push the facet predicate into EVERY leg AND assert it on the fused pool; delete/rewrite the query-blind keyword leg (retrieve.py:123 has **no query param**; :363-370 calls it only when a facet is present; :411-415 cuts the rerank pool from the fused list so violators can be promoted). No human. ~1.5 days. → **G12**
+> **(0c)** SPLIT the write guard (row-level guard vs vocabulary lint) instead of the G13 exemption list. ~0.5 day. → **G18**
+> **(1)** persist the tier stage 5 already computes (epistemic_status / isor / verification_method — stage6 has NO columns for them) and de-literal the verifier stamp (stage5_verify.py:898). → **G19**
+> **(2)** correct the ruler estimand: the FLOOR column compares stored-label **accuracy** to min_human_share, a **provenance share** (score_ruler_labels.py:136/184 vs eval_integrity.yaml:28-31). All STOPPED/CONTINUE verdicts are **withdrawn**; only the constant-baseline lift stands (ROLE −0.010, discipline +0.422, FORM +0.472). **G4a is WITHDRAWN.**
+> **(3)** R5 → R1, driven by the decision procedure config/content_types.yaml ALREADY declares (content_type_rules / D2587), with none as a first-class outcome.
+>
+> **DO NOT (priority-excluded):** re-label the corpus; buy ~85 more stratum-A rows (value-of-information ≈ 0); **train/fine-tune or swap S2/S4 on the current labels** (no provenance column exists anywhere, so min_human_share is unsatisfiable and no axis may gate a model comparison — a model fitted here learns the script's gate and a verifier whose own calibration is P 0.647 / R 0.386 / F1 0.484); extend the alias map; adopt ACORN; re-cut the 61/43 ontology; re-derive FORM on the pocket (the F-14 contrast is **statistically null** — BUG-296); add the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF before 0a–0b; run R2 before R5/R1; delete the junk rows. **The D-2637 model-eval workstream is NOT on the critical path.**
+>
+> **Answer to "do we need a clean anchor to train S2/S4, or a different approach":** the anchor is a **versioned human-adjudicated CONFORMANCE set** (ANCHOR-1 = the frozen 150 blind rows with their 51 abstentions; ANCHOR-2 ≈ 100 fresh rows drawn AFTER the vocabulary freeze; a 30-row test–retest as the single-coder ceiling; per-axis positive/near-neighbour/OOV/contradiction sets; must-link/cannot-link pairs for work identity; known-item queries derived from source_segments, NOT from live search output). **Not a training set.** The different approach is not a different model — it is removing the LLM's authority over what the rules already decide (D274g).
 
 > **PHASE A COMPLETE (2026-09-14, D2619/D2620/D2623/D2624/D2625).** Anchor frozen at **216 principle** (214 spotless + 1 emerging + 1 abductive-duplicate); 9 locked discipline/depth rulings + abductive merge applied (`p5:human-locked`); 108 d2615-principle rows emitted to `governance/expansion_queue_108.jsonl` (NOT folded); re-tiered → **gold_4axis 231 (214 principle) / pending 189 / silver 23**. Non-contamination guard `validate_discipline_domain()` wired + CI-tested (D2620).
 >

@@ -1,40 +1,53 @@
-# PRIORITY REGISTER — the critical items in strategically consequential order (2026-09-17)
+# PRIORITY REGISTER — the critical items in strategically consequential order (2026-09-19, revised)
 
-Ranked by **consequence**, not by effort or by recency. Each row names what it unblocks, and whether a human
-is required (nothing below can be delegated if the human cell says HUMAN). Companion to
-`PRIORITY_DECISION_20260917.md` (which set the sequence) and `CONTEXT_INDEX.md` (which holds the recall map).
+Ranked by **consequence**, not by effort or recency. Each row names what it unblocks and whether a human is
+required. Companion to ROUNDTABLE_CROSSEXAM_20260919.md (which re-ordered the programme),
+SEQUENCE_STATUS_20260917.md (which records the rulings) and CONTEXT_INDEX.md (the recall map).
+
+> **WHAT CHANGED ON 2026-09-19.** G4 — "certify the ruler" — was #1 and is **DONE** (150 blind human labels).
+> The ruler then surfaced a defect that outranks every item on the previous list: **the serving gate is a
+> label, not a verification verdict** (BUG-299 / D-274a). 4,745/4,745 PASS rows are content_type='principle';
+> 2,447 rows (30.6%) disagree with their own persisted verification; 1,941 failed rows are served, 506
+> verified rows are hidden. **Every measurement taken before this is fixed is uninterpretable**, so 0a is
+> now #1. G4a (repointing the floors) is **WITHDRAWN** — the estimand was confused (BUG-295).
 
 | # | item | type | unblocks | human? | effort |
 |---|---|---|---|---|---|
-| **1** | **G4 — certify the RULER: 100–150 blind human labels on content_type + discipline + FORM** | task | **everything measurable**: P2/P3 role consolidation, F-14 relabels, ModernBERT/DSPy, the S2→S6 rerun. Every axis reads **0.000 blind** against floors of 0.6/0.6/0.6/0.5/0.5, so today no model, relabel or rerun can be *approved* — only asserted | **YES** | ~3–4 h labelling + instrument build (build is mine) |
-| **2** | **BUG-276 — restore the safety net** (C13's `backup_guardian.sh` is dead; the DB has **no** automated backup) **+ F-08 disk** (46 GiB free vs floor 150) | bug | safe execution of #3 and #5, both of which are **bulk writes** (164,202 edges; 3,348 relabels) | no | hours |
-| **3** | **D-271c — implement the identity layer** (`concept_id` + authority control + re-key the 164,202 edges) under the rename freeze | task | reversibility of *every* future taxonomy decision; removes the latent tax (one rename orphans **320 edges**) | no (gated on G8 ratification) | 1–2 days |
-| **4** | **F-02 — provenance on every relabel path** | task | #5, and the root cause of the circular anchor (F-05/F-16) | no | hours |
-| **5** | **F-14 — FORM re-derivation for 3,348 rows + 115 to review** (with #4's provenance) | task | the largest data-integrity defect: **4,054 rows (49.9% of the KB)** serve a pre-repair distribution while reporting CLEAN | D-G2a only (exclude vs delete the 591 junk) | 2–3 days |
-| **6** | **Decision queue** — ratify D-271a (revised), D-271b, D-271c, D-G2a, D-G2b, D-G3a, D-G3b, G1, G5–G7 | decision | #3 and #5 (they are blocked on paperwork, not work) | **YES**, minutes each | minutes |
-| **7** | **F-15 + T3/T6 mechanisation** — give FORM a consumer (per-FORM `verification_standard` at the S5 wiring point) and mechanise the D2587 step/verb boundary for T3 | task | verifiable FORM and content_type; replaces the cancelled ~650-call judge swap (BUG-269: only T1 survives, gemma 1.000 vs 0.571 baseline) | no | 1–2 days |
-| **8** | **P2/P3 model-role consolidation (G5)** — 19 uncited roles; the live `S4_CLASSIFIER` conflict (gpt-oss on n=60 vs the 251-row voting study ranking it 4th of 6, *below* gemma); the tier-A run is **DEAD** (PID 70847 gone, checkpoint 4,260 rows, last write 9 h ago) → decide resume vs abandon; granite-4.2-8b now questionable for R5 family diversity | decision + task | a coherent, citable model map | **YES** (approve the map) | 1 day + GPU |
-| **9** | **F-06 + F-11** — harness contract test; one shared response reader (content/tool_calls/reasoning_content) | task | the BUG-262..266 class; the corrected defects (gpt-oss "33% parse failure" was a harness artifact; `guided_grammar_enabled` is a no-op without a per-request json_schema) | no | ~1 day |
-| **10** | **Data-quality tail** — BUG-273 (domains contract 1..3 vs **up to 7** on 1,002 rows), BUG-274 (`related_fbs` **56.8% asymmetric**, 88,592 one-way edges + 7 self-references), F-13 tree drift, F-12 vote partition, F-08 retention | bug | consistency of the facets and the graph | no | 1 day |
+| **0a** | **G17 — make status a function of the verification record** (one writer; typed s5_reason; label-derived writes become hard errors; CI invariant PASS ⟹ factual.passed). Measured effect: serving set **4,745 → 3,310**; de-serves 1,941 rows (138 NLI CONTRA-majority, 1,514 NEUTRAL, 278 evidence-flagged, 11 MECH/artifact); restores 506 verified rows. Deletes nothing (R-D410) | task | **everything measurable** — every retrieval number, every label accuracy claim, every benchmark frame | no | ~1 day |
+| **0b** | **G12 — the facet predicate in EVERY leg + asserted on the fused pool**; delete/rewrite the query-blind keyword leg (retrieve.py:123 has no query param, :363-370 calls it only when a facet is present, :411-415 cuts the rerank pool from the fused list) | task | correctness of facet-constrained retrieval; the whole chunk/embedding roadmap | no | ~1.5 days |
+| **0c** | **G18 — SPLIT the write guard** (row-level guard vs vocabulary lint) — replaces the G13 exemption list | task | R1; and the 261 research-methodology rows currently destroyed at the write boundary | no | ~0.5 day |
+| **1** | **G19 — persist the tier stage 5 already computes** (epistemic_status / isor / verification_method; stage6 has no columns) + de-literal the verifier stamp (stage5_verify.py:898) | task | the QUARANTINE split (R3) as a wiring job instead of a modelling job | no | ~0.5 day |
+| **2** | **Correct the ruler estimand** — the FLOOR column compares stored-label accuracy to min_human_share, a provenance share. Re-report lift over the constant baseline (ROLE −0.010, discipline +0.422, FORM +0.472) with coverage and abstention bounds | task | the validity of every accuracy number the project publishes | no | ~0.5 day |
+| **3** | **R5 → R1** — the vocabulary contract, then closed-menu classification driven by the decision procedure config/content_types.yaml ALREADY declares (content_type_rules / D2587), with none as a first-class outcome and a menu_hash stamp | task | label quality; retires the 999-rule alias map | **YES** (ratify the slot list) | 2–3 days |
+| **4** | **G15 — index what is already in the DB** (body fields into FTS first; evidence_passages as a fourth leg; per-field vectors later) | task | retrieval coverage (11.1% of each FB is searchable today; 4.8M chars of evidence indexed by nothing) | no | ~1 day |
+| **5** | **G14 — work-identity dedup at ingestion** (source_diversity counts filenames: 29.1% of "convergence" is one book twice; it feeds the S1.5 merge criterion) | task | corpus integrity; the merge criterion | **YES** | 1–2 days |
+| **6** | **S5 aggregation fix** — claim-level (every atomic claim needs ≥1 supporting passage) against the single-passage-vs-synthesised-definition premise; then measure a claim-level checker behind a protocol | task | the meaning of PASS; the 27.4%/31.1% PASS rates | no | 2–4 days |
+| **7** | **G16 — chunk/evidence leg** (join is 100%: 205,813/205,813; ~214k vectors ≈ 438 MB), plus per-field vectors and weighted RRF | task | grounding precision — but only after 0a–0b | no | ~2.5 days |
+| **8** | **Distilled classifier / fine-tune** — only with an honest gate AND an anchor (D-274f); measured on a held-out anchor version | task | a cost optimisation, not an accuracy strategy | no | days |
+| **9** | **BUG-276 — restore the safety net** (C13 backup_guardian.sh is dead; no automated DB backup) + F-08 disk | bug | safe execution of every bulk write above | no | hours |
+| **10** | **Decision queue** — ratify D-271a (revised), D-271b/c, D-G2a/b, D-G3a/b, G1, G5–G7, G17–G20 | decision | items 0a–3 (they are blocked on paperwork, not work) | **YES**, minutes each | minutes |
+
+## Explicitly EXCLUDED (do not spend on these)
+
+Re-labelling the corpus; buying ~85 more stratum-A rows (**value-of-information ≈ 0** — the decision does
+not change at 0.51 vs 0.55 and the estimand is void); **training/fine-tuning or swapping S2/S4 on the
+current labels** (no provenance column exists, so min_human_share is unsatisfiable — D-274d); extending the
+alias map; adopting ACORN; re-cutting the 61/43 ontology; re-deriving FORM on the pocket (the F-14 contrast
+is statistically null — BUG-296); the chunk leg / vec_fbs_ctx / contextual embeddings / HyDE / weighted RRF
+before 0a–0b; R2 before R5/R1; deleting the junk rows (R-D410). **The D-2637 model-eval workstream is NOT on
+the critical path.**
 
 ## Which is the most important
 
-**#1 — G4, certify the ruler.** One sentence: *you cannot approve a model assignment, a 3,348-row relabel, or
-a 40–52 h rerun against a ruler that has never been calibrated by a human.* Every other row in this table
-either **feeds** the ruler (T3 108 + T6 69 + T2 triage ≈ 177 rows, of which 166 already feed G4 — they are the
-same work) or is **measured by** it.
+**0a — G17.** One sentence: *the set of objects the system will answer from is currently decided by a
+content_type value written by a hand-run script, on an axis whose lift over a constant answer is −0.010, and
+that set contains 138 rows that NLI has already contradicted.* Until status is derived from the verification
+record, nothing else in this table can be measured — and each additional artefact produced before it
+compounds the error, which is the documented mechanism of the circling.
 
-## What I would do first in wall-clock terms (no human available now)
+## What must NOT be trusted until 0a lands
 
-**#2 then #3.** #2 has the highest consequence-per-hour in the register and protects #3 and #5; #3 is the only
-preventive item and is almost entirely deterministic. Both are no-human, so they can proceed while #1 waits
-for you — and neither can start a stage, so neither violates the "fix the ruler first" ruling.
-
-## Standing rules that outrank all of the above
-
-- **Rename freeze** (D-271c, in force in `config/identity.yaml`): no renames of object names, discipline,
-  domain or content_type until the identity layer exists.
-- **LINK, never MERGE**; and LINK must also set `status='QUARANTINE'` (`duplicate_of` has no reader).
-- **Fail closed on unknown**; **a design state is not a violation**; **no spotless without a number**;
-  **quote the measured population, not the felt one**.
-- Any **destructive** operation may never be gated by a judge that does not beat the constant-answer baseline.
+Any retrieval benchmark number; any "the KB is clean" claim; the F-14 retarget (withdrawn); the 0.60 floor
+(withdrawn); any PASS-only frame (it is a ROLE frame, not an epistemic one); any accuracy number compared to
+a floor rather than to the constant-answer baseline; and the golden retrieval set whose expected ids were
+chosen from live hybrid search output.

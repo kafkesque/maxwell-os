@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-15 13:39:35'
-total_decisions: 631
+total_decisions: 639
 decisions:
 - id: D2636
   category: QUALITY / DATA
@@ -6638,7 +6638,7 @@ summary:
   deferred: 14
   resolved: 81
   planned: 8
-  open: 13
+  open: 21
   by_category:
     ARCH: 27
     ARCH / GOV: 1
@@ -6683,6 +6683,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
+    GOVERNANCE: 1
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1
@@ -6704,11 +6705,14 @@ summary:
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 5
-    LABEL QUALITY / MEASUREMENT: 3
+    LABEL QUALITY / MEASUREMENT: 4
+    LABEL QUALITY / PROCEDURE: 1
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
+    MEASUREMENT / ANCHOR: 1
     MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1
+    MEASUREMENT / PROVENANCE: 1
     MEASUREMENT / QUALITY: 1
     MODEL: 2
     MODELS / RETIREMENT: 1
@@ -6751,10 +6755,10 @@ summary:
     RES: 4
     RESEARCH: 3
     RESILIENCE / QUALITY: 1
-    RETRIEVAL / ONTOLOGY: 5
+    RETRIEVAL / ONTOLOGY: 6
     RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
     RETRIEVAL / VALIDATION: 2
-    RETRIEVAL / VERIFICATION: 1
+    RETRIEVAL / VERIFICATION: 2
     ROBUSTNESS / QUALITY: 3
     STR: 1
     TAXONOMY: 4
@@ -6762,7 +6766,7 @@ summary:
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
-    VERIFICATION: 3
+    VERIFICATION: 4
     VERIFICATION / ONTOLOGY: 1
     governance: 1
     pipeline-fix: 2

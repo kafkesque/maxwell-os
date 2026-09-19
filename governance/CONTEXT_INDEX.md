@@ -238,7 +238,7 @@ Read **§13 of `governance/ONTOLOGY_FORENSIC_20260919.md`** before acting on §6
 | F-36 | low | **mega-merges** up to **244 sources** for one FB. **Refuted:** they do NOT cause unlabelability — singletons are **3× more** unlabelable (24.1% vs 0%) | BUG-293 |
 | F-37 | med | the ruler's strata are **not crossed with `status`**, conflating two estimands | BUG-294 · D273h |
 
-**REFUTED HYPOTHESES (recorded so they are not re-run):** (a) FTS staleness — `fits_fts` integrity-check **passed**
+**REFUTED HYPOTHESES (recorded so they are not re-run):** (a) FTS staleness — `fbs_fts` integrity-check **passed**
 on a copy; (b) contextual embeddings poisoning production — `contextual_embed.enabled: False`, production vectors
 are clean; (c) over-merging making FBs unlabelable — **the opposite holds**.
 

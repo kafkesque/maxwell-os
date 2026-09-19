@@ -1,0 +1,69 @@
+{
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "note": "no response_format (gpt-oss returns only `role` under json_object)",
+  "summary": {
+    "name": "gpt-oss-20b-MXFP4-Q8 (no response_format)",
+    "n": 6,
+    "avg_secs": 52.50833333333333,
+    "median_secs": 61.45,
+    "min_secs": 28.33,
+    "max_secs": 67.52,
+    "total_secs": 315.05,
+    "n_fb": 3,
+    "n_null": 1,
+    "n_invalid": 4,
+    "n_schema_fail": 2,
+    "fb_rate": 0.5,
+    "route_agreement": null
+  },
+  "rows": [
+    {
+      "cluster_id": "cluster_66",
+      "n_segments": 5,
+      "route": "ERROR",
+      "valid": false,
+      "secs": 67.52,
+      "name": ""
+    },
+    {
+      "cluster_id": "cluster_109",
+      "n_segments": 6,
+      "route": "FB",
+      "valid": false,
+      "secs": 62.76,
+      "name": "Focal Point Coordination"
+    },
+    {
+      "cluster_id": "cluster_113",
+      "n_segments": 8,
+      "route": "FB",
+      "valid": false,
+      "secs": 46.4,
+      "name": "Tragedy of the Commons"
+    },
+    {
+      "cluster_id": "cluster_185",
+      "n_segments": 2,
+      "route": "NULL",
+      "valid": true,
+      "secs": 28.33,
+      "name": ""
+    },
+    {
+      "cluster_id": "cluster_306",
+      "n_segments": 20,
+      "route": "FB",
+      "valid": true,
+      "secs": 48.59,
+      "name": "Priming\u2011Induced Behavioral Bias"
+    },
+    {
+      "cluster_id": "cluster_321",
+      "n_segments": 4,
+      "route": "ERROR",
+      "valid": false,
+      "secs": 61.45,
+      "name": ""
+    }
+  ]
+}

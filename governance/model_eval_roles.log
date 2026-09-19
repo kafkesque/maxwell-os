@@ -1,0 +1,40 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== toolcalling (20 items)
+  Ornith-1.5-35B-A3B-REAP-19B              toolcalling   acc=0.5  n=16  skipped=4
+  Qwen3.8-27B-MLX-4bit                     toolcalling   acc=0.562  n=16  skipped=4
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    toolcalling   acc=0.688  n=16  skipped=4
+  gemma-4-E4B-it-MLX-4bit                  toolcalling   acc=0.625  n=16  skipped=4
+  Ornith-1.5-9B-MLX-8bit                   toolcalling   acc=0.25  n=16  skipped=4
+  Phi-4-mini-instruct-8bit                 toolcalling   acc=0.438  n=16  skipped=4
+  gpt-oss-20b-MXFP4-Q8                     toolcalling   acc=0.0  n=16  skipped=4
+
+=== planning (20 items)
+  Ornith-1.5-35B-A3B-REAP-19B              planning      acc=0.235  n=17  skipped=3
+  Qwen3.8-27B-MLX-4bit                     planning      acc=0.176  n=17  skipped=3
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    planning      acc=0.176  n=17  skipped=3
+  gemma-4-E4B-it-MLX-4bit                  planning      acc=0.176  n=17  skipped=3
+  Ornith-1.5-9B-MLX-8bit                   planning      acc=0.176  n=17  skipped=3
+  Phi-4-mini-instruct-8bit                 planning      acc=0.176  n=17  skipped=3
+  gpt-oss-20b-MXFP4-Q8                     planning      acc=0.176  n=17  skipped=3
+
+done in 3031s, 231 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+SUITE BUILD FAILED planning: ModuleNotFoundError No module named 'tools'
+
+done in 0s, 0 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== planning (24 items)
+  Ornith-1.5-35B-A3B-REAP-19B              planning      acc=0.762  n=21  skipped=3
+  Qwen3.8-27B-MLX-4bit                     planning      acc=0.762  n=21  skipped=3
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    planning      acc=0.714  n=21  skipped=3
+  gemma-4-E4B-it-MLX-4bit                  planning      acc=0.667  n=21  skipped=3
+  Ornith-1.5-9B-MLX-8bit                   planning      acc=0.762  n=21  skipped=3
+  Phi-4-mini-instruct-8bit                 planning      acc=0.762  n=21  skipped=3
+  gpt-oss-20b-MXFP4-Q8                     planning      acc=0.762  n=21  skipped=3
+
+done in 3391s, 147 new results

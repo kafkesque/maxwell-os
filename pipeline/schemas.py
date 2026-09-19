@@ -18,7 +18,9 @@ Inter-stage contracts (8 stages — Stage 3 removed per D2120):
 All objects stamped: schema_version, gen_model, pipeline_commit (R14).
 """
 
+import json
 import re
+from pathlib import Path
 import unicodedata
 from datetime import datetime
 from typing import Literal, get_args
@@ -542,6 +544,147 @@ def is_valid_domain(domain: str) -> bool:
 def is_valid_discipline(discipline: str) -> bool:
     """Check if a discipline label is canonical (including 'emerging')."""
     return discipline in CANONICAL_DISCIPLINES
+
+
+_AXIS_CONTRACT_CACHE: dict | None = None
+
+
+def _axis_contract() -> dict:
+    """Load the label-axis contract from config (C12). Missing config => no exceptions.
+
+    Failing toward STRICTER is deliberate: if the contract cannot be read we must not assume
+    a collision is allowed. See `config/eval_integrity.yaml::label_axes`.
+    """
+    global _AXIS_CONTRACT_CACHE
+    if _AXIS_CONTRACT_CACHE is None:
+        try:
+            import yaml
+
+            path = Path(__file__).resolve().parent.parent / "config" / "eval_integrity.yaml"
+            _AXIS_CONTRACT_CACHE = (yaml.safe_load(path.read_text()) or {}).get("label_axes") or {}
+        except Exception:  # noqa: BLE001 — a missing/!parsable contract must not become a pass
+            _AXIS_CONTRACT_CACHE = {}
+    return _AXIS_CONTRACT_CACHE
+
+
+def _norm_label(value: object) -> str:
+    """Normalise a label for cross-vocabulary comparison (case + punctuation insensitive).
+
+    Normalisation is required because the live collision is `research methodology` vs
+    `research & methodology` — identical words, different punctuation. An exact-string
+    comparison cannot see it.
+    """
+    import re
+
+    return re.sub(r"[^a-z0-9]", "", str(value or "").lower())
+
+
+def parse_domains(value: object) -> list[str]:
+    """Parse the `domains` column/sidecar into a clean list of labels.
+
+    WHY THIS IS SHARED (2026-09-17): the column is JSON text (`["graphic design", "web & ui"]`),
+    but hand-written parsers in this repo used `strip("[]").replace("'", "")` — which strips
+    PYTHON repr quotes, not JSON double quotes. The result was that every domain looked
+    non-canonical (17,247 false flags in `audit_taxonomy_disjointness.py` on first run) and any
+    comparison that depended on it silently compared garbage. One parser, one behaviour.
+
+    Handles: JSON list, comma-separated text, single/double/unquoted items, None, empty.
+    """
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(x).strip() for x in value if str(x).strip()]
+    text = str(value).strip()
+    if not text or text in ("[]", "null", "None"):
+        return []
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, list):
+            return [str(x).strip() for x in parsed if str(x).strip()]
+    except Exception:  # noqa: BLE001 — fall back to splitting; never raise on a label cell
+        pass
+    parts = text.strip("[]").split(",")
+    return [p.strip().strip('"').strip("'").strip() for p in parts if p.strip().strip('"').strip("'").strip()]
+
+
+def validate_discipline_domain(discipline: str | None, domains: list[str] | None) -> list[str]:
+    """D2620/BUG-197 — discipline<->domain NON-CONTAMINATION guard (fail-closed, strengthened).
+
+    The 61 disciplines and 43 domains are DISJOINT vocabularies. Crossing them — emitting a
+    DOMAIN as the singular discipline, or a DISCIPLINE inside the domain set — is a hard
+    labelling error that classifiers MUST never emit. Call this on every label write
+    (S4, relabel harness, P5 review, merge, anchor review) and fail closed on a non-empty
+    result.
+
+    STRENGTHENED 2026-09-17. The original version validated MEMBERSHIP, not DISJOINTNESS: it
+    only fired when a label was missing from its own vocabulary, so a label that existed in
+    BOTH passed clean. The docstring above asserted disjointness that nothing verified — and
+    the assertion was false (`research methodology` was a canonical discipline while
+    `research & methodology` was a canonical domain, together on 909 live rows). Now:
+      * names are compared NORMALISED, so punctuation/case cannot hide a collision;
+      * every collision must be DECLARED in `config/eval_integrity.yaml::label_axes`
+        (`shared_labels` for documented catch-alls, `known_collisions` for recorded debt);
+      * an UNDECLARED collision is a hard error, and a declared one is still reported.
+
+    Flag forms (empty list = clean):
+      - "domain-as-discipline: '<x>'"
+      - "discipline-as-domain: '<x>'"
+      - "non-canonical-discipline: '<x>'"
+      - "non-canonical-domain: '<x>'"
+      - "undeclared-axis-collision: discipline '<a>' collides with domain '<b>'"
+      - "declared-axis-collision: discipline '<a>' vs domain '<b>' (known debt, decision pending)"
+    """
+    flags: list[str] = []
+    contract = _axis_contract()
+    shared = {_norm_label(x) for x in (contract.get("shared_labels") or [])}
+    declared = [
+        (_norm_label(c.get("discipline")), _norm_label(c.get("domain")))
+        for c in (contract.get("known_collisions") or [])
+    ]
+    dom_norm = {_norm_label(d): d for d in CANONICAL_DOMAINS}
+    disc_norm = {_norm_label(d): d for d in CANONICAL_DISCIPLINES}
+
+    if discipline and discipline not in CANONICAL_DISCIPLINES:
+        if discipline in CANONICAL_DOMAINS:
+            flags.append(f"domain-as-discipline: '{discipline}'")
+        else:
+            flags.append(f"non-canonical-discipline: '{discipline}'")
+    for dom in domains or []:
+        if dom not in CANONICAL_DOMAINS:
+            if dom in CANONICAL_DISCIPLINES:
+                flags.append(f"discipline-as-domain: '{dom}'")
+            else:
+                flags.append(f"non-canonical-domain: '{dom}'")
+
+    # Collision pass: a label that is CANONICAL FOR ITS OWN AXIS but is also a member of the
+    # other axis. Labels that fail the membership check above are skipped here so one error is
+    # reported once, with the most specific flag.
+    key = _norm_label(discipline)
+    if discipline and discipline in CANONICAL_DISCIPLINES and key not in shared and key in dom_norm:
+        other = dom_norm[key]
+        if any(key == a and _norm_label(other) == b for a, b in declared):
+            flags.append(f"declared-axis-collision: discipline '{discipline}' vs domain '{other}'"
+                         " (known debt, decision pending)")
+        else:
+            flags.append(f"undeclared-axis-collision: discipline '{discipline}'"
+                         f" collides with domain '{other}'")
+    for dom in domains or []:
+        key = _norm_label(dom)
+        if dom in CANONICAL_DOMAINS and key not in shared and key in disc_norm:
+            other = disc_norm[key]
+            if any(_norm_label(other) == a and key == b for a, b in declared):
+                flags.append(f"declared-axis-collision: discipline '{other}' vs domain '{dom}'"
+                             " (known debt, decision pending)")
+            else:
+                flags.append(f"undeclared-axis-collision: discipline '{other}' collides with"
+                             f" domain '{dom}'")
+    seen: set[str] = set()
+    unique: list[str] = []
+    for flag in flags:
+        if flag not in seen:
+            seen.add(flag)
+            unique.append(flag)
+    return unique
 
 
 # ═══════════════════════════════════════════════════════════════════════════

@@ -7,6 +7,9 @@ pipeline_manifest:
   pipeline_commit: v3.0-D2485
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    # D2635 (2026-09-15): gpt-oss RETIRED as GENERATOR (ARM-2 — non-viable, empty-content +
+    # schema-incomplete). Classifier role RETIRING -> ModernBERT student (classifier_modernbert_p5final)
+    # once ARM-3 abstention + student-readiness gate pass. Keep gpt-oss here until then.
     classifier: gpt-oss-20b-MXFP4-Q8
     embeddings: bge-m3
     nli: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
@@ -281,6 +284,16 @@ stage2:
   extraction_type_dominance_warn_ratio: 0.95
   relabel_max_workers: 4
   relabel_cross_family_model: gpt-oss-20b-MXFP4-Q8
+  # BUG-263 (2026-09-17): OUTPUT budget for the FORM judge. call_omlx_json() returns []
+  # (not an error) when the response is unparseable, and a Harmony reasoning model
+  # (gpt-oss) spends its whole budget on the reasoning pass BEFORE emitting content.
+  # Measured on one live record: max_tokens=64 -> content 0c; 256 -> 0c; 1024 -> 29-42c, JSON parses.
+  # The old hardcoded 64 guaranteed zero labels from the cross-family judge while the run
+  # still reported 'done'. 1024 is the smallest measured budget that yields content.
+  relabel_judge_max_tokens: 1024
+  relabel_judge_min_content_chars: 2
+  relabel_apply_reasoning_off_prefix: true
+  relabel_report_dir: governance
 watchdog:
   interval_secs: 60
   stall_checks: 3

@@ -1,0 +1,314 @@
+# ── D-2637: model_assignments.yaml — Agent role registry ──
+# CANONICAL SOURCE for pipeline models: config/pipeline_config.yaml
+# This file defines AGENT roles BEYOND the core pipeline.
+# If a model appears in BOTH files, pipeline_config.yaml takes precedence.
+#
+# REWRITE 2026-09-16 (D-2637). The prior file was the 2026-07-08 merge of three dead
+# registries and contained, in production:
+#   * PHANTOM models      — T2_GATE/T3_GATE pointed at `Phi-4-mini-instruct-4bit`, which
+#                           does not exist in the registry (only `-8bit`) -> any caller 404s;
+#                           gemma-4-26B/31B phantoms in fallbacks.
+#   * a DELETED model     — routing.self_critique.primary = deepseek-r1-8b (pruned).
+#   * STALE S5 LLM roles  — S5_VERIFIER / S5_FB_VERIFIER assigned an LLM to a stage that is
+#                           DeBERTa-NLI-only (D2298). S5 has NO LLM.
+#   * DUPLICATE fallbacks — Qwen3-Coder listed twice under HIGH_CAPABILITY.
+# Nothing was carried over without a measured justification.
+#
+# EVIDENCE BASE (all measured 2026-09-15/16, oMLX, temp 0.0):
+#   * Tier A     — 9 models x 8 suites (see governance/model_eval_report.md)
+#   * voting     — 251 human-adjudicated gold rows (governance/voting_verdict_20260916.md)
+#   * ARM-1/2/4  — student classifiers, CRIBS, capability/classification/extraction probes
+#   * production — pipeline.stage4_merged_call.merged_cribs_classify(), real prompt, 60-row table
+#
+# R5 (C8, generator != verifier, different FAMILY): S2's generator is Qwen (`qwen3_moe`),
+# so no Qwen-family model may verify, classify, probe or vote for this pipeline. Seven of
+# the ten local models are Qwen: Qwen3-Coder (`qwen3_moe`), Qwen3.8-27B + Ornith-9B
+# (`qwen3_5`), Ornith-REAP (`qwen3_5_moe`). Eligible verifiers are therefore only
+# gpt-oss-20b (`gpt_oss`), gemma-4-E4B (`gemma4`) and Phi-4-mini (`phi3`).
+
+roles:
+
+  # ─────────── S2 — convergent extraction ───────────
+  S2_GENERATOR:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+    notes: "PINNED. mmlu-free justification: mbpp 0.68 (best in portfolio), hardcode 1.00, humaneval 0.80. On the production S2 prompt it matches Qwen3.8-27B on routing (agreement 1.0) and fb_rate (0.833, 0 invalid JSON) at 33.8s vs 131.0s median — 4x faster."
+  S2_PROBE:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+    notes: "D2319 fast probe. Fastest model in the portfolio (1.3s median; 0.3s on stability) and smallest (3.99 GB). Only model with 6/6 valid extraction and ZERO NULLs (ARM-4). phi3 family = R5-safe against the Qwen generator. BUG-053 (hallucinates on open-ended research) does not apply: the probe judges SUPPLIED text."
+  S2_RELABEL_CROSS_FAMILY:
+    model: gpt-oss-20b-MXFP4-Q8
+    evidence: "PENDING — scripts/pipe_stage_probe.py queued 2026-09-16 (S0.5 / S2-relabel / S4_5 probe not yet run)"
+    backend: omlx
+    family: gpt_oss
+    notes: "R5-clean relabel of S2 output. 30/30 valid JSON through the production path."
+  S2_DSPY_TARGET:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+    notes: "DSPy/MIPROv2 optimises the prompt FOR the deployment model; the artifact does not transfer. Also the only feasible target: MIPROv2 makes hundreds of calls and Qwen3.8 costs 4x per extraction."
+
+  # ─────────── S4 — CRIBS enrichment + classification ───────────
+  S4_CLASSIFIER:
+    model: "[[G2]]"
+    evidence: "governance/pipe_s4_classify_checkpoint.jsonl 2026-09-16 n=60/model production path (gpt-oss 0.350 = Qwen3.8 0.350 discipline)"
+    backend: omlx
+    family: "gpt_oss (incumbent) | qwen | gemma"
+    notes: "GATED by scripts/pipe_s4_classify_gold.py (production merged_cribs_classify on real FBs, 60 rows/model, scored against gold_4axis, BUG-260 corrected so raw labels are mapped to canonical first). MEASURED 2026-09-16: gpt-oss 0.350 discipline / 0.320 domain F1 / 0.450 depth @17.2s vs Qwen3.8 0.350 / 0.335 / 0.467 @82.2s vs gemma-4-E4B 0.300 / 0.220 / 0.433 @9.9s. DISCIPLINE IS A DEAD TIE at 4.8x the latency, so the incumbent stays: the benchmark-prompt gap (Qwen3.8 0.709 vs gpt-oss 0.339) does NOT reproduce on the production prompt. Superseded claim: an earlier revision of this file called Qwen3.8 'the best measured classifier' from the benchmark-prompt voting suite; that prompt is not the one S4 uses."
+  S4_DEPTH:
+    model: gpt-oss-20b-MXFP4-Q8
+    evidence: "governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md 2026-08-14 n=8 production path (gemma REFUTED 62.5% vs gpt-oss 75.0%, parity 62.5%, gate<0.90 FAILED) + governance/pipe_s4_classify_checkpoint.jsonl 2026-09-16 n=60 (gpt-oss 0.450 vs Qwen3.8 0.467 vs gemma 0.433; all paired p>=0.815 = no measurable difference)"
+    family: gpt_oss
+    notes: "depth_frugal_enabled is FALSE, so production depth runs on VERIFY_MODEL = gpt-oss-20b. The gemma-4-E4B depth assignment (D2354 FrugalGPT cascade) was MEASURED AND REFUTED on 2026-08-14: gemma 62.5% vs gpt-oss 75.0% accuracy, parity 62.5%, failing the >=90% gate; the study's own verdict is 'gemma-4-E4B is NOT accurate enough for depth. Do NOT enable depth_frugal_enabled.' It stays REFUTED and the flag stays off. depth_prompt_variant v3_contrastive was tuned on gemma, which is a legacy of that path, not evidence for it. OPEN PROBLEM, NOT A MODEL CHOICE: depth is the weakest axis in the pipeline — gpt-oss itself is 75% on the dedicated depth prompt and ~0.45-0.47 on the merged-call path, and every model is capped at 0.917 because 5 gold rows are 'none' and no model ever predicts 'none' (0/60 for all three). Depth accuracy needs a prompt/data fix, not a swap."
+  S4_5_ENRICH:
+    model: gpt-oss-20b-MXFP4-Q8
+    evidence: "PENDING — scripts/pipe_stage_probe.py queued 2026-09-16 (S0.5 / S2-relabel / S4_5 probe not yet run)"
+    backend: omlx
+    family: gpt_oss
+    notes: "NEVER BENCHMARKED as a stage (declared gap). R5-clean."
+  S4_DOMAIN_FALLBACK:
+    model: "none — LLM only"
+    evidence: "DECISION not measurement — fail-closed abstain, no LLM by design"
+    backend: n/a
+    family: n/a
+    notes: "Both non-LLM domain routes are FALSIFIED by measurement: ModernBERT student domain macro-F1 0.009; bge-m3 -> taxonomy-match macro-F1 0.000, subset-accuracy 1.3%. Domains must come from the LLM."
+
+  # ─────────── S5 — verification ───────────
+  S5_VERIFIER:
+    model: null
+    evidence: "DECISION not measurement — CONSTITUTION.md D2298 (stale role: superseded by NLI_VERIFIER)"
+    backend: nli
+    family: deberta
+    notes: "NO LLM. D2298: S5 = MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli, fail-closed. This is why S5 is architecturally independent of the generator's family — the R5 concern that applies to S4 labelling does NOT apply here. S5_VERIFIER/S5_FB_VERIFIER in the prior file were stale by their own annotations and are REMOVED."
+  NLI_VERIFIER:
+    model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+    evidence: "DECISION not measurement — CONSTITUTION.md D2298: S5 is DeBERTa NLI only, no LLM, fail-closed"
+    backend: local
+    family: deberta
+
+  # ─────────── S3A / S6 / boundary — [[D2]] RESOLVED 2026-09-16 ───────────
+  S3A_CONVERGENCE:
+    model: gemma-4-E4B-it-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6 reviewing 0.83; reassigned from the S2 generator under R5 (ruling D2)"
+    backend: omlx
+    family: gemma4
+    notes: "RULING D2 (ACCEPTED 2026-09-16). Prior file assigned Qwen3-Coder — the SAME model as the S2 generator — while it judges S2 output: a live R5 violation. Reassigned to gemma-4-E4B: R5-clean distinct family (gemma4), reviewing 0.83 @ 1.7s, ifeval 1.00. Kill-switch: conviction_floor in config."
+  S6_VALIDATOR:
+    model: none (deterministic)
+    evidence: "DECISION not measurement — deterministic schema/taxonomy validation + the D2620 fail-closed guard (ruling D2)"
+    backend: deterministic
+    family: n/a
+    notes: "RULING D2 (ACCEPTED 2026-09-16). Prior file assigned Qwen3-Coder (the generator) = live R5 violation. S6 is schema/taxonomy validation plus the D2620 fail-closed guard — all deterministic code. The LLM is REMOVED entirely rather than reassigned: an R5 violation cannot exist where there is no model."
+  BOUNDARY_VERIFIER:
+    model: gemma-4-E4B-it-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6 delegation 1.00 / n=25 ifeval 1.00 (strongest spec-follower)"
+    backend: omlx
+    family: gemma4
+    notes: "RULING D2 (ACCEPTED 2026-09-16). R5 violation in the prior file (same model as the S2 generator). Reassigned to gemma-4-E4B — the strongest spec-follower measured (delegation 1.00, ifeval 1.00), which is exactly what a boundary check is."
+  VOTING_DECIDER:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/voting_verdict_20260916.md 2026-09-16 n=251 (0.709 vs gpt-oss 0.339; majority voting REJECTED 0.541)"
+    backend: omlx
+    family: qwen
+    notes: "Measured on 251 human-adjudicated rows: discipline 0.709 ALL / 0.854 circular / 0.437 human-contested, domain F1 0.693, 16.5s. Next-best local voter is 0.430 (Qwen3-Coder). The RANKING is identical across all three subsets, so the ordering and the ~2x margin are robust even though the absolute figure is not. NOTE: as a DECIDER under human adjudication it is measured against humans, so R5's correlated-agreement concern does not apply to the decider role; it DOES apply to S4 labelling."
+  UNANIMITY_GATE:
+    model: "Ornith-1.5-35B-A3B-REAP-19B + Qwen3-Coder-30B-A3B-Instruct-MLX-4bit + Qwen3.8-27B-MLX-4bit"
+    evidence: "governance/voting_verdict_20260916.md 2026-09-16 n=251 (gate 0.915 @ 18.7% coverage = auto-accept tier only)"
+    backend: omlx
+    family: mixed
+    notes: "AUTO-ACCEPT TIER ONLY: 0.915 accuracy at 18.7% coverage — route everything else to review. NOT a majority vote (average 3-combo majority 0.541 < Qwen3.8's 0.709 alone). Unanimity numbers are a selection effect: rare AND correlated with easy rows."
+  NEVER_VOTE:
+    model: [Ornith-1.5-9B-MLX-8bit, Ornith-1.5-9B-OptiQ-4bit, Phi-4-mini-instruct-8bit]
+    evidence: "governance/voting_verdict_20260916.md 2026-09-16 n=251 (Ornith-9B 0.116/0.227; mmlu_pro 3/25 = chance, default-'A' bias)"
+    backend: n/a
+    family: n/a
+    notes: "Ornith-9B: 0.116/0.227 discipline accuracy (1 rescue in 73 of Qwen3.8's errors) and a default-'A' bias (mmlu_pro 3/25 = chance for BOTH quant variants). Phi-4-mini: ruled unreliable as a voter (D2577/BUG-224)."
+
+  # ─────────── agent / orchestration roles ───────────
+  ORCHESTRATOR:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6 delegation (Qwen3.8 1.00, gemma-4-E4B 1.00)"
+    backend: omlx
+    family: qwen
+    notes: "ARM-4 orchestrating 1.0 vs gpt-oss 0.5; delegation 1.00. PRIOR FILE had Phi-4-mini here (0.50 delegation)."
+  PLANNER:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-17 n=24 planning on computed gold: Phi/gpt-oss/REAP/Ornith-9B-8bit 0.792 (19/24), Qwen3.8 0.75 (18/24); delegation 1.00 n=25 2026-09-16; toolcalling 0.60 n=20"
+    backend: omlx
+    family: qwen
+    notes: "RESOLVED at n=24 on computed gold (the 17 hand-written items with wrong answers are deleted; INVALID_ITEM_IDS). Qwen3.8 is 1 item off the top cluster = INSIDE the pre-committed 1-item tie band, so the incumbent is RETAINED rather than swapped on noise. Delegation 1.00 remains the long-horizon tie-breaker."
+  PLANNER_FALLBACK:
+    model: Ornith-1.5-35B-A3B-REAP-19B
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-17 n=24 planning 0.792 (19/24, joint best with Phi-4-mini/gpt-oss/Ornith-9B-8bit) on computed gold; governance/model_eval_checkpoint.jsonl 2026-09-15 n=20 toolcalling 0.60 (corrected harness); the n=4 planning 1.00 is DEAD"
+    backend: omlx
+    family: qwen
+    notes: "planning 0.792 at n=24 (joint best with Phi-4-mini/gpt-oss/Ornith-9B-8bit), fastest of that cluster. Promoted on measured n=24 rather than the old n=3 tie."
+  REVIEWER:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6-12 reviewing (Qwen3.8 1.00)"
+    backend: omlx
+    family: qwen
+    notes: "reviewing 1.00 (joint best with Ornith-9B, which cannot be trusted). NOTE: this is an ANALYSIS role, not verification — R5 does not bind it."
+  REVIEWER_FAST:
+    model: gemma-4-E4B-it-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6 reviewing 0.83 + n=25 ifeval 1.00 @1.7s"
+    backend: omlx
+    family: gemma
+    notes: "reviewing 0.83 at 1.7s (5x faster than Qwen3.8)."
+  HIGH_CAPABILITY:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=25 humaneval 0.96 + n=6 delegation 1.00"
+    backend: omlx
+    family: qwen
+    notes: "Composite ALL 0.878 (best overall). PRIOR FILE had Qwen3-Coder here plus a duplicated fallback and a broken gemma-4-26B."
+  L2_VALIDATOR:
+    model: gemma-4-E4B-it-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=25 ifeval 1.00 (spec conformance)"
+    backend: omlx
+    family: gemma
+    notes: "R5-clean cross-family validator."
+  S3A_VERIFIER:
+    model: gemma-4-E4B-it-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=6 reviewing 0.83, distinct family (R5)"
+    backend: omlx
+    family: gemma
+    notes: "R5-clean (prior file was already correct here)."
+  CONTEXT_CLASS:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+    notes: "Latency-critical micro-classification; 1.3s, fastest available."
+  DRAFT_TRIAGE:
+    model: Phi-4-mini-instruct-8bit
+    backend: omlx
+    family: phi
+
+  # ─────────── coding ───────────
+  CODING_FAST:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=25 mbpp 0.68 / humaneval 0.80 @2.3s"
+    backend: omlx
+    family: qwen
+    notes: "mbpp 0.68 (best), humaneval 0.80, 1.6-3.7s. It is a MoE with ~3B ACTIVE params, so it beats every dense 9-23B model on both speed and quality simultaneously."
+  CODING_COMPLEX:
+    model: Qwen3.8-27B-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-16 n=25 humaneval 0.96"
+    backend: omlx
+    family: qwen
+    notes: "humaneval 0.96 (best), hardcode 1.00."
+  CODING_COMPLEX_VALUE:
+    model: Ornith-1.5-35B-A3B-REAP-19B
+    backend: omlx
+    family: qwen
+    notes: "2nd-best mbpp 0.60 AND hardcode 1.00 at 3.4s median — the value pick when Qwen3.8's 8.0s/19.0s is too slow."
+  CODING_LIGHT:
+    model: Ornith-1.5-9B-MLX-8bit
+    backend: omlx
+    family: qwen
+    notes: "Best SMALL-model coder: humaneval 0.80, hardcode 1.00, delegation 1.00. Won the 4-bit/8-bit A/B (composite 0.682 vs 0.642; coding composite 0.773 vs 0.677). NOT an R5 role (it is not a verifier), so Qwen family is fine here. PRIOR FILE had Phi-4-mini at 0.52 humaneval."
+  CODING_DRAFT:
+    model: Ornith-1.5-9B-MLX-8bit
+    backend: omlx
+    family: qwen
+    notes: "Draft pass then CODING_COMPLEX refines. 9.30 GB, 262k context."
+  CODING_CLEAN:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    backend: omlx
+    family: qwen
+
+  # ─────────── tools / retrieval / long context ───────────
+  TOOL_CALLING_AGENT:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-17 n=20 toolcalling 0.70 on the corrected harness (BUG-262/265): Qwen3-Coder 0.70 > Qwen3.8 0.60 = REAP 0.60 = gemma-4-E4B 0.60 > Phi 0.40 > Ornith-9B-8bit 0.30; gpt-oss NA"
+    backend: omlx
+    family: qwen
+    notes: "n=4 REAP 1.00 is DEAD (REAP 0.60 at n=20). Qwen3-Coder leads by 2 items (14/20 vs 12/20) - assigned under the pre-committed >1-item rule; NOT significant, the 0.60 cluster is within reach. gpt-oss is NA not 0.00 (no required JSON at 200/1024/2048, BUG-266) so it neither wins nor loses this role. gemma 0.55 to 0.60 after BUG-265 (native tool_calls unread; magnitude +1 item)."
+  LONG_CONTEXT:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    evidence: "governance/model_eval_checkpoint.jsonl 2026-09-17 n=20 toolcalling 0.70 on the corrected harness (BUG-262/265): Qwen3-Coder 0.70 > Qwen3.8 0.60 = REAP 0.60 = gemma-4-E4B 0.60 > Phi 0.40 > Ornith-9B-8bit 0.30; gpt-oss NA"
+    backend: omlx
+    family: "pending"
+    notes: "GATED by Run B (niah 4k/12k/24k + lc_reasoning 16k on 5 keepers). Early reading: Qwen3.8-27B niah 1.000 @ 147s/item vs Qwen3-Coder 0.500 with 6 transport errors. All local models expose 131k-262k context; nothing measured past 24k before Run B."
+
+  # ─────────── non-LLM components ───────────
+  EMBEDDINGS:
+    model: bge-m3
+    backend: ollama
+    family: bge
+    notes: "512d Matryoshka. Also used for S4 dedup (cosine 0.92) and fb relationships."
+  RERANK:
+    model: BAAI/bge-reranker-v2-m3
+    backend: local
+    family: bge
+    notes: "NOT viable as a domain classifier (D2636: macro-F1 0.0 at every threshold). Retrieval reranking only."
+  HYDE:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    evidence: "PENDING — measurable via pipeline/retrieval_benchmark.py --hyde on config/golden/retrieval_queries.yaml (queued 2026-09-16)"
+    backend: omlx
+    family: qwen
+    notes: "NEVER BENCHMARKED as a stage (declared gap)."
+  RETRIEVAL_EVAL:
+    model: Phi-4-mini-instruct-8bit
+    evidence: "PENDING — retrieval_evaluator.py needs a query+retrieved-FB set; declared, not yet wired"
+    backend: omlx
+    family: phi
+    notes: "NEVER BENCHMARKED as a stage (declared gap)."
+
+verification_tolerance:
+  version: 2026-07-08.V2        # UNCHANGED — not part of the model question
+  s6_validation: {max_disagreement: 0.33, on_exceed: flag, min_verifiers: 3}
+  t2_gate:       {max_disagreement: 0.4,  on_exceed: re-verify, min_verifiers: 2}
+  t3_gate:       {max_disagreement: 0.25, on_exceed: quarantine, min_verifiers: 2}
+  s3a_verification: {max_disagreement: 0.5, on_exceed: flag, min_verifiers: 2}
+
+fallbacks:
+  S2_GENERATOR: [Qwen3.8-27B-MLX-4bit]                 # correct but 4x slower — last resort only
+  S4_CLASSIFIER: [gemma-4-E4B-it-MLX-4bit, "[[G2]]"]
+  S4_DEPTH: [Qwen3.8-27B-MLX-4bit]
+  S2_PROBE: [gemma-4-E4B-it-MLX-4bit]
+  VOTING_DECIDER: []                                   # no local third voter exists (measured)
+  ORCHESTRATOR: [Qwen3-Coder-30B-A3B-Instruct-MLX-4bit]
+  PLANNER: [Ornith-1.5-35B-A3B-REAP-19B, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit]
+  CODING_COMPLEX: [Ornith-1.5-35B-A3B-REAP-19B, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit]
+  CODING_FAST: [Ornith-1.5-35B-A3B-REAP-19B]
+  TOOL_CALLING_AGENT: [Qwen3.8-27B-MLX-4bit, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit]
+  REVIEWER: [gemma-4-E4B-it-MLX-4bit]
+  LONG_CONTEXT: []
+  EMBEDDINGS: []
+
+# Routing for EXTERNAL tools (Zed etc.). Cloud is acceptable here because these are not
+# pipeline stages — C1/C3 bind the knowledge pipeline, not the editor.
+routing:
+  daily_zed:      {primary: qwen-plus,      fallbacks: [deepseek-v4-flash], notes: 'Zed daily coding. Cloud OK (external tool).'}
+  complex_coding: {primary: qwen-max,       fallbacks: [deepseek-v4-flash], notes: 'Zed complex coding. Cloud OK (external tool).'}
+  fb_generation:  {primary: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, fallbacks: [], notes: 'C1: local only.'}
+  tier2_validation: {primary: gemma-4-E4B-it-MLX-4bit, fallbacks: [Qwen3-Coder-30B-A3B-Instruct-MLX-4bit], notes: 'R5-clean.'}
+  concept_summarization: {primary: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, fallbacks: [gemma-4-E4B-it-MLX-4bit]}
+  depth_reasoning: {primary: Qwen3.8-27B-MLX-4bit, fallbacks: [Ornith-1.5-35B-A3B-REAP-19B], notes: 'WAS qwen-max (CLOUD) — a cloud model as primary for a pipeline role conflicts with C1/C3. Now local.'}
+  self_critique:  {primary: gemma-4-E4B-it-MLX-4bit, fallbacks: [Phi-4-mini-instruct-8bit], notes: 'WAS deepseek-r1-8b — that model is pruned. Cross-family critique: the criticality is that the critic differs from the generator.'}
+
+# Deleted (evidence in governance/pruned_models_20260915.md):
+#   granite-4.2-8b-MLX-8bit          (Prune #3, ALL 0.353 = last)          ~9.1 GB
+#   gemma-4-12B-it-qat-OptiQ-4bit    (Prune #3, toolcalling 0.00, 40.5s)   ~8.7 GB
+#   DeepSeek-R1-0528-Qwen3-8B-4bit   (Prune #2)                            ~4.3 GB
+#   gemma-4-31B, gpt-oss-20b-Q4, Qwen3.5-9B-4bit (Prune #1)
+# PENDING SIGN-OFF: Ornith-1.5-9B-OptiQ-4bit (~6.9 GB) — lost the 4bit/8bit A/B.
+archived:
+  - gemma-4-31B-it-OptiQ-4bit
+  - Ornith-1.0-9B-4bit
+  - Qwopus-GLM-18B        # phantom, never existed locally
+
+constraints:
+  generator_neq_verifier: true
+  generator_family: qwen
+  eligible_verifier_families: [gpt_oss, gemma4, phi3]
+  pipeline_temp: 0.0
+  max_resident_models: 4
+  omlx_single_resident: true   # NEVER reload/swap while a benchmark or run is in flight (BUG-255)
+cloud_roles:
+  - cloud_fallback   # opt-in only (C22); never a pipeline default
+_source: full rewrite 2026-09-16 (D-2637)
+_prior: merged from model_assignments.yaml + models.yaml + model_registry.yaml on 2026-07-08

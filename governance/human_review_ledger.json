@@ -1,0 +1,198 @@
+{
+  "generated_by": "scan_review_artifacts.py (deterministic glob — no blindspots)",
+  "governance_dir": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance",
+  "n_artifacts": 33,
+  "artifacts": [
+    {
+      "file": "s4_discipline_review_sheet.csv",
+      "size_bytes": 39721,
+      "rows": 63,
+      "n_rows": 63,
+      "verdict_cols": [
+        "HUMAN_discipline_VERDICT"
+      ],
+      "verdict_fill": {
+        "HUMAN_discipline_VERDICT": 62
+      }
+    },
+    {
+      "file": "s4_discipline_review_sheet.utf8.csv",
+      "size_bytes": 39673,
+      "rows": 63,
+      "n_rows": 63,
+      "verdict_cols": [
+        "HUMAN_discipline_VERDICT"
+      ],
+      "verdict_fill": {
+        "HUMAN_discipline_VERDICT": 63
+      }
+    },
+    {
+      "file": "s4_domain_review_digest.md",
+      "size_bytes": 26135,
+      "rows": 193
+    },
+    {
+      "file": "s4_domain_review_sheet.csv",
+      "size_bytes": 133247,
+      "rows": 216,
+      "n_rows": 216,
+      "verdict_cols": [
+        "discipline_human",
+        "HUMAN_domain_VERDICT"
+      ],
+      "verdict_fill": {
+        "discipline_human": 62,
+        "HUMAN_domain_VERDICT": 216
+      }
+    },
+    {
+      "file": "s4_review_queue.jsonl",
+      "size_bytes": 1062999,
+      "rows": 2456
+    },
+    {
+      "file": "s4_review_queue.jsonl.bak_20260913_224755",
+      "size_bytes": 1052533,
+      "rows": -1
+    },
+    {
+      "file": "depth_review_queue.yaml",
+      "size_bytes": 399820,
+      "rows": -1
+    },
+    {
+      "file": "content_type_adjudication_form_unlabeled_217.md",
+      "size_bytes": 332093,
+      "rows": 2848
+    },
+    {
+      "file": "content_type_adjudication_sheet_unlabeled.jsonl",
+      "size_bytes": 47387,
+      "rows": 217
+    },
+    {
+      "file": "d2615_human_adjudication.jsonl",
+      "size_bytes": 103982,
+      "rows": 298
+    },
+    {
+      "file": "frontier69_final_adjudication.json",
+      "size_bytes": 62809,
+      "rows": 69
+    },
+    {
+      "file": "merge_4axis_adjudication_manifest.json",
+      "size_bytes": 8714,
+      "rows": 12
+    },
+    {
+      "file": "p5_adjudication_final.json",
+      "size_bytes": 2808,
+      "rows": 5
+    },
+    {
+      "file": "phase0_149core_adjudication_form.md",
+      "size_bytes": 279023,
+      "rows": 1796
+    },
+    {
+      "file": "phase0_adjudication_ledger.jsonl",
+      "size_bytes": 298602,
+      "rows": 149
+    },
+    {
+      "file": "phase0_extension_list.jsonl",
+      "size_bytes": 22710,
+      "rows": 80
+    },
+    {
+      "file": "phase0_relabel_manifest.jsonl",
+      "size_bytes": 594060,
+      "rows": 1365
+    },
+    {
+      "file": "frontier_qwen38_69_objects.json",
+      "size_bytes": 40822,
+      "rows": 69
+    },
+    {
+      "file": "p5_deepseek_review.json",
+      "size_bytes": 25707,
+      "rows": 69
+    },
+    {
+      "file": "p5_deepseek_review.md",
+      "size_bytes": 15216,
+      "rows": 76
+    },
+    {
+      "file": "p5_deepseek_verify.json",
+      "size_bytes": 28546,
+      "rows": 69
+    },
+    {
+      "file": "p5_deepseek_verify.md",
+      "size_bytes": 7536,
+      "rows": 76
+    },
+    {
+      "file": "p5_freeze_plan.json",
+      "size_bytes": 132996,
+      "rows": 8
+    },
+    {
+      "file": "p5_freeze_plan.md",
+      "size_bytes": 1246,
+      "rows": 33
+    },
+    {
+      "file": "p5_human_review_deepseek.md",
+      "size_bytes": 83405,
+      "rows": 423
+    },
+    {
+      "file": "p5_human_review_final.md",
+      "size_bytes": 80208,
+      "rows": 422
+    },
+    {
+      "file": "p5_human_review_form.md",
+      "size_bytes": 87416,
+      "rows": 552
+    },
+    {
+      "file": "p5_review_pack.md",
+      "size_bytes": 11846,
+      "rows": 140
+    },
+    {
+      "file": "content_type_contested_16_form.md",
+      "size_bytes": 26699,
+      "rows": 248
+    },
+    {
+      "file": "s4_discipline_null_retry.csv",
+      "size_bytes": 824,
+      "rows": 5,
+      "n_rows": 5,
+      "verdict_cols": [],
+      "verdict_fill": {}
+    },
+    {
+      "file": "flagged_core_human_verdicts.jsonl",
+      "size_bytes": 13035,
+      "rows": 28
+    },
+    {
+      "file": "s4_discipline_verdicts.jsonl",
+      "size_bytes": 60063,
+      "rows": 63
+    },
+    {
+      "file": "s4_domain_verdicts.jsonl",
+      "size_bytes": 193196,
+      "rows": 216
+    }
+  ]
+}

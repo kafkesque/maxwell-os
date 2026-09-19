@@ -1,0 +1,8 @@
+# Long-context shortlist — v3 (2026-09-16): KEEPERS ONLY, Ornith-9B set to the A/B WINNER.
+# v2 listed Ornith-1.5-9B-OptiQ-4bit, which LOST the 4bit/8bit A/B (composite 0.642 vs 0.682)
+# and has been pruned (Prune #4). Swap to the 8-bit so the run measures the model we keep.
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+Qwen3.8-27B-MLX-4bit
+Ornith-1.5-35B-A3B-REAP-19B
+Ornith-1.5-9B-MLX-8bit
+gemma-4-E4B-it-MLX-4bit

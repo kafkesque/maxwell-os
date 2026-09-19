@@ -1,0 +1,295 @@
+{
+  "schema_version": "3.0",
+  "gen_model": "deterministic (no model)",
+  "measured_at": "2026-09-17T20:13:33",
+  "pipeline_commit": "deterministic-rule",
+  "policy": "merge_only_if_marker_AND_body_matches",
+  "whole_kb": {
+    "rows_scanned": 7995,
+    "findings": {
+      "TRIAGE": 6
+    },
+    "items": [
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "33ec68c493541c7e3b92b3c07d01bb3060f8a55a971ccaf038747624b77ad4b7",
+        "base_name": "Decision-making Under Uncertainty",
+        "dup_fb_id": "916a3745920eb8843fc0bd37f9614752d519c50cceec4327e8c52d179d93daf5",
+        "dup_name": "Decision Making Under Uncertainty",
+        "remainder": "(identical after normalisation) [body_similarity 0.00 < threshold]"
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "5c6a142d08da89a902cd948dcb9407aa56b1f6a02dbeedfb9afd4c9a0d9c64a5",
+        "base_name": "Human-ai Collaboration Framework",
+        "dup_fb_id": "eb51f299ce8abc30c4d8a8a383528eab71aa0fc99d61cb8b9b965ebd0e4d63c9",
+        "dup_name": "Human-ai Collaboration Framework",
+        "remainder": "(identical after normalisation) [body_similarity 0.00 < threshold]"
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "77c1fb70f9517537149adf41a24d26a316327844cc1722d8e7bc366d76764b1f",
+        "base_name": "Responsible Ai Governance Framework",
+        "dup_fb_id": "91dc4ad5db83f98ec3f9642b645d71925f8d7f27a5449f1f49178defb6ad6ff1",
+        "dup_name": "Responsible Ai Governance Framework",
+        "remainder": "(identical after normalisation) [body_similarity 0.05 < threshold]"
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "654960d82b7cc31e53bfec757ee5492957093be04077169d818b52b1e1d43574",
+        "base_name": "Multifunction Workflow Automation with Ema",
+        "dup_fb_id": "b64bf1de808166a8c355be6267ab60af5a17037df0e058b79493d7ae1c7ba94d",
+        "dup_name": "Multifunction Workflow Automation with Ema",
+        "remainder": "(identical after normalisation) [body_similarity 0.00 < threshold]"
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "1fe60686a7e53881928412ecf59f5475b25df83d47050b94137c2bb7c16122ce",
+        "base_name": "Internet Success Measurement",
+        "dup_fb_id": "b632993ca3f2c4a165fe77d87979c9b97a3cd452d5ad86049dc0070cd7254fd5",
+        "dup_name": "Internet Success Measurement",
+        "remainder": "(identical after normalisation) [body_similarity 0.00 < threshold]"
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_fb_id": "add18bc53f9674e7cf2f01fb0a6b8af7d1b52690ae9bd3df1ae4716b6e66e815",
+        "base_name": "Minimal Viable Production Setup",
+        "dup_fb_id": "8b55dd94f01c0611b18b842a827b5223f0f22aa4919260af1c932c2ef00e4c9b",
+        "dup_name": "Minimal Viable Production Setup",
+        "remainder": "(identical after normalisation) [body_similarity 0.00 < threshold]"
+      }
+    ]
+  },
+  "model_flagged_pairs": {
+    "n": 32,
+    "verdicts": {
+      "TRIAGE": 32
+    },
+    "items": [
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Anna Karenina Principle",
+        "dup_name": "Anna Karenina Principle (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Blue Ocean Market Creation",
+        "dup_name": "Blue Ocean Market Creation (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Chasm Crossing Strategy",
+        "dup_name": "Chasm Crossing Strategy (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Commitment and Consistency Principle",
+        "dup_name": "Commitment and Consistency Principle (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Confident Humility Framework",
+        "dup_name": "Confident Humility Framework (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Creative Confidence Through Action",
+        "dup_name": "Creative Confidence Through Action (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Creative Process Integration",
+        "dup_name": "Creative Process Integration (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Creative Risk-taking in Design",
+        "dup_name": "Creative Risk-taking in Design (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Data-driven Decision Making",
+        "dup_name": "Data-driven Decision Making (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Data-driven Decision Making Framework",
+        "dup_name": "Data-driven Decision Making Framework (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Ethical Ai Design Framework",
+        "dup_name": "Ethical Ai Design Framework (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Everything Is Figureoutable",
+        "dup_name": "Everything Is Figureoutable (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Figure-ground Relationship",
+        "dup_name": "Figure-ground Relationship (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Human-ai Collaboration Framework",
+        "dup_name": "Human-ai Collaboration Framework (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Information-driven Decision Making",
+        "dup_name": "Information-driven Decision Making (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Iterative Design Learning",
+        "dup_name": "Iterative Design Learning (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Iterative Prompt Refinement",
+        "dup_name": "Iterative Prompt Refinement (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Metaphorically Selling How to Use the Ma",
+        "dup_name": "Metaphorically Selling How to Use the Ma (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Nonlinear System Behavior",
+        "dup_name": "Nonlinear System Behavior (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Situational Analysis in Practice Mapping",
+        "dup_name": "Situational Analysis in Practice Mapping (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Social Proof Bias",
+        "dup_name": "Social Proof Bias (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Social Proof Manipulation",
+        "dup_name": "Social Proof Manipulation (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Social Proof Manipulation",
+        "dup_name": "Social Proof Manipulation (3)",
+        "remainder": "3 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Staged Release Strategy",
+        "dup_name": "Staged Release Strategy (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Strategic Capacity Management",
+        "dup_name": "Strategic Capacity Management (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Strategic Focus Through Constraint",
+        "dup_name": "Strategic Focus Through Constraint (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Strategic Relationship Building",
+        "dup_name": "Strategic Relationship Building (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Typography As Visual Communication",
+        "dup_name": "Typography As Visual Communication (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Value-based Pricing Strategy",
+        "dup_name": "Value-based Pricing Strategy (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Visual Hierarchy Through Contrast",
+        "dup_name": "Visual Hierarchy Through Contrast (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Visual Hierarchy Through Spatial Organization",
+        "dup_name": "Visual Hierarchy Through Spatial Organization (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      },
+      {
+        "verdict": "TRIAGE",
+        "base_name": "Visual Metaphor in Advertising",
+        "dup_name": "Visual Metaphor in Advertising (2)",
+        "remainder": "2 [body_similarity 0.00 < threshold]",
+        "model_flagged": true
+      }
+    ]
+  }
+}

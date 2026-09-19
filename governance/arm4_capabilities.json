@@ -1,0 +1,53 @@
+{
+  "mlx-community/gemma-4-12B-it-qat-OptiQ-4bit": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall": 1.0
+  },
+  "mlx-community/Ornith-1.5-9B-OptiQ-4bit": {
+    "coding": 1.0,
+    "reasoning": 0.5,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall": 0.9
+  },
+  "mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall": 1.0
+  },
+  "mlx-community/gpt-oss-20b-MXFP4-Q8": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 0.0,
+    "reviewing": 1.0,
+    "analysing": 0.0,
+    "_overall": 0.6
+  },
+  "lmstudio-community/gemma-4-E4B-it-MLX-4bit": {
+    "load_error": "Received 126 parameters not in model: \nlanguage_model.model.layers.24.self_attn.k_norm.weight,\nlanguage_model.model.layers.24.self_attn.k_proj.biases,\nlanguage_"
+  },
+  "mlx-community/Phi-4-mini-instruct-8bit": {
+    "coding": 1.0,
+    "reasoning": 0.5,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall": 0.9
+  },
+  "lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall": 1.0
+  }
+}

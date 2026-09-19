@@ -1,0 +1,226 @@
+
+==================================================================
+MODEL: mlx-community/gemma-4-12B-it-qat-OptiQ-4bit
+==================================================================
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 7922.75it/s]
+[transformers] You are using a model of type `gemma4_unified` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+  [PASS] coding         c_fib        '```python\ndef fib(n):\n    if n <= 0:\n        return 0\n    elif n == 1:'
+  [PASS] coding         c_fix        '```python\ndef add(a, b): return a + b\n```'
+  [PASS] reasoning      r_syllogism  'YES'
+  [PASS] reasoning      r_batball    '$0.05'
+  [PASS] orchestrating  o_plan       '```json\n{\n  "steps": [\n    "Define the API endpoints, request methods,'
+  [PASS] orchestrating  o_tools      '```json\n{\n  "calls": [\n    {\n      "tool": "search",\n      "parameters'
+  [PASS] reviewing      v_bug        'The function will raise a `ZeroDivisionError` because `len(xs)` evalua'
+  [PASS] reviewing      v_claim      'CONTRADICTED'
+  [PASS] analysing      a_summary    'Cluster analysis groups similar text to reduce duplication and improve'
+  [PASS] analysing      a_extract    '```json\n{\n  "day": "Tuesday",\n  "time": "3pm",\n  "room": "Room 5"\n}\n``'
+
+==================================================================
+MODEL: mlx-community/Ornith-1.5-9B-OptiQ-4bit
+==================================================================
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files: 100%|██████████| 9/9 [00:00<00:00, 15521.68it/s]
+  [PASS] coding         c_fib        '```python\ndef fib(n):\n    if n < 0:\n        raise ValueError("n must b'
+  [PASS] coding         c_fix        '```python\ndef add(a, b): return a + b\n```'
+  [PASS] reasoning      r_syllogism  'YES'
+  [FAIL] reasoning      r_batball    '$0.10'
+  [PASS] orchestrating  o_plan       '{"steps": ["Define the API endpoints, request/response schemas, and ro'
+  [PASS] orchestrating  o_tools      '```json\n{\n  "calls": [\n    {\n      "tool": "search"\n    }\n  ]\n}\n```'
+  [PASS] reviewing      v_bug        'It raises a `ZeroDivisionError` because dividing by `len([])` (which i'
+  [PASS] reviewing      v_claim      'CONTRADICTED'
+  [PASS] analysing      a_summary    'Cluster analysis groups similar text to extract shared principles once'
+  [PASS] analysing      a_extract    '{"day": "Tuesday", "time": "3pm", "room": "Room 5"}'
+
+==================================================================
+MODEL: mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B
+==================================================================
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 3200.74it/s]
+  [PASS] coding         c_fib        '```python\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a'
+  [PASS] coding         c_fix        '```python\ndef add(a, b): return a + b\n```'
+  [PASS] reasoning      r_syllogism  'YES'
+  [PASS] reasoning      r_batball    '$0.05'
+  [PASS] orchestrating  o_plan       '```json\n{"steps": ["Design the API endpoints and define the resource s'
+  [PASS] orchestrating  o_tools      '```json\n{"calls": [{"tool": "search"}, {"tool": "read_file"}, {"tool":'
+  [PASS] reviewing      v_bug        'The bug is a `ZeroDivisionError` because `len([])` is 0, causing divis'
+  [PASS] reviewing      v_claim      'CONTRADICTED'
+  [PASS] analysing      a_summary    'Cluster analysis groups similar text to extract shared principles once'
+  [PASS] analysing      a_extract    '```json\n{"day": "Tuesday", "time": "3pm", "room": "Room 5"}\n```'
+
+==================================================================
+MODEL: mlx-community/gpt-oss-20b-MXFP4-Q8
+==================================================================
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 8673.09it/s]
+  [PASS] coding         c_fib        '<|channel|>analysis<|message|>We need to output only code. Provide a f'
+  [PASS] coding         c_fix        '<|channel|>analysis<|message|>We need to output only the corrected one'
+  [PASS] reasoning      r_syllogism  '<|channel|>analysis<|message|>We have a logical implication: If all bl'
+  [PASS] reasoning      r_batball    '<|channel|>analysis<|message|>We need to solve: bat + ball = 1.10, bat'
+  [FAIL] orchestrating  o_plan       '<|channel|>analysis<|message|>We need to return only JSON. The user wa'
+  [FAIL] orchestrating  o_tools      '<|channel|>analysis<|message|>We need to parse the user request: "Retu'
+  [PASS] reviewing      v_bug        '<|channel|>analysis<|message|>We need to find the bug: calling avg([])'
+  [PASS] reviewing      v_claim      '<|channel|>analysis<|message|>We need to evaluate claim: "The function'
+  [FAIL] analysing      a_summary    '<|channel|>analysis<|message|>We need to summarize in at most 20 words'
+  [FAIL] analysing      a_extract    '<|channel|>analysis<|message|>We need to output JSON only. The user sa'
+
+==================================================================
+MODEL: lmstudio-community/gemma-4-E4B-it-MLX-4bit
+==================================================================
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files: 100%|██████████| 9/9 [00:00<00:00, 5016.44it/s]
+  LOAD FAILED: Received 126 parameters not in model: 
+language_model.model.layers.24.self_attn.k_norm.weight,
+language_model.model.layers.24.self_attn.k_proj.biases,
+language_model.model.layers.24.self_attn.k_proj.scales,
+language_model.model.layers.24.self_attn.k_proj.weight,
+language_model.model.layers.24.self_attn.v_proj.biases,
+language_model.model.layers.24.self_attn.v_proj.scales,
+language_model.model.layers.24.self_attn.v_proj.weight,
+language_model.model.layers.25.self_attn.k_norm.weight,
+language_model.model.layers.25.self_attn.k_proj.biases,
+language_model.model.layers.25.self_attn.k_proj.scales,
+language_model.model.layers.25.self_attn.k_proj.weight,
+language_model.model.layers.25.self_attn.v_proj.biases,
+language_model.model.layers.25.self_attn.v_proj.scales,
+language_model.model.layers.25.self_attn.v_proj.weight,
+language_model.model.layers.26.self_attn.k_norm.weight,
+language_model.model.layers.26.self_attn.k_proj.biases,
+language_model.model.layers.26.self_attn.k_proj.scales,
+language_model.model.layers.26.self_attn.k_proj.weight,
+language_model.model.layers.26.self_attn.v_proj.biases,
+language_model.model.layers.26.self_attn.v_proj.scales,
+language_model.model.layers.26.self_attn.v_proj.weight,
+language_model.model.layers.27.self_attn.k_norm.weight,
+language_model.model.layers.27.self_attn.k_proj.biases,
+language_model.model.layers.27.self_attn.k_proj.scales,
+language_model.model.layers.27.self_attn.k_proj.weight,
+language_model.model.layers.27.self_attn.v_proj.biases,
+language_model.model.layers.27.self_attn.v_proj.scales,
+language_model.model.layers.27.self_attn.v_proj.weight,
+language_model.model.layers.28.self_attn.k_norm.weight,
+language_model.model.layers.28.self_attn.k_proj.biases,
+language_model.model.layers.28.self_attn.k_proj.scales,
+language_model.model.layers.28.self_attn.k_proj.weight,
+language_model.model.layers.28.self_attn.v_proj.biases,
+language_model.model.layers.28.self_attn.v_proj.scales,
+language_model.model.layers.28.self_attn.v_proj.weight,
+language_model.model.layers.29.self_attn.k_norm.weight,
+language_model.model.layers.29.self_attn.k_proj.biases,
+language_model.model.layers.29.self_attn.k_proj.scales,
+language_model.model.layers.29.self_attn.k_proj.weight,
+language_model.model.layers.29.self_attn.v_proj.biases,
+language_model.model.layers.29.self_attn.v_proj.scales,
+language_model.model.layers.29.self_attn.v_proj.weight,
+language_model.model.layers.30.self_attn.k_norm.weight,
+language_model.model.layers.30.self_attn.k_proj.biases,
+language_model.model.layers.30.self_attn.k_proj.scales,
+language_model.model.layers.30.self_attn.k_proj.weight,
+language_model.model.layers.30.self_attn.v_proj.biases,
+language_model.model.layers.30.self_attn.v_proj.scales,
+language_model.model.layers.30.self_attn.v_proj.weight,
+language_model.model.layers.31.self_attn.k_norm.weight,
+language_model.model.layers.31.self_attn.k_proj.biases,
+language_model.model.layers.31.self_attn.k_proj.scales,
+language_model.model.layers.31.self_attn.k_proj.weight,
+language_model.model.layers.31.self_attn.v_proj.biases,
+language_model.model.layers.31.self_attn.v_proj.scales,
+language_model.model.layers.31.self_attn.v_proj.weight,
+language_model.model.layers.32.self_attn.k_norm.weight,
+language_model.model.layers.32.self_attn.k_proj.biases,
+language_model.model.layers.32.self_attn.k_proj.scales,
+language_model.model.layers.32.self_attn.k_proj.weight,
+language_model.model.layers.32.self_attn.v_proj.biases,
+language_model.model.layers.32.self_attn.v_proj.scales,
+language_model.model.layers.32.self_attn.v_proj.weight,
+language_model.model.layers.33.self_attn.k_norm.weight,
+language_model.model.layers.33.self_attn.k_proj.biases,
+language_model.model.layers.33.self_attn.k_proj.scales,
+language_model.model.layers.33.self_attn.k_proj.weight,
+language_model.model.layers.33.self_attn.v_proj.biases,
+language_model.model.layers.33.self_attn.v_proj.scales,
+language_model.model.layers.33.self_attn.v_proj.weight,
+language_model.model.layers.34.self_attn.k_norm.weight,
+language_model.model.layers.34.self_attn.k_proj.biases,
+language_model.model.layers.34.self_attn.k_proj.scales,
+language_model.model.layers.34.self_attn.k_proj.weight,
+language_model.model.layers.34.self_attn.v_proj.biases,
+language_model.model.layers.34.self_attn.v_proj.scales,
+language_model.model.layers.34.self_attn.v_proj.weight,
+language_model.model.layers.35.self_attn.k_norm.weight,
+language_model.model.layers.35.self_attn.k_proj.biases,
+language_model.model.layers.35.self_attn.k_proj.scales,
+language_model.model.layers.35.self_attn.k_proj.weight,
+language_model.model.layers.35.self_attn.v_proj.biases,
+language_model.model.layers.35.self_attn.v_proj.scales,
+language_model.model.layers.35.self_attn.v_proj.weight,
+language_model.model.layers.36.self_attn.k_norm.weight,
+language_model.model.layers.36.self_attn.k_proj.biases,
+language_model.model.layers.36.self_attn.k_proj.scales,
+language_model.model.layers.36.self_attn.k_proj.weight,
+language_model.model.layers.36.self_attn.v_proj.biases,
+language_model.model.layers.36.self_attn.v_proj.scales,
+language_model.model.layers.36.self_attn.v_proj.weight,
+language_model.model.layers.37.self_attn.k_norm.weight,
+language_model.model.layers.37.self_attn.k_proj.biases,
+language_model.model.layers.37.self_attn.k_proj.scales,
+language_model.model.layers.37.self_attn.k_proj.weight,
+language_model.model.layers.37.self_attn.v_proj.biases,
+language_model.model.layers.37.self_attn.v_proj.scales,
+language_model.model.layers.37.self_attn.v_proj.weight,
+language_model.model.layers.38.self_attn.k_norm.weight,
+language_model.model.layers.38.self_attn.k_proj.biases,
+language_model.model.layers.38.self_attn.k_proj.scales,
+language_model.model.layers.38.self_attn.k_proj.weight,
+language_model.model.layers.38.self_attn.v_proj.biases,
+language_model.model.layers.38.self_attn.v_proj.scales,
+language_model.model.layers.38.self_attn.v_proj.weight,
+language_model.model.layers.39.self_attn.k_norm.weight,
+language_model.model.layers.39.self_attn.k_proj.biases,
+language_model.model.layers.39.self_attn.k_proj.scales,
+language_model.model.layers.39.self_attn.k_proj.weight,
+language_model.model.layers.39.self_attn.v_proj.biases,
+language_model.model.layers.39.self_attn.v_proj.scales,
+language_model.model.layers.39.self_attn.v_proj.weight,
+language_model.model.layers.40.self_attn.k_norm.weight,
+language_model.model.layers.40.self_attn.k_proj.biases,
+language_model.model.layers.40.self_attn.k_proj.scales,
+language_model.model.layers.40.self_attn.k_proj.weight,
+language_model.model.layers.40.self_attn.v_proj.biases,
+language_model.model.layers.40.self_attn.v_proj.scales,
+language_model.model.layers.40.self_attn.v_proj.weight,
+language_model.model.layers.41.self_attn.k_norm.weight,
+language_model.model.layers.41.self_attn.k_proj.biases,
+language_model.model.layers.41.self_attn.k_proj.scales,
+language_model.model.layers.41.self_attn.k_proj.weight,
+language_model.model.layers.41.self_attn.v_proj.biases,
+language_model.model.layers.41.self_attn.v_proj.scales,
+language_model.model.layers.41.self_attn.v_proj.weight.
+
+==================================================================
+MODEL: mlx-community/Phi-4-mini-instruct-8bit
+==================================================================
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 3806.08it/s]
+[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.
+  [PASS] coding         c_fib        '```python\ndef fib(n):\n    if n == 0:\n        return 0\n    elif n == 1:'
+  [PASS] coding         c_fix        'def add(a, b): return a + b'
+  [PASS] reasoning      r_syllogism  'YES'
+  [FAIL] reasoning      r_batball    '10 cents'
+  [PASS] orchestrating  o_plan       '```json\n{\n  "steps": [\n    "Design the API endpoints and define the da'
+  [PASS] orchestrating  o_tools      '```json\n{\n  "calls": [\n    {"tool": "search"},\n    {"tool": "read_file'
+  [PASS] reviewing      v_bug        'The code will raise a `ZeroDivisionError` when called with an empty li'
+  [PASS] reviewing      v_claim      'CONTRADICTED.'
+  [PASS] analysing      a_summary    'Cluster analysis organizes text for shared principles, reducing duplic'
+  [PASS] analysing      a_extract    '```json\n{"day": "Tuesday", "time": "3pm", "room": "Room 5"}\n```'
+
+==================================================================
+MODEL: lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+==================================================================
+Fetching 14 files:   0%|          | 0/14 [00:00<?, ?it/s]Fetching 14 files: 100%|██████████| 14/14 [00:00<00:00, 3236.88it/s]
+  [PASS] coding         c_fib        '```python\ndef fib(n):\n    if n <= 1:\n        return n\n    a, b = 0, 1\n'
+  [PASS] coding         c_fix        '```python\ndef add(a, b): return a + b\n```'
+  [PASS] reasoning      r_syllogism  'YES'
+  [PASS] reasoning      r_batball    '$0.05'
+  [PASS] orchestrating  o_plan       '{\n  "steps": [\n    "Define your API endpoints, resources, and HTTP met'
+  [PASS] orchestrating  o_tools      "I need to find and update a config file. Since you haven't specified w"
+  [PASS] reviewing      v_bug        'The function will raise a `ZeroDivisionError` when called with an empt'
+  [PASS] reviewing      v_claim      'CONTRADICTED\n\nThe function f(x) = x * 2 can return negative numbers (e'
+  [PASS] analysing      a_summary    'Cluster analysis groups similar text segments to extract shared princi'
+  [PASS] analysing      a_extract    '{"day": "Tuesday", "time": "3pm", "room": "Room 5"}'
+
+wrote /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/arm4_capabilities.json

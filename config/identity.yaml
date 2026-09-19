@@ -1,0 +1,48 @@
+# identity.yaml — the identity layer (D-271c). Single source of truth for HOW an object is
+# identified, renamed, merged and retired. Nothing here may be hardcoded in a script (C12).
+# Evidence for every number: scripts/identity_tax_ab_test.py (R5 gemma-4-E4B APPROVE, sha256_16 d89a44a21a1a8295)
+# and governance/DECISION_D271_IDENTITY_20260917.md.
+schema_version: "1.0"
+identity:
+  key: concept_id
+  mint_rule: "C + sha256('concept|' + fb_id_at_mint_time)[:16]"
+  stability: "minted ONCE; NEVER recomputed from mutable content"
+  legacy_key: fb_id            # content-derived sha256(name|definition) — demoted to an ALIAS
+  alias_types: [fb_id, label, external]
+  pref_label: "the ONE label a concept is displayed under"
+  alt_labels: "every historical/variant label; a rename appends the old pref_label"
+  reference_policy: "internal edges store concept_id; fb_id accepted on input, resolved via the alias table"
+  rename_freeze: true          # D-271c interim: NO renames until the layer exists
+  rename_freeze_scope: [fbs.name, discipline, domains, content_type]
+  retirement_policy: "retire = status + retired_at + superseded_by; rows are NEVER deleted (R-D410)"
+  merge_replacement: link      # D-271b: LINK supersedes MERGE
+link_policy:
+  marker_column: duplicate_of
+  semantics: "canonical concept_id of the representative row; the row itself is KEPT"
+  retrieval_filter: "status != 'QUARANTINE'"     # measured 2026-09-17: this is what ALREADY excludes linked rows
+  link_must_also_set: "status = QUARANTINE"      # REQUIRED pairing: duplicate_of has NO reader in pipeline/,
+                                                 # so a linked row without quarantine re-enters default retrieval
+  duplicate_of_reader: none                       # provenance pointer only; F-15-class consumer-less field (BUG-275)
+  merge_allowed_only_if: "human-adjudicated AND provenance recorded; never from a name rule (BUG-272)"
+  reversible: true
+name_markers:
+  pattern: '\s\(\d+\)$'   # single-quoted: YAML would read \s as an invalid escape in double quotes
+  measured_count: 41
+  policy: "a marker is a collision artefact, not a name: strip to pref_label + keep the marked form as alt_label"
+cross_reference_index: "required before any migration: an index on the edge columns so 164,202 edges stay resolvable"
+measured_2026_09_17:            # evidence, not configuration
+  objects: 7995
+  identity_keyed_edges: 164202
+  dangling_edges: 0
+  orphaned_edges_per_rename: 320
+  ambiguous_labels: 5
+  name_identical_clusters: 6
+  name_identical_rows: 12
+  flagged_semantic_groups: 273
+  flagged_member_rows: 662
+  rows_a_merge_would_delete: 389
+  disciplines: 62
+  domains: 44
+  collision_rows_discipline: 261
+  collision_rows_domain: 648
+  collision_rows_ambiguous_both: 167

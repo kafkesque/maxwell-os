@@ -1,0 +1,15 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+📋 Candidates: 5761 / 8402 records
+   before: {'empirical_pattern': 2066, 'normative_heuristic': 1993, 'descriptive_model': 3855, 'causal_mechanism': 488}
+   🚩 #2648 Extreme Customer Research Method: empirical_pattern → descriptive_model DISAGREED by cross-family (normative_heuristic) — flagged, not applied
+   🔁 #2686 City Hall Physical Design and Political : descriptive_model → causal_mechanism
+   🚩 #2716 Social Recognition Through Cash Signalin: empirical_pattern → descriptive_model DISAGREED by cross-family (empirical_pattern) — flagged, not applied
+   💾 checkpoint @ 100/8402 records
+   🚩 #2794 Prairie Lawyer Problem: descriptive_model → empirical_pattern DISAGREED by cross-family (descriptive_model) — flagged, not applied
+   🚩 #2812 AIMD Protocol: empirical_pattern → descriptive_model DISAGREED by cross-family (causal_mechanism) — flagged, not applied
+   🚩 #2834 Generalist's Faith in Disciplinary Conti: normative_heuristic → empirical_pattern DISAGREED by cross-family (causal_mechanism) — flagged, not applied
+   💾 checkpoint @ 200/8402 records
+   after : {'empirical_pattern': 2066, 'normative_heuristic': 1993, 'descriptive_model': 3854, 'causal_mechanism': 489}
+✅ Relabel done: changed 1, unchanged 194, failed 0, cross-family disagreements 5, cross-family failures 0
+   artifact: governance/relabel_report_20260917_123804.json

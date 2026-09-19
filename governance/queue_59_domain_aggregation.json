@@ -1,0 +1,1334 @@
+{
+  "checkpoint": "governance/queue_59_vote_checkpoint.jsonl",
+  "policy": "D2633: discipline unanimous-else-contested; domains overlap->UNION (incl. DeepSeek), disjoint->abstain",
+  "n_rows": 59,
+  "n_accept": 34,
+  "n_disc_unanimous": 36,
+  "n_contested": 23,
+  "domain_status_counts": {
+    "exact": 14,
+    "union": 40,
+    "disjoint": 4,
+    "abstain": 1
+  },
+  "verdicts": [
+    {
+      "fb_id": "03f5652ac402a3bc3028b789c7c4e3182efc21e52ca7a9f4195a53919ef09090",
+      "name": "Bullying and Revenge Violence Mechanism",
+      "discipline": "psychology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "social sciences"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "068767776869cbeff7651757a2b3c3e317bafc837c5edf8d29437d1ea0728244",
+      "name": "Futurist Kinetic Art Composition",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "arts & culture"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "0939198e2c8fc7022661ec5c80a01d51983317f40beffe0a8df9535e3cdf72f8",
+      "name": "Cultural Commodification Through Globalization",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "design strategy",
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "design strategy",
+        "marketing & communications"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "0abc28b0895d68edef708f62d10e1f714a5cf409b14e554b52e4688c6a04cee2",
+      "name": "Hyperreal Representation Through Integration",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "media & entertainment",
+        "motion design"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "media & entertainment",
+        "motion design"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "motion design"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "0dfad7493d5d790432cfc892eca4dd7fef1d2cf90593530d0512375f12c98fee",
+      "name": "Ai Data Poisoning Via Hidden Instructions",
+      "discipline": "information security",
+      "discipline_status": "unanimous",
+      "domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "1fca476af5bb48fb94d493c6ed3bfcd7f868162044551941794392536ef4782a",
+      "name": "Aesthetic Protection Through Legal Frameworks",
+      "discipline": "law",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "brand identity",
+        "design strategy",
+        "legal & public policy",
+        "product design"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "brand identity",
+        "legal & public policy",
+        "product design"
+      ],
+      "qwen_domains": [
+        "brand identity",
+        "design strategy",
+        "legal & public policy"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "16974d4bea26cf62a31d6ce772918fb7c37218d2d061f99c36f38a646cdf7551",
+      "name": "Data-driven Consumer Insights",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "data visualization",
+        "digital product",
+        "marketing & communications",
+        "research & methodology"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "marketing & communications",
+        "research & methodology"
+      ],
+      "qwen_domains": [
+        "data visualization",
+        "digital product",
+        "marketing & communications"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "1ff883b087722dc76e40aba32b7d9c063a4dbb0d11b51de2687a3280fd18b7f9",
+      "name": "Literacy's Impact on Cognitive Organization",
+      "discipline": "cognitive science",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "science & research",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "science & research",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "21f8783eb25d0044c41332c0aa80953581a29838b6c9f4914161b8491c018cbf",
+      "name": "Performance Variability in Poetry Recitation",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "arts & culture"
+      ],
+      "qwen_domains": [
+        "arts & culture"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "221f2984a0303fe317633b2498e9a6bf0580fb63f66ed9ade8913ec70424e24d",
+      "name": "Political Cartoon Effectiveness",
+      "discipline": "visual semiotics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "editorial & advertising",
+        "illustration",
+        "media & entertainment",
+        "semiotics & communication"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "editorial & advertising",
+        "illustration",
+        "media & entertainment",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "media & entertainment",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "29bcbc4ed90b0e49c73d08f0d5ec933eee69465a8c482cd8d040770a3c2ade38",
+      "name": "Prompt Injection Vulnerability",
+      "discipline": "information security",
+      "discipline_status": "unanimous",
+      "domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "344c267aadad9151debd442ce7e141110bd97af129e8dd876cea6b5a2a609c58",
+      "name": "Perseverance and Purpose-driven Action",
+      "discipline": "psychology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "leadership",
+        "personal productivity"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "personal productivity"
+      ],
+      "qwen_domains": [
+        "leadership",
+        "personal productivity"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "3e7dca1cc11f0dd415e5a034a1ce4c89412036503001eb7578d0eff5ade2a5e6",
+      "name": "Content Marketing Strategy",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "qwen_domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "4154453fab3744b96cf50fc586bfc44146344187158c1c995806b9257ec105e7",
+      "name": "Advertised Urgency and Emotional Manipulation",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "editorial & advertising",
+        "marketing & communications",
+        "user experience"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "editorial & advertising",
+        "marketing & communications"
+      ],
+      "qwen_domains": [
+        "marketing & communications",
+        "user experience"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "3edbe7eeb8ed07c277541c2e7fba848a644e39be3cbc4187de3fe9e8fe790747",
+      "name": "Accident Waiting to Happen",
+      "discipline": "systems thinking",
+      "discipline_status": "unanimous",
+      "domains": [
+        "design strategy",
+        "systems & frameworks"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "systems & frameworks"
+      ],
+      "qwen_domains": [
+        "design strategy",
+        "systems & frameworks"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "4ecec2eef0b367a7484bd450ea5aec63aa2e2a3a909fa2b269fbd71b7b840589",
+      "name": "Nash Equilibrium Strategy",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [],
+      "domain_status": "disjoint",
+      "deepseek_domains": [
+        "business development",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "design strategy"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "5be80313400e0a35d608edc9b8ebf49928d3aabd62e5593e238e328955928283",
+      "name": "Data-first Identity Transformation",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "ai & agents",
+        "data visualization",
+        "legal & public policy",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents",
+        "legal & public policy",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "data visualization"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "5cec0f484b31b7dc0cce0706f50a94e65055ef325408ddcb4bf58a340796441c",
+      "name": "K-shape Time Series Clustering Algorithm",
+      "discipline": "machine learning",
+      "discipline_status": "unanimous",
+      "domains": [],
+      "domain_status": "disjoint",
+      "deepseek_domains": [
+        "ai & agents",
+        "research & methodology"
+      ],
+      "qwen_domains": [
+        "code & computation",
+        "data visualization"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "5d8c7c9f4d4f7d8166f4729e688768d1612d606ae65655ef9f3658edce508f30",
+      "name": "Digital Signal Processing Sampling Rate",
+      "discipline": "engineering",
+      "discipline_status": "unanimous",
+      "domains": [],
+      "domain_status": "disjoint",
+      "deepseek_domains": [
+        "engineering & infrastructure"
+      ],
+      "qwen_domains": [
+        "engineering practice"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "60049c010f10728981416486e452edf5167446c1a68f4e803977886d953cf2b1",
+      "name": "Organizational Silos As Customer Experience Barriers",
+      "discipline": "organizational theory",
+      "discipline_status": "unanimous",
+      "domains": [
+        "business operations",
+        "design strategy",
+        "organizational behavior",
+        "user experience"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "business operations",
+        "design strategy",
+        "organizational behavior",
+        "user experience"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "organizational behavior",
+        "user experience"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "61385e868f602793893011219ac6ef86e4d107e562762c4eff1c5441a1c0cd0c",
+      "name": "Japanese Business Family Continuity Model",
+      "discipline": "organizational theory",
+      "discipline_status": "unanimous",
+      "domains": [
+        "business operations",
+        "entrepreneurship",
+        "organizational behavior"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "business operations",
+        "entrepreneurship",
+        "organizational behavior"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "organizational behavior"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "6332b8c2bada8976992b9f909094e650dfbe9fe9d7bd94b8d1dc5d15581bc8c7",
+      "name": "Sales Process Misalignment",
+      "discipline": "organizational theory",
+      "discipline_status": "unanimous",
+      "domains": [
+        "business development",
+        "business operations",
+        "organizational behavior"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "business development",
+        "organizational behavior"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "organizational behavior"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "69114ebaff7ff546719f5536e0a8f2e879a3e56f8ec8d3e4b3798bd890a03f9a",
+      "name": "User Flow Path Diversity",
+      "discipline": "human-computer interaction",
+      "discipline_status": "unanimous",
+      "domains": [
+        "digital product",
+        "information architecture",
+        "user experience",
+        "web & ui"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "digital product",
+        "information architecture",
+        "user experience",
+        "web & ui"
+      ],
+      "qwen_domains": [
+        "digital product",
+        "information architecture",
+        "user experience"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "7469f92ac6f42fbc89cdf0fb1dbb35d85cb23fbd48b831ad71108e81e5eb96e2",
+      "name": "Creative Destruction Process",
+      "discipline": "economics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "business development",
+        "business operations",
+        "design strategy",
+        "entrepreneurship",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "business development",
+        "entrepreneurship",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "design strategy",
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "762cf2860bb39b28e4d60e76c980911bedd3809e6a5acdca430a19cb634588c4",
+      "name": "Symbolic Pattern Recognition",
+      "discipline": "cognitive science",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "science & research",
+        "semiotics & communication"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "arts & culture",
+        "science & research",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "science & research",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "75adb4501576cee62206410811317d5519a4b377de33eb866dfb2ef09bb7aef5",
+      "name": "Alpha State Thinking and Creative Problem-solving",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "creative technology",
+        "design strategy",
+        "personal productivity",
+        "product design",
+        "user experience"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "creative technology",
+        "design strategy",
+        "personal productivity",
+        "product design",
+        "user experience"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "design strategy"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "7e0963a36d8a53272f5a00bfefa5e291cccb8ac3460837917e02c23afcb4b973",
+      "name": "Operator Figure in Surgical and Artistic Practice",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "health & wellness",
+        "media & entertainment"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "health & wellness",
+        "media & entertainment"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "health & wellness"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "8cb010f3ab12766c548647377c73e9214e43d6ccaaed6351b8771a886dc90324",
+      "name": "Linear Time As Cultural Construct",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "7ff8ebeae91a8abc03b73bb969c186d6d4227b980b1c26def16cb4e68cd11bde",
+      "name": "Kolmogorov Σ-field Properties",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [],
+      "domain_status": "abstain",
+      "deepseek_domains": [],
+      "qwen_domains": [
+        "research & methodology"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "958db202fdfdcb3fe78ef3518fa837781367063432341e79526535804e111dfa",
+      "name": "Shader Variable Communication",
+      "discipline": "computer graphics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "code & computation",
+        "creative technology",
+        "engineering practice",
+        "media & entertainment"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "code & computation",
+        "engineering practice",
+        "media & entertainment"
+      ],
+      "qwen_domains": [
+        "code & computation",
+        "creative technology"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "98c895d31e6141954dddc4866bb585cfbbf25c310b236eee00b7eca2db457c08",
+      "name": "Quantum Theory and Semiotic Modeling",
+      "discipline": "semiotics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "science & research",
+        "semiotics & communication"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "science & research",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "science & research",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "9a73f3e4dc1b63cd522af6c002a81e07c65e945b51eeb7908d052c89b6a202fd",
+      "name": "Global Youth Marketing and Media Consumption",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "9e5d0a00f8a7392b50a1bae130c0ed79cf97c46be6cb28854b3f664f188ae829",
+      "name": "Philosophical Assumptions in Qualitative Research",
+      "discipline": "research methodology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "education",
+        "research & methodology",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "education",
+        "research & methodology",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "research & methodology"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "a04ccef40381145cd554358769455e518422bb68958d3d115ea1d7dade6dddcd",
+      "name": "Big Data and Networked Products Business Model",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [],
+      "domain_status": "disjoint",
+      "deepseek_domains": [
+        "business development",
+        "engineering & infrastructure",
+        "systems & frameworks"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "data visualization",
+        "digital product"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "a3776fdbd9f2cb59732f5bcbbd3093eb54569826f1ec368b0f38ee9fcda5e094",
+      "name": "Three-dimensional Information Visualization Methods",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "data visualization",
+        "information architecture"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "data visualization"
+      ],
+      "qwen_domains": [
+        "data visualization",
+        "information architecture"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "a8ac4a952d56a4ac5fa78a5bd33ac4c47ffc7e451591e4de7375d4b71907faf1",
+      "name": "Analytics-driven Customer Experience",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "ai & agents",
+        "business operations",
+        "data visualization",
+        "marketing & communications",
+        "user experience"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents",
+        "business operations",
+        "marketing & communications",
+        "user experience"
+      ],
+      "qwen_domains": [
+        "business operations",
+        "data visualization",
+        "user experience"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "a6657bc0ade38986274acf617f469c46a2b824e86dcef519702f9aec1f11ef2c",
+      "name": "Post-positivist Economics Rejection",
+      "discipline": "economics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "research & methodology",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "research & methodology",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "aa77b4b742ca8db75c93e2e42c7dc01f7dcbb5e62f78edefff7a7f350c37feda",
+      "name": "Brain Energy Metabolism and Survival Mechanisms",
+      "discipline": "neuroscience",
+      "discipline_status": "unanimous",
+      "domains": [
+        "health & wellness",
+        "science & research"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "health & wellness",
+        "science & research"
+      ],
+      "qwen_domains": [
+        "health & wellness",
+        "science & research"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "b3147676094702e0f58897fd70a61db13f7e4dcff913c1b09739ec8ebb8c9865",
+      "name": "Mass Psychology and Social Engineering",
+      "discipline": "psychology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "marketing & communications",
+        "media & entertainment",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "marketing & communications",
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "b71b1e7e81647808553e0716f67c5438f6d9f3ebfcb01679f575de636acd8c16",
+      "name": "Design Review Resistance Pattern",
+      "discipline": "organizational theory",
+      "discipline_status": "unanimous",
+      "domains": [
+        "design strategy",
+        "digital product",
+        "engineering practice",
+        "organizational behavior",
+        "product design",
+        "project management"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "design strategy",
+        "digital product",
+        "engineering practice",
+        "organizational behavior",
+        "project management"
+      ],
+      "qwen_domains": [
+        "design strategy",
+        "engineering practice",
+        "product design"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "ba4fe7928c859536ab3e7e56a24255fd9d631bd3897fa969f7732feff9f63bbd",
+      "name": "Ai Application Design Complexity",
+      "discipline": "artificial intelligence",
+      "discipline_status": "unanimous",
+      "domains": [
+        "ai & agents",
+        "design systems",
+        "engineering practice",
+        "systems & frameworks"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents",
+        "engineering practice",
+        "systems & frameworks"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "design systems",
+        "engineering practice"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "beeb1d3232b81a421dc2e1cd584b8fbd9620a006966de9c8288ee769cccc6c58",
+      "name": "Information Architecture Hierarchy",
+      "discipline": "information science",
+      "discipline_status": "unanimous",
+      "domains": [
+        "digital product",
+        "information architecture",
+        "user experience",
+        "web & ui"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "digital product",
+        "information architecture",
+        "user experience"
+      ],
+      "qwen_domains": [
+        "information architecture",
+        "user experience",
+        "web & ui"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "c49bf51c04d389cc62ec1945fc9ba66b907dc54233b429f803da4ca2e36fbe41",
+      "name": "Geometric Progression in Epidemics",
+      "discipline": "systems thinking",
+      "discipline_status": "unanimous",
+      "domains": [
+        "finance & investment",
+        "health & wellness",
+        "science & research",
+        "systems & frameworks"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "finance & investment",
+        "health & wellness",
+        "systems & frameworks"
+      ],
+      "qwen_domains": [
+        "health & wellness",
+        "science & research"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "c4d7b9f2333744e6806c38e0a499c58a3cebf828312ac17976b620d893e78ab3",
+      "name": "Human Exploration Drive",
+      "discipline": "psychology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "entrepreneurship",
+        "science & research",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "entrepreneurship",
+        "science & research",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "c7bcc452e5f0bce1ad52d7d3cdae465142ef916d917a32b9f44ae33d55e9b0d2",
+      "name": "Message-first Approach in Infographic Design",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "data visualization",
+        "graphic design",
+        "semiotics & communication"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "data visualization",
+        "graphic design",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "data visualization",
+        "graphic design"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "ca43060ed756f67ee93c81b506fa505170cff8d5f37cca43ee8b247c59883e08",
+      "name": "Serpent As Symbolic Archetype",
+      "discipline": "semiotics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "cd52ed6d07766dc1a7a2ba8add9e310155c4384e71692f94667159d44cab3499",
+      "name": "Axis Mundi Symbolism",
+      "discipline": "semiotics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "semiotics & communication",
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "cdccfff0018f4f2780e4ce3ef144c94fc7a3cc285882b44e2b02e1a8091194a3",
+      "name": "Indexical Markers of Selfhood",
+      "discipline": "semiotics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "d43ad43d62399b17495758c2238bfef221ab354516cae19955d6ef00340ea305",
+      "name": "Dada Movement's Artistic Philosophy",
+      "discipline": "aesthetics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "arts & culture"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "arts & culture"
+      ],
+      "qwen_domains": [
+        "arts & culture"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "d4e02724b21adc6a63028e5ac005dc54e36e3b01f329bd105929cc76855287ea",
+      "name": "Disposition Effect in Financial Decision Making",
+      "discipline": "behavioral economics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "finance & investment"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "finance & investment"
+      ],
+      "qwen_domains": [
+        "finance & investment"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "d9c746b79e65b8f9b405efab106faae05e8c2180b16a901731585927a5789f82",
+      "name": "Visual Hierarchy Through Layout Sequence",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "editorial & advertising",
+        "graphic design",
+        "web & ui"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "editorial & advertising",
+        "graphic design"
+      ],
+      "qwen_domains": [
+        "editorial & advertising",
+        "graphic design",
+        "web & ui"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "dd4d6990d39233b6378a07c69741c7338bad6832c392aa82b21a46731e2778e9",
+      "name": "Creative Business Playbook",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "business development",
+        "design strategy",
+        "entrepreneurship",
+        "product design"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "design strategy",
+        "entrepreneurship",
+        "product design"
+      ],
+      "qwen_domains": [
+        "business development",
+        "design strategy",
+        "entrepreneurship"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "df0bed9ae0dd71f07edc29b66dec99b2eda75d52c5f49ae903aaeac454d498f7",
+      "name": "Constructivist Visual Language",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "brand identity",
+        "editorial & advertising",
+        "graphic design",
+        "semiotics & communication"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "arts & culture",
+        "editorial & advertising",
+        "graphic design",
+        "semiotics & communication"
+      ],
+      "qwen_domains": [
+        "brand identity",
+        "editorial & advertising",
+        "graphic design"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "e3660ea34287d9fee53a1ed0b4702cef922def73c961097cdcd5302186cdfab3",
+      "name": "Personality Trait Classification",
+      "discipline": "psychology",
+      "discipline_status": "unanimous",
+      "domains": [
+        "social sciences"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "social sciences"
+      ],
+      "qwen_domains": [
+        "social sciences"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "ea4b2d0b0c49e87a0a0676ac223525cb39874c1820e8456467c65aefe0f7a7ef",
+      "name": "Seki Saba Branding Effect",
+      "discipline": "behavioral economics",
+      "discipline_status": "unanimous",
+      "domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "qwen_domains": [
+        "brand identity",
+        "marketing & communications"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "f51824e553b2cce5202af6dbf6491362787e6e57e4dae27b4c6fad003d9d44c0",
+      "name": "Modular Text Representation and Retrieval",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "ai & agents",
+        "code & computation",
+        "engineering practice"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "code & computation"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "f6d6d89adee1d12ab8123af383eeaa3d39c35461642f2587860c38942dce7116",
+      "name": "Cultural Synthesis in Motion Design",
+      "discipline": null,
+      "discipline_status": "contested",
+      "domains": [
+        "arts & culture",
+        "motion design"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "arts & culture",
+        "motion design"
+      ],
+      "qwen_domains": [
+        "arts & culture",
+        "motion design"
+      ],
+      "accept": false,
+      "needs_review": true
+    },
+    {
+      "fb_id": "fa68d6eaed6580aab9f1a555696cc23e60b8fcfa40bb58c0f9718305154ba002",
+      "name": "Symptom-sign Equivalence",
+      "discipline": "health & medicine",
+      "discipline_status": "unanimous",
+      "domains": [
+        "health & wellness"
+      ],
+      "domain_status": "exact",
+      "deepseek_domains": [
+        "health & wellness"
+      ],
+      "qwen_domains": [
+        "health & wellness"
+      ],
+      "accept": true,
+      "needs_review": false
+    },
+    {
+      "fb_id": "fd1289209f64d1e2a78b6ee33e38c3a3cf1d3419e3a821947e85033032c5215a",
+      "name": "Rag Framework Dependency Management",
+      "discipline": "software engineering",
+      "discipline_status": "unanimous",
+      "domains": [
+        "ai & agents",
+        "code & computation",
+        "engineering practice"
+      ],
+      "domain_status": "union",
+      "deepseek_domains": [
+        "ai & agents",
+        "code & computation",
+        "engineering practice"
+      ],
+      "qwen_domains": [
+        "ai & agents",
+        "engineering practice"
+      ],
+      "accept": true,
+      "needs_review": false
+    }
+  ],
+  "schema_version": "3.0",
+  "gen_model": "aggregate_domain_votes.py (deterministic; no generation)",
+  "pipeline_commit": "v3.0-D2485"
+}

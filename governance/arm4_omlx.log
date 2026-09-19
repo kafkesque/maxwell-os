@@ -1,0 +1,36 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+==================================================================
+MODEL (OMLX): gpt-oss-20b-MXFP4-Q8
+==================================================================
+  [PASS] coding         c_fib      '```python\ndef fib(n: int) -> int:\n    """Return the nth Fibonacci'
+  [PASS] coding         c_fix      'def add(a, b): return a + b'
+  [PASS] reasoning      r_syllogism 'YES'
+  [PASS] reasoning      r_batball  '$0.05'
+  [PASS] orchestrating  o_plan     '{"steps":["Define the API requirements and design the endpoints, '
+  [FAIL] orchestrating  o_tools    ''
+  [PASS] reviewing      v_bug      'Calling `avg([])` raises a `ZeroDivisionError` because it attempt'
+  [PASS] reviewing      v_claim    'CONTRADICTED'
+  [PASS] analysing      a_summary  'Cluster analysis groups similar text, extracts shared principles '
+  [PASS] analysing      a_extract  '{"day":"Tuesday","time":"3pm","room":"Room 5"}'
+  [classify] discipline_acc=0.850 domain_f1=0.482 n=20
+  [extract] valid=4/6 (FB=5 NULL=1)
+
+==================================================================
+MODEL (OMLX): Qwen3.8-27B-MLX-4bit
+==================================================================
+  [PASS] coding         c_fib      '```python\ndef fib(n):\n    if n < 0:\n        raise ValueError("n m'
+  [PASS] coding         c_fix      '`def add(a, b): return a + b`'
+  [PASS] reasoning      r_syllogism 'YES'
+  [PASS] reasoning      r_batball  '$0.05'
+  [PASS] orchestrating  o_plan     '{\n  "steps": [\n    "Define the API contract by specifying endpoin'
+  [PASS] orchestrating  o_tools    '{"calls": [{"tool": "search"}, {"tool": "read_file"}, {"tool": "w'
+  [PASS] reviewing      v_bug      'The function raises a `ZeroDivisionError` because dividing by `le'
+  [PASS] reviewing      v_claim    'CONTRADICTED'
+  [PASS] analysing      a_summary  'Cluster analysis groups similar text segments to extract shared p'
+  [PASS] analysing      a_extract  '{\n  "day": "Tuesday",\n  "time": "3pm",\n  "room": "Room 5"\n}'
+  [classify] discipline_acc=0.800 domain_f1=0.736 n=30
+  [extract] valid=6/6 (FB=5 NULL=1)
+
+wrote /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/arm4_omlx.json

@@ -1,0 +1,8 @@
+# generated from live oMLX registry
+Ornith-1.5-35B-A3B-REAP-19B
+Ornith-1.5-9B-OptiQ-4bit
+Phi-4-mini-instruct-8bit
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+Qwen3.8-27B-MLX-4bit
+gemma-4-E4B-it-MLX-4bit
+gpt-oss-20b-MXFP4-Q8

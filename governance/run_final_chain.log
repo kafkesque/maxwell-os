@@ -1,0 +1,138 @@
+[final] START — waiting for the Ornith 4bit/8bit A/B  2026-09-16 15:34:37
+[final] step1 gap-fill 45 errored rows -> REAP + gpt-oss (gemma-4-12B dropped: deleted)  2026-09-16 16:12:38
+[final] step1 done  2026-09-16 16:12:39
+[final] step2 Run B — long-context (niah + lc_reasoning) on the 5 keepers  2026-09-16 16:12:39
+[final] step2 done  2026-09-16 18:18:58
+[final] step3 production-path S4 vs gold (LEVER 1: 60 rows)  2026-09-16 18:18:58
+[final] step3 done  2026-09-16 20:09:14
+[final] step4 register OptiQ (symlink + reload — safe: nothing else running)  2026-09-16 20:09:14
+[final] step4 done  2026-09-16 20:09:21
+[final] step5 Qwen3.8 uniform-4bit vs OptiQ — the quant decision  2026-09-16 20:09:21
+scripts/run_final_chain.sh: line 46: 33288 Terminated: 15          python3 tools/model_eval_suite.py --models-file governance/eval_models_qwen38_quant.txt --suites voting humaneval mbpp hardcode delegation ifeval planning toolcalling > governance/model_eval_qwen38_ab.log 2>&1
+[final] step5 done  2026-09-16 22:37:46
+[final] step6 production S4 for OptiQ (60 rows)  2026-09-16 22:37:46
+[final] step6 done  2026-09-16 22:37:47
+[final] step7 vision probe on 3 installed models (zero download)  2026-09-16 22:37:47
+[final] step7 done  2026-09-16 22:37:47
+[final] step8 Tier-1 completeness: abstain (fail-closed) + OptiQ long-context  2026-09-16 22:37:47
+[final] step8 done  2026-09-16 23:16:26
+[final] ALL DONE — consolidation-ready  2026-09-16 23:16:26
+rompts
+
+model                                stability toolcalli  planning reviewing  hardcode      mbpp humaneval  mmlu_pro     gsm8k   math500    ifeval lc_reason      niah
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Ornith-1.5-35B-A3B-REAP-19B                0.2       1.0       1.0      0.83       1.0       0.6      0.56        --        --        --      0.84       0.5       1.0
+Ornith-1.5-9B-MLX-8bit                     0.3       0.5       1.0      0.83       1.0      0.52       0.8      0.12      0.96      0.68      0.92        --        --
+Phi-4-mini-instruct-8bit                   0.5      0.25       1.0      0.83       0.5      0.48      0.52        --        --        --      0.92        --        --
+Qwen3-Coder-30B-A3B-Instruct-MLX-4b        0.5      0.75      0.67      0.83       1.0      0.68       0.8        --        --        --      0.96       0.0       1.0
+Qwen3.8-27B-MLX-4bit                       0.6      0.75      0.67       1.0       1.0      0.56      0.96        --        --        --       1.0       1.0       1.0
+gemma-4-E4B-it-MLX-4bit                    0.7      0.25       1.0      0.83       0.5      0.44      0.16        --        --        --       1.0       0.0       1.0
+gpt-oss-20b-MXFP4-Q8                       0.2       0.0       1.0      0.83       1.0      0.56      0.88        --        --        --      0.88        --        --
+
+Per-suite detail (n, median latency s, transport errors)
+------------------------------------------------------------------------------
+  Ornith-1.5-35B-A3B-REAP-19B        stability     acc=0.2    n=30   med=1.2    s
+  Ornith-1.5-35B-A3B-REAP-19B        toolcalling   acc=1.0    n=4    med=3.0    s
+  Ornith-1.5-35B-A3B-REAP-19B        planning      acc=1.0    n=3    med=14.0   s
+  Ornith-1.5-35B-A3B-REAP-19B        reviewing     acc=0.833  n=6    med=4.7    s
+  Ornith-1.5-35B-A3B-REAP-19B        hardcode      acc=1.0    n=4    med=5.8    s
+  Ornith-1.5-35B-A3B-REAP-19B        mbpp          acc=0.6    n=25   med=3.4    s
+  Ornith-1.5-35B-A3B-REAP-19B        humaneval     acc=0.56   n=25   med=8.5    s
+  Ornith-1.5-35B-A3B-REAP-19B        ifeval        acc=0.84   n=25   med=11.6   s
+  Ornith-1.5-35B-A3B-REAP-19B        lc_reasoning  acc=0.5    n=6    med=83.3   s
+  Ornith-1.5-35B-A3B-REAP-19B        niah          acc=1.0    n=9    med=32.5   s
+  Ornith-1.5-9B-MLX-8bit             stability     acc=0.3    n=30   med=2.3    s
+  Ornith-1.5-9B-MLX-8bit             toolcalling   acc=0.5    n=4    med=7.4    s
+  Ornith-1.5-9B-MLX-8bit             planning      acc=1.0    n=3    med=25.1   s
+  Ornith-1.5-9B-MLX-8bit             reviewing     acc=0.833  n=6    med=9.5    s
+  Ornith-1.5-9B-MLX-8bit             hardcode      acc=1.0    n=4    med=15.6   s
+  Ornith-1.5-9B-MLX-8bit             mbpp          acc=0.52   n=25   med=5.6    s
+  Ornith-1.5-9B-MLX-8bit             humaneval     acc=0.8    n=25   med=18.3   s
+  Ornith-1.5-9B-MLX-8bit             mmlu_pro      acc=0.12   n=25   med=40.9   s
+  Ornith-1.5-9B-MLX-8bit             gsm8k         acc=0.96   n=25   med=17.9   s
+  Ornith-1.5-9B-MLX-8bit             math500       acc=0.68   n=25   med=25.4   s
+  Ornith-1.5-9B-MLX-8bit             ifeval        acc=0.92   n=25   med=19.3   s
+  Phi-4-mini-instruct-8bit           stability     acc=0.5    n=30   med=0.3    s
+  Phi-4-mini-instruct-8bit           toolcalling   acc=0.25   n=4    med=1.5    s
+  Phi-4-mini-instruct-8bit           planning      acc=1.0    n=3    med=5.0    s
+  Phi-4-mini-instruct-8bit           reviewing     acc=0.833  n=6    med=0.8    s
+  Phi-4-mini-instruct-8bit           hardcode      acc=0.5    n=4    med=3.5    s
+  Phi-4-mini-instruct-8bit           mbpp          acc=0.48   n=25   med=1.3    s
+  Phi-4-mini-instruct-8bit           humaneval     acc=0.52   n=25   med=1.7    s
+  Phi-4-mini-instruct-8bit           ifeval        acc=0.92   n=25   med=3.2    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 stability     acc=0.5    n=30   med=0.6    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 toolcalling   acc=0.75   n=4    med=1.8    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 planning      acc=0.667  n=3    med=10.0   s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 reviewing     acc=0.833  n=6    med=1.8    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 hardcode      acc=1.0    n=4    med=3.7    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 mbpp          acc=0.68   n=25   med=1.6    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 humaneval     acc=0.8    n=25   med=3.6    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 ifeval        acc=0.96   n=25   med=3.7    s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 lc_reasoning  acc=0.0    n=6    med=130.7  s
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 niah          acc=1.0    n=6    med=39.2   s
+  Qwen3.8-27B-MLX-4bit               stability     acc=0.6    n=30   med=2.3    s
+  Qwen3.8-27B-MLX-4bit               toolcalling   acc=0.75   n=4    med=7.4    s
+  Qwen3.8-27B-MLX-4bit               planning      acc=0.667  n=3    med=56.3   s
+  Qwen3.8-27B-MLX-4bit               reviewing     acc=1.0    n=6    med=6.4    s
+  Qwen3.8-27B-MLX-4bit               hardcode      acc=1.0    n=4    med=18.6   s
+  Qwen3.8-27B-MLX-4bit               mbpp          acc=0.56   n=25   med=8.0    s
+  Qwen3.8-27B-MLX-4bit               humaneval     acc=0.96   n=25   med=19.0   s
+  Qwen3.8-27B-MLX-4bit               ifeval        acc=1.0    n=25   med=16.7   s
+  Qwen3.8-27B-MLX-4bit               lc_reasoning  acc=1.0    n=6    med=361.5  s
+  Qwen3.8-27B-MLX-4bit               niah          acc=1.0    n=9    med=147.3  s
+  gemma-4-E4B-it-MLX-4bit            stability     acc=0.7    n=30   med=0.5    s
+  gemma-4-E4B-it-MLX-4bit            toolcalling   acc=0.25   n=4    med=2.1    s
+  gemma-4-E4B-it-MLX-4bit            planning      acc=1.0    n=3    med=18.9   s
+  gemma-4-E4B-it-MLX-4bit            reviewing     acc=0.833  n=6    med=1.0    s
+  gemma-4-E4B-it-MLX-4bit            hardcode      acc=0.5    n=4    med=4.7    s
+  gemma-4-E4B-it-MLX-4bit            mbpp          acc=0.44   n=25   med=1.9    s
+  gemma-4-E4B-it-MLX-4bit            humaneval     acc=0.16   n=25   med=3.3    s
+  gemma-4-E4B-it-MLX-4bit            ifeval        acc=1.0    n=25   med=1.9    s
+  gemma-4-E4B-it-MLX-4bit            lc_reasoning  acc=0.0    n=6    med=47.2   s
+  gemma-4-E4B-it-MLX-4bit            niah          acc=1.0    n=6    med=17.1   s
+  gpt-oss-20b-MXFP4-Q8               stability     acc=0.2    n=30   med=1.4    s
+  gpt-oss-20b-MXFP4-Q8               toolcalling   acc=0.0    n=4    med=3.0    s
+  gpt-oss-20b-MXFP4-Q8               planning      acc=1.0    n=3    med=9.5    s
+  gpt-oss-20b-MXFP4-Q8               reviewing     acc=0.833  n=6    med=4.8    s
+  gpt-oss-20b-MXFP4-Q8               hardcode      acc=1.0    n=4    med=8.0    s
+  gpt-oss-20b-MXFP4-Q8               mbpp          acc=0.56   n=25   med=5.6    s
+  gpt-oss-20b-MXFP4-Q8               humaneval     acc=0.88   n=25   med=8.4    s
+  gpt-oss-20b-MXFP4-Q8               ifeval        acc=0.88   n=25   med=12.4   s
+
+Long-context — niah (by prompt size; n in brackets; errors excluded)
+------------------------------------------------------------------------------
+model                                    4000tok      16000tok      32000tok
+----------------------------------------------------------------------------
+Ornith-1.5-35B-A3B-REAP-19B              1.0 (3)       1.0 (3)       1.0 (3)
+Qwen3-Coder-30B-A3B-Instruct-MLX-        1.0 (3)       1.0 (3)            --
+Qwen3.8-27B-MLX-4bit                     1.0 (3)       1.0 (3)       1.0 (3)
+gemma-4-E4B-it-MLX-4bit                  1.0 (3)       1.0 (3)            --
+
+Long-context — lc_reasoning (by prompt size; n in brackets; errors excluded)
+------------------------------------------------------------------------------
+model                                   16000tok
+------------------------------------------------
+Ornith-1.5-35B-A3B-REAP-19B              0.5 (6)
+Qwen3-Coder-30B-A3B-Instruct-MLX-        0.0 (6)
+Qwen3.8-27B-MLX-4bit                     1.0 (6)
+gemma-4-E4B-it-MLX-4bit                  0.0 (6)
+
+Stability — self-agreement across 3 identical repeats
+------------------------------------------------------------------------------
+  Ornith-1.5-35B-A3B-REAP-19B        unanimous 10/10
+  Ornith-1.5-9B-MLX-8bit             unanimous 10/10
+  Phi-4-mini-instruct-8bit           unanimous 10/10
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4 unanimous 10/10
+  Qwen3.8-27B-MLX-4bit               unanimous 10/10
+  gemma-4-E4B-it-MLX-4bit            unanimous 10/10
+  gpt-oss-20b-MXFP4-Q8               unanimous 10/10
+
+PRUNED — historical rows only, NOT in the portfolio (do not quote as a candidate)
+------------------------------------------------------------------------------
+  Ornith-1.5-9B-OptiQ-4bit           rows=197   transport_err=15   suites=stability,toolcalling,planning,reviewing,hardcode,mbpp,humaneval,mmlu_pro,gsm8k,math500,ifeval
+  Qwen3.8-27B-OptiQ-4bit             rows=0     transport_err=0    suites=
+  gemma-4-12B-it-qat-OptiQ-4bit      rows=122   transport_err=0    suites=stability,toolcalling,planning,reviewing,hardcode,mbpp,humaneval,ifeval
+  granite-4.2-8b-MLX-8bit            rows=116   transport_err=0    suites=stability,toolcalling,planning,hardcode,mbpp,humaneval,ifeval
+
+wrote governance/model_eval_report.md
+[final] ALL DONE — consolidation-ready  2026-09-16 23:16:26

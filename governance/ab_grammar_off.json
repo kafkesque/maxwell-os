@@ -1,0 +1,188 @@
+{
+  "n": 30,
+  "valid_json": 30,
+  "valid_rate": 1.0,
+  "avg_latency_s": 23.0,
+  "results": [
+    {
+      "name": "Chroma Subsampling Optimization",
+      "valid_json": true,
+      "latency_s": 32.7,
+      "status": "ok"
+    },
+    {
+      "name": "Reciprocity as Influence Mechanism",
+      "valid_json": true,
+      "latency_s": 24.1,
+      "status": "ok"
+    },
+    {
+      "name": "Socially Mediated Emotional Expression",
+      "valid_json": true,
+      "latency_s": 24.8,
+      "status": "ok"
+    },
+    {
+      "name": "Iterative Prompt Refinement",
+      "valid_json": true,
+      "latency_s": 25.4,
+      "status": "ok"
+    },
+    {
+      "name": "Metaphorical Game Framework",
+      "valid_json": true,
+      "latency_s": 24.0,
+      "status": "ok"
+    },
+    {
+      "name": "System Behavior Misinterpretation",
+      "valid_json": true,
+      "latency_s": 26.1,
+      "status": "ok"
+    },
+    {
+      "name": "Grid-Based Design Hierarchy",
+      "valid_json": true,
+      "latency_s": 24.6,
+      "status": "ok"
+    },
+    {
+      "name": "Systemic Reinforcement Of Problem Framing",
+      "valid_json": true,
+      "latency_s": 25.5,
+      "status": "ok"
+    },
+    {
+      "name": "Reference-Based Design Alignment",
+      "valid_json": true,
+      "latency_s": 22.0,
+      "status": "ok"
+    },
+    {
+      "name": "Aesthetic Semantic Necessity",
+      "valid_json": true,
+      "latency_s": 22.5,
+      "status": "ok"
+    },
+    {
+      "name": "Hierarchical Memory Architecture",
+      "valid_json": true,
+      "latency_s": 23.8,
+      "status": "ok"
+    },
+    {
+      "name": "Park24 Nondisruptive Market Creation",
+      "valid_json": true,
+      "latency_s": 21.4,
+      "status": "ok"
+    },
+    {
+      "name": "Human-Centered Design in Medical Imaging",
+      "valid_json": true,
+      "latency_s": 20.9,
+      "status": "ok"
+    },
+    {
+      "name": "Embracing Uncertainty in Entrepreneurship",
+      "valid_json": true,
+      "latency_s": 20.8,
+      "status": "ok"
+    },
+    {
+      "name": "E-newsletter as Electronic Proxy",
+      "valid_json": true,
+      "latency_s": 20.9,
+      "status": "ok"
+    },
+    {
+      "name": "Cultural Awareness in Client Research",
+      "valid_json": true,
+      "latency_s": 20.9,
+      "status": "ok"
+    },
+    {
+      "name": "Tree of Parzen Estimators (TPE)",
+      "valid_json": true,
+      "latency_s": 23.8,
+      "status": "ok"
+    },
+    {
+      "name": "Ironing Board Caddy Market Potential Survey",
+      "valid_json": true,
+      "latency_s": 21.1,
+      "status": "ok"
+    },
+    {
+      "name": "Participatory Democracy in Porto Alegre",
+      "valid_json": true,
+      "latency_s": 21.9,
+      "status": "ok"
+    },
+    {
+      "name": "Bayesian Updating for Red Ball Sampling",
+      "valid_json": true,
+      "latency_s": 23.1,
+      "status": "ok"
+    },
+    {
+      "name": "Jaccard Similarity Coefficient for Product Recommendation",
+      "valid_json": true,
+      "latency_s": 22.4,
+      "status": "ok"
+    },
+    {
+      "name": "Proactive Problem-Solving vs Reactive Complaints",
+      "valid_json": true,
+      "latency_s": 21.2,
+      "status": "ok"
+    },
+    {
+      "name": "Neglect of Silent Evidence in Talent Studies",
+      "valid_json": true,
+      "latency_s": 22.8,
+      "status": "ok"
+    },
+    {
+      "name": "Native American Language Writing Systems",
+      "valid_json": true,
+      "latency_s": 20.8,
+      "status": "ok"
+    },
+    {
+      "name": "Creative Design Through Movement and Rhythm",
+      "valid_json": true,
+      "latency_s": 23.6,
+      "status": "ok"
+    },
+    {
+      "name": "Khaki Uniform Adoption",
+      "valid_json": true,
+      "latency_s": 22.1,
+      "status": "ok"
+    },
+    {
+      "name": "Outcome Bias in Decision Evaluation",
+      "valid_json": true,
+      "latency_s": 21.3,
+      "status": "ok"
+    },
+    {
+      "name": "Smart Risk-Taking Framework",
+      "valid_json": true,
+      "latency_s": 20.8,
+      "status": "ok"
+    },
+    {
+      "name": "Junk Food Metabolism Hypothesis",
+      "valid_json": true,
+      "latency_s": 22.4,
+      "status": "ok"
+    },
+    {
+      "name": "Analytic-Synthetic Judgment Distinction",
+      "valid_json": true,
+      "latency_s": 22.2,
+      "status": "ok"
+    }
+  ]
+}

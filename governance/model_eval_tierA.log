@@ -1,0 +1,113 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== hardcode (4 items)
+  Ornith-1.5-9B-OptiQ-4bit                 hardcode      acc=0.75  n=4
+  Phi-4-mini-instruct-8bit                 hardcode      acc=0.5  n=4
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    hardcode      acc=1.0  n=4
+  Qwen3.8-27B-MLX-4bit                     hardcode      acc=1.0  n=4
+  gemma-4-12B-it-qat-OptiQ-4bit            hardcode      acc=0.75  n=4
+  gemma-4-E4B-it-MLX-4bit                  hardcode      acc=0.5  n=4
+  gpt-oss-20b-MXFP4-Q8                     hardcode      acc=1.0  n=4
+  granite-4.2-8b-MLX-8bit                  hardcode      acc=0.25  n=4
+
+=== mbpp (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 mbpp          acc=0.56  n=25
+  Phi-4-mini-instruct-8bit                 mbpp          acc=0.524  n=21  skipped=4
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    mbpp          acc=0.68  n=25
+  Qwen3.8-27B-MLX-4bit                     mbpp          acc=0.56  n=25
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== hardcode (4 items)
+  Ornith-1.5-35B-A3B-REAP-19B              hardcode      acc=1.0  n=4
+  Ornith-1.5-9B-OptiQ-4bit                 hardcode      acc=0.0  n=0  skipped=4
+  Phi-4-mini-instruct-8bit                 hardcode      acc=0.0  n=0  skipped=4
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    hardcode      acc=0.0  n=0  skipped=4
+  Qwen3.8-27B-MLX-4bit                     hardcode      acc=0.0  n=0  skipped=4
+  gemma-4-12B-it-qat-OptiQ-4bit            hardcode      acc=0.0  n=0  skipped=4
+  gemma-4-E4B-it-MLX-4bit                  hardcode      acc=0.0  n=0  skipped=4
+  gpt-oss-20b-MXFP4-Q8                     hardcode      acc=0.0  n=0  skipped=4
+  granite-4.2-8b-MLX-8bit                  hardcode      acc=0.0  n=0  skipped=4
+
+=== mbpp (25 items)
+  Ornith-1.5-35B-A3B-REAP-19B              mbpp          acc=0.6  n=25
+  Ornith-1.5-9B-OptiQ-4bit                 mbpp          acc=0.0  n=0  skipped=25
+  Phi-4-mini-instruct-8bit                 mbpp          acc=0.0  n=0  skipped=25
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    mbpp          acc=0.0  n=0  skipped=25
+  Qwen3.8-27B-MLX-4bit                     mbpp          acc=0.0  n=0  skipped=25
+  gemma-4-12B-it-qat-OptiQ-4bit            mbpp          acc=0.375  n=16  skipped=9
+  gemma-4-E4B-it-MLX-4bit                  mbpp          acc=0.44  n=25
+  gpt-oss-20b-MXFP4-Q8                     mbpp          acc=0.56  n=25
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== delegation (6 items)
+  Ornith-1.5-35B-A3B-REAP-19B              delegation    acc=0.667  n=6
+  Ornith-1.5-9B-OptiQ-4bit                 delegation    acc=0.667  n=6
+  Phi-4-mini-instruct-8bit                 delegation    acc=0.5  n=6
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    delegation    acc=0.833  n=6
+  Qwen3.8-27B-MLX-4bit                     delegation    acc=1.0  n=6
+  gemma-4-12B-it-qat-OptiQ-4bit            delegation    acc=0.5  n=6
+  gemma-4-E4B-it-MLX-4bit                  delegation    acc=1.0  n=6
+  gpt-oss-20b-MXFP4-Q8                     delegation    acc=0.833  n=6
+  granite-4.2-8b-MLX-8bit                  delegation    acc=0.167  n=6
+
+=== ifeval (25 items)
+  Ornith-1.5-35B-A3B-REAP-19B              ifeval        acc=0.84  n=25
+  Ornith-1.5-9B-OptiQ-4bit                 ifeval        acc=0.84  n=25
+  Phi-4-mini-instruct-8bit                 ifeval        acc=0.92  n=25
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    ifeval        acc=0.96  n=25
+  Qwen3.8-27B-MLX-4bit                     ifeval        acc=1.0  n=25
+  gemma-4-12B-it-qat-OptiQ-4bit            ifeval        acc=0.64  n=25
+  gemma-4-E4B-it-MLX-4bit                  ifeval        acc=1.0  n=25
+  gpt-oss-20b-MXFP4-Q8                     ifeval        acc=0.88  n=25
+  granite-4.2-8b-MLX-8bit                  ifeval        acc=0.56  n=25
+
+=== mbpp (25 items)
+  Ornith-1.5-35B-A3B-REAP-19B              mbpp          acc=0.0  n=0  skipped=25
+  Ornith-1.5-9B-OptiQ-4bit                 mbpp          acc=0.0  n=0  skipped=25
+  Phi-4-mini-instruct-8bit                 mbpp          acc=0.0  n=0  skipped=25
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    mbpp          acc=0.0  n=0  skipped=25
+  Qwen3.8-27B-MLX-4bit                     mbpp          acc=0.0  n=0  skipped=25
+  gemma-4-12B-it-qat-OptiQ-4bit            mbpp          acc=0.0  n=0  skipped=25
+  gemma-4-E4B-it-MLX-4bit                  mbpp          acc=0.0  n=0  skipped=25
+  gpt-oss-20b-MXFP4-Q8                     mbpp          acc=0.0  n=0  skipped=25
+  granite-4.2-8b-MLX-8bit                  mbpp          acc=0.45  n=20  skipped=5
+
+=== humaneval (25 items)
+  Ornith-1.5-35B-A3B-REAP-19B              humaneval     acc=0.56  n=25
+  Ornith-1.5-9B-OptiQ-4bit                 humaneval     acc=0.72  n=25
+  Phi-4-mini-instruct-8bit                 humaneval     acc=0.52  n=25
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    humaneval     acc=0.8  n=25
+  Qwen3.8-27B-MLX-4bit                     humaneval     acc=0.96  n=25
+  gemma-4-12B-it-qat-OptiQ-4bit            humaneval     acc=0.36  n=25
+  gemma-4-E4B-it-MLX-4bit                  humaneval     acc=0.16  n=25
+  gpt-oss-20b-MXFP4-Q8                     humaneval     acc=0.88  n=25
+  granite-4.2-8b-MLX-8bit                  humaneval     acc=0.24  n=25
+
+done in 9309s, 524 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== stability (30 items)
+  Ornith-1.5-35B-A3B-REAP-19B              stability     acc=0.2  n=30
+  gemma-4-12B-it-qat-OptiQ-4bit            stability     acc=0.0  n=0  skipped=30
+  gpt-oss-20b-MXFP4-Q8                     stability     acc=0.0  n=0  skipped=30
+
+=== toolcalling (4 items)
+  Ornith-1.5-35B-A3B-REAP-19B              toolcalling   acc=1.0  n=4
+  gemma-4-12B-it-qat-OptiQ-4bit            toolcalling   acc=0.0  n=0  skipped=4
+  gpt-oss-20b-MXFP4-Q8                     toolcalling   acc=0.0  n=0  skipped=4
+
+=== planning (3 items)
+  Ornith-1.5-35B-A3B-REAP-19B              planning      acc=1.0  n=3
+  gemma-4-12B-it-qat-OptiQ-4bit            planning      acc=0.0  n=0  skipped=3
+  gpt-oss-20b-MXFP4-Q8                     planning      acc=0.0  n=0  skipped=3
+
+=== reviewing (6 items)
+  Ornith-1.5-35B-A3B-REAP-19B              reviewing     acc=0.833  n=6
+  gemma-4-12B-it-qat-OptiQ-4bit            reviewing     acc=0.0  n=0  skipped=6
+  gpt-oss-20b-MXFP4-Q8                     reviewing     acc=1.0  n=1  skipped=5
+
+done in 134s, 44 new results

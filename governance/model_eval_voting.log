@@ -1,0 +1,28 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== voting (251 items)
+  gemma-4-E4B-it-MLX-4bit                  voting        acc=0.43  n=251
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    voting        acc=0.434  n=251
+  Ornith-1.5-35B-A3B-REAP-19B              voting        acc=0.0  n=251
+  gpt-oss-20b-MXFP4-Q8                     voting        acc=0.0  n=251
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== voting (251 items)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== voting (251 items)
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== voting (251 items)
+  gpt-oss-20b-MXFP4-Q8                     voting        acc=0.339  n=251
+  Ornith-1.5-35B-A3B-REAP-19B              voting        acc=0.283  n=251
+  Ornith-1.5-9B-OptiQ-4bit                 voting        acc=0.116  n=251
+  gemma-4-E4B-it-MLX-4bit                  voting        acc=0.422  n=251
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    voting        acc=0.454  n=251
+  Qwen3.8-27B-MLX-4bit                     voting        acc=0.709  n=251
+
+done in 17647s, 1506 new results

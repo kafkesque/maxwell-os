@@ -1,0 +1,15 @@
+{
+  "principle_rows": 6525,
+  "exact_dup_groups": 0,
+  "stem_collision_groups": 273,
+  "total_candidate_groups": 273,
+  "confirmed_stem_groups": 4,
+  "confirmed_stems": [
+    "foot in the door",
+    "foot-in-the-door",
+    "iterative refinement",
+    "responsible ai",
+    "responsible artificial intelligence",
+    "squash and stretch"
+  ]
+}

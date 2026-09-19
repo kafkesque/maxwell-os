@@ -1,0 +1,27 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+== s0_5_metadata (Phi-4-mini-instruct-8bit): 12 to do
+== s2_relabel (gpt-oss-20b-MXFP4-Q8): 12 to do
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+      ❄️  cold reload detected — waiting 45s for model re-warm
+== s4_5_skill (gpt-oss-20b-MXFP4-Q8): 12 to do
+
+STAGE PROBE — assigned model vs measured behaviour
+------------------------------------------------------------------------------------------------
+  s0_5_metadata   Phi-4-mini-instruct-8bit         n= 12 valid= 1.00 med=   2.2s  pair_hit=0.58 title_side=0.33
+  s2_relabel      gpt-oss-20b-MXFP4-Q8             n= 12 valid= 0.00 med=  51.0s
+      errors: 12 — e.g. RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-
+  s4_5_skill      gpt-oss-20b-MXFP4-Q8             n= 12 valid= 1.00 med=   3.2s  snake_case=0.00 declarative=1.00
+------------------------------------------------------------------------------------------------
+  NOTE: run this ONLY with no other oMLX consumer active (BUG-255: a model switch
+  evicts the single resident model and wedges the other client).

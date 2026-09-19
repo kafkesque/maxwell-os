@@ -64,7 +64,11 @@ from pipeline.schema_accessor import (
     fb_source_ids,
 )
 from pipeline.stamp import get_pipeline_commit, stamp_record
-from pipeline.schemas import validate_fb_content_type, validate_fb_depth  # D2616 Phase 0: runtime ontology boundary
+from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
+    validate_fb_content_type,
+    validate_fb_depth,
+    validate_discipline_domain,  # D2620/D2626: discipline<->domain non-contamination (fail-closed)
+)
 
 # ── SQLite schema ──────────────────────────────────────────────────────────
 
@@ -144,7 +148,8 @@ CREATE TABLE IF NOT EXISTS fbs (
     taxonomy_version TEXT,
     pipeline_run_id TEXT,
     created_at TEXT,
-    committed_at TEXT
+    committed_at TEXT,
+    duplicate_of TEXT            -- D2627: canonical fb_id when this row is a dedup (NULL otherwise); QUARANTINE = separate from main checkpoints, NEVER delete
 );
 """
 
@@ -275,6 +280,8 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # D2439: structural evidence tier (convergence axis) — auto-heal for pre-existing DBs
     _migrate_add_column(conn, "fbs", "is_convergent", "INTEGER DEFAULT 0")
     _migrate_add_column(conn, "fbs", "origin", "TEXT DEFAULT 'single_source'")
+    # D2627: dedup marker — canonical fb_id when this row is a duplicate (NULL otherwise)
+    _migrate_add_column(conn, "fbs", "duplicate_of", "TEXT")
     # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
     # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
     # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
@@ -388,6 +395,15 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     if dp is not None and dp != "" and validate_fb_depth(dp) is None:
         print(f"   ❌ insert_fb: invalid depth {dp!r} on {fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2616)")
         return False
+    # D2620/D2626: discipline<->domain non-contamination guard (fail-closed).
+    # A discipline that is a canonical DOMAIN, or a discipline inside the domain
+    # set, is a hard labeling error (D2422/BUG-151). Reject before INSERT so a
+    # crossed label can never be persisted silently.
+    dd_flags = validate_discipline_domain(fb_discipline(fb), fb_domains(fb))
+    if dd_flags:
+        print(f"   ❌ insert_fb: discipline<->domain contamination {dd_flags} on "
+              f"{fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2620)")
+        return False
     try:
         conn.execute("""
             INSERT OR REPLACE INTO fbs (
@@ -413,7 +429,8 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 needs_human_review, verifier_model,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
-                created_at, committed_at
+                created_at, committed_at,
+                duplicate_of
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
@@ -437,7 +454,8 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?,
                 ?, ?, ?,
                 ?, ?,
-                ?, ?
+                ?, ?,
+                ?
             )
         """, (
             _safe_str(fb_id(fb)),
@@ -519,6 +537,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("pipeline_run_id")),
             _safe_str(fb.get("created_at"), ""),
             datetime.now(UTC).isoformat(),
+            _safe_str(fb.get("duplicate_of")),  # D2627: canonical fb_id for dedup rows (NULL otherwise)
         ))
         return True
     except Exception as e:

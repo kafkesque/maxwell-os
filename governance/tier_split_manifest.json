@@ -2,29 +2,28 @@
   "schema_version": "3.0",
   "gen_model": "build_4axis_tiers.py (deterministic; no generation)",
   "pipeline_commit": "v3.0-D2618-p0",
-  "created_at": "2026-09-13T20:47:23.947422+00:00",
+  "created_at": "2026-09-14T22:45:02.263121+00:00",
   "input": "governance/verified_core.jsonl",
   "input_rows": 443,
   "tier_counts": {
-    "gold_4axis": 76,
-    "pending_4axis": 294,
-    "silver_4axis": 73
+    "gold_4axis": 251,
+    "pending_4axis": 169,
+    "silver_4axis": 23
   },
   "gold_content_type_distribution": {
-    "principle": 52,
-    "noise_drop": 18,
-    "quarantine": 1,
+    "principle": 234,
+    "quarantine": 3,
+    "noise_drop": 9,
     "tool_instruction": 1,
-    "process_template": 2,
-    "process_instance": 1,
+    "process_template": 3,
     "growth_edge": 1
   },
   "silver_axis_breakdown": {
-    "disc:golden-silver + dom:golden-silver": 59,
-    "ct:golden + depth:golden-silver": 4,
-    "ct:golden": 4,
-    "depth:golden-silver + disc:golden-silver + dom:golden-silver": 3,
-    "depth:golden-silver": 3
+    "disc:golden-silver + dom:golden-silver": 11,
+    "duplicate": 1,
+    "disc:p5:claude + dom:p5:claude": 9,
+    "dom:p5:claude": 1,
+    "ct:golden + disc:p5:claude + dom:p5:claude": 1
   },
   "provenance_normalization": {
     "p5:claud+human": "p5:claude+human",

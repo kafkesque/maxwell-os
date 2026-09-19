@@ -1,0 +1,116 @@
+{
+  "gold_eval": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/gold_4axis.jsonl",
+  "n_examples": 214,
+  "device": "cpu",
+  "arms": [
+    {
+      "checkpoint": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/classifier_modernbert_p5final",
+      "architecture": "flat",
+      "n_eval": 214,
+      "n_disc_oov": 10,
+      "n_disc_eval": 204,
+      "discipline_macro_f1": 0.22904217822250608,
+      "domain_macro_f1": 0.008582502768549279,
+      "domain_micro_f1": 0.017064846416382253,
+      "abstention_risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "precision": 0.3382352941176471,
+          "macro_f1": 0.22904217822250608,
+          "abstain_rate": 0.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.004901960784313725,
+          "precision": 1.0,
+          "macro_f1": 0.01639344262295082,
+          "abstain_rate": 0.9950980392156863
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        }
+      ]
+    },
+    {
+      "checkpoint": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/classifier_hierarchical",
+      "architecture": "hierarchical",
+      "n_eval": 214,
+      "n_disc_oov": 10,
+      "n_disc_eval": 204,
+      "discipline_macro_f1": 0.17482177631647255,
+      "domain_macro_f1": 0.006495365100016264,
+      "domain_micro_f1": 0.016474464579901153,
+      "abstention_risk_coverage": [
+        {
+          "threshold": 0.0,
+          "coverage": 1.0,
+          "precision": 0.22549019607843138,
+          "macro_f1": 0.17482177631647255,
+          "abstain_rate": 0.0
+        },
+        {
+          "threshold": 0.35,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.5,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.7,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.8,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 0.0,
+          "precision": null,
+          "macro_f1": null,
+          "abstain_rate": 1.0
+        }
+      ]
+    }
+  ],
+  "policy": "D2618 ARM-1 classifier architecture + ARM-3 abstention on frozen gold_4axis"
+}

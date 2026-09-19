@@ -1,0 +1,18 @@
+# Emerging Discipline Registry  (append-only ledger)
+# A label here is PROVISIONAL: it is never written into gold_4axis as an
+# authoritative discipline and never used as a classifier class until promoted.
+schema_version: "3.0"
+pipeline_commit: "v3.0-D2618-p1"
+
+emerging:
+  - label: "statistics & probability"
+    status: "emerging"
+    proposed_by: "human:D2618-p1-adjudication"
+    first_seen: "2026-09-14"
+    evidence_count: 1
+    threshold_ref: "config/emerging_disciplines.yaml :: min_raw_instances_to_promote"
+    source_rows:
+      - fb_id: "a6c8175af9cebb11145f603bec9b0817fb575051250374c41516e6fc56ff95e"
+        name: "The Law of Truly Large Numbers"
+        verdict_raw: "emerging"
+        note: "HUMAN 2026-09-14: pure probability/statistics principle; no canonical label covers probability theory."

@@ -1,0 +1,209 @@
+{
+  "policy": "mark duplicate_of + quarantine (NEVER delete; R-D410 safe_delete only destructive path)",
+  "duplicate_of": {
+    "933174dc07f7f7b4daa902c205b8b34252b7a55fd71e90fd404934e3b2f655b7": "a94f7f9bfb2d6b5e64d918098a7a5e09d5a49f15b6f164fc9de15b5b60cf6821",
+    "e90c22e566ee59ee61009419341916e47666244e383f547779d7d81b935a0e3e": "a94f7f9bfb2d6b5e64d918098a7a5e09d5a49f15b6f164fc9de15b5b60cf6821",
+    "f3ca3d6285f1749f71fc4435a6ad6f270cdc1487aa95728e0af89aa40792530f": "4783a573632e6f75d087f4b624ee7f9778d2a7d16d75c5cd4050d947ea11ee61",
+    "565979e08dd79e6c78e3a0657ffa455389dd0fcab4c209317b55816a51613b2f": "300762be3b84b2b219bb019eaadb600e769e3172cc8d0e48ff209865c06ae476",
+    "02cad68c85950cc9055dd53fea7a454f8ad9764c880f59af74ce9f88b4b9ad67": "300762be3b84b2b219bb019eaadb600e769e3172cc8d0e48ff209865c06ae476",
+    "10816416ca83e0dd15189b758d34b4467c9223dc6ecd136521f195d80954b6f8": "586818d37e4cc604ca9752d6cb32b8f3012bc378a9c0d741c7c1d3674d61eace",
+    "91dc4ad5db83f98ec3f9642b645d71925f8d7f27a5449f1f49178defb6ad6ff1": "77c1fb70f9517537149adf41a24d26a316327844cc1722d8e7bc366d76764b1f"
+  },
+  "merged_into": {
+    "a94f7f9bfb2d6b5e64d918098a7a5e09d5a49f15b6f164fc9de15b5b60cf6821": [
+      "Squash and Stretch",
+      "Squash and Stretch Animation",
+      "Squash and Stretch Animation Principle"
+    ],
+    "77c1fb70f9517537149adf41a24d26a316327844cc1722d8e7bc366d76764b1f": [
+      "Responsible Ai Governance Framework",
+      "Responsible Ai Governance Framework (2)"
+    ],
+    "4783a573632e6f75d087f4b624ee7f9778d2a7d16d75c5cd4050d947ea11ee61": [
+      "Foot-in-the-door Tactic",
+      "Foot-in-the-door Technique"
+    ],
+    "300762be3b84b2b219bb019eaadb600e769e3172cc8d0e48ff209865c06ae476": [
+      "Iterative Refinement Through Feedback",
+      "Iterative Refinement Through Iteration",
+      "Iterative Refinement Through Feedback Loops"
+    ],
+    "586818d37e4cc604ca9752d6cb32b8f3012bc378a9c0d741c7c1d3674d61eace": [
+      "Iterative Prompt Refinement",
+      "Iterative Prompt Refinement (2)"
+    ]
+  },
+  "distinct_kept": [
+    "a6f551bd1328f69c1f3e61e81a82291b336f7aa1b60f588e302f4946213e5223",
+    "c3be815b093115e85d4cfa245ddaeb98594d3c109d9d4b5147124531043a4dce",
+    "789e8e6b560b90b9435f34cdd89f567baebe5558745ca4a8bcb586b0f7eaf73c",
+    "dec446fd98e0c78a422db8e21733068041bd4a4b0c3cdca399d85218ce651954",
+    "e1b678968c5fe2c20dc2897ac4b74654fa2a9d8777bc8422cb7861e64482558b"
+  ],
+  "high_confidence_suffix_candidates": [
+    {
+      "base": "Anna Karenina Principle",
+      "base_fb_id": "e01c258d681176807934bfc48585199b2a0bba0faf8e87c7bb8d0a8e099282b0",
+      "dup_fb_id": "4ceb7acb4f1cf03b9db836fc0f17b4f267e31d5865af1416d1a1d128e6c35012"
+    },
+    {
+      "base": "Blue Ocean Market Creation",
+      "base_fb_id": "b664613df359d0b8d7dca2eecc6635335c0babaf830e397a010f769fc4efed8f",
+      "dup_fb_id": "60076c04300602476ffc588c65ef4df68b5ec44ad153f2c74c083dc96fc83caf"
+    },
+    {
+      "base": "Chasm Crossing Strategy",
+      "base_fb_id": "e107c32461db4d82f45bb90287f158609e76cd4347025997bcfa149e860c65cc",
+      "dup_fb_id": "4c8fc38259195f2ebe06ae893d46f99163591f913eba669c7a6500b59477e85c"
+    },
+    {
+      "base": "Commitment and Consistency Principle",
+      "base_fb_id": "2e5f5453100166e4844c03e74924e7d6fbaf90fe8946fd25d12cb6183d581e89",
+      "dup_fb_id": "06ad1f6eb971f939a8a4186268770d3539b842702e133664c9c91c6c93fe8565"
+    },
+    {
+      "base": "Confident Humility Framework",
+      "base_fb_id": "daeaa09a589ef30cd94f0dee985c1cc470f3f26ba16597e8109f82b6c3834af4",
+      "dup_fb_id": "3755f05b7e71a467e970a7a8d8e933081632ad3522d4fde2a4c488d34d3ba26e"
+    },
+    {
+      "base": "Creative Confidence Through Action",
+      "base_fb_id": "6c1a9edfbdac37836d2436aed12109855bfc3443052102844d8d938d96cb0c42",
+      "dup_fb_id": "aeb8aae55b7330c0274d1ac44a01c93e05ea53476f8e41ca9742d9e4698c3d93"
+    },
+    {
+      "base": "Creative Process Integration",
+      "base_fb_id": "f99f3543037b99a53c63fc5682bffb38a1c626ad1bfcd5600eae1e3cca9212a1",
+      "dup_fb_id": "cdf5ddff0903c7c46ecf85386e4e81439efcf7bba53fd8c97fefeb95882135d8"
+    },
+    {
+      "base": "Creative Risk-taking in Design",
+      "base_fb_id": "c199ed4771febad7a57e2285f01ea2ce3c1ff7c934cc1366b147dd52662004fa",
+      "dup_fb_id": "df77f10bdb2f3ba43ae39759e24c82445ad211c1e25957dab47eafcb1bb0f003"
+    },
+    {
+      "base": "Data-driven Decision Making",
+      "base_fb_id": "2273fa2d67f87db3828af407bffa4a67dd41e4615c19a16754c65d752dd2d6aa",
+      "dup_fb_id": "3506bda95176b5be6b9db3080471f8b96b65ea381be6a1e3303ecb0e56f945c1"
+    },
+    {
+      "base": "Data-driven Decision Making Framework",
+      "base_fb_id": "d019b8e04f4d8dcf9fd76b7183bcc7e0b16e78d4bcd49b339ddf258ec6c994e3",
+      "dup_fb_id": "faa4f2d3d0280af035e4f23c2fd4c65e01690052c4120c124423daa55fa1d002"
+    },
+    {
+      "base": "Ethical Ai Design Framework",
+      "base_fb_id": "59deff36a1d34f604964107e21df1a6748fd0300e7facf7af22976b4c5d9931f",
+      "dup_fb_id": "0704163880b8e5dad12631691f4c1feec9303d72561ad6154837d9eb1855eb08"
+    },
+    {
+      "base": "Everything Is Figureoutable",
+      "base_fb_id": "adacfa23b0d90bed3435c6dcee735e590ed902d4ca41e14f88b9442a857615c9",
+      "dup_fb_id": "24916fa63a2e42670e4694268b757c91251b9dc6ff8b693e63f5dcef36604ac4"
+    },
+    {
+      "base": "Figure-ground Relationship",
+      "base_fb_id": "7a691900a1192cf161a82779484058eaf54fa2ed92bd62ba273a1af3b637896f",
+      "dup_fb_id": "23603e0bb1c8a66fa0a4b4b42bdffdb125c14d4860ff12d142a9aaec5b9b69da"
+    },
+    {
+      "base": "Human-ai Collaboration Framework",
+      "base_fb_id": "5c6a142d08da89a902cd948dcb9407aa56b1f6a02dbeedfb9afd4c9a0d9c64a5",
+      "dup_fb_id": "3328530feaea98d122587c7064eed3ffe1fa2a9d3c3fc6a31799ccbea90637a5"
+    },
+    {
+      "base": "Information-driven Decision Making",
+      "base_fb_id": "976a9ec288694754f5c908d348a4111891dc6545f29c246f4bd210744a196f36",
+      "dup_fb_id": "e2a45e3c40877dc44feff17a847ecb50d6443fb3bcb78f47a0288d6462c3512d"
+    },
+    {
+      "base": "Iterative Design Learning",
+      "base_fb_id": "d1b8b6488d4dc221003440c6684e9cc39b7cfdcb6a5639e8b9e8c0fa84090dbc",
+      "dup_fb_id": "1c33bed2cb4d04ba93fd5a68d1fee287c7f3ca9fca808b7c28bdbca6b26a98f0"
+    },
+    {
+      "base": "Iterative Prompt Refinement",
+      "base_fb_id": "586818d37e4cc604ca9752d6cb32b8f3012bc378a9c0d741c7c1d3674d61eace",
+      "dup_fb_id": "10816416ca83e0dd15189b758d34b4467c9223dc6ecd136521f195d80954b6f8"
+    },
+    {
+      "base": "Metaphorically Selling How to Use the Ma",
+      "base_fb_id": "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8",
+      "dup_fb_id": "fbcdefe9ebe1504ed6ebb408f5e7532d7e39f46761320ab0d4c67061b59d469b"
+    },
+    {
+      "base": "Nonlinear System Behavior",
+      "base_fb_id": "2d8e0a8a12d5ff19d624a9cf080317a3187901214a9d79dd0c0ec54ac6d1d08a",
+      "dup_fb_id": "e0f77e21525fa8a9aaae42c161961fbb8fcbad4da7b9ab8f225627daa64f20c3"
+    },
+    {
+      "base": "Situational Analysis in Practice Mapping",
+      "base_fb_id": "d9386e83a07d8df5bf3c5eb6bd98e149f3592a5a41c788f5816e2ca610cbcf8b",
+      "dup_fb_id": "b2ce8ca29c104eacb335f70cc4ec875b68ec271f3f6f8c51a0640683c4e5de69"
+    },
+    {
+      "base": "Social Proof Bias",
+      "base_fb_id": "5d8fd4af6785556d6e35251dce8fa56a5544fb94b717dd1d1c15bbfc143a230c",
+      "dup_fb_id": "94dd96f85c924f081cb7297a9b8bc1b97a4c1ac4c9641aa4ab2eec6d93720618"
+    },
+    {
+      "base": "Social Proof Manipulation",
+      "base_fb_id": "07de63e4402760bb36418a1951070c0beed2e5c217e4781b3e90b70cb44c1617",
+      "dup_fb_id": "805db1ef134a9d80b9315fe4d56993e473e7339ef13284dc06f05091fa6cb9c3"
+    },
+    {
+      "base": "Social Proof Manipulation",
+      "base_fb_id": "07de63e4402760bb36418a1951070c0beed2e5c217e4781b3e90b70cb44c1617",
+      "dup_fb_id": "e86454050618e699b47422095dec1954f64841c41852e8f635940d043cdaaf72"
+    },
+    {
+      "base": "Staged Release Strategy",
+      "base_fb_id": "4a4ebe69a5cb028e1518c8c8459830ee3a3c05968c8c0b7a00c14861647c65f4",
+      "dup_fb_id": "6e7d4f481f1c809389c9b44537a0f4fca4c3f5d784bf1cf006da0719d4d9c191"
+    },
+    {
+      "base": "Strategic Capacity Management",
+      "base_fb_id": "ffa2b77245a84635771025672cbaea13afab54011fe984d0c69463b0094bdf36",
+      "dup_fb_id": "22c982203091531e284a3ae39d599f5b9fdd5dfe6d7302f4af2fc5b90571b94c"
+    },
+    {
+      "base": "Strategic Focus Through Constraint",
+      "base_fb_id": "c90ff3121ca41c657f7165a85d420861e77ccff606a119d1863544fd44d6e1eb",
+      "dup_fb_id": "9605e415790cd650acd75830265e6effe46ffc530049f53d34d73020883087fc"
+    },
+    {
+      "base": "Strategic Relationship Building",
+      "base_fb_id": "6f7de6830b53840a34d300bb6d9f8d9e7cce34527754a56c97f347653c6ffe24",
+      "dup_fb_id": "9eb9e59e8cb3a6aef6d019b2aa36d839ada72dc18279c42eff32b4cdbaa5dbbe"
+    },
+    {
+      "base": "Typography As Visual Communication",
+      "base_fb_id": "3468303fb3258bfbc2498aa5d8477759a4a75cda4eacec81cf001706dcc0fd02",
+      "dup_fb_id": "da2a00eff27f7d243d3381fadecfb9597b662d5e165acc9f958655463fad9a1f"
+    },
+    {
+      "base": "Value-based Pricing Strategy",
+      "base_fb_id": "6057c6acd1e012cd24ab743e15219158849a41da988a655c1d7b265b5ac9cfbf",
+      "dup_fb_id": "5971192bab6e858ccc23af04b63207c2d940f00e722131f3453fddad5d338273"
+    },
+    {
+      "base": "Visual Hierarchy Through Contrast",
+      "base_fb_id": "0d63b54166e5eb1d669ff578b96cd521f85bc854b560f2b108c1c6614014b248",
+      "dup_fb_id": "eb47077d0cec3419fa8a243163f17280e8ac0720c06b1e48eedf0c0aaa2a0e62"
+    },
+    {
+      "base": "Visual Hierarchy Through Spatial Organization",
+      "base_fb_id": "4908d7bb61eff2b9c1a804e30d1fe2dded0d84d5e1bbf3e18108a8a11ce47575",
+      "dup_fb_id": "a98b80a098af0a6789a7b467c168f0236c25a9455954e1ddc9ba5f3b2f04bfc2"
+    },
+    {
+      "base": "Visual Metaphor in Advertising",
+      "base_fb_id": "982d303bcbf38f03abbdceb7fa0c42ebcca4c4550e3acd7ea94c14f481908aaf",
+      "dup_fb_id": "1b0b34718d0f732e74cb1392e460e8ab81bee4ec55167c86bf5f367d1f1eeac1"
+    }
+  ],
+  "corrections_from_judge": [
+    "Removed 'Iterative Design Refinement' from the generic merge (design-specific, distinct facet).",
+    "Added 'Iterative Prompt Refinement (2)' -> 'Iterative Prompt Refinement' (name collision)."
+  ]
+}

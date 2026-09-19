@@ -1,0 +1,23 @@
+# Emerging Discipline Promotion Policy  (D2618-P1 follow-up, proposed)
+# User ruling 2026-09-14: a label stays 'emerging' until the raw discipline
+# reaches critical mass, then it is promoted into config/taxonomy_v5.yaml.
+# C12: the threshold lives here, never in code.
+schema_version: "3.0"
+pipeline_commit: "v3.0-D2618-p1"
+
+emerging_disciplines:
+  registry: governance/emerging_disciplines.yaml
+  status_value: "emerging"
+  # PROPOSED - awaiting user confirmation.
+  # Evidence 2026-09-14: taxonomy has 61 canonical disciplines; the fbs.discipline
+  # column holds 7995 labelled rows over 62 distinct values (mean ~129/label);
+  # smallest existing labels: ecology 5, design psychology 6, computational theory 7.
+  min_raw_instances_to_promote: 25
+  counts_toward_threshold:
+    - "fbs rows whose raw discipline maps to this label"
+    - "adjudicated 4-axis rows (gold/pending/silver)"
+  promotion_requires:
+    - "taxonomy_v5.yaml entry added (protected file: edit via safe_edit + backup)"
+    - "decision row appended to DECISION-LOG.md + config/decisions.yaml"
+    - "classifier head retrain check (label count change invalidates trained heads)"
+    - "alias_map.yaml entry so raw strings canonicalise to the new label"

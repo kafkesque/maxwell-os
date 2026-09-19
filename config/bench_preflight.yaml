@@ -1,0 +1,77 @@
+# config/bench_preflight.yaml — M1 pre-flight gate for benchmark suites
+# WHY THIS FILE EXISTS
+#   The benchmark harness had no preflight. It sent real requests, and when a request
+#   came back ungradable (no content / no JSON / HTTP 400) the harness scored that as a
+#   MODEL failure. Result: BUG-257, BUG-258, BUG-259, BUG-260, BUG-262, BUG-263 and the
+#   OptiQ 31%-"no json" run all spent hours producing numbers that were harness artifacts.
+#   This gate runs BEFORE scoring: it proves each (model, suite) cell can actually return
+#   a gradable answer using the EXACT max_tokens that suite will use.
+# RULE: a cell that fails preflight is NA. It is NEVER scored as 0.
+version: 1
+
+omlx:
+  base_url: http://127.0.0.1:11435
+  health_path: /health
+  models_path: /v1/models
+  api_key: sk-maxwell-local
+  timeout_s: 900
+
+environment:
+  min_free_gb: 15
+  # An oMLX reload EVICTS the resident model (BUG-255) => never probe while a
+  # benchmark is live. Presence of any of these in the process table aborts a full run.
+  block_if_running:
+    - model_eval_suite.py
+    - model_eval_report.py
+    - pipe_stage_probe.py
+    - pipe_s4_classify_gold.py
+    - retrieval_benchmark.py
+    - run_final_chain.sh
+  expected_models:
+    - Ornith-1.5-35B-A3B-REAP-19B
+    - Ornith-1.5-9B-MLX-8bit
+    - Phi-4-mini-instruct-8bit
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    - Qwen3.8-27B-MLX-4bit
+    - gemma-4-E4B-it-MLX-4bit
+    - gpt-oss-20b-MXFP4-Q8
+  expected_models_mode: exact     # exact = registry must equal this set (catches BUG-259)
+
+probe:
+  default_max_tokens: 512
+  min_content_chars: 2
+  http_error_markers: ['400', '429', '500', '502', '503']
+  ceiling_marker: '400'           # a 400 at ctx_tokens = ceiling finding, NOT a model failure
+  # JSON is required ONLY where the suite's grader actually parses JSON. Measured by replaying
+  # the stored checkpoint (python3 tools/bench_preflight.py --selftest): share of historically
+  # GRADED-OK rows whose prediction is valid JSON — toolcalling 100.0%, voting 98.9%, abstain
+  # 97.4%, but planning 0.0%, niah 0.0%, ifeval 0.0%, humaneval 1.3%, mbpp 2.3%. A blanket JSON
+  # rule marked real measurements NA, which is the inverse of BUG-262 (a harness failure read as
+  # a model failure). The list below is evidence, not assumption — do not extend it by guessing.
+  json_suites: [toolcalling, voting, abstain]
+  # One retry when the first call returns empty: the first request after an oMLX model reload
+  # can come back empty (cold reload), which is not the model refusing to answer.
+  warmup_retries: 3
+  # Gate self-test floor: every suite in json_suites must agree with history at least this much.
+  selftest_min_json_agreement: 0.90
+
+# Rows measured while the harness itself was broken are NEVER re-measured:
+# model_eval_suite._done_keys() skips any (model, suite, id) already present without err,
+# so a re-run reports '0 new results' and looks like success while the poisoned row stands.
+# scripts/check_stale_toolcall_rows.py fails while any survivor is found.
+stale_row_guards:
+  checkpoint: governance/model_eval_checkpoint.jsonl
+  markers:
+    - {suite: toolcalling, model_prefix: gpt-oss, detail_contains: "no json", bug: BUG-262}
+    # BUG-265: gemma-4-E4B answers with NATIVE tool calls (finish_reason=tool_calls, content=""),
+    # which the harness could not read. detail_contains "" matches every row of that cell.
+    - {suite: toolcalling, model_prefix: gemma-4-E4B, detail_contains: "no json", bug: BUG-265}
+
+artifacts:
+  dir: governance
+  latest_name: bench_preflight_latest.json
+
+exit_codes:
+  ok: 0
+  cell_invalid: 1
+  env_unsafe: 2

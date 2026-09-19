@@ -1,0 +1,51 @@
+{
+  "budget_dependent": false,
+  "budgets": [
+    200
+  ],
+  "generated": "2026-09-17T11:52:47",
+  "model": "gemma-4-E4B-it-MLX-4bit",
+  "results": [
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chars": 0,
+          "grader": "(False, 'no json')",
+          "head": "",
+          "json_ok": false,
+          "secs": 1.8
+        },
+        {
+          "attempt": 2,
+          "chars": 0,
+          "grader": "(False, 'no json')",
+          "head": "",
+          "json_ok": false,
+          "secs": 1.9
+        },
+        {
+          "attempt": 3,
+          "chars": 0,
+          "grader": "(False, 'no json')",
+          "head": "",
+          "json_ok": false,
+          "secs": 1.86
+        },
+        {
+          "attempt": 4,
+          "chars": 0,
+          "grader": "(False, 'no json')",
+          "head": "",
+          "json_ok": false,
+          "secs": 1.83
+        }
+      ],
+      "budget": 200,
+      "item_id": "tool-0",
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "suite": "toolcalling"
+    }
+  ],
+  "suite": "toolcalling"
+}

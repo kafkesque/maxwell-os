@@ -1,0 +1,69 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== stability (30 items)
+  Ornith-1.5-9B-OptiQ-4bit                 stability     acc=0.0  n=0  skipped=30
+  Ornith-1.5-9B-MLX-8bit                   stability     acc=0.3  n=30
+
+=== toolcalling (4 items)
+  Ornith-1.5-9B-OptiQ-4bit                 toolcalling   acc=0.0  n=0  skipped=4
+  Ornith-1.5-9B-MLX-8bit                   toolcalling   acc=0.5  n=4
+
+=== planning (3 items)
+  Ornith-1.5-9B-OptiQ-4bit                 planning      acc=0.0  n=0  skipped=3
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== stability (30 items)
+  Ornith-1.5-9B-OptiQ-4bit                 stability     acc=0.0  n=0  skipped=30
+  Ornith-1.5-9B-MLX-8bit                   stability     acc=0.0  n=0  skipped=30
+
+=== toolcalling (4 items)
+  Ornith-1.5-9B-OptiQ-4bit                 toolcalling   acc=0.0  n=0  skipped=4
+  Ornith-1.5-9B-MLX-8bit                   toolcalling   acc=0.0  n=0  skipped=4
+
+=== planning (3 items)
+  Ornith-1.5-9B-OptiQ-4bit                 planning      acc=0.0  n=0  skipped=3
+  Ornith-1.5-9B-MLX-8bit                   planning      acc=1.0  n=1  skipped=2
+
+=== reviewing (6 items)
+  Ornith-1.5-9B-OptiQ-4bit                 reviewing     acc=0.0  n=0  skipped=6
+  Ornith-1.5-9B-MLX-8bit                   reviewing     acc=0.833  n=6
+
+=== hardcode (4 items)
+  Ornith-1.5-9B-OptiQ-4bit                 hardcode      acc=0.0  n=0  skipped=4
+  Ornith-1.5-9B-MLX-8bit                   hardcode      acc=1.0  n=4
+
+=== mbpp (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 mbpp          acc=0.0  n=0  skipped=25
+  Ornith-1.5-9B-MLX-8bit                   mbpp          acc=0.52  n=25
+
+=== humaneval (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 humaneval     acc=0.0  n=0  skipped=25
+  Ornith-1.5-9B-MLX-8bit                   humaneval     acc=0.8  n=25
+
+=== mmlu_pro (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 mmlu_pro      acc=0.12  n=25
+  Ornith-1.5-9B-MLX-8bit                   mmlu_pro      acc=0.12  n=25
+
+=== gsm8k (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 gsm8k         acc=0.96  n=25
+  Ornith-1.5-9B-MLX-8bit                   gsm8k         acc=0.96  n=25
+
+=== math500 (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 math500       acc=0.72  n=25
+  Ornith-1.5-9B-MLX-8bit                   math500       acc=0.68  n=25
+
+=== ifeval (25 items)
+  Ornith-1.5-9B-OptiQ-4bit                 ifeval        acc=0.0  n=0  skipped=25
+  Ornith-1.5-9B-MLX-8bit                   ifeval        acc=0.92  n=25
+
+=== delegation (6 items)
+  Ornith-1.5-9B-OptiQ-4bit                 delegation    acc=0.0  n=0  skipped=6
+  Ornith-1.5-9B-MLX-8bit                   delegation    acc=1.0  n=6
+
+=== voting (251 items)
+  Ornith-1.5-9B-OptiQ-4bit                 voting        acc=0.0  n=0  skipped=251
+  Ornith-1.5-9B-MLX-8bit                   voting        acc=0.227  n=251
+
+done in 12924s, 493 new results

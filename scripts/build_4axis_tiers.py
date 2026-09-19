@@ -30,10 +30,21 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import tempfile
 from collections import Counter
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from pipeline.axis_authority import (  # noqa: E402  (D2626: single source of truth)
+    CT_AUTH,
+    DEPTH_AUTH,
+    DISC_AUTH,
+    DOM_AUTH,
+)
 
 # ── C12/C20: named constants (no magic strings) ────────────────────────────
 GOV_DIR = "governance"
@@ -50,8 +61,8 @@ PIPELINE_COMMIT = "v3.0-D2618-p0"
 STATUS_PENDING = "pending-human"
 
 SILVER = "golden-silver"
-CT_AUTH = frozenset({"human", "joint-vote", "298-human"})
-DEPTH_AUTH = frozenset({"human", "joint-vote", "n/a-non-principle", "298-human"})
+# D2619/D2626: post-merge authoritative sets — imported from pipeline.axis_authority
+# (single source of truth, shared with merge_4axis_adjudication.py). No drift.
 
 # D2618 P0.2: non-canonical provenance typos -> canonical p5:claude+human.
 PROVENANCE_TYPOS: Dict[str, str] = {
@@ -68,21 +79,27 @@ def _norm(src: Optional[str]) -> Optional[str]:
     return PROVENANCE_TYPOS.get(src, src)
 
 
-def _discdom_authoritative(src: Optional[str]) -> bool:
-    """True iff a discipline/domain source is non-silver and non-None."""
-    s = _norm(src)
-    return isinstance(s, str) and s != SILVER and s.startswith("p5:")
-
-
 def _tier(row: Dict[str, Any]) -> str:
-    """Classify one verified-core row into gold / pending / silver."""
-    if row.get("verification_status") == STATUS_PENDING:
-        return "pending"
+    """Classify one verified-core row into gold / pending / silver.
+
+    D2619: gold requires authoritative provenance on all 4 axes, a CANONICAL
+    (non-emerging) discipline, and no duplicate marker — checked BEFORE the
+    pending-human gate, because the D2615 batch has now been human-adjudicated
+    (d2615_human_adjudication.jsonl + s4 verdicts) so a fully-authoritative row
+    is verified even if its verification_status is still pending-human. The 108
+    expansion-queue rows (content_type None) stay pending.
+    """
+    if row.get("duplicate_of"):
+        return "silver"
     ct_ok = row.get("content_type_source") in CT_AUTH
     dp_ok = row.get("depth_source") in DEPTH_AUTH
-    di_ok = _discdom_authoritative(row.get("discipline_source"))
-    do_ok = _discdom_authoritative(row.get("domains_source"))
-    return "gold" if (ct_ok and dp_ok and di_ok and do_ok) else "silver"
+    di_ok = _norm(row.get("discipline_source")) in DISC_AUTH and row.get("discipline") != "emerging"
+    do_ok = _norm(row.get("domains_source")) in DOM_AUTH
+    if ct_ok and dp_ok and di_ok and do_ok:
+        return "gold"
+    if row.get("verification_status") == STATUS_PENDING:
+        return "pending"
+    return "silver"
 
 
 def _load(path: str) -> List[Dict[str, Any]]:
@@ -176,10 +193,12 @@ def _silver_breakdown(silver: List[Dict[str, Any]]) -> Dict[str, int]:
             flags.append(f"ct:{r.get('content_type_source')}")
         if r.get("depth_source") not in DEPTH_AUTH:
             flags.append(f"depth:{r.get('depth_source')}")
-        if not _discdom_authoritative(r.get("discipline_source")):
+        if _norm(r.get("discipline_source")) not in DISC_AUTH or r.get("discipline") == "emerging":
             flags.append(f"disc:{_norm(r.get('discipline_source'))}")
-        if not _discdom_authoritative(r.get("domains_source")):
+        if _norm(r.get("domains_source")) not in DOM_AUTH:
             flags.append(f"dom:{_norm(r.get('domains_source'))}")
+        if r.get("duplicate_of"):
+            flags.append("duplicate")
         c[" + ".join(sorted(flags))] += 1
     return dict(c)
 

@@ -1,0 +1,257 @@
+# Axis-eval integrity floors + train/eval leakage guard (created 2026-09-17)
+# WHY: the anchor is BOTH the eval set and the candidate fine-tune base. If it overlaps the
+# training pool, or if its labels were produced by the model being evaluated, every downstream
+# number (ModernBERT student, S4 classifier, Ragas, retrieval) is circular and uninterpretable.
+# scripts/audit_eval_integrity.py enforces both invariants from the filesystem.
+#
+# Measured 2026-09-17 (this is why the floors exist):
+#   content_type  HUMAN 29 / 251  = 0.116   (222 model-voted; 20 from a SINGLE model)
+#   discipline    HUMAN 87 / 251  = 0.347   (164 produced by the reliable pair that is then
+#                                            evaluated: 0.709 overall but only 0.437 on the
+#                                            87 human-contested rows - CIRCULAR)
+#   depth         HUMAN 132 / 251 = 0.526
+#   domains       HUMAN 231 / 251 = 0.920
+#   extraction_type (axis 5)      = no anchor at all
+#   train-pool x eval-anchor overlap = 0 / 1027  (verified; must stay 0)
+
+schema_version: "3.0"
+decision: null            # becomes a D-number when the user ratifies the priority decision
+last_updated: "2026-09-17"
+
+anchor:
+  file: governance/gold_4axis.jsonl
+  train_pool: archive/golden_retired_D2618/stage4_golden_mined.yaml
+  max_train_eval_overlap: 0
+  overlap_shingle_chars: 40
+  overlap_shingle_share: 0.4
+
+# Minimum share of labels that must come from a HUMAN-authoritative source before the axis may be
+# used as ground truth for a MODEL comparison (retrain, classifier swap, ensemble choice).
+# A floor is a gate for the retrain, not a blocker for reading the axis.
+min_human_share:
+  content_type: 0.60
+  discipline: 0.60
+  depth: 0.50
+  domains: 0.50
+  extraction_type: 0.60   # the axis has no anchor; the floor documents the target, not the state
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BUG-267 / F-16 FIX (2026-09-17). The previous classifier tested SUBSTRINGS
+# ("human" in source), so `p5:human-frontier69` -- whose own name asserts a frontier
+# component -- was counted as a HUMAN label, and `FRONTIER` was unreachable dead code.
+# It now uses an EXACT-MATCH allow-list: an unlisted source is a hard error, not a guess.
+#
+# Tier semantics (why there are two human tiers):
+#   human-blind      an independent decision made WITHOUT seeing a model's proposal.
+#                    This is the only tier that can carry the floor: it is the only one
+#                    free of anchoring bias (the reviewer cannot rubber-stamp an answer
+#                    they never saw).
+#   human-attested   a human decision whose METHOD is unrecorded, or a human RATIFYING a
+#                    model's proposal (e.g. `p5:claude+human`). Stronger than a pure model
+#                    label, weaker than human-blind. Counted leniently, never blindly.
+#   model            produced by an LLM (single model or a model pair agreeing).
+#   frontier         produced by a non-local API model.
+#   na               a documented not-applicable sentinel, not a label.
+#   none/unknown     missing or unregistered provenance -> FAIL CLOSED.
+#
+# NOTE: `human-blind` is legitimately EMPTY today. Nothing in the anchor was produced
+# blind, which is exactly what BUG-267 records. The tier is declared now so the
+# certified-core work has a defined destination and the first blind label lands in the
+# right bucket instead of being absorbed into `human-attested`.
+# ─────────────────────────────────────────────────────────────────────────────
+provenance_tiers:
+  human-blind: []
+  human-attested:
+    - human
+    - 298-human
+    - p5:human
+    - human-d2615
+    - p5:human-d2615
+    - p5:human-d2618p1
+    - p5:human-frontier69
+    - p5:human-locked
+    - p5:human-emerging-gap
+    - p5:claude+human
+  model:
+    - joint-vote
+    - p5:reliable-pair-d2618p1
+    - p5:reliable-pair-d2619-revote
+    - p5:reliable-pair-d2631-revote
+    - p5:qwen38-ct-d2629
+  frontier: []
+  na:
+    - n/a-non-principle
+
+# Which tiers count toward the floor. `strict` is the destination (blind only);
+# `lenient` is what the floor is measured against TODAY, so the gate does not fire on a
+# taxonomy change and produce alarm fatigue. Both are always PRINTED.
+human_share:
+  count_strict: [human-blind]
+  count_lenient: [human-blind, human-attested]
+  min_blind_share: 0.0      # not yet a gate; set to 0.60 when the certified core exists
+
+# ── 4-axis anchor census, per-axis source -> tier (for auditability) ─────────────
+last_measured:
+  date: "2026-09-17"
+  note: "lenient figures below are UPPER BOUNDS (BUG-267: 'human' cannot distinguish
+         independent decision from model ratification). Re-measure after the certified core."
+
+# ─────────────────────────────────────────────────────────────────────────────
+# G3 — JUDGE CALIBRATION (R5/C8). The 6 decision-list scripts verify with Qwen3.8 while
+# the corpus generator is Qwen3-Coder => SAME family => every prior verdict is
+# uninformative (F-10). A substitute judge must come from a DIFFERENT family, and its
+# accuracy on THESE tasks is unmeasured, so it must be calibrated against a blind human
+# sample BEFORE its verdicts are trusted (protocol: JUDGE_CALIBRATION_SPEC_20260917.md).
+#
+# Eligible families (non-Qwen, competent): gemma-4-E4B, gpt-oss-20b.
+# Ineligible: Qwen3.8 / Qwen3-Coder (generator family), REAP + Ornith (family=qwen),
+#             granite (weakest or near-weakest on every suite), Phi-4-mini (BUG-053).
+# ─────────────────────────────────────────────────────────────────────────────
+judge_calibration:
+  n_per_task: 9
+  candidates: [gemma-4-E4B-it-MLX-4bit, gpt-oss-20b-MXFP4-Q8]
+  min_accuracy_adopt: 0.85        # judge may replace the same-family verifier outright
+  min_accuracy_conditional: 0.70  # usable, but record the error bar + escalate disagreements
+  # below min_accuracy_conditional -> the task must be made deterministic or human-owned
+  # A judge whose accuracy equals the MAJORITY-CLASS BASELINE ("always answer the most common
+  # label") carries ZERO information, however respectable the raw number looks. Measured
+  # 2026-09-17: T6 gpt-oss 0.778 == the constant-"justified" baseline 0.778, and T2 gemma
+  # 0.875 == the constant-"merge" baseline 0.875. Both were degenerate. A judge must beat the
+  # baseline by this margin before it may replace a verifier.
+  min_margin_over_baseline: 0.15
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LABEL AXIS CONTRACT (D2620/BUG-197, strengthened 2026-09-17)
+#
+# The rule: the DISCIPLINE vocabulary and the DOMAIN vocabulary are DISJOINT. A domain
+# emitted as the singular discipline, or a discipline emitted inside the domain set, is a
+# HARD error. `pipeline/schemas.py::validate_discipline_domain()` has claimed this since
+# D2620 — but it validated MEMBERSHIP, not DISJOINTNESS: it only fired when a label was
+# absent from its own set, so a label that legitimately exists in BOTH vocabularies passed
+# silently. Measured 2026-09-17: exactly one such real pair exists, live, in 909 rows.
+#
+# This block makes the docstring claim TESTABLE (scripts/audit_taxonomy_disjointness.py).
+# `shared_labels` are the documented catch-alls that legitimately appear on both axes.
+# `known_collisions` are recorded DEBT: real duplicates awaiting a ruling. They are counted
+# and printed on every run, never silenced — and a NEW collision is a hard error.
+# ─────────────────────────────────────────────────────────────────────────────
+label_axes:
+  normalize: "lowercase + strip all non-alphanumeric characters"
+  single_label: [content_type, extraction_type, depth, discipline]
+  multi_label: [domains]
+  shared_labels:
+    - emerging          # fail-closed catch-all; documented as NOT a real assignment
+  known_collisions:
+    - discipline: research methodology
+      domain: research & methodology
+      rows_discipline: 261
+      rows_domain: 648
+      decision: >    # D-271a RULED + REVISED 2026-09-17 (see governance/DECISION_D271_IDENTITY_20260917.md section 2a)
+        DECLARED HOMONYM — CHANGE NOTHING. Both labels stay canonical exactly as they are.
+        This is not one concept mis-migrated and not a contamination: the discipline and the domain
+        are different objects that happen to share a name, so no rename, no merge, no migration and
+        no relabelling is required. RETRIEVAL PRECEDENCE: discipline is authoritative for
+        partitioning (single-valued, exact '=' filter, 100% coverage) AND is load-bearing for depth
+        ('cross-domain' = bridges 2+ distinct DISCIPLINES, 789 rows); domains is a recall broadener
+        (1..7 labels per row). Consequence: if a collapse is ever forced, the DISCIPLINE side
+        survives — the reverse of a 'keep the larger bucket' heuristic, which counted rows (648 vs
+        261) instead of weighing the axis. Cost of this ruling: 0 migrated, 0 relabelled, 0 human
+        labelling. G8 is downgraded from 'adjudicate the 167 rows carrying BOTH' (they are coherent
+        as-is: a research-methodology object inside the research & methodology domain) to
+        'ratify this declaration'. Enforceable requirements only: (1) the namespace is enforced on
+        write, so a domain can never be typed into the discipline field or vice versa (guard +
+        scripts/audit_taxonomy_disjointness.py, criterion AXC); (2) no NORMALISED union of the two
+        vocabularies may fuse them — verified 2026-09-17: config/taxonomy_v5.yaml keeps
+        'disciplines' and 'domains' as separate keys and the runtime audit reports 0 undeclared
+        normalised collisions over 7,995 rows; (3) any cross-taxonomy set operation must be
+        namespace-qualified (discipline:X vs domain:X). Under D-271c each label also receives its
+        own concept_id, which makes the separation mechanical rather than conventional.
+      note: >
+        One concept in both taxonomies, definitions near-identical ("frameworks and
+        techniques used to conduct valid academic research" vs "design, ethics and execution
+        of academic research processes"). D2512-D2516 demoted applied-practice
+        pseudo-disciplines to domains (66 -> 61 disciplines); this pair is an INCOMPLETE
+        MIGRATION, not a deliberate split.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# T2 — SUFFIX DUPLICATE POLICY (2026-09-17). "Is name B just name A + a suffix?" is a STRING
+# OPERATION, not a judgement. Measured: gemma and gpt-oss both scored lift 0.00 against the
+# constant-answer baseline on this task (BUG-269), i.e. a model adds nothing here. A deterministic
+# test is exact, free, reproducible and cannot be wrong by opinion — the strongest available
+# outcome, and R5/C8 does not apply to a transformation that involves no generation.
+# ─────────────────────────────────────────────────────────────────────────────
+suffix_dedup:
+  # A remainder that is ONLY a variant marker => MERGE with certainty.
+  merge_markers: ["(2)", "(3)", "(4)", "(5)", "2", "3", "v2", "v3", "ii", "iii", "copy", "dup",
+                  "duplicate", "part 2", "part ii", "2 of 2", "rev 2", "mk2"]
+  # A remainder that is a marker plus noise (spacing/punctuation) is still a marker.
+  max_marker_chars: 14
+  # Anything else with a prefix relationship => REVIEW, never an automatic merge.
+  #
+  # 2026-09-17: a pure-marker rule alone was WRONG. Blind human review said `keep` for
+  # "Social Proof Bias" vs "Social Proof Bias (2)" — two substantively different objects that
+  # share a name, because `(2)` is an ARTEFACT of the extraction pipeline, not a statement about
+  # the object. A name-only rule answered MERGE 32/32 (a 100% bias — the same degeneracy as the
+  # model judges it replaced). The name test must therefore be corroborated by the BODY.
+  min_body_similarity_for_merge: 0.5      # shingle containment of definition+application
+  body_shingle_chars: 40
+  policy: merge_only_if_marker_AND_body_matches
+
+# -----------------------------------------------------------------------------
+# G4 -- RULER LABELLING SHEET (2026-09-17). The certified core that makes every other axis MEASURABLE.
+# Built by scripts/build_ruler_sheet.py, scored by scripts/score_ruler_labels.py, runbook
+# governance/G4_RULER_INSTRUCTIONS.md. Quotas/seed/thresholds are config, never hardcoded (C12).
+ruler_sheet:
+  seed: 20260917
+  min_body_chars: 200              # BUG-268: a row with less text than this is not answerable
+  source_excerpt_chars: 400
+  axes_required: [content_type, discipline, extraction_type]
+  axes_deferred: [depth, domains]  # depth 0.526 attested (floor 0.50) / domains 0.920 -> not the bottleneck
+  stratum_a:                       # PROPORTIONAL: the ONLY stratum the FLOOR may be measured on
+    n: 100
+    basis: content_type distribution of the KB (largest-remainder allocation)
+  stratum_b:                       # FORCED-MINORITY: per-class precision + the F-14 FORM test, never the floor
+    n: 50
+    minority_content_type_each: 6
+    rare_discipline_rows: 8
+    rare_discipline_max_rows: 20
+    untraceable_pocket_rows: 6
+  note_codes:                      # NUMBERED menus: free-text notes were a recorded process defect
+    1: ambiguous between two classes
+    2: definition shown is insufficient to decide
+    3: wrong granularity (too specific or too general)
+    4: source text contradicts the object
+    5: needs domain knowledge I do not have
+    6: near-duplicate of another item in this sheet
+    7: noise or junk (should not be in the KB)
+  confidences: [conf_ct, conf_disc, conf_form]   # per-axis 0.0-1.0 -> enables a selective-risk curve
+  budgets:
+    content_type_s_per_row: 40
+    discipline_s_per_row: 60
+    extraction_type_s_per_row: 60
+    session_rows: 50
+  stop_rule:                       # A1 sequential rule: stop as soon as the floor verdict is decisive
+    min_rows_before_verdict: 60
+    decisive_margin_over_floor: 0.10
+
+
+ruler_measurement:                 # D272a (2026-09-19): the FIRST certified stored-label measurement.
+  date: 2026-09-19                 # Source of truth remains governance/ruler_measurement_20260917.md (generated).
+  artifact: governance/ruler_measurement_20260917.md
+  sheet: governance/RULER_BLIND_SHEET_20260917.csv
+  reviewer: human                  # single reviewer; a SECOND coder is required before any floor is repointed (see below)
+  rows: {total: 150, stratum_a: 100, stratum_b: 50}
+  # stored-label accuracy vs the BLIND human, on the PROPORTIONAL stratum only, always beside the
+  # constant-answer baseline (BUG-269) and a Wilson 95% interval (BUG-267).
+  measured:
+    content_type:    {n: 100, unanswered: 0,  accuracy: 0.740, wilson95: [0.646, 0.816], baseline: 0.750, lift: -0.010, verdict: NO_BETTER_THAN_CONSTANT}
+    discipline:      {n: 83,  unanswered: 17, accuracy: 0.506, wilson95: [0.401, 0.611], baseline: 0.084, lift: 0.422,  verdict: FLOOR_UNRESOLVED}
+    extraction_type: {n: 89,  unanswered: 11, accuracy: 0.831, wilson95: [0.740, 0.895], baseline: 0.360, lift: 0.472,  verdict: PASS_DECISIVE}
+  # F-14 RETARGETED (D272g): FORM does NOT degrade in the untraceable pocket; ROLE does.
+  f14_retest_stratum_a:
+    extraction_type: {untraceable: [37, 43], traceable: [37, 46]}   # 0.860 vs 0.804 -> no material degradation
+    content_type:    {untraceable: [34, 51], traceable: [40, 49]}   # 0.667 vs 0.816 -> ROLE is the defective axis
+  # A floor may not be repointed on a single coder. G4a requires a second, independent reviewer on the
+  # same 150 rows before min_human_share is re-anchored to the certified core.
+  second_coder_required_before_repointing: true
+  next: continue_stratum_a_to_about_185_rows   # stop rule margin is 0.094 < 0.10 -> CONTINUE (D272g)

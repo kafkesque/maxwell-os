@@ -1,0 +1,5 @@
+[reclaim] START — waiting for chain + niah rerun + post-chain queue to drain  2026-09-17 10:22:16
+[reclaim] nothing running — reclaiming  2026-09-17 10:22:16
+/dev/disk3s5   926Gi   868Gi    24Gi    98%    3.4M  256M    1%   /System/Volumes/Data
+[reclaim] removed symlink /Users/barn/.omlx/models/Qwen3.8-27B-OptiQ-4bit  2026-09-17 10:22:16
+[reclaim] deleting /Users/barn/.cache/huggingface/hub/models--mlx-community--Qwen3.8-27B-OptiQ-4bit (19G)  2026-09-17 10:22:16

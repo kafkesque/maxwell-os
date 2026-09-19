@@ -1,0 +1,16 @@
+[complete] start 2026-09-16 15:15:07
+[complete] TIER-1 start 2026-09-16 15:15:32
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== abstain (108 items)
+  gpt-oss-20b-MXFP4-Q8                     abstain       acc=0.833  n=108
+  gemma-4-E4B-it-MLX-4bit                  abstain       acc=0.63  n=108
+  Qwen3.8-27B-MLX-4bit                     abstain       acc=0.824  n=108
+  Phi-4-mini-instruct-8bit                 abstain       acc=0.546  n=108
+
+done in 2319s, 432 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+SKIP retired models: Qwen3.8-27B-OptiQ-4bit
+all requested models are retired — nothing to do

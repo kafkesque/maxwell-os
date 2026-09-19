@@ -1,0 +1,44 @@
+=== ARM-2 CRIBS start Tue Sep 15 10:53:18 CEST 2026 ===
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+Benchmarking 6 convergent clusters across 2 models (SEQUENTIAL)
+Models: ['Qwen3-Coder-30B-A3B-Instruct-MLX-4bit', 'gpt-oss-20b-MXFP4-Q8']
+
+
+======================================================================
+MODEL: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+======================================================================
+  [ 1/6] cluster_66 nsegs=5 route=FB valid=True   39.4s  Heuristic Rationality Under Uncertainty
+  [ 2/6] cluster_109 nsegs=6 route=FB valid=True   32.8s  Focal Point Convergence
+  [ 3/6] cluster_113 nsegs=8 route=FB valid=True   33.8s  Tragedy of the Commons
+  [ 4/6] cluster_185 nsegs=2 route=NULL valid=True   12.6s  
+  [ 5/6] cluster_306 nsegs=20 route=FB valid=True   32.2s  Priming Influence on Behavior
+  [ 6/6] cluster_321 nsegs=4 route=FB valid=True   34.2s  Placebo Effect Mechanism
+
+======================================================================
+MODEL: gpt-oss-20b-MXFP4-Q8
+======================================================================
+  [ 1/6] cluster_66 ERROR empty content (reasoning-model cold reload?)
+  [ 2/6] cluster_109 ERROR empty content (reasoning-model cold reload?)
+  [ 3/6] cluster_113 ERROR empty content (reasoning-model cold reload?)
+  [ 4/6] cluster_185 ERROR empty content (reasoning-model cold reload?)
+  [ 5/6] cluster_306 ERROR empty content (reasoning-model cold reload?)
+  [ 6/6] cluster_321 ERROR empty content (reasoning-model cold reload?)
+
+======================================================================
+SUMMARY
+======================================================================
+
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: n=6 avg=30.8s median=33.8s FB=5 NULL=1 invalid=0 schema_fail=0 agreement=1.0
+
+  gpt-oss-20b-MXFP4-Q8: n=6 avg=14.3s median=13.3s FB=0 NULL=0 invalid=6 schema_fail=0 agreement=0.0
+
+  Speedup (gpt-oss-20b-MXFP4-Q8 vs Qwen3-Coder-30B-A3B-Instruct-MLX-4bit): 2.16x
+
+Wrote governance/arm2_cribs_benchmark.json
+=== ARM-2 done Tue Sep 15 10:57:49 CEST 2026, resuming 190-row vote ===
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+targets: 190 | already voted: 35 | todo: 155
+progress 5/155 (flushed checkpoint)
+progress 10/155 (flushed checkpoint)

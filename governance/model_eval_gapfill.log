@@ -1,0 +1,23 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== stability (30 items)
+  Ornith-1.5-35B-A3B-REAP-19B              stability     acc=0.0  n=0  skipped=30
+
+=== toolcalling (4 items)
+  Ornith-1.5-35B-A3B-REAP-19B              toolcalling   acc=0.0  n=0  skipped=4
+
+=== planning (3 items)
+  Ornith-1.5-35B-A3B-REAP-19B              planning      acc=0.0  n=0  skipped=3
+
+=== reviewing (6 items)
+  Ornith-1.5-35B-A3B-REAP-19B              reviewing     acc=0.0  n=0  skipped=6
+
+done in 0s, 0 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== reviewing (6 items)
+  gpt-oss-20b-MXFP4-Q8                     reviewing     acc=0.0  n=0  skipped=6
+
+done in 0s, 0 new results

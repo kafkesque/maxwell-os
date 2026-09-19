@@ -1,0 +1,16 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+targets: 59 | already voted: 2 | todo: 57
+progress 5/57 (flushed checkpoint)
+progress 10/57 (flushed checkpoint)
+progress 15/57 (flushed checkpoint)
+progress 20/57 (flushed checkpoint)
+progress 25/57 (flushed checkpoint)
+progress 30/57 (flushed checkpoint)
+progress 35/57 (flushed checkpoint)
+progress 40/57 (flushed checkpoint)
+progress 45/57 (flushed checkpoint)
+progress 50/57 (flushed checkpoint)
+progress 55/57 (flushed checkpoint)
+progress 57/57 (flushed checkpoint)
+done 57/57

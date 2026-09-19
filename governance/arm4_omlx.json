@@ -1,0 +1,40 @@
+{
+  "gpt-oss-20b-MXFP4-Q8": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 0.5,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall_capability": 0.9,
+    "classify": {
+      "discipline_acc": 0.85,
+      "domain_f1": 0.4825,
+      "n": 20
+    },
+    "extract": {
+      "n": 6,
+      "fb": 5,
+      "null": 1,
+      "valid": 4
+    }
+  },
+  "Qwen3.8-27B-MLX-4bit": {
+    "coding": 1.0,
+    "reasoning": 1.0,
+    "orchestrating": 1.0,
+    "reviewing": 1.0,
+    "analysing": 1.0,
+    "_overall_capability": 1.0,
+    "classify": {
+      "discipline_acc": 0.8,
+      "domain_f1": 0.7356,
+      "n": 30
+    },
+    "extract": {
+      "n": 6,
+      "fb": 5,
+      "null": 1,
+      "valid": 6
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "generated": "2026-09-17T12:47:58",
+  "criteria": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/p0_p1_criteria.yaml",
+  "n_drift": 2,
+  "n_warn": 1,
+  "rows": [
+    {
+      "id": "P0.no_hardcoded_judge_budget",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "absent",
+      "desc": "the judge's token budget is no longer the hardcoded 64 that guaranteed 0 labels"
+    },
+    {
+      "id": "P0.budget_from_config_ge_1024",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "1024",
+      "desc": "judge budget comes from config and is at least the measured-working 1024"
+    },
+    {
+      "id": "P0.judge_raises_on_empty",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "a judge that returns no label raises with diagnostics instead of returning ''"
+    },
+    {
+      "id": "P0.reasoning_off_prefix_applied",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "reasoning-off models (gpt-oss) are told to skip the reasoning pass (BUG-262/263)"
+    },
+    {
+      "id": "P0.fail_closed_flag_layer",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "a fully-failing cross-family FLAG layer aborts instead of reporting 0 disagreements"
+    },
+    {
+      "id": "P0.run_artifact_exists",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "1 file(s)",
+      "desc": "the relabel run produced a machine-readable artifact (M2: not a log line)"
+    },
+    {
+      "id": "P0.cross_family_actually_ran",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "200 in relabel_report_20260917_123804.json",
+      "desc": "the R5 cross-family judge executed on >=200 records and did not fail on all of them"
+    },
+    {
+      "id": "P0.cross_family_not_all_failed",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "0 < 200",
+      "desc": "fewer cross-family failures than attempts (else the layer is dead, not clean)"
+    },
+    {
+      "id": "P1.gate_wired_into_harness",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "the harness itself runs the preflight; the gate is not a voluntary step"
+    },
+    {
+      "id": "P1.na_is_not_zero",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "harness-invalid cells are recorded as NA, never scored as 0"
+    },
+    {
+      "id": "P1.report_excludes_na",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "the reporter excludes NA rows from accuracy instead of averaging them in"
+    },
+    {
+      "id": "P1.gate_artifact_fresh",
+      "severity": "fail",
+      "status": "DRIFT",
+      "detail": "stale gate: artifact 04d5bfcca5c30d00 vs current 7945905097ce4a74",
+      "desc": "a preflight artifact exists for the current harness fingerprint"
+    },
+    {
+      "id": "P1.toolcalling_rows",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "exit 0",
+      "desc": "tool-calling suite has >=140 scored rows (20 items x 7 models)"
+    },
+    {
+      "id": "P1.planning_rows",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "exit 0",
+      "desc": "planning suite has >=168 scored rows (24 items x 7 models) on computed gold"
+    },
+    {
+      "id": "P1.no_stale_gptoss_toolcall_rows",
+      "severity": "fail",
+      "status": "DRIFT",
+      "detail": "exit 1 |    never re-measured (_done_keys skips by key) \u2014 purge, then re-run the suite",
+      "desc": "no surviving gpt-oss toolcalling row from the missing-prefix run (BUG-262); _done_keys() skips by key, so a stale row is never re-measured and poisons the role forever"
+    },
+    {
+      "id": "P1.no_invalid_planning_items",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "present",
+      "desc": "the 17 hand-written planning items with wrong gold stay excluded"
+    },
+    {
+      "id": "P1.roles_cited",
+      "severity": "warn",
+      "status": "WARN",
+      "detail": "exit 1 | VERDICT: 20 role(s) uncited \u2014 annotate or freeze them as UNVERIFIED",
+      "desc": "every role declaring a model carries evidence (P2 freeze gate)"
+    },
+    {
+      "id": "M1.gate_exists",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "1 file(s)",
+      "desc": "the preflight gate and its policy file exist"
+    },
+    {
+      "id": "M1.policy_exists",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "1 file(s)",
+      "desc": "all preflight thresholds live in YAML (C12)"
+    },
+    {
+      "id": "M1.gate_selftest_passes",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "exit 0",
+      "desc": "the gate's own rules must agree with the stored artifacts (the pre-commit stress test that was missing: it was validated against an assumption instead of against history)"
+    },
+    {
+      "id": "M3.contract_exists",
+      "severity": "fail",
+      "status": "OK",
+      "detail": "1 file(s)",
+      "desc": "the acceptance criteria were frozen before execution"
+    }
+  ]
+}

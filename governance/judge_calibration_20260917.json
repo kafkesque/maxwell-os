@@ -1,0 +1,186 @@
+{
+  "tasks": {
+    "T1_dedup": {
+      "n_decisive": 7,
+      "per_model": {
+        "gemma-4-E4B-it-MLX-4bit": {
+          "accuracy": 1.0,
+          "hits": 7,
+          "unparsed": 0
+        },
+        "gpt-oss-20b-MXFP4-Q8": {
+          "accuracy": 0.5714,
+          "hits": 4,
+          "unparsed": 0
+        }
+      },
+      "majority_class": "same",
+      "majority_baseline": 0.5714
+    },
+    "T2_suffix_merge": {
+      "n_decisive": 8,
+      "per_model": {
+        "gemma-4-E4B-it-MLX-4bit": {
+          "accuracy": 0.875,
+          "hits": 7,
+          "unparsed": 0
+        },
+        "gpt-oss-20b-MXFP4-Q8": {
+          "accuracy": 0.75,
+          "hits": 6,
+          "unparsed": 0
+        }
+      },
+      "majority_class": "merge",
+      "majority_baseline": 0.875
+    },
+    "T3_content_type": {
+      "n_decisive": 9,
+      "per_model": {
+        "gemma-4-E4B-it-MLX-4bit": {
+          "accuracy": 0.2222,
+          "hits": 2,
+          "unparsed": 0
+        },
+        "gpt-oss-20b-MXFP4-Q8": {
+          "accuracy": 0.3333,
+          "hits": 3,
+          "unparsed": 0
+        }
+      },
+      "majority_class": "principle",
+      "majority_baseline": 0.7778
+    },
+    "T6_frontier69": {
+      "n_decisive": 9,
+      "per_model": {
+        "gemma-4-E4B-it-MLX-4bit": {
+          "accuracy": 0.7778,
+          "hits": 7,
+          "unparsed": 0
+        },
+        "gpt-oss-20b-MXFP4-Q8": {
+          "accuracy": 0.7778,
+          "hits": 7,
+          "unparsed": 0
+        }
+      },
+      "majority_class": "justified",
+      "majority_baseline": 0.7778
+    }
+  },
+  "models": [
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "coverage": {
+    "rows_total": 36,
+    "decisive": 33,
+    "third_state": 3,
+    "out_of_set": 0
+  },
+  "third_state": [
+    {
+      "task": "T1_dedup",
+      "item_id": "T1-03",
+      "human": "inbetween"
+    },
+    {
+      "task": "T1_dedup",
+      "item_id": "T1-06",
+      "human": "inbetween"
+    },
+    {
+      "task": "T2_suffix_merge",
+      "item_id": "T2-01",
+      "human": "inbetween"
+    }
+  ],
+  "out_of_set": [],
+  "verdicts": {
+    "T1_dedup": "ADOPT gemma-4-E4B-it-MLX-4bit acc=1.000 vs baseline 0.571 (lift +0.429) as the verifier",
+    "T2_suffix_merge": "DEGENERATE \u2014 gemma-4-E4B-it-MLX-4bit acc=0.875 vs baseline 0.875 (lift +0.000) \u2014 the judge adds no information over the constant answer 'merge'; make this task deterministic or human-owned",
+    "T3_content_type": "DEGENERATE \u2014 gpt-oss-20b-MXFP4-Q8 acc=0.333 vs baseline 0.778 (lift -0.445) \u2014 the judge adds no information over the constant answer 'principle'; make this task deterministic or human-owned",
+    "T6_frontier69": "DEGENERATE \u2014 gemma-4-E4B-it-MLX-4bit acc=0.778 vs baseline 0.778 (lift +0.000) \u2014 the judge adds no information over the constant answer 'justified'; make this task deterministic or human-owned"
+  },
+  "measured_at": "2026-09-17T19:54:23",
+  "sheet": "governance/JUDGE_CALIBRATION_SHEET_20260917.csv",
+  "raw_answers": {
+    "gemma-4-E4B-it-MLX-4bit": {
+      "T1-01": "same",
+      "T1-02": "same",
+      "T1-03": "different",
+      "T1-04": "different",
+      "T1-05": "different",
+      "T1-06": "different",
+      "T1-07": "same",
+      "T1-08": "different",
+      "T1-09": "same",
+      "T2-01": "merge",
+      "T2-02": "merge",
+      "T2-03": "merge",
+      "T2-04": "merge",
+      "T2-05": "merge",
+      "T2-06": "merge",
+      "T2-07": "merge",
+      "T2-08": "merge",
+      "T2-09": "merge",
+      "T3-01": "principle",
+      "T3-02": "principle",
+      "T3-03": "principle",
+      "T3-04": "process_template",
+      "T3-05": "process_template",
+      "T3-06": "growth_edge",
+      "T3-07": "process_template",
+      "T3-08": "principle",
+      "T3-09": "process_template",
+      "T6-01": "justified",
+      "T6-02": "justified",
+      "T6-03": "justified",
+      "T6-04": "justified",
+      "T6-05": "justified",
+      "T6-06": "justified",
+      "T6-07": "justified",
+      "T6-08": "justified",
+      "T6-09": "justified"
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+      "T1-01": "same",
+      "T1-02": "different",
+      "T1-03": "different",
+      "T1-04": "different",
+      "T1-05": "different",
+      "T1-06": "different",
+      "T1-07": "different",
+      "T1-08": "different",
+      "T1-09": "different",
+      "T2-01": "merge",
+      "T2-02": "merge",
+      "T2-03": "merge",
+      "T2-04": "merge",
+      "T2-05": "merge",
+      "T2-06": "merge",
+      "T2-07": "keep",
+      "T2-08": "merge",
+      "T2-09": "merge",
+      "T3-01": "principle",
+      "T3-02": "principle",
+      "T3-03": "principle",
+      "T3-04": "process_template",
+      "T3-05": "process_template",
+      "T3-06": "principle",
+      "T3-07": "process_template",
+      "T3-08": "principle",
+      "T3-09": "process_instance",
+      "T6-01": "justified",
+      "T6-02": "justified",
+      "T6-03": "justified",
+      "T6-04": "justified",
+      "T6-05": "justified",
+      "T6-06": "justified",
+      "T6-07": "justified",
+      "T6-08": "justified",
+      "T6-09": "justified"
+    }
+  }
+}

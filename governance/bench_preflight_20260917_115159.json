@@ -1,0 +1,220 @@
+{
+  "budgets": {
+    "planning": 900,
+    "toolcalling": 200
+  },
+  "cells": [
+    {
+      "content_chars": 126,
+      "ctx_tokens": null,
+      "detail": "gradable: ok",
+      "item_id": "tool-0",
+      "latency_s": 10.17,
+      "max_tokens": 200,
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "status": "VALID",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 735,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 8.49,
+      "max_tokens": 900,
+      "model": "Ornith-1.5-35B-A3B-REAP-19B",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 91,
+      "ctx_tokens": null,
+      "detail": "gradable: ok",
+      "item_id": "tool-0",
+      "latency_s": 14.72,
+      "max_tokens": 200,
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "status": "VALID",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 722,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 19.93,
+      "max_tokens": 900,
+      "model": "Ornith-1.5-9B-MLX-8bit",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 102,
+      "ctx_tokens": null,
+      "detail": "gradable: ok",
+      "item_id": "tool-0",
+      "latency_s": 1.36,
+      "max_tokens": 200,
+      "model": "Phi-4-mini-instruct-8bit",
+      "status": "VALID",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 410,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 3.16,
+      "max_tokens": 900,
+      "model": "Phi-4-mini-instruct-8bit",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 112,
+      "ctx_tokens": null,
+      "detail": "gradable: ok",
+      "item_id": "tool-0",
+      "latency_s": 8.36,
+      "max_tokens": 200,
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "status": "VALID",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 509,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 4.08,
+      "max_tokens": 900,
+      "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 90,
+      "ctx_tokens": null,
+      "detail": "gradable: ok",
+      "item_id": "tool-0",
+      "latency_s": 16.54,
+      "max_tokens": 200,
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "status": "VALID",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 1397,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 53.55,
+      "max_tokens": 900,
+      "model": "Qwen3.8-27B-MLX-4bit",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 0,
+      "ctx_tokens": null,
+      "detail": "empty content (cold reload, or a reasoning model with too small a budget?)",
+      "item_id": "tool-0",
+      "latency_s": 1.72,
+      "max_tokens": 200,
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "status": "NO_CONTENT",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 1075,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 11.06,
+      "max_tokens": 900,
+      "model": "gemma-4-E4B-it-MLX-4bit",
+      "status": "VALID",
+      "suite": "planning"
+    },
+    {
+      "content_chars": 884,
+      "ctx_tokens": null,
+      "detail": "unparseable JSON at max_tokens=200 (suite requires JSON)",
+      "item_id": "tool-0",
+      "latency_s": 13.3,
+      "max_tokens": 200,
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "status": "NO_JSON",
+      "suite": "toolcalling"
+    },
+    {
+      "content_chars": 10,
+      "ctx_tokens": null,
+      "detail": "gradable: pred=30 gold=30",
+      "item_id": "plan-schedule",
+      "latency_s": 3.97,
+      "max_tokens": 900,
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "status": "VALID",
+      "suite": "planning"
+    }
+  ],
+  "env_unsafe": false,
+  "environment": [
+    {
+      "check": "omlx_reachable",
+      "detail": "healthy",
+      "ok": true
+    },
+    {
+      "check": "portfolio_exact",
+      "detail": "match",
+      "ok": true
+    },
+    {
+      "check": "requested_models_served",
+      "detail": "all served",
+      "ok": true
+    },
+    {
+      "check": "disk_free_gb",
+      "detail": "48.5 GiB (floor 15.0)",
+      "ok": true
+    },
+    {
+      "check": "no_concurrent_benchmark",
+      "detail": "idle",
+      "ok": true
+    }
+  ],
+  "fingerprint": "04d5bfcca5c30d00",
+  "generated": "2026-09-17T11:51:59",
+  "invalid_cells": [
+    [
+      "gemma-4-E4B-it-MLX-4bit",
+      "toolcalling",
+      "NO_CONTENT"
+    ],
+    [
+      "gpt-oss-20b-MXFP4-Q8",
+      "toolcalling",
+      "NO_JSON"
+    ]
+  ],
+  "models": [
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "n_cells": 14,
+  "n_invalid": 2,
+  "static_only": false,
+  "suites": [
+    "toolcalling",
+    "planning"
+  ]
+}

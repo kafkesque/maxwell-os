@@ -1,0 +1,37 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== niah (9 items)
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    niah          acc=0.0  n=3  skipped=6
+  Qwen3.8-27B-MLX-4bit                     niah          acc=1.0  n=9
+  Ornith-1.5-35B-A3B-REAP-19B              niah          acc=1.0  n=9
+  Ornith-1.5-9B-OptiQ-4bit                 niah          acc=0.0  n=9
+  gemma-4-E4B-it-MLX-4bit                  niah          acc=0.667  n=9
+
+=== lc_reasoning (6 items)
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    lc_reasoning  acc=0.0  n=6
+  Qwen3.8-27B-MLX-4bit                     lc_reasoning  acc=1.0  n=6
+  Ornith-1.5-35B-A3B-REAP-19B              lc_reasoning  acc=0.5  n=6
+  Ornith-1.5-9B-OptiQ-4bit                 lc_reasoning  acc=0.0  n=6
+  gemma-4-E4B-it-MLX-4bit                  lc_reasoning  acc=0.0  n=6
+
+done in 7579s, 69 new results
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+
+=== niah (9 items)
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    niah          acc=0.5  n=6  skipped=3
+  Qwen3.8-27B-MLX-4bit                     niah          acc=1.0  n=6  skipped=3
+  Ornith-1.5-35B-A3B-REAP-19B              niah          acc=1.0  n=6  skipped=3
+  Ornith-1.5-9B-MLX-8bit                   niah          acc=0.444  n=9
+  gemma-4-E4B-it-MLX-4bit                  niah          acc=0.5  n=6  skipped=3
+
+=== lc_reasoning (6 items)
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit    lc_reasoning  acc=0.0  n=0  skipped=6
+  Qwen3.8-27B-MLX-4bit                     lc_reasoning  acc=0.0  n=0  skipped=6
+  Ornith-1.5-35B-A3B-REAP-19B              lc_reasoning  acc=0.0  n=0  skipped=6
+  Ornith-1.5-9B-MLX-8bit                   lc_reasoning  acc=0.833  n=6
+  gemma-4-E4B-it-MLX-4bit                  lc_reasoning  acc=0.0  n=0  skipped=6
+
+done in 4953s, 39 new results
+[niah-fix] done 2026-09-17 00:39:53

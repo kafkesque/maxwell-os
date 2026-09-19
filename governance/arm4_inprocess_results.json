@@ -1,0 +1,63 @@
+{
+  "note": "in-process mlx_lm ARM-4 (classification + S2 extraction). Reconstructed from arm4_benchmark.log after the process was killed during DeepSeek's hung extraction.",
+  "mlx-community/Ornith-1.5-9B-OptiQ-4bit": {
+    "classify": {
+      "discipline_acc": 0.467,
+      "domain_f1": 0.542,
+      "n": 30
+    },
+    "extract": {
+      "n": 6,
+      "fb": 5,
+      "null": 1,
+      "valid": 6
+    }
+  },
+  "mlx-community/gemma-4-12B-it-qat-OptiQ-4bit": {
+    "classify": {
+      "discipline_acc": 0.633,
+      "domain_f1": 0.598,
+      "n": 30
+    },
+    "extract": {
+      "n": 6,
+      "fb": 5,
+      "null": 1,
+      "valid": 3
+    }
+  },
+  "mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B": {
+    "classify": {
+      "discipline_acc": 0.433,
+      "domain_f1": 0.593,
+      "n": 30
+    },
+    "extract": {
+      "n": 6,
+      "fb": 5,
+      "null": 1,
+      "valid": 4
+    }
+  },
+  "mlx-community/Phi-4-mini-instruct-8bit": {
+    "classify": {
+      "discipline_acc": 0.433,
+      "domain_f1": 0.324,
+      "n": 30
+    },
+    "extract": {
+      "n": 6,
+      "fb": 6,
+      "null": 0,
+      "valid": 6
+    }
+  },
+  "mlx-community/DeepSeek-R1-0528-Qwen3-8B-4bit": {
+    "classify": {
+      "discipline_acc": 0.0,
+      "domain_f1": 0.417,
+      "n": 4
+    },
+    "extract": "HUNG (thinking traces; killed)"
+  }
+}

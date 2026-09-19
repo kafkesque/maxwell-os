@@ -1,0 +1,209 @@
+{
+  "created_at": "2026-09-15T10:57:49",
+  "n_clusters": 6,
+  "models": [
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "summaries": {
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": {
+      "name": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+      "n": 6,
+      "avg_secs": 30.82166666666667,
+      "median_secs": 33.8,
+      "min_secs": 12.65,
+      "max_secs": 39.35,
+      "total_secs": 184.93,
+      "n_fb": 5,
+      "n_null": 1,
+      "n_invalid": 0,
+      "n_schema_fail": 0,
+      "fb_rate": 0.8333333333333334,
+      "route_agreement": 1.0
+    },
+    "gpt-oss-20b-MXFP4-Q8": {
+      "name": "gpt-oss-20b-MXFP4-Q8",
+      "n": 6,
+      "avg_secs": 14.266666666666666,
+      "median_secs": 13.26,
+      "min_secs": 12.0,
+      "max_secs": 21.06,
+      "total_secs": 85.6,
+      "n_fb": 0,
+      "n_null": 0,
+      "n_invalid": 6,
+      "n_schema_fail": 0,
+      "fb_rate": 0.0,
+      "route_agreement": 0.0
+    }
+  },
+  "per_model_rows": {
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": [
+      {
+        "cluster_id": "cluster_66",
+        "n_segments": 5,
+        "route": "FB",
+        "valid": true,
+        "secs": 39.35,
+        "usage": {
+          "prompt_tokens": 2932,
+          "completion_tokens": 559,
+          "total_tokens": 3491,
+          "input_tokens": 2932,
+          "output_tokens": 559,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "model_load_duration": 5.99,
+          "total_time": 32.83
+        },
+        "name": "Heuristic Rationality Under Uncertainty"
+      },
+      {
+        "cluster_id": "cluster_109",
+        "n_segments": 6,
+        "route": "FB",
+        "valid": true,
+        "secs": 32.77,
+        "usage": {
+          "prompt_tokens": 2926,
+          "completion_tokens": 537,
+          "total_tokens": 3463,
+          "input_tokens": 2926,
+          "output_tokens": 537,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 32.75
+        },
+        "name": "Focal Point Convergence"
+      },
+      {
+        "cluster_id": "cluster_113",
+        "n_segments": 8,
+        "route": "FB",
+        "valid": true,
+        "secs": 33.8,
+        "usage": {
+          "prompt_tokens": 2929,
+          "completion_tokens": 618,
+          "total_tokens": 3547,
+          "input_tokens": 2929,
+          "output_tokens": 618,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 33.78
+        },
+        "name": "Tragedy of the Commons"
+      },
+      {
+        "cluster_id": "cluster_185",
+        "n_segments": 2,
+        "route": "NULL",
+        "valid": true,
+        "secs": 12.65,
+        "usage": {
+          "prompt_tokens": 2650,
+          "completion_tokens": 9,
+          "total_tokens": 2659,
+          "input_tokens": 2650,
+          "output_tokens": 9,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 12.63
+        },
+        "name": ""
+      },
+      {
+        "cluster_id": "cluster_306",
+        "n_segments": 20,
+        "route": "FB",
+        "valid": true,
+        "secs": 32.2,
+        "usage": {
+          "prompt_tokens": 2956,
+          "completion_tokens": 609,
+          "total_tokens": 3565,
+          "input_tokens": 2956,
+          "output_tokens": 609,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 32.18
+        },
+        "name": "Priming Influence on Behavior"
+      },
+      {
+        "cluster_id": "cluster_321",
+        "n_segments": 4,
+        "route": "FB",
+        "valid": true,
+        "secs": 34.16,
+        "usage": {
+          "prompt_tokens": 2835,
+          "completion_tokens": 717,
+          "total_tokens": 3552,
+          "input_tokens": 2835,
+          "output_tokens": 717,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "total_time": 34.14
+        },
+        "name": "Placebo Effect Mechanism"
+      }
+    ],
+    "gpt-oss-20b-MXFP4-Q8": [
+      {
+        "cluster_id": "cluster_66",
+        "n_segments": 5,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 21.06,
+        "error": "empty content (reasoning-model cold reload?)"
+      },
+      {
+        "cluster_id": "cluster_109",
+        "n_segments": 6,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 13.26,
+        "error": "empty content (reasoning-model cold reload?)"
+      },
+      {
+        "cluster_id": "cluster_113",
+        "n_segments": 8,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 13.2,
+        "error": "empty content (reasoning-model cold reload?)"
+      },
+      {
+        "cluster_id": "cluster_185",
+        "n_segments": 2,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 12.0,
+        "error": "empty content (reasoning-model cold reload?)"
+      },
+      {
+        "cluster_id": "cluster_306",
+        "n_segments": 20,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 13.45,
+        "error": "empty content (reasoning-model cold reload?)"
+      },
+      {
+        "cluster_id": "cluster_321",
+        "n_segments": 4,
+        "route": "ERROR",
+        "valid": false,
+        "secs": 12.63,
+        "error": "empty content (reasoning-model cold reload?)"
+      }
+    ]
+  }
+}

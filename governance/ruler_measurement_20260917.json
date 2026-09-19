@@ -1,0 +1,340 @@
+{
+ "rows": 150,
+ "axes": {
+  "content_type": {
+   "floor": 0.6,
+   "stratum_a_n": 100,
+   "stratum_b_n": 50,
+   "stratum_a_unanswered": 0,
+   "answer_resolution": {
+    "exact": 150
+   },
+   "human_distribution_A": {
+    "principle": 75,
+    "process_template": 8,
+    "quarantine": 6,
+    "growth_edge": 4,
+    "process_instance": 3,
+    "noise_drop": 3,
+    "tool_instruction": 1
+   },
+   "emerging_vacuous_A": 0,
+   "stored_label_accuracy_A": 0.74,
+   "wilson95": [
+    0.646,
+    0.816
+   ],
+   "constant_answer_baseline": 0.75,
+   "baseline_label": "principle",
+   "lift_over_baseline": -0.01,
+   "verdict": "STOPPED: decisive",
+   "per_class_precision_B": {
+    "growth_edge": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "noise_drop": {
+     "n": 3,
+     "stored_agrees": 2
+    },
+    "principle": {
+     "n": 34,
+     "stored_agrees": 10
+    },
+    "process_instance": {
+     "n": 2,
+     "stored_agrees": 1
+    },
+    "process_template": {
+     "n": 3,
+     "stored_agrees": 2
+    },
+    "quarantine": {
+     "n": 4,
+     "stored_agrees": 1
+    },
+    "tool_instruction": {
+     "n": 3,
+     "stored_agrees": 3
+    }
+   },
+   "untraceable_slice_A": {
+    "n": 51,
+    "stored_agrees": 34
+   },
+   "traceable_slice_A": {
+    "n": 49,
+    "stored_agrees": 40
+   }
+  },
+  "discipline": {
+   "floor": 0.6,
+   "stratum_a_n": 83,
+   "stratum_b_n": 36,
+   "stratum_a_unanswered": 17,
+   "answer_resolution": {
+    "exact": 119,
+    "blank": 29,
+    "UNRESOLVED": 2
+   },
+   "human_distribution_A": {
+    "operations research": 7,
+    "emerging": 7,
+    "design thinking": 6,
+    "psychology": 5,
+    "research methodology": 4,
+    "behavioral economics": 4,
+    "human-computer interaction": 4,
+    "cultural studies": 3,
+    "risk management": 3,
+    "strategic thinking": 3,
+    "organizational theory": 3,
+    "information science": 3,
+    "design psychology": 3,
+    "typography": 3,
+    "privacy & surveillance": 2,
+    "political economy": 2,
+    "creative process": 2,
+    "philosophy": 2,
+    "decision making": 2,
+    "information retrieval": 1,
+    "semiotics": 1,
+    "computer graphics": 1,
+    "software engineering": 1,
+    "sociology": 1,
+    "neuroscience": 1,
+    "engineering": 1,
+    "cognitive science": 1,
+    "linguistics": 1,
+    "communication theory": 1,
+    "machine learning": 1,
+    "visual perception": 1,
+    "computational geometry": 1,
+    "media studies": 1,
+    "color theory": 1
+   },
+   "emerging_vacuous_A": 0,
+   "stored_label_accuracy_A": 0.506,
+   "wilson95": [
+    0.401,
+    0.611
+   ],
+   "constant_answer_baseline": 0.084,
+   "baseline_label": "operations research",
+   "lift_over_baseline": 0.422,
+   "verdict": "CONTINUE: inside the margin",
+   "per_class_precision_B": {
+    "artificial intelligence": {
+     "n": 2,
+     "stored_agrees": 1
+    },
+    "computational physics & simulation": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "computer graphics": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "creative process": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "cultural design": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "cultural studies": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "decision making": {
+     "n": 2,
+     "stored_agrees": 1
+    },
+    "design psychology": {
+     "n": 2,
+     "stored_agrees": 0
+    },
+    "design thinking": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "economics": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "emerging": {
+     "n": 2,
+     "stored_agrees": 0
+    },
+    "engineering": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "generative ai": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "generative design": {
+     "n": 2,
+     "stored_agrees": 2
+    },
+    "human-computer interaction": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "information retrieval": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "information security": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "literary theory": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "media studies": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "operations research": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "performing arts": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "psychology": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "research methodology": {
+     "n": 2,
+     "stored_agrees": 1
+    },
+    "risk management": {
+     "n": 1,
+     "stored_agrees": 0
+    },
+    "semiotics": {
+     "n": 2,
+     "stored_agrees": 1
+    },
+    "software engineering": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "strategic thinking": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "systems engineering": {
+     "n": 1,
+     "stored_agrees": 1
+    },
+    "visual perception": {
+     "n": 1,
+     "stored_agrees": 0
+    }
+   },
+   "untraceable_slice_A": {
+    "n": 39,
+    "stored_agrees": 24
+   },
+   "traceable_slice_A": {
+    "n": 44,
+    "stored_agrees": 18
+   }
+  },
+  "extraction_type": {
+   "floor": 0.6,
+   "stratum_a_n": 89,
+   "stratum_b_n": 39,
+   "stratum_a_unanswered": 11,
+   "answer_resolution": {
+    "fuzzy": 31,
+    "exact": 97,
+    "blank": 22
+   },
+   "human_distribution_A": {
+    "descriptive_model": 32,
+    "causal_mechanism": 23,
+    "normative_heuristic": 21,
+    "empirical_pattern": 13
+   },
+   "emerging_vacuous_A": 0,
+   "stored_label_accuracy_A": 0.831,
+   "wilson95": [
+    0.74,
+    0.895
+   ],
+   "constant_answer_baseline": 0.36,
+   "baseline_label": "descriptive_model",
+   "lift_over_baseline": 0.472,
+   "verdict": "STOPPED: decisive",
+   "per_class_precision_B": {
+    "causal_mechanism": {
+     "n": 15,
+     "stored_agrees": 11
+    },
+    "descriptive_model": {
+     "n": 11,
+     "stored_agrees": 9
+    },
+    "empirical_pattern": {
+     "n": 6,
+     "stored_agrees": 5
+    },
+    "normative_heuristic": {
+     "n": 7,
+     "stored_agrees": 4
+    }
+   },
+   "untraceable_slice_A": {
+    "n": 43,
+    "stored_agrees": 37
+   },
+   "traceable_slice_A": {
+    "n": 46,
+    "stored_agrees": 37
+   }
+  }
+ },
+ "answer_resolution": {
+  "content_type": {
+   "by": {
+    "exact": 150
+   },
+   "blank": 0,
+   "unresolved": [],
+   "scored_n": 150
+  },
+  "discipline": {
+   "by": {
+    "exact": 119,
+    "blank": 29,
+    "UNRESOLVED": 2
+   },
+   "blank": 29,
+   "unresolved": [
+    "R027='leadership'",
+    "R146='leadership'"
+   ],
+   "scored_n": 119
+  },
+  "extraction_type": {
+   "by": {
+    "fuzzy": 31,
+    "exact": 97,
+    "blank": 22
+   },
+   "blank": 22,
+   "unresolved": [],
+   "scored_n": 128
+  }
+ }
+}

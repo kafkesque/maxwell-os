@@ -1,0 +1,50 @@
+{
+  "schema_version": "3.0",
+  "gen_model": "propagate_4axis_anchor.py (deterministic; no generation)",
+  "created_at": "2026-09-17T13:18:16",
+  "anchor": "gold_4axis.jsonl",
+  "db": "maxwell.db",
+  "backup": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/backup/deletions/20260917_131815",
+  "cells_written": 318,
+  "per_axis": {
+    "content_type": {
+      "already-correct": 251
+    },
+    "depth": {
+      "already-correct": 224,
+      "p5:reliable-pair-D2631-revote": 8,
+      "skipped:n/a-non-principle": 17,
+      "p5:human-locked": 1,
+      "p5:reliable-pair-D2619-revote": 1
+    },
+    "discipline": {
+      "already-correct": 142,
+      "p5:human-D2618p1": 30,
+      "p5:reliable-pair-D2618p1": 63,
+      "p5:reliable-pair-D2631-revote": 9,
+      "p5:human-locked": 5,
+      "p5:reliable-pair-D2619-revote": 2
+    },
+    "domains": {
+      "already-correct": 52,
+      "p5:human-D2618p1": 181,
+      "p5:reliable-pair-D2631-revote": 18
+    }
+  },
+  "remaining_updates_after_write": 0,
+  "residual": {
+    "content_type": {
+      "already-correct": 251
+    },
+    "depth": {
+      "already-correct": 234,
+      "skipped:n/a-non-principle": 17
+    },
+    "discipline": {
+      "already-correct": 251
+    },
+    "domains": {
+      "already-correct": 251
+    }
+  }
+}

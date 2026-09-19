@@ -116,6 +116,15 @@ VERIFY_MODEL_V2=_env("verify_model_v2",_CFG["models"]["verifier_v2"]["model"])  
 EMBED_MODEL=_env("embed_model",_CFG["models"]["embeddings"]["model"]); EMBED_PROVIDER=_CFG["models"]["embeddings"]["provider"]
 RELABEL_MAX_WORKERS=int(_env("relabel_max_workers", _CFG.get("stage2", {}).get("relabel_max_workers", 4)))  # D2434: R1 relabel sweep parallelism
 RELABEL_CROSS_FAMILY_MODEL=str(_CFG.get("stage2", {}).get("relabel_cross_family_model", ""))  # P1.3 (D2469): cross-family FLAG judge; "" = disabled
+# BUG-263: OUTPUT budget for the FORM judge. call_omlx_json() returns [] rather than raising when a
+# response is unparseable, and a Harmony reasoning model spends its budget on the reasoning pass
+# before emitting content (measured: 64 -> 0c content, 256 -> 0c, 1024 -> JSON). 64 was hardcoded and
+# guaranteed zero labels. Value lives in config (C12), not here.
+RELABEL_JUDGE_MAX_TOKENS=int(_env("relabel_judge_max_tokens", _CFG.get("stage2", {}).get("relabel_judge_max_tokens", 1024)))
+# BUG-262/263: tell a reasoning-off model to skip the reasoning pass, else the budget above is wasted.
+RELABEL_APPLY_REASONING_OFF_PREFIX=str(_env("relabel_apply_reasoning_off_prefix", "1")).lower() in ("1", "true", "yes")
+RELABEL_JUDGE_MIN_CONTENT_CHARS=int(_env("relabel_judge_min_content_chars", _CFG.get("stage2", {}).get("relabel_judge_min_content_chars", 2)))
+RELABEL_REPORT_DIR=str(_CFG.get("stage2", {}).get("relabel_report_dir", "governance"))  # M2: run artifact dir
 
 # ── Settings ───────────────────────────────────────────────────────────
 SCHEMA_VERSION=_CFG["pipeline"]["schema_version"]; PIPELINE_COMMIT=_CFG["pipeline"]["commit"]

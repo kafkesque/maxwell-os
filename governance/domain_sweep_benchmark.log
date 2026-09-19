@@ -1,0 +1,5 @@
+rows: 234 | domains: 43 | top_k: 3
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 5641.79it/s]
+[bge-reranker-v2-m3 top-3] micro-F1 0.3242 | macro-F1 0.0000 | subset 0.0128
+[bge-reranker-v2-m3 sweep] best threshold 0.15 -> micro-F1 0.2193 | macro-F1 0.0000 | subset 0.0085
+wrote /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/domain_taxonomy_match_benchmark.json

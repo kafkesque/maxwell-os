@@ -1,0 +1,84 @@
+{
+  "budgets": {
+    "abstain": 300,
+    "delegation": 600,
+    "gsm8k": 1200,
+    "hardcode": 900,
+    "hotpot_qa": 200,
+    "humaneval": 700,
+    "ifeval": 700,
+    "lc_reasoning": 300,
+    "math500": 1600,
+    "mbpp": 700,
+    "mmlu_pro": 800,
+    "niah": 40,
+    "planning": 900,
+    "reviewing": 200,
+    "stability": 30,
+    "toolcalling": 200,
+    "voting": 512
+  },
+  "cells": [],
+  "env_unsafe": false,
+  "environment": [
+    {
+      "check": "omlx_reachable",
+      "detail": "healthy",
+      "ok": true
+    },
+    {
+      "check": "portfolio_exact",
+      "detail": "match",
+      "ok": true
+    },
+    {
+      "check": "requested_models_served",
+      "detail": "all served",
+      "ok": true
+    },
+    {
+      "check": "disk_free_gb",
+      "detail": "48.4 GiB (floor 15.0)",
+      "ok": true
+    },
+    {
+      "check": "no_concurrent_benchmark",
+      "detail": "LIVE: 64848 /Library/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python tools/model_eval_suite.py ",
+      "ok": false
+    }
+  ],
+  "fingerprint": "949e8b7100344692",
+  "generated": "2026-09-17T10:43:25",
+  "invalid_cells": [],
+  "models": [
+    "Ornith-1.5-35B-A3B-REAP-19B",
+    "Ornith-1.5-9B-MLX-8bit",
+    "Phi-4-mini-instruct-8bit",
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "Qwen3.8-27B-MLX-4bit",
+    "gemma-4-E4B-it-MLX-4bit",
+    "gpt-oss-20b-MXFP4-Q8"
+  ],
+  "n_cells": 0,
+  "n_invalid": 0,
+  "static_only": true,
+  "suites": [
+    "abstain",
+    "delegation",
+    "gsm8k",
+    "hardcode",
+    "hotpot_qa",
+    "humaneval",
+    "ifeval",
+    "lc_reasoning",
+    "math500",
+    "mbpp",
+    "mmlu_pro",
+    "niah",
+    "planning",
+    "reviewing",
+    "stability",
+    "toolcalling",
+    "voting"
+  ]
+}

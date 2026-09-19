@@ -1,0 +1,299 @@
+{
+  "policy": "mark duplicate_of + QUARANTINE (NEVER delete; R-D410 safe_delete only destructive path)",
+  "model": "Qwen3.8-27B-MLX-4bit",
+  "duplicate_of": {
+    "4ceb7acb4f1cf03b9db836fc0f17b4f267e31d5865af1416d1a1d128e6c35012": "e01c258d681176807934bfc48585199b2a0bba0faf8e87c7bb8d0a8e099282b0",
+    "aeb8aae55b7330c0274d1ac44a01c93e05ea53476f8e41ca9742d9e4698c3d93": "6c1a9edfbdac37836d2436aed12109855bfc3443052102844d8d938d96cb0c42",
+    "3506bda95176b5be6b9db3080471f8b96b65ea381be6a1e3303ecb0e56f945c1": "2273fa2d67f87db3828af407bffa4a67dd41e4615c19a16754c65d752dd2d6aa",
+    "24916fa63a2e42670e4694268b757c91251b9dc6ff8b693e63f5dcef36604ac4": "adacfa23b0d90bed3435c6dcee735e590ed902d4ca41e14f88b9442a857615c9",
+    "23603e0bb1c8a66fa0a4b4b42bdffdb125c14d4860ff12d142a9aaec5b9b69da": "7a691900a1192cf161a82779484058eaf54fa2ed92bd62ba273a1af3b637896f",
+    "fbcdefe9ebe1504ed6ebb408f5e7532d7e39f46761320ab0d4c67061b59d469b": "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8",
+    "6e7d4f481f1c809389c9b44537a0f4fca4c3f5d784bf1cf006da0719d4d9c191": "4a4ebe69a5cb028e1518c8c8459830ee3a3c05968c8c0b7a00c14861647c65f4",
+    "5971192bab6e858ccc23af04b63207c2d940f00e722131f3453fddad5d338273": "6057c6acd1e012cd24ab743e15219158849a41da988a655c1d7b265b5ac9cfbf",
+    "a98b80a098af0a6789a7b467c168f0236c25a9455954e1ddc9ba5f3b2f04bfc2": "4908d7bb61eff2b9c1a804e30d1fe2dded0d84d5e1bbf3e18108a8a11ce47575",
+    "1b0b34718d0f732e74cb1392e460e8ab81bee4ec55167c86bf5f367d1f1eeac1": "982d303bcbf38f03abbdceb7fa0c42ebcca4c4550e3acd7ea94c14f481908aaf"
+  },
+  "distinct_kept": [
+    "60076c04300602476ffc588c65ef4df68b5ec44ad153f2c74c083dc96fc83caf",
+    "4c8fc38259195f2ebe06ae893d46f99163591f913eba669c7a6500b59477e85c",
+    "06ad1f6eb971f939a8a4186268770d3539b842702e133664c9c91c6c93fe8565",
+    "3755f05b7e71a467e970a7a8d8e933081632ad3522d4fde2a4c488d34d3ba26e",
+    "cdf5ddff0903c7c46ecf85386e4e81439efcf7bba53fd8c97fefeb95882135d8",
+    "df77f10bdb2f3ba43ae39759e24c82445ad211c1e25957dab47eafcb1bb0f003",
+    "faa4f2d3d0280af035e4f23c2fd4c65e01690052c4120c124423daa55fa1d002",
+    "0704163880b8e5dad12631691f4c1feec9303d72561ad6154837d9eb1855eb08",
+    "3328530feaea98d122587c7064eed3ffe1fa2a9d3c3fc6a31799ccbea90637a5",
+    "e2a45e3c40877dc44feff17a847ecb50d6443fb3bcb78f47a0288d6462c3512d",
+    "1c33bed2cb4d04ba93fd5a68d1fee287c7f3ca9fca808b7c28bdbca6b26a98f0",
+    "10816416ca83e0dd15189b758d34b4467c9223dc6ecd136521f195d80954b6f8",
+    "e0f77e21525fa8a9aaae42c161961fbb8fcbad4da7b9ab8f225627daa64f20c3",
+    "b2ce8ca29c104eacb335f70cc4ec875b68ec271f3f6f8c51a0640683c4e5de69",
+    "94dd96f85c924f081cb7297a9b8bc1b97a4c1ac4c9641aa4ab2eec6d93720618",
+    "805db1ef134a9d80b9315fe4d56993e473e7339ef13284dc06f05091fa6cb9c3",
+    "e86454050618e699b47422095dec1954f64841c41852e8f635940d043cdaaf72",
+    "22c982203091531e284a3ae39d599f5b9fdd5dfe6d7302f4af2fc5b90571b94c",
+    "9605e415790cd650acd75830265e6effe46ffc530049f53d34d73020883087fc",
+    "9eb9e59e8cb3a6aef6d019b2aa36d839ada72dc18279c42eff32b4cdbaa5dbbe",
+    "da2a00eff27f7d243d3381fadecfb9597b662d5e165acc9f958655463fad9a1f",
+    "eb47077d0cec3419fa8a243163f17280e8ac0720c06b1e48eedf0c0aaa2a0e62"
+  ],
+  "errors": [],
+  "verdicts": [
+    {
+      "base_fb_id": "e01c258d681176807934bfc48585199b2a0bba0faf8e87c7bb8d0a8e099282b0",
+      "dup_fb_id": "4ceb7acb4f1cf03b9db836fc0f17b4f267e31d5865af1416d1a1d128e6c35012",
+      "base_name": "Anna Karenina Principle",
+      "dup_name": "Anna Karenina Principle (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks define the same 'Anna Karenina Principle' with identical mechanisms (success requires avoiding multiple independent failure modes) and applications (ensuring all potential failure points are mitigated in complex systems or projects). The only difference is the explicit mention of the literary origin in [B], which does not change the underlying design principle or its application."
+    },
+    {
+      "base_fb_id": "b664613df359d0b8d7dca2eecc6635335c0babaf830e397a010f769fc4efed8f",
+      "dup_fb_id": "60076c04300602476ffc588c65ef4df68b5ec44ad153f2c74c083dc96fc83caf",
+      "base_name": "Blue Ocean Market Creation",
+      "dup_name": "Blue Ocean Market Creation (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks address the high-level concept of creating new market spaces (Blue Ocean Strategy), their mechanisms differ significantly. Block [A] specifies a concrete tactical heuristic involving the systematic scanning of alternatives and the 'ERRC' grid (Eliminate, Reduce, Raise, Create) to redesign the value chain. Block [B] describes a structural model focused on the redefinition of problems and the expansion of market size through adjacent/untapped segments, without referencing the specific value-curve manipulation or the systematic scanning process detailed in [A]. Therefore, [B] is a broader or differently framed facet of market creation, whereas [A] is a specific implementation mechanism."
+    },
+    {
+      "base_fb_id": "e107c32461db4d82f45bb90287f158609e76cd4347025997bcfa149e860c65cc",
+      "dup_fb_id": "4c8fc38259195f2ebe06ae893d46f99163591f913eba669c7a6500b59477e85c",
+      "base_name": "Chasm Crossing Strategy",
+      "dup_name": "Chasm Crossing Strategy (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks reference the 'chasm' concept, they describe fundamentally different mechanisms and applications. Block [A] focuses on a macro-level marketing strategy shift (from innovation-focused to practical/proven-value messaging) to address the difference in decision-making criteria between early adopters and mainstream pragmatists. Block [B] focuses on a micro-level sales tactic involving the acceptance of short-term revenue loss to invest in human relationship building. The mechanism in [A] is about messaging and positioning, whereas the mechanism in [B] is about time investment and relationship capital."
+    },
+    {
+      "base_fb_id": "2e5f5453100166e4844c03e74924e7d6fbaf90fe8946fd25d12cb6183d581e89",
+      "dup_fb_id": "06ad1f6eb971f939a8a4186268770d3539b842702e133664c9c91c6c93fe8565",
+      "base_name": "Commitment and Consistency Principle",
+      "dup_name": "Commitment and Consistency Principle (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the same name and core psychological mechanism (pressure to remain consistent), their applications differ in direction and intent. Block [A] describes a persuasive technique where an agent leverages a small commitment to elicit a larger, related request (active manipulation/compliance). Block [B] describes a predictive heuristic where an agent anticipates that a person will follow through on a goal they have already committed to (passive prediction/expectation). One is a tool for influencing behavior, while the other is a model for predicting behavior."
+    },
+    {
+      "base_fb_id": "daeaa09a589ef30cd94f0dee985c1cc470f3f26ba16597e8109f82b6c3834af4",
+      "dup_fb_id": "3755f05b7e71a467e970a7a8d8e933081632ad3522d4fde2a4c488d34d3ba26e",
+      "base_name": "Confident Humility Framework",
+      "dup_name": "Confident Humility Framework (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the core concept of 'confident humility' (balancing self-assurance with humility), Block [B] introduces a distinct mechanism by explicitly defining a tripartite framework that contrasts confident humility against 'blind arrogance' and 'paralyzing doubt.' Block [A] describes a binary dynamic equilibrium between confidence and humility without referencing these specific opposing states. Therefore, [B] is a more specific structural model that includes the principle in [A] but adds distinct comparative mechanisms."
+    },
+    {
+      "base_fb_id": "6c1a9edfbdac37836d2436aed12109855bfc3443052102844d8d938d96cb0c42",
+      "dup_fb_id": "aeb8aae55b7330c0274d1ac44a01c93e05ea53476f8e41ca9742d9e4698c3d93",
+      "base_name": "Creative Confidence Through Action",
+      "dup_name": "Creative Confidence Through Action (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism: building creative confidence through the execution of small, manageable actions that lead to incremental success. While [A] frames it as a normative heuristic and [B] cites self-efficacy research, the core principle (action/small wins -> confidence) and the application (start small to overcome inertia/fear) are identical."
+    },
+    {
+      "base_fb_id": "f99f3543037b99a53c63fc5682bffb38a1c626ad1bfcd5600eae1e3cca9212a1",
+      "dup_fb_id": "cdf5ddff0903c7c46ecf85386e4e81439efcf7bba53fd8c97fefeb95882135d8",
+      "base_name": "Creative Process Integration",
+      "dup_name": "Creative Process Integration (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Creative Process Integration', their mechanisms and applications are fundamentally different. Block [A] describes a structural framework for professional graphic design involving the synthesis of conceptual, visual, and analog elements. Block [B] describes a specific psychological or artistic strategy for transforming personal flaws and dysfunctions into creative assets. The mechanisms (organizational framework vs. transformation of personal limitations) and applications (general design projects vs. personal artistic expression) do not overlap."
+    },
+    {
+      "base_fb_id": "c199ed4771febad7a57e2285f01ea2ce3c1ff7c934cc1366b147dd52662004fa",
+      "dup_fb_id": "df77f10bdb2f3ba43ae39759e24c82445ad211c1e25957dab47eafcb1bb0f003",
+      "base_name": "Creative Risk-taking in Design",
+      "dup_name": "Creative Risk-taking in Design (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the general theme of creative risk-taking, their specific mechanisms and applications differ. Block [A] focuses on the *process* of initiation and commitment (self-generated briefs, trusting instincts, accepting failure as part of the cycle) to foster innovation. Block [B] focuses on the *tactical execution* of rebellion against specific constraints (challenging corporate styles, deviating from brand guidelines, using unconventional materials). One is about the mindset of starting without constraints, while the other is about the act of breaking existing constraints."
+    },
+    {
+      "base_fb_id": "2273fa2d67f87db3828af407bffa4a67dd41e4615c19a16754c65d752dd2d6aa",
+      "dup_fb_id": "3506bda95176b5be6b9db3080471f8b96b65ea381be6a1e3303ecb0e56f945c1",
+      "base_name": "Data-driven Decision Making",
+      "dup_name": "Data-driven Decision Making (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism (systematic collection, analysis, and interpretation of data/metrics to replace intuition) and the same application (guiding strategic or operational decisions). The slight differences in wording (e.g., 'complex systems' vs 'organizations') do not change the core principle or mechanism."
+    },
+    {
+      "base_fb_id": "d019b8e04f4d8dcf9fd76b7183bcc7e0b16e78d4bcd49b339ddf258ec6c994e3",
+      "dup_fb_id": "faa4f2d3d0280af035e4f23c2fd4c65e01690052c4120c124423daa55fa1d002",
+      "base_name": "Data-driven Decision Making Framework",
+      "dup_name": "Data-driven Decision Making Framework (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Data-driven Decision Making Framework', their mechanisms and applications are fundamentally different. Block [A] describes a general analytical methodology for integrating empirical data, statistical analysis, and qualitative insights to inform strategic choices. Block [B] describes a specific educational and professional training pathway for marketing research, focusing on case-based learning, software tools, and data management protocols to develop practitioner skills. The mechanism in [A] is about the structure of analysis, whereas [B] is about the structure of learning and curriculum design."
+    },
+    {
+      "base_fb_id": "59deff36a1d34f604964107e21df1a6748fd0300e7facf7af22976b4c5d9931f",
+      "dup_fb_id": "0704163880b8e5dad12631691f4c1feec9303d72561ad6154837d9eb1855eb08",
+      "base_name": "Ethical Ai Design Framework",
+      "dup_name": "Ethical Ai Design Framework (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the same high-level goal (integrating ethics into AI design), their mechanisms differ in specificity and operationalization. Block [A] prescribes a general normative heuristic to embed specific values (fairness, transparency, etc.) into every design decision. Block [B] specifies a more granular procedural mechanism involving 'systematically asking critical questions,' 'applying ethical frameworks to identify risks,' and explicitly 'balancing bias mitigation with performance preservation.' Because [B] introduces specific operational steps (questioning, risk identification, performance balancing) not present in [A], they are distinct facets of the broader ethical design principle."
+    },
+    {
+      "base_fb_id": "adacfa23b0d90bed3435c6dcee735e590ed902d4ca41e14f88b9442a857615c9",
+      "dup_fb_id": "24916fa63a2e42670e4694268b757c91251b9dc6ff8b693e63f5dcef36604ac4",
+      "base_name": "Everything Is Figureoutable",
+      "dup_name": "Everything Is Figureoutable (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the same core mechanism: reframing obstacles or failures as solvable problems/learning opportunities to drive persistence and action. Although [B] explicitly mentions 'limiting beliefs' and [A] mentions 'hope', the underlying operational logic (reframing + persistence) and the application (facing a challenge) are identical."
+    },
+    {
+      "base_fb_id": "7a691900a1192cf161a82779484058eaf54fa2ed92bd62ba273a1af3b637896f",
+      "dup_fb_id": "23603e0bb1c8a66fa0a4b4b42bdffdb125c14d4860ff12d142a9aaec5b9b69da",
+      "base_name": "Figure-ground Relationship",
+      "dup_name": "Figure-ground Relationship (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same perceptual mechanism (segmentation into figure and ground based on contrast, boundaries, and spatial arrangement) and the same application (using these factors to establish visual hierarchy and focus). The slight difference in wording regarding 'stability' in [B] versus 'shifting' in [A] does not change the core design principle or mechanism, which is the use of contrast and boundaries to define foreground/background roles."
+    },
+    {
+      "base_fb_id": "5c6a142d08da89a902cd948dcb9407aa56b1f6a02dbeedfb9afd4c9a0d9c64a5",
+      "dup_fb_id": "3328530feaea98d122587c7064eed3ffe1fa2a9d3c3fc6a31799ccbea90637a5",
+      "base_name": "Human-ai Collaboration Framework",
+      "dup_name": "Human-ai Collaboration Framework (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks describe human-AI collaboration, they focus on different mechanisms and applications. Block [A] is a strategic adoption heuristic for organizations with domain expertise but limited development resources, focusing on combining human insight with pre-built AI tools to bridge capability gaps. Block [B] is a system design principle focusing on the operational division of labor (routine vs. strategic tasks) and the specific interaction loop (feedback and control) within a built system. One addresses the 'why/how to adopt' (resource bridging), while the other addresses the 'how to structure' (role assignment)."
+    },
+    {
+      "base_fb_id": "976a9ec288694754f5c908d348a4111891dc6545f29c246f4bd210744a196f36",
+      "dup_fb_id": "e2a45e3c40877dc44feff17a847ecb50d6443fb3bcb78f47a0288d6462c3512d",
+      "base_name": "Information-driven Decision Making",
+      "dup_name": "Information-driven Decision Making (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks relate to using information for decisions, their mechanisms differ. Block [A] focuses on a normative heuristic of reducing uncertainty to improve decision quality (evidence over intuition). Block [B] focuses on the operational trade-off between information completeness and execution urgency, specifically addressing bottlenecks caused by missing data regarding external conditions and internal capabilities. One is a general quality principle, the other is a specific execution/timing constraint."
+    },
+    {
+      "base_fb_id": "d1b8b6488d4dc221003440c6684e9cc39b7cfdcb6a5639e8b9e8c0fa84090dbc",
+      "dup_fb_id": "1c33bed2cb4d04ba93fd5a68d1fee287c7f3ca9fca808b7c28bdbca6b26a98f0",
+      "base_name": "Iterative Design Learning",
+      "dup_name": "Iterative Design Learning (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Iterative Design Learning' and the general concept of iteration, their mechanisms and specific applications differ. Block [A] is a general design philosophy emphasizing a mindset shift from 'perfection' to 'adaptation' for any product or system. Block [B] is a specific heuristic for *skill development* in graphic design, focusing on building competence through high-stakes, hands-on experimentation (e.g., printing 5,000 copies) and market feedback. Block [B] is a specific facet of skill acquisition within a specific domain, whereas [A] is a broader process principle."
+    },
+    {
+      "base_fb_id": "586818d37e4cc604ca9752d6cb32b8f3012bc378a9c0d741c7c1d3674d61eace",
+      "dup_fb_id": "10816416ca83e0dd15189b758d34b4467c9223dc6ecd136521f195d80954b6f8",
+      "base_name": "Iterative Prompt Refinement",
+      "dup_name": "Iterative Prompt Refinement (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Iterative Prompt Refinement' and the general concept of iteration, their specific mechanisms and applications differ. Block [A] focuses on the meta-process of prompt engineering: setting up evaluation loops, measuring performance, and adjusting the prompt itself for reliability in production. Block [B] focuses on the runtime processing of AI outputs: applying specific techniques like summarization, chaining, and verification to refine the content of the response itself to mitigate failure modes like repetition. One is about optimizing the prompt via measurement; the other is about refining the output via processing steps."
+    },
+    {
+      "base_fb_id": "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8",
+      "dup_fb_id": "fbcdefe9ebe1504ed6ebb408f5e7532d7e39f46761320ab0d4c67061b59d469b",
+      "base_name": "Metaphorically Selling How to Use the Ma",
+      "dup_name": "Metaphorically Selling How to Use the Ma (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism (mapping abstract technical concepts onto familiar everyday domains to bridge understanding) and the same application (explaining technical features to non-experts). The differences in specific examples (server capacity vs. tax) are merely illustrative instances of the same underlying principle."
+    },
+    {
+      "base_fb_id": "2d8e0a8a12d5ff19d624a9cf080317a3187901214a9d79dd0c0ec54ac6d1d08a",
+      "dup_fb_id": "e0f77e21525fa8a9aaae42c161961fbb8fcbad4da7b9ab8f225627daa64f20c3",
+      "base_name": "Nonlinear System Behavior",
+      "dup_name": "Nonlinear System Behavior (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks address nonlinear systems, they focus on different specific mechanisms and applications. Block [A] focuses on the general classification of system behaviors (linear/nonlinear vs. predictable/unpredictable) and the emergence of properties from component interactions, recommending robust control strategies. Block [B] specifically focuses on sensitivity to initial conditions, feedback mechanisms, and the amplification of small changes (chaos/disproportionate effects), recommending adjustments for sensitivity and chaos. Since [B] is a specific facet (sensitivity/chaos) of the broader concept in [A] and the specific mechanisms (emergence vs. sensitivity/feedback) differ, they are distinct."
+    },
+    {
+      "base_fb_id": "d9386e83a07d8df5bf3c5eb6bd98e149f3592a5a41c788f5816e2ca610cbcf8b",
+      "dup_fb_id": "b2ce8ca29c104eacb335f70cc4ec875b68ec271f3f6f8c51a0640683c4e5de69",
+      "base_name": "Situational Analysis in Practice Mapping",
+      "dup_name": "Situational Analysis in Practice Mapping (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Situational Analysis in Practice Mapping', their mechanisms and applications differ significantly. Block [A] describes a specific methodological technique for mapping the context of social phenomena (identifying actors, structures, and processes to understand how local conditions shape outcomes). Block [B] describes a broader epistemological principle regarding how research practices themselves are shaped by disciplinary and cultural contexts (choosing methods that align with local norms). [A] is a tool for analyzing a situation, whereas [B] is a principle about the situated nature of the research method itself."
+    },
+    {
+      "base_fb_id": "5d8fd4af6785556d6e35251dce8fa56a5544fb94b717dd1d1c15bbfc143a230c",
+      "dup_fb_id": "94dd96f85c924f081cb7297a9b8bc1b97a4c1ac4c9641aa4ab2eec6d93720618",
+      "base_name": "Social Proof Bias",
+      "dup_name": "Social Proof Bias (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks describe the general phenomenon of social proof, they differ in mechanism and application. Block [A] describes a general conformity pressure where observing others overrides individual preferences to align with group norms. Block [B] specifically restricts the mechanism to 'ambiguous or uncertain' situations and explicitly frames it as an empirical pattern rather than a single causal mechanism. Furthermore, the applications differ: [A] advises adjusting decisions to align with the norm, whereas [B] advises using the group choice as a heuristic but explicitly requires seeking independent evidence before finalizing the decision."
+    },
+    {
+      "base_fb_id": "07de63e4402760bb36418a1951070c0beed2e5c217e4781b3e90b70cb44c1617",
+      "dup_fb_id": "805db1ef134a9d80b9315fe4d56993e473e7339ef13284dc06f05091fa6cb9c3",
+      "base_name": "Social Proof Manipulation",
+      "dup_name": "Social Proof Manipulation (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks reference the psychological mechanism of social proof, they apply it in opposite directions with different strategic goals. Block [A] focuses on the *unintended* consequence of normalizing a behavior (specifically negative/harmful ones) and advises *suppressing* prevalence claims to reduce adoption. Block [B] focuses on the *intentional* manipulation of social proof by *fabricating* or exaggerating popularity to *increase* adoption or endorsement. One is a warning about normalization side-effects, the other is a tactic for persuasion through false consensus."
+    },
+    {
+      "base_fb_id": "07de63e4402760bb36418a1951070c0beed2e5c217e4781b3e90b70cb44c1617",
+      "dup_fb_id": "e86454050618e699b47422095dec1954f64841c41852e8f635940d043cdaaf72",
+      "base_name": "Social Proof Manipulation",
+      "dup_name": "Social Proof Manipulation (3)",
+      "verdict": "distinct",
+      "reason": "While both blocks reference the psychological concept of social proof, they address opposite applications and mechanisms. Block [A] focuses on the *unintended* consequence of normalizing a behavior (specifically harmful or ambiguous ones) by highlighting its prevalence, advising communicators to frame behaviors as rare to reduce them. Block [B] focuses on the *intentional* manipulation of perception regarding quality or desirability through artificial signals (like fake lines or ratings), advising consumers to verify the authenticity of these signals. One is a warning about the side-effect of prevalence framing in public health/marketing, while the other is a heuristic for detecting deceptive quality signals in consumer contexts."
+    },
+    {
+      "base_fb_id": "4a4ebe69a5cb028e1518c8c8459830ee3a3c05968c8c0b7a00c14861647c65f4",
+      "dup_fb_id": "6e7d4f481f1c809389c9b44537a0f4fca4c3f5d784bf1cf006da0719d4d9c191",
+      "base_name": "Staged Release Strategy",
+      "dup_name": "Staged Release Strategy (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism (releasing capacity in stages to create artificial scarcity/urgency) and the same application (managing demand during a product launch with limited capacity). The slight difference in terminology ('early-bird' in B) is a specific implementation detail of the general staged release mechanism described in A, but the core principle and intent are identical."
+    },
+    {
+      "base_fb_id": "ffa2b77245a84635771025672cbaea13afab54011fe984d0c69463b0094bdf36",
+      "dup_fb_id": "22c982203091531e284a3ae39d599f5b9fdd5dfe6d7302f4af2fc5b90571b94c",
+      "base_name": "Strategic Capacity Management",
+      "dup_name": "Strategic Capacity Management (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the general theme of strategic capacity management, they operate on different specific mechanisms and applications. Block [A] focuses on the trade-off between scope and quality to optimize value creation and execution focus (reducing capacity to improve existing work). Block [B] focuses on client selection and pricing power as a method for competitive advantage and business scaling (limiting clients to increase perceived value and price). The specific lever in [B] (client selection/pricing) is a distinct facet not explicitly covered in [A] (scope/resource allocation for execution quality)."
+    },
+    {
+      "base_fb_id": "c90ff3121ca41c657f7165a85d420861e77ccff606a119d1863544fd44d6e1eb",
+      "dup_fb_id": "9605e415790cd650acd75830265e6effe46ffc530049f53d34d73020883087fc",
+      "base_name": "Strategic Focus Through Constraint",
+      "dup_name": "Strategic Focus Through Constraint (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name and the general concept of 'strategic focus through constraint,' their mechanisms and specific applications differ. Block [A] focuses on the internal execution benefit of constraint: it reduces cognitive load and resource dilution to improve 'execution fidelity' and 'clarity' when overwhelmed by competing demands. Block [B] focuses on the external competitive and adaptive benefit: it argues that constraint creates 'resilience' and 'agility' (faster pivoting) in response to external threats or market changes. Since [A] is about internal resource allocation/efficiency and [B] is about external adaptability/competitive speed, they are distinct facets of the broader principle."
+    },
+    {
+      "base_fb_id": "6f7de6830b53840a34d300bb6d9f8d9e7cce34527754a56c97f347653c6ffe24",
+      "dup_fb_id": "9eb9e59e8cb3a6aef6d019b2aa36d839ada72dc18279c42eff32b4cdbaa5dbbe",
+      "base_name": "Strategic Relationship Building",
+      "dup_name": "Strategic Relationship Building (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks address strategic relationship building, they rely on different mechanisms. Block [A] focuses on a heuristic of active listening and value alignment to establish initial trust. Block [B] focuses on a sequential, staged progression model that explicitly includes the management of objective and subjective resistance. The inclusion of resistance management and the specific staged evolution in [B] makes it a distinct mechanism from the general trust-building heuristic in [A]."
+    },
+    {
+      "base_fb_id": "3468303fb3258bfbc2498aa5d8477759a4a75cda4eacec81cf001706dcc0fd02",
+      "dup_fb_id": "da2a00eff27f7d243d3381fadecfb9597b662d5e165acc9f958655463fad9a1f",
+      "base_name": "Typography As Visual Communication",
+      "dup_name": "Typography As Visual Communication (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the name 'Typography As Visual Communication', their mechanisms and primary focuses differ. Block [A] focuses on the functional and technical calibration of typographic variables (size, spacing, line length) to optimize legibility and readability based on medium constraints. Block [B] focuses on the expressive and semantic aspect of typography, emphasizing how letterform structure and spatial relationships convey meaning, emotion, and hierarchy beyond the literal text. One is a model of functional optimization; the other is a model of expressive communication."
+    },
+    {
+      "base_fb_id": "6057c6acd1e012cd24ab743e15219158849a41da988a655c1d7b265b5ac9cfbf",
+      "dup_fb_id": "5971192bab6e858ccc23af04b63207c2d940f00e722131f3453fddad5d338273",
+      "base_name": "Value-based Pricing Strategy",
+      "dup_name": "Value-based Pricing Strategy (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the same core mechanism: setting prices based on the customer's perceived value and willingness to pay, rather than on cost, time, or market competition. Although [A] mentions psychological factors like status and [B] emphasizes the subjective nature of value and strategic importance, these are merely different facets of the same underlying principle of aligning price with perceived worth. The applications are functionally identical (aligning price with value/willingness to pay)."
+    },
+    {
+      "base_fb_id": "0d63b54166e5eb1d669ff578b96cd521f85bc854b560f2b108c1c6614014b248",
+      "dup_fb_id": "eb47077d0cec3419fa8a243163f17280e8ac0720c06b1e48eedf0c0aaa2a0e62",
+      "base_name": "Visual Hierarchy Through Contrast",
+      "dup_name": "Visual Hierarchy Through Contrast (2)",
+      "verdict": "distinct",
+      "reason": "While both blocks share the general principle of using contrast for visual hierarchy, Block [B] is a specific instance or facet of the broader principle in Block [A]. Block [A] defines the general mechanism of contrast (size, color, spacing, placement) for any interface. Block [B] describes a specific descriptive model involving a particular structural relationship (WEALTH vs. poverty) and specific typographic treatments (capitalization, distressed treatment) that are not present in the general definition of [A]. Therefore, [B] is a specific application/example rather than a true duplicate of the general principle in [A]."
+    },
+    {
+      "base_fb_id": "4908d7bb61eff2b9c1a804e30d1fe2dded0d84d5e1bbf3e18108a8a11ce47575",
+      "dup_fb_id": "a98b80a098af0a6789a7b467c168f0236c25a9455954e1ddc9ba5f3b2f04bfc2",
+      "base_name": "Visual Hierarchy Through Spatial Organization",
+      "dup_name": "Visual Hierarchy Through Spatial Organization (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism (using spatial organization—proximity, alignment, and grouping—to create visual hierarchy and guide attention) and the same application (arranging elements in a layout to guide the user's eye). The slight difference in naming (adding 'typographic' in B) does not change the core principle, as typography is a subset of the spatial arrangement described in A."
+    },
+    {
+      "base_fb_id": "982d303bcbf38f03abbdceb7fa0c42ebcca4c4550e3acd7ea94c14f481908aaf",
+      "dup_fb_id": "1b0b34718d0f732e74cb1392e460e8ab81bee4ec55167c86bf5f367d1f1eeac1",
+      "base_name": "Visual Metaphor in Advertising",
+      "dup_name": "Visual Metaphor in Advertising (2)",
+      "verdict": "duplicate",
+      "reason": "Both blocks describe the exact same mechanism (cognitive mapping of a familiar source domain onto a target domain via visual structure) and the same application (using visual metaphors in advertising to convey complex ideas quickly and emotionally). The slight differences in wording (e.g., 'rhetorical device' vs 'iconic imagery') do not change the underlying principle or usage."
+    }
+  ]
+}

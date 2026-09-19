@@ -100,6 +100,7 @@ from pipeline.schemas import (
     is_valid_domain,
     normalize_label,
     split_compound,
+    validate_discipline_domain,  # D2620/D2626: discipline<->domain non-contamination (fail-closed)
 )
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
@@ -812,6 +813,15 @@ def validate_classification(result: dict) -> tuple[bool, list[str]]:
         for d in domains:
             if not is_valid_domain(d):
                 errors.append(f"Invalid domain: '{d}'")
+
+    # D2620/D2626: discipline<->domain non-contamination (fail-closed).
+    # Even if discipline and domains are each individually canonical, crossing
+    # them (domain-as-discipline / discipline-as-domain) is a hard error. Only
+    # run when `domains` is already a well-typed list (else the type error above
+    # already fails the row and iterating a str would produce char-level noise).
+    if isinstance(domains, list):
+        for flag in validate_discipline_domain(discipline, domains):
+            errors.append(flag)
 
     # Validate depth
     depth = result.get("depth", "")

@@ -55,6 +55,12 @@
 - governance/folder_protocol.md (file creation rules)
 - agent/session_seed.yaml (session config)
 - feed.opml (technology feed sources for weekly research)
+- governance/CONTEXT_INDEX.md (RECALL MAP - read first when resuming: where everything lives,
+  which claims are superseded, and the HUMAN GATE REGISTER)
+- governance/SEQUENCE_STATUS_20260917.md (execution tracker + human gates)
+- governance/FORENSIC_AUDIT_20260917.md (F-01..F-16) | governance/MARKET_RESEARCH_20260917.md (A1..A12)
+- governance/PRIORITY_DECISION_20260917.md | governance/STRATEGIC_PLAN_20260917.md
+- config/eval_integrity.yaml (floors + provenance tier vocabulary)
 </knowledge_sources>
 
 <!-- PIPELINE — 8-stage v3.0 (CONSTITUTION §2) -->

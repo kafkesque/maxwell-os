@@ -1,0 +1,61 @@
+{
+  "budget_dependent": false,
+  "budgets": [
+    200,
+    1024,
+    2048
+  ],
+  "generated": "2026-09-17T11:52:39",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "results": [
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chars": 884,
+          "grader": "(False, 'no json')",
+          "head": "We need to find three most recent log files under /var/log. We need to",
+          "json_ok": false,
+          "secs": 6.32
+        }
+      ],
+      "budget": 200,
+      "item_id": "tool-0",
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "suite": "toolcalling"
+    },
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chars": 1433,
+          "grader": "(False, 'no json')",
+          "head": "We need to find three most recent log files under /var/log. We need to",
+          "json_ok": false,
+          "secs": 9.69
+        }
+      ],
+      "budget": 1024,
+      "item_id": "tool-0",
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "suite": "toolcalling"
+    },
+    {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chars": 1433,
+          "grader": "(False, 'no json')",
+          "head": "We need to find three most recent log files under /var/log. We need to",
+          "json_ok": false,
+          "secs": 9.4
+        }
+      ],
+      "budget": 2048,
+      "item_id": "tool-0",
+      "model": "gpt-oss-20b-MXFP4-Q8",
+      "suite": "toolcalling"
+    }
+  ],
+  "suite": "toolcalling"
+}

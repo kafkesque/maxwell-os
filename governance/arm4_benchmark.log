@@ -1,0 +1,44 @@
+ARM-4: 5 models | 30 classify rows | 6 extract clusters
+
+
+======================================================================
+MODEL: mlx-community/Ornith-1.5-9B-OptiQ-4bit
+======================================================================
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files: 100%|██████████| 9/9 [00:00<00:00, 10841.11it/s]
+  loaded in 5.6s
+  [classify] discipline_acc=0.467 domain_f1=0.542 n=30
+  [extract] valid=6/6 (FB=5 NULL=1)
+
+======================================================================
+MODEL: mlx-community/gemma-4-12B-it-qat-OptiQ-4bit
+======================================================================
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 5596.14it/s]
+[transformers] You are using a model of type `gemma4_unified` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+  loaded in 8.3s
+  [classify] discipline_acc=0.633 domain_f1=0.598 n=30
+  [extract] valid=3/6 (FB=5 NULL=1)
+
+======================================================================
+MODEL: mlx-community/Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B
+======================================================================
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 5609.86it/s]
+  loaded in 13.0s
+  [classify] discipline_acc=0.433 domain_f1=0.593 n=30
+  [extract] valid=4/6 (FB=5 NULL=1)
+
+======================================================================
+MODEL: mlx-community/Phi-4-mini-instruct-8bit
+======================================================================
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 4264.31it/s]
+[transformers] This model config has set a `rope_parameters['original_max_position_embeddings']` field, to be used together with `max_position_embeddings` to determine a scaling factor. Please set the `factor` field of `rope_parameters`with this ratio instead -- we recommend the use of this field over `original_max_position_embeddings`, as it is compatible with most model architectures.
+  loaded in 3.4s
+  [classify] discipline_acc=0.433 domain_f1=0.324 n=30
+  [extract] valid=6/6 (FB=6 NULL=0)
+
+======================================================================
+MODEL: mlx-community/DeepSeek-R1-0528-Qwen3-8B-4bit
+======================================================================
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]Fetching 7 files: 100%|██████████| 7/7 [00:00<00:00, 5555.37it/s]
+[transformers] Unrecognized keys in `rope_parameters` for 'rope_type'='yarn': {'attn_factor'}
+  loaded in 4.4s
+  [classify] discipline_acc=0.000 domain_f1=0.417 n=4

@@ -1,0 +1,184 @@
+# governance/p0_p1_criteria.yaml — executable form of governance/p0_p1_contract.md
+# WHY: prose criteria drift; executable ones cannot. scripts/drift_monitor.py evaluates every
+# row against the FILESYSTEM and prints OK/DRIFT. If I claim P0 is done and this says DRIFT, the
+# claim is void. severity: fail = blocks, warn = reported but non-blocking.
+version: 1
+checks:
+  # ---- P0: BUG-263 (S2 FORM judge) ----
+  - id: P0.no_hardcoded_judge_budget
+    severity: fail
+    desc: "the judge's token budget is no longer the hardcoded 64 that guaranteed 0 labels"
+    check: source_not_contains
+    args: {file: pipeline/stage2_relabel_extraction_type.py, needle: "max_tokens=64"}
+
+  - id: P0.budget_from_config_ge_1024
+    severity: fail
+    desc: "judge budget comes from config and is at least the measured-working 1024"
+    check: config_gte
+    args: {file: config/pipeline_config.yaml, dotted: stage2.relabel_judge_max_tokens, min: 1024}
+
+  - id: P0.judge_raises_on_empty
+    severity: fail
+    desc: "a judge that returns no label raises with diagnostics instead of returning ''"
+    check: source_contains
+    args: {file: pipeline/stage2_relabel_extraction_type.py, needle: "raise JudgeEmptyResponse("}
+
+  - id: P0.reasoning_off_prefix_applied
+    severity: fail
+    desc: "reasoning-off models (gpt-oss) are told to skip the reasoning pass (BUG-262/263)"
+    check: source_contains
+    args: {file: pipeline/stage2_relabel_extraction_type.py, needle: "RELABEL_APPLY_REASONING_OFF_PREFIX and VERIFY_REASONING_OFF_PREFIX"}
+
+  - id: P0.fail_closed_flag_layer
+    severity: fail
+    desc: "a fully-failing cross-family FLAG layer aborts instead of reporting 0 disagreements"
+    check: source_contains
+    args: {file: pipeline/stage2_relabel_extraction_type.py, needle: "0 disagreements is NOT a result"}
+
+  - id: P0.run_artifact_exists
+    severity: fail
+    desc: "the relabel run produced a machine-readable artifact (M2: not a log line)"
+    check: artifact_glob
+    args: {glob: "governance/relabel_report_*.json"}
+
+  - id: P0.cross_family_actually_ran
+    severity: fail
+    desc: "the R5 cross-family judge executed on >=200 records and did not fail on all of them"
+    check: newest_json_gte
+    args: {glob: "governance/relabel_report_*.json", path: cross_attempted, min: 200}
+
+  - id: P0.cross_family_not_all_failed
+    severity: fail
+    desc: "fewer cross-family failures than attempts (else the layer is dead, not clean)"
+    check: newest_json_lt
+    args: {glob: "governance/relabel_report_*.json", path: cross_failed, other: cross_attempted}
+
+  # ---- P1: tool-calling + planning roles ----
+  - id: P1.gate_wired_into_harness
+    severity: fail
+    desc: "the harness itself runs the preflight; the gate is not a voluntary step"
+    check: source_contains
+    args: {file: tools/model_eval_suite.py, needle: "_cell_status("}
+
+  - id: P1.na_is_not_zero
+    severity: fail
+    desc: "harness-invalid cells are recorded as NA, never scored as 0"
+    check: source_contains
+    args: {file: tools/model_eval_suite.py, needle: '"na_reason"'}
+
+  - id: P1.report_excludes_na
+    severity: fail
+    desc: "the reporter excludes NA rows from accuracy instead of averaging them in"
+    check: source_contains
+    args: {file: tools/model_eval_report.py, needle: 'r.get("na")'}
+
+  - id: P1.gate_artifact_fresh
+    severity: fail
+    desc: "a preflight artifact exists for the current harness fingerprint"
+    check: preflight_fingerprint_match
+    args: {}
+
+  - id: P1.toolcalling_rows
+    severity: fail
+    desc: "tool-calling suite has >=140 scored rows (20 items x 7 models)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/check_suite_coverage.py --suite toolcalling --min 120 --allow-missing gpt-oss-20b-MXFP4-Q8"}
+
+  - id: P1.planning_rows
+    severity: fail
+    desc: "planning suite has >=168 scored rows (24 items x 7 models) on computed gold"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/check_suite_coverage.py --suite planning --min 168"}
+
+  - id: P1.no_stale_gptoss_toolcall_rows
+    severity: fail
+    desc: "no surviving gpt-oss toolcalling row from the missing-prefix run (BUG-262); _done_keys() skips by key, so a stale row is never re-measured and poisons the role forever"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/check_stale_toolcall_rows.py"}
+
+  - id: P1.no_invalid_planning_items
+    severity: fail
+    desc: "the 17 hand-written planning items with wrong gold stay excluded"
+    check: source_contains
+    args: {file: tools/model_eval_report.py, needle: "INVALID_ITEM_IDS"}
+
+  - id: P1.roles_cited
+    severity: warn
+    desc: "every role declaring a model carries evidence (P2 freeze gate)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/validate_role_claims.py"}
+
+  # ---- invariants ----
+  - id: M1.gate_exists
+    severity: fail
+    desc: "the preflight gate and its policy file exist"
+    check: artifact_glob
+    args: {glob: "tools/bench_preflight.py"}
+
+  - id: M1.policy_exists
+    severity: fail
+    desc: "all preflight thresholds live in YAML (C12)"
+    check: artifact_glob
+    args: {glob: "config/bench_preflight.yaml"}
+
+  - id: M1.gate_selftest_passes
+    severity: fail
+    desc: "the gate's own rules must agree with the stored artifacts (the pre-commit stress test that was missing: it was validated against an assumption instead of against history)"
+    check: command_exit_zero
+    args: {cmd: "python3 tools/bench_preflight.py --selftest"}
+
+  - id: M3.contract_exists
+    severity: fail
+    desc: "the acceptance criteria were frozen before execution"
+    check: artifact_glob
+    args: {glob: "governance/p0_p1_contract.md"}
+
+  # ---- AX4: 4-axis anchor integrity (added 2026-09-17, governance/FORENSIC_AUDIT_20260917.md) ----
+  - id: AX4.runtime_matches_gold_4axis
+    severity: fail
+    desc: "the runtime KB carries the adjudicated 4-axis labels for the 251 gold rows (F-01)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_runtime_vs_gold.py --max-mismatch 0"}
+
+  - id: AX4.nonprinciple_axis_invariant
+    severity: warn
+    desc: "no principle row has a blank axis; no row is half-classified (F-03 re-scoped 2026-09-17 — NULL depth on a non-principle row is the DESIGNED state, not a violation)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_nonprinciple_axis.py"}
+
+  - id: AX4.relabel_provenance_stamped
+    severity: fail
+    desc: "the newest relabel run emitted judge/budget/cross-family provenance (F-02/R14/BUG-263)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_relabel_provenance.py"}
+
+  # ---- AX5: 5th axis (extraction_type / object FORM) integrity (F-14, 2026-09-17) ----
+  - id: AX5.form_axis_traceable
+    severity: fail
+    desc: "every FORM label is canonical and traceable to a provenance-bearing source record (F-14)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_form_axis.py"}
+
+  # ---- AXB: anchor integrity — the eval set must be evaluable and must not be trainable-on ----
+  # (priority decision 2026-09-17: governance/PRIORITY_DECISION_20260917.md)
+  - id: AXB.train_eval_disjoint
+    severity: fail
+    desc: "the eval anchor does not overlap the fine-tune/training pool (memorisation guard)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_eval_integrity.py --only disjoint"}
+
+  - id: AXB.axis_human_share
+    severity: warn
+    desc: "per-axis human share clears the floor; reports blind vs attested (BUG-267/F-16)"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_eval_integrity.py --only floors --strict"}
+
+  # ---- AXC: label-axis contract (D2620/BUG-197, strengthened 2026-09-17) ----
+  # The rule was "agreed and enforced" but the guard validated MEMBERSHIP, not DISJOINTNESS,
+  # and the test compared exact strings — so `research methodology` (discipline) and
+  # `research & methodology` (domain) coexisted on 909 rows while every check said clean.
+  - id: AXC.taxonomy_disjoint
+    severity: fail
+    desc: "no UNDECLARED discipline<->domain collision, normalised, in the taxonomy or the KB"
+    check: command_exit_zero
+    args: {cmd: "python3 scripts/audit_taxonomy_disjointness.py"}

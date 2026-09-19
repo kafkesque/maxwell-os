@@ -1,0 +1,28 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+fair re-test: gpt-oss-20b-MXFP4-Q8 WITHOUT response_format on 6 frozen clusters
+
+  [1/6] cluster_66 nsegs=5 route=ERROR valid=False 67.5s  
+  [2/6] cluster_109 nsegs=6 route=FB valid=False 62.8s  Focal Point Coordination
+  [3/6] cluster_113 nsegs=8 route=FB valid=False 46.4s  Tragedy of the Commons
+  [4/6] cluster_185 nsegs=2 route=NULL valid=True 28.3s  
+  [5/6] cluster_306 nsegs=20 route=FB valid=True 48.6s  Priming‑Induced Behavioral Bias
+  [6/6] cluster_321 nsegs=4 route=ERROR valid=False 61.4s  
+
+SUMMARY:
+{
+  "name": "gpt-oss-20b-MXFP4-Q8 (no response_format)",
+  "n": 6,
+  "avg_secs": 52.50833333333333,
+  "median_secs": 61.45,
+  "min_secs": 28.33,
+  "max_secs": 67.52,
+  "total_secs": 315.05,
+  "n_fb": 3,
+  "n_null": 1,
+  "n_invalid": 4,
+  "n_schema_fail": 2,
+  "fb_rate": 0.5,
+  "route_agreement": null
+}
+wrote /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/arm2_gptoss_fair.json

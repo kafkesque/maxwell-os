@@ -1,0 +1,29 @@
+{
+  "after": {
+    "causal_mechanism": 489,
+    "descriptive_model": 3854,
+    "empirical_pattern": 2066,
+    "normative_heuristic": 1993
+  },
+  "before": {
+    "causal_mechanism": 488,
+    "descriptive_model": 3855,
+    "empirical_pattern": 2066,
+    "normative_heuristic": 1993
+  },
+  "candidates": 200,
+  "changed": 1,
+  "checkpoint": "knowledge pipeline/stage2_extract/t11/relabel_work/checkpoint_p0_bug263.jsonl",
+  "cross_attempted": 200,
+  "cross_audit_path": "knowledge pipeline/stage2_extract/t11/relabel_work/checkpoint_p0_bug263.cross_audit.jsonl",
+  "cross_audit_rows": 200,
+  "cross_disagreements": 5,
+  "cross_failed": 0,
+  "cross_family_model": "gpt-oss-20b-MXFP4-Q8",
+  "failed": 0,
+  "generated": "2026-09-17T12:38:04",
+  "judge_max_tokens": 1024,
+  "judge_model": "gemma-4-E4B-it-MLX-4bit",
+  "reasoning_off_prefix_applied": true,
+  "unchanged": 194
+}

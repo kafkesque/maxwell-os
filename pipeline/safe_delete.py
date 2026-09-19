@@ -83,6 +83,31 @@ def backup_then_delete(path, reason, no_confirm=False, maxwell_confirmed=None):
         print('   Use --maxwell-confirmed "<reason from DECISION-LOG>" to proceed.')
         sys.exit(1)
 
+    # FREE-SPACE PRE-FLIGHT (BUG-261, 2026-09-17): this function COPIES the target into
+    # backup/deletions/ before deleting, so the operation needs ~2x the target size free.
+    # On 2026-09-17 a 19 GB model was reclaimed on a volume with 24 GB free; the copy drove
+    # the volume to 1.7 GB free (100% used) and had to be killed mid-copy, leaving a partial
+    # backup that then had to be removed by hand. Refuse instead of risking a full disk —
+    # a full disk corrupts whatever is writing at the time (DB, checkpoints, Parquet).
+    # Escape hatch for genuinely large artifacts that need no backup (model weights):
+    #   MAXWELL_SAFE_DELETE_LARGE=1
+    try:
+        import os
+
+        need = (sum(f.stat().st_size for f in path.rglob('*') if f.is_file())
+                if path.is_dir() else path.stat().st_size)
+        free = shutil.disk_usage(str(path.parent)).free
+        if need > free * 0.5 and os.environ.get('MAXWELL_SAFE_DELETE_LARGE') != '1':
+            print(f"🛑 REFUSING: backing up {get_size_str(path)} needs ~{need / 1e9:.1f} GB free "
+                  f"but only {free / 1e9:.1f} GB is available.")
+            print('   This function copies before deleting, so the free space must exceed the '
+                  'target size.')
+            print('   For model weights (not pipeline output) delete directly with rm -rf.')
+            print('   To override anyway: MAXWELL_SAFE_DELETE_LARGE=1')
+            sys.exit(1)
+    except OSError as exc:
+        print(f"⚠️  free-space pre-flight skipped: {exc}")
+
     # Create timestamped backup
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_subdir = BACKUP_DIR / timestamp

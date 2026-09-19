@@ -1,0 +1,40 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+gold rows=251  sampled=60  fbs_from_db=60
+== gpt-oss-20b-MXFP4-Q8: 60 to do (0 cached)
+   10/60 disc=0 domF1=0.3333 17.96s ok
+   20/60 disc=0 domF1=0.0 18.42s ok
+   30/60 disc=0 domF1=0.2857 17.27s ok
+   40/60 disc=1 domF1=0.0 18.03s ok
+   50/60 disc=0 domF1=0.0 17.54s ok
+   60/60 disc=1 domF1=0.0 18.28s ok
+
+PRODUCTION PATH — merged_cribs_classify() vs gold_4axis
+model                                           n   disc  domF1  valid  med_s fields
+gpt-oss-20b-MXFP4-Q8                           60  0.200  0.097  1.000   17.2    7.0
+== Qwen3.8-27B-MLX-4bit: 60 to do (0 cached)
+   10/60 disc=0 domF1=0.0 87.41s ok
+   20/60 disc=0 domF1=0.0 82.49s ok
+   30/60 disc=0 domF1=0.3333 88.23s ok
+   40/60 disc=0 domF1=0.0 90.47s ok
+   50/60 disc=1 domF1=0.0 81.37s ok
+   60/60 disc=1 domF1=0.0 82.22s ok
+
+PRODUCTION PATH — merged_cribs_classify() vs gold_4axis
+model                                           n   disc  domF1  valid  med_s fields
+gpt-oss-20b-MXFP4-Q8                           60  0.200  0.097  1.000   17.2    7.0
+Qwen3.8-27B-MLX-4bit                           60  0.217  0.109  1.000   82.2    7.0
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+gold rows=251  sampled=60  fbs_from_db=60
+== gemma-4-E4B-it-MLX-4bit: 60 to do (0 cached)
+   10/60 disc=0 domF1=0.4 11.14s ok
+   20/60 disc=0 domF1=0.0 10.9s ok
+   30/60 disc=0 domF1=0.0 9.96s ok
+   40/60 disc=0 domF1=0.0 12.32s ok
+   50/60 disc=1 domF1=0.0 11.09s ok
+   60/60 disc=1 domF1=0.0 10.17s ok
+
+PRODUCTION PATH — merged_cribs_classify() vs gold_4axis
+model                                           n   disc  domF1  valid  med_s fields
+gemma-4-E4B-it-MLX-4bit                        60  0.150  0.060  1.000    9.9    7.0

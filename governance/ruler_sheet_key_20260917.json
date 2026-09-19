@@ -1,0 +1,2702 @@
+[
+ {
+  "item_id": "R001",
+  "stratum": "A",
+  "fb_id": "3f96586aaf69c3936500ead9c2e18d6406ed5b61b29b78e33372879e638b16f4",
+  "name": "Surveillance Capitalism Value Proposition",
+  "body_chars": 1374,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "law",
+   "domains": "[\"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R002",
+  "stratum": "A",
+  "fb_id": "8f02e94dec8a9299903c2e26e2f0ad7d0e55c84327a53e3998c8d201e9bcfa81",
+  "name": "Soviet Underground Discourse Reception",
+  "body_chars": 1407,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "communication theory",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R003",
+  "stratum": "B",
+  "fb_id": "ba3907cdfced61f598c0a5fed6dd7d9974e6b566f21602012773d019ddad970f",
+  "name": "Quantum Cognitive Effects in Survey Design",
+  "body_chars": 1275,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "research methodology",
+   "domains": "[\"research & methodology\", \"science & research\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R004",
+  "stratum": "A",
+  "fb_id": "f3db999bdfbc7bf17ebd4292729a8c689d1ecb534405d0a9f9fa65190a3beeb6",
+  "name": "Lockdown Effectiveness and Economic Impact",
+  "body_chars": 910,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "health & medicine",
+   "domains": "[\"health & wellness\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R005",
+  "stratum": "B",
+  "fb_id": "d8ae648399fe3d902d79d4f2f37aea93c5148b27540fd1933de04abde77e04c4",
+  "name": "Graphics Algebra Cross Operator",
+  "body_chars": 834,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "computer graphics",
+   "domains": "[\"data visualization\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R006",
+  "stratum": "B",
+  "fb_id": "6c98af237315fd0cde140d96771f21f9086ff0ad26582c3c708ff8a7425f192c",
+  "name": "Generative Algorithmic Composition",
+  "body_chars": 1659,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "specialized",
+   "discipline": "generative design",
+   "domains": "[\"arts & culture\", \"computational art\", \"creative technology\", \"media & entertainment\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R007",
+  "stratum": "A",
+  "fb_id": "3a86d5e6c658a4cd0e52c0a33af693ddb85f2ae8e2501d8a90644422176f8743",
+  "name": "Accessible Electronic Prototyping Ecosystem",
+  "body_chars": 1205,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "engineering",
+   "domains": "[\"digital product\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R008",
+  "stratum": "A",
+  "fb_id": "696c54f5555b7d0e4d4845ef2d5d667395d1b3faeae71fb61ddfddbc59f585c8",
+  "name": "Inescapable Shock Syndrome",
+  "body_chars": 1270,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "health & medicine",
+   "domains": "[\"health & wellness\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R009",
+  "stratum": "B",
+  "fb_id": "656d2e8fd469247e961b17e9062790f93f4573c9811baa31ad59586b856f818c",
+  "name": "Entrepreneurial Risk Assessment Framework",
+  "body_chars": 1125,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "finance",
+   "domains": "[\"entrepreneurship\", \"finance & investment\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R010",
+  "stratum": "A",
+  "fb_id": "f0e821b2df591ea1f2072616db4681a397cd2cf34bb105fda91f860e3669c568",
+  "name": "Iterative Launch Process",
+  "body_chars": 1203,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "software engineering",
+   "domains": "[\"code & computation\", \"user experience\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R011",
+  "stratum": "A",
+  "fb_id": "bb3e3bb3e36fc4b46115ee6d4d6dc66830fbff68c64aaedff11ed6f181e82796",
+  "name": "Agentic Decision-making Through Contextual Retrieval",
+  "body_chars": 1708,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "artificial intelligence",
+   "domains": "[\"ai & agents\", \"engineering & infrastructure\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R012",
+  "stratum": "B",
+  "fb_id": "b7f2185f86d477145ed4f7b489a208c6e69473c99f759f112b9b1501630532f9",
+  "name": "Evolution of Game Art and Design",
+  "body_chars": 1204,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "game design",
+   "domains": "[\"arts & culture\", \"media & entertainment\", \"user experience\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R013",
+  "stratum": "A",
+  "fb_id": "05c02782bec33b8f4753e1b390f8073946819e273f46c2bc58061d56939610ac",
+  "name": "Innovation Fund Risk Management",
+  "body_chars": 1208,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "creative process",
+   "domains": "[\"business operations\", \"digital product\", \"project management\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R014",
+  "stratum": "B",
+  "fb_id": "c90edfd914cd6a2b7cccb395415e3f073f61f207f2d4405e99121b6fde00d9e2",
+  "name": "Sacred Geometry and Symbolic Resonance",
+  "body_chars": 1608,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "anthropology",
+   "domains": "[\"social sciences\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R015",
+  "stratum": "A",
+  "fb_id": "4944504e85bdd6f3e5b219098d516d377574d88ecf98510e35216f37518846d5",
+  "name": "Long-term Strategic Planning in Different Industries",
+  "body_chars": 1050,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\", \"finance & investment\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R016",
+  "stratum": "A",
+  "fb_id": "4c30b4f096d52dfe148b933fe702f00b2d9fa4c4f658a6f233be5f66086acf9e",
+  "name": "Modelans-modelandum Relationship",
+  "body_chars": 1571,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "cross-domain",
+   "discipline": "semiotics",
+   "domains": "[\"information architecture\", \"semiotics & communication\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R017",
+  "stratum": "B",
+  "fb_id": "364b3bffe30916a347fabca5285327c309d7a00737162a2d439ef159d60b8aa6",
+  "name": "Chemical Reaction Equation Automation",
+  "body_chars": 1310,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "engineering",
+   "domains": "[\"science & research\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R018",
+  "stratum": "B",
+  "fb_id": "0f87ef8930a2214a475ff21aea588e03af17d12420bb6e4908df4b416a3ac6a0",
+  "name": "Color and Typography Readability",
+  "body_chars": 1146,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "color theory",
+   "domains": "[\"digital product\", \"graphic design\", \"user experience\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R019",
+  "stratum": "A",
+  "fb_id": "dcd41e84237408a0ad4f588183a3046678819f052b9fc05596d3a48f20067f5f",
+  "name": "Scientific Research Evaluation Framework",
+  "body_chars": 1127,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "research methodology",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R020",
+  "stratum": "B",
+  "fb_id": "9e2405fa4ea50978ea02f0a86c0555ad3bbfd1e9fb15b1c35b75bd07d32f6708",
+  "name": "Dynamic System Complexity",
+  "body_chars": 1838,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "systems engineering",
+   "domains": "[\"business operations\", \"legal & public policy\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R021",
+  "stratum": "A",
+  "fb_id": "8c4b14a4cfa6421337f56f6dd158657ebca6dcdca4cad471d885ee5b1eb6c011",
+  "name": "Index Section",
+  "body_chars": 953,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "information science",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R022",
+  "stratum": "B",
+  "fb_id": "a41dfcc5c4fb6291bbdb06a5ec042afd08d8fc8705abecef1d096454a0242e2e",
+  "name": "Coupon Code Feature Placement Strategy",
+  "body_chars": 951,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "human-computer interaction",
+   "domains": "[\"finance & investment\", \"marketing & communications\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R023",
+  "stratum": "A",
+  "fb_id": "6ba0327825f40862752468c8e32765ed06438d127e0516c679d9118b48df45d8",
+  "name": "Focused Action Selection",
+  "body_chars": 1637,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\", \"digital product\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R024",
+  "stratum": "A",
+  "fb_id": "31563bf3c0ce9389ef106f6cd67b9986edcafcdaababecea3534b9b15b97d598",
+  "name": "Execution Gap From Technological Readiness",
+  "body_chars": 1874,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R025",
+  "stratum": "A",
+  "fb_id": "86a4fc636defabd3cdbe0c2aaa72027e1a8775156c1a78380a681e0bcc381648",
+  "name": "Design for Management and Organizational Culture",
+  "body_chars": 1027,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "organizational theory",
+   "domains": "[\"business operations\", \"leadership\", \"organizational behavior\", \"design strategy\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R026",
+  "stratum": "A",
+  "fb_id": "c589d4fe59aadeb990acfc40095a1b3f648003c2e4f35dfae127eac39f6cf047",
+  "name": "Index of Motion Graphic Title Design Terms",
+  "body_chars": 924,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "information science",
+   "domains": "[\"design strategy\", \"motion design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R027",
+  "stratum": "A",
+  "fb_id": "c64f086db7187e36f29cae9d931c429bd21be2088aa26924e08a29e4df9883a2",
+  "name": "Decentralized Strategic Command",
+  "body_chars": 1510,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\", \"project management\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R028",
+  "stratum": "B",
+  "fb_id": "872d38b39aa5925c1f3829f43262826d3590a85b3b7a624fabc9a1fa5e040934",
+  "name": "Gpu Acceleration Configuration",
+  "body_chars": 1555,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "machine learning",
+   "domains": "[\"engineering & infrastructure\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R029",
+  "stratum": "A",
+  "fb_id": "41a4cc541bc6b2af1c455b23e7e7f88e185ec9dde8cce222158b2fc5c12ce0bf",
+  "name": "Innovation Through Challenge to Assumptions",
+  "body_chars": 936,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "creative process",
+   "domains": "[\"digital product\", \"business development\", \"business operations\", \"entrepreneurship\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R030",
+  "stratum": "A",
+  "fb_id": "1c1612905cde0d48ea77bd91b6f48f35bc2c19a8b8b79275cdc0dc3d0bafdddd",
+  "name": "Digital Iconic Reproduction in Computer Graphics",
+  "body_chars": 937,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "computer graphics",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R031",
+  "stratum": "A",
+  "fb_id": "c399529d6b1225873c3d5011484f62692f0c35580d2e7342bba92b1ae3250b94",
+  "name": "Questionnaire Validation and Modification Risk",
+  "body_chars": 1115,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "research methodology",
+   "domains": "[\"research & methodology\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R032",
+  "stratum": "A",
+  "fb_id": "afe73bb08c27c51ff32749a6e0a021377e515f1863581918f12c8dcce586ff00",
+  "name": "Heckel's Diff Algorithm for Version Tracking",
+  "body_chars": 1165,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "software engineering",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R033",
+  "stratum": "A",
+  "fb_id": "58ea9a5296cbdaf6f8c993d823c4ddea757e80b196e745524ed32d9805d9a202",
+  "name": "Postmodern Critique of Realist Assumptions",
+  "body_chars": 1855,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "specialized",
+   "discipline": "philosophy",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R034",
+  "stratum": "A",
+  "fb_id": "94a72c96fe2bc224ec7f057751068d03e56ac4d53d30182e868edd6ac95a3dff",
+  "name": "Negative Space Alphabet Challenge",
+  "body_chars": 1182,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "typography",
+   "domains": "[\"brand identity\", \"graphic design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R035",
+  "stratum": "A",
+  "fb_id": "39f657a535a83c253e8147e6d85d0555d68eb4b48eae2813c6a46c7f2d87034e",
+  "name": "Visual Evidence Recognition",
+  "body_chars": 1535,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "information science",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R036",
+  "stratum": "A",
+  "fb_id": "d72a8a6871e93f166053b3e3add6bf2a675a28f3352f749db9fc88679f3dbf2b",
+  "name": "Domain Name Call-to-action Strategy",
+  "body_chars": 972,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"marketing & communications\", \"web & ui\", \"brand identity\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R037",
+  "stratum": "B",
+  "fb_id": "9512919cb6cb89ca3f4aa24f58906a9416b99edd6075d4bc00c2898e93f01c2f",
+  "name": "Style Precedence and Override Behavior",
+  "body_chars": 1530,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "software engineering",
+   "domains": "[\"graphic design\", \"design systems\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R038",
+  "stratum": "A",
+  "fb_id": "1817c07e0501c51a67b9c0709716994890019cb1b9e5481270d4a030c5d5b377",
+  "name": "Multiple Imputation Procedure",
+  "body_chars": 1075,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "research methodology",
+   "domains": "[\"research & methodology\", \"social sciences\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R039",
+  "stratum": "A",
+  "fb_id": "49cc57c71690f8e175f7254c37a5565f6a867ae3723fd56cc1318db1b41b3906",
+  "name": "Identity As Social Positioning and Lifestyle Signifiers",
+  "body_chars": 1101,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "psychology",
+   "domains": "[\"brand identity\", \"business development\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R040",
+  "stratum": "B",
+  "fb_id": "7764620bb329cb591e8eac12084e21f0a006e1589fc12353ceb536243be5adc8",
+  "name": "Commercial Advertising Souring of Artistic Vision",
+  "body_chars": 1194,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "media studies",
+   "domains": "[\"arts & culture\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R041",
+  "stratum": "A",
+  "fb_id": "db9f4c89ff9f952fc7504047aed8fad73ef80e3eee211a582e46a97abdc9377d",
+  "name": "Consumer Anticipation of Objections",
+  "body_chars": 1187,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"product design\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R042",
+  "stratum": "A",
+  "fb_id": "7d985625f304a4758ef817d5d8c7187f0a02aa0370009e4f18418fd2caa05537",
+  "name": "Destination-control Elevator Interaction Pattern",
+  "body_chars": 1036,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "human-computer interaction",
+   "domains": "[\"urban planning\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R043",
+  "stratum": "A",
+  "fb_id": "75adb4501576cee62206410811317d5519a4b377de33eb866dfb2ef09bb7aef5",
+  "name": "Alpha State Thinking and Creative Problem-solving",
+  "body_chars": 970,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "neuroscience",
+   "domains": "[\"business operations\", \"education\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R044",
+  "stratum": "A",
+  "fb_id": "4392d7b60b4aef66189248c31d78ceaa5319fc85965bab59945994a065a713c1",
+  "name": "Cyclical Design Lifecycle",
+  "body_chars": 1708,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"digital product\", \"industrial design\", \"project management\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R045",
+  "stratum": "A",
+  "fb_id": "f4d0b904a5ab728ad8e70db7b19c6fcd35283c0b9b9faf8f60a16fabdc5e9042",
+  "name": "Wpi Consumer Value Proposition Framework",
+  "body_chars": 1148,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"digital product\", \"marketing & communications\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R046",
+  "stratum": "A",
+  "fb_id": "591ff81805c3036ec8a053d0fd49a908d34fb28d62020305d0761d5fd7dedd07",
+  "name": "Bitcoin Mining As Digital Ownership Model",
+  "body_chars": 1135,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "emerging",
+   "domains": "[\"engineering & infrastructure\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R047",
+  "stratum": "A",
+  "fb_id": "3472611564c541cbfd3123bfc15e851179a85aecd962fbe9ba2c99db5005dbbc",
+  "name": "Emotional Transaction Design",
+  "body_chars": 1580,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"business operations\", \"user experience\", \"marketing & communications\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R048",
+  "stratum": "A",
+  "fb_id": "2fc005b1d6038a6165cd493b78196f9cecbbe4f2ade8a39b0c4d5e44aaa9218c",
+  "name": "Creative Process Through Drawing and Sketching",
+  "body_chars": 1024,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"engineering practice\", \"graphic design\", \"product design\", \"industrial design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R049",
+  "stratum": "A",
+  "fb_id": "cbd462e8b840ba3520edacc957da7fb6f6b56bcf10725e648ab3fb617749e165",
+  "name": "Fermi Estimation Method",
+  "body_chars": 1018,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "operations research",
+   "domains": "[\"business operations\", \"legal & public policy\", \"science & research\", \"computational science & physics\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R050",
+  "stratum": "A",
+  "fb_id": "5811c72772789a9cd7fb8f88477280053feccf8c8905deb0597148da0eeece9b",
+  "name": "Methodological Accountability",
+  "body_chars": 1117,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "research methodology",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R051",
+  "stratum": "A",
+  "fb_id": "4fac2ed4652246ff47f2ac62f404c94e8934f8aff1ead2d6cfbb554437f7a269",
+  "name": "Central Emptiness in Urban Design",
+  "body_chars": 1208,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"engineering practice\", \"urban planning\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R052",
+  "stratum": "A",
+  "fb_id": "46d4e1a8dfce09e03e54ee671928207a0b642d748760f95b3b501f75b071ea63",
+  "name": "Interior Design Fixture Selection Challenge",
+  "body_chars": 1257,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"engineering practice\", \"project management\", \"environmental design\", \"design strategy\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R053",
+  "stratum": "A",
+  "fb_id": "edf9ed2c8bfcc2651d2452c436839adcb6fa1a05a5dbced2be50d657a759ef6d",
+  "name": "Self-referential Incompleteness",
+  "body_chars": 1543,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "philosophy",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R054",
+  "stratum": "B",
+  "fb_id": "862e154966cdf80c7236d3ee24f3d426efcc9c311820a3d2c0996ec7241d3d37",
+  "name": "Shap Explainability Framework",
+  "body_chars": 986,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "artificial intelligence",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R055",
+  "stratum": "A",
+  "fb_id": "a1efe32a3ce09a4a6543db03ddb0755b7005206af4e44ccfe9948a527282bf41",
+  "name": "Demand-side Sales Pattern",
+  "body_chars": 1553,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "behavioral economics",
+   "domains": "[\"business development\", \"business operations\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R056",
+  "stratum": "B",
+  "fb_id": "e98d6a211c8e31c9e8b5f7c7ba9229719b25bfb32e08ee33606e6f6c7abb8e9f",
+  "name": "Quiz Generation with Llm Integration",
+  "body_chars": 1101,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "human-computer interaction",
+   "domains": "[\"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R057",
+  "stratum": "A",
+  "fb_id": "a0bbca01a9e73b41a83ef76915ba3f39294f557453c9b0f75e50c8729742ae03",
+  "name": "Annual Percentage Rate Standardization",
+  "body_chars": 928,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "law",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R058",
+  "stratum": "A",
+  "fb_id": "c5e249592e2372fdb12b80808f5cff5980d352c4ea3e85fad3fc267f135575b6",
+  "name": "Illustration As Propaganda Tool",
+  "body_chars": 1486,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "communication theory",
+   "domains": "[\"marketing & communications\", \"editorial & advertising\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R059",
+  "stratum": "B",
+  "fb_id": "96d47fb548299029152c1131cbf6b2ab4cd1307430bc327acda2ec480834067d",
+  "name": "First Course Development Framework",
+  "body_chars": 1024,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "human-computer interaction",
+   "domains": "[\"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R060",
+  "stratum": "B",
+  "fb_id": "7294fe7b2d576c79089d2c3f4fbf9ccae56ec9fe3a00d198b0d6e92b8a307432",
+  "name": "Aiga Transportation Symbol System Development",
+  "body_chars": 1010,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "visual semiotics",
+   "domains": "[\"graphic design\", \"design strategy\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R061",
+  "stratum": "A",
+  "fb_id": "108ffbdafd8fc2e549c5908cc9bbc6a35eec91ebf1330524f40850270f3e5cb0",
+  "name": "Core Focus As Organizational Discipline",
+  "body_chars": 1115,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R062",
+  "stratum": "A",
+  "fb_id": "1e3c664d8deeb4257c6d358e05cdb29f94958e58fe1653f4d2afe27f344a327f",
+  "name": "Somatic Marker Decision Making",
+  "body_chars": 1132,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "neuroscience",
+   "domains": "[\"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R063",
+  "stratum": "A",
+  "fb_id": "5583f213625a02611eee53c644fc23f2a408c260d7cba474044f0d84810f32f3",
+  "name": "Textbook Representation and State of Exception Legitimation",
+  "body_chars": 1162,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "media studies",
+   "domains": "[\"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R064",
+  "stratum": "A",
+  "fb_id": "7adfb08908a39c872b1bf641b30ab6831b1108567bb5842caa4742e9a3a81daf",
+  "name": "Optical Alignment in Typography",
+  "body_chars": 1743,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "typography",
+   "domains": "[\"graphic design\", \"web & ui\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R065",
+  "stratum": "B",
+  "fb_id": "9a6ca0e54b82560552d0c8a5d15c08a254b1ba398642491a81b19879d00197fe",
+  "name": "Media Construction of Crime Waves",
+  "body_chars": 1056,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "media studies",
+   "domains": "[\"legal & public policy\", \"social sciences\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R066",
+  "stratum": "A",
+  "fb_id": "302bb6d8bbc8b30685b8c3e2636ec3fc56c02cddd6ab77dba5a9b8bb957e2b89",
+  "name": "N-dimensional Sphere Volume Properties",
+  "body_chars": 1359,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "computational geometry",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R067",
+  "stratum": "B",
+  "fb_id": "9a54460d6acec846ac4e49206b7da708ac089f19256d72f4c5292f52b304560a",
+  "name": "Schemat's Wasser Interactive Art Framework",
+  "body_chars": 1216,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "cultural design",
+   "domains": "[\"media & entertainment\", \"user experience\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R068",
+  "stratum": "B",
+  "fb_id": "b2b71ed81ac4169ff308a5152b988757a9e737579aba6dbd14576adb1c8982c3",
+  "name": "Imagination and the Image",
+  "body_chars": 1830,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "cultural design",
+   "domains": "[\"graphic design\", \"editorial & advertising\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R069",
+  "stratum": "A",
+  "fb_id": "15b168c8c08e601257ddcd240366d8b9b34848a2597b28547a46587300aab15d",
+  "name": "Falsifiable Variable Measurement",
+  "body_chars": 1685,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "research methodology",
+   "domains": "[\"research & methodology\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R070",
+  "stratum": "B",
+  "fb_id": "210bf321b1eba495dde655456603277df87542c0401f2d68978d5ea108831b7a",
+  "name": "Iterative Design Validation",
+  "body_chars": 1654,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "software engineering",
+   "domains": "[\"user experience\", \"design strategy\", \"product design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R071",
+  "stratum": "A",
+  "fb_id": "98cd1442f675f33c2ff1e199cf99c2bfb03c332c2115f7175e42f6695c04e288",
+  "name": "Lean Startup Experimentation Framework",
+  "body_chars": 1084,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"business operations\", \"digital product\", \"entrepreneurship\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R072",
+  "stratum": "B",
+  "fb_id": "fdac2ca29b61ffce5deef71f43a231d24d275765f31fb6a11860be1983c357c9",
+  "name": "Park24 Nondisruptive Market Creation",
+  "body_chars": 1105,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "emerging",
+   "domains": "[\"urban planning\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R073",
+  "stratum": "A",
+  "fb_id": "f641b501ebfd609711d632b0c202369490d54784add6851138875eec1005ec43",
+  "name": "Evolution of Language Through Mental Models",
+  "body_chars": 1373,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "linguistics",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R074",
+  "stratum": "B",
+  "fb_id": "0c9dba217bc0a237e5e9ce78299d4a6e269f4c60abf8650b2c5c1fe847dadd3d",
+  "name": "Attention Economy Externalities",
+  "body_chars": 1071,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "psychology",
+   "domains": "[\"user experience\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R075",
+  "stratum": "A",
+  "fb_id": "370c44316d8755b4752b141335a1b630caec3f3b5cd5836c45a371e5ce88d29b",
+  "name": "Paradigm Shift Through Disruption",
+  "body_chars": 1893,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "cross-domain",
+   "discipline": "philosophy",
+   "domains": "[\"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R076",
+  "stratum": "A",
+  "fb_id": "8b6bcaafab084c74bd9baa374c5fb3bc227b4d33d6622c26508f1901b1b53b75",
+  "name": "Linguistic Fetish in Visual Communication",
+  "body_chars": 1660,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "semiotics",
+   "domains": "[\"editorial & advertising\", \"brand identity\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R077",
+  "stratum": "A",
+  "fb_id": "c270b423ea993eeab22fb43d050110b5c963bd953ec72d3a6cc5dbd65a8e1261",
+  "name": "Symbolic Meaning Through Consumption",
+  "body_chars": 1621,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "sociology",
+   "domains": "[\"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R078",
+  "stratum": "B",
+  "fb_id": "7810299ac9e6a4bb684f15a4a6ed7c9b00eaa5daa4dc4c88e117456086aa0ca3",
+  "name": "Parameterized Design Generation",
+  "body_chars": 1018,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "generative design",
+   "domains": "[\"product design\", \"industrial design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R079",
+  "stratum": "A",
+  "fb_id": "28b925d3f3d0cc12319a49fa565d22a770dc869e19e8a05e172795141eb44673",
+  "name": "Bar-hillel Paradox",
+  "body_chars": 1026,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "linguistics",
+   "domains": "[\"semiotics & communication\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R080",
+  "stratum": "A",
+  "fb_id": "dd1b1430f8b974972288c6379d9a1d0e7f7e7c82a5c1bbb39d0b619a20fe521c",
+  "name": "Information Design Community Networks",
+  "body_chars": 1989,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "information science",
+   "domains": "[\"digital product\", \"information architecture\", \"design strategy\", \"personal productivity\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R081",
+  "stratum": "A",
+  "fb_id": "1609636ae65469bea8c6d3959b454d275f25997c4f12eb999f8e281c1160da52",
+  "name": "Shift From Trend-chasing to Intentional Consumption",
+  "body_chars": 1077,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"marketing & communications\", \"editorial & advertising\", \"packaging\", \"product design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R082",
+  "stratum": "B",
+  "fb_id": "1dc7ee91e39f7c6aeaeed954e89463b51e7726840879afd3bc67b4793edf252f",
+  "name": "Historical Data Sources for Manufacturing and Economic Analysis",
+  "body_chars": 1062,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "political economy",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R083",
+  "stratum": "A",
+  "fb_id": "7b47b44c473ab48d5a9b1dc4de7b5ff6210ffdd8776dbd01dea906d6049f6c67",
+  "name": "Self-herding Behavior",
+  "body_chars": 1630,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "psychology",
+   "domains": "[\"business development\", \"organizational behavior\", \"marketing & communications\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R084",
+  "stratum": "B",
+  "fb_id": "7b3414f75d4f321efba065f1df3414b7f845d198e8a52302cdff13cb60f2f0ec",
+  "name": "Data Visualization Research Lab Leadership",
+  "body_chars": 1333,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "information science",
+   "domains": "[\"code & computation\", \"research & methodology\", \"data visualization\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R085",
+  "stratum": "B",
+  "fb_id": "9d2a95c8ef137920b46adff55572a267ad4f3ca464188ab99b27e64b1abd8518",
+  "name": "Discursive Strategy Abstraction",
+  "body_chars": 1333,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "psychology",
+   "domains": "[\"social sciences\", \"health & wellness\", \"education\", \"semiotics & communication\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R086",
+  "stratum": "A",
+  "fb_id": "06ad1f6eb971f939a8a4186268770d3539b842702e133664c9c91c6c93fe8565",
+  "name": "Commitment and Consistency Principle (2)",
+  "body_chars": 976,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "psychology",
+   "domains": "[\"organizational behavior\", \"marketing & communications\", \"editorial & advertising\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R087",
+  "stratum": "A",
+  "fb_id": "931f71e587a3242b42f058117bca4d489f5c9a129e0617ffe98d798431872ea9",
+  "name": "In-group Identity and Social Bonding",
+  "body_chars": 1208,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "psychology",
+   "domains": "[\"legal & public policy\", \"organizational behavior\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R088",
+  "stratum": "B",
+  "fb_id": "2f16d31437ab0befecefbcc869b44600cbc75a6d851975fb216c702092758ebd",
+  "name": "Gradio Web Interface for Ml Models",
+  "body_chars": 976,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "machine learning",
+   "domains": "[\"ai & agents\", \"web & ui\", \"research & methodology\", \"digital product\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R089",
+  "stratum": "A",
+  "fb_id": "3b13d441f657b9df1b65d10ab4fa130c782533037b6ea8c5e25b6209df4e2224",
+  "name": "Vr Body Constraint and Physical Immersion",
+  "body_chars": 1172,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "human-computer interaction",
+   "domains": "[\"media & entertainment\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R090",
+  "stratum": "B",
+  "fb_id": "792f14b61406c888f720a400c9d12f48795199e7ec4c32229fe830d97b344c09",
+  "name": "Culture Jamming",
+  "body_chars": 1228,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "media studies",
+   "domains": "[\"marketing & communications\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R091",
+  "stratum": "B",
+  "fb_id": "52286a1527b30f5fc7f106322a61c4a3f0b71922ff130daa6de8b0727baeb89b",
+  "name": "Autopoesis in Design Education",
+  "body_chars": 1201,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "emerging",
+   "domains": "[\"design strategy\", \"personal productivity\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R092",
+  "stratum": "A",
+  "fb_id": "84de26114085a4c6f780656676ecba61f76fd1f31b78223d1766bd11d702208a",
+  "name": "Data Quality and Method Transparency in Journalism",
+  "body_chars": 1052,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "political economy",
+   "domains": "[\"data visualization\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R093",
+  "stratum": "B",
+  "fb_id": "667f49c75ba6360666ec27807f67781d191b6a457a14b25a9ce2c3ae2fcdcc34",
+  "name": "Numerical Symbolism in Design and Biology",
+  "body_chars": 1048,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "semiotics",
+   "domains": "[\"engineering practice\", \"health & wellness\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R094",
+  "stratum": "A",
+  "fb_id": "53e4daf2f911871c61f90832138fcfec1c1da1ca560287719668b9bdbda33a4e",
+  "name": "Progressive Feature Introduction",
+  "body_chars": 967,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "specialized",
+   "discipline": "human-computer interaction",
+   "domains": "[\"user experience\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R095",
+  "stratum": "B",
+  "fb_id": "d57f8bf6cc1ff282cda769de0a403a127c627eb2fc7247219b7e8565326f6332",
+  "name": "Sensory Engagement As Quality Signal",
+  "body_chars": 1789,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "emerging",
+   "domains": "[\"business development\", \"marketing & communications\", \"product design\", \"packaging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R096",
+  "stratum": "B",
+  "fb_id": "cb1596d0e68058647dd05e222ed7b94d11f43e332e7a463d57ec81e6bbdd4a94",
+  "name": "Transportation and Setup Costs in Construction Projects",
+  "body_chars": 1235,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "economics",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R097",
+  "stratum": "B",
+  "fb_id": "6b4b26497c299fe82095995b2fd1c168c9b96768b1e09264acd784bed5bf48ab",
+  "name": "Minimin Decision Criterion",
+  "body_chars": 1301,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "descriptive_model",
+   "depth": "",
+   "discipline": "decision making",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R098",
+  "stratum": "A",
+  "fb_id": "8b6956fe67c9874bd4e727679bfac7a9ac7c6514ff249d28c3a016252f740c8b",
+  "name": "Aesthetic Refinement Through Iteration",
+  "body_chars": 1606,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"graphic design\", \"user experience\", \"product design\", \"industrial design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R099",
+  "stratum": "A",
+  "fb_id": "846c0989cd832461d6e998efe8cb32050ca4d6e2afe7934489e3913923700610",
+  "name": "Charismatic Brand Discipline",
+  "body_chars": 1474,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "behavioral economics",
+   "domains": "[\"business operations\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R100",
+  "stratum": "A",
+  "fb_id": "df7f311f7a67f68255cde9fb60a4530c991ea28ec9529bba83b73fe2ec831a5c",
+  "name": "Network Marketing Business Model",
+  "body_chars": 1028,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "economics",
+   "domains": "[\"business development\", \"entrepreneurship\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R101",
+  "stratum": "A",
+  "fb_id": "525e41f110a4aab374c39a30539c77cd37b86ac5b30cf2b10ef97630b5c45087",
+  "name": "Pragmatist View of Truth and Knowledge",
+  "body_chars": 1029,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "philosophy",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R102",
+  "stratum": "A",
+  "fb_id": "e80176e84e7a7d5404e24ea60c2e5ea4309bd800283abd8ed8faf15a43ef299c",
+  "name": "Social Entrepreneur's Playbook",
+  "body_chars": 1241,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "political economy",
+   "domains": "[\"design strategy\", \"finance & investment\", \"legal & public policy\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R103",
+  "stratum": "A",
+  "fb_id": "435b9cacb812f0034e1af794f9e45347ceac2f9d48ef7a095fbc10017ca26bb3",
+  "name": "Temporal Consistency in Visual Narrative Analysis",
+  "body_chars": 1323,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "cognitive science",
+   "domains": "[\"motion design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R104",
+  "stratum": "A",
+  "fb_id": "c94d30220e8e6805d4de613856be98a9f44f34887fa25a69d97fea9ce4238f72",
+  "name": "Strategic Information Gathering",
+  "body_chars": 1842,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "operations research",
+   "domains": "[\"business operations\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R105",
+  "stratum": "A",
+  "fb_id": "460071b3c4706183d350990648721d240bb4b52066e1ae640684b21002578304",
+  "name": "Probabilistic Forecasting with Prediction Intervals",
+  "body_chars": 914,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "cross-domain",
+   "discipline": "operations research",
+   "domains": "[\"digital product\", \"finance & investment\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R106",
+  "stratum": "A",
+  "fb_id": "246ef2b4d3e4ee2d738f17686ad9ad3d23681fdb0a11e2b37ee758b40604adbd",
+  "name": "The Invisible Art of Film Editing",
+  "body_chars": 963,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "motion & time",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R107",
+  "stratum": "A",
+  "fb_id": "ae9023a021dfc501f70b1ed0abe8a65b7cf8df3665dd7a89c257b6a9fda08329",
+  "name": "Lived Experience Focus",
+  "body_chars": 1489,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "research methodology",
+   "domains": "[\"social sciences\", \"user experience\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R108",
+  "stratum": "A",
+  "fb_id": "d49876a94d3287aeb591f71cb0f7481ef2da537ddb14e3b6db04cc5887ebf076",
+  "name": "Typography in Brand Positioning and Magazine Design",
+  "body_chars": 1156,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "typography",
+   "domains": "[\"marketing & communications\", \"media & entertainment\", \"brand identity\", \"graphic design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R109",
+  "stratum": "A",
+  "fb_id": "33ba0166918ac0c5eafa88308658836bc78133b931b5a5724500b89406eebe44",
+  "name": "Project Completion Bias",
+  "body_chars": 1209,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "empirical_pattern",
+   "depth": "cross-domain",
+   "discipline": "behavioral economics",
+   "domains": "[\"personal productivity\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R110",
+  "stratum": "A",
+  "fb_id": "75aac5fd032cbc2478b8dbd52c292eda34c5f6e2bdfc59d2544b7ac1bd259db4",
+  "name": "Federated Information Architecture",
+  "body_chars": 1569,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "information science",
+   "domains": "[\"web & ui\", \"information architecture\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R111",
+  "stratum": "B",
+  "fb_id": "17ad5fb7e5702c6a70eec0e8d35277166bf2a9ab1ad29c2e75499fe48864db20",
+  "name": "Pmt Camera Typography Manipulation",
+  "body_chars": 1054,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "emerging",
+   "domains": "[\"graphic design\", \"arts & culture\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R112",
+  "stratum": "B",
+  "fb_id": "af39863a54361c53e9985b5391915b35cf455121922ba5f8c2588e4a428f0c7a",
+  "name": "Content Analysis Approaches in Visual Research",
+  "body_chars": 1120,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "motion & time",
+   "domains": "[\"media & entertainment\", \"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R113",
+  "stratum": "A",
+  "fb_id": "10a373c7d492fd83342bb1f2cb79726e730ab7024bdc84ce0f3b15856ca5f82b",
+  "name": "Traveling Salesman Problem Computational Complexity",
+  "body_chars": 1078,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "operations research",
+   "domains": "[\"code & computation\", \"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R114",
+  "stratum": "A",
+  "fb_id": "ef95c4ed6eb9beb6546022107178fe8bdaa18b79cce1557a74bb5a2ab07c70eb",
+  "name": "Measurable Outcome Focus",
+  "body_chars": 1502,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "cross-domain",
+   "discipline": "operations research",
+   "domains": "[\"business operations\", \"legal & public policy\", \"project management\", \"personal productivity\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R115",
+  "stratum": "A",
+  "fb_id": "5bde5cfc68502dfdf84722bd9a6d4541f516fc83f4e398036e069c1fb03e3dd6",
+  "name": "Heuristic Reasoning in Problem Solving",
+  "body_chars": 1186,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "cognitive science",
+   "domains": "[\"education\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R116",
+  "stratum": "B",
+  "fb_id": "fbe41b1b7db77430e252281b66c3021f354a3e34bee1ff85f5c9efe824acbe13",
+  "name": "Ai Model Deployment Risk",
+  "body_chars": 1257,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "generative ai",
+   "domains": "[\"ai & agents\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R117",
+  "stratum": "A",
+  "fb_id": "c96a2254f877ab88b803375ad585ba9b4aac0f6b1021e2382ee28af9880a977b",
+  "name": "Sustained Purpose Over Temporary Gratification",
+  "body_chars": 1521,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "normative_heuristic",
+   "depth": "domain",
+   "discipline": "behavioral economics",
+   "domains": "[\"finance & investment\", \"personal productivity\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R118",
+  "stratum": "A",
+  "fb_id": "8601064e8e886ac36511613ae9a19bea186e470028d53d0c14032c1fa3697b13",
+  "name": "Pass@k Evaluation Method",
+  "body_chars": 937,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "machine learning",
+   "domains": "[\"ai & agents\", \"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R119",
+  "stratum": "A",
+  "fb_id": "342533616dff323e275f19c96f44bbfdcefc7a8fa2f4ff38ace16fd4c5772e75",
+  "name": "Strategic Human Resource Planning for Social Enterprises",
+  "body_chars": 995,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "organizational theory",
+   "domains": "[\"business operations\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R120",
+  "stratum": "A",
+  "fb_id": "c6ea8e7a3afcc731c29cae55f58b733f297480a1a1a2bd77a122a5e4b7e7a791",
+  "name": "Nonlinear Magnification Fields",
+  "body_chars": 1074,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "information science",
+   "domains": "[\"data visualization\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R121",
+  "stratum": "A",
+  "fb_id": "b5076194f6cea1d4ee35ada62553330f9300473fe17b07af1e3f1873166fd554",
+  "name": "Consumers Hero Refurbishment Strategy",
+  "body_chars": 1145,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "specialized",
+   "discipline": "behavioral economics",
+   "domains": "[\"finance & investment\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R122",
+  "stratum": "A",
+  "fb_id": "eb47077d0cec3419fa8a243163f17280e8ac0720c06b1e48eedf0c0aaa2a0e62",
+  "name": "Visual Hierarchy Through Contrast (2)",
+  "body_chars": 1460,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"user experience\", \"editorial & advertising\", \"brand identity\", \"graphic design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R123",
+  "stratum": "A",
+  "fb_id": "b761116e60c7973193e181d0d4b1fd0bf5e541958b58f1934aac2bfa94158442",
+  "name": "Superquadric Parameterization in 3d Space",
+  "body_chars": 1100,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "computer graphics",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R124",
+  "stratum": "B",
+  "fb_id": "d0ac52082210551c2bfda8197330087895f6188c87d7887595614478376de86d",
+  "name": "Foundation Model Integration Framework",
+  "body_chars": 1777,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "generative ai",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R125",
+  "stratum": "B",
+  "fb_id": "2b69e9bff8bc8dc1a3a0b1de1d4758f15a58cd1ac0f2b562972d476cb44eab6b",
+  "name": "Dell Computer's Direct-sale Business Model",
+  "body_chars": 1066,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "strategic thinking",
+   "domains": "[\"finance & investment\", \"marketing & communications\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R126",
+  "stratum": "A",
+  "fb_id": "cb7a3a157053e6640ce12f3951a6b10aa2d9ae1d753de0f260193f9aecc92892",
+  "name": "Embodied Knowledge in Design",
+  "body_chars": 1460,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"digital product\", \"design strategy\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R127",
+  "stratum": "B",
+  "fb_id": "c49d37c2748d6e9080e402cc2ff984b50c04c38d0c5c01cb2f9122c18baa502f",
+  "name": "Guild of Handicraft Educational Model",
+  "body_chars": 1109,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_instance",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "cultural design",
+   "domains": "[\"arts & culture\", \"design strategy\", \"education\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R128",
+  "stratum": "A",
+  "fb_id": "7542dcd08b0006891847ab64bf2c86766d47d86b988409096d39bd40ca0a1bc3",
+  "name": "Choice Architecture and Identity Framing",
+  "body_chars": 1568,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "psychology",
+   "domains": "[\"business operations\", \"leadership\", \"brand identity\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R129",
+  "stratum": "B",
+  "fb_id": "ad69cb9e4aca3b745e5a304c44f0275fc71c7da779a27f7ceaced83c36d538bd",
+  "name": "Use of Proxies and Analogues in Market Sizing",
+  "body_chars": 992,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "strategic thinking",
+   "domains": "[\"business operations\", \"digital product\", \"marketing & communications\", \"project management\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R130",
+  "stratum": "A",
+  "fb_id": "7fe0f6b494cda88248853b37de4c8388d1b8a5c32613d0a589b9fdc5647a42ec",
+  "name": "Typographic Principles of William Morris",
+  "body_chars": 1253,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "typography",
+   "domains": "[\"graphic design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R131",
+  "stratum": "B",
+  "fb_id": "559c0c920dc7943a2790b810724e7b78210019b067d739df57adc9524fb45392",
+  "name": "Differential Privacy in Data Collection",
+  "body_chars": 1085,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "privacy & surveillance",
+   "domains": "[\"data visualization\", \"research & methodology\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R132",
+  "stratum": "B",
+  "fb_id": "f11b83278882dc737f122259bee17f438bac7317012bb311d4bd325b3297abd0",
+  "name": "Monte Carlo PDE Solution Method",
+  "body_chars": 1252,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "computational physics & simulation",
+   "domains": "[\"computational science & physics\", \"finance & investment\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R133",
+  "stratum": "A",
+  "fb_id": "f113a19bb63c56fb8b92af2df651a6db644b1ef89814271eff6cca99dc39efea",
+  "name": "Three-holes-in-the-cheese Model of Error Cascades",
+  "body_chars": 997,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "human-computer interaction",
+   "domains": "[\"emerging\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R134",
+  "stratum": "B",
+  "fb_id": "571e318c33578f13b1bbd4fa59dc0b6573b86676d3cc34e090b6dc470cf996e3",
+  "name": "Holistic Interpretation Problem in Index-aware Retrieval",
+  "body_chars": 1318,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "information retrieval",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R135",
+  "stratum": "A",
+  "fb_id": "ae93c7182a9973b649a4d787d9cc38b91e6c96c7856e50900338c7496e3663c2",
+  "name": "Ase Design Problem Solving Model",
+  "body_chars": 1040,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"product design\", \"industrial design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R136",
+  "stratum": "A",
+  "fb_id": "195b0c7c822d9b2ec149a77a7f5f070073f938781b9f74f8a14e011cda929858",
+  "name": "Chatgpt Prompt Framework",
+  "body_chars": 994,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "human-computer interaction",
+   "domains": "[\"code & computation\", \"engineering practice\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R137",
+  "stratum": "A",
+  "fb_id": "b67252aad84514620796ce1f64e334b7d4d6aed27c865c3d918d18cd56247660",
+  "name": "Desire-friction Conversion Formula",
+  "body_chars": 1310,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "human-computer interaction",
+   "domains": "[\"digital product\", \"user experience\", \"marketing & communications\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R138",
+  "stratum": "B",
+  "fb_id": "a62c2c141f42b5bc4ea32f83de3d2c3037ea1613e4def36312bfaf9e9f304965",
+  "name": "Hjelmslev's Trichotomy and Linguistic Theory",
+  "body_chars": 1258,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "linguistics",
+   "domains": "[\"education\", \"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R139",
+  "stratum": "B",
+  "fb_id": "322c1ed0023485f298865312657d3caad0314275fa45642fd039ab0a0567dbc7",
+  "name": "Learning Through Failure Process",
+  "body_chars": 929,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "process_template",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "psychology",
+   "domains": "[\"education\", \"personal productivity\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R140",
+  "stratum": "B",
+  "fb_id": "e7e317889a65313188350dcc4ac258644b570e4c0242bc2f2ce404acc8750ca6",
+  "name": "Digital Culture Integration in Graphic Design",
+  "body_chars": 1747,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "quarantine",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "cultural design",
+   "domains": "[\"user experience\", \"graphic design\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R141",
+  "stratum": "B",
+  "fb_id": "2bc6d4812a91086b95d78ea9d3d81ea1471a0f47ddce73d7e8da941ac81dded9",
+  "name": "Contextual Redundancy and Representation Efficiency",
+  "body_chars": 1678,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "growth_edge",
+   "extraction_type": "empirical_pattern",
+   "depth": "",
+   "discipline": "operations research",
+   "domains": "[\"emerging\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R142",
+  "stratum": "A",
+  "fb_id": "a344596e4e819020f2dd38ee9c1aaa5ac346ed858f7624f89e728282317b2ed3",
+  "name": "Global Village Conceptual Framework",
+  "body_chars": 1077,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "media studies",
+   "domains": "[\"media & entertainment\", \"semiotics & communication\", \"social sciences\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R143",
+  "stratum": "B",
+  "fb_id": "dfb12b2e6bffe714a9e77aa4e3c22c868fe696f120d4f5a3447ea453094e1a1c",
+  "name": "Figma Hamburger Icon Creation",
+  "body_chars": 925,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "tool_instruction",
+   "extraction_type": "normative_heuristic",
+   "depth": "",
+   "discipline": "human-computer interaction",
+   "domains": "[\"design systems\", \"digital product\", \"graphic design\", \"web & ui\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R144",
+  "stratum": "A",
+  "fb_id": "8044f5ae34bffec51862a89a2020b1d37daa97c6b9c38d55bd97cd005d5e7b72",
+  "name": "Abra-kadabra Number Classification",
+  "body_chars": 1208,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "computational geometry",
+   "domains": "[\"code & computation\", \"education\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R145",
+  "stratum": "A",
+  "fb_id": "3a01753c570912440287df4c4ba2872f061b71d55354f33d21c7161f3b3f9c37",
+  "name": "Color As Cultural and Emotional Marker",
+  "body_chars": 1635,
+  "untraceable_pocket": false,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "cultural studies",
+   "domains": "[\"brand identity\", \"graphic design\", \"marketing & communications\", \"social sciences\", \"user experience\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R146",
+  "stratum": "A",
+  "fb_id": "0a1048873ece5178c7ef1f2947240fbe2b627e5cfa0f7e8ac76a3db943dede96",
+  "name": "Debate As Leadership Tool",
+  "body_chars": 1110,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "emerging",
+   "domains": "[\"business operations\", \"organizational behavior\", \"leadership\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R147",
+  "stratum": "B",
+  "fb_id": "7007133a9b27f997e7cd4934480ce81ace299596dfb0a81ebfb40301b4866712",
+  "name": "Randomness in Data Measurement",
+  "body_chars": 974,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "noise_drop",
+   "extraction_type": "causal_mechanism",
+   "depth": "",
+   "discipline": "research methodology",
+   "domains": "[\"engineering & infrastructure\", \"research & methodology\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R148",
+  "stratum": "A",
+  "fb_id": "ec6e0735af87a91d770ee4e4067970c6f881520577022938341456f1f95e6f72",
+  "name": "Professional Development Through Studio Experience",
+  "body_chars": 1024,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "causal_mechanism",
+   "depth": "domain",
+   "discipline": "design thinking",
+   "domains": "[\"graphic design\", \"design strategy\", \"industrial design\", \"product design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R149",
+  "stratum": "A",
+  "fb_id": "38e2bf94ce95cbe510557ad9723cbc62604bb2b2583bd519ea4c3ffae42d9301",
+  "name": "Perceptual Mapping Through Camouflage",
+  "body_chars": 1082,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "cross-domain",
+   "discipline": "psychology",
+   "domains": "[\"data visualization\"]",
+   "status": "QUARANTINE",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ },
+ {
+  "item_id": "R150",
+  "stratum": "A",
+  "fb_id": "db069282d326f4728e772f63d034f52ac16e9d2b3ce0217a0204fa2bbb2943a3",
+  "name": "Triple Bottom Line Business Approach",
+  "body_chars": 1148,
+  "untraceable_pocket": true,
+  "stored": {
+   "content_type": "principle",
+   "extraction_type": "descriptive_model",
+   "depth": "domain",
+   "discipline": "organizational theory",
+   "domains": "[\"business operations\", \"environmental design\"]",
+   "status": "PASS",
+   "content_type_source": null,
+   "discipline_source": null
+  }
+ }
+]

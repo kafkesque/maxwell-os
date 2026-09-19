@@ -1,0 +1,317 @@
+{
+ "1": {
+  "fb_id": "cdf61c29a6f42927af369cf807c48c6044f3a2682227887897b1ea5bb291986a",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "2": {
+  "fb_id": "1bd8c46d95068a395d33742b63c96b60dc09f6a52e75bcf1c5f88494679a0466",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "3": {
+  "fb_id": "59cc4fe5fb24cb1d59ebda61ff5eef247900de0f29ce8f239a4bc6da5649210d",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "4": {
+  "fb_id": "fb0be01acf12af8ffe28a16a11ede9408d216c5653bd0826165459bc8756af3b",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "5": {
+  "fb_id": "641036067d7a4752f004e63030a765770c064b3fb80e30f6bc1faa16b9d1f662",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "6": {
+  "fb_id": "90214f5f5193e8db5f9761512c8428378aba2b792e9ba4a11ae84d0a711d199d",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "7": {
+  "fb_id": "ef189ad0d06d7c765fa69453cdcf4c45cc34a244a1e9b52a84628678c3b75f06",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "8": {
+  "fb_id": "9e651096d902895212f4cc24dfa1ca2578bbbdc0b664eda3c8e28f0dee2b37cc",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "9": {
+  "fb_id": "603980d65464ac230c28270900c528f1731c275ed39925643f53bd844233c597",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "10": {
+  "fb_id": "7a2e37c1ad79875634ae81bf8627de9f02fd90d5d36fd40998689628bed82cd2",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "11": {
+  "fb_id": "a166d73f9b110dd34e37ae63a9462f97d100ba5e5d093cde306e5348fe27d9c6",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "12": {
+  "fb_id": "87afff91a43dd2b9756613dccc1e14ff428af9048bd9a7c60aba8b743c2b32a9",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "13": {
+  "fb_id": "eb8a62ceb5b3115af437a9422094d06be411a874a0e297b977f98c74a73a58f4",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "14": {
+  "fb_id": "8dee1eff197838443c3d78c1e6c3178f6e3fe9c76882ca1c19f059cd3b050bd5",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "15": {
+  "fb_id": "9607677619f815b80eb8a9d35fcfe91cb19af9fcf88be4fc5a5d5eccf631ad48",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "16": {
+  "fb_id": "9dc18c0c227a73e4be34e283d49743d696b956e93e8b820089f910e7141dbb57",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "17": {
+  "fb_id": "2eb4ce4fd490cf9386478a73b1da83a136d12b6e1e76069dcb85479c1367fd06",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "18": {
+  "fb_id": "85de1723a84544393edd319a89cac25d5333fe66983401fb3b1655c59f22ed9b",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "19": {
+  "fb_id": "b06cbbf11e209b66a5b3cc0de9ffd50f012af65513fe0d0b69320610f0a2b051",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "20": {
+  "fb_id": "4a6f26991d30d95d55c1f91ce5485854d6d8b6933c313958c0c75ca3aab5e99e",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "21": {
+  "fb_id": "19fa313d4c2f5755666c8101bfaf5cd9255b778eda56497a3ff0852cbba4bbf0",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "22": {
+  "fb_id": "614e9613954bd32abed28e9a7d8325e8a7dc6ce7e422ea09406cae002643800a",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "23": {
+  "fb_id": "9b5949f4d3f464f956b9206cb293f05b1152ffcf3200712ad838d58d579f1ac9",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "24": {
+  "fb_id": "f9c6023b0ef266155d682bcce13aa0d87e97f036a12b75bda7467d63bdeafd36",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "25": {
+  "fb_id": "38e67d88d6d237fdfa85d1429cb9aa63d66740b86328f506211bd8b63e7c6e8a",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "26": {
+  "fb_id": "47eaef5e4f8a6cf340d8625d4d145cddb6ef993452725d303d0f5f5ed9ef355e",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "27": {
+  "fb_id": "708389ee28b38505262a287d8bea70802cf06e44f4f1330c9bba4bcce10901fe",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "28": {
+  "fb_id": "b427f9cc79607c7f0bab37b68d52f87bd36cdfcbe37efa4aa35d14a2d08d68cc",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "29": {
+  "fb_id": "8591af941fdae62859e0a25235ec33a375c41ee9f1fcd1357225a721f9b41c59",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "30": {
+  "fb_id": "54bf0952a31a425420cced1da7c1eab03d39b9ede326a7b768b6278249ab5eb8",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "31": {
+  "fb_id": "99bfb5b86e2e78f7cf7beceef8dd782673be12d5e6db5ff2abc141ed70925682",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "32": {
+  "fb_id": "dec446fd98e0c78a422db8e21733068041bd4a4b0c3cdca399d85218ce651954",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "33": {
+  "fb_id": "f94917ec48727f11b0363fa03ffe96a3118d29c3057991ecd881dd57ccb75cbf",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "34": {
+  "fb_id": "fba10d9bd2f3351fb1a94db5847b14d6ecb29cb37144f888ec9893e9c0d5f2b5",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "35": {
+  "fb_id": "06a3b2e8d6d019fb57f1ac1fd5028603acb60db0f488ca68e44947444996eb03",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "36": {
+  "fb_id": "040a95cb87be52e87be9a8b727c604a224f5aece45e4d7b6ff8a655089798d82",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "37": {
+  "fb_id": "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "38": {
+  "fb_id": "c688261d436af4839712052f2a66fc0989a752f4ae6f12de8f18f615d9f0bccd",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "39": {
+  "fb_id": "925505e3f317d40f1ea188cb174d6517426816c16311fcd2bef54a566511bbd2",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "40": {
+  "fb_id": "67a213e128469ee1b0d4fdb640e2d427c7e678d55fbe615022b4fe3689afac7e",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "41": {
+  "fb_id": "dd6bb15b6c947e76a6b0b981d3e6ba59874c267602480009c46db5014f8fb228",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "42": {
+  "fb_id": "5d1f19a335fd3674128c099e085c6db45de4bd929dd494eddec8e5c078ff53e6",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "43": {
+  "fb_id": "18464dd5e0cac55caa573d9a62df550fd56ba3d184723717d6e556527f4b19e9",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "44": {
+  "fb_id": "b3bea285689443fddcb0aa3fce4e836d990c8a13a5ffbc81a76fe71899c916f1",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "45": {
+  "fb_id": "c0956f337071ffb7528aef7e5c43f6b592a80bfd4f15be18bd33cea56830419d",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "46": {
+  "fb_id": "7db1f4f4d042606b4bf9add4d1b503859f8ebb9012ef338dc64779d539e64be4",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "47": {
+  "fb_id": "dc759ae99642b3d8ed68fff6d42ec69fade917e309f12ba146a52e5b20a99075",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "48": {
+  "fb_id": "0b432ef20f5e314c734fa28040a3af9ba1dc21c1abbbd3e6a597fff4d64c4f41",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "49": {
+  "fb_id": "1e2b13ff3fb73875257162ff344ab13605ced4693d2eea229b37c5b89f2a220f",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "50": {
+  "fb_id": "0e6143f7b6270b1257d75cac6229e90e070af0b0da1ca9a21eb979febbce1678",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "51": {
+  "fb_id": "a42ddc7fb5a116c623e9ab16b8649864390d1c98fea355a8bf63a1837d357ace",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "52": {
+  "fb_id": "fa707344de439a1d2dd2a22184ec3add3a015b4862bdbf4786fccfb0d848d86c",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "53": {
+  "fb_id": "b3caff68aaf5e73e56de97958e3aeda9fade1dd786be1af643541091d9fb53dc",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "54": {
+  "fb_id": "9d5e48deaa4b7cd378a60b0ae8ecb971fa0663d500c10ccdab9da8a32b7152c2",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "55": {
+  "fb_id": "0f2a93d0bf24ecfe01301946c136d236e5ca16272ef8ff2bb92d5abaf9ce0ed6",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "56": {
+  "fb_id": "a6c8175af9cebb11145f603bec09b0817fb575051250374c41516e6fc56ff95e",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "57": {
+  "fb_id": "92d174512d56ec751c5a5a21d16d454830477d59f7de27a901bca88bf942f47c",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "58": {
+  "fb_id": "ca36564736360012d1b140e657b01fcf06c9cdc696637304f21044b1d49769d4",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "59": {
+  "fb_id": "e2d7c4b0ccb93b1e730facd7be5dea61e3c29774bc1a6ad0f419b9a3f31c4f10",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "60": {
+  "fb_id": "897073bd7b0c920b241096e5061d04c267389f646efa15965c49aa3db4f5b238",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ },
+ "61": {
+  "fb_id": "7bff3b300bfd84b65e2878b362da2798844fb6ca017314510afec9bfbf2d45b3",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "62": {
+  "fb_id": "ec970e76df207748b524769247613a2de1a0a1f9f2923707939cf1c9c9f96794",
+  "candidate_1": "deepseek-v4-pro",
+  "candidate_2": "qwen3.8"
+ },
+ "63": {
+  "fb_id": "fc5376052c9db41392d48d0327290eb0b4daf239d71f59a7b5b94b7fc72d979b",
+  "candidate_1": "qwen3.8",
+  "candidate_2": "deepseek-v4-pro"
+ }
+}

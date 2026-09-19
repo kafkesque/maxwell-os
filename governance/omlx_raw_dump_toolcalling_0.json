@@ -1,0 +1,172 @@
+[
+  {
+    "model": "Ornith-1.5-35B-A3B-REAP-19B",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "content",
+      "reasoning_content",
+      "role"
+    ],
+    "content_chars": 126,
+    "reasoning_chars": 122,
+    "n_tool_calls": 0,
+    "content_head": "```json {   \"tool\": \"search_files\",   \"args\": {     \"query\": \"*.log\",     \"path\": \"/var/log\",     \"max_results\": 100   } } ```",
+    "reasoning_head": "The user wants me to find the three most recent log files under /var/log. I should use search_files to look for log files.",
+    "tool_calls": "[]",
+    "finish_reason": "stop"
+  },
+  {
+    "model": "Ornith-1.5-9B-MLX-8bit",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "content",
+      "reasoning_content",
+      "role"
+    ],
+    "content_chars": 91,
+    "reasoning_chars": 436,
+    "n_tool_calls": 0,
+    "content_head": "{   \"tool\": \"search_files\",   \"query\": \"*.log\",   \"path\": \"/var/log\",   \"max_results\": 50 }",
+    "reasoning_head": "The user wants me to find the three most recent log files under /var/log. Let me use the search_files tool to explore this directory.  Actually, let me think about this. The search_files tool searches",
+    "tool_calls": "[]",
+    "finish_reason": "stop"
+  },
+  {
+    "model": "Phi-4-mini-instruct-8bit",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "content",
+      "role"
+    ],
+    "content_chars": 102,
+    "reasoning_chars": 0,
+    "n_tool_calls": 0,
+    "content_head": "```json {   \"tool\": \"search_files\",   \"query\": \"*log*\",   \"path\": \"/var/log\",   \"max_results\": 3 } ```",
+    "reasoning_head": "",
+    "tool_calls": "[]",
+    "finish_reason": "stop"
+  },
+  {
+    "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "content",
+      "role"
+    ],
+    "content_chars": 112,
+    "reasoning_chars": 0,
+    "n_tool_calls": 0,
+    "content_head": "{   \"tool\": \"search_files\",   \"args\": {     \"query\": \"*.log\",     \"path\": \"/var/log\",     \"max_results\": 3   } }",
+    "reasoning_head": "",
+    "tool_calls": "[]",
+    "finish_reason": "stop"
+  },
+  {
+    "model": "Qwen3.8-27B-MLX-4bit",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "content",
+      "role"
+    ],
+    "content_chars": 90,
+    "reasoning_chars": 0,
+    "n_tool_calls": 0,
+    "content_head": "{\"tool\": \"search_files\", \"args\": {\"path\": \"/var/log\", \"query\": \"*.log\", \"max_results\": 3}}",
+    "reasoning_head": "",
+    "tool_calls": "[]",
+    "finish_reason": "stop"
+  },
+  {
+    "model": "gemma-4-E4B-it-MLX-4bit",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "role",
+      "tool_calls"
+    ],
+    "content_chars": 0,
+    "reasoning_chars": 0,
+    "n_tool_calls": 1,
+    "content_head": "",
+    "reasoning_head": "",
+    "tool_calls": "[{\"id\": \"call_1f8e3002\", \"type\": \"function\", \"function\": {\"name\": \"search_files\", \"arguments\": \"{\\\"query\\\": \\\"log\\\", \\\"path\\\": \\\"/var/log\\\", \\\"max_results\\\": 3}\"}}]",
+    "finish_reason": "tool_calls"
+  },
+  {
+    "model": "gpt-oss-20b-MXFP4-Q8",
+    "item_id": "tool-0",
+    "max_tokens": 200,
+    "top_level_keys": [
+      "choices",
+      "created",
+      "id",
+      "model",
+      "object",
+      "usage"
+    ],
+    "message_keys": [
+      "reasoning_content",
+      "role"
+    ],
+    "content_chars": 0,
+    "reasoning_chars": 805,
+    "n_tool_calls": 0,
+    "content_head": "",
+    "reasoning_head": "We need to find three most recent log files under /var/log. We need to search files. Use search_files tool. Query maybe \"*.log\" path \"/var/log\" max_results maybe 3? But we need most recent. search_fil",
+    "tool_calls": "[]",
+    "finish_reason": "length"
+  }
+]

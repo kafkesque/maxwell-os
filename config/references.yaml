@@ -1,0 +1,315 @@
+version: 1
+# VERIFIED REFERENCE LIBRARY — the evidence base behind the ontology/retrieval programme.
+#
+# WHY THIS FILE EXISTS: the forensic reports cite ~35 works inline, which a frontier LLM (or an auditor)
+# cannot resolve or check without chasing prose. This is the single source of truth for the bibliography:
+# every entry carries an identifier that resolves, and `scripts/build_reference_library.py` FETCHES the
+# metadata from OpenAlex by DOI rather than letting anyone type it (so a wrong year, venue or DOI cannot
+# survive a rebuild).
+#
+# C12: the list lives here; the script only renders. C16: a DOI that fails to resolve is reported, never
+# silently dropped.
+#
+# Fields:
+#   id      short handle used in the reports
+#   doi     the resolving identifier ('' when the work is a W3C/ISO standard with a URL instead)
+#   url     used only for standards that have no DOI
+#   role     why Maxwell OS cares
+#   bears    the specific finding/repair it supports (traceable back to the forensic reports)
+#   used_in  where it is cited
+#
+# Rebuild:  python3 scripts/build_reference_library.py            (fetch + verify, needs network)
+#           python3 scripts/build_reference_library.py --cached   (re-render from the cache, offline)
+
+references:
+
+  # ── 1. LABELLING: make the label a decision, not a generation ──────────────────────────────
+  - id: yin2019zeroshot
+    doi: 10.18653/v1/d19-1404
+    role: "Definition-anchored / entailment-based zero-shot classification — the method behind repair R1."
+    bears: "F-C (free-generation labelling), D272c"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: lancaster1972vocab
+    doi: ''
+    url: https://archive.org/details/vocabularycontro0000lanc
+    role: "Vocabulary control for information retrieval — the 50-year settlement that curated corpora want controlled vocabularies."
+    bears: "F-C, F-I"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: nlvscontrolled1998
+    doi: 10.1002/(sici)1097-4571(199808)49:10<881::aid-asi4>3.0.co;2-y
+    role: "Natural language versus controlled vocabulary in retrieval — the finding is context-dependent; Maxwell OS is the curated case."
+    bears: "F-C"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: michie2013bctt
+    doi: 10.1007/s12160-013-9486-6
+    role: "BCTTv1 — the authoritative analogue: 93 consensus-built labels, published per-label reliability, a coding manual, mandatory training. Maxwell OS's RULER_MENUS is its coding manual."
+    bears: "F-F, R5, the whole vocabulary-gate design"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  # ── 2. VOCABULARY QUALITY: is a slot decidable? ────────────────────────────────────────────
+  - id: guarino2002ontoclean
+    doi: 10.1145/503124.503150
+    role: "OntoClean (rigidity / identity / unity / dependence) — the test for why 'typography' is applicable and 'cultural design' is not."
+    bears: "F-F (~10-12 under-defined slots)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: cohen1960kappa
+    doi: 10.1177/001316446002000104
+    role: "Cohen's kappa — the agreement coefficient for per-slot reliability."
+    bears: "F-F, the vocabulary acceptance gate"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: landis1977kappa
+    doi: 10.2307/2529310
+    role: "Landis & Koch — the 0.61 'substantial' threshold adopted as the per-slot acceptance gate."
+    bears: "F-F"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: krippendorff2019content
+    doi: 10.4135/9781071878781
+    role: "Content analysis — the reliability framework for human coding; also the source of the 'no spotless without a number' discipline."
+    bears: "F-F, the ruler methodology"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, CONTEXT_INDEX]
+    note: "EDITION NOTE: the 4th edition (2019) is cited; the work originates in 1980 and this DOI is the SAGE edition."
+
+  - id: duque2011oquare
+    doi: 10.1016/j.jss.2011.02.012
+    role: "OQuaRE — SQuaRE-based ontology quality metrics (cohesion, completeness, consistency)."
+    bears: "F-F (vocabulary scorecard)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: shacl
+    doi: ''
+    url: https://www.w3.org/TR/shacl/
+    role: "W3C SHACL — the machine-checkable shape contract. config/taxonomy_shacl.ttl already exists in this repo and is unenforced."
+    bears: "F-F, BUG-273, BUG-290"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: skos
+    doi: ''
+    url: https://www.w3.org/TR/skos-reference/
+    role: "W3C SKOS — prefLabel / altLabel / scopeNote; the authority-control vocabulary for one preferred label plus variants."
+    bears: "F-I, D271c"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  # ── 3. LABEL ERROR DETECTION without re-running the pipeline ───────────────────────────────
+  - id: northcutt2021confident
+    doi: 10.1613/jair.1.12125
+    role: "Confident Learning / cleanlab — ranks likely-mislabeled rows from existing features and labels, no LLM, fully local."
+    bears: "F-C, the cheap replacement for sample-only auditing"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: ratner2020snorkel
+    doi: 10.1007/s00778-019-00552-1
+    role: "Snorkel — weak supervision: many cheap labelling functions combined with learned accuracies. The principled successor to a 999-rule alias table."
+    bears: "F-I (DEFER)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "VERSION NOTE: the VLDB Journal article (2020) supersedes the 2017 arXiv preprint; cite the journal version."
+
+  # ── 4. VERIFICATION, ABSTENTION, AND NOT CONFLATING 'UNVERIFIABLE' WITH 'UNTRUE' ──────────
+  - id: honovich2022true
+    doi: 10.18653/v1/2022.naacl-main.287
+    role: "TRUE — NLI-based factual-consistency scorers correlate weakly with human judgement. This is the citation that forbids reading an S5 NEUTRAL as FALSE."
+    bears: "F-B / BUG-278 (the quarantine conflation)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: geifman2017selective
+    doi: 10.48550/arxiv.1705.08500
+    role: "Selective classification — abstain by an explicit risk/coverage trade-off rather than an arbitrary threshold."
+    bears: "F-B, D272d"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "arXiv identifier: the NeurIPS 2017 version is the citable one; the arXiv record has the lower citation count (OpenAlex does not merge them)."
+
+  - id: angelopoulos2021conformal
+    doi: 10.48550/arxiv.2107.07511
+    role: "Conformal prediction — distribution-free guarantees; how to choose the S5 threshold with a stated error budget."
+    bears: "F-B, D272d"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  # ── 5. RELEVANCE: why 'relevant' cannot be an intrinsic content type ──────────────────────
+  - id: saracevic2007relevance
+    doi: 10.1002/asi.20682
+    role: "Relevance is RELATIONAL (document x user x goal), not an intrinsic property of text. The theoretical basis for a separate, revisable relevance axis."
+    bears: "F-E / BUG-281, D272e"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: wettig2024qurating
+    doi: 10.48550/arxiv.2402.09739
+    role: "QuRating — quality as explicit human-rated criteria plus a trained local judge. The template for turning 'valid fact but irrelevant' into named, ratable criteria."
+    bears: "F-E, the relevance-axis design"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: penedo2024fineweb
+    doi: 10.48550/arxiv.2406.17557
+    role: "FineWeb / FineWeb-Edu — a classifier trained on a small labelled set beats regex heuristics for 'is this valuable'."
+    bears: "F-E, and the stage1.3 prefilter's limits"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: balog2019pkg
+    doi: 10.1145/3295750.3298922
+    role: "Personal Knowledge Graphs — the closest architectural frame: user-scoped, privacy-bound, non-canonical, assumes personal relevance and personal vocabulary drift."
+    bears: "the mission framing"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  # ── 6. RETRIEVAL CORRECTNESS AND GRANULARITY (the second-pass findings) ────────────────────
+  - id: acorn2024
+    doi: 10.1145/3654923
+    role: "ACORN — predicate-agnostic filtered vector search. The design conclusion that a facet meant to PARTITION must constrain every candidate generator, before truncation."
+    bears: "F-28 / BUG-285 / D273a (the filters do not filter)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: chen2024densex
+    doi: 10.18653/v1/2024.emnlp-main.845
+    role: "Dense X Retrieval — retrieval GRANULARITY: finer self-contained units beat passages, but the unit must stay self-contained."
+    bears: "D273g (the chunk-leg decision)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: karpukhin2020dpr
+    doi: 10.18653/v1/2020.emnlp-main.550
+    role: "DPR — passage-level dense retrieval; the baseline for what 'a retrieval unit' means."
+    bears: "D273g"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: khattab2020colbert
+    doi: 10.48550/arxiv.2004.12832
+    role: "ColBERT — late interaction over token-level units; the finer-grained alternative to a single pooled vector."
+    bears: "F-31 (only definition is embedded), D273g"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: liu2024lostmiddle
+    doi: 10.1162/tacl_a_00638
+    role: "Lost in the Middle — more context is not better context. Why returning the matched segment with its parent beats returning everything."
+    bears: "D273g"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: robertson2009bm25
+    doi: 10.1561/1500000019
+    role: "BM25 / probabilistic relevance — the ranking function under the FTS leg; the reference for keyword-leg weighting in fusion."
+    bears: "F-28 (fusion design)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: cormack2009rrf
+    doi: 10.1145/1571941.1572114
+    role: "Reciprocal Rank Fusion — the ORIGINAL RRF paper. search_hybrid already implements Score(d)=sum 1/(k+rank) with k=60, so this is the reference for the fusion that already exists, not a change."
+    bears: "the 'RRF is already correct' finding"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919]
+
+  - id: gao2023ragsurvey
+    doi: 10.48550/arxiv.2312.10997
+    role: "RAG survey — the landscape and the standard component decomposition."
+    bears: "the retrieval-programme framing"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: chen2024rgb
+    doi: 10.1609/aaai.v38i16.29728
+    role: "RGB — noise robustness is the dominant RAG failure mode. Wilson OS has NO retrieval benchmark; this is why one is required."
+    bears: "F-A (measure it), D273a verification"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: prietodiaz1991faceted
+    doi: 10.1145/103167.103176
+    role: "Faceted classification for software reuse — the canonical demonstration that small orthogonal controlled facets scale, and that facets MUST be orthogonal."
+    bears: "F-A, and why 'depth' is not an independent facet"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  # ── 7. DATA: contradiction, dedup, ingestion quality ──────────────────────────────────────
+  - id: li2016truthdiscovery
+    doi: 10.1145/2897350.2897352
+    role: "Truth discovery — jointly estimate source reliability and claim truth from agreement, no ground truth needed. The missing implementation behind an empty contradicts_fbs."
+    bears: "F-H, D272f step 6"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: paulheim2017kgrefine
+    doi: 10.3233/sw-160218
+    role: "Knowledge graph refinement — the standard taxonomy of error detection / completion / repair, and its evaluation methods."
+    bears: "the repair programme's evaluation vocabulary"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "METADATA DISCREPANCY: OpenAlex returns 2016 (online-first); the Semantic Web Journal article is conventionally cited as 2017, 8(1)."
+
+  - id: broder1997resemblance
+    doi: 10.1109/sequen.1997.666900
+    role: "Broder shingling/MinHash — near-duplicate detection for work-identity dedup."
+    bears: "F-32 / BUG-289 / D273e (29.1% of convergence is duplicate ingestion)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "METADATA DISCREPANCY: OpenAlex returns 2002 for this DOI; the paper is from the 1997 Compression and Complexity of Sequences proceedings. Cite as 1997 and treat the fetched year as an indexing artefact."
+
+  - id: lee2022dedup
+    doi: 10.18653/v1/2022.acl-long.577
+    role: "Deduplicating training data — measured cost of duplicates in a corpus."
+    bears: "F-32, D273e"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: fellegi1969recordlinkage
+    doi: 10.1080/01621459.1969.10501049
+    role: "Fellegi & Sunter — probabilistic record linkage with clerical review. The basis for the identity layer (Splink line of work) and for fuzzy work-identity matching."
+    bears: "D271c, D273e"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919, DECISION_D271_IDENTITY_20260917]
+
+  - id: winograd1971
+    doi: 10.1145/362384.362685
+    role: "Codd's relational model — the object/property logic the schema already follows; cited to show the schema need not be re-engineered."
+    bears: 'no restructuring required'
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: hogan2021knowledgegraphs
+    doi: 10.1145/3447772
+    role: "Knowledge Graphs (Hogan et al.) — the reference definition of a graph-structured KB; the frame for using the existing 164,202 edges in retrieval."
+    bears: "the graph-is-built-and-unused finding"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "METADATA DISCREPANCY: OpenAlex returns 2021; the ACM Computing Surveys issue is 54(4), 2022. Cite as 2021."
+
+  - id: provo
+    doi: ''
+    url: https://www.w3.org/TR/prov-o/
+    role: "W3C PROV-O — entity/activity/agent provenance. R14 demands it; the provenance column currently holds one constant for 100% of rows."
+    bears: "F-H / BUG-282"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  # ── 8. MODEL BEHAVIOUR: who may judge what ────────────────────────────────────────────────
+  - id: gilardi2023chatgpt
+    doi: 10.1073/pnas.2305016120
+    role: "ChatGPT outperforms crowd workers on text-annotation tasks — the evidence that an LLM annotator can be viable, WITH the reliability caveats."
+    bears: "the S4/R5 design, BUG-269 (report against the constant-answer baseline)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: zheng2023llmjudge
+    doi: 10.48550/arxiv.2306.05685
+    role: "LLM-as-a-Judge (MT-Bench) — including the documented position/verbosity/self-enhancement biases. The basis for judging judges and for cross-family verification (R5/C8)."
+    bears: "BUG-269, the R5 protocol"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+    note: "arXiv identifier: the NeurIPS 2023 Datasets and Benchmarks version is the citable one."
+
+  # ── 9. CLUSTERING (deferred, but referenced so the option is not re-litigated blindly) ────
+  - id: wagstaff2001constrained
+    doi: ''
+    url: https://dl.acm.org/doi/10.5555/645530.655819
+    role: "Constrained K-means with must-link/cannot-link — the only peer-reviewed way to inject ontology into clustering. Produces discipline-pure clusters, NOT a label from the cluster."
+    bears: "F-C / D7 (why cluster-derived labelling is rejected)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: campello2013hdbscan
+    doi: 10.1007/978-3-642-37456-2_14
+    role: "HDBSCAN — density-based clustering with stability. Removed by D2120/D2198 for reproducibility; DEFER as a stability MEASUREMENT only."
+    bears: "F-C, §2.1 of the forensic"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: grootendorst2022bertopic
+    doi: 10.48550/arxiv.2203.05794
+    role: "BERTopic — c-TF-IDF topic representation, the standard way to NAME a cluster. The step stage 2 currently skips."
+    bears: "F-C (cluster naming)"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: wong2012ontologylearning
+    doi: 10.1145/2333112.2333115
+    role: "Ontology learning from text — the survey for growing the vocabulary from the corpus (DEFER until application reliability is fixed)."
+    bears: "F-F, D272f step 12"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]
+
+  - id: shen2020taxoexpan
+    doi: 10.1145/3366423.3380132
+    role: "Taxonomy expansion — self-supervised placement of a new label into an existing taxonomy."
+    bears: "F-F, D272f step 12"
+    used_in: [MARKET_RESEARCH_ONTOLOGY_20260919]

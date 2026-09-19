@@ -1,6 +1,7 @@
 # MARKET RESEARCH — ontologically accurate classification, drift elimination, contradiction handling, and objective relevance filtering
 **Date:** 2026-09-19 · **Method:** OpenAlex title-verified (DOI + citation count on record) · **Constraint basis:** C1 ($0 marginal, local), C2/C4 (no lock-in), C3 (sovereign), C12 (config-first), C21 (swappable behind a protocol)
 **Companion:** `governance/ONTOLOGY_FORENSIC_20260919.md` (the measured diagnosis these candidates must answer)
+**Bibliography:** `governance/REFERENCE_LIBRARY_20260919.md` — every reference below with a DOI-verified identifier, its role, and the finding it supports (metadata fetched from OpenAlex, not typed). BibTeX: `governance/references_20260919.bib`. Source: `config/references.yaml`.
 
 ---
 

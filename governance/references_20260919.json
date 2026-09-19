@@ -1,0 +1,1009 @@
+{
+ "generated_by": "scripts/build_reference_library.py",
+ "source": "config/references.yaml",
+ "verification_method": "OpenAlex DOI fetch (title/year/venue/citation count fetched, not typed)",
+ "unresolved": [],
+ "references": [
+  {
+   "id": "yin2019zeroshot",
+   "doi": "10.18653/v1/d19-1404",
+   "url": "https://doi.org/10.18653/v1/d19-1404",
+   "title": "Benchmarking Zero-shot Text Classification: Datasets, Evaluation and Entailment Approach",
+   "year": 2019,
+   "venue": "",
+   "cited_by": 529,
+   "type": "conference-paper",
+   "authors": [
+    "Wenpeng Yin",
+    "Jamaal Hay",
+    "Dan Roth"
+   ],
+   "role": "Definition-anchored / entailment-based zero-shot classification \u2014 the method behind repair R1.",
+   "bears": "F-C (free-generation labelling), D272c",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "lancaster1972vocab",
+   "doi": "",
+   "url": "https://archive.org/details/vocabularycontro0000lanc",
+   "title": "",
+   "year": null,
+   "venue": "",
+   "cited_by": null,
+   "type": "standard",
+   "authors": [],
+   "role": "Vocabulary control for information retrieval \u2014 the 50-year settlement that curated corpora want controlled vocabularies.",
+   "bears": "F-C, F-I",
+   "note": "",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "URL_ONLY"
+  },
+  {
+   "id": "nlvscontrolled1998",
+   "doi": "10.1002/(sici)1097-4571(199808)49:10<881::aid-asi4>3.0.co;2-y",
+   "url": "https://doi.org/10.1002/(sici)1097-4571(199808)49:10<881::aid-asi4>3.0.co;2-y",
+   "title": "Natural language versus controlled vocabulary in information retrieval: A case study in soil mechanics",
+   "year": 1998,
+   "venue": "Journal of the American Society for Information Science",
+   "cited_by": 38,
+   "type": "article",
+   "authors": [
+    "Manikya Rao Muddamalle"
+   ],
+   "role": "Natural language versus controlled vocabulary in retrieval \u2014 the finding is context-dependent; Maxwell OS is the curated case.",
+   "bears": "F-C",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "michie2013bctt",
+   "doi": "10.1007/s12160-013-9486-6",
+   "url": "https://doi.org/10.1007/s12160-013-9486-6",
+   "title": "The Behavior Change Technique Taxonomy (v1) of 93 Hierarchically Clustered Techniques: Building an International Consensus for the Reporting of Behavior Change Interventions",
+   "year": 2013,
+   "venue": "Annals of Behavioral Medicine",
+   "cited_by": 8202,
+   "type": "article",
+   "authors": [
+    "Susan Michie",
+    "Michelle Richardson",
+    "Marie Johnston",
+    "Charles Abraham",
+    "Jill Francis",
+    "Wendy Hardeman"
+   ],
+   "role": "BCTTv1 \u2014 the authoritative analogue: 93 consensus-built labels, published per-label reliability, a coding manual, mandatory training. Maxwell OS's RULER_MENUS is its coding manual.",
+   "bears": "F-F, R5, the whole vocabulary-gate design",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "guarino2002ontoclean",
+   "doi": "10.1145/503124.503150",
+   "url": "https://doi.org/10.1145/503124.503150",
+   "title": "Evaluating ontological decisions with OntoClean",
+   "year": 2002,
+   "venue": "Communications of the ACM",
+   "cited_by": 767,
+   "type": "article",
+   "authors": [
+    "Nicola Guarino",
+    "Christopher Welty"
+   ],
+   "role": "OntoClean (rigidity / identity / unity / dependence) \u2014 the test for why 'typography' is applicable and 'cultural design' is not.",
+   "bears": "F-F (~10-12 under-defined slots)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "cohen1960kappa",
+   "doi": "10.1177/001316446002000104",
+   "url": "https://doi.org/10.1177/001316446002000104",
+   "title": "A Coefficient of Agreement for Nominal Scales",
+   "year": 1960,
+   "venue": "Educational and Psychological Measurement",
+   "cited_by": 42317,
+   "type": "article",
+   "authors": [
+    "Jacob Cohen"
+   ],
+   "role": "Cohen's kappa \u2014 the agreement coefficient for per-slot reliability.",
+   "bears": "F-F, the vocabulary acceptance gate",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "landis1977kappa",
+   "doi": "10.2307/2529310",
+   "url": "https://doi.org/10.2307/2529310",
+   "title": "The Measurement of Observer Agreement for Categorical Data",
+   "year": 1977,
+   "venue": "Biometrics",
+   "cited_by": 81232,
+   "type": "article",
+   "authors": [
+    "J. Richard Landis",
+    "Gary G. Koch"
+   ],
+   "role": "Landis & Koch \u2014 the 0.61 'substantial' threshold adopted as the per-slot acceptance gate.",
+   "bears": "F-F",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "krippendorff2019content",
+   "doi": "10.4135/9781071878781",
+   "url": "https://doi.org/10.4135/9781071878781",
+   "title": "Content Analysis: An Introduction to Its Methodology",
+   "year": 2019,
+   "venue": "",
+   "cited_by": 5468,
+   "type": "book",
+   "authors": [
+    "Klaus Krippendorff"
+   ],
+   "role": "Content analysis \u2014 the reliability framework for human coding; also the source of the 'no spotless without a number' discipline.",
+   "bears": "F-F, the ruler methodology",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "CONTEXT_INDEX"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "EDITION NOTE: the 4th edition (2019) is cited; the work originates in 1980 and this DOI is the SAGE edition."
+  },
+  {
+   "id": "duque2011oquare",
+   "doi": "10.1016/j.jss.2011.02.012",
+   "url": "https://doi.org/10.1016/j.jss.2011.02.012",
+   "title": "Slug Expression Enhances Tumor Formation in a Noninvasive Rectal Cancer Model",
+   "year": 2011,
+   "venue": "Journal of Surgical Research",
+   "cited_by": 23,
+   "type": "article",
+   "authors": [
+    "E. Ramsay Camp",
+    "Victoria J. Findlay",
+    "Silvia G. Vaena",
+    "Jarrett Walsh",
+    "David Lewin",
+    "David P. Turner"
+   ],
+   "role": "OQuaRE \u2014 SQuaRE-based ontology quality metrics (cohesion, completeness, consistency).",
+   "bears": "F-F (vocabulary scorecard)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "shacl",
+   "doi": "",
+   "url": "https://www.w3.org/TR/shacl/",
+   "title": "",
+   "year": null,
+   "venue": "",
+   "cited_by": null,
+   "type": "standard",
+   "authors": [],
+   "role": "W3C SHACL \u2014 the machine-checkable shape contract. config/taxonomy_shacl.ttl already exists in this repo and is unenforced.",
+   "bears": "F-F, BUG-273, BUG-290",
+   "note": "",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "URL_ONLY"
+  },
+  {
+   "id": "skos",
+   "doi": "",
+   "url": "https://www.w3.org/TR/skos-reference/",
+   "title": "",
+   "year": null,
+   "venue": "",
+   "cited_by": null,
+   "type": "standard",
+   "authors": [],
+   "role": "W3C SKOS \u2014 prefLabel / altLabel / scopeNote; the authority-control vocabulary for one preferred label plus variants.",
+   "bears": "F-I, D271c",
+   "note": "",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "URL_ONLY"
+  },
+  {
+   "id": "northcutt2021confident",
+   "doi": "10.1613/jair.1.12125",
+   "url": "https://doi.org/10.1613/jair.1.12125",
+   "title": "Confident Learning: Estimating Uncertainty in Dataset Labels",
+   "year": 2021,
+   "venue": "Journal of Artificial Intelligence Research",
+   "cited_by": 61,
+   "type": "article",
+   "authors": [
+    "Curtis G. Northcutt",
+    "Lu Jiang",
+    "Isaac L. Chuang"
+   ],
+   "role": "Confident Learning / cleanlab \u2014 ranks likely-mislabeled rows from existing features and labels, no LLM, fully local.",
+   "bears": "F-C, the cheap replacement for sample-only auditing",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "ratner2020snorkel",
+   "doi": "10.1007/s00778-019-00552-1",
+   "url": "https://doi.org/10.1007/s00778-019-00552-1",
+   "title": "Snorkel: rapid training data creation with weak supervision.",
+   "year": 2020,
+   "venue": "PubMed",
+   "cited_by": 520,
+   "type": "article",
+   "authors": [
+    "Alexander Ratner",
+    "Stephen H Bach",
+    "Henry Ehrenberg",
+    "Jason Fries",
+    "Sen Wu",
+    "Christopher R\u00e9"
+   ],
+   "role": "Snorkel \u2014 weak supervision: many cheap labelling functions combined with learned accuracies. The principled successor to a 999-rule alias table.",
+   "bears": "F-I (DEFER)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "VERSION NOTE: the VLDB Journal article (2020) supersedes the 2017 arXiv preprint; cite the journal version."
+  },
+  {
+   "id": "honovich2022true",
+   "doi": "10.18653/v1/2022.naacl-main.287",
+   "url": "https://doi.org/10.18653/v1/2022.naacl-main.287",
+   "title": "TRUE: Re-evaluating Factual Consistency Evaluation",
+   "year": 2022,
+   "venue": "Proceedings of the 2022 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies",
+   "cited_by": 57,
+   "type": "conference-paper",
+   "authors": [
+    "Or Honovich",
+    "Roee Aharoni",
+    "Jonathan Herzig",
+    "Hagai Taitelbaum",
+    "Doron Kukliansy",
+    "Vered Cohen"
+   ],
+   "role": "TRUE \u2014 NLI-based factual-consistency scorers correlate weakly with human judgement. This is the citation that forbids reading an S5 NEUTRAL as FALSE.",
+   "bears": "F-B / BUG-278 (the quarantine conflation)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "geifman2017selective",
+   "doi": "10.48550/arxiv.1705.08500",
+   "url": "https://doi.org/10.48550/arxiv.1705.08500",
+   "title": "Selective Classification for Deep Neural Networks",
+   "year": 2017,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 178,
+   "type": "preprint",
+   "authors": [
+    "Yonatan Geifman",
+    "Ran El\u2010Yaniv"
+   ],
+   "role": "Selective classification \u2014 abstain by an explicit risk/coverage trade-off rather than an arbitrary threshold.",
+   "bears": "F-B, D272d",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "arXiv identifier: the NeurIPS 2017 version is the citable one; the arXiv record has the lower citation count (OpenAlex does not merge them)."
+  },
+  {
+   "id": "angelopoulos2021conformal",
+   "doi": "10.48550/arxiv.2107.07511",
+   "url": "https://doi.org/10.48550/arxiv.2107.07511",
+   "title": "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification",
+   "year": 2021,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 28,
+   "type": "preprint",
+   "authors": [
+    "Anastasios N. Angelopoulos",
+    "Stephen Bates"
+   ],
+   "role": "Conformal prediction \u2014 distribution-free guarantees; how to choose the S5 threshold with a stated error budget.",
+   "bears": "F-B, D272d",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "saracevic2007relevance",
+   "doi": "10.1002/asi.20682",
+   "url": "https://doi.org/10.1002/asi.20682",
+   "title": "Relevance: A review of the literature and a framework for thinking on the notion in information science. Part II: nature and manifestations of relevance",
+   "year": 2007,
+   "venue": "Journal of the American Society for Information Science and Technology",
+   "cited_by": 226,
+   "type": "article",
+   "authors": [
+    "Tefko Sara\u010devi\u0107"
+   ],
+   "role": "Relevance is RELATIONAL (document x user x goal), not an intrinsic property of text. The theoretical basis for a separate, revisable relevance axis.",
+   "bears": "F-E / BUG-281, D272e",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "wettig2024qurating",
+   "doi": "10.48550/arxiv.2402.09739",
+   "url": "https://doi.org/10.48550/arxiv.2402.09739",
+   "title": "QuRating: Selecting High-Quality Data for Training Language Models",
+   "year": 2024,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 6,
+   "type": "preprint",
+   "authors": [
+    "Alexander Wettig",
+    "Aatmik Gupta",
+    "Saumya Malik",
+    "Danqi Chen"
+   ],
+   "role": "QuRating \u2014 quality as explicit human-rated criteria plus a trained local judge. The template for turning 'valid fact but irrelevant' into named, ratable criteria.",
+   "bears": "F-E, the relevance-axis design",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "penedo2024fineweb",
+   "doi": "10.48550/arxiv.2406.17557",
+   "url": "https://doi.org/10.48550/arxiv.2406.17557",
+   "title": "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale",
+   "year": 2024,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 19,
+   "type": "preprint",
+   "authors": [
+    "Guilherme Penedo",
+    "Hynek Kydl\u00ed\u010dek",
+    "Loubna Ben Allal",
+    "Anton Lozhkov",
+    "Margaret Mitchell",
+    "Colin Raffel"
+   ],
+   "role": "FineWeb / FineWeb-Edu \u2014 a classifier trained on a small labelled set beats regex heuristics for 'is this valuable'.",
+   "bears": "F-E, and the stage1.3 prefilter's limits",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "balog2019pkg",
+   "doi": "10.1145/3295750.3298922",
+   "url": "https://doi.org/10.1145/3295750.3298922",
+   "title": "Task, Information Seeking Intentions, and User Behavior",
+   "year": 2019,
+   "venue": "",
+   "cited_by": 54,
+   "type": "conference-paper",
+   "authors": [
+    "Jiqun Liu",
+    "Matthew Mitsui",
+    "Nicholas J. Belkin",
+    "Chirag Shah"
+   ],
+   "role": "Personal Knowledge Graphs \u2014 the closest architectural frame: user-scoped, privacy-bound, non-canonical, assumes personal relevance and personal vocabulary drift.",
+   "bears": "the mission framing",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "acorn2024",
+   "doi": "10.1145/3654923",
+   "url": "https://doi.org/10.1145/3654923",
+   "title": "ACORN: Performant and Predicate-Agnostic Search Over Vector Embeddings and Structured Data",
+   "year": 2024,
+   "venue": "Proceedings of the ACM on Management of Data",
+   "cited_by": 57,
+   "type": "article",
+   "authors": [
+    "Liana Patel",
+    "Peter Kraft",
+    "Carlos Guestrin",
+    "Matei Zaharia"
+   ],
+   "role": "ACORN \u2014 predicate-agnostic filtered vector search. The design conclusion that a facet meant to PARTITION must constrain every candidate generator, before truncation.",
+   "bears": "F-28 / BUG-285 / D273a (the filters do not filter)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "chen2024densex",
+   "doi": "10.18653/v1/2024.emnlp-main.845",
+   "url": "https://doi.org/10.18653/v1/2024.emnlp-main.845",
+   "title": "Dense X Retrieval: What Retrieval Granularity Should We Use?",
+   "year": 2024,
+   "venue": "",
+   "cited_by": 64,
+   "type": "conference-paper",
+   "authors": [
+    "Tong Chen",
+    "Hongwei Wang",
+    "Sihao Chen",
+    "Wenhao Yu",
+    "Kaixin Ma",
+    "Xinran Zhao"
+   ],
+   "role": "Dense X Retrieval \u2014 retrieval GRANULARITY: finer self-contained units beat passages, but the unit must stay self-contained.",
+   "bears": "D273g (the chunk-leg decision)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "karpukhin2020dpr",
+   "doi": "10.18653/v1/2020.emnlp-main.550",
+   "url": "https://doi.org/10.18653/v1/2020.emnlp-main.550",
+   "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+   "year": 2020,
+   "venue": "",
+   "cited_by": 142,
+   "type": "conference-paper",
+   "authors": [
+    "Vladimir Karpukhin",
+    "Barlas O\u011fuz",
+    "Sewon Min",
+    "Patrick Lewis",
+    "Ledell Wu",
+    "Sergey Edunov"
+   ],
+   "role": "DPR \u2014 passage-level dense retrieval; the baseline for what 'a retrieval unit' means.",
+   "bears": "D273g",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "khattab2020colbert",
+   "doi": "10.48550/arxiv.2004.12832",
+   "url": "https://doi.org/10.48550/arxiv.2004.12832",
+   "title": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT",
+   "year": 2020,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 192,
+   "type": "preprint",
+   "authors": [
+    "Omar Khattab",
+    "Matei Zaharia"
+   ],
+   "role": "ColBERT \u2014 late interaction over token-level units; the finer-grained alternative to a single pooled vector.",
+   "bears": "F-31 (only definition is embedded), D273g",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "liu2024lostmiddle",
+   "doi": "10.1162/tacl_a_00638",
+   "url": "https://doi.org/10.1162/tacl_a_00638",
+   "title": "Lost in the Middle: How Language Models Use Long Contexts",
+   "year": 2024,
+   "venue": "Transactions of the Association for Computational Linguistics",
+   "cited_by": 1303,
+   "type": "article",
+   "authors": [
+    "Nelson F. Liu",
+    "Kevin Lin",
+    "John Hewitt",
+    "Ashwin Paranjape",
+    "Michele Bevilacqua",
+    "Fabio Petroni"
+   ],
+   "role": "Lost in the Middle \u2014 more context is not better context. Why returning the matched segment with its parent beats returning everything.",
+   "bears": "D273g",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "robertson2009bm25",
+   "doi": "10.1561/1500000019",
+   "url": "https://doi.org/10.1561/1500000019",
+   "title": "The Probabilistic Relevance Framework: BM25 and Beyond",
+   "year": 2009,
+   "venue": "Foundations and Trends\u00ae in Information Retrieval",
+   "cited_by": 3183,
+   "type": "article",
+   "authors": [
+    "Stephen Robertson",
+    "Hugo Zaragoza"
+   ],
+   "role": "BM25 / probabilistic relevance \u2014 the ranking function under the FTS leg; the reference for keyword-leg weighting in fusion.",
+   "bears": "F-28 (fusion design)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "cormack2009rrf",
+   "doi": "10.1145/1571941.1572114",
+   "url": "https://doi.org/10.1145/1571941.1572114",
+   "title": "Reciprocal rank fusion outperforms condorcet and individual rank learning methods",
+   "year": 2009,
+   "venue": "",
+   "cited_by": 712,
+   "type": "conference-paper",
+   "authors": [
+    "Gordon V. Cormack",
+    "Charles L. A. Clarke",
+    "Stefan Buettcher"
+   ],
+   "role": "Reciprocal Rank Fusion \u2014 the ORIGINAL RRF paper. search_hybrid already implements Score(d)=sum 1/(k+rank) with k=60, so this is the reference for the fusion that already exists, not a change.",
+   "bears": "the 'RRF is already correct' finding",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "gao2023ragsurvey",
+   "doi": "10.48550/arxiv.2312.10997",
+   "url": "https://doi.org/10.48550/arxiv.2312.10997",
+   "title": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+   "year": 2023,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 747,
+   "type": "preprint",
+   "authors": [
+    "Yunfan Gao",
+    "Yun Xiong",
+    "Xinyu Gao",
+    "Kangxiang Jia",
+    "Jinliu Pan",
+    "Yuxi Bi"
+   ],
+   "role": "RAG survey \u2014 the landscape and the standard component decomposition.",
+   "bears": "the retrieval-programme framing",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "chen2024rgb",
+   "doi": "10.1609/aaai.v38i16.29728",
+   "url": "https://doi.org/10.1609/aaai.v38i16.29728",
+   "title": "Benchmarking Large Language Models in Retrieval-Augmented Generation",
+   "year": 2024,
+   "venue": "Proceedings of the AAAI Conference on Artificial Intelligence",
+   "cited_by": 378,
+   "type": "conference-paper",
+   "authors": [
+    "Jiawei Chen",
+    "Hongyu Lin",
+    "Xianpei Han",
+    "Le Sun"
+   ],
+   "role": "RGB \u2014 noise robustness is the dominant RAG failure mode. Wilson OS has NO retrieval benchmark; this is why one is required.",
+   "bears": "F-A (measure it), D273a verification",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "prietodiaz1991faceted",
+   "doi": "10.1145/103167.103176",
+   "url": "https://doi.org/10.1145/103167.103176",
+   "title": "Implementing faceted classification for software reuse",
+   "year": 1991,
+   "venue": "Communications of the ACM",
+   "cited_by": 511,
+   "type": "article",
+   "authors": [
+    "Rub\u00e9n Prieto-D\u00edaz"
+   ],
+   "role": "Faceted classification for software reuse \u2014 the canonical demonstration that small orthogonal controlled facets scale, and that facets MUST be orthogonal.",
+   "bears": "F-A, and why 'depth' is not an independent facet",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "li2016truthdiscovery",
+   "doi": "10.1145/2897350.2897352",
+   "url": "https://doi.org/10.1145/2897350.2897352",
+   "title": "A Survey on Truth Discovery",
+   "year": 2016,
+   "venue": "ACM SIGKDD Explorations Newsletter",
+   "cited_by": 431,
+   "type": "article",
+   "authors": [
+    "Yaliang Li",
+    "Jing Gao",
+    "Chuishi Meng",
+    "Qi Li",
+    "L\u00fc Su",
+    "Bo Zhao"
+   ],
+   "role": "Truth discovery \u2014 jointly estimate source reliability and claim truth from agreement, no ground truth needed. The missing implementation behind an empty contradicts_fbs.",
+   "bears": "F-H, D272f step 6",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "paulheim2017kgrefine",
+   "doi": "10.3233/sw-160218",
+   "url": "https://doi.org/10.3233/sw-160218",
+   "title": "Knowledge graph refinement: A survey of approaches and evaluation methods",
+   "year": 2016,
+   "venue": "Semantic Web",
+   "cited_by": 1224,
+   "type": "article",
+   "authors": [
+    "Heiko Paulheim"
+   ],
+   "role": "Knowledge graph refinement \u2014 the standard taxonomy of error detection / completion / repair, and its evaluation methods.",
+   "bears": "the repair programme's evaluation vocabulary",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "METADATA DISCREPANCY: OpenAlex returns 2016 (online-first); the Semantic Web Journal article is conventionally cited as 2017, 8(1)."
+  },
+  {
+   "id": "broder1997resemblance",
+   "doi": "10.1109/sequen.1997.666900",
+   "url": "https://doi.org/10.1109/sequen.1997.666900",
+   "title": "On the resemblance and containment of documents",
+   "year": 2002,
+   "venue": "",
+   "cited_by": 1736,
+   "type": "conference-paper",
+   "authors": [
+    "Arndt Br\u00f6der"
+   ],
+   "role": "Broder shingling/MinHash \u2014 near-duplicate detection for work-identity dedup.",
+   "bears": "F-32 / BUG-289 / D273e (29.1% of convergence is duplicate ingestion)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "METADATA DISCREPANCY: OpenAlex returns 2002 for this DOI; the paper is from the 1997 Compression and Complexity of Sequences proceedings. Cite as 1997 and treat the fetched year as an indexing artefact."
+  },
+  {
+   "id": "lee2022dedup",
+   "doi": "10.18653/v1/2022.acl-long.577",
+   "url": "https://doi.org/10.18653/v1/2022.acl-long.577",
+   "title": "Deduplicating Training Data Makes Language Models Better",
+   "year": 2022,
+   "venue": "Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+   "cited_by": 284,
+   "type": "conference-paper",
+   "authors": [
+    "Katherine Lee",
+    "Daphne Ippolito",
+    "Andrew Nystrom",
+    "Chiyuan Zhang",
+    "Douglas Eck",
+    "Chris Callison-Burch"
+   ],
+   "role": "Deduplicating training data \u2014 measured cost of duplicates in a corpus.",
+   "bears": "F-32, D273e",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "fellegi1969recordlinkage",
+   "doi": "10.1080/01621459.1969.10501049",
+   "url": "https://doi.org/10.1080/01621459.1969.10501049",
+   "title": "A Theory for Record Linkage",
+   "year": 1969,
+   "venue": "Journal of the American Statistical Association",
+   "cited_by": 2439,
+   "type": "article",
+   "authors": [
+    "Ivan P. Fellegi",
+    "A. B. Sunter"
+   ],
+   "role": "Fellegi & Sunter \u2014 probabilistic record linkage with clerical review. The basis for the identity layer (Splink line of work) and for fuzzy work-identity matching.",
+   "bears": "D271c, D273e",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919",
+    "DECISION_D271_IDENTITY_20260917"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "winograd1971",
+   "doi": "10.1145/362384.362685",
+   "url": "https://doi.org/10.1145/362384.362685",
+   "title": "A relational model of data for large shared data banks",
+   "year": 1970,
+   "venue": "Communications of the ACM",
+   "cited_by": 5302,
+   "type": "article",
+   "authors": [
+    "E. F. Codd"
+   ],
+   "role": "Codd's relational model \u2014 the object/property logic the schema already follows; cited to show the schema need not be re-engineered.",
+   "bears": "no restructuring required",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "hogan2021knowledgegraphs",
+   "doi": "10.1145/3447772",
+   "url": "https://doi.org/10.1145/3447772",
+   "title": "Knowledge Graphs",
+   "year": 2021,
+   "venue": "ACM Computing Surveys",
+   "cited_by": 1811,
+   "type": "article",
+   "authors": [
+    "Aidan Hogan",
+    "Eva Blomqvist",
+    "Michael Cochez",
+    "Claudia d\u2019Amato",
+    "Gerard de Melo",
+    "Claudio Guti\u00e9rrez"
+   ],
+   "role": "Knowledge Graphs (Hogan et al.) \u2014 the reference definition of a graph-structured KB; the frame for using the existing 164,202 edges in retrieval.",
+   "bears": "the graph-is-built-and-unused finding",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "METADATA DISCREPANCY: OpenAlex returns 2021; the ACM Computing Surveys issue is 54(4), 2022. Cite as 2021."
+  },
+  {
+   "id": "provo",
+   "doi": "",
+   "url": "https://www.w3.org/TR/prov-o/",
+   "title": "",
+   "year": null,
+   "venue": "",
+   "cited_by": null,
+   "type": "standard",
+   "authors": [],
+   "role": "W3C PROV-O \u2014 entity/activity/agent provenance. R14 demands it; the provenance column currently holds one constant for 100% of rows.",
+   "bears": "F-H / BUG-282",
+   "note": "",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "URL_ONLY"
+  },
+  {
+   "id": "gilardi2023chatgpt",
+   "doi": "10.1073/pnas.2305016120",
+   "url": "https://doi.org/10.1073/pnas.2305016120",
+   "title": "ChatGPT outperforms crowd workers for text-annotation tasks",
+   "year": 2023,
+   "venue": "Proceedings of the National Academy of Sciences",
+   "cited_by": 1100,
+   "type": "article",
+   "authors": [
+    "Fabrizio Gilardi",
+    "Meysam Alizadeh",
+    "Ma\u00ebl Kubli"
+   ],
+   "role": "ChatGPT outperforms crowd workers on text-annotation tasks \u2014 the evidence that an LLM annotator can be viable, WITH the reliability caveats.",
+   "bears": "the S4/R5 design, BUG-269 (report against the constant-answer baseline)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "zheng2023llmjudge",
+   "doi": "10.48550/arxiv.2306.05685",
+   "url": "https://doi.org/10.48550/arxiv.2306.05685",
+   "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+   "year": 2023,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 492,
+   "type": "preprint",
+   "authors": [
+    "Zheng, Lianmin",
+    "Wei-Lin Chiang",
+    "Ying Sheng",
+    "Siyuan Zhuang",
+    "Zhanghao Wu",
+    "Yonghao Zhuang"
+   ],
+   "role": "LLM-as-a-Judge (MT-Bench) \u2014 including the documented position/verbosity/self-enhancement biases. The basis for judging judges and for cross-family verification (R5/C8).",
+   "bears": "BUG-269, the R5 protocol",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": "arXiv identifier: the NeurIPS 2023 Datasets and Benchmarks version is the citable one."
+  },
+  {
+   "id": "wagstaff2001constrained",
+   "doi": "",
+   "url": "https://dl.acm.org/doi/10.5555/645530.655819",
+   "title": "",
+   "year": null,
+   "venue": "",
+   "cited_by": null,
+   "type": "standard",
+   "authors": [],
+   "role": "Constrained K-means with must-link/cannot-link \u2014 the only peer-reviewed way to inject ontology into clustering. Produces discipline-pure clusters, NOT a label from the cluster.",
+   "bears": "F-C / D7 (why cluster-derived labelling is rejected)",
+   "note": "",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "URL_ONLY"
+  },
+  {
+   "id": "campello2013hdbscan",
+   "doi": "10.1007/978-3-642-37456-2_14",
+   "url": "https://doi.org/10.1007/978-3-642-37456-2_14",
+   "title": "Density-Based Clustering Based on Hierarchical Density Estimates",
+   "year": 2013,
+   "venue": "Lecture notes in computer science",
+   "cited_by": 2548,
+   "type": "conference-paper",
+   "authors": [
+    "Ricardo J. G. B. Campello",
+    "Davoud Moulavi",
+    "J\u00f6rg Sander"
+   ],
+   "role": "HDBSCAN \u2014 density-based clustering with stability. Removed by D2120/D2198 for reproducibility; DEFER as a stability MEASUREMENT only.",
+   "bears": "F-C, \u00a72.1 of the forensic",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "grootendorst2022bertopic",
+   "doi": "10.48550/arxiv.2203.05794",
+   "url": "https://doi.org/10.48550/arxiv.2203.05794",
+   "title": "BERTopic: Neural topic modeling with a class-based TF-IDF procedure",
+   "year": 2022,
+   "venue": "arXiv (Cornell University)",
+   "cited_by": 1388,
+   "type": "preprint",
+   "authors": [
+    "Maarten Grootendorst"
+   ],
+   "role": "BERTopic \u2014 c-TF-IDF topic representation, the standard way to NAME a cluster. The step stage 2 currently skips.",
+   "bears": "F-C (cluster naming)",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "wong2012ontologylearning",
+   "doi": "10.1145/2333112.2333115",
+   "url": "https://doi.org/10.1145/2333112.2333115",
+   "title": "Ontology learning from text",
+   "year": 2012,
+   "venue": "ACM Computing Surveys",
+   "cited_by": 389,
+   "type": "article",
+   "authors": [
+    "Wilson Wong",
+    "Wei Liu",
+    "Mohammed Bennamoun"
+   ],
+   "role": "Ontology learning from text \u2014 the survey for growing the vocabulary from the corpus (DEFER until application reliability is fixed).",
+   "bears": "F-F, D272f step 12",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  },
+  {
+   "id": "shen2020taxoexpan",
+   "doi": "10.1145/3366423.3380132",
+   "url": "https://doi.org/10.1145/3366423.3380132",
+   "title": "TaxoExpan: Self-supervised Taxonomy Expansion with Position-Enhanced Graph Neural Network",
+   "year": 2020,
+   "venue": "",
+   "cited_by": 56,
+   "type": "conference-paper",
+   "authors": [
+    "Jiaming Shen",
+    "Zhihong Shen",
+    "Chenyan Xiong",
+    "Chi Wang",
+    "Kuansan Wang",
+    "Jiawei Han"
+   ],
+   "role": "Taxonomy expansion \u2014 self-supervised placement of a new label into an existing taxonomy.",
+   "bears": "F-F, D272f step 12",
+   "used_in": [
+    "MARKET_RESEARCH_ONTOLOGY_20260919"
+   ],
+   "verification": "OPENALEX_DOI_FETCH",
+   "note": ""
+  }
+ ]
+}

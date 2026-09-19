@@ -248,3 +248,21 @@ join the stage-1 checkpoint **205,813/205,813 = 100%**, so the leg costs **~214k
 no mapping/re-chunking/re-extraction, and returns **verbatim source + section heading + parent-FB link**. But it
 fixes **grounding precision, not label accuracy**, the 300/50-word overlap must be collapsed at fusion, and adding a
 leg **before F-28 is fixed amplifies the filter leak**.
+
+---
+
+## 6d. REFERENCE LIBRARY (2026-09-19) — the bibliography for the ontology/retrieval programme
+
+**Start here for any literature question:** `governance/REFERENCE_LIBRARY_20260919.md`.
+
+- ~45 works, each with a DOI-verified (or W3C-standard) identifier, a `role` (why Maxwell OS cares), and a
+  `bears` field tying it to the specific forensic finding or repair it justifies.
+- **Metadata is FETCHED from OpenAlex by DOI, not typed** — title, year, venue and citation count are evidence,
+  so a mistyped year cannot survive a rebuild. Result: **37 DOI-verified, 8 standards, 0 unresolved.**
+- The fetch **exposed 7 metadata discrepancies** (e.g. OpenAlex returns 2002 for Broder 1997; 2016 for Paulheim
+  2017) and they are rendered as `note:` lines rather than silently accepted — which is the point of fetching.
+- Machine-readable: `governance/references_20260919.bib` (BibTeX), `governance/references_20260919.json`
+  (resolved metadata snapshot; also the offline cache). Source of truth: `config/references.yaml` (C12).
+- Rebuild: `python3 scripts/build_reference_library.py` (fetch) / `--cached` (offline) / `--check` (report only).
+- Cited from: `MARKET_RESEARCH_ONTOLOGY_20260919`, `ROUNDTABLE_MASTERPROMPT_ONTOLOGY_20260919`,
+  `ONTOLOGY_FORENSIC_20260919`, `buglog.md` (BUG-285…BUG-294), `DECISION_D271_IDENTITY_20260917`.

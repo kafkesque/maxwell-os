@@ -969,3 +969,224 @@ scorer output is byte-identical to before the refactor (regression-checked).
 BUG-277's menu built from the wrong key, and now a guard contradicting its own ruling). The meta-lesson is
 recorded in the forensic report: **when a ruling lands, the guards, validators, menus and docs that encode the
 old state must be updated in the same commit** — otherwise the system spends the next days re-litigating itself.
+
+---
+
+## BUG-285 — the discipline/domain/depth filters do not constrain the hybrid result set (2026-09-19)
+
+**Severity:** CRITICAL (silent retrieval-correctness defect; independent of label quality). **Status:** OPEN.
+
+`pipeline/retrieve.py::search_hybrid` (line 329) fuses three legs and applies the facet filters to **only one**:
+
+| leg | facet params accepted |
+|---|---|
+| `search_fts(conn, query, limit, exclude_summaries, include_quarantine)` | **none** |
+| `search_vector(conn, query, limit, …, vec_table)` | **none** |
+| `search_keyword(conn, domain, discipline, depth, …)` | **all** — and it is called **only when a filter is present** (D2511) |
+
+Then `results = [fb_map[fid] for fid in ranked_ids[:limit]]` — **no post-filter anywhere**. The optional
+cross-encoder rerank (`BAAI/bge-reranker-v2-m3`, local CPU) reorders a `min(max(limit*5,20),100)` pool by query
+relevance and **cannot restore the facet**, so it can promote a filter-violating row into the top-k.
+
+**Measured on the live DB** (FTS + filtered-keyword legs, production RRF formula, k=60):
+
+```
+query='visual hierarchy design'   filter: discipline='typography'
+  FTS leg      n=50   disciplines present: cultural design, decision making, design thinking, emerging,
+                      human-computer interaction, information science, motion & time, psychology
+  keyword leg  n=50   disciplines present: typography
+  RRF top-10   -> 2 of 10 rows have discipline != 'typography'
+```
+
+The unfiltered vector leg makes the real ratio worse. Same defect on the `search_graph` path
+(`retrieve.py:668` passes `discipline=discipline` straight into `search_hybrid`).
+
+**Consequence:** `discipline=`, `domain=` and `depth=` are **advisory, not constraining**. Every filter-shaped
+claim in this project — the 261/648 homonym row counts, the 907/1538 facet maxima, "discipline is the primary
+exact-match facet" — describes a **label distribution**, never a **result set**. This also means the D-272b
+axis-inversion premise had to be re-stated: discipline is not "an exact filter on an unreliable label", it is
+"a nudge applied to one of three legs".
+
+**Fix:** apply the facet predicate to **all** legs, or post-filter the fused pool before truncating to `limit`;
+then re-run `pipeline/retrieval_benchmark.py`. **Adding legs to RRF before this fix amplifies the leak.**
+
+---
+
+## BUG-286 — the write guard destroys the label that D-271a ruled legal (2026-09-19)
+
+**Severity:** CRITICAL (data-destroying; blocks repair R1). **Status:** OPEN.
+
+`validate_discipline_domain` fires on the **discipline alone**, independent of the row's domains:
+
+```
+validate_discipline_domain('research methodology', ['brand identity']) -> non-empty
+validate_discipline_domain('research methodology', None)               -> non-empty
+```
+
+It is enforced as a hard error at both write points: `stage4_merge.py:823` appends the flag to `errors` (the row
+is **quarantined**), and `stage6_commit.py:402` returns False (the row is **REJECTED**, never inserted).
+
+**D-271a ruled the opposite**: the research-methodology collision is a DECLARED HOMONYM, both labels stay
+canonical, **change nothing**. So every *new* row classified `research methodology` dies at the write boundary.
+The 261 rows in the DB predate the guard (D2620/D2626, 2026-09-17). **The ruling is not in force in code.**
+
+**Why it is critical, not cosmetic:** `research methodology` is the **6th most reliable** label in the taxonomy
+(0.83 human agreement). Proposed repair **R1** (closed-menu classification) offers the 61 canonical disciplines
+including this one — so **R1 as specified would have every correct answer destroyed at the write boundary**, a new
+silent failure mode introduced by a repair. R1 cannot ship without a config-driven exemption for declared
+collisions. Human-owned: one line.
+
+---
+
+## BUG-287 — graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19)
+
+**Severity:** HIGH. **Status:** OPEN.
+
+```
+graph_expand(): "SELECT fb_id, related_fbs, contradicts_fbs, prerequisite_fbs FROM fbs WHERE fb_id = ?"
+                "SELECT fb_id, name, definition, domains, borp_score FROM fbs WHERE fb_id = ?"
+```
+
+**No `status` predicate on either query**, and `search_graph` passes `include_contradictions=True,
+include_prerequisites=True` by default. Seeds are PASS-only; neighbours are not.
+
+Because the edges were built from `discipline_overlap` / `domain_overlap` / `source_crossover` — i.e. **from labels
+that were ~50% wrong during the generation window** — expansion simultaneously leaks NLI-unverified content into
+the answer set and **propagates label error structurally**.
+
+**This corrects BUG-278's framing:** the 40.7% is not "invisible", it is **inconsistently visible** (present iff a
+PASS row points at it). The repair (R3) must therefore fix the *expansion* path too, or splitting the enum only
+moves the inconsistency.
+
+**Fix:** propagate the seed's status/verification policy into expansion, and return neighbours carrying an
+explicit verification tier instead of silently mixing them.
+
+---
+
+## BUG-288 — the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19)
+
+**Severity:** HIGH. **Status:** OPEN.
+
+| what is searchable | chars | share of FB body |
+|---|---|---|
+| `definition` — the **only** text the 512d vector leg embeds | 1,765,980 | **11.1%** |
+| mechanism + boundary + application + failure_mode + consequence + elaboration — **no vector, no FTS** | **14,152,908** | **88.9%** |
+| `evidence_passages` — verbatim source, ≤5 quotes/FB, 7,990 distinct — **indexed by NOTHING** | 4,802,857 | — |
+
+`fbs_fts` = `(name, definition, keywords, jargon)`. So the vector leg is blind to **88.9%** of every FB —
+including `mechanism`, the field the entire FORM axis is *about* — and **4.8M chars of real source text are
+unsearchable**.
+
+`source_text` is **misnamed and misleading**: **100% of the 7,995 rows** contain
+`"[book.md] " + definition` (median **300 chars**, min 138, max 695). It is the LLM synthesis again, prefixed with
+a filename. No column at FB level holds source text.
+
+**Fix:** (a) add the un-indexed body fields to FTS; (b) embed the full body rather than `definition` alone;
+(c) index `evidence_passages` as a fourth RRF leg — all three recover text **already in the DB**.
+
+---
+
+## BUG-289 — `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19)
+
+**Severity:** MEDIUM-HIGH (it feeds the merge decision at stage 1.5). **Status:** OPEN.
+
+Of the **2,597** rows with `source_diversity ≥ 2`, **757 (29.1%)** collapse to fewer distinct works once filenames
+are normalised. The corpus carries **1,300 distinct book filenames** but **369 work-identities have more than one
+filename** — e.g. `About Face The Essentials of Interaction Des…` vs `About Face. The Essentials of Interaction
+Des…`; `Design The Key Concepts (D. J. Huppatz) (z-library.sk…)` vs `Design The Key Concepts (D. J. Huppatz).md`;
+`Logo Design Love …` (two casings); `The impact of perceived complexity, deviation and co…` (twice).
+
+**Why it matters:** `source_diversity` is the **merge criterion at stage 1.5**, and `is_convergent` (2,603 rows) is
+the corpus's **headline quality claim**. Both are inflated by double-ingested books, so the pipeline merges on a
+signal contaminated by the ingestion layer. Work-identity dedup is a **prerequisite** that no label repair touches.
+
+---
+
+## BUG-290 — two illegal values sit inside the retrieval facets (2026-09-19)
+
+**Severity:** MEDIUM. **Status:** OPEN.
+
+- **`emerging` is used as a DOMAIN on 744 rows and is NOT one of the 43 canonical domains.** The `domains` column
+  holds 44 distinct values, **1 of which is not canonical** — the same class as BUG-273, and it sits inside a facet
+  filter.
+- **`discipline='emerging'` on 447 rows with `status='PASS'`** (757 rows total). The fallback value is therefore a
+  member of the *exact-match* facet: `discipline='emerging'` returns 447 rows of "we don't know". The human
+  reviewer also reached for `emerging` 9 times, so the fallback and the answer space are the **same string**.
+
+**Fix:** `emerging` must be a *status*, not a facet value (or a declared, non-filterable sentinel).
+
+---
+
+## BUG-291 — a label-prefixed embedding table sits one argument from production (2026-09-19)
+
+**Severity:** MEDIUM (latent; would create a self-reinforcing loop). **Status:** OPEN.
+
+`contextual_embed.enabled: False`, so **production vectors are not label-poisoned** (hypothesis tested and
+refuted). But the backfill has **already run**: the live DB contains `vec_fbs_ctx` (**7,995 rows**) holding
+embeddings of `discipline | domains | name . definition`, and `pipeline/retrieval_benchmark.py:159` fuses it:
+
+```
+vec = search_vector(conn, query, limit=pool, vec_table="vec_fbs_ctx")
+```
+
+With labels at ~0.5 accuracy, pointing production at that table creates the loop: **wrong label → label-prefixed
+embedding → retrieval prefers rows sharing the wrong label → the error is confirmed by retrieval and becomes
+invisible.**
+
+**Fix:** a guard that production may not use `vec_fbs_ctx` while any label axis is below its floor; and note that
+re-embedding is mandatory after R1/R5 land regardless.
+
+---
+
+## BUG-292 — `fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19)
+
+**Severity:** LOW (latent; hypothesis tested). **Status:** OPEN.
+
+`sqlite_master` holds exactly one trigger: **`fbs_ai`**. An external-content FTS5 table (`content='fbs'`) needs the
+insert **+ update + delete** trio, and the codebase does issue `UPDATE fbs` (`reclassify_merged_axis.py:314`,
+`feedback.py:140/237`) and `INSERT OR REPLACE INTO fbs` (= delete + insert, `stage6_commit.py:409`).
+
+**I predicted a stale index and measured it — the hypothesis was WRONG.** On a throwaway copy,
+`INSERT INTO fbs_fts(fbs_fts) VALUES('integrity-check')` **PASSED**; row counts match (7,995 / 7,995 / 7,995) and
+sampled FTS hits land on the correct rowids. Stage 6 rebuilds the index (`stage6_commit.py:239`), which is why.
+
+Kept in the register because the *invariant is one line and missing*: nothing in the pipeline **detects** staleness,
+so a future `UPDATE` outside stage 6 would corrupt keyword search silently. **Fix:** add the update/delete triggers
+and run `integrity-check` at the end of stage 6.
+
+---
+
+## BUG-293 — mega-merges up to 244 sources for a single FB (2026-09-19)
+
+**Severity:** LOW (no measurable label impact; merge-sanity risk). **Status:** OPEN.
+
+883 rows carry >10 sources, **558 >20, 65 >50**, maximum **244**. Examples (all `status='PASS'`,
+`origin='convergent'`): "Visual Data Structuring" (60 sources), "Brand As Reputation and Identity" (69),
+"Typeface As Communicative Medium" (84), and a 244-source row. A claim that 244 books converge is almost certainly
+an over-merge, and its `source_segments` list runs to 952 entries.
+
+**Measured impact on labels: NONE detectable** — the ruler sheet contains only 8 rows at 21+ sources.
+**Refuted hypothesis, recorded so it is not re-run:** I proposed that over-merged FBs become *unlabelable*. The
+opposite holds — discipline-blank rate by source diversity: 1 source **24.1%**, 2 → 9.5%, 3–5 → 0%, 6–10 → 0%,
+11–20 → 0%, 21+ → 12.5%; and `is_convergent` rows are 7% blank vs 24% for non-convergent. **Singletons are ~3×
+more likely to be unlabelable** — which is consistent with the untraceable pocket being *exactly* the singleton
+population (all 83 sheet rows flagged untraceable have `source_diversity = 1`).
+
+---
+
+## BUG-294 — the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19)
+
+**Severity:** MEDIUM (estimator validity). **Status:** OPEN.
+
+The sheet sampled the **full KB** — 47.3% PASS rows in the sheet vs 59.3% in the KB — so stratum A mixes
+retrievable and hidden rows. Re-measured restricted to `status='PASS'`:
+
+| axis | all stratum A | PASS only | QUARANTINE only |
+|---|---|---|---|
+| content_type | 0.740, lift −0.010 | **0.891, baseline 0.891, lift +0.000** | 0.472, lift −0.028 |
+| discipline | 0.494, lift +0.412 | 0.492, lift +0.393 | 0.500, lift +0.375 |
+| extraction_type | 0.831, lift +0.472 | 0.852, lift +0.426 | 0.786, lift +0.321 |
+
+Two different questions — *"is the stored label trustworthy across the KB?"* and *"is what I retrieve correctly
+labelled?"* — are being answered by one number. **Fix:** cross the ruler strata with `status` and report both
+frames; the scorer must never quote a single frame as if it were the answer.

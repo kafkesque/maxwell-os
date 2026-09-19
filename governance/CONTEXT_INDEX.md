@@ -206,3 +206,45 @@ re-decide **ROLE** on the pocket. (RULED D272g.)
 (2026-07-20); `alias_map.yaml` came **6 weeks later** (2026-09-02) and *is* post-hoc. "`is_summary` is a dead
 field" → the gate **fires** (158 gated cluster ids in `stage2_extract/t11/checkpoint.jsonl.gated_ids`); the
 field reads 0 because gated clusters never become FBs — what is missing is a **drop ledger**.
+
+---
+
+## 6c. SECOND-PASS FORENSIC (2026-09-19, later the same day) — the retrieval and ingestion layers
+
+Read **§13 of `governance/ONTOLOGY_FORENSIC_20260919.md`** before acting on §6b. The first pass examined
+**labels**; the second examined the **retrieval path**, the **ingestion path** and my own **sampling frame**, and it
+**corrected three of my own claims**.
+
+**THE THREE CORRECTIONS (do not quote the old versions):**
+
+| old claim | now |
+|---|---|
+| "ROLE 0.740 vs baseline 0.750, lift −0.010" | the sheet sampled the **full KB** (47.3% PASS vs 59.3% in the KB). On **`status='PASS'` only**: ROLE **0.891 vs baseline 0.891, lift exactly 0.000** — and 0.472 vs 0.500 on quarantined rows. Discipline 0.492 (unchanged), FORM 0.852. |
+| "discipline is the primary **exact-match filter**" | **the filter does not filter.** `search_fts`/`search_vector` take no facet params; only `search_keyword` applies `discipline = ?`; no post-filter. Measured: with `discipline='typography'`, **2 of the RRF top-10 were not typography.** It is a *nudge on one of three legs*. |
+| "40.7% is **invisible** to retrieval" | **inconsistently visible.** `graph_expand` has **no status predicate** and `search_graph` includes contradictions/prerequisites by default, so quarantined rows **re-enter as graph neighbours** of a PASS seed. |
+
+**F-28..F-37:**
+
+| id | sev | claim | bug |
+|---|---|---|---|
+| F-28 | **crit** | **filters do not constrain** the hybrid result set | BUG-285 · D273a |
+| F-29 | **crit** | the **write guard destroys the label D-271a ruled legal** (`research methodology` quarantined at S4, REJECTED at S6) → **blocks R1 as specified** | BUG-286 · D273b |
+| F-30 | high | **graph expansion leaks** the quarantined 40.7% back in, and propagates label error structurally | BUG-287 · D273c |
+| F-31 | high | **retrieval corpus = 11.1% of each FB**; 88.9% of the body and **4.8M chars of evidence are unindexed**; `source_text` is `"[book] " + definition` | BUG-288 · D273d |
+| F-32 | med-high | **29.1% of "convergence" is the same book twice** (`source_diversity` counts filenames) — and it is the **merge criterion at stage 1.5** | BUG-289 · D273e |
+| F-33 | med | **`emerging` is an illegal value inside the facets**: 744 domain rows (not canonical) + 447 PASS discipline rows | BUG-290 · D273f |
+| F-34 | med | **`vec_fbs_ctx`** (7,995 label-prefixed embeddings) sits one argument from production | BUG-291 |
+| F-35 | low | `fbs_fts` has an **INSERT trigger only**; **integrity-check PASSED** → latent, but nothing detects it | BUG-292 |
+| F-36 | low | **mega-merges** up to **244 sources** for one FB. **Refuted:** they do NOT cause unlabelability — singletons are **3× more** unlabelable (24.1% vs 0%) | BUG-293 |
+| F-37 | med | the ruler's strata are **not crossed with `status`**, conflating two estimands | BUG-294 · D273h |
+
+**REFUTED HYPOTHESES (recorded so they are not re-run):** (a) FTS staleness — `fits_fts` integrity-check **passed**
+on a copy; (b) contextual embeddings poisoning production — `contextual_embed.enabled: False`, production vectors
+are clean; (c) over-merging making FBs unlabelable — **the opposite holds**.
+
+**RRF / CHUNKING — the direct answer:** RRF is **already implemented and correct** (k=60, `1/(k+rank)`, 1-based,
+three legs). Chunk-level retrieval **is** worth adopting, at **step 8**: the DB's `source_segments` (214,220 refs)
+join the stage-1 checkpoint **205,813/205,813 = 100%**, so the leg costs **~214k vectors (≈438 MB at 512d)**, needs
+no mapping/re-chunking/re-extraction, and returns **verbatim source + section heading + parent-FB link**. But it
+fixes **grounding precision, not label accuracy**, the 300/50-word overlap must be collapsed at fusion, and adding a
+leg **before F-28 is fixed amplifies the filter leak**.

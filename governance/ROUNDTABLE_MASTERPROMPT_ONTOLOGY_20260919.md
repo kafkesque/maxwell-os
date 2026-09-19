@@ -144,6 +144,81 @@ Also: 67.5% of the KB is single-source; convergence does **not** predict label a
 
 **Claim: the axes are ordered inversely to their measured reliability relative to their retrieval load. An exact-match filter on a 0.506-accurate label over a 59.3% slice of the KB is the mechanism behind "every day a new weak point appears."**
 
+### 2.7a CORRECTION TO §2.7 (second pass, same day) — the filters do not filter
+
+`search_hybrid` applies the facet predicate to **one of three legs**: `search_fts` and `search_vector` accept **no**
+facet parameters, only `search_keyword` applies `discipline = ?` (and it is called only when a filter is present),
+and the fused ranking is truncated with **no post-filter**. Measured on the live DB with
+`discipline='typography'`: **2 of the RRF top-10 rows were not typography.** So the row above should read
+"**intended** filter — does not constrain the result set". This is a correctness defect **independent of label
+quality** and it precedes every labelling question (BUG-285).
+
+### 2.8 SECOND-PASS FINDINGS (the parts the first pass did not examine)
+
+**a) The write guard destroys a label the ruling made legal (CRITICAL).** `validate_discipline_domain` fires on the
+discipline alone (`'research methodology'` with **any** domains, or none) and is a hard error at
+`stage4_merge.py:823` (quarantine) and `stage6_commit.py:402` (**REJECTED**, never inserted). **D-271a ruled the
+opposite** ("DECLARED HOMONYM — change nothing"). Every *new* row labelled `research methodology` therefore dies at
+the write boundary; the 261 existing rows predate the guard. **Consequence for the proposed R1:** a closed menu of
+the 61 canonical disciplines includes `research methodology` (one of the *most* reliable labels at 0.83 human
+agreement) — **so R1 as specified would get every correct answer for that label destroyed.** (BUG-286.)
+
+**b) Graph expansion re-admits the quarantined 40.7%.** `graph_expand` selects neighbours with **no status
+predicate** and `search_graph` defaults to `include_contradictions=True, include_prerequisites=True`. Seeds are
+PASS-only; neighbours are not. Because the edges were built from `discipline_overlap`/`domain_overlap` over labels
+that were ~50% wrong, expansion both leaks NLI-unverified content and **propagates label error structurally**.
+Corrects the "40.7% invisible" claim: it is **inconsistently visible**. (BUG-287.)
+
+**c) The retrieval corpus is 11.1% of the knowledge.** The 512d vector leg embeds **`definition` only** =
+1,765,980 chars of a 15,918,888-char FB body; **88.9%** (`mechanism`, `boundary`, `application`, `failure_mode`,
+`consequence`, `elaboration`) is **neither embedded nor FTS-indexed**; and **4,802,857 chars of verbatim
+`evidence_passages` are indexed by nothing at all**. `source_text` is **misnamed** — 100% of rows contain
+`"[book.md] " + definition`, median **300 chars**. (BUG-288.)
+
+**d) 29.1% of "convergence" is the same book ingested twice.** `source_diversity` counts **filenames**, not works:
+of 2,597 rows with diversity ≥2, **757 (29.1%)** collapse to fewer works; **1,300 filenames** hide **369
+work-identities with >1 filename**. `source_diversity` is the **merge criterion at stage 1.5** and `is_convergent`
+is the headline quality claim — both inflated. (BUG-289.)
+
+**e) Two illegal values sit inside the facets.** `emerging` is used as a **domain** on 744 rows but is **not one of
+the 43 canonical domains**; `discipline='emerging'` occurs on **447 `status='PASS'` rows**, i.e. the fallback value
+is a member of the *exact-match* facet (and the human reviewer also typed `emerging` 9 times). (BUG-290.)
+
+**f) A label-prefixed embedding table is one argument from production.** `contextual_embed.enabled: False` so
+production is clean — **but `vec_fbs_ctx` (7,995 label-prefixed embeddings) exists in the live DB and
+`retrieval_benchmark.py:159` fuses it.** Flipping it while labels are ~0.5 accurate creates a self-reinforcing
+loop. (BUG-291.)
+
+**g) `fbs_fts` has an INSERT trigger only** (`fbs_ai`), while the code does `UPDATE fbs`; a stale index would be
+silent. **Hypothesis tested: `integrity-check` PASSED on a copy** (stage 6 rebuilds) — **latent, not live**. Kept
+for the missing invariant. (BUG-292.)
+
+**h) Mega-merges exist:** 883 rows >10 sources, 558 >20, 65 >50, **max 244 sources for one FB**. **Measured label
+impact: none detectable** (only 8 sheet rows at 21+). **Refuted hypothesis, recorded so it is not re-run:**
+over-merged FBs are *not* more unlabelable — discipline-blank rate is **24.1% for singletons** vs 0% for 3–20
+sources, and `is_convergent` rows are 7% blank vs 24%. **Singletons are ~3× more likely to be unlabelable**, which
+matches the untraceable pocket being *exactly* the singleton population. (BUG-293.)
+
+**i) CORRECTION to §2.1 — the ruler's sampling frame.** The sheet sampled the **full KB** (47.3% PASS in sheet vs
+59.3% in KB), mixing retrievable and hidden rows. Restricted to `status='PASS'`: **ROLE = 0.891 with baseline
+0.891 → lift exactly 0.000** (cleaner and stronger than 0.740 / −0.010); discipline 0.492 (unchanged); FORM 0.852.
+**Two estimands were conflated** and both must be reported. (BUG-294.)
+
+### 2.9 RRF and chunking — the direct evidence
+
+**RRF is already implemented and correct:** `Score(d) = Σ 1/(k + rank)`, `RRF_K = 60`, 1-based ranks, three legs,
+rank-based (not score-based), with the D2511 keyword-pollution fix. **There is nothing to adopt; there is something
+to feed.**
+
+**Chunk-level retrieval is feasible at a measured, low cost.** The DB's `source_segments` (214,220 references) are
+**verbatim stage-1 checkpoint `segment_id`s — sampled 205,813 / 205,813 = 100% join** against
+`knowledge pipeline/stage1_chunk/t11/checkpoint.jsonl` (741.7 MB, 299,861 segments, keys `segment_id, text,
+source_book, source_path, section_title, section_heading, word_count`). So a chunk leg needs **~214k vectors
+(≈438 MB at 512d)**, one local embed job, **no mapping, no re-chunking, no re-extraction**, and each hit returns
+**verbatim source + section heading + parent-FB link**. Granularity reference: Chen et al., *"Dense X Retrieval:
+What Retrieval Granularity Should We Use?"*, EMNLP 2024, `10.18653/v1/2024.emnlp-main.845`. Chunk config is
+`chunk_size_words: 300`, `chunk_overlap_words: 50`, so **adjacent hits must be collapsed at fusion**.
+
 ---
 
 ## PART 3 — THE PROPOSALS YOU MUST CROSS-EXAMINE
@@ -164,6 +239,14 @@ The commissioning architect's position is:
 - **D8** — The 14.8:1 domain alias density is a *compensating control* for a prompt defect; its size, not its contents, is the finding.
 - **D9** — Green instrumentation is *why* failures stay invisible: 24/45 columns dead, no usage telemetry, `classification_status` always `CLEAN`.
 - **D10** — Verdict: **no serious restructuring needed**; 5 bounded repairs (below) suffice.
+- **D11 (NEW)** — The facet filters are **advisory, not constraining** (BUG-285). This is a **correctness** defect that no label repair touches and that precedes every labelling question.
+- **D12 (NEW)** — The write guard **destroys** the label D-271a ruled legal, so **R1 as specified cannot ship** without a config-driven exemption (BUG-286).
+- **D13 (NEW)** — `graph_expand` has no status predicate, so the "hidden" 40.7% is **inconsistently visible** rather than hidden (BUG-287).
+- **D14 (NEW)** — The retrieval corpus is **11.1%** of each FB; 88.9% of the body and **4.8M chars of verbatim evidence** are unsearchable; `source_text` is misnamed (BUG-288).
+- **D15 (NEW)** — **29.1% of "convergence" is duplicate ingestion** (filenames ≠ works), and `source_diversity` is the merge criterion at stage 1.5 (BUG-289).
+- **D16 (NEW)** — `emerging` is an **illegal facet value** on 744 domain rows and 447 PASS discipline rows (BUG-290).
+- **D17 (NEW)** — The ruler's sampling frame is **not crossed with `status`**; on the retrievable slice ROLE's lift is **exactly 0.000** (BUG-294).
+- **D18 (NEW)** — **Chunk-level retrieval is worth adopting, but at step 8, not step 1**: RRF is already correct; the cost is measured (~214k vectors, 100% joinable); and adding a leg **before** D11 is fixed would **amplify** the filter leak.
 
 ### 3.2 The proposed repairs (`R1`–`R5`), ordered
 
@@ -247,6 +330,17 @@ Produce the spec you would sign off on, in this order:
 - Name the **risks** that could make it fail.
 - Answer directly: **is the "we go in circles" pattern a symptom of one root cause or many?** If one, name it.
 
+### Q8 — Retrieval architecture (NEW; the second pass)
+This is where the first pass was blind, and it changes the order of everything.
+1. **The filters do not filter (D11).** Where should the predicate be enforced — pushed into each leg, applied to the fused pool before truncation, or both? What does ACORN (`10.1145/3654923`) imply for a **sqlite-vec** index that cannot take a predicate? What is the cheapest correct fix that does not break the cross-encoder rerank (`BAAI/bge-reranker-v2-m3`, which can promote a filter-violating row into the top-k)?
+2. **Graph expansion leaks (D13).** Should a neighbour inherit the seed's status/verification tier, or be returned with its own tier and let the caller decide? What breaks either way?
+3. **Coverage (D14).** Only `definition` is embedded (11.1%) and FTS covers `name/definition/keywords/jargon`. Rank these three fixes: embed the full body, FTS the body fields, index `evidence_passages` as a fourth RRF leg. Which is first and why? Is there a case for **weighted RRF** or per-leg normalisation instead of equal leg weight?
+4. **Chunking (D18 / §2.9).** RRF is already correct; is a chunk/evidence leg worth it *given* that the FB is a synthesis? Should the leg return the parent FB (parent-document retrieval) or the segment? How do you handle the 50-word overlap, the 369 duplicate works, and the 952-segment mega-rows? Is `Dense X Retrieval` (`10.18653/v1/2024.emnlp-main.845`) directly applicable, or does a *synthesis* unit change the conclusion?
+5. **`discipline = 'emerging'` (D16).** The fallback value is a member of the exact-match facet. How should a fail-closed fallback be represented so it can never be a filter value?
+
+### Q9 — The correctness question, stated plainly
+Given D11 (filters do not constrain), D13 (expansion leaks), and D14 (11.1% coverage): **have any retrieval-quality conclusions in this project ever been measured through a path that honours its own constraints?** If not, what does that imply for every prior retrieval benchmark, facet count, and "the KB is clean" claim — and what is the first number you would re-measure?
+
 ---
 
 ## PART 5 — OUTPUT FORMAT
@@ -255,12 +349,14 @@ Produce the spec you would sign off on, in this order:
 ## VERDICT (one line)
 
 ## Q1 Reliability verdict
-## Q2 Diagnosis review            -> table: claim | verdict | reason
+## Q2 Diagnosis review            -> table: claim | verdict | reason  (D1-D18)
 ## Q3 Repair review               -> per repair: fixes / breaks / second-order / order
 ## Q4 Independent market research -> table: name | reference | V/A/R/I | verdict | what it adds
 ## Q5 Measurement critique        -> weaknesses + the next measurement
 ## Q6 Consolidated final spec     -> the 6 ordered parts
 ## Q7 Cost, risk, circling        -> days | risks | one-line root cause
+## Q8 Retrieval architecture      -> filters | expansion | coverage | chunking | fallback values
+## Q9 The correctness question    -> was any prior retrieval number measured on a constrained path?
 
 ## WHAT I WOULD CHANGE IN THE CLIENT'S PLAN
    (the 3–5 changes that matter most, each with the evidence that forces it)
@@ -286,6 +382,10 @@ Do **not** produce any of the following. Each has already happened in this proje
 8. **Deleting or rewriting pipeline output** — violates R-D410.
 9. **Claiming a component works because a column is green** — 24 of 45 columns are green and empty (D9).
 10. **Re-litigating a decision that is already measured and ruled** — e.g. D-271a is a **declared homonym** (change nothing; disciplines and domains are genuinely separate keys in `taxonomy_v5.yaml`, 0 undeclared collisions over 7,995 rows). Do not propose merging or renaming them.
+11. **Proposing to add an RRF leg or a new index before the facet filters constrain** — order-dependent; it amplifies BUG-285.
+12. **Treating a green column, a passing test, or a matching row count as evidence of correctness** — `integrity-check` passed on the FTS index (BUG-292) while the FTS index has no update/delete trigger, and 24 of 45 columns are green and empty. State the *invariant*, not the *status*.
+13. **Quoting a retrieval number without stating the frame** — the ruler mixes `PASS` and `QUARANTINE` rows, and on the `PASS`-only frame ROLE's lift is exactly 0.000 while on all-rows it is −0.010 (BUG-294). Name the frame or the number is meaningless.
+14. **Asserting that a filter filters** — measured otherwise (BUG-285). If you propose a facet-based design, say *where* the predicate is enforced.
 
 ---
 
@@ -308,11 +408,22 @@ Do **not** produce any of the following. Each has already happened in this proje
 | `pipeline/retrieve.py` | the retrieval facets: `discipline = ?`, `domains LIKE ?`, `depth = ?`, `status` default `PASS` |
 | `pipeline/stage5_verify.py` | the fail-closed NLI gate (NEUTRAL→QUARANTINE) |
 | `pipeline/reclassify_merged_axis.py` | the post-hoc repair script (~2,343 `emerging` rows, D2532) |
-| `governance/buglog.md` | live defect register (BUG-269…BUG-283) |
+| `grep`-visible defect classes | `BUG-273`…`BUG-294` in `governance/buglog.md` — including BUG-285 (filters do not filter), BUG-286 (guard destroys a ruled-legal label), BUG-287 (graph-expansion leak), BUG-288 (11.1% coverage), BUG-289 (duplicate-work convergence), BUG-290 (illegal facet values), BUG-291 (`vec_fbs_ctx`), BUG-292 (FTS trigger set), BUG-293 (mega-merges), BUG-294 (ruler frame) |
+| second-pass forensic | `governance/ONTOLOGY_FORENSIC_20260919.md` **§13** — the retrieval, ingestion and sampling-frame audit, plus the three corrections to the first-pass claims |
 | `governance/CONTEXT_INDEX.md` | recall map: where everything lives, what is superseded, human gate register |
 | `CONSTITUTION.md` | single source of truth; C1–C28, R5/R7/R14, §2 pipeline |
 
 ## ANNEX B — Human gates currently open (the client decides; you may recommend)
+
+**New second-pass gates:**
+
+- **G12** approve **constraining the facet filters** (push the predicate into every leg / post-filter the fused pool). No human cost, but it changes results for every existing query.
+- **G13** approve the **write-guard exemption** for the declared homonym — **a hard prerequisite for R1** (BUG-286).
+- **G14** approve **work-identity dedup at ingestion** (BUG-289): re-run affected merges, or only prevent future ones?
+- **G15** approve **indexing what is already in the DB** (body fields into FTS, `evidence_passages` as a fourth RRF leg, full-body embeddings).
+- **G16** approve the **chunk/evidence leg** (step 8) — and decide whether a hit returns the parent FB or the segment.
+
+**Previously open:**
 
 - **G4** ratify the certified ruler core and repoint the floors at it (recommended: repoint floors at the certified core, keep the anchor for eval).
 - **G8** ratify D-271a as a **declared homonym** (change nothing).

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-15 13:39:35'
-total_decisions: 623
+total_decisions: 631
 decisions:
 - id: D2636
   category: QUALITY / DATA
@@ -6412,8 +6412,117 @@ decisions:
   - config/eval_integrity.yaml
   - governance/ruler_measurement_20260917.md
 
+
+- id: D273a
+  category: RETRIEVAL / VALIDATION
+  state: OPEN
+  date: '2026-09-19'
+  title: Facet predicates must constrain EVERY retrieval leg, not one of three (D-273a)
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: 'measured on the live DB: 2 of the RRF top-10 violated discipline=''typography'' (BUG-285)'
+  description: 'search_hybrid applies the facet predicate to ONE of three legs: search_fts and search_vector accept no facet parameters at all, only search_keyword applies ''discipline = ?'' (and it is called only when a filter is present, D2511), and the fused ranking is truncated with NO post-filter. Measured with discipline=''typography'': 2 of the top-10 fused results were not typography, and the unfiltered vector leg makes the real ratio worse. The cross-encoder rerank (BAAI/bge-reranker-v2-m3, local CPU) reorders the pool by query relevance and cannot restore the facet, so it can promote a filter-violating row into the top-k. CONSEQUENCE: discipline=, domain= and depth= are advisory, not constraining; every facet-shaped figure in this project (261/648 homonym rows, 907/1538 maxima, ''discipline is the primary exact-match facet'') describes a LABEL DISTRIBUTION, never a RESULT SET. This is a correctness defect independent of label quality and it PRECEDES every labelling repair. Fix:
+    push the predicate into every leg, or post-filter the fused pool before truncating to limit; then re-run pipeline/retrieval_benchmark.py. Reference for predicate-aware search: ACORN, Proc. ACM Manag. Data 2024, DOI 10.1145/3654923. Human gate G12.'
+  files:
+  - pipeline/retrieve.py
+  - pipeline/retrieval_benchmark.py
+
+- id: D273b
+  category: TAXONOMY / GOVERNANCE
+  state: OPEN
+  date: '2026-09-19'
+  title: The write guard must exempt DECLARED collisions -- a hard prerequisite for R1 (D-273b)
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: 'measured: validate_discipline_domain(''research methodology'', <anything>) is non-empty (BUG-286)'
+  description: 'validate_discipline_domain fires on the DISCIPLINE ALONE, independent of the row''s own domains: ''research methodology'' with [''brand identity''], with None, or with its namesake domain all return a non-empty flag. It is enforced as a hard error at stage4_merge.py:823 (the row is quarantined) and stage6_commit.py:402 (the row is REJECTED, never inserted). D-271a ruled the opposite: the pair is a DECLARED HOMONYM, both labels stay canonical, change nothing. So every NEW row labelled ''research methodology'' dies at the write boundary; the 261 existing rows predate the guard (D2620/D2626, 2026-09-17). THE RULING IS NOT IN FORCE IN CODE. Why this blocks the solution rather than merely mis-reporting it: ''research methodology'' is among the MOST reliable labels in the taxonomy (0.83 human agreement), and repair R1 proposes a closed menu of the 61 canonical disciplines that includes it -- so R1 as specified would have every correct answer for that label destroyed at the write
+    boundary, introducing a new silent, data-destroying failure mode. Fix: a config-driven exemption for declared collisions (the ruling already lives in config/eval_integrity.yaml), consumed by both write points, while every UNDECLARED collision keeps failing closed. Human gate G13; one line.'
+  files:
+  - pipeline/schemas.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  - config/eval_integrity.yaml
+
+- id: D273c
+  category: RETRIEVAL / ONTOLOGY
+  state: OPEN
+  date: '2026-09-19'
+  title: Graph expansion must propagate the status/verification tier of its seed (D-273c)
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: 'measured: graph_expand''s two SELECTs carry no status predicate (BUG-287)'
+  description: 'graph_expand selects neighbours with NO status predicate (''SELECT fb_id, related_fbs, contradicts_fbs, prerequisite_fbs FROM fbs WHERE fb_id = ?'' and the neighbour fetch), and search_graph defaults to include_contradictions=True, include_prerequisites=True. Seeds are PASS-only; neighbours are not, so the 3,250 quarantined rows RE-ENTER the answer set whenever a PASS row points at them. This CORRECTS the claim that 40.7% of the KB is invisible: it is INCONSISTENTLY visible (present iff a PASS row points at it), which is worse because the same query returns different content depending on graph topology, and the content includes rows that failed NLI verification. Worse still, the edges were built from discipline_overlap / domain_overlap / source_crossover, i.e. FROM LABELS THAT WERE ~50% WRONG during the generation window, so expansion propagates label error structurally. Fix: propagate the seed''s status/verification policy into expansion, and attach an explicit verification
+    tier to each neighbour instead of silently mixing tiers. Note this enlarges the scope of the quarantine repair (D272d).'
+  files:
+  - pipeline/retrieve.py
+
+- id: D273d
+  category: RETRIEVAL / ONTOLOGY
+  state: OPEN
+  date: '2026-09-19'
+  title: 'Index what is already in the DB: 88.9% of each FB is unsearchable and 4.8M chars of evidence are unindexed (D-273d)'
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: measured over 7,995 rows (BUG-288)
+  description: 'The 512d vector leg embeds ''definition'' ONLY: 1,765,980 characters of a 15,918,888-character total FB body = 11.1%. The remaining 14,152,908 characters (mechanism, boundary, application, failure_mode, consequence, elaboration) are NEITHER embedded NOR FTS-indexed (fbs_fts covers name, definition, keywords, jargon). Separately, 4,802,857 characters of verbatim evidence_passages -- up to 5 quotes per FB, 7,990 distinct values -- are indexed by NOTHING. And source_text is MISNAMED: 100% of rows contain ''[book.md] '' + definition (median 300 chars, min 138, max 695), so no column at FB level holds source text at all. This is the honest answer to ''do we have accurate source text for retrieval'': we have the LLM synthesis, and the evidence is unindexed. Fix order: (1) add the body fields to FTS, which recovers 88.9% of the searchable body with no new storage; (2) embed the full body rather than definition alone; (3) index evidence_passages as a fourth RRF leg (4.8M chars already
+    in the DB); (4) only then consider a chunk index. Human gate G15.'
+  files:
+  - pipeline/embeddings.py
+  - pipeline/retrieve.py
+  - pipeline/stage6_commit.py
+
+- id: D273e
+  category: QUALITY / DATA
+  state: OPEN
+  date: '2026-09-19'
+  title: 'source_diversity counts FILENAMES not WORKS: dedup by work identity before merging (D-273e)'
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: 'measured: of 2,597 rows with diversity>=2, 757 (29.1%) collapse to fewer distinct works; 369 work-identities have >1 filename (BUG-289)'
+  description: 'source_diversity is computed over book FILENAMES. Measured: of the 2,597 rows with source_diversity >= 2, 757 (29.1%) collapse to fewer distinct works once filenames are normalised, and the corpus carries 1,300 distinct filenames hiding 369 work-identities with more than one filename (e.g. ''About Face The Essentials of Interaction Des...'' vs ''About Face. The Essentials of Interaction Des...''; ''Design The Key Concepts (D. J. Huppatz) (z-library.sk...)'' vs ''Design The Key Concepts (D. J. Huppatz).md''; ''Logo Design Love'' in two casings). WHY IT MATTERS: source_diversity IS THE MERGE CRITERION AT STAGE 1.5, and is_convergent (2,603 rows) is the corpus''s headline quality claim. Both are inflated by double-ingested books, so the pipeline merges on a signal contaminated by the ingestion layer -- a defect no label repair touches. Local, well-established fixes: Broder 1997 shingling/MinHash for near-duplicates (DOI 10.1109/sequen.1997.666900), plus Fellegi-Sunter / Splink
+    record linkage for fuzzy titles (already adopted in spirit for the identity layer). Also relevant: ''Deduplicating Training Data Makes Language Models Better'', ACL 2022, 10.18653/v1/2022.acl-long.577. Human gate G14: re-run affected merges, or only prevent future ones?'
+  files:
+  - pipeline/stage1_chunk.py
+  - pipeline/stage1_5_embed_cluster.py
+  - pipeline/stage4_merge.py
+
+- id: D273f
+  category: ONTOLOGY / SCHEMA
+  state: OPEN
+  date: '2026-09-19'
+  title: '''emerging'' must stop being a facet value: it is a status, not a label (D-273f)'
+  source: governance/ONTOLOGY_FORENSIC_20260919.md
+  verification: 'measured: 744 rows use ''emerging'' as a DOMAIN (not canonical); 447 status=''PASS'' rows carry discipline=''emerging'' (BUG-290)'
+  description: 'Two illegal values sit inside the retrieval facets. (1) ''emerging'' is used as a DOMAIN on 744 rows but is NOT one of the 43 canonical domains -- the domains column holds 44 distinct values, 1 of which is not canonical, the same class of violation as BUG-273, and it sits inside a facet filter. (2) discipline=''emerging'' occurs on 447 rows whose status is PASS (757 rows in total), so the fail-closed fallback is a member of the EXACT-MATCH facet: ''discipline = emerging'' returns 447 rows of ''we do not know''. The human reviewer also reached for ''emerging'' 9 times, i.e. the fallback and the answer space are the same string. Fix: a fail-closed fallback must be a STATUS (or a declared, non-filterable sentinel), never a value in the facet vocabulary it is meant to be outside of.'
+  files:
+  - config/taxonomy_v5.yaml
+  - pipeline/schemas.py
+  - pipeline/content_types.py
+
+- id: D273g
+  category: RETRIEVAL / ONTOLOGY
+  state: OPEN
+  date: '2026-09-19'
+  title: A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g)
+  source: governance/MARKET_RESEARCH_ONTOLOGY_20260919.md
+  verification: 'measured: RRF already correct (k=60, 1/(k+rank), 1-based); source_segments join the stage-1 checkpoint 205,813/205,813 = 100%'
+  description: 'RRF is ALREADY implemented and correct in search_hybrid: Score(d) = sum 1/(k + rank) with RRF_K=60, 1-based ranks, three legs, rank-based rather than score-based, including the D2511 keyword-pollution fix. So ''adopt RRF'' is a no-op; the question is what to feed it. Chunk-level retrieval IS worth adopting and the cost is MEASURED, not estimated: the DB''s source_segments (214,220 references) are verbatim stage-1 checkpoint segment_ids -- sampled 205,813/205,813 = 100% join against knowledge pipeline/stage1_chunk/t11/checkpoint.jsonl (741.7 MB, 299,861 segments, keys segment_id, text, source_book, source_path, section_title, section_heading, word_count). So a chunk leg needs ~214k vectors (about 438 MB at 512d), one local embedding job, NO mapping, NO re-chunking and NO re-extraction, and each hit returns verbatim source text plus a section heading plus a direct parent-FB link (retrieve the segment, return the parent FB). Granularity reference: Chen et al., Dense X Retrieval,
+    EMNLP 2024, 10.18653/v1/2024.emnlp-main.845. CAVEATS THAT MUST SHIP: chunking fixes grounding precision, NOT label accuracy; the segments inherit the corpus defect of 369 duplicate works; chunk config is 300 words with 50 overlap, so adjacent hits must be collapsed at fusion; and adding a leg BEFORE D273a is fixed would AMPLIFY BUG-285. Human gate G16, and decide whether a hit returns the parent FB or the segment.'
+  files:
+  - pipeline/retrieve.py
+  - pipeline/stage1_chunk.py
+  - config/pipeline_config.yaml
+
+- id: D273h
+  category: LABEL QUALITY / MEASUREMENT
+  state: OPEN
+  date: '2026-09-19'
+  title: Cross the ruler strata with status and always report both frames (D-273h)
+  source: governance/ruler_measurement_20260917.md
+  verification: 'measured: sheet 47.3% PASS vs KB 59.3% PASS; PASS-only ROLE lift is exactly 0.000 (BUG-294)'
+  description: 'The ruler sheet sampled the full KB -- 47.3% PASS rows in the sheet against 59.3% in the KB -- so stratum A mixes retrievable and hidden rows. Re-measured restricted to status=''PASS'': content_type 0.891 with a constant-answer baseline of 0.891, i.e. lift EXACTLY 0.000 (cleaner and stronger than the all-rows figure of 0.740 against 0.750 = -0.010); discipline 0.492 (essentially unchanged); extraction_type 0.852. On QUARANTINE rows content_type is 0.472 against a 0.500 constant, i.e. worse than a constant. The defect is that TWO ESTIMANDS are being answered by one number: ''is the stored label trustworthy across the KB?'' (all rows) and ''is what I retrieve correctly labelled?'' (PASS only). Fix: cross the ruler strata with status, report both frames in every artifact, and never quote a single frame as if it were the answer.'
+  files:
+  - scripts/score_ruler_labels.py
+  - scripts/build_ruler_sheet.py
+  - config/eval_integrity.yaml
+
 summary:
-  total: 623
+  total: 631
   proposed: 2
   draft: 1
   active: 479
@@ -6424,7 +6533,7 @@ summary:
   deferred: 14
   resolved: 81
   planned: 8
-  open: 5
+  open: 13
   by_category:
     ARCH: 27
     ARCH / GOV: 1
@@ -6490,7 +6599,7 @@ summary:
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 5
-    LABEL QUALITY / MEASUREMENT: 2
+    LABEL QUALITY / MEASUREMENT: 3
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
     MEASUREMENT / LABEL QUALITY: 3
@@ -6505,7 +6614,7 @@ summary:
     ONTOLOGY / LABEL QUALITY: 1
     ONTOLOGY / MEASUREMENT: 1
     ONTOLOGY / PIPELINE / RESEARCH: 2
-    ONTOLOGY / SCHEMA: 1
+    ONTOLOGY / SCHEMA: 2
     ONTOLOGY / VERIFICATION: 1
     OPERATIONAL / CANARY: 1
     OPS: 3
@@ -6528,7 +6637,7 @@ summary:
     QLT / AUDIT: 20
     QLT / DATA: 1
     QLT / PROMPT: 6
-    QUALITY / DATA: 12
+    QUALITY / DATA: 13
     QUALITY / GOLDEN-SET: 12
     QUALITY / GOLDEN-SET / PROMPT: 1
     QUALITY / GOVERNANCE: 3
@@ -6537,14 +6646,14 @@ summary:
     RES: 4
     RESEARCH: 3
     RESILIENCE / QUALITY: 1
-    RETRIEVAL / ONTOLOGY: 2
+    RETRIEVAL / ONTOLOGY: 5
     RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
-    RETRIEVAL / VALIDATION: 1
+    RETRIEVAL / VALIDATION: 2
     RETRIEVAL / VERIFICATION: 1
     ROBUSTNESS / QUALITY: 3
     STR: 1
     TAXONOMY: 4
-    TAXONOMY / GOVERNANCE: 1
+    TAXONOMY / GOVERNANCE: 2
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8

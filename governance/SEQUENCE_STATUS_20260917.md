@@ -241,3 +241,44 @@ indices — FIXED).
 
 **Standing rule added:** *validate an instrument against the worst realistic input, not the best.* The scorer
 was proven against an idealised sheet (indices, complete) and crashed on the first real one.
+
+---
+
+## D-273 RULED (2026-09-19, second pass) — the retrieval and ingestion layers
+
+The first pass audited **labels**. The second audited the **retrieval path**, the **ingestion path** and my own
+**sampling frame**. It produced **10 new defects (BUG-285…BUG-294)** and **corrected three of my own claims** —
+which is the point of running the audit before consolidating the review.
+
+**The order of the repair programme CHANGED.** It now begins with a **correctness** bug, not a labelling one:
+
+- **D-273a (NEW #1) — the facet filters do not filter.** `search_hybrid` applies `discipline = ?` to **one of
+  three legs** and post-filters nothing. Measured: `discipline='typography'` returned **2 of 10 results that were
+  not typography**. Independent of label quality; precedes every labelling repair. → **G12**
+- **D-273b (NEW #2) — the write guard destroys the label D-271a ruled legal.** `validate_discipline_domain` fires
+  on the discipline alone and is a hard error at `stage4_merge.py:823` (quarantine) and
+  `stage6_commit.py:402` (**REJECTED**). **The D-271a ruling is NOT in force in code**, and **R1 as specified would
+  have every correct `research methodology` answer destroyed** — one of the *most* reliable labels (0.83). One
+  config-driven line. → **G13**
+- **D-273c** `graph_expand` carries **no status predicate** → the quarantined 40.7% is **inconsistently visible**,
+  not hidden, and expansion propagates label error structurally (the edges were built from ~50%-wrong labels).
+- **D-273d** the vector leg embeds **`definition` only = 11.1%** of the FB body; **88.9% is unembedded and
+  unindexed**, and **4.8M chars of verbatim `evidence_passages` are indexed by nothing**. `source_text` is
+  `"[book.md] " + definition`.
+- **D-273e** `source_diversity` counts **filenames, not works**: **29.1% of "convergence" is the same book twice**
+  (757 of 2,597 rows; 369 work-identities with >1 filename). It is the **merge criterion at stage 1.5**. → **G14**
+- **D-273f** `emerging` is an **illegal facet value**: 744 domain rows (not canonical) and 447 PASS discipline rows.
+- **D-273g** a **chunk/evidence leg is worth it at step 8**, not now: RRF is **already correct**; the join is
+  **100% (205,813/205,813)** so the cost is ~214k vectors; but it fixes grounding, not labels, and adding a leg
+  before D-273a **amplifies** the filter leak. → **G16**
+- **D-273h** cross the ruler strata with `status`: on `PASS`-only rows ROLE's lift is **exactly 0.000**.
+
+**Measurements that REFUTED my own hypotheses (kept for the record):** FTS staleness (integrity-check **passed**);
+label-poisoned production embeddings (`contextual_embed.enabled: False`); and over-merging causing unlabelability
+(singletons are **3× more** unlabelable — 24.1% blank vs 0%).
+
+**Standing rule added:** *a filter is not a filter until it constrains every candidate generator.* And: *an
+instrument that reports a decision as pending, or a filter that does not filter, is a defect of the same class as a
+wrong label — it makes the system unmeasurable.*
+
+Registry now **631 decisions**; buglog now **BUG-294**.

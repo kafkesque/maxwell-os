@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 92,
-  "open_n": 59,
-  "closed_n": 33,
+  "total_ids": 93,
+  "open_n": 61,
+  "closed_n": 32,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -284,6 +284,11 @@
       "events": 1
     },
     {
+      "id": "BUG-333",
+      "title": "(MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp",
+      "events": 2
+    },
+    {
       "id": "BUG-334",
       "title": "(MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n",
       "events": 1
@@ -301,6 +306,11 @@
     {
       "id": "BUG-343",
       "title": "(LOW-MED \u2014 OPEN 2026-09-21) \u2014 a smoke test asserts a checkpoint that its own fixture cannot produce",
+      "events": 1
+    },
+    {
+      "id": "BUG-347",
+      "title": "(MED \u2014 FIXED 2026-09-21): the C15 classifier treated \"PARTIALLY FIXED\" as CLOSED",
       "events": 1
     }
   ],
@@ -328,7 +338,6 @@
     "BUG-329",
     "BUG-330",
     "BUG-332",
-    "BUG-333",
     "BUG-335",
     "BUG-337",
     "BUG-338",

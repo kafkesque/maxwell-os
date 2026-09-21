@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**59 open** / 33 closed of 92 ids.
+**61 open** / 32 closed of 93 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -62,7 +62,9 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-319 | qwen3coder arm abstains 116/116 (HIGH, hidden failure, 2026-09-21) | 1 |
 | BUG-326 | (MED - BLOCKED 2026-09-21): the repair's TARGET NUMBERS do not reproduce on the live DB | 2 |
 | BUG-331 | Serving-gate write to the production DB has no R5 review on record (MED, OPEN) | 1 |
+| BUG-333 | (MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp | 2 |
 | BUG-334 | (MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n | 1 |
 | BUG-336 | (MED - OPEN 2026-09-21, NEW STANDING RULE): an agent's measurement claim is not evidence | 1 |
 | BUG-341 | (HIGH — OPEN 2026-09-21, regression of BUG-311): the LIVE stage5 checkpoint is absent again | 1 |
 | BUG-343 | (LOW-MED — OPEN 2026-09-21) — a smoke test asserts a checkpoint that its own fixture cannot produce | 1 |
+| BUG-347 | (MED — FIXED 2026-09-21): the C15 classifier treated "PARTIALLY FIXED" as CLOSED | 1 |

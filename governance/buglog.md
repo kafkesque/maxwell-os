@@ -2061,6 +2061,10 @@ is the argument for machine-derived C15 counts (BUG-342) rather than hand counts
 FIX: `PARTIAL_WORDS` (PARTIAL / MITIGATED / IN PROGRESS) is classified OPEN and outranks the close words;
 precedence is opened > partial > closed > open. A `self_test()` with six registered edge cases now runs on every
 invocation and aborts FAIL-CLOSED if the classifier regresses.
-CORRECTION (audit trail): the session-10 commit 6c36bec announced BUG-347 as fixed in its message, but the
-patch's anchor assertion failed silently at the time and only the FOLLOW-UP commit carries the actual fix. The
-message was premature; this entry is the authoritative record. (Class of BUG-345: a claim that was never checked.)
+CORRECTION (audit trail, and a bug in its own right): TWO commits (6c36bec, 550cee4) announced BUG-347 as fixed
+in their messages while the code was NOT patched -- the first patch aborted on an anchor assertion, the second on a
+SyntaxError, and in both cases the commit still went through. The fix is carried by the third commit only, and the
+status count is quotable only once `bug_status.py` runs its `self_test()` without aborting. This is the same class
+as BUG-345 (a claim that was never mechanically checked) and it is the reason the standing rule is: fix -> verify
+-> THEN claim. The two premature commit messages stand uncorrected in history (R-D410); this paragraph is the
+authoritative record.

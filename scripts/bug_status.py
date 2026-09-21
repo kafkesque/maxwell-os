@@ -24,17 +24,38 @@ BUGLOG = REPO / "governance" / "buglog.md"
 C15_THRESHOLD = 5
 CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED")
 REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
+# BUG-347 (2026-09-21): "PARTIALLY FIXED" contains the substring FIXED and was classified CLOSED,
+# silently retiring a LIVE bug (BUG-333). A partial fix is an OPEN bug with progress attached.
+PARTIAL_WORDS = ("PARTIAL", "MITIGATED", "IN PROGRESS")
 HEADER_RE = re.compile(r"^##\s+(BUG-\d+)\b[\s:—‑-]*(.*)$")
 
 
 def classify(text: str) -> str:
-    """Map a header line to one status EVENT."""
+    """Classify one header event. Precedence: reopened > partial(open) > closed > open (BUG-347)."""
     up = text.upper()
     if any(w in up for w in REOPEN_WORDS):
         return "reopened"
+    if any(w in up for w in PARTIAL_WORDS):
+        return "open"
     if any(w in up for w in CLOSE_WORDS):
         return "closed"
     return "open"
+
+
+def self_test() -> None:
+    """Assert the classifier's registered edge cases before its output is trusted (BUG-347)."""
+    cases = {
+        "MED - FIXED 2026-09-21": "closed",
+        "HIGH - OPEN 2026-09-21": "open",
+        "MED - PARTIALLY FIXED 2026-09-21": "open",
+        "MED - FIXED, REGRESSED 2026-09-21": "reopened",
+        "LOW - CLOSED INVALID": "closed",
+        "MED - RESOLVED (cleaned up)": "closed",
+    }
+    for text, want in cases.items():
+        got = classify(text)
+        if got != want:
+            raise SystemExit(f"FAIL-CLOSED: bug_status self-test {text!r} -> {got}, expected {want}")
 
 
 def scan(text_lines: list[str]) -> dict[str, dict]:
@@ -57,6 +78,7 @@ def scan(text_lines: list[str]) -> dict[str, dict]:
 
 def main() -> int:
     """Re-derive the status index, write it, and state the C15 consequence."""
+    self_test()
     ap = argparse.ArgumentParser()
     ap.add_argument("--json-out", default="governance/bug_status.json")
     ap.add_argument("--md-out", default="governance/bug_status.md")

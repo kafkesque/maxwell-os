@@ -1767,3 +1767,17 @@ earlier probe returned 0 rows because it looked for dicts instead of 2-element l
 calibrated-abstention curve was therefore re-derived from the frozen artifact without re-running a model. Lesson: print
 the artifact shape before declaring a signal missing - this is the second false "missing signal" claim this session
 (the first was the assignment claim, D-310). Both are now recorded as process bugs.
+
+## BUG-328 (HIGH - OPEN 2026-09-21): 18 production/script files are modified-but-UNCOMMITTED vs HEAD (silent-revert risk)
+`git diff --stat HEAD -- pipeline/ tools/ scripts/` = 18 files, 418 insertions / 193 deletions, none of it committed:
+pipeline/retrieve.py (+167), pipeline/schemas.py (+117), pipeline/stage6_commit.py (+36), pipeline/stage4_merge.py (+21),
+pipeline/stage5_verify.py (+15), pipeline/backup_guardian.sh, scripts/repass_pair_agreed.py, the apply_* relabel scripts, ...
+The stage5 hunk is BEHAVIOURAL, not cosmetic: status is now produced by `pipeline/serving_gate.derive_status` (D274h
+"single serving-gate rule") and a new `s5_reason` is stamped, replacing the inline `fact_passed -> PASS/QUARANTINE`
+branch. So the RUNNING verifier does not match a fresh checkout of HEAD: any `git checkout`/`stash`/`reset` of these
+paths silently reverts the serving-gate rule (and the retrieve/schema work) while the DB keeps the labels that were
+produced under it -> hidden divergence between code and corpus. The 4,696 QUARANTINE rows reported in D-310 were
+produced under the uncommitted rule.
+FIX: review + commit (or explicitly park behind a feature flag) these 18 files BEFORE any run that writes to
+maxwell.db, and do not run `git checkout` on pipeline/ until then. Same failure class as the taxonomy state fixed by
+D-309 (uncommitted semantic change + committed-looking governance).

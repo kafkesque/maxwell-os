@@ -52,3 +52,24 @@ pairs are settled, then kappa is re-measured on the 116 labelled ruler rows.
 
 Status: all 16 discipline pairs are DIFFERENT with a drafted boundary test. No per-pair questions remain.
 Next: wire config/normalization_map.yaml into the comparison layer, then re-measure kappa.
+
+## CORRECTION (appended 2026-09-21, session 12) — the "Next:" line above is stale (BUG-356)
+
+Line "Next: wire config/normalization_map.yaml into the comparison layer, then re-measure kappa" is
+**already done**: `scripts/anchor2_kappa.py:56` reads the map (D-307) and the domain observed agreement
+moved 0.3938 -> 0.4385. Do not re-do it.
+
+What this queue actually still owes:
+
+1. **10 pairs have no drafted boundary test.** Re-derived against the ANCHOR-2 sheet, the disagreement
+   list is **26 pairs / 31 rows**, not 16. Items 17-26 have no test; they are drafted in
+   `governance/BOUNDARY_DISCRIMINATORS_20260921.md`.
+2. **Re-check asymmetric pairs.** Rows 25/26 are the same two slots in opposite directions, and rows
+   19/23 pair a method with an object. A rule phrased on a slot NAME will not converge for these;
+   the `default_home` + escape-condition form is recommended instead.
+3. **Nothing is wired into the classifier prompt yet.** The pairs are settled as a ruling, not applied
+   as behaviour. That wiring is a separate, measurable step (it changes what S4 emits), and it must be
+   measured on the frozen ruler, not asserted.
+
+PART 1 is additionally re-issued as `governance/PART1_PART2_REISSUE_20260921.md` (BUG-348): NOVEL=0 —
+no human label introduced a domain concept absent from the menu.

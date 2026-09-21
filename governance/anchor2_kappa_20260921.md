@@ -1,6 +1,6 @@
-# ANCHOR-1 per-axis agreement (60-row R2 adjudication sheet)
+# ANCHOR-2 per-axis agreement (60-row R2 adjudication sheet)
 
-Sheet: governance/ANCHOR1_BLIND_SHEET_20260920.csv  vs  pipeline key: governance/ANCHOR1_KEY_20260920.json  (n=60).
+Sheet: governance/ANCHOR2_BLIND_SHEET_20260920.csv  vs  pipeline key: governance/ANCHOR2_KEY_20260920.json  (n=60).
 D-275a: report chance-corrected agreement and error rate, never 'accuracy'.
 
 | axis | n | observed agree | error rate | Cohen kappa | contra kappa | clean kappa |

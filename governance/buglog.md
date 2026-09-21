@@ -2186,3 +2186,94 @@ and unnoticed.
 
 **Fix (not applied).** Extract to config, or mark each with an explicit, reasoned C12 exemption; then the gate returns
 green. Until then, "integrity: PASS" is a claim that cannot be made.
+
+## BUG-348 (MED — FIXED 2026-09-21): the menu-repair worksheet grew a SECOND, weaker matcher and reported sheet artifacts as menu gaps
+
+Cause: `scripts/menu_repair_worksheet.py` compared the human `domains_verdict` cell to the pipeline's
+emitted domains with a bare `.lower()` — no quote/whitespace hygiene, no consultation of the alias
+layer that already exists (`config/taxonomy_v5.yaml` `raw` via `pipeline.schemas.match_to_canonical`,
+plus owner-approved `config/normalization_map.yaml`, D-307) — and then printed `most_common(16)` of
+that raw counter. This is the BUG-346 "two truth paths" class: a second matching path, weaker than
+the one the pipeline uses, deciding what the owner is shown.
+
+Impact (the owner was asked to rule on a wrong list): PART 1 showed 13 rows; on inspection they were
+2 sheet artifacts (a stray quote: `marketing & communications"`, `"leadership"`), 4 surface variants
+(`social science`, `media & entertainmen`, `product desig`, `business operation`) that resolve onto
+slots the pipeline DID emit, and 7 genuinely unemitted slots. It also truncated PART 2 at 16 rows when
+the disagreement list is 26 pairs / 31 rows — so 10 pairs were never shown, and the excerpt column was
+empty because the generator read `row`/`name` but never the `definition` column.
+
+Fix: one resolver (`match_to_canonical`, kind-aware D2133) + `normalization_map.yaml`; quote/whitespace
+hygiene on every cell token; five explicit buckets (ARTIFACT / ALIAS_RESOLVED / UNEMITTED_EXISTING /
+NOVEL / NEAR_MISS); a near-match is REPORTED, never silently resolved (D2422 spirit); all 26 pairs with
+their `definition` excerpt; and the output is stamped with the sha256 of every input it read (D-318).
+The ruled worksheet is NOT regenerated — the corrected reading is a new artifact
+(`governance/PART1_PART2_REISSUE_20260921.md`), because a published artifact the owner has written on
+is evidence (R-D410).
+
+Result: ARTIFACT=2, ALIAS_RESOLVED=5 uses/4 distinct, UNEMITTED_EXISTING=7 slots/11 uses,
+**NOVEL=0**, NEAR_MISS=0, PART2=26 pairs/31 rows. NOVEL=0 is the load-bearing number: the human labels
+introduce NO domain concept absent from the menu. The ANCHOR-2 domain disagreement is 100% emission
+coverage + surface spelling, not an ontology gap.
+
+R5: `gemma-4-E4B-it-MLX-4bit` (maxwell_omlx), 6-question adversarial pass — BLOCKING ISSUES: none.
+Caveat recorded honestly: its evidence for the C16/no-silent-fallback question was asserted from the
+`try/except` "implied by context" rather than read off the file, so that item is a weak (unearned) PASS.
+The other five items were answered from the code.
+
+## BUG-354 (MED — OPEN): the shared resolver rejects the catch-all on BOTH axes
+
+`pipeline.schemas.match_to_canonical("emerging", "domain")` returns `None`, and so does
+`("emerging", "discipline")`. `load_taxonomy()` appends `emerging` to BOTH canonical lists, so the
+opposite-axis guard added for BUG-200/D2422 ("a label canonical on the opposite axis must never resolve
+on this axis") fires on the one string that is legitimately canonical on both. Verified live:
+`domain emerging -> None | discipline emerging -> None`.
+
+Impact: any consumer that uses the shared resolver to validate or map the catch-all silently gets
+`None` instead of `emerging`. Today the blast radius is small (stage4_merge has its own `emerging`
+fallback path), which is exactly why it went unnoticed. It is a latent trap: a future caller that
+treats `None` as "unmappable" would drop or re-mint the catch-all, corrupting the taxonomy-expansion
+signal (`s3_original_domain`) that the catch-all exists to preserve.
+
+Fix (not applied — touches the D2422 guard): exempt `meta.catch_all_domain`/`catch_all_discipline` from
+the opposite-axis guard, and add a regression test asserting `match_to_canonical(catch_all, k) == catch_all`
+for both k.
+
+## BUG-355 (MED — OPEN): one surface string, two canonicals — and a dead entry in the domain block of normalization_map
+
+(a) `match_to_canonical("social science", "domain")` -> `social sciences` but
+`match_to_canonical("social science", "discipline")` -> `sociology`. That is kind-scoping working as
+designed (D2133), and it is RIGHT for the axes. But `get_synonym_index(None)` (the FLAT index, still a
+public entry point and still the fallback in `match_to_canonical`) makes the winner depend on build
+order, so the same string can map to two different canonicals depending on which consumer asks. Any
+caller that passes no kind gets an arbitrary answer.
+
+(b) `config/normalization_map.yaml` has 7 entries under its `domains:` block. Six map a variant onto a
+canonical DOMAIN. The seventh is `human-computer interaction -> human computer interaction`, where the
+KEY is a canonical DISCIPLINE and the TARGET is not in the domain vocabulary nor the discipline
+vocabulary. Verified: `target_in_domains=False target_in_disciplines=False key_is_discipline=True`.
+So the entry can never produce a valid domain token; its only possible effect is to turn a legitimate
+`human-computer interaction` domain cell into a guaranteed mismatch. Same family as BUG-325 (the map was
+already found rewriting DISCIPLINE tokens), but this one survived because it is not a real discipline
+alias either.
+
+Fix (not applied — config/*.yaml is owner-owned and C12-protected): delete that one entry from the
+`domains:` block (the canonical spelling is `human-computer interaction`, which `normalize_label`'s
+dash-fold already reaches); and make the flat index either private or kind-required.
+
+## BUG-356 (LOW — OPEN): the repair queue's own "Next:" line is stale and hides the real next action
+
+`governance/MENU_REPAIR_QUEUE_20260921.md:54` says "Next: wire config/normalization_map.yaml into the
+comparison layer, then re-measure kappa." That is already done: `scripts/anchor2_kappa.py:56` reads the
+map (D-307), the domain agreement moved 0.3938 -> 0.4385, and the queue's items 2-16 are already marked
+SETTLED. Impact: the instrument of record tells the next session to do a finished task, which is how a
+queue quietly stops being read. Also: the queue holds 26 pairs while only 16 have a drafted test — the
+10 without one are drafted in `governance/BOUNDARY_DISCRIMINATORS_20260921.md`.
+
+Fix (partially applied): a CORRECTION block is appended to the queue (append-only, R-D410); the queue
+file itself is not rewritten.
+
+## C15 STATUS (2026-09-21T21:40Z) — MECHANICAL, supersedes every earlier C15 block in this file
+
+Generated by `scripts/bug_status.py` over this file; do not restate this number anywhere —
+cite `governance/bug_status.json` instead (BUG-349). C15 threshold 5 -> append-to-handoffs required: true.

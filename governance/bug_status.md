@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**65 open** / 34 closed of 99 ids.
+**67 open** / 35 closed of 102 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -67,8 +67,10 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-336 | (MED - OPEN 2026-09-21, NEW STANDING RULE): an agent's measurement claim is not evidence | 1 |
 | BUG-341 | (HIGH — OPEN 2026-09-21, regression of BUG-311): the LIVE stage5 checkpoint is absent again | 1 |
 | BUG-343 | (LOW-MED — OPEN 2026-09-21) — a smoke test asserts a checkpoint that its own fixture cannot produce | 1 |
-| BUG-348 | (MED - OPEN 2026-09-21, found by the senior-ontology review of MENU_REPAIR_WORKSHEET_20260921.md) | 1 |
 | BUG-349 | (LOW — OPEN 2026-09-21, found by the session-11 forensic audit F-A) | 1 |
 | BUG-351 | (LOW-MED — OPEN 2026-09-21, found by the session-11 audit F-C) | 1 |
 | BUG-352 | (MED — OPEN 2026-09-21, found by the session-11 audit F-D) | 1 |
 | BUG-353 | (MED — OPEN 2026-09-21, found by the session-11 audit F-H) | 1 |
+| BUG-354 | (MED — OPEN): the shared resolver rejects the catch-all on BOTH axes | 1 |
+| BUG-355 | (MED — OPEN): one surface string, two canonicals — and a dead entry in the domain block of normalization_map | 1 |
+| BUG-356 | (LOW — OPEN): the repair queue's own "Next:" line is stale and hides the real next action | 1 |

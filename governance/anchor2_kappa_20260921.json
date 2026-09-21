@@ -1,7 +1,7 @@
 {
  "schema_version": "1.0",
- "sheet": "governance/ANCHOR1_BLIND_SHEET_20260920.csv",
- "key": "governance/ANCHOR1_KEY_20260920.json",
+ "sheet": "governance/ANCHOR2_BLIND_SHEET_20260920.csv",
+ "key": "governance/ANCHOR2_KEY_20260920.json",
  "n_rows": 60,
  "out_of_vocab": [],
  "axes": {

@@ -262,3 +262,16 @@
 > **Blocked-by-owner**: ruler version (GATE 4). **R3 is not config-only runnable** — the harness reads
 > key['rows'][*]['stored'] while the ANCHOR-1 key is an fb_id dict; a pre-registered adapter is needed.
 > Report: governance/FORENSIC_AUDIT_20260921b.md.
+
+<!-- s7-sync 2026-09-21 -->
+
+### Session 7 — 2026-09-21 (R3 held-out run)
+- [x] D-312 adapter: `bakeoff.active_source` + `bakeoff.sources.anchor1` + `bakeoff.arbitration` (config-first).
+- [x] **R3 held-out run** (57 scored of 58 pre-registered): incumbent 0.5088 | R3 0.5088 (0.00 pp) | R2 0.4286
+      at 75.4% queue | R4 0.5965 | constant floor 0.8421. **R3 REJECTED — do not adopt.**
+- [x] Truth-blinding leakage test (0 diffs / pairwise abstains) + R5 review recorded (with its insufficiency).
+- [x] BUG-328 CLOSED; BUG-332 FIXED; BUG-333/334/335 logged (333, 334 OPEN).
+- [ ] BUG-326 repair (403 raw->canonical, 147 both-axes, 703 no-domain): dry-run script + mechanical
+      verification required first (R5 is now known-degraded, BUG-333).
+- [ ] GATE 4: name the canonical ruler version (BUG-329) before ANY ruler re-measure.
+- [ ] Gates: laya-mlx benchmark-only install; abstention operating point t_low=p25; ratify R3 rejection.

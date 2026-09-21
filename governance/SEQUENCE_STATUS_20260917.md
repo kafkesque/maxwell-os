@@ -463,3 +463,17 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
 - **R3 is not config-only runnable**: the ANCHOR-1 key is an fb_id dict with pipeline labels while the
   harness reads `key['rows'][*]['stored']`; a pre-registered adapter (D-311 amendment) is required
   first, else the measurement is post-hoc and inadmissible under D-300.
+
+<!-- s7-sync 2026-09-21 -->
+
+### Session 7 update (2026-09-21) — gates and the R3 disposition
+- **R3 (step 5 of the session plan): DONE — REJECTED.** Held-out n=57 of the pre-registered 58: incumbent
+  0.5088, R3 0.5088 (0.00 pp), R2 0.4286 at a 75.4% human queue, R4 0.5965, constant floor 0.8421. The owner
+  gate is therefore reduced to an administrative ratification of D-314 (no adoption, no deploy change).
+- **HUMAN GATES — now THREE live + one administrative:**
+  1. laya-mlx install (benchmark-only, isolated venv, pinned revision) — unchanged.
+  2. abstention operating point `t_low = p25` (error 0.4231 at a ~25% queue; `enabled: false`) — unchanged.
+  3. **BUG-329 (HIGH): name the canonical ruler version** (freeze `4d0c856a` / HEAD `2d456720` / working
+     `38323192`). Nothing on the ruler may be re-measured before this; D-313 makes a freeze-time hash that
+     matches no repo version a fail-closed abort.
+  4. (administrative) ratify D-314 = R3 not adopted, D-311 closed as measured-rejected.

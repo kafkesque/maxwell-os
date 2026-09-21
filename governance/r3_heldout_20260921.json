@@ -1,0 +1,88 @@
+{
+ "n_scored": 57,
+ "incumbent_arm": "pairwise",
+ "challenger_arm": "qwen3coder",
+ "margin_scale": "percent_rank",
+ "rules": {
+  "r1": {
+   "kind": "incumbent_only",
+   "decided": 57,
+   "human_queue": 0,
+   "queue_rate": 0.0,
+   "errors": 29,
+   "error_rate": 0.5088,
+   "gain_vs_incumbent_pp": 0.0,
+   "passes_min_decided_ratio": true
+  },
+  "r2": {
+   "kind": "agree_accept_disagree_human_queue",
+   "decided": 14,
+   "human_queue": 43,
+   "queue_rate": 0.7544,
+   "errors": 6,
+   "error_rate": 0.4286,
+   "gain_vs_incumbent_pp": 8.02,
+   "passes_min_decided_ratio": false
+  },
+  "r3": {
+   "kind": "agree_accept_disagree_higher_margin",
+   "decided": 57,
+   "human_queue": 0,
+   "queue_rate": 0.0,
+   "errors": 29,
+   "error_rate": 0.5088,
+   "gain_vs_incumbent_pp": 0.0,
+   "passes_min_decided_ratio": true
+  },
+  "r4": {
+   "kind": "agree_accept_disagree_challenger_if_conf_at_least_floor",
+   "decided": 57,
+   "human_queue": 0,
+   "queue_rate": 0.0,
+   "errors": 34,
+   "error_rate": 0.5965,
+   "gain_vs_incumbent_pp": -8.77,
+   "passes_min_decided_ratio": true
+  }
+ },
+ "arm_error": {
+  "pairwise": {
+   "decided": 57,
+   "abstained": 0,
+   "abstain_rate": 0.0,
+   "errors": 29,
+   "error_rate": 0.5088,
+   "abstain_reasons": {}
+  },
+  "qwen3coder": {
+   "decided": 57,
+   "abstained": 0,
+   "abstain_rate": 0.0,
+   "errors": 34,
+   "error_rate": 0.5965,
+   "abstain_reasons": {}
+  }
+ },
+ "counts": {
+  "agree": 14,
+  "disagree": 43,
+  "both_wrong": 14,
+  "either_wrong": 49
+ },
+ "deploy_bar_pp": 5.0,
+ "verdicts": {
+  "r1": "REJECT",
+  "r2": "REJECT",
+  "r3": "REJECT",
+  "r4": "REJECT"
+ },
+ "evidence": {
+  "artifact": "governance/bakeoff_typed_decision_anchor1_20260921.json",
+  "artifact_sha256": "d56c3931858887fe083afc6dd0db4d211b7aff01ea059ad390c22756e2420696",
+  "sheet_sha256": "a91f9c859a998d4d27d7ce91939c4ccf4c23e3e9d20aa0cb34ccadcb294ee821",
+  "key_sha256": "20a4a437eab902fc703a210bad26b8d3220c7c2574852fb9b97b01baf567526c",
+  "allowlist_file": "governance/ANCHOR1_HELDOUT_SET_20260921.json",
+  "menu_hash": "73597ee2b1bb1eb92edb08e743ffa0654c1e5994edcd3535d814c7942a89df6f",
+  "command_line": "scripts/r3_heldout_eval.py"
+ }
+}

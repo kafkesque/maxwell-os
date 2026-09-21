@@ -501,3 +501,17 @@ per-slot κ → 5 lift BOUND / merge only if inseparable.
 - **NEW**: BUG-330 (stale assertion), BUG-331 (no R5 record for the gate write). `fbs` is one migration
   behind code (no `menu_hash`/`*_source` columns → D-279 stamps unwritten).
 - **Superseded**: BUG-314's "zero substantive label drift".
+
+<!-- s7-sync 2026-09-21 -->
+
+### Session 7 (2026-09-21) — R3 held-out result and what it supersedes
+- **`governance/R3_HELDOUT_RESULT_20260921.md`** is the authoritative R3 statement. It SUPERSEDES the
+  in-sample "+6.0 pp" claim in `governance/anchor1_arbitration_20260921.json` (derivation on 116 ruler rows,
+  now a historical record only) — read the held-out file before quoting any R3 number.
+- **`governance/FORENSIC_AUDIT_20260921c.md`** — session-7 audit: cross-source artifact merge hazard (fixed),
+  R5 rubber-stamp risk (BUG-333), effective-n hazard (BUG-334), plus the explicit negatives.
+- Config: label sources are now named objects (`bakeoff.active_source`, `bakeoff.sources.<name>`) and the R1-R4
+  rules live in `bakeoff.arbitration`; `scripts/r3_heldout_eval.py` is the scorer. `scripts/anchor1_arbitration.py`
+  is the superseded DERIVATION helper (its hardcoded arm names were a C12 claim-vs-code mismatch, audit F-05).
+- New bug numbers this session: BUG-332 (FIXED), BUG-333 (OPEN, R5 channel), BUG-334 (OPEN, effective n),
+  BUG-335 (FIXED). BUG-328 now CLOSED with evidence.

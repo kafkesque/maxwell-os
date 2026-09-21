@@ -1,0 +1,750 @@
+{
+ "schema_version": "1.0",
+ "source": "anchor1",
+ "sheet": "governance/ANCHOR1_BLIND_SHEET_20260920.csv",
+ "key": "governance/ANCHOR1_KEY_20260920.json",
+ "axis": "discipline",
+ "limit": 60,
+ "spec": {
+  "sheet": "governance/ANCHOR1_BLIND_SHEET_20260920.csv",
+  "key": "governance/ANCHOR1_KEY_20260920.json",
+  "key_shape": "by_fb_id",
+  "truth_from": "sheet",
+  "row_id_column": "fb_id",
+  "limit": 60,
+  "verdict_columns": {
+   "discipline": "discipline_verdict"
+  },
+  "key_stored_fields": {
+   "content_type": "pipeline_content_type",
+   "discipline": "pipeline_discipline"
+  },
+  "definition_column": "definition",
+  "name_column": "name",
+  "include_catch_all": true,
+  "normalize_through_menu": true,
+  "exclude_rows_without_truth": true,
+  "row_allowlist_file": "governance/ANCHOR1_HELDOUT_SET_20260921.json",
+  "row_allowlist_field": "heldout_fb_ids",
+  "output": "governance/bakeoff_typed_decision_anchor1_20260921.json",
+  "name": "anchor1",
+  "axis": "discipline"
+ },
+ "arms": {
+  "constant": {
+   "n": 57,
+   "abstained": 0,
+   "abstain_rate": 0.0,
+   "decided": 57,
+   "error_rate": 0.8421,
+   "errors": 48,
+   "predictions": {
+    "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489": [
+     "psychology",
+     1.0
+    ],
+    "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750": [
+     "psychology",
+     1.0
+    ],
+    "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8": [
+     "psychology",
+     1.0
+    ],
+    "461f5d7a21fdb23b72b837832c2e96dd50eb730085eb0c9a76ef96c0c52fbd37": [
+     "psychology",
+     1.0
+    ],
+    "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": [
+     "psychology",
+     1.0
+    ],
+    "26009aa582740cd49ed40f85ee922b7f51bf7a4e6dac69312b72aa2a380f259c": [
+     "psychology",
+     1.0
+    ],
+    "4eae9805b94e68d5cab26ba729a28b4a61a6187205fbc797006bd972b0fd5b7f": [
+     "psychology",
+     1.0
+    ],
+    "72188d315b0353d70f9bb0f73b6a4daf42781c07f058920119414a5d6bd940a1": [
+     "psychology",
+     1.0
+    ],
+    "a7902b32946e4cf909c1fa6c6ea111ca5966d55817ec8c0881b994ac7ad6e200": [
+     "psychology",
+     1.0
+    ],
+    "79bba415374aa526af77089d2c4b7409040fe2caae62f057f11d4d81c87b28ab": [
+     "psychology",
+     1.0
+    ],
+    "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473": [
+     "psychology",
+     1.0
+    ],
+    "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8": [
+     "psychology",
+     1.0
+    ],
+    "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618": [
+     "psychology",
+     1.0
+    ],
+    "64aa7982c9505fcc27e62581a50102e15ba0fc76bdce6c3b2113515b4db8a111": [
+     "psychology",
+     1.0
+    ],
+    "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": [
+     "psychology",
+     1.0
+    ],
+    "4b7708cc94d7716e2a9b637ea423cd3611de5ab363fc0e7ed0d05816e92d6fc4": [
+     "psychology",
+     1.0
+    ],
+    "f57e39b4a612a89945f01a5faf14ff539dadec6700858bf4d4330766946c204c": [
+     "psychology",
+     1.0
+    ],
+    "41237b4764eeeb445077c6f12c1a6d42a32dd8963b918572c6ba661b995dabee": [
+     "psychology",
+     1.0
+    ],
+    "5ffa5f5b1d75f7ee8a571ac58e384293415fd1ecf13bffc6419de7a5265c68a2": [
+     "psychology",
+     1.0
+    ],
+    "4c7ffef7152a371127987cd1cd00512d9703fcba907ff47f55f962442f8fe6ef": [
+     "psychology",
+     1.0
+    ],
+    "bda4b63ec9c6c9e9b06afac10ec45d6e6d7a4fee0b9e4a92317dfd63d4fa0cc9": [
+     "psychology",
+     1.0
+    ],
+    "fb726113259db56bd205137c43bacbf20b107f0269a5449fe6feb339bdc0e1a5": [
+     "psychology",
+     1.0
+    ],
+    "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8": [
+     "psychology",
+     1.0
+    ],
+    "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22": [
+     "psychology",
+     1.0
+    ],
+    "80cc1797ee047c2b5d5f888e1fb8db9048ca6188ef65b12b65c3b743da34fdb2": [
+     "psychology",
+     1.0
+    ],
+    "a4f29d3dc0819d32d348103e7fe7d9ec18a252caadb14e38bcd8b9ce4e0b30cc": [
+     "psychology",
+     1.0
+    ],
+    "1a5ea8517cf76b4206f97d79d41c697410bd3aaf68d801b545cc43ff5d408332": [
+     "psychology",
+     1.0
+    ],
+    "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910": [
+     "psychology",
+     1.0
+    ],
+    "402aadbc5ef550a117abe70cc0ead186c709dde7a42f2ecffc56da991e756a94": [
+     "psychology",
+     1.0
+    ],
+    "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2": [
+     "psychology",
+     1.0
+    ],
+    "301a0f4af27eadb4653811805a5e49f946c82f06966b66cf0045d839589a59a6": [
+     "psychology",
+     1.0
+    ],
+    "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513": [
+     "psychology",
+     1.0
+    ],
+    "97b0adf059e70efe24ca9896a025b41f1ceb6075bd80849f827fb51e0ee332d1": [
+     "psychology",
+     1.0
+    ],
+    "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d": [
+     "psychology",
+     1.0
+    ],
+    "fd273a01cf29ce644d5aaca7b5fcc2d8fa4b37605b71675b1a8f7eca714b9159": [
+     "psychology",
+     1.0
+    ],
+    "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f": [
+     "psychology",
+     1.0
+    ],
+    "318eed66dc6c314dbb6cd1fee3b1c77d4a9e483f4a9559a3b2d69be47f3457f6": [
+     "psychology",
+     1.0
+    ],
+    "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0": [
+     "psychology",
+     1.0
+    ],
+    "b52d1d379ae61cf873350b3aa82d971a09d2cc7de61dba7fd4d34d7534f50999": [
+     "psychology",
+     1.0
+    ],
+    "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1": [
+     "psychology",
+     1.0
+    ],
+    "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f": [
+     "psychology",
+     1.0
+    ],
+    "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d": [
+     "psychology",
+     1.0
+    ],
+    "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a": [
+     "psychology",
+     1.0
+    ],
+    "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4": [
+     "psychology",
+     1.0
+    ],
+    "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e": [
+     "psychology",
+     1.0
+    ],
+    "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e": [
+     "psychology",
+     1.0
+    ],
+    "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": [
+     "psychology",
+     1.0
+    ],
+    "f4bbc48fb5aa289050c4dfb9c7c38d27881eb4175d5f2f084111d5f9f2d1e0f0": [
+     "psychology",
+     1.0
+    ],
+    "89611938d68ce24b50765e10d58a96a28a61aa50ea5648c4b090b14d7ad895b0": [
+     "psychology",
+     1.0
+    ],
+    "0a03450c243e201ceb5c5d0206a554022606b10f03a28e45e3b317b50c64aee2": [
+     "psychology",
+     1.0
+    ],
+    "1c11f2c5273ad03d3900f6a959f37c54ad933c1a178603d6222798b844cf13e0": [
+     "psychology",
+     1.0
+    ],
+    "3682aa15cb7119faf1b71b725a5d6eb173553d659506b6b94198778668d7839b": [
+     "psychology",
+     1.0
+    ],
+    "d56d6ab49ba2b2ceb2b54467e1d6112fa61348e66fa3c22a3a2cc2dd19a0c587": [
+     "psychology",
+     1.0
+    ],
+    "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c": [
+     "psychology",
+     1.0
+    ],
+    "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2": [
+     "psychology",
+     1.0
+    ],
+    "17eb362bc1ff456ee8ae7c37709a5b3b387248599b8dae5bfc0a31fe5b70d706": [
+     "psychology",
+     1.0
+    ],
+    "c07895f800d3e4010c2fe651aa67c0f2641966505c47247427664e9288598d78": [
+     "psychology",
+     1.0
+    ]
+   }
+  },
+  "pairwise": {
+   "n": 57,
+   "abstained": 0,
+   "abstain_rate": 0.0,
+   "decided": 57,
+   "error_rate": 0.5088,
+   "errors": 29,
+   "predictions": {
+    "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489": [
+     "psychology",
+     0.0013
+    ],
+    "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750": [
+     "economics",
+     0.882
+    ],
+    "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8": [
+     "research methodology",
+     0.0354
+    ],
+    "461f5d7a21fdb23b72b837832c2e96dd50eb730085eb0c9a76ef96c0c52fbd37": [
+     "strategic thinking",
+     -0.2871
+    ],
+    "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": [
+     "strategic thinking",
+     -0.0005
+    ],
+    "26009aa582740cd49ed40f85ee922b7f51bf7a4e6dac69312b72aa2a380f259c": [
+     "cognitive science",
+     -0.0013
+    ],
+    "4eae9805b94e68d5cab26ba729a28b4a61a6187205fbc797006bd972b0fd5b7f": [
+     "psychology",
+     0.0037
+    ],
+    "72188d315b0353d70f9bb0f73b6a4daf42781c07f058920119414a5d6bd940a1": [
+     "cultural design",
+     -0.0155
+    ],
+    "a7902b32946e4cf909c1fa6c6ea111ca5966d55817ec8c0881b994ac7ad6e200": [
+     "risk management",
+     -0.0033
+    ],
+    "79bba415374aa526af77089d2c4b7409040fe2caae62f057f11d4d81c87b28ab": [
+     "strategic thinking",
+     0.0258
+    ],
+    "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473": [
+     "psychology",
+     0.001
+    ],
+    "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8": [
+     "communication theory",
+     0.015
+    ],
+    "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618": [
+     "research methodology",
+     0.796
+    ],
+    "64aa7982c9505fcc27e62581a50102e15ba0fc76bdce6c3b2113515b4db8a111": [
+     "economics",
+     0.9729
+    ],
+    "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": [
+     "emerging",
+     -0.4307
+    ],
+    "4b7708cc94d7716e2a9b637ea423cd3611de5ab363fc0e7ed0d05816e92d6fc4": [
+     "behavioral economics",
+     0.0007
+    ],
+    "f57e39b4a612a89945f01a5faf14ff539dadec6700858bf4d4330766946c204c": [
+     "emerging",
+     0.0182
+    ],
+    "41237b4764eeeb445077c6f12c1a6d42a32dd8963b918572c6ba661b995dabee": [
+     "psychology",
+     0.0032
+    ],
+    "5ffa5f5b1d75f7ee8a571ac58e384293415fd1ecf13bffc6419de7a5265c68a2": [
+     "computer graphics",
+     0.1427
+    ],
+    "4c7ffef7152a371127987cd1cd00512d9703fcba907ff47f55f962442f8fe6ef": [
+     "software engineering",
+     -0.0037
+    ],
+    "bda4b63ec9c6c9e9b06afac10ec45d6e6d7a4fee0b9e4a92317dfd63d4fa0cc9": [
+     "social network analysis",
+     0.0031
+    ],
+    "fb726113259db56bd205137c43bacbf20b107f0269a5449fe6feb339bdc0e1a5": [
+     "design thinking",
+     0.2272
+    ],
+    "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8": [
+     "human-computer interaction",
+     0.008
+    ],
+    "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22": [
+     "strategic thinking",
+     0.6197
+    ],
+    "80cc1797ee047c2b5d5f888e1fb8db9048ca6188ef65b12b65c3b743da34fdb2": [
+     "psychology",
+     -0.0014
+    ],
+    "a4f29d3dc0819d32d348103e7fe7d9ec18a252caadb14e38bcd8b9ce4e0b30cc": [
+     "behavioral economics",
+     0.0008
+    ],
+    "1a5ea8517cf76b4206f97d79d41c697410bd3aaf68d801b545cc43ff5d408332": [
+     "cultural design",
+     -0.0048
+    ],
+    "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910": [
+     "human-computer interaction",
+     -0.0345
+    ],
+    "402aadbc5ef550a117abe70cc0ead186c709dde7a42f2ecffc56da991e756a94": [
+     "economics",
+     0.7914
+    ],
+    "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2": [
+     "anthropology",
+     0.0038
+    ],
+    "301a0f4af27eadb4653811805a5e49f946c82f06966b66cf0045d839589a59a6": [
+     "design thinking",
+     0.0048
+    ],
+    "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513": [
+     "psychology",
+     0.0028
+    ],
+    "97b0adf059e70efe24ca9896a025b41f1ceb6075bd80849f827fb51e0ee332d1": [
+     "emerging",
+     -0.0049
+    ],
+    "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d": [
+     "research methodology",
+     0.3389
+    ],
+    "fd273a01cf29ce644d5aaca7b5fcc2d8fa4b37605b71675b1a8f7eca714b9159": [
+     "psychology",
+     0.0029
+    ],
+    "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f": [
+     "neuroscience",
+     0.0067
+    ],
+    "318eed66dc6c314dbb6cd1fee3b1c77d4a9e483f4a9559a3b2d69be47f3457f6": [
+     "computational physics & simulation",
+     -0.0026
+    ],
+    "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0": [
+     "creative process",
+     -0.3262
+    ],
+    "b52d1d379ae61cf873350b3aa82d971a09d2cc7de61dba7fd4d34d7534f50999": [
+     "human-computer interaction",
+     0.0013
+    ],
+    "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1": [
+     "economics",
+     0.5152
+    ],
+    "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f": [
+     "emerging",
+     0.2117
+    ],
+    "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d": [
+     "software engineering",
+     -0.0024
+    ],
+    "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a": [
+     "human-computer interaction",
+     0.0057
+    ],
+    "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4": [
+     "psychology",
+     0.0038
+    ],
+    "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e": [
+     "psychology",
+     0.0013
+    ],
+    "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e": [
+     "psychology",
+     0.0117
+    ],
+    "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": [
+     "strategic thinking",
+     0.0194
+    ],
+    "f4bbc48fb5aa289050c4dfb9c7c38d27881eb4175d5f2f084111d5f9f2d1e0f0": [
+     "neuroscience",
+     0.0041
+    ],
+    "89611938d68ce24b50765e10d58a96a28a61aa50ea5648c4b090b14d7ad895b0": [
+     "performing arts",
+     0.0666
+    ],
+    "0a03450c243e201ceb5c5d0206a554022606b10f03a28e45e3b317b50c64aee2": [
+     "human-computer interaction",
+     -0.0013
+    ],
+    "1c11f2c5273ad03d3900f6a959f37c54ad933c1a178603d6222798b844cf13e0": [
+     "psychology",
+     0.001
+    ],
+    "3682aa15cb7119faf1b71b725a5d6eb173553d659506b6b94198778668d7839b": [
+     "cultural design",
+     -0.0107
+    ],
+    "d56d6ab49ba2b2ceb2b54467e1d6112fa61348e66fa3c22a3a2cc2dd19a0c587": [
+     "finance",
+     0.1587
+    ],
+    "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c": [
+     "behavioral economics",
+     0.0002
+    ],
+    "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2": [
+     "health & medicine",
+     0.0636
+    ],
+    "17eb362bc1ff456ee8ae7c37709a5b3b387248599b8dae5bfc0a31fe5b70d706": [
+     "psychology",
+     -0.0011
+    ],
+    "c07895f800d3e4010c2fe651aa67c0f2641966505c47247427664e9288598d78": [
+     "psychology",
+     0.9426
+    ]
+   }
+  },
+  "qwen3coder": {
+   "n": 57,
+   "abstained": 0,
+   "abstain_rate": 0.0,
+   "decided": 57,
+   "error_rate": 0.5965,
+   "errors": 34,
+   "predictions": {
+    "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489": [
+     "cognitive science",
+     0.95
+    ],
+    "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750": [
+     "political economy",
+     0.95
+    ],
+    "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8": [
+     "cognitive science",
+     0.85
+    ],
+    "461f5d7a21fdb23b72b837832c2e96dd50eb730085eb0c9a76ef96c0c52fbd37": [
+     "organizational theory",
+     0.85
+    ],
+    "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": [
+     "strategic thinking",
+     0.9
+    ],
+    "26009aa582740cd49ed40f85ee922b7f51bf7a4e6dac69312b72aa2a380f259c": [
+     "design psychology",
+     0.85
+    ],
+    "4eae9805b94e68d5cab26ba729a28b4a61a6187205fbc797006bd972b0fd5b7f": [
+     "cognitive science",
+     0.95
+    ],
+    "72188d315b0353d70f9bb0f73b6a4daf42781c07f058920119414a5d6bd940a1": [
+     "aesthetics",
+     0.85
+    ],
+    "a7902b32946e4cf909c1fa6c6ea111ca5966d55817ec8c0881b994ac7ad6e200": [
+     "interdisciplinary studies",
+     0.8
+    ],
+    "79bba415374aa526af77089d2c4b7409040fe2caae62f057f11d4d81c87b28ab": [
+     "strategic thinking",
+     0.85
+    ],
+    "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473": [
+     "sociology",
+     0.9
+    ],
+    "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8": [
+     "visual semiotics",
+     0.7
+    ],
+    "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618": [
+     "cognitive science",
+     0.85
+    ],
+    "64aa7982c9505fcc27e62581a50102e15ba0fc76bdce6c3b2113515b4db8a111": [
+     "political economy",
+     0.85
+    ],
+    "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": [
+     "cultural design",
+     0.85
+    ],
+    "4b7708cc94d7716e2a9b637ea423cd3611de5ab363fc0e7ed0d05816e92d6fc4": [
+     "research methodology",
+     0.9
+    ],
+    "f57e39b4a612a89945f01a5faf14ff539dadec6700858bf4d4330766946c204c": [
+     "organizational theory",
+     0.7
+    ],
+    "41237b4764eeeb445077c6f12c1a6d42a32dd8963b918572c6ba661b995dabee": [
+     "creative process",
+     0.85
+    ],
+    "5ffa5f5b1d75f7ee8a571ac58e384293415fd1ecf13bffc6419de7a5265c68a2": [
+     "computer graphics",
+     0.95
+    ],
+    "4c7ffef7152a371127987cd1cd00512d9703fcba907ff47f55f962442f8fe6ef": [
+     "systems thinking",
+     0.85
+    ],
+    "bda4b63ec9c6c9e9b06afac10ec45d6e6d7a4fee0b9e4a92317dfd63d4fa0cc9": [
+     "organizational theory",
+     0.7
+    ],
+    "fb726113259db56bd205137c43bacbf20b107f0269a5449fe6feb339bdc0e1a5": [
+     "design thinking",
+     0.95
+    ],
+    "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8": [
+     "artificial intelligence",
+     0.9
+    ],
+    "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22": [
+     "strategic thinking",
+     0.9
+    ],
+    "80cc1797ee047c2b5d5f888e1fb8db9048ca6188ef65b12b65c3b743da34fdb2": [
+     "visual semiotics",
+     0.95
+    ],
+    "a4f29d3dc0819d32d348103e7fe7d9ec18a252caadb14e38bcd8b9ce4e0b30cc": [
+     "behavioral economics",
+     0.85
+    ],
+    "1a5ea8517cf76b4206f97d79d41c697410bd3aaf68d801b545cc43ff5d408332": [
+     "design thinking",
+     0.85
+    ],
+    "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910": [
+     "cultural design",
+     0.85
+    ],
+    "402aadbc5ef550a117abe70cc0ead186c709dde7a42f2ecffc56da991e756a94": [
+     "economics",
+     0.95
+    ],
+    "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2": [
+     "cultural studies",
+     0.95
+    ],
+    "301a0f4af27eadb4653811805a5e49f946c82f06966b66cf0045d839589a59a6": [
+     "design thinking",
+     0.85
+    ],
+    "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513": [
+     "sociology",
+     0.9
+    ],
+    "97b0adf059e70efe24ca9896a025b41f1ceb6075bd80849f827fb51e0ee332d1": [
+     "behavioral economics",
+     0.85
+    ],
+    "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d": [
+     "research methodology",
+     0.9
+    ],
+    "fd273a01cf29ce644d5aaca7b5fcc2d8fa4b37605b71675b1a8f7eca714b9159": [
+     "design psychology",
+     0.9
+    ],
+    "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f": [
+     "cognitive science",
+     0.95
+    ],
+    "318eed66dc6c314dbb6cd1fee3b1c77d4a9e483f4a9559a3b2d69be47f3457f6": [
+     "computational theory",
+     0.9
+    ],
+    "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0": [
+     "design thinking",
+     0.95
+    ],
+    "b52d1d379ae61cf873350b3aa82d971a09d2cc7de61dba7fd4d34d7534f50999": [
+     "motion & time",
+     0.95
+    ],
+    "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1": [
+     "finance",
+     0.95
+    ],
+    "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f": [
+     "cultural studies",
+     0.9
+    ],
+    "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d": [
+     "artificial intelligence",
+     0.95
+    ],
+    "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a": [
+     "design thinking",
+     0.9
+    ],
+    "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4": [
+     "visual perception",
+     0.9
+    ],
+    "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e": [
+     "behavioral economics",
+     0.85
+    ],
+    "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e": [
+     "psychology",
+     0.85
+    ],
+    "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": [
+     "strategic thinking",
+     0.85
+    ],
+    "f4bbc48fb5aa289050c4dfb9c7c38d27881eb4175d5f2f084111d5f9f2d1e0f0": [
+     "health & medicine",
+     0.9
+    ],
+    "89611938d68ce24b50765e10d58a96a28a61aa50ea5648c4b090b14d7ad895b0": [
+     "media studies",
+     0.85
+    ],
+    "0a03450c243e201ceb5c5d0206a554022606b10f03a28e45e3b317b50c64aee2": [
+     "design thinking",
+     0.95
+    ],
+    "1c11f2c5273ad03d3900f6a959f37c54ad933c1a178603d6222798b844cf13e0": [
+     "psychology",
+     0.85
+    ],
+    "3682aa15cb7119faf1b71b725a5d6eb173553d659506b6b94198778668d7839b": [
+     "interdisciplinary studies",
+     0.85
+    ],
+    "d56d6ab49ba2b2ceb2b54467e1d6112fa61348e66fa3c22a3a2cc2dd19a0c587": [
+     "finance",
+     0.95
+    ],
+    "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c": [
+     "design psychology",
+     0.85
+    ],
+    "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2": [
+     "psychology",
+     0.85
+    ],
+    "17eb362bc1ff456ee8ae7c37709a5b3b387248599b8dae5bfc0a31fe5b70d706": [
+     "cognitive science",
+     0.9
+    ],
+    "c07895f800d3e4010c2fe651aa67c0f2641966505c47247427664e9288598d78": [
+     "psychology",
+     0.9
+    ]
+   }
+  }
+ },
+ "menu_hash": "73597ee2b1bb1eb92edb08e743ffa0654c1e5994edcd3535d814c7942a89df6f"
+}

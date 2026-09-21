@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 680
+total_decisions: 681
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7135,8 +7135,32 @@ decisions:
   - governance/FORENSIC_AUDIT_20260921b.md
   - governance/buglog.md
 
+- id: D314
+  category: EVALS
+  state: RESOLVED
+  date: '2026-09-21'
+  title: >-
+    R3 arbitration REJECTED on held-out data: the +6.0 pp in-sample gain does not replicate (0.00 pp at equal abstention)
+  decision: >-
+    R3 (agree -> accept, disagree -> higher-margin arm) was derived on 116 human-labelled ruler rows, where it
+    gained ~6 pp over the incumbent pairwise verifier. Scored on the 58-row pre-registered held-out set (D311,
+    n_scored=57) it gains 0.00 pp at equal abstention (error 0.5088 = the incumbent exactly), because the two
+    arms agree on only 24.6% of rows and the tie-break resolves to the incumbent. R2 (disagree -> human queue)
+    reaches 0.4286 but only by queueing 75.4% of rows, which violates the D-300 equal-or-lower-abstention
+    clause; R4 is worse than the incumbent (-8.77 pp). NOT adopted: the incumbent pairwise verifier,
+    serving_gate as the single deploy gate, and the disabled abstention operating point all remain unchanged.
+  evidence: >-
+    governance/R3_HELDOUT_RESULT_20260921.md ; governance/r3_heldout_20260921.json ;
+    governance/bakeoff_typed_decision_anchor1_20260921.json ; governance/R5_REVIEW_R3_ADAPTER_20260921.md ;
+    truth-blinding test 0 label diffs over 12 rows, pairwise abstains without the stored label
+  supersedes_note: >-
+    D311 stays PROPOSED; its pre-registered run has now happened and the answer is REJECT. Owner ratification
+    of this closure is administrative (gate 4).
+  rule_added: >-
+    D312: a label source is a config object (bakeoff.active_source + bakeoff.sources.<name>); a bake-off
+    artifact is never merged across sources, and the artifact carries source + spec + menu_hash (BUG-332).
 summary:
-  total: 680
+  total: 681
   proposed: 6
   draft: 1
   active: 483
@@ -7145,7 +7169,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 117
+  resolved: 118
   planned: 8
   ratified: 1
   open: 17
@@ -7189,6 +7213,7 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
+    EVALS: 1
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21

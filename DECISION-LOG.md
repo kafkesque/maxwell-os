@@ -234,3 +234,13 @@ Phase 0 DONE: `defaults write com.electron.goose NSWindowOcclusionDetectionEnabl
 | D-312 | PROPOSED | **Calibrated abstention designed, not enabled.** margin -> t_low (abstain to repair queue) / t_high (accept + flag); measured incumbent curve 0.474 -> 0.423 -> 0.391 -> 0.328 is monotone but role-specific (flat in the zero-shot role). `config/verify_abstention.yaml` ships `enabled: false` and is read by no production code - stage5_verify stays fail-closed (D-2298), zero behaviour change. |
 
 | D-313 | RESOLVED | **Frozen-artifact provenance rule + BUG-328 landing** — an artifact grounding a published number must be committed and cited by sha256; a freeze-time hash matching no repo version is a FAIL-CLOSED abort (BUG-329: ruler v0 `4d0c856a` lost / HEAD `2d456720` / working `38323192`, substantive drift 41 CT / 7 DISC / 62 FORM cells — BUG-314 corrected). Landed the reviewed G19/D274h + R1/D-279 + D275b/D282/D283 + D-291/D-293 set (audit: py_compile clean, 200/201 tests, gate dry-run 0/7,995 writes, menu_hash match). New: BUG-330, BUG-331. |
+
+<!-- s7-sync 2026-09-21 -->
+
+### D-314 (RESOLVED, 2026-09-21) — R3 arbitration REJECTED on held-out data
+The R3 combine rule (+6.0 pp in-sample) gains **0.00 pp** on the pre-registered 58-row held-out set
+(n_scored=57) at equal abstention; R2 clears the error bar only by queueing 75.4% of rows (violates the D-300
+abstention clause); R4 is −8.77 pp. **Not adopted** — incumbent pairwise verifier and `serving_gate` unchanged.
+Evidence: `governance/R3_HELDOUT_RESULT_20260921.md`, `governance/r3_heldout_20260921.json`,
+`governance/R5_REVIEW_R3_ADAPTER_20260921.md`. D-311 stays PROPOSED (its run happened; the answer is REJECT).
+Also D-312: label sources are config objects and bake-off artifacts never merge across sources (BUG-332).

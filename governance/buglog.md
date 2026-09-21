@@ -1768,7 +1768,7 @@ calibrated-abstention curve was therefore re-derived from the frozen artifact wi
 the artifact shape before declaring a signal missing - this is the second false "missing signal" claim this session
 (the first was the assignment claim, D-310). Both are now recorded as process bugs.
 
-## BUG-328 (HIGH - OPEN 2026-09-21): 18 production/script files are modified-but-UNCOMMITTED vs HEAD (silent-revert risk)
+## BUG-328 (HIGH - CLOSED 2026-09-21, landed 32cb9fa): 18 production/script files were modified-but-UNCOMMITTED vs HEAD (silent-revert risk)
 `git diff --stat HEAD -- pipeline/ tools/ scripts/` = 18 files, 418 insertions / 193 deletions, none of it committed:
 pipeline/retrieve.py (+167), pipeline/schemas.py (+117), pipeline/stage6_commit.py (+36), pipeline/stage4_merge.py (+21),
 pipeline/stage5_verify.py (+15), pipeline/backup_guardian.sh, scripts/repass_pair_agreed.py, the apply_* relabel scripts, ...
@@ -1843,3 +1843,39 @@ artifact — the strongest available evidence is post-hoc (the 0-change dry-run 
 in this audit). Retrofit the review (gemma-4-E4B, D2549 routing) and record the verdict in
 `governance/serving_gate_20260919.md`. No data risk identified: the rule is idempotent and its output
 is exactly the stored state.
+
+<!-- s7-sync 2026-09-21 -->
+
+## BUG-328 — CLOSURE EVIDENCE (2026-09-21, session 7)
+Landed in `32cb9fa` (18 modified + 2 new modules + configs + tests). Closure evidence, all re-run after the
+landing: (1) `scripts/apply_serving_gate.py` dry-run over all 7,995 rows writes **0** rows and reproduces the
+stored PASS 3299 / QUARANTINE 4696 exactly; (2) row-level re-derivation of `s5_reason` matches the DB;
+(3) `menu_hash` from code == the frozen `config/closed_menu_v5.sha256`; (4) `pytest`: 200 passed / 1 pre-existing
+failure (BUG-330); (5) `pipeline/` diff vs HEAD is now empty. An OPEN HIGH that is actually landed is worse
+than no entry: it hides the next genuine HIGH.
+
+## BUG-332 (LOW - FIXED 2026-09-21, found by audit F-01): the bake-off artifact merge did not check the SOURCE
+The BUG-323 "merge at write" fix kept previously measured arms, but never checked that they came from the same
+label SOURCE. The first ANCHOR-1 (R3 held-out) run would therefore have merged the ruler arms into the held-out
+artifact — silent provenance contamination of a number used for a deploy decision. Fix: the artifact now
+carries `source` + the full resolved `spec` + `menu_hash`, and a merge whose `source` differs is refused with a
+warning (no silent cross-source mixing). Verified by re-running `--arm constant` on both sources.
+
+## BUG-333 (MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp
+Asked to review the R3 adapter adversarially, the model answered in the exact requested format while replying
+"yes" to inverted-polarity questions ("any way to widen the row set silently?" -> ROW_SET: yes) and `NONE` to
+every blocker line. A pro-forma review would have "closed" a HIGH-severity gate (see also BUG-331). Standing
+rule adopted: **R5 evidence for a measurement adapter must include a MECHANICAL channel** (here: a
+truth-blinding re-run), and an LLM review that answers a polarity question without evidence must be recorded
+as INSUFFICIENT, not as a pass. Fix path: add a polarity-consistency check to `scripts/r5_review_*.py` prompt
+scaffolding (ask for a quoted line per answer) and re-review BUG-331 under the new rule.
+
+## BUG-334 (MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n
+D-311 pre-registered 58 held-out rows; one of them (sheet row 15, fb_id `38c529d5…`) carries an EMPTY human
+verdict, so the measurable set is n_scored = 57. Every published statement must declare the effective n, or
+the denominator silently flatters the result. Guard: `bakeoff.sources.<name>.exclude_rows_without_truth` now
+makes the drop explicit and the loader PRINTS `truth=` / `unlabelled_excluded=` on every run.
+
+## BUG-335 (LOW - FIXED 2026-09-21, audit F-04): a lost comment line in config/eval_integrity.yaml
+The per-pair scoring note ("padded forward batches (per-pair scoring was ~1 s/pair)") had been glued onto the
+`abstain_sweep` key instead of `nli_batch_size` by an earlier careless edit. Comment restored where it belongs.

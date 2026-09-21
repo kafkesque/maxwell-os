@@ -572,3 +572,13 @@ and the `.venv_laya` sandbox as declared.
 **Still not done, by design:** nothing wired into the S4 classifier prompt yet; items 17-23 and 25 of Part B
 are silently accepted unless rejected; Part C (adopt `default_home` + escape instead of per-pair name rules)
 is still unanswered.
+
+### Session 13c — Part C ruled (2026-09-21 22:1xZ)
+
+Owner: ratifications (a)(b) accepted; **Part B items 17-23 and 25 ACCEPTED**; **Part C ruled in favour of the
+recommendation** — `default_home` + named escape condition is the discriminator of record, per-pair NAME rules
+only where the object test converges. laya: owner accepts the Phase A/B recommendation (Phase B held on F-11).
+Abstention `t_low=p25` and G1/G5 ratified as recommended.
+
+Owner gates remaining: none blocking the next step. Step 1 (wire the ruled boundaries into the S4 prompt and
+measure on the frozen ruler) is now UNBLOCKED and is the only step that can move emission coverage.

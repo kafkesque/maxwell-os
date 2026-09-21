@@ -2371,3 +2371,8 @@ config still ships `enabled: false` and no production code reads it.
 menu was not touched. The *taxonomy* sha256 moved only because of BUG-357. Artifacts that cite the old
 `8d3c90e9…` remain historically accurate for the day they were written (D-318/D-315: a provenance stamp is
 not retro-editable); new artifacts must cite `994e056b…` + `taxonomy_version v5.6`.
+
+## NOTE (session 13c): Part C ruled — `default_home` + escape is the discriminator of record
+
+Part B items 17-23 and 25 accepted; items 24/26 remain REJECTED and superseded by 24'/26' (definition-anchored,
+now backed by the v5.6 BE definition, D-321). Nothing wired into the prompt yet.

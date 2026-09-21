@@ -53,6 +53,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
     VERIFY_REASONING_OFF_PREFIX,
 )
 from pipeline.omlx_call import call_omlx  # noqa: E402
+from pipeline.serving_gate import derive_status  # noqa: E402  D274h: single status rule
 from pipeline.schemas import (  # noqa: E402
     CANONICAL_DISCIPLINES,
     CANONICAL_DOMAINS,
@@ -365,7 +366,7 @@ def _verify_s5(fb: dict) -> dict:
     if not enrich_passed:
         results.append({"check_name": "enrichment_quality", "passed": enrich_passed, "score": enrich_score, "detail": enrich_detail})
 
-    status = "PASS" if fact_passed else "QUARANTINE"
+    status, s5_reason = derive_status(results)  # D274h: the single serving-gate rule
     needs_human = False
 
     isor = isor_score(fb)
@@ -386,6 +387,7 @@ def _verify_s5(fb: dict) -> dict:
     vfb["verification_results"] = results
     vfb["confidence_score"] = confidence_score
     vfb["status"] = status
+    vfb["s5_reason"] = s5_reason
     vfb["needs_human_review"] = needs_human
     vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold 0.10)"
     vfb["verification_method"] = method

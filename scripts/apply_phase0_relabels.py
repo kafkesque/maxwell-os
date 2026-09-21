@@ -10,7 +10,10 @@ out of the principle index in `knowledge pipeline/maxwell.db`:
 
     content_type: 'principle' -> voted non-principle value   (demote out of principle index)
     depth:        (any)         -> ''                        (depth is principle-only, BUG-242/D2612)
-    status:       (any)         -> 'QUARANTINE'              (stop serving mislabeled noise; fail-closed)
+
+    NOTE (D274a): status is NOT written here. Serving eligibility is governed by
+    the verification record (scripts/apply_serving_gate.py); a label-derived
+    status write is a hard error.
 
 Safety:
   - C13: backs up the DB to maxwell.db.bak_<ts>_pre_phase0_relabel BEFORE any write.
@@ -84,7 +87,7 @@ def _plan(targets: list[dict]) -> list[dict]:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
-        "SELECT fb_id, content_type, depth, status FROM fbs"
+        "SELECT fb_id, content_type, depth FROM fbs"
     ).fetchall()
     db = {r["fb_id"]: dict(r) for r in rows}
     conn.close()
@@ -97,7 +100,7 @@ def _plan(targets: list[dict]) -> list[dict]:
         if cur is None:
             skipped_missing += 1
             continue
-        if cur["content_type"] == t["content_type"] and cur["depth"] == "" and cur["status"] == "QUARANTINE":
+        if cur["content_type"] == t["content_type"] and cur["depth"] == "":
             skipped_already += 1
             continue
         changes.append({
@@ -106,8 +109,6 @@ def _plan(targets: list[dict]) -> list[dict]:
             "new_content_type": t["content_type"],
             "old_depth": cur["depth"],
             "new_depth": "",
-            "old_status": cur["status"],
-            "new_status": "QUARANTINE",
         })
     return changes, skipped_missing, skipped_already
 
@@ -130,8 +131,8 @@ def _apply(changes: list[dict]) -> None:
         conn.execute("BEGIN IMMEDIATE")
         for c in changes:
             conn.execute(
-                "UPDATE fbs SET content_type=?, depth=?, status=? WHERE fb_id=?",
-                (c["new_content_type"], "", "QUARANTINE", c["fb_id"]),
+                "UPDATE fbs SET content_type=?, depth=? WHERE fb_id=?",
+                (c["new_content_type"], "", c["fb_id"]),
             )
         conn.commit()
     except Exception as e:
@@ -173,7 +174,7 @@ def main(argv: list[str]) -> int:
 
     print(f"🧭 Phase 0 relabel (D2616) — vote-confirmed non-principle demotion")
     print(f"   checkpoint targets (non-principle, unanimous): {len(targets)}")
-    print(f"   → to apply (content_type/depth/status change):   {len(changes)}")
+    print(f"   → to apply (content_type/depth change):          {len(changes)}")
     print(f"   → skipped (missing from DB):                     {skipped_missing}")
     print(f"   → skipped (already demoted, idempotent):         {skipped_already}")
 
@@ -183,9 +184,7 @@ def main(argv: list[str]) -> int:
 
     from collections import Counter
     ct = Counter(c["new_content_type"] for c in changes)
-    st = Counter(c["old_status"] for c in changes)
     print(f"   new content_type distribution: {dict(ct)}")
-    print(f"   old status distribution:       {dict(st)}")
 
     if not args.apply:
         print("\n   (dry-run) pass --apply to back up + write.")

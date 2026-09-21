@@ -60,7 +60,7 @@ K_DISCIPLINE: int = 4   # single-label axis → few candidates
 K_DOMAIN: int = 8       # multi-label axis → more headroom
 
 CONTENT_TYPE_RULES = """CONTENT-TYPE (5 roles + 2 dispositions):
-- principle: general truth / reusable rule. A SINGLE transferable prescriptive claim (one-sentence heuristic acting as a filter across 3+ domains, OR a deep single-domain principle) is principle.
+- principle: general truth / reusable rule. A SINGLE transferable prescriptive claim (a self-contained heuristic at ANY scope — depth is the separate axis, never a role test) is principle.
 - process_template: step-by-step method — needs a SEQUENCE of >=2 steps AND a gate/done-condition. A single instruction is NOT a template.
 - process_instance: a specific NAMED case / execution of a method (a study, project, product).
 - growth_edge: open / unproven / speculative or a loose correlation (an articulated open tension, not a dump for failed depth-tests).

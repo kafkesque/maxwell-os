@@ -1010,7 +1010,7 @@ _CONTENT_TYPE_RULES_TEXT: str = (
     "  - tool/software-specific single step → tool_instruction.\n"
     "  - a transferable single-sentence prescriptive claim (a heuristic) → PRINCIPLE (NOT process_template); extraction_type stays normative_heuristic.\n"
     "  - a step that only makes sense inside a larger method → an inline step of a process_template, never a standalone object.\n"
-    "INSTRUCTION-vs-PRINCIPLE (Q3): a single prescriptive claim is a PRINCIPLE if it is a transferable heuristic — do NOT auto-assign process_template just because the text prescribes (\"do X\"). Acting as a filter across 3+ domains is strong POSITIVE evidence of a principle, NOT a hard requirement; a deep single-domain principle is still a principle.\n"
+    "INSTRUCTION-vs-PRINCIPLE (Q3): a single prescriptive claim is a PRINCIPLE if it is a self-contained transferable heuristic — do NOT auto-assign process_template just because the text prescribes (\"do X\"). Transferability (scope) is the separate DEPTH axis, never a role test: a deep single-domain or specialized principle is still a principle.\n"
     "DECISION MATRIX (Q2): a decision matrix is NEVER a standalone content type. A specific scoring grid = inline content in a process_template's gate; a reusable matrix methodology = principle (or process_template only if it is an executable multi-step procedure)."
 )
 

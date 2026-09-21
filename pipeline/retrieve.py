@@ -120,8 +120,71 @@ def _rank_sql() -> str:
     )
 
 
+def _facet_conditions(
+    domain: str = None,
+    discipline: str = None,
+    depth: str = None,
+    discipline_raw: str = None,
+    domains_raw: str = None,
+    alias: str = "",
+) -> tuple[list[str], list]:
+    """D273a/G12: the facet predicate as a SHARED SQL clause, used by EVERY leg.
+
+    A facet that is not asserted on every candidate generator is not a filter
+    (standing rule). This builds the exact same conditions (and params) for the
+    FTS, vector and keyword legs so a facet-bearing query is answered only by
+    rows that actually match the facet. `alias` qualifies the column names for
+    joined queries (e.g. ``alias="f."``).
+    """
+    conds: list[str] = []
+    params: list = []
+    if discipline:
+        conds.append(f"{alias}discipline = ?")
+        params.append(discipline)
+    if domain:
+        conds.append(f"{alias}domains LIKE ?")
+        params.append(f"%{domain}%")
+    if depth:
+        conds.append(f"{alias}depth = ?")
+        params.append(depth)
+    if discipline_raw:
+        conds.append(f"LOWER(TRIM({alias}discipline_raw)) = LOWER(?)")
+        params.append(discipline_raw)
+    if domains_raw:
+        conds.append(f"{alias}domains_raw LIKE ?")
+        params.append(f"%{domains_raw}%")
+    return conds, params
+
+
+def _matches_facet(
+    fb: dict,
+    domain: str = None,
+    discipline: str = None,
+    depth: str = None,
+    discipline_raw: str = None,
+    domains_raw: str = None,
+) -> bool:
+    """Post-filter assertion: a candidate matches the facet (mirrors _facet_conditions).
+
+    D273a/G12: the facet is ALSO asserted on the fused pool, so a violator can
+    never be promoted by RRF fusion or rerank.
+    """
+    if discipline and fb.get("discipline") != discipline:
+        return False
+    if domain and domain not in (fb.get("domains") or ""):
+        return False
+    if depth and fb.get("depth") != depth:
+        return False
+    if discipline_raw and (fb.get("discipline_raw") or "").strip().lower() != discipline_raw.strip().lower():
+        return False
+    if domains_raw and domains_raw not in (fb.get("domains_raw") or ""):
+        return False
+    return True
+
+
 def search_keyword(
     conn: sqlite3.Connection,
+    query: str = None,
     domain: str = None,
     discipline: str = None,
     depth: str = None,
@@ -152,22 +215,20 @@ def search_keyword(
         params.append(status)
     if has_class_status:
         conditions.append("(classification_status IS NULL OR classification_status != 'FAILED')")
-    if domain:
-        conditions.append("domains LIKE ?")
-        params.append(f"%{domain}%")
-    if discipline:
-        conditions.append("discipline = ?")
-        params.append(discipline)
-    if depth:
-        conditions.append("depth = ?")
-        params.append(depth)
-    # D2537: raw-label facets (surgical precision — finer grain than canonical buckets)
-    if discipline_raw:
-        conditions.append("LOWER(TRIM(discipline_raw)) = LOWER(?)")
-        params.append(discipline_raw)
-    if domains_raw:
-        conditions.append("domains_raw LIKE ?")
-        params.append(f"%{domains_raw}%")
+    # D273a/G12: shared facet predicate (exact discipline / depth, substring domain).
+    facet_conds, facet_params = _facet_conditions(
+        domain=domain, discipline=discipline, depth=depth,
+        discipline_raw=discipline_raw, domains_raw=domains_raw,
+    )
+    conditions.extend(facet_conds)
+    params.extend(facet_params)
+    # D273a/G12: the keyword leg is now QUERY-AWARE — it must also match the query
+    # text, not just the facet (previously it returned facet rows in insertion
+    # order with no relevance to the query, polluting the RRF fusion).
+    if query:
+        like = f"%{query}%"
+        conditions.append("(name LIKE ? OR definition LIKE ? OR keywords LIKE ?)")
+        params.extend([like, like, like])
     if exclude_summaries and has_is_summary:
         conditions.append("(is_summary = 0 OR is_summary IS NULL)")
 
@@ -200,8 +261,16 @@ def _fts_query(query: str) -> str:
 
 def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
              exclude_summaries: bool = True,
-             include_quarantine: bool = False) -> list[dict]:
+             include_quarantine: bool = False,
+             domain: str = None,
+             discipline: str = None,
+             depth: str = None,
+             discipline_raw: str = None,
+             domains_raw: str = None) -> list[dict]:
     """Full-text search on name, definition, keywords. Column-aware.
+
+    D273a/G12: accepts the same facet params as the other legs and asserts the
+    facet predicate in BOTH the FTS5 and the LIKE-fallback paths.
 
     D2330: defaults to status='PASS' — quarantined FBs are never surfaced by
     default; pass include_quarantine=True to include them.
@@ -216,6 +285,11 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     status_f: str = f"AND f.{_status_predicate(include_quarantine)}"
     summary_f: str = "AND (f.is_summary = 0 OR f.is_summary IS NULL)" if has_is_summary else ""
     class_f: str = "AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')" if has_class_status else ""
+    facet_conds, facet_params = _facet_conditions(
+        domain=domain, discipline=discipline, depth=depth,
+        discipline_raw=discipline_raw, domains_raw=domains_raw, alias="f.",
+    )
+    facet_f: str = "".join(f"AND {c} " for c in facet_conds)
 
     try:
         rows = conn.execute(f"""
@@ -223,11 +297,12 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
             JOIN fbs_fts ft ON f.rowid = ft.rowid
             WHERE fbs_fts MATCH ?
               {status_f}
+              {facet_f}
               {summary_f}
               {class_f}
             ORDER BY rank
             LIMIT ?
-        """, (_fts_query(query), limit)).fetchall()
+        """, (_fts_query(query), *facet_params, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
     except sqlite3.OperationalError as e:
         # FTS5 may not be available — fall back to LIKE.
@@ -238,15 +313,21 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
         like_status: str = f"AND {_status_predicate(include_quarantine)}"
         like_summary: str = "AND (is_summary = 0 OR is_summary IS NULL)" if (has_is_summary and exclude_summaries) else ""
         like_class: str = "AND (classification_status IS NULL OR classification_status != 'FAILED')" if has_class_status else ""
+        like_facet_conds, like_facet_params = _facet_conditions(
+            domain=domain, discipline=discipline, depth=depth,
+            discipline_raw=discipline_raw, domains_raw=domains_raw,
+        )
+        like_facet_f: str = "".join(f"AND {c} " for c in like_facet_conds)
         rows = conn.execute(f"""
             SELECT * FROM fbs
             WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
               {like_status}
+              {like_facet_f}
               {like_summary}
               {like_class}
             ORDER BY {_rank_sql()}
             LIMIT ?
-        """, (like_query, like_query, like_query, limit)).fetchall()
+        """, (like_query, like_query, like_query, *like_facet_params, limit)).fetchall()
         return [_row_to_dict(r) for r in rows]
 
 
@@ -256,6 +337,11 @@ def search_vector(
     limit: int = 20,
     include_quarantine: bool = False,
     vec_table: str = "vec_fbs",
+    domain: str = None,
+    discipline: str = None,
+    depth: str = None,
+    discipline_raw: str = None,
+    domains_raw: str = None,
 ) -> list[dict]:
     """Vector similarity search using pre-computed sqlite-vec embeddings.
 
@@ -289,7 +375,16 @@ def search_vector(
         # JOIN, and OVERSAMPLE (`k = limit*5`, floor 100) because the KNN top-k
         # is computed BEFORE the status filter and QUARANTINE dominates the
         # corpus (58%) — filtering top-k=limit directly starves PASS to 0.
-        knn_k = max(limit * 5, 100)
+        # D273a/G12: when a facet is present, oversample MORE — the KNN top-k is
+        # computed BEFORE the facet/status filters, so a rare facet starves the
+        # candidate pool otherwise (same reason the status filter oversamples).
+        has_facet = bool(domain or discipline or depth or discipline_raw or domains_raw)
+        knn_k = max(limit * (15 if has_facet else 5), 200 if has_facet else 100)
+        facet_conds, facet_params = _facet_conditions(
+            domain=domain, discipline=discipline, depth=depth,
+            discipline_raw=discipline_raw, domains_raw=domains_raw, alias="f.",
+        )
+        facet_f: str = "".join(f"AND {c} " for c in facet_conds)
         # C12/D2511: vec_table is a caller-supplied identifier (validated, not
         # user-freeform) — sqlite-vec table names cannot be parameterized, and
         # f-string interpolation is safe here because vec_table is an internal
@@ -305,9 +400,10 @@ def search_vector(
                 ) v
                 JOIN fbs f ON f.rowid = v.rowid
                 WHERE f.{_status_predicate(include_quarantine)}
+                  {facet_f}
                 ORDER BY v.distance
                 LIMIT ?
-            """, (query_blob, limit)).fetchall()
+            """, (query_blob, *facet_params, limit)).fetchall()
 
             if rows:
                 return [_row_to_dict(r) for r in rows]
@@ -355,19 +451,30 @@ def search_hybrid(
     RRF_K: int = 60  # RRF constant — higher = smoother rank blending
     POOL_SIZE: int = min(limit * 5, 100)  # Candidate pool per method
 
-    # 1. Collect ranked candidates from all three methods (D2330: quarantine opt-in)
-    fts_results: list[dict] = search_fts(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
-    vector_results: list[dict] = search_vector(conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine)
+    # 1. Collect ranked candidates from all three methods (D2330: quarantine opt-in).
+    # D273a/G12: the facet predicate is passed to EVERY leg — FTS and vector now
+    # assert it too (previously only the query-blind keyword leg did).
+    fts_results: list[dict] = search_fts(
+        conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine,
+        domain=domain, discipline=discipline, depth=depth,
+        discipline_raw=discipline_raw, domains_raw=domains_raw,
+    )
+    vector_results: list[dict] = search_vector(
+        conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine,
+        domain=domain, discipline=discipline, depth=depth,
+        discipline_raw=discipline_raw, domains_raw=domains_raw,
+    )
     # D2511 (BUG — RRF keyword-leg pollution): the "metadata/keyword" leg is only
     # meaningful when the caller actually filters by domain/discipline/depth.
     # With NO filter, search_keyword() returned `ORDER BY borp_score DESC` — and
     # with borp_score ~all 0.0 that collapses to ROWID order, i.e. a CONSTANT list
     # (e.g. "High Contrast Visual Design") injected into every query's RRF fusion.
     # That diluted the real FTS+vector signal and made hybrid WORSE than vector.
+    # D273a/G12: it is also now QUERY-AWARE (receives the query text).
     kw_results: list[dict] = []
     if domain or discipline or depth or discipline_raw or domains_raw:
         kw_results = search_keyword(
-            conn, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE,
+            conn, query=query, domain=domain, discipline=discipline, depth=depth, limit=POOL_SIZE,
             include_quarantine=include_quarantine,
             discipline_raw=discipline_raw, domains_raw=domains_raw,
         )
@@ -396,6 +503,16 @@ def search_hybrid(
 
     # 3. Sort by fused RRF score (descending)
     ranked_ids: list[str] = sorted(rrf_scores, key=lambda fid: rrf_scores[fid], reverse=True)
+
+    # 3b. D273a/G12: ASSERT the facet on the FUSED pool (defense-in-depth). Even
+    # though every leg now applies the predicate, a post-filter guarantees a
+    # violator can never be promoted by RRF fusion or the rerank pool.
+    if domain or discipline or depth or discipline_raw or domains_raw:
+        ranked_ids = [
+            fid for fid in ranked_ids
+            if _matches_facet(fb_map[fid], domain=domain, discipline=discipline, depth=depth,
+                              discipline_raw=discipline_raw, domains_raw=domains_raw)
+        ]
 
     # 4. Return top-N with RRF scores attached
     results: list[dict] = []

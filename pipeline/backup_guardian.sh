@@ -1,83 +1,67 @@
 #!/bin/bash
-# backup_guardian.sh — Maxwell OS · Pre-flight Backup Guardian
+# backup_guardian.sh — Maxwell OS · DB Backup Guardian (C13)
 # ============================================================
-# rsync `final fbs/` → `5.backup/` with timestamp.
-# Run before ANY write operation to protect against data loss.
+# Consistent SQLite backup of the knowledge DB, run before/after ANY batch
+# write. Uses sqlite3's online backup API (`.backup`) so the copy is
+# transaction-consistent even while the DB is open in WAL mode — unlike
+# `shutil.copy2`/`cp`, which can capture a torn mid-write state.
+#
+# BUG-276: the previous version rsync'd `output/5.generated` (markdown), which
+# no longer exists and was NOT the DB — there was effectively no automated DB
+# backup. This script now backs up the actual SQLite DB and integrity-checks
+# the copy (fail-closed).
 #
 # Usage:
-#   ./tools/backup_guardian.sh                    # backup, timestamped
-#   ./tools/backup_guardian.sh --quiet            # silent unless error
-#   ./tools/backup_guardian.sh --dry-run          # preview only
-#
-# B-laws:
-#   B199: script lives in tools/, ROOT = parent dir
-#   B174: no hardcoded tokens (no tokens needed for file ops)
-#
-# Standing constraint:
-#   ALWAYS rsync fbs/ → 5.backup/ after any batch write
+#   bash pipeline/backup_guardian.sh               # backup, timestamped
+#   bash pipeline/backup_guardian.sh --quiet       # silent unless error
+#   bash pipeline/backup_guardian.sh --dry-run     # preview only
+#   bash pipeline/backup_guardian.sh --tag pre_serving_gate
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-SOURCE="$ROOT/knowledge pipeline/output/5.generated"
-TARGET="$ROOT/knowledge pipeline/output/5.backup"
+DB="$ROOT/knowledge pipeline/maxwell.db"
 TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
+TAG=""
 QUIET=false
 DRY_RUN=false
 
-# Parse args
 for arg in "$@"; do
     case "$arg" in
         --quiet)   QUIET=true ;;
         --dry-run) DRY_RUN=true ;;
+        --tag=*)   TAG="_${arg#--tag=}" ;;
     esac
 done
 
-# Validate source exists
-if [ ! -d "$SOURCE" ]; then
-    echo "❌ backup_guardian: Source not found: $SOURCE"
+DEST="${DB}.bak_${TIMESTAMP}${TAG}"
+
+if [ ! -f "$DB" ]; then
+    echo "❌ backup_guardian: DB not found: $DB" >&2
     exit 1
 fi
 
-# Ensure target exists
-if [ ! -d "$TARGET" ]; then
-    echo "  backup_guardian: Creating target: $TARGET"
-    $DRY_RUN || mkdir -p "$TARGET"
-fi
-
-# Count what we're backing up
-FB_COUNT=$(find "$SOURCE" -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-SUB_COUNT=0
-if [ -d "$SOURCE/substrate" ]; then
-    SUB_COUNT=$(find "$SOURCE"/substrate -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-fi
-TOTAL_COUNT=$((FB_COUNT + SUB_COUNT))
-
-$QUIET || echo "  🔒 backup_guardian: Pre-flight backup — $TOTAL_COUNT files"
-$QUIET || echo "    Source: $SOURCE"
-$QUIET || echo "    Target: $TARGET"
-$QUIET || echo "    Timestamp: $TIMESTAMP"
-
 if $DRY_RUN; then
-    echo "    [DRY-RUN] rsync -a --delete \"$SOURCE/\" \"$TARGET/\""
-    echo "    [DRY-RUN] Would backup $TOTAL_COUNT files"
+    echo "    [DRY-RUN] sqlite3 \"$DB\" \".backup '$DEST'\""
     exit 0
 fi
 
-# Execute rsync
-# --delete removes files from target that were deleted from source
-# -a preserves permissions, timestamps, etc.
-rsync -a --delete "$SOURCE/" "$TARGET/" 2>&1
-RSYNC_EXIT=$?
+$QUIET || echo "  🔒 backup_guardian: consistent DB backup"
+$QUIET || echo "    Source: $DB"
+$QUIET || echo "    Dest:   $DEST"
 
-if [ $RSYNC_EXIT -eq 0 ]; then
-    $QUIET || echo "    ✅ backup_guardian: $TOTAL_COUNT files synced (ts=$TIMESTAMP)"
-else
-    echo "    ❌ backup_guardian: rsync failed (exit=$RSYNC_EXIT)"
-    exit $RSYNC_EXIT
+if ! sqlite3 "$DB" ".backup '$DEST'"; then
+    echo "    ❌ backup_guardian: sqlite3 .backup failed" >&2
+    exit 1
 fi
 
-# Write timestamp marker
-echo "$TIMESTAMP" > "$TARGET/.last_backup"
+CHECK="$(sqlite3 "$DEST" "PRAGMA integrity_check;" 2>/dev/null || true)"
+if [ "$CHECK" != "ok" ]; then
+    echo "    ❌ backup_guardian: integrity_check on backup failed: ${CHECK:-<empty>}" >&2
+    exit 1
+fi
+
+printf '%s' "$TIMESTAMP" > "$(dirname "$DEST")/.last_db_backup"
+$QUIET || echo "    ✅ backup_guardian: backup written + integrity ok (ts=$TIMESTAMP)"

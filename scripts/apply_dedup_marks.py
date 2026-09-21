@@ -31,6 +31,8 @@ from typing import Any, Dict, List
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from pipeline.serving_gate import derive_status  # noqa: E402  D274h: single status rule
+
 PLAN = ROOT / "governance" / "dedup_final_apply_plan.json"
 DB = ROOT / "knowledge pipeline" / "maxwell.db"
 
@@ -58,10 +60,16 @@ def _load_rows(ids: List[str]) -> Dict[str, Dict[str, Any]]:
 
 
 def _migrate_column(conn: sqlite3.Connection) -> None:
-    try:
-        conn.execute("ALTER TABLE fbs ADD COLUMN duplicate_of TEXT")
-    except sqlite3.OperationalError:
-        pass  # already exists
+    for col, ddl in (
+        ("duplicate_of", "ALTER TABLE fbs ADD COLUMN duplicate_of TEXT"),
+        ("s5_reason", "ALTER TABLE fbs ADD COLUMN s5_reason TEXT"),
+    ):
+        if col in {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}:
+            continue
+        try:
+            conn.execute(ddl)
+        except sqlite3.OperationalError:
+            pass  # already exists
 
 
 def run(apply: bool) -> None:
@@ -112,9 +120,12 @@ def run(apply: bool) -> None:
             raise RuntimeError(f"PRAGMA quick_check failed: {qc!r} — refusing to write")
         _migrate_column(conn)
         for dup_id, canon, cur_status, name, already in to_mark:
+            # D274h: route the status write through the serving gate (declared
+            # dedup rule -> QUARANTINE / s5_reason "duplicate"), not a raw literal.
+            status, s5_reason = derive_status(None, duplicate_of=canon)
             conn.execute(
-                "UPDATE fbs SET duplicate_of=?, status='QUARANTINE' WHERE fb_id=?",
-                (canon, dup_id),
+                "UPDATE fbs SET duplicate_of=?, status=?, s5_reason=? WHERE fb_id=?",
+                (canon, status, s5_reason, dup_id),
             )
         conn.commit()
     except Exception:

@@ -18,6 +18,7 @@ from pipeline.schemas import (
     _axis_contract,
     CANONICAL_DISCIPLINES,
     get_synonym_index,
+    lint_discipline_domain_vocabulary,
     match_to_canonical,
     validate_discipline_domain,
 )
@@ -137,13 +138,13 @@ def test_vocabularies_disjoint_under_normalisation() -> None:
 
 
 def test_guard_detects_punctuation_hidden_collision() -> None:
-    """The runtime guard must catch a collision that differs only by punctuation."""
-    flags = validate_discipline_domain("research methodology", ["research & methodology"])
-    assert flags, "guard returned clean for a live cross-axis collision"
-    # 2026-09-19: a DECLARED collision now carries a "DECLARED: " prefix and the ruling text read
-    # from config, so a caller can tell a decided question from an open defect (D271a). The guard
-    # still returns a non-empty list, so every fail-closed call site keeps failing closed.
-    assert all(f.startswith("DECLARED: declared-axis-collision") for f in flags), flags
+    """D273b/G18: a DECLARED collision is LEGAL for the row guard, REPORTED by the lint."""
+    # Row guard: the D-271a declared collision no longer fails closed.
+    assert validate_discipline_domain("research methodology", ["research & methodology"]) == []
+    # Vocabulary lint: the declared collision is still reported (never rejected).
+    lint_flags = lint_discipline_domain_vocabulary("research methodology", ["research & methodology"])
+    assert lint_flags, "lint returned clean for a declared cross-axis collision"
+    assert all(f.startswith("DECLARED: declared-axis-collision") for f in lint_flags), lint_flags
 
 
 if __name__ == "__main__":

@@ -102,6 +102,7 @@ from pipeline.schemas import (
     split_compound,
     validate_discipline_domain,  # D2620/D2626: discipline<->domain non-contamination (fail-closed)
 )
+from pipeline.closed_menu import menu_hash as _closed_menu_hash  # R1/D-279: menu traceability stamp
 
 # D2226: Merged S4 CRIBS+Classification single-call (D2224)
 # D2265: Batch CRIBS+Classification — amortizes GPT-OSS reasoning cost
@@ -232,6 +233,16 @@ _ROLE_PROCESS_TEMPLATE: str = ROUTE_TO_CONTENT_TYPE["PT"]
 _ROLE_PROCESS_INSTANCE: str = ROUTE_TO_CONTENT_TYPE["PI"]
 _ROLE_GROWTH_EDGE: str = ROUTE_TO_CONTENT_TYPE["GE"]
 _ROLE_TOOL_INSTRUCTION: str = ROUTE_TO_CONTENT_TYPE["TI"]
+
+
+def _current_menu_hash() -> str:
+    """R1/D-279: the closed-menu hash stamped onto every classified FB.
+
+    Computed once per process (lru_cache) from the config-derived closed menu.
+    A label is only traceable if its menu_hash matches the menu it was classified
+    against — the `min_human_share` (F-44) binding prerequisite.
+    """
+    return _closed_menu_hash()
 
 
 def _resolve_content_type(fb: dict) -> str:
@@ -2226,6 +2237,16 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "classification_error": class_data.get("classification_error"),
             # D2337: surface taxonomy match method (D2310 diagnostic, was computed then discarded)
             "taxonomy_match_method": class_data.get("taxonomy_match_method"),
+            # R1/D-279: closed-menu traceability + per-axis label provenance.
+            # All three labels are post-hoc model stamps today (D-277: the corpus
+            # has ZERO human-derived labels), so *_source defaults to
+            # llm_extracted_from_source; a human pass (single-coder ceiling, D-280)
+            # stamps human_verbatim on the rows it verifies. menu_hash makes the
+            # label traceable to the exact menu it was classified against (F-44).
+            "content_type_source": "llm_extracted_from_source",
+            "discipline_source": "llm_extracted_from_source",
+            "extraction_type_source": "llm_extracted_from_source",
+            "menu_hash": _current_menu_hash(),
         }
         # D2496/BUG-187: always emit jargon — omit-when-empty was the schema-drift
         # source (key absent vs key present-empty). None when no specialized terms.

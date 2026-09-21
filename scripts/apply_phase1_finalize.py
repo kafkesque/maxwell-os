@@ -15,8 +15,11 @@ This script closes that gap:
     target for each 149-core row (from golden_synced_4axis):
         content_type = golden content_type
         depth        = golden depth if content_type == 'principle' else ''
-        status       = 'PASS'        if content_type == 'principle' else 'QUARANTINE'
         needs_human_review = 0       (human-reviewed / reliable-pair confirmed)
+
+    NOTE (D274a): this script no longer writes `status`. Serving eligibility is
+    governed by the verification record via scripts/apply_serving_gate.py; a
+    label-derived status write is a hard error.
 
     plus #85 Iterative Design Refinement: depth 'domain' -> 'cross-domain'
     (pair split cross-domain vs universal; user ruled cross-domain).
@@ -77,7 +80,7 @@ def _plan(golden_by_id: dict[str, dict]) -> tuple[list[dict], int, int]:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
-        "SELECT fb_id, content_type, depth, status, needs_human_review FROM fbs"
+        "SELECT fb_id, content_type, depth, needs_human_review FROM fbs"
     ).fetchall()
     db = {r["fb_id"]: dict(r) for r in rows}
     conn.close()
@@ -110,18 +113,15 @@ def _plan(golden_by_id: dict[str, dict]) -> tuple[list[dict], int, int]:
             # No reliable-pair/human content_type — leave untouched (fail-closed).
             continue
         depth = (g["depth"] or "") if ct == "principle" else ""
-        status = "PASS" if ct == "principle" else "QUARANTINE"
 
-        # #85 human override (depth only, already principle/PASS).
+        # #85 human override (depth only, already principle).
         if fb in EXTRA_DEPTH:
             depth = EXTRA_DEPTH[fb]
-            status = "PASS"
 
         nhr = 0
         if (
             cur["content_type"] == ct
             and (cur["depth"] or "") == depth
-            and cur["status"] == status
             and (cur["needs_human_review"] or 0) == nhr
         ):
             skipped_already += 1
@@ -135,8 +135,6 @@ def _plan(golden_by_id: dict[str, dict]) -> tuple[list[dict], int, int]:
             "new_content_type": ct,
             "old_depth": cur["depth"],
             "new_depth": depth,
-            "old_status": cur["status"],
-            "new_status": status,
             "old_needs_human_review": cur["needs_human_review"],
             "new_needs_human_review": nhr,
         })
@@ -160,9 +158,9 @@ def _apply(changes: list[dict]) -> None:
         conn.execute("BEGIN IMMEDIATE")
         for c in changes:
             conn.execute(
-                "UPDATE fbs SET content_type=?, depth=?, status=?, needs_human_review=? "
+                "UPDATE fbs SET content_type=?, depth=?, needs_human_review=? "
                 "WHERE fb_id=?",
-                (c["new_content_type"], c["new_depth"], c["new_status"],
+                (c["new_content_type"], c["new_depth"],
                  c["new_needs_human_review"], c["fb_id"]),
             )
         conn.commit()
@@ -212,11 +210,9 @@ def main(argv: list[str]) -> int:
         return 0
 
     ct = Counter(c["new_content_type"] for c in changes)
-    st = Counter(c["new_status"] for c in changes)
     ctflip = sum(1 for c in changes if c["old_content_type"] != c["new_content_type"])
     dflip = sum(1 for c in changes if (c["old_depth"] or "") != c["new_depth"])
     print(f"   new content_type dist: {dict(ct)}")
-    print(f"   new status dist:       {dict(st)}")
     print(f"   content_type flips: {ctflip} | depth flips: {dflip}")
     print(f"   #85 override rows: {sum(1 for c in changes if c['fb_id'] in EXTRA_DEPTH)}")
 

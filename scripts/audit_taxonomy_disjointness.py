@@ -36,6 +36,7 @@ from pipeline.schemas import (  # noqa: E402
     CANONICAL_DISCIPLINES,
     CANONICAL_DOMAINS,
     _axis_contract,
+    lint_discipline_domain_vocabulary,
     parse_domains,
     validate_discipline_domain,
 )
@@ -76,12 +77,12 @@ def scan_runtime() -> tuple[int, list[str], int]:
     undeclared: list[str] = []
     debt = 0
     for fb_id, discipline, domains in rows:
-        flags = validate_discipline_domain(discipline, parse_domains(domains))
-        for flag in flags:
-            if flag.startswith("declared-axis-collision"):
-                debt += 1
-            else:
-                undeclared.append(str(fb_id)[:12] + ": " + flag)
+        # D273b/G18: the row guard no longer emits declared-collision flags (they are
+        # legal); the vocabulary lint reports them separately, so debt stays visible.
+        doms = parse_domains(domains)
+        for flag in validate_discipline_domain(discipline, doms):
+            undeclared.append(str(fb_id)[:12] + ": " + flag)
+        debt += len(lint_discipline_domain_vocabulary(discipline, doms))
     return len(rows), undeclared, debt
 
 

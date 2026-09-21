@@ -1,0 +1,188 @@
+# Maxwell OS v3.0 — R5 slot repair (OntoClean: definition + include + exclude)
+# =============================================================================
+# Decision: D-278 (2026-09-20) — R5 is repair-not-demote (D-277).
+#
+# ANCHOR-1 measured zero/near-zero human↔stored agreement on a small set of
+# slots. D-277 ruled this measures PIPELINE failure, not necessarily SLOT
+# badness: the correct first move is to RE-DERIVE each weak slot's definition
+# and give it a mandatory include set (must-map positives) + exclude set
+# (must-NOT-map negatives, each with its correct sibling target), then BOUND it
+# (human review on write) and re-measure per-slot κ. Merge into a parent group
+# only if the slot is still definitionally inseparable after this. Never DEMOTE
+# as a first move.
+#
+# C12: config-first. This file is the single source of truth for the repaired
+# definitions. `scripts/definition_nli_verify.py` (R2) consumes it: when a slot has a
+# repaired definition here, it OVERRIDES the taxonomy_v5.yaml `definition` for NLI
+# hypothesis construction. (2026-09-20: the ratified D-285/D-283 definitions were FOLDED
+# into taxonomy_v5.yaml + content_types.yaml — the 5 core disciplines now semantically
+# match this file, so `menu_hash` captures them. The dead `_R5_REPAIR_PATH` constant in
+# closed_menu.py was removed (BUG-307 RESOLVED).
+#
+# FULL r5 COLLAPSE (2026-09-20, D-289): (1) the 4 non-core discipline DEFINITIONS
+# (cultural studies / risk management / decision making / organizational theory) are
+# FOLDED into taxonomy_v5.yaml; (2) the 4 content_type overrides are DROPPED (arm C
+# D-284 builds the content_type hypothesis from the paraphrase content-claim in
+# content_types.yaml, so those definitions were dead); (3) cognitive science is
+# DE-NEGATED (BUG-313): removed the "NO design/persuasion/economic-application intent"
+# + "as pure cognition ... in itself" negative clauses that drove 94% contra. Only the
+# 9 discipline include/exclude OntoClean boundaries remain here (taxonomy has no
+# `include` list). `definition` values are now redundant with taxonomy but retained.
+#
+# Structure per slot:
+#   disposition: RE-DERIVE + BOUND | BOUND
+#   definition : mandatory discriminating definition (≤4 sentences)
+#   include    : concrete must-map positives (each a mini content example)
+#   exclude    : concrete must-NOT-map negatives, annotated with the CORRECT slot
+#
+# `include`/`exclude` are the OntoClean boundary — they are what turns a prose
+# description into a testable classifier rule (R2 premise).
+
+schema_version: "1.0"
+decision: D-278
+last_updated: "2026-09-20"
+
+discipline:
+
+  design psychology:
+    disposition: "RE-DERIVE + BOUND"
+    definition: >
+      The EXPLOITATION of cognitive science's known loopholes — biases, heuristics, and predictable
+      errors of human thinking — to externally affect, persuade, or manipulate a user's or consumer's
+      decision-making, and designing FOR those biases. It is APPLIED persuasion psychology, NOT the
+      study of cognition itself.
+    include:
+      - "a named bias (loss aversion, anchoring, social proof) exploited to drive a purchase/click/decision"
+      - "a persuasion or UX tactic justified by a cognitive bias"
+      - "how emotional design (affect) is used to drive engagement, trust, or compliance"
+    exclude:
+      - "how the mind works (memory, attention, reasoning) with no application or persuasion intent"  # → cognitive science
+      - "a descriptive psychological study of emotion, personality, or behaviour with no exploitation/persuasion intent"  # → psychology
+      - "a bias studied descriptively as a deviation from rational economic/market choice"            # → behavioral economics
+      - "interaction techniques, usability testing protocol, or interface systems"                    # → human-computer interaction
+      - "the empathise→prototype→test innovation PROCESS (a designed solution, not an explanation)"   # → design thinking
+      - "the visual beauty / composition of a form, independent of the user's mind"                   # → aesthetics / form & structure
+
+  cognitive science:
+    disposition: "SHARPEN + BOUND"
+    definition: >
+      The interdisciplinary study of HOW the mind works — perception, memory, attention, reasoning,
+      language, and learning. The DEFAULT home for any claim about cognition, thinking, or a cognitive
+      process.
+    include:
+      - "how cognitive load shapes interface layout decisions (the mental process, not the design intent)"
+      - "how memory, attention, or reasoning operate as processes"
+      - "a model of a cognitive process (e.g. working-memory limits, dual-process theory)"
+    exclude:
+      - "the EXPLOITATION of a cognitive bias to persuade or manipulate a user or consumer"           # → design psychology
+      - "a bias causing a deviation from rational economic/market choice (studied descriptively)"     # → behavioral economics
+      - "the empathise→prototype→test innovation PROCESS (a designed solution, not an explanation)"   # → design thinking
+      - "the nervous system, brain biology, or neural circuits"                                       # → neuroscience
+      - "designing an interface or system for usability"                                              # → human-computer interaction
+
+  psychology:
+    disposition: "SHARPEN + BOUND"
+    definition: >
+      The empirical study of mind and BEHAVIOUR in individuals and groups — emotion, personality,
+      development, social behaviour, and mental health — beyond the computational modelling of
+      cognition. Broader and more behavioural than cognitive science, which models mental PROCESSES
+      as computation.
+    include:
+      - "how emotion, personality, or social context shapes behaviour"
+      - "a developmental, clinical, or social-psychology finding about individuals or groups"
+    exclude:
+      - "a model of a cognitive PROCESS (perception, memory, reasoning) as computation"  # → cognitive science
+      - "the nervous system, brain biology, or neural circuits"                          # → neuroscience
+      - "the EXPLOITATION of a bias to persuade or manipulate a user"                    # → design psychology
+      - "a bias causing a deviation from rational economic/market choice"                # → behavioral economics
+
+  cultural studies:
+    disposition: "RE-DERIVE + BOUND"
+    definition: >
+      The critical analysis of cultural practices, texts, and power relations in contemporary society —
+      how meaning is produced, circulated, and contested within a culture, with attention to ideology,
+      discourse, and social power.
+    include:
+      - "how audiences reinterpret foreign media through local ideological frames"
+      - "how a cultural practice encodes or resists power relations"
+      - "critical reading of a text as a site of contested meaning"
+    exclude:
+      - "ethnographic description of a people's customs across time"           # → anthropology
+      - "the study of society's institutions and structures"                  # → sociology
+      - "the production/distribution systems of media themselves"            # → media studies
+
+  risk management:
+    disposition: "RE-DERIVE + BOUND"
+    definition: >
+      The identification, assessment, prioritisation, and mitigation of risks to minimise negative
+      impact on operations, projects, or decisions — the practice of quantifying exposure and choosing
+      responses (avoid / reduce / transfer / accept).
+    include:
+      - "a risk register / likelihood×impact matrix for a project or operation"
+      - "a mitigation strategy for a named failure mode (avoid/reduce/transfer/accept)"
+      - "quantifying exposure (probability × severity) to prioritise responses"
+    exclude:
+      - "conformance to a standard or specification"                          # → quality assurance
+      - "legal/regulatory obligation adherence"                               # → compliance
+      - "designing a system so a specific physical failure mode cannot occur" # → safety engineering
+
+  behavioral economics:
+    disposition: "RE-DERIVE + BOUND"
+    definition: >
+      The DESCRIPTIVE study of how psychological factors and cognitive biases cause systematic
+      deviations from rational choice in ECONOMIC decision-making and MARKET behaviour — where
+      heuristics, framing, and affect change what people CHOOSE (prices, incentives, markets). It
+      describes the bias; it does not exploit it to design persuasion.
+    include:
+      - "a named bias (loss aversion, anchoring, framing) changing an economic choice or price"
+      - "how default-setting or choice architecture shifts market decisions"
+      - "a psychological mechanism explaining a market-behaviour anomaly"
+    exclude:
+      - "the EXPLOITATION of a bias to design, persuade, or manipulate a user (applied persuasion)"  # → design psychology
+      - "a model of markets, incentives, or allocation without a psychological mechanism"            # → economics
+      - "how the mind works (memory, reasoning) with no economic or choice context"                  # → cognitive science
+      - "a prescriptive procedure for choosing among alternatives"                                   # → decision making
+
+  decision making:
+    disposition: "RE-DERIVE + BOUND"
+    definition: >
+      The cognitive and strategic process of selecting a course of action from alternatives — how
+      options are framed, evaluated, and committed to under uncertainty, including decision rules,
+      criteria, and (bounded) rationality.
+    include:
+      - "a decision rule or multi-criteria method for choosing among options"
+      - "how framing or uncertainty changes the selection of an action"
+      - "a structured process from alternatives → evaluation → commitment"
+    exclude:
+      - "long-term goal-setting and competitive positioning of an organisation"  # → strategic thinking
+      - "a psychological bias affecting a choice (the bias itself, not the choice procedure)"  # → behavioral economics
+      - "mathematical optimisation of a well-defined objective"                # → operations research
+
+  # ── BOUND (human review on write), NOT re-derive — definitions already adequate ──
+  design thinking:
+    disposition: "SHARPEN + BOUND"
+    definition: >
+      A human-centred approach to innovation — an iterative PROCESS (empathise → define → ideate →
+      prototype → test) that integrates user needs, technology feasibility, and business viability,
+      whose output is a designed SOLUTION, not an explanation of the mind.
+    include:
+      - "an iterative empathise→prototype→test innovation process"
+      - "a framework balancing desirability / feasibility / viability"
+    exclude:
+      - "the EXPLOITATION of a cognitive bias to persuade the user (applied psychology)"  # → design psychology
+      - "how the mind works (memory, reasoning, perception)"                              # → cognitive science
+      - "the workflow of generating/executing creative work in general"                   # → creative process
+      - "long-term organisational goal-setting"                                           # → strategic thinking
+
+  organizational theory:
+    disposition: "BOUND"
+    definition: >
+      The study of structures, processes, and dynamics within formal organisations and institutions —
+      how they are designed, how they coordinate, and how they change.
+    include:
+      - "a model of organisational structure (hierarchy, matrix, network)"
+      - "how organisations coordinate, control, or change"
+    exclude:
+      - "the study of society-wide institutions and stratification"           # → sociology
+      - "how an organisation sets and pursues long-term goals"                # → strategic thinking
+      - "the practice of running/leading people and resources"                # → management

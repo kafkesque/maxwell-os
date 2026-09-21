@@ -29,7 +29,7 @@ last_updated: "2026-08-13"
 content_types:
 
   principle:
-    description: "Conceptual knowledge — why/when something works. The Foundation Block. D2587: a SINGLE transferable prescriptive instruction (a normative heuristic stated in one sentence that passes the depth test: act as a filter across 3+ domains) is a PRINCIPLE, NOT a process_template."
+    description: "Conceptual knowledge — why/when something works. The Foundation Block. D275b/D283 (2026-09-20): a PRINCIPLE is a single self-contained epistemic claim you KNOW/APPLY (a transferable filter — ANY scope: universal/cross-domain/domain/specialized) that the text states as SETTLED knowledge — not as an open question or an unverified correlation. Discriminated from process_template by procedural INTENT + a done-condition (NOT step count: a 3-step causal chain and a 12-category taxonomy both have '>=2 steps' yet are principles), and from growth_edge by epistemic STATUS (established vs speculative) — NOT by scope. D282 (2026-09-20): scope is the SEPARATE depth axis, never the role discriminator — a 1-domain or specialized principle is still a principle."
     route_to: "foundation_block"
     output_file: "fbs.jsonl"
     extension_fields:
@@ -56,7 +56,7 @@ content_types:
       - { icon: "✅", section: "EVIDENCE",      binds: [evidence, source_books], note: "reusable · cross-domain · tested" }
 
   process_template:
-    description: "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe). D2587: requires a SEQUENCE of >=2 steps (phases + at least one gate or a done condition). A single step/instruction is NOT a template."
+    description: "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe). D275b (2026-09-20): a process_template is a procedure you EXECUTE — trigger + ordered steps + a done-condition/gate (procedural INTENT, not step count). D2587's 'SEQUENCE of >=2 steps' is necessary but NOT sufficient. A single step/instruction is NOT a template."
     min_steps: 2
     route_to: "process_template"
     output_file: "process_templates.jsonl"
@@ -206,23 +206,52 @@ content_type_rules:
   single_step_resolution:
     # A single step/instruction is NOT a template. Resolve it:
     tool_specific: tool_instruction       # software/tool command, syntax, feature
-    transferable_instruction: principle   # one-sentence heuristic passing the depth test (3+ domains)
+    transferable_instruction: principle   # a self-contained instruction you would APPLY as a rule (D282: depth is the separate axis, not a role test)
     method_bound_step: inline_step        # belongs inside a PT's steps; never a standalone object
   # Q2 (D2587): a decision matrix is NEVER a standalone content type.
   decision_matrix:
     specific_grid: inline_gate_content    # lives in a PT's gate (steps/decision field)
-    reusable_methodology: principle_or_process_template  # by the depth test / sequence test
-  # Q3 (D2587): instruction-vs-principle is decided by the depth test, not by
-  # whether the text prescribes. A prescriptive single claim that transfers
-  # across 3+ domains is a PRINCIPLE (extraction_type stays normative_heuristic).
-  instruction_is_principle_when: "one-sentence prescriptive claim that acts as a filter across 3+ domains (depth test passes)"
+    reusable_methodology: principle_or_process_template  # by the sequence / self-containedness test
+  # Q3 (D2587): instruction-vs-principle is decided by whether the instruction is a
+  # SELF-CONTAINED transferable rule you would APPLY (a principle at ANY scope),
+  # not by whether the text prescribes, and not by a domain count. Scope
+  # (universal vs cross-domain vs domain vs specialized) is the SEPARATE depth axis
+  # (D282: it must never act as the principle-role discriminator).
+  instruction_is_principle_when: "one-sentence prescriptive claim that acts as a self-contained transferable filter (any scope — depth is the separate axis)"
   instruction_is_process_template_when: "sequence of >=2 steps with a gate or done condition"
-  depth_test_domains_threshold: 3
   # D2591 (2026-09-08): descriptive summaries + ambiguous objects are NOT roles.
   descriptive_summary_resolution: noise_drop  # historical/descriptive summary with no prescriptive filter, no template, no named method-execution → DROP (a "fact", D2323 dropped it)
   ambiguous_resolution: quarantine           # carries SOME value but no clean role (no steps / method / applicable mechanism / transferable principle) → HOLD for later identification
   # D2596/BUG-230 (2026-09-09): growth_edge is NOT the catch-all for "utilizable facts".
   growth_edge_entry_criterion: "MUST articulate an OPEN TENSION or UNVERIFIED CORRELATION; NOT a dump for failed depth-tests or bare utilizable facts (those → noise_drop)"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT-TYPE DECISION PROCEDURE (D275b, ratified 2026-09-20) — the
+# authoritative top-down classifier. Answer the FIRST question that matches.
+# Mechanism A (this procedure) DECIDES the bin. Mechanism B (the stored error
+# rate, ANCHOR-1) is a METER — it calibrates confidence + abstention, and is
+# NEVER used to flip a label (a population statistic carries no per-object
+# information). See D-275a/D-276/D-277.
+# ─────────────────────────────────────────────────────────────────────────────
+content_type_decision_procedure:
+  order: first-match-wins
+  atomic_unit: "ONE self-contained epistemic claim (not one sentence)"
+  discriminator: "procedural INTENT + done-condition (EXECUTE vs KNOW/APPLY) — not step count"
+  steps:
+    - { test: "tool/software-specific command, syntax, or feature", resolve: tool_instruction }
+    - { test: "articulates an OPEN TENSION or an UNVERIFIED CORRELATION", resolve: growth_edge }
+    - { test: "bare fact / descriptive summary — no prescriptive filter, no method, no transferable value", resolve: noise_drop }
+    - { test: "a procedure you EXECUTE — trigger + ordered steps + a done-condition/gate", resolve: process_template }
+    - { test: "a single self-contained claim you KNOW/APPLY — a transferable filter (any scope)", resolve: principle }
+    - { test: "has SOME value but no clean role", resolve: quarantine }
+  edge_rules:
+    checklist: process_template          # a checklist is a procedure
+    decision_matrix: inline_gate_content # NEVER standalone — lives inside a PT gate (steps/decision field)
+    taxonomy: principle_or_split         # ONE FB iff statable as one self-contained claim; else split by self-containedness
+  calibration:
+    error_rate_is_a_meter: true          # per-class error sets confidence thresholds + BOUND classes; never picks the label
+    abstention_value: none               # first-class "does not fit" (R1)
+    provenance_stamps: [menu_hash, content_type_source, discipline_source, extraction_type_source]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DISPOSITIONS (D2591) — what to DO when an object has no clean role.
@@ -377,3 +406,22 @@ s2_body_fields:
 dropped_content_types:
   - fact
   - meta
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NLI PARAPHRASE (D-284, 2026-09-20) — R2 content_type NLI hypothesis = arm C.
+#   BUG-305 proved the category META-definition under-entails on principle ("a
+#   single self-contained claim… NOT a procedure you EXECUTE" self-negates, so a
+#   specific instance never entails the meta-definition). Arm C uses a paraphrase
+#   CONTENT-CLAIM as the hypothesis instead. A/B (r2_ab_harness.py): paraphrase
+#   beats definition as a mislabel detector (wrong-contra 91% vs 55%; false-contra
+#   0.233 vs 0.267). Single source for scripts/definition_nli_verify.py (R2) and
+#   scripts/r2_ab_harness.py (measurement).
+# ─────────────────────────────────────────────────────────────────────────────
+nli_paraphrase:
+  principle: "This describes a general rule or principle that can be applied to understand or decide something."
+  process_template: "This describes an ordered sequence of steps for carrying out a procedure."
+  process_instance: "This describes a specific real case in which a procedure was actually carried out."
+  tool_instruction: "This describes how to use a specific software tool or command."
+  growth_edge: "This describes a speculative idea, an open question, or an unverified correlation."
+  noise_drop: "This is a bare factual summary with no rule or method to apply."
+  quarantine: "This has some value but does not clearly fit any single category."

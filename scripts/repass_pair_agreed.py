@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""repass_pair_agreed.py — D2618 P0.3: re-PASS the 1,750 wrongly-quarantined rows.
+"""repass_pair_agreed.py — D2618 P0.3: sync pair-agreed depth on clean principle rows.
 
 The reliable-pair joint vote (D2612) UNANIMOUSLY agreed (content_type=principle
-+ depth agreed, high confidence) on 1,750 production rows that are currently
-sitting in `status=QUARANTINE` with `needs_human_review=0`. These are clean
-principle rows that got fail-closed to quarantine during the Phase-0/1 relabel
-cascade; the pair's vote is the authoritative label, so they should serve (PASS).
++ depth agreed, high confidence) on production rows; some still carry a stale
+silver depth from before the vote. This script syncs `depth` to the pair-agreed
+value.
 
-Deterministic, LLM-free, idempotent. Does NOT touch the 1,246 genuine abstains
-(860 content_type-abstain + 386 depth-abstain) or the 517 needs_human_review=1
-rows — those remain quarantined for human review.
+Deterministic, LLM-free, idempotent. Does NOT touch content_type, and — per
+D274a / G17 — does NOT write `status`: serving eligibility is governed by the
+verification record via scripts/apply_serving_gate.py, and a label-derived
+status write is a hard error. The former "re-PASS the wrongly-quarantined rows"
+role is superseded by the serving gate (status := f(verification record)).
 
 Actions (single transaction):
-  - status: QUARANTINE -> PASS
-  - depth:  pair-agreed vote depth (fixes the 381 stale silver depths)
+  - depth: pair-agreed vote depth (fixes the stale silver depths)
 
 Safety:
   - C13: timestamped DB backup before any write.
   - C6:  single transaction; rollback on any error.
-  - Idempotent: rows already PASS with matching depth are skipped.
+  - Idempotent: rows already at the agreed depth are skipped.
   - --check (default): dry-run, reports the exact change set, writes nothing.
   - --apply: backup + transaction + R14 manifest.
 
@@ -61,13 +61,13 @@ def _load_checkpoint() -> Dict[str, Dict[str, Any]]:
 
 
 def _plan() -> Tuple[List[Dict[str, Any]], int, int]:
-    """Return the exact change set: pair-agreed clean rows in QUARANTINE."""
+    """Return the exact change set: pair-agreed depth on clean principle rows."""
     cp = _load_checkpoint()
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
-        "SELECT fb_id, content_type, depth, status FROM fbs "
-        "WHERE content_type='principle' AND status='QUARANTINE' AND needs_human_review=0"
+        "SELECT fb_id, content_type, depth FROM fbs "
+        "WHERE content_type='principle' AND needs_human_review=0"
     ).fetchall()
     conn.close()
 
@@ -80,16 +80,14 @@ def _plan() -> Tuple[List[Dict[str, Any]], int, int]:
             skipped_missing += 1
             continue
         if rec.get("content_type_agreed") is not True or rec.get("agreed") is not True:
-            # content_type or depth abstain -> NOT a clean row, leave quarantined.
+            # content_type or depth abstain -> NOT a clean row, leave untouched.
             continue
         vote_depth = rec.get("depth")
-        if r["depth"] == vote_depth and r["status"] == "PASS":
+        if r["depth"] == vote_depth:
             skipped_already += 1
             continue
         changes.append({
             "fb_id": r["fb_id"],
-            "old_status": r["status"],
-            "new_status": "PASS",
             "old_depth": r["depth"],
             "new_depth": vote_depth,
         })
@@ -110,8 +108,8 @@ def _apply(changes: List[Dict[str, Any]]) -> Path:
         with conn:
             for c in changes:
                 conn.execute(
-                    "UPDATE fbs SET status=?, depth=? WHERE fb_id=?",
-                    (c["new_status"], c["new_depth"], c["fb_id"]),
+                    "UPDATE fbs SET depth=? WHERE fb_id=?",
+                    (c["new_depth"], c["fb_id"]),
                 )
     except Exception:
         conn.close()
@@ -121,14 +119,12 @@ def _apply(changes: List[Dict[str, Any]]) -> Path:
 
 
 def _manifest(changes: List[Dict[str, Any]], bak: Path) -> None:
-    depth_fixes = sum(1 for c in changes if c["old_depth"] != c["new_depth"])
     summary = {
         "schema_version": SCHEMA_VERSION,
         "gen_model": GEN_MODEL,
         "pipeline_commit": PIPELINE_COMMIT,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "rows_repassed": len(changes),
-        "rows_depth_synced": depth_fixes,
+        "rows_depth_synced": len(changes),
         "backup": str(bak),
         "depth_distribution": dict(Counter(c["new_depth"] for c in changes)),
     }
@@ -138,17 +134,15 @@ def _manifest(changes: List[Dict[str, Any]], bak: Path) -> None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Re-PASS the 1,750 pair-agreed clean rows (D2618 P0.3).")
+    ap = argparse.ArgumentParser(description="Sync pair-agreed depth on clean principle rows (D2618 P0.3).")
     ap.add_argument("--apply", action="store_true", help="back up + apply + manifest (default: dry-run)")
     args = ap.parse_args()
 
     changes, skipped_missing, skipped_already = _plan()
-    depth_fixes = sum(1 for c in changes if c["old_depth"] != c["new_depth"])
-    print(f"pair-agreed clean rows to re-PASS: {len(changes)}")
-    print(f"  of which depth needs sync: {depth_fixes}")
+    print(f"pair-agreed clean rows whose depth needs sync: {len(changes)}")
     print(f"  depth distribution: {dict(Counter(c['new_depth'] for c in changes))}")
     print(f"  skipped (no checkpoint record): {skipped_missing}")
-    print(f"  skipped (already PASS + matching depth): {skipped_already}")
+    print(f"  skipped (already at agreed depth): {skipped_already}")
 
     if not args.apply:
         print("[dry-run] nothing written. use --apply to execute.")
@@ -156,7 +150,7 @@ def main() -> None:
 
     bak = _apply(changes)
     _manifest(changes, bak)
-    print(f"applied {len(changes)} re-PASSes; backup {bak}")
+    print(f"applied {len(changes)} depth syncs; backup {bak}")
     print(f"manifest written: {MANIFEST}")
 
 

@@ -25,7 +25,9 @@ import pipeline.retrieve as retrieve
 
 
 def _fake_results(ids: list[str]) -> list[dict]:
-    return [{"fb_id": i} for i in ids]
+    # D273a/G12: fake rows carry the facet fields so the fused-pool post-filter
+    # (assert-on-final-pool) keeps them when a domain facet is set.
+    return [{"fb_id": i, "domains": "design", "discipline": "design"} for i in ids]
 
 
 def main() -> int:
@@ -40,14 +42,19 @@ def main() -> int:
 
     calls: dict[str, int] = {"keyword": 0}
 
-    def fake_fts(conn, query, limit=20, include_quarantine=False):
+    def fake_fts(conn, query, limit=20, include_quarantine=False,
+                 domain=None, discipline=None, depth=None,
+                 discipline_raw=None, domains_raw=None):
         return _fake_results(["fts_1", "fts_2"])
 
-    def fake_vector(conn, query, limit=20, include_quarantine=False):
+    def fake_vector(conn, query, limit=20, include_quarantine=False,
+                    domain=None, discipline=None, depth=None,
+                    discipline_raw=None, domains_raw=None):
         return _fake_results(["vec_1", "vec_2"])
 
-    def fake_keyword(conn, domain=None, discipline=None, depth=None, limit=20,
-                     status="PASS", include_quarantine=False, exclude_summaries=True):
+    def fake_keyword(conn, query=None, domain=None, discipline=None, depth=None, limit=20,
+                     status="PASS", include_quarantine=False, exclude_summaries=True,
+                     discipline_raw=None, domains_raw=None):
         calls["keyword"] += 1
         return _fake_results(["kw_1", "kw_2"])
 

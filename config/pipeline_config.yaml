@@ -93,6 +93,13 @@ services:
     port: 11435
     api_key: sk-maxwell-local
     min_version: 0.4.0
+    # D-291 (2026-09-21): pin to 0.7.0.dev2 — 0.7.0.dev4 fails to start on
+    # externally-accessible servers with API-key auth disabled (Maxwell exposes
+    # external server_aliases). Enable auth in ~/.omlx/settings.json to use dev4.
+    pinned_version: 0.7.0.dev2
+    # D-293: Lightning MTP drafter for Qwen3 adapters (+34-58% decode, lossless at
+    # temp=0.0). Enabled per-model in ~/.omlx/model_settings.json; flag records intent.
+    mtp_enabled: true
     bin: null
     default_timeout: 300
     max_retries: 2

@@ -1781,3 +1781,65 @@ produced under the uncommitted rule.
 FIX: review + commit (or explicitly park behind a feature flag) these 18 files BEFORE any run that writes to
 maxwell.db, and do not run `git checkout` on pipeline/ until then. Same failure class as the taxonomy state fixed by
 D-309 (uncommitted semantic change + committed-looking governance).
+
+
+## BUG-328 — UPDATE (HIGH, 2026-09-21, session-6 forensic audit): it is worse than "uncommitted"
+
+The 18 modified files are accompanied by **untracked modules that the modified files import**:
+`pipeline/serving_gate.py` (imported by `stage5_verify.py:50` + `scripts/apply_dedup_marks.py:34`)
+and `pipeline/closed_menu.py` (imported by `stage4_merge.py:105`). A fresh checkout therefore does
+not *silently revert* — it **raises ModuleNotFoundError at import**, i.e. a total S5/S4 outage, while
+the DB keeps the 4,696 QUARANTINE rows that the same rule produced. Second new sub-defect: the live
+`fbs` table has 71 columns and is **one migration behind the code** — `content_type_source`,
+`discipline_source`, `extraction_type_source`, `menu_hash` are absent, so the R1/D-279 provenance
+stamps have never been written to a single row (F-44 `min_human_share` still has no data to bind to).
+The G19 columns (`s5_reason`, `epistemic_status`, `verification_method`, `isor`) ARE present.
+Evidence of coherence (why landing it is correct, not risky): `py_compile` clean; `pytest` 200 passed
+/ 1 pre-existing failure (BUG-330); `menu_hash` 73597ee2 matches the frozen `.sha256`;
+`scripts/apply_serving_gate.py` dry-run over all 7,995 rows reports **0 writes** (the rule exactly
+reproduces the stored PASS 3299 / QUARANTINE 4696 and the s5_reason partition sums to 7,995);
+`retrieve` smoke-tested against the live DB (keyword/fts/vector/hybrid all return rows).
+Resolution: landed as one reviewed commit (production + config + tests), see D-313 log entry.
+
+## BUG-329 — BUG-314 CORRECTION: the frozen ruler exists in THREE versions and the drift is SUBSTANTIVE (HIGH, 2026-09-21)
+
+BUG-314 ("zero substantive label drift") was reached by comparing the live sheet against its own
+Sep-20 12:38 backup and **never against HEAD**. Comparing working tree vs `HEAD` shows real label
+movement, not normalisation:
+
+- hash triple: freeze-time `csv_sha256=4d0c856a…` (what `anchor1_frozen_20260920.json` hashed, bytes
+  existing NOWHERE in the repo) vs HEAD `2d456720…` vs working `38323192…`.
+- **DISC (human labels): 7 rows** — R024 strategic thinking→finance, R027 leadership→organizational
+  theory, R057 ∅→finance, R111 emerging→typography, R126 emerging→cultural design,
+  R139 emerging→psychology, R146 leadership→organizational theory.
+- **CT: 41 rows** (R004 process instance→quarantine, R005 principle→tool instruction, R007 growth
+  edge→noise drop, R049 principle→process template, R125 process template→principle, …).
+- **FORM: 62 rows**, mixed cosmetic (spelling) and substantive (R006 normative_heuristic→descriptive
+  model, R062 empirical pattern→descriptive model).
+- `note_codes` rewritten on 149/150 rows (the reviewer's uncertainty prose was replaced); `conf_*`
+  filled; "+4 trailing/blank lines" → 154 rows with one empty `item_id`.
+
+Impact: the published baseline (disc error 0.4741, n=116) remains *derivable* because the frozen key
+embeds per-row `human`+`stored` labels — but the grounding CSV is unversioned and its freeze-time
+bytes are lost, so byte-level verification fails closed and a re-measure would silently use v0, v1 or
+v2 depending on checkout state. Same class (untracked, unversioned human artifacts that ground
+published numbers): `ANCHOR1_BLIND_SHEET_20260920.csv`, `SINGLE_CODER_CEILING_SHEET_20260920.csv`.
+Rule added → D-313. Action: **OWNER GATE 4** — name the canonical ruler version before any re-measure.
+
+## BUG-330 — Stale smoke assertion: test expects a word the pipeline no longer prints (LOW, OPEN, pre-existing)
+
+`tests/test_stage4_preflight_smoke_stress.py:381` asserts `"QUARANTINED" in stdout+stderr`. The
+D2196 message prints "…documents quarantined…" (lowercase). The string is absent from **HEAD's**
+`stage4_merge.py` too, and the uncommitted stage4 diff does not touch that code path, so the failure
+is PRE-EXISTING and independent of BUG-328 (a `git worktree` of HEAD could not settle it: the smoke
+fixture `knowledge pipeline/stage2_extract/t11/checkpoint.jsonl` is untracked and absent there).
+Fix: assert on the D2196 phrasing or on the quarantine count.
+
+## BUG-331 — Serving-gate write to the production DB has no R5 review on record (MED, OPEN)
+
+`scripts/apply_serving_gate.py --apply` rewrote statuses across all 7,995 rows; `stage5_verify.py`
+now derives status from `derive_status()`. R5 (generator != verifier) is not documented for either
+artifact — the strongest available evidence is post-hoc (the 0-change dry-run + the row-level matches
+in this audit). Retrofit the review (gemma-4-E4B, D2549 routing) and record the verdict in
+`governance/serving_gate_20260919.md`. No data risk identified: the rule is idempotent and its output
+is exactly the stored state.

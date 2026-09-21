@@ -6,13 +6,17 @@ Deterministic, LLM-free. Reads governance/d2615_human_adjudication.jsonl
 two-axis (content_type + depth) verdicts into `knowledge pipeline/maxwell.db`:
 
     content_type axis:
-        principle            -> keep principle, un-quarantine (status=PASS)
+        principle            -> keep principle
         non-principle label  -> demote out of principle index:
-                                content_type=label, depth='', status=QUARANTINE
+                                content_type=label, depth=''
     depth axis:
-        <label>              -> set depth=<label>, un-quarantine (status=PASS)
+        <label>              -> set depth=<label>
     bonus_depth (human volunteered a depth on a content_type row):
         -> also set depth=<bonus_depth>
+
+    NOTE (D274a): status is NOT written here. Serving eligibility is governed by
+    the verification record (scripts/apply_serving_gate.py); a label-derived
+    status write is a hard error.
 
 Provenance:
   - source == 'human'        -> needs_human_review=0 (authoritative, freeze)
@@ -70,7 +74,7 @@ def _plan(adjs: list[dict]) -> tuple[list[dict], int, int]:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
-        "SELECT fb_id, content_type, depth, status, needs_human_review FROM fbs"
+        "SELECT fb_id, content_type, depth, needs_human_review FROM fbs"
     ).fetchall()
     db = {r["fb_id"]: dict(r) for r in rows}
     conn.close()
@@ -94,22 +98,18 @@ def _plan(adjs: list[dict]) -> tuple[list[dict], int, int]:
             if label == "principle":
                 new_ct = "principle"
                 new_depth = bonus if bonus else cur["depth"]
-                new_status = "PASS"
             else:
                 new_ct = label
                 new_depth = ""
-                new_status = "QUARANTINE"
         else:  # depth axis
             new_ct = cur["content_type"]  # principle (unchanged)
             new_depth = label
-            new_status = "PASS"
 
         new_nhr = 1 if src == "agent-rubric" else 0
 
         if (
             cur["content_type"] == new_ct
             and cur["depth"] == new_depth
-            and cur["status"] == new_status
             and (cur["needs_human_review"] or 0) == new_nhr
         ):
             skipped_already += 1
@@ -124,8 +124,6 @@ def _plan(adjs: list[dict]) -> tuple[list[dict], int, int]:
             "new_content_type": new_ct,
             "old_depth": cur["depth"],
             "new_depth": new_depth,
-            "old_status": cur["status"],
-            "new_status": new_status,
             "old_needs_human_review": cur["needs_human_review"],
             "new_needs_human_review": new_nhr,
         })
@@ -149,8 +147,8 @@ def _apply(changes: list[dict]) -> None:
         conn.execute("BEGIN IMMEDIATE")
         for c in changes:
             conn.execute(
-                "UPDATE fbs SET content_type=?, depth=?, status=?, needs_human_review=? WHERE fb_id=?",
-                (c["new_content_type"], c["new_depth"], c["new_status"],
+                "UPDATE fbs SET content_type=?, depth=?, needs_human_review=? WHERE fb_id=?",
+                (c["new_content_type"], c["new_depth"],
                  c["new_needs_human_review"], c["fb_id"]),
             )
         conn.commit()
@@ -199,12 +197,8 @@ def main(argv: list[str]) -> int:
         print("   ✅ nothing to do.")
         return 0
 
-    kind = Counter(c["new_status"] for c in changes)
-    demote = [c for c in changes if c["new_status"] == "QUARANTINE"]
-    unquar = [c for c in changes if c["new_status"] == "PASS" and c["old_status"] == "QUARANTINE"]
     src = Counter(c["source"] for c in changes)
     ct = Counter(c["new_content_type"] for c in changes if c["new_content_type"] != "principle")
-    print(f"   new_status dist:        {dict(kind)}  (demotions={len(demote)}, un-quarantine={len(unquar)})")
     print(f"   non-principle demote:   {dict(ct)}")
     print(f"   source dist:            {dict(src)}")
 

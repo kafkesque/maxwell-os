@@ -87,6 +87,10 @@ CREATE TABLE IF NOT EXISTS fbs (
     boundary TEXT,
     consequence TEXT,
     taxonomy_match_method TEXT,
+    content_type_source TEXT,      -- C29 provenance tier for content_type (R1/D-279)
+    discipline_source TEXT,        -- C29 provenance tier for discipline (R1/D-279)
+    extraction_type_source TEXT,   -- C29 provenance tier for extraction_type (R1/D-279)
+    menu_hash TEXT,                -- SHA-256 of closed menu at classification time (R1/D-279)
     keywords TEXT,
     jargon TEXT,
     -- Classification (D316: discipline singular, D150: domains multi-label)
@@ -141,6 +145,10 @@ CREATE TABLE IF NOT EXISTS fbs (
     status TEXT NOT NULL,
     needs_human_review INTEGER,
     verifier_model TEXT,
+    s5_reason TEXT,             -- G19/D274h: typed S5 verdict (entail|neutral|contra|no_evidence|mech_fail|vacuous|evidence_contaminated|duplicate)
+    epistemic_status TEXT,      -- G19/F-43: S5 tier (corroborated|source-supported|cross-source-unverified|speculative)
+    verification_method TEXT,   -- G19/F-43: S5 verification method
+    isor TEXT,                  -- G19/F-43: full ISOR scores (JSON) from S5
     -- Stamps (R14)
     schema_version TEXT,
     gen_model TEXT,
@@ -258,6 +266,11 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "boundary", "TEXT")
     _migrate_add_column(conn, "fbs", "consequence", "TEXT")
     _migrate_add_column(conn, "fbs", "taxonomy_match_method", "TEXT")
+    # R1/D-279: closed-menu traceability + per-axis label provenance (menu_hash + *_source).
+    _migrate_add_column(conn, "fbs", "content_type_source", "TEXT")
+    _migrate_add_column(conn, "fbs", "discipline_source", "TEXT")
+    _migrate_add_column(conn, "fbs", "extraction_type_source", "TEXT")
+    _migrate_add_column(conn, "fbs", "menu_hash", "TEXT")
     # D2352: provenance/schema contract closure — segment provenance + verbatim evidence
     _migrate_add_column(conn, "fbs", "source_segments", "TEXT")
     # D2376: canonical source identity (D2176) — was dropped at S4, now persisted
@@ -282,6 +295,11 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "origin", "TEXT DEFAULT 'single_source'")
     # D2627: dedup marker — canonical fb_id when this row is a duplicate (NULL otherwise)
     _migrate_add_column(conn, "fbs", "duplicate_of", "TEXT")
+    # G19/F-43 + s5_reason (D274h): persist the S5 verification tier that stage6 previously dropped.
+    _migrate_add_column(conn, "fbs", "s5_reason", "TEXT")
+    _migrate_add_column(conn, "fbs", "epistemic_status", "TEXT")
+    _migrate_add_column(conn, "fbs", "verification_method", "TEXT")
+    _migrate_add_column(conn, "fbs", "isor", "TEXT")
     # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
     # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
     # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
@@ -409,7 +427,9 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             INSERT OR REPLACE INTO fbs (
                 fb_id, name, definition, application, failure_mode,
                 elaboration, content_type, extraction_type, mechanism,
-                boundary, consequence, taxonomy_match_method, keywords, jargon,
+                boundary, consequence, taxonomy_match_method,
+                content_type_source, discipline_source, extraction_type_source, menu_hash,
+                keywords, jargon,
                 domains, domains_raw,
                 discipline, discipline_raw,
                 depth, evidence,
@@ -427,6 +447,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 classification_errors, classification_status, classification_error,
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
+                s5_reason, epistemic_status, verification_method, isor,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
                 created_at, committed_at,
@@ -434,7 +455,9 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?,
-                ?, ?, ?, ?, ?,
+                ?, ?, ?,
+                ?, ?, ?, ?,
+                ?, ?,
                 ?, ?,
                 ?, ?,
                 ?, ?,
@@ -452,6 +475,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?,
                 ?, ?, ?,
                 ?, ?,
+                ?, ?, ?, ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?,
@@ -470,6 +494,10 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("boundary"), ""),
             _safe_str(fb.get("consequence"), ""),
             _safe_str(fb.get("taxonomy_match_method"), ""),
+            _safe_str(fb.get("content_type_source")),
+            _safe_str(fb.get("discipline_source")),
+            _safe_str(fb.get("extraction_type_source")),
+            _safe_str(fb.get("menu_hash")),
             _safe_str(fb.get("keywords"), ""),
             _safe_str(fb.get("jargon")),
             # domains + discipline (canonical + raw) — D316: discipline singular
@@ -528,6 +556,10 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("status"), "PENDING"),
             1 if fb.get("needs_human_review") else 0,
             _safe_str(fb.get("verifier_model")),
+            _safe_str(fb.get("s5_reason")),
+            _safe_str(fb.get("epistemic_status")),
+            _safe_str(fb.get("verification_method")),
+            _safe_json(fb.get("isor")),
             # stamps
             # D2169: Read schema version from config/version.yaml (single source of truth)
             _safe_str(fb.get("schema_version"), _get_pipeline_version()),

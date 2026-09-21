@@ -47,6 +47,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
+from pipeline.serving_gate import derive_status  # D274h: the single serving-gate rule
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     S5_CONF_ENRICH_WEIGHT,  # D2310: confidence enrichment weight
@@ -853,13 +854,10 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
                 "detail": enrich_detail,
             })
 
-        # 3. Determine status — DeBERTa-only (D2322 calibrated)
-        if fact_passed:
-            status = "PASS"
-            needs_human = False
-        else:
-            status = "QUARANTINE"
-            needs_human = False  # DeBERTa is the final authority — no human needed
+        # 3. Determine status — DeBERTa-only (D2322 calibrated), via the single
+        #    serving-gate rule (D274h): status is a function of the verification record.
+        status, s5_reason = derive_status(results)
+        needs_human = False  # DeBERTa is the final authority — no human needed
 
         # Handle strict mode: any non-PASS → QUARANTINE
         if strict and status != "PASS":
@@ -894,8 +892,9 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["verification_results"] = results
         vfb["confidence_score"] = confidence_score
         vfb["status"] = status
+        vfb["s5_reason"] = s5_reason
         vfb["needs_human_review"] = needs_human
-        vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold 0.10)"
+        vfb["verifier_model"] = f"{S5_NLI_MODEL_LARGE} (threshold {S5_NLI_PASS_THRESHOLD})"
         vfb["verification_method"] = method
 
         # D2284: Epistemic status — ISOR scoring

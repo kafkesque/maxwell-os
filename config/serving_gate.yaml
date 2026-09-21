@@ -1,0 +1,75 @@
+# Serving gate — status is a function of the verification record ONLY (D274a / G17).
+# WHY: scripts/apply_phase1_finalize.py:18 set status = PASS iff content_type == 'principle',
+# and two further hand-run scripts moved rows across the gate on label grounds. The live DB
+# matched that label rule on 4,745/4,745 PASS rows and 0/1,470 non-principle rows, so 1,941
+# rows were served whose own verification said passed=False and 506 verified rows were hidden.
+# The axis that decided what is retrievable was the axis with lift -0.010 over a constant answer.
+#
+# Ruling (D274a): status is derived from verification_results + a typed s5_reason; exactly one
+# writer; a label-derived status write is a hard error; CI invariant:
+#   status=PASS ⟹ factual.passed AND s5_reason NOT IN the negative set.
+# Measured effect: serving set 4,745 → 3,310. Deletes nothing (R-D410).
+
+schema_version: "3.0"
+last_updated: "2026-09-19"
+decision: "D274a"
+
+serving_gate:
+  pass_status: "PASS"
+  quarantine_status: "QUARANTINE"
+  factual_check_name: "factual"
+  # A duplicate of a canonical FB (duplicate_of IS NOT NULL) is NEVER served, even if
+  # its verification passed — this is the declared dedup rule (D2627 / D-271d), not a
+  # verification verdict. reason: "duplicate".
+  duplicate_reason: "duplicate"
+  # The ONLY pass condition: the factual check passed (NLI ENTAIL-majority AND no
+  # mechanism / evidence / classification failure), else QUARANTINE (fail-closed, D2093).
+
+  # Typed reason vocabulary (D274a / D274g). A PASS row must carry `entail`; the CI
+  # invariant forbids PASS with any `negative` reason. The vocabulary is persisted so the
+  # QUARANTINE split (G9 / D272d) and the stage-5 tier (G19) become wiring jobs, not modelling.
+  reason_vocabulary:
+    entail:
+      passed: true
+      negative: false
+      meaning: "NLI ENTAIL-majority — the claim is supported by its evidence"
+    neutral:
+      passed: false
+      negative: false
+      meaning: "NLI NEUTRAL — unverified (no clean entailment or contradiction)"
+    contra:
+      passed: false
+      negative: true
+      meaning: "NLI CONTRA-majority — contradicted by its evidence"
+    no_evidence:
+      passed: false
+      negative: true
+      meaning: "all evidence passages are non-evidence fragments (no clean premise for NLI)"
+    mech_fail:
+      passed: false
+      negative: true
+      meaning: "mechanism tautological — restates the definition instead of explaining the causal chain"
+    vacuous:
+      passed: false
+      negative: true
+      meaning: "mechanism too short / vacuous"
+    evidence_contaminated:
+      passed: false
+      negative: true
+      meaning: "BUG-181 EPUB→MD conversion artifacts in evidence_passages"
+    duplicate:
+      passed: false
+      negative: false
+      meaning: "dedup (D2627): duplicate of a canonical FB — excluded from serving regardless of verification"
+
+  # Ordered detail-prefix rules: first match wins (specific before general).
+  # These map stage5's persisted factual `detail` string back to the typed reason.
+  detail_rules:
+    - {prefix: "ENTAIL",                         reason: entail}
+    - {prefix: "NEUTRAL",                        reason: neutral}
+    - {prefix: "CONTRA",                         reason: contra}
+    - {prefix: "All ",                           reason: no_evidence}
+    - {prefix: "MECH FAIL: Mechanism too short", reason: vacuous}
+    - {prefix: "MECH FAIL",                      reason: mech_fail}
+    - {prefix: "BUG-181#1",                      reason: evidence_contaminated}
+  fallback_reason: "unknown"

@@ -99,7 +99,7 @@ DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions"
 CONTENT_TYPE_ONTOLOGY: str = (
     "CONTENT_TYPE (choose EXACTLY ONE — is this a reusable principle, or not?):\n"
     "- principle        = a single transferable prescriptive claim / reusable rule (a "
-    "one-sentence heuristic acting as a filter across 3+ domains, OR a deep single-domain "
+    "one-sentence heuristic that is a self-contained transferable filter at ANY scope, OR a deep single-domain "
     "principle). ALSO: a reusable matrix/methodology with NO explicit steps.\n"
     "- process_template = step-by-step method — needs >=2 steps AND a gate/done-condition.\n"
     "- process_instance = a specific NAMED case / execution of a method (a study, project, product).\n"

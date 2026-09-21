@@ -49,7 +49,7 @@ PROMPT = """Classify the CONTENT-TYPE of this extracted knowledge object. Conten
 functional ROLE (what kind of object), one of: {enum}.
 
 - principle: a single TRANSFERABLE prescriptive/conceptual insight (why/when something
-  works; a normative heuristic that filters across 3+ domains). NOT a concrete case study.
+  works; a self-contained normative heuristic at ANY scope). NOT a concrete case study.
 - process_template: a repeatable how-to METHOD with >=2 ordered steps/gates (a sequence
   of actions to follow).
 - process_instance: a CONCRETE case study / worked example of a method actually executed

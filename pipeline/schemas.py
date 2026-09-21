@@ -397,6 +397,32 @@ class FB(StampedRecord):
                     "Distinct from gen_model per R5.",
     )
 
+    # ── R1 provenance (D-279) — closed-menu traceability + per-axis label provenance ──
+    # menu_hash + *_source are the binding prerequisite for `min_human_share` (F-44):
+    # a label without a menu_hash is untraceable, and a label without a *_source tier
+    # cannot contribute to the human share. *_source reuses the C29 provenance
+    # vocabulary (human_verbatim | llm_extracted_from_source | llm_hypothesis).
+    # None until R1 stamps them — the corpus currently has ZERO human-derived labels
+    # (D-277), so everything is post-hoc `llm_extracted_from_source` by default.
+    content_type_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="C29 provenance tier for content_type (D-279). human_verbatim | "
+                    "llm_extracted_from_source | llm_hypothesis.",
+    )
+    discipline_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="C29 provenance tier for discipline (D-279).",
+    )
+    extraction_type_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
+        default=None,
+        description="C29 provenance tier for extraction_type (D-279).",
+    )
+    menu_hash: str | None = Field(
+        default=None,
+        description="SHA-256 of the closed menu this FB was classified against (R1/D-279). "
+                    "Traceability stamp for `min_human_share` (F-44).",
+    )
+
     @field_validator("domains")
     @classmethod
     def domains_unique_and_sorted(cls, v: list) -> list:
@@ -490,6 +516,18 @@ class VerifiedFB(FB):
     )
     verifier_model: str | None = Field(
         default=None, description="Model that performed verification"
+    )
+    s5_reason: str | None = Field(
+        default=None, description="Typed S5 verdict reason (serving gate)"
+    )
+    epistemic_status: str | None = Field(
+        default=None, description="S5 tier: corroborated|source-supported|cross-source-unverified|speculative"
+    )
+    verification_method: str | None = Field(
+        default=None, description="S5 verification method"
+    )
+    isor: dict | None = Field(
+        default=None, description="Full ISOR scores from S5 (JSON in DB)"
     )
 
 
@@ -624,7 +662,14 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
       * names are compared NORMALISED, so punctuation/case cannot hide a collision;
       * every collision must be DECLARED in `config/eval_integrity.yaml::label_axes`
         (`shared_labels` for documented catch-alls, `known_collisions` for recorded debt);
-      * an UNDECLARED collision is a hard error, and a declared one is still reported.
+      * an UNDECLARED collision is a hard error.
+
+    SPLIT 2026-09-19 (D273b / G18). This is the ROW-LEVEL guard: it fails closed ONLY on
+    genuinely illegal labels (domain-as-discipline, discipline-as-domain, non-canonical, and
+    UNDECLARED axis collisions). A DECLARED collision (D-271a) is a ruling, not an error, so it
+    no longer produces a flag here — reported instead, never rejected, by
+    `lint_discipline_domain_vocabulary()`. This makes `validate_discipline_domain('research
+    methodology', <anything>)` empty (the D-271a legal label can be written again).
 
     Flag forms (empty list = clean):
       - "domain-as-discipline: '<x>'"
@@ -632,13 +677,8 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
       - "non-canonical-discipline: '<x>'"
       - "non-canonical-domain: '<x>'"
       - "undeclared-axis-collision: discipline '<a>' collides with domain '<b>'"
-      - "DECLARED: declared-axis-collision: discipline '<a>' vs domain '<b>' (<ruling text from config>)"
 
-    D271a (2026-09-19): a declared collision is a RULING, not pending work. The flag is prefixed
-    "DECLARED: " and its parenthetical text is read from `config/eval_integrity.yaml` (C12), so the
-    guard can never again report a decided question as open -- which it did for two days after the
-    ruling, when it still said "known debt, decision pending" (BUG-284). The list is still
-    non-empty, so every fail-closed call site keeps failing closed unchanged.
+    Declared collisions and shared catch-alls are reported by the lint companion, not here.
     """
     flags: list[str] = []
     contract = _axis_contract()
@@ -647,14 +687,6 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
         (_norm_label(c.get("discipline")), _norm_label(c.get("domain")))
         for c in (contract.get("known_collisions") or [])
     ]
-    # D271a (2026-09-17): a DECLARED collision is a ruling, not pending work. The wording is read
-    # from config (C12) so the guard can never again report a decided question as open -- which it
-    # did for two days after the ruling ("known debt, decision pending").
-    declared_note = {}
-    for _c in (contract.get("known_collisions") or []):
-        _txt = str(_c.get("decision") or "").strip() or "declared in config/eval_integrity.yaml"
-        _short = _txt.split(".")[0].split(" \u2014 ")[0].strip()
-        declared_note[(_norm_label(_c.get("discipline")), _norm_label(_c.get("domain")))] = _short
     dom_norm = {_norm_label(d): d for d in CANONICAL_DOMAINS}
     disc_norm = {_norm_label(d): d for d in CANONICAL_DISCIPLINES}
 
@@ -676,12 +708,58 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
     key = _norm_label(discipline)
     if discipline and discipline in CANONICAL_DISCIPLINES and key not in shared and key in dom_norm:
         other = dom_norm[key]
+        if not any(key == a and _norm_label(other) == b for a, b in declared):
+            flags.append(f"undeclared-axis-collision: discipline '{discipline}'"
+                         f" collides with domain '{other}'")
+    for dom in domains or []:
+        key = _norm_label(dom)
+        if dom in CANONICAL_DOMAINS and key not in shared and key in disc_norm:
+            other = disc_norm[key]
+            if not any(_norm_label(other) == a and key == b for a, b in declared):
+                flags.append(f"undeclared-axis-collision: discipline '{other}' collides with"
+                             f" domain '{dom}'")
+    seen: set[str] = set()
+    unique: list[str] = []
+    for flag in flags:
+        if flag not in seen:
+            seen.add(flag)
+            unique.append(flag)
+    return unique
+
+
+def lint_discipline_domain_vocabulary(
+    discipline: str | None = None,
+    domains: list[str] | None = None,
+) -> list[str]:
+    """Vocabulary lint (D273b / G18): report DECLARED collisions WITHOUT rejecting.
+
+    The split companion to `validate_discipline_domain()`. The row guard fails closed
+    only on genuinely illegal labels; a DECLARED collision (D-271a) is a ruling and
+    therefore LEGAL — but it should still be REPORTED so the config-hygiene signal is
+    not lost. This returns the declared-collision flags for a given label; it is NEVER
+    wired to a fail-closed call site.
+    """
+    flags: list[str] = []
+    contract = _axis_contract()
+    shared = {_norm_label(x) for x in (contract.get("shared_labels") or [])}
+    declared = [
+        (_norm_label(c.get("discipline")), _norm_label(c.get("domain")))
+        for c in (contract.get("known_collisions") or [])
+    ]
+    declared_note = {}
+    for _c in (contract.get("known_collisions") or []):
+        _txt = str(_c.get("decision") or "").strip() or "declared in config/eval_integrity.yaml"
+        _short = _txt.split(".")[0].split(" \u2014 ")[0].strip()
+        declared_note[(_norm_label(_c.get("discipline")), _norm_label(_c.get("domain")))] = _short
+    dom_norm = {_norm_label(d): d for d in CANONICAL_DOMAINS}
+    disc_norm = {_norm_label(d): d for d in CANONICAL_DISCIPLINES}
+
+    key = _norm_label(discipline)
+    if discipline and discipline in CANONICAL_DISCIPLINES and key not in shared and key in dom_norm:
+        other = dom_norm[key]
         if any(key == a and _norm_label(other) == b for a, b in declared):
             flags.append(f"DECLARED: declared-axis-collision: discipline '{discipline}' vs domain"
                          f" '{other}' ({declared_note.get((key, _norm_label(other)), 'declared debt')})")
-        else:
-            flags.append(f"undeclared-axis-collision: discipline '{discipline}'"
-                         f" collides with domain '{other}'")
     for dom in domains or []:
         key = _norm_label(dom)
         if dom in CANONICAL_DOMAINS and key not in shared and key in disc_norm:
@@ -689,9 +767,6 @@ def validate_discipline_domain(discipline: str | None, domains: list[str] | None
             if any(_norm_label(other) == a and key == b for a, b in declared):
                 flags.append(f"DECLARED: declared-axis-collision: discipline '{other}' vs domain"
                              f" '{dom}' ({declared_note.get((_norm_label(other), key), 'declared debt')})")
-            else:
-                flags.append(f"undeclared-axis-collision: discipline '{other}' collides with"
-                             f" domain '{dom}'")
     seen: set[str] = set()
     unique: list[str] = []
     for flag in flags:

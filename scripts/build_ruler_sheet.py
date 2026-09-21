@@ -264,7 +264,7 @@ AIDS: dict[str, dict[str, dict[str, str]]] = {
         "principle": {
             "ask": "Is there ONE transferable instruction or truth here that would still hold in a different field?",
             "not_this": "a described procedure with named steps is process_template; one concrete finished case is process_instance",
-            "trap": "D2587 boundary: a SINGLE transferable prescriptive sentence that acts as a filter across 3+ domains is a PRINCIPLE, not a process_template. Length is not the test; transferability is.",
+            "trap": "a SINGLE transferable prescriptive sentence (a self-contained filter at ANY scope) is a PRINCIPLE, not a process_template. Length is not the test; transferability is — depth/scope is a separate axis, never a role test.",
         },
         "process_template": {
             "ask": "Is this a reusable SHAPE with slots I could fill for a different case (numbered steps, a checklist, a matrix)?",

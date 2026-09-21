@@ -253,7 +253,7 @@ ruler_sheet:
 ruler_authority:
   decision: D-315
   authority_json: governance/anchor1_frozen_20260920.json
-  authority_sha256: 0ec321a7761d03a9277372051cef867e15d32d438ebb51fefdaf39d4159a54cf
+  authority_sha256: 0ec321a7761d03a9277372051cef867e15e32d438ebb51fefdaf39d4159a54cf
   human_workspace: governance/RULER_BLIND_SHEET_20260917.csv
   workspace_sha256_at_head: 383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b
   workspace_role: "human editing workspace + abstention-reason provenance; NEVER the answer key"
@@ -278,9 +278,37 @@ ruler_authority:
   menu_hash: "cac6e695"             # judged under THIS menu (CT = 7, no `none`); never pool across menus
   menu_file: config/closed_menu_v5.json
   truth_source: key                 # scorer default (C21). `sheet` exists only as a cross-check.
+  # BUG-344/345 FIX (2026-09-21): the pins above are now ENFORCED in the run path (verify_declared_pin,
+  # FAIL-CLOSED; --allow-pin-drift = loud override) and audited byte-exactly by scripts/pin_audit.py.
+  # The authority_sha256 pin carried a ONE-CHARACTER typo (...e15d32d4... vs ...e15e32d4..., index 34) and
+  # passed for two sessions because every prior check compared a 16-char PREFIX. Prefix != verification.
+  artifact_superseded:
+    artifact: governance/ruler_inverted_20260920.json
+    sha256: 66c9ba337061a950f434b0dce13b719dac5daeacff8ef49c0ef89e810c23bc36
+    superseded_by: "BUG-344/345 fix (2026-09-21)"
+    same_numbers: "4750 result leaves identical to the superseded artifact; CT 0.3533 / DISC 0.4741 / FORM 0.2828"
+    why: >-
+      The superseded artifact cited an EMPTY annotation_sha256 (the pin never reached the guard). The
+      regenerated artifact cites the hash it actually consumed (D-313) and the declared pins beside it.
   abstention: "blank = a datum, never imputed; `emerging` (human) = abstention, `emerging_dump` (stored) = FAILURE (BUG-338)"
   pooling: "NEVER concatenate with ANCHOR-2: different sampling design AND different menu; pool only at read time with weights"
-  human_attestation: "UNSIGNED (owner gate) -- the labels are human-blind by construction; a signed line would convert that inference into evidence"
+  human_attestation:                 # D-317 (2026-09-21): SIGNED by the owner -- EVIDENCE, not inference.
+    text: "these 150 labels are mine, made blind to pipeline output."
+    status: SIGNED
+    signed_date: "2026-09-21"
+    signer: owner
+    scope: {rows: 150, workspace: governance/RULER_BLIND_SHEET_20260917.csv, stratum_a: 100, stratum_b: 50}
+    attests_artifact: governance/anchor1_frozen_20260920.json
+    attests_sha256: 0ec321a7761d03a9277372051cef867e15e32d438ebb51fefdaf39d4159a54cf
+    converts: >-
+      "human-anchored" moves from verified-by-reconstruction to ATTESTED: every model-accuracy claim in this repo
+      now rests on a dated statement about the exact sha256-cited artifact, not on an inference from file structure.
+    does_not_convert: >-
+      Attestation is NOT independence. second_coder_required_before_repointing stays true (F-11): no second coder
+      exists, so NO floor may be repointed -- every floor is single-coder, now single-coder-ATTESTED.
+    rule: >-
+      D-317: an attestation is a dated, scoped, hash-cited record naming the exact artifact it attests; prose may
+      say "attested" only when such a record exists (this one) -- never from a bare quoted sentence.
 
 
 ruler_measurement:                 # D272a (2026-09-19): the FIRST certified stored-label measurement.

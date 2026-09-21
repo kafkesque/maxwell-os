@@ -71,14 +71,18 @@ artifact is the D-313 sin.
 ### Effective n (BUG-334) — publish it or the denominator flatters you
 CT 150/150 · DISC **116**/150 (28 blank + 6 `emerging` cannot be scored) · FORM 145/150.
 
-### HUMAN ATTESTATION — **UNSIGNED (open owner gate)**
-The human fields are the reviewer's blind verdicts by construction, and the label conversion is verifiable
-(0 CT diffs, 0 substantive DISC/FORM diffs vs the workspace). What does NOT yet exist is a **signed statement**
-converting that inference into evidence. This line is reserved for it:
+### HUMAN ATTESTATION — **SIGNED 2026-09-21 (D-317)**
+The line reserved for the owner was signed on 2026-09-21 and is now recorded machine-readably in
+`config/eval_integrity.yaml:ruler_authority.human_attestation`:
 
-> `human_attestation: ""` — owner, please sign: *"these 150 labels are mine, made blind to pipeline output."*
+> `human_attestation: "these 150 labels are mine, made blind to pipeline output."` — **owner, 2026-09-21**
 
-Until it is signed, treat "human-anchored" as *verified-by-reconstruction*, not *attested*.
+**Attests:** `governance/anchor1_frozen_20260920.json`, sha256 `0ec321a7…`, n=150 (100 stratum A + 50 stratum B).
+**Converts:** "human-anchored" from *verified-by-reconstruction* → **ATTESTED**. The owner gate that reserved this
+line is CLOSED; live owner gates drop from three to two (laya-mlx benchmark-only install; abstention `t_low = p25`).
+**Does NOT convert:** attestation is not independence — `second_coder_required_before_repointing: true` still has no
+second coder (F-11), so no floor may be repointed. No published number moves (CT 0.3533 / DISC 0.4741 / FORM 0.2828;
+re-scored from the authority, bit-identical).
 ## D-316 ADDENDUM (2026-09-21) — what is pinned, and what is only citable
 | role | path | sha256 | note |
 |---|---|---|---|

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 683
+total_decisions: 685
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7211,8 +7211,57 @@ decisions:
     BUG-341: a rotation-guarded checkpoint is not a durably restored artifact -- the live stage5 path is absent, the bytes
     survive as .stale_20260921_185942 (2c206a25...) and are cited, never copied back (that would re-arm a stale resume).
 
+- id: D317
+  category: EVALS
+  state: RATIFIED
+  date: "2026-09-21"
+  title: >-
+    The human attestation is SIGNED -- "human-anchored" becomes ATTESTED evidence (n=150, authority 0ec321a7...)
+  decision: >-
+    The owner signed the reserved line: "these 150 labels are mine, made blind to pipeline output." Recorded
+    machine-readably in config/eval_integrity.yaml:ruler_authority.human_attestation with signer, date, scope (n=150;
+    100 stratum A + 50 stratum B) and the attested artifact governance/anchor1_frozen_20260920.json (sha256
+    0ec321a7...). This converts "human-anchored" from verified-by-reconstruction to ATTESTED and CLOSES the owner gate
+    that reserved the line. Live owner gates: laya-mlx benchmark-only install; abstention operating point t_low=p25.
+    No published number moves: CT 0.3533 / DISC 0.4741 / FORM 0.2828 reproduce exactly from the authority.
+  rule_added: >-
+    D-317: an attestation is a dated, scoped, hash-cited record naming the exact artifact it attests, stored
+    machine-readably (C12); prose may say "attested" only when such a record exists. Closing a human gate requires
+    updating the artifact that recorded the gate in the SAME session -- a gate left open after it was answered is a
+    governance contradiction. Attestation is NOT independence: F-11 (no second coder) still forbids repointing any floor.
+  also_recorded: >-
+    BUG-344 (opened + fixed same session): authority_paths() never read the *_sha256 pins declared in
+    config/eval_integrity.yaml, so the annotation drift guard was INERT in the run path and the artifact cited an
+    empty annotation_sha256. Declared pins are now enforced fail-closed (C16) and the artifact cites the hash consumed.
+
+- id: D318
+  category: EVALS
+  state: RATIFIED
+  date: "2026-09-21"
+  title: >-
+    A declared pin is a control only when it is byte-compared in the RUN PATH (BUG-344/345)
+  decision: >-
+    Every sha256 declared in config/eval_integrity.yaml must be (a) read by the code that asserts it, (b) compared
+    with FULL equality, and (c) enforced fail-closed before the artifact is consumed. BUG-344: authority_paths()
+    never read the pins, so the BUG-340 annotation drift guard received an empty declared hash and could not fire,
+    while the artifact cited an empty annotation_sha256. BUG-345: once enforced, the authority pin turned out to
+    carry a one-character typo (index 34) that had passed for two sessions because every prior check compared a
+    16-char PREFIX. Both are fixed: verify_declared_pin() enforces the pin before the read (C16/D-313),
+    --allow-pin-drift is the only loud override, and scripts/pin_audit.py byte-compares every declared pin.
+    Numbers are unchanged (4750 result leaves identical to the superseded artifact).
+  rule_added: >-
+    D-318: a prefix comparison is NOT a verification. A pin that is not read by the run path is documentation, not
+    a control; a control that cannot fail is not a control. Pin→file pairs must be declared EXPLICITLY (never
+    inferred by proximity to a filename), audited byte-exactly (scripts/pin_audit.py), and an artifact must cite
+    the hash it ACTUALLY consumed, not the hash it was configured with.
+  also_recorded: >-
+    BUG-346: scripts/score_ruler_labels.py retired as a second truth path (C21) -- it now exits 2 unless
+    --legacy-sheet-truth is passed. BUG-333 partially fixed: the R5 verifier requires quoted evidence per
+    number-deciding question and exits 2 unless PASS. The superseded ruler artifact (66c9ba33...) is recorded in
+    config:ruler_authority.artifact_superseded, never deleted (R-D410).
+
 summary:
-  total: 683
+  total: 685
   proposed: 6
   draft: 1
   active: 483
@@ -7223,7 +7272,7 @@ summary:
   deferred: 14
   resolved: 118
   planned: 8
-  ratified: 3
+  ratified: 5
   open: 17
   by_category:
     ARCH: 27
@@ -7265,7 +7314,7 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 3
+    EVALS: 5
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21

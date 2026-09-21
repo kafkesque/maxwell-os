@@ -8,10 +8,12 @@
  "truth_source": "authority anchor1_frozen_20260920.json + workspace abstention annotation (6 cells)",
  "authority": "governance/anchor1_frozen_20260920.json (D-315 canonical ruler)",
  "authority_sha256": "0ec321a7761d03a9277372051cef867e15e32d438ebb51fefdaf39d4159a54cf",
+ "authority_pin_declared": "0ec321a7761d03a9277372051cef867e15e32d438ebb51fefdaf39d4159a54cf",
  "menu_hash": "cac6e695",
  "workspace": "governance/RULER_BLIND_SHEET_20260917.csv (human workspace; NOT authority)",
  "annotation_source": "governance/RULER_BLIND_SHEET_20260917.csv (abstention REASON only: blank vs emerging vs irrelevant; sha256-pinned)",
- "annotation_sha256": "",
+ "annotation_sha256": "383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b",
+ "annotation_pin_declared": "383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b",
  "annotation_overlaid_cells": 6,
  "total_rows": 150,
  "results": {

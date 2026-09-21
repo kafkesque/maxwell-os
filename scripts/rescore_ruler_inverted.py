@@ -81,9 +81,34 @@ def load_taxonomy() -> tuple[dict[str, str], dict[str, str]]:
     return norm2canon, group
 
 
+def verify_declared_pin(path: Path, declared: str, label: str, allow_drift: bool = False) -> str:
+    """Return the sha256 of `path`, FAIL-CLOSED when it contradicts the config-declared pin (C16/D-313).
+
+    BUG-344: the pins were declared in YAML but never read, so the guard existed only on paper. A pin
+    that is not enforced in the run path is documentation, not a control.
+    """
+    if not path.exists():
+        raise SystemExit(f"FAIL-CLOSED: {label} {path.name} is missing")
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if declared and actual != declared:
+        msg = f"{label} pin DRIFT: {path.name} actual {actual[:12]} != declared {declared[:12]}"
+        if not allow_drift:
+            raise SystemExit(f"FAIL-CLOSED (C16/D-313): {msg}; pass --allow-pin-drift to proceed LOUDLY")
+        print(f"WARN: {msg}")
+    elif declared:
+        print(f"PIN OK: {label} {path.name} {actual[:12]}")
+    return actual
+
+
 def authority_paths() -> dict:
-    """Return the config-declared truth/authority paths (C12), with constant fallbacks."""
-    out = {"authority": AUTHORITY, "workspace": SHEET, "truth_source": "key", "menu_hash": ""}
+    """Return the config-declared truth/authority paths AND their declared sha256 pins (C12/C16).
+
+    BUG-344: `*_sha256` was never read here, so the declared annotation pin reached the overlay as an
+    EMPTY string, the drift guard short-circuited, and the artifact cited an empty annotation_sha256.
+    """
+    out = {"authority": AUTHORITY, "workspace": SHEET, "truth_source": "key", "menu_hash": "",
+           "authority_sha256": "", "workspace_sha256": "", "annotation_sha256": "",
+           "key": KEY, "key_sha256": ""}
     try:
         cfg = yaml.safe_load(CFG.read_text(encoding="utf-8")) or {}
     except (OSError, yaml.YAMLError) as exc:
@@ -98,6 +123,12 @@ def authority_paths() -> dict:
         out["truth_source"] = str(ra["truth_source"])
     if ra.get("menu_hash"):
         out["menu_hash"] = str(ra["menu_hash"])
+    out["authority_sha256"] = str(ra.get("authority_sha256") or "")
+    out["workspace_sha256"] = str(ra.get("workspace_sha256_at_head") or "")
+    out["annotation_sha256"] = str(ra.get("annotation_sha256") or "")
+    if ra.get("key_file"):
+        out["key"] = REPO / str(ra["key_file"])
+    out["key_sha256"] = str(ra.get("key_sha256") or "")
     return out
 
 
@@ -509,6 +540,8 @@ def main() -> int:
     ap.add_argument("--out-prefix", default="", help="prefix the artifact names (never clobber a cited artifact)")
     ap.add_argument("--allow-unpinned-annotation", action="store_true",
                     help="proceed (loudly) when the annotation workspace drifted from its declared sha256")
+    ap.add_argument("--allow-pin-drift", action="store_true",
+                    help="proceed LOUDLY when a config-declared sha256 pin disagrees with the bytes on disk (C16)")
     ap.add_argument("--self-test-blinding", action="store_true",
                     help="mechanical truth-blinding test: the reference must be invariant to the object under test")
     args = ap.parse_args()
@@ -516,7 +549,11 @@ def main() -> int:
     paths = authority_paths()
     truth_source = args.truth_source or paths["truth_source"]
     overlaid = 0
+    annotation_actual = ""
     if truth_source == "key":
+        # BUG-344: enforce the DECLARED authority pin BEFORE the authority is read (C16/D-313).
+        verify_declared_pin(paths["authority"], paths.get("authority_sha256", ""), "authority",
+                            args.allow_pin_drift)
         rows, keymap = load_truth_from_authority(paths["authority"])
         source_desc = f"authority {paths['authority'].name}"
         # BUG-340: the authority cannot express an abstention REASON -> restore it from the
@@ -525,10 +562,13 @@ def main() -> int:
             rows, paths["workspace"], paths.get("annotation_sha256", ""),
             args.allow_unpinned_annotation)
         source_desc += f" + workspace abstention annotation ({overlaid} cells)"
+        annotation_actual = hashlib.sha256(paths["workspace"].read_bytes()).hexdigest() if overlaid else ""
     else:
+        verify_declared_pin(paths["workspace"], paths.get("workspace_sha256", ""), "workspace",
+                            args.allow_pin_drift)
         with paths["workspace"].open(encoding="utf-8") as fh:
             rows = [r for r in csv.DictReader(fh) if (r.get("item_id") or "").strip()]
-        keymap = {r["item_id"]: r for r in json.loads(KEY.read_text(encoding="utf-8"))}
+        keymap = {r["item_id"]: r for r in json.loads(paths["key"].read_text(encoding="utf-8"))}
         source_desc = f"workspace {paths['workspace'].name} + legacy key (cross-check only)"
     norm2canon, group = load_taxonomy()
 
@@ -548,11 +588,13 @@ def main() -> int:
         "truth_source": source_desc,
         "authority": "governance/anchor1_frozen_20260920.json (D-315 canonical ruler)",
         "authority_sha256": hashlib.sha256(paths["authority"].read_bytes()).hexdigest(),
+        "authority_pin_declared": paths.get("authority_sha256", ""),
         "menu_hash": paths["menu_hash"],
         "workspace": "governance/RULER_BLIND_SHEET_20260917.csv (human workspace; NOT authority)",
         "annotation_source": ("governance/RULER_BLIND_SHEET_20260917.csv (abstention REASON only: "
                               "blank vs emerging vs irrelevant; sha256-pinned)"),
-        "annotation_sha256": paths.get("annotation_sha256", ""),
+        "annotation_sha256": annotation_actual,        # BUG-344: the hash ACTUALLY consumed
+        "annotation_pin_declared": paths.get("annotation_sha256", ""),
         "annotation_overlaid_cells": overlaid,
         "total_rows": len(rows),
         "results": results,

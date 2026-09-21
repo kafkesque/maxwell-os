@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 89,
-  "open_n": 60,
-  "closed_n": 29,
+  "total_ids": 92,
+  "open_n": 59,
+  "closed_n": 33,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -284,11 +284,6 @@
       "events": 1
     },
     {
-      "id": "BUG-333",
-      "title": "(MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp",
-      "events": 1
-    },
-    {
       "id": "BUG-334",
       "title": "(MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n",
       "events": 1
@@ -333,11 +328,15 @@
     "BUG-329",
     "BUG-330",
     "BUG-332",
+    "BUG-333",
     "BUG-335",
     "BUG-337",
     "BUG-338",
     "BUG-339",
     "BUG-340",
-    "BUG-342"
+    "BUG-342",
+    "BUG-344",
+    "BUG-345",
+    "BUG-346"
   ]
 }

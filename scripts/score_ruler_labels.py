@@ -274,5 +274,20 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # C21 / D-315 / D-316 (2026-09-21): this scorer is RETIRED as a SECOND TRUTH PATH.
+    # It reads the legacy sheet+key pair and treats the STORED label as the answer key, i.e. it measures
+    # agreement-with-corruption. scripts/rescore_ruler_inverted.py is the ONE implementation (D-315:
+    # governance/anchor1_frozen_20260920.json is the only answer key). Kept in-tree only so the historic
+    # `verification:` citations in config/decisions.yaml remain resolvable -- it refuses to run by default.
+    if "--legacy-sheet-truth" not in sys.argv:
+        print(
+            "RETIRED (C21/D-315/D-316): this script is NOT the ruler scorer.\n"
+            "  canonical artifact: governance/ruler_inverted_20260920.json\n"
+            "  canonical scorer:   python3 scripts/rescore_ruler_inverted.py\n"
+            "  pin audit:          python3 scripts/pin_audit.py\n"
+            "Re-run with --legacy-sheet-truth ONLY for a historical cross-check; the number it prints is\n"
+            "NON-CANONICAL and must never be quoted or compared against the canonical error rates."
+        )
+        sys.exit(2)
+    print("WARN: --legacy-sheet-truth set: NON-CANONICAL number (legacy sheet+key truth path).")
     sys.exit(main())
-

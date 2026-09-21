@@ -104,7 +104,7 @@ Nothing below can be delegated to a model without destroying the value of the st
 | **G1** | **Ratify the priority ruling** — confirm "fix the ruler first" (or overrule it) | `PRIORITY_DECISION_20260917.md` (mark ratified) | 10 min reading | the whole sequence's authority |
 | **G2** | **Rule relabel vs retire on 30 sampled orphan rows** — are the 4,054 untraceable KB objects legitimate knowledge, or stale residue the checkpoint already dropped? | `F14_RELABEL_OR_RETIRE_SAMPLE_20260917.csv` (fill `G2_VERDICT_keep_or_retire`, `G2_quality_1to5`, `G2_note`) | 30-45 min | F-14 (~4,054 calls / 3 h) — and possibly saves all of it |
 | **G3** | **Blind-label 36 rows** (4 tasks x 9) *before* any model runs | `JUDGE_CALIBRATION_SHEET_20260917.csv` (fill `HUMAN_VERDICT`) | 35-50 min | R5 re-verification (~650 calls) + which judge owns T1/T2/T3/T6 |
-| **G4** | **Blind-label the certified eval core**, n=100-150, concentrated on `content_type` + `discipline` + FORM | sheet to be generated (next) | 6-10 h | **every** model-accuracy claim, the retrain, the role decisions |
+| **G4** | **Blind-label the certified eval core**, n=100-150, concentrated on `content_type` + `discipline` + FORM **— LABELLED; attestation SIGNED 2026-09-21 (D-317)** | `governance/anchor1_frozen_20260920.json` (`0ec321a7…`) | done | still blocks: nothing — it *enables* every model-accuracy claim. Independence remains open (F-11: no second coder) |
 | **G5** | **Ratify the P2 freeze** — 19 uncited roles: 4 need a real DECISION, 11 get stamped `UNVERIFIED` | `governance/consolidation_drafts_20260916/02_model_assignments.yaml.draft` | 45-60 min | `config/pipeline_config.yaml` freeze, CONSTITUTION §2 |
 | **G6** | **Decide the synced-folder question (F-09)** — corpus, DB and config live under a third-party sync root (C3 sovereignty / leak vector) | `FORENSIC_AUDIT_20260917.md` F-09 | decision | leak-risk posture |
 | **G7** | **Decide the domain aggregation policy** — 63 contested rows, exact-set vs union | `governance/domain_aggregation_policy_decision.md` | decision | the domain axis |
@@ -505,3 +505,30 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
 - BUG-330 FIXED; BUG-343 OPEN (a smoke test cannot show its own failure output).
 - HUMAN GATES (unchanged, untouched this session): (1) laya-mlx benchmark-only install in an isolated venv; (2) abstention operating point t_low=p25; (3) owner signature on the human_attestation line.
 
+
+### Session 10 update (2026-09-21) — D-317: the human attestation is SIGNED (owner gate CLOSED)
+- **D-317 RATIFIED.** Owner signed `human_attestation: "these 150 labels are mine, made blind to pipeline output."`
+  Recorded in `config/eval_integrity.yaml:ruler_authority.human_attestation` with the scope (n=150; 100 A + 50 B) and
+  the attested artifact sha256 (`governance/anchor1_frozen_20260920.json`, `0ec321a7…`). "human-anchored" is now
+  **ATTESTED**, not verified-by-reconstruction. No published number moves.
+- **HUMAN GATES — now TWO live** (the signature gate is CLOSED):
+  1. laya-mlx benchmark-only install, isolated venv, pinned revision — unchanged.
+  2. abstention operating point `t_low = p25` (error 0.4231 at a ~25% queue; `enabled: false`) — unchanged.
+  Plus G2..G7 in the register below; G4's *labelling* is done and its attestation is now signed.
+- **NOT converted:** attestation is not independence. F-11 (`second_coder_required_before_repointing: true`, no second
+  coder) still forbids repointing any floor. Every floor is single-coder, now single-coder-ATTESTED.
+- **BUG-344 opened + FIXED:** the `*_sha256` pins declared in config were never read by `authority_paths()`, so the
+  annotation drift guard was inert in the run path and the artifact cited an EMPTY `annotation_sha256`; declared pins
+  are now enforced fail-closed and the artifact cites the hash it consumed.
+- Carried, not dropped: BUG-341 (live stage5 checkpoint absent), BUG-343, BUG-312, F-11, 46 `config/*.bak_*` +
+  32 `governance/*.bak_*` housekeeping debt (the only recovery copies; owner pass).
+
+### Session 10 addendum (2026-09-21) — audit found THREE real defects, all fixed
+- **BUG-344 (HIGH, FIXED)** — declared pins were never read by `authority_paths()`, so the annotation drift
+  guard was INERT in the run path and the artifact cited an empty `annotation_sha256` (D-313 failure).
+- **BUG-345 (HIGH, FIXED)** — the authority pin itself carried a one-character typo (index 34) that passed two
+  sessions of "verification" because every check compared a 16-char PREFIX.
+- **BUG-346 (MED, FIXED)** — `score_ruler_labels.py` (stored-label-as-answer-key) retired as a second truth path.
+- **D-318 RATIFIED** — a pin is a control only if byte-compared in the run path; `scripts/pin_audit.py` is the
+  standing audit (5 pins, 0 failing). **BUG-333 partially fixed** (quoted-evidence R5 gate; BUG-331 still open).
+- Nothing published moved: 4750 result leaves identical to HEAD; CT 0.3533 / DISC 0.4741 / FORM 0.2828.

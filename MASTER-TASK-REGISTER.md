@@ -286,3 +286,12 @@
 - [ ] BUG-341 (OPEN, HIGH): re-run stage5 on the current S4 input (hours) to stop borrowing the Sep-4 snapshot for the R2 meter.
 - [ ] BUG-343 (OPEN): capture the smoke subprocess stderr so the failure is diagnosable.
 
+
+- [x] Session 10 (2026-09-21): D-317 human attestation SIGNED by owner (config-first, hash-cited); owner gates 3 -> 2; BUG-344 (declared pins not enforced) FIXED.
+- [ ] BUG-341 (OPEN, HIGH): re-run stage5 on the current S4 input (hours) -- until then the R2 corpus meter borrows the Sep-4 snapshot.
+- [ ] BUG-343 (OPEN): capture the smoke subprocess stderr so the failure is diagnosable.
+- [ ] F-11 (OPEN, methodological): recruit a SECOND coder on the 150 rows -- until then no floor may be repointed.
+- [ ] MENU_REPAIR_WORKSHEET_20260921.md (OWNER, 13 + N rows, A/B): untouched (0 answers) -- blocks the menu repair apply.
+
+- [x] Session 10 (2026-09-21): BUG-344 (pins never enforced) + BUG-345 (pin typo at index 34) FIXED; D-318 RATIFIED; BUG-346 (second scorer) retired; BUG-333 partially fixed; scripts/pin_audit.py added.
+- [ ] Wire scripts/pin_audit.py into the pre-flight/CI path so pin drift fails a run automatically (not just on request).

@@ -8,12 +8,21 @@ The review is advisory evidence for the D-311 pre-registration; it does not repl
 C12: model id, endpoint and paths come from config (pipeline.pipeline_paths + eval_integrity.yaml).
 Nothing is hardcoded. temp 0.0 (R7), single-shot (DELEGATE-002).
 
+BUG-333 (2026-09-21): the LLM returned a RUBBER STAMP -- a fluent, confident, evidence-free review that
+passed the adapter. A verifier that cannot fail is not a verifier. The review is now accepted only when it
+carries QUOTED EVIDENCE for the questions that decide the number, and the artifact is stamped
+VERDICT: INSUFFICIENT (exit 2) when it does not. In addition, a MECHANICAL precheck runs regardless of the
+model: the adapter code may not reference the answer key at all, and a review whose BLOCKERS are non-empty
+can never be recorded as an approval.
+
 Usage:  python3 scripts/r5_review_r3_adapter.py [--out governance/R5_REVIEW_R3_ADAPTER_20260921.md]
+        [--allow-unsupported]   # record a review that lacks quoted evidence, stamped INSUFFICIENT
 """
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -50,10 +59,44 @@ NITS: <numbered list of non-blocking issues, or NONE>
 """
 
 
+# Every question below decides the number, so each answer must carry a QUOTED span from the code
+# under review (BUG-333: fluency is not evidence).
+EVIDENCE_SECTIONS = ("LEAKAGE", "ROW_SET", "TRUTH", "SYMMETRY", "ABSTENTION", "VERDICT_DEPENDENCE")
+QUOTE_RE = re.compile(r'"[^"]{8,}"|\'[^\']{8,}\'|`[^`]{8,}`|\b[\w/.]+\.(py|md|yaml|json|csv):\d+')
+# The adapter must not read the answer key: a leak is decidable WITHOUT the model (this is the control
+# that would have caught the class of defect the rubber stamp waved through).
+FORBIDDEN_IN_ADAPTER = ("anchor1_frozen", "RULER_BLIND_SHEET", "ruler_sheet_key", "human_attestation")
+
+
+def mechanical_leak_precheck(code: str) -> list[str]:
+    """Return findings from the deterministic leak scan of the adapter code (never model-dependent)."""
+    return [tok for tok in FORBIDDEN_IN_ADAPTER if tok in code]
+
+
+def validate_review(content: str) -> tuple[list[str], str]:
+    """Return (problems, verdict) for a reviewer response. Empty problems == the review is usable."""
+    problems: list[str] = []
+    for sec in EVIDENCE_SECTIONS:
+        m = re.search(rf"^{sec}\s*:\s*(.*)$", content, re.MULTILINE | re.IGNORECASE)
+        if not m:
+            problems.append(f"{sec}: section missing")
+            continue
+        if not m.group(1).strip():
+            problems.append(f"{sec}: empty answer")
+        elif not QUOTE_RE.search(m.group(1)):
+            problems.append(f"{sec}: no quoted evidence (BUG-333)")
+    blockers = re.search(r"^BLOCKERS\s*:\s*(.*)$", content, re.MULTILINE | re.IGNORECASE)
+    blocked = bool(blockers) and blockers.group(1).strip().upper() not in ("NONE", "NONE.", "")
+    verdict = "BLOCKED" if blocked else ("INSUFFICIENT" if problems else "PASS")
+    return problems, verdict
+
+
 def main() -> int:
     """Send the adapter to the R5 verifier model and write the verdict artifact."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="governance/R5_REVIEW_R3_ADAPTER_20260921.md")
+    ap.add_argument("--allow-unsupported", action="store_true",
+                    help="record a review lacking quoted evidence, stamped VERDICT: INSUFFICIENT")
     args = ap.parse_args()
     from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL
 
@@ -76,12 +119,33 @@ def main() -> int:
     with urllib.request.urlopen(req, timeout=600) as resp:
         payload = json.loads(resp.read().decode())
     content = payload["choices"][0]["message"]["content"]
+
+    # Deterministic controls first -- these do not depend on the model (BUG-333).
+    leak = mechanical_leak_precheck("\n".join(parts))
+    problems, verdict = validate_review(content)
+    if leak:
+        problems.append("MECHANICAL LEAK PRECHECK: adapter references the answer key: " + ", ".join(leak))
+        verdict = "BLOCKED"
+
+    header = ("# R5 review - R3 held-out adapter (" + model + ", temp 0.0)\n\n"
+              "**VERDICT: " + verdict + "** (mechanical gate, scripts/r5_review_r3_adapter.py, BUG-333)\n"
+              + ("\n**Unsupported sections:** " + "; ".join(problems) if problems else
+                 "\nAll evidence sections carry quoted evidence; mechanical leak precheck clean.")
+              + "\n\n---\n\n")
     out = ROOT / args.out
-    out.write_text("# R5 review - R3 held-out adapter (gemma-4-E4B, temp 0.0, "
-                   + model + ")\n\n" + content + "\n", encoding="utf-8")
+    out.write_text(header + content + "\n", encoding="utf-8")
     print(content)
-    print("\nwrote " + args.out)
-    return 0
+    print("\nVERDICT: " + verdict)
+    for pr in problems:
+        print("  - " + pr)
+    print("wrote " + args.out)
+    if verdict == "PASS":
+        return 0
+    if verdict == "INSUFFICIENT" and args.allow_unsupported:
+        print("WARN: recorded as INSUFFICIENT (--allow-unsupported). NOT an approval.")
+        return 0
+    print("FAIL-CLOSED: the review cannot support a published number (BUG-333).")
+    return 2
 
 
 if __name__ == "__main__":

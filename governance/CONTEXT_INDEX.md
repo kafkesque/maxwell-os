@@ -544,3 +544,23 @@ numbers unchanged (CT 0.3533 / DISC 0.4741 / FORM 0.2828). BUG-341: the live sta
 mechanical (scripts/bug_status.py -> governance/bug_status.json): 60 open / 27 closed of 87 — the "17" was a
 hand-count and is retracted.
 
+
+## 2026-09-21 (session 10) — D-317: the human attestation is SIGNED (the evidence base is now attested)
+
+The owner signed the reserved line: `human_attestation: "these 150 labels are mine, made blind to pipeline output."`
+(2026-09-21). Recorded in `config/eval_integrity.yaml:ruler_authority.human_attestation` with scope n=150 (100 A +
+50 B) and the attested artifact `governance/anchor1_frozen_20260920.json` (sha256 `0ec321a7…`).
+Effect: "human-anchored" is **ATTESTED**, not merely verified-by-reconstruction; that owner gate is CLOSED and live
+owner gates drop to TWO (laya-mlx benchmark-only install; abstention `t_low = p25`). No published number moves
+(CT 0.3533 / DISC 0.4741 / FORM 0.2828, reproduced bit-identical from the authority). Attestation ≠ independence:
+F-11 (no second coder) still forbids repointing any floor, and D-317 now requires that a closed gate be reflected in
+config in the same session. BUG-344 opened+fixed: the declared pin hashes in config were never read by the scorer, so
+the annotation drift guard was INERT in the run path and the artifact cited an empty hash.
+
+## 2026-09-21 (session 10) — D-318: a declared pin is a control only if enforced in the run path
+Audit found the pins in `config/eval_integrity.yaml:ruler_authority` were declared but NEVER READ (BUG-344) —
+the BUG-340 drift guard was therefore inert and the artifact cited an empty `annotation_sha256`; once enforced,
+the authority pin proved to carry a one-character typo (BUG-345, invisible to 16-char prefix checks). Both fixed;
+`scripts/pin_audit.py` byte-compares every declared pin (standalone control). A second scorer
+(`scripts/score_ruler_labels.py`) is retired (BUG-346) and the R5 verifier now demands quoted evidence (BUG-333).
+Quotable pins: authority `0ec321a7…`, workspace/annotation `38323192…`, key `d4cb4595…`, stage5 survivor `2c206a25…`.

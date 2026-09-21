@@ -283,3 +283,43 @@ the live path is absent and the bytes are preserved as `.stale_20260921_185942` 
 config:label_snapshots. Deliberately NOT copied back: that would re-arm a silent resume from pre-repair labels.
 **Not closed.** F-11 (no second coder), BUG-312 (three divergent label snapshots), BUG-343.
 
+
+## D-317 (2026-09-21, RATIFIED) — The human attestation is SIGNED: "human-anchored" is now EVIDENCE
+
+**Context.** Every model-accuracy number in this repo is measured against 150 blind human labels
+(`governance/anchor1_frozen_20260920.json`, `0ec321a7…`). The labels were human-blind *by construction* and the
+label conversion was verifiable (0 CT diffs, 0 substantive DISC/FORM diffs vs the workspace), but the link between
+the labels and a human author rested on reconstruction. A signed, scoped, hash-cited statement was the one missing
+element — and it was the reason no claim here could honestly be called "attested".
+
+**Decision.** The owner signed the reserved line on 2026-09-21:
+
+> `human_attestation: "these 150 labels are mine, made blind to pipeline output."`
+
+It is recorded machine-readably in `config/eval_integrity.yaml:ruler_authority.human_attestation` together with the
+scope (n=150, 100 stratum A + 50 stratum B), the signer and the date, and the sha256 of the artifact it attests
+(`governance/anchor1_frozen_20260920.json`, `0ec321a7…`).
+
+**What it converts.** "human-anchored" moves from *verified-by-reconstruction* to **ATTESTED**. The owner gate that
+reserved the line is CLOSED. Live owner gates drop from three to two: (1) the benchmark-only laya-mlx install in an
+isolated venv with a pinned revision; (2) the abstention operating point `t_low = p25` (`enabled: false`).
+No published number moves: re-scoring from the authority reproduces CT 0.3533 / DISC 0.4741 / FORM 0.2828 exactly.
+
+**What it does NOT convert.** Attestation is not independence. `second_coder_required_before_repointing: true` still
+has no second coder behind it (F-11), so NO floor may be repointed: every floor in this repo is single-coder, and is
+now single-coder-*attested* rather than single-coder-unattested. The gap is smaller; it is not closed.
+
+**Rule added.** D-317: an attestation is a **dated, scoped, hash-cited record** naming the exact artifact it
+attests, and it lives machine-readably (config-first, C12). Prose may say "attested" only when such a record exists;
+a bare quoted sentence is not an attestation. Corollary: when a human gate is closed, the artifact that recorded the
+gate must be updated in the same session — a gate left "open" in config after it was answered is a governance
+contradiction, not a conservative default.
+
+**Not closed.** F-11 (no second coder), BUG-312 (three divergent label snapshots), BUG-341 (live stage5 checkpoint
+absent), BUG-343 (smoke test cannot show its own failure output), BUG-344 (declared pins were not enforced in the
+scorer run path — see below).
+
+**Also recorded (same session).** BUG-344: `authority_paths()` never read the `*_sha256` fields declared in
+`config/eval_integrity.yaml`, so the annotation drift guard shipped as a config declaration that the run path did
+not enforce — the artifact cited an EMPTY `annotation_sha256`. Fixed by wiring the declared pins into the run path
+fail-closed (C16); the artifact is regenerated and now cites the hash it actually consumed.

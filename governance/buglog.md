@@ -2014,3 +2014,40 @@ needs the subprocess stderr, and a test that cannot show its own failure output 
 Source of truth: governance/bug_status.json (re-derive: python3 scripts/bug_status.py). **60 open / 29 closed of 89 ids** -> the append-to-handoffs threshold is EXCEEDED: every handoff must carry this list. The session-8 claim
 of "17 unresolved" is RETRACTED as a hand-count (BUG-342).
 
+
+## BUG-344 (HIGH — FIXED 2026-09-21, audit F-17): the declared ruler pins were never enforced in the run path
+`config/eval_integrity.yaml:ruler_authority` declares authority_sha256 / workspace_sha256_at_head /
+annotation_sha256 / key_sha256 — but `authority_paths()` read only the paths, `truth_source` and `menu_hash`.
+So the annotation drift guard built for BUG-340 received an EMPTY declared hash, `if declared_sha and ...`
+short-circuited, and the guard could never fire in a real run — while the committed artifact cited
+`annotation_sha256: ""`, a D-313 provenance failure (an artifact grounding a published number must cite its
+source by sha256). The guard appeared verified only because a unit call passed the hash by hand.
+FIX: `verify_declared_pin()` enforces the declared pin BEFORE the artifact is read (FAIL-CLOSED, C16/D-313;
+`--allow-pin-drift` is the loud override); the workspace pin is enforced on the legacy `--truth-source sheet`
+path; `paths["key"]` replaces the hardcoded KEY constant; the artifact now records the hash ACTUALLY consumed
+(`annotation_sha256`) beside the declared pins (`annotation_pin_declared`, `authority_pin_declared`).
+VERIFIED: PIN OK on both paths; 4750 result leaves identical to HEAD; scored_n 150/116/145; 6 cells overlaid.
+
+## BUG-345 (HIGH — FIXED 2026-09-21, found BY the BUG-344 fix): the declared ruler pin was TYPO'd
+The newly-enforced pin failed on its very first run: config declared
+`0ec321a7761d03a9277372051cef867e15d32d438ebb51fefdaf39d4159a54cf` while the artifact is
+`...cef867e15e32d438...` — ONE character, index 34 (`d` for `e`). It survived two sessions because every prior
+"pin verified" check compared a 16-char PREFIX, and the typo sits past that window. A prefix comparison is not
+a verification; a control that cannot fail is not a control. ZERO measurement impact (nothing was ever
+decisioned on it — it only ever mis-reported agreement with a hash it never compared).
+FIX: pin corrected; `scripts/pin_audit.py` byte-compares EVERY declared pin (explicit pin→file pairs, never
+inferred by proximity) and exits non-zero on drift. Now: 5 pins checked, 0 failing.
+
+## BUG-346 (MED — FIXED 2026-09-21): a second ruler scorer could still be woken up
+`scripts/score_ruler_labels.py` treated the STORED label as the answer key (agreement-with-corruption) and
+refused only because the workspace CSV carries 4 trailing EMPTY rows — an accidental guard, not a designed one.
+Retired as a SECOND TRUTH PATH (C21/D-315/D-316): it now exits 2 with a pointer to the canonical artifact and
+scorer unless `--legacy-sheet-truth` is passed explicitly. Kept in-tree so the historic `verification:`
+citations in config/decisions.yaml still resolve.
+
+## BUG-333 (PARTIALLY FIXED 2026-09-21) — the R5 verifier returned a rubber stamp
+`scripts/r5_review_r3_adapter.py` now (a) runs a MECHANICAL leak precheck that does not depend on the model
+(any reference to the answer key in the adapter BLOCKS the review), (b) requires QUOTED EVIDENCE for all six
+number-deciding questions, and (c) stamps VERDICT: PASS / INSUFFICIENT / BLOCKED and exits 2 unless PASS.
+Unit-verified: the prior rubber stamp now scores 6/6 unsupported → INSUFFICIENT. BUG-331 stays OPEN until the
+hardened review is actually run against the adapter.

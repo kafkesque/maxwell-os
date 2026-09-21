@@ -4,7 +4,7 @@ version: '1'
 enabled: false          # fail-closed production behaviour is unchanged (D-2298)
 axis: discipline
 margin_metric: percent_rank   # pairwise verifier margin
-t_low_percentile: null        # abstain below this margin -> repair queue (never a silent drop)
-t_high_percentile: null       # accept + flag
+t_low_percentile: 25          # PROPOSED (t=-0.006, error 0.391) - inert while enabled: false
+t_high_percentile: 10         # PROPOSED (t=-0.053) - accept + flag
 repair_queue: governance/REPAIR_QUEUE.md
 measured_curve_ref: governance/ABSTENTION_DESIGN_20260921.md

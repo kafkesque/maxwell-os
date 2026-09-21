@@ -42,3 +42,22 @@ labelling role was flat (0.931 -> 0.942), so abstention claims are role-specific
 3. interaction with the arbitration rules R2/R3 (a row can be abstained by the margin rule *and* disputed by
    disagreement - one queue, one de-dup key = fb_id);
 4. re-measure the curve on the held-out set (governance/R3_HELDOUT_PREREG_20260921.md) before any production flip.
+
+## CLOSURE (2026-09-21, BUG-327 closed invalid) - the curve IS re-derivable; open item 1 above is retracted
+
+arms[arm].predictions[fb_id] = [label, margin] is persisted for every arm, so the sweep needs no model re-run.
+Re-measured on the incumbent pairwise arm over the 116 human-labelled ruler rows (abstain the lowest-margin rows):
+
+| abstained | error on remainder | margin threshold (percentile) |
+|---|---|---|
+| 0% | 0.4741 | - |
+| 10% | 0.4231 | t = -0.0528 (p10 = -0.1111) |
+| 25% | **0.3908** | t = -0.0040 (p25 = -0.0060) |
+| 50% | 0.3276 | t = +0.0011 (p50 = 0.0004) |
+
+Independent re-derivation reproduces the D-302 sweep (0.474 / 0.423 / 0.391 / 0.328) from a second code path, so the
+numbers are cross-validated. Same sweep on qwen3coder is much flatter (0.5259 -> 0.4904 -> 0.4713 -> 0.4310): the
+margin only carries signal inside the verifier role, confirming the role-specificity warning.
+
+**Proposed operating point (still NOT enabled):** t_low = p25 (-0.006, abstains 25%, error 0.391 i.e. -8.3 pp) and
+t_high = p10 (accept-but-flag). Binding constraint is repair-queue budget, which is an owner decision.

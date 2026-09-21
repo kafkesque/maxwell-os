@@ -1760,3 +1760,10 @@ ai & agents / brand identity / ..." was FALSE and came from the 60-row contra sa
 recorded here as a process bug (no whole-corpus measurement before a decision claim). Fix order: raw->canonical
 coverage, then both-axes, then the 703 domain-less rows; all three are deterministic repairs gated on a gemma-4-E4B
 review of the repair script first (R5).
+
+## BUG-327 (LOW - CLOSED INVALID 2026-09-21): "per-row margins are not persisted" was a probe error, not a defect
+The pairwise arm DOES persist predictions[fb_id] = [label, margin] (harness line 80: entailment - contradiction); the
+earlier probe returned 0 rows because it looked for dicts instead of 2-element lists (same shape in both arms). The
+calibrated-abstention curve was therefore re-derived from the frozen artifact without re-running a model. Lesson: print
+the artifact shape before declaring a signal missing - this is the second false "missing signal" claim this session
+(the first was the assignment claim, D-310). Both are now recorded as process bugs.

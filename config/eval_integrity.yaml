@@ -299,7 +299,8 @@ bakeoff:
     incumbent_arm: pairwise         # deployed configuration: candidates are judged against THIS
     min_decided_ratio: 0.5          # an arm deciding <50% of rows is INVALID, not a tie
     min_error_gain_pp: 5.0          # pre-registered D-300 deploy margin (absolute pp)
-    abstain_sweep: [0.0, 0.1, 0.25, 0.5]   # ranked-by-margin abstention curve (D-300 rec: calibration)                # padded forward batches (per-pair scoring was ~1 s/pair)
+    abstain_sweep: [0.0, 0.1, 0.25, 0.5]   # ranked-by-margin abstention curve (D-300 rec: calibration)
+  nli_batch_size_note: padded forward batches (per-pair scoring was ~1 s/pair)   # BUG-335: comment restored to its key
   omlx_path: /v1/chat/completions     # BUG-319: every production caller uses /v1 (pipeline/omlx_call.py etc.)
   omlx_model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
   omlx_timeout_s: 180
@@ -314,3 +315,48 @@ bakeoff:
     Reply with JSON only: {"choice": "<menu label or null>", "confidence": <0..1>, "abstain": <bool>}
   log:
     - "2026-09-21 (D-298): created with the arm wiring. arm_constant modal is computed over HUMAN labels."
+    - "2026-09-21 (D-312): added named label sources (bakeoff.active_source + bakeoff.sources.anchor1)
+       and the pre-registered R1-R4 arbitration block, so the R3 held-out run is source- and rule-explicit."
+  r3_measurement:                       # D-314: measured on the pre-registered held-out set, NOT adopted
+    n_scored: 57                        # of 58 pre-registered rows (1 row carries no human verdict, BUG-334)
+    error_rate: {pairwise: 0.5088, r3: 0.5088, r2: 0.4286, r4: 0.5965, constant: 0.8421}
+    gain_pp: {pairwise: 0.0, r3: 0.0, r2: 8.02, r4: -8.77}
+    queue_rate: {pairwise: 0.0, r3: 0.0, r2: 0.754, r4: 0.0}
+    adopted: false
+    report: governance/R3_HELDOUT_RESULT_20260921.md
+  # ── D-312 (C12): named label sources. The flat keys ABOVE are the `ruler` source and stay its only
+  #    definition; a source is never inferred from a filename — a run names it. ─────────────────────
+  active_source: ruler
+  sources:
+    anchor1:                              # R3 held-out adjudication source (D-311 pre-registration)
+      sheet: governance/ANCHOR1_BLIND_SHEET_20260920.csv
+      key: governance/ANCHOR1_KEY_20260920.json
+      key_shape: by_fb_id                 # key is {fb_id: {pipeline_*}} — NOT key['rows']
+      truth_from: sheet                   # human verdicts live on the SHEET; pipeline labels in the key
+      row_id_column: fb_id
+      limit: 60
+      verdict_columns:
+        discipline: discipline_verdict
+      key_stored_fields:
+        content_type: pipeline_content_type
+        discipline: pipeline_discipline
+      definition_column: definition
+      name_column: name
+      include_catch_all: true             # taxonomy meta.catch_all_discipline is a LEGAL verdict slot
+      normalize_through_menu: true        # truth AND stored labels map onto the closed menu
+      exclude_rows_without_truth: true    # an unlabelled row cannot be scored (D-275a)
+      row_allowlist_file: governance/ANCHOR1_HELDOUT_SET_20260921.json
+      row_allowlist_field: heldout_fb_ids # n=58 pre-registered held-out rows
+      output: governance/bakeoff_typed_decision_anchor1_20260921.json
+  arbitration:                            # D-300/D-311: pre-registered combine rules (R1-R4)
+    incumbent_arm: pairwise
+    challenger_arm: qwen3coder
+    margin_scale: percent_rank            # arms have different margin scales (NLI margin vs LLM conf)
+    r4_confidence_floor: 0.5
+    rules:
+      r1: incumbent_only
+      r2: agree_accept_disagree_human_queue
+      r3: agree_accept_disagree_higher_margin
+      r4: agree_accept_disagree_challenger_if_conf_at_least_floor
+    source: anchor1
+    report: governance/r3_heldout_20260921.json

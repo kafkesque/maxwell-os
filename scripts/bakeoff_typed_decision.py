@@ -23,6 +23,12 @@ C12: every path, column name, axis, model id and threshold comes from config/eva
 Usage:
   python3 scripts/bakeoff_typed_decision.py --arm constant
   python3 scripts/bakeoff_typed_decision.py --arm deberta --arm qwen3coder --limit 150
+  python3 scripts/bakeoff_typed_decision.py --source anchor1 --arm pairwise --arm qwen3coder
+
+D-312 (C12): the label SOURCE is config-declared (`bakeoff.active_source`, CLI override --source).
+  ruler   — the flat bakeoff block above: key['rows'] carries human + stored labels (truth = key).
+  anchor1 — the R3 held-out adjudication source (`bakeoff.sources.anchor1`): the SHEET carries the
+            human verdicts, the key carries the pipeline labels.
 """
 from __future__ import annotations
 
@@ -65,13 +71,10 @@ def arm_pairwise(rows: list[dict], truth: dict[str, str], cfg: dict, **_kw) -> d
     for that one pairing, which is what an abstention threshold would actually consume.
     """
     import torch  # noqa: F401  (device selection happens inside _nli_scores)
-    key = json.loads((ROOT / cfg["key"]).read_text(encoding="utf-8"))
-    field = cfg["frozen_fields"][cfg["axis"]]
-    stored = {str(r[cfg["row_id_column"]]): (r.get("stored") or {}).get(field) for r in key["rows"]}
     tmpl = cfg["hypothesis_template"]
     preds: dict[str, tuple] = {}
     for i, r in enumerate(rows, 1):
-        label = stored.get(str(r["item_id"]))
+        label = r.get("pipeline_label")   # D-312: stored label comes from the source spec
         if not label:
             preds[r["fb_id"]] = (None, 0.0)
             continue
@@ -106,44 +109,145 @@ def render(template: str, **kw: object) -> str:
     return out
 
 
-def load_rows(cfg: dict, limit: int) -> tuple[list[dict], dict[str, str]]:
-    """Join the blind sheet to the frozen JSON by row id and return (rows, ground truth).
+RULER_SOURCE = "ruler"   # name of the flat `bakeoff:` block above (D-312)
 
-    The sheet keys rows by item_id while fb_id lives only in the frozen JSON (the known arm-layer
-    gap). Returns rows enriched with fb_id, axis text (definition) and the human label.
+
+def source_spec(cfg: dict, name: str | None = None) -> dict:
+    """Return a self-contained spec for a named label source (C12: named, never inferred).
+
+    D-312: `ruler` is the flat block above (key['rows'] carries human + stored labels);
+    `anchor1` is the R3 held-out adjudication source (the SHEET carries the human verdicts, the
+    key carries the pipeline labels). A run names one source; the loader never guesses from a
+    filename, and every path/column/shape below comes from config.
     """
-    frozen = json.loads((ROOT / cfg["key"]).read_text(encoding="utf-8"))
-    frows = frozen["rows"]
-    id_field = cfg["row_id_column"]
-    truth_key = cfg["frozen_fields"][cfg["axis"]]
-    truth: dict[str, str] = {}
+    src_name = str(name or cfg.get("active_source") or RULER_SOURCE)
+    if src_name == RULER_SOURCE:
+        return {"name": RULER_SOURCE, "key_shape": "rows", "truth_from": "key",
+                "sheet": cfg["sheet"], "key": cfg["key"], "axis": cfg["axis"],
+                "row_id_column": cfg["row_id_column"], "limit": int(cfg.get("limit") or 0),
+                "sheet_columns": cfg["sheet_columns"], "key_truth_fields": cfg["frozen_fields"],
+                "key_stored_fields": cfg["frozen_fields"], "verdict_columns": {},
+                "definition_column": cfg.get("definition_column") or "DEFINITION",
+                "name_column": cfg.get("name_column") or "name",
+                "include_catch_all": bool(cfg.get("include_catch_all") or False),
+                "exclude_rows_without_truth": False, "output": str(OUT)}
+    block = (cfg.get("sources") or {}).get(src_name)
+    if not block:
+        raise KeyError("config/eval_integrity.yaml bakeoff.sources." + src_name + " is not declared")
+    spec = dict(block)
+    spec["name"] = src_name
+    for key in ("sheet", "key", "key_shape", "row_id_column", "verdict_columns",
+                "key_stored_fields", "definition_column", "name_column"):
+        if key not in spec:
+            raise KeyError("bakeoff.sources." + src_name + "." + key + " is required (C12/C16)")
+    spec.setdefault("truth_from", "sheet")
+    spec.setdefault("axis", cfg["axis"])
+    spec.setdefault("limit", int(cfg.get("limit") or 0))
+    spec.setdefault("include_catch_all", False)
+    spec.setdefault("normalize_through_menu", True)
+    spec.setdefault("exclude_rows_without_truth", False)
+    spec.setdefault("output", str(OUT))
+    return spec
+
+
+def _menu_lookup(cfg: dict, spec: dict) -> dict[str, str]:
+    """Normalised menu surface -> canonical label, for BOTH truth and stored labels (symmetric)."""
+    return {_norm_key(l): l for l in closed_menu(cfg, bool(spec.get("include_catch_all")))}
+
+
+def load_rows(cfg: dict, limit: int, spec: dict | None = None) -> tuple[list[dict], dict[str, str]]:
+    """Load (rows, human truth) for a label source, normalised onto the closed menu (D-312).
+
+    ruler  — key['rows'] carries human + stored labels; the sheet contributes text only.
+    anchor1— the SHEET carries the human verdicts, the key carries the pipeline labels.
+    An unresolvable HUMAN verdict is a hard error (C16) rather than a silent wrong answer; an
+    unresolvable STORED label becomes an abstention for the incumbent arm (never a false error).
+    `row_allowlist_file` restricts the run to the pre-registered held-out ids.
+    """
+    src = spec or source_spec(cfg)
+    axis = src["axis"]
+    id_field = src["row_id_column"]
+    key = json.loads((ROOT / src["key"]).read_text(encoding="utf-8"))
+    lookup = _menu_lookup(cfg, src) if src.get("normalize_through_menu") else {}
+    stored_raw: dict[str, str] = {}
     by_item: dict[str, str] = {}
-    for r in frows:
-        if r.get("fb_id"):
+    truth: dict[str, str] = {}
+    if src["key_shape"] == "rows":
+        truth_field = src["key_truth_fields"][axis]
+        for r in key["rows"]:
+            if not r.get("fb_id"):
+                continue
             by_item[str(r[id_field])] = r["fb_id"]
-            label = (r.get("human") or {}).get(truth_key)
+            stored_raw[r["fb_id"]] = (r.get("stored") or {}).get(src["key_stored_fields"][axis])
+            label = (r.get("human") or {}).get(truth_field)
             if label:
-                truth[r["fb_id"]] = label
-    with (ROOT / cfg["sheet"]).open(encoding="utf-8") as fh:
+                truth[r["fb_id"]] = lookup.get(_norm_key(label), label) if lookup else label
+    else:
+        for fb, v in (key.get("key") or {}).items():
+            by_item[str(fb)] = str(fb)
+            stored_raw[str(fb)] = v.get(src["key_stored_fields"][axis])
+    stored = {fb: (lookup.get(_norm_key(lab), None) if lookup else lab)
+              for fb, lab in stored_raw.items()}
+    allow: set[str] | None = None
+    if src.get("row_allowlist_file"):
+        payload = json.loads((ROOT / src["row_allowlist_file"]).read_text(encoding="utf-8"))
+        allow = {str(x) for x in payload[src["row_allowlist_field"]]}
+    with (ROOT / src["sheet"]).open(encoding="utf-8") as fh:
         raw = list(csv.DictReader(fh))
-    rows = []
-    for r in raw[:limit]:
+    truth_col = (src.get("verdict_columns") or {}).get(axis)
+    rows: list[dict] = []
+    unresolved: list[str] = []
+    unlabelled = 0
+    for r in (raw[:limit] if limit else raw):
         fb = by_item.get(str(r.get(id_field, "")).strip())
         if not fb:
             print("WARN no fb_id for " + str(r.get(id_field)), file=sys.stderr)
             continue
-        rows.append({"item_id": r[id_field], "fb_id": fb,
-                     "text": (r.get("DEFINITION") or "").strip(),
-                     "name": (r.get("name") or "").strip()})
+        if allow is not None and fb not in allow:
+            continue
+        if src.get("truth_from") == "sheet":
+            raw_label = (r.get(truth_col) or "").strip()
+            if not raw_label:
+                unlabelled += 1
+                if src.get("exclude_rows_without_truth"):
+                    continue
+            else:
+                label = lookup.get(_norm_key(raw_label), None) if lookup else raw_label
+                if label is None:
+                    unresolved.append(fb + "=" + raw_label)
+                    continue
+                truth[fb] = label
+        rows.append({"item_id": str(r.get(id_field, "")).strip(), "fb_id": fb,
+                     "text": (r.get(src["definition_column"]) or "").strip(),
+                     "name": (r.get(src["name_column"]) or "").strip(),
+                     "pipeline_label": stored.get(fb)})
+    if unresolved:
+        raise ValueError("unresolvable HUMAN verdict(s) not on the closed menu: " + ", ".join(unresolved))
+    print("loaded source=" + src["name"] + " rows=" + str(len(rows)) + " truth=" + str(len(truth)) +
+          " unlabelled_excluded=" + str(unlabelled) + " allowlist=" + str(len(allow) if allow else "all"))
     return rows, truth
 
 
-def menu(cfg: dict) -> dict[str, str]:
-    """Closed label menu: canonical label -> definition (from the taxonomy, C12)."""
+def closed_menu(cfg: dict, include_catch_all: bool = False) -> dict[str, str]:
+    """Closed discipline menu: canonical label -> definition (taxonomy, C12).
+
+    `include_catch_all` adds the taxonomy's DECLARED catch-all discipline (meta.catch_all_discipline)
+    so an adjudicated "emerging" verdict has a legal slot instead of being silently scored wrong.
+    """
     import yaml
 
     tax = yaml.safe_load((ROOT / cfg["taxonomy"]).read_text(encoding="utf-8"))
-    return {d["canonical"]: (d.get("definition") or "") for d in tax["disciplines"]}
+    out = {d["canonical"]: (d.get("definition") or "") for d in tax["disciplines"]}
+    if include_catch_all:
+        cat = str((tax.get("meta") or {}).get("catch_all_discipline") or "").strip()
+        if cat:
+            out.setdefault(cat, "declared catch-all discipline (config/taxonomy_v5.yaml meta)")
+    return out
+
+
+def menu(cfg: dict) -> dict[str, str]:
+    """Back-compat wrapper: the closed menu without the catch-all slot (ruler source)."""
+    return closed_menu(cfg, False)
 
 
 def arm_constant(rows: list[dict], truth: dict[str, str], **_kw) -> dict[str, tuple]:
@@ -291,21 +395,25 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", action="append", required=True, choices=sorted(ARMS))
     ap.add_argument("--limit", type=int, default=None)
-    ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--source", default=None,
+                    help="label source name from bakeoff.sources (default: bakeoff.active_source)")
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
     global _DEVICE_CFG
     cfg = load_config()
     _DEVICE_CFG = str(cfg.get("device", "auto"))
-    limit = args.limit or int(cfg["limit"])
-    rows, truth = load_rows(cfg, limit)
-    print("sheet=" + cfg["sheet"] + " rows=" + str(len(rows)) + " axis=" + cfg["axis"] +
-          " truth=" + str(len([r for r in rows if r['fb_id'] in truth])))
+    src = source_spec(cfg, args.source)
+    limit = args.limit or int(src.get("limit") or cfg["limit"])
+    rows, truth = load_rows(cfg, limit, src)
+    out_path = Path(args.out or src.get("output") or OUT)
+    print("source=" + src["name"] + " sheet=" + src["sheet"] + " rows=" + str(len(rows)) +
+          " axis=" + src["axis"] + " truth=" + str(len([r for r in rows if r['fb_id'] in truth])))
 
     results: dict[str, dict] = {}
     for name in args.arm:
         try:
-            preds = ARMS[name](rows, truth, cfg=cfg)
+            preds = ARMS[name](rows, truth, cfg=cfg, spec=src)
             res = score(preds, truth)
             # BUG-321: persist the per-row MARGIN, not just the label - without it no calibrated
             # abstention curve and no "why did this arm fail" audit is possible from the artifact.
@@ -318,17 +426,30 @@ def main() -> int:
         print(name + ": " + json.dumps({k: v for k, v in res.items() if k != "predictions"}),
               flush=True)
         # checkpoint per arm: a crash in a later arm must not discard a finished arm (BUG-318b)
-        out_path = Path(args.out)
         arms = dict(results)
         if out_path.exists():   # BUG-323: merge at write - an arm measured in an earlier run must survive
             try:
-                for k, v in (json.loads(out_path.read_text(encoding="utf-8")).get("arms") or {}).items():
-                    arms.setdefault(k, v)
+                prev = json.loads(out_path.read_text(encoding="utf-8"))
+                # BUG-332: never merge across SOURCES - an anchor1 artifact must not swallow ruler arms
+                if str(prev.get("source") or RULER_SOURCE) == src["name"]:
+                    for k, v in (prev.get("arms") or {}).items():
+                        arms.setdefault(k, v)
+                else:
+                    print("  WARN artifact holds source " + str(prev.get("source")) +
+                          "; not merging into " + src["name"], file=sys.stderr)
             except Exception as exc:  # noqa: BLE001 - no silent errors (C16)
                 print("  WARN could not merge previous artifact: " + str(exc), file=sys.stderr)
-        out_path.write_text(json.dumps({"axis": cfg["axis"], "limit": limit, "arms": arms},
-                                             indent=1), encoding="utf-8")
-    print("wrote " + args.out)
+        stamp: dict = {"schema_version": "1.0", "source": src["name"], "sheet": src["sheet"],
+                       "key": src["key"], "axis": src["axis"], "limit": limit,
+                       "spec": {k: v for k, v in src.items() if k != "key_truth_fields"},
+                       "arms": arms}
+        try:
+            from pipeline.closed_menu import menu_hash as _mh
+            stamp["menu_hash"] = _mh()
+        except Exception as exc:  # noqa: BLE001 (C16)
+            print("  WARN menu_hash unavailable: " + str(exc), file=sys.stderr)
+        out_path.write_text(json.dumps(stamp, indent=1), encoding="utf-8")
+    print("wrote " + str(out_path))
     return 0
 
 

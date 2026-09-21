@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import re
 import sys
@@ -31,11 +32,21 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
-SHEET = REPO / "governance" / "RULER_BLIND_SHEET_20260917.csv"
-KEY = REPO / "governance" / "ruler_sheet_key_20260917.json"
+CFG = REPO / "config" / "eval_integrity.yaml"
+# D-315 (owner-ratified 2026-09-21): the CANONICAL ruler is the frozen authority JSON. Paths are
+# config-first (C12) -- these constants are the fail-closed fallback only.
+AUTHORITY = REPO / "governance" / "anchor1_frozen_20260920.json"
+SHEET = REPO / "governance" / "RULER_BLIND_SHEET_20260917.csv"      # human workspace, NOT authority
+KEY = REPO / "governance" / "ruler_sheet_key_20260917.json"          # legacy stored-side key
 TAX = REPO / "config" / "taxonomy_v5.yaml"
 OUT_JSON = REPO / "governance" / "ruler_inverted_20260920.json"
 OUT_MD = REPO / "governance" / "ruler_inverted_20260920.md"
+
+# The scorer's OWN sentinel: `emerging` on the STORED side is a dump bucket = a stored-label
+# FAILURE, never an abstention -- unlike the human side, where `emerging` IS an abstention.
+# The frozen authority stores this sentinel verbatim in `stored.discipline` (13 rows), so the
+# resolver must be idempotent over it (BUG-338).
+STORED_DISC_SENTINEL = "emerging_dump"
 
 FORM_VALUES = ("causal_mechanism", "descriptive_model", "normative_heuristic", "empirical_pattern")
 CT_VALUES = ("principle", "process_template", "process_instance", "tool_instruction",
@@ -68,6 +79,67 @@ def load_taxonomy() -> tuple[dict[str, str], dict[str, str]]:
         for m in members:
             group[m] = g
     return norm2canon, group
+
+
+def authority_paths() -> dict:
+    """Return the config-declared truth/authority paths (C12), with constant fallbacks."""
+    out = {"authority": AUTHORITY, "workspace": SHEET, "truth_source": "key", "menu_hash": ""}
+    try:
+        cfg = yaml.safe_load(CFG.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        print(f"WARN: authority config unreadable ({exc}); using built-in defaults")
+        return out
+    ra = cfg.get("ruler_authority") or {}
+    if ra.get("authority_json"):
+        out["authority"] = REPO / str(ra["authority_json"])
+    if ra.get("human_workspace"):
+        out["workspace"] = REPO / str(ra["human_workspace"])
+    if ra.get("truth_source") in ("key", "sheet"):
+        out["truth_source"] = str(ra["truth_source"])
+    if ra.get("menu_hash"):
+        out["menu_hash"] = str(ra["menu_hash"])
+    return out
+
+
+def load_truth_from_authority(path: Path) -> tuple[list[dict], dict[str, dict]]:
+    """Build (workspace-shaped rows, stored keymap) from the FROZEN AUTHORITY.
+
+    The canonical `human` labels are written back into the raw column names so the SAME
+    resolvers run on both truth sources -- one implementation, never a second scoring path
+    (C21). A canonical label re-resolves to itself; `None` (an abstention) resolves to
+    "blank". Declared diagnostic loss: the authority keeps no raw cell, so the abstention
+    REASON (blank vs emerging vs irrelevant) survives only in the human workspace CSV.
+
+    Args:
+        path: the frozen authority JSON.
+
+    Returns:
+        rows: one dict per item, carrying the canonical human label in the raw column slots.
+        keymap: item_id -> {"stored": {...}, "stratum": ...} -- the object under test.
+    """
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    rows: list[dict] = []
+    keymap: dict[str, dict] = {}
+    for r in doc.get("rows") or []:
+        human = r.get("human") or {}
+        stored = r.get("stored") or {}
+        rows.append({
+            "item_id": r["item_id"],
+            "CT (1-7)": human.get("ct") or "",
+            "DISC (1-62)": human.get("disc") or "",
+            "FORM (1-4)": human.get("form") or "",
+        })
+        keymap[r["item_id"]] = {
+            "stored": {
+                "content_type": stored.get("ct"),
+                "discipline": stored.get("disc"),
+                "extraction_type": stored.get("form"),
+            },
+            "stratum": r.get("stratum") or "",
+        }
+    if not rows:
+        raise SystemExit(f"FAIL-CLOSED: authority {path.name} carries no rows (D-313)")
+    return rows, keymap
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,8 +195,8 @@ def resolve_disc_stored(raw: str, norm2canon: dict[str, str]) -> tuple[str | Non
     s = _norm(raw)
     if not s:
         return None, "blank"
-    if s == "emerging":
-        return "emerging_dump", "dump"
+    if s == _norm(STORED_DISC_SENTINEL) or s == "emerging":
+        return STORED_DISC_SENTINEL, "dump"
     c = norm2canon.get(s)
     if c:
         return c, "exact"
@@ -334,20 +406,84 @@ def render_md(results: dict, norm2canon: dict[str, str], group: dict[str, str]) 
     return "\n".join(L) + "\n"
 
 
+def run_blinding_self_test(rows: list[dict], keymap: dict[str, dict], axes: list[str],
+                           norm2canon: dict[str, str], group: dict[str, str]) -> int:
+    """Mechanical truth-blinding test — the only credible certification channel (BUG-333).
+
+    The REFERENCE must be invariant to the object under test. Every stored label is replaced
+    with a fixed wrong value; if any reference-side quantity moves, the scorer leaks truth
+    into the truth. An LLM review of the same question returned a rubber stamp, so this is a
+    mechanical check, not a judgement call.
+
+    Returns:
+        0 on PASS, 1 on FAIL (fail-loud, C16).
+    """
+    base = {a: score_axis(rows, keymap, a, norm2canon, group) for a in axes}
+    blinded: dict[str, dict] = {
+        item: {"stored": {k: "__BLINDED__" for k in
+                         ("content_type", "discipline", "extraction_type")},
+               "stratum": rec.get("stratum")}
+        for item, rec in keymap.items()
+    }
+    bres = {a: score_axis(rows, blinded, a, norm2canon, group) for a in axes}
+
+    fails: list[str] = []
+    for a in axes:
+        b, x = base[a], bres[a]
+        ref = {(r["item_id"], r["scored"]) for r in b["rows"]}
+        ref_b = {(r["item_id"], r["scored"]) for r in x["rows"]}
+        if ref != ref_b:
+            fails.append(f"{a}: the reference/denominator MOVED under blinding")
+        if b["scored_n"] != x["scored_n"]:
+            fails.append(f"{a}: scored_n {b['scored_n']} -> {x['scored_n']}")
+        if b["abstained"] != x["abstained"]:
+            fails.append(f"{a}: abstentions moved {dict(b['abstained'])} -> {dict(x['abstained'])}")
+        if {k: v["n"] for k, v in b["per_class"].items()} != {k: v["n"] for k, v in x["per_class"].items()}:
+            fails.append(f"{a}: per-class reference counts moved")
+        if (x["error_rates"].get("all") or {}).get("agrees", 0) != 0:
+            fails.append(f"{a}: the blinded object still AGREES with the reference")
+    if [(r["item_id"], r.get("human")) for a in axes for r in base[a]["rows"]] != \
+       [(r["item_id"], r.get("human")) for a in axes for r in bres[a]["rows"]]:
+        fails.append("human labels changed under blinding")
+
+    print("BLINDING SELF-TEST: " + ("FAIL" if fails else "PASS"))
+    for a in axes:
+        print(f"  {a:5} scored_n={base[a]['scored_n']:4}  blinded_agrees="
+              f"{(bres[a]['error_rates'].get('all') or {}).get('agrees')}")
+    for f in fails:
+        print("  - " + f)
+    return 1 if fails else 0
+
+
 def main() -> int:
+    """Score the ruler axes and write the re-measurement artifact."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--axis", choices=("form", "ct", "disc", "all"), default="all")
+    ap.add_argument("--truth-source", choices=("key", "sheet"), default=None,
+                    help="key (default, D-315) = the frozen authority; sheet = the human workspace")
+    ap.add_argument("--out-dir", default="", help="repo-relative output dir (default governance/)")
+    ap.add_argument("--out-prefix", default="", help="prefix the artifact names (never clobber a cited artifact)")
+    ap.add_argument("--self-test-blinding", action="store_true",
+                    help="mechanical truth-blinding test: the reference must be invariant to the object under test")
     args = ap.parse_args()
 
-    with SHEET.open(encoding="utf-8") as fh:
-        sheet = [r for r in csv.DictReader(fh) if (r.get("item_id") or "").strip()]
-    key = {r["item_id"]: r for r in json.loads(KEY.read_text(encoding="utf-8"))}
+    paths = authority_paths()
+    truth_source = args.truth_source or paths["truth_source"]
+    if truth_source == "key":
+        rows, keymap = load_truth_from_authority(paths["authority"])
+        source_desc = f"authority {paths['authority'].name}"
+    else:
+        with paths["workspace"].open(encoding="utf-8") as fh:
+            rows = [r for r in csv.DictReader(fh) if (r.get("item_id") or "").strip()]
+        keymap = {r["item_id"]: r for r in json.loads(KEY.read_text(encoding="utf-8"))}
+        source_desc = f"workspace {paths['workspace'].name} + legacy key (cross-check only)"
     norm2canon, group = load_taxonomy()
 
     axes = [args.axis] if args.axis != "all" else ["ct", "disc", "form"]
-    results = {}
-    for axis in axes:
-        results[axis] = score_axis(sheet, key, axis, norm2canon, group)
+    if args.self_test_blinding:
+        return run_blinding_self_test(rows, keymap, axes, norm2canon, group)
+
+    results = {axis: score_axis(rows, keymap, axis, norm2canon, group) for axis in axes}
 
     payload = {
         "schema_version": "1.0",
@@ -356,15 +492,23 @@ def main() -> int:
         "reference": "human blind label",
         "under_test": "stored free-generated label",
         "taxonomy": "config/taxonomy_v5.yaml",
-        "sheet": "governance/RULER_BLIND_SHEET_20260917.csv",
-        "key": "governance/ruler_sheet_key_20260917.json",
-        "total_rows": len(sheet),
+        "truth_source": source_desc,
+        "authority": "governance/anchor1_frozen_20260920.json (D-315 canonical ruler)",
+        "authority_sha256": hashlib.sha256(paths["authority"].read_bytes()).hexdigest(),
+        "menu_hash": paths["menu_hash"],
+        "workspace": "governance/RULER_BLIND_SHEET_20260917.csv (human workspace; NOT authority)",
+        "total_rows": len(rows),
         "results": results,
     }
-    OUT_JSON.write_text(json.dumps(payload, indent=1), encoding="utf-8")
-    OUT_MD.write_text(render_md(results, norm2canon, group), encoding="utf-8")
-    print(render_md(results, norm2canon, group))
-    print("wrote", OUT_JSON.name, "and", OUT_MD.name)
+    out_dir = REPO / (args.out_dir or "governance")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_json = out_dir / f"{args.out_prefix}{OUT_JSON.name}"
+    out_md = out_dir / f"{args.out_prefix}{OUT_MD.name}"
+    out_json.write_text(json.dumps(payload, indent=1), encoding="utf-8")
+    md = render_md(results, norm2canon, group)
+    out_md.write_text(md, encoding="utf-8")
+    print(md)
+    print("wrote", out_json, "and", out_md.name)
     return 0
 
 

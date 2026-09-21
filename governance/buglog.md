@@ -1912,3 +1912,55 @@ scripts `anchor2_kappa.py` / `anchor2_repair_triage.py`); config source `bakeoff
 `governance/ARTIFACT_REGISTRY.md` is the single name map + pooling rules. Also renamed
 `anchor1_arbitration_*` -> `ruler_arbitration_in_sample_*` (it was measured on the 150-row ruler, n=116).
 Verified: YAML loads, py_compile clean, anchor2 source resolves 57/58 rows with pipeline labels intact.
+
+## BUG-329 — CLOSED BY RULING 2026-09-21 (was HIGH): the frozen ruler exists in THREE versions
+Owner ratified D-315 ("go with the recommendation"). Disposition of all three, so no future session re-derives it:
+
+| version | sha256 | where | status |
+|---|---|---|---|
+| v0 — freeze-time | `4d0c856a…` | only inside `anchor1_frozen_20260920.json:csv_sha256` | **byte-lost**: exists in no repo version and no backup. Answered by explicit ruling, not by a D-313 abort. |
+| v1 — draft at commit `986fbc4` | `2d456720…` | `git show 986fbc4:governance/RULER_BLIND_SHEET_20260917.csv` | **superseded draft**: 41 CT + 7 substantive DISC + 82 FORM label diffs vs the authority. Adopting it would silently move 48 human labels and re-baseline every floor. Retained as the annotation record (its note_codes are the reviewer's original prose, mean 30 chars vs 129). |
+| v2 — the measured label set | `38323192…` | workspace = HEAD (committed in 85c8081) | **label-equivalent to the authority** (0 CT, 0 substantive DISC/FORM diffs). This is the set every published number was measured on. |
+
+RULING (D-315): the authority is `governance/anchor1_frozen_20260920.json` (`0ec321a7…`) — committed, immutable,
+sha256-cited, carrying human+stored+agree per row for 3 axes plus stratum and fb_id. The CSV is the human editing
+workspace, never the answer key. Verification: re-scoring from the authority reproduces the published numbers
+EXACTLY (CT 0.3533 / DISC 0.4741 / FORM 0.2828), so the ruling moves no published number.
+
+## BUG-338 (MED — FIXED 2026-09-21, audit F-02): the authority stores a SCORER SENTINEL in a label field
+`anchor1_frozen_20260920.json` carries `stored.discipline = "emerging_dump"` on 13 of 150 rows. That token exists in
+neither `config/taxonomy_v5.yaml` (61 canonicals) nor the live DB, and is not in the key's own declared
+`vocabularies.discipline`. It is the scorer's internal sentinel (`resolve_disc_stored`): `emerging` on the STORED
+side is a dump bucket = a stored-label FAILURE, deliberately asymmetric with the human side where `emerging` IS an
+abstention. Consequences: (a) 13/150 stored values do not reproduce from the DB (which holds `emerging`), so a
+future consumer joining stored labels to the DB silently sees a different value; (b) the artifact is an evaluation
+OUTPUT wearing the shape of a label record.
+**NOT fixed by editing the authority** — rewriting an immutable, sha256-cited artifact to fix cosmetics is exactly
+the sin D-313 exists to prevent. Fixed by (i) making the resolver idempotent over the sentinel, (ii) declaring the
+mapping in `config/eval_integrity.yaml:ruler_authority.abstention` and in `governance/ARTIFACT_REGISTRY.md`, so
+`emerging` (pipeline) -> `emerging_dump` (scored) is read through a documented rule instead of a hidden one.
+
+## BUG-339 (HIGH — FIXED 2026-09-21, audit F-01): the config that DECLARES "error rate, never accuracy" carried accuracy
+`config/eval_integrity.yaml:ruler_measurement.measured` still held the CORRUPT pre-correction figures
+(content_type 0.740 / discipline 0.506 / extraction_type 0.831) presented as `accuracy`, with
+`verdict: PASS_DECISIVE` anchored to them and `sheet:` pointing at the workspace rather than the authority. Those
+figures treat the STORED label as the answer key — precisely what D-275a forbids, in the file that carries the rule,
+and the machine-readable surface an agent reads before touching a floor. A live conflict: two answers to the same
+question, one of them wrong, with no deprecation marker.
+FIX: `measured_error_rate` now reports stored-label ERROR RATE vs the blind human, with the effective n
+(CT 150 / DISC 116 / FORM 145) and Wilson intervals, sourced from the authority's `summary_error_rates`. The corrupt
+block is RETAINED as `superseded_measured:` — deleting a published number is not a correction (R-D410). `sheet:`
+now points at the workspace explicitly and a new `authority:` key points at the JSON. Plus a new
+`ruler_authority:` block declaring authority/workspace/superseded/lost hashes, menu hash, truth_source and pooling rule.
+
+## BUG-337 FOLLOW-UP (LOW — FIXED 2026-09-21): one dangling citation survived the rename
+D-314's `evidence:` cited `bakeoff_typed_decision_anchor1_20260921.json`, which no longer exists after the
+ANCHOR-1/ANCHOR-2 split. A decision record whose evidence path cannot be opened is not evidence. Repointed to
+`bakeoff_typed_decision_anchor2_20260921.json`. (Rule: a rename is not complete until every citation resolves.)
+
+## C15 STATUS (2026-09-21, session 8) — 17 unresolved bugs, therefore listed here
+HIGH: BUG-311 (stage5 checkpoint missing), BUG-313 (cognitive science 94% contra, 126/133), BUG-319 (qwen3coder arm
+abstains 116/116). MED: BUG-310, BUG-312, BUG-315, BUG-316, BUG-317, BUG-326 (BLOCKED), BUG-330 (LOW), BUG-331,
+BUG-333, BUG-334, BUG-336 (standing rule). Closed this session: BUG-329, BUG-338, BUG-339, BUG-337 follow-up.
+NOTHING on the ruler may be re-measured before the second-coder gap (F-11) is addressed for anything that
+repoints a FLOOR; re-measurement for diagnosis is now unblocked and read from the authority.

@@ -477,3 +477,24 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
      `38323192`). Nothing on the ruler may be re-measured before this; D-313 makes a freeze-time hash that
      matches no repo version a fail-closed abort.
   4. (administrative) ratify D-314 = R3 not adopted, D-311 closed as measured-rejected.
+
+<!-- s8-sync 2026-09-21 -->
+
+### Session 8 update (2026-09-21) — D-315 RULER RATIFIED, ruler gate CLOSED
+- **GATE 3 (BUG-329, was blocking) is CLOSED.** The owner ratified the session's recommendation: the canonical ruler
+  is `governance/anchor1_frozen_20260920.json` (`0ec321a7…`). Three-version disposition recorded in the buglog
+  (v0 `4d0c856a` byte-lost; v1 `2d456720` = superseded draft; v2 `38323192` = the measured label set, now HEAD).
+  Re-scoring from the authority reproduces the published numbers EXACTLY (CT 0.3533 / DISC 0.4741 / FORM 0.2828) —
+  the ruling moves no published number.
+- **Truth-blinding self-test on the ruler path: PASS** (all 3 axes; reference invariant, blinded agrees 0). This is
+  the mechanical channel, because the LLM reviewer returned a rubber stamp (BUG-333).
+- **HUMAN GATES — now TWO live + one administrative:**
+  1. laya-mlx install (benchmark-only, isolated venv, pinned revision) — unchanged.
+  2. abstention operating point `t_low = p25` (error 0.4231 at a ~25% queue; `enabled: false`) — unchanged.
+  3. (administrative) ratify D-314 = R3 not adopted, D-311 closed as measured-rejected. **D-314 is now RATIFIED
+     as part of the D-315 ratification** — no adoption, no deploy change, abstention still disabled.
+- **NEW STANDING GAP (F-11, methodological, not a gate):** the ruler declares
+  `second_coder_required_before_repointing: true`. No second coder exists, so NO floor may be repointed — every
+  floor number in this repo is single-coder. Re-measurement for diagnosis is unblocked; floor REPOINTING is not.
+- Housekeeping debt carried, not silently dropped: 46 `config/*.bak_*` + 1 `governance/buglog.md.bak_*` (gitignored;
+  the only recovery copies) — the stale-config confusion risk is real and belongs to a cleanup pass with the owner.

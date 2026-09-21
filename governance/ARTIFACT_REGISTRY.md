@@ -42,3 +42,40 @@ in-sample derivation on the **116 RULER-150 rows** (script read `anchor1_frozen_
    distribution, with per-set `menu_hash` + `n_effective` (D-275a/BUG-334) — never by editing artifacts.
 4. Held-out rows (ANCHOR-2) must stay held out: they are the only set that can falsify an in-sample gain (D-311).
 5. Ruler authority is the **frozen key**, not the CSV: the CSV is a human editing workspace (D-313).
+
+---
+
+## D-315 RULING (2026-09-21, owner-ratified) — WHICH ONE IS THE RULER
+
+**Canonical ruler = `governance/anchor1_frozen_20260920.json`** (`sha256 0ec321a7…`). It is the authority for the
+150 blind **human labels** *and* for the **measurement** (per-row human/stored/agree x 3 axes + stratum + fb_id).
+
+| role | artifact | sha256 | why |
+|---|---|---|---|
+| **AUTHORITY** | `anchor1_frozen_20260920.json` | `0ec321a7…` | committed, immutable, sha256-cited, D-313-satisfying |
+| workspace | `RULER_BLIND_SHEET_20260917.csv` | `38323192…` | the human edits it; also the ONLY record of WHY a cell abstained |
+| superseded draft | commit `986fbc4` version | `2d456720…` | adopting it moves 41 CT + 7 DISC human labels and re-baselines every floor |
+| byte-lost | freeze-time | `4d0c856a…` | in no repo version, no backup; label-verified-identical -> ruled, not aborted |
+
+Evidence that the ruling moves nothing: re-scoring from the authority reproduces the published numbers EXACTLY —
+CT 0.3533 / DISC 0.4741 / FORM 0.2828 (and the authority's own `summary_error_rates`). All paths, hashes, the menu
+hash, `truth_source: key` and the pooling rule are declared in `config/eval_integrity.yaml:ruler_authority`.
+
+### Read the stored side through this mapping (BUG-338)
+The authority's `stored.discipline` field is a *scoring view*, not a pure label: `emerging_dump` (13 rows) is the
+scorer's sentinel for the pipeline's catch-all dump. `emerging` (pipeline/DB) -> `emerging_dump` (scored) = a
+stored-label **FAILURE**. On the **human** side `emerging` is an **abstention**. The two are deliberately asymmetric;
+never compare the strings naively. The authority was NOT edited to "fix" this — rewriting an immutable, sha256-cited
+artifact is the D-313 sin.
+
+### Effective n (BUG-334) — publish it or the denominator flatters you
+CT 150/150 · DISC **116**/150 (28 blank + 6 `emerging` cannot be scored) · FORM 145/150.
+
+### HUMAN ATTESTATION — **UNSIGNED (open owner gate)**
+The human fields are the reviewer's blind verdicts by construction, and the label conversion is verifiable
+(0 CT diffs, 0 substantive DISC/FORM diffs vs the workspace). What does NOT yet exist is a **signed statement**
+converting that inference into evidence. This line is reserved for it:
+
+> `human_attestation: ""` — owner, please sign: *"these 150 labels are mine, made blind to pipeline output."*
+
+Until it is signed, treat "human-anchored" as *verified-by-reconstruction*, not *attested*.

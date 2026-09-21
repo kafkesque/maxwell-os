@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 681
+total_decisions: 682
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7151,7 +7151,7 @@ decisions:
     serving_gate as the single deploy gate, and the disabled abstention operating point all remain unchanged.
   evidence: >-
     governance/R3_HELDOUT_RESULT_20260921.md ; governance/r3_heldout_20260921.json ;
-    governance/bakeoff_typed_decision_anchor1_20260921.json ; governance/R5_REVIEW_R3_ADAPTER_20260921.md ;
+    governance/bakeoff_typed_decision_anchor2_20260921.json ; governance/R5_REVIEW_R3_ADAPTER_20260921.md ;
     truth-blinding test 0 label diffs over 12 rows, pairwise abstains without the stored label
   supersedes_note: >-
     D311 stays PROPOSED; its pre-registered run has now happened and the answer is REJECT. Owner ratification
@@ -7159,8 +7159,40 @@ decisions:
   rule_added: >-
     D312: a label source is a config object (bakeoff.active_source + bakeoff.sources.<name>); a bake-off
     artifact is never merged across sources, and the artifact carries source + spec + menu_hash (BUG-332).
+- id: D315
+  category: EVALS
+  state: RATIFIED
+  date: '2026-09-21'
+  title: >-
+    The canonical ruler is the frozen authority JSON; the CSV is a workspace (BUG-329 closed by ruling)
+  decision: >-
+    BUG-329 left three ruler versions and no way to pick one. RULED (owner-ratified): governance/anchor1_frozen_20260920.json
+    (sha256 0ec321a7...) is THE ruler -- the authority for the 150 blind human labels AND for the measurement. It is
+    committed, immutable, sha256-cited, and carries human/stored/agree per row for all three axes plus stratum and fb_id.
+    governance/RULER_BLIND_SHEET_20260917.csv (HEAD 38323192...) is the human editing WORKSPACE and the only record of WHY
+    a cell abstained; it is never the answer key. 2d456720... (commit 986fbc4) is a SUPERSEDED DRAFT: adopting it would
+    silently move 41 content_type + 7 substantive discipline HUMAN labels and re-baseline every floor. 4d0c856a... is
+    BYTE-LOST and label-verified-identical to the authority, so the D-313 fail-closed trigger is answered by this ruling
+    rather than by an abort on a lost file. Both scorer paths were repointed to the authority (C21), and re-scoring from
+    it reproduces the published numbers EXACTLY (CT 0.3533 / DISC 0.4741 / FORM 0.2828): the ruling moves NO published
+    number. This also ratifies D-314 (R3 not adopted) as administrative. The ruler's labels were judged under menu
+    cac6e695 and may never be pooled with ANCHOR-2 (menu 73597ee2, different sampling design).
+  evidence: >-
+    governance/ARTIFACT_REGISTRY.md ; config/eval_integrity.yaml (ruler_authority block) ;
+    governance/buglog.md BUG-329/BUG-338/BUG-339 ; governance/FORENSIC_AUDIT_20260921c.md ;
+    scripts/rescore_ruler_inverted.py --truth-source key (identical to --truth-source sheet) ;
+    --self-test-blinding PASS on 3/3 axes
+  rule_added: >-
+    D-315: an artifact is authority only if it is committed, immutable and sha256-cited; a CSV a human still edits is a
+    workspace, and a scorer must read truth from the authority (C21). A freeze-time hash that matches no repo version is
+    answered by an explicit ruling, never by an abort on a lost file. An evaluation OUTPUT is never a label record: the
+    authority's stored side carries the scorer sentinel `emerging_dump`, which is a declared mapping (BUG-338), not a
+    label. Untested blind-ness is not blind-ness: the scorer now carries --self-test-blinding.
+  supersedes_note: >-
+    Closes BUG-329 and the ruler half of BUG-314. Does NOT close BUG-311/BUG-313/BUG-319, and does NOT close the
+    second-coder gap (audit F-11): no floor may be REPOINTED on a single coder.
 summary:
-  total: 681
+  total: 682
   proposed: 6
   draft: 1
   active: 483
@@ -7171,7 +7203,7 @@ summary:
   deferred: 14
   resolved: 118
   planned: 8
-  ratified: 1
+  ratified: 2
   open: 17
   by_category:
     ARCH: 27
@@ -7213,7 +7245,7 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 1
+    EVALS: 2
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21

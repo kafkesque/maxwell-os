@@ -524,3 +524,13 @@ menu `cac6e695`). **ANCHOR-2** = the 60-row contra-stratified adjudication/held-
 `governance/ARTIFACT_REGISTRY.md`. Also corrected: `anchor1_arbitration_20260921.json` was a RULER-150
 in-sample derivation, not ANCHOR-1/2 -> `ruler_arbitration_in_sample_20260921.json`. Rule: never concatenate
 instruments; never pool across menus; pool only at read time with weights.
+
+## 2026-09-21 — D-315 RATIFIED: THE CANONICAL RULER (BUG-329 CLOSED)
+The canonical ruler is **`governance/anchor1_frozen_20260920.json`** (`0ec321a7…` — authority for the HUMAN labels and
+for the measurement; immutable, committed, sha256-cited). `governance/RULER_BLIND_SHEET_20260917.csv`
+(HEAD `38323192…`) is the human editing **workspace** and the only record of WHY a cell abstained — never the answer
+key. `2d456720…` (commit `986fbc4`) is a **superseded draft**; `4d0c856a…` is **byte-lost / label-verified-identical**.
+Ruler labels were judged under menu **`cac6e695`** (CT = 7, no `none`) — any quoted ruler number must carry it.
+Authority/workspace/hashes/menu/truth_source/pooling are all declared in `config/eval_integrity.yaml:ruler_authority`
+(do not re-derive them from prose). Scorers read truth from the authority (`--truth-source key`, the default);
+`--self-test-blinding` is the mechanical leak guard for this path. Nothing may be pooled with ANCHOR-2.

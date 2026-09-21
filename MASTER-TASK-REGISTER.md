@@ -273,7 +273,11 @@
 - [x] BUG-328 CLOSED; BUG-332 FIXED; BUG-333/334/335 logged (333, 334 OPEN).
 - [ ] BUG-326 repair (403 raw->canonical, 147 both-axes, 703 no-domain): dry-run script + mechanical
       verification required first (R5 is now known-degraded, BUG-333).
-- [ ] GATE 4: name the canonical ruler version (BUG-329) before ANY ruler re-measure.
+- [x] GATE 4 CLOSED 2026-09-21 (D-315, owner-ratified): canonical ruler = `governance/anchor1_frozen_20260920.json`
+      (`0ec321a7`). Workspace = the CSV; `2d456720` = superseded draft; `4d0c856a` = byte-lost/label-verified.
+      Re-score from the authority reproduces CT 0.3533 / DISC 0.4741 / FORM 0.2828 exactly. Blinding test PASS.
+- [ ] GAP F-11 (OPEN, methodological): the ruler declares `second_coder_required_before_repointing: true` and no
+      second coder exists -> NO floor may be repointed. Diagnosis is unblocked; floor repointing is NOT.
 - [ ] Gates: laya-mlx benchmark-only install; abstention operating point t_low=p25; ratify R3 rejection.
 - [x] BUG-326 repair is **BLOCKED, not applied**: the target numbers (403/147/703) do not reproduce on the live
       DB (757 all-`emerging` catch-all labels / 65 mixed-axis / 0 domain-less). Re-scoped in

@@ -235,15 +235,57 @@ ruler_sheet:
     decisive_margin_over_floor: 0.10
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# D-315 (2026-09-21, OWNER-RATIFIED): THE CANONICAL RULER.
+# BUG-329 asked which of three ruler versions is the ruler. This block answers it so no
+# future session has to re-derive it from hashes.
+#   authority  = the frozen JSON. Immutable, committed, sha256-cited. human=ground truth,
+#                stored=under test, per row, for all 3 axes + stratum + fb_id.
+#   workspace  = the CSV the reviewer edits. NOT authority: it is the human's scratch surface
+#                AND the only record of WHY a cell abstained (blank vs emerging vs irrelevant).
+#   superseded = the pre-certification draft at commit 986fbc4. Adopting it would silently
+#                move 41 content_type + 7 substantive discipline HUMAN labels and re-baseline
+#                every floor -- so it is an annotation record, never the key.
+#   lost       = the freeze-time bytes 4d0c856a exist in NO repo version and NO backup. They are
+#                label-verified identical to the authority, so D-313's fail-closed trigger is
+#                answered by this explicit ruling rather than by an abort on a lost file.
+# ─────────────────────────────────────────────────────────────────────────────
+ruler_authority:
+  decision: D-315
+  authority_json: governance/anchor1_frozen_20260920.json
+  authority_sha256: 0ec321a7761d03a9277372051cef867e15d32d438ebb51fefdaf39d4159a54cf
+  human_workspace: governance/RULER_BLIND_SHEET_20260917.csv
+  workspace_sha256_at_head: 383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b
+  workspace_role: "human editing workspace + abstention-reason provenance; NEVER the answer key"
+  superseded_draft: {sha256: 2d456720182828b05b24534ffe774c415fe3a1f6b2f5f88c63457a4f1602f182, commit: 986fbc4}
+  lost_bytes: {sha256: 4d0c856a045aeab52f675c563c5de05c6c489e7cb8195df3a5036553a6ed2b22, status: "byte-lost / label-verified-identical"}
+  menu_hash: "cac6e695"             # judged under THIS menu (CT = 7, no `none`); never pool across menus
+  menu_file: config/closed_menu_v5.json
+  truth_source: key                 # scorer default (C21). `sheet` exists only as a cross-check.
+  abstention: "blank = a datum, never imputed; `emerging` (human) = abstention, `emerging_dump` (stored) = FAILURE (BUG-338)"
+  pooling: "NEVER concatenate with ANCHOR-2: different sampling design AND different menu; pool only at read time with weights"
+  human_attestation: "UNSIGNED (owner gate) -- the labels are human-blind by construction; a signed line would convert that inference into evidence"
+
+
 ruler_measurement:                 # D272a (2026-09-19): the FIRST certified stored-label measurement.
   date: 2026-09-19                 # Source of truth remains governance/ruler_measurement_20260917.md (generated).
   artifact: governance/ruler_measurement_20260917.md
-  sheet: governance/RULER_BLIND_SHEET_20260917.csv
+  authority: governance/anchor1_frozen_20260920.json   # D-315: the ruler is the JSON, not this CSV
+  sheet: governance/RULER_BLIND_SHEET_20260917.csv     # human workspace (the raw cell provenance only)
   reviewer: human                  # single reviewer; a SECOND coder is required before any floor is repointed (see below)
   rows: {total: 150, stratum_a: 100, stratum_b: 50}
-  # stored-label accuracy vs the BLIND human, on the PROPORTIONAL stratum only, always beside the
-  # constant-answer baseline (BUG-269) and a Wilson 95% interval (BUG-267).
-  measured:
+  # BUG-339 FIX (2026-09-21): the block below used to carry the CORRUPT pre-correction figures
+  # (content_type 0.740 / discipline 0.506 / extraction_type 0.831) as `accuracy`, i.e. it treated
+  # the STORED label as the answer key, and `verdict: PASS_DECISIVE` was anchored to that. They are
+  # kept below, clearly marked, because deleting a published number is not a correction (R-D410).
+  # The honest replacement reports stored-label ERROR RATE vs the BLIND human (D-275a): error, never
+  # accuracy, never a bare point estimate. Authoritative source: anchor1_frozen_20260920.json
+  # `summary_error_rates`; narrative: governance/ruler_inverted_20260920.md.
+  measured_error_rate:             # ERROR RATE vs the blind human. Lower is better.
+    content_type:    {n_scored: 150, agrees: 97,  error: 0.3533, wilson95: [0.2814, 0.4326], stratum_a_error: 0.2900, stratum_b_error: 0.4800}
+    discipline:      {n_scored: 116, agrees: 61,  error: 0.4741, wilson95: [0.3856, 0.5644], stratum_a_error: 0.4875, stratum_b_error: 0.4444, effective_n_note: "34 of 150 cannot be scored: 28 blank + 6 `emerging` (BUG-334: publish the effective n)"}
+    extraction_type: {n_scored: 145, agrees: 104, error: 0.2828, wilson95: [0.2158, 0.3609], stratum_a_error: 0.2551, stratum_b_error: 0.3404}
+  superseded_measured:             # CORRUPT: stored label treated as truth. Kept as the historical record only.
     content_type:    {n: 100, unanswered: 0,  accuracy: 0.740, wilson95: [0.646, 0.816], baseline: 0.750, lift: -0.010, verdict: NO_BETTER_THAN_CONSTANT}
     discipline:      {n: 83,  unanswered: 17, accuracy: 0.506, wilson95: [0.401, 0.611], baseline: 0.084, lift: 0.422,  verdict: FLOOR_UNRESOLVED}
     extraction_type: {n: 89,  unanswered: 11, accuracy: 0.831, wilson95: [0.740, 0.895], baseline: 0.360, lift: 0.472,  verdict: PASS_DECISIVE}

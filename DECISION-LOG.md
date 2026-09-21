@@ -244,3 +244,24 @@ abstention clause); R4 is −8.77 pp. **Not adopted** — incumbent pairwise ver
 Evidence: `governance/R3_HELDOUT_RESULT_20260921.md`, `governance/r3_heldout_20260921.json`,
 `governance/R5_REVIEW_R3_ADAPTER_20260921.md`. D-311 stays PROPOSED (its run happened; the answer is REJECT).
 Also D-312: label sources are config objects and bake-off artifacts never merge across sources (BUG-332).
+
+## D-315 (2026-09-21, RATIFIED) — The canonical ruler is the frozen authority JSON; the CSV is a workspace
+**Context.** BUG-329 left the ruler in three versions and made "which ruler?" undecidable from filenames, while the
+`ANCHOR-1` name was shared by a second, unrelated 60-row instrument (BUG-337).
+**Decision.** `governance/anchor1_frozen_20260920.json` (`sha256 0ec321a7…`) is THE ruler — authority for the 150
+blind human labels AND for the measurement. `RULER_BLIND_SHEET_20260917.csv` (HEAD `38323192…`) is the human
+editing **workspace** and the only record of *why* a cell abstained; it is never the answer key. `2d456720…`
+(commit `986fbc4`) is a **superseded draft** — adopting it would silently move 41 content_type + 7 substantive
+discipline HUMAN labels and re-baseline every floor. `4d0c856a…` is **byte-lost / label-verified-identical**; D-313's
+fail-closed trigger is answered by this explicit ruling, not by an abort on a lost file. The 60-row instrument is
+**ANCHOR-2** (`73597ee2`), a separate instrument that may never be pooled or concatenated with the ruler.
+**Rule added.** An artifact is authority only if it is committed, immutable and sha256-cited; a CSV a human still
+edits is a workspace, and a scorer must read truth from the authority (C21). An evaluation *output* is never a label
+record — the authority's stored side carries the scorer sentinel `emerging_dump`, which is now a declared mapping
+(BUG-338). Untested blind-ness is not blind-ness: the ruler scorer carries `--self-test-blinding`.
+**Evidence / verification.** Re-scoring from the authority reproduces the published numbers exactly — CT 0.3533 /
+DISC 0.4741 / FORM 0.2828 — identical to the workspace path, so the ruling moves **no published number**; blinding
+self-test PASS 3/3; `config/eval_integrity.yaml:ruler_authority` declares all paths, hashes, the menu hash,
+`truth_source` and the pooling rule. Audit: `governance/FORENSIC_AUDIT_20260921c.md` (F-01..F-12).
+**Also ratified as administrative:** D-314 (R3 not adopted; D-311 closed as measured-rejected).
+**Not closed by this decision:** the second-coder gap (F-11) — no floor may be repointed on a single coder.

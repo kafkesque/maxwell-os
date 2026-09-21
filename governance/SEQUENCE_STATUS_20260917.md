@@ -342,3 +342,113 @@ may not determine serving eligibility, and a filter that is not asserted on the 
 filter.*
 
 Registry now **639 decisions**; buglog now **BUG-301**; new gates **G17–G20**; **G4a withdrawn**.
+
+---
+
+## 0a/0b/0c IMPLEMENTED (2026-09-19, later session)
+
+The first three programme steps are executed and verified (forensic audit first, then change):
+
+- **0a / G17 (D-274a):** `scripts/apply_serving_gate.py` is the single writer for `status`, derived from
+  `verification_results[factual].passed` + a typed `s5_reason` (new `fbs.s5_reason` column; rule +
+  vocabulary in `config/serving_gate.yaml`; invariant in `pipeline/serving_gate.py` + 15 tests). Applied
+  PASS 4,745 → 3,299 (de-served 1,941 + 11 duplicates; restored 506); integrity ok; CI invariant 0
+  violations; `duplicate_of` rows hard-quarantined. The four label scripts no longer write `status`
+  (BUG-299, BUG-302).
+- **0b / G12 (D-273a):** facet predicate pushed into every retrieval leg + asserted on the fused pool
+  (`pipeline/retrieve.py`); constraint-violation rate **0.5911 → 0.0000** over 470 probes
+  (`scripts/measure_constraint_violation.py`). Closed BUG-285, BUG-300.
+- **0c / G18 (D-273b):** write guard split into `validate_discipline_domain()` (row guard) vs
+  `lint_discipline_domain_vocabulary()` (vocabulary lint); `research methodology` now writes clean
+  (BUG-286). `audit_taxonomy_disjointness.py` updated to report declared debt via the lint.
+- **BUG-276:** `pipeline/backup_guardian.sh` repointed at the SQLite DB (consistent `.backup` + integrity).
+
+**Remaining path (unchanged after step 3):** 1 (G19 persist the tier) → 2 (ruler estimand) → 3 (R5→R1) →
+4 (G15) → 5 (G14) → 6 (S5 aggregation) → 7 (G16) → 8 (distilled).
+
+## Ruler key inversion + guardrail (2026-09-19, evening)
+
+**Step 1 (D-275a) executed.** The ruler's answer key was the stored (corrupt free-generated) label.
+`scripts/rescore_ruler_inverted.py` inverts it: blind human = ground truth, stored = under test, reports
+error rate. FORM pass (reviewer's updated labels): **stored error 0.253 [0.177, 0.346]**;
+normative_heuristic 50% mislabeled (→ causal 9×, → descriptive 6×); "irrelevant" written in 4 FORM cells
+(evidence for R4). Artifacts: `governance/ruler_form_inverted_20260919.{md,json}`.
+
+**D-275b (PROPOSED, pending ratification):** content-type guardrail — procedural intent + done condition
+as the principle/process_template discriminator (not "≥2 steps"); atomic unit = one self-contained
+epistemic claim; checklist → process_template; decision matrix → inline_gate_content.
+
+**Next:** reviewer re-labels CT/discipline with the D-275b guardrail → re-score CT/discipline (inverted)
+→ freeze ANCHOR-1 → per-slot reliability → R5 ratification → R1 → R2.
+
+## G19 — persist the S5 verification tier (2026-09-19, evening)
+
+`pipeline/stage6_commit.py` now persists `s5_reason`, `epistemic_status`, `verification_method`, `isor`
+(CREATE TABLE + migrate + INSERT columns/placeholders/bindings), and `stage5_verify.py:897` derives
+`verifier_model` from config (`S5_NLI_MODEL_LARGE (threshold S5_NLI_PASS_THRESHOLD)`). Live DB migrated
+68 → 71 columns; integrity CHECK 8 passes (71 placeholders = 71 columns); 15 serving-gate tests green.
+Fixed the latent 0a drift (s5_reason in DB but not in stage6). BUG-301 RESOLVED. Also recorded D-275c
+(System One Models / Jev → REJECT for pipeline, ADAPT framing).
+
+## Full-axis inverted re-score + ANCHOR-1 freeze (2026-09-20)
+
+Reviewer locked CT + DISC + FORM. Inverted re-score (D-276): stored error **CT 0.353 / DISC 0.474 /
+FORM 0.283**. CT over-calls principle (93 vs 89), under-calls quarantine (18→6) and process_template
+(16→9). DISC: 8 zero-agreement slots (design psychology 0/5, cultural studies 0/4, risk management 0/4,
++ 5 more) — alias map discards them into `emerging`. ANCHOR-1 frozen (`anchor1_frozen_20260920.{md,json}`);
+R5 slot vote PROPOSED (DEMOTE design psychology / cultural studies / risk management / behavioral
+economics / decision making; BOUND design thinking / organizational theory). `ruler_measurement_20260917.md`
+SUPERSEDED (A5).
+
+Next (dependency order): R5 ratification → R1 (closed menu + `menu_hash` + `*_source` provenance) →
+R2 (definition NLI).
+
+## R5 repair-not-demote + D-275b ratified + raw/canonical clarified (2026-09-20, later)
+
+D-277 RESOLVED: (1) R5 is repair-not-demote — zero-agreement measures pipeline failure, not slot badness;
+DEMOTE vote withdrawn, replaced by RE-DERIVE definition + BOUND (human review) + merge only if
+inseparable. (2) raw AND canonical are both post-hoc model stamps — corpus has zero human labels; both
+demoted to G9, re-derive from source only. (3) error rate is a meter (calibration + abstention), never
+a label-picker. D-275b RATIFIED → `content_type_decision_procedure` written into config/content_types.yaml
+(6-step first-match-wins tree + edge rules + calibration block). anchor1 dispositions regenerated
+(RE-DERIVE+BOUND, no DEMOTE); D-275b RESOLVED, D-276 retraction noted, D-277 added; BUG-304 corrected.
+
+Next (dependency order): R5 repair execution → single-coder ceiling (2nd human, 30 rows) → R1 (closed
+menu + `menu_hash` + `*_source` provenance) → R2 (definition NLI).
+
+## Next-4 executed (2026-09-20, final batch) — D-278..D-281
+
+1. **R5 repair (D-278):** `config/r5_slot_repair.yaml` — OntoClean definition + include
+   + exclude for the 7 weak slots (5 discipline + 2 content-type) and 2 BOUND-only
+   slots. Exclude sets name the correct sibling target. Awaiting human ratification.
+2. **Single-coder ceiling (D-280, PROPOSED/human gate):** 30-row blind sheet +
+   protocol; second human pass not yet performed.
+3. **R1 (D-279, RESOLVED):** closed menu (`pipeline/closed_menu.py`), `menu_hash`
+   sha256 `25b10c44…`, and `content_type_source`/`discipline_source`/
+   `extraction_type_source`/`menu_hash` columns in stage4_merge + stage6_commit +
+   schemas. Verified 75==75==75 + temp-DB insert round-trip.
+4. **R2 (D-281, RESOLVED):** `scripts/definition_nli_verify.py` (definition-anchored
+   NLI, R5 override first); selfcheck green, corpus run pending.
+
+Registry: 648 decisions (resolved 93, proposed 3). Next (dependency order): human
+ratification of R5 defs → single-coder second pass → R2 corpus NLI run → re-measure
+per-slot κ → lift BOUND / merge only if inseparable.
+
+## Forensic audit + D-282 (2026-09-20) — depth-vs-role conflation fixed
+
+User-caught: "3+ domains" was used as the principle-role boundary in the D-278 defs and
+D-275b procedure — it is the universal-DEPTH threshold, not the principle-ROLE criterion.
+A domain/specialized-depth principle (1-2 domains) is still a principle. D-282 removes
+the domain-count criterion from `r5_slot_repair.yaml` + `content_types.yaml`; closed menu
+re-rendered (new menu_hash e8a8b546...). Also fixed a contra-flag threshold reuse in
+definition_nli_verify.py. Registry: 649 decisions (resolved 94, proposed 3). Remaining
+order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per-slot κ.
+
+### 2026-09-21 update (D-307..D-312, BUG-325/326)
+* Menu repair CLOSED: PART1 B normalisation applied + domain-scoped; PART1 A disproved (zero slots); 16/16 discipline
+  boundary pairs settled DIFFERENT. Taxonomy stays v5.5 (audit marker in meta).
+* Governance sync: config/decisions.yaml 673 -> 677 (D307..D312), DECISION-LOG + MTR + buglog updated, summary
+  recomputed and `--check` clean.
+* HUMAN GATES still open: (1) approve/deny the benchmark-only laya-mlx install (isolated venv, pinned revision);
+  (2) approve the abstention operating point before `verify_abstention.yaml` is ever flipped; (3) the R3 held-out
+  run must be published before R3 is adopted.

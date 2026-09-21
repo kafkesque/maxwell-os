@@ -1,0 +1,6 @@
+   🧠 DeBERTa-large: DeBERTa-v3-large-mnli-fever-anli-ling-wanli...
+Loading weights:   0%|          | 0/394 [00:00<?, ?it/s]Loading weights: 100%|██████████| 394/394 [00:00<00:00, 5184.64it/s]
+   ✅ DeBERTa-large loaded on MPS: 435M params
+✅ R2 definition NLI: 7995 FBs, 31525 label-definition pairs scored, 5438 contra, 0 inference errors
+   menu_hash=cac6e69546f0dd7f… r5_hash=04fe615a1ab3780e
+   -> governance/r2_definition_nli_20260920.json

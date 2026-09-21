@@ -1,0 +1,19 @@
+sheet=governance/RULER_BLIND_SHEET_20260917.csv rows=150 axis=discipline truth=116
+Loading weights:   0%|          | 0/394 [00:00<?, ?it/s]Loading weights: 100%|██████████| 394/394 [00:00<00:00, 13950.92it/s]
+  deberta 10/150 -> design psychology
+  deberta 20/150 -> design psychology
+  deberta 30/150 -> design psychology
+  deberta 40/150 -> psychology
+  deberta 50/150 -> design psychology
+  deberta 60/150 -> design psychology
+  deberta 70/150 -> design psychology
+  deberta 80/150 -> design psychology
+  deberta 90/150 -> design psychology
+  deberta 100/150 -> design psychology
+  deberta 110/150 -> design psychology
+  deberta 120/150 -> design psychology
+  deberta 130/150 -> typography
+  deberta 140/150 -> design psychology
+  deberta 150/150 -> design psychology
+deberta: {"n": 116, "abstained": 0, "abstain_rate": 0.0, "decided": 116, "error_rate": 0.931, "errors": 108}
+wrote /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/bakeoff_typed_decision_20260921.json

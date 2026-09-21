@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-284",
+  "reference": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/SINGLE_CODER_CEILING_SHEET_20260920.csv",
+  "n_rows_scored": 30,
+  "contra_threshold": 0.5,
+  "arms": {
+    "B_definition": {
+      "n": 30,
+      "false_contra": 0.267,
+      "entail_rate": 0.6,
+      "neutral_rate": 0.1
+    },
+    "C_paraphrase": {
+      "n": 30,
+      "false_contra": 0.233,
+      "entail_rate": 0.433,
+      "neutral_rate": 0.333
+    }
+  },
+  "wrong_probe_principle_vs_tool_instruction": {
+    "definition": {
+      "contra": 6,
+      "n": 11
+    },
+    "paraphrase": {
+      "contra": 10,
+      "n": 11
+    }
+  }
+}

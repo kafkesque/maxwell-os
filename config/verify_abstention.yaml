@@ -1,0 +1,10 @@
+# Calibrated abstention (D-312) - INERT: no production code reads this file yet.
+# Enabling requires: measured curve + chosen operating point + decision row + repair-queue owner.
+version: '1'
+enabled: false          # fail-closed production behaviour is unchanged (D-2298)
+axis: discipline
+margin_metric: percent_rank   # pairwise verifier margin
+t_low_percentile: null        # abstain below this margin -> repair queue (never a silent drop)
+t_high_percentile: null       # accept + flag
+repair_queue: governance/REPAIR_QUEUE.md
+measured_curve_ref: governance/ABSTENTION_DESIGN_20260921.md

@@ -1,0 +1,10 @@
+{
+  "n": 116,
+  "agree": 46,
+  "err_disagree_to_incumbent": 55,
+  "err_disagree_to_human": 12,
+  "err_conf_weighted": 48,
+  "err_disagree_conf_llm_wins": 52,
+  "both_wrong": 34,
+  "either_wrong": 82
+}

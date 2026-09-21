@@ -1,0 +1,6073 @@
+{
+ "schema_version": "1.0",
+ "generated_at": "2026-09-20",
+ "key_inverted": true,
+ "reference": "human blind label",
+ "under_test": "stored free-generated label",
+ "taxonomy": "config/taxonomy_v5.yaml",
+ "sheet": "governance/RULER_BLIND_SHEET_20260917.csv",
+ "key": "governance/ruler_sheet_key_20260917.json",
+ "total_rows": 150,
+ "results": {
+  "ct": {
+   "axis": "ct",
+   "reference": "human blind label",
+   "under_test": "stored free-generated label",
+   "rows": [
+    {
+     "item_id": "R001",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R002",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R003",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R004",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R005",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R006",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R007",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R008",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R009",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R010",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R011",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R012",
+     "stratum": "B",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R013",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R014",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R015",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R016",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R017",
+     "stratum": "B",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R018",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R019",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R020",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R021",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R022",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R023",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R024",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R025",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R026",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R027",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R028",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R029",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R030",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R031",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R032",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R033",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R034",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R035",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R036",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R037",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R038",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R039",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R040",
+     "stratum": "B",
+     "human": "process_instance",
+     "human_raw": "process instance",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R041",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R042",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R043",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R044",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R045",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R046",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R047",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R048",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R049",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R050",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R051",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R052",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R053",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R054",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R055",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R056",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R057",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R058",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R059",
+     "stratum": "B",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R060",
+     "stratum": "B",
+     "human": "process_instance",
+     "human_raw": "process instance",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R061",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R062",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R063",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R064",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R065",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R066",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R067",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R068",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R069",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R070",
+     "stratum": "B",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R071",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R072",
+     "stratum": "B",
+     "human": "process_instance",
+     "human_raw": "process instance",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R073",
+     "stratum": "A",
+     "human": "growth_edge",
+     "human_raw": "growth edge",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R074",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R075",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R076",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R077",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R078",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R079",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R080",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R081",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R082",
+     "stratum": "B",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R083",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R084",
+     "stratum": "B",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R085",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R086",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R087",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R088",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R089",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R090",
+     "stratum": "B",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R091",
+     "stratum": "B",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R092",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R093",
+     "stratum": "B",
+     "human": "growth_edge",
+     "human_raw": "growth edge",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R094",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R095",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R096",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R097",
+     "stratum": "B",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R098",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R099",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R100",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R101",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R102",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R103",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R104",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R105",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R106",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R107",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R108",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R109",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R110",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R111",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R112",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R113",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R114",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R115",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R116",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R117",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R118",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R119",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R120",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R121",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R122",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R123",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R124",
+     "stratum": "B",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R125",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R126",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R127",
+     "stratum": "B",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "process_instance",
+     "stored_raw": "process_instance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R128",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R129",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R130",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R131",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R132",
+     "stratum": "B",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R133",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R134",
+     "stratum": "B",
+     "human": "growth_edge",
+     "human_raw": "growth edge",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R135",
+     "stratum": "A",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R136",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R137",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R138",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R139",
+     "stratum": "B",
+     "human": "process_template",
+     "human_raw": "process template",
+     "stored": "process_template",
+     "stored_raw": "process_template",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R140",
+     "stratum": "B",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "quarantine",
+     "stored_raw": "quarantine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R141",
+     "stratum": "B",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "growth_edge",
+     "stored_raw": "growth_edge",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R142",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R143",
+     "stratum": "B",
+     "human": "tool_instruction",
+     "human_raw": "tool instruction",
+     "stored": "tool_instruction",
+     "stored_raw": "tool_instruction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R144",
+     "stratum": "A",
+     "human": "noise_drop",
+     "human_raw": "noise drop",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R145",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R146",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R147",
+     "stratum": "B",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "noise_drop",
+     "stored_raw": "noise_drop",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R148",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R149",
+     "stratum": "A",
+     "human": "quarantine",
+     "human_raw": "quarantine",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R150",
+     "stratum": "A",
+     "human": "principle",
+     "human_raw": "principle",
+     "stored": "principle",
+     "stored_raw": "principle",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    }
+   ],
+   "kinds": {
+    "exact": 150
+   },
+   "unresolved": [],
+   "abstained": {},
+   "scored_n": 150,
+   "error_rates": {
+    "A": {
+     "n": 100,
+     "agrees": 71,
+     "error": 0.29,
+     "error_lo": 0.2101,
+     "error_hi": 0.3854
+    },
+    "B": {
+     "n": 50,
+     "agrees": 26,
+     "error": 0.48,
+     "error_lo": 0.348,
+     "error_hi": 0.6149
+    },
+    "all": {
+     "n": 150,
+     "agrees": 97,
+     "error": 0.3533,
+     "error_lo": 0.2814,
+     "error_hi": 0.4326
+    }
+   },
+   "per_class": {
+    "principle": {
+     "n": 89,
+     "agrees": 71,
+     "error": 0.2022
+    },
+    "quarantine": {
+     "n": 18,
+     "agrees": 1,
+     "error": 0.9444
+    },
+    "process_template": {
+     "n": 16,
+     "agrees": 6,
+     "error": 0.625
+    },
+    "noise_drop": {
+     "n": 13,
+     "agrees": 9,
+     "error": 0.3077
+    },
+    "tool_instruction": {
+     "n": 8,
+     "agrees": 6,
+     "error": 0.25
+    },
+    "process_instance": {
+     "n": 3,
+     "agrees": 2,
+     "error": 0.3333
+    },
+    "growth_edge": {
+     "n": 3,
+     "agrees": 2,
+     "error": 0.3333
+    }
+   },
+   "confusion": [
+    {
+     "human": "principle",
+     "stored": "principle",
+     "n": 71
+    },
+    {
+     "human": "process_template",
+     "stored": "principle",
+     "n": 10
+    },
+    {
+     "human": "noise_drop",
+     "stored": "noise_drop",
+     "n": 9
+    },
+    {
+     "human": "quarantine",
+     "stored": "principle",
+     "n": 9
+    },
+    {
+     "human": "principle",
+     "stored": "noise_drop",
+     "n": 8
+    },
+    {
+     "human": "tool_instruction",
+     "stored": "tool_instruction",
+     "n": 6
+    },
+    {
+     "human": "process_template",
+     "stored": "process_template",
+     "n": 6
+    },
+    {
+     "human": "quarantine",
+     "stored": "noise_drop",
+     "n": 4
+    },
+    {
+     "human": "principle",
+     "stored": "growth_edge",
+     "n": 4
+    },
+    {
+     "human": "quarantine",
+     "stored": "process_instance",
+     "n": 3
+    },
+    {
+     "human": "principle",
+     "stored": "quarantine",
+     "n": 3
+    },
+    {
+     "human": "process_instance",
+     "stored": "process_instance",
+     "n": 2
+    },
+    {
+     "human": "principle",
+     "stored": "process_instance",
+     "n": 2
+    },
+    {
+     "human": "growth_edge",
+     "stored": "growth_edge",
+     "n": 2
+    },
+    {
+     "human": "noise_drop",
+     "stored": "principle",
+     "n": 2
+    },
+    {
+     "human": "principle",
+     "stored": "process_template",
+     "n": 1
+    },
+    {
+     "human": "quarantine",
+     "stored": "process_template",
+     "n": 1
+    },
+    {
+     "human": "noise_drop",
+     "stored": "process_instance",
+     "n": 1
+    },
+    {
+     "human": "tool_instruction",
+     "stored": "quarantine",
+     "n": 1
+    },
+    {
+     "human": "process_instance",
+     "stored": "noise_drop",
+     "n": 1
+    },
+    {
+     "human": "growth_edge",
+     "stored": "principle",
+     "n": 1
+    },
+    {
+     "human": "quarantine",
+     "stored": "quarantine",
+     "n": 1
+    },
+    {
+     "human": "tool_instruction",
+     "stored": "process_template",
+     "n": 1
+    },
+    {
+     "human": "noise_drop",
+     "stored": "quarantine",
+     "n": 1
+    }
+   ],
+   "group_near_miss": null
+  },
+  "disc": {
+   "axis": "disc",
+   "reference": "human blind label",
+   "under_test": "stored free-generated label",
+   "rows": [
+    {
+     "item_id": "R001",
+     "stratum": "A",
+     "human": "privacy & surveillance",
+     "human_raw": "privacy & surveillance",
+     "stored": "law",
+     "stored_raw": "law",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R002",
+     "stratum": "A",
+     "human": "cultural studies",
+     "human_raw": "cultural studies",
+     "stored": "communication theory",
+     "stored_raw": "communication theory",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R003",
+     "stratum": "B",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R004",
+     "stratum": "A",
+     "human": "political economy",
+     "human_raw": "political economy",
+     "stored": "health & medicine",
+     "stored_raw": "health & medicine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R005",
+     "stratum": "B",
+     "human": "computer graphics",
+     "human_raw": "computer graphics",
+     "stored": "computer graphics",
+     "stored_raw": "computer graphics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R006",
+     "stratum": "B",
+     "human": "generative design",
+     "human_raw": "generative design",
+     "stored": "generative design",
+     "stored_raw": "generative design",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R007",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "engineering",
+     "stored_raw": "engineering",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R008",
+     "stratum": "A",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "health & medicine",
+     "stored_raw": "health & medicine",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R009",
+     "stratum": "B",
+     "human": "risk management",
+     "human_raw": "risk management",
+     "stored": "finance",
+     "stored_raw": "finance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R010",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "software engineering",
+     "stored_raw": "software engineering",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R011",
+     "stratum": "A",
+     "human": "information retrieval",
+     "human_raw": "information retrieval",
+     "stored": "artificial intelligence",
+     "stored_raw": "artificial intelligence",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R012",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "game design",
+     "stored_raw": "game design",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R013",
+     "stratum": "A",
+     "human": "risk management",
+     "human_raw": "risk management",
+     "stored": "creative process",
+     "stored_raw": "creative process",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R014",
+     "stratum": "B",
+     "human": "semiotics",
+     "human_raw": "semiotics",
+     "stored": "anthropology",
+     "stored_raw": "anthropology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R015",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R016",
+     "stratum": "A",
+     "human": "semiotics",
+     "human_raw": "semiotics",
+     "stored": "semiotics",
+     "stored_raw": "semiotics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R017",
+     "stratum": "B",
+     "human": "engineering",
+     "human_raw": "engineering",
+     "stored": "engineering",
+     "stored_raw": "engineering",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R018",
+     "stratum": "B",
+     "human": "visual perception",
+     "human_raw": "visual perception",
+     "stored": "color theory",
+     "stored_raw": "color theory",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R019",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R020",
+     "stratum": "B",
+     "human": "systems engineering",
+     "human_raw": "systems engineering",
+     "stored": "systems engineering",
+     "stored_raw": "systems engineering",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R021",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R022",
+     "stratum": "B",
+     "human": "human-computer interaction",
+     "human_raw": "human-computer interaction",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R023",
+     "stratum": "A",
+     "human": "strategic thinking",
+     "human_raw": "strategic thinking",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R024",
+     "stratum": "A",
+     "human": "finance",
+     "human_raw": "finance",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R025",
+     "stratum": "A",
+     "human": "organizational theory",
+     "human_raw": "organizational theory",
+     "stored": "organizational theory",
+     "stored_raw": "organizational theory",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R026",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R027",
+     "stratum": "A",
+     "human": "organizational theory",
+     "human_raw": "organizational theory",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R028",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "machine learning",
+     "stored_raw": "machine learning",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R029",
+     "stratum": "A",
+     "human": "creative process",
+     "human_raw": "creative process",
+     "stored": "creative process",
+     "stored_raw": "creative process",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R030",
+     "stratum": "A",
+     "human": "computer graphics",
+     "human_raw": "computer graphics",
+     "stored": "computer graphics",
+     "stored_raw": "computer graphics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R031",
+     "stratum": "A",
+     "human": "risk management",
+     "human_raw": "risk management",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R032",
+     "stratum": "A",
+     "human": "software engineering",
+     "human_raw": "software engineering",
+     "stored": "software engineering",
+     "stored_raw": "software engineering",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R033",
+     "stratum": "A",
+     "human": "philosophy",
+     "human_raw": "philosophy",
+     "stored": "philosophy",
+     "stored_raw": "philosophy",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R034",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "typography",
+     "stored_raw": "typography",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R035",
+     "stratum": "A",
+     "human": "information science",
+     "human_raw": "information science",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R036",
+     "stratum": "A",
+     "human": "design psychology",
+     "human_raw": "design psychology ",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R037",
+     "stratum": "B",
+     "human": "software engineering",
+     "human_raw": "software engineering",
+     "stored": "software engineering",
+     "stored_raw": "software engineering",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R038",
+     "stratum": "A",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R039",
+     "stratum": "A",
+     "human": "sociology",
+     "human_raw": "sociology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R040",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "media studies",
+     "stored_raw": "media studies",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R041",
+     "stratum": "A",
+     "human": "design psychology",
+     "human_raw": "design psychology ",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R042",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R043",
+     "stratum": "A",
+     "human": "neuroscience",
+     "human_raw": "neuroscience",
+     "stored": "neuroscience",
+     "stored_raw": "neuroscience",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R044",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R045",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R046",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R047",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R048",
+     "stratum": "A",
+     "human": "creative process",
+     "human_raw": "creative process",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R049",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R050",
+     "stratum": "A",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R051",
+     "stratum": "A",
+     "human": "engineering",
+     "human_raw": "engineering",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R052",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R053",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "philosophy",
+     "stored_raw": "philosophy",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R054",
+     "stratum": "B",
+     "human": "artificial intelligence",
+     "human_raw": "artificial intelligence",
+     "stored": "artificial intelligence",
+     "stored_raw": "artificial intelligence",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R055",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "behavioral economics",
+     "stored_raw": "behavioral economics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R056",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R057",
+     "stratum": "A",
+     "human": "finance",
+     "human_raw": "finance",
+     "stored": "law",
+     "stored_raw": "law",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R058",
+     "stratum": "A",
+     "human": "design psychology",
+     "human_raw": "design psychology ",
+     "stored": "communication theory",
+     "stored_raw": "communication theory",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R059",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R060",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "visual semiotics",
+     "stored_raw": "visual semiotics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R061",
+     "stratum": "A",
+     "human": "strategic thinking",
+     "human_raw": "strategic thinking",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R062",
+     "stratum": "A",
+     "human": "behavioral economics",
+     "human_raw": "behavioral economics",
+     "stored": "neuroscience",
+     "stored_raw": "neuroscience",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R063",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "media studies",
+     "stored_raw": "media studies",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R064",
+     "stratum": "A",
+     "human": "typography",
+     "human_raw": "typography",
+     "stored": "typography",
+     "stored_raw": "typography",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R065",
+     "stratum": "B",
+     "human": "media studies",
+     "human_raw": "media studies",
+     "stored": "media studies",
+     "stored_raw": "media studies",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R066",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "computational geometry",
+     "stored_raw": "computational geometry",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R067",
+     "stratum": "B",
+     "human": "performing arts",
+     "human_raw": "performing arts ",
+     "stored": "cultural design",
+     "stored_raw": "cultural design",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R068",
+     "stratum": "B",
+     "human": "creative process",
+     "human_raw": "creative process",
+     "stored": "cultural design",
+     "stored_raw": "cultural design",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R069",
+     "stratum": "A",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R070",
+     "stratum": "B",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "software engineering",
+     "stored_raw": "software engineering",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R071",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R072",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R073",
+     "stratum": "A",
+     "human": "cognitive science",
+     "human_raw": "cognitive science",
+     "stored": "linguistics",
+     "stored_raw": "linguistics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R074",
+     "stratum": "B",
+     "human": "design psychology",
+     "human_raw": "design psychology ",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R075",
+     "stratum": "A",
+     "human": "political economy",
+     "human_raw": "political economy",
+     "stored": "philosophy",
+     "stored_raw": "philosophy",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R076",
+     "stratum": "A",
+     "human": "cultural studies",
+     "human_raw": "cultural studies",
+     "stored": "semiotics",
+     "stored_raw": "semiotics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R077",
+     "stratum": "A",
+     "human": "cultural studies",
+     "human_raw": "cultural studies",
+     "stored": "sociology",
+     "stored_raw": "sociology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R078",
+     "stratum": "B",
+     "human": "generative design",
+     "human_raw": "generative design",
+     "stored": "generative design",
+     "stored_raw": "generative design",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R079",
+     "stratum": "A",
+     "human": "linguistics",
+     "human_raw": "linguistics",
+     "stored": "linguistics",
+     "stored_raw": "linguistics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R080",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R081",
+     "stratum": "A",
+     "human": "behavioral economics",
+     "human_raw": "behavioral economics",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R082",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "political economy",
+     "stored_raw": "political economy",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R083",
+     "stratum": "A",
+     "human": "behavioral economics",
+     "human_raw": "behavioral economics",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R084",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R085",
+     "stratum": "B",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R086",
+     "stratum": "A",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R087",
+     "stratum": "A",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R088",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "machine learning",
+     "stored_raw": "machine learning",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R089",
+     "stratum": "A",
+     "human": "human-computer interaction",
+     "human_raw": "human-computer interaction",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R090",
+     "stratum": "B",
+     "human": "cultural design",
+     "human_raw": "cultural design",
+     "stored": "media studies",
+     "stored_raw": "media studies",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R091",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R092",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "political economy",
+     "stored_raw": "political economy",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R093",
+     "stratum": "B",
+     "human": "semiotics",
+     "human_raw": "semiotics",
+     "stored": "semiotics",
+     "stored_raw": "semiotics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R094",
+     "stratum": "A",
+     "human": "human-computer interaction",
+     "human_raw": "human-computer interaction",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R095",
+     "stratum": "B",
+     "human": "design psychology",
+     "human_raw": "design psychology ",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R096",
+     "stratum": "B",
+     "human": "economics",
+     "human_raw": "economics",
+     "stored": "economics",
+     "stored_raw": "economics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R097",
+     "stratum": "B",
+     "human": "decision making",
+     "human_raw": "decision making",
+     "stored": "decision making",
+     "stored_raw": "decision making",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R098",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R099",
+     "stratum": "A",
+     "human": "communication theory",
+     "human_raw": "communication theory",
+     "stored": "behavioral economics",
+     "stored_raw": "behavioral economics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R100",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "economics",
+     "stored_raw": "economics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R101",
+     "stratum": "A",
+     "human": "philosophy",
+     "human_raw": "philosophy",
+     "stored": "philosophy",
+     "stored_raw": "philosophy",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R102",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "political economy",
+     "stored_raw": "political economy",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R103",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "cognitive science",
+     "stored_raw": "cognitive science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R104",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R105",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R106",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "motion & time",
+     "stored_raw": "motion & time",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R107",
+     "stratum": "A",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R108",
+     "stratum": "A",
+     "human": "typography",
+     "human_raw": "typography",
+     "stored": "typography",
+     "stored_raw": "typography",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R109",
+     "stratum": "A",
+     "human": "behavioral economics",
+     "human_raw": "behavioral economics",
+     "stored": "behavioral economics",
+     "stored_raw": "behavioral economics",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R110",
+     "stratum": "A",
+     "human": "information science",
+     "human_raw": "information science",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R111",
+     "stratum": "B",
+     "human": "typography",
+     "human_raw": "typography",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R112",
+     "stratum": "B",
+     "human": "research methodology",
+     "human_raw": "research methodology",
+     "stored": "motion & time",
+     "stored_raw": "motion & time",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R113",
+     "stratum": "A",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R114",
+     "stratum": "A",
+     "human": "decision making",
+     "human_raw": "decision making",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R115",
+     "stratum": "A",
+     "human": "decision making",
+     "human_raw": "decision making",
+     "stored": "cognitive science",
+     "stored_raw": "cognitive science",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R116",
+     "stratum": "B",
+     "human": "artificial intelligence",
+     "human_raw": "artificial intelligence",
+     "stored": "generative ai",
+     "stored_raw": "generative ai",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R117",
+     "stratum": "A",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "behavioral economics",
+     "stored_raw": "behavioral economics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R118",
+     "stratum": "A",
+     "human": "machine learning",
+     "human_raw": "machine learning",
+     "stored": "machine learning",
+     "stored_raw": "machine learning",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R119",
+     "stratum": "A",
+     "human": "organizational theory",
+     "human_raw": "organizational theory",
+     "stored": "organizational theory",
+     "stored_raw": "organizational theory",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R120",
+     "stratum": "A",
+     "human": "information science",
+     "human_raw": "information science",
+     "stored": "information science",
+     "stored_raw": "information science",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R121",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "emerging",
+     "stored": "behavioral economics",
+     "stored_raw": "behavioral economics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R122",
+     "stratum": "A",
+     "human": "visual perception",
+     "human_raw": "visual perception",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R123",
+     "stratum": "A",
+     "human": "computational geometry",
+     "human_raw": "computational geometry",
+     "stored": "computer graphics",
+     "stored_raw": "computer graphics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R124",
+     "stratum": "B",
+     "human": "generative ai",
+     "human_raw": "generative ai",
+     "stored": "generative ai",
+     "stored_raw": "generative ai",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R125",
+     "stratum": "B",
+     "human": "strategic thinking",
+     "human_raw": "strategic thinking",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R126",
+     "stratum": "A",
+     "human": "cultural design",
+     "human_raw": "cultural design",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R127",
+     "stratum": "B",
+     "human": "cultural studies",
+     "human_raw": "cultural studies",
+     "stored": "cultural design",
+     "stored_raw": "cultural design",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R128",
+     "stratum": "A",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R129",
+     "stratum": "B",
+     "human": "decision making",
+     "human_raw": "decision making",
+     "stored": "strategic thinking",
+     "stored_raw": "strategic thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R130",
+     "stratum": "A",
+     "human": "typography",
+     "human_raw": "typography",
+     "stored": "typography",
+     "stored_raw": "typography",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R131",
+     "stratum": "B",
+     "human": "information security",
+     "human_raw": "information security",
+     "stored": "privacy & surveillance",
+     "stored_raw": "privacy & surveillance",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R132",
+     "stratum": "B",
+     "human": "computational physics & simulation",
+     "human_raw": "computational physics & simulation",
+     "stored": "computational physics & simulation",
+     "stored_raw": "computational physics & simulation",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R133",
+     "stratum": "A",
+     "human": "risk management",
+     "human_raw": "risk management",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R134",
+     "stratum": "B",
+     "human": "information retrieval",
+     "human_raw": "information retrieval",
+     "stored": "information retrieval",
+     "stored_raw": "information retrieval",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R135",
+     "stratum": "A",
+     "human": "design thinking",
+     "human_raw": "design thinking",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R136",
+     "stratum": "A",
+     "human": "human-computer interaction",
+     "human_raw": "human-computer interaction ",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R137",
+     "stratum": "A",
+     "human": "human-computer interaction",
+     "human_raw": "human-computer interaction",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R138",
+     "stratum": "B",
+     "human": "literary theory",
+     "human_raw": "literary theory",
+     "stored": "linguistics",
+     "stored_raw": "linguistics",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R139",
+     "stratum": "B",
+     "human": "psychology",
+     "human_raw": "psychology",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R140",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "cultural design",
+     "stored_raw": "cultural design",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R141",
+     "stratum": "B",
+     "human": "operations research",
+     "human_raw": "operations research",
+     "stored": "operations research",
+     "stored_raw": "operations research",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R142",
+     "stratum": "A",
+     "human": "media studies",
+     "human_raw": "media studies",
+     "stored": "media studies",
+     "stored_raw": "media studies",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    },
+    {
+     "item_id": "R143",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "human-computer interaction",
+     "stored_raw": "human-computer interaction",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R144",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "computational geometry",
+     "stored_raw": "computational geometry",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R145",
+     "stratum": "A",
+     "human": "color theory",
+     "human_raw": "color theory",
+     "stored": "cultural studies",
+     "stored_raw": "cultural studies",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R146",
+     "stratum": "A",
+     "human": "organizational theory",
+     "human_raw": "organizational theory",
+     "stored": "emerging_dump",
+     "stored_raw": "emerging",
+     "stored_kind": "dump",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R147",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "research methodology",
+     "stored_raw": "research methodology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R148",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "design thinking",
+     "stored_raw": "design thinking",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R149",
+     "stratum": "A",
+     "human": "privacy & surveillance",
+     "human_raw": "privacy & surveillance  ",
+     "stored": "psychology",
+     "stored_raw": "psychology",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true,
+     "same_group": false
+    },
+    {
+     "item_id": "R150",
+     "stratum": "A",
+     "human": "organizational theory",
+     "human_raw": "organizational theory",
+     "stored": "organizational theory",
+     "stored_raw": "organizational theory",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true,
+     "same_group": true
+    }
+   ],
+   "kinds": {
+    "exact": 116,
+    "blank": 28,
+    "abstain-emerging": 6
+   },
+   "unresolved": [],
+   "abstained": {
+    "blank": 28,
+    "abstain-emerging": 6
+   },
+   "scored_n": 116,
+   "error_rates": {
+    "A": {
+     "n": 80,
+     "agrees": 41,
+     "error": 0.4875,
+     "error_lo": 0.3811,
+     "error_hi": 0.5951
+    },
+    "B": {
+     "n": 36,
+     "agrees": 20,
+     "error": 0.4444,
+     "error_lo": 0.2954,
+     "error_hi": 0.6042
+    },
+    "all": {
+     "n": 116,
+     "agrees": 61,
+     "error": 0.4741,
+     "error_lo": 0.3856,
+     "error_hi": 0.5644
+    }
+   },
+   "per_class": {
+    "operations research": {
+     "n": 8,
+     "agrees": 5,
+     "error": 0.375
+    },
+    "psychology": {
+     "n": 7,
+     "agrees": 5,
+     "error": 0.2857
+    },
+    "design thinking": {
+     "n": 7,
+     "agrees": 4,
+     "error": 0.4286
+    },
+    "research methodology": {
+     "n": 6,
+     "agrees": 5,
+     "error": 0.1667
+    },
+    "human-computer interaction": {
+     "n": 5,
+     "agrees": 5,
+     "error": 0.0
+    },
+    "organizational theory": {
+     "n": 5,
+     "agrees": 3,
+     "error": 0.4
+    },
+    "design psychology": {
+     "n": 5,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "cultural studies": {
+     "n": 4,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "risk management": {
+     "n": 4,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "behavioral economics": {
+     "n": 4,
+     "agrees": 1,
+     "error": 0.75
+    },
+    "typography": {
+     "n": 4,
+     "agrees": 3,
+     "error": 0.25
+    },
+    "decision making": {
+     "n": 4,
+     "agrees": 1,
+     "error": 0.75
+    },
+    "semiotics": {
+     "n": 3,
+     "agrees": 2,
+     "error": 0.3333
+    },
+    "strategic thinking": {
+     "n": 3,
+     "agrees": 3,
+     "error": 0.0
+    },
+    "creative process": {
+     "n": 3,
+     "agrees": 1,
+     "error": 0.6667
+    },
+    "information science": {
+     "n": 3,
+     "agrees": 3,
+     "error": 0.0
+    },
+    "privacy & surveillance": {
+     "n": 2,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "political economy": {
+     "n": 2,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "computer graphics": {
+     "n": 2,
+     "agrees": 2,
+     "error": 0.0
+    },
+    "generative design": {
+     "n": 2,
+     "agrees": 2,
+     "error": 0.0
+    },
+    "information retrieval": {
+     "n": 2,
+     "agrees": 1,
+     "error": 0.5
+    },
+    "engineering": {
+     "n": 2,
+     "agrees": 1,
+     "error": 0.5
+    },
+    "visual perception": {
+     "n": 2,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "finance": {
+     "n": 2,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "software engineering": {
+     "n": 2,
+     "agrees": 2,
+     "error": 0.0
+    },
+    "philosophy": {
+     "n": 2,
+     "agrees": 2,
+     "error": 0.0
+    },
+    "artificial intelligence": {
+     "n": 2,
+     "agrees": 1,
+     "error": 0.5
+    },
+    "media studies": {
+     "n": 2,
+     "agrees": 2,
+     "error": 0.0
+    },
+    "cultural design": {
+     "n": 2,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "systems engineering": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "sociology": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "neuroscience": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "performing arts": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "cognitive science": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "linguistics": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "economics": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "communication theory": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "machine learning": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "computational geometry": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "generative ai": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "information security": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "computational physics & simulation": {
+     "n": 1,
+     "agrees": 1,
+     "error": 0.0
+    },
+    "literary theory": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    },
+    "color theory": {
+     "n": 1,
+     "agrees": 0,
+     "error": 1.0
+    }
+   },
+   "confusion": [
+    {
+     "human": "research methodology",
+     "stored": "research methodology",
+     "n": 5
+    },
+    {
+     "human": "human-computer interaction",
+     "stored": "human-computer interaction",
+     "n": 5
+    },
+    {
+     "human": "operations research",
+     "stored": "operations research",
+     "n": 5
+    },
+    {
+     "human": "psychology",
+     "stored": "psychology",
+     "n": 5
+    },
+    {
+     "human": "design thinking",
+     "stored": "design thinking",
+     "n": 4
+    },
+    {
+     "human": "strategic thinking",
+     "stored": "strategic thinking",
+     "n": 3
+    },
+    {
+     "human": "organizational theory",
+     "stored": "organizational theory",
+     "n": 3
+    },
+    {
+     "human": "information science",
+     "stored": "information science",
+     "n": 3
+    },
+    {
+     "human": "design psychology",
+     "stored": "emerging_dump",
+     "n": 3
+    },
+    {
+     "human": "typography",
+     "stored": "typography",
+     "n": 3
+    },
+    {
+     "human": "computer graphics",
+     "stored": "computer graphics",
+     "n": 2
+    },
+    {
+     "human": "generative design",
+     "stored": "generative design",
+     "n": 2
+    },
+    {
+     "human": "design thinking",
+     "stored": "software engineering",
+     "n": 2
+    },
+    {
+     "human": "semiotics",
+     "stored": "semiotics",
+     "n": 2
+    },
+    {
+     "human": "software engineering",
+     "stored": "software engineering",
+     "n": 2
+    },
+    {
+     "human": "philosophy",
+     "stored": "philosophy",
+     "n": 2
+    },
+    {
+     "human": "media studies",
+     "stored": "media studies",
+     "n": 2
+    },
+    {
+     "human": "privacy & surveillance",
+     "stored": "law",
+     "n": 1
+    },
+    {
+     "human": "cultural studies",
+     "stored": "communication theory",
+     "n": 1
+    },
+    {
+     "human": "political economy",
+     "stored": "health & medicine",
+     "n": 1
+    },
+    {
+     "human": "psychology",
+     "stored": "health & medicine",
+     "n": 1
+    },
+    {
+     "human": "risk management",
+     "stored": "finance",
+     "n": 1
+    },
+    {
+     "human": "information retrieval",
+     "stored": "artificial intelligence",
+     "n": 1
+    },
+    {
+     "human": "risk management",
+     "stored": "creative process",
+     "n": 1
+    },
+    {
+     "human": "semiotics",
+     "stored": "anthropology",
+     "n": 1
+    },
+    {
+     "human": "operations research",
+     "stored": "strategic thinking",
+     "n": 1
+    },
+    {
+     "human": "engineering",
+     "stored": "engineering",
+     "n": 1
+    },
+    {
+     "human": "visual perception",
+     "stored": "color theory",
+     "n": 1
+    },
+    {
+     "human": "systems engineering",
+     "stored": "systems engineering",
+     "n": 1
+    },
+    {
+     "human": "finance",
+     "stored": "strategic thinking",
+     "n": 1
+    },
+    {
+     "human": "organizational theory",
+     "stored": "strategic thinking",
+     "n": 1
+    },
+    {
+     "human": "creative process",
+     "stored": "creative process",
+     "n": 1
+    },
+    {
+     "human": "risk management",
+     "stored": "research methodology",
+     "n": 1
+    },
+    {
+     "human": "sociology",
+     "stored": "psychology",
+     "n": 1
+    },
+    {
+     "human": "neuroscience",
+     "stored": "neuroscience",
+     "n": 1
+    },
+    {
+     "human": "operations research",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "creative process",
+     "stored": "design thinking",
+     "n": 1
+    },
+    {
+     "human": "engineering",
+     "stored": "design thinking",
+     "n": 1
+    },
+    {
+     "human": "artificial intelligence",
+     "stored": "artificial intelligence",
+     "n": 1
+    },
+    {
+     "human": "operations research",
+     "stored": "behavioral economics",
+     "n": 1
+    },
+    {
+     "human": "finance",
+     "stored": "law",
+     "n": 1
+    },
+    {
+     "human": "design psychology",
+     "stored": "communication theory",
+     "n": 1
+    },
+    {
+     "human": "behavioral economics",
+     "stored": "neuroscience",
+     "n": 1
+    },
+    {
+     "human": "performing arts",
+     "stored": "cultural design",
+     "n": 1
+    },
+    {
+     "human": "creative process",
+     "stored": "cultural design",
+     "n": 1
+    },
+    {
+     "human": "design thinking",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "cognitive science",
+     "stored": "linguistics",
+     "n": 1
+    },
+    {
+     "human": "design psychology",
+     "stored": "psychology",
+     "n": 1
+    },
+    {
+     "human": "political economy",
+     "stored": "philosophy",
+     "n": 1
+    },
+    {
+     "human": "cultural studies",
+     "stored": "semiotics",
+     "n": 1
+    },
+    {
+     "human": "cultural studies",
+     "stored": "sociology",
+     "n": 1
+    },
+    {
+     "human": "linguistics",
+     "stored": "linguistics",
+     "n": 1
+    },
+    {
+     "human": "behavioral economics",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "behavioral economics",
+     "stored": "psychology",
+     "n": 1
+    },
+    {
+     "human": "cultural design",
+     "stored": "media studies",
+     "n": 1
+    },
+    {
+     "human": "economics",
+     "stored": "economics",
+     "n": 1
+    },
+    {
+     "human": "decision making",
+     "stored": "decision making",
+     "n": 1
+    },
+    {
+     "human": "communication theory",
+     "stored": "behavioral economics",
+     "n": 1
+    },
+    {
+     "human": "behavioral economics",
+     "stored": "behavioral economics",
+     "n": 1
+    },
+    {
+     "human": "typography",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "research methodology",
+     "stored": "motion & time",
+     "n": 1
+    },
+    {
+     "human": "decision making",
+     "stored": "operations research",
+     "n": 1
+    },
+    {
+     "human": "decision making",
+     "stored": "cognitive science",
+     "n": 1
+    },
+    {
+     "human": "artificial intelligence",
+     "stored": "generative ai",
+     "n": 1
+    },
+    {
+     "human": "psychology",
+     "stored": "behavioral economics",
+     "n": 1
+    },
+    {
+     "human": "machine learning",
+     "stored": "machine learning",
+     "n": 1
+    },
+    {
+     "human": "visual perception",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "computational geometry",
+     "stored": "computer graphics",
+     "n": 1
+    },
+    {
+     "human": "generative ai",
+     "stored": "generative ai",
+     "n": 1
+    },
+    {
+     "human": "cultural design",
+     "stored": "design thinking",
+     "n": 1
+    },
+    {
+     "human": "cultural studies",
+     "stored": "cultural design",
+     "n": 1
+    },
+    {
+     "human": "decision making",
+     "stored": "strategic thinking",
+     "n": 1
+    },
+    {
+     "human": "information security",
+     "stored": "privacy & surveillance",
+     "n": 1
+    },
+    {
+     "human": "computational physics & simulation",
+     "stored": "computational physics & simulation",
+     "n": 1
+    },
+    {
+     "human": "risk management",
+     "stored": "human-computer interaction",
+     "n": 1
+    },
+    {
+     "human": "information retrieval",
+     "stored": "information retrieval",
+     "n": 1
+    },
+    {
+     "human": "literary theory",
+     "stored": "linguistics",
+     "n": 1
+    },
+    {
+     "human": "color theory",
+     "stored": "cultural studies",
+     "n": 1
+    },
+    {
+     "human": "organizational theory",
+     "stored": "emerging_dump",
+     "n": 1
+    },
+    {
+     "human": "privacy & surveillance",
+     "stored": "psychology",
+     "n": 1
+    }
+   ],
+   "group_near_miss": {
+    "n": 107,
+    "exact_agree": 61,
+    "group_agree": 78,
+    "exact_error": 0.4299,
+    "group_error": 0.271
+   }
+  },
+  "form": {
+   "axis": "form",
+   "reference": "human blind label",
+   "under_test": "stored free-generated label",
+   "rows": [
+    {
+     "item_id": "R001",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R002",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R003",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R004",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R005",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R006",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R007",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R008",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R009",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R010",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R011",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R012",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R013",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R014",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R015",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R016",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R017",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R018",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R019",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R020",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R021",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R022",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R023",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R024",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R025",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R026",
+     "stratum": "A",
+     "human": null,
+     "human_raw": "",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R027",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R028",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R029",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R030",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R031",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R032",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R033",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R034",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R035",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R036",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R037",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R038",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R039",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R040",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R041",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R042",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R043",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R044",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R045",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R046",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R047",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R048",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R049",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R050",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R051",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R052",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R053",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R054",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R055",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R056",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R057",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R058",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R059",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R060",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R061",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative_heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R062",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R063",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R064",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R065",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "escriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R066",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "escriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R067",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R068",
+     "stratum": "B",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R069",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R070",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R071",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R072",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R073",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R074",
+     "stratum": "B",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R075",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R076",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical_pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R077",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive_model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R078",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R079",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R080",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R081",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R082",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R083",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R084",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R085",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R086",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R087",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R088",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R089",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R090",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R091",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R092",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R093",
+     "stratum": "B",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R094",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "causal mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R095",
+     "stratum": "B",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R096",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R097",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R098",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R099",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R100",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R101",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R102",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R103",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R104",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R105",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R106",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R107",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R108",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R109",
+     "stratum": "A",
+     "human": "empirical_pattern",
+     "human_raw": "empirical pattern",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R110",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R111",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R112",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R113",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R114",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R115",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R116",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R117",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R118",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R119",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R120",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R121",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R122",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R123",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R124",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R125",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R126",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R127",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R128",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R129",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R130",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R131",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R132",
+     "stratum": "B",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R133",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R134",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R135",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R136",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R137",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R138",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R139",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R140",
+     "stratum": "B",
+     "human": null,
+     "human_raw": "",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": false
+    },
+    {
+     "item_id": "R141",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "empirical_pattern",
+     "stored_raw": "empirical_pattern",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R142",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R143",
+     "stratum": "B",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "normative_heuristic",
+     "stored_raw": "normative_heuristic",
+     "stored_kind": "typo",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R144",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normativ heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R145",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R146",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R147",
+     "stratum": "B",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R148",
+     "stratum": "A",
+     "human": "causal_mechanism",
+     "human_raw": "casual mechanism",
+     "stored": "causal_mechanism",
+     "stored_raw": "causal_mechanism",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    },
+    {
+     "item_id": "R149",
+     "stratum": "A",
+     "human": "normative_heuristic",
+     "human_raw": "normative heuristic",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": false,
+     "scored": true
+    },
+    {
+     "item_id": "R150",
+     "stratum": "A",
+     "human": "descriptive_model",
+     "human_raw": "descriptive model",
+     "stored": "descriptive_model",
+     "stored_raw": "descriptive_model",
+     "stored_kind": "exact",
+     "agree": true,
+     "scored": true
+    }
+   ],
+   "kinds": {
+    "typo": 82,
+    "exact": 63,
+    "blank": 5
+   },
+   "unresolved": [],
+   "abstained": {
+    "blank": 5
+   },
+   "scored_n": 145,
+   "error_rates": {
+    "A": {
+     "n": 98,
+     "agrees": 73,
+     "error": 0.2551,
+     "error_lo": 0.1792,
+     "error_hi": 0.3495
+    },
+    "B": {
+     "n": 47,
+     "agrees": 31,
+     "error": 0.3404,
+     "error_lo": 0.2217,
+     "error_hi": 0.4833
+    },
+    "all": {
+     "n": 145,
+     "agrees": 104,
+     "error": 0.2828,
+     "error_lo": 0.2158,
+     "error_hi": 0.3609
+    }
+   },
+   "per_class": {
+    "normative_heuristic": {
+     "n": 50,
+     "agrees": 22,
+     "error": 0.56
+    },
+    "descriptive_model": {
+     "n": 41,
+     "agrees": 38,
+     "error": 0.0732
+    },
+    "causal_mechanism": {
+     "n": 40,
+     "agrees": 31,
+     "error": 0.225
+    },
+    "empirical_pattern": {
+     "n": 14,
+     "agrees": 13,
+     "error": 0.0714
+    }
+   },
+   "confusion": [
+    {
+     "human": "descriptive_model",
+     "stored": "descriptive_model",
+     "n": 38
+    },
+    {
+     "human": "causal_mechanism",
+     "stored": "causal_mechanism",
+     "n": 31
+    },
+    {
+     "human": "normative_heuristic",
+     "stored": "normative_heuristic",
+     "n": 22
+    },
+    {
+     "human": "normative_heuristic",
+     "stored": "causal_mechanism",
+     "n": 16
+    },
+    {
+     "human": "empirical_pattern",
+     "stored": "empirical_pattern",
+     "n": 13
+    },
+    {
+     "human": "normative_heuristic",
+     "stored": "empirical_pattern",
+     "n": 6
+    },
+    {
+     "human": "normative_heuristic",
+     "stored": "descriptive_model",
+     "n": 6
+    },
+    {
+     "human": "causal_mechanism",
+     "stored": "normative_heuristic",
+     "n": 4
+    },
+    {
+     "human": "causal_mechanism",
+     "stored": "descriptive_model",
+     "n": 3
+    },
+    {
+     "human": "causal_mechanism",
+     "stored": "empirical_pattern",
+     "n": 2
+    },
+    {
+     "human": "descriptive_model",
+     "stored": "normative_heuristic",
+     "n": 1
+    },
+    {
+     "human": "descriptive_model",
+     "stored": "causal_mechanism",
+     "n": 1
+    },
+    {
+     "human": "descriptive_model",
+     "stored": "empirical_pattern",
+     "n": 1
+    },
+    {
+     "human": "empirical_pattern",
+     "stored": "descriptive_model",
+     "n": 1
+    }
+   ],
+   "group_near_miss": null
+  }
+ }
+}

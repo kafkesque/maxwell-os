@@ -273,3 +273,44 @@ ruler_measurement:                 # D272a (2026-09-19): the FIRST certified sto
 # today — which is the state the comment above predicted ("the floor documents the target, not the
 # state"). G4a (repointing the floors) is WITHDRAWN until (a) a provenance column exists and
 # (b) a test-retest ceiling exists. A floor may not be re-anchored on a single coder.
+
+# ─────────────────────────────────────────────────────────────────────────────
+# D-296 typed-decision bake-off (S5) — benchmark-only (ADAPT framing, D-275c).
+# C12: every path/axis/column/model/threshold the bake-off needs is declared here.
+bakeoff:
+  sheet: governance/RULER_BLIND_SHEET_20260917.csv
+  key: governance/anchor1_frozen_20260920.json
+  taxonomy: config/taxonomy_v5.yaml
+  axis: discipline                  # content_type is DEGENERATE here (pipeline constant) — F-17
+  sheet_columns:                    # blind-sheet header -> axis (sheet keys rows by item_id)
+    content_type: "CT (1-7)"
+    discipline: "DISC (1-62)"
+    extraction_type: "FORM (1-4)"
+  frozen_fields:                    # frozen-JSON human/stored field -> axis
+    content_type: ct
+    discipline: disc
+    extraction_type: form
+  row_id_column: item_id
+  limit: 150
+  nli_batch_size: 16
+  device: auto                      # mps > cuda > cpu (arm layer must not silently run on CPU)
+  report:
+    constant_arm: constant          # same-run TRIVIALITY floor
+    incumbent_arm: pairwise         # deployed configuration: candidates are judged against THIS
+    min_decided_ratio: 0.5          # an arm deciding <50% of rows is INVALID, not a tie
+    min_error_gain_pp: 5.0          # pre-registered D-300 deploy margin (absolute pp)
+    abstain_sweep: [0.0, 0.1, 0.25, 0.5]   # ranked-by-margin abstention curve (D-300 rec: calibration)                # padded forward batches (per-pair scoring was ~1 s/pair)
+  omlx_path: /v1/chat/completions     # BUG-319: every production caller uses /v1 (pipeline/omlx_call.py etc.)
+  omlx_model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  omlx_timeout_s: 180
+  hypothesis_template: "This definition is an instance of the discipline {label}. {definition}"
+  prompt_template: |-
+    You are a taxonomy adjudicator for a knowledge pipeline.
+    Choose the ONE {axis} for the item below from the closed menu, or reply with choice null to abstain.
+    MENU:
+    {menu}
+    ITEM: {name}
+    DEFINITION: {definition}
+    Reply with JSON only: {"choice": "<menu label or null>", "confidence": <0..1>, "abstain": <bool>}
+  log:
+    - "2026-09-21 (D-298): created with the arm wiring. arm_constant modal is computed over HUMAN labels."

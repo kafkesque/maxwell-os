@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — BUG LOG (tiered)
 
-> **Updated:** 2026-09-13 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
+> **Updated:** 2026-09-20 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
 >
 > **Convention (standing rule):** OPEN bugs at the TOP (most critical first, MUST→SHOULD→WORTH); CLOSED/RESOLVED at the BOTTOM. Protocol: `governance/buglog_protocol.md`.
 
@@ -682,7 +682,10 @@ What survives is narrower and precise:
 
 ## BUG-276 — the C13 safety net is DEAD, and nothing backs up the DB (2026-09-17)
 
-**Severity:** HIGH. **Status:** OPEN.
+**Severity:** HIGH. **Status:** RESOLVED 2026-09-19.
+
+**RESOLVED:** `pipeline/backup_guardian.sh` repointed at the SQLite DB — consistent `.backup` (WAL-safe)
++ `PRAGMA integrity_check` on the copy, fail-closed. Verified live (backup written + integrity ok).
 
 Discovered while trying to satisfy C13 ("backups after batch writes") after the D-271d index write.
 
@@ -974,7 +977,11 @@ old state must be updated in the same commit** — otherwise the system spends t
 
 ## BUG-285 — the discipline/domain/depth filters do not constrain the hybrid result set (2026-09-19)
 
-**Severity:** CRITICAL (silent retrieval-correctness defect; independent of label quality). **Status:** OPEN.
+**Severity:** CRITICAL (silent retrieval-correctness defect; independent of label quality). **Status:** RESOLVED 2026-09-19 (0b/G12).
+
+**RESOLVED:** facet predicate pushed into every leg (FTS, vector, keyword) via shared `_facet_conditions` +
+asserted on the fused pool via `_matches_facet` (`pipeline/retrieve.py`). Constraint-violation rate
+**0.5911 → 0.0000** over 470 probes (`scripts/measure_constraint_violation.py`).
 
 `pipeline/retrieve.py::search_hybrid` (line 329) fuses three legs and applies the facet filters to **only one**:
 
@@ -1014,7 +1021,11 @@ then re-run `pipeline/retrieval_benchmark.py`. **Adding legs to RRF before this 
 
 ## BUG-286 — the write guard destroys the label that D-271a ruled legal (2026-09-19)
 
-**Severity:** CRITICAL (data-destroying; blocks repair R1). **Status:** OPEN.
+**Severity:** CRITICAL (data-destroying; blocks repair R1). **Status:** RESOLVED 2026-09-19 (0c/G18).
+
+**RESOLVED:** write guard split (`pipeline/schemas.py`) — `validate_discipline_domain()` (row guard, fails
+closed on illegal labels only) vs `lint_discipline_domain_vocabulary()` (reports DECLARED collisions, never
+rejects). `validate_discipline_domain('research methodology', …)` now returns `[]`; the 261 rows write clean.
 
 `validate_discipline_domain` fires on the **discipline alone**, independent of the row's domains:
 
@@ -1269,6 +1280,15 @@ The axis that decides what is retrievable is the axis with **lift -0.010 over a 
 the three external reviews found this; Claude stopped one step short (it marked "where a non-principle
 role becomes QUARANTINE" as UNVERIFIED). Human gate G17.
 
+**RESOLVED 2026-09-19 (0a / G17):** `scripts/apply_serving_gate.py` is now the single writer for `status`,
+derived from `verification_results[factual].passed` plus a typed `s5_reason` (entail | neutral | contra |
+no_evidence | mech_fail | vacuous | evidence_contaminated), persisted in a new `fbs.s5_reason` column.
+The four label scripts (apply_phase1_finalize, apply_phase1_adjudication, apply_phase0_relabels,
+repass_pair_agreed) no longer write `status`. Rule + vocabulary live in `config/serving_gate.yaml` (C12);
+CI invariant in `pipeline/serving_gate.py` + `tests/test_serving_gate.py` (14 tests). Applied in one
+transaction (C6) with C13 backup + R14 manifest: PASS 4,745 → 3,310 (de-served 1,941; restored 506);
+integrity_check ok; invariant 0 violations on the live DB.
+
 ## BUG-300 — The RRF keyword leg is query-blind, insertion-ordered and weighted equally (HIGH)
 
 pipeline/retrieve.py:123-134: search_keyword accepts domain/discipline/depth/status/limit and **no query
@@ -1279,6 +1299,9 @@ query is answered in part by the first-N-inserted rows that carry the facet, and
 rerank pool from that fused list, so a violator can be promoted. Found by temp/claude0080.md (D11,
 "confirmed, worse"); verified in source. Fix is inside D273a (programme step 0b).
 
+**RESOLVED 2026-09-19 (0b/G12):** `search_keyword` is now query-aware (accepts `query` and matches it
+against name/definition/keywords) and the facet predicate is asserted on every leg + the fused pool.
+
 ## BUG-301 — Stage 5 computes a verification tier that Stage 6 has no column for (HIGH)
 
 pipeline/stage5_verify.py computes epistemic_status in {corroborated, source-supported,
@@ -1288,3 +1311,452 @@ them. The tier vocabulary that R3/D272d asks for already exists and is discarded
 Also :898 stamps a literal — vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold
 0.10)" — a C12/R14 violation that lies after any config change.
 
+**RESOLVED 2026-09-19 (G19):** `pipeline/stage6_commit.py` now persists all four S5 tier fields —
+`s5_reason`, `epistemic_status`, `verification_method`, `isor` — added to CREATE TABLE, the
+`_migrate_add_column` list, and the INSERT (columns + placeholders + bound values). The live DB got the
+3 missing columns via idempotent migration (71 columns, s5_reason already present from 0a). `verifier_model`
+is now derived from config: `f"{S5_NLI_MODEL_LARGE} (threshold {S5_NLI_PASS_THRESHOLD})"` (C12).
+`pipeline/schemas.py` VerifiedFB model gained the 4 fields. integrity-check CHECK 8 passes (71=71);
+15 serving-gate tests green. This also fixed the latent 0a drift where `s5_reason` existed in the DB but
+not in stage6's CREATE TABLE/INSERT.
+
+
+## BUG-302 — Two further status writers remain outside the serving gate (MEDIUM, 2026-09-19)
+
+D274h rules exactly one writer for `status`. After 0a/G17 (BUG-299), two scripts still write `status`
+directly and are not routed through `pipeline/serving_gate.py`:
+
+  1. `scripts/apply_dedup_marks.py:116` — sets `status='QUARANTINE'` for `duplicate_of` rows. This is a
+     legitimate NON-label reason (dedup), but an ungoverned writer under D274h.
+  2. `scripts/reinject_bug198_singletons.py:368` — `status = "PASS" if fact_passed else "QUARANTINE"`, a
+     second copy of the serving-gate rule that can drift from the canonical implementation.
+
+Also `pipeline/stage5_verify.py` writes `status` at the verification boundary (the canonical producer);
+it should call `pipeline/serving_gate.derive_status()` so the rule has one implementation. Fix: route all
+three through `pipeline/serving_gate.py` (declare the dedup rule in config), then extend the CI invariant
+to assert no `UPDATE fbs ... SET status=...` outside that module.
+
+**RESOLVED 2026-09-19:** all three now call `pipeline/serving_gate.derive_status()`; `apply_dedup_marks.py`
+declares the `duplicate` reason in `config/serving_gate.yaml` and writes `s5_reason='duplicate'`; the
+serving gate hard-quarantines `duplicate_of IS NOT NULL` rows (11 duplicates flipped back to QUARANTINE).
+
+## BUG-303 — Stored extraction_type over-claims causal_mechanism; normative_heuristic 50% mislabeled (HIGH, 2026-09-19)
+
+Inverted-key re-score (`scripts/rescore_ruler_inverted.py`, D-275a) over the reviewer's UPDATED FORM
+labels (stratum A, n=99): the stored FORM labels are **25.3% wrong** [0.177, 0.346] — worse than the
+16.9% error the old "0.831 accuracy" implied, because the reviewer's re-examination caught more errors.
+Per-class stored reliability: descriptive_model 0.033, empirical_pattern 0.100, causal_mechanism 0.217,
+**normative_heuristic 0.500**. The stored labels mislabel normative content as causal_mechanism (9 rows)
+and descriptive_model (6 rows) — the S2 causal-overclaim bias (documented in RULER_MENUS AXIS 3) is now
+measured in the stored labels, not just the prompt. Also: the reviewer's FORM update wrote "irrelevant"
+in 4 cells (incl. 1 corrupted merge "descripirrelevanttive model") — a relevance judgement smuggled into
+the FORM axis, concrete evidence for the missing relevance axis (R4 / F-E). Report:
+`governance/ruler_form_inverted_20260919.md`. Action: do NOT re-derive FORM corpus-wide on these labels
+(F-14 retarget withdrawn, BUG-296); the stored FORM error is a data defect resolved by R1/R2
+re-classification, not a re-run of the current prompt.
+
+## BUG-304 — Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20)
+
+Full inverted-key re-score (`scripts/rescore_ruler_inverted.py --axis all`, D-276) over the reviewer's
+FINAL labels (CT + DISC + FORM all now locked). Stored-label error rates: **content_type 0.353**
+[0.281, 0.433], **discipline 0.474** [0.386, 0.564], **extraction_type 0.283** [0.216, 0.361].
+
+- **CT:** the old classifier treats `principle` as the default — it under-calls `quarantine`
+  (human 18 → stored 6) and `process_template` (human 16 → stored 9), pushing both into `principle`.
+  This is the measured signature of the D-275b guardrail gap (step-count, not procedural intent).
+- **DISC:** 8 slots have ZERO stored agreement (n≥2): design psychology 0/5, cultural studies 0/4,
+  risk management 0/4, privacy & surveillance, political economy, visual perception, finance,
+  cultural design. The old alias-map extraction silently discards this content into `emerging`.
+  Group-level near-miss: exact-canonical 0.430 → same-group 0.271 (29 labels in a different group).
+
+Artifacts: `governance/ruler_inverted_20260920.{md,json}`, `governance/anchor1_frozen_20260920.{md,json}`.
+Action: do NOT re-run the current S2/S4 prompt to "fix" these labels — the defect is the free-generation
+prompt + alias map (root cause stage4_merge.py:345/468/500, ONTOLOGY_FORENSIC §). Fix is R5 (re-derive +
+bound weak slots — D-277, never demote first) → R1 (closed menu + menu_hash) → R2 (definition NLI).
+Provenance columns (`*_source`) must
+exist before any corpus-wide re-classification so `min_human_share` is satisfiable.
+
+## BUG-305 — R2 definition-anchored NLI emits ~100% CONTRA on the principle class — the meter is broken (CRITICAL, 2026-09-20)
+
+Exposed while testing the D-282 depth-vs-role fix (user asked: "test that specialized/domain-depth
+principles won't drift"). Ran the actual R2 NLI (`_nli_pair_scores`, DeBERTa-v3-large, MPS) with
+premise = each object's DEFINITION and hypothesis = the label's CLOSED-MENU definition, over all 30
+ceiling-sheet rows + 3 synthetic pure-specialized principles ("In chess, control the center…",
+"typography leading ≈1.2–1.5× font size", "a rule-of-thumb is still a principle at any scope").
+
+Result: the `principle` hypothesis returned **entail 0.00–0.05 / contra 0.97–0.99 on every object**,
+including the synthetic specialized principles. ROOT CAUSE: the content_type hypothesis is a
+CATEGORY META-DEFINITION ("a PRINCIPLE is a single self-contained epistemic claim you KNOW/APPLY…"),
+and NLI entailment cannot test category membership — a specific rule's definition never *entails*
+the meta-definition of its own category (register mismatch: instance vs category). This is a D-281
+design flaw, NOT a D-282 regression.
+
+CONSEQUENCE: `_CONTRA_DOMINANT_THRESHOLD = 0.5` (scripts/definition_nli_verify.py) would flag ~100%
+of principles as "hard mislabel"; the pending R2 corpus NLI run would be a broken meter (universal
+false contra). Do NOT run R2 corpus-wide until fixed. The discipline/domain axes may partially
+survive (their taxonomy `definition`s are closer to content-paraphrases), but content_type cannot.
+
+FIX DIRECTION: (a) role classification must use Mechanism A (content_type_decision_procedure), not
+NLI; or (b) replace the hypothesis with a PARAPHRASEABLE CONTENT CLAIM per role (e.g. "This text
+describes a reusable rule that can be applied across situations" for principle) so a genuine
+instance ENTails it; or (c) restrict R2 NLI to discipline/domains and drop content_type from the
+NLI axes. Decision pending (D-281 revision).
+
+**RESOLVED (2026-09-20, D-283 + D-284):** the universal-contra was NOT fundamental — it was the OLD
+principle meta-definition's self-negating phrasing ("NOT a procedure you EXECUTE") tripping contra on
+imperative-form principles. The new r5 principle definition (D-283) dropped principle-class false-contra
+~1.0 → 0.27 (3/11). The A/B harness (D-284) then showed paraphrase (arm C) is the better mislabel
+detector (91% vs 55% wrong-contra) with comparable false-contra (0.233 vs 0.267). Verdict: KEEP NLI on
+content_type (reject drop-CT), adopt paraphrase (arm C), and further sharpen growth_edge (0.40
+false-contra in both arms). Adoption = rewrite definition_nli_verify.py hypothesis construction + stamp
+an r5 hash on the R2 report (BUG-307).
+
+## BUG-306 — Single-coder ceiling κ is contaminated: same-person + ruleset mismatch (HIGH, 2026-09-20)
+
+The 30-row second pass is complete, but the κ is NOT a clean human-vs-human ceiling. κ(coder1,
+coder2): **CT 0.333 (16/30), DISC 1.000 (23/23), FORM 1.000 (26/26)**. Three contaminations:
+
+1. **Same person** — both sheets are stamped `reviewer=human`. D-280 requires a second INDEPENDENT
+   human; what was measured is intra-rater test-retest, an UPPER bound on the inter-rater ceiling.
+2. **Ruleset mismatch** — coder 1 (RULER_BLIND_SHEET, 2026-09-17) predates D-275b/D-282; coder 2
+   (2026-09-20) used the D-275b procedure. The CT κ partly measures a RULES CHANGE, not rater noise.
+3. **Coder-1 bug leakage** — coder 1's 12/30 quarantine labels likely encode the pre-fix "3+ domains"
+   conflation (R147 "Randomness in Data Measurement" and R148 "Professional Development Through
+   Studio Experience" — the latter's own definition literally opens "A principle…"). Coder 2 re-labels
+   them principle / noise_drop.
+
+Additional signal: **17/30 rows carry "not sure if…" uncertainty notes** — direct evidence the CT axis
+(esp. principle ↔ growth_edge ↔ process_template) is under-specified in the menu, independent of the
+depth fix. CT drift signature: principle→growth_edge ×4, principle→process_template ×2,
+quarantine→process_template ×2; only 1 principle→quarantine (R133, borderline). The depth axis is NOT
+the source of CT disagreement.
+
+FIX: re-measure the ceiling with (a) a genuinely different second human, (b) BOTH coders bound by the
+post-D-282 menu, (c) coder 1 re-scored on the 30 rows under D-275b/D-282 first. Until then treat
+κ=0.333 as a LOWER bound on CT ceiling and do NOT quote it as the human ceiling.
+
+## BUG-307 — R2 verification provenance gap: r5 override set is unstamped; closed_menu.py has a dead constant (HIGH, 2026-09-20)
+
+Forensic audit of the R2/R5/R1 chain found two coupled issues:
+
+1. **`pipeline/closed_menu.py:29` declares `_R5_REPAIR_PATH` but never uses it** — a dead constant
+   (C19). The header comment in `config/r5_slot_repair.yaml` claimed "closed_menu.py (R1) and
+   definition_nli_verify.py (R2) consume it", but closed_menu.py does NOT read r5_slot_repair.yaml;
+   only definition_nli_verify.py does (via `_load_r5_definitions`). Header comment fixed; the dead
+   constant remains (remove or wire it).
+2. **`menu_hash` does NOT include the r5 overrides**, and the R2 report (`r2_definition_nli_20260920.json`)
+   does not stamp WHICH r5 override set produced its hypotheses. Consequence: an FB verified under the
+   D-283 sharpened definitions (principle false-contra 0.27) is indistinguishable, by provenance, from
+   one verified under the pre-sharpening definitions (false-contra ~1.0). This is a future-tax /
+   provenance gap: the r5 overrides change verification behaviour but leave no hash trail.
+
+FIX: (a) stamp an `r5_hash` (sha256 of the r5 override set) on the R2 report alongside `menu_hash`;
+(b) once the user ratifies the D-283 boundaries, FOLD the principle/growth_edge/quarantine/process_template
+overrides into config/content_types.yaml so they become part of `menu_hash` and the override layer collapses;
+(c) remove the dead `_R5_REPAIR_PATH` constant from closed_menu.py.
+
+## BUG-308 — D-282's "3+ domains" fix was incompletely applied: the role test persisted in 8 more files (HIGH, 2026-09-20)
+
+The user re-flagged that the quarantine exclude still carried a "3+ domains" reference, and a full-repo
+sweep proved the D-282 role-conflation fix had been applied ONLY to `config/r5_slot_repair.yaml` +
+`config/content_types.yaml`, leaving the "a filter across 3+ domains" role test live in the PROMPT and
+FORM layer (a second, independent source of the same drift):
+
+- `pipeline/stage2_extract.py` (Q3 prompt), `scripts/build_ruler_sheet.py` (ruler "trap" text),
+  `scripts/build_joint_vote_set.py`, `scripts/deepseek_frontier_audit.py`, `scripts/reverify_content_type_108.py`
+- `governance/RULER_MENUS_20260917.md`, `content_type_adjudication_form_unlabeled_217.md`,
+  `content_type_frontier69_remaining52_form.md`, `content_type_human_review_FORM.md`,
+  `content_type_frontier69_form.md`
+- plus a leftover "(1/2/3+ domains)" parenthetical in the r5 quarantine + principle definitions, and the
+  dead `depth_test_domains_threshold: 3` field (nothing reads it).
+
+FIXED: every instance rewritten to "a self-contained transferable filter at ANY scope (depth is the
+separate axis, never a role test)"; `depth_test_domains_threshold: 3` removed. The only remaining
+"3+ domains" occurrences are DEPTH-axis and correct (schemas.py:442 depth hierarchy, schema_accessor.py:476
+source-diversity score, stage6b_anytype_push.py:593 cross-domain folder).
+
+LESSON: a config-level fix is not complete until the SAME rule is swept out of every prompt string and
+form doc that re-encodes it. The prompt/doc layer was a second source of the identical drift D-282 fixed
+in config only.
+
+## BUG-309 — 11 NON-core raw-alias cross-listings remain (MEDIUM, 2026-09-20)
+
+After D-285's alias-conflict fix (scripts/fix_d285_alias_conflicts.py) resolved every cross-listing
+among the 5 core disciplines, a full-sweep found 11 residual cross-listings OUTSIDE the D-285 scope.
+A raw alias must map to AT MOST ONE canonical (schemas.py synonym index is last-write-wins → ordering-
+dependent drift). The 11:
+
+  color psychology                -> [color theory, visual perception]
+  computational models of social life -> [complex adaptive systems, computational physics & simulation]
+  computer vision                 -> [machine learning, visual perception]
+  decision science                -> [decision making, operations research]
+  economic theory                 -> [economics, political economy]
+  large language models           -> [generative ai, machine learning]
+  microeconomics                  -> [economics, political economy]
+  simulation                      -> [computational physics & simulation, operations research]
+  software architecture           -> [software engineering, systems engineering]
+  strategic decision making       -> [decision making, strategic thinking]
+  systems design                  -> [systems engineering, systems thinking]
+
+Plus 2 adjacent misplacements (not cross-listings, but wrong per D-285):
+  - rhetoric / Rhetoric          in behavioral economics (persuasion-flavored → recommend design
+    psychology, but alias_map.yaml routes "rhetorical studies"/"rhetorical theory" -> communication
+    theory — needs a decision)
+  - behavioural economics+persuasion  compound raw string in behavioral economics (head-wins? split?)
+
+NOT fixed by fiat: several are legitimate subsumption (computer vision spans ML + visual perception;
+political economy legitimately studies economic theory). Needs a dedicated batch-ratification.
+
+## BUG-307 — RESOLVED 2026-09-20
+
+The dead `_R5_REPAIR_PATH` constant in pipeline/closed_menu.py was removed, and the R2 report now
+stamps BOTH `menu_hash` and `r5_hash` (sha256 of the full r5 override set) alongside the per-FB scores
+(D-286). An FB's R2 verification is now traceable to the exact override set that produced its hypotheses.
+
+## BUG-308 — follow-up (second instance found + fixed 2026-09-20)
+
+The BUG-308 sweep (config fix not propagated to every layer) found a SECOND instance: the D-283
+principle fix removed the "NOT a procedure you EXECUTE" self-negating phrase from r5_slot_repair.yaml
+but NOT from content_types.yaml's principle.description — which feeds the closed MENU. A naive fold
+would have re-introduced BUG-305 universal-contra. Fixed: content_types.yaml principle description now
+uses the epistemic STATUS discriminator ("SETTLED knowledge — not an open question or unverified
+correlation"). This is exactly the BUG-308 lesson: a config fix is not complete until the same rule is
+swept out of every layer that re-encodes it (r5 override + canonical config + prompt + form).
+
+## BUG-309 — UPDATE 2026-09-20 (7/11 unambiguous resolved; 4 ambiguous + 2 misplacements → batch)
+
+The BUG-309 sweep resolved the 7 unambiguous non-core cross-listings via `scripts/fix_bug309_unambiguous.py`
+(economic theory + microeconomics → economics; software architecture → software engineering; systems design →
+systems engineering; strategic decision making → strategic thinking; large language models → generative ai;
+computer vision → machine learning). 4 genuinely-ambiguous cross-listings (color psychology, computational
+models of social life, decision science, simulation) + 2 misplacements (rhetoric, behavioural
+economics+persuasion) are left for human batch-ratification → `governance/bug309_batch_ratification.md`.
+Flagged: `macroeconomics` sits ONLY under political economy (not cross-listed) — same exclude-logic → economics.
+
+## Arm C adopted (D-284) 2026-09-20
+
+`scripts/definition_nli_verify.py` now builds the content_type hypothesis from a per-role PARAPHRASE content-
+claim, sourced from `config/content_types.yaml` `nli_paraphrase` (single source; `r2_ab_harness.py` reads the
+same block — no second hardcoded copy). discipline/domains keep the definition hypothesis. The R2 report
+stamps `content_type_hypothesis: paraphrase` + `menu_hash` + `r5_hash`. FUTURE-TAX: the r5 content_type
+`definition` overrides (principle/growth_edge/process_template/quarantine) are now UNUSED for the content_type
+hypothesis (arm C bypasses them) — they remain only for r5_hash provenance; collapse in the full-r5 fold.
+
+## BUG-306 — re-measurement prepared 2026-09-20
+
+Fresh blind sheet `governance/CEILING_REMEASURE_BLIND_SHEET_20260920.csv` (labels blanked) + protocol
+`governance/bug306_remeasure_protocol.md`. Blocked on a genuinely different second human coder (not "human",
+not the first-session reviewer). κ CT 0.333 remains a LOWER bound until re-measured.
+
+## BUG-309 — RESOLVED 2026-09-20 (M1 rulings applied; discipline raw-alias cross-listings → 0)
+
+User M1 batch-ratification applied via `scripts/fix_m1_rulings.py`:
+  A1 Color Psychology → color theory (drop from visual perception)
+  A2 Computational Models of Social Life → complex adaptive systems (drop from comp phys & sim)
+  A3 Decision Science → decision making (drop from operations research)
+  A4 Simulation → computational physics & simulation (drop from operations research)
+  B1 Rhetoric/rhetoric → linguistics (drop from behavioral economics)
+  B2 persuasion is design psychology → split 'behavioural economics+persuasion' compound (keep
+     'behavioural economics' head in behavioral economics; persuasion already in design psychology)
+  C  macroeconomics → economics (drop from political economy)
+Result: **0 raw-alias cross-listings remain in the discipline axis.**
+
+## BUG-306 — BLOCKED (no second human) 2026-09-20
+
+The re-measurement is impossible: the user is the only human ("there are just me, no second person").
+A second pass by the same person reproduces the same labels (intra-rater, not inter-rater), so κ CT
+0.333 stays a CONTAMINATED intra-rater upper bound — there is no way to measure a true human ceiling.
+CONSEQUENCE: pivot from "inter-rater κ" to "pipeline-vs-user agreement" (the user's own labels ARE the
+single ground truth). The R2 meter + per-slot κ vs ANCHOR-1 can still run — they measure whether the
+pipeline agrees with the user, which is the meaningful question for a solo project.
+
+## BUG-310 — NEW: 37 DOMAIN raw-alias cross-listings (MEDIUM, 2026-09-20)
+
+The BUG-309 sweep covered only the DISCIPLINE axis. A follow-up sweep of the DOMAIN axis found 37
+raw-alias cross-listings (a raw string listed under 2+ domains). The discipline exclude-list signal
+does NOT transfer cleanly to domains (e.g. it would wrongly route 'programming' → engineering practice
+when it is clearly code & computation). Full list + recommendations → `governance/bug310_domain_crosslistings.md`.
+Needs batch-ratification (same as M1). alias_map.yaml verified: 0 non-canonical targets.
+
+## BUG-310 — RESOLVED 2026-09-20 (all 37 domain cross-listings applied → both axes 0)
+
+User "approve all". `scripts/fix_bug310_domains.py` removed each cross-listed raw alias from its drop
+domain (surgical, section-aware, case-insensitive). A dedup bug (kept case-variants) was caught by the
+post-write verification and fixed; re-run confirmed. **Result: 0 raw-alias cross-listings on BOTH the
+discipline AND domain axes.** The synonym index is now conflict-free.
+
+## R2 arm C smoke-tested 2026-09-20 (works; full corpus run blocked on a missing checkpoint)
+
+`scripts/definition_nli_verify.py --input probe_output/stage5_fbs.jsonl` ran clean: 40 FBs, 95 label
+pairs scored, 14 contra, 0 inference errors; report stamps `content_type_hypothesis: paraphrase` +
+`menu_hash cac6e695…` + `r5_hash 04fe615a…`. DeBERTa-v3-large loads on MPS. CAVEAT: the probe corpus has
+**0 content_type labels** (all `None`) and 26/40 `discipline: emerging`, so the run exercised only the
+DOMAIN definition arm — the content_type paraphrase arm is code-correct (unit-verified) but not yet
+corpus-validated.
+
+## BUG-311 — NEW: the full stage5 checkpoint is MISSING (HIGH, 2026-09-20)
+
+`pipeline_paths.STAGE5_CHECKPOINT` = `knowledge pipeline/stage5_verify/t11/checkpoint.jsonl` — the file
+does NOT exist. Only 12 `.bak_*` backups remain (~100 MB each, Sep 3–4, most recent
+`checkpoint.jsonl.bak_20260904_152319`). The R2 corpus NLI run cannot run against the full corpus until
+the checkpoint is restored from backup (or stage5 is re-run to produce a fresh one with content_type
+labels). This is a data-integrity gap: the live corpus checkpoint was lost, leaving only pre-step backups.
+
+## BUG-311 — RESOLVED (checkpoint restored) 2026-09-20
+
+The live stage5 checkpoint was missing. Restored crash-safe (tempfile → fsync → os.replace, C6) from
+`checkpoint.jsonl.bak_20260904_152319` (sha256 2c206a255a41eb8fa42122cb8c68e0e0b5395da280c1d9c840be8e6a06188d43,
+7995 FBs, 0 malformed lines). `--selfcheck` clean (menu 62 disc / 44 domains / 8 ct; r5 4 ct + 9 disc; 7 paraphrase).
+⚠️ CAVEAT: the restored checkpoint is STALE — see BUG-312.
+
+## BUG-312 — NEW: three divergent label snapshots (HIGH, provenance drift, 2026-09-20)
+
+The committed state has diverged into THREE label snapshots with no single JSONL source of truth:
+- stage5 checkpoint (Sep 4, restored) — STALEST
+- stage4 checkpoint (Sep 11) — 1112/7995 (13.9%) discipline + 2395/7995 (30.0%) domain diffs vs stage5
+- maxwell.db (Sep 19 21:47) — FRESHEST; 231/7995 (2.9%) discipline + 353/7995 (4.4%) domain diffs vs stage4
+The DB reflects the post-repair taxonomy (M1/D-285/BUG-309/BUG-310 re-derivations); both checkpoints carry
+pre-repair labels. No JSONL checkpoint matches the DB. Consequence: R2 corpus NLI runs on stage4 (option B)
+≈ 97%/96% aligned with the DB, but a DB→JSONL export + re-meter is required for exactness. Forensic-audit
+findings (2026-09-20): compile 0 fails; YAML 0 fails; menu_hash MATCH cac6e695…; 0 cross-listings (both axes);
+nli_paraphrase single-source; no secret leak (sk-maxwell-local is a local placeholder); config-code drift 0.
+Future-tax: (a) r5 content_type overrides (4) now dead — bypassed by arm C paraphrase; (b) 12 .sh + 1 tool
+carry hardcoded paths (integrity_check #14 FAIL, pre-existing).
+
+## R2 corpus NLI — DONE 2026-09-20 (arm C, full corpus, option B)
+
+Ran `definition_nli_verify.py` over the stage4 checkpoint (7995 FBs) in ~27 min (19 pairs/s on MPS):
+**31,525 label-definition pairs scored, 5,438 contra (17.3%), 0 inference errors.** Per-axis contra:
+discipline 657/7234 (9%), domains 3059/16296 (18%), content_type principle 1722/7995 (21%). Stamps
+correct (menu_hash cac6e695…, r5_hash 04fe615a…, content_type_hypothesis=paraphrase). Output →
+`governance/r2_definition_nli_20260920.json`. See BUG-313 for the headline anomaly.
+
+## BUG-313 — NEW: cognitive science 94% contra (126/133) after D-285 sharpening (HIGH, 2026-09-20)
+
+The R2 arm-C meter found the D-285 cognitive-science definition ("HOW the mind works … as pure cognition,
+with NO design, persuasion, or economic-application intent") **contradicts 126/133 (94%) of the FBs still
+labelled cognitive science**. The contradicted FBs are design/learning/creativity-applied content (e.g.
+"Catholic Reading for Design Inspiration", "Extended Skill Acquisition Investment", "Affordance As Action
+Potential", "Reframing Creative Constraints") — NOT pure cognition. The definition moved (D-285) but the
+corpus labels did not, so these 133 are now mislabelled under the sharpened definition. The OTHER core
+disciplines are clean (psychology 0/906, behavioral economics 12/238 = 5%, design thinking 31/246 = 12%),
+so this is a SPECIFIC cognitive-science definition-vs-corpus mismatch, not a general D-285 failure. Needs a
+human decision: widen the cognitive-science definition (re-admit applied cognition/learning) OR re-label the
+133 FBs (→ design cognition / psychology / design psychology). → D-289.
+
+## BUG-313 — RESOLVED (Option A: definition de-negated) 2026-09-20
+
+User chose Option A (widen the definition). `config/r5_slot_repair.yaml` + `config/taxonomy_v5.yaml` cognitive-science definitions de-negated in lockstep: removed "with NO design, persuasion, or economic-application intent" + "as pure cognition … in itself", keeping the positive boundary "how the mind works — perception, memory, attention, reasoning, language, and learning". Menu re-rendered (menu_hash cac6e695→73597ee2). Targeted re-score: **cognitive science contra 126/133 (94%) → 6/133 (4%)** — confirms the negative clause was the root cause (NLI-negation artifact, same class as BUG-305), not genuine mislabeling. Full r5 collapse also executed: 4 non-core discipline defs folded into taxonomy_v5.yaml; dead r5 content_type overrides dropped.
+
+Full R2 v2 re-run (post-fix, 2026-09-20): 7995 FBs, 31,525 pairs, **5,318 contra (was 5,438)**, 0 errors — the 120-contra drop is exactly the cognitive-science fix. Per-axis: discipline 537/7234 (7%), domains 3059/16296 (18%), content_type 1722/7995 (21%). Core disciplines: cognitive science 6/133 (4%), psychology 0/906 (0%), behavioral economics 12/238 (5%), design thinking 31/246 (12%). ⚠️ design psychology 5/6 (83%) — tiny sample (only 6 FBs via the new persuasion→design-psychology alias); watch once the slot grows. → governance/r2_definition_nli_20260920_v2.json.
+
+## BUG-314 - Frozen ruler csv_sha256 provenance mismatch (MED, 2026-09-21)
+
+governance/anchor1_frozen_20260920.json declares csv_sha256=4d0c856a... (hash of
+RULER_BLIND_SHEET_20260917.csv at freeze time 13:15). The live sheet - and its Sep-20 12:38 backup,
+byte-identical - now hash to 38323192...: the sheet was rewritten at 20:33, i.e. reverted to the
+pre-freeze serialisation. Row-level audit of all 150 item_ids: **zero substantive label drift** -
+every apparent difference is normalisation ("tool instruction" vs tool_instruction: 43 ct + 147 form
+space/underscore diffs; casual->causal, normativ->normative; blank cell vs null on the 34 unlabelled
+discipline rows). Net: cosmetic drift, but byte-level verification of the frozen artifact now FAILS
+CLOSED, so any consumer that hash-checks the sheet before scoring aborts. Fix: re-stamp csv_sha256
+from current bytes (or freeze the normalised projection) + ship the normalisation map. Label impact: none.
+
+## BUG-315 - Hardcoded oMLX API key fallback (LOW-MED, C12, 2026-09-21)
+
+pipeline/model_lazyload.py:50 hardcodes OMLX_API_KEY = "sk-maxwell-local", duplicating the single
+source owned by pipeline/pipeline_paths.py (D2552) that unloader.py / dspy_trainer.py already import.
+Fix: import from pipeline.pipeline_paths.
+
+## BUG-316 - goose main-loop model is the known-bad agentic model (MED, Phase 3 risk, 2026-09-21)
+
+After the D-297 provider switch, ~/.config/goose/config.yaml providers.maxwell_omlx.model is
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit - the model driving goose MAIN loop. DELEGATE-002 documents
+this model as single-shot-only (monotonic decode collapse ~6.8 -> 0.4 tok/s as context grows;
+~50-token stubs). D-295 asked for the provider switch + temp 0.0, not a collapse-prone code model as
+the driver. Not changed unilaterally (it would swap the running session driver) -> D-299.
+
+## ANCHOR-1 note (not a bug): out-of-vocabulary human tokens are normalisation debt only
+
+3 human tokens miss config/taxonomy_v5.yaml: media & entertainmen, product desig, business operation
+(truncation / singular). emerging (rows 17, 19, 43) is NOT one of them - it is the documented
+catch-all (taxonomy meta.catch_all_discipline) and is used on both sides, so it is legal.
+## BUG-317 - Bake-off arm layer silently ran the NLI arm on CPU (MED, own wiring, 2026-09-21)
+
+First run of the DeBERTa arm measured 24.5 s/row (61 slots) -> 61 min for 150 rows, because
+_nli_scores never moved the model/inputs to an accelerator. After adding config-driven device
+selection (bakeoff.device: auto = mps > cuda > cpu, C24) and padded batches (bakeoff.nli_batch_size),
+the same arm runs at 0.40 s per 16 hypotheses: 5 rows in 7.1 s -> ~3.6 min for the full 150 rows
+(17x faster). Lesson: an arm that silently degrades to CPU is a HIDDEN FAILURE - it does not error, it
+just makes the benchmark look prohibitively expensive. Device is now declared in config, not implicit.
+## BUG-318 - Bake-off: config JSON braces killed the LLM arm + non-atomic artifact (HIGH, own wiring, 2026-09-21)
+
+Two coupled defects surfaced when the qwen3coder arm started: (a) the config prompt template contains a
+literal JSON example ({"choice": ...}) and was rendered with str.format(), which read {"choice"} as a
+format field -> KeyError: '"choice"' -> the arm died instantly; (b) the artifact was written once, AFTER
+the whole arm loop, so the crash also DISCARDED the completed DeBERTa arm (150/150 rows, ~4 min of
+compute) and left only the stale constant-arm artifact on disk. Fix: named-token render() (no
+str.format on config text) + per-arm checkpoint write. Lesson (C23 resilient-by-design): a benchmark
+harness that loses finished work to a later crash is a hidden failure, not an inconvenience.
+## BUG-319 - qwen3coder arm abstains 116/116 (HIGH, hidden failure, 2026-09-21)
+
+The LLM arm decided zero rows: abstain_rate 1.0, error_rate undefined. Any parse failure that is
+converted into an abstention is INDISTINGUISHABLE from a legitimate "I don't know" - the arm looks
+honest while being dead. Report layer now marks it INVALID (decided < 50%), but the parser must
+separate "model abstained" from "we failed to read the model". Fix pending: inspect raw responses.
+
+## BUG-320 - No degenerate-arm guard: a collapsed arm could be read as a tie (HIGH, fixed 2026-09-21)
+
+Nothing in the harness flagged an arm that reproduces the baseline. The DeBERTa zero-shot menu arm
+scored error 0.931 - numerically identical to the constant baseline (108/116 errors, error-set
+Jaccard 0.862), i.e. F-17 in its strongest form: on this framing the incumbent adds no signal.
+Fixed by scripts/bakeoff_report.py (local recomputation + DEGENERATE flag + live-vs-baseline verdict).
+
+## BUG-321 - Harness persisted labels only, discarding per-row margins (MED, fixed 2026-09-21)
+
+main() wrote res["predictions"] = {k: v[0]} - the confidence margin was thrown away, so no calibrated
+abstention curve and no failure audit could be derived from the artifact. Fixed: margins persisted.
+## BUG-322 - Report verdict compared every arm to the CONSTANT floor, so the incumbent "passed" (MED, fixed 2026-09-21)
+
+v1 of the report layer measured candidates against the constant baseline only. That made the incumbent
+itself report "ADOPT (gain 45.7 pp)" - vacuous, because the incumbent IS the deployed configuration.
+Fixed: D-300 v2 compares candidates against the incumbent arm (config: bakeoff.report.incumbent_arm),
+with the constant baseline demoted to a triviality floor. Lesson: a metric whose reference is not the
+deployed configuration can only ever produce flattering verdicts.
+### BUG-319 - ROOT CAUSE FOUND and FIXED (2026-09-21, HIGH -> CLOSED)
+
+The 116/116 abstention was NOT a parse problem and NOT the model refusing: the arm built
+OMLX_URL + "/chat/completions" while OMLX_URL = http://localhost:11435 (no /v1), so every call returned
+HTTP 404 and the exception handler recorded an abstention. After adding the diagnostic reasons
+(ok / model_abstained / unresolved_choice / parse_error / http_error) the first re-run printed
+[[http_error_404, 60]] - one line replacing a mystery. Fixed config-first: bakeoff.omlx_path = /v1/chat/completions.
+Audit: every production caller (pipeline/omlx_call.py, model_lazyload.py, omlx_wired_stress.py,
+dspy_trainer.py, scripts/arm4_omlx.py, benchmark_s4_quant_ab.py) already uses /v1 - the defect was
+contained to the harness, no production cascade. Proof after fix: 10/10 rows decide ("ok"), labels
+e.g. computational geometry, design thinking.
+## BUG-323 - Harness overwrote its artifact, silently destroying an arm already measured (MED, fixed 2026-09-21)
+
+main() wrote a single artifact per run, so running --arm pairwise after --arm qwen3coder erased the LLM
+arm; the report then saw no incumbent and fell back to the CONSTANT floor, re-printing a flattering
+"ADOPT". Two holes, one cause. Fixed: (a) merge-at-write in the harness (earlier arms survive), and
+(b) the report now WARNS loudly when the incumbent arm is absent instead of quietly re-basing the verdict.
+## BUG-324 - Arbitration script counted UNLABELLED rows as errors (MED, fixed within minutes 2026-09-21)
+
+First run reported incumbent error 0.593 instead of the known 0.474 because the loop iterated every row of
+the frozen key - the 34 rows with no human discipline label satisfied "pred != None" and were silently
+counted as failures. A 25% inflation of the error rate, produced by a missing guard rather than a missing
+label. Fixed: only rows carrying a human label may enter an error count. Lesson: every error metric needs an
+explicit "is this row scoreable?" predicate; absence of truth is not evidence of error.
+
+## BUG-325 (MED — FIXED 2026-09-21): normalisation map leaked across axes. `load_vocab()` merged the owner-approved DOMAIN surface variants (config/normalization_map.yaml, D-307) into the SHARED alias dict used to normalise every axis, so a domain entry (`human-computer interaction` -> `human computer interaction`) also rewrote DISCIPLINE cells on rows 25/46 and depressed discipline kappa from 0.4395 to 0.4051 for a purely cosmetic reason. Caught by the ablation audit (S2), not by any test. Fix: separate `dom_alias` used only for domain tokens; discipline axis is provably unchanged (re-ran: 0.4395 / error 0.5254). Guard for the future: the map is domain-keyed, so it must never be applied to a vocabulary that shares token space with another axis.
+
+## BUG-326 (MED - OPEN 2026-09-21): assignment/emission defect class in the corpus, and a measurement-claim defect above it
+Whole-corpus deterministic meter (`scripts/audit_full_corpus_labels.py`, knowledge pipeline/maxwell.db, 7,995 rows):
+403 FBs whose `discipline_raw` has a canonical-equivalent but no mapping (BUG-150 class taxonomy gap), 354 emerging
+FBs with EMPTY `discipline_raw` (reclass targets), 1 canonical + empty raw (D2378), 147 FBs with the SAME label on
+both axes (most: design studies 41, visual communication 12, business strategy 10 - D2422/BUG-197 disjointness),
+703 FBs with no/emerging-only domain, 0 unknown labels. Separately: the record-level claim "the pipeline never emits
+ai & agents / brand identity / ..." was FALSE and came from the 60-row contra sample; corrected in D-308/D-310 and
+recorded here as a process bug (no whole-corpus measurement before a decision claim). Fix order: raw->canonical
+coverage, then both-axes, then the 703 domain-less rows; all three are deterministic repairs gated on a gemma-4-E4B
+review of the repair script first (R5).

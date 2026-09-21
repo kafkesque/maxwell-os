@@ -138,13 +138,13 @@ content_type, NOT the yaml `content_types` key (BUG-277).
 | **G6** | decide the Dropbox/synced-folder question (C3) | `FORENSIC_AUDIT_20260917.md` F-09 | leak-risk posture |
 | **G7** | decide domain aggregation policy (63 contested rows) | `governance/domain_aggregation_policy_decision.md` | domain axis |
 
-| **G12** | approve constraining the facet filters (predicate in every leg + assert on the fused pool) | ROUNDTABLE_CROSSEXAM_20260919.md | correctness of every retrieval number |
+| **G12 ✅** | approve constraining the facet filters (predicate in every leg + assert on the fused pool) — **IMPLEMENTED 2026-09-19** | ROUNDTABLE_CROSSEXAM_20260919.md | correctness of every retrieval number |
 | **G13** | ~~approve the write-guard exemption~~ **SUPERSEDED BY G18** | — | — |
 | **G14** | approve work-identity dedup at ingestion (re-run affected merges, or prevent future ones only?) | BUG-289 | the S1.5 merge criterion |
 | **G15** | approve indexing what is already in the DB (body fields into FTS; evidence_passages as a leg) | BUG-288 | retrieval coverage (11.1% today) |
 | **G16** | approve the chunk/evidence leg, and decide whether a hit returns the parent FB or the segment | D-273g | grounding precision |
-| **G17** | **re-derive status from the verification record; make label-derived status writes impossible** (serving 4,745 → 3,310; de-serves 1,941; deletes nothing) | BUG-299 / D-274a | **everything measurable** |
-| **G18** | approve the guard SPLIT (row guard vs vocabulary lint) | D-274 / ROUNDTABLE_CROSSEXAM | R1, and the 261 research-methodology rows |
+| **G17 ✅** | **re-derive status from the verification record; make label-derived status writes impossible** — **IMPLEMENTED 2026-09-19** (PASS 4,745 → 3,299; de-serves 1,941 + 11 duplicates; deletes nothing) | BUG-299 / D-274a | **everything measurable** |
+| **G18 ✅** | approve the guard SPLIT (row guard vs vocabulary lint) — **IMPLEMENTED 2026-09-19** | D-274 / ROUNDTABLE_CROSSEXAM | R1, and the 261 research-methodology rows |
 | **G19** | persist the tier stage 5 already computes; withdraw the FLOOR estimand (**G4a withdrawn**) | BUG-295 / BUG-301 | the ruler's validity |
 | **G20** | one writer for status + an audit stamp on any script that may touch it | BUG-299 | governance of the gate |
 | **G4a** | ~~repoint the floors at the certified core~~ **WITHDRAWN** — the estimand is confused and a floor may not be re-anchored on a single coder | BUG-295 / BUG-296 | — |
@@ -316,8 +316,174 @@ at n=30.
 is already in the DB -> 5 work-identity dedup -> 6 S5 aggregation fix -> 7 chunk/evidence leg -> 8
 distilled classifier.
 
+**✅ IMPLEMENTED 2026-09-19 (later session): 0a, 0b, 0c.** (0a) `scripts/apply_serving_gate.py` is the single
+writer for `status` (from `verification_results[factual].passed` + typed `s5_reason`, new `fbs.s5_reason`
+column) — PASS 4,745 → 3,299, CI invariant 0 violations, duplicates hard-quarantined. (0b) facet predicate
+in every retrieval leg + asserted on the fused pool — constraint-violation rate 0.5911 → 0.0000. (0c) write
+guard split into row guard vs vocabulary lint — `research methodology` writes clean. Closed BUG-276/285/286/
+299/300/302. **Remaining path: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8.**
+
 **Explicitly excluded on priority grounds:** re-labelling the corpus, buying ~85 more stratum-A rows,
 training S2/S4 on the current labels, extending the alias map, ACORN, re-cutting the ontology,
 re-deriving FORM on the pocket, the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF
 before 0a-0b, deleting the junk rows, and R2 before R5/R1. The D-2637 model-eval workstream is NOT on
 the critical path.
+
+---
+
+## 2026-09-19 (evening) — Ruler key inversion + content-type guardrail
+
+**Revelation (user-forced, correct):** the G4 ruler was scored against the STORED label, but the stored
+label IS the corrupt free-generated artefact under audit. "Stored-label accuracy" = agreement-with-corruption.
+**D-275a (RESOLVED):** invert the key — blind human label = ground truth, stored label = under test,
+report error rate. `scripts/rescore_ruler_inverted.py` written + run (FORM pass).
+
+**D-275b (PROPOSED, pending ratification):** content-type guardrail — atomic unit = one self-contained
+epistemic claim (not one sentence); principle/process_template discriminator = procedural intent + done
+condition (not "≥2 steps", necessary-but-insufficient); FORM = primary epistemic commitment; taxonomy
+one-or-many = self-containedness; checklist → process_template; decision matrix → inline_gate_content.
+
+**Measured (inverted key, FORM):** stored error rate 0.253 [0.177, 0.346]; normative_heuristic 50% wrong
+in storage (→ causal 9×, → descriptive 6×); "irrelevant" written in 4 FORM cells (evidence for R4).
+Report: `governance/ruler_form_inverted_20260919.md`.
+
+**Status:** ANCHOR-1 = 150 human rows (FORM final; CT/discipline pending reviewer update). Next:
+reviewer re-labels CT/discipline with the D-275b guardrail → re-score those (inverted) → freeze ANCHOR-1
+→ per-slot reliability → R5 (ratify slots) → R1 (closed menu) → R2 (definition NLI).
+
+**G19 IMPLEMENTED 2026-09-19 (evening):** `stage6_commit.py` now persists all four S5 tier fields
+(`s5_reason`, `epistemic_status`, `verification_method`, `isor`) + `verifier_model` is config-derived
+(`S5_NLI_MODEL_LARGE` + `S5_NLI_PASS_THRESHOLD`). Live DB migrated to 71 columns; CHECK 8 passes (71=71).
+Also fixed the latent 0a drift (s5_reason was in DB but not in stage6 CREATE TABLE/INSERT). BUG-301 resolved.
+
+**D-275c (RESOLVED):** TypeSafe AI "System One Models / Jev" — REJECT as pipeline dependency (hosted paid
+API, violates C1/C3/C2/C4/C22; does what the local stack does for $0). ADAPT the framing (calibrated
+decision + typed abstention) as validation of R1/R2/R10. No new dependency.
+
+---
+
+## 2026-09-20 — Full-axis inverted re-score + ANCHOR-1 freeze
+
+**Reviewer locked all three axes** (R021 FORM blanked, R146 → organizational theory, DISC fully
+re-labelled with the menu, 4 trailing blank rows removed).
+
+**Measured (inverted key, D-276):** stored-label error — **CT 0.353** [0.281, 0.433] (A 0.290),
+**DISC 0.474** [0.386, 0.564] (A 0.487), **FORM 0.283** [0.216, 0.361] (A 0.255).
+
+**Two systemic defects now measured, not asserted:**
+- CT: the old classifier over-calls `principle` (93 stored vs 89 human), under-calls `quarantine`
+  (18→6) and `process_template` (16→9) — the D-275b "step-count not procedural-intent" gap, quantified.
+- DISC: 8 zero-agreement slots (design psychology 0/5, cultural studies 0/4, risk management 0/4,
+  privacy & surveillance, political economy, visual perception, finance, cultural design) — the alias
+  map silently discards them into `emerging`. Group-level near-miss: exact 0.430 → same-group 0.271.
+
+**Artifacts:** `ruler_inverted_20260920.{md,json}` (measurement), `anchor1_frozen_20260920.{md,json}`
+(frozen ground truth + R5 slot vote). `ruler_measurement_20260917.md` marked SUPERSEDED (A5).
+
+**Status:** ANCHOR-1 frozen. Remaining path (dependency order): 1 R5 ratification → 2 R1 (closed menu +
+`menu_hash` + `*_source` provenance) → 3 R2 (definition NLI). Provenance columns are the binding
+prerequisite: `min_human_share` is unsatisfiable until `content_type_source` / `discipline_source` /
+`extraction_type_source` / `menu_hash` exist.
+
+---
+
+## 2026-09-20 (later) — R5 repair-not-demote + D-275b ratified + raw/canonical clarified
+
+**Three clarifications ratified (D-277, RESOLVED):**
+
+1. **R5 is repair, not demote.** Zero-agreement DISC slots measure PIPELINE failure, not slot badness
+   (two distinct causes). The initial DEMOTE vote was withdrawn. Corrected scheme: RE-DERIVE definition
+   + include + exclude (OntoClean) for weak slots → BOUND (human review on write) → merge into the
+   parent group only if still definitionally inseparable. Never DEMOTE first.
+2. **Raw AND canonical are both post-hoc model stamps.** The corpus has ZERO human-derived labels; the
+   raw string and the canonical slot both came from the 2-month-old corrupt run, so neither can be
+   "recovered" into truth. Both demoted to provenance (G9); re-derive from source text only.
+3. **The error rate is a meter, not an oracle.** Per-class stored error calibrates confidence and
+   triggers abstention; it carries zero per-object information and never flips a label.
+
+**D-275b RATIFIED (RESOLVED).** The content-type decision procedure (Mechanism A: ordered 7-question
+tree, first-match-wins; checklist→process_template; decision-matrix→inline_gate_content; taxonomy
+one-or-many by self-containedness) is written into `config/content_types.yaml` as
+`content_type_decision_procedure`. `principle`/`process_template` descriptions updated to procedural
+INTENT + done-condition (D-275b), the step-count framing demoted to necessary-but-not-sufficient.
+
+**Artifacts updated:** `anchor1_frozen_20260920.{md,json}` (dispositions RE-DERIVE+BOUND, no DEMOTE);
+`config/content_types.yaml`; `decisions.yaml` D-275b RESOLVED + D-277 added; BUG-304 corrected.
+
+**Remaining path (dependency order):** 1 R5 repair execution (draft definition+include+exclude for the
+BOUND slots) → 2 single-coder ceiling (second human on 30 rows) → 3 R1 (closed-menu renderer +
+`menu_hash` + `*_source` provenance columns in stage4_merge/stage6_commit/schemas) → 4 R2
+(definition-anchored NLI).
+
+---
+
+## 2026-09-20 (final batch) — Next-4 execution: R5 repair + single-coder ceiling + R1 + R2
+
+Executed the four dependency-ordered steps. No new unexpected defect surfaced; the one
+caught-and-fixed item was a placeholder-count drift in the stage6 INSERT I introduced
+and self-corrected under verification (75==75==75, end-to-end temp-DB insert green).
+
+1. **R5 repair (D-278):** `config/r5_slot_repair.yaml` drafts OntoClean
+   definition + include + exclude for the 7 weak slots (design psychology, cultural
+   studies, risk management, behavioral economics, decision making, quarantine,
+   process_template) + the 2 BOUND-only slots (design thinking, organizational theory).
+   Exclude sets name the correct sibling target → testable R2 rules. Awaiting human
+   ratification; slots stay BOUND until then.
+2. **Single-coder ceiling (D-280, HUMAN GATE):** `SINGLE_CODER_CEILING_SHEET_20260920.csv`
+   (30 rows, stratified over the RE-DERIVE slots, labels blanked) + protocol. The second
+   human pass is NOT done — it is the next human gate.
+3. **R1 (D-279):** `pipeline/closed_menu.py` renders the closed menu (8 CT incl. `none`,
+   4 FORM, 62 DISC, 44 domains) with `menu_hash` sha256 `25b10c44…`. `stage4_merge.py`
+   stamps `content_type_source`/`discipline_source`/`extraction_type_source`
+   (all `llm_extracted_from_source` — zero human labels, D-277) + `menu_hash`;
+   `stage6_commit.py` persists the 4 columns (CREATE+migrate+INSERT); `schemas.py` FB
+   model gained the 4 fields. Frozen menu: `config/closed_menu_v5.json` + `.sha256`.
+4. **R2 (D-281):** `scripts/definition_nli_verify.py` — definition-anchored NLI
+   (premise=FB definition, hypothesis=menu definition, R5 override first). Selfcheck
+   green; the corpus-wide NLI run is the next action.
+
+**Remaining path (dependency order):** 1 human ratification of the R5 definitions →
+2 single-coder second pass (human) → 3 R2 corpus-wide NLI run → 4 re-measure per-slot κ
+against ANCHOR-1 → 5 lift BOUND / merge only if inseparable.
+
+---
+
+## 2026-09-20 (forensic audit + D-282) — depth-vs-role conflation caught and fixed
+
+User-caught defect in the D-278 R5 definitions: "a filter across 3+ domains" was used as
+the principle-role boundary. That is the **universal-depth** threshold, not the
+**principle-role** criterion — `specialized`/`domain` principles (1-2 domain labels) are
+still principles (`depth is NOT domain count`). Fix (D-282): the principle role is "a
+self-contained transferable rule at ANY scope"; scope is the separate depth axis.
+
+**Audit findings this batch:**
+- **CRITICAL (fixed):** "3+ domains" role conflation in `r5_slot_repair.yaml` +
+  `content_types.yaml` (principle description, decision-procedure step 5, D-2587
+  single-step rules). Re-rendered closed menu → new `menu_hash` `e8a8b546…`.
+- **MEDIUM (documented, no code change):** the closed menu has 8 content_types (with
+  `none` abstention); the human ruler (ANCHOR-1) used 7 (no `none`). `none` (classifier
+  abstention) must reconcile with human blank-cell abstention when the κ scorer is built.
+- **MINOR (fixed):** `definition_nli_verify.py` reused the S5 entail-pass threshold for a
+  contra-dominance flag → now a dedicated `_CONTRA_DOMINANT_THRESHOLD`.
+- **caught-and-fixed in batch:** stage6 INSERT placeholder drift (73 vs 75) → 75==75==75.
+
+No other drift/leak/contamination/conflict/future-tax found in schemas.py / stage4 /
+stage6 / closed_menu.py (all verified: py_compile, FB-model Literal validation,
+end-to-end temp-DB insert, deterministic menu hash).
+
+**Remaining path (unchanged order):** 1 human ratification of the D-282-corrected R5
+definitions → 2 single-coder second pass (human) → 3 R2 corpus NLI run → 4 re-measure
+per-slot κ → 5 lift BOUND / merge only if inseparable.
+
+### 2026-09-21 (D-307..D-312) - menu repair closed, phantom version removed, assignment premise corrected
+* `config/normalization_map.yaml` = owner-approved DOMAIN surface variants, wired into the kappa layer and
+  **domain-scoped** (BUG-325: un-scoped use rewrote discipline tokens). Domains micro-kappa 0.5765 -> 0.5931
+  (mean Jaccard 0.4515 -> 0.4737); discipline unchanged at 0.4395. Ablation reproduces both figures on identical
+  taxonomy bytes -> the delta is the map, nothing else.
+* `config/taxonomy_v5.yaml` is **v5.5 again** (D-309): v6.0 added zero slots and conflicted with the stamped
+  `TAXONOMY_VERSION`; the marker now lives in `meta.menu_repair_20260921_*`.
+* **Superseded claim (do not re-use):** "the pipeline never selects existing taxonomy slots / never emits ai & agents,
+  brand identity, code & computation, ...". Whole-corpus measurement shows all 61+43 slots present; the claim came from
+  the contra-stratified 60-row sample. See `governance/ASSIGNMENT_PATH_DIAGNOSIS_20260921.md` (D-310).
+* New open items: R3 held-out validation (`R3_HELDOUT_PREREG_20260921.md`, D-311), calibrated abstention
+  (`ABSTENTION_DESIGN_20260921.md`, D-312, inert), BUG-326 corpus assignment defects.

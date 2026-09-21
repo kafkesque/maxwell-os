@@ -1,8 +1,342 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-15 13:39:35'
-total_decisions: 639
+last_sync: '2026-09-21 12:10:00'
+total_decisions: 679
 decisions:
+- id: D298
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: ANCHOR-1 R2 kappa computed + bake-off arm layer wired
+  verification: 'Ruler arm layer: item_id->fb_id join, column map DISC (1-62)/FORM (1-4)/CT (1-7),
+    constant arm modal over HUMAN labels. Constant baseline discipline error 0.931 (n=116). R2 kappa:
+    discipline 0.4395; domains micro 0.5765; content_type 0.0000 with pipeline constant. Artifacts
+    governance/anchor1_kappa_20260921.json/.md.'
+  files:
+  - scripts/anchor1_kappa.py
+  - scripts/bakeoff_typed_decision.py
+  - config/eval_integrity.yaml
+- id: D306
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Arbitration analysis - agreement filter is high-precision; R3 beats incumbent post hoc but is not adopted
+  verification: 'incumbent 0.474 (reproduced); agreement 39.7% with error 0.103 on the agreed subset; oracle
+    headroom 48 rows (ceiling 0.293). R3 (agree->accept, disagree->higher-confidence arm) 0.414 = +6.0 pp;
+    R4 0.448 = +2.6 pp. Both rules were derived on the same 116 labelled rows => post hoc => D-300 requires
+    held-out validation before adoption. Fixed BUG-324 (unlabelled rows counted as errors).'
+  files:
+  - scripts/anchor1_arbitration.py
+  - governance/anchor1_arbitration_20260921.json
+- id: D305
+  category: RESEARCH
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Gate-0 paper audit passed for laya-mlx (Apache-2.0, caller-supplied criteria vocabulary)
+  verification: 'Repo Apache-2.0; pip install laya-mlx; MLX-native without PyTorch/Transformers; HF weights
+    aac6fef/laya-mlx 421M + aac6fef/laya-multilingual-mlx 322M; predict(criteria=[...]) accepts OUR menu => no
+    projection layer and no label-semantics conflict (C4 risk largely dissolved); 0 output tokens; peak 688-944 MiB.
+    Open: 61-way criteria untested, multilingual checkpoint required, HF revision + checkpoint licence to pin.'
+  files:
+  - governance/BAKEOFF_PROTOCOL_20260921.md
+- id: D304
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: D-300 ratified by owner; first real arm verdicts (no candidate labeler beats the incumbent)
+  verification: 'pairwise err 0.474 (incumbent, production role) vs qwen3coder err 0.526 => -5.2 pp => REJECT,
+    production unchanged. Error-set Jaccard 0.468-0.482 => complementary failures => arbitration/ensemble is the
+    live hypothesis, not substitution. Abstention by role: NLI margin best at 10%, LLM confidence best at 50%.
+    Harness merges artifacts at write; report warns on missing incumbent (BUG-323). D-300 state = RATIFIED.'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - scripts/bakeoff_report.py
+  - governance/bakeoff_typed_decision_20260921.json
+- id: D303
+  category: OPS
+  state: RESOLVED
+  date: '2026-09-21'
+  title: BUG-319 root-caused - LLM arm 404 masked as abstention; harness now produces real decisions
+  verification: 'OMLX_URL has no /v1; arm appended /chat/completions => HTTP 404 per row => recorded as
+    abstention. Fixed via bakeoff.omlx_path config + reason taxonomy. Production callers all use /v1
+    (omlx_call.py, model_lazyload.py, omlx_wired_stress.py, dspy_trainer.py) => no production impact.
+    Post-fix: 10/10 rows decided ok; 150-row arm running.'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - config/eval_integrity.yaml
+  - governance/buglog.md
+- id: D302
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Arm matrix v2 role-matched + calibrated abstention + ANCHOR-1 repair triage
+  verification: 'arm_pairwise (production role) error 0.4741 == known pipeline 0.474 (harness cross-validated);
+    abstention sweep monotone 0.474/0.423/0.391/0.328 at 0/10/25/50% abstention vs flat on the zero-shot
+    framing => abstention claims are role-specific; triage 31 boundary / 44 under-prediction / 36 over-prediction
+    with named systematic menu gaps; report verdict re-based on the incumbent (BUG-322).'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - scripts/bakeoff_report.py
+  - scripts/anchor1_repair_triage.py
+  - governance/anchor1_repair_triage_20260921.md
+- id: D301
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Bake-off report layer + validity guards; role-matched arm matrix v2
+  verification: 'deberta arm error 0.931 == constant baseline (108/116, error-set Jaccard 0.862 => DEGENERATE);
+    qwen3coder abstained 116/116 (BUG-319) => INVALID. scripts/bakeoff_report.py recomputes metrics locally,
+    flags degenerate arms, sweeps abstention, applies the pre-registered D-300 >=5pp rule. Margins now persisted
+    (BUG-321). v1 arm matrix measured the incumbent outside its production role => v2 = pairwise verifier +
+    menu labeler. Protocol: governance/BAKEOFF_PROTOCOL_20260921.md.'
+  files:
+  - scripts/bakeoff_report.py
+  - scripts/bakeoff_typed_decision.py
+  - governance/BAKEOFF_PROTOCOL_20260921.md
+- id: D300
+  category: RESEARCH
+  state: RATIFIED
+  date: '2026-09-21'
+  title: Typed-head (Jev-clone) adoption rule - paper-audit gate + benchmark-only A/B, laya-mlx champion
+  verification: 'PENDING RATIFICATION. Gate 0 = paper audit (licence/weights/schema/MLX/provenance) before
+    install. Champion mizorewww/laya-mlx; Open-Jev scalar only as abstention score; daseinlabs/open-jev
+    unlicensed REJECT. Pre-registered margin: >=5pp error-rate gain on the frozen ruler 116 human discipline
+    rows at equal-or-lower abstention, deterministic, same menu. Never a pipeline dependency (D-275c);
+    label semantics frozen (C4), artifacts stamped per R14.'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - governance/MARKET_RESEARCH_20260921.md
+- id: D299
+  category: OPS
+  state: PROPOSED
+  date: '2026-09-21'
+  title: 'ANCHOR-1 audit follow-ups (goose main model, frozen hash re-stamp, normalisation policy)'
+  verification: 'PENDING RATIFICATION: (a) BUG-316 goose agentic model -> gemma-4-E4B-it-MLX-4bit;
+    (b) BUG-314 re-stamp frozen ruler csv_sha256 + normalisation map; (c) normalisation (not sheet
+    editing) is the sanctioned fix for human token typos.'
+  files:
+  - agent/session_seed.yaml
+- id: D297
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Phase 3 executed + bake-off scaffold repointed to frozen ruler
+  source: scripts/bakeoff_typed_decision.py
+  verification: 'goose active_provider custom_deepseek->maxwell_omlx; custom_deepseek disabled. bakeoff DEFAULT_SHEET->150-row ruler, DEFAULT_KEY->anchor1_frozen, AXIS->discipline, load_ground_truth parses frozen rows. Revealed arm-layer gap: ruler CSV keys by item_id (not fb_id) + DISC/FORM col names != axis keys -> item_id->fb_id join + col-name map required before arms run. Phase 4 assessed: no ruler-sheet conflict; defer per plan gate.'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+- id: D296
+  category: PERF
+  state: ACTIVE
+  date: '2026-09-21'
+  title: Typed-decision bake-off for S5 (ADAPT D-275c, benchmark-only)
+  source: scripts/bakeoff_typed_decision.py
+  verification: 'Draft scaffold for gemma-4-E4B R5 review. Arms: constant baseline, DeBERTa-v3 NLI (incumbent S5), Qwen3-Coder one-shot typed decision, optional laya-mlx/jevmlx heads (MIT, benchmark-only). Scored on the frozen 150-row ruler blind sheet with blind human label as ground truth (D-275a error rate, never accuracy).'
+  files:
+  - scripts/bakeoff_typed_decision.py
+  - governance/MARKET_RESEARCH_20260921.md
+- id: D295
+  category: OPS
+  state: RESOLVED
+  date: '2026-09-21'
+  title: goose→oMLX provider already wired; active_provider bug
+  source: '~/.config/goose/custom_providers/maxwell_omlx.json'
+  verification: 'Provider exists (engine openai, base_url http://localhost:11435/v1, api_key_env OMLX_API_KEY) and is referenced in config.yaml (providers.maxwell_omlx, GOOSE_PLANNER_PROVIDER). Bug = active_provider: custom_deepseek (DELEGATE-001 reasoning_content passthrough). Action: switch active_provider to maxwell_omlx; pin recipe temperature 0.0.'
+  files:
+  - governance/MARKET_RESEARCH_20260921.md
+- id: D294
+  category: PERF
+  state: ACTIVE
+  date: '2026-09-21'
+  title: oQ4e/oQe quantization A/B for S2/S4 (A10 instrument)
+  verification: 'oMLX 0.7 outlier-aware oQ4e/oQe. Re-run A10 instrument (accuracy + per-item flip-rate + intervals) on Qwen3-Coder-4bit (S2) and gpt-oss-20b-MXFP4-Q8 (S4).'
+  files:
+  - config/pipeline_config.yaml
+- id: D293
+  category: PERF
+  state: ACTIVE
+  date: '2026-09-21'
+  title: Lightning MTP enablement for Qwen3-Coder S2
+  verification: 'oMLX 0.7 Lightning MTP = +34-58% decode on Qwen3 family, lossless at temp=0.0 (R7-safe). S2 = heaviest LLM stage (D2460 MoE ~50 tok/s). Enable MTP drafter + measure before/after on a frozen S2 batch.'
+  files:
+  - config/pipeline_config.yaml
+- id: D292
+  category: OPS / PERF
+  state: ACTIVE
+  date: '2026-09-21'
+  title: D2460 cache-thrash re-check (live flags found)
+  verification: 'Live ~/.omlx/settings.json has cache.enabled=true AND gdn_ssd_split_enabled=true — exact D2460 thrash flags (decode 4-7 tok/s). assert_omlx_no_cache (D2463) should refuse; D2455/D2456 GUI migration relaunched cache-on. Re-assert no-cache/hot-cache-only preflight.'
+  files:
+  - '~/.omlx/settings.json'
+- id: D291
+  category: OPS
+  state: RESOLVED
+  date: '2026-09-21'
+  title: oMLX pin to 0.7.0.dev2 (dev4 startup bug)
+  verification: '0.7.0.dev4 documented startup failure on externally-accessible servers with API-key auth disabled; Maxwell settings.json exposes external server_aliases (192.168.0.103 / 10.150.61.110) with no auth. Pin dev2 until RC or enable auth. Local plist confirms 0.7.0.dev4.'
+  files:
+  - config/pipeline_config.yaml
+- id: D290
+  category: RESEARCH
+  state: RESOLVED
+  date: '2026-09-21'
+  title: M1 Max hardware optimisation program (configurable vs hard limits)
+  source: governance/MARKET_RESEARCH_20260921.md
+  verification: 'M1 Max 64GB 400GB/s: decode bandwidth-good, prefill/TTFT the binding constraint. Levers: MTP, oQ4e, prompt cache (hot RAM only), KV quant, wired memory. Hard limits: no NAX, no neural accelerator, no CED relevance, no Cluster v2, Apple AFM closed (C2/C3). Pipeline: S2 top priority, S4 secondary, S5 typed-decision bake-off only accuracy lever.'
+  files:
+  - governance/MARKET_RESEARCH_20260921.md
+- id: D289
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Cognitive-science boundary post-D-285 — widen definition vs re-label 133 FBs (BUG-313)
+  source: governance/r2_definition_nli_20260920.json
+  verification: 'R2 arm-C corpus meter: cognitive science contra 126/133 (94%) — the D-285 definition ("HOW the mind works … as pure cognition, with NO design, persuasion, or economic-application intent") contradicts the corpus FBs still labelled cognitive science (design/learning/creativity-applied content). Other core disciplines clean: psychology 0/906, behavioral economics 12/238 (5%), design thinking 31/246 (12%) → the mismatch is SPECIFIC to cognitive science, not a general D-285 failure. RESOLVED (user chose A — widen). De-negated the definition in r5 + taxonomy (removed "with NO design, persuasion, or economic-application intent" + "as pure cognition … in itself"); menu_hash cac6e695→73597ee2; targeted re-score: cognitive-science contra 126/133 (94%) → 6/133 (4%). Full r5 collapse executed alongside (4 non-core defs folded into taxonomy + dead r5 content_type dropped).'
+  description: 'The D-285 cognitive-science re-derivation excluded design/application intent, but the corpus still carries ~133 pre-sharpening labels. This is the same post-hoc-repair mismatch class as BUG-312 (definition moved, labels did not). Human adjudication required before the M2 per-slot κ vs ANCHOR-1 can be measured against a corrected cognitive-science slot.'
+  files:
+  - config/r5_slot_repair.yaml
+  - config/taxonomy_v5.yaml
+- id: D288
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: R2 corpus NLI source selection + provenance drift (BUG-311/BUG-312)
+  source: scripts/definition_nli_verify.py
+  verification: 'BUG-311 restored the missing stage5 checkpoint from bak_20260904_152319 (sha256 2c206a255a…, 7995 FBs, 0 malformed, --selfcheck clean). Forensic audit then surfaced BUG-312: three divergent label snapshots — stage5 checkpoint (Sep 4, stalest) < stage4 checkpoint (Sep 11, 1112/7995 discipline + 2395/7995 domain diffs vs stage5) < maxwell.db (Sep 19, freshest, 231/7995 discipline + 353/7995 domain diffs vs stage4). The DB reflects the post-repair taxonomy (M1/D-285/BUG-309/BUG-310 re-derivations). Decision: run the R2 arm-C meter over stage4 (option B, freshest checkpoint labels) rather than the stale stage5 or a multi-hour stage5 re-run; DB→JSONL export + re-meter flagged as a follow-up for exactness.'
+  description: 'The R2 corpus NLI is the first full-corpus semantic measurement of label-definition consistency after the D-285/M1/BUG-309/BUG-310 taxonomy repairs. It meters every discipline/domain/content_type label against its current definition (arm C paraphrase for content_type). Read-only (Mechanism B meter) — output is a triage report, never a label flip; human adjudication of contra-flagged cases builds ANCHOR-1 for the M2 pipeline-vs-user κ.'
+  files:
+  - scripts/definition_nli_verify.py
+  - governance/r2_definition_nli_20260920.json
+  - config/r5_slot_repair.yaml
+- id: D285
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Discipline boundary re-derivation — cognitive science / design psychology / psychology / behavioral economics / design thinking (D-285)
+  source: config/r5_slot_repair.yaml
+  verification: 'User-dictated re-derivation 2026-09-20. design psychology redefined as the EXPLOITATION of cognitive-science biases/loopholes to persuade/manipulate a user or consumer (applied persuasion), NOT the study of cognition. cognitive science = how the mind works (perception, memory, attention, reasoning) as pure cognition — the DEFAULT home for memory/reasoning/cognitive-load claims (e.g. "how cognitive load shapes interface layout" is cognitive science, not design psychology). psychology = mind/behaviour beyond computation (emotion, personality, development, social). behavioral economics = DESCRIPTIVE study of bias in economic/market choice. design thinking = the empathise->prototype->test innovation PROCESS. All five mutually exclusive (symmetric excludes verified). menu_hash re-rendered 14540ec3... because taxonomy discipline definitions feed the closed menu.'
+  description: 'The D-282 depth fix held, but the discipline axis had unresolved overlaps across design psychology / cognitive science / psychology / behavioral economics / design thinking. All five re-derived with definition + include + exclude in r5_slot_repair.yaml, and taxonomy_v5.yaml canonical definitions updated in lockstep (zero canonical<->repair drift). Symmetry verified: every exclude has a matching reverse.'
+  files:
+  - config/r5_slot_repair.yaml
+  - config/taxonomy_v5.yaml
+  - config/closed_menu_v5.json
+  - config/closed_menu_v5.sha256
+- id: D287
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Domain raw-alias cross-listing resolution — 37 rulings applied (BUG-310)
+  source: scripts/fix_bug310_domains.py
+  verification: 'User "approve all" on the 37-row recommendation table (governance/bug310_domain_crosslistings.md). Applied surgically: each cross-listed domain raw alias kept in exactly one domain, dropped from the other (e.g. programming -> code & computation, ui/ux -> user experience, advertising -> editorial & advertising, rhetoric already -> linguistics per M1). A case-variant dedup bug was caught by post-write verification and fixed. Result: 0 raw-alias cross-listings on BOTH discipline and domain axes — the synonym index is now conflict-free.'
+  description: 'The BUG-309 sweep covered only the discipline axis; a domain-axis sweep found 37 more cross-listings (same class). The discipline exclude-signal does not transfer cleanly to domains, so all 37 were batch-ratified by the user rather than auto-fixed. menu_hash unchanged (raw lists do not feed the menu).'
+  files:
+  - config/taxonomy_v5.yaml
+  - governance/bug310_domain_crosslistings.md
+  - scripts/fix_bug310_domains.py
+- id: D286
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: D-285/D-283 execution — raw-alias cross-listing resolution + definition fold; 11 non-core cross-listings remain (BUG-309)
+  source: scripts/fix_d285_alias_conflicts.py
+  verification: 'Executed 2026-09-20 after ratification of D-285/D-283. (1) Raw-alias cross-listings among the 5 core disciplines RESOLVED: cognitive ergonomics + cognitive psychology -> cognitive science; behavioral psychology + creative psychology + psychology of creativity -> psychology; persuasion -> design psychology; problem solving -> cognitive science. Canonical-name self-collisions fixed: color theory removed from visual perception raw, economics removed from political economy raw, clinical psychology removed from health & medicine raw — each had an exclude-list that already named the true home. (2) Strengthened D-285 definitions FOLDED into taxonomy_v5.yaml (5 core now semantically match r5_slot_repair.yaml) and the BUG-305 "NOT a procedure you EXECUTE" self-negating phrase removed from content_types.yaml principle description (now uses the epistemic STATUS discriminator). New menu_hash cac6e69546f0dd7fe168b9b0c3bdf1b0ca5f2d4e11b102353898720f388e8cf4. (3) BUG-307 resolved: dead _R5_REPAIR_PATH removed from pipeline/closed_menu.py; menu_hash + r5_hash stamped on the R2 report. (4) 11 NON-core raw-alias cross-listings REMAIN (color psychology, computational models of social life, computer vision, decision science, economic theory, large language models, microeconomics, simulation, software architecture, strategic decision making, systems design) plus 2 adjacent misplacements (rhetoric, behavioural economics+persuasion) — OUTSIDE D-285 scope, need a separate batch-ratification (BUG-309).'
+  description: 'The D-285 discipline boundaries were ratified but not fully swept: the raw-alias lists (live synonym index) still cross-listed 5-core terms, and the canonical definitions lagged the r5 strengthening (drift). Fixed surgically (text-preserving, no yaml re-wrap) via scripts/fix_d285_alias_conflicts.py. 11 non-core cross-listings are logged as BUG-309 for a dedicated taxonomy-hygiene decision — NOT fixed by fiat (some are legitimate subsumption, e.g. computer vision spans ML + visual perception).'
+  files:
+  - config/taxonomy_v5.yaml
+  - config/content_types.yaml
+  - config/closed_menu_v5.json
+  - config/closed_menu_v5.sha256
+  - pipeline/closed_menu.py
+  - scripts/definition_nli_verify.py
+  - scripts/fix_d285_alias_conflicts.py
+- id: D284
+  category: MEASUREMENT
+  state: RESOLVED
+  date: '2026-09-20'
+  title: R2 hypothesis-construction A/B — paraphrase beats definition as mislabel detector (D-284)
+  source: scripts/r2_ab_harness.py
+  verification: 'Ran 2026-09-20 on the 30-row ceiling sheet (DeBERTa-v3-large, MPS). Arm B (definition hypothesis, r5-overridden): false_contra 0.267, entail 0.600, neutral 0.100. Arm C (paraphrase content-claim hypothesis): false_contra 0.233, entail 0.433, neutral 0.333. Wrong-probe (principle rows vs tool_instruction hypothesis): definition 6/11 contra, paraphrase 10/11 contra. Verdict: (1) BUG-305 was NOT fundamental — the new r5 principle definition (D-283) dropped principle-class false-contra ~1.0 -> 0.27, so KEEP NLI on content_type (reject drop-CT arm A); (2) paraphrase (arm C) is the better mislabel detector (91% vs 55% wrong-contra) with comparable false-contra; (3) growth_edge is the hardest class (0.40 false-contra in both arms).'
+  description: 'A/B-tests the R2 hypothesis construction instead of committing by fiat. IMPLEMENTED 2026-09-20: arm C adopted — scripts/definition_nli_verify.py now builds the content_type hypothesis from a per-role PARAPHRASE content-claim (config/content_types.yaml `nli_paraphrase`, single source also read by r2_ab_harness.py); discipline/domains keep the definition hypothesis. r5_hash + menu_hash are stamped on the R2 report (BUG-307 resolved). Caveat: the reference labels are coder-2 (same-person, kappa 0.333 vs coder-1), so the A/B figures are DIRECTIONAL until the ceiling is re-measured (BUG-306).'
+  files:
+  - scripts/r2_ab_harness.py
+  - governance/r2_ab_harness_20260920.json
+  - scripts/definition_nli_verify.py
+  - config/content_types.yaml
+- id: D283
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: CT boundary sharpening — principle/growth_edge/process_template SHARPEN + BOUND (D-283)
+  source: config/r5_slot_repair.yaml
+  verification: 'Drafted 2026-09-20 after the single-coder ceiling showed CT kappa 0.333 (16/30) with drift concentrated on principle->growth_edge (x4) and principle->process_template (x2) — NOT the depth axis (0 specialized-principle->quarantine drift, confirming D-282). Added principle + growth_edge entries to config/r5_slot_repair.yaml with include/exclude. The principle<->growth_edge discriminator is epistemic STATUS (established/settled vs unverified-correlation/open-tension), NOT scope; principle<->process_template is procedural INTENT + done-condition. The A/B harness measured principle-class false-contra drop ~1.0 -> 0.27 after the new principle definition.'
+  description: 'The D-282 depth fix held, but testing it exposed that the CT axis is under-specified at principle<->growth_edge and principle<->process_template (the real drift source). These boundaries are now SHARPEN + BOUND (pending human ratification, same as the D-278 repair slots). growth_edge remains the hardest class and may need further sharpening.'
+  files:
+  - config/r5_slot_repair.yaml
+- id: D282
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Depth-vs-role conflation fix — "3+ domains" is the universal-depth threshold, not the principle-role discriminator (D-282)
+  source: config/content_types.yaml
+  verification: 'user-forced correction 2026-09-20. The principle/quarantine/process_template boundary drafted in D-278 (and the D-275b principle description + decision-procedure step 5) imported "a filter across 3+ domains" as the principle-role test. That conflates the DEPTH axis (universal = >=3 domains) with the CONTENT-TYPE ROLE axis (principle). A domain-depth (1-2 domains) or specialized-depth (1 narrow domain) principle is still a principle — schemas.py:442 confirms "depth is NOT domain count". Fix: the principle role is "a self-contained transferable rule you KNOW/APPLY at ANY scope"; scope is the separate depth axis and never demotes a principle into quarantine.'
+  description: 'Removed the domain-count criterion from (1) config/r5_slot_repair.yaml quarantine definition/include/exclude + process_template exclude, and (2) config/content_types.yaml principle description + content_type_decision_procedure step 5 + the D-2587 single-step rules. depth_test_domains_threshold: 3 remains but is now unambiguously a DEPTH-axis (scope) threshold. The closed menu was re-rendered (new menu_hash e8a8b546...) because the principle description is embedded in the menu. Also fixed a minor threshold reuse in scripts/definition_nli_verify.py (contra-dominance now uses its own constant, not the S5 entail-pass threshold).'
+  files:
+  - config/r5_slot_repair.yaml
+  - config/content_types.yaml
+  - config/closed_menu_v5.json
+  - config/closed_menu_v5.sha256
+  - scripts/definition_nli_verify.py
+- id: D281
+  category: QUALITY / DATA
+  state: RESOLVED
+  date: '2026-09-20'
+  title: R2 definition-anchored NLI verifier against the closed menu + R5 definitions (D-281)
+  source: scripts/definition_nli_verify.py
+  verification: 'scripts/definition_nli_verify.py --selfcheck loads the closed menu + r5_slot_repair.yaml overrides (content_type 2, discipline 7) and resolves every re-derived slot to a definition. It reuses the S5 NLI pair scorer (stage5_verify._nli_pair_scores) with premise=FB definition, hypothesis=label definition (r5 override first, else taxonomy), reporting entail/neutral/contra per label. contra at or above the S5 threshold is a hard mislabel signal; this is Mechanism B (a meter) that calibrates confidence and abstention, never a label flipper (D-277).'
+  description: 'Definition-anchored NLI replaces the flat "This text is about {label}." hypothesis (which under-entails on broad labels, D2571 anomaly-C) with the label canonical definition as the anchor. The R5 repaired definitions take precedence for the weak slots, so the re-derived boundary (include/exclude) is what gets verified. The corpus-wide run is the next action (a long local inference over the stage5 checkpoint), not executed in this batch.'
+  files:
+  - scripts/definition_nli_verify.py
+  - config/r5_slot_repair.yaml
+- id: D280
+  category: MEASUREMENT
+  state: PROPOSED
+  date: '2026-09-20'
+  title: Single-coder ceiling — 30-row second-coder blind sheet prepared (D-280)
+  source: governance/SINGLE_CODER_CEILING_SHEET_20260920.csv
+  verification: 'scripts/prepare_single_coder_sheet.py selects a deterministic 30-row stratified sample from ANCHOR-1 covering every RE-DERIVE slot (design psychology 5, cultural studies 4, risk management 4, behavioral economics 4, decision making 4 = 21 rows) plus a seeded 9-row draw from the content-type RE-DERIVE slots (quarantine/process_template). The label columns are BLANKED (CT 30/30, DISC 30/30, FORM 30/30) so the second pass is blind to the first reviewer.'
+  description: 'The classifier ceiling is human-vs-human kappa on the same closed menu, never "100%" (D-277). A second independent human must fill the blank labels using the D-275b content-type decision procedure + the 61-menu discipline + the 4-menu FORM, blind. kappa(coder1, coder2) over these 30 rows is the human ceiling that bounds every downstream accuracy claim. This is a HUMAN GATE: the sheet is prepared, the second pass has not happened.'
+  files:
+  - scripts/prepare_single_coder_sheet.py
+  - governance/SINGLE_CODER_CEILING_SHEET_20260920.csv
+  - governance/SINGLE_CODER_CEILING_PROTOCOL_20260920.md
+- id: D279
+  category: DATA / PROVENANCE
+  state: RESOLVED
+  date: '2026-09-20'
+  title: R1 closed menu + menu_hash + per-axis label provenance columns (D-279)
+  source: pipeline/closed_menu.py
+  verification: 'implemented + end-to-end tested 2026-09-20. pipeline/closed_menu.py renders the canonical closed menu from config (8 content_types incl. none abstention, 4 extraction_types, 62 disciplines, 44 domains) and computes a stable sha256 menu_hash (e8a8b546... after the D-282 re-render; was 25b10c44... before the scope-conflation fix). stage4_merge.py stamps content_type_source/discipline_source/extraction_type_source (all llm_extracted_from_source — the corpus has ZERO human labels, D-277) + menu_hash on every classified FB. stage6_commit.py persists the four columns (CREATE TABLE + migrate + INSERT). Verified: 75 columns == 75 placeholders == 75 bindings; a fresh temp-DB insert round-trips all four values; the FB model accepts the four fields.'
+  description: 'A label is only trustworthy if it is traceable to the exact menu it was classified against (menu_hash) and to who/what stamped it (per-axis *_source). This is the binding prerequisite for min_human_share (F-44), which was unsatisfiable because no label-provenance column existed. none is a first-class abstention value, so the classifier may answer "does not fit" instead of force-fitting. The frozen menu is config/closed_menu_v5.json (+ .sha256); regenerating it after any taxonomy/content-type change is mandatory.'
+  files:
+  - pipeline/closed_menu.py
+  - scripts/render_closed_menu.py
+  - pipeline/stage4_merge.py
+  - pipeline/stage6_commit.py
+  - pipeline/schemas.py
+  - config/closed_menu_v5.json
+  - config/closed_menu_v5.sha256
+- id: D278
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: R5 repair execution — OntoClean definition + include + exclude drafted for the seven weak slots (D-278)
+  source: config/r5_slot_repair.yaml
+  verification: 'drafted 2026-09-20 from ANCHOR-1 (D-276) zero/near-zero-agreement slots. Five discipline slots (design psychology 0/5, cultural studies 0/4, risk management 0/4, behavioral economics 1/4, decision making 1/4) and two content-type slots (quarantine 1/18, process_template 6/16) each get a mandatory definition + include (must-map positives) + exclude (must-NOT-map negatives with the correct sibling target). The two BOUND slots (design thinking, organizational theory) get definition + include + exclude but no re-derive (their definitions were already adequate; their errors are BOUND-on-write, not re-derive).'
+  description: 'Every RE-DERIVE slot is repaired, never demoted (D-277). The exclude set is the OntoClean boundary: each negative names the sibling slot it should map to instead, which turns the prose description into a testable rule that R2 definition NLI can premise on. The definitions OVERRIDE taxonomy_v5.yaml for the weak slots (consumed by pipeline/closed_menu.py and scripts/definition_nli_verify.py). Human ratification of these definitions is the next gate; until then the slots stay BOUND (human review on write).'
+  files:
+  - config/r5_slot_repair.yaml
 - id: D2636
   category: QUALITY / DATA
   state: RESOLVED
@@ -6415,7 +6749,7 @@ decisions:
 
 - id: D273a
   category: RETRIEVAL / VALIDATION
-  state: OPEN
+  state: RESOLVED
   date: '2026-09-19'
   title: Facet predicates must constrain EVERY retrieval leg, not one of three (D-273a)
   source: governance/ONTOLOGY_FORENSIC_20260919.md
@@ -6428,7 +6762,7 @@ decisions:
 
 - id: D273b
   category: TAXONOMY / GOVERNANCE
-  state: OPEN
+  state: RESOLVED
   date: '2026-09-19'
   title: The write guard must exempt DECLARED collisions -- a hard prerequisite for R1 (D-273b)
   source: governance/ONTOLOGY_FORENSIC_20260919.md
@@ -6523,7 +6857,7 @@ decisions:
 
 - id: D274a
   category: RETRIEVAL / VERIFICATION
-  state: OPEN
+  state: RESOLVED
   date: '2026-09-19'
   title: The serving gate must be a function of the verification record, not of content_type (D-274a)
   source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
@@ -6614,7 +6948,7 @@ decisions:
 
 - id: D274h
   category: GOVERNANCE
-  state: OPEN
+  state: RESOLVED
   date: '2026-09-19'
   title: One writer for the serving gate, with an audit stamp on every script that may touch it (D-274h)
   source: governance/ROUNDTABLE_CROSSEXAM_20260919.md
@@ -6626,19 +6960,171 @@ decisions:
   - scripts/repass_pair_agreed.py
   - pipeline/integrity_check.py
 
+- id: D275a
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-19'
+  title: Ruler key inversion — the blind human label is ground truth, the stored label is the artefact under test (D-275a)
+  source: governance/RULER_BLIND_SHEET_20260917.csv
+  verification: 'measured: score_ruler_labels.py treats the stored label as the answer key, but the stored label IS the corrupt free-generated artefact (1,089 raw discipline strings squeezed through a 999-rule alias map into 61 slots). "Stored-label accuracy" therefore measures agreement-with-corruption, not correctness. scripts/rescore_ruler_inverted.py flips the reference and reports error rate. FORM pass: stored error rate 0.253 [0.177, 0.346] on stratum A.'
+  description: 'The ruler cannot be scored against the very artefact it exists to audit. Ruling: (1) the blind human label is ground truth for the rows the reviewer answered; (2) the stored label is the artefact under test; (3) reports are error rate (1 - agreement), never "accuracy"; (4) abstentions (blank + out-of-vocabulary relevance judgements) are kept as abstentions, never imputed; (5) the per-slot reliability table that R5 is decided on is computed from the inverted key only. The stored label is demoted to raw (G9) and never trusted again.'
+  files:
+  - scripts/rescore_ruler_inverted.py
+  - scripts/score_ruler_labels.py
+
+- id: D275b
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Content-type guardrail refinement — procedural intent, not step count (D-275b)
+  source: config/content_types.yaml
+  verification: 'measured: D2587 process_template_min_steps: 2 is necessary but not sufficient — a 3-step causal chain and a 12-category taxonomy both satisfy ">=2 steps" yet are principles, not templates. The inverted-key CT re-score (D-276) measured the bias: stored under-calls quarantine (18→6) and process_template (16→9), over-calls principle (93 vs 89). RATIFIED 2026-09-20 and written into content_types.yaml as content_type_decision_procedure. Clarified (D-277): the stored error rate is a METER (calibration + abstention), never a label-picker.'
+  description: 'The atomic unit is ONE self-contained epistemic claim, not one sentence. The principle/process_template discriminator is procedural intent + done condition ("would you EXECUTE this, or KNOW/APPLY this?"), not step count. FORM is the PRIMARY epistemic commitment of a single-valued axis; secondary commitments live in the body fields. Taxonomy "one or many" is decided by self-containedness: a category becomes its own FB iff its claim is statable without naming the framework. Checklist -> process_template; decision matrix -> inline_gate_content (never standalone). RATIFIED 2026-09-20.'
+  files:
+  - config/content_types.yaml
+  - pipeline/stage4_merge.py
+
+- id: D275c
+  category: MARKET RESEARCH
+  state: RESOLVED
+  date: '2026-09-19'
+  title: System One Models / Jev (TypeSafe AI) — REJECT for the pipeline; ADAPT the calibrated-decision framing (D-275c)
+  source: https://typesafe.ai/blog/introducing-system-one-models-and-jev
+  verification: 'fetched 2026-09-19. Jev is a hosted, paid (input $0.042/MTok), early-access, proprietary API claiming type-safe structured outputs, calibrated confidence, and 2-orders-of-magnitude speedup. Claims are self-reported ("we are skeptics ourselves"), pricing subsidy explicitly unproven, no independent third-party validation.'
+  description: 'REJECT as a pipeline dependency: violates C1 ($0 marginal), C3 (sovereign/local), C2/C4 (vendor lock-in), C22 (local-first). It is a cloud API performing exactly the classification/scoring/verification the local stack (gpt-oss-20b classifier + DeBERTa NLI + serving gate) already does for $0. Maxwell OS is a batch pipeline, so the 70-500ms latency is worthless. ADAPT the framing: "System One" (fast structured decisions + calibrated confidence + typed abstention) independently validates the R1/R2/R10 direction — closed menu + definition NLI + calibrated abstention — which Maxwell OS implements locally. No new dependency.'
+  files: []
+
+- id: D276
+  category: LABEL QUALITY / MEASUREMENT
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Inverted-key re-score across all three axes — stored-label error 0.353 (CT) / 0.474 (DISC) / 0.283 (FORM); 8 zero-agreement discipline slots (D-276)
+  source: governance/ruler_inverted_20260920.json
+  verification: 'measured 2026-09-20 via scripts/rescore_ruler_inverted.py --axis all (150 rows, human=ground truth, stored=under test, D-275a). CT 0.353 [0.281,0.433] (stratum A 0.290); DISC 0.474 [0.386,0.564] (A 0.487); FORM 0.283 [0.216,0.361] (A 0.255). CT confusion: stored under-calls quarantine (human 18 -> stored 6) and process_template (16 -> 9), over-calls principle (93 stored vs 89 human) — the D-275b step-count gap, now measured. DISC group-level near-miss: exact-canonical error 0.430 -> same-group error 0.271, i.e. 29 stored labels land in a DIFFERENT discipline group.'
+  description: 'Confirms the stored free-generated labels are corrupt on all three axes, not just FORM. DISC has 8 zero-agreement slots with n>=2 (design psychology 0/5, cultural studies 0/4, risk management 0/4, privacy & surveillance, political economy, visual perception, finance, cultural design) — the old alias-map extraction silently discards this content into the emerging dump bucket. NOTE (retraction, D-277): zero-agreement measures PIPELINE failure, not necessarily slot badness — the initial DEMOTE dispositions were withdrawn. Corrected R5 scheme: RE-DERIVE + BOUND the weak slots (definition + include + exclude, then human review on write), merge into the parent group only if definitionally inseparable.'
+  files:
+  - governance/anchor1_frozen_20260920.json
+  - governance/anchor1_frozen_20260920.md
+  - scripts/rescore_ruler_inverted.py
+  - scripts/freeze_anchor1.py
+
+- id: D277
+  category: ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-20'
+  title: Three clarifications — R5 is repair-not-demote; raw and canonical are both post-hoc model stamps; the error rate is a meter, not an oracle (D-277)
+  source: governance/anchor1_frozen_20260920.md
+  verification: 'user-forced clarification 2026-09-20. (1) The zero-agreement DISC slots measure PIPELINE failure, not SLOT badness — two distinct causes; the initial DEMOTE vote assumed slot badness without evidence and was withdrawn. (2) The corpus has ZERO human-derived labels: both the raw string and the canonical slot are post-hoc model stamps from the 2-month-old corrupt run, so neither can be "recovered" into truth — the only path is re-derive from source text under a human-κ-bounded procedure. (3) The per-class error rate is a population statistic (a meter) that calibrates confidence and triggers abstention; it carries zero per-object information and must never flip a label.'
+  description: 'R5-as-repair: every discipline slot gets a mandatory definition + include + exclude (OntoClean); measure per-slot κ against ANCHOR-1; BOUND weak slots (human review on write); MERGE only definitionally-inseparable slots into their parent group; never DEMOTE as a first move. Raw and canonical labels are BOTH demoted to provenance (G9) and never trusted for retrieval — re-derive from source segments via R1 closed menu + R2 definition NLI, stamped menu_hash + *_source. Accuracy is reported as agreement-with-human-κ, never "100%"; the classifier abstains (none) below a per-class confidence threshold set from measured error.'
+  files:
+  - config/content_types.yaml
+  - governance/anchor1_frozen_20260920.md
+
+- id: D307
+  category: TAXONOMY
+  state: RESOLVED
+  date: '2026-09-21'
+  title: PART1 B domain normalisation applied; PART1 A premise disproved (no ontology gap)
+  verification: 'PART1 B applied via config/normalization_map.yaml (7 surface variants -> existing canonicals):
+    domain observed agreement 0.3938 -> 0.4385 (mean Jaccard 0.4515 -> 0.4737). PART1 A premise DISPROVED by
+    audit: all 8 nominated gap domains already existed in v5.5, so ZERO slots were added and no kappa re-basing
+    is warranted; the real defect is that the pipeline never SELECTS existing tail slots (assignment/emission,
+    not an ontology gap). PART2 B: all 16 discipline boundary pairs settled DIFFERENT by the owner.'
+  files:
+  - config/normalization_map.yaml
+  - governance/MENU_REPAIR_QUEUE_20260921.md
+  - governance/TAXONOMY_v6_MIGRATION_20260921.md
+- id: D308
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Normalisation map wired into the kappa layer (domain-scoped) + abortive cross-axis leak fixed
+  verification: 'Ablation on identical taxonomy bytes isolates the effect: WITHOUT map domains micro-kappa 0.5765
+    / mean Jaccard 0.4515 / OOV 3; WITH map 0.5931 / 0.4737 / OOV 2 (reproduces both the D-307 baseline and the
+    new figure, so no confound). BUG-325: the map was first merged into the SHARED alias dict, which also rewrote
+    discipline tokens (human-computer interaction -> human computer interaction, rows 25/46) and pushed discipline
+    kappa to 0.4051; now domain-scoped => discipline kappa stays 0.4395 (honest, unchanged). CORRECTED (D-310, S3 audit): slot reachability measured on the whole corpus - knowledge pipeline/maxwell.db 7,995 rows emits ALL 61 discipline and ALL 43 domain slots (min 6 rows, median 85; 13/61 disciplines below 20 rows). The earlier "these slots are never selected" reading came from the contra-stratified 60-row ANCHOR-1 sample (covers only 23/61 disciplines, 33/43 domains), i.e. a sampling artifact, not a global assignment failure. Real signal: 4,696/7,995 rows (58.7%) sit in QUARANTINE and the top-6 disciplines hold 38.2% of the corpus.'
+  files:
+  - scripts/anchor1_kappa.py
+  - config/normalization_map.yaml
+  - governance/anchor1_kappa_20260921.json
+- id: D309
+  category: TAXONOMY
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Taxonomy v6.0 audit marker reverted to v5.5 (phantom version removed, two-sources-of-truth closed)
+  verification: 'scripts/apply_menu_repair_v6.py bumped config/taxonomy_v5.yaml to v6.0 while config/version.yaml
+    and config/pipeline_config.yaml stayed v5.5, and pipeline/pipeline_paths.py stamps TAXONOMY_VERSION (v5.5)
+    onto every FB (R14) via pipeline/stamp.py -> the SAME ontology had two version strings, and any future FB
+    would have been stamped with the stale one (future tax). Forensic check: the 18:30 write was content-safe -
+    the parsed tree is identical to config/taxonomy_v5.yaml.bak_v5_5 apart from the two version strings and two
+    meta keys; the alias/exclude churn visible against git HEAD is the already-documented Sep-20 D-285/D-286/D-289
+    work, not new drift. Since v6 added ZERO slots the honest state is v5.5: version strings reverted, marker kept
+    as meta.menu_repair_20260921_* instead of a phantom version.'
+  files:
+  - config/taxonomy_v5.yaml
+  - governance/TAXONOMY_v6_MIGRATION_20260921.md
+- id: D310
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Assignment-path diagnosis - "the pipeline never selects existing slots" was a sampling artifact
+  verification: 'Whole-corpus measurement (knowledge pipeline/maxwell.db, 7,995 rows, provenance llm_extracted_from_source):
+    ALL 61 discipline and ALL 43 domain slots are emitted (min 6 rows, median 85; 13/61 disciplines below 20 rows);
+    top-6 disciplines hold 38.2%; status QUARANTINE 4,696 (58.7%) / PASS 3,299. The earlier "never emits ai & agents,
+    brand identity, ..." claim came from the contra-stratified 60-row ANCHOR-1 sample (covers 23/61 disciplines,
+    33/43 domains) and is CORRECTED here (the first D-308 text is amended in place). Mechanism: production labels
+    against the FULL closed menu (pipeline/closed_menu.py + stage4_merge menu_hash); candidate_pool/top_k belong to
+    retrieval_benchmark.py, a retrieval benchmark, not the classification path; labels are post-mapped by
+    match_to_canonical. Real assignment defects found by the deterministic meter: 403 FBs with a raw label that has
+    no canonical (BUG-150 class), 354 emerging with empty raw, 147 BOTH-AXES disjointness violations, 703 FBs with no
+    domain, 0 unknown labels. Standing rule: no claim of the form "the pipeline never emits X" may enter a decision
+    record without a whole-corpus measurement.'
+  files:
+  - governance/ASSIGNMENT_PATH_DIAGNOSIS_20260921.md
+  - scripts/audit_full_corpus_labels.py
+- id: D311
+  category: VERIFICATION
+  state: PROPOSED
+  date: '2026-09-21'
+  title: R3 held-out validation pre-registered (adoption blocked until the held-out run is published)
+  verification: 'R3 (agree->accept, disagree->higher-confidence arm) was derived on the 116 human-labelled ruler rows and
+    reached +6.0 pp on those same rows, so D-300 forbids adopting it. Pre-registered now, before any run: held-out set
+    = the 60-row ANCHOR-1 sheet minus the 2 rows that overlap the frozen ruler (n=58), metric = discipline error rate
+    over rows both arms label, bar = beats the incumbent by >= 5.0 absolute pp at equal-or-lower abstention with
+    deterministic decode and the same 61-slot menu; R2 judged by queue size + error on the auto-accepted remainder.
+    Set frozen in governance/ANCHOR1_HELDOUT_SET_20260921.json; nothing is adopted until the arms are re-run on it.'
+  files:
+  - governance/R3_HELDOUT_PREREG_20260921.md
+  - governance/ANCHOR1_HELDOUT_SET_20260921.json
+- id: D312
+  category: VERIFICATION
+  state: PROPOSED
+  date: '2026-09-21'
+  title: Calibrated abstention design - inert config, fail-closed production preserved
+  verification: 'Margin->threshold->repair-queue design documented (governance/ABSTENTION_DESIGN_20260921.md) together with
+    the measured incumbent curve 0.474 -> 0.423 (10%) -> 0.391 (25%) -> 0.328 (50%) and the role-specificity warning
+    (the same sweep on the zero-shot role was flat): abstention is only informative inside the verifier role. Recommended
+    operating point is PROPOSED only (queue budget is the binding constraint). config/verify_abstention.yaml ships
+    enabled: false and no production code reads it, so stage5_verify.py stays fail-closed (D-2298) and zero behaviour
+    changes. Enabling requires a measured curve on the held-out set + a decision row.'
+  files:
+  - config/verify_abstention.yaml
+  - governance/ABSTENTION_DESIGN_20260921.md
 summary:
-  total: 639
-  proposed: 2
+  total: 679
+  proposed: 6
   draft: 1
-  active: 479
+  active: 483
   stale: 0
   superseded: 16
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 81
+  resolved: 116
   planned: 8
-  open: 21
+  ratified: 1
+  open: 17
   by_category:
     ARCH: 27
     ARCH / GOV: 1
@@ -6671,6 +7157,7 @@ summary:
     DAT / OPS: 1
     DATA: 3
     DATA / GOVERNANCE: 1
+    DATA / PROVENANCE: 1
     DATA / QUALITY: 1
     DATA / RELIABILITY: 2
     DATA / TAXONOMY: 2
@@ -6683,7 +7170,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 1
+    GOVERNANCE: 2
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1
@@ -6705,10 +7192,12 @@ summary:
     LABEL QUALITY / ENRICHMENT: 2
     LABEL QUALITY / EXECUTION: 6
     LABEL QUALITY / HUMAN REVIEW: 5
-    LABEL QUALITY / MEASUREMENT: 4
+    LABEL QUALITY / MEASUREMENT: 5
     LABEL QUALITY / PROCEDURE: 1
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
+    MARKET RESEARCH: 1
+    MEASUREMENT: 2
     MEASUREMENT / ANCHOR: 1
     MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1
@@ -6717,6 +7206,7 @@ summary:
     MODEL: 2
     MODELS / RETIREMENT: 1
     OBSERVABILITY / TOOLING: 1
+    ONTOLOGY: 10
     ONTOLOGY / AUDIT: 3
     ONTOLOGY / AUDIT / STRATEGY: 1
     ONTOLOGY / GOVERNANCE: 1
@@ -6726,13 +7216,13 @@ summary:
     ONTOLOGY / SCHEMA: 2
     ONTOLOGY / VERIFICATION: 1
     OPERATIONAL / CANARY: 1
-    OPS: 3
+    OPS: 7
     OPS / AUDIT: 1
     OPS / DATA: 1
-    OPS / PERF: 1
+    OPS / PERF: 2
     OPS / QUALITY: 2
     OPS / RELIABILITY: 10
-    PERF: 11
+    PERF: 14
     PERF / BUGFIX: 1
     PERFORMANCE / DATA INTEGRITY / GOVERNANCE: 1
     PIPELINE / CONTAMINATION: 1
@@ -6746,14 +7236,14 @@ summary:
     QLT / AUDIT: 20
     QLT / DATA: 1
     QLT / PROMPT: 6
-    QUALITY / DATA: 13
+    QUALITY / DATA: 14
     QUALITY / GOLDEN-SET: 12
     QUALITY / GOLDEN-SET / PROMPT: 1
     QUALITY / GOVERNANCE: 3
     QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
     RES: 4
-    RESEARCH: 3
+    RESEARCH: 6
     RESILIENCE / QUALITY: 1
     RETRIEVAL / ONTOLOGY: 6
     RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
@@ -6761,12 +7251,12 @@ summary:
     RETRIEVAL / VERIFICATION: 2
     ROBUSTNESS / QUALITY: 3
     STR: 1
-    TAXONOMY: 4
+    TAXONOMY: 6
     TAXONOMY / GOVERNANCE: 2
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
-    VERIFICATION: 4
+    VERIFICATION: 14
     VERIFICATION / ONTOLOGY: 1
     governance: 1
     pipeline-fix: 2

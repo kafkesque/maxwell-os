@@ -1,0 +1,1291 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-281/D-284",
+  "content_type_hypothesis": "paraphrase",
+  "menu_hash": "cac6e69546f0dd7fe168b9b0c3bdf1b0ca5f2d4e11b102353898720f388e8cf4",
+  "r5_hash": "04fe615a1ab3780e4d75e53951f963d3eeda511ebfa29f5c6c0f6150fc1dbc37",
+  "n_fbs": 40,
+  "n_labels_scored": 95,
+  "n_contra": 14,
+  "n_inference_errors": 0,
+  "results": [
+    {
+      "fb_id": "439b696d1db9261549a7c8e8ad467e26475efe67fd52126c2defb1e6d81d484f",
+      "name": "Safe Withdrawal Rate",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "finance & investment",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of assets, portfolio theory, and financial planning strategies.",
+          "scores": {
+            "entail": 0.5938,
+            "neutral": 0.4025,
+            "contra": 0.0037
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "5f107e9fa210134a6692f87efdcc5ec70e71d6be50fe57d0c1e2eb155a0d0477",
+      "name": "Scarcity-driven Conflict Escalation",
+      "labels": []
+    },
+    {
+      "fb_id": "4a694c0f30f4d7b8733fe89e4b968019ef42e33a37d889781fcc0326f2d2fa0b",
+      "name": "Transgenic Artistic Agency",
+      "labels": []
+    },
+    {
+      "fb_id": "048773f468da7dee4d90fb394a6e83f23382b59390a2f197cb9d09abb88aa403",
+      "name": "Data-driven Pipeline Processing",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "engineering & infrastructure",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of mechanical, aerospace, and distributed cloud computing systems.",
+          "scores": {
+            "entail": 0.0007,
+            "neutral": 0.0195,
+            "contra": 0.9798
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "research & methodology",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design, ethics, and execution of academic and empirical research processes.",
+          "scores": {
+            "entail": 0.005,
+            "neutral": 0.2203,
+            "contra": 0.7748
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "d65345c3fb7ecd5e417b4cb29034db507c756a3009b98a6785056f5afff88d56",
+      "name": "Cultural Resonance in Visual Design",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.8819,
+            "neutral": 0.114,
+            "contra": 0.0041
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "brand identity",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.",
+          "scores": {
+            "entail": 0.0179,
+            "neutral": 0.3446,
+            "contra": 0.6375
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.0179,
+            "neutral": 0.9675,
+            "contra": 0.0146
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0039,
+            "neutral": 0.9869,
+            "contra": 0.0092
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "cff9dec7fba02545aa5784bd067e76476fc904d8254884be49dc85706cf516ab",
+      "name": "Column-alignable Numerals",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "typography",
+          "hypothesis_type": "definition",
+          "hypothesis": "The art and technique of arranging typefaces, spacing, and layout for effective visual communication.",
+          "scores": {
+            "entail": 0.9772,
+            "neutral": 0.0209,
+            "contra": 0.0019
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.9696,
+            "neutral": 0.0289,
+            "contra": 0.0016
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "media & entertainment",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of video games, media technology, and publishing platforms.",
+          "scores": {
+            "entail": 0.0078,
+            "neutral": 0.1904,
+            "contra": 0.8018
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "data visualization",
+          "hypothesis_type": "definition",
+          "hypothesis": "The graphical representation of quantitative data to facilitate understanding and analysis.",
+          "scores": {
+            "entail": 0.5085,
+            "neutral": 0.3157,
+            "contra": 0.1758
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "web & ui",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and architecture of responsive websites and user interface components.",
+          "scores": {
+            "entail": 0.0187,
+            "neutral": 0.5883,
+            "contra": 0.393
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "1a09f3e7d850d79e8f1811588ea0323883ac21b3aa637b9c6318e2f1bde84d61",
+      "name": "Design Thinking Integration",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.0087,
+            "neutral": 0.1065,
+            "contra": 0.8847
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0056,
+            "neutral": 0.8777,
+            "contra": 0.1167
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "entrepreneurship",
+          "hypothesis_type": "definition",
+          "hypothesis": "The process of creating, managing, and scaling new business ventures and startups.",
+          "scores": {
+            "entail": 0.0278,
+            "neutral": 0.9433,
+            "contra": 0.0289
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "ee6e31e4cabd608049ef7c1b7c6d99dcdf8e27d19834c27cd3a84c8b2564c370",
+      "name": "Warren Harding Error",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "psychology",
+          "hypothesis_type": "definition",
+          "hypothesis": "The empirical study of mind and BEHAVIOUR in individuals and groups — emotion, personality, development, social behaviour, and mental health — beyond the computational modelling of cognition. Broader and more behavioural than cognitive science, which models mental PROCESSES as computation.",
+          "scores": {
+            "entail": 0.9848,
+            "neutral": 0.0142,
+            "contra": 0.001
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.0019,
+            "neutral": 0.9946,
+            "contra": 0.0035
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "3ad384b2144fe176a27a4f67bb2c0e38e75e4c5938ecc61b9cc6a7f35a0cc554",
+      "name": "Strategic Restructuring Failure",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "strategic thinking",
+          "hypothesis_type": "definition",
+          "hypothesis": "The high-level planning and long-term goal setting involved in business and organizational management.",
+          "scores": {
+            "entail": 0.9145,
+            "neutral": 0.0819,
+            "contra": 0.0037
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.0108,
+            "neutral": 0.9301,
+            "contra": 0.059
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "organizational behavior",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of human behavior, culture, and psychology within workplace structures.",
+          "scores": {
+            "entail": 0.0592,
+            "neutral": 0.9308,
+            "contra": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "b75965ddd14c57cab2d6990fc2c3106c93878085eb2ab1ba02a1dbd3e112d5e8",
+      "name": "Silence and Recovery in Cultural",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "anthropology",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of human societies, cultures, and their development across time and space.",
+          "scores": {
+            "entail": 0.952,
+            "neutral": 0.0456,
+            "contra": 0.0024
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "4875244b063423b0b9e68f1fedaf0244e342f0e387949edef45e3c7a3a84519e",
+      "name": "Subjective Value Mapping",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business development",
+          "hypothesis_type": "definition",
+          "hypothesis": "Strategic activities focused on market expansion, sales psychology, and revenue generation.",
+          "scores": {
+            "entail": 0.0426,
+            "neutral": 0.9511,
+            "contra": 0.0063
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "brand identity",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.",
+          "scores": {
+            "entail": 0.0232,
+            "neutral": 0.4331,
+            "contra": 0.5437
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.0187,
+            "neutral": 0.9798,
+            "contra": 0.0015
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0029,
+            "neutral": 0.0631,
+            "contra": 0.9339
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "03bd287c98da44f58f2b879292152f5389f9a8610a541bac1ef9e8388535d9c7",
+      "name": "Temporal Typography",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.9845,
+            "neutral": 0.0147,
+            "contra": 0.0008
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "web & ui",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and architecture of responsive websites and user interface components.",
+          "scores": {
+            "entail": 0.0257,
+            "neutral": 0.9651,
+            "contra": 0.0092
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "motion design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The creation of animated visual content, motion graphics, and time-based digital media.",
+          "scores": {
+            "entail": 0.8857,
+            "neutral": 0.1028,
+            "contra": 0.0115
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "711e764ebbfc170211736d42f354be417eb941412f726226b9d19f735148efc7",
+      "name": "Ambiguous Visual Language",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.3776,
+            "neutral": 0.6196,
+            "contra": 0.0028
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.0275,
+            "neutral": 0.967,
+            "contra": 0.0055
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "arts & culture",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice and theory of visual arts, performance, and cultural expression.",
+          "scores": {
+            "entail": 0.2756,
+            "neutral": 0.7152,
+            "contra": 0.0092
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "4dd95d60da33205c8f6d3d6f0c71aa3809de18ee348dd495c621ac9ac5c8981c",
+      "name": "Overexposure Reaction",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "psychology",
+          "hypothesis_type": "definition",
+          "hypothesis": "The empirical study of mind and BEHAVIOUR in individuals and groups — emotion, personality, development, social behaviour, and mental health — beyond the computational modelling of cognition. Broader and more behavioural than cognitive science, which models mental PROCESSES as computation.",
+          "scores": {
+            "entail": 0.9937,
+            "neutral": 0.0057,
+            "contra": 0.0006
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "business development",
+          "hypothesis_type": "definition",
+          "hypothesis": "Strategic activities focused on market expansion, sales psychology, and revenue generation.",
+          "scores": {
+            "entail": 0.0298,
+            "neutral": 0.9685,
+            "contra": 0.0017
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.0134,
+            "neutral": 0.9857,
+            "contra": 0.001
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "education",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of instructional strategies, academic policy, and learning environments.",
+          "scores": {
+            "entail": 0.0041,
+            "neutral": 0.9948,
+            "contra": 0.0011
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "media & entertainment",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of video games, media technology, and publishing platforms.",
+          "scores": {
+            "entail": 0.0023,
+            "neutral": 0.9908,
+            "contra": 0.0069
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0009,
+            "neutral": 0.9983,
+            "contra": 0.0008
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "c92531780920e84181db949216aead424ce8a553b49f640f8ffe82f5114f4229",
+      "name": "Visual Identity Through Form and",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "brand identity",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.",
+          "scores": {
+            "entail": 0.1387,
+            "neutral": 0.8602,
+            "contra": 0.0011
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.25,
+            "neutral": 0.742,
+            "contra": 0.0079
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.42,
+            "neutral": 0.3888,
+            "contra": 0.1912
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "packaging",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of physical containers and structural materials for product protection and presentation.",
+          "scores": {
+            "entail": 0.0191,
+            "neutral": 0.8949,
+            "contra": 0.0859
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "web & ui",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and architecture of responsive websites and user interface components.",
+          "scores": {
+            "entail": 0.0045,
+            "neutral": 0.9882,
+            "contra": 0.0072
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "ffe7033de159e21843918107fbd92e69ea4d41b2a8cc1968b3a30ab8beeb4277",
+      "name": "Black Swan Risk Management",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.0406,
+            "neutral": 0.2272,
+            "contra": 0.7322
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "295f15ec166da1009f86cb3b6b43022dbf4d2f534ba2e7b794216bda5b833c32",
+      "name": "Progressive Disclosure",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.5691,
+            "neutral": 0.4291,
+            "contra": 0.0018
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "engineering practice",
+          "hypothesis_type": "definition",
+          "hypothesis": "The application of software architecture, programming languages, and development methodologies.",
+          "scores": {
+            "entail": 0.0857,
+            "neutral": 0.9123,
+            "contra": 0.002
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.3139,
+            "neutral": 0.685,
+            "contra": 0.0011
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "e76e0f9cba7ca9467b7ed764bc31d72c6fd497e12bd2ea64d9a0c6a8bc6c8231",
+      "name": "Reciprocal Concession",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "psychology",
+          "hypothesis_type": "definition",
+          "hypothesis": "The empirical study of mind and BEHAVIOUR in individuals and groups — emotion, personality, development, social behaviour, and mental health — beyond the computational modelling of cognition. Broader and more behavioural than cognitive science, which models mental PROCESSES as computation.",
+          "scores": {
+            "entail": 0.9956,
+            "neutral": 0.0039,
+            "contra": 0.0005
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "organizational behavior",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of human behavior, culture, and psychology within workplace structures.",
+          "scores": {
+            "entail": 0.0061,
+            "neutral": 0.9933,
+            "contra": 0.0005
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "health & wellness",
+          "hypothesis_type": "definition",
+          "hypothesis": "The promotion of physical, mental, and public health through healthcare systems.",
+          "scores": {
+            "entail": 0.5756,
+            "neutral": 0.4118,
+            "contra": 0.0126
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "a5e4ca052ca9b50301fcccef3d3cc43ae5f91494772de52183883eaea6e5be71",
+      "name": "Integrated Campaign Approach",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business development",
+          "hypothesis_type": "definition",
+          "hypothesis": "Strategic activities focused on market expansion, sales psychology, and revenue generation.",
+          "scores": {
+            "entail": 0.0015,
+            "neutral": 0.9975,
+            "contra": 0.0009
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.1333,
+            "neutral": 0.8034,
+            "contra": 0.0632
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "marketing & communications",
+          "hypothesis_type": "definition",
+          "hypothesis": "Strategic promotion, public relations, and digital marketing for brand engagement.",
+          "scores": {
+            "entail": 0.0143,
+            "neutral": 0.9832,
+            "contra": 0.0025
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "media & entertainment",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of video games, media technology, and publishing platforms.",
+          "scores": {
+            "entail": 0.0013,
+            "neutral": 0.0209,
+            "contra": 0.9778
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "4daf49e05dba763b65f6b68273443b7a524186ac24ac01597a64e68597d03ca9",
+      "name": "Degenerate Solution",
+      "labels": []
+    },
+    {
+      "fb_id": "9b7a458601c89e9bd9cc6f04a66f901d83f43f805c0a2e045c5e5efb1af59a1f",
+      "name": "Information Encoding Through Recursive Patterns",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "engineering practice",
+          "hypothesis_type": "definition",
+          "hypothesis": "The application of software architecture, programming languages, and development methodologies.",
+          "scores": {
+            "entail": 0.0119,
+            "neutral": 0.877,
+            "contra": 0.1112
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "science & research",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of biological, genetic, and statistical scientific disciplines.",
+          "scores": {
+            "entail": 0.0593,
+            "neutral": 0.9321,
+            "contra": 0.0086
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "ai & agents",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and implementation of autonomous artificial intelligence systems and agents.",
+          "scores": {
+            "entail": 0.0268,
+            "neutral": 0.9567,
+            "contra": 0.0165
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "3c93307ff214b13752ff18d7bcbba39e1b1d74d2f0d747d5cf1586aedf9edeae",
+      "name": "Gendered Product Positioning",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "behavioral economics",
+          "hypothesis_type": "definition",
+          "hypothesis": "The DESCRIPTIVE study of how psychological factors and cognitive biases cause systematic deviations from rational choice in ECONOMIC decision-making and MARKET behaviour — where heuristics, framing, and affect change what people CHOOSE (prices, incentives, markets). It describes the bias; it does not exploit it to design persuasion.",
+          "scores": {
+            "entail": 0.7646,
+            "neutral": 0.1414,
+            "contra": 0.094
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "business development",
+          "hypothesis_type": "definition",
+          "hypothesis": "Strategic activities focused on market expansion, sales psychology, and revenue generation.",
+          "scores": {
+            "entail": 0.8812,
+            "neutral": 0.1135,
+            "contra": 0.0053
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.0487,
+            "neutral": 0.9443,
+            "contra": 0.007
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0126,
+            "neutral": 0.6148,
+            "contra": 0.3725
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "packaging",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of physical containers and structural materials for product protection and presentation.",
+          "scores": {
+            "entail": 0.1216,
+            "neutral": 0.7166,
+            "contra": 0.1618
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "9a5e3b097db596e4c2c9a12555adedb95709a45e0b0d283affb94c4dcbce2f58",
+      "name": "Infrastructure As Cultural Medium",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "engineering practice",
+          "hypothesis_type": "definition",
+          "hypothesis": "The application of software architecture, programming languages, and development methodologies.",
+          "scores": {
+            "entail": 0.0257,
+            "neutral": 0.6545,
+            "contra": 0.3199
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "432ef5174835c5d4986f52f53e89174c43fa4f07639ee4494f8001ce7f0579d2",
+      "name": "Visual Structuring Focus",
+      "labels": []
+    },
+    {
+      "fb_id": "331728d82e9efdc8afb9a8dd9d14400bd5127a83db728d50fd6f87bef6ed2a05",
+      "name": "Critical Mass Threshold",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.0491,
+            "neutral": 0.9215,
+            "contra": 0.0294
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "ce7d5b693ee65d8f89d9ab529fedef7182282be39dd38fed300db027fbce6c3e",
+      "name": "Transformer Neural Network Architecture",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "machine learning",
+          "hypothesis_type": "definition",
+          "hypothesis": "The field of artificial intelligence focused on algorithms that learn patterns from data.",
+          "scores": {
+            "entail": 0.0737,
+            "neutral": 0.9237,
+            "contra": 0.0025
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "science & research",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of biological, genetic, and statistical scientific disciplines.",
+          "scores": {
+            "entail": 0.9417,
+            "neutral": 0.049,
+            "contra": 0.0093
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "engineering & infrastructure",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of mechanical, aerospace, and distributed cloud computing systems.",
+          "scores": {
+            "entail": 0.003,
+            "neutral": 0.0789,
+            "contra": 0.9181
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "c723281e03b114b85087b89e01cd7017d8badd8052078c8e2d69a472abed70d0",
+      "name": "Stranger Engagement As Creative Practice",
+      "labels": []
+    },
+    {
+      "fb_id": "6870334eaeaf7eb30f4593d42afa0ee911913d97b2eb1b349f19e2b0d935b89b",
+      "name": "Prompt Stability and Consistency",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "machine learning",
+          "hypothesis_type": "definition",
+          "hypothesis": "The field of artificial intelligence focused on algorithms that learn patterns from data.",
+          "scores": {
+            "entail": 0.0029,
+            "neutral": 0.9966,
+            "contra": 0.0005
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "engineering practice",
+          "hypothesis_type": "definition",
+          "hypothesis": "The application of software architecture, programming languages, and development methodologies.",
+          "scores": {
+            "entail": 0.7811,
+            "neutral": 0.2092,
+            "contra": 0.0097
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "engineering & infrastructure",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of mechanical, aerospace, and distributed cloud computing systems.",
+          "scores": {
+            "entail": 0.0068,
+            "neutral": 0.9705,
+            "contra": 0.0227
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "1c76183ddce82c9c2a0f2c0301a3d23b07fb7f4ac4dc5c70bcf97ea34af0bc4c",
+      "name": "Narrative Grammar Universality",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "arts & culture",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice and theory of visual arts, performance, and cultural expression.",
+          "scores": {
+            "entail": 0.0562,
+            "neutral": 0.0794,
+            "contra": 0.8645
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.8527,
+            "neutral": 0.1281,
+            "contra": 0.0192
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "education",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of instructional strategies, academic policy, and learning environments.",
+          "scores": {
+            "entail": 0.3986,
+            "neutral": 0.5741,
+            "contra": 0.0273
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "2dbd4ffa74bfd6a627ac0b5e601fff4862c6a7e0fca4c31d5e9d36382a5ce8d1",
+      "name": "Disorienting Ai Era",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "legal & public policy",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of law, public administration, and regulatory policy frameworks.",
+          "scores": {
+            "entail": 0.0083,
+            "neutral": 0.9745,
+            "contra": 0.0172
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.0154,
+            "neutral": 0.9794,
+            "contra": 0.0052
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "7240763c2949fde523f2b2aa18a9490adeeb2a1f853b8ab45f968c2810d91583",
+      "name": "Recursive Structural Generation",
+      "labels": []
+    },
+    {
+      "fb_id": "10c02e27d49c72149031162322fca6ef104310df45646ebffb6cfb41c014ca0f",
+      "name": "Simulacrum-driven Reality Tv",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "media studies",
+          "hypothesis_type": "definition",
+          "hypothesis": "The academic analysis of media forms, technologies, and their social and cultural impacts.",
+          "scores": {
+            "entail": 0.9773,
+            "neutral": 0.0216,
+            "contra": 0.0011
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "59bde2571376547a38555c289555db245ab3348bd29147932479a3cef944b471",
+      "name": "Displacement-driven Innovation",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "digital product",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and development of user interfaces and experiences for software applications.",
+          "scores": {
+            "entail": 0.0603,
+            "neutral": 0.8525,
+            "contra": 0.0872
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.3831,
+            "neutral": 0.3558,
+            "contra": 0.2611
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "a218e4795b08490d9ac3f0b7e8c9428fcccd9775ecb1864fc73b0d5b35d4f8cc",
+      "name": "Semantic Component Alignment",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.8124,
+            "neutral": 0.1827,
+            "contra": 0.005
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.7907,
+            "neutral": 0.2038,
+            "contra": 0.0055
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "semiotics & communication",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of signs, symbols, and visual rhetoric in human communication.",
+          "scores": {
+            "entail": 0.5705,
+            "neutral": 0.4269,
+            "contra": 0.0026
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "3588f7a858099febe75f63a6cb76a9cad73a9369bac0e7b5e6560c996145358b",
+      "name": "True Cost Accounting",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.6693,
+            "neutral": 0.2742,
+            "contra": 0.0565
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "legal & public policy",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of law, public administration, and regulatory policy frameworks.",
+          "scores": {
+            "entail": 0.3152,
+            "neutral": 0.6768,
+            "contra": 0.008
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "1ffa86cd04855a4819a04a4e9e81a7b5a11f0c81769e23e8277521e12f1a07d0",
+      "name": "Dadaist Visual-form Experimentation",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "cultural design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The historical and theoretical analysis of design practices, aesthetics, and their cultural significance.",
+          "scores": {
+            "entail": 0.9593,
+            "neutral": 0.0386,
+            "contra": 0.0021
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.9916,
+            "neutral": 0.0072,
+            "contra": 0.0012
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "arts & culture",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice and theory of visual arts, performance, and cultural expression.",
+          "scores": {
+            "entail": 0.9773,
+            "neutral": 0.0191,
+            "contra": 0.0036
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "3d20d7f4af164dbb8dc6fd6467197d23e0933801278e041d66bd4b05eec75406",
+      "name": "Digital Font Evolution",
+      "labels": [
+        {
+          "axis": "discipline",
+          "label": "typography",
+          "hypothesis_type": "definition",
+          "hypothesis": "The art and technique of arranging typefaces, spacing, and layout for effective visual communication.",
+          "scores": {
+            "entail": 0.9774,
+            "neutral": 0.0146,
+            "contra": 0.008
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.9741,
+            "neutral": 0.0237,
+            "contra": 0.0022
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.5558,
+            "neutral": 0.3166,
+            "contra": 0.1276
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "web & ui",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and architecture of responsive websites and user interface components.",
+          "scores": {
+            "entail": 0.0011,
+            "neutral": 0.0079,
+            "contra": 0.991
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "a4321e3c5caddfe145747efeb06a399f180c795238fb51d7e576d8d01d1174aa",
+      "name": "Customer-centric Organizational Design",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "user experience",
+          "hypothesis_type": "definition",
+          "hypothesis": "The study of user behavior, research, and interaction design for digital products.",
+          "scores": {
+            "entail": 0.0123,
+            "neutral": 0.9831,
+            "contra": 0.0045
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "business operations",
+          "hypothesis_type": "definition",
+          "hypothesis": "The management of internal processes, accounting, and administrative functions within organizations.",
+          "scores": {
+            "entail": 0.0008,
+            "neutral": 0.0202,
+            "contra": 0.979
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "b378e69dee6eee26ac6452979d2343366118d9d84ee1a57eddbd64d9a99e33a5",
+      "name": "Ethical Responsibility in Graphic Design",
+      "labels": [
+        {
+          "axis": "domains",
+          "label": "graphic design",
+          "hypothesis_type": "definition",
+          "hypothesis": "The practice of visual communication through layout, typography, and print media composition.",
+          "scores": {
+            "entail": 0.9852,
+            "neutral": 0.0136,
+            "contra": 0.0012
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "editorial & advertising",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+          "scores": {
+            "entail": 0.0764,
+            "neutral": 0.9211,
+            "contra": 0.0025
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "brand identity",
+          "hypothesis_type": "definition",
+          "hypothesis": "The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.",
+          "scores": {
+            "entail": 0.6496,
+            "neutral": 0.345,
+            "contra": 0.0053
+          }
+        },
+        {
+          "axis": "domains",
+          "label": "packaging",
+          "hypothesis_type": "definition",
+          "hypothesis": "The design of physical containers and structural materials for product protection and presentation.",
+          "scores": {
+            "entail": 0.0049,
+            "neutral": 0.0429,
+            "contra": 0.9522
+          }
+        }
+      ]
+    },
+    {
+      "fb_id": "231ecc4e6d8abc92e583d8392f74f37ee988b2c228c5b51e4c7f076c6f324fd6",
+      "name": "High-stakes Brand Approval",
+      "labels": []
+    }
+  ]
+}

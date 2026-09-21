@@ -1,0 +1,12 @@
+# ANCHOR-1 blind review — valid labels (menu reference)
+
+menu_hash: `73597ee2b1bb1eb9…`
+
+## content_type (pick ONE)
+`growth_edge`, `noise_drop`, `none`, `principle`, `process_instance`, `process_template`, `quarantine`, `tool_instruction`
+
+## discipline (pick ONE)
+`aesthetics`, `anthropology`, `artificial intelligence`, `behavioral economics`, `cognitive science`, `color theory`, `communication theory`, `complex adaptive systems`, `computational geometry`, `computational physics & simulation`, `computational theory`, `computer graphics`, `creative coding`, `creative process`, `cultural design`, `cultural studies`, `decision making`, `design psychology`, `design thinking`, `ecology`, `economics`, `emerging`, `engineering`, `evolutionary biology`, `finance`, `game design`, `generative ai`, `generative design`, `health & medicine`, `human-computer interaction`, `information retrieval`, `information science`, `information security`, `interdisciplinary studies`, `law`, `linguistics`, `literary theory`, `machine learning`, `media studies`, `motion & time`, `neuroscience`, `operations research`, `organizational theory`, `performing arts`, `philosophy`, `political economy`, `privacy & surveillance`, `psychology`, `research methodology`, `risk management`, `robotics`, `semiotics`, `social network analysis`, `sociology`, `software engineering`, `strategic thinking`, `systems engineering`, `systems thinking`, `theoretical physics`, `typography`, `visual perception`, `visual semiotics`
+
+## domains (pick 1–5, comma-separated)
+`ai & agents`, `arts & culture`, `brand identity`, `business development`, `business operations`, `code & computation`, `computational art`, `computational science & physics`, `creative technology`, `data visualization`, `design strategy`, `design systems`, `digital product`, `editorial & advertising`, `education`, `emerging`, `engineering & infrastructure`, `engineering practice`, `entrepreneurship`, `environmental design`, `finance & investment`, `graphic design`, `health & wellness`, `illustration`, `industrial design`, `information architecture`, `leadership`, `legal & public policy`, `marketing & communications`, `media & entertainment`, `motion design`, `organizational behavior`, `packaging`, `personal productivity`, `product design`, `project management`, `research & methodology`, `science & research`, `semiotics & communication`, `social sciences`, `systems & frameworks`, `urban planning`, `user experience`, `web & ui`

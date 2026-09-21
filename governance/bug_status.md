@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**69 open** / 35 closed of 104 ids.
+**67 open** / 37 closed of 104 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -74,5 +74,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-354 | (MED — OPEN): the shared resolver rejects the catch-all on BOTH axes | 1 |
 | BUG-355 | (MED — OPEN): one surface string, two canonicals — and a dead entry in the domain block of normalization_map | 2 |
 | BUG-356 | (LOW — OPEN): the repair queue's own "Next:" line is stale and hides the real next action | 1 |
-| BUG-357 | (MED — OPEN): the `behavioral economics` definition is narrower than its operational denotation | 1 |
-| BUG-358 | (LOW — OPEN): `config/verify_abstention.yaml` cites a repair queue that does not exist | 1 |

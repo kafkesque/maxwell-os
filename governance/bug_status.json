@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 104,
-  "open_n": 69,
-  "closed_n": 35,
+  "open_n": 67,
+  "closed_n": 37,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -342,16 +342,6 @@
       "id": "BUG-356",
       "title": "(LOW \u2014 OPEN): the repair queue's own \"Next:\" line is stale and hides the real next action",
       "events": 1
-    },
-    {
-      "id": "BUG-357",
-      "title": "(MED \u2014 OPEN): the `behavioral economics` definition is narrower than its operational denotation",
-      "events": 1
-    },
-    {
-      "id": "BUG-358",
-      "title": "(LOW \u2014 OPEN): `config/verify_abstention.yaml` cites a repair queue that does not exist",
-      "events": 1
     }
   ],
   "closed": [
@@ -389,6 +379,8 @@
     "BUG-346",
     "BUG-347",
     "BUG-348",
-    "BUG-350"
+    "BUG-350",
+    "BUG-357",
+    "BUG-358"
   ]
 }

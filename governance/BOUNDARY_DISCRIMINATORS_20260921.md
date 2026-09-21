@@ -207,3 +207,7 @@ Two ways out — the owner's call, and note that **neither moves a menu slot** (
   the sheet's BE class has one member and the nudge / social-norms family has no home in the menu.
 
 Logged as **BUG-357**. Until the owner rules, 24′/26′ are *drafts*, and nothing is wired into any prompt.
+
+### Provenance update (2026-09-21, D-321)
+
+`config/taxonomy_v5.yaml` moved `8d3c90e9…` -> `994e056b5e04ef1f37d350c0faae87e344da5cf85da2e405a8825d1f8f840312` (**v5.5 -> v5.6**) because the owner ruled option (i): the `behavioral economics` `definition:` was widened (BUG-357). The other three pins in the table above are unchanged. **24′/26′ are now the definition of record** and may be wired into the S4 prompt; the rejected tests stay struck.

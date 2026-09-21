@@ -554,3 +554,21 @@ BUG-355 is PARTIALLY FIXED, not closed.
 
 **Not done, by design:** nothing wired into the S4 classifier prompt; no menu slot added; no canonical
 renamed; `config/taxonomy_v5.yaml` bytes unchanged; `arm_typed_head` still a stub.
+
+### Session 13b — three owner approvals executed (2026-09-21 22:0xZ)
+
+| owner decision | state |
+|---|---|
+| widen the `behavioral economics` definition | **DONE (D-321)** — BUG-357 FIXED at the source; `taxonomy_v5.yaml` v5.6, sha `994e056b…`; 0 slots added; menu pin unchanged; row-60 effect predicted, not yet measured |
+| laya-mlx, my recommendation (Phase A only) | **DONE (D-322)** — `.venv_laya`, `laya-mlx 0.1.0`, menu accepted as 62 criteria, pins live in `config/bakeoff_laya.yaml`; Phase B remains blocked on a second coder (F-11) |
+| repair_queue, my recommendation (declare, do not create) | **DONE (D-323)** — BUG-358 CLOSED; contract declared, no empty queue file |
+
+**RATIFY (one word each, if you disagree):** (a) the **v5.6 version bump** that rode along with the definition
+widening — required so two emission behaviours do not share one stamp (R14); (b) `config/bakeoff_laya.yaml`
+and the `.venv_laya` sandbox as declared.
+
+**Bug register:** cite `governance/bug_status.json` (BUG-349: not restated in handoffs).
+
+**Still not done, by design:** nothing wired into the S4 classifier prompt yet; items 17-23 and 25 of Part B
+are silently accepted unless rejected; Part C (adopt `default_home` + escape instead of per-pair name rules)
+is still unanswered.

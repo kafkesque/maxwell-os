@@ -1,5 +1,5 @@
-version: v5.5
-classification_version: v5.5
+version: v5.6
+classification_version: v5.6
 groups:
   domain:
   - Visual Practice
@@ -1153,11 +1153,7 @@ disciplines:
   - behavioral analysis
   - Consumer Behavior
   - behavioural economics
-  definition: The descriptive study of how psychological factors and cognitive biases
-    cause systematic deviations from rational choice in economic decision-making and
-    market behavior — where heuristics, framing, and affect change what people choose
-    (prices, incentives, markets). It describes the bias; it does not exploit it to
-    design persuasion.
+  definition: The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion.
   exclude:
   - economics
   - psychology
@@ -2187,3 +2183,9 @@ meta:
     so NO slot was added and the version is NOT bumped; the v6.0 string was an audit marker
     written by scripts/apply_menu_repair_v6.py and reverted by D-309. Ontology bytes are
     unchanged from v5.5 (see governance/TAXONOMY_v6_MIGRATION_20260921.md).'
+  be_definition_widened_20260921:
+    decision: D-321
+    slots_added: 0
+    denotation_not_spelling: true
+    sha256_before: 8d3c90e949ab1988e097c9fc58c80b6f4279477c9651436dddf4d8ffa91d3ae0
+    note: 'behavioral economics definition widened to name the mechanism class (heuristics, framing, affect, social norms, peer influence) and the second object class (behavior-change interventions); excludes unchanged; fixes BUG-357 (row 60).'

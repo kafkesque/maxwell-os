@@ -106,3 +106,4 @@ checkpoint.jsonl.depth.json
 
 # Stray root-level SQLite (real DB lives in "knowledge pipeline/maxwell.db")
 maxwell.db
+.venv_laya/

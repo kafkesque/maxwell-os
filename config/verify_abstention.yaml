@@ -6,5 +6,12 @@ axis: discipline
 margin_metric: percent_rank   # pairwise verifier margin
 t_low_percentile: 25          # PROPOSED (t=-0.006, error 0.391) - inert while enabled: false
 t_high_percentile: 10         # PROPOSED (t=-0.053) - accept + flag
-repair_queue: governance/REPAIR_QUEUE.md
+# BUG-358: the path below was cited but never existed, and cannot exist until a writer does.
+repair_queue: null                    # NOT MATERIALISED - do not create an empty queue file
+repair_queue_contract:                # the contract the writer must satisfy when abstention is enabled
+  write_path: governance/abstention_repair_queue.jsonl
+  format: jsonl
+  append_only: true
+  dedup_key: fb_id                    # ABSTENTION_DESIGN open item 3 (overlap with arbitration)
+  owner: TBD-OWNER-GATE               # capacity + routing owner is the binding constraint, not the path
 measured_curve_ref: governance/ABSTENTION_DESIGN_20260921.md

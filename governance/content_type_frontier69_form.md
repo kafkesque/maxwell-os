@@ -14,8 +14,8 @@
   instruction or micro-method is NOT a template.
 - **Q2 — reusable matrix/methodology with NO explicit steps** → route to `principle`
   (extraction_type `descriptive_model`), not process_template.
-- **Q3 — single transferable prescriptive claim** (one-sentence heuristic that acts as a filter
-  across 3+ domains, OR a deep single-domain principle) → `principle`.
+- **Q3 — single transferable prescriptive claim** (one-sentence heuristic that is a self-contained
+  filter at ANY scope — depth is the separate axis, never a role test) → `principle`.
 - **descriptive / historical summary** (no prescriptive filter, no template, no named
   method-execution) → `noise_drop`.
 - **named method-execution** (a case of a repeatable method, e.g. a specific study/project) →

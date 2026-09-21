@@ -316,7 +316,12 @@ book_library:
 # Read governance/SESSION-HANDOFF-2026-09-19.md FIRST, then CONTEXT_INDEX.md §6e, then
 # governance/ROUNDTABLE_CROSSEXAM_20260919.md.
 current_state:
-    date: 2026-09-19
+    date: 2026-09-21
+    # 2026-09-21 (D-290..D-296): M1 Max / oMLX 0.7 / goose runtime optimisation (parallel to R2/ANCHOR).
+    # Phase 0 DONE (goose UI core-steal fixed via com.electron.goose defaults). Phase 1: pin oMLX dev2,
+    # enable MTP for Qwen3-Coder S2, re-assert D2460 no-cache (live settings.json has thrash flags),
+    # oQ4e A/B, switch goose active_provider off custom_deepseek→maxwell_omlx, bakeoff script drafted.
+    # Read governance/MARKET_RESEARCH_20260921.md first. Hard limits (M1 Max): NAX, neural accel, CED, Cluster v2, Apple AFM.
     critical_finding: >
         BUG-299 / D-274a — the serving gate is a LABEL, not a verification verdict.
         scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle'

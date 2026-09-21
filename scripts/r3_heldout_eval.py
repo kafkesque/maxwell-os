@@ -4,8 +4,8 @@
 R3 (from D-306) claims that combining the incumbent pairwise verifier with the LLM labeler beats the
 incumbent. It was DERIVED on the 116 human-labelled ruler rows, so D-300 forbids adopting it there;
 this script scores the pre-registered combine rules on the 58-row held-out set frozen in
-`governance/ANCHOR1_HELDOUT_SET_20260921.json` (D-311) using the per-arm artifact produced by
-`scripts/bakeoff_typed_decision.py --source anchor1`.
+`governance/ANCHOR2_HELDOUT_SET_20260921.json` (D-311) using the per-arm artifact produced by
+`scripts/bakeoff_typed_decision.py --source anchor2`.
 
 C12: every path, arm name, rule name, threshold and margin scale comes from
 `config/eval_integrity.yaml` (bakeoff.arbitration / bakeoff.sources.<source>). Nothing is hardcoded.
@@ -13,7 +13,7 @@ D-275a: errors are reported as ERROR RATES, never as "accuracy".
 
 Usage:
   python3 scripts/r3_heldout_eval.py                      # uses bakeoff.arbitration.source
-  python3 scripts/r3_heldout_eval.py --source anchor1 --artifact governance/....json
+  python3 scripts/r3_heldout_eval.py --source anchor2 --artifact governance/....json
 """
 from __future__ import annotations
 

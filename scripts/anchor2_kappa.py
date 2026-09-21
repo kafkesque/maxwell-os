@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""ANCHOR-1 per-axis kappa + disagreement/repair queue (R2 annotation vs pipeline labels).
+"""ANCHOR-2 per-axis kappa + disagreement/repair queue (R2 annotation vs pipeline labels).
 
-Reads the human-annotated 60-row ANCHOR-1 adjudication sheet (discipline_verdict,
+Reads the human-annotated 60-row ANCHOR-2 adjudication sheet (discipline_verdict,
 domains_verdict) and the pipeline-label key, then reports chance-corrected agreement
 per axis (D-275a: report ERROR RATE / kappa, never "accuracy") plus a per-row repair queue.
 
@@ -9,12 +9,12 @@ Deterministic measurement script, no generation. Vocabulary + alias resolution c
 config/taxonomy_v5.yaml (C12: no hardcoded vocabulary).
 
 Outputs:
-  governance/anchor1_kappa_20260921.json   machine-readable (kappa, per-row verdicts, queue)
-  governance/anchor1_kappa_20260921.md     human-readable summary + repair queue
+  governance/anchor2_kappa_20260921.json   machine-readable (kappa, per-row verdicts, queue)
+  governance/anchor2_kappa_20260921.md     human-readable summary + repair queue
 
 Usage:
-  python3 scripts/anchor1_kappa.py            # write artifacts
-  python3 scripts/anchor1_kappa.py --check    # exit 1 if any human label is out-of-vocabulary
+  python3 scripts/anchor2_kappa.py            # write artifacts
+  python3 scripts/anchor2_kappa.py --check    # exit 1 if any human label is out-of-vocabulary
 """
 from __future__ import annotations
 
@@ -26,11 +26,11 @@ import statistics
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SHEET = ROOT / "governance" / "ANCHOR1_BLIND_SHEET_20260920.csv"
-KEY = ROOT / "governance" / "ANCHOR1_KEY_20260920.json"
+SHEET = ROOT / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv"
+KEY = ROOT / "governance" / "ANCHOR2_KEY_20260920.json"
 TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
-OUT_JSON = ROOT / "governance" / "anchor1_kappa_20260921.json"
-OUT_MD = ROOT / "governance" / "anchor1_kappa_20260921.md"
+OUT_JSON = ROOT / "governance" / "anchor2_kappa_20260921.json"
+OUT_MD = ROOT / "governance" / "anchor2_kappa_20260921.md"
 AXES = ("discipline", "domains", "content_type")
 
 
@@ -210,7 +210,7 @@ def main() -> int:
     OUT_JSON.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
 
     a = report["axes"]
-    lines = ["# ANCHOR-1 per-axis agreement (60-row R2 adjudication sheet)", "",
+    lines = ["# ANCHOR-2 per-axis agreement (60-row R2 adjudication sheet)", "",
              "Sheet: " + report["sheet"] + "  vs  pipeline key: " + report["key"] +
              "  (n=" + str(report["n_rows"]) + ").",
              "D-275a: report chance-corrected agreement and error rate, never 'accuracy'.", "",

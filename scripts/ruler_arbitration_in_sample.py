@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "governance" / "bakeoff_typed_decision_20260921.json"
 FROZEN = ROOT / "governance" / "anchor1_frozen_20260920.json"
-OUT = ROOT / "governance" / "anchor1_arbitration_20260921.json"
+OUT = ROOT / "governance" / "ruler_arbitration_in_sample_20260921.json"
 
 
 def load_truth() -> dict[str, str]:

@@ -290,7 +290,7 @@ The model hint is NON-BINDING — your judgment wins.
 **MODEL hint (non-binding):** `growth_edge` (confidence: `medium`) — Empirical pattern, no isolated cause-effect
 
 - [ ] **AGREE** → `growth_edge`
-- [ ] **DISAGREE** → correct label: `principle`. The model flags this as an empirical pattern. However, the nonlinear fragility of large/complex systems to exogenous shocks is a well-established principle in systems dynamics and complexity theory. It passes the depth test across domains.
+- [ ] **DISAGREE** → correct label: `principle`. The model flags this as an empirical pattern. However, the nonlinear fragility of large/complex systems to exogenous shocks is a well-established principle in systems dynamics and complexity theory. It is a transferable principle across domains (depth is a separate axis, not a role test).
 
 ---
 

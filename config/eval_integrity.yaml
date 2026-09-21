@@ -328,9 +328,10 @@ bakeoff:
   #    definition; a source is never inferred from a filename — a run names it. ─────────────────────
   active_source: ruler
   sources:
-    anchor1:                              # R3 held-out adjudication source (D-311 pre-registration)
-      sheet: governance/ANCHOR1_BLIND_SHEET_20260920.csv
-      key: governance/ANCHOR1_KEY_20260920.json
+    anchor2:                              # ANCHOR-2 (renamed 2026-09-21 from 'anchor1'; bytes unchanged) - R3 held-out adjudication source (D-311)
+      legacy_names: [anchor1]             # name collision fix 2026-09-21: the 60-row set is ANCHOR-2; ANCHOR-1 = the 150-row ruler
+      sheet: governance/ANCHOR2_BLIND_SHEET_20260920.csv
+      key: governance/ANCHOR2_KEY_20260920.json
       key_shape: by_fb_id                 # key is {fb_id: {pipeline_*}} — NOT key['rows']
       truth_from: sheet                   # human verdicts live on the SHEET; pipeline labels in the key
       row_id_column: fb_id
@@ -345,9 +346,9 @@ bakeoff:
       include_catch_all: true             # taxonomy meta.catch_all_discipline is a LEGAL verdict slot
       normalize_through_menu: true        # truth AND stored labels map onto the closed menu
       exclude_rows_without_truth: true    # an unlabelled row cannot be scored (D-275a)
-      row_allowlist_file: governance/ANCHOR1_HELDOUT_SET_20260921.json
+      row_allowlist_file: governance/ANCHOR2_HELDOUT_SET_20260921.json
       row_allowlist_field: heldout_fb_ids # n=58 pre-registered held-out rows
-      output: governance/bakeoff_typed_decision_anchor1_20260921.json
+      output: governance/bakeoff_typed_decision_anchor2_20260921.json
   arbitration:                            # D-300/D-311: pre-registered combine rules (R1-R4)
     incumbent_arm: pairwise
     challenger_arm: qwen3coder
@@ -358,5 +359,5 @@ bakeoff:
       r2: agree_accept_disagree_human_queue
       r3: agree_accept_disagree_higher_margin
       r4: agree_accept_disagree_challenger_if_conf_at_least_floor
-    source: anchor1
+    source: anchor2
     report: governance/r3_heldout_20260921.json

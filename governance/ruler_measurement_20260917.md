@@ -1,5 +1,10 @@
 # RULER MEASUREMENT (2026-09-17)
 
+> **⚠️ SUPERSEDED (D-275a / A5, 2026-09-20).** This report treats the STORED label as the answer key,
+> so its "0.740 / 0.506 / 0.831" figures measure *agreement with corruption*, not correctness. Read the
+> inverted-key re-score instead: `governance/ruler_inverted_20260920.md` (stored error CT 0.353 /
+> DISC 0.474 / FORM 0.283) and `governance/anchor1_frozen_20260920.md` (frozen ground truth + R5 slot vote).
+
 The certified core: 150 blind-human-answered rows (100 proportional + 50 forced-minority).
 
 Reviewer: human | sheet: RULER_BLIND_SHEET_20260917.csv

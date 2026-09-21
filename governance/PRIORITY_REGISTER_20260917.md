@@ -4,6 +4,14 @@ Ranked by **consequence**, not by effort or recency. Each row names what it unbl
 required. Companion to ROUNDTABLE_CROSSEXAM_20260919.md (which re-ordered the programme),
 SEQUENCE_STATUS_20260917.md (which records the rulings) and CONTEXT_INDEX.md (the recall map).
 
+> **WHAT CHANGED ON 2026-09-19 (later session).** **0a/0b/0c are DONE.** 0a: `scripts/apply_serving_gate.py`
+> is the single writer for `status` (from `verification_results[factual].passed` + typed `s5_reason`, new
+> `fbs.s5_reason` column) — PASS 4,745 → 3,299 (de-served 1,941 + 11 duplicates; restored 506); CI invariant
+> 0 violations; duplicates hard-quarantined. 0b: facet predicate in every retrieval leg + asserted on the
+> fused pool — constraint-violation rate **0.5911 → 0.0000**. 0c: write guard split (row guard vs vocabulary
+> lint) — `research methodology` writes clean. Also closed **BUG-276** (DB backup) and **BUG-302** (status
+> writers routed through the serving gate). **Item 1 (G19) is now #1.**
+
 > **WHAT CHANGED ON 2026-09-19.** G4 — "certify the ruler" — was #1 and is **DONE** (150 blind human labels).
 > The ruler then surfaced a defect that outranks every item on the previous list: **the serving gate is a
 > label, not a verification verdict** (BUG-299 / D-274a). 4,745/4,745 PASS rows are content_type='principle';
@@ -13,9 +21,9 @@ SEQUENCE_STATUS_20260917.md (which records the rulings) and CONTEXT_INDEX.md (th
 
 | # | item | type | unblocks | human? | effort |
 |---|---|---|---|---|---|
-| **0a** | **G17 — make status a function of the verification record** (one writer; typed s5_reason; label-derived writes become hard errors; CI invariant PASS ⟹ factual.passed). Measured effect: serving set **4,745 → 3,310**; de-serves 1,941 rows (138 NLI CONTRA-majority, 1,514 NEUTRAL, 278 evidence-flagged, 11 MECH/artifact); restores 506 verified rows. Deletes nothing (R-D410) | task | **everything measurable** — every retrieval number, every label accuracy claim, every benchmark frame | no | ~1 day |
-| **0b** | **G12 — the facet predicate in EVERY leg + asserted on the fused pool**; delete/rewrite the query-blind keyword leg (retrieve.py:123 has no query param, :363-370 calls it only when a facet is present, :411-415 cuts the rerank pool from the fused list) | task | correctness of facet-constrained retrieval; the whole chunk/embedding roadmap | no | ~1.5 days |
-| **0c** | **G18 — SPLIT the write guard** (row-level guard vs vocabulary lint) — replaces the G13 exemption list | task | R1; and the 261 research-methodology rows currently destroyed at the write boundary | no | ~0.5 day |
+| **0a ✅ DONE** | **G17 — make status a function of the verification record** (one writer; typed s5_reason; label-derived writes become hard errors; CI invariant PASS ⟹ factual.passed). Measured effect: serving set **4,745 → 3,310**; de-serves 1,941 rows (138 NLI CONTRA-majority, 1,514 NEUTRAL, 278 evidence-flagged, 11 MECH/artifact); restores 506 verified rows. Deletes nothing (R-D410) | task | **everything measurable** — every retrieval number, every label accuracy claim, every benchmark frame | no | ~1 day |
+| **0b ✅ DONE** | **G12 — the facet predicate in EVERY leg + asserted on the fused pool**; keyword leg made query-aware | task | correctness of facet-constrained retrieval; the whole chunk/embedding roadmap | no | done |
+| **0c ✅ DONE** | **G18 — SPLIT the write guard** (row-level guard vs vocabulary lint) — replaces the G13 exemption list | task | R1; the 261 research-methodology rows | no | done |
 | **1** | **G19 — persist the tier stage 5 already computes** (epistemic_status / isor / verification_method; stage6 has no columns) + de-literal the verifier stamp (stage5_verify.py:898) | task | the QUARANTINE split (R3) as a wiring job instead of a modelling job | no | ~0.5 day |
 | **2** | **Correct the ruler estimand** — the FLOOR column compares stored-label accuracy to min_human_share, a provenance share. Re-report lift over the constant baseline (ROLE −0.010, discipline +0.422, FORM +0.472) with coverage and abstention bounds | task | the validity of every accuracy number the project publishes | no | ~0.5 day |
 | **3** | **R5 → R1** — the vocabulary contract, then closed-menu classification driven by the decision procedure config/content_types.yaml ALREADY declares (content_type_rules / D2587), with none as a first-class outcome and a menu_hash stamp | task | label quality; retires the 999-rule alias map | **YES** (ratify the slot list) | 2–3 days |
@@ -24,8 +32,8 @@ SEQUENCE_STATUS_20260917.md (which records the rulings) and CONTEXT_INDEX.md (th
 | **6** | **S5 aggregation fix** — claim-level (every atomic claim needs ≥1 supporting passage) against the single-passage-vs-synthesised-definition premise; then measure a claim-level checker behind a protocol | task | the meaning of PASS; the 27.4%/31.1% PASS rates | no | 2–4 days |
 | **7** | **G16 — chunk/evidence leg** (join is 100%: 205,813/205,813; ~214k vectors ≈ 438 MB), plus per-field vectors and weighted RRF | task | grounding precision — but only after 0a–0b | no | ~2.5 days |
 | **8** | **Distilled classifier / fine-tune** — only with an honest gate AND an anchor (D-274f); measured on a held-out anchor version | task | a cost optimisation, not an accuracy strategy | no | days |
-| **9** | **BUG-276 — restore the safety net** (C13 backup_guardian.sh is dead; no automated DB backup) + F-08 disk | bug | safe execution of every bulk write above | no | hours |
-| **10** | **Decision queue** — ratify D-271a (revised), D-271b/c, D-G2a/b, D-G3a/b, G1, G5–G7, G17–G20 | decision | items 0a–3 (they are blocked on paperwork, not work) | **YES**, minutes each | minutes |
+| **9 ✅ DONE** | **BUG-276 — restore the safety net** (C13 backup_guardian.sh now backs up the SQLite DB consistently) + F-08 disk | bug | safe execution of every bulk write above | no | done |
+| **10** | **Decision queue** — ratify D-271a (revised), D-271b/c, D-G2a/b, D-G3a/b, G1, G5–G7 (G17/G18 implemented, pending ratification) | decision | items 1–3 (paperwork, not work) | **YES**, minutes each | minutes |
 
 ## Explicitly EXCLUDED (do not spend on these)
 

@@ -1898,3 +1898,17 @@ re-derived in the session that acts on it. **Rule: before any repair/backfill/ma
 must be re-derived READ-ONLY from the live store in the same session, and the re-derivation must be recorded with
 the query's row count; a number that does not reproduce cancels the write.** Corollary already in force: a
 `--apply` path is only allowed once the dry-run counts match the re-derived counts exactly.
+
+## BUG-337 — Name collision: two different human instruments both called "ANCHOR-1" (MED, FIXED 2026-09-21)
+
+`ANCHOR1_BLIND_SHEET_20260920.csv` (60 rows, contra-stratified, menu 73597ee2) and
+`anchor1_frozen_20260920.json` (150 rows, stratified, menu cac6e695) shared the ANCHOR-1 name while
+overlapping on only 2 fb_ids, and D-274f reserved ANCHOR-1 for the 150-row set. Consequence: "which ruler?"
+was undecidable from filenames, and a reader could merge or substitute the wrong instrument.
+
+FIX: 60-row set renamed ANCHOR-2 (sheet, key, menu reference, held-out set, kappa/triage/bakeoff artifacts,
+scripts `anchor2_kappa.py` / `anchor2_repair_triage.py`); config source `bakeoff.sources.anchor1` ->
+`anchor2` with `legacy_names: [anchor1]`; bytes unchanged so all sha256 citations remain valid;
+`governance/ARTIFACT_REGISTRY.md` is the single name map + pooling rules. Also renamed
+`anchor1_arbitration_*` -> `ruler_arbitration_in_sample_*` (it was measured on the 150-row ruler, n=116).
+Verified: YAML loads, py_compile clean, anchor2 source resolves 57/58 rows with pipeline labels intact.

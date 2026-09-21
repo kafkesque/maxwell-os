@@ -515,3 +515,12 @@ per-slot κ → 5 lift BOUND / merge only if inseparable.
   is the superseded DERIVATION helper (its hardcoded arm names were a C12 claim-vs-code mismatch, audit F-05).
 - New bug numbers this session: BUG-332 (FIXED), BUG-333 (OPEN, R5 channel), BUG-334 (OPEN, effective n),
   BUG-335 (FIXED). BUG-328 now CLOSED with evidence.
+
+## 2026-09-21 — NAME COLLISION FIXED (ANCHOR-1 vs ANCHOR-2)
+Two instruments were both called "ANCHOR-1". Fixed: **RULER-150** = the 150-row stratified calibration
+instrument (`anchor1_frozen_20260920.json` = authority; `RULER_BLIND_SHEET_20260917.csv` = human workspace,
+menu `cac6e695`). **ANCHOR-2** = the 60-row contra-stratified adjudication/held-out instrument (renamed from
+`ANCHOR1_*` -> `ANCHOR2_*`, pair = sheet + key, menu `73597ee2`, 58 held out for R3). Full map + rules:
+`governance/ARTIFACT_REGISTRY.md`. Also corrected: `anchor1_arbitration_20260921.json` was a RULER-150
+in-sample derivation, not ANCHOR-1/2 -> `ruler_arbitration_in_sample_20260921.json`. Rule: never concatenate
+instruments; never pool across menus; pool only at read time with weights.

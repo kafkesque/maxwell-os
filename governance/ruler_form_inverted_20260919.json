@@ -1,0 +1,105 @@
+{
+ "axis": "extraction_type",
+ "key_inverted": true,
+ "reference": "human blind label",
+ "under_test": "stored free-generated label",
+ "total_rows": 150,
+ "scored_n": 146,
+ "abstained": {
+  "blank": 0,
+  "abstain-irrelevant": 4
+ },
+ "typo_n": 82,
+ "unresolved": [],
+ "stratum_a_n": 99,
+ "stored_agrees_A": 74,
+ "stored_error_rate_A": 0.253,
+ "wilson95_error_rate_A": [
+  0.177,
+  0.346
+ ],
+ "per_class_stored_reliability_A": {
+  "causal_mechanism": {
+   "n": 23,
+   "stored_agrees": 18,
+   "error_rate": 0.217
+  },
+  "descriptive_model": {
+   "n": 30,
+   "stored_agrees": 29,
+   "error_rate": 0.033
+  },
+  "empirical_pattern": {
+   "n": 10,
+   "stored_agrees": 9,
+   "error_rate": 0.1
+  },
+  "normative_heuristic": {
+   "n": 36,
+   "stored_agrees": 18,
+   "error_rate": 0.5
+  }
+ },
+ "confusion_A": [
+  {
+   "human": "causal_mechanism",
+   "stored": "causal_mechanism",
+   "n": 18
+  },
+  {
+   "human": "causal_mechanism",
+   "stored": "descriptive_model",
+   "n": 1
+  },
+  {
+   "human": "causal_mechanism",
+   "stored": "empirical_pattern",
+   "n": 2
+  },
+  {
+   "human": "causal_mechanism",
+   "stored": "normative_heuristic",
+   "n": 2
+  },
+  {
+   "human": "descriptive_model",
+   "stored": "causal_mechanism",
+   "n": 1
+  },
+  {
+   "human": "descriptive_model",
+   "stored": "descriptive_model",
+   "n": 29
+  },
+  {
+   "human": "empirical_pattern",
+   "stored": "descriptive_model",
+   "n": 1
+  },
+  {
+   "human": "empirical_pattern",
+   "stored": "empirical_pattern",
+   "n": 9
+  },
+  {
+   "human": "normative_heuristic",
+   "stored": "causal_mechanism",
+   "n": 9
+  },
+  {
+   "human": "normative_heuristic",
+   "stored": "descriptive_model",
+   "n": 6
+  },
+  {
+   "human": "normative_heuristic",
+   "stored": "empirical_pattern",
+   "n": 3
+  },
+  {
+   "human": "normative_heuristic",
+   "stored": "normative_heuristic",
+   "n": 18
+  }
+ ]
+}

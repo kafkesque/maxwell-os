@@ -1,4 +1,4 @@
-"""Build a human-readable MENU REPAIR WORKSHEET from the ANCHOR-1 triage.
+"""Build a human-readable MENU REPAIR WORKSHEET from the ANCHOR-2 triage.
 
 Turns machine triage output into a tick-list: domain slots the pipeline never emits, and
 discipline pairs where the human label and the stored label disagree. No decisions are made here.
@@ -11,13 +11,13 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SHEET = ROOT / "governance" / "ANCHOR1_BLIND_SHEET_20260920.csv"
-KEY = ROOT / "governance" / "ANCHOR1_KEY_20260920.json"
+SHEET = ROOT / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv"
+KEY = ROOT / "governance" / "ANCHOR2_KEY_20260920.json"
 OUT = ROOT / "governance" / "MENU_REPAIR_WORKSHEET_20260921.md"
 
 
 def load_rows() -> list:
-    """Return the adjudication sheet rows joined to the pipeline labels of ANCHOR-1 key."""
+    """Return the adjudication sheet rows joined to the pipeline labels of ANCHOR-2 key."""
     key = json.loads(KEY.read_text(encoding="utf-8"))["key"]
     rows = []
     with SHEET.open(encoding="utf-8", newline="") as fh:

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""ANCHOR-1 repair-queue triage: bucket the disagreements by CAUSE, not by row.
+"""ANCHOR-2 repair-queue triage: bucket the disagreements by CAUSE, not by row.
 
 Reads the human blind sheet + the pipeline key and classifies each disagreed row:
   A. boundary/definition  - discipline differs (the label semantics or the boundary note is wrong)
   B. domain under-prediction - human named domains the pipeline never emitted
   C. domain over-prediction  - the pipeline emitted domains the human rejected
-Writes governance/anchor1_repair_triage_20260921.md. Read-only over the source files.
+Writes governance/anchor2_repair_triage_20260921.md. Read-only over the source files.
 """
 import csv, json, pathlib, collections
 
@@ -17,8 +17,8 @@ def norm(v: object) -> str:
 
 
 def main() -> int:
-    sheet = list(csv.DictReader((R / "governance" / "ANCHOR1_BLIND_SHEET_20260920.csv").open(encoding="utf-8")))
-    key = json.loads((R / "governance" / "ANCHOR1_KEY_20260920.json").read_text(encoding="utf-8"))["key"]
+    sheet = list(csv.DictReader((R / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv").open(encoding="utf-8")))
+    key = json.loads((R / "governance" / "ANCHOR2_KEY_20260920.json").read_text(encoding="utf-8"))["key"]
     buckets = collections.defaultdict(list)
     tally = collections.Counter()
     for row in sheet:
@@ -37,7 +37,7 @@ def main() -> int:
         if extra:
             buckets["C_domain_over"].append((row["row"], sorted(extra)))
             tally["C_domain_over"] += 1
-    lines = ["# ANCHOR-1 repair-queue triage (generated)", "",
+    lines = ["# ANCHOR-2 repair-queue triage (generated)", "",
              "Buckets are by CAUSE. A row can appear in more than one (see the R2 sheet rationale).", ""]
     for name in ("A_boundary", "B_domain_under", "C_domain_over"):
         lines.append("## %s - %d rows" % (name, tally[name]))
@@ -49,7 +49,7 @@ def main() -> int:
     lines += ["## Systematic menu gaps (fix the MENU, not the rows)", "",
               "never-emitted by pipeline: " + json.dumps(miss_c.most_common(12)), "",
               "falsely-emitted by pipeline: " + json.dumps(extra_c.most_common(12)), ""]
-    out = R / "governance" / "anchor1_repair_triage_20260921.md"
+    out = R / "governance" / "anchor2_repair_triage_20260921.md"
     out.write_text("\n".join(lines), encoding="utf-8")
     print("A_boundary", tally["A_boundary"], "B_under", tally["B_domain_under"], "C_over", tally["C_domain_over"])
     print("never-emitted:", miss_c.most_common(6))

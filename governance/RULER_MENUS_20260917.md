@@ -44,10 +44,10 @@ no clean one): answering 6 or 7 says the object should be dropped or held, not p
 
 ### 1. principle
 
-- **definition (config):** Conceptual knowledge — why/when something works. The Foundation Block. D2587: a SINGLE transferable prescriptive instruction (a normative heuristic stated in one sentence that passes the depth test: act as a filter across 3+ domains) is a PRINCIPLE, NOT a process_template.
+- **definition (config):** Conceptual knowledge — why/when something works. The Foundation Block. A single self-contained epistemic claim you KNOW/APPLY (a transferable filter — ANY scope) is a PRINCIPLE, NOT a process_template. D-282: scope is the separate depth axis, never the role discriminator.
 - **ASK:** Is there ONE transferable instruction or truth here that would still hold in a different field?
 - **NOT THIS:** a described procedure with named steps is process_template; one concrete finished case is process_instance
-- **TRAP:** D2587 boundary: a SINGLE transferable prescriptive sentence that acts as a filter across 3+ domains is a PRINCIPLE, not a process_template. Length is not the test; transferability is.
+- **TRAP:** a SINGLE transferable prescriptive sentence (a self-contained filter at ANY scope) is a PRINCIPLE, not a process_template. Length is not the test; transferability is — and depth/scope is a separate axis, never a role test.
 - **EXAMPLE (in the KB, not in this sheet):** Status-driven Narrative Structure -- A narrative framework where status dynamics drive character motivation and plot progression, particularly in moments of high social stakes such as weddings or ceremonies. The principle describes how status hierarchies create tension and age
 
 ### 2. process_template

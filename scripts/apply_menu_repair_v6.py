@@ -18,8 +18,8 @@ TAX = ROOT / "config" / "taxonomy_v5.yaml"
 NORM = ROOT / "config" / "normalization_map.yaml"
 QUEUE = ROOT / "governance" / "MENU_REPAIR_QUEUE_20260921.md"
 MIG = ROOT / "governance" / "TAXONOMY_v6_MIGRATION_20260921.md"
-SHEET = ROOT / "governance" / "ANCHOR1_BLIND_SHEET_20260920.csv"
-KEY = ROOT / "governance" / "ANCHOR1_KEY_20260920.json"
+SHEET = ROOT / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv"
+KEY = ROOT / "governance" / "ANCHOR2_KEY_20260920.json"
 
 # new domain -> (reference existing domain whose group it inherits, aliases)
 ADDS = {
@@ -70,7 +70,7 @@ def write_support_files(added: list) -> None:
     NORM.write_text(yaml.safe_dump({"version": "v1", "note": "owner-approved 2026-09-21: spelling/surface variants -> existing canonical label",
                                     "domains": NORMALISE}, sort_keys=False, allow_unicode=True), encoding="utf-8")
     MIG.write_text("# Taxonomy v6 migration record (2026-09-21)\n\n"
-                   "Trigger: ANCHOR-1 repair triage (owner-approved PART1 A).\n\n"
+                   "Trigger: ANCHOR-2 repair triage (owner-approved PART1 A).\n\n"
                    "## Added domains\n" + "".join("- " + a + "\n" for a in added) +
                    "\n## Unchanged\n- every v5.5 canonical is preserved; no slot was removed or renamed,\n"
                    "  so all pre-v6 kappa / contra numbers stay readable.\n\n"

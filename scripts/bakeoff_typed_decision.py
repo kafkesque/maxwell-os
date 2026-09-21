@@ -23,11 +23,11 @@ C12: every path, column name, axis, model id and threshold comes from config/eva
 Usage:
   python3 scripts/bakeoff_typed_decision.py --arm constant
   python3 scripts/bakeoff_typed_decision.py --arm deberta --arm qwen3coder --limit 150
-  python3 scripts/bakeoff_typed_decision.py --source anchor1 --arm pairwise --arm qwen3coder
+  python3 scripts/bakeoff_typed_decision.py --source anchor2 --arm pairwise --arm qwen3coder
 
 D-312 (C12): the label SOURCE is config-declared (`bakeoff.active_source`, CLI override --source).
   ruler   — the flat bakeoff block above: key['rows'] carries human + stored labels (truth = key).
-  anchor1 — the R3 held-out adjudication source (`bakeoff.sources.anchor1`): the SHEET carries the
+  anchor2 — the R3 held-out (legacy name: anchor1) adjudication source (`bakeoff.sources.anchor1`): the SHEET carries the
             human verdicts, the key carries the pipeline labels.
 """
 from __future__ import annotations
@@ -116,7 +116,7 @@ def source_spec(cfg: dict, name: str | None = None) -> dict:
     """Return a self-contained spec for a named label source (C12: named, never inferred).
 
     D-312: `ruler` is the flat block above (key['rows'] carries human + stored labels);
-    `anchor1` is the R3 held-out adjudication source (the SHEET carries the human verdicts, the
+    `anchor2` is the R3 held-out (legacy name: `anchor1`) adjudication source (the SHEET carries the human verdicts, the
     key carries the pipeline labels). A run names one source; the loader never guesses from a
     filename, and every path/column/shape below comes from config.
     """
@@ -159,7 +159,7 @@ def load_rows(cfg: dict, limit: int, spec: dict | None = None) -> tuple[list[dic
     """Load (rows, human truth) for a label source, normalised onto the closed menu (D-312).
 
     ruler  — key['rows'] carries human + stored labels; the sheet contributes text only.
-    anchor1— the SHEET carries the human verdicts, the key carries the pipeline labels.
+    anchor2 — the SHEET carries the human verdicts, the key carries the pipeline labels.
     An unresolvable HUMAN verdict is a hard error (C16) rather than a silent wrong answer; an
     unresolvable STORED label becomes an abstention for the incumbent arm (never a false error).
     `row_allowlist_file` restricts the run to the pre-registered held-out ids.
@@ -430,7 +430,7 @@ def main() -> int:
         if out_path.exists():   # BUG-323: merge at write - an arm measured in an earlier run must survive
             try:
                 prev = json.loads(out_path.read_text(encoding="utf-8"))
-                # BUG-332: never merge across SOURCES - an anchor1 artifact must not swallow ruler arms
+                # BUG-332: never merge across SOURCES - an anchor2 artifact must not swallow ruler arms
                 if str(prev.get("source") or RULER_SOURCE) == src["name"]:
                     for k, v in (prev.get("arms") or {}).items():
                         arms.setdefault(k, v)

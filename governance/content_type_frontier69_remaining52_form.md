@@ -11,7 +11,7 @@
 
 - **Q1 — process_template:** SEQUENCE of **2+ steps** AND a gate/done-condition. A single instruction is NOT a template.
 - **Q2 — reusable matrix/methodology with NO explicit steps** → `principle` (not process_template).
-- **Q3 — single transferable prescriptive claim** (filter across 3+ domains, OR deep single-domain) → `principle`.
+- **Q3 — single transferable prescriptive claim** (a self-contained filter at ANY scope — depth is the separate axis) → `principle`.
 - **descriptive / historical summary or bare fact** (no prescriptive filter, no template, no named method) → `noise_drop`.
 - **growth_edge (BUG-230):** MUST be an OPEN TENSION or UNVERIFIED CORRELATION — NOT a bare "utilizable fact" (that's `noise_drop`).
 - **named method-execution** → `process_instance`. **Ambiguous, some value no clean role** → `quarantine`.

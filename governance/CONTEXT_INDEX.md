@@ -487,3 +487,17 @@ per-slot κ → 5 lift BOUND / merge only if inseparable.
   the contra-stratified 60-row sample. See `governance/ASSIGNMENT_PATH_DIAGNOSIS_20260921.md` (D-310).
 * New open items: R3 held-out validation (`R3_HELDOUT_PREREG_20260921.md`, D-311), calibrated abstention
   (`ABSTENTION_DESIGN_20260921.md`, D-312, inert), BUG-326 corpus assignment defects.
+
+## 2026-09-21 (session 6, D-313) — forensic audit + BUG-328 landing
+
+- **Landed**: G19/D274h serving gate + R1/D-279 `menu_hash`/`*_source` + D275b/D282/D283 principle-role
+  semantics + D-291/D-293 pin/MTP. Safety evidence: `apply_serving_gate.py` dry-run = **0 writes** over
+  7,995 rows (the rule exactly reproduces the stored PASS 3299 / QUARANTINE 4696); `menu_hash`
+  73597ee2 matches the frozen `.sha256`; retrieval smoke-tested OK.
+- **NEW HIGH — BUG-329 (corrects BUG-314)**: the ruler has three versions — freeze-time `4d0c856a`
+  (bytes lost), HEAD `2d456720`, working `38323192` — and HEAD to working drift is substantive
+  (41 CT / 7 DISC / 62 FORM cells). 0.4741 stays derivable from the frozen key, but NO re-measure is
+  valid until gate 4 names the ruler.
+- **NEW**: BUG-330 (stale assertion), BUG-331 (no R5 record for the gate write). `fbs` is one migration
+  behind code (no `menu_hash`/`*_source` columns → D-279 stamps unwritten).
+- **Superseded**: BUG-314's "zero substantive label drift".

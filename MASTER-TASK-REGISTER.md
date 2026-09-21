@@ -251,3 +251,14 @@
 > **CORRECTION (D-310, 2026-09-21):** the 'the pipeline never selects existing slots' reading was a
 > sampling artifact of the contra-stratified 60-row ANCHOR-1 sample. Whole-corpus measurement: ALL 61
 > discipline + 43 domain slots are emitted (min 6 rows, median 85); 58.7% of the corpus is QUARANTINE.
+
+> **SESSION-6 FORENSIC AUDIT (2026-09-21, D-313) — 4 defects, 2 HIGH.**
+> (1) **BUG-328 closed by landing** — the uncommitted production set was coherent and already in force
+> in the DB (gate dry-run 0/7,995 writes) but its new modules `pipeline/serving_gate.py` and
+> `pipeline/closed_menu.py` were untracked, so a fresh checkout raised ImportError in S4/S5 instead of
+> silently reverting. (2) **BUG-329 HIGH** — the frozen ruler has three versions and the HEAD-vs-working
+> diff is substantive (41 CT / 7 DISC / 62 FORM label cells); BUG-314's "cosmetic only" is corrected.
+> (3) BUG-330 pre-existing stale assertion. (4) BUG-331 the serving-gate DB write has no R5 record.
+> **Blocked-by-owner**: ruler version (GATE 4). **R3 is not config-only runnable** — the harness reads
+> key['rows'][*]['stored'] while the ANCHOR-1 key is an fb_id dict; a pre-registered adapter is needed.
+> Report: governance/FORENSIC_AUDIT_20260921b.md.

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 679
+total_decisions: 680
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7111,8 +7111,32 @@ decisions:
   files:
   - config/verify_abstention.yaml
   - governance/ABSTENTION_DESIGN_20260921.md
+
+- id: D313
+  category: TAXONOMY / GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-21'
+  title: Frozen-artifact provenance rule + BUG-328 production landing (session-6 forensic audit)
+  verification: 'An artifact that grounds a published number must be COMMITTED and cited by sha256;
+    frozen means byte-pinned and hash-verified, and a freeze-time hash matching no version present in
+    the repo is a FAIL-CLOSED abort, not a footnote (BUG-329: the ruler exists as 4d0c856a freeze-time
+    (bytes lost), 2d456720 HEAD, 38323192 working, with SUBSTANTIVE HEAD drift 41 CT / 7 DISC / 62
+    FORM label cells - BUG-314 corrected). Landed the reviewed G19/D274h serving gate + R1/D-279
+    menu_hash/*_source + D275b/D282/D283 principle-role semantics + D-291/D-293 pin/MTP set as one
+    commit (BUG-328), because a fresh checkout raised ModuleNotFoundError in S4/S5 (the imported
+    modules were untracked) while the DB kept the 4,696 QUARANTINE rows the same rule produced.
+    Audit evidence: py_compile clean; pytest 200 passed / 1 pre-existing failure (BUG-330); serving
+    gate dry-run 0 writes over 7,995 rows reproducing PASS 3299 / QUARANTINE 4696; s5_reason partition
+    sums to 7,995; menu_hash 73597ee2 matches the frozen sha256; retrieval smoke OK. Also recorded:
+    BUG-331 (no R5 record for the gate write), fbs one migration behind code (no menu_hash/*_source
+    columns -> D-279 stamps unwritten), and that R3 is NOT config-only runnable (the ANCHOR-1 key
+    lacks the rows[*].stored shape the harness reads).'
+  files:
+  - governance/FORENSIC_AUDIT_20260921b.md
+  - governance/buglog.md
+
 summary:
-  total: 679
+  total: 680
   proposed: 6
   draft: 1
   active: 483
@@ -7121,7 +7145,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 116
+  resolved: 117
   planned: 8
   ratified: 1
   open: 17
@@ -7252,7 +7276,7 @@ summary:
     ROBUSTNESS / QUALITY: 3
     STR: 1
     TAXONOMY: 6
-    TAXONOMY / GOVERNANCE: 2
+    TAXONOMY / GOVERNANCE: 3
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
@@ -7261,26 +7285,3 @@ summary:
     governance: 1
     pipeline-fix: 2
     validation: 1
-
-- id: D313
-  category: TAXONOMY / GOVERNANCE
-  state: RESOLVED
-  date: '2026-09-21'
-  title: Frozen-artifact provenance rule + BUG-328 production landing (session-6 forensic audit)
-  verification: 'An artifact that grounds a published number must be COMMITTED and cited by sha256;
-    frozen means byte-pinned and hash-verified, and a freeze-time hash matching no version present in
-    the repo is a FAIL-CLOSED abort, not a footnote (BUG-329: the ruler exists as 4d0c856a freeze-time
-    (bytes lost), 2d456720 HEAD, 38323192 working, with SUBSTANTIVE HEAD drift 41 CT / 7 DISC / 62
-    FORM label cells - BUG-314 corrected). Landed the reviewed G19/D274h serving gate + R1/D-279
-    menu_hash/*_source + D275b/D282/D283 principle-role semantics + D-291/D-293 pin/MTP set as one
-    commit (BUG-328), because a fresh checkout raised ModuleNotFoundError in S4/S5 (the imported
-    modules were untracked) while the DB kept the 4,696 QUARANTINE rows the same rule produced.
-    Audit evidence: py_compile clean; pytest 200 passed / 1 pre-existing failure (BUG-330); serving
-    gate dry-run 0 writes over 7,995 rows reproducing PASS 3299 / QUARANTINE 4696; s5_reason partition
-    sums to 7,995; menu_hash 73597ee2 matches the frozen sha256; retrieval smoke OK. Also recorded:
-    BUG-331 (no R5 record for the gate write), fbs one migration behind code (no menu_hash/*_source
-    columns -> D-279 stamps unwritten), and that R3 is NOT config-only runnable (the ANCHOR-1 key
-    lacks the rows[*].stored shape the harness reads).'
-  files:
-  - governance/FORENSIC_AUDIT_20260921b.md
-  - governance/buglog.md

@@ -452,3 +452,14 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
 * HUMAN GATES still open: (1) approve/deny the benchmark-only laya-mlx install (isolated venv, pinned revision);
   (2) approve the abstention operating point before `verify_abstention.yaml` is ever flipped; (3) the R3 held-out
   run must be published before R3 is adopted.
+
+## 2026-09-21 (session 6) — audit, BUG-328 landed, gates re-counted to FOUR
+
+- **Landed**: serving-gate / menu_hash / principle-role production set (BUG-328 closed) + audit report.
+- **HUMAN GATES — FOUR**: (1) benchmark-only laya-mlx install, isolated venv, pinned revision;
+  (2) abstention operating point `t_low = p25` (-0.006, -8.3 pp, 25% queue) — still `enabled: false`;
+  (3) R3 adoption only after the held-out number is published; **(4) NEW — name the canonical ruler
+  version (v0 lost / v1 HEAD / v2 working, BUG-329) before ANY ruler re-measure.**
+- **R3 is not config-only runnable**: the ANCHOR-1 key is an fb_id dict with pipeline labels while the
+  harness reads `key['rows'][*]['stored']`; a pre-registered adapter (D-311 amendment) is required
+  first, else the measurement is post-hoc and inadmissible under D-300.

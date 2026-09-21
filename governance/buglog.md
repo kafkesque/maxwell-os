@@ -1750,7 +1750,7 @@ explicit "is this row scoreable?" predicate; absence of truth is not evidence of
 
 ## BUG-325 (MED — FIXED 2026-09-21): normalisation map leaked across axes. `load_vocab()` merged the owner-approved DOMAIN surface variants (config/normalization_map.yaml, D-307) into the SHARED alias dict used to normalise every axis, so a domain entry (`human-computer interaction` -> `human computer interaction`) also rewrote DISCIPLINE cells on rows 25/46 and depressed discipline kappa from 0.4395 to 0.4051 for a purely cosmetic reason. Caught by the ablation audit (S2), not by any test. Fix: separate `dom_alias` used only for domain tokens; discipline axis is provably unchanged (re-ran: 0.4395 / error 0.5254). Guard for the future: the map is domain-keyed, so it must never be applied to a vocabulary that shares token space with another axis.
 
-## BUG-326 (MED - OPEN 2026-09-21): assignment/emission defect class in the corpus, and a measurement-claim defect above it
+## BUG-326 (MED - BLOCKED 2026-09-21): the repair's TARGET NUMBERS do not reproduce on the live DB
 Whole-corpus deterministic meter (`scripts/audit_full_corpus_labels.py`, knowledge pipeline/maxwell.db, 7,995 rows):
 403 FBs whose `discipline_raw` has a canonical-equivalent but no mapping (BUG-150 class taxonomy gap), 354 emerging
 FBs with EMPTY `discipline_raw` (reclass targets), 1 canonical + empty raw (D2378), 147 FBs with the SAME label on
@@ -1879,3 +1879,22 @@ makes the drop explicit and the loader PRINTS `truth=` / `unlabelled_excluded=` 
 ## BUG-335 (LOW - FIXED 2026-09-21, audit F-04): a lost comment line in config/eval_integrity.yaml
 The per-pair scoring note ("padded forward batches (per-pair scoring was ~1 s/pair)") had been glued onto the
 `abstain_sweep` key instead of `nli_batch_size` by an earlier careless edit. Comment restored where it belongs.
+
+## BUG-326 — UPDATE (2026-09-21, session 7): the repair is BLOCKED, its target set is not re-derivable
+Re-measured read-only against `knowledge pipeline/maxwell.db` (7,995 rows) in the session that was about to act
+on it: non-canonical `discipline` = **757, and every single one is the string `emerging`** — the taxonomy's
+DECLARED CATCH-ALL (`meta.catch_all_discipline`), i.e. a legitimate label, not a mis-canonicalisation.
+`config/alias_map.yaml` yields **0** hits for them. Both-axes rows = **65** (not 147); rows with an empty
+`domains` field = **0** (not 703); empty `discipline_raw` = **355** (not 354). A naive "raw→canonical" sweep
+would therefore have rewritten 757 legitimate catch-all labels. **No write was made (0 rows changed).** The
+residual real gaps are (a) 355 rows whose `discipline_raw` was never persisted (a C29/F-44 provenance gap, not a
+taxonomy defect) and (b) 65 rows where a discipline token also appears among the domains — both need owner
+intent, not a script. Scope doc: `governance/BUG326_REPAIR_SCOPING_20260921.md`.
+
+## BUG-336 (MED - OPEN 2026-09-21, NEW STANDING RULE): an agent's measurement claim is not evidence
+Third instance in two sessions (see also the retracted "assignment missing" and "margins not persisted" claims):
+a count or defect claim was carried forward across sessions and used to plan a mass write, without being
+re-derived in the session that acts on it. **Rule: before any repair/backfill/mass-write, every target number
+must be re-derived READ-ONLY from the live store in the same session, and the re-derivation must be recorded with
+the query's row count; a number that does not reproduce cancels the write.** Corollary already in force: a
+`--apply` path is only allowed once the dry-run counts match the re-derived counts exactly.

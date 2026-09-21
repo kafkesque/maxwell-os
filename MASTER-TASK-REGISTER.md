@@ -275,3 +275,6 @@
       verification required first (R5 is now known-degraded, BUG-333).
 - [ ] GATE 4: name the canonical ruler version (BUG-329) before ANY ruler re-measure.
 - [ ] Gates: laya-mlx benchmark-only install; abstention operating point t_low=p25; ratify R3 rejection.
+- [x] BUG-326 repair is **BLOCKED, not applied**: the target numbers (403/147/703) do not reproduce on the live
+      DB (757 all-`emerging` catch-all labels / 65 mixed-axis / 0 domain-less). Re-scoped in
+      `governance/BUG326_REPAIR_SCOPING_20260921.md`; new standing rule BUG-336.

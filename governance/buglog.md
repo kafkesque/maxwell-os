@@ -2394,3 +2394,17 @@ environment. Exempted with the explicit marker C12-FIXTURE: on the line; check 1
 count in its PASS message so the exemption surface is visible and countable, never a silent hole.
 (3) The detector's own regex literal was then flagged by itself → same marker applied.
 Gate: python3 pipeline/integrity_check.py --quick → 10/10 PASS.
+
+## BUG-360 (LOW — process, LOGGED 2026-09-21): a second stale carried claim in one session
+The carried RED "BUG-341: stage-5 Verify = 0" is stale. Running pipeline/stage5_verify.py (2026-09-21) reports
+"S5 resuming: 550 FBs already verified -> 7445 remaining": the checkpoint holds 550 verified FBs and the
+verification pass is now re-running over the remainder. Two stale carried claims were found in one session
+(this and BUG-359 justfile path). Standing rule: a carried claim is re-verified before it is re-reported as RED.
+
+## BUG-357 follow-up (2026-09-21, D-327): the row-60 prediction is NOT CONFIRMED
+The widened definition (v5.6) plus the ruled boundary block did not move row 60 to the human slot; the whole
+treatment arm was WORSE than baseline (emission 70.0% vs 78.3%, error 0.8333 vs 0.8000, oov 18 vs 13). The
+ontology fix stays (it is correct at the definition level and BUG-357 was a real denotation defect), but the
+prompt-level boundary rules are REJECTED as an intervention on this instrument. The dominant defect is now
+measurable and different: 13-18 of 60 rows emit a label OUTSIDE the closed menu (out-of-vocab), and only ~20%
+of rows agree with the human slot. That is a MENU-COMPLIANCE (emission) problem, not a boundary problem.

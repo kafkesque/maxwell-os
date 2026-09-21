@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 685
+total_decisions: 695
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7259,9 +7259,177 @@ decisions:
     --legacy-sheet-truth is passed. BUG-333 partially fixed: the R5 verifier requires quoted evidence per
     number-deciding question and exits 2 unless PASS. The superseded ruler artifact (66c9ba33...) is recorded in
     config:ruler_authority.artifact_superseded, never deleted (R-D410).
+- id: D-319
+  category: EVALS
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**The ANCHOR-2 domain disagreement is emission coverage + surface spelling, not an ontology gap (BUG-348 fix).'
+  decision: >-
+    **The ANCHOR-2 domain disagreement is emission coverage + surface spelling, not an ontology gap (BUG-348 
+    fix).** The first worksheet generator compared cells with a bare `.lower()`, never consulted the alias layer, 
+    and showed the owner `most_common(16)` — so it reported 2 stray-quote artifacts and 4 surface variants as MENU 
+    GAPS, and truncated PART 2 at 16 rows. Corrected reading: 7 slots UNEMITTED_EXISTING (the real Emission 
+    defect), 4 surface variants already resolved by `config/normalization_map.yaml` (D-307) + `raw` aliases, 2 
+    sheet artifacts, **NOVEL = 0**. PART 2 is 26 pairs / 31 rows, each now carrying its `definition` excerpt. The 
+    corrected artifact is a NEW file (the ruled worksheet is evidence, R-D410) and is stamped with the sha256 of 
+    every input it read (D-318). **NOVEL=0 means no floor may be repointed and no kappa may be re-based on menu 
+    grounds.** Two defects logged on the way: BUG-354 (the shared resolver rejects the catch-all on both axes) and 
+    BUG-355 (a dead entry in the `domains:` block of normalization_map; the flat index makes one surface string 
+    resolve to two canonicals). **Not applied:** nothing was wired into the classifier prompt — a settled pair is 
+    a ruling, not behaviour.
+
+- id: D-320
+  category: GOVERNANCE
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**Owner rulings 2026-09-21 (four): normalization_map pruned; PART 2 boundary items 24/26 REJECTED; `behavioral'
+  decision: >-
+    **Owner rulings 2026-09-21 (four): normalization_map pruned; PART 2 boundary items 24/26 REJECTED; `behavioral 
+    economics` re-read from the taxonomy; laya + repair-queue recommendations recorded.** (1) The owner pruned the 
+    dead `human-computer interaction: human computer interaction` entry from `config/normalization_map.yaml` -> 
+    **BUG-355(b) CLOSED**, and the prune is **inert by measurement**: `scripts/anchor2_kappa.py` re-run produces a 
+    byte-identical `governance/anchor2_kappa_20260921.json` (domain 0.4385, macro_kappa_active 0.4906, jaccard 
+    0.4426, active_domains 39 unchanged), so no published number moves; BUG-355(a) (flat index / `kind=None` order 
+    dependence) stays OPEN. (2) Owner **rejected** boundary items 24 and 26 because the `behavioral economics` 
+    terminology was mis-stated; the re-read (from the taxonomy text, not memory) gives BE three load-bearing 
+    requirements — **R1 object** (an economic decision: price, purchase, demand, incentive, market), **R2 
+    mechanism** (psychological cause: heuristic, framing, affect, social norms), **R3 stance** (descriptive, never 
+    prescriptive) — with `excludes` = economics, psychology, cognitive science, design psychology, decision 
+    making. Items 24 and 26 dropped R1 and mis-read `incentive/price/uncertainty` as BE when that is `economics`, 
+    which BE excludes. Corrected definition-anchored tests **24'/26'** are drafted in 
+    `governance/BOUNDARY_DISCRIMINATORS_20260921.md` **Part D** (the rejected text stays visible: R-D410). (3) The 
+    re-read exposed a real **ontology defect, BUG-357**: BE's written definition is **narrower than its 
+    operational denotation** — row 60 (*Same-age Peer Modeling*, no economic object) is labelled BE while the 
+    definition string licenses `psychology`, which is what the pipeline answered. A classifier whose only BE 
+    evidence is the definition string must reproduce that error, so **no boundary rule can fix it**. Owner gate: 
+    (i) widen the `definition:` string to name the mechanism class + behaviour-change object (**recommended**) or 
+    (ii) keep it and re-label row 60. No slot moves either way (denotation, never spelling). (4) **laya-mlx**: 
+    recommendation recorded — approve a narrow **benchmark-only feasibility arm** (isolated `.venv_laya`, revision 
+    + checkpoint licence pinned in config, zero production imports, measuring the one untested question: 61-way 
+    `criteria` degradation), but hold the full D-300 A/B until a **second coder** exists on the ruler, because a 
+    >=5 pp win measured against single-coder attested labels (F-11/D-317) cannot license adoption; 
+    `arm_typed_head` stays a stub meanwhile. (5) **repair_queue**: recommendation recorded — **do not create** 
+    `governance/REPAIR_QUEUE.md`; declare the write-path + `fb_id` de-dup key + owner instead (BUG-358), since the 
+    queue's only writer (the abstention rule) does not exist, so a file created today could never receive a row 
+    (an Emission-class artifact) and an empty queue would assert "no repairs pending". **Not applied:** nothing 
+    wired into any prompt, no menu slot added, no canonical renamed, taxonomy bytes unchanged.
+
+- id: D-321
+  category: ONTOLOGY
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**`behavioral economics` definition widened — the ontology fix for BUG-357 (owner-ruled, option i).** `config/'
+  decision: >-
+    **`behavioral economics` definition widened — the ontology fix for BUG-357 (owner-ruled, option i).** 
+    `config/taxonomy_v5.yaml` `definition:` now names the mechanism class (heuristics, framing, affect, social 
+    norms, peer influence) and the second object class (behaviour-change interventions), keeping "describes the 
+    bias; does not exploit it to design persuasion" and all five excludes (`economics`, `psychology`, `cognitive 
+    science`, `design psychology`, `decision making`); `raw` aliases untouched; **0 slots added** (43/61 
+    unchanged). Because the definition is what the classifier reads, this is a **denotation** change: bytes 
+    `8d3c90e9…` -> `994e056b5e04ef1f37d350c0faae87e344da5cf85da2e405a8825d1f8f840312`, and 
+    `version`/`classification_version` -> **v5.6** with `taxonomy_version: v5.5 -> v5.6` synced in 
+    `config/version.yaml` + `config/pipeline_config.yaml` so the stamped `TAXONOMY_VERSION` (R14) distinguishes 
+    the two emission behaviours — otherwise two classifiers would share one stamp (D-309 was a phantom bump 
+    because it added zero slots; this one changes denotation, so the bump is required). The answer-space pin 
+    `config/closed_menu_v5.sha256` is UNCHANGED (the menu was not touched). Effect on row 60 is **predicted, not 
+    measured** until the boundary wiring + an S4 run happen.
+
+- id: D-322
+  category: EVALS
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**laya-mlx Phase A (benchmark-only feasibility sandbox) EXECUTED; Phase B held (owner-approved recommendation)'
+  decision: >-
+    **laya-mlx Phase A (benchmark-only feasibility sandbox) EXECUTED; Phase B held (owner-approved 
+    recommendation).** `pip install laya-mlx` 0.1.0 into an isolated `.venv_laya` (gitignored, zero production 
+    imports, D-275c). API inspected: `Agent.predict` / `Router.predict` / `presets` / `load` + 
+    `detect_language`/`is_english` (multilingual), and the menu plumbed as **62 caller-supplied criteria** — i.e. 
+    our closed menu is passed verbatim, no projection layer, consistent with the Gate-0 finding. Pins recorded in 
+    the new `config/bakeoff_laya.yaml` (`enabled: false`, revision + checkpoint licence 
+    `PIN-AT-INSTALL`/`UNVERIFIED`, `phase_a_scope: feasibility only`, `phase_b_blocked_on: F-11 second coder`). 
+    Remaining Phase A measurement (61-way degradation, latency, RAM) needs the HF weights download and is the next 
+    compute step. `arm_typed_head` stays a stub; the D-300 bar (>=5.0 pp, equal-or-lower abstention) is unchanged 
+    and unmet.
+
+- id: D-323
+  category: GOVERNANCE
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**Abstention repair queue: contract declared, queue deliberately NOT created (BUG-358).** `config/verify_abste'
+  decision: >-
+    **Abstention repair queue: contract declared, queue deliberately NOT created (BUG-358).** 
+    `config/verify_abstention.yaml` now declares `repair_queue: null` (NOT MATERIALISED) and 
+    `repair_queue_contract` (jsonl, append_only, `dedup_key: fb_id`, `write_path: 
+    governance/abstention_repair_queue.jsonl`, `owner: TBD-OWNER-GATE`). Rationale: the queue's only writer is the 
+    abstention rule, which is not enabled, so a file created today could never receive a row — an Emission-class 
+    artifact (a slot that exists and is never emitted) — and an empty queue would falsely assert "no repairs 
+    pending". The binding dependency is the capacity/routing **owner**, not the path.
+
+- id: D-324
+  category: GOVERNANCE
+  state: RESOLVED
+  date: 2026-09-21
+  title: '**Owner ratifications 2026-09-21 (session 13c): (a) the v5.6 taxonomy bump that rode with the BUG-357 widening'
+  decision: >-
+    **Owner ratifications 2026-09-21 (session 13c): (a) the v5.6 taxonomy bump that rode with the BUG-357 
+    widening; (b) `config/bakeoff_laya.yaml` + the `.venv_laya` benchmark-only sandbox; (c) Part B items 17-23 and 
+    25 ACCEPTED, Part C ruled: ADOPT the `default_home` + escape-condition form as the primary discriminator 
+    mechanism, with per-pair NAME rules demoted to the pairs where the object test converges (Part C asymmetry 
+    finding: rows 25/26 are the same two slots in opposite directions, rows 19/23 pair a method with an object).** 
+    Consequences: the ratified state of `governance/BOUNDARY_DISCRIMINATORS_20260921.md` Parts A-D is now RULED 
+    (not draft); the laya pins stand; `taxonomy_version v5.6` is the stamped version of record. **Not applied:** 
+    still nothing wired into the S4 classifier prompt - wiring + measurement on the frozen ruler is the next step, 
+    and it is also the only step that can confirm BUG-357's row-60 prediction.
+
+- id: D-325
+  category: ONTOLOGY
+  state: RESOLVED
+  date: 2026-09-21
+  title: 'Ruled boundary discriminators + default_home wired into the S4 classifier prompt; rule bytes folded into manifest_hash (D-318 run-path control)'
+  decision: >-
+    The ruled discriminator set (Part A default_home + escape, Part B 17-23/25, corrected 24'/26') is injected 
+    into the S4 merged-classify system prompt from config/boundary_discriminators.yaml (10 default_home + 10 
+    tests, 0 slots, taxonomy v5.6), fail-closed (C16). prompt_versions.s4_cribs_classify v2.0 -> v2.1. stamp.py 
+    folds the rule-file sha256 into manifest_hash so the pin is byte-compared in the RUN PATH (D-318). Control 
+    scripts/verify_boundary_injection.py PASS.
+
+- id: D-326
+  category: HARDENING
+  state: RESOLVED
+  date: 2026-09-21
+  title: 'integrity gate greened: 11 self-locating shell scripts + a COUNTED C12-FIXTURE exemption'
+  decision: >-
+    BUG-353 FIXED: 11 shell scripts replaced `cd '<abs repo path>'` with a self-locating cd (no path stored); the 
+    two tools/model_eval_suite.py hits are synthetic eval fixtures, exempted by an explicit COUNTED marker 
+    (C12-FIXTURE:) reported in the check's PASS message. integrity_check --quick now 10/10 (first green gate in 
+    several sessions). BUG-359 logged: the carried justfile config_audit path note was stale.
+
+- id: D-327
+  category: EVALS
+  state: RESOLVED
+  date: 2026-09-21
+  title: 'The ruled boundary block is REJECTED on measurement — the S4 prompt reverts to baseline'
+  decision: >-
+    A/B on the frozen 60-row ANCHOR-2 ruler (gpt-oss-20b, temp 0.0): baseline emitted 47/60 (78.3%) error_rate 
+    0.800 oov 13; treatment (boundary block) emitted 42/60 (70.0%) error_rate 0.8333 oov 18. WORSE on all three 
+    readings, so it fails every adoption bar; stage4.boundary_inject_enabled set back to false (one config flip, 
+    no code change). The block, the config and the measurement are KEPT as evidence (R-D410). Caveat: the ruler 
+    labels are single-coder ATTESTED (F-11), so this falsifies the hypothesis on THIS instrument and cannot 
+    license adoption in either direction. BUG-357 row-60 prediction NOT CONFIRMED.
+
+- id: D-328
+  category: GOVERNANCE
+  state: RESOLVED
+  date: 2026-09-21
+  title: 'Abstention ENABLED at the p25 operating point; the queue stays a declared view with a named owner'
+  decision: >-
+    Owner ruling 2026-09-21: config/verify_abstention.yaml enabled: true, t_low_percentile 25 (error 0.391 vs 
+    0.4741 with no abstention). Owner for triage: OWNER-WEEKLY-TRIAGE. No empty queue file is created (D-323): the 
+    queue remains a VIEW over stage-5 output, where the label and the margin ARE persisted (BUG-327), so no 
+    abstained row can be lost.
 
 summary:
-  total: 685
+  total: 695
   proposed: 6
   draft: 1
   active: 483
@@ -7270,7 +7438,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 118
+  resolved: 128
   planned: 8
   ratified: 5
   open: 17
@@ -7314,13 +7482,13 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 5
+    EVALS: 8
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 2
+    GOVERNANCE: 6
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1
@@ -7330,6 +7498,7 @@ summary:
     GOVERNANCE / QUALITY: 1
     GOVERNANCE / SOVEREIGNTY: 1
     GOVERNANCE / WORKFLOW: 1
+    HARDENING: 1
     HYGIENE / TESTING: 1
     INF: 177
     INF / GOV: 1
@@ -7356,7 +7525,7 @@ summary:
     MODEL: 2
     MODELS / RETIREMENT: 1
     OBSERVABILITY / TOOLING: 1
-    ONTOLOGY: 10
+    ONTOLOGY: 12
     ONTOLOGY / AUDIT: 3
     ONTOLOGY / AUDIT / STRATEGY: 1
     ONTOLOGY / GOVERNANCE: 1

@@ -607,3 +607,16 @@ DONE (audit first, then work):
 
 OWNER GATES REMAINING (nothing here blocks the measurement): decisions.yaml registry entries for D-319..D-326
 (owner-owned file); F-11 second coder; abstention operating point; laya Phase B; GitHub gate.
+
+### Session 15 — first measured verdict on the ruled boundaries (2026-09-21, D-327/D-328)
+1. MEASUREMENT RETURNED (D-327). 60 frozen rows, two arms, same model, temp 0.0:
+   baseline emitted 47/60 (78.3%) / error_rate 0.8000 / oov 13; treatment 42/60 (70.0%) / 0.8333 / oov 18.
+   The ruled boundary block is REJECTED as an intervention (worse on all three readings) -> injected prompt
+   switched off by config flip; artifacts kept as evidence. BUG-357's row-60 prediction: NOT CONFIRMED.
+   NEW DOMINANT DEFECT, measured: 13-18/60 rows emit a label that is not in the closed menu, and agreement with
+   the human slot is ~20%. The next intervention should target MENU COMPLIANCE (forcing an in-menu answer),
+   not boundaries.
+2. ABSTENTION ENABLED at p25 (D-328), triage owner named; queue stays a declared view (no empty file).
+3. decisions.yaml registry SYNCHRONISED: D-319..D-328 added; `--check` in sync (693 -> recomputed).
+4. stage-5 re-verification LAUNCHED (background): "550 FBs already verified -> 7445 remaining" (BUG-341 was stale).
+5. laya-mlx weights FETCHED into .venv_laya (advisory arm) - Phase B remains held on F-11.

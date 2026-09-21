@@ -532,3 +532,25 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
 - **D-318 RATIFIED** — a pin is a control only if byte-compared in the run path; `scripts/pin_audit.py` is the
   standing audit (5 pins, 0 failing). **BUG-333 partially fixed** (quoted-evidence R5 gate; BUG-331 still open).
 - Nothing published moved: 4750 result leaves identical to HEAD; CT 0.3533 / DISC 0.4741 / FORM 0.2828.
+
+### Session 13 — owner rulings applied (2026-09-21 19:54Z)
+
+**Owner gates: one closed, one new, three still open.**
+
+| gate | state |
+|---|---|
+| (1) prune the dead `normalization_map` entry (BUG-355b) | **CLOSED by owner** — verified inert: kappa artifact byte-identical after the prune |
+| (2) PART 2 boundary items 17-26 | **PARTLY RULED** — items 24 and 26 REJECTED (BE terminology); 17-23 and 25 remain silently accepted unless rejected. Part C (adopt `default_home` + escape instead of per-pair name rules) still unanswered |
+| (3) **NEW**: `behavioral economics` definition is narrower than its denotation (BUG-357) | **OPEN** — widen the `definition:` string (recommended) or re-label row 60 |
+| (4) laya-mlx benchmark-only install | **OPEN** — recommendation: narrow feasibility arm only; full A/B waits on the second coder (F-11) |
+| (5) abstention operating point `t_low = p25` | **OPEN** — still `enabled: false`, INERT |
+| (6) `repair_queue` path (BUG-358) | **OPEN** — recommendation: repoint to the write-path + `fb_id` de-dup key + owner; do not create an empty queue |
+
+**Corrected boundary tests** (definition-anchored, `behavioral economics` R1/R2/R3) are drafted in
+`governance/BOUNDARY_DISCRIMINATORS_20260921.md` **Part D**; the two rejected tests are struck but kept.
+
+**Bug register:** cite `governance/bug_status.json` — the count is deliberately NOT restated in a handoff (BUG-349);
+BUG-355 is PARTIALLY FIXED, not closed.
+
+**Not done, by design:** nothing wired into the S4 classifier prompt; no menu slot added; no canonical
+renamed; `config/taxonomy_v5.yaml` bytes unchanged; `arm_typed_head` still a stub.

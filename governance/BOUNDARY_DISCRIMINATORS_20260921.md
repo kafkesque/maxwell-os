@@ -78,6 +78,12 @@ of the source text, not to the label.
 26. **behavioral economics vs psychology** :: the claim is framed by an incentive, a price or a
     choice under uncertainty => behavioral economics ; the claim is about affect, personality,
     development or clinical behaviour => psychology.
+    ⛔ **REJECTED BY OWNER 2026-09-21** — the test never names BE's R1 (an *economic* object), so it
+    fires on `cognitive science`, `psychology` and `decision making`, the three slots BE explicitly excludes.
+    Corrected test: item 24′ in Part D.
+    ⛔ **REJECTED BY OWNER 2026-09-21** — "incentive / price / choice under uncertainty" is `economics`
+    (which BE excludes: it is the standard model BE deviates *from*), and the B side under-scopes `psychology`
+    (whose definition includes social behaviour). Corrected test: item 26′ in Part D.
 
 ---
 
@@ -110,3 +116,94 @@ default with a stated escape can.
 
 Not applied: these tests change no canonical, no `raw` list and no menu slot. They become binding
 only if the owner rules them in and a later decision wires them into the classifier prompt.
+
+---
+
+## Part D — OWNER RULINGS 2026-09-21: items 24 and 26 REJECTED; `behavioral economics` re-read from the taxonomy
+
+Owner: *"24: reject, 26: reject — both behavioural; behavioral economics is misunderstood"*. Both rejected
+tests above are **struck, not deleted**, because the rejection is itself the evidence. What follows is the
+terminology re-read that was asked for, done against the text of `config/taxonomy_v5.yaml` rather than from
+memory, then the corrected tests.
+
+### D.1 The definition of record (verbatim, `config/taxonomy_v5.yaml`)
+
+> **behavioral economics** — *"The descriptive study of how psychological factors and cognitive biases cause
+> systematic deviations from rational choice in economic decision-making and market behavior — where
+> heuristics, framing, and affect change what people choose (prices, incentives, markets). It describes the
+> bias; it does not exploit it to design persuasion."*
+> `exclude`: `economics`, `psychology`, `cognitive science`, `design psychology`, `decision making`
+> `raw`: `Behavioral Economics`, `behavioral economics`, `Behavioral Analysis`, `behavioral analysis`,
+> `Consumer Behavior`, `behavioural economics` (group: human & behavioral science)
+
+Three requirements are load-bearing. A test that drops one is not a BE test:
+
+| # | requirement | what dropping it produces |
+|---|---|---|
+| **R1** | **object** — an *economic* decision: a price, a purchase, demand, an incentive response, a market outcome, willingness to pay | "any deviation from the rational model" → `cognitive science`, `decision making` |
+| **R2** | **mechanism** — the cause is *psychological*: heuristic, framing, affect (and, in the nudging tradition, social norms / peer influence) | "incentive / price / uncertainty" is the vocabulary of `economics`, which BE **excludes** |
+| **R3** | **stance** — *descriptive*: it explains the deviation, it does not prescribe how to exploit it | "how to persuade / sell" → `marketing & communications`, `design` |
+
+### D.2 What was wrong with the two rejected tests
+
+* **item 24** offered R2's *marker* alone ("a systematic deviation of judgement from a rational benchmark")
+  and never named R1. It therefore fires on every bias claim, including the three slots BE excludes.
+  Row 57 *Generous Audacious Marketing* ("the bold assertion that a better alternative exists and a
+  willingness to lead users toward it… the audacity to communicate that vision") is a deliberate
+  positioning claim with **no economic-decision object**; the pipeline answered `behavioral economics`,
+  which is exactly the error an R1-less test predicts and cannot see.
+* **item 26** offered "an incentive, a price or a choice under uncertainty" as the BE test — that is
+  `economics` / `decision making`, i.e. the *standard model* BE deviates from (choice under uncertainty is
+  expected-utility territory, the baseline, not the deviation). Its B side was also mis-scoped:
+  `psychology` is defined as *"the empirical study of mind and behavior in individuals and groups —
+  emotion, personality, development, **social behavior**, and mental health"*, so a test naming only
+  affect/personality/clinical is **not** the complement of BE and silently re-routes social-behaviour
+  claims.
+
+### D.3 Corrected tests (definition-anchored; R-D410 — the rejected text above stands as evidence)
+
+**24′. strategic thinking vs behavioral economics**
+* a *deliberate* choice of ends or positioning by an organisational actor (vision, competitive position,
+  long-horizon intent, how to win) ⇒ **strategic thinking**;
+* *describes* how a psychological factor (heuristic, framing, affect, social influence) systematically
+  moves an **economic** choice — price, purchase, demand, incentive response, market outcome — away from the
+  standard/rational model ⇒ **behavioral economics**;
+* a bias or framing claim with **no economic object** ⇒ **not BE** (`cognitive science` if the mechanism is
+  computational/cognitive, `psychology` if it is behaviour/affect); a prescriptive "how to persuade" claim ⇒
+  `marketing & communications` / `design`, never BE (R3).
+
+**26′. behavioral economics vs psychology**
+* an **economic object** (price, purchase, demand, incentive, market, willingness to pay) *plus* a
+  psychological causal mechanism, described and not prescribed ⇒ **behavioral economics**;
+* a mechanism claim about the mind or behaviour of individuals or groups with **no economic object**
+  (emotion, personality, development, social behaviour, perception, judgement, mental health) ⇒
+  **psychology**;
+* an economic object with a standard/rational account and no psychological cause ⇒ **economics**;
+  no economic object and no behaviour claim ⇒ **cognitive science**.
+
+### D.4 The defect this exposes — the written definition is NARROWER than the operational denotation
+
+`behavioral economics` has exactly **two** human rows on the frozen 60-row sheet:
+
+| row | name | R1 (economic object) | R2 (psychological mechanism) | written definition says |
+|---|---|---|---|---|
+| 35 | Tv Advertising Consumer Behavior Pattern | present (perceived quality → purchasing decisions → demand) | present | **behavioral economics** ✔ |
+| 60 | Same-age Peer Modeling | **absent** (influence → "behaviour or attitude change"; no price, purchase, demand or incentive anywhere) | present | `psychology` (social psychology) |
+
+The owner's label for row 60 is `behavioral economics`, and the pipeline answered `psychology` — which is
+precisely what the **definition string read literally licenses**. So this is not a boundary question and
+not a typo: it is an **ontology (denotation) defect**, and no amount of boundary-rule wiring in the
+classifier prompt can fix it, because the definition string *is* the prompt's evidence for BE.
+
+Two ways out — the owner's call, and note that **neither moves a menu slot** (denotation, never spelling):
+
+* **(i) Widen the definition string** *(recommended)*: name the mechanism class and the second object class,
+  e.g. *"…in economic decision-making, market behaviour and behaviour-change interventions, where
+  heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives,
+  markets, choice of behaviour). It describes the bias; it does not exploit it to design persuasion."*
+  Keeps all five excludes. Matches 2/2 of the owner's BE rows and keeps the **object test** as the only
+  discriminator that converges.
+* **(ii) Keep the definition and re-label row 60** as `psychology` — honest to the written text, but then
+  the sheet's BE class has one member and the nudge / social-norms family has no home in the menu.
+
+Logged as **BUG-357**. Until the owner rules, 24′/26′ are *drafts*, and nothing is wired into any prompt.

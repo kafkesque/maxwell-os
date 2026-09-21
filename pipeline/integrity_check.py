@@ -453,16 +453,26 @@ def check_deprecated_config() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 # CHECK 14: No hardcoded paths (C12 compliance)
 # ═══════════════════════════════════════════════════════════════════════════
+# BUG-353/D-326: inline marker for synthetic eval-fixture paths (counted, never silent)
+FIXTURE_MARKER = "C12-FIXTURE:"
+
+
 def check_hardcoded_paths() -> tuple[bool, str]:
     """Scan the whole repo (pipeline/, tools/, scripts/, tests/, root *.sh) for hardcoded user paths (C12).
 
     D2439: previously only globbed PIPELINE_DIR.glob("*.py") — flat, non-recursive,
     .py-only. It could not see tools/, tests/, scripts/, pipeline/providers/,
     pipeline/storage/, or any .sh — 9 hardcoded /Users/barn paths were invisible.
+
+    BUG-353 (D-326): a line whose fixture data is a synthetic POSIX path (e.g. the tool-calling
+    eval prompts (a synthetic home/<user>/notes path)) is not a C12 hazard — C12 is about OUR environment paths.
+    Such a line must carry the explicit marker C12-FIXTURE:, and the exemption count is always
+    reported in the PASS message so the exemption surface stays visible and countable (never a
+    silent hole). The marker is deliberately narrow: it does not exempt a real repo/user path.
     """
     issues = []
     # `/Users/...`, `/home/...`, `C:\Users\...` — match the leading path portion only
-    user_paths = re.compile(r'["\'](/Users/[^\s"\']+|/home/[^\s"\']+|C:\\Users\\[^\s"\']+)')
+    user_paths = re.compile(r'["\'](/Users/[^\s"\']+|/home/[^\s"\']+|C:\\Users\\[^\s"\']+)')  # C12-FIXTURE: the detector's own pattern, not a path
 
     scan_roots = [
         PIPELINE_DIR,
@@ -483,18 +493,23 @@ def check_hardcoded_paths() -> tuple[bool, str]:
     # root-level shell scripts
     targets.extend(sorted(REPO_ROOT.glob("*.sh")))
 
+    exempted = 0
     for pf in sorted(set(targets)):
         try:
             with open(pf, encoding="utf-8") as f:
                 for i, line in enumerate(f, 1):
                     if user_paths.search(line) and "REMOVED" not in line:
+                        if FIXTURE_MARKER in line:  # synthetic eval fixture (BUG-353)
+                            exempted += 1
+                            continue
                         issues.append(f"  {pf.relative_to(REPO_ROOT)}:{i}: hardcoded path")
         except (OSError, UnicodeDecodeError):
             continue
 
     if issues:
         return False, "Hardcoded paths found (C12 violation):\n" + "\n".join(issues[:15])
-    return True, f"No hardcoded paths in {len(set(targets))} scanned files (C12 compliant)"
+    return True, (f"No hardcoded paths in {len(set(targets))} scanned files (C12 compliant)"
+                  f" — {exempted} explicit synthetic-fixture exemption(s)")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

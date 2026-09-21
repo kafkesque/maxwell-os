@@ -100,6 +100,73 @@ except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an
     raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
 
 
+# ── D-325 (2026-09-21): inject the RULED boundary discriminators + default_home. ──
+# D-324 ruled the default_home + named-escape form is the discriminator of record (per-pair NAME
+# rules demoted to pairs where the object test converges). D-318 requires the rules to be
+# byte-compared IN THE RUN PATH: pipeline/stamp.py folds the rule-file sha256 into manifest_hash,
+# and scripts/verify_boundary_injection.py asserts these bytes are present in this prompt.
+def _load_boundary_block() -> str:
+    """Render the ruled boundary rules from config into an S4 prompt block.
+
+    Fail-closed (C16): enabled + missing/malformed/empty rules → raise. Never classify
+    silently without the ruled boundaries once they are switched on.
+
+    Returns:
+        The rendered block, or "" when the injection is disabled in config.
+    """
+    import yaml
+    from pipeline.pipeline_paths import (PROJECT_ROOT, S4_BOUNDARY_INJECT_ENABLED,
+                                         S4_BOUNDARY_PATH)
+    if not S4_BOUNDARY_INJECT_ENABLED:
+        return ""
+    path = PROJECT_ROOT / S4_BOUNDARY_PATH
+    if not path.exists():
+        raise RuntimeError(f"D-325: boundary_inject_enabled but {S4_BOUNDARY_PATH} is missing")
+    cfg = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if not cfg.get("enabled"):
+        return ""
+    defaults = cfg.get("default_home") or []
+    tests = cfg.get("boundary_tests") or []
+    if not defaults or not tests:
+        raise RuntimeError("D-325: boundary rules empty (default_home/boundary_tests) — fail-closed")
+    out = [f"PART 3 — BOUNDARY DISCRIMINATORS (binding, taxonomy {cfg.get('taxonomy_version','')}).",
+           "Two disciplines can both look like a home. Apply these BEFORE choosing, in this order:",
+           "A) default_home — if the claim carries no evidence for any finer slot, use the group",
+           "   default below, UNLESS the claim matches its stated escape clause:"]
+    out += [f"   - {d['group']}: {str(d['sentence']).strip()}" for d in defaults]
+    out.append("B) boundary tests — apply the test to ONE sentence of the source text:")
+    out += [f"   {t['id']}. {t['pair']}: {str(t['rule']).strip()}" for t in tests]
+    return "\n".join(out)
+
+
+_BOUNDARY_BLOCK: str = _load_boundary_block()
+_BOUNDARY_ANCHOR = "Return ONLY a JSON object:"
+if _BOUNDARY_BLOCK:
+    if MERGED_CRIBS_CLASSIFY_SYSTEM.count(_BOUNDARY_ANCHOR) != 1:
+        raise RuntimeError("D-325: boundary injection anchor not unique — refusing to guess (C16)")
+    MERGED_CRIBS_CLASSIFY_SYSTEM = MERGED_CRIBS_CLASSIFY_SYSTEM.replace(
+        _BOUNDARY_ANCHOR, _BOUNDARY_BLOCK + "\n\n" + _BOUNDARY_ANCHOR, 1)
+
+
+def system_prompt(boundary: bool | None = None) -> str:
+    """Return the merged-classify system prompt.
+
+    Args:
+        boundary: True → include the ruled boundary block (production default from config);
+            False → the BASELINE arm with the block stripped (used only by the A/B harness);
+            None → whatever config/boundary_discriminators.yaml has enabled.
+
+    Returns:
+        The system prompt string sent to the S4 classifier.
+    """
+    if boundary is None or boundary:
+        return MERGED_CRIBS_CLASSIFY_SYSTEM
+    base = MERGED_CRIBS_CLASSIFY_SYSTEM
+    if _BOUNDARY_BLOCK and _BOUNDARY_BLOCK in base:
+        base = base.replace(_BOUNDARY_BLOCK + "\n\n", "", 1)
+    return base
+
+
 def build_merged_prompt(fb_data: dict) -> str:
     """Build a merged CRIBS + classification prompt for a single FB.
 
@@ -138,11 +205,14 @@ def merged_cribs_classify(
     model: str | None = None,
     max_tokens: int | None = None,
     timeout: int = 120,
+    boundary: bool | None = None,
 ) -> dict:
     """Single-call CRIBS enrichment + classification (D2224).
 
     Args:
         fb_data: FB dict with name, definition, mechanism, boundary, consequence.
+        boundary: True → inject the ruled boundary block (config default); False → baseline arm
+            (measurement only). See config/boundary_discriminators.yaml (D-324/D-325).
         model: Model to use. Default GPT-OSS-20B (D2249 — R5: different family from S2 Qwen).
         max_tokens: Max output tokens. None → read from pipeline_config.yaml (C12).
         timeout: Request timeout in seconds.
@@ -170,7 +240,7 @@ def merged_cribs_classify(
 
     # D2249/BUG-074: reasoning models (e.g. GPT-OSS) — prepend Reasoning:none
     # so they don't burn max_tokens on chain-of-thought before producing JSON.
-    system = MERGED_CRIBS_CLASSIFY_SYSTEM
+    system = system_prompt(boundary=boundary)
     if model:
         from pipeline.pipeline_paths import VERIFY_REASONING_OFF_MODELS, VERIFY_REASONING_OFF_PREFIX
         if model in VERIFY_REASONING_OFF_MODELS and VERIFY_REASONING_OFF_PREFIX:

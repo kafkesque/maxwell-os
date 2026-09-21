@@ -115,7 +115,19 @@ def _load_manifest() -> dict:
     try:
         with open(_cfg_path) as _f:
             _cfg = _yaml.safe_load(_f) or {}
-        return _cfg.get("pipeline_manifest", {})
+        manifest = _cfg.get("pipeline_manifest", {}) or {}
+        # D-318/D-325: a pin is a control only if it is byte-compared IN THE RUN PATH. Folding the
+        # bytes of the ruled boundary rules (and the taxonomy) into manifest_hash means an FB
+        # classified under different boundary rules cannot carry the same stamp (R14).
+        from pipeline.pipeline_paths import (PROJECT_ROOT, S4_BOUNDARY_INJECT_ENABLED,
+                                             S4_BOUNDARY_PATH)
+        if S4_BOUNDARY_INJECT_ENABLED:
+            _bp = PROJECT_ROOT / S4_BOUNDARY_PATH
+            if not _bp.exists():
+                raise RuntimeError(
+                    f"D-325: boundary_inject_enabled but {S4_BOUNDARY_PATH} is missing (fail-closed, C16)")
+            manifest["_s4_boundary_rules_sha256"] = hashlib.sha256(_bp.read_bytes()).hexdigest()[:16]
+        return manifest
     except Exception as e:
         print(f"   ⚠️  stamp: pipeline_manifest unreadable ({type(e).__name__}: {e}) — empty manifest (C16)", file=sys.stderr)
         return {}

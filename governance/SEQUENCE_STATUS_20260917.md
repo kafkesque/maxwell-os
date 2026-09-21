@@ -582,3 +582,28 @@ Abstention `t_low=p25` and G1/G5 ratified as recommended.
 
 Owner gates remaining: none blocking the next step. Step 1 (wire the ruled boundaries into the S4 prompt and
 measure on the frozen ruler) is now UNBLOCKED and is the only step that can move emission coverage.
+
+### Session 14 — the ruled boundaries are now IN the classifier (2026-09-21)
+Owner: "accept your recommendation / do the next 6 steps / forensic audit first / hand over anything blocked
+by a manual review or decision / update and sync governance dependencies / list next strategically
+consequential steps".
+
+DONE (audit first, then work):
+1. FORENSIC AUDIT GREEN — clean tree at 0e681c1 (no drift/bind/gap/conflict/leak/contamination); menu pin
+   unchanged (73597ee2); pin_audit.py PINS 5 checked 0 failing PASS; decisions summary in sync; bug register
+   104 ids / 67 open / 37 closed; anchored ruler unchanged (0ec321a7 / a91f9c85 / 20a4a437).
+   RED/orange carried: integrity [14] (now FIXED, see below) and stage-5 Verify = 0 (BUG-341, still OPEN).
+2. D-325 — the ruled discriminator set is WIRED: config/boundary_discriminators.yaml (10 default_home + 10
+   boundary tests: 17-23, 25, 24', 26'), injected into the S4 merged-classify system prompt, fail-closed
+   (C16), prompt_versions.s4_cribs_classify v2.0→v2.1, and the rule bytes folded into manifest_hash
+   (D-318: byte-compared in the run path; manifest_hash now 024579b6).
+   Control artifact: scripts/verify_boundary_injection.py → PASS.
+3. D-326 — BUG-353 integrity gate greened: 11 shell scripts self-locating cd + a COUNTED C12-FIXTURE
+   exemption for synthetic eval fixtures → integrity_check --quick 10/10.
+4. Measurement launched: scripts/s4_emission_ruler.py (config/s4_emission_ruler.yaml) — A/B, baseline vs
+   treatment, 60 frozen rows, gpt-oss-20b, temp 0.0 → governance/anchor2_s4_emission_20260921.json.
+   This is the first run that can CONFIRM OR FALSIFY the BUG-357 row-60 prediction.
+5. STALE NOTE CORRECTED (BUG-359): the justfile config_audit path was already correct.
+
+OWNER GATES REMAINING (nothing here blocks the measurement): decisions.yaml registry entries for D-319..D-326
+(owner-owned file); F-11 second coder; abstention operating point; laya Phase B; GitHub gate.

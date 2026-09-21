@@ -1,0 +1,86 @@
+schema_version: "1.0"
+decision: D-325
+created_at: "2026-09-21"
+taxonomy_version: v5.6
+enabled: true
+role: >-
+  S4 classifier boundary discriminators + default_home tie-breakers. D-324 ruled the
+  default_home + named-escape form is the discriminator of record; per-pair NAME rules are
+  demoted to the pairs where the object test converges (24p/26p, 19, 23).
+source_doc: governance/BOUNDARY_DISCRIMINATORS_20260921.md
+source_doc_sha256: "40a3c642c2adc2da29660a4766799201a7b8053cdd996ad0bfd5f0fe20fa0c94"
+taxonomy_sha256: "994e056b5e04ef1f37d350c0faae87e344da5cf85da2e405a8825d1f8f840312"
+menu_hash: "73597ee2b1bb1eb92edb08e743ffa0654c1e5994edcd3535d814c7942a89df6f"
+slots_added: 0
+default_home:
+  - group: "design & visual arts"
+    sentence: >-
+      The default home for any claim about how a designed artefact is made, composed or read is design & visual arts - unless the claim is about a user's measured response to it (-> human & behavioral science) or about the machinery that renders it (-> computing, ai & information).
+  - group: "human & behavioral science"
+    sentence: >-
+      The default home for any claim about how people perceive, judge, feel or behave is human & behavioral science - unless the claim is about the mechanism of a market or an incentive (-> economics & business) or about meaning carried by signs (-> communication & media).
+  - group: "computing, ai & information"
+    sentence: >-
+      The default home for any claim about how a machine represents, learns, retrieves or secures information is computing, ai & information - unless the claim is about the economic or organisational consequence of that system (-> economics & business) or about the construction practice of shipping it (-> software engineering, inside this same group).
+  - group: "economics & business"
+    sentence: >-
+      The default home for any claim about resource allocation, incentive or organisational choice is economics & business - unless the claim is about the distribution of power and institutions that set the rules (-> political economy) or about a formal optimisation model (-> systems & operations).
+  - group: "communication & media"
+    sentence: >-
+      The default home for any claim about meaning, message, audience or framing is communication & media - unless the sign system is specifically visual (-> visual semiotics) or the claim is about how a message is produced as an artefact (-> design & visual arts).
+  - group: "systems & operations"
+    sentence: >-
+      The default home for any claim about feedback, stocks/flows, optimisation or method is systems & operations - unless the claim is about the knowledge-producing procedure itself (-> research methodology) or about downside exposure (-> risk management).
+  - group: "philosophy & law"
+    sentence: >-
+      The default home for any claim about norms, justification, obligation or what may be permitted is philosophy & law - unless the claim is about how a norm is actually enforced or breached in practice (-> economics & business / human & behavioural science).
+  - group: "engineering, math & physics"
+    sentence: >-
+      The default home for any claim about a mathematical structure, a physical constraint or a bounded engineering artefact is engineering, math & physics - unless the claim is about the digital system built on it (-> computing, ai & information).
+  - group: "life & health science"
+    sentence: >-
+      The default home for any claim about biological or clinical processes is life & health science - unless the claim is about a cognitive or behavioural mechanism with no clinical outcome (-> cognitive science / psychology).
+  - group: "interdisciplinary"
+    sentence: >-
+      interdisciplinary is the default home for a claim whose evidence is a deliberate crossing of two groups, and it is the home of last resort before emerging - never a first choice.
+boundary_tests:
+  - id: "17"
+    pair: "cognitive science vs neuroscience"
+    rule: >-
+      The claim is about a representation, computation or strategy (how information is processed) => cognitive science ; the claim is about a neural substrate, a measured brain signal or a lesion => neuroscience.
+  - id: "18"
+    pair: "operations research vs creative process"
+    rule: >-
+      The claim has a formal objective to be optimised (cost, queue, schedule) => operations research ; the claim is about how an idea is generated, incubated or selected for novelty => creative process.
+  - id: "19"
+    pair: "motion & time vs human-computer interaction"
+    rule: >-
+      The claim is about the temporal design of an artefact (timing, easing, sequence, pace) => motion & time ; the claim is about the interface mechanism through which a user acts (control, feedback, usability) => human computer interaction.
+  - id: "20"
+    pair: "finance vs economics"
+    rule: >-
+      The claim is about the valuation, pricing or allocation of capital instruments => finance ; the claim is about production, trade, markets or welfare in aggregate => economics.
+  - id: "21"
+    pair: "design psychology vs emerging"
+    rule: >-
+      The claim is about a designer's or user's cognition, perception or affect WITHIN a design activity => design psychology ; the claim has no settled slot and is being parked => emerging (a label of last resort, never a first choice).
+  - id: "22"
+    pair: "artificial intelligence vs software engineering"
+    rule: >-
+      The claim is about learning, representation or model behaviour => artificial intelligence ; the claim is about latency, coupling, deployment or maintainability of the delivered system => software engineering.
+  - id: "23"
+    pair: "research methodology vs finance"
+    rule: >-
+      The claim is about a method for producing or validating knowledge (sampling, design, validity, a detector applied to data) => research methodology ; the claim's OBJECT is a return, a price or a portfolio => finance. The discriminator is the OBJECT of the claim, not the instrument used.
+  - id: "24p"
+    pair: "strategic thinking vs behavioral economics"
+    rule: >-
+      A DELIBERATE choice of ends or positioning by an organisational actor (vision, competitive position, long-horizon intent, how to win) => strategic thinking ; the claim DESCRIBES how a psychological factor (heuristic, framing, affect, social influence) systematically moves an ECONOMIC choice - price, purchase, demand, incentive response, market outcome - away from the standard/rational model => behavioral economics ; a bias or framing claim with NO economic object => NOT behavioral economics (cognitive science if the mechanism is computational/cognitive, psychology if it is behaviour/affect) ; a prescriptive how-to-persuade claim => marketing & communications or design, never behavioral economics.
+  - id: "25"
+    pair: "psychology vs health & medicine"
+    rule: >-
+      The claim is about a mental, affective or behavioural mechanism => psychology ; the claim is about a diagnosis, a treatment or a clinical outcome => health & medicine.
+  - id: "26p"
+    pair: "behavioral economics vs psychology"
+    rule: >-
+      An ECONOMIC object (price, purchase, demand, incentive, market, willingness to pay) PLUS a psychological causal mechanism, described and not prescribed => behavioral economics ; a mechanism claim about the mind or behaviour of individuals or groups with NO economic object (emotion, personality, development, social behaviour, perception, judgement, mental health) => psychology ; an economic object with a standard/rational account and no psychological cause => economics ; no economic object and no behaviour claim => cognitive science.

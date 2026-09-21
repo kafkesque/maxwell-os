@@ -2376,3 +2376,21 @@ not retro-editable); new artifacts must cite `994e056b…` + `taxonomy_version v
 
 Part B items 17-23 and 25 accepted; items 24/26 remain REJECTED and superseded by 24'/26' (definition-anchored,
 now backed by the v5.6 BE definition, D-321). Nothing wired into the prompt yet.
+
+## BUG-359 (LOW — process, LOGGED 2026-09-21): a carried "pending fix" note that was never re-verified
+The justfile preflight path ('names scripts/config_audit.py, should be pipeline/config_audit.py') was carried
+across at least three sessions as an open task. Re-checked today: justfile:24 and justfile:255 ALREADY read
+`pipeline/config_audit.py`. The note was stale from the moment the file moved, and re-deferring it cost
+sessions of attention. Standing rule: a pending-task note is not evidence - re-run the check before
+re-deferring it, and delete the note the moment it passes.
+
+## BUG-353 (MED → FIXED 2026-09-21, D-326): integrity check [14] Hardcoded paths (C12), 13 hits
+(1) 11 shell scripts (next_critical_queue, queue_after_chain, reclaim_optiq, rerun_niah_fixed,
+run_completeness, run_completeness_tier2, run_final_chain, run_qwen38_quant_ab, run_remaining_chain,
+run_s4_gemma, run_vision_probe) each began with `cd '<abs repo path>' || exit 1` → replaced with a
+self-locating `cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"` (no path stored anywhere).
+(2) tools/model_eval_suite.py:303,308 → synthetic tool-calling EVAL FIXTURES ("/home/dana/notes"), not our
+environment. Exempted with the explicit marker C12-FIXTURE: on the line; check 14 now REPORTS the exemption
+count in its PASS message so the exemption surface is visible and countable, never a silent hole.
+(3) The detector's own regex literal was then flagged by itself → same marker applied.
+Gate: python3 pipeline/integrity_check.py --quick → 10/10 PASS.

@@ -15,7 +15,7 @@ pipeline_manifest:
     nli: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
   prompt_versions:
     s2_convergent_extract: v7.0
-    s4_cribs_classify: v2.0
+    s4_cribs_classify: v2.1  # D-325: boundary discriminator block injected
     s5_factual_check: v3.0
 classifier_training:
   # D2577: auto-sorter student — full fine-tune (NO LoRA).
@@ -307,6 +307,9 @@ watchdog:
   causal_warn_ratio: 0.5
   causal_halt_ratio: 0.9
 stage4:
+  # D-325 (2026-09-21): ruled boundary discriminators, D-318 byte-compared in the run path
+  boundary_inject_enabled: true
+  boundary_path: config/boundary_discriminators.yaml
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl
   growth_edge_output: growth_edges.jsonl

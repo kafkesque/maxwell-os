@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 104,
+  "total_ids": 105,
   "open_n": 67,
-  "closed_n": 37,
+  "closed_n": 38,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -324,11 +324,6 @@
       "events": 1
     },
     {
-      "id": "BUG-353",
-      "title": "(MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-H)",
-      "events": 1
-    },
-    {
       "id": "BUG-354",
       "title": "(MED \u2014 OPEN): the shared resolver rejects the catch-all on BOTH axes",
       "events": 1
@@ -341,6 +336,11 @@
     {
       "id": "BUG-356",
       "title": "(LOW \u2014 OPEN): the repair queue's own \"Next:\" line is stale and hides the real next action",
+      "events": 1
+    },
+    {
+      "id": "BUG-359",
+      "title": "(LOW \u2014 process, LOGGED 2026-09-21): a carried \"pending fix\" note that was never re-verified",
       "events": 1
     }
   ],
@@ -380,6 +380,7 @@
     "BUG-347",
     "BUG-348",
     "BUG-350",
+    "BUG-353",
     "BUG-357",
     "BUG-358"
   ]

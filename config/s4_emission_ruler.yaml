@@ -1,0 +1,13 @@
+schema_version: "1.0"
+decision: D-325
+role: >-
+  A/B measurement of the ruled boundary block on the frozen ANCHOR-2 ruler (60 rows).
+  baseline arm = S4 merged-classify WITHOUT the boundary block; treatment arm = WITH it.
+  Measures EMISSION (a slot actually written) and canonical agreement vs the human verdict.
+sheet: governance/ANCHOR2_BLIND_SHEET_20260920.csv
+key: governance/ANCHOR2_KEY_20260920.json
+output: governance/anchor2_s4_emission_20260921.json
+arms: [baseline, treatment]
+max_workers: 8
+max_tokens: 900
+timeout: 180

@@ -11,7 +11,7 @@
 # 3. CHECK S4_5: the probe recorded 12/12 'declarative', which is suspicious. Compare against the
 #    stored procedural_skill column before believing it.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/next_critical.log
 say() { echo "[next] $*  $(date '+%F %T')" | tee -a "$LOG"; }
 

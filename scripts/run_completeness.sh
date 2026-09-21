@@ -5,7 +5,7 @@
 # Ordered by decision-relevance; the harness skips measured rows, so partial == resumable.
 # Runs LAST in the serial chain (single resident model — BUG-255).
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/model_eval_completeness.log
 echo "[complete] TIER-1 start $(date '+%F %T')" | tee -a $LOG
 

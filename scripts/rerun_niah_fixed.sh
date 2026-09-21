@@ -6,7 +6,7 @@
 # long-context suites for the 5 keepers with corrected tiers; the 32k rows persist in the
 # checkpoint as transport errors and are retried automatically (_done_keys skips errors).
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/model_eval_runB.log
 echo "[niah-fix] start $(date '+%F %T')" | tee -a $LOG
 while pgrep -f 'run_final_chain.sh' > /dev/null 2>&1; do sleep 60; done

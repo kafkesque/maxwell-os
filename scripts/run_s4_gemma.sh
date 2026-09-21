@@ -6,7 +6,7 @@
 # 0.339) and domain F1 (0.357 vs 0.261). So the production-path table must include it.
 # Serialised behind chains 2 and 3 (single resident model — BUG-255).
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 echo "[s4gemma] start $(date '+%F %T')"
 while pgrep -f 'run_qwen38_quant_ab.sh' > /dev/null 2>&1 || pgrep -f 'run_vision_probe.sh' > /dev/null 2>&1; do sleep 60; done
 echo "[s4gemma] queue clear $(date '+%F %T')"

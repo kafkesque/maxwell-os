@@ -3,7 +3,7 @@
 # 1) wait for the Ornith 4bit/8bit A/B   2) gap-fill the 43+2 errored rows
 # 3) Run B long-context shortlist        4) production-path S4 vs gold
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 
 echo "[chain] start $(date '+%F %T')"
 while pgrep -f 'eval_models_ornith_ab' > /dev/null 2>&1; do sleep 60; done

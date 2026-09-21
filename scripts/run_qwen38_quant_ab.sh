@@ -4,7 +4,7 @@
 # download, registers the model via /admin/api/reload (no GUI restart), then runs the
 # decisive suites on BOTH variants so the comparison uses identical gold rows.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 
 echo "[ab] start $(date '+%F %T')"
 while pgrep -f 'run_remaining_chain.sh' > /dev/null 2>&1; do sleep 60; done

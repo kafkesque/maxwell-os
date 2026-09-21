@@ -12,7 +12,7 @@
 #      S2 cross-family relabel, S4_5 procedural_skill.
 #   3. hyDE, via the existing golden-set A/B (recall@k / MRR with vs without HyDE).
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/post_chain_queue.log
 say() { echo "[post] $*  $(date '+%F %T')" | tee -a "$LOG"; }
 

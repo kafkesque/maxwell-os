@@ -209,6 +209,9 @@ S4_QUARANTINE_OUTPUT=_CFG["stage4"]["quarantine_output"]
 S4_GOLDEN_PATH = _CFG.get("stage4", {}).get("golden_path", "config/golden/stage4_golden.yaml")
 S4_GOLDEN_INJECT_ENABLED = bool(_CFG.get("stage4", {}).get("golden_inject_enabled", False))
 S4_GOLDEN_MAX_EXAMPLES = int(_CFG.get("stage4", {}).get("golden_max_examples", 4))
+# D-325 (2026-09-21): ruled boundary discriminators + default_home tie-breakers (D-324).
+S4_BOUNDARY_INJECT_ENABLED = bool(_CFG.get("stage4", {}).get("boundary_inject_enabled", False))
+S4_BOUNDARY_PATH = _CFG.get("stage4", {}).get("boundary_path", "config/boundary_discriminators.yaml")
 S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long combined).
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))

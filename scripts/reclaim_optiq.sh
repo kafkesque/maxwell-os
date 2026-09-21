@@ -9,7 +9,7 @@
 # is unmapped, so the space appears once oMLX releases it. The symlink is removed first so the
 # registry cannot load it again before oMLX re-scans.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/reclaim_optiq.log
 say() { echo "[reclaim] $*  $(date '+%F %T')" | tee -a "$LOG"; }
 

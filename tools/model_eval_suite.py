@@ -300,12 +300,12 @@ TOOL_CASES = [
     # ── extended 2026-09-16: tool calling rested on n=4, which is not enough to assign a role.
     # Target n>=20 so one item cannot move the ranking. Same grader (tool name + arg containment).
     ("Find configuration files under /srv/app.", "search_files", {"query": "config", "path": "/srv/app"}),
-    ("List every markdown note in /home/dana/notes.", "search_files", {"query": "markdown", "path": "/home/dana/notes"}),
+    ("List every markdown note in /home/dana/notes.", "search_files", {"query": "markdown", "path": "/home/dana/notes"}),  # C12-FIXTURE: synthetic eval path, not a repo/env path
     ("Search /data/raw for parquet files.", "search_files", {"query": "parquet", "path": "/data/raw"}),
     ("Locate backup archives under /mnt/archive.", "search_files", {"query": "backup", "path": "/mnt/archive"}),
     ("Read the first 25 lines of /srv/app/main.py.", "read_file", {"path": "/srv/app/main.py", "start_line": "1", "end_line": "25"}),
     ("Show lines 100 to 140 of /var/log/nginx/error.log.", "read_file", {"path": "/var/log/nginx/error.log", "start_line": "100", "end_line": "140"}),
-    ("Open /home/dana/notes/plan.md.", "read_file", {"path": "/home/dana/notes/plan.md"}),
+    ("Open /home/dana/notes/plan.md.", "read_file", {"path": "/home/dana/notes/plan.md"}),  # C12-FIXTURE: synthetic eval path, not a repo/env path
     ("Read lines 7 to 9 of /etc/hosts.", "read_file", {"path": "/etc/hosts", "start_line": "7", "end_line": "9"}),
     ("Email the security team at security@example.com with subject Rotate keys.", "send_email", {"to": "security@example.com", "subject": "Rotate keys"}),
     ("Send a message to ana@example.com titled Weekly digest confirming the report.", "send_email", {"to": "ana@example.com", "subject": "Weekly digest"}),

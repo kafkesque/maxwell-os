@@ -4,7 +4,7 @@
 # decision (long-context, S4 production, Qwen3.8 quant, Ornith A/B); it completes the
 # characterisation of models whose roles are already settled by other evidence.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/model_eval_completeness.log
 say() { echo "[tier2] $*  $(date '+%F %T')" | tee -a $LOG; }
 while pgrep -f 'run_final_chain.sh' > /dev/null 2>&1; do sleep 60; done

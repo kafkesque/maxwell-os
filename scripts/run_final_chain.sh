@@ -7,7 +7,7 @@
 #   LEVER 2: Tier-1 completeness carries NO reasoning battery (+/-2.7 h); the battery
 #            moves to run_completeness_tier2.sh so the data is deferred, not lost.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 LOG=governance/run_final_chain.log
 S4LOG=governance/pipe_s4_classify.log
 say() { echo "[final] $*  $(date '+%F %T')" | tee -a $LOG; }

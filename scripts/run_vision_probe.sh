@@ -3,7 +3,7 @@
 # downloading any 9B VLM. Waits for the benchmark queue (single resident model, BUG-255),
 # then probes Qwen3.8-27B / REAP-19B / gemma-4-E4B with a synthesised image.
 set -u
-cd '/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' || exit 1
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1  # C12: self-locating, no hardcoded path
 echo "[vision] start $(date '+%F %T')"
 while pgrep -f 'run_qwen38_quant_ab.sh' > /dev/null 2>&1; do sleep 60; done
 echo "[vision] queue clear $(date '+%F %T')"

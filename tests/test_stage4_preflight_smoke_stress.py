@@ -377,8 +377,10 @@ def test_smoke_d2371_quarantine_without_application(tmp_path: Path) -> None:
         {"MAXWELL_RUN_ID": run_id, "MAXWELL_SKIP_LLM": "1"},
     )
     # Application is absent → every principle is quarantined → non-zero exit.
+    # BUG-330: probe the INTENT (a quarantine was reported), not one casing. D2196 prints
+    # "...documents quarantined..." (lowercase), so the uppercase-only probe was a false failure.
     assert r.returncode in (1, 2)
-    assert "QUARANTINED" in (r.stdout + r.stderr)
+    assert "quarantined" in (r.stdout + r.stderr).lower()
 
 
 def test_smoke_diverse_batch_writes_checkpoint_and_routes(tmp_path: Path) -> None:

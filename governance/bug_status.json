@@ -1,0 +1,343 @@
+{
+  "schema_version": "1.0",
+  "source": "governance/buglog.md",
+  "parser": "scripts/bug_status.py",
+  "total_ids": 89,
+  "open_n": 60,
+  "closed_n": 29,
+  "c15_threshold": 5,
+  "c15_must_append_to_handoffs": true,
+  "open": [
+    {
+      "id": "BUG-253",
+      "title": "reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure)",
+      "events": 1
+    },
+    {
+      "id": "BUG-254",
+      "title": "oMLX model registry is startup-cached; the fix is POST /admin/api/reload, not a GUI restart",
+      "events": 1
+    },
+    {
+      "id": "BUG-255",
+      "title": "`POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark",
+      "events": 1
+    },
+    {
+      "id": "BUG-257",
+      "title": "the niah top tier exceeded oMLX's context window, making it unmeasurable",
+      "events": 2
+    },
+    {
+      "id": "BUG-258",
+      "title": "model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE)",
+      "events": 1
+    },
+    {
+      "id": "BUG-259",
+      "title": "report tables quoted PRUNED models as if they were candidates",
+      "events": 1
+    },
+    {
+      "id": "BUG-260",
+      "title": "pipe_s4_classify_gold scored the RAW LLM label against CANONICAL gold (S4 swap gate [[G2]] was mis-measured)",
+      "events": 1
+    },
+    {
+      "id": "BUG-261",
+      "title": "safe_delete.py copies before deleting, so reclaiming space can FILL THE DISK",
+      "events": 1
+    },
+    {
+      "id": "BUG-263",
+      "title": "the S2 cross-family relabel produces NOTHING when run with gpt-oss (silent, every record)",
+      "events": 2
+    },
+    {
+      "id": "BUG-264",
+      "title": "poisoned rows survive every re-run (found by drift_monitor, 2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-265",
+      "title": "toolcalling scored the HARNESS, not the model: native tool_calls ignored",
+      "events": 2
+    },
+    {
+      "id": "BUG-266",
+      "title": "gpt-oss toolcalling is truncated, not incapable",
+      "events": 1
+    },
+    {
+      "id": "BUG-270",
+      "title": "OPEN (2026-09-17) \u2014 the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomi",
+      "events": 1
+    },
+    {
+      "id": "BUG-273",
+      "title": "the domains axis violates its own cardinality contract (2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-274",
+      "title": "the `related_fbs` graph is 56.8% asymmetric (2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-275",
+      "title": "LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-276",
+      "title": "the C13 safety net is DEAD, and nothing backs up the DB (2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-277",
+      "title": "the content_type axis mixes two vocabularies, and the docs say \"7 values\" (2026-09-17)",
+      "events": 1
+    },
+    {
+      "id": "BUG-278",
+      "title": "stage 5 treats \"unverifiable\" as \"untrue\", and never persists which one it was (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-279",
+      "title": "the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-280",
+      "title": "`content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-281",
+      "title": "`noise_drop` fuses two different questions; there is no relevance axis (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-282",
+      "title": "the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-283",
+      "title": "the ruler scorer accepted only integer indices and would have crashed on the first real sheet (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-284",
+      "title": "the tooling kept reporting a RULED question as an open defect, and the ruler validator failed a decided sheet (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-285",
+      "title": "the discipline/domain/depth filters do not constrain the hybrid result set (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-286",
+      "title": "the write guard destroys the label that D-271a ruled legal (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-287",
+      "title": "graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-288",
+      "title": "the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-289",
+      "title": "`source_diversity` counts FILENAMES, not works: 29.1% of \"convergence\" is duplicate ingestion (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-290",
+      "title": "two illegal values sit inside the retrieval facets (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-292",
+      "title": "`fbs_fts` has an INSERT trigger only, and nothing checks the index (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-293",
+      "title": "mega-merges up to 244 sources for a single FB (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-294",
+      "title": "the ruler's sampling frame is not crossed with `status`, so two estimands are conflated (2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-295",
+      "title": "The ruler compares stored-label ACCURACY to a human-provenance SHARE (MEDIUM, my instrument)",
+      "events": 1
+    },
+    {
+      "id": "BUG-296",
+      "title": "F-14 pocket retarget is statistically null; the claim is withdrawn (MEDIUM, my instrument)",
+      "events": 1
+    },
+    {
+      "id": "BUG-297",
+      "title": "\"ROLE is decorative\" is INVERTED: ROLE is the only serving gate (CRITICAL, my instrument)",
+      "events": 1
+    },
+    {
+      "id": "BUG-298",
+      "title": "No label carries human provenance; the floor gate is unsatisfiable (MEDIUM)",
+      "events": 1
+    },
+    {
+      "id": "BUG-299",
+      "title": "The serving gate is a LABEL, not a verification verdict (CRITICAL, 2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-300",
+      "title": "The RRF keyword leg is query-blind, insertion-ordered and weighted equally (HIGH)",
+      "events": 1
+    },
+    {
+      "id": "BUG-301",
+      "title": "Stage 5 computes a verification tier that Stage 6 has no column for (HIGH)",
+      "events": 1
+    },
+    {
+      "id": "BUG-302",
+      "title": "Two further status writers remain outside the serving gate (MEDIUM, 2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-303",
+      "title": "Stored extraction_type over-claims causal_mechanism; normative_heuristic 50% mislabeled (HIGH, 2026-09-19)",
+      "events": 1
+    },
+    {
+      "id": "BUG-304",
+      "title": "Stored content_type over-calls principle; stored discipline 47% wrong with 8 zero-agreement slots (HIGH, 2026-09-20)",
+      "events": 1
+    },
+    {
+      "id": "BUG-305",
+      "title": "R2 definition-anchored NLI emits ~100% CONTRA on the principle class \u2014 the meter is broken (CRITICAL, 2026-09-20)",
+      "events": 1
+    },
+    {
+      "id": "BUG-306",
+      "title": "Single-coder ceiling \u03ba is contaminated: same-person + ruleset mismatch (HIGH, 2026-09-20)",
+      "events": 3
+    },
+    {
+      "id": "BUG-312",
+      "title": "NEW: three divergent label snapshots (HIGH, provenance drift, 2026-09-20)",
+      "events": 1
+    },
+    {
+      "id": "BUG-314",
+      "title": "Frozen ruler csv_sha256 provenance mismatch (MED, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-315",
+      "title": "Hardcoded oMLX API key fallback (LOW-MED, C12, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-316",
+      "title": "goose main-loop model is the known-bad agentic model (MED, Phase 3 risk, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-317",
+      "title": "Bake-off arm layer silently ran the NLI arm on CPU (MED, own wiring, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-318",
+      "title": "Bake-off: config JSON braces killed the LLM arm + non-atomic artifact (HIGH, own wiring, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-319",
+      "title": "qwen3coder arm abstains 116/116 (HIGH, hidden failure, 2026-09-21)",
+      "events": 1
+    },
+    {
+      "id": "BUG-326",
+      "title": "(MED - BLOCKED 2026-09-21): the repair's TARGET NUMBERS do not reproduce on the live DB",
+      "events": 2
+    },
+    {
+      "id": "BUG-331",
+      "title": "Serving-gate write to the production DB has no R5 review on record (MED, OPEN)",
+      "events": 1
+    },
+    {
+      "id": "BUG-333",
+      "title": "(MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp",
+      "events": 1
+    },
+    {
+      "id": "BUG-334",
+      "title": "(MED - OPEN 2026-09-21): a pre-registered n is not automatically the measurable n",
+      "events": 1
+    },
+    {
+      "id": "BUG-336",
+      "title": "(MED - OPEN 2026-09-21, NEW STANDING RULE): an agent's measurement claim is not evidence",
+      "events": 1
+    },
+    {
+      "id": "BUG-341",
+      "title": "(HIGH \u2014 OPEN 2026-09-21, regression of BUG-311): the LIVE stage5 checkpoint is absent again",
+      "events": 1
+    },
+    {
+      "id": "BUG-343",
+      "title": "(LOW-MED \u2014 OPEN 2026-09-21) \u2014 a smoke test asserts a checkpoint that its own fixture cannot produce",
+      "events": 1
+    }
+  ],
+  "closed": [
+    "BUG-256",
+    "BUG-268",
+    "BUG-269",
+    "BUG-271",
+    "BUG-272",
+    "BUG-291",
+    "BUG-307",
+    "BUG-308",
+    "BUG-309",
+    "BUG-310",
+    "BUG-311",
+    "BUG-313",
+    "BUG-320",
+    "BUG-321",
+    "BUG-322",
+    "BUG-323",
+    "BUG-324",
+    "BUG-325",
+    "BUG-327",
+    "BUG-328",
+    "BUG-329",
+    "BUG-330",
+    "BUG-332",
+    "BUG-335",
+    "BUG-337",
+    "BUG-338",
+    "BUG-339",
+    "BUG-340",
+    "BUG-342"
+  ]
+}

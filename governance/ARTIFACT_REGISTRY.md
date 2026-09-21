@@ -79,3 +79,12 @@ converting that inference into evidence. This line is reserved for it:
 > `human_attestation: ""` — owner, please sign: *"these 150 labels are mine, made blind to pipeline output."*
 
 Until it is signed, treat "human-anchored" as *verified-by-reconstruction*, not *attested*.
+## D-316 ADDENDUM (2026-09-21) — what is pinned, and what is only citable
+| role | path | sha256 | note |
+|---|---|---|---|
+| answer key (only) | governance/anchor1_frozen_20260920.json | 0ec321a7… | unchanged by D-316 |
+| abstention REASON | governance/RULER_BLIND_SHEET_20260917.csv | 38323192… | annotation only, drift = FAIL-CLOSED |
+| stored side | governance/ruler_sheet_key_20260917.json | d4cb4595… | now declared in config |
+| stage5 labels (only survivor) | knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.stale_20260921_185942 | 2c206a25… | STALE; live path deliberately empty |
+| bug register | governance/bug_status.json | generated | the only quotable C15 count |
+

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 682
+total_decisions: 683
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7191,8 +7191,28 @@ decisions:
   supersedes_note: >-
     Closes BUG-329 and the ruler half of BUG-314. Does NOT close BUG-311/BUG-313/BUG-319, and does NOT close the
     second-coder gap (audit F-11): no floor may be REPOINTED on a single coder.
+- id: D316
+  category: EVALS
+  state: RATIFIED
+  date: "2026-09-21"
+  title: >-
+    One answer key per evaluation artifact; any extra read must be hash-pinned, annotation-only and fail-closed (BUG-340)
+  decision: >-
+    The canonical ruler (anchor1_frozen_20260920.json, 0ec321a7...) stays the ONLY answer key. Because it cannot express an
+    abstention REASON (34 DISC nulls = 28 blank + 6 emerging), the scorer restores the reason from the human workspace CSV,
+    whose sha256 is declared (38323192...), ONLY where the authority cell is empty; drift aborts FAIL-CLOSED. Numbers are
+    invariant: CT 0.3533 / DISC 0.4741 / FORM 0.2828, scored_n 150/116/145, blinding self-test PASS.
+  rule_added: >-
+    D-316: an evaluation artifact may read at most ONE answer key; an additional read must be hash-pinned, single-purpose
+    (annotation, never truth) and fail-closed on drift. A canonical artifact that cannot express a distinction the
+    measurement uses must declare that in config and name the surviving provenance of the distinction. C15 counts must be
+    machine-derived (scripts/bug_status.py), never hand-counted.
+  also_recorded: >-
+    BUG-341: a rotation-guarded checkpoint is not a durably restored artifact -- the live stage5 path is absent, the bytes
+    survive as .stale_20260921_185942 (2c206a25...) and are cited, never copied back (that would re-arm a stale resume).
+
 summary:
-  total: 682
+  total: 683
   proposed: 6
   draft: 1
   active: 483
@@ -7203,7 +7223,7 @@ summary:
   deferred: 14
   resolved: 118
   planned: 8
-  ratified: 2
+  ratified: 3
   open: 17
   by_category:
     ARCH: 27
@@ -7245,7 +7265,7 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 2
+    EVALS: 3
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21

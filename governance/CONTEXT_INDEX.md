@@ -534,3 +534,13 @@ Ruler labels were judged under menu **`cac6e695`** (CT = 7, no `none`) — any q
 Authority/workspace/hashes/menu/truth_source/pooling are all declared in `config/eval_integrity.yaml:ruler_authority`
 (do not re-derive them from prose). Scorers read truth from the authority (`--truth-source key`, the default);
 `--self-test-blinding` is the mechanical leak guard for this path. Nothing may be pooled with ANCHOR-2.
+## 2026-09-21 (session 9) — D-316: ONE answer key; annotation may be a second hash-pinned source
+Ruler answer key = governance/anchor1_frozen_20260920.json (0ec321a7…), unchanged. BUG-340: that artifact cannot
+express an abstention REASON (34 DISC nulls = 28 blank + 6 emerging), so the scorer restores the reason from the
+human workspace CSV behind the declared sha256 (38323192…; drift = FAIL-CLOSED) and only where the authority cell
+is empty. Machine-readable details: config/eval_integrity.yaml (ruler_authority, label_snapshots). Published
+numbers unchanged (CT 0.3533 / DISC 0.4741 / FORM 0.2828). BUG-341: the live stage5 checkpoint is ABSENT again
+(rotated at 18:59:42, no re-run); the bytes are citable as the .stale file, never copied back. C15 counts are now
+mechanical (scripts/bug_status.py -> governance/bug_status.json): 60 open / 27 closed of 87 — the "17" was a
+hand-count and is retracted.
+

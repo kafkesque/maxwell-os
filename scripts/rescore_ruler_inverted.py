@@ -142,6 +142,50 @@ def load_truth_from_authority(path: Path) -> tuple[list[dict], dict[str, dict]]:
     return rows, keymap
 
 
+def overlay_annotation_from_workspace(rows: list[dict], workspace: Path, declared_sha: str,
+                                     allow_unpinned: bool = False) -> int:
+    """Restore the ABSTENTION REASON (blank vs emerging vs irrelevant) onto authority rows.
+
+    D-315 makes the JSON the answer key, but the frozen authority stores a human abstention as JSON
+    null: it cannot express WHY the reviewer did not answer (BUG-340). The human workspace CSV is the
+    declared provenance for that reason, so it is read HERE for annotation ONLY, behind its own hash
+    pin -- the answer key never comes from it (C21), and a workspace whose bytes do not match the
+    declared sha256 is a fail-closed abort (C16/D-313) unless explicitly overridden. A cell is copied
+    only where the authority cell is EMPTY, so a canonical authority label is never overwritten by
+    workspace typing.
+
+    Args:
+        rows: authority-shaped rows (raw column slots carry canonical labels).
+        workspace: the human workspace CSV.
+        declared_sha: the sha256 the config declares for the workspace.
+        allow_unpinned: proceed, loudly, when the workspace bytes have drifted.
+
+    Returns:
+        The number of cells overlaid (0 when there is nothing to restore).
+    """
+    if not workspace.exists():
+        raise SystemExit(f"FAIL-CLOSED: annotation workspace {workspace.name} is missing")
+    actual = hashlib.sha256(workspace.read_bytes()).hexdigest()
+    if declared_sha and actual != declared_sha:
+        msg = (f"DRIFT: annotation workspace sha256 {actual[:8]} != declared {declared_sha[:8]} "
+               f"({workspace.name})")
+        if not allow_unpinned:
+            raise SystemExit(f"FAIL-CLOSED (C16/D-313): {msg}; pass --allow-unpinned-annotation to proceed")
+        print(f"WARN: {msg}")
+    with workspace.open(encoding="utf-8") as fh:
+        sheet = {r["item_id"]: r for r in csv.DictReader(fh) if (r.get("item_id") or "").strip()}
+    overlaid = 0
+    for row in rows:
+        src = sheet.get(row["item_id"])
+        if not src:
+            continue
+        for col in ("CT (1-7)", "DISC (1-62)", "FORM (1-4)"):
+            if not (row.get(col) or "").strip() and (src.get(col) or "").strip():
+                row[col] = src[col]
+                overlaid += 1
+    return overlaid
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Resolvers — human side (ground truth) and stored side (under test)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -463,15 +507,24 @@ def main() -> int:
                     help="key (default, D-315) = the frozen authority; sheet = the human workspace")
     ap.add_argument("--out-dir", default="", help="repo-relative output dir (default governance/)")
     ap.add_argument("--out-prefix", default="", help="prefix the artifact names (never clobber a cited artifact)")
+    ap.add_argument("--allow-unpinned-annotation", action="store_true",
+                    help="proceed (loudly) when the annotation workspace drifted from its declared sha256")
     ap.add_argument("--self-test-blinding", action="store_true",
                     help="mechanical truth-blinding test: the reference must be invariant to the object under test")
     args = ap.parse_args()
 
     paths = authority_paths()
     truth_source = args.truth_source or paths["truth_source"]
+    overlaid = 0
     if truth_source == "key":
         rows, keymap = load_truth_from_authority(paths["authority"])
         source_desc = f"authority {paths['authority'].name}"
+        # BUG-340: the authority cannot express an abstention REASON -> restore it from the
+        # hash-pinned workspace (annotation only; the answer key stays the authority).
+        overlaid = overlay_annotation_from_workspace(
+            rows, paths["workspace"], paths.get("annotation_sha256", ""),
+            args.allow_unpinned_annotation)
+        source_desc += f" + workspace abstention annotation ({overlaid} cells)"
     else:
         with paths["workspace"].open(encoding="utf-8") as fh:
             rows = [r for r in csv.DictReader(fh) if (r.get("item_id") or "").strip()]
@@ -497,6 +550,10 @@ def main() -> int:
         "authority_sha256": hashlib.sha256(paths["authority"].read_bytes()).hexdigest(),
         "menu_hash": paths["menu_hash"],
         "workspace": "governance/RULER_BLIND_SHEET_20260917.csv (human workspace; NOT authority)",
+        "annotation_source": ("governance/RULER_BLIND_SHEET_20260917.csv (abstention REASON only: "
+                              "blank vs emerging vs irrelevant; sha256-pinned)"),
+        "annotation_sha256": paths.get("annotation_sha256", ""),
+        "annotation_overlaid_cells": overlaid,
         "total_rows": len(rows),
         "results": results,
     }

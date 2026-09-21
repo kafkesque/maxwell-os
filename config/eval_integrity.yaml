@@ -257,6 +257,22 @@ ruler_authority:
   human_workspace: governance/RULER_BLIND_SHEET_20260917.csv
   workspace_sha256_at_head: 383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b
   workspace_role: "human editing workspace + abstention-reason provenance; NEVER the answer key"
+  annotation_source: governance/RULER_BLIND_SHEET_20260917.csv
+  annotation_sha256: 383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b
+  annotation_rule: >-
+    Used ONLY to restore the abstention REASON (blank vs emerging vs irrelevant) onto authority rows, and only
+    where the authority cell is EMPTY; a canonical authority label is never overwritten. Hash-pinned: a workspace
+    whose bytes drift is a FAIL-CLOSED abort (C16/D-313) unless --allow-unpinned-annotation is passed.
+  key_file: governance/ruler_sheet_key_20260917.json
+  key_sha256: d4cb45957505a784b78304b1c3ccfe144b16c5034fd48b90630c6b9edd3c128b
+  authority_internal_provenance: >-
+    anchor1_frozen_20260920.json declares csv_sha256 4d0c856a... -- that IS lost_bytes above (the byte-lost
+    freeze-time CSV). It is NOT a mismatch: the authority is the survivor of a source whose bytes no longer exist.
+    The surviving annotated workspace is 38323192... and differs from it ONLY by downstream canonicalisation.
+  annotation_loss: >-
+    BUG-340: the authority stores a human abstention as JSON null, so blank (a datum) and emerging (an explicit
+    abstention) are INDISTINGUISHABLE in the authority alone (34 DISC nulls = 28 blank + 6 emerging). Any
+    abstention statistic derived WITHOUT the workspace overlay understates abstention; the answer key is unchanged.
   superseded_draft: {sha256: 2d456720182828b05b24534ffe774c415fe3a1f6b2f5f88c63457a4f1602f182, commit: 986fbc4}
   lost_bytes: {sha256: 4d0c856a045aeab52f675c563c5de05c6c489e7cb8195df3a5036553a6ed2b22, status: "byte-lost / label-verified-identical"}
   menu_hash: "cac6e695"             # judged under THIS menu (CT = 7, no `none`); never pool across menus
@@ -403,3 +419,20 @@ bakeoff:
       r4: agree_accept_disagree_challenger_if_conf_at_least_floor
     source: anchor2
     report: governance/r3_heldout_20260921.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LABEL SNAPSHOTS (D-312 / BUG-311 / BUG-341)
+# The stage5 label snapshot is NOT a durable file: stage5 ROTATES it to `<name>.stale_<ts>` whenever
+# its input fingerprint (S4 checkpoint sha + taxonomy version + pipeline commit) moves. That is
+# correct behaviour -- resuming from pre-repair labels would silently contaminate the corpus -- but
+# it means the live path can be ABSENT with the bytes preserved under .stale. Never "restore" it to
+# the live path to make a reader happy: that re-arms the silent stale resume. Cite the .stale file.
+label_snapshots:
+  stage5_t11:
+    live_path: "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl"
+    live_absent_since: "2026-09-21T18:59:42"      # rotation event; no completing re-run (pid 9665 is from Sep 2)
+    surviving_path: "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.stale_20260921_185942"
+    surviving_sha256: 2c206a255a41eb8fa42122cb8c68e0e0b5395da280c1d9c840be8e6a06188d43
+    is_identical_to: "checkpoint.jsonl.bak_20260904_152319 (same bytes)"
+    fingerprint_moved_because: {s4_checkpoint_sha256: 2f8b34fb0f104bbecc32d5b7cd3a37a272e9f3bc7b533db4a0e5b43fbff13992, taxonomy_version: v5.5, pipeline_commit: f5ec415}
+    status: "STALE-BUT-ONLY-SURVIVOR -- citable, read-only; a fresh stage5 run on the current S4 input is the only fix"

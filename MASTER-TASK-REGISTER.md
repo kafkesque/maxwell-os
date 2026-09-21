@@ -282,3 +282,7 @@
 - [x] BUG-326 repair is **BLOCKED, not applied**: the target numbers (403/147/703) do not reproduce on the live
       DB (757 all-`emerging` catch-all labels / 65 mixed-axis / 0 domain-less). Re-scoped in
       `governance/BUG326_REPAIR_SCOPING_20260921.md`; new standing rule BUG-336.
+- [x] Session 9 (2026-09-21): D-316 one-answer-key rule; ruler annotation loss FIXED (BUG-340); C15 mechanical (BUG-342, 60 open); BUG-330 FIXED.
+- [ ] BUG-341 (OPEN, HIGH): re-run stage5 on the current S4 input (hours) to stop borrowing the Sep-4 snapshot for the R2 meter.
+- [ ] BUG-343 (OPEN): capture the smoke subprocess stderr so the failure is diagnosable.
+

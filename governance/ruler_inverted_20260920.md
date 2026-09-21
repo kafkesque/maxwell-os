@@ -173,7 +173,7 @@ This is the honest replacement for the corrupt ruler_measurement `0.740 / 0.506 
 | stratum A | **0.255** | [0.179, 0.349] | 73/98 |
 | stratum B | **0.340** | [0.222, 0.483] | 31/47 |
 
-- scored: 145 | abstained: {'blank': 5} | typos/dups resolved on human side: {'typo': 82, 'exact': 63, 'blank': 5}
+- scored: 145 | abstained: {'blank': 5} | typos/dups resolved on human side: {'exact': 95, 'typo': 50, 'blank': 5}
 
 ### Per-class stored reliability (human class = truth)
 

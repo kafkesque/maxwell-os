@@ -498,3 +498,10 @@ order unchanged: R5 ratification → single-coder pass → R2 corpus NLI → per
   floor number in this repo is single-coder. Re-measurement for diagnosis is unblocked; floor REPOINTING is not.
 - Housekeeping debt carried, not silently dropped: 46 `config/*.bak_*` + 1 `governance/buglog.md.bak_*` (gitignored;
   the only recovery copies) — the stale-config confusion risk is real and belongs to a cleanup pass with the owner.
+### Session 9 update (2026-09-21) — D-316, ruler annotation restored, stage5 snapshot regression declared
+- D-316 RATIFIED: one answer key (the authority); the abstention REASON comes from the hash-pinned workspace, annotation only, fail-closed on drift.
+- BUG-340 FIXED; BUG-342 FIXED (C15 is now mechanical: 60 open / 27 closed of 87 ids -- every handoff must carry it).
+- BUG-341 OPEN (HIGH): the live stage5 checkpoint is absent (rotated 18:59:42; no re-run). Bytes preserved and cited; NOT restored to the live path by design.
+- BUG-330 FIXED; BUG-343 OPEN (a smoke test cannot show its own failure output).
+- HUMAN GATES (unchanged, untouched this session): (1) laya-mlx benchmark-only install in an isolated venv; (2) abstention operating point t_low=p25; (3) owner signature on the human_attestation line.
+

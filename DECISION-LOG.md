@@ -265,3 +265,21 @@ self-test PASS 3/3; `config/eval_integrity.yaml:ruler_authority` declares all pa
 `truth_source` and the pooling rule. Audit: `governance/FORENSIC_AUDIT_20260921c.md` (F-01..F-12).
 **Also ratified as administrative:** D-314 (R3 not adopted; D-311 closed as measured-rejected).
 **Not closed by this decision:** the second-coder gap (F-11) — no floor may be repointed on a single coder.
+## D-316 (2026-09-21, RATIFIED) — The answer key is one artifact; an annotation may come from a second, hash-pinned one
+**Context.** D-315 made governance/anchor1_frozen_20260920.json the canonical ruler. Session 9 found the cost:
+the authority stores a human abstention as JSON null, so `blank` (a datum, never imputed) and `emerging` (an
+explicit abstention) are indistinguishable in it (34 DISC nulls = 28 + 6), and a re-score driven only by the
+authority silently rewrote the published annotation line to `{blank: 34}`.
+**Decision.** The authority remains the only ANSWER KEY. The abstention REASON is restored from the human
+workspace, whose sha256 is declared in config, and ONLY where the authority cell is empty; declared drift is a
+fail-closed abort (C16/D-313), never a silent fallback. Numbers are invariant to the overlay (verified: CT
+0.3533 / DISC 0.4741 / FORM 0.2828, scored_n 150/116/145, blinding self-test PASS).
+**Rule added.** D-316: an evaluation artifact may read at most ONE answer key; any additional read must be
+hash-pinned, single-purpose (annotation, never truth) and fail-closed on drift. A canonical artifact that cannot
+express a distinction the measurement uses must say so in config, and the surviving provenance of that
+distinction must be named.
+**Also recorded.** BUG-341: the stage5 snapshot rotation means a "restored checkpoint" is not a durable state;
+the live path is absent and the bytes are preserved as `.stale_20260921_185942` (2c206a25…), declared in
+config:label_snapshots. Deliberately NOT copied back: that would re-arm a silent resume from pre-repair labels.
+**Not closed.** F-11 (no second coder), BUG-312 (three divergent label snapshots), BUG-343.
+

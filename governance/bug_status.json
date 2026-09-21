@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 93,
-  "open_n": 61,
-  "closed_n": 32,
+  "total_ids": 99,
+  "open_n": 65,
+  "closed_n": 34,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -309,8 +309,28 @@
       "events": 1
     },
     {
-      "id": "BUG-347",
-      "title": "(MED \u2014 FIXED 2026-09-21): the C15 classifier treated \"PARTIALLY FIXED\" as CLOSED",
+      "id": "BUG-348",
+      "title": "(MED - OPEN 2026-09-21, found by the senior-ontology review of MENU_REPAIR_WORKSHEET_20260921.md)",
+      "events": 1
+    },
+    {
+      "id": "BUG-349",
+      "title": "(LOW \u2014 OPEN 2026-09-21, found by the session-11 forensic audit F-A)",
+      "events": 1
+    },
+    {
+      "id": "BUG-351",
+      "title": "(LOW-MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-C)",
+      "events": 1
+    },
+    {
+      "id": "BUG-352",
+      "title": "(MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-D)",
+      "events": 1
+    },
+    {
+      "id": "BUG-353",
+      "title": "(MED \u2014 OPEN 2026-09-21, found by the session-11 audit F-H)",
       "events": 1
     }
   ],
@@ -346,6 +366,8 @@
     "BUG-342",
     "BUG-344",
     "BUG-345",
-    "BUG-346"
+    "BUG-346",
+    "BUG-347",
+    "BUG-350"
   ]
 }

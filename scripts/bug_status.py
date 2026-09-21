@@ -27,6 +27,32 @@ REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
 # BUG-347 (2026-09-21): "PARTIALLY FIXED" contains the substring FIXED and was classified CLOSED,
 # silently retiring a LIVE bug (BUG-333). A partial fix is an OPEN bug with progress attached.
 PARTIAL_WORDS = ("PARTIAL", "MITIGATED", "IN PROGRESS")
+STATUS_WORDS = CLOSE_WORDS + REOPEN_WORDS + PARTIAL_WORDS
+QQ = chr(34) + chr(8220) + chr(8221) + chr(39)
+QUOTE_RE = re.compile("[" + QQ + "][^" + QQ + "]*[" + QQ + "]")
+PAREN_RE = re.compile("[(]([^)]*)[)]")
+
+
+def status_slot(rest: str) -> str:
+    """
+    Return only the header STATUS SLOT (BUG-350), never the prose title.
+
+    Order: the parenthetical after the bug id, then the text before the first colon.
+    Quoted spans are dropped, so a title that merely quotes a status word cannot decide it.
+    If no candidate names a status word the whole header is read, so an unlabelled header stays OPEN
+    (no closure claim is not a closure).
+    """
+    m = PAREN_RE.match(rest)
+    cands = ([m.group(1)] if m else []) + [rest.split(chr(58))[0], rest]
+    for cand in cands:
+        clean = QUOTE_RE.sub(chr(32), cand).strip()
+        if any(w in clean.upper() for w in STATUS_WORDS):
+            return clean
+    return QUOTE_RE.sub(chr(32), rest).strip()
+
+
+# BUG-350: status is read from status_slot(); a title that QUOTES a status word cannot decide.
+
 HEADER_RE = re.compile(r"^##\s+(BUG-\d+)\b[\s:—‑-]*(.*)$")
 
 
@@ -51,9 +77,12 @@ def self_test() -> None:
         "MED - FIXED, REGRESSED 2026-09-21": "reopened",
         "LOW - CLOSED INVALID": "closed",
         "MED - RESOLVED (cleaned up)": "closed",
+        # BUG-350 shapes, taken from live headers:
+        "MED FIXED 2026-09-21): the C15 classifier treated PARTIALLY FIXED as CLOSED": "closed",
+        "No degenerate-arm guard: a collapsed arm could be read as a tie (HIGH, fixed 2026-09-21)": "closed",
     }
     for text, want in cases.items():
-        got = classify(text)
+        got = classify(status_slot(text))
         if got != want:
             raise SystemExit(f"FAIL-CLOSED: bug_status self-test {text!r} -> {got}, expected {want}")
 
@@ -67,7 +96,7 @@ def scan(text_lines: list[str]) -> dict[str, dict]:
             continue
         bid, rest = m.group(1), m.group(2).strip()
         rec = bugs.setdefault(bid, {"id": bid, "status": "open", "events": [], "title": rest[:140], "line": i})
-        event = classify(rest)
+        event = classify(status_slot(rest))
         rec["events"].append({"line": i, "event": event, "text": rest[:140]})
         if event == "closed" and rec["status"] == "open":
             rec["status"] = "closed"

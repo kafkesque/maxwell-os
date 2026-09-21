@@ -24,22 +24,22 @@ Two short lists. Write A or B in the last column of each row. Nothing changes un
 
 | # | your label | stored label | rows | A = SAME thing (make them aliases) | B = DIFFERENT (keep both, rewrite boundaries) |
 |---|---|---|---|---|---|
-| 1 | cognitive science | psychology | 3 |  |
-| 2 | political economy | economics | 2 |  |
-| 3 | finance | strategic thinking | 2 |  |
-| 4 | design thinking | human-computer interaction | 2 |  |
-| 5 | research methodology | risk management | 1 |  |
-| 6 | operations research | strategic thinking | 1 |  |
-| 7 | operations research | behavioral economics | 1 |  |
-| 8 | visual semiotics | communication theory | 1 |  |
-| 9 | artificial intelligence | economics | 1 |  |
-| 10 | research methodology | behavioral economics | 1 |  |
-| 11 | systems thinking | software engineering | 1 |  |
-| 12 | visual semiotics | psychology | 1 |  |
-| 13 | psychology | behavioral economics | 1 |  |
-| 14 | creative process | cultural design | 1 |  |
-| 15 | behavioral economics | emerging | 1 |  |
-| 16 | strategic thinking | psychology | 1 |  |
+| 1 | cognitive science | psychology | 3 | B|
+| 2 | political economy | economics | 2 | B|
+| 3 | finance | strategic thinking | 2 | B|
+| 4 | design thinking | human-computer interaction | 2 | B|
+| 5 | research methodology | risk management | 1 | B|
+| 6 | operations research | strategic thinking | 1 | B|
+| 7 | operations research | behavioral economics | 1 | B|
+| 8 | visual semiotics | communication theory | 1 | B|
+| 9 | artificial intelligence | economics | 1 | B|
+| 10 | research methodology | behavioral economics | 1 | B|
+| 11 | systems thinking | software engineering | 1 | B|
+| 12 | visual semiotics | psychology | 1 | B|
+| 13 | psychology | behavioral economics | 1 | B|
+| 14 | creative process | cultural design | 1 | B|
+| 15 | behavioral economics | emerging | 1 | B|
+| 16 | strategic thinking | psychology | 1 | B|
 
 ## PART 3 - one question
 

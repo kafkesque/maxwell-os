@@ -2051,3 +2051,16 @@ citations in config/decisions.yaml still resolve.
 number-deciding questions, and (c) stamps VERDICT: PASS / INSUFFICIENT / BLOCKED and exits 2 unless PASS.
 Unit-verified: the prior rubber stamp now scores 6/6 unsupported → INSUFFICIENT. BUG-331 stays OPEN until the
 hardened review is actually run against the adapter.
+
+## BUG-347 (MED — FIXED 2026-09-21): the C15 classifier treated "PARTIALLY FIXED" as CLOSED
+`scripts/bug_status.py` matched close-words as SUBSTRINGS, so the new header
+`## BUG-333 (PARTIALLY FIXED 2026-09-21)` classified as CLOSED and a LIVE bug silently left the open count
+(60 -> 59). A partial fix is an OPEN bug with progress attached; the substring rule turned a status word into a
+verdict. This is the second defect in three sessions that the mechanical index caught in ITS OWN output -- which
+is the argument for machine-derived C15 counts (BUG-342) rather than hand counts.
+FIX: `PARTIAL_WORDS` (PARTIAL / MITIGATED / IN PROGRESS) is classified OPEN and outranks the close words;
+precedence is opened > partial > closed > open. A `self_test()` with six registered edge cases now runs on every
+invocation and aborts FAIL-CLOSED if the classifier regresses.
+CORRECTION (audit trail): the session-10 commit 6c36bec announced BUG-347 as fixed in its message, but the
+patch's anchor assertion failed silently at the time and only the FOLLOW-UP commit carries the actual fix. The
+message was premature; this entry is the authoritative record. (Class of BUG-345: a claim that was never checked.)

@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-317",
+  "created_at": "2026-09-22T19:09:56",
+  "provenance_tier": "llm-attested",
+  "cannot_unfreeze": [
+    "F-11",
+    "D-300 adoption bar",
+    "config/eval_integrity.yaml floors"
+  ],
+  "n_rows": 150,
+  "n_excluded_incomplete_rows": 0,
+  "excluded_item_ids": [],
+  "partial": false,
+  "identity_columns": [
+    "#",
+    "item_id",
+    "name",
+    "DEFINITION",
+    "APPLICATION",
+    "MECHANISM",
+    "BOUNDARY",
+    "SOURCE EXCERPT",
+    "len"
+  ],
+  "human_answer_columns_removed": [
+    "CT (1-7)",
+    "DISC (1-62)",
+    "FORM (1-4)",
+    "conf_ct",
+    "conf_disc",
+    "conf_form",
+    "note_codes",
+    "reviewer",
+    "date"
+  ],
+  "inputs": {
+    "governance/RULER_BLIND_SHEET_20260917.csv": "383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b",
+    "governance/RULER_MENUS_20260917.md": "8260d0f31207bd3aef5739b1fd2ce7b02bc64a454c9e11db8d30115d57a0fca4",
+    "PROMPT.md": "578eaee8f60d97f7a0a2d577ce6b98208a1157a76f60c37502fca1d3f7d4c9ee",
+    "README.md": "59a1afc1c8b7f73b140871f24da759ff28218e45b6f90a311c318814a2fafe0b"
+  },
+  "outputs": {
+    "governance/F11_LLM_CODER_20260922/ROWS_BLIND.csv": "76e2522a775dd40cbaed44024cc522cb82f7e270afac1e8f34229922a63a6e27"
+  }
+}

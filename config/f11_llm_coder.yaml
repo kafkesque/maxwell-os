@@ -24,11 +24,11 @@ cannot_unfreeze: [F-11, D-300 adoption bar, config/eval_integrity.yaml floors]
 # ── paths (repo-relative; read via pipeline.pipeline_paths PROJECT_ROOT) ──
 sheet: governance/RULER_BLIND_SHEET_20260917.csv      # the FILLED single-coder sheet (human answers)
 menus: governance/RULER_MENUS_20260917.md             # attach verbatim to the coder prompt
-package_dir: governance/F11_LLM_CODER_20260921
-blind_rows: governance/F11_LLM_CODER_20260921/ROWS_BLIND.csv   # count-neutral name: the row count is in MANIFEST.json
-manifest: governance/F11_LLM_CODER_20260921/MANIFEST.json
-out_json: governance/f11_llm_coder_20260921.json
-out_md: governance/f11_llm_coder_20260921.md
+package_dir: governance/F11_LLM_CODER_20260922
+blind_rows: governance/F11_LLM_CODER_20260922/ROWS_BLIND.csv   # count-neutral name: the row count is in MANIFEST.json
+manifest: governance/F11_LLM_CODER_20260922/MANIFEST.json
+out_json: governance/f11_llm_coder_20260922.json
+out_md: governance/f11_llm_coder_20260922.md
 
 # ── what leaves the machine / what the scorer compares ──
 identity_columns: ['#', 'item_id', 'name', 'DEFINITION', 'APPLICATION', 'MECHANISM', 'BOUNDARY', 'SOURCE EXCERPT', 'len']
@@ -52,6 +52,10 @@ conf_columns:                          # the JSON keys the coder returns per axi
 # keeps only the fully-answered rows and RECORDS n_rows + the excluded item_ids
 # in MANIFEST.json, so the reduced measurement is declared, never silent (C12d).
 allow_partial: true
+# round 2 (2026-09-22, owner decision 3b): export EVERY row, including the 28 the human left
+# unanswered, so the same coders adjudicate the blanks. No row is ever dropped or padded.
+export_all_rows: true
+blank_separator_header: '>>> ANSWER IN THE JSONL ONLY - DO NOT TYPE IN THIS CSV <<<'
 partial_policy: 'export the fully-answered rows only; record excluded item_ids in the manifest'
 
 declared_aliases:
@@ -63,6 +67,22 @@ declared_aliases:
     as_written: normativ heuristic
     canonical: normative_heuristic
     reason: typo in the single-coder sheet (R-rows), reported separately
+  - axis: extraction_type
+    as_written: escriptive model
+    canonical: descriptive_model
+    reason: typo in the single-coder sheet (R-rows), BUG-367; reported separately
+  - axis: content_type
+    as_written: priniple
+    canonical: principle
+    reason: typo in an OWNER ruling cell (2026-09-22); declared so the split is auditable (C12d)
+  - axis: content_type
+    as_written: noisedrop
+    canonical: noise_drop
+    reason: owner spelling variant of menu slot 6 (2026-09-22)
+  - axis: content_type
+    as_written: growthedge
+    canonical: growth_edge
+    reason: owner spelling variant of menu slot 5 (2026-09-22)
 
 # ── coder identity (R14: fill BEFORE sending; never after) ──
 coder:
@@ -72,3 +92,25 @@ coder:
   one_shot: true                      # one prompt version, one model version, no retries
   prompt_sha256: TO-BE-FILLED-AT-RUN  # sha256 of PROMPT.md as actually sent
   sovereign_opt_in: false             # set true ONLY on the owner's explicit go (C22)
+
+# ── OWNER DECISION SHEET REBUILD (2026-09-22, BUG-368) ──
+# The v1 sheet dropped the FORM axis (keys `*_extr` were written while the header emitted
+# `*_extra`), leaving 4 emitted-but-EMPTY columns that looked like free space; the owner then
+# wrote rulings into `human_extra`. This block rebuilds the sheet APPEND-ONLY: A..R are copied
+# verbatim and never rewritten, the missing FORM axis is appended at S..V, and the owner's input
+# columns are appended at X..Z behind a blank separator column (W) so the collision cannot recur.
+decision_sheet:
+  base: governance/F11_DECISION_SHEET_20260922.csv
+  out: governance/F11_DECISION_SHEET_20260922.csv
+  ruling_map_out: governance/F11_OWNER_RULING_MAP_20260922.csv
+  base_header:
+    [item_id, name, DECIDE, class_cont, human_cont, a_cont, b_cont, class_disc, human_disc,
+     a_disc, b_disc, class_extra, human_extra, a_extra, b_extra, DEFINITION, APPLICATION, MECHANISM]
+  owner_input_column: human_extra
+  separator_header: '>>> OWNER INPUT (fill only X/Y/Z) <<<'
+  form_header: [FORM_human_as_written, FORM_canonical, FORM_claude, FORM_kimi]
+  owner_header: [owner_cont, owner_disc, owner_notes]
+  coder_a_raw: temp/claude sonnet labels.jsonl
+  coder_b_raw: temp/kimi3 labels.md
+  form_source_column: 'FORM (1-4)'
+  menu: config/closed_menu_v5.json

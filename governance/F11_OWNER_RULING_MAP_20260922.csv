@@ -1,0 +1,82 @@
+item_id,human_extra_verbatim,owner_cont,owner_disc,status
+R002,principle,principle,,
+R004,"principle,political economy",principle,politicaleconomy,SPLIT
+R005,information science,,informationscience,
+R009,"principle,decision making",principle,decisionmaking,SPLIT
+R010,strategic thinking,,strategicthinking,
+R011,artificial intelligence,,artificialintelligence,
+R013,"principle, risk management",principle,riskmanagement,SPLIT
+R014,semiotics,,semiotics,
+R015,strategic thinking,,strategicthinking,
+R017,computational physics simulation,,computationalphysicssimulation,
+R018,typography,,typography,
+R020,complex adaptive systems,,complexadaptivesystems,
+R023,strategic thinking,,strategicthinking,
+R024,strategic thinking,,strategicthinking,
+R025,"principle, ",principle,,EMPTY_TOKEN
+R027,strategic thinking,,strategicthinking,
+R029,creative process,,creativeprocess,
+R030,quarantine,quarantine,,
+R031,research methodology,,researchmethodology,
+R035,research methodology,,researchmethodology,
+R036,design strategy,,designstrategy,NOT_IN_MENU
+R037,software engineering,,softwareengineering,
+R041,risk management,,riskmanagement,
+R043,cognitive science,,cognitivescience,
+R044,systems thinking,,systemsthinking,
+R045,"process template, operations research",processtemplate,operationsresearch,SPLIT
+R049,operations research,,operationsresearch,
+R051,emerging,,emerging,CATCHALL_SLOT_62
+R053,philosophy,,philosophy,
+R054,machine learning,,machinelearning,
+R055,operations research,,operationsresearch,
+R057,finance,,finance,
+R058,design psychology,,designpsychology,
+R061,organizational theory,,organizationaltheory,
+R062,behavioral economics,,behavioraleconomics,
+R066,computational geometry,,computationalgeometry,
+R067,"process instance, performing arts",processinstance,performingarts,SPLIT
+R071,"principle, strategic thinking",principle,strategicthinking,SPLIT
+R073,linguistics,,linguistics,
+R074,media studies,,mediastudies,
+R075,philosophy,,philosophy,
+R076,visual semiotics,,visualsemiotics,
+R077,anthropology,,anthropology,
+R085,cultural studies,,culturalstudies,
+R086,behavioral economics,,behavioraleconomics,
+R089,principle,principle,,
+R090,"principle, cultural design",principle,culturaldesign,SPLIT
+R092,research methodology,,researchmethodology,
+R093,quarantine,quarantine,,
+R095,behavioral economics,,behavioraleconomics,
+R096,finance,,finance,
+R097,"principle,operations research",principle,operationsresearch,SPLIT
+R098,design strategy,,designstrategy,NOT_IN_MENU
+R099,design psychology,,designpsychology,
+R100,strategic thinking,,strategicthinking,
+R103,"principle, visual semiotics",principle,visualsemiotics,SPLIT
+R104,decision making,,decisionmaking,
+R108,principle,principle,,
+R109,behavioral economics,,behavioraleconomics,
+R112,principle,principle,,
+R115,"principle, decision making",principle,decisionmaking,SPLIT
+R116,risk management,,riskmanagement,
+R117,personal productivity,,personalproductivity,NOT_IN_MENU
+R118,tool instruction,toolinstruction,,
+R120,"process template, data visualization",processtemplate,datavisualization,NOT_IN_MENU;SPLIT
+R121,strategic thinking,,strategicthinking,
+R122,visual perception,,visualperception,
+R123,"tool instruction, creative coding",toolinstruction,creativecoding,SPLIT
+R124,generative ai,,generativeai,
+R125,priniple,principle,,TYPO_FIXED
+R126,cultural design,,culturaldesign,
+R127,process instance,processinstance,,
+R128,emerging,,emerging,CATCHALL_SLOT_62
+R129,decision making,,decisionmaking,
+R131,privacy surveillance,,privacysurveillance,
+R136,"principle,generative ai",principle,generativeai,SPLIT
+R137,design psychology,,designpsychology,
+R138,linguistics,,linguistics,
+R139,cognitive science,,cognitivescience,
+R149,"principle,visual perception",principle,visualperception,SPLIT
+R150,strategic thinking,,strategicthinking,

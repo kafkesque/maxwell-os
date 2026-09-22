@@ -104,7 +104,9 @@ def cmd_export(cfg: dict[str, Any]) -> int:
 
     unanswered = [r["item_id"] for r in rows if any(not (r.get(a) or "").strip() for a in axes)]
     excluded: list[str] = []
-    if unanswered:
+    # export_all_rows (2026-09-22): the owner asked for ALL rows to go to the coders, so that the
+    # 28 rows the human left unanswered are adjudicated by the SAME coders instead of being dropped.
+    if unanswered and not cfg.get("export_all_rows"):
         if not cfg.get("allow_partial"):
             raise SystemExit(
                 f"{sheet}: {len(unanswered)} row(s) lack a human answer on one of {axes} "
@@ -119,9 +121,14 @@ def cmd_export(cfg: dict[str, Any]) -> int:
             raise SystemExit(f"{sheet}: every row is incomplete — nothing to export")
 
     out_rows.parent.mkdir(parents=True, exist_ok=True)
-    buf = [",".join(ident)]
+    # A trailing EMPTY separator column: a blank column that has a header saying what it is for
+    # cannot again be mistaken for free space to write answers into (BUG-368).
+    sep = str(cfg.get("blank_separator_header") or "").strip()
+    cols = ident + ([sep] if sep else [])
+    buf = [",".join(cols)]
     for r in rows:
-        buf.append(",".join('"' + (r.get(c) or "").replace('"', '""') + '"' for c in ident))
+        cells = ['"' + (r.get(c) or "").replace('"', '""') + '"' for c in ident] + (['""'] if sep else [])
+        buf.append(",".join(cells))
     text = "\n".join(buf) + "\n"
     leaked = [c for c in answer if f'"{c}"' in buf[0] or f",{c}," in buf[0]]
     if leaked:

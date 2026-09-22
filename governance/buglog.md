@@ -2493,3 +2493,51 @@ and `manifest_hash` are still recorded, under `informational`, but are NOT part 
 EVIDENCE: old id 63f823bd1175b97f → new id c2754fc63f8450; changed keys were exactly the informational/scheme ones
 (manifest_hash, pipeline_commit, s5_code_sha256, s5_config_sha256); all 7 substantive inputs identical. The 1,250
 verified records survived: resume printed "1250 FBs already verified -> 6745 remaining".
+
+## BUG-368 (HIGH - OWNER-FACING DATA TRAP, FIXED 2026-09-22): the decision sheet emitted 4 EMPTY columns because the FORM axis was written to the wrong keys - and the owner wrote his rulings into one of them
+
+HOW: scripts/f11_decision_sheet.py built the axis keys as `f"{ax[:4]}"` -> 'cont', 'disc' and **'extr'** for
+`extraction_type`, while the emitted header said `class_extra` / `human_extra` / `a_extra` / `b_extra`. The FORM
+axis was therefore written to `human_extr`/`a_extr`/`b_extr` (keys no column reads) and the four header columns
+shipped EMPTY. It was the same class of defect as the earlier conf-column mismatch (`conf_cont` vs `conf_ct`).
+
+EFFECT: the owner, told to record his content-type/discipline rulings in `human_extra`, wrote 81 cells into a
+column that is NAMED for the FORM axis but was empty and looked like free space. Nothing was overwritten (it
+really was empty) and the data survived - but the record was semantically wrong, and no FORM data exists in
+v1 of the sheet at all.
+
+FIX (all non-destructive, R-D410): scripts/f11_decision_sheet_v2.py rebuilds the sheet APPEND-ONLY.
+  * A..R (item_id..MECHANISM) are copied byte-for-byte and asserted identical before any write; the owner's 81
+    ruling cells in `human_extra` remain VERBATIM. A..R sha256 = 05cb48630c3dfa15... (recorded in the stamp).
+  * the missing FORM axis is appended: S=FORM_human_as_written (verbatim), T=FORM_canonical, U/V=the two coders.
+  * a BLANK SEPARATOR column (W) then X=owner_cont, Y=owner_disc, Z=owner_notes. A blank column can no longer be
+    mistaken for free space, because the only blank column now has a header that says what it is.
+  * `owner_cont`/`owner_disc` are re-derived from the owner's raw cell through a declared, validated split
+    (two-value cells split; typos fixed; every token checked against config/closed_menu_v5.json); the audit trail
+    is governance/F11_OWNER_RULING_MAP_20260922.csv.
+  * a backup of the owner's working file is kept at governance/backups/F11_DECISION_SHEET_20260922.USER_WORK_*.csv
+
+REGRESSION RULE: a column-emission bug must be caught by asserting that every emitted column header has a
+populating key. A generator that writes keys a header does not read MUST fail loudly (C16).
+
+## BUG-364 (MED - R14 provenance, FIXED 2026-09-22): laya pins recorded; the repo ids in the config were wrong
+
+The pre-existing `weights:` block named repos `aac6fef/laya-mlx` and `aac6fef/laya-multilingual-mlx` with
+`revision: PIN-AT-INSTALL`. Neither is what the installed package fetches: laya_mlx/router.py resolves
+`convaiinnovations/laya` (bundle), `/laya-multilingual`, `/laya-typed-decisions`.
+
+RECORDED (owner-approved; NO run performed, adoption stays false, `enabled: false`):
+  revision 1c5edc17a7acd8701df6fc341c0d179f1c62c982, 5 files re-hashed from disk, payload 846,195,574 bytes
+  (model.safetensors 842,609,210 B - consistent with the ~421M-param ModernBERT-large in router.py).
+  licence.checkpoint: benchmark-only-advisory (was UNVERIFIED). scope: never feeds the pipeline, never
+  unfreezes F-11 / D-300 (D-275c/D-322).
+NOTE: a `stat`-based size probe in this session first reported these files as tens of BYTES; that reading was
+wrong (it measured symlink metadata, not content). The corrected hash pass is the recorded one. Lesson: never
+size a hash-pinned artifact without reading it.
+
+## BUG-363 (MED - measurement integrity) - STATUS 2026-09-22: owner chose option (b)
+
+The 28 rows the human left unanswered are NOT gap-filled by hand. Round 2 of the F-11 export
+(governance/F11_LLM_CODER_20260922/, PROMPT.md sha256 578eaee8f60d97f7...) exports ALL 150 ruler rows -
+`n_rows: 150`, `n_excluded_incomplete_rows: 0`, `partial: false` - so the same coders adjudicate the blanks.
+The blind CSV carries a final empty fence column so the BUG-368 collision cannot recur.

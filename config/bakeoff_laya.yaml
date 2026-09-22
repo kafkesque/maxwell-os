@@ -1,22 +1,53 @@
 # laya-mlx typed-decision arm - BENCHMARK-ONLY SANDBOX (D-300 / D-322). Not a pipeline dependency (D-275c).
 version: '1'
-enabled: false                      # nothing in the production path reads this file
-role: labeler                       # projected onto OUR menu via caller-supplied criteria (no projection layer)
+enabled: false
+role: labeler
 adoption_bar: 'D-300: >=5.0 absolute pp error-rate gain on the frozen ruler at equal-or-lower abstention'
-phase_a_scope: feasibility only     # 61-way criteria degradation, latency, RAM, output validity - NO labels, NO deploy
+phase_a_scope: feasibility only
 phase_b_blocked_on: 'F-11 second coder on the 150-row ruler (D-317): a win on single-coder attested labels is advisory'
-venv: .venv_laya                    # isolated; never the production interpreter
+venv: .venv_laya
 imports_in_production_code: false
 licence:
-  repo: Apache-2.0                  # pip install laya-mlx
-  checkpoint: UNVERIFIED            # HF checkpoint licence MUST be recorded before first measured use (R14)
+  repo: Apache-2.0
+  checkpoint: benchmark-only-advisory
 weights:
-  - repo: aac6fef/laya-mlx
-    role: primary
-    revision: PIN-AT-INSTALL
-    sha256: PIN-AT-INSTALL
-  - repo: aac6fef/laya-multilingual-mlx
-    role: required (multilingual corpus)
-    revision: PIN-AT-INSTALL
-    sha256: PIN-AT-INSTALL
-menu: config/closed_menu_v5.json    # 61-slot criteria list is passed verbatim; menu_hash must be recorded per run
+- repo: convaiinnovations/laya
+  role: typed-decision bundle (resolved from laya_mlx/router.py; the previous aac6fef/* ids were WRONG - BUG-364)
+  revision: 1c5edc17a7acd8701df6fc341c0d179f1c62c982
+  sha256:
+    encoder/config.json: bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979
+    model.safetensors: 891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c
+    rl_agent_config.json: ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd
+    tokenizer/tokenizer.json: 6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30
+    tokenizer/tokenizer_config.json: 50044de60daaa73df97d262e15a40d4faf0160e7d742df64b377877a1320dd12
+menu: config/closed_menu_v5.json
+provenance:
+  recorded_at: '2026-09-22T19:09:46'
+  recorded_by: BUG-364 pin recording (owner-approved); NO run performed
+  hf_repo: convaiinnovations/laya
+  revision: 1c5edc17a7acd8701df6fc341c0d179f1c62c982
+  snapshot_path: ~/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/1c5edc17a7acd8701df6fc341c0d179f1c62c982
+  total_bytes: 846195574
+  files:
+  - path: encoder/config.json
+    bytes: 2083
+    sha256: bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979
+  - path: model.safetensors
+    bytes: 842609210
+    sha256: 891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c
+  - path: rl_agent_config.json
+    bytes: 745
+    sha256: ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd
+  - path: tokenizer/tokenizer.json
+    bytes: 3583228
+    sha256: 6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30
+  - path: tokenizer/tokenizer_config.json
+    bytes: 308
+    sha256: 50044de60daaa73df97d262e15a40d4faf0160e7d742df64b377877a1320dd12
+  completeness: 'COMPLETE - payload 846,195,574 bytes: model.safetensors 842,609,210 B (ModernBERT-large head, matches the
+    ~421M params noted in laya_mlx/router.py), tokenizer/tokenizer.json 3,583,228 B, encoder/config.json 2,083 B, rl_agent_config.json
+    745 B, tokenizer/tokenizer_config.json 308 B. The earlier ''PIN-AT-INSTALL'' entries and the aac6fef/* repo ids were both
+    wrong (BUG-364).'
+  adoption: false
+  scope: benchmark-only-advisory - never feeds the pipeline, never unfreezes F-11 / D-300 (D-275c/D-322)
+  verified_how: re-hashed from the snapshot on disk 2026-09-22; no run performed

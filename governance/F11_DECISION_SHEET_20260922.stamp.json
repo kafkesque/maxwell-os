@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "decision": "BUG-368 / BUG-367",
+  "created_at": "2026-09-22T19:09:05",
+  "out": "governance/F11_DECISION_SHEET_20260922.csv",
+  "sha256": "6ce78e446e6015e6af37e1f28e07ea6591eaec08034cb67224cb3cc05b539acd",
+  "rows": 154,
+  "cols": 26,
+  "a_to_r_sha256": "05cb48630c3dfa158f38e3a24ac54ca40612055b7fa78b76ed5fb9d4f55fc91a",
+  "owner_cells_parsed": 81,
+  "flags": {
+    "EMPTY_TOKEN": 1,
+    "SPLIT": 14,
+    "TYPO_FIXED": 1,
+    "NOT_IN_MENU": 4,
+    "CATCHALL_SLOT_62": 2
+  },
+  "gen_model": "none (deterministic rebuild)"
+}

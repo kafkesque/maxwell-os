@@ -2541,3 +2541,30 @@ The 28 rows the human left unanswered are NOT gap-filled by hand. Round 2 of the
 (governance/F11_LLM_CODER_20260922/, PROMPT.md sha256 578eaee8f60d97f7...) exports ALL 150 ruler rows -
 `n_rows: 150`, `n_excluded_incomplete_rows: 0`, `partial: false` - so the same coders adjudicate the blanks.
 The blind CSV carries a final empty fence column so the BUG-368 collision cannot recur.
+
+## BUG-369 (HIGH - MEASUREMENT INTEGRITY, FIXED 2026-09-22): blank human cells were scored as coder disagreements
+
+HOW: scripts/f11_llm_coder.py cmd_score built `pairs.append((_canon(human_cell), _canon(llm_axis)))` for every
+row in the sheet, unconditionally. `_canon("")` is `""`, so each row where the human never answered that axis
+became the pair `("", <real label>)` - a guaranteed mismatch. The 28 DISC blanks, 5 FORM blanks and (in the
+150-row set) 0 CT blanks were therefore counted as the coder being WRONG.
+
+EFFECT: round-2 DISC agreement read 37.3% / k=0.360 instead of 45.9% / k=0.445, and the round-2 numbers were
+not comparable with round 1 (whose human cells were all filled by construction). A silent, directional skew
+that penalised the coders by exactly the blank share.
+
+FIX: blank-aware pairing. If either side of a pair is empty after canonicalisation, the row is EXCLUDED from
+that axis's pair set and counted in `n_excluded_human_blank` / `n_excluded_llm_blank` with the item_ids listed
+in the artifact. An unanswered cell is not an answer and not an error.
+
+STANDING RULE: any agreement/kappa/accuracy computation must state, per axis, how many rows were EXCLUDED and
+why. `n` alone is not sufficient provenance (C12d/C16).
+
+## BUG-363 (MED - CLOSED 2026-09-22, resolved as two different things, not one)
+Round 2 measured the abstentions instead of guessing at them (governance/F11_R2_MEASUREMENT_20260923.md):
+* the 5 blank FORM cells are NOT ambiguous - both independent families agree 5/5 (k=1.0)
+* the 28 blank DISC cells ARE genuinely contested - the coders agree only 18/28 (64%, k=0.623) vs 0.682 on
+  the rows the human did label
+Disposition: the 28 DISC blanks stay MISSING (declared UNCERTIFIABLE, never back-filled with a consensus that
+does not exist); the 5 FORM blanks are flagged for the owner's own adjudication. No row was padded, no row
+was silently imputed.

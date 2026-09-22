@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-21 12:10:00'
-total_decisions: 697
+last_sync: '2026-09-22 20:06:00'
+total_decisions: 702
 decisions:
 - id: D298
   category: VERIFICATION
@@ -156,12 +156,13 @@ decisions:
   - config/pipeline_config.yaml
 - id: D293
   category: PERF
-  state: ACTIVE
-  date: '2026-09-21'
-  title: Lightning MTP enablement for Qwen3-Coder S2
-  verification: 'oMLX 0.7 Lightning MTP = +34-58% decode on Qwen3 family, lossless at temp=0.0 (R7-safe). S2 = heaviest LLM stage (D2460 MoE ~50 tok/s). Enable MTP drafter + measure before/after on a frozen S2 batch.'
+  state: RESOLVED
+  date: '2026-09-22'
+  title: Lightning MTP for Qwen3-Coder S2 - MEASURED NEUTRAL (0.98x) on M1 Max, NOT adopted
+  verification: 'A/B on this M1 Max (scripts/mtp_ab.py, frozen 8-prompt S2 batch, stream=True ttft split, temp=0.0, API-key auth): MTP OFF mean 7.93 tok/s (median 7.94, n=8) vs MTP ON mean 7.74 tok/s (median 7.80, n=8) = 0.98x NEUTRAL (slightly negative, within noise). Consistent with community evidence (ARahim3/mlx-dspark#38: speculative decode net loss on M1 Max; D-332). Vendor +34-58% targets LONG decode; S2 emits short JSON (31-50 tok) where verify overhead cannot amortize. mtp_enabled left false. Remaining M1 Max levers: D-294 (oQ4e/oQe quant) + D-292 (cache fix).'
   files:
-  - config/pipeline_config.yaml
+  - scripts/mtp_ab.py
+  - governance/mtp_ab_results.jsonl
 - id: D292
   category: OPS / PERF
   state: ACTIVE
@@ -7467,8 +7468,103 @@ decisions:
     config gate stage5.single_writer_lock) because two writers on one checkpoint is worse than a crash: on 2026-09-21
     two runs wrote it within 4 minutes and only the io_guard shrink guard prevented a 50-row rollback. Proven live by a
     deliberately started second run being refused.
+- id: D-331
+  category: RESEARCH
+  state: RESOLVED
+  date: '2026-09-22'
+  title: 'Inference-engine bake-off vs oMLX 0.7 (turbo-fieldfare / mlx-dspark / splash): no swap, no integration'
+  decision: >-
+    Evaluated drumih/turbo-fieldfare (Swift+Metal single-model Gemma 4 26B-A4B), ARahim3/mlx-dspark
+    (DSpark/DFlash lossless speculative decoding on MLX), incoai/splash (M3+ local engine) against
+    oMLX 0.7 on the M1 Max (Metal 3, macOS 27). Verdicts: SPLASH REJECT - hard 'M3 or newer' + Metal 4
+    uint4b gate excludes M1 Max (dispositive), proprietary model-package format violates C2/C4/C21, 'no
+    config file' violates C12/C24/C28, catalog of 2 models misses Qwen3-Coder-30B-A3B/gpt-oss-20B/Phi-4-mini.
+    TURBO-FIELDFARE REJECT as engine (single model, SSD expert-paging = D2460 thrash anti-pattern on 64 GB),
+    REFERENCE its 103-experiment inventory for MoE/Metal kernel notes. MLX-DSPARK REFERENCE/WATCH - drafter
+    registry has NO Qwen3-Coder-30B-A3B or gpt-oss-20B drafter, redundant with oMLX Lightning MTP (D-293);
+    ADOPT its self-calibration methodology (measure THIS machine's verify/drafter cost curves, derive draft
+    cap, never hardcode) for D-293 MTP tuning; re-open A/B only if a Qwen3-Coder/gpt-oss DSpark/DFlash
+    drafter ships. NO SWAP, NO INTEGRATION: oMLX 0.7 already ships lossless speculative decode (MTP) and is
+    the only engine serving Maxwell's catalog on Metal 3. Artifact governance/MARKET_RESEARCH_20260922.md.
+  files:
+  - governance/MARKET_RESEARCH_20260922.md
+- id: D-332
+  category: RESEARCH
+  state: RESOLVED
+  date: '2026-09-22'
+  title: 'Community-benchmark-first standing rule + mlx-dspark M1 net-loss + on-device topic sweep (no engine beats oMLX on M1 Max)'
+  decision: >-
+    STANDING RULE: for every speed/latency/quant claim, weight COMMUNITY benchmark results on matching
+    hardware ABOVE vendor claims on newer hardware (use both). Vendor M4/M5 numbers do NOT transfer to
+    M1 Max. Canonical sources: whichllm (community tok/s), SiliconScope, LM Studio community, engine-repo
+    issues. EVIDENCE: ARahim3/mlx-dspark#38 (M1 Max 64GB, exact Maxwell hardware) — speculative decoding
+    is a NET LOSS on Qwen3.8-27B-8bit (0.55-0.91x; round cost ~2.4x a decode step; verify compute-bound on
+    old GPU, no NAX). mlx-dspark RUNS on M1 (doctor passes) but does not help. CONSEQUENCE: D-293 (oMLX MTP)
+    re-scoped from 'enable' to 'measure before/after on a frozen S2 batch, adopt only if faster'; M1 Max is
+    bandwidth-bound so D-294 (oQ4e/oQe quant) + D-292 (cache fix) outrank MTP. TOPIC SWEEP (on-device-ai/
+    on-device-llm): TinyChatEngine (AWQ+Metal, M1, REFERENCE), LiteRT-LM (mobile-first, WATCH), needle/cactus
+    (121M tool-call/extraction model, WATCH as S2 probe head), BigMoeOnEdge/PrismML-Bonsai (WATCH/REJECT).
+    NO engine in the topics out-serves oMLX on M1 Max. Artifacts: governance/MARKET_RESEARCH_20260922_M1.md,
+    feed.opml (+on-device-ai/on-device-llm topics + 6 evaluated engine entries).
+  files:
+  - governance/MARKET_RESEARCH_20260922_M1.md
+  - feed.opml
+- id: D-334
+  category: PERF
+  state: ACTIVE
+  date: '2026-09-22'
+  title: M1 Max Metal wired-memory cap raise (iogpu.wired_limit_mb)
+  verification: 'omlx.process_memory_enforcer log (2026-09-22): Metal cap 48-51.8 GB (Apple max_recommended_working_set_size) is below the oMLX 56 GB static ceiling because iogpu.wired_limit_mb is unset. Raising it (sudo sysctl iogpu.wired_limit_mb=57344) lets oMLX wire more of the 64 GB for weights/KV. NOT auto-applied (sudo + system-wide). Apply manually, then re-check the oMLX memory-enforcer log for a clean start. Related: D-294 harness (scripts/omlx_lever_ab.py) + best-config spec (config/omlx_m1_best_config.yaml) ready.'
+  files:
+  - config/omlx_m1_best_config.yaml
+  - scripts/omlx_apply_best_m1_config.py
+  - scripts/omlx_lever_ab.py
+- id: D-333
+  category: RESEARCH
+  state: RESOLVED
+  date: '2026-09-22'
+  title: 'MTP A/B instrument (D-293 re-scope) + knowledge-pipeline & skill-orchestration research sweep'
+  decision: >-
+    (1) D-293 MEASURE-DON'T-ASSUME INSTRUMENT: scripts/mtp_ab.py drafted + compiles. Toggles
+    mtp_enabled per-model in ~/.omlx/model_settings.json (crash-safe tempfile->fsync->os.replace + .bak,
+    C6/C13) + omlx_reload, then measures decode tok/s on a FROZEN batch via stream=True (ttft split +
+    non-stream fallback), appends labelled JSONL (crash-safe), and --compare A B prints the ratio with a
+    WIN/LOSS/NEUTRAL verdict (adopt MTP only if WIN on THIS M1 Max; D-332). Temp=0.0 (R7), model+URL from
+    config (C12). (2) KNOWLEDGE PIPELINE & SKILL ORCHESTRATION SWEEP (report:
+    governance/MARKET_RESEARCH_20260922_PIPELINE.md). MUST-REFERENCE: nano-graphrag (local GraphRAG,
+    C1/C3-clean) + GraphRAG/HippoRAG/RAPTOR peer-reviewed family + MCP server patterns (github-mcp-server,
+    context7) for C25. SHOULD-REFERENCE: fastembed-rs local cross-encoder reranker (rerank pass after
+    bge-m3 for S1.5/S5 precision; basis Nogueira&Cho 2019 + ColBERT). ADAPT: LightRAG (already flagged) +
+    skill.md recipe schema. WATCH: Graphify (churn), sibila, n8n. REFERENCE-only (no new deps, C2/C5):
+    microsoft/graphrag (Azure-tied), instructor/outlines (PyTorch-tied), LangGraph/CrewAI (agent-coupling).
+    NO tool displaces current S0-S6 + goose-recipe design; upside moves are rerank pass + lightweight
+    graph index, both gated behind measurement (D-332 spirit).
+  files:
+  - scripts/mtp_ab.py
+  - governance/MARKET_RESEARCH_20260922_PIPELINE.md
+  - feed.opml
+- id: D331
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-22'
+  title: 'F-11 round 2 (all-150 export) confirms D-329 - ruler is the outlier, FORM weakest, blanks now measured'
+  verification: 'Both attestation coders returned 150/150 rows, 9/9 schema fields, 0 gaps, 0 padding. Human vs
+    coder on non-blank pairs: CT k=0.487 (claude-sonnet-4.5) / 0.554 (kimi-k3); DISC k=0.445 / 0.403 (n=122);
+    FORM k=0.305 / 0.266 (n=145). Coder vs coder, two independent families, all 150 rows: CT 88.7% k=0.758;
+    DISC 69.3% k=0.682; FORM 74.0% k=0.638 - models agree with each other 1.6-2.4x more than with the human on
+    every axis, so the human labels remain the outlier and no eval floor is certifiable (D-329 stands). Where
+    the human abstained: the 5 FORM blanks are uncontested (coders agree 5/5, k=1.0) = oversight; the 28 DISC
+    blanks are genuinely contested (coders agree 18/28, 64%, k=0.623) and stay DECLARED MISSING, never
+    back-filled. Fixed BUG-369 (blank human cells were scored as disagreements, deflating round-2 numbers).
+    Tier llm-attested/advisory - cannot unfreeze F-11 / D-300 / eval floors.'
+  files:
+  - governance/F11_R2_MEASUREMENT_20260923.md
+  - governance/f11_llm_coder_claude-sonnet-r2_20260923.json
+  - governance/f11_llm_coder_kimi3-r2_20260923.json
+  - scripts/f11_llm_coder.py
+
 summary:
-  total: 697
+  total: 702
   proposed: 6
   draft: 1
   active: 483
@@ -7477,7 +7573,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 130
+  resolved: 135
   planned: 8
   ratified: 5
   open: 17
@@ -7580,7 +7676,7 @@ summary:
     OPS / PERF: 2
     OPS / QUALITY: 2
     OPS / RELIABILITY: 10
-    PERF: 14
+    PERF: 15
     PERF / BUGFIX: 1
     PERFORMANCE / DATA INTEGRITY / GOVERNANCE: 1
     PIPELINE / CONTAMINATION: 1
@@ -7601,7 +7697,7 @@ summary:
     QUALITY / RELIABILITY: 2
     QUALITY / TAXONOMY: 1
     RES: 4
-    RESEARCH: 6
+    RESEARCH: 9
     RESILIENCE / QUALITY: 1
     RETRIEVAL / ONTOLOGY: 6
     RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
@@ -7614,7 +7710,7 @@ summary:
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
-    VERIFICATION: 14
+    VERIFICATION: 15
     VERIFICATION / ONTOLOGY: 1
     governance: 1
     pipeline-fix: 2

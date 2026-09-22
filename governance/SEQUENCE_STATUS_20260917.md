@@ -659,3 +659,13 @@ lock (BUG-361) + `--adopt-fingerprint` migration with a substantive-input guard.
 10/10, decisions 696 in sync, pins 5/5 PASS, taxonomy v5.6, S5 fingerprint MATCH, a second S5 writer REFUSED live,
 0 tracked .bak. S5 is running again (pid 4194) with the 1,250 records kept: "1250 FBs already verified -> 6745
 remaining". Commits no longer kill a live S5 run - that was the whole point.
+
+## Session 17 addendum - F-11 ROUND 2 measured (D-331, 2026-09-22)
+
+Round 2 re-ran the second-coder task over ALL 150 rows (round 1 exported only the 122 fully-answered rows).
+Both coders delivered 150/150, schema-clean. Coder-vs-coder (two families, 150 rows): CT k=0.758, DISC
+k=0.682, FORM k=0.638 - against human-vs-coder CT 0.487/0.554, DISC 0.445/0.403, FORM 0.305/0.266. D-329 is
+reproduced and strengthened: the human reference is the outlier; no floor is certifiable; F-11 stays open.
+The 28 DISC abstentions are genuinely contested (coders 64% agree) and remain declared-missing; the 5 FORM
+abstentions are uncontested (100%) and await the owner's own call. Fixed BUG-369 (blank cells scored as
+disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN coder lifts F-11.

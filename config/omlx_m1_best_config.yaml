@@ -1,0 +1,88 @@
+# oMLX per-model "community best config" for Apple M1 Max (MacBookPro18,2).
+#
+# This is the Maxwell OS single-source spec for "most-optimized per-model config"
+# on THIS hardware (M1 Max · 64 GB · 400 GB/s · 10-core · no NAX · no advanced ANE).
+# Source: oMLX 0.7.0.dev4 model_settings.json schema + D-332 community-benchmark-first
+# rule (community measurements on matching hardware outrank vendor claims) + the
+# executed D-293 MTP A/B (0.98x neutral) + mlx-dspark#38 (spec decode net loss on M1 Max).
+#
+# Three classes of setting (mirrors the D-294 instrument pattern — never vibe-set):
+#   apply  -> safe, hardware/task-justified; enforced by scripts/omlx_apply_best_m1_config.py
+#   measure-> measurement-gated; ONLY adopted if an A/B on THIS M1 Max shows a WIN (D-332)
+#   system -> system-level lever (sudo); surfaced, never auto-applied
+#
+# Do NOT restate a value here that lives in model_settings.json — this file is the
+# *intent* spec; the live file is the applied state (C12: cite, don't duplicate).
+
+hardware_anchor:
+  machine: MacBookPro18,2
+  chip: Apple M1 Max
+  ram_gb: 64
+  bandwidth_gb_s: 400
+  cores: "8P + 2E"
+  metal_gen: 3            # no NAX fused attention, no per-GPU neural accelerator
+  ane: "16-core (M1-era, NOT the M5 NAX path)"
+
+# Universal M1-Max-appropriate settings applied to EVERY model (reasoning in comments).
+universal_apply:
+  enable_thinking: false            # non-reasoning pipeline tasks: faster + cheaper (R7 temp=0.0)
+  mtp_enabled: false                # D-293 A/B measured 0.98x NEUTRAL on Qwen3-Coder
+  dflash_enabled: false             # community: spec decode net loss on M1 (mlx-dspark#38)
+  qwen35_ane_prefill_enabled: false # ANE-prefill is an M5+ path; M1 ANE is a wash
+  qwen4_ple_ssd_offload: false      # D2460: SSD paging = decode thrash on 64 GB
+  vlm_mtp_enabled: false            # no VLM in pipeline
+
+# Per-model task -> settings. guided_grammar_enabled=true forces schema-valid JSON
+# output for extraction/classification (matches Maxwell's structured FBs).
+models:
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit:      # S2 generator (heaviest LLM stage)
+    task: convergent FB extraction (JSON)
+    apply:
+      guided_grammar_enabled: true
+      enable_thinking: false
+      max_tool_result_tokens: 4096
+    measure:
+      - turboquant_kv_enabled   # KV-cache quant -> cuts decode bandwidth (M1 is bandwidth-bound)
+      - specprefill_enabled     # currently true; speculative prefill is long-prefill-only
+      - quant_variant: oQ4e     # requires download (only MLX-4bit present locally)
+
+  gpt-oss-20b-MXFP4-Q8:                         # S4 depth/domain classifier
+    task: one-word depth + discipline classification (long context)
+    apply:
+      guided_grammar_enabled: true
+      enable_thinking: false
+      specprefill_enabled: false   # already false; keep
+    measure:
+      - turboquant_kv_enabled     # long-context classify -> KV quant is the top bandwidth lever
+      - quant_variant: Q4         # gpt-oss Q4 present in settings but NOT symlinked -> needs download
+
+  Phi-4-mini-instruct-8bit:                     # S2 fast probe (summarize WITH source)
+    task: source-grounded summarization / fast probe (D2319)
+    apply:
+      guided_grammar_enabled: true
+      enable_thinking: false
+      is_pinned: true              # already pinned at startup
+
+  gemma-4-E4B-it-MLX-4bit:                      # R5 review / classification sanity
+    task: code review + classification sanity (R5 generator != verifier)
+    apply:
+      guided_grammar_enabled: true
+      enable_thinking: false
+
+  Qwen3.8-27B-MLX-4bit:                         # alternate generator / eval model
+    task: general generation + eval suites
+    apply:
+      guided_grammar_enabled: true
+      enable_thinking: false
+
+# System-level lever surfaced from omlx.process_memory_enforcer log (2026-09-22):
+#   Metal cap (48.0-51.8 GB, Apple max_recommended_working_set_size) < oMLX 56 GB ceiling.
+#   Raise to let oMLX wire more unified memory for weights/KV on the 64 GB part:
+#       sudo sysctl iogpu.wired_limit_mb=57344
+#   NOT auto-applied (requires sudo; system-wide). Recorded as D-334.
+system_levers:
+  - name: iogpu_wired_limit_mb
+    value: 57344
+    command: sudo sysctl iogpu.wired_limit_mb=57344
+    reason: Metal wired cap below oMLX 56 GB ceiling; raises GPU-wirable memory on 64 GB
+    risk: system-wide change; verify no memory pressure before applying

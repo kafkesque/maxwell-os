@@ -1,0 +1,16 @@
+{"error": null, "n_tokens": 31, "ttft_s": 1.561, "total_s": 5.31, "decode_tok_s": 8.0, "wall_tok_s": 5.84, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 19:59:48"}
+{"error": null, "n_tokens": 36, "ttft_s": 0.778, "total_s": 5.181, "decode_tok_s": 7.95, "wall_tok_s": 6.95, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 19:59:53"}
+{"error": null, "n_tokens": 47, "ttft_s": 0.921, "total_s": 6.725, "decode_tok_s": 7.93, "wall_tok_s": 6.99, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:00"}
+{"error": null, "n_tokens": 31, "ttft_s": 1.146, "total_s": 4.939, "decode_tok_s": 7.91, "wall_tok_s": 6.28, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:05"}
+{"error": null, "n_tokens": 36, "ttft_s": 0.793, "total_s": 5.288, "decode_tok_s": 7.79, "wall_tok_s": 6.81, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:10"}
+{"error": null, "n_tokens": 47, "ttft_s": 0.952, "total_s": 6.794, "decode_tok_s": 7.87, "wall_tok_s": 6.92, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:17"}
+{"error": null, "n_tokens": 31, "ttft_s": 1.176, "total_s": 4.949, "decode_tok_s": 7.95, "wall_tok_s": 6.26, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:22"}
+{"error": null, "n_tokens": 37, "ttft_s": 0.728, "total_s": 5.197, "decode_tok_s": 8.06, "wall_tok_s": 7.12, "label": "mtp_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:00:27"}
+{"error": null, "n_tokens": 31, "ttft_s": 6.807, "total_s": 10.591, "decode_tok_s": 7.93, "wall_tok_s": 2.93, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:16"}
+{"error": null, "n_tokens": 36, "ttft_s": 0.829, "total_s": 5.296, "decode_tok_s": 7.84, "wall_tok_s": 6.8, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:22"}
+{"error": null, "n_tokens": 47, "ttft_s": 0.942, "total_s": 6.815, "decode_tok_s": 7.83, "wall_tok_s": 6.9, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:28"}
+{"error": null, "n_tokens": 32, "ttft_s": 1.135, "total_s": 5.118, "decode_tok_s": 7.78, "wall_tok_s": 6.25, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:33"}
+{"error": null, "n_tokens": 38, "ttft_s": 0.821, "total_s": 5.696, "decode_tok_s": 7.59, "wall_tok_s": 6.67, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:39"}
+{"error": null, "n_tokens": 50, "ttft_s": 0.893, "total_s": 7.161, "decode_tok_s": 7.82, "wall_tok_s": 6.98, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:46"}
+{"error": null, "n_tokens": 31, "ttft_s": 1.252, "total_s": 5.248, "decode_tok_s": 7.51, "wall_tok_s": 5.91, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:52"}
+{"error": null, "n_tokens": 37, "ttft_s": 0.864, "total_s": 5.611, "decode_tok_s": 7.58, "wall_tok_s": 6.59, "label": "mtp_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "ts": "2026-09-22 20:01:57"}

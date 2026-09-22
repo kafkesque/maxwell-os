@@ -1,0 +1,1073 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-317",
+  "created_at": "2026-09-23T00:24:49",
+  "provenance_tier": "llm-attested",
+  "cannot_unfreeze": [
+    "F-11",
+    "D-300 adoption bar",
+    "config/eval_integrity.yaml floors"
+  ],
+  "STATUS": "ADVISORY \u2014 this is a THIRD attested label set produced by a model. It measures RULER RELIABILITY (human\u2194LLM agreement). It is NOT human-blind, it is NOT independent human truth, and it CANNOT license adoption (D-300) or unfreeze config/eval_integrity.yaml (F-11).",
+  "first_coder": {
+    "sheet": "governance/RULER_BLIND_SHEET_20260917.csv",
+    "sha256": "383231921fffda2c477cabc9611887c51d1499cae5b0763448bc49aebed1587b",
+    "reviewer_field": "human (single coder)"
+  },
+  "second_coder": {
+    "file": "temp/kimi3 labels01.md",
+    "sha256": "dbe8a99f81616f6294d5af8a38fb6361817e4144142a16737729995db2b8bb68",
+    "model": "kimi-k3",
+    "family": "moonshot",
+    "temperature": 0.0,
+    "one_shot": true,
+    "prompt_sha256": "TO-BE-FILLED-AT-RUN",
+    "sovereign_opt_in": false
+  },
+  "n_rows": 150,
+  "n_rows_exported": 150,
+  "rows_unanswered_by_this_coder": [],
+  "rows_not_in_export": [],
+  "partial": false,
+  "declared_aliases_applied": [
+    "casual mechanism \u2192 causal_mechanism (extraction_type): typo in the single-coder sheet (R-rows), reported separately",
+    "normativ heuristic \u2192 normative_heuristic (extraction_type): typo in the single-coder sheet (R-rows), reported separately",
+    "escriptive model \u2192 descriptive_model (extraction_type): typo in the single-coder sheet (R-rows), BUG-367; reported separately",
+    "priniple \u2192 principle (content_type): typo in an OWNER ruling cell (2026-09-22); declared so the split is auditable (C12d)",
+    "noisedrop \u2192 noise_drop (content_type): owner spelling variant of menu slot 6 (2026-09-22)",
+    "growthedge \u2192 growth_edge (content_type): owner spelling variant of menu slot 5 (2026-09-22)"
+  ],
+  "axes": {
+    "content_type": {
+      "column": "CT (1-7)",
+      "n": 150,
+      "n_excluded_human_blank": 0,
+      "n_excluded_llm_blank": 0,
+      "excluded_human_blank_item_ids": [],
+      "agreement_pct": 75.3,
+      "cohen_kappa": 0.5543,
+      "n_distinct_human": 7,
+      "n_distinct_llm": 6,
+      "labels_llm_used_human_never_used": [],
+      "labels_human_used_llm_never_used": [
+        "quarantine"
+      ],
+      "mean_llm_conf": 0.813,
+      "n_disagreements": 37,
+      "disagreements": [
+        {
+          "item_id": "R002",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R004",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R007",
+          "human": "noise drop",
+          "llm": "tool_instruction"
+        },
+        {
+          "item_id": "R013",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R017",
+          "human": "quarantine",
+          "llm": "tool_instruction"
+        },
+        {
+          "item_id": "R025",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R030",
+          "human": "quarantine",
+          "llm": "tool_instruction"
+        },
+        {
+          "item_id": "R032",
+          "human": "principle",
+          "llm": "process_template"
+        },
+        {
+          "item_id": "R034",
+          "human": "noise drop",
+          "llm": "process_instance"
+        },
+        {
+          "item_id": "R042",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R046",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R052",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R057",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R063",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R067",
+          "human": "principle",
+          "llm": "process_instance"
+        },
+        {
+          "item_id": "R080",
+          "human": "noise drop",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R089",
+          "human": "noise drop",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R090",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R091",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R093",
+          "human": "growth edge",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R097",
+          "human": "process template",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R103",
+          "human": "process template",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R106",
+          "human": "noise drop",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R108",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R112",
+          "human": "principle",
+          "llm": "process_template"
+        },
+        {
+          "item_id": "R115",
+          "human": "process template",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R118",
+          "human": "process template",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R120",
+          "human": "principle",
+          "llm": "tool_instruction"
+        },
+        {
+          "item_id": "R123",
+          "human": "principle",
+          "llm": "tool_instruction"
+        },
+        {
+          "item_id": "R124",
+          "human": "noise drop",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R125",
+          "human": "principle",
+          "llm": "process_instance"
+        },
+        {
+          "item_id": "R127",
+          "human": "quarantine",
+          "llm": "process_instance"
+        },
+        {
+          "item_id": "R140",
+          "human": "noise drop",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R144",
+          "human": "noise drop",
+          "llm": "process_template"
+        },
+        {
+          "item_id": "R147",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R148",
+          "human": "quarantine",
+          "llm": "principle"
+        },
+        {
+          "item_id": "R149",
+          "human": "quarantine",
+          "llm": "principle"
+        }
+      ]
+    },
+    "discipline": {
+      "column": "DISC (1-62)",
+      "n": 122,
+      "n_excluded_human_blank": 28,
+      "n_excluded_llm_blank": 0,
+      "excluded_human_blank_item_ids": [
+        "R007",
+        "R012",
+        "R019",
+        "R021",
+        "R026",
+        "R028",
+        "R034",
+        "R040",
+        "R042",
+        "R046",
+        "R052",
+        "R056",
+        "R059",
+        "R060",
+        "R063",
+        "R072",
+        "R080",
+        "R082",
+        "R084",
+        "R088",
+        "R091",
+        "R102",
+        "R106",
+        "R140",
+        "R143",
+        "R144",
+        "R147",
+        "R148"
+      ],
+      "agreement_pct": 41.8,
+      "cohen_kappa": 0.4031,
+      "n_distinct_human": 45,
+      "n_distinct_llm": 45,
+      "labels_llm_used_human_never_used": [
+        "aesthetics",
+        "anthropology",
+        "complexadaptivesystems",
+        "computationaltheory",
+        "creativecoding",
+        "healthmedicine",
+        "law",
+        "visualsemiotics"
+      ],
+      "labels_human_used_llm_never_used": [
+        "communicationtheory",
+        "engineering",
+        "finance",
+        "informationsecurity",
+        "literarytheory",
+        "performingarts",
+        "politicaleconomy",
+        "systemsengineering"
+      ],
+      "mean_llm_conf": 0.703,
+      "n_disagreements": 71,
+      "disagreements": [
+        {
+          "item_id": "R003",
+          "human": "research methodology",
+          "llm": "cognitive science"
+        },
+        {
+          "item_id": "R004",
+          "human": "political economy",
+          "llm": "health & medicine"
+        },
+        {
+          "item_id": "R005",
+          "human": "computer graphics",
+          "llm": "information science"
+        },
+        {
+          "item_id": "R008",
+          "human": "psychology",
+          "llm": "neuroscience"
+        },
+        {
+          "item_id": "R009",
+          "human": "risk management",
+          "llm": "decision making"
+        },
+        {
+          "item_id": "R010",
+          "human": "design thinking",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R011",
+          "human": "information retrieval",
+          "llm": "artificial intelligence"
+        },
+        {
+          "item_id": "R013",
+          "human": "risk management",
+          "llm": "organizational theory"
+        },
+        {
+          "item_id": "R015",
+          "human": "operations research",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R017",
+          "human": "engineering",
+          "llm": "computational physics & simulation"
+        },
+        {
+          "item_id": "R018",
+          "human": "visual perception",
+          "llm": "color theory"
+        },
+        {
+          "item_id": "R020",
+          "human": "systems engineering",
+          "llm": "complex adaptive systems"
+        },
+        {
+          "item_id": "R023",
+          "human": "strategic thinking",
+          "llm": "decision making"
+        },
+        {
+          "item_id": "R024",
+          "human": "finance",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R025",
+          "human": "organizational theory",
+          "llm": "design thinking"
+        },
+        {
+          "item_id": "R027",
+          "human": "organizational theory",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R031",
+          "human": "risk management",
+          "llm": "research methodology"
+        },
+        {
+          "item_id": "R035",
+          "human": "information science",
+          "llm": "research methodology"
+        },
+        {
+          "item_id": "R036",
+          "human": "design psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R037",
+          "human": "software engineering",
+          "llm": "typography"
+        },
+        {
+          "item_id": "R041",
+          "human": "design psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R043",
+          "human": "neuroscience",
+          "llm": "cognitive science"
+        },
+        {
+          "item_id": "R045",
+          "human": "operations research",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R047",
+          "human": "design thinking",
+          "llm": "design psychology"
+        },
+        {
+          "item_id": "R049",
+          "human": "operations research",
+          "llm": "decision making"
+        },
+        {
+          "item_id": "R051",
+          "human": "engineering",
+          "llm": "emerging"
+        },
+        {
+          "item_id": "R053",
+          "human": "emerging",
+          "llm": "philosophy"
+        },
+        {
+          "item_id": "R054",
+          "human": "artificial intelligence",
+          "llm": "machine learning"
+        },
+        {
+          "item_id": "R055",
+          "human": "operations research",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R057",
+          "human": "finance",
+          "llm": "law"
+        },
+        {
+          "item_id": "R058",
+          "human": "design psychology",
+          "llm": "visual semiotics"
+        },
+        {
+          "item_id": "R061",
+          "human": "strategic thinking",
+          "llm": "organizational theory"
+        },
+        {
+          "item_id": "R062",
+          "human": "behavioral economics",
+          "llm": "neuroscience"
+        },
+        {
+          "item_id": "R066",
+          "human": "emerging",
+          "llm": "computational geometry"
+        },
+        {
+          "item_id": "R067",
+          "human": "performing arts",
+          "llm": "media studies"
+        },
+        {
+          "item_id": "R071",
+          "human": "design thinking",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R073",
+          "human": "cognitive science",
+          "llm": "linguistics"
+        },
+        {
+          "item_id": "R074",
+          "human": "design psychology",
+          "llm": "media studies"
+        },
+        {
+          "item_id": "R075",
+          "human": "political economy",
+          "llm": "philosophy"
+        },
+        {
+          "item_id": "R076",
+          "human": "cultural studies",
+          "llm": "visual semiotics"
+        },
+        {
+          "item_id": "R077",
+          "human": "cultural studies",
+          "llm": "anthropology"
+        },
+        {
+          "item_id": "R085",
+          "human": "psychology",
+          "llm": "cultural studies"
+        },
+        {
+          "item_id": "R086",
+          "human": "psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R090",
+          "human": "cultural design",
+          "llm": "cultural studies"
+        },
+        {
+          "item_id": "R092",
+          "human": "emerging",
+          "llm": "media studies"
+        },
+        {
+          "item_id": "R095",
+          "human": "design psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R097",
+          "human": "decision making",
+          "llm": "operations research"
+        },
+        {
+          "item_id": "R098",
+          "human": "design thinking",
+          "llm": "aesthetics"
+        },
+        {
+          "item_id": "R099",
+          "human": "communication theory",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R100",
+          "human": "emerging",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R103",
+          "human": "emerging",
+          "llm": "visual semiotics"
+        },
+        {
+          "item_id": "R104",
+          "human": "operations research",
+          "llm": "research methodology"
+        },
+        {
+          "item_id": "R109",
+          "human": "behavioral economics",
+          "llm": "psychology"
+        },
+        {
+          "item_id": "R113",
+          "human": "operations research",
+          "llm": "computational theory"
+        },
+        {
+          "item_id": "R116",
+          "human": "artificial intelligence",
+          "llm": "machine learning"
+        },
+        {
+          "item_id": "R117",
+          "human": "psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R120",
+          "human": "information science",
+          "llm": "computer graphics"
+        },
+        {
+          "item_id": "R121",
+          "human": "emerging",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R122",
+          "human": "visual perception",
+          "llm": "visual semiotics"
+        },
+        {
+          "item_id": "R123",
+          "human": "computational geometry",
+          "llm": "creative coding"
+        },
+        {
+          "item_id": "R127",
+          "human": "cultural studies",
+          "llm": "cultural design"
+        },
+        {
+          "item_id": "R128",
+          "human": "psychology",
+          "llm": "behavioral economics"
+        },
+        {
+          "item_id": "R129",
+          "human": "decision making",
+          "llm": "strategic thinking"
+        },
+        {
+          "item_id": "R131",
+          "human": "information security",
+          "llm": "privacy & surveillance"
+        },
+        {
+          "item_id": "R136",
+          "human": "human-computer interaction",
+          "llm": "generative ai"
+        },
+        {
+          "item_id": "R137",
+          "human": "human-computer interaction",
+          "llm": "design psychology"
+        },
+        {
+          "item_id": "R138",
+          "human": "literary theory",
+          "llm": "linguistics"
+        },
+        {
+          "item_id": "R139",
+          "human": "psychology",
+          "llm": "cognitive science"
+        },
+        {
+          "item_id": "R141",
+          "human": "operations research",
+          "llm": "artificial intelligence"
+        },
+        {
+          "item_id": "R149",
+          "human": "privacy & surveillance",
+          "llm": "visual perception"
+        },
+        {
+          "item_id": "R150",
+          "human": "organizational theory",
+          "llm": "strategic thinking"
+        }
+      ]
+    },
+    "extraction_type": {
+      "column": "FORM (1-4)",
+      "n": 145,
+      "n_excluded_human_blank": 5,
+      "n_excluded_llm_blank": 0,
+      "excluded_human_blank_item_ids": [
+        "R012",
+        "R021",
+        "R026",
+        "R084",
+        "R140"
+      ],
+      "agreement_pct": 46.9,
+      "cohen_kappa": 0.266,
+      "n_distinct_human": 4,
+      "n_distinct_llm": 4,
+      "labels_llm_used_human_never_used": [],
+      "labels_human_used_llm_never_used": [],
+      "mean_llm_conf": 0.799,
+      "n_disagreements": 77,
+      "disagreements": [
+        {
+          "item_id": "R001",
+          "human": "casual mechanism",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R003",
+          "human": "normativ heuristic",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R005",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R006",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R007",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R008",
+          "human": "descriptive model",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R013",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R015",
+          "human": "normativ heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R018",
+          "human": "normativ heuristic",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R019",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R020",
+          "human": "descriptive model",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R022",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R024",
+          "human": "normativ heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R028",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R030",
+          "human": "causal mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R032",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R034",
+          "human": "empirical pattern",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R035",
+          "human": "casual mechanism",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R037",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R038",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R040",
+          "human": "normative heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R042",
+          "human": "empirical pattern",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R043",
+          "human": "normative heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R046",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R047",
+          "human": "normative heuristic",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R052",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R054",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R056",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R057",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R060",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R062",
+          "human": "descriptive model",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R063",
+          "human": "descriptive model",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R064",
+          "human": "normativ heuristic",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R065",
+          "human": "escriptive model",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R067",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R069",
+          "human": "normative heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R072",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R073",
+          "human": "casual mechanism",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R075",
+          "human": "causal mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R076",
+          "human": "empirical_pattern",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R078",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R085",
+          "human": "descriptive model",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R086",
+          "human": "normative heuristic",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R087",
+          "human": "descriptive model",
+          "llm": "causal_mechanism"
+        },
+        {
+          "item_id": "R089",
+          "human": "causal mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R090",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R091",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R092",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R094",
+          "human": "causal mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R096",
+          "human": "normative heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R097",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R103",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R111",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R113",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R116",
+          "human": "casual mechanism",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R118",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R119",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R120",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R121",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R123",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R125",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R127",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R129",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R130",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R131",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R132",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R134",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R135",
+          "human": "descriptive model",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R136",
+          "human": "normative heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R138",
+          "human": "normative heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R139",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R141",
+          "human": "normative heuristic",
+          "llm": "empirical_pattern"
+        },
+        {
+          "item_id": "R144",
+          "human": "normativ heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R145",
+          "human": "normative heuristic",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R146",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        },
+        {
+          "item_id": "R147",
+          "human": "casual mechanism",
+          "llm": "descriptive_model"
+        },
+        {
+          "item_id": "R148",
+          "human": "casual mechanism",
+          "llm": "normative_heuristic"
+        }
+      ]
+    }
+  }
+}

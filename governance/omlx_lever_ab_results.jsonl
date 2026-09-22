@@ -1,0 +1,2 @@
+{"label": "kv_off", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "mean": 161.12, "median": 122.65, "n": 6, "ts": "2026-09-22T20:29:37.441512"}
+{"label": "kv_on", "model": "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit", "mean": 104.82, "median": 99.37, "n": 6, "ts": "2026-09-22T20:30:30.645413"}

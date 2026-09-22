@@ -273,9 +273,22 @@ def cmd_score(cfg: dict[str, Any], llm_path: Path, tag: str = "", model: str = "
         confs: list[float] = []
         distinct: dict[str, Counter[str]] = {"human": Counter(), "llm": Counter()}
         disagreements: list[dict[str, str]] = []
+        blank_human = blank_llm = 0
+        blank_human_ids: list[str] = []
         for iid in sorted(human):
             a_raw, b_raw = human[iid].get(col, ""), str(llm[iid].get(axis, ""))
             a, b = _canon(a_raw, aliases), _canon(b_raw, aliases)
+            # BUG-369: an UNANSWERED cell is NOT a disagreement. A blank human axis (the rows of
+            # BUG-363 that no human ever labelled) or a blank coder axis is excluded from the pair
+            # set and counted separately - otherwise the blanks deflate agreement/kappa by exactly
+            # their share, and round 1 (complete human cells) becomes incomparable to round 2.
+            if not a or not b:
+                if not a:
+                    blank_human += 1
+                    blank_human_ids.append(iid)
+                if not b:
+                    blank_llm += 1
+                continue
             pairs.append((a, b))
             distinct["human"][a] += 1
             distinct["llm"][b] += 1
@@ -289,12 +302,15 @@ def cmd_score(cfg: dict[str, Any], llm_path: Path, tag: str = "", model: str = "
         per_axis[axis] = {
             "column": col,
             "n": len(pairs),
-            "agreement_pct": round(100 * sum(1 for a, b in pairs if a == b) / len(pairs), 1),
-            "cohen_kappa": _kappa(pairs),
+            "n_excluded_human_blank": blank_human,
+            "n_excluded_llm_blank": blank_llm,
+            "excluded_human_blank_item_ids": blank_human_ids,
+            "agreement_pct": round(100 * sum(1 for a, b in pairs if a == b) / len(pairs), 1) if pairs else None,
+            "cohen_kappa": _kappa(pairs) if pairs else None,
             "n_distinct_human": len(distinct["human"]),
             "n_distinct_llm": len(distinct["llm"]),
-            "labels_llm_used_human_never_used": sorted(novel_h),
-            "labels_human_used_llm_never_used": sorted(novel_l),
+            "labels_llm_used_human_never_used": [l for l in sorted(novel_h) if l],
+            "labels_human_used_llm_never_used": [l for l in sorted(novel_l) if l],
             "mean_llm_conf": round(sum(confs) / len(confs), 3) if confs else None,
             "n_disagreements": len(disagreements),
             "disagreements": disagreements,

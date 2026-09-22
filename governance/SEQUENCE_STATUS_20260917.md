@@ -652,3 +652,10 @@ swaps among causal/descriptive/normative: the FORM axis is the weakest AND the m
 CT - the 18 human 'quarantine' rows (a legal DISPOSITION, menu item 7) are the human refusing a role where both models
 assign one: a threshold-of-clean-role policy difference, not a labelling error.
 New bug BUG-367 (FORM column is 38% non-canonical spellings - corroborates F-14).
+
+### Session 16 addendum 2 - the freeze is lifted (D-330)
+Owner ruling: option A on BUG-362. Implemented and committed (81b813f): path-scoped S5 fingerprint + single-writer
+lock (BUG-361) + `--adopt-fingerprint` migration with a substantive-input guard. Audit after the change: integrity
+10/10, decisions 696 in sync, pins 5/5 PASS, taxonomy v5.6, S5 fingerprint MATCH, a second S5 writer REFUSED live,
+0 tracked .bak. S5 is running again (pid 4194) with the 1,250 records kept: "1250 FBs already verified -> 6745
+remaining". Commits no longer kill a live S5 run - that was the whole point.

@@ -2475,3 +2475,21 @@ are not the canonical menu string; the canonical 'causal mechanism' appears only
 config/f11_llm_coder.yaml declares the aliases, so SCORING is unaffected - but any consumer that reads the raw column
 (filters, GROUP BY, the F-14 4054 pre-repair FORM rows) sees out-of-vocabulary values. This is direct corroboration of
 the F-14 concern and a repair target: canonicalise the sheet in place (append a repaired column, R-D410) or repair at read.
+
+## BUG-361 (MED - FIXED 2026-09-22, D-330): no single-writer lock on the S5 checkpoint
+Two runs wrote one checkpoint within 4 minutes on 2026-09-21 (mine archived by the shrink guard; the user's Ctrl-C left
+1,250 records from the other writer). FIXED: pipeline/stage5_verify.py acquires <checkpoint>.lock (pid + timestamp,
+O_EXCL-style create, atexit release) before ANY checkpoint decision; a LIVE holder makes the second run refuse
+(fail-closed, C16) and a dead pid's lock is reclaimed with a printed warning. PROVEN live: a second
+`stage5_verify.py` while pid 4194 held the lock printed the refusal and exited. Config gate: stage5.single_writer_lock.
+
+## BUG-362 (HIGH - FIXED 2026-09-22, D-330): any commit discarded a live S5 checkpoint
+_s5_input_fingerprint() bound `pipeline_commit` (GLOBAL HEAD) and the whole-config `manifest_hash`, so a governance-only
+commit invalidated a live checkpoint and re-verified 7,995 rows. FIXED: the fingerprint now binds the S4 checkpoint
+content, schema/taxonomy versions, the model lineup, the S5-relevant source files (config list:
+stage5.fingerprint_files = stage5_verify.py, serving_gate.py, io_guard.py) and the stage5 config slice. `pipeline_commit`
+and `manifest_hash` are still recorded, under `informational`, but are NOT part of the identity. Migration is explicit:
+`stage5_verify.py --adopt-fingerprint` re-stamps ONLY if all 7 substantive inputs are identical (it refuses otherwise).
+EVIDENCE: old id 63f823bd1175b97f → new id c2754fc63f8450; changed keys were exactly the informational/scheme ones
+(manifest_hash, pipeline_commit, s5_code_sha256, s5_config_sha256); all 7 substantive inputs identical. The 1,250
+verified records survived: resume printed "1250 FBs already verified -> 6745 remaining".

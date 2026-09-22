@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 696
+total_decisions: 697
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7447,8 +7447,28 @@ decisions:
     out-of-menu emission (13-18 of 60 rows, D-327) is a classifier/prompt defect, NOT a menu defect; (e) next
     step is 3-way arbitration on the disagreed rows to locate granularity, feeding
     config/boundary_discriminators.yaml. Artifacts: governance/f11_llm_coder_{claude-sonnet,kimi3}_20260922.*
+- id: D-330
+  category: HARDENING
+  state: RESOLVED
+  date: 2026-09-22
+  title: 'S5 checkpoint identity bound to its real inputs (never global HEAD) + a single-writer lock; migration is an explicit validated re-stamp'
+  decision: >-
+    BUG-361/BUG-362 fixed. _s5_input_fingerprint() no longer binds pipeline_commit (global HEAD) or the whole-config
+    manifest_hash: those move on governance-only commits, which hard-discarded a live 1,250-record S5 checkpoint
+    (D2485 behaviour). The fingerprint now binds the S4 checkpoint content, schema/taxonomy versions, the model lineup,
+    the S5-relevant source files (C12 config list stage5.fingerprint_files: stage5_verify.py, serving_gate.py,
+    io_guard.py) and the stage5 config slice; pipeline_commit and manifest_hash are still recorded but under
+    `informational`, so they never change the id. The scheme change is migrated by an EXPLICIT, validated act:
+    `stage5_verify.py --adopt-fingerprint` re-stamps only if all 7 substantive inputs are byte-identical and refuses
+    otherwise (fail-closed, C16); on 2026-09-22 it changed exactly manifest_hash, pipeline_commit, s5_code_sha256 and
+    s5_config_sha256 (id 63f823bd1175b97f -> c2754fc63f845084) with all substantive inputs identical, and the 1,250
+    verified records survived the resume (1250 -> 6745 remaining). Additionally the S5 checkpoint now has a
+    single-writer lock (<checkpoint>.lock, pid + timestamp, atexit release, live-holder refusal, dead-pid reclaim,
+    config gate stage5.single_writer_lock) because two writers on one checkpoint is worse than a crash: on 2026-09-21
+    two runs wrote it within 4 minutes and only the io_guard shrink guard prevented a 50-row rollback. Proven live by a
+    deliberately started second run being refused.
 summary:
-  total: 696
+  total: 697
   proposed: 6
   draft: 1
   active: 483
@@ -7457,7 +7477,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 129
+  resolved: 130
   planned: 8
   ratified: 5
   open: 17
@@ -7517,7 +7537,7 @@ summary:
     GOVERNANCE / QUALITY: 1
     GOVERNANCE / SOVEREIGNTY: 1
     GOVERNANCE / WORKFLOW: 1
-    HARDENING: 1
+    HARDENING: 2
     HYGIENE / TESTING: 1
     INF: 177
     INF / GOV: 1

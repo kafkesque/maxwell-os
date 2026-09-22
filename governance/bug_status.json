@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 113,
-  "open_n": 74,
-  "closed_n": 39,
+  "open_n": 72,
+  "closed_n": 41,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -349,16 +349,6 @@
       "events": 1
     },
     {
-      "id": "BUG-361",
-      "title": "(HIGH - resilience/concurrency, OPEN): two S5 writers on one checkpoint; S5 has no single-writer lock",
-      "events": 1
-    },
-    {
-      "id": "BUG-362",
-      "title": "(HIGH - future tax, OPEN): an S5 checkpoint is discarded by ANY commit, including governance-only ones",
-      "events": 1
-    },
-    {
       "id": "BUG-363",
       "title": "(MED - measurement integrity, OPEN): the ruler sheet is FILLED and 28/150 rows are INCOMPLETE; G4 still describes it as blank",
       "events": 1
@@ -418,6 +408,8 @@
     "BUG-353",
     "BUG-357",
     "BUG-358",
+    "BUG-361",
+    "BUG-362",
     "BUG-365"
   ]
 }

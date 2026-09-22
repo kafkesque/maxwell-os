@@ -9,6 +9,40 @@
 
 ---
 
+## 2026-09-22 — D-332 (community-benchmark-first rule + mlx-dspark M1 net-loss + on-device sweep) — RESOLVED
+
+| ID | State | Decision |
+|---|---|---|
+| D-332 | RESOLVED | **STANDING RULE — community benchmarks outrank vendor claims.** Weight community results on *matching hardware* above vendor numbers measured on newer chips (use both). Evidence: `ARahim3/mlx-dspark#38` on the exact M1 Max 64 GB shows speculative decode is a **NET LOSS** (0.55–0.91×; round cost ~2.4× a decode step, verify compute-bound on the old GPU). mlx-dspark *runs* on M1 but does not help. **Consequence: D-293 (oMLX MTP) re-scoped to measure-before-adopt**; D-294 (oQ4e/oQe quant) + D-292 (cache fix) outrank it (M1 Max is bandwidth-bound). On-device sweep (topics `on-device-ai`/`on-device-llm`): TinyChatEngine REFERENCE (AWQ+Metal, M1), LiteRT-LM WATCH (mobile-first), needle/cactus WATCH (121M tool-call/extraction head), BigMoeOnEdge/PrismML-Bonsai WATCH/REJECT. **No engine out-serves oMLX on M1 Max.** Artifacts: `governance/MARKET_RESEARCH_20260922_M1.md`, `feed.opml` (+2 topics, +6 evaluated engines). |
+
+## 2026-09-22 — D-333 (MTP A/B instrument + knowledge-pipeline & skill-orchestration sweep) — RESOLVED
+
+| ID | State | Decision |
+|---|---|---|
+| D-333 | RESOLVED | **(1) D-293 re-scope instrument** — `scripts/mtp_ab.py` drafted + compiles: toggles `mtp_enabled` in `~/.omlx/model_settings.json` (crash-safe + .bak, C6/C13) → `omlx_reload`, measures decode tok/s on a frozen batch (stream=True ttft split, non-stream fallback), appends labelled JSONL, `--compare A B` prints WIN/LOSS/NEUTRAL (adopt MTP only if WIN on this M1 Max, D-332). temp=0.0 (R7), model/URL from config (C12). **(2) Knowledge pipeline & skill orchestration sweep** (`governance/MARKET_RESEARCH_20260922_PIPELINE.md`): MUST-REFERENCE nano-graphrag (local GraphRAG) + GraphRAG/HippoRAG/RAPTOR papers + MCP patterns (github-mcp-server, context7); SHOULD-REFERENCE fastembed-rs local reranker (rerank after bge-m3); ADAPT LightRAG + skill.md schema; WATCH Graphify/sibila/n8n; REFERENCE-only microsoft/graphrag, instructor/outlines, LangGraph/CrewAI (no new deps, C2/C5). No tool displaces S0–S6 + goose-recipe design. |
+
+## 2026-09-22 — D-293 RESOLVED (MTP A/B executed on M1 Max)
+
+| ID | State | Decision |
+|---|---|---|
+| D-293 | RESOLVED | **Lightning MTP measured on THIS M1 Max — NEUTRAL, not adopted.** `scripts/mtp_ab.py` A/B (frozen 8-prompt S2 batch, stream=True ttft split, temp=0.0): **MTP OFF 7.93 tok/s vs MTP ON 7.74 tok/s = 0.98×** (median 7.94 vs 7.80, n=8 each). Slightly negative, within noise. Confirms community evidence (mlx-dspark#38): speculative decode is a net loss on M1 Max (D-332). Vendor +34-58% targets LONG decode; S2 emits short JSON (31–50 tok) where verify overhead can't amortize. `mtp_enabled` restored to `false` (production state). Instrument fixed to send API-key auth (oMLX has 401 auth enabled). Remaining M1 Max levers: D-294 (oQ4e/oQe quant A/B) + D-292 (cache fix). |
+
+## 2026-09-22 — D-334 (Metal cap) + M1 Max "best config" applied
+
+| ID | State | Decision |
+|---|---|---|
+| D-334 | ACTIVE | **Metal wired-memory cap below oMLX ceiling.** `omlx.process_memory_enforcer` logs Metal cap 48–51.8 GB < oMLX 56 GB ceiling (`iogpu.wired_limit_mb` unset). Raise with `sudo sysctl iogpu.wired_limit_mb=57344` to wire more of 64 GB for weights/KV. Surfaced only (sudo). |
+
+**M1 Max "community best config" (oMLX 0.7 profile/template system):** wrote `config/omlx_m1_best_config.yaml` (per-model intent spec) + `scripts/omlx_apply_best_m1_config.py` (apply/measure/system classes). Dry-run confirms all `apply` settings are **already at target** — the live config is already M1-appropriate (mtp/dflash/ANE-prefill/SSD-offload all off; guided_grammar on for extraction/classifier; thinking off). Measurement-gated levers (D-294): `turboquant_kv_enabled` (KV-cache quant → decode bandwidth) and `specprefill_enabled` on Qwen3-Coder; `turboquant_kv` on gpt-oss. Quant *variant* A/B (oQ4e/oQe/Q4) needs a download (only single variants present locally). `scripts/omlx_lever_ab.py` = generic per-model flag A/B harness (compiles).
+
+## 2026-09-22 — D-294 lever A/B: turboquant_kv = LOSS on S2 (keep false)
+
+| ID | State | Decision |
+|---|---|---|
+| D-294 | ACTIVE (partial) | **turboquant_kv_enabled A/B on Qwen3-Coder S2 — 0.65x LOSS (median 0.81x), NOT adopted.** `scripts/omlx_lever_ab.py` (6-prompt frozen batch, stream ttft split, temp=0.0): kv_off mean 161 tok/s vs kv_on 105 tok/s (median 122.7 vs 99.4). Restored to `false`. Caveat: high variance (outputs 45–2161 tok; different length distributions per arm) — median is the robust signal. Expected result: KV-cache quant only helps LONG context; S2 emits short JSON so quant overhead > bandwidth saving. Remaining D-294 levers: specprefill (Qwen3-Coder), turboquant_kv on gpt-oss (LONG-context S4 = the meaningful KV-quant test), quant-variant A/B (needs download). |
+
+---
+
 ## 🔴 OPEN / PENDING — highest priority first
 
 ### New from cross-model adjudication (2026-09-03)
@@ -341,3 +375,4 @@ fail-closed (C16); the artifact is regenerated and now cites the hash it actuall
 | D-328 | RESOLVED | Abstention ENABLED at p25 (owner ruling): config/verify_abstention.yaml enabled: true, t_low_percentile 25 (error 0.391 vs 0.4741), triage owner OWNER-WEEKLY-TRIAGE. The queue stays a declared VIEW over stage-5 output (label + margin persisted, BUG-327) - no empty queue file is created (D-323). |
 | D-329 | RESOLVED | F-11 FIRST MEASUREMENT - the ruler human label set is an OUTLIER against two independent model coders. Same 79 rows: human~claude k=0.47/0.40/0.37, human~kimi k=0.55/0.35/0.33, claude~kimi k=0.80/0.71/0.62 (CT/DISC/FORM). Two different families agree with each other ~2x more than either agrees with the single human. (a) tier stays llm-attested/advisory, F-11 OPEN; (b) NO eval floor may be certified from this reference sheet; (c) D-327s RELATIVE verdict (baseline vs treatment) stands, but its ABSOLUTE error rate 0.80 is NOT a classifier property - it is bounded below by the reference's own reproducibility; (d) both model coders emitted 0 out-of-menu labels, so the closed menu IS usable text-only and the S4 OOV emission (13-18/60) is a classifier/prompt defect, not a menu defect; (e) next = 3-way disagreement arbitration on the disagreed rows to locate the granularity, feeding config/boundary_discriminators.yaml. |
 | D-330 | RESOLVED | S5 checkpoint identity is bound to what S5 actually depends on, and one writer at a time (BUG-361/BUG-362). The input fingerprint no longer includes global HEAD (pipeline_commit) or the whole-config manifest_hash - both move on governance-only commits and hard-discarded a live 1,250-row checkpoint. It now binds: S4 checkpoint content, schema/taxonomy versions, the model lineup, the S5-relevant sources (C12 list stage5.fingerprint_files) and the stage5 config slice; commit+manifest_hash are recorded as `informational` only. Migration is a declared act: --adopt-fingerprint re-stamps ONLY when all 7 substantive inputs are byte-identical (it refuses otherwise) - id 63f823bd -> c2754fc6 with exactly the informational/scheme keys changed; the 1,250 verified records survived. A single-writer lock (<checkpoint>.lock, pid + atexit release, live-holder refuse, dead-pid reclaim) now makes interleaved writers impossible; proven live by a refused second run. |
+| D-331 | VERIFICATION | RESOLVED | 2026-09-22 | F-11 round 2 (all-150 export) confirms D-329: two independent model families agree with each other 1.6-2.4x more than with the human on every axis (coder-vs-coder k: CT 0.758, DISC 0.682, FORM 0.638; human-vs-coder k: CT 0.487/0.554, DISC 0.445/0.403, FORM 0.305/0.266). No eval floor certifiable; F-11 stays open. The 5 blank FORM rows are uncontested (k=1.0) but the 28 blank DISC rows are genuinely contested (64%) and stay declared-missing. Fixed BUG-369 en route. Artifacts: governance/F11_R2_MEASUREMENT_20260923.md + the two r2 coder artifacts. |

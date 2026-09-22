@@ -1,0 +1,74 @@
+# F-11 SECOND-CODER PACKAGE (LLM-as-second-coder) — D-317 / D-319.
+#
+# WHAT THIS IS: the user has no second HUMAN coder, so the single-coder ruler
+# sheet (governance/RULER_BLIND_SHEET_20260917.csv, reviewer=human, 150 rows)
+# cannot yield inter-coder agreement on its own. This config parameterises a
+# BLIND export of the same 150 rows plus an agreement scorer, so a different
+# model family can produce a SECOND, independent-in-tooling label set.
+#
+# WHAT IT IS NOT: the second coder is not human and not independent of us in
+# the strict sense. Its output tier is `llm-attested` and it CANNOT unfreeze
+# the adoption bar (D-300) or the eval floors (D-317 / F-11). It measures
+# RULER RELIABILITY (human <-> LLM agreement), not human truth.
+#
+# C22 HYBRID SOVEREIGNTY: the rows are book-derived text. Sending them to an
+# API model leaves the machine — that is an EXPLICIT, recorded opt-in (see
+# README.md step 0). A purely local fallback is listed in README.md.
+version: '1'
+enabled: true
+decision: D-317
+role: second coder (attested, LLM)
+provenance_tier: llm-attested
+cannot_unfreeze: [F-11, D-300 adoption bar, config/eval_integrity.yaml floors]
+
+# ── paths (repo-relative; read via pipeline.pipeline_paths PROJECT_ROOT) ──
+sheet: governance/RULER_BLIND_SHEET_20260917.csv      # the FILLED single-coder sheet (human answers)
+menus: governance/RULER_MENUS_20260917.md             # attach verbatim to the coder prompt
+package_dir: governance/F11_LLM_CODER_20260921
+blind_rows: governance/F11_LLM_CODER_20260921/ROWS_BLIND.csv   # count-neutral name: the row count is in MANIFEST.json
+manifest: governance/F11_LLM_CODER_20260921/MANIFEST.json
+out_json: governance/f11_llm_coder_20260921.json
+out_md: governance/f11_llm_coder_20260921.md
+
+# ── what leaves the machine / what the scorer compares ──
+identity_columns: ['#', 'item_id', 'name', 'DEFINITION', 'APPLICATION', 'MECHANISM', 'BOUNDARY', 'SOURCE EXCERPT', 'len']
+answer_columns: ['CT (1-7)', 'DISC (1-62)', 'FORM (1-4)', 'conf_ct', 'conf_disc', 'conf_form', 'note_codes', 'reviewer', 'date']
+axes:
+  content_type: "CT (1-7)"
+  discipline: "DISC (1-62)"
+  extraction_type: "FORM (1-4)"
+conf_columns:                          # the JSON keys the coder returns per axis (PROMPT.md schema)
+  content_type: conf_ct
+  discipline: conf_disc
+  extraction_type: conf_form
+
+# DECLARED normalisation of the single coder's own spelling variants. These are
+# counted and REPORTED (C12d), never merged silently: the human sheet writes
+# `casual mechanism` where the menu says `causal_mechanism`, and
+# `normativ heuristic` where the menu says `normative_heuristic`.
+# The single-coder sheet is NOT complete: 28 of 150 rows are missing at least one
+# axis answer (measured 2026-09-21). Strict default = refuse (an incomplete
+# reference cannot measure reliability). With allow_partial: true the export
+# keeps only the fully-answered rows and RECORDS n_rows + the excluded item_ids
+# in MANIFEST.json, so the reduced measurement is declared, never silent (C12d).
+allow_partial: true
+partial_policy: 'export the fully-answered rows only; record excluded item_ids in the manifest'
+
+declared_aliases:
+  - axis: extraction_type
+    as_written: casual mechanism
+    canonical: causal_mechanism
+    reason: typo in the single-coder sheet (R-rows), reported separately
+  - axis: extraction_type
+    as_written: normativ heuristic
+    canonical: normative_heuristic
+    reason: typo in the single-coder sheet (R-rows), reported separately
+
+# ── coder identity (R14: fill BEFORE sending; never after) ──
+coder:
+  model: TO-BE-FILLED-AT-RUN          # e.g. claude-opus-4.5 | deepseek-v3.2 | local:<model>
+  family: TO-BE-FILLED-AT-RUN         # must differ from generator (Qwen) + classifier (gpt-oss)
+  temperature: 0.0                    # R7
+  one_shot: true                      # one prompt version, one model version, no retries
+  prompt_sha256: TO-BE-FILLED-AT-RUN  # sha256 of PROMPT.md as actually sent
+  sovereign_opt_in: false             # set true ONLY on the owner's explicit go (C22)

@@ -620,3 +620,35 @@ OWNER GATES REMAINING (nothing here blocks the measurement): decisions.yaml regi
 3. decisions.yaml registry SYNCHRONISED: D-319..D-328 added; `--check` in sync (693 -> recomputed).
 4. stage-5 re-verification LAUNCHED (background): "550 FBs already verified -> 7445 remaining" (BUG-341 was stale).
 5. laya-mlx weights FETCHED into .venv_laya (advisory arm) - Phase B remains held on F-11.
+
+## Session 16 (2026-09-22, morning) - F-11 first measurement (D-329)
+- Built and ran the F-11 second-coder package (config/f11_llm_coder.yaml, scripts/f11_llm_coder.py,
+  governance/F11_LLM_CODER_20260921/): blind export of 122 fully-answered rows + declared-partial handling,
+  menus file included, count-neutral prompt. Two LLM coders returned labels (claude-sonnet 122/122, kimi-k3 79/122).
+- RESULT (same 79 rows): human~claude k = 0.47/0.40/0.37, human~kimi k = 0.55/0.35/0.33,
+  claude~kimi k = 0.80/0.71/0.62 (CT/DISC/FORM). The rubric is measured, not asserted: two independent
+  families agree with each other ~2x more than either agrees with the single human coder.
+- CONSEQUENCES: no eval floor certifiable from this sheet; D-327's relative verdict stands but its absolute
+  error rate (0.8000) is not a classifier property; both LLM coders emitted 0 out-of-menu labels, so the
+  closed menu IS usable from text and the S4 OOV emission is a classifier/prompt defect (supports the
+  menu-compliance intervention); F-11 stays OPEN (llm-attested cannot unfreeze floors).
+- New bugs: BUG-365 (harness crashed on a relative coder path - FIXED), BUG-366 (kimi under-delivered 43 rows).
+- STILL OPEN from session 15: BUG-361 (no S5 single-writer lock), BUG-362 (any commit discards a live S5
+  checkpoint - nothing committed since 249c9d1 for this reason), BUG-363 (28 ruler rows unanswered), BUG-364
+  (laya R14 pins unfilled).
+
+### Session 16 addendum - the 3-way worksheet (D-329 evidence, governance/f11_disagreement_3way_20260922.md)
+Kimi's full 122 rows landed; human~kimi k = 0.51 (CT) / 0.40 (DISC) / 0.30 (FORM) - converging with Claude's, so the
+effect is stable, not sampling noise. Worksheet over all 122 rows:
+  CT    94/122 unanimous | 18 consensus divergence (15%) |  6 model split |  4 three-way
+  DISC  43/122 unanimous | 43 consensus divergence (35%) | 21 model split | 15 three-way
+  FORM  51/122 unanimous | 41 consensus divergence (34%) | 20 model split | 10 three-way
+("consensus divergence" = BOTH independent coders agree with each other and the human is the odd one out.)
+Named patterns: DISC - human 'design psychology'/'psychology'/'organizational theory' vs BOTH coders 'behavioral
+economics' (7 rows), human 'research methodology' vs 'cognitive science' - the human reads the INSTITUTIONAL field,
+both models read the SUBJECT MATTER (exactly the D-325 default_home discriminator, applied in the opposite direction).
+FORM - human 'causal mechanism'/'descriptive model' vs BOTH coders 'normative heuristic' (16 rows) plus 10 mutual
+swaps among causal/descriptive/normative: the FORM axis is the weakest AND the most contested.
+CT - the 18 human 'quarantine' rows (a legal DISPOSITION, menu item 7) are the human refusing a role where both models
+assign one: a threshold-of-clean-role policy difference, not a labelling error.
+New bug BUG-367 (FORM column is 38% non-canonical spellings - corroborates F-14).

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**67 open** / 38 closed of 105 ids.
+**74 open** / 39 closed of 113 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -74,3 +74,10 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-355 | (MED — OPEN): one surface string, two canonicals — and a dead entry in the domain block of normalization_map | 2 |
 | BUG-356 | (LOW — OPEN): the repair queue's own "Next:" line is stale and hides the real next action | 1 |
 | BUG-359 | (LOW — process, LOGGED 2026-09-21): a carried "pending fix" note that was never re-verified | 1 |
+| BUG-360 | (LOW — process, LOGGED 2026-09-21): a second stale carried claim in one session | 1 |
+| BUG-361 | (HIGH - resilience/concurrency, OPEN): two S5 writers on one checkpoint; S5 has no single-writer lock | 1 |
+| BUG-362 | (HIGH - future tax, OPEN): an S5 checkpoint is discarded by ANY commit, including governance-only ones | 1 |
+| BUG-363 | (MED - measurement integrity, OPEN): the ruler sheet is FILLED and 28/150 rows are INCOMPLETE; G4 still describes it as blank | 1 |
+| BUG-364 | (MED - R14 provenance, OPEN): laya weights are on disk while bakeoff_laya.yaml still says PIN-AT-INSTALL / licence UNVERIFIED | 1 |
+| BUG-366 | (LOW - process, OPEN): an LLM coder silently under-delivered (79 of 122 rows) | 1 |
+| BUG-367 | (MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings | 1 |

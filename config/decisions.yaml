@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-21 12:10:00'
-total_decisions: 695
+total_decisions: 696
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7428,8 +7428,27 @@ decisions:
     queue remains a VIEW over stage-5 output, where the label and the margin ARE persisted (BUG-327), so no 
     abstained row can be lost.
 
+- id: D-329
+  category: EVALS
+  state: RESOLVED
+  date: 2026-09-22
+  title: 'F-11 first measurement: the ruler human labels are an outlier against two independent model coders; no floor certifiable from this sheet'
+  decision: >-
+    Two LLM coders from different families (claude-sonnet, kimi-k3), each blind to the human and to each other,
+    labelled the exported 122-row ruler. On the common 79 rows: human~claude k = 0.47 (CT) / 0.40 (DISC) / 0.37
+    (FORM); human~kimi k = 0.55 / 0.35 / 0.33; claude~kimi k = 0.80 / 0.71 / 0.62. Both models agree with each
+    other roughly twice as much as either agrees with the single human coder, on all three axes. Consequences:
+    (a) the provenance tier stays llm-attested/advisory and F-11 stays OPEN - a third attested set is not
+    independent human truth; (b) NO eval floor in config/eval_integrity.yaml may be certified from this
+    reference sheet - it is not reproducible enough; (c) D-327's relative verdict stands (baseline vs treatment
+    compared on one reference), but its ABSOLUTE error rate (0.8000) is not a classifier property: it is bounded
+    below by the reference's own reproducibility; (d) both model coders stayed INSIDE the closed menu (0
+    out-of-vocabulary labels), which shows the menu is usable from text alone and therefore the S4 classifier's
+    out-of-menu emission (13-18 of 60 rows, D-327) is a classifier/prompt defect, NOT a menu defect; (e) next
+    step is 3-way arbitration on the disagreed rows to locate granularity, feeding
+    config/boundary_discriminators.yaml. Artifacts: governance/f11_llm_coder_{claude-sonnet,kimi3}_20260922.*
 summary:
-  total: 695
+  total: 696
   proposed: 6
   draft: 1
   active: 483
@@ -7438,7 +7457,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 128
+  resolved: 129
   planned: 8
   ratified: 5
   open: 17
@@ -7482,7 +7501,7 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 8
+    EVALS: 9
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21

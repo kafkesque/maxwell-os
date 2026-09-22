@@ -1,0 +1,507 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-329",
+  "date": "2026-09-22",
+  "tier": "llm-attested (advisory \u2014 cannot unfreeze eval floors, F-11)",
+  "n_rows": 122,
+  "coder_a": {
+    "file": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/temp/claude sonnet labels.jsonl",
+    "rows": 122
+  },
+  "coder_b": {
+    "file": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/temp/kimi3 labels.md",
+    "rows": 122
+  },
+  "axes": {
+    "content_type": {
+      "column": "CT (1-7)",
+      "classes": {
+        "unanimous": 94,
+        "consensus divergence": 18,
+        "model split": 6,
+        "three-way": 4
+      },
+      "n_divergent": 122,
+      "top_pairs": [
+        [
+          [
+            "quarantine",
+            "principle"
+          ],
+          8
+        ],
+        [
+          [
+            "principle",
+            "processtemplate | principle"
+          ],
+          2
+        ],
+        [
+          [
+            "principle",
+            "processinstance"
+          ],
+          2
+        ],
+        [
+          [
+            "processtemplate",
+            "principle"
+          ],
+          2
+        ],
+        [
+          [
+            "principle",
+            "toolinstruction"
+          ],
+          2
+        ],
+        [
+          [
+            "toolinstruction",
+            "principle | toolinstruction"
+          ],
+          1
+        ],
+        [
+          [
+            "quarantine",
+            "processtemplate | toolinstruction"
+          ],
+          1
+        ],
+        [
+          [
+            "quarantine",
+            "toolinstruction"
+          ],
+          1
+        ],
+        [
+          [
+            "principle",
+            "processtemplate"
+          ],
+          1
+        ],
+        [
+          [
+            "noisedrop",
+            "principle"
+          ],
+          1
+        ],
+        [
+          [
+            "growthedge",
+            "quarantine | principle"
+          ],
+          1
+        ],
+        [
+          [
+            "processtemplate",
+            "processtemplate | principle"
+          ],
+          1
+        ]
+      ],
+      "ids": {
+        "consensus divergence": [
+          "R002",
+          "R004",
+          "R013",
+          "R025",
+          "R030",
+          "R032",
+          "R057",
+          "R067",
+          "R089",
+          "R090",
+          "R097",
+          "R108",
+          "R115",
+          "R120",
+          "R123",
+          "R125",
+          "R127",
+          "R149"
+        ],
+        "model split": [
+          "R005",
+          "R009",
+          "R045",
+          "R103",
+          "R112",
+          "R136"
+        ],
+        "three-way": [
+          "R017",
+          "R093",
+          "R118",
+          "R124"
+        ]
+      }
+    },
+    "discipline": {
+      "column": "DISC (1-62)",
+      "classes": {
+        "unanimous": 43,
+        "consensus divergence": 43,
+        "model split": 21,
+        "three-way": 15
+      },
+      "n_divergent": 122,
+      "top_pairs": [
+        [
+          [
+            "designpsychology",
+            "behavioraleconomics"
+          ],
+          3
+        ],
+        [
+          [
+            "organizationaltheory",
+            "strategicthinking"
+          ],
+          2
+        ],
+        [
+          [
+            "psychology",
+            "behavioraleconomics"
+          ],
+          2
+        ],
+        [
+          [
+            "researchmethodology",
+            "cognitivescience"
+          ],
+          1
+        ],
+        [
+          [
+            "politicaleconomy",
+            "politicaleconomy | healthmedicine"
+          ],
+          1
+        ],
+        [
+          [
+            "computergraphics",
+            "computergraphics | informationscience"
+          ],
+          1
+        ],
+        [
+          [
+            "psychology",
+            "psychology | neuroscience"
+          ],
+          1
+        ],
+        [
+          [
+            "riskmanagement",
+            "decisionmaking"
+          ],
+          1
+        ],
+        [
+          [
+            "designthinking",
+            "designthinking | strategicthinking"
+          ],
+          1
+        ],
+        [
+          [
+            "informationretrieval",
+            "artificialintelligence"
+          ],
+          1
+        ],
+        [
+          [
+            "riskmanagement",
+            "riskmanagement | organizationaltheory"
+          ],
+          1
+        ],
+        [
+          [
+            "semiotics",
+            "anthropology | semiotics"
+          ],
+          1
+        ]
+      ],
+      "ids": {
+        "consensus divergence": [
+          "R003",
+          "R009",
+          "R011",
+          "R015",
+          "R017",
+          "R020",
+          "R024",
+          "R025",
+          "R027",
+          "R031",
+          "R035",
+          "R036",
+          "R041",
+          "R043",
+          "R047",
+          "R049",
+          "R053",
+          "R054",
+          "R055",
+          "R058",
+          "R061",
+          "R066",
+          "R071",
+          "R073",
+          "R074",
+          "R075",
+          "R076",
+          "R077",
+          "R086",
+          "R095",
+          "R097",
+          "R098",
+          "R099",
+          "R103",
+          "R113",
+          "R117",
+          "R121",
+          "R127",
+          "R131",
+          "R136",
+          "R138",
+          "R149",
+          "R150"
+        ],
+        "model split": [
+          "R004",
+          "R005",
+          "R008",
+          "R010",
+          "R013",
+          "R014",
+          "R023",
+          "R029",
+          "R037",
+          "R044",
+          "R057",
+          "R085",
+          "R093",
+          "R096",
+          "R109",
+          "R115",
+          "R116",
+          "R120",
+          "R124",
+          "R126",
+          "R139"
+        ],
+        "three-way": [
+          "R018",
+          "R045",
+          "R051",
+          "R062",
+          "R067",
+          "R090",
+          "R092",
+          "R100",
+          "R104",
+          "R122",
+          "R123",
+          "R128",
+          "R129",
+          "R137",
+          "R141"
+        ]
+      }
+    },
+    "extraction_type": {
+      "column": "FORM (1-4)",
+      "classes": {
+        "consensus divergence": 41,
+        "unanimous": 51,
+        "three-way": 10,
+        "model split": 20
+      },
+      "n_divergent": 122,
+      "top_pairs": [
+        [
+          [
+            "causalmechanism",
+            "normativeheuristic"
+          ],
+          10
+        ],
+        [
+          [
+            "descriptivemodel",
+            "normativeheuristic"
+          ],
+          6
+        ],
+        [
+          [
+            "causalmechanism",
+            "descriptivemodel"
+          ],
+          5
+        ],
+        [
+          [
+            "normativeheuristic",
+            "descriptivemodel"
+          ],
+          5
+        ],
+        [
+          [
+            "causalmechanism",
+            "empiricalpattern"
+          ],
+          4
+        ],
+        [
+          [
+            "normativeheuristic",
+            "empiricalpattern"
+          ],
+          4
+        ],
+        [
+          [
+            "causalmechanism",
+            "causalmechanism | descriptivemodel"
+          ],
+          4
+        ],
+        [
+          [
+            "normativeheuristic",
+            "normativeheuristic | descriptivemodel"
+          ],
+          3
+        ],
+        [
+          [
+            "normativeheuristic",
+            "causalmechanism"
+          ],
+          3
+        ],
+        [
+          [
+            "descriptivemodel",
+            "empiricalpattern | descriptivemodel"
+          ],
+          3
+        ],
+        [
+          [
+            "normativeheuristic",
+            "empiricalpattern | causalmechanism"
+          ],
+          2
+        ],
+        [
+          [
+            "descriptivemodel",
+            "causalmechanism"
+          ],
+          2
+        ]
+      ],
+      "ids": {
+        "consensus divergence": [
+          "R001",
+          "R006",
+          "R008",
+          "R015",
+          "R018",
+          "R020",
+          "R022",
+          "R024",
+          "R035",
+          "R038",
+          "R043",
+          "R062",
+          "R064",
+          "R067",
+          "R073",
+          "R075",
+          "R085",
+          "R086",
+          "R089",
+          "R090",
+          "R092",
+          "R094",
+          "R097",
+          "R103",
+          "R111",
+          "R116",
+          "R118",
+          "R119",
+          "R121",
+          "R125",
+          "R127",
+          "R129",
+          "R130",
+          "R134",
+          "R135",
+          "R136",
+          "R138",
+          "R139",
+          "R141",
+          "R145",
+          "R146"
+        ],
+        "three-way": [
+          "R003",
+          "R032",
+          "R047",
+          "R065",
+          "R066",
+          "R076",
+          "R087",
+          "R096",
+          "R113",
+          "R132"
+        ],
+        "model split": [
+          "R005",
+          "R011",
+          "R013",
+          "R030",
+          "R037",
+          "R044",
+          "R048",
+          "R051",
+          "R054",
+          "R057",
+          "R058",
+          "R069",
+          "R078",
+          "R079",
+          "R120",
+          "R123",
+          "R131",
+          "R137",
+          "R142",
+          "R149"
+        ]
+      }
+    }
+  }
+}

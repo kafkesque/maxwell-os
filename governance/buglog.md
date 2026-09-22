@@ -2408,3 +2408,70 @@ ontology fix stays (it is correct at the definition level and BUG-357 was a real
 prompt-level boundary rules are REJECTED as an intervention on this instrument. The dominant defect is now
 measurable and different: 13-18 of 60 rows emit a label OUTSIDE the closed menu (out-of-vocab), and only ~20%
 of rows agree with the human slot. That is a MENU-COMPLIANCE (emission) problem, not a boundary problem.
+
+## BUG-361 (HIGH - resilience/concurrency, OPEN): two S5 writers on one checkpoint; S5 has no single-writer lock
+Evidence (exact byte arithmetic, 2026-09-21 23:01). Run A (pid 30050, started 23:00:40) resumed at 550 records
+and died at its first incremental write (i=50) with `SHRINK GUARD: checkpoint.jsonl would shrink 12305321 ->
+10632913 bytes (13.6%)`. Cumulative line sums of the current t11/checkpoint.jsonl settle the attribution:
+line 601 = 10,632,913 bytes (run A = 550 resumed + 50 new = 600 records) and line 651 = 12,304,671 ~= the
+12,305,321 bytes on disk (the other writer's 650 = 550 + 100). Run B - the owner's foreground run - kept
+writing to 1,250 records (550 + 700) at 23:04:45 and then stopped. Two processes wrote one checkpoint; the
+guard prevented a REAL 50-row rollback and killed run A (correct fail-closed behaviour, wrong root cause).
+IMPACT: wasted GPU work, a run that looked "frozen", an aborted stage, and a checkpoint whose provenance
+mixes two processes. FIX (proposed, NOT applied): an O_EXCL pidfile lock taken in run_stage5 BEFORE the resume
+read; a live pid => refuse to start (C16 fail-closed); release on exit including SIGINT.
+
+## BUG-362 (HIGH - future tax, OPEN): an S5 checkpoint is discarded by ANY commit, including governance-only ones
+D2485 fingerprints the S5 input with pipeline_commit=get_pipeline_commit() (which returns HEAD) and
+manifest_hash. Observed 2026-09-21: HEAD moved 8de5d36 -> 249c9d1 at 23:01:28 (a governance/config commit) and
+the D-327 config flip changed manifest_hash 0a974d60 -> bc567ad8, while s4_checkpoint_sha256 (2f8b34fb...),
+taxonomy v5.6, nli_model and schema_version were ALL unchanged. Current fp id 9eb47b31... != stored 63f823bd...
+=> the next `python3 pipeline/stage5_verify.py` prints "fingerprint MISMATCH", archives the 1,250-record
+checkpoint and re-verifies all 7,995 FBs (~1.3 h of DeBERTa). Standing consequence: while a long stage is in
+flight, no commit of any kind can be made without throwing that stage's progress away. FIX (proposed, NOT
+applied): fingerprint the S5-relevant code only (last commit touching pipeline/stage5_verify.py + its imports)
+rather than a global HEAD, and scope manifest_hash to the S4 keys S5 actually consumes. Owner decision needed
+first (see the session handover: re-stamp with a declared note vs accept the re-verify).
+
+## BUG-363 (MED - measurement integrity, OPEN): the ruler sheet is FILLED and 28/150 rows are INCOMPLETE; G4 still describes it as blank
+G4_RULER_INSTRUCTIONS.md section 3 claims the sheet carries "zero stored-label columns" and that one human pass
+turns the 150 rows into the first `human-blind` tier. Re-read against the bytes today: all 150 rows carry
+reviewer='human' + a date + CT/DISC/FORM answers - so the single-coder pass HAPPENED, and that is the attested
+set F-11 refers to (not evidence of independent human truth). (a) 28 of 150 rows are missing at least one axis
+(measured by scripts/f11_llm_coder.py --export; the item_ids are recorded in MANIFEST.json) so
+score_ruler_labels.py refuses the entire sheet and the ruler cannot be scored at all until those rows are
+answered or deleted. (b) the coder's FORM answers include non-menu spellings: 'casual mechanism' (30 rows) and
+'normativ heuristic' - out-of-vocabulary AS WRITTEN; they are declared as aliases in config/f11_llm_coder.yaml
+and reported, never merged silently (C12d). (c) note_codes holds free text, not the 0-2 numbered codes the
+rubric requires. PROCESS: a "blind/blank sheet" claim is verified against the file bytes before it is
+re-reported (the BUG-359/BUG-360 standing rule). G4 section 3 needs a one-line correction.
+
+## BUG-364 (MED - R14 provenance, OPEN): laya weights are on disk while bakeoff_laya.yaml still says PIN-AT-INSTALL / licence UNVERIFIED
+temp/laya_download.log: "Fetching 5 files: 100% ... loaded in 87.5 s" (2026-09-21 23:02) - the sandbox weights
+are local now. config/bakeoff_laya.yaml still carries revision: PIN-AT-INSTALL, sha256: PIN-AT-INSTALL and
+licence.checkpoint: UNVERIFIED. R14 forbids a measured use before revision + sha256 + checkpoint licence are
+recorded, and the menu_hash must be recorded per run. FIX: pin revision and sha256 of the fetched files and
+record the checkpoint licence before ANY laya advisory run.
+
+## BUG-365 (LOW - harness defect in this session's new code, FIXED 2026-09-22): f11_llm_coder.py crashed on a relative coder path
+`--score "temp/claude sonnet labels.jsonl"` raised ValueError: '...' is not in the subpath of '<repo>' from
+`llm_path.relative_to(PROJECT_ROOT)` because the CLI path was never resolved. FIXED in-session: cmd_score now
+resolves the path and falls back to recording it ABSOLUTELY when the coder file lives outside the repo.
+Third defect found in the F-11 harness's first hour (after the conf_ct/conf_extr key mismatch and the stale
+150-row prompt text) - all three found by USING it, none by reading it. Standing note: a new harness is
+exercised with a real input before its output is believed.
+
+## BUG-366 (LOW - process, OPEN): an LLM coder silently under-delivered (79 of 122 rows)
+temp/kimi3 labels.md contains 79 valid JSONL rows; 43 rows (R101, R103-R110, ...) were never answered, and the
+file is named .md although it is JSONL. The harness refuses a partial coder by default, so nothing was scored
+on a wrong denominator (the --partial run DECLARED n=79 and recorded the missing ids in the artifact). Ask the
+coder for the remaining 43 rows, or record the shortfall permanently.
+
+## BUG-367 (MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings
+RULER_BLIND_SHEET_20260917.csv FORM (1-4) tally: 'descriptive model' 38, 'casual mechanism' 30, 'normative heuristic' 27,
+'normativ heuristic' 22, 'empirical pattern' 13, 'causal mechanism' 10, 'escriptive model' 2, 'normative_heuristic' 1,
+'empirical_pattern' 1, 'descriptive_model' 1. The MISSPELLED variants dominate the canonical ones (57 of 150 cells = 38%
+are not the canonical menu string; the canonical 'causal mechanism' appears only 10 times against 30 'casual mechanism').
+config/f11_llm_coder.yaml declares the aliases, so SCORING is unaffected - but any consumer that reads the raw column
+(filters, GROUP BY, the F-14 4054 pre-repair FORM rows) sees out-of-vocabulary values. This is direct corroboration of
+the F-14 concern and a repair target: canonicalise the sheet in place (append a repaired column, R-D410) or repair at read.

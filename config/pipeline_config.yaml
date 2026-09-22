@@ -480,6 +480,14 @@ stage5:
     quarantine_cap: 0.25
     human_review_isor_rating: strong
   checkpoint_interval: 50
+  # D-330 (BUG-362): the S5 input fingerprint binds ONLY these files + the stage5 config
+  # slice + the S4 checkpoint content + the model lineup — never global HEAD, which moved on
+  # governance-only commits and hard-discarded a live 1,250-row checkpoint.
+  fingerprint_files:
+    - pipeline/stage5_verify.py
+    - pipeline/serving_gate.py
+    - pipeline/io_guard.py
+  single_writer_lock: true  # BUG-361: refuse a second S5 writer on one checkpoint
 stage6:
   commit_non_fb_types: true
   okf_export_enabled: true

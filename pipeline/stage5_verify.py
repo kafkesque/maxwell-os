@@ -70,6 +70,7 @@ from pipeline.pipeline_paths import (
     VERIFY_MODEL,  # D2485: S5 input fingerprint (classifier identity)
 )
 from pipeline.pipeline_paths import _CFG  # D2405: C12 config-first threshold source
+from pipeline.pipeline_paths import PROJECT_ROOT  # D-330: repo root for the path-scoped S5 fingerprint
 
 # fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
 # deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
@@ -556,6 +557,7 @@ def check_mechanism_quality(fb: dict) -> tuple[bool, float, str]:
 # ── D2485 (P0): S5 input fingerprint — bind checkpoint to the S4 input it verified ──
 
 S5_INPUT_FINGERPRINT_PATH = Path(str(STAGE5_CHECKPOINT) + ".input_fingerprint.json")
+S5_LOCK_PATH = Path(str(STAGE5_CHECKPOINT) + ".lock")  # BUG-361 single-writer
 
 
 def _sha256_file(path: Path) -> str:
@@ -567,6 +569,113 @@ def _sha256_file(path: Path) -> str:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def _s5_code_fingerprint() -> str:
+    """D-330 (BUG-362): sha256 over ONLY the S5-relevant source files.
+
+    The file list is config-owned (C12: stage5.fingerprint_files). An empty list is
+    refused (C16, fail-closed): fingerprinting nothing would silently accept ANY code.
+    """
+    files = list(_CFG.get("stage5", {}).get("fingerprint_files") or [])
+    if not files:
+        raise RuntimeError("stage5.fingerprint_files is empty — refusing to fingerprint nothing (C16)")
+    h = hashlib.sha256()
+    for rel in sorted(files):
+        f = PROJECT_ROOT / rel
+        if not f.exists():
+            raise RuntimeError(f"D-330: stage5.fingerprint_files entry missing: {rel} (C16)")
+        h.update(rel.encode())
+        h.update(b"\0")
+        h.update(f.read_bytes())
+        h.update(b"\0")
+    return h.hexdigest()[:16]
+
+
+def _s5_config_fingerprint() -> str:
+    """D-330: sha256 of the stage5 config slice ONLY (S5's own thresholds, not the manifest)."""
+    return hashlib.sha256(
+        json.dumps(_CFG.get("stage5", {}) or {}, sort_keys=True, default=str).encode()
+    ).hexdigest()[:16]
+
+
+def _load_stored_fingerprint() -> dict:
+    """Return the stored fingerprint's input dict ({} when absent or unreadable)."""
+    if not S5_INPUT_FINGERPRINT_PATH.exists():
+        return {}
+    try:
+        return (json.loads(S5_INPUT_FINGERPRINT_PATH.read_text()) or {}).get("input") or {}
+    except Exception as e:
+        print(f"   ⚠️  stored S5 fingerprint unreadable ({type(e).__name__}: {e}) — treated as absent")
+        return {}
+
+
+def _acquire_single_writer_lock() -> None:
+    """BUG-361: at most ONE S5 writer may hold a checkpoint.
+
+    An interleaved writer is worse than a crash: on 2026-09-21 two runs wrote the same
+    checkpoint within 4 minutes and the io_guard shrink guard caught the rollback only by
+    luck. Fail-closed: refuse to start while a LIVE holder exists, reclaim a dead one.
+    Disable via config (stage5.single_writer_lock) when consciously re-driving a stage.
+    """
+    import os
+    if not bool(_CFG.get("stage5", {}).get("single_writer_lock", True)):
+        print("   ⚠️  single-writer lock DISABLED by config — two writers can corrupt this checkpoint")
+        return
+    if S5_LOCK_PATH.exists():
+        try:
+            held = int(S5_LOCK_PATH.read_text().split()[0])
+        except Exception:
+            held = -1
+        alive = False
+        if held > 0:
+            try:
+                os.kill(held, 0)
+                alive = True
+            except OSError:
+                alive = False
+        if alive:
+            raise SystemExit(
+                f"🛑 BUG-361: another S5 writer is LIVE (pid {held}, lock {S5_LOCK_PATH.name}) — refusing to "
+                f"start a second one. Wait for it, or stop it deliberately (kill {held}) if you are sure it is "
+                f"a leftover; the lock is reclaimed automatically once that pid is gone."
+            )
+        print(f"   ⚠️  reclaiming stale S5 lock (pid {held} is gone)")
+        S5_LOCK_PATH.unlink(missing_ok=True)
+    S5_LOCK_PATH.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
+    import atexit
+    atexit.register(lambda: S5_LOCK_PATH.unlink(missing_ok=True))
+    print(f"   🔒 S5 single-writer lock held (pid {os.getpid()})")
+
+
+def _adopt_fingerprint() -> int:
+    """D-330 migration: re-stamp the stored fingerprint under the new scheme, but ONLY if every substantive S5 input is byte-identical.
+
+    This is the BUG-362 migration, and it is deliberately not automatic: it prints the old
+    and new ids and refuses if ANY substantive input (S4 checkpoint content, schema,
+    taxonomy, models, NLI model) changed. A pure code/config-scheme change is exactly the
+    case it exists for; anything else must re-verify.
+    """
+    cur, stored = _s5_input_fingerprint(), _load_stored_fingerprint()
+    if not stored:
+        print("   nothing to adopt (no stored fingerprint beside this checkpoint)")
+        return 0
+    substantive = ("s4_checkpoint", "s4_checkpoint_sha256", "schema_version", "taxonomy_version",
+                   "gen_model", "classify_model", "nli_model")
+    bad = {k: {"stored": stored.get(k), "current": cur.get(k)} for k in substantive
+           if stored.get(k) != cur.get(k)}
+    if bad:
+        print(f"🛑 REFUSING to adopt (D-330): substantive S5 inputs differ — this checkpoint is NOT about the same input")
+        for k, v in bad.items():
+            print(f"     {k}: stored={v['stored']!r} current={v['current']!r}")
+        print("   → the checkpoint must re-verify (run without --adopt-fingerprint).")
+        return 1
+    changed = sorted(k for k in set(stored) | set(cur) if stored.get(k) != cur.get(k))
+    print(f"   📌 fingerprint migration: {_load_stored_fingerprint_id()} → {_fingerprint_id(cur)}")
+    print(f"      all {len(substantive)} substantive inputs identical; changed keys (informational/scheme): {changed}")
+    _write_input_fingerprint()
+    print("   ✅ adopted — the existing checkpoint stays valid")
+    return 0
 
 
 def _s5_input_fingerprint() -> dict:
@@ -585,8 +694,11 @@ def _s5_input_fingerprint() -> dict:
         "s4_checkpoint_sha256": _sha256_file(source),
         "schema_version": SCHEMA_VERSION,
         "taxonomy_version": TAXONOMY_VERSION,
-        "pipeline_commit": get_pipeline_commit(),
-        "manifest_hash": get_manifest_hash(),  # config + prompt fingerprint (D2282)
+        # D-330 (BUG-362): bind ONLY what determines S5 behaviour. Global HEAD and the
+        # whole-config manifest_hash moved on governance-only commits and hard-discarded a
+        # live 1,250-row checkpoint; they are now recorded as INFORMATION, not as identity.
+        "s5_code_sha256": _s5_code_fingerprint(),
+        "s5_config_sha256": _s5_config_fingerprint(),
         "gen_model": GEN_MODEL,
         "classify_model": VERIFY_MODEL,
         "nli_model": S5_NLI_MODEL_LARGE,
@@ -621,6 +733,11 @@ def _write_input_fingerprint() -> None:
     payload = {
         "fingerprint_id": _fingerprint_id(fp),
         "input": fp,
+        "informational": {  # D-330: recorded for audit, deliberately NOT part of the identity
+            "pipeline_commit": get_pipeline_commit(),
+            "manifest_hash": get_manifest_hash(),
+            "written_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        },
     }
     try:
         S5_INPUT_FINGERPRINT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -715,6 +832,8 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     _stored_fp_id = _load_stored_fingerprint_id()
     _fp_mismatch = _stored_fp_id != _cur_fp_id  # None (absent) → mismatch
 
+    _acquire_single_writer_lock()  # BUG-361: no second writer may touch this checkpoint
+
     if STAGE5_CHECKPOINT.exists() and not _fp_mismatch:
         try:
             prior = load_jsonl(STAGE5_CHECKPOINT, context="S5 checkpoint")
@@ -725,7 +844,10 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
             verified = []
             done_ids = set()
     elif STAGE5_CHECKPOINT.exists():
-        _reason = "fingerprint absent" if _stored_fp_id is None else "fingerprint MISMATCH"
+        _stored_fp = _load_stored_fingerprint()
+        _diff_keys = sorted(k for k in set(_stored_fp) | set(_cur_fp) if _stored_fp.get(k) != _cur_fp.get(k))
+        _reason = ("fingerprint absent" if _stored_fp_id is None
+                   else f"fingerprint MISMATCH on {_diff_keys}")
         print(f"   🛑 S5 checkpoint {_reason} — hard-discarding and re-verifying all "
               f"(D2485: no manual archive needed)")
         # D2507 (BUG-206): archive the stale checkpoint BEFORE re-verifying. The
@@ -940,7 +1062,12 @@ def main():
                         help="Quarantine on any failure (default: flag on BORP-only)")
     parser.add_argument("--skip-nli", action="store_true",
                         help="Skip DeBERTa NLI pre-filter, use LLM for all checks")
+    parser.add_argument("--adopt-fingerprint", action="store_true",
+                        help="D-330 migration: re-stamp the stored fingerprint under the current scheme "
+                             "ONLY if every substantive S5 input is identical (BUG-362)")
     args = parser.parse_args()
+    if getattr(args, "adopt_fingerprint", False):
+        return _adopt_fingerprint()
 
     run_stage5(strict=args.strict, skip_nli=args.skip_nli)
 

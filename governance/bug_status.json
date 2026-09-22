@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 105,
-  "open_n": 67,
-  "closed_n": 38,
+  "total_ids": 113,
+  "open_n": 74,
+  "closed_n": 39,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -342,6 +342,41 @@
       "id": "BUG-359",
       "title": "(LOW \u2014 process, LOGGED 2026-09-21): a carried \"pending fix\" note that was never re-verified",
       "events": 1
+    },
+    {
+      "id": "BUG-360",
+      "title": "(LOW \u2014 process, LOGGED 2026-09-21): a second stale carried claim in one session",
+      "events": 1
+    },
+    {
+      "id": "BUG-361",
+      "title": "(HIGH - resilience/concurrency, OPEN): two S5 writers on one checkpoint; S5 has no single-writer lock",
+      "events": 1
+    },
+    {
+      "id": "BUG-362",
+      "title": "(HIGH - future tax, OPEN): an S5 checkpoint is discarded by ANY commit, including governance-only ones",
+      "events": 1
+    },
+    {
+      "id": "BUG-363",
+      "title": "(MED - measurement integrity, OPEN): the ruler sheet is FILLED and 28/150 rows are INCOMPLETE; G4 still describes it as blank",
+      "events": 1
+    },
+    {
+      "id": "BUG-364",
+      "title": "(MED - R14 provenance, OPEN): laya weights are on disk while bakeoff_laya.yaml still says PIN-AT-INSTALL / licence UNVERIFIED",
+      "events": 1
+    },
+    {
+      "id": "BUG-366",
+      "title": "(LOW - process, OPEN): an LLM coder silently under-delivered (79 of 122 rows)",
+      "events": 1
+    },
+    {
+      "id": "BUG-367",
+      "title": "(MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings",
+      "events": 1
     }
   ],
   "closed": [
@@ -382,6 +417,7 @@
     "BUG-350",
     "BUG-353",
     "BUG-357",
-    "BUG-358"
+    "BUG-358",
+    "BUG-365"
   ]
 }

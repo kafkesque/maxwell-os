@@ -151,8 +151,11 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 
 ## C15 BLOCK (2026-09-23, session 21) - unresolved bugs travel with every handoff
 
-**93 open / 67 closed of 160 ids** (threshold for this block is 5). Full machine-readable list with events:
+**94 open / 70 closed of 164 ids** (threshold for this block is 5). Full machine-readable list with events:
 `governance/bug_status.json` (regenerate: `python3 scripts/bug_status.py`).
+
+Regenerated 2026-09-23 18:57 (session 22) from the parser after the BUG-418 dedup - this line is GENERATED,
+not typed (a hand-typed count is a second clock for one artifact - the BUG-402 failure mode).
 
 Highest-consequence open ids: BUG-400 (Dropbox File Provider owns the served store - owner action), BUG-403
 (stage4.depth_model hardcoded default names the refuted depth route), BUG-341 (live stage5 checkpoint absent),

@@ -3514,58 +3514,6 @@ FIX: declare the 4 depth classes (label, description, the soft domain-count band
 surface - the same place domains/disciplines live - then repoint the menu check and generate the rubric
 from it. Blocked on nothing but a decision; no behaviour change.
 
-## BUG-415 (MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says requires one
-
-MEASURED 2026-09-23 (session-21 forensic audit). The frozen anchor/ruler family carries ZERO depth
-columns: `RULER_BLIND_SHEET_20260917.csv` is (#, item_id, name, DEFINITION, APPLICATION, MECHANISM,
-BOUNDARY, SOURCE EXCERPT, len, CT (1-7), DISC (1-62), FORM (1-4), conf_ct, conf_disc, conf_form,
-note_codes, reviewer, date); `F11_ANCHOR_REVIEW_20260923.csv` and the consolidated ANCHOR-3 (150 rows x
-31 cols, sha256 29393d5f9d529205..., tier human-mixed+llm-attested) carry content_type / discipline /
-extraction_type only. ONLY `F14_RELABEL_OR_RETIRE_SAMPLE_20260917.csv` and
-`remaining_verification_audit.csv` carry a depth column, and neither is an anchor.
-
-WHAT DEPTH ACTUALLY HAS: `governance/gold_4axis.jsonl` is the only depth reference - 251 rows, 234 with a
-depth value, depth_source = human-derived 132 (p5:human-d2615 104 + human 18 + p5:human-frontier69 7 +
-p5:human-locked 2 + 298-human 1) + joint-vote 81 + reliable-pair revote 21 + n/a-non-principle 17, i.e.
-coverage 0.526 against the 0.50 floor (config/eval_integrity.yaml:12,34) - which is exactly why line 220
-holds `axes_deferred: [depth, domains]`. The LIVE reference is the 996-row 3-voter LLM consensus
-(`governance/depth_vote_checkpoint.jsonl`), which is ADVISORY, not human truth (D-329/D-331/D-337), and
-depth is RELATIVE-ONLY - never "accurate to X". No record carries a depth provenance field.
-
-CONSEQUENCE: the D2577 4-way depth ModernBERT head cannot be CERTIFIED. Its labels are the binding
-constraint, not the model: the depth eval set is built on classifier_depth_cleanC (macro-F1 0.4790,
-acc 0.530, n=200) and classifier_depth_coreC_core (0.4298, n=133); governance/depth_path_recommendation_
-2026-09-10.md concludes the binding constraint is label POLICY, not model capacity (encoder 0.4790 vs
-gpt-oss zero-shot 0.4433 vs few-shot 0.4571, all inside one +-0.05 band). The D274f 30-row test-retest
-(the single-coder ceiling any floor must be anchored to) is therefore unbuilt, and per D274d nothing may
-be trained, distilled or swapped on unanchored labels.
-
-FIX (owner-accepted 2026-09-23, in progress): **ANCHOR-4** = the SAME 150 ruler rows - they already carry
-DEFINITION / APPLICATION / MECHANISM / BOUNDARY, so they are answerable without re-reading the source -
-plus a `DEPTH (1-4)` column, coded blind by the owner, then by a SECOND coder, and only then the D274f
-test-retest of 30 rows after >= 2 weeks. A single-coder anchor has no ceiling to quote, so the freeze
-waits for coder 2. Sheet + rubric generated this session:
-`governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`, `governance/ANCHOR4_DEPTH_RUBRIC_20260923.md`.
-STATUS: PENDING OWNER CODING -> OPEN (this is the gate on the entire depth roadmap).
-
-## BUG-416 (MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them
-
-MEASURED: `config/taxonomy_v5.yaml` has no depth key (its keys are version, classification_version,
-groups, domains, disciplines, discipline_groups, meta). The depth vocabulary
-(universal / cross-domain / domain / specialized) exists only in PROSE - config/content_types.yaml:218
-(a comment), config/content_types.yaml:32 (the principle description), decisions D282/D2130/D2577 - and
-in data (gold_4axis depth values). `just health` already carries the symptom as a WARN: "menu source
-config/taxonomy_v5.yaml::depth not found - queue labels unverified" and "exposes no readable list --
-closure unverified".
-
-CONSEQUENCE: three separate consumers cannot be pinned to a vocabulary - (a) the menu-closure check
-cannot verify depth labels, (b) the ANCHOR-4 rubric cannot be generated config-first (it had to be
-hand-written this session, which is itself the C12 smell), (c) the D2577 4-way student head's class order
-is not declared anywhere, so a checkpoint cannot be checked against the ontology it was trained on.
-FIX: declare the 4 depth classes (label, description, the soft domain-count band from D2130) in a config
-surface - the same place domains/disciplines live - then repoint the menu check and generate the rubric
-from it. Blocked on nothing but a decision; no behaviour change.
-
 ## BUG-417 (HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, and 4 of its entries are download scratch
 
 MEASURED 2026-09-23 with the D-370 resolution-first test, on the hub repo behind the SERVED generator
@@ -3583,3 +3531,28 @@ resolving all 18 blobs entries and all 14 symlinks, and reclaim only what is BOT
 `*.incomplete` (the 4 scratch files, megabytes). LESSON, again: the classifier itself has to be verified -
 a resolution-first method applied to only the OUTER entry (the ~/.omlx/models symlink) still leaves the
 inner store classified by name. Verify the method's own coverage, not just its first level.
+
+## BUG-418 (LOW, FIXED 2026-09-23) - the step-B remediation script was idempotent on the status flips but NOT on the append path, so it duplicated the BUG-415 and BUG-416 blocks
+
+MEASURED (session-22 forensic audit): the buglog carried TWO byte-identical copies of each of the BUG-415
+and BUG-416 blocks (2865 bytes and 1438 bytes, equal to the byte). Cause: the first run of the step-B
+script aborted on an assertion AFTER the header flips but BEFORE the appends; the re-run then flipped
+nothing (the flip guard held) but appended the two blocks a second time. The guard was written for the flip
+branch only. Root cause is the same class as the incident: IDEMPOTENCY WAS VERIFIED ON ONE PATH AND
+ASSUMED ON THE OTHERS.
+
+IMPACT: none on any bug's parsed state (both blocks are (MED, OPEN), and the parser treats a repeated
+status event as an event, not a state change) - but the artifact was wrong to read, and a block-counting
+reader would over-count. Detection was incidental: bug_status reported 210 headers for 163 ids.
+
+FIX: removed the two LATER byte-identical copies by exact-match rewrite (the earlier copies are
+authoritative), then regenerated governance/bug_status.json AND the C15 count line from the parser
+instead of hand-typing them. Verified: 208 headers / 163 ids unchanged / BUG-415 and BUG-416 one block each.
+
+STANDING RULES (added to the incident set):
+  (a) every remediation step is idempotent BY TEST, not by construction - run each mutating step twice on a
+      scratch copy and assert the second run is a no-op;
+  (b) counts in prose (the C15 block) are GENERATED from the parser, never typed - a hand-typed count is a
+      second clock for one artifact (the BUG-402 failure mode, one level up);
+  (c) an audit that only re-runs the invariants the author wrote will not find the author's own
+      non-idempotency - the audit must diff the ARTIFACT against its own generator.

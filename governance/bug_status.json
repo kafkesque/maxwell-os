@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 163,
+  "total_ids": 164,
   "open_n": 94,
-  "closed_n": 69,
+  "closed_n": 70,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -466,12 +466,12 @@
     {
       "id": "BUG-415",
       "title": "(MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says re",
-      "events": 2
+      "events": 1
     },
     {
       "id": "BUG-416",
       "title": "(MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them",
-      "events": 2
+      "events": 1
     },
     {
       "id": "BUG-417",
@@ -548,6 +548,7 @@
     "BUG-409",
     "BUG-410",
     "BUG-413",
-    "BUG-414"
+    "BUG-414",
+    "BUG-418"
   ]
 }

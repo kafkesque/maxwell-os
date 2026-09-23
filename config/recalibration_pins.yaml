@@ -21,8 +21,8 @@ pins:
     decision: D-279
   abstention_policy:
     path: config/verify_abstention.yaml
-    sha256: fcf96d92bddab771b066c2fa9b9b8ea6e1087685eaebf5700ac738ec59683972
-    decision: D-353
+    sha256: bc994ae56048ea05a9fd664eecb270a426ad07e3830cc7f712398a053707a6be
+    decision: D-362
   robustness_meter:
     path: scripts/abstention_robustness.py
     sha256: 0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f

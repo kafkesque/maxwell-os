@@ -3095,3 +3095,51 @@ attempt died with "SyntaxError: unterminated string literal" (a heredoc escaping
 followed carried no change to pipeline/student_classifier.py. The repoint landed in the follow-up commit. Rule
 restated (same class as F-e3): a receipt is a claim about the artifact as it exists at the moment the claim is
 written - verify the write, then write the claim.
+
+## D-354 VEC REPAIR - DONE AND VERIFIED (2026-09-23, session 23) - owner-gated, executed by the owner, verified independently here
+
+RECEIPT: dry run 15990 dead rows (7995 vec_fbs + 7995 vec_fbs_ctx) -> bash pipeline/backup_guardian.sh (maxwell.db.bak_20260923_164120)
+-> --apply (own copy maxwell.db.pre_d354_20260923_164133, ONE transaction, 7995 + 7995 deleted). Post-repair, re-measured by me:
+vec_fbs REQUIRED live=7995 orphans=0 missing=0 live_pct=100.0; vec_fbs_ctx DORMANT live=0 orphans=0 missing=7995 (expected); 0 RED; exit 0.
+FUNCTION IS NOT TOUCHED EITHER: fbs 7995 rows, rowid range still 7997..15991 (nothing re-issued), pragma integrity_check ok,
+0 foreign-key violations, fbs_fts 7995, vec_fbs shadow rowids 7995. The half-dead index is gone; the spine did not move.
+
+SUCCESSOR DISCHARGED: the D-354 gate is now a CHAINED control of just health (D-361). It was withheld while it was RED and
+chained the moment it was green - a gate that is not chained is decoration (D-355). Fail-closed: an absent run DB is RED.
+
+RESIDUAL (not a defect): the session now leaves FOUR large DB copies on disk (bak_20260923_164120, pre_d354_20260923_164133,
+archive/db_backups/maxwell_pre_index_20260917.db, archive/session_20260923/scratch/.../maxwell.db). Disk is at 97% (28 GiB free).
+Folded into the disk chore, not repaired here.
+
+## THE PIN CONTROL FIRED AND WAS HONOURED (2026-09-23) - evidence the D-353 scheme works
+
+Editing config/verify_abstention.yaml (the D-362 coverage SLA) turned just health RED with exactly one reason: "abstention_policy:
+config/verify_abstention.yaml CHANGED since it was pinned - re-run the measurement and mint a new decision (this is the BUG-391
+class)". It was NOT bypassed: D-362 was minted and the pin re-pointed (fcf96d92... -> bc994ae5...) in the same session. Recording
+this because a control that has never been observed firing is a claim, not a gate.
+
+## BUG-388 - FIXED AND THE OWNER-GATED RE-RUN IS DONE (2026-09-23)
+
+python3 pipeline/stage6_commit.py --export-only -> 7995 verified FBs -> fbs_snapshot_20260923_164926.parquet (42.4 MB), exit clean,
+no ArrowInvalid. The bool coercion holds on the REAL list, not just the probe fixture. The last successful snapshot before this was
+2026-09-02, so the artifact of record was 3 weeks behind the store.
+
+NEW FINDING RECORDED WITH IT (do not treat the snapshot as a dump of the store): --export-only sources its rows from
+load_stage5_fbs(), i.e. the STAGE 5 CHECKPOINT, not from the committed fbs table. Row counts match today (7995 == 7995), so the
+snapshot is faithful in COUNT, but commit-time field mutations (status, committed_at, pipeline_run_id, gen_model, taxonomy_version)
+are those of the checkpoint list, not of the rows as they sit in SQLite. A downstream reader that treats the .parquet as "the store"
+is therefore slightly wrong. Fix direction (NOT done, needs a driver + R5 review): dump fbs from the DB and export that. Recorded
+so it is a known tax rather than a silent one.
+
+## BUG-397(b) - FIXED (2026-09-23) - the two-site trap, and why nulling one site would have made it worse
+
+Site 1 config/pipeline_config.yaml: s2.dspy_program_path -> null (key KEPT: .get(key, default) resurrects a code default when the key
+is absent, and a present-but-null key with the OLD code produced Path("None") - a silently wrong path).
+Site 2 pipeline/pipeline_paths.py: the literal fallback data/dspy_mipro_optimized.json is GONE; an unset key yields None (C12).
+Guards pipeline/dspy_trainer.py: load raises when S2_DSPY_ENABLED and the path is unset (reports + returns the documented None when
+the flag is off); save ALWAYS raises (D2243 - a save with nowhere to go is silent data loss). Probe: DSPY_PROGRAM_PATH None,
+S2_DSPY_ENABLED False, ast parse ok on all three files. D-364. Latent either way - config/flag_consumer_registry.yaml records the flag
+as having no verifiable consumer.
+ALSO reconciled: the dangling comment citation in pipeline/student_classifier.py (it cited a D-361 that had never been minted); it now
+cites D-2618/BUG-397(a). D-361 was subsequently minted for a DIFFERENT subject (the vec gate), so the old comment would have become a
+silently WRONG citation rather than a dangling one - the worse failure mode.

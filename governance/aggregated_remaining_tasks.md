@@ -941,3 +941,18 @@ DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, 
 - OPEN (verification for D-359): R5 gemma-4-E4B review of the stage6 diff + a re-commit rehearsal on a SCRATCH copy (orphans stay 0, fbs count stable). Then wire the D-354 gate as control 12 of just health.
 - DONE (BUG-397a): pipeline/student_classifier.py DEFAULT_GOLDEN now points at archive/golden_retired_D2618/stage4_golden_mined.yaml.
 - OPEN (BUG-397b, two-site): dspy_program_path absent in config AND hardcoded as its own fallback in pipeline/pipeline_paths.py:186.
+
+## Session 23 addendum (2026-09-23) - owner gates discharged
+
+- CLOSED (owner-authorized, D-361): the vec repair ran; 15990 dead rows deleted; verified 0 RED, fbs untouched, integrity ok;
+  the D-354 gate is now control 12 of just health and is fail-closed on an absent DB.
+- CLOSED (D-362): coverage_sla = 0.75. Rationale on the artifact: it is the smallest withholding whose bootstrap lower bound is
+  above zero. NEXT (mine, no gate): the shadow run - a log-only replay of the ratified policy that withholds nothing and reports
+  abstain_rate + decided/abstained error; only after that may enabled become true.
+- CLOSED (D-364): BUG-397(b) two-site fix; no code-level default survives; the loader and saver refuse rather than guess.
+- CLOSED (D-363): v6 menu merge DROPPED, R3 held-out DEFERRED - both recorded so no session re-litigates them.
+- CLOSED (BUG-388): the parquet re-run landed; NEW TAX RECORDED: the snapshot sources the S5 checkpoint, not the store. A DB-dump
+  export driver (with R5 review) is the follow-up if the parquet is ever consumed as "the store".
+- OPEN (owner, physical): the disk chore - 16.5 GB movables named, archive/golden_retired_D2618 must NOT move (live default).
+- OPEN (mine): D-359 R5 review + scratch re-commit rehearsal; the second disk batch (the 10 classifier_* dirs, 5.7 GB) after a
+  reference scan; the extraction_type curve (--config argument for r2_gate_measure.py).

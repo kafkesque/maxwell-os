@@ -183,9 +183,14 @@ WATCHDOG_CAUSAL_WARN_RATIO=float(_CFG.get("watchdog", {}).get("causal_warn_ratio
 WATCHDOG_CAUSAL_HALT_RATIO=float(_CFG.get("watchdog", {}).get("causal_halt_ratio", 0.9))  # D2384: causal bias halt
 # D2304: DSPy optimized-program persistence path (C12). Was hardcoded /tmp/dspy_mipro_optimized.json.
 # NOTE: the `s2` key (lowercase) holds DSPy training settings; `stage2` holds pipeline extraction settings.
-_dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path", "data/dspy_mipro_optimized.json")
-_dspy_program_p = Path(str(_dspy_program_raw))
-DSPY_PROGRAM_PATH = _dspy_program_p if _dspy_program_p.is_absolute() else PROJECT_ROOT / _dspy_program_p
+# BUG-397(b)/D-364: the fallback here used to be the literal "data/dspy_mipro_optimized.json" - a path that has
+# never existed on disk - so NULLING the config key would not have fixed anything (C12: a hardcoded code default is
+# the second defect). There is NO code-level default now: an unset key yields None and the consumer must refuse.
+_dspy_program_raw = _CFG.get("s2", {}).get("dspy_program_path")
+DSPY_PROGRAM_PATH: Path | None = None
+if _dspy_program_raw:
+    _dspy_program_p = Path(str(_dspy_program_raw))
+    DSPY_PROGRAM_PATH = _dspy_program_p if _dspy_program_p.is_absolute() else PROJECT_ROOT / _dspy_program_p
 S2_DSPY_ENABLED=bool(_CFG.get("s2", {}).get("dspy_enabled", False))  # D2482: gate DSPy extraction path in stage2 (default off)
 
 # ── Stage 1.3 settings (D2080: Regex pre-filter) ────────────────────────

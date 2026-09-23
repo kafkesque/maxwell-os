@@ -25,4 +25,5 @@ rules:
   dormant: 'RED if orphans > 0 or live > 0 — a dormant store must hold NO entries at all; missing == fbs_count is EXPECTED here, not a defect. An absent table PASSES (the strongest form of empty).'
 interpreter: '/opt/homebrew/bin/python3'
 interpreter_note: 'Opening a vec0 table needs a python build with enable_load_extension. The default /usr/local/bin/python3 is a python.org framework build (sqlite 3.43.1, loader UNAVAILABLE, BUG-104) and the macOS sqlite3 CLI rejects .load, so BOTH fail with "no such module: vec0". AUDIT needs no vec0 (it reads the shadow rowid table); REPAIR does.'
-note: 'deliberately NOT in just health until the D-354 repair lands (a permanently RED gate is its own future tax)'
+note: 'WIRED into just health as a chained control on 2026-09-23 (D-361) the moment the D-354 repair landed; while the store was RED the gate was deliberately withheld (a permanently RED gate is its own future tax), and a gate that is not chained is decoration (D-355). This control reads the SHADOW rowid tables, so it needs no sqlite-vec extension - the interpreter note above applies to REPAIR only. It is fail-closed: an absent run DB is RED.'
+db_absent_is_red: true   # D-361: the run DB is the served artifact; a machine without it cannot pass just health

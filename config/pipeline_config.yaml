@@ -425,7 +425,10 @@ s2:
   dspy_max_labeled_demos: 3
   dspy_max_bootstrapped_demos: 3
   dspy_max_tokens: 4096
-  dspy_program_path: data/dspy_mipro_optimized.json
+  dspy_program_path: null    # BUG-397(b)/D-364: data/dspy_mipro_optimized.json has never existed and no program was
+                             # ever trained to it. null = declared-absent, deliberately NOT deleted: .get(k, default)
+                             # would resurrect the code-level default from pipeline_paths.py. Set it only when a real
+                             # optimizer run has written a program (pipeline/dspy_trainer.py).
   dspy_enabled: false
   gate:
     enabled: false

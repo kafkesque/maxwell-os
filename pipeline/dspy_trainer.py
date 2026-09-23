@@ -392,6 +392,18 @@ def load_optimized_program(path: Path | str | None = None) -> dspy.Module | None
     from pipeline.pipeline_paths import DSPY_PROGRAM_PATH
 
     p = Path(path) if path is not None else DSPY_PROGRAM_PATH
+    if p is None:
+        # BUG-397(b)/D-364: unset is a CONFIG error, not a missing file. Refuse if the flag says DSPy is wanted;
+        # otherwise report (never silently) and report "no program" through the documented None contract.
+        from pipeline.pipeline_paths import S2_DSPY_ENABLED
+
+        if S2_DSPY_ENABLED:
+            raise RuntimeError(
+                "services.s2.dspy_enabled is true but services.s2.dspy_program_path is unset - refusing to guess "
+                "a path (BUG-397(b)/D-364). Set it in config/pipeline_config.yaml."
+            )
+        print("  ℹ️  DSPy program path unset (services.s2.dspy_program_path) - no saved program to load (D-364).")
+        return None
     if not p.exists():
         return None
 
@@ -677,6 +689,12 @@ def run_dspy_pilot(
     # Lost the first pilot to kernel panic + /tmp cleanup — never again.
     # D2304: config-driven path (C12) — was hardcoded /tmp/dspy_mipro_optimized.json.
     from pipeline.pipeline_paths import DSPY_PROGRAM_PATH
+    if DSPY_PROGRAM_PATH is None:
+        # D2243 promised this pilot would never be lost again; a save with nowhere to go is silent data loss.
+        raise RuntimeError(
+            "cannot persist the optimized DSPy program: services.s2.dspy_program_path is unset (BUG-397(b)/D-364). "
+            "Refusing to discard the pilot (D2243)."
+        )
     save_path = DSPY_PROGRAM_PATH
     try:
         optimized.save(str(save_path))

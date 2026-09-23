@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 727
+total_decisions: 731
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7809,6 +7809,34 @@ decisions:
     re-commit rehearsal on a scratch copy.
   artifacts: [pipeline/stage6_commit.py, tests/test_vec_rowid_contract.py, governance/FORENSIC_AUDIT_20260923f.md]
   related: [BUG-387, D-354, D-357, D-2185, BUG-104, D-359]
+- id: D-361
+  category: ARCHITECTURE
+  status: RATIFIED
+  title: "The D-354 vec store integrity gate is a chained control of just health"
+  description: "Discharges the sequencing condition recorded in config/vec_integrity.yaml, which deliberately withheld the gate while the store was RED (a permanently RED gate is its own future tax). REPAIR RECEIPT 2026-09-23: 15990 dead vec rows deleted (7995 vec_fbs + 7995 vec_fbs_ctx) in one transaction after a backup_guardian copy and the script's own pre_d354 copy; post-repair vec_fbs live 7995 orphans 0 missing 0 (live_pct 100.0), vec_fbs_ctx dormant empty, 0 RED, gate exit 0. fbs was never touched: 7995 rows, rowids still 7997..15991, pragma integrity_check ok, 0 foreign-key violations, fbs_fts 7995. The gate then became a chained control of just health in the same session. It is fail-closed: an absent run DB is RED, so a machine without the run DB cannot pass health - intended, because the run DB is the served artifact. The control reads the SHADOW rowid tables, so it needs no sqlite-vec extension (the BUG-104 interpreter constraint applies to REPAIR only)."
+  artifacts: [justfile, config/vec_integrity.yaml, scripts/verify_vec_integrity.py, scripts/repair_vec_integrity.py, knowledge pipeline/maxwell.db]
+  related: [D-354, D-357, D-355, BUG-387, BUG-394, BUG-104]
+- id: D-362
+  category: MEASUREMENT
+  status: RATIFIED
+  title: "coverage_sla 0.75 - at most 25 percent of rows may be withheld"
+  description: "Owner gate discharged 2026-09-23. The value is the smallest withholding whose paired-bootstrap LOWER bound is above zero on the ruler in force (the D-352/D-353 adoption rule), measured on ANCHOR-3 n=150 relative-only: 10 percent abstain gives 2.74 pp CI [-0.30, 4.96] NOT established; 25 percent gives 5.33 pp CI [1.37, 10.26] established; 50 percent gives 16.66 pp CI [7.33, 23.33] and is legal only if the SLA were 0.50. Consequence: the ratified discipline point is legal and the lever stays alive; the single remaining gate item is the shadow run before enabled may become true. Narrowing the SLA to 0.80 or higher would make the adopted point illegal and kill the lever, because its only legal alternative (10 percent) is not established. This is a risk control, not an accuracy claim: at the adopted point the served stream is still about 50 percent wrong against an advisory reference."
+  artifacts: [config/verify_abstention.yaml, governance/ABSTENTION_ROBUSTNESS_20260923.json, governance/ABSTENTION_CALIBRATION_20260923.json]
+  related: [D-349, D-352, D-353, D-339, D-337, BUG-391]
+- id: D-363
+  category: GOVERNANCE
+  status: RESOLVED
+  title: "v6 menu merge DROPPED and R3 held-out DEFERRED, both recorded so they are not re-litigated"
+  description: "(1) The one measured menu merge (making -> operations research, cos 0.9752, runner-up 0.9535, gap 0.0216) is DROPPED: it is a ~0 pp accuracy lever that would drag a labeler re-run and a ruler re-score and would invalidate the D-279 menu pin. (2) R3 held-out is DEFERRED: the ANCHOR1 blind sheet and key do not exist on disk or in git, so repointing the harness is a new pre-registration rather than a repair; the live harness already binds source anchor2 with authority ANCHOR-3. The cost of deferring is explicit: no held-out number this cycle, so every claim in this cycle stays relative-only (D-337). config/menu_v6_merge_map.yaml remains ratified_partial and NOT IN FORCE."
+  artifacts: [config/menu_v6_merge_map.yaml, config/recalibration_pins.yaml, scripts/r3_preflight.py, governance/aggregated_remaining_tasks.md]
+  related: [D-279, D-337, BUG-372]
+- id: D-364
+  category: ARCHITECTURE
+  status: RATIFIED
+  title: "No code-level default for the DSPy program path - an unset config plus an enabled flag refuses"
+  description: "BUG-397(b) two-site fix. Site 1: config/pipeline_config.yaml services.s2.dspy_program_path is explicitly null, and the key is KEPT because .get(key, default) would resurrect a code default if it were deleted. Site 2: pipeline/pipeline_paths.py no longer falls back to the literal data/dspy_mipro_optimized.json, a path that has never existed (C12: a hardcoded code default is the second defect, so a one-site fix would not have fixed it). Consumers refuse instead of guessing: pipeline/dspy_trainer.py raises on load when S2_DSPY_ENABLED is true and the path is unset, and always raises on save (D2243: never discard the pilot); with the flag false it reports and returns the documented None. Probe receipt: DSPY_PROGRAM_PATH is None and S2_DSPY_ENABLED is False. Latent either way: config/flag_consumer_registry.yaml records that the flag has no consumer the audit can verify."
+  artifacts: [config/pipeline_config.yaml, pipeline/pipeline_paths.py, pipeline/dspy_trainer.py, config/flag_consumer_registry.yaml]
+  related: [BUG-397, D2304, D2482, D2243]
 - id: D-357
   category: ARCHITECTURE
   status: RESOLVED
@@ -7903,10 +7931,10 @@ decisions:
   decisions: [D-344]
 
 summary:
-  total: 727
+  total: 731
   proposed: 6
   draft: 1
-  active: 497
+  active: 501
   stale: 0
   superseded: 16
   archived: 8
@@ -7919,7 +7947,7 @@ summary:
   by_category:
     ARCH: 27
     ARCH / GOV: 1
-    ARCHITECTURE: 9
+    ARCHITECTURE: 11
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     AUDIT / ONTOLOGY / BUGFIX: 1
@@ -7964,7 +7992,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 11
+    GOVERNANCE: 12
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1
@@ -7992,7 +8020,7 @@ summary:
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
     MARKET RESEARCH: 1
-    MEASUREMENT: 7
+    MEASUREMENT: 8
     MEASUREMENT / ANCHOR: 1
     MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1

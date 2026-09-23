@@ -3579,3 +3579,19 @@ depth_frugal_enabled and depth_batch_enabled only), so there was nothing to corr
 ADD a stage4.depth_model entry (reader = pipeline/pipeline_paths.py + pipeline/stage4_merge.py:2008). That
 addition is a doc-only change and is queued, not done. This is the FOURTH instance this session of a claim
 about a missing signal that had to be measured before it could be believed.
+
+## BUG-419 (LOW, OPEN 2026-09-23) - bug_status.json is schema-ASYMMETRIC: open is a list of objects, closed is a list of plain id strings
+
+MEASURED: governance/bug_status.json has open[0] = dict {id, title, events} but closed[0] = str ("BUG-..."),
+so one artifact carries two shapes for the same concept. Any consumer that reads a title, an event count or
+the severity of a CLOSED bug gets a TypeError (this was hit live while writing the session-22 audit verifier:
+"TypeError: string indices must be integers"). Symmetry matters because the whole point of this file is to be
+the machine-readable answer to "what is open" - and a consumer must not have to branch on which list it is
+holding.
+
+IMPACT: no production pipeline reads it (governance/reporting only), which is why it survived; the cost is
+exactly the future tax class - the next consumer writes a branch, and the branch is where the drift starts.
+
+FIX (queued, one line of intent, no behaviour change): make closed a list of {id, title, events} like open, or
+document the asymmetry deliberately in the file's own header. Prefer the former (one shape, D2585-class
+symmetry). Must be done together with a consumer scan so no existing reader breaks.

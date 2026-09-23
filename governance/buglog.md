@@ -3310,3 +3310,35 @@ declares, with no check that the consumer can still resolve its input - the same
 instruction that could not execute), F-f1 (a test that skips everywhere) and BUG-359. Fix (applied):
 `protected_paths` in config/archive_index.yaml names every declared temp/ path, and the rule is now that a
 sweep MUST be preceded by the declared-input grep, never by age alone.
+
+## BUG-407 (MED, OPEN) - the R5 cross-family review channel failed twice in one session, in two different ways
+
+The R5 review of `scripts/build_archive_index.py` (required by AGENTS.md delegate_rules: "delegate CODE
+REVIEW of any NEW repair script to gemma-4-E4B-it-MLX-4bit before --apply") was attempted TWICE, bounded,
+temperature 0.0, provider maxwell_omlx:
+1. Attempt 1 (files described, verdict format specified): the model returned an EMPTY response -
+   "The model returned an empty response." No APPROVE/REJECT. This is the SECOND consecutive session in
+   which gemma produced no verdict on an R5 request (D-364 last session, recorded in this log).
+2. Attempt 2 (6-line fixed format, tool-free): the delegate terminated with "the read_file tool was not
+   available in the turn context" - i.e. a reviewer that cannot read the artifact it is reviewing.
+Consequence stated plainly: **the R5 verdict for scripts/build_archive_index.py is OWED, NOT SATISFIED.**
+A verifier that returns no verdict does not discharge R5 - the same rule recorded for D-364 and D-359.
+Evidence supporting the script's correctness that is NOT an R5 verdict, and is not offered as one:
+`--check` exit 0 after regeneration; the check went RED exactly when the bytes changed (it caught the
+restore of 35 declared inputs mid-session, which is the strongest available proof that the check is live
+rather than tautological); one commit, `just health` exit 0, tree dirty 0.
+Routing fix (not yet applied, needs an owner-free decision next session): run gemma through the
+one-shot curl path (D2543/D2549) instead of delegate(), or transfer the R5 review to Qwen3.8-27B as the
+deep auditor (D2556), since gemma's channel is now degraded in two distinct ways.
+
+## BUG-408 (LOW, FIXED 2026-09-23) - a one-line edit to justfile dropped a recipe line's indent and made health unreachable
+
+Wiring the archive-index checker into `just health` was done with a text replace whose anchor string
+omitted the line's LEADING 4 SPACES. The indent therefore applied to the inserted line only, and the
+following line (recompute_decision_summary --check) fell to column 0: `just health` then died with
+"Unknown start of token '.'  justfile:23:43" - the whole health control chain was unreachable for two
+commits. Caught by running health immediately after the edit, fixed in the same session.
+Class: an edit to a control file verified by an intention ("the check is now chained"), not by the
+control itself. The rule this instance adds to the others: after editing justfile, RUN it - a recipe
+that cannot parse reports nothing about the thing you changed, and the false header claim in
+archive/index.yaml ("check: just health -> ...") was true for exactly zero commits until this fix.

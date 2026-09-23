@@ -3342,3 +3342,23 @@ Class: an edit to a control file verified by an intention ("the check is now cha
 control itself. The rule this instance adds to the others: after editing justfile, RUN it - a recipe
 that cannot parse reports nothing about the thing you changed, and the false header claim in
 archive/index.yaml ("check: just health -> ...") was true for exactly zero commits until this fix.
+
+## BUG-409 (MED, FIXED 2026-09-23) - a yaml round-trip rewrote a 100k-line governance artifact and destroyed its blame history
+
+The D-365 entry was added to `config/decisions.yaml` with `yaml.safe_load` -> `yaml.safe_dump`. The
+round-trip reformatted the WHOLE file: 812 insertions / 758 deletions for a 731-entry registry, i.e.
+almost every line in a hand-curated governance artifact changed bytes. Verified NOT to be content loss -
+the original had 0 comment lines, `recompute_decision_summary.py` writes surgically (a regex replace of
+`total_decisions` plus the trailing `summary:` block, never a dump), and a parsed comparison of the
+original vs the round-tripped version found 731/731 entries IDENTICAL with exactly one addition (D-365)
+and zero removals. So the damage was limited to: (a) git blame/log for 731 decisions now points at one
+mechanical commit, (b) any future byte-level diff of the registry is unreadable, (c) a false alarm that
+took a full diagnostic pass to clear.
+FIX: the original text was restored from git and D-365 was inserted textually immediately before the
+`summary:` marker, then `recompute_decision_summary.py` re-derived the counts. The rule this instance
+adds to BUG-342's: **append to a governance registry by text insertion at a marker, never by a
+load/dump round-trip.** A round-trip is content-equivalent and history-destroying at the same time, which
+is why it passes every check the repo has and still costs something.
+SIDE EFFECT, and it is the check working: restoring the declared input `temp/trackb_full.jsonl` changed
+the bytes of `archive/temp_archive_20260923/`, so the new archive-index control went RED until the index
+was regenerated. A control that goes RED the moment the inventory changes is what "live" means.

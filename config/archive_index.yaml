@@ -127,7 +127,6 @@ protected_paths:
   - temp/evidence_mismatch_quarantine.jsonl
   - temp/forensic_audit_local_llms.json
   - temp/golden_labels_probabilistic.jsonl
-  - temp/golden_labels_probabilistic.jsonl.
   - temp/golden_source_map.json
   - temp/golden_source_map_clean.json
   - temp/kimi3
@@ -154,7 +153,6 @@ protected_paths:
   - temp/severe_evidence_quarantine.jsonl
   - temp/stage1_5_intent_v6_1.py
   - temp/test_matryoshka_nli_results.json
-  - temp/trackb_full.jsonl.
   - temp/trackb_full_20260905.jsonl
   - temp/trackb_slim.jsonl
   - temp/train_classifier.log

@@ -2005,6 +2005,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                     # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification;
                     # depth may route to a cheap third-family model (Gemma) when
                     # enabled. Default (flag off) = GPT-OSS (VERIFY_MODEL).
+                    # BUG-403/405 (Gate D, 2026-09-23): fail-closed (C16). A frugal depth route with no
+                    # configured model must refuse, not call an unset/phantom model.
+                    if S4_DEPTH_FRUGAL_ENABLED and not S4_DEPTH_MODEL:
+                        raise ValueError(
+                            "stage4.depth_frugal_enabled is true but stage4.depth_model is unset "
+                            "(config/pipeline_config.yaml) - refusing to guess a depth model (BUG-403/405)"
+                        )
                     depth_model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL
                     depth_val = classify_depth_focused(
                         fb_data,

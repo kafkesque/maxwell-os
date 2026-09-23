@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**94 open** / 70 closed of 164 ids.
+**92 open** / 72 closed of 164 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -93,8 +93,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-399 | (MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere | 2 |
 | BUG-400 | (HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22) | 1 |
 | BUG-401 | (MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit | 1 |
-| BUG-403 | (HIGH, OPEN) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED | 1 |
-| BUG-405 | (MED, OPEN) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403 | 1 |
 | BUG-406 | (HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/ | 1 |
 | BUG-411 | (LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else | 1 |
 | BUG-412 | (LOW, OPEN) - the archive index declares an absolute cloud path with no guard that it still resolves | 1 |

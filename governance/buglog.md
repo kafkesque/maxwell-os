@@ -3278,7 +3278,7 @@ subdirs` is not possible per-subfolder in Dropbox, so the practical form is: mov
 sync stays and record the risk as an accepted, dated decision). Both are owner calls. The forbidden option is to
 leave it implicit.
 
-## BUG-403 (HIGH, OPEN) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED
+## BUG-403 (LOW, FIXED 2026-09-23) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED
 
 `pipeline/pipeline_paths.py:230` reads `S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))`.
 Two defects in one line. (a) C12: that string is a HARDCODED CODE DEFAULT - exactly the class D-364 was
@@ -3306,7 +3306,7 @@ artifact that drifts silently (BUG-342's class). FIXED: `config/archive_index.ya
 regenerated `archive/index.yaml` whose authority is D-365. Measured after the fix: 34 entries, 17.3 GB,
 dispositions {keep 5, keep_append_only 21, external_move_candidate 5, purge_candidate 3}, `--check` exit 0.
 
-## BUG-405 (MED, OPEN) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403
+## BUG-405 (LOW, FIXED 2026-09-23) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403
 
 `config/flag_consumer_registry.yaml` records `stage4.depth_frugal_enabled` with `consumers: []` and the note
 "no consumer the audit can verify; it enforces nothing today". That is FALSE by grep: `pipeline/stage4_merge.py:2008`
@@ -3556,3 +3556,26 @@ STANDING RULES (added to the incident set):
       second clock for one artifact (the BUG-402 failure mode, one level up);
   (c) an audit that only re-runs the invariants the author wrote will not find the author's own
       non-idempotency - the audit must diff the ARTIFACT against its own generator.
+
+## BUG-403 / BUG-405 (Gate D) - fix receipt
+
+RECEIPT 2026-09-23 (Gate D, owner-accepted; session 22). Executed and verified, zero behaviour change:
+  (1) config/pipeline_config.yaml stage4.depth_model: gemma-4-E4B-it-MLX-4bit -> null, KEY KEPT. Deleting the
+      key is forbidden here and the reason is documented inline: the old reader coerced a missing key to a
+      CODE DEFAULT naming the same refuted model, so deletion would resurrect it.
+  (2) pipeline/pipeline_paths.py: the code default is REMOVED. depth_model null/absent now resolves to ""
+      (UNSET) - and explicitly NOT to the literal string "None", which str(None) would have produced and
+      which is the trap this fix would otherwise have introduced had only the config been changed.
+  (3) pipeline/stage4_merge.py (the depth call): fail-closed per C16 - when depth_frugal_enabled is true and
+      depth_model is unset it now RAISES instead of calling an unset/phantom model.
+  (4) Both files compile (py_compile exit 0); the served depth path is unchanged because
+      depth_frugal_enabled is false, so depth still uses VERIFY_MODEL (gpt-oss).
+  (5) R5: see governance/r5_reviews.jsonl for the reviewer verdict on the diff (D-367: a verdict is evidence
+      only when produced by that harness).
+CORRECTION OF MY OWN EARLIER CLAIM (recorded, not silently dropped): I had written that this fix included
+correcting a config/flag_consumer_registry.yaml entry that "denies the consumer read at
+pipeline/stage4_merge.py:2008". MEASURED: the registry has NO depth_model entry at all (it carries
+depth_frugal_enabled and depth_batch_enabled only), so there was nothing to correct - the owed action is to
+ADD a stage4.depth_model entry (reader = pipeline/pipeline_paths.py + pipeline/stage4_merge.py:2008). That
+addition is a doc-only change and is queued, not done. This is the FOURTH instance this session of a claim
+about a missing signal that had to be measured before it could be believed.

@@ -338,7 +338,12 @@ stage4:
   depth_batch_enabled: true
   depth_prompt_variant: v3_contrastive
   depth_frugal_enabled: false
-  depth_model: gemma-4-E4B-it-MLX-4bit
+  # BUG-403/405 (Gate D, 2026-09-23): KEPT and deliberately UNSET. The gemma depth route is REFUTED
+  # (governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md: 62.5% vs a >=90% gate) and
+  # depth_frugal_enabled is false, so the served depth path is VERIFY_MODEL (gpt-oss). DO NOT DELETE
+  # this key - deleting it resurrects the code default in pipeline/pipeline_paths.py. Give it a value
+  # only after a depth route WINS an A/B arm (D2618/D2635).
+  depth_model: null
   depth_fallback_depth: domain
   # D2607 (C): LLM-hybrid student pre-classifier. ModernBERT student classifies
   # discipline/domains; low-confidence/abstain falls back to gpt-oss (VERIFY_MODEL).

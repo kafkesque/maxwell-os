@@ -227,7 +227,8 @@ S4_DEPTH_BATCH_ENABLED=bool(_CFG.get("stage4", {}).get("depth_batch_enabled", Fa
 S4_DEPTH_PROMPT_VARIANT=str(_CFG.get("stage4", {}).get("depth_prompt_variant", "baseline"))  # D2483: BUG-185 goldilocks depth-prompt variant ("baseline" default = unchanged)
 # D2354 FrugalGPT cascade: GPT-OSS does CRIBS/classification, a cheap model does depth only.
 S4_DEPTH_FRUGAL_ENABLED=bool(_CFG.get("stage4", {}).get("depth_frugal_enabled", False))
-S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))
+_S4_DEPTH_MODEL_RAW = _CFG.get("stage4", {}).get("depth_model")  # BUG-403/405 Gate D: config-first, NO code default (the model it named is refuted, D2454->S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md)
+S4_DEPTH_MODEL = str(_S4_DEPTH_MODEL_RAW) if _S4_DEPTH_MODEL_RAW else ""  # null/absent -> "" (UNSET), never the literal string "None"
 S4_DEPTH_FALLBACK_DEPTH=str(_CFG.get("stage4", {}).get("depth_fallback_depth", "domain"))
 # D2607 (C): LLM-hybrid student pre-classifier (ModernBERT student + gpt-oss fallback).
 S4_STUDENT_PRECLASSIFIER_ENABLED=bool(_CFG.get("stage4", {}).get("student_preclassifier_enabled", False))

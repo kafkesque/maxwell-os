@@ -439,3 +439,61 @@ D-353: Abstention re-ratified by the lower-CI-bound rule; recalibration trigger 
    ruler, the calibration, the R2 meter, the menu or the meters change without a new decision id, the check is RED.
 5. Open owner gates recorded in config/verify_abstention.yaml: coverage_sla is null, enabled stays false,
    and the served stream is explicitly documented as ~50% wrong (risk control, not accuracy).
+
+D-354: Referential integrity of the sqlite-vec stores is a gate
+
+## D-354 - Referential integrity of the sqlite-vec stores is a gate (2026-09-23)
+
+1. The vec0 stores are append-only in the stage6 path, so committing over a populated store orphans the
+   previous generation of vectors and a row COUNT cannot see it (BUG-394: vec_fbs = 7995 live + 7995 orphan;
+   vec_fbs_ctx = 0 live / 7995 orphan, i.e. an entirely dead index).
+2. live == fbs is now a contract, checked read-only and fail-closed by scripts/verify_vec_integrity.py against
+   config/vec_integrity.yaml.
+3. No new retrieval-quality measurement may be made on a store whose live fraction is below 1.0: a number taken
+   on a diluted index is a number on a different ruler.
+4. The gate is deliberately NOT wired into just health yet: it is RED until the owner-gated repair lands, and a
+   permanently RED gate is its own future tax. Wiring it is the last step of that repair.
+
+
+D-355: A control must assert the state it is in, not the state it was built for
+
+## D-355 - A control must assert the state it is in, not the state it was built for (2026-09-23)
+
+1. Every pin, gate and control must resolve the configured state it depends on and assert the contract of that
+   state, fail-closed in both directions.
+2. When the state is off, the assertion inverts: the ruled bytes must be absent from every arm AND the stamp
+   must not claim them (a stamp must never claim rule bytes the prompt was not built from).
+3. BUG-392/393/395/396 are four instances of one class: a check that cannot resolve the state it exists to
+   check. BUG-395 cost three abandoned edits because the premise, not the artifact, was wrong.
+4. Corollary (BUG-396): a gate in a run harness MUST be chained to the commit with &&. A gate that is not
+   chained is decoration.
+
+
+D-356: The R2 meter speaks extraction_type - capability, with the ratified curve still owed
+
+## D-356 - The R2 meter speaks extraction_type (2026-09-23)
+
+1. scripts/definition_nli_verify.py scores the extraction_type axis (menu key extraction_types; definition
+   hypothesis per D-281) alongside discipline, domains and content_type.
+2. Its axis map no longer falls back to the domains list for an unlisted axis - that fallback would have scored an
+   extraction_type label against a DOMAIN definition, silently and plausibly.
+3. Receipt: capability proven by a smoke run (6 FBs, 40 label-definition pairs, 0 inference errors, the axis
+   included). The ratified curve over the frozen ruler is NOT yet measured - the full run exceeded the working
+   budget and is carried as a work item.
+4. No extraction_type abstention threshold may be set from capability alone: config/verify_abstention.yaml keeps
+   extraction_type in refused_axes until a point is ratified by the lower-CI-bound rule (D-353).
+
+
+D-356: The R2 meter speaks extraction_type - measured, not transplanted
+
+## D-356 - The R2 meter speaks extraction_type (2026-09-23)
+
+1. scripts/definition_nli_verify.py scores the extraction_type axis (menu key extraction_types; definition
+   hypothesis per D-281) alongside discipline, domains and content_type.
+2. Its axis map no longer falls back to the domains list for an unlisted axis - that fallback would have scored an
+   extraction_type label against a DOMAIN definition (silent, plausible, wrong).
+3. Receipt: the D-353 pin fired the moment the meter changed ("r2_meter CHANGED since it was pinned - re-run the
+   measurement and mint a new decision"); the meter was re-run over the frozen input into a NEW dated artifact
+   (governance/R2_DEFINITION_NLI_20260923.json) and the pin now carries this decision id.
+4. No extraction_type abstention threshold may be set from this: config/verify_abstention.yaml keeps
+   extraction_type in refused_axes until a point is ratified by the lower-CI-bound rule (D-353).

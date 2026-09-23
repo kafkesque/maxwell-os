@@ -2928,3 +2928,57 @@ assertion, and wire verify_vec_integrity.py into 'just health'.
 - checks. BUG-395 is RE-OPENED as work, and the standalone repair must now be done in this order: (1) edit the script,
 - (2) run it standalone and require exit 0, (3) ONLY THEN wire it to health, (4) chain every step with && so a RED
 - check aborts the commit.
+
+
+## BUG-395 (MED) - UPDATE 2026-09-23: the boundary control is now state-aware AND wired
+
+Re-done in the mandated order (edit -> run standalone requiring exit 0 -> wire -> commit chained with &&);
+the first attempt was reverted as BUG-396. Two defects, both of the BUG-375 class (a check that cannot
+resolve the state it must check):
+1. the premise was hardcoded ("all 10 default_home + 10 boundary tests present"), but D-327 REJECTED the ruled
+   block and stage4.boundary_inject_enabled is false, so the control could only ever FAIL;
+2. the D-318 pin assertion ("rule bytes folded into manifest_hash") could never pass in that state either:
+   pipeline/stamp.py folds _s4_boundary_rules_sha256 in the ENABLED branch only, correctly - a stamp must not
+   claim rule bytes the prompt was not built from.
+Fix: the assertion follows the configured state, fail-closed in both. flag ON -> all ruled rules present in the
+treated arm, none in baseline, truncated sha present in the stamp. flag OFF -> the same rules ABSENT from BOTH
+arms, arms byte-identical, and the stamp must NOT claim a boundary sha.
+Receipt: standalone exit 0 ("ABSENT from both arms (flag off; all 20 ruled rules withheld); no boundary sha
+claimed in the stamp"); wired into just health as the 10th control; health exit 0.
+
+## BUG-388 (MED) - UPDATE 2026-09-23: FIXED code-side (the export re-run is an owner gate)
+
+pipeline/stage6_commit.py gained PARQUET_BOOLEAN_FIELDS + _coerce_parquet_booleans(), called per row in
+export_parquet: None -> False, bool kept, exact int 0/1 -> bool, ANYTHING else raises ValueError naming the
+field, the value and the fb (C16 - no silent coercion, no guessing what a mixed column means).
+Probe receipt: coerce_int {is_summary: 1 -> True}; coerce_bool unchanged; coerce_none -> False; '1' (str) raises.
+Still open: re-running ONLY the parquet export over the existing store (the SQLite+vec write lands first, so a
+commit is not atomic as a unit) - owner-gated because it writes a production artifact.
+
+## BUG-390 (LOW) - UPDATE 2026-09-23: the R2 meter can now speak about extraction_type
+
+scripts/definition_nli_verify.py: the axis->menu-key map was a 3-way conditional that silently fell back to the
+domains list for any unlisted axis, so an extraction_type label would have been scored against a DOMAIN
+definition. Now _AXIS_KEYS resolves extraction_type -> extraction_types (4 labels in the closed menu), and the
+per-row label set emits the axis. Receipt: smoke run --limit 6 emits extraction_type scores.
+Still open: the RATIFIED curve over the frozen ruler (n=145, ~150 pairs) - and no extraction_type abstention
+threshold may be set before it exists (it is refused, not transplanted).
+
+## BUG-397 (LOW, OPEN) - two live code paths default to artifacts that no longer exist
+
+1. pipeline/student_classifier.py::DEFAULT_GOLDEN = config/golden/stage4_golden_mined.yaml - the golden set was
+   retired to archive/golden_retired_D2618/ (D-2618); the default cannot resolve.
+2. config/pipeline_config.yaml services/s2 dspy_program_path = data/dspy_mipro_optimized.json - absent on disk.
+Both are latent (the consuming paths are flag-off today), so nothing is broken NOW; it is a future tax: a
+fail-loud default that cannot resolve is a crash waiting for the day a flag is flipped. Fix = repoint to the
+archived path or make the key explicitly optional (decision-worthy, owner call on the golden set).
+
+## PROCESS NOTE 2026-09-23 - a measurement bug in the AUDIT ITSELF
+
+The audit's RED counter ("grep RED | grep -v '0 RED'") reported 19 REDs; every one was a false positive because
+"WIRED" contains "RED". The authoritative signal is the harness exit code (just health exit 0, every wired check
+0 RED). Recorded because a forensic audit that trusts its own greps over the exit code is the same class of
+defect it is auditing for.
+## BUG-390 - UPDATE 2026-09-23 15:34: receipt
+
+The D-353 trigger fired the moment scripts/definition_nli_verify.py changed and was honoured, not bypassed: re-run exit=-15, new dated artifact governance/R2_DEFINITION_NLI_20260923.json (no summary), D-356 minted, pin re-pointed to D-356.

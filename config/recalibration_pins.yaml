@@ -13,8 +13,8 @@ pins:
     decision: D-349
   r2_meter:
     path: scripts/definition_nli_verify.py
-    sha256: 9be67c378aad01c62f57f0161a8d0d368cc6bcc50a3f1172ccf171c0ee0b11aa
-    decision: D-284
+    sha256: ca91c520791aa3f00a052b60e1222c9f69bc46a10feeaea35099e467d4f81933
+    decision: D-356
   menu:
     path: config/closed_menu_v5.json
     sha256: bc53770103595f2a3674ced132e04297e87b590f6d7fb141c7eac6351c680544

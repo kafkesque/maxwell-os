@@ -904,3 +904,23 @@ old and new numbers by hand (BUG-342): the old denominator is a SUBSET. Sites st
 
 Executed this turn: B7 (temp inputs -> data/anchor_inputs/), B8 (mtp_enabled false). B5 recommendation recorded:
 DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, not a fix).
+
+## 2026-09-23 15:27 - audit (d): executed items + closed items
+
+- CLOSED (F5, measured): ANCHOR-3 reproducibility. All five declared ruler inputs + the consolidated ruler are
+  tracked in git (governance/RULER_BLIND_SHEET_20260917.csv, governance/F11_ANCHOR_REVIEW_20260923.csv,
+  governance/F11_OWNER_RULING_MAP_20260922.csv, config/closed_menu_v5.json, config/f11_llm_coder.yaml,
+  governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv) and data/anchor_inputs/LLM_LABELS_R2_ALL150.jsonl is
+  tracked too. No temp/ move was needed.
+- CLOSED (F7, measured): the two carried typos. Every live file carries the correct spelling; the only surviving
+  "computer graphic / media studie" is inside a VERBATIM quote in config/decisions.yaml:7582 (append-only, R-D410)
+  and must not be edited.
+- CLOSED (F1): BUG-395 - state-aware + wired (10th control); CLOSED code-side (F2): BUG-388;
+  CAPABILITY CLOSED (F3): BUG-390 extraction_type axis.
+- OPEN (F4, LOW): BUG-397 - two live defaults point at a retired golden set (archive/golden_retired_D2618/) and an
+  absent dspy program (data/dspy_mipro_optimized.json). Latent today; a crash when a flag is flipped.
+- POINTER (F6): the six artifacts citing the non-existent ANCHOR1 sheet/key are historical; the live harness binds
+  anchor2 + ANCHOR-3 (see the CONTEXT_INDEX pointer block).
+- STILL OWNER-GATED (unchanged, highest value first): vec store repair (BUG-394); coverage_sla for the adopted
+  discipline abstention point; the BUG-388 parquet export re-run; the ratified BUG-390 curve; the v6 menu merge
+  (DROP/DEFER recommended); R3 GO/DEFER; the disk chore (97% full, 29 GiB free).

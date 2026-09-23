@@ -89,7 +89,11 @@ def _r5_hash() -> str | None:
 
 
 def _menu_definition(menu: dict, axis: str, label: str) -> str | None:
-    axis_key = "content_types" if axis == "content_type" else ("disciplines" if axis == "discipline" else "domains")
+    # BUG-390: every axis the closed menu exposes must be resolvable, or the meter silently
+    # falls back to the domains list and scores the wrong definition for the label.
+    _AXIS_KEYS = {"content_type": "content_types", "discipline": "disciplines",
+                  "extraction_type": "extraction_types"}
+    axis_key = _AXIS_KEYS.get(axis, "domains")
     for e in menu.get(axis_key, []):
         if e.get("value") == label:
             return (e.get("definition") or e.get("description") or "").strip() or None
@@ -198,6 +202,9 @@ def run(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, str],
         for d in _parse_domains(fb.get("domains")):
             labels.append(("domains", d))
         labels.append(("content_type", str(fb.get("content_type") or "")))
+        # BUG-390: extraction_type is a scored axis (definition hypothesis, D-281) - it was
+        # refused for abstention precisely because no measured curve existed for it.
+        labels.append(("extraction_type", str(fb.get("extraction_type") or "")))
 
         row = {"fb_id": fb_id, "name": fb.get("name", ""), "labels": []}
         for axis, label in labels:

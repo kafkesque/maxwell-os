@@ -577,6 +577,35 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
         return False
 
 
+PARQUET_BOOLEAN_FIELDS: tuple[str, ...] = ("is_summary", "is_convergent")
+
+
+def _coerce_parquet_booleans(row: dict) -> None:
+    """BUG-388: normalise declared boolean keys in place, failing loud on anything else.
+
+    The S5 checkpoint mixes Python bool with SQLite-style int 0/1 for the same key, which
+    made pa.Table.from_pylist() infer a column type from the first rows and then raise
+    ArrowInvalid on a later row. Only the exact ints 0/1 are coerced; any other type raises
+    (C16 - no silent coercion, no guessing what a mixed column means).
+    """
+    for field in PARQUET_BOOLEAN_FIELDS:
+        if field not in row:
+            continue
+        val = row[field]
+        if val is None:
+            row[field] = False
+        elif isinstance(val, bool):
+            continue
+        elif isinstance(val, int) and val in (0, 1):
+            row[field] = bool(val)
+        else:
+            raise ValueError(
+                f"BUG-388: {field}={val!r} ({type(val).__name__}) for fb "
+                f"{row.get('fb_id') or row.get('id')!r} is neither bool nor a 0/1 int; "
+                "refusing to export a mixed-type column (C16)"
+            )
+
+
 def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
     """Export FBs to Parquet snapshot."""
     parquet_dir.mkdir(parents=True, exist_ok=True)
@@ -605,6 +634,7 @@ def export_parquet(fbs: list[dict], parquet_dir: Path) -> Path:
                     row[field] = json.dumps(val, ensure_ascii=False)
                 elif val is None and field not in ("jargon", "domains_raw", "discipline_raw"):
                     row[field] = "[]"
+            _coerce_parquet_booleans(row)
             rows.append(row)
 
         table = pa.Table.from_pylist(rows)

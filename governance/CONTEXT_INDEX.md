@@ -676,3 +676,21 @@ old and new numbers by hand (BUG-342): the old denominator is a SUBSET. Sites st
 
 Executed this turn: B7 (temp inputs -> data/anchor_inputs/), B8 (mtp_enabled false). B5 recommendation recorded:
 DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, not a fix).
+
+### 2026-09-23 15:27 - audit (d): the state-aware control, the bool coercion, the meter's silent axis fallback
+
+D-355 minted (a control must assert the state it is in) + D-354 synced into DECISION-LOG.md (it had been minted
+into config/decisions.yaml and 4 governance files but not into the log, where every D-3xx entry lives - a real
+sync gap, closed). BUG-395 is now state-aware AND wired into just health as the 10th control (standalone exit 0,
+health exit 0). BUG-388 fixed code-side. BUG-390: the R2 meter can speak about extraction_type (its axis map had
+silently fallen back to the DOMAINS list for unlisted axes). BUG-397 opened (two live defaults point at retired or
+absent artifacts). F5 CLOSED by measurement: the ANCHOR-3 ruler and all five declared inputs are tracked in git,
+so it reproduces from a clone. F7 CLOSED: the only surviving typo is inside a verbatim quote in decisions.yaml.
+
+POINTER (R3): governance/ANCHOR1_BLIND_SHEET_20260920.csv and governance/ANCHOR1_KEY_20260920.json DO NOT EXIST
+on disk and are not tracked. Six artifacts still cite them (governance/R3_HELDOUT_PREREG_20260921.md,
+governance/R3_HELDOUT_RESULT_20260921.md, governance/FORENSIC_AUDIT_20260921b.md,
+governance/FORENSIC_AUDIT_20260923b.md, governance/ARTIFACT_REGISTRY.md, governance/buglog.md). Those citations
+are historical and unreproducible as written. The LIVE harness is scripts/r3_preflight.py (inside just health),
+which binds source 'anchor2' + authority ANCHOR-3. GO/DEFER on the R3 result stays an owner call (repointing is a
+new pre-registration).

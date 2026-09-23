@@ -793,3 +793,10 @@ AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).
 - CORRECTED: BUG-387's 'doubled vector store' framing -> BUG-394 dead-index measurement (7995 live + 7995 orphans;
   vec_fbs_ctx 0 live). See governance/FORENSIC_AUDIT_20260923c.md.
 - NEW: D-354 vec referential-integrity gate (config/vec_integrity.yaml + scripts/verify_vec_integrity.py), RED today.
+
+### 2026-09-23 15:27 - audit (d) addendum: control class fixed at the root
+
+D-355 (a control must assert the state it is in) is now a recorded architecture decision, and BUG-395's artifact
+is state-aware AND wired into just health as the 10th control (previously unwired; its line 600 PASS was stale -
+corrected in the (c) addendum). Line-600-class stale verdicts should now be impossible for THIS control: it runs
+in health on every check, so its verdict can no longer drift from the config it depends on.

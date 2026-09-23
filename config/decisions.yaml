@@ -7761,6 +7761,36 @@ decisions:
   status: RESOLVED
   date: 2026-09-23
   artifacts: [config/verify_abstention.yaml, config/recalibration_pins.yaml, scripts/verify_recalibration_pins.py]
+- id: D-356
+  category: MEASUREMENT
+  status: RESOLVED
+  date: 2026-09-23
+  title: The R2 meter speaks extraction_type - capability, with the ratified curve still owed
+  decision: >-
+    scripts/definition_nli_verify.py scores the extraction_type axis (menu key extraction_types, definition
+    hypothesis per D-281) alongside discipline, domains and content_type, and its axis map no longer falls back to
+    the domains list for an unlisted axis - that fallback would have scored an extraction_type label against a
+    DOMAIN definition, silently. Receipt: capability proven by a smoke run (6 FBs, 40 label-definition pairs, 0
+    inference errors, extraction_type included). The RATIFIED curve over the frozen ruler is NOT yet measured: the
+    full run exceeds the working budget in this session and is carried as a work item. No extraction_type
+    abstention threshold may be set from capability alone: config/verify_abstention.yaml keeps extraction_type in
+    refused_axes until a point is ratified by the lower-CI-bound rule (D-353).
+  artifacts: [scripts/definition_nli_verify.py, config/recalibration_pins.yaml]
+  related: [D-281, D-284, D-353, BUG-390]
+- id: D-355
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+  title: A control must assert the state it is in, not the state it was built for
+  decision: >-
+    A pin, gate or control artifact MUST resolve the configured state it depends on, and must assert the
+    contract of THAT state fail-closed in both directions. When the state is off the assertion INVERTS (the
+    ruled bytes must be absent from every arm AND the stamp must not claim them) instead of asserting a premise
+    that can no longer be true. BUG-392, BUG-393, BUG-395 and BUG-396 are four instances of one class: a check
+    that cannot resolve the state it exists to check. Corollary (BUG-396): a gate in a run harness MUST be
+    chained to the commit with && - a gate that is not chained is decoration.
+  artifacts: [scripts/verify_boundary_injection.py, justfile, governance/FORENSIC_AUDIT_20260923d.md]
+  related: [D-318, D-327, BUG-395, BUG-396]
 - id: D-354
   category: ARCHITECTURE
   status: RESOLVED

@@ -1,0 +1,16 @@
+# D-354 — referential integrity contract for the sqlite-vec stores.
+# Why: stage6's vector insert is append-only, so replacing fbs rows orphans vectors. A row COUNT cannot see it.
+schema_version: '1'
+decision: D-354
+db_path: knowledge pipeline/maxwell.db
+fbs_table: fbs
+vec_tables:
+  - vec_fbs        # definition embeddings (the production vector leg)
+  - vec_fbs_ctx    # contextual embeddings (R26 guard: production must not point here)
+shadow_rowids_suffix: _rowids
+semantics:
+  live: 'vec rowid present in fbs'
+  orphan: 'vec rowid absent from fbs — dead index entry; dilutes k-NN slots, and at 100 percent returns nothing'
+  missing: 'fbs rowid with no vec entry — the row cannot be retrieved by the vector leg'
+rule: 'RED if orphans > 0 or missing > 0 or live != fbs_count, for any listed table'
+note: 'deliberately NOT in just health until the D-354 repair lands (a permanently RED gate is its own future tax)'

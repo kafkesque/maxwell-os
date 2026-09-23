@@ -2869,3 +2869,50 @@ the artifact it described. Any session that read "just health 12/12" was reading
 Fix: both checkers plus the new verify_recalibration_pins.py are now wired into just health with || exit 1.
 Lesson (BUG-375 class): a wiring claim must be verified by RUNNING the recipe and reading its output, never by
 the diff that was supposed to contain the edit.
+
+## BUG-394 (HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not a measurement
+
+Measured 2026-09-23 15:14 (read-only on the run DB), the shape is NOT a doubling:
+
+| object | rows | live (joins fbs) | orphaned | missing |
+|---|---|---|---|---|
+| fbs | 7995 (rowids 7997..15991) | - | - | - |
+| vec_fbs | 15990 (rowids 1..15991) | 7995 | 7995 | 0 |
+| vec_fbs_ctx | 7995 | 0 | 7995 | 7995 fbs rows have no ctx vector |
+
+- distinct(rowid) in vec_fbs_rowids = 15990: there is NO collision with a live rowid. The extra 7995 are the
+  PREVIOUS generation's vectors, orphaned when the fbs rows were replaced (their rowids <= 7996 no longer exist).
+- So BUG-387's phrase 'DOUBLED (15990 = 2 x 7995)' was an inference from two counts; the true defect is dead
+  index entries, not duplicate live entries. Severity reframed: retrieval DILUTION (knn_k = max(limit*5,100),
+  or max(limit*15,200) with facets, so limit=20 still fills at 50 percent live) - not the total read blocker
+  BUG-387 implied. The REAL risk is measurement validity: a retrieval number taken on a diluted index is on a
+  different ruler. Existing retrieval research predates the dilution (doc 09-02, benchmark 09-03), so it is clean.
+- vec_fbs_ctx is worse and was NOT previously recorded: ALL 7995 rows are orphans and 0 join live, so any consumer
+  that sets vec_table='vec_fbs_ctx' (pipeline/retrieval_benchmark.py:159, an S1 A/B leg) returns ZERO usable hits
+  and does so SILENTLY, because the hit->fbs join drops every hit. The R26 guard (buglog:1136) covers a DIFFERENT
+  risk (label-poisoned content), not referential death, so the guard does not imply this is safe to use.
+- Attribution is unrecoverable from inside the session (fbs created_at 08-30..09-03, DB mtime 09-23 13:41, no
+  artifact names the writing run) - the BUG-391 class: provenance that cannot be reconstructed.
+
+Fix (owner-gated: the delete is destructive, R-D410/BUG-261): backup first, then in the run DB delete only the
+orphans - 'DELETE FROM vec_fbs WHERE rowid NOT IN (SELECT rowid FROM fbs)' (7995 rows) and the same for vec_fbs_ctx,
+then re-run 'python3 scripts/verify_vec_integrity.py' (new, D-354) and expect exit 0. Do NOT use pipeline/safe_delete.py.
+Then make the stage6 insert rowid-preserving and replace the count-only completeness check with a rowid-level
+assertion, and wire verify_vec_integrity.py into 'just health'.
+
+## BUG-395 (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration
+
+- scripts/verify_boundary_injection.py (65 lines, D-318/D-325) asserts the ruled boundary rules are byte-present in
+  the assembled S4 prompt. Nothing runs it: 'grep -n boundary justfile' = 0 hits, and no recipe or log references it.
+- Ran it 2026-09-23: exit 1, 'baseline prompt 11126 chars | treated 11126 chars (+0)', 'FAIL missing=[default_home:...]'.
+- That is NOT a live regression. D-327 REJECTED the ruled boundary block on measurement, and
+  config/pipeline_config.yaml:313 stage4.boundary_inject_enabled: false (registered with 3 consumers in
+  config/flag_consumer_registry.yaml) means the block is intentionally absent from the run path. The checker has no
+  flag awareness, so it reports a correct configuration as a failure - the BUG-375 class (a check that cannot resolve
+  the state it must check).
+- Second defect: governance/SEQUENCE_STATUS_20260917.md:600 and DECISION-LOG D-325 still present this artifact as
+  'Control artifact ... -> PASS'. It would FAIL today. A stale PASS in a control register is the BUG-393 class.
+- Fix (no owner decision needed; D-327 already ruled): (1) make the script read stage4.boundary_inject_enabled and
+  invert the assertion when False (require the block to be ABSENT - the D-327 state), printing which state it
+  verified; (2) correct the SEQUENCE_STATUS/D-325 claim with an append-only pointer; (3) add it to 'just health' as
+  'python3 scripts/verify_boundary_injection.py || exit 1' so it can never go stale unwatched again.

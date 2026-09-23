@@ -784,3 +784,12 @@ RE-RATIFIED: D-353 - discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10
 SUPERSEDED (pointer only, protected files NOT rewritten): the 0.4741/116 figures in eval_integrity/incumbent_ruler_score/knn_arm/REPRESENTABILITY_SWEEP/R3_HELDOUT_RESULT.
 DANGLING: ANCHOR1 sheet/key are cited by 7 artifacts and do not exist (blocks the R3 held-out run); temp/ consolidation inputs are untracked.
 AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).
+
+### 2026-09-23 15:14 — audit (c): vec-store referential audit (D-354)
+
+- CLOSED-CLASS: BUG-393 (unwired menu checkers) stays fixed: wired set == on-disk set minus one, 8 checks, health exit 0.
+- CORRECTED: SEQUENCE_STATUS line 600 'control artifact verify_boundary_injection.py -> PASS' is STALE; the artifact
+  FAILs today and no recipe runs it (BUG-395). D-327 rejected the block, so the config is right and the checker is wrong.
+- CORRECTED: BUG-387's 'doubled vector store' framing -> BUG-394 dead-index measurement (7995 live + 7995 orphans;
+  vec_fbs_ctx 0 live). See governance/FORENSIC_AUDIT_20260923c.md.
+- NEW: D-354 vec referential-integrity gate (config/vec_integrity.yaml + scripts/verify_vec_integrity.py), RED today.

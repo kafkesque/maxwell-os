@@ -880,3 +880,12 @@ RE-RATIFIED: D-353 - discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10
 SUPERSEDED (pointer only, protected files NOT rewritten): the 0.4741/116 figures in eval_integrity/incumbent_ruler_score/knn_arm/REPRESENTABILITY_SWEEP/R3_HELDOUT_RESULT.
 DANGLING: ANCHOR1 sheet/key are cited by 7 artifacts and do not exist (blocks the R3 held-out run); temp/ consolidation inputs are untracked.
 AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).
+
+## 2026-09-23 — audit (c) addendum (D-354, BUG-394, BUG-395)
+
+- [OWNER-GATED, HIGH] Repair the vec stores: backup, then delete ONLY orphans (7995 in vec_fbs, 7995 in vec_fbs_ctx),
+  re-run scripts/verify_vec_integrity.py to 0 RED, then make the stage6 insert rowid-preserving + rowid-level assertion,
+  then wire the gate into just health. NEVER pipeline/safe_delete.py (BUG-261).
+- [WORK, MED] BUG-395: make verify_boundary_injection.py flag-aware (invert when boundary_inject_enabled is false),
+  correct the stale PASS pointer, and wire it into just health.
+- [STANDING] No new retrieval-quality measurement until the vec repair lands (audit (c)).

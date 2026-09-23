@@ -648,3 +648,16 @@ RE-RATIFIED: D-353 - discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10
 SUPERSEDED (pointer only, protected files NOT rewritten): the 0.4741/116 figures in eval_integrity/incumbent_ruler_score/knn_arm/REPRESENTABILITY_SWEEP/R3_HELDOUT_RESULT.
 DANGLING: ANCHOR1 sheet/key are cited by 7 artifacts and do not exist (blocks the R3 held-out run); temp/ consolidation inputs are untracked.
 AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).
+
+### 2026-09-23 — audit (c) addendum: D-354 + BUG-394/BUG-395 (vec-store referential audit)
+
+- NEW BUG-394 (HIGH, OPEN): vec_fbs_ctx is 100 percent referentially DEAD (7995 rows, 0 live, 7995 orphans).
+- CORRECTION: BUG-387 is not a 'doubling' (see BUG-394). Measured: fbs 7995 (rowids 7997..15991); vec_fbs 15990
+  = 7995 live + 7995 orphans; distinct rowids 15990 (no collision); retrieval effect is dilution, not starvation.
+- NEW gate D-354: config/vec_integrity.yaml + scripts/verify_vec_integrity.py (read-only, exits 1 TODAY).
+  Deliberately NOT in 'just health' until the owner-authorised repair lands (a permanently RED gate is its own tax).
+- NEW BUG-395 (MED, OPEN): scripts/verify_boundary_injection.py is run by NO recipe and exits 1 today because
+  D-327 rejected the boundary block (stage4.boundary_inject_enabled: false) and the checker has no flag awareness.
+  Its 'PASS' in SEQUENCE_STATUS:600 is stale.
+- STANDING RULE from audit (c): no NEW retrieval-quality number until the vec orphans are repaired (a number taken
+  on a diluted index is on a different ruler). Existing retrieval research predates the dilution and is clean.

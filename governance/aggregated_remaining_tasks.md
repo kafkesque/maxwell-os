@@ -933,3 +933,11 @@ DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, 
 - OPEN (F-e4 execution, OWNER): run scripts/repair_vec_integrity.py --apply against the run DB (one command; it makes its own backup, deletes 15990 dead rows, re-measures, fails loud).
 - OPEN (F-e5, work): stage6's in-run vector check is a count ("READY 15990/7995" while half the index was dead) and the D-354 gate stays out of just health until the repair lands.
 - RECORDED (F-e1): my own count harness was subset-scoped (33 ids published where the registry holds 724) - same class as the 'WIRED'-contains-'RED' counter.
+
+## Audit (f) - 2026-09-23 (next 4 steps)
+- DONE (D-360, measured): the owed R2 artifact was produced over the frozen ruler by running the meter to completion - governance/R2_EXTRACTION_TYPE_RULER_20260923.json (150 FBs, 728 label scores, 135 contra, 0 errors, extraction_type scored 150/150). Its menu_hash (d2fc500c) differs from the corpus artifact's (73597ee2), so the two are NOT comparable.
+- OPEN (next executable, no owner gate): the extraction_type CURVE. scripts/r2_gate_measure.py hardcodes its config path, so the honest route is a --config argument (or a second config file) pointing at config/r2_gate_measure_ruler.yaml with r2_artifact = the new ruler artifact and axes += extraction_type (truth_column extraction_type_final), writing NEW dated outputs. Until then extraction_type stays in refused_axes.
+- DONE (D-359, PROPOSED): BUG-387 fixed code-side - the commit loop retires the previous rowid's vector, insert_embedding is idempotent per rowid, and the count check became a rowid-level assertion that RAISES on orphans. Verified by tests/test_vec_rowid_contract.py (5/5 PASS, self-running because pytest skips wherever vec0 cannot load).
+- OPEN (verification for D-359): R5 gemma-4-E4B review of the stage6 diff + a re-commit rehearsal on a SCRATCH copy (orphans stay 0, fbs count stable). Then wire the D-354 gate as control 12 of just health.
+- DONE (BUG-397a): pipeline/student_classifier.py DEFAULT_GOLDEN now points at archive/golden_retired_D2618/stage4_golden_mined.yaml.
+- OPEN (BUG-397b, two-site): dspy_program_path absent in config AND hardcoded as its own fallback in pipeline/pipeline_paths.py:186.

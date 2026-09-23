@@ -3050,3 +3050,41 @@ harness invoke - did not include it. So the drift was invisible to the control t
 control, and the entry above overstates it. The fix is unchanged and now verified twice: the check is control 11 of
 just health (justfile:21) AND still present in healthcheck (justfile:39). Rule: state which recipe the control was in
 before saying no recipe ran it - "wired somewhere" and "wired into the gate that runs" are different claims.
+
+## BUG-387 (HIGH, code-side FIXED 2026-09-23, audit f) - the vector store is keyed by ROWID and only a rowid-level assertion can see it
+Root cause, measured: fbs' primary key is the TEXT fb_id, so "INSERT OR REPLACE INTO fbs" deletes the conflicting row
+and inserts a new one - which RE-ISSUES the implicit rowid. The vec store is keyed by that rowid, so every re-commit
+moved the spine (fbs now 7997..15991, contiguous) while the old vectors stayed (1..7996 = 7995 dead entries, 50% of
+vec_fbs). The in-run check was a COUNT, so a doubled store printed "Vector: READY 15990/7995". Fix (D-359, PROPOSED):
+(a) the commit loop captures the rowid the fb_id held BEFORE the insert and retires that vector in the same
+transaction (fbs_rowid + delete_embedding, fail-loud if the retire fails); (b) insert_embedding deletes its rowid
+first, so the write is idempotent; (c) the count check + the R-017 orphan COUNT were REPLACED by
+assert_vector_integrity(), which joins by rowid and RAISES on orphans (C16) - a missing vector is DEGRADED (the row
+still answers through FTS), an absent vec table is DEGRADED (BUG-104), never a silent pass.
+Regression test: tests/test_vec_rowid_contract.py - 5/5 PASS under /opt/homebrew/bin/python3 (the only interpreter
+that can load vec0). OWED before the fix is trusted: an R5 gemma-4-E4B review of the diff, and a re-commit rehearsal
+on a SCRATCH copy (never the run DB) showing orphans 0 -> 0 and fbs count stable.
+
+## BUG-398 (MED, half-discharged 2026-09-23, audit f) - the owed receipt now exists, but not where it was claimed
+The D-356 entry claimed governance/R2_DEFINITION_NLI_20260923.json; no such file existed. Audit (f) ran the meter to
+COMPLETION over the frozen ruler instead and wrote governance/R2_EXTRACTION_TYPE_RULER_20260923.json (150 FBs, 728
+label scores, 135 contra, 0 inference errors, extraction_type scored on 150/150). The claim in DECISION-LOG is NOT
+retroactively true - the file that was named still does not exist - and the artifact is deliberately named for what
+it is (ruler-scoped). STILL OWED: the ratified extraction_type curve (a gate measurement over this artifact) before
+any operating point may be set on that axis; extraction_type therefore stays in refused_axes.
+
+## BUG-397 (LOW, half-FIXED 2026-09-23, audit f) - two live defaults pointed at retired artifacts
+(a) pipeline/student_classifier.py DEFAULT_GOLDEN now resolves to
+archive/golden_retired_D2618/stage4_golden_mined.yaml (the path 4 sibling scripts already use; the config/ path had
+resolved to nothing). (b) STILL OPEN: config/pipeline_config.yaml services.s2.dspy_program_path is
+data/dspy_mipro_optimized.json (absent) AND pipeline/pipeline_paths.py:186 hardcodes the SAME absent path as its
+fallback, so removing the config key does not fix it (C12: the code default is the second defect). Fix is two-site:
+null the config value and make the loader fail loud when dspy_enabled is set without a program. Latent while
+dspy_enabled: false.
+
+## PROCESS NOTE 2026-09-23 (audit f) - a test that skips everywhere is not a test
+tests/test_vec_rowid_contract.py first reported "5 skipped" under the interpreter that runs pytest, because vec0 needs
+enable_load_extension and the python.org framework build cannot enable it (BUG-104) - while the interpreter that CAN
+load vec0 (/opt/homebrew/bin/python3) has no pytest. A green "skipped" line reads like coverage. The file now carries
+a __main__ runner so the real assertions execute under the interpreter that can run them; it prints its own skip
+reason and never reports a skip as a pass.

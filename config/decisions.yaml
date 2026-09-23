@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 725
+total_decisions: 727
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7777,6 +7777,38 @@ decisions:
     refused_axes until a point is ratified by the lower-CI-bound rule (D-353).
   artifacts: [scripts/definition_nli_verify.py, config/recalibration_pins.yaml]
   related: [D-281, D-284, D-353, BUG-390]
+- id: D-360
+  category: MEASUREMENT
+  status: RESOLVED
+  date: 2026-09-23
+  title: "The owed R2 artifact is produced over the frozen ruler under a provenance stamp that differs from the corpus artifact"
+  decision: >-
+    The D-356 receipt named an artifact that never existed. The meter was therefore run to COMPLETION over the frozen
+    ruler (150 FBs, 728 label scores, 135 contra, 0 inference errors, extraction_type scored 150/150) into
+    governance/R2_EXTRACTION_TYPE_RULER_20260923.json. Provenance is stamped on the artifact: menu_hash d2fc500c...
+    (the v5.5 menu) and r5_hash 7fe8a2d6..., while the corpus artifact governance/r2_definition_nli_20260920_v2.json
+    carries menu_hash 73597ee2.... The two are NOT interchangeable: a score from one may not be compared with a score
+    from the other, and the ruler-scoped curve is valid only within its own artifact. extraction_type stays in
+    refused_axes until the curve (a gate measurement over this artifact) exists.
+  artifacts: [governance/R2_EXTRACTION_TYPE_RULER_20260923.json, governance/FORENSIC_AUDIT_20260923f.md]
+  related: [D-356, BUG-398, D-348, D-337]
+- id: D-359
+  category: ARCHITECTURE
+  status: PROPOSED
+  date: 2026-09-23
+  title: "The vector store is keyed by ROWID: a re-commit retires the previous rowid's vector and completeness is asserted at the rowid level"
+  decision: >-
+    fbs' primary key is the TEXT fb_id, so INSERT OR REPLACE re-issues the implicit rowid; the vec store is keyed by
+    that rowid. Every re-commit therefore moved the spine (fbs 7997..15991) while the old vectors survived (1..7996,
+    7995 dead entries = 50% of vec_fbs), and the in-run completeness check was a COUNT that could not see it. The
+    commit loop now captures the rowid an fb_id held BEFORE the insert and retires that vector in the same
+    transaction (fail-loud if the retire fails), insert_embedding is idempotent per rowid, and the count check is
+    replaced by assert_vector_integrity(): a ROWID-level join that RAISES on orphans (dead index entries silently
+    dilute k-NN) while a missing vector is DEGRADED (that row still answers through FTS) and an absent vec table is
+    DEGRADED (BUG-104). Verification owed before this is trusted: an R5 gemma-4-E4B review of the diff and a
+    re-commit rehearsal on a scratch copy.
+  artifacts: [pipeline/stage6_commit.py, tests/test_vec_rowid_contract.py, governance/FORENSIC_AUDIT_20260923f.md]
+  related: [BUG-387, D-354, D-357, D-2185, BUG-104, D-359]
 - id: D-357
   category: ARCHITECTURE
   status: RESOLVED
@@ -7871,10 +7903,10 @@ decisions:
   decisions: [D-344]
 
 summary:
-  total: 725
+  total: 727
   proposed: 6
   draft: 1
-  active: 495
+  active: 497
   stale: 0
   superseded: 16
   archived: 8
@@ -7887,7 +7919,7 @@ summary:
   by_category:
     ARCH: 27
     ARCH / GOV: 1
-    ARCHITECTURE: 8
+    ARCHITECTURE: 9
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     AUDIT / ONTOLOGY / BUGFIX: 1
@@ -7960,7 +7992,7 @@ summary:
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
     MARKET RESEARCH: 1
-    MEASUREMENT: 6
+    MEASUREMENT: 7
     MEASUREMENT / ANCHOR: 1
     MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1

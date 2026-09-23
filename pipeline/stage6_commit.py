@@ -360,6 +360,74 @@ def _safe_json(val, default=None):
     return val
 
 
+def fbs_rowid(conn: sqlite3.Connection, fb_id: str | None) -> int | None:
+    """Return the stored fbs rowid for an fb_id, or None when it is not there yet.
+
+    BUG-387/D-359: fbs' primary key is the TEXT `fb_id`, so `INSERT OR REPLACE`
+    deletes the conflicting row and inserts a NEW one, which re-issues the
+    implicit rowid. The vec store is keyed by that rowid, so a re-commit moves
+    the spine and leaves the previous rowid's vector behind as a dead index
+    entry. Capturing the rowid BEFORE the insert is what makes that visible.
+    """
+    if not fb_id:
+        return None
+    row = conn.execute("SELECT rowid FROM fbs WHERE fb_id = ?", (str(fb_id),)).fetchone()
+    return int(row[0]) if row else None
+
+
+def delete_embedding(conn: sqlite3.Connection, rowid: int) -> bool:
+    """Delete one rowid's vector from vec_fbs (no-op when the rowid is absent).
+
+    Returns False when the vec0 module is unavailable (BUG-104) or the delete
+    failed — a caller performing a BUG-387 repair must not read False as success
+    (C16). vec0 exposes DELETE by rowid, so this needs no vec0-specific module.
+    """
+    try:
+        conn.execute("DELETE FROM vec_fbs WHERE rowid = ?", (int(rowid),))
+        return True
+    except Exception as e:
+        print(f"  ⚠️  Embedding delete failed (rowid={rowid}): {e}")
+        return False
+
+
+def assert_vector_integrity(conn: sqlite3.Connection) -> tuple[bool, str]:
+    """ROWID-level vector completeness assertion (D2185 R-016/R-017, BUG-387/D-359).
+
+    Returns (ok, message). `ok` is False only for ORPHANS: index entries whose
+    fbs row no longer exists. Those are dead k-NN slots — the index still
+    answers, so retrieval looks fine while results are silently diluted, which
+    is why a COUNT cannot see them (it printed "Vector: READY 15990/7995" on a
+    store where half the entries were dead).
+
+    A MISSING entry (fbs row with no vector) is reported as DEGRADED but is not
+    corruption: that row still answers through FTS. An absent vec table is
+    DEGRADED (sqlite-vec unavailable, BUG-104), never a silent pass.
+    """
+    try:
+        n_fbs = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
+        n_vec = conn.execute("SELECT COUNT(*) FROM vec_fbs").fetchone()[0]
+        orphans = conn.execute(
+            "SELECT COUNT(*) FROM vec_fbs v LEFT JOIN fbs f ON v.rowid = f.rowid "
+            "WHERE f.rowid IS NULL"
+        ).fetchone()[0]
+        missing = conn.execute(
+            "SELECT COUNT(*) FROM fbs f LEFT JOIN vec_fbs v ON v.rowid = f.rowid "
+            "WHERE v.rowid IS NULL"
+        ).fetchone()[0]
+    except Exception as e:
+        return True, f"  ⚠️  Vector: UNMEASURABLE — {e} (sqlite-vec unavailable; FTS fallback)"
+    if orphans:
+        return False, (
+            f"  ❌ Vector: CORRUPT — {orphans} orphaned index entries (dead k-NN slots); "
+            f"live={n_vec - orphans}/{n_fbs}"
+        )
+    if missing:
+        return True, f"  ⚠️  Vector: DEGRADED — {missing} fbs rows carry no vector (FTS fallback)"
+    if n_vec == 0 and n_fbs > 0:
+        return True, "  ⚠️  Vector: DEGRADED — 0 embeddings (sqlite-vec may be unavailable)"
+    return True, f"  ✅ Vector: READY {n_vec}/{n_fbs} (rowid-verified)"
+
+
 def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> bool:
     """BUG-004 FIX: Pre-compute and store embedding for vector search.
 
@@ -721,6 +789,11 @@ def run_stage6(export_only: bool = False):
     if not export_only:
         for i, fb in enumerate(fbs, 1):
             name = fb_name(fb)[:40]
+            # BUG-387/D-359: capture the rowid the fb_id holds BEFORE the insert.
+            # `INSERT OR REPLACE` re-issues a new rowid for an existing fb_id, and
+            # the vec store is keyed by rowid — so the old rowid's vector must be
+            # retired in the same transaction or it survives as a dead k-NN slot.
+            stale_rowid = fbs_rowid(conn, fb.get("fb_id"))
             if insert_fb(conn, fb):
                 inserted += 1
                 commit_status[fb["fb_id"]] = "INSERTED"
@@ -728,6 +801,14 @@ def run_stage6(export_only: bool = False):
                 definition = fb_definition(fb)
                 if definition:
                     rowid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                    if stale_rowid is not None and stale_rowid != rowid:
+                        if not delete_embedding(conn, stale_rowid):
+                            # Fail loud: an unrepaired stale vector is exactly the
+                            # BUG-387 defect, and continuing would hide it.
+                            raise RuntimeError(
+                                f"stage6: could not retire stale vector rowid={stale_rowid} "
+                                f"for {fb.get('fb_id')!r} (BUG-387/D-359)"
+                            )
                     insert_embedding(conn, rowid, definition)
             else:
                 failed += 1
@@ -740,31 +821,18 @@ def run_stage6(export_only: bool = False):
         count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
         print(f"  ✅ SQLite: {inserted} inserted, {failed} failed, {count} total rows")
 
-        # ── D2185: Vector embedding completeness check (R-016) ──
-        vec_count = 0
-        try:
-            vec_count = conn.execute("SELECT COUNT(*) FROM vec_fbs").fetchone()[0]
-        except Exception:
-            pass
-        if vec_count == 0:
-            print("  ⚠️  Vector: DEGRADED — 0 embeddings (sqlite-vec may be unavailable)")
-        elif vec_count < count:
-            pct = round(vec_count / count * 100, 1)
-            print(f"  ⚠️  Vector: DEGRADED {vec_count}/{count} ({pct}%)")
-        else:
-            print(f"  ✅ Vector: READY {vec_count}/{count}")
-
-        # ── D2185: vec_fbs ↔ fbs rowid reconciliation (R-017) ──
-        try:
-            orphaned = conn.execute("""
-                SELECT COUNT(*) FROM vec_fbs v
-                LEFT JOIN fbs f ON v.rowid = f.rowid
-                WHERE f.rowid IS NULL
-            """).fetchone()[0]
-            if orphaned > 0:
-                print(f"  ⚠️  Orphaned vector rows: {orphaned} (run reconcile)")
-        except Exception:
-            pass
+        # ── D2185 R-016/R-017 completeness check, repaired by BUG-387/D-359 ──
+        # A COUNT is not verification. The old check compared counts and printed
+        # "Vector: READY 15990/7995" on a store where 7995 index entries were
+        # already dead. The assertion is ROWID-level and fails LOUD (C16).
+        vec_ok, vec_msg = assert_vector_integrity(conn)
+        print(vec_msg)
+        if not vec_ok:
+            raise RuntimeError(
+                "stage6: the vector store violates its rowid contract — refusing to "
+                "report a successful commit. Run scripts/repair_vec_integrity.py and "
+                "re-verify with scripts/verify_vec_integrity.py (BUG-387/D-354/D-359)."
+            )
 
         # ── D2066: Dynamic taxonomy post-commit (BEFORE conn.close) ──
         try:

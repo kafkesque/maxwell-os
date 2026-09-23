@@ -46,7 +46,7 @@ def main() -> int:
         if present:
             print("FAIL (D-327 state) boundary_inject_enabled=false but " + str(len(present)) + " ruled rules are present: " + str(present))
             return 1
-        print("PASS (D-327 state) boundary_inject_enabled=false; all ruled rules verified ABSENT from the run path; rule sha " + str(sha)[:16])
+        print("PASS (D-327 state) boundary_inject_enabled=false (D-327); all ruled rules verified ABSENT from the run path)
         return 0
     missing: list[str] = []
     for d in cfg.get("default_home") or []:

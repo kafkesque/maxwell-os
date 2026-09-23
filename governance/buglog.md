@@ -3565,3 +3565,21 @@ is not declared anywhere, so a checkpoint cannot be checked against the ontology
 FIX: declare the 4 depth classes (label, description, the soft domain-count band from D2130) in a config
 surface - the same place domains/disciplines live - then repoint the menu check and generate the rubric
 from it. Blocked on nothing but a decision; no behaviour change.
+
+## BUG-417 (HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, and 4 of its entries are download scratch
+
+MEASURED 2026-09-23 with the D-370 resolution-first test, on the hub repo behind the SERVED generator
+(`~/.cache/huggingface/hub/models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit`):
+`snapshots/main` is a REAL directory holding 34 REAL files (not symlinks) - and NONE of them exists in
+`blobs/` (inode test: 0 hardlinks, 0 same-name blobs, including all 4 safetensors shards). `blobs/` holds
+18 entries, 4 of which are `*.incomplete` download scratch, and the repo's OTHER 14 symlinks resolve INTO
+`blobs/`. So the claim in `governance/MODEL_STORE_RECLAIM_A2_CORRECTED_20260923.md` - "`<gen repo>/blobs`
+16.4 GB, internal duplicate of snapshots/main" - is FALSE in both directions: it is not a duplicate of
+snapshots/main, and it is not free space, because a different revision serves through those 14 links.
+Deleting it as a duplicate would have broken whatever those links feed: the THIRD instance of the BUG-414
+class (classify by name, not by resolution) and the SECOND inside the very document written to fix it.
+ACTION (no byte has moved): withdraw that line by append-only correction (R-D410), re-derive the entry by
+resolving all 18 blobs entries and all 14 symlinks, and reclaim only what is BOTH unreferenced AND
+`*.incomplete` (the 4 scratch files, megabytes). LESSON, again: the classifier itself has to be verified -
+a resolution-first method applied to only the OUTER entry (the ~/.omlx/models symlink) still leaves the
+inner store classified by name. Verify the method's own coverage, not just its first level.

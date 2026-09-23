@@ -36,3 +36,15 @@ NO BYTE MOVED. Owner approval still required.
 never rm a store; remove it from the SERVING list, restart, load from the surviving
 store, confirm the model ANSWERS, then reclaim; ~/.omlx/cache is touched last with the
 server stopped; owner decides the two named-vs-phantom items by knowledge, not inference.
+
+## CORRECTION 2026-09-23 (BUG-417), appended, never edited (R-D410)
+
+The candidate line `| <gen repo>/blobs | 16.4 | internal duplicate of snapshots/main; holds 2 .incomplete
+files |` is WITHDRAWN. Measured with the resolution-first test (D-370) on
+`~/.cache/huggingface/hub/models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit`:
+`snapshots/main` is a real directory of 34 real files, NONE of which exists in `blobs/` (0 hardlinks,
+0 same-name entries, including the 4 safetensors); `blobs/` holds 18 entries, 4 of them `*.incomplete`,
+and the repo's 14 other symlinks resolve INTO `blobs/`. So `blobs/` is neither a duplicate nor free.
+RECLAIMABLE AFTER PER-ENTRY RESOLUTION: only entries that are unreferenced AND `*.incomplete`.
+The 16.4 GB headline was therefore ~0 GB of safe reclaim, and the corrected list's total (~81.2 GB) is
+reduced accordingly until each candidate is re-derived at the INNER store, not just the outer symlink.

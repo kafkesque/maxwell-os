@@ -316,7 +316,7 @@ book_library:
 # Read governance/SESSION-HANDOFF-2026-09-19.md FIRST, then CONTEXT_INDEX.md §6e, then
 # governance/ROUNDTABLE_CROSSEXAM_20260919.md.
 current_state:
-    open_bugs_n: 71
+    open_bugs_n: 77
     c15_register: governance/SESSION-HANDOFF-2026-09-23.md
     date: 2026-09-22
     # 2026-09-22 (D-331..D-333): inference-engine bake-off, M1 reality-check, MTP re-scope.

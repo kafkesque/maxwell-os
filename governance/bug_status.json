@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 124,
-  "open_n": 73,
+  "total_ids": 128,
+  "open_n": 77,
   "closed_n": 51,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -371,6 +371,26 @@
     {
       "id": "BUG-378",
       "title": "(LOW-MED \u2014 OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift",
+      "events": 1
+    },
+    {
+      "id": "BUG-379",
+      "title": "",
+      "events": 1
+    },
+    {
+      "id": "BUG-380",
+      "title": "",
+      "events": 1
+    },
+    {
+      "id": "BUG-381",
+      "title": "",
+      "events": 1
+    },
+    {
+      "id": "BUG-382",
+      "title": "",
       "events": 1
     }
   ],

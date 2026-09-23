@@ -119,3 +119,26 @@ index, never from prose (BUG-342 rule). This block was MISSING from the previous
 | 5 | 40 unregistered flags | `REGISTER FLAGS` | same blindspot class as C-1/C-2, warn tier only |
 | 6 | boundary block intent | `BOUNDARY ON` | reverses D-327 -> needs a new decision, not a comment |
 *Generated 2026-09-23 by the session-18 forensic audit (append-only, R-D410).*
+
+
+## Session 22 addendum — 2026-09-23 (forensic audit + owner's 'do your recommendation')
+
+**Findings (all re-derived from the generators, never hand-counted — BUG-342):**
+- **BUG-326 repair is NOT APPLICABLE** and always was: `governance/BUG326_REPAIR_SCOPING_20260921.md` (2026-09-21) closed it
+  because 403/147/703 DO NOT REPRODUCE (757 'non-canonical' are all the legitimate catch-all `emerging`; 0 alias-map hits;
+  65 mixed-axis; 0 domain-less). The handoff/register/gate list still carried 'BUG-326 GO' → an assistant recommendation
+  (mine, prior turn) was based on a stale row. Fixed: BUG-380, gate withdrawn.
+- **BUG-381 (NEW, HIGH, OPEN)**: terminal-store vintage mismatch. `maxwell.db` (mtime 09-19T21:47) says PASS 3299 /
+  QUARANTINE 4696, while the S5 t11 run (09-22) computed PASS 5023 / QUARANTINE 2972 over the same 7995 rows. The
+  committed store does not carry the verdicts of the run the status report shows. **Owner gate.**
+- **BUG-379 (NEW, FIXED)**: D-327's A/B receipt existed only as root scratch (`ab_off.json`/`ab_on.json`). Filed as
+  `governance/evidence/D327_BOUNDARY_AB_20260921/`; class rule minted as **D-342**.
+- **BUG-382 (NEW, OPEN)**: registry dotted paths break on dotted model names (3rd instance of the BUG-375 class).
+- `probe_output/` + `handoff/` filed to `archive/root_filing_20260923/` (docstring-only refs, verified before moving).
+- Authority markers written for `stage4_merge/t11` and `stage5_verify/t11` (BUG-378(b) resolved at the instance level).
+
+**Minted:** D-341 (S5 t11 cited from the frozen pair + mandatory qualifier; live path is never a citation surface) and
+D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registry now **710 decisions, in sync**.
+**New control:** `scripts/verify_evidence_manifests.py` (+`config/evidence_manifest.yaml`) — 9th fail-loud health check.
+**Flags:** 44 registered under D-339; deferred residue + owner calls in `governance/FLAG_HYGIENE_TASKS_20260923.md`.
+**Not run:** R3 held-out (preflight green, 58/58) — the run is staged; command below. S5 REVERIFY not run (not blocking).

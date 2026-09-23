@@ -600,3 +600,18 @@ pair) · BUG-326 (author + R5 review, then apply — **only after the freeze**, 
 preflight passes 58/58) · laya (GO, C22 opt-in) · REGISTER FLAGS (proposal ready) · BUG-378 (which S4 image is
 authoritative). Open bugs: 73 OPEN / 51 CLOSED of 124 (`governance/bug_status.md`); C15 register in
 `governance/SESSION-HANDOFF-2026-09-23.md`.
+
+
+## 2026-09-23 (session 22) — audit + freeze/evidence/citation controls
+
+| superseded claim | now |
+|---|---|
+| "BUG-326 repair (403/147/703)" is a live owner gate | **NOT APPLICABLE** — does not reproduce; closed 2026-09-21; gate withdrawn (BUG-380) |
+| "S6 commit is the one-word-away terminal step" | the store holds a **different vintage** than the run (BUG-381): PASS 3299/QUAR 4696 (db) vs 5023/2972 (S5 09-22) |
+| D-327's measurement = a config note | **frozen receipt** `governance/evidence/D327_BOUNDARY_AB_20260921/` (30/30 vs 0/30) — D-342 |
+| S5 t11 verdicts citable from the live path | **D-341**: cite `FROZEN-S5-T11-20260922` + qualifier; the live path is not a citation surface |
+
+**Binding now:** D-341 (frozen-pair citation), D-342 (measurement receipts), D-340 (input mutation notices),
+D-338/D-339 (no state claim without a receipt; flag registry). **Health = 9 fail-loud checks** (adds
+`verify_evidence_manifests.py`). **Open owner gates:** see `governance/FLAG_HYGIENE_TASKS_20260923.md`, BUG-381, BUG-382,
+S5 REVERIFY (optional), R3 GO (staged), laya (recommended DEFER), disk chore.

@@ -119,6 +119,9 @@ def run(quiet: bool = False) -> int:
         if dead:
             red.append(f"{entry['config']}::{dotted} declares consumer(s) that never read it: {dead}")
             continue
+        if consumers and entry.get("exempt_reason"):
+            red.append(f"{entry['config']}::{dotted} has an exempt_reason AND {len(consumers)} consumer(s) - "
+                       "STALE EXEMPTION (the flag is consumed, so the exemption is a lie; D-339/BUG-375 class)")
         if not consumers and not entry.get("exempt_reason"):
             red.append(f"{entry['config']}::{dotted} has no consumers and no exempt_reason")
             continue

@@ -482,6 +482,16 @@ bakeoff:
 # it means the live path can be ABSENT with the bytes preserved under .stale. Never "restore" it to
 # the live path to make a reader happy: that re-arms the silent stale resume. Cite the .stale file.
 eval:
+  # D-341 (owner-approved 2026-09-23): the S5 t11 verdict set is cited from the FROZEN pair only.
+  # The live knowledge-pipeline path is mutable (it WAS mutated 2026-09-22T12:52, C-3/BUG-376) and is
+  # therefore never a citation surface. Alternative (not run, not blocking): S5 REVERIFY as a 2nd vintage.
+  s5_t11_citation:
+    mode: frozen_pair_cite
+    manifest: governance/FROZEN_S5_T11_20260922.json
+    owner_approval: "2026-09-23"
+    qualifier_required: true
+    live_path_is_not_a_citation_surface: true
+    verify: scripts/verify_frozen_pair.py
   # frozen stage pairs (C-3): cited by manifest, verified by scripts/verify_frozen_pair.py
   frozen_manifests:
     - governance/FROZEN_S5_T11_20260922.json

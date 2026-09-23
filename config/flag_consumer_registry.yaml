@@ -1,38 +1,353 @@
+# config/flag_consumer_registry.yaml - D-339 decisions -> config STATE link (44 entries, 2026-09-23).
 schema_version: '1'
-# D-339: the decisions -> config STATE link. scripts/audit_flag_consumers.py is RED when a
-# config value disagrees with what the cited decision requires, or when a flag that is ON has
-# no consumer that reads it. Add an entry for every flag you intend to keep.
 flags:
-  - config: config/pipeline_config.yaml
-    path: stage4.boundary_inject_enabled
-    required: false
-    decisions: [D-327]
-    consumers: [pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py, pipeline/stamp.py]
-    note: >-
-      D-327 rejected the boundary block on measurement (emitted 42/60 vs 47/60, error 0.8333 vs
-      0.8000, oov 18 vs 13) and ruled the flag back to FALSE. It was last touched by commit
-      81b813f (S5 fingerprint work) - an unrelated commit carrying a stale value. Reported by
-      the 2026-09-23 audit as C-2; the flip is an OWNER GATE because the S4 prompt changes.
-
-  - config: config/boundary_discriminators.yaml
-    path: enabled
-    required: true
-    decisions: [D-325, D-318]
-    consumers: [pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py]
-    note: the ruled rule FILE is loaded and byte-compared in the run path.
-
-  - config: config/f11_llm_coder.yaml
-    path: enabled
-    required: true
-    decisions: [D-335, D-337]
-    consumers: [scripts/f11_llm_coder.py, scripts/consolidate_anchor_ruler.py]
-    note: the coder harness must be explicitly enabled; sovereignty opt-in (C22).
-
-  - config: config/verify_abstention.yaml
-    path: enabled
-    required: false
-    decisions: [D-328, D-338]
-    consumers: []
-    exempt_reason: >-
-      approved in principle, NOT activated (D-338): consumers: [] is deliberate and the empty
-      consumer list is the explicit statement that this flag enforces nothing today.
+- config: config/pipeline_config.yaml
+  path: stage4.boundary_inject_enabled
+  required: false
+  decisions:
+  - D-327
+  consumers:
+  - pipeline/pipeline_paths.py
+  - pipeline/stage4_merged_call.py
+  - pipeline/stamp.py
+  note: D-327 rejected the boundary block on measurement (emitted 42/60 vs 47/60, error 0.8333 vs 0.8000, oov 18 vs 13) and ruled the flag back to FALSE. It was last touched by commit 81b813f (S5 fingerprint work) - an unrelated commit carrying a stale value. Reported by the 2026-09-23 audit as C-2; the flip is an OWNER GATE because the S4 prompt changes.
+- config: config/boundary_discriminators.yaml
+  path: enabled
+  required: true
+  decisions:
+  - D-325
+  - D-318
+  consumers:
+  - pipeline/pipeline_paths.py
+  - pipeline/stage4_merged_call.py
+  note: the ruled rule FILE is loaded and byte-compared in the run path.
+- config: config/f11_llm_coder.yaml
+  path: enabled
+  required: true
+  decisions:
+  - D-335
+  - D-337
+  consumers:
+  - scripts/f11_llm_coder.py
+  - scripts/consolidate_anchor_ruler.py
+  note: the coder harness must be explicitly enabled; sovereignty opt-in (C22).
+- config: config/verify_abstention.yaml
+  path: enabled
+  required: false
+  decisions:
+  - D-328
+  - D-338
+  consumers: []
+  exempt_reason: 'approved in principle, NOT activated (D-338): consumers: [] is deliberate and the empty consumer list is the explicit statement that this flag enforces nothing today.'
+- config: config/bakeoff_laya.yaml
+  path: enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: universal_apply.mtp_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: universal_apply.dflash_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: universal_apply.qwen35_ane_prefill_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: universal_apply.vlm_mtp_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: models.Qwen3-Coder-30B-A3B-Instruct-MLX-4bit.apply.guided_grammar_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: models.gpt-oss-20b-MXFP4-Q8.apply.guided_grammar_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: models.gpt-oss-20b-MXFP4-Q8.apply.specprefill_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: models.Phi-4-mini-instruct-8bit.apply.guided_grammar_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/omlx_m1_best_config.yaml
+  path: models.gemma-4-E4B-it-MLX-4bit.apply.guided_grammar_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: services.omlx.mtp_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: services.omlx.circuit_breaker_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage1_5.embed_checkpoint_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage1_3.enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage2.golden_inject_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage2.golden_single_source_inject_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage2.split_probe_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage2.gate_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage2.singleton_prefilter_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.merged_call_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.batch_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.depth_batch_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.depth_frugal_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.student_preclassifier_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.grammar_decoding_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4.golden_inject_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: s2.dspy_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: s2.gate.enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage5.factscore_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage6.okf_export_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4_5.enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4_5.procedural_skill_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: stage4_5.edge_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: rerank.enabled
+  required: true
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: ranking.quality_score_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: contextual_embed.enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: hyde.enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/pipeline_config.yaml
+  path: e2e.corpus_aware_pass_rate.enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
+  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+- config: config/version.yaml
+  path: version_gate_enabled
+  required: true
+  decisions:
+  - D-339
+  consumers:
+  - pipeline/runner.py
+  note: 'registered 2026-09-23 (D-339): version-gate flag read by pipeline/runner.py; required = value observed at registration, so a flip must cite a decision (D-338).'

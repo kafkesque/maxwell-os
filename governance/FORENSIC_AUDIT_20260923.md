@@ -107,3 +107,11 @@ process + checkpoint inspection). No LLM judged anything; no artifact was writte
    `checkpoint_enriched_kindsafe.jsonl` sibling, stale `__pycache__`, five `.stale_*` fingerprint siblings).
 6. **`just health` now runs 8 checks**, all fail-loud: guard_stacks, status, integrity --quick,
    audit_flag_consumers, verify_anchor_manifest, verify_declared_inputs, verify_frozen_pair, r3_preflight.
+
+
+## Session 22 addendum — audit after the owner's 'do your recommendation'
+F-1 stale gate row (BUG-326 NOT APPLICABLE) → BUG-380 FIXED. F-2 measurement receipt was scratch → BUG-379 FIXED, D-342.
+F-3 store vintage ≠ run vintage → BUG-381 OPEN (HIGH). F-4 two enriched S4 candidates, no authority marker → markers
+written (BUG-378(b)). F-5 40 unregistered flags → 44 registered, residue + owner calls documented; audit now also REDs a
+STALE EXEMPTION. F-6 registry path grammar breaks on dotted model names → BUG-382. F-7 all controls green: integrity
+10/10, 9 health checks, decisions in sync (710), tree clean, `pipeline/` untouched (no production code modified).

@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "ruling": "D-327",
+  "filed_on": "2026-09-23",
+  "artifact_id": "D327-BOUNDARY-AB-20260921",
+  "why": "D-327 rejected stage4.boundary_inject_enabled on measurement. Until 2026-09-23 the only machine-readable receipt for that measurement was two untracked-looking JSON files at repo root; a routine scratch cleanup would have destroyed the evidence for a live flag (BUG-379).",
+  "measurement_table": {
+    "boundary_off": {
+      "valid_json": 30,
+      "n": 30,
+      "valid_rate": 1.0,
+      "avg_latency_s": 21.1
+    },
+    "boundary_on": {
+      "valid_json": 0,
+      "n": 30,
+      "valid_rate": 0.0,
+      "avg_latency_s": 63.5,
+      "failure": "RuntimeError: OMLX call failed after 2 attempts: 'content missing from message (reasoning-mode\u2026'"
+    }
+  },
+  "interpretation": "boundary ON: 0/30 valid JSON and 3.0x latency, with a server-side reasoning-mode failure; boundary OFF: 30/30 valid. Not a judgement call \u2014 a hard measurement, and the reason the flag must stay false.",
+  "receipts": [
+    {
+      "file": "ab_off.json",
+      "sha256": "d5637bbed7671407046a3f9b506531afbaa21e81828d8bd26f249bb17af5ca61",
+      "bytes": 4206,
+      "role": "A/B measurement payload for D-327",
+      "summary": {
+        "n": 30,
+        "valid_json": 30,
+        "valid_rate": 1.0,
+        "avg_latency_s": 21.1
+      }
+    },
+    {
+      "file": "ab_on.json",
+      "sha256": "44d1fd6b09714436d71715a8a789c13a62d056f1cdfba8ac3982b2c8504eec12",
+      "bytes": 6939,
+      "role": "A/B measurement payload for D-327",
+      "summary": {
+        "n": 30,
+        "valid_json": 0,
+        "valid_rate": 0.0,
+        "avg_latency_s": 63.5
+      }
+    }
+  ],
+  "verify": "python3 scripts/verify_evidence_manifests.py"
+}

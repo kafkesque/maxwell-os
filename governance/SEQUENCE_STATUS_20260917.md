@@ -737,3 +737,9 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
   laya (GO), REGISTER FLAGS (proposal ready), F-11 unchanged (REDEFINED, D-337).
 * **Open bugs:** 73 OPEN / 51 CLOSED of 124 (see
   `governance/SESSION-HANDOFF-2026-09-23.md`).
+
+
+## Session 22 addendum (2026-09-23)
+D-341 + D-342 minted; evidence receipts + authority markers + 9th health check live; BUG-379/380 FIXED, BUG-381 (HIGH)
++ BUG-382 OPEN. Gate list corrected: **BUG-326 GO withdrawn (not applicable)**. Remaining: BUG-381 vintage call, flags
+hygiene, S5 REVERIFY (optional), R3 GO (staged), laya (DEFER), disk. Open bugs: see governance/bug_status.json.

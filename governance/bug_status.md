@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**73 open** / 51 closed of 124 ids.
+**77 open** / 51 closed of 128 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -80,3 +80,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-376 | (HIGH — OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone | 2 |
 | BUG-377 | (LOW-MED — OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled | 1 |
 | BUG-378 | (LOW-MED — OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift | 1 |
+| BUG-379 |  | 1 |
+| BUG-380 |  | 1 |
+| BUG-381 |  | 1 |
+| BUG-382 |  | 1 |

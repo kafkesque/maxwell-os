@@ -11,6 +11,7 @@ health:
     python3 scripts/verify_anchor_manifest.py || exit 1
     python3 scripts/verify_declared_inputs.py || exit 1
     python3 scripts/verify_frozen_pair.py || exit 1
+    python3 scripts/verify_evidence_manifests.py || exit 1
     python3 scripts/r3_preflight.py || exit 1
 
 healthcheck: health

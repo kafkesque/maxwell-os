@@ -826,3 +826,11 @@ python3 pipeline/stage6_commit.py
   (`governance/FLAG_REGISTRATION_PROPOSAL_20260923.md`); (6) BUG-378(b) — declare which S4 image is authoritative.
 * **Terminal value:** S6 commit of the stage-5 output — one word away via the frozen pair.
 * **Capacity:** disk 97%, 27 GiB free (archive/ = 11 GB). Never free space with `safe_delete.py` (BUG-261: it copies).
+
+
+## 2026-09-23 (session 22) sync
+CLOSED: BUG-379 (D-327 receipt filed + D-342 class rule), BUG-380 (stale BUG-326 gate withdrawn), BUG-378(b) instance
+(authority markers). MINTS: D-341, D-342 → 710 decisions in sync. OPEN: **BUG-381** (store vintage vs run vintage — HIGH),
+BUG-382 (path grammar), flag-hygiene owner calls, S5 REVERIFY (optional), R3 GO (staged, 10 min), laya (DEFER), disk.
+CAPACITY: 29 GiB free; freeze 191 MB; ~1 GB of `.stale_*` checkpoints + backup dirs under stage4/stage5 t11 are the
+largest safe reclaim candidates (owner-only; never `pipeline/safe_delete.py`, BUG-261).

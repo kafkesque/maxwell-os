@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 708
+total_decisions: 710
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7679,8 +7679,43 @@ decisions:
     only when such a notice covers it, so an exception is authored by the WRITER, never hand-edited into config.
     Frozen pairs (governance/FROZEN_S5_T11_20260922.json, scripts/verify_frozen_pair.py) are the citation form:
     a result cites a byte-stable frozen manifest, never a mutable knowledge-pipeline path.
+- id: D-341
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-23'
+  title: S5 t11 verdicts are cited from the frozen pair and its qualifier, never from the live path
+  detail: >-
+    Owner-approved 2026-09-23. The 7995-row S5 t11 verdict set (PASS 5023 / QUARANTINE 2972) is cited from
+    FROZEN-S5-T11-20260922 and must carry its two qualifier lines verbatim. The live
+    knowledge-pipeline path is NOT a citation surface: it was mutated in place 65 minutes after the run
+    (C-3/BUG-376), so a path-based citation silently re-points at a different image. The frozen S4 copy is
+    the LATER image (0ca6f0f0...); the verdicts were computed against the vanished 2f8b34fb... image. Same
+    7995-row corpus, not byte-identical - the qualifier is what keeps that honest.
+  verification: >-
+    Receipt (D-338 discipline): config/eval_integrity.yaml eval.s5_t11_citation written 2026-09-23, file
+    sha256 b26763d4bc42e7e7 -> de8d70db48a8414a. Verified by scripts/verify_frozen_pair.py in just health
+    (4 files, 0 RED). Alternative S5 REVERIFY (~1.3 h) remains available as a SECOND vintage; it is not
+    blocking and does not restore the original image.
+
+- id: D-342
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-23'
+  title: A measurement-backed ruling must cite a frozen receipt artifact, not scratch (root cause of BUG-379)
+  detail: >-
+    A ruling that rests on a measurement is only as durable as its receipt. D-327 rejected the S4 boundary
+    block on measurement (30/30 valid JSON off vs 0/30 on, 21.1s vs 63.5s avg latency), yet the only
+    machine-readable receipt was two untracked-looking JSON files at repo root; any routine scratch cleanup
+    would have destroyed the evidence for a LIVE flag. Rule: every measurement-backed ruling cites
+    governance/evidence/<ruling-id>/EVIDENCE_MANIFEST.json, and a receipt that exists only as scratch is a
+    standing RED.
+  verification: >-
+    Implemented 2026-09-23: governance/evidence/D327_BOUNDARY_AB_20260921/ (2 payloads + manifest + README),
+    verified by scripts/verify_evidence_manifests.py (config/evidence_manifest.yaml, C12) wired into just
+    health. Exit 1 on missing payload, hash drift, size drift, or an unlisted file in an evidence dir.
+
 summary:
-  total: 708
+  total: 710
   proposed: 6
   draft: 1
   active: 483
@@ -7689,7 +7724,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 141
+  resolved: 143
   planned: 8
   ratified: 5
   open: 17
@@ -7739,7 +7774,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 8
+    GOVERNANCE: 10
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1

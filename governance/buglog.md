@@ -2744,3 +2744,32 @@ subdir inside the pipeline dir.
 (c) `scripts/__pycache__/` holds .pyc for scripts that were renamed/archived (C19: no __pycache__ in the repo).
 (d) FIVE `.input_fingerprint.json.stale_*` siblings sit next to the live S5 fingerprint. Harmless to machines (the
 reader takes the exact name) but they invite a human to cite a stale reference.
+
+
+## BUG-379
+
+- **severity**: MED
+- **status**: FIXED
+- **logged**: 2026-09-23
+- **detail**: A measurement-backed ruling's receipt existed only as untracked scratch. D-327 rests on an A/B measurement (boundary OFF 30/30 valid JSON @21.1s vs ON 0/30 @63.5s with a server-side reasoning-mode failure), but the only machine-readable receipt was ab_off.json/ab_on.json at repo root - misread as scratch by two audits, one cleanup away from destroying the evidence for a LIVE flag. FIXED 2026-09-23: filed as governance/evidence/D327_BOUNDARY_AB_20260921/ (payload + EVIDENCE_MANIFEST.json + README) and made a class rule by D-342; scripts/verify_evidence_manifests.py is in just health.
+
+## BUG-380
+
+- **severity**: MED
+- **status**: FIXED
+- **logged**: 2026-09-23
+- **detail**: Register drift: governance/BUG326_REPAIR_SCOPING_20260921.md closed the BUG-326 repair as NOT APPLICABLE on 2026-09-21 (403 raw->canonical / 147 both-axes / 703 no-domain DO NOT REPRODUCE: 757 'non-canonical' are all the legitimate catch-all 'emerging', 0 alias-map hits, 65 mixed-axis, 0 domain-less), yet the session handoff, the task register and the gate list still carried 'BUG-326 GO' as an open owner gate - so the assistant recommended authoring a repair script for a target that cannot be re-derived. FIXED 2026-09-23 by re-reading the scoping doc and correcting the gate list (BUG-342 class: quote the generator, never carry a stale count).
+
+## BUG-381
+
+- **severity**: HIGH
+- **status**: OPEN
+- **logged**: 2026-09-23
+- **detail**: Terminal-store vintage mismatch: knowledge pipeline/maxwell.db (mtime 2026-09-19T21:47) reports PASS 3299 / QUARANTINE 4696 of 7995 FBs, while the S5 t11 run of 2026-09-22 produced PASS 5023 / QUARANTINE 2972 over the same 7995 rows. The committed store therefore does NOT carry the verdicts of the run that the pipeline status reports. Source of each number quoted: pipeline/status.py (DB) vs the S5 checkpoint verdict counts (frozen manifest). Owner gate: which vintage is the committed truth - stage6 re-commit of the 2026-09-22 verdicts against the frozen pair, or accept the 09-19 vintage as the store of record.
+
+## BUG-382
+
+- **severity**: MED
+- **status**: OPEN
+- **logged**: 2026-09-23
+- **detail**: Third instance of the BUG-375 class (a check that cannot resolve the names it must check). The flag registry uses DOTTED paths, but model names contain dots (`models.Qwen3.8-27B-MLX-4bit.apply.guided_grammar_enabled`), so scripts/audit_flag_consumers.py resolves a path that does not exist and reports `path MISSING (registry/artifact mismatch)` for flags that are present in the artifact. Effect: 4 legitimate flags cannot be registered at all until the path grammar is quoted/fixed. Fix (queued): resolve the path segment-wise against the parsed document, or store the path as a YAML list of segments.

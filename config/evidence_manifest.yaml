@@ -1,0 +1,14 @@
+# config/evidence_manifest.yaml — D-342 (measurement-backed rulings must cite a frozen receipt).
+# scripts/verify_evidence_manifests.py re-hashes every file listed in every EVIDENCE_MANIFEST.json
+# under these roots. A missing or drifted receipt file is RED (exit 1): a ruling may not rest on a
+# receipt that can silently change or disappear (that is exactly how D-327's A/B evidence almost
+# became untracked scratch, BUG-379(a)).
+schema_version: "1.0"
+roots:
+  - governance/evidence
+manifest_name: EVIDENCE_MANIFEST.json
+# Files inside an evidence dir that are not payload receipts do not need to be listed.
+ignore_names:
+  - EVIDENCE_MANIFEST.json
+  - README.md
+  - .DS_Store

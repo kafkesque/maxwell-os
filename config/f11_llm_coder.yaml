@@ -120,6 +120,7 @@ decision_sheet:
 anchor_review:
   ruler_sheet: governance/RULER_BLIND_SHEET_20260917.csv
   decision_sheet: governance/F11_DECISION_SHEET_20260922.csv
+  ruling_map: governance/F11_OWNER_RULING_MAP_20260922.csv
   columns:
     content_type: CT (1-7)
     discipline: DISC (1-62)

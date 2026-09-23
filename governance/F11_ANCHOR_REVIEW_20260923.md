@@ -1,6 +1,6 @@
 # F-11 ANCHOR REVIEW SHEET — every absent or contested ruler label, all three axes
 
-Built 2026-09-23T09:54:41 · 108 rows · all three axes in one file (a review that stopped at one axis would leave the rest unaudited)
+Built 2026-09-23T09:59:49 · 108 rows · all three axes in one file (a review that stopped at one axis would leave the rest unaudited)
 
 Blank (never labelled by a human): {'BLANK:discipline': 28, 'BLANK:extraction_type': 5}
 Divergent (both coder families agree AGAINST the human): {'DIVERGE:extraction_type': 49, 'DIVERGE:content_type': 28, 'DIVERGE:discipline': 43}
@@ -13,32 +13,34 @@ Divergent (both coder families agree AGAINST the human): {'DIVERGE:extraction_ty
 - `D4` DECIDE
 - `E5` DEFINITION
 - `F6` APPLICATION
-- `G7` human_ct
-- `H8` claude_ct
-- `I9` kimi_ct
-- `J10` ct_agree
-- `K11` ct_consensus
-- `L12` human_disc
-- `M13` claude_disc
-- `N14` kimi_disc
-- `O15` disc_agree
-- `P16` disc_consensus
-- `Q17` human_form
-- `R18` claude_form
-- `S19` kimi_form
-- `T20` form_agree
-- `U21` form_consensus
-- `V22` menu_check
-- `W23` >>> FILL ONLY THE COLUMNS AFTER THIS ONE <<<
-- `X24` owner_ct
-- `Y25` owner_disc
-- `Z26` owner_form
-- `[27` owner_keep_missing
-- `\28` owner_notes
+- `G7` ruled_ct_20260922
+- `H8` ruled_disc_20260922
+- `I9` human_ct
+- `J10` claude_ct
+- `K11` kimi_ct
+- `L12` ct_agree
+- `M13` ct_consensus
+- `N14` human_disc
+- `O15` claude_disc
+- `P16` kimi_disc
+- `Q17` disc_agree
+- `R18` disc_consensus
+- `S19` human_form
+- `T20` claude_form
+- `U21` kimi_form
+- `V22` form_agree
+- `W23` form_consensus
+- `X24` menu_check
+- `Y25` >>> FILL ONLY THE COLUMNS AFTER THIS ONE <<<
+- `Z26` owner_ct
+- `[27` owner_disc
+- `\28` owner_form
+- `]29` owner_keep_missing
+- `^30` owner_notes
 
 ## What you do
 
-1. Fill **only** `owner_ct`, `owner_disc`, `owner_form`, `owner_keep_missing`, `owner_notes` — column `W23` is a blank fence column, and it exists so an empty column can never again be mistaken for free space (BUG-368).
+1. Fill **only** `owner_ct`, `owner_disc`, `owner_form`, `owner_keep_missing`, `owner_notes` — column `Y25` is a blank fence column, and it exists so an empty column can never again be mistaken for free space (BUG-368).
 2. Each `owner_ct` / `owner_disc` / `owner_form`: exactly one value from the matching closed menu, typed verbatim. Leave a cell EMPTY to mean 'the human label stands as written' (blank stays blank, a divergence stays a divergence) - or fill it to override. An empty cell is a decision, not an omission.
 3. `owner_keep_missing = yes` marks a row whose blank you judge genuinely unlabelable: it stays declared-missing and will NEVER be imputed (set it only where the coders also disagree).
 4. `owner_notes`: free text, any language — the *why* (contract, provenance, ambiguity, near-neighbour).
@@ -49,6 +51,7 @@ Divergent (both coder families agree AGAINST the human): {'DIVERGE:extraction_ty
 * `why` names the family per axis, e.g. `BLANK:discipline | DIVERGE:content_type`.
 * `coders_agree=YES` on a `DIVERGE` axis means both families independently produced that value — a candidate RULER defect, not coder noise. `NO` means there is nothing to inherit.
 * confidences are inline as `label (0.50)`; read them as a relative signal only (Kimi is systematically more confident: mean 0.81 vs 0.59 on CT).
+* `ruled_ct_20260922` / `ruled_disc_20260922` — YOUR OWN earlier rulings, carried over read-only from the 22-Sep decision sheet (M13, parsed to owner_cont/owner_disc). Empty = you did not rule that axis. These are context, NOT decisions: they are deliberately NOT pre-filled into the owner_* columns, whose empty state means 'the ruler label stands as written'. Restate a value in owner_* to make it binding.
 * `menu_check=OK` means every coder value resolves against the closed menu. Out-of-menu coder cells in this build: 0
 
 ## Closed menu — content_type (8 values, type verbatim)

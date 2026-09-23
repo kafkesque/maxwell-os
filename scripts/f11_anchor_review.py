@@ -123,6 +123,10 @@ def build() -> tuple[list[str], list[list[str]], dict[str, Any]]:
     menus = {ax: _menu(sec) for ax, sec in MENU_SECTION.items()}
     ruler = _read_indexed(PROJECT_ROOT / rc["ruler_sheet"])
     sheet = _read_indexed(PROJECT_ROOT / rc["decision_sheet"])
+    # The owner's OWN earlier rulings (the CT/DISC he wrote into the 22-Sep decision sheet, parsed to
+    # owner_cont/owner_disc). Shown READ-ONLY as context so nothing he already decided is invisible here -
+    # but never pre-filled into the owner_* fill columns, whose empty state means "the ruler label stands".
+    rulings = _read_indexed(PROJECT_ROOT / rc["ruling_map"]) if rc.get("ruling_map") else {}
     coders = {c["tag"]: _read_coder(PROJECT_ROOT / c["path"], aliases) for c in rc["coders"]}
     tags = list(coders)
     if len(tags) < 2:
@@ -149,7 +153,8 @@ def build() -> tuple[list[str], list[list[str]], dict[str, Any]]:
         if flags:
             per_item[iid] = {"flags": flags, "cells": cells}
 
-    header = ["item_id", "name", "why", "DECIDE", "DEFINITION", "APPLICATION"]
+    header = ["item_id", "name", "why", "DECIDE", "DEFINITION", "APPLICATION",
+              "ruled_ct_20260922", "ruled_disc_20260922"]
     for axis in MENU_SECTION:
         short = {"content_type": "ct", "discipline": "disc", "extraction_type": "form"}[axis]
         header += [f"human_{short}", f"{tags[0]}_{short}", f"{tags[1]}_{short}",
@@ -171,7 +176,11 @@ def build() -> tuple[list[str], list[list[str]], dict[str, Any]]:
         out: list[str] = [iid, sheet.get(iid, {}).get("name", ruler[iid].get("name", "")),
                           " | ".join(per_item[iid]["flags"]), sheet.get(iid, {}).get("DECIDE", ""),
                           (sheet.get(iid, {}).get("DEFINITION", "") or "")[:TRUNC],
-                          (sheet.get(iid, {}).get("APPLICATION", "") or "")[:TRUNC]]
+                          (sheet.get(iid, {}).get("APPLICATION", "") or "")[:TRUNC],
+                          _display(_canon(rulings.get(iid, {}).get("owner_cont", ""), aliases),
+                                   menus["content_type"][1]),
+                          _display(_canon(rulings.get(iid, {}).get("owner_disc", ""), aliases),
+                                   menus["discipline"][1])]
         for axis in MENU_SECTION:
             c = cells[axis]
             for t in tags:
@@ -252,6 +261,10 @@ def _legend(header: list[str], stats: dict[str, Any]) -> str:
         "a candidate RULER defect, not coder noise. `NO` means there is nothing to inherit.",
         "* confidences are inline as `label (0.50)`; read them as a relative signal only (Kimi is systematically "
         "more confident: mean 0.81 vs 0.59 on CT).",
+        "* `ruled_ct_20260922` / `ruled_disc_20260922` — YOUR OWN earlier rulings, carried over read-only from "
+        "the 22-Sep decision sheet (M13, parsed to owner_cont/owner_disc). Empty = you did not rule that axis. "
+        "These are context, NOT decisions: they are deliberately NOT pre-filled into the owner_* columns, whose "
+        "empty state means 'the ruler label stands as written'. Restate a value in owner_* to make it binding.",
         f"* `menu_check=OK` means every coder value resolves against the closed menu. Out-of-menu coder cells in "
         f"this build: {stats['n_out_of_menu_cells']}"
         + (f" → {stats['out_of_menu']}" if stats["n_out_of_menu_cells"] else ""),

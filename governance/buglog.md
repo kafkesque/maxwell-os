@@ -3088,3 +3088,10 @@ enable_load_extension and the python.org framework build cannot enable it (BUG-1
 load vec0 (/opt/homebrew/bin/python3) has no pytest. A green "skipped" line reads like coverage. The file now carries
 a __main__ runner so the real assertions execute under the interpreter that can run them; it prints its own skip
 reason and never reports a skip as a pass.
+
+## BUG-397(a) correction (audit f, same day) - the repoint did NOT land in the first attempt
+The entry above records BUG-397(a) as FIXED. It was not, at the moment that line was written: the patch script in that
+attempt died with "SyntaxError: unterminated string literal" (a heredoc escaping defect of mine) and the commit that
+followed carried no change to pipeline/student_classifier.py. The repoint landed in the follow-up commit. Rule
+restated (same class as F-e3): a receipt is a claim about the artifact as it exists at the moment the claim is
+written - verify the write, then write the claim.

@@ -42,7 +42,10 @@ MIN_EXAMPLES_PER_CLASS: int = 5
 MAX_LENGTH: int = 320
 
 DEFAULT_CHECKPOINT: str = "knowledge pipeline/classifier_modernbert_p5final"
-DEFAULT_GOLDEN: str = "config/golden/stage4_golden_mined.yaml"
+# BUG-397/D-361: the golden was retired to archive/ by D-2618, so this default
+# resolved to NOTHING. The archived path is the convention the sibling training
+# scripts already use (train_discipline_classifier.py:51, train_depth_classifier.py:69).
+DEFAULT_GOLDEN: str = "archive/golden_retired_D2618/stage4_golden_mined.yaml"
 DEFAULT_THRESHOLD: float = 0.35
 DEFAULT_COARSE_THRESHOLD: float = 0.70  # D2607 (B): measured 90%-precision coarse point
 DOMAIN_SIGMOID_THRESHOLD: float = 0.5

@@ -2916,3 +2916,15 @@ assertion, and wire verify_vec_integrity.py into 'just health'.
   invert the assertion when False (require the block to be ABSENT - the D-327 state), printing which state it
   verified; (2) correct the SEQUENCE_STATUS/D-325 claim with an append-only pointer; (3) add it to 'just health' as
   'python3 scripts/verify_boundary_injection.py || exit 1' so it can never go stale unwatched again.
+
+## BUG-396 (MED, FIXED by revert) - the BUG-395 repair attempt left 'just health' RED, and my own run harness let it commit
+
+- Attempted the BUG-395 fix (flag-aware boundary control + wire into health) in commits b393dd6/ea6ca77. The edit
+- introduced three successive defects (comprehension continuation, _ROOT vs ROOT, a sha reference used before its
+- assignment), and each time the checker failed the COMMIT STILL LANDED, so health was RED for two commits.
+- Root cause is the harness, not the script: the shell chain used ';' between the check and the 'git commit', so a
+- failing gate could not stop the commit. Lesson (BUG-393 class): a gate that is not chained with && is decoration.
+- Fixed by reverting scripts/verify_boundary_injection.py and justfile to d25fceb. Health is green again with 8 verify
+- checks. BUG-395 is RE-OPENED as work, and the standalone repair must now be done in this order: (1) edit the script,
+- (2) run it standalone and require exit 0, (3) ONLY THEN wire it to health, (4) chain every step with && so a RED
+- check aborts the commit.

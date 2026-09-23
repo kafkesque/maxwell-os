@@ -56,3 +56,10 @@ again, third instance (BUG-382). Owner call: none — it is a checker fix (path 
 verified is exactly the C-1 pattern (a claimed control that does not exist). Owner call, per flag: **wire it** (name the
 file that reads it) or **turn it off**.
 - `config/omlx_m1_best_config.yaml::models.Qwen3.8-27B-MLX-4bit.apply.guided_grammar_enabled`
+
+## G. Final deferred set (2026-09-23, one owner call each)
+
+Cause A = path grammar (BUG-382, checker fix, no owner call). Cause B = ON with no verifiable reader
+(the C-1 pattern: a claimed control that may not exist) — **wire it** (name the reading file) or **turn it off**.
+
+

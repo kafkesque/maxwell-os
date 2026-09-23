@@ -1,8 +1,9 @@
-# F-11 DISC REVIEW SHEET — how to fill it
+# F-11 ANCHOR REVIEW SHEET — every absent or contested ruler label, all three axes
 
-Built 2026-09-23T09:47:00 · BLANK_ABSTENTION 28 rows · CONSENSUS_DIVERGENCE 43 rows
+Built 2026-09-23T09:54:41 · 108 rows · all three axes in one file (a review that stopped at one axis would leave the rest unaudited)
 
-On the 28 rows no human ever labelled, the two independent coder families agree on only 18 of them — so on the other 10 there is NO consensus to inherit. You are the only adjudicator for those.
+Blank (never labelled by a human): {'BLANK:discipline': 28, 'BLANK:extraction_type': 5}
+Divergent (both coder families agree AGAINST the human): {'DIVERGE:extraction_type': 49, 'DIVERGE:content_type': 28, 'DIVERGE:discipline': 43}
 
 ## Columns (letters as in the CSV)
 
@@ -10,38 +11,60 @@ On the 28 rows no human ever labelled, the two independent coder families agree 
 - `B2` name
 - `C3` why
 - `D4` DECIDE
-- `E5` human_disc_now
-- `F6` claude_disc
-- `G7` claude_conf
-- `H8` kimi_disc
-- `I9` kimi_conf
-- `J10` coders_agree
-- `K11` menu_check
-- `L12` coders_consensus
-- `M13` DEFINITION
-- `N14` APPLICATION
-- `O15` >>> FILL ONLY THE 3 COLUMNS AFTER THIS ONE <<<
-- `P16` owner_disc_final
-- `Q17` owner_keep_missing
-- `R18` owner_notes
+- `E5` DEFINITION
+- `F6` APPLICATION
+- `G7` human_ct
+- `H8` claude_ct
+- `I9` kimi_ct
+- `J10` ct_agree
+- `K11` ct_consensus
+- `L12` human_disc
+- `M13` claude_disc
+- `N14` kimi_disc
+- `O15` disc_agree
+- `P16` disc_consensus
+- `Q17` human_form
+- `R18` claude_form
+- `S19` kimi_form
+- `T20` form_agree
+- `U21` form_consensus
+- `V22` menu_check
+- `W23` >>> FILL ONLY THE COLUMNS AFTER THIS ONE <<<
+- `X24` owner_ct
+- `Y25` owner_disc
+- `Z26` owner_form
+- `[27` owner_keep_missing
+- `\28` owner_notes
 
 ## What you do
 
-1. Fill **only** `owner_disc_final`, `owner_keep_missing`, `owner_notes` — column `O15` is a blank fence column, and it exists so an empty column can never again be mistaken for free space (BUG-368).
-2. `owner_disc_final`: exactly one value from the closed menu below, typed verbatim, **or** leave it empty and set `owner_keep_missing = yes` if you judge the row genuinely unlabelable. The two are mutually exclusive: a filled cell with `keep_missing = yes` is a contradiction and will be rejected.
-3. `owner_notes`: free text, any language — the *why* (contract, provenance, ambiguity, near-neighbour).
-4. Nothing else: do not rename, reorder, delete or add columns or rows. Do not edit A–N.
+1. Fill **only** `owner_ct`, `owner_disc`, `owner_form`, `owner_keep_missing`, `owner_notes` — column `W23` is a blank fence column, and it exists so an empty column can never again be mistaken for free space (BUG-368).
+2. Each `owner_ct` / `owner_disc` / `owner_form`: exactly one value from the matching closed menu, typed verbatim. Leave a cell EMPTY to mean 'the human label stands as written' (blank stays blank, a divergence stays a divergence) - or fill it to override. An empty cell is a decision, not an omission.
+3. `owner_keep_missing = yes` marks a row whose blank you judge genuinely unlabelable: it stays declared-missing and will NEVER be imputed (set it only where the coders also disagree).
+4. `owner_notes`: free text, any language — the *why* (contract, provenance, ambiguity, near-neighbour).
+5. Nothing else: do not rename, reorder, delete or add columns or rows. Do not edit A–U.
 
 ## Reading the columns
 
-* `why=BLANK_ABSTENTION` — no human discipline label ever existed for this row (BUG-363).
-* `why=CONSENSUS_DIVERGENCE` — you labelled it, both coder families agreed on something else.
-* `coders_agree=YES` — both families independently produced the same value (`coders_consensus`).
-* `coders_agree=NO` — they disagree; `coders_consensus` is empty, and there is nothing to inherit.
-* `menu_check=OK` means every coder value resolves against the closed menu. Out-of-menu cells in this build: 0
-* `claude_conf` / `kimi_conf` — the coder's own confidence, read as a relative signal only (Kimi is systematically more confident: mean 0.81 vs 0.59 on CT).
+* `why` names the family per axis, e.g. `BLANK:discipline | DIVERGE:content_type`.
+* `coders_agree=YES` on a `DIVERGE` axis means both families independently produced that value — a candidate RULER defect, not coder noise. `NO` means there is nothing to inherit.
+* confidences are inline as `label (0.50)`; read them as a relative signal only (Kimi is systematically more confident: mean 0.81 vs 0.59 on CT).
+* `menu_check=OK` means every coder value resolves against the closed menu. Out-of-menu coder cells in this build: 0
 
-## Closed menu — disciplines (62 values, type verbatim)
+## Closed menu — content_type (8 values, type verbatim)
+
+### ungrouped
+
+- `growth_edge` — 
+- `noise_drop` — 
+- `none` — 
+- `principle` — 
+- `process_instance` — 
+- `process_template` — 
+- `quarantine` — 
+- `tool_instruction` — 
+
+## Closed menu — discipline (62 values, type verbatim)
 
 ### 
 
@@ -135,6 +158,15 @@ On the 28 rows no human ever labelled, the two independent coder families agree 
 - `systems thinking` — An approach to understanding complex systems by analyzing their interrelationships and holistic behavior.
 - `theoretical physics` — The branch of physics focused on mathematical models and abstract theories of natural phenomena.
 
+## Closed menu — extraction_type (4 values, type verbatim)
+
+### ungrouped
+
+- `causal_mechanism` — 
+- `descriptive_model` — 
+- `empirical_pattern` — 
+- `normative_heuristic` — 
+
 ## Provenance of the inputs read (R14)
 
 - `governance/RULER_BLIND_SHEET_20260917.csv` sha256 `383231921fffda2c…`
@@ -145,4 +177,4 @@ On the 28 rows no human ever labelled, the two independent coder families agree 
 
 ## What happens next
 
-You return the file. The anchor is then consolidated in ONE explicit, append-only step: your value wins where you ruled, `owner_keep_missing=yes` stays declared-missing (never imputed), and the ruler sheet is not rewritten — the consolidation lands as a new artifact with its own stamp, and the tier stays `llm-attested`/human-mixed until a genuinely independent human coder exists (F-11 stays open).
+You return the file. The anchor is then consolidated in ONE explicit, append-only step: your value wins where you ruled, an empty cell leaves the human label as written, `owner_keep_missing=yes` stays declared-missing (never imputed), and the ruler sheet itself is NOT rewritten — the consolidation lands as a new artifact with its own stamp. Tier stays human-mixed + `llm-attested`: this still cannot unfreeze F-11 or any eval floor. Only a genuinely independent second HUMAN coder can.

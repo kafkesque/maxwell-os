@@ -63,3 +63,28 @@ Cause A = path grammar (BUG-382, checker fix, no owner call). Cause B = ON with 
 (the C-1 pattern: a claimed control that may not exist) — **wire it** (name the reading file) or **turn it off**.
 
 
+
+## H. Deferred (unregistered) — one owner call each
+
+These flags are ON and the audit could NOT verify a reader. Registering them would assert a control that may not
+exist (D-338), so they stay WARN. Owner call per flag: **wire it** (name the file that reads it) or **turn it off**.
+
+- `config/omlx_m1_best_config.yaml::models.gpt-oss-20b-MXFP4-Q8.apply.guided_grammar_enabled`
+- `config/pipeline_config.yaml::stage4.depth_batch_enabled`
+- `config/pipeline_config.yaml::stage4_5.edge_enabled`
+- `config/omlx_m1_best_config.yaml::models.gemma-4-E4B-it-MLX-4bit.apply.guided_grammar_enabled`
+- `config/pipeline_config.yaml::stage1_3.enabled`
+- `config/pipeline_config.yaml::stage1_5.embed_checkpoint_enabled`
+- `config/pipeline_config.yaml::stage6.okf_export_enabled`
+- `config/pipeline_config.yaml::stage4.merged_call_enabled`
+- `config/pipeline_config.yaml::stage4.golden_inject_enabled`
+- `config/pipeline_config.yaml::services.omlx.circuit_breaker_enabled`
+- `config/pipeline_config.yaml::stage2.golden_single_source_inject_enabled`
+- `config/pipeline_config.yaml::stage2.golden_inject_enabled`
+- `config/pipeline_config.yaml::stage2.gate_enabled`
+- `config/pipeline_config.yaml::services.omlx.mtp_enabled`
+- `config/pipeline_config.yaml::stage4_5.procedural_skill_enabled`
+- `config/omlx_m1_best_config.yaml::models.Qwen3-Coder-30B-A3B-Instruct-MLX-4bit.apply.guided_grammar_enabled`
+- `config/omlx_m1_best_config.yaml::models.Phi-4-mini-instruct-8bit.apply.guided_grammar_enabled`
+- `config/pipeline_config.yaml::stage2.split_probe_enabled`
+- `config/pipeline_config.yaml::stage2.singleton_prefilter_enabled`

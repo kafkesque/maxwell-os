@@ -816,3 +816,13 @@ python3 pipeline/stage6_commit.py
 # Hybrid gate: DISABLED for T1.1 (BUG-085 A/B: 4.3% negative rejection — net-negative)
 # ISOR: 3-dimension independence in every verified FB
 ```
+
+## 2026-09-23 sync (sessions 18-20)
+* **CLOSED:** C-1 (D-338), F-1 (R030/R063 owner spelling), C-2/BUG-374 (D-327 flip applied), BUG-375, C15 register gap.
+* **OPEN / OWNER GATES, in order:** (1) C-3/BUG-376 — `S5 REVERIFY` or cite `FROZEN-S5-T11-20260922`; (2) author
+  `scripts/repair_bug326.py` **with mutation notices** (freeze first — it rewrites S4 rows in place), R5-review, apply;
+  (3) `R3 GO` (preflight passes 58/58; ANCHOR-3 is the cited authority; relative-ranking only per D-337);
+  (4) `laya benchmark GO` (C22 opt-in); (5) `REGISTER FLAGS` — 40 unregistered, 10 consumed / 30 with NO consumer
+  (`governance/FLAG_REGISTRATION_PROPOSAL_20260923.md`); (6) BUG-378(b) — declare which S4 image is authoritative.
+* **Terminal value:** S6 commit of the stage-5 output — one word away via the frozen pair.
+* **Capacity:** disk 97%, 27 GiB free (archive/ = 11 GB). Never free space with `safe_delete.py` (BUG-261: it copies).

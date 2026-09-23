@@ -564,3 +564,39 @@ the authority pin proved to carry a one-character typo (BUG-345, invisible to 16
 `scripts/pin_audit.py` byte-compares every declared pin (standalone control). A second scorer
 (`scripts/score_ruler_labels.py`) is retired (BUG-346) and the R5 verifier now demands quoted evidence (BUG-333).
 Quotable pins: authority `0ec321a7…`, workspace/annotation `38323192…`, key `d4cb4595…`, stage5 survivor `2c206a25…`.
+
+## 2026-09-23 (sessions 18-20) — C-1/C-2/C-3, ANCHOR-3, D-338/339/340: READ THIS BEFORE CITING ANY RUN
+**Supersessions (do not quote the older claim):**
+
+| older claim (still visible in this file / older reports) | superseded by |
+|---|---|
+| D-328: abstention ENABLED at p25 | **D-338**: approved IN PRINCIPLE, NOT ACTIVATED (`config/verify_abstention.yaml` = `status: gated`, `enabled: false`, `consumers: []`). D-328 was an unimplemented state assertion. |
+| BUG-341: "the LIVE stage5 checkpoint is ABSENT" | **C-3/BUG-376**: the live checkpoint is PRESENT and COMPLETE (7995 = 5023 PASS + 2972 QUARANTINE), but its declared S4 input was rewritten 65 min AFTER the run and the verified image is gone. |
+| ANCHOR sha256 `3911eece4555a2da…` | **ANCHOR-3 = `29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698`**, manifest `governance/ANCHOR_MANIFEST_20260923.json`. |
+| D-327 "flip recorded as done 2026-09-21" | the flip had NEVER landed; applied 2026-09-23 (`stage4.boundary_inject_enabled: false`). |
+
+**New binding rules (each has a machine check, not just prose):**
+* **D-338** — a decision may assert INTENT and name the artifact, never implementation state. An enable/flip ruling
+  needs an **implementation receipt** (config sha before/after, consumer, run fingerprint).
+* **D-339** — a flag with no declared consumer, or whose state contradicts its cited decision, is a standing RED
+  (`scripts/audit_flag_consumers.py` + `config/flag_consumer_registry.yaml`).
+* **D-340** — a **declared stage input is immutable**; an in-place writer must publish a mutation notice at the moment
+  of the change (`scripts/input_mutation_notice.py`), consumed by `scripts/verify_declared_inputs.py`.
+* **BUG-342 rule** — never re-derive a governance count by hand; quote the generator (a hand derivation gave 75 vs the
+  parser's 72 and was discarded).
+
+**Frozen/citable artifacts (cite these, never a bare mutable path):**
+* `ANCHOR-3` — manifest above; **RELATIVE-ONLY** (D-337): arm ranking/deltas, **no absolute error floor** (D-329/D-331).
+* `FROZEN-S5-T11-20260922` — `governance/FROZEN_S5_T11_20260922.json` + `frozen/S5_t11_20260922/` (payload, 191 MB,
+  gitignored). Any citation must carry: *"verdicts computed against the S4 image of 2026-09-22T11:26 (`2f8b34fb…`,
+  no longer exists); frozen S4 copy is the LATER `0ca6f0f0…` image — same 7995-row corpus, not byte-identical"*.
+
+**`just health` now runs 8 fail-loud checks:** guard_stacks, status, integrity --quick, audit_flag_consumers,
+verify_anchor_manifest, verify_declared_inputs, verify_frozen_pair, r3_preflight. A RED here means a governance claim
+and reality disagree — do not "fix" the check.
+
+**HUMAN GATE REGISTER (current):** unchanged F-11 (REDEFINED, D-337) · **C-3/BUG-376** (S5 REVERIFY or cite the frozen
+pair) · BUG-326 (author + R5 review, then apply — **only after the freeze**, it rewrites S4 rows in place) · R3 (GO;
+preflight passes 58/58) · laya (GO, C22 opt-in) · REGISTER FLAGS (proposal ready) · BUG-378 (which S4 image is
+authoritative). Open bugs: 73 OPEN / 51 CLOSED of 124 (`governance/bug_status.md`); C15 register in
+`governance/SESSION-HANDOFF-2026-09-23.md`.

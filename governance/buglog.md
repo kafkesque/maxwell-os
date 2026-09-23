@@ -3042,3 +3042,11 @@ D-319..D-356 block of config/decisions.yaml. The registry actually holds 724 ent
 duplicate-D-356 repair was correct; the COUNT I published was scoped to a subset and stated as the whole. Same
 class as the 'WIRED'-contains-'RED' counter: a harness defect dressed as a finding. Rule: a governance count is
 published only from a parsed load of the whole file, never from a line-anchored regex.
+## BUG-399 correction (audit e, same day) - the detector ran in the `healthcheck` recipe, not in `health`
+
+Measured after the fix: justfile:39 (recipe healthcheck) ALREADY ran scripts/recompute_decision_summary.py --check with a
+clear error message. What ran nowhere is the recipe that matters: `just health` - the one the boot sequence and the run
+harness invoke - did not include it. So the drift was invisible to the control the project actually runs, not to every
+control, and the entry above overstates it. The fix is unchanged and now verified twice: the check is control 11 of
+just health (justfile:21) AND still present in healthcheck (justfile:39). Rule: state which recipe the control was in
+before saying no recipe ran it - "wired somewhere" and "wired into the gate that runs" are different claims.

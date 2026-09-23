@@ -1,4 +1,4 @@
-# config/flag_consumer_registry.yaml - D-339 decisions -> config STATE link (44 entries, 2026-09-23).
+# config/flag_consumer_registry.yaml - D-339 decisions -> config STATE link (2026-09-23).
 schema_version: '1'
 flags:
 - config: config/pipeline_config.yaml
@@ -308,9 +308,9 @@ flags:
   required: true
   decisions:
   - D-339
-  consumers: []
-  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).
-  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+  consumers:
+  - pipeline/retrieval_benchmark.py
+  note: 'registered 2026-09-23 (D-339): rerank flag read by the retrieval benchmark; a flip must cite a decision (D-338).'
 - config: config/pipeline_config.yaml
   path: ranking.quality_score_enabled
   required: false

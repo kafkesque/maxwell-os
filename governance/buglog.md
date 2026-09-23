@@ -3253,3 +3253,60 @@ the pipeline output directories out of sync first (a selective-sync exclusion of
 subdirs` is not possible per-subfolder in Dropbox, so the practical form is: move the repo out, OR accept that the
 sync stays and record the risk as an accepted, dated decision). Both are owner calls. The forbidden option is to
 leave it implicit.
+
+## BUG-403 (HIGH, OPEN) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED
+
+`pipeline/pipeline_paths.py:230` reads `S4_DEPTH_MODEL=str(_CFG.get("stage4", {}).get("depth_model", "gemma-4-E4B-it-MLX-4bit"))`.
+Two defects in one line. (a) C12: that string is a HARDCODED CODE DEFAULT - exactly the class D-364 was
+ratified to remove on the DSPy key (site 2 of BUG-397(b)); the fix landed on one key and this one was left
+armed. (b) The default names gemma-4-E4B, whose S4 depth route is REFUTED on measurement (D2454: 62.5% vs
+gpt-oss 75%, gate >=90%; the frugal speedup is 0.9x - governance/CROSS-LLM-AUDIT-VERDICT-2026-08-15.md:63).
+It is DORMANT but ARMED: `pipeline/stage4_merge.py:2008` instantiates `S4_DEPTH_MODEL` the moment
+`stage4.depth_frugal_enabled` flips true (`depth_model = S4_DEPTH_MODEL if S4_DEPTH_FRUGAL_ENABLED else VERIFY_MODEL`),
+so ONE flag flip resurrects a refuted routing with no gate in front of it - the D-327/BUG-374 class (a ruled
+rejection whose flip never landed). Measured today: `just health` reports `depth_frugal_enabled off`, so
+nothing is misclassified right now. NOT fixed (a code change to a config default is its own reviewed act).
+Fix shape: mirror D-364 - make the config key explicitly null and have the consumer REFUSE when the flag is
+true and the path is unset, instead of resurrecting a literal.
+
+## BUG-404 (MED, FIXED 2026-09-23) - archive/index.yaml was an index with no writer, no checker, and a REJECTED authority
+
+`archive/index.yaml` declared `authority: D2226`. `config/decisions.yaml` holds D2226 in state **REJECTED**.
+The file was generated 2026-08-10 against an OUT-OF-REPO `archive_root` (`claude projects/archived/maxwell os`,
+verified present, 35 entries) and never regenerated, so the IN-REPO `archive/` - 17.3 GB and 34 top-level
+entries, including 11 GB of sweep payload and 5.3 GB of session scratch - was entirely unindexed; only two
+sections (governance_archive, code_archive) had been hand-appended. Finally, a grep for `archive/index.yaml`
+across the repo returns NO consumer: an index nothing reads and nothing regenerates is an Emission-class
+artifact that drifts silently (BUG-342's class). FIXED: `config/archive_index.yaml` (the contract) +
+`scripts/build_archive_index.py` (writer and `--check` checker, atomic, deterministic body hash) + a
+regenerated `archive/index.yaml` whose authority is D-365. Measured after the fix: 34 entries, 17.3 GB,
+dispositions {keep 5, keep_append_only 21, external_move_candidate 5, purge_candidate 3}, `--check` exit 0.
+
+## BUG-405 (MED, OPEN) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403
+
+`config/flag_consumer_registry.yaml` records `stage4.depth_frugal_enabled` with `consumers: []` and the note
+"no consumer the audit can verify; it enforces nothing today". That is FALSE by grep: `pipeline/stage4_merge.py:2008`
+reads it to choose between `S4_DEPTH_MODEL` and `VERIFY_MODEL`. A registry entry that denies an existing
+consumer is the BUG-375 class (a proposal naming a consumer that does not read the artifact, inverted), and
+here it is load-bearing: an empty consumer list is precisely what would have kept BUG-403 invisible in every
+flag audit. NOT fixed (the registry is a hand-curated governance artifact; the entry needs a corrected
+consumer + a decision id, not a silent edit).
+
+## BUG-406 (HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/
+
+`governance/folder_protocol.md` sets "Temp | Delete | 7 days". Following the protocol, `temp/` was swept:
+414 entries older than 7 days -> `archive/temp_archive_20260923/` (archive-first, not delete, because the
+entries include date-stamped LLM cross-examination transcripts and are evidence under R-D410). THEN the
+guard grep ran, and it found that **35 of the moved entries are DECLARED INPUTS of live scripts**, including:
+- `temp/golden_source_map.json` - the `SOURCE_MAP` read by `scripts/propagate_p5_final.py:40` AND
+  `scripts/propagate_content_type_decisions.py:44` (a pipeline relay input, not scratch)
+- `temp/golden_labels_probabilistic.jsonl` (scripts/audit_false_convergence.py:24)
+- `temp/p5_ct758_flags.csv` + `temp/p5_fewshot_manifest.json` (scripts/build_boundary_corpus.py:31-32)
+- `temp/ct818_oa_joined_partial.json` (scripts/content_type_sweep_rank.py:31)
+- `temp/forensic_audit_local_llms.json` (scripts/run_forensic_audit_parallel.py:21)
+ALL 35 RESTORED to `temp/` in the same session; `archive/temp_archive_20260923/MANIFEST.tsv` pruned from
+412 to 377 rows; verified 0 declared names remain moved. Class: a process that MOVES bytes a consumer
+declares, with no check that the consumer can still resolve its input - the same class as BUG-401 (an
+instruction that could not execute), F-f1 (a test that skips everywhere) and BUG-359. Fix (applied):
+`protected_paths` in config/archive_index.yaml names every declared temp/ path, and the rule is now that a
+sweep MUST be preceded by the declared-input grep, never by age alone.

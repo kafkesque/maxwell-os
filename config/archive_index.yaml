@@ -1,0 +1,161 @@
+# config/archive_index.yaml — the archive index contract (D-365)
+# =============================================================================
+# WHY: archive/index.yaml declared `authority: D2226`, and D2226 sits in state
+# REJECTED in config/decisions.yaml. It was generated 2026-08-10 against an
+# OUT-OF-REPO archive_root and never regenerated, so the in-repo archive/
+# (16 GB, 36 top-level entries) was unindexed, and NO reader anywhere consumes
+# the file. Derived data with no writer and no checker is BUG-342's class, not a
+# document. This file configures the writer (scripts/build_archive_index.py) and
+# its check.
+#
+# C12: every path, section rule, vocabulary word and reason lives here — none in
+#      the script. C6: the writer is atomic. C16: a declared input that is
+#      missing refuses; it does not silently produce an empty section.
+# R-D410: an archive entry is REGISTERED, never rewritten or removed by this
+#      script. It reads bytes and writes an index; it never touches archive/.
+# =============================================================================
+schema_version: "1.0"
+decision: D-365
+
+# The archive this index governs: inside the repo, covered by .gitignore line 64.
+local_archive: archive
+output: archive/index.yaml
+
+# Verified 2026-09-23: the out-of-repo archive the OLD index described. It exists
+# (35 top-level entries) but is Dropbox-replicated, not a named volume, and no
+# repo operation moves bytes into or out of it. Reported, never operated on.
+external_archive_root:
+  path: /Users/barn/Library/CloudStorage/Dropbox/claude projects/archived/maxwell os
+  generated_by: 'index.yaml generation 2026-08-10T09:25:13.827454 (pre-tiered, D2226 REJECTED)'
+  operated_on_by_this_repo: false
+
+# Ordered rules; FIRST match wins. A disposition is a claim about what may be done
+# to the entry, not something this script does.
+rules:
+  - match: '^bak_sweep_'
+    category: sweep
+    disposition: external_move_candidate
+    authority: BUG-401
+    reason: bulk-sweep payload; the external-drive gate could not execute (no volume mounted)
+  - match: '^session_'
+    category: session_scratch
+    disposition: external_move_candidate
+    authority: BUG-401
+    reason: per-session scratch; large, not evidence-bearing beyond the session it names
+  - match: '^temp_archive_'
+    category: temp_overflow
+    disposition: keep
+    authority: folder_protocol
+    reason: protocol temp disposition is archive-first, not delete (R-D410); purging is owner-gated
+  - match: '^db_backups$'
+    category: restore_point
+    disposition: keep_append_only
+    authority: D-361
+    reason: pre-repair restore point; the vec repair receipt names this state
+  - match: '^governance_pre_tiered_'
+    category: governance_history
+    disposition: keep_append_only
+    authority: R-D410
+    reason: pre-tiered append-only governance history; the reference source for thin tiered entries
+  - match: '^golden_retired_'
+    category: retired_training_set
+    disposition: keep_append_only
+    authority: D2618
+    reason: retired silver pool; the live default path, never move it
+  - match: '^root_filing_'
+    category: root_filing
+    disposition: keep
+    authority: folder_protocol
+    reason: root one-in-one-out filings kept as evidence of the filing
+  - match: '^housekeeping_'
+    category: pycache
+    disposition: purge_candidate
+    authority: C19
+    reason: regenerable bytecode; the only entry class with no evidence value
+  - match: '\.archived-\d{4}-\d{2}-\d{2}$'
+    category: dead_code
+    disposition: keep_append_only
+    authority: C19
+    reason: C19 dead code keeps its bytes under archive/<name>.py.archived-<date>
+  - match: '\.(bak_|pre_|pre369$|prewrite|archived-)'
+    category: declared_suffix
+    disposition: keep_append_only
+    authority: R-D410
+    reason: superseded generation of a live artifact; the superseded bytes stay visible
+  - match: '^maxwell_os_v1$'
+    category: empty_placeholder
+    disposition: purge_candidate
+    authority: folder_protocol
+    reason: empty directory; carries no bytes and no evidence
+  - match: '^\.DS_Store$'
+    category: os_metadata
+    disposition: purge_candidate
+    authority: hygiene
+    reason: macOS Finder metadata; regenerable, never evidence
+
+default:
+  category: unclassified
+  disposition: keep
+  authority: null
+  reason: no rule matched — classify it in config/archive_index.yaml before any removal
+
+# Vocabulary this index is allowed to emit (D-355: assert the state you are in).
+dispositions:
+  keep: bytes stay, no action contemplated
+  keep_append_only: bytes stay and are evidence; never edited, never removed (R-D410)
+  external_move_candidate: bytes may leave the repo once a real external volume exists (BUG-401)
+  purge_candidate: regenerable or metadata; safe to delete, but deletion is owner-gated
+
+# BUG-406: a sweep of temp/ moved 35 DECLARED INPUTS of live scripts out of temp/,
+# including temp/golden_source_map.json (the SOURCE_MAP of the propagate_p5_final /
+# propagate_content_type_decisions relay). A path listed here may NEVER be swept: a
+# consumer declares it, and a consumer that cannot resolve its input is a silent input
+# removal, which is the BUG-401/F-f1 class. Extend this list by re-running the declared-
+# input grep, never from memory.
+protected_paths:
+  - temp/LLM_LABELS_R2_ALL150.jsonl
+  - temp/_build_form.py
+  - temp/ab_test_s2_vs_s4.py
+  - temp/ab_test_s2_vs_s4_result.json
+  - temp/alias_review_qwen38.jsonl
+  - temp/audit_form_2026-08-22.md
+  - temp/chatgpt0020.md
+  - temp/claude
+  - temp/ct818_oa_joined_partial.json
+  - temp/depth_audit_results.json
+  - temp/depth_audit_summary.py
+  - temp/evidence_mismatch_quarantine.jsonl
+  - temp/forensic_audit_local_llms.json
+  - temp/golden_labels_probabilistic.jsonl
+  - temp/golden_labels_probabilistic.jsonl.
+  - temp/golden_source_map.json
+  - temp/golden_source_map_clean.json
+  - temp/kimi3
+  - temp/label_vote.jsonl
+  - temp/label_vote_high_suspicion.jsonl
+  - temp/market_research
+  - temp/market_research_depth.py
+  - temp/market_research_depth2.py
+  - temp/p4_corrections_manifest.json
+  - temp/p5_adjudication_master.jsonl
+  - temp/p5_ct758_flags.csv
+  - temp/p5_ct_resweep_descriptive.json
+  - temp/p5_ct_retriage_result.json
+  - temp/p5_fewshot_manifest.json
+  - temp/p5_human_adjudication.jsonl
+  - temp/p5_phase1_human_adjudication.jsonl
+  - temp/p5_review_pack.jsonl
+  - temp/promotion_classify_qwen38.jsonl
+  - temp/qwen38_classifier_market_research.py
+  - temp/qwen38_golden_strat.py
+  - temp/s4_depth_batch_variant_ab_results.json
+  - temp/s4_depth_prompt_ab_report.md
+  - temp/s4_depth_prompt_ab_results.json
+  - temp/severe_evidence_quarantine.jsonl
+  - temp/stage1_5_intent_v6_1.py
+  - temp/test_matryoshka_nli_results.json
+  - temp/trackb_full.jsonl.
+  - temp/trackb_full_20260905.jsonl
+  - temp/trackb_slim.jsonl
+  - temp/train_classifier.log
+  - temp/vote.jsonl

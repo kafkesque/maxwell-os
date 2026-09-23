@@ -25,12 +25,29 @@ import yaml  # noqa: E402
 from pipeline.pipeline_paths import PROJECT_ROOT, S4_BOUNDARY_PATH  # noqa: E402
 
 
+def _inject_enabled() -> bool:
+    """Return stage4.boundary_inject_enabled (D-327). Missing key -> True (fail-closed)."""
+    cfg = yaml.safe_load((ROOT / "config" / "pipeline_config.yaml").read_text())
+    v = (cfg.get("stage4") or {}).get("boundary_inject_enabled")
+    return True if v is None else bool(v)
+
+
 def main() -> int:
     """Run the injection control and return a process exit code."""
     rules_path = ROOT / S4_BOUNDARY_PATH
     cfg = yaml.safe_load(rules_path.read_text(encoding="utf-8")) or {}
     from pipeline.stage4_merged_call import system_prompt
     treated, baseline = system_prompt(True), system_prompt(False)
+    # D-327/BUG-395: the ruled block is REJECTED on measurement, so when the flag is false the block must be
+    # ABSENT. Asserting presence unconditionally made this control report a correct config as a failure.
+    if not _inject_enabled():
+        present = ["default_home:" + str(d["group"]) for d in (cfg.get("default_home") or []) if str(d["sentence"]).strip()[:80] in treated]
+        present += ["test:" + str(t["id"]) for t in (cfg.get("boundary_tests") or []) if str(t["rule"]).strip()[:80] in treated]
+        if present:
+            print("FAIL (D-327 state) boundary_inject_enabled=false but " + str(len(present)) + " ruled rules are present: " + str(present))
+            return 1
+        print("PASS (D-327 state) boundary_inject_enabled=false; all ruled rules verified ABSENT from the run path; rule sha " + str(sha)[:16])
+        return 0
     missing: list[str] = []
     for d in cfg.get("default_home") or []:
         if str(d["sentence"]).strip()[:80] not in treated:

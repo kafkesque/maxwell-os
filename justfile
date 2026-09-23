@@ -12,6 +12,7 @@ health:
     python3 scripts/verify_menu_routing.py || exit 1
     python3 scripts/verify_menu_policy.py || exit 1
     python3 scripts/verify_recalibration_pins.py || exit 1
+python3 scripts/verify_boundary_injection.py || exit 1
     python3 scripts/verify_declared_inputs.py || exit 1
     python3 scripts/verify_frozen_pair.py || exit 1
     python3 scripts/verify_evidence_manifests.py || exit 1

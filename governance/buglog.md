@@ -3224,3 +3224,32 @@ hand-maintained, drifted exactly as BUG-342 predicts, and its drift is invisible
 **Not fixed here** (it needs a tooling change with an R5 review, not a hand edit - a hand edit is how it drifted).
 Decision needed: either let `recompute_decision_summary.py` stamp it (then it is derived data with a writer), or
 retire the field. Recorded so the next session does not hand-edit it back into sync.
+
+### BUG-400 remediation impact scan (2026-09-23, session 23) - what moving the repo would actually cost
+
+Measured before recommending anything, because a relocation is not free:
+
+1. **Absolute Dropbox paths are baked into ~20+ committed artifacts**, including pipeline checkpoints and - worse -
+   **input fingerprints**: `knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.input_fingerprint.json` records
+   `"s4_checkpoint": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/
+   stage4_merge/t11/checkpoint_enriched.jsonl"`. Every `*.checkpoint.jsonl.manifest.json` under stage1_chunk,
+   stage1_5_embed_cluster and stage4_merge does the same. So a relocation **invalidates the declared-input receipts
+   that `verify_declared_inputs.py` checks** (`just health` control) and the provenance stamps that cite those paths.
+   Relocation therefore needs its own decision + a re-baselining of the fingerprints, not a bare `mv`.
+2. **Nothing in-repo resolves the project root from that literal** - `pipeline/pipeline_paths.py` derives PROJECT_ROOT
+   from `__file__`, and `.env` carries no absolute-path keys - so the CODE survives a move; only the RECEIPTS do not.
+3. **Outside the repo**: `~/Library/LaunchAgents` holds `com.maxwell.omlx-api-key.plist` (live) plus
+   `com.maxwell.memoryguardian.plist.DISABLED` and `com.maxwellos.watchdog.plist.DISABLED`; `crontab -l` has 3
+   maxwell entries. These must be grepped for the old path before any move.
+4. **Backup tax, measured:** the repo currently holds six full-size copies of the run DB
+   (`maxwell.db.bak_20260923_164120`, `maxwell.db.bak_20260923_170702`, `maxwell.db.pre_d354_20260923_164133` +
+   three older, 133-167 MB each, ~900 MB total) because `backup_guardian.sh` keeps a full copy per batch write. Cheap
+   disk, but it is a standing cost that grows with every session and nobody prunes it.
+5. **The real Dropbox mass is not the repo**: `media` 97G, `app` 54G, `claude projects` 48G (the repo is 30G of it),
+   `education` 40G, `soulseek` 34G, `design` 16G, `00 inbox` 5.0G.
+
+**Recommendation now on record:** the cheapest correct step is NOT to move the repo. It is to (a) take the run DB and
+the pipeline output directories out of sync first (a selective-sync exclusion of `claude projects/maxwell os 2.0/compute-heavy
+subdirs` is not possible per-subfolder in Dropbox, so the practical form is: move the repo out, OR accept that the
+sync stays and record the risk as an accepted, dated decision). Both are owner calls. The forbidden option is to
+leave it implicit.

@@ -95,24 +95,41 @@ def load_menu(path: Path) -> tuple[dict[str, dict[str, str]], dict[str, list[str
 
 def build_canon(
     aliases: list[dict[str, str]], menu: dict[str, dict[str, str]]
-) -> Callable[[str, object], tuple[str | None, str]]:
+) -> Callable[[str, object], tuple[str | None, str, str]]:
     """Build a canonicaliser: raw label -> (menu value | None, verbatim raw)."""
-    alias_map: dict[str, str] = {}
+    # Aliases are AXIS-TAGGED: a content_type typo must never relabel a discipline cell.
+    # An entry without an "axis" key stays global for backwards compatibility.
+    alias_map: dict[tuple[str, str], str] = {}
+    global_alias: dict[str, str] = {}
     for entry in aliases or []:
-        if isinstance(entry, dict) and entry.get("as_written") and entry.get("canonical"):
-            alias_map[norm(entry["as_written"])] = norm(entry["canonical"])
+        if not (isinstance(entry, dict) and entry.get("as_written") and entry.get("canonical")):
+            continue
+        key, target = norm(entry["as_written"]), norm(entry["canonical"])
+        if entry.get("axis"):
+            alias_map[(str(entry["axis"]), key)] = target
+        else:
+            global_alias[key] = target
 
-    def canon(axis: str, raw: object) -> tuple[str | None, str]:
+    def canon(axis: str, raw: object) -> tuple[str | None, str, str]:
+        """Canonicalise and REPORT THE MECHANISM.
+
+        Returning the mechanism is what keeps a declared alias (a typo repair - an act of
+        interpretation) distinguishable from pure orthographic normalisation (separator/case
+        only, no interpretation). Conflating them made the first F-1 fix label 32 innocent
+        "tool instruction" cells as "canonicalised via a declared alias".
+        """
         text = strip_conf(str(raw or ""))
         if not text:
-            return None, ""
+            return None, "", "empty"
         key = norm(text)
         table = menu[axis]
         if key in table:
-            return table[key], text
-        if key in alias_map and alias_map[key] in table:
-            return table[alias_map[key]], text
-        return None, text
+            value = table[key]
+            return value, text, ("verbatim" if text == value else "orthographic")
+        for target in (alias_map.get((axis, key)), global_alias.get(key)):
+            if target is not None and target in table:
+                return table[target], text, "alias"
+        return None, text, "offmenu"
 
     return canon
 
@@ -291,11 +308,11 @@ def main() -> int:
         flags: list[str] = []
 
         for axis in AXES:
-            human, human_raw = canon(axis, src[axis])
+            human, human_raw, human_mech = canon(axis, src[axis])
             picks = {tag: canon(axis, labels.get(iid, {}).get(axis, ""))[0]
                      for tag, labels in coder_labels.items()}
             owner_raw = str(rev.get(owner_col[axis], "") or "").strip()
-            owner, _ = canon(axis, owner_raw)
+            owner, _, owner_mech = canon(axis, owner_raw)
 
             if human_raw and human is None:
                 offmenu_human[human_raw] += 1
@@ -306,11 +323,22 @@ def main() -> int:
                 kind = "DOMAIN" if norm(owner_raw) in domain_norm else "OWNER"
                 flags.append(f"OFF_MENU_{kind}:{axis}={owner_raw}")
 
+            # F-1 fix: an alias note is a SUFFIX on the tier note, never a replacement for it.
+            # The old chain let the tier branch overwrite the alias note (R030/R063 lost the
+            # owner's verbatim spelling), and a prose note alone is not machine-checkable - so
+            # the canonicalisation is also emitted as a qc_flag.
+            alias_note = ""
+            if owner_mech == "alias" and owner is not None:
+                alias_note = (f"owner spelling {owner_raw!r} canonicalised via a declared alias to "
+                              f"{owner!r} (C12)")
+                flags.append(f"ALIAS_CANONICALISED:owner:{axis}")
+            # NOTE (BUG-372): no "spelling differs from the ruler" flag is emitted on purpose.
+            # A raw comparison fires on every legitimate OVERRIDE (50 rows) and a normalised one
+            # fires on every separator/case variant (35 rows) - both expected. The two facts that
+            # matter are already machine-readable: ALIAS_CANONICALISED:owner:<axis> (an
+            # interpretation was applied) and the *_ruler_raw / owner_notes columns (verbatim).
+
             if owner_raw:
-                if owner is not None and owner_raw != owner:
-                    tier = "owner-supplied" if human is None else "owner-adjudicated"
-                    note = (f"owner spelling {owner_raw!r} canonicalised via a declared alias to "
-                            f"{owner!r} (C12); verbatim spelling preserved in the review sheet")
                 if human is not None and owner is not None and owner == human:
                     tier, note = "owner-adjudicated", "owner reaffirms the ruler label"
                 elif human is None:
@@ -326,12 +354,14 @@ def main() -> int:
                     note = "owner value is OFF-MENU; kept verbatim, NOT canonicalised"
                     if near:
                         note += f" (nearest menu value {near!r} - proposal only, not applied)"
+                if alias_note:
+                    note = f"{alias_note}; {note}"
             elif human is not None:
                 tier, note = "human-ruled", "ruler label as written"
                 final = human
-                if human_raw and norm(human_raw) != norm(human):
-                    note = f"ruler label canonicalised from {human_raw!r}"
-                    flags.append(f"CANONICALISED:{axis}")
+                if human_mech == "alias":
+                    note = f"ruler label canonicalised from {human_raw!r} via a declared alias"
+                    flags.append(f"ALIAS_CANONICALISED:ruler:{axis}")
             else:
                 tier, note = "declared-missing", "no human label; owner did not adjudicate"
                 final = ""

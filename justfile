@@ -7,6 +7,7 @@ health:
     python3 scripts/guard_stacks_single_source.py || exit 1
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
+    python3 scripts/audit_flag_consumers.py || exit 1
 
 healthcheck: health
 

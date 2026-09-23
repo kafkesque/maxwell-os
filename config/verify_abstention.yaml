@@ -1,12 +1,24 @@
 # Calibrated abstention (D-312) - INERT: no production code reads this file yet.
-# Enabling requires: measured curve + chosen operating point + decision row + repair-queue owner.
+# STATUS (2026-09-23, D-338/D-339): GATED, not dormant. The p25 operating point is APPROVED IN PRINCIPLE.
+# D-328 asserted enabled: true here; that was never applied and nothing reads the file, so the claim was
+# superseded rather than honoured (D-338). Activation is gated on ALL FOUR items below (D-339 = every
+# state change needs an implementation receipt: config sha256 before/after + the consumer + a run fingerprint).
 version: '1'
+status: gated           # proposed | gated | shadow | enabled  (D-338; a flip is its own dated decision)
+consumers: []           # NO production code reads this file. A flag with no consumer enforces nothing.
 enabled: false          # fail-closed production behaviour is unchanged (D-2298)
+activation_gate:        # ALL FOUR must hold before enabled may become true
+  triage_owner: TBD-OWNER-GATE        # must be a NAMED owner with a rows-per-week capacity (the binding constraint)
+  capacity_rows_per_week: null        # a percentile threshold is NOT a bounded cost: p25 abstains 25% of ANY batch
+  calibration_artifact: null          # path + sha256 of the measured curve on a FROZEN fingerprinted reference
+  shadow_run: null                    # >=1 full run with abstention in shadow mode: abstain_rate + decided/abstained error
+  evidence_tier: relative-only        # D-329(b)/D-337: no absolute error floor may be certified from this reference
 axis: discipline
 margin_metric: percent_rank   # pairwise verifier margin
 t_low_percentile: 25          # PROPOSED (t=-0.006, error 0.391) - inert while enabled: false
 t_high_percentile: 10         # PROPOSED (t=-0.053) - accept + flag
 # BUG-358: the path below was cited but never existed, and cannot exist until a writer does.
+# The writer is part of the activation gate (D-338): no queue file is created while enabled: false (D-323).
 repair_queue: null                    # NOT MATERIALISED - do not create an empty queue file
 repair_queue_contract:                # the contract the writer must satisfy when abstention is enabled
   write_path: governance/abstention_repair_queue.jsonl

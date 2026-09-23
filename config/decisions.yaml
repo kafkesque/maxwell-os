@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 705
+total_decisions: 707
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7423,6 +7423,11 @@ decisions:
   state: RESOLVED
   date: 2026-09-21
   title: 'Abstention ENABLED at the p25 operating point; the queue stays a declared view with a named owner'
+  superseded_by: [D338, D339]
+  superseded_by_note: >-
+    Superseded 2026-09-23 by D-338 (the operating point is approved in principle, not activated) and D-339 (state
+    changes need an implementation receipt). The original text is preserved verbatim (R-D410). The config never
+    carried enabled: true and no production code reads it, so no behaviour changes by this ruling.
   decision: >-
     Owner ruling 2026-09-21: config/verify_abstention.yaml enabled: true, t_low_percentile 25 (error 0.391 vs 
     0.4741 with no abstention). Owner for triage: OWNER-WEEKLY-TRIAGE. No empty queue file is created (D-323): the 
@@ -7627,8 +7632,40 @@ decisions:
   - governance/SEQUENCE_STATUS_20260917.md
   - config/eval_integrity.yaml
   - config/f11_llm_coder.yaml
+- id: D338
+  category: EVALS
+  state: RESOLVED
+  date: '2026-09-23'
+  title: Abstention at p25 is APPROVED IN PRINCIPLE but NOT ACTIVATED; D-328 superseded as an unimplemented state assertion
+  verification: >-
+    Owner approved the audit recommendation (2026-09-23). D-328 asserted config/verify_abstention.yaml enabled: true
+    with t_low_percentile 25 and triage owner OWNER-WEEKLY-TRIAGE. No artifact was ever changed: the file still says
+    enabled: false with owner TBD-OWNER-GATE, and NO production code reads it (grep hits only in temp/ and archive/).
+    The ruling therefore described a protection that enforces nothing, while D-2298 fail-closed is what actually runs.
+    Superseded, never edited (R-D410). Second reason: the operating point rests on a 0.391-vs-0.4741 ABSOLUTE error
+    claim measured against the pre-F-11 ruler, which D-329(b) and D-337 now forbid as a certified floor - the delta is
+    relative only. Third reason: a percentile threshold is not a bounded cost: p25 abstains 25 percent of ANY batch,
+    so the queue grows with throughput while its owner (capacity) is unassigned. Posture: enabled stays false, with an
+    explicit status: gated and a four-item activation gate (named triage owner with a rows-per-week capacity, a
+    calibration artifact referenced by path plus sha256, at least one shadow run with metrics, and a real consumer in
+    the run path). No queue file is created (D-323).
+- id: D339
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-23'
+  title: State-changing rulings must carry an implementation receipt; a flag with no consumer is a standing RED
+  verification: >-
+    Standing rule, closing the C-1 class (D-338, BUG-373): a decision may assert INTENT and name the artifact, but
+    never implementation state. Any enable/flip ruling must carry the config sha256 before and after, the consumer
+    that reads it, and the run fingerprint that proves it took effect. A decision that asserts a state change with no
+    receipt is a FALSE claim in the register - worse than a false config value, because it launders an unmet
+    dependency into apparent safety. Enforced by scripts/audit_flag_consumers.py, wired into just health: every
+    config/*.yaml stateful flag is checked against config/flag_consumer_registry.yaml, and enabled: true with no
+    consumer that actually references the file is RED. config/verify_abstention.yaml now declares status: gated and
+    consumers: [] so the emptiness is explicit instead of implied.
+
 summary:
-  total: 705
+  total: 707
   proposed: 6
   draft: 1
   active: 483
@@ -7637,7 +7674,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 138
+  resolved: 140
   planned: 8
   ratified: 5
   open: 17
@@ -7681,13 +7718,13 @@ summary:
     DELEGATION / GOVERNANCE: 1
     DELEGATION / GOVERNANCE / MCP: 1
     EMBEDDING / MEASUREMENT: 1
-    EVALS: 9
+    EVALS: 10
     FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
     FORENSIC AUDIT / CODE HYGIENE: 1
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 6
+    GOVERNANCE: 7
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1

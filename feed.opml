@@ -3,7 +3,7 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-08-31T00:00:00Z</dateModified>
+    <dateModified>2026-09-22T19:45:00Z</dateModified>
     <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
   </head>
   <body>
@@ -59,6 +59,11 @@
       <!-- 2026-08-31: D2498 — speculative decoding (lossless draft-model acceleration) -->
       <outline type="rss" text="Speculative Decoding" xmlUrl="https://github.com/topics/speculative-decoding"
                description="Draft-model speculative decoding: DFlash, DFlare, DSpark, EAGLE, MTP, AngelSpec. Lossless; temp=0.0-safe."/>
+      <!-- 2026-09-22 (D-332): on-device inference engines/models — M1 community-benchmark sweep -->
+      <outline type="rss" text="On-Device AI" xmlUrl="https://github.com/topics/on-device-ai"
+               description="On-device inference engines and models (M1/M-series desktop vs mobile/embedded). Sweep 2026-09-22: none out-serves OMLX on M1 Max."/>
+      <outline type="rss" text="On-Device LLM" xmlUrl="https://github.com/topics/on-device-llm"
+               description="On-device LLM runtimes and quantized models. Community-benchmark-first (D-332)."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -119,6 +124,72 @@
       <outline type="link" text="EAGLE-3 — autoregressive layer-fused drafter" 
                url="https://arxiv.org/abs/2503.01840"
                description="NeurIPS 2025. Autoregressive drafter fusing multi-layer features; claimed 3-6.5x. Default in most serving stacks. See also MTPLX (native-MTP MLX path) in MLX Inference Engines above."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- ON-DEVICE ENGINES / MODELS — evaluated 2026-09-22 (D-332, community-benchmark-first) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="On-Device Inference (M1 candidates)" description="Evaluated 2026-09-22 against OMLX on M1 Max; NONE out-serves OMLX">
+
+      <!-- mlx-dspark — runs on M1 but speculative decode is a NET LOSS -->
+      <outline type="link" text="mlx-dspark — DSpark/DFlash speculative decode (runs on M1, net LOSS)" 
+               url="https://github.com/ARahim3/mlx-dspark"
+               description="⭐679 | Python | MIT | Lossless DSpark/DFlash drafters on MLX. RUNS on M1 (doctor passes, mlx≥0.32). COMMUNITY (issue #38, M1 Max 64GB): speculative decode 0.55-0.91× = net LOSS (round cost ~2.4× a decode step, verify compute-bound on old GPU). Vendor speedups are M4/M5-only. REFERENCE self-calibration methodology; do NOT adopt on M1."/>
+
+      <!-- splash — M3+ only -->
+      <outline type="link" text="incoai/splash — M3+ engine (REJECT on M1)" 
+               url="https://github.com/incoai/splash"
+               description="⭐610 | Python | Apache-2.0 | 'Apple M3 or newer, macOS 26.4+' (Metal 4 uint4b). Hard-excludes M1 Max (Metal 3). Proprietary model-package format (C2), 'no config file' (C12/C21), 2-model catalog. REJECT."/>
+
+      <!-- turbo-fieldfare — single-model, SSD-paging -->
+      <outline type="link" text="turbo-fieldfare — Gemma 4 26B-A4B single-model (REJECT/REFERENCE)" 
+               url="https://github.com/drumih/turbo-fieldfare"
+               description="⭐6,800 | Swift | Apache-2.0 | Swift+Metal single-model runtime; streams MoE experts from SSD (D2460 thrash anti-pattern on 64GB). Text-only runs on M1 but serves the wrong model. REFERENCE the 103-experiment inventory only."/>
+
+      <!-- TinyChatEngine — real M1 Metal engine, research-tier -->
+      <outline type="link" text="TinyChatEngine — AWQ/SmoothQuant M1 Metal engine (REFERENCE)" 
+               url="https://github.com/mit-han-lab/TinyChatEngine"
+               description="⭐967 | C++ | MLSys 2024 Best Paper. Explicit M1/M2 Metal support, real-time on MacBook. AWQ-only model zoo, no OpenAI server / continuous batching / grammar. Research-tier; REFERENCE AWQ+Metal kernel design."/>
+
+      <!-- LiteRT-LM — mobile-first, macOS early preview -->
+      <outline type="link" text="LiteRT-LM — cross-platform (WATCH)" 
+               url="https://github.com/google-ai-edge/LiteRT-LM"
+               description="⭐6,495 | C++ | Android/iOS/Web/Desktop GPU/NPU delegates; macOS Swift 'early preview'. Mobile-first; not an M1-Max desktop server. WATCH for desktop-Metal maturity."/>
+
+      <!-- needle/cactus — tiny tool-call/extraction model -->
+      <outline type="link" text="needle (cactus-compute) — 121M tool-call/extraction model (WATCH)" 
+               url="https://github.com/cactus-compute/needle"
+               description="⭐12,169 | Python | 121M-param foundation model (8-29MB) specialized for tool-calls / structured extraction / embedding with byte-level grammar. Different tier: WATCH as a specialized S2 probe / extraction head, NOT a generator swap."/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KNOWLEDGE PIPELINE & SKILL ORCHESTRATION — evaluated 2026-09-22 (D-333) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="Knowledge Pipeline &amp; Skill Orchestration" description="Evaluated 2026-09-22; REFERENCE/ADAPT only, no new deps (C2/C5)">
+      <outline type="link" text="nano-graphrag — lightweight local GraphRAG (MUST-REFERENCE)" 
+               url="https://github.com/gusye1234/nano-graphrag"
+               description="⭐3.9k | Python | 'GraphRAG in 100 lines', local few-MB graph store. Best C1/C3 fit for an FB knowledge-graph layer on S1.5/S4. Peer-reviewed basis: GraphRAG (Edge 2024), LightRAG (Guo 2024), HippoRAG (NeurIPS 2024)."/>
+      <outline type="link" text="HKUDS/LightRAG — graph+vector hybrid (ADAPT, already flagged)" 
+               url="https://github.com/HKUDS/LightRAG"
+               description="⭐39.8k | Python | Graph + vector hybrid, incremental, cheap. Already flagged for FB-retrieval quality via graph approach."/>
+      <outline type="link" text="microsoft/graphrag — canonical GraphRAG (REFERENCE, Azure-tied)" 
+               url="https://github.com/microsoft/graphrag"
+               description="⭐36k | Python | 'From Local to Global' (Edge 2024). Azure/OpenAI-first = C2/C3 friction. REFERENCE the method only, not the dep."/>
+      <outline type="link" text="Graphify — new dominant GraphRAG tool (WATCH)" 
+               url="https://github.com/Graphify-Labs/graphify"
+               description="⭐120k | Python | High churn; verify license + self-host cost vs C1/C2 before any adoption."/>
+      <outline type="link" text="fastembed-rs — local ONNX reranker (SHOULD-REFERENCE)" 
+               url="https://github.com/anush008/fastembed-rs"
+               description="⭐1k | Rust+ONNX | Local cross-encoder/bge-reranker, no PyTorch, Apple Silicon. SHOULD-REFERENCE for a rerank pass after bge-m3 retrieval (S1.5/S5). Basis: cross-encoder reranking (Nogueira &amp; Cho 2019), ColBERT (Khattab &amp; Zaharia 2020)."/>
+      <outline type="link" text="sibila — local structured extraction (WATCH)" 
+               url="https://github.com/jndiogo/sibila"
+               description="⭐55 | Python | Structured extraction tuned for local llama.cpp/Ollama. Niche; oMLX guided_grammar + json_fixer already cover this. WATCH."/>
+      <outline type="link" text="github-mcp-server — MCP reference (C25)" 
+               url="https://github.com/github/github-mcp-server"
+               description="⭐33k | Go | Canonical MCP server pattern. REFERENCE for Maxwell's C25 MCP exposure (agent-agnostic, no agent coupling)."/>
+      <outline type="link" text="context7 — docs MCP (REFERENCE)" 
+               url="https://github.com/upstash/context7"
+               description="⭐62k | TypeScript | Docs-as-MCP. REFERENCE for pipeline-as-MCP-tool exposure."/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->

@@ -316,12 +316,20 @@ book_library:
 # Read governance/SESSION-HANDOFF-2026-09-19.md FIRST, then CONTEXT_INDEX.md §6e, then
 # governance/ROUNDTABLE_CROSSEXAM_20260919.md.
 current_state:
-    date: 2026-09-21
-    # 2026-09-21 (D-290..D-296): M1 Max / oMLX 0.7 / goose runtime optimisation (parallel to R2/ANCHOR).
+    date: 2026-09-22
+    # 2026-09-22 (D-331..D-333): inference-engine bake-off, M1 reality-check, MTP re-scope.
     # Phase 0 DONE (goose UI core-steal fixed via com.electron.goose defaults). Phase 1: pin oMLX dev2,
-    # enable MTP for Qwen3-Coder S2, re-assert D2460 no-cache (live settings.json has thrash flags),
-    # oQ4e A/B, switch goose active_provider off custom_deepseek→maxwell_omlx, bakeoff script drafted.
-    # Read governance/MARKET_RESEARCH_20260921.md first. Hard limits (M1 Max): NAX, neural accel, CED, Cluster v2, Apple AFM.
+    # D-293 MTP RE-SCOPED to MEASURE-don't-assume (scripts/mtp_ab.py; community #38 shows speculative
+    # decode is a net LOSS on M1 Max → D-332 community-benchmark-first rule). Re-assert D2460 no-cache,
+    # oQ4e/oQe A/B (D-294), goose active_provider custom_deepseek→maxwell_omlx (D-295).
+    # Read governance/MARKET_RESEARCH_20260922{M,_M1,_PIPELINE}.md first. Hard limits (M1 Max): NAX,
+    # neural accel, CED, Cluster v2, Apple AFM; M5-era speedups (MTP/TensorOps) do NOT transfer (D-332).
+    # D-293 RESOLVED (MTP A/B 0.98x neutral). D-334 ACTIVE: Metal wired cap <56GB -> sudo sysctl
+    # iogpu.wired_limit_mb=57344. "Best config" applied via config/omlx_m1_best_config.yaml +
+    # scripts/omlx_apply_best_m1_config.py (all `apply` already at target). D-294 gated levers:
+    # turboquant_kv + specprefill (scripts/omlx_lever_ab.py); quant variant A/B needs download.
+    # D-294 partial: turboquant_kv A/B on Qwen3-Coder S2 = 0.65x LOSS (median 0.81x) -> keep false.
+    # Next D-294 levers: specprefill (S2), turboquant_kv on gpt-oss (LONG-context S4), quant A/B.
     critical_finding: >
         BUG-299 / D-274a — the serving gate is a LABEL, not a verification verdict.
         scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle'

@@ -37,3 +37,31 @@ process + checkpoint inspection). No LLM judged anything; no artifact was writte
   flagged `OFF_MENU_DOMAIN`, preserved verbatim - a declared vocabulary choice, not an error.
 * `anchor1_frozen_20260920.json` byte-loss note: pre-existing, citable read-only (D-315); out of scope.
 * `agent/session_seed.yaml` + `feed.opml` are dirty from the owner's own tooling - left untouched.
+
+## Session 18 addendum (2026-09-23) - C-1 CLOSED, F-1 CLOSED, C-2 OPENED
+
+* **C-1 CLOSED (D-338).** The conflict was NOT "which file wins": D-328 asserted an implementation
+  state that no artifact ever carried. No production code reads `config/verify_abstention.yaml`
+  (grep hits only in `temp/` and `archive/`), so the register claimed a protection that enforced
+  nothing while D-2298 fail-closed is what runs. Resolution: D-328 superseded (never edited, R-D410),
+  the config now carries `status: gated` + `consumers: []` + a four-item `activation_gate`, and
+  `enabled` stays **false**. Second ground: the 0.391-vs-0.4741 delta is RELATIVE (D-329(b)/D-337),
+  so it cannot be an enforced absolute door; third: a percentile threshold is not a bounded cost.
+* **F-1 CLOSED.** `canon()` now reports the canonicalisation MECHANISM (verbatim / orthographic /
+  alias / offmenu) and aliases are AXIS-TAGGED; R030/R063 name the owner verbatim spelling
+  (`computer graphic`, `media studie`) and carry `ALIAS_CANONICALISED:owner:discipline`. Labels and
+  tiers unchanged (0 diffs), 150 rows. Anchor sha256 now
+  `29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698` (supersedes 3911eece...).
+  Fixed BUG-372 en route (two wrong repair attempts, both caught by a flag guard before writing).
+* **C-2 OPENED (HIGH, OWNER GATE - production behaviour).**
+  `config/pipeline_config.yaml:311 stage4.boundary_inject_enabled: true` while D-327 (RESOLVED
+  2026-09-21) ruled the flag back to **false** after the block failed every reading (emitted 42/60 vs
+  47/60, error 0.8333 vs 0.8000, oov 18 vs 13). `git log -S` shows exactly ONE change to that string:
+  commit `8de5d36` added it as true - **the flip D-327 records was never applied**. The flag IS
+  consumed (`pipeline_paths.py:213` -> `stage4_merged_call.py:120`, `stamp.py:124`), so the rejected
+  experiment is live in the S4 prompt. Fix is one line; it is an owner gate because the S4 prompt
+  changes. Logged BUG-374.
+* **New standing check (D-339).** `scripts/audit_flag_consumers.py` + `config/flag_consumer_registry.yaml`
+  (wired into `just health`) turns every stateful flag into a test: STATE MISMATCH vs the cited
+  decision, or an ON flag whose consumer never reads it, is RED. C-1 and C-2 were both invisible to
+  every previous check because nothing compared a decision to the artifact's state.

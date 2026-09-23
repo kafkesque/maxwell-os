@@ -2613,3 +2613,56 @@ STANDING RULE: never derive a new decision id from a single artifact. The next i
 max(all ids in config/decisions.yaml, all ids in DECISION-LOG.md) + 1, and any divergence between the two
 registers must be reported BEFORE a new id is minted. `recompute_decision_summary.py --check` validates counts,
 not id uniqueness against the prose log.
+
+## BUG-372 (MEDIUM — FIXED): the F-1 provenance note was unobservable, and the first two repairs were both wrong
+
+*Reported 2026-09-23 by the forensic audit (F-1), fixed the same day.*
+
+`scripts/consolidate_anchor_ruler.py` computed the alias/canonicalisation note into a local variable that the
+tier branch then overwrote, so the owner's verbatim spelling (`computer graphic`, `media studie`) never surfaced
+in `*_source_note`. Damage: cosmetic only (data was safe - the verbatim spelling was in the committed review
+sheet and in `discipline_ruler_raw`), but the note is prose and therefore not machine-checkable.
+
+Two repair attempts were wrong and were caught by the flag guard BEFORE the artifact was written:
+
+1. comparing `owner_raw != owner` labelled 32 innocent `tool instruction` / `process template` cells as
+   "canonicalised via a declared alias" - they were only separator/case variants;
+2. comparing `norm(owner_raw) != norm(human_raw)` then fired on all 50 legitimate OVERRIDES.
+
+Resolution: `canon()` now returns the MECHANISM (`verbatim` / `orthographic` / `alias` / `offmenu`), and the
+anchor emits machine-checkable flags `ALIAS_CANONICALISED:owner:<axis>` and `ALIAS_CANONICALISED:ruler:<axis>`.
+No "spelling differs" flag is emitted on purpose: it fires on expected behaviour. Aliases are now AXIS-TAGGED
+(a content_type typo can no longer relabel a discipline cell).
+
+**Rule:** an integrity flag that fires on expected behaviour is worse than no flag - it trains the reader to
+ignore flags. Flag vocabulary must be justified by a guard test before the artifact is written.
+
+## BUG-373 (HIGH — FIXED): a decision asserted an implementation state that no artifact carried
+
+*Found 2026-09-23 by the forensic audit (C-1), fixed by D-338/D-339.*
+
+`D-328` (2026-09-21) states that `config/verify_abstention.yaml` was set to `enabled: true` at p25 with triage
+owner `OWNER-WEEKLY-TRIAGE`. No artifact was ever changed (the file still said `enabled: false`, owner
+`TBD-OWNER-GATE`) and no production code reads it. The register therefore held a claim of an active protection
+that enforced nothing - the D-2298 fail-closed path is what actually ran. This survived a full audit round
+before being caught by reading the artifact instead of the decision.
+
+**Class:** decision-asserts-state. **Fix:** D-338 (posture restated as approved-in-principle + gated, no
+behaviour change) and D-339 (implementation receipt required for any flip) plus
+`scripts/audit_flag_consumers.py` in `just health`, which makes a flag with no consumer a standing RED.
+
+## BUG-374 (HIGH — OPEN, OWNER GATE): the rejected S4 boundary block is still live in production
+
+*Found 2026-09-23 by the forensic audit (C-2).*
+
+`D-327` (RESOLVED 2026-09-21) rejected the boundary block on measurement and states the flag was set
+back to false. `config/pipeline_config.yaml:311` still reads `stage4.boundary_inject_enabled: true`,
+and the flag is consumed in the run path (`pipeline/pipeline_paths.py:213` -> `stage4_merged_call.py:120`
+prompt injection, `pipeline/stamp.py:124` fail-closed stamp). `git log -S boundary_inject_enabled --
+config/pipeline_config.yaml` returns exactly one commit (`8de5d36`, which ADDED it as true): the flip
+D-327 records has never been applied. Same class as BUG-373 - a decision asserting a state no artifact
+carries - but here it changes behaviour, so it is the more dangerous instance.
+
+**Remedy (one line, owner GO):** set `stage4.boundary_inject_enabled: false` in
+`config/pipeline_config.yaml`, then re-run `just health` (the new flag-consumer check goes green).
+Until then `just health` reports one RED by design.

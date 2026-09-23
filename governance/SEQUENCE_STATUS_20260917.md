@@ -699,3 +699,15 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
   (R086/R091/R117) and `design strategy` (R042) are DOMAIN-vocabulary values used in the discipline column; they
   are preserved verbatim and flagged OFF_MENU_DOMAIN - a declared vocabulary choice, NOT an error and NOT a typo.
 * Anchor re-consolidated: 150 rows x 31 cols, sha256 3911eece4555a2da... (D-335/D-336/D-337).
+
+## Session 18 addendum 3 (2026-09-23) - abstention gate closed, flag-consumer check live
+
+* **HUMAN GATE REGISTER:** F-11 unchanged (REDEFINED, D-337). **NEW GATE: C-2 / BUG-374** - the S4
+  boundary block is still injected (`stage4.boundary_inject_enabled: true`) although D-327 ruled it
+  false; D-327's flip never landed (git -S: one change, added as true). Needs a one-line owner GO.
+* **D-338/D-339 registered** (707 decisions, `--check` in sync). The abstention operating point is
+  approved in principle and NOT activated: `status: gated`, `consumers: []`, four-item activation
+  gate, `enabled: false` unchanged - zero production behaviour change.
+* **New check:** `python3 scripts/audit_flag_consumers.py` (in `just health`) - RED on a flag whose
+  state disagrees with its decision, or an ON flag with no consumer that reads it.
+* Anchor re-issued after F-1: sha256 `29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698`.

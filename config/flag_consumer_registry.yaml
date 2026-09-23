@@ -1,0 +1,38 @@
+schema_version: '1'
+# D-339: the decisions -> config STATE link. scripts/audit_flag_consumers.py is RED when a
+# config value disagrees with what the cited decision requires, or when a flag that is ON has
+# no consumer that reads it. Add an entry for every flag you intend to keep.
+flags:
+  - config: config/pipeline_config.yaml
+    path: stage4.boundary_inject_enabled
+    required: false
+    decisions: [D-327]
+    consumers: [pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py, pipeline/stamp.py]
+    note: >-
+      D-327 rejected the boundary block on measurement (emitted 42/60 vs 47/60, error 0.8333 vs
+      0.8000, oov 18 vs 13) and ruled the flag back to FALSE. It was last touched by commit
+      81b813f (S5 fingerprint work) - an unrelated commit carrying a stale value. Reported by
+      the 2026-09-23 audit as C-2; the flip is an OWNER GATE because the S4 prompt changes.
+
+  - config: config/boundary_discriminators.yaml
+    path: enabled
+    required: true
+    decisions: [D-325, D-318]
+    consumers: [pipeline/pipeline_paths.py, pipeline/stage4_merged_call.py]
+    note: the ruled rule FILE is loaded and byte-compared in the run path.
+
+  - config: config/f11_llm_coder.yaml
+    path: enabled
+    required: true
+    decisions: [D-335, D-337]
+    consumers: [scripts/f11_llm_coder.py, scripts/consolidate_anchor_ruler.py]
+    note: the coder harness must be explicitly enabled; sovereignty opt-in (C22).
+
+  - config: config/verify_abstention.yaml
+    path: enabled
+    required: false
+    decisions: [D-328, D-338]
+    consumers: []
+    exempt_reason: >-
+      approved in principle, NOT activated (D-338): consumers: [] is deliberate and the empty
+      consumer list is the explicit statement that this flag enforces nothing today.

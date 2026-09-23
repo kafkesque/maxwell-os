@@ -154,9 +154,10 @@ inheriting a model consensus.
 
 | flag | n |
 |---|---|
-| `CANONICALISED:extraction_type` | 54 |
+| `ALIAS_CANONICALISED:ruler:extraction_type` | 54 |
 | `MISSING:extraction_type` | 5 |
 | `OFF_MENU_DOMAIN:discipline=personal productivity` | 3 |
+| `ALIAS_CANONICALISED:owner:discipline` | 2 |
 | `OFF_MENU_DOMAIN:discipline=design strategy` | 1 |
 
 42 rows were never flagged by the review sheet (unanimous or model-split with

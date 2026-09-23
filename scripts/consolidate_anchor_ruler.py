@@ -173,6 +173,17 @@ def safe_write(path: Path, text: str, *, force: bool) -> None:
         raise
 
 
+def _domains(menu_path: Path) -> frozenset[str]:
+    """Normalised set of DOMAIN menu values (the fourth menu, not one of the axes).
+
+    The owner sometimes files a domain where a discipline belongs. That is a deliberate
+    vocabulary choice, not a typo and not noise, so it is preserved verbatim and flagged as
+    OFF_MENU_DOMAIN rather than being "repaired" into a discipline nobody ruled for.
+    """
+    items = json.loads(menu_path.read_text(encoding="utf-8")).get("domains", [])
+    return frozenset(norm(i["value"] if isinstance(i, dict) else str(i)) for i in items)
+
+
 def nearest(axis: str, raw: str, table: dict[str, str], cutoff: float = 0.8) -> str | None:
     """Return the closest menu value to an off-menu label, for a human to confirm.
 
@@ -220,6 +231,7 @@ def main() -> int:
     canon = build_canon(cfg.get("declared_aliases", []), menu)
     coders = cfg["anchor_review"]["coders"]
     owner_col = {a: cons["owner_columns"][a] for a in AXES}
+    domain_norm = _domains(PROJECT_ROOT / cons["menu"])
 
     review_path = PROJECT_ROOT / cons["review_sheet"]
     ruler_path = PROJECT_ROOT / cons["ruler_sheet"]
@@ -291,7 +303,8 @@ def main() -> int:
                 unresolved_human[human_raw] += 1
             if owner_raw and owner is None:
                 unresolved[owner_raw] += 1
-                flags.append(f"OFF_MENU_OWNER:{axis}={owner_raw}")
+                kind = "DOMAIN" if norm(owner_raw) in domain_norm else "OWNER"
+                flags.append(f"OFF_MENU_{kind}:{axis}={owner_raw}")
 
             if owner_raw:
                 if human is not None and owner is not None and owner == human:

@@ -59,6 +59,12 @@ blank_separator_header: '>>> ANSWER IN THE JSONL ONLY - DO NOT TYPE IN THIS CSV 
 partial_policy: 'export the fully-answered rows only; record excluded item_ids in the manifest'
 
 declared_aliases:
+  - axis: discipline
+    as_written: media studie
+    canonical: media_studies
+  - axis: discipline
+    as_written: computer graphic
+    canonical: computer_graphics
   - axis: extraction_type
     as_written: casual mechanism
     canonical: causal_mechanism

@@ -685,3 +685,17 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
   domain-valued labels. Nothing was guessed.
 * HUMAN GATE unchanged: this anchor cannot unfreeze F-11, D-300 adoption or the eval_integrity floors. The
   second-coder gate still needs an independent HUMAN coder.
+## Session 17 addendum 2 (2026-09-23 12:35) - HUMAN GATE REGISTER updated: F-11 gate REDEFINED (D-337)
+
+* Owner ruling: there will be NO independent human truth. The "second independent HUMAN coder" gate is
+  UNSATISFIABLE in a single-owner sovereign project, so it is closed as a MISSING PERSON and re-opened as a
+  DECLARED LIMITATION. It is no longer something to wait for.
+* Effective now: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv (150 rows, human-mixed+llm-attested) is the
+  terminal reference for RELATIVE comparisons only - arm ranking, A/B, relative deltas.
+* Still forbidden: certifying an ABSOLUTE error floor from it (bounded below by reference reproducibility,
+  D-329/D-331); every adoption record must state the ruler tier, the non-independence and the bound.
+* Owner typos repaired by instruction (declared aliases, C12): `computer graphic` -> `computer graphics` (R030),
+  `media studie` -> `media studies` (R063). The remaining 4 owner cells `personal productivity` x3
+  (R086/R091/R117) and `design strategy` (R042) are DOMAIN-vocabulary values used in the discipline column; they
+  are preserved verbatim and flagged OFF_MENU_DOMAIN - a declared vocabulary choice, NOT an error and NOT a typo.
+* Anchor re-consolidated: 150 rows x 31 cols, sha256 3911eece4555a2da... (D-335/D-336/D-337).

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 704
+total_decisions: 705
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7604,8 +7604,31 @@ decisions:
   - config/f11_llm_coder.yaml
   - governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
   - governance/F11_R2_MEASUREMENT_20260923.md
+- id: D337
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-23'
+  title: F-11 second-coder gate is UNSATISFIABLE - no independent human coder will ever exist; the gate is redefined, not deferred
+  verification: 'Owner ruling (2026-09-23, verbatim intent): there will be no independent human truth. This project is
+    single-owner, sovereign and local-first (C1/C3), so the F-11 second-coder gate as written can never be satisfied -
+    waiting for a second independent HUMAN coder is not a plan, it is a permanent freeze. Gate REDEFINED: the
+    consolidated anchor (governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv, 150 rows, tier
+    human-mixed+llm-attested) is the terminal reference for RELATIVE comparisons only - it may rank classifier arms,
+    support A/B and bound relative deltas. It may NOT certify an ABSOLUTE error floor: any absolute claim is bounded
+    below by the reference reproducibility (D-329/D-331) and must be reported with the ruler tier and its
+    non-independence. Consequences: (a) F-11 stays OPEN but its blocking condition is now a DECLARED LIMITATION, not a
+    missing person - recorded in governance/SEQUENCE_STATUS_20260917.md; (b) D-300 adoption records must state the
+    ruler tier, the single-rater/non-independent status and the reproducibility bound; (c) the S4 menu-compliance
+    intervention and the held-out A/B work may proceed on this reference because they are relative; (d) no future
+    absolute floor may cite this reference without stating the bound. This replaces the standing instruction to "await
+    an independent human coder".'
+  files:
+  - governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  - governance/SEQUENCE_STATUS_20260917.md
+  - config/eval_integrity.yaml
+  - config/f11_llm_coder.yaml
 summary:
-  total: 704
+  total: 705
   proposed: 6
   draft: 1
   active: 483
@@ -7614,7 +7637,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 137
+  resolved: 138
   planned: 8
   ratified: 5
   open: 17
@@ -7751,7 +7774,7 @@ summary:
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
-    VERIFICATION: 17
+    VERIFICATION: 18
     VERIFICATION / ONTOLOGY: 1
     governance: 1
     pipeline-fix: 2

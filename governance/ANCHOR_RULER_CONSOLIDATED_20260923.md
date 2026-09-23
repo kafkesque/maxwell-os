@@ -147,11 +147,7 @@ inheriting a model consensus.
 
 - OFF-MENU owner value `personal productivity` x3 - kept verbatim; the nearest menu
   candidate is recorded in that row's `discipline_source_note` for a one-line ruling
-- OFF-MENU owner value `computer graphic` x1 - kept verbatim; the nearest menu
-  candidate is recorded in that row's `discipline_source_note` for a one-line ruling
 - OFF-MENU owner value `design strategy` x1 - kept verbatim; the nearest menu
-  candidate is recorded in that row's `discipline_source_note` for a one-line ruling
-- OFF-MENU owner value `media studie` x1 - kept verbatim; the nearest menu
   candidate is recorded in that row's `discipline_source_note` for a one-line ruling
 
 ## QC flags
@@ -160,10 +156,8 @@ inheriting a model consensus.
 |---|---|
 | `CANONICALISED:extraction_type` | 54 |
 | `MISSING:extraction_type` | 5 |
-| `OFF_MENU_OWNER:discipline=personal productivity` | 3 |
-| `OFF_MENU_OWNER:discipline=computer graphic` | 1 |
-| `OFF_MENU_OWNER:discipline=design strategy` | 1 |
-| `OFF_MENU_OWNER:discipline=media studie` | 1 |
+| `OFF_MENU_DOMAIN:discipline=personal productivity` | 3 |
+| `OFF_MENU_DOMAIN:discipline=design strategy` | 1 |
 
 42 rows were never flagged by the review sheet (unanimous or model-split with
 a present human label); the harness re-verified them row by row and fails loudly if a

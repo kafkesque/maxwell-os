@@ -114,3 +114,18 @@ decision_sheet:
   coder_b_raw: temp/kimi3 labels.md
   form_source_column: 'FORM (1-4)'
   menu: config/closed_menu_v5.json
+
+# DISC review sheet (owner manual review of the discipline axis: the 28 unlabelled rows + the rows where BOTH
+# coder families agree against the human). Consumed by scripts/f11_disc_abstention_review.py.
+disc_review:
+  ruler_sheet: governance/RULER_BLIND_SHEET_20260917.csv
+  human_column: DISC (1-62)
+  decision_sheet: governance/F11_DECISION_SHEET_20260922.csv
+  coders:
+    - tag: claude
+      path: temp/LLM_LABELS_R2_ALL150.jsonl
+      axis: discipline
+    - tag: kimi
+      path: temp/kimi3 labels01.md
+      axis: discipline
+  out_csv: governance/F11_DISC_REVIEW_{date}.csv

@@ -924,3 +924,12 @@ DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, 
 - STILL OWNER-GATED (unchanged, highest value first): vec store repair (BUG-394); coverage_sla for the adopted
   discipline abstention point; the BUG-388 parquet export re-run; the ratified BUG-390 curve; the v6 menu merge
   (DROP/DEFER recommended); R3 GO/DEFER; the disk chore (97% full, 29 GiB free).
+
+## Audit (e) executed 2026-09-23 15:53 - findings F-e1..F-e7, invariants I1..I9 all HELD
+
+- CLOSED (F-e2/F-e7, measured): the derived decision summary drifted 5 counts and its detector ran nowhere; recomputed with the sanctioned tool and the detector wired into just health as control 11 (BUG-399). MTR superseding entry appended.
+- CLOSED (F-e4, proved on copies): the vec repair is now a runnable, dry-run-by-default script (scripts/repair_vec_integrity.py) with a per-table contract (D-357). The recipe previously handed over could not run at all: the vec0 module cannot be opened by the default interpreter or the macOS sqlite3 CLI, and "0 RED" was unreachable while the dormant store was held to the mirror contract.
+- CORRECTED (F-e3): the D-356 receipt claims a dated artifact that does not exist (BUG-398); correction appended, the ratified extraction_type curve stays OWED.
+- OPEN (F-e4 execution, OWNER): run scripts/repair_vec_integrity.py --apply against the run DB (one command; it makes its own backup, deletes 15990 dead rows, re-measures, fails loud).
+- OPEN (F-e5, work): stage6's in-run vector check is a count ("READY 15990/7995" while half the index was dead) and the D-354 gate stays out of just health until the repair lands.
+- RECORDED (F-e1): my own count harness was subset-scoped (33 ids published where the registry holds 724) - same class as the 'WIRED'-contains-'RED' counter.

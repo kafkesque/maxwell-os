@@ -497,3 +497,37 @@ D-356: The R2 meter speaks extraction_type - measured, not transplanted
    (governance/R2_DEFINITION_NLI_20260923.json) and the pin now carries this decision id.
 4. No extraction_type abstention threshold may be set from this: config/verify_abstention.yaml keeps
    extraction_type in refused_axes until a point is ratified by the lower-CI-bound rule (D-353).
+
+## D-357 - 2026-09-23 (audit e) - The vec integrity contract is per table: a dormant store must be EMPTY
+
+Context: D-354 made referential integrity of the sqlite-vec stores a gate and fixed the contract as
+"live == fbs, orphans == 0, missing == 0" for every listed table. That contract is right for the production vector
+leg (vec_fbs) and WRONG for vec_fbs_ctx, which R26 forbids production from reading: emptying a dormant store turns
+its dead entries into MISSING rows, so the same rule calls the repaired state RED and "0 RED" becomes unreachable.
+This is D-355 again in a new place - the assertion was written for the state the table was built for, not the state
+it is in.
+
+Decision: config/vec_integrity.yaml declares a PER-TABLE contract. required: true -> the store must mirror fbs
+(live == fbs, orphans == 0, missing == 0). required: false -> the store is DORMANT and must be EMPTY (orphans == 0
+AND live == 0); missing == fbs is the EXPECTED state, and an absent table passes as the strongest form of empty.
+A bare string defaults to required (fail-closed). scripts/verify_vec_integrity.py implements the inversion and
+takes --db so a repaired copy can be measured without touching the run DB.
+
+Receipt (copies only): the production DB reports "2 tables checked (1 required, 1 dormant), 2 RED" (exit 1); the
+same DB after scripts/repair_vec_integrity.py --apply reports vec_fbs live=7995 orphans=0 missing=0, vec_fbs_ctx
+dormant empty, "0 RED" (exit 0).
+
+Consequence for the owner gate: the repair is now ONE command that makes its own timestamped backup, deletes in a
+single transaction, re-measures with this gate and fails loud. The act itself remains the owner's call.
+
+## CORRECTION to the D-356 entry - 2026-09-23 (audit e), appended, never edited (R-D410)
+
+The D-356 entry states the meter "was re-run over the frozen input into a NEW dated artifact
+(governance/R2_DEFINITION_NLI_20260923.json)". That file does not exist and never did: the full ruler run exceeded
+the working budget, and only the 6-FB capability smoke completed (receipt: 6 FBs, 40 label-definition pairs, 4
+contra, 0 inference errors, artifact schema logged). The capability half of D-356 stands - the axis map resolves
+extraction_type to the menu key extraction_types instead of silently scoring it against a DOMAIN definition - and
+the pin was re-pointed against D-356 on the strength of that capability. What does NOT stand is the receipt of a
+ratified curve. The ratified extraction_type curve remains OWED (BUG-398); extraction_type stays in refused_axes
+until a point is ratified by the lower-CI-bound rule (D-353). Rule restated: a receipt is a claim about an artifact
+that exists at the moment the claim is written.

@@ -800,3 +800,13 @@ D-355 (a control must assert the state it is in) is now a recorded architecture 
 is state-aware AND wired into just health as the 10th control (previously unwired; its line 600 PASS was stale -
 corrected in the (c) addendum). Line-600-class stale verdicts should now be impossible for THIS control: it runs
 in health on every check, so its verdict can no longer drift from the config it depends on.
+
+### 2026-09-23 15:53 - audit (e): the vec repair became a proven script, and a control that ran nowhere was wired
+
+I1-I9 all HELD (git clean at 6aae15a, 41/41 config parse, 724 decisions 0 dups, vec byte-identical to audit (d),
+pins 6/0 RED, health exit 0, hygiene clean, no stray compute, disk unchanged). Findings F-e1..F-e7: two fixed here
+(the derived summary drift + its unwired detector; the vec repair recipe, which was unrunnable and over-promised),
+one corrected append-only (a receipt claiming a nonexistent artifact, BUG-398), one recorded (stage6's count-only
+vector check), one closed by measurement (typos), one stale-header sync (MTR). D-357 minted: the integrity contract
+is per table, and a dormant store must be EMPTY. The vec repair itself stays OWNER-GATED; it is now ONE command
+that backs itself up, and it was proved end-to-end on copies before being offered.

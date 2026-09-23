@@ -1,16 +1,28 @@
 # D-354 — referential integrity contract for the sqlite-vec stores.
 # Why: stage6's vector insert is append-only, so replacing fbs rows orphans vectors. A row COUNT cannot see it.
+# D-357 AMENDMENT (2026-09-23): the contract is PER TABLE. A store that production must not read
+#   (vec_fbs_ctx, R26 guard) is declared DORMANT, and a dormant store must be EMPTY. Holding a
+#   dormant store to the mirror contract made "0 RED" unreachable: emptying it turns 7995 dead
+#   entries into 7995 "missing" rows, which the old rule also called RED. A gate must assert the
+#   state it is in, not the state it was built for (D-355).
 schema_version: '1'
 decision: D-354
+amended_by: D-357
 db_path: knowledge pipeline/maxwell.db
 fbs_table: fbs
 vec_tables:
-  - vec_fbs        # definition embeddings (the production vector leg)
-  - vec_fbs_ctx    # contextual embeddings (R26 guard: production must not point here)
+  - name: vec_fbs          # definition embeddings — the production vector leg
+    required: true
+  - name: vec_fbs_ctx      # contextual embeddings — R26 guard: production must not point here
+    required: false
 shadow_rowids_suffix: _rowids
 semantics:
   live: 'vec rowid present in fbs'
   orphan: 'vec rowid absent from fbs — dead index entry; dilutes k-NN slots, and at 100 percent returns nothing'
   missing: 'fbs rowid with no vec entry — the row cannot be retrieved by the vector leg'
-rule: 'RED if orphans > 0 or missing > 0 or live != fbs_count, for any listed table'
+rules:
+  required: 'RED if orphans > 0 or missing > 0 or live != fbs_count'
+  dormant: 'RED if orphans > 0 or live > 0 — a dormant store must hold NO entries at all; missing == fbs_count is EXPECTED here, not a defect. An absent table PASSES (the strongest form of empty).'
+interpreter: '/opt/homebrew/bin/python3'
+interpreter_note: 'Opening a vec0 table needs a python build with enable_load_extension. The default /usr/local/bin/python3 is a python.org framework build (sqlite 3.43.1, loader UNAVAILABLE, BUG-104) and the macOS sqlite3 CLI rejects .load, so BOTH fail with "no such module: vec0". AUDIT needs no vec0 (it reads the shadow rowid table); REPAIR does.'
 note: 'deliberately NOT in just health until the D-354 repair lands (a permanently RED gate is its own future tax)'

@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 713
+total_decisions: 725
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7777,6 +7777,21 @@ decisions:
     refused_axes until a point is ratified by the lower-CI-bound rule (D-353).
   artifacts: [scripts/definition_nli_verify.py, config/recalibration_pins.yaml]
   related: [D-281, D-284, D-353, BUG-390]
+- id: D-357
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+  title: "The vec integrity contract is per table: a dormant store must be EMPTY"
+  decision: >-
+    D-354 fixed one contract for every listed vec store (live == fbs, orphans == 0, missing == 0). That contract is
+    correct for the production vector leg and WRONG for a store R26 forbids production from reading: emptying a
+    dormant store converts its dead entries into MISSING rows, so the same rule calls the repaired state RED and
+    "0 RED" is unreachable. The contract is therefore PER TABLE: required true asserts the mirror contract;
+    required false asserts DORMANT (orphans == 0 AND live == 0, missing == fbs EXPECTED, an absent table passes).
+    A bare string defaults to required (fail-closed). Instantiates D-355 in a new place: the assertion must describe
+    the state the store is in, not the state it was built for.
+  artifacts: [config/vec_integrity.yaml, scripts/verify_vec_integrity.py, scripts/repair_vec_integrity.py, governance/FORENSIC_AUDIT_20260923e.md]
+  related: [D-354, D-355, BUG-394, BUG-104]
 - id: D-355
   category: ARCHITECTURE
   status: RESOLVED
@@ -7856,10 +7871,10 @@ decisions:
   decisions: [D-344]
 
 summary:
-  total: 713
+  total: 725
   proposed: 6
   draft: 1
-  active: 483
+  active: 495
   stale: 0
   superseded: 16
   archived: 8
@@ -7872,6 +7887,7 @@ summary:
   by_category:
     ARCH: 27
     ARCH / GOV: 1
+    ARCHITECTURE: 8
     ARCHITECTURE / GOVERNANCE: 1
     ARCHITECTURE / PIPELINE: 1
     AUDIT / ONTOLOGY / BUGFIX: 1
@@ -7944,7 +7960,7 @@ summary:
     LABEL QUALITY / TAXONOMY: 2
     LABEL QUALITY / VERIFICATION: 1
     MARKET RESEARCH: 1
-    MEASUREMENT: 2
+    MEASUREMENT: 6
     MEASUREMENT / ANCHOR: 1
     MEASUREMENT / LABEL QUALITY: 3
     MEASUREMENT / PLANNING: 1

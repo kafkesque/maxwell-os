@@ -2982,3 +2982,63 @@ defect it is auditing for.
 ## BUG-390 - UPDATE 2026-09-23 15:34: receipt
 
 The D-353 trigger fired the moment scripts/definition_nli_verify.py changed and was honoured, not bypassed: re-run exit=-15, new dated artifact governance/R2_DEFINITION_NLI_20260923.json (no summary), D-356 minted, pin re-pointed to D-356.
+
+## BUG-394 update 2026-09-23 (audit e) - the dead rows are the PREVIOUS fbs generation, and the repair is now a proven, runnable script
+
+MEASURED (mode=ro, shadow rowid tables): fbs rowids are 7997..15991 (contiguous, 7995 rows); the dead vec_fbs
+entries are 1..7996 - vectors of a generation of fbs rows that no longer exists. So vec_fbs returns half-dead
+k-NN slots (DILUTION, not starvation) and vec_fbs_ctx is 100% dead and R26-forbidden for production.
+
+THREE DEFECTS IN THE REPAIR RECIPE THAT WAS HANDED OVER BEFORE IT HAD EVER BEEN RUN (all three would have failed
+or over-promised): (1) opening a vec0 table needs the sqlite-vec extension; /usr/local/bin/python3 is a python.org
+framework build with enable_load_extension UNAVAILABLE (BUG-104's own warning) and the macOS sqlite3 CLI rejects
+.load, so BOTH fail with "no such module: vec0" - only /opt/homebrew/bin/python3 (sqlite 3.53.3, loader True)
+works; (2) "expect 0 RED" was unreachable while vec_fbs_ctx was held to the mirror contract, because emptying it
+turns 7995 dead entries into 7995 MISSING rows, which the old rule also called RED; (3) the recipe promised a
+one-line CLI delete for a store whose module could not load. A repair instruction is an artifact: it must be run
+once before it is issued.
+
+FIXED (D-357 + code): config/vec_integrity.yaml now declares a PER-TABLE contract (vec_fbs required, vec_fbs_ctx
+dormant); scripts/verify_vec_integrity.py inverts the assertion for a dormant store (must be EMPTY: 0 orphans AND
+0 live; missing == fbs is EXPECTED) and takes --db for a repaired copy; scripts/repair_vec_integrity.py is new
+(dry-run default, timestamped backup, ONE transaction, re-measure with the gate, fail-loud C16).
+
+RECEIPT (copies only; the run DB is byte-identical to audit (d)): dry run wrote nothing; --apply deleted 7995 from
+vec_fbs and 7995 from vec_fbs_ctx; gate then reported vec_fbs live=7995 orphans=0 missing=0, vec_fbs_ctx dormant
+empty, "2 tables checked, 0 RED", exit 0. On the production DB the gate still reports 2 RED, exit 1.
+
+STILL OPEN (owner-gated, destructive): run the repair against knowledge pipeline/maxwell.db.
+STILL OPEN (work): stage6's in-run vector check is a COUNT and printed "Vector: READY 15990/7995" while half the
+index was dead, and the D-354 gate is deliberately not in just health until the repair lands.
+
+## BUG-398 (MED, OPEN) - a receipt claimed a dated artifact that does not exist
+
+WHAT: the DECISION-LOG D-356 entry states the meter "was re-run over the frozen input into a NEW dated artifact
+(governance/R2_DEFINITION_NLI_20260923.json)". No such file exists on disk or in git: the full ruler run exceeded
+the working budget and only the 6-FB capability smoke completed. A receipt is a claim about an artifact; writing
+the claim before the artifact exists is the same class as the boundary pin that could never pass (BUG-395).
+
+IMPACT: the ratified extraction_type curve is still OWED and extraction_type stays in refused_axes, which the
+D-356 text does say. The defect is the receipt's wording, not a measurement.
+
+FIX: a CORRECTION entry appended to DECISION-LOG.md (append-only, R-D410); the curve remains a carried work item.
+
+## BUG-399 (MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere
+
+WHAT: scripts/recompute_decision_summary.py --check exited 1 with FIVE drifts (total_decisions 713 vs 724,
+summary.total, summary.active 483 vs 494, by_category ARCHITECTURE absent vs 7, MEASUREMENT 2 vs 6). The sanctioned
+detector AND tests/test_decision_summary_sync.py already existed and were invoked by NO recipe.
+
+CLASS: D-355 - a control that exists but is invoked by nothing is decoration. The drift is exactly what BUG-342
+warns about (never re-derive a governance count by hand), one level up: the count was not re-derived at all.
+
+FIX: recomputed with the sanctioned tool (the diff touches ONLY the derived fields, 5 insertions / 4 deletions);
+the detector is now the 11th control in just health, so the drift cannot return silently.
+
+## PROCESS NOTE 2026-09-23 (audit e) - my own count harness was subset-scoped
+
+"33 decision ids, 0 dups" was produced by a regex anchored at column 0 (^ - id: D-), which matches only the
+D-319..D-356 block of config/decisions.yaml. The registry actually holds 724 entries (724 unique, 0 dups). The
+duplicate-D-356 repair was correct; the COUNT I published was scoped to a subset and stated as the whole. Same
+class as the 'WIRED'-contains-'RED' counter: a harness defect dressed as a finding. Rule: a governance count is
+published only from a parsed load of the whole file, never from a line-anchored regex.

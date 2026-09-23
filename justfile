@@ -18,6 +18,7 @@ health:
     python3 scripts/verify_artifact_authority.py || exit 1
     python3 scripts/r3_preflight.py || exit 1
     python3 scripts/verify_boundary_injection.py || exit 1
+    python3 scripts/recompute_decision_summary.py --check || exit 1
 
 healthcheck: health
 

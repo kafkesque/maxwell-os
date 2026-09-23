@@ -8,6 +8,8 @@ health:
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
     python3 scripts/audit_flag_consumers.py || exit 1
+    python3 scripts/verify_anchor_manifest.py || exit 1
+    python3 scripts/verify_declared_inputs.py || exit 1
 
 healthcheck: health
 

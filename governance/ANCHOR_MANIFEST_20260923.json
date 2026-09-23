@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "ANCHOR-3",
+  "path": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+  "sha256": "29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698",
+  "bytes": 85811,
+  "rows": 150,
+  "columns": 31,
+  "artifact_schema_version": "1.0",
+  "artifact_provenance_tier": "human-mixed+llm-attested",
+  "frozen_on": "2026-09-23",
+  "frozen_by": "session 18 forensic audit; owner approved the F-1 fix ('Approve your recommendation')",
+  "supersedes": {
+    "sha256_prefix": "3911eece4555a2da",
+    "reason": "re-issued by the F-1 fix: R030/R063 now name the owner's verbatim spelling via axis-tagged aliases"
+  },
+  "inputs": {
+    "ruler_sheet": "governance/RULER_BLIND_SHEET_20260917.csv",
+    "review_sheet": "governance/F11_ANCHOR_REVIEW_20260923.csv",
+    "ruling_map": "governance/F11_OWNER_RULING_MAP_20260922.csv",
+    "menu": "config/closed_menu_v5.json",
+    "config": "config/f11_llm_coder.yaml"
+  },
+  "provenance_tier_meaning": "human-mixed+llm-attested: owner-adjudicated + owner-supplied rows are mixed with ruler (single-coder) rows; the tier is NOT a human-truth tier",
+  "allowed_uses": [
+    "arm ranking",
+    "A/B comparison",
+    "relative deltas between classifiers or prompts"
+  ],
+  "forbidden_uses": [
+    "absolute error floor / error-rate certification",
+    "any claim that a classifier property is measured absolutely"
+  ],
+  "bound": "RELATIVE-ONLY (D-337): the F-11 second-coder gate is UNSATISFIABLE and will never be satisfied, so no absolute error floor may be certified from this reference (D-329/D-331). An arm may be declared better or worse; never 'accurate to X'.",
+  "non_independence_note": "the ruler rows are single-human-coded; two model coders disagree with the human ~2x more than with each other (D-329), so the reference is an ADVISORY anchor, not ground truth",
+  "verify": "python3 scripts/verify_anchor_manifest.py",
+  "regenerate": "python3 scripts/consolidate_anchor_ruler.py --apply (deterministic, no LLM)"
+}

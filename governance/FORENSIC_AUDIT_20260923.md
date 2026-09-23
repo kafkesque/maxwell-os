@@ -65,3 +65,26 @@ process + checkpoint inspection). No LLM judged anything; no artifact was writte
   (wired into `just health`) turns every stateful flag into a test: STATE MISMATCH vs the cited
   decision, or an ON flag whose consumer never reads it, is RED. C-1 and C-2 were both invisible to
   every previous check because nothing compared a decision to the artifact's state.
+
+## Session 19 addendum (2026-09-23) — 6 steps executed; 3 new defects found and 2 closed
+1. **C-2 CLOSED (BUG-374).** D-327's flip had never landed (`git log -S` = exactly one commit, 8de5d36, which added
+   it as true); the A/B-rejected boundary block was live in the S4 prompt for two days. Applied atomically, verified,
+   `just health` RED cleared. No new decision: D-327 already ruled it.
+2. **BUG-375 FIXED (audit-on-the-audit).** The new D-339 flag check reported a REGISTERED flag as unregistered
+   because its scan used leaf keys while the registry uses dotted paths — the BUG-372 class inside the very check
+   meant to catch it. Scan rewritten to walk the parsed document; a self-check now makes that drift RED.
+3. **C-3 OPENED (BUG-376, HIGH, owner gate).** The complete 7995-verdict S5 run (`PASS 5023 / QUARANTINE 2972`)
+   declares input `2f8b34fb...`, but its S4 input was rewritten 65 min after completion and that image is GONE from
+   disk. `config/eval_integrity.yaml` was asserting the opposite ("live_absent_since 2026-09-21") — stale governance,
+   now synced additively (`current_state_20260923`), with BUG-341's premise superseded.
+4. **NEW standing check.** `scripts/verify_declared_inputs.py`: every `input_fingerprint.json` hash claim must still
+   resolve; an unacknowledged move is RED. This is the class-level fix for "a completed run silently stops being
+   citable". Wired into `just health`.
+5. **ANCHOR-3 FROZEN.** `governance/ANCHOR_MANIFEST_20260923.json` (sha256 29393d5f..., 85811 bytes, 150x31,
+   tier human-mixed+llm-attested, RELATIVE-ONLY per D-337) + `scripts/verify_anchor_manifest.py` in `just health`.
+   Every arm comparison now cites a manifest, so a silent regeneration cannot change the reference.
+6. **C15 OBLIGATION REPAIRED.** 71 open / 49 closed of 120 ids (mechanically re-derived, BUG-342 rule) while
+   `agent/session_seed.yaml` carried ZERO bug ids. `governance/SESSION-HANDOFF-2026-09-23.md` now carries the full
+   register and the seed points at it.
+7. **Flag audit truth restored as a first-class refusal:** if the scan and the registry ever disagree about naming,
+   the check reports RED, not warn — an integrity flag may never fire on expected behaviour.

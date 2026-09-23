@@ -308,7 +308,9 @@ watchdog:
   causal_halt_ratio: 0.9
 stage4:
   # D-325 (2026-09-21): ruled boundary discriminators, D-318 byte-compared in the run path
-  boundary_inject_enabled: true
+  # BUG-374/C-2 (fixed 2026-09-23): D-327 ruled the boundary block REJECTED on measurement
+  # ('set back to false') but the flip never landed; the rejected experiment ran live 2 days.
+  boundary_inject_enabled: false
   boundary_path: config/boundary_discriminators.yaml
   process_template_output: process_templates.jsonl
   process_instance_output: process_instances.jsonl

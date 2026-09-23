@@ -157,6 +157,9 @@ consolidation:
   review_sheet: governance/F11_ANCHOR_REVIEW_20260923.csv
   ruling_map: governance/F11_OWNER_RULING_MAP_20260922.csv
   n_anchor_rows: 150
+  # D-337/ANCHOR-3: the frozen manifest (sha256 + rows + cols + tier). Every arm comparison cites
+  # the manifest, never the bare path, so a silent regeneration cannot change the reference.
+  anchor_manifest: governance/ANCHOR_MANIFEST_20260923.json
   # the review sheet names its fill columns by axis abbreviation; map them explicitly so
   # a rename can never silently detach a column from its reader (BUG-368 regression rule)
   owner_columns:

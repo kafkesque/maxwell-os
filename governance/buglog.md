@@ -2666,3 +2666,58 @@ carries - but here it changes behaviour, so it is the more dangerous instance.
 **Remedy (one line, owner GO):** set `stage4.boundary_inject_enabled: false` in
 `config/pipeline_config.yaml`, then re-run `just health` (the new flag-consumer check goes green).
 Until then `just health` reports one RED by design.
+
+## BUG-374 (HIGH — FIXED 2026-09-23, C-2): the rejected S4 boundary block was live in production
+`config/pipeline_config.yaml:311 stage4.boundary_inject_enabled: true` while D-327 (2026-09-21) ruled the block
+REJECTED and recorded the flip as DONE ("set back to false"). `git log -S boundary_inject_enabled` returns exactly
+one commit (8de5d36, which ADDED it as true): the flip never landed, so the A/B-failed experiment was injected into
+every S4 prompt for two days. The flag IS consumed (pipeline_paths.py:213 -> stage4_merged_call.py:120 injection,
+stamp.py:124 fail-closed stamp), so this changed production behaviour, not a comment.
+FIXED: flip applied atomically (backup `governance/backups/pipeline_config.yaml.PRE_C2_20260923`), value verified
+false, YAML valid, `just health` RED cleared. CLASS: BUG-373 again — a decision asserting an implementation state
+that no artifact carried. No new decision was minted: D-327 already rules it; this restores compliance.
+
+## BUG-375 (MED — FIXED 2026-09-23, found by the session-18 audit): the flag audit's own scan could not match the registry
+`scripts/audit_flag_consumers.py::scan_unregistered()` emitted the LEAF key (`boundary_inject_enabled`) via a regex,
+while `config/flag_consumer_registry.yaml` registers the DOTTED path (`stage4.boundary_inject_enabled`). Consequences:
+(a) a REGISTERED flag was ALSO printed as unregistered — the check firing on expected behaviour (BUG-372 class);
+(b) the 8 anonymous `enabled` keys were unactionable ("add it to the registry" — which one?);
+(c) 40 warn lines per run -> warn fatigue that buries the one RED.
+FIXED: the scan now walks the parsed document and emits full dotted paths (e.g.
+`config/omlx_m1_best_config.yaml::models.gpt-oss-20b-MXFP4-Q8.apply.guided_grammar_enabled`), de-duplicated; a
+SELF-CHECK makes "registered but reported unregistered" a RED, so the convention cannot drift again. The now-unused
+`import re` was removed (C19). Evidence: 4 verified / 0 RED, warns 40 -> 40 actionable, exit 0.
+
+## BUG-376 (HIGH — OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone
+`knowledge pipeline/stage5_verify/t11/checkpoint.jsonl` is COMPLETE: 7995 records, `status` PASS 5023 / QUARANTINE
+2972, commit spread 1250 x 8de5d36 (adopted) + 6745 x 81b813f (new run), lock released, no fatal error. But its
+`input_fingerprint.json` (id c2754fc6..., written 2026-09-22T11:26) declares
+`s4_checkpoint_sha256 = 2f8b34fb0f104bbecc32d5b7cd3a37a272e9f3bc7b533db4a0e5b43fbff13992`, while the file
+`knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl` was rewritten at 2026-09-22T12:52 (AFTER the run
+completed at 11:47) and now hashes `0ca6f0f08bea8f2dfbafb7a598e934e4f2afc3b98a894ee847e3ca1183c3d1b0`.
+A repo-wide sha256 scan found NO surviving copy of the 2f8b34fb image, so the identity of the verified input is
+unprovable. Cause class: writers that rewrite this path in place (grep: reclassify_merged_axis.py,
+sync_checkpoint_from_db.py, apply_bug150_*.py, rename_ai_systems_domain.py, fix_bug216_domains_raw.py, e2e_proof.py)
+with no re-stamp of the downstream fingerprint. EFFECT: the next `stage5_verify.py` prints fingerprint MISMATCH,
+archives the 7995 verdicts and re-verifies (~1.3 h); and S6 must not commit this output as "verified against the
+current S4 artifact" (R14). Rows count is unchanged (7995) and the records still carry their own stamps (taxonomy
+v5.1, manifest 711c8218, commit c042e05), so this is a MUTATION-OF-BYTES event rather than a re-classification —
+but "same corpus, different bytes" is exactly what a hash claim cannot absorb.
+DETECTION (new, live): `scripts/verify_declared_inputs.py` + `config/verify_declared_inputs.yaml` (roots + the
+acknowledged-move list). An UNACKNOWLEDGED input move is RED (exit 1); this specific one is a DECLARED exception
+with its reason, per the D-339 exempt_reason pattern. Wired into `just health`.
+OWNER GATE: (a) `S5 REVERIFY` (~1.3 h on the current input), or (b) `S5 FREEZE` (copy the S4 image + S5 output +
+manifest into a frozen/ dir and cite the pair). Pending the ruling, `config/eval_integrity.yaml` carries the truth
+under `label_snapshots.stage5_t11.current_state_20260923` (the old "live_absent_since" keys are kept verbatim,
+R-D410) and BUG-341's premise ("the live checkpoint is absent") is superseded by this entry.
+
+## BUG-377 (LOW-MED — OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled
+Five stale pidfiles were still on disk with no live owner: `temp/train_classifier.pid`, `temp/p3_challenger.pid`,
+`temp/p4_retrain.pid`, `temp/p4_clean.pid` (contents are literally `PID: <n>`, unparseable) and
+`knowledge pipeline/stage5_verify/t11/s5_rerun.pid` (pid 9665, from Sep 2). Worse,
+`knowledge pipeline/stage4_merge/t11/s4_run.pid` holds pid 1933, which is now ALIVE — it belongs to
+`SetStoreUpdateService.xpc` (macOS), i.e. the pid was RECYCLED. No current consumer reads these files
+(`audit_e2e_cohesion.py` reads `singleton_run.pid`; `omlx_watchdog --pid` is explicit), so this is latent, not
+live. IMPACT IF WIRED: any "is a stage running?" check based on pidfile liveness would refuse to start forever
+(fail-closed) or attribute a stranger's process to a pipeline run. FIX (proposed, NOT applied): pidfiles must carry
+a start-time or a command fingerprint (ps -o lstart= + command match) before liveness is trusted.

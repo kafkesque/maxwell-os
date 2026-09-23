@@ -711,3 +711,18 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
 * **New check:** `python3 scripts/audit_flag_consumers.py` (in `just health`) - RED on a flag whose
   state disagrees with its decision, or an ON flag with no consumer that reads it.
 * Anchor re-issued after F-1: sha256 `29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698`.
+
+## Session 19 addendum 4 (2026-09-23) — C-2 closed, C-3 opened, ANCHOR-3 frozen, C15 register live
+* **HUMAN GATE REGISTER:** F-11 unchanged (REDEFINED, D-337). C-2/BUG-374 **CLOSED**. **NEW GATE C-3/BUG-376**
+  (S5 input moved after completion: `S5 REVERIFY` ~1.3 h, or `S5 FREEZE` = freeze the pair and cite it).
+* Decisions 707, `recompute_decision_summary.py --check` in sync. No new ids minted this session (C-2/D-327 already
+  ruled; the freeze is covered by D-337).
+* **Frozen artifacts:** ANCHOR-3 manifest `governance/ANCHOR_MANIFEST_20260923.json`, sha256
+  `29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698`, verified by
+  `scripts/verify_anchor_manifest.py` in `just health`.
+* **S5 t11:** live and COMPLETE (7995 = 5023 PASS + 2972 QUARANTINE), fingerprint `c2754fc6...`,
+  status **COMPLETE-BUT-INPUT-MOVED** (C-3) — cite it only with that qualifier.
+* **Checks now in `just health`:** guard_stacks, status, integrity --quick, audit_flag_consumers (D-339),
+  verify_anchor_manifest (ANCHOR-3), verify_declared_inputs (C-3 class).
+* **Open bug count:** 71 OPEN / 49 CLOSED of 120 — see
+  `governance/SESSION-HANDOFF-2026-09-23.md` (C15 register).

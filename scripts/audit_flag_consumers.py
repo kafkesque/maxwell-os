@@ -19,7 +19,6 @@ Usage: python3 scripts/audit_flag_consumers.py [--quiet]
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -58,14 +57,34 @@ def consumer_reads(consumer: str, config: Path) -> bool:
     return config.name in body or config.stem in body
 
 
+def enabled_keys(doc: Any, prefix: str = "") -> list[str]:
+    """Return dotted paths of every ``enabled``/``*_enabled`` boolean key under ``doc``.
+
+    BUG-375: this scan used to emit the LEAF key only (``boundary_inject_enabled``) while the
+    registry registers the full DOTTED path (``stage4.boundary_inject_enabled``), so a REGISTERED
+    flag was ALSO reported as "unregistered" and the anonymous ``enabled`` keys were unactionable.
+    Walk the parsed document so the registry and the scan share one naming convention.
+    """
+    out: list[str] = []
+    if isinstance(doc, dict):
+        for key, value in doc.items():
+            dotted = f"{prefix}.{key}" if prefix else str(key)
+            if isinstance(value, bool) and (key == "enabled" or str(key).endswith("_enabled")):
+                out.append(dotted)
+            out.extend(enabled_keys(value, dotted))
+    elif isinstance(doc, list):
+        for i, value in enumerate(doc):
+            out.extend(enabled_keys(value, f"{prefix}[{i}]"))
+    return out
+
+
 def scan_unregistered() -> list[str]:
-    """Return dotted paths of every ``enabled``/``*_enabled`` key in config/*.yaml."""
+    """Return dotted paths of every ``enabled``/``*_enabled`` key in config/*.yaml (BUG-375)."""
     found: list[str] = []
     for path in sorted(PROJECT_ROOT.glob(CONFIG_GLOB)):
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        for m in re.finditer(r"^(\s*)([a-z_]*enabled):\s*(true|false)\s*(#.*)?$", text, re.M):
-            found.append(f"{path.relative_to(PROJECT_ROOT)}::{m.group(2)}")
-    return found
+        for dotted in enabled_keys(load_yaml(path)):
+            found.append(f"{path.relative_to(PROJECT_ROOT)}::{dotted}")
+    return sorted(set(found))
 
 
 def run(quiet: bool = False) -> int:
@@ -112,6 +131,14 @@ def run(quiet: bool = False) -> int:
     for key in scan_unregistered():
         if key not in registered:
             yellow.append(key)
+
+    # GUARD (BUG-375/BUG-372 class): the scan and the registry must share ONE path convention.
+    # A REGISTERED flag reported as unregistered means the check itself is lying -> RED, not warn.
+    self_broken = [k for k in yellow if k in registered]
+    if self_broken:
+        red.extend(f"{k} - REGISTERED but reported unregistered: scan/registry path convention "
+                   f"drift (BUG-375 self-check)" for k in self_broken)
+        yellow = [k for k in yellow if k not in registered]
 
     print(f"\nflag consumers: {green} verified, {len(red)} RED, {len(yellow)} unregistered flag(s)")
     for item in yellow:

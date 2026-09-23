@@ -661,3 +661,18 @@ AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).
   Its 'PASS' in SEQUENCE_STATUS:600 is stale.
 - STANDING RULE from audit (c): no NEW retrieval-quality number until the vec orphans are repaired (a number taken
   on a diluted index is on a different ruler). Existing retrieval research predates the dilution and is clean.
+
+## 2026-09-23 - POINTER (B6/D-352): every quoted 0.4741/116 is SUPERSEDED, never re-derive it
+
+The discipline figure 0.4741 (n=116) is not reconstructible (BUG-391) and is superseded by the re-score on the
+ruler in force: base 0.5533 (n=150), adopted point 0.5000 at 25 percent abstain (D-353). Do NOT reconcile the
+old and new numbers by hand (BUG-342): the old denominator is a SUBSET. Sites still quoting it and their status:
+
+- config/eval_integrity.yaml:341 - POINTED (protected file, floors deliberately not rewritten)
+- config/incumbent_ruler_score.yaml:45 - POINTED (same)
+- config/knn_arm.yaml:14 - POINTED (same)
+- governance/REPRESENTABILITY_SWEEP_20260923.md:76 - POINTED (quoted, never re-derived - correct behaviour)
+- governance/R3_HELDOUT_RESULT_20260921.md:36,40 - POINTED; R3 itself is DEFERRED (B5): its ANCHOR-1 sheet/key do not exist
+
+Executed this turn: B7 (temp inputs -> data/anchor_inputs/), B8 (mtp_enabled false). B5 recommendation recorded:
+DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, not a fix).

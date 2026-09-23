@@ -99,7 +99,7 @@ services:
     pinned_version: 0.7.0.dev2
     # D-293: Lightning MTP drafter for Qwen3 adapters (+34-58% decode, lossless at
     # temp=0.0). Enabled per-model in ~/.omlx/model_settings.json; flag records intent.
-    mtp_enabled: true
+    mtp_enabled: false
     bin: null
     default_timeout: 300
     max_retries: 2

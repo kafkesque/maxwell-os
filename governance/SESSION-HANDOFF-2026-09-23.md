@@ -142,3 +142,9 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 **New control:** `scripts/verify_evidence_manifests.py` (+`config/evidence_manifest.yaml`) — 9th fail-loud health check.
 **Flags:** 44 registered under D-339; deferred residue + owner calls in `governance/FLAG_HYGIENE_TASKS_20260923.md`.
 **Not run:** R3 held-out (preflight green, 58/58) — the run is staged; command below. S5 REVERIFY not run (not blocking).
+
+## Session 23 addendum — 2026-09-23 (owner approved the classification recommendation)
+- **D-343 MINTED + MEASURED**: representability sweep over all 7995 FBs (7.8 s). discipline and domains are SEPARABLE (+15.2 pp / +22.2 pp over the constant-answer baseline); extraction_type is WEAK (+9.0 pp); **content_type (−2.98 pp) and depth (−16.5 pp) LOSE to the constant** and must not be classified. Receipt: governance/evidence/REPRESENTABILITY_SWEEP_20260923/. Corrects the earlier blanket "retrieval is dead for discipline" claim: it is dead as a MISLABEL detector (D2575), not as a representation.
+- **D-344 MINTED**: scripts/verify_artifact_authority.py enforces the ARTIFACT_AUTHORITY.json markers (10th just health check); 2 markers, 17 files verified, 0 RED.
+- **BUG-383 FIXED** (167 gitignored __pycache__ dirs / 31 MB invisible to C19; purged) and **BUG-384 FIXED** (the new checker's own pipe-joined-glob defect, BUG-375 class, caught on its first run).
+- pipeline/ untouched; no new owner gate created by this session.

@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "ruling": "D-343",
+  "date": "2026-09-23",
+  "generator": "scripts/representability_sweep.py",
+  "config": "config/representability_sweep.yaml",
+  "measurement_table": {
+    "discipline": {
+      "effective_n": 7995,
+      "modal_share": 0.1134,
+      "knn_agreement": 0.2652,
+      "permutation_null": 0.0398,
+      "lift_over_null_pp": 22.54,
+      "lift_over_constant_pp": 15.18,
+      "route": "classify"
+    },
+    "extraction_type": {
+      "effective_n": 7995,
+      "modal_share": 0.3265,
+      "knn_agreement": 0.4165,
+      "permutation_null": 0.2675,
+      "lift_over_null_pp": 14.89,
+      "lift_over_constant_pp": 9.0,
+      "route": "coarsen_or_classify_with_calibrated_abstention"
+    },
+    "content_type": {
+      "effective_n": 7995,
+      "modal_share": 0.8161,
+      "knn_agreement": 0.7863,
+      "permutation_null": 0.6834,
+      "lift_over_null_pp": 10.28,
+      "lift_over_constant_pp": -2.99,
+      "route": "constant_plus_human_queue"
+    },
+    "depth": {
+      "effective_n": 6525,
+      "modal_share": 0.8193,
+      "knn_agreement": 0.654,
+      "permutation_null": 0.4568,
+      "lift_over_null_pp": 19.71,
+      "lift_over_constant_pp": -16.53,
+      "route": "constant_plus_human_queue"
+    },
+    "domains": {
+      "effective_n": 7995,
+      "modal_share": 0.0879,
+      "knn_agreement": 0.3095,
+      "permutation_null": 0.0832,
+      "lift_over_null_pp": 22.64,
+      "lift_over_constant_pp": 22.16,
+      "route": "classify"
+    }
+  },
+  "receipts": [
+    {
+      "file": "REPRESENTABILITY_SWEEP_20260923.json",
+      "sha256": "d7bb10ceab37b050b23cbd2277acc828a448bf971f6ded808fde434f76cd7ed0",
+      "bytes": 7377,
+      "role": "representability sweep receipt (frozen copy)"
+    },
+    {
+      "file": "REPRESENTABILITY_SWEEP_20260923.md",
+      "sha256": "ddcdcfa2c6ec458c347185f1ab6e9e9ca34eb54b4d6df8d9cabb8b684cae1d5f",
+      "bytes": 3777,
+      "role": "representability sweep receipt (frozen copy)"
+    }
+  ]
+}

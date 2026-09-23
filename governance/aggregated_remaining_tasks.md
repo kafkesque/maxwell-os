@@ -834,3 +834,9 @@ CLOSED: BUG-379 (D-327 receipt filed + D-342 class rule), BUG-380 (stale BUG-326
 BUG-382 (path grammar), flag-hygiene owner calls, S5 REVERIFY (optional), R3 GO (staged, 10 min), laya (DEFER), disk.
 CAPACITY: 29 GiB free; freeze 191 MB; ~1 GB of `.stale_*` checkpoints + backup dirs under stage4/stage5 t11 are the
 largest safe reclaim candidates (owner-only; never `pipeline/safe_delete.py`, BUG-261).
+
+## 2026-09-23 (session 23) sync
+- NEW: D-343 (representability routing regime) + D-344 (ARTIFACT_AUTHORITY enforcement, 10th health check).
+- CLOSED: BUG-383 (gitignored __pycache__ invisible to C19 — 31 MB reclaimed), BUG-384 (checker's own glob grammar).
+- NEW WORK ITEM (assistant, queued): apply the D-343 routing table — content_type + depth move to constant+queue; extraction_type gets a calibrated-abstention threshold; discipline/domains get a kNN arm measured under the frozen ANCHOR-3 reference (D-337, RELATIVE-ONLY).
+- OPEN EARLIER: BUG-381 HIGH (store vintage) still blocks "trustworthy store of record".

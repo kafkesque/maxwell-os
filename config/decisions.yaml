@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 710
+total_decisions: 712
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7714,8 +7714,47 @@ decisions:
     verified by scripts/verify_evidence_manifests.py (config/evidence_manifest.yaml, C12) wired into just
     health. Exit 1 on missing payload, hash drift, size drift, or an unlisted file in an evidence dir.
 
+- id: D-343
+  category: CLASSIFICATION
+  state: RESOLVED
+  date: '2026-09-23'
+  title: >-
+    An axis is deployable as a classifier only if its labels are separable from BOTH a seeded
+    label-permutation null AND the constant-answer baseline; otherwise it is routed to constant+queue
+  rationale: >-
+    Measured 2026-09-23 over all 7995 committed FBs in bge-m3 512d space (scripts/representability_sweep.py,
+    config/representability_sweep.yaml, receipt governance/evidence/REPRESENTABILITY_SWEEP_20260923/):
+    neighbour label-agreement vs a seeded permutation null and vs the modal-label share.
+    discipline 0.2652 vs constant 0.1134 (+15.2 pp) vs null 0.0398 (+22.5 pp) = SEPARABLE;
+    domains 0.3095 vs 0.0879 (+22.2 pp) vs 0.0832 (+22.6 pp) = SEPARABLE;
+    extraction_type 0.4165 vs 0.3265 (+9.0 pp) vs null 0.2675 (+14.9 pp) = WEAK, calibrated abstention only;
+    content_type 0.7863 vs constant 0.8161 (-2.98 pp) = LOSES TO THE CONSTANT (confirms F-17);
+    depth 0.6540 vs constant 0.8193 (-16.5 pp) = LOSES TO THE CONSTANT (the 'domain' class alone is 82%).
+    Consequence: content_type and depth must not be classified; a kNN over this representation already
+    beats the pipeline on discipline and domains, which is where the partition is load-bearing.
+  consequence: >-
+    No new model may be adopted for an axis on the strength of a lift over chance alone. Menu coarsening
+    (D2556 per-label error budgets) is the accuracy lever for the weak axes, not model scale.
+  evidence: governance/evidence/REPRESENTABILITY_SWEEP_20260923/EVIDENCE_MANIFEST.json
+  decisions: [D-343]
+- id: D-344
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-23'
+  title: ARTIFACT_AUTHORITY.json markers are enforced by a checker, and a declared pattern is binding only on the entry that claims authority
+  rationale: >-
+    Session 22 wrote authority markers for stage4_merge/t11 and stage5_verify/t11 but nothing verified them
+    (the last claim-without-a-check). scripts/verify_artifact_authority.py (config/artifact_authority.yaml)
+    now re-hashes every declared authoritative artifact and is the 10th just health check. BUG-372-safe:
+    undeclared files (.stale_*, .bak_*, sidecars) are REPORTED, never RED, because those directories are
+    append-only by design (R-D410). A pipe-joined glob ('a|b') is split, and a pattern is binding only on an
+    authoritative entry - both fixed after the checker's own first run RED-ed on its own grammar (BUG-384),
+    which is the BUG-375 class: a check that cannot resolve the names it must check.
+  evidence: governance/buglog.md (BUG-384)
+  decisions: [D-344]
+
 summary:
-  total: 710
+  total: 712
   proposed: 6
   draft: 1
   active: 483
@@ -7724,7 +7763,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 143
+  resolved: 145
   planned: 8
   ratified: 5
   open: 17
@@ -7752,6 +7791,7 @@ summary:
     C12: 1
     C12 / GOVERNANCE / BUGFIX: 1
     CFG: 5
+    CLASSIFICATION: 1
     CLS: 16
     CLS / CFG: 1
     CONTENT-TYPE ONTOLOGY / DATA: 6
@@ -7774,7 +7814,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 10
+    GOVERNANCE: 11
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1

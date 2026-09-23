@@ -2773,3 +2773,12 @@ reader takes the exact name) but they invite a human to cite a stale reference.
 - **status**: OPEN
 - **logged**: 2026-09-23
 - **detail**: Third instance of the BUG-375 class (a check that cannot resolve the names it must check). The flag registry uses DOTTED paths, but model names contain dots (`models.Qwen3.8-27B-MLX-4bit.apply.guided_grammar_enabled`), so scripts/audit_flag_consumers.py resolves a path that does not exist and reports `path MISSING (registry/artifact mismatch)` for flags that are present in the artifact. Effect: 4 legitimate flags cannot be registered at all until the path grammar is quoted/fixed. Fix (queued): resolve the path segment-wise against the parsed document, or store the path as a YAML list of segments.
+
+## BUG-383 — C19's no-__pycache__ check cannot see gitignored caches (LOW, FIXED 2026-09-23)
+**Symptom:** `find . -name __pycache__` reported **167 directories / 31,084,330 bytes** while C19 was recorded as clean.
+**Root cause:** the C19 check measures *tracked* files; `__pycache__` is gitignored, so every script run regenerates 31 MB that no check sees (BUG-375 class: a check that cannot see the thing it names).
+**Fix:** purged to 0 (they are untracked caches, not pipeline output, so R-D410/safe_delete.py does not apply) and the count is now reported in the audit with the reasoned reading. Reclaimed ~31 MB on a 97%-full disk.
+## BUG-384 — the new authority checker RED-ed on its own pattern grammar (LOW, FIXED 2026-09-23)
+**Symptom:** first run of scripts/verify_artifact_authority.py produced 11 spurious REDs: 10 on `checkpoint.jsonl.stale_*|*.input_fingerprint.json.stale_*` (a PIPE-JOINED glob, which `fnmatch` treats as one literal so it can never match) and 1 on a non_authoritative bookkeeping entry whose pattern did not cover its own filename.
+**Root cause:** BUG-375 class again — the checker could not resolve the names it was asked to check. Also a BUG-372 trap: RED on a non_authoritative entry's pattern would make the marker fire on expected append-only drift.
+**Fix:** split patterns on `|` (both in `declares_pattern` and the per-entry check) and made a declared pattern binding ONLY on an authoritative entry. Re-run: 2 markers, 17 files verified, 0 RED, 0 undeclared.

@@ -1,371 +1,322 @@
-# Maxwell OS v3.0 — Session Seed
-# Loaded at agent startup. Source of truth for session config.
-# Updated: 2026-09-14 (ANTI-DRIFT PROTOCOL — do NOT answer "what's done/remaining" from
-#   memory or a targeted grep. BEFORE answering any such question, run:
-#     python3 scripts/scan_review_artifacts.py      # globs governance/ for ALL review artifacts (no blindspot)
-#     python3 scripts/audit_human_verification.py   # per-row × per-axis provenance → remaining_verification_audit.csv
-#   and read governance/human_review_ledger.json. The human review is FRAGMENTED across
-#   33 artifacts (s4_domain_review_sheet.csv 216 domain verdicts + s4_discipline_review_sheet 63
-#   + frontier69 + d2615 298 + p5 + phase0 149 + D2612 217). MISSING-THIS-CLASS was the root
-#   cause of the 2026-09-14 domain-review blindspot. NEVER assume a single sheet is the whole story.)
-# Updated: 2026-09-14 (D2631 QUEUE-59 DONE + ANCHOR GROWN. revote_queue_59.py finished 59/59 (depth unanimous 36 / discipline 36 / domains 14). D2633 union aggregation -> queue_59_domain_aggregation.json: 34 accepted (disc unanimous + domains overlap->union). apply_queue_59_anchor.py (deterministic; C13 backup + R14 manifest + re-tier) -> 20 full-4axis rows into gold_4axis (214->234 principle, 57 disciplines; source p5:reliable-pair-D2631-revote depth/disc/dom + p5:qwen38-ct-D2629 content_type); 14 depth-abstained + 23 contested-discipline + 2 disjoint stay pending-human. axis_authority.py gained p5:reliable-pair-D2631-revote (DEPTH/DISC/DOM) + p5:qwen38-ct-D2629 (CT).)
-# Updated: 2026-09-14 (b/c FOLLOW-UP (D2633-RESOLVED + D2634). (b) A/B accuracy-dependence ANALYSIS: accuracy is dominated by per-class TRAINING-sample count + label quality (NOT anchor size/architecture). Training set stage4_golden_mined_p4.yaml 1027 ex: 61 disciplines avg 16.8 ex/class, 18/61 <10; 43 domains avg 2.22 labels/row, 11 <20 positives. ARM-1 flat 0.229 vs hierarchical 0.175; domain head near-zero 0.009. Anchor (gold_4axis 214) is EVAL/measurement (35/56 eval classes <=3 rows) — growing it improves trust NOT accuracy. TO INCREASE ACCURACY: (1) targeted ingestion 18-29 starved disciplines (D2607-D); (2) clean labels via reliable-pair relabel (D2610) / weak-sup from verified core (D2585); (3) domain -> bge-m3->taxonomy-match (D2613, training-free) NOT sigmoid head. (c) DOMAIN-AGGREGATION RULED by user: overlap->union (B), final set = sorted union of BOTH reliable voters ALWAYS incl DeepSeek; disjoint -> abstain. scripts/aggregate_domain_votes.py (deterministic, LLM-free) -> governance/p1_domain_aggregation.json: 148/216 accepted (42 exact + 106 union), 2 disc-unanimous disjoint -> domain-abstain, 66 contested. Same policy applies to queue-59 (D2631). decisions 609->610.)
-# Updated: 2026-09-14 (3-MUST EXECUTION (D2631-D2633). (a) D2631 QUEUE-59 3-AXIS RE-VOTE LAUNCHED: scripts/revote_queue_59.py + scripts/run_queue_59_vote.sh vote depth+discipline+domains (3 axes in ONE prompt) on the 59 principle rows remaining after D2629 (49/108 non-principle) via the reliable pair (DeepSeek-v4-pro + Qwen3.8-27B), D2610 unanimous-else-abstain per axis, resumable checkpoint governance/queue_59_vote_checkpoint.jsonl (C6 atomic, R14). Grows the 216 anchor by at most +59. (b) D2632 A/B HARNESS ARM-1 BUILT + RUN: scripts/ab_harness_arm1.py evaluated flat (classifier_modernbert_p5final) vs hierarchical (classifier_hierarchical) on FROZEN gold_4axis (214 principle, contract-first D2618 P0.5) -> FLAT discipline macro-F1 0.229 BEATS hierarchical 0.175 (coarse-gating hurts, consistent w/ D2607 masked-fine falsification); domain head near-useless BOTH (macro-F1 0.009 flat / 0.007 hier — 43-way multi-label starved, confirms D2613 bge-m3 taxonomy-match); confidence compressed (precision 1.0 only at ~0.5% coverage). Latent mismatch surfaced: label_maps.json n_discipline=56 vs model discipline_head=61 (harness infers true head size from state_dict). Output governance/ab_harness_arm1.json. (c) D2633 DOMAIN-AGGREGATION AUTO-POLICY MEASURED: 150/216 discipline unanimous, 42 exact-set domain unanimous (19.4%), 116 overlap, 2 disjoint, 148 auto-acceptable (68.5%). Options A exact-set (42) vs B overlap->union (148, matches measured human union behavior) vs C overlap->intersection. RECOMMENDATION B. OPEN user ruling. Artifact governance/domain_aggregation_policy_decision.md. decisions 606->609.)
-# Updated: 2026-09-14 (6-RECOMMENDATION EXECUTION (D2626-D2630). (1) D2626: authority sets consolidated into pipeline/axis_authority.py (single source of truth; drift bug class eliminated) + D2620 guard wired fail-closed into S4 stage4_merge.validate_classification + S6 stage6_commit.insert_fb. Verified tier 231/189/23 + merge 214-spotless/1-straggler/108-queue unchanged. (2) D2627: 32 (N)-suffix pairs judged mechanism-aware via Qwen3.8 -> 10 dup + 22 distinct; 269 name-stem groups pre-filtered -> 0 pairs with def+mech Jaccard>=0.35. (3) D2628: domain-aggregation policy formalized (human-curated; reliable-pair advisory; future auto-agg exact-set-vs-union = OPEN user decision). (4) D2629: 108-queue content_type re-verify -> 49/108=45.4% NOT principle (39 PT + 4 noise_drop + 4 TI + 1 GE + 1 PI); 59 remain principle. (5) D2630: apply_dedup_marks.py added fbs.duplicate_of + marked 17 rows duplicate_of+QUARANTINE (never delete; PASS 4762->4745 / QUARANTINE 3233->3250, integrity ok). decisions 601->606.)
-# Updated: 2026-09-14 (FORENSIC AUDIT + STRAGGLER RESOLUTION (D2624/D2625). 3 stragglers USER-RULED: Historical-Thinking->discipline=engineering (NOT DeepSeek systems-thinking), Semiospheric->depth=cross-domain, Simplicity->depth=universal -> anchor 214 spotless + 1 emerging + 1 dup = 216. AUDIT fixed 3 issues: (1) D2620 guard was defined+tested but NOT WIRED -> now fail-closed in merge_4axis_adjudication.py; (2) authority-set DRIFT (p5:reliable-pair-D2619-revote + p5:human-locked missing from merge DP/DISC sets -> would undo re-votes) -> fixed, sets MATCH; (3) dedup plan errors corrected (Iterative Design Refinement kept distinct, Iterative Prompt Refinement (2) merged). DEDUP POLICY LOCKED: mark duplicate_of + quarantine, NEVER delete. 35 (N)-suffix rows = high-confidence dup candidates. decisions 601.)
-# Updated: 2026-09-14 (PHASE B DEDUP SCAN+JUDGE (D2621 stage 1-3). scripts/dedup_scan.py (deterministic, read-only) -> governance/dedup_candidates.jsonl (273 name-stem collision groups, 0 exact SHA-256 dupes; 4 confirmed-stem groups: Squash-and-Stretch 3, Responsible-AI 3, Foot-in-the-door 2, Iterative-Refinement 9). scripts/dedup_judge.py (Qwen3.8 mechanism-aware) -> governance/dedup_merge_plan.json (non-destructive, human-review gate): Squash-and-Stretch 3->1, Responsible-AI 2->1, Foot-in-the-door 2->1, Iterative-Refinement 4->1 (judge slightly over-merged 'Iterative Design Refinement' + missed '(2)' prompt collision -> needs human review per D2621). NO DB mutation (dedup=mark not delete).)
-# Updated: 2026-09-14 (D2619-D2624 PHASE A EXECUTED. merge_4axis_adjudication.py fixed (2 bugs: 108-fold-in + spotless metric) + applied -> verified_core 443 rows, 216 principle (215 + 1 abductive duplicate), 6 locked rulings as p5:human-locked overrides (CONFLICTED with reliable-pair vote), 108 -> governance/expansion_queue_108.jsonl. build_4axis_tiers.py re-authored to post-merge authority sets + emerging/duplicate exclusion -> gold_4axis 228 (211 principle) / pending 190 / silver 25. scripts/revote_stragglers.py re-voted 6 stragglers (reliable pair): 3 RESOLVED (Dynamic-System depth=universal, Feminist-Data disc=visual-semiotics, Infrastructure disc=cultural-design; src p5:reliable-pair-D2619-revote) + 3 ABSTAIN (D2624 human queue: Historical-Thinking Qwen3.8 persistent null, Semiospheric + Simplicity depth pair-disagree) + 1 emerging kept. Fixed DeepSeek empty-content (max_tokens 512->2048). decisions 600.)
-# Updated: 2026-09-14 (D2619-D2622 RECORDED + NON-CONTAMINATION CONFIRMED. D2619 4-axis anchor consolidation: merge 5 scattered adjudication files into verified_core.jsonl gap-fill-only; anchor FROZEN at 216 (200 spotless + 1 emerging Law-of-Truly-Large-Numbers + 15 stragglers: 4 ct golden + 10 depth golden-silver + 5 null discipline); the 108 d2615-principle rows = SEPARATE expansion queue (NOT merged). D2620 non-contamination guardrail CONFIRMED by user: 61 disciplines / 43 domains are DISJOINT vocabularies (verified 0 overlap, only shared 'emerging'); psychology + design psychology = DISCIPLINE-ONLY; marketing & communications = DOMAIN-ONLY; validate_discipline_domain() in pipeline/schemas.py + CI test tests/test_taxonomy_disjointness.py::test_validate_discipline_domain_guard (5/5 pass). taxonomy_v5.yaml <-> governance/canonical_labels_reference.md verified IN SYNC (61/61 + 43/43, 0 drift). D2621 distinct-facet-aware dedup + D2622 S5 practicality filter = PROPOSED. D2618 P1 VOTE COMPLETE 216/216 (checkpoint-only, no DB writes). decisions 598.)
-# Updated: 2026-09-13 (D2618 P0 EXECUTED + P1 LAUNCHED. P0 (commit 31be38f): build_4axis_tiers.py split verified_core 443 -> gold_4axis 76 (52 principle) / pending_4axis 294 / silver_4axis 73; normalize_provenance.py canonicalized 6 cells; repass_pair_agreed.py re-PASSed exactly 1,750 pair-agreed rows (PASS 3012->4762, 381 depth syncs); reconcile_review_queue.py deduped checkpoint (25 dup) + appended 25 missing abstains; train_*.py gained load_gold_4axis() wired as GOLDEN_EVAL, stage4_golden_mined.yaml archived to archive/golden_retired_D2618. post-P0 health 10/10. P1 IN-FLIGHT: build_discipline_domain_vote.py votes discipline+domain on 216 principle core rows (DeepSeek-v4-pro + Qwen3.8, unanimous else abstain, resumable ~3.5h serial). FINDING: discipline unanimous ~4/5, domain exact-set unanimous ~1/5 (multi-label granularity), so strict-set unanimity over-abstains domains — domain aggregation policy needs a decision (exact-set vs intersection vs human).)
-# Updated: 2026-09-13 (D2618 A/B-GATED S4 ADOPTION — three frontier auditors (Claude/Qwen/GPT) diverged on classifier architecture: Claude hierarchical ModernBERT+SetFit+conformal; Qwen RAC (bge-m3 cosine+SetFit); GPT contract-first (4-axis gold as authority). RULING: A/B-test the ARCHITECTURE, do NOT A/B the correctness prerequisites. NON-NEGOTIABLE P0 (0 LLM): split verified_core.jsonl→immutable gold_4axis/pending_4axis/silver_4axis; normalize p5:* provenance (guman/juman/claud→claude+human); re-PASS 1,750 wrongly-quarantined pair-agreed rows; reconcile 25 missing review-queue fb_ids; wire gold_4axis into all train_*.py load_golden_set() + archive stage4_golden_mined.yaml from eval. A/B HARNESS (reuse D2577/D2610 fixed-split, frozen gold_4axis held-out): ARM-1 classifier hierarchical vs RAC vs flat+conformal ($0 local); ARM-2 CRIBS gpt-oss vs Qwen3-Coder on frozen D2293 benchmark (retain gpt-oss until replacement WINS); ARM-3 abstention raw-threshold vs conformal/selective vs SetFit. UNCONDITIONAL FIXES: _masked_fine_pred -inf flat-logit fallback; S5 char→token truncation; remove dead route=FB; S5 classification-entailment. HONEST GUARANTEE: 100% prevention of silent acceptance outside confidence envelope, NOT semantic 100%. decisions 594.)
-# Updated: 2026-09-13 (D2617 VERIFIED-CORE FREEZE + PHASE-1 FINALIZE + SPOTLESS RECOUNT. Phase 1 COMPLETE: scripts/build_verified_core.py (deterministic, LLM-free) froze the sole eval target governance/verified_core.jsonl = 443 unique rows (149-core + 298-sample; 4 fb_id overlap → 149+298=447 additive). R14-stamped, verification_status HONEST: human-verified 28 / joint-vote-verified 121 / pending-human 294 (298-sample D2615 batch NOT yet human-adjudicated — carried with disagreement_pair, never re-branded verified). BUG-241 "93.3% unverified silver" RETIRED AT DATA LEVEL: 1,027 stage4_golden_mined.yaml demoted to silver candidate pool; eval must use verified_core.jsonl. ALSO: #85 Iterative Design Refinement depth domain→cross-domain (human) + apply_phase1_finalize.py materialized 88 DB state changes (8 ct flips, 49 depth flips, 66 PASS/22 QUARANTINE) + blanked 21 residual non-principle depth rows (29→0); C13 backup + R14 manifest + integrity ok; post-finalize fbs 7,995 = PASS 3,012 / QUARANTINE 4,983. SPOTLESS RECOUNT: ct+depth DeepSeek+Qwen/human cross-checked 702 (561 principle + 141 non-principle); strict 4-axis (ct+depth verified AND disc/dom non-silver) 153; disc/dom non-silver 209/1027 = BINDING CONSTRAINT (DeepSeek+Qwen never voted domain/discipline → "4-axis DeepSeek approval" NOT claimable). VERDICT: verified set too small to beat gpt-oss on 61/43 (61 disc ≈ 16.8 ex/class) — sufficient only for coarse 7-way ct + 4-way depth gate + frozen eval core. NEXT (Phase 1b): human-adjudicate 294 pending + DeepSeek+Qwen3.8 domain/discipline verification pass on principle rows (the only axis never voted). decisions 593.)
-# Updated: 2026-09-13 (D2616 S2/S4/S5 FORENSIC AUDIT ADJUDICATION + PHASE 0 EXECUTED. Four frontier auditors (Claude/GPT/GPT-5.6-Luna/Qwen) + goose/Qwen3.8-27B verification → ultimate solution (4 phases). REJECTED: Qwen's "38% golden corrupted" (real = 93.3% unverified silver, 69/1027 = 6.7% 4-axis verified) + "retire gpt-oss now + Snorkel" (Dawid-Skene already 48.7% false-flag in-repo). PHASE 0 APPLIED: commit_non_fb_types:true (D2590); route deprecated as ontology carrier — missing content_type → quarantine, never principle (BUG-148 CLOSED); scripts/apply_phase0_relabels.py demoted 1,365 vote-confirmed non-principle rows (C13 backup + R14 manifest + integrity ok) → fbs content_type principle 7,966→6,601 / noise_drop 1,054 / PT 179 / PI 121 / TI 16 / GE 17 / quarantine 7; Pydantic runtime boundary (validate_fb_content_type/validate_fb_depth) wired fail-closed into S6 insert_fb. BUG-243: DeepSeek empty-content on open-ended prompts (use Qwen3.8 local + deterministic checks). NEXT (Phase 1): human-adjudicate 149-core + 298-sample (~435 verified rows) as sole eval target; Phase 2 local $0 label stack (weak-sup + hierarchical ModernBERT + SetFit + conformal + S5 classification-entailment); Phase 3 gated gpt-oss retirement; Phase 4 rebuild once + 11-mode invariant gates. decisions 592.)
-# Updated: 2026-09-11 (D2613 GOLDEN-SET TRUST GAP + VERIFIED-CORE INVENTORY + JOINT VOTE LIVE. The 1,027-example "golden" set is gpt-oss teacher SILVER — every rationale says "NOT hand-reviewed" (gpt-oss 1027 / DeepSeek 0 / human 0). Verified-label inventory: content_type 314 / domain-discipline 138 / depth 133+69; 4-axis intersection = 69 (frontier69) = 6.7%. Canonical counts CORRECTED to 43 domains / 61 disciplines (was drifting 35/75). RULING (Phase 0): freeze a human+DeepSeek-verified core (69->~150, stratified) as the sole eval target; demote the 1,027 to silver pool; no further classification/voting until it exists. JOINT VOTE (content_type+depth, 7,966 rows) LAUNCHED + HARDENED: BUG-240 fixed (DeepSeek no-retry -> permanent empty-content poison; now 3-attempt backoff + parse_json_robust + R14 stamps + --preflight/--retry-failures/--checkpoint); pilot corrected production principle 61.0% (not 82.0%), relabel target ~3,800-4,900 rows. Running via scripts/run_joint_vote.sh (caffeinate + reliable-only), checkpoint governance/joint_vote_production_checkpoint.jsonl, ~16s/row (Qwen3.8 vlm-engine serializes) = ~35h ETA. Strategy: object type at S2 (S4 trusts), depth = reliable-pair + encoder cache, domain/discipline = bge-m3->taxonomy-match, one-model end state via weak-supervision seeded from the verified core. decisions 589.)
-# Updated: 2026-09-11 (D2612 CONTENT-TYPE ADJUDICATION + DEPTH RELABEL SCOPE. The 217 unlabeled golden-mined rows were human-adjudicated then R5-verified by DeepSeek-v4-pro on the FULL text (definition+mechanism+boundary, NOT the truncated form). RESULT: agreement 201/217 = 92.6% (up from 79.3% first pass); 16 contested -> governance/content_type_contested_16_form.md. Frozen non-principle rate: user 36/217 = 16.6%, DeepSeek 34/217 = 15.7%; confirmed-principle 178/217 = 82.0%. BUG-239 FIXED: form generator dropped boundary 217/217 + truncated mechanism 185/217 -> scripts/content_type_human_review_form.py now emits full mechanism+boundary. RULING: 7995-row depth relabel SCOPED to confirmed-principle subset (~6,600-6,900 rows) NOT 7,995 (BUG-238: 12.7-16.6% non-principle, not 0.4%). D2610 policy PORTED to scripts/label_vote.py (reliable-pair unanimity + abstain + provider-aware deepseek routing; was 2-of-3 fail-closed). DeepSeek balance RESTORED (HTTP 200). NEXT: resolve 16 contested rows (form), then relabel depth on confirmed-principle under D2610. decisions 588.)
-# Updated: 2026-09-10 (D2610 DEPTH LABEL POLICY v2 + D2611 SERVING RULING. MEASURED: reliable-pair (DeepSeek-v4-pro + Qwen3.8-27B) agreement is only 69.0% and Qwen3-Coder-30B matches it 44.7%, yet under 2-of-3 it DECIDED the 304 rows where the pair disagreed -> 612/996 majorities were partly coin flips; fail-closed-to-domain fabricated 8.1% of labels (encoder acc 0.300 exactly there). POLICY v2: reliable voters must be unanimous -> label + confidence high; else ABSTAIN (confidence low + needs_review -> governance/depth_review_queue.yaml); advisory voters never decide; checkpoint upserted (1780 lines/996 unique -> 996). Re-derived 996 FBs with NO model calls -> 678 confirmed / 318 abstained. CONTROLLED: encoder on v2 labels 0.4298 macro-F1 / 0.594 acc vs v1 0.4073 / 0.526 on the identical 133-row consensus slice with 251 FEWER train rows; selective prediction 0.712 acc at 50% coverage. A/B (same 200 FBs): encoder 0.4790/0.530/0.6ms vs production gpt-oss depth call 0.4433/0.580/2.15s vs few-shot 0.4571/0.550/3.02s -> no model swap buys quality; 2-way scope 0.690 vs 0.645. RULING: keep the prompt-versioned generative call as labeler of record, encoder = regenerable cache, RETIRE the 0.85 gate for kappa + coverage/precision + the 133-row core regression. NEXT: adjudicate 318, relabel 7995 prod rows (BUG-237), grow eval to >=100/class.)
-# Updated: 2026-09-10 (D2577 DEPTH VOTE EXECUTED + CONTROLLED RESULT: (1) scripts/build_depth_vote_set.py voted 996 FBs (716 cross-domain + 80 universal + 200 controls) with 3 voters = DeepSeek-v4-pro + Qwen3.8-27B + Qwen3-Coder-30B (Phi-4-mini/gemma RULED UNRELIABLE). FIRST PASS COMPROMISED: DeepSeek HTTP 402 "Insufficient Balance" on 781/996 -> 78% degraded to 2-voter; recovered live key from .zsh_history (sk-4719...; sk-b266...=revoked, sk-laUw...=Moonshot) + added --retry-failures/--workers -> 982/996 full 3-voter coverage, 915 agreed. CLEAN dist: domain 501 / cross-domain 384 / universal 65 / specialized 46 (silver twin same FBs: 716/80/100/100) — vote downshifts ~330 silver cross-domain to domain (D2576 confirmed). (2) CONTROLLED EXPERIMENT (fixed 796/200 split, scripts/eval_depth_classifier.py): CLEAN labels macro-F1 0.4790 vs SILVER 0.3409 on the IDENTICAL test set = +0.138 (+40% rel); domain 0.252->0.564, universal 0.143->0.348, specialized 0.381->0.480. Naive per-set macro-F1 was CONFOUNDED by class proportion (silver 0.6153 on its own cross-domain-heavy split). (3) VERDICT: vote materially improves depth labels but still BELOW the 0.85 gate -> depth is annotation-limited; 4-way per-FB is hard for a 139M encoder.)
-# Updated: 2026-09-10 (SESSION: R5 QWEN3.8 RE-REVIEW + DEPTH 4-WAY BASELINE + INGESTION SOURCE MAP. (1) R5 re-review with Qwen3.8-27B (USER OVERRIDE: gemma unreliable) of all 5 new scripts (B/C/D + BUG-233 guard) -> governance/r5_review_qwen38_session_2026-09-10.{jsonl,md}: all NEEDS_FIX; triage FIXED C16 no-silent-errors (raw_predict loop + yaml/sqlite/json/torch.load wrapped), R14 stamps (thresholds.json + manifests + hierarchical/depth label_maps), C12 created-date->datetime + env overrides (GOLDEN_YAML/CHECKPOINT_DIR/MAXWELL_DB/BOUNDARY_CORPUS/TAXONOMY_YAML), C18 docstrings, C20 GRAD_CLIP_NORM; C12/C20 module-constant findings triaged FALSE-POSITIVE (runtime config-driven at stage4_merge; named constants C20-compliant). (2) DEPTH 4-WAY CLASSIFIER (D2577 baseline): scripts/train_depth_classifier.py (dedicated ModernBERT-base, 4-way softmax, ontology from pipeline.schemas.DEPTH_LITERAL) -> knowledge pipeline/classifier_depth. Trained on 1,027-ex golden depth labels: macro-F1 0.4796 (gate 0.85) — universal 0.000 / cross-domain 0.437 / domain 0.815 / specialized 0.667. DATA-NOISE-LIMITED (universal collapses: 18 ex, gpt-oss over-assigns universal ~2/3 wrong); 3-model-vote clean set is the NEXT step. (3) 9 CRITICAL disciplines SOURCE MAP: feed.opml gained "Targeted Ingestion (D2607-D)" section (10 arXiv RSS feeds: cs.RO/cs.CC/cs.DS/cs.FL/physics.comp-ph/cs.GR/cs.CE/cs.HC/cs.CV/q-bio.PE) + governance/targeted_ingestion_sources.md (finding: prior feed.opml covered ZERO of the 9 CRITICAL). decisions stay 585 (amendments D2577 + D2607).)
-# Updated: 2026-09-09 (D2607 B+C — COARSE HEAD WIRED + INGESTION PLAN: (1) student_classifier.py now auto-detects hierarchical vs flat checkpoint (3-head coarse 10 + discipline 61 + domain 43 vs 2-head); added predict_coarse() + coarse-gated predict() (emit discipline only if coarse confidence >= 0.70 AND coarse<->fine agree); config student_preclassifier_checkpoint -> classifier_hierarchical + student_preclassifier_coarse_threshold 0.70 threaded via pipeline_paths + stage4_merge; R5 gemma APPROVE_WITH_CAVEATS (redundant softmax fixed). FLAG STAYS OFF (fine head still under-confident -> coarse-gated predict abstains ~100% = safe). (2) scripts/plan_targeted_ingestion.py + governance/targeted_ingestion_plan.{json,md}: 18 starved disciplines = 9 CRITICAL (convergent<=3) + 8 HIGH + 1 MODERATE; new source content is the only lever for the fine head.)
-# Updated: 2026-09-09 (D2607 AMEND B — HIERARCHICAL RESULT: taxonomy discipline_groups (10 groups, 61/61 exact) + scripts/train_hierarchical_classifier.py + checkpoint classifier_hierarchical (coarse 10-way + fine 61-way + domain 43-way). Measured held-out: coarse top-1 54.0% (macro-F1 0.46, 90% prec @ 20% cov) vs fine-flat 28.7% vs fine-masked 24.8%. MASKED FINE FALSIFIED (coarse 46% error propagates unrecoverably). COARSE HEAD = KEEPER (10-way student >> 61-way as abstention signal). NEXT: wire coarse head as student signal; fine 61-way data-limited -> targeted ingestion (D).)
-# Updated: 2026-09-09 (D2607 AMEND — C CALIBRATION RESULT: per-class selective thresholds wired (student_classifier.py raw_predict + thresholds.json loading) + scripts/calibrate_student_thresholds.py, R5 gemma-4-E4B APPROVE_WITH_CAVEATS (C16 try/except + C20 DOMAIN_SIGMOID_THRESHOLD + --min-emit fixes applied). EMPIRICAL FALSIFICATION of C-as-is: held-out student top-1 27.7% (wrong 72%), confidence compressed 0.05-0.39, cannot reach 90% precision at ANY coverage (best 75% @ 4%). FLAG LEFT OFF — enabling now = wrong labels OR ~always-abstain (zero savings + 596MB load). RE-SEQUENCED: B hierarchical + targeted ingestion FIRST, then re-run calibration + enable C. Mechanism ready; the DATA (student quality), not the code, blocks C.)
-# Updated: 2026-09-09 (D2609: BUG-233 RESOLVED option b+ — D2587 boundary corpus = rules-regression-only content_type eval (NOT model-eval), example_ids = HELD-OUT from future content_type training. (a) rejected: cross-task overlap (discipline training vs content_type eval), content_type rules-based today, excluding 150 IDs would starve the discipline classifier. Plain (b) rejected as prose latent-trap. FIX: eval_scope + held_out_from_training schema fields + pipeline/boundary_holdout_guard.py (assert_no_training_overlap). decisions 584->585.)
-# Updated: 2026-09-09 (D2608: FORENSIC AUDIT (R5: Qwen3.8-27B auditor + gemma-4-E4B verifier; DeepSeek keychain blocked -> gemma substituted). Deterministic checks clean (taxonomy 61/43, golden<->DB 1027/1027, student label-map reconstruction == training logic). 6 findings all AGREE: F1[HIGH] CHALLENGE boundary corpus 150/150 overlaps Tier2 training -> BUG-233 (latent eval contamination, pending disjoint-vs-documented); F2 checkpoint drift FIXED (both dirs -> p5final); F3 stale D2605 FIXED (30/7/resolved); F4[HIGH] student label maps from live golden FIXED (label_maps.json frozen); F5 swallowed exceptions FIXED (logger.exception + student_override_error); F6 source-pool overlap subsumed in F1. decisions 583->584.)
-# Updated: 2026-09-09 (D2607: CLASSIFIER 0.75-STRATEGY (data-backed). Audit 7,995 FBs / 2,603 convergent / 2,441 labeled; 29/61 disciplines <20 convergent, golden 18/61 <10 even after backfill. P5 retrain macro-F1 0.2036 (vs P4 0.2875) = no improvement, confirms data-limited. RULING: A) bare S2 re-run REJECTED (same skew); B) HIERARCHICAL (61->~10-12 coarse) = structural; C) LLM-HYBRID = now (ModernBERT student + gpt-oss fallback, KPI=end-to-end); D) targeted ingestion for 18 starved disciplines. 00631 resolved discipline=risk management + domains=[ai & agents]. Tier3 D2594 parallel. decisions 582->583.)
-# Updated: 2026-09-09 (D2606: R5 REVIEW FALSE-POSITIVE. Qwen3.8-27B REJECTED scripts/propagate_p5_final.py claiming sqlite3 "BEGIN within transaction" crash. Empirically FALSE — script committed 28 rows, integrity ok, spot checks pass; same BEGIN pattern in already-reviewed propagate scripts. APPROVED on empirical grounds; overruled as hallucinated bug. decisions 581->582.)
-# Updated: 2026-09-09 (D2605: P5 FINAL HUMAN ADJUDICATION APPLIED. Arbiter ruled A/B/C axes -> governance/p5_adjudication_final.json + scripts/propagate_p5_final.py. A content_type: 9 noise_drop (00434/00972/00995/00984/00272/00975/00507 + already 00516/00548/00971), 4 principle kept (00423 Periodic-Table law, 00790 Virtuous-Design, 00278 Stiglers-Law, 00606 Variation-Decomposition), 00650 Metafont kept process_template. B discipline: 11 FIX_LABEL (00063->computer graphics; 00587->HCI reversing DeepSeek sociology). C domain: 6 FIX_LABEL. 28 writes -> stage4_golden_mined.yaml + gold_frozen.yaml + maxwell.db (C13 backup). FLAGGED 00631: domain "strategic thinking"=DISCIPLINE conflation, NOT applied, needs re-decision. AMENDED 2026-09-09: 00631 resolved -> discipline=risk management, domains=[ai & agents], final 30 writes / 7 domain. decisions 580->581.)
-# Updated: 2026-09-09 (D2604: P5 DEEPSEEK CROSS-VERIFICATION (v4-flash vs v4-pro). R5 generator!=verifier: scripts/deepseek_p5_verify.py used deepseek-v4-flash (independent of v4-pro) to verify the 69 discipline/domain claims -> 66/69 discipline agree (95.7%), 68/69 domain agree (98.6%). 3 v4-pro errors CORRECTED: 00366 evolutionary biology->health & medicine (CRISPR=biomedical); 00722 political economy->philosophy (totalitarian authority=political philosophy); 00895 domains drop 'semiotics & communication'. 1 AMBIGUOUS: 00063 software engineering vs computer graphics. Final form: governance/p5_human_review_final.md. decisions 579->580.)
-# Updated: 2026-09-09 (D2603: P5 DEEPSEEK ADJUDICATION (69 FBs). Local-LLM challenger votes (Qwen3.8-27B/gemma-4-E4B/Phi-4-mini) conflated domain/discipline (e.g. proposed "urban planning" — a DOMAIN — as discipline), discrediting recommendations. scripts/deepseek_p5_review.py (DeepSeek-v4-pro, C22 opt-in, temp 0.0, strict 61-discipline/43-domain separation + post-validation) -> governance/p5_deepseek_review.{json,md} + p5_human_review_deepseek.md. Result 69/69, 0 contamination flags, 48/69 discipline CHANGED vs silver (69.6%). DeepSeek DIFFERS from all 4 local-LLM deferred proposals (00156->systems thinking; 00423->theoretical physics [keeps silver]; 00440->creative coding; 00602->generative design). Human remains arbiter. decisions 578->579.)
-# Updated: 2026-09-09 (D2602: LABEL-CLASSIFIER P5 FREEZE PLAN + P6 RETIRE. (1) P5: scripts/p5_freeze_plan.py -> governance/p5_freeze_plan.{json,md} + p5_human_review_form.md. Classifier macro-F1 0.2875 (target 0.75) is DATA-LIMITED: 18/61 disciplines <10 ex (game design/theoretical physics/privacy/robotics/decision making/ecology/generative ai at 5). Tiers GOLD-A 135 / GOLD-B 892 / CHALLENGE 9. BOUNDED human-review queue = 69 FBs (4 deferred + 65 challenger-abstain) = immediate blocker to GOLD-A freeze + retrain. (2) P6: scripts/label_vote.py marked RETIRED-TO-SPOT-CHECK. decisions 577->578.)
-# Updated: 2026-09-09 (D2601: BUG-232 FALSE-CONVERGENCE FIX + GOV SYNC. (1) scripts/fix_false_convergence.py (Qwen3.8-27B R5 code-review APPROVE — USER OVERRIDE: Qwen3.8 > gemma for R5 code review) re-tiered the 96 same-author echoes -> is_convergent=0 + source_diversity=1 (author-floored) in maxwell.db (C13 backup maxwell.db.bak_20260909_162749_pre_falseconv; integrity ok). Manifest governance/false_convergence_fix_manifest.{json,md}. REMAINS (BUG-232 tail): recompute source_diversity as distinct primary works at extraction + CI gate. (2) GOV SYNC: MASTER-TASK-REGISTER.md + DECISION-LOG.md were 3 days STALE (last touched 2026-09-06) — reconciled now: header counts 562->577, ACTIVE 460->473, DONE 81->82, added D2587-D2601. decisions 576->577.)
-# Updated: 2026-09-09 (D2599: P4 SPLIT-BRAIN MERGE + P2 FALSE-CONVERGENCE AUDIT + CONVERGENT=PRINCIPLE-BY-DESIGN CORRECTION. (1) P4: 12 boundary-corpus cases appended to ledger → 97 unique = single source of truth. (2) P2: scripts/audit_false_convergence.py → 96/1012 golden FBs (~9.5%) are SAME-AUTHOR ECHOES (source_diversity>=2 but <2 distinct authors); governance/false_convergence_echoes.json. Re-tier = human decision. (3) CORRECTION: stage2_fewshot_convergent.yaml is 100% principle BY DESIGN (S2 convergent path = FB/principle only); non-principle roles live in single-source path — stage2_fewshot_single_source.yaml ALREADY has 11 non-principle positives (2 PT + 7 TI + 1 PI + 1 GE). The "add non-principle to convergent few-shot" task was a phantom gap. decisions 574→575.)
-# Updated: 2026-09-09 (D2598: FORENSIC AUDIT + QWEN3.8 DOUBLE-CHECK + P1 PROPAGATION. (1) Forensic audit (governance/FORENSIC_AUDIT_CONTENT_TYPE_2026-09-09.md) found content_type adjudication was INERT — lived only in ledger+backlog+boundary-corpus, never reached pipeline data. Also: false-convergence (00177 same book 2 editions), invalid "noise" content_type (2 rows→fixed), governance split-brain (84 ledger + 13 boundary-corpus), stale silver discipline (00547). (2) Qwen3.8-27B local second-opinion triangulated 6 objects. (3) FINAL human verdicts (user): 00177→tool_instruction, 00547→process_template, 00650→process_template, 00934→principle, 00668→process_instance, 00006→growth_edge. (4) P1: scripts/propagate_content_type_decisions.py writes 97 merged content_types back to stage4_golden_mined.yaml + gold_frozen.yaml + maxwell.db (C13 backup). Ledger 85 unique; frontier69 = 58 principle / 6 noise_drop / 2 quarantine / 2 process_template / 1 tool_instruction. decisions 573→574.)
-# Updated: 2026-09-09 (CORRECTION: few-shot "30 empty content_type/extraction_type" = NEGATIVE/rejection examples (should_extract=False, route=NULL, tier=CHALLENGE) — correctly empty, NOT gaps to fill. No fill form needed. Real remaining few-shot task = add 2-4 non-principle few-shots to stage2_fewshot_convergent.yaml (D2587 P0 role diversity; convergent positives are 100% principle).)
-# Updated: 2026-09-09 (D2597: FRONTIER69 GOLDEN SEED COMPLETE. All 69 frontier objects now HUMAN-adjudicated on content_type (52 agrees-with-DeepSeek batch applied): FINAL = 57 principle / 6 noise_drop / 2 quarantine / 2 tool_instruction / 2 process_template. depth/domain/discipline already frontier-verified (Qwen3.8 + DeepSeek 98.6/97.1/98.6% agreement). Ledger 84 unique, backlog human_confirmed 97 / unlabeled 217. This is the 4-axis-clean golden seed. REMAINING Tier1: 30-empty content_type + 30-empty extraction_type in injected few-shot files (stage2_fewshot_convergent CONV-XXX + stage2_fewshot_single_source). decisions 572→573.)
-# Updated: 2026-09-09 (BUG-230 CRITERION CODIFIED + 52-object form. (1) content_types.yaml: growth_edge description now states the positive entry criterion (OPEN TENSION or UNVERIFIED CORRELATION; NOT bare utilizable fact) + new content_type_rules.growth_edge_entry_criterion. BUG-230 fully resolved. (2) Emitted governance/content_type_frontier69_remaining52_form.md — 52 remaining frontier69 objects with DeepSeek hints inline (50 principle / 2 process_template). Next: human-confirm those 52.)
-# Updated: 2026-09-09 (D2596 follow-up: BUG-230 option-1 RESOLVED. The 4 growth_edge assignments (00334 Equity Capital Sources / 00385 Language Standardization / 00495 Melatonin Suppression / 00882 Digital Identity) re-classified → noise_drop (established facts/trends, no prescriptive claim) — ledger appended + backlog + frontier69_final_adjudication.json corrected. growth_edge kept narrow (falsifiable). BUG-230 REMAINS: codify positive entry criterion in content_types.yaml to prevent recurrence. NET 17 human decisions: 7 principle / 2 quarantine / 2 tool_instruction / 6 noise_drop / 0 growth_edge.)
-# Updated: 2026-09-09 (D2596: DEEPSEEK FRONTIER AUDIT + 17 HUMAN content_type DECISIONS. (1) DeepSeek-v4-pro (C22 opt-in, temp 0.0) independently re-verified the 69 frontier-Qwen3.8 objects: depth 98.6% / discipline 97.1% / domains 98.6% cross-frontier agreement (NOT 100%). 4 overrides recorded (00085 depth+disc, 00418 disc was empty->generative ai, 00562 domains, 00629 disc->theoretical physics). (2) 17 human content_type decisions applied to ledger+backlog: 7 principle / 4 growth_edge / 2 quarantine / 2 tool_instruction / 2 noise_drop (human_confirmed 28->45, unlabeled 286->269). (3) FLAG BUG-230: 4 growth_edge assignments with rationale "utilizable fact" = catch-all anti-pattern; resolve positive entry criterion. (4) 52 of 69 remain DeepSeek-proposal-only. Artifacts: governance/deepseek_frontier69_audit.{json,md} + frontier69_final_adjudication.json. decisions 571→572.)
-# Updated: 2026-09-09 (D2595: FRONTIER QWEN3.8 VERIFICATION SET LOCATED + TIER-1 RETARGET. CORRECTION: there IS a frontier Qwen3.8 review (reviewer="Qwen3.8", NOT local MLX) of depth/domain/discipline — 69 golden objects in temp/p5_phase1_human_adjudication.jsonl with final_depth/final_discipline/final_domains + confidence (high 68/medium 1) + notes. BUT content_type is a SEPARATE axis frontier Qwen3.8 did NOT touch: 69/69 content_type-UNLABELED, and the ct60 clean-content_type set (60) is DISJOINT from these 69 (0 overlap). TIER-1 RETARGET: fill content_type on the 69 frontier-verified objects (depth/domain/discipline already done) → one pass of 69 = spotless 4-axis golden seed. Form: governance/content_type_frontier69_form.md + data governance/frontier_qwen38_69_objects.json. decisions 570→571.)
-# Updated: 2026-09-09 (D2594: 3-TIER GOLDEN ARCHITECTURE LOCKED (Option C) + D2592 DSPy gate REVISED to tier-based. A+B EXECUTED: (A) GOVERNANCE LOCK — D2594 locks 3-tier golden architecture: Tier1 SPOTLESS FEW-SHOT (stage2_fewshot_convergent/single_source + stage4_golden, ~33 injected, target ~40-70 human-verified, 0-unlabeled+0-model-only on content_type+extraction_type) + Tier2 STATISTICALLY-CLEANED TRAINING CORPUS (stage4_golden_mined + _p4, ~1027, label model D2585/D2586 pi=0.785 + 59 P4 corrections + cleanlab D2571 + T-NLI — NOT hand-verified, hand-verifying 1027 is the unbounded cost eliminated) + Tier3 BOUNDARY/REGRESSION (d2587_boundary_corpus.yaml, 9→~150-250 CHALLENGE, 2-of-3 adjudication). REJECTED: retire-to-70 (breaks MIN_GOLDEN_EXAMPLES=100 + throws ~950) and sweep-all-1027 (unbounded cost). DSPy re-open gate REVISED: all-1027-spotless → Tier1-spotless + Tier2-statistically-clean + Tier3-≥150. (B) TIER2 STATISTICAL CLEAN CONSOLIDATED = ALREADY DONE (label model + P4 + cleanlab ran 2026-09-05/06) — content_type sweep RE-SCOPED to Tier1+Tier3 only, NOT all 1027. decisions 569→570.)
-# Updated: 2026-09-08 (D2592 + D2593: CONTENT-TYPE VERIFICATION BACKLOG + DSPy ARCHIVE + S2 SMOKE TEST. (1) D2592 DSPy ARCHIVED (BUG-168 wire-or-archive → ARCHIVE/defer) with MANDATORY RE-OPEN GATE = "as soon as golden examples are SPOTLESS (content_type + extraction_type fully human-verified, 0 unlabeled + 0 model-only-unverified)". DSPy optimizes on labels; golden content_type NOT yet spotless → wiring now = training on noise. (2) D2593 CONTENT-TYPE BACKLOG BUILT (scripts/content_type_sweep_rank.py → governance/content_type_verification_backlog.{json,md}): content_type is the LEAST-verified golden axis — of 1027 mined rows, 286 UNLABELED + 701 MODEL-ONLY + 40 human-attended (3.9%). VERIFICATION ORDER LOCKED: content_type → extraction_type → domain/discipline/depth. (3) S2 SMOKE TEST GREEN (deterministic): D2587 rules present in SINGLE_SOURCE_SYSTEM + SINGLETON_SYSTEM + SINGLETON_BATCH_SYSTEM; _check_d2587_rules fires; BUG-226/148 instrumentation present. FIXED validator gap: empty steps=[] now flagged (was silently clean). Ready for scoped 300-500-cluster S2 run via `just s2-singletons` (code-behavior smoke, NOT golden eval). decisions 567→569.)
-# Updated: 2026-09-06 (D2584 + D2585 + P0/P1/P2/P3: VOTE-MODEL VERDICT + LABEL-MODEL EXECUTION. (1) D2584 DATA-ABSENT RESOLVED: computational theory/ecology/robotics were NOT missing content — unresolved domain axes → 19 aliases + resolve_data_absent_domains.py; golden 1026→1027, 61/61 trainable; bug197_kind_swap 400 FBs (2 disc + 35 dom). (2) D2585 LABEL-QUALITY VERDICT (roundtable + 2nd-round peer review): RETIRE full-corpus 3-model vote (D2582→SUPERSEDED) → weak-supervision label model (gpt-oss teacher → {T-NLI + cleanlab + challenger} LFs → Snorkel/Dawid-Skene → GOLD-A/B/C → ModernBERT + calibrate + conformal abstention) with MANDATORY LF-audit gate. (3) P0 BASELINE: ModernBERT 1,027-ex/61-class → macro-F1 0.1845 (DOWN from 0.2621; 61/61 trainable, 33 data-starved, nonzero-mean 0.402); confusion matrix saved. (4) P1 LF-AUDIT (lf_dependency_audit.py): T-NLI vs cleanlab near-INDEPENDENT (phi=0.093, kappa=0.062) → Dawid-Skene independence NOT violated; cleanlab uncalibrated (θ=0.41 = 41% FP). (5) P2 LABEL MODEL (build_label_model.py, Dawid-Skene EM): π=0.785, 135 high-suspicion golden FBs (challenger/GOLD-A seed). (6) P3 CHALLENGER PREP: residency fix (unload between voters) + --high-suspicion filter + gemma-4-E4B path validated; full 135-FB run pending (OMLX up, BUG-224). decisions 560→562.)
-# Updated: 2026-09-05 (D2573-D2575: D2399 CLOSED-LOOP + KIND-LEAK CLEANUP + GOLDEN STRAT. (1) D2573 ECOLOGY PROMOTION (option 1, user-approved): promote ecology (5 FBs) → canonical; demote computer networking (4 FBs) → displaced. taxonomy_v5.yaml +ecology/-computer networking; alias_map removed dangling data communication→computer networking. scripts/apply_d2399_ecology_promotion.py (gemma R5 APPROVE). Canonical 61→61, integrity 18/18. (2) D2574 KIND-LEAK CLEANUP: 33 FBs (domain labels in discipline slot) → discipline_raw cleared (domain already in domains 33/33). D2399 FULLY ADJUDICATED: 292 → 241 true-gaps, 0 kind-leaks. NET emerging 969→956. (3) D2575 k-NN retired (topical coherence ≠ correctness) + S4 golden stratification spec (Qwen3.8 single-shot + gemma APPROVE_WITH_CAVEATS → governance/d2575_s4_golden_stratification_qwen38.json, target 1000). KEY FINDING: universal depth only 81 FBs (37 convergent) = binding bottleneck. decisions 548→551.)
-# Updated: 2026-09-05 (D2572: D2399 USER-ADJUDICATED — A+B applied, C deferred. FORENSIC: 292 gaps = 42 KIND-LEAKS (domain labels in discipline slot) + 250 TRUE-GAPS (250 = the recurring figure). APPLIED via scripts/apply_d2399_user_decisions.py (gemma-4-E4B R5 APPROVE): 6 discipline aliases (history of philosophy→philosophy, financial engineering→finance, Medical Humanities→health & medicine, Experimental Psychology→psychology, Educational Measurement→research methodology, Design Studies→design thinking) = 12 FBs; Marketing kind-swap → marketing & communications = 5 FBs (4 Marketing + 1 marketing). NET emerging 969→957; gaps 292→275 (33 kind-leaks + 242 true-gaps); 0 residual; integrity 18/18; 5/5 contract. (C) Ecology promotion (5 FBs) DEFERRED on D2378 closed-loop demotion (candidate computer networking 4; ratio 1.10 → 5>4.4 qualifies). decisions 547→548.)
-# Updated: 2026-09-05 (D2571: NEXT-4 EXECUTION — DEF-BEARING-NLI + CLEANLAB + CLASSIFIER + D2547. (1) DEF-BEARING-NLI CONTROL (pipeline/nli_definition_control.py, 500-FB sample): flat "is about {label}" vs definition-bearing hypothesis. FINDING = LABEL-SPECIFIC confound (anthropology 0.004→0.44, evolutionary biology 0.024→0.41, cognitive science 0.01→0.31, cultural design 0.03→0.32; overall mean entail 0.273→0.241 but pass rate 0.372→0.424). Per-label rates must be re-derived with definitions, not blanket-switched. (2) CLEANLAB (scripts/cleanlab_label_audit.py, TF-IDF + 5-fold CV-LR → Confident Learning): 3424/7026 flagged (48.7%; top behavioral economics 150, philosophy 133); third instrument wired; bge-m3 embeddings upgrade = follow-up. (3) CLASSIFIER (scripts/train_discipline_classifier.py, deberta-v3-base+LoRA+2 heads+abstain, fail-loud <100 golden): BLOCKED on golden expansion 7→750. (4) D2547 GATE (scripts/apply_cost_weighted_thresholds.py, cost=n/median): 96 labels 80 REJECT/16 PASS; remaining = domain-axis freq + cost-model calibration. Qwen3.8 generated (3)(4); gemma cross-family review (DB-path bug fixed + classifier padding fragility). DeepSeek NOT used (C1/C3 remote + keychain not shell-retrievable). decisions 546→547.)
-# Updated: 2026-09-05 (D2570: NEXT-5 EXECUTION + FORENSIC AUDIT + P1 ONTOLOGY. (0) BASELINE: committed+pushed D2569 as 2c866c3 (14 files + corrected handoff v2). FORENSIC AUDIT CLEAN: integrity 18/18; config-audit no drift; decision-sync 545; DB integrity ok / 0 FK / 0 non-canonical disciplines / 0 null R14; emerging 969 (623 empty + 54 '[]' + 292 genuine); 0 residual. (1) C16 FIX: scripts/review_aliases.py _load_checkpoint silent except → log to stderr + continue. (2) C12 FIX: reclassify_merged_axis.py CHUNK_SIZE_DEFAULT=200 → config stage4.reclassify_chunk_size=200 + CONFIG_TO_CODE registry (audit --check-unchecked clean). (3) TEST: tests/test_per_label_threshold_contract.py (5 tests) guards 96-entry per_label block. (4) P1 ONTOLOGY LAYER: added definition+exclude to all 104 canonicals in taxonomy_v5.yaml — Qwen3.8-27B authored (single-shot temp 0), gemma-4-E4B cross-family verified (0/25 wrong), ruamel round-trip (byte-identical canonical/group/raw/meta); 199/199 tests green. Unblocks definition-bearing NLI control (anomaly C). (5) BUG-223 logged: 54 emerging FBs discipline_raw='[]' literal-array. decisions 545→546.)
-# Updated: 2026-09-05 (D2569: P0 EXECUTION + GOV SYNC. (1) GOV-SYNC: removed D2544/D2545 double-listing from DECISION-LOG OPEN; re-surfaced D2440 into MTR SHOULD #20; flipped D2454/D2483 ACTIVE→RESOLVED. (2) BUG-215 RESIDUAL: scripts/fix_bug215_residual.py --apply — 66 FBs (discipline≠emerging + empty raw + stale emerging_real) → 24 verified alias restore (Information Systems/Health Informatics → information science) + 42 reverted to emerging (raw doesn't resolve: Marketing→finance, music education→psychology, Applied Mathematics→theoretical physics, info-science catch-all). NET emerging 927→969; 0 residual; integrity ok. (3) P0 #2: nli_label_audit.py persists FULL population (results, 23,364 records) alongside flagged lists. (4) P0 #1 contradict/weak split: build_mislabel_triage.py → nli_total/nli_contradict/nli_weak; populate_semantic_error_thresholds.py → nli_contradict-based + idempotent; project management 0.9425→0.3914 (true contradiction 245/626). Qwen3.8-27B cross-verify → 2 defensive fixes applied. decisions 544→545.)
-# Updated: 2026-09-04 (D2568: NEXT-5 EXECUTED (cascade dereg + alias review + BUG-150 promotion + re-audit + thresholds). (1) CASCADE DEREG: scripts/cascade_deregister_domains.py --apply: 615 FB domain deregistrations across 3 systematic catch-all domains (project management 257 / business operations 202 / legal & public policy 156); 75 single-domain→emerging; counts 879/1756/806→622/1554/650. (2) ALIAS REVIEW: scripts/review_aliases.py (Qwen3.8-27B re-reviewed 927 single-value aliases→76 flags) + DeepSeek-v4-pro cross-family verify → scripts/apply_alias_corrections.py applied 66 corrections (49 domain + 17 discipline), 9 kept, 1 no-op; D2567 corpus-dependent fixes protected (video production→motion design, statistics & data science→data visualization). (3) BUG-150 PROMOTION: bug197_kind_swap 1,235 FBs (56 discipline + 140 domain recovered) + scripts/resolve_emerging_promotion.py 54 deterministic (suffix/compound, curated exclusion) + 24 LLM (Information Systems + Health Informatics → information science, Qwen3.8×DeepSeek agreement). NET discipline=emerging 1,010→927 (-83), domains∋emerging 716→772. Remaining 250 genuine gaps (Ecology/Musicology/History of Technology/audio signal processing + 221 tail) = D2399 candidates (frozen). (4) RE-AUDIT: k-NN mean agreement 41.2%→40.7% (FLAT — topical-diversity metric, not label accuracy; audited 12,667→14,334); T-NLI contradict 21.5%→19.9% (-1.6pp) + domain mean entail 0.248→0.265 (improved); calibration 526 rows + triage 2,142 FBs. (5) THRESHOLDS: scripts/populate_semantic_error_thresholds.py → 96 per-label NLI-contradiction rates → taxonomy.semantic_error_rate_max.per_label (flag-rate proxy; cost-weighting + gate consumer pending). integrity ok, 0 FK violations. decisions 543→544.)
-# Updated: 2026-09-04 (D2567: TRACK B SLIM + DOMAIN RESOLUTION + ALIAS CORRECTION EXECUTED. (1) reclassify_merged_axis.py --slim --apply: 1,488 discipline=emerging → 478 resolved + 981 raw-corrected (~1.4s/FB), harvested temp/trackb_slim.jsonl, checkpoints re-synced. (2) resolve_domains_emerging.py --apply: 846 domains∋emerging → real domains. (3) Quality: cross-model agreement missed 8 shared-bias wrong aliases — fixed 7 (video analytics→data viz, scientific research→science & research, …) + reverted 1 (video production→motion design correct for corpus); correct_wrong_enrichments.py fixed 19 FBs. NET emerging: discipline 1,842→1,010 (-832), domains∋emerging 1,562→716 (-846). integrity 18/18. Remaining 1,010 discipline=emerging = genuine taxonomy gaps → BUG-150 promotion.)
-# Updated: 2026-09-04 (D2566: ALIAS EXTENSION + PHASE 2b EXECUTED. (1) scripts/extend_alias_index.py: deterministic pass (canonical-self + Unicode/dash fold + compound split + suffix strip) then LLM bulk-map (generator=Qwen3.8-27B × verifier=gpt-oss-20b, cross-family R5, agreement-only) → 618 domain + 151 discipline aliases ADDED to config/alias_map.yaml (add-only; 201 existing discipline_aliases preserved). Fixed a cross-axis flat-index bug (D2133). (2) Wired alias_map.yaml into pipeline/schemas.py _build_synonym_index (step 3) — S4 + enrichment + remap_emerging now share the extended index; kind-safety verified. (3) scripts/apply_enrichment.py rewritten to use the full domain index (taxonomy raw + synonym_map SYNONYMS-only + alias_map + canonical-self + compound split; KEYWORDS excluded to avoid "e-commerce"→finance false positive). (4) Enrichment re-run: 727 FBs enriched (vs 75 in Phase 2a). (5) scripts/resolve_emerging_deterministic.py: 354 emerging FBs → canonical discipline (no LLM). Remaining discipline=emerging 1,488 → Track B re-classification (D2567).)
-# Updated: 2026-09-04 (D2565: PHASE 1 + 2a EXECUTED. Phase 1: 8 human-review FB domain changes applied (scripts/apply_relabel_plan.py, C13 backup + atomic). Phase 2a: 75 safe enrichments applied (scripts/apply_enrichment.py). KEY FINDING: 1,926-FB backlog is mostly a MAPPING GAP — 2,139 distinct raw labels unmapped by the 500-entry taxonomy alias index; only 107 mapped cleanly (75 non-catch-all). ~1,850 FBs need taxonomy alias extension OR LLM raw->canonical mapping (overlaps Track B).)
-# Updated: 2026-09-04 (D2564: ENRICHMENT PLAN. Verified retrieval is semantic-first (search_hybrid=FTS+vector+keyword RRF; contextual_embed.enabled=false → labels NOT in embedding) + domains is a JSON array → cross-disciplinary FBs must carry ALL scopes. Classified 11 human-review FBs: 1 enrich (Color As Cultural Marker +social sciences), 4 retarget (Structural Theory→design strategy; Community Mapping→project management; Figma AI/Hamburger→web & ui), 6 deregister. Backlog: 1,926 FBs single-domain+2+raw (immediate enrich); 1,842 discipline=emerging + 1,562 domains∋emerging (Track B first). → governance/enrichment_plan.md.)
-# Updated: 2026-09-04 (D2563: HUMAN-REVIEW RELABEL PLAN BUILT. User annotated governance/human_review_sample.md (relabel/keep/? marks on 64 sample FBs across 8 worst labels). scripts/build_relabel_plan.py parses marks + joins DB → governance/relabel_plan.json/.md (PLAN-ONLY, no DB mutation). Verdicts: SYSTEMATIC mislabeling of domain catch-alls project management (260/7-8), business operations (199/7-8), legal & public policy (150/6-8); MIXED for marketing & communications, engineering & infrastructure (surveillance→not-engineering), organizational behavior; MOSTLY-KEEP for editorial & advertising, user experience (ux-vs-ui). Actions: 5 retarget (ui→web & ui, brand→design strategy/brand identity, psychology/sociology→social sciences, community-mapping→project management), 40 deregister, 14 keep, 5 unreviewed. NEXT: execute relabel (user approval) + D2547 threshold population.)
-# Updated: 2026-09-04 (D2561: DEEPSEEK RE-VERIFY CORRECTION + D2547 CALIBRATION + TRIAGE. (1) DeepSeek re-verified at user request: active_provider=custom_deepseek (deepseek-v4-pro) is LIVE+AUTHENTICATED via macOS Keychain internet-password (srvr=https://api.deepseek.com/v1, acct=Bearer); live goose serve ESTABLISHED conn to api.deepseek.com:443. PRIOR "no credentials/HTTP 401" claim was WRONG (probed without key + wrong keychain service names). Real issue = remote CLOUD → C1/C3 violation BY DESIGN (not "dead"). Corrected decisions.yaml D2560 + MTR #19/#66 + buglog BUG-222. (2) D2547 calibration: scripts/build_mislabel_triage.py (deterministic, C6 safe_write) → governance/d2547_calibration.json (440 labels) + governance/mislabel_triage.json/.md (1,989 FBs flagged by BOTH k-NN low-agree 6,211 ∩ T-NLI contradict 4,497). Worst labels: project management 841, digital product 663, education 394, leadership 411, philosophy 110.)
-# Updated: 2026-09-04 (D2557-D2560: NEXT-UP EXECUTION + GOV SYNC. (1) D2544 k-NN audit EXECUTED across 7,995 FBs — first fixed a latent domain-comparison bug in scripts/knn_label_disagreement.py (`.split("|")[0]` on the JSON-encoded domains column compared the whole array string and measured nothing; fixed to JSON-parse + set-intersection + canonical-only filter). RESULT (k=10): mean neighbor-label agreement 41.2%, 49.03% of 12,667 pairings <=30% agreement -> 6,211 low-agreement candidates (governance/knn_label_disagreement.json). (2) T-NLI: created pipeline/nli_label_audit.py (D2542 target, was planned but the async delegate never wrote it) — DeBERTa-v3-large NLI label-consistency audit (premise=definition, hypothesis="This text is about {label}."), C6 safe_write reports + JSONL checkpoint/resume; Qwen3.8-27B R5-reviewed (APPROVE + 2 C20 magic-number fixes); full run COMPLETE — 20,929 pairings, mean entail 0.332/0.248, 4,497 contradict-label (21.5%), 8,978 weak (42.9%), 0 errors (governance/nli_label_audit.json/.md). (3) C16: search_fts LIKE fallback now logs loudly (was silent — Qwen3.8 finding). (4) DeepSeek API: active_provider=custom_deepseek — [CORRECTED 2026-09-04/D2561: NOT dead, LIVE+AUTH via Keychain; see D2560 re-verify] — remote-cloud → C1/C3 violation → recommend maxwell_omlx (live, 8 models). decisions 532->536.)
-# Updated: 2026-09-03 (GOV RESTRUCTURE + D2545: Tiered governance. Archived DECISION-LOG.md/MASTER-TASK-REGISTER.md/buglog.md/aggregated_remaining_tasks.md -> archive/governance_pre_tiered_2026-09-03/. Rebuilt all three as TIERED files: open/pending at top (critical-first, MUST->SHOULD->WORTH), done/closed at bottom. Executed D2545 C12 fixes (EVIDENCE_CONTAMINATION_RATIO->stage5.evidence_contamination_ratio; circuit-breaker max(...,25)->circuit_breaker_failure_threshold_floor) + F-07 CONSTITUTION taxonomy 35/72->43/61 + D2184 PII path redact + MASTERPROMPT golden-staleness fix. Aggregated cross-model adjudication Part1+Part2 into DECISION-LOG (D2544-D2548) + buglog + MTR. STANDING RULE on any future gov sync: MTR = unresolved/undone at top + resolved/done at bottom, top-ordered most-critical-first; DECISION-LOG = open/pending top (critical first) + done bottom; buglog = same.)
-# Updated: 2026-09-03 (D2533: FORENSIC AUDIT + PRE-EXISTING BUGS + BLINDSPOT FIX. Fixed 6 self-defects (harvest crash-safety/backup fsync/C17/BATCH_SIZE_DEFAULT/.lower() mirror/config-audit registry). Catalogued 5 PRE-EXISTING: BUG-215 (1097 empty discipline_raw, now repaired), BUG-216 (27 empty domains_raw), BUG-217 (mixed checkpoint stamps), BUG-218 (9 sidecar shells), BUG-219 (integrity checker FP). BLINDSPOT FIXED: --sync default ON auto-runs sync_checkpoint_from_db.py + sync_s5_checkpoint_from_db.py after apply. Qwen3.8: script-safety PASS, opt-in PASS, golden-axis PASS-with-note (organizational-behavior=taxonomy-design review). integrity 17/18 (1 pre-existing FP), preflight/stress PASS, config-audit 0 drift, contract 5/5. FULL APPLY ~8h (12s/FB gpt-oss); monitoring via temp/reclassify_full_apply.log + harvest. TOP: (1) restart full apply with monitoring; (2) after apply -> BUG-150 promotion candidates for review; (3) BUG-216/217/218/219 triage.)
-# Updated: 2026-09-03 (D2532+D2531: BUG-197 RECLASSIFICATION PREP + CORPUS-AWARE PASS-RATE OPT-IN. Wrote pipeline/reclassify_merged_axis.py (discipline-only merged-axis reclass of ~2,343 discipline=emerging; dry-run default; --apply = C13 backup + integrity gate + atomic txn; --harvest JSONL for BUG-150). A/B stage4.batch_enabled: batch 12.2s/FB vs seq 23.4s/FB (~2x) -> batch VALIDATED. CRITICAL: (1) re-classifying DOMAINS regresses valid canonicals -> discipline-only (preserve domains); (2) corrected prompt WORKS but CANONICAL_DISCIPLINES missing real labels (data science/human factors engineering/design theory/financial technology) -> only ~25-37% resolve, rest are BUG-150 gaps. BUGFIX: BATCH_CRIBS_CLASSIFY_SYSTEM missing D2422/BUG-197 disjointness rules -> aligned with merged prompt. Golden axis-clean ENFORCED (7/7 clean + 2 new contract tests). e2e.corpus_aware_pass_rate OPT-IN (enabled=false): convergent actually 31.1% (19/61), single-source 27.4% (17/62) — corrects D2528 convergent-0.80 claim. FIXED pre-existing session_seed.yaml YAML parse error. integrity 10/10, config-audit 0 drift, contract 5/5, decisions total=514 active=455. TOP: (1) BUG-197 --apply reclass (resolves ~25-37%); (2) BUG-150 promote harvested raw labels; (3) BUG-151 taxonomy disjointness CI; (4) evidence-quality investigation (31% convergent NLI).)
-# Updated: 2026-09-03 (D2528: E2E S5/S6 COMPLETE + 123-FB VECTOR BACKFILL + verify_pass_rate A/B + stage4_golden EXPANSION. S5 36 PASS/87 QUARANTINE (29.3% — single-source FBs genuinely unentailed, NOT a threshold bug); S6 123 committed (DB 7,995); vector re-backfill vec_fbs/vec_fbs_ctx both 7,995 (0 orphaned). BUG-214 FIXED (taxonomy hook tuple row_factory, D2527). BUG-193 FIXED (CircuitOpenError import, D2525). BUG-187/180/145 status reconciled (already fixed). Elaboration VERIFIED (123/123 principle non-empty, 40/40 non-principle empty). validate_results 9/10 — verify_pass_rate 29.3%<80% (threshold calibrated for convergent, not single-source). stage4_golden 5→7 (domain/discipline disjointness, BUG-197 at golden level) + golden_max_examples 5→7. decisions total=510. TOP: (1) BUG-197 pre-commit checklist; (2) corpus-aware E2E_MIN_PASS_RATE; (3) DB VACUUM.)
-# Updated: 2026-09-03 (D2521: D2399 BOTH-CANDIDATES REJECTED + PROMOTIONS FROZEN + S2 RERANK ENABLED + S3 HYDE HARNESS. (1) D2399 HUMAN REVIEW (user decision): BOTH post-BUG-197 candidates REJECTED as semantically invalid — organizational change (85)>design systems (19) [design systems = UI/web/visual design (Figma/tokens/grids, 19 FBs); organizational change = scattered innovation/strategy/systems raw grab-bag, domains_raw-only] + entrepreneurial management (7)>agentic architecture (2) [business/startup mgmt vs multi-agent AI]. Flipped taxonomy.d2399_promotions_frozen: true → check_for_replacements() returns [] (verified 0 candidates). (2) S2 RERANK ENABLED: rerank.enabled: true + RERANK_ENABLED flag + search_hybrid cross-encoder post-pass (A/B MRR 0.708→0.739). (3) S3 HYDE HARNESS IMPLEMENTED: retrieval_benchmark.py --hyde (hyde + hybrid+hyde legs) + config hyde block + HYDE_* flags. Config + code only (no DB mutation). decision total=505, active=446. 192/192 tests. TOP PRIORITY: (1) S1 contextual decision; (2) e2e shrink-guard full S0-S6 eval; (3) run S3 HyDE A/B to decide hyde.enabled.)
-# Updated: 2026-09-02 (D2520: CHECKPOINT-DRIFT FIX + FORENSIC AUDIT + E2E FINDING. BUG-197/BUG-198 mutated DB directly → S4 checkpoint stale (6,819 FBs pre-swap + 6 missing). FIXED via scripts/sync_checkpoint_from_db.py → 7,873 records, 0 drift. FORENSIC AUDIT clean: 0 null required, 0 empty provenance, 0 axis leaks, 0 invalid canonical/depth/evidence/status, integrity ok, source_segments valid. FRESH EXPORTS: parquet/fbs_export_20260902_final.jsonl + fbs_snapshot_20260902_final.parquet (7,873). health 10/10, integrity 17/18 (1 pre-existing fp), preflight PASS, config-audit 0 drift, 192/192 tests. e2e stage0 = SHRINK GUARD (book-count mismatch, safety feature, NOT regression); D2510 BUG-197 prompt fix verified present. decision total=504, active=445. TOP PRIORITY: (1) D2399 human review — organizational change (85)>design systems (19) + entrepreneurial management (7)>agentic architecture (2); (2) S3 HyDE; (3) S2 rerank enable decision; (4) S1 contextual decision.)
-# Updated: 2026-09-02 (D2519: D2399 POLICY A ADOPTED + BUG-198 PART 2 + BUG-197 DETERMINISTIC KIND-SWAP — all EXECUTED. (1) D2399 policy A (user): freeze until BUG-197 runs + never promote both-axes-emerging + only stable single-axis long-tails → config taxonomy.d2399_promotions_frozen + d2399_allow_both_axes_emerging=false + _is_both_axes_emerging() guard in check_for_replacements (filters change management 92/6 + human factors engineering 37/18); no promotions applied. (2) BUG-198 part 2: scripts/reinject_bug198_singletons.py targeted S4→S5→S6 re-inject (reuses real merged_cribs_classify/classify_depth_focused/deberta_check/insert_fb); 6/6 committed (1 PASS + 5 QUARANTINE), DB 7867→7873, integrity ok; fixed D2408-adjacent LaTeX-escape JSON gap (_clean_latex_json). (3) BUG-197 deterministic kind-swap: scripts/bug197_kind_swap.py LLM-free field-scoped UPDATE — 3694 FBs (598 disciplines recovered + 1830 redundant leaks dropped + 374 domains recovered); 0 residual axis leaks; taxonomy_counts recounted. decision total=503, active=444. 192/192 tests. NEXT: human-review D2399 candidates organizational change (85)>design systems (19) + entrepreneurial management (7)>agentic architecture (2); then S3 HyDE harness.)
-# Updated: 2026-09-02 (D2518: TURN-WIDE FORENSIC VERIFICATION + GOV-SYNC + S1/S2/S3 A/B + SIDE-CAR BACKFILL. (1) Verification all clean: integrity 10/10, config-audit 0 drift, SQLite ok, DB 7867 rows 0 drift (0 bad labels/null/missing stamps/provenance, unique fb_ids), checkpoint_enriched 7867 valid records intact. (2) FIXED broken test (D2517 displacement left stale "ml systems & infrastructure" in S4-GOLD-002 → systems & frameworks) + cleaned 4 stale displaced refs (pipeline_config context_signals ×2, synonym_map ml_systems_infrastructure block, domain_disciplines ml-systems block + 13 social engineering lines). (3) S1/S2/S3 A/B on 30-query golden set: S2 rerank IMPROVES MRR 0.708→0.739 (7-query gate 0.606 was small-sample artifact); S1 contextual = tradeoff recall 1.000→0.967/MRR→0.792; S3 HyDE not implemented; vec_fbs_ctx backfilled 7867. (4) 25 sidecar empty-shells backfilled via gemma cross-family (10 PT/5 PI/6 GE/4 TI): 16 full + 9 partial (outcome_metric/syntax/parameters not in source — BUG-182 model gap). decision total=502, active=443. NEXT: (1) BUG-198 part 2 live S4→S5→S6 re-inject (6 records ready in recovered_singletons.jsonl) → (2) BUG-197 deterministic kind-swap (~4,774 domains_raw discipline-leak; 1,519 recoverable) → (3) D2399 policy: change management (92)>design systems (19) domain + human factors engineering (18)>agentic architecture (2) discipline → (4) S3 HyDE harness.)
-# Updated: 2026-09-02 (D2517: D2399 CANDIDATE 1 APPROVED + APPLIED (urban planning 133 → canonical domain, displacing ml systems & infrastructure 18; cardinality 43; taxonomy v5.4→v5.5). BUG-196 FIXED (normalize_fb_name slices title-cased list + ellipsis sentinel). BUG-198 PART 1 (6 singleton principles located + application backfilled cross-family via gemma → stage2_extract/t11/recovered_singletons.jsonl; part 2 targeted S4→S5→S6 re-inject deferred, needs live generator+NLI). GOLDEN SET 16→30 (14 clean PASS FBs verified live hybrid top-10; all 30 vector recall 1.000 — un-gates S1/S2/S3). decision total=501. NEXT: (1) BUG-198 part 2 re-inject → (2) BUG-197 deterministic kind-swap of domains_raw discipline-leak (~4,774; 1,519 recoverable discipline) → (3) D2399 next candidates (change management 92>design systems 19 domain; human factors engineering 18>agentic architecture 2 discipline) → (4) S1/S2 A/B on 30-query golden set → (5) 25 empty-shells.)
-# Updated: 2026-09-02 (D2516: D2399 CANDIDATE 2 APPROVED + APPLIED. organizational theory (19) → canonical discipline, displacing weakest canonical social engineering (1) (D2378 closed-loop, cardinality 61). marketing research KEPT as domain alias (marketing & communications), NOT discipline. scripts/apply_d2399_organizational_theory.py deterministic/LLM-free (DB backed up): 19 FBs discipline=emerging→organizational theory + 1 FB social engineering→emerging (raw intelligence analysis preserved); social engineering marked displaced; idempotent recount. taxonomy v5.3→v5.4 (+meta.displaced_canonicals). Cascade surfaced NEXT: domain urban planning (118) [candidate 1 pending]; discipline human factors engineering (18) > agentic architecture (2). decision-summary recomputed total=500. NEXT: (1) candidate 1 urban planning decision → (2) BUG-197 reclass batch (only LLM re-run) → (3) BUG-196/198 → (4) 25 empty-shells → (5) golden set ~30.)
-# Updated: 2026-09-02 (D2515: LABEL NORMALIZATION + COMPOUND DECOMP + ALIAS + DEAD-CANONICAL CLEANUP. (1) NFKC+dash-fold normalize_label() in schemas.py (NFKC ALONE does NOT collapse U+2010/U+2011/U+2013 — added explicit dash-fold U+2010..U+2015/U+2212→U+002D), wired into match_to_canonical/_build_synonym_index/map_to_canonical_with_fallback(stage4_merge)/update_counts_from_fbs/_is_long_tail(taxonomy_manager). (2) split_compound() decomposes "X & Y"/"X and Y" into constituent canonicals (match_domains_to_canonical + stage4_merge domain loop + _is_long_tail covered-compounds-not-challengers). (3) 29 marketing/advertising/branding/sales fragments ALIASED in taxonomy_v5.yaml raw lists (17→marketing & communications, 8→brand identity, 4→editorial & advertising). (4) DEAD-CANONICAL CLEANUP: removed 5 count-0 disciplines (multimodal metaphor/composition & layout/geometry & proportion/iconography/narrative design); domain_disciplines.yaml −78 refs; 66→61 disciplines; taxonomy v5.2→v5.3 (pipeline_config ×3 + taxonomy_v5.yaml). (5) scripts/normalize_taxonomy_labels.py re-derived 6018 FBs LLM-free (5976 compound domains decomposed, 713 NFKC, 0 discipline — all discipline='emerging' are BUG-197 domain-not-discipline, correctly untouched); DB backed up maxwell.db.bak_20260902_195006. D2399 now clean: urban planning (118) > ml systems & infrastructure (18) + organizational theory (19) > social engineering (1). 187 tests green (5 new). D2514 also done: Drift F taxonomy_counts 3x-inflation FIXED (reset+idempotent recount). NEXT: (1) user decision candidate 2 (organizational theory / marketing-research cross-axis) → (2) D2399 apply → (3) BUG-197 reclass batch (only LLM re-run) → (4) BUG-196/198 → (5) 25 empty-shells → (6) golden set ~30.)
-# Updated: 2026-09-02 (D2513: DRIFT C EXECUTED + D2399 surfaced (NOT auto-applied). Demoted 9 applied-practice labels discipline→domain via scripts/demote_disciplines_to_domains.py: marketing→MERGED into existing marketing & communications domain; product design/design strategy/project management/leadership/personal productivity/industrial design/information architecture/design systems→8 NEW domain canonicals; KEPT as discipline typography/creative process/design thinking. Config 35→43 domains, 75→66 disciplines, 0 overlap, taxonomy_version v5.1→v5.2 (minor only — file stays taxonomy_v5.yaml, hardcoded in schemas.py/doc_guard.py/_get_taxonomy_path). Data re-derived via scripts/rederive_demoted_fbs.py: 851 FBs → discipline=emerging (0/851 discipline_raw re-matched) + new domain added; DB backed up (maxwell.db.bak_20260902_183727); residual demoted disciplines=0. alias_map.yaml: 14 entries targeting demoted disciplines removed. D2399 EXECUTED via run_post_commit_taxonomy → human_review_taxonomy.json 2 candidates. CRITICAL FRAGMENTATION: candidate 1 (marketing & advertising 360) is one of 28 fragmented emerging labels (marketing & branding 339/advertising & marketing 219/advertising & branding 99/...) all aliases of the marketing & communications domain JUST created → auto-applying would recreate the redundancy Drift C removed. Candidate 2 (organizational theory 57 displacing dead multimodal metaphor 0) defensible. DECISION: human review required; do NOT auto-promote fragmented raw labels — ALIAS to marketing & communications via synonym_map.yaml instead. 186 tests green (2 test fixtures updated design strategy→design thinking). NEXT: (1) human review D2399 + alias 28 fragmented marketing labels via synonym_map → (2) D2399 apply → (3) Drift D raw-alias dedup (189 unrelated overlaps) → (4) BUG-196/198.)
-# Updated: 2026-09-02 (D2512: TAXONOMY DRIFT FORENSIC AUDIT — 4 drifts found, B+D fixed, C evaluated. BUG-207 Drift A: "5,686 reclass" WRONG — emerging 2,080 = CORRECT honest-unmapped (not contamination); applied-practice disciplines 1,677 (marketing 439/typography 99/product design 31/design thinking 124/industrial design 23/leadership 61/project management 104/design strategy 127/personal productivity 29/information architecture 25); genuinely-non-canonical 114 (economics 108 + color theory 6). BUG-208 Drift B FIXED: taxonomy_v5.yaml (75 disc/35 dom) vs taxonomy_counts (72/34) out of sync — economics sat emerging, color theory raw, multimodal metaphor raw, social sciences emerging (seed_from_taxonomy_yaml INSERT-OR-IGNORE on empty-table only + no emerging→canonical path in update_counts_from_fbs); D2399 would propose promoting economics (already YAML-canonical). FIX = reconcile_canonical_status() wired into run_post_commit_taxonomy every run + applied live (4 transitions). BUG-209 Drift C EVALUATED (awaiting decision): D2510 prompt says never emit marketing/product design as discipline but YAML still lists them as discipline canonicals. Ontological verdict (FB contents): marketing→DOMAIN, product design→DOMAIN, typography→DISCIPLINE; +9 more applied-practice-as-discipline (design thinking/design strategy/project management/leadership/personal productivity/industrial design/information architecture/design systems/creative process). BUG-210 Drift D FIXED (locked): 231 raw-alias cross-axis overlaps, 0 coercions verified, CI-locked. NEW Drift E documented: context_signals lists bare 'marketing' (canonical is 'marketing & communications') + software engineering/philosophy as domain signals → never matches. 186 tests green (+4). NEXT: user decision on demote set → Drift C fix → BUG-197 (only if open-set re-judgment wanted) → D2399.)
-# Updated: 2026-09-02 (D2511: RRF keyword-leg pollution BUG FIXED — search_hybrid fused the metadata leg into RRF even with NO domain/discipline/depth filter; search_keyword() then returned ORDER BY borp_score DESC ≈ ROWID (constant list) → "High Contrast Visual Design" at rank ~2 in EVERY query, diluting FTS+vector. FIX: keyword leg only when a filter is set; test_hybrid_rrf_keyword_leg_d2511.py. BENCHMARK HARNESS DELIVERED (action #7): config/golden/retrieval_queries.yaml (7 verified queries) + pipeline/retrieval_benchmark.py (recall@k/MRR/P@k for fts/vector/hybrid + --contextual + --rerank). BASELINE: vector=hybrid recall 1.000 / MRR 0.857 / P@k 0.100; FTS recall 0.000 (natural-language vocab mismatch → proves vector leg carries retrieval, D2509). S2 RERANKER = bge-reranker-v2-m3 (ALREADY CACHED + VERIFIED working; newer/better than bge-reranker-large which is NOT downloaded) via pipeline/rerank.py — A/B DROPS MRR 0.857→0.606 → GATED OFF. S1 CONTEXTUAL = embeddings.contextualize_text() + backfill --contextual (separate vec_fbs_ctx) + search_vector(vec_table=) — A/B DROPS recall 1.000→0.857 → GATED OFF. S3 HyDE still gated (needs S1 + bigger golden set). 182 tests green. NEXT: enlarge golden set 7→~30 → re-run S1/S2 A/B → S3 HyDE; BUG-197 reclass → D2399 (blocked on reclass) → BUG-196/198 → 25 empty-shells.)
-# Updated: 2026-09-02 (D2510: BUG-205 a/an residual FIXED — drop a/an from _SPACE_SUBTITLE_SPLIT (book_metadata.py); committed DB ALREADY correct (distinct source_ids 92d597f3efa1cd12 vs 122fb1e8b4b66f17; bug introduced D2507 AFTER S4 merge = LATENT, no data re-resolve); 11/11 book-dedup tests. BUG-197 classifier prompt FIXED — discipline-vs-domain disjointness block in stage4_merged_call.py PART 2 (graphic design/organizational behavior/data visualization/entrepreneurship/marketing/HR = DOMAINS not disciplines); RE-CLASSIFICATION (~2,080 emerging + 3,184 raw-leak + 422 domain-not-discipline) = FUTURE-BATCH LLM run, NOT now. STACK AUDIT — Homebrew Python (/opt/homebrew/bin/python3) has all pipeline deps EXCEPT datasketch+pypandoc (PEP 668 blocks pip install); system python (/usr/local/bin/python3) has all deps but no enable_load_extension → SPLIT RETAINED: full pipeline S0-S6 on system python, vector backfill+retrieval on Homebrew python (run /opt/homebrew/bin/python3 pipeline/backfill_embeddings.py post-S6). RERANKER research (llmfit): BAAI/bge-reranker-large (560M Q4_K_M) + drawais/Qwen3-Reranker-4B (4.1B AWQ-INT4) candidates; NEITHER installed in Ollama; S2 gated. D2399 = domain promote/demote via taxonomy_manager.py (check_for_replacements→apply_replacements, human-review C8-G1/G2, post-S6 full-corpus), MUST run AFTER BUG-197 re-classification (raw leak feeds D2399 garbage). NEXT: BUG-197 reclass → D2399 → BUG-196/198 → 25 empty-shells → S1/S2/S3 gated.)
-# Updated: 2026-09-02 (D2509: M1 VECTOR SEARCH FIXED + 7867 embeddings backfilled (RESOLVES D2508 M1). FOUR bugs: (1) env — /usr/local/bin/python3 SQLite lacks enable_load_extension → use /opt/homebrew/bin/python3 (SQLite 3.53.3, has sqlite-vec+numpy+pandas+pyarrow); (2) DIMENSION CONTRACT (M1 latent) — insert_embedding + search_vector packed raw bge-m3 1024d into vec_fbs float[512]; (3) READ PATH — retrieve.get_conn() never loaded sqlite-vec → "no such module: vec0"; (4) QUERY FORM — JOIN+MATCH broke sqlite-vec KNN detection (0 rows) AND k-before-status-filter starved PASS (QUARANTINE 58%). FIXED: both embed paths → pipeline.embeddings.embed_texts_bge_m3 (512d L2-normalized); get_conn() loads sqlite-vec (graceful FTS fallback C23); search_vector → KNN subquery + oversample k=limit*5 floor 100; NEW pipeline/backfill_embeddings.py (idempotent, run: /opt/homebrew/bin/python3 pipeline/backfill_embeddings.py). VERIFIED: 7867/7867 (0 orphaned, 2m52s); vector top-5 sane PASS; FTS=0 for "bounce back after a crisis" while hybrid RRF recovers "Collective Intelligence Recovery" (semantic recall PROVEN); 174 + 5 new M1 contract tests pass. RRF KEPT (M2, Cormack/Clarke/Buettcher SIGIR 2009). S1/S2/S3 gated (no local reranker model, no A/B benchmark). DB retrieval now runs under /opt/homebrew/bin/python3 for vector. NEXT: BUG-205 a/an opener → BUG-197 reclass → D2399 → 25 empty-shells.)
-# Updated: 2026-09-02 (D2508: S6 COMMITTED 7867 FBs (0 failed) + FTS + Parquet fbs_snapshot_20260902_151043. B2 majority MATERIALIZED — PASS 5074→3274 / QUARANTINE 2793→4593 (ENTAIL-majority 3274, NEUTRAL 3727, CONTRA-veto 293, all-garbage 550, MECH-FAIL 15, evidence-garbage 8); commit-with-status NOT data loss, 626 needs_human_review. M1 VECTOR DEGRADED (NEW) — vec_fbs absent: active python.org framework Python 3.12.1 SQLite lacks enable_load_extension; sqlite-vec IS installed (vec0.dylib present) but cannot load. FIX: Homebrew Python (/opt/homebrew/bin/python3, SQLite 3.53.3) or knowledge-pipeline conda env (3.11.15, SQLite 3.52.0) + pip install sqlite-vec + backfill from fbs.definition (NO S5 re-run). BUG-205 residual FALSE-MERGE: Raschka Build-a-LLM vs Build-a-Reasoning-Model collapse via _SPACE_SUBTITLE_SPLIT mid-title "a" opener → drop a/an from opener list (post-S6). NEXT: M1 vector env fix → BUG-197 reclass → D2399 → 25 empty-shells.)
-# Updated: 2026-09-02 (D2507: BUG-205 RESOLVED — book_metadata.py _unicode_fold (NFKC→NFKD→strip combining) + _SPACE_SUBTITLE_SPLIT (space-subtitle opener collapses w/ colon edition) + resolve_source_id fallback sanitize; 962 metadata files → 910 distinct source_ids; residual (post-S6 Stage 0.5 + fuzzy matcher) = same-book title rename / space-separated co-authors / truncated titles. B2 synthesis-entailment RESOLVED — stage5_verify.py _b2_majority_verdict (strict majority >0.5 config b2_majority_ratio of CLEAN passages must entail to PASS / contradict to veto; replaces weak single-passage max-entailment; score stays max(entail)); evidence_garbage_* fallbacks promoted into config (C12). RETRIEVAL RESEARCH governance/RETRIEVAL-RESEARCH-2026-09-02.md — MUST verify bge-m3 512d↔vec_fbs + keep RRF; SHOULD contextual/late-chunk + gated cross-encoder rerank + gated HyDE; WORTH USearch/TurboVec/LightRAG/ColBERT/GraphRAG/RAPTOR. 174 tests green. NEXT: post-hoc S5 re-run → just pre-s6 → just stage6.)
-# Updated: 2026-09-02 (D2506: POST-S5 HARDENING — golden canonicalization (45 dormant stage2 domain/discipline alias→canonical, surgical line-level via production match_to_canonical, 123 cross-kind/missing left), B2 evidence-garbage filter in stage5_verify (_is_garbage_passage excludes caption/title/UI fragments before NLI; 205/2793 quarantined have ≥1 garbage passage), quarantine triage (scripts/quarantine_triage.py 50-record stratified sample + QUARANTINE-BATCH-ADJUDICATION-PROMPT.md frontier 7-label adjudication). FRONTIER REVIEW (claude0041/chatgpt0041) VALIDATED: (a) triage CSV missing evidence_passages → FIXED; (b) source_diversity INFLATED by near-duplicate book files → BUG-205 S1/S2 book-dedup gap (source_diversity>=3 NOT trustworthy for B2 until fixed). NLI distribution BImodal (PASS median 0.716 vs QUAR 0.016) → threshold recalibration RULED OUT. GOV backfilled D2505 (committed 6e621fd, never synced). decision summary 488→490. S6 = GO (pre-s6 gate PASSED). POST-S6 MUST: B2 synthesis-entailment + evidence-filter S5 re-run (post-hoc); SHOULD: BUG-205 book-dedup, BUG-197 reclass; WORTH: contextual embeddings, RRF, taxonomy-as-graph.)
-# Updated: 2026-09-02 (D2504: PRE-S5 GATE VALIDATION PASSED + BUG-203/BUG-204 FIXED + .golden_meta contract. BUG-203 S5 FLAG dead code DELETED (honest needs_human_review count); BUG-204 TAXONOMY_MAX_DISCIPLINES 72→75 + dead MAX_DOMAINS/MAX_DISCIPLINES/_max_count removed (C19); .golden_meta.json regenerated (commit→HEAD, +total_examples 84/61/23) + CI test_golden_meta_contract.py; decision summary 483→488. FORENSIC: dedup was 6 groups (13→6, removed 7) NOT 4 (BUG-195 corrected) — record lineage 7880→7874(−6 BUG-198)→7867(−7). Count=7,867 CONFIRMED (NOT 7,687). Pre-S5 gates ALL GREEN: integrity 10/10, config-audit no-drift, emerging-rate 26.4%/27.4%/0.0% PASS, audit_s4_final PASS, evidence-cleanliness 187 contaminated/8 severe→QUARANTINE, stress PASSED. READY FOR S5 = GO. REMAINING post-S5 (WORTH): BUG-197 prompt fix + reclass (~2,080 emerging + 6 BUG-198 dropped + 518 axis-swapped + 48 ML-as-domain + 231 cross-axis aliases), D2399 promote/demote, 25 sidecar empty-shells, B2 entail hardening, fingerprint fail-closed.)
-# Updated: 2026-09-02 (D2503: ai systems→ml systems & infrastructure rename (NOT merged — distinct agentic vs ML-infra) + BUG-202 evidence-gate fail-closed + audit_evidence_cleanliness 8-severe→QUARANTINE. Checkpoint remap 15/7867 via scripts/rename_ai_systems_domain.py. 23/23 tests green. PRE-S5: MUST = human-review gate (6 dedup merges, emerging rate, audit_s4_final PASS, count 7867) + BUG-198 defer; SHOULD = BUG-203 FLAG, BUG-204 MAX_DISCIPLINES 72→75, .golden_meta regen; WORTH = B2 entail rule, fingerprint fail-closed, BUG-197 reclass, D2399, 25 empty-shells. See MASTER-TASK-REGISTER aggregated list.)
-# Updated: 2026-09-02 (D2502: roundtable S4/S5 bulletproof audit adjudicated — Claude CONDITIONAL-GO / ChatGPT NO-GO → ULTIMATE VERDICT CONDITIONAL-GO. Verified real: BUG-202 evidence-gate fail-open (top P0), BUG-203 FLAG dead code, BUG-204 MAX_DISCIPLINES 72vs75, B2 weak max-entailment, fingerprint fail-open, stale golden_meta. Rejected: ChatGPT P1-5 (231 cross-axis raw aliases, handled by kind-scoped index; root = open-set B3/BUG-197). Corrected roundtable+gemma miss: deberta_check raise_on_error=True → fail-closed. NEW: machine-learning-as-raw-domain 48× = BUG-197 surface. ai systems(15) vs ai & agents(66) = DISTINCT, do NOT merge (disambiguate + D2399). Task 1 DONE: test_stage2_golden_metadata_isolation.py (23/23 golden+taxonomy green).)
-# Updated: 2026-09-02 (D2501: golden/few-shot forensic audit — S4 golden stage4_golden.yaml CLEAN/canonical/cross-kind-free; BUG-201 golden_max_examples 4→5 (S4-GOLD-005 D2482 boundary example was silently dropped; CI guard test_s4_golden_not_silently_truncated added); stage2_fewshot_* domain/discipline metadata = dormant drift (~108 cross-kind/non-canonical labels, NOT consumed by any code → P2 future-tax, not rewritten); alias_map.yaml committed (was untracked). Roundtable prompt v9 written. READINESS: S5 GO after human-review gate; 25 sidecar empty-shells are POST-S5 backfill, NOT fixed by S5.)
-# Updated: 2026-09-02 (D2500: BUG-200/BUG-199 cross-kind contamination FIXED — kind-safe match_to_canonical (schemas.py) + map_to_canonical_with_fallback (stage4_merge.py) + CI guard (test_taxonomy_disjointness 4/4) + D2399 promotion guard (taxonomy_manager._is_opposite_kind) + post-hoc re-derive scripts/rederive_kindsafe_domains.py → 2,007 records fixed / 0 non-domains drift. Root cause = taxonomy_v5.yaml (36 cross-kind domain aliases) + synonym_map.yaml (18) cross-pollinated the synonym index; D2422 guarded canonical↔canonical only, NOT alias↔canonical. CONFIGS CLEANED (taxonomy_v5 −63 lines, synonym_map −18 lines; alias_map verified clean — all backed up .bak_20260902_005929) + kindsafe checkpoint PROMOTED to checkpoint_enriched.jsonl (backup_pre_kindsafe_promote_20260902_005603).)
-# Updated: 2026-08-28 (D2482: R5 cross-family FLAG judge ON (relabel_cross_family_model→gpt-oss-20b) + DSPy DirectOMLXLM auth fix (not-needed→OMLX_API_KEY) + s2.dspy_enabled gate (default off) + skill-safety guardrail (tool_instruction empty-params+syntax fail-closed) + stage4_golden WIRED + S4-GOLD-005 cross-domain boundary golden. VERIFIED: local-LLM delegation WORKS (maxwell_omlx→gemma-4-E4B live). FINDINGS: depth collapse 97.5%→domain (BUG-185); OMLX serves Qwen3.8-27B 256K ctx already installed (fixes "local ctx too small"); goose 1.48.0 active=custom_deepseek, maxwell_omlx provider FIXED — model list synced to live OMLX (7 models: +Qwen3.8-27B 256K, +Qwen3.5-9B 256K, +gemma-4-31B 256K, +gpt-oss-20b 128K; context windows corrected). Delegation verified live (Qwen3.8-27B → READY). Auth pinned to provider headers (Bearer sk-maxwell-local, requires_auth=false) — env-var independent (was .zshrc-only); wrong-key test confirmed headers are the auth source. NEXT: DSPy --full training → wire into S2; depth-prompt calibration; boundary goldens universal/specialized.)
-# Updated: 2026-08-28 (D2481: S4 HARDENED — killed serial-depth run, fixed BUG-184 (batch-depth truncation: depth_batch_max_tokens 2048 + thinking_budget 128 + per-chunk retry/serial-fallback; live 8/8 valid, 1.99s/FB vs 6.23s/FB serial), fixed BUG-183 (S2-input fingerprint stale-resume guard in .state.json), added SIGINT/SIGTERM graceful pause + incremental .depth.json checkpoint + resume. Live-verified SIGINT→checkpoint→resume (skipped 2/3 clusters, reused pre-computed depth, cleared sidecars on completion). Full-run relaunch PENDING.)
-# Updated: 2026-08-27 (D2479: root-cause verdict (a) + targeted S2 rerun 229+31 EXECUTED — singleton 5,202 FBs/21 NULL, checkpoint 8,402 FBs, frontier 13,604; 48 empty-shell residual → BUG-182 (model-level, NOT S4 blocker). D2480: option-(a) dead-end sweep — 11 read tools + 5 write tools → canonical, promote_cleaned.py → archive/, integrity #18 inverted to fail-on-existence; BUG-181/165/166 CLOSED; S4 suite 50/50, full 148/148, integrity 16/18; ETA filtered frontier 7,898 principles × 22s/FB ≈ 48.3h (53–56h w/ overhead). S4 contract audit PASS (non-principle sidecars LLM-free → BUG-170 deferred only). Blocked on: D2440 (alignscore/minicheck + nli_golden.jsonl) + S4-C distillation.)
-# Updated: 2026-08-24 (D2456: forensic audit — Ollama had the IDENTICAL dual-install clusterfuck as OMLX (homebrew 0.30.0 vs app 0.32.15, stale launchd crash-looping). FIXED: uninstalled homebrew ollama + archived stale plist + autoremoved orphaned brew mlx/mlx-c. BLINDSPOTS fixed: status.py now reports VERSIONS (drift was silent); get_ollama_version added; guard generalized to scripts/guard_stacks_single_source.py (OMLX+Ollama, config-first) with false-positive fix for app-owned CLI shims; NEW scripts/monitor_stacks.py one-panel monitor (status+version+min_version drift+single-source) wired into just preflight + just stacks. 126/126 tests, 10/10 integrity, config audit clean. Still blocked on: singleton extraction (just s2-singletons) + S5 verifier calibration (D2440).)
-# Updated: 2026-08-24 (D2455: OMLX single-source-of-truth + permanent re-infection guard. Root cause of the "two-version clusterfuck" = TWO OMLX installs (GUI app 0.6.2 vs homebrew 0.5.1) both claiming port 11435 + rewriting settings.json; homebrew launchd agent crash-looped every ~11s and clobbered max_concurrent_requests 6→3. FIXED: uninstalled homebrew omlx 0.5.1 (GUI app = single source of truth), archived all 6 stale launchd plists, added scripts/guard_omlx_single_source.py (config-first C12, fail-loud on forbidden binary/stale agent/port conflict) wired into just health + just preflight. QUALITY: max_concurrent_requests batching byte-identical to solo (temp=0.0 greedy + continuous batching = pure scheduling). Ollama dual-install (com.ollama.ollama + stale homebrew.mxcl.ollama) flagged, NOT touched. Still blocked on: singleton extraction (just s2-singletons) + S5 verifier calibration (D2440).)
-# Updated: 2026-08-24 (D2452: S2 singleton-readiness hardening + fail-closed schema enforcement. (1) WIRED D2437 prefilter into process_singletons — config stage2.singleton_prefilter_enabled; fail-LOUD if singletons.prefiltered.jsonl absent. (2) FIXED BUG-173 enforcement gap — _blank_elaboration_for_non_principle blanks elaboration for PT/PI/GE/TI in BOTH builders (was prompt-only; live smoke reproduced 602-char elaboration on a PT). (3) _capture_type_specific_fields now emits typed placeholders ([]/False/"") so every s2_body_field is present. (4) load_golden_single_source truncation now round-robins (preserves all 5 roles; old pos.pop() dropped GE/PI first). (5) pipeline_config stages gained stage0_5_extract_metadata (external-audit #6). (6) just s2-singletons + s2-singletons-prefilter. 121/121 tests green. D2453 = S2 singleton checkpoint/pause/resume + external-audit #5/#14 capture. S4 golden wiring renumbered D2454 (still pending). BUG-165 S4→S5→S6 rerun STILL blocked on: singleton extraction first (just s2-singletons) + S5 verifier calibration (D2440).)
-# Updated: 2026-08-20 (T1.1 S2→S5 complete, S6 HELD; D2417-D2422 + BUG-145..151; quarantine policy DECIDED D2420, re-extract approved D2421, domain/discipline disjointness D2422; see governance/SESSION-HANDOFF-2026-08-20.md)
-# PREVIOUS: 2026-08-17 (D2391-D2408: grammar OFF; depth prompt; taxonomy synonym/alias; dead-column drop; DB reset; golden verbatim; S4 reval confirm D2398; domain-promotion defer D2399; S4/S6 field-production contract D2400; session_seed YAML break D2406; dead-code purge D2407; response_format fix D2408; R3 canary S4→S6 rerun COMPLETE)
-
 session:
-    version: "3.0.0"
-    pipeline_commit: v3.0-D2370
-    schema_version: "3.0"
-    project_root: knowledge pipeline/
-
-# ── Models (synced with config/pipeline_config.yaml — D2115/D2298) ──
+  version: 3.0.0
+  pipeline_commit: v3.0-D2370
+  schema_version: '3.0'
+  project_root: knowledge pipeline/
 models:
-    generator:
-        model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
-        provider: omlx
-        temperature: 0.0
-        family: qwen
-    classifier:
-        model: gpt-oss-20b-MXFP4-Q8
-        provider: omlx
-        temperature: 0.0
-        family: gpt-oss
-        notes: "D2249: S4 classifier (NOT the S5 verifier). D2340 renamed from `verifier` to stop role confusion."
-    probe:
-        model: Phi-4-mini-instruct-8bit
-        provider: omlx
-        family: phi
-        notes: "D2319: S2 fast probe (~1.5s), NOT an S5 verifier. D2298 removed Phi from S5 verification only (67% acc, hallucination risk); S5 = DeBERTa-only. D2340: renamed from misleading `verifier_v2`."
-    embeddings:
-        model: bge-m3
-        provider: ollama
-        dims: 512                       # E7: Matryoshka truncated from 1024 (95.3% neighbor overlap, 2× speed)
-        family: bge
-    nli:
-        model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
-        provider: local
-        family: deberta
-        notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest auto-cal: P=0.647/R=0.386/F1=0.484 (D2293's P=1.000 was on the broken pre-D2321 call — NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded). D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py harness vs DeBERTa before any threshold change — F1>0.484 gate + fail-closed (D2093)."
-
-    # D2442 (2026-08-24): structural evidence tier — is_convergent/origin now
-    # survive S4→S6 (was silently dropped). Retrieval can tier:
-    #   convergent (>=2 sources agree) vs single_source vs singleton.
-    evidence_tier:
-        axis: convergence          # orthogonal to provenance (C29 extraction honesty)
-        values: [convergent, single_source, singleton]
-        persisted: true            # 2 SQLite cols: is_convergent INTEGER, origin TEXT (D2442)
-
-# ── Pipeline (8-stage v3.0 — cluster-before-extract) ──
-# D2197: stage3 removed (D2120). Pipeline is 8-stage, not 9.
+  generator:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    provider: omlx
+    temperature: 0.0
+    family: qwen
+  classifier:
+    model: gpt-oss-20b-MXFP4-Q8
+    provider: omlx
+    temperature: 0.0
+    family: gpt-oss
+    notes: 'D2249: S4 classifier (NOT the S5 verifier). D2340 renamed from `verifier`
+      to stop role confusion.'
+  probe:
+    model: Phi-4-mini-instruct-8bit
+    provider: omlx
+    family: phi
+    notes: 'D2319: S2 fast probe (~1.5s), NOT an S5 verifier. D2298 removed Phi from
+      S5 verification only (67% acc, hallucination risk); S5 = DeBERTa-only. D2340:
+      renamed from misleading `verifier_v2`.'
+  embeddings:
+    model: bge-m3
+    provider: ollama
+    dims: 512
+    family: bge
+  nli:
+    model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+    provider: local
+    family: deberta
+    notes: 'D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest
+      auto-cal: P=0.647/R=0.386/F1=0.484 (D2293''s P=1.000 was on the broken pre-D2321
+      call — NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded).
+      D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py harness
+      vs DeBERTa before any threshold change — F1>0.484 gate + fail-closed (D2093).'
+  evidence_tier:
+    axis: convergence
+    values:
+    - convergent
+    - single_source
+    - singleton
+    persisted: true
 pipeline:
-    stages:
-        stage0:    convert           # EPUB/PDF → MD (Pandoc/Docling)
-        stage0_5:  extract_metadata  # Filename → author/title/year (LLM)
-        stage1:    chunk             # MD → segments + SHA-256 dedup
-        stage1_3:  prefilter         # Regex structural garbage filter (D2080)
-        stage1_5:  embed_cluster     # FAISS clustering on raw segments (D2094)
-        stage2:    extract           # Clusters → convergent FBs (1 LLM call per cluster — REWRITE D2110)
-        # stage3: REMOVED (D2120) — HDBSCAN semantic dedup replaced by cluster-before-extract
-        stage4:    classify          # Multi-label classification + formatting (D2066 multi-label, not SALSA)
-        stage5:    verify            # DeBERTa-v3-large NLI only (D2298, D2093 fail-closed)
-        stage6:    commit            # SQLite + Parquet export
-    clustering:
-        method: FAISS
-        metric: cosine
-        threshold: 0.75              # D2205: synced with pipeline_config.yaml faiss_threshold (was 0.70 on 3 books — recalibrate at 20+ books)
-        embed_model: bge-m3
-        min_source_diversity: 2
-    classification:
-        method: multi_label          # D2066: raw labels dethrone canonicals. Not SALSA.
-        model: classifier            # R5: Generator (Qwen3-Coder) ≠ Classifier (gpt-oss). D2340 rename.
-        max_domains_per_fb: 5
-    verification:
-        borp_min_sources: 2
-        nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli   # D2298: DeBERTa-only
-        nli_entailment_threshold: 0.10
-        cross_family_verifier: null   # D2298: removed (RoBERTa/Phi-4-mini/Gemma deleted)
-        fail_mode: fail_closed       # D2093: QUARANTINE on any check failure, never PASS
-
-# ── Services ──
+  stages:
+    stage0: convert
+    stage0_5: extract_metadata
+    stage1: chunk
+    stage1_3: prefilter
+    stage1_5: embed_cluster
+    stage2: extract
+    stage4: classify
+    stage5: verify
+    stage6: commit
+  clustering:
+    method: FAISS
+    metric: cosine
+    threshold: 0.75
+    embed_model: bge-m3
+    min_source_diversity: 2
+  classification:
+    method: multi_label
+    model: classifier
+    max_domains_per_fb: 5
+  verification:
+    borp_min_sources: 2
+    nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+    nli_entailment_threshold: 0.1
+    cross_family_verifier: null
+    fail_mode: fail_closed
 services:
-    omlx:
-        host: localhost
-        port: 11435
-        api_key: sk-maxwell-local
-        watchdog: pipeline/omlx_watchdog.py
-        memory_guard: pipeline/memory_guard.py
-        memory_limit_gb: 24          # BUG-017 mitigation: restart OMLX if RSS exceeds
-    ollama:
-        host: localhost
-        port: 11434
-
-# ── Storage ──
+  omlx:
+    host: localhost
+    port: 11435
+    api_key: sk-maxwell-local
+    watchdog: pipeline/omlx_watchdog.py
+    memory_guard: pipeline/memory_guard.py
+    memory_limit_gb: 24
+  ollama:
+    host: localhost
+    port: 11434
 storage:
-    canonical: knowledge pipeline/maxwell.db
-    checkpoints: knowledge pipeline/checkpoints/
-    parquet: knowledge pipeline/parquet/
-    archive: knowledge pipeline/archive/
-
-# ── Content-Type Ontology (D2323) ──
+  canonical: knowledge pipeline/maxwell.db
+  checkpoints: knowledge pipeline/checkpoints/
+  parquet: knowledge pipeline/parquet/
+  archive: knowledge pipeline/archive/
 content_type:
-    registry: config/content_types.yaml   # single source of truth (C12)
-    content_types: [principle, process_template, process_instance, tool_instruction, growth_edge]
-    extraction_types: [causal_mechanism, descriptive_model, normative_heuristic, empirical_pattern]
-    note: "2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction→content) + D2128 (route→content) mappings in registry."
-
-# ── Governance ──
+  registry: config/content_types.yaml
+  content_types:
+  - principle
+  - process_template
+  - process_instance
+  - tool_instruction
+  - growth_edge
+  extraction_types:
+  - causal_mechanism
+  - descriptive_model
+  - normative_heuristic
+  - empirical_pattern
+  note: 2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction→content)
+    + D2128 (route→content) mappings in registry.
 governance:
-    constitution: CONSTITUTION.md
-    decision_log: DECISION-LOG.md
-    master_task_register: MASTER-TASK-REGISTER.md
-    buglog: governance/buglog.md
-    protected_files:
-        - CONSTITUTION.md
-        - DECISION-LOG.md
-        - MASTER-TASK-REGISTER.md
-        - AGENTS.md
-        - .env
-        - config/*.yaml
-        - governance/*.md
-
-# ── Boot Sequence ──
+  constitution: CONSTITUTION.md
+  decision_log: DECISION-LOG.md
+  master_task_register: MASTER-TASK-REGISTER.md
+  buglog: governance/buglog.md
+  protected_files:
+  - CONSTITUTION.md
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - AGENTS.md
+  - .env
+  - config/*.yaml
+  - governance/*.md
 boot:
-    1: Read CONSTITUTION.md
-    2: Load agent/session_seed.yaml
-    3: Run OMLX stress test (pipeline/omlx_watchdog.py --pre-stage)
-    4: Verify OMLX + Ollama running
-    5: python3 pipeline/status.py
-
-# ── Phase Tracking ──
+  1: Read CONSTITUTION.md
+  2: Load agent/session_seed.yaml
+  3: Run OMLX stress test (pipeline/omlx_watchdog.py --pre-stage)
+  4: Verify OMLX + Ollama running
+  5: python3 pipeline/status.py
 phase:
-    current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-    status: 'T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge pipeline/runner_t11_20260817_212404.log). S0 ✅ 940/940, S0.5 ✅ cached, S1 chunking → S1.5 embed (D2409 incremental cache) → S2 (~25-40h long pole) → S4 (~39h) → S5 → S6. Fresh DB per D2396 (canary archived maxwell.db.pre_t11_20260817_211632.bak). caffeinate -disu active, OMLX lazy-load on demand, watchdog per-stage. D2409/D2410 committed 3e6a383. Monitor: python3 pipeline/status.py; tail -f "knowledge pipeline/runner_t11_20260817_212404.log" (block-buffered under nohup — bursts); resume: python3 pipeline/runner.py --run-id t11 --resume-from <stage>.'
-    completed:
-        - Phase 0: 14/14 foundation fixes ✅
-        - Phase 0.5: cleaning pipeline spec'd, partially implemented
-        - Tier 1: architecture restructure (cluster-before-extract) ✅
-        - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
-        - D2092-D2114: v3.0 architecture decisions recorded ✅
-        - B1-B10 (D2325-D2332): pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343 residual closures)
-        - B11 (P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence (D2337, BUG-095)
-        - B12 (P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
-        - B13 (P1): runner --run-id import-order isolation (D2339, BUG-097)
-        - B14 (P1): model-registry drift correction — session_seed rename done; config/path rename deferred (D2340, BUG-099)
-        - B16 (P0): S1.5 embedding-drop index alignment — (filtered_segments, embeddings) + len assert (D2346, BUG-102)
-        - B17 (P1): e2e convergence metric → sum(c["is_convergent"]) canonical IDs (D2347, BUG-103)
-        - B18 (P0): embedding reliability — timeout 180s + keep_alive=-1 (D2348, BUG-105)
-        - V1-V6 (P0): T1.1 canary GREEN — 2255 clusters → 279 FBs → 239 PASS → 279 committed
-        - V7 (D2368): DECISION-LOG D2351-D2363 backfilled
-        - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config key
-        - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized (1→2 each)
-        - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
-        - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume verified on 20-cluster subset
-        - D2386: S4 gate relaxed 0.0→0.01 (cluster_6241 empty-application quarantine within 1% tolerance)
-        - D2391: S6 schema-migration gap fixed (is_summary + classification_status auto-heal) — 278 committed cleanly
-        - D2392: grammar A/B RESOLVED — 0.6.0 xgrammar breaks gpt-oss-20b (Harmony conflict) → keep grammar OFF; 0.5.1 stays on 11435
-        - D2393: depth skew fixed — focused prompts tightened (default-to-domain; cross-domain = 2+ DISTINCT disciplines)
-        - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion — discipline emerging 32%→15.5%
-        - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity 17/17 + audit green
-        - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)
-        - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
-        - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline emerging 32.0%→15.5%
-        - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts (post-T1.1+D2345), NOT canary
-        - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only; orphan-field producers = post-S4 enrichment (F1)
-        - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests pass)
-        - "D2402: S4 runner timeout '4': 3600 → null (unlimited, like S2) — FIXED"
-        - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
-        - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from processed_ids — FIXED
-        - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate FAILED→QUARANTINE — FIXED
-        - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status + D2402 scalars — FIXED
-        - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests (9 tests) — DONE
-        - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict) → skip for reasoning models — FIXED
-        - R3 (D2408 validation): canary S4→S6 rerun COMPLETE — S4 279/279 FBs (0 failed clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87 min; D2408 validated live; no regression vs prior 235/43
-    pending:
-        - "D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9% — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true) — both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions until explicitly re-opened."
-        - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer (D2396 follow-up)
-        - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py (reuse S1.5 clusters)
-        - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256 (gated, BUG-132)
-        - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining per-principle)
-        - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id dup/skip after a live resume
-        - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now unblocked by BUG-132)
-        - BUG-104 (🟠 env, non-blocking, ACTION): switch runtime to Homebrew Python (`brew install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`); FTS fallback works meanwhile
-        - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback config-first (D2341)
-        - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml
-        - Q6: 5+ book E2E test with meaningful convergent extraction
-        - Tier 2: quality calibration (golden set audit, manual FB review)
-        - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
-        - C8: D2066 dynamic canonical taxonomy
-        - C9: D2067 cross-run incremental extraction
-        - MPS backend: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors) — post-T1.1 (ollama is prod backend)
-        - S1.5 K-means fallback: mark positional-split clusters degraded — post-T1.1
-        - S2 probe cache: fingerprint (not just counts) — post-T1.1
-        - S2 sampling: group by canonical source_id (not truncated basename) — post-T1.1
-        - S2 evidence: verbatim substring verification — post-T1.1
-        - S4.5: register in runner STAGE_ORDER — post-T1.1
-        - NLI calibration data (evals/nli_golden.jsonl) not committed → threshold not reproducible — post-T1.1
-        - D2452 (D2451 follow-up): wire config/golden/stage4_golden.yaml into the 4 S4 classification prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM / BATCH_CRIBS_CLASSIFY_SYSTEM / depth-focused) — extract hardcoded inline depth examples, config-first, live smoke before BUG-165
-    next_phase: T1.1 full run → Tier 2 quality calibration
-    # D2449/D2450/D2451 (2026-08-24): singleton parity + PT-vs-TI golden + S4 golden DONE:
-    #   - D2449: _enrich_provenance/_sanitize_books shared across both S2 builders (BUG-174 FIXED); sanitize_source_book (config/filtering.yaml source_noise)
-    #   - D2450: SS-POS-007/008/009 TI positives + _capture_type_specific_fields always-emits + scripts/audit_content_type_contract.py
-    #   - D2451: SS-POS-010 descriptive-principle / SS-POS-011 PT-not-TI / SS-NEG-004 over-split + config/golden/stage4_golden.yaml (AUTHORED, not wired → D2452)
-    #   - 121/121 tests green; BUG-165 still blocked on singleton extraction + D2440 S5 calibration
-    # D2439/D2440 (2026-08-24): external SOTA audit verdict — post-BUG-165 P2 queue:
-    #   - D2440 AlignScore+MiniCheck calibration vs DeBERTa (single convergent action)
-    #   - BUG-168 dspy_trainer.py wire-or-archive
-    #   - Leiden swap (D2168 already documented; needs igraph C-dep)
-    #   - contextual retrieval / late chunking / cross-encoder reranker / DuckDB
-    # D2441/D2442 (2026-08-24): external-audit A+B DONE:
-    #   - leak redacted (pipeline_config books manifest → runtime glob)
-    #   - C12 hardcoded-path scanner recursive (162 files)
-    #   - evidence-tier preserved S4→S6 (BUG-171 FIXED)
-    #   - freeze_run_manifest.py + audit_s4_fields.py added
-    #   - BUG-169 (TI parameters) + BUG-170 (non-principle not classified) OPEN
-
-# ── Book Library ──
+  current: Phase 1 (v3.0 architecture validation) — pre-T1.1
+  status: 'T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge
+    pipeline/runner_t11_20260817_212404.log). S0 ✅ 940/940, S0.5 ✅ cached, S1 chunking
+    → S1.5 embed (D2409 incremental cache) → S2 (~25-40h long pole) → S4 (~39h) →
+    S5 → S6. Fresh DB per D2396 (canary archived maxwell.db.pre_t11_20260817_211632.bak).
+    caffeinate -disu active, OMLX lazy-load on demand, watchdog per-stage. D2409/D2410
+    committed 3e6a383. Monitor: python3 pipeline/status.py; tail -f "knowledge pipeline/runner_t11_20260817_212404.log"
+    (block-buffered under nohup — bursts); resume: python3 pipeline/runner.py --run-id
+    t11 --resume-from <stage>.'
+  completed:
+  - Phase 0: 14/14 foundation fixes ✅
+  - Phase 0.5: cleaning pipeline spec'd, partially implemented
+  - Tier 1: architecture restructure (cluster-before-extract) ✅
+  - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
+  - D2092-D2114: v3.0 architecture decisions recorded ✅
+  - B1-B10 (D2325-D2332): pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343 residual
+      closures)
+  - B11 (P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence
+      (D2337, BUG-095)
+  - B12 (P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
+  - B13 (P1): runner --run-id import-order isolation (D2339, BUG-097)
+  - B14 (P1): model-registry drift correction — session_seed rename done; config/path
+      rename deferred (D2340, BUG-099)
+  - B16 (P0): S1.5 embedding-drop index alignment — (filtered_segments, embeddings)
+      + len assert (D2346, BUG-102)
+  - B17 (P1): e2e convergence metric → sum(c["is_convergent"]) canonical IDs (D2347,
+      BUG-103)
+  - B18 (P0): embedding reliability — timeout 180s + keep_alive=-1 (D2348, BUG-105)
+  - V1-V6 (P0): T1.1 canary GREEN — 2255 clusters → 279 FBs → 239 PASS → 279 committed
+  - V7 (D2368): DECISION-LOG D2351-D2363 backfilled
+  - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config
+      key
+  - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized
+      (1→2 each)
+  - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
+  - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint
+      every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume
+      verified on 20-cluster subset
+  - D2386: S4 gate relaxed 0.0→0.01 (cluster_6241 empty-application quarantine within
+      1% tolerance)
+  - D2391: S6 schema-migration gap fixed (is_summary + classification_status auto-heal)
+      — 278 committed cleanly
+  - D2392: grammar A/B RESOLVED — 0.6.0 xgrammar breaks gpt-oss-20b (Harmony conflict)
+      → keep grammar OFF; 0.5.1 stays on 11435
+  - D2393: depth skew fixed — focused prompts tightened (default-to-domain; cross-domain
+      = 2+ DISTINCT disciplines)
+  - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion
+      — discipline emerging 32%→15.5%
+  - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity
+      17/17 + audit green
+  - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak);
+      run-specific DB = G10 (P2)
+  - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM
+      → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
+  - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline
+      emerging 32.0%→15.5%
+  - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts
+      (post-T1.1+D2345), NOT canary
+  - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only;
+      orphan-field producers = post-S4 enrichment (F1)
+  - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces
+      prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests
+      pass)
+  - 'D2402: S4 runner timeout ''4'': 3600 → null (unlimited, like S2) — FIXED'
+  - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
+  - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from
+      processed_ids — FIXED
+  - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate
+      FAILED→QUARANTINE — FIXED
+  - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status
+      + D2402 scalars — FIXED
+  - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests
+      (9 tests) — DONE
+  - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict)
+      → skip for reasoning models — FIXED
+  - R3 (D2408 validation): canary S4→S6 rerun COMPLETE — S4 279/279 FBs (0 failed
+      clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6
+      279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87 min; D2408 validated
+      live; no regression vs prior 235/43
+  pending:
+  - 'D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9%
+    — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts
+    (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true)
+    — both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions
+    until explicitly re-opened.'
+  - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer
+      (D2396 follow-up)
+  - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py
+      (reuse S1.5 clusters)
+  - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256
+      (gated, BUG-132)
+  - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining
+      per-principle)
+  - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id
+      dup/skip after a live resume
+  - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now
+      unblocked by BUG-132)
+  - BUG-104 (🟠 env, non-blocking, ACTION): switch runtime to Homebrew Python (`brew
+      install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`); FTS fallback
+      works meanwhile
+  - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback
+      config-first (D2341)
+  - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe
+      in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml
+  - Q6: 5+ book E2E test with meaningful convergent extraction
+  - Tier 2: quality calibration (golden set audit, manual FB review)
+  - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
+  - C8: D2066 dynamic canonical taxonomy
+  - C9: D2067 cross-run incremental extraction
+  - MPS backend: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors)
+      — post-T1.1 (ollama is prod backend)
+  - S1.5 K-means fallback: mark positional-split clusters degraded — post-T1.1
+  - S2 probe cache: fingerprint (not just counts) — post-T1.1
+  - S2 sampling: group by canonical source_id (not truncated basename) — post-T1.1
+  - S2 evidence: verbatim substring verification — post-T1.1
+  - S4.5: register in runner STAGE_ORDER — post-T1.1
+  - NLI calibration data (evals/nli_golden.jsonl) not committed → threshold not reproducible
+    — post-T1.1
+  - D2452 (D2451 follow-up): wire config/golden/stage4_golden.yaml into the 4 S4 classification
+      prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM / BATCH_CRIBS_CLASSIFY_SYSTEM
+      / depth-focused) — extract hardcoded inline depth examples, config-first, live
+      smoke before BUG-165
+  next_phase: T1.1 full run → Tier 2 quality calibration
 book_library:
-    total_books: 852 MD (8 domains)
-    test_domains:
-        - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
-        - Pricing subset (3 books, 237 segments — E2E test)
-    source: knowledge pipeline/books/
-
-# ── CURRENT STATE (2026-09-19) ──────────────────────────────────────────────
-# Read governance/SESSION-HANDOFF-2026-09-19.md FIRST, then CONTEXT_INDEX.md §6e, then
-# governance/ROUNDTABLE_CROSSEXAM_20260919.md.
+  total_books: 852 MD (8 domains)
+  test_domains:
+  - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
+  - Pricing subset (3 books, 237 segments — E2E test)
+  source: knowledge pipeline/books/
 current_state:
-    open_bugs_n: 77
-    c15_register: governance/SESSION-HANDOFF-2026-09-23.md
-    date: 2026-09-22
-    # 2026-09-22 (D-331..D-333): inference-engine bake-off, M1 reality-check, MTP re-scope.
-    # Phase 0 DONE (goose UI core-steal fixed via com.electron.goose defaults). Phase 1: pin oMLX dev2,
-    # D-293 MTP RE-SCOPED to MEASURE-don't-assume (scripts/mtp_ab.py; community #38 shows speculative
-    # decode is a net LOSS on M1 Max → D-332 community-benchmark-first rule). Re-assert D2460 no-cache,
-    # oQ4e/oQe A/B (D-294), goose active_provider custom_deepseek→maxwell_omlx (D-295).
-    # Read governance/MARKET_RESEARCH_20260922{M,_M1,_PIPELINE}.md first. Hard limits (M1 Max): NAX,
-    # neural accel, CED, Cluster v2, Apple AFM; M5-era speedups (MTP/TensorOps) do NOT transfer (D-332).
-    # D-293 RESOLVED (MTP A/B 0.98x neutral). D-334 ACTIVE: Metal wired cap <56GB -> sudo sysctl
-    # iogpu.wired_limit_mb=57344. "Best config" applied via config/omlx_m1_best_config.yaml +
-    # scripts/omlx_apply_best_m1_config.py (all `apply` already at target). D-294 gated levers:
-    # turboquant_kv + specprefill (scripts/omlx_lever_ab.py); quant variant A/B needs download.
-    # D-294 partial: turboquant_kv A/B on Qwen3-Coder S2 = 0.65x LOSS (median 0.81x) -> keep false.
-    # Next D-294 levers: specprefill (S2), turboquant_kv on gpt-oss (LONG-context S4), quant A/B.
-    critical_finding: >
-        BUG-299 / D-274a — the serving gate is a LABEL, not a verification verdict.
-        scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type == 'principle'
-        else 'QUARANTINE' (written at :163). 4,745/4,745 PASS rows are content_type='principle';
-        0/1,470 non-principle rows pass. 2,447 rows (30.6%) disagree with their own persisted
-        verification_results[factual].passed: 138 NLI CONTRA-majority and 1,514 NEUTRAL rows are
-        SERVED, 278 served rows had all evidence flagged non-evidence fragments, and 506
-        ENTAIL-majority rows are HIDDEN. Honest gate: PASS 4,745 -> 3,310.
-        => ROLE is the highest-leverage axis, not decorative (D6 / BUG-280 / D272g INVERTED).
-    next_phase: >
-        0a G17 re-derive status from the verification record (+ typed s5_reason, one writer,
-        CI invariant). Then 0b G12 facet predicate in every leg. Then 0c G18 guard split.
-        Do NOT relabel, retrain, benchmark or rerun before 0a-0b.
-    ruling_artifacts:
-        - governance/ROUNDTABLE_CROSSEXAM_20260919.md
-        - governance/SESSION-HANDOFF-2026-09-19.md
-        - governance/ONTOLOGY_FORENSIC_20260919.md
-        - governance/PRIORITY_REGISTER_20260917.md
-        - governance/SEQUENCE_STATUS_20260917.md
-    open_gates: [G1, G2, G3, G5, G6, G7, G8, G9, G10, G11, G12, G14, G15, G16, G17, G18, G19, G20]
-    withdrawn_gates: [G4a, G13]
-    registry: {decisions: 639, highest_bug: BUG-301, buglog_entries: 50}
-    do_not:
-        - relabel the corpus
-        - buy more stratum-A ruler rows
-        - train or swap S2/S4 on the current labels (no provenance column exists)
-        - extend the alias map
-        - re-cut the 61/43 ontology
-        - add the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF before 0a-0b
-        - run R2 before R5/R1
-        - treat the D-2637 model-eval workstream as a blocker (it is not on the critical path)
-    do_not_quote:
-        - the 0.60 floor (two estimands, one number - BUG-295)
-        - the F-14 pocket retarget (statistically null - BUG-296)
-        - any PASS-only frame as an epistemic frame (it is a ROLE frame)
-        - the golden retrieval set as ground truth (ids chosen from live search output)
+  open_bugs_n: 77
+  c15_register: governance/SESSION-HANDOFF-2026-09-23.md
+  date: 2026-09-22
+  critical_finding: 'BUG-299 / D-274a — the serving gate is a LABEL, not a verification
+    verdict. scripts/apply_phase1_finalize.py:18 sets status = ''PASS'' if content_type
+    == ''principle'' else ''QUARANTINE'' (written at :163). 4,745/4,745 PASS rows
+    are content_type=''principle''; 0/1,470 non-principle rows pass. 2,447 rows (30.6%)
+    disagree with their own persisted verification_results[factual].passed: 138 NLI
+    CONTRA-majority and 1,514 NEUTRAL rows are SERVED, 278 served rows had all evidence
+    flagged non-evidence fragments, and 506 ENTAIL-majority rows are HIDDEN. Honest
+    gate: PASS 4,745 -> 3,310. => ROLE is the highest-leverage axis, not decorative
+    (D6 / BUG-280 / D272g INVERTED).
 
+    '
+  next_phase: '0a G17 re-derive status from the verification record (+ typed s5_reason,
+    one writer, CI invariant). Then 0b G12 facet predicate in every leg. Then 0c G18
+    guard split. Do NOT relabel, retrain, benchmark or rerun before 0a-0b.
+
+    '
+  ruling_artifacts:
+  - governance/ROUNDTABLE_CROSSEXAM_20260919.md
+  - governance/SESSION-HANDOFF-2026-09-19.md
+  - governance/ONTOLOGY_FORENSIC_20260919.md
+  - governance/PRIORITY_REGISTER_20260917.md
+  - governance/SEQUENCE_STATUS_20260917.md
+  open_gates:
+  - G1
+  - G2
+  - G3
+  - G5
+  - G6
+  - G7
+  - G8
+  - G9
+  - G10
+  - G11
+  - G12
+  - G14
+  - G15
+  - G16
+  - G17
+  - G18
+  - G19
+  - G20
+  withdrawn_gates:
+  - G4a
+  - G13
+  registry:
+    decisions: 639
+    highest_bug: BUG-301
+    buglog_entries: 50
+  do_not:
+  - relabel the corpus
+  - buy more stratum-A ruler rows
+  - train or swap S2/S4 on the current labels (no provenance column exists)
+  - extend the alias map
+  - re-cut the 61/43 ontology
+  - add the chunk leg / vec_fbs_ctx / contextual embeddings / weighted RRF before
+    0a-0b
+  - run R2 before R5/R1
+  - treat the D-2637 model-eval workstream as a blocker (it is not on the critical
+    path)
+  do_not_quote:
+  - the 0.60 floor (two estimands, one number - BUG-295)
+  - the F-14 pocket retarget (statistically null - BUG-296)
+  - any PASS-only frame as an epistemic frame (it is a ROLE frame)
+  - the golden retrieval set as ground truth (ids chosen from live search output)
+open_bugs_n: 77

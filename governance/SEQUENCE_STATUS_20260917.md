@@ -743,3 +743,8 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
 D-341 + D-342 minted; evidence receipts + authority markers + 9th health check live; BUG-379/380 FIXED, BUG-381 (HIGH)
 + BUG-382 OPEN. Gate list corrected: **BUG-326 GO withdrawn (not applicable)**. Remaining: BUG-381 vintage call, flags
 hygiene, S5 REVERIFY (optional), R3 GO (staged), laya (DEFER), disk. Open bugs: see governance/bug_status.json.
+
+## Session 23 (2026-09-23) — classification regime measured + authority markers enforced
+- D-343 (representability regime) + D-344 (authority enforcement) minted. Health = 10 checks.
+- Routing table now binding: discipline/domains `classify`; extraction_type `coarsen_or_calibrated_abstention`; content_type + depth `constant_plus_human_queue`.
+- Owner gates unchanged and still open: S6 RE-COMMIT/STORE AS IS (BUG-381), R3 GO, FLAGS OFF / WIRE, outlines install, menu coarsen GO.

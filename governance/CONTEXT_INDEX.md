@@ -615,3 +615,12 @@ authoritative). Open bugs: 73 OPEN / 51 CLOSED of 124 (`governance/bug_status.md
 D-338/D-339 (no state claim without a receipt; flag registry). **Health = 9 fail-loud checks** (adds
 `verify_evidence_manifests.py`). **Open owner gates:** see `governance/FLAG_HYGIENE_TASKS_20260923.md`, BUG-381, BUG-382,
 S5 REVERIFY (optional), R3 GO (staged), laya (recommended DEFER), disk chore.
+
+### Supersession table — 2026-09-23 (session 23)
+| superseded claim | now |
+|---|---|
+| "retrieval/k-NN is dead for the discipline axis" | DEAD only as a mislabel detector (D2575). As a REPRESENTATION it separates discipline (+15.2 pp over the constant) and domains (+22.2 pp) — D-343 |
+| "content_type is merely degenerate (F-17)" | measured: kNN 0.7863 vs constant 0.8161 = **−2.98 pp**; classifying it is worse than always emitting the modal label — D-343 |
+| "depth is a classification axis" | depth loses to the constant by 16.5 pp ('domain' alone is 82%); route constant+queue — D-343 |
+| "ARTIFACT_AUTHORITY.json is written but unenforced" | enforced: 10th health check, 0 RED — D-344 |
+- Binding rules: a model may not be adopted on a lift over chance alone; both references (null AND constant) must be beaten. Health = **10** checks.

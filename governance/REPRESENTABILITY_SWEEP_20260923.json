@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0",
+  "gen_model": "deterministic-numpy",
+  "pipeline_commit": "9d0964d",
+  "created_at": "2026-09-23T11:23:28+00:00",
+  "decision": "D-343",
+  "db": "knowledge pipeline/maxwell.db",
+  "n_vectors": 7995,
+  "dim": 512,
+  "k": 10,
+  "seed": 20260923,
+  "reference_stored_error": {
+    "content_type": {
+      "n_scored": 150,
+      "agrees": 97,
+      "error": 0.3533,
+      "wilson95": [
+        0.2814,
+        0.4326
+      ],
+      "stratum_a_error": 0.29,
+      "stratum_b_error": 0.48
+    },
+    "discipline": {
+      "n_scored": 116,
+      "agrees": 61,
+      "error": 0.4741,
+      "wilson95": [
+        0.3856,
+        0.5644
+      ],
+      "stratum_a_error": 0.4875,
+      "stratum_b_error": 0.4444,
+      "effective_n_note": "34 of 150 cannot be scored: 28 blank + 6 `emerging` (BUG-334: publish the effective n)"
+    },
+    "extraction_type": {
+      "n_scored": 145,
+      "agrees": 104,
+      "error": 0.2828,
+      "wilson95": [
+        0.2158,
+        0.3609
+      ],
+      "stratum_a_error": 0.2551,
+      "stratum_b_error": 0.3404
+    }
+  },
+  "axes": [
+    {
+      "axis": "discipline",
+      "multi_label": false,
+      "effective_n": 7995,
+      "excluded_empty_label_rows": 0,
+      "modal_share": 0.1134,
+      "modal_label": "psychology",
+      "knn_agreement_observed": 0.2652,
+      "knn_agreement_permutation_null": 0.0398,
+      "lift_over_null_pp": 22.54,
+      "lift_over_constant_pp": 15.18,
+      "beats_constant_baseline": true,
+      "route": "classify",
+      "worst_labels": [
+        {
+          "label": "theoreticalphysics",
+          "rows": 24,
+          "knn_agreement": 0.0417,
+          "global_share": 0.003
+        },
+        {
+          "label": "riskmanagement",
+          "rows": 57,
+          "knn_agreement": 0.0561,
+          "global_share": 0.0071
+        },
+        {
+          "label": "culturalstudies",
+          "rows": 87,
+          "knn_agreement": 0.0586,
+          "global_share": 0.0109
+        },
+        {
+          "label": "decisionmaking",
+          "rows": 30,
+          "knn_agreement": 0.0633,
+          "global_share": 0.0038
+        },
+        {
+          "label": "interdisciplinarystudies",
+          "rows": 23,
+          "knn_agreement": 0.0696,
+          "global_share": 0.0029
+        },
+        {
+          "label": "computationalgeometry",
+          "rows": 41,
+          "knn_agreement": 0.0878,
+          "global_share": 0.0051
+        },
+        {
+          "label": "engineering",
+          "rows": 85,
+          "knn_agreement": 0.0953,
+          "global_share": 0.0106
+        },
+        {
+          "label": "complexadaptivesystems",
+          "rows": 45,
+          "knn_agreement": 0.0956,
+          "global_share": 0.0056
+        },
+        {
+          "label": "cognitivescience",
+          "rows": 131,
+          "knn_agreement": 0.1015,
+          "global_share": 0.0164
+        },
+        {
+          "label": "informationsecurity",
+          "rows": 38,
+          "knn_agreement": 0.1026,
+          "global_share": 0.0048
+        }
+      ],
+      "vec_rows_without_fbs_match": 0
+    },
+    {
+      "axis": "extraction_type",
+      "multi_label": false,
+      "effective_n": 7995,
+      "excluded_empty_label_rows": 0,
+      "modal_share": 0.3265,
+      "modal_label": "causalmechanism",
+      "knn_agreement_observed": 0.4165,
+      "knn_agreement_permutation_null": 0.2675,
+      "lift_over_null_pp": 14.89,
+      "lift_over_constant_pp": 9.0,
+      "beats_constant_baseline": true,
+      "route": "coarsen_or_classify_with_calibrated_abstention",
+      "worst_labels": [
+        {
+          "label": "empiricalpattern",
+          "rows": 1513,
+          "knn_agreement": 0.3096,
+          "global_share": 0.1892
+        },
+        {
+          "label": "descriptivemodel",
+          "rows": 2359,
+          "knn_agreement": 0.4131,
+          "global_share": 0.2951
+        },
+        {
+          "label": "normativeheuristic",
+          "rows": 1513,
+          "knn_agreement": 0.4381,
+          "global_share": 0.1892
+        },
+        {
+          "label": "causalmechanism",
+          "rows": 2610,
+          "knn_agreement": 0.4689,
+          "global_share": 0.3265
+        }
+      ],
+      "vec_rows_without_fbs_match": 0
+    },
+    {
+      "axis": "content_type",
+      "multi_label": false,
+      "effective_n": 7995,
+      "excluded_empty_label_rows": 0,
+      "modal_share": 0.8161,
+      "modal_label": "principle",
+      "knn_agreement_observed": 0.7863,
+      "knn_agreement_permutation_null": 0.6834,
+      "lift_over_null_pp": 10.28,
+      "lift_over_constant_pp": -2.99,
+      "beats_constant_baseline": false,
+      "route": "constant_plus_human_queue",
+      "worst_labels": [
+        {
+          "label": "quarantine",
+          "rows": 35,
+          "knn_agreement": 0.0029,
+          "global_share": 0.0044
+        },
+        {
+          "label": "growthedge",
+          "rows": 30,
+          "knn_agreement": 0.0133,
+          "global_share": 0.0038
+        },
+        {
+          "label": "toolinstruction",
+          "rows": 23,
+          "knn_agreement": 0.0348,
+          "global_share": 0.0029
+        },
+        {
+          "label": "processinstance",
+          "rows": 139,
+          "knn_agreement": 0.0647,
+          "global_share": 0.0174
+        },
+        {
+          "label": "processtemplate",
+          "rows": 188,
+          "knn_agreement": 0.1846,
+          "global_share": 0.0235
+        },
+        {
+          "label": "noisedrop",
+          "rows": 1055,
+          "knn_agreement": 0.258,
+          "global_share": 0.132
+        },
+        {
+          "label": "principle",
+          "rows": 6525,
+          "knn_agreement": 0.9148,
+          "global_share": 0.8161
+        }
+      ],
+      "vec_rows_without_fbs_match": 0
+    },
+    {
+      "axis": "depth",
+      "multi_label": false,
+      "effective_n": 6525,
+      "excluded_empty_label_rows": 1470,
+      "modal_share": 0.8193,
+      "modal_label": "domain",
+      "knn_agreement_observed": 0.654,
+      "knn_agreement_permutation_null": 0.4568,
+      "lift_over_null_pp": 19.71,
+      "lift_over_constant_pp": -16.53,
+      "beats_constant_baseline": false,
+      "route": "constant_plus_human_queue",
+      "worst_labels": [
+        {
+          "label": "universal",
+          "rows": 62,
+          "knn_agreement": 0.0355,
+          "global_share": 0.0095
+        },
+        {
+          "label": "specialized",
+          "rows": 328,
+          "knn_agreement": 0.1784,
+          "global_share": 0.0503
+        },
+        {
+          "label": "crossdomain",
+          "rows": 789,
+          "knn_agreement": 0.2299,
+          "global_share": 0.1209
+        },
+        {
+          "label": "domain",
+          "rows": 5346,
+          "knn_agreement": 0.7529,
+          "global_share": 0.8193
+        }
+      ],
+      "vec_rows_without_fbs_match": 0
+    },
+    {
+      "axis": "domains",
+      "multi_label": true,
+      "effective_n": 7995,
+      "excluded_empty_label_rows": 0,
+      "modal_share": 0.0879,
+      "modal_label": [
+        "emerging"
+      ],
+      "knn_agreement_observed": 0.3095,
+      "knn_agreement_permutation_null": 0.0832,
+      "lift_over_null_pp": 22.64,
+      "lift_over_constant_pp": 22.16,
+      "beats_constant_baseline": true,
+      "route": "classify",
+      "worst_labels": [],
+      "vec_rows_without_fbs_match": 0
+    }
+  ]
+}

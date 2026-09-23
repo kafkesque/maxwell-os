@@ -1,0 +1,58 @@
+# config/representability_sweep.yaml — D-343: is an axis CLASSIFIABLE as labelled?
+# =============================================================================
+# WHY: every model-centric lever in this repo has been measured and closed
+# (content_type lift over the constant baseline -0.010 / F-17; R3 held-out
+# arbitration gain +0.00 pp / D-311,D-314; challenger -8.77 pp; k-NN retired
+# as a MISLABEL detector / D2575). The open question is therefore not "which
+# model" but "which axes can a classifier separate AT ALL in the representation
+# the pipeline actually uses".
+#
+# This config drives scripts/representability_sweep.py. C12: every path, axis,
+# threshold and seed is here. Nothing is hardcoded in the script.
+# =============================================================================
+
+schema_version: "1.0"
+decision: D-343
+
+db: "knowledge pipeline/maxwell.db"
+vec_shadow_chunks: vec_fbs_vector_chunks00   # vec0 shadow store (readable without the vec0 module)
+vec_shadow_rowids: vec_fbs_rowids
+din: 0                                        # unused placeholder removed by C12 review
+dim: 512                                      # S15_EMBED_DIM (bge-m3 Matryoshka)
+k: 10                                         # neighbours
+block_rows: 512                               # kNN block size (bounds peak memory)
+min_rows: 1000                                # refuse to publish a verdict on a toy corpus (C16)
+
+# The axes under test. `multi_label: true` switches the agreement metric from
+# exact-match to label recall (|row ∩ neighbour| / |row|) — domains is 1..7 labels.
+axes:
+  discipline:      {column: discipline,      multi_label: false}
+  extraction_type: {column: extraction_type, multi_label: false}
+  content_type:    {column: content_type,    multi_label: false}
+  depth:           {column: depth,           multi_label: false}
+  domains:         {column: domains,         multi_label: true, multi_label_delimiters: [",", ";", "|"]}
+
+# Pre-registered routing thresholds (absolute percentage points of lift over the
+# seeded label-permutation NULL — NOT over the constant baseline, which conflates
+# class imbalance with separability).
+separable_min_pp: 15.0     # >= this -> the axis is classifiable as labelled
+chance_margin_pp: 2.0      # < this -> the embedding carries no label signal
+min_label_rows: 20         # a label thinner than this cannot carry a verdict (BUG-334)
+top_labels: 10             # worst-offender labels printed per axis
+
+blinding_seed: 20260923    # the permutation null is SEEDED and reproducible
+# Mechanical truth-blinding control (R3 precedent, governance/R3_HELDOUT_RESULT_20260921.md):
+# the sweep is re-run with the label assignment PERMUTED. If the observed metric is
+# not above this null, the metric is reading the representation, not a leak.
+max_null_drift_pp: 3.0
+
+# Reference numbers this sweep must NOT re-derive (quote the generator, BUG-342)
+reference_stored_error:
+  source: config/eval_integrity.yaml
+  path: ruler_measurement.measured_error_rate
+  note: >-
+    Incumbent stored-label ERROR rate vs the blind human on the ANCHOR-1 ruler
+    (RELATIVE-ONLY, D-337). Quoted for orientation; never re-derived here.
+
+output_json: governance/REPRESENTABILITY_SWEEP_20260923.json
+output_md: governance/REPRESENTABILITY_SWEEP_20260923.md

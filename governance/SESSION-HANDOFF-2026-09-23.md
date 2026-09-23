@@ -9,6 +9,80 @@ index, never from prose (BUG-342 rule). This block was MISSING from the previous
 
 | id | status |
 |---|---|
+| BUG-253 | OPEN |
+| BUG-254 | OPEN |
+| BUG-255 | OPEN |
+| BUG-257 | OPEN |
+| BUG-258 | OPEN |
+| BUG-259 | OPEN |
+| BUG-260 | OPEN |
+| BUG-261 | OPEN |
+| BUG-263 | OPEN |
+| BUG-264 | OPEN |
+| BUG-265 | OPEN |
+| BUG-266 | OPEN |
+| BUG-270 | OPEN |
+| BUG-273 | OPEN |
+| BUG-274 | OPEN |
+| BUG-275 | OPEN |
+| BUG-276 | OPEN |
+| BUG-277 | OPEN |
+| BUG-278 | OPEN |
+| BUG-279 | OPEN |
+| BUG-280 | OPEN |
+| BUG-281 | OPEN |
+| BUG-282 | OPEN |
+| BUG-283 | OPEN |
+| BUG-284 | OPEN |
+| BUG-285 | OPEN |
+| BUG-286 | OPEN |
+| BUG-287 | OPEN |
+| BUG-288 | OPEN |
+| BUG-289 | OPEN |
+| BUG-290 | OPEN |
+| BUG-292 | OPEN |
+| BUG-293 | OPEN |
+| BUG-294 | OPEN |
+| BUG-295 | OPEN |
+| BUG-296 | OPEN |
+| BUG-297 | OPEN |
+| BUG-298 | OPEN |
+| BUG-299 | OPEN |
+| BUG-300 | OPEN |
+| BUG-301 | OPEN |
+| BUG-302 | OPEN |
+| BUG-303 | OPEN |
+| BUG-304 | OPEN |
+| BUG-305 | OPEN |
+| BUG-306 | OPEN |
+| BUG-312 | OPEN |
+| BUG-314 | OPEN |
+| BUG-315 | OPEN |
+| BUG-316 | OPEN |
+| BUG-317 | OPEN |
+| BUG-318 | OPEN |
+| BUG-319 | OPEN |
+| BUG-326 | OPEN |
+| BUG-331 | OPEN |
+| BUG-333 | OPEN |
+| BUG-334 | OPEN |
+| BUG-336 | OPEN |
+| BUG-341 | OPEN |
+| BUG-343 | OPEN |
+| BUG-349 | OPEN |
+| BUG-351 | OPEN |
+| BUG-352 | OPEN |
+| BUG-354 | OPEN |
+| BUG-355 | OPEN |
+| BUG-356 | OPEN |
+| BUG-359 | OPEN |
+| BUG-360 | OPEN |
+| BUG-366 | OPEN |
+| BUG-367 | OPEN |
+| BUG-376 | OPEN |
+| BUG-377 | OPEN |
+
+List emitted by `scripts/bug_status.py` (the project's own parser), counts from `governance/bug_status.json` — never re-derived by hand (BUG-342 rule).
 
 ## 1. WHAT THIS SESSION CLOSED
 * **C-1 CLOSED (D-338)**: abstention at p25 is approved IN PRINCIPLE, not activated; `enabled: false`,

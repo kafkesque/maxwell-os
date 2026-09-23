@@ -131,3 +131,37 @@ anchor_review:
     - tag: kimi
       path: temp/kimi3 labels01.md
   out_csv: governance/F11_ANCHOR_REVIEW_{date}.csv
+
+consolidation:
+  schema_version: "1.0"
+  # provenance vocabulary is deliberately the same as config/eval_integrity.yaml
+  provenance_tier: "human-mixed+llm-attested"
+  menu: config/closed_menu_v5.json
+  ruler_sheet: governance/RULER_BLIND_SHEET_20260917.csv
+  review_sheet: governance/F11_ANCHOR_REVIEW_20260923.csv
+  ruling_map: governance/F11_OWNER_RULING_MAP_20260922.csv
+  n_anchor_rows: 150
+  # the review sheet names its fill columns by axis abbreviation; map them explicitly so
+  # a rename can never silently detach a column from its reader (BUG-368 regression rule)
+  owner_columns:
+    content_type: owner_ct
+    discipline: owner_disc
+    extraction_type: owner_form
+  keep_missing_column: owner_keep_missing
+  notes_column: owner_notes
+  columns:
+    content_type: CT (1-7)
+    discipline: DISC (1-62)
+    extraction_type: FORM (1-4)
+  skipped_axes:
+    extraction_type:
+      date: "2026-09-23"
+      reason: >-
+        Owner deliberately skipped FORM adjudication: the two model coders have no
+        adequate reference point on this axis, so a coder-derived FORM label was never
+        offered as evidence. FORM therefore stays entirely human-ruled and the axis
+        remains the least trustworthy of the three (coder-vs-coder kappa 0.638 is the
+        lowest of the three axes).
+      adjudicated: false
+  out_csv: governance/ANCHOR_RULER_CONSOLIDATED_{date}.csv
+  out_md: governance/ANCHOR_RULER_CONSOLIDATED_{date}.md

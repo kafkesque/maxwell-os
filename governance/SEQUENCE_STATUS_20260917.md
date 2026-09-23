@@ -669,3 +669,19 @@ reproduced and strengthened: the human reference is the outlier; no floor is cer
 The 28 DISC abstentions are genuinely contested (coders 64% agree) and remain declared-missing; the 5 FORM
 abstentions are uncontested (100%) and await the owner's own call. Fixed BUG-369 (blank cells scored as
 disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN coder lifts F-11.
+
+## Session 17 addendum (2026-09-23 12:30) - F-11 anchor CONSOLIDATED from the owner's judgement
+
+* Owner returned governance/F11_ANCHOR_REVIEW_20260923.csv filled: 216 owner cells across all 108 flagged rows.
+* Result: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv (150 rows, schema 1.0, provenance tier
+  human-mixed+llm-attested) + companion .md. Deterministic, no LLM in the loop.
+* 50 overrules (18 content-type, 32 discipline); 28 discipline labels SUPPLIED by the owner where the ruler had
+  abstained (tier owner-supplied, flagged human_present=no so scoring can exclude them); 0 declared-missing.
+* FORM was deliberately NOT adjudicated by the owner (no adequate LLM reference point) -> the axis is 100%
+  human-ruled, the 5 ruler abstentions stay declared-missing, and no FORM floor may rest on coder agreement (D-336).
+* 6 owner discipline cells are OFF-MENU and were kept verbatim with a nearest-match proposal only:
+  personal productivity x3 (R086/R091/R117), design strategy (R042), computer graphic (R030), media studie (R063).
+  OPEN HUMAN DECISION: confirm the two obvious typo repairs (computer graphics, media studies) and rule on the two
+  domain-valued labels. Nothing was guessed.
+* HUMAN GATE unchanged: this anchor cannot unfreeze F-11, D-300 adoption or the eval_integrity floors. The
+  second-coder gate still needs an independent HUMAN coder.

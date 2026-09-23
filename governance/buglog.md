@@ -2568,3 +2568,48 @@ Round 2 measured the abstentions instead of guessing at them (governance/F11_R2_
 Disposition: the 28 DISC blanks stay MISSING (declared UNCERTIFIABLE, never back-filled with a consensus that
 does not exist); the 5 FORM blanks are flagged for the owner's own adjudication. No row was padded, no row
 was silently imputed.
+
+## BUG-370 - anchor consolidator guessed the owner column names instead of mapping them (FIXED, 2026-09-23)
+
+SEVERITY: HIGH (silent-wrong-answer class, caught before any write)
+SURFACE: scripts/consolidate_anchor_ruler.py
+
+WHAT HAPPENED: the first version looked up `owner_<axis>` (owner_content_type / owner_discipline /
+owner_extraction_type). The review sheet names those columns owner_ct / owner_disc / owner_form, so every
+lookup returned empty and the dry run reported "content_type: human-ruled 150" - i.e. it claimed the owner had
+adjudicated NOTHING while the file contained 216 filled cells. Had the dry-run mode not existed, the
+consolidated anchor would have shipped silently discarding the owner's entire day of work.
+
+This is the exact mirror image of BUG-368 (generator emitted header columns that no key populated):
+there a written column was read as free space, here a written column was read as absent. Both are the same
+defect - a column name that is never bound to a reader/writer.
+
+FIX: the mapping is now declared in config/f11_llm_coder.yaml -> consolidation.owner_columns
+(content_type: owner_ct, discipline: owner_disc, extraction_type: owner_form) plus keep_missing_column and
+notes_column, and the loader FAILS LOUDLY (C16) if any owner_* column present in the sheet is unmapped, or if a
+declared column is absent from the sheet. It also prints the filled count per owner column before doing
+anything else, so "0 filled" can never again be mistaken for "nothing to consolidate".
+
+STANDING RULE (extends the BUG-368 rule to the read side): every config-declared path/column mapping must be
+verified against the artifact it points at BEFORE the first write, and a report of "no data" must be
+distinguishable from a report of "no mapping". Dry-run-first is mandatory for any consolidation script.
+
+## BUG-371 - decision numbering collision: DECISION-LOG.md leads config/decisions.yaml by 3 (FIXED, 2026-09-23)
+
+SEVERITY: HIGH (governance integrity - an id can silently name two different decisions)
+SURFACE: config/decisions.yaml <-> DECISION-LOG.md
+
+WHAT HAPPENED: the registry's highest id was D331, so this session appended D332/D333 for the F-11 anchor
+consolidation. DECISION-LOG.md, however, already contained D-332 (community-benchmark-first rule), D-333 (MTP A/B
+instrument) and D-334 (Metal cap) - all dated 2026-09-22 - none of which had ever been imported into the registry.
+The new ids therefore collided: a citation of "D-332" would have resolved to two unrelated decisions depending on
+which artifact the reader opened. Caught before commit; the new entries were renumbered to D-335/D-336.
+
+FIX: this session's two decisions renumbered to D-335/D-336 in both artifacts. Rows for D-332/D-333/D-334 remain
+absent from the registry (NOT silently imported - importing another session's decisions without its evidence is
+its own defect); the gap is now recorded here.
+
+STANDING RULE: never derive a new decision id from a single artifact. The next id is
+max(all ids in config/decisions.yaml, all ids in DECISION-LOG.md) + 1, and any divergence between the two
+registers must be reported BEFORE a new id is minted. `recompute_decision_summary.py --check` validates counts,
+not id uniqueness against the prose log.

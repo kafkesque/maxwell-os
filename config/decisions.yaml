@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 702
+total_decisions: 704
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7563,8 +7563,49 @@ decisions:
   - governance/f11_llm_coder_kimi3-r2_20260923.json
   - scripts/f11_llm_coder.py
 
+- id: D335
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-23'
+  title: F-11 anchor consolidated from the owner adjudication (108/108 rows returned); FORM left human-ruled
+  verification: 'Owner returned the review sheet fully filled: 216 owner cells (CT 108, DISC 108, FORM 0).
+    Outcome: 50 overrules (18 CT, 32 DISC), 45 DISC reaffirmations, 28 DISC labels SUPPLIED where the ruler
+    had abstained (tier owner-supplied, no human reference ever existed, kept machine-identifiable via
+    <axis>_human_present=no), 0 FORM adjudications. Content-type final: principle 98, process_template 14,
+    tool_instruction 12, noise_drop 11, quarantine 9, process_instance 3, growth_edge 3. Discipline: 122
+    human-ruled + 28 owner-supplied, 0 declared-missing. 6 owner DISC cells are OFF-MENU (personal
+    productivity x3, design strategy, computer graphic, media studie) and were preserved VERBATIM with only a
+    nearest-match proposal - nothing guessed, no imputation. Provenance tier human-mixed+llm-attested: a
+    better-calibrated ruler, still NOT independent human truth and cannot unfreeze F-11 / D-300 / the
+    eval_integrity floors. The 22-Sep judgement was backed up first (A-R byte-identity re-verified); the
+    ruler sheet was never modified (append-only, R-D410).'
+  files:
+  - scripts/consolidate_anchor_ruler.py
+  - governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  - governance/ANCHOR_RULER_CONSOLIDATED_20260923.md
+  - governance/F11_ANCHOR_REVIEW_20260923.csv
+  - config/f11_llm_coder.yaml
+- id: D336
+  category: VERIFICATION
+  state: RESOLVED
+  date: '2026-09-23'
+  title: FORM is not coder-adjudicable - the owner deliberately skipped it on stated grounds
+  verification: 'Owner ruling: he did not adjudicate FORM because the two model coders have no adequate
+    reference point on that axis, so a coder-derived FORM label was never offered as evidence. Recorded in
+    config/f11_llm_coder.yaml -> consolidation.skipped_axes.extraction_type (adjudicated: false) and enforced
+    by the consolidator: FORM is 100% human-ruled and the 5 ruler abstentions stay declared-missing instead of
+    inheriting a model consensus. Consistent with measurement: FORM has the lowest coder-vs-coder kappa of the
+    three axes (0.638 vs CT 0.758, DISC 0.682) and the lowest human-vs-coder kappa (0.27-0.31) - the owner
+    rejected the axis the data itself marks as least reliable. CONSEQUENCE: no FORM floor may ever rest on
+    coder agreement; FORM labels are single-rater evidence (1 human rater, 0 independent raters) and must be
+    reported as such. 54 FORM cells were canonicalised non-destructively (raw spelling kept in
+    extraction_type_ruler_raw: casual mechanism x30, normativ heuristic x22, escriptive model x2).'
+  files:
+  - config/f11_llm_coder.yaml
+  - governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  - governance/F11_R2_MEASUREMENT_20260923.md
 summary:
-  total: 702
+  total: 704
   proposed: 6
   draft: 1
   active: 483
@@ -7573,7 +7614,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 135
+  resolved: 137
   planned: 8
   ratified: 5
   open: 17
@@ -7710,7 +7751,7 @@ summary:
     TAXONOMY / ONTOLOGY: 1
     TAXONOMY / RETRIEVAL: 1
     VAL: 8
-    VERIFICATION: 15
+    VERIFICATION: 17
     VERIFICATION / ONTOLOGY: 1
     governance: 1
     pipeline-fix: 2

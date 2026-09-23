@@ -3153,3 +3153,74 @@ review and must not be recorded as one: the same class as F-f1 ("a test that ski
 bounded instruction (no repo exploration, the diff pasted inline) before D-364 and D-359 are treated as externally reviewed.
 Both changes are nonetheless receipted by execution, not by assertion: ast parse ok on all three files, DSPY_PROGRAM_PATH None,
 S2_DSPY_ENABLED False, just health exit 0 with 13 controls + the new vec control green.
+
+## BUG-400 (HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22)
+
+**Found 2026-09-23 (session 23, disk-chore audit), by measurement, not inference.**
+
+`xattr` on the repo root returns `com.apple.file-provider-domain-id`, `com.dropbox.fp_hydration_policy`,
+`com.apple.fileprovider.dir#N`. `CONSTITUTION.md`, `config/decisions.yaml`, `pipeline/stage6_commit.py` and
+**`knowledge pipeline/maxwell.db`** each carry `com.dropbox.attrs` + `com.dropbox.internal`. A 400-file sample of
+the repo returned **794 dropbox attribute lines** (every sampled file is Dropbox-tracked). `DropboxFileProvider.appex`
+is running. The working directory is `~/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0`.
+
+**Why this is a defect, not a preference.** C3 says all data and compute remain local; C22 says local-first with an
+EXPLICIT opt-in for anything else. This is not opt-in - it is where the repo happens to sit, so the corpus, the
+registry and the served SQLite store are cloud-replicated by default. Three concrete failure modes:
+1. Replication of the corpus + run DB to a third party with no decision authorising it (the sovereignty claim in
+   CONSTITUTION.md is currently falsified by the filesystem, not by intent).
+2. **Torn / partial upload of a live SQLite file.** stage6 writes the DB in one transaction while a sync client reads
+   it whenever it likes; a restore on another machine can therefore serve a stale or half-written store AS
+   authoritative. That is the same failure class as BUG-387 - half-dead state that a COUNT cannot see - and here
+   there is no gate at all, because D-354/D-361 check referential integrity, not freshness or origin.
+3. **Conflict copies. Already happened:** `knowledge pipeline/stage1_5_embed_cluster/s15_bge-m3_run (Klaus Beyer's
+   conflicted copy 2026-08-05).log` and its `... 1).log` sibling sit inside a pipeline directory right now. Two
+   conflict copies of one file is the mechanism proving itself.
+
+**NOT fixed here** - the fix is a location change and that is owner-gated (MTR owner gate). Interim mitigations the
+owner can take without moving anything: exclude `claude projects/maxwell os 2.0` from Dropbox sync (selective sync /
+per-folder "Online only" OFF), or move the repo out of `~/Library/CloudStorage` entirely. Recorded immediately per
+the AUTO-LOG rule rather than worked around.
+
+## BUG-401 (MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit
+
+**Found 2026-09-23 (session 23).** The owner's paste proves the instruction failed twice over:
+
+```
+v "archive/bak_sweep_20260923"      /Volumes/<EXTERNAL>/maxwell_archive_20260923/
+zsh: no such file or directory: EXTERNAL
+```
+
+(a) `<EXTERNAL>` was left as a literal placeholder: zsh parsed `<EXTERNAL>` as a stdin redirect and aborted the
+command before `mv` was ever looked up (`v` is also a typo for `mv`; the follow-up `mv "archive/bak_sweep_20260923"`
+with one argument printed usage). **Nothing moved - verified: `archive/bak_sweep_20260923` is 11G and
+`archive/session_20260923/scratch` is 5.3G, both still in place, tree clean at b6f0bd1.**
+
+(b) The real defect: **no external volume is mounted.** `/Volumes` contains only `Data`, `Macintosh HD` (a symlink to
+/) and `Recovery`. So even with the placeholder replaced the move had no valid target. My earlier task text said
+"move to the external drive" without ever asserting that a drive exists - an instruction that cannot execute is not
+an instruction (same class as F-f1 "a test that skips everywhere is not a test").
+
+(c) And the target was the wrong 16 GB. Measured sizes: repo **30G**; `~/.cache/huggingface` **127G**;
+`~/.omlx/cache` **92G**; `~/Library/CloudStorage/Dropbox` **296G** (the repo sits inside it); `~/models` 27G;
+`~/.mtplx/models` 21G; `~/Library/Application Support/Zed` 14G; `~/.ollama` 13G; `~/Downloads` 10G;
+`~/.cache/uv` 6.4G; `~/Documents` 7.6G; `~/Databases` 5.3G; `/Applications` 58G; `/Library` 27G. Disk is 874Gi used
+of 926Gi (28Gi free, 97%). No local Time Machine snapshots (`tmutil listlocalsnapshots /` is empty), so the fullness
+is real data, not purgeable. The 16.5 GB project move is ~2% of the deficit; the model caches are ~279 GB.
+
+**Corrective action taken:** the owner gate in MASTER-TASK-REGISTER.md and the aggregated task register was rewritten
+this session to name the real targets and to state the precondition (a mounted volume, with its real name). See
+BUG-402 for the second-order drift found by the same audit.
+
+## BUG-402 (LOW, OPEN) - `last_sync` in config/decisions.yaml has no sanctioned writer, and it is now stale
+
+`config/decisions.yaml` line 3 reads `last_sync: '2026-09-22 20:06:00'` while the registry holds four decisions
+minted 2026-09-23 (D-361..D-364). `scripts/recompute_decision_summary.py` - the sanctioned tool - does not touch
+`last_sync` (it recomputes ONLY `total_decisions` + `summary`). The only writer in the tree is
+`tools/sync_decisions.py`, which the sanctioned script's own docstring declares INVERTED and dangerous
+("~237 heading blocks vs 434 decisions here; running it would corrupt hand-curated records"). So the field is
+hand-maintained, drifted exactly as BUG-342 predicts, and its drift is invisible because `--check` does not cover it.
+
+**Not fixed here** (it needs a tooling change with an R5 review, not a hand edit - a hand edit is how it drifted).
+Decision needed: either let `recompute_decision_summary.py` stamp it (then it is derived data with a writer), or
+retire the field. Recorded so the next session does not hand-edit it back into sync.

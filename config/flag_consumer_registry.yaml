@@ -446,3 +446,35 @@ flags:
     which reads model_settings.json and NOT this artifact - a BUG-375-class false negative (a proposal that names a consumer
     that does not read the artifact) that made 5 ON flags look as if nothing consumed them. required = value observed at registration
     (D-338). Server-side schema-valid JSON, not a pipeline-path flag.'
+
+- config: config/verify_abstention.yaml
+  path: abstention_policy.enabled
+  required: false
+  decisions:
+  - D-349
+  - D-352
+  - D-353
+  - D-362
+  consumers: []
+  exempt_reason: 'the SECOND `enabled` key in this file, and the one that actually represents the ratified policy
+    (D-349). It is registered here because the top-level `enabled` above was registered under D-328/D-338 and the
+    flag scanner correctly reported the nested path as unregistered (2026-09-23 audit). consumers: [] is deliberate
+    and is the explicit statement that this flag enforces nothing today: nothing in pipeline/ or scripts/ reads
+    abstention_policy.enabled, only scripts/verify_menu_policy.py reads the policy block for labels and operating
+    points. status: gated, enabled: false, and one activation item remains (shadow_run) - D-362.'
+  note: 'registered 2026-09-23 under D-339 (every state change needs an implementation receipt). HAZARD RECORDED:
+    this file carries two keys spelled `enabled`, at the top level and under abstention_policy; any reader that
+    uses a bare `enabled` lookup gets the D-328-era key, which is the provenance block, not the ratified policy.'
+
+- config: config/pipeline_config.yaml
+  path: services.omlx.mtp_enabled
+  required: false
+  decisions:
+  - D-339
+  consumers: []
+  exempt_reason: 'surfaced by the flag scanner on 2026-09-23 (session 23 audit) once the abstention entry above was
+    registered - the scanner reports unregistered flags one audit at a time, so this was masked. No consumer in
+    pipeline/ or scripts/ reads services.omlx.mtp_enabled; it is the same C-1 pattern as
+    config/omlx_m1_best_config.yaml::universal_apply.mtp_enabled (registered with the same shape).'
+  note: 'registered 2026-09-23 under D-339; required = value observed at registration (D-338). Deferred to
+    governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).'

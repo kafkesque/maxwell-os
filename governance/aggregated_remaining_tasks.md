@@ -956,3 +956,21 @@ DEFER the R3 held-out run (repointing it to ANCHOR-3 is a new pre-registration, 
 - OPEN (owner, physical): the disk chore - 16.5 GB movables named, archive/golden_retired_D2618 must NOT move (live default).
 - OPEN (mine): D-359 R5 review + scratch re-commit rehearsal; the second disk batch (the 10 classifier_* dirs, 5.7 GB) after a
   reference scan; the extraction_type curve (--config argument for r2_gate_measure.py).
+
+## Session 23 addendum (audit, 2026-09-23) - the disk chore was mis-scoped; here is the correction
+
+- **The owner-gated disk chore as previously written was UNRUNNABLE and is SUPERSEDED (BUG-401).** No external volume
+  is mounted; `/Volumes` holds only Data, Macintosh HD and Recovery. The literal `<EXTERNAL>` placeholder made zsh
+  abort on a stdin redirect before `mv` ran. Nothing moved: both directories are intact (11G, 5.3G), tree clean.
+- **The project is 30G of 874G used (28Gi free, 97%).** The real debt, measured: `~/.cache/huggingface` 127G,
+  `~/.omlx/cache` 92G, `~/Library/CloudStorage/Dropbox` 296G, `~/models` 27G, `~/.mtplx/models` 21G,
+  `Zed` app support 14G, `~/.ollama` 13G, `~/Downloads` 10G, `~/Documents` 7.6G, `~/.cache/uv` 6.4G,
+  `~/Databases` 5.3G, `/Applications` 58G, `/Library` 27G. No local snapshots. Model stores ~279G = the only big lever.
+- **NEW, HIGH (BUG-400): the repo is a Dropbox File Provider domain**, so the corpus and the served SQLite store are
+  cloud-replicated. Owner gate: exclude the folder from sync, or move the repo out of `~/Library/CloudStorage`.
+- **CLOSED this session (governance sync):** the flag-consumer WARN for `abstention_policy.enabled` (registered,
+  with the two-`enabled`-keys hazard noted); `__pycache__` swept out of the tree (C19).
+- **OPEN (mine, no gate):** R5 bounded re-review of D-364 + D-359; D-359 scratch re-commit rehearsal; abstention
+  shadow run; extraction_type curve.
+- **OPEN (owner, small, not physical):** BUG-402 - `last_sync` in decisions.yaml has no sanctioned writer. Choose:
+  extend `recompute_decision_summary.py` to stamp it, or retire the field.

@@ -310,3 +310,27 @@
 > (mint D-362 + re-pin), not bypassed. STILL OWNER-GATED: the disk chore (16.5 GB movable, do not move archive/golden_retired_D2618);
 > the abstention shadow run (mine, no gate, now the last step before a flip). STILL OWED BY ME: the D-359 R5 review + scratch
 > re-commit rehearsal before D-359 leaves PROPOSED.
+
+> **SESSION 23 CORRECTION - 2026-09-23 (audit).** The disk-chore owner gate as written could not execute and is
+> herewith SUPERSEDED. The owner ran it and it failed on the placeholder (`<EXTERNAL>`) - and, decisively, **no
+> external volume is mounted on this machine** (`/Volumes` = Data, Macintosh HD, Recovery only; `df` shows two APFS
+> volumes on `/dev/disk3`: 926Gi, 874Gi used, 28Gi free, 97%). Nothing moved: `archive/bak_sweep_20260923` is 11G
+> and `archive/session_20260923/scratch` is 5.3G, both intact, tree clean at b6f0bd1.
+>
+> **THE REAL NUMBERS (measured, session 23).** The project is **30G of 874G**. The debt is elsewhere:
+> `~/.cache/huggingface` 127G, `~/.omlx/cache` 92G, `~/Library/CloudStorage/Dropbox` 296G (the repo is inside it),
+> `~/models` 27G, `~/.mtplx/models` 21G, `~/Library/Application Support/Zed` 14G, `~/.ollama` 13G,
+> `~/Downloads` 10G, `~/Documents` 7.6G, `~/.cache/uv` 6.4G, `~/Databases` 5.3G, `/Applications` 58G,
+> `/Library` 27G. No local Time Machine snapshots exist, so none of it is purgeable. Model stores+caches
+> (`huggingface` + `omlx` + `mtplx` + `ollama`) total ~279G and are the only lever with a meaningful size.
+>
+> **NEW OWNER GATE (replaces the old one): BUG-400 - the repo is a Dropbox File Provider domain.** `com.dropbox.attrs`
+> is on `CONSTITUTION.md`, `config/decisions.yaml`, `pipeline/stage6_commit.py` and `knowledge pipeline/maxwell.db`;
+> 794 dropbox attribute lines in a 400-file sample; two Dropbox conflict copies already exist under
+> `knowledge pipeline/stage1_5_embed_cluster/`. The sovereign store is cloud-replicated with no decision authorising
+> it (C3/C22) and a live SQLite file under a sync client can be restored stale elsewhere. Fix = exclude the folder
+> from Dropbox sync, or move the repo out of `~/Library/CloudStorage`.
+>
+> **STILL OWED (mine, no gate):** the R5 bounded re-review of D-364 and D-359 (the first attempt returned NO VERDICT,
+> recorded in the buglog as owed); the D-359 scratch re-commit rehearsal; the abstention shadow run (the last
+> activation item); the extraction_type curve (`--config` argument for `scripts/r2_gate_measure.py`).

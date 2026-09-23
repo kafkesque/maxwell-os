@@ -3143,3 +3143,13 @@ as having no verifiable consumer.
 ALSO reconciled: the dangling comment citation in pipeline/student_classifier.py (it cited a D-361 that had never been minted); it now
 cites D-2618/BUG-397(a). D-361 was subsequently minted for a DIFFERENT subject (the vec gate), so the old comment would have become a
 silently WRONG citation rather than a dangling one - the worse failure mode.
+
+## PROCESS NOTE 2026-09-23 (session 23) - the R5 cross-family review of D-364 returned NO VERDICT, so it is OWED, not satisfied
+
+The gemma-4-E4B verifier was invoked on the two-site DSPy fix (the four just-landed changes) and terminated with
+"I've reached the maximum number of actions I can do without user input" - it never emitted APPROVE or REJECT. That is not a
+review and must not be recorded as one: the same class as F-f1 ("a test that skips everywhere is not a test") and F-e3
+(a receipt is a claim about the artifact as it exists at the moment the claim is written). OWED: re-run the R5 verifier with a
+bounded instruction (no repo exploration, the diff pasted inline) before D-364 and D-359 are treated as externally reviewed.
+Both changes are nonetheless receipted by execution, not by assertion: ast parse ok on all three files, DSPY_PROGRAM_PATH None,
+S2_DSPY_ENABLED False, just health exit 0 with 13 controls + the new vec control green.

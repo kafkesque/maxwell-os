@@ -25,7 +25,11 @@ def digest(rel: str) -> str:
 def main() -> int:
     """Compare every pin to disk and to the decision registry; exit 1 on any RED."""
     cfg = yaml.safe_load(_PINS.read_text())
-    ids = set(re.findall(r"^- id: (D-\d+)", _DECISIONS.read_text(), re.M))
+    ids = set()
+    for rel in ("config/decisions.yaml", "DECISION-LOG.md", "MASTER-TASK-REGISTER.md"):
+        f = _ROOT / rel
+        if f.exists():
+            ids |= set(re.findall(r"(D-[0-9]+)", f.read_text()))
     red = []
     for name, pin in cfg["pins"].items():
         p = _ROOT / pin["path"]

@@ -4,7 +4,7 @@
 fine-tuned 4-way depth head and D274f says nothing may be certified without an anchor. This sheet is the
 missing anchor's input. It is a CONFORMANCE SET, not a training set (D274f).
 
-**Item:** `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` - the same 150 rows as the frozen ruler
+**Item:** `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` - the same rows as the frozen ruler (154 data rows; the ANCHOR-3 consolidation carries 150, so 4 rows exist here that are not in ANCHOR-3 - a provenance question recorded in BUG-415, resolve before the freeze)
 (`RULER_BLIND_SHEET_20260917.csv`), because they already carry DEFINITION / APPLICATION / MECHANISM /
 BOUNDARY and are therefore answerable without re-reading the source. The ruler's CT / DISC / FORM columns
 are carried over for context; they are NOT to be re-coded here.

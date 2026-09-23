@@ -58,6 +58,15 @@ def check_fingerprint(fp: Path, cfg: dict[str, Any], warnings: list[str],
         observed = sha256_file(target)
         if observed == declared:
             continue
+        # D-340: a notice published by the WRITER at mutation time is the preferred acknowledgement
+        notice = fp.with_name(fp.name.replace(".input_fingerprint.json", "") + ".mutation_notice.json")
+        if notice.exists():
+            nd = json.loads(notice.read_text(encoding="utf-8"))
+            if nd.get("sha256_after") == observed:
+                warnings.append(f"{rel}: input {Path(value).name} MOVED (declared {declared[:12]}..., "
+                                f"on disk {observed[:12]}...) - DECLARED by the writer (D-340), "
+                                f"{nd.get('issue')}: {' '.join(str(nd.get('reason','')).split())[:120]}")
+                continue
         known = ack.get(rel)
         if known and known.get("declared_input_sha256") == declared:
             warnings.append(f"{rel}: input {Path(value).name} MOVED (declared {declared[:12]}..., "

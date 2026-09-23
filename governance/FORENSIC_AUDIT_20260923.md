@@ -88,3 +88,22 @@ process + checkpoint inspection). No LLM judged anything; no artifact was writte
    register and the seed points at it.
 7. **Flag audit truth restored as a first-class refusal:** if the scan and the registry ever disagree about naming,
    the check reports RED, not warn — an integrity flag may never fire on expected behaviour.
+
+## Session 20 addendum (2026-09-23) — 6 steps: C-3 mitigated, D-340 minted, R3 gated, hygiene logged
+1. **C-3 MITIGATED (not closed):** `frozen/S5_t11_20260922/` + `governance/FROZEN_S5_T11_20260922.json` +
+   `scripts/verify_frozen_pair.py` (in `just health`). S6 can cite a byte-stable pair with the mandatory qualifier;
+   the owner gate (S5 REVERIFY vs cite-the-pair) is unchanged.
+2. **D-340 minted (GOVERNANCE, class fix for C-3):** a declared stage input is immutable; an in-place writer must
+   publish a mutation notice at the moment of change (`scripts/input_mutation_notice.py`), and
+   `scripts/verify_declared_inputs.py` accepts a mismatch ONLY when a notice covers it — the exception is authored by
+   the writer, never hand-edited into config afterwards. Registry now 124 ids, `--check` in sync.
+3. **R3 PREFLIGHT (config-first, no invented source):** `bakeoff.anchor_ref` names ANCHOR-3 + its bound;
+   `scripts/r3_preflight.py` verifies the authority's bytes, the truth source's verdict columns and the
+   pre-registered n (58/58 measured) before any arm comparison runs. The truth source was NOT silently swapped —
+   swapping a reference is a scientific change and needs a decision (D-337 relative-only).
+4. **Flag registration proposal:** `governance/FLAG_REGISTRATION_PROPOSAL_20260923.md` — every unregistered flag with
+   the files that reference it, so `REGISTER FLAGS` is a one-word call with no reading.
+5. **Hygiene:** untracked root scratch archived; **BUG-378** logged (tracked root scratch files, the undeclared 95 MB
+   `checkpoint_enriched_kindsafe.jsonl` sibling, stale `__pycache__`, five `.stale_*` fingerprint siblings).
+6. **`just health` now runs 8 checks**, all fail-loud: guard_stacks, status, integrity --quick,
+   audit_flag_consumers, verify_anchor_manifest, verify_declared_inputs, verify_frozen_pair, r3_preflight.

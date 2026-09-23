@@ -726,3 +726,14 @@ disagreements). HUMAN GATE unchanged: only a genuinely independent second HUMAN 
   verify_anchor_manifest (ANCHOR-3), verify_declared_inputs (C-3 class).
 * **Open bug count:** 71 OPEN / 49 CLOSED of 120 — see
   `governance/SESSION-HANDOFF-2026-09-23.md` (C15 register).
+
+## Session 20 addendum 5 (2026-09-23) — C-3 mitigated, D-340, R3 preflight live
+* **D-340 minted** (124 decisions, `--check` in sync): declared stage inputs are immutable; writers
+  publish mutation notices. Class fix for C-3/BUG-376.
+* **Frozen pair:** `FROZEN-S5-T11-20260922` (7995 = 5023 PASS + 2972 QUARANTINE), manifest
+  `governance/FROZEN_S5_T11_20260922.json`, verified by `scripts/verify_frozen_pair.py`. **Owner gate unchanged:**
+  `S5 REVERIFY` or cite the frozen pair with the qualifier.
+* **Human gates now:** C-3/BUG-376 (S5), BUG-326 (GO), R3 (GO — preflight passes, so it is one command),
+  laya (GO), REGISTER FLAGS (proposal ready), F-11 unchanged (REDEFINED, D-337).
+* **Open bugs:** 73 OPEN / 51 CLOSED of 124 (see
+  `governance/SESSION-HANDOFF-2026-09-23.md`).

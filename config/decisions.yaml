@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 707
+total_decisions: 708
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7664,8 +7664,23 @@ decisions:
     consumer that actually references the file is RED. config/verify_abstention.yaml now declares status: gated and
     consumers: [] so the emptiness is explicit instead of implied.
 
+- id: D-340
+  category: GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-23'
+  title: A declared stage input is immutable; an in-place writer must publish a mutation notice (root cause of C-3)
+  detail: >-
+    C-3/BUG-376: the complete 7995-row S5 run became uncitable because a repair path rewrote its declared S4 input
+    in place 65 minutes AFTER the run finished, and the verified byte-image no longer exists. The config-side
+    acknowledgement list (config/verify_declared_inputs.yaml) cannot scale to that, because it is edited AFTER the
+    fact by whoever notices. Rule: an artifact that a long stage DECLARES as its input is (a) written once, or
+    (b) its in-place writer must call scripts/input_mutation_notice.py at the moment of the change, which records
+    sha256_before/sha256_after, the reason and the issue id. scripts/verify_declared_inputs.py accepts a mismatch
+    only when such a notice covers it, so an exception is authored by the WRITER, never hand-edited into config.
+    Frozen pairs (governance/FROZEN_S5_T11_20260922.json, scripts/verify_frozen_pair.py) are the citation form:
+    a result cites a byte-stable frozen manifest, never a mutable knowledge-pipeline path.
 summary:
-  total: 707
+  total: 708
   proposed: 6
   draft: 1
   active: 483
@@ -7674,7 +7689,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 140
+  resolved: 141
   planned: 8
   ratified: 5
   open: 17
@@ -7724,7 +7739,7 @@ summary:
     GOV: 21
     GOV / ARCH: 1
     GOV / PERF: 1
-    GOVERNANCE: 7
+    GOVERNANCE: 8
     GOVERNANCE / C11 / C12: 1
     GOVERNANCE / DATA: 1
     GOVERNANCE / DELEGATION: 1

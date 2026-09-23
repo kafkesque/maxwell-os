@@ -424,6 +424,17 @@ bakeoff:
     queue_rate: {pairwise: 0.0, r3: 0.0, r2: 0.754, r4: 0.0}
     adopted: false
     report: governance/R3_HELDOUT_RESULT_20260921.md
+  # ── ANCHOR-3 (D-337): the frozen authority an arm comparison CITES. The eval does not swap its
+  #    truth source silently - bakeoff.sources.anchor2 (60-row blind sheet + key, D-311 pre-registration)
+  #    stays the R3 truth source. This block only names the authority and its bound so a report can
+  #    state which reference it stands on, and scripts/r3_preflight.py refuses to run a comparison whose
+  #    reference cannot be verified. Swapping the reference is a SCIENTIFIC change: it needs a decision.
+  anchor_ref:
+    manifest: governance/ANCHOR_MANIFEST_20260923.json
+    artifact_id: ANCHOR-3
+    tier: human-mixed+llm-attested
+    bound: RELATIVE-ONLY (D-337) - arm ranking and deltas; no absolute error floor (D-329/D-331)
+    verify: scripts/verify_anchor_manifest.py
   # ── D-312 (C12): named label sources. The flat keys ABOVE are the `ruler` source and stay its only
   #    definition; a source is never inferred from a filename — a run names it. ─────────────────────
   active_source: ruler
@@ -448,6 +459,7 @@ bakeoff:
       exclude_rows_without_truth: true    # an unlabelled row cannot be scored (D-275a)
       row_allowlist_file: governance/ANCHOR2_HELDOUT_SET_20260921.json
       row_allowlist_field: heldout_fb_ids # n=58 pre-registered held-out rows
+      pre_registered_n: 58             # D-311 pre-registration (BUG-334: the measurable n is checked, not assumed)
       output: governance/bakeoff_typed_decision_anchor2_20260921.json
   arbitration:                            # D-300/D-311: pre-registered combine rules (R1-R4)
     incumbent_arm: pairwise
@@ -469,6 +481,11 @@ bakeoff:
 # correct behaviour -- resuming from pre-repair labels would silently contaminate the corpus -- but
 # it means the live path can be ABSENT with the bytes preserved under .stale. Never "restore" it to
 # the live path to make a reader happy: that re-arms the silent stale resume. Cite the .stale file.
+eval:
+  # frozen stage pairs (C-3): cited by manifest, verified by scripts/verify_frozen_pair.py
+  frozen_manifests:
+    - governance/FROZEN_S5_T11_20260922.json
+
 label_snapshots:
   stage5_t11:
     live_path: "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl"

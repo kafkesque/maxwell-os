@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "frozen_on": "2026-09-23",
+  "artifact_id": "FROZEN-S5-T11-20260922",
+  "why": "C-3/BUG-376: the S5 run finished 2026-09-22T11:47 against S4 image 2f8b34fb..., which was then rewritten in place at 2026-09-22T12:52 (0ca6f0f0...) and no longer exists anywhere. This pair is frozen so S6 can cite a BYTE-STABLE pair instead of a mutable knowledge-pipeline path.",
+  "s5_output_records": 7995,
+  "s5_verdict_counts": {
+    "PASS": 5023,
+    "QUARANTINE": 2972
+  },
+  "declared_input_sha256": "2f8b34fb0f104bbecc32d5b7cd3a37a272e9f3bc7b533db4a0e5b43fbff13992",
+  "declared_input_image_present": false,
+  "current_s4_input_sha256": "0ca6f0f08bea8f2dfbafb7a598e934e4f2afc3b98a894ee847e3ca1183c3d1b0",
+  "truth_that_must_travel_with_any_citation": [
+    "the 7995 verdicts were computed against the S4 image of 2026-09-22T11:26 (2f8b34fb...), which no longer exists",
+    "the frozen S4 copy here is the LATER image (0ca6f0f0...); the two are the same 7995-row corpus by row count, schema and per-record stamps, but they are NOT byte-identical - so no citation may claim 'verified against the current S4 artifact' without the qualifier 'paired with the 2026-09-22T12:52 image'"
+  ],
+  "files": {
+    "frozen/S5_t11_20260922/checkpoint.jsonl": {
+      "sha256": "8f82daf8a96faa67a693b3c178f92ff1a1bc6c8e1736e6a989091af5cd660380",
+      "bytes": 102936020,
+      "source": "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl"
+    },
+    "frozen/S5_t11_20260922/checkpoint.jsonl.input_fingerprint.json": {
+      "sha256": "a92e17e420a86891d2ee3ca7c1abbeee50c6b65ec8b09bd355d8692d82c71926",
+      "bytes": 831,
+      "source": "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.input_fingerprint.json"
+    },
+    "frozen/S5_t11_20260922/checkpoint_enriched.jsonl": {
+      "sha256": "0ca6f0f08bea8f2dfbafb7a598e934e4f2afc3b98a894ee847e3ca1183c3d1b0",
+      "bytes": 96902142,
+      "source": "knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl"
+    },
+    "frozen/S5_t11_20260922/checkpoint_enriched.jsonl.expected_count.json": {
+      "sha256": "0c9879155bf2b329d244d7fb0343c32086506bbc4762cfca600929c90bc28a92",
+      "bytes": 172,
+      "source": "knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl.expected_count.json"
+    }
+  },
+  "bound": "RELATIVE-ONLY (D-337): arm rankings and deltas only; no absolute error floor (D-329/D-331).",
+  "citation": "Cite 'FROZEN-S5-T11-20260922' + this file; never a bare knowledge-pipeline path (it is mutable).",
+  "verify": "python3 scripts/verify_frozen_pair.py",
+  "s6_gate": "S6 may commit the frozen pair ONLY with the qualifier above, or after S5 REVERIFY on the current input."
+}

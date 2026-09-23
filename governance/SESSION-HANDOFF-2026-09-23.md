@@ -3,7 +3,7 @@
 ## 0. C15 OBLIGATION (mandatory, mechanically re-derived)
 Source: `governance/buglog.md` via `scripts/bug_status.py` -> `governance/bug_status.json`
 (`c15_threshold: 5`, `c15_must_append_to_handoffs: true`).
-**72 OPEN / 51 CLOSED of 123 ids.** The count is quoted from the generated
+**73 OPEN / 51 CLOSED of 124 ids.** The count is quoted from the generated
 index, never from prose (BUG-342 rule). This block was MISSING from the previous handoff
 (`agent/session_seed.yaml` carried 0 bug ids) — fixed 2026-09-23.
 
@@ -81,8 +81,7 @@ index, never from prose (BUG-342 rule). This block was MISSING from the previous
 | BUG-367 | OPEN |
 | BUG-376 | OPEN |
 | BUG-377 | OPEN |
-
-List emitted by `scripts/bug_status.py` (the project's own parser), counts from `governance/bug_status.json` — never re-derived by hand (BUG-342 rule).
+| BUG-378 | OPEN |
 
 ## 1. WHAT THIS SESSION CLOSED
 * **C-1 CLOSED (D-338)**: abstention at p25 is approved IN PRINCIPLE, not activated; `enabled: false`,

@@ -2721,3 +2721,26 @@ Five stale pidfiles were still on disk with no live owner: `temp/train_classifie
 live. IMPACT IF WIRED: any "is a stage running?" check based on pidfile liveness would refuse to start forever
 (fail-closed) or attribute a stranger's process to a pipeline run. FIX (proposed, NOT applied): pidfiles must carry
 a start-time or a command fingerprint (ps -o lstart= + command match) before liveness is trusted.
+
+## BUG-376 (HIGH — OPEN, OWNER GATE = C-3; mitigation APPLIED 2026-09-23): S5's declared input was rewritten after the run
+MITIGATION (not a fix) 2026-09-23: the pair is now FROZEN — `frozen/S5_t11_20260922/` (191 MB, gitignored payload)
++ `governance/FROZEN_S5_T11_20260922.json` (sha256 of all 4 files, 7995 records, PASS 5023 / QUARANTINE 2972) +
+`scripts/verify_frozen_pair.py` in `just health`. S6 can now cite a BYTE-STABLE pair instead of a mutable
+knowledge-pipeline path. The truth that must travel with any citation is recorded in the manifest: the verdicts were
+computed against the S4 image of 2026-09-22T11:26 (2f8b34fb..., which no longer exists); the frozen S4 copy is the
+LATER image (0ca6f0f0...) — same 7995-row corpus by count/schema/stamps, NOT byte-identical. CLASS FIX: D-340, an
+in-place writer of a declared stage input must publish a mutation notice. OWNER GATE UNCHANGED: S5 REVERIFY or
+cite the frozen pair with the qualifier.
+
+## BUG-378 (LOW-MED — OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift
+(a) TRACKED root scratch: `ab_off.json`, `ab_on.json`, `probe_clean.sh`, `probe_output`, `handoff` are committed at the
+repo root (session artefacts, not product). Untracked equivalents (`checkpoint.jsonl.depth.json`, `audit_output`,
+`backup`) were archived to `archive/session_20260923/scratch/`; the tracked five were deliberately NOT moved, because
+moving a tracked file is a diff and needs a decision on whether the file is product or scratch.
+(b) `knowledge pipeline/stage4_merge/t11/` holds a 95 MB sibling `checkpoint_enriched_kindsafe.jsonl` (Sep 2) next to
+the live `checkpoint_enriched.jsonl`. Nothing declares which is authoritative — a human or a repair script can pick the
+wrong one (the same ambiguity class that produced C-3). Proposal: a `*.authoritative` marker or a move to an `archive/`
+subdir inside the pipeline dir.
+(c) `scripts/__pycache__/` holds .pyc for scripts that were renamed/archived (C19: no __pycache__ in the repo).
+(d) FIVE `.input_fingerprint.json.stale_*` siblings sit next to the live S5 fingerprint. Harmless to machines (the
+reader takes the exact name) but they invite a human to cite a stale reference.

@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-348",
+  "r2_artifact": "governance/r2_definition_nli_20260920_v2.json",
+  "ruler_artifact": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+  "n_ruler_rows": 150,
+  "n_r2_fbs": 7995,
+  "unmeasurable_axes": {
+    "extraction_type": "no R2 score exists for this axis (declared, not guessed)",
+    "domains": "no ruler truth column exists (declared, not guessed)"
+  },
+  "gate_rule": "flag if any assigned-label score has contra >= contra_threshold, OR assigned-label support (max entail) < weak_entail",
+  "qualifier": "RELATIVE-ONLY (D-337). Gate discrimination on a frozen ruler, not an absolute accuracy floor.",
+  "axes": {
+    "content_type": {
+      "n_scored": 150,
+      "n_skipped": 0,
+      "base_error": 0.3467,
+      "gate": {
+        "n_flagged": 58,
+        "flag_rate": 0.3867,
+        "flagged_error": 0.4483,
+        "unflagged_error": 0.2826
+      },
+      "separation": {
+        "mean_support_correct": 0.4693,
+        "mean_support_wrong": 0.229,
+        "auc_support_vs_correct": 0.641
+      },
+      "selective_risk_curve": [
+        {
+          "coverage": 1.0,
+          "kept": 150,
+          "selective_error": 0.3467,
+          "delta_pp": 0.0
+        },
+        {
+          "coverage": 0.95,
+          "kept": 142,
+          "selective_error": 0.3592,
+          "delta_pp": 1.25
+        },
+        {
+          "coverage": 0.9,
+          "kept": 135,
+          "selective_error": 0.363,
+          "delta_pp": 1.63
+        },
+        {
+          "coverage": 0.85,
+          "kept": 128,
+          "selective_error": 0.3516,
+          "delta_pp": 0.49
+        },
+        {
+          "coverage": 0.8,
+          "kept": 120,
+          "selective_error": 0.3333,
+          "delta_pp": -1.33
+        },
+        {
+          "coverage": 0.75,
+          "kept": 112,
+          "selective_error": 0.3304,
+          "delta_pp": -1.63
+        },
+        {
+          "coverage": 0.7,
+          "kept": 105,
+          "selective_error": 0.3048,
+          "delta_pp": -4.19
+        },
+        {
+          "coverage": 0.6,
+          "kept": 90,
+          "selective_error": 0.2667,
+          "delta_pp": -8.0
+        },
+        {
+          "coverage": 0.5,
+          "kept": 75,
+          "selective_error": 0.24,
+          "delta_pp": -10.67
+        }
+      ]
+    },
+    "discipline": {
+      "n_scored": 137,
+      "n_skipped": 13,
+      "base_error": 0.5255,
+      "gate": {
+        "n_flagged": 49,
+        "flag_rate": 0.3577,
+        "flagged_error": 0.4898,
+        "unflagged_error": 0.5455
+      },
+      "separation": {
+        "mean_support_correct": 0.39,
+        "mean_support_wrong": 0.3442,
+        "auc_support_vs_correct": 0.5348
+      },
+      "selective_risk_curve": [
+        {
+          "coverage": 1.0,
+          "kept": 137,
+          "selective_error": 0.5255,
+          "delta_pp": 0.0
+        },
+        {
+          "coverage": 0.95,
+          "kept": 130,
+          "selective_error": 0.5154,
+          "delta_pp": -1.02
+        },
+        {
+          "coverage": 0.9,
+          "kept": 123,
+          "selective_error": 0.4959,
+          "delta_pp": -2.96
+        },
+        {
+          "coverage": 0.85,
+          "kept": 116,
+          "selective_error": 0.5086,
+          "delta_pp": -1.69
+        },
+        {
+          "coverage": 0.8,
+          "kept": 110,
+          "selective_error": 0.5182,
+          "delta_pp": -0.74
+        },
+        {
+          "coverage": 0.75,
+          "kept": 103,
+          "selective_error": 0.5243,
+          "delta_pp": -0.13
+        },
+        {
+          "coverage": 0.7,
+          "kept": 96,
+          "selective_error": 0.5312,
+          "delta_pp": 0.57
+        },
+        {
+          "coverage": 0.6,
+          "kept": 82,
+          "selective_error": 0.5122,
+          "delta_pp": -1.34
+        },
+        {
+          "coverage": 0.5,
+          "kept": 68,
+          "selective_error": 0.4853,
+          "delta_pp": -4.03
+        }
+      ]
+    }
+  }
+}

@@ -390,3 +390,19 @@ fail-closed (C16); the artifact is regenerated and now cites the hash it actuall
 
 | D-346 | ARCHITECTURE | RESOLVED | 2026-09-23 | MENU COARSEN GO: the D-343 routing table is adopted as an enforced contract (config/menu_routing.yaml + scripts/verify_menu_routing.py in just health). domains classify (+22.64 pp), discipline classify (+22.54 pp), extraction_type coarsen/calibrated abstention (+14.89 pp), content_type constant+human queue (0.7863 <= 0.8161 constant), depth constant+human queue (0.6540 <= 0.8193 constant): the constant test dominates the null test. Taxonomy merges stay a versioned menu change (v5.6 -> v6) with the labeler re-run and the ruler re-scored. Checker: 5 axes, 23 queued labels, 0 RED, 1 warn. |
 | D-347 | MEASUREMENT | RESOLVED | 2026-09-23 | The incumbent must be re-scored on the ruler in force, never quoted: content_type 0.6467 quoted vs 0.5933 on the same human cells (live store -5.34 pp / 8 rows) and 0.6533 against the owner-adjudicated truth (+0.66 pp); discipline 0.5259 quoted vs 0.5172 on the identical 116-row subset and 0.4400 against the current truth (-8.59 pp); extraction_type 0.7172 unchanged. D-345 survives the correction. Any floor reading ruler_measurement.measured_error_rate quotes a superseded ruler - re-point (G4a) or mark superseded. Evidence: governance/INCUMBENT_RULER_SCORE_20260923.json/.md |
+
+## D-348..D-351 (2026-09-23) - the three MENU COARSEN owner calls answered by measurement
+D-348 R2 definition-NLI gate, measured on the EXISTING 7995-FB artifact x consolidated ruler (no new inference):
+content_type n=150 base 0.3467, AUC 0.6410, flagged error 0.4483 vs unflagged 0.2826, selective 0.3048 at 70% coverage;
+discipline n=137 base 0.5255, AUC 0.5348 = NO signal (flagged rows MORE accurate). The meter is a content_type margin only.
+D-349 abstention drains to the MACHINE quarantine state, not a human repair queue: discipline t_low=p25 (0.3910 vs 0.4741,
+-8.3 pp) and content_type t_low=p30 (0.3048 vs 0.3467, -4.2 pp) ratified with measured curves; extraction_type REFUSED
+(no measured curve, BUG-390; transplant forbidden). enabled stays false - ONE gate item left: a shadow run (D-339).
+D-350 discipline tail merge map measured on stored vec_fbs centroids: 1 merge ratified (decision making -> operations
+research, cos 0.9752, gap 0.0216); 9 REFUSED (gaps 0.0017-0.0115 < 0.02) - the tail is a dense blob, so a hand-picked
+parent would be an unmeasured assertion (D-347). Proposal only: config/menu_v6_merge_map.yaml, NOT IN FORCE.
+D-351 noise_drop and process_template KEPT as human-only queue labels; retirement DECLINED (load-bearing semantics:
+growth_edge entry criterion BUG-230; process_template = FB->PT->PI->Recipe primitive; retiring orphans stored rows).
+Replaced by an enforced queue-closure rule: on a constant axis every non-constant menu label except the declared
+abstention label must be queued - scripts/verify_menu_policy.py (12th just health check).
+New/updated: scripts/r2_gate_measure.py + config/r2_gate_measure.yaml; scripts/menu_merge_map.py + config/menu_merge_map.yaml; scripts/verify_menu_policy.py; config/verify_abstention.yaml (v2 abstention_policy append); config/menu_v6_merge_map.yaml; governance/R2_GATE_MEASUREMENT_20260923.{json,md}; governance/MENU_MERGE_MAP_20260923.{json,md}; governance/ABSTENTION_CALIBRATION_20260923.json; governance/CLASSIFICATION_LEVERS_20260923.md.

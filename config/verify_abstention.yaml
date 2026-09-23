@@ -5,7 +5,7 @@
 # state change needs an implementation receipt: config sha256 before/after + the consumer + a run fingerprint).
 version: '1'
 status: gated           # proposed | gated | shadow | enabled  (D-338; a flip is its own dated decision)
-consumers: []           # NO production code reads this file. A flag with no consumer enforces nothing.
+consumers: [scripts/verify_menu_policy.py]   # D-349: the policy checker consumes the abstention_policy block
 enabled: false          # fail-closed production behaviour is unchanged (D-2298)
 activation_gate:        # ALL FOUR must hold before enabled may become true
   triage_owner: TBD-OWNER-GATE        # must be a NAMED owner with a rows-per-week capacity (the binding constraint)
@@ -27,3 +27,25 @@ repair_queue_contract:                # the contract the writer must satisfy whe
   dedup_key: fb_id                    # ABSTENTION_DESIGN open item 3 (overlap with arbitration)
   owner: TBD-OWNER-GATE               # capacity + routing owner is the binding constraint, not the path
 measured_curve_ref: governance/ABSTENTION_DESIGN_20260921.md
+
+# ===== V2 APPEND (2026-09-23, D-349) - the ratified policy. The block above is retained as
+# provenance and stays INERT (enabled: false) until ONE shadow run exists (D-339 receipt rule).
+abstention_policy:
+  decision: D-349
+  enabled: false
+  drain_target: quarantine
+  drain_target_kind: machine_state      # D-349: NOT a human repair queue (human capacity was the binding blocker)
+  human_review_required: false
+  measured_curve_artifact: governance/ABSTENTION_CALIBRATION_20260923.json
+  measured_curve_sha256: cf9400036681fb579f243be151c215463842a3bc02bf21783b4fc08a0cd96e78
+  abstention_labels: {content_type: none, discipline: emerging}
+  operating_points:
+    discipline: {metric: percent_rank, t_low_percentile: 25, abstain_rate: 0.25, selective_error: 0.3910, base_error: 0.4741}
+    content_type: {metric: r2_max_entail, t_low_percentile: 30, abstain_rate: 0.30, selective_error: 0.3048, base_error: 0.3467}
+  refused_axes:
+    extraction_type: "no measured curve exists for this axis; may NOT be transplanted from another axis"
+  gate:
+    calibration_artifact: present
+    human_capacity_gate: superseded_by_machine_state_drain
+    shadow_run: null                    # the ONE remaining gate item
+  qualifier: "RELATIVE-ONLY (D-337). Selective error measured on a frozen reference; no absolute floor certified."

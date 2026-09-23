@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-348",
+  "axis": "discipline",
+  "reader": "scripts/knn_arm_eval.py",
+  "db": "knowledge pipeline/maxwell.db",
+  "dim": 512,
+  "n_rows": 15990,
+  "runner_up_margin": 0.02,
+  "min_label_rows": 20,
+  "n_tail": 10,
+  "n_merge": 1,
+  "qualifier": "RELATIVE-ONLY (D-337). A merge proposal from centroid separability, not an accuracy claim.",
+  "map": [
+    {
+      "tail_label": "theoretical physics",
+      "n_rows": 26,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0048 < 0.02",
+      "best": {
+        "label": "systems thinking",
+        "cos": 0.9269
+      },
+      "runner_up": {
+        "label": "systems engineering",
+        "cos": 0.9221
+      },
+      "gap": 0.0048
+    },
+    {
+      "tail_label": "risk management",
+      "n_rows": 52,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0109 < 0.02",
+      "best": {
+        "label": "operations research",
+        "cos": 0.9687
+      },
+      "runner_up": {
+        "label": "systems engineering",
+        "cos": 0.9578
+      },
+      "gap": 0.0109
+    },
+    {
+      "tail_label": "cultural studies",
+      "n_rows": 91,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0017 < 0.02",
+      "best": {
+        "label": "sociology",
+        "cos": 0.9667
+      },
+      "runner_up": {
+        "label": "media studies",
+        "cos": 0.965
+      },
+      "gap": 0.0017
+    },
+    {
+      "tail_label": "decision making",
+      "n_rows": 22,
+      "action": "merge_into_parent",
+      "parent": "operations research",
+      "parent_group": "Systems & Method",
+      "reason": "beats runner-up by 0.0216",
+      "best": {
+        "label": "operations research",
+        "cos": 0.9752
+      },
+      "runner_up": {
+        "label": "research methodology",
+        "cos": 0.9535
+      },
+      "gap": 0.0216
+    },
+    {
+      "tail_label": "interdisciplinary studies",
+      "n_rows": 25,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0115 < 0.02",
+      "best": {
+        "label": "sociology",
+        "cos": 0.9279
+      },
+      "runner_up": {
+        "label": "political economy",
+        "cos": 0.9164
+      },
+      "gap": 0.0115
+    },
+    {
+      "tail_label": "computational geometry",
+      "n_rows": 41,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0087 < 0.02",
+      "best": {
+        "label": "computational physics & simulation",
+        "cos": 0.9274
+      },
+      "runner_up": {
+        "label": "operations research",
+        "cos": 0.9187
+      },
+      "gap": 0.0087
+    },
+    {
+      "tail_label": "engineering",
+      "n_rows": 88,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0045 < 0.02",
+      "best": {
+        "label": "software engineering",
+        "cos": 0.963
+      },
+      "runner_up": {
+        "label": "systems engineering",
+        "cos": 0.9585
+      },
+      "gap": 0.0045
+    },
+    {
+      "tail_label": "complex adaptive systems",
+      "n_rows": 36,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0032 < 0.02",
+      "best": {
+        "label": "systems thinking",
+        "cos": 0.9693
+      },
+      "runner_up": {
+        "label": "systems engineering",
+        "cos": 0.9661
+      },
+      "gap": 0.0032
+    },
+    {
+      "tail_label": "cognitive science",
+      "n_rows": 133,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.007 < 0.02",
+      "best": {
+        "label": "psychology",
+        "cos": 0.9692
+      },
+      "runner_up": {
+        "label": "design thinking",
+        "cos": 0.9621
+      },
+      "gap": 0.007
+    },
+    {
+      "tail_label": "information security",
+      "n_rows": 41,
+      "action": "keep_label",
+      "parent": null,
+      "parent_group": "",
+      "reason": "ambiguous: gap 0.0076 < 0.02",
+      "best": {
+        "label": "software engineering",
+        "cos": 0.9423
+      },
+      "runner_up": {
+        "label": "artificial intelligence",
+        "cos": 0.9347
+      },
+      "gap": 0.0076
+    }
+  ]
+}

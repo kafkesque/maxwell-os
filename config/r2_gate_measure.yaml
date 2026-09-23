@@ -1,0 +1,40 @@
+# config/r2_gate_measure.yaml — R2 definition-anchored NLI as a MONOTONE PRECISION GATE (D-348)
+# =============================================================================
+# WHY: D-345 killed the k-NN arm; D-346 routed the axes by representability. The
+# open question an owner actually feels is: can accuracy rise WITHOUT a human
+# reading rows, and without changing what a label MEANS? This file configures the
+# measurement that answers it using an artifact that ALREADY EXISTS:
+# governance/r2_definition_nli_*.json (7995 FBs, DeBERTa/ModernBERT NLI; premise =
+# FB definition, hypothesis = the menu/paraphrase DEFINITION of the label the
+# pipeline ASSIGNED). No new inference, no LLM, no drift: the hypothesis text is
+# the frozen menu definition, so the gate can only ever test a claim against the
+# definition the menu already published.
+#
+# C12: every path, threshold and grid value lives here, none in the script.
+# C16: the script fails CLOSED if the join or the row count is below the floor.
+# D-337: RELATIVE-ONLY. This measures discrimination on a frozen reference; it
+# certifies no absolute error floor.
+# =============================================================================
+schema_version: "1.0"
+decision: D-348
+
+r2_artifact: governance/r2_definition_nli_20260920_v2.json
+ruler_artifact: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+output_json: governance/R2_GATE_MEASUREMENT_20260923.json
+output_md: governance/R2_GATE_MEASUREMENT_20260923.md
+
+# axis -> ruler truth column. Only axes with BOTH an R2 score and a ruler truth
+# column are measurable; anything absent here is DECLARED unmeasurable, not guessed.
+axes:
+  content_type: {truth_column: content_type_final, hypothesis_type: paraphrase}
+  discipline:   {truth_column: discipline_final,   hypothesis_type: definition}
+
+# The gate rule under test (the meter; it can only DEMOTE, never relabel).
+gate:
+  contra_threshold: 0.5      # contradiction probability that counts as a HARD signal
+  weak_entail: 0.10          # same threshold as governance/nli_label_audit.json
+  rule: "flag if any assigned-label score has contra >= contra_threshold, OR assigned-label support (max entail) < weak_entail"
+
+coverage_grid: [1.0, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.6, 0.5]
+min_joined_rows: 100
+qualifier: "RELATIVE-ONLY (D-337). Gate discrimination on a frozen ruler, not an absolute accuracy floor."

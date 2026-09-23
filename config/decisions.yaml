@@ -7748,6 +7748,31 @@ decisions:
   status: RESOLVED
   date: 2026-09-23
 
+- id: D-348
+  title: "R2 definition-anchored NLI as a precision gate: content_type AUC 0.6410, flagged error 0.4483 vs unflagged
+    0.2826, selective 0.3048 at 70% coverage; discipline AUC 0.5348 = NO signal. Measured on the existing 7995-FB artifact."
+  category: MEASUREMENT
+  status: RESOLVED
+  date: 2026-09-23
+- id: D-349
+  title: "Abstention drains to the MACHINE quarantine state, not a human queue: discipline t_low=p25 (0.3910 vs 0.4741) and
+    content_type t_low=p30 (0.3048 vs 0.3467) ratified with measured curves; extraction_type REFUSED (BUG-390); enabled
+    stays false until one shadow run."
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+- id: D-350
+  title: "Discipline tail merge map measured on stored centroids: 1 merge (decision making -> operations research, gap 0.0216),
+    9 REFUSED (gap 0.0017-0.0115 < 0.02) - hand-picking a parent would be an unmeasured assertion."
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+- id: D-351
+  title: "noise_drop and process_template KEPT as human-only queue labels; retirement DECLINED; replaced by an enforced
+    queue-closure rule on every constant axis."
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
 - id: D-345
   category: CLASSIFICATION
   state: RESOLVED

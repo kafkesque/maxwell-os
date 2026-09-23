@@ -1,0 +1,37 @@
+# config/menu_merge_map.yaml — discipline tail-merge map, MEASURED not asserted (D-348)
+# =============================================================================
+# WHY: D-346 routed discipline to "keep the labeler, coarsen the tail" and left the
+# owner to ratify WHICH parent owns each of the 10 tail labels. A hand-written merge
+# map would be an opinion. This measures it in the SAME representation the pipeline
+# uses: the stored definition embeddings (vec_fbs). Parent = the candidate label
+# whose stored-row centroid is closest in cosine to the tail label's centroid.
+#
+# A merge is proposed ONLY when the winner beats the runner-up by >= margin, so an
+# ambiguous tail label is returned as keep_label (no merge) instead of being forced
+# into an arbitrary parent. Nothing here rewrites the taxonomy: it is a PROPOSAL +
+# evidence for the versioned v5.6 -> v6 menu change (D-346).
+#
+# C12: paths, margin, dim, candidates source all live here.
+# C16: fails closed if a tail label has no stored rows or the vector store shape
+#      disagrees with the declared dim (BUG-375 class: never assume resolvability).
+# D-337: RELATIVE-ONLY. Cosine is separability evidence, not an accuracy claim.
+# =============================================================================
+schema_version: "1.0"
+decision: D-348
+
+db: "knowledge pipeline/maxwell.db"
+vec_shadow_chunks: vec_fbs_vector_chunks00
+vec_shadow_rowids: vec_fbs_rowids
+dim: 512
+knn_arm_module: scripts/knn_arm_eval.py     # the reader proven on this store (D-345)
+
+closed_menu: config/closed_menu_v5.json
+routing_config: config/menu_routing.yaml    # the tail labels are READ from here, never retyped
+axis: discipline
+excluded_candidates: [emerging]             # the declared no-canonical sink is reported, not proposed
+runner_up_margin: 0.02                      # cosine gap required to call a winner unambiguous
+min_label_rows: 20                          # below this, a centroid is noise -> keep_label
+output_json: governance/MENU_MERGE_MAP_20260923.json
+output_md: governance/MENU_MERGE_MAP_20260923.md
+output_config: config/menu_v6_merge_map.yaml
+qualifier: "RELATIVE-ONLY (D-337). A merge proposal from centroid separability, not an accuracy claim."

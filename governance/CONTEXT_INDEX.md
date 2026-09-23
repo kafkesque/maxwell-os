@@ -694,3 +694,50 @@ governance/FORENSIC_AUDIT_20260923b.md, governance/ARTIFACT_REGISTRY.md, governa
 are historical and unreproducible as written. The LIVE harness is scripts/r3_preflight.py (inside just health),
 which binds source 'anchor2' + authority ANCHOR-3. GO/DEFER on the R3 result stays an owner call (repointing is a
 new pre-registration).
+
+## RECALL ADDENDUM 2026-09-23 (session 21) - A2 / depth / which stage gets a student / the sync incident
+
+**Which stage gets a student (the agreement).** S4 CLASSIFICATION ONLY - never S2 (FB text generation, stays
+Qwen3-Coder) and never S5 (verification, stays DeBERTa NLI). TWO SEPARATE ModernBERT-base (139M) FULL
+fine-tunes, no LoRA (LoRA q_proj/v_proj is a SILENT no-op on disentangled attention, D2578): (a) CRIBS +
+discipline/domains (61-way softmax + 43-way sigmoid head), (b) a dedicated 4-way DEPTH head so rare depth
+classes are not swamped. Teacher / label oracle = gpt-oss-20b (D2577, user-approved 2026-09-23; D2607 C).
+"Overtake" is a HYBRID CASCADE, not a replacement: student pre-classifies, abstain/low-confidence escalates
+to gpt-oss, and the KPI is END-TO-END ACCURACY WITH FALLBACK (D2607 C), gated on ARM-3 abstention plus
+student readiness, with gpt-oss teacher retirement BLOCKED until the student wins (D2635). It is
+DATA-limited, not model-limited: discipline macro-F1 0.2621 -> 0.2036, top-1 27.7%, cannot reach 90%
+precision at ANY coverage (best 75% at 4% coverage); the coarse 10-way head (54% top-1) is the better
+abstention signal and IS wired (student_classifier.py, coarse_threshold 0.70, override of DISCIPLINE/DOMAINS
+only, never depth). Per D274d nothing may be trained, distilled or swapped on the current labels.
+
+**Depth anchor - the honest answer (BUG-415, NEW).** An older manual reference DOES exist and is still in
+use: `governance/gold_4axis.jsonl`, 251 rows / 234 with depth, 132 human-derived + 81 joint-vote + 21
+reliable-pair revote + 17 n/a = coverage 0.526 vs the 0.50 floor, which is why `axes_deferred: [depth,
+domains]` (config/eval_integrity.yaml:220). But NO BLIND ANCHOR exists for depth: the ruler/anchor family
+(RULER_BLIND_SHEET_20260917, F11_ANCHOR_REVIEW, ANCHOR-3 150x31) carries ZERO depth columns, and the live
+reference is the 996-row 3-voter LLM consensus, which is ADVISORY and RELATIVE-ONLY (D-329/331/337). So the
+D2577 depth head cannot be certified and the D274f test-retest is unbuilt. Owner-accepted fix: ANCHOR-4 =
+the same 150 ruler rows + a blind `DEPTH (1-4)` column + a second coder, then the 30-row test-retest
+(governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv + _RUBRIC_20260923.md). Coder 2 is what turns a coding
+into an anchor.
+
+**A2 (reclaim) - superseded rule.** D-370 amends D-369 by append-only note: a model store is classified by
+RESOLUTION (readlink + the SERVED-MODEL LIST), never by directory name and never by du (du reports 0 MB for
+a symlink then the full size of its target). hf hub is NOT a cache - it IS the serving store for 5 of 7
+served models. A digest test is not a deletion test. Safe-reclaim evidence = absent from the serving list +
+zero config/code/golden references + a survivor that loads and ANSWERS after restart + a logged restorable
+source id. Execute last-verified-first. The current list is
+`governance/MODEL_STORE_RECLAIM_A2_CORRECTED_20260923.md` (supersedes the original; ~81.2 GB); NOTHING has
+moved and the owner still answers two knowledge questions (the 27.1 GB orphan Qwen3.6-35B-A3B-6bit, and the
+20.6 GB .mtplx Qwopus3.6 that model_assignments.yaml calls a phantom).
+
+**Writer incident (BUG-402, FIXED).** `tools/sync_decisions.py` was INVERTED and was run before its own
+tombstone landed: it re-dumped config/decisions.yaml (3526+/2259-) and the damage was committed as 934f755.
+Recovered from 32404ce (736 records) + D-370 appended surgically (737, stamp 64fddc833723eba3). The tool is
+now a hard-fail tombstone (exit 2) and the stamp is derived + checked in `just health`. Standing rule: never
+invoke a tool whose retirement is only planned - neuter FIRST, then verify.
+
+**Gates accepted 2026-09-23:** Gate B, Gate E, Gate A/A2, Gate F, the depth anchor, BUG-403/405 (Gate D),
+the BUG-410 repoint, A2 execution and the abstention shadow run. Gate F acceptance changes NOTHING today
+(verify_abstention.yaml enabled: false, status: gated; abstention is PER-AXIS, so content_type keeps 100%
+coverage); the recommendation stands to DROP the content_type 30% point and keep discipline 25%.

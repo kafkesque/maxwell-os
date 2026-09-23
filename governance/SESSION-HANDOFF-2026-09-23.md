@@ -148,3 +148,18 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 - **D-344 MINTED**: scripts/verify_artifact_authority.py enforces the ARTIFACT_AUTHORITY.json markers (10th just health check); 2 markers, 17 files verified, 0 RED.
 - **BUG-383 FIXED** (167 gitignored __pycache__ dirs / 31 MB invisible to C19; purged) and **BUG-384 FIXED** (the new checker's own pipe-joined-glob defect, BUG-375 class, caught on its first run).
 - pipeline/ untouched; no new owner gate created by this session.
+
+## C15 BLOCK (2026-09-23, session 21) - unresolved bugs travel with every handoff
+
+**93 open / 67 closed of 160 ids** (threshold for this block is 5). Full machine-readable list with events:
+`governance/bug_status.json` (regenerate: `python3 scripts/bug_status.py`).
+
+Highest-consequence open ids: BUG-400 (Dropbox File Provider owns the served store - owner action), BUG-403
+(stage4.depth_model hardcoded default names the refuted depth route), BUG-341 (live stage5 checkpoint absent),
+BUG-376 (a completed S5 run's declared input was rewritten after the run), BUG-391 (the ratified abstention
+point does not reproduce on the ruler in force), BUG-381 (terminal-store vintage mismatch), BUG-326 (repair
+target numbers do not reproduce on the live DB), BUG-406 (temp auto-purge guard), BUG-415 (no depth anchor),
+BUG-416 (depth is not a menu). Owner-gated: BUG-400, BUG-403/405, BUG-381, BUG-376, and A2 execution.
+
+Carried rule (C15): no handoff is complete while this block is absent, and no bug may be closed by inference
+- a closure needs a receipt (D-339).

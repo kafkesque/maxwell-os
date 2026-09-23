@@ -3212,7 +3212,31 @@ is real data, not purgeable. The 16.5 GB project move is ~2% of the deficit; the
 this session to name the real targets and to state the precondition (a mounted volume, with its real name). See
 BUG-402 for the second-order drift found by the same audit.
 
-## BUG-402 (LOW, OPEN) - `last_sync` in config/decisions.yaml has no sanctioned writer, and it is now stale
+## BUG-402 (LOW, FIXED 2026-09-23) - 
+**FIXED 2026-09-23 (implementation receipt).** `last_sync` is now DERIVED and CHECKED, and the writer that
+owned it is retired. The defect was a DECLARATION with no sanctioned writer sitting beside derived data
+(summary, total_decisions) that DID have a writer - two clocks for one artifact, which is how it drifted.
+Landed: (a) `scripts/recompute_decision_summary.py` derives `last_sync` in the same surgical atomic write,
+adds a content-derived `decisions_sha256_16` (sha256 of the canonical JSON of the decisions LIST, so it is
+self-reference free) plus `written_by`, and `--check` exits 1 on any drift; (b) the wire is in `just health`
+(`recompute_decision_summary.py --check || exit 1`); (c) `tools/sync_decisions.py` is RETIRED as a hard-fail
+tombstone (exit 2), because it is INVERTED - it treats DECISION-LOG.md (~154 heading blocks, 29 of them
+headings) as truth over 709 registry ids and would re-dump the file (the BUG-409 formatting destruction).
+DAMAGE NOTE (R-D410 honest record): the tombstone was planned but had not landed when two of my own
+verification commands ran the tool live; it wrote 2 decisions and re-dumped `config/decisions.yaml`
+(3526 insertions / 2259 deletions), and a `git checkout --` restored from the already-staged index so the
+damaged 738-record file was committed as 934f755. Recovered from 32404ce: 736 records, hand-curated
+formatting intact, then D-370 appended surgically (737). `git diff --stat 32404ce -- config/decisions.yaml`
+is now 29 insertions / 4 deletions (the D-370 record + the stamp fields) instead of 5785 changed lines.
+MEASURED, and it retires the tool's whole premise: its "2 new decisions found" was 2/2 FALSE POSITIVES -
+the reverse membership direction (log-only ids) is EMPTY of real decisions, containing only D2537 (a TABLE
+ROW on log line 110) and D3251 (a PROSE mention on line 231), plus the rule id D410 and D6. So there was
+never a decision to sync; the tool fired on a markdown table and a parenthetical.
+RESIDUAL (open, low): membership in the other direction is structural, not a defect - 454 registry ids are
+never named in DECISION-LOG.md because the log is a curated narrative subset, not a registry mirror. No
+detector exists and none is needed; a read-only membership check is available if the log is ever meant to
+be a mirror. LESSON (standing): never invoke a tool whose retirement is only planned - neuter FIRST, then
+verify, and never verify a writer with the writer's own tool.`last_sync` in config/decisions.yaml has no sanctioned writer, and it is now stale
 
 `config/decisions.yaml` line 3 reads `last_sync: '2026-09-22 20:06:00'` while the registry holds four decisions
 minted 2026-09-23 (D-361..D-364). `scripts/recompute_decision_summary.py` - the sanctioned tool - does not touch
@@ -3376,7 +3400,15 @@ consecutive sessions were recorded as if the MODEL had failed. Owed verdicts dis
 scripts/build_archive_index.py (APPROVE, sha256_16 e133da4716a9e68e). Still owed: D-359 (stage6_commit.py diff)
 and D-364 (DSPy no-code-default diff).
 
-## BUG-410 (MED, OPEN) - T2_GATE and T3_GATE are assigned a model that is not served and not on disk
+## BUG-410 (MED, FIXED 2026-09-23) - 
+**FIXED 2026-09-23.** `T2_GATE`/`T3_GATE` in `config/model_assignments.yaml` were repointed from the
+PHANTOM `Phi-4-mini-instruct-4bit` to the SERVED probe `Phi-4-mini-instruct-8bit` (D2319), with dated
+inline notes; a pre-fix copy is in the gitignored `backup/`. Relief was verified BEFORE the edit: both
+roles are registry-only (inherited from the 2026-07-08 merge of three dead registries) and have no code
+consumer anywhere, so no call ever 404ed; the 0.25 quarantine tolerance they name is enforced in
+`config/content_types.yaml` plus the CRIBS quality guard at `pipeline/stage4_merge.py:1125-1157`.
+RESIDUAL (open): the same file still carries a stale `S5_VERIFIER` family (D2298/D2340) and a
+`PLANNER_FALLBACK` phantom, so T2_GATE/T3_GATE should be retired in the D-2637 rewrite, not patched again.T2_GATE and T3_GATE are assigned a model that is not served and not on disk
 config/model_assignments.yaml assigns roles.T2_GATE.model and roles.T3_GATE.model = Phi-4-mini-instruct-4bit.
 The live OMLX server serves 7 models (Phi-4-mini-instruct-8bit, Qwen3-Coder-30B, Qwen3.8-27B, gemma-4-E4B,
 gpt-oss-20b-MXFP4-Q8, Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit) - Phi-4-mini-instruct-4bit is NOT
@@ -3429,3 +3461,107 @@ moved to KEEP, one genuine internal duplicate identified: repo blobs/ 16.4 GB wi
 and the rule amended: a store is classified by RESOLUTION, never by name and never by du.
 ALSO CORRECTED: ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit (3.9 GB) holds the SERVED
 Phi probe; ~/.omlx/_unloaded/* are empty; ~/.omlx/cache is a live cache, not a store.
+
+## BUG-415 (MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says requires one
+
+MEASURED 2026-09-23 (session-21 forensic audit). The frozen anchor/ruler family carries ZERO depth
+columns: `RULER_BLIND_SHEET_20260917.csv` is (#, item_id, name, DEFINITION, APPLICATION, MECHANISM,
+BOUNDARY, SOURCE EXCERPT, len, CT (1-7), DISC (1-62), FORM (1-4), conf_ct, conf_disc, conf_form,
+note_codes, reviewer, date); `F11_ANCHOR_REVIEW_20260923.csv` and the consolidated ANCHOR-3 (150 rows x
+31 cols, sha256 29393d5f9d529205..., tier human-mixed+llm-attested) carry content_type / discipline /
+extraction_type only. ONLY `F14_RELABEL_OR_RETIRE_SAMPLE_20260917.csv` and
+`remaining_verification_audit.csv` carry a depth column, and neither is an anchor.
+
+WHAT DEPTH ACTUALLY HAS: `governance/gold_4axis.jsonl` is the only depth reference - 251 rows, 234 with a
+depth value, depth_source = human-derived 132 (p5:human-d2615 104 + human 18 + p5:human-frontier69 7 +
+p5:human-locked 2 + 298-human 1) + joint-vote 81 + reliable-pair revote 21 + n/a-non-principle 17, i.e.
+coverage 0.526 against the 0.50 floor (config/eval_integrity.yaml:12,34) - which is exactly why line 220
+holds `axes_deferred: [depth, domains]`. The LIVE reference is the 996-row 3-voter LLM consensus
+(`governance/depth_vote_checkpoint.jsonl`), which is ADVISORY, not human truth (D-329/D-331/D-337), and
+depth is RELATIVE-ONLY - never "accurate to X". No record carries a depth provenance field.
+
+CONSEQUENCE: the D2577 4-way depth ModernBERT head cannot be CERTIFIED. Its labels are the binding
+constraint, not the model: the depth eval set is built on classifier_depth_cleanC (macro-F1 0.4790,
+acc 0.530, n=200) and classifier_depth_coreC_core (0.4298, n=133); governance/depth_path_recommendation_
+2026-09-10.md concludes the binding constraint is label POLICY, not model capacity (encoder 0.4790 vs
+gpt-oss zero-shot 0.4433 vs few-shot 0.4571, all inside one +-0.05 band). The D274f 30-row test-retest
+(the single-coder ceiling any floor must be anchored to) is therefore unbuilt, and per D274d nothing may
+be trained, distilled or swapped on unanchored labels.
+
+FIX (owner-accepted 2026-09-23, in progress): **ANCHOR-4** = the SAME 150 ruler rows - they already carry
+DEFINITION / APPLICATION / MECHANISM / BOUNDARY, so they are answerable without re-reading the source -
+plus a `DEPTH (1-4)` column, coded blind by the owner, then by a SECOND coder, and only then the D274f
+test-retest of 30 rows after >= 2 weeks. A single-coder anchor has no ceiling to quote, so the freeze
+waits for coder 2. Sheet + rubric generated this session:
+`governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`, `governance/ANCHOR4_DEPTH_RUBRIC_20260923.md`.
+STATUS: PENDING OWNER CODING -> OPEN (this is the gate on the entire depth roadmap).
+
+## BUG-416 (MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them
+
+MEASURED: `config/taxonomy_v5.yaml` has no depth key (its keys are version, classification_version,
+groups, domains, disciplines, discipline_groups, meta). The depth vocabulary
+(universal / cross-domain / domain / specialized) exists only in PROSE - config/content_types.yaml:218
+(a comment), config/content_types.yaml:32 (the principle description), decisions D282/D2130/D2577 - and
+in data (gold_4axis depth values). `just health` already carries the symptom as a WARN: "menu source
+config/taxonomy_v5.yaml::depth not found - queue labels unverified" and "exposes no readable list --
+closure unverified".
+
+CONSEQUENCE: three separate consumers cannot be pinned to a vocabulary - (a) the menu-closure check
+cannot verify depth labels, (b) the ANCHOR-4 rubric cannot be generated config-first (it had to be
+hand-written this session, which is itself the C12 smell), (c) the D2577 4-way student head's class order
+is not declared anywhere, so a checkpoint cannot be checked against the ontology it was trained on.
+FIX: declare the 4 depth classes (label, description, the soft domain-count band from D2130) in a config
+surface - the same place domains/disciplines live - then repoint the menu check and generate the rubric
+from it. Blocked on nothing but a decision; no behaviour change.
+
+## BUG-415 (MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says requires one
+
+MEASURED 2026-09-23 (session-21 forensic audit). The frozen anchor/ruler family carries ZERO depth
+columns: `RULER_BLIND_SHEET_20260917.csv` is (#, item_id, name, DEFINITION, APPLICATION, MECHANISM,
+BOUNDARY, SOURCE EXCERPT, len, CT (1-7), DISC (1-62), FORM (1-4), conf_ct, conf_disc, conf_form,
+note_codes, reviewer, date); `F11_ANCHOR_REVIEW_20260923.csv` and the consolidated ANCHOR-3 (150 rows x
+31 cols, sha256 29393d5f9d529205..., tier human-mixed+llm-attested) carry content_type / discipline /
+extraction_type only. ONLY `F14_RELABEL_OR_RETIRE_SAMPLE_20260917.csv` and
+`remaining_verification_audit.csv` carry a depth column, and neither is an anchor.
+
+WHAT DEPTH ACTUALLY HAS: `governance/gold_4axis.jsonl` is the only depth reference - 251 rows, 234 with a
+depth value, depth_source = human-derived 132 (p5:human-d2615 104 + human 18 + p5:human-frontier69 7 +
+p5:human-locked 2 + 298-human 1) + joint-vote 81 + reliable-pair revote 21 + n/a-non-principle 17, i.e.
+coverage 0.526 against the 0.50 floor (config/eval_integrity.yaml:12,34) - which is exactly why line 220
+holds `axes_deferred: [depth, domains]`. The LIVE reference is the 996-row 3-voter LLM consensus
+(`governance/depth_vote_checkpoint.jsonl`), which is ADVISORY, not human truth (D-329/D-331/D-337), and
+depth is RELATIVE-ONLY - never "accurate to X". No record carries a depth provenance field.
+
+CONSEQUENCE: the D2577 4-way depth ModernBERT head cannot be CERTIFIED. Its labels are the binding
+constraint, not the model: the depth eval set is built on classifier_depth_cleanC (macro-F1 0.4790,
+acc 0.530, n=200) and classifier_depth_coreC_core (0.4298, n=133); governance/depth_path_recommendation_
+2026-09-10.md concludes the binding constraint is label POLICY, not model capacity (encoder 0.4790 vs
+gpt-oss zero-shot 0.4433 vs few-shot 0.4571, all inside one +-0.05 band). The D274f 30-row test-retest
+(the single-coder ceiling any floor must be anchored to) is therefore unbuilt, and per D274d nothing may
+be trained, distilled or swapped on unanchored labels.
+
+FIX (owner-accepted 2026-09-23, in progress): **ANCHOR-4** = the SAME 150 ruler rows - they already carry
+DEFINITION / APPLICATION / MECHANISM / BOUNDARY, so they are answerable without re-reading the source -
+plus a `DEPTH (1-4)` column, coded blind by the owner, then by a SECOND coder, and only then the D274f
+test-retest of 30 rows after >= 2 weeks. A single-coder anchor has no ceiling to quote, so the freeze
+waits for coder 2. Sheet + rubric generated this session:
+`governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`, `governance/ANCHOR4_DEPTH_RUBRIC_20260923.md`.
+STATUS: PENDING OWNER CODING -> OPEN (this is the gate on the entire depth roadmap).
+
+## BUG-416 (MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them
+
+MEASURED: `config/taxonomy_v5.yaml` has no depth key (its keys are version, classification_version,
+groups, domains, disciplines, discipline_groups, meta). The depth vocabulary
+(universal / cross-domain / domain / specialized) exists only in PROSE - config/content_types.yaml:218
+(a comment), config/content_types.yaml:32 (the principle description), decisions D282/D2130/D2577 - and
+in data (gold_4axis depth values). `just health` already carries the symptom as a WARN: "menu source
+config/taxonomy_v5.yaml::depth not found - queue labels unverified" and "exposes no readable list --
+closure unverified".
+
+CONSEQUENCE: three separate consumers cannot be pinned to a vocabulary - (a) the menu-closure check
+cannot verify depth labels, (b) the ANCHOR-4 rubric cannot be generated config-first (it had to be
+hand-written this session, which is itself the C12 smell), (c) the D2577 4-way student head's class order
+is not declared anywhere, so a checkpoint cannot be checked against the ontology it was trained on.
+FIX: declare the 4 depth classes (label, description, the soft domain-count band from D2130) in a config
+surface - the same place domains/disciplines live - then repoint the menu check and generate the rubric
+from it. Blocked on nothing but a decision; no behaviour change.

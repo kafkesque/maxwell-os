@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 132,
-  "open_n": 77,
-  "closed_n": 55,
+  "total_ids": 162,
+  "open_n": 93,
+  "closed_n": 69,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -392,6 +392,86 @@
       "id": "BUG-382",
       "title": "",
       "events": 1
+    },
+    {
+      "id": "BUG-389",
+      "title": "MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank",
+      "events": 1
+    },
+    {
+      "id": "BUG-390",
+      "title": "(LOW, OPEN) - the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable",
+      "events": 3
+    },
+    {
+      "id": "BUG-391",
+      "title": "(HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force",
+      "events": 1
+    },
+    {
+      "id": "BUG-394",
+      "title": "(HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not ",
+      "events": 2
+    },
+    {
+      "id": "BUG-395",
+      "title": "(MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration",
+      "events": 2
+    },
+    {
+      "id": "BUG-398",
+      "title": "(MED, OPEN) - a receipt claimed a dated artifact that does not exist",
+      "events": 2
+    },
+    {
+      "id": "BUG-399",
+      "title": "(MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere",
+      "events": 2
+    },
+    {
+      "id": "BUG-400",
+      "title": "(HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22)",
+      "events": 1
+    },
+    {
+      "id": "BUG-401",
+      "title": "(MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit",
+      "events": 1
+    },
+    {
+      "id": "BUG-403",
+      "title": "(HIGH, OPEN) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED",
+      "events": 1
+    },
+    {
+      "id": "BUG-405",
+      "title": "(MED, OPEN) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403",
+      "events": 1
+    },
+    {
+      "id": "BUG-406",
+      "title": "(HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/",
+      "events": 1
+    },
+    {
+      "id": "BUG-411",
+      "title": "(LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else",
+      "events": 1
+    },
+    {
+      "id": "BUG-412",
+      "title": "(LOW, OPEN) - the archive index declares an absolute cloud path with no guard that it still resolves",
+      "events": 1
+    },
+    {
+      "id": "BUG-415",
+      "title": "(MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says re",
+      "events": 2
+    },
+    {
+      "id": "BUG-416",
+      "title": "(MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them",
+      "events": 2
     }
   ],
   "closed": [
@@ -449,6 +529,20 @@
     "BUG-383",
     "BUG-384",
     "BUG-385",
-    "BUG-386"
+    "BUG-386",
+    "BUG-387",
+    "BUG-388",
+    "BUG-392",
+    "BUG-393",
+    "BUG-396",
+    "BUG-397",
+    "BUG-402",
+    "BUG-404",
+    "BUG-407",
+    "BUG-408",
+    "BUG-409",
+    "BUG-410",
+    "BUG-413",
+    "BUG-414"
   ]
 }

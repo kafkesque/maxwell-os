@@ -628,3 +628,14 @@ S5 REVERIFY (optional), R3 GO (staged), laya (recommended DEFER), disk chore.
 | "a k-NN / retrieval arm is the cheap fix for discipline" | **DEAD, measured (D-345).** Loses on all three axes (-26.59 / -4.67 / -25.05 pp); 31/150 discipline rows tie. Separability ≠ deployability — D-345 |
 | "the 19 remaining ON flags enforce nothing, so bulk FLAGS OFF is a no-op" | **DEAD (BUG-385).** All 19 have readers; OFF would have silently disabled 9 capabilities. Registry 43 verified / 0 RED / 1 unregistered — D-339b |
 \n- k-NN/retrieval arm DEAD (D-345) | superseded by D-346 route contract | the quoting of ANCHOR-1 incumbent numbers is DEAD - re-score with scripts/incumbent_ruler_score.py (D-347).\n
+
+## ADDENDUM 2026-09-23 (D-352) - the abstention points were re-scored, and two of them changed
+
+NEW: sampling + reference audit of the ratified abstention points - governance/ABSTENTION_ROBUSTNESS_20260923.md,
+     scripts/abstention_robustness.py, config/abstention_robustness.yaml (deterministic, LLM-free, no new inference).
+NEW: BUG-391 (HIGH) the ratified discipline figure is not reproducible on the ruler in force (0.4741/116 legacy vs
+     0.5533/150 re-scored); BUG-392 (LOW, FIXED) two defects in the checker that produced this audit.
+SUPERSEDED-PENDING: the discipline point (-8.3 pp) and the content_type point (-4.2 pp) are marked supersession_pending
+     in config/verify_abstention.yaml; re-ratification on ANCHOR-3 is an OWNER CALL. enabled stays false.
+VERIFIED, UNCHANGED: the mechanism (the margin does discriminate: AUC 0.7035 [0.620, 0.785]; abstained-bucket error 0.711).
+UNCHANGED: no label, menu, definition or pipeline artifact was touched.

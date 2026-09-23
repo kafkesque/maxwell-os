@@ -98,6 +98,12 @@ if pol['drain_target_kind'] != 'machine_state':
     red.append('abstention: drain target is not a machine state -- human capacity would be the binding constraint')
 if pol['enabled'] is not False:
     red.append('abstention: enabled must stay false until a shadow run exists (D-339 receipt rule)')
+    sup = pol.get("re_measurement_20260923") if isinstance(pol, dict) else None
+    if sup:
+        if sup.get("status") == "supersession_pending" and pol.get("enabled") is not False:
+            red.append("abstention: a supersession_pending operating point must not be enabled (D-352)")
+        for f in sup.get("findings", []):
+            print("WARN abstention: supersession pending -", f)
 print(f'OK  abstention: drain {pol["drain_target"]} ({pol["drain_target_kind"]}), '
       f'{len(pol["operating_points"])} measured operating points, {len(pol["refused_axes"])} refused axis, sha256 match')
 

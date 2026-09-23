@@ -2827,3 +2827,35 @@ Two verdicts were derived from checks that could not resolve what they were chec
 
 ## BUG-390 (LOW, OPEN) - the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable
 scripts/definition_nli_verify.py scores discipline + domains + content_type only. There is no per-row extraction_type NLI score anywhere in governance/, and no persisted extraction_type margin in any arm artifact (all four bakeoff files are axis=discipline). Consequence: the extraction_type abstention operating point CANNOT be measured today and was NOT transplanted from another axis (D-349 refuses it). Fix direction: extend the R2 meter to the extraction_type axis over the frozen ruler (n=145, ~150 inference pairs, no model of the generator family involved) before any extraction_type threshold is set.
+
+
+## BUG-391 (HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force
+
+The D-312/D-349 discipline curve was measured with a denominator of n=116 and a base error of 0.4741. That figure
+cannot be reproduced from anything on disk. On the reconstructible reference set (the ruler sheet's own human
+discipline cells, 122 rows) the incumbent pairwise verifier scores 0.5000 (61/122); on ANCHOR-3 (ruler in force, 150
+rows) it scores 0.5533. 0.4741 = 55/116 and 61-6 = 55, so the 116-row denominator is a SUBSET of the reference in
+force whose 6 excluded rows were all incumbent errors, and the artifact that names those rows (the ANCHOR-1 sheet/key
+referenced by the anchor2 bakeoff spec) is not on disk. Consequence: the ratified numbers are legacy, not verified.
+
+Re-scored on the ruler in force (governance/ABSTENTION_ROBUSTNESS_20260923.json, paired bootstrap, 2000 draws):
+
+| axis | ratified | re-scored on the ruler in force |
+|---|---|---|
+| discipline | base 0.4741, abstain 25% -> 0.3910 (-8.3 pp) | base 0.5533, abstain 25% -> 0.5000 (-5.3 pp, CI [1.4, 10.3], P(gain>0)=0.995) |
+| content_type | base 0.3467, abstain 30% -> 0.3048 (-4.2 pp) | base 0.3467, abstain 30% -> 0.3048 (-4.2 pp, CI [-1.8, 8.9], P(gain>0)=0.908) |
+
+The MECHANISM survives (margin AUC 0.7035 [0.620, 0.785] on the ruler in force; abstained-bucket error 0.711 at 25%),
+but the content_type gain at the ratified point is indistinguishable from noise (P=0.908 < 0.95).
+
+Fix direction: re-ratify both operating points on ANCHOR-3, record the denominator, and require a bootstrap CI in the
+calibration artifact so a point estimate can never again be read as verified. Do NOT delete the legacy curve: keep it as
+provenance with a supersession pointer (R-D410).
+
+## BUG-392 (LOW, FIXED in session) - two defects in this session's own robustness checker
+
+(a) the bootstrap AUC interval fed constant scores to the rank-sum AUC, so it printed a false [1.0, 1.0] certainty; fixed
+by resampling rows and recomputing the AUC on the resampled scores. (b) the finding check only evaluated abstain rates in
+the configured grid, so the content_type ratified rate (30%) was silently NOT evaluated - the BUG-375 class (a check that
+cannot resolve what it must check); fixed by unioning the ratified rate from the calibration artifact into the grid. Both
+defects produced a checker that looked green on the thing it was supposed to catch.

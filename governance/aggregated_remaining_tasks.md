@@ -860,3 +860,14 @@ largest safe reclaim candidates (owner-only; never `pipeline/safe_delete.py`, BU
 - BUG-389 (MED, FIXED) two verdicts from unresolvable checks: RERANK IS ALREADY WIRED (retrieve.py:35/526 at
   HEAD 0182763) so the standing "RERANK WIRE" task is VOID; and the incumbent baseline was stale.
 - CARRY: G4a repoint-the-floors now has a measured reason (the ruler in force changed).
+
+## ADDENDUM 2026-09-23 (D-352) - the abstention points were re-scored, and two of them changed
+
+NEW: sampling + reference audit of the ratified abstention points - governance/ABSTENTION_ROBUSTNESS_20260923.md,
+     scripts/abstention_robustness.py, config/abstention_robustness.yaml (deterministic, LLM-free, no new inference).
+NEW: BUG-391 (HIGH) the ratified discipline figure is not reproducible on the ruler in force (0.4741/116 legacy vs
+     0.5533/150 re-scored); BUG-392 (LOW, FIXED) two defects in the checker that produced this audit.
+SUPERSEDED-PENDING: the discipline point (-8.3 pp) and the content_type point (-4.2 pp) are marked supersession_pending
+     in config/verify_abstention.yaml; re-ratification on ANCHOR-3 is an OWNER CALL. enabled stays false.
+VERIFIED, UNCHANGED: the mechanism (the margin does discriminate: AUC 0.7035 [0.620, 0.785]; abstained-bucket error 0.711).
+UNCHANGED: no label, menu, definition or pipeline artifact was touched.

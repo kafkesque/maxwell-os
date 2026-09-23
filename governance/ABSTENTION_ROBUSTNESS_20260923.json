@@ -1,0 +1,335 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-352",
+  "calibration_artifact": "governance/ABSTENTION_CALIBRATION_20260923.json",
+  "bakeoff_artifact": "governance/bakeoff_typed_decision_20260921.json",
+  "bakeoff_arm": "pairwise",
+  "bootstrap": {
+    "n_boot": 2000,
+    "seed": 20260923,
+    "alpha": 0.05
+  },
+  "abstain_grid": [
+    0.1,
+    0.25,
+    0.5
+  ],
+  "qualifier": "RELATIVE-ONLY (D-337). Intervals describe sampling noise on a frozen reference, not absolute accuracy.",
+  "combinations": {
+    "discipline|ruler_sheet_raw": {
+      "n": 122,
+      "auc_margin_vs_correct": 0.7275,
+      "base_error": 0.5,
+      "points": [
+        {
+          "abstain_rate": 0.0,
+          "n_abstained": 0,
+          "n_kept": 122,
+          "selective_error": 0.5,
+          "selective_error_ci": [
+            0.4098,
+            0.582
+          ],
+          "delta_vs_base_pp": 0.0,
+          "delta_vs_base_pp_ci": [
+            0.0,
+            0.0
+          ],
+          "prob_delta_gt_zero": 0.0,
+          "abstained_bucket_error": null,
+          "abstained_bucket_error_ci": null
+        },
+        {
+          "abstain_rate": 0.1,
+          "n_abstained": 12,
+          "n_kept": 110,
+          "selective_error": 0.4545,
+          "selective_error_ci": [
+            0.3545,
+            0.5455
+          ],
+          "delta_vs_base_pp": 4.55,
+          "delta_vs_base_pp_ci": [
+            2.46,
+            6.08
+          ],
+          "prob_delta_gt_zero": 1.0,
+          "abstained_bucket_error": 0.9167,
+          "abstained_bucket_error_ci": [
+            0.75,
+            1.0
+          ]
+        },
+        {
+          "abstain_rate": 0.25,
+          "n_abstained": 30,
+          "n_kept": 92,
+          "selective_error": 0.4022,
+          "selective_error_ci": [
+            0.3043,
+            0.5
+          ],
+          "delta_vs_base_pp": 9.78,
+          "delta_vs_base_pp_ci": [
+            4.31,
+            14.38
+          ],
+          "prob_delta_gt_zero": 0.999,
+          "abstained_bucket_error": 0.8,
+          "abstained_bucket_error_ci": [
+            0.6,
+            0.9342
+          ]
+        },
+        {
+          "abstain_rate": 0.5,
+          "n_abstained": 61,
+          "n_kept": 61,
+          "selective_error": 0.3279,
+          "selective_error_ci": [
+            0.2131,
+            0.4754
+          ],
+          "delta_vs_base_pp": 17.21,
+          "delta_vs_base_pp_ci": [
+            6.56,
+            24.59
+          ],
+          "prob_delta_gt_zero": 0.9985,
+          "abstained_bucket_error": 0.6721,
+          "abstained_bucket_error_ci": [
+            0.541,
+            0.7869
+          ]
+        }
+      ],
+      "auc_ci": [
+        0.6352,
+        0.8126
+      ],
+      "operating_point_abstain_rate": 0.25
+    },
+    "discipline|ruler_in_force": {
+      "n": 150,
+      "auc_margin_vs_correct": 0.7035,
+      "base_error": 0.5533,
+      "points": [
+        {
+          "abstain_rate": 0.0,
+          "n_abstained": 0,
+          "n_kept": 150,
+          "selective_error": 0.5533,
+          "selective_error_ci": [
+            0.4733,
+            0.6333
+          ],
+          "delta_vs_base_pp": -0.0,
+          "delta_vs_base_pp_ci": [
+            0.0,
+            0.0
+          ],
+          "prob_delta_gt_zero": 0.0,
+          "abstained_bucket_error": null,
+          "abstained_bucket_error_ci": null
+        },
+        {
+          "abstain_rate": 0.1,
+          "n_abstained": 15,
+          "n_kept": 135,
+          "selective_error": 0.5259,
+          "selective_error_ci": [
+            0.4444,
+            0.6148
+          ],
+          "delta_vs_base_pp": 2.74,
+          "delta_vs_base_pp_ci": [
+            -0.3,
+            4.96
+          ],
+          "prob_delta_gt_zero": 0.962,
+          "abstained_bucket_error": 0.8,
+          "abstained_bucket_error_ci": [
+            0.5333,
+            1.0
+          ]
+        },
+        {
+          "abstain_rate": 0.25,
+          "n_abstained": 38,
+          "n_kept": 112,
+          "selective_error": 0.5,
+          "selective_error_ci": [
+            0.4018,
+            0.5893
+          ],
+          "delta_vs_base_pp": 5.33,
+          "delta_vs_base_pp_ci": [
+            1.37,
+            10.26
+          ],
+          "prob_delta_gt_zero": 0.9945,
+          "abstained_bucket_error": 0.7105,
+          "abstained_bucket_error_ci": [
+            0.5789,
+            0.8684
+          ]
+        },
+        {
+          "abstain_rate": 0.5,
+          "n_abstained": 75,
+          "n_kept": 75,
+          "selective_error": 0.3867,
+          "selective_error_ci": [
+            0.28,
+            0.52
+          ],
+          "delta_vs_base_pp": 16.66,
+          "delta_vs_base_pp_ci": [
+            7.33,
+            23.33
+          ],
+          "prob_delta_gt_zero": 0.9995,
+          "abstained_bucket_error": 0.72,
+          "abstained_bucket_error_ci": [
+            0.6133,
+            0.8133
+          ]
+        }
+      ],
+      "auc_ci": [
+        0.6204,
+        0.7849
+      ],
+      "operating_point_abstain_rate": 0.25
+    },
+    "content_type|ruler_in_force": {
+      "n": 150,
+      "auc_margin_vs_correct": 0.641,
+      "base_error": 0.3467,
+      "points": [
+        {
+          "abstain_rate": 0.0,
+          "n_abstained": 0,
+          "n_kept": 150,
+          "selective_error": 0.3467,
+          "selective_error_ci": [
+            0.2733,
+            0.4267
+          ],
+          "delta_vs_base_pp": 0.0,
+          "delta_vs_base_pp_ci": [
+            0.0,
+            0.0
+          ],
+          "prob_delta_gt_zero": 0.0,
+          "abstained_bucket_error": null,
+          "abstained_bucket_error_ci": null
+        },
+        {
+          "abstain_rate": 0.1,
+          "n_abstained": 15,
+          "n_kept": 135,
+          "selective_error": 0.363,
+          "selective_error_ci": [
+            0.2889,
+            0.4519
+          ],
+          "delta_vs_base_pp": -1.63,
+          "delta_vs_base_pp_ci": [
+            -3.93,
+            1.19
+          ],
+          "prob_delta_gt_zero": 0.093,
+          "abstained_bucket_error": 0.2,
+          "abstained_bucket_error_ci": [
+            0.0,
+            0.4667
+          ]
+        },
+        {
+          "abstain_rate": 0.25,
+          "n_abstained": 38,
+          "n_kept": 112,
+          "selective_error": 0.3304,
+          "selective_error_ci": [
+            0.2321,
+            0.4107
+          ],
+          "delta_vs_base_pp": 1.63,
+          "delta_vs_base_pp_ci": [
+            -2.37,
+            7.0
+          ],
+          "prob_delta_gt_zero": 0.8485,
+          "abstained_bucket_error": 0.3947,
+          "abstained_bucket_error_ci": [
+            0.2632,
+            0.5789
+          ]
+        },
+        {
+          "abstain_rate": 0.3,
+          "n_abstained": 45,
+          "n_kept": 105,
+          "selective_error": 0.3048,
+          "selective_error_ci": [
+            0.219,
+            0.4
+          ],
+          "delta_vs_base_pp": 4.19,
+          "delta_vs_base_pp_ci": [
+            -1.81,
+            8.86
+          ],
+          "prob_delta_gt_zero": 0.908,
+          "abstained_bucket_error": 0.4444,
+          "abstained_bucket_error_ci": [
+            0.2889,
+            0.5778
+          ]
+        },
+        {
+          "abstain_rate": 0.5,
+          "n_abstained": 75,
+          "n_kept": 75,
+          "selective_error": 0.24,
+          "selective_error_ci": [
+            0.12,
+            0.3467
+          ],
+          "delta_vs_base_pp": 10.67,
+          "delta_vs_base_pp_ci": [
+            3.33,
+            19.33
+          ],
+          "prob_delta_gt_zero": 0.996,
+          "abstained_bucket_error": 0.4533,
+          "abstained_bucket_error_ci": [
+            0.36,
+            0.5737
+          ]
+        }
+      ],
+      "auc_ci": [
+        0.5484,
+        0.7299
+      ],
+      "operating_point_abstain_rate": 0.30000000000000004
+    }
+  },
+  "reproduction": {
+    "legacy_reference": "ruler_sheet_raw",
+    "recorded_base_error": 0.4741,
+    "rescored_base_error": 0.5,
+    "tolerance": 0.02,
+    "reproduced": false,
+    "recorded_n": 116,
+    "rescored_n": 122,
+    "reconcile_note": "0.4741 = 55/116 and the reconstructible superset is 61/122: the legacy denominator is a 116-row SUBSET whose 6 excluded rows were all incumbent errors, and the artifact that defines them is not on disk"
+  },
+  "findings": [
+    "content_type: the ratified operating point's gain CI includes 0 on the ruler in force [-1.81, 8.86]",
+    "content_type: P(gain>0) = 0.908 at the ratified operating point (<0.95)",
+    "NOT REPRODUCIBLE: the ratified discipline base error 0.4741 (n=116) cannot be reproduced on the legacy reference. On every reconstructible subset the incumbent scores 0.5 (n=122); the 116-row denominator needs 6 rows whose identity is not recorded anywhere on disk, so the ratified curve was measured on a SUBSET of the reference now in force. Re-ratify the discipline operating point on the ruler in force (D-347)"
+  ]
+}

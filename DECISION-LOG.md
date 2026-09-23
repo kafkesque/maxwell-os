@@ -406,3 +406,23 @@ growth_edge entry criterion BUG-230; process_template = FB->PT->PI->Recipe primi
 Replaced by an enforced queue-closure rule: on a constant axis every non-constant menu label except the declared
 abstention label must be queued - scripts/verify_menu_policy.py (12th just health check).
 New/updated: scripts/r2_gate_measure.py + config/r2_gate_measure.yaml; scripts/menu_merge_map.py + config/menu_merge_map.yaml; scripts/verify_menu_policy.py; config/verify_abstention.yaml (v2 abstention_policy append); config/menu_v6_merge_map.yaml; governance/R2_GATE_MEASUREMENT_20260923.{json,md}; governance/MENU_MERGE_MAP_20260923.{json,md}; governance/ABSTENTION_CALIBRATION_20260923.json; governance/CLASSIFICATION_LEVERS_20260923.md.
+
+## D-352 - The ratified abstention points do not survive a D-347 re-score (MEASUREMENT, 2026-09-23)
+
+Paired bootstrap (2000 draws, seed 20260923) of the D-349 operating points, plus a D-347 re-score of the incumbent on the
+reference in force. Artifacts: scripts/abstention_robustness.py, config/abstention_robustness.yaml,
+governance/ABSTENTION_ROBUSTNESS_20260923.json/.md. No model, no LLM, no new inference.
+
+1. The mechanism is real: the incumbent verifier margin discriminates (AUC 0.7035 [0.620, 0.785] on the ruler in force;
+   AUC 0.7275 [0.635, 0.813] on the ruler sheet's human cells), and the abstained bucket concentrates the errors
+   (0.711 error at 25% abstained vs 0.553 base).
+2. The ratified DISCIPLINE point is over-stated: -8.3 pp becomes -5.33 pp at 25% abstain on the ruler in force
+   (CI [1.37, 10.26], P(gain>0)=0.9945). Still a real gain, but half the ratified size, and the ratified base error
+   0.4741 (n=116) is not reproducible (BUG-391: the 116-row denominator is an unreconstructible subset).
+3. The ratified CONTENT_TYPE point is NOT established: at 30% abstain the gain is 4.19 pp with CI [-1.81, 8.86] and
+   P(gain>0)=0.908 - below the 0.95 bar. Only at 50% abstain does content_type clear zero (10.67 pp, CI [3.33, 19.33]).
+4. Absolute claims remain impossible (D-337): the base-error CI alone is +-0.08 on n=150, so only relative ranking counts.
+
+Consequence: config/verify_abstention.yaml carries a re_measurement_20260923 block with status supersession_pending;
+enabled stays false. Re-ratification of both points on ANCHOR-3 is an owner call. The legacy curve is retained as
+provenance (R-D410, append-only).

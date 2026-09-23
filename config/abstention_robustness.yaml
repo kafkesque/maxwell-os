@@ -1,0 +1,54 @@
+# config/abstention_robustness.yaml - bootstrap error bars + reference-drift check on the ratified
+# abstention points (D-352)
+# =============================================================================
+# WHY: D-349/D-348 ratified two operating points as POINT estimates (discipline n=116,
+# content_type n=150). Two things are unverified about them and this file configures the
+# check for both:
+#   1. SAMPLING NOISE - a point estimate on 116/150 rows carries no interval.
+#   2. REFERENCE DRIFT - the discipline curve was measured against a reference (the ruler
+#      sheet's raw human cells) that the F-11 consolidation SUPERSEDED (D-347). The
+#      incumbent must be RE-SCORED on the ruler in force, never quoted (D-347).
+# C12: every path, column name, seed and grid value lives here, none in the script.
+# C16: a missing declared input refuses; a reproduction mismatch is reported LOUD and the
+#      run continues (exit 2), because detecting that mismatch is the point of the check.
+# =============================================================================
+schema_version: "1.0"
+decision: D-352
+
+calibration_artifact: governance/ABSTENTION_CALIBRATION_20260923.json   # operating points READ from here, never retyped
+r2_artifact: governance/r2_definition_nli_20260920_v2.json
+bakeoff_artifact: governance/bakeoff_typed_decision_20260921.json
+bakeoff_arm: pairwise
+output_json: governance/ABSTENTION_ROBUSTNESS_20260923.json
+output_md: governance/ABSTENTION_ROBUSTNESS_20260923.md
+
+# reference (truth) variants - the whole point is that these are NOT interchangeable
+references:
+  ruler_sheet_raw:                        # the reference the D-312 curve was measured against (legacy)
+    path: governance/RULER_BLIND_SHEET_20260917.csv
+    discipline_column: "DISC (1-62)"
+  ruler_in_force:                         # ANCHOR-3, the only reference allowed to rank arms today
+    path: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+    discipline_column: discipline_final
+    content_type_column: content_type_final
+    human_present_column: discipline_human_present
+    human_present_value: "yes"
+
+axes:
+  discipline:   {score: margin,        primary_reference: ruler_in_force, bootstrap_reference: ruler_sheet_raw}
+  content_type: {score: r2_max_entail, primary_reference: ruler_in_force}
+
+abstain_grid: [0.1, 0.25, 0.5]
+
+bootstrap:
+  n_boot: 2000
+  seed: 20260923
+  alpha: 0.05
+
+reproduction_check:
+  discipline_base_error_legacy: 0.4741     # recorded by ABSTENTION_DESIGN_20260921.md (n=116)
+  tolerance: 0.02
+  on_mismatch: report_and_rescore
+  rule: "the legacy figure must be reproduced on the LEGACY reference; a gap means the ratified operating point has drifted and must be re-ratified (D-347)"
+
+qualifier: "RELATIVE-ONLY (D-337). Intervals describe sampling noise on a frozen reference, not absolute accuracy."

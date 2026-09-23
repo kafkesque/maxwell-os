@@ -7748,6 +7748,13 @@ decisions:
   status: RESOLVED
   date: 2026-09-23
 
+- id: D-352
+  title: "Abstention operating points re-scored on the ruler in force (D-347): the mechanism survives (margin AUC 0.7035 [0.620,0.785]), the ratified discipline point is over-stated (-8.3pp -> -5.33pp at 25% abstain, CI [1.4,10.3]), the ratified content_type point is indistinguishable from noise (4.19pp, CI [-1.8,8.9], P(gain>0)=0.908), and the 0.4741/116 denominator is unreconstructible (BUG-391). Paired bootstrap, no new inference."
+  category: MEASUREMENT
+  status: RESOLVED
+  date: 2026-09-23
+  artifacts: [scripts/abstention_robustness.py, config/abstention_robustness.yaml, governance/ABSTENTION_ROBUSTNESS_20260923.json]
+  supersedes_note: "the discipline and content_type operating points in governance/ABSTENTION_CALIBRATION_20260923.json are marked supersession_pending, not deleted (R-D410)"
 - id: D-348
   title: "R2 definition-anchored NLI as a precision gate: content_type AUC 0.6410, flagged error 0.4483 vs unflagged
     0.2826, selective 0.3048 at 70% coverage; discipline AUC 0.5348 = NO signal. Measured on the existing 7995-FB artifact."

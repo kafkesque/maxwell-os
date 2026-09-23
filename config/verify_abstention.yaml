@@ -49,3 +49,20 @@ abstention_policy:
     human_capacity_gate: superseded_by_machine_state_drain
     shadow_run: null                    # the ONE remaining gate item
   qualifier: "RELATIVE-ONLY (D-337). Selective error measured on a frozen reference; no absolute floor certified."
+
+  # APPENDED 2026-09-23 (D-352/BUG-391) - append-only; the ratified block above is kept as provenance (R-D410)
+  re_measurement_20260923:
+    decision: D-352
+    status: supersession_pending            # owner re-ratification required on ANCHOR-3
+    artifact: governance/ABSTENTION_ROBUSTNESS_20260923.json
+    method: "paired bootstrap, 2000 draws, seed 20260923, relative deltas only (D-337)"
+    ruler_in_force_base_error: {discipline: 0.5533, content_type: 0.3467}
+    superseded_points:
+      discipline:   {ratified: "-8.3 pp at 25% abstain (base 0.4741, n=116)", rescored: "-5.33 pp at 25% abstain (base 0.5533, n=150)", ci_pp: [1.37, 10.26], prob_gain_gt_zero: 0.9945, standing: survives, note: "the ratified base was drawn from an unreconstructible 116-row subset (BUG-391)"}
+      content_type: {ratified: "-4.2 pp at 30% abstain", rescored: "-4.19 pp at 30% abstain", ci_pp: [-1.81, 8.86], prob_gain_gt_zero: 0.908, standing: not_established, note: "clears zero only at 50% abstain (10.67 pp, CI [3.33, 19.33])"}
+    mechanism_verified: {margin_auc_ruler_in_force: 0.7035, auc_ci: [0.6204, 0.7849], abstained_bucket_error_at_25pct: 0.7105}
+    findings:
+      - "discipline: the base error and the gain were over-stated (D-347 re-score)"
+      - "content_type: the gain at the ratified point is below the 0.95 bar"
+      - "BUG-391: the 0.4741/116 denominator is unreconstructible from disk"
+    enable_rule: "enabled stays false; a shadow run AND re-ratification on ANCHOR-3 are both required before ANY flip"

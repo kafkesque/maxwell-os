@@ -7755,6 +7755,12 @@ decisions:
   date: 2026-09-23
   artifacts: [scripts/abstention_robustness.py, config/abstention_robustness.yaml, governance/ABSTENTION_ROBUSTNESS_20260923.json]
   supersedes_note: "the discipline and content_type operating points in governance/ABSTENTION_CALIBRATION_20260923.json are marked supersession_pending, not deleted (R-D410)"
+- id: D-353
+  title: "Abstention re-ratified on the ruler in force by the LOWER-CI-bound rule: discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10.26]); content_type REJECTED at its ratified point (CI [-1.81,8.86]) and only available at 50% abstain as a coverage/product decision. Recalibration trigger added (digest pins + verify_recalibration_pins.py wired into just health). Coverage SLA and served-stream honesty recorded as open owner gates."
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+  artifacts: [config/verify_abstention.yaml, config/recalibration_pins.yaml, scripts/verify_recalibration_pins.py]
 - id: D-348
   title: "R2 definition-anchored NLI as a precision gate: content_type AUC 0.6410, flagged error 0.4483 vs unflagged
     0.2826, selective 0.3048 at 70% coverage; discipline AUC 0.5348 = NO signal. Measured on the existing 7995-FB artifact."

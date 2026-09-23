@@ -639,3 +639,12 @@ SUPERSEDED-PENDING: the discipline point (-8.3 pp) and the content_type point (-
      in config/verify_abstention.yaml; re-ratification on ANCHOR-3 is an OWNER CALL. enabled stays false.
 VERIFIED, UNCHANGED: the mechanism (the margin does discriminate: AUC 0.7035 [0.620, 0.785]; abstained-bucket error 0.711).
 UNCHANGED: no label, menu, definition or pipeline artifact was touched.
+
+## ADDENDUM 2026-09-23 (D-353) - audit (b): one HIGH wiring claim was false, and the abstention points were re-ratified
+
+FIXED: BUG-393 - `just health` did not run the two menu checkers it was reported to run; all three are wired now.
+NEW: config/recalibration_pins.yaml + scripts/verify_recalibration_pins.py (the BUG-391 class: a measurement must not survive a change to its own reference).
+RE-RATIFIED: D-353 - discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10.26]); content_type rejected at 30% (CI [-1.81,8.86]).
+SUPERSEDED (pointer only, protected files NOT rewritten): the 0.4741/116 figures in eval_integrity/incumbent_ruler_score/knn_arm/REPRESENTABILITY_SWEEP/R3_HELDOUT_RESULT.
+DANGLING: ANCHOR1 sheet/key are cited by 7 artifacts and do not exist (blocks the R3 held-out run); temp/ consolidation inputs are untracked.
+AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).

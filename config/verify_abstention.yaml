@@ -53,7 +53,7 @@ abstention_policy:
   # APPENDED 2026-09-23 (D-352/BUG-391) - append-only; the ratified block above is kept as provenance (R-D410)
   re_measurement_20260923:
     decision: D-352
-    status: supersession_pending            # owner re-ratification required on ANCHOR-3
+    status: ratified_rescored                # owner accepted the D-353 re-rating 2026-09-23 (receipt below)
     artifact: governance/ABSTENTION_ROBUSTNESS_20260923.json
     method: "paired bootstrap, 2000 draws, seed 20260923, relative deltas only (D-337)"
     ruler_in_force_base_error: {discipline: 0.5533, content_type: 0.3467}
@@ -66,3 +66,15 @@ abstention_policy:
       - "content_type: the gain at the ratified point is below the 0.95 bar"
       - "BUG-391: the 0.4741/116 denominator is unreconstructible from disk"
     enable_rule: "enabled stays false; a shadow run AND re-ratification on ANCHOR-3 are both required before ANY flip"
+  # APPENDED 2026-09-23 (D-353) - the re-scored points, chosen by the LOWER CI bound rule, not the point estimate
+  re_ratification_20260923:
+    decision: D-353
+    receipt: {config_sha256_before: ada2be0027f78fccd3127ccbcf08a5224e42526f1517614673f8fd85b0d03d13, replaced_field: "re_measurement_20260923.status"}
+    rule: "an operating point is adopted only if the bootstrap LOWER bound of its gain is > 0 on the ruler in force (D-352)"
+    adopted:
+      discipline: {abstain_rate: 0.25, selective_error: 0.5, gain_pp: 5.33, ci_pp: [1.37, 10.26], lower_bound_pp: 1.37, verdict: adopted, note: "the ratified -8.3 pp is superseded; the base error is 0.5533, not 0.4741 (BUG-391)"}
+    rejected:
+      content_type: {abstain_rate: 0.30, gain_pp: 4.19, ci_pp: [-1.81, 8.86], lower_bound_pp: -1.81, verdict: rejected, reason: "lower bound < 0 - indistinguishable from noise at the ratified point (P(gain>0)=0.908)", alternative: "50% abstain gives 10.67 pp, CI [3.33, 19.33], but that is a coverage product decision, not an accuracy claim"}
+    coverage_cost: {discipline: "25% of rows stop being served; the abstained bucket is 71% wrong, so ~29% of it is wasted work"}
+    coverage_sla: null                  # OWNER GATE: the minimum fraction of rows that MUST still be served; without it this lever cannot be flipped
+    served_stream_honesty: "at the adopted point the served stream is still ~50% wrong against an advisory reference - this is a risk control, NOT an accuracy claim"

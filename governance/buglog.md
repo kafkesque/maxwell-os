@@ -2859,3 +2859,13 @@ by resampling rows and recomputing the AUC on the resampled scores. (b) the find
 the configured grid, so the content_type ratified rate (30%) was silently NOT evaluated - the BUG-375 class (a check that
 cannot resolve what it must check); fixed by unioning the ratified rate from the calibration artifact into the grid. Both
 defects produced a checker that looked green on the thing it was supposed to catch.
+
+
+## BUG-393 (HIGH, FIXED this session) - just health did not run the menu checkers it was claimed to run
+
+verify_menu_routing.py and verify_menu_policy.py were reported as health checks (D-346/D-350), but the health
+recipe contained only 5 verify_* lines and no recipe mentioned them at all: a governance claim contradicted by
+the artifact it described. Any session that read "just health 12/12" was reading a check that never ran.
+Fix: both checkers plus the new verify_recalibration_pins.py are now wired into just health with || exit 1.
+Lesson (BUG-375 class): a wiring claim must be verified by RUNNING the recipe and reading its output, never by
+the diff that was supposed to contain the edit.

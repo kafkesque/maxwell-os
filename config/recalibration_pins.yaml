@@ -1,0 +1,29 @@
+schema_version: '1.0'
+decision: D-353
+rule: any change to a pinned artifact requires a NEW decision id in config/decisions.yaml;
+  the checker goes RED otherwise
+pins:
+  ruler_in_force:
+    path: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+    sha256: 29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698
+    decision: D-337
+  abstention_calibration:
+    path: governance/ABSTENTION_CALIBRATION_20260923.json
+    sha256: cf9400036681fb579f243be151c215463842a3bc02bf21783b4fc08a0cd96e78
+    decision: D-349
+  r2_meter:
+    path: scripts/definition_nli_verify.py
+    sha256: 9be67c378aad01c62f57f0161a8d0d368cc6bcc50a3f1172ccf171c0ee0b11aa
+    decision: D-284
+  menu:
+    path: config/closed_menu_v5.json
+    sha256: bc53770103595f2a3674ced132e04297e87b590f6d7fb141c7eac6351c680544
+    decision: D-279
+  abstention_policy:
+    path: config/verify_abstention.yaml
+    sha256: fcf96d92bddab771b066c2fa9b9b8ea6e1087685eaebf5700ac738ec59683972
+    decision: D-353
+  robustness_meter:
+    path: scripts/abstention_robustness.py
+    sha256: 0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f
+    decision: D-352

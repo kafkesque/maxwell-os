@@ -775,3 +775,12 @@ hygiene, S5 REVERIFY (optional), R3 GO (staged), laya (DEFER), disk. Open bugs: 
 - BUG-389 (MED, FIXED) two verdicts from unresolvable checks: RERANK IS ALREADY WIRED (retrieve.py:35/526 at
   HEAD 0182763) so the standing "RERANK WIRE" task is VOID; and the incumbent baseline was stale.
 - CARRY: G4a repoint-the-floors now has a measured reason (the ruler in force changed).
+
+## ADDENDUM 2026-09-23 (D-353) - audit (b): one HIGH wiring claim was false, and the abstention points were re-ratified
+
+FIXED: BUG-393 - `just health` did not run the two menu checkers it was reported to run; all three are wired now.
+NEW: config/recalibration_pins.yaml + scripts/verify_recalibration_pins.py (the BUG-391 class: a measurement must not survive a change to its own reference).
+RE-RATIFIED: D-353 - discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10.26]); content_type rejected at 30% (CI [-1.81,8.86]).
+SUPERSEDED (pointer only, protected files NOT rewritten): the 0.4741/116 figures in eval_integrity/incumbent_ruler_score/knn_arm/REPRESENTABILITY_SWEEP/R3_HELDOUT_RESULT.
+DANGLING: ANCHOR1 sheet/key are cited by 7 artifacts and do not exist (blocks the R3 held-out run); temp/ consolidation inputs are untracked.
+AUDIT: governance/FORENSIC_AUDIT_20260923b.md (F1..F15).

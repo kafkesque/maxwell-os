@@ -426,3 +426,16 @@ governance/ABSTENTION_ROBUSTNESS_20260923.json/.md. No model, no LLM, no new inf
 Consequence: config/verify_abstention.yaml carries a re_measurement_20260923 block with status supersession_pending;
 enabled stays false. Re-ratification of both points on ANCHOR-3 is an owner call. The legacy curve is retained as
 provenance (R-D410, append-only).
+
+
+D-353: Abstention re-ratified by the lower-CI-bound rule; recalibration trigger added
+
+## D-353 - Abstention re-ratified on the ruler in force; a recalibration trigger now exists (2026-09-23)
+
+1. Adopted: discipline, 25% abstain (served error 0.5000 vs base 0.5533, gain 5.33 pp, CI [1.37, 10.26]).
+2. Rejected: content_type at 30% abstain (gain 4.19 pp, CI [-1.81, 8.86]) - lower bound below zero.
+3. Rule: a point is adopted only when the bootstrap LOWER bound of its gain is > 0 (no point-estimate adoption).
+4. Trigger: config/recalibration_pins.yaml + scripts/verify_recalibration_pins.py, wired into just health; if the
+   ruler, the calibration, the R2 meter, the menu or the meters change without a new decision id, the check is RED.
+5. Open owner gates recorded in config/verify_abstention.yaml: coverage_sla is null, enabled stays false,
+   and the served stream is explicitly documented as ~50% wrong (risk control, not accuracy).

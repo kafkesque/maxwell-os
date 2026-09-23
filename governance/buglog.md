@@ -3410,3 +3410,22 @@ and archive/vision_probe.py as disposition 'keep' with authority null and the re
 classify it in config/archive_index.yaml by hand". A rule set that answers "keep" when it does not know is not
 a rule set; a default must be explicit and attributable. Survives the Gate E purge (34 -> 31 entries): 12 rules
 matched, 3 did not. Fix: add explicit rules to config/archive_index.yaml with an authority for each.
+
+## BUG-414 (HIGH, FIXED-DOCUMENTED 2026-09-23) - the A2 reclaim list's largest candidate WAS the served generator
+governance/MODEL_STORE_RECLAIM_A2_20260923.md classified ~/.cache/huggingface/hub as a stale
+cache and listed its 32.8 GB generator repo as "probable DUPLICATE of the generator repo -
+confirm by digest". It is not a duplicate: ~/.omlx/models/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+is a SYMLINK to that repo's snapshots/main. Five of the seven served models resolve into the
+hf hub, and du reports 0 MB for a symlink and the full size for its target, which is exactly
+how the store came to look like a cache. Deleting the list's first entry would have deleted
+the generator, and the proposed "digest" test would have CONFIRMED the deletion as safe,
+because a digest test compares the two paths of ONE model and finds them identical.
+ROOT CAUSE: classification by directory name plus du, instead of by resolution (readlink plus
+the served-model list). The stop point (list-first, no byte moved) is the only reason this was
+caught.
+FIX: governance/MODEL_STORE_RECLAIM_A2_CORRECTED_20260923.md (resolution-first list, hf hub
+moved to KEEP, one genuine internal duplicate identified: repo blobs/ 16.4 GB with two
+.incomplete files versus snapshots/main 16.4 GB), CORRECTION block appended to the original,
+and the rule amended: a store is classified by RESOLUTION, never by name and never by du.
+ALSO CORRECTED: ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit (3.9 GB) holds the SERVED
+Phi probe; ~/.omlx/_unloaded/* are empty; ~/.omlx/cache is a live cache, not a store.

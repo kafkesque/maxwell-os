@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**77 open** / 55 closed of 132 ids.
+**93 open** / 67 closed of 160 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -84,3 +84,19 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-380 |  | 1 |
 | BUG-381 |  | 1 |
 | BUG-382 |  | 1 |
+| BUG-389 | MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank | 1 |
+| BUG-390 | (LOW, OPEN) - the R2 meter cannot speak about extraction_type, so owner call 2 was unmeasurable | 3 |
+| BUG-391 | (HIGH, OPEN) - the ratified abstention operating point is not reproducible on the ruler in force | 1 |
+| BUG-394 | (HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not  | 2 |
+| BUG-395 | (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration | 2 |
+| BUG-398 | (MED, OPEN) - a receipt claimed a dated artifact that does not exist | 2 |
+| BUG-399 | (MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere | 2 |
+| BUG-400 | (HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22) | 1 |
+| BUG-401 | (MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit | 1 |
+| BUG-402 | (LOW, OPEN) - `last_sync` in config/decisions.yaml has no sanctioned writer, and it is now stale | 1 |
+| BUG-403 | (HIGH, OPEN) - stage4.depth_model carries a HARDCODED code default naming the one model whose depth route is REFUTED | 1 |
+| BUG-405 | (MED, OPEN) - the flag registry DENIES the one consumer that exists, and that denial is what masked BUG-403 | 1 |
+| BUG-406 | (HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/ | 1 |
+| BUG-410 | (MED, OPEN) - T2_GATE and T3_GATE are assigned a model that is not served and not on disk | 1 |
+| BUG-411 | (LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else | 1 |
+| BUG-412 | (LOW, OPEN) - the archive index declares an absolute cloud path with no guard that it still resolves | 1 |

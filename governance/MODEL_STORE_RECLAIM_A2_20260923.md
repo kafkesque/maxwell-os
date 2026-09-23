@@ -62,3 +62,42 @@ while oMLX runs; it can only be reclaimed by removing models from the server's o
   store and confirm the model ANSWERS, then reclaim.
 - `~/.omlx/cache` is not prunable by name and is live. Touch it last, server stopped.
 - The KEEP set above is the floor: 84 GB of the 280 GB is genuinely in use.
+
+---
+## CORRECTION 2026-09-23 (same day, BEFORE any byte moved) - BUG-414
+
+The RECLAIM CANDIDATES list above is WRONG for the hf-hub block, including its
+first and largest entry. Nothing was deleted, so nothing was lost.
+
+MECHANISM (why the original list was wrong): `~/.omlx/models/<name>` entries are
+SYMLINKS into ~/.cache/huggingface/hub. `du` reports 0 MB for a symlink and the
+full size for its target, so the hf hub read as a stale "cache" while it is in
+fact the SERVING STORE. Measured resolution (readlink + /v1/models):
+
+| served model (OMLX :11435) | resolves to |
+|---|---|
+| Qwen3-Coder-30B-A3B-Instruct-MLX-4bit (GENERATOR) | hf hub lmstudio-community--Qwen3-Coder-30B.../snapshots/main |
+| gpt-oss-20b-MXFP4-Q8 (CLASSIFIER/VERIFIER) | hf hub mlx-community--gpt-oss-20b-MXFP4-Q8/snapshots/<sha> |
+| gemma-4-E4B-it-MLX-4bit (REVIEWER) | hf hub lmstudio-community--gemma-4-E4B-it-MLX-4bit/snapshots/main |
+| Ornith-1.5-35B-A3B-REAP-19B | hf hub mlx-community--Ornith-1.5-35B.../snapshots/<sha> |
+| Ornith-1.5-9B-MLX-8bit | hf hub ornith-ai--Ornith-1.5-9B-MLX-8bit/snapshots/<sha> |
+| Phi-4-mini-instruct-8bit | ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit (REAL bytes, 3.9 GB) |
+| Qwen3.8-27B-MLX-4bit | ~/.omlx/models/Qwen3.8-27B-MLX-4bit (REAL bytes, 15.3 GB) |
+
+CONSEQUENCE: the hf hub is KEEP, not a candidate. Deleting the 32.8 GB entry
+labelled "probable duplicate of the generator repo" would have deleted the
+generator. The apparent duplicate was ONE model counted under two paths.
+
+The only genuine duplicate inside that repo: `blobs/` (16.4 GB, contains two
+`.incomplete` files from an interrupted download) versus `snapshots/main/`
+(16.4 GB, the real files that the served symlink resolves to). refs/main points
+at the OTHER snapshot (bbecedef..., symlink layer into blobs), which is why the
+two copies exist. Reclaiming blobs/ requires: server stopped, symlink re-resolved,
+no cross-repo blob references, then a load-and-answer probe.
+
+Also corrected: ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit holds the SERVED
+Phi probe (3.9 GB) - keep. ~/.omlx/_unloaded/* are all 0 MB (empty dirs) - free.
+~/.omlx/cache (92.5 GB) is the live content-addressed runtime cache - not a store.
+
+RULE DERIVED (amends D-369): a model store is classified by RESOLUTION -
+readlink plus the served-model list - never by directory name and never by du.

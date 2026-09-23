@@ -1,0 +1,122 @@
+# config/menu_routing.yaml — D-343 routing table as CONFIG (MENU COARSEN GO, owner ruling 2026-09-23)
+# =============================================================================
+# WHY: representability (D-343) says WHICH axes a classifier can separate in the
+# representation the pipeline actually uses. Measured evidence:
+# governance/REPRESENTABILITY_SWEEP_20260923.json (generator: deterministic numpy).
+# This file turns that table into an ENFORCED routing contract so the pipeline
+# cannot silently keep publishing labels an axis cannot support (D-275a/D-300).
+#
+# C12: no axis, threshold, path or label in the script — all of it is here.
+# C16: scripts/verify_menu_routing.py fails CLOSED on any mismatch.
+# BUG-342: the measured numbers below are QUOTED from the sweep artifact; the checker
+# asserts they still equal the artifact (so this file cannot rot silently).
+# D-337: relative-only. Nothing here licenses an absolute accuracy claim.
+# =============================================================================
+schema_version: "1.0"
+decision: D-343
+owner_ruling: "MENU COARSEN GO (2026-09-23)"
+
+sweep_artifact: governance/REPRESENTABILITY_SWEEP_20260923.json
+sweep_config: config/representability_sweep.yaml
+
+# The routing contract. Re-derivation rule (checked, not trusted):
+#   knn_agreement <= modal_share                  -> constant_plus_human_queue
+#   lift_over_null_pp >= separable_min_pp         -> classify
+#   otherwise                                     -> coarsen_or_classify_with_calibrated_abstention
+axes:
+  discipline:
+    route: classify
+    knn_agreement: 0.2652
+    permutation_null: 0.0398
+    lift_over_null_pp: 22.54
+    modal_share: 0.1134
+    action: >-
+      Keep the labeler. Coarsen the tail: merge the labels below into their nearest
+      parent group (they carry rows but no separable signal at this granularity).
+    queue:
+      - {label: theoretical physics, action: merge_into_parent}
+      - {label: risk management, action: merge_into_parent}
+      - {label: cultural studies, action: merge_into_parent}
+      - {label: decision making, action: merge_into_parent}
+      - {label: interdisciplinary studies, action: merge_into_parent}
+      - {label: computational geometry, action: merge_into_parent}
+      - {label: engineering, action: merge_into_parent}
+      - {label: complex adaptive systems, action: merge_into_parent}
+      - {label: cognitive science, action: merge_into_parent}
+      - {label: information security, action: merge_into_parent}
+  domains:
+    route: classify
+    knn_agreement: 0.3095
+    permutation_null: 0.0832
+    lift_over_null_pp: 22.64
+    modal_share: 0.0879
+    multi_label: true
+    action: >-
+      Keep. This is the axis that actually works (multi-label recall, worst-label list
+      empty in the sweep) — route fine-grained accuracy demand through domains, not
+      through discipline/forms the representation cannot separate.
+    queue: []
+  extraction_type:
+    route: coarsen_or_classify_with_calibrated_abstention
+    knn_agreement: 0.4165
+    permutation_null: 0.2675
+    lift_over_null_pp: 14.89
+    modal_share: 0.3265
+    action: >-
+      Keep the labeler but never publish a silent point label: require a calibrated
+      selective-risk threshold (config/abstention) and abstain below it.
+    queue:
+      - {label: empirical pattern, action: keep_label_with_abstention}
+      - {label: descriptive model, action: keep_label_with_abstention}
+      - {label: normative heuristic, action: keep_label_with_abstention}
+      - {label: causal mechanism, action: keep_label_with_abstention}
+  content_type:
+    route: constant_plus_human_queue
+    knn_agreement: 0.7863
+    permutation_null: 0.6834
+    lift_over_null_pp: 10.28
+    modal_share: 0.8161
+    constant_label: principle
+    action: >-
+      The constant BEATS the neighborhood (0.8161 > 0.7863) and the lift over the null
+      is +10.28 pp: emit the constant and queue the rest for human review. A classifier
+      here is strictly worse than the constant (D-275a/D-300). Fix the MENU, not the model.
+    queue:
+      - {label: quarantine, action: queue_for_human_review}
+      - {label: growth edge, action: queue_for_human_review}
+      - {label: tool instruction, action: queue_for_human_review}
+      - {label: process instance, action: queue_for_human_review}
+      - {label: process template, action: queue_for_human_review}
+      - {label: noise drop, action: queue_for_human_review}
+  depth:
+    route: constant_plus_human_queue
+    knn_agreement: 0.654
+    permutation_null: 0.4568
+    lift_over_null_pp: 19.71
+    modal_share: 0.8193
+    constant_label: domain
+    action: >-
+      Same verdict as content_type by the constant test, despite a high lift over the
+      null: the embedding is dominated by the modal scope. Emit 'domain' + queue the rest.
+    queue:
+      - {label: universal, action: queue_for_human_review}
+      - {label: specialized, action: queue_for_human_review}
+      - {label: cross-domain, action: queue_for_human_review}
+
+# Label-existence sources (a queue entry that names a label no menu owns is rot).
+menu_sources:
+  content_type: {path: config/closed_menu_v5.json, key: content_types}
+  discipline: {path: config/closed_menu_v5.json, key: disciplines}
+  extraction_type: {path: config/closed_menu_v5.json, key: extraction_types}
+  depth: {path: config/taxonomy_v5.yaml, key: depth}
+  domains: {path: config/closed_menu_v5.json, key: domains}
+
+actions_vocabulary:
+  [merge_into_parent, queue_for_human_review, keep_label_with_abstention, retire_label, keep_label]
+
+# D-339b: the routing contract must name the code that enforces it, and the checker
+# asserts the declared symbol really exists in that file (the BUG-385 guard).
+consumer: scripts/verify_menu_routing.py
+consumer_symbol: ROUTING_CFG
+
+qualifier: "RELATIVE-ONLY (D-337). Routing is a separability verdict, not an accuracy claim."

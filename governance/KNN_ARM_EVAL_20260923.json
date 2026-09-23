@@ -1,0 +1,45 @@
+{
+  "n_ruler": 150,
+  "axes": {
+    "discipline": {
+      "n_scored": 150,
+      "unmatched_ruler_rows": 0,
+      "ties_counted_as_miss": 31,
+      "knn_agreement": 0.26,
+      "constant_agreement": 0.06,
+      "constant_label": "research methodology",
+      "incumbent_agreement_stored": 0.5259,
+      "delta_vs_incumbent_pp": -26.59,
+      "beats_incumbent": false
+    },
+    "content_type": {
+      "n_scored": 150,
+      "unmatched_ruler_rows": 0,
+      "ties_counted_as_miss": 1,
+      "knn_agreement": 0.6,
+      "constant_agreement": 0.5933,
+      "constant_label": "principle",
+      "incumbent_agreement_stored": 0.6467,
+      "delta_vs_incumbent_pp": -4.67,
+      "beats_incumbent": false
+    },
+    "extraction_type": {
+      "n_scored": 150,
+      "unmatched_ruler_rows": 0,
+      "ties_counted_as_miss": 9,
+      "knn_agreement": 0.4667,
+      "constant_agreement": 0.3333,
+      "constant_label": "normative_heuristic",
+      "incumbent_agreement_stored": 0.7172,
+      "delta_vs_incumbent_pp": -25.05,
+      "beats_incumbent": false
+    }
+  },
+  "qualifier": "RELATIVE-ONLY (D-337). No absolute error floor. k-NN here measures representation separability on the ruler rows, not deployable accuracy (D2575: it is not a mislabel detector).",
+  "store": {
+    "vec_rows": 7995,
+    "fbs_rows": 7995,
+    "dim": 512,
+    "k": 10
+  }
+}

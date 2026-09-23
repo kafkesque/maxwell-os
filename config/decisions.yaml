@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 712
+total_decisions: 713
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7737,6 +7737,28 @@ decisions:
     (D2556 per-label error budgets) is the accuracy lever for the weak axes, not model scale.
   evidence: governance/evidence/REPRESENTABILITY_SWEEP_20260923/EVIDENCE_MANIFEST.json
   decisions: [D-343]
+- id: D-346
+  title: "MENU COARSEN GO (owner ruling 2026-09-23): the D-343 routing table is adopted as an ENFORCED contract (config/menu_routing.yaml + scripts/verify_menu_routing.py wired into just health) because every model-centric lever is measured and closed (k-NN arm rejected D-345; challenger -8.77 pp; R3 arbitration +0.00 pp) and the only remaining accuracy lever with a measured positive prior is making the menu honest about what the representation can carry: domains classify (+22.64 pp), discipline classify (+22.54 pp), extraction_type coarsen/calibrated abstention (+14.89 pp), content_type constant+human queue (+10.28 pp but 0.7863 <= 0.8161 constant), depth constant+human queue (+19.71 pp but 0.6540 <= 0.8193 constant) - the constant test dominates the null test. Taxonomy merges, retirements and any label removal remain a versioned menu change (v5.6 -> v6) with the labeler re-run and the ruler re-scored, never a silent edit. Checker run: 5 axes, 23 queued labels, 0 RED, 1 warn (depth has no machine-readable menu list)."
+  category: ARCHITECTURE
+  status: RESOLVED
+  date: 2026-09-23
+- id: D-347
+  title: "The incumbent must be RE-SCORED on the ruler in force, never quoted: scripts/incumbent_ruler_score.py + config/incumbent_ruler_score.yaml re-score the live store against ANCHOR_RULER_CONSOLIDATED_20260923 and show the widely quoted ANCHOR-1 numbers were stale in BOTH directions - content_type 0.6467 quoted vs 0.5933 against the same human cells (live store regressed 5.34 pp / 8 rows) and 0.6533 against the owner-adjudicated truth (+0.66 pp); discipline 0.5259 quoted vs 0.5172 on the identical 116-row subset (1 row) and 0.4400 against the current truth (-8.59 pp, owner adjudication moves against the incumbent); extraction_type 0.7172 unchanged on all three references. D-345 survives the correction (the k-NN arm loses under every reference), so the rejection was not a stale-baseline artifact. Any floor or gate reading ruler_measurement.measured_error_rate quotes a superseded ruler and must be re-pointed (G4a) or marked superseded. Evidence: governance/INCUMBENT_RULER_SCORE_20260923.json/.md"
+  category: MEASUREMENT
+  status: RESOLVED
+  date: 2026-09-23
+
+- id: D-345
+  category: CLASSIFICATION
+  state: RESOLVED
+  date: '2026-09-23'
+  title: 'Representability is necessary but NOT sufficient for deployability: the k-NN label arm is REJECTED on the D-343-routed axes (discipline -26.59 pp, content_type -4.67 pp, extraction_type -25.05 pp vs the incumbent on the 150-row ruler); D-343 licenses a learnable arm, not a nearest-neighbour arm.'
+  rationale: 'Measured 2026-09-23 over all 7995 committed FBs in bge-m3 512d space (scripts/representability_sweep.py, config/representability_sweep.yaml, receipt governance/evidence/REPRESENTABILITY_SWEEP_20260923/): neighbour label-agreement vs a seeded permutation null and vs the modal-label share. discipline 0.2652 vs constant 0.1134 (+15.2 pp) vs null 0.0398 (+22.5 pp) = SEPARABLE; domains 0.3095 vs 0.0879 (+22.2 pp) vs 0.0832 (+22.6 pp) = SEPARABLE; extraction_type 0.4165 vs 0.3265 (+9.0 pp) vs null 0.2675 (+14.9 pp) = WEAK, calibrated abstention only; content_type 0.7863 vs constant 0.8161 (-2.98 pp) = LOSES TO THE CONSTANT (confirms F-17); depth 0.6540 vs constant 0.8193 (-16.5 pp) = LOSES TO THE CONSTANT (the ''domain'' class alone is 82%). Consequence: content_type and depth must not be classified; a kNN over this representation already beats the pipeline on discipline and domains, which is where the partition is load-bearing.'
+  consequence: No new model may be adopted for an axis on the strength of a lift over chance alone. Menu coarsening (D2556 per-label error budgets) is the accuracy lever for the weak axes, not model scale.
+  evidence: governance/evidence/REPRESENTABILITY_SWEEP_20260923/EVIDENCE_MANIFEST.json
+  decisions:
+  - D-343
+
 - id: D-344
   category: GOVERNANCE
   state: RESOLVED
@@ -7754,7 +7776,7 @@ decisions:
   decisions: [D-344]
 
 summary:
-  total: 712
+  total: 713
   proposed: 6
   draft: 1
   active: 483
@@ -7763,7 +7785,7 @@ summary:
   archived: 8
   rejected: 9
   deferred: 14
-  resolved: 145
+  resolved: 146
   planned: 8
   ratified: 5
   open: 17
@@ -7791,7 +7813,7 @@ summary:
     C12: 1
     C12 / GOVERNANCE / BUGFIX: 1
     CFG: 5
-    CLASSIFICATION: 1
+    CLASSIFICATION: 2
     CLS: 16
     CLS / CFG: 1
     CONTENT-TYPE ONTOLOGY / DATA: 6

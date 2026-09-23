@@ -748,3 +748,30 @@ hygiene, S5 REVERIFY (optional), R3 GO (staged), laya (DEFER), disk. Open bugs: 
 - D-343 (representability regime) + D-344 (authority enforcement) minted. Health = 10 checks.
 - Routing table now binding: discipline/domains `classify`; extraction_type `coarsen_or_calibrated_abstention`; content_type + depth `constant_plus_human_queue`.
 - Owner gates unchanged and still open: S6 RE-COMMIT/STORE AS IS (BUG-381), R3 GO, FLAGS OFF / WIRE, outlines install, menu coarsen GO.
+
+## Session 23 (2026-09-23, second addendum) — kNN arm REJECTED; flags WIRED
+* **D-345:** k-NN arm REJECTED on all three D-343-routed axes vs the frozen 150-row ruler (discipline -26.59 pp,
+  content_type -4.67 pp = F-17 again, extraction_type -25.05 pp; 31/150 ties). Representability is necessary but NOT
+  sufficient; the incumbent labeler stands; no k-NN arm is built.
+* **BUG-385 (MED, FIXED):** the 19 "ON with no verifiable reader" flags all HAVE readers — the prior FLAGS OFF
+  recommendation was wrong and would have caused silent capability loss. Wired with symbol-level binding (D-339b).
+  **BUG-382** (dotted-key resolution) and **BUG-386** (vec0 shadow reader) FIXED in the same change.
+* **BUG-381:** `S6 RE-COMMIT` launched (S5 t11 vintage PASS 5023 / QUARANTINE 2972) under
+  `/opt/homebrew/bin/python3` — `just stage6` uses a Python WITHOUT `enable_load_extension` and would silently fail
+  all 7995 vector inserts. C13 backup: `maxwell.db.bak_20260923_133729_pre_s6_recommit`.
+* **HUMAN GATES:** S6 RE-COMMIT (executing), MENU COARSEN (approved), RERANK WIRE (approved/not executed),
+  INSTALL OUTLINES (approved/not executed), FLAGS OFF → **SUPERSEDED by FLAGS WIRE**, R3 GO (DEFER), laya (DEFER),
+  `services.omlx.mtp_enabled`.
+
+## 2026-09-23 (session 23, THIRD addendum) - MENU COARSEN enforced; incumbent re-scored
+
+- D-346 MENU COARSEN GO: config/menu_routing.yaml + scripts/verify_menu_routing.py (11th health check),
+  5 axes / 23 queued labels / 0 RED. D-347 incumbent re-score: content_type 0.5933 (same human cells) vs
+  0.6533 (current truth); discipline 0.5172 / 0.4400; extraction_type 0.7172 unchanged. D-345 stands.
+- BUG-387 (HIGH, OPEN) stage6 re-commit DOUBLED the vector store: 15990 vec rows / 7995 orphans; the
+  count-only completeness check printed "READY 15990/7995". DO NOT re-run stage6 until the vec path is repaired.
+- BUG-388 (MED, OPEN) export_parquet ArrowInvalid: is_summary/is_convergent are bool in 7867 rows and int in
+  128 rows -> fbs+vec_fbs committed, parquet snapshot not.
+- BUG-389 (MED, FIXED) two verdicts from unresolvable checks: RERANK IS ALREADY WIRED (retrieve.py:35/526 at
+  HEAD 0182763) so the standing "RERANK WIRE" task is VOID; and the incumbent baseline was stale.
+- CARRY: G4a repoint-the-floors now has a measured reason (the ruler in force changed).

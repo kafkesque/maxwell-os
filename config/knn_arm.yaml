@@ -1,0 +1,17 @@
+# config/knn_arm.yaml - D-337/D-343: rank a k-NN label arm against the incumbent, RELATIVE only.
+schema_version: '1'
+db: "knowledge pipeline/maxwell.db"
+vec_shadow_chunks: vec_fbs_vector_chunks00      # col: rowid, vectors
+vec_shadow_rowids: vec_fbs_rowids               # col: rowid, id, chunk_id, chunk_offset
+dim: 512
+k: 10
+ruler: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+ruler_verdict_column: "{axis}_human"            # per-row human verdict
+ruler_label_column: "{axis}_final"              # consolidated label of record
+axes: [discipline, content_type, extraction_type]
+# incumbent agreement = 1 - stored error, quoted from config/eval_integrity.yaml ruler_measurement
+incumbent_agreement:
+  discipline: 0.5259      # error 0.4741 (n=116)
+  content_type: 0.6467    # error 0.3533 (n=150)
+  extraction_type: 0.7172 # error 0.2828 (n=145)
+qualifier: "RELATIVE-ONLY (D-337). No absolute error floor. k-NN here measures representation separability on the ruler rows, not deployable accuracy (D2575: it is not a mislabel detector)."

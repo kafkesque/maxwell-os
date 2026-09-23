@@ -840,3 +840,23 @@ largest safe reclaim candidates (owner-only; never `pipeline/safe_delete.py`, BU
 - CLOSED: BUG-383 (gitignored __pycache__ invisible to C19 — 31 MB reclaimed), BUG-384 (checker's own glob grammar).
 - NEW WORK ITEM (assistant, queued): apply the D-343 routing table — content_type + depth move to constant+queue; extraction_type gets a calibrated-abstention threshold; discipline/domains get a kNN arm measured under the frozen ANCHOR-3 reference (D-337, RELATIVE-ONLY).
 - OPEN EARLIER: BUG-381 HIGH (store vintage) still blocks "trustworthy store of record".
+
+## 2026-09-23 (session 23, second sync)
+* **NEW:** D-345 — the k-NN arm is REJECTED (governance/KNN_ARM_EVAL_20260923.md). Do not build it.
+* **CLOSED:** BUG-382, BUG-383, BUG-384, BUG-385, BUG-386. **OPEN:** BUG-381 (re-commit executing), BUG-376 (C-3, acknowledged).
+* **CHANGED:** "FLAGS OFF" SUPERSEDED by "FLAGS WIRE" (19/20 registered with symbol-level evidence).
+* **QUEUED:** D-343 routing table as config + checker; RERANK WIRE (needs S2 A/B + R5 review of the retrieve.py diff);
+  INSTALL OUTLINES (pip on a 97%-full disk, A/B on the frozen D-327 harness); G4a repoint-the-floors.
+
+## 2026-09-23 (session 23, THIRD addendum) - MENU COARSEN enforced; incumbent re-scored
+
+- D-346 MENU COARSEN GO: config/menu_routing.yaml + scripts/verify_menu_routing.py (11th health check),
+  5 axes / 23 queued labels / 0 RED. D-347 incumbent re-score: content_type 0.5933 (same human cells) vs
+  0.6533 (current truth); discipline 0.5172 / 0.4400; extraction_type 0.7172 unchanged. D-345 stands.
+- BUG-387 (HIGH, OPEN) stage6 re-commit DOUBLED the vector store: 15990 vec rows / 7995 orphans; the
+  count-only completeness check printed "READY 15990/7995". DO NOT re-run stage6 until the vec path is repaired.
+- BUG-388 (MED, OPEN) export_parquet ArrowInvalid: is_summary/is_convergent are bool in 7867 rows and int in
+  128 rows -> fbs+vec_fbs committed, parquet snapshot not.
+- BUG-389 (MED, FIXED) two verdicts from unresolvable checks: RERANK IS ALREADY WIRED (retrieve.py:35/526 at
+  HEAD 0182763) so the standing "RERANK WIRE" task is VOID; and the incumbent baseline was stale.
+- CARRY: G4a repoint-the-floors now has a measured reason (the ruler in force changed).

@@ -1,0 +1,53 @@
+# config/incumbent_ruler_score.yaml - re-score the INCUMBENT labeler on the current ruler
+# =============================================================================
+# WHY: every "the arm loses to the incumbent" verdict (D-345, D-343 orientation,
+# eval_integrity floors) compares against an incumbent agreement that was measured
+# on the ANCHOR-1 ruler (2026-09-20). The consolidated ruler
+# (ANCHOR_RULER_CONSOLIDATED_20260923) CHANGED 50 human cells (owner overrules) and
+# added owner-supplied labels. If the incumbent is never re-scored against the
+# labels it is supposed to be measured against, the comparison is stale and every
+# derived verdict inherits the staleness.
+#
+# This config drives scripts/incumbent_ruler_score.py (deterministic, no LLM, C12:
+# no path, column, axis or threshold is hardcoded in the script).
+# D-337: RELATIVE only - this is an agreement delta, NOT an accuracy claim and NOT
+# an absolute error floor. BUG-342: the stored reference is QUOTED, never re-derived.
+# =============================================================================
+schema_version: "1.0"
+decision: D-346
+
+db: "knowledge pipeline/maxwell.db"
+ruler: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+
+axes: [content_type, discipline, extraction_type]
+
+# Store column per axis (fbs) and ruler reference columns.
+store_column: "{axis}"
+join_key_ruler: name
+join_key_store: name
+
+# The ruler's verbatim human cell = what ANCHOR-1 was scored against (previous).
+reference_previous_column: "{axis}_human"
+# The consolidated owner-adjudicated label = the current truth.
+reference_current_column: "{axis}_final"
+
+# Canonicalisation before comparing (store uses snake_case, the ruler spaces).
+canonicalise: true
+min_joined_rows: 100
+
+# Quoted, never re-derived (BUG-342). Orientation only.
+incumbent_reference:
+  source: config/eval_integrity.yaml
+  path: ruler_measurement.measured_error_rate
+  ruler: governance/RULER_BLIND_SHEET_20260917.csv
+  note: >-
+    ANCHOR-1 (2026-09-20) stored-label ERROR rate vs the blind human reader, per axis:
+    content_type 0.3533 (97/150 agree), discipline 0.4741 (61/116), extraction_type
+    0.2828 (104/145). Agreement = 1 - error.
+
+qualifier: >-
+  RELATIVE-ONLY (D-337). Agreement against a human-mixed+llm-attested ruler; the ruler
+  is not independent human truth and cannot unfreeze F-11, D-300 adoption or the floors.
+
+output_json: governance/INCUMBENT_RULER_SCORE_20260923.json
+output_md: governance/INCUMBENT_RULER_SCORE_20260923.md

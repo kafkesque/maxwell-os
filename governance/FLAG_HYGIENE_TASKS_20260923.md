@@ -88,3 +88,16 @@ exist (D-338), so they stay WARN. Owner call per flag: **wire it** (name the fil
 - `config/omlx_m1_best_config.yaml::models.Phi-4-mini-instruct-8bit.apply.guided_grammar_enabled`
 - `config/pipeline_config.yaml::stage2.split_probe_enabled`
 - `config/pipeline_config.yaml::stage2.singleton_prefilter_enabled`
+
+## RESOLVED 2026-09-23 — §H is WIRED, not OFF (BUG-385)
+**The prior "bulk FLAGS OFF is behaviourally a no-op" recommendation was WRONG.** All 19 flags have real readers;
+OFF would have silently disabled the D2080 stage1.3 pre-filter, OKF export, the S2 gate, both golden-injection
+paths, merged-call, depth-batch, the OMLX circuit breaker and S4.5 edge/procedural enrichment.
+
+Registered with symbol-level evidence (D-339b, `consumer_symbols: {file: CONSTANT}`): 13 `pipeline_config.yaml`
+flags → bound constants in `pipeline/pipeline_paths.py` (+`stage2_extract.py`, `stage4_merge.py`); 5
+`omlx_m1_best_config.yaml` `guided_grammar_enabled` flags → `scripts/omlx_apply_best_m1_config.py::apply_spec`
+(**the proposal's named consumer was wrong**). Audit: **43 verified, 0 RED, 1 unregistered**.
+
+**REMAINING OWNER CALL (1):** `config/pipeline_config.yaml::services.omlx.mtp_enabled` is ON with no reader in the
+repo (`scripts/mtp_ab.py` patches `~/.omlx/model_settings.json`, not this file) — delete the key, or name its reader.

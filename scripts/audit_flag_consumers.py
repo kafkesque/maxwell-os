@@ -39,12 +39,28 @@ def load_yaml(path: Path) -> Any:
 
 
 def get_path(doc: Any, dotted: str) -> tuple[bool, Any]:
-    """Resolve a dotted key path inside nested dicts; return (found, value)."""
+    """Resolve a dotted key path inside nested dicts; return (found, value).
+
+    BUG-382 (BUG-375 class): a key may itself contain a dot (``models.Qwen3.8-27B-MLX-4bit``),
+    so splitting on ``.`` walks a path that does not exist and reports ``path MISSING`` for a
+    flag that IS present -- the check could not resolve the name it was asked to check. Resolve
+    greedily, preferring the LONGEST candidate key at each step; that is the only reading
+    consistent with the artifact.
+    """
     cur = doc
-    for part in dotted.split("."):
-        if not isinstance(cur, dict) or part not in cur:
+    parts = dotted.split(".")
+    i = 0
+    while i < len(parts):
+        if not isinstance(cur, dict):
             return False, None
-        cur = cur[part]
+        for j in range(len(parts), i, -1):
+            key = ".".join(parts[i:j])
+            if key in cur:
+                cur = cur[key]
+                i = j
+                break
+        else:
+            return False, None
     return True, cur
 
 
@@ -55,6 +71,24 @@ def consumer_reads(consumer: str, config: Path) -> bool:
         return False
     body = path.read_text(encoding="utf-8", errors="ignore")
     return config.name in body or config.stem in body
+
+
+def consumer_binds_symbol(consumer: str, symbol: str) -> bool:
+    """True when the declared consumer file actually contains the declared symbol (D-339b).
+
+    File-level verification (``consumer_reads``) is too weak to be a control: it proves the file
+    reads the config, not that it reads THIS flag. Naming the module constant that carries the
+    flag (e.g. ``S13_ENABLED``) is evidence a human can re-check in one grep, and it closes the
+    2026-09-23 false negative in which 19 ON flags were reported as "no verifiable reader"
+    because the literal config key never appears in code that binds it through
+    ``pipeline/pipeline_paths.py`` (BUG-385, BUG-375 class).
+    """
+    path = PROJECT_ROOT / consumer
+    if not path.exists():
+        return False
+    body = path.read_text(encoding="utf-8", errors="ignore")
+    token = str(symbol).strip()
+    return bool(token) and token in body
 
 
 def enabled_keys(doc: Any, prefix: str = "") -> list[str]:
@@ -118,6 +152,12 @@ def run(quiet: bool = False) -> int:
         dead = [c for c in consumers if not consumer_reads(c, config)]
         if dead:
             red.append(f"{entry['config']}::{dotted} declares consumer(s) that never read it: {dead}")
+            continue
+        bad_sym = [c for c, s in (entry.get("consumer_symbols") or {}).items()
+                   if not consumer_binds_symbol(c, s)]
+        if bad_sym:
+            red.append(f"{entry['config']}::{dotted} declares a symbol binding absent from the named "
+                       f"consumer file(s): {bad_sym} - the claim cannot be re-checked (D-339b)")
             continue
         if consumers and entry.get("exempt_reason"):
             red.append(f"{entry['config']}::{dotted} has an exempt_reason AND {len(consumers)} consumer(s) - "

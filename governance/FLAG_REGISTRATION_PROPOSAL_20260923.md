@@ -46,3 +46,8 @@ your one-word call (`REGISTER FLAGS`). This table is the evidence, so the call n
 | `config/pipeline_config.yaml::stage5.factscore_enabled` | 1 | pipeline/config_audit.py | register: required state = its current value, decisions = [D-339] |
 | `config/pipeline_config.yaml::stage6.okf_export_enabled` | 2 | pipeline/config_audit.py, pipeline/stage6_okf_export.py | register: required state = its current value, decisions = [D-339] |
 | `config/version.yaml::version_gate_enabled` | 1 | pipeline/runner.py | register: required state = its current value, decisions = [D-339] |
+
+## CORRECTION 2026-09-23 (BUG-385)
+The `exempt_reason (no consumer)` dispositions for the 5 `models.<M>.apply.guided_grammar_enabled` rows are
+WITHDRAWN: `scripts/_omlx_apply_settings.py` reads `~/.omlx/model_settings.json`, not this artifact. The real reader
+is `scripts/omlx_apply_best_m1_config.py` (`SPEC_PATH`, generic `apply` applier). All 5 are registered as WIRED.

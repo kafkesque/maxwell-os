@@ -2782,3 +2782,45 @@ reader takes the exact name) but they invite a human to cite a stale reference.
 **Symptom:** first run of scripts/verify_artifact_authority.py produced 11 spurious REDs: 10 on `checkpoint.jsonl.stale_*|*.input_fingerprint.json.stale_*` (a PIPE-JOINED glob, which `fnmatch` treats as one literal so it can never match) and 1 on a non_authoritative bookkeeping entry whose pattern did not cover its own filename.
 **Root cause:** BUG-375 class again — the checker could not resolve the names it was asked to check. Also a BUG-372 trap: RED on a non_authoritative entry's pattern would make the marker fire on expected append-only drift.
 **Fix:** split patterns on `|` (both in `declares_pattern` and the per-entry check) and made a declared pattern binding ONLY on an authoritative entry. Re-run: 2 markers, 17 files verified, 0 RED, 0 undeclared.
+
+## BUG-385 — the flag audit + a mis-named consumer made 19 ON flags look unconsumed (MED, FIXED 2026-09-23)
+**Symptom:** `governance/FLAG_HYGIENE_TASKS_20260923.md` §H and the session-22 proposal listed 19 ON flags as
+"ON and the audit could NOT verify a reader", and the standing recommendation was **bulk FLAGS OFF as a
+behaviourally no-op**.
+**Root cause:** two stacked false negatives (BUG-375 class). (a) `consumer_reads()` is FILE-level: it proves a
+file reads the *config artifact*, not that it reads *this flag*, so a flag bound through the C12 binder
+(`pipeline/pipeline_paths.py` constants) is invisible to a literal-key grep. (b) The proposal named the WRONG
+consumer for the 5 OMLX `guided_grammar_enabled` flags (`scripts/_omlx_apply_settings.py`, which reads
+`~/.omlx/model_settings.json`) while the real reader is `scripts/omlx_apply_best_m1_config.py` (SPEC_PATH).
+**Impact — a near-miss, not a cosmetic one:** FLAGS OFF would have set `stage1_3.enabled=false` (disables the
+D2080 regex pre-filter for every run), `stage6.okf_export_enabled=false` (disables OKF export),
+`stage4.merged_call_enabled=false`, `stage2.gate_enabled=false`, `stage4.depth_batch_enabled=false`,
+`services.omlx.circuit_breaker_enabled=false` and both golden-injection paths — silent capability loss presented
+as a no-op. A recommendation is a claim; this one was wrong.
+**Fix:** symbol-level binding evidence (`consumer_symbols: {file: CONSTANT}`, D-339b) + BUG-382 dotted-key
+resolution + the 5 OMLX entries re-pointed at the real consumer + `required` set to the value observed at
+registration (D-338). Audit now reports **43 verified, 0 RED, 1 unregistered**. The remaining flag
+`config/pipeline_config.yaml::services.omlx.mtp_enabled` is ON with no reader in the repo (a mirror of the
+server-side setting; `scripts/mtp_ab.py` patches `model_settings.json`, not this artifact) and is handed to the
+owner as a delete-or-reader call.
+
+## BUG-386 — the k-NN arm reader mis-read the vec0 shadow store (LOW, FIXED 2026-09-23)
+**Symptom:** first run of `scripts/knn_arm_eval.py` aborted with `chunk 18 missing/short for rowid 1`.
+**Root cause:** the shadow chunk blob is 2,097,152 bytes = **1024 vectors x 512 dims x 4 bytes**, and
+`vec_fbs_rowids.chunk_offset` indexes *vectors within the chunk*, not bytes. The reader compared a whole chunk
+(524,288 floats) to `dim=512` and rejected every row.
+**Fix:** slice `flat[offset*dim:(offset+1)*dim]` per row, chunk cached by id. The fail-closed guard (C16) turned
+a schema misunderstanding into an abort rather than a plausible-looking wrong number - the intended behaviour.
+
+## BUG-387 - HIGH - stage6_commit re-commit DOUBLED the vector store instead of replacing it: `insert_embedding()` reads `last_insert_rowid()` after `insert_fb()` and writes `INSERT INTO vec_fbs(rowid, .
+
+stage6_commit re-commit DOUBLED the vector store instead of replacing it: `insert_embedding()` reads `last_insert_rowid()` after `insert_fb()` and writes `INSERT INTO vec_fbs(rowid, ...)`; on a re-commit over a populated store the vec rows are appended (15990 rows = 2x7995, all distinct rowids, 7995 orphans with no fbs counterpart) while the completeness check only compares COUNTS so it printed 'Vector: READY 15990/7995'. Detected by the D2185 orphan reconciliation it printed itself. Impact: every re-commit doubles the vector store and leaves the live rows served by stale vectors; retrieval correctness is NOT visibly broken (the matching rowids still answer) which is exactly why counts-only verification is not verification. NOT FIXED in code yet - do not re-run stage6 until the vec path is repaired (DELETE-then-INSERT or a rowid-preserving upsert + a rowid-level completeness assertion, not a count assertion).
+
+## BUG-388 - MED - stage6_commit.
+
+stage6_commit.py::export_parquet crashed AFTER the SQLite+vector write: pyarrow.lib.ArrowInvalid 'Could not convert 0 with type int: tried to convert to boolean' from pa.Table.from_pylist(rows). Root cause: the S5 checkpoint mixes Python bool and int 0/1 for the same key - is_summary and is_convergent are bool in 7867 rows and int in 128 rows (the same 128 rows that carry classification_error), so pyarrow infers boolean from the first row and then refuses the ints. The commit is therefore NOT atomic as a unit: fbs+vec_fbs are written, the parquet snapshot is not. Fix direction: coerce declared boolean keys to bool at load (C16 fail-loud if a key is mixed), never let pyarrow infer.
+
+## BUG-389 - MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank.
+
+Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank.enabled is consumed only by retrieval_benchmark, not retrieve.py' - retrieve.py imports RERANK_ENABLED from pipeline_paths at line 35 and honours it at line 526 (`should_rerank = RERANK_ENABLED if rerank is None else rerank`), unmodified at HEAD 0182763, so production retrieval ALREADY reranks and the standing 'RERANK WIRE' task is void, not pending; the earlier grep looked for the literal config key, which the constant-bound consumer never contains. (b) The incumbent agreements compared against every arm (content_type 0.6467 / discipline 0.5259 / extraction_type 0.7172) are ANCHOR-1 numbers quoted forward from the 2026-09-20 ruler, but 108 of 150 content_type and 122 of 150 discipline cells have since been owner-adjudicated: the incumbent had never been re-scored on the ruler in force. FIXED by scripts/incumbent_ruler_score.py + config/incumbent_ruler_score.yaml (D-347).
+

@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "decision": "D-346",
+  "ruler": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+  "n_ruler_rows": 150,
+  "n_store_rows": 7990,
+  "axes": {
+    "content_type": {
+      "n_ruler": 150,
+      "n_scored_previous": 150,
+      "n_scored_current": 150,
+      "blank_previous": 0,
+      "blank_current": 0,
+      "agreement_previous_ruler": 0.5933,
+      "agreement_current_ruler": 0.6533,
+      "delta_current_minus_previous_pp": 6.0
+    },
+    "discipline": {
+      "n_ruler": 150,
+      "n_scored_previous": 122,
+      "n_scored_current": 150,
+      "blank_previous": 28,
+      "blank_current": 0,
+      "agreement_previous_ruler": 0.4918,
+      "agreement_current_ruler": 0.44,
+      "delta_current_minus_previous_pp": -5.18
+    },
+    "extraction_type": {
+      "n_ruler": 150,
+      "n_scored_previous": 145,
+      "n_scored_current": 145,
+      "blank_previous": 5,
+      "blank_current": 5,
+      "agreement_previous_ruler": 0.7172,
+      "agreement_current_ruler": 0.7172,
+      "delta_current_minus_previous_pp": 0.0
+    }
+  },
+  "incumbent_reference_quoted": {
+    "source": "config/eval_integrity.yaml",
+    "path": "ruler_measurement.measured_error_rate",
+    "ruler": "governance/RULER_BLIND_SHEET_20260917.csv",
+    "note": "ANCHOR-1 (2026-09-20) stored-label ERROR rate vs the blind human reader, per axis: content_type 0.3533 (97/150 agree), discipline 0.4741 (61/116), extraction_type 0.2828 (104/145). Agreement = 1 - error."
+  },
+  "qualifier": "RELATIVE-ONLY (D-337). Agreement against a human-mixed+llm-attested ruler; the ruler is not independent human truth and cannot unfreeze F-11, D-300 adoption or the floors."
+}

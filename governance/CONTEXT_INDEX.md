@@ -624,3 +624,7 @@ S5 REVERIFY (optional), R3 GO (staged), laya (recommended DEFER), disk chore.
 | "depth is a classification axis" | depth loses to the constant by 16.5 pp ('domain' alone is 82%); route constant+queue — D-343 |
 | "ARTIFACT_AUTHORITY.json is written but unenforced" | enforced: 10th health check, 0 RED — D-344 |
 - Binding rules: a model may not be adopted on a lift over chance alone; both references (null AND constant) must be beaten. Health = **10** checks.
+
+| "a k-NN / retrieval arm is the cheap fix for discipline" | **DEAD, measured (D-345).** Loses on all three axes (-26.59 / -4.67 / -25.05 pp); 31/150 discipline rows tie. Separability ≠ deployability — D-345 |
+| "the 19 remaining ON flags enforce nothing, so bulk FLAGS OFF is a no-op" | **DEAD (BUG-385).** All 19 have readers; OFF would have silently disabled 9 capabilities. Registry 43 verified / 0 RED / 1 unregistered — D-339b |
+\n- k-NN/retrieval arm DEAD (D-345) | superseded by D-346 route contract | the quoting of ANCHOR-1 incumbent numbers is DEAD - re-score with scripts/incumbent_ruler_score.py (D-347).\n

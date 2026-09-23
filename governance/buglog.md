@@ -3557,7 +3557,7 @@ STANDING RULES (added to the incident set):
   (c) an audit that only re-runs the invariants the author wrote will not find the author's own
       non-idempotency - the audit must diff the ARTIFACT against its own generator.
 
-## BUG-403 / BUG-405 (Gate D) - fix receipt
+## RECEIPT - BUG-403 / BUG-405 (Gate D), 2026-09-23
 
 RECEIPT 2026-09-23 (Gate D, owner-accepted; session 22). Executed and verified, zero behaviour change:
   (1) config/pipeline_config.yaml stage4.depth_model: gemma-4-E4B-it-MLX-4bit -> null, KEY KEPT. Deleting the

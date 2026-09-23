@@ -3362,3 +3362,51 @@ is why it passes every check the repo has and still costs something.
 SIDE EFFECT, and it is the check working: restoring the declared input `temp/trackb_full.jsonl` changed
 the bytes of `archive/temp_archive_20260923/`, so the new archive-index control went RED until the index
 was regenerated. A control that goes RED the moment the inventory changes is what "live" means.
+
+## BUG-407 (MED, FIXED 2026-09-23) - the R5 review channel failed twice and the cause was the CALLER, not the model
+Root cause found 2026-09-23: the two failures (empty response; "the read_file tool was not available in the turn
+context") were TURN-CONTEXT failures of the DELEGATE tool, not model failures. gemma-4-E4B-it-MLX-4bit answers
+normally: a direct `curl` one-shot returned `OK Gemma 4.` in 0.74s warm, and the repo's OWN harness
+`scripts/r5_code_review.py` (which POSTs to OMLX via tools/model_eval_suite.call, i.e. plain HTTP with no tool
+channel) returned APPROVE/confidence 1.0 on scripts/build_archive_index.py.
+STANDING RULE: an R5 verdict MUST be produced by `python3 scripts/r5_code_review.py --file <f> --reviewer
+<model>` and land in governance/r5_reviews.jsonl as an artifact. Never route an R5 review through a tool-using
+agent channel; a reviewer that depends on a tool it may not have is a reviewer that can fail silently, and two
+consecutive sessions were recorded as if the MODEL had failed. Owed verdicts discharged for
+scripts/build_archive_index.py (APPROVE, sha256_16 e133da4716a9e68e). Still owed: D-359 (stage6_commit.py diff)
+and D-364 (DSPy no-code-default diff).
+
+## BUG-410 (MED, OPEN) - T2_GATE and T3_GATE are assigned a model that is not served and not on disk
+config/model_assignments.yaml assigns roles.T2_GATE.model and roles.T3_GATE.model = Phi-4-mini-instruct-4bit.
+The live OMLX server serves 7 models (Phi-4-mini-instruct-8bit, Qwen3-Coder-30B, Qwen3.8-27B, gemma-4-E4B,
+gpt-oss-20b-MXFP4-Q8, Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit) - Phi-4-mini-instruct-4bit is NOT
+among them, and no such repo exists in ~/.cache/huggingface/hub. This is the documented PHANTOM-MODEL class
+(the file already annotates PLANNER_FALLBACK as "PHANTOM - Qwopus-GLM-18B does not exist locally"): a role
+naming an unobtainable model, discovered by cross-checking the registry against the SERVER's model list rather
+than against prose. T3_GATE quarantine tolerance (0.25) is therefore unenforceable as declared. Fix: point both
+roles at Phi-4-mini-instruct-8bit (the D2319 S2 probe) or restore the 4-bit weights, then re-run the probe.
+
+## BUG-411 (LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else
+config/decisions.yaml D2577 reads "gemma frugal depth route already REFUTED (62.5%, D2454)". D2454 is the
+D2454 golden-wiring decision (config/golden/stage4_golden.yaml injected into the four S4 prompts; post-wiring
+19.50s vs 17.71s median). The refutation lives in governance/S4_DEPTH_EMPIRICAL_RESULTS_2026-08-14.md
+(n=8, seed=42: gemma 62.5% vs gpt-oss 75.0%, parity 62.5%, gate >=90%) and the data in
+governance/s4_depth_frugal_benchmark.json. A decision id that points at the wrong artifact is how "gemma is the
+depth model" gets repeated; scripts/validate_role_claims.py exists for exactly this class. Fix: correct D2577's
+citation to the empirical-results file (append-only, R-D410: add a correction note, do not rewrite the record).
+
+## BUG-412 (LOW, OPEN) - the archive index declares an absolute cloud path with no guard that it still resolves
+config/archive_index.yaml external_archive_root.path = /Users/barn/Library/CloudStorage/Dropbox/claude
+projects/archived/maxwell os. The index records present: true and 33 entries generated 2026-08-10 under the
+REJECTED authority D2226. Two defects in one value: (a) a BUG-400 corollary - the path is absolute and inside
+the Dropbox File Provider domain, so relocating the repo brick it silently; (b) its contents are described by a
+generation made under a decision that is now REJECTED. No control asserts that the external root still resolves
+or that its 33 entries are current. Fix under D-365: make the external root a checked input (fail loudly if
+absent) or drop it from the contract.
+
+## BUG-413 (LOW, CLOSED 2026-09-23) - 3 archive index entries matched no rule and were silently 'keep'
+archive/index.yaml classified archive/GOLDEN-REVIEW-v2.0-ARCHIVED-2026-08-11.md, archive/promote_cleaned.py
+and archive/vision_probe.py as disposition 'keep' with authority null and the reason "no rule matched -
+classify it in config/archive_index.yaml by hand". A rule set that answers "keep" when it does not know is not
+a rule set; a default must be explicit and attributable. Survives the Gate E purge (34 -> 31 entries): 12 rules
+matched, 3 did not. Fix: add explicit rules to config/archive_index.yaml with an authority for each.

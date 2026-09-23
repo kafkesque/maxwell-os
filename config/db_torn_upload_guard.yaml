@@ -1,0 +1,9 @@
+# config/db_torn_upload_guard.yaml — D-366 (BUG-400): torn/partial cloud upload guard on the live DB.
+# C12: the guard script holds no paths; every value it needs is here.
+schema_version: "1.0"
+decision: D-366
+ledger: governance/db_torn_upload_ledger.jsonl   # append-only pre/post fingerprint pairs
+db_path: "knowledge pipeline/maxwell.db"          # the live run DB (BUG-400: inside the Dropbox domain)
+db_path_keys: ["stage6", "db_path"]               # read order for the config-resolved path
+db_path_config: config/pipeline_config.yaml
+chunk_bytes: 8388608                              # 64 MiB read buffer; the DB is streamed, never loaded

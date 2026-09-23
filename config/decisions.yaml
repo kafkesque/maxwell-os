@@ -1,7 +1,7 @@
 version: '1.0'
 ratified: '2026-07-26'
 last_sync: '2026-09-22 20:06:00'
-total_decisions: 732
+total_decisions: 736
 decisions:
 - id: D298
   category: VERIFICATION
@@ -7937,9 +7937,83 @@ decisions:
   decision: 'archive/index.yaml is DERIVED data: its writer is scripts/build_archive_index.py and its checker is the same script with --check (exit 1 on a body_sha256 mismatch), configured entirely by config/archive_index.yaml (C12) and written atomically (C6). Its authority is D-365; the previous authority was D2226, which is in state REJECTED (BUG-404). The script READS bytes and WRITES one index and never moves, edits or deletes an archive entry: a disposition in the index is a claim about what MAY be done, not an act. An archive sweep may NOT be driven by age alone - every path declared as an input by any script or config is listed in protected_paths and is exempt, because moving a declared input is a silent input removal (BUG-406 measured: 35 of 414 swept temp/ entries were declared inputs, including the pipeline relay SOURCE_MAP temp/golden_source_map.json; all restored). temp/ overflow is dispositioned archive-first, never deleted, because the entries include date-stamped LLM transcripts that are evidence under R-D410. RECEIPT: archive/index.yaml regenerated - 34 entries, 17.3 GB, --check exit 0.'
   artifacts: ['config/archive_index.yaml', 'scripts/build_archive_index.py', 'archive/index.yaml', 'archive/temp_archive_20260923/MANIFEST.tsv']
   related: ['D2226', 'R-D410', 'C19', 'C12', 'C6', 'BUG-404', 'BUG-406', 'BUG-342']
+- id: D-366
+  category: SOVEREIGNTY
+  state: RATIFIED
+  title: "BUG-400 accepted-and-documented: the Dropbox File Provider replication is a KNOWN C3 exception, with a torn-upload guard, not a silent one"
+  description: 'The repo, CONSTITUTION.md, config/decisions.yaml, pipeline/stage6_commit.py, the knowledge pipeline
+    tree and knowledge pipeline/maxwell.db live under ~/Library/CloudStorage/Dropbox (a File Provider domain),
+    which does not satisfy C3 (all data and compute local) or C22 (local-first, any remote an EXPLICIT opt-in).
+    Owner decision 2026-09-23: ACCEPT AND DOCUMENT rather than relocate now. This record makes the exception
+    explicit and dated, which is the difference between an accepted risk and a leak. (1) The cloud copy is a
+    REPLICA, never an authority: no pipeline reader may resolve its input from a Dropbox path other than the
+    working tree. (2) Interim guard: scripts/assert_db_torn_upload_guard.py hashes knowledge pipeline/maxwell.db
+    and reports a pre/post-run digest pair, so a partial or torn upload cannot be served as authoritative
+    (the failure mode is silent corruption of the only copy, not a missing file). (3) Relocation, when
+    scheduled, is a planned window, never a bare mv: 20+ artifacts bake the absolute path, including S5 input
+    fingerprints, and 3 crontab entries plus ~/Library/LaunchAgents/com.maxwell.omlx-api-key.plist must be
+    re-grepped. (4) Selective sync is REJECTED: it evicts local copies and can pull the live DB mid-run.
+    Supersedes nothing; narrows BUG-400 from an open leak to a documented exception.'
+  target_files: ['scripts/assert_db_torn_upload_guard.py', 'governance/buglog.md']
+  created: 2026-09-23
+
+- id: D-367
+  category: PROCESS
+  state: RATIFIED
+  title: "An R5 verdict is produced by scripts/r5_code_review.py and lands as an artifact - never through a tool-using agent channel"
+  description: 'BUG-407 root cause: two consecutive sessions recorded gemma-4-E4B as having FAILED an R5 review
+    when the failures were turn-context failures of the delegate tool (empty response; then "the read_file tool
+    was not available in the turn context"). The model was never at fault: a direct one-shot returned "OK Gemma 4."
+    in 0.74s and the repo harness returned APPROVE/1.0 on scripts/build_archive_index.py. RULE: an R5 verdict is
+    evidence only when (a) it is produced by python3 scripts/r5_code_review.py --file <path> --reviewer <model>,
+    which reaches OMLX over plain HTTP (tools/model_eval_suite.call) with no tool channel, and (b) it is appended
+    to governance/r5_reviews.jsonl with the reviewer, the sha256_16 of the reviewed bytes, the verdict and the
+    concerns. A reviewer that depends on a tool it may not have can fail silently, and a silent reviewer failure
+    read as a model failure is how a broken channel survives two sessions. Corollary: an owed verdict is a
+    BLOCKER on the change it gates, and is listed as owed until it lands, not until it is attempted.'
+  target_files: ['scripts/r5_code_review.py', 'governance/r5_reviews.jsonl']
+  created: 2026-09-23
+
+- id: D-368
+  category: HYGIENE
+  state: RATIFIED
+  title: "Gate E executed: the three regenerable non-evidence archive entries are deleted, with a record of the act"
+  description: 'Owner-approved 2026-09-23. Deleted: archive/housekeeping_20260923 (1.4 MB, 51 .pyc + 1
+    .DS_Store), archive/maxwell_os_v1 (empty directory, 0 bytes), archive/.DS_Store (12 KB). Authority for the
+    act: each is C19/regenerable_non_evidence - bytecode, an empty directory, and Finder metadata - and none
+    carries evidence, so R-D410 (append-only, never delete pipeline output) is not engaged. The record of the
+    act is governance/PURGE_RECORD_20260923.tsv (path, kind, bytes, mtime, class, authority), because deleting
+    evidence-free bytes still owes an account of what was deleted and by what right. Everything else stays:
+    every .bak/.archived-* file and every date-stamped transcript is retained, and the index moved 34 -> 31
+    entries with dispositions now {external_move_candidate 5, keep 5, keep_append_only 21} and 0 purge
+    candidates. pipeline/safe_delete.py was NOT used (BUG-261: it copies before deleting and would refill the
+    disk). Corollary: a purge of non-evidence bytes must still be recorded and must still leave the index
+    regenerated and --check-clean in the same commit.'
+  target_files: ['governance/PURGE_RECORD_20260923.tsv', 'archive/index.yaml']
+  created: 2026-09-23
+
+- id: D-369
+  category: INFRA
+  state: PROPOSED
+  title: "Model-store reclaim is config-reference-driven and LIST-FIRST: no byte moves until the keep/delete list is owner-approved"
+  description: 'Gate A2 accepted 2026-09-23, and Gate A is KILLED (no external volume is mounted and its ~16.5 GB
+    is ~2% of a 28 GiB deficit). The measured reclaim target is the model stores, not the archive: 280 GB total
+    against 28 GiB free. Config-reference classification (keep only what config/model_assignments.yaml or
+    config/pipeline_config.yaml names) yields ~84 GB genuinely in use and ~78 GB of candidates
+    (governance/MODEL_STORE_RECLAIM_A2_20260923.md). THREE rules: (1) never rm a model store - remove it from the
+    SERVING list, restart, load from the surviving store and confirm the model ANSWERS, then reclaim; (2)
+    ~/.omlx/cache (92.5 GB) is content-addressed with no names and is the LIVE cache of a running server, so it
+    cannot be pruned by config reference and is touched last, server stopped; (3) two candidates are decisions,
+    not deletions - ~/models/Qwen3.6-35B-A3B-6bit (27.1 GB) is named by nothing, and ~/.mtplx/models holds
+    Qwopus3.6-35B (20.6 GB) which model_assignments.yaml calls a PHANTOM that "does not exist locally" while it
+    does. PROPOSED, not RATIFIED, because no byte has moved and the 27.1 GB orphan needs an owner answer.
+    Corollary: this session produced the LIST and stopped exactly where the rule says to stop.'
+  target_files: ['governance/MODEL_STORE_RECLAIM_A2_20260923.md']
+  created: 2026-09-23
+
 summary:
-  total: 732
-  proposed: 6
+  total: 736
+  proposed: 7
   draft: 1
   active: 502
   stale: 0
@@ -7949,7 +8023,7 @@ summary:
   deferred: 14
   resolved: 146
   planned: 8
-  ratified: 5
+  ratified: 8
   open: 17
   by_category:
     ARCH: 27
@@ -8010,10 +8084,12 @@ summary:
     GOVERNANCE / SOVEREIGNTY: 1
     GOVERNANCE / WORKFLOW: 1
     HARDENING: 2
+    HYGIENE: 1
     HYGIENE / TESTING: 1
     INF: 177
     INF / GOV: 1
     INF / OPS: 1
+    INFRA: 1
     INFRASTRUCTURE: 1
     INFRASTRUCTURE / RELIABILITY: 2
     INFRASTRUCTURE / SOVEREIGNTY: 1
@@ -8061,6 +8137,7 @@ summary:
     PIPELINE / QUALITY / BUGFIX: 1
     PIPELINE / QUALITY / GOVERNANCE: 1
     PRD: 1
+    PROCESS: 1
     QA: 4
     QLT: 50
     QLT / AUDIT: 20
@@ -8080,6 +8157,7 @@ summary:
     RETRIEVAL / VALIDATION: 2
     RETRIEVAL / VERIFICATION: 2
     ROBUSTNESS / QUALITY: 3
+    SOVEREIGNTY: 1
     STR: 1
     TAXONOMY: 6
     TAXONOMY / GOVERNANCE: 3

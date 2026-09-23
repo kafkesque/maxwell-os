@@ -1,0 +1,2 @@
+{"bytes": 156622848, "guard": "D-366/BUG-400", "label": "d366_self_test", "mtime": "2026-09-23T14:49:26+00:00", "path": "knowledge pipeline/maxwell.db", "phase": "pre", "recorded": "2026-09-23T15:38:07+00:00", "sha256": "6d5770b6dfff18ace121c4e9a3fb25970a7cccd0852521bb584040bee23490fb"}
+{"bytes": 156622848, "guard": "D-366/BUG-400", "label": "d366_self_test", "mtime": "2026-09-23T14:49:26+00:00", "path": "knowledge pipeline/maxwell.db", "phase": "post", "recorded": "2026-09-23T15:38:07+00:00", "sha256": "6d5770b6dfff18ace121c4e9a3fb25970a7cccd0852521bb584040bee23490fb"}

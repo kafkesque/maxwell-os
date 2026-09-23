@@ -307,6 +307,10 @@ def main() -> int:
                 flags.append(f"OFF_MENU_{kind}:{axis}={owner_raw}")
 
             if owner_raw:
+                if owner is not None and owner_raw != owner:
+                    tier = "owner-supplied" if human is None else "owner-adjudicated"
+                    note = (f"owner spelling {owner_raw!r} canonicalised via a declared alias to "
+                            f"{owner!r} (C12); verbatim spelling preserved in the review sheet")
                 if human is not None and owner is not None and owner == human:
                     tier, note = "owner-adjudicated", "owner reaffirms the ruler label"
                 elif human is None:

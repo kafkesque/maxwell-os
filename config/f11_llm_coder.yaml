@@ -133,8 +133,18 @@ anchor_review:
     extraction_type: FORM (1-4)
   coders:
     - tag: claude
+      model: claude-sonnet-4.5
+      family: anthropic
+      prompt_sha256: 578eaee8f60d97f7a0a2d577ce6b98208a1157a76f60c37502fca1d3f7d4c9ee
+      identity_source: 'delivered by the owner 2026-09-23 as temp/LLM_LABELS_R2_ALL150.jsonl - label identity is OWNER-ATTESTED, not machine-verified (no API receipt)'
+      provenance_tier: llm-attested
       path: temp/LLM_LABELS_R2_ALL150.jsonl
     - tag: kimi
+      model: kimi-k3
+      family: moonshot
+      prompt_sha256: 578eaee8f60d97f7a0a2d577ce6b98208a1157a76f60c37502fca1d3f7d4c9ee
+      identity_source: 'delivered by the owner 2026-09-23 as "temp/kimi3 labels01.md" - label identity is OWNER-ATTESTED, not machine-verified (no API receipt)'
+      provenance_tier: llm-attested
       path: temp/kimi3 labels01.md
   out_csv: governance/F11_ANCHOR_REVIEW_{date}.csv
 

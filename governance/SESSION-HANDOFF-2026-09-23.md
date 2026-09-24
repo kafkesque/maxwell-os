@@ -151,7 +151,7 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 
 ## C15 BLOCK (2026-09-23, session 21) - unresolved bugs travel with every handoff
 
-**92 open / 73 closed of 165 ids** (threshold for this block is 5). Full machine-readable list with events:
+**93 open / 73 closed of 166 ids** (threshold for this block is 5). Full machine-readable list with events:
 `governance/bug_status.json` (regenerate: `python3 scripts/bug_status.py`).
 
 Regenerated 2026-09-23 18:57 (session 22) from the parser after the BUG-418 dedup - this line is GENERATED,

@@ -3595,3 +3595,28 @@ exactly the future tax class - the next consumer writes a branch, and the branch
 FIX (queued, one line of intent, no behaviour change): make closed a list of {id, title, events} like open, or
 document the asymmetry deliberately in the file's own header. Prefer the former (one shape, D2585-class
 symmetry). Must be done together with a consumer scan so no existing reader breaks.
+
+## BUG-420 (MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth work cannot be attributed to the 150 anchor rows
+
+MEASURED (session 23). Two identifier spaces that do not intersect:
+  ANCHOR-4 / RULER_BLIND_SHEET: item_id = R001, R002, R003 ... (4 chars, a SHEET-LOCAL row label)
+  gold_4axis.jsonl / depth_vote_checkpoint.jsonl: fb_id = 64-hex content-addressed
+  anchor4 vs gold.fb_id = 0 of 150 | anchor4 vs gold.example_id = 0 | anchor4 vs depth_vote.fb_id = 0
+  ruler vs gold.fb_id = 0 | ruler vs depth_vote.fb_id = 0
+  fuzzy NAME join: anchor4 vs gold = 2 | anchor4 vs depth_vote = 17
+So the 234 depth values already in gold_4axis (132 human-derived) CANNOT be mechanically attributed to the
+150 anchor rows. The anchor is therefore not merely "blind by design" (which it is, deliberately) - it is
+also UNJOINABLE to the corpus depth work that does exist, even after the fact, and the name join is too
+fuzzy (2 and 17 hits) to be used as a bridge.
+
+WHY IT MATTERS: (1) any future depth training set (D2577 4-way head) must be assembled from gold_4axis by
+fb_id and can never be checked against the anchor; (2) the D274f 30-row test-retest needs rows it can point
+to unambiguously; (3) a provenance bridge is what makes "the human said X" auditable at row level (C13/R14).
+
+ALSO MEASURED, same pass: on the 150 anchor rows the carried manual coding is CT filled 150/150, FORM
+145/150, DISC only 122/150 - i.e. 28 rows have NO discipline. So the belief that manual domain/discipline
+assignment for these rows is COMPLETE is not supported; DISC 122/150 and FORM 145/150.
+
+FIX (queued, cheap, non-destructive): add fb_id (+ source sheet row, and the name joined only where
+unambiguous) as columns on the anchor sheet and on ANCHOR-4, so the anchor becomes attributable at row level.
+That is an additive column change on a sheet that is not yet coded - the right moment, before the freeze.

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 165,
-  "open_n": 92,
+  "total_ids": 166,
+  "open_n": 93,
   "closed_n": 73,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -466,6 +466,11 @@
     {
       "id": "BUG-417",
       "title": "(HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, a",
+      "events": 1
+    },
+    {
+      "id": "BUG-420",
+      "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo",
       "events": 1
     }
   ],

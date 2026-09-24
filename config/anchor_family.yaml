@@ -1,0 +1,104 @@
+# anchor_family.yaml — machine-readable OWNERSHIP registry for the ANCHOR family (C12).
+#
+# WHY THIS FILE EXISTS
+#   On 2026-09-24 the owner asked twice whether the anchor family contains the domain axis, and
+#   then could not find the frozen anchor at all. A registry that lists only what a family OWNS
+#   cannot answer "does it include axis X?", and prose cannot be checked (BUG-416/BUG-424/BUG-425).
+#   So: EVERY axis is declared here, either `owned` by an artifact of this family or `disowned`
+#   with the cohort it actually comes from plus the MEASURED intersection with the 150 anchor rows.
+#
+# NO VALUE IN THIS FILE IS HAND-TRUSTED
+#   `scripts/verify_anchor_family_registry.py` re-derives every count below from the artifacts
+#   themselves and exits 1 naming the field on any disagreement. It runs in `just health`.
+#   Regenerate with: python3 scripts/verify_anchor_family_registry.py --print-config
+#
+# Reading rule: when asked "did you include axis X?" read THIS file — never an artifact's own
+# derived or copied column (that mistake is BUG-422).
+
+schema_version: '1.0'
+generated: '2026-09-24'
+registry_doc: governance/ANCHOR_FAMILY_CONSOLIDATION_PLAN_20260924.md
+recall_map: governance/CONTEXT_INDEX.md
+taxonomy: config/taxonomy_v5.yaml
+
+anchor:
+  artifact_id: ANCHOR-3
+  sheet: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  sha256: 29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698
+  rows: 150
+  columns: 31
+  key: item_id
+  manifest: governance/ANCHOR_MANIFEST_20260923.json
+  provenance_tier: human-mixed+llm-attested
+  bound: RELATIVE-ONLY (D-337) — no absolute error floor may be certified from this reference
+
+derived_sheet:
+  artifact_id: ANCHOR-4
+  sheet: governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+  key: item_id
+  manifest: governance/ANCHOR4_MANIFEST_20260924.json
+  writer: scripts/consolidate_anchor4_context.py
+  owns: [depth]
+  pending: depth cells blank until the blind coding freezes
+
+# Axis-by-axis. status ∈ {owned, disowned_deferred, disowned_scope_change}.
+axes:
+  content_type:
+    owner: ANCHOR-3
+    status: owned
+    column: content_type_final
+    cohort: 150
+    intersection: 150
+  discipline:
+    owner: ANCHOR-3
+    status: owned
+    column: discipline_final
+    cohort: 150
+    intersection: 150
+    note: owner-adjudicated 80 / human-ruled 42 / owner-supplied 28 (the "I already did the 150" list)
+  extraction_type:
+    owner: ANCHOR-3
+    status: owned
+    column: extraction_type_final
+    cohort: 150
+    intersection: 145
+    note: 5 rows declared-missing upstream — legitimately blank, never imputed
+  depth:
+    owner: ANCHOR-4
+    status: owned
+    column: DEPTH (1-4)
+    cohort: 150
+    intersection: 0
+    note: blind sheet; blank until freeze; class menu still prose-only (BUG-416)
+  domains:
+    owner: external
+    status: disowned_deferred
+    artifact: governance/s4_domain_verdicts.jsonl
+    review_sheet: governance/s4_domain_review_sheet.csv
+    cohort_artifact_key: out_id            # == fb_id (64-hex content address)
+    anchor_key: fb_id
+    cohort: 216
+    cohort_human_adjudicated: 216
+    cohort_authority: p5:human
+    intersection_default_key: 2            # by out_id == fb_id
+    intersection_alternate_key: 2          # by exact name — two independent joins, same 2 rows
+    intersection_rows: [R109, R142]
+    provenance_of_anchor_domain_values: machine (S4/gpt-oss), NOT human
+    deferral_cited_in: config/eval_integrity.yaml   # axes_deferred: [depth, domains]
+    escalation: SCOPE_CHANGE — adding a domains column to this family requires a decision, not a consolidation
+    rule: a question about the domain axis is answered from THIS block, never from a copied column
+
+# Machine-side observations about the 150 that are NOT owner labels (defect candidates).
+machine_observations:
+  anchor_domains_source: temp/ruler_input_20260923.jsonl
+  anchor_domains_key: fb_id
+  anchor_domains_rows_with_values: 150
+  anchor_domains_tokens: 310
+  anchor_domains_distinct: 40
+  anchor_domains_off_menu: 0
+  anchor_domains_catchall_emerging_rows: 19
+  catchall_note: a domain of `emerging` is by contract "never a real assignment" — defect to triage on the machine axis
+  off_menu_discipline_cells: 4
+  off_menu_discipline_values: ['design strategy', 'personal productivity']
+  off_menu_discipline_rows: [R042, R086, R091, R117]
+  off_menu_note: DOMAIN-lexicon values written into the discipline cell; kept verbatim + flagged OFF_MENU_DOMAIN; two one-line owner rulings outstanding

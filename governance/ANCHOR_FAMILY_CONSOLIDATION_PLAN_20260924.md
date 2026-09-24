@@ -44,7 +44,40 @@ Why `FORM` moved on 142 rows: ANCHOR-3 canonicalised the ruler's raw spellings t
 (`casual mechanism` -> `causal_mechanism`), so the sheet had been showing 142 rows of SUPERSEDED label text -
 the single largest source of contamination in the instrument.
 
-## 3. The anti-drift machinery (this is the part that makes it stick)
+## 3. Axes this family does NOT own (declared — the wrong-cohort guard)
+
+A registry that lists only what a family owns is the defect class that produced BUG-422 (a claim about a
+missing signal, measured on the wrong artifact). Every axis is therefore either OWNED or explicitly DISOWNED here.
+
+| axis | owner | key | cohort | relation to the 150 |
+|---|---|---|---|---|
+| `content_type` | ANCHOR-3 (this family) | `item_id` | 150 | `content_type_final` 150/150 |
+| `discipline` | ANCHOR-3 (this family) | `item_id` | 150 | `discipline_final` 150/150 (owner-adjudicated 80 / human-ruled 42 / owner-supplied 28) |
+| `extraction_type` (= FORM) | ANCHOR-3 (this family) | `item_id` | 150 | `extraction_type_final` 145/150, 5 declared-missing |
+| `depth` | **ANCHOR-4 (this family)** | `item_id` | 150 | blind, blank until freeze |
+| **`domains`** (multi-label) | **`governance/s4_domain_verdicts.jsonl`** (+ `s4_domain_review_sheet.csv`) | `out_id` = `fb_id` | **216** rows, 216/216 `human-adjudicated`, authority `p5:human` (D2628/D2633) | **INTERSECTION = 2/150 (R109, R142)** — cross-verified by `fb_id` AND by name |
+
+### Consequences, measured 2026-09-24 (owner question: "have you included the canonical domain labels I classified?")
+
+1. **No.** ANCHOR-3 (31 cols) and ANCHOR-4 (16 cols) carry **no domain column at all** — and they cannot
+   inherit one: the owner's classified domain labels cover a different cohort, overlapping the 150 by 2 rows.
+   Nothing was dropped by the consolidation; there was no human domain label for 148/150 to carry.
+2. The 150 rows **do** carry domain values, but from the **machine store**
+   (`temp/ruler_input_20260923.jsonl`, `ruler_sheet_key_20260917.json::stored.domains`): 150/150 rows,
+   310 tokens, 40 distinct, 0 off-menu, provenance S4/gpt-oss — **not** `p5:human`. 19 rows contain the
+   fail-closed catch-all `emerging` (defect candidate, BUG-425).
+3. Four of the 150 `discipline_final` cells are **DOMAIN-lexicon values** written as a discipline —
+   `personal productivity` ×3 (R086/R091/R117), `design strategy` ×1 (R042) — kept verbatim and flagged
+   `OFF_MENU_DOMAIN`. That is the only owner domain-side vocabulary that reached the anchor, and it sits in
+   the DISCIPLINE cell, never as a domain set.
+4. The axis is **deliberately deferred**: `config/eval_integrity.yaml` → `axes_deferred: [depth, domains]`
+   (domains 0.920 attested, i.e. not the bottleneck). Adding a domain column to the anchor family is a
+   **SCOPE CHANGE requiring a decision**, not a consolidation.
+
+**Rule.** A question of the form "did you include axis X?" must be answered from this table — owner, key,
+cohort, intersection — never from memory and never from a derived column.
+
+## 4. The anti-drift machinery (this is the part that makes it stick)
 
 1. **One writer per field.** ANCHOR-3 owns three axes; ANCHOR-4 derives them. The generator is the ONLY
    writer of those three columns, and it says so in its docstring. The previous build was a second writer.

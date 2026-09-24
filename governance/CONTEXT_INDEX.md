@@ -525,6 +525,28 @@ menu `cac6e695`). **ANCHOR-2** = the 60-row contra-stratified adjudication/held-
 in-sample derivation, not ANCHOR-1/2 -> `ruler_arbitration_in_sample_20260921.json`. Rule: never concatenate
 instruments; never pool across menus; pool only at read time with weights.
 
+## 2026-09-24 — ANCHOR-3 / ANCHOR-4 ADDED TO THE RECALL MAP (they were missing — BUG-424)
+
+The 150-row **frozen anchor was cited nowhere in this file**, which is the mechanical reason the owner
+could not find it (2026-09-24: "I cant find ANCHOR_RULER_CONSOLIDATED"). It exists, in exactly one
+place on disk. Three artifacts + two manifests:
+
+| artifact | path | OWNS | key | status |
+|---|---|---|---|---|
+| **ANCHOR-3** — consolidated 150-row anchor | `governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv` (+ `.md`) | `content_type_final`, `discipline_final`, `extraction_type_final` | `item_id` | **FROZEN** `29393d5f9d529205…`, 150 rows × 31 cols, tier `human-mixed+llm-attested` |
+| **ANCHOR-4** — depth blind coding sheet | `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` | `DEPTH (1-4)` (EMPTY until freeze) | `item_id` | DERIVES CT/DISC/FORM from ANCHOR-3 |
+| **registry + join contract** | `governance/ANCHOR_FAMILY_CONSOLIDATION_PLAN_20260924.md` | which anchor artifact owns which axis | — | live |
+| manifests (C12) | `governance/ANCHOR_MANIFEST_20260923.json`, `governance/ANCHOR4_MANIFEST_20260924.json` | sha256 / rows / allowed + forbidden uses / verify command | — | live |
+
+- ANCHOR-3 is **RELATIVE-ONLY (D-337)** — no absolute error floor or "accurate to X" may be cited from it.
+- The three context columns of ANCHOR-4 are **DERIVED** by `scripts/consolidate_anchor4_context.py` (the only
+  writer; `--check` runs in `just health`) — never hand-edit them, always re-run the generator.
+- **ANCHOR-3 ≠ ANCHOR-1/2.** ANCHOR-3 is the *consolidated owner-adjudicated* form of the RULER-150 sheet
+  (`consolidate_anchor_ruler.py`, deterministic). Do not concatenate it with ANCHOR-1/ANCHOR-2.
+- **The `domains` axis is NOT part of this family.** It is owned by `governance/s4_domain_verdicts.jsonl` on a
+  DIFFERENT 216-row cohort that intersects the 150 by **2 rows** (R109, R142); `config/eval_integrity.yaml`
+  defers it (`axes_deferred: [depth, domains]`). See the registry, §9.
+
 ## 2026-09-21 — D-315 RATIFIED: THE CANONICAL RULER (BUG-329 CLOSED)
 The canonical ruler is **`governance/anchor1_frozen_20260920.json`** (`0ec321a7…` — authority for the HUMAN labels and
 for the measurement; immutable, committed, sha256-cited). `governance/RULER_BLIND_SHEET_20260917.csv`

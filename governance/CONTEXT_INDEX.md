@@ -545,7 +545,7 @@ place on disk. Three artifacts + two manifests:
   (`consolidate_anchor_ruler.py`, deterministic). Do not concatenate it with ANCHOR-1/ANCHOR-2.
 - **The `domains` axis is NOT part of this family.** It is owned by `governance/s4_domain_verdicts.jsonl` on a
   DIFFERENT 216-row cohort that intersects the 150 by **2 rows** (R109, R142); `config/eval_integrity.yaml`
-  defers it (`axes_deferred: [depth, domains]`). See the registry, §9.
+  defers it (`axes_deferred: [depth, domains]`). See the registry, its section "Axes this family does NOT own".
 
 ## 2026-09-21 — D-315 RATIFIED: THE CANONICAL RULER (BUG-329 CLOSED)
 The canonical ruler is **`governance/anchor1_frozen_20260920.json`** (`0ec321a7…` — authority for the HUMAN labels and

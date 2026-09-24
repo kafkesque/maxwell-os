@@ -103,7 +103,7 @@ cohort, intersection — never from memory and never from a derived column.
    coding freezes, disagreement on those rows is a direct measurement of the advisory references' error rate
    on this row family - the thing no one has ever measured. They are NOT to be read while coding.
 
-## 4. The plan for finishing the depth axis
+## 5. The plan for finishing the depth axis
 
 | step | act | gate |
 |---|---|---|
@@ -120,7 +120,7 @@ cohort, intersection — never from memory and never from a derived column.
 reading the prediction key while coding, adding depth values to the sheet before the freeze, or treating a
 single-coder result as truth.
 
-## 5. Self-review findings recorded from this consolidation
+## 6. Self-review findings recorded from this consolidation
 
 - MY DEFECT (fixed): the first `--apply` recorded `cells_refreshed` correctly, but a second (no-op) run
   overwrote it with `{}` - a no-op path erasing evidence, the BUG-418 class one level down. Fixed by
@@ -136,3 +136,50 @@ single-coder result as truth.
 - Counter discrepancy explained: an ad-hoc scan said 265 stale cells, the generator said 260. The 5-cell
   difference was the FORM rows whose upstream value is legitimately blank (already blank in the sheet). The
   generator's number is authoritative because there is now exactly ONE counter. The ad-hoc scan is deleted.
+
+## 7. UPDATED RECOMMENDATION (2026-09-24, after mapping the domain pipeline end to end)
+
+The owner's recollection is correct and is now measured: the domain axis **was** run frontier-LLMs-first and
+then human-adjudicated. What the mapping adds is *which cohort the human review landed on* — and that, not the
+key space, is why it does not consolidate.
+
+| step | artifact / field | measured |
+|---|---|---|
+| 1. two external frontier coders | `s4_domain_verdicts.jsonl::domains_ds` (DeepSeek) + `::domains_qw` (Qwen) | 216 rows each |
+| 2. silver consensus | `::silver_domains` (+ `domains_core`) | 216 rows |
+| 3. owner adjudication | `::domains`, `domains_authority: p5:human`, `domains_status: human-adjudicated`, `gen_model: human:D2618-p1-adjudication` | **216/216 human**; tier gold 63 / silver 47 / pending 106 |
+| 4. was the human load-bearing? | rows where DeepSeek != Qwen | **174/216 = 81 %** — the human pass WAS the value |
+
+**Cohort (the actual blocker).** The 216 is the D2618-P0 adjudication queue; the anchor is the F-11 ruler sample.
+This is **not** a key-space failure: both cohorts live in the same corpus store
+(`governance/joint_vote_production_checkpoint.jsonl` holds 149/150 ruler names and 216/216 verdict names;
+`knowledge pipeline/stage6_commit/t11/checkpoint.jsonl` likewise). They are **different items of the same corpus**.
+Intersection 216 ∩ 150 = **2** (R109, R142) — identical by `out_id` = `fb_id` *and* by exact name.
+Concatenating them yields a third instrument (364 rows: 148 with no domain axis, 214 with no CT/DISC/ET), which
+the never-concatenate-instruments rule forbids.
+
+**Why the 150 were never in that queue.** The F-11 human instrument had 26 columns —
+`item_id, name, DECIDE, class_/human_/a_/b_cont, class_/human_/a_/b_disc, class_/human_/a_/b_extra,
+DEFINITION, APPLICATION, MECHANISM, FORM_human_as_written/FORM_canonical/FORM_claude/FORM_kimi, owner_cont,
+owner_disc, owner_notes` — and **no domain column at all**. The axis was never asked of the owner on the 150,
+so nothing was dropped by the consolidation. The 150 carry only machine domains
+(`domains` + `domains_raw`, 150/150, 92 multi-label, 19 with the fail-closed `emerging`) and **no voter-level
+fields**, i.e. they never went through the DS/Qwen → human path.
+
+### Recommendation, in dependency order
+
+1. **Add `domains_machine` to ANCHOR-3 now** — provenance `machine`, never a `_final` column. The 150's machine
+   labels already exist for 150/150 rows; surfacing them makes the axis visible in the anchor instead of only in
+   `temp/`, and the family registry keeps it declared as machine-annotated so it can never be read as truth.
+2. **Replay the D2618-p1 pattern on the 150** — frontier pair → dispute set → **one** owner adjudication session →
+   freeze `domains_final`. Cost is 300 label generations, not 150 human hours: the owner only ever sees disputes.
+   Precedent (81 % dispute) bounds it. **OWNER GATE (C22):** frontier calls are opt-in and need explicit approval.
+3. **Do it in the SAME owner session as the depth coding.** Both axes are class-menu driven, both need exactly one
+   adjudication pass, and BUG-416 (the four depth classes exist only in prose) blocks both. One session, two axes,
+   one freeze — that is the cheapest path to a three-owned-axis anchor (CT/DISC/ET + depth + domains).
+
+**Revision to the earlier depth recommendation:** depth is no longer a novel instrument to be invented; it becomes
+the *second* axis through a pattern this repo has already proven (two machine coders + owner adjudication, the
+provenance tier that ANCHOR-3 already carries as `human-mixed+llm-attested`). The domain axis is the cheaper of the
+two because its machine pre-labels exist. Sequence unchanged: declare the class menu (BUG-416) → depth blind coding
+→ unseal the pre-registered key → D274f test-retest → only then D2577 head training.

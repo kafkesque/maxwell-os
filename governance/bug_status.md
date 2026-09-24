@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**94 open** / 77 closed of 171 ids.
+**95 open** / 79 closed of 174 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -59,7 +59,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-316 | goose main-loop model is the known-bad agentic model (MED, Phase 3 risk, 2026-09-21) | 1 |
 | BUG-317 | Bake-off arm layer silently ran the NLI arm on CPU (MED, own wiring, 2026-09-21) | 1 |
 | BUG-318 | Bake-off: config JSON braces killed the LLM arm + non-atomic artifact (HIGH, own wiring, 2026-09-21) | 1 |
-| BUG-319 | qwen3coder arm abstains 116/116 (HIGH, hidden failure, 2026-09-21) | 1 |
 | BUG-326 | (MED - BLOCKED 2026-09-21): the repair's TARGET NUMBERS do not reproduce on the live DB | 2 |
 | BUG-331 | Serving-gate write to the production DB has no R5 review on record (MED, OPEN) | 1 |
 | BUG-333 | (MED - OPEN 2026-09-21): the R5 verifier (gemma-4-E4B) can return a schema-shaped rubber stamp | 2 |
@@ -91,7 +90,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-395 | (MED, OPEN) - a control artifact that no recipe runs, whose verdict is stale and whose premise no longer matches the configuration | 2 |
 | BUG-398 | (MED, OPEN) - a receipt claimed a dated artifact that does not exist | 2 |
 | BUG-399 | (MED, OPEN -> detector now wired) - a derived governance count drifted and its detector ran nowhere | 2 |
-| BUG-400 | (HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22) | 1 |
+| BUG-400 | (HIGH, OPEN) - the sovereign corpus and the served store live inside a Dropbox File Provider domain (C3/C22) | 2 |
 | BUG-401 | (MED, OPEN) - the disk-chore instruction handed to the owner could not execute, and it aimed at 2 percent of the deficit | 1 |
 | BUG-406 | (HIGH, MITIGATED 2026-09-23) - the temp auto-purge rule had no declared-input guard: a sweep moved 35 declared inputs out of temp/ | 1 |
 | BUG-411 | (LOW, OPEN) - D2577 cites D2454 as the source of the gemma-depth refutation, and D2454 says something else | 1 |
@@ -100,4 +99,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-416 | (MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them | 1 |
 | BUG-417 | (HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, a | 1 |
 | BUG-420 | (MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo | 2 |
-| BUG-425 | (MED, OPEN 2026-09-24) - the `domains` axis is owned by a DIFFERENT cohort (intersection 2/150) and the family registry never said so | 1 |
+| BUG-425 | (MED, OPEN 2026-09-24) - the `domains` axis is owned by a DIFFERENT cohort (intersection 2/150) and the family registry never said so | 2 |
+| BUG-426 | (HIGH, OPEN - UNRESOLVED) - twice asserted "the 150's domain axis was never asked" while the owner states it WAS done. My search was methodo | 1 |
+| BUG-427 | (LOW, OPEN) - the F-11 human instrument carries 4 trailing blank-`item_id` padding rows, so `len(rows)` is 154 while the anchor is 150 | 1 |

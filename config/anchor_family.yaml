@@ -73,6 +73,10 @@ axes:
   domains:
     owner: external
     status: disowned_deferred
+    # OWNER RULING (2026-09-24, verbatim intent): "those 216 domain classifications have nothing to do
+    # with the ANCHOR". Recorded so the axis cannot be re-described as existing-but-misfiled.
+    axis_absent_in_anchor: true            # ANCHOR-3 has NO domain column. The axis does not exist here.
+    relationship: separate instrument (the D2618-P0 adjudication queue) - NOT this anchor's domain work
     artifact: governance/s4_domain_verdicts.jsonl
     review_sheet: governance/s4_domain_review_sheet.csv
     cohort_artifact_key: out_id            # == fb_id (64-hex content address)
@@ -80,7 +84,7 @@ axes:
     cohort: 216
     cohort_human_adjudicated: 216
     cohort_authority: p5:human
-    intersection_default_key: 2            # by out_id == fb_id
+    intersection_default_key: 2            # SHARED ITEMS ONLY - not axis ownership, not a merge candidate
     intersection_alternate_key: 2          # by exact name — two independent joins, same 2 rows
     intersection_rows: [R109, R142]
     provenance_of_anchor_domain_values: machine (S4/gpt-oss), NOT human

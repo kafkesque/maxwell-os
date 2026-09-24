@@ -28,6 +28,12 @@ REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
 # silently retiring a LIVE bug (BUG-333). A partial fix is an OPEN bug with progress attached.
 PARTIAL_WORDS = ("PARTIAL", "MITIGATED", "IN PROGRESS")
 STATUS_WORDS = CLOSE_WORDS + REOPEN_WORDS + PARTIAL_WORDS
+# BUG-429 (2026-09-24): "UNRESOLVED" CONTAINS "RESOLVED", so `### BUG-426 (HIGH, OPEN - UNRESOLVED)` was
+# classified CLOSED - a HIGH, explicitly-unresolved bug auto-retired by substring. Same degeneracy class as
+# BUG-347 (PARTIAL FIXED), second occurrence. A negated status word is checked FIRST and forces OPEN, which is
+# the fail-safe direction: an open bug that is really closed costs a look; a closed bug that is really open
+# costs the work being silently abandoned.
+NEGATED_WORDS = ("UNRESOLVED", "UNFIXED", "NOT RESOLVED", "NOT FIXED", "STILL OPEN", "NOT CLOSED")
 QQ = chr(34) + chr(8220) + chr(8221) + chr(39)
 QUOTE_RE = re.compile("[" + QQ + "][^" + QQ + "]*[" + QQ + "]")
 PAREN_RE = re.compile("[(]([^)]*)[)]")
@@ -53,12 +59,17 @@ def status_slot(rest: str) -> str:
 
 # BUG-350: status is read from status_slot(); a title that QUOTES a status word cannot decide.
 
-HEADER_RE = re.compile(r"^##\s+(BUG-\d+)\b[\s:—‑-]*(.*)$")
+HEADER_RE = re.compile(r"^#{2,3}\s+(BUG-\d+)\b[\s:—‑-]*(.*)$")
+# BUG-428 (2026-09-24): the pattern was `^##\s+` - EXACTLY two hashes - so the two OPEN bugs written
+# with three hashes (BUG-426 HIGH/UNRESOLVED, BUG-427 LOW) were silently absent from the machine
+# register and therefore from the C15 count and every handoff. A parser must not be able to lose a bug.
 
 
 def classify(text: str) -> str:
-    """Classify one header event. Precedence: reopened > partial(open) > closed > open (BUG-347)."""
+    """Classify one header event. Precedence: negated(open) > reopened > partial(open) > closed > open."""
     up = text.upper()
+    if any(w in up for w in NEGATED_WORDS):
+        return "open"
     if any(w in up for w in REOPEN_WORDS):
         return "reopened"
     if any(w in up for w in PARTIAL_WORDS):
@@ -77,6 +88,10 @@ def self_test() -> None:
         "MED - FIXED, REGRESSED 2026-09-21": "reopened",
         "LOW - CLOSED INVALID": "closed",
         "MED - RESOLVED (cleaned up)": "closed",
+        # BUG-429 shapes, taken from live headers:
+        "HIGH, OPEN - UNRESOLVED": "open",
+        "MED - UNFIXED 2026-09-24": "open",
+        "LOW - NOT CLOSED, FIXED PENDING REVIEW": "open",
         # BUG-350 shapes, taken from live headers:
         "MED FIXED 2026-09-21): the C15 classifier treated PARTIALLY FIXED as CLOSED": "closed",
         "No degenerate-arm guard: a collapsed arm could be read as a tie (HIGH, fixed 2026-09-21)": "closed",

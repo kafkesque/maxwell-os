@@ -1,0 +1,88 @@
+# anchor_cross_exam.yaml - sources, DECLARED coverage and thresholds for the ANCHOR two-axis cross-examination.
+#
+# WHY: a cross-examination that silently accepts whatever files happen to be on disk is not a measurement.
+# Every source carries a DECLARED coverage fingerprint (rows, first/last item_id, sha256). If a file changes or
+# shrinks, scripts/cross_examine_anchor_axes.py FAILS CLOSED instead of quietly scoring a different sample.
+# The owner's depth pass is the only source read as GOLD, and its sha256 is re-verified against the rail-1 lock
+# registry (config/human_instrument_locks.yaml) before a single column is read.
+#
+# Authority vocabulary (config/artifact_authority.yaml): only the owner may produce *_final values. Machine and
+# frontier sources here are ADVISORY; the cross-examination never writes domains_final or depth_final.
+schema_version: '1.0'
+artifact: ANCHOR-AXIS-CROSS-EXAM
+
+owner_gold:
+  path: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+  axis: depth
+  column: "DEPTH (1-4)"
+  conf_column: conf_depth
+  lock_registry: config/human_instrument_locks.yaml
+  authority: HUMAN-GOLD
+
+sources:
+  - id: deepseek-v4-pro
+    kind: pair_voter
+    path: governance/anchor4_domain_vote_checkpoint.jsonl
+    axes: [domains]
+    authority: MACHINE-ADVISORY-ONLY
+    declared: {rows: 150}
+  - id: Qwen3.8-27B-MLX-4bit
+    kind: pair_voter
+    path: governance/anchor4_domain_vote_checkpoint.jsonl
+    axes: [domains]
+    authority: MACHINE-ADVISORY-ONLY
+    declared: {rows: 150}
+  - id: claude-sonnet-5
+    kind: frontier_csv
+    path: governance/frontier_pack_20260924/raw/raw_claude_rows101-150.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    declared:
+      rows: 50
+      first: R101
+      last: R150
+      fenced: true
+      sha256: 4e142cfe0115d767505489ca20211a128b70d8a894f7b58ac584eb71c9bcd6c5
+  - id: kimi
+    kind: frontier_csv
+    path: governance/frontier_pack_20260924/raw/raw_kimi_rows001-145.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    declared:
+      rows: 145
+      first: R001
+      last: R145
+      fenced: false          # DECLARED FORMAT DEVIATION: raw CSV, no fenced block
+      accept_repeated_header: true   # header line re-emitted 5x mid-reply (real: it is a multi-block reply)
+      allow_truncated_tail: true     # reply cut by the output cap at row 146 (a single 'R' line) - declared shortfall
+      sha256: cfacb168edb180ba309f7a7af243c136cf622927d86d3b83623bcabc17bf7fdc
+  - id: claude-sonnet-5
+    kind: declared_missing
+    path: governance/frontier_pack_20260924/raw/raw_claude_rows001-050.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    note: "chunks 1-50 and 51-100 were never delivered; only chunk 101-150 exists"
+  - id: claude-sonnet-5
+    kind: declared_missing
+    path: governance/frontier_pack_20260924/raw/raw_claude_rows051-100.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    note: "chunks 1-50 and 51-100 were never delivered; only chunk 101-150 exists"
+  - id: kimi
+    kind: declared_missing
+    path: governance/frontier_pack_20260924/raw/raw_kimi_rows146-150.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    note: "output cap cut the reply at R145; rows R146-R150 are owed"
+
+thresholds:
+  depth_hard_spread: 2          # depth classes >= this far apart (ordinal) = a HARD split
+  domain_hard_min_coders: 3     # a zero-overlap domain split is only called HARD with this many coders present
+  low_conf: 0.5                 # a coder's own confidence below this is flagged for the owner
+  majority_min_share: 0.5       # share of present coders needed for a "majority" reading
+
+outputs:
+  long_csv: governance/anchor_axis_coders_20260924.csv
+  workbook: governance/anchor_adjudication_workbook_20260924.csv
+  stats_json: governance/anchor_axis_cross_exam_20260924.json
+  report_md: governance/ANCHOR_AXIS_CROSS_EXAM_20260924.md

@@ -3839,3 +3839,35 @@ instrument that cannot tell "no answer" from "a disagreeing answer" manufactures
 as done only when every reliable voter actually ANSWERED (`answered(rec) >= len(reliable)`), with an `attempt` counter
 capped at MAX_ATTEMPTS=3 so a hard failure cannot loop; the checkpoint is append-only and the latest record per
 `item_id` wins. Caught by re-reading the resume code before letting a multi-hour run proceed on it, not by a guard.
+
+## BUG-436 — MED — FIXED (by declaration + a standing rule)
+
+`scripts/vote_anchor_domains.py` declared two prompt deviations that **were never in force** on the run that
+produced `governance/anchor4_domain_vote_checkpoint.jsonl`. `vote_row()` delegates to the SHARED
+`bddv.vote_once()`, and that function builds its own prompt with `bddv._prompt()`: BOTH axes, the 61-label
+discipline menu and a `Boundary:` line. `BLIND_INPUT_150.csv` has no BOUNDARY column, so the field was sent
+EMPTY. The module's own `prompt_for()` — the domains-only prompt the docstring and the run receipt described —
+was dead code exercised only by `--dry-run`. The pre-flight "verification" that reported *"has DISCIPLINE
+section: False | domain labels offered: 43"* therefore certified a prompt the run never sent.
+
+WHY IT MATTERS: a declared deviation is a claim about the instrument, and the instrument's provenance is what the
+216-row cohort is compared against. Two consequences, both now declared: (a) the domain values are still strictly
+comparable to the 216 cohort, because they came from the identical instrument — this is a documentation defect,
+not a contamination; (b) every record also carries an unofficial machine `discipline` value, which must NEVER be
+read as an axis decision (discipline is HUMAN-owned in ANCHOR-3, 150/150).
+
+FIX: the script docstring and the run receipt both carry a CORRECTION block naming what was sent. STANDING RULE
+(this is the generalisable part): **a `--dry-run` that executes a different code path than `--run` verifies
+nothing.** The acceptance test must call the same function the run calls, or print the prompt built by the run
+path itself. Corollary defect in the same record: the first 4 checkpoint rows carry `n_voters: null` because they
+were written before the BUG-434 fix landed; `n_voters` is derived at read time by the cross-examination and is
+never trusted from the record.
+
+## BUG-437 — LOW — FIXED
+
+`scripts/cross_examine_anchor_axes.py` computed each row's domain "plurality" with `Counter(union)` where `union`
+was a **set** — so every candidate label counted 1, the "plurality label" was an arbitrary element of an unordered
+set, and the `DOMAIN_SPLIT_MENU` flag fired on **150 of 150 rows**. A flag that fires on every row is not a
+signal; it buried the real structure in the same table. FIX: count over the multiset of labels actually chosen.
+The verdict changed from `HARD 28 / SOFT 122 / AGREE 0` to `HARD 28 / SOFT 116 / AGREE 6`. Caught by re-reading my
+own output before showing it, not by a guard — which is the argument for showing the numbers, not the summary.

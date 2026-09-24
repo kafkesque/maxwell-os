@@ -10,11 +10,20 @@ cohorts stay comparable:
     policy = D2610 v2 via the shared vote_once()/aggregate() in scripts/build_discipline_domain_vote.py
     (unanimous domain SET -> agreed; disagreement or missing voter -> ABSTAIN + needs_review).
 
+CORRECTION 2026-09-24 (BUG-436) - the two deviations below were NOT in force on the run that produced
+governance/anchor4_domain_vote_checkpoint.jsonl. vote_row() delegates to bddv.vote_once(), which builds its own
+prompt with bddv._prompt(): BOTH axes + the 61-label discipline menu + a Boundary field. The prompt actually sent
+was therefore the SHARED 216-row instrument with an EMPTY Boundary (BLIND_INPUT_150.csv has no BOUNDARY column),
+and this module's prompt_for() was dead code exercised only by --dry-run - which is why the dry-run "verification"
+confirmed the wrong function. Consequences, both declared in the run receipt: the domain values remain strictly
+comparable to the 216-row cohort (same instrument), and every record additionally carries an unofficial machine
+`discipline` value that must NEVER be read as an axis decision (discipline is HUMAN-owned in ANCHOR-3).
+
 BLIND BY CONSTRUCTION: the input is governance/frontier_pack_20260924/BLIND_INPUT_150.csv — row text only, no
 CT/DISC/FORM/DEPTH/conf_depth, and no BOUNDARY (boundary encodes scope, which would leak the depth axis). The same
 file is the frontier pack's input, so every coder reads one identical artifact.
 
-DECLARED DEVIATIONS from the 216-row prompt (prompt_id `anchor_domains_v1`):
+DECLARED DEVIATIONS *AS INTENDED* (see the CORRECTION below - they were not in force) (prompt_id `anchor_domains_v1`):
   1. domains-only — the anchor's content_type and discipline are HUMAN-owned in ANCHOR-3; re-coding them here would
      invite a second, non-owner series for axes the owner has already decided.
   2. input fields name/definition/application/mechanism — the 216 run used boundary instead of application, since

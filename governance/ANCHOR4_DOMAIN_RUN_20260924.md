@@ -11,6 +11,17 @@ two cohorts stay comparable. Harness: `scripts/vote_anchor_domains.py` — it **
 ancestor contamination. "Qwen3.8" in the owner's question = Qwen3.8-27B, the local half of the pair.
 
 ## Blinding + declared deviations
+
+> **CORRECTION 2026-09-24 (BUG-436) - read this before the paragraph below.** The prompt that was actually sent was
+> NOT domains-only. `vote_row()` delegates to the shared `bddv.vote_once()`, which builds its own prompt with BOTH
+> axes, the 61-label discipline menu and a `Boundary:` line; `BLIND_INPUT_150.csv` carries no BOUNDARY column, so
+> that field was sent EMPTY. The module's `prompt_for()` (domains-only) was dead code used only by `--dry-run`,
+> which is why the pre-flight check confirmed a prompt the run never sent. What this does NOT change: the domain
+> values are byte-comparable to the 216-row cohort (same instrument, same vocabulary) and no domain was ever read
+> from a non-blind source. What it DOES add: each record carries an unofficial machine `discipline` value - it is
+> NOT an axis decision and must never be promoted (discipline is HUMAN-owned in ANCHOR-3). The paragraph below
+> stands as the DECLARATION OF INTENT; it is not a record of what was sent.
+
 Input: `governance/frontier_pack_20260924/BLIND_INPUT_150.csv` — row text only, **no CT/DISC/FORM/DEPTH/conf_depth and
 no BOUNDARY** (boundary encodes scope, which would leak the depth axis). The frontier coders will read the identical file.
 `prompt_id: anchor_domains_v1` is **domains-only**: the anchor's content_type and discipline are HUMAN-owned in ANCHOR-3

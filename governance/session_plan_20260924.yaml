@@ -9,6 +9,12 @@ next_state:
     pre-registered references; ANCHOR-4 sheet itself STILL not written (owner gate)
   - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+  - scripts/cross_examine_anchor_axes.py
+  - config/anchor_cross_exam.yaml
+  - governance/anchor_axis_*
+  - governance/ANCHOR_AXIS_*
+  - governance/frontier_pack_20260924/raw/*
+  - governance/bug_status.json
   - config/*.yaml
   - config/*.json
   - scripts/*.py

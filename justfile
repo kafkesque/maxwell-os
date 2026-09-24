@@ -10,6 +10,11 @@ health:
     python3 scripts/audit_flag_consumers.py || exit 1
     python3 scripts/verify_anchor_manifest.py || exit 1
     python3 scripts/consolidate_anchor4_context.py --check || exit 1
+python3 scripts/check_depth_menu.py || exit 1
+        python3 scripts/check_human_instruments.py || exit 1
+    python3 scripts/check_instrument_cohorts.py governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv || exit 1
+    python3 scripts/check_existence_negatives.py || exit 1
+    python3 scripts/check_buglog_coverage.py || exit 1
     python3 scripts/verify_anchor_family_registry.py || exit 1
     python3 scripts/verify_menu_routing.py || exit 1
     python3 scripts/verify_menu_policy.py || exit 1

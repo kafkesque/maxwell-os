@@ -1,0 +1,30 @@
+# depth_classes.yaml - THE depth class menu (BUG-416). Single source of truth for the depth axis.
+#
+# WHY: the four classes existed only as prose in governance/ANCHOR4_DEPTH_RUBRIC_20260923.md, so nothing
+# could check a coded value, regenerate the rubric, or stop a session from re-inventing the classes. A rule
+# that lives in prose drifts (the same defect BUG-416, and the reason BUG-424/425 happened).
+# `scripts/check_depth_menu.py` asserts this file and the rubric's prose agree, and that any coded DEPTH
+# value is a member of this menu. Direction of authority: THIS FILE, never the prose.
+schema_version: '1.0'
+axis: depth
+what_it_measures: epistemic SCOPE, never subject matter
+scope_test: ask whether the claim survives substitution into a DIFFERENT field with no domain-specific change
+blind_prohibition:
+  - gpt-oss labels
+  - the 3-voter depth consensus
+  - gold_4axis.jsonl depth values
+  - any pre-registered prediction key
+classes:
+  - {id: 1, label: universal,    definition: "holds in every field tried; the domain context is irrelevant to its truth"}
+  - {id: 2, label: cross-domain, definition: "holds in >= 2 fields but not all; at least one field resists it"}
+  - {id: 3, label: domain,       definition: "holds inside one field; carrying it elsewhere needs re-derivation"}
+  - {id: 4, label: specialized,  definition: "holds only inside a narrow sub-specialty, an instrument, a technique or a named corpus"}
+soft_band:                       # D2130: a BAND, never a mechanical rule
+  universal: ">= 3 domains"
+  cross-domain: ">= 2"
+  domain: "1..N adjacent"
+  specialized: "1"
+guards:
+  - "D282: scope is the depth axis and NEVER the content_type discriminator - a 1-domain or specialized PRINCIPLE is still a principle"
+  - "D2130: the band informs, it does not decide; a coder may deviate with a note"
+  - "the menu is CLOSED: a value outside 1-4 is a defect, never a new class"

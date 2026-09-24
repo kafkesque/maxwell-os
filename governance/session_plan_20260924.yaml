@@ -1,0 +1,25 @@
+# session_plan_20260924.yaml - the anti-drift lock for this session (rail 4).
+mission: |
+  Answer the owner's clarification questions with byte-level proof; build the four rails so the answer to
+  "can this drift again?" is enforced rather than promised; then declare the depth class menu (BUG-416).
+next_state:
+  - declared depth class menu in config, rubric derived from it, closure check repointed
+  - four rails green in just health
+may_touch:
+  - config/*.yaml
+  - config/*.json
+  - scripts/*.py
+  - governance/buglog.md
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - governance/SESSION-HANDOFF-*.md
+  - governance/existence_negatives.yaml
+  - governance/session_plan_*.yaml
+  - governance/depth_menu*.md
+  - governance/ANCHOR4_DEPTH_RUBRIC_*.md
+  - justfile
+will_not_touch:
+  - governance/F11_*            # owner instruments (write-locked)
+  - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
+  - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
+  - pipeline/**

@@ -1,0 +1,55 @@
+# human_instrument_locks.yaml - WRITE LOCKS on owner-authored artifacts (BUG-430 rail 1).
+# Every sha256 is MEASURED via the format-aware reader in scripts/check_human_instruments.py.
+# protected = column name contains human|owner. Byte-identical required; new columns allowed;
+# removed/rewritten columns FAIL. Keys are JSON-quoted (a column name contains '>>>').
+schema_version: '1.0'
+generated: '2026-09-24'
+instruments:
+  - path: governance/F11_DECISION_SHEET_20260922.csv
+    sha256: 6ce78e446e6015e6af37e1f28e07ea6591eaec08034cb67224cb3cc05b539acd
+    rows: 154
+    protected_columns:
+      "human_cont": fab1d1246020e6abe888c7070172d28384855ea72ffe90c93977188eb6fcbdfc
+      "human_disc": f45b4d5ba0dc3543215abade012503dc82aeb4f3c545526313bb851a1c400254
+      "human_extra": 223a7c1828c561990d2a31a9c0e9b15d2928fac95773f95b9ff89c3f59341a09
+      "FORM_human_as_written": 96148ae9be79de5c3fb312294fe58fb59f6bbbc6e50865935f7b9a1fb564f426
+      ">>> OWNER INPUT (fill only X/Y/Z) <<<": a482d24354a4df2466a1a532547143834954fe8e89821f3e4011ce428bc00d4b
+      "owner_cont": 92fbdad173856c8bcbc6ad52d272f9125784128d9729f1411c69711069fe330e
+      "owner_disc": f57538161a75e201884d02f38b0bcafa4dbc3f7f7aba7573bd1775f93e2837cc
+      "owner_notes": a482d24354a4df2466a1a532547143834954fe8e89821f3e4011ce428bc00d4b
+  - path: governance/F11_OWNER_RULING_MAP_20260922.csv
+    sha256: 906c2ef6cf1c9727e639fadf71be4a2e1f3dd31e4b8c6aa5dc610a33b45f81cb
+    rows: 81
+    protected_columns:
+      "human_extra_verbatim": a3fbbf43d2c7ae32eb512daad37cbb176a1d85eb4fe1c53af87e3af2fc6737d2
+      "owner_cont": ddfefbd979dcaf22d5b9a34b8c413be82a62a9f1a5364f303e0c421382559fea
+      "owner_disc": fca8ac3de9efee4dd2a976123ce70dc64c43c7756137e7130d428730c92b6b7e
+  - path: governance/F11_ANCHOR_REVIEW_20260923.csv
+    sha256: fa4ea1eb3d50aa2c400454e803e6ce3d217bd8d4a250da937f244b7cf8ef6a4a
+    rows: 108
+    protected_columns:
+      "human_ct": 7654b43aa267e0dafef7a472d4ab8cb8a6f6be4478965667c5811419996dfe7e
+      "human_disc": 22c846070eefc43a3175ea58bd8535d72efd294e7dcc5157a30e5c5b03eadd3b
+      "human_form": 2ff05a9aacd3a3c33e43cc567d37085a40a9c53b7d1b7fae929aa86b994d5f49
+      "owner_ct": b12564281a30bca173b7824fbb9efb16e99f0696e21526b7d20d374591253e8f
+      "owner_disc": c3644a7b86fe17b93b6ad4fa75a293dcb08b49bdf42ec570309ee2ac11e21d42
+      "owner_form": 227968c9c0a46b641d1f9189b8e6fd99df43de3d5f0577b6c4555e8bd24781a8
+      "owner_keep_missing": 227968c9c0a46b641d1f9189b8e6fd99df43de3d5f0577b6c4555e8bd24781a8
+      "owner_notes": 1b570ba88109e02144bcde834b3f49eda38aa37d550df39ae2de1dd983765b7a
+  - path: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+    sha256: 29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698
+    rows: 150
+    protected_columns:
+      "content_type_human_present": 0ccc8f74b6cd99113916f6ec09b93e86696cf77424c2f149abd8e5e1227a226e
+      "content_type_human": 3cb0b539803c1343dadbbe03a96fb2d786ce44334e576e3f71fd2d9ae68191e1
+      "discipline_human_present": a227212c84fd19258fa7637dbe1f6e03f340bc318c2c80a663a284217387c04f
+      "discipline_human": 88a5a534d59db62f550f2854a14b0bf7a32b8e4b0820490e4fcae1e5c8931dce
+      "extraction_type_human_present": 6632ca1209f3c0ee357732a57c0448d2c44a2ef276da0ac08542f18b7d0d38ae
+      "extraction_type_human": df38438f19d53d46ccf464cfe6b1a39cbd3db287ea6200d8c9d0445682b5af48
+      "owner_keep_missing": 5c7c97653eff293da3cd1341ad26eede87a94bfee51a54217d9e72d9513c1919
+      "owner_notes": 0454c15381e7b0f3e72a55a814880bf1e1cf88c4ce37a95e05a9642b641cc10d
+  - path: governance/s4_domain_verdicts.jsonl
+    sha256: 3596fd3ec5cb14d3aec0e7de709dc8caa8f73f948c364f3ae43c9f5f55552680
+    rows: 216
+    protected_columns:
+      "discipline_human": 68d920621879d4c952da335a9353d732ed1d3d42236b22ab4bb1e08d3cc9799e

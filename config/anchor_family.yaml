@@ -76,6 +76,12 @@ axes:
     # OWNER RULING (2026-09-24, verbatim intent): "those 216 domain classifications have nothing to do
     # with the ANCHOR". Recorded so the axis cannot be re-described as existing-but-misfiled.
     axis_absent_in_anchor: true            # ANCHOR-3 has NO domain column. The axis does not exist here.
+    # OWNER CORRECTION (2026-09-24): "domain are not absent by design those are absent because of your
+    # mismanagement". Correct and recorded: the axis was IN SCOPE (taxonomy v5 carries 44 domains; the
+    # 216-row cohort got the full frontier-pair + owner-adjudication path) while the F-11 instrument built
+    # for the ruler sample carried 26 columns and NO domain column. That is an omission owed back, NOT a
+    # deliberate deferral - so `axes_deferred: [depth, domains]` in config/eval_integrity.yaml must not be
+    # read as "no work owed" for domains. Work owed: one frontier-pair + one owner adjudication pass.
     relationship: separate instrument (the D2618-P0 adjudication queue) - NOT this anchor's domain work
     artifact: governance/s4_domain_verdicts.jsonl
     review_sheet: governance/s4_domain_review_sheet.csv

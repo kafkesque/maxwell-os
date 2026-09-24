@@ -1,0 +1,19 @@
+# existence_negatives.yaml - every NEGATIVE claim about the owner's own work (BUG-426 rail 3).
+# A row may not answer "does not exist" unless search_complete is true AND not_searched is empty.
+# Otherwise the only permitted answer is "not found yet".
+schema_version: '1.0'
+claims:
+  - id: NEG-001
+    claim: a 150-row artifact in this repo carries the owner's OWN domain labels for anchor rows R001-R150
+    keys_used: [item_id, name, fb_id, out_id]
+    roots_searched:
+      - governance/*.csv|jsonl
+      - temp/ruler_input_20260923.jsonl
+      - ~/Downloads/maxwell-os-main
+    search_complete: false
+    not_searched:
+      - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os
+      - ~/Library/CloudStorage/Dropbox/claude projects/maxwell-os-heavy
+      - ~/Library/CloudStorage/Dropbox/claude projects/archived
+      - session attachments referenced in goose sessions 20260913_1 / 20260919_3
+    answer: not found yet

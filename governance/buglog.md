@@ -3783,3 +3783,24 @@ backup before any re-write. Mitigation done now: the clobbered bytes are preserv
 write-locked, and the context guard now reports a DECLARED interim state (config/anchor4_interim_state.json) as WARN
 while BUG-431 is open, with `--strict` proving it still fails closed. FIX (owner gate): one promotion write.
 
+
+### RECEIPT - ANCHOR-4 depth drop-in rev 2: the owner fixed the date, and rail 1 caught the edit within minutes (2026-09-24, annotation)
+- rev 1 (committed byte-exact as-is at 075ae65): sha256 `be1a39e0…`, `date` = `13.09.26` ×150.
+- rev 2 (mtime 2026-09-24 15:23:32, 203506 bytes — SAME byte count): sha256 `bc1cc956…`, `date` = `24.09.26` ×150.
+- Cell-level diff rev 1 → rev 2: **`date` 150 cells, nothing else.** DEPTH (1-4) / conf_depth / note_codes / reviewer
+  column hashes are byte-identical to their rev-1 locked values, so the LABEL CONTENT of the owner's pass is unchanged
+  and every conclusion of `ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md` §1–§3 stands (§7 of that receipt records
+  the supersession). The write lock now binds rev 2 and keeps rev 1 as a declared `superseded` revision.
+- This is the rail WORKING, not a defect: `check_human_instruments.py` failed closed with
+  `REWRITTEN governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv::date` the moment the file was touched.
+  Before rail 1 the same edit was invisible (BUG-432).
+
+### BUG-432 - INSTANCE 3 (2026-09-24): an owner drop-in was edited AFTER it was committed, so a committed `Copy of *` is a point-in-time snapshot, not a live instrument
+The drop-in was committed byte-exact at 075ae65 (rev 1) and edited in place ~5 hours later (rev 2, the date fix).
+Nothing about the edit was wrong — but it means any config, receipt or ledger that pins a drop-in sha256 must be
+re-measured whenever the file is touched, and the old sha must be kept as a declared `superseded` revision rather than
+silently overwritten (done in `config/human_instrument_locks.yaml`). Rail 5(b) now has a second observable form: "a
+TRACKED drop-in with an uncommitted modification", in addition to "a `Copy of *` sibling newer than its tracked
+counterpart". CONSEQUENCE: the touch re-opens every open existence-negative claim under the standing rule, so
+BUG-426's `NEG-001.last_dropin_considered` must name rev 2 (sha + mtime) and `search_complete: false` — depth ≠ domains,
+the owners's depth pass is still NOT this claim's answer.

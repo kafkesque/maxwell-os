@@ -491,7 +491,7 @@
     {
       "id": "BUG-432",
       "title": "INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the",
-      "events": 2
+      "events": 3
     },
     {
       "id": "BUG-433",

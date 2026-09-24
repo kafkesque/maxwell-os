@@ -78,3 +78,21 @@ Verified by two independent fail-closed guards, which is why this was caught at 
 blind` and `sheet sha256 b47114d4 != manifest 14ee0d7a`; `verify_anchor_family_registry.py` -> blank-count 150 declared
 vs 132 measured. New ids: BUG-433 (the clobber) and BUG-432 INSTANCE 2 (staleness). Clobbered bytes preserved at
 `governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_20260924.csv`.
+
+## 7. Supersession (2026-09-24 15:23) — the owner fixed the date; this receipt stays bound to rev 1
+`governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` was edited **in place** after §1–§6 were written:
+- rev 1 sha256 `be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb` — the bytes this receipt was measured
+  on, committed byte-exact at 075ae65;
+- rev 2 sha256 `bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4`, mtime 2026-09-24 15:23:32,
+  **same byte count** 203506.
+
+Cell-level diff rev 1 → rev 2: `date` 150 cells `13.09.26` → `24.09.26`. **Nothing else.** `DEPTH (1-4)` `e35247a8…`,
+`conf_depth` `c9047a09…`, `note_codes` `5c7c9765…` and `reviewer` `3adf424c…` column hashes are byte-identical to the
+ones locked against rev 1, and `scripts/check_human_instruments.py` reports exactly one rewritten column, `::date`.
+
+**Consequences.** §1 (COMPLETE, menu-conformant), §2 (9/12 vs the pre-registered key; 2/2 human-derived), §3
+(blinding + D282) and §4 (anomalies) all **STAND unchanged** — they rest on the label columns, which did not move.
+What does change: the instrument's `date` is now the correct coding date, so the D274f 30-row test-retest clock runs
+from **2026-09-24**. Which hash is bound where: the write lock now binds rev 2 and keeps rev 1 as a declared
+`superseded` revision; this receipt deliberately documents rev 1. The outstanding owner question about the date is
+answered (it was a carried-over date, now corrected).

@@ -23,7 +23,11 @@ claims:
       - temp/ruler_input_20260923.jsonl
       - ~/Downloads/maxwell-os-main
       - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0   # the LIVE repo (searched 2026-09-24)
-    last_dropin_considered: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv (depth axis, not domains)
+    last_dropin_considered: >
+      governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv rev 2, sha256
+      bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4, mtime 2026-09-24 15:23:32
+      (rev 1 be1a39e0... is the same pass, date 13.09.26). DEPTH axis only - NOT this claim's answer:
+      an owner depth pass says nothing about whether an owner 150-row DOMAIN classification exists.
     search_complete: false
     not_searched:
       - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os        # sibling tree, NOT the repo; holds domain machinery:

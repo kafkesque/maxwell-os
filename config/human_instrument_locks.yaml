@@ -54,14 +54,22 @@ instruments:
     protected_columns:
       "discipline_human": 68d920621879d4c952da335a9353d732ed1d3d42236b22ab4bb1e08d3cc9799e
   - path: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
-    sha256: be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb
+    # rev 2 (2026-09-24 15:23:32): owner fixed the date in place (13.09.26 -> 24.09.26), same byte
+    # count. ONLY the date column moved, so the DEPTH/conf_depth/note_codes/reviewer hashes below are
+    # unchanged and the label content of the pass is byte-identical to rev 1.
+    sha256: bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4
     rows: 150
+    superseded:
+      # rev 1 = the byte-exact copy committed as-is at 075ae65, and the artifact that
+      # ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md sections 1-3 were measured on.
+      - sha256: be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb
+        date: 1cfce0e97d5b7e94abe0c47a8a749e72b3b69aa96a55714209ad1dbd6ee7e2bb
     protected_columns:
       "DEPTH (1-4)": e35247a84e0004194d7c8eec8b883ebaaea7c4be78699bb433521b1284353b7a
       "conf_depth": c9047a091805711580d297b990f01a1e988c65313a8e336f7da4ac0af54bf411
       "note_codes": 5c7c97653eff293da3cd1341ad26eede87a94bfee51a54217d9e72d9513c1919
       "reviewer": 3adf424cde66855fc3d6ada4532cbc29c6995aa1a2465a6b053262b45f4bb548
-      "date": 1cfce0e97d5b7e94abe0c47a8a749e72b3b69aa96a55714209ad1dbd6ee7e2bb
+      "date": ee41a9fd5494c51429205065f0e10584103ff7a06fe6cc920c3aff2436a63cfd
   - path: governance/F11_DISC_REVIEW_20260923.csv
     sha256: 4aed251af15e01cdc36ce39d41b99026996efe3210ff5eff65f6861fcfea2442
     rows: 71

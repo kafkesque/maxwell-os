@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "state": "pending_owner_gate",
+  "bug": "BUG-431",
+  "also_open": [
+    "BUG-432",
+    "BUG-433"
+  ],
+  "reason": "the tracked ANCHOR-4 sheet carries pre-consolidation context plus the owner's PARTIAL depth pass; the complete pass exists as a write-locked drop-in and promotion is an owner gate",
+  "dropin_sha256": "be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb",
+  "receipt": "governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md",
+  "expires_when": "the promoted sheet is committed; then this file is deleted and the guard fails closed again"
+}

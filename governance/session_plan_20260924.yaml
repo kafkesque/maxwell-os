@@ -5,6 +5,8 @@ mission: |
 next_state:
   - declared depth class menu in config, rubric derived from it, closure check repointed
   - four rails green in just health
+  - owner's ANCHOR-4 depth pass (150/150, drop-in) receipted, write-locked and scored against the
+    pre-registered references; ANCHOR-4 sheet itself STILL not written (owner gate)
 may_touch:
   - config/*.yaml
   - config/*.json
@@ -19,6 +21,10 @@ may_touch:
   - governance/ANCHOR4_DEPTH_RUBRIC_*.md
   - justfile
   - governance/frontier_pack_*
+  - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_*.md
+  - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv   # owner drop-in: committed as-is, never rewritten
+  - governance/F11_DISC_REVIEW_*.csv                            # owner instrument, drop-in
+  - governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_*.csv
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

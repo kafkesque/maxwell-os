@@ -1,19 +1,38 @@
 # existence_negatives.yaml - every NEGATIVE claim about the owner's own work (BUG-426 rail 3).
 # A row may not answer "does not exist" unless search_complete is true AND not_searched is empty.
 # Otherwise the only permitted answer is "not found yet".
-schema_version: '1.0'
+schema_version: '1.1'
+standing_rules:
+  # BUG-432 (2026-09-24): the owner's completed work arrived as a drop-in "Copy of <sheet>" file from OUTSIDE the repo,
+  # 11 days after the fact, while the tracked file held a partial save. A negative about owner work is therefore only
+  # valid as of the last drop-in seen - never as a standing fact.
+  - rule: any owner drop-in (a new file under governance/ named 'Copy of *', or any file carrying an owner-authored
+      date/reviewer value) RE-OPENS every open claim below and requires a re-scan before any negative is restated.
+  - rule: a negative must name the LAST drop-in considered, with its sha256 or mtime.
+  - rule: name every root as the path that was actually opened. The live repo is
+      '~/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0' - '.../maxwell os' is a DIFFERENT sibling tree
+      and was wrongly named as the repo root in the first version of this ledger. Same for maxwell-os-heavy, archived,
+      'book classification', 'claude skills'.
 claims:
   - id: NEG-001
     claim: a 150-row artifact in this repo carries the owner's OWN domain labels for anchor rows R001-R150
+    axis: domains          # NOTE: the owner's 150-row DEPTH pass is NOT this claim's answer - depth != domains
     keys_used: [item_id, name, fb_id, out_id]
     roots_searched:
       - governance/*.csv|jsonl
       - temp/ruler_input_20260923.jsonl
       - ~/Downloads/maxwell-os-main
+      - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0   # the LIVE repo (searched 2026-09-24)
+    last_dropin_considered: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv (depth axis, not domains)
     search_complete: false
     not_searched:
-      - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os
+      - ~/Library/CloudStorage/Dropbox/claude projects/maxwell os        # sibling tree, NOT the repo; holds domain machinery:
+          # tools/classify_domains.py, tools/reclassify_fb_domains.py, config/domain_discipline_constraints.yaml, and
+          # architecture/_historical/550 fb source domain and discipline labels+content+ and proposed domain and discipline labels.md
+          # -> highest-value remaining lead for this claim (fb-source cohort, domain labels)
       - ~/Library/CloudStorage/Dropbox/claude projects/maxwell-os-heavy
       - ~/Library/CloudStorage/Dropbox/claude projects/archived
+      - ~/Library/CloudStorage/Dropbox/claude projects/book classification
+      - ~/Library/CloudStorage/Dropbox/claude projects/claude skills
       - session attachments referenced in goose sessions 20260913_1 / 20260919_3
     answer: not found yet

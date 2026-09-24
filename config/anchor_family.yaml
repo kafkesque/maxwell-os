@@ -39,7 +39,17 @@ derived_sheet:
   manifest: governance/ANCHOR4_MANIFEST_20260924.json
   writer: scripts/consolidate_anchor4_context.py
   owns: [depth]
+  depth_blank_expected: 132     # MEASURED 2026-09-24: the owner's pass covers R001-R018 in the tracked sheet; the
+                                # complete 150/150 pass lives in the write-locked drop-in (see interim_20260924)
   pending: depth cells blank until the blind coding freezes
+  interim_20260924: |
+    MEASURED 2026-09-24: the tracked sheet is NOT consolidated and NOT blind. It was clobbered at 13:39 by an
+    out-of-band writer (Dropbox/file-provider re-sync) back to the PRE-consolidation context (142 FORM / 62 DISC /
+    56 CT cells stale) while carrying the owner's reviewer/date on all 150 rows and DEPTH on R001-R018 only.
+    The owner's COMPLETE pass (150/150) exists as the write-locked drop-in
+    'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv' (sha256 be1a39e0...). Promoting it into this
+    sheet is ONE owner-gated write and clears BUG-431/432/433. Receipt:
+    governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md
 
 # Axis-by-axis. status ∈ {owned, disowned_deferred, disowned_scope_change}.
 axes:

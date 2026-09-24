@@ -53,3 +53,20 @@ instruments:
     rows: 216
     protected_columns:
       "discipline_human": 68d920621879d4c952da335a9353d732ed1d3d42236b22ab4bb1e08d3cc9799e
+  - path: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+    sha256: be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb
+    rows: 150
+    protected_columns:
+      "DEPTH (1-4)": e35247a84e0004194d7c8eec8b883ebaaea7c4be78699bb433521b1284353b7a
+      "conf_depth": c9047a091805711580d297b990f01a1e988c65313a8e336f7da4ac0af54bf411
+      "note_codes": 5c7c97653eff293da3cd1341ad26eede87a94bfee51a54217d9e72d9513c1919
+      "reviewer": 3adf424cde66855fc3d6ada4532cbc29c6995aa1a2465a6b053262b45f4bb548
+      "date": 1cfce0e97d5b7e94abe0c47a8a749e72b3b69aa96a55714209ad1dbd6ee7e2bb
+  - path: governance/F11_DISC_REVIEW_20260923.csv
+    sha256: 4aed251af15e01cdc36ce39d41b99026996efe3210ff5eff65f6861fcfea2442
+    rows: 71
+    protected_columns:
+      "human_disc_now": 222e09ddf4c340f4fe3fb3857461fec96d23f128da8257a78ea32f1c2a26705d
+      "owner_disc_final": 930c381e8b7e5e97e8a940261fa7e1d3d35dcf3fd54336bde975fae6b9475a8a
+      "owner_keep_missing": 8ac510d326fff80fee6d3333a69b64a2c20141a6c8d51524f6d205aa3ca43815
+      "owner_notes": 8ac510d326fff80fee6d3333a69b64a2c20141a6c8d51524f6d205aa3ca43815

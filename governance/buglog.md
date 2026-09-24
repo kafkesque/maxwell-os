@@ -3717,3 +3717,69 @@ Asked directly by the owner ("did you lose, overwrite or corrupt my previous FOR
 **Fix.** (a) `HEADER_RE` accepts `##` and `###`; (b) `NEGATED_WORDS` is checked FIRST and forces OPEN (UNRESOLVED/UNFIXED/NOT RESOLVED/NOT FIXED/STILL OPEN/NOT CLOSED), with 3 live-shape self-test cases - the direction of failure is chosen deliberately: an open bug that is really closed costs a look, a closed bug that is really open costs the work being silently abandoned; (c) new `scripts/check_buglog_coverage.py` fails closed on any heading that names a bug id and is not parsed by `HEADER_RE`, reusing `HEADER_RE` by import so pattern and guard cannot diverge, and exempting declared ANNOTATION headings (`CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|...`) so the guard does not get disabled for shouting at apparatus.
 **Why it is HIGH.** The register is the artifact a session quotes as "current state". A register that silently drops the top-severity unresolved item converts a known, loud problem into a false "all clear" - the exact failure the owner named.
 **Detected by.** recounting the register against `governance/buglog.md` while answering "did you corrupt my FORM classification?" - i.e. the drift audit was load-bearing, not ceremony.
+
+### RECEIPT - ANCHOR-4 depth owner pass evaluated + ANCHOR-4-KEY unsealed (2026-09-24, annotation)
+Owner supplied `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` (sha256 be1a39e04c378af9..., 150 rows).
+Measured: DEPTH 150/150 all in {1,2,3,4}; conf_depth 150/150 all in {1,2,3}; reviewer human 150/150; date 13.09.26
+150/150; note_codes 0/150. Distribution 3=66, 4=44, 2=33, 1=7. vs the 12 pre-registered ANCHOR-4-KEY references:
+9/12 agree (human-derived 2/2). vs the 3-voter depth advisory: 8/11 on a name join, but the advisory is joinnable on
+only 17/150 rows (94% unjoinable) so it cannot validate this cohort. The tracked sheet on disk is a PARTIAL autosave
+of the same pass (18/150, 18/18 agreement) with `conf_depth` corrupted to the word `domain` on R149/R150; preserved
+byte-exact as `governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_20260924.csv`.
+ANCHOR-4-KEY (governance/ANCHOR4_DEPTH_PREDICTION_KEY_20260924.json) was READ to score this pass - declared here so the
+peek cannot later be presented as a pre-registered result. Receipt: governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md.
+Also recorded: config/human_instrument_locks.yaml and scripts/check_human_instruments.py cite "BUG-430" in their headers but
+no heading exists in this file - a citation without an entry is the same traceability hole as BUG-428. Stands as the
+missing-rails defect id; do not reuse 430.
+
+### BUG-432 - INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the
+owner's depth pass was coded against a 58%-stale context (260/450 context cells differ from ANCHOR-3). The judged row
+TEXT (DEFINITION/APPLICATION/MECHANISM/BOUNDARY/SOURCE EXCERPT) is identical apart from R147's DEFINITION, and the
+D282 check (depth is not determined by content_type) passes - so the labels stand, but the staleness must be declared
+in the freeze manifest rather than discovered later. One owner line needed: is R147's text difference a wording fix
+(copy) or a stale copy (tracked)?
+
+### BUG-431 - ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN)
+Measured: at 4a4c71d the ANCHOR-4 `FORM (1-4)` column held the menu-conformant `extraction_type_final` values
+(normative_heuristic 50 / descriptive_model 41 / causal_mechanism 40 / empirical_pattern 14, 5 blank). After the
+context refresh it holds `extraction_type_ruler_raw` - the owner's verbatim spellings: 'descriptive model' 38,
+'casual mechanism' 30, 'normative heuristic' 27, 'normativ heuristic' 22, 'empirical pattern' 13, 'causal mechanism' 10,
+'escriptive model' 2, 'normative_heuristic' 1, 'descriptive_model' 1, 'empirical_pattern' 1 (= 145). Only 3 cells are
+strictly on-menu. The rubric (lines 47-49) declares the derivation source is `extraction_type_final`, and the column
+header says "(1-4)": both are now false. The refresh therefore downgraded a conformant column, and
+`consolidate_anchor4_context.py --check` cannot see it because guard and writer read the same mapping - the same
+"guard agrees with its own assumption" class as BUG-421. Same defect class in the sibling columns: CT/DISC cells hold
+label prose while the headers say (1-7)/(1-62). FIX (owner gate, ANCHOR-4 sheet is write-frozen this session): map
+FORM to extraction_type_final, keep ruler_raw in its own provenance column, add a menu-conformance assertion for
+CT/DISC/FORM to the context guard so a wrong mapping fails closed. NOT a depth defect: D282 leak check passes, DEPTH
+is not determined by FORM; the owner's depth pass remains valid.
+
+### BUG-432 - owner work can arrive as an unversioned drop-in while the tracked sheet holds a partial save; nothing detects it (2026-09-24, HIGH, OPEN)
+The owner's completed 150-row depth pass existed only as `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`
+(untracked, Finder/Dropbox "Copy of" naming, produced outside the repo) while the git-tracked sheet held an 18-row
+partial autosave of the same pass - and the working tree sat like that, undetected, with all rails green. The
+"Copy of *" pattern is the observable signature: it means the artifact that people edited is NOT the artifact in git.
+No existing rail covers this: write-locks protect a tracked file's contents, cohort guards protect joins, the
+existence-negative ledger covers claims - none of them notices that the authoritative copy is outside version control.
+PROPOSED RAIL 5 (next session, config-driven): (a) a detector that fails when a sheet has reviewer/date filled but a
+target column partially empty, or when it is modified while owning an uncommitted partial state; (b) a drop-in scan
+that reports any `Copy of *` / " *copy* " sibling newer than its tracked counterpart; (c) a standing rule that any
+owner drop-in RE-OPENS every open existence-negative claim (NEG-001) and requires a re-scan before any negative is
+restated. Immediate mitigation done: drop-in committed as-is, write-locked, partial byte-copied to backups/.
+
+### BUG-433 - a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)
+Evidence: `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` was committed CONSOLIDATED at 10:40 (e7da35b, manifest
+sha 14ee0d7a8d46e1d6), yet the working tree at 13:39 held the PRE-consolidation content (142 FORM / 62 DISC / 56 CT
+cells stale vs ANCHOR-3) plus the owner's reviewer/date on all 150 rows and DEPTH on R001-R018 only. Nothing in the
+repo performed that write: it is an out-of-band writer - the Dropbox File Provider re-syncing a cloud-editor save
+down over the repo copy (the BUG-400 / Gate D hazard class), i.e. the same mechanism that produced the untracked
+'Copy of ...' drop-in. Two fail-closed guards noticed (`consolidate_anchor4_context.py --check`: 5 drifts incl.
+'sheet sha256 != manifest' and 'DEPTH already filled on R001 - the sheet is no longer blind';
+`verify_anchor_family_registry.py`: blank-count 150 declared vs 132 measured) - nothing else did, and `git status`
+had shown the file as ordinary 'M'. Standing rule: a tracked artifact that is MODIFIED without a corresponding local
+process must be treated as an out-of-band clobber until proven otherwise, and its pre-clobber bytes must exist in a
+backup before any re-write. Mitigation done now: the clobbered bytes are preserved byte-exact at
+`governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_20260924.csv`, the owner's complete pass is
+write-locked, and the context guard now reports a DECLARED interim state (config/anchor4_interim_state.json) as WARN
+while BUG-431 is open, with `--strict` proving it still fails closed. FIX (owner gate): one promotion write.
+

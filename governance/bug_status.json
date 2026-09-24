@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 174,
-  "open_n": 95,
+  "total_ids": 177,
+  "open_n": 98,
   "closed_n": 79,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -481,6 +481,21 @@
     {
       "id": "BUG-427",
       "title": "(LOW, OPEN) - the F-11 human instrument carries 4 trailing blank-`item_id` padding rows, so `len(rows)` is 154 while the anchor is 150",
+      "events": 1
+    },
+    {
+      "id": "BUG-431",
+      "title": "ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN)",
+      "events": 1
+    },
+    {
+      "id": "BUG-432",
+      "title": "INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the",
+      "events": 2
+    },
+    {
+      "id": "BUG-433",
+      "title": "a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)",
       "events": 1
     }
   ],

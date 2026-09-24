@@ -3804,3 +3804,28 @@ TRACKED drop-in with an uncommitted modification", in addition to "a `Copy of *`
 counterpart". CONSEQUENCE: the touch re-opens every open existence-negative claim under the standing rule, so
 BUG-426's `NEG-001.last_dropin_considered` must name rev 2 (sha + mtime) and `search_complete: false` — depth ≠ domains,
 the owners's depth pass is still NOT this claim's answer.
+
+### RECEIPT - the ANCHOR's missing DOMAIN axis: the reliable pair is now voting the 150 blind rows (2026-09-24, run opened)
+The owner's instruction was "do the domain classification", and the instrument is settled by PRECEDENT, not by choice:
+the D2618-P0/P1 cohort was coded by the reliable pair `deepseek-v4-pro` (API) + `Qwen3.8-27B-MLX-4bit` (local OMLX),
+so the SAME pair + the SAME D2610-v2 policy now votes the anchor. Harness `scripts/vote_anchor_domains.py` imports the
+shared `vote_once()`/`aggregate()`/`_canonical_defs()` from `build_discipline_domain_vote.py` — it does not fork the
+instrument. Input is `governance/frontier_pack_20260924/BLIND_INPUT_150.csv`, i.e. row text only: no CT/DISC/FORM/DEPTH
+and no BOUNDARY (boundary encodes scope, which would leak the depth axis), so the run is blind by construction and the
+frontier coders will read the identical file. Declared deviations (prompt_id `anchor_domains_v1`, domains-only; input
+fields name/definition/application/mechanism): the anchor's content_type and discipline are HUMAN-owned in ANCHOR-3 and
+are deliberately not re-coded. gpt-oss was NOT used: it is the S4 classifier family under test, so labeling the anchor
+it will later be scored against is ancestor contamination. Output `governance/anchor4_domain_vote_checkpoint.jsonl`
+stamps schema_version / prompt_id / gen_model / gen_temperature 0.0 / pipeline_commit and `authority: MACHINE-ADVISORY-ONLY`.
+FIRST MEASURED BEHAVIOUR (pilot, 3 rows): 1 agreed, 2 abstained on GENUINE pair disagreement (R001 DeepSeek
+`business development/digital product/marketing & communications` vs Qwen `digital product/marketing & communications/
+user experience`) — the abstention is the policy working. The abstain share is expected to be high (the 216 cohort ran
+81% non-agreement), which is exactly why `domains_final` is the OWNER's column and no script writes it.
+
+### BUG-434 (LOW, FIXED 2026-09-24) - the domain vote record declared `n_voters` from a key the producer never returns, so every row carried a null where a count belongs
+`vote_once()` returns no `n_voters`, so `scripts/vote_anchor_domains.py` wrote `"n_voters": null` on every row while
+`per_voter_domains` held the truth right beside it — a declared-but-empty field, the same class as BUG-419 (a schema
+the reader cannot trust). Caught by inspecting the pilot records instead of trusting a green run. FIX: derive it
+(`sum(1 for v in votes.values() if not v.get("error"))`), then kill + relaunch (the run is resumable, nothing lost).
+Epoch note: rows written before the fix keep `n_voters: null` and are identifiable by their `pipeline_commit`; the
+count is re-derivable from `per_voter_domains` for those rows, and the records are append-only (R-D410).

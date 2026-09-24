@@ -7,6 +7,7 @@ next_state:
   - four rails green in just health
   - owner's ANCHOR-4 depth pass (150/150, drop-in) receipted, write-locked and scored against the
     pre-registered references; ANCHOR-4 sheet itself STILL not written (owner gate)
+  - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
   - config/*.yaml
   - config/*.json
@@ -21,6 +22,8 @@ may_touch:
   - governance/ANCHOR4_DEPTH_RUBRIC_*.md
   - justfile
   - governance/frontier_pack_*
+  - governance/anchor4_domain_*
+  - governance/ANCHOR4_DOMAIN_*
   - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_*.md
   - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv   # owner drop-in: committed as-is, never rewritten
   - governance/F11_DISC_REVIEW_*.csv                            # owner instrument, drop-in

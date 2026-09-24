@@ -151,7 +151,7 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 
 ## C15 BLOCK (2026-09-23, session 21) - unresolved bugs travel with every handoff
 
-**98 open / 79 closed of 177 ids** (threshold for this block is 5). Full machine-readable list with events:
+**99 open / 79 closed of 178 ids** — and the ANCHOR domain axis is being produced by the reliable pair (DeepSeek + Qwen3.8) on the blind 150; abstentions are owner-adjudication work, not failures (BUG-434 fixed) (threshold for this block is 5). Full machine-readable list with events:
 `governance/bug_status.json` (regenerate: `python3 scripts/bug_status.py`).
 
 Regenerated 2026-09-23 18:57 (session 22) from the parser after the BUG-418 dedup - this line is GENERATED,

@@ -1,0 +1,77 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "ANCHOR-4",
+  "purpose": "the depth axis blind coding sheet (BUG-415) plus its context and key surfaces",
+  "sheet": {
+    "path": "governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv",
+    "encoding": "utf-8",
+    "backup": "governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.PRE_CONTEXT_REFRESH_20260924.csv",
+    "sha256": "14ee0d7a8d46e1d604c33db467684cbaeebedbc7d00ca2ab98612d0d87289e77",
+    "bytes": 201773,
+    "rows": 150,
+    "columns": 16,
+    "context_columns": [
+      "CT (1-7)",
+      "DISC (1-62)",
+      "FORM (1-4)"
+    ],
+    "blind_columns": [
+      "DEPTH (1-4)",
+      "conf_depth",
+      "note_codes",
+      "reviewer",
+      "date"
+    ]
+  },
+  "upstream": {
+    "path": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+    "artifact_id": "ANCHOR-3",
+    "role": "OWNS content_type/discipline/extraction_type. ANCHOR-4 DERIVES the three context columns from it - one artifact, one writer (the BUG-402 lesson). Never copy the raw ruler sheet again.",
+    "columns": {
+      "content_type": "content_type_final",
+      "discipline": "discipline_final",
+      "extraction_type": "extraction_type_final"
+    }
+  },
+  "key": {
+    "path": "governance/ANCHOR4_DEPTH_PREDICTION_KEY_20260924.json",
+    "sha256": "9272f199fb1530f36423567d19f260c8d17fadafbe59bcf08ae4dc62de2633fb",
+    "gold": "governance/gold_4axis.jsonl",
+    "depth_vote": "governance/depth_vote_checkpoint.jsonl",
+    "carriers": [
+      {
+        "path": "governance/remaining_verification_audit.csv"
+      },
+      {
+        "path": "governance/ANCHOR2_BLIND_SHEET_20260920.csv"
+      }
+    ]
+  },
+  "provenance_tier": "human-mixed+llm-attested for the CONTEXT columns only; the depth column is UNCODED and must stay blank until the freeze",
+  "allowed_uses": [
+    "arm ranking",
+    "A/B comparison",
+    "relative deltas between depth classifiers"
+  ],
+  "forbidden_uses": [
+    "absolute error floor / error-rate certification",
+    "training on the anchor (D274f: the anchor is a conformance set, not a training set)"
+  ],
+  "bound": "RELATIVE-ONLY (D-337)",
+  "verify": "python3 scripts/consolidate_anchor4_context.py --check",
+  "regenerate": "python3 scripts/consolidate_anchor4_context.py --apply (deterministic, no LLM)",
+  "context_refresh": {
+    "date": "2026-09-24",
+    "upstream": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+    "reason": "BUG-421: the sheet carried the PRE-consolidation raw ruler columns; a blind sheet whose context is more than half stale is not a valid instrument",
+    "cells_refreshed": {
+      "FORM (1-4)": 142,
+      "DISC (1-62)": 62,
+      "CT (1-7)": 56
+    },
+    "from_sha256": "e6f48181101ae2c30f3f27e0075c41fdc8075f139351c04c2033f1cd362d4af7",
+    "to_sha256": "14ee0d7a8d46e1d604c33db467684cbaeebedbc7d00ca2ab98612d0d87289e77",
+    "writer": "scripts/consolidate_anchor4_context.py",
+    "note": "cells_refreshed is DERIVED by diffing the backup against the sheet, and a later no-op re-run must not erase it (the BUG-418 idempotency rule)"
+  }
+}

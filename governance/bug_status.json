@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 166,
+  "total_ids": 168,
   "open_n": 93,
-  "closed_n": 73,
+  "closed_n": 75,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -471,7 +471,7 @@
     {
       "id": "BUG-420",
       "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo",
-      "events": 1
+      "events": 2
     }
   ],
   "closed": [
@@ -547,6 +547,8 @@
     "BUG-413",
     "BUG-414",
     "BUG-418",
-    "BUG-419"
+    "BUG-419",
+    "BUG-421",
+    "BUG-422"
   ]
 }

@@ -4,7 +4,7 @@
 fine-tuned 4-way depth head and D274f says nothing may be certified without an anchor. This sheet is the
 missing anchor's input. It is a CONFORMANCE SET, not a training set (D274f).
 
-**Item:** `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` - the same rows as the frozen ruler (154 data rows; the ANCHOR-3 consolidation carries 150, so 4 rows exist here that are not in ANCHOR-3 - a provenance question recorded in BUG-415, resolve before the freeze)
+**Item:** `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` - the same rows as the frozen ruler (150 data rows, item_id R001-R150; the provisional 154-row build was filtered to the 150 rows that ANCHOR-3 carries, so the 154-vs-150 provenance question in BUG-415 is RESOLVED: this sheet is row-identical to ANCHOR-3 by item_id, 150/150, zero name mismatches)
 (`RULER_BLIND_SHEET_20260917.csv`), because they already carry DEFINITION / APPLICATION / MECHANISM /
 BOUNDARY and are therefore answerable without re-reading the source. The ruler's CT / DISC / FORM columns
 are carried over for context; they are NOT to be re-coded here.
@@ -41,3 +41,16 @@ must never be frozen as if it were truth.
 **Known limit (BUG-416):** the depth vocabulary is NOT declared in any config surface, so this rubric is
 hand-written rather than generated. When the 4 classes are declared in config, this file must be
 regenerated from it (C12 config-first) and the menu-closure check repointed at the same source.
+
+## CONTEXT PROVENANCE (added 2026-09-24, BUG-421)
+
+The `CT (1-7)` / `DISC (1-62)` / `FORM (1-4)` columns of this sheet are DERIVED, not authored: they are
+generated from `governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv` (`content_type_final`,
+`discipline_final`, `extraction_type_final`) by `python3 scripts/consolidate_anchor4_context.py --apply`
+and guarded by `--check`. Do NOT edit them by hand; re-run the generator. Before 2026-09-24 they were a
+copy of the pre-consolidation raw ruler and 260 of 450 cells were stale or blank.
+
+**Blinding, second rule.** `governance/ANCHOR4_DEPTH_PREDICTION_KEY_20260924.json` carries the corpus
+`fb_id` bridge and the depth values that already exist in `gold_4axis` / `depth_vote_checkpoint`.
+A coder MUST NOT open it while coding; it is unsealed only AFTER the freeze, as a pre-registered
+prediction check against the frozen anchor.

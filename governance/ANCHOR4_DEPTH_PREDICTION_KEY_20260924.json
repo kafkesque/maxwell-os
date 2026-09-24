@@ -1,0 +1,188 @@
+{
+ "schema_version": "1.0",
+ "artifact_id": "ANCHOR-4-KEY",
+ "blinding": "DO NOT SHOW THIS FILE TO A CODER. It carries the corpus fb_id bridge and the depth values that already exist in gold_4axis / depth_vote_checkpoint. Its purpose is a PRE-REGISTERED prediction check: after the blind coding freezes, compare the coder output against depth_ref to measure the advisory references' error rate on this row family. Consulting it during coding destroys the anchor (rubric blinding rule).",
+ "primary_key": "item_id (anchor family); fb_id (corpus family)",
+ "rows_in_sheet": 150,
+ "rows_with_fb_id": 22,
+ "rows_with_depth_ref": 2,
+ "rows_with_depth_ref_namejoin": 10,
+ "entries": {
+  "R016": {
+   "name": "Modelans-modelandum Relationship",
+   "depth_ref_namejoin": "universal",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):universal",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R024": {
+   "name": "Execution Gap From Technological Readiness",
+   "fb_id": "31563bf3c0ce9389ef106f6cd67b9986edcafcdaababecea3534b9b15b97d598",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R032": {
+   "name": "Heckel's Diff Algorithm for Version Tracking",
+   "fb_id": "afe73bb08c27c51ff32749a6e0a021377e515f1863581918f12c8dcce586ff00",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R037": {
+   "name": "Style Precedence and Override Behavior",
+   "fb_id": "9512919cb6cb89ca3f4aa24f58906a9416b99edd6075d4bc00c2898e93f01c2f",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R041": {
+   "name": "Consumer Anticipation of Objections",
+   "fb_id": "db9f4c89ff9f952fc7504047aed8fad73ef80e3eee211a582e46a97abdc9377d",
+   "fb_id_source": "governance/ANCHOR2_BLIND_SHEET_20260920.csv (name join)"
+  },
+  "R043": {
+   "name": "Alpha State Thinking and Creative Problem-solving",
+   "fb_id": "75adb4501576cee62206410811317d5519a4b377de33eb866dfb2ef09bb7aef5",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R046": {
+   "name": "Bitcoin Mining As Digital Ownership Model",
+   "fb_id": "591ff81805c3036ec8a053d0fd49a908d34fb28d62020305d0761d5fd7dedd07",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R053": {
+   "name": "Self-referential Incompleteness",
+   "depth_ref_namejoin": "domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R055": {
+   "name": "Demand-side Sales Pattern",
+   "fb_id": "a1efe32a3ce09a4a6543db03ddb0755b7005206af4e44ccfe9948a527282bf41",
+   "fb_id_source": "governance/ANCHOR2_BLIND_SHEET_20260920.csv (name join)"
+  },
+  "R056": {
+   "name": "Quiz Generation with Llm Integration",
+   "fb_id": "e98d6a211c8e31c9e8b5f7c7ba9229719b25bfb32e08ee33606e6f6c7abb8e9f",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R065": {
+   "name": "Media Construction of Crime Waves",
+   "fb_id": "9a6ca0e54b82560552d0c8a5d15c08a254b1ba398642491a81b19879d00197fe",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R068": {
+   "name": "Imagination and the Image",
+   "fb_id": "b2b71ed81ac4169ff308a5152b988757a9e737579aba6dbd14576adb1c8982c3",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R075": {
+   "name": "Paradigm Shift Through Disruption",
+   "depth_ref_namejoin": "cross-domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):cross-domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R080": {
+   "name": "Information Design Community Networks",
+   "depth_ref_namejoin": "domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R085": {
+   "name": "Discursive Strategy Abstraction",
+   "fb_id": "9d2a95c8ef137920b46adff55572a267ad4f3ca464188ab99b27e64b1abd8518",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R088": {
+   "name": "Gradio Web Interface for Ml Models",
+   "depth_ref_namejoin": "specialized",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):specialized",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R090": {
+   "name": "Culture Jamming",
+   "fb_id": "792f14b61406c888f720a400c9d12f48795199e7ec4c32229fe830d97b344c09",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R091": {
+   "name": "Autopoesis in Design Education",
+   "fb_id": "52286a1527b30f5fc7f106322a61c4a3f0b71922ff130daa6de8b0727baeb89b",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R093": {
+   "name": "Numerical Symbolism in Design and Biology",
+   "depth_ref_namejoin": "cross-domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):cross-domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R096": {
+   "name": "Transportation and Setup Costs in Construction Projects",
+   "fb_id": "cb1596d0e68058647dd05e222ed7b94d11f43e332e7a463d57ec81e6bbdd4a94",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R097": {
+   "name": "Minimin Decision Criterion",
+   "fb_id": "6b4b26497c299fe82095995b2fd1c168c9b96768b1e09264acd784bed5bf48ab",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R100": {
+   "name": "Network Marketing Business Model",
+   "fb_id": "df7f311f7a67f68255cde9fb60a4530c991ea28ec9529bba83b73fe2ec831a5c",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R106": {
+   "name": "The Invisible Art of Film Editing",
+   "depth_ref_namejoin": "domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R109": {
+   "name": "Project Completion Bias",
+   "fb_id": "33ba0166918ac0c5eafa88308658836bc78133b931b5a5724500b89406eebe44",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)",
+   "depth_ref": "cross-domain",
+   "depth_ref_source": "gold_4axis:p5:human-d2615",
+   "depth_ref_tier": "human-derived"
+  },
+  "R111": {
+   "name": "Pmt Camera Typography Manipulation",
+   "depth_ref_namejoin": "specialized",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):specialized",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R114": {
+   "name": "Measurable Outcome Focus",
+   "depth_ref_namejoin": "cross-domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):cross-domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R121": {
+   "name": "Consumers Hero Refurbishment Strategy",
+   "fb_id": "b5076194f6cea1d4ee35ada62553330f9300473fe17b07af1e3f1873166fd554",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R134": {
+   "name": "Holistic Interpretation Problem in Index-aware Retrieval",
+   "fb_id": "571e318c33578f13b1bbd4fa59dc0b6573b86676d3cc34e090b6dc470cf996e3",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R137": {
+   "name": "Desire-friction Conversion Formula",
+   "depth_ref_namejoin": "domain",
+   "depth_ref_namejoin_source": "depth_vote:name join (identity UNVERIFIED):domain",
+   "depth_ref_namejoin_tier": "llm-advisory"
+  },
+  "R140": {
+   "name": "Digital Culture Integration in Graphic Design",
+   "fb_id": "e7e317889a65313188350dcc4ac258644b570e4c0242bc2f2ce404acc8750ca6",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  },
+  "R142": {
+   "name": "Global Village Conceptual Framework",
+   "fb_id": "a344596e4e819020f2dd38ee9c1aaa5ac346ed858f7624f89e728282317b2ed3",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)",
+   "depth_ref": "domain",
+   "depth_ref_source": "gold_4axis:p5:human-d2615",
+   "depth_ref_tier": "human-derived"
+  },
+  "R143": {
+   "name": "Figma Hamburger Icon Creation",
+   "fb_id": "dfb12b2e6bffe714a9e77aa4e3c22c868fe696f120d4f5a3447ea453094e1a1c",
+   "fb_id_source": "governance/remaining_verification_audit.csv (name join)"
+  }
+ }
+}

@@ -9,6 +9,7 @@ health:
     python3 pipeline/integrity_check.py --quick
     python3 scripts/audit_flag_consumers.py || exit 1
     python3 scripts/verify_anchor_manifest.py || exit 1
+    python3 scripts/consolidate_anchor4_context.py --check || exit 1
     python3 scripts/verify_menu_routing.py || exit 1
     python3 scripts/verify_menu_policy.py || exit 1
     python3 scripts/verify_recalibration_pins.py || exit 1

@@ -3829,3 +3829,13 @@ the reader cannot trust). Caught by inspecting the pilot records instead of trus
 (`sum(1 for v in votes.values() if not v.get("error"))`), then kill + relaunch (the run is resumable, nothing lost).
 Epoch note: rows written before the fix keep `n_voters: null` and are identifiable by their `pipeline_commit`; the
 count is re-derivable from `per_voter_domains` for those rows, and the records are append-only (R-D410).
+
+### BUG-435 (MED, FIXED 2026-09-24) - the domain vote's resume rule froze transient API failures into permanent abstentions
+`--resume` skipped any `item_id` already present in the checkpoint. A row where ONE voter errored (timeout, rate limit,
+OMLX eviction) was therefore never retried: the record said `agreed: false, needs_review: true`, which is
+INDISTINGUISHABLE from an honest pair disagreement, and the owner's adjudication queue would have silently absorbed
+infrastructure failures as if they were coding disputes. This is the BUG-432 class in a different register: an
+instrument that cannot tell "no answer" from "a disagreeing answer" manufactures work for the owner. FIX: a row counts
+as done only when every reliable voter actually ANSWERED (`answered(rec) >= len(reliable)`), with an `attempt` counter
+capped at MAX_ATTEMPTS=3 so a hard failure cannot loop; the checkpoint is append-only and the latest record per
+`item_id` wins. Caught by re-reading the resume code before letting a multi-hour run proceed on it, not by a guard.

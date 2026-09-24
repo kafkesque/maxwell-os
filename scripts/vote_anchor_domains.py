@@ -133,8 +133,21 @@ def atomic_append(path: pathlib.Path, text: str) -> None:
     os.replace(tmp, path)
 
 
+MAX_ATTEMPTS = 3
+
+
+def answered(rec: dict[str, Any]) -> int:
+    """How many voters actually answered this row (an error is not an answer)."""
+    return sum(1 for v in (rec.get("votes") or {}).values() if isinstance(v, dict) and not v.get("error"))
+
+
 def load_done() -> dict[str, dict[str, Any]]:
-    """Resume set: item_id -> record already in the checkpoint."""
+    """Resume set: item_id -> LATEST record in the checkpoint (append-only, last wins).
+
+    BUG-435: a row whose voter ERRORED must not count as done — otherwise one transient API failure freezes an
+    abstention that looks like a genuine pair disagreement forever. Attempts are capped so a hard failure cannot
+    loop.
+    """
     if not CHECKPOINT.exists():
         return {}
     done: dict[str, dict[str, Any]] = {}
@@ -148,8 +161,17 @@ def load_done() -> dict[str, dict[str, Any]]:
     return done
 
 
+def is_open(rec: dict[str, Any] | None, need: int) -> bool:
+    """True if this row still needs a vote: never voted, undersupplied by voters, or under the attempt cap."""
+    if rec is None:
+        return True
+    if answered(rec) >= need:
+        return False
+    return int(rec.get("attempt") or 1) < MAX_ATTEMPTS
+
+
 def vote_row(row: dict[str, str], voters: list[dict[str, str]], key: str,
-             policy: dict[str, Any]) -> dict[str, Any]:
+             policy: dict[str, Any], attempt: int = 1) -> dict[str, Any]:
     """Run the reliable pair on one anchor row and normalise the record. A failed voter is recorded, never faked (C16)."""
     res = bddv.vote_once(dict(row), voters, key, policy)
     votes = res.get("votes") or {}
@@ -174,6 +196,7 @@ def vote_row(row: dict[str, str], voters: list[dict[str, str]], key: str,
         "gen_model": res.get("gen_model"),
         "gen_temperature": 0.0,
         "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "attempt": attempt,
         "pipeline_commit": pipeline_commit(),
         "authority": "MACHINE-ADVISORY-ONLY",          # never p5:human; the owner adjudicates
     }
@@ -192,7 +215,8 @@ def run(limit: int, workers: int, key: str, allow_api: bool) -> int:
         return 2
     rows = load_blind_rows()
     done = load_done()
-    todo = [r for r in rows if r["item_id"] not in done]
+    need = len(set(policy["reliable"]))
+    todo = [r for r in rows if is_open(done.get(r["item_id"]), need)]
     if limit:
         todo = todo[:limit]
     print(f"reliable pair: {policy['reliable']} | voters: {[v.get('model') for v in voters]}")
@@ -201,7 +225,8 @@ def run(limit: int, workers: int, key: str, allow_api: bool) -> int:
         return 0
     n_ok = n_abstain = n_err = 0
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futs = {pool.submit(vote_row, r, voters, key, policy): r for r in todo}
+        futs = {pool.submit(vote_row, r, voters, key, policy,
+                             int((done.get(r["item_id"]) or {}).get("attempt") or 0) + 1): r for r in todo}
         for fut in as_completed(futs):
             r = futs[fut]
             try:

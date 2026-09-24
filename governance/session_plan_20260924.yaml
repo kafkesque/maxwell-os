@@ -18,6 +18,7 @@ may_touch:
   - governance/depth_menu*.md
   - governance/ANCHOR4_DEPTH_RUBRIC_*.md
   - justfile
+  - governance/frontier_pack_*
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

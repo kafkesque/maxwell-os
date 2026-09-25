@@ -28,6 +28,10 @@ may_touch:
   - governance/ANCHOR4_DEPTH_RUBRIC_*.md
   - justfile
   - governance/frontier_pack_*
+  - governance/anchor_adjudication_workbook_*.csv     # owner-filled adjudication instrument (normalised in place, declared fixes only)
+  - governance/anchor_adjudication_fixlog_*.csv
+  - governance/ANCHOR_ADJUDICATION_NORMALIZATION_*.md
+  - backups/anchor_adjudication_workbook_*.csv         # byte-exact owner revisions (rev1 as submitted, rev2 owner R024 fix)
   - governance/anchor4_domain_*
   - governance/ANCHOR4_DOMAIN_*
   - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_*.md

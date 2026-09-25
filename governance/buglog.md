@@ -3911,3 +3911,30 @@ from set membership, and recommend a label only when **>= half the coders LEAD w
 `domain=OWNER_ONLY`. Every recommendation now states its own `n/N` in `recommendation_basis`, so a weak 2/4 plurality
 can never be read as consensus.
 STANDING RULE: **a recommendation must carry its own vote count, and set membership is not a vote.**
+
+## BUG-441 — MED — FIXED (2026-09-25)
+
+The owner's filled adjudication workbook `governance/anchor_adjudication_workbook_20260924.csv` was saved **Mac
+Roman encoded**: one byte (`0xCA`, a non-breaking space inside a row NAME) made the whole file undecodable as
+UTF-8, so the cross-examination harness — and any other reader — died on it. Content damage: none (one typographic
+space); reachability damage: total. FIX: `scripts/normalize_owner_workbook.py` detects the encoding
+(utf-8-sig -> utf-8 -> mac_roman -> cp1252), rewrites the file as UTF-8, and keeps the byte-exact raw drop-in in
+`backups/anchor_adjudication_workbook_20260924.OWNER_RAW_20260925.csv`.
+STANDING RULE: **an owner drop-in is checked for encoding BEFORE it is parsed — a file that cannot be decoded is
+not an empty file, and must never be reported as missing data.**
+
+## BUG-442 — MED — FIXED by declaration (2026-09-25)
+
+The owner's review carried 10 lexical defects that were all FORMAT, none of them judgement: 7 truncated canonical
+labels (`research & methodolog` x3, `business developmen`, `media & entertainmen`, `user experienc`,
+`esign systems`, `systems & framework`), one canonical label shattered by the separator
+(`business,operations` — the owner separates with commas and the label CONTAINS one), one trailing `|`, and one
+off-menu token with no defensible nearest label (`emerging`, R040). Worst case found: under the owner's new
+first-token rule a shattered label **silently decided the PRIMARY domain of R024** — a format defect owning a
+semantic slot. FIX: declared exact-match fix map in `config/anchor_workbook_fixes.yaml`, applied only on an exact
+token match (no fuzzy matching anywhere near the gold); every change written to
+`governance/anchor_adjudication_fixlog_20260925.csv`; the owner's original strings preserved in the new
+`domains_final_raw` column so a fix is additive, not a replacement. `emerging` and the 4 blank cells are declared
+and left exactly as submitted, awaiting the owner.
+STANDING RULE: **a separator is part of the taxonomy. If a canonical label can contain the separator, the cell
+format must be quoted or the separator must be one the labels cannot contain.**

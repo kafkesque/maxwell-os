@@ -1,0 +1,67 @@
+# Declared fixes for the owner's FILLED adjudication workbook (owner review of 2026-09-25).
+# AUTHORITY: this file decides what may be rewritten. The script never guesses and never fuzzy-matches:
+# a token is fixed only on an EXACT match below, and anything off-menu that is not declared here fails
+# the run CLOSED and is printed for the owner.
+#
+# OWNER RULING (2026-09-25), recorded verbatim in substance: "always consider the first domain the primary
+# domain" and "I include more canonical labels occasionally on one instead of writing every unit" - i.e. a
+# single-label row is a complete answer, and multiple labels are a set whose FIRST member is the primary.
+
+axis: domains
+
+# The owner separates with commas; the workbook's own coder columns use '|'. Normalising to ONE separator is a
+# format decision, not a semantic one - the raw string is preserved in `domains_final_raw`.
+separator_out: "|"
+
+# Applied to the whole cell BEFORE splitting. The owner's comma ALSO appears inside one canonical label, so
+# 'business,operations' was being split into two non-labels ('business' + 'operations'). Under the first-token
+# rule that defect was silently deciding the PRIMARY domain of R024 - which is why it is fixed at cell level.
+cell_replacements:
+  - from: "business,operations"
+    to: "business operations"
+
+# Applied per token AFTER splitting. All EXCEPT 'emerging' are truncated canonical labels: the tail was cut,
+# the head is unambiguous, and the completion is the only canonical label that fits.
+token_fixes:
+  "business developmen": business development
+  "media & entertainmen": media & entertainment
+  "research & methodolog": research & methodology
+  "user experienc": user experience
+  "esign systems": design systems
+  "systems & framework": systems & frameworks
+  "systems & frameworks " : systems & frameworks
+
+# Off-menu values that are DECLARED and awaiting an owner ruling. They are left EXACTLY as the owner typed
+# them, listed in the receipt, and listed in the fix log with status=UNRESOLVED - never repaired, never
+# silently dropped. 'emerging' (R040) matches no label on the 43-label domain menu by any edit distance worth
+# acting on, so the only honest move is to ask.
+unresolved_allowed:
+  - emerging
+
+# Depth: the owner answered in WORDS (the menu's own names). The numeric class is written to a NEW column
+# `depth_final_class`; the owner's word stays untouched in `depth_final`.
+# MUST mirror config/depth_classes.yaml (the script asserts every label below is present in that file).
+depth_alias:
+  universal: 1
+  cross-domain: 2
+  domain: 3
+  specialized: 4
+
+# Rows the owner left blank on an axis. Declared, never filled in by anything automatic: a blank is a fact
+# about the review, and inventing a value would corrupt the gold.
+expect_blank:
+  domains_final: [R140]
+  depth_final: [R070, R080, R130]
+
+# OWNER RULING (2026-09-25): the four discipline cells that hold DOMAIN-menu labels were written there
+# ACCIDENTALLY - they are domain labels, misfiled into the discipline column of the frozen ANCHOR-3 sheet.
+# Treatment: the value is RELOCATED to the domain axis (where it is a legal canonical label) and is NOT
+# counted as a discipline reading. The discipline axis for these rows is declared UNAVAILABLE until the
+# owner supplies a real discipline label - this map moves a value, it never invents one.
+# Effect: the 4 OFF_MENU cells are classified as a FILING error (recoverable, axis-attributable), not as
+# ontology drift or as four bad disciplines - which is why they must not trigger a menu-widening change.
+discipline_cell_relocations:
+  R042: {value: "design strategy",      axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
+  R086: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
+  R091: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
+  R117: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}

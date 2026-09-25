@@ -1,0 +1,15 @@
+item_id,column,old,new,status
+R024,domains_final,"business,operations",business operations,FIXED
+R040,domains_final,emerging,emerging,UNRESOLVED-OWNER-RULING
+R042,domains_final,user experienc,user experience,FIXED
+R053,domains_final,systems & framework,systems & frameworks,FIXED
+R078,domains_final,esign systems,design systems,FIXED
+R100,domains_final,business developmen,business development,FIXED
+R106,domains_final,media & entertainmen,media & entertainment,FIXED
+R112,domains_final,research & methodolog,research & methodology,FIXED
+R115,domains_final,research & methodolog,research & methodology,FIXED
+R147,domains_final,research & methodolog,research & methodology,FIXED
+R140,domains_final,,,BLANK-AS-SUBMITTED
+R070,depth_final,,,BLANK-AS-SUBMITTED
+R080,depth_final,,,BLANK-AS-SUBMITTED
+R130,depth_final,,,BLANK-AS-SUBMITTED

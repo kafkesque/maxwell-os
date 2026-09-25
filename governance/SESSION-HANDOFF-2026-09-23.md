@@ -151,7 +151,7 @@ D-342 (a measurement-backed ruling must cite a frozen receipt artifact). Registr
 
 ## C15 BLOCK (2026-09-23, session 21) - unresolved bugs travel with every handoff
 
-**98 open / 81 closed of 179 ids** — the ANCHOR domain axis is being produced by the reliable pair (DeepSeek + Qwen3.8) on the blind 150; abstentions are OWNER ADJUDICATION WORK, not failures (BUG-434/435 fixed) — and the ANCHOR domain axis is being produced by the reliable pair (DeepSeek + Qwen3.8) on the blind 150; abstentions are owner-adjudication work, not failures (BUG-434 fixed) (threshold for this block is 5). Full machine-readable list with events:
+**98 open / 84 closed of 182 ids** — the ANCHOR two-axis cross-examination now has FULL COVERAGE: DOMAIN 4 coders and DEPTH 2 coders on all 150 rows (DeepSeek+Qwen3.8 reliable pair, Claude in 3 chunks, Kimi in 2 chunks). 36 HARD + 112 SOFT rows = the ONE owner adjudication session in `governance/anchor_adjudication_workbook_20260924.csv` (owner columns EMPTY). Abstentions, coder disagreements and MENU REFUSALS are OWNER ADJUDICATION WORK, not failures (BUG-434/435/436/437/438 fixed) (threshold for this block is 5). Full machine-readable list with events:
 `governance/bug_status.json` (regenerate: `python3 scripts/bug_status.py`).
 
 Regenerated 2026-09-23 18:57 (session 22) from the parser after the BUG-418 dedup - this line is GENERATED,

@@ -3871,3 +3871,18 @@ set, and the `DOMAIN_SPLIT_MENU` flag fired on **150 of 150 rows**. A flag that 
 signal; it buried the real structure in the same table. FIX: count over the multiset of labels actually chosen.
 The verdict changed from `HARD 28 / SOFT 122 / AGREE 0` to `HARD 28 / SOFT 116 / AGREE 6`. Caught by re-reading my
 own output before showing it, not by a guard — which is the argument for showing the numbers, not the summary.
+
+## BUG-438 — LOW — FIXED (2026-09-25)
+
+The cross-examination rendered a **declined** axis identically to an **undelivered** one. Claude returned
+`none_fits` on BOTH axes for R021 and R026 — a refusal of the MENU, which is a substantive finding — and
+`read_frontier()` accepted the value (it is in the declared vocabulary) while `collect()` stored `depth: None`.
+The workbook cell, the long CSV and the per-coder coverage line therefore read exactly like "this coder never
+answered that row": `claude-sonnet-5: domains 148/150, depth 148/150`, with the missing 2 unexplained. That is a
+FAIL-OPEN DISTINCTION LOSS: the one thing the owner most needs to see (a coder rejecting the taxonomy) was the one
+thing invisible in the output. FIX: a `depth_declined` field, a `DEPTH_MENU_DECLINED` flag that pulls both rows into
+the dispute set, a `none_fits` marker in the workbook so the cell can never be read as blank, and a MENU DECLINED
+note per row. EVIDENCE that it was worth catching: the frozen ANCHOR-3 already carries
+`content_type_final = noise_drop` for both rows ("Index Section" / "Index of Motion Graphic Title Design Terms"), so
+an independent frontier coder refusing to class them is a CROSS-VALIDATION of the anchor's own noise decision — not
+a hole in the data. STANDING RULE: **"absent" and "declined" are different facts and must never share a rendering.**

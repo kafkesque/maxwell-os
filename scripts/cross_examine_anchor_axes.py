@@ -34,7 +34,9 @@ import json
 import pathlib
 import re
 import statistics
+import subprocess
 import sys
+from datetime import datetime, timezone
 from typing import Any
 
 import yaml
@@ -54,6 +56,23 @@ WORKBOOK_OWNER_COLS = ["domains_final", "depth_final", "owner_note", "owner_date
 def sha256_of(path: pathlib.Path) -> str:
     """Return the sha256 of a file without loading it twice."""
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def pipeline_commit() -> str:
+    """Return the short HEAD commit, so every generated artifact is traceable to a code state (R14)."""
+    try:
+        return subprocess.run(["git", "-C", str(REPO), "rev-parse", "--short", "HEAD"],
+                              capture_output=True, text=True, check=False).stdout.strip() or "unknown"
+    except OSError:
+        return "unknown"
+
+
+def stamp() -> dict[str, Any]:
+    """Return the R14 provenance stamp carried by every persistent object this script writes."""
+    return {"schema_version": "1.0", "artifact_id": "ANCHOR-AXIS-CROSS-EXAM",
+            "gen_model": "none (deterministic, LLM-free)", "gen_temperature": 0.0,
+            "pipeline_commit": pipeline_commit(),
+            "ts": datetime.now(timezone.utc).isoformat(timespec="seconds")}
 
 
 def depth_menu() -> tuple[dict[str, int], dict[int, str]]:
@@ -113,6 +132,13 @@ def read_frontier(path: pathlib.Path, declared: dict[str, Any]) -> tuple[list[di
             notes.append(f"{path.name}: header line repeated {repeats}x - dropped as a declared format artifact")
         else:
             fatal.append(f"{path.name}: header line repeated {repeats}x, undeclared")
+    if not seen_header:
+        if declared.get("prepend_header"):
+            kept = [",".join(HEADER)] + kept
+            notes.append(f"DECLARED HEADERLESS FRAGMENT {path.name}: {len(kept) - 1} data line(s), no header line - "
+                         f"the reply CONTINUES the declared header of this coder's earlier chunk")
+        else:
+            return [], fatal + [f"{path.name}: header mismatch"], notes
     rows = list(csv.DictReader(io.StringIO("\n".join(kept))))
     if not rows or list(rows[0].keys()) != HEADER:
         return [], fatal + [f"{path.name}: header mismatch"], notes
@@ -132,13 +158,34 @@ def read_frontier(path: pathlib.Path, declared: dict[str, Any]) -> tuple[list[di
             fatal.append(f"{path.name}:{i}: depth '{r['depth'].strip()}' outside the closed menu")
         if not (r["evidence_quote"] or "").strip():
             fatal.append(f"{path.name}:{i}: empty evidence_quote")
+        if declared.get("expect_coder") and (r["coder"] or "").strip() != declared["expect_coder"]:
+            fatal.append(f"{path.name}:{i}: coder '{(r['coder'] or '').strip()}' != declared "
+                         f"'{declared['expect_coder']}' - a reply from a different model is a different source")
+        if r["depth"].strip() == "none_fits":
+            notes.append(f"MENU DECLINED {path.name}:{i}: the coder returned 'none_fits' on the DEPTH axis (and, "
+                         f"where domains are empty, on DOMAIN too). That is a disagreement with the MENU, not a "
+                         f"missing value - it must reach the owner, never be coerced into a class")
         out.append(r)
     if short:
         msg = f"{path.name}: {len(short)} partial record(s) at the tail {short[:3]}"
         if declared.get("allow_truncated_tail"):
-            notes.append(f"DECLARED SHORTFALL {msg} - the reply was cut by the coder's output cap")
+            if declared.get("tail_superseded_by"):
+                notes.append(f"HISTORICAL BOUNDARY {msg} - the reply was cut by the coder's output cap; those rows "
+                             f"were delivered later and are declared separately as {declared['tail_superseded_by']}")
+            else:
+                notes.append(f"DECLARED SHORTFALL {msg} - the reply was cut by the coder's output cap")
         else:
             fatal.append(f"{msg} - reply is truncated, refused")
+    m = re.search(r"rows_expected=(\d+)\s+rows_emitted=(\d+)", text)
+    if declared.get("self_check"):
+        if not m:
+            fatal.append(f"{path.name}: declared self-check line is absent from the reply")
+        elif int(m.group(2)) != len(out):
+            fatal.append(f"{path.name}: the coder's own self-check says rows_emitted={m.group(2)} but {len(out)} valid "
+                         f"row(s) parsed - never score a file whose own count disagrees with the parse")
+        else:
+            notes.append(f"{path.name}: coder self-check rows_expected={m.group(1)} rows_emitted={m.group(2)} "
+                         f"- agrees with the parse")
     want_n = declared.get("rows")
     if want_n is not None and len(out) != want_n:
         fatal.append(f"{path.name}: {len(out)} valid rows != declared {want_n}")
@@ -208,6 +255,8 @@ def collect(cfg: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[str], 
                     doms = [c for c in (canonical_domain(d) for d in (vote.get("domains") or [])) if c]
                     items[item]["coders"][src["id"]] = {"domains": doms, "depth": None,
                                                        "conf_domain": None, "conf_depth": None,
+                                                       "depth_declined": False,
+                                                       "source_path": src["path"],
                                                        "authority": src["authority"]}
             continue
         rows, fr, nt = read_frontier(path, src.get("declared") or {})
@@ -218,15 +267,21 @@ def collect(cfg: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[str], 
             if i not in items:
                 notes.append(f"{src['id']}: item {i} not in the 150-row family")
                 continue
+            prev = items[i]["coders"].get(src["id"])
+            if prev is not None and prev.get("source_path") != src["path"]:
+                fatal.append(f"{src['id']}:{i} was coded TWICE from different files "
+                             f"({prev.get('source_path')} and {src['path']}) - a chunked delivery must be disjoint")
             raw_doms = [c for c in (canonical_domain(x) for x in
                                     ((r["domains"] or "") + "|" + (r["domains_secondary"] or "")).split("|")) if c]
             items[i]["coders"][src["id"]] = {
                 "domains": raw_doms,
                 "depth": labels.get(r["depth"].strip()),
+                "depth_declined": r["depth"].strip() == "none_fits",
                 "conf_domain": (r["conf_domain"] or "").strip(),
                 "conf_depth": (r["conf_depth"] or "").strip(),
                 "rationale": (r["rationale"] or "").strip(),
                 "boundary_condition": (r["boundary_condition"] or "").strip(),
+                "source_path": src["path"],
                 "authority": src["authority"],
             }
     return items, fatal, notes
@@ -275,6 +330,8 @@ def score(items: dict[str, dict[str, Any]], gold: dict[str, int], gconf: dict[st
             flags.append("PRIMARY_DOMAIN_DIFFERS")
         if len(set(dep_vals)) > 1:
             flags.append("DEPTH_DIFFERS")
+        if any(v.get("depth_declined") for v in coders.values()):
+            flags.append("DEPTH_MENU_DECLINED")
         dom_plurality = plural.most_common(1)[0] if plural else ("", 0)
         dep_plurality = collections.Counter(dep_vals).most_common(1)[0] if dep_vals else (None, 0)
         if dom_plurality[1] and dom_sets and dom_plurality[1] / max(1, len(dom_sets)) < th["majority_min_share"]:
@@ -363,7 +420,7 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
                    "owner_depth": r["owner_depth"]}
             for c in coders:
                 v = r["coders"].get(c) or {}
-                rec[f"{c}_depth"] = v.get("depth", "")
+                rec[f"{c}_depth"] = ("none_fits" if v.get("depth_declined") else v.get("depth", ""))
                 rec[f"{c}_domains"] = "|".join(v.get("domains") or [])
             rec["owner_plurality_note"] = ("coder plurality == owner depth" if r["depth_plurality"] == r["owner_depth"]
                                            and r["owner_depth"] != "" else
@@ -372,7 +429,7 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
                 rec[k] = ""
             w.writerow(rec)
     written.append(str(out["workbook"].relative_to(REPO)))
-    out["stats_json"].write_text(json.dumps({"sources": cfg["sources"], "notes": notes,
+    out["stats_json"].write_text(json.dumps({"stamp": stamp(), "sources": cfg["sources"], "notes": notes,
                                              "thresholds": cfg["thresholds"], **stats}, indent=1),
                                 encoding="utf-8")
     written.append(str(out["stats_json"].relative_to(REPO)))
@@ -386,11 +443,13 @@ def render_report(cfg: dict[str, Any], stats: dict[str, Any], notes: list[str], 
     per_row = stats["per_row"]
     tiers = collections.Counter(r["tier"] for r in per_row)
     flags = collections.Counter(f for r in per_row for f in r["flags"].split(";") if f)
-    L: list[str] = ["# ANCHOR two-axis cross-examination - 2026-09-24", "",
+    L: list[str] = ["# ANCHOR two-axis cross-examination - anchor family 2026-09-23, coder pass 2026-09-24, coverage completed 2026-09-25", "",
                     "Deterministic, LLM-free comparison of every independent reading of the ANCHOR's DOMAIN and DEPTH",
                     "axes. Generated by `scripts/cross_examine_anchor_axes.py`; sources and declared coverage are in",
                     "`config/anchor_cross_exam.yaml`. Authority: machine/frontier rows are ADVISORY; only the owner",
                     "writes a `*_final` value.", "",
+                    f"Run stamp: pipeline_commit `{pipeline_commit()}` | deterministic (no LLM, temp not applicable) | "
+                    f"generated {datetime.now(timezone.utc).isoformat(timespec='seconds')}", "",
                     "## 1. Coverage ledger", "",
                     "| source | axes | authority | declared rows | delivered | gap |",
                     "|---|---|---|---|---|---|"]
@@ -400,10 +459,17 @@ def render_report(cfg: dict[str, Any], stats: dict[str, Any], notes: list[str], 
             L.append(f"| {src['id']} | {','.join(src['axes'])} | {src['authority']} | - | **0 (not delivered)** | "
                      f"{src['path'].split('/')[-1]} |")
         else:
-            got = sum(1 for r in per_row if src["id"] in r["coders"] and
-                      (r["coders"][src["id"]]["domains"] or r["coders"][src["id"]]["depth"]))
+            got = sum(1 for r in per_row if (r["coders"].get(src["id"]) or {}).get("source_path") == src["path"])
             L.append(f"| {src['id']} | {','.join(src['axes'])} | {src['authority']} | {d.get('rows','-')} | {got} | "
                      f"{'none' if got == d.get('rows') else 'MISMATCH'} |")
+    L += ["", "Per coder - all files of one model merged. This is the number that decides whether an axis is",
+          "measurable at all, and it is NOT the same as the file list above:", "",
+          "| coder | rows with domains | rows with depth | files |", "|---|---|---|---|"]
+    for c in stats["coder_ids"]:
+        dom = sum(1 for r in per_row if (r["coders"].get(c) or {}).get("domains"))
+        dep = sum(1 for r in per_row if (r["coders"].get(c) or {}).get("depth"))
+        files = sorted({(r["coders"].get(c) or {}).get("source_path") for r in per_row if r["coders"].get(c)})
+        L.append(f"| {c} | {dom}/150 | {dep}/150 | {' + '.join(f.split('raw_')[-1] for f in files)} |")
     L += ["", "## 2. Format and integrity notes", ""]
     L += [f"- {n}" for n in notes] or ["- none"]
     L += ["", "## 3. Verdict per row", "", "| tier | rows |", "|---|---|"]
@@ -429,15 +495,25 @@ def render_report(cfg: dict[str, Any], stats: dict[str, Any], notes: list[str], 
           "`governance/anchor_adjudication_workbook_20260924.csv` - ordered HARD split first, owner columns EMPTY.",
           "The workbook is the instrument: do not pre-filter it, and do not let a coder's plurality anchor the cell.", "",
           "## 7. Recommendation", "",
-          "1. **Do not average or majority-vote the coders.** With four independent readings the mean is not a label,",
-          "   and a plurality that gets written into a frozen sheet becomes unrecoverable provenance.",
-          "2. **Adjudicate the dispute set only, on the workbook**, and record `domains_final` / `depth_final` there.",
-          "3. **Score, never adopt, the frontier coders**: their depth error against the owner's pass is the honest",
-          "   release gate for the S4 depth head (D274d) and for the D274f test-retest.",
-          "4. **Close the coverage gaps before finalising**: Claude chunks 1-50 / 51-100 and Kimi R146-R150 are owed;",
-          "   without them the domain axis is 2-coder on 100 of 150 rows.",
-          "5. **Any coder file that changes must change its declared sha256** in `config/anchor_cross_exam.yaml` - the",
-          "   run fails closed otherwise, so the ruler sample can never be silently re-scoped.", "",
+          "1. **Do not average or majority-vote the coders.** The mean of ordinal classes is not a label, and a",
+          "   plurality written into a frozen sheet becomes unrecoverable provenance. Coders stay advisory; the",
+          "   owner's adjudication is the only path from a reading to a `*_final` value.",
+          "2. **Adjudicate the dispute set only**, on `governance/anchor_adjudication_workbook_20260924.csv`",
+          "   (owner columns EMPTY). Ask for the PRIMARY domain label and the depth class; the coder sets stay in",
+          "   the same row as secondary provenance.",
+          "3. **Depth is now 2 coders on all 150 rows - that is enough for a cross-check, not for a verdict.**",
+          "   Both frontier coders sit below the ruler bar against the owner's pass and the disagreement clusters",
+          "   on the D2/D3 boundary, so the remaining depth error is a RUBRIC problem before it is a coder problem.",
+          "4. **Fix the depth rubric and re-measure the disputed band only.** Add a 2-3 row worked-example annex for",
+          "   the cross-domain/domain boundary to `taxonomy_domain_depth.md`, then re-run the frontier pair on the",
+          "   disputed rows. Do NOT train the S4 depth head on these labels (D274d).",
+          "5. **Score, never adopt, the frontier coders**: their depth error against the owner's pass is the honest",
+          "   release gate for the S4 head (D274d) and for the D274f test-retest.",
+          "6. **Every coder file must declare its fingerprint** in `config/anchor_cross_exam.yaml` - rows, first/last",
+          "   item_id, sha256, expected coder. A changed, shrunken, re-scoped or mis-attributed file fails the run",
+          "   closed, and a chunked delivery that overlaps another chunk of the SAME coder is refused rather than",
+          "   silently overwritten. Freeze the coder roster + hashes as part of the anchor family definition so a",
+          "   later session physically cannot re-code the ruler sample.", "",
           "## 8. Files", "",
           "- long CSV: `governance/anchor_axis_coders_20260924.csv`",
           "- workbook: `governance/anchor_adjudication_workbook_20260924.csv`",
@@ -472,6 +548,10 @@ def main() -> int:
     stats = score(items, gold, gconf, cfg)
     hard = sum(1 for r in stats["per_row"] if r["tier"] == "HARD")
     print(f"coverage: gold={len(gold)}/150 rows; coders={stats['coder_ids']}")
+    for c in stats["coder_ids"]:
+        dom = sum(1 for r in stats["per_row"] if (r["coders"].get(c) or {}).get("domains"))
+        dep = sum(1 for r in stats["per_row"] if (r["coders"].get(c) or {}).get("depth"))
+        print(f"  per coder {c}: domains {dom}/150, depth {dep}/150")
     print(f"depth vs owner: " + ", ".join(f"{c}={stats['depth_vs_gold'].get(c,{}).get('exact',0)}exact/"
                                           f"{sum(stats['depth_vs_gold'].get(c,{}).get(k,0) for k in ('exact','within1','far'))}n"
                                           for c in stats["coder_ids"] if c in stats["depth_vs_gold"]))

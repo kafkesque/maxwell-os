@@ -32,6 +32,34 @@ sources:
     axes: [domains]
     authority: MACHINE-ADVISORY-ONLY
     declared: {rows: 150}
+  # claude-sonnet-5 replied in THREE chunks. Each chunk is its own declared fingerprint, and the harness
+  # refuses a row coded twice by the same model: a chunked delivery must be disjoint, never overwritten.
+  - id: claude-sonnet-5
+    kind: frontier_csv
+    path: governance/frontier_pack_20260924/raw/raw_claude_rows001-050.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    declared:
+      rows: 50
+      first: R001
+      last: R050
+      fenced: true
+      expect_coder: claude-sonnet-5
+      self_check: true           # the reply's own 'rows_expected=N rows_emitted=M' line must agree with the parse
+      sha256: 118c0ece9bd0a93737b3c977f4ca3cfca6ba45e0b47b899324056bb59504b1f4
+  - id: claude-sonnet-5
+    kind: frontier_csv
+    path: governance/frontier_pack_20260924/raw/raw_claude_rows051-100.md
+    axes: [domains, depth]
+    authority: FRONTIER-ADVISORY
+    declared:
+      rows: 50
+      first: R051
+      last: R100
+      fenced: true
+      expect_coder: claude-sonnet-5
+      self_check: true
+      sha256: b0d232cdead830317385865864291fc1a945532a562c14fc957bc0aad6e71bc0
   - id: claude-sonnet-5
     kind: frontier_csv
     path: governance/frontier_pack_20260924/raw/raw_claude_rows101-150.md
@@ -42,6 +70,8 @@ sources:
       first: R101
       last: R150
       fenced: true
+      expect_coder: claude-sonnet-5
+      self_check: true
       sha256: 4e142cfe0115d767505489ca20211a128b70d8a894f7b58ac584eb71c9bcd6c5
   - id: kimi
     kind: frontier_csv
@@ -54,26 +84,27 @@ sources:
       last: R145
       fenced: false          # DECLARED FORMAT DEVIATION: raw CSV, no fenced block
       accept_repeated_header: true   # header line re-emitted 5x mid-reply (real: it is a multi-block reply)
-      allow_truncated_tail: true     # reply cut by the output cap at row 146 (a single 'R' line) - declared shortfall
+      allow_truncated_tail: true     # reply cut by the output cap at row 146 (a single 'R' line)
+      tail_superseded_by: governance/frontier_pack_20260924/raw/raw_kimi_rows146-150.md
+      expect_coder: kimi-k2
       sha256: cfacb168edb180ba309f7a7af243c136cf622927d86d3b83623bcabc17bf7fdc
-  - id: claude-sonnet-5
-    kind: declared_missing
-    path: governance/frontier_pack_20260924/raw/raw_claude_rows001-050.md
-    axes: [domains, depth]
-    authority: FRONTIER-ADVISORY
-    note: "chunks 1-50 and 51-100 were never delivered; only chunk 101-150 exists"
-  - id: claude-sonnet-5
-    kind: declared_missing
-    path: governance/frontier_pack_20260924/raw/raw_claude_rows051-100.md
-    axes: [domains, depth]
-    authority: FRONTIER-ADVISORY
-    note: "chunks 1-50 and 51-100 were never delivered; only chunk 101-150 exists"
   - id: kimi
-    kind: declared_missing
+    kind: frontier_csv
     path: governance/frontier_pack_20260924/raw/raw_kimi_rows146-150.md
     axes: [domains, depth]
     authority: FRONTIER-ADVISORY
-    note: "output cap cut the reply at R145; rows R146-R150 are owed"
+    declared:
+      rows: 5
+      first: R146
+      last: R150
+      fenced: false
+      prepend_header: true   # DECLARED HEADERLESS FRAGMENT: 5 data lines, no header; continues the chunk above
+      expect_coder: kimi-k2
+      delivery: "owner chat paste 2026-09-25 (no file drop-in). The declared sha256 binds THIS preserved copy
+        (5 lines, LF-terminated, 2170 bytes) - not bytes off the coder's wire, which never existed as a file."
+      sha256: e00b050802602b26a0242744bfabf349a5a1b9a1617d3dcd2212b5f59b73de07
+  # No declared_missing entries remain: all 150 rows now carry domains + depth from at least 2 frontier coders.
+  # The kind is still supported so a future gap can be DECLARED instead of silently scoring a smaller sample.
 
 thresholds:
   depth_hard_spread: 2          # depth classes >= this far apart (ordinal) = a HARD split

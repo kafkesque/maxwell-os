@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 187,
-  "open_n": 99,
+  "total_ids": 189,
+  "open_n": 101,
   "closed_n": 88,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -501,6 +501,16 @@
     {
       "id": "BUG-443",
       "title": "Cloud editor silently overwrote the NORMALISED owner workbook (working tree)",
+      "events": 1
+    },
+    {
+      "id": "BUG-444",
+      "title": "`git add -A` committed a deliberately-dirty OWNER instrument (ANCHOR-4 sheet)",
+      "events": 1
+    },
+    {
+      "id": "BUG-445",
+      "title": "The rail-4 guard could be SILENCED instead of satisfied (scope laundering)",
       "events": 1
     }
   ],

@@ -18,6 +18,7 @@ may_touch:
   - config/*.yaml
   - config/*.json
   - scripts/*.py
+  - scripts/*.sh                                     # rail installers (install_git_hooks.sh = rail 4 as a pre-commit hook)
   - governance/buglog.md
   - governance/bug_status.json
   - governance/bug_status.md

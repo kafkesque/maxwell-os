@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 186,
-  "open_n": 98,
+  "total_ids": 187,
+  "open_n": 99,
   "closed_n": 88,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -496,6 +496,11 @@
     {
       "id": "BUG-433",
       "title": "a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)",
+      "events": 1
+    },
+    {
+      "id": "BUG-443",
+      "title": "Cloud editor silently overwrote the NORMALISED owner workbook (working tree)",
       "events": 1
     }
   ],

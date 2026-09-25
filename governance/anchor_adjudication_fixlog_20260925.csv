@@ -1,5 +1,4 @@
 item_id,column,old,new,status
-R024,domains_final,"business,operations",business operations,FIXED
 R040,domains_final,emerging,emerging,UNRESOLVED-OWNER-RULING
 R042,domains_final,user experienc,user experience,FIXED
 R053,domains_final,systems & framework,systems & frameworks,FIXED

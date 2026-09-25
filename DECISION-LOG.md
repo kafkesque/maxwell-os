@@ -531,3 +531,33 @@ the pin was re-pointed against D-356 on the strength of that capability. What do
 ratified curve. The ratified extraction_type curve remains OWED (BUG-398); extraction_type stays in refused_axes
 until a point is ratified by the lower-CI-bound rule (D-353). Rule restated: a receipt is a claim about an artifact
 that exists at the moment the claim is written.
+
+## D637 - DEPTH CLASS 1 IS REACHABLE: the axis keeps 4 classes (owner ruling, 2026-09-25)
+
+The owner ruled all four candidates in governance/frontier_pack_20260924/ANCHOR4_DEPTH_ANNEX_CALIBRATION_v1.md
+UNIVERSAL (verbatim: "agree with those 4 theyare universal"), writing DEPTH (1-4) = 1 for U001 Iterative
+Feedback Refinement, U002 Proxy Decay (the measure becomes the target), U003 Constraint-Originality Inversion
+and U004 Relative-Difference (Contrast) Law of Evaluation.
+
+What this settles. Class 1 stood at ZERO assignments across the owner's reviewed 148 rows, after the owner
+blind-called it 7 times (R033, R049, R062, R085, R087, R101, R139) and then RETRACTED all 7 on seeing four
+independent coders. Two explanations were open: (a) the class-1 bar was too loose to survive scrutiny, or
+(b) universal does not occur among design-principle claims. The ruling selects (a): the bar was the problem,
+not the class. The depth axis therefore KEEPS FOUR CLASSES and the D2577 depth head stays 4-way; the
+3-class fallback and the deletion of class 1 from the head output space are WITHDRAWN, not deferred.
+
+What moved the bar. Each confirmed candidate states no domain noun, is attested in three or more unrelated
+fields, and is a falsifiable claim rather than a method. Each rejected blind call failed exactly one of those
+three: R085/R101 are domain-scoped stances about knowledge (class 3); R139 Learning Through Failure is the
+cross-domain instance of U001; R049 Fermi Estimation lists FIVE owner domains yet was graded cross-domain (2),
+which is D2130 demonstrated in the data - the declared soft band informs, it does not decide.
+
+What is NOT claimed. Prevalence of class 1 is still MEASURED, not assumed: the blind held-out run on the
+frozen 58 rows (frontier pair, asked only whether class 1 appears unprompted) remains owed. The annex is
+tier annex-illustrative: it is not a ruler row, it does not change the 150 denominator, the coder rubric is
+not amended mid-record (the 4-coder cross-exam must stay comparable), it is never scored, and it is
+permanently excluded from any train set (D274d). No conf_depth was recorded because the owner ruled
+acceptance, not a certainty level - nothing is fabricated into a gold column.
+
+Rule restated: a class that the gold never reaches is either misdefined or absent, and those two are told
+apart by writing the class definition as a claim someone can falsify, not by lowering the bar until it fires.

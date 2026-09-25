@@ -4,7 +4,15 @@
 schema_version: "1.0"
 artifact_id: ANCHOR4_DEPTH_ANNEX_CALIBRATION_v1
 tier: annex-illustrative
-status: candidate-pending-owner-exam
+status: owner-confirmed-class1
+owner_ruling:
+  date: "2026-09-25"
+  verbatim: "agree with those 4 theyare universal"
+  verdict: {U001: 1, U002: 1, U003: 1, U004: 1}     # DEPTH (1-4), written into the annex CSV
+  consequence: |
+    The class-1 question is CLOSED in the affirmative: universal is reachable in this corpus.
+    The depth axis KEEPS 4 classes; the D2577 head stays 4-way. The 3-class fallback branch is dead.
+    Prevalence is still measured, not assumed - the blind held-out run remains owed.
 date: "2026-09-25"
 authority: "config/depth_classes.yaml  # the depth axis; this annex never overrides it"
 purpose: |
@@ -18,7 +26,7 @@ files:
   negatives_source:
     - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv  # sealed drop-in, sha256 bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4
     - governance/anchor_adjudication_workbook_20260924.csv        # owner rev 2
-candidates: [U001, U002, U003, U004]           # DEPTH (1-4) is OWED BY THE OWNER, not pre-filled
+candidates: {U001: 1, U002: 1, U003: 1, U004: 1}   # DEPTH (1-4) OWNER-CONFIRMED 2026-09-25
 negative_set: [R033, R049, R062, R085, R087, R101, R139]
 csv_layout:
   base: "ANCHOR-4 blind sheet 16-column header, verbatim"

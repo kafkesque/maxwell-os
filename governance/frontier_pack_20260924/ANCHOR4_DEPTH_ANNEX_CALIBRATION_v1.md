@@ -1,6 +1,6 @@
 # ANCHOR-4 DEPTH ANNEX — CLASS-1 CALIBRATION (CANDIDATES)
 **Artifact ID:** `ANCHOR4_DEPTH_ANNEX_CALIBRATION_v1` · **schema_version:** 1.0 · **tier:** `annex-illustrative`
-**Status:** `CANDIDATE-PENDING-OWNER-EXAM` — the DEPTH gold column below is deliberately EMPTY; the owner owns it.
+**Status:** `OWNER-CONFIRMED` (2026-09-25) — all four candidates ruled **universal, DEPTH (1-4) = 1**; the gold column is filled in the annex CSV.
 **Date:** 2026-09-25 · **Owner gate:** C22 (no promotion write, no training) · **D274d** (no S4/depth-head training before the freeze)
 
 ---
@@ -123,3 +123,24 @@ Authoring candidate universals *after* seeing the gold is the exact mechanism by
 
 **Files:** annex rows `governance/frontier_pack_20260924/ANCHOR4_DEPTH_ANNEX_CAL1_v1.csv` · declaration `config/anchor4_depth_annex.yaml`
 **Negative-set source of truth:** `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` (sha256 bc1cc956…, sealed) + `governance/anchor_adjudication_workbook_20260924.csv` (owner rev 2)
+
+---
+
+## §7 RULING RECORDED (2026-09-25)
+
+**Owner, verbatim:** *"agree with those 4 theyare universal"*
+
+| row | candidate | owner verdict | DEPTH (1-4) written |
+|---|---|---|---|
+| U001 | Iterative Feedback Refinement | universal | **1** |
+| U002 | Proxy Decay (the measure becomes the target) | universal | **1** |
+| U003 | Constraint-Originality Inversion | universal | **1** |
+| U004 | Relative-Difference (Contrast) Law of Evaluation | universal | **1** |
+
+**Consequences, in order of weight:**
+1. **Explanation (a) is the one that holds.** The class-1 bar was too loose to survive scrutiny, not empty: universal is *reachable* in this corpus once the claim is stated without a domain noun. The 3-class fallback is **dead** — the depth axis keeps **4 classes** and the D2577 head stays **4-way**.
+2. **Class 1 now has a reference set**, which is the whole reason this annex exists and the reason it is *not* inside the 150.
+3. **The retraction of the 7 stands and is now explained.** R049 (five domains, graded 2), R085/R101 (domain-scoped stances about knowledge), R139 (the cross-domain instance of U001) are the boundary cases that show *where* the class-1 bar sits: U001 is what R139 becomes once the field noun is removed.
+4. **Prevalence is still measured, not assumed.** The blind held-out run stays owed and is unchanged in design: the frontier pair on the frozen 58 rows, asked only whether class 1 appears unprompted. The annex is calibration material, so the run that produced the 4-coder cross-exam stays comparable — the coder rubric is **not** amended mid-record.
+5. **Confidence not recorded.** The owner ruled acceptance, not a certainty level, so `conf_depth` is left blank on these rows rather than invented (nothing is fabricated into a gold column, ever).
+6. **Still never trained** (D274d) and **still not a ruler row**: `tier: annex-illustrative`, `scored: false`, no denominator change. The 150 keep their 28% stability floor, their 145/150 extraction_type and their F-11 comparability.

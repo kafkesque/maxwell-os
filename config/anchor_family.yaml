@@ -122,3 +122,18 @@ machine_observations:
   off_menu_discipline_values: ['design strategy', 'personal productivity']
   off_menu_discipline_rows: [R042, R086, R091, R117]
   off_menu_note: DOMAIN-lexicon values written into the discipline cell; kept verbatim + flagged OFF_MENU_DOMAIN; two one-line owner rulings outstanding
+
+# --- ANCHOR-4 class-1 reference (owner-confirmed 2026-09-25) ---
+# The owner ruled all four annex candidates UNIVERSAL, so depth class 1 is REACHABLE in this corpus:
+# the class-1 bar was too loose (explanation a), not empty (explanation b). Depth axis stays 4-class.
+anchor4_depth_annex:
+  artifact_id: ANCHOR4_DEPTH_ANNEX_CALIBRATION_v1
+  tier: annex-illustrative
+  status: owner-confirmed-class1
+  owner_verbatim: "agree with those 4 theyare universal"
+  class1_reference: {U001: 1, U002: 1, U003: 1, U004: 1}
+  negative_set: [R033, R049, R062, R085, R087, R101, R139]   # blind class-1 calls RETRACTED by the owner
+  scored: false
+  trained: false            # D274d
+  denominator_change: false # the scored 150 are untouched
+  band_falsifier: "R049: 5 owner domains, graded cross-domain (2) - D2130 (the band informs, it does not decide)"

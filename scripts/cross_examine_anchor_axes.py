@@ -239,6 +239,15 @@ def jaccard(a: set[str], b: set[str]) -> float:
 def collect(cfg: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[str], list[str]]:
     """Build item_id -> {coder readings} across every source. Returns (items, fatal, notes)."""
     items: dict[str, dict[str, Any]] = {f"R{i:03d}": {"coders": {}} for i in range(1, N_ROWS + 1)}
+    # NAMES come from the SHARED blind input (one source of truth), never from a coder's reply: a title typed by
+    # a model would be a second, drifting copy of the anchor. Fail closed if the blind input is gone.
+    blind = REPO / cfg.get("blind_input", "governance/frontier_pack_20260924/BLIND_INPUT_150.csv")
+    if not blind.exists():
+        return items, [f"blind input {blind} is missing - the workbook cannot carry row names, refusing"], []
+    with blind.open(encoding="utf-8-sig", newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row.get("item_id") in items:
+                items[row["item_id"]]["name"] = (row.get("name") or "").strip()
     notes: list[str] = []
     fatal: list[str] = []
     labels = depth_menu()[0]
@@ -333,6 +342,9 @@ def score(items: dict[str, dict[str, Any]], gold: dict[str, int], gconf: dict[st
         if any(v.get("depth_declined") for v in coders.values()):
             flags.append("DEPTH_MENU_DECLINED")
         dom_plurality = plural.most_common(1)[0] if plural else ("", 0)
+        # a label being PRESENT in a set is weaker than a coder LEADING with it, so the two are stored apart:
+        # domain_plurality_share counts membership, primary_share counts coders whose FIRST label it is.
+        pri_plural = collections.Counter(primaries).most_common(1)[0] if primaries else ("", 0)
         dep_plurality = collections.Counter(dep_vals).most_common(1)[0] if dep_vals else (None, 0)
         if dom_plurality[1] and dom_sets and dom_plurality[1] / max(1, len(dom_sets)) < th["majority_min_share"]:
             flags.append("DOMAIN_NO_MAJORITY_LABEL")
@@ -351,6 +363,9 @@ def score(items: dict[str, dict[str, Any]], gold: dict[str, int], gconf: dict[st
             "domain_intersection": "|".join(sorted(inter)),
             "domain_plurality": dom_plurality[0],
             "domain_plurality_share": round(dom_plurality[1] / max(1, len(dom_sets)), 3),
+            "primary_plurality": pri_plural[0],
+            "primary_share": round(pri_plural[1] / max(1, len(primaries)), 3) if primaries else "",
+            "name": it.get("name", ""),
             "domain_jaccard_mean": round(statistics.mean(js), 3) if js else "",
             "depth_mean": round(statistics.mean(dep_vals), 2) if dep_vals else "",
             "depth_spread": spread,
@@ -392,13 +407,113 @@ def score(items: dict[str, dict[str, Any]], gold: dict[str, int], gconf: dict[st
     return stats
 
 
+def recommend_row(r: dict[str, Any], th: dict[str, Any]) -> tuple[str, str, str]:
+    """Return (recommendation, basis, owner_answer_needed) for one disputed row. ADVISORY - never a `*_final`.
+
+    A recommendation is emitted only where the coders can carry it (a real plurality). Everywhere else the
+    honest output is OWNER_ONLY. Depth recommendations never invent a class: they NAME the dispute and say
+    which one your ruling would teach. A row is only asked about on an axis that is actually in dispute.
+    """
+    flags = set(f for f in r["flags"].split(";") if f)
+    n_dom, n_dep = r["n_domain_coders"], r["n_depth_coders"]
+    has_dom = n_dom == 0 or any(f.startswith(("DOMAIN_", "PRIMARY_DOMAIN")) or
+                                f == "OWNER_coder_majority_DIFFERS" for f in flags)
+    has_dep = n_dep == 0 or any(f.startswith("DEPTH_") for f in flags)
+    basis: list[str] = []
+    need: list[str] = []
+    if not has_dom:
+        dom_r = "domain=no dispute"
+    elif n_dom == 0:
+        dom_r = "domain=NO_ANSWER"
+        need.append("domain")
+        basis.append("no coder answered the domain axis")
+    else:
+        share = float(r["domain_plurality_share"] or 0)
+        pri = r.get("primary_plurality") or ""
+        pri_share = float(r.get("primary_share") or 0)
+        if pri and pri_share >= float(th["majority_min_share"]):
+            dom_r = f"domain={pri} as PRIMARY"
+            need.append("domain")
+            basis.append(f"{int(round(pri_share * n_dom))}/{n_dom} coders LEAD with {pri} - confirm it, or replace it "
+                         f"if it is wrong (it is also shared by {share:.2f} of the coder sets)")
+        else:
+            dom_r = "domain=OWNER_ONLY"
+            need.append("domain")
+            basis.append(f"no label is LED by half the coders (best primary share {pri_share:.2f} of {n_dom}, "
+                         f"best set-membership share {share:.2f}) - the PRIMARY label is yours to name; "
+                         f"the coder sets stay in this row as provenance")
+    if not has_dep:
+        dep_r = "depth=no dispute"
+    elif any(v.get("depth_declined") for v in r["coders"].values()):
+        dep_r = "depth=NOT_A_CLAIM?"
+        need.append("depth")
+        basis.append("a coder REFUSED the menu ('none_fits') - decide whether the row is a claim at all")
+    elif n_dep == 0:
+        dep_r = "depth=NO_ANSWER"
+        need.append("depth")
+        basis.append("no coder answered the depth axis")
+    elif r["depth_spread"] == 0 and r["depth_plurality"] == r["owner_depth"]:
+        dep_r = f"depth=KEEP owner {r['owner_depth']}"
+        basis.append("all coders agree with your depth - nothing to do")
+    elif r["depth_spread"] == 0:
+        dep_r = "depth=CHECK_OWNER_FIRST"
+        need.append("depth")
+        basis.append(f"all coders say {r['depth_plurality']} where you said {r['owner_depth']} - a CLEAN signal, "
+                     f"so read it first: either your cell or the rubric is off, and it is cheap to tell which")
+    elif int(r["depth_spread"]) >= int(th["depth_hard_spread"]):
+        dep_r = "depth=RECODE_BAND"
+        need.append("depth")
+        basis.append(f"coders span {r['depth_spread']} classes - name the boundary in the rubric and re-code this band")
+    else:
+        dep_r = "depth=OWNER_RULING_NEAR"
+        need.append("depth")
+        basis.append(f"coders differ by ONE class (mean D{r['depth_mean']}) - this is the D2/D3 boundary; "
+                     f"a ruling here is what teaches the rubric")
+    return f"{dom_r}; {dep_r}", " | ".join(basis), ";".join(need)
+
+
+def render_review(stats: dict[str, Any], dispute: list[dict[str, Any]], th: dict[str, Any]) -> str:
+    """Render the readable review sheet: one block per disputed row, before anything is consolidated."""
+    coders = stats["coder_ids"]
+    L: list[str] = ["# ANCHOR adjudication - REVIEW SHEET (read this before the CSV)", "",
+                    "Every row the cross-examination puts in front of you, with what each independent reader said and",
+                    "the recommendation this repo can defend. Advisory only: your `*_final` values are written by you,",
+                    "in the workbooks CSV (`governance/anchor_adjudication_workbook_20260924.csv`), whose owner",
+                    "columns are EMPTY and must stay empty until you type in them.", "",
+                    f"`machine_recommendation` legend: `domain=<label> as PRIMARY` = a coder plurality exists, confirm",
+                    f"or replace | `domain=OWNER_ONLY` = no label reaches share {th['majority_min_share']}, yours to name |",
+                    "`depth=KEEP` = coders agree with you, nothing to do | `depth=CHECK_OWNER_FIRST` = coders agree with",
+                    "EACH OTHER against you, so it is a clean signal about the cell or the rubric | `depth=OWNER_RULING_NEAR`",
+                    "= one class apart, the D2/D3 boundary | `depth=RECODE_BAND` = span >= 2 classes, do not adjudicate it,",
+                    "re-code it | `depth=NOT_A_CLAIM?` = a coder refused the menu.", ""]
+    for tier in ("HARD", "SOFT"):
+        rows = [r for r in dispute if r["tier"] == tier]
+        L += [f"## {tier} ({len(rows)} rows)", ""]
+        for r in rows:
+            rec, why, need = recommend_row(r, th)
+            L.append(f"### {r['item_id']} - {r['name'][:90] or '(no name)'}")
+            L.append(f"- **coders** - " + " | ".join(
+                f"{c}: d={(r['coders'].get(c) or {}).get('depth') if not (r['coders'].get(c) or {}).get('depth_declined') else 'none_fits'}"
+                f" / {'|'.join((r['coders'].get(c) or {}).get('domains') or []) or '-'}" for c in coders))
+            L.append(f"- **owner depth** {r['owner_depth'] or '-'} (conf {r['owner_conf_depth'] or '-'}) | "
+                     f"coder spread {r['depth_spread']} | domain union: {r['domain_union'] or '-'}")
+            L.append(f"- **RECOMMEND** `{rec}`")
+            L.append(f"- why: {why}")
+            L.append(f"- **you must answer: {need or 'nothing'}**")
+            if r["flags"]:
+                L.append(f"- flags: `{r['flags']}`")
+            L.append("")
+    return "\n".join(L) + "\n"
+
+
 def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: dict[str, Any],
                   gold: dict[str, int], notes: list[str]) -> list[str]:
     """Write the long CSV, the owner workbook, the stats JSON and the report. Returns the paths written."""
     out = {k: REPO / v for k, v in cfg["outputs"].items()}
     written: list[str] = []
-    cols = ["item_id", "row", "n_coders", "n_domain_coders", "n_depth_coders", "tier", "flags",
+    cols = ["item_id", "row", "n_coders", "n_domain_coders", "n_depth_coders", "tier", "flags", "name",
             "domain_union", "domain_intersection", "domain_plurality", "domain_plurality_share",
+            "primary_plurality", "primary_share",
             "domain_jaccard_mean", "depth_mean", "depth_spread", "depth_plurality",
             "owner_depth", "owner_conf_depth"]
     with out["long_csv"].open("w", encoding="utf-8", newline="") as fh:
@@ -409,7 +524,9 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
     written.append(str(out["long_csv"].relative_to(REPO)))
     coders = stats["coder_ids"]
     wb_cols = ["item_id", "row", "tier", "flags", "name"] + [f"{c}_depth" for c in coders] + \
-              [f"{c}_domains" for c in coders] + ["owner_depth", "owner_plurality_note"] + WORKBOOK_OWNER_COLS
+              [f"{c}_domains" for c in coders] + ["owner_depth", "owner_plurality_note",
+                                                  "machine_recommendation", "recommendation_basis",
+                                                  "owner_answer_needed"] + WORKBOOK_OWNER_COLS
     dispute = [r for r in stats["per_row"] if r["tier"] in ("HARD", "SOFT") or r["flags"]]
     dispute.sort(key=lambda r: (0 if r["tier"] == "HARD" else 1, r["row"]))
     with out["workbook"].open("w", encoding="utf-8", newline="") as fh:
@@ -417,7 +534,7 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
         w.writeheader()
         for r in dispute:
             rec = {"item_id": r["item_id"], "row": r["row"], "tier": r["tier"], "flags": r["flags"],
-                   "owner_depth": r["owner_depth"]}
+                   "name": r.get("name", ""), "owner_depth": r["owner_depth"]}
             for c in coders:
                 v = r["coders"].get(c) or {}
                 rec[f"{c}_depth"] = ("none_fits" if v.get("depth_declined") else v.get("depth", ""))
@@ -425,10 +542,14 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
             rec["owner_plurality_note"] = ("coder plurality == owner depth" if r["depth_plurality"] == r["owner_depth"]
                                            and r["owner_depth"] != "" else
                                            "CODERS vs OWNER: check this row first" if r["owner_depth"] != "" else "")
+            rec["machine_recommendation"], rec["recommendation_basis"], rec["owner_answer_needed"] = \
+                recommend_row(r, cfg["thresholds"])
             for k in WORKBOOK_OWNER_COLS:
                 rec[k] = ""
             w.writerow(rec)
     written.append(str(out["workbook"].relative_to(REPO)))
+    out["review_md"].write_text(render_review(stats, dispute, cfg["thresholds"]), encoding="utf-8")
+    written.append(str(out["review_md"].relative_to(REPO)))
     out["stats_json"].write_text(json.dumps({"stamp": stamp(), "sources": cfg["sources"], "notes": notes,
                                              "thresholds": cfg["thresholds"], **stats}, indent=1),
                                 encoding="utf-8")

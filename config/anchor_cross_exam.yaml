@@ -113,7 +113,11 @@ thresholds:
   majority_min_share: 0.5       # share of present coders needed for a "majority" reading
 
 outputs:
+  # the SHARED blind input: one source of truth for row names and for what a coder was allowed to see
+  blind_input: governance/frontier_pack_20260924/BLIND_INPUT_150.csv
   long_csv: governance/anchor_axis_coders_20260924.csv
   workbook: governance/anchor_adjudication_workbook_20260924.csv
   stats_json: governance/anchor_axis_cross_exam_20260924.json
   report_md: governance/ANCHOR_AXIS_CROSS_EXAM_20260924.md
+  # the REVIEW SHEET the owner reads before the CSV: same rows, readable, recommendation inline
+  review_md: governance/ANCHOR_AXIS_REVIEW_20260925.md

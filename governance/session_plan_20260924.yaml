@@ -32,6 +32,7 @@ may_touch:
   - governance/anchor_adjudication_fixlog_*.csv
   - governance/ANCHOR_ADJUDICATION_NORMALIZATION_*.md
   - backups/anchor_adjudication_workbook_*.csv         # byte-exact owner revisions (rev1 as submitted, rev2 owner R024 fix)
+  - DECISION-LOG.md                                    # append-only (R-D410); D637 records the class-1 owner ruling
   - governance/anchor4_domain_*
   - governance/ANCHOR4_DOMAIN_*
   - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_*.md

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**101 open** / 88 closed of 189 ids.
+**98 open** / 91 closed of 189 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -105,6 +105,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-431 | ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN) | 1 |
 | BUG-432 | INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the | 3 |
 | BUG-433 | a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN) | 1 |
-| BUG-443 | Cloud editor silently overwrote the NORMALISED owner workbook (working tree) | 1 |
-| BUG-444 | `git add -A` committed a deliberately-dirty OWNER instrument (ANCHOR-4 sheet) | 1 |
-| BUG-445 | The rail-4 guard could be SILENCED instead of satisfied (scope laundering) | 1 |

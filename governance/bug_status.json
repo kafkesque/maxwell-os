@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 189,
-  "open_n": 101,
-  "closed_n": 88,
+  "open_n": 98,
+  "closed_n": 91,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -497,21 +497,6 @@
       "id": "BUG-433",
       "title": "a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)",
       "events": 1
-    },
-    {
-      "id": "BUG-443",
-      "title": "Cloud editor silently overwrote the NORMALISED owner workbook (working tree)",
-      "events": 1
-    },
-    {
-      "id": "BUG-444",
-      "title": "`git add -A` committed a deliberately-dirty OWNER instrument (ANCHOR-4 sheet)",
-      "events": 1
-    },
-    {
-      "id": "BUG-445",
-      "title": "The rail-4 guard could be SILENCED instead of satisfied (scope laundering)",
-      "events": 1
     }
   ],
   "closed": [
@@ -602,6 +587,9 @@
     "BUG-439",
     "BUG-440",
     "BUG-441",
-    "BUG-442"
+    "BUG-442",
+    "BUG-443",
+    "BUG-444",
+    "BUG-445"
   ]
 }

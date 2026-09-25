@@ -3967,3 +3967,16 @@ format must be quoted or the separator must be one the labels cannot contain.**
 
 ## Cross-cutting finding (third out-of-band write in this family)
 BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer than its tracked counterpart), BUG-443 (cloud editor overwrote the normalised workbook). All three are the same failure: **a tracked governance file changed with no local git process**, and all three would have been caught by the watcher proposed in BUG-432 rail 5(b). That watcher is now the highest-value unbuilt rail in the family.
+
+## BUG-443 - FIXED 2026-09-25 (header omitted the status word; content unchanged, see entry above)
+## BUG-444 - FIXED 2026-09-25 (content unharmed - the sheet is byte-identical to HEAD; see entry above)
+## BUG-445 - FIXED 2026-09-25 (rail 4 is now a pre-commit hook; will_not_touch outranks may_touch; re-audit of ff6641b returns exit 2)
+
+## STANDING RULE - a bug entry HEADER must carry its status word
+- **Bug:** the three entries above declared **Status:** FIXED in their body, but `scripts/bug_status.py` reads the
+  **header line** (the last `## BUG-<id>` event wins). All three were therefore indexed **OPEN**: the register
+  over-reported open by 3 while the bugs were fixed. Fail-safe direction, but still drift - the register must
+  describe the record, not lag it.
+- **STANDING RULE.** Write the status word IN THE HEADER when the entry is created (`## BUG-NNN - FIXED ...`),
+  because the register parses headers; a status that lives only in the body is a status the register cannot see.
+  Rule restated: an artifact is only as authoritative as the field the reader actually reads.

@@ -436,3 +436,18 @@
 - OWED (mine): HEAD reconciliation with receipts (the certified tree and the reviewed tree are NOT the same bytes while 42 tracked files sit uncommitted).
 
 - **D-2667 (2026-09-26) - plan revision + the PAIRING rule.** DONE: session plan restored from git and re-written escape-free (entries 21/22; may_touch widened by TWO NAMED paths, never a glob); the protected-family rewrite reverted after preservation (BUG-561); commit 1 (plan) landed. OWED: (a) the reconciliation commit - BLOCKED by BUG-562 (config/serving_gate.yaml granted vs pipeline/serving_gate.py will_not_touch) -> owner pipeline/** crossing ack or per-path pairing split; (b) the mint of D-2667; (c) BUG-561 DEEPER: the tracked sync-client rename of the owner blind sheet must be REMOVED from the repo (plan revision + owner gate); (d) BUG-559 / BUG-560 remain OPEN; (e) MUTATION_JOURNAL.jsonl (100 KB) and INSTRUMENT_CONTROLS.jsonl are UNTRACKED and NOT granted - the receipt ledger is unversioned.
+
+- **D-2668 (2026-09-26) - the CROSS permit + the reconciliation.** DONE: `crossing: true` is now a PERMIT the rail
+  consumes (subject + ack + spend; controls 14 -> 20, `--selftest` 20/20). DONE: plan entry 23 (8 NAMED
+  `pipeline/**` subjects, acked by owner 2026-09-26, SPENT by e3f94f4). DONE: the reconciliation - 62 paths landed,
+  HEAD now names the tree every rail measured (before: 163 dirty entries and a `git checkout` of HEAD would have
+  deleted passed work). DONE: BUG-561 CORRECTED (the "clobber" was the declared rev 3; the REVERT orphaned a
+  write-locked digest and was restored from the R-D410 backup - rev 3 exists in NO git ref). DONE: BUG-562's
+  INCIDENT (config/serving_gate.yaml + pipeline/serving_gate.py + tests/test_serving_gate.py in ONE commit).
+  OWED: (a) the BUG-562 PAIRING RAIL - nothing yet REFUSES a commit set whose granted artifact's consumer is
+  withheld; the property now holds only because a session looked; (b) BUG-563 - `backups/**` is neither GRANTED nor
+  IGNORED (92 dirty entries) and the rail output stores are in the same class (the R-D410 receipt ledger
+  `governance/MUTATION_JOURNAL.jsonl` is unversioned); (c) the owner drop-in rev 3 remains owner-gated (BUG-493) and
+  its bytes exist in exactly one non-worktree copy; (d) the D-2667 + D-2668 mints; (e) BUG-559 then BUG-560.
+  RISK: committing 8 `pipeline/**` files was the owner-acked crossing, and the reconciliation is what makes
+  declarations and implementations land together - the pairing rail is what makes that a property instead of an act.

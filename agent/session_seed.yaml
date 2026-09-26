@@ -365,3 +365,15 @@ open_bugs_n: 128
 # BUG-561: a TRACKED rename-sibling of the owner blind sheet was rewritten wholesale in the working tree - a rail
 # auditing only the STAGED set cannot see it. OWNER GATE (one word): CROSS the pipeline/** boundary for the
 # serving-gate pair, or SPLIT the reconciliation per pair.
+
+# D-2668 (2026-09-26): the owner's CROSS is IMPLEMENTED - `crossing: true` is now a PERMIT with a SUBJECT (`crossed:`),
+# an ACK (`acked_by`/`acked_on`) and a SPEND (`spent_by`); entry 23 named 8 pipeline/** paths, acked by the owner,
+# and is SPENT by e3f94f4. HEAD = 11c0fe4 and it names the TREE THE RAILS MEASURED (62 paths landed: the plan's
+# grants + the 8 crossed, incl. config/serving_gate.yaml WITH its consumer and its test - BUG-562 closed by
+# construction). A may_touch widening was REJECTED: standing permission over production code cannot be closed later.
+# BUG-561 WAS CORRECTED: the worktree "clobber" was the DECLARED rev 3 of the owner drop-in; the REVERT orphaned a
+# write-locked digest and was repaired by restoring the bytes from the R-D410 backup (rev 3 exists in NO git ref -
+# one `git checkout` from losing it). The rule: a diff against HEAD is NOT a clobber test; test the DECLARED revision.
+# STILL OPEN: the BUG-562 PAIRING rail (nothing yet REFUSES a commit set whose granted consumer is withheld),
+# BUG-563 (backups/** neither granted nor ignored), BUG-559/560, the D-2667/D-2668 mints, the owner drop-in rev 3
+# promotion (BUG-493: HEAD carries the superseded rev 2).

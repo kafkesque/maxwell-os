@@ -7019,3 +7019,47 @@ FIX: the rewritten bytes were PRESERVED to backups/ANCHOR4_DEPTH_BLIND_SHEET_202
 FOUND BY: the pre-commit audit of the reconciliation set. The plan says what a session MAY touch; nothing checks that a changed artifact CONSUMER travels with it.
 MEASURED: config/serving_gate.yaml (+67 lines, GRANTED by config/*.yaml) is read at pipeline/serving_gate.py:22 (CONFIG_PATH = ROOT / config / serving_gate.yaml), a file the plan declares will_not_touch (+173 lines); the GRANTED tests/test_serving_gate.py exercises that module. Committing the granted half alone would put into history a declaration whose implementation is absent and a test whose subject is absent - D-405 violated by a COMMIT SET, not by one artifact.
 FIX (owed): a PAIRING check - refuse a commit in which a changed granted artifact whose declared CONSUMER is withheld/absent is present - and the plan rule that a config and its consumer land in the SAME commit. Until then the 53-path reconciliation set is NOT committable as one unit: it needs the owner pipeline/** crossing ack (a one-off, owner-acked crossing, never standing permission) or a per-path pairing split.
+
+## BUG-561 CORRECTION (2026-09-26, same session): the "clobber" WAS the declared rev 3, and the REVERT was the defect
+- **status**: MED - the report was WRONG IN ITS CONCLUSION; the damage was the repair. REPAIRED by restoring the bytes.
+- **what was claimed**: a tracked sync-client rename of a `will_not_touch` FAMILY member had been rewritten WHOLESALE
+  in the working tree (151/151 lines differ from HEAD, mtime Sep 26 10:32) -> reverting the path to HEAD was treated
+  as the remedy. The bytes were preserved first (R-D410), which is the only reason this was recoverable.
+- **what is MEASURED**: that diff was taken against HEAD, and HEAD carries rev 2. The receipts sealed
+  526991cb / 203963 B at 08:46, 08:59 AND 10:34 - so the bytes at 10:32 were UNCHANGED and only mtime moved:
+  nothing was rewritten. rev 3 = rev 2 + 3 UNNAMED trailing columns plus one stray cell, a spreadsheet save the
+  repo ALREADY documents (`config/anchor4_interim_state.json#dropin_note`, BUG-493, "the save is owner-gated").
+  Every row gains 3 trailing columns, which is exactly why every LINE differs in a diff.
+- **the defect the revert created**: the write-locked digest 526991cb became an ORPHAN. `verify_handoffs` rc=1
+  ("bytes CHANGED 526991cb -> bc1cc956", plus 2 orphan digests in `config/human_instrument_locks.yaml` and
+  `config/anchor4_interim_state.json`), and `just health` fell at justfile line 49.
+- **the near-miss**: rev 3's bytes exist in NO git ref. rev 1 = `git:075ae65` and rev 2 = `git:65a13c3` are declared
+  locators; rev 3 has no locator, so the single `git checkout HEAD` had exactly one copy of a write-locked owner
+  revision to destroy - the R-D410 backup taken minutes earlier.
+- **REPAIRED**: bytes restored to rev 3 (526991cb) from `backups/ANCHOR4_DEPTH_BLIND_SHEET_20260923.Copy-of.PRE_revert_20260926T230500Z.csv`;
+  `verify_handoffs` rc=0 (13/13 digests, 3 revisions re-derived, 11/11 cross-declarations resolve),
+  `check_human_instruments` rc=0 (7 locked, all protected columns byte-identical), `just health` rc=0.
+- **the rail-level lesson**: a diff against HEAD is NOT a clobber test. The test is against the DECLARED revision
+  (locks + receipts), because a detector that fires on "worktree != HEAD" fires on EVERY sanctioned uncommitted
+  revision. The prior session's structural observation stands unchanged (rail 4 audits the STAGED set, so a
+  worktree-only change to a protected family member is invisible to it) - that deeper question is still OPEN.
+
+## BUG-562 UPDATE (2026-09-26): the INCIDENT is closed by construction; the RAIL is still OWED
+- CLOSED BY CONSTRUCTION: the reconciliation commit e3f94f4 carries `config/serving_gate.yaml` AND its consumer
+  `pipeline/serving_gate.py` AND `tests/test_serving_gate.py` in ONE commit, under the owner's CROSS (plan entry 23,
+  spent by that commit). The declaration and its implementation are no longer separable in history.
+- STILL OWED: nothing yet REFUSES a commit set in which a changed GRANTED artifact's declared consumer is withheld.
+  The fix is a PAIRING check with a control SEEN to refuse the serving-gate pair, so the next commit set cannot
+  re-create the mismatch silently. Until that lands, the property holds only because a session looked.
+
+## BUG-563 (MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git
+- **detail**: 92 of the 163 dirty entries are `backups/*`, and those are EVIDENCE files that C13/R-D410 REQUIRE a
+  session to write. So a session is obliged to create paths it may not commit, and git is not told to ignore them:
+  the tree can never be clean, and the evidence trail is unversioned BY ACCIDENT rather than by decision.
+- **shape**: the same defect the archive census refuses on a smaller scale - "an on-disk object is either INDEXED
+  or DECLARED excluded, never silently absent" (`archive/index.yaml#excluded`, BUG-537/BUG-556).
+- **fix owed**: ONE home saying which it is (an ignore rule carrying a declared disposition, or a `may_touch` grant),
+  plus a rail that fails on a dirty path that is NEITHER granted NOR declared-excluded.
+- **related**: the rail OUTPUT stores (`governance/MUTATION_JOURNAL.jsonl` - the R-D410 append-only receipt ledger,
+  100 KB, `governance/INSTRUMENT_CONTROLS.jsonl`, `governance/METRICS.jsonl`, `drift_report_*`, `bench_preflight_*`)
+  are in the same class: live outputs of rails, tracked by nothing.

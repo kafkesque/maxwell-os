@@ -1042,3 +1042,24 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
 - The workbook's encoding has ONE value in all THREE homes: `utf-8`. Read `config/reconciliation.yaml#artifact_encodings` for why a declaration measured off the bytes on disk is how a foreign body becomes certified (BUG-558).
 - BUG-559 (a receipt cut over bytes joined to no revision), BUG-560 (the applier writes a human_authored artifact outside write_guard): both OPEN, both named in the register.
 - The suite ceiling is 0 (was 3) and SHRINK-ONLY: the 3 declared red ids were red ONLY because the ruler was unratified.
+
+## D-2667 / D-2668 (2026-09-26) - the plan revision, the CROSS permit, and the reconciliation
+
+- **What is TRUE now**: `just health` rc=0; `verify_handoffs` rc=0 (6 declared paths, 13 digests, 3 revisions);
+  rail 4 `--selftest` 20/20; suite 261 collected / 256 passed / 0 failed / 0 declared red.
+- **HEAD**: 6166a3d (D-2667 plan revision) -> 68be49a (D-2668 permit) -> e3f94f4 (the RECONCILIATION, 62 paths,
+  `pipeline/**` crossed under plan entry 23) -> 11c0fe4 (the crossing SPENT).
+- **The receipt/lock join that matters**: `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` is the
+  write-locked owner drop-in at rev 3 = 526991cb (203963 B). rev 1 = `git:075ae65`, rev 2 = `git:65a13c3` are
+  declared revision locators; **rev 3 has NO locator and exists in no git ref** - its only non-worktree copy is
+  `backups/ANCHOR4_DEPTH_BLIND_SHEET_20260923.Copy-of.PRE_revert_20260926T230500Z.csv`. HEAD carries rev 2, which
+  `config/anchor4_interim_state.json` declares SUPERSEDED. Promotion into the instrument is OWNER-GATED (BUG-493).
+- **The rule this session paid for**: a diff against HEAD is NOT a clobber test - rev 3's delta (3 unnamed trailing
+  columns per row) makes every LINE differ while the bytes are the ones 10 receipts already sealed. Test the
+  DECLARED revision (locks + receipts), or a repair will revert a locked artifact (BUG-561 correction).
+- **The permit semantics (D-2668)**: `crossing: true` grants NOTHING without `crossed:` (subject), `acked_by` +
+  `acked_on` (ack) and a later `spent_by` (spend). A `crossed:` path outside every `will_not_touch` family is
+  refused, so `crossed:` can never become a second `may_touch`.
+- **STILL UNCOMMITTED, DECLARED**: the drop-in rev 3 (will_not_touch BY FAMILY, BUG-528); 92 `backups/*`; the rail
+  output stores (`governance/MUTATION_JOURNAL.jsonl`, `INSTRUMENT_CONTROLS.jsonl`, `METRICS.jsonl`,
+  `drift_report_*`, `bench_preflight_*`); four governance tables.

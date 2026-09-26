@@ -354,3 +354,27 @@ The owner ruled RATIFY on the depth/domain contract's owner gate. Executing it s
 4. Ceiling 3 -> 0 (SHRINK-ONLY). `just health` rc=0, `just health-deep --strict` rc=0, 261 collected / 256 passed / 0 failed.
 
 NEXT (in order): BUG-559 (refuse a receipt whose bytes join to no revision - with a control seen to refuse one) -> BUG-560 (the applier through write_guard) -> re-cut the workbook's receipt against the committed revision -> HEAD reconciliation with receipts -> the SEALED REVIEW PACK. OWNER: PURGE vs KEEP the two foreign-body backups; the Dropbox siblings HELD vs DISCARD decision; hooks ACTIVE.
+
+## D-2667 + D-2668 (2026-09-26, session close) - CROSS implemented; the reconciliation landed; BUG-561 corrected
+
+**Landed (HEAD = 11c0fe4)**
+1. `6166a3d` D-2667 plan revision (entries 21-22; the two owner-gold grants NAMED, never globbed).
+2. `68be49a` D-2668 permit: an owner-acked `crossing: true` is now a PERMIT with a SUBJECT, an ACK and a SPEND,
+   consumed by `verdicts()` in BOTH places it must be (the FORBIDDEN set and the outside-the-plan set).
+   Controls 14 -> 20, all on a synthetic baseline; a `may_touch` widening was rejected as standing permission.
+3. `e3f94f4` the RECONCILIATION: 62 paths (the plan's grants + the 8 `pipeline/**` subjects of entry 23).
+   `config/serving_gate.yaml` lands WITH its consumer `pipeline/serving_gate.py` and its test -> BUG-562 closed by
+   construction (D-405 can no longer be violated by a COMMIT SET for this pair).
+4. `11c0fe4` the crossing SPENT.
+
+**Repaired (my own cascade, found by the ladder)**
+`governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` had been reverted last session to HEAD = rev 2, which
+made the write-locked rev 3 (526991cb) an ORPHAN: `verify_handoffs` rc=1, `just health` RED at justfile line 49.
+MEASURED cause: the "clobber" was the DECLARED rev 3 (10 receipts sealed 526991cb/203963 B at 08:46, 08:59, 10:34 -
+the bytes never changed; only mtime moved) and its delta is 3 unnamed trailing columns per row, which is why every
+LINE differed from HEAD. Restored from the R-D410 backup. rev 3 exists in NO git ref: that backup was the only copy.
+
+**Open / next**
+(a) the BUG-562 PAIRING RAIL (a control SEEN to refuse a commit set whose granted artifact's consumer is withheld);
+(b) BUG-559 then BUG-560; (c) BUG-563 (`backups/**` neither granted nor ignored) + the unversioned receipt ledger;
+(d) the D-2667/D-2668 mints; (e) the owner drop-in rev 3 promotion (BUG-493, owner-gated).

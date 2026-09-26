@@ -687,3 +687,38 @@ DECISION 2 (the PAIRING rule, from the audit - BUG-562): a commit is coherent on
 LANDED: commit 1 = the plan revision ALONE (the rail requires the widening to land FIRST, so scope becomes a visible, reviewable act rather than a side effect).
 MEASURED AFTER: just health rc=0; verify_handoffs rc=0 (6 paths / 13 digests / 3 revisions agree with their bytes); rail 4 live-plan self-consistency rc=0 with widening_faults [] and no may_touch entry resolving into a will_not_touch family; suite 261 collected / 256 passed / 0 failed / 0 declared red.
 OWED: the reconciliation commit (blocked by BUG-562), the mint of D-2667, the owner pipeline/** crossing ack.
+
+## D-2668 (2026-09-26) - the owner's CROSS is implemented as a PERMIT with a SUBJECT, an ACK and a SPEND; and HEAD now names the tree the rails actually measured
+
+- **CONTEXT**: the owner gave ONE word - CROSS - for the serving-gate pair crossing `pipeline/**`. Before this
+  decision, `crossing: true` was a RECORD nothing consumed: `widening_faults` tolerated it (BUG-548) and `verdicts`
+  ignored it, so the plan READ as if the boundary had an owner ack while every `pipeline/**` path still returned
+  rc=2 (owner-owed) and the pre-commit hook refused. A record with no consumer is not a rule; its INVERSE is worse -
+  a permit with no subject and no ack is standing permission nobody granted.
+- **DECISION 1 - the permit (scripts/check_session_plan.py)**: an owner-acked crossing is a permit for the paths it
+  NAMES (`crossed:`), only with a NAMED ACK (`acked_by` + `acked_on`), and only until it is SPENT (`spent_by`, the
+  commit that used it). A `crossed:` path outside every `will_not_touch` family is REFUSED, or `crossed:` would be a
+  second, unaudited `may_touch` (the granting-direction bypass). Subjects with no ack are a FAIL, not a pass,
+  because such an entry LOOKS like permission while granting none. Controls 14 -> 20, all on a SYNTHETIC plan, and
+  the permit is consumed in BOTH places it must be (the FORBIDDEN set and the outside-the-plan offender set).
+  A `may_touch` widening was REJECTED: a may_touch entry is STANDING permission over production code, and no later
+  edit can close it, whereas a spent crossing is closed.
+- **DECISION 2 - the repair rule this session learned the hard way (BUG-561 correction)**: a working-tree revision
+  that the DECLARED revisions name is NOT a clobber. rev 3 of the owner drop-in (526991cb) was live in the worktree,
+  declared current by `config/human_instrument_locks.yaml` + `config/anchor4_interim_state.json` + 10 receipts, and
+  declared SUPERSEDED for rev 2 (bc1cc956) by the revision locators. A diff against HEAD read as a wholesale rewrite
+  (every row gains 3 unnamed trailing columns) and the path was reverted to HEAD, which orphaned a write-locked
+  digest and turned the ladder RED. The test is against the DECLARED revision, never against HEAD. Restored.
+- **LANDED**: 68be49a (the permit + 6 controls + plan entry 23) / e3f94f4 (the RECONCILIATION: 62 paths = the plan's
+  grants + the 8 crossed `pipeline/**` paths, incl. `config/serving_gate.yaml` WITH its consumer and its test -
+  BUG-562 closed by construction) / 11c0fe4 (the crossing SPENT).
+- **MEASURED AFTER**: `just health` rc=0; `verify_handoffs` rc=0 (6 declared paths, 13 digests, 3 revisions);
+  `check_session_plan --selftest` 20/20; suite 261 collected / 256 passed / 0 failed / 0 declared red;
+  `check_human_instruments` rc=0; pre-commit hook green on all three commits.
+- **NOT LANDED, DECLARED** (the mismatch stops being silent): the owner drop-in rev 3 (will_not_touch BY FAMILY; HEAD
+  carries superseded rev 2 until the owner promotes, BUG-493) and its single-copy exposure; 92 `backups/*` plus the
+  rail output stores (BUG-563); four governance tables.
+- **NO DELEGATE SIGNATURE CLAIMED**: no competent local verifier was reachable (the OMLX server refused; only
+  Ollama 3B-class models answered and none of those is a verifier, R5). The verification here is the rail's controls.
+- **OWED**: the BUG-562 PAIRING rail (the property holds only because a session looked); BUG-559 (receipts whose
+  bytes join to no revision) then BUG-560 (the workbook applier through write_guard); BUG-563; the D-2667/D-2668 mints.

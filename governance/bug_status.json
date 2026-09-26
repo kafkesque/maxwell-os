@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 299,
+  "total_ids": 300,
   "open_n": 129,
-  "closed_n": 170,
+  "closed_n": 171,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -649,8 +649,8 @@
       "events": 1
     },
     {
-      "id": "BUG-562",
-      "title": "(STRUCTURAL - OPEN 2026-09-26): a GRANTED config can be committed while its CONSUMER sits in will_not_touch, so a commit can declare a gate ",
+      "id": "BUG-563",
+      "title": "(MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git",
       "events": 1
     }
   ],
@@ -824,6 +824,7 @@
     "BUG-556",
     "BUG-557",
     "BUG-558",
-    "BUG-561"
+    "BUG-561",
+    "BUG-562"
   ]
 }

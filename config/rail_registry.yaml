@@ -1,0 +1,54 @@
+# config/rail_registry.yaml - THE RAIL REGISTRY (D-2665). The ONE home of the fact "this rail is a rail".
+#
+# WHY THIS FILE EXISTS. The rail set had no registry, so "which invariant has no owner" could only be found by
+# inspiration, and three classes of mechanical defect kept recurring (BUG-537 and BUG-556 are both class iii):
+#   (i)   a rail NOTHING RUNS        - a control that never fires (BUG-492)
+#   (ii)  a rail whose PRINTED verdict and EXIT CODE disagree - a green line over a red code
+#   (iii) a rail whose REMEDY or INPUT is uncontrolled - a rail that rewrites the thing it checks (BUG-537),
+#         or whose input the ladder itself mutates (BUG-556)
+# The registry is the ONE home of two facts a machine can settle without judgement:
+#   * every `scripts/check_*.py` / `scripts/verify_*.py` is either INVOKED by a declared ladder recipe, or
+#     declared DORMANT here with the exact thing that exercises it (a path that must EXIST, C16);
+#   * every rail DECLARED as a writer must have its own `--selftest` run BY THE LADDER (class iii: a rail that
+#     writes is a rail whose remedy is a claim, and a claim needs a known-answer control that has been SEEN).
+# A `guard:` declared here is matched against the ladder's own text; a disagreement is class (ii), fail closed.
+# This registry does NOT decide policy: it reports which invariant has no owner.
+schema_version: '1'
+authority: D-2665
+ladder: justfile
+recipes: [health, health-deep]     # the ladder(s) this registry governs; every other recipe is out of scope
+
+#: Rails the ladder does NOT invoke. Each MUST name the thing that exercises it, and that path MUST exist: a
+#: dormancy claim is a declaration, and a declaration whose subject is absent is an assertion (D-405/BUG-488).
+dormant:
+  scripts/check_session_plan.py:
+    exercised_by: ['gitdir:hooks/pre-commit']
+    reason: 'runs at COMMIT time over the STAGED set (--staged) from gitdir:hooks/pre-commit, not from the ladder; measured 2026-09-26: it ran inside `git commit` and reported "ok session plan: staged set touched 15 path(s)"'
+  scripts/check_stale_toolcall_rows.py:
+    exercised_by: ['governance/p0_p1_criteria.yaml']
+    reason: 'a CRITERION of drift_monitor.py, declared as an args/cmd line in governance/p0_p1_criteria.yaml (measured 2026-09-26)'
+  scripts/check_suite_coverage.py:
+    exercised_by: ['governance/p0_p1_criteria.yaml']
+    reason: 'a CRITERION of drift_monitor.py, declared as an args/cmd line in governance/p0_p1_criteria.yaml (measured 2026-09-26)'
+
+#: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
+#: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.
+writers:
+  scripts/build_archive_index.py:
+    writes: ['archive/index.yaml']
+    why: 'regenerates the archive census; its remedy was the subject of BUG-537 (a silent de-listing) and BUG-556 (a volatile input)'
+  scripts/check_tests.py:
+    writes: ['temp/tests_rail_last_run.json']
+    why: 'records the suite census a later run is compared against'
+  scripts/recompute_decision_summary.py:
+    writes: ['config/decisions.yaml', 'config/decisions_summary.json']
+    why: 'the MINT gate: it appends a record, so its own controls must be SEEN (D-2660/BUG-492)'
+
+#: Optional: the guard class a rail is DECLARED to have. Omit unless the declared class must be pinned: an
+#: entry that disagrees with the ladder is class (ii) and fails CLOSED. fatal = `|| exit 1`; tri_state =
+#: `|| [ $? -eq 2 ]` (2 is owner-owed: loud, NOT fatal, BUG-457); report_only = `--report-only`.
+guards:
+  scripts/build_archive_index.py --check: fatal
+  scripts/build_archive_index.py --selftest: fatal
+  scripts/recompute_decision_summary.py --check: fatal
+  scripts/validate_depth_domain_contract.py --gate-if-active: tri_state

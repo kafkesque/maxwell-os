@@ -85,6 +85,8 @@ health:
     python3 scripts/depth_pass_agreement.py --check-cohort || exit 1
     python3 scripts/build_archive_index.py --selftest || exit 1   # BUG-537/BUG-556/BUG-492: the archive rail's own decisions (a silent de-listing, a shadowed rule, a transient input) must be SEEN to fire
     python3 scripts/build_archive_index.py --check || exit 1
+    python3 scripts/check_rail_registry.py --selftest || exit 1   # D-2665/BUG-492: the registry's OWN decisions (an unowned rail, a stale dormancy, a guard the ladder contradicts, a writer with no proven remedy) must be SEEN to fire
+    python3 scripts/check_rail_registry.py || exit 1   # D-2665: the rail set had NO registry - classes (i) a rail nothing runs, (ii) a printed verdict that disagrees with its exit code, (iii) a remedy or INPUT nobody controls (BUG-537/BUG-556)
     python3 scripts/recompute_decision_summary.py --selftest || exit 1  # D-2660/BUG-492: the MINT gate's own controls - a record is joined to the tree BEFORE a byte is written
     python3 scripts/recompute_decision_summary.py --check || exit 1
     python3 scripts/check_tests.py --selftest || exit 1   # BUG-492: the suite rail's OWN decisions (floor breach, regression, paid red, strict) must be SEEN to fire

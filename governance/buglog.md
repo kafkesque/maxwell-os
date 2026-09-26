@@ -6957,3 +6957,28 @@ learns to ignore (BUG-462).
 FIX (D-2664). The declared ignore class gains `-(wal|shm|journal)$` in the SAME one home as the names and globs
 that exclude them, the excluded objects are REPORTED rather than skipped (BUG-537), and the class is held by the
 known-answer control `transient_sidecar_ignored` (a sidecar excluded, a real `.db` NOT).
+## BUG-557 (MED - D-2665, FIXED 2026-09-26): the rail set had no registry, so a rail NOTHING RUNS and a WRITER whose remedy was never proven were undetectable BY CONSTRUCTION
+
+FOUND BY: four sessions of "each fix breeds the next bug" (BUG-492, BUG-537, BUG-546, BUG-556) - the same three
+mechanical classes from four angles: (i) a rail nothing runs; (ii) a printed verdict that disagrees with its exit
+code; (iii) a remedy or INPUT nobody controls. 78 ladder invocations and 40 `check_*/verify_*` scripts had no
+registry, so "which invariant has no owner" was answerable only by inspiration.
+MEASURED THE MOMENT THE REGISTRY RAN: `rail registry: 78 ladder invocation(s), 55 rail(s) invoked, 40 rail script(s)
+on disk, 3 declared dormant, 3 declared writer(s)` - and its FIRST finding was about ITSELF: `(i) a rail NOTHING RUNS:
+scripts/check_rail_registry.py is invoked by no declared ladder recipe and is declared dormant nowhere` (BUG-492).
+FIX (D-2665): `config/rail_registry.yaml` + `scripts/check_rail_registry.py` - the ladder's own text is parsed (the
+guard class is READ from the line, never inferred), every rail must be invoked or declared dormant with an exerciser
+that MUST EXIST (`gitdir:hooks/pre-commit` resolved from git: the git dir lives outside the synced tree, BUG-500),
+every declared guard is matched against the ladder (a disagreement fails CLOSED), and every declared WRITER must have
+`--selftest` run BY THE LADDER (class iii: a rail that replaces bytes makes a claim). 7 known-answer controls over
+SYNTHETIC ladders; no NLI, no live-tree write.
+FOUR DEFECTS IN THE REGISTRY WERE CAUGHT BY ITS OWN CONTROLS BEFORE IT WAS WIRED: the invocation key kept the
+`python3 ` prefix (so a guards lookup and a `--selftest` obligation both missed by a prefix, and one control passed
+for the WRONG reason - it counted every (i) fault instead of the one it names); a dormancy entry whose script is NOT
+on disk was never examined; the census called `len()` on an int (a crash the control harness could not reach); and the
+hook path was a hardcoded `.git/hooks`, a lie in this repo (BUG-500).
+NO CASCADE, MEASURED: `just health` rc=0 with the registry in the ladder and the ladder's FAIL/ERROR set
+DIFF-IDENTICAL to the pre-patch log; the two remaining FAILs are the pre-existing OWNER gates (ANCHOR-4 drift; the
+depth/domain contract's 38 hard findings, suppressed by design under a `status: proposed` contract).
+DECLARED: no delegate signature is claimed for this patch - the gemma-4-E4B-it-MLX-4bit review returned a PLAN, not
+a verdict, and a review that never ran must not be cited as one (D-2660's rule applied to delegation).

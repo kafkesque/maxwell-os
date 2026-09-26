@@ -137,3 +137,63 @@ anchor4_depth_annex:
   trained: false            # D274d
   denominator_change: false # the scored 150 are untouched
   band_falsifier: "R049: 5 owner domains, graded cross-domain (2) - D2130 (the band informs, it does not decide)"
+
+# MEASURED 2026-09-25 (third pass) - the DEPTH state, three declared layers (BUG-463 / D-384).
+# Appended rather than folded into `axes:` deliberately: the structure above is a family/axes registry with
+# consumers that re-derive counts from the artifacts, and a blind restructure of it BROKE
+# scripts/check_instrument_cohorts.py during this pass (KeyError: 'domains' - restored from HEAD). A registry
+# edit is not a prose edit; it gets its own pass, not a regex.
+measured_20260925:
+  depth:
+    canonical_column: depth_final_class          # governance/anchor_adjudication_workbook_20260924.csv
+    canonical_cohort: 148
+    canonical_intersection: 145                  # blanks: R070, R080, R130 (domain answered, depth not) - BUG-465
+    earlier_tracked_sheet: {artifact: governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv,
+                            column: 'DEPTH (1-4)', cohort: 150, intersection: 18, date: 13.09.26, sha256: b47114d4cdb621bbf67ec39f37c119eff8b74ce2802ed4552ed6be2b51792167}
+    complete_drop_in: {artifact: 'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv',
+                        column: 'DEPTH (1-4)', cohort: 150, intersection: 150, date: 24.09.26, sha256: bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4,
+                        relation: 'strict superset of the tracked sheet; 0 conflicting cells on the 18 both fill (only `date` differs)'}
+    intra_rater_alpha: {units: 145, raw: 0.710, nominal: 0.914, ordinal: 0.896, interval: 0.946,
+                        floor: config/agreement_floor.yaml, reading: 'adjacency-boundary, not noise'}
+    NOTE: 'the earlier `interim_20260924` block above records the drop-in as sha256 be1a39e0... ; MEASURED today it is bc1cc956... The drop-in has been written since that evaluation - a digest claim about a live file goes stale exactly like every other register (BUG-467/BUG-464 family). Do not overwrite the record; re-derive it.'
+
+# store_bridge - the anchor<->corpus BRIDGE (BUG-420). The join is keyed by CONTENT (the item's NAME), never by
+# a row position (D-2658): a coordinate is not a fact about the row. Derived and verified by
+# scripts/build_anchor_store_bridge.py (--check re-derives and compares, so the artifact cannot go stale silently).
+# An UNRESOLVED row may only exit 2 (owner-owed) if it is NAMED in declared_unresolved below.
+store_bridge:
+  artifact: governance/ANCHOR_STORE_BRIDGE_20260926.json
+  artifact_id: ANCHOR-STORE-BRIDGE
+  ruler_sheet: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  ruler_encoding: utf-8-sig
+  store: knowledge pipeline/maxwell.db
+  store_table: fbs
+  store_key: fb_id
+  store_name_column: name
+  item_key: item_id
+  join: content_name
+  normalization: collapse_whitespace
+  declared_unresolved: []
+  golden:
+    path: archive/golden_retired_D2618/stage4_golden_mined.yaml
+    id_key: id
+    name_path: input_fb.name
+
+  # DECLARED GOLDEN-SIDE BRIDGE GAPS (BUG-551, 2026-09-26). MEASURED: both rows below do NOT join because their
+  # `input_fb.name` normalises onto TWO corpus rows (`histogram: {ambiguous: 2}`) - the bridge refuses to PICK, so
+  # the row is OWNER-OWED until it carries an explicit fb_id. Before this key existed the rail exited 2 on ANY
+  # unjoined golden row while the config declared NOTHING: the verdict claimed a declaration nobody made and a real
+  # receiving-side breakage would have been filed as owner-owed instead of DRIFT (the BUG-548 class). ONE rule for
+  # BOTH sides now: UNDECLARED unjoined = 1 (DRIFT), DECLARED = 2, no adequate why = 1, and a declaration whose row
+  # now JOINS = 2 - the ceiling is SHRINK-ONLY and it shrinks LOUDLY.
+  declared_golden_unjoined:
+    - id: S4-GOLD-MINED-00478
+      why: >-
+        Ambiguous under the declared normalization: two corpus rows share the folded name, so the join refuses to
+        pick one (D-2658 - a join is by content, never by position). OWED: an explicit fb_id before this row enters
+        any train/eval set. It is NOT evidence that the anchor and the corpus disagree.
+    - id: S4-GOLD-MINED-00600
+      why: >-
+        Same cause as S4-GOLD-MINED-00478: two candidate corpus rows under collapse_whitespace, recorded and never
+        picked. OWED: an explicit fb_id. Keeping it declared forever would hide the owed repair, which is exactly
+        why a declaration that starts JOINING is reported as owner-owed.

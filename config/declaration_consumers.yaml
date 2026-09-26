@@ -46,6 +46,9 @@ declarations:
 - declaration: config/rail_registry.yaml
   consumers: [scripts/check_rail_registry.py]
   decisions: [D-2665]
+- declaration: config/handoffs.yaml
+  consumers: [scripts/verify_handoffs.py]
+  decisions: [BUG-559, D-2670]
   why: >-
     the rail registry is read by scripts/check_rail_registry.py::CFG; a registry whose reader is withheld is a
     declaration that no rail reports on - the class (i) shape it exists to catch.

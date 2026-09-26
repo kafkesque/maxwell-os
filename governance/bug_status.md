@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**129 open** / 171 closed of 300 ids.
+**130 open** / 171 closed of 301 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -136,3 +136,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-559 | (STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a f | 1 |
 | BUG-560 | (MED - D-2666, OPEN 2026-09-26): the sanctioned applier rewrites a `human_authored` artifact OUTSIDE write_guard and leaves no mutation rece | 1 |
 | BUG-563 | (MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git | 1 |
+| BUG-564 | the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26 | 1 |

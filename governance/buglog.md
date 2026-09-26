@@ -7076,3 +7076,15 @@ BUG-562 is CLOSED BY CONSTRUCTION in the same act: scripts/check_declaration_con
 set in which a staged declaration's declared consumer is in NEITHER HEAD NOR the index - the exact incident shape -
 with 11 synthetic controls. STILL OPEN: the hook ROUTE itself (a git dir re-created by a clone, or a hook installed
 by hand, is not a declared subject); and BUG-563 (backups/** + the rail output stores: neither granted nor excluded).
+
+**BUG-559 STATUS (2026-09-26, FIX LANDED - the join is now a property, D-2670).** The owed fix was *make verify_handoffs refuse a receipt whose (path, digest) is neither the live bytes' digest AND git_bytes(HEAD, path), nor a declared revision locator*. It is landed as a new check class, `provenance`, with FOUR joins and one declared escape:
+JOIN (measured, `5/6 receipt(s) re-derivable (head=2, prefix=1, declared=2; unrevisioned=1)`):
+  * `head` - the receipted digest IS this path's digest at git HEAD (a receipt over a revision);
+  * `prefix` - the path is append_only and the receipted bytes are its RETAINED PREFIX, re-derived by truncating to the receipted length (the BUG-540 rule); this is how `config/decisions.yaml` (629488 of 635398 bytes) is joined;
+  * `revision` - a declared `revision_locators` entry for THIS path (its bytes re-derive from `bytes_at`);
+  * `declared` - named in `config/handoffs.yaml#receipt_provenance.unrevisioned_declared` WITH the reason no store can hold the bytes (the two gitignored run-root checkpoints, `.gitignore:73`).
+WHY `head` ALONE WOULD HAVE BEEN A LIE: a receipt cut YESTERDAY over a file committed SINCE is legal and would have been refused - the BUG-492 shape (a rule never seen to pass). Conversely a SAME-LENGTH live copy is deliberately NOT a join: the live path is the same copy, so "the bytes are on disk and the receipt describes them" is exactly the circularity this bug is about.
+THE ESCAPE IS A DECLARATION, NOT A DEFAULT and is joined in BOTH directions (D-405): a receipt over unrevisioned bytes that is not named is refused, and an escape no live receipt matches is DRIFT. `max_unrevisioned: 2` is a SHRINK-ONLY CENSUS - honestly, a census, not the enforcement.
+MEASURED REFUSALS (each SEEN, R5/BUG-492): a same-length live copy -> unrevisioned; a foreign body -> unrevisioned; a digestless receipt -> unrevisioned; a stale escape -> rc=1 DRIFT; census raised to 3 -> rc=1 DRIFT. Selftest green (7 provenance cases + the escape join).
+LIVE VERDICT TODAY: rc=2 owner-owed, naming exactly ONE object - the owner drop-in at 526991cb17287006 (203963 B), whose receipt is re-derivable from NO store because git HEAD still carries the superseded rev 2 (bc1cc956). That is BUG-493's gate, now MECHANICAL instead of remembered: **the PROMOTE of rev 3 clears this line to 0.**
+REMAINING (narrowed, not closed): a receipt over an EARLIER COMMITTED revision is reported unrevisioned (the remedy is a declared revision locator), and the two run-root escapes are held by census rather than by a store that could hold 100MB bodies.

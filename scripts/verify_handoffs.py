@@ -20,6 +20,11 @@ Checks, each a declaration<->reality join (D-405):
   cross_declaration - every digest this repo declares about a path (locks, supersession) must be a live digest
                       or a declared revision. An ORPHAN digest is DRIFT wherever it is declared, not only in
                       the documents this config names
+  provenance        - every receipted (path, digest) is joined to a store that RE-DERIVES it: git HEAD, a declared
+                      revision locator, or the RETAINED PREFIX of an append_only path (BUG-540). A receipt over
+                      bytes no declared store can re-derive certified a FOREIGN body (BUG-559) and is refused;
+                      the escapes are DECLARED in config/handoffs.yaml#receipt_provenance and joined to a live
+                      receipt in both directions (an escape nobody can join is DRIFT, D-405)
 
 Emits D-404 metric envelopes, so the numbers this rail reports travel with their ruler (I4).
 --selftest is the known-answer control for the RESOLUTION meter (D-400/RC-5): a meter that resolves everything
@@ -127,6 +132,54 @@ def prefix_state(cur: bytes, rec: dict) -> tuple[str, str]:
     return "appended", ""
 
 
+PROVENANCE_JOINS: tuple[str, ...] = ("head", "prefix", "revision", "declared")
+
+
+def receipt_provenance(path: str, rec: dict, cur: bytes | None, head: str | None,
+                       loc: dict[str, dict], declared: set[tuple[str, str]]) -> tuple[str, str]:
+    """Decide whether the RECEIPTED bytes are RE-DERIVABLE, and name the store that re-derives them (BUG-559).
+
+    A receipt is {path, digest, bytes, mutability, code_sha, stamp} about BYTES, and NOTHING in that record says
+    those bytes are a revision of this repo or a declared derivation from one - so receipt() and --backfill
+    could bless whatever a process found on disk. MEASURED (BUG-558): the workbook path held 92135 bytes
+    (574aafef64f0cff7) that exist in NO revision of that path, and this rail reported "unchanged" because the
+    receipt had been cut OVER them. The rail was not broken; it verified exactly what it was told. What was
+    missing is the JOIN, and that is what this function decides. Returns (join, detail):
+
+      head     - the receipted digest IS the digest of this path at git HEAD (the receipt is over a revision)
+      prefix   - the path is append_only and the receipted bytes are its RETAINED PREFIX, so truncating the
+                 live file to the receipted LENGTH re-derives them (the BUG-540 rule, already proven seen)
+      revision - the digest is a declared revision locator for THIS path (its bytes re-derive from bytes_at)
+      declared - named in config/handoffs.yaml#receipt_provenance.unrevisioned_declared, which must carry the
+                 reason no store can hold them; the escape is a DECLARATION, never a default
+      unrevisioned - none of the above: no declared store can re-derive the receipted bytes (refused)
+
+    A same-length live copy is deliberately NOT a join: the live path is the SAME copy, so "the bytes are on
+    disk and the receipt describes them" is exactly the circularity BUG-559 is about. Limit, named rather than
+    hidden: a receipt over an EARLIER COMMITTED revision is reported unrevisioned, and the remedy is a revision
+    locator - a locator is this repo's declared home for superseded bytes.
+    """
+    digest = str(rec.get("sha256") or "")
+    if not digest:
+        return "unrevisioned", "the receipt carries no digest at all"
+    if head and digest == head:
+        return "head", "the receipted bytes ARE the revision of this path at git HEAD (" + head[:16] + ")"
+    ell = loc.get(digest)
+    if ell is not None and str(ell.get("path") or "") == path:
+        return "revision", ("declared revision locator " + digest[:16] + " re-derived from "
+                            + str(ell.get("bytes_at")))
+    n = int(rec.get("bytes") or 0)
+    if str(rec.get("mutability") or "") == "append_only" and cur is not None and n > 0 and len(cur) > n:
+        if handoff.sha256_bytes(cur[:n]) == digest:
+            return "prefix", ("the receipted bytes are the RETAINED PREFIX of the live file (" + str(n) + " of "
+                              + str(len(cur)) + " bytes), re-derived by truncation to the receipted length")
+    if (path, digest) in declared:
+        return "declared", "named in config/handoffs.yaml#receipt_provenance.unrevisioned_declared"
+    return "unrevisioned", ("no declared store re-derives it: not the bytes of this path at git HEAD, not a "
+                            "declared revision locator, not the retained prefix of an append_only path, and not "
+                            "named in config/handoffs.yaml#receipt_provenance.unrevisioned_declared")
+
+
 def check() -> int:
     """Evaluate every declared artifact, print one line per finding, and return the tri-state exit code."""
     cfg = handoff.config()
@@ -182,6 +235,66 @@ def check() -> int:
             elif mut == "immutable" and not str(spec.get("no_seal_reason") or "").strip():
                 owed.append(aid + ": " + path + " is immutable with seal: false and no declared "
                             "no_seal_reason - an unsealed immutable claim dies with its path")
+
+    # RECEIPT PROVENANCE (BUG-559): join every receipted (path, digest) to a store that RE-DERIVES it, and
+    # refuse a receipt over bytes no declared store can re-derive. The per-artifact loop above answers "do these
+    # bytes still match the receipt"; this answers the question that loop cannot ask - "is the receipted body a
+    # REVISION of anything at all". A receipt whose bytes resolve to no store certified a FOREIGN body.
+    rp = cfg.get("receipt_provenance") or {}
+    declared = {(str(e.get("path")), str(e.get("digest") or ""))
+                for e in (rp.get("unrevisioned_declared") or [])}
+    ceiling = int(rp.get("max_unrevisioned") or 0)
+    joins: dict[str, int] = {}
+    joined = 0
+    seen_pairs: set[tuple[str, str]] = set()
+    seen_escapes: set[tuple[str, str]] = set()
+    for spec in cfg.get("artifacts") or []:
+        aid = str(spec.get("id"))
+        for p in handoff.paths_of(spec):
+            path = p["path"]
+            rec = receipts.get((aid, path))
+            if rec is None or not rec.get("present"):
+                continue
+            seen_pairs.add((path, str(rec.get("sha256") or "")))
+            cur_sha, _ = current(path)
+            hb = handoff.git_bytes("HEAD", path)
+            head = handoff.sha256_bytes(hb) if hb is not None else None
+            cur = (REPO / path).read_bytes() if cur_sha else None
+            join, detail = receipt_provenance(path, rec, cur, head, loc, declared)
+            joins[join] = joins.get(join, 0) + 1
+            if join == "declared":
+                seen_escapes.add((path, str(rec.get("sha256") or "")))
+            if join == "unrevisioned":
+                owed.append("provenance: " + aid + " receipted " + path + " at "
+                            + str(rec.get("sha256"))[:16] + " - UNREVISIONED (BUG-559): " + detail
+                            + ". Remedy: land those bytes as a revision and declare a revision_locator, re-cut the"
+                              " receipt over the committed revision, or - with a decision, and only when NO store"
+                              " can hold the bytes - name it in config/handoffs.yaml#receipt_provenance")
+            else:
+                joined += 1
+                print("  ok  provenance: " + aid + " -> " + join + " (" + detail + ")")
+    # THE ESCAPE IS JOINED TO REALITY IN BOTH DIRECTIONS (D-405): a declaration no live receipt matches is an
+    # assertion someone wrote once and nobody re-read. Measured both ways: frozen bytes make an escape stale.
+    stale = sorted(declared - seen_escapes)
+    if stale:
+        drift.append("provenance: " + str([p for p, _ in stale]) + " is declared as unrevisioned in "
+                     "config/handoffs.yaml#receipt_provenance but NO live receipt carries that (path, digest) - an"
+                     " escape nobody can join is not a declaration (D-405)")
+    if len(declared) > ceiling:
+        drift.append("provenance: " + str(len(declared)) + " declared escape(s) exceed the SHRINK-ONLY census "
+                     "max_unrevisioned " + str(ceiling) + " - adding an escape weakens the rule for every path, "
+                     "so it takes a decision (config/handoffs.yaml) and two coordinated edits, not one")
+    emit_metric("handoff_receipts_revisioned", float(joined),
+                population="every receipted declared handoff path whose receipted digest is re-derivable",
+                denominator=joined + joins.get("unrevisioned", 0), ruler="config/handoffs.yaml",
+                note=str(joins.get("head", 0)) + " at git HEAD, " + str(joins.get("prefix", 0))
+                     + " retained prefix, " + str(joins.get("revision", 0)) + " declared revision, "
+                     + str(joins.get("declared", 0)) + " declared unrevisioned, "
+                     + str(joins.get("unrevisioned", 0)) + " UNREVISIONED (BUG-559)")
+    print("  ok  provenance: " + str(joined) + "/" + str(joined + joins.get("unrevisioned", 0))
+          + " receipt(s) re-derivable (" + ", ".join(k + "=" + str(joins[k]) for k in PROVENANCE_JOINS if k in joins)
+          + ("; unrevisioned=" + str(joins["unrevisioned"]) if joins.get("unrevisioned") else "")
+          + "); " + str(len(declared)) + " declared escape(s) of census " + str(ceiling))
 
     # FLOORS (BUG-487 class): a rail that reads a journal or a blob store which does not exist must FAIL
     # CLOSED, because 0 of 0 reads as "ok" and an empty registry passes every check ever written. The numbers
@@ -418,10 +531,63 @@ def selftest() -> int:
             print("FAIL verify_handoffs selftest: " + label + " - the meter said " + repr(got)
                   + " instead of " + repr(want))
             ok = False
+    # BUG-559 CONTROL, both directions. The PROVENANCE join must be SEEN to refuse a receipt over bytes no
+    # declared store can re-derive, and SEEN to accept each of the four joins a legitimate receipt can have - a
+    # rule never seen to fail is a comment, and a rule never seen to PASS is not a rule either (BUG-492).
+    # Synthetic only: a control that calibrates a ruler must not write into it (BUG-491).
+    body, older = b"alpha\nbeta\n", b"alpha\n"
+    hid, oid = handoff.sha256_bytes(body), handoff.sha256_bytes(older)
+    fake_loc = {"deadbeef" * 8: {"path": "p.csv", "bytes_at": "git:abc1234"}}
+    decl = {("p.csv", FABRICATED)}
+    for label, rec, cur, head, want in (
+        ("a receipt over the bytes AT HEAD is accepted",
+         {"sha256": hid, "bytes": len(body)}, body, hid, "head"),
+        ("a receipt over a RETAINED PREFIX is accepted",
+         {"sha256": oid, "bytes": len(older), "mutability": "append_only"}, body, hid, "prefix"),
+        ("a receipt over a DECLARED REVISION is accepted",
+         {"sha256": "deadbeef" * 8, "bytes": 9}, None, hid, "revision"),
+        ("a NAMED unrevisioned receipt is accepted (the declared escape)",
+         {"sha256": FABRICATED, "bytes": 9}, None, hid, "declared"),
+        ("a receipt over a SAME-LENGTH live copy is REFUSED (the BUG-559 shape)",
+         {"sha256": oid, "bytes": len(body), "mutability": "append_only"}, body, None, "unrevisioned"),
+        ("a receipt over a FOREIGN body is REFUSED",
+         {"sha256": "ab" * 32, "bytes": 9}, None, hid, "unrevisioned"),
+        ("a receipt with NO digest is REFUSED", {"sha256": "", "bytes": 9}, None, hid, "unrevisioned"),
+    ):
+        got, _d = receipt_provenance("p.csv", rec, cur, head, fake_loc, decl)
+        if got != want:
+            print("FAIL verify_handoffs selftest: " + label + " - the join said " + repr(got) + " instead of "
+                  + repr(want))
+            ok = False
+    # THE ESCAPE MUST BE JOINED IN BOTH DIRECTIONS (D-405): the live config's escapes are checked against the
+    # live receipts here, so this control refuses the moment an escape stops describing a real receipt.
+    rp = (cfg.get("receipt_provenance") or {})
+    live_pairs = set()
+    receipts = handoff.latest()
+    for spec in cfg.get("artifacts") or []:
+        for p in handoff.paths_of(spec):
+            r = receipts.get((str(spec.get("id")), p["path"]))
+            if r is not None:
+                live_pairs.add((p["path"], str(r.get("sha256") or "")))
+    declared_live = {(str(e.get("path")), str(e.get("digest") or ""))
+                     for e in (rp.get("unrevisioned_declared") or [])}
+    for pair in sorted(declared_live):
+        if pair not in live_pairs:
+            print("FAIL verify_handoffs selftest: the declared unrevisioned escape " + pair[0]
+                  + " (" + pair[1][:16] + ") matches NO live receipt - either the receipt was re-cut and the "
+                    "escape is stale, or the escape was written for bytes nobody receipted")
+            ok = False
+    if not declared_live:
+        print("FAIL verify_handoffs selftest: no declared unrevisioned escape exists, so the positive half of the "
+              "provenance control (an escape that IS joined to a live receipt) is untested - the rule is "
+              "unvalidated in the direction that lets it pass")
+        ok = False
     if ok:
         print("ok verify_handoffs selftest: a fabricated digest resolves to nothing (" + str(len(live))
-              + " live digest(s), " + str(len(loc)) + " revision(s)) and each declared revision re-derives its "
-              "digest from the store it names (the meter can say no and can say yes)")
+              + " live digest(s), " + str(len(loc)) + " revision(s)), each declared revision re-derives its "
+              "digest from the store it names, the provenance join accepts all FOUR joins (head/prefix/revision/"
+              "declared) and refuses a same-length live copy, a foreign body and a digestless receipt, and every "
+              "declared unrevisioned escape is joined to a live receipt (the meter can say no AND can say yes)")
     return 0 if ok else 1
 
 

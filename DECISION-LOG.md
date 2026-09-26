@@ -744,3 +744,22 @@ MEASURED AFTER. consumers 11/11 controls, write moment rc=0 and state rc=0 on th
 check_repo_integrity rc=0. The hand-edit of the hook was REFUSED by the ladder until the line was declared in its
 tracked source scripts/install_git_hooks.sh - the repo's own control, seen to fire.
 NO DELEGATE SIGNATURE IS CLAIMED (R5): no local verifier of the required capability was reachable this session.
+
+## D-2670 (2026-09-26) - the RECEIPT PROVENANCE JOIN: a receipt must be joined to a store that RE-DERIVES its bytes (BUG-559)
+
+CONTEXT. A receipt is {path, digest, bytes, mutability, code_sha, stamp} about BYTES, and nothing in that record says the bytes are a REVISION of this repo or a declared derivation from one. MEASURED (BUG-558): the workbook held 92135 bytes (574aafef64f0cff7) present in NO revision of that path, and `verify_handoffs.py` printed "unchanged" because the receipt had been cut OVER them. The rail was not broken - it verified exactly what it was told. BUG-559 is the missing join.
+
+DECISION. Every receipted (path, digest) must be re-derivable from a declared store, or it is refused. Four joins, each naming the store that re-derives the bytes: `head` (this path's bytes at git HEAD), `prefix` (a RETAINED PREFIX of an append_only path, re-derived by truncating to the receipted length - the BUG-540 rule, already proven), `revision` (a declared revision locator for THIS path), `declared` (an escape named in `config/handoffs.yaml#receipt_provenance.unrevisioned_declared` together with the reason no store can hold the bytes). Anything else is UNREVISIONED and is reported owner-owed with its remedy.
+
+WHY NOT `head` ONLY. The owed fix text said "the live digest AND git_bytes(HEAD, path)". Implemented literally it would refuse a receipt cut YESTERDAY over a file COMMITTED SINCE - a legal receipt - which is the BUG-492 failure (a rule never seen to pass is not a rule). MEASURED before coding: of the 7 latest receipts, 2 join at HEAD, 1 is a retained prefix (config/decisions.yaml, 629488 of 635398 bytes), 2 are gitignored run-root checkpoints, and 1 - the owner drop-in - joins NOTHING. The prefix join therefore has a live subject, and the join is measured rather than assumed.
+
+WHY A SAME-LENGTH LIVE COPY IS NOT A JOIN. If the digest merely matches what is on disk, the receipt and the artifact are the same copy, and "the receipt describes these bytes" is circular - exactly the shape that blessed the foreign body. A join must name a DIFFERENT store (HEAD, a locator, or a retained earlier revision inside the file).
+
+WHY THE ESCAPE IS DECLARED AND COUNTED. A 100MB run checkpoint under `.gitignore:73` has no revision anywhere and no `bytes_at` to locate, so no store CAN hold it; the honest act is to name it with the reason, not to weaken the rule for every path. The list is joined in BOTH directions (D-405): an unmatched escape is DRIFT, and an unnamed unrevisioned receipt is refused. `max_unrevisioned: 2` is a SHRINK-ONLY census - stated plainly as a census, NOT as the enforcement.
+
+WHY IT IS A CHECK CLASS, NOT A NEW RAIL (D-2646). The receipt rail already owns the receipt domain; a second rail reading the same journal would be a second home for one fact. This adds one join to the rail that owns receipts, at every moment the ladder already runs it.
+
+THE SECOND CLAIM (what this makes visible). The one live UNREVISIONED object is the owner drop-in (rev 3, 526991cb, 203963 B) whose bytes no store re-derives because git HEAD still carries the superseded rev 2. BUG-493's owner gate was a remembered fact; it is now a MEASURED line in the ladder that only the PROMOTE clears.
+
+MEASURED AFTER: `verify_handoffs.py --selftest` rc=0 (7 provenance cases + the escape join, both directions); live rc=2 with exactly one finding, the drop-in; stale-escape control rc=1; census-3 control rc=1; declaration consumers 11/11 + 5 edges; rail registry 9/9 + rc=0 (80 invocations, 56 rails); check_repo_integrity rc=0; `just health` rc=0.
+NOT a delegate claim (R5): OMLX is unreachable and no reachable local model is a verifier, so no signature is claimed.

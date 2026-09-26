@@ -463,3 +463,12 @@ OWED. (a) the hook ROUTE is not yet a declared subject (a re-created git dir or 
 RISK NOTE. PROMOTE is the highest future-tax item: HEAD carries the SUPERSEDED rev 2 of a write-locked instrument
 while the declared rev 3 is re-derivable from no git ref; its only other copy is a byte-exact (203963 B) blob under
 governance/handoffs/blobs/, which is covered by a .bin ignore rule - so a worktree clean destroys BOTH copies.
+
+### D-2670 DONE / OWED (2026-09-26)
+DONE: BUG-559's owed fix is LANDED as the `provenance` check class in `scripts/verify_handoffs.py` (four joins: head/prefix/revision/declared; a same-length live copy, a foreign body and a digestless receipt are each SEEN refused) with its ONE declaration home `config/handoffs.yaml#receipt_provenance` (rule + `unrevisioned_declared` + SHRINK-ONLY census `max_unrevisioned: 2`) and its consumer edge registered in `config/declaration_consumers.yaml` (D-2669). MEASURED: selftest rc=0; live rc=2 naming exactly ONE object - the owner drop-in at 526991cb (203963 B); stale escape rc=1; census 3 rc=1; consumers 11/11; rail registry 9/9; repo integrity rc=0.
+OWED (mine, next in order):
+  (a) **BUG-559's live line: the PROMOTE** - land rev 3 (526991cb, 203963 B) as the tracked revision and declare its `revision_locator`, which turns the rail's single owner-owed finding into `head` and closes BUG-493; the rail is now the gate that proves it landed.
+  (b) a receipt over an EARLIER COMMITTED revision still reads unrevisioned (remedy = a declared revision locator); no live subject today - measured, not assumed.
+  (c) BUG-560 (`apply_workbook_rulings.py` outside write_guard), BUG-563 (backups/** + rail output stores neither granted nor declared excluded), BUG-564 remainder (the hook ROUTE as a declared subject).
+  (d) MINT D-2667, D-2668, D-2669 AND D-2670 into `config/decisions.yaml` (D-2670 is written in DECISION-LOG.md only).
+RISK NOTE: the highest future-tax item is unchanged - PROMOTE (a write-locked owner instrument whose only other copy is a gitignored `*.bin` blob).

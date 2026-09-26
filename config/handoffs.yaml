@@ -50,7 +50,10 @@ artifacts:
   - id: anchor4_depth_sheet_owner_dropin
     mutability: immutable
     paths: [{path: "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv", seal: true}]
-    why: the owner drop-in REV 2, write-locked in config/human_instrument_locks.yaml.
+    why: the owner drop-in REV 3 (526991cb, 203963 B), write-locked in config/human_instrument_locks.yaml.
+      rev 3 IS the tracked revision of this path since the D-2671 owner PROMOTE (2026-09-26); rev 1 and rev 2
+      stay declared SUPERSEDED revision locators. The seal is taken over rev 3 and the receipt joins it by HEAD,
+      so the label and the bytes agree again (BUG-493).
 
 # IDENTITY MAP (BUG-488, corrected 2026-09-25). The three paths that first read as "one artifact, three
 # digests, identity unresolved" are NOT three copies of one artifact: each has a ROLE, and each role is

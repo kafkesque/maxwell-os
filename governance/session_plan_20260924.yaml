@@ -486,3 +486,29 @@ widening_log:
       because a may_touch entry is STANDING permission and this is production code: the permit NAMES its 8
       subjects, NAMES its ack, and must be SPENT (`spent_by`) by the commit that lands them. The 44c249b
       correction rides with it: the reconciliation the earlier commit DECLARED is the one this entry unlocks.
+  - entry: 24
+    session: 20260926U
+    crossing: true
+    crossed:
+      - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+    acked_by: owner
+    acked_on: '2026-09-26'
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: false
+    why: >-
+      D-2671 (OWNER WORD: 'Promote', 2026-09-26): the write-locked owner drop-in's rev 3 (526991cb, 203963 B) is
+      landed as the TRACKED REVISION OF ITS OWN PATH in ONE commit. The path is will_not_touch BY FAMILY
+      (governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv, BUG-528 - a sync-client RENAME of a protected artifact is not a
+      permit to edit it), so this is an owner-acked ONE-OFF CROSSING and NOT a may_touch widening: 'crossed:' names
+      ONE subject, 'acked_by' + 'acked_on' name the ack, and 'spent_by' must name the commit that landed it or the
+      ack decays into standing permission over an owner instrument (D-2668). WHY IT IS OWED, MEASURED NOT ASSUMED:
+      git HEAD carries the SUPERSEDED rev 2 (bc1cc956) while the live path holds rev 3, so 'verify_handoffs'
+      reports the drop-in's receipt as UNREVISIONED (BUG-559, rc=2) - and rev 3's ONLY other copy is
+      governance/handoffs/blobs/526991cb....bin, which .gitignore:61 ('*.bin') does not track, so a worktree clean
+      would destroy both copies of a write-locked owner instrument. THE RAIL IS THE PROOF: after this commit the
+      same check must read 'provenance: anchor4_depth_sheet_owner_dropin -> head'. WHY THIS IS NOT BUG-431'S
+      PROMOTION: the CONTENT promotion (merge the owner's complete 150/150 pass INTO the tracked
+      governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, after which config/anchor4_interim_state.json is deleted)
+      is a DIFFERENT act and REMAINS an owner gate; nothing here writes the tracked sheet, and this entry claims
+      no path it does not name.

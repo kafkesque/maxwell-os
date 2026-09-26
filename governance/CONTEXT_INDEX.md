@@ -1063,3 +1063,12 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
 - **STILL UNCOMMITTED, DECLARED**: the drop-in rev 3 (will_not_touch BY FAMILY, BUG-528); 92 `backups/*`; the rail
   output stores (`governance/MUTATION_JOURNAL.jsonl`, `INSTRUMENT_CONTROLS.jsonl`, `METRICS.jsonl`,
   `drift_report_*`, `bench_preflight_*`); four governance tables.
+- **D-2671 PROMOTE landed (2026-09-26, owner word 'Promote')**: rev 3 of the write-locked drop-in
+  ('governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv', 526991cb, 203963 B) is now the TRACKED revision of its
+  own path, landed through a SPENT one-off crossing permit (session_plan entry 24). 'verify_handoffs' now reads
+  'provenance: anchor4_depth_sheet_owner_dropin -> head', rc=0 (was rc=2 owner-owed), so BUG-493 is CLOSED and
+  BUG-559's one live line is cleared. The bullet above (rev 3 'exists in no git ref') is SUPERSEDED by this.
+- **Human gates answered**: (6th) KEEP the two foreign-body backups ('*.PRE_CLAUDER_RESTORE_20260926T202715Z') - the
+  only surviving bytes of the body a receipt once certified (574aafef64f0cff7, BUG-559); PURGE would delete the
+  specimen. STILL OPEN: BUG-431's CONTENT promotion (merge the owner's complete pass into the TRACKED ANCHOR4 sheet
+  and retire 'config/anchor4_interim_state.json') - a DIFFERENT act from the PROMOTE landed above.

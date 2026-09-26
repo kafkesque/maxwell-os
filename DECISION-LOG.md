@@ -763,3 +763,47 @@ THE SECOND CLAIM (what this makes visible). The one live UNREVISIONED object is 
 
 MEASURED AFTER: `verify_handoffs.py --selftest` rc=0 (7 provenance cases + the escape join, both directions); live rc=2 with exactly one finding, the drop-in; stale-escape control rc=1; census-3 control rc=1; declaration consumers 11/11 + 5 edges; rail registry 9/9 + rc=0 (80 invocations, 56 rails); check_repo_integrity rc=0; `just health` rc=0.
 NOT a delegate claim (R5): OMLX is unreachable and no reachable local model is a verifier, so no signature is claimed.
+
+## D-2671 (2026-09-26) - the PROMOTE: an owner's one word lands a write-locked REVISION through a SPENT crossing permit (BUG-493/BUG-559)
+
+CONTEXT. The write-locked owner drop-in 'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv' holds rev 3
+(526991cb, 203963 B) and has done since 2026-09-25 21:08; git HEAD held the SUPERSEDED rev 2 (bc1cc956, 203506 B).
+Nothing was corrupt - the path was AHEAD of history, and that made two declarations disagree with the tree: the
+ledger still read 'REV 2', and the receipt's bytes were re-derivable from no store (BUG-559, rc=2 owner-owed on
+exactly this one object). rev 3's only non-worktree copy was a '.bin' blob, which .gitignore:61 does not track.
+
+DECISION. OWNER WORD: 'Promote' (2026-09-26). rev 3 is landed as the TRACKED REVISION of its own path, by the SAME
+mechanism the owner's earlier CROSS used (D-2668): a widening_log entry with 'crossing: true' naming ONE subject,
+'acked_by: owner' + 'acked_on', and 'spent_by' naming the commit that used it. Rail 4's will_not_touch match is BY
+FAMILY (BUG-528), so the path is forbidden by default and only an owner-acked one-off permit may cross it; a
+may_touch entry would have been STANDING permission over an owner instrument, which is the abuse rail 4 exists to
+prevent. The permit is recorded BEFORE the write (BUG-445) and SPENT in the commit that follows (D-2668), so the ack
+cannot outlive the commit it was given for.
+
+WHY NO revision_locator FOR rev 3. The rail offers two remedies: land the bytes as a revision, OR declare a revision
+locator. A locator exists to make SUPERSEDED bytes resolvable; once rev 3 is HEAD it is re-derived by the HEAD join,
+and a locator pointing at the same bytes would be a SECOND home for one fact (D-2646) that goes stale the moment the
+path is rewritten. The locators for rev 1 (git:075ae65) and rev 2 (git:65a13c3) are untouched, so the receipts that
+quote them still resolve.
+
+WHY NO NEW RECEIPT. The journal already holds 13 records for this path, every one 526991cb/203963 B. A re-cut would
+add a record saying the same thing about the same bytes; the PROMOTE changed WHICH STORE re-derives them, not the
+bytes, and the rail re-derives the join on every run.
+
+WHY THE LABEL FIXES RIDE WITH IT. Two homes still described rev 2 - config/handoffs.yaml's artifact 'why' and
+config/human_instrument_locks.yaml's comment above the LIVE digest - and a promotion that leaves its own declarations
+describing the superseded revision recreates the mismatch it just closed. The third, unconsumed home
+(config/anchor4_depth_annex.yaml's restated digest) is reduced to a POINTER at the one home rather than a copy of
+the digest: the D-2646 remedy, not a re-statement.
+
+WHAT THIS IS NOT. It is NOT BUG-431's content promotion: the tracked ANCHOR4 sheet still carries pre-consolidation
+context plus the owner's PARTIAL pass, config/anchor4_interim_state.json still stands (state: pending_owner_gate,
+expires_when 'the promoted sheet is committed'), and merging the complete 150/150 pass into the tracked sheet - then
+retiring that interim file - remains an OWNER GATE. No sheet was written here.
+
+MEASURED AFTER. verify_handoffs: 'provenance: anchor4_depth_sheet_owner_dropin -> head', rc=0 (was rc=2 naming this
+one object); revision locators still re-derive (rev 1, rev 2, f2778a48); hash_claims 13/13 and cross_declaration
+11/11 unchanged; check_human_instruments byte-identical; the suite, rail registry, declaration consumers and repo
+integrity unchanged; 'just health' rc=0.
+
+NOT a delegate claim (R5): OMLX is unreachable and no reachable local model is a verifier, so no signature is claimed.

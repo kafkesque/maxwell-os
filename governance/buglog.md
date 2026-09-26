@@ -7088,3 +7088,22 @@ THE ESCAPE IS A DECLARATION, NOT A DEFAULT and is joined in BOTH directions (D-4
 MEASURED REFUSALS (each SEEN, R5/BUG-492): a same-length live copy -> unrevisioned; a foreign body -> unrevisioned; a digestless receipt -> unrevisioned; a stale escape -> rc=1 DRIFT; census raised to 3 -> rc=1 DRIFT. Selftest green (7 provenance cases + the escape join).
 LIVE VERDICT TODAY: rc=2 owner-owed, naming exactly ONE object - the owner drop-in at 526991cb17287006 (203963 B), whose receipt is re-derivable from NO store because git HEAD still carries the superseded rev 2 (bc1cc956). That is BUG-493's gate, now MECHANICAL instead of remembered: **the PROMOTE of rev 3 clears this line to 0.**
 REMAINING (narrowed, not closed): a receipt over an EARLIER COMMITTED revision is reported unrevisioned (the remedy is a declared revision locator), and the two run-root escapes are held by census rather than by a store that could hold 100MB bodies.
+
+**BUG-493 STATUS (2026-09-26, PROMOTE LANDED - owner word 'Promote', D-2671).** rev 3 (526991cb, 203963 B) of the
+write-locked owner drop-in is landed as the TRACKED REVISION of its own path. MEASURED BEFORE: git HEAD carried the
+SUPERSEDED rev 2 (bc1cc956), the live path held rev 3, verify_handoffs returned rc=2 owner-owed naming exactly ONE
+object (the drop-in, UNREVISIONED - BUG-559), and rev 3's only other copy was a '.bin' blob under .gitignore:61.
+MEASURED AFTER: 'provenance: anchor4_depth_sheet_owner_dropin -> head', rc=0; the join is the receipt (13 records,
+all 526991cb) against the COMMITTED revision, with NO re-cut and NO new record. HOW: an owner-acked ONE-OFF crossing
+permit (widening_log entry 24, 'crossed:' naming ONE path), NOT a may_touch widening - the path is will_not_touch by
+FAMILY (BUG-528) and a may_touch entry is STANDING permission. THE OTHER PROMOTION IS STILL OWED: BUG-431's CONTENT
+promotion (the owner's complete 150/150 pass merged INTO the tracked ANCHOR4 sheet, retiring
+config/anchor4_interim_state.json) remains an OWNER GATE - this commit wrote no sheet.
+
+**BUG-558 OWNER RULING (2026-09-26, KEEP - 6th owner gate answered).** The two foreign-body copies
+backups/anchor_adjudication_workbook_20260924.csv.PRE_CLAUDER_RESTORE_20260926T202715Z and its fixlog sibling are
+KEPT (owner word: KEEP, on the assistant's recommendation). WHY KEEP IS THE HONEST DEFAULT: they are the only
+surviving bytes of the foreign body a receipt once certified (574aafef64f0cff7, 92135 B, present in NO revision of
+that path) - the evidence for BUG-559; PURGE would delete the specimen and leave the rule with nothing to be
+re-derived against. The sealed blob 574aafef64f0cff7.bin also holds them, so the ruling costs no history and nothing
+is deleted (R-D410: operators do not destroy a record).

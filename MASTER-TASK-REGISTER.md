@@ -432,7 +432,10 @@
 - OWED (mine, next): BUG-559 - refuse a receipt whose bytes join to no revision, with a control SEEN to refuse one; then re-cut the workbook receipt against the committed revision.
 - OWED (mine, next): BUG-560 - route scripts/apply_workbook_rulings.py through write_guard (owned_keys = the ruled columns) so the one writer that defends the owner's rulings is receipted.
 - OWED (mine): the truncated prose digest in governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md (`f2778a488610cbf1...`) is a claim no reader can join; the full digest now resolves as a revision locator, so the prose can be pointed at it without rewriting a protected record.
-- OWED (owner, one word): PURGE vs KEEP the two foreign-body backups once the receipt is green (it is green now). KEEP is the honest default: they are the only evidence of the clobber.
+- RULED (owner, one word: KEEP, 2026-09-26 - 6th owner gate answered): the two foreign-body copies
+  (backups/anchor_adjudication_workbook_20260924.csv.PRE_CLAUDER_RESTORE_20260926T202715Z + its fixlog sibling)
+  are KEPT - the only surviving bytes of the body a receipt once certified (574aafef64f0cff7, BUG-559), so PURGE
+  would delete the specimen and leave the rule with nothing to re-derive against. Nothing deleted (R-D410).
 - OWED (mine): HEAD reconciliation with receipts (the certified tree and the reviewed tree are NOT the same bytes while 42 tracked files sit uncommitted).
 
 - **D-2667 (2026-09-26) - plan revision + the PAIRING rule.** DONE: session plan restored from git and re-written escape-free (entries 21/22; may_touch widened by TWO NAMED paths, never a glob); the protected-family rewrite reverted after preservation (BUG-561); commit 1 (plan) landed. OWED: (a) the reconciliation commit - BLOCKED by BUG-562 (config/serving_gate.yaml granted vs pipeline/serving_gate.py will_not_touch) -> owner pipeline/** crossing ack or per-path pairing split; (b) the mint of D-2667; (c) BUG-561 DEEPER: the tracked sync-client rename of the owner blind sheet must be REMOVED from the repo (plan revision + owner gate); (d) BUG-559 / BUG-560 remain OPEN; (e) MUTATION_JOURNAL.jsonl (100 KB) and INSTRUMENT_CONTROLS.jsonl are UNTRACKED and NOT granted - the receipt ledger is unversioned.
@@ -472,3 +475,22 @@ OWED (mine, next in order):
   (c) BUG-560 (`apply_workbook_rulings.py` outside write_guard), BUG-563 (backups/** + rail output stores neither granted nor declared excluded), BUG-564 remainder (the hook ROUTE as a declared subject).
   (d) MINT D-2667, D-2668, D-2669 AND D-2670 into `config/decisions.yaml` (D-2670 is written in DECISION-LOG.md only).
 RISK NOTE: the highest future-tax item is unchanged - PROMOTE (a write-locked owner instrument whose only other copy is a gitignored `*.bin` blob).
+
+### D-2671 DONE / OWED (2026-09-26)
+DONE: the owner's one word 'Promote' LANDED rev 3 (526991cb, 203963 B) of the write-locked drop-in as the TRACKED
+revision of its own path, through a ONE-OFF owner-acked crossing permit (widening_log entry 24) that is SPENT by the
+commit - NOT through a may_touch widening (rail 4 matches by FAMILY, BUG-528). Staged bytes MEASURED == 526991cb
+(no eol/filter normalisation: i/crlf w/crlf, no .gitattributes rule). The rail flipped from rc=2 owner-owed on
+exactly ONE object to 'provenance: anchor4_depth_sheet_owner_dropin -> head', rc=0 - BUG-493 closed and BUG-559's
+live line cleared. Labels that still described rev 2 (config/handoffs.yaml, config/human_instrument_locks.yaml) are
+corrected in the same commit, and the unconsumed second home config/anchor4_depth_annex.yaml is reduced to a POINTER
+(D-2646). ALSO DONE: the 6th owner gate is ANSWERED - KEEP the two foreign-body backups (recorded in the buglog).
+OWED (mine, next in order):
+  (a) BUG-431's CONTENT promotion - merge the owner's complete 150/150 pass INTO the tracked ANCHOR4 sheet and retire
+      config/anchor4_interim_state.json; still an OWNER GATE (it writes an owner instrument and deletes a declared home).
+  (b) BUG-560 (apply_workbook_rulings.py outside write_guard), BUG-563 (backups/** + rail output stores declared),
+      BUG-564 remainder (the hook ROUTE as a declared subject).
+  (c) MINT D-2667, D-2668, D-2669, D-2670 AND D-2671 into config/decisions.yaml.
+  (d) a receipt over an EARLIER COMMITTED revision still reads unrevisioned (remedy = a declared revision locator).
+RISK NOTE: the highest future-tax item is now CLOSED - before this commit a worktree clean destroyed BOTH copies of a
+write-locked owner instrument (HEAD carried rev 2; rev 3 lived only in the tree and in a gitignored *.bin blob).

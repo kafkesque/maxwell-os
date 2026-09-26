@@ -397,3 +397,13 @@ open_bugs_n: 128
 # NEXT: (1) PROMOTE rev 3 -> the rail's single owner-owed line becomes `head` and BUG-493 closes; (2) BUG-560
 # write_guard for apply_workbook_rulings.py; (3) BUG-563 one home for backups/** + the rail output stores;
 # (4) BUG-564 remainder (the hook ROUTE as a declared subject); (5) MINT D-2667/2668/2669/2670.
+# D-2671 (2026-09-26, owner word 'Promote'): rev 3 (526991cb, 203963 B) of the write-locked owner drop-in is the
+# TRACKED revision of its own path - landed through a SPENT one-off crossing permit (session_plan entry 24), never a
+# may_touch widening (rail 4 matches by FAMILY, BUG-528). MEASURED: staged bytes == 526991cb (i/crlf w/crlf, no
+# filter); verify_handoffs flipped from rc=2 owner-owed on ONE object to 'provenance: ... -> head', rc=0; BUG-493
+# closed and BUG-559's live line cleared; NO new receipt and NO rev-3 locator (HEAD IS the store; a locator would be
+# a second home). ALSO: 6th owner gate ANSWERED - KEEP the two foreign-body backups (574aafef64f0cff7 is the only
+# evidence of the body a receipt once certified; PURGE would delete the specimen).
+# NEXT: (1) BUG-431's CONTENT promotion (owner gate; writes the tracked sheet + retires anchor4_interim_state.json);
+# (2) BUG-560 write_guard for apply_workbook_rulings.py; (3) BUG-563 backups/** + rail output stores; (4) BUG-564
+# remainder (the hook ROUTE); (5) MINT D-2667/2668/2669/2670/2671.

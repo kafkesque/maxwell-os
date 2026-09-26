@@ -54,9 +54,10 @@ instruments:
     protected_columns:
       "discipline_human": 68d920621879d4c952da335a9353d732ed1d3d42236b22ab4bb1e08d3cc9799e
   - path: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
-    # rev 2 (2026-09-24 15:23:32): owner fixed the date in place (13.09.26 -> 24.09.26), same byte
-    # count. ONLY the date column moved, so the DEPTH/conf_depth/note_codes/reviewer hashes below are
-    # unchanged and the label content of the pass is byte-identical to rev 1.
+    # rev 3 (2026-09-25 21:08, 203963 B) is the LIVE revision and - since the D-2671 owner PROMOTE of
+    # 2026-09-26 - the TRACKED revision of this path. rev 1 (be1a39e0) and rev 2 (bc1cc956) are declared
+    # SUPERSEDED, their bytes located in config/handoffs.yaml#revision_locators. Only this digest is the RULE;
+    # the earlier revision labels are not restated here (one fact, one home - see rev3_note below).
     sha256: 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
     rows: 150
     superseded:

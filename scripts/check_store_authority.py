@@ -16,6 +16,12 @@ THE RULE (one rule, one home -- D-2646)
   * a non-authoritative store that shares a TABLE name with the authoritative one must declare that sharing
     (`shares_tables:` + `shares_why:`) -- declared, never tolerated silently;
   * a declaration whose `path` escapes the repo is refused (an undeclared authority is the defect);
+  * a store file inside a DECLARED deletion pre-image region (`preimage_regions:`) is a TOMBSTONE, not a candidate
+    truth: it must still be a readable sqlite store with >= 1 table, and it is COUNTED in the verdict. Declared,
+    never tolerated silently; a region may not cover a declared store and may not cover the repo (BUG-549);
+  * a store file carrying ZERO tables (or 0 bytes) is reported EMPTY-STORE -- the fingerprint of a
+    `sqlite3.connect()` on a path that did not exist, which CREATES the file. A read-only probe that writes is
+    the defect, so the rail NAMES the cause instead of filing it under UNDECLARED-STORE (BUG-549).
   * a declared store that is ABSENT is STALE (a declaration that cannot be checked is not a check);
   * `status` outside the declared vocabulary, or a missing/short `why`, fails CLOSED.
 
@@ -43,6 +49,7 @@ SQLITE_SUFFIXES = (".db", ".sqlite", ".sqlite3")
 PARQUET_SUFFIXES = (".parquet",)
 SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".mypy_cache", ".pytest_cache", ".ruff_cache"}
 MIN_WHY = 20
+PREIMAGE_KEY = "preimage_regions"
 
 
 def find_stores(root: Path, scan_roots: list[str], max_depth: int) -> dict[str, str]:
@@ -93,6 +100,66 @@ def sqlite_tables(path: Path) -> set[str]:
     return {str(r[0]) for r in rows if not str(r[0]).startswith("sqlite_")}
 
 
+def _probe_shape(path: Path) -> tuple[str, set[str]]:
+    """Return ("tables", names) | ("empty", set()) | ("unreadable", set()) - never raises (a rail must not abort)."""
+    import sqlite3
+
+    try:
+        if path.stat().st_size == 0:
+            return "empty", set()
+        con = sqlite3.connect("file:" + str(path) + "?mode=ro", uri=True)
+    except (OSError, sqlite3.Error):
+        return "unreadable", set()
+    try:
+        rows = con.execute("select name from sqlite_master where type='table'").fetchall()
+    except sqlite3.Error:
+        return "unreadable", set()
+    finally:
+        con.close()
+    tables = {str(r[0]) for r in rows if not str(r[0]).startswith("sqlite_")}
+    return ("tables", tables) if tables else ("empty", set())
+
+
+def _size_of(path: Path) -> str:
+    """Byte size of a file as text, or "unknown" if it vanished mid-scan (TOCTOU - never raise)."""
+    try:
+        return str(path.stat().st_size)
+    except OSError:
+        return "unknown"
+
+
+def _preimage_regions(root: Path, reg: dict[str, Any]) -> dict[str, Any]:
+    """Declared deletion pre-image regions: a TOMBSTONE home, measured and bounded, never a blanket excuse."""
+    out: dict[str, Any] = {"paths": [], "faults": []}
+    entries = reg.get(PREIMAGE_KEY) or []
+    if not isinstance(entries, list):
+        raise SystemExit("FAIL-CLOSED (" + PREFIX + "): `" + PREIMAGE_KEY + ":` must be a list of paths.")
+    for entry in entries:
+        if not isinstance(entry, dict) or "path" not in entry:
+            raise SystemExit("FAIL-CLOSED (" + PREFIX + "): a `" + PREIMAGE_KEY + "` entry has no `path`: "
+                             + repr(entry))
+        rel = str(entry["path"]).strip().rstrip("/")
+        why = str(entry.get("why") or "").strip()
+        if rel in ("", "."):
+            out["faults"].append("REGION-BLINDS-REPO: a pre-image region declared as " + repr(rel) + " covers the "
+                                 "whole repo - that is not a region, it is a blindfold on every store.")
+            continue
+        if rel in out["paths"]:
+            out["faults"].append("DOUBLE-DECLARED: pre-image region " + rel + " is declared twice; one region has "
+                                 "ONE declaration home (D-2649).")
+        if len(why) < MIN_WHY:
+            out["faults"].append("MISSING-WHY: pre-image region " + rel + " declares no adequate `why` (got "
+                                 + str(len(why)) + " chars, want >= " + str(MIN_WHY) + ") - a region without a "
+                                 "reason is a hiding place.")
+        base = root / rel
+        if not base.is_dir():
+            out["faults"].append("DEAD-REGION: " + rel + " is declared a pre-image region but is NOT a directory "
+                                 "on disk - a declaration that cannot be measured is not a check.")
+            continue
+        out["paths"].append(rel)
+    return out
+
+
 def _declared(reg: dict[str, Any]) -> list[dict[str, Any]]:
     entries = reg.get("stores")
     if not isinstance(entries, list):
@@ -106,8 +173,12 @@ def _declared(reg: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-def audit(root: Path, reg: dict[str, Any]) -> list[str]:
-    """Return DRIFT faults; an empty list means the declaration and the disk agree."""
+def audit(root: Path, reg: dict[str, Any], note: dict[str, Any] | None = None) -> list[str]:
+    """Return DRIFT faults; an empty list means the declaration and the disk agree.
+
+    `note` is an optional out-parameter: the caller gets the COUNTS (declared / on_disk / tombstones / regions)
+    so the verdict can state the boundary it measured instead of hiding it (BUG-521).
+    """
     faults: list[str] = []
     scan_roots = [str(s) for s in (reg.get("scan_roots") or ["."])]
     max_depth = int(reg.get("max_depth") or 4)
@@ -144,9 +215,37 @@ def audit(root: Path, reg: dict[str, Any]) -> list[str]:
             faults.append("STALE: " + rel + " is declared but NOT on disk - a declaration that cannot be checked "
                           "is not a check.")
 
+    regions = _preimage_regions(root, reg)
+    faults.extend(regions["faults"])
+    region_paths: list[str] = regions["paths"]
+    for name in region_paths:
+        for rel in sorted(by_path):
+            if rel == name or rel.startswith(name + "/"):
+                faults.append("REGION-SHADOWS-DECLARATION: pre-image region " + name + " covers the DECLARED store "
+                              + rel + " - a tombstone region may not cover a declaration; an exclusion is not a "
+                              "hiding place.")
+
+    tombstones: list[str] = []
     for rel in sorted(on_disk):
+        kind = on_disk[rel]
+        inside = next((p for p in region_paths if rel == p or rel.startswith(p + "/")), None)
+        if kind == "sqlite":
+            shape, _tables = _probe_shape(root / rel)
+            if shape != "tables":
+                head = "EMPTY-STORE" if shape == "empty" else "UNREADABLE-STORE"
+                why_shape = ("carries NO table - the fingerprint of `sqlite3.connect()` on a path that did not "
+                             "exist, which CREATES the file (BUG-549). A read-only probe may not write: remove it "
+                             "or declare what it is."
+                             if shape == "empty" else
+                             "cannot be read as a sqlite store - its shape cannot be established, so it is a "
+                             "store nobody can reason about.")
+                faults.append(head + ": " + rel + " (" + _size_of(root / rel) + " bytes) " + why_shape)
+                continue
+        if inside is not None:
+            tombstones.append(rel)
+            continue
         if rel not in by_path:
-            faults.append("UNDECLARED-STORE: " + rel + " (" + on_disk[rel] + ") exists and is declared NOWHERE - "
+            faults.append("UNDECLARED-STORE: " + rel + " (" + kind + ") exists and is declared NOWHERE - "
                           "an undeclared store is an undeclared authority.")
 
     if len(authoritative) == 1:
@@ -177,6 +276,9 @@ def audit(root: Path, reg: dict[str, Any]) -> list[str]:
                     if len(why) < MIN_WHY:
                         faults.append("MISSING-WHY: " + rel + " declares `shares_tables: true` with no "
                                       "adequate `shares_why`.")
+    if note is not None:
+        note.update({"declared": len(declared), "on_disk": len(on_disk), "tombstones": len(tombstones),
+                     "regions": list(region_paths), "faults": len(faults)})
     return faults
 
 
@@ -285,6 +387,95 @@ def controls() -> list[tuple[str, Callable[[], bool]]]:
             {"path": "../outside/maxwell.db", "status": "archive",
              "why": "a path outside the repo has no declaration home at all"}]}, "ESCAPES-REPO")
 
+    GOV = {"path": "gov/maxwell.db", "status": "authoritative",
+           "why": "the governed store for this synthetic control case"}
+    TOMB = {"path": "backup/deletions", "why": "sanctioned deletion pre-images: a reversible copy, never truth"}
+
+    def c10_tombstone_counted() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"], "backup/deletions/20260101_000000/maxwell.db": ["fbs"]})
+            note: dict = {}
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                                  "preimage_regions": [dict(TOMB)]}, note)
+            if faults or note.get("tombstones") != 1:
+                print("      faults: " + " | ".join(faults) + " tombstones=" + str(note.get("tombstones")))
+            return not faults and note.get("tombstones") == 1
+
+    def c11_empty_store_named() -> bool:
+        import sqlite3
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"]})
+            (base / "scratch").mkdir(parents=True, exist_ok=True)
+            con = sqlite3.connect(str(base / "scratch" / "typo.db"))  # CREATES a real 0-byte file
+            con.close()
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [
+                dict(GOV), {"path": "scratch/typo.db", "status": "archive",
+                            "why": "a 0-byte file created by connecting to a path that did not exist"}]})
+            if not any(f.startswith("EMPTY-STORE") for f in faults) or any(f.startswith("UNDECLARED") for f in faults):
+                print("      faults: " + " | ".join(faults))
+            return (any(f.startswith("EMPTY-STORE") for f in faults)
+                    and not any(f.startswith("UNDECLARED") for f in faults))
+
+    def c12_empty_region_is_healthy() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"]})
+            (base / "backup" / "deletions").mkdir(parents=True, exist_ok=True)
+            note: dict = {}
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                                  "preimage_regions": [dict(TOMB)]}, note)
+            if faults or note.get("tombstones") != 0:
+                print("      faults: " + " | ".join(faults))
+            return not faults and note.get("tombstones") == 0
+
+    def c13_dead_region() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"]})
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                                  "preimage_regions": [dict(TOMB)]})
+            if not any(f.startswith("DEAD-REGION") for f in faults):
+                print("      faults: " + " | ".join(faults))
+            return any(f.startswith("DEAD-REGION") for f in faults)
+
+    def c14_region_shadows_declaration() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"]})
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [
+                dict(GOV), {"path": "gov/legacy.db", "status": "archive",
+                            "why": "a declared legacy store used by this control case"}],
+                "preimage_regions": [{"path": "gov",
+                                      "why": "a region that would swallow declared stores, which is refused"}]})
+            if not any(f.startswith("REGION-SHADOWS-DECLARATION") for f in faults):
+                print("      faults: " + " | ".join(faults))
+            return any(f.startswith("REGION-SHADOWS-DECLARATION") for f in faults)
+
+    def c15_region_blinds_repo() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"]})
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                                  "preimage_regions": [{"path": ".",
+                                                        "why": "a region over the whole repo is a blindfold"}]})
+            if not any(f.startswith("REGION-BLINDS-REPO") for f in faults):
+                print("      faults: " + " | ".join(faults))
+            return any(f.startswith("REGION-BLINDS-REPO") for f in faults)
+
+    def c16_region_does_not_loosen() -> bool:
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            _seed_repo(base, {"gov/maxwell.db": ["fbs"], "elsewhere/real.db": ["fbs"]})
+            (base / "backup" / "deletions").mkdir(parents=True, exist_ok=True)
+            faults = audit(base, {"scan_roots": ["."], "max_depth": 4, "stores": [dict(GOV)],
+                                  "preimage_regions": [dict(TOMB)]})
+            if not any(f.startswith("UNDECLARED-STORE") for f in faults):
+                print("      faults: " + " | ".join(faults))
+            return any(f.startswith("UNDECLARED-STORE") for f in faults)
+
     return [
         ("c01 a single authoritative store with no siblings is CLEAN", c01_clean),
         ("c02 an undeclared store is UNDECLARED-STORE", c02_undeclared),
@@ -295,6 +486,14 @@ def controls() -> list[tuple[str, Callable[[], bool]]]:
         ("c07 a DECLARED shared table name is tolerated and checked", c07_shared_table_declared),
         ("c08 a declared-but-absent store is STALE", c08_stale_declaration),
         ("c09 a declaration escaping the repo is refused", c09_escapes_repo),
+        ("c10 a tombstone in a DECLARED pre-image region is tolerated AND counted", c10_tombstone_counted),
+        ("c11 a 0-byte file (connect() on a missing path) is EMPTY-STORE, not UNDECLARED-STORE",
+         c11_empty_store_named),
+        ("c12 an EMPTY declared region is the healthy state (0 tombstones, no fault)", c12_empty_region_is_healthy),
+        ("c13 a region that is not a directory is DEAD-REGION", c13_dead_region),
+        ("c14 a region covering a DECLARED store is refused", c14_region_shadows_declaration),
+        ("c15 a region covering the whole repo is refused", c15_region_blinds_repo),
+        ("c16 a declared region does NOT loosen the rule elsewhere", c16_region_does_not_loosen),
     ]
 
 
@@ -333,11 +532,13 @@ def main(argv: list[str]) -> int:
             print("  " + rel.ljust(58) + on_disk[rel].ljust(20) + declared.get(rel, "UNDECLARED"))
         print(PREFIX + ": " + str(len(on_disk)) + " store(s) on disk, " + str(len(declared)) + " declared")
         return EXIT_CLEAN
-    faults = audit(ROOT, reg)
+    note: dict[str, Any] = {}
+    faults = audit(ROOT, reg, note)
     for fault in faults:
         print("  DRIFT " + fault)
-    print(("FAIL " if faults else "ok ") + PREFIX + ": " + str(len(_declared(reg))) + " store(s) declared | "
-          + str(len(faults)) + " fault(s)")
+    print(("FAIL " if faults else "ok ") + PREFIX + ": " + str(note.get("declared", 0)) + " store(s) declared | "
+          + str(note.get("tombstones", 0)) + " tombstone(s) in " + str(len(note.get("regions", [])))
+          + " declared pre-image region(s) | " + str(len(faults)) + " fault(s)")
     return EXIT_DRIFT if faults else EXIT_CLEAN
 
 

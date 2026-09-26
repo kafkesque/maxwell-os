@@ -75,3 +75,24 @@ stores:
     shares_why: >-
       Declared and checked: it is a full fidelity copy (18 shared tables incl. fbs, taxonomy_counts and the
       vec_* shadows), so any consumer pointed at it reads a frozen 2026-09-17 state, not the truth.
+
+# PRE-IMAGE REGIONS (BUG-549, 2026-09-26). The sanctioned deletion path (pipeline/safe_delete.py) COPIES a target
+# into backup/deletions/{timestamp}/ before deleting it; that copy is a TOMBSTONE, not a candidate truth. The rail
+# COUNT tombstone(s) in its verdict and requires each region to be declared here with a why. MEASURED 2026-09-26:
+# the live region holds ZERO tombstone files (the 0-byte pre-image of the stray `pipeline/maxwell.db` was removed --
+# a 0-byte pre-image gives no reversibility) -- an empty region is the HEALTHY state, so emptiness is not a fault
+# here. What IS a fault: a region that is not a directory; a region that covers a DECLARED store; a region that
+# covers the repo; and a store file carrying NO table at all (EMPTY-STORE -- the fingerprint of sqlite3.connect()
+# on a path that did not exist, which CREATES the file). That last rule is the fix for the 2026-09-26 incident: a
+# read-only probe wrote a store and `just health` aborted the rails BELOW the one that could name it (BUG-457).
+preimage_regions:
+  - path: backup/deletions
+    why: >-
+      The only sanctioned deletion path's pre-image store: a byte copy made before a delete so the delete is
+      reversible. A tombstone here is never read to answer a query and is counted in the rail's verdict instead of
+      being reported UNDECLARED-STORE (BUG-549).
+  - path: backups
+    why: >-
+      Pre-write copies taken by editors and by the config-first data-edit protocol (PRE_*). Same role as
+      backup/deletions - a reversible pre-image, never a candidate truth - declared here so the FIRST store file
+      written here is COUNTED rather than reported as an undeclared authority (the BUG-549 class, pre-empted).

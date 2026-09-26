@@ -6690,3 +6690,93 @@ D-2646). The live entry is keyed `match: 'reflog.read_text(errors'`.
 VERIFIED. `--selftest` 24/24 known-answer controls fire (was 18); 6 are new and 2 are ANTI-OVERREACH (a
 content-keyed register must tolerate its site MOVING, and a dead key must still be REPORTED). `--check` is exit 2
 (declared debt only, loud NOT fatal) with 0 DRIFT and 0 STALE, so the ladder runs PAST line 51.
+
+
+## BUG-549 (MED - FIXED 2026-09-26) - the SANCTIONED deletion path manufactured the store-authority FATAL, and a read-only probe that WRITES was filed under the wrong name
+
+MEASURED (2026-09-26; BOTH instances aborted `just health` at justfile line 57 and hid every rail below it - BUG-457: an abort is an amnesia generator):
+
+1. an earlier "read-only" probe ran `sqlite3.connect('pipeline/maxwell.db')` against a path that did NOT exist.
+   `sqlite3.connect()` CREATES a missing file, so a read-only probe WROTE a 0-byte store. The rail reported it
+   UNDECLARED-STORE - true, but it names the WRONG CAUSE, so the next reader (and the next session) hunts a
+   phantom authority instead of a stray probe.
+2. the interim fix (delete it via the sanctioned `pipeline/safe_delete.py`) then failed AGAIN: safe_delete copies
+   the target to `backup/deletions/{timestamp}/` BEFORE deleting, and that pre-image directory sits INSIDE the
+   rail's own scan root, so the sanctioned deletion path re-manufactured the identical FATAL. The interim action
+   (removing the 0-byte pre-image, "the deletion log is the receipt") traded a green rail for the REVERSIBILITY
+   the tool exists to provide - the fix cost more than the defect.
+
+ROOT CAUSE (class, not site): the rail could not tell a STORE from THE FINGERPRINT OF NOT-A-STORE, and had no
+declared home for a TOMBSTONE. A 0-byte file and a 4,964,352-byte diagnostic snapshot were both just "a .db".
+
+FIX (class fix):
+  * `preimage_regions:` in config/store_authority.yaml - a DECLARED tombstone home (backup/deletions, backups).
+    A store file inside one is COUNTED as a tombstone, never reported as an authority. A region may not cover the
+    repo (REGION-BLINDS-REPO), may not cover a DECLARED store (REGION-SHADOWS-DECLARATION), must be a directory
+    (DEAD-REGION), and must carry an adequate `why`. An EMPTY region is the HEALTHY state and is not a fault.
+  * EMPTY-STORE - a store file with ZERO tables (or 0 bytes) is now reported BY CAUSE: "the fingerprint of
+    `sqlite3.connect()` on a path that did not exist, which CREATES the file". An unreadable store is
+    UNREADABLE-STORE. Both stay FATAL; the message names the defect instead of mis-filing it.
+  * the verdict STATES the boundary it measured (BUG-521):
+    `ok store-authority: 7 store(s) declared | 0 tombstone(s) in 2 declared pre-image region(s) | 0 fault(s)`.
+  * controls 9 -> 16: c10 tombstone counted, c11 0-byte file is EMPTY-STORE (and NOT UNDECLARED-STORE),
+    c12 an EMPTY declared region is healthy, c13 a non-directory region is DEAD-REGION, c14 a region covering a
+    declared store is refused, c15 a region covering the repo is refused, c16 a region does NOT loosen the rule
+    elsewhere. `--selftest` 16/16 fire; `--check` exit 0 (0 faults).
+
+BOUNDARY (what this fix does NOT do): it does not stop a probe from writing. MEASURED 2026-09-26: 159 of 174
+`sqlite3.connect(` sites in pipeline|scripts|tools do NOT open `mode=ro`, so a blanket lint would be FATAL on day
+one - it must be a NAMED shrink-only ceiling, not a gate. OWED: (a) a RECEIPT per pre-image (the writer names
+file + bytes + sha256) so a region cannot hide an unrelated store; (b) the read-only opener helper + the
+shrink-only ceiling for bare connects.
+
+
+## BUG-550 (MED - FIXED 2026-09-26) - the mint was a CLONE: D-2659 carried D-2658's files, bugs and rationale
+
+MEASURED (2026-09-26S, by the PRE-COMMIT FORENSIC AUDIT of the A1 bridge + BUG-549 change-set, before the first
+commit of either): config/decisions.yaml carried a record whose id, category and title were D-2659's (the
+EMPTY-STORE / tombstone-region rule) while `files`, `bugs` and `rationale` were BYTE-IDENTICAL to D-2658's (the
+content-keyed silent-repair SITE). A record that names the wrong files and the wrong bug is a FALSE RECORD: a
+later reader following it lands in the wrong module, and the id's provenance claim is untrue.
+
+ROOT CAUSE (class): MINTING HAS NO HOME. The record was minted by an ad-hoc heredoc that COPIED the previous
+record as a template and edited only the fields the author remembered. scripts/recompute_decision_summary.py
+re-derives counts and the stamp, so the SUMMARY stayed consistent - and NO rail compares a record's
+`files`/`bugs`/`rationale` against its own `title`, or against the tree. The defect is invisible to every
+existing rail because it is a MISMATCH INSIDE ONE ARTIFACT, and no rail reads two fields of one record together.
+
+FIX (SAFE only because the record had never landed): the uncommitted record is REPAIRED IN PLACE - `files`,
+`bugs` and `rationale` now describe BUG-549, and the rationale itself carries the repair notice. This does NOT
+violate BUG-539 (minting is an APPEND, never a mid-file edit): BUG-539 protects HISTORY - a record that has been
+committed and read - and this record's first commit had not happened. The summary was then re-derived
+(source_sha256 moved), so the receipt and the registry agree again.
+
+BOUNDARY / OWED (the CLASS is NOT fixed): minting still has no home and no validator, so the next mint can clone
+again. OWED: a receipted minter that (a) asserts the id is the next FREE id, (b) requires a non-empty title,
+rationale and at least one file and one bug, (c) asserts every named file EXISTS in the tree and every named bug
+EXISTS in the register, and (d) asserts the rationale NAMES the bugs it is attached to - with a known-answer
+control that FAILS on a cloned payload. Until then: every minted record is read back FIELD BY FIELD before its
+commit (this audit is the procedure, not a promise).
+
+## BUG-551 (LOW-MED - FIXED 2026-09-26) - the bridge exited 2 on the golden side while the config declared NOTHING
+
+MEASURED (2026-09-26S, by the same pre-commit forensic audit): `python3 scripts/build_anchor_store_bridge.py
+--check` returned exit 2 with `golden: 2 row(s) unjoined` while `store_bridge.declared_unresolved` was `[]` and
+the two rows (S4-GOLD-MINED-00478, S4-GOLD-MINED-00600) were declared NOWHERE. The module docstring AND the
+justfile comment both state that 2 means "unresolved rows the config DECLARES" - so the rail's own stated
+contract was FALSE at the moment it was about to land, and the golden side of the tri-state was an undeclared
+blanket: ANY future golden row that failed to join would have been silently downgraded from DRIFT (1) to
+owner-owed (2) - the loudest available place to hide a real receiving-side breakage.
+
+ROOT CAUSE (class): the CORPUS side had a declaration requirement and the GOLDEN side did not - ONE RULE WITH
+TWO IMPLEMENTATIONS, the lenient one on the receiving side (D-2646). The two rows ARE ambiguous under the
+declared normalization (`histogram: {ambiguous: 2}`), so refusing to PICK them is CORRECT (D-2658); what was
+wrong was an exit code claiming a declaration that did not exist.
+
+FIX: `declared_golden_unjoined:` in config/anchor_family.yaml#store_bridge names both rows with a why, and the
+verdict now applies ONE rule to BOTH sides: an UNDECLARED unjoined golden row is DRIFT (1); a DECLARED one is
+owner-owed (2); an entry whose why is thinner than MIN_WHY is DRIFT (1); and a declared row that starts JOINING
+is owner-owed (2) - the ceiling is SHRINK-ONLY and it shrinks LOUDLY. The derived document now also records
+`unjoined_detail` (id, cause, candidates), so the receipt carries the CAUSE and not only the id. VERIFIED: 19/19
+known-answer controls (was 15), including all four golden-side cases; `--check` exit 2 with "golden: 2 row(s)
+unjoined, all DECLARED in config".

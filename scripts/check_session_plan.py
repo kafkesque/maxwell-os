@@ -26,6 +26,13 @@ only for the paths it NAMES (`crossed:`), only with a NAMED ACK (`acked_by` + `a
 SPENT (`spent_by`, the commit that used it) - an ack may not outlive the commit it was given for. A `crossed:`
 path outside every will_not_touch family is refused, or `crossed:` would be a second, unaudited may_touch.
 
+FOURTH HARDENING, MEASURED 2026-09-26 (BUG-565 - found by this rail REFUSING the owner's own PROMOTE):
+the staged set was read as TEXT and split on WHITESPACE, so a path containing a space was audited as several
+phantom paths. ELEVEN tracked paths here contain a space, including the write-locked owner instrument this rail
+exists to guard. The name-list read is now NUL-separated and has ONE home
+(scripts/lib/git_subject.py#run_git_paths), and three controls hand the rail a REAL synthetic index holding such
+a path: it is ONE path, its sync-client RENAME is FORBIDDEN (rc=2), and an owner permit can GRANT it (rc=0).
+
 Usage: python3 scripts/check_session_plan.py [--commit HEAD] [--staged] [--plan ...] [--index-file P] [--selftest]
 Post-hoc checking catches violations AFTER they are in history (BUG-445): install the hook instead -
 bash scripts/install_git_hooks.sh - so rail 4 refuses the commit rather than reporting it.
@@ -207,18 +214,23 @@ def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: 
 
 
 def _paths(a: argparse.Namespace) -> list[str]:
-    """The file list to audit: the PINNED staged set (--staged) or a finished commit's paths (BUG-527)."""
+    """The file list to audit: the PINNED staged set (--staged) or a finished commit's paths (BUG-527).
+
+    BUG-565: a NUL-separated NAME LIST, never a whitespace split - ELEVEN tracked paths here contain a space
+    (incl. the write-locked owner drop-in), and splitting on blanks audited three phantom paths for one, blinding
+    both the permit and the family check. The flag and the parse live in git_subject.run_git_paths (one home).
+    """
     subj = git_subject.subject(a.index_file)
     if a.staged:
-        rc, out = git_subject.run_git(subj, ["diff", "--cached", "--name-only"])
+        rc, out = git_subject.run_git_paths(subj, ["diff", "--cached", "--name-only"])
         if rc != 0:
             raise git_subject.SubjectRefused("REFUSED (C16): `git diff --cached` did not resolve against the "
                                              "pinned index " + subj.index_file)
-        return out.split()
-    rc, out = git_subject.run_git(subj, ["show", "--name-only", "--format=", a.commit])
+        return out
+    rc, out = git_subject.run_git_paths(subj, ["show", "--name-only", "--format=", a.commit])
     if rc != 0:
         raise git_subject.SubjectRefused("REFUSED (C16): commit " + a.commit + " does not resolve")
-    return out.split()
+    return out
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -251,9 +263,14 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _staged_count_raw() -> int:
-    """The REAL index's staged count, read with no pin - the control's own control (BUG-492: the incident)."""
-    out = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=REPO, capture_output=True, text=True)
-    return len(out.stdout.split())
+    """The REAL index's staged count, read with no pin - the control's own control (BUG-492: the incident).
+
+    BUG-565: counted from a NUL-separated read, so the control's own arithmetic cannot be inflated by a path with
+    a space in it (before the fix it reported 12 paths for a 10-path set, and both readings were equally wrong,
+    which is how a differential control certifies a defect: it compares two readings, not a reading to reality).
+    """
+    out = subprocess.run(["git", "diff", "--cached", "--name-only", "-z"], cwd=REPO, capture_output=True)
+    return sum(1 for b in out.stdout.split(b"\0") if b)
 
 
 def selftest() -> int:
@@ -299,6 +316,60 @@ def selftest() -> int:
     finally:
         if os.path.exists(synth):
             os.unlink(synth)
+    # BUG-565 (MEASURED 2026-09-26, pre-fix rc=1 naming 2 and 3 phantom paths): a path containing a SPACE is ONE
+    # path. The index is REAL (git builds it from HEAD) and the rail is run END TO END through its own
+    # --index-file, so the control exercises the parser the hook uses, not a helper it happens to call (BUG-492).
+    spaced_ok = "scripts/space probe.py"
+    spaced_owner = "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv"
+
+    def _synth_index(paths: list[str]) -> tuple[str, dict]:
+        """A REAL index holding exactly `paths`, built from HEAD - nothing here guesses git's own format."""
+        fd, idx = tempfile.mkstemp(prefix="rail4_space_")
+        os.close(fd)
+        os.unlink(idx)
+        e = dict(os.environ, GIT_INDEX_FILE=idx)
+        subprocess.run(["git", "read-tree", "HEAD"], cwd=REPO, env=e, capture_output=True)
+        blob = subprocess.run(["git", "rev-parse", "HEAD:scripts/check_session_plan.py"], cwd=REPO,
+                              capture_output=True, text=True).stdout.strip()
+        for p in paths:
+            subprocess.run(["git", "update-index", "--add", "--cacheinfo", "100644," + blob + "," + p],
+                           cwd=REPO, env=e, capture_output=True)
+        return idx, e
+
+    def _on_synth(idx: str, e: dict, plan: str) -> subprocess.CompletedProcess:
+        """Run THIS rail on a synthetic index under a SYNTHETIC plan (BUG-492: never the live plan's state)."""
+        return subprocess.run([sys.executable, str(Path(__file__)), "--staged", "--index-file", idx,
+                               "--plan", plan], cwd=REPO, env=e, capture_output=True, text=True)
+
+    fd_p, plan_plain = tempfile.mkstemp(prefix="rail4_plan_", suffix=".yaml")
+    fd_q, plan_permit = tempfile.mkstemp(prefix="rail4_perm_", suffix=".yaml")
+    os.close(fd_p)
+    os.close(fd_q)
+    Path(plan_plain).write_text(yaml.safe_dump(
+        {"may_touch": [], "will_not_touch": list(live["will_not_touch"])}), encoding="utf-8")
+    Path(plan_permit).write_text(yaml.safe_dump(
+        {"may_touch": [], "will_not_touch": list(live["will_not_touch"]),
+         "widening_log": [{"crossing": True, "crossed": [spaced_owner], "acked_by": "owner",
+                           "acked_on": "2026-09-26"}]}), encoding="utf-8")
+    idx_a, env_a = _synth_index([spaced_ok])
+    idx_b, env_b = _synth_index([spaced_owner])
+    plain_a = _on_synth(idx_a, env_a, plan_plain)
+    plain_b = _on_synth(idx_b, env_b, plan_plain)
+    permit_b = _on_synth(idx_b, env_b, plan_permit)
+    controls += [
+        ("BUG-565: a path containing a SPACE is ONE path (rc=1 names exactly ONE offender, not the pre-fix "
+         "phantoms `scripts/space` + `probe.py`)",
+         plain_a.returncode == 1 and "touched 1 path(s) outside the plan" in plain_a.stdout),
+        ("BUG-565 x BUG-528: the spaced sync-client RENAME of a will_not_touch artifact is FORBIDDEN (rc=2) - the "
+         "family check is no longer blind to a path with a space (pre-fix: rc=1, 3 phantoms)",
+         plain_b.returncode == 2),
+        ("BUG-565 x D-2668: an owner-acked permit CAN grant the spaced path it NAMES (rc=0) - pre-fix the audited "
+         "set never contained that path, so the owner's PROMOTE was refused for a reason that did not exist",
+         permit_b.returncode == 0),
+    ]
+    for _f in (idx_a, idx_b, plan_plain, plan_permit):
+        if os.path.exists(_f):
+            os.unlink(_f)
     real_after = _staged_count_raw()
     controls.append(("INDEX control: an inherited/synthetic GIT_INDEX_FILE is REFUSED, not obeyed (BUG-527)",
                      env_refused))

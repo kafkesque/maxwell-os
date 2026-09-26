@@ -174,6 +174,23 @@ def run_git_raw(argv: Sequence[str], index_file: str | None = None) -> tuple[int
     return p.returncode, p.stdout
 
 
+def run_git_paths(subj: Subject, argv: Sequence[str],
+                  doc: dict[str, Any] | None = None) -> tuple[int, list[str]]:
+    """A git NAME-LIST read (BUG-565): the `-z` flag and the NUL parse live HERE, so no caller splits on blanks.
+
+    MEASURED 2026-09-26 (found because this defect REFUSED the owner's own PROMOTE): the staged set was read as
+    TEXT and split on WHITESPACE. ELEVEN tracked paths in this repo contain a space - including the write-locked
+    owner instrument `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` - so rail 4 audited it as THREE
+    phantom paths (`governance/Copy`, `of`, `ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`). Both directions went
+    blind at once: the owner's one-off crossing permit could never GRANT the path it names, and the BUG-528
+    family check could never FORBID it. The rule is a fact about the NAME LIST, so it has ONE home: a caller
+    cannot forget the flag because it is not the caller's to pass.
+    """
+    env = subj.env(os.environ, guard_vars(doc or config()))
+    p = subprocess.run(["git", *argv, "-z"], cwd=REPO, capture_output=True, env=env)
+    return p.returncode, [b.decode("utf-8", "surrogateescape") for b in p.stdout.split(b"\0") if b]
+
+
 def selftest() -> int:
     """Known-answer controls (BUG-492): each can FAIL, and one only certifies that the pin changed nothing."""
     doc = config()

@@ -93,6 +93,7 @@ health:
     python3 scripts/check_tests.py --check || exit 1      # D-2656: the SUITE is a RAIL - a failing test no rail runs is a control that never fires (BUG-470 class). 3 failures are DECLARED red and SHRINK-ONLY (the depth/domain contract is 'proposed'/owner gate); a 4th is FATAL, 0 collected is FATAL, a paid red is OWNER-OWED (2)
 
     python3 scripts/check_declaration_consumers.py --selftest || exit 1   # D-2669/BUG-492: the CONSUMER JOIN's own decisions (a withheld consumer in the commit set, an over-reaching census, an unreadable registry) must be SEEN to fire
+    python3 scripts/check_session_plan.py --selftest || exit 1   # BUG-565/BUG-492: RAIL 4's OWN controls, incl. that a path containing a SPACE is ONE path (fourth hardening); wired here because a control nothing runs is a comment
     python3 scripts/check_declaration_consumers.py || exit 1              # D-2669: no declaration without its reader - BUG-562 landed the pair in one commit; this makes the JOIN a property, not an act
 
 healthcheck: health

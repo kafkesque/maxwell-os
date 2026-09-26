@@ -473,6 +473,7 @@ widening_log:
       - pipeline/label_traceability.py
     acked_by: owner
     acked_on: '2026-09-26'
+    spent_by: e3f94f42eaf238c7041a3ac385e66d157ff09983
     widened: []
     may_touch_untouched: true
     will_not_touch_untouched: false

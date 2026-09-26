@@ -70,7 +70,12 @@ debt:
     mode: replace
     why: reads config + source text into the undeclared-default census; a silent repair could hide a producer's text.
   - path: scripts/check_derivation_homes.py
-    lines: [78]
+    # BUG-542/D-2658 applied to its OWN register (2026-09-26T, D-2661): this entry was `lines: [78]`, a
+    # COORDINATE, and the coordinate held only until the rail grew - the D-2661 coordinate join inserted lines
+    # above it, which is precisely the class BUG-542 named (ONE site reported twice: STALE at the old number,
+    # FATAL DRIFT at the new one, aborting `just health` above every rail below it). Keyed by CONTENT now: the
+    # substring ties the entry to the repairing CALL, not to a line number (D-2658).
+    match: 'read_text(encoding="utf-8", errors="replace")'
     mode: replace
     why: reads source text into the one-home census; a repaired byte could hide a rival definition from the rail.
   - path: scripts/check_revoked_references.py

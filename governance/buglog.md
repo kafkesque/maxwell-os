@@ -6816,3 +6816,55 @@ rewrite.
 VERIFIED: --selftest 10/10 controls fire; a cloned payload is REFUSED end-to-end; a nonexistent file citation is
 REFUSED end-to-end; --check stays green with the registry stamp UNMOVED - the patch touched the WRITER, not the
 record bytes.
+
+## BUG-553 (MED - FIXED 2026-09-26) - two fields of every registry row were joined by NOTHING: `table:`/`column:` were written by a human, a rail read neither, and a row could cite a coordinate that exists NOWHERE while `just health` printed ok
+
+MEASURED (2026-09-26T, opening this step): config/derivations.yaml declares 10 derived values, each with a
+`table:` and a `column:` - the coordinate that says WHERE the value lives. scripts/check_derivation_homes.py read
+`home`, `status` and `name`, and NOTHING ELSE: its own docstring promised the registry is JOINED "to reality on
+every run" while the coordinate half of every row was read by no code at all. Any of the 10 rows could have cited
+`no_such_table.no_such_column` and the rail's verdict would not have moved. That is the BUG-550 class a second
+time: a mismatch INSIDE one record that no rail can see, because no rail reads two fields of one record TOGETHER.
+
+ROOT CAUSE (class): a registry field written by a hand and read by no machine is a comment with a colon. The
+registry was treated as prose to be maintained, not as a claim to be joined - and a claim that nothing resolves
+is indistinguishable from a claim that is true.
+
+FIX (D-2661): a new clause in the EXISTING rail home (no new script: a second derivation rail would be the
+D-2646/BUG-502 defect this register exists to prevent). Every row's coordinate must RESOLVE to the census home
+config/derivations.yaml#coordinate_homes declares for its `table`, in one of TWO machine-distinct kinds:
+  * document     - the path must EXIST, read as a MAPPING, carry `column` as a TOP-LEVEL KEY, and name an
+                   existing producer under the declared `producer_key`.
+  * store_census - DELEGATED: the census `census:` names must exist, its `rail:` must exist, its declared
+                   `table` must EQUAL the row's table, and `column` must appear in the membership map at the
+                   DECLARED dotted path `membership:` (never a code default, D-2644).
+A cited table with NO entry fails CLOSED - so a new row cannot cite a new coordinate until its census home is
+declared, which is the guarantee, not a side effect.
+
+WHY DELEGATED, AND WHY IT MUST NEVER OPEN THE STORE: the column question ALREADY has a home -
+scripts/check_store_columns.py measures all 75 columns of `fbs` against declared roles, and a second census of one
+fact is the defect (D-2646). Separately, MEASURED here: opening the governed store read-only and reading
+sqlite_master raises `sqlite3.OperationalError: no such module: vec0` (the store carries a vec0 virtual table;
+pipeline/stage6_commit.py documents its own first-run crash on the same module). A "verify the table exists" join
+written the obvious way would have been FATAL ON DAY ONE for all 7 store rows. The rail consumes the owning
+census's MEASUREMENT instead: existence in the store stays that rail's proof, and both rails run in the ladder.
+
+CASCADE FOUND AND FIXED BEFORE THE EDIT (the audit step, not an afterthought): config/silent_repair.yaml declared
+this rail's own silent-repair site by a COORDINATE (`lines: [78]`), the exact D-2658/BUG-542 pattern. The D-2661
+edit inserts lines above 78, so the legacy entry would have reported ONE site twice - STALE at 78 and FATAL DRIFT
+at the new number - and aborted `just health` above every rail below it. Re-keyed to `match:` FIRST, then the rail
+was edited. The class is now applied to its own register.
+
+NEGATIVES SEEN TO FIRE ON LIVE BYTES (BUG-492: a detector nobody has seen fail is a comment). The registry was
+mutated and restored three times, byte-identical each time (sha256 verified):
+  * a column the owning census is BLIND to  -> rc=1 "column 'no_such_column_zz' is absent from
+    config/store_columns.yaml#measured.columns (75 column(s) measured)".
+  * a document key that does not exist      -> rc=1 "...carries no top-level key 'no_such_key_zz'".
+  * a cited table with no census home       -> rc=1 "cites table 'no_such_table' but
+    config/derivations.yaml#coordinate_homes declares no census home for it - the coordinate is UNVERIFIABLE".
+Controls: 7 -> 23, wired into `just health` as --selftest (16 new, one per arm, including the two that must
+fail CLOSED rather than open: an unresolvable `membership:` path and a census with no declared membership).
+
+FORWARD-ONLY, DECLARED (the boundary, stated the BUG-521 way): the rail now proves EXISTENCE and MEMBERSHIP of
+every cited coordinate - NOT that the stored value equals the home's output. Value parity remains each row's
+`parity_rail`, as the rail's SCOPE has said since it was written.

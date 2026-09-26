@@ -13,19 +13,28 @@ WHAT IT CHECKS (the population is every row of config/derivations.yaml):
      this registry exists to find;
   3. a row with home null declares a no-home status, and a module-level definition named after the row's last
      segment is DRIFT: home null states "no code decides this", so a writer appearing while the row says nobody
-     decides it must fail loudly rather than quietly.
+     decides it must fail loudly rather than quietly;
+  4. a row's COORDINATE (`table:` + `column:`, the claim about WHERE the value lives) RESOLVES to the census home
+     that config/derivations.yaml#coordinate_homes declares for that table (D-2661, the BUG-553 class: two fields of
+     every row were read by NO rail, so a row could cite a coordinate that exists nowhere and still print ok). The
+     two kinds are machine-distinct - a document coordinate must exist, parse, carry the column as a top-level key
+     and name an existing producer; a store coordinate is DELEGATED to its declared column census, whose declared
+     table must match, whose rail must exist, and whose membership map must carry the column.
 SCOPE (stated, because an unstated scope reads as coverage): this rail does NOT prove the home is the only
-WRITER of the stored value and it does not re-derive values - that is each row's parity rail. It proves the
-ONE-HOME property, which is what the class needed.
+WRITER of the stored value, it does not re-derive values - that is each row's parity rail - and it does not
+measure the STORE: it proves the ONE-HOME property and coordinate EXISTENCE + MEMBERSHIP, delegated. It NEVER
+opens the store: the store carries a vec0 virtual table, so a store open here would raise `no such module: vec0`
+and kill the rail on its first run. VALUE parity is never this rail's job.
 
 TRI-STATE (BUG-457): 0 clean | 1 drift | 2 owner-owed (non-homed rows BELOW the declared shrink-only ceiling).
 """
 from __future__ import annotations
 
 import ast
+import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import yaml
 
@@ -35,6 +44,9 @@ REGISTRY = ROOT / "config" / "derivations.yaml"
 EXIT_CLEAN, EXIT_DRIFT, EXIT_OWED = 0, 1, 2
 STATUSES: tuple[str, ...] = ("homed", "orphan_magic_threshold", "dead_but_read", "declared_but_empty")
 NO_HOME_STATUSES: tuple[str, ...] = ("dead_but_read", "declared_but_empty")
+# D-2661: the CLOSED vocabulary of coordinate kinds. Each kind is a distinct MACHINE rule, never a label (BUG-492);
+# an unknown kind fails CLOSED, because a kind nobody implements is a coordinate nobody reads.
+COORDINATE_KINDS: tuple[str, ...] = ("document", "store_census")
 
 
 def load_yaml(path: Path) -> dict:
@@ -79,8 +91,132 @@ def sources_under(roots: list[str]) -> dict[str, str]:
     return out
 
 
-def check_rows(rows: list[dict], sources: dict[str, str]) -> tuple[list[str], int]:
-    """Join every registry row to reality. Returns (problems, non_homed_count)."""
+def load_artifact(rel: str) -> tuple[str, Any]:
+    """(state, parsed) for a cited coordinate artifact: missing | unparsable | ok - unreadable is NOT clean (C16).
+
+    The text is read STRICTLY, with no `errors=` argument, and that omission is the point: a silent repair inside
+    the rail that decides whether silent repairs are allowed would be this class eating itself, and the sibling
+    register keys this file's ONE remaining repair site by CONTENT precisely because a second such call would be a
+    second truth. An unreadable byte is a STATE this function reports, never a byte it repairs.
+    """
+    path = ROOT / rel
+    if not path.is_file():
+        return "missing", None
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return "unparsable", None
+    try:
+        return "ok", json.loads(text) if path.suffix == ".json" else yaml.safe_load(text)
+    except (ValueError, yaml.YAMLError):
+        return "unparsable", None
+
+
+def member_map(doc: dict, dotted: str) -> dict | None:
+    """Resolve a DECLARED dotted key path inside a census document; an absent path is None, never a default (D-2644).
+
+    Returned as None rather than {} so the caller can tell "the census does not carry that block" from "the block is
+    empty": the first is a broken declaration, the second is a census that measures nothing.
+    """
+    node: Any = doc
+    for part in str(dotted).split("."):
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node if isinstance(node, dict) else None
+
+
+def coordinate_problems(name: str, row: dict, homes: dict,
+                        load: Callable[[str], tuple[str, Any]]) -> list[str]:
+    """Join ONE row's cited `table:`/`column:` to the census home declared for that table (D-2661).
+
+    Existence + membership, delegated, never value. `load` is injected so the known-answer controls can drive every
+    arm (missing / unparsable / present) without a fixture on disk - a detector nobody has seen fire is a comment.
+    """
+    table = str(row.get("table") or "").strip()
+    column = str(row.get("column") or "").strip()
+    if not table or not column:
+        return [name + ": declares table " + repr(table) + " and column " + repr(column) + " - a row whose "
+                "coordinate is unnamed cannot be joined to anything, and an unjoined claim is the BUG-553 shape"]
+    entry = homes.get(table)
+    if not isinstance(entry, dict):
+        return [name + ": cites table " + repr(table) + " but config/derivations.yaml#coordinate_homes declares no "
+                "census home for it - the coordinate is UNVERIFIABLE, and a claim no machine reads is the defect "
+                "(D-2661). Declare its census home, or stop citing the coordinate."]
+    kind = str(entry.get("kind") or "").strip()
+    if kind not in COORDINATE_KINDS:
+        return [name + ": coordinate_homes." + table + " declares kind " + repr(kind) + " which is not one of "
+                + str(list(COORDINATE_KINDS)) + " - an unknown kind is read as no kind at all, so it fails CLOSED "
+                "(C16) instead of passing as unexamined"]
+    if kind == "document":
+        state, doc = load(table)
+        if state == "missing":
+            return [name + ": cites the document coordinate " + table + ", which does NOT exist under the repo "
+                    "root - a coordinate is a claim about the tree at the moment the rail runs"]
+        if state != "ok" or not isinstance(doc, dict):
+            return [name + ": the document coordinate " + table + " does not read as a mapping, so membership of "
+                    + repr(column) + " cannot be established - unreadable is not clean (C16)"]
+        found: list[str] = []
+        if column not in doc:
+            found.append(name + ": " + table + " carries no top-level key " + repr(column) + " - the row cites a "
+                         "coordinate the document does not have (top-level keys: "
+                         + ", ".join(sorted(str(k) for k in doc)[:12]) + ")")
+        key = str(entry.get("producer_key") or "").strip()
+        if not key:
+            found.append(name + ": coordinate_homes." + table + " declares kind document but names no "
+                         "producer_key - a coordinate whose producer is unnamed is a fact nobody owns (D-2649)")
+        else:
+            producer = str(doc.get(key) or "").strip()
+            if not producer:
+                found.append(name + ": " + table + " carries no " + key + " - the document does not name who "
+                             "writes it, so the coordinate has no home on the writing side either")
+            elif not (ROOT / producer).exists():
+                found.append(name + ": " + table + "#" + key + " names " + producer + ", which does not exist - "
+                             "the document's own declared producer is a claim about the tree")
+        return found
+    census_rel = str(entry.get("census") or "").strip()
+    if not census_rel:
+        return [name + ": coordinate_homes." + table + " declares kind store_census but names no census - the "
+                "column question then has no home to DELEGATE to, and re-measuring it here would be the "
+                "second-census defect (D-2646)"]
+    state, census = load(census_rel)
+    if state == "missing":
+        return [name + ": the declared column census " + census_rel + " for table " + repr(table) + " does NOT "
+                "exist - the delegation target is a path nothing holds"]
+    if state != "ok" or not isinstance(census, dict):
+        return [name + ": the declared column census " + census_rel + " does not read as a mapping - the "
+                "coordinate's home exists and cannot be read, which is DRIFT, not a pass (C16)"]
+    rail = str(census.get("rail") or "").strip()
+    found = []
+    if not rail:
+        found.append(name + ": " + census_rel + " names no rail - a census with no machine is a comment (BUG-492)")
+    elif not (ROOT / rail).exists():
+        found.append(name + ": " + census_rel + " names rail " + rail + ", which does not exist - the delegation "
+                     "target has no machine behind it")
+    declared_table = str(census.get("table") or "").strip()
+    if declared_table != table:
+        found.append(name + ": cites table " + repr(table) + " while its declared census " + census_rel
+                     + " measures table " + repr(declared_table) + " - delegating to a census of a DIFFERENT table "
+                     "proves nothing about this coordinate")
+        return found
+    membership = str(entry.get("membership") or "").strip()
+    if not membership:
+        return found + [name + ": coordinate_homes." + table + " declares no membership path - which key of the "
+                        "census lists the measured columns is a DECLARATION, never a code default (D-2644)"]
+    measured = member_map(census, membership)
+    if measured is None:
+        return found + [name + ": " + census_rel + " carries no " + membership + " mapping - the declared "
+                        "membership path does not resolve, so membership cannot be established (fails CLOSED)"]
+    if column not in measured:
+        found.append(name + ": column " + repr(column) + " is absent from " + census_rel + "#" + membership
+                     + " (" + str(len(measured)) + " column(s) measured) - the coordinate's OWN census is blind to "
+                     "it, so the row cites a column no machine has measured")
+    return found
+
+
+def check_rows(rows: list[dict], sources: dict[str, str], homes: dict,
+               load: Callable[[str], tuple[str, Any]]) -> tuple[list[str], int]:
+    """Join every registry row to reality: its home, and its COORDINATE (D-2661). Returns (problems, non_homed)."""
     problems: list[str] = []
     non_homed = 0
     seen: set[str] = set()
@@ -124,6 +260,7 @@ def check_rows(rows: list[dict], sources: dict[str, str]) -> tuple[list[str], in
                 problems.append(name + ": home is null, yet a module-level " + writer + " exists in "
                                 + ", ".join(found) + " - a writer appeared while the registry still says NO code "
                                 "decides it (home null is a statement, not a blank)")
+        problems.extend(coordinate_problems(name, row, homes, load))
     return problems, non_homed
 
 
@@ -140,6 +277,67 @@ def controls() -> list[tuple[str, bool]]:
         ("an unparsable module yields NO defs rather than a silent pass", module_defs("def (") == set()),
         ("the status vocabulary is CLOSED and names the four known states", len(STATUSES) == 4),
         ("a no-home status may not claim a home", "homed" not in NO_HOME_STATUSES),
+    ] + coordinate_controls()
+
+
+def coordinate_controls() -> list[tuple[str, bool]]:
+    """The COORDINATE join's known-answer controls (D-2661): one per arm, and EVERY arm must be able to FAIL."""
+
+    def loader(docs: dict[str, Any]) -> Callable[[str], tuple[str, Any]]:
+        """A fixture census: absent -> missing, None -> unparsable, else ok. Each arm is reachable by design."""
+        def load(rel: str) -> tuple[str, Any]:
+            if rel not in docs:
+                return "missing", None
+            if docs[rel] is None:
+                return "unparsable", None
+            return "ok", docs[rel]
+        return load
+
+    def probe(row: dict, homes: dict, docs: dict) -> list[str]:
+        return coordinate_problems("probe.row", row, homes, loader(docs))
+
+    live_producer = "config/derivations.yaml"   # a path that EXISTS: the arm needs one that does not
+    doc_row = {"table": "d.json", "column": "summary"}
+    doc_home = {"d.json": {"kind": "document", "producer_key": "written_by"}}
+    doc_ok = {"d.json": {"summary": {}, "written_by": live_producer}}
+    store_row = {"table": "t", "column": "c"}
+    store_home = {"t": {"kind": "store_census", "census": "c.yaml", "membership": "measured.columns"}}
+    census_ok = {"c.yaml": {"table": "t", "rail": "scripts/check_store_columns.py",
+                            "measured": {"columns": {"c": {}}}}}
+    return [
+        ("a document coordinate's key, PRESENT in the document, resolves", probe(doc_row, doc_home, doc_ok) == []),
+        ("a document coordinate's key, ABSENT from the document, is DETECTED",
+         bool(probe({"table": "d.json", "column": "nope"}, doc_home, doc_ok))),
+        ("a cited document path that does NOT exist is DETECTED", bool(probe(doc_row, doc_home, {}))),
+        ("an UNPARSABLE document is DETECTED, never a silent pass",
+         bool(probe(doc_row, doc_home, {"d.json": None}))),
+        ("a document producer that does NOT exist is DETECTED",
+         bool(probe(doc_row, doc_home, {"d.json": {"summary": {}, "written_by": "scripts/nope_zzz.py"}}))),
+        ("a document coordinate with NO producer_key declared is DETECTED",
+         bool(probe(doc_row, {"d.json": {"kind": "document"}}, doc_ok))),
+        ("a store coordinate's column, PRESENT in its census membership, resolves",
+         probe(store_row, store_home, census_ok) == []),
+        ("a store coordinate's column the census is BLIND to is DETECTED",
+         bool(probe({"table": "t", "column": "zz"}, store_home, census_ok))),
+        ("a census measuring a DIFFERENT table proves nothing and is DETECTED",
+         bool(probe(store_row, store_home, {"c.yaml": {"table": "other",
+                                                       "rail": "scripts/check_store_columns.py",
+                                                       "measured": {"columns": {"c": {}}}}}))),
+        ("a census whose declared RAIL does not exist is DETECTED",
+         bool(probe(store_row, store_home, {"c.yaml": {"table": "t", "rail": "scripts/nope_zzz.py",
+                                                       "measured": {"columns": {"c": {}}}}}))),
+        ("a cited table with NO declared census home is DETECTED (unverifiable coordinate)",
+         bool(probe({"table": "z", "column": "c"}, store_home, census_ok))),
+        ("an UNPARSEABLE census HOME is DETECTED",
+         bool(probe(store_row, store_home, {"c.yaml": None}))),
+        ("an UNKNOWN coordinate kind fails CLOSED",
+         bool(probe(store_row, {"t": {"kind": "vibes", "census": "c.yaml"}}, census_ok))),
+        ("a row naming no column is DETECTED", bool(probe({"table": "t"}, store_home, census_ok))),
+        ("a declared membership path that does not RESOLVE fails CLOSED, not open",
+         bool(probe(store_row, {"t": {"kind": "store_census", "census": "c.yaml", "membership": "nope.deep"}},
+                    census_ok))),
+        ("a store_census home with NO membership path declared fails CLOSED (no code default, D-2644)",
+         bool(probe(store_row, {"t": {"kind": "store_census", "census": "c.yaml"}}, census_ok))),
     ]
 
 
@@ -166,11 +364,18 @@ def main(argv: list[str]) -> int:
     if ceiling < 0:
         raise SystemExit("FAIL " + PREFIX + ": config/derivations.yaml#enforcement declares no numeric "
                          "max_non_homed - a ceiling with no number is a comment (BUG-491 class)")
+    homes = declared(registry, "coordinate_homes", "config/derivations.yaml")
+    if not isinstance(homes, dict) or not homes:
+        raise SystemExit("FAIL " + PREFIX + ": config/derivations.yaml declares no coordinate_homes mapping - the "
+                         "coordinate half of every row would be joined by nothing, which is the BUG-553 defect: a "
+                         "read with a code default is not a declaration (D-2644).")
     sources = sources_under(roots)
-    problems, non_homed = check_rows(rows, sources)
+    problems, non_homed = check_rows(rows, sources, homes, load_artifact)
     homed = len(rows) - non_homed
     line = (str(len(rows)) + " registered derivation(s) over " + str(len(sources)) + " module(s): " + str(homed)
-            + " homed, " + str(non_homed) + " not homed (declared ceiling " + str(ceiling) + ", shrink-only)")
+            + " homed, " + str(non_homed) + " not homed (declared ceiling " + str(ceiling) + ", shrink-only); "
+            + str(len(rows)) + " cited coordinate(s) joined to " + str(len(homes))
+            + " declared census home(s)")
     if problems:
         print("FAIL " + PREFIX + ": " + str(len(problems)) + " home problem(s) - " + line)
         for p in problems:
@@ -184,8 +389,9 @@ def main(argv: list[str]) -> int:
               "declared ceiling " + str(ceiling) + " - lower it (a ceiling may only be LOWERED; raising it is a "
               "decision) - " + line)
         return EXIT_OWED
-    print("ok " + PREFIX + ": every registered home exists, is UNIQUE, and no writer appeared where home is null "
-          "- " + line)
+    print("ok " + PREFIX + ": every registered home exists, is UNIQUE, every cited coordinate RESOLVES to its "
+          "declared census home, and no writer appeared where home is null (the store is never opened here: the "
+          "column question is DELEGATED to its own rail, D-2646/D-2661) - " + line)
     return EXIT_CLEAN
 
 

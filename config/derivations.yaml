@@ -17,6 +17,42 @@ schema_version: '1'
 decided: D-2646
 scan_roots: [pipeline, scripts, tools]
 
+# COORDINATE HOMES (D-2661, the BUG-553 class). `table:` and `column:` are CLAIMS about WHERE a value lives,
+# and until this block existed NO rail read either field: both were written by a human and joined by nothing, so a
+# row could cite a table and a column that exist NOWHERE while the registry printed ok. The rule this block turns
+# into a machine:
+#
+#   a cited COORDINATE must RESOLVE to its ONE census home - existence + membership, DELEGATED, never the VALUE.
+#
+# DELEGATED, because the column question already has a home: scripts/check_store_columns.py measures every column of
+# the governed store against a declared role, and a SECOND census of one fact is the defect this registry exists to
+# prevent (D-2646/BUG-502). This rail therefore consumes that census; it never re-measures a column and NEVER OPENS
+# THE STORE. It must not: the store carries a vec0 virtual table, so a naive "verify the cited table exists" join
+# would raise `no such module: vec0` and kill the rail on its first run.
+#
+# TWO KINDS, machine-distinct (a kind is a rule, not a label - BUG-492):
+#   document     - the coordinate lives in a document this repo writes. The path must EXIST, must PARSE as a
+#                  mapping, and `column` must be a TOP-LEVEL KEY of it. `producer_key` names the field holding the
+#                  document's own writer, and that path must exist: a coordinate whose producer is unnamed is a
+#                  fact nobody owns (D-2649/D-2646).
+#   store_census - the coordinate lives in a governed STORE whose column census is ANOTHER rail's register.
+#                  `census` names it, `membership` names the dotted key path inside it that lists the measured
+#                  columns (declared, never a code default - D-2644), its declared `table` must equal this row's
+#                  table, its `rail` must exist, and `column` must appear in that membership map. Existence in the
+#                  STORE is check_store_columns' measurement, and the ladder runs it.
+#
+# A cited table with NO entry here is UNVERIFIABLE and fails CLOSED. That IS the guarantee: a new row cannot cite
+# a new coordinate until the coordinate's census home is declared, so "nobody reads two fields of one record
+# together" cannot come back by adding a row.
+coordinate_homes:
+  fbs:
+    kind: store_census
+    census: config/store_columns.yaml
+    membership: measured.columns
+  config/decisions_summary.json:
+    kind: document
+    producer_key: written_by
+
 derivations:
 - name: fbs.status
   table: fbs
@@ -149,8 +185,12 @@ enforcement:
   # SHRINK-ONLY: how many registered derivations are NOT homed. Measured 2026-09-25 = 3 (1 orphan
   # magic threshold, 1 dead-but-read, 1 declared-but-empty). Raising it is a DECISION, not an edit
   # (the D-401/guard_coverage precedent): a count that can grow by edit is not a ceiling.
-  # LOWERED 3 -> 1 on 2026-09-26 by the rail's own instruction ("a ceiling may only be LOWERED"): the
-  # registry now carries 9 rows, 8 homed. The rail reported the stale ceiling as owner-owed (RC=2) on every
-  # run; a ceiling above the measured count is a number nothing enforces. Raising it remains a DECISION.
+  # LOWERED 3 -> 1 on 2026-09-26 by the rail's own instruction ("a ceiling may only be LOWERED"). The rail
+  # reported the stale ceiling as owner-owed (RC=2) on every run; a ceiling above the measured count is a number
+  # nothing enforces. Raising it remains a DECISION.
+  # CORRECTED 2026-09-26T (D-2661, the BUG-521 class - a verdict must state the counts it measured). This comment
+  # claimed "the registry now carries 9 rows, 8 homed" while the rail measured 10 rows, 9 carrying a home and 1
+  # with home null (borp_score). The registry grew and the prose did not: a count written in prose is a claim NO
+  # MACHINE READS. The rail PRINTS the count it measured on every run, and that print is the number.
   max_non_homed: 1
   direction: shrink_only

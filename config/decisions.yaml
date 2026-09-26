@@ -8832,3 +8832,48 @@ decisions:
   - governance/buglog.md
   bugs:
   - BUG-552
+- id: D-2661
+  state: OPEN
+  category: GOVERNANCE / RULES
+  date: '2026-09-26'
+  title: 'Two fields of every registry row were joined by NOTHING: a cited coordinate (table/column) must RESOLVE
+    to the census home declared for it - EXISTENCE + MEMBERSHIP, DELEGATED, NEVER VALUE'
+  files:
+  - scripts/check_derivation_homes.py
+  - config/derivations.yaml
+  - config/silent_repair.yaml
+  - governance/buglog.md
+  bugs:
+  - BUG-553
+  decision: 'SCOPE, ONE LINE: a cited coordinate must RESOLVE to its ONE declared census home - existence + membership,
+    DELEGATED, never the value. scripts/check_derivation_homes.py gains a fourth clause: every row''s `table:` must
+    name an entry under config/derivations.yaml#coordinate_homes, and the entry''s machine-distinct `kind` decides
+    the join - `document` (the path EXISTS, reads as a mapping, carries `column` as a TOP-LEVEL KEY, and names an
+    existing producer under `producer_key`) or `store_census` (DELEGATED to the column census named by `census:`:
+    its declared `rail:` must exist, its declared `table` must EQUAL the row''s table, and `column` must appear
+    in the membership map at the DECLARED dotted path `membership:`, never a code default). A cited table with no
+    declared census home fails CLOSED, so a new row cannot cite a new coordinate until its census home is declared.'
+  rationale: 'BUG-553: `table:` and `column:` are CLAIMS about where a value lives, and the rail read NEITHER -
+    a row could cite a coordinate that exists nowhere while `just health` printed ok (the BUG-550 class a second
+    time: a mismatch inside one record, invisible because no rail reads two fields of one record together). The
+    column question ALREADY has a home (scripts/check_store_columns.py measures all 75 columns of fbs against declared
+    roles), and a second census of one fact is the defect this registry exists to prevent (D-2646/BUG-502) - so
+    this rail DELEGATES instead of re-measuring. It must also NEVER open the store: measured here, opening the governed
+    store read-only and reading sqlite_master raises ''no such module: vec0'' (the store carries a vec0 virtual
+    table), so the obvious ''verify the table exists'' join would have been FATAL ON DAY ONE for all 7 store rows.'
+  measured: 'MEASURED 2026-09-26T before the rule was written: 10 rows (9 carrying a home, 1 with home null), 2
+    distinct cited tables (fbs, config/decisions_summary.json), 7 fbs columns all present among the census'' 75
+    MEASURED columns, and all 3 document coordinates present among the document''s 7 top-level keys - i.e. the join
+    was satisfiable on day one and every existing row RESOLVES. NEGATIVES SEEN TO FIRE ON LIVE BYTES (registry mutated
+    and restored three times, sha256 identical each time): a census-blind column rc=1, a nonexistent document key
+    rc=1, a table with no census home rc=1. Controls 7 -> 23 (16 new, one per arm, incl. two that must fail CLOSED
+    not open). CASCADE FOUND BEFORE THE EDIT: config/silent_repair.yaml keyed this rail''s own repair site by a
+    COORDINATE (lines: [78]), so the edit would have reported ONE site twice (STALE + FATAL DRIFT) and aborted `just
+    health` above every rail below it (the D-2658/BUG-542 class unapplied to its own register) - re-keyed to `match:`
+    FIRST, then the rail was edited.'
+  verification: 'python3 scripts/check_derivation_homes.py --selftest -> 23/23 known-answer control(s) fire; the
+    rail -> rc=0 ''every cited coordinate RESOLVES to its declared census home ... 10 cited coordinate(s) joined
+    to 2 declared census home(s)''; scripts/check_silent_repair.py --check -> ''unknown 0'' (the re-keyed entry
+    resolves, debt unchanged 17/17); just health rc=0. FORWARD-ONLY BOUNDARY (BUG-521): the rail proves EXISTENCE
+    and MEMBERSHIP of every cited coordinate, NOT that the stored value equals the home''s output - value parity
+    remains each row''s parity_rail.'

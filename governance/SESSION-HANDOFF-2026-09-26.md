@@ -272,3 +272,28 @@ path-existence DECISION; (7) A3 eval_integrity.yaml:14 SUPERSEDED; (8) A2 per-ax
 ## 2026-09-26T (D-2660 - the mint joins a record's OWN FIELDS)
 
 State: the BUG-550 class is CLOSED at the mint. scripts/recompute_decision_summary.py --mint now joins the record to the tree BEFORE a byte is written: the next FREE id (a skip is a hole indistinguishable from a deletion), bugs that EXIST in governance/bug_status.json, a payload that NAMES at least one of its own bugs (the BUG-550 tell), files that EXIST (and a list, not a comma-joined blob), and a whole-payload CLONE refused by name. 10 known-answer controls, incl. the control record itself having to PASS; wired into just health as --selftest. The fix is INSIDE the existing mint home on purpose: a second minter would be the D-2646/BUG-502 defect the register exists to prevent. FORWARD-ONLY and DECLARED: 559/790 landed records carry no title and 26 file citations do not resolve, so the rule never rewrites history (BUG-539) and the historical vector is NOT a ceiling (its only way down would be rewriting landed history). ORDER: bug registered and the register regenerated BEFORE the decision that cites it - the gate enforces it. D-2660 minted through itself (dogfood); registry stamp moved 790 -> 791 with --check green.
+
+## 2026-09-26T (D-2661 - the COORDINATE join: existence + membership, delegated, never value)
+
+DONE. config/derivations.yaml declares 10 derived values, each with `table:`/`column:` - and NO rail read either
+field, so a row could cite a coordinate that exists nowhere while `just health` printed ok (BUG-553; the BUG-550
+class a second time). scripts/check_derivation_homes.py now joins every cited coordinate to the census home its
+`table` declares under `coordinate_homes:` - `document` kind (path exists, parses, `column` is a top-level key,
+declared `producer_key` resolves) or `store_census` kind (DELEGATED to check_store_columns' register: rail exists,
+declared table EQUALS the row's, `column` in the membership map at the DECLARED `membership:` path). A table with no
+declared census home fails CLOSED. DELIBERATELY NOT DONE: no store open (vec0 makes `no such module: vec0` fatal),
+no value parity (that is each row's parity_rail), no second column census (D-2646).
+
+MEASURED: rail rc=0 - "10 registered derivation(s) ... 9 homed, 1 not homed (declared ceiling 1, shrink-only); 10
+cited coordinate(s) joined to 2 declared census home(s)". Controls 7 -> 23, wired as --selftest. 3 negatives SEEN
+to fire on LIVE bytes and the registry restored byte-identical (sha256 verified). CASCADE HANDLED BEFORE THE EDIT:
+config/silent_repair.yaml keyed this rail's own repair site by `lines: [78]`; the edit inserts above it, which would
+have reported ONE site twice (STALE + FATAL DRIFT) and aborted the ladder - re-keyed to `match:` FIRST (D-2658 on
+its own register). Also corrected: the stale prose count in derivations.yaml ("9 rows, 8 homed" -> the rail measures
+10 rows / 9 with a home) - the BUG-521 class. BUG-553 registered BEFORE the citing decision minted (D-2660
+ordering); D-2661 minted THROUGH the gate (792 records, stamp 24223a6951829361).
+
+OWED / NEXT: the owner's one-word SCOPE ratification is no longer blocking (the rail is in force and green); the
+larger owner gates are unchanged (ANCHOR-4 rev 3 promotion; the A/B depth/domain contract ruling; data/maxwell.db
+delete-or-keep; Dropbox siblings HELD/DISCARD). MY NEXT: the R2 pin re-mint; BUG-537's archive control;
+freeze_gold_sets.py -> write_guard.

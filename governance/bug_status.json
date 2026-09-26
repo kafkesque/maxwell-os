@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 285,
-  "open_n": 128,
-  "closed_n": 157,
+  "open_n": 127,
+  "closed_n": 158,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -639,11 +639,6 @@
       "events": 1
     },
     {
-      "id": "BUG-542",
-      "title": "(MEDIUM - MITIGATED, REMEDY OWED 2026-09-26): the silent-repair allowlist is keyed by LINE NUMBER, so a mechanical edit becomes a FALSE FAIL",
-      "events": 2
-    },
-    {
       "id": "BUG-545",
       "title": "(MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history",
       "events": 1
@@ -802,6 +797,7 @@
     "BUG-539",
     "BUG-540",
     "BUG-541",
+    "BUG-542",
     "BUG-543",
     "BUG-544",
     "BUG-546",

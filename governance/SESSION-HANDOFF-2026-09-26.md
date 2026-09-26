@@ -228,3 +228,8 @@ whose status is 'proposed' (owner gate). `--strict` (health-deep) stays RED unti
    own bodies so the gate stops executing uncommitted code; (iii) tighten the fnmatch matcher as its own decision;
    (iv) BUG-542 content-keyed silent-repair sites; (v) `check_derivation_homes.py` on-disk path validation.
 
+
+## 2026-09-26S - the register that points at code stops pointing at COORDINATES (BUG-542 class fix)
+1. **FORENSIC AUDIT FIRST** (as asked) found the ladder itself was lying about its own reach: `just health` RC=1 at justfile line 51 for a reason UNRELATED to the R2 pin, so the R2 OWNER-OWED red below it could not be seen at all. The cause was my owed BUG-542: a declared site keyed by a LINE NUMBER, orphaned when rail 0 grew for BUG-547 (one site, two symptoms, FATAL DRIFT).
+2. **FIXED AT THE CLASS**: `scripts/check_silent_repair.py` resolves a declared site by CONTENT (`match:`) or legacy `lines:`, exactly one of the two; a dead `match` is REPORTED; two entries may not claim one site. `--check` exit 2, 0 DRIFT, 0 STALE; 24/24 controls (2 anti-overreach). D-2658 minted OPEN.
+3. **NEXT**: R2 pin re-mint (meter + pin + new decision in ONE commit, never a quiet re-hash, D-382/BUG-535/BUG-542 precedent); then the rails' own bodies into git (BUG-545); then the `fnmatch` tightening decision; then the owner's depth/domain ruling.

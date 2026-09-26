@@ -11,6 +11,9 @@ rail: scripts/check_silent_repair.py
 scan_roots: [scripts, pipeline, tools]          # tools/ was OUTSIDE the first census and is audited by this rail now
 # 2026-09-26: scripts/vote_anchor_domains.py:120 (a repair mode on .env) was REPAIRED rather than declared - the
 # operator-key rule now has one home, scripts/lib/operator_env.py, which reads .env through the decode home.
+# 2026-09-26S (BUG-542): an entry keys its site by CONTENT (`match:`) or, legacy, by `lines:`. A line-keyed
+# entry that goes STALE is not maintenance noise - it is this class: the SITE moved and the declaration did not,
+# and while it lasted `just health` aborted above the rails below it (BUG-457).
 # 2026-09-26 (BUG-521/522): scripts/audit_flag_consumers.py:72,89 and scripts/definition_nli_verify.py:207 were
 # REPAIRED, not declared - the first reads through the decode home, the second named ONE rule for its input
 # (its silent repair could never fire: the module already opened the same file strictly).
@@ -26,7 +29,11 @@ allowed:
     mode: replace
     why: the watchdog socket's reply is decoded for a one-line DISPLAY echo; it is never parsed or stored.
   - path: scripts/check_repo_integrity.py
-    lines: [280]
+    # BUG-542 (MEASURED 2026-09-26S): this entry was `lines: [280]` and became FALSE when rail 0 grew for BUG-547 -
+    # the site moved to 306, so ONE site was reported twice (STALE 280 + DRIFT 306) and the FATAL DRIFT aborted
+    # `just health`, hiding every rail below it. Keyed by CONTENT now: the substring ties the entry to the
+    # repairing CALL, not to a coordinate.
+    match: 'reflog.read_text(errors'
     mode: replace
     why: git reflog output - a foreign stream produced by git, not an artifact this repo declares.
   - path: scripts/pipe_stage_probe.py

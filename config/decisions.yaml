@@ -8783,3 +8783,23 @@ decisions:
   - governance/session_plan_20260924.yaml
   bugs:
   - BUG-548
+
+- id: D-2658
+  category: GOVERNANCE / RULES
+  state: OPEN
+  title: 'A declared SITE is keyed by CONTENT, never by a line number - a coordinate is not a fact about the code'
+  rationale: 'MEASURED 2026-09-26S (BUG-542, third occurrence): config/silent_repair.yaml declared rail 0''s one
+    repair site as `lines: [280]`; rail 0 grew for BUG-547 and the site moved to 306, so the register reported ONE
+    site TWICE - STALE 280 (declared, not measured) + DRIFT 306 (measured, not declared) - and the DRIFT is FATAL,
+    so `just health` aborted at justfile line 51 and HID every rail below it, including the R2 pin the owner owes
+    (BUG-457: an abort is an amnesia generator). The previous remedy had re-pointed the LINE NUMBER, which is why
+    the class returned the same day. Fix: an entry keys its site with `match:` (the substring the repairing line
+    carries) or, legacy, `lines:` - exactly one of the two; a `match` that resolves to nothing is REPORTED, never
+    dropped (BUG-492); two entries may not claim one site (D-2646). The drifted entry is keyed by
+    `match: reflog.read_text(errors`. Verified: 24/24 known-answer controls (was 18), --check exit 2 with 0 DRIFT
+    and 0 STALE, and the ladder runs past line 51.'
+  files:
+  - scripts/check_silent_repair.py
+  - config/silent_repair.yaml
+  bugs:
+  - BUG-542

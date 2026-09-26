@@ -362,3 +362,9 @@
   live paths it would forbid; **R2 pin re-mint** (sha AND decision together, D-382/BUG-535) - the pin still names
   `e9070635...` while the worktree holds `fbfd62f3...`, so it describes a file that does not exist.
 
+
+## 2026-09-26S - a register that points at code no longer points at COORDINATES (BUG-542 class fix)
+- **BUG-542 FIXED (class, third occurrence)**: rail 0's repair site was declared as `lines: [280]`; the site moved to 306 → the register reported ONE site twice (STALE 280 + DRIFT 306) and the FATAL DRIFT **aborted `just health` at line 51**, hiding ~20 rails below it. Keyed by CONTENT now (`match:`); 24/24 controls, 0 DRIFT, 0 STALE, exit 2 (declared debt only).
+- **D-2658 minted, state OPEN** (owner ratify): a declared site is keyed by content, never by a coordinate.
+- **OWED (mine)**: R2 pin re-mint (meter + pin + new decision in ONE commit); the rails' own bodies into git (BUG-545 - the gate still executes uncommitted code); the `fnmatch` tightening decision (BUG-548 sub-finding).
+- **OWED (owner)**: the depth/domain contract ruling (A ratify+S4 re-derivation / B withdraw) - the only remaining red that a shrink-only ceiling may not clear.

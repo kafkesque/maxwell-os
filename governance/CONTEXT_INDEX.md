@@ -991,3 +991,9 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
 - **D-2657 (OPEN)**: the rule above, minted. `config/decisions.yaml` is records-only (D-2655), so the mint is an
   append + `recompute_decision_summary.py`, never a mid-file edit (BUG-539).
 
+
+### 2026-09-26S - the register that points at CODE stops pointing at COORDINATES (BUG-542 class fix; the ladder is unblocked)
+- **BUG-542 FIXED (class; third occurrence)**: `config/silent_repair.yaml` keyed rail 0's repair site by `lines: [280]`; rail 0's BUG-547 edit moved it to 306, so ONE site was reported TWICE (STALE 280 + DRIFT 306) and the FATAL DRIFT **aborted `just health` at justfile line 51** - every rail below it, including the R2 OWNER-OWED pin, never ran. Sites are keyed by CONTENT (`match:`) now; `scripts/check_silent_repair.py::declared_sites`, 24/24 controls.
+- **SUPERSEDED CLAIM**: "BUG-542 REMEDY APPLIED 2026-09-26" (buglog). What was applied was a new LINE NUMBER. A coordinate fix is not a class fix.
+- **HERO FACT**: the ladder's RED at line 51 had nothing to do with the R2 pin - and the R2 red was BELOW the abort, so it could not be seen at all (BUG-457).
+- **D-2658** (OPEN, owner ratify) - the rule, its home and its proof.

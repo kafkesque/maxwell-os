@@ -597,3 +597,21 @@ record, two ANTI-OVERREACH controls that must TOLERATE a granted claim and a wit
 true`, and the LIVE plan's own control). The four paths are granted as NAMED paths (widening_log entry 16).
 STATE OPEN because the owner has not ratified it; nothing here is a claim of approval.
 
+
+## D-2658 - A declared SITE is keyed by CONTENT, never by a line number (OPEN, minted 2026-09-26S)
+
+RULE. A register that points at CODE (`config/silent_repair.yaml`) keys each declared site by the CONTENT of the
+repairing line (`match:`), never by its coordinate (`lines:`). A line number is not a fact about the code.
+
+WHY. MEASURED (BUG-542, third occurrence): rail 0's repair site moved 280 -> 306 when rail 0 grew for BUG-547, so
+ONE site was reported TWICE - STALE 280 (declared, not measured) and DRIFT 306 (measured, not declared) - and the
+DRIFT is FATAL. `just health` aborted at line 51 and every rail below it never ran: the store-authority and
+store-columns rails, the Dropbox-conflict resolver, reconcile, measure --gaps, the menu rails, the pins rail (the
+R2 OWNER-OWED red was BELOW the abort and therefore INVISIBLE) and generator pins. The previous remedy re-pointed
+the LINE NUMBER; the class returned the same day, which is the signature of a symptom fix (compare BUG-548: the
+record is not the rule).
+
+HOME + PROOF. `scripts/check_silent_repair.py::declared_sites` resolves `match:` against the measured line text;
+`lines:` stays legal as legacy. Exactly one of the two is required, a `match` resolving to nothing is REPORTED (a
+key that can match nothing is a comment, BUG-492), and two entries may not claim one site (D-2646) - the last two
+fail closed (C16). Controls 18 -> 24, two of them ANTI-OVERREACH.

@@ -19,6 +19,14 @@ It is an AST scan, not a grep: a COMMENT that mentions errors="replace" decides 
 An `errors=` argument that is NOT a literal is reported as `unresolvable` and must be declared too - a detector
 never passes what it cannot read.
 
+IT KEYS A SITE BY CONTENT, NOT BY LINE NUMBER (BUG-542, MEASURED 2026-09-26S). An entry keys its site with
+either `lines:` (legacy, a coordinate) or `match:` (the substring the repairing LINE carries). A line number is not
+a fact about the code: rail 0 was edited for BUG-547, its repair site moved 280 -> 306, and this register reported
+the SAME site twice - STALE at 280 and DRIFT at 306 - while the DRIFT is FATAL, so `just health` aborted and HID
+every rail below it (BUG-457: an abort is an amnesia generator). The previous remedy for this bug re-pointed the
+LINE NUMBER, which is why the class came back the same day. A `match:` that resolves to no measured site is
+REPORTED, never dropped: a key that can match nothing is a comment (BUG-492).
+
 TRI-STATE (BUG-457): 0 clean | 1 a NEW/undeclared site, or the ceiling widened | 2 declared debt only (loud, NOT
 fatal). CLI: --selftest | --check | --list.
 
@@ -64,14 +72,19 @@ def findings_in(source: str) -> list[tuple[int, str]]:
     return sorted(out)
 
 
-def scan(cfg: dict, repo: Path = REPO) -> tuple[dict[str, list[tuple[int, str]]], list[str]]:
+def scan(cfg: dict, repo: Path = REPO) -> tuple[dict[str, list[tuple[int, str]]], dict[str, dict[int, str]], list[str]]:
     """{relative path: findings} for every module under the declared scan roots.
+
+    Also returns, per file, the SOURCE TEXT of every flagged line, because a declared entry may be keyed by CONTENT
+    (`match:`) rather than by a line number (BUG-542).
 
     FAILS CLOSED (C16, BUG-544): an EMPTY scan_roots - or a declared root that is not on disk - would narrow the
     census to nothing and still print ok. A rail that can never say FAIL is a comment (BUG-492); the sibling rail
     scripts/check_config_defaults.py carries the same guard for the same reason.
     """
-    found, broken = {}, []
+    found: dict[str, list[tuple[int, str]]] = {}
+    texts: dict[str, dict[int, str]] = {}
+    broken: list[str] = []
     roots = cfg.get("scan_roots") or []
     if not roots:
         raise SystemExit("FAIL-CLOSED (" + PREFIX + "): scan_roots is EMPTY - a census over no root is not a "
@@ -87,24 +100,63 @@ def scan(cfg: dict, repo: Path = REPO) -> tuple[dict[str, list[tuple[int, str]]]
                 continue
             rel = path.relative_to(repo).as_posix()
             try:
-                hits = findings_in(path.read_text(encoding="utf-8"))
-            except (SyntaxError, UnicodeDecodeError) as exc:
+                source = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError as exc:
+                broken.append(rel + ": " + type(exc).__name__); continue
+            try:
+                hits = findings_in(source)
+            except SyntaxError as exc:
                 broken.append(rel + ": " + type(exc).__name__); continue
             if hits:
+                listing = source.splitlines()
                 found[rel] = hits
-    return found, broken
+                texts[rel] = {ln: (listing[ln - 1].strip() if 0 < ln <= len(listing) else "") for ln, _ in hits}
+    return found, texts, broken
 
 
-def declared_sites(cfg: dict) -> dict[tuple[str, int], tuple[str, set[str]]]:
-    """{(path, line): (kind, {modes})} for every allowed/debt entry. The register is keyed by SITE, not by file."""
+def _claim(out: dict, faults: list[str], pair: tuple[str, int], kind: str, modes: set[str]) -> None:
+    """Record one declared site, refusing a SECOND entry for the same site (one site, one declaration, D-2646)."""
+    if pair in out:
+        faults.append("two entries declare the same SITE " + pair[0] + ":" + str(pair[1]) + " - one site, one "
+                      "declaration (D-2646); the later entry would be dropped in silence (C16)")
+    out[pair] = (kind, modes)
+
+
+def declared_sites(cfg: dict, found: dict[str, list[tuple[int, str]]],
+                   texts: dict[str, dict[int, str]]) -> tuple[dict[tuple[str, int], tuple[str, set[str]]], list[str], list[str]]:
+    """{(path, line): (kind, {modes})} for every allowed/debt entry, RESOLVED against the measurement (BUG-542).
+
+    An entry keys its site by EXACTLY ONE of `lines:` (legacy coordinate) or `match:` (the content of the repairing
+    line). A `match` is resolved against the MEASURED line text, so the declaration survives the site MOVING - the
+    defect this fixes, where the coordinate stayed and the site did not. Returns (sites, stale_keys, bad_keys): a
+    `match` that resolves to nothing is a STALE key (reported, never dropped - BUG-492), and an ambiguous
+    declaration (both keys, neither key, two entries on one site) is a BROKEN key (fail closed, C16).
+    """
     out: dict[tuple[str, int], tuple[str, set[str]]] = {}
+    stale: list[str] = []
+    bad: list[str] = []
     for kind in ("allowed", "debt"):
         for entry in cfg.get(kind) or []:
             path = str(entry["path"])
             modes = {str(entry.get("mode") or REPAIR_MODES[0])}
-            for line in entry.get("lines") or []:
-                out[(path, int(line))] = (kind, modes)
-    return out
+            lines = [int(x) for x in entry.get("lines") or []]
+            match = entry.get("match")
+            if bool(lines) == bool(match):
+                bad.append(kind + " entry for " + path + " must key its site by EXACTLY ONE of `lines:` (legacy "
+                           "coordinate) or `match:` (content) - both or neither cannot be resolved (C16)")
+                continue
+            if match:
+                pattern = str(match)
+                pairs = [(path, ln) for rel, hits in found.items() if rel == path for ln, _ in hits
+                         if pattern in (texts.get(rel) or {}).get(ln, "")]
+                if not pairs:
+                    stale.append(path + " `match: " + pattern + "`")
+                for pair in pairs:
+                    _claim(out, bad, pair, kind, modes)
+                continue
+            for line in lines:
+                _claim(out, bad, (path, line), kind, modes)
+    return out, stale, bad
 
 
 def verdict(found: dict, sites: dict, ceiling: int) -> tuple[int, int, list[str], list[str]]:
@@ -186,6 +238,17 @@ def controls() -> list[tuple[str, bool]]:
     debt = {("scripts/artifact_reader.py", 12): ("debt", {"ignore"})}
     # BUG-544 fixtures: a name under the temp dir that cannot exist (uuid4), so "ABSENT" is PROVEN absent.
     absent = Path(tempfile.gettempdir()) / ("silent_repair_absent_" + uuid4().hex + ".yaml")
+    # BUG-542 fixtures: ONE site at line 306, and registers that key it by content, by a STALE coordinate, by a key
+    # that matches nothing, by both keys, by neither, and by two entries at once.
+    moved_found = {"scripts/rail.py": [(306, "replace")]}
+    moved_texts = {"scripts/rail.py": {306: 'last = reflog.read_text(errors="replace").splitlines()'}}
+    moved_content = {"allowed": [{"path": "scripts/rail.py", "match": "reflog.read_text", "mode": "replace"}]}
+    moved_lines = {"allowed": [{"path": "scripts/rail.py", "lines": [280], "mode": "replace"}]}
+    dead_key = {"allowed": [{"path": "scripts/rail.py", "match": "no such text", "mode": "replace"}]}
+    both_keys = {"allowed": [{"path": "scripts/rail.py", "match": "reflog", "lines": [306], "mode": "replace"}]}
+    no_keys = {"allowed": [{"path": "scripts/rail.py", "mode": "replace"}]}
+    double_claim = {"allowed": [{"path": "scripts/rail.py", "lines": [306], "mode": "replace"},
+                                {"path": "scripts/rail.py", "match": "reflog.read_text", "mode": "replace"}]}
 
     def named(fn, *args) -> str:
         """The NAMED message of the SystemExit `fn(*args)` raises, or '' when it does NOT fail closed (BUG-544)."""
@@ -234,6 +297,24 @@ def controls() -> list[tuple[str, bool]]:
         ("a declaration missing a REQUIRED key is a NAMED failure (BUG-544)", "declares no" in t_missing),
         ("a declared scan root that does not exist is a NAMED failure, not a silent narrowing (C16)",
          "does not exist" in t_narrow),
+        # BUG-542: the register must survive its site MOVING. Line-keyed = the defect; content-keyed = the fix.
+        ("a CONTENT-keyed entry tolerates its site after it MOVED (BUG-542)",
+         declared_sites(moved_content, moved_found, moved_texts)[0].get(("scripts/rail.py", 306)) == ("allowed", {"replace"})
+         and not declared_sites(moved_content, moved_found, moved_texts)[1]
+         and not declared_sites(moved_content, moved_found, moved_texts)[2]),
+        ("a LINE-keyed entry for that SAME moved site is STALE - the defect the content key fixes (BUG-542)",
+         declared_sites(moved_lines, moved_found, moved_texts)[0].get(("scripts/rail.py", 280)) == ("allowed", {"replace"})
+         and declared_sites(moved_lines, moved_found, moved_texts)[1] == []),
+        # anti-overreach (BUG-492): the fix must not buy silence - a key that matches NOTHING is reported, and an
+        # ambiguous declaration fails closed rather than dropping a site.
+        ("a `match:` that resolves to NO measured site is REPORTED, never silently dropped (BUG-492)",
+         declared_sites(dead_key, moved_found, moved_texts)[1] == ["scripts/rail.py `match: no such text`"]),
+        ("an entry keying BOTH `lines:` and `match:` is a BROKEN declaration (fail closed, C16)",
+         len(declared_sites(both_keys, moved_found, moved_texts)[2]) == 1),
+        ("an entry keying NEITHER is a BROKEN declaration (fail closed, C16)",
+         len(declared_sites(no_keys, moved_found, moved_texts)[2]) == 1),
+        ("two entries claiming ONE site is a BROKEN declaration (one site, one declaration, D-2646)",
+         len(declared_sites(double_claim, moved_found, moved_texts)[2]) == 1),
     ]
 
 
@@ -257,8 +338,8 @@ def main(argv: list[str]) -> int:
         print("ok " + PREFIX + ": " + str(len(rows)) + "/" + str(len(rows)) + " known-answer control(s) fire")
         return EXIT_CLEAN
     cfg = load()
-    found, broken = scan(cfg)
-    sites = declared_sites(cfg)
+    found, texts, broken = scan(cfg)
+    sites, stale_keys, bad_keys = declared_sites(cfg, found, texts)
     if args.list:
         for rel, hits in sorted(found.items()):
             print("   " + rel + " : " + ", ".join(str(line) + "/" + mode for line, mode in hits))
@@ -266,17 +347,20 @@ def main(argv: list[str]) -> int:
               + ", ".join(str(r) for r in cfg.get("scan_roots") or []))
         return EXIT_CLEAN
     code, debt, unknown, stale = verdict(found, sites, int((cfg.get("ceiling") or {}).get("debt", 0)))
+    stale = stale + stale_keys
     for line in unknown:
         print("  DRIFT " + line)
     for line in stale:
         print("  STALE " + line + " - declared but NOT measured; correct the entry or LOWER the ceiling")
+    for line in bad_keys:
+        print("  BROKEN " + line)
     for rel in broken:
         print("  BAD   " + rel + " does not parse (a rail cannot certify what it cannot read)")
     mark = "ok " if code == EXIT_CLEAN else ("OWED " if code == EXIT_OWED else "FAIL ")
     print(mark + PREFIX + ": debt " + str(debt) + " of ceiling " + str((cfg.get("ceiling") or {}).get("debt"))
           + " | unknown " + str(len(unknown)) + " | allowed " + str(sum(1 for e in cfg.get("allowed") or []))
           + " entry(ies) | home " + str(cfg.get("home")))
-    return EXIT_DRIFT if broken else code
+    return EXIT_DRIFT if (broken or bad_keys) else code
 
 
 if __name__ == "__main__":

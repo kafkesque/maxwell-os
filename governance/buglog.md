@@ -6661,3 +6661,32 @@ therefore GRANTS `scripts/lib/yaml_guard.py`. Entries #5 and #7 were already gra
 is LOOSER than its patterns read. Tightening the matcher FORBIDS paths that are legal today, so it is its own
 decision with its own blast-radius measurement - not a patch smuggled into this one. Until then: every new entry
 is a NAMED path, never a glob.
+
+## BUG-542 (MEDIUM - FIXED 2026-09-26S): the CLASS fix - a declared silent-repair SITE is keyed by CONTENT, not by a line number (the earlier remedy re-pointed the coordinate, so rail 0's own edit orphaned it again)
+
+WHAT (MEASURED, third occurrence of this bug). `config/silent_repair.yaml` declared rail 0's one repair site as
+`lines: [280]`. Rail 0 then grew for BUG-547 and the site moved to 306, so the register reported ONE site TWICE:
+
+| reported as | site | truth |
+| --- | --- | --- |
+| `STALE scripts/check_repo_integrity.py:280` | declared, not measured | the coordinate, still in the register |
+| `DRIFT scripts/check_repo_integrity.py:306` | measured, not declared | the SAME site, moved |
+
+The DRIFT is FATAL (exit 1) and it is NOT tolerated by `just health`, so the ladder ABORTED at justfile line 51 and
+every rail below it never ran: check_undeclared_encoding, check_store_authority, check_store_columns,
+resolve_dropbox_conflicts --check, reconcile --check, measure --gaps, verify_anchor_family_registry,
+verify_menu_routing, verify_menu_policy, the pins rail (the R2 OWNER-OWED red lived BELOW the abort and was
+therefore INVISIBLE), verify_generator_pins, verify_declared_inputs. BUG-457: an abort is an amnesia generator.
+
+WHY IT RECURRED. The previous remedy (buglog, same file, same day) re-pointed the LINE NUMBER. A coordinate is not
+a fact about the code, so the defect returned as soon as rail 0 was edited again - a symptom fix, not a class fix.
+
+FIX (the class). `scripts/check_silent_repair.py::declared_sites` now resolves an entry's site against the
+MEASURED line text: an entry keys it by `match:` (the substring the repairing line carries) or, legacy, by
+`lines:`. EXACTLY ONE of the two is required; a `match` that resolves to nothing is REPORTED (never dropped - a
+key that can match nothing is a comment, BUG-492); two entries may not claim one site (one site, one declaration,
+D-2646). The live entry is keyed `match: 'reflog.read_text(errors'`.
+
+VERIFIED. `--selftest` 24/24 known-answer controls fire (was 18); 6 are new and 2 are ANTI-OVERREACH (a
+content-keyed register must tolerate its site MOVING, and a dead key must still be REPORTED). `--check` is exit 2
+(declared debt only, loud NOT fatal) with 0 DRIFT and 0 STALE, so the ladder runs PAST line 51.

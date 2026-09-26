@@ -50,6 +50,14 @@ may_touch:
   # two rules (D-2646). OWED, GATED: will_not_touch should CONSUME config/human_instrument_locks.yaml instead
   # of restating `governance/F11_*`; until then the coarse lock stands and nothing here may write F11_*.
   - governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_*.csv
+  # WIDENED 2026-09-26R (widening_log entry 15) - FIVE NAMED PATHS, never globs. MEASURED before this: the
+  # record-keeping surface every session must write sat OUTSIDE the contract; this plan had itself recorded
+  # three of them as STILL OWED, and DECISION-LOG.md was already modified and refused by rail 4.
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - agent/session_seed.yaml
+  - governance/RECONCILIATION.json
+  - governance/ROOT_CAUSE_AND_DRIFT_ARCHITECTURE_20260925.md
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

@@ -1027,3 +1027,11 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   found BUG-555: `coder_key_present` was a SUBSTRING test ("coder" in the whole raw text) that printed `true` on
   400/400 live records carrying NO `coder` key (the BUG-528 class inside the BUG-450 block); it is a membership
   test on the parsed rows now, with counts and 4 controls at `--selftest`.
+
+- **BUG-537 FIXED / BUG-556 FIXED / D-2664 (the archive index)**: `archive/index.yaml` silently de-listed
+  `.DS_Store` when the BUG-469 ignore block landed (the block blaming the 2026-09-26T15:54 remedy run is
+  CORRECTED with both digests: `ecfe29517a941e1b...` already had 32 entries and no `.DS_Store`; HEAD `07e8e3559727bc99...`
+  still had it). The index now carries an `excluded` census and `--check` asserts indexed-or-declared-excluded;
+  the unreachable `^\.DS_Store$` rule is deleted and `shadowed_rules()` exits 2 on that shape. Chasing it found
+  BUG-556: a transient SQLite sidecar (`-shm`, mtime written by the health run itself) moved the rail's own input
+  (files 3/135528448 B/2026-09-19 counted vs files 1/135495680 B/2026-09-17 excluded). 7 controls at `--selftest`.

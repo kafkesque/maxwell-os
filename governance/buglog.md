@@ -6201,7 +6201,7 @@ r3_preflight, verify_vec_integrity, verify_boundary_injection, depth_pass_agreem
 recompute_decision_summary) are now RUN, and every one of them is GREEN except the archive index of BUG-537.
 The R2 pin itself is NOT laundered: it is still RED-as-OWED and still owes a re-measure + a mint (D-382's rule).
 
-## BUG-537 (MED - PROPOSED D-2653, OPEN 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silent blur
+## BUG-537 (MED - D-2664, FIXED 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silent blur
 
 FOUND BY: the forensic question "did my own fix create a blindspot?" - asked of the BUG-536 fix's very next
 step. `archive/index.yaml` was STALE (`stored body_sha256 ecfe29517a94 != measured 07ab497cecf9`), so the rail's
@@ -6219,6 +6219,30 @@ STATUS: OPEN and NOT papered over. Class: the rail's remedy is not itself contro
 has no known-answer control asserting "an on-disk object that was indexed is either still indexed or declared
 gone" (BUG-492: the control must be SEEN to fire). The pre-image is preserved at /tmp/index_yaml_pre.yaml for
 the next pass. NOT a measurement artifact, so nothing downstream is consumption-blocked.
+
+CORRECTED 2026-09-26 (D-2664) - THIS BLOCK ATTRIBUTED THE DE-LISTING TO THE WRONG ACT, AND THE PRE-IMAGE IT
+NAMES DISPROVES ITS OWN NUMBERS. It claimed "Diff: 25 insertions / 26 deletions" and "the entries NAME SET is
+byte-identical". MEASURED now, both sides carried by their DIGESTS: the pre-image this block names,
+`/tmp/index_yaml_pre.yaml` (generated 2026-09-26T10:48:33, body_sha256 ecfe29517a941e1b76cff4482d1c43877b3363f2cb1f5b618d459c37a1e45667), ALREADY carries 32
+entries and ZERO `.DS_Store`: the remedy run removed NOTHING. `git show HEAD:archive/index.yaml` - the COMMITTED
+index (generated 2026-09-24T10:40:37, body_sha256 07e8e3559727bc9955c0048ee520d23d1c0284eb15c7dbdacc327737a881281b) - still listed it. So the de-listing
+happened when the BUG-469 ignore block landed, between those two generations, and not at 2026-09-26T15:54. The
+25/26 diff was computed against the COMMITTED index while the text named the pre-image: a diff claim that does not
+carry the digests of both sides is not evidence (the D-2663 lesson, applied to the audit trail itself).
+THE REAL DELTA, pre-image -> now (`archive/index.yaml`, generated 2026-09-26T21:48:18, body_sha256 47532fca72a9ab9a8d7339ce1d34c4e5d9a7175d6869ada2052ccd09a16262eb):
+12 deletions / 31 insertions, and it is exactly the fix: (a) the `excluded` census appeared; (b) the ignored class
+left the COUNTS that had been silently including it, which is the "silent blur" this bug was about - `db_backups`
+files 3 -> 1, bytes 135528448 -> 135495680, modified 2026-09-19 -> 2026-09-17, and the largest entry 213 -> 207
+files / -98304 bytes (six AppleDouble/SQLite sidecars); local_archive bytes 17312358363 -> 17312161755.
+FIX (D-2664). archive/index.yaml now carries an `excluded` census - measured name, bytes and date of every object
+the index declines to count, with the DECLARED disposition - so an on-disk object is either INDEXED or DECLARED
+excluded, never silently absent. `--check` asserts that invariant against the stored index (`coverage_faults`: an
+on-disk name in NEITHER list, or an indexed name whose bytes are gone) and REFUSES an index carrying no readable
+census: an absent census is an UNKNOWN, not a clean (C16). The ignore block became the ONE home of the excluded
+class (names + globs + disposition + authority + reason, D-2646) and the unreachable `- match: '^\.DS_Store$'`
+rule was DELETED (C19) - it could never fire, because an ignored name never reaches classify() - while
+shadowed_rules() reports exactly that shape as a DECLARATION CONFLICT and exits 2, fail closed. Controls 0 -> 7
+(`--selftest`, no NLI, no live-tree write).
 
 ## BUG-538 (HIGH - D-2653, FIXED 2026-09-26): Maxwell pinned its SCRIPTS and its EVIDENCE but pinned ZERO GENERATORS - and the first rail that closed the gap shipped three defects the pre-commit audit found
 
@@ -6915,3 +6939,21 @@ checkpoint, `--limit 40`, digests of both arms recorded) was run under the commi
 D-356 pin) and under the final bytes: `results` sha256 a4c9a1d6f37433a1 in BOTH, counts 231/21/0 in BOTH, and
 `only_in_B = ['provenance']`. The uncommitted delta and this fix are therefore SCORE-NEUTRAL BY MEASUREMENT, not
 by claim. NOTHING was laundered: the digest is re-pinned under a NEW decision (D-2663), never under D-382.
+
+## BUG-556 (HIGH - D-2664, FIXED 2026-09-26): the archive rail's INPUT was mutated by the very ladder that checks it - a transient SQLite sidecar was counted, so the index moved with zero content change
+
+FOUND BY: the forensic question asked of the BUG-537 remedy ("did my own fix create a blindspot?") turned out to
+point at the rail's INPUT, not its output. Measured, not inferred: `archive/db_backups/maxwell_pre_index_20260917.db-shm`
+carried mtime 2026-09-26T21:44 - written during the `just health` run that was checking this rail - with its
+`-wal` sibling of the same class beside it. A/B on ONE tree, one config field apart: with the sidecar COUNTED the
+`db_backups` entry is `files: 3 / bytes: 135528448 / modified: 2026-09-19` (the digest-carrying pre-image above);
+with it DECLARED EXCLUDED it is `files: 1 / bytes: 135495680 / modified: 2026-09-17` - the newest bytes that are
+actually content. That single field is why the index digest moved between generations, and why this rail could go
+RED with ZERO content change.
+CLASS: BUG-469's class, incompletely fixed. That bug named a directory date moving because a browser wrote
+`.DS_Store` into it; `-wal/-shm/-journal` are the SQLite face of the same fact - a file that appears and moves
+whenever any process OPENS the database beside it. A rail whose own ladder mutates its input is a rail the owner
+learns to ignore (BUG-462).
+FIX (D-2664). The declared ignore class gains `-(wal|shm|journal)$` in the SAME one home as the names and globs
+that exclude them, the excluded objects are REPORTED rather than skipped (BUG-537), and the class is held by the
+known-answer control `transient_sidecar_ignored` (a sidecar excluded, a real `.db` NOT).

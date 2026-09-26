@@ -31,6 +31,20 @@ external_archive_root:
 
 # Ordered rules; FIRST match wins. A disposition is a claim about what may be done
 # to the entry, not something this script does.
+# BUG-469 (2026-09-25): macOS Finder / Dropbox writes '.DS_Store' into any directory it browses, and a
+# directory's OWN mtime moves with it. This rail went RED with ZERO content change (measured: +1 file,
+# +6148 bytes, and archive/.DS_Store rewritten at 18:01:21 today). OS metadata is not archive content, so
+# it is excluded from every count AND from the `modified` date (the date is the newest non-ignored
+# descendant, never the directory's own mtime). Without this the rail is flaky by construction and a
+# flaky rail is a rail the owner learns to ignore - the failure class BUG-462 already names.
+ignore:
+  names: ['.DS_Store', 'Thumbs.db']
+  globs: ['^\._', '-(wal|shm|journal)$']   # AppleDouble sidecars; SQLite transient sidecars (BUG-556)                    # AppleDouble sidecars
+  category: os_metadata
+  disposition: purge_candidate
+  authority: hygiene
+  reason: 'machine-generated, regenerable, never archive content (file-browser metadata, AppleDouble sidecars, SQLite -wal/-shm/-journal sidecars). A transient sidecar moves whenever any process OPENS the database beside it, so counting one makes this rail a function of whoever read the DB last (BUG-556); excluded from every count and from the modified date, and REPORTED rather than silently absent (BUG-537). This block is the ONE home of the excluded class: the classifier reports a rules: pattern that this block already excludes as a DECLARATION CONFLICT, fail closed (C16/D-2646)'
+
 rules:
   - match: '^bak_sweep_'
     category: sweep
@@ -87,11 +101,11 @@ rules:
     disposition: purge_candidate
     authority: folder_protocol
     reason: empty directory; carries no bytes and no evidence
-  - match: '^\.DS_Store$'
-    category: os_metadata
-    disposition: purge_candidate
-    authority: hygiene
-    reason: macOS Finder metadata; regenerable, never evidence
+  # C19/BUG-537 (D-2664): a rule HERE for a name the ignore block already excludes can never fire -
+  # ignored names never reach classify(). The `- match: '^\.DS_Store$'` rule that used to sit on this line
+  # was measured to match nothing, and it is the reason the hygiene object left the index unnoticed.
+  # shadowed_rules() now reports such a rule as a DECLARATION CONFLICT (exit 2, fail closed), so the
+  # declaration cannot go dead in silence again.
 
 default:
   category: unclassified

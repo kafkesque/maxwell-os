@@ -8956,3 +8956,51 @@ decisions:
     the very next edit moved the digest again. This re-mint replaces the claim with a measurement that anyone can
     re-run from two recorded digests, and it refuses to certify bytes it had not first audited - the audit is what
     found BUG-555, a falsehood the pin would otherwise have frozen into place.
+- id: D-2664
+  state: OPEN
+  category: DERIVED DATA / RAIL INTEGRITY
+  date: '2026-09-26'
+  title: the archive index reports what it declines to count and its input stops being volatile - a transient SQLite
+    sidecar had made a rail a function of whoever opened the database last, and a buglog block that named an artifact
+    it never read was corrected with both digests
+  files:
+  - scripts/build_archive_index.py
+  - config/archive_index.yaml
+  - justfile
+  - archive/index.yaml
+  - governance/buglog.md
+  bugs:
+  - BUG-537
+  - BUG-556
+  decision: D-2664 (BUG-537, BUG-556, with D-2646/BUG-469) - archive/index.yaml carries an `excluded` census (measured
+    name, bytes, date plus the DECLARED disposition) so every on-disk object is either INDEXED or DECLARED excluded
+    and never silently absent; `--check` asserts that invariant (coverage_faults) and REFUSES an index with no readable
+    census, because an absent census must not read as a clean one (C16); the ignore block is the ONE home of the
+    excluded class (D-2646) and the unreachable `^\.DS_Store$` rule is DELETED (C19) with shadowed_rules() failing
+    CLOSED (exit 2) on that shape; and the declared class gains the SQLite sidecar `-(wal|shm|journal)$`, because
+    such a file moves whenever any process OPENS the database beside it. Controls 0 -> 7, no NLI, no live-tree write.
+  measured: 'A/B on ONE tree, one config field apart: `db_backups` = files 3 / bytes 135528448 / modified 2026-09-19
+    with the sidecar COUNTED (the -shm mtime written by the very `just health` run at 21:44) versus files 1 / bytes
+    135495680 / modified 2026-09-17 with it DECLARED EXCLUDED. Layout, each side by DIGEST: HEAD index generated
+    2026-09-24T10:40:37 body 07e8e3559727bc9955c0048ee520d23d1c0284eb15c7dbdacc327737a881281b, 32 entries INCLUDING
+    .DS_Store; the pre-image the BUG-537 block names, generated 2026-09-26T10:48:33 body ecfe29517a941e1b76cff4482d1c43877b3363f2cb1f5b618d459c37a1e45667,
+    32 entries with none; now, generated 2026-09-26T21:48:18 body 47532fca72a9ab9a8d7339ce1d34c4e5d9a7175d6869ada2052ccd09a16262eb.
+    Pre-image -> now is 12 deletions / 31 insertions and is exactly the fix (the census, plus the ignored class
+    leaving the counts that had silently included it: local_archive bytes 17312358363 -> 17312161755, one entry
+    213 -> 207 files / -98304 bytes). So the de-listing is the BUG-469 landing, not the 2026-09-26T15:54 remedy
+    run - the block''s own attribution is corrected, not quietly dropped.'
+  verification: 'python3 scripts/build_archive_index.py --selftest -> 7/7 known-answer controls | --check -> ok
+    (32 entries, 1 declared exclusion, 17.3 GB, dispositions {external_move_candidate: 5, keep: 6, keep_append_only:
+    21}) | compile with -W error::SyntaxWarning -> clean | just health rc=0, i.e. the same ladder that mutates the
+    -shm no longer moves the index | bug_status / check_buglog_coverage / verify_handoffs / recompute_decision_summary
+    --check all rc=0 | SIGNED VERIFIER (R5): gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx -> VERDICT: APPROVE
+    (gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx, 2026-09-26) - none found (read-only review of scripts/build_archive_index.py,
+    config/archive_index.yaml, `git diff -- justfile`) - selftest: "archive-index controls: 7/7 known-answer control(s)
+    fire" - check: "ok archive index in sync (32 entries, 1 declared exclusion(s), 17.3 GB, dispositions {''external_move_candidate'':
+    5, ''keep'': 6, ''keep_append_only'': 21})" NOTE (recorded by the author, NOT by the verifier): the reviewer
+    is a 4B-class local model; its "none found" is a signature, not a proof. The binding evidence for this pat'
+  rationale: 'A de-listing nobody can see is the BUG-450 class one step earlier, and a rail that goes red because
+    the ladder read the database it indexes is exactly the flaky rail the owner learns to ignore (BUG-462). Both
+    are closed by REPORTING what the index declines to count and by DECLARING the volatility class in the same one
+    home that excludes it. The audit also corrected its own trail: a buglog diff must carry the digests of both
+    sides.'

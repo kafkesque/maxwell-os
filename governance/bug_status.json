@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 292,
-  "open_n": 127,
-  "closed_n": 165,
+  "total_ids": 293,
+  "open_n": 126,
+  "closed_n": 167,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -634,11 +634,6 @@
       "events": 1
     },
     {
-      "id": "BUG-537",
-      "title": "(MED - PROPOSED D-2653, OPEN 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silen",
-      "events": 1
-    },
-    {
       "id": "BUG-545",
       "title": "(MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history",
       "events": 1
@@ -793,6 +788,7 @@
     "BUG-534",
     "BUG-535",
     "BUG-536",
+    "BUG-537",
     "BUG-538",
     "BUG-539",
     "BUG-540",
@@ -809,6 +805,7 @@
     "BUG-552",
     "BUG-553",
     "BUG-554",
-    "BUG-555"
+    "BUG-555",
+    "BUG-556"
   ]
 }

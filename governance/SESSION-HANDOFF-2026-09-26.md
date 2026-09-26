@@ -321,3 +321,25 @@ D-2661/D-2662.
   vs final e2ced5fa...; controls 4/4; legacy substring rule True on the live input vs 0/40 rows with a coder key.
 - **NOT DONE, DECLARED**: the scored-axis list in `label_source.column` is still prose (D-2646 second home) -
   left out so the measurement certifies exactly what it measured.
+
+## 2026-09-26T (D-2664 - the archive rail reports its exclusions; the audit corrected its own buglog block)
+
+WHY THIS ORDER: BUG-537 was the smallest remaining mine-owned defect, and it is the class the owner keeps paying
+for - a fix whose own remedy creates the next blindspot. So the audit ran FIRST and asked the buglog's claim to
+reproduce itself. It did not: the pre-image the block NAMES (`ecfe29517a941e1b...`) disproves both its numbers and its
+attribution.
+WHAT CHANGED: `scripts/build_archive_index.py` (`excluded` census, coverage invariant, shadowed-rule conflict,
+7 controls, `--selftest`, two self-caught nits fixed), `config/archive_index.yaml` (one home for the excluded
+class; `-(wal|shm|journal)$`), `justfile` (controls before the verdict), `archive/index.yaml` (regenerated,
+`.DS_Store` reported as a declared exclusion, body `47532fca72a9ab9a...`).
+EVIDENCE: `--selftest` 7/7 | `--check` ok (32 entries, 1 declared exclusion, 17.3 GB) | A/B
+files 3/135528448 B/2026-09-19 vs files 1/135495680 B/2026-09-17 | pre-image -> now 12 deletions / 31 insertions,
+which IS the fix | `just health` rc=0, i.e. the ladder that mutates the `-shm` no longer moves the index.
+SIGNED REVIEW (R5): gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx. Verdict: VERDICT: APPROVE (gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx, 2026-09-26) - none found (read-only review of scripts/build_archive_index.py, config/archive_index.yaml, `git diff -- justfile`) - selftest: "archive-index controls: 7/7 known-answer control(s) fire" - check: "ok archive index in sync (32 entries, 1 declared exclusion(s), 17.3 GB, dispositions {'external_move_candidate': 5, 'keep': 6, 'keep_append_only': 21})" NOTE (recorded by the author, NOT by the verifier): the reviewer is a 4B-class local model; its "none found" is a signature, not a proof. The binding evidence for this pat
+NOT DONE, DECLARED: the writer is still not routed through `write_guard` (it writes `archive/index.yaml` only,
+declared in `config/archive_index.yaml`).
+NEXT: the RAIL REGISTRY meta-rail (class i/ii/iii: a rail nothing runs, a rail whose verdict and exit code
+disagree, a rail whose remedy or INPUT is uncontrolled - BUG-537 and BUG-556 are both class iii); then the R2
+meter's ordered-axis list folded to ONE home; then the fnmatch tightening in `check_session_plan.py`;
+`freeze_gold_sets.py` through `write_guard`; then the owner's one-word depth/domain contract ruling, which
+unblocks the object-level (7,000-object / S0-S6) work.

@@ -83,6 +83,7 @@ health:
     python3 scripts/verify_boundary_injection.py || exit 1
     python3 scripts/depth_pass_agreement.py --report-only
     python3 scripts/depth_pass_agreement.py --check-cohort || exit 1
+    python3 scripts/build_archive_index.py --selftest || exit 1   # BUG-537/BUG-556/BUG-492: the archive rail's own decisions (a silent de-listing, a shadowed rule, a transient input) must be SEEN to fire
     python3 scripts/build_archive_index.py --check || exit 1
     python3 scripts/recompute_decision_summary.py --selftest || exit 1  # D-2660/BUG-492: the MINT gate's own controls - a record is joined to the tree BEFORE a byte is written
     python3 scripts/recompute_decision_summary.py --check || exit 1

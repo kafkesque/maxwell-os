@@ -403,3 +403,20 @@
   constant would touch the scoring path, so it is deliberately OUT of this measurement, not forgotten.
 - **OWED (owner)**: unchanged - the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw), the
   ANCHOR-4 depth drop-in rev 3, data/maxwell.db disposition.
+
+## 2026-09-26T - the archive index reports its exclusions, and the rail stops reading its own ladder's side effects (BUG-537 corrected / BUG-556 / D-2664)
+
+- **BUG-537 FIXED, and its own record CORRECTED.** The block blamed the remedy run; the pre-image it named
+  (`/tmp/index_yaml_pre.yaml`, body `ecfe29517a941e1b...`) proves the index had ALREADY de-listed `.DS_Store` before it,
+  and the committed HEAD index (`07e8e3559727bc99...`, 2026-09-24T10:40:37) still carried it - so the de-listing is the
+  BUG-469 ignore landing. The block's "25 insertions / 26 deletions" was computed against the commit, not the
+  pre-image it named.
+- **BUG-556 (HIGH, FIXED), found by chasing that field**: the rail's input moves when the ladder opens
+  `archive/db_backups/*.db`. A/B: `files 3 / 135528448 B / 2026-09-19` counted vs `files 1 / 135495680 B /
+  2026-09-17` declared excluded. Class: BUG-469, incompletely fixed.
+- **Controls 0 -> 7** (`--selftest`, no NLI, no live-tree write): silent de-listing, absent bytes, shadowed rule,
+  live-config shadow census, transient sidecar, fail-closed claim, clean case.
+- **OWED (mine)**: any rail that OPENS `archive/db_backups/*.db` still moves bytes (`-shm` regrows). Harmless now
+  (the class is declared and reported), but such a rail should be DECLARED as doing so - the RAIL REGISTRY's job.
+- **OWED (owner)**: unchanged - the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw), the
+  ANCHOR-4 depth drop-in rev 3, `data/maxwell.db` disposition.

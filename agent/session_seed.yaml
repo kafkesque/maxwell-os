@@ -332,3 +332,13 @@ open_bugs_n: 128
 # THE CLASS, ONCE MORE: a provenance field is a CONTROL only if its question is the question it claims to ask.
 # "coder" in the whole file text answers a SUBSTRING question and printed true on 400/400 records with no coder key.
 # A PIN closed on prose ("the change is additive") is not closed; it is closed by an A/B anyone can re-run.
+
+# 2026-09-26T (D-2664/BUG-537/BUG-556) - session trail (comments only: this file stays PARSEABLE).
+# THE CLASS, ONCE MORE, AND THIS TIME AT THE RAIL'S OWN INPUT: a rail that reads a tree it shares with the
+# ladder is a rail whose verdict depends on who ran what last. archive/db_backups/...db-shm (mtime 21:44,
+# written by `just health`) was counted, so the index digest moved with ZERO content change
+# (files 3/135528448 B/2026-09-19 counted vs files 1/135495680 B/2026-09-17 declared excluded).
+# AND: the buglog block for BUG-537 named a pre-image that DISPROVED its own numbers (ecfe29517a941e1b... already had
+# 32 entries and no .DS_Store). A diff claim must carry the DIGESTS of both sides - D-2663's lesson, applied to
+# the audit trail itself. archive/index.yaml body now 47532fca72a9ab9a... (12 deletions / 31 insertions vs the
+# pre-image, which IS the fix: the census, plus the ignored class leaving the counts that had included it).

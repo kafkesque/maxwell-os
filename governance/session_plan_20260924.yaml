@@ -410,3 +410,14 @@ widening_log:
       governance/session_plan_*.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md and agent/session_seed.yaml are ALL already inside
       may_touch, so NOTHING was widened and no glob was asked for. pipeline/** untouched. The A/B used a HEAD copy at
       temp/_ab_head_r2_meter.py, deleted before the commit and NEVER staged (the temp path is not a may_touch entry).'
+  - entry: 20
+    session: 20260926T
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: true
+    why: 'BUG-537/BUG-556/D-2664: the archive rail. scripts/build_archive_index.py and justfile are declared;
+      config/archive_index.yaml and archive/index.yaml are declared; governance/buglog.md, governance/bug_status.json|.md,
+      governance/CONTEXT_INDEX.md, governance/SESSION-HANDOFF-*.md, governance/session_plan_*.yaml, DECISION-LOG.md,
+      MASTER-TASK-REGISTER.md, config/decisions*.yaml|json and agent/session_seed.yaml are ALL already inside
+      may_touch. pipeline/** untouched. temp/d2664_record.yaml and temp/d2664_review.txt are scratch and are NEVER
+      staged. SIGNED REVIEW obtained (R5): gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx.'

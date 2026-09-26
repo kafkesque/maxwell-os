@@ -649,3 +649,22 @@ re-mint forced found BUG-555 first: `coder_key_present` asked whether the string
 raw text - true on 400/400 records of an input where not one record carries the key - so the field printed `true`
 on precisely the artifact BUG-450 exists to expose. It is a membership test on the parsed rows now (counts
 included, one pass, the third 102 MB read deleted), with 4 known-answer controls at `--selftest`.
+
+## D-2664 - The archive index reports what it declines to count, and its input stops being volatile (OPEN, minted 2026-09-26T)
+
+BUG-537 said regenerating `archive/index.yaml` de-listed a hygiene entry. Audit-first: the pre-image the block
+NAMES disproves its attribution - `/tmp/index_yaml_pre.yaml` (2026-09-26T10:48:33, body `ecfe29517a941e1b...`)
+already carries 32 entries and no `.DS_Store`; the remedy run removed nothing, and the committed HEAD index
+(2026-09-24T10:40:37, body `07e8e3559727bc99...`, 32 entries INCLUDING `.DS_Store`) dates the de-listing to the BUG-469
+ignore landing. Chasing that field found BUG-556: the rail's INPUT is mutated by the ladder that checks it -
+`archive/db_backups/...db-shm` (mtime 21:44, i.e. during `just health`) is a transient SQLite sidecar, and
+counting it is what moved the digest.
+
+FIX: `archive/index.yaml` gains an `excluded` census (name, bytes, date plus the declared disposition); `--check`
+asserts the coverage invariant (indexed or declared excluded, never silently absent) and refuses an index with no
+readable census; the ignore block is the ONE home of the excluded class and the unreachable `^\.DS_Store$` rule is
+deleted (C19), with `shadowed_rules()` failing CLOSED on that shape (exit 2); the declared class gains
+`-(wal|shm|journal)$`. A/B on one tree: files 3 / 135528448 B / 2026-09-19 counting the sidecar versus files 1 /
+135495680 B / 2026-09-17 excluding it, and the 12/31 diff between the pre-image (`ecfe29517a941e1b...`) and now
+(`47532fca72a9ab9a...`) is exactly that fix. Controls 0 -> 7 (`--selftest`). LESSON carried: a diff claim in a buglog
+must carry the DIGESTS of both sides - a claim that names an artifact it never read is not evidence.

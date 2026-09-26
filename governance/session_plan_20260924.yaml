@@ -71,6 +71,11 @@ may_touch:
   # it - a receipt that cannot be committed is not a receipt (the accepted rationale for governance/HANDOFFS.jsonl
   # and governance/evidence/**).
   - governance/ANCHOR_STORE_BRIDGE_20260926.json
+  - # D-2666 (2026-09-26): NAMED grants for the TWO owner artifacts this session repaired. NOT globs:
+  - # a wildcard over the owner gold would make the instrument editable by default - the BUG-548 shape
+  - # in the GRANTING direction (a plan that permits more than it says). Named, per-session, reviewable.
+  - governance/anchor_adjudication_workbook_20260924.csv
+  - governance/anchor_adjudication_fixlog_20260925.csv
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -421,3 +426,36 @@ widening_log:
       MASTER-TASK-REGISTER.md, config/decisions*.yaml|json and agent/session_seed.yaml are ALL already inside
       may_touch. pipeline/** untouched. temp/d2664_record.yaml and temp/d2664_review.txt are scratch and are NEVER
       staged. SIGNED REVIEW obtained (R5): gemma-4-E4B-it-MLX-4bit, provider maxwell_omlx.'
+  - entry: 21
+    session: 20260926T
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: true
+    why: >-
+      D-2665/BUG-557: the rail registry. Both paths this entry creates - scripts/check_rail_registry.py
+      and config/rail_registry.yaml - are NEW files and BOTH are already GRANTED by may_touch
+      (scripts/*.py, config/*.yaml): nothing was widened and no glob was asked for. Every governance home
+      is already inside may_touch. pipeline/** untouched. temp/d2665_record.yaml is scratch and is NEVER
+      staged. The mint was REFUSED once (BUG-550: the payload named BUG-492/537/546/556 but not its own
+      BUG-557); the record was corrected and the mint re-cut - and the commit message that claimed it was
+      minted BEFORE that correction is corrected here (the over-claim was a defect of the RECORD, not of
+      the bytes).
+  - entry: 22
+    session: 20260926T
+    widened:
+      - governance/anchor_adjudication_workbook_20260924.csv
+      - governance/anchor_adjudication_fixlog_20260925.csv
+    may_touch_untouched: false
+    will_not_touch_untouched: true
+    why: >-
+      D-2666: the owner RATIFIED the depth/domain contract and the activation was made real. This entry DOES
+      widen may_touch, by two NAMED paths and no glob: the certified workbook and its fixlog - the two
+      artifacts under repair. A session that may edit the owner gold by default is a session that can
+      clobber it, so the grant is NAMED, visible and reviewable instead of implied by a wildcard (the
+      BUG-548 shape in the granting direction: a plan that permits more than it says). The widened set is
+      DERIVED, not guessed - every OTHER touched path is already matched by may_touch (asserted below).
+      governance/handoffs/blobs/ is unchanged from HEAD and is therefore NOT claimed: a claim no rail
+      needs is noise, and a claim the plan does not grant is refused. pipeline/** untouched.
+      temp/d2666_*.py are scratch and are NEVER staged. Every rail measured green AFTER the change:
+      just health rc=0, health-deep --strict rc=0, verify_handoffs rc=0 with 6 declared path(s), 13
+      digest(s) and 3 revision(s) agreeing with their bytes.

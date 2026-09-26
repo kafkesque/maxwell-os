@@ -6623,3 +6623,41 @@ NOTE (same sitting, caught by a rail): the widening entry was first written with
 unquoted `@: ` inside a value, which made the plan UNPARSEABLE - the D-2648 class, reproduced by the hand that
 recorded it. Caught within seconds by `check_session_plan.py --selftest` (rc=1), repaired to a block scalar, and
 re-verified. The guard existed and fired; the write should have gone through `scripts/lib/yaml_guard.py`.
+
+## BUG-548 (HIGH - FIXED 2026-09-26): the plan RECORDED permissions it did not GRANT - the record is not the rule
+
+**MEASURED.** `governance/session_plan_20260924.yaml` carried 15 `widening_log` entries and FOUR paths claimed as
+widenings that `may_touch` never granted:
+
+| entry | recorded as a widening | in may_touch before this fix |
+| --- | --- | --- |
+| #1 (2026-09-25) | `governance/ANCHOR4_MANIFEST_20260924.json` | NO |
+| #6 | `governance/CONFLICT_REGISTER.md` | NO |
+| #9 | `scripts/*.sh` | NO |
+| #14 | `governance/NOT-YET-EVALUATED-RESEARCH.md` | NO |
+
+**ROOT CAUSE.** Rail 4 reads `may_touch` ONLY, and NOTHING read `widening_log` - so the log was a record with no
+consumer: a promise to a reviewer who cannot check it (D-2649: a declaration whose home is not the thing that is
+READ). The consequence was not theoretical: on the same day, TWO refused artifacts (`governance/CONFLICT_REGISTER.md`
+and `governance/RECONCILIATION.json`) were dropped out of COMMIT 1 by exactly this gap, while the plan read as if
+they were permitted. Entry 15 - added hours earlier to fix the same class by hand - had the identical shape and was
+caught only because rail 4 refused the commit.
+
+**FIX (the class, not the four paths).**
+- The four paths are GRANTED as NAMED paths (widening_log entry 16); the recorded glob `scripts/*.sh` is
+  WITHDRAWN in favour of the exact path `scripts/install_git_hooks.sh` (a directory glob asked for as a one-file
+  need is laundering surface, BUG-445/BUG-528); the two owner-acked `pipeline/**` crossings are declared
+  `crossing: true` - the SUBJECT of an ack, never standing permission.
+- `scripts/check_session_plan.py` now CHECKS the log on EVERY invocation: every `widened:` /
+  `additions[*].pattern` must be MATCHED by `may_touch`, unless the entry is `crossing: true` or the path is
+  listed under `withdrawn:`. FIVE known-answer controls, two of them anti-overreach (a GRANTED claim and a
+  WITHDRAWN claim must both be TOLERATED) plus the LIVE plan's own control (BUG-492).
+
+**VERIFIED.** `--selftest` 12/12 known-answer controls fire (was 7); `--staged` rc=0 over the staged set of every
+commit in this sitting; the live plan's own control PASSES only after the repair - it was written to FAIL first.
+
+**SUB-FINDING (MEASURED, NOT FIXED - OWED).** The matcher is `fnmatch`, so `*` crosses `/`: `scripts/*.py`
+therefore GRANTS `scripts/lib/yaml_guard.py`. Entries #5 and #7 were already granted BY ACCIDENT, and `may_touch`
+is LOOSER than its patterns read. Tightening the matcher FORBIDS paths that are legal today, so it is its own
+decision with its own blast-radius measurement - not a patch smuggled into this one. Until then: every new entry
+is a NAMED path, never a glob.

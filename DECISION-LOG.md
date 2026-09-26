@@ -577,3 +577,23 @@ HOME + PROOF: scripts/lib/artifact_encoding.py (declared(), 8/8 known-answer con
 MINTED BY: scripts/recompute_decision_summary.py --mint — a validated, emitter-rendered insertion path (the
 record is dumped by the YAML emitter, parsed back in full, and written with the derived fields in ONE write).
 STATE OPEN because the owner has not ratified it; nothing about the mint is a claim of approval.
+
+## D-2657 - A widening_log entry is not a permission until it is IN may_touch; the rail checks the record (OPEN, minted 2026-09-26)
+
+RULE: rail 4 reads `may_touch` ONLY, so a `widening_log` entry that records a widening is a PROMISE, not a permit.
+Every recorded widening MUST be matched by `may_touch`, unless the entry declares itself a `crossing: true`
+(an owner-acked one-off crossing of `will_not_touch`) or lists the path under `withdrawn:`. A plan that records a
+permission it does not grant FAILS the rail at every invocation.
+
+WHY: a record with no consumer is a declaration whose home is not the thing that is READ (D-2649). MEASURED
+2026-09-26 (BUG-548): four of fifteen recorded widenings were never granted, and two artifacts were dropped from
+COMMIT 1 by exactly that gap while the plan read as if they were permitted. Entry 15 - written hours earlier to fix
+the same class BY HAND - had the identical shape and was caught only because rail 4 refused the commit: a defect
+repaired by hand is repaired for one entry, never for the class.
+
+HOME + PROOF: `scripts/check_session_plan.py::widening_faults`, wired into `verdicts()` so it fires on `--staged`,
+on a finished commit and in `--selftest`; 12/12 known-answer controls (5 new: one that must FAIL on an ungranted
+record, two ANTI-OVERREACH controls that must TOLERATE a granted claim and a withdrawn one, one for `crossing:
+true`, and the LIVE plan's own control). The four paths are granted as NAMED paths (widening_log entry 16).
+STATE OPEN because the owner has not ratified it; nothing here is a claim of approval.
+

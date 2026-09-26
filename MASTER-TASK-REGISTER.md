@@ -349,3 +349,16 @@
   contract, instead of being recorded as OWED session after session. Commit the plan FIRST.
 - **OWED**: the three-commit landing; the `DECISION-LOG.md` narratives D-2650..D-2656; the owner's ruling on the
   depth/domain contract (3 red tests are a PAID red on an owner gate, not a defect).
+
+## 2026-09-26S - regulatory: the plan's own record was the last thing that could lie (BUG-548)
+
+- **BUG-548 (HIGH, FIXED)**: `widening_log` recorded 15 widenings and FOUR were never granted by `may_touch`.
+  Nothing read the log, so it was a record with no consumer. FIXED at the class: the rail now CHECKS every
+  `widened:` / `additions[*].pattern` against `may_touch` (5 new controls, 2 anti-overreach), the four paths are
+  GRANTED as NAMED paths (entry 16), the `scripts/*.sh` glob is WITHDRAWN for the exact path, and the two
+  owner-acked `pipeline/**` crossings are declared `crossing: true`.
+- **D-2657 (OPEN, minted)**: a widening_log entry is not a permission until it is IN `may_touch`.
+- **OWED (mine)**: tighten the `fnmatch` matcher (SUB-FINDING above) as its own decision, AFTER measuring which
+  live paths it would forbid; **R2 pin re-mint** (sha AND decision together, D-382/BUG-535) - the pin still names
+  `e9070635...` while the worktree holds `fbfd62f3...`, so it describes a file that does not exist.
+

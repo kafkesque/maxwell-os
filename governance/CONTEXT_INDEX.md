@@ -975,3 +975,19 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   uncommitted lines minting D-2649) and REFUSED, and `governance/RECONCILIATION.json` (a DECLARED artifact,
   `writer_of_record: scripts/reconcile.py`, `derived_regenerable`) was not in git AT ALL. WIDENED by FIVE
   NAMED PATHS (widening_log entry 15), never globs.
+
+### 2026-09-26S - the plan stops lying to its own reviewer (BUG-548 FIXED; `widening_log` now CHECKED)
+
+- **BUG-548 (HIGH, FIXED)**: `widening_log` was a RECORD WITH NO CONSUMER. FOUR of 15 entries claimed widens that
+  `may_touch` never granted (`governance/ANCHOR4_MANIFEST_20260924.json` #1, `governance/CONFLICT_REGISTER.md` #6,
+  `scripts/*.sh` #9, `governance/NOT-YET-EVALUATED-RESEARCH.md` #14), so the plan documented permissions it did not
+  give - and two artifacts were dropped from COMMIT 1 the same day by that gap. `scripts/check_session_plan.py` now
+  CHECKS the log (5 new controls, 2 anti-overreach); the four paths are GRANTED as NAMED paths (entry 16) and the
+  glob is WITHDRAWN in favour of the exact path `scripts/install_git_hooks.sh`.
+- **SUPERSEDED CLAIM**: "a widening_log entry is a permission". It is a RECORD. The permission is `may_touch`,
+  and only a rail that reads the record can make the two agree (D-2649 applied to the plan itself).
+- **SUB-FINDING, OWED**: `fnmatch` makes `*` cross `/`, so `scripts/*.py` grants `scripts/lib/**` - `may_touch` is
+  LOOSER than it reads. Entries #5/#7 were granted by accident. Tightening it is its own decision.
+- **D-2657 (OPEN)**: the rule above, minted. `config/decisions.yaml` is records-only (D-2655), so the mint is an
+  append + `recompute_decision_summary.py`, never a mid-file edit (BUG-539).
+

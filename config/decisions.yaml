@@ -8763,3 +8763,23 @@ decisions:
   - justfile
   bugs:
   - BUG-546
+
+- id: D-2657
+  category: GOVERNANCE / RULES
+  state: OPEN
+  title: 'A widening_log entry is not a permission until it is IN may_touch - and rail 4 now CHECKS the record'
+  rationale: 'MEASURED 2026-09-26 (BUG-548): 4 of 15 recorded widenings were never granted by may_touch
+    (governance/ANCHOR4_MANIFEST_20260924.json #1, governance/CONFLICT_REGISTER.md #6, scripts/*.sh #9,
+    governance/NOT-YET-EVALUATED-RESEARCH.md #14) because nothing read widening_log - a record with no consumer,
+    the D-2649 shape applied to the plan itself. Two artifacts were dropped from COMMIT 1 the same day by that
+    gap while the plan read as if they were permitted. Fix: the rail checks every widened:/additions[*].pattern
+    against may_touch (5 new controls, 2 anti-overreach), the four paths are GRANTED as NAMED paths (entry 16),
+    the scripts/*.sh glob is WITHDRAWN for the exact path scripts/install_git_hooks.sh, and the two owner-acked
+    pipeline/** crossings are declared crossing: true (an ACK, never a permit). SUB-FINDING, OWED: fnmatch makes
+    * cross /, so scripts/*.py grants scripts/lib/** - may_touch is LOOSER than it reads; tightening it is its
+    own decision because it forbids paths that are legal today.'
+  files:
+  - scripts/check_session_plan.py
+  - governance/session_plan_20260924.yaml
+  bugs:
+  - BUG-548

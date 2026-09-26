@@ -213,3 +213,18 @@ whose status is 'proposed' (owner gate). `--strict` (health-deep) stays RED unti
    D-2649..D-2656 narratives in `DECISION-LOG.md` (the log currently carries D-2649 only; the registry carries
    all 787 records). NEXT CODE STEP: `check_derivation_homes.py` must validate that a cited PATH-shaped
    table/column EXISTS on disk - a row can cite a nonexistent one and stay green.
+
+## 2026-09-26S - the plan's own record was the last thing that could lie
+
+1. **FORENSIC AUDIT FIRST** (as instructed), and it found three real things naive committing would have hit:
+   (a) the R2 pin names `e9070635acdec985...` while the worktree holds `fbfd62f326d26611...` and HEAD holds
+   `ca91c520791aa3f0...` - THREE digests, so the pin certifies a file that does not exist; (b) the pre-commit
+   hook executes `scripts/verify_recalibration_pins.py` and `scripts/check_session_plan.py` from the WORKING TREE
+   while BOTH are uncommitted (` M`) - the gate runs code that has no history (the BUG-545 class); (c) the plan
+   recorded four widenings `may_touch` never granted (BUG-548).
+2. **BUG-548 FIXED and made a RAIL** - the record is now checked, not remembered.
+3. **NEXT**: (i) R2 pin re-mint (sha AND decision TOGETHER; new id; the meter's scoring path is byte-identical in
+   behaviour, so the report is regenerated or explicitly not - never silently re-hashed); (ii) land the rails'
+   own bodies so the gate stops executing uncommitted code; (iii) tighten the fnmatch matcher as its own decision;
+   (iv) BUG-542 content-keyed silent-repair sites; (v) `check_derivation_homes.py` on-disk path validation.
+

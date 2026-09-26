@@ -459,3 +459,29 @@ widening_log:
       temp/d2666_*.py are scratch and are NEVER staged. Every rail measured green AFTER the change:
       just health rc=0, health-deep --strict rc=0, verify_handoffs rc=0 with 6 declared path(s), 13
       digest(s) and 3 revision(s) agreeing with their bytes.
+  - entry: 23
+    session: 20260926T
+    crossing: true
+    crossed:
+      - pipeline/migrate_D2205_epistemic.py
+      - pipeline/pipeline_paths.py
+      - pipeline/query.py
+      - pipeline/retrieve.py
+      - pipeline/serving_gate.py
+      - pipeline/stage5_verify.py
+      - pipeline/stage6_commit.py
+      - pipeline/label_traceability.py
+    acked_by: owner
+    acked_on: '2026-09-26'
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: false
+    why: >-
+      D-2668 (OWNER WORD: CROSS, 2026-09-26): the serving-gate PAIR crosses pipeline/** in ONE commit.
+      config/serving_gate.yaml (+67) is GRANTED while its consumer pipeline/serving_gate.py (+173, reads it at
+      line 22) is will_not_touch, and the granted tests/test_serving_gate.py exercises that module - so
+      committing the granted half alone would put a DECLARATION into history whose implementation is absent
+      (D-405 violated by a COMMIT SET: BUG-562). The owner acked ONE crossing rather than a may_touch widening,
+      because a may_touch entry is STANDING permission and this is production code: the permit NAMES its 8
+      subjects, NAMES its ack, and must be SPENT (`spent_by`) by the commit that lands them. The 44c249b
+      correction rides with it: the reconciliation the earlier commit DECLARED is the one this entry unlocks.

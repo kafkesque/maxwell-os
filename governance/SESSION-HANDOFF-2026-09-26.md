@@ -233,3 +233,38 @@ whose status is 'proposed' (owner gate). `--strict` (health-deep) stays RED unti
 1. **FORENSIC AUDIT FIRST** (as asked) found the ladder itself was lying about its own reach: `just health` RC=1 at justfile line 51 for a reason UNRELATED to the R2 pin, so the R2 OWNER-OWED red below it could not be seen at all. The cause was my owed BUG-542: a declared site keyed by a LINE NUMBER, orphaned when rail 0 grew for BUG-547 (one site, two symptoms, FATAL DRIFT).
 2. **FIXED AT THE CLASS**: `scripts/check_silent_repair.py` resolves a declared site by CONTENT (`match:`) or legacy `lines:`, exactly one of the two; a dead `match` is REPORTED; two entries may not claim one site. `--check` exit 2, 0 DRIFT, 0 STALE; 24/24 controls (2 anti-overreach). D-2658 minted OPEN.
 3. **NEXT**: R2 pin re-mint (meter + pin + new decision in ONE commit, never a quiet re-hash, D-382/BUG-535/BUG-542 precedent); then the rails' own bodies into git (BUG-545); then the `fnmatch` tightening decision; then the owner's depth/domain ruling.
+
+
+## 2026-09-26T (post-compaction) - LANDED: COMMIT A (bridge) + BUG-549 class fix + BUG-545 hook rails
+
+STATE: HEAD 99ad83d. FOUR commits, each gated by rails 0/3/4 at the commit boundary: b560f2b (plan widening entry
+17 FIRST - ef3e95b rule) -> 36c3557 (COMMIT A: the content-keyed anchor<->corpus bridge, BUG-420/D-2658) ->
+91684fe (BUG-549 class fix + D-2659 + records) -> 99ad83d (BUG-545 hook rails). The installed pre-commit hook
+EQUALS its re-derivation (`bash scripts/install_git_hooks.sh --check` rc=0).
+
+THE FORENSIC AUDIT - run BEFORE the first commit as instructed - FOUND TWO DEFECTS IN THE CHANGE-SET ITSELF:
+* BUG-550 (FIXED; class OWED): the D-2659 mint had CLONED D-2658's `files`, `bugs` and `rationale` - a record
+  naming the wrong module and the wrong bug. Repaired IN PLACE (it had never landed, so BUG-539 is intact) and the
+  summary re-derived (source_sha256 moved). MINTING STILL HAS NO HOME AND NO VALIDATOR: OWED a receipted minter
+  (next free id; non-empty title/rationale; named files EXIST; named bugs EXIST; the rationale NAMES its bugs) plus
+  a cloned-payload control. UNTIL THEN: every mint is read back FIELD BY FIELD before its commit.
+* BUG-551 (FIXED): the bridge exited 2 on the GOLDEN side while the config declared NOTHING - the verdict claimed a
+  declaration nobody made (the BUG-548 class, receiving side). `declared_golden_unjoined:` now names both ambiguous
+  rows; UNDECLARED unjoined = 1, DECLARED = 2, thin why = 1, a declaration that starts JOINING = 2 (shrink-only,
+  loudly). Controls 15 -> 19; the receipt now records `unjoined_detail` (cause + candidates).
+
+MEASURED AFTER: store-authority --check exit 0 (7 declared | 0 tombstone(s) in 2 regions | 0 faults); bridge
+--check exit 2 BACKED BY the declaration (150/150 anchor rows bridged: 149 exact + 1 normalised; golden 1025/1027);
+plan rail 14/14; pins rail 16/16; D-2659 reads back files=[check_store_authority.py, store_authority.yaml],
+bugs=[BUG-549]; register 288 ids / 127 open / 161 closed.
+
+OWNER GATES (unchanged, one word each): (1) promote the ANCHOR-4 depth drop-in rev 3 - HIGHEST VALUE, makes depth
+gradeable, flips the 3 declared reds; (2) rule A or B on the depth/domain contract - `just health-deep --strict`
+stays RED until ruled; (3) data/maxwell.db delete-or-keep (19 rows = 0.24% of the truth = wrong-answer hazard);
+(4) Dropbox siblings HELD vs DISCARD. scripts/definition_nli_verify.py remains OWNER-OWED red (R2 re-mint: a NEW
+decision id + a re-measurement, D-382 / BUG-535 / BUG-536) - NOT laundered into any commit above.
+
+NEXT (mine, consequential order): (1) the mint validator (BUG-550 class); (2) the pre-image RECEIPT (file + bytes
++ sha256); (3) the read-only opener helper + the shrink-only writable-connect ceiling (159 named sites);
+(4) BUG-537 archive/.DS_Store control; (5) freeze_gold_sets.py -> write_guard; (6) the check_derivation_homes
+path-existence DECISION; (7) A3 eval_integrity.yaml:14 SUPERSEDED; (8) A2 per-axis quadruple + the F-11 kappa floor.

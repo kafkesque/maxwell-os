@@ -722,3 +722,25 @@ OWED: the reconciliation commit (blocked by BUG-562), the mint of D-2667, the ow
   Ollama 3B-class models answered and none of those is a verifier, R5). The verification here is the rail's controls.
 - **OWED**: the BUG-562 PAIRING rail (the property holds only because a session looked); BUG-559 (receipts whose
   bytes join to no revision) then BUG-560 (the workbook applier through write_guard); BUG-563; the D-2667/D-2668 mints.
+
+## D-2669 (2026-09-26) - the CONSUMER JOIN: a declaration and the code that reads it are ONE object, at the WRITE moment and at the STATE moment
+
+DECISION. ONE home - config/declaration_consumers.yaml - plus ONE rail - scripts/check_declaration_consumers.py -
+measured at TWO moments (the RAIL 3 precedent, config/recalibration_pins.yaml): the WRITE moment in
+gitdir:hooks/pre-commit (RAIL 5) and the STATE mode in the ladder. A staged declaration whose declared consumer is in
+NEITHER HEAD NOR the index is a WITHDRAWN CONSUMER -> rc=1, the commit is refused. Worktree existence is deliberately
+NOT enough: the BUG-562 state was a consumer that EXISTED and was UNTRACKED. An entry with no consumer must carry
+exempt_reason (the flag-registry vocabulary). There is NO "lands later" escape.
+WHY NOT A CENSUS. A filename grep over config/*.yaml would LIE: config/anchor4_depth_annex.yaml is read through
+config/anchor_family.yaml#anchor4_depth_annex (a KEY, not a path) - measured, then rejected as an orphan. 4 edges are
+declared, each naming the line of its reader; growth is an edit with a reason.
+WHY NOT A may_touch PERMIT (D-2668's lesson): a standing grant over production code cannot be closed; a rail that
+refuses the SPLIT is a property and it can be closed.
+THE SECOND CLAIM (BUG-564). config/rail_registry.yaml#commit_boundary declares the hook's REQUIRED TEXT;
+check_rail_registry.py verifies it against the bytes: a dormancy claim said WHICH file exercises a rail, it could not
+say the file still DOES.
+MEASURED AFTER. consumers 11/11 controls, write moment rc=0 and state rc=0 on the live tree; registry 9/9 + live rc=0
+(80 ladder invocations, 56 rails invoked, 41 on disk); hook dry-run rc=0 with all four commit rails; just health rc=0;
+check_repo_integrity rc=0. The hand-edit of the hook was REFUSED by the ladder until the line was declared in its
+tracked source scripts/install_git_hooks.sh - the repo's own control, seen to fire.
+NO DELEGATE SIGNATURE IS CLAIMED (R5): no local verifier of the required capability was reachable this session.

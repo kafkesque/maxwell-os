@@ -28,6 +28,11 @@ python3 scripts/check_repo_integrity.py || exit 1
 # is that same home at the WRITE moment. It does NOT overreach: a commit naming no pinned artifact is tolerated
 # even while the tree is RED - only the commit that MOVES a pinned artifact is refused.
 python3 scripts/verify_recalibration_pins.py --staged || exit 1
+# RAIL 5 - refuse a commit set that SPLITS a declaration from the only code that reads it (D-2669/BUG-562).
+# The required lines of this hook are DECLARED in config/rail_registry.yaml#commit_boundary, so a line someone
+# deletes is caught by check_rail_registry.py - this hook lives outside the synced tree (BUG-500), where no diff
+# and no backup would show it.
+python3 scripts/check_declaration_consumers.py --staged || exit 1
 # RAIL 4 - refuse a commit whose staged paths are outside the session plan. Never bypass with --no-verify.
 exec python3 scripts/check_session_plan.py --staged
 HOOK

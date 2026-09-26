@@ -52,3 +52,16 @@ guards:
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal
   scripts/validate_depth_domain_contract.py --gate-if-active: tri_state
+
+#: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
+#: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup
+#: would show a line someone deleted, and the strictest gate in the system (RAIL 0/3/4/5) would silently disarm.
+#: Its REQUIRED TEXT is therefore a declaration, verified against the bytes on disk, fail closed (C16).
+commit_boundary:
+  path: gitdir:hooks/pre-commit
+  why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary'
+  must_contain:
+  - 'python3 scripts/check_repo_integrity.py'
+  - 'python3 scripts/verify_recalibration_pins.py --staged'
+  - 'python3 scripts/check_declaration_consumers.py --staged'
+  - 'python3 scripts/check_session_plan.py --staged'

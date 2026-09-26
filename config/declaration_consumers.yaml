@@ -1,0 +1,51 @@
+# config/declaration_consumers.yaml - the CONSUMER JOIN (D-2669). The ONE home of the fact "<declaration> is read by
+# <code>". A declaration and the code that reads it are ONE object: D-405 joins a claim to its reality, and BUG-562
+# measured the cost of NOT joining them at COMMIT time - config/serving_gate.yaml (GRANTED) landed while
+# pipeline/serving_gate.py, its ONLY reader, was withheld (will_not_touch). Nothing refused that commit set; the
+# property held only because a session looked.
+#
+# Consumed by scripts/check_declaration_consumers.py at TWO moments of the SAME home (the RAIL 3 precedent,
+# config/recalibration_pins.yaml): --staged at the WRITE moment (gitdir:hooks/pre-commit) and the default STATE mode
+# in the ladder (justfile: health).
+#
+# Rules the rail enforces, all mechanical:
+#   * every declaration named here must EXIST (a declaration whose subject is absent is an assertion, BUG-488);
+#   * every consumer must EXIST on disk (a declaration joined to nothing is prose, D-405);
+#   * in --staged mode a STAGED declaration whose consumer is in NEITHER HEAD NOR the index is a WITHDRAWN CONSUMER
+#     and the commit is refused. Worktree existence is deliberately NOT enough: the BUG-562 state was a consumer that
+#     EXISTED and was UNTRACKED.
+#   * there is deliberately NO "the consumer lands later" escape. The escape is: do not stage the declaration.
+#   * a declaration with NO consumer must say so with exempt_reason (the config/flag_consumer_registry.yaml
+#     vocabulary), so the emptiness is explicit instead of implied.
+# This registry does NOT census all config/*.yaml: a filename grep would LIE about a config read through another
+# config key (config/anchor_family.yaml#anchor4_depth_annex is the live example). An edge is declared by a decision,
+# and its growth is an edit with a reason.
+schema_version: '1'
+authority: D-2669
+decisions: [D-2669]
+declarations:
+- declaration: config/serving_gate.yaml
+  consumers: [pipeline/serving_gate.py]
+  decisions: [D-2668, BUG-562]
+  why: >-
+    the serving-gate declaration is read by exactly ONE module (pipeline/serving_gate.py::CONFIG_PATH); the BUG-562
+    incident was this pair landing in two commits, declaration first, reader withheld because pipeline/** was
+    will_not_touch.
+- declaration: config/label_provenance.yaml
+  consumers: [pipeline/label_traceability.py]
+  decisions: [D-2640, BUG-497]
+  why: >-
+    the label-provenance declaration's reader is pipeline/label_traceability.py::CONFIG_PATH; the module fails closed
+    on a missing or incomplete block, so a withheld reader leaves the declaration UNREAD, not broken.
+- declaration: config/flag_consumer_registry.yaml
+  consumers: [scripts/audit_flag_consumers.py]
+  decisions: [BUG-380]
+  why: >-
+    the flag registry is read by scripts/audit_flag_consumers.py::REGISTRY_PATH; a flag registry whose audit is
+    withheld is a registry nothing joins to a decision.
+- declaration: config/rail_registry.yaml
+  consumers: [scripts/check_rail_registry.py]
+  decisions: [D-2665]
+  why: >-
+    the rail registry is read by scripts/check_rail_registry.py::CFG; a registry whose reader is withheld is a
+    declaration that no rail reports on - the class (i) shape it exists to catch.

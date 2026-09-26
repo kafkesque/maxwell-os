@@ -7063,3 +7063,16 @@ FIX (owed): a PAIRING check - refuse a commit in which a changed granted artifac
 - **related**: the rail OUTPUT stores (`governance/MUTATION_JOURNAL.jsonl` - the R-D410 append-only receipt ledger,
   100 KB, `governance/INSTRUMENT_CONTROLS.jsonl`, `governance/METRICS.jsonl`, `drift_report_*`, `bench_preflight_*`)
   are in the same class: live outputs of rails, tracked by nothing.
+
+## BUG-564 - the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26
+
+STATUS OPEN (narrowed). MEASURED: the hook at gitdir:hooks/pre-commit is the strictest gate in the system
+(RAIL 0/3/4/5) and it lives OUTSIDE the synced tree (BUG-500): not in git, so no diff, review or backup shows a
+deleted line. One control already existed - a hand-edit was REFUSED at once by the ladder ("re-install: bash
+scripts/install_git_hooks.sh") - so the installed hook is joined to its tracked SOURCE. What was NOT declared is its
+REQUIRED TEXT: now declared in config/rail_registry.yaml#commit_boundary and verified line-by-line against the bytes
+by check_rail_registry.py, with a DELETED-line control SEEN to refuse (9/9 controls fire).
+BUG-562 is CLOSED BY CONSTRUCTION in the same act: scripts/check_declaration_consumers.py --staged REFUSES a commit
+set in which a staged declaration's declared consumer is in NEITHER HEAD NOR the index - the exact incident shape -
+with 11 synthetic controls. STILL OPEN: the hook ROUTE itself (a git dir re-created by a clone, or a hook installed
+by hand, is not a declared subject); and BUG-563 (backups/** + the rail output stores: neither granted nor excluded).

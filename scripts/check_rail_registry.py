@@ -73,7 +73,8 @@ def guard_of(body: str) -> str:
     return "unguarded"
 
 
-def audit(ladder: str, discovered: list[str], cfg: dict, exists=lambda p: True) -> tuple[list[str], dict]:
+def audit(ladder: str, discovered: list[str], cfg: dict, exists=lambda p: True,
+          read=lambda p: None) -> tuple[list[str], dict]:
     """Return (faults, census) for one ladder text, one set of discovered rails, one declaration."""
     inv = ladder_invocations(ladder, [str(r) for r in cfg.get("recipes") or []])
     invoked = {SCRIPT.search(c).group(1) for c in inv}  # type: ignore[union-attr]
@@ -106,6 +107,25 @@ def audit(ladder: str, discovered: list[str], cfg: dict, exists=lambda p: True) 
     for script in dormant:
         if script in invoked:
             faults.append(f"(i) STALE dormancy: {script} is declared dormant and IS invoked by the ladder")
+
+    # COMMIT BOUNDARY (BUG-564): a dormancy claim says WHICH file exercises a rail; it cannot say the file still
+    # DOES. This hook lives OUTSIDE the synced tree (BUG-500), so no diff would show a deleted line: its required
+    # text is a declaration here, verified against the bytes on disk, fail closed (C16).
+    cb = cfg.get("commit_boundary") or {}
+    if cb:
+        bp = str(cb.get("path") or "")
+        btext = read(bp) if bp else None
+        mc = [str(x) for x in (cb.get("must_contain") or [])]
+        if not bp or btext is None:
+            faults.append("(i) commit_boundary declares " + (bp or "<nothing>") + ", which is not a readable file - the "
+                          "commit-time rails would have no verifiable exerciser (C16/BUG-564)")
+        elif not mc:
+            faults.append("(i) commit_boundary " + bp + " declares NO must_contain - a claim with no subject")
+        else:
+            for want in mc:
+                if want not in btext:
+                    faults.append("(i) commit_boundary " + bp + " does NOT contain " + repr(want) + ": the rail the "
+                                  "registry says runs at COMMIT time would silently not run (BUG-564)")
 
     # (ii) a declared guard that disagrees with the ladder's own text
     for key, want in guards.items():
@@ -205,6 +225,17 @@ def selftest() -> int:
                                                                                         "why": "fixture"}}})
     check("writer_with_selftest", len(f), 0, "a declared writer whose --selftest the ladder runs is clean")
 
+    HB = "#/bin/bash" + chr(10) + "python3 scripts/check_a.py --staged" + chr(10)
+    b2 = {**base, "commit_boundary": {"path": "gitdir:hooks/pre-commit",
+                                      "must_contain": ["scripts/check_a.py --staged"]}}
+    f, _ = audit(L, ["scripts/check_a.py"], b2, read=lambda p: HB)
+    check("boundary_line_present", len(f), 0, "a declared commit-boundary line that IS in the file is silent")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": {"path": "gitdir:hooks/pre-commit",
+                "must_contain": ["scripts/check_declaration_consumers.py --staged"]}}, read=lambda p: HB)
+    check("boundary_line_deleted", len([x for x in f if "commit_boundary" in x]), 1,
+          "a commit-boundary line DELETED from the out-of-tree hook is reported, not trusted (i/BUG-564)")
+
     print(f"rail-registry controls: {ok}/{ok + fail} known-answer control(s) fire")
     return 1 if fail else 0
 
@@ -229,7 +260,20 @@ def main() -> int:
             return bool(gitdir) and (gitdir / p.split(":", 1)[1]).exists()
         return (REPO / p).exists()
 
-    faults, census = audit(text, declared, cfg, exists=exists)
+    def readx(p: str) -> str | None:
+        """The declared exerciser's TEXT: gitdir:<rel> resolves against THIS repo's out-of-tree git dir (BUG-500)."""
+        if p.startswith("gitdir:"):
+            if not gitdir:
+                return None
+            q = gitdir / p.split(":", 1)[1]
+        else:
+            q = REPO / p
+        try:
+            return q.read_text(encoding="utf-8")
+        except OSError:
+            return None
+
+    faults, census = audit(text, declared, cfg, exists=exists, read=readx)
     print(f"rail registry: {census['invocations']} ladder invocation(s), {len(census['rails_invoked'])} rail(s) "
           f"invoked, {census['discovered']} rail script(s) on disk, {len(census['dormant'])} declared dormant, "
           f"{len(census['writers'])} declared writer(s)")

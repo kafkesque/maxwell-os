@@ -377,3 +377,11 @@ open_bugs_n: 128
 # STILL OPEN: the BUG-562 PAIRING rail (nothing yet REFUSES a commit set whose granted consumer is withheld),
 # BUG-563 (backups/** neither granted nor ignored), BUG-559/560, the D-2667/D-2668 mints, the owner drop-in rev 3
 # promotion (BUG-493: HEAD carries the superseded rev 2).
+
+# D-2669 (2026-09-26): the CONSUMER JOIN is a property, not an act. config/declaration_consumers.yaml (4 edges) +
+# scripts/check_declaration_consumers.py: the WRITE moment in the pre-commit hook (RAIL 5, installed from
+# scripts/install_git_hooks.sh) refuses a commit set that withholds a declaration's reader; STATE mode + --selftest in
+# the ladder. BUG-562 CLOSED BY CONSTRUCTION. config/rail_registry.yaml#commit_boundary declares the hook's REQUIRED
+# TEXT and check_rail_registry.py verifies it (BUG-564: the hook ROUTE is not yet a declared subject).
+# MEASURED: health rc=0, registry 9/9 + live rc=0, consumers 11/11, hook dry-run rc=0 (4 rails), repo-integrity rc=0.
+# NEXT: BUG-559 -> BUG-560 -> BUG-563; the mints D-2667/2668/2669. OWNER (one word): PROMOTE rev 3 (526991cb).

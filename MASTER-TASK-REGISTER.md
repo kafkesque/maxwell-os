@@ -451,3 +451,15 @@
   its bytes exist in exactly one non-worktree copy; (d) the D-2667 + D-2668 mints; (e) BUG-559 then BUG-560.
   RISK: committing 8 `pipeline/**` files was the owner-acked crossing, and the reconciliation is what makes
   declarations and implementations land together - the pairing rail is what makes that a property instead of an act.
+
+### D-2669 DONE / OWED (2026-09-26)
+
+DONE. (1) BUG-562 CLOSED BY CONSTRUCTION: check_declaration_consumers.py --staged refuses a commit set that withholds
+a declared declaration's consumer (11 controls, incl. the exact incident shape). (2) config/declaration_consumers.yaml
+= the ONE home (4 edges). (3) RAIL 5 installed from scripts/install_git_hooks.sh and declared in
+config/rail_registry.yaml#commit_boundary, with check_rail_registry.py verifying the hook's TEXT (BUG-564).
+OWED. (a) the hook ROUTE is not yet a declared subject (a re-created git dir or a hand-installed hook is invisible);
+(b) BUG-559 then BUG-560; (c) BUG-563; (d) the D-2667 + D-2668 + D-2669 mints; (e) rev-3 promotion (owner word).
+RISK NOTE. PROMOTE is the highest future-tax item: HEAD carries the SUPERSEDED rev 2 of a write-locked instrument
+while the declared rev 3 is re-derivable from no git ref; its only other copy is a byte-exact (203963 B) blob under
+governance/handoffs/blobs/, which is covered by a .bin ignore rule - so a worktree clean destroys BOTH copies.

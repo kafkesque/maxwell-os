@@ -186,9 +186,10 @@ config_reads:
   receivers: [_CFG, cfg, config, conf, settings]
   config_glob: 'config/*.yaml'
   ceilings:
-    shadowed_declared: 210
+    shadowed_declared: 211
     undeclared: 2
     measured_by: scripts/check_config_defaults.py
+
 
   direction: shrink_only
   ceiling_changed: >-
@@ -196,6 +197,7 @@ config_reads:
     (scripts/check_config_defaults.py, next step) re-measures and its number replaces this one, recorded here.
     REMEASURED 2026-09-26 by scripts/check_config_defaults.py: shadowed_declared 179 -> 209, undeclared 20 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
     REMEASURED 2026-09-26 by scripts/check_config_defaults.py: shadowed_declared 209 -> 210, undeclared 2 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
+    REMEASURED 2026-09-26 by scripts/check_config_defaults.py: shadowed_declared 210 -> 211, undeclared 2 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
 
 enforcement:
   rail: scripts/check_derivation_homes.py

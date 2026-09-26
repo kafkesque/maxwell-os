@@ -28,9 +28,10 @@ from typing import Any
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 CONFIG = REPO / "config" / "anchor_family.yaml"
 MENU = REPO / "config" / "closed_menu_v5.json"
-ENCODINGS = ("utf-8", "latin-1")  # repo carries latin-1 sheets (see buglog)
 
 
 def load_config(path: Path = CONFIG) -> dict[str, Any]:
@@ -49,13 +50,9 @@ def sha256(path: Path) -> str:
 
 def read_csv_rows(path: Path) -> list[dict[str, str]]:
     """Read a CSV, falling back to latin-1 (the repo stores some sheets that way)."""
-    for enc in ENCODINGS:
-        try:
-            with path.open(newline="", encoding=enc) as fh:
-                return list(csv.DictReader(fh))
-        except UnicodeDecodeError:
-            continue
-    raise RuntimeError(f"undecodable with {ENCODINGS}: {path}")
+    # D-2646/BUG-516: the artifact DECLARES its encoding - latin-1 was a guess that silently mis-reads Mac Roman.
+    with artifact_encoding.open_artifact(path, REPO) as fh:
+        return list(csv.DictReader(fh))
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:

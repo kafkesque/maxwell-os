@@ -40,3 +40,25 @@ claims:
       - ~/Library/CloudStorage/Dropbox/claude projects/claude skills
       - session attachments referenced in goose sessions 20260913_1 / 20260919_3
     answer: not found yet
+  - id: NEG-002
+    claim: the FORM axis (extraction_type) has no anchor, i.e. FORM (1-4) is blank in the consolidated ruler
+           and in the depth blind sheet, so FORM cannot be an axis
+    axis: extraction_type
+    keys_used: [extraction_type_final, extraction_type_human, FORM (1-4), DEPTH (1-4)]
+    roots_searched:
+      - governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+      - governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+      - config/anchor_family.yaml
+      - config/human_instrument_locks.yaml
+      - config/form*.yaml            # the original (wrong) query: a glob over the wrong namespace
+    search_complete: true
+    not_searched: []
+    answer: refuted    # the negative is FALSE: the FORM anchor exists (145/150)
+    measured: >
+      FALSE (2026-09-25). extraction_type_final = 145/150 non-blank in the consolidated ruler;
+      FORM (1-4) = 145/150 non-blank in the depth blind sheet. The column that is blank (0/150) is DEPTH.
+      The original negative came from a glob over `config/form*.yaml` (a namespace that never existed) and
+      from reading the DEPTH column as FORM. Recorded as BUG-459 - the third false absence of the cycle.
+    standing_rule: >
+      an existence-NEGATIVE written in prose (a docstring, a comment, a report) must name the artifact set
+      searched and the query used, and that query must have been RUN. A docstring is not a search.

@@ -63,6 +63,7 @@ from pipeline.schema_accessor import (
     fb_source_books,
     fb_source_ids,
 )
+from pipeline.serving_gate import pre_write_verdict  # D274a/D274h: the pre-write half of the gate
 from pipeline.stamp import get_pipeline_commit, stamp_record
 from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
     validate_fb_content_type,
@@ -489,6 +490,15 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     if dd_flags:
         print(f"   ❌ insert_fb: discipline<->domain contamination {dd_flags} on "
               f"{fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2620)")
+        return False
+    # D274a / D274h (BUG-502): the WRITER half of the serving-gate invariant. The rail evaluates STORED
+    # rows after the fact; this refuses the row BEFORE the INSERT, through the SAME comparator
+    # (pipeline.serving_gate.store_verdict) the rail uses - so a status that the row's own verification
+    # record does not derive can never reach the governed store, and the rail stays a backstop rather
+    # than the only detector. MEASURED 2026-09-25: all 7,995 stored rows satisfy this predicate.
+    storable, complaint = pre_write_verdict(fb)
+    if not storable:
+        print(f"   ❌ insert_fb: {complaint} on {fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D274a)")
         return False
     try:
         conn.execute("""

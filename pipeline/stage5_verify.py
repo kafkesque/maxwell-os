@@ -47,20 +47,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.io_guard import load_jsonl, safe_write  # D2332: fail-closed JSONL boundary
-from pipeline.serving_gate import derive_status  # D274h: the single serving-gate rule
+from pipeline.serving_gate import (  # D274h / BUG-499 / BUG-502: ONE rule, never re-implemented (C21)
+    derive_conf_and_review,
+    derive_epistemic_status,
+    derive_status,
+)
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
-    S5_CONF_ENRICH_WEIGHT,  # D2310: confidence enrichment weight
-    S5_CONF_ISOR_WEIGHT,  # D2310: confidence ISOR weight
-    S5_CONF_MECH_WEIGHT,  # D2310: confidence mechanism weight
-    S5_HUMAN_REVIEW_ISOR,  # D2310: ISOR rating triggering human review
     S5_CHECKPOINT_INTERVAL,  # D2409: intra-stage incremental checkpoint cadence (FBs)
     S5_NLI_MODEL_LARGE,  # D2298: DeBERTa-v3-large (435M) sole NLI verifier
     S5_NLI_MAX_HYPOTHESIS_CHARS,  # D2321: hypothesis(definition) truncation for NLI pairing
     S5_NLI_MAX_PREMISE_CHARS,  # D2321: premise(evidence) truncation for NLI pairing
     S5_NLI_PASS_THRESHOLD,  # D2155: NLI score threshold for PASS (0.10, D2298 calibrated)
     S5_EVIDENCE_CONTAMINATION_RATIO,  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (C12 config-first)
-    S5_QUARANTINE_CONF_CAP,  # D2310: confidence cap for QUARANTINE
+    S5_QUARANTINE_CONF_CAP,  # noqa: F401  re-exported: tests/test_fail_closed_d2402_2405.py asserts against it  # D2310: confidence cap for QUARANTINE
     STAGE4_5_CHECKPOINT,  # F1/D2400: enriched S4 checkpoint (preferred when present)
     STAGE4_CHECKPOINT,
     STAGE5_CHECKPOINT,
@@ -979,7 +979,6 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         # 3. Determine status — DeBERTa-only (D2322 calibrated), via the single
         #    serving-gate rule (D274h): status is a function of the verification record.
         status, s5_reason = derive_status(results)
-        needs_human = False  # DeBERTa is the final authority — no human needed
 
         # Handle strict mode: any non-PASS → QUARANTINE
         if strict and status != "PASS":
@@ -990,22 +989,15 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         # D2310: ISOR computed BEFORE confidence (confidence uses ISOR, not NLI).
         from pipeline.schema_accessor import isor_score as _isor_score
         isor = _isor_score(fb)
-        isor_composite = float(isor.get("score", 0.0))
 
-        # D2310: Confidence = mechanism + enrichment + ISOR (NLI is a binary gate).
-        confidence_score = round(
-            S5_CONF_MECH_WEIGHT * mech_score_float
-            + S5_CONF_ENRICH_WEIGHT * enrich_score
-            + S5_CONF_ISOR_WEIGHT * isor_composite,
-            4,
+        # D2310 / BUG-502: the score axis (confidence + human-review flag) has ONE home -
+        # pipeline/serving_gate.py::derive_conf_and_review. It used to be retyped here AND in
+        # scripts/reinject_bug198_singletons.py (two truths for one rule). MEASURED 2026-09-25: the
+        # ONE home reproduces the stored confidence_score 7,995/7,995 and the stored
+        # needs_human_review 7,995/7,995 (scripts/check_s5_score_axis.py).
+        confidence_score, needs_human = derive_conf_and_review(
+            fact_passed, mech_score_float, enrich_score, isor
         )
-        if not fact_passed:
-            # NLI gate failed → cap confidence (fail-closed, D2093).
-            confidence_score = min(confidence_score, S5_QUARANTINE_CONF_CAP)
-
-        # D2310: human adjudication for QUARANTINED canonical principles (strong ISOR + NLI fail).
-        if not fact_passed and isor.get("rating") == S5_HUMAN_REVIEW_ISOR:
-            needs_human = True
 
         # Build verified FB. R14/C10: preserve generator provenance from Stage 4
         # (gen_model stays = generator); verifier identity is captured in verifier_model below.
@@ -1019,16 +1011,12 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         vfb["verifier_model"] = f"{S5_NLI_MODEL_LARGE} (threshold {S5_NLI_PASS_THRESHOLD})"
         vfb["verification_method"] = method
 
-        # D2284: Epistemic status — ISOR scoring
-        if isor["rating"] in ("strong",) and fact_passed:
-            epistemic_status = "corroborated"
-        elif isor["rating"] in ("strong", "medium") and not fact_passed:
-            epistemic_status = "cross-source-unverified"
-        elif fact_passed:
-            epistemic_status = "source-supported"
-        else:
-            epistemic_status = "speculative"
-        vfb["epistemic_status"] = epistemic_status
+        # D2284 epistemic label — BUG-499: this was the THIRD inline copy of the rule (the other two
+        # were the S5 checkpoint sync and the BUG-198 re-inject). The rule now has ONE home
+        # (pipeline/serving_gate.py::derive_epistemic_status) and its rating classes are declared in
+        # config/serving_gate.yaml (C12 / C21). Behaviour is unchanged: the config rules reproduce
+        # these branches in the same order — proved by re-deriving all 7,995 stored labels, 0 mismatch.
+        vfb["epistemic_status"] = derive_epistemic_status(fact_passed, isor["rating"])
         vfb["isor"] = isor  # D2284: Full ISOR scores embedded in verified FB
 
         elapsed = time.time() - start

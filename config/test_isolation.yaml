@@ -32,8 +32,5 @@ suite_rail:
   invocation: ['python3', '-m', 'pytest', 'tests', '-q', '-p', 'no:cacheprovider']
   min_collected: 261
   timeout_seconds: 900
-  known_red_reason: 'the depth/domain contract is status: proposed (owner gate) - its 3 tests are DECLARED red and SHRINK-ONLY (D-2656); a paid red is owner-owed, a new failure is FATAL, and a collection floor breach is FATAL'
-  known_red:
-    - 'tests/test_depth_domain_contract.py::test_group_variant_blast_radius_measured'
-    - 'tests/test_depth_domain_contract.py::test_real_data_regression'
-    - 'tests/test_depth_domain_contract.py::test_composite_and_answer_space_are_reported_as_different_facts'
+  known_red_reason: 'EMPTY since 2026-09-26 (D-2666). `status: proposed` on the depth/domain contract was the ONLY reason these 3 tests were DECLARED red; the owner RATIFIED the ruler, the certified workbook was restored from git HEAD, and all 3 now PASS on measured evidence (12 passed in 0.75s). This ceiling is SHRINK-ONLY and is now AT ITS FLOOR: a new failure is FATAL, a declared-red that still fails under --strict is FATAL, and a collection floor breach is FATAL. Raising it is a declared decision, never an edit.'
+  known_red: []

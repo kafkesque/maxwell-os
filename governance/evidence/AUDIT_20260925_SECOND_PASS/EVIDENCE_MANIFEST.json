@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "ruling": "AUDIT-2026-09-25-SECOND-PASS",
+  "date": "2026-09-25",
+  "generator": "assistant forensic sweep (read-only probes + rail runs)",
+  "decision": [
+    "D-371",
+    "D-372",
+    "D-373",
+    "D-374",
+    "D-377",
+    "D-378",
+    "D-379",
+    "D-380"
+  ],
+  "receipts": [
+    {
+      "file": "AUDIT_FINDINGS.md",
+      "sha256": "5b9aae617b8e63b2e8c17bf65f538496706af69a84209739f99ebd5603fdc3d3",
+      "bytes": 6588,
+      "role": "the findings, the measurements, the owner gates, the ordered next steps"
+    }
+  ],
+  "measured_inputs": [
+    {
+      "file": "governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITATION_11.csv",
+      "sha256": "77b56fe483e0bd94362f0f6052e1eaf4f90d99860b8eea06a45993395a89bd0f",
+      "bytes": 9496
+    },
+    {
+      "file": "config/claim_shape_instrument.yaml",
+      "sha256": "c993c9e22383170b59fcbb7ae332117221ce0be44c4e525367163d07fbb86854",
+      "bytes": 2882
+    },
+    {
+      "file": "scripts/build_claim_shape_instrument.py",
+      "sha256": "5f486d7dc826b3bb21d722bb2f01cf6f66c445b3e446d0cc59195605c426fc1b",
+      "bytes": 5713
+    },
+    {
+      "file": "scripts/score_claim_shape_gate.py",
+      "sha256": "255a3c4358b4ca9d73abcec64c51f1edc2440c9607f06a6638ab0e49539100c1",
+      "bytes": 6097
+    },
+    {
+      "file": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
+      "sha256": "29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698",
+      "bytes": 85811
+    },
+    {
+      "file": "governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv",
+      "sha256": "b47114d4cdb621bbf67ec39f37c119eff8b74ce2802ed4552ed6be2b51792167",
+      "bytes": 203253
+    },
+    {
+      "file": "config/anchor_family.yaml",
+      "sha256": "8ad6ac07f5f924fc9121d81695bbafa3ead39fbcd66c5a99465c914473a6dc49",
+      "bytes": 7326
+    },
+    {
+      "file": "config/menu_axis_hashes.yaml",
+      "sha256": "bf516446bc16e508efc079878b062bfee91da2a0b44605fbc6fde654c1311d01",
+      "bytes": 1759
+    },
+    {
+      "file": "config/closed_menu_v5.sha256",
+      "sha256": "cc902029253546a7d21885a5d0daa3912bd9183c659d430d07f94b8e29a9492b",
+      "bytes": 65
+    },
+    {
+      "file": "config/agreement_floor.yaml",
+      "sha256": "fb148870a2c163db35c675781755c5ed49390e1bf9bcc601669d98cdb34e1259",
+      "bytes": 3044
+    },
+    {
+      "file": "governance/existence_negatives.yaml",
+      "sha256": "d7659f4951767ca320c596765ac337a8d7fa75cab7c08d60008b3f1733aa4917",
+      "bytes": 4512
+    },
+    {
+      "file": "scripts/check_bug_status.py",
+      "sha256": "470f351199ac0b312b78edeedd083b8ccedbf16b5ec6f4f5f92f9bddc0c1ae9f",
+      "bytes": 1946
+    },
+    {
+      "file": "justfile",
+      "sha256": "d00aefe4b2a36db18dc77f3b766c0af9004a02be4c1983fc6c9a6a99a85d04b6",
+      "bytes": 16787
+    }
+  ]
+}

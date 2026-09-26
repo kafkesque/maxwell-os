@@ -117,6 +117,12 @@ outputs:
   blind_input: governance/frontier_pack_20260924/BLIND_INPUT_150.csv
   long_csv: governance/anchor_axis_coders_20260924.csv
   workbook: governance/anchor_adjudication_workbook_20260924.csv
+  # BUG-478 ROOT (owner gate, 2026-09-25): this file is the OWNER's blind instrument. A machine may CREATE it
+  # once when absent and may never rewrite it - write_outputs used to open it with mode "w", rebuild it from the
+  # dispute set and blank WORKBOOK_OWNER_COLS, one documented command away from destroying 148 rows of typed
+  # adjudication. config/artifact_ownership.yaml already listed that writer under machine_writers_forbidden.
+  # Declared, not defaulted: a default is how an owner artifact gets rewritten silently (C12).
+  workbook_create_only: true
   stats_json: governance/anchor_axis_cross_exam_20260924.json
   report_md: governance/ANCHOR_AXIS_CROSS_EXAM_20260924.md
   # the REVIEW SHEET the owner reads before the CSV: same rows, readable, recommendation inline

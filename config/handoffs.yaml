@@ -112,6 +112,29 @@ revision_locators:
       rev 2 while the receipt's digest describes rev 1. Byte count agreement with a digest disagreement is the
       signature of an equal-length in-place edit, and it is why a size check can never stand in for a digest.
 
+  # D-2666/BUG-558: the WORKBOOK's pre-ruling certified image. It was the live revision for the hour between the
+  # restore from git HEAD and the sanctioned applier run, so no live path holds it now - yet it is the body every
+  # claim about the clobber must be JOINED to. Declared so it re-derives from git on every run instead of
+  # surviving as a prose digest, and so BUG-559 (a receipt whose bytes are joined to NO revision) has a revision
+  # to join.
+  - digest: f2778a488610cbf1081f53d18421f558f7b2fec72d1d03d3d4265b4ee18ca1ca
+    path: governance/anchor_adjudication_workbook_20260924.csv
+    state: superseded
+    superseded_by: 972def3224a1abbad5f9d90a7c75f800e81df65a2c61c25a6783e603c62a439d
+    bytes_at: git:44c249b
+    declared_by:
+      - config/reconciliation.yaml
+      - config/artifact_ownership.yaml
+      - governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md
+    note: >-
+      Restored from git HEAD (99332 bytes) at 2026-09-26T20:27Z after this path was found holding a FOREIGN BODY
+      (574aafef64f0cff7, 92135 bytes: absent from EVERY revision of this path, lacking the normalizer's three
+      added columns, and scoring 38 hard MENU_OFF_TOKEN against the ruler while HEAD's bytes score 0).
+      scripts/apply_workbook_rulings.py then applied the owner's DECLARED rulings (R040 primary_domain 'emerging'
+      -> 'arts & culture'; R070/R080/R130 depth CARRY-FORWARD), which is why the LIVE digest is superseded_by.
+      The foreign body's bytes survive under backups/*.PRE_CLAUDER_RESTORE_* and its blob 574aafef64f0cff7.bin
+      STAYS in the sealed store: it is the evidence that a receipt once certified those bytes (BUG-559).
+
 # FLOORS MOVED: a rail that reads a journal (or a blob store) which does NOT EXIST must fail closed,
 # because 0 of 0 reads as "ok" (BUG-487) - but the floor itself now lives in ONE home,
 # config/evidence_floors.yaml (C12/C21). scripts/verify_handoffs.py reads it there; a floor

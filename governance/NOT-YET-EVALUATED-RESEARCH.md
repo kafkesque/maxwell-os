@@ -69,3 +69,49 @@
 | 2026-08-09 | R-03 (llmfit preflight) | ✅ ADDED to just preflight |
 | 2026-08-09 | R-02 (Structured JSON) | ⬜ PENDING A/B test |
 | 2026-08-09 | R-07 (Merged CRIBS+Classify) | ⬜ PENDING A/B test |
+
+
+---
+
+## Exhaustive competitor / alternative sweep for "make Maxwell OS engineering faster, less hallucinatory, more accurate" (OWNER-APPROVED 2026-09-26; home widened by widening_log entry 14)
+
+**Scope (the owner's definition):** everyday Maxwell OS engineering - fixing bugs, writing rails/scripts,
+engineering the pipeline's *code*, skill orchestration. NOT the pipeline's own inference quality (that stays
+open only if a change PROVABLY raises quality).
+
+**The question this sweep answers:** is there an EXISTING solution that improves it, and if so which one.
+**Decision rule applied to every row (the house gates, not preference):** a RAIL beats a MODEL for accuracy
+(deterministic > probabilistic for anything a rail can decide); C1 $0 marginal; C3 sovereign/local;
+C2/C4 no single closed model family, no vendor lock-in; C21 swappable behind a protocol; C25 agent-agnostic;
+prefer ALREADY-INSTALLED over a new dependency. Evidence tiers are marked, because a recalled claim is not a
+measurement: **[M]** measured on this machine | **[D]** read from disk/config/repo metadata | **[K]** engineering
+knowledge, NOT verified here (must be verified before adoption).
+
+| # | Class / candidate | Verdict | Tier + why |
+|---|---|---|---|
+| 1 | **Grammar / structured decoding** - `outlines` + `pydantic` present; Ollama 0.34.2 `format: <json schema>`; `xgrammar` ABSENT | **ADOPT (first)** | [M] dependencies measured present. The single biggest accuracy/tool-calling lever for the S4/menu-routing chores, and it costs no new dependency. `xgrammar` only if benchmarked. |
+| 2 | **Prefix/prompt caching + speculative decoding** - `mlx_lm.generate --prompt-cache-file`; draft-model speculation | **ADOPT behind a config flag** | [M] the capability exists in the installed `mlx_lm`; the 1.5-2.5x speedup itself is [K] LITERATURE, NOT measured here - adopt behind a flag, then measure on the eval rail (row 10). |
+| 3 | **Typed-decision / verifier arms** - laya-mlx, CLM (Contrastive-LM/CLM, CLM-8B), Jev-class heads | **WATCH-LIST, not adopt** | [D] `config/bakeoff_laya.yaml` role=labeler, phase_a=feasibility, `imports_in_production_code:false`; the arm is a STUB (`arm_typed_head()` raises NotImplementedError) so it has never produced a number. [D] CLM is the same lineage: a typed decision head over a CALLER-SUPPLIED criteria vocabulary; an 8B Qwen3 encoder served by vllm = no Metal/MLX path (breaks C1/C3), repo 3 days old, self-reported benchmarks. Its real claim is VERIFIER on agentic coding - which is row 9's loop, and it is still gated by D-300 + Phase B (D-317). |
+| 4 | **Verification COVERAGE (NLI)** - DeBERTa-v3-large, fail-closed | **EXTEND COVERAGE** | [D] "less hallucinatory" in a pipeline is coverage of verification, not model IQ. Swapping the verifier is C2/C4 risk; extending what it covers is free and monotone. |
+| 5 | **Agent frameworks** - LangGraph, CrewAI, AutoGen, OpenAI Agents SDK, smolagents | **REJECT** | [D] goose + MCP already provide the loop and the tool surface (C25); a framework would be a second orchestration home (the D-2646 one-home rule) plus future tax (C27). |
+| 6 | **Hosted workspaces** - Notion (the notion.site link), cloud agent platforms | **REJECT** | [M] HTTP 200, `<title>Notion</title>` - a marketing/workspace page, not a model or library; and hosted = C3/C1/C2 violations by construction. |
+| 7 | **Local inference servers** - OMLX (incumbent) vs vLLM vs llama.cpp vs Ollama | **KEEP OMLX** | [D] Metal/MLX-native, already serving the generator; moving would trade a $0 sovereign stack for a portability claim Maxwell does not need. |
+| 8 | **Deterministic codegen scaffolds** - libcst / ast-grep / `ast` + templates instead of asking a model to patch a script | **ADOPT as method** | [K] this is the house rule already ("the fix must be a rail, not a prompt") mechanized; needs one installed-check before use. |
+| 9 | **Agentic-coding eval harnesses** - SWE-bench Verified, Terminal-Bench, DeepSWE, plus CLM's claimed 87.6/81.6 | **ADOPT as METHOD, not as a leaderboard** | [K] the harness idea is right and the numbers are self-reported; what matters is row 10. |
+| 10 | **A per-capability EVAL SET for everyday engineering** (30-50 golden tasks: a rail to fix, a config to edit, a bug to root-cause) | **THE MISSING PREREQUISITE - ADOPT FIRST AFTER row 1** | [M] ABSENT on disk. Without it "faster / more accurate / less hallucinatory" is UNMEASURABLE, and every claim in rows 2, 3, 8, 9 is unfalsifiable. This is the acceptance test for everything else in this table. |
+| 11 | **Prompt-optimization tooling** - DSPy, guidance, LMQL; `promptfoo` (present, 1 owed artifact) | **DEFER to row 10** | [D] promptfoo config is an open debt; compiling prompts without an eval set optimizes nothing measurable. |
+| 12 | **Observability** - Langfuse / Phoenix (hosted) vs the local `METRICS.jsonl` + measure --gaps | **REJECT hosted / KEEP local** | [D] 321 metric records with floor/ruler/denominator already carry what an external tool would add, locally. |
+| 13 | **Static enforcement for the fleet** - pyright/mypy/ruff gate on C17's "type hints on all signatures" | **CANDIDATE (cheap, verifiable)** | [D] C17 is a DECLARED rule with no rail enforcing it - the BUG-492 shape ("a rule in a message is not a rule"). A repo-wide type gate is deterministic and would catch the sentinel-default class of defect that hit BUG-535 in-flight. |
+| 14 | **Recurrence detection over the buglog/decisions** - cluster root causes so a FAMILY cannot be fixed one member at a time | **CANDIDATE (the anti-treadmill lever)** | [M] BUG-526/528/531/533/536 are ONE family ("enforcement by name, not identity; an abort hides its successors") and were fixed as five separate incidents. A rail that names the family at the second occurrence is the cheapest available protection against going in circles. |
+
+**Honest limit of this register:** rows are CLASSIFIED and the decision rule is fixed; the [M]/[D] rows were
+verified on this machine, and the [K] rows are explicitly marked as NOT verified here - a per-candidate web
+sweep (current alternatives, licenses, benchmark provenance, and whether a candidate duplicates an installed
+capability) is the REMAINING WORK, not a claim made here. Retrying the entry shape that was recorded as a
+NEGATIVE RESULT (a reconciliation entry pointing at a JSON/markdown register) is forbidden (BUG-534).
+
+**Not adopted, and why (one line each):** CLM = 8B + vllm, no Metal path, 3-day-old self-reported benchmarks,
+gated by D-300/Phase B -> WATCH. laya-mlx = labeler head, zero scaffolding surface, arm never run -> WATCH.
+Notion = hosted workspace -> REJECT. Apple FM = see `config/apple_fm.yaml` (enabled:false, arms:[]) -> GATED
+ON MEASUREMENT, verdict in the buglog's BUG-538 discussion; it is an ARM for schema-shaped chores, never a
+generator (C2/C4) and never a verifier (S5 stays DeBERTa, D2298).

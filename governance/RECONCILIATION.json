@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "decided": "D-405",
+  "declaration": "config/reconciliation.yaml",
+  "results": [
+    {
+      "id": "depth_panel_raters_vs_workbook",
+      "state": "ok",
+      "evidence": "5 declared rater(s) == 5 column(s) ending '_depth'",
+      "check": "declared_keys_match_columns",
+      "about": "governance/anchor_adjudication_workbook_20260924.csv",
+      "declares": "config/agreement_floor.yaml#panels.depth_axis_panel.rater_status"
+    },
+    {
+      "id": "depth_panel_consumer_exists",
+      "state": "ok",
+      "evidence": "1 declared target(s) resolve",
+      "check": "consumer_exists",
+      "about": "scripts/depth_pass_agreement.py",
+      "declares": "config/agreement_floor.yaml#panels.depth_axis_panel.consumer"
+    },
+    {
+      "id": "f11_review_present",
+      "state": "ok",
+      "evidence": "1 declared target(s) resolve",
+      "check": "path_resolves",
+      "about": "governance/F11_ANCHOR_REVIEW_20260923.csv",
+      "declares": "config/agreement_floor.yaml#must_not_be_cited_as"
+    },
+    {
+      "id": "depth_workbook_row_count",
+      "state": "ok",
+      "evidence": "declared count == found count (148)",
+      "check": "count_matches",
+      "about": "governance/anchor_adjudication_workbook_20260924.csv",
+      "declares": "config/cohort_declaration.yaml#cohorts.anchor4_depth.measured_rows"
+    },
+    {
+      "id": "decision_registry_wellformed",
+      "state": "owner_owed",
+      "evidence": "6 citation value(s) are NOT id-shaped, so no rail can validate them - name the deciding decision or drop the key: [\"config/generator_pins.yaml:decided='PENDING'\", \"config/repo_integrity.yaml:decided='PENDING-OWNER'\", \"config/silent_repair.yaml:decided='BUG-518'\", \"config/store_authority.yaml:decided='PENDING-OWNER'\", \"config/store_columns.yaml:decided='PENDING-OWNER'\", \"config/yaml_guard.yaml:decided='PENDING-OWNER'\"]",
+      "check": "decision_registry_wellformed",
+      "about": "config/decisions.yaml",
+      "declares": "config/decisions.yaml#decisions"
+    },
+    {
+      "id": "reconciliation_artifact_resolves",
+      "state": "ok",
+      "evidence": "1 declared target(s) resolve",
+      "check": "path_resolves",
+      "about": "governance/RECONCILIATION.json",
+      "declares": "governance/RECONCILIATION.json"
+    },
+    {
+      "id": "artifact_ownership_decided",
+      "state": "ok",
+      "evidence": "1 cited decision(s) resolve in the registry",
+      "check": "decision_exists",
+      "about": "config/artifact_ownership.yaml",
+      "declares": "config/artifact_ownership.yaml#decided"
+    },
+    {
+      "id": "reconciliation_decided",
+      "state": "ok",
+      "evidence": "1 cited decision(s) resolve in the registry",
+      "check": "decision_exists",
+      "about": "config/reconciliation.yaml",
+      "declares": "config/reconciliation.yaml#decided"
+    },
+    {
+      "id": "register_divergence_decided",
+      "state": "ok",
+      "evidence": "1 cited decision(s) resolve in the registry",
+      "check": "decision_exists",
+      "about": "config/register_divergence.yaml",
+      "declares": "config/register_divergence.yaml#decided"
+    },
+    {
+      "id": "depth_domain_contract_decided",
+      "state": "ok",
+      "evidence": "1 cited decision(s) resolve in the registry",
+      "check": "decision_exists",
+      "about": "config/depth_domain_contract.yaml",
+      "declares": "config/depth_domain_contract.yaml#load_bearing.decided"
+    },
+    {
+      "id": "reach",
+      "state": "ok",
+      "evidence": "0 uninvoked of 102 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "unwired": [],
+      "edges": [
+        {
+          "file": "governance/p0_p1_criteria.yaml",
+          "reader": "drift_monitor.py",
+          "fired": 14,
+          "state": "ok"
+        }
+      ]
+    }
+  ],
+  "drift_n": 0,
+  "owner_owed_n": 0
+}

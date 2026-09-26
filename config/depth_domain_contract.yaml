@@ -23,8 +23,16 @@
 
 schema_version: '1.0'
 contract_version: '1.0.0'
-status: proposed            # proposed | active. `proposed` = nothing decides on this yet (importable, not wired).
+status: active              # proposed | active. ACTIVATED 2026-09-26 by the owner's one-word ruling
+                            # (RATIFY, D-2666): the ruler is IN FORCE, its findings are gating, and the
+                            # activation was preceded by restoring the certified workbook from git HEAD
+                            # (the live path held a foreign body - BUG-558).
 owner_gate_required: true   # activation is a C22 owner act, not an assistant one.
+owner_gate:
+  ruling: RATIFY
+  by: owner
+  date: '2026-09-26'
+  evidence: 'governance/MASTER-TASK-REGISTER.md#D-2666 (restore + activation + measured counts)'
 
 inputs:
   menu: config/closed_menu_v5.json

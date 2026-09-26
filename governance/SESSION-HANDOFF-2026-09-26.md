@@ -343,3 +343,14 @@ disagree, a rail whose remedy or INPUT is uncontrolled - BUG-537 and BUG-556 are
 meter's ordered-axis list folded to ONE home; then the fnmatch tightening in `check_session_plan.py`;
 `freeze_gold_sets.py` through `write_guard`; then the owner's one-word depth/domain contract ruling, which
 unblocks the object-level (7,000-object / S0-S6) work.
+
+### D-2666 - RATIFY executed (the ruler is active, the gold is the certified generation, the ladder is GREEN)
+
+The owner ruled RATIFY on the depth/domain contract's owner gate. Executing it surfaced the real defect one layer down, and both were closed:
+
+1. `status: proposed` -> `active` + owner_gate. The validator is gating; its 38 findings are the work list; the 7,000+ object depth/domain program is no longer measuring against an unratified ruler.
+2. BUG-558 (HIGH, FIXED): the live workbook was a FOREIGN BODY - 92135 B, matching no revision of its path, 43 domain + 42 depth answers SHORT of HEAD, 38 hard findings that were really un-normalized comma-joined owner cells. Restored from `git show HEAD:` atomically, owner rulings re-applied through the sanctioned applier, foreign bytes preserved to backups/ (R-D410). The declaration had been reconciled TO the foreign body (`mac_roman`, measured off its own 0xCA byte) - all three homes now say `utf-8` with the reason; the D-2649 join REFUSED the disagreement first, which is the control working.
+3. The receipt is honest again (`--backfill`, origin=backfill by design) and the pre-ruling image is a declared sealed revision locator, so the intermediate state re-derives from git rather than living in prose.
+4. Ceiling 3 -> 0 (SHRINK-ONLY). `just health` rc=0, `just health-deep --strict` rc=0, 261 collected / 256 passed / 0 failed.
+
+NEXT (in order): BUG-559 (refuse a receipt whose bytes join to no revision - with a control seen to refuse one) -> BUG-560 (the applier through write_guard) -> re-cut the workbook's receipt against the committed revision -> HEAD reconciliation with receipts -> the SEALED REVIEW PACK. OWNER: PURGE vs KEEP the two foreign-body backups; the Dropbox siblings HELD vs DISCARD decision; hooks ACTIVE.

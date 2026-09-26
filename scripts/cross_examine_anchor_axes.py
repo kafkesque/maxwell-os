@@ -42,6 +42,7 @@ from typing import Any
 import yaml
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 sys.path.insert(0, str(REPO / "scripts"))
 import build_discipline_domain_vote as bddv  # noqa: E402  (the shared taxonomy surface, never a copy)
 
@@ -107,7 +108,7 @@ def read_frontier(path: pathlib.Path, declared: dict[str, Any]) -> tuple[list[di
     want = declared.get("sha256")
     if want and got != want:
         fatal.append(f"{path.name}: sha256 {got[:12]} != declared {want[:12]} - reply changed since it was declared")
-    text = blob.decode("utf-8", errors="replace")
+    text = artifact_encoding.open_artifact(path, REPO).read()  # BUG-511: no silent U+FFFD; the declaration decides
     if declared.get("fenced", True):
         blocks = re.findall(r"```(?:csv)?\s*\n(.*?)```", text, re.S)
         if len(blocks) != 1:
@@ -220,7 +221,7 @@ def read_owner_gold(cfg: dict[str, Any]) -> tuple[dict[str, int], dict[str, str]
         return {}, {}, [f"owner gold sha256 {got[:12]} != locked {entry['sha256'][:12]} - REFUSING (rail 1)"]
     depths: dict[str, int] = {}
     confs: dict[str, str] = {}
-    with sheet.open(encoding="utf-8-sig", newline="") as fh:
+    with artifact_encoding.open_artifact(sheet, REPO) as fh:
         for row in csv.DictReader(fh):
             i = (row.get("item_id") or "").strip()
             if ITEM_RE.match(i):
@@ -244,7 +245,7 @@ def collect(cfg: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[str], 
     blind = REPO / cfg.get("blind_input", "governance/frontier_pack_20260924/BLIND_INPUT_150.csv")
     if not blind.exists():
         return items, [f"blind input {blind} is missing - the workbook cannot carry row names, refusing"], []
-    with blind.open(encoding="utf-8-sig", newline="") as fh:
+    with artifact_encoding.open_artifact(blind, REPO) as fh:
         for row in csv.DictReader(fh):
             if row.get("item_id") in items:
                 items[row["item_id"]]["name"] = (row.get("name") or "").strip()
@@ -506,6 +507,40 @@ def render_review(stats: dict[str, Any], dispute: list[dict[str, Any]], th: dict
     return "\n".join(L) + "\n"
 
 
+def _write_owner_workbook(cfg: dict[str, Any], path: pathlib.Path, cols: list[str],
+                          recs: list[dict[str, Any]], written: list[str]) -> None:
+    """CREATE the owner's blind workbook once, or leave it exactly as it is (BUG-478 root).
+
+    WHY. This path used to open the workbook with mode "w" and rebuild it from the dispute set, blanking every
+    column in WORKBOOK_OWNER_COLS. MEASURED 2026-09-25: the artifact carries 148 rows of the owner's typed
+    adjudication (depth_final, owner_date, domains_final), so the documented way to run a cross-exam was one
+    command away from destroying the instrument it exists to produce. config/artifact_ownership.yaml did not
+    merely omit this writer, it named it under machine_writers_forbidden: the declaration was right and the code
+    was wrong. Repair: a machine may CREATE this file when it is ABSENT (the blind instrument has to come from
+    somewhere) and may never rewrite one, and even the creation goes through write_guard.append_rows, so every
+    row is addressable by item_id and every column it fills is declared. Filling a panel column is
+    scripts/ingest_panel_column.py (D-398), never this script.
+    """
+    import sys as _sys
+    _sys.path.insert(0, str(REPO / "scripts"))
+    from lib import write_guard
+    create_only = (cfg.get("outputs") or {}).get("workbook_create_only")
+    if create_only is None:
+        raise SystemExit("REFUSING: config/anchor_cross_exam.yaml#outputs.workbook_create_only is not declared "
+                         "- a machine may not write the owner's instrument on an UNDECLARED default (C12, "
+                         "BUG-478: the default is how an owner artifact gets rewritten silently)")
+    rel = str(path.relative_to(REPO))
+    if create_only and path.exists():
+        print("  SKIP workbook " + rel + ": it EXISTS - a machine may create this instrument once and never "
+              "rewrite it (BUG-478 root; the owner's typed cells ARE the instrument, D-398)")
+        return
+    rep = write_guard.append_rows(path, recs, owned_keys=set(cols), writer=pathlib.Path(__file__).resolve()
+                                  .relative_to(REPO).as_posix(), id_column="item_id", columns=cols,
+                                  backup=False, journal=True)
+    print("  ok   workbook " + rel + " CREATED (" + str(rep.added) + " row(s), sha16 " + rep.post_sha16 + ")")
+    written.append(rel)
+
+
 def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: dict[str, Any],
                   gold: dict[str, int], notes: list[str]) -> list[str]:
     """Write the long CSV, the owner workbook, the stats JSON and the report. Returns the paths written."""
@@ -529,10 +564,8 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
                                                   "owner_answer_needed"] + WORKBOOK_OWNER_COLS
     dispute = [r for r in stats["per_row"] if r["tier"] in ("HARD", "SOFT") or r["flags"]]
     dispute.sort(key=lambda r: (0 if r["tier"] == "HARD" else 1, r["row"]))
-    with out["workbook"].open("w", encoding="utf-8", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=wb_cols, extrasaction="ignore")
-        w.writeheader()
-        for r in dispute:
+    wb_recs: list[dict[str, Any]] = []
+    for r in dispute:
             rec = {"item_id": r["item_id"], "row": r["row"], "tier": r["tier"], "flags": r["flags"],
                    "name": r.get("name", ""), "owner_depth": r["owner_depth"]}
             for c in coders:
@@ -546,8 +579,8 @@ def write_outputs(cfg: dict[str, Any], items: dict[str, dict[str, Any]], stats: 
                 recommend_row(r, cfg["thresholds"])
             for k in WORKBOOK_OWNER_COLS:
                 rec[k] = ""
-            w.writerow(rec)
-    written.append(str(out["workbook"].relative_to(REPO)))
+            wb_recs.append(rec)
+    _write_owner_workbook(cfg, out["workbook"], wb_cols, wb_recs, written)
     out["review_md"].write_text(render_review(stats, dispute, cfg["thresholds"]), encoding="utf-8")
     written.append(str(out["review_md"].relative_to(REPO)))
     out["stats_json"].write_text(json.dumps({"stamp": stamp(), "sources": cfg["sources"], "notes": notes,

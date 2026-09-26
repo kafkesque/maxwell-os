@@ -1,0 +1,4 @@
+claim_shape_q1: does the statement make a COMPARATIVE claim (more/less than) rather than assert a value or describe a practice?
+claim_shape_q2: is a STATED EXCHANGE RATE present (what you give up for what you get, or the variable the comparison turns on)?
+claim_shape_q3: is a BOUNDARY present (where the claim stops holding / the condition under which it inverts)?
+claim_shape_q4: is the claim FALSIFIABLE by an observation that could in principle be made?

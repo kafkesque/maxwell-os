@@ -172,6 +172,11 @@ def test_s5_resume_skips_verified_fbs(monkeypatch, tmp_path):
     monkeypatch.setattr(s5, "STAGE4_CHECKPOINT", s4_input)
     monkeypatch.setattr(s5, "STAGE4_5_CHECKPOINT", tmp_path / "s4_5_absent.jsonl")
     monkeypatch.setattr(s5, "S5_INPUT_FINGERPRINT_PATH", tmp_path / "verified.jsonl.input_fingerprint.json")
+    # BUG-475: the single-writer lock path is a separate module constant derived at IMPORT time
+    # (`Path(str(STAGE5_CHECKPOINT) + ".lock")`), so it does NOT follow the patched checkpoint.
+    # Left unpatched, this test creates the lock in the live t11 dir; a second S5 test in the same
+    # process then reads it as a LIVE holder (same pid) and exits — BUG-471.
+    monkeypatch.setattr(s5, "S5_LOCK_PATH", tmp_path / "verified.jsonl.lock")
 
     fbs = [_valid_fb(f"fb_{i}") for i in range(5)]
 

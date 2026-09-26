@@ -18,6 +18,9 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 
 ROOT = Path(__file__).resolve().parent.parent
 GOV = ROOT / "governance"
@@ -34,7 +37,8 @@ def _row_count(p: Path) -> int:
     try:
         if p.suffix == ".csv":
             # tolerate non-utf8 (cp1252/latin-1)
-            for enc in ("utf-8", "cp1252", "latin-1"):
+            # D-2646/BUG-516: one entry - the encoding the artifact DECLARES (no local vocabulary here).
+            for enc in (artifact_encoding.read_encoding(p, REPO),):
                 try:
                     with open(p, encoding=enc, newline="") as fh:
                         return sum(1 for _ in csv.reader(fh)) - 1
@@ -59,7 +63,8 @@ def _human_fill(p: Path) -> Dict[str, Any]:
     if p.suffix != ".csv":
         return out
     try:
-        for enc in ("utf-8", "cp1252", "latin-1"):
+            # D-2646/BUG-516: one entry - the encoding the artifact DECLARES (no local vocabulary here).
+        for enc in (artifact_encoding.read_encoding(p, REPO),):
             try:
                 rows = list(csv.DictReader(open(p, encoding=enc, newline="")))
                 out["n_rows"] = len(rows)

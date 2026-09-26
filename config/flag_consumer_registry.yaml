@@ -478,3 +478,35 @@ flags:
     config/omlx_m1_best_config.yaml::universal_apply.mtp_enabled (registered with the same shape).'
   note: 'registered 2026-09-23 under D-339; required = value observed at registration (D-338). Deferred to
     governance/FLAG_HYGIENE_TASKS_20260923.md for a delete-or-wire call (C19/C12/D-338).'
+
+- config: config/depth_domain_contract.yaml
+  path: load_bearing.enabled
+  required: false
+  decisions:
+  - D-394
+  - D-397
+  consumers:
+  - scripts/check_depth_load_bearing.py
+  consumer_symbols:
+    scripts/check_depth_load_bearing.py: 'lb.get("enabled")'
+  note: 'WIRED, and INVOKED as a rail (justfile:25 -> python3 scripts/check_depth_load_bearing.py || exit 1).
+    reader = scripts/check_depth_load_bearing.py:55 `enabled = bool(lb.get("enabled"))`. SEMANTICS (read the
+    script before flipping): false = PROHIBITIVE - every forbidden trace declared under this block makes the
+    rail exit 1; true = REPORTING - the same traces are printed and the rail passes. So flipping it on is a
+    DE-FANGING of D-394, not a feature switch, and the contract states the precondition (panel complete and
+    the axis above the operative floor). required = value observed at registration (D-338).'
+
+- config: config/depth_domain_contract.yaml
+  path: pct_scalar.enabled
+  required: false
+  decisions: []
+  consumers: []
+  exempt_reason: 'no consumer exists and ONE WAS SEARCHED FOR, not assumed: git grep pct_scalar matches only
+    this block, the buglog hygiene task and this registry - no file in pipeline/ or scripts/ reads
+    pct_scalar.enabled or pct_scalar.value. That is the honest state of a MEASURED-DEAD threshold: the block
+    itself records the measurement (max domain coverage 5/43 = 11.6%, Wilson CI [5.1%, 24.5%], while 75% of
+    43 is 32.2 domains, so no row reaches a sixth of the bar and any threshold >= 12% cannot lose), and
+    value 0.93 is kept only because it is the smallest inert value whose Wilson LOWER bound clears 0.75.
+    decisions: [] is deliberate - no record in config/decisions.yaml names pct_scalar, so citing one would be
+    a manufactured source. registered 2026-09-25 (session 20260925K) so the scanner stops reporting a flag
+    whose state is already recorded as inert; a delete-or-wire call stays open (C19/D-338).'

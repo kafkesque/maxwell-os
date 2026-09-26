@@ -17,10 +17,21 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 BUGLOG = REPO / "governance" / "buglog.md"
+OWNERSHIP = REPO / "config" / "artifact_ownership.yaml"
+#: This script's identity as a declared writer_of_record (config/artifact_ownership.yaml, D-401).
+WRITER = "scripts/bug_status.py"
+
+# D-401/I1 (BUG-530): write_guard.write_document is the ONLY legal whole-document writer, so BOTH outputs of this
+# generator are routed through it. The path insert is needed because this script runs as a direct invocation AND
+# as a subprocess of scripts/check_bug_status.py, whose cwd and sys.path are its own.
+sys.path.insert(0, str(REPO / "scripts"))
+from lib import write_guard  # noqa: E402
+
 C15_THRESHOLD = 5
 CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED")
 REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
@@ -120,12 +131,56 @@ def scan(text_lines: list[str]) -> dict[str, dict]:
     return bugs
 
 
+def declared_outputs() -> dict[str, str]:
+    """
+    This generator's outputs, read from the ONE ownership declaration (D-2646/C12) - never restated here.
+
+    WHY NOT A LITERAL: "which files does this script write" is a DECLARED fact (config/artifact_ownership.yaml,
+    D-401); a second copy of it inside this file would be the two-homes defect (D-2646), and the copy is the one
+    that goes stale. Fail closed (C16): a generator that cannot read its own declaration cannot tell a GOVERNED
+    write from a FOREIGN one, and that distinction is the whole of BUG-530.
+    """
+    import yaml  # lazy, matching scripts/lib/write_guard.py's own idiom (keeps this module's imports minimal)
+    if not OWNERSHIP.exists():
+        raise SystemExit("FAIL-CLOSED (BUG-530/D-401): " + str(OWNERSHIP) + " is absent - the declaration is the "
+                         "only source for which files this generator owns, so its outputs cannot be classified")
+    doc = yaml.safe_load(OWNERSHIP.read_text(encoding="utf-8")) or {}
+    mine = [str(p) for p, spec in (doc.get("artifacts") or {}).items()
+            if str((spec or {}).get("writer_of_record") or "") == WRITER]
+    by_suffix = {Path(p).suffix: p for p in mine}
+    missing = [s for s in (".json", ".md") if s not in by_suffix]
+    if missing:
+        raise SystemExit("FAIL-CLOSED (BUG-530): config/artifact_ownership.yaml declares no " + " / ".join(missing)
+                         + " output for writer_of_record " + WRITER + " (declared: " + str(mine) + ")")
+    return by_suffix
+
+
+def emit(target: Path, text: str) -> None:
+    """
+    Write one output crash-safely (C6), routed through the guard when the target IS a declared artifact.
+
+    THE ROUTING IS BY IDENTITY, NOT BY NAME (the BUG-528/BUG-531 class): the target is RESOLVED - symlinks and
+    '..' collapsed - before it is compared with the resolved declared artifacts, so the dotted form
+    './governance/../governance/bug_status.json' is the governed write it looks like. A string compare would let
+    that form bypass the guard, which is the same defect shape as a rename bypassing a lock (BUG-528).
+    A FOREIGN target (scripts/check_bug_status.py re-derives into a TEMP dir and byte-compares) goes through the
+    SAME guard call: it is the only legal whole-document writer (D-401/I1), and using it keeps crash-safety as ONE
+    implementation instead of a second local copy. Such a target is written with journal=False, because a mutation
+    receipt for a file that is not an artifact would make the ledger read as if a declaration had been rewritten.
+    """
+    governed = {str((REPO / p).resolve()) for p in declared_outputs().values()}
+    resolved = str(Path(target).resolve())
+    write_guard.write_document(Path(target), text, writer=WRITER, owned_keys={write_guard.OWNED_ANY},
+                               backup=False, journal=resolved in governed)
+
+
 def main() -> int:
     """Re-derive the status index, write it, and state the C15 consequence."""
     self_test()
     ap = argparse.ArgumentParser()
-    ap.add_argument("--json-out", default="governance/bug_status.json")
-    ap.add_argument("--md-out", default="governance/bug_status.md")
+    outs = declared_outputs()   # the defaults ARE the declared artifact paths - one home (D-2646)
+    ap.add_argument("--json-out", default=outs[".json"])
+    ap.add_argument("--md-out", default=outs[".md"])
     args = ap.parse_args()
     bugs = scan(BUGLOG.read_text(encoding="utf-8").splitlines())
     open_ids = sorted((b for b in bugs.values() if b["status"] == "open"), key=lambda b: int(b["id"][4:]))
@@ -136,14 +191,14 @@ def main() -> int:
                "c15_must_append_to_handoffs": len(open_ids) >= C15_THRESHOLD,
                "open": [{"id": b["id"], "title": b["title"], "events": len(b["events"])} for b in open_ids],
                "closed": [b["id"] for b in closed_ids]}
-    (REPO / args.json_out).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    emit(REPO / args.json_out, json.dumps(payload, indent=2) + "\n")
     rows = ["| id | title (last header) | events |", "|---|---|---|"]
     rows += ["| " + b["id"] + " | " + str(b["title"]) + " | " + str(len(b["events"])) + " |" for b in open_ids]
     head = ["# Bug status index (mechanical, re-derived)", "",
             "Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).", "",
             "**" + str(payload["open_n"]) + " open** / " + str(payload["closed_n"]) + " closed of " + str(payload["total_ids"]) + " ids.",
             "C15 append-to-handoffs required: **" + str(payload["c15_must_append_to_handoffs"]) + "** (threshold " + str(C15_THRESHOLD) + ").", ""]
-    (REPO / args.md_out).write_text("\n".join(head + rows) + "\n", encoding="utf-8")
+    emit(REPO / args.md_out, "\n".join(head + rows) + "\n")
     print("OPEN " + str(payload["open_n"]) + " / CLOSED " + str(payload["closed_n"]) + " of " + str(payload["total_ids"]))
     print("open ids: " + ", ".join(b["id"] for b in open_ids))
     return 0

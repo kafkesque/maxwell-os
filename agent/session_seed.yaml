@@ -342,3 +342,26 @@ open_bugs_n: 128
 # 32 entries and no .DS_Store). A diff claim must carry the DIGESTS of both sides - D-2663's lesson, applied to
 # the audit trail itself. archive/index.yaml body now 47532fca72a9ab9a... (12 deletions / 31 insertions vs the
 # pre-image, which IS the fix: the census, plus the ignored class leaving the counts that had included it).
+
+# D-2666 (2026-09-26) - RATIFY EXECUTED (comments-only: this file must stay parseable, C12).
+#   * config/depth_domain_contract.yaml status: active (owner_gate: RATIFY). The ruler is GATING; re-derive
+#     depth/domain labels AGAINST IT, never against a proposed document.
+#   * BUG-558 FIXED: the live ANCHOR-4 workbook was a FOREIGN BODY; certified bytes restored from git HEAD
+#     (f2778a488610cbf1) + owner rulings applied through scripts/apply_workbook_rulings.py = 972def3224a1abba.
+#     NEVER hand-edit that CSV: it is human_authored, and the one sanctioned writer is the applier (BUG-560: it
+#     is not yet receipted - do not treat its silence as safety).
+#   * The workbook's encoding has ONE value (utf-8) in all three homes of config/reconciliation.yaml. A
+#     declaration derived from the bytes on disk is how a clobber becomes certified (BUG-558).
+#   * BUG-559 OPEN: a receipt may be cut over bytes joined to no revision. verify_handoffs rc=0 today because
+#     the live digest is recorded AND its pre-ruling image is a sealed revision locator - not because the class
+#     is closed.
+#   * RATIFIED-BY-DEFAULT READING: when a rail's exit code is suppressed by an owner gate, every green rail is
+#     green BECAUSE it is silent. The gate is the finding.
+
+# D-2667 (2026-09-26): the plan PARSES and the ladder is GREEN (just health rc=0, verify_handoffs rc=0), and the
+# reconciliation commit is BLOCKED BY A FOUND DEFECT (BUG-562), not by a missing edit: a GRANTED config
+# (config/serving_gate.yaml) whose CONSUMER (pipeline/serving_gate.py:22) is will_not_touch - one without the other
+# declares a gate whose implementation is absent. may_touch now grants the TWO owner artifacts BY NAME, never a glob.
+# BUG-561: a TRACKED rename-sibling of the owner blind sheet was rewritten wholesale in the working tree - a rail
+# auditing only the STAGED set cannot see it. OWNER GATE (one word): CROSS the pipeline/** boundary for the
+# serving-gate pair, or SPLIT the reconciliation per pair.

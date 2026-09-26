@@ -263,11 +263,27 @@ S5_NLI_MAX_PREMISE_CHARS=int(_CFG.get("stage5", {}).get("nli_max_premise_chars",
 S5_NLI_MAX_HYPOTHESIS_CHARS=int(_CFG.get("stage5", {}).get("nli_max_hypothesis_chars", 256))  # D2321: hypothesis(definition) truncation
 S5_EVIDENCE_CONTAMINATION_RATIO=float(_CFG.get("stage5", {}).get("evidence_contamination_ratio", 0.15))  # D2545: D2496/BUG-181#1 severe evidence-contamination threshold (was hardcoded 0.15)
 # D2310: Confidence weights — NLI is a binary gate, not a score component (C12 config-driven).
-S5_CONF_MECH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("mechanism_weight", 0.35))
-S5_CONF_ENRICH_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("enrichment_weight", 0.25))
-S5_CONF_ISOR_WEIGHT=float(_CFG.get("stage5", {}).get("confidence", {}).get("isor_weight", 0.40))
-S5_QUARANTINE_CONF_CAP=float(_CFG.get("stage5", {}).get("confidence", {}).get("quarantine_cap", 0.25))
-S5_HUMAN_REVIEW_ISOR=str(_CFG.get("stage5", {}).get("confidence", {}).get("human_review_isor_rating", "strong"))
+def _s5_conf(key: str) -> object:
+    """Read an S5 confidence value from config/pipeline_config.yaml#stage5.confidence.
+
+    BUG-504 (C12/C16): this replaced .get(..., <code default>). A silent default lets a typo or a
+    rename change the S5 score axis with no error anywhere - the config miss IS the bug. An
+    undeclared key now raises, naming the file and the key.
+    """
+    try:
+        return _CFG["stage5"]["confidence"][key]
+    except KeyError as exc:
+        raise KeyError(
+            f"config/pipeline_config.yaml#stage5.confidence.{key} is NOT declared - S5 score-axis "
+            f"constants must be DECLARED, never silently defaulted (C12/C16, BUG-504)"
+        ) from exc
+
+
+S5_CONF_MECH_WEIGHT=float(_s5_conf("mechanism_weight"))
+S5_CONF_ENRICH_WEIGHT=float(_s5_conf("enrichment_weight"))
+S5_CONF_ISOR_WEIGHT=float(_s5_conf("isor_weight"))
+S5_QUARANTINE_CONF_CAP=float(_s5_conf("quarantine_cap"))
+S5_HUMAN_REVIEW_ISOR=str(_s5_conf("human_review_isor_rating"))
 S5_CHECKPOINT_INTERVAL=int(_CFG.get("stage5", {}).get("checkpoint_interval", 50))  # D2409: intra-stage incremental checkpoint cadence (FBs)
 
 # ── NLI threshold sanity check (D2185: T1.4 — catch misconfigured thresholds) ──

@@ -45,6 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.pipeline_paths import DB_PATH, VERIFY_MODEL  # noqa: E402
 from pipeline.stamp import get_manifest_hash  # noqa: E402
 from pipeline.schema_accessor import isor_score  # noqa: E402
+from pipeline.serving_gate import derive_epistemic_status  # noqa: E402  BUG-499: ONE label rule (C21)
 
 S5_DIR = Path("knowledge pipeline/stage5_verify/t11")
 CHECKPOINT = S5_DIR / "checkpoint.jsonl"
@@ -110,15 +111,9 @@ def _s5_record_from_db(row: sqlite3.Row, manifest_hash: str) -> dict:
     # S5-only fields — re-derived deterministically (NO NLI re-run).
     fact_passed = _fact_passed(row["verification_results"])
     isor = isor_score(rec)
-    if isor.get("rating") == "strong" and fact_passed:
-        epistemic_status = "corroborated"
-    elif isor.get("rating") in ("strong", "medium") and not fact_passed:
-        epistemic_status = "cross-source-unverified"
-    elif fact_passed:
-        epistemic_status = "source-supported"
-    else:
-        epistemic_status = "speculative"
-    rec["epistemic_status"] = epistemic_status
+    # BUG-499: this was the second inline copy of the D2284 rule. One home now
+    # (pipeline/serving_gate.py::derive_epistemic_status), rating classes in config (C12/C21).
+    rec["epistemic_status"] = derive_epistemic_status(bool(fact_passed), isor.get("rating"))
     rec["isor"] = isor
     rec["verification_method"] = "deberta-nli"
     return rec

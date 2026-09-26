@@ -89,10 +89,30 @@ def _failed_fb() -> dict:
     }
 
 
-def test_s5_failed_classification_quarantines(monkeypatch):
+def test_s5_failed_classification_quarantines(monkeypatch, tmp_path):
     """A classification_status=FAILED FB must go QUARANTINE with method
-    classification_failed — never PASS, and never reach the DeBERTa NLI call."""
+    classification_failed — never PASS, and never reach the DeBERTa NLI call.
+
+    BUG-473: run_stage5() resolves the PRODUCTION checkpoint path. With a faked
+    S4 loader the D2507 stale-archive path RENAMED the live 1.03 GB t11
+    checkpoint (checkpoint.jsonl -> checkpoint.jsonl.stale_20260925_182629).
+    The three paths below are redirected into tmp_path, exactly as
+    tests/test_checkpoint_resume_d2409.py does. STANDING RULE: a test may not
+    write outside a tmp dir (enforced by tests/conftest.py).
+    """
     failed_fb = _failed_fb()
+
+    # BUG-473: no test may resolve a production artifact path.
+    monkeypatch.setattr(stage5_verify, "STAGE5_CHECKPOINT", tmp_path / "checkpoint.jsonl")
+    monkeypatch.setattr(
+        stage5_verify, "S5_INPUT_FINGERPRINT_PATH", tmp_path / "checkpoint.jsonl.input_fingerprint.json"
+    )
+    monkeypatch.setattr(stage5_verify, "STAGE4_5_CHECKPOINT", tmp_path / "s4_5_absent.jsonl")
+    # BUG-475: S5_LOCK_PATH is derived from STAGE5_CHECKPOINT at IMPORT time, so patching the
+    # checkpoint alone left the single-writer lock in the PRODUCTION dir. Two S5 tests in one
+    # pytest process then saw each other's lock as LIVE (same pid) and the second died with
+    # SystemExit — the exact mechanism behind BUG-471's order-dependence.
+    monkeypatch.setattr(stage5_verify, "S5_LOCK_PATH", tmp_path / "checkpoint.jsonl.lock")
 
     monkeypatch.setattr(stage5_verify, "load_stage4_fbs", lambda: [failed_fb])
     monkeypatch.setattr(stage5_verify, "_load_dual_encoders", lambda: (None, None))

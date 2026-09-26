@@ -9004,3 +9004,78 @@ decisions:
     are closed by REPORTING what the index declines to count and by DECLARING the volatility class in the same one
     home that excludes it. The audit also corrected its own trail: a buglog diff must carry the digests of both
     sides.'
+- id: D-2665
+  state: OPEN
+  category: RAIL INTEGRITY / META
+  date: '2026-09-26'
+  title: the RAIL REGISTRY - one home for the fact that a rail IS a rail, so (i) a rail nothing runs, (ii) a printed
+    verdict that disagrees with its exit code, and (iii) a remedy or INPUT nobody controls are settled by the tree
+    instead of by inspiration
+  files:
+  - scripts/check_rail_registry.py
+  - config/rail_registry.yaml
+  - justfile
+  bugs:
+  - BUG-557
+  decision: 'D-2665 (with BUG-492/537/546/556, and this record''s own BUG-557) - config/rail_registry.yaml declares
+    the ladder, which rails are DORMANT and what exercises them (the exerciser must EXIST; `gitdir:` is resolved
+    from git, BUG-500), which rails are WRITERS and what they replace, and each rail''s guard class. scripts/check_rail_registry.py
+    parses the ladder''s OWN text, matches every declared guard against it (a disagreement fails CLOSED), and requires
+    every declared writer to have `--selftest` run BY THE LADDER: a rail that replaces bytes makes a claim, and
+    an unproven claim is where BUG-537/556 came from. 7 controls over synthetic ladders; no NLI, no live-tree write.'
+  measured: '78 ladder invocations / 55 rails invoked / 40 rail scripts on disk / 3 declared dormant / 3 declared
+    writers; `--selftest` 7/7; its FIRST real finding was about ITSELF - `(i) a rail NOTHING RUNS: scripts/check_rail_registry.py`
+    - closed by wiring it into the ladder; FOUR of the registry''s own defects were caught by its own controls before
+    it was wired (the invocation key kept `python3 ` so one control passed for the WRONG reason; a dormancy about
+    a script not on disk was never examined; `len()` on an int census; a hardcoded `.git/hooks` that is a lie in
+    this repo).'
+  verification: '`just health` rc=0 with the registry in the ladder, and the ladder''s FAIL/ERROR set is DIFF-IDENTICAL
+    to the pre-patch log (no cascade); --selftest 7/7; bug_status / check_buglog_coverage / verify_handoffs / recompute_decision_summary
+    --check / check_session_plan --staged all rc=0. NO delegate signature (the gemma-4-E4B-it-MLX-4bit review returned
+    a plan, not a verdict - a review that never ran is not cited as one).'
+  rationale: 'point fixes against a topological problem keep breeding: the fixes were right, the LAYER was missing.
+    Same invariant as D-2661/2662/2663, applied to the rail layer - and it doubles as the answer key that makes
+    an external frontier review comparable and falsifiable.'
+- id: D-2666
+  state: OPEN
+  category: OWNER GATE / DATA INTEGRITY
+  date: '2026-09-26'
+  title: RATIFY made real - the depth/domain ruler goes from proposed to ACTIVE, the certified ANCHOR-4 workbook
+    is restored from git HEAD with the owner's declared rulings re-applied, and the ruler reads GREEN on the gold
+  files:
+  - config/depth_domain_contract.yaml
+  - config/reconciliation.yaml
+  - config/handoffs.yaml
+  - config/test_isolation.yaml
+  - governance/anchor_adjudication_workbook_20260924.csv
+  - governance/anchor_adjudication_fixlog_20260925.csv
+  bugs:
+  - BUG-558
+  - BUG-559
+  - BUG-560
+  decision: 'D-2666 - the owner''s one-word ruling RATIFY flips the depth/domain contract from `status: proposed`
+    to `active` with an owner_gate block, so the validator is GATING and its findings are a work list. The same
+    pass closed BUG-558 (the live workbook was a FOREIGN BODY: 574aafef64f0cff7, 92135 B, matching no revision of
+    its path, 43 domain and 42 depth answers SHORT of HEAD, and 38 hard findings that were really pre-normalization
+    comma-joined owner cells), re-declared the encoding in ALL THREE homes of config/reconciliation.yaml (`utf-8`:
+    the old `mac_roman` had been measured off the foreign body''s own 0xCA byte), took an honest receipt via handoff.py
+    --backfill, declared the pre-ruling certified image as a SEALED revision locator re-derived from git:44c249b,
+    and SHRANK the suite ceiling 3 -> 0. BUG-559 (a receipt cut over bytes joined to no revision) and BUG-560 (the
+    sanctioned applier writes a human_authored artifact outside write_guard with no mutation receipt) are named
+    OPEN rather than papered over.'
+  measured: 'before: live 574aafef64f0cff7 / 92135 B / 38 hard MENU_OFF_TOKEN / 43 owner_blocked / the validator
+    ABORTING on an intra-file encoding disagreement, so it could not read its subject at all. after: live 972def3224a1abba
+    / 99228 B / the ruler on the authored gold `hard: 0, owner_blocked: 0, soft: 10`; `just health` rc=0; `just
+    health-deep --strict` rc=0; verify_handoffs rc=0 (6 declared path(s), 13 digest(s), 3 revision(s) all agree
+    with their bytes); 261 collected / 256 passed / 0 failed / 0 declared red / 5 skipped; the 3 formerly declared-red
+    depth/domain test ids now PASS (12 passed in 0.75s).'
+  verification: 'BUG-558 was measured by three independent comparators (the pre-ROWFLAGS backup, git HEAD bytes,
+    and a column/row census) agreeing that the disk body LOST answers and gained none; the D-2649 encoding join
+    was SEEN to refuse the disagreement in production BEFORE the fix (a control proven on real data, not asserted);
+    and every rail was re-run AFTER the change, not inferred - "the fix ran" is not "the rail is green". NO delegate
+    signature is claimed: this was byte-level restoration verified by scripts, not by a model.'
+  rationale: point fixes kept breeding because they were applied to symptoms; the missing layer was the RULER. 38
+    "illegal owner answers" were one wrong generation of file plus a declaration edited to match it. Activating
+    the ruler converts "which invariant has no owner" into a query, and restoring the bytes converts 38 findings
+    into zero - which is what a gating ruler is FOR. It also unblocks the 7,000+ object depth/domain program, which
+    would otherwise have re-derived labels against a document nobody had ruled on.

@@ -285,7 +285,13 @@ def _legend(header: list[str], stats: dict[str, Any]) -> str:
 
 
 def main() -> None:
-    """Write the review CSV + legend, refusing to overwrite an earlier export (append-only discipline)."""
+    """Write the review CSV + legend, refusing to overwrite an earlier export (append-only discipline).
+
+    The CSV goes through write_guard.append_rows (D-401/I1): gate A is this function's own refuse-if-exists rule
+    (an export is evidence, R-D410), gate B is the guard's declared append invariant - an empty or reused
+    item_id is refused, so the review can be re-joined to the ruler row by row. The former exemption claimed the
+    guard "refuses additions"; that is what the declared APPEND mode exists for (BUG-491c, instance 2).
+    """
     global CONF_KEYS
     cfg = _load_cfg()
     CONF_KEYS = dict(cfg["conf_columns"])
@@ -295,8 +301,16 @@ def main() -> None:
     for p in (out_csv, out_md):
         if p.exists():
             raise SystemExit(f"refusing to overwrite {p.relative_to(PROJECT_ROOT)} (append-only, R-D410)")
-    with out_csv.open("w", newline="", encoding="utf-8") as fh:
-        csv.writer(fh).writerows([header, *rows])
+    if "item_id" not in header:
+        raise SystemExit("REFUSING: this review header carries no item_id - every written row must be "
+                         "addressable under the guard's append invariant (D-401/I1)")
+    import sys as _sys
+    _sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+    from lib import write_guard
+    rep = write_guard.append_rows(out_csv, [dict(zip(header, r)) for r in rows], owned_keys=set(header),
+                                  writer=pathlib.Path(__file__).resolve().relative_to(PROJECT_ROOT).as_posix(),
+                                  id_column="item_id", columns=header, backup=False, journal=True)
+    print(f"   guard: mode={rep.mode} rows={rep.rows} added={rep.added} sha16={rep.post_sha16}")
     out_md.write_text(_legend(header, stats), encoding="utf-8")
     print(f"✅ {out_csv.relative_to(PROJECT_ROOT)}  ({len(rows)} rows x {len(header)} cols)")
     for i, c in enumerate(header):

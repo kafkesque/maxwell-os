@@ -27,6 +27,9 @@ import random
 import sys
 import tempfile
 from pathlib import Path
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 
 _ROOT = Path(__file__).resolve().parent.parent
 _SRC_CSV = _ROOT / "governance" / "RULER_BLIND_SHEET_20260917.csv"
@@ -85,7 +88,7 @@ def _crash_safe_write(path: Path, lines: list[str]) -> None:
 
 
 def _load_rows() -> list[dict]:
-    with open(_SRC_CSV, encoding="utf-8-sig", newline="") as f:
+    with artifact_encoding.open_artifact(_SRC_CSV, REPO) as f:
         reader = csv.DictReader(f)
         return [dict(r) for r in reader if (r.get("item_id") or "").strip()]
 

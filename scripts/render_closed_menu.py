@@ -14,6 +14,7 @@ Read-only w.r.t. the DB. Crash-safe write (tempfile → fsync → os.replace, C6
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import os
@@ -102,15 +103,56 @@ def _render_report(menu: dict, h: str, summary: dict) -> str:
 
 
 def main() -> int:
+    """Freeze the menu, or MINT a new revision - never rewrite a frozen one in place (D-371, I2).
+
+    MEASURED 2026-09-25: this script used to write config/closed_menu_v5.json unconditionally, so a taxonomy edit
+    re-froze the answer space with a NEW menu_hash and NO refusal, while config/artifact_ownership.yaml declared
+    the file immutable - the declaration and the mechanism disagreed (BUG-491c). D-371 then ruled the composite
+    pin HISTORICAL and the ANSWER SPACE (config/menu_axis_hashes.yaml#answer_space_hash) the pin. Both rules are
+    enforced here: an existing revision is never overwritten (a new answer space gets a NEW revision file, I2),
+    and the run prints the consumer-repoint obligation, because a revision nobody reads is not a live pin.
+    """
+    ap = argparse.ArgumentParser(description="Freeze or mint a closed-menu revision (D-279, D-371).")
+    ap.add_argument("--mint-version", type=int, default=None,
+                    help="mint config/closed_menu_vN.json (+ .sha256) as a NEW revision instead of writing v5")
+    a = ap.parse_args()
     menu = render_closed_menu()
     h = menu_hash(menu)
     summary = menu_summary(menu)
-
-    _crash_safe_write_text(_MENU_JSON, json.dumps(menu, sort_keys=True, ensure_ascii=False, indent=2) + "\n")
+    payload = json.dumps(menu, sort_keys=True, ensure_ascii=False, indent=2) + "\n"
+    if a.mint_version is not None:
+        target = _ROOT / "config" / ("closed_menu_v%d.json" % a.mint_version)
+        target_sha = _ROOT / "config" / ("closed_menu_v%d.sha256" % a.mint_version)
+        if target.exists():
+            print("REFUSED: " + target.name + " already exists - a revision is minted once and never rewritten "
+                  "(I2). Mint the NEXT version number.", file=sys.stderr)
+            return 1
+        _crash_safe_write_text(target, payload)
+        _crash_safe_write_text(target_sha, h + "\n")
+        print("minted " + target.name + " (menu_hash " + h[:16] + ")")
+        print("REPOINT OBLIGATION (I2, not optional): declare the new revision in config/menu_axis_groups.yaml"
+              " + config/menu_axis_hashes.yaml (source:) and repoint every declared live reader; a revision that"
+              " no reader reads is not a pin, and a reader on a SUPERSEDED revision stamps labels with a hash the"
+              " live config can no longer reproduce (D-277). Run: python3 scripts/menu_axis_hashes.py")
+        return 0
+    if _MENU_JSON.exists():
+        existing = _MENU_JSON.read_text(encoding="utf-8")
+        if existing == payload:
+            print("ok  " + _MENU_JSON.name + " is already the render of the live config (menu_hash " + h[:16]
+                  + ") - nothing to write")
+            return 0
+        print("REFUSED: " + _MENU_JSON.name + " exists and holds menu_hash "
+              + menu_hash(json.loads(existing))[:16] + ", while the live config renders " + h[:16]
+              + ". Overwriting it in place would destroy the provenance the frozen revision exists to provide and"
+              " would move the stamp every label carrying it was classified against (D-277, D-371: the composite"
+              " is HISTORICAL). Mint a NEW revision instead: python3 scripts/render_closed_menu.py --mint-version N"
+              " - then repoint the declared readers.", file=sys.stderr)
+        return 1
+    _crash_safe_write_text(_MENU_JSON, payload)
     _crash_safe_write_text(_MENU_SHA, h + "\n")
     _crash_safe_write_text(_REPORT_MD, _render_report(menu, h, summary))
 
-    print(f"✅ closed menu frozen:")
+    print("froze a FIRST revision:")
     print(f"   menu_hash = {h}")
     print(f"   content_types={summary['content_types']} extraction_types={summary['extraction_types']} "
           f"disciplines={summary['disciplines']} domains={summary['domains']}")

@@ -483,6 +483,17 @@ stage5:
   - because it provides
   - because it makes
   - because it can
+  # BUG-504 (2026-09-25): these five values were read with SILENT CODE DEFAULTS in
+  # pipeline_paths.py - a config miss could change the S5 score axis with no error anywhere. They
+  # are now DECLARED and read loudly (C12/C16). The values are byte-identical to the former
+  # defaults, so behaviour is unchanged and the stored corpus still reproduces on 7,995/7,995 rows
+  # (scripts/check_s5_score_axis.py). D2310.
+  #
+  # BUG-525 (2026-09-26): this key was declared TWICE in this mapping - a shadowed `confidence:` sat
+  # directly above `borp_bypass_types:` and PyYAML silently kept the LAST one, so the declaration
+  # above was a fact nobody read (D-2649). The shadowed copy was deleted. The surviving values are
+  # parse-IDENTICAL (0.4 and strong), so no score moves and the D-330 stage5 slice fingerprint is
+  # unmoved; only the ambiguity is gone. No reader ever saw the deleted copy.
   confidence:
     mechanism_weight: 0.35
     enrichment_weight: 0.25

@@ -1035,3 +1035,10 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   the unreachable `^\.DS_Store$` rule is deleted and `shadowed_rules()` exits 2 on that shape. Chasing it found
   BUG-556: a transient SQLite sidecar (`-shm`, mtime written by the health run itself) moved the rail's own input
   (files 3/135528448 B/2026-09-19 counted vs files 1/135495680 B/2026-09-17 excluded). 7 controls at `--selftest`.
+
+### D-2666 (2026-09-26) - RATIFY: the depth/domain ruler is ACTIVE, the certified workbook is restored (4th instance of the artifact_encoding join)
+- `config/depth_domain_contract.yaml` status: active (owner_gate: RATIFY). Its validator is now GATING: `just health` runs it (tri-state guard) and its 38 former findings are the scheduled work list.
+- The live workbook is the CERTIFIED generation again (972def3224a1abba), and its pre-ruling image (f2778a488610cbf1) is a declared sealed revision locator re-derived from git:44c249b. The foreign body (574aafef64f0cff7) survives only in backups/ + the sealed blob store, as evidence.
+- The workbook's encoding has ONE value in all THREE homes: `utf-8`. Read `config/reconciliation.yaml#artifact_encodings` for why a declaration measured off the bytes on disk is how a foreign body becomes certified (BUG-558).
+- BUG-559 (a receipt cut over bytes joined to no revision), BUG-560 (the applier writes a human_authored artifact outside write_guard): both OPEN, both named in the register.
+- The suite ceiling is 0 (was 3) and SHRINK-ONLY: the 3 declared red ids were red ONLY because the ruler was unratified.

@@ -12,6 +12,7 @@ from __future__ import annotations
 import ast
 import csv
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, Set
@@ -28,6 +29,9 @@ P5 = GOV / "p5_adjudication_final.json"
 REVIEW = GOV / "s4_discipline_review_sheet.utf8.csv"
 
 AXES = ("content_type", "depth", "discipline", "domains")
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lib.artifact_encoding as artifact_encoding  # noqa: E402 - the ONE home for a DECLARED encoding (D-2644)
 
 
 def _literal(v: Any) -> Any:
@@ -68,15 +72,18 @@ def main() -> None:
 
     # 63 contested discipline review
     if REVIEW.exists():
-        for row in csv.DictReader(open(REVIEW, encoding="utf-8")):
+        for row in csv.DictReader(artifact_encoding.open_artifact(REVIEW, ROOT)):
             v = (row.get("HUMAN_discipline_VERDICT") or "").strip()
             if v and row.get("fb_id") in by_fb:
                 human[row["fb_id"]]["discipline"] = "s4-review"
 
-    # 216-row DOMAIN review sheet (cp1252; fb_id is the blank first column)
+    # 216-row DOMAIN review sheet (fb_id is the blank first column). BUG-514: this reader used to GUESS a
+    # codec here; the sheet is Mac Roman (34 non-ASCII bytes) and 0xD1 decodes as an N-tilde under that
+    # guess but as an em dash in Mac Roman - a wrong read that does NOT crash (BUG-511). The encoding is
+    # DECLARED in config/reconciliation.yaml#artifact_encodings and read through the ONE home (D-2644).
     dom_sheet = GOV / "s4_domain_review_sheet.csv"
     if dom_sheet.exists():
-        for row in csv.DictReader(open(dom_sheet, encoding="cp1252")):
+        for row in csv.DictReader(artifact_encoding.open_artifact(dom_sheet, ROOT)):
             fb = row.get("") or row.get(" ")  # blank first-column header
             if not fb or fb not in by_fb:
                 continue

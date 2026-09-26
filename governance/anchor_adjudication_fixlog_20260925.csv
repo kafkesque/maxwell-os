@@ -12,3 +12,12 @@ R140,domains_final,,,BLANK-AS-SUBMITTED
 R070,depth_final,,,BLANK-AS-SUBMITTED
 R080,depth_final,,,BLANK-AS-SUBMITTED
 R130,depth_final,,,BLANK-AS-SUBMITTED
+R070,depth_final,,cross-domain,CARRY-FORWARD
+R070,depth_final_class,,2,CARRY-FORWARD
+R080,depth_final,,domain,CARRY-FORWARD
+R080,depth_final_class,,3,CARRY-FORWARD
+R130,depth_final,,domain,CARRY-FORWARD
+R130,depth_final_class,,3,CARRY-FORWARD
+R040,domains_final,emerging,arts & culture,OWNER-RULED
+R040,domains_final_raw,emerging,arts & culture,OWNER-RULED
+R040,primary_domain,emerging,arts & culture,OWNER-RULED

@@ -420,3 +420,19 @@
   (the class is declared and reported), but such a rail should be DECLARED as doing so - the RAIL REGISTRY's job.
 - **OWED (owner)**: unchanged - the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw), the
   ANCHOR-4 depth drop-in rev 3, `data/maxwell.db` disposition.
+
+## D-2666 (RATIFY) - DONE 2026-09-26: the ruler is active, the workbook is the certified generation, and the ladder is GREEN
+
+- DONE: `config/depth_domain_contract.yaml` status proposed -> active + owner_gate block (owner ruling RATIFY, 2026-09-26).
+- DONE (BUG-558): foreign body preserved (R-D410) -> backups/*.PRE_CLAUDER_RESTORE_20260926T202715Z; certified bytes restored from `git show HEAD:` (C6 atomic) -> f2778a488610cbf1; owner rulings re-applied through the sanctioned applier -> live 972def3224a1abba; pre-ruling image declared as a revision locator AND sealed (f2778a...bin) so it re-derives from git:44c249b on every run.
+- DONE: the encoding declaration corrected in ALL THREE homes (config/reconciliation.yaml) - `mac_roman` there had been measured off the foreign body. The D-2649 two-homes join fired on this disagreement in production before the fix: the control is PROVEN, not presumed.
+- DONE: honest receipt via `scripts/lib/handoff.py --backfill` (origin=backfill claims what the bytes ARE now, by design) -> verify_handoffs rc=0.
+- DONE: suite ceiling 3 -> 0 in config/test_isolation.yaml, with the reason replaced by the measured truth (the 3 ids were red ONLY because the ruler was unratified; they now pass). SHRINK-ONLY, at floor.
+- MEASURED: `just health` rc=0; `just health-deep --strict` rc=0; 261 collected / 256 passed / 0 failed / 0 declared red / 5 skipped.
+- OWED (mine, next): BUG-559 - refuse a receipt whose bytes join to no revision, with a control SEEN to refuse one; then re-cut the workbook receipt against the committed revision.
+- OWED (mine, next): BUG-560 - route scripts/apply_workbook_rulings.py through write_guard (owned_keys = the ruled columns) so the one writer that defends the owner's rulings is receipted.
+- OWED (mine): the truncated prose digest in governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md (`f2778a488610cbf1...`) is a claim no reader can join; the full digest now resolves as a revision locator, so the prose can be pointed at it without rewriting a protected record.
+- OWED (owner, one word): PURGE vs KEEP the two foreign-body backups once the receipt is green (it is green now). KEEP is the honest default: they are the only evidence of the clobber.
+- OWED (mine): HEAD reconciliation with receipts (the certified tree and the reviewed tree are NOT the same bytes while 42 tracked files sit uncommitted).
+
+- **D-2667 (2026-09-26) - plan revision + the PAIRING rule.** DONE: session plan restored from git and re-written escape-free (entries 21/22; may_touch widened by TWO NAMED paths, never a glob); the protected-family rewrite reverted after preservation (BUG-561); commit 1 (plan) landed. OWED: (a) the reconciliation commit - BLOCKED by BUG-562 (config/serving_gate.yaml granted vs pipeline/serving_gate.py will_not_touch) -> owner pipeline/** crossing ack or per-path pairing split; (b) the mint of D-2667; (c) BUG-561 DEEPER: the tracked sync-client rename of the owner blind sheet must be REMOVED from the repo (plan revision + owner gate); (d) BUG-559 / BUG-560 remain OPEN; (e) MUTATION_JOURNAL.jsonl (100 KB) and INSTRUMENT_CONTROLS.jsonl are UNTRACKED and NOT granted - the receipt ledger is unversioned.

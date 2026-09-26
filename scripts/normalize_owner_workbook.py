@@ -48,6 +48,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_discipline_domain_vote as bddv  # noqa: E402  the canonical domain menu, one source of truth
 
 REPO = Path(__file__).resolve().parents[1]
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 WORKBOOK = REPO / "governance" / "anchor_adjudication_workbook_20260924.csv"
 CONFIG = REPO / "config" / "anchor_workbook_fixes.yaml"
 DEPTH_MENU = REPO / "config" / "depth_classes.yaml"
@@ -66,12 +67,8 @@ def sha256_of(path: Path) -> str:
 
 def decode_owner_file(path: Path) -> tuple[str, str]:
     """Decode the owner's file and report which encoding worked (mac_roman is the observed fallback)."""
-    raw = path.read_bytes()
-    for enc in ("utf-8-sig", "utf-8", "mac_roman", "cp1252"):
-        try:
-            return raw.decode(enc), enc
-        except UnicodeDecodeError:
-            continue
+    # D-2646/BUG-516: the decode rule has ONE home. Delegating wrapper - no codec list lives here.
+    return artifact_encoding.open_artifact(path, REPO).read(), artifact_encoding.read_encoding(path, REPO)
     raise SystemExit(f"cannot decode {path} with any known encoding")
 
 

@@ -7,10 +7,10 @@
     "BUG-433"
   ],
   "reason": "the tracked ANCHOR-4 sheet carries pre-consolidation context plus the owner's PARTIAL depth pass; the complete pass exists as a write-locked drop-in and promotion is an owner gate",
-  "dropin_sha256": "bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4",
+  "dropin_sha256": "526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed",
   "receipt": "governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md",
   "expires_when": "the promoted sheet is committed; then this file is deleted and the guard fails closed again",
-  "dropin_rev": 2,
+  "dropin_rev": 3,
   "dropin_superseded_sha256": "be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb",
-  "dropin_note": "rev 2 = rev 1 with the owner's date corrected in place (13.09.26 -> 24.09.26); the DEPTH/conf_depth/note_codes/reviewer cells are byte-identical, so the promotion write takes the same 5 columns from either revision"
+  "dropin_note": "rev 3 = rev 2 + 3 UNNAMED trailing columns and ONE stray cell ('rese', row 43 item R043, col 18) - a spreadsheet save (2026-09-25 21:08). The 16 declared columns are a byte-exact prefix of all 151 rows and check_human_instruments.py reports every protected column byte-identical, so the promotion write takes the same 5 columns from any revolution. rev 2 (bc1cc956) is declared superseded in config/human_instrument_locks.yaml. BUG-493; the save is owner-gated."
 }

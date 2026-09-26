@@ -31,6 +31,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from pipeline.label_traceability import traceability_of  # noqa: E402  BUG-497/D-2640: declared label provenance
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
 from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
@@ -546,6 +547,12 @@ def _row_to_dict(row: sqlite3.Row) -> dict:
                 d[field] = json.loads(d[field])
             except json.JSONDecodeError:
                 pass
+    # BUG-497 / D-2640: the DECLARED traceability of this row's label provenance. menu_hash and the
+    # *_source tiers are empty for the whole pre-boundary corpus, and an empty stamp read as "no menu"
+    # is indistinguishable from a broken stamp. Every SQL leg of this module maps rows through here, so
+    # all four legs carry the field, and a consumer that needs a traceable label filters on
+    # label_traceability == "stamped" instead of inferring it from an empty column.
+    d["label_traceability"] = traceability_of(d)
     return d
 
 

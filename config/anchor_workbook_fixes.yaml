@@ -19,9 +19,18 @@ separator_out: "|"
 cell_replacements:
   - from: "business,operations"
     to: "business operations"
+  # BUG-449 (owner ruling 2026-09-25: "fix it to user experience - it's a typo"). MEASURED: the defect is a
+  # TRAILING SEPARATOR, not a misspelt word - R137 `domains_final_raw` is exactly 'user experience|', so the
+  # cell ends in a separator and the split yields a phantom EMPTY token after the real label. Declared at
+  # CELL level (the trailing byte is the defect; the label is already correct), exact match only.
 
 # Applied per token AFTER splitting. All EXCEPT 'emerging' are truncated canonical labels: the tail was cut,
 # the head is unambiguous, and the completion is the only canonical label that fits.
+# WHOLE-CELL ONLY (BUG-458). A cell replacement is applied only when the trimmed cell EQUALS `from`. Applied as
+# a SUBSTRING edit it will one day merge two tokens of a pipe-joined list, and the result is an undeclared raw
+# token - an unrecorded edit of the owner's bytes, which is the failure this file exists to prevent.
+trailing_separator_trim: ['|', ',']   # the owner's trailing separators are TRIMMED, never replaced (BUG-449)
+
 token_fixes:
   "business developmen": business development
   "media & entertainmen": media & entertainment
@@ -47,12 +56,12 @@ depth_alias:
   domain: 3
   specialized: 4
 
-# Rows the owner left blank on an axis. Declared, never filled in by anything automatic: a blank is a fact
-# about the review, and inventing a value would corrupt the gold.
-expect_blank:
-  domains_final: [R140]
-  depth_final: [R070, R080, R130]
-
+# NOTE (BUG-474, fixed 2026-09-25): a SECOND `expect_blank:` block used to be declared below the rulings,
+# so this key was DUPLICATED in one YAML document. PyYAML resolves a duplicate key by last-wins, which
+# silently discarded the [R140]/[R070,R080,R130] declaration and kept `[]` — the reading happened to be
+# the intended one, but a reader (or a stricter parser) would have seen a file with two answers. The
+# declaration now lives in exactly ONE place, in the OWNER-RULED section below.
+#
 # OWNER RULING (2026-09-25): the four discipline cells that hold DOMAIN-menu labels were written there
 # ACCIDENTALLY - they are domain labels, misfiled into the discipline column of the frozen ANCHOR-3 sheet.
 # Treatment: the value is RELOCATED to the domain axis (where it is a legal canonical label) and is NOT
@@ -65,3 +74,47 @@ discipline_cell_relocations:
   R086: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
   R091: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
   R117: {value: "personal productivity", axis: domain, discipline_status: UNAVAILABLE-OWNER-OWED}
+
+column_renames:            # D-383: a column NAME is config, not code. The rename happens once,
+  flags: row_flags         # while the column has exactly one consumer (none in scripts/ - measured 2026-09-25).
+
+# ── OWNER-RULED 2026-09-25 (D-387/D-388): the four cells this file once declared BLANK ──────────────────
+# The owner accepted the assistant recommendation + the senior-RAG recommendation for each blocked cell.
+# Every entry carries a `basis`: a value whose provenance is not a row-citable artifact is an INVENTION.
+# Applied ONLY by scripts/apply_workbook_rulings.py, which is checked by `just health` (--check) so a
+# re-run of normalize_owner_workbook.py --apply cannot silently revert a ruling (it WOULD: normalize
+# re-derives the blank, therefore the applier must follow it - order is load-bearing, not cosmetic).
+rulings_io:
+  workbook: governance/anchor_adjudication_workbook_20260924.csv
+  fixlog: governance/anchor_adjudication_fixlog_20260925.csv
+  backup_dir: backups
+  backup_suffix: PRE_RULINGS_20260925
+
+# Expectation for the CURRENT workbook. Amended from [R140]/[R070,R080,R130]: nothing is blank now.
+# Kept as a key so normalize_owner_workbook.py still reads a declaration rather than assuming one.
+expect_blank:
+  domains_final: []
+  depth_final: []
+
+owner_rulings:
+  # CARRY-FORWARD (D-387, policy: a later pass that OMITS a cell the owner already filled does NOT
+  # withdraw it; withdrawal requires the explicit ..._DECLINED token). The value is the owner's OWN
+  # 24.09 answer, read from the write-locked drop-in, not a coder value and not an inference.
+  R070: {column: depth_final, value: cross-domain, class: '2', status: CARRY-FORWARD,
+         basis: 'owner depth pass 2026-09-24, DEPTH=2 conf=2', source: 'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv'}
+  R080: {column: depth_final, value: domain, class: '3', status: CARRY-FORWARD,
+         basis: 'owner depth pass 2026-09-24, DEPTH=3 conf=1', source: 'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv'}
+  R130: {column: depth_final, value: domain, class: '3', status: CARRY-FORWARD,
+         basis: 'owner depth pass 2026-09-24, DEPTH=3 conf=3', source: 'governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv'}
+  # OWNER-RULED. 'emerging' is the domain menu's ABSTENTION slot ("none of the 43 fits") and cannot be the
+  # answer for a row whose owner depth is 'domain' (class 3 requires >=1 real domain). Every non-empty
+  # coder cell leads with the same label (claude/kimi/deepseek: arts & culture first; deepseek adds a 3rd).
+  R040: {column: domains_final, value: 'arts & culture', raw: 'arts & culture', primary: 'arts & culture',
+         status: OWNER-RULED, basis: 'coders 3/3 lead arts & culture; resolves the abstention-vs-class-3 contradiction',
+         source: 'governance/anchor_adjudication_workbook_20260924.csv#coder columns'}
+  # R140 is NOT cell-edited: its axes are declared NOT APPLICABLE in config/depth_domain_contract.yaml
+  # (abstention.axis_exempt_rows) because its CT is a non-claim class. An exemption is a declaration; a
+  # rewritten cell would be an edit of the owner's answer. Recorded for the reader:
+  R140: {column: both, value: null, status: DECLARED-NOT-APPLICABLE,
+         basis: "CT='noise drop' (blind sheet 2026-09-24); neither axis applies; parity, never owed",
+         source: 'config/depth_domain_contract.yaml#abstention.axis_exempt_rows'}

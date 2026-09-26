@@ -15,7 +15,8 @@
 #   train-pool x eval-anchor overlap = 0 / 1027  (verified; must stay 0)
 
 schema_version: "3.0"
-decision: null            # becomes a D-number when the user ratifies the priority decision
+# decision: NONE YET - the priority decision is not ratified, so there is no source to cite. An empty
+# citation key is not a citation (BUG-483); put a real D-number here when ratified.
 last_updated: "2026-09-17"
 
 anchor:
@@ -158,7 +159,7 @@ label_axes:
       rows_discipline: 261
       rows_domain: 648
       decision: >    # D-271a RULED + REVISED 2026-09-17 (see governance/DECISION_D271_IDENTITY_20260917.md section 2a)
-        DECLARED HOMONYM — CHANGE NOTHING. Both labels stay canonical exactly as they are.
+        D-271a DECLARED HOMONYM — CHANGE NOTHING. Both labels stay canonical exactly as they are.
         This is not one concept mis-migrated and not a contamination: the discipline and the domain
         are different objects that happen to share a name, so no rename, no merge, no migration and
         no relabelling is required. RETRIEVAL PRECEDENCE: discipline is authoritative for

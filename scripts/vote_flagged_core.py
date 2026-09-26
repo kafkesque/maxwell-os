@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
 
 sys.path.insert(0, str(ROOT / "scripts"))
 import build_joint_vote_set as bjv  # noqa: E402
+from lib import operator_env  # noqa: E402 - D-2646/BUG-519: the operator-key rule has ONE home
 
 DB = ROOT / "knowledge pipeline" / "maxwell.db"
 CHECKPOINT = ROOT / "governance" / "joint_vote_production_checkpoint.jsonl"
@@ -74,12 +75,9 @@ def main(argv):
     # DeepSeek key: env var, else .env (C22 opt-in, same as run_joint_vote.sh).
     key = args.key or os.environ.get("DEEPSEEK_API_KEY", "")
     if not key:
-        env = ROOT / ".env"
-        if env.exists():
-            for ln in env.read_text().splitlines():
-                if ln.strip().startswith("DEEPSEEK_API_KEY="):
-                    key = ln.split("=", 1)[1].strip().strip('"').strip("'")
-                    break
+        # D-2646/BUG-519: the operator-key rule has ONE home. The copy removed here read .env with
+        # read_text()'s PLATFORM-DEFAULT codec, while vote_anchor_domains used a repair mode: two behaviours.
+        key = operator_env.read_key(operator_env.DEFAULT_NAME, "", ROOT)
     if not key:
         raise SystemExit("FATAL: no DEEPSEEK_API_KEY in env or .env (C22 opt-in)")
 

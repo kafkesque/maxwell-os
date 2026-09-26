@@ -43,17 +43,17 @@ from pipeline.pipeline_paths import (  # noqa: E402
     S4_DEPTH_FOCUSED_CLASSIFICATION,
     S4_DEPTH_MAX_TOKENS,
     S4_TEMPORAL_SIGNALS,
-    S5_CONF_ENRICH_WEIGHT,
-    S5_CONF_ISOR_WEIGHT,
-    S5_CONF_MECH_WEIGHT,
-    S5_HUMAN_REVIEW_ISOR,
     S5_QUARANTINE_CONF_CAP,
     VERIFY_MODEL,
     VERIFY_REASONING_OFF_MODELS,
     VERIFY_REASONING_OFF_PREFIX,
 )
 from pipeline.omlx_call import call_omlx  # noqa: E402
-from pipeline.serving_gate import derive_status  # noqa: E402  D274h: single status rule
+from pipeline.serving_gate import (  # noqa: E402  D274h / BUG-499 / BUG-502: ONE rule
+    derive_conf_and_review,
+    derive_epistemic_status,
+    derive_status,
+)
 from pipeline.schemas import (  # noqa: E402
     CANONICAL_DISCIPLINES,
     CANONICAL_DOMAINS,
@@ -367,21 +367,13 @@ def _verify_s5(fb: dict) -> dict:
         results.append({"check_name": "enrichment_quality", "passed": enrich_passed, "score": enrich_score, "detail": enrich_detail})
 
     status, s5_reason = derive_status(results)  # D274h: the single serving-gate rule
-    needs_human = False
 
     isor = isor_score(fb)
-    isor_composite = float(isor.get("score", 0.0))
 
-    confidence_score = round(
-        S5_CONF_MECH_WEIGHT * mech_score_float
-        + S5_CONF_ENRICH_WEIGHT * enrich_score
-        + S5_CONF_ISOR_WEIGHT * isor_composite,
-        4,
+    # BUG-502: this was a verbatim SECOND copy of the S5 score axis - now the ONE home.
+    confidence_score, needs_human = derive_conf_and_review(
+        fact_passed, mech_score_float, enrich_score, isor
     )
-    if not fact_passed:
-        confidence_score = min(confidence_score, S5_QUARANTINE_CONF_CAP)
-    if not fact_passed and isor.get("rating") == S5_HUMAN_REVIEW_ISOR:
-        needs_human = True
 
     vfb = dict(fb)
     vfb["verification_results"] = results
@@ -392,15 +384,8 @@ def _verify_s5(fb: dict) -> dict:
     vfb["verifier_model"] = "DeBERTa-v3-large (D2322 calibrated, threshold 0.10)"
     vfb["verification_method"] = method
 
-    if isor["rating"] == "strong" and fact_passed:
-        epistemic_status = "corroborated"
-    elif isor["rating"] in ("strong", "medium") and not fact_passed:
-        epistemic_status = "cross-source-unverified"
-    elif fact_passed:
-        epistemic_status = "source-supported"
-    else:
-        epistemic_status = "speculative"
-    vfb["epistemic_status"] = epistemic_status
+    # BUG-499: this was the third inline copy of the D2284 rule - now the one home (C21).
+    vfb["epistemic_status"] = derive_epistemic_status(fact_passed, isor["rating"])
     vfb["isor"] = isor
     return vfb
 

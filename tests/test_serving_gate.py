@@ -13,8 +13,11 @@ import pytest
 
 from pipeline.serving_gate import (
     assert_invariant,
+    derive_epistemic_status,
     derive_status,
+    load_label_config,
     negative_reasons,
+    pre_write_verdict,
 )
 
 
@@ -94,3 +97,92 @@ def test_duplicate_hard_quarantine_overrides_verification():
     )
     assert status == "QUARANTINE"
     assert reason == "duplicate"
+
+
+# ── BUG-499: the epistemic label is CO-DERIVED, and its rule has ONE home ────────────────────────
+# The module docstring above says "a label can never determine status" - but until BUG-499 nothing
+# tested the label at all: its rule lived as three inline copies (stage 5 + two scripts), with no
+# config and no single home. These tests pin the one home and the co-derivation.
+
+def test_label_rule_is_declared_in_config_and_names_only_its_vocabulary():
+    """C12/C21: the rule is config-declared and can only name declared labels (fail-closed)."""
+    cfg = load_label_config()
+    assert set(cfg["vocabulary"]) == {
+        "corroborated", "source-supported", "cross-source-unverified", "speculative",
+    }
+    assert len(cfg["rules"]) == 4
+    assert {r["label"] for r in cfg["rules"]} <= set(cfg["vocabulary"])
+    assert cfg["fallback"] in cfg["vocabulary"]
+
+
+@pytest.mark.parametrize(
+    ("passed", "rating", "expected"),
+    [
+        (True, "strong", "corroborated"),
+        (True, "medium", "source-supported"),
+        (True, "weak", "source-supported"),
+        (False, "strong", "cross-source-unverified"),
+        (False, "medium", "cross-source-unverified"),
+        (False, "weak", "speculative"),
+        (False, None, "speculative"),
+    ],
+)
+def test_label_derives_from_the_same_record(passed, rating, expected):
+    assert derive_epistemic_status(passed, rating) == expected
+
+
+def test_label_refines_status_so_the_1_to_1_is_a_theorem_not_a_gate():
+    """BUG-499: every label implies exactly ONE status, and the label is strictly finer."""
+    labels: dict[str, set[str]] = {}
+    per_status: dict[str, set[str]] = {}
+    for passed in (True, False):
+        for rating in ("weak", "medium", "strong"):
+            label = derive_epistemic_status(passed, rating)
+            status, _reason = derive_status(_vr("ENTAIL (majority 1/1): ent=1.00", passed))
+            labels.setdefault(label, set()).add(status)
+            per_status.setdefault(status, set()).add(label)
+    assert all(len(v) == 1 for v in labels.values()), labels
+    assert any(len(v) > 1 for v in per_status.values()), per_status
+
+
+def test_a_label_outside_the_derivation_is_detectable():
+    """The teeth: the label is a FUNCTION of the record, so a hand-set label cannot match."""
+    assert derive_epistemic_status(True, "weak") != "corroborated"
+    assert derive_epistemic_status(False, "strong") != "speculative"
+
+
+def _fb(status: str, reason: str, detail: str = "ENTAIL (majority 1/1): ent=1.00",
+        passed: bool = True, **extra: object) -> dict:
+    """Build a stage-5/6-shaped row dict for the pre-write guard."""
+    row: dict = {"fb_id": "fb_test", "status": status, "s5_reason": reason,
+                 "verification_results": _vr(detail, passed)}
+    row.update(extra)
+    return row
+
+
+def test_pre_write_guard_accepts_a_row_its_record_derives():
+    ok, complaint = pre_write_verdict(_fb("PASS", "entail"))
+    assert ok, complaint
+
+
+def test_pre_write_guard_refuses_a_status_the_record_does_not_derive():
+    """D274a writer half: a hand-set or label-derived status can never reach the store."""
+    ok, complaint = pre_write_verdict(_fb("PASS", "entail", detail="CONTRA 3/3", passed=False))
+    assert not ok and "STATUS_MISMATCH" in complaint
+
+
+def test_pre_write_guard_refuses_a_pass_row_carrying_a_negative_reason():
+    ok, complaint = pre_write_verdict(_fb("PASS", "contra"))
+    assert not ok and "REASON_MISMATCH" in complaint
+
+
+def test_pre_write_guard_refuses_an_unverifiable_row_instead_of_guessing():
+    ok, complaint = pre_write_verdict({"fb_id": "x", "status": "PASS", "s5_reason": "entail",
+                                       "verification_results": "[]"})
+    assert not ok and "UNDECIDABLE" in complaint
+
+
+def test_pre_write_guard_accepts_the_declared_duplicate_quarantine():
+    ok, complaint = pre_write_verdict(_fb("QUARANTINE", "duplicate", duplicate_of="fb_canon"))
+    assert ok, complaint
+# ── BUG-502")[1].join(["

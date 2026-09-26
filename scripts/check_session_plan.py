@@ -20,6 +20,12 @@ the pre-fix code):
     forbidden through its name. The renaming VOCABULARY is consumed from its one home
     (config/repo_integrity.yaml#conflict_marker) instead of being restated here.
 
+THIRD HARDENING, MEASURED 2026-09-26 (D-2668): `crossing: true` was a RECORD no rail consumed, so the
+pipeline/** boundary stayed closed while the plan read as if the owner had acked it. A crossing is now a PERMIT
+only for the paths it NAMES (`crossed:`), only with a NAMED ACK (`acked_by` + `acked_on`), and only until it is
+SPENT (`spent_by`, the commit that used it) - an ack may not outlive the commit it was given for. A `crossed:`
+path outside every will_not_touch family is refused, or `crossed:` would be a second, unaudited may_touch.
+
 Usage: python3 scripts/check_session_plan.py [--commit HEAD] [--staged] [--plan ...] [--index-file P] [--selftest]
 Post-hoc checking catches violations AFTER they are in history (BUG-445): install the hook instead -
 bash scripts/install_git_hooks.sh - so rail 4 refuses the commit rather than reporting it.
@@ -106,6 +112,53 @@ def widening_faults(plan: dict, plan_rel: str) -> list[str]:
     return faults
 
 
+def crossing_permits(plan: dict, forbid: list[str], pats: list[re.Pattern[str]]) -> tuple[list[str], list[str], list[str]]:
+    """D-2668: an owner-acked `crossing: true` entry is a PERMIT only for the paths it NAMES.
+
+    MEASURED 2026-09-26 (BUG-562): `crossing: true` was a RECORD that NOTHING consumed - `widening_faults`
+    tolerated it and `verdicts` ignored it - so the plan read as if the owner had acked the pipeline/**
+    boundary while every path under it still returned rc=2. A record with no consumer is not a rule; its
+    inverse is worse: a permit with no SUBJECT and no ACK is standing permission nobody granted.
+
+    Three conditions, each with a control that can fail (BUG-492), all three required:
+      * SUBJECT - `crossed:` names the paths. A `crossed:` path that is NOT in a will_not_touch family is
+        refused, or `crossed:` would become a second, unaudited may_touch (the granting-direction bypass).
+      * ACK - `acked_by` + `acked_on` name who acked and when. Named subjects with no ack is a FAIL, not a
+        pass, because the entry then LOOKS like a permit while granting nothing (the BUG-548 shape).
+      * SPENT - `spent_by` is the commit that used it. Once set the entry yields NOTHING, so an ack cannot
+        outlive the commit it was given for and decay into standing permission over production files.
+    """
+    permits: list[str] = []
+    faults: list[str] = []
+    notes: list[str] = []
+    for i, entry in enumerate(plan.get("widening_log") or [], start=1):
+        if not isinstance(entry, dict) or entry.get("crossing") is not True:
+            continue
+        crossed = [str(p) for p in (entry.get("crossed") or [])]
+        if not crossed:
+            continue  # a RECORD, not a permit (BUG-548: tolerated, grants nothing)
+        owner = str(entry.get("acked_by") or "").strip()
+        when = str(entry.get("acked_on") or "").strip()
+        if not (owner and when):
+            faults.append("widening_log entry #" + str(i) + " NAMES " + str(len(crossed)) + " crossing subject(s) "
+                          "but no ACK: a permit without its ack is the BUG-548 shape in the GRANTING direction "
+                          "-> add `acked_by` + `acked_on`, or drop `crossed:` and let it stay a RECORD")
+            continue
+        for pat in crossed:
+            if any(fnmatch.fnmatch(n, f) for n in canonical_names(pat, pats) for f in forbid):
+                continue
+            faults.append("widening_log entry #" + str(i) + " crosses '" + pat + "' which is NOT in any "
+                          "will_not_touch family - `crossed:` is not a second may_touch: grant a path there, or "
+                          "record it as a `widened:` widening instead")
+        if entry.get("spent_by"):
+            continue  # SPENT: the ack was used by that commit and yields no further permit
+        permits += crossed
+        notes.append("PERMIT session plan: widening_log entry #" + str(i) + " crosses " + str(len(crossed))
+                     + " will_not_touch path(s) under an owner ack (" + owner + ", " + when + ") -> mark it "
+                     "`spent_by: <commit>` when it lands, or an acked permit decays into standing permission "
+                     "(D-2668)")
+    return permits, faults, notes
+
 def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: str) -> tuple[int, list[str]]:
     """The whole rule as a pure function, so the controls can hand it a synthetic plan as easily as the live one."""
     allow = [str(x) for x in (plan.get("may_touch") or [])]
@@ -118,6 +171,12 @@ def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: 
         lines.append("FAIL session plan: the plan RECORDS permissions it does not GRANT (BUG-548):")
         lines += ["  " + x for x in lie]
         return 1, lines
+    permits, permit_faults, permit_notes = crossing_permits(plan, forbid, pats)
+    if permit_faults:
+        lines.append("FAIL session plan: a `crossing` entry claims a permit it may not use (D-2668):")
+        lines += ["  " + x for x in permit_faults]
+        return 1, lines
+    lines += permit_notes
     defect = [str(x) for x in (plan.get("may_touch") or [])
               if any(fnmatch.fnmatch(n, f) for n in canonical_names(str(x), pats) for f in forbid)]
     if defect:
@@ -127,7 +186,8 @@ def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: 
         lines.append("   -> remove the entry (a copy of a protected artifact is not a permit to edit it)")
         return 1, lines
     forbidden = [f for f in out
-                 if any(fnmatch.fnmatch(n, pat) for n in canonical_names(f, pats) for pat in forbid)]
+                 if any(fnmatch.fnmatch(n, pat) for n in canonical_names(f, pats) for pat in forbid)
+                 and not any(fnmatch.fnmatch(f, c) for c in permits)]
     if forbidden:
         lines.append("FORBIDDEN session plan: " + str(len(forbidden)) + " path(s) are declared will_not_touch, "
                      "by name or as a sync-client RENAME of one (BUG-528) -> widening")
@@ -136,7 +196,8 @@ def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: 
         lines.append("   -> git checkout HEAD -- <path>   OR get the owner gate, then declare a NEW plan revision")
         return 2, lines
     offenders = [f for f in out
-                 if not any(fnmatch.fnmatch(f, pat) for pat in allow) and f != plan_rel]
+                 if not any(fnmatch.fnmatch(f, pat) for pat in allow) and f != plan_rel
+                 and not any(fnmatch.fnmatch(f, c) for c in permits)]
     if offenders:
         lines.append("FAIL session plan: touched " + str(len(offenders)) + " path(s) outside the plan:")
         lines += ["  " + o for o in offenders]
@@ -262,6 +323,30 @@ def selftest() -> int:
         ("BUG-548: the LIVE plan records no permission it does not grant (a FAIL here is a plan defect)",
          widening_faults(live, DEFAULT_PLAN) == []),
     ]
+    def _cross(**over) -> dict:
+        """A SYNTHETIC baseline (BUG-492): the permit controls must not depend on the live plan's state."""
+        entry = {"crossing": True, "crossed": ["pipeline/stage5_verify.py"], "acked_by": "owner",
+                 "acked_on": "2026-09-26"}
+        entry.update(over)
+        return {"widening_log": [entry], "may_touch": list(clean["may_touch"]),
+                "will_not_touch": list(clean["will_not_touch"])}
+    sib = "pipeline/stage6_commit.py"
+    controls += [
+        ("D-2668: a NAMED, ACKED crossing subject is PERMITTED (the owner's one-off CROSS, rc=0)",
+         verdicts(_cross(), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 0),
+        ("D-2668 ANTI-OVERREACH: an UNNAMED SIBLING of the crossing subject stays FORBIDDEN (rc=2) - the permit "
+         "names its subject or it is not a permit",
+         verdicts(_cross(), [sib], pats, DEFAULT_PLAN)[0] == 2),
+        ("D-2668: `crossed:` with NO ack is a FAIL (rc=1) - a permit without its ack only LOOKS like permission",
+         verdicts(_cross(acked_by="", acked_on=""), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 1),
+        ("D-2668: a SPENT crossing permits NOTHING (rc=2) - an ack may not outlive the commit it was given for",
+         verdicts(_cross(spent_by="deadbeef"), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 2),
+        ("D-2668: a `crossed:` path OUTSIDE every will_not_touch family is a FAIL (crossed is not a 2nd may_touch)",
+         verdicts(_cross(crossed=["docs/not_protected.md"]), ["docs/not_protected.md"], pats, DEFAULT_PLAN)[0] == 1),
+        ("D-2668: the LIVE plan's crossing entries are well-formed (a FAIL here is a plan defect)",
+         crossing_permits(live, list(live.get("will_not_touch") or []), pats)[1] == []),
+    ]
+
     bad = 0
     for name, ok in controls:
         print(("  ok   " if ok else "  FAIL ") + name)

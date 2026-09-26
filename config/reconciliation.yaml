@@ -24,10 +24,12 @@ entries:
   - id: depth_panel_raters_vs_workbook
     declares: config/agreement_floor.yaml#panels.depth_axis_panel.rater_status
     about: governance/anchor_adjudication_workbook_20260924.csv
-    # MEASURED 2026-09-26: this workbook is OWNER-DROPPED Excel-on-macOS output, so it is MacRoman, not UTF-8
-    # (0xCA = non-breaking space, 0xD1 = em dash). The encoding is declared here because it is a fact about the
-    # artifact; the artifact itself is write-locked and was NOT rewritten to suit the reader.
-    encoding: mac_roman
+    # D-2666/BUG-558 (2026-09-26): the LIVE artifact is the NORMALIZER's utf-8 OUTPUT, restored from git HEAD
+    # after a FOREIGN BODY (the owner's pre-normalization MacRoman drop-in - 0xCA = non-breaking space,
+    # 0xD1 = em dash) had been sitting at this path and had been declared HERE as if it were the artifact.
+    # `mac_roman` is a fact about the INPUT; the input's bytes survive in
+    # backups/anchor_adjudication_workbook_20260924.csv.PRE_CLAUDER_RESTORE_20260926T202715Z.
+    encoding: utf-8
     check: declared_keys_match_columns
     column_suffix: _depth
     why: >
@@ -52,7 +54,8 @@ entries:
   - id: depth_workbook_row_count
     declares: config/cohort_declaration.yaml#cohorts.anchor4_depth.measured_rows
     about: governance/anchor_adjudication_workbook_20260924.csv
-    encoding: mac_roman   # declared, not guessed: see depth_panel_raters_vs_workbook above (D-2644)
+    # declared, not guessed: the same ONE fact as depth_panel_raters_vs_workbook above (D-2644/D-2649).
+    encoding: utf-8
     check: count_matches
     why: >
       BUG-466 / BUG-501 - 148 adjudicated rows against a declared 150-row cohort. The rule WAS ruled (D-393,
@@ -132,11 +135,21 @@ artifact_encodings:
       reader matches on hold no non-ASCII byte today, so no OUTPUT changed - the read was silent, and that silence
       is the defect, not the value.
   - about: governance/anchor_adjudication_workbook_20260924.csv
-    encoding: mac_roman
+    encoding: utf-8
     why: >-
-      MEASURED: 0xCA at offset 42564 (a non-breaking space in row 66, Identity<NBSP>As Social Positioning). Already
-      declared mac_roman by the two `entries` above with the SAME value - an agreement D-2649 checks and tolerates
-      rather than assumes, so this entry is redundant by design and must stay consistent with them.
+      CORRECTED 2026-09-26 (D-2666/BUG-558). The previous value was `mac_roman`, measured on 0xCA at offset 42564
+      (a non-breaking space in row 66, Identity<NBSP>As Social Positioning) - but that byte belonged to the
+      PRE-NORMALIZATION drop-in body that had been sitting at this path, NOT to the artifact. A declaration
+      derived from whatever bytes are on disk is HOW a foreign body gets laundered into a certified-looking one:
+      the reader stopped failing closed, and the one rail that could have noticed (the depth/domain contract) was
+      `status: proposed`, so its exit code was suppressed. The LIVE artifact is the NORMALIZER's utf-8 OUTPUT:
+      restored from git HEAD (f2778a488610cbf1) and then had the owner's DECLARED rulings applied through
+      scripts/apply_workbook_rulings.py (972def3224a1abba) - see config/anchor_workbook_fixes.yaml#owner_rulings.
+      `mac_roman` remains a TRUE fact about the INPUT; those bytes survive in
+      backups/anchor_adjudication_workbook_20260924.csv.PRE_CLAUDER_RESTORE_20260926T202715Z.
+      KEPT as a third home ON PURPOSE (the D-402 two-oracle pattern, which is why the comment above calls it
+      "redundant by design"): the D-2649 join in scripts/lib/artifact_encoding.py fired on this very
+      disagreement in production on 2026-09-26, so this control has been SEEN to refuse, not merely asserted.
 
 meta:
   # Every check_*.py / verify_*.py that declares a contract must be reachable from a recipe. BUG-482: three

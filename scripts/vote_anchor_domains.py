@@ -55,6 +55,8 @@ from datetime import datetime, timezone
 from typing import Any
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+from lib import operator_env  # noqa: E402 - D-2646/BUG-519: the operator-key rule has ONE home
 sys.path.insert(0, str(REPO / "scripts"))
 import build_discipline_domain_vote as bddv  # noqa: E402  (the shared instrument, not a copy of it)
 
@@ -66,7 +68,7 @@ PROMPT_ID = "anchor_domains_v1"
 
 def load_blind_rows() -> list[dict[str, str]]:
     """Return the 150 blind anchor rows (text columns only) in sheet order."""
-    with BLIND_INPUT.open(encoding="utf-8-sig", newline="") as fh:
+    with artifact_encoding.open_artifact(BLIND_INPUT, REPO) as fh:
         rows = list(csv.DictReader(fh))
     out = []
     for r in rows:
@@ -109,17 +111,10 @@ def prompt_for(row: dict[str, str]) -> str:
 
 
 def resolve_key(explicit: str) -> str:
-    """API key from --key, the environment, or .env (never printed)."""
-    if explicit:
-        return explicit
-    if os.environ.get("DEEPSEEK_API_KEY"):
-        return os.environ["DEEPSEEK_API_KEY"]
-    env = REPO / ".env"
-    if env.exists():
-        for line in env.read_text(encoding="utf-8", errors="ignore").splitlines():
-            if line.strip().startswith("DEEPSEEK_API_KEY="):
-                return line.split("=", 1)[1].strip().strip('"').strip("'")
-    return ""
+    """API key from --key, the environment, or .env - resolved by the ONE home (never printed)."""
+    # D-2646/BUG-519: the operator-key rule has ONE home. The copy removed here read .env in a repair mode
+    # that DROPPED a non-UTF-8 byte silently (the C16/BUG-511 class). A delegating wrapper, not a second rule.
+    return operator_env.read_key(operator_env.DEFAULT_NAME, explicit, REPO)
 
 
 def pipeline_commit() -> str:

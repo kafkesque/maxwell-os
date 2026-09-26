@@ -37,6 +37,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+# TOMBSTONED 2026-09-25 (BUG-503 / no reachable write path for an abandoned ontology).
+# D2205's two-axis epistemic model was ABANDONED. This script is kept only as archaeology: it would
+# ALTER fbs with 8 D2205 columns and backfill epistemic_state - a FOURTH epistemic column that
+# collides in name with the live epistemic_status - with DEFAULT 'corroborated'. The three justfile
+# recipes that reached it are removed, and this guard makes a direct invocation refuse too (exit 2 =
+# owner-owed, BUG-457 convention). Reviving D2205 requires an explicit OWNER decision.
+TOMBSTONE_OPT_IN = "--i-understand-D2205-is-abandoned"
+if TOMBSTONE_OPT_IN not in sys.argv:
+    print(
+        """TOMBSTONED (BUG-503): D2205 is an ABANDONED ontology and this migration would mutate fbs
+with a fourth epistemic column defaulting to 'corroborated'. Refusing (exit 2, owner-owed).
+An owner may re-open it explicitly with: --i-understand-D2205-is-abandoned"""
+    )
+    raise SystemExit(2)
+
 from pipeline.pipeline_paths import DB_PATH
 
 # ── Column definitions (C12: in code rather than config since these are

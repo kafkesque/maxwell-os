@@ -27,6 +27,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "config" / "flag_consumer_registry.yaml"
 CONFIG_GLOB = "config/*.yaml"
 
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
+
 
 def load_yaml(path: Path) -> Any:
     """Load a YAML document, exiting loudly if it cannot be parsed (C16)."""
@@ -69,7 +72,9 @@ def consumer_reads(consumer: str, config: Path) -> bool:
     path = PROJECT_ROOT / consumer
     if not path.exists():
         return False
-    body = path.read_text(encoding="utf-8", errors="ignore")
+    # D-2646/BUG-521: read through the DECODE home. errors="ignore" DROPPED bytes from the text this
+    # census then searched, so a present token could become absent (the C16/BUG-511 class).
+    body = artifact_encoding.open_artifact(path, PROJECT_ROOT).read()
     return config.name in body or config.stem in body
 
 
@@ -86,7 +91,7 @@ def consumer_binds_symbol(consumer: str, symbol: str) -> bool:
     path = PROJECT_ROOT / consumer
     if not path.exists():
         return False
-    body = path.read_text(encoding="utf-8", errors="ignore")
+    body = artifact_encoding.open_artifact(path, PROJECT_ROOT).read()  # D-2646/BUG-521
     token = str(symbol).strip()
     return bool(token) and token in body
 

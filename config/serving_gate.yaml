@@ -22,6 +22,15 @@ serving_gate:
   # its verification passed — this is the declared dedup rule (D2627 / D-271d), not a
   # verification verdict. reason: "duplicate".
   duplicate_reason: "duplicate"
+  # D274a / D274h, WRITER HALF (2026-09-25, BUG-502). The rail evaluates stored rows AFTER the fact;
+  # pipeline/stage6_commit.insert_fb (the ONE path that INSERTs into fbs, also used by
+  # scripts/reinject_bug198_singletons.py) now REFUSES a row whose status its own verification record
+  # does not derive, through the same comparator the rail imports. "reject" is the only implemented
+  # policy and it is DECLARED here so the guard's behaviour is auditable rather than assumed; an
+  # unknown value is fatal in code, so this key cannot become an off switch (C16).
+  # MEASURED 2026-09-25: all 7,995 stored rows satisfy the predicate, so the guard refuses nothing
+  # that exists today and fires only on a row written by something other than the one writer.
+  pre_write_enforcement: "reject"
   # The ONLY pass condition: the factual check passed (NLI ENTAIL-majority AND no
   # mechanism / evidence / classification failure), else QUARANTINE (fail-closed, D2093).
 
@@ -73,3 +82,61 @@ serving_gate:
     - {prefix: "MECH FAIL",                      reason: mech_fail}
     - {prefix: "BUG-181#1",                      reason: evidence_contaminated}
   fallback_reason: "unknown"
+
+# ── EPISTEMIC LABEL (D2284) — the ONTOLOGY, ruled 2026-09-25 (BUG-499) ───────────────────────────
+# epistemic_status and status are CO-DERIVED: both are functions of the SAME verification record, and
+# the label is a strict REFINEMENT of the status partition (it splits one status by an ISOR rating).
+# The 1:1 label -> status coupling is therefore a THEOREM about one shared record, NOT a gate: nothing
+# here may gate serving, and D274a / D274h still forbid a label-derived STATUS write.
+# MEASURED 2026-09-25 (7,995 rows): every stored label re-derives from (factual.passed, isor.rating)
+# with 0 mismatch, and every label maps to exactly one status. Declaring
+# rail.label_relationship: co_derived makes the rail PROVE that per row instead of assuming a shape.
+#
+# ONE home for the RULE: pipeline/serving_gate.py::derive_epistemic_status (C21). Rule ORDER is part
+# of the rule (first match wins — the same idiom as detail_rules above, no invented DSL). Rating
+# classes live here so that no rating literal sits in code (C12) and no magic index does either (C20).
+epistemic_label:
+  vocabulary: [corroborated, source-supported, cross-source-unverified, speculative]
+  rules:
+    - {label: corroborated,            requires_factual_pass: true,  ratings: [strong]}
+    - {label: cross-source-unverified, requires_factual_pass: false, ratings: [strong, medium]}
+    - {label: source-supported,        requires_factual_pass: true}
+    - {label: speculative,             requires_factual_pass: false}
+  fallback: speculative
+
+# The RAIL over the live store: the D274a invariant, evaluated against rows rather than asserted by the
+# writer (BUG-499). Every path, column name and tolerance lives HERE - the check script hardcodes none of
+# them (C12). The rule itself is NOT re-declared: the script imports pipeline.serving_gate (C21).
+rail:
+  db: "knowledge pipeline/maxwell.db"
+  table: fbs
+  col_status: status
+  col_reason: s5_reason
+  col_verification: verification_results
+  col_duplicate_of: duplicate_of
+  col_label: epistemic_status
+  col_isor: isor
+  # SHRINK-ONLY tolerances. MEASURED 2026-09-25 (first run of the rail): 7,995 rows, 0 status mismatch,
+  # 0 reason mismatch, 0 undecidable, PASS 5,023 all carrying reason 'entail'. Raising either number is a
+  # declared decision, not an edit.
+  max_status_mismatch: 0
+  max_reason_mismatch: 0
+  max_undecidable: 0
+  # BUG-499: the label is re-derived from the SAME stored record (factual.passed + isor.rating). A
+  # stored label that no longer re-derives means the label was HAND-EDITED, or the ONE rule moved and
+  # the rows did not. Either way it is DRIFT, not a tolerance question. SHRINK-ONLY.
+  max_label_mismatch: 0
+  # BUG-499, the ontology question (RULED 2026-09-25 — this is an ontology, not a tolerance).
+  #   unruled        - the rail reports the measured coupling and exits 2 (owner-owed, loud not fatal)
+  #   derived_mirror - status is DECLARED a mirror OF the label. This INVERTS the causal arrow and
+  #                    checks nothing about where the label came from, so a hand-set label would read
+  #                    as intended. Kept for completeness; must not be used here.
+  #   independent    - the two must decouple; a 1:1 label -> status function is then a DEFECT (exit 1).
+  #                    MEASURED FALSE today: the label is DETERMINED by the record (0/7,995 mismatch),
+  #                    so demanding decoupling would demand a fictitious edit.
+  #   co_derived     - DECLARED: both columns are functions of the SAME verification record and the
+  #                    label REFINES status. The rail must then PROVE the shared source by re-deriving
+  #                    every stored label (max_label_mismatch) — strictly stronger than the other two,
+  #                    which inspect only the SHAPE of the coupling; this one inspects its PROVENANCE,
+  #                    so a co-varying label can no longer become a gate unnoticed.
+  label_relationship: co_derived

@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import DB_PATH
+from pipeline.label_traceability import traceability_of  # BUG-497/D-2640
 
 
 def get_conn() -> sqlite3.Connection:
@@ -59,6 +60,10 @@ def show_fb(conn: sqlite3.Connection, fb_id: str) -> dict | None:
         row = rows[0]
 
     fb = dict(row)
+    # BUG-497 / D-2640: the declared provenance state of this row's label - never inferred from an
+    # empty menu_hash by whoever reads the record.
+    fb["label_traceability"] = traceability_of(fb)
+    print(f"label traceability: {fb['label_traceability']}")
     _print_fb_full(fb)
     return fb
 

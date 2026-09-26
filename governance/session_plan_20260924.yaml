@@ -389,3 +389,14 @@ widening_log:
       (2) BUG-551 - the bridge exited 2 on the GOLDEN side while the config declared NOTHING: the verdict claimed
       a declaration nobody made (the BUG-548 class on the receiving side). Fixed with declared_golden_unjoined:
       + ONE rule for BOTH sides; controls 15 -> 19.
+  - entry: 18
+    session: 20260926T
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: true
+    why: 'BUG-554/D-2662: the parity join. Paths touched: scripts/check_derivation_homes.py, config/derivations.yaml,
+      governance/buglog.md, governance/bug_status.json|md, config/decisions.yaml, config/decisions_summary.json,
+      governance/CONTEXT_INDEX.md, governance/SESSION-HANDOFF-2026-09-26.md, DECISION-LOG.md,
+      MASTER-TASK-REGISTER.md, agent/session_seed.yaml, justfile(no change). ALL are already inside may_touch, so
+      NOTHING was widened and no glob was asked for. pipeline/** untouched; NO pinned artifact staged (the R2 meter
+      stays OWNER-OWED rather than laundered).'

@@ -8877,3 +8877,45 @@ decisions:
     resolves, debt unchanged 17/17); just health rc=0. FORWARD-ONLY BOUNDARY (BUG-521): the rail proves EXISTENCE
     and MEMBERSHIP of every cited coordinate, NOT that the stored value equals the home''s output - value parity
     remains each row''s parity_rail.'
+- id: D-2662
+  state: OPEN
+  category: GOVERNANCE / RULES
+  date: '2026-09-26'
+  title: a cited parity rail must RESOLVE - the path must exist and the DECLARED ladder must invoke it - and a homed
+    row may not leave it null
+  files:
+  - scripts/check_derivation_homes.py
+  - config/derivations.yaml
+  - governance/buglog.md
+  bugs:
+  - BUG-554
+  decision: 'D-2662 (BUG-554) - a row''s parity_rail must RESOLVE: the named script must EXIST and the ladder DECLARED
+    at config/derivations.yaml#enforcement.ladder must INVOKE it (a mention inside a comment is not a run, and the
+    path must be a whole token, never a substring). A row that claims status homed may not declare parity_rail null:
+    the two fields of ONE record are joined, so a homed claim with nothing that re-derives it is a mismatch (the
+    BUG-550 class) and FAILS rather than passing as unexamined. The three rows whose null repeats their own declared
+    defect (orphan_magic_threshold, dead_but_read, declared_but_empty) keep it legally, and an absent or unreadable
+    ladder is DRIFT. VALUE parity is NOT this rail''s job: comparing re-derived bytes against the stored corpus
+    stays each parity rail''s own measurement, because re-measuring it here would be a second home for one fact
+    (D-2646).'
+  rationale: 'MEASURED 2026-09-26T before any rule: config/derivations.yaml declares 10 rows and a grep over pipeline|scripts|tools
+    found ZERO readers of parity_rail - the field was a claim written by a human and joined by no machine, which
+    is BUG-553 exactly, one field over (D-2661 joined table:/column:, and home: was already joined by the one-home
+    rule). 7 rows name a rail over 3 distinct scripts, all three invoked by justfile; the 3 nulls are exactly the
+    3 non-homed rows. So the population is green TODAY and the rule is a guarantee, not a report. Invocation is
+    half of existence because a rail nothing runs protects nothing (the BUG-508/BUG-510 class: the controls nothing
+    ran got wired), and the null case is joined to the row''s OWN status rather than demanding a rail that status
+    contradicts. Every failure arm fails CLOSED, so a new row cannot cite an unresolvable parity rail.'
+  measured: 'MEASURED 2026-09-26T: 10 rows, 7 with a named parity rail over 3 distinct scripts (scripts/check_serving_gate.py,
+    scripts/check_s5_score_axis.py, scripts/recompute_decision_summary.py), each appearing as a whole token on a
+    python3 recipe line of the declared ladder justfile; 3 rows with null, all three non-homed. Rail verdict after:
+    ''ok check-derivation-homes: ... 7 cited parity rail(s) over 3 distinct script(s), ladder justfile'', rc=0.
+    Controls 23 -> 32.'
+  verification: 'VERIFIED: 32/32 known-answer controls fire (9 new: exists-and-invoked, @-prefix PASS, missing,
+    never-invoked, comment-only, unreadable ladder, homed-null, non-homed-null PASS (anti-overreach), substring).
+    4 negatives SEEN to fire on LIVE bytes with the registry mutated and then restored byte-identical (sha256 compared):
+    a rail that does not exist, an existing script the ladder never runs, a homed row with parity_rail null, and
+    the ladder declaration removed (fails CLOSED). NO CASCADE: scripts/check_silent_repair.py --check unchanged
+    at ''debt 17 of ceiling 17'' (the new reader returns a STATE and repairs nothing), scripts/check_config_defaults.py
+    --check rc=0 over the same registry bytes, and the rail''s own repair site in config/silent_repair.yaml is keyed
+    by CONTENT (D-2658) so the three functions inserted above it move nothing.'

@@ -368,3 +368,19 @@
 - **D-2658 minted, state OPEN** (owner ratify): a declared site is keyed by content, never by a coordinate.
 - **OWED (mine)**: R2 pin re-mint (meter + pin + new decision in ONE commit); the rails' own bodies into git (BUG-545 - the gate still executes uncommitted code); the `fnmatch` tightening decision (BUG-548 sub-finding).
 - **OWED (owner)**: the depth/domain contract ruling (A ratify+S4 re-derivation / B withdraw) - the only remaining red that a shrink-only ceiling may not clear.
+
+---
+
+## 2026-09-26T - the registry's THIRD unjoined field (BUG-554 / D-2662)
+
+- **BUG-554 (MED, FIXED)**: parity_rail was read by NO machine - a row could cite a script that exists nowhere, or
+  one the ladder never runs, and just health printed ok. Now: EXISTS + the declared ladder INVOKES it + a homed row
+  may not leave it null (two fields of one record, the BUG-550 class). Controls 23 -> 32; 4 negatives fired on live
+  bytes. Cascade checked BEFORE the edit: silent-repair 17/17 (the new reader returns a STATE, never repairs) and
+  config-defaults rc=0.
+- **D-2662 minted, state OPEN** (owner ratify).
+- **OWED (mine)**: R2 pin re-mint (the meter + the pin + a NEW decision id in ONE commit; scripts/definition_nli_verify.py
+  is edited in the worktree and OWNER-OWED under BUG-536); BUG-537 archive/.DS_Store control; freeze_gold_sets.py
+  through write_guard; the fnmatch tightening decision after measuring.
+- **OWED (owner)**: the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw) - the only red a
+  shrink-only ceiling may not clear; the ANCHOR-4 depth drop-in rev 3; data/maxwell.db disposition.

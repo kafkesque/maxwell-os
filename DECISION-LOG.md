@@ -615,3 +615,27 @@ HOME + PROOF. `scripts/check_silent_repair.py::declared_sites` resolves `match:`
 `lines:` stays legal as legacy. Exactly one of the two is required, a `match` resolving to nothing is REPORTED (a
 key that can match nothing is a comment, BUG-492), and two entries may not claim one site (D-2646) - the last two
 fail closed (C16). Controls 18 -> 24, two of them ANTI-OVERREACH.
+
+## D-2662 - A cited PARITY RAIL must RESOLVE: existence + invocation, and a homed row may not leave it null (OPEN, minted 2026-09-26T)
+
+RULE. Each row of config/derivations.yaml declares a parity_rail - the script that RE-DERIVES the value. That claim
+now has a machine: the named script must EXIST, and the ladder DECLARED at config/derivations.yaml#enforcement.ladder
+must INVOKE it (whole token, on a recipe line - a mention inside a comment is not a run). A row claiming status homed
+may NOT declare parity_rail null: the two fields are joined, so the strongest status this file has cannot be a claim
+with nothing behind it. An absent or unreadable ladder is DRIFT.
+
+WHY. MEASURED before any rule: 10 rows, and a grep over pipeline|scripts|tools found ZERO readers of parity_rail -
+the third declared field of every row joined by NOTHING. That is BUG-553 (table:/column:) one field over, and it was
+found because D-2661 removed the first two instances of the class; the class returns wherever a field is written by
+a human and read by no machine. 7 rows name a rail over 3 distinct scripts (all three invoked by justfile) and the 3
+nulls are exactly the 3 non-homed rows, so the join is green TODAY and it is a guarantee from here: a new row cannot
+cite a rail the ladder never runs.
+
+SCOPE (stated). Existence + invocation only. Comparing re-derived bytes against the stored corpus is each parity
+rail's OWN measurement; re-measuring it here would be a SECOND HOME for one fact (D-2646).
+
+HOME + PROOF. scripts/check_derivation_homes.py::parity_problems + ladder_invokes; 9 new known-answer controls
+(23 -> 32) with two ANTI-OVERREACH arms (@-prefix must PASS, a non-homed null must PASS) and 4 negatives SEEN to
+fire on LIVE bytes with the registry restored byte-identical. No cascade: silent-repair debt unchanged at 17 of
+ceiling 17 and check_config_defaults rc=0 over the same bytes.
+STATE OPEN because the owner has not ratified it; nothing here is a claim of approval.

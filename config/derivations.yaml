@@ -52,6 +52,23 @@ coordinate_homes:
   config/decisions_summary.json:
     kind: document
     producer_key: written_by
+# PARITY RAILS (D-2662, the BUG-553 class a THIRD time). parity_rail is a row's claim about WHAT RE-DERIVES the
+# value, and until this clause no machine read it either: a row could name a script that exists NOWHERE, or a script
+# that exists and that the LADDER NEVER RUNS, and the registry printed ok - the same shape as the coordinate fields
+# above. The rule:
+#
+#   a cited PARITY RAIL must RESOLVE - the path must EXIST, and the declared ladder must INVOKE it.
+#
+# WHY INVOCATION IS HALF OF EXISTENCE. A rail nothing runs is not a rail (BUG-508/510: the controls nothing ran got
+# wired). The comparison of re-derived bytes against the stored corpus stays the parity rail's OWN job; this registry
+# proves only that the machine is there and that something runs it, and a mention inside a comment is NOT a run.
+#
+# WHY A HOMED ROW MAY NOT LEAVE IT NULL. parity_rail: null says "no re-derivation exists" - the same statement the
+# three defective rows already make through their status: - so the null is checked AGAINST the row's own status, two
+# fields of ONE record joined (the BUG-550 class). MEASURED 2026-09-26T: 7 of 10 rows name a rail over 3 distinct
+# scripts, all three invoked by the ladder (check_serving_gate, check_s5_score_axis, recompute_decision_summary),
+# and the 3 nulls are exactly the 3 NON-homed rows (orphan_magic_threshold, dead_but_read, declared_but_empty). The
+# strongest status this file has would otherwise be a claim with nothing behind it.
 
 derivations:
 - name: fbs.status
@@ -182,6 +199,11 @@ config_reads:
 
 enforcement:
   rail: scripts/check_derivation_homes.py
+  # D-2662: WHERE THE PARITY RAILS ARE RUN is a DECLARATION, never a path hardcoded in the rail (C12). The parity
+  # clause resolves each cited parity_rail against this file: a script that EXISTS but that nothing runs is a rail
+  # that protects nothing (the BUG-508/BUG-510 class - "the controls nothing ran got wired"), and a ladder that
+  # cannot be read is DRIFT, not a pass.
+  ladder: justfile
   # SHRINK-ONLY: how many registered derivations are NOT homed. Measured 2026-09-25 = 3 (1 orphan
   # magic threshold, 1 dead-but-read, 1 declared-but-empty). Raising it is a DECISION, not an edit
   # (the D-401/guard_coverage precedent): a count that can grow by edit is not a ceiling.

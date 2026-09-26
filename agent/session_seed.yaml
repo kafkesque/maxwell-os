@@ -320,3 +320,10 @@ current_state:
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
 open_bugs_n: 128
+
+# 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
+# THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:
+# table:/column: (BUG-553, joined by D-2661) and parity_rail (BUG-554, joined by D-2662) were each read by nobody,
+# and each rail that joined them is now IN the ladder (scripts/check_derivation_homes.py, 32/32 controls).
+# NEXT SESSION READS, in order: governance/CONTEXT_INDEX.md (recall map), governance/SESSION-HANDOFF-2026-09-26.md,
+# then the ladder: just health. The R2 pin is OWNER-OWED (a moved sha256 needs a NEW decision id, BUG-535).

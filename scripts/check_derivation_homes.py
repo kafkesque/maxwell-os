@@ -20,9 +20,18 @@ WHAT IT CHECKS (the population is every row of config/derivations.yaml):
      two kinds are machine-distinct - a document coordinate must exist, parse, carry the column as a top-level key
      and name an existing producer; a store coordinate is DELEGATED to its declared column census, whose declared
      table must match, whose rail must exist, and whose membership map must carry the column.
+  5. a row's PARITY RAIL (the claim about WHAT RE-DERIVES the value) RESOLVES too (D-2662, the BUG-553 class a
+     THIRD time - the field was read by no machine either): the named script must EXIST, and the DECLARED ladder
+     must INVOKE it, because a rail nothing runs protects nothing (the BUG-508/BUG-510 class) and a mention inside
+     a comment is not a run. A row claiming status 'homed' may NOT leave it null: 'homed' is the strongest status
+     the vocabulary has, and a home with nothing that re-proves it against the store is a mismatch INSIDE ONE
+     RECORD (the BUG-550 class). The null case is joined to the row's OWN status - two fields of one record - so
+     the three declared-defective rows keep their null legally and a new homed row cannot.
 SCOPE (stated, because an unstated scope reads as coverage): this rail does NOT prove the home is the only
-WRITER of the stored value, it does not re-derive values - that is each row's parity rail - and it does not
-measure the STORE: it proves the ONE-HOME property and coordinate EXISTENCE + MEMBERSHIP, delegated. It NEVER
+WRITER of the stored value, and it does NOT re-derive any value - it proves that each row's parity rail EXISTS and
+that the declared ladder RUNS it; comparing re-derived bytes against the stored corpus is that rail's own job. It
+does not measure the STORE either: it proves the ONE-HOME property, coordinate EXISTENCE + MEMBERSHIP (delegated)
+and parity EXISTENCE + INVOCATION. It NEVER
 opens the store: the store carries a vec0 virtual table, so a store open here would raise `no such module: vec0`
 and kill the rail on its first run. VALUE parity is never this rail's job.
 
@@ -47,6 +56,11 @@ NO_HOME_STATUSES: tuple[str, ...] = ("dead_but_read", "declared_but_empty")
 # D-2661: the CLOSED vocabulary of coordinate kinds. Each kind is a distinct MACHINE rule, never a label (BUG-492);
 # an unknown kind fails CLOSED, because a kind nobody implements is a coordinate nobody reads.
 COORDINATE_KINDS: tuple[str, ...] = ("document", "store_census")
+# D-2662: the ONE status that CLAIMS the value has a working home. A row carrying it with no parity rail states a
+# home and names nothing that re-proves it against the store, which is a mismatch INSIDE ONE RECORD (BUG-550), so it
+# is FATAL rather than unexamined. The other statuses already declare a defect; their null repeats that statement,
+# and joining the two fields of the row is what makes the repetition checkable instead of assumed.
+HOMED_STATUS = "homed"
 
 
 def load_yaml(path: Path) -> dict:
@@ -112,6 +126,21 @@ def load_artifact(rel: str) -> tuple[str, Any]:
         return "unparsable", None
 
 
+def load_text(rel: str) -> tuple[str, str]:
+    """(state, text) for a cited NON-YAML artifact: missing | unreadable | ok - unreadable is not clean (C16).
+
+    Read STRICTLY, with no errors= argument, for the same reason load_artifact is: a rail that audits silent
+    repairs may not perform one. The except clause RETURNS A STATE - nothing is repaired and nothing is swallowed.
+    """
+    path = ROOT / rel
+    if not path.is_file():
+        return "missing", ""
+    try:
+        return "ok", path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return "unreadable", ""
+
+
 def member_map(doc: dict, dotted: str) -> dict | None:
     """Resolve a DECLARED dotted key path inside a census document; an absent path is None, never a default (D-2644).
 
@@ -124,6 +153,52 @@ def member_map(doc: dict, dotted: str) -> dict | None:
             return None
         node = node[part]
     return node if isinstance(node, dict) else None
+
+
+def ladder_invokes(text: str, script: str) -> bool:
+    """True iff a ladder RECIPE LINE actually INVOKES script (D-2662).
+
+    A mention inside a comment is not a run (BUG-492: a kind is a rule, not a label), so the comment half of each
+    line is dropped first; an @-prefixed recipe line executes the very same command, so the prefix is stripped. The
+    path must be a WHOLE TOKEN: a substring test would read scripts/x.py.bak as scripts/x.py (the BUG-528 class,
+    where one path reads as another).
+    """
+    for raw in text.splitlines():
+        code = raw.split("#", 1)[0].replace("@", " ")
+        tokens = code.split()
+        if tokens and tokens[0] in ("python3", "python") and script in tokens:
+            return True
+    return False
+
+
+def parity_problems(name: str, row: dict, status: str, ladder: tuple[str, str], ladder_rel: str) -> list[str]:
+    """Join ONE row's declared parity_rail to reality: EXISTENCE + INVOCATION, joined to its OWN status (D-2662).
+
+    VALUE parity is not this rail's job: comparing re-derived bytes against the stored corpus is the parity rail's
+    own measurement. This proves the machine is there AND that the ladder runs it, and it joins the null case to the
+    row's own status rather than demanding a rail the row's other field contradicts.
+    """
+    rail = str(row.get("parity_rail") or "").strip()
+    if not rail:
+        if status == HOMED_STATUS:
+            return [name + ": claims status " + repr(HOMED_STATUS) + " while declaring parity_rail null - a homed "
+                    "value with nothing that re-derives it is a mismatch INSIDE ONE RECORD (the BUG-550 class): the "
+                    "row states the value has ONE home and no machine re-proves it against the store. Name the rail "
+                    "that re-derives it, or stop claiming it is homed (D-2662)."]
+        return []
+    state, text = ladder
+    if state != "ok":
+        return [name + ": declares parity_rail " + rail + " but the DECLARED ladder " + ladder_rel + " is " + state
+                + " - whether that rail ever runs cannot be established, and an unreadable ladder is not clean (C16)"]
+    found: list[str] = []
+    if not (ROOT / rail).is_file():
+        found.append(name + ": declares parity_rail " + rail + ", which does NOT exist - the row claims a "
+                     "re-derivation that no file performs (a rail is a path before it is a promise)")
+    elif not ladder_invokes(text, rail):
+        found.append(name + ": parity_rail " + rail + " exists but " + ladder_rel + " never INVOKES it (a mention "
+                     "inside a comment is not a run) - a rail nothing runs protects nothing (the BUG-508/BUG-510 "
+                     "class), so the row's re-derivation is a claim, not a machine")
+    return found
 
 
 def coordinate_problems(name: str, row: dict, homes: dict,
@@ -215,8 +290,9 @@ def coordinate_problems(name: str, row: dict, homes: dict,
 
 
 def check_rows(rows: list[dict], sources: dict[str, str], homes: dict,
-               load: Callable[[str], tuple[str, Any]]) -> tuple[list[str], int]:
-    """Join every registry row to reality: its home, and its COORDINATE (D-2661). Returns (problems, non_homed)."""
+               load: Callable[[str], tuple[str, Any]], ladder: tuple[str, str],
+               ladder_rel: str) -> tuple[list[str], int]:
+    """Join every row to reality: its HOME, its COORDINATE (D-2661) and its PARITY RAIL (D-2662)."""
     problems: list[str] = []
     non_homed = 0
     seen: set[str] = set()
@@ -261,6 +337,7 @@ def check_rows(rows: list[dict], sources: dict[str, str], homes: dict,
                                 + ", ".join(found) + " - a writer appeared while the registry still says NO code "
                                 "decides it (home null is a statement, not a blank)")
         problems.extend(coordinate_problems(name, row, homes, load))
+        problems.extend(parity_problems(name, row, status, ladder, ladder_rel))
     return problems, non_homed
 
 
@@ -277,7 +354,7 @@ def controls() -> list[tuple[str, bool]]:
         ("an unparsable module yields NO defs rather than a silent pass", module_defs("def (") == set()),
         ("the status vocabulary is CLOSED and names the four known states", len(STATUSES) == 4),
         ("a no-home status may not claim a home", "homed" not in NO_HOME_STATUSES),
-    ] + coordinate_controls()
+    ] + coordinate_controls() + parity_controls()
 
 
 def coordinate_controls() -> list[tuple[str, bool]]:
@@ -341,6 +418,52 @@ def coordinate_controls() -> list[tuple[str, bool]]:
     ]
 
 
+def parity_controls() -> list[tuple[str, bool]]:
+    """The PARITY join's known-answer controls (D-2662): one per arm, and EVERY arm must be able to FAIL.
+
+    The fixture ladder is written with REAL newlines rather than escapes, so a control's text has exactly the shape
+    a recipe line has. Arms proved: exists-and-invoked | missing | never-invoked | comment-only | unreadable ladder,
+    plus two ANTI-OVERREACH arms (a non-homed null is LEGAL, an @-prefixed line IS a run) and the substring arm.
+    """
+    live = "scripts/check_store_columns.py"        # a path that EXISTS: the missing arm needs one that does not
+    ok_ladder = ("ok", """health:
+    python3 """ + live + """ --check || exit 1
+""")
+    other_ladder = ("ok", """health:
+    python3 scripts/nope_other_zzz.py --check || exit 1
+""")
+    comment_ladder = ("ok", """health:
+    # the parity rail is """ + live + """
+    python3 scripts/nope_other_zzz.py --check || exit 1
+""")
+    at_ladder = ("ok", """health:
+    @python3 """ + live + """ --check || exit 1
+""")
+    suffix_ladder = ("ok", """health:
+    python3 """ + live + """.bak --check || exit 1
+""")
+    return [
+        ("a homed row whose rail EXISTS and whose ladder INVOKES it resolves",
+         parity_problems("probe.row", {"parity_rail": live}, "homed", ok_ladder, "justfile") == []),
+        ("an @-prefixed recipe line IS a run (the @ is not part of the path)",
+         ladder_invokes(at_ladder[1], live)),
+        ("a parity rail that does NOT exist is DETECTED",
+         bool(parity_problems("probe.row", {"parity_rail": "scripts/nope_zzz.py"}, "homed", ok_ladder, "justfile"))),
+        ("a parity rail the ladder NEVER runs is DETECTED",
+         bool(parity_problems("probe.row", {"parity_rail": live}, "homed", other_ladder, "justfile"))),
+        ("a parity rail mentioned ONLY IN A COMMENT is not a run and is DETECTED",
+         bool(parity_problems("probe.row", {"parity_rail": live}, "homed", comment_ladder, "justfile"))),
+        ("an UNREADABLE ladder is DETECTED, never a silent pass",
+         bool(parity_problems("probe.row", {"parity_rail": live}, "homed", ("missing", ""), "justfile"))),
+        ("a HOMED row with NO parity rail is DETECTED (a claim with nothing re-deriving it)",
+         bool(parity_problems("probe.row", {"parity_rail": None}, "homed", ok_ladder, "justfile"))),
+        ("a NON-homed row with no parity rail is TOLERATED (its null repeats its own status)",
+         parity_problems("probe.row", {"parity_rail": None}, "dead_but_read", ok_ladder, "justfile") == []),
+        ("a path that is only a SUBSTRING of another is not an invocation (BUG-528 class)",
+         not ladder_invokes(suffix_ladder[1], live)),
+    ]
+
+
 def main(argv: list[str]) -> int:
     """Run the known-answer controls, or join the registry's homes to the tree."""
     if "--selftest" in argv:
@@ -369,13 +492,25 @@ def main(argv: list[str]) -> int:
         raise SystemExit("FAIL " + PREFIX + ": config/derivations.yaml declares no coordinate_homes mapping - the "
                          "coordinate half of every row would be joined by nothing, which is the BUG-553 defect: a "
                          "read with a code default is not a declaration (D-2644).")
+    ladder_rel = str(enforcement.get("ladder") or "").strip()
+    if not ladder_rel:
+        raise SystemExit("FAIL " + PREFIX + ": config/derivations.yaml#enforcement declares no ladder - the place "
+                         "that runs the parity rails is a DECLARATION (C12), never a path hardcoded here (D-2662), "
+                         "and a rail nothing runs protects nothing.")
+    ladder = load_text(ladder_rel)
+    if ladder[0] != "ok":
+        raise SystemExit("FAIL " + PREFIX + ": the declared ladder " + ladder_rel + " is " + ladder[0]
+                         + " - whether any parity rail ever runs cannot be established from a ladder nobody can "
+                         "read, and unreadable is not clean (C16)")
     sources = sources_under(roots)
-    problems, non_homed = check_rows(rows, sources, homes, load_artifact)
+    problems, non_homed = check_rows(rows, sources, homes, load_artifact, ladder, ladder_rel)
     homed = len(rows) - non_homed
+    named = [str(r.get("parity_rail") or "").strip() for r in rows if str(r.get("parity_rail") or "").strip()]
     line = (str(len(rows)) + " registered derivation(s) over " + str(len(sources)) + " module(s): " + str(homed)
             + " homed, " + str(non_homed) + " not homed (declared ceiling " + str(ceiling) + ", shrink-only); "
             + str(len(rows)) + " cited coordinate(s) joined to " + str(len(homes))
-            + " declared census home(s)")
+            + " declared census home(s); " + str(len(named)) + " cited parity rail(s) over "
+            + str(len(set(named))) + " distinct script(s), ladder " + ladder_rel)
     if problems:
         print("FAIL " + PREFIX + ": " + str(len(problems)) + " home problem(s) - " + line)
         for p in problems:
@@ -390,8 +525,9 @@ def main(argv: list[str]) -> int:
               "decision) - " + line)
         return EXIT_OWED
     print("ok " + PREFIX + ": every registered home exists, is UNIQUE, every cited coordinate RESOLVES to its "
-          "declared census home, and no writer appeared where home is null (the store is never opened here: the "
-          "column question is DELEGATED to its own rail, D-2646/D-2661) - " + line)
+          "declared census home, every cited parity rail EXISTS and is INVOKED by the declared ladder, and no "
+          "writer appeared where home is null (the store is never opened here: the column question is DELEGATED to "
+          "its own rail, D-2646/D-2661/D-2662) - " + line)
     return EXIT_CLEAN
 
 

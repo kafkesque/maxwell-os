@@ -1011,3 +1011,11 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   declared `membership:` path). NO store is ever opened (vec0 -> `no such module: vec0` would be fatal day one).
   Controls 7 -> 23; 3 negatives SEEN to fire on live bytes. Cascade fixed first: silent_repair.yaml keyed this rail's
   own site by `lines: [78]` -> re-keyed to `match:` (D-2658 applied to its own register).
+
+- **BUG-554 FIXED / D-2662 (the PARITY join)**: scripts/check_derivation_homes.py gained its 5th clause - a cited
+  parity_rail must EXIST and the LADDER DECLARED at config/derivations.yaml#enforcement.ladder (justfile) must INVOKE
+  it as a whole token on a recipe line; a mention in a comment is not a run; a row claiming status homed may not
+  leave it null (two fields of ONE record joined, the BUG-550 class); an unreadable ladder fails CLOSED. Controls
+  23 -> 32; 4 negatives fired on LIVE bytes (registry restored byte-identical); silent-repair debt UNCHANGED 17/17
+  and config-defaults rc=0 (no cascade). VALUE parity stays each parity rail's own job - re-measuring it here would
+  be a second home (D-2646).

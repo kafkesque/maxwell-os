@@ -297,3 +297,14 @@ OWED / NEXT: the owner's one-word SCOPE ratification is no longer blocking (the 
 larger owner gates are unchanged (ANCHOR-4 rev 3 promotion; the A/B depth/domain contract ruling; data/maxwell.db
 delete-or-keep; Dropbox siblings HELD/DISCARD). MY NEXT: the R2 pin re-mint; BUG-537's archive control;
 freeze_gold_sets.py -> write_guard.
+
+## 2026-09-26T (D-2662 - the PARITY join: existence + the ladder that runs it, never value)
+
+NEXT. The derivation registry now joins three declared fields to reality: home (the one-home rule), table:/column:
+(D-2661's coordinate census), and parity_rail (D-2662 - exists AND invoked by the declared ladder). The REMAINING
+unjoined surfaces are OUTSIDE this registry: the R2 pin re-mint (OWNER-OWED: the meter's sha moved, and a moved pin
+needs a NEW decision id WITH the measurement), BUG-537's archive control, and freeze_gold_sets.py's undeclared write.
+
+OWNER GATES (unchanged, one word each): the depth/domain contract A/B ruling; the ANCHOR-4 depth drop-in rev 3; the
+data/maxwell.db disposition (19 rows, 0.24% of truth, same table name); Dropbox siblings HELD vs DISCARD; ratify
+D-2661/D-2662.

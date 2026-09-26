@@ -6868,3 +6868,15 @@ fail CLOSED rather than open: an unresolvable `membership:` path and a census wi
 FORWARD-ONLY, DECLARED (the boundary, stated the BUG-521 way): the rail now proves EXISTENCE and MEMBERSHIP of
 every cited coordinate - NOT that the stored value equals the home's output. Value parity remains each row's
 `parity_rail`, as the rail's SCOPE has said since it was written.
+
+## BUG-554 (MED - FIXED 2026-09-26) - the third declared field of every registry row was joined by NOTHING: parity_rail named the script that RE-DERIVES the value and no rail read it, so a row could cite a script that exists nowhere - or one the ladder never runs - while just health printed ok
+
+MEASURED BEFORE ANY RULE. config/derivations.yaml declares 10 rows. A grep over pipeline|scripts|tools for parity_rail found ZERO readers: the field was a claim written by a human and joined by no machine - BUG-553 exactly, one field over (D-2661 joined table:/column:; home: was already joined by the one-home rule). MEASURED: 7 rows name a rail over 3 distinct scripts; the 3 nulls are exactly the 3 NON-homed rows. All 3 named scripts ARE invoked by justfile, so the join is green on live bytes and it is a GUARANTEE rather than a report: any NEW row that names a rail has it resolved from now on.
+
+THE RULE (D-2662). A cited parity rail must RESOLVE - the path must EXIST, and the DECLARED ladder (config/derivations.yaml#enforcement.ladder = justfile, C12: never a path hardcoded in the rail) must INVOKE it. A mention inside a comment is NOT a run and the path must be a WHOLE TOKEN (a substring test would read scripts/x.py.bak as scripts/x.py, the BUG-528 class). A row claiming status homed may NOT leave parity_rail null: that joins TWO FIELDS OF ONE RECORD (the BUG-550 class), so a homed claim with nothing behind it FAILS instead of passing as unexamined. An absent or unreadable ladder is DRIFT (C16).
+
+WHY THE SCOPE STOPS AT EXISTENCE + INVOCATION. Comparing re-derived bytes against the stored corpus is each parity rail's OWN measurement (check_serving_gate, check_s5_score_axis, recompute_decision_summary). Re-measuring it here would be a SECOND HOME for one fact - the defect this registry exists to prevent (D-2646).
+
+VERIFIED. 9 new known-answer controls (23 -> 32), including a comment-only arm, an @-prefix arm that must PASS, a non-homed null arm that must PASS (anti-overreach) and a substring arm. 4 negatives SEEN to fire on LIVE bytes (registry mutated, then restored byte-identical): a rail that does not exist; an existing script the ladder never runs; a homed row with parity_rail null; the ladder declaration removed (fails CLOSED). No cascade: silent-repair debt is UNCHANGED at 17 of ceiling 17 (the new reader returns a STATE, it does not repair) and check_config_defaults stays rc=0 over the same registry bytes.
+
+FILES: scripts/check_derivation_homes.py, config/derivations.yaml.

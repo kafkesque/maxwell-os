@@ -8810,3 +8810,25 @@ decisions:
   rationale: "MEASURED 2026-09-26S (BUG-549, twice the same day): (1) a read-only probe ran sqlite3.connect('pipeline/maxwell.db') on a path that did NOT exist - connect() CREATES the file, so a read-only probe WROTE a 0-byte store and the rail filed it UNDECLARED-STORE, naming the WRONG CAUSE; (2) the interim repair (pipeline/safe_delete.py COPIES the target to backup/deletions/{timestamp}/ before deleting) put that pre-image INSIDE the rail's own scan root and re-manufactured the identical FATAL, so the fix cost the reversibility the tool exists to provide. Both aborted `just health` at justfile line 57 and HID every rail below (BUG-457). ROOT CAUSE (class): the rail could not tell a STORE from THE FINGERPRINT OF NOT-A-STORE and had no declared home for a TOMBSTONE. FIX, 5 clauses: (1) a store file with ZERO tables (or 0 bytes) is EMPTY-STORE, named by CAUSE, never UNDECLARED-STORE; unreadable is UNREADABLE-STORE; both stay FATAL; (2) preimage_regions: declares tombstone homes - a store file inside one is COUNTED, never an authority; (3) a region may not cover the repo (REGION-BLINDS-REPO), may not cover a DECLARED store (REGION-SHADOWS-DECLARATION), must be a directory (DEAD-REGION) and must carry an adequate why; an EMPTY region is the HEALTHY state and is NOT a fault; (4) the verdict STATES the boundary it measured (BUG-521) - declared | tombstones | regions | faults; (5) the writable-probe guard is a SHRINK-ONLY CEILING with a named read-only opener, NOT a blanket lint - MEASURED: 159 of 174 sqlite3.connect( sites in pipeline|scripts|tools do not open mode=ro, so a gate would be FATAL on day one. VERIFIED: 16/16 known-answer controls (was 9, incl. c11 a 0-byte file is EMPTY-STORE and NOT UNDECLARED-STORE, c12 an EMPTY region is healthy, c16 a region does NOT loosen the rule elsewhere); --check exit 0 with 0 faults. RECORD REPAIRED 2026-09-26S BEFORE ITS FIRST COMMIT: the mint had CLONED D-2658's files, bugs and rationale into D-2659 (BUG-550), found by the pre-commit forensic audit; the in-place repair does not violate BUG-539, which protects LANDED history."
   files: ["scripts/check_store_authority.py", "config/store_authority.yaml"]
   bugs: ["BUG-549"]
+- id: D-2660
+  state: OPEN
+  category: GOVERNANCE / RULES
+  date: '2026-09-26'
+  title: 'The mint joins a record''s OWN FIELDS to reality before a byte is written: the next free id, registered
+    bugs, a payload that names its own bugs, existing files, no cloned payload'
+  decision: 'MEASURED 2026-09-26T: --mint validated a record''s SHAPE and never its CLAIM, so BUG-550 (a minted
+    record carrying another record''s files, bugs and rationale) was invisible to every rail and could only be found
+    by reading two fields of one record together. FIX (BUG-552) - four clauses in the mint''s ONE home, scripts/recompute_decision_summary.py:
+    (1) the id MUST be the next FREE id; (2) ''bugs:'' is required and every cited bug MUST exist in governance/bug_status.json
+    (register the bug BEFORE the decision that cites it); (3) the payload MUST name at least one of its OWN bugs
+    (the BUG-550 tell); (4) every cited file MUST exist and ''files:'' MUST be a list. A whole-payload clone is
+    REFUSED by name. 10 known-answer controls, incl. the control record having to PASS, wired into just health.
+    FORWARD-ONLY: it applies at the moment of mint and never rewrites the 790 landed records (559 carry no title,
+    26 file citations do not resolve, 1 files value is a blob) because the registry is append_only with a PREFIX
+    receipt (BUG-539); the historical vector is therefore NOT a ceiling.'
+  files:
+  - scripts/recompute_decision_summary.py
+  - justfile
+  - governance/buglog.md
+  bugs:
+  - BUG-552

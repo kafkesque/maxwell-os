@@ -6780,3 +6780,39 @@ is owner-owed (2) - the ceiling is SHRINK-ONLY and it shrinks LOUDLY. The derive
 `unjoined_detail` (id, cause, candidates), so the receipt carries the CAUSE and not only the id. VERIFIED: 19/19
 known-answer controls (was 15), including all four golden-side cases; `--check` exit 2 with "golden: 2 row(s)
 unjoined, all DECLARED in config".
+
+## BUG-552 (MED - FIXED 2026-09-26) - the mint had no FIELD-LEVEL join: a record could cite a file that exists nowhere, a bug the register has never seen, or another record's payload, while every rail stayed green
+
+MEASURED (2026-09-26T, opening this step): scripts/recompute_decision_summary.py --mint already validated that a
+record is a mapping carrying id/state/category/title/decision, that its state is canonical, that its id is not
+ALREADY minted, that the append preserves the registry prefix (BUG-539) and that the result re-derives
+(D-2648/D-2649). It validated NOTHING about the record's own FIELDS: a mint could name a file that exists
+nowhere, cite a bug id the register has never seen, omit 'bugs:' entirely (MINT_REQUIRED did not list it), and
+could carry the byte-identical payload of the record above it. That last one is not hypothetical - it is BUG-550
+(D-2659 carried D-2658's files, bugs and rationale), found BY HAND, because NO RAIL READS TWO FIELDS OF ONE
+RECORD TOGETHER.
+
+ROOT CAUSE (class): the validation was about the record's SHAPE, never the record's CLAIM. A claim carries fields
+that can be joined to reality - this file exists, this bug exists, this id is the next one - and the join was
+missing at the one moment it is cheap: the mint.
+
+FIX (D-2660): four clauses inside the EXISTING mint home. NO NEW SCRIPT, because a second minter would be exactly
+the D-2646/BUG-502 defect (one rule, two implementations) that this register exists to prevent. (1) the id MUST be
+the next FREE id - a skip is a hole indistinguishable from a deleted record; (2) 'bugs:' is REQUIRED and every
+cited bug id MUST be in governance/bug_status.json (register the bug BEFORE the decision that cites it); (3) the
+record's payload MUST name at least one of its OWN bugs - the BUG-550 tell, where the payload named BUG-542 while
+the record claimed BUG-549; (4) every cited file MUST exist and 'files:' MUST be a LIST (one record on disk
+carries a comma-joined blob naming a path that exists nowhere). A WHOLE-PAYLOAD CLONE (same files AND same bugs
+AND the same payload opening) is REFUSED by name. 10 known-answer controls - including the control record itself
+having to PASS - wired into just health as --selftest.
+
+FORWARD-ONLY, DECLARED (the boundary, stated the BUG-521 way): across the 790 records already on disk, 559 carry
+no 'title', 128 name no payload key at all, 26 file citations do not resolve and 1 'files' value is a blob. The
+rule therefore applies at the MOMENT OF MINT and never rewrites history (the registry is append_only and its
+receipt is a PREFIX rule, BUG-539). The historical vector is deliberately NOT declared as a shrink-only ceiling:
+a ceiling whose only way down is rewriting landed history is a ceiling nobody can lower, and BUG-539 forbids the
+rewrite.
+
+VERIFIED: --selftest 10/10 controls fire; a cloned payload is REFUSED end-to-end; a nonexistent file citation is
+REFUSED end-to-end; --check stays green with the registry stamp UNMOVED - the patch touched the WRITER, not the
+record bytes.

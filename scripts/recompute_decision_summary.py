@@ -17,7 +17,12 @@ records list extends to end-of-file, so:
 
     --mint <file|-> [--apply]       APPENDS validated record(s). The append is CHECKED (the new text must have
                                     the old text as a prefix), which is exactly what the append-only receipt
-                                    demands; the census is rewritten in the same invocation.
+                                    demands; the census is rewritten in the same invocation. D-2660: the record's
+                                    OWN FIELDS are joined to reality FIRST - the id is the next free one, its bugs
+                                    exist in governance/bug_status.json, its payload NAMES its own bugs, every cited
+                                    file EXISTS, and a whole-payload clone of a record on disk is REFUSED.
+    --selftest                      run the MINT gate's known-answer controls (BUG-492); a control that has never
+                                    been seen to fire is a comment. Wired into just health.
     --strip-derived-head [--apply]  the ONE-SHOT migration that removed the derived head and the summary block
                                     by BYTE SPLICE, so the record bytes were never re-rendered.
 
@@ -412,6 +417,65 @@ def _diff(data: dict, total: int, summary: dict, digest: str) -> list[str]:
 
 MINT_REQUIRED: tuple[str, ...] = ("id", "state", "category", "title", "decision")
 
+# D-2660 - THE MINT GATE JOINS A RECORD'S OWN FIELDS TO REALITY. BUG-550 was a record that named the wrong
+# module and the wrong bug and stayed invisible: every rail read a record's VERDICT, no rail read two of its
+# FIELDS together. MEASURED 2026-09-26 on the 790 records already on disk: 559 carry no `title`, 128 name no
+# payload key at all, 26 file citations do not resolve and one `files:` value is a comma-joined BLOB - so this
+# rule is FORWARD-ONLY, applied at the MOMENT OF MINT. It never rewrites history (the registry is append_only
+# and its receipt is a PREFIX rule, BUG-539) and it never counts it. Existence of a cited FILE is checked on
+# the machine that mints: a citation is a claim about the tree NOW, and the mint is the moment it is authored.
+MINT_BUGS_KEY: str = "bugs"
+MINT_PAYLOAD_KEYS: tuple[str, ...] = ("title", "decision", "rationale", "measured", "description", "verification")
+MINT_CLONE_PREFIX: int = 200
+BUG_REGISTER: Path = ROOT / "governance" / "bug_status.json"
+
+
+def bug_register_ids() -> set[str]:
+    """Return every bug id the register carries, or FAIL CLOSED - a citation checked against nothing is unchecked."""
+    if not BUG_REGISTER.exists():
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + BUG_REGISTER.relative_to(ROOT).as_posix()
+                         + " is absent - a bug citation checked against nothing is a citation nobody checked (C16)")
+    doc = json.loads(BUG_REGISTER.read_text(encoding="utf-8"))
+    ids = {str(b.get("id")) for b in (doc.get("open") or []) if isinstance(b, dict)}
+    ids |= {str(b) for b in (doc.get("closed") or [])}
+    if not ids:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + BUG_REGISTER.relative_to(ROOT).as_posix()
+                         + " carries no bug id - an EMPTY register would refuse every honest mint or, worse, "
+                         "pass every dishonest one (D-2659: a store named by its CAUSE)")
+    return ids
+
+
+def next_free_decision_id(decisions: list) -> str:
+    """Return D-<max+1>: an id is a POSITION in the namespace, so a mint may only extend it by one."""
+    nums: list[int] = []
+    for d in decisions:
+        body = str(d.get("id") or "").strip()
+        if body.startswith("D"):
+            body = body[1:].lstrip("-")
+            if body.isdigit():
+                nums.append(int(body))
+    if not nums:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the registry carries no D-NNNN id - the next free id "
+                         "cannot be derived from an empty namespace (C16)")
+    return "D-" + str(max(nums) + 1)
+
+
+def payload_text(record: dict) -> str:
+    """Return every prose field of one record, joined: the payload a CLONE would have copied verbatim (BUG-550)."""
+    return " ".join(str(record.get(k) or "") for k in MINT_PAYLOAD_KEYS).strip()
+
+
+def _file_list(record: dict) -> list[str]:
+    """Return the cited files as a list of strings - anything else is NOT a list and is reported as such."""
+    files = record.get("files")
+    return [str(f) for f in files] if isinstance(files, list) else []
+
+
+def _bug_list(record: dict) -> list[str]:
+    """Return the cited bugs as a list of strings - anything else is NOT a list and is reported as such."""
+    bugs = record.get(MINT_BUGS_KEY)
+    return [str(b) for b in bugs] if isinstance(bugs, list) else []
+
 
 def mint_validate(record: dict, decisions: list) -> list[str]:
     """Every reason a record may NOT be inserted - checked BEFORE a byte is written (D-2648/D-2649)."""
@@ -431,7 +495,109 @@ def mint_validate(record: dict, decisions: list) -> list[str]:
                         + " - a registry that can hold one id twice cannot answer what is decided (C21)")
     if "status" in record:
         problems.append("carries a legacy `status:` key alongside `state:` - one fact in two places (BUG-483)")
+    # D-2660 CLAUSE 1 - the id is the NEXT FREE id. A namespace is extended, never sampled: a skipped id is a hole
+    # that cannot be told apart from a record somebody removed (C21), and BUG-550 was found by reading ids in order.
+    expected = next_free_decision_id(decisions)
+    if normalized_id(record) != normalized_id({"id": expected}):
+        problems.append("id " + str(record.get("id")) + " is not the next FREE id (" + expected + ") - the mint "
+                        "APPENDS, so an id that skips one is a hole indistinguishable from a deleted record (D-2660)")
+    # CLAUSE 2 - the bugs it names EXIST in the register, and its own payload NAMES at least one of them. A record
+    # whose payload names a bug it does not cite IS the BUG-550 signature (D-2659 carried BUG-542's rationale).
+    bugs = _bug_list(record)
+    if not [b for b in bugs if b.strip()]:
+        problems.append("names no `bugs:` list - a decision that fixes nothing cannot be joined to the register "
+                        "(D-2660)")
+    else:
+        known = bug_register_ids()
+        unknown = [b for b in bugs if b not in known]
+        if unknown:
+            problems.append("cites bug(s) that are NOT in the register: " + ", ".join(unknown)
+                            + " - register the bug BEFORE the decision that cites it, or the citation names nothing "
+                            "(D-2660)")
+        payload = payload_text(record)
+        if payload and not any(b in payload for b in bugs):
+            problems.append("its payload names NONE of its own bugs " + str(bugs) + " - the tell of a CLONED record "
+                            "(BUG-550); a decision must say what it fixes")
+    # CLAUSE 3 - every cited FILE exists, and `files` is a LIST. A comma-joined blob is one path that exists
+    # nowhere: MEASURED on 1 of the 790 records on disk, which is why the rule is forward-only.
+    files = _file_list(record)
+    if not files:
+        problems.append("names no `files:` list - a decision with no artifact cannot be joined to the tree (D-2660)")
+    else:
+        absent = [f for f in files if not Path(f).expanduser().exists()]
+        if absent:
+            problems.append("cites file(s) that do NOT exist: " + ", ".join(absent)
+                            + " - a citation is a claim about the tree at the MOMENT OF MINT (D-2660)")
+    # CLAUSE 4 - a WHOLE-PAYLOAD CLONE of a record already on disk is REFUSED. Same files AND same bugs AND the
+    # same payload opening is not a coincidence: it is BUG-550, where a cloned record named the wrong module and
+    # the wrong bug while EVERY rail stayed green, because no rail read two fields of one record together.
+    mine = (sorted(files), sorted(bugs), payload_text(record)[:MINT_CLONE_PREFIX])
+    for other in decisions:
+        theirs = (sorted(_file_list(other)), sorted(_bug_list(other)),
+                  payload_text(other)[:MINT_CLONE_PREFIX])
+        if mine[2] and mine == theirs:
+            problems.append("is a WHOLE-PAYLOAD CLONE of " + str(other.get("id")) + " (same files, same bugs, same "
+                            "payload opening) - that is the BUG-550 signature, not a coincidence (D-2660)")
+            break
     return problems
+
+
+
+
+def mint_controls() -> list[tuple[str, bool]]:
+    """Known-answer controls for the D-2660 MINT gate (BUG-492: a detector nobody has seen fail is not a detector)."""
+    live = (yaml.safe_load(DECISIONS_YAML.read_text(encoding="utf-8")) or {}).get("decisions") or []
+    good = {
+        "id": next_free_decision_id(live),
+        "state": "OPEN",
+        "category": "GOVERNANCE / RULES",
+        "title": "control record - never written",
+        "decision": "a control payload naming BUG-549 and scripts/recompute_decision_summary.py",
+        "bugs": ["BUG-549"],
+        "files": ["scripts/recompute_decision_summary.py"],
+    }
+
+    def rec(**kw) -> dict:
+        """One mutated copy of the control record: a control must be able to fire on ONE field change."""
+        base = dict(good)
+        base.update(kw)
+        return base
+
+    def fires(record: dict) -> bool:
+        """True when the gate REFUSES the record (the only evidence a gate exists)."""
+        return bool(mint_validate(dict(record), live))
+
+    last = live[-1] if live else {"id": "D-0"}
+    skipped = "D-" + str(int(next_free_decision_id(live).split("-")[1]) + 1)
+    return [
+        ("the control record itself PASSES - a gate that refuses everything proves nothing", not fires(good)),
+        ("an id that SKIPS the next free one fires", fires(rec(id=skipped))),
+        ("an id already minted fires", fires(rec(id=str(last.get("id"))))),
+        ("a bug that is NOT in the register fires", fires(rec(bugs=["BUG-9999"], decision="naming BUG-9999"))),
+        ("no `bugs:` list fires", fires(rec(bugs=[]))),
+        ("a payload naming NONE of its own bugs fires (the BUG-550 tell)",
+         fires(rec(bugs=["BUG-549"], decision="a record about nothing in particular"))),
+        ("a cited FILE that does not exist fires", fires(rec(files=["scripts/does_not_exist_9f3.py"]))),
+        ("a comma-joined `files` BLOB fires", fires(rec(files="scripts/a.py, scripts/b.py"))),
+        ("a WHOLE-PAYLOAD CLONE of the last record on disk fires",
+         fires(dict(last, id=next_free_decision_id(live)))),
+        ("a missing required key fires", fires(rec(title=""))),
+    ]
+
+
+def mint_selftest() -> int:
+    """Run the mint gate's known-answer controls; return 1 if any control did NOT fire."""
+    rows = mint_controls()
+    for name, ok in rows:
+        print(("  ok  " if ok else "  !!  ") + name)
+    failed = [n for n, ok in rows if not ok]
+    if failed:
+        print("FAIL (" + WRITER + ") --selftest: " + str(len(failed)) + " of " + str(len(rows))
+              + " known-answer control(s) did not fire - a mint gate nobody has seen refuse is a comment (BUG-492)")
+        return 1
+    print("ok (" + WRITER + ") --selftest: " + str(len(rows)) + "/" + str(len(rows))
+          + " known-answer control(s) fire")
+    return 0
 
 
 def mint_main(argv: list[str]) -> int:
@@ -582,6 +748,8 @@ def main(argv: list[str]) -> int:
     would move `last_sync` on a healthy registry and turn that receipt into 'rewritten' - a repair that breaks a
     guarantee is not a repair.
     """
+    if "--selftest" in argv:
+        return mint_selftest()
     if "--mint" in argv:
         return mint_main(argv)
     if STRIP_FLAG in argv:

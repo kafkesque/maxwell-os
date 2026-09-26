@@ -84,6 +84,7 @@ health:
     python3 scripts/depth_pass_agreement.py --report-only
     python3 scripts/depth_pass_agreement.py --check-cohort || exit 1
     python3 scripts/build_archive_index.py --check || exit 1
+    python3 scripts/recompute_decision_summary.py --selftest || exit 1  # D-2660/BUG-492: the MINT gate's own controls - a record is joined to the tree BEFORE a byte is written
     python3 scripts/recompute_decision_summary.py --check || exit 1
     python3 scripts/check_tests.py --selftest || exit 1   # BUG-492: the suite rail's OWN decisions (floor breach, regression, paid red, strict) must be SEEN to fire
     python3 scripts/check_tests.py --check || exit 1      # D-2656: the SUITE is a RAIL - a failing test no rail runs is a control that never fires (BUG-470 class). 3 failures are DECLARED red and SHRINK-ONLY (the depth/domain contract is 'proposed'/owner gate); a 4th is FATAL, 0 collected is FATAL, a paid red is OWNER-OWED (2)

@@ -639,3 +639,13 @@ HOME + PROOF. scripts/check_derivation_homes.py::parity_problems + ladder_invoke
 fire on LIVE bytes with the registry restored byte-identical. No cascade: silent-repair debt unchanged at 17 of
 ceiling 17 and check_config_defaults rc=0 over the same bytes.
 STATE OPEN because the owner has not ratified it; nothing here is a claim of approval.
+
+## D-2663 - The R2 meter is re-pinned by MEASUREMENT, and its provenance block stops asking a substring question (OPEN, minted 2026-09-26T)
+
+The pin debt D-382 left behind was closed the way D-382 should have been: an A/B on a frozen probe proving the
+delta score-neutral (results sha a4c9a1d6f37433a1 under BOTH the committed bytes and the final bytes, 231 pairs /
+21 contra / 0 errors, only the `provenance` key added), instead of the prose word "additive". The audit that the
+re-mint forced found BUG-555 first: `coder_key_present` asked whether the string "coder" occurred ANYWHERE in the
+raw text - true on 400/400 records of an input where not one record carries the key - so the field printed `true`
+on precisely the artifact BUG-450 exists to expose. It is a membership test on the parsed rows now (counts
+included, one pass, the third 102 MB read deleted), with 4 known-answer controls at `--selftest`.

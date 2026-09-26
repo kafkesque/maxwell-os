@@ -6880,3 +6880,38 @@ WHY THE SCOPE STOPS AT EXISTENCE + INVOCATION. Comparing re-derived bytes agains
 VERIFIED. 9 new known-answer controls (23 -> 32), including a comment-only arm, an @-prefix arm that must PASS, a non-homed null arm that must PASS (anti-overreach) and a substring arm. 4 negatives SEEN to fire on LIVE bytes (registry mutated, then restored byte-identical): a rail that does not exist; an existing script the ladder never runs; a homed row with parity_rail null; the ladder declaration removed (fails CLOSED). No cascade: silent-repair debt is UNCHANGED at 17 of ceiling 17 (the new reader returns a STATE, it does not repair) and check_config_defaults stays rc=0 over the same registry bytes.
 
 FILES: scripts/check_derivation_homes.py, config/derivations.yaml.
+
+
+
+## BUG-555 (MED - FIXED 2026-09-26) - a provenance field asked whether a SUBSTRING occurred anywhere in the raw text, so it reported `true` on an artifact whose labels are traceable to NOBODY (the BUG-528 class, inside the block whose whole purpose is BUG-450 prevention)
+
+ROOT CAUSE. `scripts/definition_nli_verify.py` gained an additive provenance block (D-379/D-382) and answered
+"does this input declare a rater?" with `"coder" in <the whole input read as one string>`. MEASURED 2026-09-26 on
+the live stage5 checkpoint (102,936,020 bytes): the substring is present, and NOT ONE of the 400 records scanned
+carries a `coder` key ("encoder", "decoder" and "coder_version" all match it). So the field printed `true` on
+exactly the artifact BUG-450 exists to expose - and it did it by reading the whole input a THIRD time (once to
+score, once for `_sha`, once for this test) to answer a question the scoring pass had already parsed.
+
+SECOND DEFECT, SAME READ: the legacy rule was `... if path.exists() else None` - an absent input answered None,
+which is not a state anyone can act on; the new rule derives from the PARSED rows, so absence cannot arise.
+
+FIX. `coder_coverage(rows_scored, rows_with_coder)` is one home (D-2646) for one rule: a MEMBERSHIP test on the
+parsed rows, computed inside the SINGLE scoring pass (the extra 102 MB read is gone). It reports `rows_scored`,
+`rows_with_coder` and `coder_key_present`, where present means present on EVERY scored row - a PARTIAL presence
+can never be collapsed into a bare `true`. `_read_input_text` (now dead) is DELETED (C19), and the stale
+reference to it in `_open_input`'s docstring with it.
+
+CONTROLS, SEEN TO FIRE (BUG-492): 0 -> 4, `--selftest` 4/4, reachable without NLI or a menu, and also run by the
+module's existing verification mode `--selfcheck` so the documented check proves the rule too:
+  * the raw text contains the substring (inside `encoder`) while NO row declares a coder -> that is not a membership;
+  * a coder on EVERY scored row is reported present;
+  * a coder on SOME rows is NOT collapsed into a bare true (the counts stay visible);
+  * an EMPTY artifact reports ABSENT, never vacuously present.
+SEEN ON LIVE BYTES, this session: legacy rule True; membership rule `rows_scored 40, rows_with_coder 0,
+coder_key_present False`.
+
+MEASURED BEFORE ANY BYTE WAS PINNED - the A/B the D-382 re-pin never had. The same frozen probe (stage5
+checkpoint, `--limit 40`, digests of both arms recorded) was run under the committed HEAD bytes (ca91c520..., the
+D-356 pin) and under the final bytes: `results` sha256 a4c9a1d6f37433a1 in BOTH, counts 231/21/0 in BOTH, and
+`only_in_B = ['provenance']`. The uncommitted delta and this fix are therefore SCORE-NEUTRAL BY MEASUREMENT, not
+by claim. NOTHING was laundered: the digest is re-pinned under a NEW decision (D-2663), never under D-382.

@@ -384,3 +384,22 @@
   through write_guard; the fnmatch tightening decision after measuring.
 - **OWED (owner)**: the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw) - the only red a
   shrink-only ceiling may not clear; the ANCHOR-4 depth drop-in rev 3; data/maxwell.db disposition.
+
+---
+
+## 2026-09-26T - the R2 pin re-mint, done by measurement (BUG-555 / D-2663)
+
+- **The pin debt is CLOSED, not laundered.** `scripts/definition_nli_verify.py` -> sha256 e2ced5fa... and
+  `r2_meter.decision` moved e9070635/D-382 -> e2ced5fa/D-2663 in the SAME commit; the scan is now
+  `6 pinned, 0 DRIFT, 0 OWNER-OWED` (rc=0). D-382's digest named a version that existed nowhere.
+- **BUG-555 (MED, FIXED)**: the provenance field asked a SUBSTRING question (`"coder" in <whole file text>`) and
+  answered true on 400/400 live records where 0 records declare a coder - the BUG-528 class inside the BUG-450
+  block. Now a membership test on the parsed rows, `coder_key_present` = present on EVERY scored row, counts
+  reported, third 102 MB read gone, `_read_input_text` deleted (C19). Controls 0 -> 4 (`--selftest`, no NLI).
+- **CERTIFIED BY MEASUREMENT, not by prose** (this is the lesson of D-382): same frozen probe under HEAD bytes
+  ca91c520... and final bytes -> results sha a4c9a1d6f37433a1 BOTH, counts 231/21/0 BOTH, delta = `provenance` only.
+- **OWED (mine)**: the scored-axis list is restated in prose inside the provenance block
+  (`label_source.column`) while `run()` builds it in code - two homes for one fact (D-2646); folding it into one
+  constant would touch the scoring path, so it is deliberately OUT of this measurement, not forgotten.
+- **OWED (owner)**: unchanged - the depth/domain contract ruling (A ratify + S4 re-derivation / B withdraw), the
+  ANCHOR-4 depth drop-in rev 3, data/maxwell.db disposition.

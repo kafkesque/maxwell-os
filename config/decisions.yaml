@@ -8919,3 +8919,40 @@ decisions:
     at ''debt 17 of ceiling 17'' (the new reader returns a STATE and repairs nothing), scripts/check_config_defaults.py
     --check rc=0 over the same registry bytes, and the rail''s own repair site in config/silent_repair.yaml is keyed
     by CONTENT (D-2658) so the three functions inserted above it move nothing.'
+- id: D-2663
+  state: OPEN
+  category: PROVENANCE / VERIFICATION
+  date: '2026-09-26'
+  title: the R2 meter is re-pinned by MEASUREMENT - an A/B proving the delta score-neutral - and a provenance field
+    that asked a substring question is a membership question, reported with its counts
+  files:
+  - scripts/definition_nli_verify.py
+  - config/recalibration_pins.yaml
+  - governance/buglog.md
+  bugs:
+  - BUG-555
+  decision: 'D-2663 (BUG-555, with BUG-522) - scripts/definition_nli_verify.py is re-pinned to sha256 e2ced5fa4f5205c21192eb47480b0a36d16b50af2dc3c545016126a4139a28f1
+    and the r2_meter pin moves from D-382''s e9070635... (a digest that certified a version which no longer exists
+    anywhere) to this decision, because a re-pin is a RE-MINT (D-382/BUG-535) and only a decision minted for the
+    measurement may certify it. The cumulative uncommitted delta (D-382''s additive provenance block, the BUG-522
+    one-rule decode home, BUG-555''s membership fix) is certified SCORE-NEUTRAL BY MEASUREMENT: the same frozen
+    probe (stage5 checkpoint, --limit 40) run under the committed HEAD bytes ca91c520... and under the final bytes
+    produced BIT-IDENTICAL `results` (sha256 a4c9a1d6f37433a1), identical counts (231 label pairs, 21 contra, 0
+    inference errors), and differed only by the added `provenance` key. BUG-555: that block asked whether the substring
+    "coder" occurred anywhere in the raw text and answered true on 400/400 records of an input where NO record has
+    a `coder` key - the BUG-528 class inside the block whose purpose is BUG-450 prevention - so it is now a membership
+    test on the parsed rows, `coder_key_present` means present on EVERY scored row, the counts travel with it, and
+    the third full read of the 102 MB input is gone. VALUE parity is not asserted here: the R2 measurement artifact
+    (governance/r2_definition_nli_20260923.json) is byte-unchanged and was NOT back-filled (D-379); what this decision
+    certifies is the METER''s bytes, and the pin is the one home for that claim.'
+  measured: 'A/B on the frozen probe 2026-09-26: HEAD ca91c520... vs final e2ced5fa4f5205c21192eb47480b0a36d16b50af2dc3c545016126a4139a28f1
+    -> results sha a4c9a1d6f37433a1 BOTH, 231 pairs / 21 contra / 0 errors BOTH, only_in_B [''provenance'']. coder_key_present
+    before: true (substring, 0 rows with the key); after: false, rows_scored 40 rows_with_coder 0. New controls
+    4/4 fire (--selftest, no NLI).'
+  verification: python3 scripts/definition_nli_verify.py --selftest (4/4) | --selfcheck (loads menu+r5, then the
+    same controls) | python3 scripts/verify_recalibration_pins.py --selftest (16/16) and the live scan (0 DRIFT,
+    0 OWNER-OWED).
+  rationale: D-382 closed a pin debt on a PROSE claim ("the change is additive") that no machine could read, and
+    the very next edit moved the digest again. This re-mint replaces the claim with a measurement that anyone can
+    re-run from two recorded digests, and it refuses to certify bytes it had not first audited - the audit is what
+    found BUG-555, a falsehood the pin would otherwise have frozen into place.

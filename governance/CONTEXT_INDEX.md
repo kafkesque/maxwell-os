@@ -1019,3 +1019,11 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   23 -> 32; 4 negatives fired on LIVE bytes (registry restored byte-identical); silent-repair debt UNCHANGED 17/17
   and config-defaults rc=0 (no cascade). VALUE parity stays each parity rail's own job - re-measuring it here would
   be a second home (D-2646).
+
+- **BUG-555 FIXED / D-2663 (the R2 pin re-mint)**: `scripts/definition_nli_verify.py` is pinned at e2ced5fa... under
+  D-2663 (the scan is `0 DRIFT, 0 OWNER-OWED`). The debt D-382 left is closed by MEASUREMENT - the same frozen
+  probe under HEAD ca91c520... and the final bytes gives the SAME `results` sha a4c9a1d6f37433a1, the same counts
+  231/21/0, and only an added `provenance` key - never by the prose word "additive". The audit the re-mint forced
+  found BUG-555: `coder_key_present` was a SUBSTRING test ("coder" in the whole raw text) that printed `true` on
+  400/400 live records carrying NO `coder` key (the BUG-528 class inside the BUG-450 block); it is a membership
+  test on the parsed rows now, with counts and 4 controls at `--selftest`.

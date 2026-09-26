@@ -23,7 +23,8 @@ and triggers human review / abstention — it NEVER flips a label by itself.
 Read-only w.r.t. the DB. Writes a JSON report (crash-safe, C6).
 
 Modes:
-    --selfcheck      load menu + r5 definitions, print coverage, NO NLI inference
+    --selfcheck      load menu + r5 definitions, print coverage, NO NLI inference (+ the provenance controls)
+    --selftest       the provenance rule known-answer controls alone (BUG-492/BUG-555): no NLI, no menu
     (default)        run NLI over the input FBs (stage5 checkpoint by default)
 """
 from __future__ import annotations
@@ -131,8 +132,66 @@ def _hypothesis_for(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, s
     return (hyp, "definition") if hyp else (None, None)
 
 
+def _open_input(path: Path):
+    """Open the module's input with the ONE rule this module reads it by (D-2646/BUG-522).
+
+    MEASURED 2026-09-26: this module read its own input with TWO rules - _iter_fbs opened it strictly while
+    the provenance block opened it with errors="ignore". That repair could only ever mask a byte the data
+    path had ALREADY refused, so it protected nothing and hid the disagreement (BUG-518: a fallback that
+    could never fire). The rule is named ONCE; every reader of this input opens it through this one function.
+    """
+    return open(path, encoding=_INPUT_ENCODING)
+
+
+def coder_coverage(rows_scored: int, rows_with_coder: int) -> dict:
+    """How many SCORED rows declare a rater - a question of MEMBERSHIP, never of substring (BUG-555).
+
+    MEASURED 2026-09-26 on the live stage5 checkpoint: the previous form asked whether the string
+    "coder" occurred ANYWHERE IN THE RAW TEXT, and it answers True on 400 of 400 records of an input
+    where NOT ONE record carries a `coder` key - "encoder", "decoder" and "coder_version" all match. It
+    also read the 102 MB input a THIRD time (once to score, once to digest, once for this test) to
+    answer a question the scoring pass had already parsed. That is the BUG-528 class - a substring is
+    not an identity - inside the very provenance block whose purpose (BUG-450 prevention, D-379) is to
+    expose an artifact whose labels are traceable to no rater: a field that says true there is worse
+    than no field at all. The rule is derived from the PARSED rows - one pass, one home (D-2646) - and
+    the counts are reported alongside the boolean, so a PARTIAL presence is never collapsed into a
+    bare true.
+    """
+    return {
+        "rows_scored": rows_scored,
+        "rows_with_coder": rows_with_coder,
+        # present means present on EVERY scored row: some rows having a rater is not the artifact being traceable
+        "coder_key_present": bool(rows_scored) and rows_with_coder == rows_scored,
+    }
+
+
+def selftest() -> int:
+    """Known-answer controls for the provenance rule (BUG-492/BUG-555): each must be able to FAIL."""
+    raw = '{"fb_id": "x", "encoder": "bge-m3", "definition": "d"}'  # no `coder` KEY, yet the text matches
+    rows = [json.loads(raw)]
+    controls = [
+        ("BUG-555: the raw text contains the substring (inside encoder) while NO row declares a coder - a substring is not a membership",
+         ("coder" in raw) and not coder_coverage(len(rows), sum(1 for r in rows if "coder" in r))["coder_key_present"]),
+        ("a coder on EVERY scored row is reported present",
+         coder_coverage(2, 2)["coder_key_present"]),
+        ("a coder on SOME rows is not collapsed into a bare true - the counts stay visible",
+         coder_coverage(2, 1) == {"rows_scored": 2, "rows_with_coder": 1, "coder_key_present": False}),
+        ("an EMPTY artifact reports ABSENT, never vacuously present",
+         coder_coverage(0, 0)["coder_key_present"] is False),
+    ]
+    bad = 0
+    for name, ok in controls:
+        print(("  ok   " if ok else "  FAIL ") + name)
+        bad += 1 - int(ok)
+    print("r2-provenance controls: " + str(len(controls) - bad) + "/" + str(len(controls)) + " known-answer control(s) fire")
+    return 1 if bad else 0
+
+
+_INPUT_ENCODING = "utf-8"  # D-2644: the input is a pipeline JSONL - one named constant, ONE rule
+
+
 def _iter_fbs(path: Path, limit: int | None):
-    with open(path, encoding="utf-8") as f:
+    with _open_input(path) as f:
         for i, line in enumerate(f):
             line = line.strip()
             if not line:
@@ -176,6 +235,43 @@ def selfcheck(menu: dict, r5: dict[str, dict[str, str]]) -> int:
     return 0
 
 
+def _provenance(path: Path, menu: dict, rows_scored: int, rows_with_coder: int) -> dict:
+    """Report-level provenance for the R2 meter (BUG-450 prevention, D-379).
+
+    The 2026-09-23 artifact carried NO ``coder`` key at all, so every FORM label in it is untraceable to a
+    rater - and nothing in the report said what had been scored, against which menu, by which model. This
+    block makes the NEXT regeneration answerable: what was read, from where, and against which pins. It is
+    additive: the existing artifact is NOT back-filled (that would be inventing provenance).
+    """
+    def _sha(p: Path) -> str | None:
+        return hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
+
+    def _digest(p: Path, key: str) -> str | None:
+        if not p.exists():
+            return None
+        import yaml  # local import keeps the failure mode explicit
+
+        return (yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get(key)
+
+    groups = _ROOT / "config" / "menu_axis_hashes.yaml"
+    composite = _ROOT / "config" / "closed_menu_v5.sha256"
+    return {
+        "schema_version": "1.0",
+        "generator": "scripts/definition_nli_verify.py",
+        "input": {"path": str(path), "sha256": _sha(path)},
+        "extractor": {"name": "definition_nli_verify", "kind": "local-NLI", "temperature": None,
+                      "note": "an NLI meter proposes nothing: it scores proposed labels (Mechanism B, D-277)"},
+        "label_source": {"artifact": str(path), "column": "discipline|domains|content_type|extraction_type",
+                         "sha256": _sha(path), **coder_coverage(rows_scored, rows_with_coder)},
+        "menu_version": (_ROOT / "config" / "closed_menu_v5.json").name.replace(".json", ""),
+        "answer_space_sha256": _digest(groups, "answer_space_hash"),
+        "closed_menu_sha256_pin": composite.read_text(encoding="utf-8").strip() if composite.exists() else None,
+        "menu_hash_rendered": menu_hash(menu),
+        "nli_model": NLI_MODEL_ID if "NLI_MODEL_ID" in globals() else None,
+        "r5_hash": _r5_hash(),
+    }
+
+
 def run(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, str],
         path: Path, limit: int | None, out: Path) -> int:
     from pipeline.stage5_verify import NLIInferenceError, _nli_pair_scores  # noqa: E402
@@ -184,6 +280,7 @@ def run(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, str],
     n_labels = 0
     n_contra = 0
     n_errors = 0
+    n_with_coder = 0
 
     def _score(premise: str, hypothesis: str) -> dict | None:
         try:
@@ -223,6 +320,7 @@ def run(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, str],
                 n_errors += 1
             row["labels"].append({"axis": axis, "label": label, "hypothesis_type": htype,
                                   "hypothesis": hyp, "scores": sc})
+        n_with_coder += int("coder" in fb)
         results.append(row)
 
     report = {
@@ -235,6 +333,7 @@ def run(menu: dict, r5: dict[str, dict[str, str]], para: dict[str, str],
         "n_labels_scored": n_labels,
         "n_contra": n_contra,
         "n_inference_errors": n_errors,
+        "provenance": _provenance(path, menu, len(results), n_with_coder),
         "results": results,
     }
     safe_write(out, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
@@ -251,15 +350,19 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=None, help="max FBs to verify")
     ap.add_argument("--output", default=str(_DEFAULT_OUT))
     ap.add_argument("--selfcheck", action="store_true", help="load defs only, no NLI inference")
+    ap.add_argument("--selftest", action="store_true", help="known-answer controls for the provenance rule (BUG-555)")
     args = ap.parse_args()
 
     menu = render_closed_menu()
     r5 = _load_r5_definitions()
     para = _load_nli_paraphrase()
 
+    if args.selftest:
+        return selftest()
     if args.selfcheck:
         print(f"nli_paraphrase: {len(para)} roles loaded (arm C)")
-        return selfcheck(menu, r5)
+        rc = selfcheck(menu, r5)
+        return selftest() or rc
 
     in_path = Path(args.input)
     if not in_path.exists():

@@ -400,3 +400,13 @@ widening_log:
       MASTER-TASK-REGISTER.md, agent/session_seed.yaml, justfile(no change). ALL are already inside may_touch, so
       NOTHING was widened and no glob was asked for. pipeline/** untouched; NO pinned artifact staged (the R2 meter
       stays OWNER-OWED rather than laundered).'
+  - entry: 19
+    session: 20260926T
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: true
+    why: 'BUG-555/D-2663: the R2 pin re-mint. scripts/definition_nli_verify.py (scripts/*.py), config/recalibration_pins.yaml
+      (config/*.yaml), governance/buglog.md, governance/bug_status.json|.md, governance/CONTEXT_INDEX.md, governance/SESSION-HANDOFF-*.md,
+      governance/session_plan_*.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md and agent/session_seed.yaml are ALL already inside
+      may_touch, so NOTHING was widened and no glob was asked for. pipeline/** untouched. The A/B used a HEAD copy at
+      temp/_ab_head_r2_meter.py, deleted before the commit and NEVER staged (the temp path is not a may_touch entry).'

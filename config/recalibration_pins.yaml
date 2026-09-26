@@ -1,7 +1,10 @@
 schema_version: '1.0'
 decision: D-353
-rule: any change to a pinned artifact requires a NEW decision id in config/decisions.yaml;
-  the checker goes RED otherwise
+rule: any change to a pinned artifact requires a NEW decision id in config/decisions.yaml, and the
+  new sha256 and the new id are recorded HERE in the same commit (a re-pin is a re-mint, BUG-535). The SCAN is
+  tri-state (BUG-536) - 0 clean | 1 a BROKEN declaration, fail closed | 2 the OWNER owes the re-measure and the
+  re-mint - while the WRITE gate (--staged, pre-commit) refuses EITHER kind with 1, so the declaration and the
+  code cannot drift apart by wording alone (D-2648)
 pins:
   ruler_in_force:
     path: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
@@ -13,8 +16,8 @@ pins:
     decision: D-349
   r2_meter:
     path: scripts/definition_nli_verify.py
-    sha256: ca91c520791aa3f00a052b60e1222c9f69bc46a10feeaea35099e467d4f81933
-    decision: D-356
+    sha256: e2ced5fa4f5205c21192eb47480b0a36d16b50af2dc3c545016126a4139a28f1
+    decision: D-2663
   menu:
     path: config/closed_menu_v5.json
     sha256: bc53770103595f2a3674ced132e04297e87b590f6d7fb141c7eac6351c680544

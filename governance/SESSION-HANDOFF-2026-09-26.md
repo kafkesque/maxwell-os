@@ -308,3 +308,16 @@ needs a NEW decision id WITH the measurement), BUG-537's archive control, and fr
 OWNER GATES (unchanged, one word each): the depth/domain contract A/B ruling; the ANCHOR-4 depth drop-in rev 3; the
 data/maxwell.db disposition (19 rows, 0.24% of truth, same table name); Dropbox siblings HELD vs DISCARD; ratify
 D-2661/D-2662.
+
+## 2026-09-26T (D-2663 - the R2 pin re-mint: certified by measurement, and the audit that found BUG-555 first)
+
+- **WHY THIS ORDER**: the pin was the last non-owner red in the tree (scan rc=2, `OWED r2_meter`). Closing it is
+  what unblocks the R2 -> S5 evidence chain, and it concerns the VERIFIER itself.
+- **WHAT CHANGED**: `coder_coverage()` + `selftest()` replace the substring provenance rule and the dead
+  `_read_input_text` reader; `_provenance` takes the counts from the single scoring pass; `--selftest` added and
+  run by `--selfcheck`; the pin now reads e2ced5fa.../D-2663; `config/recalibration_pins.yaml`'s `rule:` prose
+  states the tri-state the code actually implements (it said "RED", the rail says "OWED" - a mismatch in one record).
+- **EVIDENCE**: A/B identical results sha a4c9a1d6f37433a1 (231 pairs / 21 contra / 0 errors) over HEAD ca91c520...
+  vs final e2ced5fa...; controls 4/4; legacy substring rule True on the live input vs 0/40 rows with a coder key.
+- **NOT DONE, DECLARED**: the scored-axis list in `label_source.column` is still prose (D-2646 second home) -
+  left out so the measurement certifies exactly what it measured.

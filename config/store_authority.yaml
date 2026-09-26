@@ -1,0 +1,77 @@
+# store_authority.yaml - the register for the STORES axis (BUG-524). Until 2026-09-26 no machine in this repo
+# could answer "which of these stores is the truth?"; this file is the declaration and check_store_authority.py is
+# the machine that fails when the disk and the declaration disagree.
+#
+# MEASURED 2026-09-26: three sqlite stores (156,622,848 / 4,964,352 / 131,072 bytes) and 31 parquet snapshots in
+# three directories. `data/maxwell.db` carries the SAME table name (`fbs`, 19 rows) as the authoritative store
+# (7995 rows): a consumer pointed there gets a plausible answer set that is 0.24% of the truth, with no crash.
+#
+# ENTRY RULES
+#   status:  one of authoritative | derived | archive | stale | synthetic. EXACTLY ONE may be `authoritative`.
+#   why:     >= 20 chars. A status without a reason is a convenience, not a declaration (C12).
+#   shares_tables / shares_why: REQUIRED for any non-authoritative sqlite store carrying a table name that also
+#            exists in the authoritative store. Declared, never tolerated silently.
+#
+# BOUNDARY (a rail's blindness IS its boundary): the walk is depth-bounded by `max_depth` and prunes hidden and
+# cache directories. A store deeper than that bound is NOT seen. The bound is declared here, not hidden.
+schema_version: '1.0'
+decided: PENDING-OWNER
+bug: BUG-524
+rail: scripts/check_store_authority.py
+scan_roots: ['.']
+max_depth: 4
+stores:
+  - path: knowledge pipeline/maxwell.db
+    kind: sqlite
+    status: authoritative
+    why: >-
+      The governed knowledge store: 7995 fbs / 75 columns, FTS5 + sqlite-vec. Every knowledge answer must come
+      from here; it is the only store with a commit pipeline (stage6_commit.py) writing to it.
+  - path: knowledge pipeline/diagnostic_diagnostic_20260811_232853.db
+    kind: sqlite
+    status: derived
+    shares_tables: true
+    shares_why: >-
+      Declared and checked: the diagnostic snapshot carries copies of the fbs and taxonomy_counts schema, so a
+      consumer pointed here is reading a frozen 2026-08-11 snapshot, not the truth.
+    why: >-
+      A diagnostic snapshot (4,964,352 bytes) written by the diagnostic runner on 2026-08-11. Derived from the
+      governed store, carries its own run id, and is never a source of truth for a knowledge answer.
+  - path: data/maxwell.db
+    kind: sqlite
+    status: stale
+    why: >-
+      A 19-row legacy export (131,072 bytes) predating the governed store. Measured 2026-09-26: carries the same
+      table name as the truth and is 0.24% of its row count, so it is a wrong-answer hazard, not a backup.
+    shares_tables: true
+    shares_why: >-
+      Declared and checked, never tolerated: the overlap is why this store is status `stale` rather than
+      `derived`. Owner decision owed on deleting it (D-2650 gate) versus keeping it as a reproducibility record.
+  - path: knowledge pipeline/parquet
+    kind: parquet_collection
+    status: derived
+    why: >-
+      25 parquet snapshots exported by stage6_commit.py beside the governed store. A read-only projection of the
+      truth, regenerated from it, and never authoritative for a knowledge answer.
+  - path: knowledge pipeline/parquet/diagnostic_20260811_232853
+    kind: parquet_collection
+    status: derived
+    why: >-
+      One parquet snapshot belonging to the 2026-08-11 diagnostic run, written beside the export directory. It is
+      scoped to that run id and is never a source of truth for a knowledge answer.
+  - path: data/parquet
+    kind: parquet_collection
+    status: stale
+    why: >-
+      Five parquet snapshots beside the 19-row legacy export in `data/`. Older than the governed store and not
+      produced by the current stage6_commit.py, so it is stale rather than derived.
+  - path: archive/db_backups/maxwell_pre_index_20260917.db
+    kind: sqlite
+    status: archive
+    why: >-
+      A pre-index backup of the governed store taken 2026-09-17 before an FTS rebuild. It is a fidelity copy, kept
+      to make that rebuild reversible, and it must never be read to answer a knowledge query.
+    shares_tables: true
+    shares_why: >-
+      Declared and checked: it is a full fidelity copy (18 shared tables incl. fbs, taxonomy_counts and the
+      vec_* shadows), so any consumer pointed at it reads a frozen 2026-09-17 state, not the truth.

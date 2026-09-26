@@ -1,0 +1,135 @@
+# repo_integrity.yaml - the SYNC-INTEGRITY surface (BUG-400 class; P0-A / P0-B, 2026-09-25).
+#
+# WHY THIS FILE EXISTS
+#   The repo lives inside a Dropbox File Provider domain, and the File Provider renames files out from under
+#   the tools that read them. On 2026-09-25 that hit two layers at once, and BOTH were invisible to every
+#   rail in this repo because no rail looked at the repository itself:
+#     P0-A (git METADATA): .git/refs/heads/main was renamed to "main (M1 max's conflicted copy 2026-09-25)".
+#       HEAD stopped resolving, `git log` said "does not have any commits yet", and `git status` claimed 1,220
+#       files were ADDED (a first-commit-of-everything view). A commit from that state would have been a
+#       bogus root commit. Later the same day .git/logs/HEAD was renamed away and git's reflog for main was
+#       ROLLED BACK to an older file, so `git reflog` reported HEAD@{0}=a1061cd while HEAD was 96b1e9c - a
+#       quiet disagreement between two records of the same fact, exactly the kind that misleads a recovery.
+#     P0-B (worktree): 43 files were renamed to "<name> (<client>'s conflicted copy <date>)", and for 38 of
+#       them the canonical path was LEFT EMPTY, so the conflict copy was the ONLY surviving copy - including
+#       this repo's own justfile, config/decisions.yaml, DECISION-LOG.md and governance/buglog.md. `just
+#       health` could not even start: there was no justfile to parse.
+#
+# THE INVARIANT
+#   A repository whose git metadata resolves, and in which no name carries a sync conflict marker, and in
+#   which every tracked path is present. scripts/check_repo_integrity.py is the enforcement; `--plan` prints
+#   the deterministic repair, so a recovery is a REVIEWED PLAN and not an improvised `mv` (this file is the
+#   single source for the marker pattern, the vault, and the git paths, so rail and plan cannot drift).
+#
+# WHAT THIS FILE IS NOT
+#   It does not stop Dropbox. A rail cannot. It makes the condition LOUD within one `just health` (and it is
+#   wired FIRST, before anything that needs git), and it refuses a COMMIT through a conflicted git (the
+#   pre-commit hook calls it before rail 4). The root-cause fix is an owner act: get `.git` out of the synced
+#   tree (BUG-400 / BUG-500 class), or stop the second client writing it.
+schema_version: "1.0"
+bug: BUG-400
+provenance: "measured 2026-09-25 22:1x in this repo: 43 conflict copies, 38 with the canonical path missing, 3 inside .git"
+
+conflict_marker:
+  # The File Provider's naming, taken from the 43 measured names - not invented. The capture group is the
+  # marker text (which machine caused it), reported so a recurrence names its source.
+  patterns:
+    - ' \(([^)]*conflicted copy[^)]*)\)'
+  # BUG-528 (MEASURED 2026-09-26): the provider uses a SECOND form - a PREFIX, not a suffix. Unlike the
+  # patterns above these do NOT mark a conflict to repair; they name a SIBLING whose canonical path is INTACT.
+  # That makes them a rename-laundering vector: a rail that protects a path by NAME can be defeated by touching
+  # the sibling (`governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` was itself listed in may_touch
+  # while its canonical name sat in will_not_touch). Declared HERE so the renaming vocabulary has one home and
+  # rail 4 CONSUMES it rather than restating a pattern (D-2646).
+  # OWED, GATED (BUG-528b): scripts/check_repo_integrity.py does NOT yet scan for these names - it must, but a
+  #   `Copy of <owner instrument>` is owner-owed (exit 2) and the pre-commit hook treats exit 2 as fatal, so
+  #   widening the integrity rail's subject would refuse EVERY commit until the one measured sibling is ruled
+  #   on. Sequence first, then widen: the plan rail consumes this vocabulary today.
+  prefix_patterns:
+    - '^Copy of '
+
+git:
+  # The DEFAULT/bootstrap value only. The rail resolves the REAL git dir from git itself (resolve_from below):
+  # after the BUG-500 fix .git is a one-line pointer FILE, and a rail that demanded a directory would then
+  # fail on a repository that is perfectly intact.
+  git_dir: .git
+  # BUG-500. `git rev-parse --absolute-git-dir` is the only authority on where git metadata lives.
+  resolve_from: 'rev-parse --absolute-git-dir'
+  # BUG-500 PREVENTION. A sync client RENAMES what it syncs, and git metadata that gets renamed is a
+  # repository that lies. Markers are substrings of the resolved ABSOLUTE path (platform-agnostic, C26) -
+  # never a client name hardcoded in the script (C12).
+  sync_root_markers:
+    - 'Library/CloudStorage/Dropbox'
+    - 'Library/Mobile Documents'
+    - 'OneDrive'
+    - 'Google Drive'
+  # true = a git dir inside a sync domain is a FAILURE (exit 1), and the pre-commit hook refuses to commit
+  # through it. This is the BUG-500 switch: it is turned to true ONLY once the git dir lives outside the
+  # synced tree, and only an owner decision may turn it back.
+  require_git_dir_outside_sync_root: true
+  # P0-A. Each is an argv tail for `git`. If one of these does not resolve, EVERY other rail is reading a
+  # repository that is not there, so this is the first thing `just health` evaluates.
+  must_resolve:
+    - 'rev-parse --verify HEAD^{commit}'
+    - 'rev-parse --show-toplevel'
+  # P0-A. The reflog for HEAD and the commit HEAD names are two records of one fact. `.git/logs/HEAD` was
+  # renamed away on 2026-09-25 and `git reflog` silently served a STALE branch reflog instead.
+  head_reflog_relpath: logs/HEAD
+  reflog_must_agree_with_head: true
+
+repair:
+  # Bytes are never deleted: a conflict copy that is NOT restored is MOVED to this vault, which is outside
+  # the synced tree (so it cannot conflict again) and holds a byte-exact copy plus a sha256 manifest.
+  vault_dir: ~/maxwell_os_conflict_snapshot_20260925
+  vault_subdir: vaulted
+  # A reflog is append-only, so the file that CONTAINS the other as a byte-prefix is strictly newer
+  # information about the same linear history: restoring it loses nothing. Measured for logs/refs/heads/main
+  # (94,781 -> 96,921 bytes, prefix=True). If containment does NOT hold the two are different histories and
+  # this rail refuses to choose. Paths are relative to git.git_dir.
+  prefer_superset_prefixes:
+    - logs/refs/heads/main
+    - logs/HEAD
+  # Transient git bookkeeping whose losing copy carries no information (git rewrites it every commit).
+  # Vaulted rather than restored: restoring a COMMIT_EDITMSG would re-create a stale file git does not need.
+  transient_git_paths:
+    - COMMIT_EDITMSG
+    - MERGE_MSG
+    - TAG_EDITMSG
+
+severity:
+  # report_only_globs: a conflict copy here is real but not a repository-integrity defect, so it is reported
+  # as owner-owed (loud, exit 2) rather than fatal (BUG-457 convention: 2 = owner-owed, never silent).
+  report_only_globs:
+    - 'knowledge pipeline/**'
+    - '**/__pycache__/**'
+    - '.pytest_cache/**'
+exit_codes:
+  ok: 0
+  fail: 1
+  owner_owed: 2
+
+git_subject:
+  # BUG-527 (MEASURED 2026-09-26). A rail that shells git audits whichever index/repository the ENVIRONMENT
+  # names, because GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE are inherited by every child process. This block is
+  # the ONE home of the guard set (D-2646); scripts/lib/git_subject.py is the ONE implementation; consumers are
+  # scripts/check_repo_integrity.py (RAIL 0), scripts/verify_recalibration_pins.py (RAIL 3) and
+  # scripts/check_session_plan.py (RAIL 4). Measured bypass: `GIT_INDEX_FILE=/tmp/abidx ... --staged` returned
+  # rc=0 while the real staged set was never read; the same day an unflagged `git add` moved the commit set
+  # 42 -> 43 and nothing observed it.
+  decided: PENDING-OWNER   # no decision id is spent by this change; minting is the owner's act
+  bug: BUG-527
+  home: scripts/lib/git_subject.py
+  # subject_env: compared against the DISCOVERED subject. An ambient value that names the SAME subject is
+  #   TOLERATED - MEASURED probe 2026-09-26: git DOES hand the pre-commit hook GIT_DIR + GIT_INDEX_FILE for the
+  #   real repository (in this separate-git-dir layout), so a presence-detecting rule would refuse EVERY commit.
+  #   A value naming a DIFFERENT subject is REFUSED (C16, fail closed; nothing is guessed).
+  # clear_env: REMOVED from every child git environment. Where there is no path-like value to compare against,
+  #   clearing is strictly stronger than refusing and cannot misfire: an alternate object store can supply an
+  #   object a read would otherwise fail to find, and a GIT_CONFIG can redirect core.worktree.
+  subject_env: [GIT_DIR, GIT_WORK_TREE, GIT_INDEX_FILE, GIT_COMMON_DIR, GIT_OBJECT_DIRECTORY]
+  clear_env: [GIT_ALTERNATE_OBJECT_DIRECTORIES, GIT_CONFIG, GIT_CONFIG_PARAMETERS, GIT_CONFIG_COUNT,
+              GIT_IMPLICIT_WORK_TREE, GIT_GRAFT_FILE, GIT_NO_REPLACE_OBJECTS, GIT_REPLACE_REF_BASE, GIT_PREFIX,
+              GIT_INTERNAL_SUPER_PREFIX, GIT_SHALLOW_FILE]
+  # UNION CONTROL (--selftest): git's OWN `rev-parse --local-env-vars` (16 variables, measured 2026-09-26 on git
+  # 2.39.5) must be covered by the two sets above, or a variable a FUTURE git adds escapes the pin silently.
+  guard_union: 'rev-parse --local-env-vars'

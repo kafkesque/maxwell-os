@@ -1,0 +1,138 @@
+# handoffs.yaml - stage handoffs are RECEIPTS, and a hash claim never points at a mutable path (D-403).
+#
+# WHY (RC-2/BUG-376): a stage that declares an input PATH cannot prove WHICH BYTES it consumed. A producer
+# that rewrites that path after the run invalidates every downstream claim without any transaction failing.
+# BUG-376: the t11 checkpoint_enriched.jsonl was rewritten after the S5 run and the verified image no longer
+# exists. BUG-341/BUG-433 are the same class.
+#
+# MECHANISM: scripts/lib/handoff.py takes a receipt - output digest, size, mutability, code_sha, stamp - and
+# scripts/verify_handoffs.py compares BYTES, never paths. A rewrite is then DETECTED, and for a sealed
+# artifact the verified image still EXISTS in the blob store (content-addressed, so sealing twice is free).
+#
+# ONE FACT, ONE HOME (C12/C21): this file does NOT re-declare an artifact's MUTABILITY when
+# config/artifact_ownership.yaml already declares it - a second copy of a fact IS the drift. Use
+# ownership_ref, and mutability only where no ownership entry exists.
+schema_version: "1.0"
+decided: D-403
+
+journal: governance/HANDOFFS.jsonl
+blob_dir: governance/handoffs/blobs
+
+# A path is sealed only when sealing is DECLARED: a blob is a copy of bytes, and copying is not free.
+# An immutable path with seal: false must carry no_seal_reason, else it is RED (a declared reason, not silence).
+artifacts:
+  - id: s4_enriched_checkpoint
+    ownership_ref: config/artifact_ownership.yaml
+    paths: [{path: knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl, seal: false}]
+    no_seal_reason: >-
+      BUG-376: this is the path that was rewritten in place after the S5 run, so sealing is the point of
+      D-403 here. Cutover is owner-gated (pipeline is production); until then the rail reports the state.
+
+  - id: s5_verify_checkpoint
+    ownership_ref: config/artifact_ownership.yaml
+    paths: [{path: knowledge pipeline/stage5_verify/t11/checkpoint.jsonl, seal: false}]
+    no_seal_reason: BUG-475 declares S5_LOCK_PATH at import time; the seal lands with the pipeline cutover.
+
+  - id: decisions_registry
+    ownership_ref: config/artifact_ownership.yaml
+    paths: [{path: config/decisions.yaml, seal: false}]
+    no_seal_reason: the registry is append_only and textual, so a prefix check detects a rewrite without a copy.
+
+  - id: anchor4_workbook
+    ownership_ref: config/artifact_ownership.yaml
+    paths: [{path: governance/anchor_adjudication_workbook_20260924.csv, seal: true}]
+
+  - id: frontier_pack_blind_input
+    mutability: immutable
+    paths: [{path: governance/frontier_pack_20260924/BLIND_INPUT_150.csv, seal: true}]
+    why: the blinded input handed to a coder. Rewriting it after a coding run destroys the anchor.
+
+  - id: anchor4_depth_sheet_owner_dropin
+    mutability: immutable
+    paths: [{path: "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv", seal: true}]
+    why: the owner drop-in REV 2, write-locked in config/human_instrument_locks.yaml.
+
+# IDENTITY MAP (BUG-488, corrected 2026-09-25). The three paths that first read as "one artifact, three
+# digests, identity unresolved" are NOT three copies of one artifact: each has a ROLE, and each role is
+# DECLARED ELSEWHERE in this repo. This file does not assert the roles - it names the declaring file, and the
+# rail verifies that the declaring file exists. The earlier reading was wrong in its premise AND in its
+# conclusion, and the correction is the reason the check below exists:
+#   * the digest that "matched none of the three files on disk" is be1a39e0 = rev 1 of the drop-in, DECLARED as
+#     superseded in config/human_instrument_locks.yaml AND config/anchor4_interim_state.json;
+#   * its bytes were never lost: they are content-addressed in the git object store at commit 075ae65, where
+#     they re-derive to exactly be1a39e0 (sealed below, and re-derived by the rail on every run);
+#   * the three files are, in declared terms: the write-locked owner drop-in (rev 2), the TRACKED sheet that
+#     still carries pre-consolidation context plus the owner's PARTIAL pass, and the frontier pack's blinded
+#     input derived for the cohort.
+# The real defect (D-403, and it stands): the receipt's hash claim pointed at a PATH whose bytes had been
+# rewritten IN PLACE, so the claim named bytes no live path held. A rail that resolves digests against live
+# paths only cannot see a superseded revision -> it now resolves them against declared stores as well.
+identity_map:
+  - path: "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv"
+    role: "owner drop-in rev 3 (write-locked); rev 1 and rev 2 are superseded and located below"
+    declared_by: [config/human_instrument_locks.yaml, config/anchor4_interim_state.json]
+  - path: governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+    role: "the TRACKED ANCHOR-4 sheet: pre-consolidation context plus the owner's PARTIAL depth pass"
+    declared_by: [config/anchor4_interim_state.json]
+  - path: governance/frontier_pack_20260924/BLIND_INPUT_150.csv
+    role: "the blinded input handed to a coder for the 150-row cohort"
+    declared_by: [config/anchor_cross_exam.yaml, config/handoffs.yaml]
+
+# REVISION LOCATORS (D-403). A digest quoted in prose may name a SUPERSEDED revision, so NO live path holds
+# those bytes. A locator names a content-addressed store that still does; the rail RE-DERIVES the digest from
+# the bytes it finds there and FAILS CLOSED if they disagree. Nothing here is taken on trust: the locator is a
+# claim about bytes like every other claim in this file.
+revision_locators:
+  # rev 2 was the LIVE revision for one day and is now SUPERSEDED, so no live path holds its bytes either: a
+  # digest that a document quotes must still resolve, or the claim becomes an ORPHAN digest (BUG-493/D-403).
+  - digest: bc1cc956cbd07fd7b3d622a42d9f6f96f5fe9584fe6cb9252c73a3cda7e150e4
+    path: "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv"
+    state: superseded
+    superseded_by: 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
+    bytes_at: git:65a13c3cff5b89f584f6411c65082e2e479434cb
+    declared_by:
+      - config/human_instrument_locks.yaml
+      - config/anchor4_interim_state.json
+      - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md
+    note: >-
+      rev 2 = rev 1 with the owner's date corrected IN PLACE (13.09.26 -> 24.09.26). Same byte count as rev 1
+      (203506) and a different digest, which is the signature of an equal-length edit.
+  - digest: be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb
+    path: "governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv"
+    state: superseded
+    superseded_by: 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
+    bytes_at: git:075ae65
+    declared_by:
+      - config/human_instrument_locks.yaml
+      - config/anchor4_interim_state.json
+      - governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md
+    note: >-
+      rev 1 of the owner drop-in: the artifact sections 1-3 of the owner-pass receipt were measured on. The
+      owner then corrected the date IN PLACE (13.09.26 -> 24.09.26, SAME byte count 203506), so the path holds
+      rev 2 while the receipt's digest describes rev 1. Byte count agreement with a digest disagreement is the
+      signature of an equal-length in-place edit, and it is why a size check can never stand in for a digest.
+
+# FLOORS MOVED: a rail that reads a journal (or a blob store) which does NOT EXIST must fail closed,
+# because 0 of 0 reads as "ok" (BUG-487) - but the floor itself now lives in ONE home,
+# config/evidence_floors.yaml (C12/C21). scripts/verify_handoffs.py reads it there; a floor
+# re-declared per rail is the drift this repo keeps paying for.
+
+# CROSS-DECLARATION JOIN (RC-2). Digests this repo declares about artifacts, and the bytes those digests name,
+# are joined in ONE place. A lock whose declared digest is neither live NOR a declared revision is an ORPHAN
+# digest: the D-403 defect, found wherever it is declared rather than only where this config happens to look.
+cross_declarations:
+  - file: config/human_instrument_locks.yaml
+    structure: locks  # instruments[].sha256 and instruments[].superseded[].sha256
+  - file: config/anchor4_interim_state.json
+    structure: named_digests
+    fields: [dropin_sha256, dropin_superseded_sha256]
+
+# A hash quoted in prose is a claim about bytes. It must resolve to declared bytes that exist - a live declared
+# path OR a declared revision - or it is DRIFT.
+hash_claims:
+  - document: governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md
+    about: anchor4_depth_sheet_owner_dropin
+    why: >-
+      the doc quotes 203506 bytes and 2 digests: be1a39e0 (rev 1, the bytes it was measured on) and bc1cc956
+      (rev 2, then live). BOTH are superseded now, so both must resolve as REVISION LOCATORS rather than as live
+      bytes - the doc's claim is about the bytes it was measured on, not about whatever the path holds today.

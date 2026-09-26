@@ -1,0 +1,216 @@
+# depth_domain_contract.yaml - the DETERMINISTIC contract between the two anchor axes (PROPOSED).
+#
+# WHY: the depth axis and the domain axis are two readouts of ONE measurement (the row's domain profile).
+# Nothing checked that they were consistent, so a row could carry depth=specialized with four domains and
+# no consumer would notice (measured: 0 such rows today, but nothing prevented them), and a row with ZERO
+# real domains could carry depth=domain and be counted in every depth statistic (measured: R040, R140).
+# The contract turns "these two columns agree" from a claim into an assertion.
+#
+# DIRECTION OF AUTHORITY: this file. Config owns labels and thresholds, code owns decisions, an LLM owns
+# nothing here. No value in this file may be duplicated as a literal in scripts/ (C12/C12c/C20).
+#
+# THE THREE TIERS (why not one):
+#   hard          invalid BY CONSTRUCTION - a value outside the closed menu, an undeclared raw token, a
+#                 missing provenance stamp. Always exit 1.
+#   owner_blocked the cell cannot be scored at all (abstention-only, blank). NOT a defect: a blank is a
+#                 fact about the review. Exit 2 so it is loud but cannot masquerade as a build failure.
+#   soft          a JUDGEMENT the owner is allowed to make (D2130: the band informs, it does not decide).
+#                 Reported and counted, never rewritten, never fatal. The gold is not edited by a linter.
+#
+# MODES: the SAME rule is hard for an EMITTED value (a coder/model wrote it - a defect) and soft for an
+# AUTHORED value (the owner wrote it - a deviation with a note). That asymmetry is the whole point: a
+# validator that hard-fails the owner's gold is corrupting the gold.
+
+schema_version: '1.0'
+contract_version: '1.0.0'
+status: proposed            # proposed | active. `proposed` = nothing decides on this yet (importable, not wired).
+owner_gate_required: true   # activation is a C22 owner act, not an assistant one.
+
+inputs:
+  menu: config/closed_menu_v5.json
+  menu_sha256_file: config/closed_menu_v5.sha256          # COMPOSITE - HISTORICAL since D-371: never rewritten
+  menu_axis_groups: config/menu_axis_groups.yaml          # axis -> group, ONE declaration read by two scripts
+  menu_axis_hashes: config/menu_axis_hashes.yaml          # generated per-axis hashes + the answer-space pin
+  anchor_manifest: governance/ANCHOR4_MANIFEST_20260924.json
+  workbook: governance/anchor_adjudication_workbook_20260924.csv
+  raw_repair_declaration: config/anchor_workbook_fixes.yaml
+  annex: governance/frontier_pack_20260924/ANCHOR4_DEPTH_ANNEX_CAL1_v1.csv
+  depth_menu: config/depth_classes.yaml
+
+columns:
+  id: item_id
+  domains_final: domains_final
+  domains_final_raw: domains_final_raw
+  depth_word: depth_final
+  depth_class: depth_final_class
+  primary: primary_domain
+  owner_note: owner_note
+  separator: '|'
+
+menu_pin:
+  # BUG-447/D-371, owner-ruled 2026-09-25. `config/closed_menu_v5.sha256` is a COMPOSITE hash over 7 sub-objects,
+  # yet it was consumed as the ANSWER-SPACE pin: ONE hash, TWO meanings. D-285 ("taxonomy discipline definitions
+  # feed the closed menu") and D-321 ("the menu was not touched") were both recorded RESOLVED and read as
+  # contradictory. MEASURED: both are half true - the DEFINITION moved (composite frozen 73597ee2... vs live
+  # d2fc500c...), the ANSWER SPACE did not (domains + abstention byte-identical).
+  #
+  # RESOLUTION. Keep the composite frozen as a HISTORICAL artifact; make the ANSWER SPACE the pin; report the two
+  # drifts as two different things. Why not the alternatives: re-rendering the composite moves the stamp every
+  # 2026-09-2x row already carries and would falsify D-321's recorded claim; overwriting the .sha256 destroys the
+  # provenance it exists to provide (it IS the evidence of which menu the existing labels were classified against).
+  composite_pin_file: config/closed_menu_v5.sha256          # historical; never rewritten, never overwritten
+  composite_is_historical: true
+  answer_space_pin_source: config/menu_axis_hashes.yaml
+  answer_space_pin_key: answer_space_hash                   # over the `answer_space` group in menu_axis_groups.yaml
+  require_every_axis_grouped: true                          # an ungrouped axis is pinned by nothing
+  # Severity is NOT declared here: it is the tiers in `tiers_by_mode` below (one authority per fact).
+  #   ANSWER_SPACE_DRIFT  hard - a value a classifier may EMIT changed -> every stored count is incomparable
+  #   DEFINITION_DRIFT    soft - wording moved, the answer set did not -> recorded, nothing invalidated
+  drift_codes: {answer_space: ANSWER_SPACE_DRIFT, definition: DEFINITION_DRIFT}
+
+menu_conformance:
+  # S10 (sandbox): a truncated token silently normalised to ZERO domains - no exception, no log. A
+  # truncation DEGRADED INTO AN ABSTENTION, which is the one failure mode that looks like a valid answer.
+  on_off_menu_token: fail_closed       # fail_closed | drop | repair. Only fail_closed is a contract.
+  repair_only_if_declared: true        # a repair is legal only when config/anchor_workbook_fixes.yaml declares it
+  measure_off_menu_with_fullwidth: true
+  log_every_off_menu_token: true
+
+raw_provenance:
+  # The owner's bytes must be read with the OWNER's separator. Splitting the provenance column on the OUTPUT
+  # separator manufactured 48 phantom off-menu tokens in the first run of this check: a false positive about
+  # the owner's data, produced by a reader that assumed the wrong delimiter.
+  separator: ',|'                     # the owner typed commas, the machine writes pipes; provenance may hold BOTH
+  separators: [',', '|']
+  cell_repair_source: config/anchor_workbook_fixes.yaml
+  rederive_equivalence_or_fail: true   # declared repairs must REPRODUCE domains_final, else it was an edit
+
+abstention:
+  # 'emerging' is the domain menu's abstention slot (the only menu entry with an EMPTY group): "none of the
+  # 43 fits". It is symmetric with the depth axis' `none_fits`. It is not a domain, it is not a group
+  # witness, and it must leave BOTH sides of every rate (parity) - otherwise "how many domains does this
+  # claim span" silently counts an abstention as a domain.
+  domain_vocabulary: ['emerging']
+  depth_vocabulary: ['none_fits']
+  parity: numerator_and_denominator
+  counts_as_group_witness: false
+  counts_as_domain: false
+  unclassified_row_state: abstained_owner_owed
+  promotion_script: scripts/resolve_emerging_deterministic.py
+  terminal: true
+  # BUG-465/D-387. An abstention the owner DECLARED is an ANSWER, not an open cell: it is counted, it leaves
+  # every rate with parity, and it is never reported as owed. An owed cell that can never be cleared -
+  # because the owner's honest answer IS the abstention - trains the owner to ignore the gate (exit 2 is only
+  # meaningful while every exit 2 can be cleared by an owner act).
+  axis_exempt_rows: [R140]
+  # Declared, never inferred: R140's claim type is a NON-CLAIM class ('noise drop', blind sheet 24.09), so
+  # neither the depth nor the domain axis is a reading of this row. The cell values are recorded and NOT
+  # scored; nothing here rewrites the owner's bytes (see config/anchor_workbook_fixes.yaml#owner_rulings).
+  axis_exempt_reason: "R140: CT='noise drop' - the row asserts no claim, so no axis reads it"
+  axis_exempt_code: AXIS_EXEMPT_DECLARED
+
+arity:
+  # depth constrains the SHAPE of the domain vector - a VALIDATOR, never a generator. Depth must never
+  # choose WHICH domains: that collapses the two axes (the R049 error).
+  #   rank       = a claim-local ordering among the row's own domains (never a global menu order)
+  #   primary    = rank 1, and the owner's rule is that it is the FIRST domain as typed (measured: 0/148
+  #                rows violate it, so the rule is already how the owner works - it is a guard, not a change)
+  #   max_rank 2 = the workbook only ever adjudicates the LEAD domain; a third rank has never been exercised
+  1: {min_domains: 3, min_groups: 3, primary: forbidden, max_rank: 0, label: universal}
+  2: {min_domains: 2, min_groups: 1, primary: required,  max_rank: 2, label: cross-domain}
+  3: {min_domains: 1, min_groups: 1, max_groups: 1,     max_rank: 2, label: domain}
+  4: {min_domains: 1, max_domains: 1, min_groups: 1, max_groups: 1, max_rank: 2, label: specialized}
+
+group_coverage:
+  # Groups are load-bearing for the MACRO average only (7 groups, cardinality 12/9/7/6/3/3/3 - a micro
+  # average over 43 domains is dominated by Business & Strategy at 28% of the canvas).
+  n_groups: 7
+  universal_rule: all_groups         # 7/7. Only place groups decide a class.
+  cross_domain_rule: domains_ge_2    # AMENDED after the stress test - see rationale.
+  cross_domain_rule_rejected: domains_ge_2_and_groups_ge_2
+  cross_domain_rule_rejected_blast_radius: 12
+  cross_domain_rule_blast_radius: 1
+  cross_field_note_field: null       # no such column exists yet; the >=2-groups variant needed one for 12 rows
+  gameability_note: >
+    Measured: three groups hold only 3 domains each, so "one domain per group" (7 ticks) is a CHEAP way to
+    satisfy a 7/7 rule. The rule cannot distinguish a genuinely universal claim from a lazily ticked one;
+    only the CLAIM-SHAPE gate can (D-395, 2026-09-25: FORM is DEMOTED from candidate gate - measured catch
+    rate 1/7 on the owner's own retracted class-1 calls, so "the FORM gate" was a name for a gate that does
+    not exist; the gate is config/claim_shape_instrument.yaml#gate_bit). Kept because 0/148 rows reach 7/7 and the rule is therefore untested at the
+    positive end, and flagged because untested-and-gameable is not the same as sound.
+
+pct_scalar:
+  # MEASURED DEAD. Max domain coverage in the corpus is 5/43 domains = 11.6% (Wilson CI [5.1%, 24.5%]).
+  # 75% of 43 = 32.2 domains. No row reaches one sixth of the bar, so any threshold >= 12% is unfalsifiable
+  # here: it cannot lose. 0.93 is kept only because it is the smallest value whose Wilson LOWER bound
+  # (81.4%) clears 0.75 - it is inert, disabled, and must never decide a class.
+  enabled: false
+  value: 0.93
+  value_if_enabled_min: 0.93
+  basis: wilson_lower_bound_clears_0_75
+  measured_max_coverage: 0.116
+  measured_max_coverage_ci95: [0.051, 0.245]
+
+provenance:
+  # R14: every persistent object is stamped. A rate whose denominator cannot be reproduced is not a rate.
+  required_on_emitted_rows: [schema_version, contract_version, menu_version, gen_model, pipeline_commit]
+  menu_version_source: config/closed_menu_v5.json
+  require_menu_version_stamp: true   # versioning that lives only in a FILENAME is not versioning (drift probe)
+  menu_version_stamp_keys: [menu_version, closed_menu_sha256, answer_space_sha256, menu_sha256]
+  # A stamp that is never CHECKED against the pin it claims to be is a decoration. Each manifest key must
+  # resolve to the recorded pin of the same fact, or it is a MISMATCH (hard) - never a pass.
+  stamp_verify_keys: {closed_menu_sha256: composite_hash_frozen_pin, answer_space_sha256: answer_space_hash}
+
+load_bearing:
+  # D-394 (2026-09-25). Written as a RAIL, not as a paragraph: scripts/check_depth_load_bearing.py resolves
+  # every probe below from THIS block and exits 1 while `enabled: false` and a forbidden trace is present.
+  # A declaration with no consumer is a comment (the BUG-462 class), and the failure it prevents - a class
+  # decided by a band, an anchor edited to fit coders, a head trained on an axis two of whose declared
+  # coders have never run - would otherwise arrive silently, because nothing in the repo looks for it.
+  enabled: false
+  decided: D-394
+  reason: >
+    MEASURED on the executed panel: alpha 0.4004 nominal / 0.5701 ordinal / interval ICC 0.546, all below the
+    reporting floor 0.667, on an INCOMPLETE panel (2 of 5 declared raters hold zero depth cells - BUG-476).
+    The disagreement is item-specific with ZERO rater bias (G-study D-396: F_rater 0.146, rater component
+    0.0% of variance), so the axis is not broken - it is UNMEASURED at the panel size it declares.
+  consequences: [no_gate, no_anchor_edit, no_depth_head, no_freeze]
+  unblocks_when: >
+    the declared panel is COMPLETE and has been run blind, AND the honest statistic for an ordered menu
+    (ordinal alpha / interval ICC) reaches config/agreement_floor.yaml#operative_floor. Choosing the
+    statistic after the score exists is forbidden; that choice needs its own owner ruling.
+  forbidden_traces:
+    - kind: value_must_be
+      key: config/anchor_family.yaml#anchor4_depth_annex.trained
+      expect: false
+      why: "D274d - a head trained on this axis would launder coder agreement into an anchor"
+    - kind: key_absent_or_false
+      key: config/agreement_floor.yaml#panels.depth_axis_panel.gate
+      why: "a depth GATE would decide a class from a band (D2130: the band informs, it does not decide)"
+    - kind: glob_absent
+      patterns: ['governance/*depth*head*', 'models/*depth*head*', 'governance/depth_head*.json']
+      why: "a trained depth head is the one artifact that makes the axis load-bearing by accident"
+
+tiers_by_mode:
+  # A code's severity lives HERE, not in the script: a finding whose tier is a literal cannot be re-graded.
+  authored:
+    hard: [MENU_OFF_TOKEN, ANSWER_SPACE_DRIFT, AXIS_PIN_MISSING, ANSWER_SPACE_PIN_UNVERIFIABLE, UNCLASSIFIED_MENU_AXIS, MENU_VERSION_STAMP_MISMATCH, MENU_HASH_ARTIFACT_STALE, MISSING_MENU_VERSION, RAW_REDERIVE_MISMATCH]
+    owner_blocked: [DOMAINS_BLANK]
+    soft: [ABSTENTION_ONLY, AXIS_EXEMPT_DECLARED, RAW_UNDECLARED_TOKEN, ARITY_MIN_DOMAINS, ARITY_MAX_DOMAINS, ARITY_MIN_GROUPS, ARITY_MAX_GROUPS, ARITY_PRIMARY, PRIMARY_NOT_FIRST, GROUP_COVERAGE_CLASS_MISMATCH, PCT_SCALAR_BELOW, DEFINITION_DRIFT]
+  emitted:
+    hard: [MENU_OFF_TOKEN, RAW_UNDECLARED_TOKEN, RAW_REDERIVE_MISMATCH, ANSWER_SPACE_DRIFT, AXIS_PIN_MISSING, ANSWER_SPACE_PIN_UNVERIFIABLE, UNCLASSIFIED_MENU_AXIS, MENU_VERSION_STAMP_MISMATCH, MENU_HASH_ARTIFACT_STALE, MISSING_MENU_VERSION, ARITY_MIN_DOMAINS, ARITY_MAX_DOMAINS, ARITY_MIN_GROUPS, ARITY_MAX_GROUPS, ARITY_PRIMARY, PRIMARY_NOT_FIRST]
+    owner_blocked: [DOMAINS_BLANK]
+    soft: [ABSTENTION_ONLY, AXIS_EXEMPT_DECLARED, GROUP_COVERAGE_CLASS_MISMATCH, PCT_SCALAR_BELOW, DEFINITION_DRIFT]
+
+exit_codes:
+  clean: 0
+  contract_defect: 1     # hard tier
+  owner_owed: 2          # owner_blocked tier - loud, not fatal
+
+what_this_does_not_do:
+  - "it does not decide a depth class (D2130: the band informs, it does not decide)"
+  - "it does not add, rewrite or normalise any owner cell"
+  - "it does not license training a head (D274d) or change the 4-class axis (D637 stands)"
+  - "it does not evaluate the FORM gate (separate instrument, separate score). FORM/extraction_type IS
+     anchored: owner ANCHOR-3, column extraction_type_final, 145/150 human, write-locked (see
+     config/anchor_family.yaml). FORM is not this contract's gate and never was."

@@ -1,0 +1,81 @@
+# config/label_provenance.yaml — the DECLARED label-provenance state of a stored FB (BUG-497 / D-2640).
+#
+# WHY THIS FILE EXISTS (MEASURED 2026-09-25, knowledge pipeline/maxwell.db, fbs, 7,995 rows):
+#   menu_hash             NULL/empty on 7,995 / 7,995
+#   content_type_source   empty on 7,995 / 7,995
+#   discipline_source     empty on 7,995 / 7,995
+#   extraction_type_source empty on 7,995 / 7,995
+#   pipeline_run_id       exactly three values: t11 (7,867) | bug198_reinject (6) | e2e (122)
+# This is NOT a stage-6 write bug: the corpus PREDATES the R1/D-279 stamp, which
+# pipeline/stage4_merge.py stamps on every classified FB. But "empty stamp" read as "there was no
+# menu at classification time" is indistinguishable from "the stamp is broken", and the F-44
+# `min_human_share` gate is DEFINED on menu_hash + *_source (pipeline/schemas.py). A state that only
+# a human can tell apart is a state the store must DECLARE, not one each consumer infers.
+#
+# R14 IS NOT EXEMPTED, and this file must not claim it is. MEASURED: the R14 object stamps ARE present
+# on all 7,995 rows (schema_version '3.0' x7,995; gen_model Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+# x7,995; pipeline_commit in {81b813f: 6,745, 8de5d36: 1,250}). What is missing is D-279 label
+# TRACEABILITY. Declaring an R14 exemption here would be an ontologically false claim.
+#
+# THREE DISTINCT PROVENANCE AXES (do not conflate — the BUG-499 lesson that two near-identical names
+# for two different things is how an ontology drifts):
+#   1. AUTHORSHIP  — the C29 per-label source vocabulary (human_verbatim | llm_extracted_from_source |
+#                    llm_hypothesis), now carried by fbs.provenance (MEASURED: llm_extracted_from_source
+#                    on 7,995/7,995) and by the *_source tier columns once they are stamped.
+#   2. EVAL TIER   — config/eval_integrity.yaml#provenance_tiers (human-blind | human-attested | model |
+#                    frontier | na). Answers "who could this label be trusted to?" for the eval anchor.
+#   3. TRACEABILITY — THIS FILE. Answers "does the label still point at the menu it was produced
+#                    against?" A pre-boundary label is not untrustworthy; it is UNTRACEABLE.
+#
+# R-D410 / D-277: nothing here is backfilled or imputed. A pre-boundary row stays pre_boundary for
+# ever; manufacturing a menu_hash retroactively would manufacture a provenance claim.
+schema_version: "3.0"
+last_updated: "2026-09-25"
+decision: "D-2640"
+
+label_provenance:
+  db: "knowledge pipeline/maxwell.db"
+  table: fbs
+  # The R1/D-279 traceability quartet (pipeline/schemas.py#L400-424).
+  run_column: pipeline_run_id
+  stamp_columns: [menu_hash, content_type_source, discipline_source, extraction_type_source]
+  # The declared vocabulary. REQUIRED: every one of these keys must exist (pipeline/label_traceability.py
+  # fails closed otherwise), and the module returns the KEY, so a rename is an edit in exactly one place.
+  states:
+    stamped:
+      definition: "every stamp column carries a value — the label is traceable to its menu and its tiers"
+      is_defect: false
+    pre_boundary:
+      definition: "no stamp, and the row belongs to a DECLARED pre-boundary generation run — untraceable by dated declaration, never imputed"
+      is_defect: false
+    missing:
+      definition: "no stamp and the row is OUTSIDE the boundary — a broken stamp. A real gap must never be able to hide behind the boundary"
+      is_defect: true
+    unstampable:
+      definition: "the row/store carries none of the stamp columns at all, so traceability cannot even be evaluated — fail closed, never read as pre_boundary"
+      is_defect: true
+  boundary:
+    declared: "2026-09-25"
+    decision: "D-2640"
+    scope: "the R1/D-279 label-traceability quartet for the corpus generated before the stamp existed"
+    # A CLOSED SET of generation runs, not a date: a new run can never silently join the boundary and
+    # absorb its own gap. MEASURED 2026-09-25 as the complete set of pipeline_run_id values.
+    generation_runs: [t11, bug198_reinject, e2e]
+    # A DECLARED denominator (BUG-501/D-2638): a population that is only COMPUTED cannot disagree with
+    # anything, so the measured count is declared and the rail compares. If it changes, that is drift
+    # (or an explicit owner-authored update of this file), never a silent edit.
+    measured_rows: 7995
+    measured: "t11 7,867 | bug198_reinject 6 | e2e 122 (7,995 rows; menu_hash and all three *_source columns empty on every one)"
+    rule: >-
+      Inside the boundary a label is declared pre_boundary: its provenance is NOT imputed and NOT
+      backfilled (D-277). Outside the boundary every row MUST carry the full quartet; a row that does
+      not is `missing` and is a DEFECT (exit 1), so a future batch committed without the R1 stamp is
+      reported instead of being absorbed. Dissolving the boundary requires an owner decision (the
+      boundary rows would have to be RE-STAMPED, i.e. a provenance claim manufactured by a human act
+      and recorded as one) — the rail reports a boundary row that has become stamped, it never writes.
+    surface: >-
+      The state is exposed to consumers as the query-surface field `label_traceability` (declared in
+      pipeline/label_traceability.py, attached at the ONE row-mapping choke point
+      pipeline/retrieve.py::_row_to_dict, so every retrieval leg carries it). A consumer that needs a
+      traceable label filters on label_traceability == "stamped"; it must never infer traceability
+      from an empty menu_hash.

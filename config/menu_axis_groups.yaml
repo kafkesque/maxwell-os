@@ -1,0 +1,25 @@
+# menu_axis_groups.yaml - WHICH AXIS OF THE CLOSED MENU BELONGS TO WHICH GROUP (D-371 / BUG-447, BUG-453).
+#
+# WHY: config/closed_menu_v5.sha256 is a COMPOSITE hash over every sub-object of the menu, and it was consumed
+# as the ANSWER-SPACE pin. One hash, two meanings. Two RESOLVED decisions were read as contradictory as a
+# result: D-285 ("taxonomy discipline definitions feed the closed menu") and D-321 ("the menu was not
+# touched"). MEASURED 2026-09-25: both are half true - the DEFINITION moved, the ANSWER SPACE did not.
+#
+# A claim about the ANSWER SPACE must be checkable against the ANSWER SPACE, so the membership is declared
+# ONCE here and read by BOTH the generator (scripts/menu_axis_hashes.py) and the checker
+# (scripts/validate_depth_domain_contract.py). A second, inline copy of this list would be a second truth
+# (C21) - which is exactly how the composite/answer-space confusion arose in the first place.
+#
+# This file declares MEMBERSHIP ONLY. Severity lives in config/depth_domain_contract.yaml `tiers_by_mode`
+# (a finding whose tier is written in two places is a finding with two tiers).
+
+schema_version: '1.0'
+source: config/closed_menu_v5.json
+axis_groups:
+  # what a classifier may EMIT. A change here changes an ANSWER, so every stored label count is incomparable.
+  answer_space: [domains, abstention]
+  # definitions that FEED the rendering. A change here changes wording, not the answer set.
+  definition_axes: [disciplines, content_types, extraction_types]
+  # bookkeeping carried inside the same composite object.
+  housekeeping: [decision, schema_version]
+require_every_axis_grouped: true   # an axis in no group is pinned by nothing, so a change to it is invisible

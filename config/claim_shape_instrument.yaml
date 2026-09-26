@@ -1,0 +1,70 @@
+# claim_shape_instrument.yaml - THE declaration of the D1/D2 claim-shape instrument (D-374).
+#
+# NAMING (C21, one token = one namespace):
+#   FORM        = AXIS 2 `extraction_type` (4 epistemic forms: causal_mechanism / descriptive_model /
+#                 normative_heuristic / empirical_pattern). It HAS an anchor: owner ANCHOR-3, column
+#                 `extraction_type_final`, 145/150 in governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+#                 (declared in config/anchor_family.yaml; write-locked via config/human_instrument_locks.yaml).
+#   CLAIM SHAPE = a 1-BIT gate (comparative + STATED exchange rate + BOUNDARY). This instrument.
+# The bit is NOT FORM and must not be named FORM. An earlier revision named every column FORM_* and
+# asserted "there is NO FORM anchor" - both wrong (BUG-459/BUG-461). MEASURED 2026-09-25: FORM (1-4)
+# nonblank = 145/150 in the depth blind sheet; the column that is blank (0/150) is DEPTH, not FORM.
+schema_version: '1.0'
+decision: D-374
+
+instrument:
+  path: governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITATION_11.csv
+  questions_file: governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITATION_11.questions.txt
+  source_annex: governance/frontier_pack_20260924/ANCHOR4_DEPTH_ANNEX_CAL1_v1.csv
+  source_sheet: governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+
+# The cohort is declared ONCE here and read by BOTH the builder and the scorer: two inline copies of a
+# cohort ARE the drift (a denominator that can change without anyone editing the gate).
+cohort:
+  candidates: [U001, U002, U003, U004]
+  negatives: [R033, R049, R062, R085, R087, R101, R139]
+  asserted_against: source_annex
+
+columns:
+  identity: [item_id, name]
+  source_text: [DEFINITION, APPLICATION, MECHANISM, BOUNDARY]
+  answers: [claim_shape_q1, claim_shape_q2, claim_shape_q3, claim_shape_q4, claim_shape_bit,
+            evidence_span, abstain, claim_shape_note, elicitor, date]
+  answered_cells: [claim_shape_q1, claim_shape_q2, claim_shape_q3, claim_shape_q4, claim_shape_bit,
+                   evidence_span, abstain, claim_shape_note, elicitor, date]
+  gate_bit: claim_shape_bit
+
+questions:
+  claim_shape_q1: does the statement make a COMPARATIVE claim (more/less than) rather than assert a value or describe a practice?
+  claim_shape_q2: is a STATED EXCHANGE RATE present (what you give up for what you get, or the variable the comparison turns on)?
+  claim_shape_q3: is a BOUNDARY present (where the claim stops holding / the condition under which it inverts)?
+  claim_shape_q4: is the claim FALSIFIABLE by an observation that could in principle be made?
+
+# DECLARED BEFORE ANY ANSWER EXISTED (2026-09-25). The composition of the bit is a rule, not a post-hoc
+# choice: q1-q3 are the three conjuncts the D1/D2 boundary was DERIVED from (comparative + stated exchange
+# rate + boundary). q4 (falsifiable) is RECORDED, not required - it is a property of the text that is
+# reported alongside, and reporting it while not letting it decide is the only way it can later be argued
+# for without re-picking the statistic after a score exists (the same discipline as the floor file).
+bit_rule:
+  required: [claim_shape_q1, claim_shape_q2, claim_shape_q3]
+  recorded_not_required: [claim_shape_q4]
+
+# WHO MAY ELICIT. The judgment must come from a family that is not the rule's author and that holds no
+# access to the cohort, the retraction verdicts or the depth axis. `primary` is the elicitor whose file is
+# the canonical instrument; every other declared elicitor writes a receipt file, and the two confusion
+# matrices are reported side by side (an agreement number between elicitors is the only way to see how much
+# of the gate is the text and how much is the reader).
+elicitors:
+  primary: Qwen3.8-27B-MLX-4bit
+  declared: [Qwen3.8-27B-MLX-4bit, gemma-4-E4B-it-MLX-4bit]
+  blind_columns: [item_id, name, DEFINITION, APPLICATION, MECHANISM, BOUNDARY]
+  blind_identity: true          # the item_id is WITHHELD from the prompt (U*/R* encodes the cohort)
+  max_tokens: 700
+  timeout_s: 300
+
+guards:
+  # An answer from the annex's author is the rule restated, not evidence about the rule.
+  refuse_elicitor: [assistant]
+  # Rebuilding must never erase an elicitor's answers or silently narrow the schema.
+  refuse_overwrite_when_answered: true
+  forbid_depth_in_instrument: true

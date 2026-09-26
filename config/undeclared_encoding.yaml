@@ -1,0 +1,41 @@
+# undeclared_encoding.yaml - the register for D-2644 in CODE: a text read or write that does not NAME its
+# encoding has an UNDECLARED value, and the value is the environment's (locale.getpreferredencoding(False)).
+#
+# WHY THIS EXISTS (BUG-521, MEASURED 2026-09-26): the two neighbouring rails cannot see this class.
+#   scripts/check_encoding_homes.py  - sees non-UTF-8 codec LITERALS in code.
+#   scripts/check_silent_repair.py   - sees `errors=` LITERALS (a repair of undecodable bytes).
+# A platform default has NEITHER literal, so 166 modules carrying this defect produced no finding anywhere. That is
+# the same shape of blind spot as tools/ in the 2026-09-26 errors= census, found the same way: by widening the scan.
+#
+# WHY IT MATTERS HERE. On this machine it is usually UTF-8 and therefore INERT (which is exactly why it was never
+# seen). It is not inert under LC_ALL=C (a UnicodeDecodeError that names no artifact - a C16 error leak) and it is
+# not inert on Windows (cp1252: 0xD1 is 'N-tilde', not an em dash - the BUG-511 class). A WRITE is the sharper
+# case: the bytes an artifact gets then depend on the machine that wrote it, so a sha256 pin pins different bytes
+# on different platforms (C3 sovereignty / C26 cross-platform / R14 provenance).
+#
+# ENTRY RULES
+#   allowed:  a site where the platform default is CORRECT (a foreign stream, a file this process just wrote), with
+#             a reason. An entry whose site is gone is reported STALE and fails the rail.
+#   unresolvable:  a mode that is not a literal is NOT proof of text, so the rail will not judge it: it is counted
+#             separately (a fourth number) and repaired by making the mode literal. It is NOT listed in `allowed`,
+#             because declaring it correct would be a claim the bytes do not support.
+#   exempt:   a whole module excluded from the census - a declaration with a reason, never a convenience.
+#   ceiling:  written by the RAIL (--record), never by hand. `files` is the unit of repair (a module is fixed at
+#             ZERO sites, so copying a line can never lower the number); direction is shrink_only, and a raise is
+#             REFUSED once measured_by names the rail (D-2642).
+schema_version: '1.0'
+decided: D-2644
+bug: BUG-521
+home: scripts/lib/artifact_encoding.py
+rail: scripts/check_undeclared_encoding.py
+scan_roots: [scripts, pipeline, tools]
+exempt:
+  - scripts/check_undeclared_encoding.py
+measured_by: scripts/check_undeclared_encoding.py
+allowed: []
+ceiling:
+  files: 156
+  sites: 392
+  writes: 74
+  unresolvable: 3
+  direction: shrink_only

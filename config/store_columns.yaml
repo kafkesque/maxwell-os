@@ -1,0 +1,588 @@
+# store_columns.yaml - the register for the COLUMNS axis (BUG-524). Every column of the governed store must
+# declare a lifecycle the MEASUREMENT supports; scripts/check_store_columns.py is the machine that fails when the
+# declaration and the ruler disagree.
+#
+# MEASURED 2026-09-26 (7995 rows / 75 columns). The ruler is the blind spot, so this rail measures FIVE numbers per
+# column and never one: nonnull | nonblank | hollow | distinct | mentions. `count(col)` counts '' as present and
+# cannot see a blank; it cannot see '[]' either. That is why an earlier hand census of this store reported
+# "procedural_skill is 0/7995" when the truth is: 7995/7995 rows carry a BLANK, and separately it reported ten
+# zero-populated columns where the named rulers show 12 content-empty and 20 single-valued.
+#
+# DEFAULT DECLARATION (required, C12): every column NOT listed below is declared `value` - it must be non-blank on
+# every row and must VARY. 52 of the 75 columns satisfy that today; the 23 that do not are named below.
+#
+# A column that must vary but is constant is NOT a separate role: it is `role: value` + `status: debt`, which is how
+# the approved varying-column rule fails CLOSED instead of being remembered.
+schema_version: '1.0'
+decided: PENDING-OWNER
+bug: BUG-524
+rail: scripts/check_store_columns.py
+store: knowledge pipeline/maxwell.db
+table: fbs
+scan_roots: [scripts, pipeline, tools]
+default_role: value
+default_why: >-
+  Declared default: every column not named under `columns:` carries a non-blank value on every row and the value
+  varies (>= 2 distinct). Measured 2026-09-26: 52 of 75 columns; the exceptions are named below, each with a why.
+columns:
+  # ---- state: one value that IS this run's fact (a stamp or a genuinely single-state flag) ----
+  provenance: {role: state, why: "constant 'llm_extracted_from_source' - the store is entirely LLM-extracted, which is a fact about this run and not a label"}
+  verifier_model: {role: state, why: "constant 'MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli' - one NLI verifier, R5 satisfied, one run"}
+  schema_version: {role: state, why: "constant '3.0' - the schema stamp of this run, R14 satisfied at row level"}
+  gen_model: {role: state, why: "constant 'Qwen3-Coder-30B-A3B-Instruct-MLX-4bit' - one generator for this run"}
+  fb_version: {role: state, why: "constant 1 - the first committed version of every feedback object in this run"}
+  usage_count: {role: state, why: "constant 0 - the knowledge layer has never served this store, so nothing has ever been retrieved"}
+  feedback_count: {role: state, why: "constant 0 - no feedback has ever been recorded against this store"}
+  is_summary: {role: state, why: "constant 0 - this run produced no summary feedback objects, so the flag is true as declared"}
+  # ---- reserved: nothing has written it yet (blank or hollow), so `filled_by` is REQUIRED ----
+  procedural_skill: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py Phase 1", why: "BLANK on 7995/7995 rows (not NULL - count(col) cannot see it) while 11 files read the column; the skill-orchestration field exists and is unwritten"}
+  prerequisite_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py graph pass", why: "hollow literal '[]' on 7995/7995 rows - an empty JSON array is not a value, and a reader cannot tell it from 'no prerequisite'"}
+  contradicts_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py contradiction pass", why: "NULL on 7995/7995 rows while 9 files name it"}
+  last_retrieved_at: {role: reserved, filled_by: "the knowledge layer query path (T4)", why: "blank on 7995/7995 rows - retrieval has never been recorded"}
+  feedback_score: {role: reserved, filled_by: "the feedback loop that does not exist yet", why: "NULL on 7995/7995 rows while 14 files name it; part of the unwired 4-column feedback subsystem"}
+  menu_hash: {role: reserved, filled_by: "the S4 classifier menu writer", why: "blank on 7995/7995 rows - the S4 menu provenance was never stamped, so a re-classification cannot be tied to the menu that produced it"}
+  classification_error: {role: reserved, filled_by: "nobody - superseded by classification_errors", why: "blank on 7995/7995 rows while a plural sibling carries the real values; one rule with two homes, one of them dead (D-2646)"}
+  # ---- sparse: a row-carried diagnostic ----
+  classification_errors: {role: sparse, why: "2 of 7995 rows carry content ('Too many domains: 6 > 5' and 7 > 5) - a diagnostic carried by the rows that failed, which is the correct shape for it"}
+  # ---- debt: KNOWN defects, OWED and shrink-only ----
+  content_type: {role: value, status: debt, why: "constant 'principle' on 7995/7995 rows - the S4 content-type classifier never varied, so this column cannot carry the label authority the eval floor assumes"}
+  classification_status: {role: value, status: debt, why: "constant 'CLEAN' on 7995/7995 rows while classification_errors records 2 real errors and status QUARANTINEs 2972 rows - a status column that is FALSE, not merely unvarying"}
+  borp_score: {role: value, status: debt, why: "constant 0.0 on 7995/7995 rows - retired per T2, still NAMED by 13 files, so a reader can branch on a value nothing writes (the BUG-511 family)"}
+  application: {role: value, status: debt, why: "blank on 1 of 7995 rows (measured nonblank 7994) - a single blank makes the column indistinguishable from unwritten for that row; repair the writer"}
+  jargon: {role: value, status: debt, why: "blank on 2091 of 7995 rows (measured nonblank 5904) with 5868 distinct - a partially written field whose blank rows cannot be told from 'no jargon'"}
+  duplicate_of: {role: reserved, status: debt, filled_by: "a dedup stage that no longer exists (D2120/D2198)", why: "blank 0/7995 for a REMOVED stage while 11 files still name the column"}
+  content_type_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 while governance/gold_4axis.jsonl is 100% stamped per axis - R14 holds at ROW level and FAILS at LABEL level"}
+  discipline_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 while the anchor records 142 reliable-pair and 60 human labels for this axis"}
+  extraction_type_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 - the weakest anchor axis (joint-vote 202 of 251) is also the one with no store-side provenance"}
+ceiling:
+  debt: 9
+  direction: shrink_only
+measured:
+  columns:
+    accessibility:
+      distinct: 2
+      hollow: 0
+      mentions: 10
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    application:
+      distinct: 7994
+      hollow: 0
+      mentions: 70
+      nonblank: 7994
+      nonnull: 7995
+      rows: 7995
+    borp_score:
+      distinct: 1
+      hollow: 0
+      mentions: 13
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    boundary:
+      distinct: 7994
+      hollow: 0
+      mentions: 106
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    citation:
+      distinct: 752
+      hollow: 0
+      mentions: 30
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    classification_error:
+      distinct: 0
+      hollow: 0
+      mentions: 7
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    classification_errors:
+      distinct: 2
+      hollow: 0
+      mentions: 11
+      nonblank: 2
+      nonnull: 2
+      rows: 7995
+    classification_status:
+      distinct: 1
+      hollow: 0
+      mentions: 14
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    committed_at:
+      distinct: 7995
+      hollow: 0
+      mentions: 6
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    confidence_score:
+      distinct: 175
+      hollow: 0
+      mentions: 8
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    consequence:
+      distinct: 7994
+      hollow: 0
+      mentions: 43
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    content_type:
+      distinct: 1
+      hollow: 0
+      mentions: 107
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    content_type_source:
+      distinct: 0
+      hollow: 0
+      mentions: 12
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    context:
+      distinct: 16
+      hollow: 0
+      mentions: 66
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    contradicts_fbs:
+      distinct: 0
+      hollow: 0
+      mentions: 9
+      nonblank: 0
+      nonnull: 0
+      rows: 7995
+    created_at:
+      distinct: 7995
+      hollow: 0
+      mentions: 37
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    definition:
+      distinct: 7995
+      hollow: 0
+      mentions: 155
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    depth:
+      distinct: 4
+      hollow: 0
+      mentions: 125
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    difficulty_level:
+      distinct: 3
+      hollow: 0
+      mentions: 8
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    discipline:
+      distinct: 62
+      hollow: 0
+      mentions: 164
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    discipline_raw:
+      distinct: 1423
+      hollow: 54
+      mentions: 39
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    discipline_source:
+      distinct: 0
+      hollow: 0
+      mentions: 13
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    domains:
+      distinct: 2081
+      hollow: 0
+      mentions: 142
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    domains_raw:
+      distinct: 7631
+      hollow: 39
+      mentions: 34
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    duplicate_of:
+      distinct: 0
+      hollow: 0
+      mentions: 11
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    elaboration:
+      distinct: 7995
+      hollow: 0
+      mentions: 34
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    epistemic_status:
+      distinct: 4
+      hollow: 0
+      mentions: 10
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    evidence:
+      distinct: 2
+      hollow: 0
+      mentions: 94
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    evidence_passages:
+      distinct: 7991
+      hollow: 0
+      mentions: 44
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    evidence_passages_shown:
+      distinct: 7991
+      hollow: 0
+      mentions: 13
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    extraction_type:
+      distinct: 4
+      hollow: 0
+      mentions: 69
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    extraction_type_source:
+      distinct: 0
+      hollow: 0
+      mentions: 4
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    failure_mode:
+      distinct: 7995
+      hollow: 0
+      mentions: 27
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    fb_id:
+      distinct: 7995
+      hollow: 0
+      mentions: 158
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    fb_version:
+      distinct: 1
+      hollow: 0
+      mentions: 9
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    feedback_count:
+      distinct: 1
+      hollow: 0
+      mentions: 11
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    feedback_score:
+      distinct: 0
+      hollow: 0
+      mentions: 14
+      nonblank: 0
+      nonnull: 0
+      rows: 7995
+    gen_model:
+      distinct: 1
+      hollow: 0
+      mentions: 58
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    intimacy_boundary:
+      distinct: 3
+      hollow: 0
+      mentions: 11
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    is_convergent:
+      distinct: 2
+      hollow: 0
+      mentions: 44
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    is_summary:
+      distinct: 1
+      hollow: 0
+      mentions: 23
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    isor:
+      distinct: 622
+      hollow: 0
+      mentions: 9
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    jargon:
+      distinct: 5868
+      hollow: 0
+      mentions: 19
+      nonblank: 5904
+      nonnull: 7995
+      rows: 7995
+    keywords:
+      distinct: 7995
+      hollow: 0
+      mentions: 22
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    last_retrieved_at:
+      distinct: 0
+      hollow: 0
+      mentions: 6
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    mechanism:
+      distinct: 7995
+      hollow: 0
+      mentions: 120
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    menu_hash:
+      distinct: 0
+      hollow: 0
+      mentions: 18
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    name:
+      distinct: 7990
+      hollow: 0
+      mentions: 270
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    needs_human_review:
+      distinct: 2
+      hollow: 0
+      mentions: 9
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    origin:
+      distinct: 3
+      hollow: 0
+      mentions: 19
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    pipeline_commit:
+      distinct: 2
+      hollow: 0
+      mentions: 57
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    pipeline_run_id:
+      distinct: 3
+      hollow: 0
+      mentions: 15
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    prerequisite_fbs:
+      distinct: 1
+      hollow: 7995
+      mentions: 13
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    primary_source:
+      distinct: 1320
+      hollow: 0
+      mentions: 18
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    procedural_skill:
+      distinct: 0
+      hollow: 0
+      mentions: 11
+      nonblank: 0
+      nonnull: 7995
+      rows: 7995
+    provenance:
+      distinct: 1
+      hollow: 0
+      mentions: 76
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    related_fbs:
+      distinct: 7983
+      hollow: 13
+      mentions: 15
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    s5_reason:
+      distinct: 7
+      hollow: 0
+      mentions: 8
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    schema_version:
+      distinct: 1
+      hollow: 0
+      mentions: 83
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_authors:
+      distinct: 2867
+      hollow: 0
+      mentions: 22
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_books:
+      distinct: 2851
+      hollow: 0
+      mentions: 43
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_clusters:
+      distinct: 7993
+      hollow: 0
+      mentions: 17
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_diversity:
+      distinct: 77
+      hollow: 0
+      mentions: 25
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_ids:
+      distinct: 2615
+      hollow: 0
+      mentions: 22
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_principle_ids:
+      distinct: 7995
+      hollow: 0
+      mentions: 12
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_segments:
+      distinct: 7991
+      hollow: 0
+      mentions: 19
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    source_text:
+      distinct: 7995
+      hollow: 0
+      mentions: 15
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    status:
+      distinct: 2
+      hollow: 0
+      mentions: 100
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    taxonomy_match_method:
+      distinct: 4
+      hollow: 0
+      mentions: 18
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    taxonomy_version:
+      distinct: 2
+      hollow: 0
+      mentions: 14
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    temporal_scope:
+      distinct: 2
+      hollow: 0
+      mentions: 8
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    usage_count:
+      distinct: 1
+      hollow: 0
+      mentions: 12
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    verification_method:
+      distinct: 3
+      hollow: 0
+      mentions: 7
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    verification_results:
+      distinct: 6058
+      hollow: 0
+      mentions: 15
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+    verifier_model:
+      distinct: 1
+      hollow: 0
+      mentions: 7
+      nonblank: 7995
+      nonnull: 7995
+      rows: 7995
+  rows: 7995
+measured_by: scripts/check_store_columns.py

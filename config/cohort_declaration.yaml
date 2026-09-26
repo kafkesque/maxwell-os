@@ -1,0 +1,31 @@
+# cohort_declaration.yaml — the DENOMINATOR of every rate on the anchor cohorts (BUG-466).
+#
+# WHY: the ANCHOR-4 sheet declares `rows: 150` (ANCHOR4_MANIFEST_20260924.json) while the owner
+# workbook carries 148 data rows. R003/R146 are simply absent, and NOTHING declared why — so every
+# rate computed on the workbook had an undeclared denominator: 148 of a declared 150, with no
+# exclusion rule a reader could find. A rate whose denominator is undeclared cannot be audited.
+#
+# THE RULE: a rate reports BOTH denominators. `measured` is what the artifact holds; `declared` is
+# what the cohort says it holds. An absent row is DECLARED, never imputed and never silently dropped.
+schema_version: '1.0'
+decided: D-393
+authority: 'OWNER-ACCEPTED 2026-09-25 (BUG-466) — a declaration, not a repair: no row is added, no cell is invented'
+rule: 'every rate reports measured AND declared; absent rows are listed with a reason'
+cohorts:
+  anchor4_depth:
+    declared_rows: 150
+    declared_by: governance/ANCHOR4_MANIFEST_20260924.json#sheet.rows
+    # BUG-501: the DECLARED measured count. Computed-only, a denominator cannot DISAGREE with anything - it
+    # simply becomes whatever the artifact now holds (the BUG-466 failure mode). Declared, it is falsifiable
+    # in the one direction that matters: a row silently added or dropped is now a failure, not a new truth.
+    # Two readers, independent oracles (D-402): scripts/depth_pass_agreement.py --check-cohort asserts it
+    # against the workbook; config/reconciliation.yaml#depth_workbook_row_count pins it to the row count.
+    measured_rows: 148
+    measured_from: governance/anchor_adjudication_workbook_20260924.csv
+    absent_rows: [R003, R146]
+    absent_reason: >-
+      the owner review pass returned 148 of the 150 declared rows; R003 and R146 were never
+      returned and no exclusion rule existed (BUG-466). They are ABSENT, not withdrawn and not
+      failed: D-387 ('omission is not withdrawal') applies to a CELL the owner already filled,
+      while these two ROWS were never filled at all. Neither may be imputed.
+    forbidden: 'adding a row to the 150, imputing a cell, or reporting a rate on 148 as if it were the cohort'

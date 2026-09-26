@@ -1,0 +1,23 @@
+# register_divergence.yaml - bugs closed in PROSE but still counted OPEN (BUG-481, the register's own instance
+# of the RC-2/RC-3 disease).
+#
+# WHY: scripts/bug_status.py folds STATUS EVENTS and a status event is a HEADER. A closure written as a body
+# paragraph is invisible, so the machine register over-reports: MEASURED 2026-09-25, 8 ids carry an explicit
+# `**Status:** FIXED|RESOLVED|CLOSED` in the body while their last header classifies OPEN. "114 open" was a
+# parse artifact, and the C15 handoff rule was driven by that phantom count.
+#
+# check_bug_status.py CANNOT catch this - it re-derives the register from the same headers and byte-compares,
+# so it certifies the PARSER, never the LOG.
+#
+# THE RULE: one fact (is this bug open?) has one HOME (the header event). The other place is made LOUD.
+# This list is SHRINK-ONLY: an id listed here that is NO LONGER divergent is itself a FAILURE, so the list
+# can only be emptied by promoting each closure to a header event (or re-opening the bug). Raising
+# declared_max requires a declared decision, not an edit.
+schema_version: "1.0"
+decided: D-402   # the rail rule this list implements (a bug id is not a decision)
+driver: BUG-481   # the bug that produced the rule
+declared_max: 0
+
+declared_divergent: []   # EMPTIED 2026-09-25: all eight were promoted to header events (see governance/buglog.md,
+                         # REGISTER PROMOTION 20260925). SHRINK-ONLY: a new prose-only closure must be promoted
+                         # to a header event, never declared here.

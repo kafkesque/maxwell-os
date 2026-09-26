@@ -1,0 +1,108 @@
+# config/silent_repair.yaml - the D-2646/C16 register for `errors=` reads (BUG-518/BUG-519 class).
+#
+# MEASURED 2026-09-26 by scripts/check_silent_repair.py over scan_roots: 31 silent-repair sites that this register
+# DECLARES - 11 where repair is correct (a runtime log or a foreign stream, not an artifact) and 20 that still owe
+# a repoint to the one decode home. Both numbers are a MEASUREMENT; `ceiling.debt` is SHRINK-ONLY (D-2642), and an
+# entry with no measured site is reported STALE rather than left to rot (BUG-424 class).
+schema_version: '1.0'
+decided: BUG-518
+home: scripts/lib/artifact_encoding.py          # the ONE place a byte-level repair is allowed to be replaced by a declaration
+rail: scripts/check_silent_repair.py
+scan_roots: [scripts, pipeline, tools]          # tools/ was OUTSIDE the first census and is audited by this rail now
+# 2026-09-26: scripts/vote_anchor_domains.py:120 (a repair mode on .env) was REPAIRED rather than declared - the
+# operator-key rule now has one home, scripts/lib/operator_env.py, which reads .env through the decode home.
+# 2026-09-26 (BUG-521/522): scripts/audit_flag_consumers.py:72,89 and scripts/definition_nli_verify.py:207 were
+# REPAIRED, not declared - the first reads through the decode home, the second named ONE rule for its input
+# (its silent repair could never fire: the module already opened the same file strictly).
+ceiling:
+  debt: 17
+  direction: shrink_only
+
+allowed:
+  # repair is CORRECT here: these bytes come from a RUNTIME LOG or a FOREIGN producer, never from an artifact whose
+  # encoding is a declared fact. Nothing is written back, so no text is laundered into a stored object (C16 clean).
+  - path: scripts/_omlx_restart.py
+    lines: [33]
+    mode: replace
+    why: the watchdog socket's reply is decoded for a one-line DISPLAY echo; it is never parsed or stored.
+  - path: scripts/check_repo_integrity.py
+    lines: [280]
+    mode: replace
+    why: git reflog output - a foreign stream produced by git, not an artifact this repo declares.
+  - path: scripts/pipe_stage_probe.py
+    lines: [71, 190, 215]
+    mode: replace
+    why: a probe that PRINTS a head of the run's own markdown and reads the run's own checkpoint jsonl.
+  - path: scripts/s4_post_finish.py
+    lines: [64]
+    mode: replace
+    why: the S4 run log - the logger's own output, tailed for display.
+  - path: scripts/s4_status.py
+    lines: [77, 90]
+    mode: replace
+    why: the S4 run log, tailed for display.
+  - path: scripts/s4_watch.py
+    lines: [64, 80]
+    mode: replace
+    why: the S4 run log, tailed for display.
+  - path: scripts/seed_gated_ids.py
+    lines: [75]
+    mode: replace
+    why: the S4 run log, mined for ids; a repaired byte cannot create or change an id.
+
+debt:
+  # ARTIFACT/SOURCE reads that still repair silently. MEASURED 2026-09-26: every one is INERT today (the 3
+  # non-UTF-8 artifacts in this repo are all declared, and no source file is non-UTF-8), so nothing is mis-read
+  # right now. It is declared debt because a repair that never fired cannot be trusted to have been tested.
+  - path: scripts/audit_final_chain.py
+    lines: [43]
+    mode: replace
+    why: reads run jsonl; a repaired byte becomes U+FFFD INSIDE a parsed row. Repoint to scripts/lib/artifact_encoding.py.
+  - path: scripts/check_config_defaults.py
+    lines: [114, 140]
+    mode: replace
+    why: reads config + source text into the undeclared-default census; a silent repair could hide a producer's text.
+  - path: scripts/check_derivation_homes.py
+    lines: [78]
+    mode: replace
+    why: reads source text into the one-home census; a repaired byte could hide a rival definition from the rail.
+  - path: scripts/check_revoked_references.py
+    lines: [100, 134]
+    mode: replace
+    why: the anti-resurrection rail reads source text; its verdict must never rest on repaired bytes.
+  - path: scripts/f11_anchor_review.py
+    lines: [81]
+    mode: replace
+    why: reads the coders' label files (a Kimi return arrived as .md) - the artifact class where Mac Roman is real here.
+  - path: scripts/verify_anchor_family_registry.py
+    lines: [61]
+    mode: replace
+    why: reads the cohort/anchor jsonl artifacts; delegates the CSV path already, this one still repairs.
+  - path: pipeline/batch_convert_epubs.py
+    lines: [160]
+    mode: replace
+    why: pipeline/** is will_not_touch this session (rail 4); the convert path READS BACK the md it will write.
+  - path: pipeline/enhance_md_headers.py
+    lines: [182, 248]
+    mode: replace
+    why: pipeline/** is will_not_touch this session (rail 4); the header pass writes the text it repaired.
+  - path: pipeline/fix_remaining.py
+    lines: [235, 263]
+    mode: replace
+    why: pipeline/** is will_not_touch this session (rail 4); the fix pass writes the text it repaired.
+  - path: tools/watch_s2.py
+    lines: [89]
+    mode: replace
+    why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.
+  - path: tools/model_eval_suite.py
+    lines: [918]
+    mode: replace
+    why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.
+  - path: tools/voting_report.py
+    lines: [65]
+    mode: replace
+    why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.
+  - path: tools/model_eval_report.py
+    lines: [57]
+    mode: replace
+    why: tools/ was outside the first census - declared from measurement so the debt is visible, not forgotten.

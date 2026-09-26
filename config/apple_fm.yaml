@@ -1,0 +1,50 @@
+# apple_fm.yaml - the Apple Foundation Models (macOS 27 on-device LLM) OPTIONAL arm.
+# MEASURED 2026-09-26 on this machine: macOS 27.0 (26A428), M1 Max / 64GB, /usr/bin/fm present with
+# commands respond | chat | count-tokens | schema | serve | available | license, and the Swift 6.1.2
+# toolchain. `fm serve` hosts a Chat Completions API server, so integration is CONFIG-FIRST: no Swift
+# shim and no PyObjC bridge (measured: pyobjc is absent; Python 3.12.1). That is why this file exists.
+#
+# WHAT IT MUST NEVER BECOME (this is the whole point of keeping `arms: []` empty):
+#   C2/C4 - a single CLOSED model family may only ever be an OPTIONAL arm behind a protocol with a
+#           declared fallback. Generator stays Qwen3-Coder; S5 stays DeBERTa (D2298).
+#   C1    - it does not reduce PIPELINE cost, which is already $0 local. The saving it can make is
+#           AGENT-side: the schema-shaped chores that today spend the assistant's context.
+#   C3    - UNVERIFIED until probe.egress is GREEN. A local model that opens an outbound socket is not
+#           sovereign, and AppleIntelligenceReporting.framework is installed on this machine.
+schema_version: "1.0"
+generated: "2026-09-26"
+enabled: false                  # NOTHING may consume this arm until probe_apple_fm.py reports all GREEN
+# VERDICT (D-2654, OPEN 2026-09-26) - NOT ADOPTED ON STRUCTURAL GROUNDS. The four probes are thereby moot:
+#   (1) the weights are SIP-unreadable ('Operation not permitted'), so this arm's model can never be hashed,
+#       pinned (D-382) or stamped (R14): every gen_model it wrote would be an unfalsifiable LABEL.
+#   (2) FoundationModels.framework exists only in the dyld shared cache, so the model VERSION is UNRECORDABLE -
+#       an identity that cannot be measured is not an identity.
+#   (3) every `fm` subcommand returns rc=69 until `sudo fm license` binds EVERY user on the machine; an assistant
+#       must never accept a machine-wide legal agreement on the owner's behalf. NOT ADOPTED owes NO legal act.
+#   (4) the plausible niche (schema-shaped label/route/classify) is already filled by pinned, swappable, $0 local
+#       models (gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit), so marginal capability is ~0 while the default
+#       guardrail path can REWRITE or REFUSE - the wrong failure mode for "less hallucinatory" work.
+#   Egress is NOT a cost of adopting this arm: the Apple on-device stack, the PCC client and auto_opt_in=1 are
+#   already live machine-wide (a fact about the machine, not about this arm).
+verdict: NOT_ADOPTED
+verdict_decision: D-2654
+binary: /usr/bin/fm             # measured; a CLI process, not a linked library
+model: system                   # `fm --model system` = the on-device Apple model (the only value today)
+fallback: "OMLX gemma-4-E4B-it-MLX-4bit / shell - this arm must never be a dependency"
+license:
+  command: "sudo fm license"
+  state: NOT_AGREED             # MEASURED: `fm license --status` -> "Not agreed."
+  scope: machine_wide            # measured text: "applies to every user on the machine" -> OWNER ACT ONLY
+  note: "an assistant must never accept a machine-wide legal agreement on the owner's behalf"
+probe:                          # the four risks the owner approved measuring; all PENDING until licensed
+  egress: PENDING               # does respond/serve open an outbound socket?  (C3 sovereignty)
+  context_ceiling_tokens: null  # MEASURE by bisect with `fm count-tokens`; never trust a recalled number
+  guardrail_fidelity: PENDING   # --guardrails may rewrite or refuse: known-answer byte-compare, or it is a
+                                # silent-transformation hazard for a knowledge pipeline
+  serve_bind: PENDING           # `fm serve` must bind 127.0.0.1 only; a new local port is new attack surface
+protocol:                       # declared now, USED only after the probe passes (C27: protocols first)
+  transport: openai_chat_completions   # what `fm serve` speaks -> fits the provider abstraction (C21/C25)
+  base_url: "http://127.0.0.1:{port}/v1"
+  context_window: strict_verify # any consumer MUST verify the ceiling by measurement, not by the vendor's word
+arms: []                        # no consumer declared => no coupling exists to drift
+gated_on: "owner runs `sudo fm license`; then: python3 scripts/probe_apple_fm.py"

@@ -1,0 +1,16 @@
+schema_version: '1'
+decided: D-2647
+# WHY: Dropbox writes a "<name> (M1 max's conflicted copy YYYY-MM-DD)<ext>" sibling when two
+# machines edit one file, and reverts the LIVE file to an older blob. MEASURED 2026-09-26 in this
+# tree: 36 siblings; 26 held NEWER work than the live file - including the entire D-2645/D-2646
+# rail work (recompute_decision_summary.py), the WIRED justfile, and the 782-record decisions.yaml.
+# A live artifact that reverts under a rail is indistinguishable from silent drift, so every rail
+# that read one of those files read a stale tree and still printed ok.
+name_marker: " (M1 max's conflicted copy "
+archive_dir: archive/conflicted_20260926
+register: governance/CONFLICT_REGISTER.md
+# Measured resolution order. Never guessed: git can prove which side holds which blob.
+resolution_order: [index, head, three_way]
+# A checkpoint is not a document to be text-merged: pipeline state is owner judgement.
+never_touch:
+  - knowledge pipeline/

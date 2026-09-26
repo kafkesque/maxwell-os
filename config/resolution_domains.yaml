@@ -1,0 +1,89 @@
+# resolution_domains.yaml - WHAT a rail resolved an identifier AGAINST (BUG-489; the premise of D-403/D-405).
+#
+# WHY. BUG-488 was never an artifact defect. A receipt named a sha256 whose bytes a PATH no longer held, the rail
+# resolved that digest against LIVE PATHS ONLY, and the resulting JOIN MISS was printed as a fact about the
+# artifact ("one artifact, three digests, a digest matching nothing"). An unwritten premise of a resolver is
+# indistinguishable from a fact about the world: every finding a rail prints inherits it. So a resolver DECLARES
+# its resolution domain here, PUBLISHES its coverage in a D-404 envelope, and PRINTS the domain beside its rows.
+#
+# THE RULE (enforced, not documented). For every resolver below:
+#   * the rail must exist - a domain nobody implements is a comment;
+#   * every declared store must name a READER - a store nothing can read is the BUG-486 class;
+#   * every declared metric must carry a `domain` block (identifier/stores/searched/resolved) in
+#     governance/METRICS.jsonl - scripts/lib/measure.py refuses to emit a declared resolver metric without it;
+#   * a resolver with an empty `metrics` list must carry `no_metric_reason` - emptiness is not a reason;
+#   * a finding may NOT name an artifact defective without naming what was searched. The rail prints one
+#     `domain:` line per resolver, and scripts/reconcile.py joins this file to reality on every run.
+schema_version: "1.0"
+# D-2637 (minted 2026-09-25): this was stamped D-405, and D-405 is a DIFFERENT rule - the
+# declaration-to-reality JOIN (config/reconciliation.yaml, scripts/reconcile.py). One id was carrying two
+# subjects, which only became visible because a stamp is a bare id: nothing could falsify it.
+decided: D-2637
+
+resolvers:
+  - id: handoff_hash_claims
+    rail: scripts/verify_handoffs.py
+    identifier: "a 64-hex sha256 digest quoted in a declared document"
+    stores:
+      - name: declared live paths (config/handoffs.yaml#artifacts)
+        kind: path_bytes
+        reader: scripts/lib/handoff.py::sha256_file
+      - name: declared revision locators (config/handoffs.yaml#revision_locators)
+        kind: declared_revision
+        reader: scripts/lib/handoff.py::git_bytes
+      - name: sealed blob store (governance/handoffs/blobs)
+        kind: content_addressed
+        reader: scripts/lib/handoff.py::blob_dir
+    metrics: [handoff_digests_resolved]
+    fail_mode: >-
+      BUG-488: resolving against live paths only made a SUPERSEDED revision read as "resolves to nothing", and
+      the join miss was reported to the owner as a defect of the artifact.
+
+  - id: handoff_paths
+    rail: scripts/verify_handoffs.py
+    identifier: "a receipted path in governance/HANDOFFS.jsonl"
+    stores:
+      - name: receipt journal (governance/HANDOFFS.jsonl)
+        kind: jsonl
+        reader: scripts/lib/handoff.py::read_receipts
+      - name: working tree
+        kind: path_bytes
+        reader: scripts/lib/handoff.py::sha256_file
+    metrics: [handoff_paths_unchanged]
+    fail_mode: >-
+      a receipt journal read as empty makes every path read as unchanged (BUG-487 class: green by vacancy),
+      which is why the journal floor is declared in config/evidence_floors.yaml.
+
+  - id: reconcile_entries
+    rail: scripts/reconcile.py
+    identifier: "a declared object (config/reconciliation.yaml#entries)"
+    stores:
+      - name: declared entries and meta (config/reconciliation.yaml)
+        kind: declared_objects
+        reader: scripts/reconcile.py::check_entry
+      - name: owned artifacts (config/artifact_ownership.yaml)
+        kind: declared_objects
+        reader: scripts/reconcile.py::cover
+    metrics: [reconcile_objects_agreeing]
+    fail_mode: >-
+      the engine can only report on objects someone DECLARED, so the declaration IS the population. Without the
+      denominator published, "N declared objects agree with reality" cannot be distinguished from "N is small".
+
+  - id: reach_invoked_scripts
+    rail: scripts/reconcile.py
+    identifier: "scripts/check_*.py and scripts/verify_*.py"
+    stores:
+      - name: invocation edges (justfile + config/reconciliation.yaml#meta.reach.declared_commands)
+        kind: invocation_edges
+        reader: scripts/reconcile.py::_reach_closure
+      - name: the script population (scripts/*.py)
+        kind: path_enumeration
+        reader: scripts/reconcile.py::reach
+    metrics: []
+    no_metric_reason: >-
+      reach is evaluated BEFORE reconcile emits its own envelope, so publishing a reach coverage number from
+      inside the same run would be a number without a settled denominator. The coverage this resolver DOES
+      publish is its row text ("N uninvoked of M reachable"), which names the population and the enumeration.
+    fail_mode: >-
+      BUG-486: an invocation edge compared as a PATH against a set of BASENAMES can never fire, so a check that
+      IS wired reads as uninvoked - a claim about the rail presented as a claim about the scripts.

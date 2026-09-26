@@ -1,0 +1,69 @@
+# yaml_guard.yaml - the register for the AMBIGUOUS-DECLARATION axis (BUG-525, landed 2026-09-26).
+#
+# ONE RULE, ONE HOME (D-2646): the rule itself lives in scripts/lib/yaml_guard.py::duplicate_keys, and the
+# WRITE-TIME guard (assert_yaml) calls the SAME function this scan calls - so a writer can no longer create the
+# defect this scan looks for. This register declares only WHAT to scan; it declares no rule.
+#
+# WHY THE RULE EXISTS: PyYAML does not refuse a key declared twice in the same mapping. It SILENTLY keeps the
+# LAST one, so the first declaration is a fact nobody reads (D-2649: one declared fact, one declaration home).
+# MEASURED the day the rule landed: config/pipeline_config.yaml#stage5.confidence was declared twice (the
+# shadowed copy sat directly above `borp_bypass_types:`) and config/store_columns.yaml carried two `ceiling:`
+# blocks - the second written by the rail that had just been asked to record the first. Neither was visible to
+# ANY existing rail, because every neighbouring rail parses the file and PyYAML had already resolved the
+# ambiguity for them. That is the class: the reader cannot see what the parser silently dropped.
+schema_version: '1.0'
+decided: PENDING-OWNER
+bug: BUG-525
+rule_home: scripts/lib/yaml_guard.py
+rail: scripts/lib/yaml_guard.py
+# Bounded by DECLARED depth, never by a tree crawl: this repo lives on a Dropbox path where a full recursive
+# scan times out (300s), and a timed-out scan is not a clean scan.
+roots:
+  - {path: '.', depth: 0}          # root-level *.yaml
+  - {path: config, depth: 0}
+  - {path: governance, depth: 0}
+  - {path: agent, depth: 0}
+  - {path: evals, depth: 0}
+  - {path: backups, depth: 0}
+# A skip is a blind spot, so it is DECLARED here and its count is REPORTED on every run - never silent.
+skip_dirs: ['.git', '__pycache__', 'node_modules', '.venv', 'venv']
+skip_why: >-
+  Version-control and dependency-cache internals: they hold no declaration this repository owns, and walking them
+  costs the scan its time budget on a Dropbox path. Declared, counted and printed rather than skipped quietly.
+exempt: []
+# OWED, not drift: an ambiguous or unreadable artifact whose repair this rail cannot perform (a snapshot with no
+# surviving original, a hand-authored prompt). Loud, rc=2, and settled by the OWNER. The list is SHRINK-ONLY: an
+# entry that now reads cleanly fails as STALE-OWED, so the ceiling can never be padded.
+owed:
+  - path: backups/decisions.PRE_config-first-data-edit_20260925T214936Z.yaml
+    why: >-
+      Does NOT parse: ScannerError 'mapping values are not allowed here' at line 8651 of 602,251 bytes. It is a
+      pre-edit snapshot of config/decisions.yaml, so this revert path is DEAD - a backup that cannot be loaded is
+      not a backup (C23/R-D410). It cannot be repaired from itself; the owner settles it (re-snapshot from the
+      live artifact, or delete via pipeline/safe_delete.py). The LIVE config/decisions.yaml parses cleanly.
+  - path: backups/derivations.PRE_check_config_defaults_20260926T084048Z.yaml
+    why: >-
+      Does NOT parse: ScannerError 'mapping values are not allowed here' at line 132, where a recorded delta
+      ('shadowed_declared 179 -> 209') was written unquoted into a flow context. Same class as the decision
+      snapshot above: a dead revert path, 6,725 bytes, owner decides re-snapshot or delete.
+  - path: evals/promptfooconfig.yaml
+    why: >-
+      Does NOT parse: ParserError at line 5 - the whole D315 prompt is ONE double-quoted YAML scalar carrying
+      unescaped inner quotes ("specialized", "universal"). promptfoo reads YAML, so this eval config cannot load
+      for its own consumer: the D315 depth eval is currently unrunnable from this file. Repairing it means
+      re-quoting 340 lines of prompt text (an eval change, not a formatting change), so the owner decides.
+  - path: backups/store_columns.PRE_check_store_columns_20260926T115814Z.yaml
+    why: >-
+      FOUND BY THIS RAIL ON ITS FIRST RUN, minutes after the snapshot was taken: the backup of the PRE-fix column
+      register carries the duplicated `ceiling:` key (lines 57 and 60). It is a faithful copy of ambiguous bytes,
+      which makes it a REVERT PATH THAT SILENTLY RE-INTRODUCES THE DEFECT - restoring it would restore the
+      last-wins shadow. Kept as history, declared here as unsafe to restore, deleted by the owner (R-D410) or
+      superseded by the post-fix snapshot. This is why backups/ is inside the scan: a snapshot is a declaration
+      too, and an artifact can be defective even when nothing reads it today.
+# The receipt is the coverage claim. A scan that covers FEWER artifacts than this number fails CLOSED, because a
+# silently shrunken scan is indistinguishable from a clean one - the exact way a blind spot survives an audit.
+# MEASURED 2026-09-26 (first full run): 113 artifacts across 6 declared roots, 5 dir names skipped by declaration.
+receipt:
+  artifacts: 113
+  at: '2026-09-26T11:58Z - first run of scripts/lib/yaml_guard.py --check'
+  direction: shrink_only

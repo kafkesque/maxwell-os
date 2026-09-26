@@ -1,0 +1,172 @@
+# reconciliation.yaml - the DECLARATION<->REALITY surface (D-405, the RC-2/RC-3 gate).
+#
+# WHY: ~30 verify_* scripts each check one declaration against one artifact, each written ad hoc, each having
+# to be REMEMBERED. That is why one class (declaration diverges from reality) arrived 30 times under 30 names:
+# BUG-462, BUG-463, BUG-466, BUG-476, BUG-450, BUG-454/461, BUG-459, BUG-468, BUG-455/456, BUG-412.
+#
+# scripts/reconcile.py evaluates every entry below by re-deriving from the DECLARATION and the ARTIFACT
+# independently. It NEVER reads another rail's output, because a rail whose evidence is the same source as the
+# artifact it checks cannot detect drift (BUG-467 class). One command answers "where does declaration disagree
+# with reality, right now?" for every declared object at once.
+#
+# check kinds implemented by the engine (an UNDECLARED kind is a hard failure, never a silent pass):
+#   path_resolves                 - the declared path (or list of paths) exists
+#   consumer_exists               - the declared consumer script(s) exist
+#   count_matches                 - the declared integer equals the artifact's row/record count
+#   digest_current                - the declared sha256 prefix equals the file's current sha256 prefix
+#   key_present                   - the artifact (CSV) carries the declared column
+#   enum_matches                  - the artifact's distinct values in a column equal the declared list
+#   declared_keys_match_columns   - the declared dict's key set equals the artifact's columns with a suffix
+schema_version: "1.0"
+decided: D-405
+
+entries:
+  - id: depth_panel_raters_vs_workbook
+    declares: config/agreement_floor.yaml#panels.depth_axis_panel.rater_status
+    about: governance/anchor_adjudication_workbook_20260924.csv
+    # MEASURED 2026-09-26: this workbook is OWNER-DROPPED Excel-on-macOS output, so it is MacRoman, not UTF-8
+    # (0xCA = non-breaking space, 0xD1 = em dash). The encoding is declared here because it is a fact about the
+    # artifact; the artifact itself is write-locked and was NOT rewritten to suit the reader.
+    encoding: mac_roman
+    check: declared_keys_match_columns
+    column_suffix: _depth
+    why: >
+      BUG-476: the panel DECLARED five raters while only three ever rated, and alpha's missing-cell capability
+      makes an EMPTY COLUMN indistinguishable from a rater who skipped a few rows. This entry makes the two
+      sets provably equal: a declared rater with no column, or an ungoverned *_depth column, is RED.
+
+  - id: depth_panel_consumer_exists
+    declares: config/agreement_floor.yaml#panels.depth_axis_panel.consumer
+    about: scripts/depth_pass_agreement.py
+    check: consumer_exists
+    why: BUG-462 - a declared floor with no consumer is a comment. The consumer must resolve.
+
+  - id: f11_review_present
+    declares: config/agreement_floor.yaml#must_not_be_cited_as
+    about: governance/F11_ANCHOR_REVIEW_20260923.csv
+    check: path_resolves
+    why: >
+      BUG-412 class - the floor forbids citing a raw-agreement figure from this file (BUG-452). A forbidding
+      clause that points at a path nobody resolves is a claim about the world that is never checked.
+
+  - id: depth_workbook_row_count
+    declares: config/cohort_declaration.yaml#cohorts.anchor4_depth.measured_rows
+    about: governance/anchor_adjudication_workbook_20260924.csv
+    encoding: mac_roman   # declared, not guessed: see depth_panel_raters_vs_workbook above (D-2644)
+    check: count_matches
+    why: >
+      BUG-466 / BUG-501 - 148 adjudicated rows against a declared 150-row cohort. The rule WAS ruled (D-393,
+      owner-accepted 2026-09-25) and the declaration MOVED to the artifact that owns the denominator,
+      config/cohort_declaration.yaml - but this entry kept naming the PRE-ruling key
+      (config/agreement_floor.yaml#panels.depth_axis_panel.rows_declared), which was never written anywhere,
+      so a ruled rule kept printing as a pending one. The pointer now names the ONE home and `optional` is
+      GONE: once a denominator is declared, disagreeing with the artifact is DRIFT, not owner-owed.
+      This entry is the SECOND ORACLE for the count (D-402). scripts/depth_pass_agreement.py --check-cohort
+      verifies the declared cohort BALANCES (measured + absent == declared, and declared-absent rows are
+      provably NOT in the workbook); THIS entry pins the declared `measured_rows` to the workbook's ACTUAL
+      row count, so a row silently added or dropped cannot keep the arithmetic closed.
+
+  - id: decision_registry_wellformed
+    declares: config/decisions.yaml#decisions
+    about: config/decisions.yaml
+    check: decision_registry_wellformed
+    why: >
+      BUG-483 - the registry is the source of truth for decision ids and 62 of 766 records carried their state
+      under a legacy `status:` key (or none) while the summariser silently defaulted them to ACTIVE, so the
+      census was wrong while the rail reported "in sync". This entry re-derives the whole registry from the
+      file: duplicate ids under one normalised token, records with no canonical state, and EVERY `decided:` /
+      `decision:` citation under config/** that names a decision which does not exist.
+
+  - id: reconciliation_artifact_resolves
+    declares: governance/RECONCILIATION.json
+    about: governance/RECONCILIATION.json
+    check: path_resolves
+    why: >
+      I1/D-401: the engine's own output is a DECLARED artifact (derived_regenerable, writer_of_record
+      scripts/reconcile.py) and is written through write_guard - so it needs cover like every other declared
+      artifact. An artifact declared and never covered is how its existence goes unchecked (BUG-487).
+
+  - id: artifact_ownership_decided
+    declares: config/artifact_ownership.yaml#decided
+    about: config/artifact_ownership.yaml
+    check: decision_exists
+    why: A config whose provenance stamp names an undefined decision is a claim, not a source (R14).
+
+  - id: reconciliation_decided
+    declares: config/reconciliation.yaml#decided
+    about: config/reconciliation.yaml
+    check: decision_exists
+    why: This file's own stamp must resolve under the same rule it enforces.
+
+  - id: register_divergence_decided
+    declares: config/register_divergence.yaml#decided
+    about: config/register_divergence.yaml
+    check: decision_exists
+    why: BUG-481 cited the BUG as its decision; a bug is a symptom, the decision is the rule.
+
+  - id: depth_domain_contract_decided
+    declares: config/depth_domain_contract.yaml#load_bearing.decided
+    about: config/depth_domain_contract.yaml
+    check: decision_exists
+    why: The load-bearing block cites D-394; the citation must resolve.
+
+artifact_encodings:
+  - about: governance/s4_discipline_review_sheet.csv
+    encoding: mac_roman
+    why: >-
+      MEASURED 2026-09-26 (BUG-516 sweep): 21 non-ASCII byte(s) 0x80, 0x94, 0xd0, 0xd1, 0xe2, not valid UTF-8
+      (first bad byte 0xd1 at offset 5204 = an em dash in Mac Roman, 'N-tilde' in cp1252). Excel-on-macOS wrote
+      this owner-adjudicated sheet (63 contested discipline rows, D2633) in Mac Roman. It was UNDECLARED, which made it a
+      fail-closed landmine for every reader repointed to the one decode home; declared so the declaration, not a guess,
+      decides. NOT identical to the .utf8 sibling (different row/column content - the sibling is not a recoding).
+  # D-2644/D-2649: an artifact's encoding is a DECLARED fact about the artifact, never a guess the reader makes.
+  # scripts/lib/artifact_encoding.py joins THIS block (and config/cohort_declaration.yaml) and fails closed on a
+  # disagreement; scripts/check_encoding_homes.py is the rail that forbids a reader naming a codec itself.
+  - about: governance/s4_domain_review_sheet.csv
+    encoding: mac_roman
+    why: >-
+      MEASURED 2026-09-26: 34 non-ASCII bytes, Excel-on-macOS Mac Roman (0xD1 = em dash, twice in `note`; a
+      double-encoded em dash 0xCF 0x80 0x94; 0xE2 0x80 0x94 spelling a UTF-8 em dash in Mac Roman bytes).
+      scripts/audit_human_verification.py read it as cp1252 and turned the owner's "no signal domain - best-fit"
+      into "no signal domain N-tilde best-fit": a wrong read that does NOT crash (BUG-511). The four columns that
+      reader matches on hold no non-ASCII byte today, so no OUTPUT changed - the read was silent, and that silence
+      is the defect, not the value.
+  - about: governance/anchor_adjudication_workbook_20260924.csv
+    encoding: mac_roman
+    why: >-
+      MEASURED: 0xCA at offset 42564 (a non-breaking space in row 66, Identity<NBSP>As Social Positioning). Already
+      declared mac_roman by the two `entries` above with the SAME value - an agreement D-2649 checks and tolerates
+      rather than assumes, so this entry is redundant by design and must stay consistent with them.
+
+meta:
+  # Every check_*.py / verify_*.py that declares a contract must be reachable from a recipe. BUG-482: three
+  # checks built in one week (check_depth_load_bearing, ingest_panel_column, score_claim_shape_gate) were
+  # invoked by nothing, so the rail built to be un-silent was itself silent.
+  # BUG-483 residual: a key whose NAME is in the citation vocabulary but whose value is not a source. Declared,
+  # reasoned, printed on every run, shrink-only. Renaming a key to escape the rail is NOT an exemption.
+  # EMPTY since 2026-09-25, and it is a FLOOR, not a default: a new entry is a declared decision, not
+  # an edit. The one entry (config/menu_axis_hashes.yaml:decision) was never a citation - it was the
+  # sha256 of the menu's 'decision' AXIS sitting in KEY position. Fixed at the source, not by naming it:
+  # scripts/menu_axis_hashes.py now emits hashes: as a list of {axis, sha256} records.
+  citation_exemptions: []
+
+  reach:
+    # SHRINK-ONLY. Measured baseline 2026-09-25 (4): check_depth_load_bearing.py (BUG-482 - built, invoked by
+    # nothing) + check_session_plan.py, check_stale_toolcall_rows.py, check_suite_coverage.py. This number may
+    # only be LOWERED; raising it is a declared decision, not an edit.
+    debt_max: 0
+    # BUG-486: a declared edge whose reader is compared as a PATH against a set of
+    # BASENAMES can never fire. An edge that fires nothing is now DRIFT, not a silent pass.
+    require_edge_fires: true
+    # D-402/BUG-482: reachability is DERIVED from declared invocation edges, never guessed from a filename.
+    # A file that DECLARES invocations counts only when its declared reader is itself reached.
+    roots: [justfile, scripts/install_git_hooks.sh]
+    declared_commands:
+      - file: governance/p0_p1_criteria.yaml
+        reader: scripts/drift_monitor.py
+    exempt: []
+
+  # Every artifact declared in config/artifact_ownership.yaml must have a reconciliation entry here (matching
+  # `about`) or an `unreconciled_reason`. That is what stops this file from becoming the 31st thing to remember.
+  cover:
+    requires: config/artifact_ownership.yaml

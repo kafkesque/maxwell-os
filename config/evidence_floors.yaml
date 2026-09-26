@@ -1,0 +1,103 @@
+# evidence_floors.yaml - the ONE home for "how little content makes reading this store meaningless" (BUG-487).
+#
+# WHY. An evidence journal that does not exist (or was truncated) reads as EMPTY, and 0 of 0 passes every check
+# ever written. That is how a rail goes green by vacancy (BUG-487): absence is reported as agreement. A floor is
+# the minimum content a store must hold for reading it to be a measurement at all - and a store whose true
+# content IS zero must say so EXPLICITLY (`vacuous: true` + reason), because silence and emptiness look alike.
+#
+# A FLOOR IS FOUR FACTS, NOT ONE NUMBER (BUG-491). A bare number cannot be audited:
+#   1. WHAT COUNTS      `exclude_origins` - a control's fixture is not evidence. A rail's known-answer control
+#                       must not write into the journal it calibrates; grandfathered ones are bounded by a
+#                       SHRINK-ONLY `contaminant_ceiling`.
+#   2. THE POPULATION   `min_distinct_field` + `min_distinct_values` - a record count over an append-per-run log
+#                       is a RUN counter: it is satisfied by re-running the rail, not by measuring anything.
+#   3. THE MINIMUM      `min_records`.
+#   4. WHO ENFORCES IT  `enforced_by` - a floor with no enforcer is a comment.
+# ONE definition of what counts (`lib.measure.floor_check`) is shared by EVERY rail that reports a floor, so no
+# rail can print a number another rail disagrees with. Before BUG-491 was closed, scripts/reconcile.py printed
+# "20 >= 6" while scripts/verify_handoffs.py printed "6 >= 6" for THIS store: one fact, two homes (C12/C21).
+#
+# SHRINK-ONLY DIRECTION: a floor may only be RAISED by edit. Lowering one weakens every check that reads the
+# store, so it requires a declared decision, not an edit. Same direction as config/register_divergence.yaml.
+#
+# schema_version 2.1 (2026-09-25): the contaminant allowance for governance/HANDOFFS.jsonl was a COUNT
+#   ceiling (max: 14) and is now a SEALED SET + shrink-only max_records. A count cannot distinguish a
+#   grandfathered control record from a new one (BUG-491), so the allowance was unfalsifiable in both
+#   directions; a sealed set of digests is falsifiable in both (unsealed record = DRIFT, vanished sealed
+#   digest = DRIFT). SAME REASON as 2.0: a reader that silently ignores a key it does not know is how a
+#   floor stops being a floor, so the change gets a version that makes the incompatibility VISIBLE (R14).
+# schema_version 2.0 (2026-09-25): min_distinct_names -> min_distinct_field + min_distinct_values. The
+#   rename is deliberate. A reader that silently ignores a key it does not know is how a floor stops being a floor,
+#   so a schema change gets a version that makes the incompatibility VISIBLE instead of green (R14).
+schema_version: "2.1"
+decided: D-403
+
+journals:
+  - store: governance/HANDOFFS.jsonl
+    kind: jsonl
+    min_records: 6
+    counted_by: "receipts whose origin is NOT a control fixture"
+    min_distinct_field: path       # the population is the set of DECLARED handoff paths, not the number of runs
+    min_distinct_values: 6         # MEASURED 2026-09-25: 6 counted receipts cover 6 distinct declared paths
+    exclude_origins: [selftest]    # BUG-491: a control's fixture is not evidence
+    contaminant_ceiling:           # SHRINK-ONLY (same direction as config/register_divergence.yaml): only LOWER
+      origin: selftest
+      # SEALED SET (owner gate accepted 2026-09-25; BUG-491 class). A COUNT ceiling cannot tell a GRANDFATHERED
+      # control record from a NEW one: any fixture is legal while n <= max, so 13 and 15 were equally 'green'.
+      # The sealed set names the exact digests that were grandfathered, which makes BOTH directions falsifiable:
+      # a control record whose digest is not sealed is DRIFT, and a sealed digest that has VANISHED is DRIFT too
+      # (R-D410 - a removed record cannot be audited). Nothing was moved or deleted: the allowance is only
+      # TIGHTENED, and the count survives as the shrink-only max_records.
+      sealed_set:
+        digest_field: sha256
+        grandfathered_sha16: ['0682c5f2076f099c', 'e5bc54d3288ee8af']   # MEASURED 2026-09-25: 7 pre-isolation runs x 2 fixtures, 17:55-18:27
+      max_records: 14                # SHRINK-ONLY count of the sealed records - a NEW digest is refused, not counted
+      direction: shrink_only
+      reason: >-
+        scripts/lib/handoff.py --selftest appended 2 fixture receipts to the PRODUCTION journal on every run,
+        which is exactly why this store's floor was unfalsifiable: a journal that grows 2 records per health run
+        can never fall below a floor, so the floor could not fail. Isolation landed 2026-09-25 (the control now
+        runs in a temp sandbox and asserts the production journal is byte-identical). The 14 historical records
+        are GRANDFATHERED, not deleted: a journal is append-only (R-D410) and a record that was removed cannot
+        be audited. Declaring them as a SEALED SET rather than a count is what makes the allowance falsifiable
+        in both directions; a digest OUTSIDE the set means a control is writing into the ruler it calibrates,
+        and a sealed digest that is GONE means evidence was removed.
+    measured: 6                    # counted receipts (origin=backfill); 14 control records sealed (2 digests)
+    enforced_by: scripts/verify_handoffs.py
+  - store: governance/METRICS.jsonl
+    kind: jsonl
+    min_records: 12
+    counted_by: "records"
+    min_distinct_field: name       # BUG-491b: the population is the SET OF METRICS, not the number of runs
+    min_distinct_values: 4         # MEASURED 2026-09-25: 4 distinct metric name(s); the rest are re-emissions
+    measured: 34                   # most of these records are the same 4 metrics re-emitted once per health run
+    enforced_by: scripts/lib/measure.py
+  - store: governance/INSTRUMENT_CONTROLS.jsonl
+    kind: jsonl
+    min_records: 1
+    min_distinct_field: instrument # the population is the set of CALIBRATED INSTRUMENTS
+    min_distinct_values: 1         # MEASURED 2026-09-25: claim_shape_gate's sealed control (D-400)
+    measured: 1
+    enforced_by: scripts/reconcile.py
+  - store: governance/MUTATION_JOURNAL.jsonl
+    kind: jsonl
+    min_records: 1
+    counted_by: "one receipt per guarded write"
+    min_distinct_field: path       # the population is the set of ARTIFACTS written under the guard, not the runs
+    min_distinct_values: 1         # MEASURED 2026-09-25: RECONCILIATION.json - the first guarded write
+    measured: 3
+    vacuity_retired: >-
+      2026-09-25: the first guarded production write LANDED (scripts/reconcile.py -> governance/RECONCILIATION.json
+      through write_guard.write_document, OWNED_ANY, derived_regenerable) so this entry stopped being a vacuity
+      and became a real floor. floor_check reported the old `vacuous: true` as STALE (rc=1) the moment reality
+      contradicted it - the check working, rather than a comment quietly going out of date (BUG-487). Note
+      min_records alone would be a RUN counter here: every reconcile run appends a receipt, so the POPULATION is
+      the set of artifacts written (min_distinct_field: path), not the number of runs (BUG-491b).
+    enforced_by: scripts/lib/write_guard.py
+
+stores:
+  - store: governance/handoffs/blobs
+    kind: content_addressed_dir
+    min_entries: 3
+    measured: 4  # 2026-09-25: rev-1 image + 3 artifact seals
+    enforced_by: scripts/verify_handoffs.py

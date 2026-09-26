@@ -1,0 +1,53 @@
+# instrument_controls.yaml - every instrument that DECIDES must first be measured on a SEALED control (D-400).
+# WHY (RC-5): an instrument's confidence in itself was the only evidence of its quality. Seven instruments
+# shipped this month whose error had never been measured on a control whose answer was known and unavailable
+# to the builder (BUG-480: a perfect screen measured at 10/11; the depth head at n=2).
+# DECLARED BEFORE MEASUREMENT: the control, the denominator and the floor are written here BEFORE the number
+# exists, so the number cannot pick its own falsification.
+schema_version: "1.0"
+decided: D-400
+journal: governance/INSTRUMENT_CONTROLS.jsonl
+floors:
+  agreement_floor: 0.667
+  operative_floor: 0.800
+instruments:
+  - id: claim_shape_gate
+    decides: "the D1/D2 claim-shape bit: comparative + STATED exchange rate + BOUNDARY"
+    path: scripts/score_claim_shape_gate.py
+    instrument_config: config/claim_shape_instrument.yaml
+    predictions: governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITED_Qwen3.8-27B-MLX-4bit.csv
+    id_column: item_id
+    prediction_column: claim_shape_bit
+    positive_ids: candidates
+    negative_ids: negatives
+    positive_value: "1"
+    control:
+      sealed: true
+      n_declared: 11
+      answer_withheld_from: [Qwen3.8-27B-MLX-4bit, assistant]
+      withheld_field: item_id
+      why_sealed: "The cohort membership IS the answer; it existed in the instrument config before any answer
+        did and the elicitor was given item_id withheld. n=11 with 4 positives: one miss moves recall 25 points."
+    floor: {min_recall: 0.75, min_precision: 0.50}
+    decides_production: false
+  - id: depth_head
+    decides: "the DEPTH axis (1-4: universal / cross-domain / domain / specialized)"
+    path: scripts/eval_depth_classifier.py
+    record: governance/depth_eval_classifier_depth_cleanC_core.json
+    control:
+      sealed: false
+      n: 133
+      held_out_kind: builder-chosen internal split
+      owed: "ANCHOR4_DEPTH_PREDICTION_KEY declares rows_with_depth_ref: 2, so the only sealed key this family
+        has is n=2 (BUG-480). The n=133 number is a baseline over a split the builder chose."
+    floor: {min_macro_f1: 0.55}
+    decides_production: false
+  - id: s4_classifier
+    decides: "CT / DISC / ET classification in stage 4"
+    path: tools/model_eval_suite.py
+    control:
+      sealed: false
+      owed: "OWED per D-400: the S4 classifier has never been measured on a control whose answer was withheld
+        from the builder."
+    floor: {min_macro_f1: 0.55}
+    decides_production: false

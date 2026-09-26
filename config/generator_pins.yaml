@@ -1,0 +1,111 @@
+# ── config/generator_pins.yaml — WHO PRODUCED THE NUMBERS (BUG-538 / D-2653) ──
+#
+# WHY THIS FILE EXISTS. Maxwell pinned its SCRIPTS (config/recalibration_pins.yaml) and its EVIDENCE
+# (sha256 blocks in the anchor configs) but pinned ZERO GENERATORS. Every metric record names its
+# generator with a STRING, and a name is not an identity: an `ollama pull`, an HF re-download or an
+# LM Studio re-quantisation moves the bytes while every stored `gen_model` keeps saying the same words.
+# A measurement whose generator silently changed is not a smaller measurement - it is an UNCOMPARABLE
+# one. This was found by measuring, not by reasoning: `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` (the
+# generator) and `gemma-4-E4B-it-MLX-4bit` (the R5 reviewer) are the two cache entries that are NOT
+# content-addressed (rev=main, no symlinks), i.e. exactly the two whose identity could not be read off
+# the store. Checked by scripts/verify_generator_pins.py, on the rail, tri-state (BUG-536 convention).
+#
+# BOUNDARY - WHY THIS IS NOT A RIVAL HOME (D-2646, the BUG-499/BUG-502 class):
+#   * config/pipeline_config.yaml + config/model_assignments.yaml own NAME -> ROLE. They carry no bytes.
+#   * config/recalibration_pins.yaml owns SCRIPT digests - a meter's identity.
+#   * this file owns BYTES-ON-DISK -> DIGEST for a GENERATOR.
+#   Three different RULES, three homes, each boundary declared. A model may appear in all three.
+#
+# THE RAIL CANNOT RE-PIN ITSELF (D-382 / BUG-535). `--pin` PRINTS the measurement and writes nothing:
+# a pin is re-minted by a DECISION, never by a quiet re-hash, so a moved digest must arrive with a
+# NEW decision id.
+#
+# HONEST LIMIT: `sparse_sha256` is a manifest over (relpath, bytes) - it catches an added, removed or
+# re-sized file, which is what a re-pull / re-quantisation does. A byte-swap that preserves every
+# (path, size) is NOT caught by the daily check; it IS caught by `--deep` (per-file sha256) and by
+# `identity_sha256` wherever the snapshot is symlinked (the blob basename is the content digest).
+
+schema_version: '1'
+decided: PENDING            # a mint must arrive with a decision - the rail never writes this file (D-382)
+
+hf_cache: "~/.cache/huggingface/hub"
+ollama_manifests: "~/.ollama/models/manifests"
+
+pins:
+- name: generator_s2
+  role: "S2 convergent FB extraction (JSON) - the heaviest LLM stage; R5 generator"
+  served_as: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  kind: hf_repo
+  repo: lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  rev: bbecedefd826819d2c6b6465e88ca7b9b8ad3407
+  alias_snapshots: [main]   # MEASURED 2026-09-26: this repo carries snapshots/<commit> (14 files, ALL symlinked
+  #   = content-addressed) AND a snapshots/main dir beside it (34 files, 0 symlinks) whose extras are the
+  #   downloader's own bookkeeping (.cache/huggingface/**, CACHEDIR.TAG; 5,842 B). Pinning `main` would bind
+  #   that bookkeeping as if it were weights; the COMMIT is pinned and the alias is DECLARED, so the rail
+  #   checks the alias still holds the same payload. An alias is not a second home: it is the same object,
+  #   and only a disagreement is a fault.
+  resolved_commit: bbecedefd826819d2c6b6465e88ca7b9b8ad3407
+  file_count: 14
+  bytes: 17190793452
+  sparse_sha256: 07bdad28f403c33c30ea383e9fd7f870ddad5e685f87fdb7a9d735324479deb9
+  identity_sha256: de38c442825a14103942e99e5a0bb9f0758a352308ec205b376319804565e0a9
+
+- name: reviewer_r5
+  role: "R5 code review + classification sanity (generator != verifier)"
+  served_as: gemma-4-E4B-it-MLX-4bit
+  kind: hf_repo
+  repo: lmstudio-community/gemma-4-E4B-it-MLX-4bit
+  rev: ce713a0013bb7090305edfb8e3773a07ccae35c1
+  alias_snapshots: [main]   # MEASURED 2026-09-26: pinning the COMMIT (11 files, all symlinked); the aliased
+  #   snapshots/main holds 25 files / 0 symlinks and 3,187 B of harness metadata. See generator_s2.
+  resolved_commit: ce713a0013bb7090305edfb8e3773a07ccae35c1
+  file_count: 11
+  bytes: 6861844944
+  sparse_sha256: 608d8505b6c98846e8ef9e0a1aaf4456a8fd64325b500462f912333ff80f9735
+  identity_sha256: 8810e0c719f5c24280f8fadf7328fb33dc0327750d5312bbfc1b3271c45cadd3
+
+- name: classifier_s4
+  role: "S4 depth/domain classifier (OMLX, long context) - D2249"
+  served_as: gpt-oss-20b-MXFP4-Q8
+  kind: hf_repo
+  repo: mlx-community/gpt-oss-20b-MXFP4-Q8
+  rev: 773a7da77e569019bb0fd17a554b263738d669a3   # AUDIT 2026-09-26: was a TRUNCATED prefix (773a7da77e56), i.e. an approximation pretending to be an identity - the rail reported a PHANTOM "not on disk"
+  resolved_commit: 773a7da77e569019bb0fd17a554b263738d669a3
+  file_count: 12
+  bytes: 12104218243
+  sparse_sha256: af5b5acb649bd5511b4fa0ce2cb380c203efc9ac336f1c9211e174f261e12da8
+  identity_sha256: 0d7af2dda84ea124bd0b7eb3403d9abe0f180c05e231f7d1c0e7e4c2ac8ec0bc
+
+- name: probe_phi4mini
+  role: "S2 fast probe - summarization WITH source text (D2319); NOT an S5 verifier (D2298)"
+  served_as: Phi-4-mini-instruct-8bit
+  kind: hf_repo
+  repo: mlx-community/Phi-4-mini-instruct-8bit
+  rev: 93b273a5497a4fcdcfb7ac00143565506b4f72e4   # AUDIT 2026-09-26: was a TRUNCATED prefix (93b273a5497a)
+  resolved_commit: 93b273a5497a4fcdcfb7ac00143565506b4f72e4
+  file_count: 12
+  bytes: 4097975786
+  sparse_sha256: 97ad18a0e77a06101b7a4d7c14f151c4fe37dfde7280eccfe5ce763973ae3094
+  identity_sha256: c0a22c2e71f1adfd4890d5d5261aaf672d78b9cfe3b75ca472122fa1d8edc60d
+
+- name: nli_verifier_s5
+  role: "S5 fail-closed NLI verifier (D2298) - the rail that decides what may ship"
+  served_as: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+  kind: hf_repo
+  repo: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+  rev: b3546ea6b0346eb6f8d5d68b13c7dc6d0376b3d7   # AUDIT 2026-09-26: was a TRUNCATED prefix (b3546ea6b034)
+  resolved_commit: b3546ea6b0346eb6f8d5d68b13c7dc6d0376b3d7
+  file_count: 12
+  bytes: 4136145852
+  sparse_sha256: b5bcf72c5c5ebd0df2e221a1a0a77346ce4afcd347d95d802d89a3879b20a2fa
+  identity_sha256: 033860c26019e7c464d3d1d84c0a2cd317b95a22f3b02bb6f6a7171e7ff2d332
+
+- name: embeddings_bge_m3
+  role: "S1.5 embedding + source diversity (cluster-before-extract)"
+  served_as: bge-m3:latest
+  kind: ollama_manifest
+  tag: bge-m3:latest
+  config: sha256:0c4c9c2a325fb1cdafec606e6809cb745f1cb26a6d919994400d27372303e276
+  layers:
+  - sha256:a406579cd136771c705c521db86ca7d60a6f3de7c9b5460e6193a2df27861bde
+  - sha256:daec91ffb5dd0c27411bd71f29932917c49cf529a641d0168496c3a501e3062c

@@ -1,0 +1,13 @@
+# config/encoding_homes.yaml - the D-2646 decode-home register.
+# GENERATED from `python3 scripts/check_encoding_homes.py --check`, never hand-typed: the ceiling and the allow
+# list are a MEASUREMENT, so the number cannot be smuggled (BUG-492). `ceiling` is SHRINK-ONLY (D-2642).
+schema_version: '1.0'
+decided: D-2644
+home: scripts/lib/artifact_encoding.py
+scan_roots: [scripts, pipeline]
+exempt: ['scripts/lib', 'scripts/check_encoding_homes.py']
+direction: shrink_only
+# 2026-09-26 (BUG-516 sweep): 12 -> 0. Every module that decided an encoding locally now delegates to the home:
+# the rule lives in ONE place, and a single delegating wrapper is an INTERFACE, not a second implementation.
+ceiling: 0
+allow: []

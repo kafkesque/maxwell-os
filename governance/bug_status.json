@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 301,
-  "open_n": 130,
-  "closed_n": 171,
+  "total_ids": 303,
+  "open_n": 131,
+  "closed_n": 172,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -657,6 +657,11 @@
       "id": "BUG-564",
       "title": "the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26",
       "events": 1
+    },
+    {
+      "id": "BUG-566",
+      "title": "(OPEN, MED): TWO RAILS, ONE FACT - git's OWN next-index is TOLERATED by rail 5 and REFUSED by rail 4",
+      "events": 1
     }
   ],
   "closed": [
@@ -830,6 +835,7 @@
     "BUG-557",
     "BUG-558",
     "BUG-561",
-    "BUG-562"
+    "BUG-562",
+    "BUG-565"
   ]
 }

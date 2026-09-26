@@ -493,6 +493,10 @@ widening_log:
       - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
     acked_by: owner
     acked_on: '2026-09-26'
+    # SPENT 2026-09-26 by the commit that landed it: the PROMOTE. MEASURED, not asserted: HEAD's blob for the
+    # path is 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed (203963 B) and
+    # scripts/verify_handoffs.py now reads `provenance: anchor4_depth_sheet_owner_dropin -> head`, rc=0.
+    spent_by: fe239dfb8ca73c956e0bbdc3c4098421580c75c2
     widened: []
     may_touch_untouched: true
     will_not_touch_untouched: false

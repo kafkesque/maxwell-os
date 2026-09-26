@@ -1072,3 +1072,15 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   only surviving bytes of the body a receipt once certified (574aafef64f0cff7, BUG-559); PURGE would delete the
   specimen. STILL OPEN: BUG-431's CONTENT promotion (merge the owner's complete pass into the TRACKED ANCHOR4 sheet
   and retire 'config/anchor4_interim_state.json') - a DIFFERENT act from the PROMOTE landed above.
+
+- **BUG-565 FIXED (8a84622) + BUG-566 NEW (2026-09-26)**: the staged set is a NUL-separated NAME LIST - ELEVEN
+  tracked paths here contain a SPACE, so one path had been audited as three phantoms (the owner's permit could
+  never GRANT it; the BUG-528 family check could never FORBID it). One home: git_subject.run_git_paths. NEW:
+  rail 4 REFUSES git's own `next-index-*.lock` at a PARTIAL commit while rail 5 tolerates and names it - so no
+  `git commit -- <path>` can pass rail 4 until a declared tolerance lands.
+- **D-2671 PROMOTE LANDED (fe239df, 2026-09-26)**: rev 3 (526991cb, 203963 B) of
+  `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` is the TRACKED revision of its own path, landed
+  through the SPENT owner-acked crossing permit (session_plan entry 24). MEASURED: verify_handoffs rc=2 -> rc=0,
+  `provenance: anchor4_depth_sheet_owner_dropin -> head`; BUG-493 CLOSED. **BUG-431's CONTENT promotion (the
+  owner's 150/150 pass INTO the tracked sheet + retiring config/anchor4_interim_state.json) is STILL an OWNER
+  GATE - the PROMOTE wrote no sheet.**

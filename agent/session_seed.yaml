@@ -407,3 +407,14 @@ open_bugs_n: 128
 # NEXT: (1) BUG-431's CONTENT promotion (owner gate; writes the tracked sheet + retires anchor4_interim_state.json);
 # (2) BUG-560 write_guard for apply_workbook_rulings.py; (3) BUG-563 backups/** + rail output stores; (4) BUG-564
 # remainder (the hook ROUTE); (5) MINT D-2667/2668/2669/2670/2671.
+
+# D-2672 (2026-09-26): BUG-565 FIXED in 8a84622 - the staged set is a NUL-separated NAME LIST
+# (scripts/lib/git_subject.py#run_git_paths, one home: -z + NUL parse); three controls over a REAL synthetic
+# index are SEEN red on the pre-fix code; RAIL 4's --selftest is wired into `just health`. BUG-566 filed: rail 4
+# REFUSES git's OWN next-index-*.lock at a PARTIAL commit while rail 5 tolerates and names it (two homes, one
+# fact) - no partial commit can pass rail 4 until a DECLARED tolerance lands.
+# D-2671 LANDED in fe239df: rev 3 (526991cb, 203963 B) of the write-locked owner drop-in is the TRACKED revision
+# of its own path; the entry-24 crossing permit is SPENT by that commit; verify_handoffs rc=2 -> rc=0
+# (`provenance: anchor4_depth_sheet_owner_dropin -> head`); BUG-493 CLOSED.
+# NEXT: (1) BUG-566 tolerance; (2) BUG-431 CONTENT promotion (OWNER GATE); (3) BUG-560 write_guard for
+# apply_workbook_rulings.py; (4) mints D-2671/D-2672; (5) BUG-563; (6) BUG-564 remainder (the hook ROUTE).

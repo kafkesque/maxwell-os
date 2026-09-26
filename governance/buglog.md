@@ -7107,3 +7107,61 @@ surviving bytes of the foreign body a receipt once certified (574aafef64f0cff7, 
 that path) - the evidence for BUG-559; PURGE would delete the specimen and leave the rule with nothing to be
 re-derived against. The sealed blob 574aafef64f0cff7.bin also holds them, so the ruling costs no history and nothing
 is deleted (R-D410: operators do not destroy a record).
+## BUG-565 (STRUCTURAL, FIXED 2026-09-26 - commit 8a84622, D-2672): a git NAME-LIST read is not a
+whitespace-split of TEXT
+**WHAT WAS BROKEN.** `scripts/check_session_plan.py::_paths()` read the staged set with `git diff --cached
+--name-only` and split it on WHITESPACE. ELEVEN tracked paths in this repo contain a space - INCLUDING the
+write-locked owner instrument this rail exists to guard - so ONE path was audited as SEVERAL phantom paths.
+MEASURED pre-fix, on a REAL synthetic index built from HEAD: `{scripts/space probe.py}` -> rc=1 naming
+`scripts/space` + `probe.py`; `{governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv}` -> rc=1 naming 3
+phantoms. **BOTH DIRECTIONS WERE BLIND AT ONCE:** the owner's one-off crossing permit could never GRANT the path
+it names, and the BUG-528 family check could never FORBID the spaced rename. It was found by the rail REFUSING
+THE OWNER'S OWN PROMOTE - a defect surfaced by the exact act it blocked, not by a code review.
+**FIX.** `scripts/lib/git_subject.py#run_git_paths` owns the `-z` flag AND the NUL parse (ONE home, D-2646: a
+caller cannot forget a flag it does not pass); rail 4 consumes it in both modes; `_staged_count_raw()` counts the
+same way (it reported 12 paths for a 10-path set, and its before/after differential certified that defect because
+it compared two readings, never a reading to reality); THREE controls run the rail END TO END through its own
+`--index-file` over a real synthetic index and are SEEN red on the pre-fix code; RAIL 4's `--selftest` is now
+wired into `just health` (a control nothing runs is a comment, BUG-508/510 class). MEASURED AFTER: 23/23
+controls fire, live staged set 10 paths rc=0.
+**REMAINDER (no live subject today, filed not fixed):** `scripts/verify_recalibration_pins.py::_staged_paths()`
+still splits on whitespace (a spaced PIN path would escape the write gate); `scripts/lib/git_subject.py#selftest`'s
+differential control compares two equally-split reads (it certifies the pin, not the parse). Same fact, other homes.
+
+## BUG-566 (OPEN, MED): TWO RAILS, ONE FACT - git's OWN next-index is TOLERATED by rail 5 and REFUSED by rail 4
+**MEASURED 2026-09-26 while landing 8a84622.** `git commit -- <path>` (a PARTIAL commit) makes git hand the hook
+`GIT_INDEX_FILE=<gitdir>/next-index-46129.lock`. Rail 5 (check_declaration_consumers) TOLERATES and NAMES it:
+"at the WRITE moment that IS the commit's subject, so it is accepted and NAMED". Rail 4's git-subject pin REFUSED
+it ("names a DIFFERENT subject than the one audited"), so NO partial commit can pass rail 4 - and a rule that
+cannot fire on the legitimate case is the exact shape BUG-527's own doc forbids. TWO HOMES, TWO RULES, ONE FACT
+(D-2646). **REMEDY (not taken, it is the next step):** a DECLARED tolerance in
+`config/repo_integrity.yaml#git_subject` - accept an ambient index that IS git's own next-index for the PINNED
+git dir, refuse one that belongs to another git dir - with both controls (the legitimate partial commit is
+TOLERATED; a foreign next-index is REFUSED). **NOT WORKED AROUND:** the fix landed through git's normal index API
+(unstage -> stage, every digest re-measured; the drop-in stayed 526991cb), not `--no-verify`, and no rule was bent.
+
+**BUG-493 STATUS (2026-09-26, CLOSED - MEASURED, not argued).** The owner's PROMOTE landed as `fe239df`:
+`git cat-file -p HEAD:<path> | shasum -a 256` = 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
+(203963 B). The receipt now joins by HEAD - `provenance: anchor4_depth_sheet_owner_dropin -> head` - and
+`scripts/verify_handoffs.py` is rc=0 (was rc=2 naming EXACTLY ONE owner-owed object). The label fixes landed WITH
+the bytes, so no declaration describes the superseded revision (config/handoffs.yaml REV 2->3;
+config/human_instrument_locks.yaml comment - the sha256 line is the RULE and is unchanged;
+config/anchor4_depth_annex.yaml's stale rev-2 digest reduced to a POINTER, D-2646). NO new receipt and NO rev-3
+locator: 13 records already carry 526991cb/203963, and a locator exists to resolve SUPERSEDED bytes while rev 3
+IS the head. **STILL OWED AND DISTINCT: BUG-431's CONTENT promotion** (merge the owner's complete 150/150 pass
+INTO the tracked governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, then retire config/anchor4_interim_state.json)
+- an OWNER GATE; this commit wrote no sheet.
+
+
+**BUG-493 STATUS (2026-09-26, CLOSED - MEASURED, not argued).** The owner's PROMOTE landed as `fe239df`:
+`git cat-file -p HEAD:<path> | shasum -a 256` = 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
+(203963 B). The receipt now joins by HEAD - `provenance: anchor4_depth_sheet_owner_dropin -> head` - and
+`scripts/verify_handoffs.py` is rc=0 (was rc=2 naming EXACTLY ONE owner-owed object). The label fixes landed WITH
+the bytes, so no declaration describes the superseded revision (config/handoffs.yaml REV 2->3;
+config/human_instrument_locks.yaml comment - the sha256 line is the RULE and is unchanged;
+config/anchor4_depth_annex.yaml's stale rev-2 digest reduced to a POINTER, D-2646). NO new receipt and NO rev-3
+locator: 13 records already carry 526991cb/203963, and a locator exists to resolve SUPERSEDED bytes while rev 3
+IS the head. **STILL OWED AND DISTINCT: BUG-431's CONTENT promotion** (merge the owner's complete 150/150 pass
+INTO the tracked governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, then retire config/anchor4_interim_state.json)
+- an OWNER GATE; this commit wrote no sheet.
+

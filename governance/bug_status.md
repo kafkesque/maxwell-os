@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**130 open** / 171 closed of 301 ids.
+**131 open** / 172 closed of 303 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -137,3 +137,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-560 | (MED - D-2666, OPEN 2026-09-26): the sanctioned applier rewrites a `human_authored` artifact OUTSIDE write_guard and leaves no mutation rece | 1 |
 | BUG-563 | (MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git | 1 |
 | BUG-564 | the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26 | 1 |
+| BUG-566 | (OPEN, MED): TWO RAILS, ONE FACT - git's OWN next-index is TOLERATED by rail 5 and REFUSED by rail 4 | 1 |

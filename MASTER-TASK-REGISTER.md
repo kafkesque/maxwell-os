@@ -494,3 +494,17 @@ OWED (mine, next in order):
   (d) a receipt over an EARLIER COMMITTED revision still reads unrevisioned (remedy = a declared revision locator).
 RISK NOTE: the highest future-tax item is now CLOSED - before this commit a worktree clean destroyed BOTH copies of a
 write-locked owner instrument (HEAD carried rev 2; rev 3 lived only in the tree and in a gitignored *.bin blob).
+
+### D-2671 / D-2672 DONE / OWED (2026-09-26)
+DONE (8a84622): **BUG-565 FIXED** - a git name-list read is NUL-separated; one home
+(`scripts/lib/git_subject.py#run_git_paths`), rail 4 consumes it, three controls over a REAL synthetic index are
+SEEN red pre-fix, and RAIL 4's `--selftest` is wired into `just health`. MEASURED: 23/23 controls.
+DONE (fe239df): **THE PROMOTE - owner word 'Promote'.** rev 3 (526991cb, 203963 B) is the TRACKED revision of
+`governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`, landed through the owner-acked ONE-OFF crossing
+permit (session_plan widening_log entry 24), SPENT in this same commit-set. MEASURED AFTER:
+`provenance: anchor4_depth_sheet_owner_dropin -> head`, `verify_handoffs` rc=0 (was rc=2). **BUG-493 CLOSED.**
+OWED: (1) **BUG-566** - rail 4 refuses git's OWN next-index at a partial commit while rail 5 tolerates it: a
+declared tolerance in `config/repo_integrity.yaml#git_subject` + two controls; (2) BUG-565 remainder (rail 3's
+`_staged_paths`, git_subject's differential control); (3) **BUG-431's CONTENT promotion** - OWNER GATE; (4) mints
+D-2671/D-2672; (5) BUG-560 -> BUG-563 -> BUG-564 remainder.
+RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies of a write-locked owner instrument.
